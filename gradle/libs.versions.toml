@@ -15,6 +15,9 @@ compose-compiler = "1.5.6"
 compose-plugin = "1.6.0-alpha01"
 junit = "4.13.2"
 kotlin = "1.9.21"
+mockmp = "1.16.0"
+ksp = "1.9.21-1.0.15"
+dokka = "1.9.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -38,3 +41,7 @@ androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+mockmp = { id = "org.kodein.mock.mockmp", version.ref = "mockmp" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

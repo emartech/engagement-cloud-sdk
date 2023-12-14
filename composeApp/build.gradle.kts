@@ -1,6 +1,5 @@
 import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -8,9 +7,17 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
 }
 
+repositories {
+    google()
+    mavenCentral()
+    maven(url = "https://www.jitpack.io")
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+}
+
 kotlin {
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
+    jvmToolchain(17)
+
+    js {
         moduleName = "composeApp"
         browser {
             commonWebpackConfig {
