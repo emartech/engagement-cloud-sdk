@@ -7,11 +7,12 @@ plugins {
     alias(libs.plugins.dokka) apply false
     alias(libs.plugins.mockmp) apply false
     alias(libs.plugins.ksp) apply false
+    alias(libs.plugins.buildConfig) apply false
 }
 
 repositories {
-    google()
     mavenCentral()
     maven(url = "https://www.jitpack.io")
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    google()
 }

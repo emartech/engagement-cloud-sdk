@@ -2,18 +2,21 @@ package com.emarsys.core.device
 
 import kotlinx.serialization.Serializable
 
+const val UNKNOWN_VERSION_NAME = "unknown"
 
 data class DeviceInfo(
     val platform: String,
     val applicationVersion: String,
     val deviceModel: String,
     val manufacturer: String,
+    val displayMetrics: String,
     val osVersion: String,
     val sdkVersion: String,
     val language: String,
     val timezone: String,
     val iOSPushSettings: PushSettings?,
     val androidNotificationSettings: NotificationSettings?,
+    val isDebugMode: Boolean,
     val hardwareId: String
 )
 

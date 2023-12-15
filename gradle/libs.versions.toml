@@ -18,6 +18,7 @@ kotlin = "1.9.21"
 mockmp = "1.16.0"
 ksp = "1.9.21-1.0.15"
 dokka = "1.9.0"
+buildConfig = "4.2.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -45,3 +46,4 @@ kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", versio
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 mockmp = { id = "org.kodein.mock.mockmp", version.ref = "mockmp" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+buildConfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildConfig" }
