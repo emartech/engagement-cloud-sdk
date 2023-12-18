@@ -5,8 +5,6 @@ import android.app.Application
 import android.app.NotificationManager
 import android.content.Context
 import android.content.SharedPreferences
-import com.emarsys.core.device.DeviceInfoCollector
-import com.emarsys.core.storage.StringStorage
 
 actual class CommonPlatformContext actual constructor() : PlatformContext {
     val application: Application by lazy {

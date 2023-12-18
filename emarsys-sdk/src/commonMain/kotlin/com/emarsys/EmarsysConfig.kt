@@ -1,6 +1,6 @@
 package com.emarsys
 
-import com.emarsys.core.exceptions.PreconditionFailed
+import com.emarsys.core.exceptions.PreconditionFailedException
 
 
 data class EmarsysConfig(val applicationCode: String? = null, val merchantId: String? = null)
@@ -8,13 +8,13 @@ data class EmarsysConfig(val applicationCode: String? = null, val merchantId: St
 fun EmarsysConfig.isValid(): Boolean {
     val invalidCases = listOf("null", "", "0", "test")
     if (invalidCases.contains(applicationCode)) {
-        throw PreconditionFailed("ApplicationCode should be valid!")
+        throw PreconditionFailedException("ApplicationCode should be valid!")
     }
     if (invalidCases.contains(merchantId)) {
-        throw PreconditionFailed("MerchantId should be valid!")
+        throw PreconditionFailedException("MerchantId should be valid!")
     }
     if (applicationCode == null && merchantId == null) {
-        throw PreconditionFailed("ApplicationCode or MerchantId must be present for Tracking!")
+        throw PreconditionFailedException("ApplicationCode or MerchantId must be present for Tracking!")
     }
     return true
 }

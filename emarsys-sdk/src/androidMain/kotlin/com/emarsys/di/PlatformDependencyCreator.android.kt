@@ -1,9 +1,6 @@
 package com.emarsys.di
 
 import PlatformContext
-import android.app.NotificationManager
-import android.content.Context
-import android.content.SharedPreferences
 import com.emarsys.core.device.AndroidLanguageProvider
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.LanguageProvider

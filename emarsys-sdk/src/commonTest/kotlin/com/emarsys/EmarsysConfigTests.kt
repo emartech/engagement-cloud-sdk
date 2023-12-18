@@ -1,6 +1,6 @@
 package com.emarsys
 
-import com.emarsys.core.exceptions.PreconditionFailed
+import com.emarsys.core.exceptions.PreconditionFailedException
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import kotlin.test.Test
@@ -23,7 +23,7 @@ class EmarsysConfigTest {
         config.applicationCode shouldBe "null"
         config.merchantId shouldBe "merchantId"
 
-        shouldThrow<PreconditionFailed> {
+        shouldThrow<PreconditionFailedException> {
             config.isValid()
         }
     }
