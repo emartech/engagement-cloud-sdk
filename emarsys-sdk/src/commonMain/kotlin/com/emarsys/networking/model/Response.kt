@@ -17,3 +17,7 @@ inline fun <reified T> Response.body(): T {
 fun Response.isSuccess(): Boolean {
     return status.isSuccess()
 }
+
+fun Response.isRetryable(): Boolean {
+    return !isSuccess() && (status.value == 408 || status.value == 429 || status.value !in 400..499)
+}
