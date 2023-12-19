@@ -38,23 +38,23 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
-            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
-            implementation("io.ktor:ktor-client-core:2.3.4")
-            implementation("io.ktor:ktor-client-content-negotiation:2.3.4")
-            implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.4")
-            implementation("io.ktor:ktor-serialization:2.3.4")
+            implementation(libs.kotlinx.datetime)
+            implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.ktor.serialization)
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
-            implementation("io.ktor:ktor-client-mock:2.3.4")
-            implementation("io.kotest:kotest-framework-engine:5.8.0")
-            implementation("io.kotest:kotest-assertions-core:5.8.0")
+            implementation(libs.ktor.client.mock)
+            implementation(libs.kotest.framework.engine)
+            implementation(libs.kotest.assertions.core)
         }
         androidMain.dependencies {
-            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-            implementation("io.ktor:ktor-client-android:2.3.4")
+            implementation(libs.kotlinx.coroutines.android)
+            implementation(libs.ktor.client.android)
         }
 
         val androidUnitTest by getting {
@@ -65,14 +65,15 @@ kotlin {
         val androidInstrumentedTest by getting {
             dependencies {
                 implementation(kotlin("test"))
-                implementation("io.mockk:mockk-android:1.13.8")
-                implementation("androidx.test:runner:1.5.2")
-                implementation("androidx.test.ext:junit:1.1.5")
-                implementation("io.kotest:kotest-assertions-core:5.8.0")
+                implementation(libs.mockk.android)
+                implementation(libs.androidx.runner)
+                implementation(libs.androidx.test.junit)
+                implementation(libs.kotest.assertions.core)
             }
         }
+
         jsMain.dependencies {
-            implementation("io.ktor:ktor-client-js:2.3.4")
+            implementation(libs.ktor.client.js)
         }
         jsTest.dependencies {
             implementation(kotlin("test-js"))
