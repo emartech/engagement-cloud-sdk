@@ -1,5 +1,5 @@
 package com.emarsys.di
 
 object DependencyInjection {
-    var container: DependencyContainerApi? = null
+    var container: DependencyContainerApi? = DependencyContainer()
 }

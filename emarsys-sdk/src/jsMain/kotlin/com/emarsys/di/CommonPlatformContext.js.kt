@@ -1,5 +1,10 @@
 package com.emarsys.di
 
-import PlatformContext
+import kotlinx.browser.window
+import org.w3c.dom.Storage
 
-actual class CommonPlatformContext actual constructor() : PlatformContext
+actual class CommonPlatformContext actual constructor() : PlatformContext {
+
+    val storage: Storage = window.localStorage
+
+}

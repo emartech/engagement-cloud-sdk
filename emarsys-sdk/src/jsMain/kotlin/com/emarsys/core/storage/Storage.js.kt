@@ -1,0 +1,19 @@
+package com.emarsys.core.storage
+
+import org.w3c.dom.Storage
+
+class Storage(private val storage: Storage): StorageApi {
+
+    override fun put(key: String, value: String?) {
+        if (value == null) {
+            storage.removeItem(key)
+        } else {
+            storage.setItem(key, value)
+        }
+    }
+
+    override fun get(key: String): String? {
+        return storage.getItem(key)
+    }
+
+}

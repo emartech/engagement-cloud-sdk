@@ -60,6 +60,7 @@ kotlin {
         val androidUnitTest by getting {
             dependencies {
                 implementation(kotlin("test"))
+                implementation("io.mockk:mockk-android:1.13.8")
             }
         }
         val androidInstrumentedTest by getting {

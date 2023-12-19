@@ -1,6 +1,5 @@
 package com.emarsys.di
 
-import PlatformContext
 import android.app.Application
 import android.app.NotificationManager
 import android.content.Context

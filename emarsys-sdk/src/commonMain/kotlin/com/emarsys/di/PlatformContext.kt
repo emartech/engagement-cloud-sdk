@@ -1,4 +1,3 @@
+package com.emarsys.di
 
-interface PlatformContext {
-    
-} 
+interface PlatformContext

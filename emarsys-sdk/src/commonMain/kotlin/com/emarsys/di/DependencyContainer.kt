@@ -1,21 +1,20 @@
 package com.emarsys.di
 
-import PlatformContext
 import com.emarsys.core.device.DeviceInfoCollector
-import com.emarsys.core.storage.Storage
 import com.emarsys.networking.GenericNetworkClient
 import io.ktor.client.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
+import com.emarsys.core.storage.StorageApi
 
 class DependencyContainer : DependencyContainerApi {
 
-    val platformContext: PlatformContext = CommonPlatformContext()
+    private val platformContext: PlatformContext = CommonPlatformContext()
 
-    val dependencyCreator: DependencyCreator = PlatformDependencyCreator(platformContext)
+    private val dependencyCreator: DependencyCreator = PlatformDependencyCreator(platformContext)
 
-    val storage: Storage by lazy { dependencyCreator.createStringStorage() }
+    val storage: StorageApi by lazy { dependencyCreator.createStorage() }
 
     val deviceInfoCollector: DeviceInfoCollector by lazy { dependencyCreator.createDeviceInfoCollector() }
 

@@ -1,3 +1,3 @@
 package com.emarsys.di
 
-interface DependencyContainerApi {}
+interface DependencyContainerApi
