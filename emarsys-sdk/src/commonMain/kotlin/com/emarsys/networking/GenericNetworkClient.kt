@@ -4,48 +4,57 @@ import com.emarsys.core.exceptions.FailedRequestException
 import com.emarsys.core.exceptions.RetryLimitReachedException
 import com.emarsys.networking.model.Response
 import com.emarsys.networking.model.UrlRequest
-import com.emarsys.networking.model.isRetryable
-import com.emarsys.networking.model.isSuccess
 import io.ktor.client.*
+import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import io.ktor.http.*
 import kotlin.time.Duration.Companion.seconds
 
-class GenericNetworkClient(private val client: HttpClient) : NetworkClient, Retrier() {
+class GenericNetworkClient(private val client: HttpClient) : NetworkClient {
 
     private companion object {
-        const val RETRY_COUNT = 5
+        const val MAX_RETRY_COUNT = 5
         val RETRY_DELAY = 2.seconds
     }
 
     override suspend fun send(request: UrlRequest): Response {
-        val response = retry(RETRY_COUNT, RETRY_DELAY, ::shouldRetry) {
-            val httpResponse = client.request {
-                method = request.method
-                url(request.urlString)
-                request.headers?.forEach {
-                    header(it.key, it.value)
+        var retries = 0
+        val httpResponse = client.request {
+            if (request.shouldRetryOnFail) {
+                retry {
+                    constantDelay(RETRY_DELAY.inWholeMilliseconds)
+                    retryIf(MAX_RETRY_COUNT) { _, httpResponse ->
+                        retries++
+                        shouldRetry(httpResponse)
+                    }
                 }
-                request.bodyString?.let { setBody(request.bodyString) }
             }
-            val bodyAsText = httpResponse.bodyAsText()
-
-            Response(
-                request,
-                httpResponse.status,
-                httpResponse.headers,
-                bodyAsText
-            )
+            method = request.method
+            url(request.urlString)
+            request.headers?.forEach {
+                header(it.key, it.value)
+            }
+            request.bodyString?.let { setBody(request.bodyString) }
         }
 
-        if (response.isSuccess()) {
-            return response
-        } else {
+        val response = Response(
+            request,
+            httpResponse.status,
+            httpResponse.headers,
+            httpResponse.bodyAsText()
+        )
+        if (!httpResponse.status.isSuccess()) {
+            if (retries == MAX_RETRY_COUNT) {
+                throw RetryLimitReachedException("Request retry limit reached! Response: ${httpResponse.bodyAsText()}")
+            }
             throw FailedRequestException(response)
         }
+
+        return response
     }
 
-    private fun shouldRetry(response: Response): Boolean {
-        return response.isRetryable()
+    private fun shouldRetry(response: HttpResponse): Boolean {
+        return !response.status.isSuccess() && (response.status.value == 408 || response.status.value == 429 || response.status.value !in 400..499)
     }
 }

@@ -11,6 +11,7 @@ import io.kotest.matchers.shouldBe
 import io.ktor.client.*
 import io.ktor.client.engine.*
 import io.ktor.client.engine.mock.*
+import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
@@ -106,6 +107,47 @@ class GenericNetworkClientTests {
     @Test
     fun testSend_should_send_request_that_fails_withRetries() = runTest {
         val mockHttpEngine = MockEngine.config {
+            repeat(6) {
+                addHandler {
+                    respond(
+                        ByteReadChannel("""{"eventName":"test"}"""),
+                        status = HttpStatusCode.InternalServerError,
+                        headers = Headers.Empty
+                    )
+                }
+            }
+            addHandler {
+                respond(
+                    ByteReadChannel("""{"eventName":"test"}"""),
+                    status = HttpStatusCode.OK,
+                    headers = Headers.Empty,
+                )
+            }
+        }
+        val httpClient = HttpClient(mockHttpEngine) {
+            install(ContentNegotiation) {
+                json()
+            }
+            install(HttpRequestRetry)
+        }
+        genericNetworkClient = GenericNetworkClient(httpClient)
+        val urlString = URLBuilder("https://denna.gservice.emarsys.net/customResponseCode/500").build()
+        val request = UrlRequest(
+            urlString,
+            HttpMethod.Get,
+            null,
+            mapOf("Content-Type" to listOf("application/json"))
+        )
+
+        val exception = shouldThrow<RetryLimitReachedException> {
+            genericNetworkClient.send(request)
+        }
+        exception.message shouldBe """Request retry limit reached! Response: {"eventName":"test"}"""
+    }
+
+    @Test
+    fun testSend_should_send_request_that_succeeds_after_retries() = runTest {
+        val mockHttpEngine = MockEngine.config {
             repeat(5) {
                 addHandler {
                     respond(
@@ -127,46 +169,7 @@ class GenericNetworkClientTests {
             install(ContentNegotiation) {
                 json()
             }
-        }
-        genericNetworkClient = GenericNetworkClient(httpClient)
-        val urlString = URLBuilder("https://denna.gservice.emarsys.net/customResponseCode/500").build()
-        val request = UrlRequest(
-            urlString,
-            HttpMethod.Get,
-            null,
-            mapOf("Content-Type" to listOf("application/json"))
-        )
-
-        val exception = shouldThrow<RetryLimitReachedException> {
-            genericNetworkClient.send(request)
-        }
-        exception.message shouldBe "Retry failed after 5 retries"
-    }
-
-    @Test
-    fun testSend_should_send_request_that_succeeds_after_retries() = runTest {
-        val mockHttpEngine = MockEngine.config {
-            repeat(4) {
-                addHandler {
-                    respond(
-                        ByteReadChannel("""{"eventName":"test"}"""),
-                        status = HttpStatusCode.InternalServerError,
-                        headers = Headers.Empty
-                    )
-                }
-            }
-            addHandler {
-                respond(
-                    ByteReadChannel("""{"eventName":"test"}"""),
-                    status = HttpStatusCode.OK,
-                    headers = Headers.Empty,
-                )
-            }
-        }
-        val httpClient = HttpClient(mockHttpEngine) {
-            install(ContentNegotiation) {
-                json()
-            }
+            install(HttpRequestRetry)
         }
         genericNetworkClient = GenericNetworkClient(httpClient)
 
@@ -205,6 +208,7 @@ class GenericNetworkClientTests {
             install(ContentNegotiation) {
                 json()
             }
+            install(HttpRequestRetry)
         }
         genericNetworkClient = GenericNetworkClient(httpClient)
     }
