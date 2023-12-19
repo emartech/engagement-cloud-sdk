@@ -1,3 +1,6 @@
+import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
+import com.github.gmazzo.gradle.plugins.BuildConfigTask
+
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
@@ -31,17 +34,6 @@ kotlin {
             }
         }
         binaries.executable()
-    }
-
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach { iosTarget ->
-        iosTarget.binaries.framework {
-            baseName = "emarsys-sdk"
-            isStatic = true
-        }
     }
 
     sourceSets {
@@ -79,9 +71,6 @@ kotlin {
                 implementation("io.kotest:kotest-assertions-core:5.8.0")
             }
         }
-
-        iosMain.dependencies {
-        }
         jsMain.dependencies {
             implementation("io.ktor:ktor-client-js:2.3.4")
         }
@@ -114,6 +103,13 @@ android {
 buildConfig {
     packageName("com.emarsys.core.device")
     buildConfigField("String", "VERSION_NAME", "\"0.0.1\"")
+}
+
+afterEvaluate {
+    tasks.withType<AndroidLintAnalysisTask>()
+        .configureEach {// https://github.com/gmazzo/gradle-buildconfig-plugin/issues/67
+            mustRunAfter(tasks.withType<BuildConfigTask>())
+        }
 }
 
 mockmp {
