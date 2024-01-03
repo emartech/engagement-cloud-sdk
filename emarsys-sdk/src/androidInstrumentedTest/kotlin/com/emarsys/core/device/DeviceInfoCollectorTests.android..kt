@@ -14,6 +14,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.After
 import org.junit.Before
@@ -62,30 +63,31 @@ class DeviceInfoCollectorTests {
 
     @Test
     fun test_collect_shouldReturn_deviceInfo() {
+        val expectedPlatformInfo = AndroidDeviceInfo(
+            applicationVersion = APP_VERSION,
+            osVersion = Build.VERSION.RELEASE,
+            null,
+            isDebugMode = true,
+        )
+        val expectedDeviceInfo = DeviceInformation(
+            platform = "android",
+            manufacturer = Build.MANUFACTURER,
+            displayMetrics = "${Resources.getSystem().displayMetrics.widthPixels}x${Resources.getSystem().displayMetrics.heightPixels}",
+            model = Build.MODEL,
+            sdkVersion = BuildConfig.VERSION_NAME,
+            language = LANGUAGE,
+            timezone = "+0900",
+            hardwareId = "test hwid",
+            platformInfo = Json.encodeToString(expectedPlatformInfo)
+        )
         testAndroidDeviceInfoCollector = AndroidDeviceInfoCollector(mockContext, true)
         val deviceInfoCollector =
             DeviceInfoCollector(testAndroidDeviceInfoCollector, mockLanguageProvider)
 
         val result = deviceInfoCollector.collect()
 
-        val deviceInfo = Json.decodeFromString<DeviceInformation>(result)
-
+        result shouldBe Json.encodeToString(expectedDeviceInfo)
         verify { mockLanguageProvider.provideLanguage() }
-
-        deviceInfo.platform shouldBe "android"
-        deviceInfo.manufacturer shouldBe Build.MANUFACTURER
-        deviceInfo.displayMetrics shouldBe "${Resources.getSystem().displayMetrics.widthPixels}x${Resources.getSystem().displayMetrics.heightPixels}"
-        deviceInfo.model shouldBe Build.MODEL
-        deviceInfo.sdkVersion shouldBe BuildConfig.VERSION_NAME
-        deviceInfo.language shouldBe LANGUAGE
-        deviceInfo.timezone shouldBe "+0900"
-        deviceInfo.hardwareId shouldBe "test hwid"
-
-        val platformInfo = Json.decodeFromString<AndroidDeviceInfo>(deviceInfo.platformInfo)
-
-        platformInfo.applicationVersion shouldBe APP_VERSION
-        platformInfo.isDebugMode shouldBe true
-        platformInfo.osVersion shouldBe Build.VERSION.RELEASE
     }
 
     @Test
