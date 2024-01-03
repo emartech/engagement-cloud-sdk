@@ -6,16 +6,16 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class StorageTests {
+class StringStorageTests {
 
     companion object {
         private const val KEY = "testKey"
     }
-    private lateinit var storage: Storage
+    private lateinit var storage: StringStorage
 
     @BeforeTest
     fun setup() {
-        storage = Storage(window.localStorage)
+        storage = StringStorage(window.localStorage)
     }
     
     @AfterTest

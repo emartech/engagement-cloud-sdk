@@ -1,9 +1,9 @@
 package com.emarsys.core.storage
 
-interface StorageApi {
+interface StorageApi<Value> {
 
-    fun put(key: String, value: String?)
+    fun put(key: String, value: Value?)
 
-    fun get(key: String): String?
+    fun get(key: String): Value?
 
 }
