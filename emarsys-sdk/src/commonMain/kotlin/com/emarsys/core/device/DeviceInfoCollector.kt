@@ -1,6 +1,5 @@
 package com.emarsys.core.device
 
-expect class DeviceInfoCollector {
-    fun collectDeviceInfoRequest(): String
-
+expect class DeviceInfoCollector: DeviceInfoCollectorApi {
+    override fun collect(): String
 }

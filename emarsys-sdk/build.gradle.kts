@@ -26,7 +26,7 @@ kotlin {
     jvmToolchain(17)
     androidTarget()
 
-    js {
+    js(IR) {
         moduleName = "emarsys-sdk"
         browser {
             commonWebpackConfig {
@@ -37,30 +37,36 @@ kotlin {
     }
 
     sourceSets {
-        commonMain.dependencies {
-            implementation(libs.kotlinx.datetime)
-            implementation(libs.kotlinx.coroutines.core)
-            implementation(libs.kotlinx.serialization.json)
-            implementation(libs.ktor.client.core)
-            implementation(libs.ktor.client.content.negotiation)
-            implementation(libs.ktor.serialization.kotlinx.json)
-            implementation(libs.ktor.serialization)
+        val commonMain by getting {
+            dependencies {
+                implementation(libs.kotlinx.datetime)
+                implementation(libs.kotlinx.coroutines.core)
+                implementation(libs.kotlinx.serialization.json)
+                implementation(libs.ktor.client.core)
+                implementation(libs.ktor.client.content.negotiation)
+                implementation(libs.ktor.serialization.kotlinx.json)
+                implementation(libs.ktor.serialization)
+            }
         }
-        commonTest.dependencies {
-            implementation(kotlin("test"))
-            implementation(libs.ktor.client.mock)
-            implementation(libs.kotest.framework.engine)
-            implementation(libs.kotest.assertions.core)
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+                implementation(libs.mockk.android)
+                implementation(libs.ktor.client.mock)
+                implementation(libs.kotest.framework.engine)
+                implementation(libs.kotest.assertions.core)
+            }
         }
-        androidMain.dependencies {
-            implementation(libs.kotlinx.coroutines.android)
-            implementation(libs.ktor.client.android)
-        }
-
+       val androidMain by getting {
+           dependencies {
+               implementation(libs.kotlinx.coroutines.android)
+               implementation(libs.ktor.client.android)
+           }
+       }
         val androidUnitTest by getting {
             dependencies {
                 implementation(kotlin("test"))
-                implementation("io.mockk:mockk-android:1.13.8")
+                implementation(libs.mockk.android)
             }
         }
         val androidInstrumentedTest by getting {
@@ -88,11 +94,13 @@ android {
 
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
             excludes += "/META-INF/LICENSE.md"
+            excludes += "/META-INF/LICENSE-notice.md"
         }
     }
     buildTypes {

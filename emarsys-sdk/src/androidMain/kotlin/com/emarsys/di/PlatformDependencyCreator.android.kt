@@ -1,5 +1,7 @@
 package com.emarsys.di
 
+import android.content.Context
+import com.emarsys.core.device.AndroidDeviceInfoCollector
 import com.emarsys.core.device.AndroidLanguageProvider
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.LanguageProvider
@@ -16,8 +18,12 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
         return AndroidLanguageProvider(Locale.getDefault())
     }
 
+    private fun createAndroidDeviceInfoCollector(): AndroidDeviceInfoCollector {
+        return AndroidDeviceInfoCollector(platformContext.application as Context, true)
+    }
+
     override fun createDeviceInfoCollector(): DeviceInfoCollector {
-        return DeviceInfoCollector(platformContext.application, createLanguageProvider(), true, true)
+        return DeviceInfoCollector(createAndroidDeviceInfoCollector(), createLanguageProvider())
     }
 
     override fun createStorage(): StorageApi = Storage(platformContext.sharedPreferences)

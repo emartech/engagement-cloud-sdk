@@ -8,20 +8,17 @@ import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.os.Build
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
-import com.emarsys.core.util.AndroidVersionUtils
 import io.kotest.matchers.booleans.shouldBeFalse
-import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
-import org.json.JSONObject
+import kotlinx.serialization.json.Json
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
 import java.util.*
-import kotlin.test.BeforeTest
-import kotlin.test.AfterTest
-import kotlin.test.Test
 
 class DeviceInfoCollectorTests {
 
@@ -30,52 +27,83 @@ class DeviceInfoCollectorTests {
         private const val APP_VERSION = "2.0"
     }
 
-    private lateinit var deviceInfoCollector: DeviceInfoCollector
-    private lateinit var tz: TimeZone
-    private lateinit var context: Context
-
+    private lateinit var testAndroidDeviceInfoCollector: AndroidDeviceInfoCollector
     private lateinit var mockLanguageProvider: LanguageProvider
+    private lateinit var timeZone: TimeZone
+    private lateinit var context: Context
+    private lateinit var mockContext: Context
 
-    private lateinit var mockNotificationManagerHelper: NotificationSettings
-
-    @BeforeTest
+    @Before
     fun setup() {
-        tz = TimeZone.getTimeZone("Asia/Tokyo")
-        TimeZone.setDefault(tz)
         context = getInstrumentation().targetContext.applicationContext
 
-        mockLanguageProvider = mockk()
-        every { mockLanguageProvider.provideLanguage() } returns LANGUAGE
+        val packageManager: PackageManager = mockk(relaxed = true)
+        val packageName = "packageName"
+        val packageInfo = PackageInfo()
+        packageInfo.versionName = APP_VERSION
 
-        deviceInfoCollector = DeviceInfoCollector(context, mockLanguageProvider, true, true)
+        mockContext = getApplication { flags = ApplicationInfo.FLAG_DEBUGGABLE }
+        every { mockContext.contentResolver } returns context.contentResolver
+        every { mockContext.packageName } returns packageName
+        every { mockContext.packageManager } returns packageManager
+        every { packageManager.getPackageInfo(packageName, 0) } returns packageInfo
+
+        timeZone = TimeZone.getTimeZone("Asia/Tokyo")
+        TimeZone.setDefault(timeZone)
+
+        mockLanguageProvider = mockk(relaxed = true)
+        every { mockLanguageProvider.provideLanguage() } returns LANGUAGE
     }
 
-    @AfterTest
+    @After
     fun teardown() {
         TimeZone.setDefault(null)
     }
 
     @Test
-    fun testCollect_initializesFields() {
-        val deviceInfo = deviceInfoCollector.collect()
-        with(deviceInfo) {
-            hardwareId shouldNotBe null
-            platform shouldNotBe null
-            language shouldNotBe null
-            timezone shouldNotBe null
-            manufacturer shouldNotBe null
-            deviceModel shouldNotBe null
-            applicationVersion shouldNotBe null
-            osVersion shouldNotBe null
-            displayMetrics shouldNotBe null
-            sdkVersion shouldNotBe null
+    fun test_collect_shouldReturn_deviceInfo() {
+        testAndroidDeviceInfoCollector = AndroidDeviceInfoCollector(mockContext, true)
+        val deviceInfoCollector =
+            DeviceInfoCollector(testAndroidDeviceInfoCollector, mockLanguageProvider)
 
-        }
+        val result = deviceInfoCollector.collect()
+
+        val deviceInfo = Json.decodeFromString<DeviceInformation>(result)
+
+        verify { mockLanguageProvider.provideLanguage() }
+
+        deviceInfo.platform shouldBe "android"
+        deviceInfo.manufacturer shouldBe Build.MANUFACTURER
+        deviceInfo.displayMetrics shouldBe "${Resources.getSystem().displayMetrics.widthPixels}x${Resources.getSystem().displayMetrics.heightPixels}"
+        deviceInfo.model shouldBe Build.MODEL
+        deviceInfo.sdkVersion shouldBe BuildConfig.VERSION_NAME
+        deviceInfo.language shouldBe LANGUAGE
+        deviceInfo.timezone shouldBe "+0900"
+        deviceInfo.hardwareId shouldBe "test hwid"
+
+        val platformInfo = Json.decodeFromString<AndroidDeviceInfo>(deviceInfo.platformInfo)
+
+        platformInfo.applicationVersion shouldBe APP_VERSION
+        platformInfo.isDebugMode shouldBe true
+        platformInfo.osVersion shouldBe Build.VERSION.RELEASE
+    }
+
+    @Test
+    fun test_collect_platformShouldBe_huawei() {
+        testAndroidDeviceInfoCollector = AndroidDeviceInfoCollector(mockContext, false)
+        val deviceInfoCollector =
+            DeviceInfoCollector(testAndroidDeviceInfoCollector, mockLanguageProvider)
+
+        val result = deviceInfoCollector.collect()
+
+        val deviceInfo = Json.decodeFromString<DeviceInformation>(result)
+
+        deviceInfo.platform shouldBe "android-huawei"
     }
 
     @Test
     @Throws(PackageManager.NameNotFoundException::class)
-    fun testGetApplicationVersion_shouldBeDefault_whenVersionInPackageInfo_isNull() {
+    fun test_collect_applicationVersion_shouldBeDefault_whenVersionInPackageInfo_isNull() {
         val packageName = "packageName"
         val mockContext: Context = mockk()
         val packageInfo = PackageInfo()
@@ -87,149 +115,33 @@ class DeviceInfoCollectorTests {
         every { packageManager.getPackageInfo(packageName, 0) } returns (packageInfo)
         every { mockContext.applicationInfo } returns (mockk())
 
-        val deviceInfo = deviceInfoCollector.collect()
+        testAndroidDeviceInfoCollector = AndroidDeviceInfoCollector(mockContext, false)
+        val deviceInfoCollector =
+            DeviceInfoCollector(testAndroidDeviceInfoCollector, mockLanguageProvider)
 
-        deviceInfo.applicationVersion shouldBe UNKNOWN_VERSION_NAME
+        val result = deviceInfoCollector.collect()
+
+        val deviceInfo = Json.decodeFromString<DeviceInformation>(result)
+
+        val platformInfo = Json.decodeFromString<AndroidDeviceInfo>(deviceInfo.platformInfo)
+
+        platformInfo.applicationVersion shouldBe UNKNOWN_VERSION_NAME
     }
 
     @Test
-    fun testTimezoneCorrectlyFormatted() {
-        val deviceInfo = deviceInfoCollector.collect()
-
-        "+0900" shouldBe deviceInfo.timezone
-    }
-
-    @Test
-    fun testTimezoneCorrectlyFormatted_withArabicLocale() {
-        val previous = Locale.getDefault()
-        val locale = Locale("my")
-        val resources = context.resources
-        Locale.setDefault(locale)
-        val config = resources.configuration
-        config.locale = locale
-        resources.updateConfiguration(config, resources.displayMetrics)
-        Locale.setDefault(previous)
-
-        val deviceInfo = deviceInfoCollector.collect()
-
-        "+0900" shouldBe deviceInfo.timezone
-    }
-
-    @Test
-    fun testGetDisplayMetrics() {
-        val deviceInfo = deviceInfoCollector.collect()
-        deviceInfo.displayMetrics shouldBe Resources.getSystem().displayMetrics
-    }
-
-    @Test
-    fun testIsDebugMode_withDebugApplication() {
-        val mockDebugContext = getApplication { flags = ApplicationInfo.FLAG_DEBUGGABLE }
-        val debugDeviceInfo = DeviceInfoCollector(
-            mockDebugContext,
-            mockLanguageProvider,
-            isAutomaticPushSendingEnabled = true,
-            isGooglePlayServicesAvailable = true
-        )
-        val deviceInfo = debugDeviceInfo.collect()
-        deviceInfo.isDebugMode.shouldBeTrue()
-    }
-
-    @Test
-    fun testIsDebugMode_withReleaseApplication() {
+    fun test_collect_isDebugMode_shouldBeFalse_withReleaseApplication() {
         val mockReleaseContext = getApplication { flags = 0 }
-        val debugDeviceInfo = DeviceInfoCollector(
-            mockReleaseContext,
-            mockLanguageProvider,
-            isAutomaticPushSendingEnabled = true,
-            isGooglePlayServicesAvailable = true
-        )
-        val deviceInfo = deviceInfoCollector.collect()
+        testAndroidDeviceInfoCollector = AndroidDeviceInfoCollector(mockReleaseContext, false)
+        val debugDeviceInfo =
+            DeviceInfoCollector(testAndroidDeviceInfoCollector, mockLanguageProvider)
 
-        deviceInfo.isDebugMode.shouldBeFalse()
-    }
+        val result = debugDeviceInfo.collect()
 
-    @Test
-    fun testGetLanguage_isAcquiredFromLanguageProvider() {
-        val deviceInfo = deviceInfoCollector.collect()
+        val deviceInfo = Json.decodeFromString<DeviceInformation>(result)
 
-        val language = deviceInfo.language
-        verify { mockLanguageProvider.provideLanguage() }
-        LANGUAGE shouldBe language
-    }
+        val platformInfo = Json.decodeFromString<AndroidDeviceInfo>(deviceInfo.platformInfo)
 
-    @Test
-    fun testGetDeviceInfoPayload_shouldEqualPayload() {
-        val packageName = "packageName"
-        val mockContext: Context = mockk()
-        val packageInfo = PackageInfo()
-        val packageManager: PackageManager = mockk()
-        packageInfo.versionName = APP_VERSION
-        every { mockContext.contentResolver } returns context.contentResolver
-        every { mockContext.packageName } returns packageName
-        every { mockContext.packageManager } returns packageManager
-        every { packageManager.getPackageInfo(packageName, 0) } returns (packageInfo)
-        every { mockContext.applicationInfo } returns mockk()
-
-        every { mockNotificationManagerHelper.channelSettings } returns
-                listOf(
-                    ChannelSettings(
-                        channelId = "channelId"
-                    )
-                )
-
-
-        var channelSettings = """
-        channelSettings: [
-            {
-                "channelId":"channelId",
-                "importance":-1000,
-                "isCanBypassDnd":false,
-                "isCanShowBadge":false,
-                "isShouldVibrate":false
-            }
-        ]"""
-
-        if (!AndroidVersionUtils.isOreoOrAbove) {
-            channelSettings = "channelSettings: [{}]"
-        }
-        val expectedPayload = JSONObject(
-            """{
-                  "notificationSettings": {
-                    $channelSettings,
-                    "importance": 0,
-                    "areNotificationsEnabled": false
-                  },
-                  "hwid": "hwid",
-                  "platform": "android",
-                  "language": "en-US",
-                  "timezone": "+0900",
-                  "manufacturer": "${Build.MANUFACTURER}",
-                  "model": "${Build.MODEL}",
-                  "osVersion": "${Build.VERSION.RELEASE}",
-                  "displayMetrics": "${Resources.getSystem().displayMetrics.widthPixels}x${Resources.getSystem().displayMetrics.heightPixels}",
-                  "sdkVersion": "sdkVersion",
-                  "appVersion": "$APP_VERSION" 
-                }"""
-        ).toString()
-        deviceInfoCollector.collectDeviceInfoRequest() shouldBe expectedPayload
-    }
-
-    @Test
-    fun testDeviceInfo_platformShouldBeHuawei() {
-        val packageName = "packageName"
-        val mockContext: Context = mockk()
-        val packageInfo = PackageInfo()
-        val packageManager: PackageManager = mockk()
-        packageInfo.versionName = APP_VERSION
-        every { mockContext.contentResolver } returns (context.contentResolver)
-        every { mockContext.packageName } returns (packageName)
-        every { mockContext.packageManager } returns (packageManager)
-        every { packageManager.getPackageInfo(packageName, 0) } returns (packageInfo)
-        every { mockContext.applicationInfo } returns (mockk())
-
-        val deviceInfo = deviceInfoCollector.collect()
-
-        deviceInfo.platform shouldBe "android-huawei"
+        platformInfo.isDebugMode.shouldBeFalse()
     }
 
     private fun getApplication(init: ApplicationInfo.() -> Unit) =
