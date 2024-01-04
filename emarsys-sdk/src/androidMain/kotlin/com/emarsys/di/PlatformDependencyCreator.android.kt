@@ -19,11 +19,11 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
     }
 
     private fun createAndroidDeviceInfoCollector(): AndroidDeviceInfoCollector {
-        return AndroidDeviceInfoCollector(platformContext.application as Context, true)
+        return AndroidDeviceInfoCollector(platformContext.application as Context)
     }
 
     override fun createDeviceInfoCollector(): DeviceInfoCollector {
-        return DeviceInfoCollector(createAndroidDeviceInfoCollector(), createLanguageProvider())
+        return DeviceInfoCollector(createAndroidDeviceInfoCollector(), createLanguageProvider(), true)
     }
 
     override fun createStorage(): StorageApi = Storage(platformContext.sharedPreferences)

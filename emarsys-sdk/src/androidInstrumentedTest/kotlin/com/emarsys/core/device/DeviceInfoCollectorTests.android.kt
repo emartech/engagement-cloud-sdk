@@ -80,9 +80,9 @@ class DeviceInfoCollectorTests {
             hardwareId = "test hwid",
             platformInfo = Json.encodeToString(expectedPlatformInfo)
         )
-        testAndroidDeviceInfoCollector = AndroidDeviceInfoCollector(mockContext, true)
+        testAndroidDeviceInfoCollector = AndroidDeviceInfoCollector(mockContext)
         val deviceInfoCollector =
-            DeviceInfoCollector(testAndroidDeviceInfoCollector, mockLanguageProvider)
+            DeviceInfoCollector(testAndroidDeviceInfoCollector, mockLanguageProvider, true)
 
         val result = deviceInfoCollector.collect()
 
@@ -92,9 +92,9 @@ class DeviceInfoCollectorTests {
 
     @Test
     fun test_collect_platformShouldBe_huawei() {
-        testAndroidDeviceInfoCollector = AndroidDeviceInfoCollector(mockContext, false)
+        testAndroidDeviceInfoCollector = AndroidDeviceInfoCollector(mockContext)
         val deviceInfoCollector =
-            DeviceInfoCollector(testAndroidDeviceInfoCollector, mockLanguageProvider)
+            DeviceInfoCollector(testAndroidDeviceInfoCollector, mockLanguageProvider, false)
 
         val result = deviceInfoCollector.collect()
 
@@ -117,9 +117,9 @@ class DeviceInfoCollectorTests {
         every { packageManager.getPackageInfo(packageName, 0) } returns (packageInfo)
         every { mockContext.applicationInfo } returns (mockk())
 
-        testAndroidDeviceInfoCollector = AndroidDeviceInfoCollector(mockContext, false)
+        testAndroidDeviceInfoCollector = AndroidDeviceInfoCollector(mockContext)
         val deviceInfoCollector =
-            DeviceInfoCollector(testAndroidDeviceInfoCollector, mockLanguageProvider)
+            DeviceInfoCollector(testAndroidDeviceInfoCollector, mockLanguageProvider, true)
 
         val result = deviceInfoCollector.collect()
 
@@ -133,9 +133,9 @@ class DeviceInfoCollectorTests {
     @Test
     fun test_collect_isDebugMode_shouldBeFalse_withReleaseApplication() {
         val mockReleaseContext = getApplication { flags = 0 }
-        testAndroidDeviceInfoCollector = AndroidDeviceInfoCollector(mockReleaseContext, false)
+        testAndroidDeviceInfoCollector = AndroidDeviceInfoCollector(mockReleaseContext)
         val debugDeviceInfo =
-            DeviceInfoCollector(testAndroidDeviceInfoCollector, mockLanguageProvider)
+            DeviceInfoCollector(testAndroidDeviceInfoCollector, mockLanguageProvider, true)
 
         val result = debugDeviceInfo.collect()
 

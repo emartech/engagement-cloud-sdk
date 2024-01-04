@@ -10,15 +10,16 @@ import java.util.Calendar
 import java.util.Locale.ENGLISH
 
 actual class DeviceInfoCollector(
-    private val androidDeviceInfoCollector: AndroidDeviceInfoCollector,
+    private val androidDeviceInfoCollector: DeviceInfoCollectorApi,
     private val languageProvider: LanguageProvider,
+    private val isGooglePlayServicesAvailable: Boolean,
 ): DeviceInfoCollectorApi {
     actual override fun collect(): String {
         val androidDeviceInfo = androidDeviceInfoCollector.collect()
         val displayMetrics: DisplayMetrics = Resources.getSystem().displayMetrics
 
         val deviceInfo = DeviceInformation(
-            platform = androidDeviceInfoCollector.getPlatform(),
+            platform = getPlatform(),
             manufacturer = Build.MANUFACTURER,
             model = Build.MODEL,
             sdkVersion = BuildConfig.VERSION_NAME,
@@ -30,5 +31,9 @@ actual class DeviceInfoCollector(
         )
 
         return Json.encodeToString(deviceInfo)
+    }
+
+    private fun getPlatform(): String {
+        return if (isGooglePlayServicesAvailable) "android" else "android-huawei"
     }
 }

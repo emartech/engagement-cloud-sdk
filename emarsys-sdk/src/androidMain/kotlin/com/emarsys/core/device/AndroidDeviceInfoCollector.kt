@@ -10,7 +10,6 @@ import org.json.JSONObject
 
 class AndroidDeviceInfoCollector(
     private val context: Context,
-    private val isGooglePlayServicesAvailable: Boolean,
 ): DeviceInfoCollectorApi {
 
     override fun collect(): String {
@@ -22,10 +21,6 @@ class AndroidDeviceInfoCollector(
         )
         
         return Json.encodeToString(androidInfo)
-    }
-    
-    fun getPlatform(): String {
-        return if (isGooglePlayServicesAvailable) "android" else "android-huawei"
     }
 
     private fun parseAppVersion(): String? {
