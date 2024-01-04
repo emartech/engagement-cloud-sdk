@@ -32,8 +32,13 @@ kotlin {
             commonWebpackConfig {
                 outputFileName = "emarsys-sdk.js"
             }
+            testTask {
+                useKarma {
+                    useChromeHeadless()
+                }
+            }
+            binaries.executable()
         }
-        binaries.executable()
     }
 
     sourceSets {
@@ -51,7 +56,6 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
-                implementation(libs.mockk.android)
                 implementation(libs.ktor.client.mock)
                 implementation(libs.kotest.framework.engine)
                 implementation(libs.kotest.assertions.core)
@@ -79,11 +83,15 @@ kotlin {
             }
         }
 
-        jsMain.dependencies {
-            implementation(libs.ktor.client.js)
+        val jsMain by getting {
+            dependencies {
+                implementation(libs.ktor.client.js)
+            }
         }
-        jsTest.dependencies {
-            implementation(kotlin("test-js"))
+        val jsTest by getting {
+            dependencies {
+                implementation(kotlin("test-js"))
+            }
         }
     }
 }
