@@ -1,3 +1,9 @@
 package com.emarsys.di
 
-interface DependencyContainerApi
+import com.emarsys.api.contact.ContactApi
+
+interface DependencyContainerApi {
+
+    val contactApi: ContactApi
+
+}
