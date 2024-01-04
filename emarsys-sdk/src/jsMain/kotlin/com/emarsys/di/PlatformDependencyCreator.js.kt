@@ -2,15 +2,15 @@ package com.emarsys.di
 
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.WebDeviceInfoCollector
-import com.emarsys.core.storage.Storage
 import com.emarsys.core.storage.StorageApi
+import com.emarsys.core.storage.StringStorage
 import kotlinx.browser.window
 
 actual class PlatformDependencyCreator actual constructor(platformContext: PlatformContext) : DependencyCreator {
 
     private val platformContext: CommonPlatformContext = platformContext as CommonPlatformContext
-    override fun createStorage(): StorageApi {
-        return Storage(platformContext.storage)
+    override fun createStorage(): StorageApi<String> {
+        return StringStorage(platformContext.storage)
     }
 
     override fun createDeviceInfoCollector(): DeviceInfoCollector {

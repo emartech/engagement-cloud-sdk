@@ -1,4 +1,6 @@
-import com.emarsys.api.SdkState
+package com.emarsys.api.generic
+
+import SdkContext
 import com.emarsys.api.SdkState.active
 import com.emarsys.api.SdkState.inactive
 import com.emarsys.api.SdkState.onHold
@@ -7,9 +9,8 @@ import com.emarsys.api.contact.ContactInternal
 import com.emarsys.api.contact.FakeSdkLogger
 import com.emarsys.api.contact.GathererContact
 import com.emarsys.api.contact.LoggingContact
-import com.emarsys.api.generic.GenericApi
-import com.emarsys.extensions.waitUntilInactive
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -35,7 +36,7 @@ class GenericApiTests {
     fun testActive_whenSdkState_isInactive() = runTest {
         sdkContext.setSdkState(inactive)
 
-        sdkContext.sdkScope.waitUntilInactive()
+        while (!sdkContext.sdkScope.isActive)
 
         genericApi.active shouldBe loggingContact
     }
@@ -44,7 +45,7 @@ class GenericApiTests {
     fun testActive_whenSdkState_isOnHold() = runTest {
         sdkContext.setSdkState(onHold)
 
-        sdkContext.sdkScope.waitUntilInactive()
+        while (!sdkContext.sdkScope.isActive)
 
         genericApi.active shouldBe gathererContact
     }
@@ -53,7 +54,7 @@ class GenericApiTests {
     fun testActive_whenSdkState_isActive() = runTest {
         sdkContext.setSdkState(active)
 
-        sdkContext.sdkScope.waitUntilInactive()
+        while (!sdkContext.sdkScope.isActive)
 
         genericApi.active shouldBe contactInternal
     }
