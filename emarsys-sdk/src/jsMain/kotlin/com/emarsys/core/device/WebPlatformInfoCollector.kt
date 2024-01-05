@@ -5,7 +5,10 @@ import com.emarsys.core.device.constants.OsInfo
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-class WebDeviceInfoCollector(private val navigatorData: String) : DeviceInfoCollectorApi {
+class WebPlatformInfoCollector(private val navigatorData: String) : PlatformInfoCollectorApi {
+    private companion object {
+        const val DEFAULT_VERSION = "0"
+    }
 
     override fun collect(): String {
         val headerData = analiseHeaders()
@@ -41,6 +44,6 @@ class WebDeviceInfoCollector(private val navigatorData: String) : DeviceInfoColl
         return if (!versionMatches.isNullOrEmpty()) {
             val versionNumbers = versionMatches.drop(1)
             return versionNumbers.first().replace("_", ".")
-        } else "0"
+        } else DEFAULT_VERSION
     }
 }

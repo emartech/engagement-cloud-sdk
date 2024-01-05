@@ -1,5 +1,7 @@
 package com.emarsys.core.device
 
+import com.emarsys.core.storage.StorageApi
+import com.emarsys.providers.Provider
 import kotlinx.browser.window
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
@@ -7,10 +9,17 @@ import kotlinx.datetime.offsetIn
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-actual class DeviceInfoCollector(private val webDeviceInfoCollector: DeviceInfoCollectorApi) :
-    DeviceInfoCollectorApi {
+actual class DeviceInfoCollector(
+    private val webPlatformInfoCollector: PlatformInfoCollectorApi,
+    private val uuidProvider: Provider<String>,
+    private val storage: StorageApi<String>
+) : DeviceInfoCollectorApi {
+    private companion object {
+        const val HARDWARE_ID_STORAGE_KEY = "hardwareId"
+    }
+
     actual override fun collect(): String {
-        val platformInfo = webDeviceInfoCollector.collect()
+        val platformInfo = webPlatformInfoCollector.collect()
         return Json.encodeToString(
             DeviceInformation(
                 platform = window.navigator.platform,
@@ -20,9 +29,17 @@ actual class DeviceInfoCollector(private val webDeviceInfoCollector: DeviceInfoC
                 sdkVersion = BuildConfig.VERSION_NAME,
                 language = window.navigator.language,
                 timezone = Clock.System.now().offsetIn(TimeZone.currentSystemDefault()).toString(),
-                hardwareId = "test hwid",
+                hardwareId = getHardwareId(),
                 platformInfo = platformInfo
             )
         )
+    }
+
+    override fun getHardwareId(): String {
+        return storage.get(HARDWARE_ID_STORAGE_KEY) ?: run {
+            val generatedId = uuidProvider.provide()
+            storage.put(HARDWARE_ID_STORAGE_KEY, generatedId)
+            generatedId
+        }
     }
 }

@@ -1,6 +1,8 @@
 package com.emarsys.core.device
 
-import com.emarsys.core.device.fakes.FakeWebDeviceInfoCollector
+import com.emarsys.core.device.fakes.FakeStorage
+import com.emarsys.core.device.fakes.FakeUuidProvider
+import com.emarsys.core.device.fakes.FakeWebPlatformInfoCollector
 import io.kotest.matchers.shouldBe
 import kotlinx.browser.window
 import kotlinx.datetime.Clock
@@ -12,7 +14,14 @@ import kotlin.test.Test
 
 class DeviceInfoCollectorTests {
 
-    private lateinit var fakeWebDeviceInfoCollector: DeviceInfoCollectorApi
+    private companion object {
+        const val TEST_UUID = "test uuid"
+        const val STORED_ID = "stored hardware id"
+    }
+
+    private lateinit var fakeWebPlatformInfoCollector: PlatformInfoCollectorApi
+    private lateinit var fakeStorage: FakeStorage
+    private lateinit var fakeUuidProvider: FakeUuidProvider
     private lateinit var deviceInfoCollector: DeviceInfoCollector
 
     @Test
@@ -34,16 +43,46 @@ class DeviceInfoCollectorTests {
             sdkVersion = BuildConfig.VERSION_NAME,
             language = navigator.language,
             timezone = Clock.System.now().offsetIn(TimeZone.currentSystemDefault()).toString(),
-            hardwareId = "test hwid",
+            hardwareId = TEST_UUID,
             platformInfo = Json.encodeToString(expectedPlatformInfo)
         )
 
+        fakeStorage = FakeStorage()
+        fakeUuidProvider = FakeUuidProvider(TEST_UUID)
         val onCollectCalled: () -> String = { Json.encodeToString(expectedPlatformInfo) }
-        fakeWebDeviceInfoCollector = FakeWebDeviceInfoCollector(onCollectCalled)
-        deviceInfoCollector = DeviceInfoCollector(fakeWebDeviceInfoCollector)
+        fakeWebPlatformInfoCollector = FakeWebPlatformInfoCollector(onCollectCalled)
+        deviceInfoCollector =
+            DeviceInfoCollector(fakeWebPlatformInfoCollector, fakeUuidProvider, fakeStorage)
 
         val result = deviceInfoCollector.collect()
 
         result shouldBe Json.encodeToString(expectedDeviceInfo)
+    }
+
+    @Test
+    fun getHardwareId_shouldGenerateNewId_ifStoredId_isNull() {
+        fakeStorage = FakeStorage()
+        fakeUuidProvider = FakeUuidProvider(TEST_UUID)
+        fakeWebPlatformInfoCollector = FakeWebPlatformInfoCollector()
+        deviceInfoCollector =
+            DeviceInfoCollector(fakeWebPlatformInfoCollector, fakeUuidProvider, fakeStorage)
+
+        val result = deviceInfoCollector.collect()
+
+        Json.decodeFromString<DeviceInformation>(result).hardwareId shouldBe TEST_UUID
+    }
+
+    @Test
+    fun getHardwareId_shouldReturnStoredId_ifPresent() {
+        fakeStorage = FakeStorage()
+        fakeStorage.put("hardwareId", STORED_ID)
+        fakeUuidProvider = FakeUuidProvider(TEST_UUID)
+        fakeWebPlatformInfoCollector = FakeWebPlatformInfoCollector()
+        deviceInfoCollector =
+            DeviceInfoCollector(fakeWebPlatformInfoCollector, fakeUuidProvider, fakeStorage)
+
+        val result = deviceInfoCollector.collect()
+
+        Json.decodeFromString<DeviceInformation>(result).hardwareId shouldBe STORED_ID
     }
 }

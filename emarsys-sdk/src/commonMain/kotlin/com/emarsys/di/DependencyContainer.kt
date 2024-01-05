@@ -2,6 +2,7 @@ package com.emarsys.di
 
 import SdkContext
 import com.emarsys.api.contact.*
+import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.storage.Storage
 import com.emarsys.networking.GenericNetworkClient
@@ -26,7 +27,9 @@ class DependencyContainer : DependencyContainerApi {
 
     val storage: Storage by lazy { Storage(stringStorage, json) }
 
-    val uuidProvider: Provider<String> by lazy { UUIDProvider() }
+    override val uuidProvider: Provider<String> by lazy { UUIDProvider() }
+
+    val deviceInfoCollector: DeviceInfoCollectorApi by lazy { dependencyCreator.createDeviceInfoCollector(uuidProvider) }
 
     val sdkLogger: SdkLogger by lazy { SdkLogger() }
 

@@ -8,12 +8,12 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.json.JSONObject
 
-class AndroidDeviceInfoCollector(
+class AndroidPlatformInfoCollector(
     private val context: Context,
-): DeviceInfoCollectorApi {
+): PlatformInfoCollectorApi {
 
     override fun collect(): String {
-        val androidInfo = AndroidDeviceInfo(
+        val androidInfo = AndroidPlatformInfo(
             applicationVersion = parseAppVersion() ?: UNKNOWN_VERSION_NAME,
             osVersion = Build.VERSION.RELEASE,
             notificationSettings = null,
