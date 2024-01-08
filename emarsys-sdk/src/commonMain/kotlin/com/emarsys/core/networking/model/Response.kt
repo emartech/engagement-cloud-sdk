@@ -1,4 +1,4 @@
-package com.emarsys.networking.model
+package com.emarsys.core.networking.model
 
 import io.ktor.http.*
 import kotlinx.serialization.json.Json

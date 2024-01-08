@@ -3,9 +3,9 @@ package com.emarsys.clients.push
 import com.emarsys.EmarsysConfig
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.DefaultUrlsApi
-import com.emarsys.networking.NetworkClientApi
-import com.emarsys.networking.model.Response
-import com.emarsys.networking.model.UrlRequest
+import com.emarsys.core.networking.NetworkClientApi
+import com.emarsys.core.networking.model.Response
+import com.emarsys.core.networking.model.UrlRequest
 import io.ktor.http.*
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json

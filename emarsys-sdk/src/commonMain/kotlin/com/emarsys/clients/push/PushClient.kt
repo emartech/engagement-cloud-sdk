@@ -3,8 +3,8 @@ package com.emarsys.clients.push
 import com.emarsys.clients.push.model.PushToken
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.DefaultUrlsApi
-import com.emarsys.networking.NetworkClientApi
-import com.emarsys.networking.model.UrlRequest
+import com.emarsys.core.networking.NetworkClientApi
+import com.emarsys.core.networking.model.UrlRequest
 import io.ktor.http.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

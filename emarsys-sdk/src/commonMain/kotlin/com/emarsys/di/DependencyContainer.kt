@@ -9,7 +9,7 @@ import com.emarsys.core.DefaultUrlsApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.storage.Storage
-import com.emarsys.networking.GenericNetworkClient
+import com.emarsys.core.networking.GenericNetworkClient
 import io.ktor.client.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*

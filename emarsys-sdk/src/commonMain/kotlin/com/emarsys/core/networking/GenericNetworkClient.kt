@@ -1,9 +1,9 @@
-package com.emarsys.networking
+package com.emarsys.core.networking
 
 import com.emarsys.core.exceptions.FailedRequestException
 import com.emarsys.core.exceptions.RetryLimitReachedException
-import com.emarsys.networking.model.Response
-import com.emarsys.networking.model.UrlRequest
+import com.emarsys.core.networking.model.Response
+import com.emarsys.core.networking.model.UrlRequest
 import io.ktor.client.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
