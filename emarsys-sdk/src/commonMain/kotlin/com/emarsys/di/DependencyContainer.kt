@@ -15,8 +15,10 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import com.emarsys.core.storage.StorageApi
+import com.emarsys.networking.EmarsysAuthPlugin
 import com.emarsys.providers.Provider
 import com.emarsys.providers.UUIDProvider
+import com.emarsys.session.SessionContext
 import kotlinx.serialization.json.Json
 
 class DependencyContainer : DependencyContainerApi {
@@ -39,6 +41,10 @@ class DependencyContainer : DependencyContainerApi {
 
     val sdkContext: SdkContext by lazy {
         SdkContext()
+    }
+
+    val sessionContext: SessionContext by lazy {
+        SessionContext()
     }
 
     override val contactApi: ContactApi by lazy {
@@ -69,6 +75,9 @@ class DependencyContainer : DependencyContainerApi {
                 json()
             }
             install(HttpRequestRetry)
+//TODO:            install(EmarsysAuthPlugin) {
+//                sessionContext = this@DependencyContainer.sessionContext
+//            }
         }
         GenericNetworkClient(httpClient)
     }
