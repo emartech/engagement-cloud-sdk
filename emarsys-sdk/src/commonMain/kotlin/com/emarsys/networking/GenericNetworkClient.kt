@@ -11,7 +11,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlin.time.Duration.Companion.seconds
 
-class GenericNetworkClient(private val client: HttpClient) : NetworkClient {
+class GenericNetworkClient(private val client: HttpClient) : NetworkClientApi {
 
     private companion object {
         const val MAX_RETRY_COUNT = 5
@@ -21,6 +21,9 @@ class GenericNetworkClient(private val client: HttpClient) : NetworkClient {
     override suspend fun send(request: UrlRequest): Response {
         var retries = 0
         val httpResponse = client.request {
+           if(request.headers?.get(HttpHeaders.ContentType)?.size == 0) {
+               contentType(ContentType.Application.Json)
+           }
             if (request.shouldRetryOnFail) {
                 retry {
                     constantDelay(RETRY_DELAY.inWholeMilliseconds)

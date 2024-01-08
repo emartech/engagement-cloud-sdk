@@ -3,7 +3,7 @@ package com.emarsys.networking.model
 import io.ktor.http.*
 
 data class UrlRequest(
-    val urlString: Url,
+    val url: Url,
     val method: HttpMethod,
     val bodyString: String? = null,
     val headers: Map<String, List<String>>? = null,
