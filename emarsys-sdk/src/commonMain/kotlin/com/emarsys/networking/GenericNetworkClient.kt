@@ -31,7 +31,7 @@ class GenericNetworkClient(private val client: HttpClient) : NetworkClient {
                 }
             }
             method = request.method
-            url(request.urlString)
+            url(request.url)
             request.headers?.forEach {
                 header(it.key, it.value)
             }

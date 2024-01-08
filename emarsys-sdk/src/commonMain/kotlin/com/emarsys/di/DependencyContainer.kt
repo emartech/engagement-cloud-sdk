@@ -2,6 +2,10 @@ package com.emarsys.di
 
 import SdkContext
 import com.emarsys.api.contact.*
+import com.emarsys.clients.push.PushClient
+import com.emarsys.clients.push.PushClientApi
+import com.emarsys.core.DefaultUrls
+import com.emarsys.core.DefaultUrlsApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.storage.Storage
@@ -44,7 +48,21 @@ class DependencyContainer : DependencyContainerApi {
         val contactInternal = ContactInternal()
         Contact(loggingContact, gathererContact, contactInternal, sdkContext)
     }
+    val pushClient: PushClientApi by lazy {
+        PushClient(genericNetworkClient, sdkContext, defaultUrls, json)
+    }
 
+    val defaultUrls: DefaultUrlsApi by lazy {
+        DefaultUrls(
+            "https://me-client.eservice.emarsys.net",
+            "https://mobile-events.eservice.emarsys.net",
+            "https://recommender.scarabresearch.com/merchants",
+            "https://deep-link.eservice.emarsys.net",
+            "https://me-inbox.eservice.emarsys.net",
+            "https://mobile-sdk-config.gservice.emarsys.net",
+            "https://log-dealer.eservice.emarsys.net"
+        )
+    }
     val genericNetworkClient: GenericNetworkClient by lazy {
         val httpClient = HttpClient {
             install(ContentNegotiation) {
