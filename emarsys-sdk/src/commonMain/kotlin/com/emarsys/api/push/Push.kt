@@ -1,9 +1,8 @@
 package com.emarsys.api.push
 
 import Activatable
-import SdkContext
 import com.emarsys.api.generic.GenericApi
-import kotlinx.coroutines.launch
+import com.emarsys.context.SdkContextApi
 import kotlinx.coroutines.withContext
 
 interface PushInstance : PushApi, Activatable
@@ -12,11 +11,11 @@ class Push<Logging : PushInstance, Gatherer : PushInstance, Internal : PushInsta
     loggingApi: Logging,
     gathererApi: Gatherer,
     internalApi: Internal,
-    sdkContext: SdkContext
+    sdkContext: SdkContextApi
 ) : GenericApi<Logging, Gatherer, Internal>(loggingApi, gathererApi, internalApi, sdkContext), PushApi {
-    override suspend fun setPushToken(pushToken: String) {
+    override suspend fun registerPushToken(pushToken: String) {
         withContext(sdkContext.sdkDispatcher) {
-            activeInstance<PushApi>().setPushToken(pushToken)
+            activeInstance<PushApi>().registerPushToken(pushToken)
         }
     }
 

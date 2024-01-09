@@ -29,7 +29,7 @@ class GathererPushTests {
             clearPushToken
         )
 
-        gathererPush.setPushToken(pushToken)
+        gathererPush.registerPushToken(pushToken)
         gathererPush.clearPushToken()
 
         pushContext.calls shouldBe expected

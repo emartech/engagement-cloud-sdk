@@ -3,7 +3,7 @@ package com.emarsys.api.push
 import com.emarsys.clients.push.PushClientApi
 
 class PushInternal(private val pushClient: PushClientApi) : PushInstance {
-    override suspend fun setPushToken(pushToken: String) {
+    override suspend fun registerPushToken(pushToken: String) {
         TODO("Not yet implemented")
     }
 

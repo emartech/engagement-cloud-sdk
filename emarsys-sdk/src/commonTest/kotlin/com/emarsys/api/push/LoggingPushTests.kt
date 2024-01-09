@@ -1,6 +1,5 @@
 package com.emarsys.api.push
 
-import com.emarsys.api.contact.LoggingContact
 import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
@@ -36,7 +35,7 @@ class LoggingPushTests {
 
     @Test
     fun testSetPushToken() = runTest {
-        loggingPush.setPushToken(pushToken)
+        loggingPush.registerPushToken(pushToken)
 
         fakeLogger.funCalls.first().first.topic shouldBe "log_method_not_allowed"
         fakeLogger.funCalls.first().second shouldBe LogLevel.debug

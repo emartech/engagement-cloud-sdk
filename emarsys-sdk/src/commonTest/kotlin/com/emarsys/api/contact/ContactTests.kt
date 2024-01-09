@@ -2,12 +2,10 @@ package com.emarsys.api.contact
 
 import com.emarsys.api.SdkState
 import com.emarsys.context.SdkContextApi
-import io.kotest.common.runBlocking
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -21,10 +19,10 @@ import kotlin.test.Test
 class ContactTests : TestsWithMocks() {
     override fun setUpMocks() = injectMocks(mocker)
 
-    companion object {
-        val contactFieldId = 42
-        val contactFieldValue = "testContactFieldValue"
-        val openIdToken = "testOpenIdToken"
+    private companion object {
+        const val contactFieldId = 42
+        const val contactFieldValue = "testContactFieldValue"
+        const val openIdToken = "testOpenIdToken"
     }
 
     @Mock

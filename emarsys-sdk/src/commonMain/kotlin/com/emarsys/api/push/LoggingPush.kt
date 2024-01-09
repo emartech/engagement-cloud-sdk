@@ -5,9 +5,9 @@ import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
 
 class LoggingPush(private val logger: Logger) : PushInstance {
-    override suspend fun setPushToken(pushToken: String) {
+    override suspend fun registerPushToken(pushToken: String) {
         val entry = LogEntry.createMethodNotAllowed(
-            this, this::setPushToken.name, mapOf(
+            this, this::registerPushToken.name, mapOf(
                 "pushToken" to pushToken,
             )
         )
