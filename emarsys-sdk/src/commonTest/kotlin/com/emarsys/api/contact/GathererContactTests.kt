@@ -13,8 +13,8 @@ class GathererContactTests {
         val openIdToken = "testOpenIdToken"
     }
 
-    lateinit private var contactContext: ContactContext
-    lateinit private var gathererContact: GathererContact
+    private lateinit var contactContext: ContactContext
+    private lateinit var gathererContact: GathererContact
 
     @BeforeTest
     fun setup() {
@@ -28,7 +28,14 @@ class GathererContactTests {
         val linkAuthenticatedContact = ContactCall.LinkAuthenticatedContact(contactFieldId, openIdToken)
         val unlinkContact = ContactCall.UnlinkContact()
 
-        val expected = listOf(linkContact, linkAuthenticatedContact, unlinkContact, linkContact, unlinkContact, linkAuthenticatedContact)
+        val expected = listOf(
+            linkContact,
+            linkAuthenticatedContact,
+            unlinkContact,
+            linkContact,
+            unlinkContact,
+            linkAuthenticatedContact
+        )
 
         gathererContact.linkContact(contactFieldId, contactFieldValue)
         gathererContact.linkAuthenticatedContact(contactFieldId, openIdToken)

@@ -198,6 +198,7 @@ class GenericNetworkClientTests {
         body: String = """{"eventName":"test"}"""
     ) {
         val mockHttpEngine = MockEngine {
+            it.headers[HttpHeaders.Accept] shouldBe "application/json"
             respond(
                 ByteReadChannel(body),
                 status = responseStatus,

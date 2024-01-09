@@ -21,9 +21,10 @@ class GenericNetworkClient(private val client: HttpClient) : NetworkClientApi {
     override suspend fun send(request: UrlRequest): Response {
         var retries = 0
         val httpResponse = client.request {
-           if(request.headers?.get(HttpHeaders.ContentType)?.size == 0) {
-               contentType(ContentType.Application.Json)
-           }
+            val shouldAddDefaultHeader = request.headers?.get(HttpHeaders.ContentType)?.toString().isNullOrEmpty()
+            if (shouldAddDefaultHeader) {
+                contentType(ContentType.Application.Json)
+            }
             if (request.shouldRetryOnFail) {
                 retry {
                     constantDelay(RETRY_DELAY.inWholeMilliseconds)

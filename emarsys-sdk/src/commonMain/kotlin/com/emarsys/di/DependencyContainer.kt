@@ -2,6 +2,7 @@ package com.emarsys.di
 
 import SdkContext
 import com.emarsys.api.contact.*
+import com.emarsys.api.push.*
 import com.emarsys.clients.push.PushClient
 import com.emarsys.clients.push.PushClientApi
 import com.emarsys.core.DefaultUrls
@@ -15,7 +16,6 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import com.emarsys.core.storage.StorageApi
-import com.emarsys.networking.EmarsysAuthPlugin
 import com.emarsys.providers.Provider
 import com.emarsys.providers.UUIDProvider
 import com.emarsys.session.SessionContext
@@ -53,6 +53,13 @@ class DependencyContainer : DependencyContainerApi {
         val gathererContact = GathererContact(contactContext)
         val contactInternal = ContactInternal()
         Contact(loggingContact, gathererContact, contactInternal, sdkContext)
+    }
+    override val pushApi: PushApi by lazy {
+        val pushContext = PushContext()
+        val loggingPush = LoggingPush(sdkLogger)
+        val gathererPush = GathererPush(pushContext)
+        val pushInternal = PushInternal(pushClient)
+        Push(loggingPush, gathererPush, pushInternal, sdkContext)
     }
     val pushClient: PushClientApi by lazy {
         PushClient(genericNetworkClient, sdkContext, defaultUrls, json)
