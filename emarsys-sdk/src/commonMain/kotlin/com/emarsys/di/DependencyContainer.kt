@@ -16,6 +16,7 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import com.emarsys.core.storage.StorageApi
+import com.emarsys.networking.ktor.plugin.EmarsysAuthPlugin
 import com.emarsys.providers.Provider
 import com.emarsys.providers.UUIDProvider
 import com.emarsys.session.SessionContext
@@ -82,9 +83,9 @@ class DependencyContainer : DependencyContainerApi {
                 json()
             }
             install(HttpRequestRetry)
-//TODO:            install(EmarsysAuthPlugin) {
-//                sessionContext = this@DependencyContainer.sessionContext
-//            }
+            install(EmarsysAuthPlugin) {
+                sessionContext = this@DependencyContainer.sessionContext
+            }
         }
         GenericNetworkClient(httpClient)
     }

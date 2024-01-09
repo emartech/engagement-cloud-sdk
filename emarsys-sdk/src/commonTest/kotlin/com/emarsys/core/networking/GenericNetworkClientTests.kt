@@ -6,6 +6,8 @@ import com.emarsys.core.exceptions.RetryLimitReachedException
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.networking.model.body
+import com.emarsys.networking.ktor.plugin.EmarsysAuthPlugin
+import com.emarsys.session.SessionContext
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.ktor.client.*
@@ -190,6 +192,60 @@ class GenericNetworkClientTests {
         response shouldBe expectedResponse
         response.body<CustomEvent>() shouldBe CustomEvent("test")
 
+    }
+
+    @Test
+    fun testSend_should_retry_on401_and_try_to_get_refreshToken() = runTest {
+        val mockHttpEngine = MockEngine.config {
+            addHandler {
+                respond(
+                    ByteReadChannel(""),
+                    status = HttpStatusCode.Unauthorized,
+                    headers = headersOf("Content-Type", "application/json")
+                )
+            }
+            addHandler {
+                respond(
+                    ByteReadChannel("""{"contactToken":"testContactToken"}"""),
+                    status = HttpStatusCode.OK,
+                    headers = headersOf("Content-Type", "application/json")
+                )
+            }
+            addHandler {
+                respond(
+                    ByteReadChannel("""{"eventName":"test"}"""),
+                    status = HttpStatusCode.OK,
+                    headers = headersOf("Content-Type", "application/json")
+                )
+            }
+        }
+        val httpClient = HttpClient(mockHttpEngine) {
+            install(ContentNegotiation) {
+                json()
+            }
+            install(EmarsysAuthPlugin) {
+                sessionContext = SessionContext(clientId = "testClientId", refreshToken = "testRefreshToken")
+            }
+            install(HttpRequestRetry)
+        }
+        genericNetworkClient = GenericNetworkClient(httpClient)
+        val urlString =
+            URLBuilder("https://testUrl.com").build()
+        val request = UrlRequest(
+            urlString,
+            HttpMethod.Get,
+            null,
+            mapOf("Content-Type" to "application/json")
+        )
+        val expectedResponse = Response(
+            request,
+            HttpStatusCode.OK,
+            headersOf("Content-Type", "application/json"),
+            """{"eventName":"test"}"""
+        )
+        val response: Response = genericNetworkClient.send(request)
+        response shouldBe expectedResponse
+        response.body<CustomEvent>() shouldBe CustomEvent("test")
     }
 
     private fun createHttpClient(
