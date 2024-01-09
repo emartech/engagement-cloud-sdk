@@ -36,27 +36,27 @@ class GenericApiTests {
     fun testActive_whenSdkState_isInactive() = runTest {
         sdkContext.setSdkState(inactive)
 
-        while (!sdkContext.sdkScope.isActive)
+        while (!sdkContext.sdkDispatcher.isActive)
 
-        genericApi.active shouldBe loggingContact
+        genericApi.activeInstance shouldBe loggingContact
     }
 
     @Test
     fun testActive_whenSdkState_isOnHold() = runTest {
         sdkContext.setSdkState(onHold)
 
-        while (!sdkContext.sdkScope.isActive)
+        while (!sdkContext.sdkDispatcher.isActive)
 
-        genericApi.active shouldBe gathererContact
+        genericApi.activeInstance shouldBe gathererContact
     }
 
     @Test
     fun testActive_whenSdkState_isActive() = runTest {
         sdkContext.setSdkState(active)
 
-        while (!sdkContext.sdkScope.isActive)
+        while (!sdkContext.sdkDispatcher.isActive)
 
-        genericApi.active shouldBe contactInternal
+        genericApi.activeInstance shouldBe contactInternal
     }
 
 }

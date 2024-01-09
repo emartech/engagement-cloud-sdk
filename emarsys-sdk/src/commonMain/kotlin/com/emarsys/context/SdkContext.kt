@@ -2,6 +2,7 @@ import com.emarsys.EmarsysConfig
 import com.emarsys.api.SdkState
 import com.emarsys.context.SdkContextApi
 import io.ktor.http.*
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -15,7 +16,7 @@ class SdkContext : SdkContextApi {
 
     override val sdkState: StateFlow<SdkState> = innerSdkState.asStateFlow()
 
-    override val sdkScope: CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    override val sdkDispatcher: CoroutineDispatcher = Dispatchers.Default
     override var config: EmarsysConfig? = null
     override fun setSdkState(sdkState: SdkState) {
         innerSdkState.value = sdkState
