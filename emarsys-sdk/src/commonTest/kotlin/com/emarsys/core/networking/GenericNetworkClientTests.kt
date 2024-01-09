@@ -31,7 +31,7 @@ class GenericNetworkClientTests {
             urlString,
             HttpMethod.Post,
             """{"eventName":"test"}""",
-            mapOf("Content-Type" to listOf("application/json"))
+            headers = mapOf("Content-Type" to "application/json")
         )
         val expectedResponse = Response(
             request,
@@ -96,7 +96,7 @@ class GenericNetworkClientTests {
             urlString,
             HttpMethod.Get,
             null,
-            mapOf("Content-Type" to listOf("application/json"))
+            mapOf("Content-Type" to "application/json")
         )
 
         shouldThrow<FailedRequestException> {
@@ -136,7 +136,7 @@ class GenericNetworkClientTests {
             urlString,
             HttpMethod.Get,
             null,
-            mapOf("Content-Type" to listOf("application/json"))
+            mapOf("Content-Type" to "application/json")
         )
 
         val exception = shouldThrow<RetryLimitReachedException> {
@@ -178,7 +178,7 @@ class GenericNetworkClientTests {
             urlString,
             HttpMethod.Get,
             null,
-            mapOf("Content-Type" to listOf("application/json"))
+            mapOf("Content-Type" to "application/json")
         )
         val expectedResponse = Response(
             request,
