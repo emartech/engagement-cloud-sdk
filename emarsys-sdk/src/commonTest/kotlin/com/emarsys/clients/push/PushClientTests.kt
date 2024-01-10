@@ -3,10 +3,16 @@ package com.emarsys.clients.push
 import com.emarsys.EmarsysConfig
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.DefaultUrlsApi
-import com.emarsys.core.networking.NetworkClientApi
+import com.emarsys.core.networking.clients.NetworkClientApi
+import com.emarsys.core.networking.clients.push.PushClient
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
-import io.ktor.http.*
+import com.emarsys.url.EmarsysUrlType
+import com.emarsys.url.FactoryApi
+import io.ktor.http.Headers
+import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.Url
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import org.kodein.mock.Mock
@@ -26,8 +32,11 @@ class PushClientTests : TestsWithMocks() {
     @Mock
     lateinit var mockSdkContext: SdkContextApi
 
+    @Mock
+    lateinit var mockUrlFactory: FactoryApi<EmarsysUrlType, String>
+
     private var pushClient: PushClient by withMocks {
-        PushClient(mockNetworkClient, mockSdkContext, mockDefaultUrls, Json.Default)
+        PushClient(mockNetworkClient, mockUrlFactory, Json)
     }
 
     @Test
@@ -36,13 +45,8 @@ class PushClientTests : TestsWithMocks() {
         every { mockDefaultUrls.clientServiceBaseUrl } returns clientServiceBaseUrl
         every { mockSdkContext.config } returns EmarsysConfig("EMS11-C3FD3")
         every {
-            mockSdkContext.createUrl(
-                baseUrl = clientServiceBaseUrl,
-                version = "v3",
-                withAppCode = true,
-                path = "/client/push-token"
-            )
-        } returns Url("$clientServiceBaseUrl/v3/apps/EMS11-C3FD3/client/push-token")
+            mockUrlFactory.create(EmarsysUrlType.REGISTER_PUSH_TOKEN)
+        } returns "$clientServiceBaseUrl/v3/apps/EMS11-C3FD3/client/push-token"
 
         val expectedUrlRequest = UrlRequest(
             Url("$clientServiceBaseUrl/v3/apps/EMS11-C3FD3/client/push-token"),

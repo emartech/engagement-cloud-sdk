@@ -1,4 +1,4 @@
-package com.emarsys.core.networking
+package com.emarsys.core.networking.clients
 
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest

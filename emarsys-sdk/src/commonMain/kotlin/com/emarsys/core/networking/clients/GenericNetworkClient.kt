@@ -1,14 +1,21 @@
-package com.emarsys.core.networking
+package com.emarsys.core.networking.clients
 
 import com.emarsys.core.exceptions.FailedRequestException
 import com.emarsys.core.exceptions.RetryLimitReachedException
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
-import io.ktor.client.*
-import io.ktor.client.plugins.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.retry
+import io.ktor.client.request.header
+import io.ktor.client.request.request
+import io.ktor.client.request.setBody
+import io.ktor.client.request.url
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.contentType
+import io.ktor.http.isSuccess
 import kotlin.time.Duration.Companion.seconds
 
 class GenericNetworkClient(private val client: HttpClient) : NetworkClientApi {

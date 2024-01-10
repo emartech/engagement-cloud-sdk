@@ -1,4 +1,4 @@
-package com.emarsys.clients.push.model
+package com.emarsys.core.networking.clients.push.model
 
 import kotlinx.serialization.Serializable
 

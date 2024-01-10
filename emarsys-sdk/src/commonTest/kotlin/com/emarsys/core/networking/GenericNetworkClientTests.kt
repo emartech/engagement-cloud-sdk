@@ -1,8 +1,9 @@
 package com.emarsys.core.networking
 
-import com.emarsys.clients.event.model.CustomEvent
 import com.emarsys.core.exceptions.FailedRequestException
 import com.emarsys.core.exceptions.RetryLimitReachedException
+import com.emarsys.core.networking.clients.GenericNetworkClient
+import com.emarsys.core.networking.clients.event.model.CustomEvent
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.networking.model.body
@@ -10,14 +11,20 @@ import com.emarsys.networking.ktor.plugin.EmarsysAuthPlugin
 import com.emarsys.session.SessionContext
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
-import io.ktor.client.*
-import io.ktor.client.engine.*
-import io.ktor.client.engine.mock.*
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
-import io.ktor.utils.io.*
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.config
+import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.engine.mock.respond
+import io.ktor.client.plugins.HttpRequestRetry
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.URLBuilder
+import io.ktor.http.headersOf
+import io.ktor.serialization.kotlinx.json.json
+import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
@@ -224,7 +231,11 @@ class GenericNetworkClientTests {
                 json()
             }
             install(EmarsysAuthPlugin) {
-                sessionContext = SessionContext(clientId = "testClientId", refreshToken = "testRefreshToken")
+                sessionContext = SessionContext(
+                    refreshToken = "testRefreshToken",
+                    clientId = "testClientId",
+                    clientState = null
+                )
             }
             install(HttpRequestRetry)
         }

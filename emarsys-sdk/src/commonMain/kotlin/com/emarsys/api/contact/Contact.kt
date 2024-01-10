@@ -1,14 +1,9 @@
 package com.emarsys.api.contact
 
 import Activatable
-import SdkContext
 import com.emarsys.api.generic.GenericApi
 import com.emarsys.context.SdkContextApi
-import com.emarsys.core.exceptions.PreconditionFailedException
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.reflect.typeOf
 
 interface ContactInstance : ContactApi, Activatable
 

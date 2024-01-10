@@ -1,6 +1,6 @@
 package com.emarsys.api.push
 
-import com.emarsys.clients.push.PushClientApi
+import com.emarsys.core.networking.clients.push.PushClientApi
 
 class PushInternal(private val pushClient: PushClientApi) : PushInstance {
     override suspend fun registerPushToken(pushToken: String) {

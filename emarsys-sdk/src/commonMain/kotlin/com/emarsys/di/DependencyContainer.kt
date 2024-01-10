@@ -1,25 +1,38 @@
 package com.emarsys.di
 
-import SdkContext
-import com.emarsys.api.contact.*
-import com.emarsys.api.push.*
-import com.emarsys.clients.push.PushClient
-import com.emarsys.clients.push.PushClientApi
+import com.emarsys.api.contact.Contact
+import com.emarsys.api.contact.ContactApi
+import com.emarsys.api.contact.ContactContext
+import com.emarsys.api.contact.ContactInternal
+import com.emarsys.api.contact.GathererContact
+import com.emarsys.api.contact.LoggingContact
+import com.emarsys.api.push.GathererPush
+import com.emarsys.api.push.LoggingPush
+import com.emarsys.api.push.Push
+import com.emarsys.api.push.PushApi
+import com.emarsys.api.push.PushContext
+import com.emarsys.api.push.PushInternal
+import com.emarsys.context.SdkContext
 import com.emarsys.core.DefaultUrls
 import com.emarsys.core.DefaultUrlsApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.log.SdkLogger
+import com.emarsys.core.networking.clients.GenericNetworkClient
+import com.emarsys.core.networking.clients.push.PushClient
+import com.emarsys.core.networking.clients.push.PushClientApi
 import com.emarsys.core.storage.Storage
-import com.emarsys.core.networking.GenericNetworkClient
-import io.ktor.client.*
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.serialization.kotlinx.json.*
 import com.emarsys.core.storage.StorageApi
 import com.emarsys.networking.ktor.plugin.EmarsysAuthPlugin
 import com.emarsys.providers.Provider
 import com.emarsys.providers.UUIDProvider
 import com.emarsys.session.SessionContext
+import com.emarsys.url.EmarsysUrlType
+import com.emarsys.url.FactoryApi
+import com.emarsys.url.UrlFactory
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.HttpRequestRetry
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
 class DependencyContainer : DependencyContainerApi {
@@ -45,7 +58,11 @@ class DependencyContainer : DependencyContainerApi {
     }
 
     val sessionContext: SessionContext by lazy {
-        SessionContext()
+        SessionContext(clientState = null)
+    }
+
+    val urlFactory: FactoryApi<EmarsysUrlType, String> by lazy {
+        UrlFactory(sdkContext, defaultUrls)
     }
 
     override val contactApi: ContactApi by lazy {
@@ -63,7 +80,7 @@ class DependencyContainer : DependencyContainerApi {
         Push(loggingPush, gathererPush, pushInternal, sdkContext)
     }
     val pushClient: PushClientApi by lazy {
-        PushClient(genericNetworkClient, sdkContext, defaultUrls, json)
+        PushClient(genericNetworkClient, urlFactory, json)
     }
 
     val defaultUrls: DefaultUrlsApi by lazy {

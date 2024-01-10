@@ -1,6 +1,5 @@
 package com.emarsys.api.generic
 
-import SdkContext
 import com.emarsys.api.SdkState.active
 import com.emarsys.api.SdkState.inactive
 import com.emarsys.api.SdkState.onHold
@@ -9,6 +8,7 @@ import com.emarsys.api.contact.ContactInternal
 import com.emarsys.api.contact.FakeSdkLogger
 import com.emarsys.api.contact.GathererContact
 import com.emarsys.api.contact.LoggingContact
+import com.emarsys.context.SdkContext
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.test.runTest
