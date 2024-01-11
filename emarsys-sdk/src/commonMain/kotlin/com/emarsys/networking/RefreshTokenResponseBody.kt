@@ -1,4 +1,4 @@
-package com.emarsys.networking.ktor.plugin
+package com.emarsys.networking
 
 import kotlinx.serialization.Serializable
 

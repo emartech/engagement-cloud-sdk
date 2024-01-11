@@ -22,7 +22,6 @@ import com.emarsys.core.networking.clients.push.PushClient
 import com.emarsys.core.networking.clients.push.PushClientApi
 import com.emarsys.core.storage.Storage
 import com.emarsys.core.storage.StorageApi
-import com.emarsys.networking.ktor.plugin.EmarsysAuthPlugin
 import com.emarsys.providers.Provider
 import com.emarsys.providers.UUIDProvider
 import com.emarsys.session.SessionContext
@@ -100,9 +99,6 @@ class DependencyContainer : DependencyContainerApi {
                 json()
             }
             install(HttpRequestRetry)
-            install(EmarsysAuthPlugin) {
-                sessionContext = this@DependencyContainer.sessionContext
-            }
         }
         GenericNetworkClient(httpClient)
     }

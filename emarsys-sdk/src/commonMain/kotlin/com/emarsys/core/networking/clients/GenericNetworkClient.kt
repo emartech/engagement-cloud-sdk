@@ -14,6 +14,7 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import kotlin.time.Duration.Companion.seconds
@@ -55,7 +56,7 @@ class GenericNetworkClient(private val client: HttpClient) : NetworkClientApi {
             httpResponse.headers,
             httpResponse.bodyAsText()
         )
-        if (!httpResponse.status.isSuccess()) {
+        if (!httpResponse.status.isSuccess() && httpResponse.status != HttpStatusCode.Unauthorized) {
             if (retries == MAX_RETRY_COUNT) {
                 throw RetryLimitReachedException("Request retry limit reached! Response: ${httpResponse.bodyAsText()}")
             }
