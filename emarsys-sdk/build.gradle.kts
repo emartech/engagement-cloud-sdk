@@ -14,13 +14,6 @@ plugins {
 group = "com.emarsys"
 version = "1.0-SNAPSHOT"
 
-repositories {
-    mavenCentral()
-    maven(url = "https://www.jitpack.io")
-    google()
-
-}
-
 kotlin {
     //explicitApi()
     jvmToolchain(17)

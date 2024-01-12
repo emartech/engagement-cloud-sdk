@@ -8,7 +8,7 @@ androidx-appcompat = "1.6.1"
 androidx-constraintlayout = "2.1.4"
 androidx-core-ktx = "1.12.0"
 androidx-espresso-core = "3.5.1"
-androidx-material = "1.10.0"
+androidx-material = "1.11.0"
 androidx-test-junit = "1.1.5"
 buildConfig = "4.2.0"
 compose = "1.5.4"
@@ -27,6 +27,10 @@ mockkAndroid = "1.13.8"
 mockmp = "1.16.0"
 runner = "1.5.2"
 uuid = "0.8.2"
+fcm = "23.4.0"
+agconnect_core = "1.9.1.300"
+hms_push = "6.11.0.300"
+googleServices = "4.4.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
@@ -42,6 +46,9 @@ compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = 
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
 compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
 compose-material = { module = "androidx.compose.material:material", version.ref = "compose" }
+fcm = { group = "com.google.firebase", name = "firebase-messaging", version.ref = "fcm" }
+hms = { group = "com.huawei.hms", name = "push", version.ref = "hms_push" }
+agconnect-core = { group = "com.huawei.agconnect", name = "agconnect-core", version.ref = "agconnect_core" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-framework-engine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
@@ -59,15 +66,18 @@ ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
 ktor-serialization = { module = "io.ktor:ktor-serialization", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockkAndroid" }
-uuid = { module = "com.benasher44:uuid", version.ref = "uuid"}
+uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 mockmp = { id = "org.kodein.mock.mockmp", version.ref = "mockmp" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 buildConfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildConfig" }
+agconnect = { id = "com.huawei.agconnect", version.ref = "agconnect_core" }
+googleServices = { id = "com.google.gms.google-services", version.ref = "googleServices" }

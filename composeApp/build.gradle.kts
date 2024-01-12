@@ -7,13 +7,6 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
 }
 
-repositories {
-    google()
-    mavenCentral()
-    maven(url = "https://www.jitpack.io")
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-}
-
 kotlin {
     jvmToolchain(17)
 
