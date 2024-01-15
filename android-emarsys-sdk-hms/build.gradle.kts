@@ -11,4 +11,8 @@ dependencies {
 android {
     namespace = "com.emarsys.hms"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }

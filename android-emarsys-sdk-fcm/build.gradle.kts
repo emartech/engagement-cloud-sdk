@@ -10,4 +10,8 @@ dependencies {
 android {
     namespace = "com.emarsys.fcm"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }
