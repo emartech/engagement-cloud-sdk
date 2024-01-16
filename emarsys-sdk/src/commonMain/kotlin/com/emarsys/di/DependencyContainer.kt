@@ -11,6 +11,7 @@ import com.emarsys.api.push.LoggingPush
 import com.emarsys.api.push.Push
 import com.emarsys.api.push.PushApi
 import com.emarsys.api.push.PushContext
+import com.emarsys.api.push.PushInstance
 import com.emarsys.api.push.PushInternal
 import com.emarsys.context.SdkContext
 import com.emarsys.core.DefaultUrls
@@ -71,11 +72,15 @@ class DependencyContainer : DependencyContainerApi {
         val contactInternal = ContactInternal()
         Contact(loggingContact, gathererContact, contactInternal, sdkContext)
     }
+
+    val pushInternal: PushInstance by lazy {
+        PushInternal(pushClient, stringStorage)
+    }
+
     override val pushApi: PushApi by lazy {
         val pushContext = PushContext()
         val loggingPush = LoggingPush(sdkLogger)
         val gathererPush = GathererPush(pushContext)
-        val pushInternal = PushInternal(pushClient, stringStorage)
         Push(loggingPush, gathererPush, pushInternal, sdkContext)
     }
     val pushClient: PushClientApi by lazy {
@@ -101,5 +106,11 @@ class DependencyContainer : DependencyContainerApi {
             install(HttpRequestRetry)
         }
         GenericNetworkClient(httpClient)
+    }
+
+    val setupOrganizer: String by lazy { //TODO NOT string
+        val platformInit = dependencyCreator.createPlatformInitState(pushInternal)
+// TODO;        SetupOrganizer(machine, context, states)
+        ""
     }
 }
