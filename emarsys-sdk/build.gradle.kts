@@ -59,6 +59,7 @@ kotlin {
            dependencies {
                implementation(libs.kotlinx.coroutines.android)
                implementation(libs.ktor.client.android)
+               implementation(libs.androidx.core.ktx)
            }
        }
         val androidUnitTest by getting {

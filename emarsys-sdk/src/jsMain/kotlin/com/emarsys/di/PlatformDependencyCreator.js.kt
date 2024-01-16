@@ -9,6 +9,7 @@ import com.emarsys.providers.Provider
 import com.emarsys.setup.PlatformInitState
 import com.emarsys.setup.PlatformInitStateApi
 import kotlinx.browser.window
+import kotlinx.coroutines.CoroutineDispatcher
 
 actual class PlatformDependencyCreator actual constructor(platformContext: PlatformContext) : DependencyCreator {
 
@@ -22,7 +23,7 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
         return DeviceInfoCollector(createWebDeviceInfoCollector(), uuidProvider, createStorage())
     }
 
-    override fun createPlatformInitState(pushApi: PushApi): PlatformInitStateApi {
+    override fun createPlatformInitState(pushApi: PushApi, sdkDispatcher: CoroutineDispatcher): PlatformInitStateApi {
         return PlatformInitState(pushApi)
     }
 

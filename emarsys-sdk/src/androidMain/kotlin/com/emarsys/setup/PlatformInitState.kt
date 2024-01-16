@@ -1,20 +1,30 @@
 package com.emarsys.setup
 
-import com.emarsys.api.push.PushApi
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.IntentFilter
+import androidx.core.content.ContextCompat
+import com.emarsys.api.push.PushConstants.PUSH_TOKEN_INTENT_FILTER_ACTION
 
-class PlatformInitState(val pushApi: PushApi): PlatformInitStateApi {
+class PlatformInitState(
+    private val pushTokenBroadcastReceiver: BroadcastReceiver,
+    private val context: Context
+) : PlatformInitStateApi {
 
     override val name: String = "androidInitState"
 
     override fun prepare() {
-        TODO("Not yet implemented")
+        ContextCompat.registerReceiver(
+            context,
+            pushTokenBroadcastReceiver,
+            IntentFilter(PUSH_TOKEN_INTENT_FILTER_ACTION),
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
     }
 
     override suspend fun active() {
-        TODO("Not yet implemented")
     }
 
     override fun relax() {
-        TODO("Not yet implemented")
     }
 }

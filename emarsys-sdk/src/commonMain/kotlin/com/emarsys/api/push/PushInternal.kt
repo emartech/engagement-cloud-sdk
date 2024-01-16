@@ -1,5 +1,6 @@
 package com.emarsys.api.push
 
+import com.emarsys.api.push.PushConstants.PUSH_TOKEN_STORAGE_KEY
 import com.emarsys.core.networking.clients.push.PushClientApi
 import com.emarsys.core.storage.StorageApi
 
@@ -9,10 +10,10 @@ class PushInternal(
 ): PushInstance {
 
     override suspend fun registerPushToken(pushToken: String) {
-        val storedPushToken = storageApi.get("emsPushToken")
+        val storedPushToken = storageApi.get(PUSH_TOKEN_STORAGE_KEY)
         if (storedPushToken != pushToken) {
             pushClient.registerPushToken(pushToken)
-            storageApi.put("emsPushToken", pushToken)
+            storageApi.put(PUSH_TOKEN_STORAGE_KEY, pushToken)
         }
     }
 

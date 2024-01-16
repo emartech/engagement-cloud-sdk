@@ -11,6 +11,7 @@ import com.emarsys.api.contact.LoggingContact
 import com.emarsys.context.SdkContext
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -28,7 +29,7 @@ class GenericApiTests {
         loggingContact = LoggingContact(FakeSdkLogger())
         gathererContact = GathererContact(ContactContext())
         contactInternal = ContactInternal()
-        sdkContext = SdkContext()
+        sdkContext = SdkContext(StandardTestDispatcher())
         genericApi = GenericApi(loggingContact, gathererContact, contactInternal, sdkContext)
     }
 
