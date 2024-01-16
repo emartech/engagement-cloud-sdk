@@ -4,12 +4,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class StateMachine(private val states: List<State>): StateContext {
-
+class StateMachine(private val states: List<State>): StateMachineApi {
     private val innerStateLifecycle: MutableStateFlow<Pair<String, StateLifecycle>?> = MutableStateFlow(null)
     override val stateLifecycle: StateFlow<Pair<String, StateLifecycle>?> = innerStateLifecycle.asStateFlow()
 
-    suspend fun activate() {
+    override suspend fun activate() {
         states.forEach {
             innerStateLifecycle.value = it.name to StateLifecycle.prepare
             it.prepare()

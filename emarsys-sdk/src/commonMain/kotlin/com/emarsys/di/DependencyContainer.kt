@@ -19,13 +19,17 @@ import com.emarsys.core.DefaultUrlsApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.networking.clients.GenericNetworkClient
+import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.clients.push.PushClient
 import com.emarsys.core.networking.clients.push.PushClientApi
+import com.emarsys.core.state.StateMachine
 import com.emarsys.core.storage.Storage
 import com.emarsys.core.storage.StorageApi
 import com.emarsys.providers.Provider
 import com.emarsys.providers.UUIDProvider
 import com.emarsys.session.SessionContext
+import com.emarsys.setup.SetupOrganizer
+import com.emarsys.setup.SetupOrganizerApi
 import com.emarsys.url.EmarsysUrlType
 import com.emarsys.url.FactoryApi
 import com.emarsys.url.UrlFactory
@@ -33,6 +37,8 @@ import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.json.Json
 
 class DependencyContainer : DependencyContainerApi {
@@ -53,8 +59,12 @@ class DependencyContainer : DependencyContainerApi {
 
     val sdkLogger: SdkLogger by lazy { SdkLogger() }
 
+    val sdkDispatcher: CoroutineDispatcher by lazy {
+        Dispatchers.Default
+    }
+
     val sdkContext: SdkContext by lazy {
-        SdkContext()
+        SdkContext(sdkDispatcher)
     }
 
     val sessionContext: SessionContext by lazy {
@@ -98,7 +108,7 @@ class DependencyContainer : DependencyContainerApi {
             "https://log-dealer.eservice.emarsys.net"
         )
     }
-    val genericNetworkClient: GenericNetworkClient by lazy {
+    val genericNetworkClient: NetworkClientApi by lazy {
         val httpClient = HttpClient {
             install(ContentNegotiation) {
                 json()
@@ -108,9 +118,9 @@ class DependencyContainer : DependencyContainerApi {
         GenericNetworkClient(httpClient)
     }
 
-    val setupOrganizer: String by lazy { //TODO NOT string
-        val platformInit = dependencyCreator.createPlatformInitState(pushInternal)
-// TODO;        SetupOrganizer(machine, context, states)
-        ""
+    override val setupOrganizerApi: SetupOrganizerApi by lazy {
+        val platformInit = dependencyCreator.createPlatformInitState(pushInternal, sdkDispatcher)
+        val stateMachine = StateMachine(listOf(platformInit))
+        SetupOrganizer(stateMachine, sdkContext)
     }
 }

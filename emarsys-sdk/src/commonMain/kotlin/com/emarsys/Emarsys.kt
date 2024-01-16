@@ -10,6 +10,7 @@ object Emarsys {
 
     suspend fun enableTracking(config: EmarsysConfig){
         config.isValid()
+        DependencyInjection.container?.setupOrganizerApi?.setup(config)
     }
 
     suspend fun linkContact(contactFieldId: Int, contactFieldValue: String) {
