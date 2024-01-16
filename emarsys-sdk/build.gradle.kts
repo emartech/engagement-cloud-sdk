@@ -81,6 +81,7 @@ kotlin {
         val jsMain by getting {
             dependencies {
                 implementation(libs.ktor.client.js)
+                implementation(libs.kotlin.wrapper.browser)
             }
         }
         val jsTest by getting {

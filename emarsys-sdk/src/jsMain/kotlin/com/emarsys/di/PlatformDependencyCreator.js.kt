@@ -6,6 +6,7 @@ import com.emarsys.core.device.WebPlatformInfoCollector
 import com.emarsys.core.storage.StorageApi
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.providers.Provider
+import com.emarsys.push.PushService
 import com.emarsys.setup.PlatformInitState
 import com.emarsys.setup.PlatformInitStateApi
 import kotlinx.browser.window
@@ -24,7 +25,8 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
     }
 
     override fun createPlatformInitState(pushApi: PushApi, sdkDispatcher: CoroutineDispatcher): PlatformInitStateApi {
-        return PlatformInitState(pushApi)
+        val pushService = PushService("VAPID server key", "/ems-service-worker.js", pushApi)
+        return PlatformInitState(pushService)
     }
 
     private fun createWebDeviceInfoCollector(): WebPlatformInfoCollector {

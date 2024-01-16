@@ -31,6 +31,7 @@ fcm = "23.4.0"
 agconnect_core = "1.9.1.300"
 hms_push = "6.11.0.300"
 googleServices = "4.4.0"
+kotlinWrappers = "1.0.0-pre.686"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
@@ -67,6 +68,7 @@ ktor-serialization = { module = "io.ktor:ktor-serialization", version.ref = "kto
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockkAndroid" }
 uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
+kotlin-wrapper-browser = { module = "org.jetbrains.kotlin-wrappers:kotlin-browser", version.ref = "kotlinWrappers" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
