@@ -21,4 +21,7 @@ class PushClient(
         val body = json.encodeToString(PushToken(pushToken))
         networkClient.send(UrlRequest(url, HttpMethod.Put, body))
     }
+
+    override suspend fun clearPushToken() {
+    }
 }

@@ -75,7 +75,7 @@ class DependencyContainer : DependencyContainerApi {
         val pushContext = PushContext()
         val loggingPush = LoggingPush(sdkLogger)
         val gathererPush = GathererPush(pushContext)
-        val pushInternal = PushInternal(pushClient)
+        val pushInternal = PushInternal(pushClient, stringStorage)
         Push(loggingPush, gathererPush, pushInternal, sdkContext)
     }
     val pushClient: PushClientApi by lazy {
