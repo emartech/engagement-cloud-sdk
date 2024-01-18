@@ -64,4 +64,26 @@ class UrlFactoryTests : TestsWithMocks() {
 
         result shouldBe "https://me-client.eservice.emarsys.net/v3/apps/testAppCode/client"
     }
+
+    @Test
+    fun testCreate_linkContact_should_return_url_withAppCode() {
+        val config = EmarsysConfig("testAppCode", null)
+        val clientServiceBaseUrl = "https://me-client.eservice.emarsys.net"
+        every { mockDefaultUrls.clientServiceBaseUrl } returns clientServiceBaseUrl
+        every { mockSdkContext.config } returns config
+        val result = urlFactory.create(EmarsysUrlType.LINK_CONTACT)
+
+        result shouldBe "https://me-client.eservice.emarsys.net/v3/apps/testAppCode/client/contact"
+    }
+
+    @Test
+    fun testCreate_linkContact_should_return_url_for_predict() {
+        val config = EmarsysConfig(null, "testMerchantId")
+        val clientServiceBaseUrl = "https://me-client.eservice.emarsys.net"
+        every { mockDefaultUrls.clientServiceBaseUrl } returns clientServiceBaseUrl
+        every { mockSdkContext.config } returns config
+        val result = urlFactory.create(EmarsysUrlType.LINK_CONTACT)
+
+        result shouldBe "https://me-client.eservice.emarsys.net/v3/contact"
+    }
 }
