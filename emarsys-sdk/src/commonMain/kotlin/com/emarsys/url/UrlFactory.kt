@@ -2,6 +2,7 @@ package com.emarsys.url
 
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.DefaultUrlsApi
+import com.emarsys.url.EmarsysUrlType.EVENT
 import com.emarsys.url.EmarsysUrlType.LINK_CONTACT
 import com.emarsys.url.EmarsysUrlType.REFRESH_TOKEN
 import com.emarsys.url.EmarsysUrlType.REGISTER_DEVICE_INFO
@@ -13,6 +14,7 @@ class UrlFactory(
 ) : FactoryApi<EmarsysUrlType, String> {
     private companion object {
         const val V3_API = "v3"
+        const val V4_API = "v4"
     }
 
     override fun create(value: EmarsysUrlType): String {
@@ -31,6 +33,9 @@ class UrlFactory(
 
             REGISTER_PUSH_TOKEN -> "${defaultUrls.clientServiceBaseUrl}/$V3_API/apps/${sdkContext.config?.applicationCode}/client/push-token"
             REGISTER_DEVICE_INFO -> "${defaultUrls.clientServiceBaseUrl}/$V3_API/apps/${sdkContext.config?.applicationCode}/client"
+            EVENT -> {
+                "${defaultUrls.eventServiceBaseUrl}/$V4_API/apps/${sdkContext.config?.applicationCode}/client/events"
+            }
         }
     }
 

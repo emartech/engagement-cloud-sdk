@@ -2,7 +2,8 @@ package com.emarsys.networking
 
 import com.emarsys.core.networking.clients.GenericNetworkClient
 import com.emarsys.core.networking.clients.NetworkClientApi
-import com.emarsys.networking.clients.event.model.CustomEvent
+import com.emarsys.core.networking.clients.event.model.Event
+import com.emarsys.core.networking.clients.event.model.EventType
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.networking.model.body
@@ -52,7 +53,7 @@ class EmarsysClientTests : TestsWithMocks() {
 
     @BeforeTest
     fun setup() = runTest {
-        sessionContext = SessionContext(refreshToken = "testRefreshToken")
+        sessionContext = SessionContext(refreshToken = "testRefreshToken", deviceEventState = null)
         json = Json
         val mockHttpEngine = MockEngine.config {
             addHandler {
@@ -71,7 +72,7 @@ class EmarsysClientTests : TestsWithMocks() {
             }
             addHandler {
                 respond(
-                    ByteReadChannel("""{"eventName":"test"}"""),
+                    ByteReadChannel("""{"eventType":"${EventType.CUSTOM}", "eventName":"test"}"""),
                     status = HttpStatusCode.OK,
                     headers = headers {
                         append("Content-Type", "application/json")
@@ -120,13 +121,13 @@ class EmarsysClientTests : TestsWithMocks() {
                 append("Content-Type", "application/json")
                 append("X-Client-State", "testClientState")
             },
-            """{"eventName":"test"}"""
+            """{"eventType":"${EventType.CUSTOM}", "eventName":"test"}"""
         )
 
         val response: Response = emarsysClient.send(request)
 
         response shouldBe expectedResponse
-        response.body<CustomEvent>() shouldBe CustomEvent("test")
+        response.body<Event>() shouldBe Event(EventType.CUSTOM, "test")
         sessionContext.clientState shouldBe "testClientState"
     }
 
