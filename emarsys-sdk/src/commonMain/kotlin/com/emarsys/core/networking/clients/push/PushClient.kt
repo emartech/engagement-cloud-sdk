@@ -12,14 +12,14 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class PushClient(
-    private val networkClient: NetworkClientApi,
+    private val emarsysClient: NetworkClientApi,
     private val urlFactory: FactoryApi<EmarsysUrlType, String>,
     private val json: Json
 ) : PushClientApi {
     override suspend fun registerPushToken(pushToken: String) {
         val url = Url(urlFactory.create(REGISTER_PUSH_TOKEN))
         val body = json.encodeToString(PushToken(pushToken))
-        networkClient.send(UrlRequest(url, HttpMethod.Put, body))
+        emarsysClient.send(UrlRequest(url, HttpMethod.Put, body))
     }
 
     override suspend fun clearPushToken() {

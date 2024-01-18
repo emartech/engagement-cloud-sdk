@@ -24,7 +24,7 @@ class PushClientTests : TestsWithMocks() {
     override fun setUpMocks() = injectMocks(mocker)
 
     @Mock
-    lateinit var mockNetworkClient: NetworkClientApi
+    lateinit var mockEmarsysClient: NetworkClientApi
 
     @Mock
     lateinit var mockDefaultUrls: DefaultUrlsApi
@@ -36,7 +36,7 @@ class PushClientTests : TestsWithMocks() {
     lateinit var mockUrlFactory: FactoryApi<EmarsysUrlType, String>
 
     private var pushClient: PushClient by withMocks {
-        PushClient(mockNetworkClient, mockUrlFactory, Json)
+        PushClient(mockEmarsysClient, mockUrlFactory, Json)
     }
 
     @Test
@@ -53,7 +53,7 @@ class PushClientTests : TestsWithMocks() {
             HttpMethod.Put,
             """{"pushToken":"test"}"""
         )
-        everySuspending { mockNetworkClient.send(expectedUrlRequest) } returns Response(
+        everySuspending { mockEmarsysClient.send(expectedUrlRequest) } returns Response(
             expectedUrlRequest,
             HttpStatusCode.OK,
             Headers.Empty,
@@ -63,7 +63,7 @@ class PushClientTests : TestsWithMocks() {
         pushClient.registerPushToken("test")
 
         verifyWithSuspend(exhaustive = false) {
-            mockNetworkClient.send(expectedUrlRequest)
+            mockEmarsysClient.send(expectedUrlRequest)
         }
     }
 }
