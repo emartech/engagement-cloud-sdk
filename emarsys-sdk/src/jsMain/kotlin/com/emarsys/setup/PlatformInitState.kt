@@ -7,7 +7,7 @@ class PlatformInitState(private val pushService: PushService): PlatformInitState
     override val name: String = "jsInitState"
 
     override fun prepare() {
-        TODO("Not yet implemented")
+
     }
 
     override suspend fun active() {
@@ -15,6 +15,6 @@ class PlatformInitState(private val pushService: PushService): PlatformInitState
     }
 
     override fun relax() {
-        TODO("Not yet implemented")
+
     }
 }

@@ -25,7 +25,7 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
     }
 
     override fun createPlatformInitState(pushApi: PushApi, sdkDispatcher: CoroutineDispatcher): PlatformInitStateApi {
-        val pushService = PushService("VAPID server key", "/ems-service-worker.js", pushApi)
+        val pushService = PushService("BDa49_IiPdIo2Kda5cATItp81sOaYg-eFFISMdlSXatDAIZCdtAxUuMVzXo4M2MXXI0sUYQzQI7shyNkKgwyD_I", "/ems-service-worker.js", pushApi)
         return PlatformInitState(pushService)
     }
 

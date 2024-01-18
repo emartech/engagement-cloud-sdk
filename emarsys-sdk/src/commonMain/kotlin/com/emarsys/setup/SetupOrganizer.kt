@@ -11,8 +11,8 @@ class SetupOrganizer(
 ) : SetupOrganizerApi {
 
     override suspend fun setup(config: EmarsysConfig) {
-        stateMachine.activate()
         sdkContext.config = config
+        stateMachine.activate()
         sdkContext.setSdkState(SdkState.active)
     }
 }
