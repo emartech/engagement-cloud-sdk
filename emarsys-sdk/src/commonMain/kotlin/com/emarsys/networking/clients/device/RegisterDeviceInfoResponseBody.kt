@@ -1,4 +1,4 @@
-package com.emarsys.core.networking.clients.device
+package com.emarsys.networking.clients.device
 
 import kotlinx.serialization.Serializable
 

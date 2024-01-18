@@ -1,7 +1,7 @@
-package com.emarsys.core.networking.clients.push
+package com.emarsys.networking.clients.push
 
 import com.emarsys.core.networking.clients.NetworkClientApi
-import com.emarsys.core.networking.clients.push.model.PushToken
+import com.emarsys.networking.clients.push.model.PushToken
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.url.EmarsysUrlType
 import com.emarsys.url.EmarsysUrlType.REGISTER_PUSH_TOKEN

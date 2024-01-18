@@ -20,10 +20,10 @@ import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.networking.clients.GenericNetworkClient
 import com.emarsys.core.networking.clients.NetworkClientApi
-import com.emarsys.core.networking.clients.device.DeviceClient
-import com.emarsys.core.networking.clients.device.DeviceClientApi
-import com.emarsys.core.networking.clients.push.PushClient
-import com.emarsys.core.networking.clients.push.PushClientApi
+import com.emarsys.networking.clients.device.DeviceClient
+import com.emarsys.networking.clients.device.DeviceClientApi
+import com.emarsys.networking.clients.push.PushClient
+import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.core.state.StateMachine
 import com.emarsys.core.storage.Storage
 import com.emarsys.core.storage.StorageApi

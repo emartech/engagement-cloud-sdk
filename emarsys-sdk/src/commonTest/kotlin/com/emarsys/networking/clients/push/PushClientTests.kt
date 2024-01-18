@@ -1,10 +1,11 @@
-package com.emarsys.clients.push
+package com.emarsys.networking.clients.push
 
 import com.emarsys.EmarsysConfig
+import com.emarsys.clients.push.injectMocks
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.DefaultUrlsApi
 import com.emarsys.core.networking.clients.NetworkClientApi
-import com.emarsys.core.networking.clients.push.PushClient
+import com.emarsys.networking.clients.push.PushClient
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.url.EmarsysUrlType

@@ -1,6 +1,6 @@
 package com.emarsys.api.push
 
-import com.emarsys.core.networking.clients.push.PushClientApi
+import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.core.storage.StorageApi
 import kotlinx.coroutines.test.runTest
 import org.kodein.mock.Mock

@@ -3,7 +3,7 @@ package com.emarsys.core.networking
 import com.emarsys.core.exceptions.FailedRequestException
 import com.emarsys.core.exceptions.RetryLimitReachedException
 import com.emarsys.core.networking.clients.GenericNetworkClient
-import com.emarsys.core.networking.clients.event.model.CustomEvent
+import com.emarsys.networking.clients.event.model.CustomEvent
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.networking.model.body

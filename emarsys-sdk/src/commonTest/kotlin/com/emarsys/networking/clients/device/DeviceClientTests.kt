@@ -1,9 +1,9 @@
-package com.emarsys.clients.device
+package com.emarsys.networking.clients.device
 
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.networking.clients.NetworkClientApi
-import com.emarsys.core.networking.clients.device.DeviceClient
-import com.emarsys.core.networking.clients.device.DeviceClientApi
+import com.emarsys.networking.clients.device.DeviceClient
+import com.emarsys.networking.clients.device.DeviceClientApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.session.SessionContext
