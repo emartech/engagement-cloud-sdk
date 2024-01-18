@@ -1,0 +1,13 @@
+<html>
+    <head>
+        <script src="emarsys-sdk.js"></script>
+        
+    </head>
+    <body>
+        <button type="button" id="button1" >Click me!</button>
+    </body>
+
+    <script>
+            document.getElementById("button1").onclick = async () => {await new window["emarsys-sdk"].com.emarsys.EmarsysJs().enableTracking()}
+    </script>  
+</html>
