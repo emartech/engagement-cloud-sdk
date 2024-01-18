@@ -11,7 +11,7 @@ import com.emarsys.networking.EmarsysHeaders.REQUEST_ORDER_HEADER
 import com.emarsys.providers.Provider
 import com.emarsys.session.SessionContext
 import com.emarsys.url.EmarsysUrlType
-import com.emarsys.url.FactoryApi
+import com.emarsys.url.UrlFactoryApi
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
@@ -26,7 +26,7 @@ class EmarsysClient(
     private val networkClient: NetworkClientApi,
     private val sessionContext: SessionContext,
     private val timestampProvider: Provider<Instant>,
-    private val urlFactory: FactoryApi<EmarsysUrlType, String>,
+    private val urlFactory: UrlFactoryApi,
     private val json: Json
 ) : NetworkClientApi {
     private companion object {
@@ -60,9 +60,7 @@ class EmarsysClient(
     }
 
     private fun createRefreshContactTokenRequest() = UrlRequest(
-        Url(
-            urlFactory.create(EmarsysUrlType.REFRESH_TOKEN)
-        ),
+        urlFactory.create(EmarsysUrlType.REFRESH_TOKEN),
         HttpMethod.Post,
         json.encodeToString(RefreshTokenRequestBody(sessionContext.refreshToken!!)),
         mapOf(

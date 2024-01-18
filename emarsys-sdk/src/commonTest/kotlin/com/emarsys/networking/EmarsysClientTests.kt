@@ -9,7 +9,7 @@ import com.emarsys.core.networking.model.body
 import com.emarsys.providers.Provider
 import com.emarsys.session.SessionContext
 import com.emarsys.url.EmarsysUrlType
-import com.emarsys.url.FactoryApi
+import com.emarsys.url.UrlFactoryApi
 import io.kotest.matchers.shouldBe
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.config
@@ -17,11 +17,7 @@ import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.http.HttpMethod
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.URLBuilder
-import io.ktor.http.headers
-import io.ktor.http.headersOf
+import io.ktor.http.*
 import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
@@ -40,7 +36,7 @@ class EmarsysClientTests : TestsWithMocks() {
     lateinit var mockTimestampProvider: Provider<Instant>
 
     @Mock
-    lateinit var mockUrlFactory: FactoryApi<EmarsysUrlType, String>
+    lateinit var mockUrlFactory: UrlFactoryApi
 
     private lateinit var networkClient: NetworkClientApi
     private lateinit var json: Json
@@ -87,7 +83,7 @@ class EmarsysClientTests : TestsWithMocks() {
             install(HttpRequestRetry)
         }
         every { mockTimestampProvider.provide() } returns now
-        every { mockUrlFactory.create(isAny()) } returns "https://testUrl.com"
+        every { mockUrlFactory.create(isAny()) } returns Url("https://testUrl.com")
 
         networkClient = GenericNetworkClient(httpClient)
         emarsysClient = EmarsysClient(

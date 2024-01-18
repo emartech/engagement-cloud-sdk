@@ -2,14 +2,12 @@ package com.emarsys.networking.clients.device
 
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.networking.clients.NetworkClientApi
-import com.emarsys.networking.clients.device.DeviceClient
-import com.emarsys.networking.clients.device.DeviceClientApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.session.SessionContext
 import com.emarsys.url.EmarsysUrlType
 import com.emarsys.url.EmarsysUrlType.REGISTER_DEVICE_INFO
-import com.emarsys.url.FactoryApi
+import com.emarsys.url.UrlFactoryApi
 import io.kotest.matchers.shouldBe
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -28,7 +26,7 @@ class DeviceClientTests : TestsWithMocks() {
     lateinit var mockEmarsysClient: NetworkClientApi
 
     @Mock
-    lateinit var mockUrlFactory: FactoryApi<EmarsysUrlType, String>
+    lateinit var mockUrlFactory: UrlFactoryApi
 
     @Mock
     lateinit var mockDeviceInfoCollector: DeviceInfoCollectorApi
@@ -46,13 +44,13 @@ class DeviceClientTests : TestsWithMocks() {
     }
 
     @Test
-    fun registerDeviceInfo_should_send_deviceInfo_to_client_service() = runTest {
-        val testUrl = "https://www.testUrl.com/testAppCode/client"
+    fun testRegisterDeviceInfo_should_send_deviceInfo_to_client_service() = runTest {
+        val testUrl = Url("https://www.testUrl.com/testAppCode/client")
         val testDeviceInfoString = "testDeviceInfo"
         val testRefreshToken = "testRefreshToken"
         val testContactToken = "testContactToken"
         val request = UrlRequest(
-            Url(testUrl),
+            testUrl,
             HttpMethod.Post,
             testDeviceInfoString
         )

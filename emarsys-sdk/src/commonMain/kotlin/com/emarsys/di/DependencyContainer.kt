@@ -36,7 +36,7 @@ import com.emarsys.setup.CollectDeviceInfoState
 import com.emarsys.setup.SetupOrganizer
 import com.emarsys.setup.SetupOrganizerApi
 import com.emarsys.url.EmarsysUrlType
-import com.emarsys.url.FactoryApi
+import com.emarsys.url.UrlFactoryApi
 import com.emarsys.url.UrlFactory
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpRequestRetry
@@ -77,7 +77,7 @@ class DependencyContainer : DependencyContainerApi {
         SessionContext(clientState = null)
     }
 
-    private val urlFactory: FactoryApi<EmarsysUrlType, String> by lazy {
+    private val urlFactory: UrlFactoryApi by lazy {
         UrlFactory(sdkContext, defaultUrls)
     }
 

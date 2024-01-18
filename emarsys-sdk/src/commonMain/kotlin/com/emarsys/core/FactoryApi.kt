@@ -1,4 +1,4 @@
-package com.emarsys.url
+package com.emarsys.core
 
 interface FactoryApi<Input, Output> {
 

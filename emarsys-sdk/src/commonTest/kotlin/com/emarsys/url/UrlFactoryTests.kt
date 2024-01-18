@@ -3,6 +3,7 @@ package com.emarsys.url
 import com.emarsys.EmarsysConfig
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.DefaultUrlsApi
+import com.emarsys.url.UrlFactoryApi
 import io.kotest.matchers.shouldBe
 import org.kodein.mock.Mock
 import org.kodein.mock.tests.TestsWithMocks
@@ -17,7 +18,7 @@ class UrlFactoryTests : TestsWithMocks() {
     @Mock
     lateinit var mockDefaultUrls: DefaultUrlsApi
 
-    private var urlFactory: FactoryApi<EmarsysUrlType, String> by withMocks {
+    private var urlFactory: UrlFactoryApi by withMocks {
         UrlFactory(mockSdkContext, mockDefaultUrls)
     }
 

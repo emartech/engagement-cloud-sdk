@@ -8,13 +8,13 @@ import com.emarsys.core.networking.model.body
 import com.emarsys.session.SessionContext
 import com.emarsys.url.EmarsysUrlType
 import com.emarsys.url.EmarsysUrlType.REGISTER_DEVICE_INFO
-import com.emarsys.url.FactoryApi
+import com.emarsys.url.UrlFactoryApi
 import io.ktor.http.HttpMethod
 import io.ktor.http.Url
 
 class DeviceClient(
     private val emarsysClient: NetworkClientApi,
-    private val urlFactory: FactoryApi<EmarsysUrlType, String>,
+    private val urlFactory: UrlFactoryApi,
     private val deviceInfoCollector: DeviceInfoCollectorApi,
     private val sessionContext: SessionContext
 ) : DeviceClientApi {
@@ -25,7 +25,7 @@ class DeviceClient(
 
     private fun createRequest(): UrlRequest {
         val deviceInfoString = deviceInfoCollector.collect()
-        val url = Url(urlFactory.create(REGISTER_DEVICE_INFO))
+        val url = urlFactory.create(REGISTER_DEVICE_INFO)
         return UrlRequest(
             url,
             HttpMethod.Post,

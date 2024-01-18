@@ -1,4 +1,4 @@
-package com.emarsys.core.networking.clients.event.model
+package com.emarsys.networking.clients.event.model
 
 import kotlinx.serialization.Serializable
 
