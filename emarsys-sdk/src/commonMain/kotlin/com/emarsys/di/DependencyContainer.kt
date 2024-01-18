@@ -112,7 +112,7 @@ class DependencyContainer : DependencyContainerApi {
         Push(loggingPush, gathererPush, pushInternal, sdkContext)
     }
     private val pushClient: PushClientApi by lazy {
-        PushClient(genericNetworkClient, urlFactory, json)
+        PushClient(emarsysClient, urlFactory, json)
     }
 
     private val defaultUrls: DefaultUrlsApi by lazy {

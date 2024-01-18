@@ -107,13 +107,14 @@ class EmarsysClientTests : TestsWithMocks() {
             urlString,
             HttpMethod.Get,
             null,
-            mapOf(
-                "X-Contact-Token" to "testContactToken",
-                "X-Request-Order" to now.toString()
-            )
         )
+        val expectedRequest = request.copy(headers = mapOf(
+            "X-Contact-Token" to "testContactToken",
+            "X-Request-Order" to now.toEpochMilliseconds()
+        ))
+
         val expectedResponse = Response(
-            request,
+            expectedRequest,
             HttpStatusCode.OK,
             headers {
                 append("Content-Type", "application/json")

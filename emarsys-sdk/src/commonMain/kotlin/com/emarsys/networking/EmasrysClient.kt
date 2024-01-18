@@ -68,7 +68,7 @@ class EmarsysClient(
         mapOf(
             CLIENT_ID_HEADER to sessionContext.clientId,
             CLIENT_STATE_HEADER to sessionContext.clientState,
-            REQUEST_ORDER_HEADER to timestampProvider.provide().toString()
+            REQUEST_ORDER_HEADER to timestampProvider.provide().toEpochMilliseconds()
         )
     )
 
@@ -85,7 +85,7 @@ class EmarsysClient(
             CLIENT_ID_HEADER to sessionContext.clientId,
             CLIENT_STATE_HEADER to sessionContext.clientState,
             CONTACT_TOKEN_HEADER to sessionContext.contactToken,
-            REQUEST_ORDER_HEADER to timestampProvider.provide().toString()
+            REQUEST_ORDER_HEADER to timestampProvider.provide().toEpochMilliseconds()
         ).filterValues { it != null }
 
         request.headers?.let {
