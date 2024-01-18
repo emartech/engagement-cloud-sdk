@@ -28,6 +28,7 @@ import com.emarsys.core.storage.StorageApi
 import com.emarsys.providers.Provider
 import com.emarsys.providers.UUIDProvider
 import com.emarsys.session.SessionContext
+import com.emarsys.setup.CollectDeviceInfoState
 import com.emarsys.setup.SetupOrganizer
 import com.emarsys.setup.SetupOrganizerApi
 import com.emarsys.url.EmarsysUrlType
@@ -119,8 +120,9 @@ class DependencyContainer : DependencyContainerApi {
     }
 
     override val setupOrganizerApi: SetupOrganizerApi by lazy {
+        val collectDeviceInfoState = CollectDeviceInfoState(deviceInfoCollector, sessionContext)
         val platformInit = dependencyCreator.createPlatformInitState(pushInternal, sdkDispatcher)
-        val stateMachine = StateMachine(listOf(platformInit))
+        val stateMachine = StateMachine(listOf(collectDeviceInfoState, platformInit))
         SetupOrganizer(stateMachine, sdkContext)
     }
 }
