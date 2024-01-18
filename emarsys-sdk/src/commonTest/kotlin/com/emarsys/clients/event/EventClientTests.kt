@@ -3,14 +3,15 @@ package com.emarsys.clients.event
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.DeviceEventChannelApi
 import com.emarsys.core.networking.clients.NetworkClientApi
-import com.emarsys.core.networking.clients.event.EventClient
-import com.emarsys.core.networking.clients.event.model.Event
-import com.emarsys.core.networking.clients.event.model.EventType.CUSTOM
+
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
+import com.emarsys.networking.clients.event.EventClient
+import com.emarsys.networking.clients.event.model.Event
+import com.emarsys.networking.clients.event.model.EventType
 import com.emarsys.session.SessionContext
 import com.emarsys.url.EmarsysUrlType
-import com.emarsys.url.FactoryApi
+import com.emarsys.url.UrlFactoryApi
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -40,14 +41,14 @@ class EventClientTests : TestsWithMocks() {
         const val EVENT_NAME = "test event name"
         const val IN_APP_DND = false
         val testEventAttributes = mapOf("key" to "value")
-        val testEvent = Event(CUSTOM, EVENT_NAME, testEventAttributes)
+        val testEvent = Event(EventType.CUSTOM, EVENT_NAME, testEventAttributes)
     }
 
     @Mock
     lateinit var mockEmarsysClient: NetworkClientApi
 
     @Mock
-    lateinit var mockUrlFactory: FactoryApi<EmarsysUrlType, String>
+    lateinit var mockUrlFactory: UrlFactoryApi
 
     @Mock
     lateinit var mockDeviceEventChannel: DeviceEventChannelApi
@@ -125,12 +126,12 @@ class EventClientTests : TestsWithMocks() {
 
     @Test
     fun testConsumer_should_call_client_with_correct_request() = runTest {
-        val testBaseUrl = "https://test-base-url/"
+        val testBaseUrl = Url("https://test-base-url/")
 
         everySuspending { mockEmarsysClient.send(isAny()) }.returns(
             Response(
                 UrlRequest(
-                    Url(testBaseUrl),
+                    testBaseUrl,
                     HttpMethod.Post
                 ), HttpStatusCode.OK, Headers.Empty, ""
             )
@@ -138,7 +139,7 @@ class EventClientTests : TestsWithMocks() {
         every { mockUrlFactory.create(isAny()) }.returns(testBaseUrl)
 
         val expectedUrlRequest = UrlRequest(
-            Url(testBaseUrl),
+            testBaseUrl,
             HttpMethod.Post,
             """{"dnd":$IN_APP_DND,"events":[{"eventType":"${testEvent.eventType}","eventName":"${testEvent.eventName}","attributes":{"key":"value"}}],"deviceEventState":"$DEVICE_EVENT_STATE"}""",
             )

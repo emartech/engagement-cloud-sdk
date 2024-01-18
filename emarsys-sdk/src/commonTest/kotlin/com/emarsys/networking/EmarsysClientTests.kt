@@ -2,14 +2,13 @@ package com.emarsys.networking
 
 import com.emarsys.core.networking.clients.GenericNetworkClient
 import com.emarsys.core.networking.clients.NetworkClientApi
-import com.emarsys.core.networking.clients.event.model.Event
-import com.emarsys.core.networking.clients.event.model.EventType
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.networking.model.body
+import com.emarsys.networking.clients.event.model.Event
+import com.emarsys.networking.clients.event.model.EventType
 import com.emarsys.providers.Provider
 import com.emarsys.session.SessionContext
-import com.emarsys.url.EmarsysUrlType
 import com.emarsys.url.UrlFactoryApi
 import io.kotest.matchers.shouldBe
 import io.ktor.client.HttpClient

@@ -22,15 +22,15 @@ import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.networking.clients.GenericNetworkClient
 import com.emarsys.core.networking.clients.NetworkClientApi
-import com.emarsys.core.networking.clients.event.EventClient
-import com.emarsys.core.networking.clients.event.EventClientApi
-import com.emarsys.core.networking.clients.event.model.Event
 import com.emarsys.core.state.StateMachine
 import com.emarsys.core.storage.Storage
 import com.emarsys.core.storage.StorageApi
 import com.emarsys.networking.EmarsysClient
 import com.emarsys.networking.clients.device.DeviceClient
 import com.emarsys.networking.clients.device.DeviceClientApi
+import com.emarsys.networking.clients.event.EventClient
+import com.emarsys.networking.clients.event.EventClientApi
+import com.emarsys.networking.clients.event.model.Event
 import com.emarsys.networking.clients.push.PushClient
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.providers.Provider
@@ -40,7 +40,6 @@ import com.emarsys.session.SessionContext
 import com.emarsys.setup.CollectDeviceInfoState
 import com.emarsys.setup.SetupOrganizer
 import com.emarsys.setup.SetupOrganizerApi
-import com.emarsys.url.EmarsysUrlType
 import com.emarsys.url.UrlFactoryApi
 import com.emarsys.url.UrlFactory
 import io.ktor.client.HttpClient

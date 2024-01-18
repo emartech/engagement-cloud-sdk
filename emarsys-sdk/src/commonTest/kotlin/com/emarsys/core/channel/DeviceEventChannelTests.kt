@@ -1,7 +1,7 @@
 package com.emarsys.core.channel
 
-import com.emarsys.core.networking.clients.event.model.Event
-import com.emarsys.core.networking.clients.event.model.EventType
+import com.emarsys.networking.clients.event.model.Event
+import com.emarsys.networking.clients.event.model.EventType
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.first

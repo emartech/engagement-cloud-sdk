@@ -1,6 +1,6 @@
 package com.emarsys.core.channel
 
-import com.emarsys.core.networking.clients.event.model.Event
+import com.emarsys.networking.clients.event.model.Event
 import kotlinx.coroutines.flow.Flow
 
 interface DeviceEventChannelApi {

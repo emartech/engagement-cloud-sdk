@@ -1,19 +1,18 @@
-package com.emarsys.core.networking.clients.event
+package com.emarsys.networking.clients.event
 
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.DeviceEventChannelApi
 import com.emarsys.core.channel.naturalBatching
 import com.emarsys.core.networking.clients.NetworkClientApi
-import com.emarsys.core.networking.clients.event.model.DeviceEventRequestBody
-import com.emarsys.core.networking.clients.event.model.DeviceEventResponse
-import com.emarsys.core.networking.clients.event.model.Event
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.networking.model.body
+import com.emarsys.networking.clients.event.model.DeviceEventRequestBody
+import com.emarsys.networking.clients.event.model.DeviceEventResponse
+import com.emarsys.networking.clients.event.model.Event
 import com.emarsys.session.SessionContext
 import com.emarsys.url.EmarsysUrlType
-import com.emarsys.url.FactoryApi
+import com.emarsys.url.UrlFactoryApi
 import io.ktor.http.HttpMethod
-import io.ktor.http.Url
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -22,7 +21,7 @@ import kotlinx.serialization.json.Json
 
 class EventClient(
     private val emarsysNetworkClient: NetworkClientApi,
-    private val urlFactory: FactoryApi<EmarsysUrlType, String>,
+    private val urlFactory: UrlFactoryApi,
     private val json: Json,
     private val deviceEventChannel: DeviceEventChannelApi,
     private val sessionContext: SessionContext,
@@ -42,7 +41,7 @@ class EventClient(
 
     private suspend fun startEventConsumer() {
         deviceEventChannel.consume().naturalBatching().collect {
-            val url = Url(urlFactory.create(EmarsysUrlType.EVENT))
+            val url = urlFactory.create(EmarsysUrlType.EVENT)
             val requestBody = DeviceEventRequestBody(sdkContext.inAppDndD, it, sessionContext.deviceEventState)
             val body = json.encodeToString(requestBody)
             val result: DeviceEventResponse =

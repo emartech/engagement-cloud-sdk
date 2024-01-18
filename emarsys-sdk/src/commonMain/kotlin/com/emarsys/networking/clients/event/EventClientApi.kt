@@ -1,6 +1,7 @@
-package com.emarsys.core.networking.clients.event
+package com.emarsys.networking.clients.event
 
-import com.emarsys.core.networking.clients.event.model.Event
+import com.emarsys.networking.clients.event.model.Event
+
 
 interface EventClientApi {
 
