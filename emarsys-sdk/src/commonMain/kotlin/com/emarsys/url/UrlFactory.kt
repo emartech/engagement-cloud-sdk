@@ -3,6 +3,7 @@ package com.emarsys.url
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.DefaultUrlsApi
 import com.emarsys.url.EmarsysUrlType.REFRESH_TOKEN
+import com.emarsys.url.EmarsysUrlType.REGISTER_DEVICE_INFO
 import com.emarsys.url.EmarsysUrlType.REGISTER_PUSH_TOKEN
 
 class UrlFactory(
@@ -25,6 +26,9 @@ class UrlFactory(
            }
             REGISTER_PUSH_TOKEN -> {
                 "${defaultUrls.clientServiceBaseUrl}/$V3_API/apps/${sdkContext.config?.applicationCode}/client/push-token"
+            }
+            REGISTER_DEVICE_INFO -> {
+                "${defaultUrls.clientServiceBaseUrl}/$V3_API/apps/${sdkContext.config?.applicationCode}/client"
             }
         }
     }

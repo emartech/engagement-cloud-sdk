@@ -53,4 +53,15 @@ class UrlFactoryTests : TestsWithMocks() {
 
         result shouldBe "https://me-client.eservice.emarsys.net/v3/apps/testAppCode/client/push-token"
     }
+
+    @Test
+    fun testCreate_registerDeviceInfo_should_return_url() {
+        val config = EmarsysConfig("testAppCode", null)
+        val clientServiceBaseUrl = "https://me-client.eservice.emarsys.net"
+        every { mockDefaultUrls.clientServiceBaseUrl } returns clientServiceBaseUrl
+        every { mockSdkContext.config } returns config
+        val result = urlFactory.create(EmarsysUrlType.REGISTER_DEVICE_INFO)
+
+        result shouldBe "https://me-client.eservice.emarsys.net/v3/apps/testAppCode/client"
+    }
 }

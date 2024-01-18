@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 const val UNKNOWN_VERSION_NAME = "unknown"
 
+@Serializable
 data class DeviceInfo(
     val platform: String,
     val applicationVersion: String,

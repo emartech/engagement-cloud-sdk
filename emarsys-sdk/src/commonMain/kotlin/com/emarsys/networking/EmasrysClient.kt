@@ -4,6 +4,10 @@ import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.networking.model.body
+import com.emarsys.networking.EmarsysHeaders.CLIENT_ID_HEADER
+import com.emarsys.networking.EmarsysHeaders.CLIENT_STATE_HEADER
+import com.emarsys.networking.EmarsysHeaders.CONTACT_TOKEN_HEADER
+import com.emarsys.networking.EmarsysHeaders.REQUEST_ORDER_HEADER
 import com.emarsys.providers.Provider
 import com.emarsys.session.SessionContext
 import com.emarsys.url.EmarsysUrlType
@@ -25,12 +29,7 @@ class EmarsysClient(
     private val urlFactory: FactoryApi<EmarsysUrlType, String>,
     private val json: Json
 ) : NetworkClientApi {
-
     private companion object {
-        private const val CLIENT_ID_HEADER = "X-Client-Id"
-        private const val CLIENT_STATE_HEADER = "X-Client-State"
-        private const val CONTACT_TOKEN_HEADER = "X-Contact-Token"
-        private const val REQUEST_ORDER_HEADER = "X-Request-Order"
         private const val MAX_RETRY_COUNT = 3
     }
 
