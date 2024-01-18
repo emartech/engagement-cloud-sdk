@@ -20,12 +20,16 @@ import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.networking.clients.GenericNetworkClient
 import com.emarsys.core.networking.clients.NetworkClientApi
+import com.emarsys.core.networking.clients.device.DeviceClient
+import com.emarsys.core.networking.clients.device.DeviceClientApi
 import com.emarsys.core.networking.clients.push.PushClient
 import com.emarsys.core.networking.clients.push.PushClientApi
 import com.emarsys.core.state.StateMachine
 import com.emarsys.core.storage.Storage
 import com.emarsys.core.storage.StorageApi
+import com.emarsys.networking.EmarsysClient
 import com.emarsys.providers.Provider
+import com.emarsys.providers.TimestampProvider
 import com.emarsys.providers.UUIDProvider
 import com.emarsys.session.SessionContext
 import com.emarsys.setup.CollectDeviceInfoState
@@ -40,6 +44,7 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 
 class DependencyContainer : DependencyContainerApi {
@@ -56,9 +61,9 @@ class DependencyContainer : DependencyContainerApi {
 
     override val uuidProvider: Provider<String> by lazy { UUIDProvider() }
 
-    val deviceInfoCollector: DeviceInfoCollectorApi by lazy { dependencyCreator.createDeviceInfoCollector(uuidProvider) }
+    private val deviceInfoCollector: DeviceInfoCollectorApi by lazy { dependencyCreator.createDeviceInfoCollector(uuidProvider) }
 
-    val sdkLogger: SdkLogger by lazy { SdkLogger() }
+    private val sdkLogger: SdkLogger by lazy { SdkLogger() }
 
     val sdkDispatcher: CoroutineDispatcher by lazy {
         Dispatchers.Default
@@ -68,11 +73,11 @@ class DependencyContainer : DependencyContainerApi {
         SdkContext(sdkDispatcher)
     }
 
-    val sessionContext: SessionContext by lazy {
+    private val sessionContext: SessionContext by lazy {
         SessionContext(clientState = null)
     }
 
-    val urlFactory: FactoryApi<EmarsysUrlType, String> by lazy {
+    private val urlFactory: FactoryApi<EmarsysUrlType, String> by lazy {
         UrlFactory(sdkContext, defaultUrls)
     }
 
@@ -84,7 +89,19 @@ class DependencyContainer : DependencyContainerApi {
         Contact(loggingContact, gathererContact, contactInternal, sdkContext)
     }
 
-    val pushInternal: PushInstance by lazy {
+    private val timestampProvider: Provider<Instant> by lazy {
+        TimestampProvider()
+    }
+
+    private val emarsysClient: NetworkClientApi by lazy {
+        EmarsysClient(genericNetworkClient, sessionContext, timestampProvider, urlFactory, json)
+    }
+
+    private val deviceClient: DeviceClientApi by lazy {
+        DeviceClient(emarsysClient, urlFactory, deviceInfoCollector, sessionContext)
+    }
+
+    private val pushInternal: PushInstance by lazy {
         PushInternal(pushClient, stringStorage)
     }
 
@@ -94,11 +111,11 @@ class DependencyContainer : DependencyContainerApi {
         val gathererPush = GathererPush(pushContext)
         Push(loggingPush, gathererPush, pushInternal, sdkContext)
     }
-    val pushClient: PushClientApi by lazy {
+    private val pushClient: PushClientApi by lazy {
         PushClient(genericNetworkClient, urlFactory, json)
     }
 
-    val defaultUrls: DefaultUrlsApi by lazy {
+    private val defaultUrls: DefaultUrlsApi by lazy {
         DefaultUrls(
             "https://me-client.eservice.emarsys.net",
             "https://mobile-events.eservice.emarsys.net",
@@ -109,7 +126,7 @@ class DependencyContainer : DependencyContainerApi {
             "https://log-dealer.eservice.emarsys.net"
         )
     }
-    val genericNetworkClient: NetworkClientApi by lazy {
+    private val genericNetworkClient: NetworkClientApi by lazy {
         val httpClient = HttpClient {
             install(ContentNegotiation) {
                 json()
@@ -121,8 +138,8 @@ class DependencyContainer : DependencyContainerApi {
 
     override val setupOrganizerApi: SetupOrganizerApi by lazy {
         val collectDeviceInfoState = CollectDeviceInfoState(deviceInfoCollector, sessionContext)
-        val platformInit = dependencyCreator.createPlatformInitState(pushInternal, sdkDispatcher)
-        val stateMachine = StateMachine(listOf(collectDeviceInfoState, platformInit))
+        val platformInitState = dependencyCreator.createPlatformInitState(pushInternal, sdkDispatcher)
+        val stateMachine = StateMachine(listOf(collectDeviceInfoState, platformInitState))
         SetupOrganizer(stateMachine, sdkContext)
     }
 }
