@@ -14,6 +14,9 @@ class SdkContext(override val sdkDispatcher: CoroutineDispatcher) : SdkContextAp
     override val sdkState: StateFlow<SdkState> = innerSdkState.asStateFlow()
 
     override var config: EmarsysConfig? = null
+
+    override var inAppDndD: Boolean = false
+
     override fun setSdkState(sdkState: SdkState) {
         innerSdkState.value = sdkState
     }

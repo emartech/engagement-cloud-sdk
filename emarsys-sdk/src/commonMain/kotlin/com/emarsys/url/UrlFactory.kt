@@ -2,6 +2,11 @@ package com.emarsys.url
 
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.DefaultUrlsApi
+import com.emarsys.url.EmarsysUrlType.EVENT
+import com.emarsys.url.EmarsysUrlType.LINK_CONTACT
+import com.emarsys.url.EmarsysUrlType.REFRESH_TOKEN
+import com.emarsys.url.EmarsysUrlType.REGISTER_DEVICE_INFO
+import com.emarsys.url.EmarsysUrlType.REGISTER_PUSH_TOKEN
 import com.emarsys.url.UrlFactoryApi
 import com.emarsys.url.EmarsysUrlType.*
 import io.ktor.http.*
@@ -12,6 +17,7 @@ class UrlFactory(
 ) : UrlFactoryApi {
     private companion object {
         const val V3_API = "v3"
+        const val V4_API = "v4"
     }
 
     override fun create(value: EmarsysUrlType): Url {
@@ -36,6 +42,9 @@ class UrlFactory(
 
             REGISTER_PUSH_TOKEN -> Url("${defaultUrls.clientServiceBaseUrl}/$V3_API/apps/${sdkContext.config?.applicationCode}/client/push-token")
             REGISTER_DEVICE_INFO -> Url("${defaultUrls.clientServiceBaseUrl}/$V3_API/apps/${sdkContext.config?.applicationCode}/client")
+            EVENT -> {
+               Url("${defaultUrls.eventServiceBaseUrl}/$V4_API/apps/${sdkContext.config?.applicationCode}/client/events")
+            }
         }
     }
 

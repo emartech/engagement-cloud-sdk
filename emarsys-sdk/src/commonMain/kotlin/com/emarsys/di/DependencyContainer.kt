@@ -16,18 +16,23 @@ import com.emarsys.api.push.PushInternal
 import com.emarsys.context.SdkContext
 import com.emarsys.core.DefaultUrls
 import com.emarsys.core.DefaultUrlsApi
+import com.emarsys.core.channel.DeviceEventChannel
+import com.emarsys.core.channel.DeviceEventChannelApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.networking.clients.GenericNetworkClient
 import com.emarsys.core.networking.clients.NetworkClientApi
-import com.emarsys.networking.clients.device.DeviceClient
-import com.emarsys.networking.clients.device.DeviceClientApi
-import com.emarsys.networking.clients.push.PushClient
-import com.emarsys.networking.clients.push.PushClientApi
+import com.emarsys.core.networking.clients.event.EventClient
+import com.emarsys.core.networking.clients.event.EventClientApi
+import com.emarsys.core.networking.clients.event.model.Event
 import com.emarsys.core.state.StateMachine
 import com.emarsys.core.storage.Storage
 import com.emarsys.core.storage.StorageApi
 import com.emarsys.networking.EmarsysClient
+import com.emarsys.networking.clients.device.DeviceClient
+import com.emarsys.networking.clients.device.DeviceClientApi
+import com.emarsys.networking.clients.push.PushClient
+import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.providers.Provider
 import com.emarsys.providers.TimestampProvider
 import com.emarsys.providers.UUIDProvider
@@ -44,6 +49,7 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 
@@ -53,7 +59,11 @@ class DependencyContainer : DependencyContainerApi {
 
     private val dependencyCreator: DependencyCreator = PlatformDependencyCreator(platformContext)
 
-    private val json: Json by lazy { Json }
+    private val json: Json by lazy {
+        Json {
+            encodeDefaults = true
+        }
+    }
 
     private val stringStorage: StorageApi<String> by lazy { dependencyCreator.createStorage() }
 
@@ -61,7 +71,11 @@ class DependencyContainer : DependencyContainerApi {
 
     override val uuidProvider: Provider<String> by lazy { UUIDProvider() }
 
-    private val deviceInfoCollector: DeviceInfoCollectorApi by lazy { dependencyCreator.createDeviceInfoCollector(uuidProvider) }
+    private val deviceInfoCollector: DeviceInfoCollectorApi by lazy {
+        dependencyCreator.createDeviceInfoCollector(
+            uuidProvider
+        )
+    }
 
     private val sdkLogger: SdkLogger by lazy { SdkLogger() }
 
@@ -69,12 +83,20 @@ class DependencyContainer : DependencyContainerApi {
         Dispatchers.Default
     }
 
+    private val eventChannel: Channel<Event> by lazy {
+        Channel()
+    }
+
+    private val deviceEventChannel: DeviceEventChannelApi by lazy {
+        DeviceEventChannel(eventChannel)
+    }
+
     val sdkContext: SdkContext by lazy {
         SdkContext(sdkDispatcher)
     }
 
     private val sessionContext: SessionContext by lazy {
-        SessionContext(clientState = null)
+        SessionContext(clientState = null, deviceEventState = null)
     }
 
     private val urlFactory: UrlFactoryApi by lazy {
@@ -101,6 +123,18 @@ class DependencyContainer : DependencyContainerApi {
         DeviceClient(emarsysClient, urlFactory, deviceInfoCollector, sessionContext)
     }
 
+    private val eventClient: EventClientApi by lazy {
+        EventClient(
+            emarsysClient,
+            urlFactory,
+            json,
+            deviceEventChannel,
+            sessionContext,
+            sdkContext,
+            sdkDispatcher
+        )
+    }
+
     private val pushInternal: PushInstance by lazy {
         PushInternal(pushClient, stringStorage)
     }
@@ -112,7 +146,7 @@ class DependencyContainer : DependencyContainerApi {
         Push(loggingPush, gathererPush, pushInternal, sdkContext)
     }
     private val pushClient: PushClientApi by lazy {
-        PushClient(genericNetworkClient, urlFactory, json)
+        PushClient(emarsysClient, urlFactory, json)
     }
 
     private val defaultUrls: DefaultUrlsApi by lazy {

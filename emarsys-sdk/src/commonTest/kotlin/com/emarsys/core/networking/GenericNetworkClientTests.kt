@@ -3,7 +3,8 @@ package com.emarsys.core.networking
 import com.emarsys.core.exceptions.FailedRequestException
 import com.emarsys.core.exceptions.RetryLimitReachedException
 import com.emarsys.core.networking.clients.GenericNetworkClient
-import com.emarsys.networking.clients.event.model.CustomEvent
+import com.emarsys.core.networking.clients.event.model.Event
+import com.emarsys.core.networking.clients.event.model.EventType
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.networking.model.body
@@ -37,19 +38,19 @@ class GenericNetworkClientTests {
         val request = UrlRequest(
             urlString,
             HttpMethod.Post,
-            """{"eventName":"test"}""",
+            """{"eventType":"${EventType.CUSTOM}", "eventName":"test"}""",
             headers = mapOf("Content-Type" to "application/json")
         )
         val expectedResponse = Response(
             request,
             HttpStatusCode.OK,
             headersOf(HttpHeaders.ContentType, "application/json"),
-            """{"eventName":"test"}"""
+            """{"eventType":"${EventType.CUSTOM}", "eventName":"test"}"""
         )
 
         val response: Response = genericNetworkClient.send(request)
         response shouldBe expectedResponse
-        response.body<CustomEvent>() shouldBe CustomEvent("test")
+        response.body<Event>() shouldBe Event(EventType.CUSTOM,"test")
     }
 
     @Test
@@ -59,19 +60,19 @@ class GenericNetworkClientTests {
         val request = UrlRequest(
             urlString,
             HttpMethod.Post,
-            """{"eventName":"test"}""",
+            """{"eventType":"${EventType.CUSTOM}", "eventName":"test"}""",
             null
         )
         val expectedResponse = Response(
             request,
             HttpStatusCode.OK,
             Headers.Empty,
-            """{"eventName":"test"}"""
+            """{"eventType":"${EventType.CUSTOM}", "eventName":"test"}"""
         )
 
         val response: Response = genericNetworkClient.send(request)
         response shouldBe expectedResponse
-        response.body<CustomEvent>() shouldBe CustomEvent("test")
+        response.body<Event>() shouldBe Event(EventType.CUSTOM, "test")
     }
 
     @Test
@@ -158,7 +159,7 @@ class GenericNetworkClientTests {
             repeat(5) {
                 addHandler {
                     respond(
-                        ByteReadChannel("""{"eventName":"test"}"""),
+                        ByteReadChannel("""{"eventType":"${EventType.CUSTOM}", "eventName":"test"}"""),
                         status = HttpStatusCode.InternalServerError,
                         headers = Headers.Empty
                     )
@@ -166,7 +167,7 @@ class GenericNetworkClientTests {
             }
             addHandler {
                 respond(
-                    ByteReadChannel("""{"eventName":"test"}"""),
+                    ByteReadChannel("""{"eventType":"${EventType.CUSTOM}", "eventName":"test"}"""),
                     status = HttpStatusCode.OK,
                     headers = Headers.Empty,
                 )
@@ -191,18 +192,18 @@ class GenericNetworkClientTests {
             request,
             HttpStatusCode.OK,
             Headers.Empty,
-            """{"eventName":"test"}"""
+            """{"eventType":"${EventType.CUSTOM}", "eventName":"test"}"""
         )
         val response: Response = genericNetworkClient.send(request)
         response shouldBe expectedResponse
-        response.body<CustomEvent>() shouldBe CustomEvent("test")
+        response.body<Event>() shouldBe Event(EventType.CUSTOM, "test")
 
     }
 
     private fun createHttpClient(
         responseStatus: HttpStatusCode = HttpStatusCode.OK,
         headers: Headers = Headers.Empty,
-        body: String = """{"eventName":"test"}"""
+        body: String = """{"eventType":"${EventType.CUSTOM}", "eventName":"test"}""",
     ) {
         val mockHttpEngine = MockEngine {
             it.headers[HttpHeaders.Accept] shouldBe "application/json"

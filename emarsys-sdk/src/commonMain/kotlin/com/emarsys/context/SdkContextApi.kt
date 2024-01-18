@@ -9,5 +9,6 @@ interface SdkContextApi {
     val sdkState: StateFlow<SdkState>
     val sdkDispatcher: CoroutineDispatcher
     var config: EmarsysConfig?
+    var inAppDndD: Boolean
     fun setSdkState(sdkState: SdkState)
 }

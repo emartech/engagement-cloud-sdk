@@ -5,5 +5,6 @@ enum class EmarsysUrlType {
     UNLINK_CONTACT,
     REFRESH_TOKEN,
     REGISTER_PUSH_TOKEN,
+    EVENT,
     REGISTER_DEVICE_INFO
 }
