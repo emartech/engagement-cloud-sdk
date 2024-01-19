@@ -4,9 +4,10 @@ import com.emarsys.api.contact.Contact
 import com.emarsys.api.contact.ContactApi
 import com.emarsys.api.contact.ContactContext
 import com.emarsys.api.contact.ContactInternal
-import com.emarsys.api.contact.GathererContact
+import com.emarsys.api.contact.ContactGatherer
 import com.emarsys.api.contact.LoggingContact
-import com.emarsys.api.push.GathererPush
+import com.emarsys.api.event.*
+import com.emarsys.api.push.PushGatherer
 import com.emarsys.api.push.LoggingPush
 import com.emarsys.api.push.Push
 import com.emarsys.api.push.PushApi
@@ -105,9 +106,17 @@ class DependencyContainer : DependencyContainerApi {
     override val contactApi: ContactApi by lazy {
         val contactContext = ContactContext()
         val loggingContact = LoggingContact(sdkLogger)
-        val gathererContact = GathererContact(contactContext)
+        val contactGatherer = ContactGatherer(contactContext)
         val contactInternal = ContactInternal()
-        Contact(loggingContact, gathererContact, contactInternal, sdkContext)
+        Contact(loggingContact, contactGatherer, contactInternal, sdkContext)
+    }
+
+    override val eventTrackerApi: EventTrackerApi by lazy {
+        val eventTrackerContext = EventTrackerContext()
+        val loggingEvent = LoggingEventTracker(sdkLogger)
+        val gathererEvent = EventTrackerGatherer(eventTrackerContext)
+        val eventInternal = EventTrackerInternal(eventClient)
+        EventTracker(loggingEvent, gathererEvent, eventInternal, sdkContext)
     }
 
     private val timestampProvider: Provider<Instant> by lazy {
@@ -141,8 +150,8 @@ class DependencyContainer : DependencyContainerApi {
     override val pushApi: PushApi by lazy {
         val pushContext = PushContext()
         val loggingPush = LoggingPush(sdkLogger)
-        val gathererPush = GathererPush(pushContext)
-        Push(loggingPush, gathererPush, pushInternal, sdkContext)
+        val pushGatherer = PushGatherer(pushContext)
+        Push(loggingPush, pushGatherer, pushInternal, sdkContext)
     }
     private val pushClient: PushClientApi by lazy {
         PushClient(emarsysClient, urlFactory, json)

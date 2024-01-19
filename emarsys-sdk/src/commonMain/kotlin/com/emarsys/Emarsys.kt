@@ -1,14 +1,15 @@
 package com.emarsys
 
+import com.emarsys.api.event.CustomEvent
 import com.emarsys.di.DependencyInjection
 
 object Emarsys {
 
     suspend fun initialize() {
-
+        DependencyInjection.container
     }
 
-    suspend fun enableTracking(config: EmarsysConfig){
+    suspend fun enableTracking(config: EmarsysConfig) {
         config.isValid()
         DependencyInjection.container?.setupOrganizerApi?.setup(config)
     }
@@ -25,4 +26,7 @@ object Emarsys {
         DependencyInjection.container?.contactApi?.unlinkContact()
     }
 
+    suspend fun trackCustomEvent(event: String, attributes: Map<String, String>) {
+        DependencyInjection.container?.eventTrackerApi?.trackEvent(CustomEvent(event, attributes))
+    }
 }

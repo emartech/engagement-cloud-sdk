@@ -5,7 +5,7 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class GathererContactTests {
+class ContactGathererTests {
 
     companion object {
         val contactFieldId = 42
@@ -14,12 +14,12 @@ class GathererContactTests {
     }
 
     private lateinit var contactContext: ContactContext
-    private lateinit var gathererContact: GathererContact
+    private lateinit var contactGatherer: ContactGatherer
 
     @BeforeTest
     fun setup() {
         contactContext = ContactContext()
-        gathererContact = GathererContact(contactContext)
+        contactGatherer = ContactGatherer(contactContext)
     }
 
     @Test
@@ -37,12 +37,12 @@ class GathererContactTests {
             linkAuthenticatedContact
         )
 
-        gathererContact.linkContact(contactFieldId, contactFieldValue)
-        gathererContact.linkAuthenticatedContact(contactFieldId, openIdToken)
-        gathererContact.unlinkContact()
-        gathererContact.linkContact(contactFieldId, contactFieldValue)
-        gathererContact.unlinkContact()
-        gathererContact.linkAuthenticatedContact(contactFieldId, openIdToken)
+        contactGatherer.linkContact(contactFieldId, contactFieldValue)
+        contactGatherer.linkAuthenticatedContact(contactFieldId, openIdToken)
+        contactGatherer.unlinkContact()
+        contactGatherer.linkContact(contactFieldId, contactFieldValue)
+        contactGatherer.unlinkContact()
+        contactGatherer.linkAuthenticatedContact(contactFieldId, openIdToken)
 
         contactContext.calls shouldBe expected
     }

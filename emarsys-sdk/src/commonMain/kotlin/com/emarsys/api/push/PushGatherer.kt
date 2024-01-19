@@ -2,7 +2,7 @@ package com.emarsys.api.push
 
 import com.emarsys.api.generic.ApiContext
 
-class GathererPush(private val context: ApiContext<PushCall>) : PushInstance {
+class PushGatherer(private val context: ApiContext<PushCall>) : PushInstance {
     override suspend fun registerPushToken(pushToken: String) {
         context.calls.add(PushCall.SetPushToken(pushToken))
     }

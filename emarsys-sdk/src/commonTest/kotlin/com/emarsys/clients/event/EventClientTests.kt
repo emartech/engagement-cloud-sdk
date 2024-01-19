@@ -10,7 +10,6 @@ import com.emarsys.networking.clients.event.EventClient
 import com.emarsys.networking.clients.event.model.Event
 import com.emarsys.networking.clients.event.model.EventType
 import com.emarsys.session.SessionContext
-import com.emarsys.url.EmarsysUrlType
 import com.emarsys.url.UrlFactoryApi
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod

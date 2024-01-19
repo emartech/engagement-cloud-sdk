@@ -6,7 +6,7 @@ import com.emarsys.api.SdkState.onHold
 import com.emarsys.api.contact.ContactContext
 import com.emarsys.api.contact.ContactInternal
 import com.emarsys.api.contact.FakeSdkLogger
-import com.emarsys.api.contact.GathererContact
+import com.emarsys.api.contact.ContactGatherer
 import com.emarsys.api.contact.LoggingContact
 import com.emarsys.context.SdkContext
 import io.kotest.matchers.shouldBe
@@ -19,18 +19,18 @@ import kotlin.test.Test
 class GenericApiTests {
 
     private lateinit var loggingContact: LoggingContact
-    private lateinit var gathererContact: GathererContact
+    private lateinit var contactGatherer: ContactGatherer
     private lateinit var contactInternal: ContactInternal
     private lateinit var sdkContext: SdkContext
-    private lateinit var genericApi: GenericApi<LoggingContact, GathererContact, ContactInternal>
+    private lateinit var genericApi: GenericApi<LoggingContact, ContactGatherer, ContactInternal>
 
     @BeforeTest
     fun setup() = runTest {
         loggingContact = LoggingContact(FakeSdkLogger())
-        gathererContact = GathererContact(ContactContext())
+        contactGatherer = ContactGatherer(ContactContext())
         contactInternal = ContactInternal()
         sdkContext = SdkContext(StandardTestDispatcher())
-        genericApi = GenericApi(loggingContact, gathererContact, contactInternal, sdkContext)
+        genericApi = GenericApi(loggingContact, contactGatherer, contactInternal, sdkContext)
     }
 
     @Test
@@ -48,7 +48,7 @@ class GenericApiTests {
 
         while (!sdkContext.sdkDispatcher.isActive)
 
-        genericApi.activeInstance shouldBe gathererContact
+        genericApi.activeInstance shouldBe contactGatherer
     }
 
     @Test

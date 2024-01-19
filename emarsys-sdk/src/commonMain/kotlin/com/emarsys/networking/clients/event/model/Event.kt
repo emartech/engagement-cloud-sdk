@@ -9,6 +9,6 @@ data class Event(
     val attributes: Map<String, String>? = null
 )
 
-enum class EventType {
+ enum class EventType {
     INTERNAL, CUSTOM
 }

@@ -20,9 +20,9 @@ class ContactTests : TestsWithMocks() {
     override fun setUpMocks() = injectMocks(mocker)
 
     private companion object {
-        const val contactFieldId = 42
-        const val contactFieldValue = "testContactFieldValue"
-        const val openIdToken = "testOpenIdToken"
+        const val CONTACT_FIELD_ID = 42
+        const val CONTACT_FIELD_VALUE = "testContactFieldValue"
+        const val OPEN_ID_TOKEN = "testOpenIdToken"
     }
 
     @Mock
@@ -59,145 +59,145 @@ class ContactTests : TestsWithMocks() {
     }
 
     @Test
-    fun test_linkContact_inactiveState() = runTest {
+    fun testLinkContact_inactiveState() = runTest {
         every { mockSdkContext.sdkState } returns MutableStateFlow(SdkState.inactive)
         everySuspending {
             mockLoggingContact.linkContact(
-                contactFieldId,
-                contactFieldValue
+                CONTACT_FIELD_ID,
+                CONTACT_FIELD_VALUE
             )
         } returns Unit
 
         contact =
             Contact(mockLoggingContact, mockGathererContact, mockContactInternal, mockSdkContext)
 
-        contact.linkContact(contactFieldId, contactFieldValue)
+        contact.linkContact(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE)
 
         verifyWithSuspend(exhaustive = false) {
             mockLoggingContact.linkContact(
-                contactFieldId,
-                contactFieldValue
+                CONTACT_FIELD_ID,
+                CONTACT_FIELD_VALUE
             )
         }
     }
 
     @Test
-    fun test_linkContact_onHoldState() = runTest {
+    fun testLinkContact_onHoldState() = runTest {
         every { mockSdkContext.sdkState } returns MutableStateFlow(SdkState.onHold)
         everySuspending {
             mockGathererContact.linkContact(
-                contactFieldId,
-                contactFieldValue
+                CONTACT_FIELD_ID,
+                CONTACT_FIELD_VALUE
             )
         } returns Unit
 
         contact =
             Contact(mockLoggingContact, mockGathererContact, mockContactInternal, mockSdkContext)
 
-        contact.linkContact(contactFieldId, contactFieldValue)
+        contact.linkContact(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE)
 
         verifyWithSuspend(exhaustive = false) {
             mockGathererContact.linkContact(
-                contactFieldId,
-                contactFieldValue
+                CONTACT_FIELD_ID,
+                CONTACT_FIELD_VALUE
             )
         }
     }
 
     @Test
-    fun test_linkContact_activeState() = runTest {
+    fun testLinkContact_activeState() = runTest {
         every { mockSdkContext.sdkState } returns MutableStateFlow(SdkState.active)
         everySuspending {
             mockContactInternal.linkContact(
-                contactFieldId,
-                contactFieldValue
+                CONTACT_FIELD_ID,
+                CONTACT_FIELD_VALUE
             )
         } returns Unit
 
         contact =
             Contact(mockLoggingContact, mockGathererContact, mockContactInternal, mockSdkContext)
 
-        contact.linkContact(contactFieldId, contactFieldValue)
+        contact.linkContact(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE)
 
         verifyWithSuspend(exhaustive = false) {
             mockContactInternal.linkContact(
-                contactFieldId,
-                contactFieldValue
+                CONTACT_FIELD_ID,
+                CONTACT_FIELD_VALUE
             )
         }
     }
 
     @Test
-    fun test_linkAuthenticatedContact_inactiveState() = runTest {
+    fun testLinkAuthenticatedContact_inactiveState() = runTest {
         every { mockSdkContext.sdkState } returns MutableStateFlow(SdkState.inactive)
         everySuspending {
             mockLoggingContact.linkAuthenticatedContact(
-                contactFieldId,
-                openIdToken
+                CONTACT_FIELD_ID,
+                OPEN_ID_TOKEN
             )
         } returns Unit
 
         contact =
             Contact(mockLoggingContact, mockGathererContact, mockContactInternal, mockSdkContext)
 
-        contact.linkAuthenticatedContact(contactFieldId, openIdToken)
+        contact.linkAuthenticatedContact(CONTACT_FIELD_ID, OPEN_ID_TOKEN)
 
         verifyWithSuspend(exhaustive = false) {
             mockLoggingContact.linkAuthenticatedContact(
-                contactFieldId,
-                openIdToken
+                CONTACT_FIELD_ID,
+                OPEN_ID_TOKEN
             )
         }
     }
 
     @Test
-    fun test_linkAuthenticatedContact_onHoldState() = runTest {
+    fun testLinkAuthenticatedContact_onHoldState() = runTest {
         every { mockSdkContext.sdkState } returns MutableStateFlow(SdkState.onHold)
         everySuspending {
             mockGathererContact.linkAuthenticatedContact(
-                contactFieldId,
-                openIdToken
+                CONTACT_FIELD_ID,
+                OPEN_ID_TOKEN
             )
         } returns Unit
 
         contact =
             Contact(mockLoggingContact, mockGathererContact, mockContactInternal, mockSdkContext)
 
-        contact.linkAuthenticatedContact(contactFieldId, openIdToken)
+        contact.linkAuthenticatedContact(CONTACT_FIELD_ID, OPEN_ID_TOKEN)
 
         verifyWithSuspend(exhaustive = false) {
             mockGathererContact.linkAuthenticatedContact(
-                contactFieldId,
-                openIdToken
+                CONTACT_FIELD_ID,
+                OPEN_ID_TOKEN
             )
         }
     }
 
     @Test
-    fun test_linkAuthenticatedContact_activeState() = runTest {
+    fun testLinkAuthenticatedContact_activeState() = runTest {
         every { mockSdkContext.sdkState } returns MutableStateFlow(SdkState.active)
         everySuspending {
             mockContactInternal.linkAuthenticatedContact(
-                contactFieldId,
-                openIdToken
+                CONTACT_FIELD_ID,
+                OPEN_ID_TOKEN
             )
         } returns Unit
 
         contact =
             Contact(mockLoggingContact, mockGathererContact, mockContactInternal, mockSdkContext)
 
-        contact.linkAuthenticatedContact(contactFieldId, openIdToken)
+        contact.linkAuthenticatedContact(CONTACT_FIELD_ID, OPEN_ID_TOKEN)
 
         verifyWithSuspend(exhaustive = false) {
             mockContactInternal.linkAuthenticatedContact(
-                contactFieldId,
-                openIdToken
+                CONTACT_FIELD_ID,
+                OPEN_ID_TOKEN
             )
         }
     }
 
     @Test
-    fun test_unlinkContact_inactiveState() = runTest {
+    fun testUnlinkContact_inactiveState() = runTest {
         every { mockSdkContext.sdkState } returns MutableStateFlow(SdkState.inactive)
         everySuspending {
             mockLoggingContact.unlinkContact()
@@ -214,7 +214,7 @@ class ContactTests : TestsWithMocks() {
     }
 
     @Test
-    fun test_unlinkContact_onHoldState() = runTest {
+    fun testUnlinkContact_onHoldState() = runTest {
         every { mockSdkContext.sdkState } returns MutableStateFlow(SdkState.onHold)
         everySuspending {
             mockGathererContact.unlinkContact()

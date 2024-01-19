@@ -11,12 +11,12 @@ class GathererPushTests {
     }
 
     private lateinit var pushContext: PushContext
-    private lateinit var gathererPush: GathererPush
+    private lateinit var pushGatherer: PushGatherer
 
     @BeforeTest
     fun setup() {
         pushContext = PushContext()
-        gathererPush = GathererPush(pushContext)
+        pushGatherer = PushGatherer(pushContext)
     }
 
     @Test
@@ -29,8 +29,8 @@ class GathererPushTests {
             clearPushToken
         )
 
-        gathererPush.registerPushToken(pushToken)
-        gathererPush.clearPushToken()
+        pushGatherer.registerPushToken(pushToken)
+        pushGatherer.clearPushToken()
 
         pushContext.calls shouldBe expected
     }

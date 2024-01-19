@@ -5,7 +5,7 @@ import com.emarsys.api.contact.ContactCall.LinkContact
 import com.emarsys.api.contact.ContactCall.UnlinkContact
 import com.emarsys.api.generic.ApiContext
 
-class GathererContact(val context: ApiContext<ContactCall>): ContactInstance {
+class ContactGatherer(val context: ApiContext<ContactCall>): ContactInstance {
     override suspend fun linkContact(contactFieldId: Int, contactFieldValue: String) {
         context.calls.add(LinkContact(contactFieldId, contactFieldValue))
     }

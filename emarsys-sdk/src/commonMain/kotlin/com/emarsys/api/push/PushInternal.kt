@@ -22,6 +22,5 @@ class PushInternal(
     }
 
     override suspend fun activate() {
-        TODO("Not yet implemented")
     }
 }
