@@ -9,16 +9,16 @@ import com.emarsys.networking.clients.event.model.Event
 import com.emarsys.networking.clients.event.model.EventType
 import com.emarsys.providers.Provider
 import com.emarsys.session.SessionContext
+import com.emarsys.url.EmarsysUrlType
 import com.emarsys.url.UrlFactoryApi
 import io.kotest.matchers.shouldBe
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.config
-import io.ktor.client.engine.mock.MockEngine
-import io.ktor.client.engine.mock.respond
-import io.ktor.client.plugins.HttpRequestRetry
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.*
+import io.ktor.client.engine.*
+import io.ktor.client.engine.mock.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.http.*
-import io.ktor.utils.io.ByteReadChannel
+import io.ktor.utils.io.*
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -83,7 +83,7 @@ class EmarsysClientTests : TestsWithMocks() {
             install(HttpRequestRetry)
         }
         every { mockTimestampProvider.provide() } returns now
-        every { mockUrlFactory.create(isAny()) } returns Url("https://testUrl.com")
+        every { mockUrlFactory.create(EmarsysUrlType.REFRESH_TOKEN) } returns Url("https://testUrl.com")
 
         networkClient = GenericNetworkClient(httpClient)
         emarsysClient = EmarsysClient(

@@ -1,19 +1,8 @@
 package com.emarsys.di
 
-import com.emarsys.api.contact.Contact
-import com.emarsys.api.contact.ContactApi
-import com.emarsys.api.contact.ContactContext
-import com.emarsys.api.contact.ContactInternal
-import com.emarsys.api.contact.ContactGatherer
-import com.emarsys.api.contact.LoggingContact
+import com.emarsys.api.contact.*
 import com.emarsys.api.event.*
-import com.emarsys.api.push.PushGatherer
-import com.emarsys.api.push.LoggingPush
-import com.emarsys.api.push.Push
-import com.emarsys.api.push.PushApi
-import com.emarsys.api.push.PushContext
-import com.emarsys.api.push.PushInstance
-import com.emarsys.api.push.PushInternal
+import com.emarsys.api.push.*
 import com.emarsys.context.SdkContext
 import com.emarsys.core.DefaultUrls
 import com.emarsys.core.DefaultUrlsApi
@@ -27,6 +16,7 @@ import com.emarsys.core.state.StateMachine
 import com.emarsys.core.storage.Storage
 import com.emarsys.core.storage.StorageApi
 import com.emarsys.networking.EmarsysClient
+import com.emarsys.networking.clients.contact.ContactClient
 import com.emarsys.networking.clients.device.DeviceClient
 import com.emarsys.networking.clients.device.DeviceClientApi
 import com.emarsys.networking.clients.event.EventClient
@@ -41,12 +31,12 @@ import com.emarsys.session.SessionContext
 import com.emarsys.setup.CollectDeviceInfoState
 import com.emarsys.setup.SetupOrganizer
 import com.emarsys.setup.SetupOrganizerApi
-import com.emarsys.url.UrlFactoryApi
 import com.emarsys.url.UrlFactory
-import io.ktor.client.HttpClient
-import io.ktor.client.plugins.HttpRequestRetry
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.serialization.kotlinx.json.json
+import com.emarsys.url.UrlFactoryApi
+import io.ktor.client.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -104,10 +94,11 @@ class DependencyContainer : DependencyContainerApi {
     }
 
     override val contactApi: ContactApi by lazy {
+        val contactClient = ContactClient(emarsysClient, urlFactory, sdkContext, json)
         val contactContext = ContactContext()
         val loggingContact = LoggingContact(sdkLogger)
         val contactGatherer = ContactGatherer(contactContext)
-        val contactInternal = ContactInternal()
+        val contactInternal = ContactInternal(contactClient)
         Contact(loggingContact, contactGatherer, contactInternal, sdkContext)
     }
 

@@ -1,22 +1,24 @@
 package com.emarsys.api.generic
 
-import com.emarsys.api.SdkState.active
-import com.emarsys.api.SdkState.inactive
-import com.emarsys.api.SdkState.onHold
-import com.emarsys.api.contact.ContactContext
-import com.emarsys.api.contact.ContactInternal
-import com.emarsys.api.contact.FakeSdkLogger
-import com.emarsys.api.contact.ContactGatherer
-import com.emarsys.api.contact.LoggingContact
+import com.emarsys.api.SdkState.*
+import com.emarsys.api.contact.*
 import com.emarsys.context.SdkContext
+import com.emarsys.networking.clients.contact.ContactClientApi
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
+import org.kodein.mock.Mock
+import org.kodein.mock.tests.TestsWithMocks
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class GenericApiTests {
+class GenericApiTests: TestsWithMocks() {
+
+    override fun setUpMocks() = injectMocks(mocker)
+
+    @Mock
+    lateinit var mockContactClient: ContactClientApi
 
     private lateinit var loggingContact: LoggingContact
     private lateinit var contactGatherer: ContactGatherer
@@ -28,7 +30,7 @@ class GenericApiTests {
     fun setup() = runTest {
         loggingContact = LoggingContact(FakeSdkLogger())
         contactGatherer = ContactGatherer(ContactContext())
-        contactInternal = ContactInternal()
+        contactInternal = ContactInternal(mockContactClient)
         sdkContext = SdkContext(StandardTestDispatcher())
         genericApi = GenericApi(loggingContact, contactGatherer, contactInternal, sdkContext)
     }
@@ -59,5 +61,4 @@ class GenericApiTests {
 
         genericApi.activeInstance shouldBe contactInternal
     }
-
 }

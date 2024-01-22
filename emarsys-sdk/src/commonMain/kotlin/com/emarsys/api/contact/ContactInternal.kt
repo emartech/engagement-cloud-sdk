@@ -1,16 +1,18 @@
 package com.emarsys.api.contact
 
-class ContactInternal: ContactInstance {
+import com.emarsys.networking.clients.contact.ContactClientApi
+
+class ContactInternal(private val contactClient: ContactClientApi) : ContactInstance {
     override suspend fun linkContact(contactFieldId: Int, contactFieldValue: String) {
-        TODO("Not yet implemented")
+        contactClient.linkContact(contactFieldId, contactFieldValue, null)
     }
 
     override suspend fun linkAuthenticatedContact(contactFieldId: Int, openIdToken: String) {
-        TODO("Not yet implemented")
+        contactClient.linkContact(contactFieldId, null, openIdToken)
     }
 
     override suspend fun unlinkContact() {
-        TODO("Not yet implemented")
+        contactClient.unLinkContact()
     }
 
     override suspend fun activate() {
