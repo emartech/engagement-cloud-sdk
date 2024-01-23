@@ -70,7 +70,10 @@ ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx
 mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockkAndroid" }
 uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
 kotlin-wrapper-browser = { module = "org.jetbrains.kotlin-wrappers:kotlin-browser", version.ref = "kotlinWrappers" }
-cryptography = { module = "dev.whyoleg.cryptography:cryptography-core", version.ref= "cryptography" }
+cryptography = { module = "dev.whyoleg.cryptography:cryptography-bom", version.ref= "cryptography" }
+cryptography-core = { module = "dev.whyoleg.cryptography:cryptography-core" }
+cryptography-provider-jdk = { module = "dev.whyoleg.cryptography:cryptography-provider-jdk" }
+cryptography-provider-webcrypto = { module = "dev.whyoleg.cryptography:cryptography-provider-webcrypto" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
