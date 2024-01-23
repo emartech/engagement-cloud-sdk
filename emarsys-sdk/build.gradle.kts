@@ -45,6 +45,7 @@ kotlin {
                 implementation(libs.ktor.serialization.kotlinx.json)
                 implementation(libs.ktor.serialization)
                 implementation(libs.uuid)
+                implementation(libs.cryptography)
             }
         }
         val commonTest by getting {
