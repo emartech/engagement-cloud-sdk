@@ -6,7 +6,9 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
@@ -18,9 +20,11 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        setContent {
+            AppAndroidPreview()
+        }
         lifecycleScope.launch {
-            val config = EmarsysConfig("testApplicationCode")
+            val config = EmarsysConfig("EMS11-C3FD3")
             Emarsys.enableTracking(config)
             askNotificationPermission()
         }
@@ -53,5 +57,5 @@ class MainActivity : ComponentActivity() {
 @Preview
 @Composable
 fun AppAndroidPreview() {
-
+    Text("Hello SDK!")
 }
