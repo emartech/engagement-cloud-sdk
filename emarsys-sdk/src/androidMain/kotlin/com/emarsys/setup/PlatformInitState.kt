@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.IntentFilter
 import androidx.core.content.ContextCompat
 import com.emarsys.api.push.PushConstants.PUSH_TOKEN_INTENT_FILTER_ACTION
+import com.emarsys.setup.states.PlatformInitStateApi
 
 class PlatformInitState(
     private val pushTokenBroadcastReceiver: BroadcastReceiver,

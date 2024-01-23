@@ -1,6 +1,7 @@
 package com.emarsys.setup
 
 import com.emarsys.push.PushService
+import com.emarsys.setup.states.PlatformInitStateApi
 
 class PlatformInitState(private val pushService: PushService): PlatformInitStateApi {
 
