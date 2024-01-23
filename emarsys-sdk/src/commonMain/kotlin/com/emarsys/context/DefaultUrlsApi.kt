@@ -1,4 +1,4 @@
-package com.emarsys.core
+package com.emarsys.context
 
 interface DefaultUrlsApi {
 
