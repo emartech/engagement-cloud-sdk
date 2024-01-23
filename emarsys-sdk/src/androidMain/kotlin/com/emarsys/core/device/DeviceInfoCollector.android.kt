@@ -35,7 +35,8 @@ actual class DeviceInfoCollector(
             language = languageProvider.provideLanguage(),
             timezone = SimpleDateFormat("Z", ENGLISH).format(Calendar.getInstance().time),
             hardwareId = getHardwareId(),
-            platformInfo = androidDeviceInfo
+            platformInfo = androidDeviceInfo,
+            applicationVersion = androidPlatformInfoCollector.applicationVersion()
         )
 
         return Json.encodeToString(deviceInfo)

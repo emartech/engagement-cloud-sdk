@@ -12,5 +12,6 @@ data class DeviceInformation(
     val language: String,
     val timezone: String,
     val hardwareId: String,
-    val platformInfo: String
+    val platformInfo: String,
+    val applicationVersion: String
 )

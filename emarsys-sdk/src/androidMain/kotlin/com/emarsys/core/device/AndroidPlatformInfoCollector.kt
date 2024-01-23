@@ -3,7 +3,6 @@ package com.emarsys.core.device
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
-import android.os.Build
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.json.JSONObject
@@ -14,8 +13,8 @@ class AndroidPlatformInfoCollector(
 
     override fun collect(): String {
         val androidInfo = AndroidPlatformInfo(
-            applicationVersion = parseAppVersion() ?: UNKNOWN_VERSION_NAME,
-            osVersion = Build.VERSION.RELEASE,
+            applicationVersion = applicationVersion(),
+            osVersion = SdkBuildConfig.getOsVersion(),
             notificationSettings = null,
             isDebugMode = 0 != context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE,
         )
@@ -23,12 +22,12 @@ class AndroidPlatformInfoCollector(
         return Json.encodeToString(androidInfo)
     }
 
-    private fun parseAppVersion(): String? {
+    override fun applicationVersion(): String {
         return try {
             context.packageManager.getPackageInfo(context.packageName, 0).versionName
         } catch (e: PackageManager.NameNotFoundException) {
             e.printStackTrace()
-            return null
+            return UNKNOWN_VERSION_NAME
         }
     }
 

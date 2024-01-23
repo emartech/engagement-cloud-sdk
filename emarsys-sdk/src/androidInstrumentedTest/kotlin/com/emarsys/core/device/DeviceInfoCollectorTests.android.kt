@@ -1,27 +1,19 @@
 package com.emarsys.core.device
 
-import android.app.Application
-import android.content.Context
-import android.content.pm.ApplicationInfo
-import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.os.Build
-import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.emarsys.core.storage.StorageApi
 import com.emarsys.providers.Provider
-import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.spyk
 import io.mockk.verify
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import java.util.*
+import java.util.TimeZone
 
 class DeviceInfoCollectorTests {
 
@@ -30,31 +22,17 @@ class DeviceInfoCollectorTests {
         private const val APP_VERSION = "2.0"
         private const val GENERATED_ID = "test uuid"
         private const val STORED_ID = "stored hardware id"
+        private const val PLATFORM_INFO = "testPlatformInfo"
     }
 
-    private lateinit var testAndroidPlatformInfoCollector: AndroidPlatformInfoCollector
     private lateinit var mockLanguageProvider: LanguageProvider
     private lateinit var mockUuidProvider: Provider<String>
     private lateinit var mockStorage: StorageApi<String>
     private lateinit var timeZone: TimeZone
-    private lateinit var context: Context
-    private lateinit var mockContext: Context
+    private lateinit var mockAndroidPlatformInfoCollector: AndroidPlatformInfoCollector
 
     @Before
     fun setup() {
-        context = getInstrumentation().targetContext.applicationContext
-
-        val packageManager: PackageManager = mockk(relaxed = true)
-        val packageName = "packageName"
-        val packageInfo = PackageInfo()
-        packageInfo.versionName = APP_VERSION
-
-        mockContext = getApplication { flags = ApplicationInfo.FLAG_DEBUGGABLE }
-        every { mockContext.contentResolver } returns context.contentResolver
-        every { mockContext.packageName } returns packageName
-        every { mockContext.packageManager } returns packageManager
-        every { packageManager.getPackageInfo(packageName, 0) } returns packageInfo
-
         timeZone = TimeZone.getTimeZone("Asia/Tokyo")
         TimeZone.setDefault(timeZone)
 
@@ -66,6 +44,9 @@ class DeviceInfoCollectorTests {
 
         mockUuidProvider = mockk(relaxed = true)
         every { mockUuidProvider.provide() } returns GENERATED_ID
+
+        mockAndroidPlatformInfoCollector = mockk(relaxed = true)
+        every { mockAndroidPlatformInfoCollector.collect() } returns PLATFORM_INFO
     }
 
     @After
@@ -77,7 +58,7 @@ class DeviceInfoCollectorTests {
     fun getHardwareId_shouldReturnGenerateNewId_ifStorageReturnsNull() {
         val deviceInfoCollector =
             DeviceInfoCollector(
-                mockk(),
+                mockAndroidPlatformInfoCollector,
                 mockLanguageProvider,
                 mockUuidProvider,
                 mockStorage,
@@ -93,7 +74,7 @@ class DeviceInfoCollectorTests {
 
         val deviceInfoCollector =
             DeviceInfoCollector(
-                mockk(),
+                mockAndroidPlatformInfoCollector,
                 mockLanguageProvider,
                 mockUuidProvider,
                 mockStorage,
@@ -105,12 +86,8 @@ class DeviceInfoCollectorTests {
 
     @Test
     fun collect_shouldReturn_deviceInfo() {
-        val expectedPlatformInfo = AndroidPlatformInfo(
-            applicationVersion = APP_VERSION,
-            osVersion = Build.VERSION.RELEASE,
-            null,
-            isDebugMode = true,
-        )
+        every { mockAndroidPlatformInfoCollector.applicationVersion() } returns APP_VERSION
+
         val expectedDeviceInfo = DeviceInformation(
             platform = "android",
             manufacturer = Build.MANUFACTURER,
@@ -120,12 +97,12 @@ class DeviceInfoCollectorTests {
             language = LANGUAGE,
             timezone = "+0900",
             hardwareId = GENERATED_ID,
-            platformInfo = Json.encodeToString(expectedPlatformInfo)
+            platformInfo = PLATFORM_INFO,
+            applicationVersion = APP_VERSION
         )
-        testAndroidPlatformInfoCollector = AndroidPlatformInfoCollector(mockContext)
         val deviceInfoCollector =
             DeviceInfoCollector(
-                testAndroidPlatformInfoCollector,
+                mockAndroidPlatformInfoCollector,
                 mockLanguageProvider,
                 mockUuidProvider,
                 mockStorage,
@@ -140,10 +117,9 @@ class DeviceInfoCollectorTests {
 
     @Test
     fun collect_platformShouldBe_huawei() {
-        testAndroidPlatformInfoCollector = AndroidPlatformInfoCollector(mockContext)
         val deviceInfoCollector =
             DeviceInfoCollector(
-                testAndroidPlatformInfoCollector,
+                mockAndroidPlatformInfoCollector,
                 mockLanguageProvider,
                 mockUuidProvider,
                 mockStorage,
@@ -156,64 +132,4 @@ class DeviceInfoCollectorTests {
 
         deviceInfo.platform shouldBe "android-huawei"
     }
-
-    @Test
-    @Throws(PackageManager.NameNotFoundException::class)
-    fun collect_applicationVersion_shouldBeDefault_whenVersionInPackageInfo_isNull() {
-        val packageName = "packageName"
-        val mockContext: Context = mockk()
-        val packageInfo = PackageInfo()
-        val packageManager: PackageManager = mockk()
-        packageInfo.versionName = null
-        every { mockContext.contentResolver } returns context.contentResolver
-        every { mockContext.packageName } returns (packageName)
-        every { mockContext.packageManager } returns (packageManager)
-        every { packageManager.getPackageInfo(packageName, 0) } returns (packageInfo)
-        every { mockContext.applicationInfo } returns (mockk())
-
-        testAndroidPlatformInfoCollector = AndroidPlatformInfoCollector(mockContext)
-        val deviceInfoCollector =
-            DeviceInfoCollector(
-                testAndroidPlatformInfoCollector,
-                mockLanguageProvider,
-                mockUuidProvider,
-                mockStorage,
-                true,
-            )
-
-        val result = deviceInfoCollector.collect()
-
-        val deviceInfo = Json.decodeFromString<DeviceInformation>(result)
-
-        val platformInfo = Json.decodeFromString<AndroidPlatformInfo>(deviceInfo.platformInfo)
-
-        platformInfo.applicationVersion shouldBe UNKNOWN_VERSION_NAME
-    }
-
-    @Test
-    fun collect_isDebugMode_shouldBeFalse_withReleaseApplication() {
-        val mockReleaseContext = getApplication { flags = 0 }
-        testAndroidPlatformInfoCollector = AndroidPlatformInfoCollector(mockReleaseContext)
-        val debugDeviceInfo =
-            DeviceInfoCollector(
-                testAndroidPlatformInfoCollector,
-                mockLanguageProvider,
-                mockUuidProvider,
-                mockStorage,
-                true,
-            )
-
-        val result = debugDeviceInfo.collect()
-
-        val deviceInfo = Json.decodeFromString<DeviceInformation>(result)
-
-        val platformInfo = Json.decodeFromString<AndroidPlatformInfo>(deviceInfo.platformInfo)
-
-        platformInfo.isDebugMode.shouldBeFalse()
-    }
-
-    private fun getApplication(init: ApplicationInfo.() -> Unit) =
-        (spyk<Context>(context.applicationContext) as Application).also {
-            every { it.applicationInfo } returns (ApplicationInfo().apply(init))
-        }
 }

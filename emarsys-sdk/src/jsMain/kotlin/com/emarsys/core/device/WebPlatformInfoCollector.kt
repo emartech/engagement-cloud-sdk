@@ -7,7 +7,7 @@ import kotlinx.serialization.json.Json
 
 class WebPlatformInfoCollector(private val navigatorData: String) : PlatformInfoCollectorApi {
     private companion object {
-        const val DEFAULT_VERSION = "0"
+        const val DEFAULT_BROWSER_VERSION = "0"
     }
 
     override fun collect(): String {
@@ -24,26 +24,30 @@ class WebPlatformInfoCollector(private val navigatorData: String) : PlatformInfo
         return Json.encodeToString(webPlatformInfo)
     }
 
+    override fun applicationVersion(): String {
+        return UNKNOWN_VERSION_NAME
+    }
+
     private fun analiseHeaders(): WindowHeaderData {
         val osInfo = OsInfo.entries.firstOrNull {
             navigatorData.contains(it.value)
         } ?: OsInfo.Unknown
-        val osVersion = extractVersionNumber(osInfo.versionPrefix)
+        val osVersion = extractBrowserVersionNumber(osInfo.versionPrefix)
 
         val browserInfo = BrowserInfo.entries.firstOrNull {
             navigatorData.contains(it.value)
         } ?: BrowserInfo.Unknown
-        val browserVersion = extractVersionNumber(browserInfo.versionPrefix)
+        val browserVersion = extractBrowserVersionNumber(browserInfo.versionPrefix)
 
         return WindowHeaderData(osInfo.name, osVersion, browserInfo.name, browserVersion)
     }
 
-    private fun extractVersionNumber(versionPrefix: String): String {
+    private fun extractBrowserVersionNumber(versionPrefix: String): String {
         val versionRegex = Regex("""$versionPrefix[- /:;]([\d._]+)""")
         val versionMatches = versionRegex.findAll(navigatorData).firstOrNull()?.groupValues
         return if (!versionMatches.isNullOrEmpty()) {
             val versionNumbers = versionMatches.drop(1)
             return versionNumbers.first().replace("_", ".")
-        } else DEFAULT_VERSION
+        } else DEFAULT_BROWSER_VERSION
     }
 }
