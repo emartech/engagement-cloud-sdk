@@ -51,14 +51,8 @@ class RemoteConfigHandler(
     }
 
     private fun applyFeatures(features: RemoteConfigFeatures?) {
-        features?.let {
-            it.mobileEngage?.let { hasMobileEngage ->
-                switch(Features.MOBILE_ENGAGE, hasMobileEngage)
-            }
-            it.predict?.let { hasPredict ->
-                switch(Features.PREDICT, hasPredict)
-            }
-        }
+        features?.mobileEngage?.let { switch(Features.MOBILE_ENGAGE, it) }
+        features?.predict?.let { switch(Features.PREDICT, it) }
     }
 
     private fun applyLuckyLogger(luckyLogger: LuckyLogger?) {

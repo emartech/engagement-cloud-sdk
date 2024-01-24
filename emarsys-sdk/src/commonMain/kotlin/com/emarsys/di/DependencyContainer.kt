@@ -118,7 +118,7 @@ class DependencyContainer : DependencyContainerApi {
     }
 
     val sdkContext: SdkContext by lazy {
-        SdkContext(sdkDispatcher, defaultUrls, LogLevel.error, mutableListOf())
+        SdkContext(sdkDispatcher, defaultUrls, LogLevel.error, mutableSetOf())
     }
 
     private val sessionContext: SessionContext by lazy {

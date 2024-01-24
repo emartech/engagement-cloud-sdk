@@ -31,7 +31,8 @@ class DefaultUrlTests {
             clientServiceBaseUrl = "clientServiceBaseUrl - new",
             predictBaseUrl = "predictBaseUrl - new",
             inboxBaseUrl = "inboxBaseUrl - new",
-            loggingUrl = "loggingUrl - new"
+            loggingUrl = "loggingUrl - new",
+            remoteConfigBaseUrl = null
         )
 
         result shouldBe expected

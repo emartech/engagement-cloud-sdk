@@ -24,7 +24,7 @@ class RemoteConfigHandlerTests : TestsWithMocks() {
     @Mock
     lateinit var mockDeviceInfoCollector: DeviceInfoCollectorApi
 
-    private val sdkContext = SdkContext(StandardTestDispatcher(), DefaultUrls("", "", "", "", "", "", ""), LogLevel.debug, mutableListOf())
+    private val sdkContext = SdkContext(StandardTestDispatcher(), DefaultUrls("", "", "", "", "", "", ""), LogLevel.debug, mutableSetOf())
 
     @Mock
     lateinit var mockRandomProvider: Provider<Double>
@@ -52,6 +52,9 @@ class RemoteConfigHandlerTests : TestsWithMocks() {
             overrides = mapOf(
                 hardwareId to RemoteConfig(
                     ServiceUrls(predictService = predictServiceUrl)
+                ),
+                "differentHardwareId" to RemoteConfig(
+                    ServiceUrls(clientService = "differentClientServiceUrl")
                 )
             )
         )

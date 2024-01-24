@@ -14,7 +14,7 @@ interface SdkContextApi: ObservableApi<SdkState> {
     var inAppDndD: Boolean
     var defaultUrls: DefaultUrlsApi
     var remoteLogLevel: LogLevel
-    val features: MutableList<Features>
+    val features: MutableSet<Features>
     fun setSdkState(sdkState: SdkState)
 
     suspend fun setSdkState(sdkState: SdkState)
