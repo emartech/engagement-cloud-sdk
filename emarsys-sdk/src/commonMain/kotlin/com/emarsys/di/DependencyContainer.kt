@@ -1,13 +1,31 @@
 package com.emarsys.di
 
-import com.emarsys.api.contact.*
-import com.emarsys.api.event.*
-import com.emarsys.api.push.*
+import com.emarsys.api.contact.Contact
+import com.emarsys.api.contact.ContactApi
+import com.emarsys.api.contact.ContactContext
+import com.emarsys.api.contact.ContactGatherer
+import com.emarsys.api.contact.ContactInternal
+import com.emarsys.api.contact.LoggingContact
+import com.emarsys.api.event.EventTracker
+import com.emarsys.api.event.EventTrackerApi
+import com.emarsys.api.event.EventTrackerContext
+import com.emarsys.api.event.EventTrackerGatherer
+import com.emarsys.api.event.EventTrackerInternal
+import com.emarsys.api.event.LoggingEventTracker
+import com.emarsys.api.push.LoggingPush
+import com.emarsys.api.push.Push
+import com.emarsys.api.push.PushApi
+import com.emarsys.api.push.PushContext
+import com.emarsys.api.push.PushGatherer
+import com.emarsys.api.push.PushInstance
+import com.emarsys.api.push.PushInternal
 import com.emarsys.context.SdkContext
 import com.emarsys.core.DefaultUrls
 import com.emarsys.core.DefaultUrlsApi
 import com.emarsys.core.channel.DeviceEventChannel
 import com.emarsys.core.channel.DeviceEventChannelApi
+import com.emarsys.core.crypto.Crypto
+import com.emarsys.core.crypto.CryptoApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.networking.clients.GenericNetworkClient
@@ -33,10 +51,14 @@ import com.emarsys.setup.SetupOrganizer
 import com.emarsys.setup.SetupOrganizerApi
 import com.emarsys.url.UrlFactory
 import com.emarsys.url.UrlFactoryApi
-import io.ktor.client.*
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.serialization.kotlinx.json.*
+import dev.whyoleg.cryptography.CryptographyProvider
+import dev.whyoleg.cryptography.algorithms.digest.SHA512
+import dev.whyoleg.cryptography.algorithms.symmetric.AES
+import dev.whyoleg.cryptography.operations.hash.Hasher
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.HttpRequestRetry
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -44,6 +66,10 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 
 class DependencyContainer : DependencyContainerApi {
+    private companion object {
+        const val PUBLIC_KEY =
+            "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAELjWEUIBX9zlm1OI4gF1hMCBLzpaBwgs9HlmSIBAqP4MDGy4ibOOV3FVDrnAY0Q34LZTbPBlp3gRNZJ19UoSy2Q=="
+    }
 
     private val platformContext: PlatformContext = CommonPlatformContext()
 
@@ -108,6 +134,13 @@ class DependencyContainer : DependencyContainerApi {
         val gathererEvent = EventTrackerGatherer(eventTrackerContext)
         val eventInternal = EventTrackerInternal(eventClient)
         EventTracker(loggingEvent, gathererEvent, eventInternal, sdkContext)
+    }
+
+    private val crypto: CryptoApi by lazy {
+        val aesGcm: AES.GCM = CryptographyProvider.Default.get(AES.GCM)
+        val hasher: Hasher = CryptographyProvider.Default.get(SHA512).hasher()
+
+        Crypto(aesGcm, hasher, PUBLIC_KEY)
     }
 
     private val timestampProvider: Provider<Instant> by lazy {

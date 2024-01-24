@@ -4,7 +4,7 @@ interface CryptoApi {
 
     suspend fun verify(message: String, signature: String): Boolean
 
-    fun encrypt()
+    suspend fun encrypt(value: String, secret: String): String
 
-    fun decrypt(): String?
+    suspend fun decrypt(encryptedValue: String, secret: String): String?
 }
