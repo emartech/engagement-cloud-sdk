@@ -1,17 +1,17 @@
 package com.emarsys.remoteConfig
 
 import com.emarsys.context.Features
-import com.emarsys.context.SdkContext
+import com.emarsys.context.SdkContextApi
 import com.emarsys.context.copyWith
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.log.LogLevel
-import com.emarsys.networking.clients.remoteConfig.RemoteConfigClient
+import com.emarsys.networking.clients.remoteConfig.RemoteConfigClientApi
 import com.emarsys.providers.Provider
 
 class RemoteConfigHandler(
-    private val remoteConfigClient: RemoteConfigClient,
+    private val remoteConfigClient: RemoteConfigClientApi,
     private val deviceInfoCollector: DeviceInfoCollectorApi,
-    private val sdkContext: SdkContext,
+    private val sdkContext: SdkContextApi,
     private val randomProvider: Provider<Double>
 ) : RemoteConfigHandlerApi {
     override suspend fun handle() {
