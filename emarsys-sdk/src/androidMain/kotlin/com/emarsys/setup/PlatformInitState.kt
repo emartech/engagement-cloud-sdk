@@ -4,12 +4,13 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.IntentFilter
 import androidx.core.content.ContextCompat
-import com.emarsys.api.push.PushConstants.PUSH_TOKEN_INTENT_FILTER_ACTION
+import com.emarsys.core.state.State
 
 class PlatformInitState(
     private val pushTokenBroadcastReceiver: BroadcastReceiver,
+    private val intentFilter: IntentFilter,
     private val context: Context
-) : PlatformInitStateApi {
+) : State {
 
     override val name: String = "androidInitState"
 
@@ -17,7 +18,7 @@ class PlatformInitState(
         ContextCompat.registerReceiver(
             context,
             pushTokenBroadcastReceiver,
-            IntentFilter(PUSH_TOKEN_INTENT_FILTER_ACTION),
+            intentFilter,
             ContextCompat.RECEIVER_NOT_EXPORTED
         )
     }

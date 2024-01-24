@@ -5,9 +5,6 @@ import com.emarsys.api.Api
 import com.emarsys.api.SdkState
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.exceptions.PreconditionFailedException
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlin.reflect.typeOf
 
 open class GenericApi<Logging : Activatable, Gatherer : Activatable, Internal : Activatable>(
@@ -24,10 +21,8 @@ open class GenericApi<Logging : Activatable, Gatherer : Activatable, Internal : 
     }
 
     init {
-        CoroutineScope(sdkContext.sdkDispatcher).launch {
-            sdkContext.sdkState.collect {
-                setActiveInstance(it)
-            }
+        sdkContext.addObserver {
+            setActiveInstance(it)
         }
     }
 

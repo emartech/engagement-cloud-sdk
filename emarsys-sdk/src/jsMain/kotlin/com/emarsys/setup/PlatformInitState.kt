@@ -1,8 +1,9 @@
 package com.emarsys.setup
 
+import com.emarsys.core.state.State
 import com.emarsys.push.PushService
 
-class PlatformInitState(private val pushService: PushService): PlatformInitStateApi {
+class PlatformInitState(private val pushService: PushService): State {
 
     override val name: String = "jsInitState"
 
@@ -15,6 +16,5 @@ class PlatformInitState(private val pushService: PushService): PlatformInitState
     }
 
     override fun relax() {
-
     }
 }

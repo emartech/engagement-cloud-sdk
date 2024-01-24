@@ -71,13 +71,13 @@ class ContactInternalTests : TestsWithMocks() {
     }
 
     @Test
-    fun testUnLinkContact_should_make_call_on_contactClient() = runTest {
+    fun testUnlinkContact_should_make_call_on_contactClient() = runTest {
         everySuspending {
-            mockContactClient.unLinkContact()
+            mockContactClient.unlinkContact()
         } returns testResponse
 
         contactInternal.unlinkContact()
 
-        verifyWithSuspend { mockContactClient.unLinkContact() }
+        verifyWithSuspend { mockContactClient.unlinkContact() }
     }
 }

@@ -1,10 +1,10 @@
 package com.emarsys.api.push
 
 import com.emarsys.api.SdkState
+import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -32,8 +32,7 @@ class PushTests : TestsWithMocks() {
     @Mock
     lateinit var mockPushInternal: PushInstance
 
-    @Mock
-    lateinit var mockSdkContext: SdkContextApi
+    private lateinit var sdkContext: SdkContextApi
 
     lateinit var push: Push<PushInstance, PushInstance, PushInstance>
 
@@ -43,7 +42,7 @@ class PushTests : TestsWithMocks() {
 
     @BeforeTest
     fun setup() = runTest {
-        every { mockSdkContext.sdkDispatcher } returns StandardTestDispatcher()
+        sdkContext = SdkContext(StandardTestDispatcher())
 
         everySuspending { mockLoggingPush.activate() } returns Unit
         everySuspending { mockGathererPush.activate() } returns Unit
@@ -58,7 +57,6 @@ class PushTests : TestsWithMocks() {
 
     @Test
     fun test_registerPushToken_inactiveState() = runTest {
-        every { mockSdkContext.sdkState } returns MutableStateFlow(SdkState.inactive)
         everySuspending {
             mockLoggingPush.registerPushToken(
                 pushToken
@@ -66,7 +64,7 @@ class PushTests : TestsWithMocks() {
         } returns Unit
 
         push =
-            Push(mockLoggingPush, mockGathererPush, mockPushInternal, mockSdkContext)
+            Push(mockLoggingPush, mockGathererPush, mockPushInternal, sdkContext)
 
         push.registerPushToken(pushToken)
 
@@ -79,7 +77,6 @@ class PushTests : TestsWithMocks() {
 
     @Test
     fun test_linkContact_onHoldState() = runTest {
-        every { mockSdkContext.sdkState } returns MutableStateFlow(SdkState.onHold)
         everySuspending {
             mockGathererPush.registerPushToken(
                 pushToken
@@ -87,8 +84,9 @@ class PushTests : TestsWithMocks() {
         } returns Unit
 
         push =
-            Push(mockLoggingPush, mockGathererPush, mockPushInternal, mockSdkContext)
+            Push(mockLoggingPush, mockGathererPush, mockPushInternal, sdkContext)
 
+        sdkContext.setSdkState(SdkState.onHold)
         push.registerPushToken(pushToken)
 
         verifyWithSuspend(exhaustive = false) {
@@ -100,7 +98,6 @@ class PushTests : TestsWithMocks() {
 
     @Test
     fun test_linkContact_activeState() = runTest {
-        every { mockSdkContext.sdkState } returns MutableStateFlow(SdkState.active)
         everySuspending {
             mockPushInternal.registerPushToken(
                 pushToken
@@ -108,8 +105,9 @@ class PushTests : TestsWithMocks() {
         } returns Unit
 
         push =
-            Push(mockLoggingPush, mockGathererPush, mockPushInternal, mockSdkContext)
+            Push(mockLoggingPush, mockGathererPush, mockPushInternal, sdkContext)
 
+        sdkContext.setSdkState(SdkState.active)
         push.registerPushToken(pushToken)
 
         verifyWithSuspend(exhaustive = false) {
@@ -121,13 +119,12 @@ class PushTests : TestsWithMocks() {
 
     @Test
     fun test_clearPushToken_inactiveState() = runTest {
-        every { mockSdkContext.sdkState } returns MutableStateFlow(SdkState.inactive)
         everySuspending {
             mockLoggingPush.clearPushToken()
         } returns Unit
 
         push =
-            Push(mockLoggingPush, mockGathererPush, mockPushInternal, mockSdkContext)
+            Push(mockLoggingPush, mockGathererPush, mockPushInternal, sdkContext)
 
         push.clearPushToken()
 
@@ -138,14 +135,14 @@ class PushTests : TestsWithMocks() {
 
     @Test
     fun test_clearPushToken_onHoldState() = runTest {
-        every { mockSdkContext.sdkState } returns MutableStateFlow(SdkState.onHold)
         everySuspending {
             mockGathererPush.clearPushToken()
         } returns Unit
 
         push =
-            Push(mockLoggingPush, mockGathererPush, mockPushInternal, mockSdkContext)
+            Push(mockLoggingPush, mockGathererPush, mockPushInternal, sdkContext)
 
+        sdkContext.setSdkState(SdkState.onHold)
         push.clearPushToken()
 
         verifyWithSuspend(exhaustive = false) {
@@ -155,14 +152,14 @@ class PushTests : TestsWithMocks() {
 
     @Test
     fun test_clearPushToken_activeState() = runTest {
-        every { mockSdkContext.sdkState } returns MutableStateFlow(SdkState.active)
         everySuspending {
             mockPushInternal.clearPushToken()
         } returns Unit
 
         push =
-            Push(mockLoggingPush, mockGathererPush, mockPushInternal, mockSdkContext)
+            Push(mockLoggingPush, mockGathererPush, mockPushInternal, sdkContext)
 
+        sdkContext.setSdkState(SdkState.active)
         push.clearPushToken()
 
         verifyWithSuspend(exhaustive = false) {

@@ -119,22 +119,6 @@ class DependencyContainer : DependencyContainerApi {
         UrlFactory(sdkContext, defaultUrls)
     }
 
-    override val contactApi: ContactApi by lazy {
-        val contactClient = ContactClient(emarsysClient, urlFactory, sdkContext, json)
-        val contactContext = ContactContext()
-        val loggingContact = LoggingContact(sdkLogger)
-        val contactGatherer = ContactGatherer(contactContext)
-        val contactInternal = ContactInternal(contactClient)
-        Contact(loggingContact, contactGatherer, contactInternal, sdkContext)
-    }
-
-    override val eventTrackerApi: EventTrackerApi by lazy {
-        val eventTrackerContext = EventTrackerContext()
-        val loggingEvent = LoggingEventTracker(sdkLogger)
-        val gathererEvent = EventTrackerGatherer(eventTrackerContext)
-        val eventInternal = EventTrackerInternal(eventClient)
-        EventTracker(loggingEvent, gathererEvent, eventInternal, sdkContext)
-    }
 
     private val crypto: CryptoApi by lazy {
         val aesGcm: AES.GCM = CryptographyProvider.Default.get(AES.GCM)
@@ -192,6 +176,7 @@ class DependencyContainer : DependencyContainerApi {
             "https://log-dealer.eservice.emarsys.net"
         )
     }
+
     private val genericNetworkClient: NetworkClientApi by lazy {
         val httpClient = HttpClient {
             install(ContentNegotiation) {
@@ -204,8 +189,28 @@ class DependencyContainer : DependencyContainerApi {
 
     override val setupOrganizerApi: SetupOrganizerApi by lazy {
         val collectDeviceInfoState = CollectDeviceInfoState(deviceInfoCollector, sessionContext)
+        val registerClientState = RegisterClientState(deviceClient)
+        val registerPushTokenState = RegisterPushTokenState(pushClient, stringStorage)
         val platformInitState = dependencyCreator.createPlatformInitState(pushInternal, sdkDispatcher)
-        val stateMachine = StateMachine(listOf(collectDeviceInfoState, platformInitState))
+        val stateMachine =
+            StateMachine(listOf(collectDeviceInfoState, platformInitState, registerClientState, registerPushTokenState))
         SetupOrganizer(stateMachine, sdkContext)
+    }
+
+    override val contactApi: ContactApi = run {
+        val contactClient = ContactClient(emarsysClient, urlFactory, sdkContext, json)
+        val contactContext = ContactContext()
+        val loggingContact = LoggingContact(sdkLogger)
+        val contactGatherer = ContactGatherer(contactContext)
+        val contactInternal = ContactInternal(contactClient)
+        Contact(loggingContact, contactGatherer, contactInternal, sdkContext)
+    }
+
+    override val eventTrackerApi: EventTrackerApi = run {
+        val eventTrackerContext = EventTrackerContext()
+        val loggingEvent = LoggingEventTracker(sdkLogger)
+        val gathererEvent = EventTrackerGatherer(eventTrackerContext)
+        val eventInternal = EventTrackerInternal(eventClient)
+        EventTracker(loggingEvent, gathererEvent, eventInternal, sdkContext)
     }
 }

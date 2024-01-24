@@ -2,23 +2,24 @@ package com.emarsys.context
 
 import com.emarsys.EmarsysConfig
 import com.emarsys.api.SdkState
+import com.emarsys.core.Observable
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
-class SdkContext(override val sdkDispatcher: CoroutineDispatcher) : SdkContextApi {
 
-    private val innerSdkState: MutableStateFlow<SdkState> = MutableStateFlow(SdkState.inactive)
-
-    override val sdkState: StateFlow<SdkState> = innerSdkState.asStateFlow()
+class SdkContext(override val sdkDispatcher: CoroutineDispatcher) : SdkContextApi,
+    Observable<SdkState>(SdkState.inactive) {
 
     override var config: EmarsysConfig? = null
 
     override var inAppDndD: Boolean = false
 
-    override fun setSdkState(sdkState: SdkState) {
-        innerSdkState.value = sdkState
+    override val currentSdkState
+        get() = this.value
+
+    override suspend fun setSdkState(sdkState: SdkState) {
+        changeValue(sdkState)
     }
 }
+
+
 

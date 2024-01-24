@@ -34,8 +34,12 @@ class DeviceClient(
     }
 
     private fun handleResponse(response: Response) {
-        val body: RegisterDeviceInfoResponseBody = response.body()
-        sessionContext.refreshToken = body.refreshToken
-        sessionContext.contactToken = body.contactToken
+        try {
+            val body: RegisterDeviceInfoResponseBody = response.body()
+            sessionContext.refreshToken = body.refreshToken
+            sessionContext.contactToken = body.contactToken
+        } catch (ignored: Exception) {
+            // TODO
+        }
     }
 }

@@ -77,4 +77,33 @@ class DeviceClientTests : TestsWithMocks() {
         sessionContext.refreshToken shouldBe testRefreshToken
         sessionContext.contactToken shouldBe testContactToken
     }
+
+    @Test
+    fun testRegisterDeviceInfo_should_not_crash_on_empty_response() = runTest {
+        val testDeviceInfoString = "testDeviceInfo"
+        val testUrl = Url("https://www.testUrl.com/testAppCode/client")
+        val request = UrlRequest(
+            testUrl,
+            HttpMethod.Post,
+            testDeviceInfoString
+        )
+        val expectedResponse = Response(
+            request,
+            HttpStatusCode.OK,
+            headers {
+                append("Content-Type", "application/json")
+                append("X-Client-State", "testClientState")
+            },
+            """{}"""
+        )
+        every { mockDeviceInfoCollector.collect() } returns testDeviceInfoString
+        every { mockUrlFactory.create(REGISTER_DEVICE_INFO) } returns testUrl
+        everySuspending { mockEmarsysClient.send(isAny()) } returns expectedResponse
+
+        deviceClient.registerDeviceInfo()
+
+        verifyWithSuspend(exhaustive = false) {
+            mockEmarsysClient.send(request)
+        }
+    }
 }

@@ -30,7 +30,8 @@ actual class DeviceInfoCollector(
                 language = window.navigator.language,
                 timezone = Clock.System.now().offsetIn(TimeZone.currentSystemDefault()).toString(),
                 hardwareId = getHardwareId(),
-                platformInfo = platformInfo
+                platformInfo = platformInfo,
+                applicationVersion = webPlatformInfoCollector.applicationVersion()
             )
         )
     }
