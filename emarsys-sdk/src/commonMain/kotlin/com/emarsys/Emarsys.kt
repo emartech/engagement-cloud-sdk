@@ -26,7 +26,7 @@ object Emarsys {
         DependencyInjection.container?.contactApi?.unlinkContact()
     }
 
-    suspend fun trackCustomEvent(event: String, attributes: Map<String, String>) {
+    suspend fun trackCustomEvent(event: String, attributes: Map<String, String>? = null) {
         DependencyInjection.container?.eventTrackerApi?.trackEvent(CustomEvent(event, attributes))
     }
 }
