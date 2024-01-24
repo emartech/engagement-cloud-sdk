@@ -25,6 +25,7 @@ import com.emarsys.context.DefaultUrlsApi
 import com.emarsys.core.channel.DeviceEventChannel
 import com.emarsys.core.channel.DeviceEventChannelApi
 import com.emarsys.core.crypto.Crypto
+import com.emarsys.core.crypto.CryptoApi
 import com.emarsys.core.crypto.Crypto
 import com.emarsys.core.crypto.CryptoApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
@@ -203,13 +204,11 @@ class DependencyContainer : DependencyContainerApi {
         val platformInitState =
             dependencyCreator.createPlatformInitState(pushInternal, sdkDispatcher)
         val applyRemoteConfigState = ApplyRemoteConfigState(
-            RemoteConfigHandler(RemoteConfigClient(genericNetworkClient, urlFactory,
-                object : Crypto {
-                    override fun verify(content: ByteArray, signature: ByteArray): Boolean {
-                        return true
-                    }
-                }, json
-            ), deviceInfoCollector, sdkContext, RandomProvider()
+            RemoteConfigHandler(
+                RemoteConfigClient(genericNetworkClient, urlFactory, crypto, json),
+                deviceInfoCollector,
+                sdkContext,
+                RandomProvider()
             )
         )
         val stateMachine =

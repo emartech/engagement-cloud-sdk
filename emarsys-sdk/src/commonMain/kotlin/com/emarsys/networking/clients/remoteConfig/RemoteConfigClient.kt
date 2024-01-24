@@ -1,6 +1,6 @@
 package com.emarsys.networking.clients.remoteConfig
 
-import com.emarsys.core.crypto.Crypto
+import com.emarsys.core.crypto.CryptoApi
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.remoteConfig.RemoteConfigResponse
@@ -15,7 +15,7 @@ import kotlinx.serialization.json.Json
 class RemoteConfigClient(
     private val networkClient: NetworkClientApi,
     private val urlFactoryApi: UrlFactoryApi,
-    private val crypto: Crypto,
+    private val crypto: CryptoApi,
     private val json: Json
 ) : RemoteConfigClientApi {
     override suspend fun fetchRemoteConfig(): RemoteConfigResponse? {
@@ -24,27 +24,27 @@ class RemoteConfigClient(
         val config = toBeConfigBytes.await()
         val verified = crypto.verify(config, toBeSignatureBytes.await())
         return if (verified) {
-            json.decodeFromString(config.decodeToString())
+            json.decodeFromString(config)
         } else {
             null
         }
     }
 
-    private suspend fun fetchConfig(): Deferred<ByteArray> = coroutineScope {
+    private suspend fun fetchConfig(): Deferred<String> = coroutineScope {
         async {
             val request =
                 UrlRequest(urlFactoryApi.create(EmarsysUrlType.REMOTE_CONFIG), HttpMethod.Get)
-            networkClient.send(request).bodyAsText.encodeToByteArray()
+            networkClient.send(request).bodyAsText
         }
     }
 
-    private suspend fun fetchSignature(): Deferred<ByteArray> = coroutineScope {
+    private suspend fun fetchSignature(): Deferred<String> = coroutineScope {
         async {
             val request = UrlRequest(
                 urlFactoryApi.create(EmarsysUrlType.REMOTE_CONFIG_SIGNATURE),
                 HttpMethod.Get
             )
-            networkClient.send(request).bodyAsText.encodeToByteArray()
+            networkClient.send(request).bodyAsText
         }
     }
 

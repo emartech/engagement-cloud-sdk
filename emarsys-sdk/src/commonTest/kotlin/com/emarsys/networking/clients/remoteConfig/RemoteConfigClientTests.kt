@@ -1,6 +1,7 @@
 package com.emarsys.networking.clients.remoteConfig
 
 import com.emarsys.core.crypto.Crypto
+import com.emarsys.core.crypto.CryptoApi
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
@@ -29,7 +30,7 @@ class RemoteConfigClientTests: TestsWithMocks() {
     lateinit var mockUrlFactory: UrlFactoryApi
 
     @Mock
-    lateinit var mockCrypto: Crypto
+    lateinit var mockCrypto: CryptoApi
 
     private var remoteConfigClient: RemoteConfigClient by withMocks {
         RemoteConfigClient(mockNetworkClient, mockUrlFactory, mockCrypto, Json)
@@ -50,7 +51,7 @@ class RemoteConfigClientTests: TestsWithMocks() {
         every { mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG_SIGNATURE) } returns configSignatureUrl
         everySuspending { mockNetworkClient.send(configRequest) } returns configResponse
         everySuspending { mockNetworkClient.send(configSignatureRequest) } returns configSignatureResponse
-        every { mockCrypto.verify(isAny(), isAny()) } returns true
+        everySuspending { mockCrypto.verify(isAny(), isAny()) } returns true
 
         val result = remoteConfigClient.fetchRemoteConfig()
 
@@ -72,7 +73,7 @@ class RemoteConfigClientTests: TestsWithMocks() {
         every { mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG_SIGNATURE) } returns configSignatureUrl
         everySuspending { mockNetworkClient.send(configRequest) } returns configResponse
         everySuspending { mockNetworkClient.send(configSignatureRequest) } returns configSignatureResponse
-        every { mockCrypto.verify(isAny(), isAny()) } returns false
+        everySuspending { mockCrypto.verify(isAny(), isAny()) } returns false
 
         val result = remoteConfigClient.fetchRemoteConfig()
 
