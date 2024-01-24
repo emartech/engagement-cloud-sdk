@@ -14,7 +14,6 @@ import com.emarsys.url.EmarsysUrlType
 import com.emarsys.url.UrlFactoryApi
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.Url
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.delay
 import kotlinx.datetime.Instant

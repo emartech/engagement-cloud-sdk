@@ -44,7 +44,8 @@ class DeviceInfoCollectorTests {
             language = navigator.language,
             timezone = Clock.System.now().offsetIn(TimeZone.currentSystemDefault()).toString(),
             hardwareId = TEST_UUID,
-            platformInfo = Json.encodeToString(expectedPlatformInfo)
+            platformInfo = Json.encodeToString(expectedPlatformInfo),
+            applicationVersion = UNKNOWN_VERSION_NAME
         )
 
         fakeStorage = FakeStorage()
