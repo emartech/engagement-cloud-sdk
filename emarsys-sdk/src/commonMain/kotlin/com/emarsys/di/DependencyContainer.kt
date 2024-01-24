@@ -1,8 +1,24 @@
 package com.emarsys.di
 
-import com.emarsys.api.contact.*
-import com.emarsys.api.event.*
-import com.emarsys.api.push.*
+import com.emarsys.api.contact.Contact
+import com.emarsys.api.contact.ContactApi
+import com.emarsys.api.contact.ContactContext
+import com.emarsys.api.contact.ContactGatherer
+import com.emarsys.api.contact.ContactInternal
+import com.emarsys.api.contact.LoggingContact
+import com.emarsys.api.event.EventTracker
+import com.emarsys.api.event.EventTrackerApi
+import com.emarsys.api.event.EventTrackerContext
+import com.emarsys.api.event.EventTrackerGatherer
+import com.emarsys.api.event.EventTrackerInternal
+import com.emarsys.api.event.LoggingEventTracker
+import com.emarsys.api.push.LoggingPush
+import com.emarsys.api.push.Push
+import com.emarsys.api.push.PushApi
+import com.emarsys.api.push.PushContext
+import com.emarsys.api.push.PushGatherer
+import com.emarsys.api.push.PushInstance
+import com.emarsys.api.push.PushInternal
 import com.emarsys.context.SdkContext
 import com.emarsys.core.DefaultUrls
 import com.emarsys.core.DefaultUrlsApi
@@ -28,15 +44,17 @@ import com.emarsys.providers.Provider
 import com.emarsys.providers.TimestampProvider
 import com.emarsys.providers.UUIDProvider
 import com.emarsys.session.SessionContext
-import com.emarsys.setup.CollectDeviceInfoState
 import com.emarsys.setup.SetupOrganizer
 import com.emarsys.setup.SetupOrganizerApi
+import com.emarsys.setup.states.CollectDeviceInfoState
+import com.emarsys.setup.states.RegisterClientState
+import com.emarsys.setup.states.RegisterPushTokenState
 import com.emarsys.url.UrlFactory
 import com.emarsys.url.UrlFactoryApi
-import io.ktor.client.*
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.serialization.kotlinx.json.*
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.HttpRequestRetry
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -93,22 +111,6 @@ class DependencyContainer : DependencyContainerApi {
         UrlFactory(sdkContext, defaultUrls)
     }
 
-    override val contactApi: ContactApi by lazy {
-        val contactClient = ContactClient(emarsysClient, urlFactory, sdkContext, json)
-        val contactContext = ContactContext()
-        val loggingContact = LoggingContact(sdkLogger)
-        val contactGatherer = ContactGatherer(contactContext)
-        val contactInternal = ContactInternal(contactClient)
-        Contact(loggingContact, contactGatherer, contactInternal, sdkContext)
-    }
-
-    override val eventTrackerApi: EventTrackerApi by lazy {
-        val eventTrackerContext = EventTrackerContext()
-        val loggingEvent = LoggingEventTracker(sdkLogger)
-        val gathererEvent = EventTrackerGatherer(eventTrackerContext)
-        val eventInternal = EventTrackerInternal(eventClient)
-        EventTracker(loggingEvent, gathererEvent, eventInternal, sdkContext)
-    }
 
     private val timestampProvider: Provider<Instant> by lazy {
         TimestampProvider()
@@ -159,6 +161,7 @@ class DependencyContainer : DependencyContainerApi {
             "https://log-dealer.eservice.emarsys.net"
         )
     }
+
     private val genericNetworkClient: NetworkClientApi by lazy {
         val httpClient = HttpClient {
             install(ContentNegotiation) {
@@ -171,8 +174,28 @@ class DependencyContainer : DependencyContainerApi {
 
     override val setupOrganizerApi: SetupOrganizerApi by lazy {
         val collectDeviceInfoState = CollectDeviceInfoState(deviceInfoCollector, sessionContext)
+        val registerClientState = RegisterClientState(deviceClient)
+        val registerPushTokenState = RegisterPushTokenState(pushClient, stringStorage)
         val platformInitState = dependencyCreator.createPlatformInitState(pushInternal, sdkDispatcher)
-        val stateMachine = StateMachine(listOf(collectDeviceInfoState, platformInitState))
+        val stateMachine =
+            StateMachine(listOf(collectDeviceInfoState, platformInitState, registerClientState, registerPushTokenState))
         SetupOrganizer(stateMachine, sdkContext)
+    }
+
+    override val contactApi: ContactApi = run {
+        val contactClient = ContactClient(emarsysClient, urlFactory, sdkContext, json)
+        val contactContext = ContactContext()
+        val loggingContact = LoggingContact(sdkLogger)
+        val contactGatherer = ContactGatherer(contactContext)
+        val contactInternal = ContactInternal(contactClient)
+        Contact(loggingContact, contactGatherer, contactInternal, sdkContext)
+    }
+
+    override val eventTrackerApi: EventTrackerApi = run {
+        val eventTrackerContext = EventTrackerContext()
+        val loggingEvent = LoggingEventTracker(sdkLogger)
+        val gathererEvent = EventTrackerGatherer(eventTrackerContext)
+        val eventInternal = EventTrackerInternal(eventClient)
+        EventTracker(loggingEvent, gathererEvent, eventInternal, sdkContext)
     }
 }

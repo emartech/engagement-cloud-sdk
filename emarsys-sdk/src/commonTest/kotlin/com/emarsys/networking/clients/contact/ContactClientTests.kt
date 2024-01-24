@@ -184,7 +184,7 @@ class ContactClientTests : TestsWithMocks() {
             """{"refreshToken":"testRefreshToken", "contactToken":"testContactToken"}"""
         )
 
-        val response = contactClient.unLinkContact()
+        val response = contactClient.unlinkContact()
 
         verifyWithSuspend(exhaustive = false) {
             mockEmarsysClient.send(expectedUrlRequest)
@@ -226,7 +226,7 @@ class ContactClientTests : TestsWithMocks() {
             """{"refreshToken":"testRefreshToken", "contactToken":"testContactToken"}"""
         )
 
-        val response = contactClient.unLinkContact()
+        val response = contactClient.unlinkContact()
 
         verifyWithSuspend(exhaustive = false) {
             mockEmarsysClient.send(expectedUrlRequest)

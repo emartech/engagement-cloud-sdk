@@ -7,14 +7,15 @@ import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.networking.EmarsysHeaders
 import com.emarsys.url.EmarsysUrlType
 import com.emarsys.url.UrlFactoryApi
-import io.ktor.http.*
+import io.ktor.http.HttpMethod
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlin.collections.set
 
 class ContactClient(
     private val emarsysClient: NetworkClientApi,
     private val urlFactory: UrlFactoryApi,
-    private val sdkContextApi: SdkContextApi,
+    private val sdkContext: SdkContextApi,
     private val json: Json
 ) : ContactClientApi {
     override suspend fun linkContact(
@@ -32,8 +33,8 @@ class ContactClient(
         val url = urlFactory.create(EmarsysUrlType.LINK_CONTACT)
         val headers = mutableMapOf<String, Any?>()
 
-        if (sdkContextApi.config?.merchantId != null) {
-            headers[EmarsysHeaders.MERCHANT_ID_HEADER] = sdkContextApi.config!!.merchantId
+        if (sdkContext.config?.merchantId != null) {
+            headers[EmarsysHeaders.MERCHANT_ID_HEADER] = sdkContext.config!!.merchantId
         }
 
         val request = UrlRequest(
@@ -47,12 +48,12 @@ class ContactClient(
         return response
     }
 
-    override suspend fun unLinkContact(): Response {
+    override suspend fun unlinkContact(): Response {
         val url = urlFactory.create(EmarsysUrlType.UNLINK_CONTACT)
         val headers = mutableMapOf<String, Any?>()
 
-        if (sdkContextApi.config?.merchantId != null) {
-            headers[EmarsysHeaders.MERCHANT_ID_HEADER] = sdkContextApi.config!!.merchantId
+        if (sdkContext.config?.merchantId != null) {
+            headers[EmarsysHeaders.MERCHANT_ID_HEADER] = sdkContext.config!!.merchantId
         }
 
         val request = UrlRequest(url, HttpMethod.Post, null, headers)

@@ -36,6 +36,6 @@ class SetupOrganizerTests : TestsWithMocks() {
             mockStateMachine.activate()
         }
         sdkContext.config shouldBe config
-        sdkContext.sdkState.value shouldBe SdkState.active
+        sdkContext.currentSdkState shouldBe SdkState.active
     }
 }

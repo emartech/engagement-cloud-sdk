@@ -10,5 +10,5 @@ interface ContactClientApi {
         openIdToken: String? = null
     ): Response
 
-    suspend fun unLinkContact(): Response
+    suspend fun unlinkContact(): Response
 }
