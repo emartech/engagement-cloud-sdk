@@ -40,7 +40,8 @@ class Crypto(private val aesGcm: AES.GCM, private val hasher: Hasher, private va
         val key = hasher.hash(secret.encodeToByteArray())
         val decrypted: ByteArray? = try {
             val decodedKey: AES.GCM.Key =
-                aesGcm.keyDecoder().decodeFrom(AES.Key.Format.RAW, key.copyOfRange(SECRET_START_INDEX, SECRET_END_INDEX))
+                aesGcm.keyDecoder()
+                    .decodeFrom(AES.Key.Format.RAW, key.copyOfRange(SECRET_START_INDEX, SECRET_END_INDEX))
 
             decodedKey.cipher().decrypt(encryptedValue.decodeBase64Bytes())
         } catch (exception: Exception) {

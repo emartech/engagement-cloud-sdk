@@ -7,7 +7,6 @@ import com.emarsys.providers.Provider
 import com.emarsys.setup.SetupOrganizerApi
 
 interface DependencyContainerApi {
-
     val contactApi: ContactApi
 
     val eventTrackerApi: EventTrackerApi

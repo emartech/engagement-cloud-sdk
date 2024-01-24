@@ -46,9 +46,11 @@ import com.emarsys.providers.Provider
 import com.emarsys.providers.TimestampProvider
 import com.emarsys.providers.UUIDProvider
 import com.emarsys.session.SessionContext
-import com.emarsys.setup.CollectDeviceInfoState
 import com.emarsys.setup.SetupOrganizer
 import com.emarsys.setup.SetupOrganizerApi
+import com.emarsys.setup.states.CollectDeviceInfoState
+import com.emarsys.setup.states.RegisterClientState
+import com.emarsys.setup.states.RegisterPushTokenState
 import com.emarsys.url.UrlFactory
 import com.emarsys.url.UrlFactoryApi
 import dev.whyoleg.cryptography.CryptographyProvider
