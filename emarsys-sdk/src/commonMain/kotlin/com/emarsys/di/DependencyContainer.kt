@@ -20,13 +20,15 @@ import com.emarsys.api.push.PushGatherer
 import com.emarsys.api.push.PushInstance
 import com.emarsys.api.push.PushInternal
 import com.emarsys.context.SdkContext
-import com.emarsys.core.DefaultUrls
-import com.emarsys.core.DefaultUrlsApi
+import com.emarsys.context.DefaultUrls
+import com.emarsys.context.DefaultUrlsApi
 import com.emarsys.core.channel.DeviceEventChannel
 import com.emarsys.core.channel.DeviceEventChannelApi
 import com.emarsys.core.crypto.Crypto
+import com.emarsys.core.crypto.Crypto
 import com.emarsys.core.crypto.CryptoApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
+import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.networking.clients.GenericNetworkClient
 import com.emarsys.core.networking.clients.NetworkClientApi
@@ -42,10 +44,15 @@ import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.event.model.Event
 import com.emarsys.networking.clients.push.PushClient
 import com.emarsys.networking.clients.push.PushClientApi
+import com.emarsys.networking.clients.remoteConfig.RemoteConfigClient
 import com.emarsys.providers.Provider
+import com.emarsys.providers.RandomProvider
 import com.emarsys.providers.TimestampProvider
 import com.emarsys.providers.UUIDProvider
+import com.emarsys.remoteConfig.RemoteConfigHandler
 import com.emarsys.session.SessionContext
+import com.emarsys.setup.ApplyRemoteConfigState
+import com.emarsys.setup.CollectDeviceInfoState
 import com.emarsys.setup.SetupOrganizer
 import com.emarsys.setup.SetupOrganizerApi
 import com.emarsys.setup.states.CollectDeviceInfoState
@@ -110,7 +117,7 @@ class DependencyContainer : DependencyContainerApi {
     }
 
     val sdkContext: SdkContext by lazy {
-        SdkContext(sdkDispatcher)
+        SdkContext(sdkDispatcher, defaultUrls, LogLevel.error, mutableListOf())
     }
 
     private val sessionContext: SessionContext by lazy {
@@ -118,7 +125,7 @@ class DependencyContainer : DependencyContainerApi {
     }
 
     private val urlFactory: UrlFactoryApi by lazy {
-        UrlFactory(sdkContext, defaultUrls)
+        UrlFactory(sdkContext)
     }
 
 
@@ -193,9 +200,20 @@ class DependencyContainer : DependencyContainerApi {
         val collectDeviceInfoState = CollectDeviceInfoState(deviceInfoCollector, sessionContext)
         val registerClientState = RegisterClientState(deviceClient)
         val registerPushTokenState = RegisterPushTokenState(pushClient, stringStorage)
-        val platformInitState = dependencyCreator.createPlatformInitState(pushInternal, sdkDispatcher)
+        val platformInitState =
+            dependencyCreator.createPlatformInitState(pushInternal, sdkDispatcher)
+        val applyRemoteConfigState = ApplyRemoteConfigState(
+            RemoteConfigHandler(RemoteConfigClient(genericNetworkClient, urlFactory,
+                object : Crypto {
+                    override fun verify(content: ByteArray, signature: ByteArray): Boolean {
+                        return true
+                    }
+                }, json
+            ), deviceInfoCollector, sdkContext, RandomProvider()
+            )
+        )
         val stateMachine =
-            StateMachine(listOf(collectDeviceInfoState, platformInitState, registerClientState, registerPushTokenState))
+            StateMachine(listOf(collectDeviceInfoState, applyRemoteConfigState, platformInitState, registerClientState, registerPushTokenState))
         SetupOrganizer(stateMachine, sdkContext)
     }
 
