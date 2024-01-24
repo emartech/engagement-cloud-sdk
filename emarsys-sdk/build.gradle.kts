@@ -45,6 +45,8 @@ kotlin {
                 implementation(libs.ktor.serialization.kotlinx.json)
                 implementation(libs.ktor.serialization)
                 implementation(libs.uuid)
+                implementation(project.dependencies.platform(libs.cryptography))
+                implementation(libs.cryptography.core)
             }
         }
         val commonTest by getting {
@@ -60,6 +62,7 @@ kotlin {
                implementation(libs.kotlinx.coroutines.android)
                implementation(libs.ktor.client.android)
                implementation(libs.androidx.core.ktx)
+               implementation(libs.cryptography.provider.jdk)
            }
        }
         val androidUnitTest by getting {
@@ -82,6 +85,7 @@ kotlin {
             dependencies {
                 implementation(libs.ktor.client.js)
                 implementation(libs.kotlin.wrapper.browser)
+                implementation(libs.cryptography.provider.webcrypto)
             }
         }
         val jsTest by getting {
