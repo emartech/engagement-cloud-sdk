@@ -2,7 +2,7 @@ package com.emarsys.networking.clients.push
 
 import com.emarsys.EmarsysConfig
 import com.emarsys.context.SdkContextApi
-import com.emarsys.core.DefaultUrlsApi
+import com.emarsys.context.DefaultUrlsApi
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest

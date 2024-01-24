@@ -3,6 +3,8 @@ package com.emarsys.api.generic
 import com.emarsys.api.SdkState.*
 import com.emarsys.api.contact.*
 import com.emarsys.context.SdkContext
+import com.emarsys.context.DefaultUrls
+import com.emarsys.core.log.LogLevel
 import com.emarsys.networking.clients.contact.ContactClientApi
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.isActive
@@ -31,7 +33,7 @@ class GenericApiTests: TestsWithMocks() {
         loggingContact = LoggingContact(FakeSdkLogger())
         contactGatherer = ContactGatherer(ContactContext())
         contactInternal = ContactInternal(mockContactClient)
-        sdkContext = SdkContext(StandardTestDispatcher())
+        sdkContext = SdkContext(StandardTestDispatcher(), DefaultUrls("", "", "", "", "", "", ""), LogLevel.error, mutableListOf())
         genericApi = GenericApi(loggingContact, contactGatherer, contactInternal, sdkContext)
     }
 

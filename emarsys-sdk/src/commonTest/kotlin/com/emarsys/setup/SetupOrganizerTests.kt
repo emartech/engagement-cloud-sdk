@@ -4,6 +4,8 @@ import com.emarsys.EmarsysConfig
 import com.emarsys.api.SdkState
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
+import com.emarsys.context.DefaultUrls
+import com.emarsys.core.log.LogLevel
 import com.emarsys.core.state.StateMachineApi
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -21,7 +23,7 @@ class SetupOrganizerTests : TestsWithMocks() {
     private lateinit var sdkContext: SdkContextApi
 
     private val setupOrganizer: SetupOrganizerApi by withMocks {
-        sdkContext = SdkContext(StandardTestDispatcher())
+        sdkContext = SdkContext(StandardTestDispatcher(), DefaultUrls("", "", "", "", "", "", ""), LogLevel.error, mutableListOf())
         SetupOrganizer(mockStateMachine, sdkContext)
     }
 
