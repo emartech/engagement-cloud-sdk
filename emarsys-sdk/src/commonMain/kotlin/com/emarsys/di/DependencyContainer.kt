@@ -26,8 +26,6 @@ import com.emarsys.core.channel.DeviceEventChannel
 import com.emarsys.core.channel.DeviceEventChannelApi
 import com.emarsys.core.crypto.Crypto
 import com.emarsys.core.crypto.CryptoApi
-import com.emarsys.core.crypto.Crypto
-import com.emarsys.core.crypto.CryptoApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.SdkLogger
@@ -53,7 +51,6 @@ import com.emarsys.providers.UUIDProvider
 import com.emarsys.remoteConfig.RemoteConfigHandler
 import com.emarsys.session.SessionContext
 import com.emarsys.setup.ApplyRemoteConfigState
-import com.emarsys.setup.CollectDeviceInfoState
 import com.emarsys.setup.SetupOrganizer
 import com.emarsys.setup.SetupOrganizerApi
 import com.emarsys.setup.states.CollectDeviceInfoState

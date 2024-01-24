@@ -11,7 +11,7 @@ class SdkContext(
     override var defaultUrls: DefaultUrlsApi,
     override var remoteLogLevel: LogLevel,
     override val features: MutableSet<Features>
-    ) : SdkContextApi {
+    ): SdkContextApi, Observable<SdkState>(SdkState.inactive) {
 
     override var config: EmarsysConfig? = null
 

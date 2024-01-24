@@ -1,8 +1,10 @@
 package com.emarsys.api.event
 
 import com.emarsys.api.SdkState
+import com.emarsys.context.DefaultUrls
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.log.LogLevel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -42,7 +44,7 @@ class EventTrackerTests : TestsWithMocks() {
 
     @BeforeTest
     fun setup() = runTest {
-        sdkContext = SdkContext(StandardTestDispatcher())
+        sdkContext = SdkContext(StandardTestDispatcher(), DefaultUrls("", "", "", "", "", "", ""), LogLevel.error, mutableSetOf())
 
         everySuspending { mockLoggingEventTracker.activate() } returns Unit
         everySuspending { mockEventTrackerGatherer.activate() } returns Unit
