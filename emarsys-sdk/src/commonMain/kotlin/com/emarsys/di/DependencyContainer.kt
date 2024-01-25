@@ -19,9 +19,9 @@ import com.emarsys.api.push.PushContext
 import com.emarsys.api.push.PushGatherer
 import com.emarsys.api.push.PushInstance
 import com.emarsys.api.push.PushInternal
-import com.emarsys.context.SdkContext
 import com.emarsys.context.DefaultUrls
 import com.emarsys.context.DefaultUrlsApi
+import com.emarsys.context.SdkContext
 import com.emarsys.core.channel.DeviceEventChannel
 import com.emarsys.core.channel.DeviceEventChannelApi
 import com.emarsys.core.crypto.Crypto
@@ -36,6 +36,8 @@ import com.emarsys.core.storage.Storage
 import com.emarsys.core.storage.StorageApi
 import com.emarsys.networking.EmarsysClient
 import com.emarsys.networking.clients.contact.ContactClient
+import com.emarsys.networking.clients.contact.ContactTokenHandler
+import com.emarsys.networking.clients.contact.ContactTokenHandlerApi
 import com.emarsys.networking.clients.device.DeviceClient
 import com.emarsys.networking.clients.device.DeviceClientApi
 import com.emarsys.networking.clients.event.EventClient
@@ -142,8 +144,12 @@ class DependencyContainer : DependencyContainerApi {
         EmarsysClient(genericNetworkClient, sessionContext, timestampProvider, urlFactory, json)
     }
 
+    private val contactTokenHandler: ContactTokenHandlerApi by lazy {
+        ContactTokenHandler(sessionContext)
+    }
+
     private val deviceClient: DeviceClientApi by lazy {
-        DeviceClient(emarsysClient, urlFactory, deviceInfoCollector, sessionContext)
+        DeviceClient(emarsysClient, urlFactory, deviceInfoCollector, contactTokenHandler)
     }
 
     private val eventClient: EventClientApi by lazy {
@@ -214,7 +220,7 @@ class DependencyContainer : DependencyContainerApi {
     }
 
     override val contactApi: ContactApi = run {
-        val contactClient = ContactClient(emarsysClient, urlFactory, sdkContext, json)
+        val contactClient = ContactClient(emarsysClient, urlFactory, sdkContext, contactTokenHandler, json)
         val contactContext = ContactContext()
         val loggingContact = LoggingContact(sdkLogger)
         val contactGatherer = ContactGatherer(contactContext)

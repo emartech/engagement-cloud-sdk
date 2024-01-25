@@ -4,11 +4,10 @@ import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
+import com.emarsys.networking.clients.contact.ContactTokenHandlerApi
 import com.emarsys.session.SessionContext
-import com.emarsys.url.EmarsysUrlType
 import com.emarsys.url.EmarsysUrlType.REGISTER_DEVICE_INFO
 import com.emarsys.url.UrlFactoryApi
-import io.kotest.matchers.shouldBe
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
@@ -31,10 +30,13 @@ class DeviceClientTests : TestsWithMocks() {
     @Mock
     lateinit var mockDeviceInfoCollector: DeviceInfoCollectorApi
 
+    @Mock
+    lateinit var mockContactTokenHandler: ContactTokenHandlerApi
+
     private var sessionContext: SessionContext = SessionContext()
 
     private val deviceClient: DeviceClientApi by withMocks {
-        DeviceClient(mockEmarsysClient, mockUrlFactory, mockDeviceInfoCollector, sessionContext)
+        DeviceClient(mockEmarsysClient, mockUrlFactory, mockDeviceInfoCollector, mockContactTokenHandler)
     }
 
     @AfterTest
@@ -66,6 +68,7 @@ class DeviceClientTests : TestsWithMocks() {
         every { mockDeviceInfoCollector.collect() } returns testDeviceInfoString
         every { mockUrlFactory.create(REGISTER_DEVICE_INFO) } returns testUrl
         everySuspending { mockEmarsysClient.send(isAny()) } returns expectedResponse
+        every { mockContactTokenHandler.handleContactTokens(expectedResponse) } returns Unit
 
         deviceClient.registerDeviceInfo()
 
@@ -73,37 +76,7 @@ class DeviceClientTests : TestsWithMocks() {
             mockDeviceInfoCollector.collect()
             mockUrlFactory.create(REGISTER_DEVICE_INFO)
             mockEmarsysClient.send(request)
-        }
-        sessionContext.refreshToken shouldBe testRefreshToken
-        sessionContext.contactToken shouldBe testContactToken
-    }
-
-    @Test
-    fun testRegisterDeviceInfo_should_not_crash_on_empty_response() = runTest {
-        val testDeviceInfoString = "testDeviceInfo"
-        val testUrl = Url("https://www.testUrl.com/testAppCode/client")
-        val request = UrlRequest(
-            testUrl,
-            HttpMethod.Post,
-            testDeviceInfoString
-        )
-        val expectedResponse = Response(
-            request,
-            HttpStatusCode.OK,
-            headers {
-                append("Content-Type", "application/json")
-                append("X-Client-State", "testClientState")
-            },
-            """{}"""
-        )
-        every { mockDeviceInfoCollector.collect() } returns testDeviceInfoString
-        every { mockUrlFactory.create(REGISTER_DEVICE_INFO) } returns testUrl
-        everySuspending { mockEmarsysClient.send(isAny()) } returns expectedResponse
-
-        deviceClient.registerDeviceInfo()
-
-        verifyWithSuspend(exhaustive = false) {
-            mockEmarsysClient.send(request)
+            mockContactTokenHandler.handleContactTokens(expectedResponse)
         }
     }
 }

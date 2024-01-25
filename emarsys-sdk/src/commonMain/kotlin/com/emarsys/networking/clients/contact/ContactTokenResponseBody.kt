@@ -1,9 +1,9 @@
-package com.emarsys.networking.clients.device
+package com.emarsys.networking.clients.contact
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RegisterDeviceInfoResponseBody(
+data class ContactTokenResponseBody(
     val refreshToken: String,
     val contactToken: String
 )

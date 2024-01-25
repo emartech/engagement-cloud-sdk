@@ -16,6 +16,7 @@ class ContactClient(
     private val emarsysClient: NetworkClientApi,
     private val urlFactory: UrlFactoryApi,
     private val sdkContext: SdkContextApi,
+    private val contactTokenHandler: ContactTokenHandlerApi,
     private val json: Json
 ) : ContactClientApi {
     override suspend fun linkContact(
@@ -45,6 +46,7 @@ class ContactClient(
         )
         val response = emarsysClient.send(request)
 
+        contactTokenHandler.handleContactTokens(response)
         return response
     }
 
