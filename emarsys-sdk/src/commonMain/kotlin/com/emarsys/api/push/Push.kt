@@ -1,6 +1,7 @@
 package com.emarsys.api.push
 
 import Activatable
+import com.emarsys.api.SdkResult
 import com.emarsys.api.generic.GenericApi
 import com.emarsys.context.SdkContextApi
 import kotlinx.coroutines.withContext
@@ -13,15 +14,19 @@ class Push<Logging : PushInstance, Gatherer : PushInstance, Internal : PushInsta
     internalApi: Internal,
     sdkContext: SdkContextApi
 ) : GenericApi<Logging, Gatherer, Internal>(loggingApi, gathererApi, internalApi, sdkContext), PushApi {
-    override suspend fun registerPushToken(pushToken: String) {
-        withContext(sdkContext.sdkDispatcher) {
+    override suspend fun registerPushToken(pushToken: String): SdkResult {
+        return withContext(sdkContext.sdkDispatcher) {
             activeInstance<PushApi>().registerPushToken(pushToken)
         }
     }
 
-    override suspend fun clearPushToken() {
-        withContext(sdkContext.sdkDispatcher) {
+    override suspend fun clearPushToken(): SdkResult {
+        return withContext(sdkContext.sdkDispatcher) {
             activeInstance<PushApi>().clearPushToken()
         }
     }
+
+    override var pushToken: String?
+        get() = TODO("Not yet implemented")
+        set(value) {}
 }

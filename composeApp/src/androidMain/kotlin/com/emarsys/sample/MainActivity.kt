@@ -26,6 +26,11 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             val config = EmarsysConfig("EMS11-C3FD3")
             Emarsys.enableTracking(config)
+            Emarsys.inApp.events.collect {event ->
+                event.name
+                event.payload
+                event.context
+            }
             askNotificationPermission()
         }
     }

@@ -1,4 +1,4 @@
-package com.emarsys.api.event
+package com.emarsys.api.event.model
 
 data class CustomEvent(
     val name: String,

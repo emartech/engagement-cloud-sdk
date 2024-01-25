@@ -1,5 +1,6 @@
 package com.emarsys.api.event
 
+import com.emarsys.api.event.model.CustomEvent
 import com.emarsys.networking.clients.event.model.Event
 import com.emarsys.networking.clients.event.model.EventType
 import io.kotest.matchers.shouldBe

@@ -1,6 +1,8 @@
 package com.emarsys.api.event
 
+import com.emarsys.api.SdkResult
 import com.emarsys.api.SdkState
+import com.emarsys.api.event.model.CustomEvent
 import com.emarsys.context.DefaultUrls
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
@@ -44,7 +46,12 @@ class EventTrackerTests : TestsWithMocks() {
 
     @BeforeTest
     fun setup() = runTest {
-        sdkContext = SdkContext(StandardTestDispatcher(), DefaultUrls("", "", "", "", "", "", ""), LogLevel.error, mutableSetOf())
+        sdkContext = SdkContext(
+            StandardTestDispatcher(),
+            DefaultUrls("", "", "", "", "", "", ""),
+            LogLevel.error,
+            mutableSetOf()
+        )
 
         everySuspending { mockLoggingEventTracker.activate() } returns Unit
         everySuspending { mockEventTrackerGatherer.activate() } returns Unit
@@ -61,7 +68,7 @@ class EventTrackerTests : TestsWithMocks() {
     fun testTrackEvent_inactiveState() = runTest {
         everySuspending {
             mockLoggingEventTracker.trackEvent(event)
-        } returns Unit
+        } returns SdkResult.Success(Unit)
 
         eventTracker =
             EventTracker(mockLoggingEventTracker, mockEventTrackerGatherer, mockEventTrackerInternal, sdkContext)
@@ -77,7 +84,7 @@ class EventTrackerTests : TestsWithMocks() {
     fun testTrackEvent_onHoldState() = runTest {
         everySuspending {
             mockEventTrackerGatherer.trackEvent(event)
-        } returns Unit
+        } returns SdkResult.Success(Unit)
 
         eventTracker =
             EventTracker(mockLoggingEventTracker, mockEventTrackerGatherer, mockEventTrackerInternal, sdkContext)
@@ -94,7 +101,7 @@ class EventTrackerTests : TestsWithMocks() {
     fun testTrackEvent_activeState() = runTest {
         everySuspending {
             mockEventTrackerInternal.trackEvent(event)
-        } returns Unit
+        } returns SdkResult.Success(Unit)
 
         eventTracker =
             EventTracker(mockLoggingEventTracker, mockEventTrackerGatherer, mockEventTrackerInternal, sdkContext)

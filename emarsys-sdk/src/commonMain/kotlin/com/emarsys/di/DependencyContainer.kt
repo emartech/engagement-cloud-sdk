@@ -1,5 +1,7 @@
 package com.emarsys.di
 
+import com.emarsys.api.config.Config
+import com.emarsys.api.config.ConfigApi
 import com.emarsys.api.contact.Contact
 import com.emarsys.api.contact.ContactApi
 import com.emarsys.api.contact.ContactContext
@@ -12,6 +14,16 @@ import com.emarsys.api.event.EventTrackerContext
 import com.emarsys.api.event.EventTrackerGatherer
 import com.emarsys.api.event.EventTrackerInternal
 import com.emarsys.api.event.LoggingEventTracker
+import com.emarsys.api.geofence.GeofenceApi
+import com.emarsys.api.geofence.GeofenceTracker
+import com.emarsys.api.inapp.InApp
+import com.emarsys.api.inapp.InAppApi
+import com.emarsys.api.inbox.Inbox
+import com.emarsys.api.inbox.InboxApi
+import com.emarsys.api.oneventaction.OnEventAction
+import com.emarsys.api.oneventaction.OnEventActionApi
+import com.emarsys.api.predict.Predict
+import com.emarsys.api.predict.PredictApi
 import com.emarsys.api.push.LoggingPush
 import com.emarsys.api.push.Push
 import com.emarsys.api.push.PushApi
@@ -168,6 +180,29 @@ class DependencyContainer : DependencyContainerApi {
         PushInternal(pushClient, stringStorage)
     }
 
+    override val inAppApi: InAppApi by lazy {
+        InApp()
+    }
+
+    override val inbox: InboxApi by lazy {
+        Inbox()
+    }
+
+    override val predict: PredictApi by lazy {
+        Predict()
+    }
+
+    override val geofence: GeofenceApi by lazy {
+        GeofenceTracker()
+    }
+
+    override val onEventAction: OnEventActionApi by lazy {
+        OnEventAction()
+    }
+    override val config: ConfigApi by lazy {
+        Config()
+    }
+
     override val pushApi: PushApi by lazy {
         val pushContext = PushContext()
         val loggingPush = LoggingPush(sdkLogger)
@@ -215,11 +250,19 @@ class DependencyContainer : DependencyContainerApi {
             )
         )
         val stateMachine =
-            StateMachine(listOf(collectDeviceInfoState, applyRemoteConfigState, platformInitState, registerClientState, registerPushTokenState))
+            StateMachine(
+                listOf(
+                    collectDeviceInfoState,
+                    applyRemoteConfigState,
+                    platformInitState,
+                    registerClientState,
+                    registerPushTokenState
+                )
+            )
         SetupOrganizer(stateMachine, sdkContext)
     }
 
-    override val contactApi: ContactApi = run {
+    override val contactApi: ContactApi by lazy {
         val contactClient = ContactClient(emarsysClient, urlFactory, sdkContext, contactTokenHandler, json)
         val contactContext = ContactContext()
         val loggingContact = LoggingContact(sdkLogger)

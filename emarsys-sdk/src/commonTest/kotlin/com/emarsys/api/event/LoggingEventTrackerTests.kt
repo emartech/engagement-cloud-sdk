@@ -1,5 +1,6 @@
 package com.emarsys.api.event
 
+import com.emarsys.api.event.model.CustomEvent
 import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger

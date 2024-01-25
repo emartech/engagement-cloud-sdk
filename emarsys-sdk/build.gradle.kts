@@ -63,6 +63,8 @@ kotlin {
                implementation(libs.ktor.client.android)
                implementation(libs.androidx.core.ktx)
                implementation(libs.cryptography.provider.jdk)
+               implementation (libs.startup.runtime)
+
            }
        }
         val androidUnitTest by getting {

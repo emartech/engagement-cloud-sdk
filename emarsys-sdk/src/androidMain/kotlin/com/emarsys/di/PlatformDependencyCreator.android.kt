@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.IntentFilter
 import com.emarsys.api.push.PushApi
 import com.emarsys.api.push.PushConstants
+import com.emarsys.applicationContext
 import com.emarsys.core.device.AndroidLanguageProvider
 import com.emarsys.core.device.AndroidPlatformInfoCollector
 import com.emarsys.core.device.DeviceInfoCollector
@@ -27,7 +28,7 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
     }
 
     private fun createAndroidDeviceInfoCollector(): AndroidPlatformInfoCollector {
-        return AndroidPlatformInfoCollector(platformContext.application as Context)
+        return AndroidPlatformInfoCollector(applicationContext)
     }
 
     override fun createDeviceInfoCollector(uuidProvider: Provider<String>): DeviceInfoCollector {
@@ -48,7 +49,7 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
         return PlatformInitState(
             receiver,
             IntentFilter(PushConstants.PUSH_TOKEN_INTENT_FILTER_ACTION),
-            platformContext.application
+            applicationContext
         )
     }
 
