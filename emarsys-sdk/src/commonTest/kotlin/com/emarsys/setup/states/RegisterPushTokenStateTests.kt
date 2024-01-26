@@ -22,7 +22,7 @@ class RegisterPushTokenStateTests : TestsWithMocks() {
     lateinit var mockPushClient: PushClientApi
 
     @Mock
-    lateinit var mockStorage: StorageApi<String>
+    lateinit var mockStorage: StorageApi<String?>
 
     private val registerPushTokenState: RegisterPushTokenState by withMocks {
         RegisterPushTokenState(mockPushClient, mockStorage)

@@ -20,8 +20,8 @@ class FakeSdkLogger : Logger {
 
 class LoggingPushTests {
 
-    companion object {
-        val pushToken = "testPushToken"
+    private companion object {
+        const val PUSH_TOKEN = "testPushToken"
     }
 
     lateinit var fakeLogger: FakeSdkLogger
@@ -35,7 +35,7 @@ class LoggingPushTests {
 
     @Test
     fun testSetPushToken() = runTest {
-        loggingPush.registerPushToken(pushToken)
+        loggingPush.registerPushToken(PUSH_TOKEN)
 
         fakeLogger.funCalls.first().first.topic shouldBe "log_method_not_allowed"
         fakeLogger.funCalls.first().second shouldBe LogLevel.debug
@@ -47,6 +47,16 @@ class LoggingPushTests {
 
         fakeLogger.funCalls.first().first.topic shouldBe "log_method_not_allowed"
         fakeLogger.funCalls.first().second shouldBe LogLevel.debug
+    }
+
+    @Test
+    fun testPushToken() = runTest {
+        val result = loggingPush.pushToken
+
+        fakeLogger.funCalls.first().first.topic shouldBe "log_method_not_allowed"
+        fakeLogger.funCalls.first().second shouldBe LogLevel.debug
+
+        result shouldBe null
     }
 
     @Test

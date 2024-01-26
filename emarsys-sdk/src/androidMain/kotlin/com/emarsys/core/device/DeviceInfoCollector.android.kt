@@ -15,7 +15,7 @@ actual class DeviceInfoCollector(
     private val androidPlatformInfoCollector: PlatformInfoCollectorApi,
     private val languageProvider: LanguageProvider,
     private val uuidProvider: Provider<String>,
-    private val storage: StorageApi<String>,
+    private val storage: StorageApi<String?>,
     private val isGooglePlayServicesAvailable: Boolean,
 ): DeviceInfoCollectorApi {
     private companion object {

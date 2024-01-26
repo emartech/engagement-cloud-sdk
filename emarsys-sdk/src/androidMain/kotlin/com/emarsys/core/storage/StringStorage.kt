@@ -2,7 +2,7 @@ package com.emarsys.core.storage
 
 import android.content.SharedPreferences
 
-class StringStorage(private val sharedPreferences: SharedPreferences): StorageApi<String> {
+class StringStorage(private val sharedPreferences: SharedPreferences): StorageApi<String?> {
 
     override fun put(key: String, value: String?) {
         sharedPreferences

@@ -53,7 +53,7 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
         )
     }
 
-    override fun createStorage(): StorageApi<String> =
+    override fun createStorage(): StorageApi<String?> =
         StringStorage(platformContext.sharedPreferences)
 
 }

@@ -25,9 +25,13 @@ class LoggingPush(private val logger: Logger) : PushInstance {
         return SdkResult.Failure(MethodNotAllowedException(entry))
     }
 
-    override var pushToken: String?
-        get() = TODO("Not yet implemented")
-        set(value) {}
+    override val pushToken: String?
+        get() {
+            val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)
+            logger.log(entry, LogLevel.debug)
+            return null
+        }
+
 
     override suspend fun activate() {
         val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)

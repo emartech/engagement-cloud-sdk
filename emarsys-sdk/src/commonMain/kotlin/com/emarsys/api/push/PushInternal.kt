@@ -7,14 +7,14 @@ import com.emarsys.core.storage.StorageApi
 
 class PushInternal(
     private val pushClient: PushClientApi,
-    private val storageApi: StorageApi<String>
+    private val storage: StorageApi<String?>
 ) : PushInstance {
 
     override suspend fun registerPushToken(pushToken: String): SdkResult {
-        val storedPushToken = storageApi.get(PUSH_TOKEN_STORAGE_KEY)
+        val storedPushToken = storage.get(PUSH_TOKEN_STORAGE_KEY)
         if (storedPushToken != pushToken) {
             pushClient.registerPushToken(pushToken)
-            storageApi.put(PUSH_TOKEN_STORAGE_KEY, pushToken)
+            storage.put(PUSH_TOKEN_STORAGE_KEY, pushToken)
         }
         return SdkResult.Success(Unit)
     }
@@ -25,9 +25,9 @@ class PushInternal(
 
     }
 
-    override var pushToken: String?
-        get() = TODO("Not yet implemented")
-        set(value) {}
+    override val pushToken: String?
+        get() = storage.get(PUSH_TOKEN_STORAGE_KEY)
+
 
     override suspend fun activate() {
     }

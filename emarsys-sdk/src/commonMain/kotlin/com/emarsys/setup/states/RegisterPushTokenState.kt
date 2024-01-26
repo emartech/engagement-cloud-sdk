@@ -7,7 +7,7 @@ import com.emarsys.networking.clients.push.PushClientApi
 
 class RegisterPushTokenState(
     private val pushClient: PushClientApi,
-    private val storage: StorageApi<String>
+    private val storage: StorageApi<String?>
 ) : State {
     override val name: String
         get() = "registerPushToken"

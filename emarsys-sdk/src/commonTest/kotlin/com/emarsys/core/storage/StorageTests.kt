@@ -7,7 +7,7 @@ import kotlinx.serialization.json.Json
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class StringFakeStorage: StorageApi<String> {
+class StringFakeStorage: StorageApi<String?> {
 
     val store = mutableMapOf<String, String>()
     override fun put(key: String, value: String?) {

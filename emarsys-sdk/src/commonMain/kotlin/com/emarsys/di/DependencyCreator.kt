@@ -8,7 +8,7 @@ import com.emarsys.providers.Provider
 import kotlinx.coroutines.CoroutineDispatcher
 
 interface DependencyCreator {
-    fun createStorage():  StorageApi<String>
+    fun createStorage():  StorageApi<String?>
 
     fun createDeviceInfoCollector(uuidProvider: Provider<String>): DeviceInfoCollector
 

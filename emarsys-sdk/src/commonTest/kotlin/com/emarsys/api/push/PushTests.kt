@@ -6,6 +6,7 @@ import com.emarsys.context.DefaultUrls
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.log.LogLevel
+import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -64,7 +65,7 @@ class PushTests : TestsWithMocks() {
     }
 
     @Test
-    fun test_registerPushToken_inactiveState() = runTest {
+    fun testRegisterPushToken_inactiveState() = runTest {
         everySuspending {
             mockLoggingPush.registerPushToken(
                 pushToken
@@ -84,7 +85,7 @@ class PushTests : TestsWithMocks() {
     }
 
     @Test
-    fun test_linkContact_onHoldState() = runTest {
+    fun testLinkContact_onHoldState() = runTest {
         everySuspending {
             mockGathererPush.registerPushToken(
                 pushToken
@@ -105,7 +106,7 @@ class PushTests : TestsWithMocks() {
     }
 
     @Test
-    fun test_linkContact_activeState() = runTest {
+    fun testLinkContact_activeState() = runTest {
         everySuspending {
             mockPushInternal.registerPushToken(
                 pushToken
@@ -126,7 +127,7 @@ class PushTests : TestsWithMocks() {
     }
 
     @Test
-    fun test_clearPushToken_inactiveState() = runTest {
+    fun testClearPushToken_inactiveState() = runTest {
         everySuspending {
             mockLoggingPush.clearPushToken()
         } returns SdkResult.Success(Unit)
@@ -142,7 +143,7 @@ class PushTests : TestsWithMocks() {
     }
 
     @Test
-    fun test_clearPushToken_onHoldState() = runTest {
+    fun testClearPushToken_onHoldState() = runTest {
         everySuspending {
             mockGathererPush.clearPushToken()
         } returns SdkResult.Success(Unit)
@@ -159,7 +160,7 @@ class PushTests : TestsWithMocks() {
     }
 
     @Test
-    fun test_clearPushToken_activeState() = runTest {
+    fun testClearPushToken_activeState() = runTest {
         everySuspending {
             mockPushInternal.clearPushToken()
         } returns SdkResult.Success(Unit)
@@ -173,5 +174,51 @@ class PushTests : TestsWithMocks() {
         verifyWithSuspend(exhaustive = false) {
             mockPushInternal.clearPushToken()
         }
+    }
+
+    @Test
+    fun testPushToken_inactiveState() = runTest {
+        every {
+            mockLoggingPush.pushToken
+        } returns null
+
+        push =
+            Push(mockLoggingPush, mockGathererPush, mockPushInternal, sdkContext)
+
+        val result = push.pushToken
+
+        result shouldBe null
+    }
+
+    @Test
+    fun testPushToken_onHoldState() = runTest {
+        every {
+            mockGathererPush.pushToken
+        } returns "pushToken"
+
+        push =
+            Push(mockLoggingPush, mockGathererPush, mockPushInternal, sdkContext)
+
+        sdkContext.setSdkState(SdkState.onHold)
+
+        val result = push.pushToken
+
+        result shouldBe "pushToken"
+    }
+
+    @Test
+    fun testPushToken_activeState() = runTest {
+        every {
+            mockPushInternal.pushToken
+        } returns "pushToken"
+
+        push =
+            Push(mockLoggingPush, mockGathererPush, mockPushInternal, sdkContext)
+
+        sdkContext.setSdkState(SdkState.active)
+
+        val result = push.pushToken
+
+        result shouldBe "pushToken"
     }
 }

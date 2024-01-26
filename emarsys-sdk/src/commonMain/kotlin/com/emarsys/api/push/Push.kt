@@ -26,7 +26,7 @@ class Push<Logging : PushInstance, Gatherer : PushInstance, Internal : PushInsta
         }
     }
 
-    override var pushToken: String?
-        get() = TODO("Not yet implemented")
-        set(value) {}
+    override val pushToken: String?
+        get() = activeInstance<PushApi>().pushToken
+
 }

@@ -102,7 +102,7 @@ class DependencyContainer : DependencyContainerApi {
         }
     }
 
-    private val stringStorage: StorageApi<String> by lazy { dependencyCreator.createStorage() }
+    private val stringStorage: StorageApi<String?> by lazy { dependencyCreator.createStorage() }
 
     val storage: Storage by lazy { Storage(stringStorage, json) }
 
@@ -206,7 +206,7 @@ class DependencyContainer : DependencyContainerApi {
     override val pushApi: PushApi by lazy {
         val pushContext = PushContext()
         val loggingPush = LoggingPush(sdkLogger)
-        val pushGatherer = PushGatherer(pushContext)
+        val pushGatherer = PushGatherer(pushContext, stringStorage)
         Push(loggingPush, pushGatherer, pushInternal, sdkContext)
     }
     private val pushClient: PushClientApi by lazy {

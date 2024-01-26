@@ -2,19 +2,23 @@ package com.emarsys.api.push
 
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.core.storage.StorageApi
+import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import org.kodein.mock.Mock
 import org.kodein.mock.tests.TestsWithMocks
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class PushInternalTests: TestsWithMocks() {
+class PushInternalTests : TestsWithMocks() {
+    private companion object {
+        const val PUSH_TOKEN = "testPushToken"
+    }
 
     @Mock
     lateinit var mockPushClient: PushClientApi
 
     @Mock
-    lateinit var mockStorage: StorageApi<String>
+    lateinit var mockStorage: StorageApi<String?>
 
     private lateinit var pushInternal: PushInternal
 
@@ -27,13 +31,13 @@ class PushInternalTests: TestsWithMocks() {
 
     @Test
     fun testRegisterPushToken_shouldNotDoAnything_whenPushTokenStoredAlready() = runTest {
-        every { mockStorage.get("emsPushToken") } returns "<testPushToken>"
+        every { mockStorage.get("emsPushToken") } returns PUSH_TOKEN
 
-        pushInternal.registerPushToken("<testPushToken>")
+        pushInternal.registerPushToken(PUSH_TOKEN)
 
         verifyWithSuspend(exhaustive = false) {
             repeat(0) {
-                mockPushClient.registerPushToken("<testPushToken>")
+                mockPushClient.registerPushToken(PUSH_TOKEN)
             }
         }
     }
@@ -41,28 +45,28 @@ class PushInternalTests: TestsWithMocks() {
     @Test
     fun testRegisterPushToken_shouldRegisterPushToken_whenPushTokenWasNotStoredPreviously() = runTest {
         every { mockStorage.get("emsPushToken") } returns null
-        every { mockStorage.put("emsPushToken", "<testPushToken>") } returns Unit
+        every { mockStorage.put("emsPushToken", PUSH_TOKEN) } returns Unit
         everySuspending { mockPushClient.registerPushToken(isAny()) } returns Unit
 
-        pushInternal.registerPushToken("<testPushToken>")
+        pushInternal.registerPushToken(PUSH_TOKEN)
 
         verifyWithSuspend(exhaustive = false) {
-            mockPushClient.registerPushToken("<testPushToken>")
-            mockStorage.put("emsPushToken", "<testPushToken>")
+            mockPushClient.registerPushToken(PUSH_TOKEN)
+            mockStorage.put("emsPushToken", PUSH_TOKEN)
         }
     }
 
     @Test
     fun testRegisterPushToken_shouldRegisterPushToken_whenStoredPushTokenIsDifferent() = runTest {
         every { mockStorage.get("emsPushToken") } returns "<differentTestPushToken>"
-        every { mockStorage.put("emsPushToken", "<testPushToken>") } returns Unit
+        every { mockStorage.put("emsPushToken", PUSH_TOKEN) } returns Unit
         everySuspending { mockPushClient.registerPushToken(isAny()) } returns Unit
 
-        pushInternal.registerPushToken("<testPushToken>")
+        pushInternal.registerPushToken(PUSH_TOKEN)
 
         verifyWithSuspend(exhaustive = false) {
-            mockPushClient.registerPushToken("<testPushToken>")
-            mockStorage.put("emsPushToken", "<testPushToken>")
+            mockPushClient.registerPushToken(PUSH_TOKEN)
+            mockStorage.put("emsPushToken", PUSH_TOKEN)
         }
     }
 
@@ -75,6 +79,13 @@ class PushInternalTests: TestsWithMocks() {
         verifyWithSuspend(exhaustive = false) {
             mockPushClient.clearPushToken()
         }
+    }
+
+    @Test
+    fun testPushToken() = runTest {
+        every { mockStorage.get(PushConstants.PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
+        pushInternal.registerPushToken(PUSH_TOKEN)
+        pushInternal.pushToken shouldBe PUSH_TOKEN
     }
 
 }
