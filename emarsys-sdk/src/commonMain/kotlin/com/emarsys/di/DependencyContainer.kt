@@ -67,6 +67,7 @@ import com.emarsys.remoteConfig.RemoteConfigHandler
 import com.emarsys.session.SessionContext
 import com.emarsys.setup.SetupOrganizer
 import com.emarsys.setup.SetupOrganizerApi
+import com.emarsys.setup.states.AppStartState
 import com.emarsys.setup.states.ApplyRemoteConfigState
 import com.emarsys.setup.states.CollectDeviceInfoState
 import com.emarsys.setup.states.LinkAnonymousContactState
@@ -257,6 +258,7 @@ class DependencyContainer : DependencyContainerApi {
             )
         )
         val linkAnonymousContactState = LinkAnonymousContactState(contactClient, sessionContext)
+        val appStartState = AppStartState(eventClient)
         val stateMachine =
             StateMachine(
                 listOf(
@@ -265,7 +267,8 @@ class DependencyContainer : DependencyContainerApi {
                     platformInitState,
                     registerClientState,
                     registerPushTokenState,
-                    linkAnonymousContactState
+                    linkAnonymousContactState,
+                    appStartState
                 )
             )
         SetupOrganizer(stateMachine, sdkContext)
