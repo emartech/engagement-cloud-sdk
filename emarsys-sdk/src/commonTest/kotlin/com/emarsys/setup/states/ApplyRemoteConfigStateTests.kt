@@ -1,4 +1,4 @@
-package com.emarsys.setup
+package com.emarsys.setup.states
 
 import com.emarsys.remoteConfig.RemoteConfigHandlerApi
 import io.kotest.matchers.shouldBe

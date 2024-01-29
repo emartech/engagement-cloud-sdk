@@ -48,6 +48,7 @@ import com.emarsys.core.storage.Storage
 import com.emarsys.core.storage.StorageApi
 import com.emarsys.networking.EmarsysClient
 import com.emarsys.networking.clients.contact.ContactClient
+import com.emarsys.networking.clients.contact.ContactClientApi
 import com.emarsys.networking.clients.contact.ContactTokenHandler
 import com.emarsys.networking.clients.contact.ContactTokenHandlerApi
 import com.emarsys.networking.clients.device.DeviceClient
@@ -64,10 +65,11 @@ import com.emarsys.providers.TimestampProvider
 import com.emarsys.providers.UUIDProvider
 import com.emarsys.remoteConfig.RemoteConfigHandler
 import com.emarsys.session.SessionContext
-import com.emarsys.setup.ApplyRemoteConfigState
 import com.emarsys.setup.SetupOrganizer
 import com.emarsys.setup.SetupOrganizerApi
+import com.emarsys.setup.states.ApplyRemoteConfigState
 import com.emarsys.setup.states.CollectDeviceInfoState
+import com.emarsys.setup.states.LinkAnonymousContactState
 import com.emarsys.setup.states.RegisterClientState
 import com.emarsys.setup.states.RegisterPushTokenState
 import com.emarsys.url.UrlFactory
@@ -209,8 +211,13 @@ class DependencyContainer : DependencyContainerApi {
         val pushGatherer = PushGatherer(pushContext, stringStorage)
         Push(loggingPush, pushGatherer, pushInternal, sdkContext)
     }
+
     private val pushClient: PushClientApi by lazy {
         PushClient(emarsysClient, urlFactory, json)
+    }
+
+    private val contactClient: ContactClientApi by lazy {
+        ContactClient(emarsysClient, urlFactory, sdkContext, contactTokenHandler, json)
     }
 
     private val defaultUrls: DefaultUrlsApi by lazy {
@@ -249,6 +256,7 @@ class DependencyContainer : DependencyContainerApi {
                 RandomProvider()
             )
         )
+        val linkAnonymousContactState = LinkAnonymousContactState(contactClient, sessionContext)
         val stateMachine =
             StateMachine(
                 listOf(
@@ -256,7 +264,8 @@ class DependencyContainer : DependencyContainerApi {
                     applyRemoteConfigState,
                     platformInitState,
                     registerClientState,
-                    registerPushTokenState
+                    registerPushTokenState,
+                    linkAnonymousContactState
                 )
             )
         SetupOrganizer(stateMachine, sdkContext)

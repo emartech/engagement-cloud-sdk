@@ -1,7 +1,6 @@
-package com.emarsys.setup
+package com.emarsys.setup.states
 
 import com.emarsys.core.state.State
-import com.emarsys.remoteConfig.RemoteConfigHandler
 import com.emarsys.remoteConfig.RemoteConfigHandlerApi
 
 class ApplyRemoteConfigState(private val remoteConfigHandler: RemoteConfigHandlerApi): State {

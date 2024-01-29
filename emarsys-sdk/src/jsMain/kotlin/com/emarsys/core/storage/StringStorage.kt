@@ -2,7 +2,7 @@ package com.emarsys.core.storage
 
 import org.w3c.dom.Storage
 
-class StringStorage(private val storage: Storage): StorageApi<String> {
+class StringStorage(private val storage: Storage): StorageApi<String?> {
 
     override fun put(key: String, value: String?) {
         if (value == null) {

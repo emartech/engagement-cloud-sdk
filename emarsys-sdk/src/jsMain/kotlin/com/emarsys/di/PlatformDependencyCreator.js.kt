@@ -16,7 +16,7 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
 
     private val platformContext: CommonPlatformContext = platformContext as CommonPlatformContext
 
-    override fun createStorage(): StorageApi<String> {
+    override fun createStorage(): StorageApi<String?> {
         return StringStorage(platformContext.storage)
     }
 

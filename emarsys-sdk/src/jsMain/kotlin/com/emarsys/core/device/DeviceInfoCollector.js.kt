@@ -12,7 +12,7 @@ import kotlinx.serialization.json.Json
 actual class DeviceInfoCollector(
     private val webPlatformInfoCollector: PlatformInfoCollectorApi,
     private val uuidProvider: Provider<String>,
-    private val storage: StorageApi<String>
+    private val storage: StorageApi<String?>
 ) : DeviceInfoCollectorApi {
     private companion object {
         const val HARDWARE_ID_STORAGE_KEY = "hardwareId"

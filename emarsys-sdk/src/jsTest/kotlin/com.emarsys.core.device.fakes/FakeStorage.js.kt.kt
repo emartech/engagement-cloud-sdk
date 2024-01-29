@@ -2,7 +2,7 @@ package com.emarsys.core.device.fakes
 
 import com.emarsys.core.storage.StorageApi
 
-class FakeStorage: StorageApi<String> {
+class FakeStorage: StorageApi<String?> {
     private val storedValue: MutableMap<String, String?> = mutableMapOf()
 
     override fun put(key: String, value: String?) {
