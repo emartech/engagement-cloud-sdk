@@ -1,9 +1,14 @@
 package com.emarsys.api.contact
 
+import com.emarsys.api.generic.ApiContext
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.networking.clients.contact.ContactClientApi
-import io.ktor.http.*
+import io.kotest.matchers.shouldBe
+import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.Url
+import io.ktor.http.headersOf
 import kotlinx.coroutines.test.runTest
 import org.kodein.mock.Mock
 import org.kodein.mock.tests.TestsWithMocks
@@ -14,12 +19,22 @@ class ContactInternalTests : TestsWithMocks() {
         const val CONTACT_FIELD_ID = 2575
         const val CONTACT_FIELD_VALUE = "testContactFieldValue"
         const val OPEN_ID_TOKEN = "testOpenIdToken"
+        const val contactFieldId = 42
+        const val contactFieldValue = "testContactFieldValue"
+        const val openIdToken = "testOpenIdToken"
+        val linkContact = ContactCall.LinkContact(contactFieldId, contactFieldValue)
+        val linkAuthenticatedContact =
+            ContactCall.LinkAuthenticatedContact(contactFieldId, openIdToken)
+        val unlinkContact = ContactCall.UnlinkContact()
+        val calls = mutableListOf(linkContact, linkAuthenticatedContact, unlinkContact)
     }
 
     override fun setUpMocks() = injectMocks(mocker)
 
     @Mock
     lateinit var mockContactClient: ContactClientApi
+
+    private lateinit var contactContext: ApiContext<ContactCall>
 
     private val testResponse = Response(
         UrlRequest(
@@ -33,7 +48,8 @@ class ContactInternalTests : TestsWithMocks() {
     )
 
     private val contactInternal: ContactInstance by withMocks {
-        ContactInternal(mockContactClient)
+        contactContext = ContactContext(calls)
+        ContactInternal(mockContactClient, contactContext)
     }
 
     @Test
@@ -79,5 +95,41 @@ class ContactInternalTests : TestsWithMocks() {
         contactInternal.unlinkContact()
 
         verifyWithSuspend { mockContactClient.unlinkContact() }
+    }
+
+    @Test
+    fun testActivate_should_send_calls_to_client() = runTest {
+        everySuspending {
+            mockContactClient.linkContact(linkContact.contactFieldId, linkContact.contactFieldValue)
+        } returns testResponse
+
+        everySuspending {
+            mockContactClient.linkContact(
+                linkAuthenticatedContact.contactFieldId,
+                null,
+                linkAuthenticatedContact.openIdToken
+            )
+        } returns testResponse
+
+        everySuspending {
+            mockContactClient.unlinkContact()
+        } returns testResponse
+
+        contactInternal.activate()
+
+        verifyWithSuspend {
+            mockContactClient.linkContact(
+                linkContact.contactFieldId,
+                linkContact.contactFieldValue
+            )
+            mockContactClient.linkContact(
+                linkAuthenticatedContact.contactFieldId,
+                null,
+                linkAuthenticatedContact.openIdToken
+            )
+            mockContactClient.unlinkContact()
+        }
+
+        contactContext.calls.size shouldBe 0
     }
 }

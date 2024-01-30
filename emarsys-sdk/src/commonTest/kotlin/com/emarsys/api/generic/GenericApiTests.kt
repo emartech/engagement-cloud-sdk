@@ -3,6 +3,7 @@ package com.emarsys.api.generic
 import com.emarsys.api.SdkState.active
 import com.emarsys.api.SdkState.inactive
 import com.emarsys.api.SdkState.onHold
+import com.emarsys.api.contact.ContactCall
 import com.emarsys.api.contact.ContactContext
 import com.emarsys.api.contact.ContactGatherer
 import com.emarsys.api.contact.ContactInternal
@@ -33,12 +34,14 @@ class GenericApiTests: TestsWithMocks() {
     private lateinit var contactInternal: ContactInternal
     private lateinit var sdkContext: SdkContext
     private lateinit var genericApi: GenericApi<LoggingContact, ContactGatherer, ContactInternal>
+    private lateinit var contactContext: ApiContext<ContactCall>
 
     @BeforeTest
     fun setup() = runTest {
+        contactContext = ContactContext(mutableListOf())
         loggingContact = LoggingContact(FakeSdkLogger())
-        contactGatherer = ContactGatherer(ContactContext(mutableListOf()))
-        contactInternal = ContactInternal(mockContactClient)
+        contactGatherer = ContactGatherer(contactContext)
+        contactInternal = ContactInternal(mockContactClient, contactContext)
         sdkContext = SdkContext(StandardTestDispatcher(), DefaultUrls("", "", "", "", "", "", ""), LogLevel.error, mutableSetOf())
         genericApi = GenericApi(loggingContact, contactGatherer, contactInternal, sdkContext)
     }

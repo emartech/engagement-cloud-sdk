@@ -281,7 +281,7 @@ class DependencyContainer : DependencyContainerApi {
         val contactContext = ContactContext(persistentListOf("contactContextPersistentId", storage, ContactCall.serializer()))
         val loggingContact = LoggingContact(sdkLogger)
         val contactGatherer = ContactGatherer(contactContext)
-        val contactInternal = ContactInternal(contactClient)
+        val contactInternal = ContactInternal(contactClient, contactContext)
         Contact(loggingContact, contactGatherer, contactInternal, sdkContext)
     }
 
