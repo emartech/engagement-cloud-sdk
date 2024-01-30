@@ -29,7 +29,7 @@ class MainActivity : ComponentActivity() {
             Emarsys.inApp.events.collect {event ->
                 event.name
                 event.payload
-                event.context
+//                event.context
             }
             askNotificationPermission()
         }
