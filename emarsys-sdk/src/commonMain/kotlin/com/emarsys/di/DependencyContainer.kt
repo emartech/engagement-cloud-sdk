@@ -4,6 +4,7 @@ import com.emarsys.api.config.Config
 import com.emarsys.api.config.ConfigApi
 import com.emarsys.api.contact.Contact
 import com.emarsys.api.contact.ContactApi
+import com.emarsys.api.contact.ContactCall
 import com.emarsys.api.contact.ContactContext
 import com.emarsys.api.contact.ContactGatherer
 import com.emarsys.api.contact.ContactInternal
@@ -36,6 +37,7 @@ import com.emarsys.context.DefaultUrlsApi
 import com.emarsys.context.SdkContext
 import com.emarsys.core.channel.DeviceEventChannel
 import com.emarsys.core.channel.DeviceEventChannelApi
+import com.emarsys.core.collections.persistentListOf
 import com.emarsys.core.crypto.Crypto
 import com.emarsys.core.crypto.CryptoApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
@@ -276,7 +278,7 @@ class DependencyContainer : DependencyContainerApi {
 
     override val contactApi: ContactApi by lazy {
         val contactClient = ContactClient(emarsysClient, urlFactory, sdkContext, contactTokenHandler, json)
-        val contactContext = ContactContext()
+        val contactContext = ContactContext(persistentListOf("contactContextPersistentId", storage, ContactCall.serializer()))
         val loggingContact = LoggingContact(sdkLogger)
         val contactGatherer = ContactGatherer(contactContext)
         val contactInternal = ContactInternal(contactClient)

@@ -7,28 +7,16 @@ import kotlin.test.Test
 
 class ContactGathererTests {
 
-    companion object {
-        val contactFieldId = 42
-        val contactFieldValue = "testContactFieldValue"
-        val openIdToken = "testOpenIdToken"
-    }
-
-    private lateinit var contactContext: ContactContext
-    private lateinit var contactGatherer: ContactGatherer
-
-    @BeforeTest
-    fun setup() {
-        contactContext = ContactContext()
-        contactGatherer = ContactGatherer(contactContext)
-    }
-
-    @Test
-    fun testGathering() = runTest {
+    private companion object {
+        const val contactFieldId = 42
+        const val contactFieldValue = "testContactFieldValue"
+        const val openIdToken = "testOpenIdToken"
         val linkContact = ContactCall.LinkContact(contactFieldId, contactFieldValue)
-        val linkAuthenticatedContact = ContactCall.LinkAuthenticatedContact(contactFieldId, openIdToken)
+        val linkAuthenticatedContact =
+            ContactCall.LinkAuthenticatedContact(contactFieldId, openIdToken)
         val unlinkContact = ContactCall.UnlinkContact()
 
-        val expected = listOf(
+        val expected = mutableListOf(
             linkContact,
             linkAuthenticatedContact,
             unlinkContact,
@@ -36,6 +24,19 @@ class ContactGathererTests {
             unlinkContact,
             linkAuthenticatedContact
         )
+    }
+
+    private lateinit var contactContext: ContactContext
+    private lateinit var contactGatherer: ContactGatherer
+
+    @BeforeTest
+    fun setup() {
+        contactContext = ContactContext(expected)
+        contactGatherer = ContactGatherer(contactContext)
+    }
+
+    @Test
+    fun testGathering() = runTest {
 
         contactGatherer.linkContact(contactFieldId, contactFieldValue)
         contactGatherer.linkAuthenticatedContact(contactFieldId, openIdToken)
