@@ -277,6 +277,17 @@ class PersistentListTests: TestsWithMocks() {
         persistentList2[1] shouldBe value2
     }
 
+    @Test
+    fun testSecondaryConstructorWithEmptyVararg() = runTest {
+        val elements = listOf<String>()
+        every { mockStorage.get(isEqual("testId2"), isAny<KSerializer<Any>>()) } returns elements
+        every { mockStorage.put(isEqual("testId2"),  isAny<KSerializer<Any>>(), isEqual(elements)) } returns Unit
+
+        val persistentList2 = persistentListOf("testId2", mockStorage, String.serializer())
+
+        persistentList2.size shouldBe 0
+    }
+
     private fun teachStorage(elements: List<String>) {
         every { mockStorage.put(isEqual(testId),  isAny<KSerializer<Any>>(), isEqual(elements)) } returns Unit
     }
