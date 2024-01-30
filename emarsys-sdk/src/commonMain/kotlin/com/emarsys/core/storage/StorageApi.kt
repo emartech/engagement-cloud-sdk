@@ -1,9 +1,11 @@
 package com.emarsys.core.storage
 
-interface StorageApi<Value> {
+import kotlinx.serialization.KSerializer
 
-    fun put(key: String, value: Value?)
+interface StorageApi {
 
-    fun get(key: String): Value?
+    fun <Value>put(key: String, serializer: KSerializer<Value>, value: Value?)
+
+    fun <Value>get(key: String, serializer: KSerializer<Value>): Value?
 
 }

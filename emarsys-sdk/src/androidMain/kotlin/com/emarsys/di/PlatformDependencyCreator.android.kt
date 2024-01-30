@@ -1,6 +1,5 @@
 package com.emarsys.di
 
-import android.content.Context
 import android.content.IntentFilter
 import com.emarsys.api.push.PushApi
 import com.emarsys.api.push.PushConstants
@@ -10,8 +9,8 @@ import com.emarsys.core.device.AndroidPlatformInfoCollector
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.LanguageProvider
 import com.emarsys.core.state.State
-import com.emarsys.core.storage.StorageApi
 import com.emarsys.core.storage.StringStorage
+import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.providers.Provider
 import com.emarsys.push.PushTokenBroadcastReceiver
 import com.emarsys.setup.PlatformInitState
@@ -53,7 +52,7 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
         )
     }
 
-    override fun createStorage(): StorageApi<String?> =
+    override fun createStorage(): TypedStorageApi<String?> =
         StringStorage(platformContext.sharedPreferences)
 
 }

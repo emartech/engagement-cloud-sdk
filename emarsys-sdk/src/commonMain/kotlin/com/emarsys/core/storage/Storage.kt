@@ -1,17 +1,24 @@
 package com.emarsys.core.storage
 
-import kotlinx.serialization.encodeToString
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 
-class Storage(val stringStorage: StorageApi<String?>, val json: Json) {
-    inline fun <reified Value>put(key: String, value: Value) {
-        val encodedValue = json.encodeToString(value)
+class Storage(private val stringStorage: TypedStorageApi<String?>, val json: Json): StorageApi {
+
+    override fun <Value>put(key: String, serializer: KSerializer<Value>, value: Value?) {
+        val encodedValue = value?.let {
+            json.encodeToString(serializer, value)
+        }
         stringStorage.put(key, encodedValue)
     }
 
-    inline fun <reified Value> get(key: String): Value? {
+    override fun <Value>get(key: String, serializer: KSerializer<Value>): Value? {
         val encodedValue = stringStorage.get(key)
-        return encodedValue?.let { json.decodeFromString<Value?>(it) }
+        return if (encodedValue != null) {
+            json.decodeFromString(serializer, encodedValue)
+        } else {
+            null
+        }
     }
 
 }

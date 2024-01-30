@@ -1,26 +1,29 @@
 package com.emarsys.api.push
 
-import com.emarsys.core.storage.StorageApi
-import com.emarsys.core.storage.StringFakeStorage
+import com.emarsys.api.push.PushConstants.PUSH_TOKEN_STORAGE_KEY
+import com.emarsys.core.storage.TypedStorageApi
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
-import kotlin.test.BeforeTest
+import org.kodein.mock.Mock
+import org.kodein.mock.tests.TestsWithMocks
 import kotlin.test.Test
 
-class GathererPushTests {
+class GathererPushTests: TestsWithMocks() {
+
     companion object {
         const val PUSH_TOKEN = "testPushToken"
     }
 
-    private lateinit var pushContext: PushContext
-    private lateinit var pushGatherer: PushGatherer
-    private lateinit var storage: StorageApi<String?>
+    override fun setUpMocks() = injectMocks(mocker)
 
-    @BeforeTest
-    fun setup() {
-        storage = StringFakeStorage()
+    @Mock
+    lateinit var mockStringStorage: TypedStorageApi<String?>
+
+    private lateinit var pushContext: PushContext
+
+    private val pushGatherer: PushGatherer by withMocks {
         pushContext = PushContext()
-        pushGatherer = PushGatherer(pushContext, storage)
+        PushGatherer(pushContext, mockStringStorage)
     }
 
     @Test
@@ -41,7 +44,8 @@ class GathererPushTests {
 
     @Test
     fun testPushToken() = runTest {
-        storage.put(PushConstants.PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN)
+        every { mockStringStorage.get(PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
+
         pushGatherer.pushToken shouldBe PUSH_TOKEN
     }
 

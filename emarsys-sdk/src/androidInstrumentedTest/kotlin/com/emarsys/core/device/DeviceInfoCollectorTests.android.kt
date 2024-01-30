@@ -2,7 +2,7 @@ package com.emarsys.core.device
 
 import android.content.res.Resources
 import android.os.Build
-import com.emarsys.core.storage.StorageApi
+import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.providers.Provider
 import io.kotest.matchers.shouldBe
 import io.mockk.every
@@ -27,7 +27,7 @@ class DeviceInfoCollectorTests {
 
     private lateinit var mockLanguageProvider: LanguageProvider
     private lateinit var mockUuidProvider: Provider<String>
-    private lateinit var mockStorage: StorageApi<String>
+    private lateinit var mockStorage: TypedStorageApi<String>
     private lateinit var timeZone: TimeZone
     private lateinit var mockAndroidPlatformInfoCollector: AndroidPlatformInfoCollector
 

@@ -2,9 +2,9 @@ package com.emarsys.api.push
 
 import com.emarsys.api.SdkResult
 import com.emarsys.api.generic.ApiContext
-import com.emarsys.core.storage.StorageApi
+import com.emarsys.core.storage.TypedStorageApi
 
-class PushGatherer(private val context: ApiContext<PushCall>, private val storage: StorageApi<String?>) : PushInstance {
+class PushGatherer(private val context: ApiContext<PushCall>, private val storage: TypedStorageApi<String?>) : PushInstance {
     override suspend fun registerPushToken(pushToken: String): SdkResult {
         context.calls.add(PushCall.SetPushToken(pushToken))
         return SdkResult.Success(Unit)

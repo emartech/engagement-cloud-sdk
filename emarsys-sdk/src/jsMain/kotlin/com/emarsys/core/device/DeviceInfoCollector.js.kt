@@ -1,6 +1,6 @@
 package com.emarsys.core.device
 
-import com.emarsys.core.storage.StorageApi
+import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.providers.Provider
 import kotlinx.browser.window
 import kotlinx.datetime.Clock
@@ -12,7 +12,7 @@ import kotlinx.serialization.json.Json
 actual class DeviceInfoCollector(
     private val webPlatformInfoCollector: PlatformInfoCollectorApi,
     private val uuidProvider: Provider<String>,
-    private val storage: StorageApi<String?>
+    private val storage: TypedStorageApi<String?>
 ) : DeviceInfoCollectorApi {
     private companion object {
         const val HARDWARE_ID_STORAGE_KEY = "hardwareId"

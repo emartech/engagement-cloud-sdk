@@ -2,12 +2,12 @@ package com.emarsys.setup.states
 
 import com.emarsys.api.push.PushConstants
 import com.emarsys.core.state.State
-import com.emarsys.core.storage.StorageApi
+import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.networking.clients.push.PushClientApi
 
 class RegisterPushTokenState(
     private val pushClient: PushClientApi,
-    private val storage: StorageApi<String?>
+    private val storage: TypedStorageApi<String?>
 ) : State {
     override val name: String
         get() = "registerPushToken"

@@ -45,7 +45,7 @@ import com.emarsys.core.networking.clients.GenericNetworkClient
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.state.StateMachine
 import com.emarsys.core.storage.Storage
-import com.emarsys.core.storage.StorageApi
+import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.networking.EmarsysClient
 import com.emarsys.networking.clients.contact.ContactClient
 import com.emarsys.networking.clients.contact.ContactClientApi
@@ -105,7 +105,7 @@ class DependencyContainer : DependencyContainerApi {
         }
     }
 
-    private val stringStorage: StorageApi<String?> by lazy { dependencyCreator.createStorage() }
+    private val stringStorage: TypedStorageApi<String?> by lazy { dependencyCreator.createStorage() }
 
     val storage: Storage by lazy { Storage(stringStorage, json) }
 

@@ -1,7 +1,7 @@
 package com.emarsys.api.push
 
+import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.networking.clients.push.PushClientApi
-import com.emarsys.core.storage.StorageApi
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import org.kodein.mock.Mock
@@ -18,7 +18,7 @@ class PushInternalTests : TestsWithMocks() {
     lateinit var mockPushClient: PushClientApi
 
     @Mock
-    lateinit var mockStorage: StorageApi<String?>
+    lateinit var mockStorage: TypedStorageApi<String?>
 
     private lateinit var pushInternal: PushInternal
 

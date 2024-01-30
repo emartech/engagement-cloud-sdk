@@ -3,7 +3,7 @@ package com.emarsys.core.device
 import android.content.res.Resources
 import android.os.Build
 import android.util.DisplayMetrics
-import com.emarsys.core.storage.StorageApi
+import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.providers.Provider
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -15,7 +15,7 @@ actual class DeviceInfoCollector(
     private val androidPlatformInfoCollector: PlatformInfoCollectorApi,
     private val languageProvider: LanguageProvider,
     private val uuidProvider: Provider<String>,
-    private val storage: StorageApi<String?>,
+    private val storage: TypedStorageApi<String?>,
     private val isGooglePlayServicesAvailable: Boolean,
 ): DeviceInfoCollectorApi {
     private companion object {

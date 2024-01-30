@@ -4,8 +4,8 @@ import com.emarsys.api.push.PushApi
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.WebPlatformInfoCollector
 import com.emarsys.core.state.State
-import com.emarsys.core.storage.StorageApi
 import com.emarsys.core.storage.StringStorage
+import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.providers.Provider
 import com.emarsys.push.PushService
 import com.emarsys.setup.PlatformInitState
@@ -16,7 +16,7 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
 
     private val platformContext: CommonPlatformContext = platformContext as CommonPlatformContext
 
-    override fun createStorage(): StorageApi<String?> {
+    override fun createStorage(): TypedStorageApi<String?> {
         return StringStorage(platformContext.storage)
     }
 
