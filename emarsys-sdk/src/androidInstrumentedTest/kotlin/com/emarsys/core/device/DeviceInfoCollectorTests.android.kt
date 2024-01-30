@@ -27,7 +27,7 @@ class DeviceInfoCollectorTests {
 
     private lateinit var mockLanguageProvider: LanguageProvider
     private lateinit var mockUuidProvider: Provider<String>
-    private lateinit var mockStorage: TypedStorageApi<String>
+    private lateinit var mockStorage: TypedStorageApi<String?>
     private lateinit var timeZone: TimeZone
     private lateinit var mockAndroidPlatformInfoCollector: AndroidPlatformInfoCollector
 
