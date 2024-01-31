@@ -62,6 +62,8 @@ class ContactClient(
 
         val response = emarsysClient.send(request)
 
+        contactTokenHandler.handleContactTokens(response)
+
         return response
     }
 }

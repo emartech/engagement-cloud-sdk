@@ -169,7 +169,7 @@ class ContactClientTests : TestsWithMocks() {
     }
 
     @Test
-    fun testUnLinkContact_should_send_request_to_client_service() = runTest {
+    fun testUnLinkContact_should_send_request_to_client_service_andHandleContactTokens() = runTest {
         every { mockSdkContext.config } returns EmarsysConfig(
             merchantId = null
         )
@@ -195,11 +195,13 @@ class ContactClientTests : TestsWithMocks() {
             Headers.Empty,
             """{"refreshToken":"testRefreshToken", "contactToken":"testContactToken"}"""
         )
+        every { mockContactTokenHandler.handleContactTokens(expectedResponse) } returns Unit
 
         val response = contactClient.unlinkContact()
 
         verifyWithSuspend(exhaustive = false) {
             mockEmarsysClient.send(expectedUrlRequest)
+            mockContactTokenHandler.handleContactTokens(expectedResponse)
         }
 
         response shouldBe expectedResponse
@@ -237,11 +239,13 @@ class ContactClientTests : TestsWithMocks() {
             },
             """{"refreshToken":"testRefreshToken", "contactToken":"testContactToken"}"""
         )
+        every { mockContactTokenHandler.handleContactTokens(expectedResponse) } returns Unit
 
         val response = contactClient.unlinkContact()
 
         verifyWithSuspend(exhaustive = false) {
             mockEmarsysClient.send(expectedUrlRequest)
+            mockContactTokenHandler.handleContactTokens(expectedResponse)
         }
 
         response shouldBe expectedResponse
