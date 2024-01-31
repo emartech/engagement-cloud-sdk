@@ -4,6 +4,7 @@ import com.emarsys.api.contact.ContactCall.LinkAuthenticatedContact
 import com.emarsys.api.contact.ContactCall.LinkContact
 import com.emarsys.api.contact.ContactCall.UnlinkContact
 import com.emarsys.api.generic.ApiContext
+import com.emarsys.core.collections.dequeue
 import com.emarsys.networking.clients.contact.ContactClientApi
 
 class ContactInternal(
@@ -23,14 +24,12 @@ class ContactInternal(
     }
 
     override suspend fun activate() {
-        val iterator = contactContext.calls.iterator()
-        while (iterator.hasNext()) {
-            when(val call = iterator.next()) {
-                is LinkContact -> contactClient.linkContact(call.contactFieldId, call.contactFieldValue)
-                is LinkAuthenticatedContact -> contactClient.linkContact(call.contactFieldId, null, call.openIdToken)
+        contactContext.calls.dequeue {
+            when(it) {
+                is LinkContact -> contactClient.linkContact(it.contactFieldId, it.contactFieldValue)
+                is LinkAuthenticatedContact -> contactClient.linkContact(it.contactFieldId, null, it.openIdToken)
                 is UnlinkContact -> contactClient.unlinkContact()
             }
-            iterator.remove()
         }
     }
 
