@@ -8,10 +8,17 @@ import org.kodein.mock.Mock
 import org.kodein.mock.tests.TestsWithMocks
 import kotlin.test.Test
 
-class GathererPushTests: TestsWithMocks() {
+class PushGathererTests : TestsWithMocks() {
 
-    companion object {
+    private companion object {
         const val PUSH_TOKEN = "testPushToken"
+        val registerPushToken = PushCall.RegisterPushToken(PUSH_TOKEN)
+        val clearPushToken = PushCall.ClearPushToken()
+
+        val expected = mutableListOf(
+            registerPushToken,
+            clearPushToken
+        )
     }
 
     override fun setUpMocks() = injectMocks(mocker)
@@ -22,20 +29,12 @@ class GathererPushTests: TestsWithMocks() {
     private lateinit var pushContext: PushContext
 
     private val pushGatherer: PushGatherer by withMocks {
-        pushContext = PushContext()
+        pushContext = PushContext(expected)
         PushGatherer(pushContext, mockStringStorage)
     }
 
     @Test
     fun testGathering() = runTest {
-        val setPushToken = PushCall.SetPushToken(PUSH_TOKEN)
-        val clearPushToken = PushCall.ClearPushToken()
-
-        val expected = listOf(
-            setPushToken,
-            clearPushToken
-        )
-
         pushGatherer.registerPushToken(PUSH_TOKEN)
         pushGatherer.clearPushToken()
 

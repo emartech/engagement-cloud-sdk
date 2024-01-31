@@ -1,5 +1,6 @@
 package com.emarsys.api.push
 
+import com.emarsys.api.generic.ApiContext
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.networking.clients.push.PushClientApi
 import io.kotest.matchers.shouldBe
@@ -12,6 +13,13 @@ import kotlin.test.Test
 class PushInternalTests : TestsWithMocks() {
     private companion object {
         const val PUSH_TOKEN = "testPushToken"
+        val registerPushToken = PushCall.RegisterPushToken(PUSH_TOKEN)
+        val clearPushToken = PushCall.ClearPushToken()
+
+        val expected = mutableListOf(
+            registerPushToken,
+            clearPushToken
+        )
     }
 
     @Mock
@@ -20,13 +28,16 @@ class PushInternalTests : TestsWithMocks() {
     @Mock
     lateinit var mockStorage: TypedStorageApi<String?>
 
+    private lateinit var pushContext: ApiContext<PushCall>
+
     private lateinit var pushInternal: PushInternal
 
     override fun setUpMocks() = injectMocks(mocker)
 
     @BeforeTest
     fun setup() = runTest {
-        pushInternal = PushInternal(mockPushClient, mockStorage)
+        pushContext = PushContext(expected)
+        pushInternal = PushInternal(mockPushClient, mockStorage, pushContext)
     }
 
     @Test
@@ -86,6 +97,19 @@ class PushInternalTests : TestsWithMocks() {
         every { mockStorage.get(PushConstants.PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
         pushInternal.registerPushToken(PUSH_TOKEN)
         pushInternal.pushToken shouldBe PUSH_TOKEN
+    }
+
+    @Test
+    fun testActivate_should_sendCalls_toPushClient() = runTest {
+        everySuspending { mockPushClient.registerPushToken(isAny()) } returns Unit
+        everySuspending { mockPushClient.clearPushToken() } returns Unit
+
+        pushInternal.activate()
+
+        everySuspending {
+            mockPushClient.registerPushToken(PUSH_TOKEN)
+            mockPushClient.clearPushToken()
+        }
     }
 
 }

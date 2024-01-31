@@ -15,6 +15,7 @@ import com.emarsys.api.event.EventTrackerContext
 import com.emarsys.api.event.EventTrackerGatherer
 import com.emarsys.api.event.EventTrackerInternal
 import com.emarsys.api.event.LoggingEventTracker
+import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.geofence.GeofenceApi
 import com.emarsys.api.geofence.GeofenceTracker
 import com.emarsys.api.inapp.InApp
@@ -28,6 +29,7 @@ import com.emarsys.api.predict.PredictApi
 import com.emarsys.api.push.LoggingPush
 import com.emarsys.api.push.Push
 import com.emarsys.api.push.PushApi
+import com.emarsys.api.push.PushCall
 import com.emarsys.api.push.PushContext
 import com.emarsys.api.push.PushGatherer
 import com.emarsys.api.push.PushInstance
@@ -181,8 +183,12 @@ class DependencyContainer : DependencyContainerApi {
         )
     }
 
+    private val pushContext: ApiContext<PushCall> by lazy {
+        PushContext(persistentListOf("pushContextPersistentId", storage, PushCall.serializer()))
+    }
+
     private val pushInternal: PushInstance by lazy {
-        PushInternal(pushClient, stringStorage)
+        PushInternal(pushClient, stringStorage, pushContext)
     }
 
     override val inAppApi: InAppApi by lazy {
@@ -209,7 +215,6 @@ class DependencyContainer : DependencyContainerApi {
     }
 
     override val pushApi: PushApi by lazy {
-        val pushContext = PushContext()
         val loggingPush = LoggingPush(sdkLogger)
         val pushGatherer = PushGatherer(pushContext, stringStorage)
         Push(loggingPush, pushGatherer, pushInternal, sdkContext)
