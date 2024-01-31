@@ -5,23 +5,29 @@ import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.networking.model.body
-import com.emarsys.networking.clients.event.model.Event
-import com.emarsys.networking.clients.event.model.EventType
+import com.emarsys.model.TestDataClass
 import com.emarsys.providers.Provider
 import com.emarsys.session.SessionContext
 import com.emarsys.url.EmarsysUrlType
 import com.emarsys.url.UrlFactoryApi
 import io.kotest.matchers.shouldBe
-import io.ktor.client.*
-import io.ktor.client.engine.*
-import io.ktor.client.engine.mock.*
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.http.*
-import io.ktor.utils.io.*
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.config
+import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.engine.mock.respond
+import io.ktor.client.plugins.HttpRequestRetry
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.URLBuilder
+import io.ktor.http.Url
+import io.ktor.http.headers
+import io.ktor.http.headersOf
+import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.kodein.mock.Mock
 import org.kodein.mock.tests.TestsWithMocks
@@ -29,8 +35,13 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class EmarsysClientTests : TestsWithMocks() {
-
     override fun setUpMocks() = injectMocks(mocker)
+
+    private companion object {
+        const val id = "testId"
+        const val name = "testName"
+        val testData = TestDataClass(id, name)
+    }
 
     @Mock
     lateinit var mockTimestampProvider: Provider<Instant>
@@ -67,7 +78,7 @@ class EmarsysClientTests : TestsWithMocks() {
             }
             addHandler {
                 respond(
-                    ByteReadChannel("""{"eventType":"${EventType.CUSTOM}", "eventName":"test"}"""),
+                    ByteReadChannel(json.encodeToString(testData)),
                     status = HttpStatusCode.OK,
                     headers = headers {
                         append("Content-Type", "application/json")
@@ -104,10 +115,12 @@ class EmarsysClientTests : TestsWithMocks() {
             HttpMethod.Get,
             null,
         )
-        val expectedRequest = request.copy(headers = mapOf(
-            "X-Contact-Token" to "testContactToken",
-            "X-Request-Order" to now.toEpochMilliseconds()
-        ))
+        val expectedRequest = request.copy(
+            headers = mapOf(
+                "X-Contact-Token" to "testContactToken",
+                "X-Request-Order" to now.toEpochMilliseconds()
+            )
+        )
 
         val expectedResponse = Response(
             expectedRequest,
@@ -116,13 +129,13 @@ class EmarsysClientTests : TestsWithMocks() {
                 append("Content-Type", "application/json")
                 append("X-Client-State", "testClientState")
             },
-            """{"eventType":"${EventType.CUSTOM}", "eventName":"test"}"""
+            json.encodeToString(testData)
         )
 
         val response: Response = emarsysClient.send(request)
 
         response shouldBe expectedResponse
-        response.body<Event>() shouldBe Event(EventType.CUSTOM, "test")
+        response.body<TestDataClass>() shouldBe testData
         sessionContext.clientState shouldBe "testClientState"
     }
 

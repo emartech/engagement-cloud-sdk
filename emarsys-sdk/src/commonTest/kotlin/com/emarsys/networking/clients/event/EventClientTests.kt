@@ -1,22 +1,29 @@
-package com.emarsys.clients.event
+package com.emarsys.networking.clients.event
 
+import com.emarsys.action.ActionCommandFactoryApi
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.DeviceEventChannelApi
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
-import com.emarsys.networking.clients.event.EventClient
 import com.emarsys.networking.clients.event.model.Event
 import com.emarsys.networking.clients.event.model.EventType
 import com.emarsys.session.SessionContext
 import com.emarsys.url.EmarsysUrlType
 import com.emarsys.url.UrlFactoryApi
-import io.ktor.http.*
+import io.ktor.http.Headers
+import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.Url
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.*
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import kotlinx.serialization.json.Json
 import org.kodein.mock.Mock
 import org.kodein.mock.tests.TestsWithMocks
@@ -32,8 +39,9 @@ class EventClientTests : TestsWithMocks() {
         const val DEVICE_EVENT_STATE = "test device event state"
         const val EVENT_NAME = "test event name"
         const val IN_APP_DND = false
+        const val TIMESTAMP = "testTimestamp"
         val testEventAttributes = mapOf("key" to "value")
-        val testEvent = Event(EventType.CUSTOM, EVENT_NAME, testEventAttributes)
+        val testEvent = Event(EventType.CUSTOM, EVENT_NAME, testEventAttributes, TIMESTAMP)
     }
 
     @Mock
@@ -41,6 +49,9 @@ class EventClientTests : TestsWithMocks() {
 
     @Mock
     lateinit var mockUrlFactory: UrlFactoryApi
+
+    @Mock
+    lateinit var mockActionCommandFactory: ActionCommandFactoryApi
 
     @Mock
     lateinit var mockDeviceEventChannel: DeviceEventChannelApi
@@ -85,6 +96,7 @@ class EventClientTests : TestsWithMocks() {
             mockUrlFactory,
             json,
             mockDeviceEventChannel,
+            mockActionCommandFactory,
             sessionContext,
             mockSdkContext,
             sdkDispatcher
@@ -104,6 +116,7 @@ class EventClientTests : TestsWithMocks() {
             mockUrlFactory,
             json,
             mockDeviceEventChannel,
+            mockActionCommandFactory,
             sessionContext,
             mockSdkContext,
             sdkDispatcher
@@ -133,14 +146,15 @@ class EventClientTests : TestsWithMocks() {
         val expectedUrlRequest = UrlRequest(
             testBaseUrl,
             HttpMethod.Post,
-            """{"dnd":$IN_APP_DND,"events":[{"eventType":"${testEvent.eventType}","eventName":"${testEvent.eventName}","attributes":{"key":"value"}}],"deviceEventState":"$DEVICE_EVENT_STATE"}""",
-            )
+            """{"dnd":$IN_APP_DND,"events":[{"type":"${testEvent.type}","name":"${testEvent.name}","attributes":{"key":"value"},"timestamp":"$TIMESTAMP"}],"deviceEventState":"$DEVICE_EVENT_STATE"}""",
+        )
 
         eventClient = EventClient(
             mockEmarsysClient,
             mockUrlFactory,
             json,
             mockDeviceEventChannel,
+            mockActionCommandFactory,
             sessionContext,
             mockSdkContext,
             sdkDispatcher
@@ -154,5 +168,4 @@ class EventClientTests : TestsWithMocks() {
             mockEmarsysClient.send(expectedUrlRequest)
         }
     }
-
 }

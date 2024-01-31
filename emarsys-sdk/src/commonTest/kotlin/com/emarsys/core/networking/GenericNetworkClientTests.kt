@@ -6,8 +6,7 @@ import com.emarsys.core.networking.clients.GenericNetworkClient
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.networking.model.body
-import com.emarsys.networking.clients.event.model.Event
-import com.emarsys.networking.clients.event.model.EventType
+import com.emarsys.model.TestDataClass
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.ktor.client.HttpClient
@@ -25,10 +24,20 @@ import io.ktor.http.headersOf
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import kotlin.test.Test
 
 class GenericNetworkClientTests {
     private lateinit var genericNetworkClient: GenericNetworkClient
+
+    private val json: Json = Json
+
+    private companion object {
+        const val id = "testId"
+        const val name = "testName"
+        val testData = TestDataClass(id, name)
+    }
 
 
     @Test
@@ -38,19 +47,19 @@ class GenericNetworkClientTests {
         val request = UrlRequest(
             urlString,
             HttpMethod.Post,
-            """{"eventType":"${EventType.CUSTOM}", "eventName":"test"}""",
+            json.encodeToString(testData),
             headers = mapOf("Content-Type" to "application/json")
         )
         val expectedResponse = Response(
             request,
             HttpStatusCode.OK,
             headersOf(HttpHeaders.ContentType, "application/json"),
-            """{"eventType":"${EventType.CUSTOM}", "eventName":"test"}"""
+            json.encodeToString(testData)
         )
 
         val response: Response = genericNetworkClient.send(request)
         response shouldBe expectedResponse
-        response.body<Event>() shouldBe Event(EventType.CUSTOM,"test")
+        response.body<TestDataClass>() shouldBe testData
     }
 
     @Test
@@ -60,19 +69,19 @@ class GenericNetworkClientTests {
         val request = UrlRequest(
             urlString,
             HttpMethod.Post,
-            """{"eventType":"${EventType.CUSTOM}", "eventName":"test"}""",
+            json.encodeToString(testData),
             null
         )
         val expectedResponse = Response(
             request,
             HttpStatusCode.OK,
             Headers.Empty,
-            """{"eventType":"${EventType.CUSTOM}", "eventName":"test"}"""
+            json.encodeToString(testData)
         )
 
         val response: Response = genericNetworkClient.send(request)
         response shouldBe expectedResponse
-        response.body<Event>() shouldBe Event(EventType.CUSTOM, "test")
+        response.body<TestDataClass>() shouldBe testData
     }
 
     @Test
@@ -159,7 +168,7 @@ class GenericNetworkClientTests {
             repeat(5) {
                 addHandler {
                     respond(
-                        ByteReadChannel("""{"eventType":"${EventType.CUSTOM}", "eventName":"test"}"""),
+                        ByteReadChannel(json.encodeToString(testData)),
                         status = HttpStatusCode.InternalServerError,
                         headers = Headers.Empty
                     )
@@ -167,7 +176,7 @@ class GenericNetworkClientTests {
             }
             addHandler {
                 respond(
-                    ByteReadChannel("""{"eventType":"${EventType.CUSTOM}", "eventName":"test"}"""),
+                    ByteReadChannel(json.encodeToString(testData)),
                     status = HttpStatusCode.OK,
                     headers = Headers.Empty,
                 )
@@ -192,18 +201,18 @@ class GenericNetworkClientTests {
             request,
             HttpStatusCode.OK,
             Headers.Empty,
-            """{"eventType":"${EventType.CUSTOM}", "eventName":"test"}"""
+            json.encodeToString(testData)
         )
         val response: Response = genericNetworkClient.send(request)
         response shouldBe expectedResponse
-        response.body<Event>() shouldBe Event(EventType.CUSTOM, "test")
+        response.body<TestDataClass>() shouldBe testData
 
     }
 
     private fun createHttpClient(
         responseStatus: HttpStatusCode = HttpStatusCode.OK,
         headers: Headers = Headers.Empty,
-        body: String = """{"eventType":"${EventType.CUSTOM}", "eventName":"test"}""",
+        body: String = json.encodeToString(testData),
     ) {
         val mockHttpEngine = MockEngine {
             it.headers[HttpHeaders.Accept] shouldBe "application/json"

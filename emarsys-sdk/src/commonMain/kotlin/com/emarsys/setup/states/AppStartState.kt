@@ -4,8 +4,13 @@ import com.emarsys.core.state.State
 import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.event.model.Event
 import com.emarsys.networking.clients.event.model.EventType
+import com.emarsys.providers.Provider
+import kotlinx.datetime.Instant
 
-class AppStartState(private val eventClient: EventClientApi) : State {
+class AppStartState(
+    private val eventClient: EventClientApi,
+    private val timestampProvider: Provider<Instant>
+) : State {
     private var alreadyCompleted = false
 
     private companion object {
@@ -18,12 +23,13 @@ class AppStartState(private val eventClient: EventClientApi) : State {
 
     override suspend fun active() {
         if (!alreadyCompleted) {
-            eventClient.registerEvent(
-                Event(
-                    EventType.INTERNAL,
-                    APP_START_EVENT_NAME
-                )
+            val appStartEvent = Event(
+                EventType.INTERNAL,
+                APP_START_EVENT_NAME,
+                null,
+                timestampProvider.provide().toString()
             )
+            eventClient.registerEvent(appStartEvent)
             alreadyCompleted = true
         }
     }

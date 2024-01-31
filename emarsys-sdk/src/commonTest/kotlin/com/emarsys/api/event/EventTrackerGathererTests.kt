@@ -3,27 +3,45 @@ package com.emarsys.api.event
 import com.emarsys.api.event.model.CustomEvent
 import com.emarsys.networking.clients.event.model.Event
 import com.emarsys.networking.clients.event.model.EventType
+import com.emarsys.providers.Provider
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
-import kotlin.test.BeforeTest
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import org.kodein.mock.Mock
+import org.kodein.mock.tests.TestsWithMocks
 import kotlin.test.Test
 
-class EventTrackerGathererTests {
+class EventTrackerGathererTests : TestsWithMocks() {
+    override fun setUpMocks() = injectMocks(mocker)
+
     private companion object {
         val customEvent = CustomEvent("testEvent", mapOf("testAttribute" to "testValue"))
+        val timestamp = Clock.System.now()
 
-        val trackEvent = EventTrackerCall.TrackEvent(Event(EventType.CUSTOM, "testEvent", mapOf("testAttribute" to "testValue")))
+        val trackEvent = EventTrackerCall.TrackEvent(
+            Event(
+                EventType.CUSTOM,
+                "testEvent",
+                mapOf("testAttribute" to "testValue"),
+                timestamp.toString()
+            )
+        )
         val expected: MutableList<EventTrackerCall> = mutableListOf(trackEvent)
     }
 
-    private lateinit var context: EventTrackerContext
-    private lateinit var gatherer: EventTrackerGatherer
+    @Mock
+    lateinit var mockTimestampProvider: Provider<Instant>
 
-    @BeforeTest
-    fun setup() {
-        context = EventTrackerContext(expected)
-        gatherer = EventTrackerGatherer(context)
+    private lateinit var context: EventTrackerContext
+
+    private val gatherer: EventTrackerGatherer by withMocks {
+        every { mockTimestampProvider.provide() } returns timestamp
+        context = EventTrackerContext(mutableListOf())
+
+        EventTrackerGatherer(context, mockTimestampProvider)
     }
+
 
     @Test
     fun testGathering() = runTest {

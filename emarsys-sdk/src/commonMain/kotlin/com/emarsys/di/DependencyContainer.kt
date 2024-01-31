@@ -1,5 +1,7 @@
 package com.emarsys.di
 
+import com.emarsys.action.ActionCommandFactory
+import com.emarsys.action.ActionCommandFactoryApi
 import com.emarsys.api.config.Config
 import com.emarsys.api.config.ConfigApi
 import com.emarsys.api.contact.Contact
@@ -25,6 +27,7 @@ import com.emarsys.api.inbox.Inbox
 import com.emarsys.api.inbox.InboxApi
 import com.emarsys.api.oneventaction.OnEventAction
 import com.emarsys.api.oneventaction.OnEventActionApi
+import com.emarsys.api.oneventaction.OnEventActionInternal
 import com.emarsys.api.predict.Predict
 import com.emarsys.api.predict.PredictApi
 import com.emarsys.api.push.LoggingPush
@@ -178,12 +181,20 @@ class DependencyContainer : DependencyContainerApi {
             urlFactory,
             json,
             deviceEventChannel,
+            actionCommandFactory,
             sessionContext,
             sdkContext,
             sdkDispatcher
         )
     }
 
+    private val onEventActionInternal: OnEventActionInternal by lazy {
+        OnEventActionInternal()
+    }
+
+    private val actionCommandFactory: ActionCommandFactoryApi by lazy {
+        ActionCommandFactory(onEventActionInternal)
+    }
     private val pushContext: ApiContext<PushCall> by lazy {
         PushContext(persistentListOf("pushContextPersistentId", storage, PushCall.serializer()))
     }
@@ -209,7 +220,7 @@ class DependencyContainer : DependencyContainerApi {
     }
 
     override val onEventAction: OnEventActionApi by lazy {
-        OnEventAction()
+        OnEventAction(onEventActionInternal)
     }
     override val config: ConfigApi by lazy {
         Config()
@@ -266,7 +277,7 @@ class DependencyContainer : DependencyContainerApi {
             )
         )
         val linkAnonymousContactState = LinkAnonymousContactState(contactClient, sessionContext)
-        val appStartState = AppStartState(eventClient)
+        val appStartState = AppStartState(eventClient, timestampProvider)
         val stateMachine =
             StateMachine(
                 listOf(
@@ -284,7 +295,8 @@ class DependencyContainer : DependencyContainerApi {
 
     override val contactApi: ContactApi by lazy {
         val contactClient = ContactClient(emarsysClient, urlFactory, sdkContext, contactTokenHandler, json)
-        val contactContext = ContactContext(persistentListOf("contactContextPersistentId", storage, ContactCall.serializer()))
+        val contactContext =
+            ContactContext(persistentListOf("contactContextPersistentId", storage, ContactCall.serializer()))
         val loggingContact = LoggingContact(sdkLogger)
         val contactGatherer = ContactGatherer(contactContext)
         val contactInternal = ContactInternal(contactClient, contactContext)
@@ -294,8 +306,8 @@ class DependencyContainer : DependencyContainerApi {
     override val eventTrackerApi: EventTrackerApi = run {
         val eventTrackerContext = EventTrackerContext(persistentListOf("eventTrackerContextPersistentId", storage, EventTrackerCall.serializer()))
         val loggingEvent = LoggingEventTracker(sdkLogger)
-        val gathererEvent = EventTrackerGatherer(eventTrackerContext)
-        val eventInternal = EventTrackerInternal(eventClient, eventTrackerContext)
+        val gathererEvent = EventTrackerGatherer(eventTrackerContext, timestampProvider)
+        val eventInternal = EventTrackerInternal(eventClient, eventTrackerContext, timestampProvider)
         EventTracker(loggingEvent, gathererEvent, eventInternal, sdkContext)
     }
 }
