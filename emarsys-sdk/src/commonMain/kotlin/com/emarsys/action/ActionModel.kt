@@ -1,39 +1,43 @@
-package com.emarsys.api.action
+package com.emarsys.action
 
-import io.ktor.http.*
+import kotlinx.serialization.Serializable
 
-
+@Serializable
 sealed class ActionModel {
     abstract val id: String
     abstract val title: String
     abstract val type: String
 }
 
+@Serializable
 data class AppEventActionModel(
     override val id: String,
     override val title: String,
     override val type: String,
     val name: String,
-    val payload: Map<String, Any>?
-): ActionModel()
+    val payload: Map<String, String>?
+) : ActionModel()
 
+@Serializable
 data class CustomEventActionModel(
     override val id: String,
     override val title: String,
     override val type: String,
     val name: String,
-    val payload: Map<String, Any>?
-): ActionModel()
+    val payload: Map<String, String>?
+) : ActionModel()
 
+@Serializable
 data class DismissActionModel(
     override val id: String,
     override val title: String,
     override val type: String
-): ActionModel()
+) : ActionModel()
 
+@Serializable
 data class OpenExternalUrlActionModel(
     override val id: String,
     override val title: String,
     override val type: String,
     val url: String
-): ActionModel()
+) : ActionModel()

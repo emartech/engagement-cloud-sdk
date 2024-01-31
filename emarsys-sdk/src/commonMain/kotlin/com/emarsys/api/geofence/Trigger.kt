@@ -1,6 +1,6 @@
 package com.emarsys.api.geofence
 
-import com.emarsys.api.action.ActionModel
+import com.emarsys.action.ActionModel
 
 
 data class Trigger(

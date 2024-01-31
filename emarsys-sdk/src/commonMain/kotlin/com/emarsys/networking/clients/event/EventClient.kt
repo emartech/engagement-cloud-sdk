@@ -1,5 +1,6 @@
 package com.emarsys.networking.clients.event
 
+import com.emarsys.action.ActionCommandFactoryApi
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.DeviceEventChannelApi
 import com.emarsys.core.channel.naturalBatching
@@ -9,6 +10,7 @@ import com.emarsys.core.networking.model.body
 import com.emarsys.networking.clients.event.model.DeviceEventRequestBody
 import com.emarsys.networking.clients.event.model.DeviceEventResponse
 import com.emarsys.networking.clients.event.model.Event
+import com.emarsys.networking.clients.event.model.EventType
 import com.emarsys.session.SessionContext
 import com.emarsys.url.EmarsysUrlType
 import com.emarsys.url.UrlFactoryApi
@@ -24,6 +26,7 @@ class EventClient(
     private val urlFactory: UrlFactoryApi,
     private val json: Json,
     private val deviceEventChannel: DeviceEventChannelApi,
+    private val actionCommandFactory: ActionCommandFactoryApi,
     private val sessionContext: SessionContext,
     private val sdkContext: SdkContextApi,
     sdkDispatcher: CoroutineDispatcher
@@ -42,13 +45,29 @@ class EventClient(
     private suspend fun startEventConsumer() {
         deviceEventChannel.consume().naturalBatching().collect {
             val url = urlFactory.create(EmarsysUrlType.EVENT)
-            val requestBody = DeviceEventRequestBody(sdkContext.inAppDndD, it, sessionContext.deviceEventState)
+            val requestBody =
+                DeviceEventRequestBody(sdkContext.inAppDndD, it, sessionContext.deviceEventState)
             val body = json.encodeToString(requestBody)
             val result: DeviceEventResponse =
                 emarsysNetworkClient.send(UrlRequest(url, HttpMethod.Post, body)).body()
+            handleOnAppEventAction(result)
             // handleInapp(result)
-            // handleOnAppEventAction(result)
             // handleDeviceEventState(result)
         }
+    }
+
+    private suspend fun handleOnAppEventAction(deviceEventResponse: DeviceEventResponse) {
+        deviceEventResponse.onEventAction?.let {
+            val actions = it.actions
+            val campaignId = it.campaignId
+            actions.forEach { action ->
+                actionCommandFactory.create(action).invoke()
+            }
+            reportOnEventAction(campaignId)
+        }
+    }
+
+    private suspend fun reportOnEventAction(campaignId: String) {
+        registerEvent(Event(EventType.INTERNAL, "inapp:viewed", mapOf("campaignId" to campaignId)))
     }
 }
