@@ -9,9 +9,11 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class EventTrackerGathererTests {
-    companion object {
-        val event = Event(EventType.CUSTOM, "testEvent", mapOf("testAttribute" to "testValue"))
+    private companion object {
         val customEvent = CustomEvent("testEvent", mapOf("testAttribute" to "testValue"))
+
+        val trackEvent = EventTrackerCall.TrackEvent(Event(EventType.CUSTOM, "testEvent", mapOf("testAttribute" to "testValue")))
+        val expected: MutableList<EventTrackerCall> = mutableListOf(trackEvent)
     }
 
     private lateinit var context: EventTrackerContext
@@ -19,16 +21,12 @@ class EventTrackerGathererTests {
 
     @BeforeTest
     fun setup() {
-        context = EventTrackerContext()
+        context = EventTrackerContext(expected)
         gatherer = EventTrackerGatherer(context)
     }
 
     @Test
     fun testGathering() = runTest {
-        val trackEvent = EventTrackerCall.TrackEvent(event)
-
-        val expected = listOf(trackEvent)
-
         gatherer.trackEvent(customEvent)
 
         context.calls shouldBe expected

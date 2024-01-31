@@ -11,6 +11,7 @@ import com.emarsys.api.contact.ContactInternal
 import com.emarsys.api.contact.LoggingContact
 import com.emarsys.api.event.EventTracker
 import com.emarsys.api.event.EventTrackerApi
+import com.emarsys.api.event.EventTrackerCall
 import com.emarsys.api.event.EventTrackerContext
 import com.emarsys.api.event.EventTrackerGatherer
 import com.emarsys.api.event.EventTrackerInternal
@@ -291,7 +292,7 @@ class DependencyContainer : DependencyContainerApi {
     }
 
     override val eventTrackerApi: EventTrackerApi = run {
-        val eventTrackerContext = EventTrackerContext()
+        val eventTrackerContext = EventTrackerContext(persistentListOf("eventTrackerContextPersistentId", storage, EventTrackerCall.serializer()))
         val loggingEvent = LoggingEventTracker(sdkLogger)
         val gathererEvent = EventTrackerGatherer(eventTrackerContext)
         val eventInternal = EventTrackerInternal(eventClient)
