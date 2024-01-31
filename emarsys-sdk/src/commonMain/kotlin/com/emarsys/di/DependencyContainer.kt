@@ -295,7 +295,7 @@ class DependencyContainer : DependencyContainerApi {
         val eventTrackerContext = EventTrackerContext(persistentListOf("eventTrackerContextPersistentId", storage, EventTrackerCall.serializer()))
         val loggingEvent = LoggingEventTracker(sdkLogger)
         val gathererEvent = EventTrackerGatherer(eventTrackerContext)
-        val eventInternal = EventTrackerInternal(eventClient)
+        val eventInternal = EventTrackerInternal(eventClient, eventTrackerContext)
         EventTracker(loggingEvent, gathererEvent, eventInternal, sdkContext)
     }
 }
