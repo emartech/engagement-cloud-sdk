@@ -1,6 +1,6 @@
 package com.emarsys.networking.clients.event
 
-import com.emarsys.action.ActionCommandFactoryApi
+import com.emarsys.action.*
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.DeviceEventChannelApi
 import com.emarsys.core.channel.naturalBatching
@@ -26,7 +26,7 @@ class EventClient(
     private val urlFactory: UrlFactoryApi,
     private val json: Json,
     private val deviceEventChannel: DeviceEventChannelApi,
-    private val actionCommandFactory: ActionCommandFactoryApi,
+    private val onEventActionFactory: OnEventActionFactoryApi,
     private val sessionContext: SessionContext,
     private val sdkContext: SdkContextApi,
     sdkDispatcher: CoroutineDispatcher
@@ -60,8 +60,9 @@ class EventClient(
         deviceEventResponse.onEventAction?.let {
             val actions = it.actions
             val campaignId = it.campaignId
+
             actions.forEach { action ->
-                actionCommandFactory.create(action).invoke()
+                onEventActionFactory.create(action).invoke()
             }
             reportOnEventAction(campaignId)
         }

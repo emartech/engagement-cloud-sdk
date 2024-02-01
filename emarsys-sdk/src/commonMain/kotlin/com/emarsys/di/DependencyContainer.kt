@@ -2,6 +2,7 @@ package com.emarsys.di
 
 import com.emarsys.action.ActionCommandFactory
 import com.emarsys.action.ActionCommandFactoryApi
+import com.emarsys.action.OnEventActionFactory
 import com.emarsys.api.config.Config
 import com.emarsys.api.config.ConfigApi
 import com.emarsys.api.contact.Contact
@@ -115,6 +116,14 @@ class DependencyContainer : DependencyContainerApi {
 
     private val stringStorage: TypedStorageApi<String?> by lazy { dependencyCreator.createStorage() }
 
+    private val actionCommandFactory: ActionCommandFactoryApi by lazy { dependencyCreator.createActionCommandFactory() }
+    private val onEventActionFactory: OnEventActionFactory by lazy {
+        OnEventActionFactory(
+            dependencyCreator.createActionCommandFactory(),
+            onEventActionInternal
+        )
+    }
+
     val storage: Storage by lazy { Storage(stringStorage, json) }
 
     override val uuidProvider: Provider<String> by lazy { UUIDProvider() }
@@ -181,7 +190,7 @@ class DependencyContainer : DependencyContainerApi {
             urlFactory,
             json,
             deviceEventChannel,
-            actionCommandFactory,
+            onEventActionFactory,
             sessionContext,
             sdkContext,
             sdkDispatcher
@@ -192,9 +201,7 @@ class DependencyContainer : DependencyContainerApi {
         OnEventActionInternal()
     }
 
-    private val actionCommandFactory: ActionCommandFactoryApi by lazy {
-        ActionCommandFactory(onEventActionInternal)
-    }
+
     private val pushContext: ApiContext<PushCall> by lazy {
         PushContext(persistentListOf("pushContextPersistentId", storage, PushCall.serializer()))
     }
@@ -304,7 +311,13 @@ class DependencyContainer : DependencyContainerApi {
     }
 
     override val eventTrackerApi: EventTrackerApi = run {
-        val eventTrackerContext = EventTrackerContext(persistentListOf("eventTrackerContextPersistentId", storage, EventTrackerCall.serializer()))
+        val eventTrackerContext = EventTrackerContext(
+            persistentListOf(
+                "eventTrackerContextPersistentId",
+                storage,
+                EventTrackerCall.serializer()
+            )
+        )
         val loggingEvent = LoggingEventTracker(sdkLogger)
         val gathererEvent = EventTrackerGatherer(eventTrackerContext, timestampProvider)
         val eventInternal = EventTrackerInternal(eventClient, eventTrackerContext, timestampProvider)

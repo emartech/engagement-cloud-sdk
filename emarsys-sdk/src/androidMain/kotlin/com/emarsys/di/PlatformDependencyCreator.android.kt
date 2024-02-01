@@ -1,6 +1,9 @@
 package com.emarsys.di
 
 import android.content.IntentFilter
+import com.emarsys.action.ActionCommandFactory
+import com.emarsys.action.ActionCommandFactoryApi
+import com.emarsys.api.oneventaction.OnEventActionInternalApi
 import com.emarsys.api.push.PushApi
 import com.emarsys.api.push.PushConstants
 import com.emarsys.applicationContext
@@ -54,5 +57,7 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
 
     override fun createStorage(): TypedStorageApi<String?> =
         StringStorage(platformContext.sharedPreferences)
+
+    override fun createActionCommandFactory(): ActionCommandFactoryApi = ActionCommandFactory()
 
 }

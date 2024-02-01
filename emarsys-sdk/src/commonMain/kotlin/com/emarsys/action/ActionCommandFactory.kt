@@ -1,27 +1,12 @@
 package com.emarsys.action
 
+import com.emarsys.api.oneventaction.OnEventActionInternal
 import com.emarsys.api.oneventaction.OnEventActionInternalApi
 
 
-class ActionCommandFactory(private val onEventActionInternal: OnEventActionInternalApi) : ActionCommandFactoryApi {
+expect class ActionCommandFactory :ActionCommandFactoryApi {
 
-    override suspend fun create(action: ActionModel): Command {
-        return when (action) {
-            is AppEventActionModel -> {
-                { }
-            }
+    override suspend fun create(action: ActionModel): Command
 
-            is CustomEventActionModel -> {
-                { }
-            }
 
-            is DismissActionModel -> {
-                { }
-            }
-
-            is OpenExternalUrlActionModel -> {
-                { }
-            }
-        }
-    }
 }

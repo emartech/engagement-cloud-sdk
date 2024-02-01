@@ -1,5 +1,7 @@
 package com.emarsys.di
 
+import com.emarsys.action.ActionCommandFactory
+import com.emarsys.action.ActionCommandFactoryApi
 import com.emarsys.api.push.PushApi
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.WebPlatformInfoCollector
@@ -25,7 +27,11 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
     }
 
     override fun createPlatformInitState(pushApi: PushApi, sdkDispatcher: CoroutineDispatcher): State {
-        val pushService = PushService("BDa49_IiPdIo2Kda5cATItp81sOaYg-eFFISMdlSXatDAIZCdtAxUuMVzXo4M2MXXI0sUYQzQI7shyNkKgwyD_I", "/ems-service-worker.js", pushApi)
+        val pushService = PushService(
+            "BDa49_IiPdIo2Kda5cATItp81sOaYg-eFFISMdlSXatDAIZCdtAxUuMVzXo4M2MXXI0sUYQzQI7shyNkKgwyD_I",
+            "/ems-service-worker.js",
+            pushApi
+        )
         return PlatformInitState(pushService)
     }
 
@@ -41,4 +47,7 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
             window.navigator.vendor,
         ).joinToString(" ")
     }
+
+    override fun createActionCommandFactory(): ActionCommandFactoryApi = ActionCommandFactory()
+
 }

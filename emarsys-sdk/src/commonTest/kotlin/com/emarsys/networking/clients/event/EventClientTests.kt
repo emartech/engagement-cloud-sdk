@@ -1,6 +1,7 @@
 package com.emarsys.networking.clients.event
 
 import com.emarsys.action.ActionCommandFactoryApi
+import com.emarsys.action.OnEventActionFactoryApi
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.DeviceEventChannelApi
 import com.emarsys.core.networking.clients.NetworkClientApi
@@ -51,7 +52,7 @@ class EventClientTests : TestsWithMocks() {
     lateinit var mockUrlFactory: UrlFactoryApi
 
     @Mock
-    lateinit var mockActionCommandFactory: ActionCommandFactoryApi
+    lateinit var mockOnEventActionFactory: OnEventActionFactoryApi
 
     @Mock
     lateinit var mockDeviceEventChannel: DeviceEventChannelApi
@@ -96,7 +97,7 @@ class EventClientTests : TestsWithMocks() {
             mockUrlFactory,
             json,
             mockDeviceEventChannel,
-            mockActionCommandFactory,
+            mockOnEventActionFactory,
             sessionContext,
             mockSdkContext,
             sdkDispatcher
@@ -116,7 +117,7 @@ class EventClientTests : TestsWithMocks() {
             mockUrlFactory,
             json,
             mockDeviceEventChannel,
-            mockActionCommandFactory,
+            mockOnEventActionFactory,
             sessionContext,
             mockSdkContext,
             sdkDispatcher
@@ -154,7 +155,7 @@ class EventClientTests : TestsWithMocks() {
             mockUrlFactory,
             json,
             mockDeviceEventChannel,
-            mockActionCommandFactory,
+            mockOnEventActionFactory,
             sessionContext,
             mockSdkContext,
             sdkDispatcher

@@ -1,5 +1,6 @@
 package com.emarsys.di
 
+import com.emarsys.action.ActionCommandFactoryApi
 import com.emarsys.api.push.PushApi
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.state.State
@@ -9,6 +10,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 
 interface DependencyCreator {
     fun createStorage():  TypedStorageApi<String?>
+    fun createActionCommandFactory():  ActionCommandFactoryApi
 
     fun createDeviceInfoCollector(uuidProvider: Provider<String>): DeviceInfoCollector
 

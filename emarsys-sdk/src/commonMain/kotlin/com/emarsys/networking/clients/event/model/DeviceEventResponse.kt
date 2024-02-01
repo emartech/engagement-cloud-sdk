@@ -1,7 +1,6 @@
 package com.emarsys.networking.clients.event.model
 
 import com.emarsys.action.ActionModel
-import com.emarsys.action.GenericAction
 import kotlinx.serialization.Serializable
 
 @Serializable

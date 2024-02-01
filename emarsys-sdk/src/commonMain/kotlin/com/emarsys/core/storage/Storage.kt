@@ -14,7 +14,7 @@ class Storage(private val stringStorage: TypedStorageApi<String?>, val json: Jso
 
     override fun <Value>get(key: String, serializer: KSerializer<Value>): Value? {
         val encodedValue = stringStorage.get(key)
-        return if (encodedValue != null) {
+        return if (!encodedValue.isNullOrEmpty()) {
             json.decodeFromString(serializer, encodedValue)
         } else {
             null
