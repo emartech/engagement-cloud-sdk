@@ -1,7 +1,7 @@
-package com.emarsys.push
+package com.emarsys.inapp
 
 import com.emarsys.action.*
-import com.emarsys.api.push.PushInternalApi
+import com.emarsys.api.inapp.InAppInternalApi
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -10,7 +10,7 @@ import org.kodein.mock.Mock
 import org.kodein.mock.tests.TestsWithMocks
 import kotlin.test.Test
 
-class PushActionFactoryTests : TestsWithMocks() {
+class InAppActionFactoryTests : TestsWithMocks() {
     private companion object {
         const val ID = "testId"
         const val TITLE = "testTitle"
@@ -25,13 +25,13 @@ class PushActionFactoryTests : TestsWithMocks() {
     lateinit var mockActionCommandFactory: ActionCommandFactoryApi
 
     @Mock
-    lateinit var mockPushInternal: PushInternalApi
+    lateinit var mockInAppInternal: InAppInternalApi
 
     @Mock
     lateinit var mockAppEventCommand: AppEventCommand
 
     @Mock
-    lateinit var mockBadgeCountCommand: BadgeCountCommand
+    lateinit var mockAskForPushPermissionCommand: AskForPushPermissionCommand
 
     @Mock
     lateinit var mockOpenExternalUrlCommand: OpenExternalUrlCommand
@@ -39,10 +39,10 @@ class PushActionFactoryTests : TestsWithMocks() {
     @Mock
     lateinit var mockDismissCommand: DismissCommand
 
-    private val pushActionFactory: PushActionFactory by withMocks {
-        PushActionFactory(
+    private val inAppActionFactory: InAppActionFactoryApi by withMocks {
+        InAppActionFactory(
             mockActionCommandFactory,
-            mockPushInternal
+            mockInAppInternal
         )
     }
 
@@ -52,7 +52,7 @@ class PushActionFactoryTests : TestsWithMocks() {
 
         everySuspending { mockActionCommandFactory.create(action) } returns mockAppEventCommand
 
-        val result = pushActionFactory.create(action)
+        val result = inAppActionFactory.create(action)
 
         result shouldNotBe null
     }
@@ -62,7 +62,7 @@ class PushActionFactoryTests : TestsWithMocks() {
         val action = CustomEventActionModel(ID, TITLE, TYPE, NAME, payload)
         everySuspending { mockActionCommandFactory.create(action) } returns mockAppEventCommand
 
-        val result = pushActionFactory.create(action)
+        val result = inAppActionFactory.create(action)
 
         result shouldNotBe null
     }
@@ -73,7 +73,7 @@ class PushActionFactoryTests : TestsWithMocks() {
 
         everySuspending { mockActionCommandFactory.create(action) } returns mockDismissCommand
 
-        val result = pushActionFactory.create(action)
+        val result = inAppActionFactory.create(action)
 
         result shouldNotBe null
     }
@@ -84,18 +84,18 @@ class PushActionFactoryTests : TestsWithMocks() {
 
         everySuspending { mockActionCommandFactory.create(action) } returns mockOpenExternalUrlCommand
 
-        val result = pushActionFactory.create(action)
+        val result = inAppActionFactory.create(action)
 
         result shouldNotBe null
     }
 
     @Test
-    fun testCreate_withBadgeCountActionModel() = runTest {
-        val action = BadgeCountActionModel(ID, TITLE, TYPE, "add", 1)
+    fun testCreate_withAskForPushPermissionActionModel() = runTest {
+        val action = AskForPushPermissionActionModel(ID, TITLE, TYPE)
 
-        everySuspending { mockActionCommandFactory.create(action) } returns mockBadgeCountCommand
+        everySuspending { mockActionCommandFactory.create(action) } returns mockAskForPushPermissionCommand
 
-        val result = pushActionFactory.create(action)
+        val result = inAppActionFactory.create(action)
 
         result shouldNotBe null
     }
@@ -105,9 +105,9 @@ class PushActionFactoryTests : TestsWithMocks() {
         val action = UnknownActionModel()
 
         val exception = shouldThrow<IllegalArgumentException> {
-            pushActionFactory.create(action)
+            inAppActionFactory.create(action)
 
         }
-        exception.message shouldBe "Action is not a PushAction"
+        exception.message shouldBe "Action is not an InAppAction"
     }
 }

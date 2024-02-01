@@ -1,7 +1,6 @@
 package com.emarsys.action
 
 import com.emarsys.api.AppEvent
-import com.emarsys.api.oneventaction.OnEventActionInternalApi
 
 actual class ActionCommandFactory() :
     ActionCommandFactoryApi {
@@ -11,19 +10,15 @@ actual class ActionCommandFactory() :
                 events.emit(AppEvent(action.name, action.payload))
             }
 
-            is CustomEventActionModel -> {
-                ExecutableCommand { }
-            }
+            is CustomEventActionModel -> ExecutableCommand { }
 
-            is DismissActionModel -> {
-                ExecutableCommand { }
-            }
+            is DismissActionModel -> ExecutableCommand { }
 
-            is OpenExternalUrlActionModel -> {
-                ExecutableCommand { }
-            }
+            is OpenExternalUrlActionModel -> ExecutableCommand { }
 
             is BadgeCountActionModel -> BadgeCountCommand {}
+
+            is AskForPushPermissionActionModel -> AskForPushPermissionCommand { }
         }
     }
 }

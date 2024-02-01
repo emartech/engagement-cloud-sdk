@@ -25,6 +25,8 @@ import com.emarsys.api.geofence.GeofenceApi
 import com.emarsys.api.geofence.GeofenceTracker
 import com.emarsys.api.inapp.InApp
 import com.emarsys.api.inapp.InAppApi
+import com.emarsys.api.inapp.InAppInternal
+import com.emarsys.api.inapp.InAppInternalApi
 import com.emarsys.api.inbox.Inbox
 import com.emarsys.api.inbox.InboxApi
 import com.emarsys.api.oneventaction.OnEventAction
@@ -215,8 +217,12 @@ class DependencyContainer : DependencyContainerApi {
         PushInternal(pushClient, stringStorage, pushContext, notificationEvents)
     }
 
+    private val inAppInternal: InAppInternalApi by lazy {
+        val events = MutableSharedFlow<AppEvent>(replay = 100)
+        InAppInternal(events)
+    }
     override val inAppApi: InAppApi by lazy {
-        InApp()
+        InApp(inAppInternal)
     }
 
     override val inbox: InboxApi by lazy {

@@ -36,7 +36,14 @@ data class DismissActionModel(
     override val id: String,
     override val title: String,
     override val type: String
-) : ActionModel(), PushAction
+) : ActionModel(), PushAction, InAppAction
+
+@Serializable
+data class AskForPushPermissionActionModel(
+    override val id: String,
+    override val title: String,
+    override val type: String
+) : ActionModel(), InAppAction
 
 @Serializable
 data class OpenExternalUrlActionModel(

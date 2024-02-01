@@ -20,6 +20,10 @@ fun interface DismissCommand : Command {
     suspend operator fun invoke()
 }
 
+fun interface AskForPushPermissionCommand : Command {
+    suspend operator fun invoke()
+}
+
 fun interface OpenExternalUrlCommand : Command {
     suspend operator fun invoke()
 }
