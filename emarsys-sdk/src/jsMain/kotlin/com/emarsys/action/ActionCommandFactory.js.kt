@@ -22,6 +22,8 @@ actual class ActionCommandFactory() :
             is OpenExternalUrlActionModel -> {
                 ExecutableCommand { }
             }
+
+            is BadgeCountActionModel -> BadgeCountCommand {}
         }
     }
 }

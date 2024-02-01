@@ -1,9 +1,13 @@
 package com.emarsys.api.push
 
+import com.emarsys.api.AppEvent
 import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -24,13 +28,14 @@ class LoggingPushTests {
         const val PUSH_TOKEN = "testPushToken"
     }
 
-    lateinit var fakeLogger: FakeSdkLogger
-    lateinit var loggingPush: LoggingPush
+    private lateinit var fakeLogger: FakeSdkLogger
+    private lateinit var loggingPush: LoggingPush
+    private val notificationEvents: MutableSharedFlow<AppEvent> = MutableSharedFlow()
 
     @BeforeTest
     fun setup() = runTest {
         fakeLogger = FakeSdkLogger()
-        loggingPush = LoggingPush(fakeLogger)
+        loggingPush = LoggingPush(fakeLogger, notificationEvents)
     }
 
     @Test

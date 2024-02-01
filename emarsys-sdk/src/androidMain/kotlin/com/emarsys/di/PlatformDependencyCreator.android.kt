@@ -6,6 +6,7 @@ import com.emarsys.action.ActionCommandFactoryApi
 import com.emarsys.api.oneventaction.OnEventActionInternalApi
 import com.emarsys.api.push.PushApi
 import com.emarsys.api.push.PushConstants
+import com.emarsys.api.push.PushInternalApi
 import com.emarsys.applicationContext
 import com.emarsys.core.device.AndroidLanguageProvider
 import com.emarsys.core.device.AndroidPlatformInfoCollector
@@ -44,7 +45,7 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
     }
 
     override fun createPlatformInitState(
-        pushApi: PushApi,
+        pushApi: PushInternalApi,
         sdkDispatcher: CoroutineDispatcher
     ): State {
         val receiver = PushTokenBroadcastReceiver(sdkDispatcher, pushApi)

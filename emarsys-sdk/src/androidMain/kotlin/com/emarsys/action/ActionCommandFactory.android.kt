@@ -10,17 +10,19 @@ actual class ActionCommandFactory : ActionCommandFactoryApi {
                 events.emit(AppEvent(applicationContext, action.name, action.payload))
             }
 
-            is CustomEventActionModel -> {
+            is CustomEventActionModel ->
                 CustomEventCommand { }
-            }
 
-            is DismissActionModel -> {
+
+            is DismissActionModel ->
                 DismissCommand { }
-            }
 
-            is OpenExternalUrlActionModel -> {
+
+            is OpenExternalUrlActionModel ->
                 OpenExternalUrlCommand { }
-            }
+
+
+            is BadgeCountActionModel -> BadgeCountCommand {}
         }
     }
 }

@@ -3,11 +3,15 @@ package com.emarsys.action
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class ActionModel {
+sealed interface Action
+
+@Serializable
+sealed class ActionModel : Action {
     abstract val id: String
     abstract val title: String
     abstract val type: String
 }
+
 
 @Serializable
 data class AppEventActionModel(
@@ -16,7 +20,7 @@ data class AppEventActionModel(
     override val type: String,
     val name: String,
     val payload: Map<String, String>?
-) : ActionModel(), InAppAction, OnEventAction
+) : ActionModel(), InAppAction, OnEventAction, PushAction, SilentPushAction
 
 @Serializable
 data class CustomEventActionModel(
@@ -25,14 +29,14 @@ data class CustomEventActionModel(
     override val type: String,
     val name: String,
     val payload: Map<String, String>?
-) : ActionModel(), InAppAction, OnEventAction
+) : ActionModel(), InAppAction, OnEventAction, PushAction
 
 @Serializable
 data class DismissActionModel(
     override val id: String,
     override val title: String,
     override val type: String
-) : ActionModel()
+) : ActionModel(), PushAction
 
 @Serializable
 data class OpenExternalUrlActionModel(
@@ -40,7 +44,31 @@ data class OpenExternalUrlActionModel(
     override val title: String,
     override val type: String,
     val url: String
-) : ActionModel(), InAppAction
+) : ActionModel(), InAppAction, PushAction
 
-sealed interface InAppAction {}
-sealed interface OnEventAction {}
+@Serializable
+data class BadgeCountActionModel(
+    override val id: String,
+    override val title: String,
+    override val type: String,
+    val method: String,
+    val value: Int
+) : ActionModel(), PushAction
+
+
+class UnknownActionModel : Action {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return this::class.hashCode()
+    }
+}
+
+sealed interface InAppAction
+sealed interface PushAction
+sealed interface SilentPushAction
+sealed interface OnEventAction

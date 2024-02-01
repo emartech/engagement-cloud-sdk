@@ -2,6 +2,7 @@ package com.emarsys.di
 
 import com.emarsys.action.ActionCommandFactoryApi
 import com.emarsys.api.push.PushApi
+import com.emarsys.api.push.PushInternalApi
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.TypedStorageApi
@@ -14,6 +15,6 @@ interface DependencyCreator {
 
     fun createDeviceInfoCollector(uuidProvider: Provider<String>): DeviceInfoCollector
 
-    fun createPlatformInitState(pushApi: PushApi, sdkDispatcher: CoroutineDispatcher): State
+    fun createPlatformInitState(pushApi: PushInternalApi, sdkDispatcher: CoroutineDispatcher): State
 
 }

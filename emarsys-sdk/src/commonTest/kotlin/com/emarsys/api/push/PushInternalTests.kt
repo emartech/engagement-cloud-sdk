@@ -1,9 +1,11 @@
 package com.emarsys.api.push
 
+import com.emarsys.api.AppEvent
 import com.emarsys.api.generic.ApiContext
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.networking.clients.push.PushClientApi
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import org.kodein.mock.Mock
 import org.kodein.mock.tests.TestsWithMocks
@@ -31,13 +33,13 @@ class PushInternalTests : TestsWithMocks() {
     private lateinit var pushContext: ApiContext<PushCall>
 
     private lateinit var pushInternal: PushInternal
-
+    private val notificationEvents: MutableSharedFlow<AppEvent> = MutableSharedFlow()
     override fun setUpMocks() = injectMocks(mocker)
 
     @BeforeTest
     fun setup() = runTest {
         pushContext = PushContext(expected)
-        pushInternal = PushInternal(mockPushClient, mockStorage, pushContext)
+        pushInternal = PushInternal(mockPushClient, mockStorage, pushContext, notificationEvents)
     }
 
     @Test

@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import com.emarsys.api.push.PushApi
 import com.emarsys.api.push.PushConstants
+import com.emarsys.api.push.PushInternalApi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -14,7 +15,7 @@ import kotlin.coroutines.CoroutineContext
 
 class PushTokenBroadcastReceiver(
     private val sdkDispatcher: CoroutineDispatcher,
-    private val pushApi: PushApi
+    private val pushApi: PushInternalApi
 ) : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) = goAsync(sdkDispatcher) {
         intent.getStringExtra(PushConstants.PUSH_TOKEN_INTENT_KEY)?.let {

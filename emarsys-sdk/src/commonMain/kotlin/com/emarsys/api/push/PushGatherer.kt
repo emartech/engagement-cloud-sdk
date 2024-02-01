@@ -1,10 +1,15 @@
 package com.emarsys.api.push
 
+import com.emarsys.api.AppEvent
 import com.emarsys.api.SdkResult
 import com.emarsys.api.generic.ApiContext
 import com.emarsys.core.storage.TypedStorageApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 
-class PushGatherer(private val context: ApiContext<PushCall>, private val storage: TypedStorageApi<String?>) : PushInstance {
+class PushGatherer(
+    private val context: ApiContext<PushCall>, private val storage: TypedStorageApi<String?>,
+    override val notificationEvents: MutableSharedFlow<AppEvent>
+) : PushInstance {
     override suspend fun registerPushToken(pushToken: String): SdkResult {
         context.calls.add(PushCall.RegisterPushToken(pushToken))
         return SdkResult.Success(Unit)

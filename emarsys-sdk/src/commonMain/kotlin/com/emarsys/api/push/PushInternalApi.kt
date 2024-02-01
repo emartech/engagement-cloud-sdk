@@ -5,12 +5,11 @@ import com.emarsys.api.SdkResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 
-interface PushApi {
+interface PushInternalApi {
     suspend fun registerPushToken(pushToken: String): SdkResult
     suspend fun clearPushToken(): SdkResult
 
     val pushToken: String?
 
-    val notificationEvents: Flow<AppEvent>
-
+    val notificationEvents: MutableSharedFlow<AppEvent>
 }

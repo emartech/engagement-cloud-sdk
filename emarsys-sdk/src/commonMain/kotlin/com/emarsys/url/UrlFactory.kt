@@ -17,8 +17,8 @@ class UrlFactory(
         const val V4_API = "v4"
     }
 
-    override fun create(value: EmarsysUrlType): Url {
-        return when (value) {
+    override fun create(urlType: EmarsysUrlType): Url {
+        return when (urlType) {
             LINK_CONTACT -> createUrlBasedOnPredict(
                 sdkContext.defaultUrls.clientServiceBaseUrl,
                 "contact",
@@ -40,8 +40,9 @@ class UrlFactory(
             REGISTER_PUSH_TOKEN -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V3_API/apps/${sdkContext.config?.applicationCode}/client/push-token")
             REGISTER_DEVICE_INFO -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V3_API/apps/${sdkContext.config?.applicationCode}/client")
             EVENT -> {
-               Url("${sdkContext.defaultUrls.eventServiceBaseUrl}/$V4_API/apps/${sdkContext.config?.applicationCode}/client/events")
+                Url("${sdkContext.defaultUrls.eventServiceBaseUrl}/$V4_API/apps/${sdkContext.config?.applicationCode}/client/events")
             }
+
             REMOTE_CONFIG_SIGNATURE -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/signature/${sdkContext.config?.applicationCode}")
             REMOTE_CONFIG -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/${sdkContext.config?.applicationCode}")
         }

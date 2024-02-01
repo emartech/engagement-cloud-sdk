@@ -3,6 +3,7 @@ package com.emarsys.di
 import com.emarsys.action.ActionCommandFactory
 import com.emarsys.action.ActionCommandFactoryApi
 import com.emarsys.action.OnEventActionFactory
+import com.emarsys.api.AppEvent
 import com.emarsys.api.config.Config
 import com.emarsys.api.config.ConfigApi
 import com.emarsys.api.contact.Contact
@@ -95,6 +96,7 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 
@@ -206,8 +208,11 @@ class DependencyContainer : DependencyContainerApi {
         PushContext(persistentListOf("pushContextPersistentId", storage, PushCall.serializer()))
     }
 
+    val notificationEvents: MutableSharedFlow<AppEvent> by lazy {
+        MutableSharedFlow(replay = 100)
+    }
     private val pushInternal: PushInstance by lazy {
-        PushInternal(pushClient, stringStorage, pushContext)
+        PushInternal(pushClient, stringStorage, pushContext, notificationEvents)
     }
 
     override val inAppApi: InAppApi by lazy {
@@ -234,8 +239,8 @@ class DependencyContainer : DependencyContainerApi {
     }
 
     override val pushApi: PushApi by lazy {
-        val loggingPush = LoggingPush(sdkLogger)
-        val pushGatherer = PushGatherer(pushContext, stringStorage)
+        val loggingPush = LoggingPush(sdkLogger, notificationEvents)
+        val pushGatherer = PushGatherer(pushContext, stringStorage, notificationEvents)
         Push(loggingPush, pushGatherer, pushInternal, sdkContext)
     }
 

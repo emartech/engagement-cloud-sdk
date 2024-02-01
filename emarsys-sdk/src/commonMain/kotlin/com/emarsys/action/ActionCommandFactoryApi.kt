@@ -24,6 +24,10 @@ fun interface OpenExternalUrlCommand : Command {
     suspend operator fun invoke()
 }
 
+fun interface BadgeCountCommand : Command {
+    suspend operator fun invoke()
+}
+
 interface ActionCommandFactoryApi {
     suspend fun create(action: ActionModel): Command
 }
