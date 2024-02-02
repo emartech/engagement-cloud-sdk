@@ -1,16 +1,16 @@
 package com.emarsys.action
 
 import android.content.Context
-import com.emarsys.Emarsys
 import com.emarsys.EmarsysSdkInitializer
 import com.emarsys.api.AppEvent
 import com.emarsys.applicationContext
+import com.emarsys.mobileengage.action.AppEventActionModel
+import com.emarsys.mobileengage.action.AppEventCommand
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import kotlin.test.BeforeTest
@@ -35,7 +35,7 @@ class ActionCommandFactoryTest {
     @Test
     fun testCreate_shouldCreateAppEventCommand() = runTest {
         val action = AppEventActionModel(ID, TITLE, TYPE, NAME, payload)
-        val result = ActionCommandFactory().create(action)
+        val result = com.emarsys.mobileengage.action.ActionCommandFactory().create(action)
 
         (result is AppEventCommand) shouldBe true
         val events = MutableSharedFlow<AppEvent>()

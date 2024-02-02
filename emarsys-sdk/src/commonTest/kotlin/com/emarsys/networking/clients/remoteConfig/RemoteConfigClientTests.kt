@@ -7,8 +7,8 @@ import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.remoteConfig.RemoteConfigResponse
-import com.emarsys.url.EmarsysUrlType
-import com.emarsys.url.UrlFactoryApi
+import com.emarsys.core.url.EmarsysUrlType
+import com.emarsys.core.url.UrlFactoryApi
 import io.kotest.matchers.shouldBe
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod

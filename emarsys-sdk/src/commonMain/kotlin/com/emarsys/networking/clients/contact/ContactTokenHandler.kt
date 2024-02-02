@@ -2,7 +2,7 @@ package com.emarsys.networking.clients.contact
 
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.body
-import com.emarsys.session.SessionContext
+import com.emarsys.core.session.SessionContext
 
 class ContactTokenHandler(private val sessionContext: SessionContext): ContactTokenHandlerApi {
 

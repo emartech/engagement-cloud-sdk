@@ -1,6 +1,6 @@
 package com.emarsys.networking.clients.event.model
 
-import com.emarsys.providers.TimestampProvider
+import com.emarsys.core.providers.TimestampProvider
 import kotlinx.serialization.Serializable
 
 @Serializable

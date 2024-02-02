@@ -1,7 +1,6 @@
 package com.emarsys.networking.clients.event
 
-import com.emarsys.action.ActionCommandFactoryApi
-import com.emarsys.action.OnEventActionFactoryApi
+import com.emarsys.mobileengage.action.OnEventActionFactoryApi
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.DeviceEventChannelApi
 import com.emarsys.core.networking.clients.NetworkClientApi
@@ -9,9 +8,9 @@ import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.networking.clients.event.model.Event
 import com.emarsys.networking.clients.event.model.EventType
-import com.emarsys.session.SessionContext
-import com.emarsys.url.EmarsysUrlType
-import com.emarsys.url.UrlFactoryApi
+import com.emarsys.core.session.SessionContext
+import com.emarsys.core.url.EmarsysUrlType
+import com.emarsys.core.url.UrlFactoryApi
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode

@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import androidx.core.content.ContextCompat
-import com.emarsys.push.PushTokenBroadcastReceiver
+import com.emarsys.mobileengage.push.PushTokenBroadcastReceiver
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic

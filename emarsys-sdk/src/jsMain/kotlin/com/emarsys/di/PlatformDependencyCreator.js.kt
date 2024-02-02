@@ -1,15 +1,15 @@
 package com.emarsys.di
 
-import com.emarsys.action.ActionCommandFactory
-import com.emarsys.action.ActionCommandFactoryApi
-import com.emarsys.api.push.PushApi
+import com.emarsys.mobileengage.action.ActionCommandFactory
+import com.emarsys.mobileengage.action.ActionCommandFactoryApi
+import com.emarsys.api.push.PushInternalApi
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.WebPlatformInfoCollector
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.TypedStorageApi
-import com.emarsys.providers.Provider
-import com.emarsys.push.PushService
+import com.emarsys.core.providers.Provider
+import com.emarsys.mobileengage.push.PushService
 import com.emarsys.setup.PlatformInitState
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineDispatcher
@@ -26,7 +26,7 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
         return DeviceInfoCollector(createWebDeviceInfoCollector(), uuidProvider, createStorage())
     }
 
-    override fun createPlatformInitState(pushApi: PushApi, sdkDispatcher: CoroutineDispatcher): State {
+    override fun createPlatformInitState(pushApi: PushInternalApi, sdkDispatcher: CoroutineDispatcher): State {
         val pushService = PushService(
             "BDa49_IiPdIo2Kda5cATItp81sOaYg-eFFISMdlSXatDAIZCdtAxUuMVzXo4M2MXXI0sUYQzQI7shyNkKgwyD_I",
             "/ems-service-worker.js",

@@ -4,7 +4,7 @@ import android.content.res.Resources
 import android.os.Build
 import android.util.DisplayMetrics
 import com.emarsys.core.storage.TypedStorageApi
-import com.emarsys.providers.Provider
+import com.emarsys.core.providers.Provider
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.text.SimpleDateFormat

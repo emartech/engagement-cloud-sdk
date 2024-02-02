@@ -1,10 +1,8 @@
 package com.emarsys.di
 
 import android.content.IntentFilter
-import com.emarsys.action.ActionCommandFactory
-import com.emarsys.action.ActionCommandFactoryApi
-import com.emarsys.api.oneventaction.OnEventActionInternalApi
-import com.emarsys.api.push.PushApi
+import com.emarsys.mobileengage.action.ActionCommandFactory
+import com.emarsys.mobileengage.action.ActionCommandFactoryApi
 import com.emarsys.api.push.PushConstants
 import com.emarsys.api.push.PushInternalApi
 import com.emarsys.applicationContext
@@ -15,8 +13,8 @@ import com.emarsys.core.device.LanguageProvider
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.TypedStorageApi
-import com.emarsys.providers.Provider
-import com.emarsys.push.PushTokenBroadcastReceiver
+import com.emarsys.core.providers.Provider
+import com.emarsys.mobileengage.push.PushTokenBroadcastReceiver
 import com.emarsys.setup.PlatformInitState
 import kotlinx.coroutines.CoroutineDispatcher
 import java.util.Locale

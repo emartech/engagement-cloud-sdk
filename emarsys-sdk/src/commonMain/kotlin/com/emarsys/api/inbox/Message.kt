@@ -1,6 +1,6 @@
 package com.emarsys.api.inbox
 
-import com.emarsys.action.ActionModel
+import com.emarsys.mobileengage.action.ActionModel
 
 
 data class Message(

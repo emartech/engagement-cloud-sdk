@@ -1,5 +1,6 @@
 package com.emarsys.api.push
 
+import com.emarsys.api.AppEvent
 import com.emarsys.api.SdkResult
 import com.emarsys.api.SdkState
 import com.emarsys.context.DefaultUrls
@@ -9,6 +10,7 @@ import com.emarsys.core.log.LogLevel
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -56,6 +58,15 @@ class PushTests : TestsWithMocks() {
         everySuspending { mockLoggingPush.activate() } returns Unit
         everySuspending { mockGathererPush.activate() } returns Unit
         everySuspending { mockPushInternal.activate() } returns Unit
+        every {
+            mockLoggingPush.notificationEvents
+        } returns MutableSharedFlow()
+        every {
+            mockGathererPush.notificationEvents
+        } returns MutableSharedFlow()
+        every {
+            mockPushInternal.notificationEvents
+        } returns MutableSharedFlow()
     }
 
     @AfterTest

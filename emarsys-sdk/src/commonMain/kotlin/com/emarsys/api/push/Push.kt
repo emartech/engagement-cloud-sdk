@@ -21,17 +21,17 @@ class Push<Logging : PushInstance, Gatherer : PushInstance, Internal : PushInsta
 
     override suspend fun registerPushToken(pushToken: String): SdkResult {
         return withContext(sdkContext.sdkDispatcher) {
-            activeInstance<PushApi>().registerPushToken(pushToken)
+            activeInstance<PushInternalApi>().registerPushToken(pushToken)
         }
     }
 
     override suspend fun clearPushToken(): SdkResult {
         return withContext(sdkContext.sdkDispatcher) {
-            activeInstance<PushApi>().clearPushToken()
+            activeInstance<PushInternalApi>().clearPushToken()
         }
     }
 
     override val pushToken: String?
-        get() = activeInstance<PushApi>().pushToken
+        get() = activeInstance<PushInternalApi>().pushToken
 
 }

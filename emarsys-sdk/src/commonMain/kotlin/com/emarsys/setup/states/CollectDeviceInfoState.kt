@@ -2,7 +2,7 @@ package com.emarsys.setup.states
 
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.state.State
-import com.emarsys.session.SessionContext
+import com.emarsys.core.session.SessionContext
 
 class CollectDeviceInfoState(
     private val deviceInfoCollector: DeviceInfoCollectorApi,

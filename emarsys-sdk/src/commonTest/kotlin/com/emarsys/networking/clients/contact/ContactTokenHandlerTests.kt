@@ -2,7 +2,7 @@ package com.emarsys.networking.clients.contact
 
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
-import com.emarsys.session.SessionContext
+import com.emarsys.core.session.SessionContext
 import io.kotest.matchers.shouldBe
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode

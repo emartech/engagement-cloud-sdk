@@ -3,7 +3,7 @@ package com.emarsys.core.device
 import android.content.res.Resources
 import android.os.Build
 import com.emarsys.core.storage.TypedStorageApi
-import com.emarsys.providers.Provider
+import com.emarsys.core.providers.Provider
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk

@@ -2,7 +2,7 @@ package com.emarsys.setup.states
 
 import com.emarsys.core.state.State
 import com.emarsys.networking.clients.contact.ContactClientApi
-import com.emarsys.session.SessionContext
+import com.emarsys.core.session.SessionContext
 
 class LinkAnonymousContactState(
     private val contactClient: ContactClientApi,

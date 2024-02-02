@@ -5,9 +5,9 @@ import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.networking.clients.contact.ContactTokenHandlerApi
-import com.emarsys.session.SessionContext
-import com.emarsys.url.EmarsysUrlType.REGISTER_DEVICE_INFO
-import com.emarsys.url.UrlFactoryApi
+import com.emarsys.core.session.SessionContext
+import com.emarsys.core.url.EmarsysUrlType.REGISTER_DEVICE_INFO
+import com.emarsys.core.url.UrlFactoryApi
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url

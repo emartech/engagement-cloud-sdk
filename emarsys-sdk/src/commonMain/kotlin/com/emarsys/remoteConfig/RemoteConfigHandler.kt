@@ -6,7 +6,7 @@ import com.emarsys.context.copyWith
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.log.LogLevel
 import com.emarsys.networking.clients.remoteConfig.RemoteConfigClientApi
-import com.emarsys.providers.Provider
+import com.emarsys.core.providers.Provider
 
 class RemoteConfigHandler(
     private val remoteConfigClient: RemoteConfigClientApi,

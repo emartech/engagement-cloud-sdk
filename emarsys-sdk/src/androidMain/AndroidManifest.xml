@@ -10,7 +10,7 @@
                        android:value="androidx.startup"/>
         </provider>
         <receiver
-                android:name="com.emarsys.push.PushTokenRegisterOnBootCompletedReceiver"
+                android:name="com.emarsys.mobileengage.push.PushTokenRegisterOnBootCompletedReceiver"
                 android:enabled="true"
                 android:exported="false">
             <intent-filter>

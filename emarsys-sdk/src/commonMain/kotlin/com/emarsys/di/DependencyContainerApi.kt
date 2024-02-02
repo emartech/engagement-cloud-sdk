@@ -9,7 +9,7 @@ import com.emarsys.api.inbox.InboxApi
 import com.emarsys.api.oneventaction.OnEventActionApi
 import com.emarsys.api.predict.PredictApi
 import com.emarsys.api.push.PushApi
-import com.emarsys.providers.Provider
+import com.emarsys.core.providers.Provider
 import com.emarsys.setup.SetupOrganizerApi
 
 interface DependencyContainerApi {

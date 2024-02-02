@@ -3,9 +3,9 @@ package com.emarsys.networking.clients.push
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.networking.clients.push.model.PushToken
 import com.emarsys.core.networking.model.UrlRequest
-import com.emarsys.url.EmarsysUrlType
-import com.emarsys.url.EmarsysUrlType.REGISTER_PUSH_TOKEN
-import com.emarsys.url.UrlFactoryApi
+import com.emarsys.core.url.EmarsysUrlType
+import com.emarsys.core.url.EmarsysUrlType.REGISTER_PUSH_TOKEN
+import com.emarsys.core.url.UrlFactoryApi
 import io.ktor.http.HttpMethod
 import io.ktor.http.Url
 import kotlinx.serialization.encodeToString

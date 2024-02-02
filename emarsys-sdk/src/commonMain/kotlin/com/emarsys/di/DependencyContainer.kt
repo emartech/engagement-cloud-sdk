@@ -1,8 +1,7 @@
 package com.emarsys.di
 
-import com.emarsys.action.ActionCommandFactory
-import com.emarsys.action.ActionCommandFactoryApi
-import com.emarsys.action.OnEventActionFactory
+import com.emarsys.mobileengage.action.ActionCommandFactoryApi
+import com.emarsys.mobileengage.action.OnEventActionFactory
 import com.emarsys.api.AppEvent
 import com.emarsys.api.config.Config
 import com.emarsys.api.config.ConfigApi
@@ -71,12 +70,12 @@ import com.emarsys.networking.clients.event.model.Event
 import com.emarsys.networking.clients.push.PushClient
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.networking.clients.remoteConfig.RemoteConfigClient
-import com.emarsys.providers.Provider
-import com.emarsys.providers.RandomProvider
-import com.emarsys.providers.TimestampProvider
-import com.emarsys.providers.UUIDProvider
+import com.emarsys.core.providers.Provider
+import com.emarsys.core.providers.RandomProvider
+import com.emarsys.core.providers.TimestampProvider
+import com.emarsys.core.providers.UUIDProvider
 import com.emarsys.remoteConfig.RemoteConfigHandler
-import com.emarsys.session.SessionContext
+import com.emarsys.core.session.SessionContext
 import com.emarsys.setup.SetupOrganizer
 import com.emarsys.setup.SetupOrganizerApi
 import com.emarsys.setup.states.AppStartState
@@ -85,8 +84,8 @@ import com.emarsys.setup.states.CollectDeviceInfoState
 import com.emarsys.setup.states.LinkAnonymousContactState
 import com.emarsys.setup.states.RegisterClientState
 import com.emarsys.setup.states.RegisterPushTokenState
-import com.emarsys.url.UrlFactory
-import com.emarsys.url.UrlFactoryApi
+import com.emarsys.core.url.UrlFactory
+import com.emarsys.core.url.UrlFactoryApi
 import dev.whyoleg.cryptography.CryptographyProvider
 import dev.whyoleg.cryptography.algorithms.digest.SHA512
 import dev.whyoleg.cryptography.algorithms.symmetric.AES

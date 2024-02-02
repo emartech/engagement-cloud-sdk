@@ -6,7 +6,7 @@ import com.emarsys.context.SdkContext
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.log.LogLevel
 import com.emarsys.networking.clients.remoteConfig.RemoteConfigClientApi
-import com.emarsys.providers.Provider
+import com.emarsys.core.providers.Provider
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest

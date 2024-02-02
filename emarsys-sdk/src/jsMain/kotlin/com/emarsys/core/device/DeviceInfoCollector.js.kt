@@ -1,7 +1,7 @@
 package com.emarsys.core.device
 
 import com.emarsys.core.storage.TypedStorageApi
-import com.emarsys.providers.Provider
+import com.emarsys.core.providers.Provider
 import kotlinx.browser.window
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone

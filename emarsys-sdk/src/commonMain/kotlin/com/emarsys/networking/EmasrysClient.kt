@@ -8,10 +8,10 @@ import com.emarsys.networking.EmarsysHeaders.CLIENT_ID_HEADER
 import com.emarsys.networking.EmarsysHeaders.CLIENT_STATE_HEADER
 import com.emarsys.networking.EmarsysHeaders.CONTACT_TOKEN_HEADER
 import com.emarsys.networking.EmarsysHeaders.REQUEST_ORDER_HEADER
-import com.emarsys.providers.Provider
-import com.emarsys.session.SessionContext
-import com.emarsys.url.EmarsysUrlType
-import com.emarsys.url.UrlFactoryApi
+import com.emarsys.core.providers.Provider
+import com.emarsys.core.session.SessionContext
+import com.emarsys.core.url.EmarsysUrlType
+import com.emarsys.core.url.UrlFactoryApi
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
