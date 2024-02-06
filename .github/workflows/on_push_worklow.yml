@@ -47,7 +47,15 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 33
-          script: ./gradlew :emarsys-sdk:connectedAndroidTest
+          script: |
+            ./gradlew :emarsys-sdk:build -x :composeApp:build
+            ./gradlew :emarsys-sdk:connectedAndroidTest
+
+      - name: Build and test Android
+        if: matrix.platform == 'android'
+        run: |
+          ./gradlew :emarsys-sdk:build -x :composeApp:build
+          ./gradlew :emarsys-sdk:test
 
       - name: Setup Node.js
         if: matrix.platform == 'web'
@@ -55,17 +63,13 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Build and test Android
-        if: matrix.platform == 'android'
-        run: |
-          ./gradlew :emarsys-sdk:build
-          ./gradlew :emarsys-sdk:test
+      - name: Setup Chrome
+        if: matrix.platform == 'web'
+        uses: browser-actions/setup-chrome@v1
 
       - name: Build and test Web
         if: matrix.platform == 'web'
-        uses: browser-actions/setup-chrome@v1
         run: |
-          chrome --version
-          ./gradlew :emarsys-sdk:build
+          ./gradlew :emarsys-sdk:build -x :composeApp:build
           ./gradlew :emarsys-sdk:test
           ./gradlew :emarsys-sdk:jsBrowserTest
