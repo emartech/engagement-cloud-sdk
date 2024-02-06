@@ -4,6 +4,7 @@
 xcuserdata
 !src/**/build/
 local.properties
+mobile-team-android.jks
 .idea
 .DS_Store
 captures
