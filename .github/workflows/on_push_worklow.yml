@@ -53,6 +53,26 @@ jobs:
 
         - name: Gradle Build
           run: make build
+  lint:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v3
+
+      - name: Run lint
+        run: make lint
+
   test:
     needs: build
     runs-on: macos-13
@@ -76,9 +96,6 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-
-      - name: Run lint
-        run: make lint
 
       - name: Setup Android SDK
         if: matrix.platform == 'android'
@@ -108,7 +125,10 @@ jobs:
       - name: Build and test Web
         if: matrix.platform == 'web'
         run: make test-web
-
+  reporting:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
       - name: Report on Slack (Error)
         if: failure()
         uses: megamegax/slack_action@0.2.3
