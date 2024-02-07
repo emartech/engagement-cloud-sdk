@@ -1,6 +1,7 @@
 name: KMP Emarsys SDK CI
 
 on:
+  workflow_dispatch:
   push:
     branches: [ main ]
 
@@ -51,6 +52,7 @@ jobs:
         uses: gradle/gradle-build-action@v3
         with:
           cache-overwrite-existing: true
+          gradle-home-cache-cleanup: true
 
       - name: Gradle Build
         run: make build
