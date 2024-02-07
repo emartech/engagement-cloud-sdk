@@ -4,9 +4,35 @@ on:
   push:
     branches: [ main ]
 
+env:
+  USE_LOCAL_DEPENDENCY: ${{ vars.USE_LOCAL_DEPENDENCY }}
+  GOOGLE_SERVICES_API_KEY: ${{ secrets.GOOGLE_SERVICES_API_KEY }}
+  RELEASE_MODE: ${{ vars.RELEASE_MODE }}
+  ANDROID_RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}
+  ANDROID_RELEASE_KEY_ALIAS: ${{ secrets.ANDROID_RELEASE_KEY_ALIAS }}
+  ANDROID_RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_RELEASE_STORE_PASSWORD }}
+  ANDROID_RELEASE_STORE_FILE_BASE64: ${{ secrets.ANDROID_RELEASE_STORE_FILE_BASE64 }}
+  GOOGLE_OAUTH_SERVER_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_SERVER_CLIENT_ID }}
+  OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+  OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+  SONATYPE_STAGING_PROFILE_ID: ${{ secrets.SONATYPE_STAGING_PROFILE_ID }}
+  SONATYPE_SIGNING_KEY_ID: ${{ secrets.SONATYPE_SIGNING_KEY_ID }}
+  SONATYPE_SIGNING_PASSWORD: ${{ secrets.SONATYPE_SIGNING_PASSWORD }}
+  SONATYPE_SIGNING_SECRET_KEY_RING_FILE: ${{ secrets.SONATYPE_SIGNING_SECRET_KEY_RING_FILE }}
+  DETECT_LATEST_RELEASE_VERSION: ${{ secrets.DETECT_LATEST_RELEASE_VERSION }}
+  DETECT_PROJECT_USER_GROUPS: ${{ secrets.DETECT_PROJECT_USER_GROUPS }}
+  DETECT_PROJECT_VERSION_DISTRIBUTION: ${{ secrets.DETECT_PROJECT_VERSION_DISTRIBUTION }}
+  BLACKDUCK_ACCESS_TOKEN: ${{ secrets.BLACKDUCK_ACCESS_TOKEN }}
+  BLACKDUCK_URL: ${{ secrets.BLACKDUCK_URL }}
+  SLACK_CHANNEL: mobile-team-ci
+  SLACK_ICON: https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Kotlin_Icon.svg/1200px-Kotlin_Icon.svg.png
+  SLACK_TITLE: Commit status
+  SLACK_USERNAME: Emarsys SDK - KMP
+  SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
 jobs:
   build-and-test:
-    runs-on: macos-latest
+    runs-on: macos-13
     strategy:
       matrix:
         include:
@@ -38,6 +64,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
+      - name: Build
+        run: ./make build
+
+      - name: Run lint
+        run: ./make lint
+
       - name: Setup Android SDK
         if: matrix.platform == 'android'
         uses: android-actions/setup-android@v3
@@ -46,16 +78,12 @@ jobs:
         if: matrix.platform == 'android'
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 29
-          script: |
-            ./gradlew :emarsys-sdk:build -x :composeApp:build
-            ./gradlew :emarsys-sdk:connectedAndroidTest
+          api-level: 33
+          script: ./make test-android
 
       - name: Build and test Android
         if: matrix.platform == 'android'
-        run: |
-          ./gradlew :emarsys-sdk:build -x :composeApp:build
-          ./gradlew :emarsys-sdk:test
+        run: ./make test
 
       - name: Setup Node.js
         if: matrix.platform == 'web'
@@ -69,7 +97,26 @@ jobs:
 
       - name: Build and test Web
         if: matrix.platform == 'web'
-        run: |
-          ./gradlew :emarsys-sdk:build -x :composeApp:build
-          ./gradlew :emarsys-sdk:test
-          ./gradlew :emarsys-sdk:jsBrowserTest
+        run: ./make test-web
+
+      - name: Report on Slack (Error)
+        if: failure()
+        uses: megamegax/slack_action@0.2.3
+        with:
+          channel: '${{env.SLACK_CHANNEL}}'
+          message: 'Last push build failed! :man-gesturing-no: :blobcatfearful:'
+          user_name: '${{env.SLACK_USERNAME}}'
+          job_status: 'failure'
+          user_icon: '${{env.SLACK_ICON}}'
+          actions: '[{ "type": "button", "text": "View actions", "url": "https://github.com/emartech/android-emarsys-sdk/actions" },{ "type": "button", "text": "View Firebase", "url": "https://console.firebase.google.com/project/ems-mobile-sdk/testlab/histories/" }]'
+
+      - name: Report on Slack (Success)
+        if: '${{ !failure() }}'
+        uses: megamegax/slack_action@0.2.3
+        with:
+          channel: '${{env.SLACK_CHANNEL}}'
+          message: 'Last push build successful! :man-gesturing-ok: :bananadance:'
+          user_name: '${{env.SLACK_USERNAME}}'
+          job_status: 'success'
+          user_icon: '${{env.SLACK_ICON}}'
+          actions: '[{ "type": "button", "text": "View actions", "url": "https://github.com/emartech/android-emarsys-sdk/actions" },{ "type": "button", "text": "View Firebase", "url": "https://console.firebase.google.com/project/ems-mobile-sdk/testlab/histories/" },{ "type": "button", "text": "Install page", "url": "http://ems-mobileteam-artifacts.s3-website-eu-west-1.amazonaws.com/index-ems.html" }]'

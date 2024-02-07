@@ -1,4 +1,4 @@
-.PHONY: build clean test test-web test-android test-jvm check-env help
+.PHONY: build clean test test-web test-android test-jvm lint check-env help
 .DEFAULT_GOAL := help
 
 ifneq (,$(wildcard .env))
@@ -41,3 +41,6 @@ test-jvm: check-env ## run common tests on jvm
 
 test-android: check-env ## run Android Instrumented tests
 	@./gradlew :emarsys-sdk:connectedAndroidTest -x :composeApp:test
+
+lint: check-env ## run Android Instrumented tests
+	@./gradlew :emarsys-sdk:lint -x :composeApp:lint
