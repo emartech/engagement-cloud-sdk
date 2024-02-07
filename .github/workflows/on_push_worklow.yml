@@ -65,10 +65,10 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Build
-        run: ./make build
+        run: make build
 
       - name: Run lint
-        run: ./make lint
+        run: make lint
 
       - name: Setup Android SDK
         if: matrix.platform == 'android'
@@ -79,11 +79,11 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 33
-          script: ./make test-android
+          script: make test-android
 
       - name: Build and test Android
         if: matrix.platform == 'android'
-        run: ./make test
+        run: make test
 
       - name: Setup Node.js
         if: matrix.platform == 'web'
@@ -97,7 +97,7 @@ jobs:
 
       - name: Build and test Web
         if: matrix.platform == 'web'
-        run: ./make test-web
+        run: make test-web
 
       - name: Report on Slack (Error)
         if: failure()
