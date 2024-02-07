@@ -108,7 +108,7 @@ jobs:
 
       - name: Test JVM
         if: matrix.platform == 'jvm'
-        run: make test
+        run: make test-jvm
 
       - name: Setup Node.js
         if: matrix.platform == 'web'

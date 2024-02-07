@@ -25,7 +25,7 @@ help: ## Show this help
 	@echo
 
 build: check-env ## compile and build all modules for all platforms
-	@./gradlew :emarsys-sdk:build -x :emarsys-sdk:test -x :emarsys-sdk:testDebugUnitTest -x :emarsys-sdk:testReleaseUnitTest -x :emarsys-sdk:jsBrowserTest -x composeApp:build -x :emarsys-sdk:lint
+	@./gradlew :emarsys-sdk:build :emarsys-sdk:javaPreCompileRelease :emarsys-sdk:compileTestDevelopmentExecutableKotlinJs -x :emarsys-sdk:test -x :emarsys-sdk:testDebugUnitTest -x :emarsys-sdk:testReleaseUnitTest -x :emarsys-sdk:jsBrowserTest -x composeApp:build -x :emarsys-sdk:lint
 
 clean: check-env ## clean all build artifacts
 	@./gradlew clean
