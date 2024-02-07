@@ -27,7 +27,7 @@ env:
   SLACK_CHANNEL: mobile-team-ci
   SLACK_ICON: https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Kotlin_Icon.svg/1200px-Kotlin_Icon.svg.png
   SLACK_TITLE: Commit status
-  SLACK_USERNAME: Emarsys SDK - KMP
+  SLACK_USERNAME: Unified Emarsys SDK - KMP
   SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
 
 jobs:
@@ -49,6 +49,8 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v3
+        with:
+          cache-overwrite-existing: true
 
       - name: Gradle Build
         run: make build
