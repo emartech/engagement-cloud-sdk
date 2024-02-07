@@ -55,7 +55,7 @@ jobs:
           gradle-home-cache-cleanup: true
 
       - name: Gradle Build
-        run: make build
+        run: make build-pipeline
   lint:
     needs: build
     runs-on: macos-latest
