@@ -155,7 +155,7 @@ jobs:
           actions: '[{ "type": "button", "text": "View actions", "url": "https://github.com/emartech/kmp-emarsys-sdk/actions" }]'
 
       - name: Report on Slack (Success)
-        if: ${{ !contains(needs.*.result, 'cancelled') && !contains(needs.*.result, 'failure')) }}
+        if: ${{ !contains(needs.*.result, 'cancelled') && !contains(needs.*.result, 'failure') }}
         uses: megamegax/slack_action@0.2.4
         with:
           channel: '${{env.SLACK_CHANNEL}}'
