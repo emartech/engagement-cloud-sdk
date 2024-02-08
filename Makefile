@@ -64,7 +64,9 @@ test-web: check-env ## run common tests on web
 		 	-x :composeApp:jsPackageJson \
 		 	-x :composeApp:jsTestPackageJson \
 		 	-x :composeApp:jsPublicPackageJson \
-		 	-x :composeApp:jsTestPublicPackageJson
+		 	-x :composeApp:jsTestPublicPackageJson \
+		 	-x :kotlinStoreYarnLock \
+ 			-x :kotlinUpgradeYarnLock
 
 test-jvm: check-env ## run common tests on jvm
 	@./gradlew :emarsys-sdk:test -x :composeApp:test
