@@ -7,11 +7,13 @@ jobs:
   auto-merge:
     runs-on: ubuntu-latest
     steps:
+      - run: echo ${{ github.event.client_payload }}
+
       - name: Check CI status and Merge PR
         uses: actions/github-script@v7
         with:
           script: |
-            const prNumber = github.event.client_payload.pr_number;
+            const prNumber = github.event.client_payload.prNumber;
             if (!prNumber) {
               console.log("No PR number found.");
               return;

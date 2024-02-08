@@ -52,7 +52,7 @@ jobs:
         with:
           token: ${{ secrets.AUTO_MERGE_TOKEN }}
           event-type: checks-complete
-          client-payload: '{ "pr_number": "${{ github.event.pull_request.number }}"}'
+          client-payload: '{ "prNumber": "${{ github.event.pull_request.number }}"}'
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -187,4 +187,4 @@ jobs:
         with:
           token: ${{ secrets.AUTO_MERGE_TOKEN }}
           event-type: checks-complete
-          client-payload: '{ "pr_number": "${{ github.event.pull_request.number }}"}'
+          client-payload: '{ "prNumber": "${{ github.event.pull_request.number }}"}'
