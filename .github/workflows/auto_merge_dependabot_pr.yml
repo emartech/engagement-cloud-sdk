@@ -15,17 +15,35 @@ jobs:
         uses: actions/github-script@v5
         with:
           script: |
-            const { data: statusCheck } = await github.rest.checks.listForRef({
+            const prNumber = context.issue.number;
+            if (!prNumber) {
+              console.log("No PR number found.");
+              return;
+            }
+
+            const { data: pullRequest } = await github.rest.pulls.get({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: context.payload.pull_request.head.sha,
+              pull_number: prNumber,
             });
-            const checksOK = statusCheck.check_runs.every(check => check.conclusion === 'success');
-            if (checksOK) {
+
+            const { data: listCheckRuns } = await github.rest.checks.listForRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: pullRequest.head.sha,
+            });
+
+            const allChecksPassed = listCheckRuns.check_runs.every(check => check.conclusion === 'success');
+
+            if (allChecksPassed) {
               await github.rest.pulls.merge({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                pull_number: context.payload.pull_request.number,
+                pull_number: prNumber,
               });
+              console.log(`Merged PR #${prNumber}`);
+            } else {
+              console.log(`Not all checks passed for PR #${prNumber}`);
             }
+
           github-token: ${{ secrets.GITHUB_TOKEN }}
