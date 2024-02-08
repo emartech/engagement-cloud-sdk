@@ -46,13 +46,6 @@ jobs:
           job_status: 'cancelled'
           user_icon: '${{env.SLACK_ICON}}'
           actions: '[{ "type": "button", "text": "View actions", "url": "https://github.com/emartech/kmp-emarsys-sdk/actions" }]'
-      - name: Trigger automerge
-        if: ${{ !contains(needs.*.result, 'cancelled') && !contains(needs.*.result, 'failure') && github.event.pull_request != null && github.actor == 'dependabot[bot]' && github.event.pull_request.merged == false}}
-        uses: peter-evans/repository-dispatch@v3
-        with:
-          token: ${{ secrets.AUTO_MERGE_TOKEN }}
-          event-type: checks-complete
-          client-payload: '{ "prNumber": "${{ github.event.pull_request.number }}"}'
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
