@@ -43,7 +43,7 @@ jobs:
           channel: 'mobile-team-ci'
           message: 'Build started'
           user_name: 'Unified Emarsys SDK'
-          job_status: 'success'
+          job_status: 'cancelled'
           user_icon: '${{env.SLACK_ICON}}'
           actions: '[{ "type": "button", "text": "View actions", "url": "https://github.com/emartech/kmp-emarsys-sdk/actions" }]'
       - uses: actions/checkout@v4
