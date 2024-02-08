@@ -1,8 +1,8 @@
 name: Auto-Merge Dependabot PRs on CI Success
 
 on:
-  check_suite:
-    types: [ completed ]
+  repository_dispatch:
+    types: [checks-complete]
 jobs:
   auto-merge:
     runs-on: ubuntu-latest
