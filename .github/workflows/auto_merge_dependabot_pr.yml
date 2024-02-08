@@ -6,7 +6,6 @@ on:
 jobs:
   auto-merge:
     runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]' && github.event.pull_request.merged == false
     steps:
       - name: Check CI status and Merge PR
         uses: actions/github-script@v7
