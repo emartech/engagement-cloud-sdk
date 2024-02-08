@@ -27,10 +27,7 @@ env:
   DETECT_PROJECT_VERSION_DISTRIBUTION: ${{ secrets.DETECT_PROJECT_VERSION_DISTRIBUTION }}
   BLACKDUCK_ACCESS_TOKEN: ${{ secrets.BLACKDUCK_ACCESS_TOKEN }}
   BLACKDUCK_URL: ${{ secrets.BLACKDUCK_URL }}
-  SLACK_CHANNEL: mobile-team-ci
   SLACK_ICON: https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Kotlin_Icon.svg/1200px-Kotlin_Icon.svg.png
-  SLACK_TITLE: Commit status
-  SLACK_USERNAME: Unified Emarsys SDK - KMP
   SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
   IS_NIGHTLY_BUILD: false
 
@@ -38,6 +35,17 @@ jobs:
   build:
     runs-on: macos-13
     steps:
+      - name: Report Build Successful
+        if: ${{ !contains(needs.*.result, 'cancelled') && !contains(needs.*.result, 'failure') }}
+        uses: megamegax/slack_action@0.3.1
+        with:
+          webhook_url: '${{env.SLACK_WEBHOOK}}'
+          channel: 'mobile-team-ci'
+          message: 'Build started'
+          user_name: 'Unified Emarsys SDK'
+          job_status: 'success'
+          user_icon: '${{env.SLACK_ICON}}'
+          actions: '[{ "type": "button", "text": "View actions", "url": "https://github.com/emartech/kmp-emarsys-sdk/actions" }]'
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -59,6 +67,7 @@ jobs:
 
       - name: Gradle Build
         run: make build-pipeline
+
   lint:
     needs: build
     runs-on: macos-latest
@@ -146,9 +155,9 @@ jobs:
         uses: megamegax/slack_action@0.3.1
         with:
           webhook_url: '${{env.SLACK_WEBHOOK}}'
-          channel: '${{env.SLACK_CHANNEL}}'
+          channel: 'mobile-team-ci'
           message: 'Last push build failed! :man-gesturing-no: :blobcatfearful:'
-          user_name: '${{env.SLACK_USERNAME}}'
+          user_name: 'Unified Emarsys SDK'
           job_status: 'failure'
           user_icon: '${{env.SLACK_ICON}}'
           actions: '[{ "type": "button", "text": "View actions", "url": "https://github.com/emartech/kmp-emarsys-sdk/actions" }]'
@@ -158,9 +167,9 @@ jobs:
         uses: megamegax/slack_action@0.3.1
         with:
           webhook_url: '${{env.SLACK_WEBHOOK}}'
-          channel: '${{env.SLACK_CHANNEL}}'
+          channel: 'mobile-team-ci'
           message: 'Last push build successful! :man-gesturing-ok: :bananadance:'
-          user_name: '${{env.SLACK_USERNAME}}'
+          user_name: 'Unified Emarsys SDK'
           job_status: 'success'
           user_icon: '${{env.SLACK_ICON}}'
           actions: '[{ "type": "button", "text": "View actions", "url": "https://github.com/emartech/kmp-emarsys-sdk/actions" }]'
