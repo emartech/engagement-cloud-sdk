@@ -2,17 +2,18 @@ name: Auto-Merge Dependabot PRs on CI Success
 
 on:
   repository_dispatch:
-    types: [ checks-complete ]
+    types: [checks-complete]
 jobs:
   auto-merge:
     runs-on: ubuntu-latest
     steps:
       - run: echo "PR_NUMBER=${{ toJson(github.event.client_payload.prNumber) }}" >> $GITHUB_ENV
+      - name: Wait for 30 seconds
+        run: sleep 30
       - name: Check CI status and Merge PR
         uses: actions/github-script@v7
         with:
           script: |
-            setTimeout(async function() {
             const prNumber = process.env.PR_NUMBER;
             if (!prNumber) {
               console.log("No PR number found.");
@@ -43,6 +44,5 @@ jobs:
             } else {
               console.log(`Not all checks passed for PR #${prNumber}`);
             }
-        }, 500);
 
           github-token: ${{ secrets.GITHUB_TOKEN }}
