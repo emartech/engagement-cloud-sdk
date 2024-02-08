@@ -128,7 +128,7 @@ jobs:
 
       - name: Setup Chrome
         if: matrix.platform == 'web'
-        uses: browser-actions/setup-chrome@v1
+        run: brew install --cask google-chrome
 
       - name: Test Web
         if: matrix.platform == 'web'
