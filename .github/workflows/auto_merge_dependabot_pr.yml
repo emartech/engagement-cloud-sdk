@@ -43,6 +43,6 @@ jobs:
             } else {
               console.log(`Not all checks passed for PR #${prNumber}`);
             }
-          }, 500);
+        }, 500);
 
           github-token: ${{ secrets.GITHUB_TOKEN }}
