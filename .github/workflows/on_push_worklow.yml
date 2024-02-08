@@ -30,6 +30,7 @@ env:
   SLACK_TITLE: Commit status
   SLACK_USERNAME: Unified Emarsys SDK - KMP
   SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+  IS_NIGHTLY_BUILD: false
 
 jobs:
   build:
