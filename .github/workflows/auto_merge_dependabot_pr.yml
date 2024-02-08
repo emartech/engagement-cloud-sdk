@@ -9,7 +9,7 @@ jobs:
     steps:
       - run: echo "PR_NUMBER=${{ toJson(github.event.client_payload.prNumber) }}" >> $GITHUB_ENV
       - name: Wait for 30 seconds
-        run: sleep 30
+        run: sleep 60
       - name: Check CI status and Merge PR
         uses: actions/github-script@v7
         with:
