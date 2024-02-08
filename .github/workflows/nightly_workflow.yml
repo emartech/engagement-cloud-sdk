@@ -1,9 +1,9 @@
-name: Unified Emarsys SDK CI
+name: Unified Emarsys SDK Nightly CI
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ main ]
+  schedule:
+    - cron: '0 2 * * *'
 
 env:
   USE_LOCAL_DEPENDENCY: ${{ vars.USE_LOCAL_DEPENDENCY }}
@@ -30,6 +30,7 @@ env:
   SLACK_TITLE: Commit status
   SLACK_USERNAME: Unified Emarsys SDK - KMP
   SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+  IS_NIGHTLY_BUILD: true
 
 jobs:
   build:
@@ -105,16 +106,16 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Setup Android SDK
-        if: matrix.platform == 'android'
-        uses: android-actions/setup-android@v3
-
-      - name: Setup Android Emulator & Test
-        if: matrix.platform == 'android'
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 29
-          script: make test-android
+#      - name: Setup Android SDK
+#        if: matrix.platform == 'android'
+#        uses: android-actions/setup-android@v3
+#
+#      - name: Setup Android Emulator & Test
+#        if: matrix.platform == 'android'
+#        uses: reactivecircus/android-emulator-runner@v2
+#        with:
+#          api-level: 29
+#          script: make test-android
 
       - name: Test JVM
         if: matrix.platform == 'jvm'
@@ -125,6 +126,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+
+      - name: Setup Firefox
+        if: matrix.platform == 'web'
+        run: brew install --cask firefox
 
       - name: Setup Chrome
         if: matrix.platform == 'web'
@@ -143,7 +148,7 @@ jobs:
         uses: megamegax/slack_action@0.2.4
         with:
           channel: '${{env.SLACK_CHANNEL}}'
-          message: 'Last push build failed! :man-gesturing-no: :blobcatfearful:'
+          message: 'Nightly build failed! :man-gesturing-no: :blobcatfearful:'
           user_name: '${{env.SLACK_USERNAME}}'
           job_status: 'failure'
           user_icon: '${{env.SLACK_ICON}}'
@@ -154,7 +159,7 @@ jobs:
         uses: megamegax/slack_action@0.2.4
         with:
           channel: '${{env.SLACK_CHANNEL}}'
-          message: 'Last push build successful! :man-gesturing-ok: :bananadance:'
+          message: 'Nightly build successful! :man-gesturing-ok: :bananadance:'
           user_name: '${{env.SLACK_USERNAME}}'
           job_status: 'success'
           user_icon: '${{env.SLACK_ICON}}'

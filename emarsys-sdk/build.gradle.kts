@@ -27,7 +27,13 @@ kotlin {
             }
             testTask {
                 useKarma {
-                    useChromeHeadless()
+                    if (System.getenv()["IS_NIGHTLY_BUILD"].toBoolean()) {
+                        useSafari()
+                        useFirefox()
+                        useChromeHeadless()
+                    } else {
+                        useChromeHeadless()
+                    }
                 }
             }
             binaries.executable()
