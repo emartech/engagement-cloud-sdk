@@ -2,7 +2,7 @@ name: Auto-Merge Dependabot PRs on CI Success
 
 on:
   repository_dispatch:
-    types: [checks-complete]
+    types: [ checks-complete ]
 jobs:
   auto-merge:
     runs-on: ubuntu-latest
@@ -12,6 +12,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
+            setTimeout(async function() {
             const prNumber = process.env.PR_NUMBER;
             if (!prNumber) {
               console.log("No PR number found.");
@@ -42,5 +43,6 @@ jobs:
             } else {
               console.log(`Not all checks passed for PR #${prNumber}`);
             }
+          }, 500);
 
           github-token: ${{ secrets.GITHUB_TOKEN }}
