@@ -1,5 +1,5 @@
 import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
-import com.github.gmazzo.gradle.plugins.BuildConfigTask
+import com.github.gmazzo.buildconfig.BuildConfigTask
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
