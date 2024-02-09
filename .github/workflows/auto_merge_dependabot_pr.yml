@@ -8,8 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo "PR_NUMBER=${{ toJson(github.event.client_payload.prNumber) }}" >> $GITHUB_ENV
-      - name: Wait for 30 seconds
-        run: sleep 60
+      - name: Wait for 10 seconds
+        run: sleep 10
       - name: Check CI status and Merge PR
         uses: actions/github-script@v7
         with:
@@ -25,15 +25,16 @@ jobs:
               repo: context.repo.repo,
               pull_number: prNumber,
             });
-            console.log("DEBUG: ", pullRequest);
+            if(pullRequest.merged) {
+              console.log(`PR #${prNumber} is already merged.`);
+              return;
+            }
             const { data: listCheckRuns } = await github.rest.checks.listForRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
               ref: pullRequest.head.sha,
             });
-            console.log("DEBUG: ", listCheckRuns);
             const allChecksPassed = listCheckRuns.check_runs.every(check => check.conclusion === 'success' || check.name === 'Inclusive Language');
-            console.log("DEBUG: ", allChecksPassed);
 
             if (allChecksPassed) {
               await github.rest.pulls.merge({
