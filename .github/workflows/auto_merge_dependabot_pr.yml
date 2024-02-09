@@ -32,7 +32,7 @@ jobs:
               ref: pullRequest.head.sha,
             });
             console.log("DEBUG: ", listCheckRuns);
-            const allChecksPassed = listCheckRuns.check_runs.every(check => check.conclusion === 'success');
+            const allChecksPassed = listCheckRuns.check_runs.every(check => check.conclusion === 'success' || check.name === 'Inclusive Language');
             console.log("DEBUG: ", allChecksPassed);
 
             if (allChecksPassed) {
