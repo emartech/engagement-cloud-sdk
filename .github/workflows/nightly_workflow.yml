@@ -105,16 +105,41 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      #      - name: Setup Android SDK
-      #        if: matrix.platform == 'android'
-      #        uses: android-actions/setup-android@v3
-      #
-      #      - name: Setup Android Emulator & Test
-      #        if: matrix.platform == 'android'
-      #        uses: reactivecircus/android-emulator-runner@v2
-      #        with:
-      #          api-level: 29
-      #          script: make test-android
+      - name: Add Google-Services.json from secret
+        if: matrix.platform == 'android'
+        uses: davidSchuppa/base64Secret-toFile-action@v1
+        with:
+          destination-path: composeApp/src/
+          filename: google-services.json
+          secret: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
+
+      - name: Set up Firebase Service Account
+        if: matrix.platform == 'android'
+        uses: davidSchuppa/base64Secret-toFile-action@v1
+        with:
+          destination-path: ./
+          filename: firebase_test_lab_service_account.json
+          secret: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 }}
+
+      - name: Create test apks
+        if: matrix.platform == 'android'
+        run: make create-apks
+
+      - name: Copy compose app apk
+        if: matrix.platform == 'android'
+        run: cp ./composeApp/build/outputs/apk/androidTest/debug/composeApp-debug-androidTest.apk composeApp.apk
+
+      - name: Copy test apk
+        if: matrix.platform == 'android'
+        run: cp ./emarsys-sdk/build/outputs/apk/androidTest/debug/emarsys-sdk-debug-androidTest.apk androidTests.apk
+
+      - name: Run tests
+        if: matrix.platform == 'android'
+        uses: asadmansr/Firebase-Test-Lab-Action@v1.0
+        with:
+          arg-spec: 'androidTestDevices.yml:emarsys-sdk'
+        env:
+          SERVICE_ACCOUNT: ./firebase_test_lab_service_account.json
 
       - name: Test JVM
         if: matrix.platform == 'jvm'

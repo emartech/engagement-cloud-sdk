@@ -11,6 +11,10 @@ android {
     namespace = "com.emarsys.fcm"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
+    defaultConfig {
+        minSdk = libs.versions.android.minSdk.get().toInt()
+    }
+
     kotlinOptions {
         jvmTarget = "1.8"
     }

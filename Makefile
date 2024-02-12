@@ -55,6 +55,9 @@ build-pipeline: check-env ## compile and build all modules for all platforms
 clean: check-env ## clean all build artifacts
 	@./gradlew clean
 
+create-apks: check-env ## create apks for testing
+	@./gradlew assembleAndroidTest -x :composeApp:test
+
 test: check-env ## run common tests on all platforms (jvm,web)
 	@./gradlew :emarsys-sdk:allTests -x :composeApp:test
 
