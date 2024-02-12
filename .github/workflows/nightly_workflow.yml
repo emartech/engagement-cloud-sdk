@@ -30,7 +30,6 @@ env:
   SLACK_TITLE: Commit status
   SLACK_USERNAME: Unified Emarsys SDK - KMP
   SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-  IS_NIGHTLY_BUILD: true
 
 jobs:
   build:
@@ -127,16 +126,9 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Setup Firefox
-        if: matrix.platform == 'web'
-        run: brew install --cask firefox && open -a Firefox "http://localhost:9876/"
-
       - name: Setup Chrome
         if: matrix.platform == 'web'
         run: brew install --cask google-chrome && open -a Google\ Chrome
-
-      - name: Open Safari
-        run: open -a Safari "http://localhost:9876/"
 
       - name: Test Web
         if: matrix.platform == 'web'

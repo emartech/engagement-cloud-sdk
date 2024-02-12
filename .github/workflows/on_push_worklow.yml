@@ -29,7 +29,6 @@ env:
   BLACKDUCK_URL: ${{ secrets.BLACKDUCK_URL }}
   SLACK_ICON: https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Kotlin_Icon.svg/1200px-Kotlin_Icon.svg.png
   SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-  IS_NIGHTLY_BUILD: false
 
 jobs:
   build:
