@@ -129,14 +129,14 @@ jobs:
 
       - name: Setup Firefox
         if: matrix.platform == 'web'
-        run: brew install --cask firefox && open -a Firefox
+        run: brew install --cask firefox && open -a Firefox "http://localhost:9876/"
 
       - name: Setup Chrome
         if: matrix.platform == 'web'
         run: brew install --cask google-chrome && open -a Google\ Chrome
 
       - name: Open Safari
-        run: open -a Safari
+        run: open -a Safari "http://localhost:9876/"
 
       - name: Test Web
         if: matrix.platform == 'web'
