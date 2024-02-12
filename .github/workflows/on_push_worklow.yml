@@ -146,7 +146,7 @@ jobs:
         run: make test-web
   reporting:
     if: always()
-    needs: [ test, lint ]
+    needs: [ build, test, lint ]
     runs-on: ubuntu-latest
     steps:
       - name: Report on Slack (Error)
