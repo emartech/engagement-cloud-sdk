@@ -109,7 +109,7 @@ jobs:
 
       - name: Add Google-Services.json from secret
         if: matrix.platform == 'android'
-        uses: davidSchuppa/base64Secret-toFile-action@v1
+        uses: davidSchuppa/base64Secret-toFile-action@v3
         with:
           destination-path: composeApp/src/
           filename: google-services.json
@@ -117,7 +117,7 @@ jobs:
 
       - name: Set up Firebase Service Account
         if: matrix.platform == 'android'
-        uses: davidSchuppa/base64Secret-toFile-action@v1
+        uses: davidSchuppa/base64Secret-toFile-action@v3
         with:
           destination-path: ./
           filename: firebase_test_lab_service_account.json
