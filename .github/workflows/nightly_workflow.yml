@@ -13,6 +13,7 @@ env:
   ANDROID_RELEASE_KEY_ALIAS: ${{ secrets.ANDROID_RELEASE_KEY_ALIAS }}
   ANDROID_RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_RELEASE_STORE_PASSWORD }}
   ANDROID_RELEASE_STORE_FILE_BASE64: ${{ secrets.ANDROID_RELEASE_STORE_FILE_BASE64 }}
+  FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
   FIREBASE_SERVICE_ACCOUNT_BASE64: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 }}
   GOOGLE_OAUTH_SERVER_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_SERVER_CLIENT_ID }}
   GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
@@ -113,7 +114,7 @@ jobs:
         with:
           destination-path: composeApp/src/
           filename: google-services.json
-          secret: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
+          secret: ${{ env.GOOGLE_SERVICES_JSON_BASE64 }}
 
       - name: Set up Firebase Service Account
         if: matrix.platform == 'android'
@@ -121,27 +122,23 @@ jobs:
         with:
           destination-path: ./
           filename: firebase_test_lab_service_account.json
-          secret: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 }}
+          secret: ${{ env.FIREBASE_SERVICE_ACCOUNT_BASE64 }}
 
-      - name: Create test apks
+      - name: Authenticate to Google Cloud
         if: matrix.platform == 'android'
-        run: make create-apks
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ./firebase_test_lab_service_account.json
 
-      - name: Copy compose app apk
+      - name: Set up Cloud SDK
         if: matrix.platform == 'android'
-        run: cp ./composeApp/build/outputs/apk/androidTest/debug/composeApp-debug-androidTest.apk composeApp.apk
-
-      - name: Copy test apk
-        if: matrix.platform == 'android'
-        run: cp ./emarsys-sdk/build/outputs/apk/androidTest/debug/emarsys-sdk-debug-androidTest.apk androidTests.apk
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.FIREBASE_PROJECT_ID }}
 
       - name: Run tests
         if: matrix.platform == 'android'
-        uses: asadmansr/Firebase-Test-Lab-Action@v1.0
-        with:
-          arg-spec: 'androidTestDevices.yml:emarsys-sdk'
-        env:
-          SERVICE_ACCOUNT: ./firebase_test_lab_service_account.json
+        run: make test-android-firebase
 
       - name: Test JVM
         if: matrix.platform == 'jvm'

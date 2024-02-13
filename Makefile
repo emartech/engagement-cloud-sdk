@@ -77,5 +77,16 @@ test-jvm: check-env ## run common tests on jvm
 test-android: check-env ## run Android Instrumented tests
 	@./gradlew :emarsys-sdk:connectedAndroidTest -x :composeApp:test
 
+test-android-firebase: check-env ## run Android Instrumented tests on Firebase Test Lab
+	@gcloud firebase test android run \
+       --type instrumentation \
+       --app ./composeApp/build/outputs/apk/androidTest/debug/composeApp-debug-androidTest.apk \
+       --test ./emarsys-sdk/build/outputs/apk/androidTest/debug/emarsys-sdk-debug-androidTest.apk \
+       --device model=f2q,version=30,locale=en,orientation=portrait  \
+       --device model=a51,version=31,locale=en,orientation=portrait \
+       --device model=bluejay,version=32,locale=en,orientation=portrait \
+       --device model=b4q,version=33,locale=en,orientation=portrait \
+       --client-details matrixLabel="Unified SDK"
+
 lint: check-env ## run Android Instrumented tests
 	@./gradlew :emarsys-sdk:lint -x :composeApp:lint
