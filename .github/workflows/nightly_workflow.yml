@@ -126,7 +126,7 @@ jobs:
 
       - name: Authenticate to Google Cloud
         if: matrix.platform == 'android'
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v2.1.1
         with:
           credentials_json: ./firebase_test_lab_service_account.json
 
