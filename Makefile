@@ -1,4 +1,4 @@
-.PHONY: build-pipeline clean test test-web test-android test-jvm lint check-env help
+.PHONY: build-pipeline check-env clean create-apks help lint test test-web test-android test-android-firebase test-jvm
 .DEFAULT_GOAL := help
 
 ifneq (,$(wildcard .env))
@@ -36,12 +36,12 @@ build-pipeline: check-env ## compile and build all modules for all platforms
 			 	-x :emarsys-sdk:compileKotlinJs \
 			 	-x :composeApp:build \
 			 	-x :composeApp:jsPackageJson \
-			 	-x :emarsys-sdk:jsTestPackageJson \
-			 	-x :emarsys-sdk:jsPublicPackageJson \
-			 	-x :emarsys-sdk:jsTestPublicPackageJson \
 			 	-x :composeApp:jsTestPackageJson \
 			 	-x :composeApp:jsPublicPackageJson \
 			 	-x :composeApp:jsTestPublicPackageJson \
+			 	-x :emarsys-sdk:jsTestPackageJson \
+			 	-x :emarsys-sdk:jsPublicPackageJson \
+			 	-x :emarsys-sdk:jsTestPublicPackageJson \
 			 	-x :emarsys-sdk:jsPackageJson \
 			 	-x :packageJsonUmbrella \
 			 	-x :rootPackageJson \
