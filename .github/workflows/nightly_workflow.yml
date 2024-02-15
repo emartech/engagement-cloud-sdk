@@ -14,7 +14,7 @@ env:
   ANDROID_RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_RELEASE_STORE_PASSWORD }}
   ANDROID_RELEASE_STORE_FILE_BASE64: ${{ secrets.ANDROID_RELEASE_STORE_FILE_BASE64 }}
   FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
-  FIREBASE_SERVICE_ACCOUNT_BASE64: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 }}
+  FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
   GOOGLE_OAUTH_SERVER_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_SERVER_CLIENT_ID }}
   GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
   OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
@@ -116,19 +116,11 @@ jobs:
           filename: google-services.json
           secret: ${{ env.GOOGLE_SERVICES_JSON_BASE64 }}
 
-      - name: Set up Firebase Service Account
-        if: matrix.platform == 'android'
-        uses: davidSchuppa/base64Secret-toFile-action@v3
-        with:
-          destination-path: ./
-          filename: firebase_test_lab_service_account.json
-          secret: ${{ env.FIREBASE_SERVICE_ACCOUNT_BASE64 }}
-
       - name: Authenticate to Google Cloud
         if: matrix.platform == 'android'
         uses: google-github-actions/auth@v2.1.1
         with:
-          credentials_json: ./firebase_test_lab_service_account.json
+          credentials_json: ${{ env.FIREBASE_SERVICE_ACCOUNT_JSON }}
 
       - name: Set up Cloud SDK
         if: matrix.platform == 'android'
