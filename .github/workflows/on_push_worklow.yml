@@ -5,7 +5,8 @@ on:
     types: [ labeled, synchronize, opened, reopened, ready_for_review ]
   workflow_dispatch:
   push:
-    branches: [ main ]
+    branches-ignore:
+      - 'dependabot/**'
 
 env:
   USE_LOCAL_DEPENDENCY: ${{ vars.USE_LOCAL_DEPENDENCY }}

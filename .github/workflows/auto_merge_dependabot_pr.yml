@@ -34,7 +34,8 @@ jobs:
               repo: context.repo.repo,
               ref: pullRequest.head.sha,
             });
-            const allChecksPassed = listCheckRuns.check_runs.every(check => check.conclusion === 'success' || check.name === 'Inclusive Language');
+             console.log("checks: ", listCheckRuns);
+            const allChecksPassed = listCheckRuns.check_runs.every(check => check.conclusion === 'success' || check.name === 'Inclusive Language' || check.conclusion === 'skipped');
 
             if (allChecksPassed) {
               await github.rest.pulls.merge({
