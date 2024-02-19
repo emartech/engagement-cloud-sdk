@@ -31,7 +31,7 @@ uuid = "0.8.2"
 fcm = "23.4.0"
 agconnect_core = "1.9.1.300"
 hms_push = "6.11.0.300"
-googleServices = "4.4.0"
+googleServices = "4.4.1"
 kotlinWrappers = "1.0.0-pre.697"
 cryptography = "0.2.0"
 
