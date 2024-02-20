@@ -2,7 +2,7 @@ name: Unified Emarsys SDK CI
 
 on:
   pull_request:
-    types: [ labeled, synchronize, opened, reopened, ready_for_review ]
+    types: [ opened, reopened, synchronize ]
   workflow_dispatch:
   push:
     branches-ignore:
