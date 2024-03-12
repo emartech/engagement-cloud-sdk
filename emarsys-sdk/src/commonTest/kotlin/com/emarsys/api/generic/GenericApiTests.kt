@@ -42,7 +42,7 @@ class GenericApiTests: TestsWithMocks() {
         loggingContact = LoggingContact(FakeSdkLogger())
         contactGatherer = ContactGatherer(contactContext)
         contactInternal = ContactInternal(mockContactClient, contactContext)
-        sdkContext = SdkContext(StandardTestDispatcher(), DefaultUrls("", "", "", "", "", "", ""), LogLevel.error, mutableSetOf())
+        sdkContext = SdkContext(StandardTestDispatcher(), DefaultUrls("", "", "", "", "", "", ""), LogLevel.Error, mutableSetOf())
         genericApi = GenericApi(loggingContact, contactGatherer, contactInternal, sdkContext)
     }
 

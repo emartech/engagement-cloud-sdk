@@ -49,7 +49,7 @@ class EventTrackerTests : TestsWithMocks() {
         sdkContext = SdkContext(
             StandardTestDispatcher(),
             DefaultUrls("", "", "", "", "", "", ""),
-            LogLevel.error,
+            LogLevel.Error,
             mutableSetOf()
         )
 

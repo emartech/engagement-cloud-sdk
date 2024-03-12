@@ -24,7 +24,7 @@ class RemoteConfigHandlerTests : TestsWithMocks() {
     @Mock
     lateinit var mockDeviceInfoCollector: DeviceInfoCollectorApi
 
-    private val sdkContext = SdkContext(StandardTestDispatcher(), DefaultUrls("", "", "", "", "", "", ""), LogLevel.debug, mutableSetOf())
+    private val sdkContext = SdkContext(StandardTestDispatcher(), DefaultUrls("", "", "", "", "", "", ""), LogLevel.Debug, mutableSetOf())
 
     @Mock
     lateinit var mockRandomProvider: Provider<Double>
@@ -46,8 +46,8 @@ class RemoteConfigHandlerTests : TestsWithMocks() {
         val config = RemoteConfigResponse(
             ServiceUrls(
                 clientService = clientServiceUrl
-            ), LogLevel.debug,
-            LuckyLogger(LogLevel.error, 1.0),
+            ), LogLevel.Debug,
+            LuckyLogger(LogLevel.Error, 1.0),
             RemoteConfigFeatures(mobileEngage = true),
             overrides = mapOf(
                 hardwareId to RemoteConfig(
@@ -67,7 +67,7 @@ class RemoteConfigHandlerTests : TestsWithMocks() {
 
         sdkContext.defaultUrls.clientServiceBaseUrl shouldBe clientServiceUrl
         sdkContext.defaultUrls.predictBaseUrl shouldBe predictServiceUrl
-        sdkContext.remoteLogLevel shouldBe LogLevel.error
+        sdkContext.remoteLogLevel shouldBe LogLevel.Error
         sdkContext.features shouldBe listOf(Features.MOBILE_ENGAGE)
     }
 

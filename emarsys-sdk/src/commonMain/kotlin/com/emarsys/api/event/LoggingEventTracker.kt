@@ -14,12 +14,12 @@ class LoggingEventTracker(private val logger: Logger) : EventTrackerInstance {
                 "event" to event,
             )
         )
-        logger.log(entry, LogLevel.debug)
+        logger.log(entry, LogLevel.Debug)
         return SdkResult.Failure(MethodNotAllowedException(entry))
     }
 
     override suspend fun activate() {
         val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)
-        logger.log(entry, LogLevel.debug)
+        logger.log(entry, LogLevel.Debug)
     }
 }

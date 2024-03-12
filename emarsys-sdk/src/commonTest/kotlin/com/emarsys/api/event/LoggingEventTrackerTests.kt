@@ -38,7 +38,7 @@ class LoggingEventTrackerTests {
         loggingInstance.trackEvent(event)
 
         fakeLogger.funCalls.first().first.topic shouldBe "log_method_not_allowed"
-        fakeLogger.funCalls.first().second shouldBe LogLevel.debug
+        fakeLogger.funCalls.first().second shouldBe LogLevel.Debug
     }
 
     @Test
@@ -46,7 +46,7 @@ class LoggingEventTrackerTests {
         loggingInstance.activate()
 
         fakeLogger.funCalls.first().first.topic shouldBe "log_method_not_allowed"
-        fakeLogger.funCalls.first().second shouldBe LogLevel.debug
+        fakeLogger.funCalls.first().second shouldBe LogLevel.Debug
     }
 
 }

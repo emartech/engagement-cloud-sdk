@@ -163,10 +163,7 @@ class DependencyContainer : DependencyContainerApi {
 
 
     private val crypto: CryptoApi by lazy {
-        val aesGcm: AES.GCM = CryptographyProvider.Default.get(AES.GCM)
-        val hasher: Hasher = CryptographyProvider.Default.get(SHA512).hasher()
-
-        Crypto(aesGcm, hasher, PUBLIC_KEY)
+        Crypto(PUBLIC_KEY)
     }
 
     private val timestampProvider: Provider<Instant> by lazy {

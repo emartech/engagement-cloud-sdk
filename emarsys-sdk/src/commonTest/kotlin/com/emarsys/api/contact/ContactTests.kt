@@ -46,7 +46,7 @@ class ContactTests : TestsWithMocks() {
 
     @BeforeTest
     fun setup() = runTest {
-        sdkContext = SdkContext(StandardTestDispatcher(), DefaultUrls("", "", "", "", "", "", ""), LogLevel.error, mutableSetOf())
+        sdkContext = SdkContext(StandardTestDispatcher(), DefaultUrls("", "", "", "", "", "", ""), LogLevel.Error, mutableSetOf())
 
         everySuspending { mockLoggingContact.activate() } returns Unit
         everySuspending { mockGathererContact.activate() } returns Unit

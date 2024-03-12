@@ -23,7 +23,7 @@ class SetupOrganizerTests : TestsWithMocks() {
     private lateinit var sdkContext: SdkContextApi
 
     private val setupOrganizer: SetupOrganizerApi by withMocks {
-        sdkContext = SdkContext(StandardTestDispatcher(), DefaultUrls("", "", "", "", "", "", ""), LogLevel.error, mutableSetOf())
+        sdkContext = SdkContext(StandardTestDispatcher(), DefaultUrls("", "", "", "", "", "", ""), LogLevel.Error, mutableSetOf())
         SetupOrganizer(mockStateMachine, sdkContext)
     }
 

@@ -55,7 +55,7 @@ class RemoteConfigClientTests: TestsWithMocks() {
 
         val result = remoteConfigClient.fetchRemoteConfig()
 
-        result shouldBe RemoteConfigResponse(logLevel = LogLevel.error)
+        result shouldBe RemoteConfigResponse(logLevel = LogLevel.Error)
     }
 
     @Test

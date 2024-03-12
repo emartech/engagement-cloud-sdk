@@ -5,9 +5,7 @@ import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -43,7 +41,7 @@ class LoggingPushTests {
         loggingPush.registerPushToken(PUSH_TOKEN)
 
         fakeLogger.funCalls.first().first.topic shouldBe "log_method_not_allowed"
-        fakeLogger.funCalls.first().second shouldBe LogLevel.debug
+        fakeLogger.funCalls.first().second shouldBe LogLevel.Debug
     }
 
     @Test
@@ -51,7 +49,7 @@ class LoggingPushTests {
         loggingPush.clearPushToken()
 
         fakeLogger.funCalls.first().first.topic shouldBe "log_method_not_allowed"
-        fakeLogger.funCalls.first().second shouldBe LogLevel.debug
+        fakeLogger.funCalls.first().second shouldBe LogLevel.Debug
     }
 
     @Test
@@ -59,7 +57,7 @@ class LoggingPushTests {
         val result = loggingPush.pushToken
 
         fakeLogger.funCalls.first().first.topic shouldBe "log_method_not_allowed"
-        fakeLogger.funCalls.first().second shouldBe LogLevel.debug
+        fakeLogger.funCalls.first().second shouldBe LogLevel.Debug
 
         result shouldBe null
     }
@@ -69,7 +67,7 @@ class LoggingPushTests {
         loggingPush.activate()
 
         fakeLogger.funCalls.first().first.topic shouldBe "log_method_not_allowed"
-        fakeLogger.funCalls.first().second shouldBe LogLevel.debug
+        fakeLogger.funCalls.first().second shouldBe LogLevel.Debug
     }
 
 }

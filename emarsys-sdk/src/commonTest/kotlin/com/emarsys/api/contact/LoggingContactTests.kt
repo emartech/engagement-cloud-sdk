@@ -39,7 +39,7 @@ class LoggingContactTests {
         loggingContact.linkContact(contactFieldId, contactFieldValue)
 
         fakeLogger.funCalls.first().first.topic shouldBe "log_method_not_allowed"
-        fakeLogger.funCalls.first().second shouldBe LogLevel.debug
+        fakeLogger.funCalls.first().second shouldBe LogLevel.Debug
     }
 
     @Test
@@ -47,7 +47,7 @@ class LoggingContactTests {
         loggingContact.linkAuthenticatedContact(contactFieldId, openIdToken)
 
         fakeLogger.funCalls.first().first.topic shouldBe "log_method_not_allowed"
-        fakeLogger.funCalls.first().second shouldBe LogLevel.debug
+        fakeLogger.funCalls.first().second shouldBe LogLevel.Debug
     }
 
     @Test
@@ -55,7 +55,7 @@ class LoggingContactTests {
         loggingContact.linkAuthenticatedContact(contactFieldId, openIdToken)
 
         fakeLogger.funCalls.first().first.topic shouldBe "log_method_not_allowed"
-        fakeLogger.funCalls.first().second shouldBe LogLevel.debug
+        fakeLogger.funCalls.first().second shouldBe LogLevel.Debug
     }
 
     @Test
@@ -63,7 +63,7 @@ class LoggingContactTests {
         loggingContact.linkAuthenticatedContact(contactFieldId, openIdToken)
 
         fakeLogger.funCalls.first().first.topic shouldBe "log_method_not_allowed"
-        fakeLogger.funCalls.first().second shouldBe LogLevel.debug
+        fakeLogger.funCalls.first().second shouldBe LogLevel.Debug
     }
 
 }

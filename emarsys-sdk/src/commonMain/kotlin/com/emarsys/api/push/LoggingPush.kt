@@ -6,7 +6,6 @@ import com.emarsys.core.exceptions.MethodNotAllowedException
 import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 class LoggingPush(
@@ -19,7 +18,7 @@ class LoggingPush(
                 "pushToken" to pushToken,
             )
         )
-        logger.log(entry, LogLevel.debug)
+        logger.log(entry, LogLevel.Debug)
         return SdkResult.Failure(MethodNotAllowedException(entry))
     }
 
@@ -27,20 +26,20 @@ class LoggingPush(
         val entry = LogEntry.createMethodNotAllowed(
             this, this::clearPushToken.name
         )
-        logger.log(entry, LogLevel.debug)
+        logger.log(entry, LogLevel.Debug)
         return SdkResult.Failure(MethodNotAllowedException(entry))
     }
 
     override val pushToken: String?
         get() {
             val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)
-            logger.log(entry, LogLevel.debug)
+            logger.log(entry, LogLevel.Debug)
             return null
         }
 
 
     override suspend fun activate() {
         val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)
-        logger.log(entry, LogLevel.debug)
+        logger.log(entry, LogLevel.Debug)
     }
 }
