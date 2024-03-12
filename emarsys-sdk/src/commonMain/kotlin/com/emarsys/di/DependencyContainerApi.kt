@@ -10,6 +10,7 @@ import com.emarsys.api.oneventaction.OnEventActionApi
 import com.emarsys.api.predict.PredictApi
 import com.emarsys.api.push.PushApi
 import com.emarsys.core.providers.Provider
+import com.emarsys.remoteConfig.RemoteConfigHandlerApi
 import com.emarsys.setup.SetupOrganizerApi
 
 interface DependencyContainerApi {
@@ -34,5 +35,6 @@ interface DependencyContainerApi {
     val uuidProvider: Provider<String>
 
     val setupOrganizerApi: SetupOrganizerApi
-
+    
+    val remoteConfigHandler: RemoteConfigHandlerApi
 }

@@ -25,7 +25,7 @@ class AndroidPlatformInfoCollector(
     override fun applicationVersion(): String {
         return try {
             context.packageManager.getPackageInfo(context.packageName, 0).versionName
-        } catch (e: PackageManager.NameNotFoundException) {
+        } catch (e: Exception) {
             e.printStackTrace()
             return UNKNOWN_VERSION_NAME
         }

@@ -57,16 +57,16 @@ kotlin {
                 implementation(libs.kotest.assertions.core)
             }
         }
-       val androidMain by getting {
-           dependencies {
-               implementation(libs.kotlinx.coroutines.android)
-               implementation(libs.ktor.client.android)
-               implementation(libs.androidx.core.ktx)
-               implementation(libs.cryptography.provider.jdk)
-               implementation (libs.startup.runtime)
+        val androidMain by getting {
+            dependencies {
+                implementation(libs.kotlinx.coroutines.android)
+                implementation(libs.ktor.client.android)
+                implementation(libs.androidx.core.ktx)
+                implementation(libs.cryptography.provider.jdk)
+                implementation(libs.startup.runtime)
+            }
+        }
 
-           }
-       }
         val androidUnitTest by getting {
             dependencies {
                 implementation(kotlin("test"))
@@ -80,6 +80,7 @@ kotlin {
                 implementation(libs.androidx.runner)
                 implementation(libs.androidx.test.junit)
                 implementation(libs.kotest.assertions.core)
+                implementation(libs.kotlinx.coroutines.test)
             }
         }
 

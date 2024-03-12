@@ -86,10 +86,7 @@ import com.emarsys.setup.states.RegisterClientState
 import com.emarsys.setup.states.RegisterPushTokenState
 import com.emarsys.core.url.UrlFactory
 import com.emarsys.core.url.UrlFactoryApi
-import dev.whyoleg.cryptography.CryptographyProvider
-import dev.whyoleg.cryptography.algorithms.digest.SHA512
-import dev.whyoleg.cryptography.algorithms.symmetric.AES
-import dev.whyoleg.cryptography.operations.hash.Hasher
+import com.emarsys.remoteConfig.RemoteConfigHandlerApi
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -113,6 +110,7 @@ class DependencyContainer : DependencyContainerApi {
 
     private val json: Json by lazy {
         Json {
+            ignoreUnknownKeys = true
             encodeDefaults = true
         }
     }
@@ -152,7 +150,7 @@ class DependencyContainer : DependencyContainerApi {
     }
 
     val sdkContext: SdkContext by lazy {
-        SdkContext(sdkDispatcher, defaultUrls, LogLevel.error, mutableSetOf())
+        SdkContext(sdkDispatcher, defaultUrls, LogLevel.Error, mutableSetOf())
     }
 
     private val sessionContext: SessionContext by lazy {
@@ -278,7 +276,14 @@ class DependencyContainer : DependencyContainerApi {
         }
         GenericNetworkClient(httpClient)
     }
-
+    override val remoteConfigHandler: RemoteConfigHandlerApi by lazy {
+        RemoteConfigHandler(
+            RemoteConfigClient(genericNetworkClient, urlFactory, crypto, json),
+            deviceInfoCollector,
+            sdkContext,
+            RandomProvider()
+        )
+    }
     override val setupOrganizerApi: SetupOrganizerApi by lazy {
         val collectDeviceInfoState = CollectDeviceInfoState(deviceInfoCollector, sessionContext)
         val registerClientState = RegisterClientState(deviceClient)
@@ -286,12 +291,7 @@ class DependencyContainer : DependencyContainerApi {
         val platformInitState =
             dependencyCreator.createPlatformInitState(pushInternal, sdkDispatcher)
         val applyRemoteConfigState = ApplyRemoteConfigState(
-            RemoteConfigHandler(
-                RemoteConfigClient(genericNetworkClient, urlFactory, crypto, json),
-                deviceInfoCollector,
-                sdkContext,
-                RandomProvider()
-            )
+            remoteConfigHandler
         )
         val linkAnonymousContactState = LinkAnonymousContactState(contactClient, sessionContext)
         val appStartState = AppStartState(eventClient, timestampProvider)
