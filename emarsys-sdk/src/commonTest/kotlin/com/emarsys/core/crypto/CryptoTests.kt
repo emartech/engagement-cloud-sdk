@@ -1,9 +1,6 @@
 package com.emarsys.core.crypto
 
 import com.emarsys.core.exceptions.DecryptionFailedException
-import dev.whyoleg.cryptography.CryptographyProvider
-import dev.whyoleg.cryptography.algorithms.digest.SHA512
-import dev.whyoleg.cryptography.algorithms.symmetric.AES
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -17,11 +14,7 @@ class CryptoTests {
         const val TEST_SECRET = "test secret"
     }
 
-    private val aesGcm = CryptographyProvider.Default.get(AES.GCM)
-
-    private val hasher = CryptographyProvider.Default.get(SHA512).hasher()
-
-    private val crypto = Crypto(aesGcm, hasher, PUBLIC_KEY)
+    private val crypto = Crypto(PUBLIC_KEY)
 
     @Test
     fun testVerify_should_returnTrue() = runTest {

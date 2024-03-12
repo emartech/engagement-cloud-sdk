@@ -1,14 +1,13 @@
 package com.emarsys.networking.clients.remoteConfig
 
-import com.emarsys.core.crypto.Crypto
 import com.emarsys.core.crypto.CryptoApi
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
-import com.emarsys.remoteConfig.RemoteConfigResponse
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
+import com.emarsys.remoteConfig.RemoteConfigResponse
 import io.kotest.matchers.shouldBe
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
@@ -38,7 +37,7 @@ class RemoteConfigClientTests: TestsWithMocks() {
 
     @Test
     fun testFetchRemoteConfig_shouldReturnRemoteConfig() = runTest {
-        val configResult = """{"logLevel":"error"}"""
+        val configResult = """{"logLevel":"ERROR"}"""
         val configSignatureResult = """<<<testSignature>>>"""
         val configUrl = Url("testRemoteConfigUrl")
         val configSignatureUrl = Url("testRemoteConfigSignatureUrl")
