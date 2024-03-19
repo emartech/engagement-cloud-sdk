@@ -1,14 +1,15 @@
 package com.emarsys.di
 
-import com.emarsys.mobileengage.action.ActionCommandFactory
-import com.emarsys.mobileengage.action.ActionCommandFactoryApi
 import com.emarsys.api.push.PushInternalApi
+import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.WebPlatformInfoCollector
+import com.emarsys.core.permission.PermissionHandlerApi
+import com.emarsys.core.providers.Provider
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.TypedStorageApi
-import com.emarsys.core.providers.Provider
+import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.mobileengage.push.PushService
 import com.emarsys.setup.PlatformInitState
 import kotlinx.browser.window
@@ -35,6 +36,18 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
         return PlatformInitState(pushService)
     }
 
+    override fun createPermissionHandler(): PermissionHandlerApi {
+        TODO("Not yet implemented")
+    }
+
+    override fun createBadgeCountHandler(): BadgeCountHandlerApi {
+        TODO("Not yet implemented")
+    }
+
+    override fun createExternalUrlOpener(): ExternalUrlOpenerApi {
+        TODO("Not yet implemented")
+    }
+
     private fun createWebDeviceInfoCollector(): WebPlatformInfoCollector {
         return WebPlatformInfoCollector(getNavigatorData())
     }
@@ -47,7 +60,5 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
             window.navigator.vendor,
         ).joinToString(" ")
     }
-
-    override fun createActionCommandFactory(): ActionCommandFactoryApi = ActionCommandFactory()
 
 }

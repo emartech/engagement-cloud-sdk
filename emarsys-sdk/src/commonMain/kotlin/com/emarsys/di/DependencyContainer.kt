@@ -1,7 +1,5 @@
 package com.emarsys.di
 
-import com.emarsys.mobileengage.action.ActionCommandFactoryApi
-import com.emarsys.mobileengage.action.OnEventActionFactory
 import com.emarsys.api.AppEvent
 import com.emarsys.api.config.Config
 import com.emarsys.api.config.ConfigApi
@@ -44,6 +42,7 @@ import com.emarsys.api.push.PushInternal
 import com.emarsys.context.DefaultUrls
 import com.emarsys.context.DefaultUrlsApi
 import com.emarsys.context.SdkContext
+import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.channel.DeviceEventChannel
 import com.emarsys.core.channel.DeviceEventChannelApi
 import com.emarsys.core.collections.persistentListOf
@@ -52,11 +51,26 @@ import com.emarsys.core.crypto.CryptoApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.SdkLogger
+import com.emarsys.core.message.MsgHub
+import com.emarsys.core.message.MsgHubApi
 import com.emarsys.core.networking.clients.GenericNetworkClient
 import com.emarsys.core.networking.clients.NetworkClientApi
+import com.emarsys.core.permission.PermissionHandlerApi
+import com.emarsys.core.providers.Provider
+import com.emarsys.core.providers.RandomProvider
+import com.emarsys.core.providers.TimestampProvider
+import com.emarsys.core.providers.UUIDProvider
+import com.emarsys.core.session.SessionContext
 import com.emarsys.core.state.StateMachine
 import com.emarsys.core.storage.Storage
 import com.emarsys.core.storage.TypedStorageApi
+import com.emarsys.core.url.ExternalUrlOpenerApi
+import com.emarsys.core.url.UrlFactory
+import com.emarsys.core.url.UrlFactoryApi
+import com.emarsys.mobileengage.action.ActionFactory
+import com.emarsys.mobileengage.action.ActionFactoryApi
+import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.action.models.OnEventActionModel
 import com.emarsys.networking.EmarsysClient
 import com.emarsys.networking.clients.contact.ContactClient
 import com.emarsys.networking.clients.contact.ContactClientApi
@@ -70,12 +84,8 @@ import com.emarsys.networking.clients.event.model.Event
 import com.emarsys.networking.clients.push.PushClient
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.networking.clients.remoteConfig.RemoteConfigClient
-import com.emarsys.core.providers.Provider
-import com.emarsys.core.providers.RandomProvider
-import com.emarsys.core.providers.TimestampProvider
-import com.emarsys.core.providers.UUIDProvider
 import com.emarsys.remoteConfig.RemoteConfigHandler
-import com.emarsys.core.session.SessionContext
+import com.emarsys.remoteConfig.RemoteConfigHandlerApi
 import com.emarsys.setup.SetupOrganizer
 import com.emarsys.setup.SetupOrganizerApi
 import com.emarsys.setup.states.AppStartState
@@ -84,9 +94,6 @@ import com.emarsys.setup.states.CollectDeviceInfoState
 import com.emarsys.setup.states.LinkAnonymousContactState
 import com.emarsys.setup.states.RegisterClientState
 import com.emarsys.setup.states.RegisterPushTokenState
-import com.emarsys.core.url.UrlFactory
-import com.emarsys.core.url.UrlFactoryApi
-import com.emarsys.remoteConfig.RemoteConfigHandlerApi
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -117,12 +124,20 @@ class DependencyContainer : DependencyContainerApi {
 
     private val stringStorage: TypedStorageApi<String?> by lazy { dependencyCreator.createStorage() }
 
-    private val actionCommandFactory: ActionCommandFactoryApi by lazy { dependencyCreator.createActionCommandFactory() }
-    private val onEventActionFactory: OnEventActionFactory by lazy {
-        OnEventActionFactory(
-            dependencyCreator.createActionCommandFactory(),
-            onEventActionInternal
-        )
+    private val permissionHandler: PermissionHandlerApi by lazy { dependencyCreator.createPermissionHandler() }
+
+    private val badgeCountHandler: BadgeCountHandlerApi by lazy { dependencyCreator.createBadgeCountHandler() }
+
+    private val externalUrlOpener: ExternalUrlOpenerApi by lazy { dependencyCreator.createExternalUrlOpener() }
+
+    private val msgHub: MsgHubApi by lazy { MsgHub() }
+
+    private val actionFactory: ActionFactoryApi<ActionModel> by lazy {
+        ActionFactory(onEventActionInternal, eventTrackerApi, permissionHandler, badgeCountHandler, externalUrlOpener, msgHub)
+    }
+
+    private val onEventActionFactory: ActionFactoryApi<OnEventActionModel> by lazy {
+        ActionFactory(onEventActionInternal, eventTrackerApi, permissionHandler, badgeCountHandler, externalUrlOpener, msgHub)
     }
 
     val storage: Storage by lazy { Storage(stringStorage, json) }
