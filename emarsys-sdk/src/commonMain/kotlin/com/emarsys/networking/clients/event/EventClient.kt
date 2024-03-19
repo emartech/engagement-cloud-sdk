@@ -6,14 +6,15 @@ import com.emarsys.core.channel.naturalBatching
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.networking.model.body
-import com.emarsys.mobileengage.action.OnEventActionFactoryApi
+import com.emarsys.core.session.SessionContext
+import com.emarsys.core.url.EmarsysUrlType
+import com.emarsys.core.url.UrlFactoryApi
+import com.emarsys.mobileengage.action.ActionFactoryApi
+import com.emarsys.mobileengage.action.models.OnEventActionModel
 import com.emarsys.networking.clients.event.model.DeviceEventRequestBody
 import com.emarsys.networking.clients.event.model.DeviceEventResponse
 import com.emarsys.networking.clients.event.model.Event
 import com.emarsys.networking.clients.event.model.EventType
-import com.emarsys.core.session.SessionContext
-import com.emarsys.core.url.EmarsysUrlType
-import com.emarsys.core.url.UrlFactoryApi
 import io.ktor.http.HttpMethod
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -26,7 +27,7 @@ class EventClient(
     private val urlFactory: UrlFactoryApi,
     private val json: Json,
     private val deviceEventChannel: DeviceEventChannelApi,
-    private val onEventActionFactory: OnEventActionFactoryApi,
+    private val onEventActionFactory: ActionFactoryApi<OnEventActionModel>,
     private val sessionContext: SessionContext,
     private val sdkContext: SdkContextApi,
     sdkDispatcher: CoroutineDispatcher
