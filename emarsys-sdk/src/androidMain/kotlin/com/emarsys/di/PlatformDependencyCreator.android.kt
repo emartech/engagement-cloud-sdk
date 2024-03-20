@@ -4,6 +4,7 @@ import android.content.IntentFilter
 import com.emarsys.api.push.PushConstants
 import com.emarsys.api.push.PushInternalApi
 import com.emarsys.applicationContext
+import com.emarsys.core.badge.AndroidBadgeCountHandler
 import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.device.AndroidLanguageProvider
 import com.emarsys.core.device.AndroidPlatformInfoCollector
@@ -65,7 +66,7 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
     }
 
     override fun createBadgeCountHandler(): BadgeCountHandlerApi {
-        TODO("Not yet implemented")
+        return AndroidBadgeCountHandler()
     }
 
     override fun createExternalUrlOpener(): ExternalUrlOpenerApi {

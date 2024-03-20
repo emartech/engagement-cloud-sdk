@@ -2,6 +2,7 @@ package com.emarsys.di
 
 import com.emarsys.api.push.PushInternalApi
 import com.emarsys.core.badge.BadgeCountHandlerApi
+import com.emarsys.core.badge.WebBadgeCountHandler
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.WebPlatformInfoCollector
 import com.emarsys.core.permission.PermissionHandlerApi
@@ -43,7 +44,7 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
     }
 
     override fun createBadgeCountHandler(): BadgeCountHandlerApi {
-        TODO("Not yet implemented")
+        return WebBadgeCountHandler()
     }
 
     override fun createExternalUrlOpener(): ExternalUrlOpenerApi {

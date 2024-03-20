@@ -1,4 +1,4 @@
-package com.emarsys.core
+package com.emarsys.core.connection
 
 import android.net.ConnectivityManager
 import android.net.Network

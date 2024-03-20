@@ -2,7 +2,6 @@ package com.emarsys.core.connection
 
 import android.net.ConnectivityManager
 import android.net.Network
-import com.emarsys.core.AndroidConnectionWatchDog
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import io.mockk.verify
