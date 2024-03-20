@@ -5,6 +5,7 @@ import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.WebPlatformInfoCollector
 import com.emarsys.core.permission.PermissionHandlerApi
+import com.emarsys.core.permission.WebPermissionHandler
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.StringStorage
@@ -38,7 +39,7 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
     }
 
     override fun createPermissionHandler(): PermissionHandlerApi {
-        TODO("Not yet implemented")
+        return WebPermissionHandler()
     }
 
     override fun createBadgeCountHandler(): BadgeCountHandlerApi {

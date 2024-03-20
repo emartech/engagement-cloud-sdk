@@ -9,6 +9,7 @@ import com.emarsys.core.device.AndroidLanguageProvider
 import com.emarsys.core.device.AndroidPlatformInfoCollector
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.LanguageProvider
+import com.emarsys.core.permission.AndroidPermissionHandler
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.state.State
@@ -60,7 +61,7 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
         StringStorage(platformContext.sharedPreferences)
 
     override fun createPermissionHandler(): PermissionHandlerApi {
-        TODO("Not yet implemented")
+        return AndroidPermissionHandler()
     }
 
     override fun createBadgeCountHandler(): BadgeCountHandlerApi {
