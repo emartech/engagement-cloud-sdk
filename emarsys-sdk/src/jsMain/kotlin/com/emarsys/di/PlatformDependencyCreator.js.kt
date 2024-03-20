@@ -10,6 +10,7 @@ import com.emarsys.core.state.State
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
+import com.emarsys.core.url.WebExternalUrlOpener
 import com.emarsys.mobileengage.push.PushService
 import com.emarsys.setup.PlatformInitState
 import kotlinx.browser.window
@@ -45,7 +46,7 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
     }
 
     override fun createExternalUrlOpener(): ExternalUrlOpenerApi {
-        TODO("Not yet implemented")
+        return WebExternalUrlOpener()
     }
 
     private fun createWebDeviceInfoCollector(): WebPlatformInfoCollector {

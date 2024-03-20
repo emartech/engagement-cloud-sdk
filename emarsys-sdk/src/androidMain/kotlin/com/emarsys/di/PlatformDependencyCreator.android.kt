@@ -14,6 +14,7 @@ import com.emarsys.core.providers.Provider
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.TypedStorageApi
+import com.emarsys.core.url.AndroidExternalUrlOpener
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.mobileengage.push.PushTokenBroadcastReceiver
 import com.emarsys.setup.PlatformInitState
@@ -67,7 +68,7 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
     }
 
     override fun createExternalUrlOpener(): ExternalUrlOpenerApi {
-        TODO("Not yet implemented")
+        return AndroidExternalUrlOpener()
     }
 
 }
