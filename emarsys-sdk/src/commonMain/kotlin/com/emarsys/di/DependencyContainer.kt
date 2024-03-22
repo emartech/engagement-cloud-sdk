@@ -133,11 +133,11 @@ class DependencyContainer : DependencyContainerApi {
     private val msgHub: MsgHubApi by lazy { MsgHub() }
 
     private val actionFactory: ActionFactoryApi<ActionModel> by lazy {
-        ActionFactory(onEventActionInternal, eventTrackerApi, permissionHandler, badgeCountHandler, externalUrlOpener, msgHub)
+        ActionFactory(onEventActionInternal, deviceEventChannel, permissionHandler, badgeCountHandler, externalUrlOpener, msgHub)
     }
 
     private val onEventActionFactory: ActionFactoryApi<OnEventActionModel> by lazy {
-        ActionFactory(onEventActionInternal, eventTrackerApi, permissionHandler, badgeCountHandler, externalUrlOpener, msgHub)
+        ActionFactory(onEventActionInternal, deviceEventChannel, permissionHandler, badgeCountHandler, externalUrlOpener, msgHub)
     }
 
     val storage: Storage by lazy { Storage(stringStorage, json) }

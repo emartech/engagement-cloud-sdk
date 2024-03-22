@@ -1,8 +1,8 @@
 package com.emarsys.mobileengage.action
 
-import com.emarsys.api.event.EventTrackerApi
 import com.emarsys.api.oneventaction.OnEventActionInternalApi
 import com.emarsys.core.badge.BadgeCountHandlerApi
+import com.emarsys.core.channel.DeviceEventChannelApi
 import com.emarsys.core.message.MsgHubApi
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
@@ -22,7 +22,7 @@ import com.emarsys.mobileengage.action.models.OpenExternalUrlActionModel
 
 class ActionFactory<ActionModelType>(
     private val onEventActionInternal: OnEventActionInternalApi,
-    private val eventTracker: EventTrackerApi,
+    private val eventChannel: DeviceEventChannelApi,
     private val permissionHandler: PermissionHandlerApi,
     private val badgeCountHandler: BadgeCountHandlerApi,
     private val externalUrlOpener: ExternalUrlOpenerApi,
@@ -32,7 +32,7 @@ class ActionFactory<ActionModelType>(
     override suspend fun create(action: ActionModelType): Action<*> {
         return when (action) {
             is AppEventActionModel -> AppEventAction(action, onEventActionInternal)
-            is CustomEventActionModel -> CustomEventAction(action, eventTracker)
+            is CustomEventActionModel -> CustomEventAction(action, eventChannel)
             is AskForPushPermissionActionModel -> AskForPushPermissionAction(action, permissionHandler)
             is BadgeCountActionModel -> BadgeCountAction(action, badgeCountHandler)
             is DismissActionModel -> DismissAction(action, msgHub)

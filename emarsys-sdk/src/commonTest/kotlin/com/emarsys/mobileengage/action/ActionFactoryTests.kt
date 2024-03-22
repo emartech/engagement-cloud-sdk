@@ -1,8 +1,8 @@
 package com.emarsys.mobileengage.action
 
-import com.emarsys.api.event.EventTrackerApi
 import com.emarsys.api.oneventaction.OnEventActionInternalApi
 import com.emarsys.core.badge.BadgeCountHandlerApi
+import com.emarsys.core.channel.DeviceEventChannelApi
 import com.emarsys.core.message.MsgBox
 import com.emarsys.core.message.MsgHubApi
 import com.emarsys.core.permission.PermissionHandlerApi
@@ -32,7 +32,7 @@ class ActionFactoryTests : TestsWithMocks() {
     override fun setUpMocks() = injectMocks(mocker)
 
     @Mock
-    lateinit var mockEventTracker: EventTrackerApi
+    lateinit var mockEventChannel: DeviceEventChannelApi
 
     @Mock
     lateinit var mockOnEventActionInternal: OnEventActionInternalApi
@@ -52,7 +52,7 @@ class ActionFactoryTests : TestsWithMocks() {
     private val actionFactory: ActionFactoryApi<ActionModel> by withMocks {
         ActionFactory(
             mockOnEventActionInternal,
-            mockEventTracker,
+            mockEventChannel,
             mockPermissionHandler,
             mockBadgeCountHandler,
             mockExternalUrlOpener,

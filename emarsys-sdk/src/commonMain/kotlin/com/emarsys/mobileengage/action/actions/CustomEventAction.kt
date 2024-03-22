@@ -1,14 +1,15 @@
 package com.emarsys.mobileengage.action.actions
 
-import com.emarsys.api.event.EventTrackerApi
-import com.emarsys.api.event.model.CustomEvent
+import com.emarsys.core.channel.DeviceEventChannelApi
 import com.emarsys.mobileengage.action.models.CustomEventActionModel
+import com.emarsys.networking.clients.event.model.Event
+import com.emarsys.networking.clients.event.model.EventType
 
 class CustomEventAction(
     private val action: CustomEventActionModel,
-    private val eventTracker: EventTrackerApi
+    private val eventChannel: DeviceEventChannelApi
 ): Action<Unit> {
     override suspend fun invoke(value: Unit?) {
-        eventTracker.trackEvent(CustomEvent(action.name, action.payload))
+        eventChannel.send(Event(EventType.CUSTOM, action.name, action.payload))
     }
 }
