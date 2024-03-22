@@ -3,7 +3,6 @@ package com.emarsys.core.device
 import com.emarsys.core.device.constants.BrowserInfo
 import com.emarsys.core.device.constants.OsInfo
 import io.kotest.matchers.shouldBe
-import kotlinx.serialization.json.Json
 import kotlin.test.Test
 
 class WebPlatformInfoCollectorTests {
@@ -28,9 +27,7 @@ class WebPlatformInfoCollectorTests {
 
             val result = webPlatformInfoCollector.collect()
 
-            val webPlatformInfo = Json.decodeFromString<WebPlatformInfo>(result)
-
-            webPlatformInfo shouldBe expectedPlatformInfo
+            result shouldBe expectedPlatformInfo
         }
     }
 
@@ -51,9 +48,7 @@ class WebPlatformInfoCollectorTests {
 
             val result = webPlatformInfoCollector.collect()
 
-            val webPlatformInfo = Json.decodeFromString<WebPlatformInfo>(result)
-
-            webPlatformInfo shouldBe expectedPlatformInfo
+            result shouldBe expectedPlatformInfo
         }
     }
 
@@ -72,9 +67,7 @@ class WebPlatformInfoCollectorTests {
 
         val result = webPlatformInfoCollector.collect()
 
-        val platformInfo = Json.decodeFromString<WebPlatformInfo>(result)
-
-        platformInfo shouldBe expectation
+        result shouldBe expectation
     }
 
     @Test
@@ -92,8 +85,6 @@ class WebPlatformInfoCollectorTests {
 
         val result = webPlatformInfoCollector.collect()
 
-        val platformInfo = Json.decodeFromString<WebPlatformInfo>(result)
-
-        platformInfo shouldBe expectation
+        result shouldBe expectation
     }
 }

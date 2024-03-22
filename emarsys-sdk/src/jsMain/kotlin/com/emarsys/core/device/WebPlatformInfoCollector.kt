@@ -2,30 +2,22 @@ package com.emarsys.core.device
 
 import com.emarsys.core.device.constants.BrowserInfo
 import com.emarsys.core.device.constants.OsInfo
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
-class WebPlatformInfoCollector(private val navigatorData: String) : PlatformInfoCollectorApi {
+class WebPlatformInfoCollector(private val navigatorData: String) : WebPlatformInfoCollectorApi {
     private companion object {
         const val DEFAULT_BROWSER_VERSION = "0"
     }
 
-    override fun collect(): String {
+    override fun collect(): WebPlatformInfo {
         val headerData = analiseHeaders()
-        val webPlatformInfo =
-            WebPlatformInfo(
-                null,
-                false,
-                headerData.osName,
-                headerData.osVersion,
-                headerData.browserName,
-                headerData.browserVersion
-            )
-        return Json.encodeToString(webPlatformInfo)
-    }
-
-    override fun applicationVersion(): String {
-        return UNKNOWN_VERSION_NAME
+        return WebPlatformInfo(
+            null,
+            false,
+            headerData.osName,
+            headerData.osVersion,
+            headerData.browserName,
+            headerData.browserVersion
+        )
     }
 
     private fun analiseHeaders(): WindowHeaderData {
