@@ -55,6 +55,10 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
         return WebPlatformInfoCollector(getNavigatorData())
     }
 
+    private fun createApplicationVersionProvider(): ApplicationVersionProvider {
+        return ApplicationVersionProvider()
+    }
+
     private fun getNavigatorData(): String {
         return listOf(
             window.navigator.platform,

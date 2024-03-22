@@ -46,6 +46,10 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
         )
     }
 
+    private fun createApplicationVersionProvider(): Provider<String> {
+        return ApplicationVersionProvider(applicationContext)
+    }
+
     override fun createPlatformInitState(
         pushApi: PushInternalApi,
         sdkDispatcher: CoroutineDispatcher

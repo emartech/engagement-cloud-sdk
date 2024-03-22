@@ -1,13 +1,12 @@
 package com.emarsys.core.device
 
 import io.kotest.matchers.shouldBe
-import java.util.*
-import kotlin.test.BeforeTest
+import java.util.Locale
 import kotlin.test.Test
 
 
 class AndroidLanguageProviderTests {
-    lateinit var languageProvider: LanguageProvider
+    private lateinit var languageProvider: LanguageProvider
 
     @Test
     fun testProvideLanguage_shouldReturnCorrectLanguageCode_whenOnlyLanguageUsed() {
