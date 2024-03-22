@@ -1,37 +1,33 @@
 package com.emarsys.core.device
 
-import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.providers.Provider
+import com.emarsys.core.storage.TypedStorageApi
 import kotlinx.browser.window
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.offsetIn
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 actual class DeviceInfoCollector(
-    private val webPlatformInfoCollector: PlatformInfoCollectorApi,
     private val uuidProvider: Provider<String>,
-    private val storage: TypedStorageApi<String?>
+    private val timezoneProvider: Provider<String>,
+    private val webPlatformInfoCollector: WebPlatformInfoCollectorApi,
+    private val storage: TypedStorageApi<String?>,
+    private val applicationVersionProvider: Provider<String>
 ) : DeviceInfoCollectorApi {
     private companion object {
         const val HARDWARE_ID_STORAGE_KEY = "hardwareId"
     }
 
     actual override fun collect(): String {
-        val platformInfo = webPlatformInfoCollector.collect()
+        val headerData = webPlatformInfoCollector.collect()
         return Json.encodeToString(
-            DeviceInformation(
-                platform = window.navigator.platform,
-                manufacturer = window.navigator.vendor,
-                displayMetrics = "${window.innerWidth}x${window.innerHeight}",
-                model = window.navigator.product,
+            DeviceInfo(
+                platform = headerData.browserName,
+                applicationVersion = applicationVersionProvider.provide(),
+                deviceModel = window.navigator.userAgent,
+                osVersion = headerData.browserVersion,
                 sdkVersion = BuildConfig.VERSION_NAME,
                 language = window.navigator.language,
-                timezone = Clock.System.now().offsetIn(TimeZone.currentSystemDefault()).toString(),
-                hardwareId = getHardwareId(),
-                platformInfo = platformInfo,
-                applicationVersion = webPlatformInfoCollector.applicationVersion()
+                timezone = timezoneProvider.provide()
             )
         )
     }

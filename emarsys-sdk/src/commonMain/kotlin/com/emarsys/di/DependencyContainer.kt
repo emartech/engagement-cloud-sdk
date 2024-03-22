@@ -59,6 +59,7 @@ import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.providers.RandomProvider
 import com.emarsys.core.providers.TimestampProvider
+import com.emarsys.core.providers.TimezoneProvider
 import com.emarsys.core.providers.UUIDProvider
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.state.StateMachine
@@ -144,9 +145,12 @@ class DependencyContainer : DependencyContainerApi {
 
     override val uuidProvider: Provider<String> by lazy { UUIDProvider() }
 
+    override val timezoneProvider: Provider<String> by lazy { TimezoneProvider(timestampProvider) }
+
     private val deviceInfoCollector: DeviceInfoCollectorApi by lazy {
         dependencyCreator.createDeviceInfoCollector(
-            uuidProvider
+            uuidProvider,
+            timezoneProvider
         )
     }
 

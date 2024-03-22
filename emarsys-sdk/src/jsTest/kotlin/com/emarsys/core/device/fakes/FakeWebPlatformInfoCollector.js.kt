@@ -1,13 +1,10 @@
 package com.emarsys.core.device.fakes
 
-import com.emarsys.core.device.PlatformInfoCollectorApi
-import com.emarsys.core.device.UNKNOWN_VERSION_NAME
+import com.emarsys.core.device.WebPlatformInfo
+import com.emarsys.core.device.WebPlatformInfoCollectorApi
 
-class FakeWebPlatformInfoCollector(private val onCollectCalled: (() -> String)? = null): PlatformInfoCollectorApi {
-
-    override fun collect(): String {
-        return onCollectCalled?.let { it() } ?: ""
+class FakeWebPlatformInfoCollector(private val fakeValue: WebPlatformInfo? = null): WebPlatformInfoCollectorApi {
+    override fun collect(): WebPlatformInfo {
+        return fakeValue ?: WebPlatformInfo(null, false, "unknown", "0.0.0", "unknown", "0.0.0")
     }
-
-    override fun applicationVersion(): String = UNKNOWN_VERSION_NAME
 }

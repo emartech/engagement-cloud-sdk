@@ -13,7 +13,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 interface DependencyCreator {
     fun createStorage():  TypedStorageApi<String?>
 
-    fun createDeviceInfoCollector(uuidProvider: Provider<String>): DeviceInfoCollector
+    fun createDeviceInfoCollector(uuidProvider: Provider<String>, timezoneProvider: Provider<String>): DeviceInfoCollector
 
     fun createPlatformInitState(pushApi: PushInternalApi, sdkDispatcher: CoroutineDispatcher): State
 

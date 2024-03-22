@@ -34,6 +34,8 @@ interface DependencyContainerApi {
 
     val uuidProvider: Provider<String>
 
+    val timezoneProvider: Provider<String>
+
     val setupOrganizerApi: SetupOrganizerApi
     
     val remoteConfigHandler: RemoteConfigHandlerApi

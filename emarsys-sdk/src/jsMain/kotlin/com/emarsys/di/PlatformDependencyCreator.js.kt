@@ -7,6 +7,7 @@ import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.WebPlatformInfoCollector
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.permission.WebPermissionHandler
+import com.emarsys.core.provider.ApplicationVersionProvider
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.StringStorage
@@ -26,8 +27,14 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
         return StringStorage(platformContext.storage)
     }
 
-    override fun createDeviceInfoCollector(uuidProvider: Provider<String>): DeviceInfoCollector {
-        return DeviceInfoCollector(createWebDeviceInfoCollector(), uuidProvider, createStorage())
+    override fun createDeviceInfoCollector(uuidProvider: Provider<String>, timezoneProvider: Provider<String>): DeviceInfoCollector {
+        return DeviceInfoCollector(
+            uuidProvider,
+            timezoneProvider,
+            createWebDeviceInfoCollector(),
+            createStorage(),
+            createApplicationVersionProvider(),
+        )
     }
 
     override fun createPlatformInitState(pushApi: PushInternalApi, sdkDispatcher: CoroutineDispatcher): State {

@@ -12,6 +12,7 @@ import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.LanguageProvider
 import com.emarsys.core.permission.AndroidPermissionHandler
 import com.emarsys.core.permission.PermissionHandlerApi
+import com.emarsys.core.provider.ApplicationVersionProvider
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.StringStorage
@@ -36,13 +37,17 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
         return AndroidPlatformInfoCollector(applicationContext)
     }
 
-    override fun createDeviceInfoCollector(uuidProvider: Provider<String>): DeviceInfoCollector {
+    override fun createDeviceInfoCollector(
+        uuidProvider: Provider<String>,
+        timezoneProvider: Provider<String>
+    ): DeviceInfoCollector {
         return DeviceInfoCollector(
-            createAndroidDeviceInfoCollector(),
-            createLanguageProvider(),
             uuidProvider,
+            timezoneProvider,
+            createLanguageProvider(),
+            createApplicationVersionProvider(),
             createStorage(),
-            true,
+            true
         )
     }
 

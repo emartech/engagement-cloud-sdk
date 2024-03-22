@@ -1,42 +1,32 @@
 package com.emarsys.core.device
 
-import android.content.res.Resources
 import android.os.Build
-import android.util.DisplayMetrics
-import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.providers.Provider
+import com.emarsys.core.storage.TypedStorageApi
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale.ENGLISH
 
 actual class DeviceInfoCollector(
-    private val androidPlatformInfoCollector: PlatformInfoCollectorApi,
-    private val languageProvider: LanguageProvider,
     private val uuidProvider: Provider<String>,
+    private val timezoneProvider: Provider<String>,
+    private val languageProvider: LanguageProvider,
+    private val applicationVersionProvider: Provider<String>,
     private val storage: TypedStorageApi<String?>,
     private val isGooglePlayServicesAvailable: Boolean,
-): DeviceInfoCollectorApi {
+) : DeviceInfoCollectorApi {
     private companion object {
         const val HARDWARE_ID_STORAGE_KEY = "hardwareId"
     }
 
     actual override fun collect(): String {
-        val androidDeviceInfo = androidPlatformInfoCollector.collect()
-        val displayMetrics: DisplayMetrics = Resources.getSystem().displayMetrics
-
-        val deviceInfo = DeviceInformation(
+        val deviceInfo = DeviceInfo(
             platform = getPlatform(),
-            manufacturer = Build.MANUFACTURER,
-            model = Build.MODEL,
+            applicationVersion = applicationVersionProvider.provide(),
+            deviceModel = Build.MODEL,
+            osVersion = SdkBuildConfig.getOsVersion(),
             sdkVersion = BuildConfig.VERSION_NAME,
-            displayMetrics = "${displayMetrics.widthPixels}x${displayMetrics.heightPixels}",
             language = languageProvider.provideLanguage(),
-            timezone = SimpleDateFormat("Z", ENGLISH).format(Calendar.getInstance().time),
-            hardwareId = getHardwareId(),
-            platformInfo = androidDeviceInfo,
-            applicationVersion = androidPlatformInfoCollector.applicationVersion()
+            timezone = timezoneProvider.provide()
         )
 
         return Json.encodeToString(deviceInfo)
