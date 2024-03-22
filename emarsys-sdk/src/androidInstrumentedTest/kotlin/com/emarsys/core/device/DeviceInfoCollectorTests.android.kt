@@ -20,7 +20,6 @@ class DeviceInfoCollectorTests {
         const val GENERATED_ID = "test uuid"
         const val STORED_ID = "stored hardware id"
         const val TIMEZONE = "+0300"
-        const val OS_VERSION = "13.2.1"
     }
 
     private lateinit var mockLanguageProvider: LanguageProvider
