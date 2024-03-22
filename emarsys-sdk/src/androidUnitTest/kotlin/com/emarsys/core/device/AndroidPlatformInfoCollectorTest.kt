@@ -56,7 +56,6 @@ class AndroidPlatformInfoCollectorTest {
         val applicationInfo = ApplicationInfo().apply { flags = ApplicationInfo.FLAG_DEBUGGABLE }
         every { mockContext.applicationInfo } returns applicationInfo
         val expected = AndroidPlatformInfo(
-            APP_VERSION,
             OS_VERSION,
             null,
             true
@@ -64,15 +63,12 @@ class AndroidPlatformInfoCollectorTest {
 
         val result = androidPlatformInfoCollector.collect()
 
-        val platformInfo = json.decodeFromString<AndroidPlatformInfo>(result)
-
-        platformInfo shouldBe expected
+        result shouldBe expected
     }
 
     @Test
     fun testCollect_should_collect_platformInfo_debugMode_false() {
         val expected = AndroidPlatformInfo(
-            APP_VERSION,
             OS_VERSION,
             null,
             false
@@ -80,18 +76,6 @@ class AndroidPlatformInfoCollectorTest {
 
         val result = androidPlatformInfoCollector.collect()
 
-        val platformInfo = json.decodeFromString<AndroidPlatformInfo>(result)
-
-        platformInfo shouldBe expected
-    }
-
-    @Test
-    fun testApplicationVersion_should_return_applicationVersion_from_packageInfo_if_available() {
-        androidPlatformInfoCollector.applicationVersion() shouldBe APP_VERSION
-    }
-    @Test
-    fun testApplicationVersion_should_return_UNKNOWN_when_packageInfo_is_not_available() {
-        every { mockContext.packageManager.getPackageInfo(any<String>(), any<Int>()) } throws PackageManager.NameNotFoundException()
-        androidPlatformInfoCollector.applicationVersion() shouldBe UNKNOWN_VERSION_NAME
+        result shouldBe expected
     }
 }
