@@ -131,7 +131,7 @@ class DependencyContainer : DependencyContainerApi {
 
     private val externalUrlOpener: ExternalUrlOpenerApi by lazy { dependencyCreator.createExternalUrlOpener() }
 
-    private val msgHub: MsgHubApi by lazy { MsgHub() }
+    private val msgHub: MsgHubApi by lazy { MsgHub(sdkDispatcher) }
 
     private val actionFactory: ActionFactoryApi<ActionModel> by lazy {
         ActionFactory(onEventActionInternal, deviceEventChannel, permissionHandler, badgeCountHandler, externalUrlOpener, msgHub)

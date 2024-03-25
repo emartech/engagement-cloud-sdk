@@ -3,7 +3,6 @@ package com.emarsys.mobileengage.action
 import com.emarsys.api.oneventaction.OnEventActionInternalApi
 import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.channel.DeviceEventChannelApi
-import com.emarsys.core.message.MsgBox
 import com.emarsys.core.message.MsgHubApi
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
@@ -102,10 +101,7 @@ class ActionFactoryTests : TestsWithMocks() {
 
     @Test
     fun testCreate_withDismissActionModel() = runTest {
-        val action = DismissActionModel("type", object: MsgBox<Unit>{
-            override val id: String = "id"
-            override val replayCount: Int = 0
-        })
+        val action = DismissActionModel("type", "testTopic")
 
         val result = actionFactory.create(action)
 

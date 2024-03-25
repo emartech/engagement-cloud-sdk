@@ -1,59 +1,27 @@
 package com.emarsys.core.message
 
-class MsgHub: MsgHubApi {
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 
-    private val msgBoxes = mutableMapOf<MsgBox<*>, MsgDispatcher<*>>()
-    override fun <Content> open(msgBox: MsgBox<Content>) {
-        require(msgBoxes[msgBox] == null) { "MsgBox is already open" }
-        msgBoxes[msgBox] = MsgDispatcher(msgBox)
-    }
+class MsgHub(private val dispatcher: CoroutineDispatcher): MsgHubApi {
 
-    override fun <Content> close(msgBox: MsgBox<Content>) {
-        require(msgBoxes[msgBox] != null) { "MsgBox is not open" }
-        msgBoxes.remove(msgBox)
-    }
+    private val flow = MutableSharedFlow<Any>()
 
-    @Suppress("UNCHECKED_CAST")
-    override fun <Content> send(msg: Msg<Content>, to: MsgBox<Content>) {
-        require(msgBoxes[to] != null) { "MsgBox is not open" }
-        (msgBoxes[to] as MsgDispatcher<Content>).send(msg)
+    override suspend fun send(msg: Any, to: String) {
+        flow.emit(Pair(to, msg))
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun <Content> enrollFor(msgBox: MsgBox<Content>, onMsg: MsgCallback<Content>) {
-        require(msgBoxes[msgBox] != null) { "MsgBox is not open" }
-        (msgBoxes[msgBox] as MsgDispatcher<Content>).enrollWith(onMsg)
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    override fun <Content> unEnrollFor(msgBox: MsgBox<Content>, onMsg: MsgCallback<Content>) {
-        require(msgBoxes[msgBox] != null) { "MsgBox is not open" }
-        (msgBoxes[msgBox] as MsgDispatcher<Content>).unEnrollWith(onMsg)
-    }
-
-}
-
-private class MsgDispatcher<Content>(override val msgBox: MsgBox<Content>): MsgDispatcherApi<Content> {
-
-    val msgCallbacks = mutableListOf<MsgCallback<Content>>()
-    var msgQueue = mutableListOf<Msg<Content>>()
-    override fun send(msg: Msg<Content>) {
-        msgQueue.add(msg)
-        msgCallbacks.forEach { callback -> callback.invoke(msg) }
-    }
-
-    override fun enrollWith(onMsg: MsgCallback<Content>) {
-        if (msgBox.replayCount > 0) {
-            msgQueue = msgQueue.takeLast(msgBox.replayCount).toMutableList()
-            msgQueue.forEach { msg ->
-                onMsg.invoke(msg)
+    override suspend fun subscribe(topic: String, onMsg: MsgCallback<Any>) {
+        CoroutineScope(dispatcher).launch {
+            flow.collect {
+                if (it is Pair<*, *> && it.first == topic) {
+                    onMsg(it.second as Any)
+                }
             }
         }
-        msgCallbacks.add(onMsg)
-    }
-
-    override fun unEnrollWith(onMsg: MsgCallback<Content>) {
-        msgCallbacks.remove(onMsg)
     }
 
 }
