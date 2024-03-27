@@ -1,15 +1,19 @@
 package com.emarsys.di
 
+import android.content.Context
 import android.content.IntentFilter
+import android.net.ConnectivityManager
 import com.emarsys.api.push.PushConstants
 import com.emarsys.api.push.PushInternalApi
 import com.emarsys.applicationContext
 import com.emarsys.core.badge.AndroidBadgeCountHandler
 import com.emarsys.core.badge.BadgeCountHandlerApi
+import com.emarsys.core.connection.AndroidConnectionWatchDog
 import com.emarsys.core.device.AndroidLanguageProvider
 import com.emarsys.core.device.AndroidPlatformInfoCollector
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.LanguageProvider
+import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.permission.AndroidPermissionHandler
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.provider.ApplicationVersionProvider
@@ -23,6 +27,7 @@ import com.emarsys.mobileengage.push.PushTokenBroadcastReceiver
 import com.emarsys.setup.PlatformInitState
 import kotlinx.coroutines.CoroutineDispatcher
 import java.util.Locale
+
 
 actual class PlatformDependencyCreator actual constructor(platformContext: PlatformContext) :
     DependencyCreator {
@@ -80,6 +85,12 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
 
     override fun createExternalUrlOpener(): ExternalUrlOpenerApi {
         return AndroidExternalUrlOpener()
+    }
+
+    override fun createConnectionWatchDog(sdkLogger: SdkLogger): AndroidConnectionWatchDog {
+        val connectivityManager =
+            applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        return AndroidConnectionWatchDog(connectivityManager, sdkLogger)
     }
 
 }

@@ -2,6 +2,7 @@ package com.emarsys.api.generic
 
 import Activatable
 import com.emarsys.api.Api
+import com.emarsys.api.AutoRegisterable
 import com.emarsys.api.SdkState
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.exceptions.PreconditionFailedException
@@ -12,7 +13,7 @@ open class GenericApi<Logging : Activatable, Gatherer : Activatable, Internal : 
     private val gathererApi: Gatherer,
     private val internalApi: Internal,
     final override val sdkContext: SdkContextApi
-) : Api {
+) : Api, AutoRegisterable {
     var activeInstance: Activatable = loggingApi
 
     private suspend fun activate(instance: Activatable) {
@@ -20,7 +21,7 @@ open class GenericApi<Logging : Activatable, Gatherer : Activatable, Internal : 
         activeInstance = instance
     }
 
-    init {
+    override fun registerOnContext() {
         sdkContext.addObserver {
             setActiveInstance(it)
         }

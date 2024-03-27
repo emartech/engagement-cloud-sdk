@@ -1,6 +1,6 @@
 package com.emarsys.api.contact
 
-interface ContactApi {
+interface ContactInternalApi {
 
     suspend fun linkContact(contactFieldId: Int, contactFieldValue: String)
 

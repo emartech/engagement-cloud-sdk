@@ -1,4 +1,4 @@
-package com.emarsys.connection
+package com.emarsys.watchdog.connection
 
 import kotlinx.coroutines.flow.StateFlow
 

@@ -56,6 +56,10 @@ class EventTrackerTests : TestsWithMocks() {
         everySuspending { mockLoggingEventTracker.activate() } returns Unit
         everySuspending { mockEventTrackerGatherer.activate() } returns Unit
         everySuspending { mockEventTrackerInternal.activate() } returns Unit
+
+        eventTracker =
+            EventTracker(mockLoggingEventTracker, mockEventTrackerGatherer, mockEventTrackerInternal, sdkContext)
+        eventTracker.registerOnContext()
     }
 
     @AfterTest
@@ -70,9 +74,6 @@ class EventTrackerTests : TestsWithMocks() {
             mockLoggingEventTracker.trackEvent(event)
         } returns SdkResult.Success(Unit)
 
-        eventTracker =
-            EventTracker(mockLoggingEventTracker, mockEventTrackerGatherer, mockEventTrackerInternal, sdkContext)
-
         eventTracker.trackEvent(event)
 
         verifyWithSuspend(exhaustive = false) {
@@ -86,8 +87,6 @@ class EventTrackerTests : TestsWithMocks() {
             mockEventTrackerGatherer.trackEvent(event)
         } returns SdkResult.Success(Unit)
 
-        eventTracker =
-            EventTracker(mockLoggingEventTracker, mockEventTrackerGatherer, mockEventTrackerInternal, sdkContext)
 
         sdkContext.setSdkState(SdkState.onHold)
         eventTracker.trackEvent(event)
@@ -102,9 +101,6 @@ class EventTrackerTests : TestsWithMocks() {
         everySuspending {
             mockEventTrackerInternal.trackEvent(event)
         } returns SdkResult.Success(Unit)
-
-        eventTracker =
-            EventTracker(mockLoggingEventTracker, mockEventTrackerGatherer, mockEventTrackerInternal, sdkContext)
 
         sdkContext.setSdkState(SdkState.active)
         eventTracker.trackEvent(event)

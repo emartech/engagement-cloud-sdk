@@ -13,7 +13,7 @@ import com.emarsys.di.DependencyInjection
 object Emarsys {
 
     suspend fun initialize() {
-        DependencyInjection.container
+        DependencyInjection.container.setup()
     }
 
     suspend fun enableTracking(config: EmarsysConfig) {
@@ -48,18 +48,18 @@ object Emarsys {
         get() = DependencyInjection.container.inAppApi
 
     val inbox: InboxApi
-        get() = DependencyInjection.container.inbox
+        get() = DependencyInjection.container.inboxApi
 
     val config: ConfigApi
-        get() = DependencyInjection.container.config
+        get() = DependencyInjection.container.configApi
 
     val geofence: GeofenceApi
-        get() = DependencyInjection.container.geofence
+        get() = DependencyInjection.container.geofenceApi
 
     val onEventAction: OnEventActionApi
-        get() = DependencyInjection.container.onEventAction
+        get() = DependencyInjection.container.onEventActionApi
 
     val predict: PredictApi
-        get() = DependencyInjection.container.predict
+        get() = DependencyInjection.container.predictApi
 
 }

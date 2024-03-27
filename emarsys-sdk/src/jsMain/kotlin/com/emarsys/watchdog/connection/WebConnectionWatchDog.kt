@@ -1,6 +1,5 @@
-package com.emarsys.core.connection
+package com.emarsys.watchdog.connection
 
-import com.emarsys.connection.ConnectionWatchDog
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.w3c.dom.Window

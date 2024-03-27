@@ -1,8 +1,8 @@
 package com.emarsys.di
 
 import com.emarsys.api.config.ConfigApi
-import com.emarsys.api.contact.ContactApi
-import com.emarsys.api.event.EventTrackerApi
+import com.emarsys.api.contact.ContactInternalApi
+import com.emarsys.api.event.EventTrackerInternalApi
 import com.emarsys.api.geofence.GeofenceApi
 import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.inbox.InboxApi
@@ -12,31 +12,36 @@ import com.emarsys.api.push.PushApi
 import com.emarsys.core.providers.Provider
 import com.emarsys.remoteConfig.RemoteConfigHandlerApi
 import com.emarsys.setup.SetupOrganizerApi
+import com.emarsys.watchdog.connection.ConnectionWatchDog
 
 interface DependencyContainerApi {
-    val contactApi: ContactApi
+    val contactApi: ContactInternalApi
 
-    val eventTrackerApi: EventTrackerApi
+    val eventTrackerApi: EventTrackerInternalApi
 
     val inAppApi: InAppApi
 
-    val inbox: InboxApi
+    val inboxApi: InboxApi
 
-    val predict: PredictApi
+    val predictApi: PredictApi
 
     val pushApi: PushApi
 
-    val geofence: GeofenceApi
+    val geofenceApi: GeofenceApi
 
-    val config: ConfigApi
+    val configApi: ConfigApi
 
-    val onEventAction: OnEventActionApi
+    val onEventActionApi: OnEventActionApi
 
     val uuidProvider: Provider<String>
 
     val timezoneProvider: Provider<String>
 
     val setupOrganizerApi: SetupOrganizerApi
-    
+
     val remoteConfigHandler: RemoteConfigHandlerApi
+
+    val connectionWatchDog: ConnectionWatchDog
+
+    suspend fun setup()
 }

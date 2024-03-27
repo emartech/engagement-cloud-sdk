@@ -35,7 +35,7 @@ class ContactTests : TestsWithMocks() {
 
     @Mock
     lateinit var mockContactInternal: ContactInstance
-    
+
     private lateinit var sdkContext: SdkContextApi
 
     private lateinit var contact: Contact<ContactInstance, ContactInstance, ContactInstance>
@@ -46,11 +46,19 @@ class ContactTests : TestsWithMocks() {
 
     @BeforeTest
     fun setup() = runTest {
-        sdkContext = SdkContext(StandardTestDispatcher(), DefaultUrls("", "", "", "", "", "", ""), LogLevel.Error, mutableSetOf())
+        sdkContext = SdkContext(
+            StandardTestDispatcher(),
+            DefaultUrls("", "", "", "", "", "", ""),
+            LogLevel.Error,
+            mutableSetOf()
+        )
 
         everySuspending { mockLoggingContact.activate() } returns Unit
         everySuspending { mockGathererContact.activate() } returns Unit
         everySuspending { mockContactInternal.activate() } returns Unit
+        contact =
+            Contact(mockLoggingContact, mockGathererContact, mockContactInternal, sdkContext)
+        contact.registerOnContext()
     }
 
     @AfterTest
@@ -67,9 +75,6 @@ class ContactTests : TestsWithMocks() {
                 CONTACT_FIELD_VALUE
             )
         } returns Unit
-
-        contact =
-            Contact(mockLoggingContact, mockGathererContact, mockContactInternal, sdkContext)
 
         sdkContext.setSdkState(SdkState.inactive)
         contact.linkContact(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE)
@@ -91,9 +96,6 @@ class ContactTests : TestsWithMocks() {
             )
         } returns Unit
 
-        contact =
-            Contact(mockLoggingContact, mockGathererContact, mockContactInternal, sdkContext)
-
         sdkContext.setSdkState(SdkState.onHold)
         contact.linkContact(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE)
 
@@ -113,9 +115,6 @@ class ContactTests : TestsWithMocks() {
                 CONTACT_FIELD_VALUE
             )
         } returns Unit
-
-        contact =
-            Contact(mockLoggingContact, mockGathererContact, mockContactInternal, sdkContext)
 
         sdkContext.setSdkState(SdkState.active)
         contact.linkContact(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE)
@@ -137,9 +136,6 @@ class ContactTests : TestsWithMocks() {
             )
         } returns Unit
 
-        contact =
-            Contact(mockLoggingContact, mockGathererContact, mockContactInternal, sdkContext)
-
         sdkContext.setSdkState(SdkState.inactive)
         contact.linkAuthenticatedContact(CONTACT_FIELD_ID, OPEN_ID_TOKEN)
 
@@ -159,9 +155,6 @@ class ContactTests : TestsWithMocks() {
                 OPEN_ID_TOKEN
             )
         } returns Unit
-
-        contact =
-            Contact(mockLoggingContact, mockGathererContact, mockContactInternal, sdkContext)
 
         sdkContext.setSdkState(SdkState.onHold)
         contact.linkAuthenticatedContact(CONTACT_FIELD_ID, OPEN_ID_TOKEN)
@@ -183,9 +176,6 @@ class ContactTests : TestsWithMocks() {
             )
         } returns Unit
 
-        contact =
-            Contact(mockLoggingContact, mockGathererContact, mockContactInternal, sdkContext)
-
         sdkContext.setSdkState(SdkState.active)
         contact.linkAuthenticatedContact(CONTACT_FIELD_ID, OPEN_ID_TOKEN)
 
@@ -203,9 +193,6 @@ class ContactTests : TestsWithMocks() {
             mockLoggingContact.unlinkContact()
         } returns Unit
 
-        contact =
-            Contact(mockLoggingContact, mockGathererContact, mockContactInternal, sdkContext)
-
         sdkContext.setSdkState(SdkState.inactive)
         contact.unlinkContact()
 
@@ -220,9 +207,6 @@ class ContactTests : TestsWithMocks() {
             mockGathererContact.unlinkContact()
         } returns Unit
 
-        contact =
-            Contact(mockLoggingContact, mockGathererContact, mockContactInternal, sdkContext)
-
         sdkContext.setSdkState(SdkState.onHold)
         contact.unlinkContact()
 
@@ -236,9 +220,6 @@ class ContactTests : TestsWithMocks() {
         everySuspending {
             mockContactInternal.unlinkContact()
         } returns Unit
-
-        contact =
-            Contact(mockLoggingContact, mockGathererContact, mockContactInternal, sdkContext)
 
         sdkContext.setSdkState(SdkState.active)
         contact.unlinkContact()

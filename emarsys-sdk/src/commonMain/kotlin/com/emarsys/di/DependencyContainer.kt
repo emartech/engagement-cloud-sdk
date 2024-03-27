@@ -95,6 +95,7 @@ import com.emarsys.setup.states.CollectDeviceInfoState
 import com.emarsys.setup.states.LinkAnonymousContactState
 import com.emarsys.setup.states.RegisterClientState
 import com.emarsys.setup.states.RegisterPushTokenState
+import com.emarsys.watchdog.connection.ConnectionWatchDog
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -134,11 +135,25 @@ class DependencyContainer : DependencyContainerApi {
     private val msgHub: MsgHubApi by lazy { MsgHub(sdkDispatcher) }
 
     private val actionFactory: ActionFactoryApi<ActionModel> by lazy {
-        ActionFactory(onEventActionInternal, deviceEventChannel, permissionHandler, badgeCountHandler, externalUrlOpener, msgHub)
+        ActionFactory(
+            onEventActionInternal,
+            deviceEventChannel,
+            permissionHandler,
+            badgeCountHandler,
+            externalUrlOpener,
+            msgHub
+        )
     }
 
     private val onEventActionFactory: ActionFactoryApi<OnEventActionModel> by lazy {
-        ActionFactory(onEventActionInternal, deviceEventChannel, permissionHandler, badgeCountHandler, externalUrlOpener, msgHub)
+        ActionFactory(
+            onEventActionInternal,
+            deviceEventChannel,
+            permissionHandler,
+            badgeCountHandler,
+            externalUrlOpener,
+            msgHub
+        )
     }
 
     val storage: Storage by lazy { Storage(stringStorage, json) }
@@ -238,22 +253,22 @@ class DependencyContainer : DependencyContainerApi {
         InApp(inAppInternal)
     }
 
-    override val inbox: InboxApi by lazy {
+    override val inboxApi: InboxApi by lazy {
         Inbox()
     }
 
-    override val predict: PredictApi by lazy {
+    override val predictApi: PredictApi by lazy {
         Predict()
     }
 
-    override val geofence: GeofenceApi by lazy {
+    override val geofenceApi: GeofenceApi by lazy {
         GeofenceTracker()
     }
 
-    override val onEventAction: OnEventActionApi by lazy {
+    override val onEventActionApi: OnEventActionApi by lazy {
         OnEventAction(onEventActionInternal)
     }
-    override val config: ConfigApi by lazy {
+    override val configApi: ConfigApi by lazy {
         Config()
     }
 
@@ -336,7 +351,7 @@ class DependencyContainer : DependencyContainerApi {
         Contact(loggingContact, contactGatherer, contactInternal, sdkContext)
     }
 
-    override val eventTrackerApi: EventTrackerApi = run {
+    override val eventTrackerApi: EventTrackerApi by lazy {
         val eventTrackerContext = EventTrackerContext(
             persistentListOf(
                 "eventTrackerContextPersistentId",
@@ -348,5 +363,15 @@ class DependencyContainer : DependencyContainerApi {
         val gathererEvent = EventTrackerGatherer(eventTrackerContext, timestampProvider)
         val eventInternal = EventTrackerInternal(eventClient, eventTrackerContext, timestampProvider)
         EventTracker(loggingEvent, gathererEvent, eventInternal, sdkContext)
+    }
+    override val connectionWatchDog: ConnectionWatchDog
+        get() = dependencyCreator.createConnectionWatchDog(sdkLogger)
+
+    override suspend fun setup() {
+        eventTrackerApi.registerOnContext()
+        contactApi.registerOnContext()
+        pushApi.registerOnContext()
+
+        connectionWatchDog.start()
     }
 }

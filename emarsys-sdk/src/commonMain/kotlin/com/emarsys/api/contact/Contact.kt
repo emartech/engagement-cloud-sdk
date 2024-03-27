@@ -1,11 +1,14 @@
 package com.emarsys.api.contact
 
 import Activatable
+import com.emarsys.api.AutoRegisterable
 import com.emarsys.api.generic.GenericApi
 import com.emarsys.context.SdkContextApi
 import kotlinx.coroutines.withContext
 
-interface ContactInstance : ContactApi, Activatable
+interface ContactInstance : ContactInternalApi, Activatable
+
+interface ContactApi : ContactInternalApi, AutoRegisterable
 
 class Contact<Logging : ContactInstance, Gatherer : ContactInstance, Internal : ContactInstance>(
     loggingApi: Logging,
@@ -20,19 +23,19 @@ class Contact<Logging : ContactInstance, Gatherer : ContactInstance, Internal : 
 ), ContactApi {
     override suspend fun linkContact(contactFieldId: Int, contactFieldValue: String) {
         withContext(sdkContext.sdkDispatcher) {
-            activeInstance<ContactApi>().linkContact(contactFieldId, contactFieldValue)
+            activeInstance<ContactInternalApi>().linkContact(contactFieldId, contactFieldValue)
         }
     }
 
     override suspend fun linkAuthenticatedContact(contactFieldId: Int, openIdToken: String) {
         withContext(sdkContext.sdkDispatcher) {
-            activeInstance<ContactApi>().linkAuthenticatedContact(contactFieldId, openIdToken)
+            activeInstance<ContactInternalApi>().linkAuthenticatedContact(contactFieldId, openIdToken)
         }
     }
 
     override suspend fun unlinkContact() {
         withContext(sdkContext.sdkDispatcher) {
-            activeInstance<ContactApi>().unlinkContact()
+            activeInstance<ContactInternalApi>().unlinkContact()
         }
     }
 

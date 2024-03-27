@@ -5,6 +5,7 @@ import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.badge.WebBadgeCountHandler
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.WebPlatformInfoCollector
+import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.permission.WebPermissionHandler
 import com.emarsys.core.provider.ApplicationVersionProvider
@@ -16,6 +17,8 @@ import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.url.WebExternalUrlOpener
 import com.emarsys.mobileengage.push.PushService
 import com.emarsys.setup.PlatformInitState
+import com.emarsys.watchdog.connection.ConnectionWatchDog
+import com.emarsys.watchdog.connection.WebConnectionWatchDog
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineDispatcher
 
@@ -27,7 +30,10 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
         return StringStorage(platformContext.storage)
     }
 
-    override fun createDeviceInfoCollector(uuidProvider: Provider<String>, timezoneProvider: Provider<String>): DeviceInfoCollector {
+    override fun createDeviceInfoCollector(
+        uuidProvider: Provider<String>,
+        timezoneProvider: Provider<String>
+    ): DeviceInfoCollector {
         return DeviceInfoCollector(
             uuidProvider,
             timezoneProvider,
@@ -56,6 +62,10 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
 
     override fun createExternalUrlOpener(): ExternalUrlOpenerApi {
         return WebExternalUrlOpener()
+    }
+
+    override fun createConnectionWatchDog(sdkLogger: SdkLogger): ConnectionWatchDog {
+        return WebConnectionWatchDog(window)
     }
 
     private fun createWebDeviceInfoCollector(): WebPlatformInfoCollector {
