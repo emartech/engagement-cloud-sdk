@@ -25,6 +25,7 @@ import com.emarsys.core.url.AndroidExternalUrlOpener
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.mobileengage.push.PushTokenBroadcastReceiver
 import com.emarsys.setup.PlatformInitState
+import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
 import java.util.Locale
 
@@ -91,6 +92,10 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
         val connectivityManager =
             applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         return AndroidConnectionWatchDog(connectivityManager, sdkLogger)
+    }
+
+    override fun createLifeCycleWatchDog(): LifecycleWatchDog {
+        TODO("Not yet implemented")
     }
 
 }

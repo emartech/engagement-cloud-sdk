@@ -1,6 +1,5 @@
-package com.emarsys.core.connection
+package com.emarsys.watchdog.connection
 
-import com.emarsys.watchdog.connection.WebConnectionWatchDog
 import io.kotest.matchers.shouldBe
 import kotlinx.browser.window
 import org.w3c.dom.events.Event

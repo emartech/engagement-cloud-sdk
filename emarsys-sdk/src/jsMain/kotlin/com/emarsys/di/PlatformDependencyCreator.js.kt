@@ -19,10 +19,16 @@ import com.emarsys.mobileengage.push.PushService
 import com.emarsys.setup.PlatformInitState
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.connection.WebConnectionWatchDog
+import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
+import com.emarsys.watchdog.lifecycle.WebLifeCycleWatchDog
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import web.dom.document
 
-actual class PlatformDependencyCreator actual constructor(platformContext: PlatformContext) : DependencyCreator {
+actual class PlatformDependencyCreator actual constructor(platformContext: PlatformContext) :
+    DependencyCreator {
 
     private val platformContext: CommonPlatformContext = platformContext as CommonPlatformContext
 
@@ -43,7 +49,10 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
         )
     }
 
-    override fun createPlatformInitState(pushApi: PushInternalApi, sdkDispatcher: CoroutineDispatcher): State {
+    override fun createPlatformInitState(
+        pushApi: PushInternalApi,
+        sdkDispatcher: CoroutineDispatcher
+    ): State {
         val pushService = PushService(
             "BDa49_IiPdIo2Kda5cATItp81sOaYg-eFFISMdlSXatDAIZCdtAxUuMVzXo4M2MXXI0sUYQzQI7shyNkKgwyD_I",
             "/ems-service-worker.js",
@@ -66,6 +75,10 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
 
     override fun createConnectionWatchDog(sdkLogger: SdkLogger): ConnectionWatchDog {
         return WebConnectionWatchDog(window)
+    }
+
+    override fun createLifeCycleWatchDog(): LifecycleWatchDog {
+        return WebLifeCycleWatchDog(document, CoroutineScope(Dispatchers.Default))
     }
 
     private fun createWebDeviceInfoCollector(): WebPlatformInfoCollector {

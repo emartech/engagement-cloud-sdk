@@ -13,6 +13,7 @@ import com.emarsys.core.providers.Provider
 import com.emarsys.remoteConfig.RemoteConfigHandlerApi
 import com.emarsys.setup.SetupOrganizerApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
+import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 
 interface DependencyContainerApi {
     val contactApi: ContactInternalApi
@@ -42,6 +43,8 @@ interface DependencyContainerApi {
     val remoteConfigHandler: RemoteConfigHandlerApi
 
     val connectionWatchDog: ConnectionWatchDog
+
+    val lifecycleWatchDog: LifecycleWatchDog
 
     suspend fun setup()
 }

@@ -10,6 +10,7 @@ import com.emarsys.core.state.State
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
+import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
 
 interface DependencyCreator {
@@ -28,5 +29,7 @@ interface DependencyCreator {
 
     fun createExternalUrlOpener(): ExternalUrlOpenerApi
     fun createConnectionWatchDog(sdkLogger: SdkLogger): ConnectionWatchDog
+
+    fun createLifeCycleWatchDog(): LifecycleWatchDog
 
 }

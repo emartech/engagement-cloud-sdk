@@ -96,6 +96,7 @@ import com.emarsys.setup.states.LinkAnonymousContactState
 import com.emarsys.setup.states.RegisterClientState
 import com.emarsys.setup.states.RegisterPushTokenState
 import com.emarsys.watchdog.connection.ConnectionWatchDog
+import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -364,8 +365,13 @@ class DependencyContainer : DependencyContainerApi {
         val eventInternal = EventTrackerInternal(eventClient, eventTrackerContext, timestampProvider)
         EventTracker(loggingEvent, gathererEvent, eventInternal, sdkContext)
     }
-    override val connectionWatchDog: ConnectionWatchDog
-        get() = dependencyCreator.createConnectionWatchDog(sdkLogger)
+    override val connectionWatchDog: ConnectionWatchDog by lazy {
+        dependencyCreator.createConnectionWatchDog(sdkLogger)
+    }
+
+    override val lifecycleWatchDog: LifecycleWatchDog by lazy {
+        dependencyCreator.createLifeCycleWatchDog()
+    }
 
     override suspend fun setup() {
         eventTrackerApi.registerOnContext()
@@ -373,5 +379,6 @@ class DependencyContainer : DependencyContainerApi {
         pushApi.registerOnContext()
 
         connectionWatchDog.start()
+        lifecycleWatchDog.start()
     }
 }
