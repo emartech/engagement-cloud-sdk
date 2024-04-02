@@ -6,6 +6,7 @@ import android.net.ConnectivityManager
 import com.emarsys.api.push.PushConstants
 import com.emarsys.api.push.PushInternalApi
 import com.emarsys.applicationContext
+import com.emarsys.core.actions.LifecycleEvent
 import com.emarsys.core.badge.AndroidBadgeCountHandler
 import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.connection.AndroidConnectionWatchDog
@@ -27,6 +28,7 @@ import com.emarsys.mobileengage.push.PushTokenBroadcastReceiver
 import com.emarsys.setup.PlatformInitState
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.SharedFlow
 import java.util.Locale
 
 
@@ -95,7 +97,14 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
     }
 
     override fun createLifeCycleWatchDog(): LifecycleWatchDog {
-        TODO("Not yet implemented")
+        return object : LifecycleWatchDog {
+            override val lifecycleEvents: SharedFlow<LifecycleEvent>
+                get() = TODO("Not yet implemented")
+
+            override fun start() {
+                TODO("Not yet implemented")
+            }
+        }
     }
 
 }
