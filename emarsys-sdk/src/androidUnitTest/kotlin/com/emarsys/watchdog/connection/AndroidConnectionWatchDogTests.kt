@@ -1,4 +1,4 @@
-package com.emarsys.core.connection
+package com.emarsys.watchdog.connection
 
 import android.net.ConnectivityManager
 import android.net.Network
@@ -21,7 +21,7 @@ class AndroidConnectionWatchDogTests {
     }
 
     @Test
-    fun testRegister_shouldRegisterItselfAsDefaultNetworkCallback() {
+    fun testStart_shouldRegisterItselfAsDefaultNetworkCallback() {
         androidConnectionWatchDog.start()
 
         verify { mockConnectivityManager.registerDefaultNetworkCallback(androidConnectionWatchDog) }

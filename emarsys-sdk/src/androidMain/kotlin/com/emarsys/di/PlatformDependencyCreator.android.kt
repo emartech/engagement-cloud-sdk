@@ -3,13 +3,14 @@ package com.emarsys.di
 import android.content.Context
 import android.content.IntentFilter
 import android.net.ConnectivityManager
+import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import com.emarsys.api.push.PushConstants
 import com.emarsys.api.push.PushInternalApi
 import com.emarsys.applicationContext
-import com.emarsys.core.actions.LifecycleEvent
 import com.emarsys.core.badge.AndroidBadgeCountHandler
 import com.emarsys.core.badge.BadgeCountHandlerApi
-import com.emarsys.core.connection.AndroidConnectionWatchDog
+import com.emarsys.watchdog.connection.AndroidConnectionWatchDog
 import com.emarsys.core.device.AndroidLanguageProvider
 import com.emarsys.core.device.AndroidPlatformInfoCollector
 import com.emarsys.core.device.DeviceInfoCollector
@@ -26,11 +27,12 @@ import com.emarsys.core.url.AndroidExternalUrlOpener
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.mobileengage.push.PushTokenBroadcastReceiver
 import com.emarsys.setup.PlatformInitState
+import com.emarsys.watchdog.lifecycle.AndroidLifecycleWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import java.util.Locale
 
 
@@ -98,14 +100,12 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
         return AndroidConnectionWatchDog(connectivityManager, sdkLogger)
     }
 
-    override fun createLifeCycleWatchDog(): LifecycleWatchDog {  // TODO
-        return object : LifecycleWatchDog {
-            override val lifecycleEvents: SharedFlow<LifecycleEvent>
-                get() = MutableSharedFlow<LifecycleEvent>().asSharedFlow()
-
-            override fun start() {
-            }
-        }
+    override fun createLifeCycleWatchDog(): LifecycleWatchDog {
+        return AndroidLifecycleWatchDog(
+            ProcessLifecycleOwner.get().lifecycle,
+            ProcessLifecycleOwner.get().lifecycleScope,
+            CoroutineScope(Dispatchers.Default)
+        )
     }
 
 }

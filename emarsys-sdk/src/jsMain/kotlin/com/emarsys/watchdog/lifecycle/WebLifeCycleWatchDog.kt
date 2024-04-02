@@ -20,7 +20,7 @@ class WebLifeCycleWatchDog(
 
     override val lifecycleEvents: SharedFlow<LifecycleEvent> = _lifecycleEvents.asSharedFlow()
 
-    override fun start() {
+    override suspend fun start() {
         document.addEventListener(EventType("visibilitychange"), this::onVisibilityChange)
         document.addEventListener(EventType("pagehide"), this::onPageHide)
     }

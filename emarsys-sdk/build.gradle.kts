@@ -64,6 +64,8 @@ kotlin {
                 implementation(libs.androidx.core.ktx)
                 implementation(libs.cryptography.provider.jdk)
                 implementation(libs.startup.runtime)
+                implementation(libs.androidx.lifecycle.common)
+                implementation(libs.androidx.lifecycle.process)
             }
         }
 

@@ -1,4 +1,4 @@
-package com.emarsys.core.connection
+package com.emarsys.watchdog.connection
 
 import android.net.ConnectivityManager
 import android.net.Network
@@ -6,7 +6,6 @@ import android.net.NetworkCapabilities
 import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.SdkLogger
-import com.emarsys.watchdog.connection.ConnectionWatchDog
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 

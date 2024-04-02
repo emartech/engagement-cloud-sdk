@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.SharedFlow
 interface LifecycleWatchDog {
     val lifecycleEvents: SharedFlow<LifecycleEvent>
 
-    fun start()
+    suspend fun start()
 }
