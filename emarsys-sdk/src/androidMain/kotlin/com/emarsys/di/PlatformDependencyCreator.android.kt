@@ -28,7 +28,9 @@ import com.emarsys.mobileengage.push.PushTokenBroadcastReceiver
 import com.emarsys.setup.PlatformInitState
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import java.util.Locale
 
 
@@ -96,13 +98,12 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
         return AndroidConnectionWatchDog(connectivityManager, sdkLogger)
     }
 
-    override fun createLifeCycleWatchDog(): LifecycleWatchDog {
+    override fun createLifeCycleWatchDog(): LifecycleWatchDog {  // TODO
         return object : LifecycleWatchDog {
             override val lifecycleEvents: SharedFlow<LifecycleEvent>
-                get() = TODO("Not yet implemented")
+                get() = MutableSharedFlow<LifecycleEvent>().asSharedFlow()
 
             override fun start() {
-                TODO("Not yet implemented")
             }
         }
     }
