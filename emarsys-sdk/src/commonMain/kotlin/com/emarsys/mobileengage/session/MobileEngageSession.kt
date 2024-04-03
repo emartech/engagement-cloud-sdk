@@ -6,6 +6,7 @@ import com.emarsys.core.providers.Provider
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.session.SessionId
 import com.emarsys.networking.clients.event.EventClientApi
+import com.emarsys.networking.clients.event.model.Event
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -40,14 +41,36 @@ class MobileEngageSession(
     }
 
     override suspend fun startSession(): SdkResult {
+
         sessionContext.sessionStart = timestampProvider.provide().toEpochMilliseconds()
         sessionContext.sessionId = SessionId(uuidProvider.provide())
-        return SdkResult.Success(null)
+        return try {
+            eventClient.registerEvent(
+                Event.createSessionStart(
+                    timestampProvider.provide().toString()
+                )
+            )
+            SdkResult.Success(null)
+        } catch (e: Exception) {
+            SdkResult.Failure(e)
+        }
     }
 
     override suspend fun endSession(): SdkResult {
-        sessionContext.sessionStart = null
-        sessionContext.sessionId = null
-        return SdkResult.Success(null)
+        return try {
+            val duration =
+                timestampProvider.provide().toEpochMilliseconds() - sessionContext.sessionStart!!
+            eventClient.registerEvent(
+                Event.createSessionEnd(
+                    duration,
+                    timestampProvider.provide().toString()
+                )
+            )
+            sessionContext.sessionStart = null
+            sessionContext.sessionId = null
+            SdkResult.Success(null)
+        } catch (e: Exception) {
+            SdkResult.Failure(e)
+        }
     }
 }
