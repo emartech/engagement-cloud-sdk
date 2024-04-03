@@ -20,7 +20,7 @@ class AndroidLifecycleWatchDog(
 
     override val lifecycleEvents: SharedFlow<LifecycleEvent> = _lifecycleEvents.asSharedFlow()
 
-    override suspend fun start() {
+    override suspend fun register() {
         processLifecycleOwnerScope.launch {
             processLifecycleOwnerLifecycle.addObserver(this@AndroidLifecycleWatchDog)
         }

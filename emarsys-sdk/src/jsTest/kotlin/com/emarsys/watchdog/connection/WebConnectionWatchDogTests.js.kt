@@ -22,7 +22,7 @@ class WebConnectionWatchDogTests {
 
     @Test
     fun testStart_shouldAddOnlineEventListener() {
-        webConnectionWatchDog.start()
+        webConnectionWatchDog.register()
 
         window.dispatchEvent(Event("online"))
 
@@ -31,7 +31,7 @@ class WebConnectionWatchDogTests {
 
     @Test
     fun testStart_shouldAddOfflineEventListener() {
-        webConnectionWatchDog.start()
+        webConnectionWatchDog.register()
 
         window.dispatchEvent(Event("offline"))
 
@@ -40,7 +40,7 @@ class WebConnectionWatchDogTests {
 
     @Test
     fun testWatchDog_shouldSetIsOnlineToFalseThenToTrue_WhenConnection_GoesOffline_AndThen_Online() {
-        webConnectionWatchDog.start()
+        webConnectionWatchDog.register()
 
         window.dispatchEvent(Event("offline"))
 
@@ -53,7 +53,7 @@ class WebConnectionWatchDogTests {
 
     @Test
     fun testWatchDog_shouldSetIsOnlineToTrueThenToFalse_WhenConnection_GoesOnline_AndThen_Offline() {
-        webConnectionWatchDog.start()
+        webConnectionWatchDog.register()
 
         window.dispatchEvent(Event("online"))
 

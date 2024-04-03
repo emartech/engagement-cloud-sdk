@@ -30,7 +30,7 @@ class WebConnectionWatchDogTests {
     @Test
     fun testStart_shouldAddVisibilityChangeEventListener() = runTest {
         webLifeCycleWatchDog = WebLifeCycleWatchDog(document, TestScope())
-        webLifeCycleWatchDog.start()
+        webLifeCycleWatchDog.register()
         val events = mutableListOf<LifecycleEvent>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
            webLifeCycleWatchDog.lifecycleEvents.collect {
@@ -52,7 +52,7 @@ class WebConnectionWatchDogTests {
     @Test
     fun testStart_shouldAddPageHideEventListener() = runTest {
         webLifeCycleWatchDog = WebLifeCycleWatchDog(document, TestScope())
-        webLifeCycleWatchDog.start()
+        webLifeCycleWatchDog.register()
         val events = mutableListOf<LifecycleEvent>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             webLifeCycleWatchDog.lifecycleEvents.collect {

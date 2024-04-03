@@ -5,6 +5,7 @@ import android.net.Network
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
@@ -21,8 +22,8 @@ class AndroidConnectionWatchDogTests {
     }
 
     @Test
-    fun testStart_shouldRegisterItselfAsDefaultNetworkCallback() {
-        androidConnectionWatchDog.start()
+    fun testStart_shouldRegisterItselfAsDefaultNetworkCallback() = runTest {
+        androidConnectionWatchDog.register()
 
         verify { mockConnectivityManager.registerDefaultNetworkCallback(androidConnectionWatchDog) }
     }

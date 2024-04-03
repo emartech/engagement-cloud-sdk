@@ -8,7 +8,8 @@ data class SessionContext(
     var clientId: String? = null,
     var clientState: String? = null,
     var deviceEventState: String? = null,
-    var sessionId: SessionId? = null
+    var sessionId: SessionId? = null,
+    var sessionStart: Long? = null
 ) {
 
     fun hasContactIdentification() =

@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import web.dom.Document
 import web.dom.DocumentVisibilityState
-import web.events.EventType
 import web.events.Event
+import web.events.EventType
 
 class WebLifeCycleWatchDog(
     private val document: Document,
@@ -20,7 +20,7 @@ class WebLifeCycleWatchDog(
 
     override val lifecycleEvents: SharedFlow<LifecycleEvent> = _lifecycleEvents.asSharedFlow()
 
-    override suspend fun start() {
+    override suspend fun register() {
         document.addEventListener(EventType("visibilitychange"), this::onVisibilityChange)
         document.addEventListener(EventType("pagehide"), this::onPageHide)
     }

@@ -42,7 +42,7 @@ class AndroidLifecycleWatchDogTests {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun testStart_shouldAddItselfAsLifecycleObserver() = runTest {
-        androidLifecycleWatchDog.start()
+        androidLifecycleWatchDog.register()
         advanceUntilIdle()
 
         verify { mockProcessLifecycleOwnerLifecycle.addObserver(androidLifecycleWatchDog) }
@@ -51,7 +51,7 @@ class AndroidLifecycleWatchDogTests {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun testOnStart_shouldEmitOnForeGroundLifecycleEvent() = runTest {
-        androidLifecycleWatchDog.start()
+        androidLifecycleWatchDog.register()
         advanceUntilIdle()
         val events = mutableListOf<LifecycleEvent>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
@@ -69,7 +69,7 @@ class AndroidLifecycleWatchDogTests {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun testOnStop_shouldEmitOnBackGroundLifecycleEvent() = runTest {
-        androidLifecycleWatchDog.start()
+        androidLifecycleWatchDog.register()
         advanceUntilIdle()
         val events = mutableListOf<LifecycleEvent>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {

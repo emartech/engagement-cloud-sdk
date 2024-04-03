@@ -18,7 +18,7 @@ class AndroidConnectionWatchDog(
     private val _isOnline = MutableStateFlow(isConnected())
 
     override val isOnline = _isOnline.asStateFlow()
-    override fun start() {
+    override suspend fun register() {
         logger.log(LogEntry("log_network_monitoring_start", mapOf()), LogLevel.Debug)
         connectivityManager.registerDefaultNetworkCallback(this)
     }

@@ -10,6 +10,7 @@ import com.emarsys.api.oneventaction.OnEventActionApi
 import com.emarsys.api.predict.PredictApi
 import com.emarsys.api.push.PushApi
 import com.emarsys.core.providers.Provider
+import com.emarsys.mobileengage.session.MobileEngageSession
 import com.emarsys.remoteConfig.RemoteConfigHandlerApi
 import com.emarsys.setup.SetupOrganizerApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
@@ -45,6 +46,8 @@ interface DependencyContainerApi {
     val connectionWatchDog: ConnectionWatchDog
 
     val lifecycleWatchDog: LifecycleWatchDog
+
+    val mobileEngageSession: MobileEngageSession
 
     suspend fun setup()
 }

@@ -15,7 +15,7 @@ class WebConnectionWatchDog(
 
     override val isOnline = _isOnline.asStateFlow()
 
-    override fun start() {
+    override fun register() {
         window.addEventListener("online", this::onOnline)
         window.addEventListener("offline", this::onOffline)
     }

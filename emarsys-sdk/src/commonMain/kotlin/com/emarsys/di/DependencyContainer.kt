@@ -72,6 +72,7 @@ import com.emarsys.mobileengage.action.ActionFactory
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.OnEventActionModel
+import com.emarsys.mobileengage.session.MobileEngageSession
 import com.emarsys.networking.EmarsysClient
 import com.emarsys.networking.clients.contact.ContactClient
 import com.emarsys.networking.clients.contact.ContactClientApi
@@ -343,9 +344,16 @@ class DependencyContainer : DependencyContainerApi {
     }
 
     override val contactApi: ContactApi by lazy {
-        val contactClient = ContactClient(emarsysClient, urlFactory, sdkContext, contactTokenHandler, json)
+        val contactClient =
+            ContactClient(emarsysClient, urlFactory, sdkContext, contactTokenHandler, json)
         val contactContext =
-            ContactContext(persistentListOf("contactContextPersistentId", storage, ContactCall.serializer()))
+            ContactContext(
+                persistentListOf(
+                    "contactContextPersistentId",
+                    storage,
+                    ContactCall.serializer()
+                )
+            )
         val loggingContact = LoggingContact(sdkLogger)
         val contactGatherer = ContactGatherer(contactContext)
         val contactInternal = ContactInternal(contactClient, contactContext)
@@ -362,7 +370,8 @@ class DependencyContainer : DependencyContainerApi {
         )
         val loggingEvent = LoggingEventTracker(sdkLogger)
         val gathererEvent = EventTrackerGatherer(eventTrackerContext, timestampProvider)
-        val eventInternal = EventTrackerInternal(eventClient, eventTrackerContext, timestampProvider)
+        val eventInternal =
+            EventTrackerInternal(eventClient, eventTrackerContext, timestampProvider)
         EventTracker(loggingEvent, gathererEvent, eventInternal, sdkContext)
     }
     override val connectionWatchDog: ConnectionWatchDog by lazy {
@@ -373,12 +382,25 @@ class DependencyContainer : DependencyContainerApi {
         dependencyCreator.createLifeCycleWatchDog()
     }
 
+    override val mobileEngageSession: MobileEngageSession by lazy {
+        MobileEngageSession(
+            timestampProvider,
+            uuidProvider,
+            sessionContext,
+            eventClient,
+            sdkDispatcher
+        )
+    }
+
+
     override suspend fun setup() {
         eventTrackerApi.registerOnContext()
         contactApi.registerOnContext()
         pushApi.registerOnContext()
 
-        connectionWatchDog.start()
-        lifecycleWatchDog.start()
+        connectionWatchDog.register()
+        lifecycleWatchDog.register()
+
+        mobileEngageSession.subscribe(lifecycleWatchDog)
     }
 }
