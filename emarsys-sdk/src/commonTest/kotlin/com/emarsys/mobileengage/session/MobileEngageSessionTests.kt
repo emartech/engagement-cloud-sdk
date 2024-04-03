@@ -3,6 +3,7 @@ package com.emarsys.mobileengage.session
 import com.emarsys.core.actions.LifecycleEvent
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.session.SessionContext
+import com.emarsys.core.session.SessionId
 import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import io.kotest.matchers.shouldBe
@@ -29,6 +30,7 @@ import kotlin.test.Test
 class MobileEngageSessionTests : TestsWithMocks() {
     private companion object {
         const val SESSION_START = 123456789L
+        val SESSION_ID = SessionId("testSessionId")
     }
 
     override fun setUpMocks() = injectMocks(mocker)
@@ -63,6 +65,7 @@ class MobileEngageSessionTests : TestsWithMocks() {
         every { mockTimestampProvider.provide() } returns Instant.fromEpochMilliseconds(
             SESSION_START
         )
+        every { mockUuidProvider.provide() } returns SESSION_ID.value
 
         mobileEngageSession = MobileEngageSession(
             mockTimestampProvider,
@@ -87,6 +90,7 @@ class MobileEngageSessionTests : TestsWithMocks() {
         })
         advanceUntilIdle()
         sessionContext.sessionStart shouldBe SESSION_START
+        sessionContext.sessionId shouldBe SESSION_ID
     }
 
     @Test
@@ -100,10 +104,12 @@ class MobileEngageSessionTests : TestsWithMocks() {
         sharedFlow.emit(LifecycleEvent.OnForeground)
         advanceUntilIdle()
         sessionContext.sessionStart shouldBe SESSION_START
+        sessionContext.sessionId shouldBe SESSION_ID
 
         sharedFlow.emit(LifecycleEvent.OnBackground)
         advanceUntilIdle()
         sessionContext.sessionStart shouldBe null
+        sessionContext.sessionId shouldBe null
     }
 
 }
