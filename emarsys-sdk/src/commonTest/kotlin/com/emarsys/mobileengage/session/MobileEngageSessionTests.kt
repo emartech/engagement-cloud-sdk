@@ -1,6 +1,10 @@
 package com.emarsys.mobileengage.session
 
+import com.emarsys.EmarsysConfig
+import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.LifecycleEvent
+import com.emarsys.core.log.LogLevel
+import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.session.SessionId
@@ -10,14 +14,10 @@ import com.emarsys.networking.clients.event.model.EventType
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -32,6 +32,8 @@ import kotlin.test.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class MobileEngageSessionTests : TestsWithMocks() {
     private companion object {
+        const val APPLICATION_CODE = "testApplicationCode"
+        const val CONTACT_TOKEN = "testContactToken"
         const val SESSION_START_UTC = "1970-01-02T10:17:36.789Z"
         const val SESSION_START = 123456789L
         const val SESSION_END = 123457789L
@@ -56,18 +58,30 @@ class MobileEngageSessionTests : TestsWithMocks() {
 
     @Mock
     lateinit var mockTimestampProvider: Provider<Instant>
-    lateinit var timestampProviderMocker: Mocker.Every<Instant>
 
     @Mock
     lateinit var mockUuidProvider: Provider<String>
 
-    lateinit var sessionContext: SessionContext
+    @Mock
+    lateinit var mockSdkLogger: Logger
 
     @Mock
     lateinit var mockEventClient: EventClientApi
 
-    private lateinit var sdkDispatcher: CoroutineDispatcher
+    @Mock
+    lateinit var mockSdkContext: SdkContextApi
 
+    private lateinit var sessionContext: SessionContext
+
+    private lateinit var timestampProviderMocker: Mocker.Every<Instant>
+
+    private lateinit var uuidProviderMocker: Mocker.Every<String>
+
+    private lateinit var eventClientStartEventRegistrationMocker: Mocker.EverySuspend<Unit>
+
+    private lateinit var eventClientEndEventRegistrationMocker: Mocker.EverySuspend<Unit>
+
+    private lateinit var sdkDispatcher: CoroutineDispatcher
 
     private lateinit var mobileEngageSession: MobileEngageSession
 
@@ -78,55 +92,86 @@ class MobileEngageSessionTests : TestsWithMocks() {
     }
 
     @BeforeTest
-    fun setUp() {
+    fun setUp() = runTest {
         sdkDispatcher = StandardTestDispatcher()
-        sessionContext = SessionContext()
+
+        sessionContext = SessionContext(
+            contactToken = CONTACT_TOKEN,
+            sessionId = SESSION_ID,
+            sessionStart = SESSION_START
+        )
 
         timestampProviderMocker = every { mockTimestampProvider.provide() }
-        timestampProviderMocker returns Instant.fromEpochMilliseconds(SESSION_START)
-        every { mockUuidProvider.provide() } returns SESSION_ID.value
+
+        uuidProviderMocker = every { mockUuidProvider.provide() }
+        uuidProviderMocker returns SESSION_ID.value
+
+        eventClientStartEventRegistrationMocker =
+            everySuspending { mockEventClient.registerEvent(sessionStartEvent) }
+        eventClientStartEventRegistrationMocker returns Unit
+
+        eventClientEndEventRegistrationMocker =
+            everySuspending { mockEventClient.registerEvent(sessionEndEvent) }
+        eventClientEndEventRegistrationMocker returns Unit
+
+        every { mockSdkLogger.log(isAny(), isAny()) } returns Unit
 
         mobileEngageSession = MobileEngageSession(
             mockTimestampProvider,
             mockUuidProvider,
             sessionContext,
+            mockSdkContext,
             mockEventClient,
-            sdkDispatcher
+            sdkDispatcher,
+            mockSdkLogger
         )
     }
 
     @Test
     fun testSubscribe_shouldCallStartSession() = runTest {
-
-        mobileEngageSession.subscribe(object : LifecycleWatchDog {
-            override val lifecycleEvents: SharedFlow<LifecycleEvent>
-                get() = flowOf(LifecycleEvent.OnForeground).shareIn(
-                    scope = CoroutineScope(StandardTestDispatcher()),
-                    started = SharingStarted.Eagerly
-                )
-
-            override suspend fun register() {}
-        })
-        advanceUntilIdle()
-        sessionContext.sessionStart shouldBe SESSION_START
-        sessionContext.sessionId shouldBe SESSION_ID
-    }
-
-    @Test
-    fun testSubscribe_shouldCallEndSession() = runTest {
+        sessionContext.contactToken = CONTACT_TOKEN
+        sessionContext.sessionId = null
+        sessionContext.sessionStart = null
+        every { mockSdkContext.config } returns EmarsysConfig(applicationCode = APPLICATION_CODE)
+        timestampProviderMocker returns Instant.fromEpochMilliseconds(SESSION_START)
         val sharedFlow = MutableSharedFlow<LifecycleEvent>()
         mobileEngageSession.subscribe(object : LifecycleWatchDog {
             override val lifecycleEvents: SharedFlow<LifecycleEvent> = sharedFlow
 
             override suspend fun register() {}
         })
+
         sharedFlow.emit(LifecycleEvent.OnForeground)
         advanceUntilIdle()
+
+        sessionContext.sessionStart shouldBe SESSION_START
+        sessionContext.sessionId shouldBe SESSION_ID
+    }
+
+    @Test
+    fun testSubscribe_shouldCallEndSession() = runTest {
+        everySuspending { mockEventClient.registerEvent(sessionStartEvent) } returns Unit
+        everySuspending { mockEventClient.registerEvent(sessionEndEvent) } returns Unit
+        every { mockSdkContext.config } returns EmarsysConfig(applicationCode = APPLICATION_CODE)
+        timestampProviderMocker returns Instant.fromEpochMilliseconds(SESSION_START)
+        val sharedFlow = MutableSharedFlow<LifecycleEvent>()
+        mobileEngageSession.subscribe(object : LifecycleWatchDog {
+            override val lifecycleEvents: SharedFlow<LifecycleEvent> = sharedFlow
+
+            override suspend fun register() {}
+        })
+
+        sharedFlow.emit(LifecycleEvent.OnForeground)
+        advanceUntilIdle()
+
         sessionContext.sessionStart shouldBe SESSION_START
         sessionContext.sessionId shouldBe SESSION_ID
 
+        timestampProviderMocker returns Instant.fromEpochMilliseconds(SESSION_END)
+
         sharedFlow.emit(LifecycleEvent.OnBackground)
         advanceUntilIdle()
+
         sessionContext.sessionStart shouldBe null
         sessionContext.sessionId shouldBe null
     }
@@ -134,40 +179,169 @@ class MobileEngageSessionTests : TestsWithMocks() {
 
     @Test
     fun testStartSession_shouldTrackSessionStartEvent() = runTest {
-        everySuspending { mockEventClient.registerEvent(sessionStartEvent) } returns Unit
+        sessionContext.sessionId = null
+        sessionContext.sessionStart = null
+        every { mockSdkContext.config } returns EmarsysConfig(applicationCode = APPLICATION_CODE)
+        timestampProviderMocker returns Instant.fromEpochMilliseconds(SESSION_START)
 
-        mobileEngageSession.subscribe(object : LifecycleWatchDog {
-            override val lifecycleEvents: SharedFlow<LifecycleEvent>
-                get() = flowOf(LifecycleEvent.OnForeground).shareIn(
-                    scope = CoroutineScope(StandardTestDispatcher()),
-                    started = SharingStarted.Eagerly
-                )
+        mobileEngageSession.startSession()
 
-            override suspend fun register() {}
-        })
-        advanceUntilIdle()
         verifyWithSuspend(exhaustive = false) { mockEventClient.registerEvent(sessionStartEvent) }
     }
 
     @Test
     fun testEndSession_shouldTrackSessionEndEvent() = runTest {
-        everySuspending { mockEventClient.registerEvent(sessionEndEvent) } returns Unit
-        everySuspending { mockEventClient.registerEvent(sessionStartEvent) } returns Unit
-        val sharedFlow = MutableSharedFlow<LifecycleEvent>()
-        mobileEngageSession.subscribe(object : LifecycleWatchDog {
-            override val lifecycleEvents: SharedFlow<LifecycleEvent> = sharedFlow
-
-            override suspend fun register() {}
-        })
-        sharedFlow.emit(LifecycleEvent.OnForeground)
-        advanceUntilIdle()
-        verifyWithSuspend(exhaustive = false) { mockEventClient.registerEvent(sessionStartEvent) }
-
         timestampProviderMocker returns Instant.fromEpochMilliseconds(SESSION_END)
+        every { mockSdkContext.config } returns EmarsysConfig(applicationCode = APPLICATION_CODE)
 
-        sharedFlow.emit(LifecycleEvent.OnBackground)
+        mobileEngageSession.endSession()
 
-        advanceUntilIdle()
         verifyWithSuspend(exhaustive = false) { mockEventClient.registerEvent(sessionEndEvent) }
+    }
+
+    @Test
+    fun testStartSession_shouldSetSession_evenWhenRegisteringEventFails() = runTest {
+        sessionContext.sessionId = null
+        sessionContext.sessionStart = null
+        eventClientStartEventRegistrationMocker runs {
+            throw RuntimeException(
+                "uuid provider failed"
+            )
+        }
+        timestampProviderMocker returns Instant.fromEpochMilliseconds(SESSION_START)
+        every { mockSdkContext.config } returns EmarsysConfig(applicationCode = APPLICATION_CODE)
+
+        mobileEngageSession.startSession()
+
+        verifyWithSuspend(exhaustive = false) {
+            threw<RuntimeException> { mockEventClient.registerEvent(sessionStartEvent) }
+        }
+        sessionContext.sessionStart shouldBe SESSION_START
+        sessionContext.sessionId shouldBe SESSION_ID
+    }
+
+    @Test
+    fun testStartSession_shouldNotDoAnything_whenApplicationCodeIsNull() = runTest {
+        sessionContext.sessionId = null
+        sessionContext.sessionStart = null
+        every { mockSdkContext.config } returns EmarsysConfig(applicationCode = null)
+
+        mobileEngageSession.startSession()
+
+        verifySessionEventNotRegistered(sessionStartEvent)
+        sessionContext.sessionId shouldBe null
+        sessionContext.sessionStart shouldBe null
+    }
+
+    @Test
+    fun testStartSession_shouldNotDoAnything_whenContactTokenIsNull() = runTest {
+        sessionContext.contactToken = null
+        every { mockSdkContext.config } returns EmarsysConfig(applicationCode = APPLICATION_CODE)
+
+        mobileEngageSession.startSession()
+
+        verifySessionEventNotRegistered(sessionStartEvent)
+        sessionContext.sessionId shouldBe SESSION_ID
+        sessionContext.sessionStart shouldBe SESSION_START
+    }
+
+    @Test
+    fun testStartSession_shouldNotDoAnything_whenSessionIdIsNull() = runTest {
+        sessionContext.sessionId = null
+        every { mockSdkContext.config } returns EmarsysConfig(applicationCode = APPLICATION_CODE)
+
+        mobileEngageSession.startSession()
+
+        verifySessionEventNotRegistered(sessionStartEvent)
+        sessionContext.sessionId shouldBe null
+        sessionContext.sessionStart shouldBe SESSION_START
+    }
+
+    @Test
+    fun testStartSession_shouldNotDoAnything_whenSessionStartIsNull() = runTest {
+        sessionContext.sessionStart = null
+        every { mockSdkContext.config } returns EmarsysConfig(applicationCode = APPLICATION_CODE)
+
+        mobileEngageSession.startSession()
+
+        verifySessionEventNotRegistered(sessionStartEvent)
+        sessionContext.sessionId shouldBe SESSION_ID
+        sessionContext.sessionStart shouldBe null
+    }
+
+    @Test
+    fun testEndSession_shouldResetSession_evenWhenRegisteringEventFails() = runTest {
+        timestampProviderMocker returns Instant.fromEpochMilliseconds(SESSION_END)
+        eventClientEndEventRegistrationMocker runs {
+            throw RuntimeException(
+                "request failed"
+            )
+        }
+        every { mockSdkContext.config } returns EmarsysConfig(applicationCode = APPLICATION_CODE)
+
+        mobileEngageSession.endSession()
+
+        verifyWithSuspend(exhaustive = false) {
+            threw<RuntimeException> { mockEventClient.registerEvent(sessionEndEvent) }
+        }
+        sessionContext.sessionStart shouldBe null
+        sessionContext.sessionId shouldBe null
+    }
+
+    @Test
+    fun testEndSession_shouldNotDoAnything_whenSessionIdIsNull() = runTest {
+        sessionContext.sessionId = null
+        every { mockSdkContext.config } returns EmarsysConfig(applicationCode = APPLICATION_CODE)
+
+        mobileEngageSession.endSession()
+
+        verifySessionEventNotRegistered(sessionEndEvent)
+        sessionContext.sessionId shouldBe null
+        sessionContext.sessionStart shouldBe SESSION_START
+    }
+
+    @Test
+    fun testEndSession_shouldNotDoAnything_whenSessionStartIsNull() = runTest {
+        sessionContext.sessionStart = null
+        every { mockSdkContext.config } returns EmarsysConfig(applicationCode = APPLICATION_CODE)
+
+        mobileEngageSession.endSession()
+
+        verifySessionEventNotRegistered(sessionEndEvent)
+        sessionContext.sessionId shouldBe SESSION_ID
+        sessionContext.sessionStart shouldBe null
+    }
+
+    @Test
+    fun testEndSession_shouldNotDoAnything_whenApplicationCodeIsNull() = runTest {
+        every { mockSdkContext.config } returns EmarsysConfig(applicationCode = null)
+
+        mobileEngageSession.endSession()
+
+        verifySessionEventNotRegistered(sessionEndEvent)
+        sessionContext.sessionId shouldBe SESSION_ID
+        sessionContext.sessionStart shouldBe SESSION_START
+    }
+
+    @Test
+    fun testEndSession_shouldNotDoAnything_whenContactTokenIsNull() = runTest {
+        sessionContext.contactToken = null
+        every { mockSdkContext.config } returns EmarsysConfig(applicationCode = APPLICATION_CODE)
+
+        mobileEngageSession.endSession()
+
+        verifySessionEventNotRegistered(sessionEndEvent)
+        sessionContext.sessionId shouldBe SESSION_ID
+        sessionContext.sessionStart shouldBe SESSION_START
+    }
+
+    private suspend fun verifySessionEventNotRegistered(sessionEvent: Event) {
+        verifyWithSuspend {
+            mockSdkContext.config
+            mockSdkLogger.log(isAny(), isEqual(LogLevel.Debug))
+            repeat(0) {
+                mockEventClient.registerEvent(sessionEvent)
+            }
+        }
     }
 }

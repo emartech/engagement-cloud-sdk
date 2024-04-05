@@ -18,7 +18,7 @@ class AppStartState(
 
     override suspend fun active() {
         if (!alreadyCompleted) {
-            val appStartEvent = Event.createAppStart(timestampProvider.provide().toString())
+            val appStartEvent = Event.createAppStart(timestampProvider.provide())
             eventClient.registerEvent(appStartEvent)
             alreadyCompleted = true
         }

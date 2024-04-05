@@ -73,6 +73,7 @@ import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.OnEventActionModel
 import com.emarsys.mobileengage.session.MobileEngageSession
+import com.emarsys.mobileengage.session.Session
 import com.emarsys.networking.EmarsysClient
 import com.emarsys.networking.clients.contact.ContactClient
 import com.emarsys.networking.clients.contact.ContactClientApi
@@ -382,13 +383,15 @@ class DependencyContainer : DependencyContainerApi {
         dependencyCreator.createLifeCycleWatchDog()
     }
 
-    override val mobileEngageSession: MobileEngageSession by lazy {
+    override val mobileEngageSession: Session by lazy {
         MobileEngageSession(
             timestampProvider,
             uuidProvider,
             sessionContext,
+            sdkContext,
             eventClient,
-            sdkDispatcher
+            sdkDispatcher,
+            sdkLogger
         )
     }
 

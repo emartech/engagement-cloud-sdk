@@ -1,7 +1,9 @@
 package com.emarsys.mobileengage.session
 
-import com.emarsys.api.SdkResult
+import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.LifecycleEvent
+import com.emarsys.core.log.LogEntry
+import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.session.SessionId
@@ -18,59 +20,92 @@ class MobileEngageSession(
     private val timestampProvider: Provider<Instant>,
     private val uuidProvider: Provider<String>,
     private val sessionContext: SessionContext,
+    private val sdkContext: SdkContextApi,
     private val eventClient: EventClientApi,
-    private val sdkDispatcher: CoroutineDispatcher
+    private val sdkDispatcher: CoroutineDispatcher,
+    private val sdkLogger: Logger
 ) : Session {
 
-    suspend fun subscribe(lifecycleWatchDog: LifecycleWatchDog) {
+    override suspend fun subscribe(lifecycleWatchDog: LifecycleWatchDog) {
         CoroutineScope(sdkDispatcher).launch(
             start = CoroutineStart.UNDISPATCHED
         ) {
             lifecycleWatchDog.lifecycleEvents.collect { event ->
                 when (event) {
-                    LifecycleEvent.OnForeground -> {
-                        startSession()
-                    }
-
-                    LifecycleEvent.OnBackground -> {
-                        endSession()
-                    }
+                    LifecycleEvent.OnForeground -> startSession()
+                    LifecycleEvent.OnBackground -> endSession()
                 }
             }
         }
     }
 
-    override suspend fun startSession(): SdkResult {
-
-        sessionContext.sessionStart = timestampProvider.provide().toEpochMilliseconds()
-        sessionContext.sessionId = SessionId(uuidProvider.provide())
-        return try {
-            eventClient.registerEvent(
-                Event.createSessionStart(
-                    timestampProvider.provide().toString()
+    override suspend fun startSession() {
+        if (canStartSession()) {
+            val sessionStart = timestampProvider.provide()
+            try {
+                eventClient.registerEvent(Event.createSessionStart(sessionStart))
+            } catch (exception: Exception) {
+                sdkLogger.error(
+                    LogEntry(
+                        "mobile-engage-session-start-request-failed",
+                        mapOf("error" to (exception.message ?: "Start session failed."))
+                    )
                 )
-            )
-            SdkResult.Success(null)
-        } catch (e: Exception) {
-            SdkResult.Failure(e)
+                resetSessionContext()
+            } finally {
+                sessionContext.sessionStart = sessionStart.toEpochMilliseconds()
+                sessionContext.sessionId = SessionId(uuidProvider.provide())
+            }
+        } else {
+            sdkLogger.debug(LogEntry("mobile-engage-session-start-not-possible"))
         }
     }
 
-    override suspend fun endSession(): SdkResult {
-        return try {
-            val duration =
-                timestampProvider.provide().toEpochMilliseconds() - sessionContext.sessionStart!!
-            eventClient.registerEvent(
-                Event.createSessionEnd(
-                    duration,
-                    timestampProvider.provide().toString()
+    override suspend fun endSession() {
+        if (canEndSession()) {
+            return try {
+                val event = createSessionEndEvent()
+                eventClient.registerEvent(event)
+            } catch (exception: Exception) {
+                sdkLogger.error(
+                    LogEntry(
+                        "mobile-engage-session-end-request-failed",
+                        mapOf("error" to (exception.message ?: "End session failed"))
+                    )
                 )
+            } finally {
+                resetSessionContext()
+            }
+        } else {
+            sdkLogger.debug(
+                LogEntry("mobile-engage-session-end-not-possible")
             )
-            sessionContext.sessionStart = null
-            sessionContext.sessionId = null
-            SdkResult.Success(null)
-        } catch (e: Exception) {
-            SdkResult.Failure(e)
         }
     }
+
+    private fun canStartSession() =
+        sdkContext.config?.applicationCode != null
+                && sessionContext.contactToken != null
+                && sessionContext.sessionId == null
+                && sessionContext.sessionStart == null
+
+    private fun canEndSession() =
+        sdkContext.config?.applicationCode != null
+                && sessionContext.contactToken != null
+                && sessionContext.sessionId != null
+                && sessionContext.sessionStart != null
+
+    private fun resetSessionContext() {
+        sessionContext.sessionStart = null
+        sessionContext.sessionId = null
+    }
+
+    private fun createSessionEndEvent(): Event {
+        val sessionEnd = timestampProvider.provide()
+        val duration =
+            sessionEnd.toEpochMilliseconds() - sessionContext.sessionStart!!
+        return Event.createSessionEnd(duration, sessionEnd)
+    }
+
+
 }

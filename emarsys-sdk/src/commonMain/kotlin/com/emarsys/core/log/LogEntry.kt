@@ -1,12 +1,10 @@
 package com.emarsys.core.log
 
-import kotlinx.coroutines.currentCoroutineContext
-import kotlin.native.concurrent.ThreadLocal
 import kotlin.reflect.typeOf
 
 data class LogEntry(
     val topic: String,
-    val data: Map<String, Any>
+    val data: Map<String, Any> = mapOf()
 ) {
     
     companion object {
