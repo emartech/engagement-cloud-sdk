@@ -4,12 +4,7 @@ interface Logger {
 
     fun log(entry: LogEntry, level: LogLevel)
 
-    fun debug(entry: LogEntry) {
-        log(entry, LogLevel.Debug)
-    }
+    fun debug(entry: LogEntry)
 
-    fun error(entry: LogEntry) {
-        log(entry, LogLevel.Error)
-    }
-
+    fun error(entry: LogEntry)
 }

@@ -2,6 +2,7 @@ package com.emarsys.watchdog.connection
 
 import io.kotest.matchers.shouldBe
 import kotlinx.browser.window
+import kotlinx.coroutines.test.runTest
 import org.w3c.dom.events.Event
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -12,7 +13,7 @@ class WebConnectionWatchDogTests {
 
     @BeforeTest
     fun setup() {
-        webConnectionWatchDog= WebConnectionWatchDog(window)
+        webConnectionWatchDog = WebConnectionWatchDog(window)
     }
 
     @Test
@@ -21,7 +22,7 @@ class WebConnectionWatchDogTests {
     }
 
     @Test
-    fun testStart_shouldAddOnlineEventListener() {
+    fun testStart_shouldAddOnlineEventListener() = runTest {
         webConnectionWatchDog.register()
 
         window.dispatchEvent(Event("online"))
@@ -30,7 +31,7 @@ class WebConnectionWatchDogTests {
     }
 
     @Test
-    fun testStart_shouldAddOfflineEventListener() {
+    fun testStart_shouldAddOfflineEventListener() = runTest {
         webConnectionWatchDog.register()
 
         window.dispatchEvent(Event("offline"))
@@ -39,29 +40,31 @@ class WebConnectionWatchDogTests {
     }
 
     @Test
-    fun testWatchDog_shouldSetIsOnlineToFalseThenToTrue_WhenConnection_GoesOffline_AndThen_Online() {
-        webConnectionWatchDog.register()
+    fun testWatchDog_shouldSetIsOnlineToFalseThenToTrue_WhenConnection_GoesOffline_AndThen_Online() =
+        runTest {
+            webConnectionWatchDog.register()
 
-        window.dispatchEvent(Event("offline"))
+            window.dispatchEvent(Event("offline"))
 
-        webConnectionWatchDog.isOnline.value shouldBe false
+            webConnectionWatchDog.isOnline.value shouldBe false
 
-        window.dispatchEvent(Event("online"))
+            window.dispatchEvent(Event("online"))
 
-        webConnectionWatchDog.isOnline.value shouldBe true
-    }
+            webConnectionWatchDog.isOnline.value shouldBe true
+        }
 
     @Test
-    fun testWatchDog_shouldSetIsOnlineToTrueThenToFalse_WhenConnection_GoesOnline_AndThen_Offline() {
-        webConnectionWatchDog.register()
+    fun testWatchDog_shouldSetIsOnlineToTrueThenToFalse_WhenConnection_GoesOnline_AndThen_Offline() =
+        runTest {
+            webConnectionWatchDog.register()
 
-        window.dispatchEvent(Event("online"))
+            window.dispatchEvent(Event("online"))
 
-        webConnectionWatchDog.isOnline.value shouldBe true
+            webConnectionWatchDog.isOnline.value shouldBe true
 
-        window.dispatchEvent(Event("offline"))
+            window.dispatchEvent(Event("offline"))
 
-        webConnectionWatchDog.isOnline.value shouldBe false
-    }
+            webConnectionWatchDog.isOnline.value shouldBe false
+        }
 
 }

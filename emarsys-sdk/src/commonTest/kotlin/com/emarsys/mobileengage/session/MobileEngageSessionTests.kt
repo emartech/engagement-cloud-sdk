@@ -3,7 +3,6 @@ package com.emarsys.mobileengage.session
 import com.emarsys.EmarsysConfig
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.LifecycleEvent
-import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.session.SessionContext
@@ -115,6 +114,8 @@ class MobileEngageSessionTests : TestsWithMocks() {
         eventClientEndEventRegistrationMocker returns Unit
 
         every { mockSdkLogger.log(isAny(), isAny()) } returns Unit
+        every { mockSdkLogger.debug(isAny()) } returns Unit
+        every { mockSdkLogger.error(isAny()) } returns Unit
 
         mobileEngageSession = MobileEngageSession(
             mockTimestampProvider,
@@ -338,7 +339,7 @@ class MobileEngageSessionTests : TestsWithMocks() {
     private suspend fun verifySessionEventNotRegistered(sessionEvent: Event) {
         verifyWithSuspend {
             mockSdkContext.config
-            mockSdkLogger.log(isAny(), isEqual(LogLevel.Debug))
+            mockSdkLogger.debug(isAny())
             repeat(0) {
                 mockEventClient.registerEvent(sessionEvent)
             }

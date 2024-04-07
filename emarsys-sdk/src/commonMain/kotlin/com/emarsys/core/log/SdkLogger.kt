@@ -6,4 +6,12 @@ class SdkLogger: Logger {
         println("LogEntry: $entry logLevel: $level")
     }
 
+    override fun debug(entry: LogEntry) {
+        log(entry, LogLevel.Debug)
+    }
+
+    override fun error(entry: LogEntry) {
+        log(entry, LogLevel.Error)
+    }
+
 }

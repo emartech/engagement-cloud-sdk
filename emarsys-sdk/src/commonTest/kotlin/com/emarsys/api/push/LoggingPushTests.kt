@@ -18,6 +18,14 @@ class FakeSdkLogger : Logger {
         funCalls.add(Pair(entry, level))
     }
 
+    override fun debug(entry: LogEntry) {
+        log(entry, LogLevel.Debug)
+    }
+
+    override fun error(entry: LogEntry) {
+        log(entry, LogLevel.Error)
+    }
+
 }
 
 class LoggingPushTests {
