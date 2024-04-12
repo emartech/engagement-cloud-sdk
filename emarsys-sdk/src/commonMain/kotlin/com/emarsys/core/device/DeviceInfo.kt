@@ -11,34 +11,21 @@ data class DeviceInfo(
     val deviceModel: String,
     val osVersion: String,
     val sdkVersion: String,
-    val language: String,
-    val timezone: String,
+    val languageCode: String,
+    val timezone: String
 )
-
 
 @Serializable
-data class PushSettings(
-    val authorizationStatus: String,
-    val soundSetting: String,
-    val iOSBadgeSetting: String,
-    val alertSetting: String,
-    val notificationCenterSetting: String,
-    val lockScreenSetting: String,
-    val carPlaySetting: String,
-    val alertStyle: String,
-    val showPreviewsSetting: String,
-    val criticalAlertSetting: String,
-    val providesAppNotificationSettings: String,
-    val scheduledDeliverySetting: String,
-    val timeSensitiveSetting: String
-)
+sealed interface PushSettings
 
-interface NotificationSettings {
-    val areNotificationsEnabled: Boolean
-    val importance: Int
+@Serializable
+data class AndroidNotificationSettings(
+    val areNotificationsEnabled: Boolean,
+    val importance: Int,
     val channelSettings: List<ChannelSettings>
-}
+): PushSettings
 
+@Serializable
 data class ChannelSettings(
     val channelId: String,
     val importance: Int = -1000,

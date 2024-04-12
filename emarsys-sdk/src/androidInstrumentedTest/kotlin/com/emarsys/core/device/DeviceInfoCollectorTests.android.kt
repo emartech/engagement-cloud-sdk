@@ -20,6 +20,7 @@ class DeviceInfoCollectorTests {
         const val GENERATED_ID = "test uuid"
         const val STORED_ID = "stored hardware id"
         const val TIMEZONE = "+0300"
+        val PUSH_SETTINGS = AndroidNotificationSettings(true, 1, listOf())
     }
 
     private lateinit var mockLanguageProvider: LanguageProvider
@@ -76,7 +77,7 @@ class DeviceInfoCollectorTests {
             deviceModel = Build.MODEL,
             osVersion = SdkBuildConfig.getOsVersion(),
             sdkVersion = BuildConfig.VERSION_NAME,
-            language = LANGUAGE,
+            languageCode = LANGUAGE,
             timezone = TIMEZONE
         )
 

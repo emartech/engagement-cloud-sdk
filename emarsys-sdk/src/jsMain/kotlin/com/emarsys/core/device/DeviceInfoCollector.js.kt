@@ -26,7 +26,7 @@ actual class DeviceInfoCollector(
                 deviceModel = window.navigator.userAgent,
                 osVersion = headerData.browserVersion,
                 sdkVersion = BuildConfig.VERSION_NAME,
-                language = window.navigator.language,
+                languageCode = window.navigator.language,
                 timezone = timezoneProvider.provide()
             )
         )
@@ -38,5 +38,9 @@ actual class DeviceInfoCollector(
             storage.put(HARDWARE_ID_STORAGE_KEY, generatedId)
             generatedId
         }
+    }
+
+    override fun getPushSettings(): PushSettings {
+        TODO("Not yet implemented")
     }
 }

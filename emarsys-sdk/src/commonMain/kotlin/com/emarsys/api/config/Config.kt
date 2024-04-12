@@ -1,31 +1,58 @@
 package com.emarsys.api.config
 
+import Activatable
 import com.emarsys.api.SdkResult
-import com.emarsys.core.device.NotificationSettings
+import com.emarsys.api.generic.GenericApi
+import com.emarsys.context.SdkContextApi
+import com.emarsys.core.device.DeviceInfo
+import com.emarsys.core.device.DeviceInfoCollectorApi
+import com.emarsys.core.device.PushSettings
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 
-class Config:ConfigApi {
+interface ConfigInstance: ConfigInternalApi, Activatable
+
+class Config<Logging : ConfigInstance, Gatherer : ConfigInstance, Internal : ConfigInstance>(
+    loggingApi: Logging,
+    gathererApi: Gatherer,
+    internalApi: Internal,
+    sdkContext: SdkContextApi,
+    private val deviceInfoCollector: DeviceInfoCollectorApi
+) : GenericApi<Logging, Gatherer, Internal>(
+    loggingApi,
+    gathererApi,
+    internalApi,
+    sdkContext
+), ConfigApi {
     override val contactFieldId: Int?
-        get() = TODO("Not yet implemented")
+        get() = sdkContext.contactFieldId
     override val applicationCode: String?
-        get() = TODO("Not yet implemented")
+        get() = sdkContext.config?.applicationCode
     override val merchantId: String?
-        get() = TODO("Not yet implemented")
+        get() = sdkContext.config?.merchantId
     override val hardwareId: String
-        get() = TODO("Not yet implemented")
+        get() = deviceInfoCollector.getHardwareId()
     override val languageCode: String
-        get() = TODO("Not yet implemented")
-    override val notificationSettings: NotificationSettings
-        get() = TODO("Not yet implemented")
-    override val isAutomaticPushSendingEnabled: Boolean
-        get() = TODO("Not yet implemented")
-    override val sdkVersion: String
-        get() = TODO("Not yet implemented")
+        get() = getDeviceInfo().languageCode
+    override val pushSettings: PushSettings
+        get() = deviceInfoCollector.getPushSettings()
 
-    override fun changeApplicationCode(applicationCode: String?): SdkResult {
-        TODO("Not yet implemented")
+    override val sdkVersion: String
+        get() = getDeviceInfo().sdkVersion
+
+    override suspend fun changeApplicationCode(applicationCode: String): SdkResult {
+        return withContext(sdkContext.sdkDispatcher) {
+            activeInstance<ConfigInternalApi>().changeApplicationCode(applicationCode)
+        }
     }
 
-    override fun changeMerchantId(merchantId: String?): SdkResult {
-        TODO("Not yet implemented")
+    override suspend fun changeMerchantId(merchantId: String): SdkResult {
+        return withContext(sdkContext.sdkDispatcher) {
+            activeInstance<ConfigInternalApi>().changeMerchantId(merchantId)
+        }
+    }
+
+    private fun getDeviceInfo(): DeviceInfo {
+        return Json.decodeFromString<DeviceInfo>(deviceInfoCollector.collect())
     }
 }

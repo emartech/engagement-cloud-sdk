@@ -25,7 +25,7 @@ actual class DeviceInfoCollector(
             deviceModel = Build.MODEL,
             osVersion = SdkBuildConfig.getOsVersion(),
             sdkVersion = BuildConfig.VERSION_NAME,
-            language = languageProvider.provideLanguage(),
+            languageCode = languageProvider.provideLanguage(),
             timezone = timezoneProvider.provide()
         )
 
@@ -42,5 +42,9 @@ actual class DeviceInfoCollector(
 
     private fun getPlatform(): String {
         return if (isGooglePlayServicesAvailable) "android" else "android-huawei"
+    }
+
+    override fun getPushSettings(): PushSettings {
+        TODO("Not yet implemented")
     }
 }

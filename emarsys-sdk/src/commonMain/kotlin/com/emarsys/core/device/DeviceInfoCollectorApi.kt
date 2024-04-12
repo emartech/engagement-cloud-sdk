@@ -4,4 +4,6 @@ interface DeviceInfoCollectorApi {
     fun collect(): String
 
     fun getHardwareId(): String
+
+    fun getPushSettings(): PushSettings
 }

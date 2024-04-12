@@ -3,6 +3,9 @@ package com.emarsys.di
 import com.emarsys.api.AppEvent
 import com.emarsys.api.config.Config
 import com.emarsys.api.config.ConfigApi
+import com.emarsys.api.config.ConfigInternal
+import com.emarsys.api.config.GathererConfig
+import com.emarsys.api.config.LoggingConfig
 import com.emarsys.api.contact.Contact
 import com.emarsys.api.contact.ContactApi
 import com.emarsys.api.contact.ContactCall
@@ -272,7 +275,10 @@ class DependencyContainer : DependencyContainerApi {
         OnEventAction(onEventActionInternal)
     }
     override val configApi: ConfigApi by lazy {
-        Config()
+        val loggingConfig = LoggingConfig()
+        val gathererConfig = GathererConfig()
+        val configInternal = ConfigInternal()
+        Config(loggingConfig, gathererConfig, configInternal, sdkContext, deviceInfoCollector)
     }
 
     override val pushApi: PushApi by lazy {

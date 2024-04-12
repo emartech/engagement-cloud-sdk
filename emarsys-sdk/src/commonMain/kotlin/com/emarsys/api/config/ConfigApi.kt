@@ -1,7 +1,7 @@
 package com.emarsys.api.config
 
 import com.emarsys.api.SdkResult
-import com.emarsys.core.device.NotificationSettings
+import com.emarsys.core.device.PushSettings
 
 interface ConfigApi {
 
@@ -15,14 +15,11 @@ interface ConfigApi {
 
     val languageCode: String
 
-    val notificationSettings: NotificationSettings
-
-    val isAutomaticPushSendingEnabled: Boolean
+    val pushSettings: PushSettings
 
     val sdkVersion: String
 
-    fun changeApplicationCode(applicationCode: String?): SdkResult
+    suspend fun changeApplicationCode(applicationCode: String): SdkResult
 
-
-    fun changeMerchantId(merchantId: String?): SdkResult
+    suspend fun changeMerchantId(merchantId: String): SdkResult
 }

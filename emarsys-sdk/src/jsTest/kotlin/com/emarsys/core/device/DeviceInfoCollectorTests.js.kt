@@ -60,7 +60,7 @@ class DeviceInfoCollectorTests {
             deviceModel = navigator.userAgent,
             sdkVersion = BuildConfig.VERSION_NAME,
             osVersion = BROWSER_VERSION,
-            language = navigator.language,
+            languageCode = navigator.language,
             timezone = TIMEZONE,
             applicationVersion = APPLICATION_VERSION,
         )
