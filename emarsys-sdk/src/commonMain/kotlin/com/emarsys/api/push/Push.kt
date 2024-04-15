@@ -2,7 +2,6 @@ package com.emarsys.api.push
 
 import Activatable
 import com.emarsys.api.AppEvent
-import com.emarsys.api.SdkResult
 import com.emarsys.api.generic.GenericApi
 import com.emarsys.context.SdkContextApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -15,23 +14,24 @@ class Push<Logging : PushInstance, Gatherer : PushInstance, Internal : PushInsta
     gathererApi: Gatherer,
     internalApi: Internal,
     sdkContext: SdkContextApi
-) : GenericApi<Logging, Gatherer, Internal>(loggingApi, gathererApi, internalApi, sdkContext), PushInternalApi,
+) : GenericApi<Logging, Gatherer, Internal>(loggingApi, gathererApi, internalApi, sdkContext),
     PushApi {
-    override val notificationEvents: MutableSharedFlow<AppEvent> = activeInstance<PushInstance>().notificationEvents
-
-    override suspend fun registerPushToken(pushToken: String): SdkResult {
-        return withContext(sdkContext.sdkDispatcher) {
+    override suspend fun registerPushToken(pushToken: String): Result<Unit> = runCatching {
+        withContext(sdkContext.sdkDispatcher) {
             activeInstance<PushInternalApi>().registerPushToken(pushToken)
         }
     }
 
-    override suspend fun clearPushToken(): SdkResult {
-        return withContext(sdkContext.sdkDispatcher) {
+    override suspend fun clearPushToken(): Result<Unit> = runCatching {
+        withContext(sdkContext.sdkDispatcher) {
             activeInstance<PushInternalApi>().clearPushToken()
         }
     }
 
-    override val pushToken: String?
-        get() = activeInstance<PushInternalApi>().pushToken
+    override val pushToken: Result<String?>
+        get() = runCatching { activeInstance<PushInternalApi>().pushToken }
+
+    override val notificationEvents: MutableSharedFlow<AppEvent> =
+        activeInstance<PushInstance>().notificationEvents
 
 }

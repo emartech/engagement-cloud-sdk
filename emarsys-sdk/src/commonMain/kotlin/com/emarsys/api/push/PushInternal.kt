@@ -1,7 +1,6 @@
 package com.emarsys.api.push
 
 import com.emarsys.api.AppEvent
-import com.emarsys.api.SdkResult
 import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.PushCall.ClearPushToken
 import com.emarsys.api.push.PushCall.RegisterPushToken
@@ -18,19 +17,16 @@ class PushInternal(
     override val notificationEvents: MutableSharedFlow<AppEvent>
 ) : PushInstance {
 
-    override suspend fun registerPushToken(pushToken: String): SdkResult {
+    override suspend fun registerPushToken(pushToken: String) {
         val storedPushToken = storage.get(PUSH_TOKEN_STORAGE_KEY)
         if (storedPushToken != pushToken) {
             pushClient.registerPushToken(pushToken)
             storage.put(PUSH_TOKEN_STORAGE_KEY, pushToken)
         }
-        return SdkResult.Success(Unit)
     }
 
-    override suspend fun clearPushToken(): SdkResult {
+    override suspend fun clearPushToken() {
         pushClient.clearPushToken()
-        return SdkResult.Success(Unit)
-
     }
 
     override val pushToken: String?
