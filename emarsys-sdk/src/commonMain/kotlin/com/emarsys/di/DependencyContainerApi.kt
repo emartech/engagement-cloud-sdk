@@ -1,5 +1,6 @@
 package com.emarsys.di
 
+import EventTrackerApi
 import com.emarsys.api.config.ConfigApi
 import com.emarsys.api.contact.ContactInternalApi
 import com.emarsys.api.event.EventTrackerInternalApi
@@ -19,7 +20,7 @@ import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 interface DependencyContainerApi {
     val contactApi: ContactInternalApi
 
-    val eventTrackerApi: EventTrackerInternalApi
+    val eventTrackerApi: EventTrackerApi
 
     val inAppApi: InAppApi
 

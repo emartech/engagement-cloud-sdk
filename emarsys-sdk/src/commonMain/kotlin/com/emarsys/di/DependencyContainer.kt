@@ -1,5 +1,6 @@
 package com.emarsys.di
 
+import EventTrackerApi
 import com.emarsys.api.AppEvent
 import com.emarsys.api.config.Config
 import com.emarsys.api.config.ConfigApi
