@@ -1,13 +1,11 @@
 package com.emarsys.api.config
 
-import com.emarsys.api.SdkResult
-
 class ConfigInternal: ConfigInstance {
-    override suspend fun changeApplicationCode(applicationCode: String): SdkResult {
+    override suspend fun changeApplicationCode(applicationCode: String) {
         TODO("Not yet implemented")
     }
 
-    override suspend fun changeMerchantId(merchantId: String): SdkResult {
+    override suspend fun changeMerchantId(merchantId: String) {
         TODO("Not yet implemented")
     }
 

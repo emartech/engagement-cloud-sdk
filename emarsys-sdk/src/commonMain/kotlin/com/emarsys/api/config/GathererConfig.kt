@@ -1,17 +1,15 @@
 package com.emarsys.api.config
 
-import com.emarsys.api.SdkResult
+import com.emarsys.api.generic.ApiContext
 
-class GathererConfig: ConfigInstance {
-    override suspend fun changeApplicationCode(applicationCode: String): SdkResult {
-        TODO("Not yet implemented")
+class GathererConfig(val context: ApiContext<ConfigCall>): ConfigInstance {
+    override suspend fun changeApplicationCode(applicationCode: String) {
+        context.calls.add(ConfigCall.ChangeApplicationCode(applicationCode))
     }
 
-    override suspend fun changeMerchantId(merchantId: String): SdkResult {
-        TODO("Not yet implemented")
+    override suspend fun changeMerchantId(merchantId: String) {
+        context.calls.add(ConfigCall.ChangeMerchantId(merchantId))
     }
 
-    override suspend fun activate() {
-        TODO("Not yet implemented")
-    }
+    override suspend fun activate() {}
 }

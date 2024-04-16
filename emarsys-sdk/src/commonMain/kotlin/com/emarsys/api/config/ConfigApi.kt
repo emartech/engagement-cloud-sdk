@@ -1,6 +1,5 @@
 package com.emarsys.api.config
 
-import com.emarsys.api.SdkResult
 import com.emarsys.core.device.PushSettings
 
 interface ConfigApi {
@@ -19,7 +18,7 @@ interface ConfigApi {
 
     val sdkVersion: String
 
-    suspend fun changeApplicationCode(applicationCode: String): SdkResult
+    suspend fun changeApplicationCode(applicationCode: String): Result<Unit>
 
-    suspend fun changeMerchantId(merchantId: String): SdkResult
+    suspend fun changeMerchantId(merchantId: String): Result<Unit>
 }

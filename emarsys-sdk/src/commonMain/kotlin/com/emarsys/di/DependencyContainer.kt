@@ -3,6 +3,8 @@ package com.emarsys.di
 import com.emarsys.api.AppEvent
 import com.emarsys.api.config.Config
 import com.emarsys.api.config.ConfigApi
+import com.emarsys.api.config.ConfigCall
+import com.emarsys.api.config.ConfigContext
 import com.emarsys.api.config.ConfigInternal
 import com.emarsys.api.config.GathererConfig
 import com.emarsys.api.config.LoggingConfig
@@ -275,8 +277,16 @@ class DependencyContainer : DependencyContainerApi {
         OnEventAction(onEventActionInternal)
     }
     override val configApi: ConfigApi by lazy {
-        val loggingConfig = LoggingConfig()
-        val gathererConfig = GathererConfig()
+        val loggingConfig = LoggingConfig(sdkLogger)
+        val gathererConfig = GathererConfig(
+            ConfigContext(
+                persistentListOf(
+                    "configContextPersistentId",
+                    storage,
+                    ConfigCall.serializer()
+                )
+            )
+        )
         val configInternal = ConfigInternal()
         Config(loggingConfig, gathererConfig, configInternal, sdkContext, deviceInfoCollector)
     }

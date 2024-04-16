@@ -1,7 +1,6 @@
 package com.emarsys.api.config
 
 import Activatable
-import com.emarsys.api.SdkResult
 import com.emarsys.api.generic.GenericApi
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.device.DeviceInfo
@@ -10,7 +9,7 @@ import com.emarsys.core.device.PushSettings
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 
-interface ConfigInstance: ConfigInternalApi, Activatable
+interface ConfigInstance : ConfigInternalApi, Activatable
 
 class Config<Logging : ConfigInstance, Gatherer : ConfigInstance, Internal : ConfigInstance>(
     loggingApi: Logging,
@@ -40,14 +39,15 @@ class Config<Logging : ConfigInstance, Gatherer : ConfigInstance, Internal : Con
     override val sdkVersion: String
         get() = getDeviceInfo().sdkVersion
 
-    override suspend fun changeApplicationCode(applicationCode: String): SdkResult {
-        return withContext(sdkContext.sdkDispatcher) {
-            activeInstance<ConfigInternalApi>().changeApplicationCode(applicationCode)
+    override suspend fun changeApplicationCode(applicationCode: String): Result<Unit> =
+        runCatching {
+            withContext(sdkContext.sdkDispatcher) {
+                activeInstance<ConfigInternalApi>().changeApplicationCode(applicationCode)
+            }
         }
-    }
 
-    override suspend fun changeMerchantId(merchantId: String): SdkResult {
-        return withContext(sdkContext.sdkDispatcher) {
+    override suspend fun changeMerchantId(merchantId: String): Result<Unit> = runCatching {
+        withContext(sdkContext.sdkDispatcher) {
             activeInstance<ConfigInternalApi>().changeMerchantId(merchantId)
         }
     }

@@ -1,17 +1,30 @@
 package com.emarsys.api.config
 
-import com.emarsys.api.SdkResult
+import com.emarsys.core.log.LogEntry
+import com.emarsys.core.log.LogLevel
+import com.emarsys.core.log.Logger
 
-class LoggingConfig: ConfigInstance {
-    override suspend fun changeApplicationCode(applicationCode: String): SdkResult {
-        TODO("Not yet implemented")
+class LoggingConfig(private val logger: Logger): ConfigInstance {
+    override suspend fun changeApplicationCode(applicationCode: String) {
+        val entry = LogEntry.createMethodNotAllowed(
+            this, this::changeApplicationCode.name, mapOf(
+                "applicationCode" to applicationCode,
+            )
+        )
+        logger.debug(entry)
     }
 
-    override suspend fun changeMerchantId(merchantId: String): SdkResult {
-        TODO("Not yet implemented")
+    override suspend fun changeMerchantId(merchantId: String) {
+        val entry = LogEntry.createMethodNotAllowed(
+            this, this::changeMerchantId.name, mapOf(
+                "merchantId" to merchantId,
+            )
+        )
+        logger.debug(entry)
     }
 
     override suspend fun activate() {
-        TODO("Not yet implemented")
+        val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)
+        logger.log(entry, LogLevel.Debug)
     }
 }

@@ -1,7 +1,6 @@
 package com.emarsys.api.config
 
 import com.emarsys.EmarsysConfig
-import com.emarsys.api.SdkResult
 import com.emarsys.api.SdkState
 import com.emarsys.context.DefaultUrls
 import com.emarsys.context.SdkContext
@@ -144,7 +143,7 @@ class ConfigTests : TestsWithMocks() {
     @Test
     fun testChangeApplicationCode_delegatesToCorrectInstance() = runTest {
         val newAppCode = "newAppCode"
-        everySuspending { mockGathererConfig.changeApplicationCode(newAppCode) } returns SdkResult.Success(Unit)
+        everySuspending { mockGathererConfig.changeApplicationCode(newAppCode) } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
         config.changeApplicationCode(newAppCode)
@@ -157,7 +156,7 @@ class ConfigTests : TestsWithMocks() {
     @Test
     fun testChangeMerchantId_delegatesToCorrectInstance() = runTest {
         val newMerchantId = "newMerchantId"
-        everySuspending { mockInternalConfig.changeMerchantId(newMerchantId) } returns SdkResult.Success(Unit)
+        everySuspending { mockInternalConfig.changeMerchantId(newMerchantId) } returns Unit
 
         sdkContext.setSdkState(SdkState.active)
         config.changeMerchantId(newMerchantId)
