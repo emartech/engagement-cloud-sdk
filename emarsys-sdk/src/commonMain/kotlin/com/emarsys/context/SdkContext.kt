@@ -2,6 +2,7 @@ package com.emarsys.context
 
 import com.emarsys.EmarsysConfig
 import com.emarsys.api.SdkState
+import com.emarsys.api.geofence.model.Geofence
 import com.emarsys.core.Observable
 import com.emarsys.core.log.LogLevel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -18,6 +19,10 @@ class SdkContext(
     override var config: EmarsysConfig? = null
 
     override var inAppDndD: Boolean = false
+
+    override var isGeofenceTrackerEnabled: Boolean = false
+
+    override val registeredGeofences: MutableList<Geofence> = mutableListOf()
 
     override val currentSdkState
         get() = this.value

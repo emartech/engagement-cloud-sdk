@@ -17,15 +17,19 @@ import com.emarsys.api.contact.ContactGatherer
 import com.emarsys.api.contact.ContactInternal
 import com.emarsys.api.contact.LoggingContact
 import com.emarsys.api.event.EventTracker
-import com.emarsys.api.event.EventTrackerApi
 import com.emarsys.api.event.EventTrackerCall
 import com.emarsys.api.event.EventTrackerContext
 import com.emarsys.api.event.EventTrackerGatherer
 import com.emarsys.api.event.EventTrackerInternal
 import com.emarsys.api.event.LoggingEventTracker
 import com.emarsys.api.generic.ApiContext
-import com.emarsys.api.geofence.GeofenceApi
+import com.emarsys.api.geofence.GathererGeofenceTracker
 import com.emarsys.api.geofence.GeofenceTracker
+import com.emarsys.api.geofence.GeofenceTrackerApi
+import com.emarsys.api.geofence.GeofenceTrackerCall
+import com.emarsys.api.geofence.GeofenceTrackerContext
+import com.emarsys.api.geofence.GeofenceTrackerInternal
+import com.emarsys.api.geofence.LoggingGeofenceTracker
 import com.emarsys.api.inapp.InApp
 import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.inapp.InAppInternal
@@ -270,9 +274,28 @@ class DependencyContainer : DependencyContainerApi {
         Predict()
     }
 
-    override val geofenceApi: GeofenceApi by lazy {
-        GeofenceTracker()
+    override val geofenceTrackerApi: GeofenceTrackerApi by lazy {
+        val geofenceEvents = MutableSharedFlow<AppEvent>(replay = 100)
+
+        val loggingGeofenceTracker = LoggingGeofenceTracker(sdkLogger)
+        val gathererGeofenceTracker = GathererGeofenceTracker(geofenceTrackerContext, sdkContext, geofenceEvents)
+        val geofenceTrackerInternal = GeofenceTrackerInternal()
+
+        GeofenceTracker(
+            loggingGeofenceTracker,
+            gathererGeofenceTracker,
+            geofenceTrackerInternal,
+            sdkContext
+        )
     }
+
+    private val geofenceTrackerContext = GeofenceTrackerContext(
+        persistentListOf(
+            "geofenceTrackerContextPersistentId",
+            storage,
+            GeofenceTrackerCall.serializer()
+        )
+    )
 
     override val onEventActionApi: OnEventActionApi by lazy {
         OnEventAction(onEventActionInternal)

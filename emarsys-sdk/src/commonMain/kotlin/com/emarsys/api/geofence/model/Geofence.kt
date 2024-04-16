@@ -1,4 +1,4 @@
-package com.emarsys.api.geofence
+package com.emarsys.api.geofence.model
 
 data class Geofence(
     val id: String,

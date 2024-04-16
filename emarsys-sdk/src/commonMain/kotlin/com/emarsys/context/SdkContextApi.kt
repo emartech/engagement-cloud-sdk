@@ -2,6 +2,7 @@ package com.emarsys.context
 
 import com.emarsys.EmarsysConfig
 import com.emarsys.api.SdkState
+import com.emarsys.api.geofence.model.Geofence
 import com.emarsys.core.ObservableApi
 import com.emarsys.core.Observer
 import com.emarsys.core.log.LogLevel
@@ -13,6 +14,8 @@ interface SdkContextApi: ObservableApi<SdkState> {
     var contactFieldId: Int?
     var config: EmarsysConfig?
     var inAppDndD: Boolean
+    var isGeofenceTrackerEnabled: Boolean
+    val registeredGeofences: MutableList<Geofence>
     var defaultUrls: DefaultUrlsApi
     var remoteLogLevel: LogLevel
     val features: MutableSet<Features>

@@ -2,7 +2,7 @@ package com.emarsys
 
 import com.emarsys.api.config.ConfigApi
 import com.emarsys.api.event.model.CustomEvent
-import com.emarsys.api.geofence.GeofenceApi
+import com.emarsys.api.geofence.GeofenceTrackerApi
 import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.inbox.InboxApi
 import com.emarsys.api.oneventaction.OnEventActionApi
@@ -53,8 +53,8 @@ object Emarsys {
     val config: ConfigApi
         get() = DependencyInjection.container.configApi
 
-    val geofence: GeofenceApi
-        get() = DependencyInjection.container.geofenceApi
+    val geofence: GeofenceTrackerApi
+        get() = DependencyInjection.container.geofenceTrackerApi
 
     val onEventAction: OnEventActionApi
         get() = DependencyInjection.container.onEventActionApi
