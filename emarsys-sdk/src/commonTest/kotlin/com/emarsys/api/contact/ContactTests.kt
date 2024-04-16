@@ -5,6 +5,7 @@ import com.emarsys.context.DefaultUrls
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.log.LogLevel
+import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -25,6 +26,7 @@ class ContactTests : TestsWithMocks() {
         const val CONTACT_FIELD_ID = 42
         const val CONTACT_FIELD_VALUE = "testContactFieldValue"
         const val OPEN_ID_TOKEN = "testOpenIdToken"
+        val testException = Exception()
     }
 
     @Mock
@@ -128,6 +130,23 @@ class ContactTests : TestsWithMocks() {
     }
 
     @Test
+    fun testLinkContact_activeState_throws() = runTest {
+        everySuspending {
+            mockContactInternal.linkContact(
+                CONTACT_FIELD_ID,
+                CONTACT_FIELD_VALUE
+            )
+        } runs {
+            throw testException
+        }
+
+        sdkContext.setSdkState(SdkState.active)
+        val result = contact.linkContact(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE)
+
+        result.exceptionOrNull() shouldBe testException
+    }
+
+    @Test
     fun testLinkAuthenticatedContact_inactiveState() = runTest {
         everySuspending {
             mockLoggingContact.linkAuthenticatedContact(
@@ -188,6 +207,21 @@ class ContactTests : TestsWithMocks() {
     }
 
     @Test
+    fun testLinkAuthenticatedContact_activeState_throws() = runTest {
+        everySuspending {
+            mockContactInternal.linkAuthenticatedContact(
+                CONTACT_FIELD_ID,
+                OPEN_ID_TOKEN
+            )
+        } runs { throw testException }
+
+        sdkContext.setSdkState(SdkState.active)
+        val result = contact.linkAuthenticatedContact(CONTACT_FIELD_ID, OPEN_ID_TOKEN)
+
+        result.exceptionOrNull() shouldBe testException
+    }
+
+    @Test
     fun testUnlinkContact_inactiveState() = runTest {
         everySuspending {
             mockLoggingContact.unlinkContact()
@@ -227,6 +261,18 @@ class ContactTests : TestsWithMocks() {
         verifyWithSuspend(exhaustive = false) {
             mockContactInternal.unlinkContact()
         }
+    }
+
+    @Test
+    fun test_unlinkContact_activeState_throws() = runTest {
+        everySuspending {
+            mockContactInternal.unlinkContact()
+        } runs { throw testException }
+
+        sdkContext.setSdkState(SdkState.active)
+        val result = contact.unlinkContact()
+
+        result.exceptionOrNull() shouldBe testException
     }
 
 }

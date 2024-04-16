@@ -2,7 +2,7 @@ package com.emarsys.di
 
 import EventTrackerApi
 import com.emarsys.api.config.ConfigApi
-import com.emarsys.api.contact.ContactInternalApi
+import com.emarsys.api.contact.ContactApi
 import com.emarsys.api.geofence.GeofenceTrackerApi
 import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.inbox.InboxApi
@@ -17,7 +17,7 @@ import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 
 interface DependencyContainerApi {
-    val contactApi: ContactInternalApi
+    val contactApi: ContactApi
 
     val eventTrackerApi: EventTrackerApi
 
