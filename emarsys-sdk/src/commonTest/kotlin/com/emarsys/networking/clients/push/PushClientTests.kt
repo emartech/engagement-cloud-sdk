@@ -1,8 +1,8 @@
 package com.emarsys.networking.clients.push
 
 import com.emarsys.EmarsysConfig
-import com.emarsys.context.SdkContextApi
 import com.emarsys.context.DefaultUrlsApi
+import com.emarsys.context.SdkContextApi
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
@@ -44,7 +44,7 @@ class PushClientTests : TestsWithMocks() {
         every { mockDefaultUrls.clientServiceBaseUrl } returns clientServiceBaseUrl
         every { mockSdkContext.config } returns EmarsysConfig("EMS11-C3FD3")
         every {
-            mockUrlFactory.create(EmarsysUrlType.REGISTER_PUSH_TOKEN)
+            mockUrlFactory.create(EmarsysUrlType.PUSH_TOKEN)
         } returns Url("$clientServiceBaseUrl/v3/apps/EMS11-C3FD3/client/push-token")
 
         val expectedUrlRequest = UrlRequest(
@@ -60,6 +60,32 @@ class PushClientTests : TestsWithMocks() {
         )
 
         pushClient.registerPushToken("test")
+
+        verifyWithSuspend(exhaustive = false) {
+            mockEmarsysClient.send(expectedUrlRequest)
+        }
+    }
+    @Test
+    fun testClearPushToken() = runTest {
+        val clientServiceBaseUrl = "https://me-client.eservice.emarsys.net"
+        every { mockDefaultUrls.clientServiceBaseUrl } returns clientServiceBaseUrl
+        every { mockSdkContext.config } returns EmarsysConfig("EMS11-C3FD3")
+        every {
+            mockUrlFactory.create(EmarsysUrlType.PUSH_TOKEN)
+        } returns Url("$clientServiceBaseUrl/v3/apps/EMS11-C3FD3/client/push-token")
+
+        val expectedUrlRequest = UrlRequest(
+            Url("$clientServiceBaseUrl/v3/apps/EMS11-C3FD3/client/push-token"),
+            HttpMethod.Delete
+        )
+        everySuspending { mockEmarsysClient.send(expectedUrlRequest) } returns Response(
+            expectedUrlRequest,
+            HttpStatusCode.OK,
+            Headers.Empty,
+            ""
+        )
+
+        pushClient.clearPushToken()
 
         verifyWithSuspend(exhaustive = false) {
             mockEmarsysClient.send(expectedUrlRequest)

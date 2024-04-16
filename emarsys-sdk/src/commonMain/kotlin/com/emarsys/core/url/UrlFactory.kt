@@ -3,11 +3,14 @@ package com.emarsys.core.url
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.url.EmarsysUrlType.EVENT
 import com.emarsys.core.url.EmarsysUrlType.LINK_CONTACT
+import com.emarsys.core.url.EmarsysUrlType.PUSH_TOKEN
 import com.emarsys.core.url.EmarsysUrlType.REFRESH_TOKEN
 import com.emarsys.core.url.EmarsysUrlType.REGISTER_DEVICE_INFO
-import com.emarsys.core.url.EmarsysUrlType.REGISTER_PUSH_TOKEN
-import com.emarsys.core.url.EmarsysUrlType.*
-import io.ktor.http.*
+import com.emarsys.core.url.EmarsysUrlType.REMOTE_CONFIG
+import com.emarsys.core.url.EmarsysUrlType.REMOTE_CONFIG_SIGNATURE
+import com.emarsys.core.url.EmarsysUrlType.UNLINK_CONTACT
+import io.ktor.http.URLBuilder
+import io.ktor.http.Url
 
 class UrlFactory(
     private val sdkContext: SdkContextApi
@@ -37,7 +40,7 @@ class UrlFactory(
                 "contact-token"
             ).build()
 
-            REGISTER_PUSH_TOKEN -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V3_API/apps/${sdkContext.config?.applicationCode}/client/push-token")
+            PUSH_TOKEN -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V3_API/apps/${sdkContext.config?.applicationCode}/client/push-token")
             REGISTER_DEVICE_INFO -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V3_API/apps/${sdkContext.config?.applicationCode}/client")
             EVENT -> {
                 Url("${sdkContext.defaultUrls.eventServiceBaseUrl}/$V4_API/apps/${sdkContext.config?.applicationCode}/client/events")

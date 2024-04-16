@@ -4,7 +4,7 @@ import com.emarsys.EmarsysConfig
 import com.emarsys.context.DefaultUrlsApi
 import com.emarsys.context.SdkContextApi
 import io.kotest.matchers.shouldBe
-import io.ktor.http.*
+import io.ktor.http.Url
 import org.kodein.mock.Mock
 import org.kodein.mock.tests.TestsWithMocks
 import kotlin.test.Test
@@ -54,7 +54,7 @@ class UrlFactoryTests : TestsWithMocks() {
         every { mockSdkContext.defaultUrls } returns mockDefaultUrls
         every { mockDefaultUrls.clientServiceBaseUrl } returns clientServiceBaseUrl
         every { mockSdkContext.config } returns config
-        val result = urlFactory.create(EmarsysUrlType.REGISTER_PUSH_TOKEN)
+        val result = urlFactory.create(EmarsysUrlType.PUSH_TOKEN)
 
         result shouldBe Url("https://me-client.eservice.emarsys.net/v3/apps/testAppCode/client/push-token")
     }
