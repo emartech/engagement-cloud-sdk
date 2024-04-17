@@ -4,9 +4,9 @@ import com.emarsys.api.AppEvent
 import kotlinx.coroutines.flow.Flow
 
 interface InAppApi {
-    suspend fun pause()
-    suspend fun resume()
     val isPaused:Boolean
     val events: Flow<AppEvent>
+    suspend fun pause(): Result<Unit>
+    suspend fun resume(): Result<Unit>
 
 }

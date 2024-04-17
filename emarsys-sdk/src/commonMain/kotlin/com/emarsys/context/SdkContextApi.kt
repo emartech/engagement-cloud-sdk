@@ -13,7 +13,7 @@ interface SdkContextApi: ObservableApi<SdkState> {
     val sdkDispatcher: CoroutineDispatcher
     var contactFieldId: Int?
     var config: EmarsysConfig?
-    var inAppDndD: Boolean
+    var inAppDnd: Boolean
     var isGeofenceTrackerEnabled: Boolean
     val registeredGeofences: MutableList<Geofence>
     var defaultUrls: DefaultUrlsApi

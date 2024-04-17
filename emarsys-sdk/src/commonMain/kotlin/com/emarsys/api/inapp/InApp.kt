@@ -1,21 +1,38 @@
 package com.emarsys.api.inapp
 
+import Activatable
 import com.emarsys.api.AppEvent
+import com.emarsys.api.generic.GenericApi
+import com.emarsys.context.SdkContextApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.withContext
 
-class InApp(private val inAppInternal: InAppInternalApi) : InAppApi {
-    override suspend fun pause() {
-        inAppInternal.pause()
+interface InAppInstance : InAppInternalApi, Activatable
+
+class InApp<Logging : InAppInstance, Gatherer : InAppInstance, Internal : InAppInstance>(
+    loggingApi: Logging,
+    gathererApi: Gatherer,
+    internalApi: Internal,
+    sdkContext: SdkContextApi
+) : GenericApi<Logging, Gatherer, Internal>(
+    loggingApi, gathererApi, internalApi, sdkContext
+), InAppApi {
+    override suspend fun pause(): Result<Unit> = runCatching {
+        withContext(sdkContext.sdkDispatcher) {
+            activeInstance<InAppInstance>().pause()
+        }
     }
 
-    override suspend fun resume() {
-        inAppInternal.resume()
+    override suspend fun resume(): Result<Unit> = runCatching {
+         withContext(sdkContext.sdkDispatcher) {
+            activeInstance<InAppInstance>().resume()
+        }
     }
 
     override val isPaused: Boolean
-        get() = inAppInternal.isPaused
+        get() = activeInstance<InAppInstance>().isPaused
 
     override val events: Flow<AppEvent>
-        get() = inAppInternal.events.asSharedFlow()
+        get() = activeInstance<InAppInstance>().events.asSharedFlow()
 }

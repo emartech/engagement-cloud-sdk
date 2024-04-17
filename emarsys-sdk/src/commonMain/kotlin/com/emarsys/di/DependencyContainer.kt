@@ -30,10 +30,13 @@ import com.emarsys.api.geofence.GeofenceTrackerCall
 import com.emarsys.api.geofence.GeofenceTrackerContext
 import com.emarsys.api.geofence.GeofenceTrackerInternal
 import com.emarsys.api.geofence.LoggingGeofenceTracker
+import com.emarsys.api.inapp.GathererInApp
 import com.emarsys.api.inapp.InApp
 import com.emarsys.api.inapp.InAppApi
+import com.emarsys.api.inapp.InAppCall
+import com.emarsys.api.inapp.InAppContext
 import com.emarsys.api.inapp.InAppInternal
-import com.emarsys.api.inapp.InAppInternalApi
+import com.emarsys.api.inapp.LoggingInApp
 import com.emarsys.api.inbox.GathererInbox
 import com.emarsys.api.inbox.Inbox
 import com.emarsys.api.inbox.InboxApi
@@ -263,13 +266,22 @@ class DependencyContainer : DependencyContainerApi {
         PushInternal(pushClient, stringStorage, pushContext, notificationEvents)
     }
 
-    private val inAppInternal: InAppInternalApi by lazy {
-        val events = MutableSharedFlow<AppEvent>(replay = 100)
-        InAppInternal(events)
-    }
     override val inAppApi: InAppApi by lazy {
-        InApp(inAppInternal)
+        val events = MutableSharedFlow<AppEvent>(replay = 100)
+
+        val loggingInApp = LoggingInApp(sdkLogger)
+        val gathererInApp = GathererInApp(inAppContext,sdkContext, events)
+        val inAppInternal = InAppInternal(events)
+        InApp(loggingInApp, gathererInApp, inAppInternal, sdkContext)
     }
+
+    private val inAppContext = InAppContext(
+        persistentListOf(
+            "inAppContextPersistentId",
+            storage,
+            InAppCall.serializer()
+        )
+    )
 
     override val inboxApi: InboxApi by lazy {
         val loggingInbox = LoggingInbox(sdkLogger)

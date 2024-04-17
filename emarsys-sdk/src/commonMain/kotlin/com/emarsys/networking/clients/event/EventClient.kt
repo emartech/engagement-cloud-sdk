@@ -47,7 +47,7 @@ class EventClient(
         deviceEventChannel.consume().naturalBatching().collect {
             val url = urlFactory.create(EmarsysUrlType.EVENT)
             val requestBody =
-                DeviceEventRequestBody(sdkContext.inAppDndD, it, sessionContext.deviceEventState)
+                DeviceEventRequestBody(sdkContext.inAppDnd, it, sessionContext.deviceEventState)
             val body = json.encodeToString(requestBody)
             val result: DeviceEventResponse =
                 emarsysNetworkClient.send(UrlRequest(url, HttpMethod.Post, body)).body()

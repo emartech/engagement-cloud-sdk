@@ -79,7 +79,7 @@ class EventClientTests : TestsWithMocks() {
         }
         sdkDispatcher = StandardTestDispatcher()
         sessionContext = SessionContext(deviceEventState = DEVICE_EVENT_STATE)
-        every { mockSdkContext.inAppDndD }.returns(IN_APP_DND)
+        every { mockSdkContext.inAppDnd }.returns(IN_APP_DND)
 
         everySuspending { mockDeviceEventChannel.consume() }.returns(flowOf(testEvent))
         everySuspending { mockDeviceEventChannel.send(testEvent) }.runs { }

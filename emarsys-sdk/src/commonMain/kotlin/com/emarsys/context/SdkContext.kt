@@ -18,7 +18,7 @@ class SdkContext(
 
     override var config: EmarsysConfig? = null
 
-    override var inAppDndD: Boolean = false
+    override var inAppDnd: Boolean = false
 
     override var isGeofenceTrackerEnabled: Boolean = false
 
