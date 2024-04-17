@@ -34,8 +34,13 @@ import com.emarsys.api.inapp.InApp
 import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.inapp.InAppInternal
 import com.emarsys.api.inapp.InAppInternalApi
+import com.emarsys.api.inbox.GathererInbox
 import com.emarsys.api.inbox.Inbox
 import com.emarsys.api.inbox.InboxApi
+import com.emarsys.api.inbox.InboxCall
+import com.emarsys.api.inbox.InboxContext
+import com.emarsys.api.inbox.InboxInternal
+import com.emarsys.api.inbox.LoggingInbox
 import com.emarsys.api.oneventaction.OnEventAction
 import com.emarsys.api.oneventaction.OnEventActionApi
 import com.emarsys.api.oneventaction.OnEventActionInternal
@@ -267,8 +272,19 @@ class DependencyContainer : DependencyContainerApi {
     }
 
     override val inboxApi: InboxApi by lazy {
-        Inbox()
+        val loggingInbox = LoggingInbox(sdkLogger)
+        val gathererInbox = GathererInbox(inboxContext)
+        val inboxInternal = InboxInternal()
+        Inbox(loggingInbox, gathererInbox, inboxInternal, sdkContext)
     }
+
+    private val inboxContext = InboxContext(
+        persistentListOf(
+            "inboxContextPersistentId",
+            storage,
+            InboxCall.serializer()
+        )
+    )
 
     override val predictApi: PredictApi by lazy {
         Predict()
@@ -278,7 +294,8 @@ class DependencyContainer : DependencyContainerApi {
         val geofenceEvents = MutableSharedFlow<AppEvent>(replay = 100)
 
         val loggingGeofenceTracker = LoggingGeofenceTracker(sdkLogger)
-        val gathererGeofenceTracker = GathererGeofenceTracker(geofenceTrackerContext, sdkContext, geofenceEvents)
+        val gathererGeofenceTracker =
+            GathererGeofenceTracker(geofenceTrackerContext, sdkContext, geofenceEvents)
         val geofenceTrackerInternal = GeofenceTrackerInternal()
 
         GeofenceTracker(

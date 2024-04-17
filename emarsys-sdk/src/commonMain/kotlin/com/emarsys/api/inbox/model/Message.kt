@@ -1,7 +1,6 @@
-package com.emarsys.api.inbox
+package com.emarsys.api.inbox.model
 
 import com.emarsys.mobileengage.action.models.ActionModel
-
 
 data class Message(
     val id: String,

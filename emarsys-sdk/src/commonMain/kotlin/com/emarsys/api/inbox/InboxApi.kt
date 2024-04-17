@@ -1,11 +1,11 @@
 package com.emarsys.api.inbox
 
-import com.emarsys.api.SdkResult
+import com.emarsys.api.inbox.model.Message
 
 interface InboxApi {
-    suspend fun fetchMessages(): SdkResult
+    suspend fun fetchMessages(): Result<List<Message>>
 
-    suspend fun addTag(tag: String, messageId: String): SdkResult
+    suspend fun addTag(tag: String, messageId: String): Result<Unit>
 
-    suspend fun removeTag(tag: String, messageId: String): SdkResult
+    suspend fun removeTag(tag: String, messageId: String): Result<Unit>
 }
