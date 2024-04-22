@@ -1,8 +1,9 @@
 package com.emarsys.api.predict.model
 
-import io.ktor.http.*
+import io.ktor.http.Url
+import kotlinx.serialization.Serializable
 
-
+@Serializable
 data class Product(
     val productId: String,
     val title: String,
@@ -11,9 +12,7 @@ data class Product(
     val cohort: String,
     val customFields: Map<String, String?> = mutableMapOf(),
     private val imageUrlString: String? = null,
-    val imageUrl: Url? = if (imageUrlString != null) Url(imageUrlString) else null,
     private val zoomImageUrlString: String? = null,
-    val zoomImageUrl: Url? = if (zoomImageUrlString != null) Url(zoomImageUrlString) else null,
     val categoryPath: String? = null,
     val available: Boolean? = null,
     val productDescription: String? = null,
@@ -25,4 +24,8 @@ data class Product(
     val author: String? = null,
     val brand: String? = null,
     val year: Int? = null
-)
+) {
+    val imageUrl: Url?  get() = if (imageUrlString != null) Url(imageUrlString) else null
+
+    val zoomImageUrl: Url? get() = if (zoomImageUrlString != null) Url(zoomImageUrlString) else null
+}

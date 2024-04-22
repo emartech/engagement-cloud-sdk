@@ -1,5 +1,8 @@
 package com.emarsys.api.predict.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 class RecommendationLogic internal constructor(
     override val logicName: String,
     override val data: Map<String, String> = mapOf(),
@@ -101,5 +104,9 @@ class RecommendationLogic internal constructor(
         private fun cartItemToQueryParam(cartItem: CartItem?): String {
             return "i:" + cartItem!!.itemId + ",p:" + cartItem.price + ",q:" + cartItem.quantity
         }
+    }
+
+    override fun toString(): String {
+        return "LogicName: $logicName, data: $data, variants: $variants"
     }
 }

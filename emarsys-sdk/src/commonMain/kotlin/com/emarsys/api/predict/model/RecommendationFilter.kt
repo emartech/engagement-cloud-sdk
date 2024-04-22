@@ -1,6 +1,8 @@
 package com.emarsys.api.predict.model
 
+import kotlinx.serialization.Serializable
 
+@Serializable
 class RecommendationFilter {
     companion object {
         private const val IS = "IS"
@@ -113,5 +115,8 @@ class RecommendationFilter {
         return result
     }
 
+    override fun toString(): String {
+        return "Type: $type, field: $field, comparison: $comparison, expectations: $expectations"
+    }
 
 }

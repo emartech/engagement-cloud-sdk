@@ -1,6 +1,5 @@
 package com.emarsys.mobileengage.session
 
-import com.emarsys.api.SdkResult
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 
 interface Session {
