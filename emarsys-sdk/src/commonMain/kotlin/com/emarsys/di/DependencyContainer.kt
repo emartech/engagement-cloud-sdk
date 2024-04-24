@@ -323,7 +323,7 @@ class DependencyContainer : DependencyContainerApi {
 
         val loggingGeofenceTracker = LoggingGeofenceTracker(sdkLogger)
         val gathererGeofenceTracker =
-            GathererGeofenceTracker(geofenceTrackerContext, sdkContext, geofenceEvents)
+            GathererGeofenceTracker(geofenceTrackerContext, geofenceEvents)
         val geofenceTrackerInternal = GeofenceTrackerInternal()
 
         GeofenceTracker(

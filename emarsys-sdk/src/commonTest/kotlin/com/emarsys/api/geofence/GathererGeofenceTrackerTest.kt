@@ -1,14 +1,8 @@
 package com.emarsys.api.geofence
 
-import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.geofence.model.Geofence
-import com.emarsys.context.DefaultUrls
-import com.emarsys.context.SdkContext
-import com.emarsys.context.SdkContextApi
-import com.emarsys.core.log.LogLevel
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -16,27 +10,19 @@ import kotlin.test.Test
 class GathererGeofenceTrackerTest {
 
     private lateinit var gathererGeofenceTracker: GathererGeofenceTracker
-
-    private lateinit var geofenceContext: ApiContext<GeofenceTrackerCall>
-    private lateinit var sdkContext: SdkContextApi
+    private lateinit var geofenceContext: GeofenceContext
 
     @BeforeTest
     fun setup() {
         geofenceContext = GeofenceTrackerContext(mutableListOf())
-        sdkContext = SdkContext(
-            StandardTestDispatcher(),
-            DefaultUrls("", "", "", "", "", "", ""),
-            LogLevel.Error,
-            mutableSetOf()
-        )
 
-        gathererGeofenceTracker = GathererGeofenceTracker(geofenceContext, sdkContext, emptyFlow())
+        gathererGeofenceTracker = GathererGeofenceTracker(geofenceContext, emptyFlow())
     }
 
     @Test
     fun testRegisteredGeofences() = runTest {
         val testGeofence = Geofence("testGeofence", 12.3, 34.5, 10.0, null, listOf())
-        sdkContext.registeredGeofences.add(testGeofence)
+        geofenceContext.registeredGeofences.add(testGeofence)
 
         val result = gathererGeofenceTracker.registeredGeofences
 
@@ -45,7 +31,7 @@ class GathererGeofenceTrackerTest {
 
     @Test
     fun testIsEnabled() = runTest {
-        sdkContext.isGeofenceTrackerEnabled = true
+        geofenceContext.isGeofenceTrackerEnabled = true
 
         gathererGeofenceTracker.isEnabled shouldBe true
     }

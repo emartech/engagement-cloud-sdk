@@ -60,8 +60,6 @@ class GeofenceTrackerTests : TestsWithMocks() {
             mutableSetOf()
         )
 
-        sdkContext.registeredGeofences.add(testGeofence)
-
         everySuspending { mockLoggingGeofenceTracker.activate() } returns Unit
         everySuspending { mockGathererGeofenceTracker.activate() } returns Unit
         everySuspending { mockGeofenceTrackerInternal.activate() } returns Unit
