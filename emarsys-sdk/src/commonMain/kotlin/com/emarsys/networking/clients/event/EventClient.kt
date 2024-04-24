@@ -1,6 +1,6 @@
 package com.emarsys.networking.clients.event
 
-import com.emarsys.context.SdkContextApi
+import com.emarsys.api.inapp.InAppConfig
 import com.emarsys.core.channel.DeviceEventChannelApi
 import com.emarsys.core.channel.naturalBatching
 import com.emarsys.core.networking.clients.NetworkClientApi
@@ -29,7 +29,7 @@ class EventClient(
     private val deviceEventChannel: DeviceEventChannelApi,
     private val onEventActionFactory: ActionFactoryApi<OnEventActionModel>,
     private val sessionContext: SessionContext,
-    private val sdkContext: SdkContextApi,
+    private val inAppConfig: InAppConfig,
     sdkDispatcher: CoroutineDispatcher
 ) : EventClientApi {
 
@@ -47,7 +47,7 @@ class EventClient(
         deviceEventChannel.consume().naturalBatching().collect {
             val url = urlFactory.create(EmarsysUrlType.EVENT)
             val requestBody =
-                DeviceEventRequestBody(sdkContext.inAppDnd, it, sessionContext.deviceEventState)
+                DeviceEventRequestBody(inAppConfig.inAppDnd, it, sessionContext.deviceEventState)
             val body = json.encodeToString(requestBody)
             val result: DeviceEventResponse =
                 emarsysNetworkClient.send(UrlRequest(url, HttpMethod.Post, body)).body()

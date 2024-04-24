@@ -17,8 +17,6 @@ class SdkContext(
 
     override var config: EmarsysConfig? = null
 
-    override var inAppDnd: Boolean = false
-
     override val currentSdkState
         get() = this.value
 

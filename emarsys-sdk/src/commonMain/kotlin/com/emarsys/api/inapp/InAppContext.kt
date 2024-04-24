@@ -3,12 +3,20 @@ package com.emarsys.api.inapp
 import com.emarsys.api.generic.ApiContext
 import kotlinx.serialization.Serializable
 
-class InAppContext(override val calls: MutableList<InAppCall>) : ApiContext<InAppCall>
+interface InAppApiContext: ApiContext<InAppCall>, InAppConfig
+
+interface InAppConfig {
+    var inAppDnd: Boolean
+}
+
+class InAppContext(override val calls: MutableList<InAppCall>) : InAppApiContext {
+    override var inAppDnd: Boolean = false
+}
 
 @Serializable
 sealed interface InAppCall {
 
-    @Serializable class Pause(): InAppCall {
+    @Serializable class Pause: InAppCall {
         override fun equals(other: Any?): Boolean {
             return other is Pause
         }
@@ -18,7 +26,7 @@ sealed interface InAppCall {
         }
     }
 
-    @Serializable class Resume(): InAppCall {
+    @Serializable class Resume: InAppCall {
         override fun equals(other: Any?): Boolean {
             return other is Resume
         }

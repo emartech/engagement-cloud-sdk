@@ -12,7 +12,6 @@ interface SdkContextApi: ObservableApi<SdkState> {
     val sdkDispatcher: CoroutineDispatcher
     var contactFieldId: Int?
     var config: EmarsysConfig?
-    var inAppDnd: Boolean
     var defaultUrls: DefaultUrlsApi
     var remoteLogLevel: LogLevel
     val features: MutableSet<Features>

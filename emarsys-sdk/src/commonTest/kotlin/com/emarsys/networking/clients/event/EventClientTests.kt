@@ -1,6 +1,6 @@
 package com.emarsys.networking.clients.event
 
-import com.emarsys.context.SdkContextApi
+import com.emarsys.api.inapp.InAppConfig
 import com.emarsys.core.channel.DeviceEventChannelApi
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
@@ -58,7 +58,7 @@ class EventClientTests : TestsWithMocks() {
     lateinit var mockDeviceEventChannel: DeviceEventChannelApi
 
     @Mock
-    lateinit var mockSdkContext: SdkContextApi
+    lateinit var mockInAppConfig: InAppConfig
 
     private lateinit var sdkDispatcher: CoroutineDispatcher
 
@@ -79,7 +79,7 @@ class EventClientTests : TestsWithMocks() {
         }
         sdkDispatcher = StandardTestDispatcher()
         sessionContext = SessionContext(deviceEventState = DEVICE_EVENT_STATE)
-        every { mockSdkContext.inAppDnd }.returns(IN_APP_DND)
+        every { mockInAppConfig.inAppDnd }.returns(IN_APP_DND)
 
         everySuspending { mockDeviceEventChannel.consume() }.returns(flowOf(testEvent))
         everySuspending { mockDeviceEventChannel.send(testEvent) }.runs { }
@@ -99,7 +99,7 @@ class EventClientTests : TestsWithMocks() {
             mockDeviceEventChannel,
             mockOnEventActionFactory,
             sessionContext,
-            mockSdkContext,
+            mockInAppConfig,
             sdkDispatcher
         )
 
@@ -119,7 +119,7 @@ class EventClientTests : TestsWithMocks() {
             mockDeviceEventChannel,
             mockOnEventActionFactory,
             sessionContext,
-            mockSdkContext,
+            mockInAppConfig,
             sdkDispatcher
         )
 
@@ -157,7 +157,7 @@ class EventClientTests : TestsWithMocks() {
             mockDeviceEventChannel,
             mockOnEventActionFactory,
             sessionContext,
-            mockSdkContext,
+            mockInAppConfig,
             sdkDispatcher
         )
 

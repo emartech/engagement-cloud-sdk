@@ -250,7 +250,7 @@ class DependencyContainer : DependencyContainerApi {
             deviceEventChannel,
             onEventActionFactory,
             sessionContext,
-            sdkContext,
+            inAppContext,
             sdkDispatcher
         )
     }
@@ -275,7 +275,7 @@ class DependencyContainer : DependencyContainerApi {
         val events = MutableSharedFlow<AppEvent>(replay = 100)
 
         val loggingInApp = LoggingInApp(sdkLogger)
-        val gathererInApp = GathererInApp(inAppContext, sdkContext, events)
+        val gathererInApp = GathererInApp(inAppContext, events)
         val inAppInternal = InAppInternal(events)
         InApp(loggingInApp, gathererInApp, inAppInternal, sdkContext)
     }
