@@ -7,11 +7,11 @@ import com.emarsys.api.contact.ContactCall
 import com.emarsys.api.contact.ContactContext
 import com.emarsys.api.contact.ContactGatherer
 import com.emarsys.api.contact.ContactInternal
-import com.emarsys.api.contact.FakeSdkLogger
 import com.emarsys.api.contact.LoggingContact
 import com.emarsys.context.DefaultUrls
 import com.emarsys.context.SdkContext
 import com.emarsys.core.log.LogLevel
+import com.emarsys.core.log.Logger
 import com.emarsys.networking.clients.contact.ContactClientApi
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.isActive
@@ -22,12 +22,15 @@ import org.kodein.mock.tests.TestsWithMocks
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class GenericApiTests: TestsWithMocks() {
+class GenericApiTests : TestsWithMocks() {
 
     override fun setUpMocks() = injectMocks(mocker)
 
     @Mock
     lateinit var mockContactClient: ContactClientApi
+
+    @Mock
+    lateinit var mockSdkLogger: Logger
 
     private lateinit var loggingContact: LoggingContact
     private lateinit var contactGatherer: ContactGatherer
@@ -39,10 +42,23 @@ class GenericApiTests: TestsWithMocks() {
     @BeforeTest
     fun setup() = runTest {
         contactContext = ContactContext(mutableListOf())
-        loggingContact = LoggingContact(FakeSdkLogger())
+        loggingContact = LoggingContact(mockSdkLogger)
         contactGatherer = ContactGatherer(contactContext)
         contactInternal = ContactInternal(mockContactClient, contactContext)
-        sdkContext = SdkContext(StandardTestDispatcher(), DefaultUrls("", "", "", "", "", "", ""), LogLevel.Error, mutableSetOf())
+        sdkContext = SdkContext(
+            StandardTestDispatcher(),
+            DefaultUrls(
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                ""
+            ),
+            LogLevel.Error,
+            mutableSetOf()
+        )
         genericApi = GenericApi(loggingContact, contactGatherer, contactInternal, sdkContext)
     }
 
@@ -52,7 +68,7 @@ class GenericApiTests: TestsWithMocks() {
 
         while (!sdkContext.sdkDispatcher.isActive)
 
-        genericApi.activeInstance shouldBe loggingContact
+            genericApi.activeInstance shouldBe loggingContact
     }
 
     @Test
@@ -61,7 +77,7 @@ class GenericApiTests: TestsWithMocks() {
 
         while (!sdkContext.sdkDispatcher.isActive)
 
-        genericApi.activeInstance shouldBe contactGatherer
+            genericApi.activeInstance shouldBe contactGatherer
     }
 
     @Test
@@ -70,6 +86,6 @@ class GenericApiTests: TestsWithMocks() {
 
         while (!sdkContext.sdkDispatcher.isActive)
 
-        genericApi.activeInstance shouldBe contactInternal
+            genericApi.activeInstance shouldBe contactInternal
     }
 }
