@@ -72,6 +72,7 @@ import com.emarsys.core.collections.persistentListOf
 import com.emarsys.core.crypto.Crypto
 import com.emarsys.core.crypto.CryptoApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
+import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.message.MsgHub
@@ -195,7 +196,7 @@ class DependencyContainer : DependencyContainerApi {
         )
     }
 
-    private val sdkLogger: SdkLogger by lazy { SdkLogger() }
+    private val sdkLogger: SdkLogger by lazy { SdkLogger(ConsoleLogger()) }
 
     val sdkDispatcher: CoroutineDispatcher by lazy {
         Dispatchers.Default
@@ -274,7 +275,7 @@ class DependencyContainer : DependencyContainerApi {
     override val inAppApi: InAppApi by lazy {
         val events = MutableSharedFlow<AppEvent>(replay = 100)
 
-        val loggingInApp = LoggingInApp(sdkLogger)
+        val loggingInApp = LoggingInApp(sdkContext, sdkLogger)
         val gathererInApp = GathererInApp(inAppContext, events)
         val inAppInternal = InAppInternal(events)
         InApp(loggingInApp, gathererInApp, inAppInternal, sdkContext)
@@ -321,7 +322,7 @@ class DependencyContainer : DependencyContainerApi {
     override val geofenceTrackerApi: GeofenceTrackerApi by lazy {
         val geofenceEvents = MutableSharedFlow<AppEvent>(replay = 100)
 
-        val loggingGeofenceTracker = LoggingGeofenceTracker(sdkLogger)
+        val loggingGeofenceTracker = LoggingGeofenceTracker(sdkContext, sdkLogger)
         val gathererGeofenceTracker =
             GathererGeofenceTracker(geofenceTrackerContext, geofenceEvents)
         val geofenceTrackerInternal = GeofenceTrackerInternal()

@@ -25,7 +25,7 @@ class LoggingEventTrackerTests: TestsWithMocks() {
 
     @BeforeTest
     fun setup() = runTest {
-        every { mockLogger.debug(isAny()) } returns Unit
+        everySuspending { mockLogger.debug(isAny()) } returns Unit
 
         loggingInstance = LoggingEventTracker(mockLogger)
     }
@@ -44,9 +44,9 @@ class LoggingEventTrackerTests: TestsWithMocks() {
         verifyLogging()
     }
 
-    private fun verifyLogging() {
+    private suspend fun verifyLogging() {
         val logEntryCapture = mutableListOf<LogEntry>()
-        verify { mockLogger.debug(isAny(capture = logEntryCapture)) }
+        verifyWithSuspend { mockLogger.debug(isAny(capture = logEntryCapture)) }
         logEntryCapture.first().topic shouldBe "log_method_not_allowed"
     }
 }

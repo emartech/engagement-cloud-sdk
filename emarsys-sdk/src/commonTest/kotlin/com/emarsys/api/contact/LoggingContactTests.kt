@@ -1,7 +1,6 @@
 package com.emarsys.api.contact
 
 import com.emarsys.core.log.LogEntry
-import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
@@ -26,7 +25,7 @@ class LoggingContactTests : TestsWithMocks() {
 
     @BeforeTest
     fun setup() = runTest {
-        every {  mockSdkLogger.log(isAny(), isAny()) } returns Unit
+        everySuspending {  mockSdkLogger.debug(isAny()) } returns Unit
 
         loggingContact = LoggingContact(mockSdkLogger)
     }
@@ -59,9 +58,9 @@ class LoggingContactTests : TestsWithMocks() {
         verifyLogging()
     }
 
-    private fun verifyLogging() {
+    private suspend fun verifyLogging() {
         val logEntryCapture = mutableListOf<LogEntry>()
-        verify { mockSdkLogger.log(isAny(capture = logEntryCapture), isEqual(LogLevel.Debug)) }
+        verifyWithSuspend { mockSdkLogger.debug(isAny(capture = logEntryCapture)) }
         logEntryCapture.first().topic shouldBe "log_method_not_allowed"
     }
 }
