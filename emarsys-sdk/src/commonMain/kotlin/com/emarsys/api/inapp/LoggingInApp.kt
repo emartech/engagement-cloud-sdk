@@ -1,17 +1,22 @@
 package com.emarsys.api.inapp
 
 import com.emarsys.api.AppEvent
+import com.emarsys.context.SdkContextApi
 import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.Logger
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 
-class LoggingInApp(private val logger: Logger) : InAppInstance {
+class LoggingInApp(private val sdkContext: SdkContextApi, private val logger: Logger) : InAppInstance {
     override val isPaused: Boolean
         get() {
             val entry = LogEntry.createMethodNotAllowed<LoggingInApp>(
                 this, this::isPaused.name
             )
-            logger.debug(entry)
+            CoroutineScope(sdkContext.sdkDispatcher).launch {
+                logger.debug(entry)
+            }
             return false
         }
 
@@ -20,7 +25,9 @@ class LoggingInApp(private val logger: Logger) : InAppInstance {
             val entry = LogEntry.createMethodNotAllowed(
                 this, this::events.name
             )
-            logger.debug(entry)
+            CoroutineScope(sdkContext.sdkDispatcher).launch {
+                logger.debug(entry)
+            }
             return MutableSharedFlow()
         }
 

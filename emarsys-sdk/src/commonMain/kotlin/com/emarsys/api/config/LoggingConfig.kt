@@ -1,7 +1,6 @@
 package com.emarsys.api.config
 
 import com.emarsys.core.log.LogEntry
-import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
 
 class LoggingConfig(private val logger: Logger): ConfigInstance {
@@ -25,6 +24,6 @@ class LoggingConfig(private val logger: Logger): ConfigInstance {
 
     override suspend fun activate() {
         val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)
-        logger.log(entry, LogLevel.Debug)
+        logger.debug(entry)
     }
 }

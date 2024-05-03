@@ -7,65 +7,51 @@ import com.emarsys.core.log.Logger
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
+import org.kodein.mock.Mock
+import org.kodein.mock.tests.TestsWithMocks
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 
-class FakeSdkLogger : Logger {
-
-    var funCalls: MutableList<Pair<LogEntry, LogLevel>> = mutableListOf()
-    override fun log(entry: LogEntry, level: LogLevel) {
-        funCalls.add(Pair(entry, level))
-    }
-
-    override fun debug(entry: LogEntry) {
-        log(entry, LogLevel.Debug)
-    }
-
-    override fun error(entry: LogEntry) {
-        log(entry, LogLevel.Error)
-    }
-
-}
-
-class LoggingPushTests {
-
+class LoggingPushTests: TestsWithMocks() {
     private companion object {
         const val PUSH_TOKEN = "testPushToken"
     }
 
-    private lateinit var fakeLogger: FakeSdkLogger
+    override fun setUpMocks() = injectMocks(mocker)
+
+    @Mock
+    lateinit var mockLogger: Logger
+
     private lateinit var loggingPush: LoggingPush
     private val notificationEvents: MutableSharedFlow<AppEvent> = MutableSharedFlow()
 
     @BeforeTest
     fun setup() = runTest {
-        fakeLogger = FakeSdkLogger()
-        loggingPush = LoggingPush(fakeLogger, notificationEvents)
+        every { mockLogger.log(isAny(), isAny()) } returns Unit
+
+        loggingPush = LoggingPush(mockLogger, notificationEvents)
     }
 
     @Test
     fun testSetPushToken() = runTest {
         loggingPush.registerPushToken(PUSH_TOKEN)
 
-        fakeLogger.funCalls.first().first.topic shouldBe "log_method_not_allowed"
-        fakeLogger.funCalls.first().second shouldBe LogLevel.Debug
+        verifyLogging()
     }
 
     @Test
     fun testClearPushToken() = runTest {
         loggingPush.clearPushToken()
 
-        fakeLogger.funCalls.first().first.topic shouldBe "log_method_not_allowed"
-        fakeLogger.funCalls.first().second shouldBe LogLevel.Debug
+        verifyLogging()
     }
 
     @Test
     fun testPushToken() = runTest {
         val result = loggingPush.pushToken
 
-        fakeLogger.funCalls.first().first.topic shouldBe "log_method_not_allowed"
-        fakeLogger.funCalls.first().second shouldBe LogLevel.Debug
+        verifyLogging()
 
         result shouldBe null
     }
@@ -74,8 +60,13 @@ class LoggingPushTests {
     fun testActive() = runTest {
         loggingPush.activate()
 
-        fakeLogger.funCalls.first().first.topic shouldBe "log_method_not_allowed"
-        fakeLogger.funCalls.first().second shouldBe LogLevel.Debug
+        verifyLogging()
+    }
+
+    private fun verifyLogging() {
+        val logEntryCapture = mutableListOf<LogEntry>()
+        verify { mockLogger.log(isAny(capture = logEntryCapture), isEqual(LogLevel.Debug)) }
+        logEntryCapture.first().topic shouldBe "log_method_not_allowed"
     }
 
 }

@@ -114,8 +114,8 @@ class MobileEngageSessionTests : TestsWithMocks() {
         eventClientEndEventRegistrationMocker returns Unit
 
         every { mockSdkLogger.log(isAny(), isAny()) } returns Unit
-        every { mockSdkLogger.debug(isAny()) } returns Unit
-        every { mockSdkLogger.error(isAny()) } returns Unit
+        everySuspending { mockSdkLogger.debug(isAny()) } returns Unit
+        everySuspending { mockSdkLogger.error(isAny()) } returns Unit
 
         mobileEngageSession = MobileEngageSession(
             mockTimestampProvider,

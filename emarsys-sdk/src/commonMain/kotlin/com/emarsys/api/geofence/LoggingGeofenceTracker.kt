@@ -2,19 +2,26 @@ package com.emarsys.api.geofence
 
 import com.emarsys.api.AppEvent
 import com.emarsys.api.geofence.model.Geofence
+import com.emarsys.context.SdkContextApi
 import com.emarsys.core.log.LogEntry
-import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.launch
 
-class LoggingGeofenceTracker(private val logger: Logger) : GeofenceTrackerInstance {
+class LoggingGeofenceTracker(
+    private val sdkContext: SdkContextApi,
+    private val logger: Logger
+) : GeofenceTrackerInstance {
     override val registeredGeofences: List<Geofence>
         get() {
             val entry = LogEntry.createMethodNotAllowed<LoggingGeofenceTracker>(
                 this, this::registeredGeofences.name
             )
-            logger.debug(entry)
+            CoroutineScope(sdkContext.sdkDispatcher).launch {
+                logger.debug(entry)
+            }
             return listOf()
         }
 
@@ -23,7 +30,9 @@ class LoggingGeofenceTracker(private val logger: Logger) : GeofenceTrackerInstan
             val entry = LogEntry.createMethodNotAllowed<LoggingGeofenceTracker>(
                 this, this::events.name
             )
-            logger.debug(entry)
+            CoroutineScope(sdkContext.sdkDispatcher).launch {
+                logger.debug(entry)
+            }
             return emptyFlow()
         }
 
@@ -32,7 +41,9 @@ class LoggingGeofenceTracker(private val logger: Logger) : GeofenceTrackerInstan
             val entry = LogEntry.createMethodNotAllowed<LoggingGeofenceTracker>(
                 this, this::isEnabled.name
             )
-            logger.debug(entry)
+            CoroutineScope(sdkContext.sdkDispatcher).launch {
+                logger.debug(entry)
+            }
             return false
         }
 
@@ -61,6 +72,6 @@ class LoggingGeofenceTracker(private val logger: Logger) : GeofenceTrackerInstan
 
     override suspend fun activate() {
         val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)
-        logger.log(entry, LogLevel.Debug)
+        logger.debug(entry)
     }
 }
