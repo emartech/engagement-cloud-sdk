@@ -1,12 +1,15 @@
 package com.emarsys.mobileengage.push
 
-import com.emarsys.api.push.PushApi
+import com.emarsys.EmarsysConfig
 import com.emarsys.api.push.PushInternalApi
 import js.buffer.BufferSource
 import js.promise.await
 import js.typedarrays.Uint8Array
 import kotlinx.browser.window
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.await
+import kotlinx.coroutines.launch
 import org.w3c.notifications.GRANTED
 import org.w3c.notifications.Notification
 import org.w3c.notifications.NotificationPermission
@@ -15,44 +18,53 @@ import web.push.PushSubscriptionOptionsInit
 
 //TODO: add logger instead of console log
 class PushService(
-    private val applicationServerKey: String,
-    private val serviceWorkerPath: String,
-    private val pushApi: PushInternalApi
+    private val pushServiceContext: PushServiceContext,
+    private val pushApi: PushInternalApi,
+    private val pushMessageMapper: PushMessageMapper,
+    private val pushPresenter: PushPresenter,
+    private val sdkDispatcher: CoroutineDispatcher
 ) {
 
-    suspend fun register() {
+    suspend fun register(config: EmarsysConfig) {
         if (Notification.requestPermission().await() != NotificationPermission.GRANTED) return
-        subscribeForPushReceiving()
+        subscribeForPushReceiving(config)
         subscribeForPushMessages()
     }
 
     private fun subscribeForPushMessages() {
         try {
             navigator.serviceWorker.onmessage = {
-                console.log("MESSAGE: ${JSON.stringify(it.data)}")
+                CoroutineScope(sdkDispatcher).launch {
+                    val pushMessage = pushMessageMapper.map(JSON.parse(JSON.stringify(it.data)))
+                    pushPresenter.present(pushMessage)
+                    console.log("MESSAGE: ${JSON.stringify(it.data)}")
+                }
             }
         } catch (e: Throwable) {
             e.printStackTrace()
         }
     }
 
-    private suspend fun subscribeForPushReceiving() {
+    private suspend fun subscribeForPushReceiving(config: EmarsysConfig) {
         try {
-            val registration = navigator.serviceWorker.register(serviceWorkerPath).await()
-            val options = createPushSubscriptionOptions()
+            val serviceWorkerPath = "/ems-service-worker.js" // TODO: config.serviceWorkerPath
+            pushServiceContext.registration = navigator.serviceWorker.register(serviceWorkerPath).await()
+            val options = createPushSubscriptionOptions(config)
             navigator.serviceWorker.ready.await()
-            val pushToken = registration.pushManager.subscribe(options).await()
+            val pushToken = pushServiceContext.registration.pushManager.subscribe(options).await()
             pushApi.registerPushToken(pushToken.toString())
         } catch (throwable: Throwable) {
             console.log("service worker registration failed: $throwable")
         }
     }
 
-    private fun createPushSubscriptionOptions(): PushSubscriptionOptionsInit =
-        js("{}").unsafeCast<PushSubscriptionOptionsInit>().apply {
-            this.applicationServerKey = urlBase64ToUint8Array(this@PushService.applicationServerKey)
+    private fun createPushSubscriptionOptions(config: EmarsysConfig): PushSubscriptionOptionsInit {
+        val applicationServerKey = "BDa49_IiPdIo2Kda5cATItp81sOaYg-eFFISMdlSXatDAIZCdtAxUuMVzXo4M2MXXI0sUYQzQI7shyNkKgwyD_I" // TODO: config.applicationServerKey
+        return js("{}").unsafeCast<PushSubscriptionOptionsInit>().apply {
+            this.applicationServerKey = urlBase64ToUint8Array(applicationServerKey)
             this.userVisibleOnly = true
         }
+    }
 
     private fun urlBase64ToUint8Array(base64String: String): BufferSource {
         val padding = "=".repeat((4 - base64String.length % 4) % 4);

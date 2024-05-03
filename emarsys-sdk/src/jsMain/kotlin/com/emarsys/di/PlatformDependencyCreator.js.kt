@@ -1,6 +1,7 @@
 package com.emarsys.di
 
 import com.emarsys.api.push.PushInternalApi
+import com.emarsys.context.SdkContext
 import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.badge.WebBadgeCountHandler
 import com.emarsys.core.device.DeviceInfoCollector
@@ -15,7 +16,12 @@ import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.url.WebExternalUrlOpener
+import com.emarsys.mobileengage.action.ActionFactoryApi
+import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.push.PushMessageMapper
+import com.emarsys.mobileengage.push.PushMessagePresenter
 import com.emarsys.mobileengage.push.PushService
+import com.emarsys.mobileengage.push.PushServiceContext
 import com.emarsys.setup.PlatformInitState
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.connection.WebConnectionWatchDog
@@ -51,14 +57,13 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
 
     override fun createPlatformInitState(
         pushApi: PushInternalApi,
-        sdkDispatcher: CoroutineDispatcher
+        sdkDispatcher: CoroutineDispatcher,
+        sdkContext: SdkContext,
+        actionFactory: ActionFactoryApi<ActionModel>
     ): State {
-        val pushService = PushService(
-            "BDa49_IiPdIo2Kda5cATItp81sOaYg-eFFISMdlSXatDAIZCdtAxUuMVzXo4M2MXXI0sUYQzQI7shyNkKgwyD_I",
-            "/ems-service-worker.js",
-            pushApi
-        )
-        return PlatformInitState(pushService)
+        val pushPresenter = PushMessagePresenter(pushServiceContext, actionFactory, sdkDispatcher)
+        val pushService = PushService(pushServiceContext, pushApi, pushMessageMapper, pushPresenter, sdkDispatcher)
+        return PlatformInitState(pushService, sdkContext)
     }
 
     override fun createPermissionHandler(): PermissionHandlerApi {
@@ -79,6 +84,14 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
 
     override fun createLifeCycleWatchDog(): LifecycleWatchDog {
         return WebLifeCycleWatchDog(document, CoroutineScope(Dispatchers.Default))
+    }
+
+    private val pushServiceContext: PushServiceContext by lazy {
+        PushServiceContext()
+    }
+
+    private val pushMessageMapper: PushMessageMapper by lazy {
+        PushMessageMapper()
     }
 
     private fun createWebDeviceInfoCollector(): WebPlatformInfoCollector {

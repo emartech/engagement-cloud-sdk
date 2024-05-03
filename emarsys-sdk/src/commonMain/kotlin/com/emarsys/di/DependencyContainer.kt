@@ -409,7 +409,7 @@ class DependencyContainer : DependencyContainerApi {
         val registerClientState = RegisterClientState(deviceClient)
         val registerPushTokenState = RegisterPushTokenState(pushClient, stringStorage)
         val platformInitState =
-            dependencyCreator.createPlatformInitState(pushInternal, sdkDispatcher)
+            dependencyCreator.createPlatformInitState(pushInternal, sdkDispatcher, sdkContext, actionFactory)
         val applyRemoteConfigState = ApplyRemoteConfigState(
             remoteConfigHandler
         )

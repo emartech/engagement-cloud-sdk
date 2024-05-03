@@ -8,9 +8,9 @@ import androidx.lifecycle.lifecycleScope
 import com.emarsys.api.push.PushConstants
 import com.emarsys.api.push.PushInternalApi
 import com.emarsys.applicationContext
+import com.emarsys.context.SdkContext
 import com.emarsys.core.badge.AndroidBadgeCountHandler
 import com.emarsys.core.badge.BadgeCountHandlerApi
-import com.emarsys.watchdog.connection.AndroidConnectionWatchDog
 import com.emarsys.core.device.AndroidLanguageProvider
 import com.emarsys.core.device.AndroidPlatformInfoCollector
 import com.emarsys.core.device.DeviceInfoCollector
@@ -25,14 +25,16 @@ import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.AndroidExternalUrlOpener
 import com.emarsys.core.url.ExternalUrlOpenerApi
+import com.emarsys.mobileengage.action.ActionFactoryApi
+import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.push.PushTokenBroadcastReceiver
 import com.emarsys.setup.PlatformInitState
+import com.emarsys.watchdog.connection.AndroidConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.AndroidLifecycleWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import java.util.Locale
 
 
@@ -69,7 +71,9 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
 
     override fun createPlatformInitState(
         pushApi: PushInternalApi,
-        sdkDispatcher: CoroutineDispatcher
+        sdkDispatcher: CoroutineDispatcher,
+        sdkContext: SdkContext,
+        actionFactory: ActionFactoryApi<ActionModel>
     ): State {
         val receiver = PushTokenBroadcastReceiver(sdkDispatcher, pushApi)
         return PlatformInitState(
