@@ -10,8 +10,9 @@ dependencies {
     implementation(kotlin("test"))
     implementation(libs.mockk.android)
     implementation(libs.androidx.runner)
-    androidTestImplementation(libs.junit)
     implementation(libs.kotest.assertions.core)
+
+    androidTestImplementation(libs.junit)
 }
 android {
     namespace = "com.emarsys.fcm"

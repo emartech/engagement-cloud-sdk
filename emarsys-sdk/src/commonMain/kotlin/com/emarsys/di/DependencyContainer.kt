@@ -142,7 +142,7 @@ class DependencyContainer : DependencyContainerApi {
 
     private val platformContext: PlatformContext = CommonPlatformContext()
 
-    private val dependencyCreator: DependencyCreator = PlatformDependencyCreator(platformContext)
+    private val sdkLogger: SdkLogger = SdkLogger(ConsoleLogger())
 
     private val json: Json by lazy {
         Json {
@@ -150,6 +150,9 @@ class DependencyContainer : DependencyContainerApi {
             encodeDefaults = true
         }
     }
+
+    private val dependencyCreator: DependencyCreator =
+        PlatformDependencyCreator(platformContext, sdkLogger, json)
 
     private val stringStorage: TypedStorageApi<String?> by lazy { dependencyCreator.createStorage() }
 
@@ -195,8 +198,6 @@ class DependencyContainer : DependencyContainerApi {
             timezoneProvider
         )
     }
-
-    private val sdkLogger: SdkLogger by lazy { SdkLogger(ConsoleLogger()) }
 
     val sdkDispatcher: CoroutineDispatcher by lazy {
         Dispatchers.Default
@@ -409,7 +410,12 @@ class DependencyContainer : DependencyContainerApi {
         val registerClientState = RegisterClientState(deviceClient)
         val registerPushTokenState = RegisterPushTokenState(pushClient, stringStorage)
         val platformInitState =
-            dependencyCreator.createPlatformInitState(pushInternal, sdkDispatcher, sdkContext, actionFactory)
+            dependencyCreator.createPlatformInitState(
+                pushInternal,
+                sdkDispatcher,
+                sdkContext,
+                actionFactory
+            )
         val applyRemoteConfigState = ApplyRemoteConfigState(
             remoteConfigHandler
         )

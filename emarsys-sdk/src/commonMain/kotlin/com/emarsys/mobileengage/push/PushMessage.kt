@@ -8,25 +8,25 @@ import kotlinx.serialization.json.JsonObject
 data class PushMessage(
     val title: String,
     val body: String,
-    val iconUrlString: String?,
-    val imageUrlString: String?,
-    val data: PushData?
+    val iconUrlString: String? = null,
+    val imageUrlString: String? = null,
+    val data: PushData? = null
 )
 
 @Serializable
 data class PushData(
     val silent: Boolean,
     val sid: String,
-    val platformContext: JsonObject?,
-    val defaultAction: ActionModel?,
-    val actions: List<ActionModel>?,
-    val inApp: InApp?,
-    val rootParams: JsonObject?
+    val platformContext: JsonObject? = null,
+    val defaultAction: ActionModel? = null,
+    val actions: List<ActionModel>? = null,
+    val inApp: InApp? = null,
+    val rootParams: JsonObject? = null
 )
 
 @Serializable
 data class InApp(
     val campaignId: String,
     val urlString: String,
-    val ignoreViewedEvent: Boolean?
+    val ignoreViewedEvent: Boolean? = null
 )

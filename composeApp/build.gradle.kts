@@ -60,6 +60,8 @@ android {
     }
     packaging {
         resources {
+            pickFirsts.add("META-INF/LICENSE.md")
+            pickFirsts.add("META-INF/LICENSE-notice.md")
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }

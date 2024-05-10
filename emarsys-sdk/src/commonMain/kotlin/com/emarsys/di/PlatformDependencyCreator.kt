@@ -1,3 +1,6 @@
 package com.emarsys.di
 
-expect class PlatformDependencyCreator(platformContext: PlatformContext): DependencyCreator
+import com.emarsys.core.log.Logger
+import kotlinx.serialization.json.Json
+
+expect class PlatformDependencyCreator(platformContext: PlatformContext, sdkLogger: Logger, json: Json): DependencyCreator

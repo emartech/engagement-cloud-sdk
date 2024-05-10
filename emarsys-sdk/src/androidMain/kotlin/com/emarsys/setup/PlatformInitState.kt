@@ -8,7 +8,9 @@ import com.emarsys.core.state.State
 
 class PlatformInitState(
     private val pushTokenBroadcastReceiver: BroadcastReceiver,
-    private val intentFilter: IntentFilter,
+    private val pushTokenIntentFilter: IntentFilter,
+    private val pushMessageBroadcastReceiver: BroadcastReceiver,
+    private val pushMessageIntentFilter: IntentFilter,
     private val context: Context
 ) : State {
 
@@ -18,7 +20,14 @@ class PlatformInitState(
         ContextCompat.registerReceiver(
             context,
             pushTokenBroadcastReceiver,
-            intentFilter,
+            pushTokenIntentFilter,
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
+
+        ContextCompat.registerReceiver(
+            context,
+            pushMessageBroadcastReceiver,
+            pushMessageIntentFilter,
             ContextCompat.RECEIVER_NOT_EXPORTED
         )
     }

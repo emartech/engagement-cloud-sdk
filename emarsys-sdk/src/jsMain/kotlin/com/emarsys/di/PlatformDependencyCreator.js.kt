@@ -6,6 +6,7 @@ import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.badge.WebBadgeCountHandler
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.WebPlatformInfoCollector
+import com.emarsys.core.log.Logger
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.permission.WebPermissionHandler
@@ -31,9 +32,10 @@ import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.serialization.json.Json
 import web.dom.document
 
-actual class PlatformDependencyCreator actual constructor(platformContext: PlatformContext) :
+actual class PlatformDependencyCreator actual constructor(platformContext: PlatformContext, sdkLogger: Logger, json: Json) :
     DependencyCreator {
 
     private val platformContext: CommonPlatformContext = platformContext as CommonPlatformContext
