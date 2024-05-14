@@ -1,5 +1,6 @@
 package com.emarsys.di
 
+import android.app.NotificationManager
 import android.content.Context
 import android.content.IntentFilter
 import android.net.ConnectivityManager
@@ -83,7 +84,9 @@ actual class PlatformDependencyCreator actual constructor(
         sdkContext: SdkContext,
         actionFactory: ActionFactoryApi<ActionModel>
     ): State {
-        val pushPresenter = PushMessagePresenter(applicationContext)
+        val notificationManager =
+            (applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+        val pushPresenter = PushMessagePresenter(applicationContext, json, notificationManager)
         val pushTokenBroadcastReceiver = PushTokenBroadcastReceiver(sdkDispatcher, pushApi)
         val pushMessageBroadcastReceiver =
             PushMessageBroadcastReceiver(pushPresenter, sdkDispatcher, sdkLogger, json)

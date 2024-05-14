@@ -5,6 +5,7 @@ import org.json.JSONObject
 
 object FirebaseRemoteMessageMapper {
     fun map(remoteMessage: RemoteMessage): JSONObject {
+        //TODO: this mapper needs to be adjusted to the new version of FCM payload
         val json = JSONObject()
         with(remoteMessage.data) {
             this["notification.title"]?.let {
@@ -33,19 +34,8 @@ object FirebaseRemoteMessageMapper {
                 pushData.put("sid", it)
             }
 
-            val defaultAction = extractDefaultAction(this)
-            pushData.put("defaultAction", defaultAction)
-
-            this["ems.actions"]?.let {
-                pushData.put("sid", it)
-            }
-
             this["ems.inapp"]?.let {
                 pushData.put("inApp", it)
-            }
-
-            this["ems.root_params"]?.let {
-                pushData.put("rootParams", it)
             }
 
             val platformContext = JSONObject()
@@ -67,24 +57,5 @@ object FirebaseRemoteMessageMapper {
         }
 
         return json
-    }
-
-    private fun extractDefaultAction(remoteMessageData: Map<String, String?>): String? {
-        val name = remoteMessageData.getOrDefault("ems.tap_actions.default_action.name", null)
-        val type = remoteMessageData.getOrDefault("ems.tap_actions.default_action.type", null)
-        val url = remoteMessageData.getOrDefault("ems.tap_actions.default_action.url", null)
-        val payload =
-            remoteMessageData.getOrDefault("ems.tap_actions.default_action.payload", null)
-        val payloadObject = payload?.let { JSONObject(payload) }
-
-        val defaultAction = if (type != null) {
-            JSONObject()
-                .put("name", name)
-                .put("type", type)
-                .put("url", url)
-                .put("payload", payloadObject)
-        } else null
-
-        return defaultAction?.toString()
     }
 }

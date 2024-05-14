@@ -20,6 +20,11 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <meta-data
+            android:name="com.emarsys.sample.small_notification_icon"
+            android:resource="@drawable/mobile_engage_logo_icon" />
+
         <service android:name="com.emarsys.service.EmarsysFirebaseMessagingService"
                  android:exported="false">
             <intent-filter>

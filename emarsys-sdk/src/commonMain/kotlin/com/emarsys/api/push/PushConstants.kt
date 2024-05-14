@@ -7,4 +7,5 @@ object PushConstants {
     const val PUSH_TOKEN_INTENT_FILTER_ACTION = "com.emarsys.sdk.PUSH_TOKEN"
     const val PUSH_MESSAGE_PAYLOAD_INTENT_KEY = "pushPayload"
     const val PUSH_MESSAGE_PAYLOAD_INTENT_FILTER_ACTION = "com.emarsys.sdk.PUSH_MESSAGE_PAYLOAD"
+    const val PUSH_NOTIFICATION_ICON_NAME = "com.emarsys.sample.small_notification_icon"
 }

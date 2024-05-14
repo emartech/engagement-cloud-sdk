@@ -125,7 +125,7 @@ android {
 
 buildConfig {
     packageName("com.emarsys.core.device")
-    buildConfigField("String", "VERSION_NAME", "\"0.0.1\"")
+    buildConfigField("String", "VERSION_NAME", "\"4.0.0\"")
 }
 
 afterEvaluate {
