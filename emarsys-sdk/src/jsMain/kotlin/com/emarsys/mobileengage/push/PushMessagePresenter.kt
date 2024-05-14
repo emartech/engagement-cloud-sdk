@@ -14,15 +14,15 @@ open class PushMessagePresenter(
     private val sdkDispatcher: CoroutineDispatcher
 ): PushPresenter {
 
-    override suspend fun present(push: PushMessage) {
+    override suspend fun present(pushMessage: PushMessage) {
         // TODO: show message
         pushServiceContext.registration.showNotification(
-            push.title
+            pushMessage.title
         )
 
         window.addEventListener(NotificationEvent.NOTIFICATION_CLICK, { event ->
             CoroutineScope(sdkDispatcher).launch {
-                val actionModel = push.data?.actions?.first { it.type == event.action }
+                val actionModel = pushMessage.data?.actions?.first { it.type == event.action }
                 actionModel?.let {
                     val action = actionFactory.create(it)
                     action()

@@ -29,7 +29,7 @@ class EmarsysFirebaseMessagingService : FirebaseMessagingService() {
             action = PUSH_TOKEN_INTENT_FILTER_ACTION
             putExtra(PUSH_TOKEN_INTENT_KEY, token)
         }
-        sendBroadcast(intent)
+        applicationContext.sendBroadcast(intent)
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
@@ -46,6 +46,6 @@ class EmarsysFirebaseMessagingService : FirebaseMessagingService() {
                 FirebaseRemoteMessageMapper.map(remoteMessage).toString()
             )
         }
-        sendBroadcast(intent)
+        applicationContext.sendBroadcast(intent)
     }
 }

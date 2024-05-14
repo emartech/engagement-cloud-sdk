@@ -13,8 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import com.emarsys.Emarsys
-import com.emarsys.EmarsysConfig
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -24,13 +22,6 @@ class MainActivity : ComponentActivity() {
             AppAndroidPreview()
         }
         lifecycleScope.launch {
-            val config = EmarsysConfig("EMS11-C3FD3")
-            Emarsys.enableTracking(config)
-            Emarsys.inApp.events.collect {event ->
-                event.name
-                event.payload
-//                event.context
-            }
             askNotificationPermission()
         }
     }

@@ -1,5 +1,5 @@
 package com.emarsys.mobileengage.push
 
 interface PushPresenter {
-    suspend fun present(push: PushMessage)
+    suspend fun present(pushMessage: PushMessage)
 }

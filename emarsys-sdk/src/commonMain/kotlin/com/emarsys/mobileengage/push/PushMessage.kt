@@ -15,7 +15,7 @@ data class PushMessage(
 
 @Serializable
 data class PushData(
-    val silent: Boolean,
+    val silent: Boolean = false,
     val sid: String,
     val platformContext: JsonObject? = null,
     val defaultAction: ActionModel? = null,
