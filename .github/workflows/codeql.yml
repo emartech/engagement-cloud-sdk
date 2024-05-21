@@ -72,7 +72,7 @@ jobs:
         build-mode: ${{ matrix.build-mode }}
 
     - if: matrix.build-mode == 'manual'
-      shell: bash
+      shell: sh
       run: |
         make build-pipeline
 
