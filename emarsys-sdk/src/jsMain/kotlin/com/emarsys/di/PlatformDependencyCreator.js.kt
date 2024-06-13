@@ -40,11 +40,11 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
 
     private val platformContext: CommonPlatformContext = platformContext as CommonPlatformContext
 
-    override fun createStorage(): TypedStorageApi<String?> {
+    actual override fun createStorage(): TypedStorageApi<String?> {
         return StringStorage(platformContext.storage)
     }
 
-    override fun createDeviceInfoCollector(
+    actual override fun createDeviceInfoCollector(
         uuidProvider: Provider<String>,
         timezoneProvider: Provider<String>
     ): DeviceInfoCollector {
@@ -57,7 +57,7 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
         )
     }
 
-    override fun createPlatformInitState(
+    actual override fun createPlatformInitState(
         pushApi: PushInternalApi,
         sdkDispatcher: CoroutineDispatcher,
         sdkContext: SdkContext,
@@ -68,23 +68,23 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
         return PlatformInitState(pushService, sdkContext)
     }
 
-    override fun createPermissionHandler(): PermissionHandlerApi {
+    actual override fun createPermissionHandler(): PermissionHandlerApi {
         return WebPermissionHandler()
     }
 
-    override fun createBadgeCountHandler(): BadgeCountHandlerApi {
+    actual override fun createBadgeCountHandler(): BadgeCountHandlerApi {
         return WebBadgeCountHandler()
     }
 
-    override fun createExternalUrlOpener(): ExternalUrlOpenerApi {
+    actual override fun createExternalUrlOpener(): ExternalUrlOpenerApi {
         return WebExternalUrlOpener()
     }
 
-    override fun createConnectionWatchDog(sdkLogger: SdkLogger): ConnectionWatchDog {
+    actual override fun createConnectionWatchDog(sdkLogger: SdkLogger): ConnectionWatchDog {
         return WebConnectionWatchDog(window)
     }
 
-    override fun createLifeCycleWatchDog(): LifecycleWatchDog {
+    actual override fun createLifeCycleWatchDog(): LifecycleWatchDog {
         return WebLifeCycleWatchDog(document, CoroutineScope(Dispatchers.Default))
     }
 
