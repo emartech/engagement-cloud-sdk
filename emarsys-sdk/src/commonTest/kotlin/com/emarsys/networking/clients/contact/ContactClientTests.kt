@@ -7,6 +7,11 @@ import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
+import dev.mokkery.answering.returns
+import dev.mokkery.every
+import dev.mokkery.everySuspend
+import dev.mokkery.mock
+import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
@@ -15,12 +20,10 @@ import io.ktor.http.Url
 import io.ktor.http.headers
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
-import org.kodein.mock.Mock
-import org.kodein.mock.tests.TestsWithMocks
-import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class ContactClientTests : TestsWithMocks() {
+class ContactClientTests  {
     private companion object {
         const val OPEN_ID_TOKEN = "testOpenIdToken"
         const val CONTACT_FIELD_VALUE = "testContactFieldValue"
@@ -28,28 +31,20 @@ class ContactClientTests : TestsWithMocks() {
         const val MERCHANT_ID = "testMerchantId"
     }
 
-    override fun setUpMocks() = injectMocks(mocker)
-
-    @Mock
-    lateinit var mockEmarsysClient: NetworkClientApi
-
-    @Mock
-    lateinit var mockUrlFactory: UrlFactoryApi
-
-    @Mock
-    lateinit var mockSdkContext: SdkContextApi
-
-    @Mock
-    lateinit var mockContactTokenHandler: ContactTokenHandlerApi
-
     private val json: Json = Json
-    private val contactClient: ContactClientApi by withMocks {
-        ContactClient(mockEmarsysClient, mockUrlFactory, mockSdkContext, mockContactTokenHandler, json)
-    }
+    private lateinit var mockEmarsysClient: NetworkClientApi
+    private lateinit var mockUrlFactory: UrlFactoryApi
+    private lateinit var mockSdkContext: SdkContextApi
+    private lateinit var mockContactTokenHandler: ContactTokenHandlerApi
+    private lateinit var contactClient: ContactClientApi
 
-    @AfterTest
-    fun teardown() {
-        mocker.reset()
+    @BeforeTest
+    fun setUp() {
+        mockEmarsysClient = mock()
+        mockUrlFactory = mock()
+        mockSdkContext = mock()
+        mockContactTokenHandler = mock()
+        contactClient = ContactClient(mockEmarsysClient, mockUrlFactory, mockSdkContext, mockContactTokenHandler, json)
     }
 
     @Test
@@ -73,13 +68,13 @@ class ContactClientTests : TestsWithMocks() {
             """{"refreshToken":"testRefreshToken", "contactToken":"testContactToken"}"""
         )
         every { mockUrlFactory.create(EmarsysUrlType.LINK_CONTACT) } returns testUrl
-        everySuspending { mockEmarsysClient.send(expectedUrlRequest) } returns expectedResponse
+        everySuspend { mockEmarsysClient.send(expectedUrlRequest) } returns expectedResponse
         every { mockContactTokenHandler.handleContactTokens(expectedResponse) } returns Unit
 
         contactClient.linkContact(CONTACT_FIELD_ID, contactFieldValue = CONTACT_FIELD_VALUE)
 
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockEmarsysClient.send(expectedUrlRequest)
             mockContactTokenHandler.handleContactTokens(expectedResponse)
         }
@@ -106,7 +101,7 @@ class ContactClientTests : TestsWithMocks() {
             """{"refreshToken":"testRefreshToken", "contactToken":"testContactToken"}"""
         )
         every { mockUrlFactory.create(EmarsysUrlType.LINK_CONTACT) } returns testUrl
-        everySuspending { mockEmarsysClient.send(expectedUrlRequest) } returns Response(
+        everySuspend { mockEmarsysClient.send(expectedUrlRequest) } returns Response(
             expectedUrlRequest,
             HttpStatusCode.OK,
             Headers.Empty,
@@ -117,7 +112,7 @@ class ContactClientTests : TestsWithMocks() {
 
         val response = contactClient.linkContact(CONTACT_FIELD_ID, openIdToken = OPEN_ID_TOKEN)
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockEmarsysClient.send(expectedUrlRequest)
         }
 
@@ -149,7 +144,7 @@ class ContactClientTests : TestsWithMocks() {
             """{"refreshToken":"testRefreshToken", "contactToken":"testContactToken"}"""
         )
         every { mockUrlFactory.create(EmarsysUrlType.LINK_CONTACT) } returns testUrl
-        everySuspending { mockEmarsysClient.send(expectedUrlRequest) } returns Response(
+        everySuspend { mockEmarsysClient.send(expectedUrlRequest) } returns Response(
             expectedUrlRequest,
             HttpStatusCode.OK,
             headers {
@@ -161,7 +156,7 @@ class ContactClientTests : TestsWithMocks() {
 
         val response = contactClient.linkContact(CONTACT_FIELD_ID, openIdToken = OPEN_ID_TOKEN)
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockEmarsysClient.send(expectedUrlRequest)
         }
 
@@ -182,7 +177,7 @@ class ContactClientTests : TestsWithMocks() {
             mapOf()
         )
         every { mockUrlFactory.create(EmarsysUrlType.UNLINK_CONTACT) } returns testUrl
-        everySuspending { mockEmarsysClient.send(expectedUrlRequest) } returns Response(
+        everySuspend { mockEmarsysClient.send(expectedUrlRequest) } returns Response(
             expectedUrlRequest,
             HttpStatusCode.OK,
             Headers.Empty,
@@ -199,7 +194,7 @@ class ContactClientTests : TestsWithMocks() {
 
         val response = contactClient.unlinkContact()
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockEmarsysClient.send(expectedUrlRequest)
             mockContactTokenHandler.handleContactTokens(expectedResponse)
         }
@@ -222,7 +217,7 @@ class ContactClientTests : TestsWithMocks() {
             mapOf("X-Merchant-Id" to MERCHANT_ID)
         )
         every { mockUrlFactory.create(EmarsysUrlType.UNLINK_CONTACT) } returns testUrl
-        everySuspending { mockEmarsysClient.send(expectedUrlRequest) } returns Response(
+        everySuspend { mockEmarsysClient.send(expectedUrlRequest) } returns Response(
             expectedUrlRequest,
             HttpStatusCode.OK,
             headers {
@@ -243,7 +238,7 @@ class ContactClientTests : TestsWithMocks() {
 
         val response = contactClient.unlinkContact()
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockEmarsysClient.send(expectedUrlRequest)
             mockContactTokenHandler.handleContactTokens(expectedResponse)
         }

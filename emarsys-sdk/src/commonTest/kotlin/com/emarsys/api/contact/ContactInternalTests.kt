@@ -14,6 +14,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import io.ktor.http.headersOf
 import kotlinx.coroutines.test.runTest
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class ContactInternalTests  {
@@ -31,7 +32,7 @@ class ContactInternalTests  {
         val calls = mutableListOf(linkContact, linkAuthenticatedContact, unlinkContact)
     }
 
-    lateinit var mockContactClient: ContactClientApi
+    private lateinit var mockContactClient: ContactClientApi
 
     private lateinit var contactContext: ApiContext<ContactCall>
 
@@ -46,10 +47,13 @@ class ContactInternalTests  {
         ""
     )
 
-    private val contactInternal: ContactInstance by lazy {
+    private lateinit var contactInternal: ContactInstance
+
+    @BeforeTest
+    fun setUp() {
         mockContactClient = mock()
         contactContext = ContactContext(calls)
-        ContactInternal(mockContactClient, contactContext)
+        contactInternal = ContactInternal(mockContactClient, contactContext)
     }
 
     @Test

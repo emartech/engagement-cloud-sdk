@@ -5,32 +5,32 @@ import com.emarsys.context.Features
 import com.emarsys.context.SdkContext
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.log.LogLevel
-import com.emarsys.networking.clients.remoteConfig.RemoteConfigClientApi
 import com.emarsys.core.providers.Provider
+import com.emarsys.networking.clients.remoteConfig.RemoteConfigClientApi
+import dev.mokkery.answering.returns
+import dev.mokkery.every
+import dev.mokkery.everySuspend
+import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.kodein.mock.Mock
-import org.kodein.mock.tests.TestsWithMocks
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class RemoteConfigHandlerTests : TestsWithMocks() {
-
-    override fun setUpMocks() = injectMocks(mocker)
-
-    @Mock
-    lateinit var mockRemoteConfigClient: RemoteConfigClientApi
-
-    @Mock
-    lateinit var mockDeviceInfoCollector: DeviceInfoCollectorApi
-
+class RemoteConfigHandlerTests {
     private val sdkContext = SdkContext(StandardTestDispatcher(), DefaultUrls("", "", "", "", "", "", ""), LogLevel.Debug, mutableSetOf())
+    private lateinit var mockRemoteConfigClient: RemoteConfigClientApi
+    private lateinit var mockDeviceInfoCollector: DeviceInfoCollectorApi
+    private lateinit var mockRandomProvider: Provider<Double>
+    private lateinit var remoteConfigHandler: RemoteConfigHandler
 
-    @Mock
-    lateinit var mockRandomProvider: Provider<Double>
+    @BeforeTest
+    fun setUp() {
+        mockRemoteConfigClient = mock()
+        mockDeviceInfoCollector = mock()
+        mockRandomProvider = mock()
 
-    private var remoteConfigHandler: RemoteConfigHandler by withMocks {
-        RemoteConfigHandler(
+        remoteConfigHandler = RemoteConfigHandler(
             mockRemoteConfigClient,
             mockDeviceInfoCollector,
             sdkContext,
@@ -60,7 +60,7 @@ class RemoteConfigHandlerTests : TestsWithMocks() {
         )
 
         every { mockDeviceInfoCollector.getHardwareId() } returns hardwareId
-        everySuspending { mockRemoteConfigClient.fetchRemoteConfig() } returns config
+        everySuspend { mockRemoteConfigClient.fetchRemoteConfig() } returns config
         every { mockRandomProvider.provide() } returns 0.1
 
         remoteConfigHandler.handle()

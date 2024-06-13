@@ -6,6 +6,11 @@ import com.emarsys.context.DefaultUrls
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.log.LogLevel
+import dev.mokkery.answering.returns
+import dev.mokkery.answering.throws
+import dev.mokkery.everySuspend
+import dev.mokkery.mock
+import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -13,14 +18,12 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.kodein.mock.Mock
-import org.kodein.mock.tests.TestsWithMocks
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class InboxTests : TestsWithMocks() {
+class InboxTests {
     private companion object {
         const val TAG = "testTag"
         const val MESSAGE_ID = "testMessageId"
@@ -28,27 +31,22 @@ class InboxTests : TestsWithMocks() {
         val testException = Exception()
     }
 
-    override fun setUpMocks() = injectMocks(mocker)
-
-    @Mock
-    lateinit var mockLoggingInbox: InboxInstance
-
-    @Mock
-    lateinit var mockGathererInbox: InboxInstance
-
-    @Mock
-    lateinit var mockInboxInternal: InboxInstance
-
-    private lateinit var sdkContext: SdkContextApi
-
-    private lateinit var inbox: Inbox<InboxInstance, InboxInstance, InboxInstance>
-
     init {
         Dispatchers.setMain(StandardTestDispatcher())
     }
 
+    private lateinit var mockLoggingInbox: InboxInstance
+    private lateinit var mockGathererInbox: InboxInstance
+    private lateinit var mockInboxInternal: InboxInstance
+    private lateinit var sdkContext: SdkContextApi
+    private lateinit var inbox: Inbox<InboxInstance, InboxInstance, InboxInstance>
+
     @BeforeTest
     fun setup() = runTest {
+        mockLoggingInbox = mock()
+        mockGathererInbox = mock()
+        mockInboxInternal = mock()
+        
         sdkContext = SdkContext(
             StandardTestDispatcher(),
             DefaultUrls("", "", "", "", "", "", ""),
@@ -56,9 +54,9 @@ class InboxTests : TestsWithMocks() {
             mutableSetOf()
         )
 
-        everySuspending { mockLoggingInbox.activate() } returns Unit
-        everySuspending { mockGathererInbox.activate() } returns Unit
-        everySuspending { mockInboxInternal.activate() } returns Unit
+        everySuspend { mockLoggingInbox.activate() } returns Unit
+        everySuspend { mockGathererInbox.activate() } returns Unit
+        everySuspend { mockInboxInternal.activate() } returns Unit
 
         inbox = Inbox(mockLoggingInbox, mockGathererInbox, mockInboxInternal, sdkContext)
 
@@ -68,51 +66,48 @@ class InboxTests : TestsWithMocks() {
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
-        mocker.reset()
     }
 
     @Test
     fun testFetchMessages_shouldCallLoggingInstance_whenInactive() = runTest {
         val expectedResult = emptyList<Message>()
-        everySuspending { mockLoggingInbox.fetchMessages() } returns expectedResult
+        everySuspend { mockLoggingInbox.fetchMessages() } returns expectedResult
 
         val result = inbox.fetchMessages()
 
         result.getOrNull() shouldBe expectedResult
-        verifyWithSuspend(exhaustive = false) { mockLoggingInbox.fetchMessages() }
+        verifySuspend { mockLoggingInbox.fetchMessages() }
     }
 
     @Test
     fun testFetchMessages_shouldCallGathererInstance_whenOnHold() = runTest {
         val expectedResult = listOf(testMessage)
-        everySuspending { mockGathererInbox.fetchMessages() } returns expectedResult
+        everySuspend { mockGathererInbox.fetchMessages() } returns expectedResult
 
         sdkContext.setSdkState(SdkState.onHold)
 
         val result = inbox.fetchMessages()
 
-        verifyWithSuspend(exhaustive = false) { mockGathererInbox.fetchMessages() }
+        verifySuspend { mockGathererInbox.fetchMessages() }
         result.getOrNull() shouldBe expectedResult
     }
 
     @Test
     fun testFetchMessages_shouldCallGathererInstance_whenActive() = runTest {
         val expectedResult = listOf(testMessage)
-        everySuspending { mockInboxInternal.fetchMessages() } returns expectedResult
+        everySuspend { mockInboxInternal.fetchMessages() } returns expectedResult
 
         sdkContext.setSdkState(SdkState.active)
 
         val result = inbox.fetchMessages()
 
-        verifyWithSuspend(exhaustive = false) { mockInboxInternal.fetchMessages() }
+        verifySuspend { mockInboxInternal.fetchMessages() }
         result.getOrNull() shouldBe expectedResult
     }
 
     @Test
     fun testFetchMessages_shouldCallGathererInstance_whenActive_throws() = runTest {
-        everySuspending { mockInboxInternal.fetchMessages() } runs {
-            throw testException
-        }
+        everySuspend { mockInboxInternal.fetchMessages() } throws testException
 
         sdkContext.setSdkState(SdkState.active)
 
@@ -123,40 +118,38 @@ class InboxTests : TestsWithMocks() {
 
     @Test
     fun testAddTag_shouldCallLoggingInstance_whenInactive() = runTest {
-        everySuspending { mockLoggingInbox.addTag(TAG, MESSAGE_ID) } returns Unit
+        everySuspend { mockLoggingInbox.addTag(TAG, MESSAGE_ID) } returns Unit
 
         inbox.addTag(TAG, MESSAGE_ID)
 
-        verifyWithSuspend(exhaustive = false) { mockLoggingInbox.addTag(TAG, MESSAGE_ID) }
+        verifySuspend { mockLoggingInbox.addTag(TAG, MESSAGE_ID) }
     }
 
     @Test
     fun testAddTag_shouldCallGathererInstance_whenOnHold() = runTest {
-        everySuspending { mockGathererInbox.addTag(TAG, MESSAGE_ID) } returns Unit
+        everySuspend { mockGathererInbox.addTag(TAG, MESSAGE_ID) } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
 
         inbox.addTag(TAG, MESSAGE_ID)
 
-        verifyWithSuspend(exhaustive = false) { mockGathererInbox.addTag(TAG, MESSAGE_ID) }
+        verifySuspend { mockGathererInbox.addTag(TAG, MESSAGE_ID) }
     }
 
     @Test
     fun testAddTag_shouldCallGathererInstance_whenActive() = runTest {
-        everySuspending { mockInboxInternal.addTag(TAG, MESSAGE_ID) } returns Unit
+        everySuspend { mockInboxInternal.addTag(TAG, MESSAGE_ID) } returns Unit
 
         sdkContext.setSdkState(SdkState.active)
 
         inbox.addTag(TAG, MESSAGE_ID)
 
-        verifyWithSuspend(exhaustive = false) { mockInboxInternal.addTag(TAG, MESSAGE_ID) }
+        verifySuspend { mockInboxInternal.addTag(TAG, MESSAGE_ID) }
     }
 
     @Test
     fun testAddTag_shouldCallGathererInstance_whenActive_throws() = runTest {
-        everySuspending { mockInboxInternal.addTag(TAG, MESSAGE_ID) } runs {
-            throw testException
-        }
+        everySuspend { mockInboxInternal.addTag(TAG, MESSAGE_ID) } throws testException
 
         sdkContext.setSdkState(SdkState.active)
 
@@ -167,40 +160,38 @@ class InboxTests : TestsWithMocks() {
 
     @Test
     fun testRemoveTag_shouldCallLoggingInstance_whenInactive() = runTest {
-        everySuspending { mockLoggingInbox.removeTag(TAG, MESSAGE_ID) } returns Unit
+        everySuspend { mockLoggingInbox.removeTag(TAG, MESSAGE_ID) } returns Unit
 
         inbox.removeTag(TAG, MESSAGE_ID)
 
-        verifyWithSuspend(exhaustive = false) { mockLoggingInbox.removeTag(TAG, MESSAGE_ID) }
+        verifySuspend { mockLoggingInbox.removeTag(TAG, MESSAGE_ID) }
     }
 
     @Test
     fun testRemoveTag_shouldCallGathererInstance_whenOnHold() = runTest {
-        everySuspending { mockGathererInbox.removeTag(TAG, MESSAGE_ID) } returns Unit
+        everySuspend { mockGathererInbox.removeTag(TAG, MESSAGE_ID) } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
 
         inbox.removeTag(TAG, MESSAGE_ID)
 
-        verifyWithSuspend(exhaustive = false) { mockGathererInbox.removeTag(TAG, MESSAGE_ID) }
+        verifySuspend { mockGathererInbox.removeTag(TAG, MESSAGE_ID) }
     }
 
     @Test
     fun testRemoveTag_shouldCallGathererInstance_whenActive() = runTest {
-        everySuspending { mockInboxInternal.removeTag(TAG, MESSAGE_ID) } returns Unit
+        everySuspend { mockInboxInternal.removeTag(TAG, MESSAGE_ID) } returns Unit
 
         sdkContext.setSdkState(SdkState.active)
 
         inbox.removeTag(TAG, MESSAGE_ID)
 
-        verifyWithSuspend(exhaustive = false) { mockInboxInternal.removeTag(TAG, MESSAGE_ID) }
+        verifySuspend { mockInboxInternal.removeTag(TAG, MESSAGE_ID) }
     }
 
     @Test
     fun testRemoveTag_shouldCallGathererInstance_whenActive_throws() = runTest {
-        everySuspending { mockInboxInternal.removeTag(TAG, MESSAGE_ID) } runs {
-            throw testException
-        }
+        everySuspend { mockInboxInternal.removeTag(TAG, MESSAGE_ID) } throws testException
 
         sdkContext.setSdkState(SdkState.active)
 

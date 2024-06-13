@@ -3,15 +3,17 @@ package com.emarsys.api.push
 import com.emarsys.api.AppEvent
 import com.emarsys.api.push.PushConstants.PUSH_TOKEN_STORAGE_KEY
 import com.emarsys.core.storage.TypedStorageApi
+import dev.mokkery.answering.returns
+import dev.mokkery.every
+import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
-import org.kodein.mock.Mock
-import org.kodein.mock.tests.TestsWithMocks
+import kotlin.test.BeforeTest
+
 import kotlin.test.Test
 
-class PushGathererTests : TestsWithMocks() {
-
+class PushGathererTests {
     private companion object {
         const val PUSH_TOKEN = "testPushToken"
         val registerPushToken = PushCall.RegisterPushToken(PUSH_TOKEN)
@@ -23,16 +25,16 @@ class PushGathererTests : TestsWithMocks() {
         )
     }
 
-    override fun setUpMocks() = injectMocks(mocker)
-
-    @Mock
-    lateinit var mockStringStorage: TypedStorageApi<String?>
-
+    private lateinit var mockStringStorage: TypedStorageApi<String?>
     private lateinit var pushContext: PushContext
     private val notificationEvents: MutableSharedFlow<AppEvent> = MutableSharedFlow()
-    private val pushGatherer: PushGatherer by withMocks {
+    private lateinit var pushGatherer: PushGatherer
+
+    @BeforeTest
+    fun setUp() {
+        mockStringStorage = mock()
         pushContext = PushContext(expected)
-        PushGatherer(pushContext, mockStringStorage, notificationEvents)
+        pushGatherer = PushGatherer(pushContext, mockStringStorage, notificationEvents)
     }
 
     @Test

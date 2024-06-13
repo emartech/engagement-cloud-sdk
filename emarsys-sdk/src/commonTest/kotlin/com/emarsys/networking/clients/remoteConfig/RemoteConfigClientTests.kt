@@ -8,6 +8,11 @@ import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.remoteConfig.RemoteConfigResponse
+import dev.mokkery.answering.returns
+import dev.mokkery.every
+import dev.mokkery.everySuspend
+import dev.mokkery.matcher.any
+import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
@@ -15,24 +20,22 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
-import org.kodein.mock.Mock
-import org.kodein.mock.tests.TestsWithMocks
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class RemoteConfigClientTests: TestsWithMocks() {
-    override fun setUpMocks() = injectMocks(mocker)
+class RemoteConfigClientTests {
+    private lateinit var mockNetworkClient: NetworkClientApi
+    private lateinit var mockUrlFactory: UrlFactoryApi
+    private lateinit var mockCrypto: CryptoApi
+    private lateinit var remoteConfigClient: RemoteConfigClient
 
-    @Mock
-    lateinit var mockNetworkClient: NetworkClientApi
+    @BeforeTest
+    fun setUp() {
+        mockNetworkClient = mock()
+        mockUrlFactory = mock()
+        mockCrypto = mock()
 
-    @Mock
-    lateinit var mockUrlFactory: UrlFactoryApi
-
-    @Mock
-    lateinit var mockCrypto: CryptoApi
-
-    private var remoteConfigClient: RemoteConfigClient by withMocks {
-        RemoteConfigClient(mockNetworkClient, mockUrlFactory, mockCrypto, Json)
+        remoteConfigClient = RemoteConfigClient(mockNetworkClient, mockUrlFactory, mockCrypto, Json)
     }
 
     @Test
@@ -48,9 +51,9 @@ class RemoteConfigClientTests: TestsWithMocks() {
 
         every { mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG) } returns configUrl
         every { mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG_SIGNATURE) } returns configSignatureUrl
-        everySuspending { mockNetworkClient.send(configRequest) } returns configResponse
-        everySuspending { mockNetworkClient.send(configSignatureRequest) } returns configSignatureResponse
-        everySuspending { mockCrypto.verify(isAny(), isAny()) } returns true
+        everySuspend { mockNetworkClient.send(configRequest) } returns configResponse
+        everySuspend { mockNetworkClient.send(configSignatureRequest) } returns configSignatureResponse
+        everySuspend { mockCrypto.verify(any(), any()) } returns true
 
         val result = remoteConfigClient.fetchRemoteConfig()
 
@@ -70,9 +73,9 @@ class RemoteConfigClientTests: TestsWithMocks() {
 
         every { mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG) } returns configUrl
         every { mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG_SIGNATURE) } returns configSignatureUrl
-        everySuspending { mockNetworkClient.send(configRequest) } returns configResponse
-        everySuspending { mockNetworkClient.send(configSignatureRequest) } returns configSignatureResponse
-        everySuspending { mockCrypto.verify(isAny(), isAny()) } returns false
+        everySuspend { mockNetworkClient.send(configRequest) } returns configResponse
+        everySuspend { mockNetworkClient.send(configSignatureRequest) } returns configSignatureResponse
+        everySuspend { mockCrypto.verify(any(), any()) } returns false
 
         val result = remoteConfigClient.fetchRemoteConfig()
 

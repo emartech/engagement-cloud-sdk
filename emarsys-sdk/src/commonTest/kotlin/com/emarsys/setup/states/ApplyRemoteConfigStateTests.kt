@@ -1,20 +1,23 @@
 package com.emarsys.setup.states
 
 import com.emarsys.remoteConfig.RemoteConfigHandlerApi
+import dev.mokkery.answering.returns
+import dev.mokkery.everySuspend
+import dev.mokkery.mock
+import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
-import org.kodein.mock.Mock
-import org.kodein.mock.tests.TestsWithMocks
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class ApplyRemoteConfigStateTests: TestsWithMocks() {
-    override fun setUpMocks() = injectMocks(mocker)
+class ApplyRemoteConfigStateTests {
+    private lateinit var mockRemoteConfigHandler: RemoteConfigHandlerApi
+    private lateinit var applyRemoteConfigState: ApplyRemoteConfigState
 
-    @Mock
-    lateinit var mockRemoteConfigHandler: RemoteConfigHandlerApi
-
-    private var applyRemoteConfigState: ApplyRemoteConfigState by withMocks {
-        ApplyRemoteConfigState(mockRemoteConfigHandler)
+    @BeforeTest
+    fun setUp() {
+        mockRemoteConfigHandler = mock()
+        applyRemoteConfigState = ApplyRemoteConfigState(mockRemoteConfigHandler)
     }
 
     @Test
@@ -24,10 +27,10 @@ class ApplyRemoteConfigStateTests: TestsWithMocks() {
 
     @Test
     fun testActive() = runTest {
-        everySuspending { mockRemoteConfigHandler.handle() } returns Unit
+        everySuspend { mockRemoteConfigHandler.handle() } returns Unit
 
         applyRemoteConfigState.active()
 
-        verifyWithSuspend { mockRemoteConfigHandler.handle() }
+        verifySuspend { mockRemoteConfigHandler.handle() }
     }
 }

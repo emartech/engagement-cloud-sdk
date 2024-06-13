@@ -5,11 +5,14 @@ import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.networking.model.body
-import com.emarsys.model.TestDataClass
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
+import com.emarsys.model.TestDataClass
+import dev.mokkery.answering.returns
+import dev.mokkery.every
+import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.config
@@ -29,36 +32,29 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.kodein.mock.Mock
-import org.kodein.mock.tests.TestsWithMocks
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class EmarsysClientTests : TestsWithMocks() {
-    override fun setUpMocks() = injectMocks(mocker)
-
+class EmarsysClientTests {
     private companion object {
         const val id = "testId"
         const val name = "testName"
         val testData = TestDataClass(id, name)
     }
 
-    @Mock
-    lateinit var mockTimestampProvider: Provider<Instant>
-
-    @Mock
-    lateinit var mockUrlFactory: UrlFactoryApi
-
+    private lateinit var mockTimestampProvider: Provider<Instant>
+    private lateinit var mockUrlFactory: UrlFactoryApi
     private lateinit var networkClient: NetworkClientApi
     private lateinit var json: Json
     private lateinit var sessionContext: SessionContext
-
     private lateinit var emarsysClient: EmarsysClient
-
     private val now = Clock.System.now()
 
     @BeforeTest
     fun setup() = runTest {
+        mockTimestampProvider = mock()
+        mockUrlFactory = mock()
+
         sessionContext = SessionContext(refreshToken = "testRefreshToken", deviceEventState = null)
         json = Json
         val mockHttpEngine = MockEngine.config {

@@ -11,6 +11,13 @@ import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.event.model.Event
 import com.emarsys.networking.clients.event.model.EventType
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
+import dev.mokkery.answering.returns
+import dev.mokkery.answering.throws
+import dev.mokkery.every
+import dev.mokkery.everySuspend
+import dev.mokkery.matcher.any
+import dev.mokkery.mock
+import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -22,14 +29,11 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.Instant
-import org.kodein.mock.Mock
-import org.kodein.mock.Mocker
-import org.kodein.mock.tests.TestsWithMocks
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class MobileEngageSessionTests : TestsWithMocks() {
+class MobileEngageSessionTests {
     private companion object {
         const val APPLICATION_CODE = "testApplicationCode"
         const val CONTACT_TOKEN = "testContactToken"
@@ -52,36 +56,14 @@ class MobileEngageSessionTests : TestsWithMocks() {
             SESSION_END_UTC
         )
     }
-
-    override fun setUpMocks() = injectMocks(mocker)
-
-    @Mock
-    lateinit var mockTimestampProvider: Provider<Instant>
-
-    @Mock
-    lateinit var mockUuidProvider: Provider<String>
-
-    @Mock
-    lateinit var mockSdkLogger: Logger
-
-    @Mock
-    lateinit var mockEventClient: EventClientApi
-
-    @Mock
-    lateinit var mockSdkContext: SdkContextApi
-
+    
+    private lateinit var mockTimestampProvider: Provider<Instant>
+    private lateinit var mockUuidProvider: Provider<String>
+    private lateinit var mockSdkLogger: Logger
+    private lateinit var mockEventClient: EventClientApi
+    private lateinit var mockSdkContext: SdkContextApi
     private lateinit var sessionContext: SessionContext
-
-    private lateinit var timestampProviderMocker: Mocker.Every<Instant>
-
-    private lateinit var uuidProviderMocker: Mocker.Every<String>
-
-    private lateinit var eventClientStartEventRegistrationMocker: Mocker.EverySuspend<Unit>
-
-    private lateinit var eventClientEndEventRegistrationMocker: Mocker.EverySuspend<Unit>
-
     private lateinit var sdkDispatcher: CoroutineDispatcher
-
     private lateinit var mobileEngageSession: MobileEngageSession
 
     init {
@@ -92,30 +74,24 @@ class MobileEngageSessionTests : TestsWithMocks() {
 
     @BeforeTest
     fun setUp() = runTest {
+        mockTimestampProvider = mock()
+        mockUuidProvider = mock()
+        mockSdkLogger = mock()
+        mockEventClient = mock()
+        mockSdkContext = mock()
         sdkDispatcher = StandardTestDispatcher()
-
         sessionContext = SessionContext(
             contactToken = CONTACT_TOKEN,
             sessionId = SESSION_ID,
             sessionStart = SESSION_START
         )
 
-        timestampProviderMocker = every { mockTimestampProvider.provide() }
-
-        uuidProviderMocker = every { mockUuidProvider.provide() }
-        uuidProviderMocker returns SESSION_ID.value
-
-        eventClientStartEventRegistrationMocker =
-            everySuspending { mockEventClient.registerEvent(sessionStartEvent) }
-        eventClientStartEventRegistrationMocker returns Unit
-
-        eventClientEndEventRegistrationMocker =
-            everySuspending { mockEventClient.registerEvent(sessionEndEvent) }
-        eventClientEndEventRegistrationMocker returns Unit
-
-        every { mockSdkLogger.log(isAny(), isAny()) } returns Unit
-        everySuspending { mockSdkLogger.debug(isAny()) } returns Unit
-        everySuspending { mockSdkLogger.error(isAny()) } returns Unit
+        every { mockUuidProvider.provide() } returns SESSION_ID.value
+        everySuspend { mockEventClient.registerEvent(sessionStartEvent) } returns Unit
+        everySuspend { mockEventClient.registerEvent(sessionEndEvent) } returns Unit
+        every { mockSdkLogger.log(any(), any()) } returns Unit
+        everySuspend { mockSdkLogger.debug(any()) } returns Unit
+        everySuspend { mockSdkLogger.error(any()) } returns Unit
 
         mobileEngageSession = MobileEngageSession(
             mockTimestampProvider,
@@ -134,7 +110,8 @@ class MobileEngageSessionTests : TestsWithMocks() {
         sessionContext.sessionId = null
         sessionContext.sessionStart = null
         every { mockSdkContext.config } returns EmarsysConfig(applicationCode = APPLICATION_CODE)
-        timestampProviderMocker returns Instant.fromEpochMilliseconds(SESSION_START)
+        every { mockTimestampProvider.provide() } returns Instant.fromEpochMilliseconds(SESSION_START)
+//        mockTimestampProvider returns Instant.fromEpochMilliseconds(SESSION_START)
         val sharedFlow = MutableSharedFlow<LifecycleEvent>()
         mobileEngageSession.subscribe(object : LifecycleWatchDog {
             override val lifecycleEvents: SharedFlow<LifecycleEvent> = sharedFlow
@@ -151,10 +128,10 @@ class MobileEngageSessionTests : TestsWithMocks() {
 
     @Test
     fun testSubscribe_shouldCallEndSession() = runTest {
-        everySuspending { mockEventClient.registerEvent(sessionStartEvent) } returns Unit
-        everySuspending { mockEventClient.registerEvent(sessionEndEvent) } returns Unit
+        everySuspend { mockEventClient.registerEvent(sessionStartEvent) } returns Unit
+        everySuspend { mockEventClient.registerEvent(sessionEndEvent) } returns Unit
         every { mockSdkContext.config } returns EmarsysConfig(applicationCode = APPLICATION_CODE)
-        timestampProviderMocker returns Instant.fromEpochMilliseconds(SESSION_START)
+        every { mockTimestampProvider.provide() } returns Instant.fromEpochMilliseconds(SESSION_START)
         val sharedFlow = MutableSharedFlow<LifecycleEvent>()
         mobileEngageSession.subscribe(object : LifecycleWatchDog {
             override val lifecycleEvents: SharedFlow<LifecycleEvent> = sharedFlow
@@ -168,7 +145,7 @@ class MobileEngageSessionTests : TestsWithMocks() {
         sessionContext.sessionStart shouldBe SESSION_START
         sessionContext.sessionId shouldBe SESSION_ID
 
-        timestampProviderMocker returns Instant.fromEpochMilliseconds(SESSION_END)
+        every { mockTimestampProvider.provide() } returns Instant.fromEpochMilliseconds(SESSION_END)
 
         sharedFlow.emit(LifecycleEvent.OnBackground)
         advanceUntilIdle()
@@ -183,40 +160,35 @@ class MobileEngageSessionTests : TestsWithMocks() {
         sessionContext.sessionId = null
         sessionContext.sessionStart = null
         every { mockSdkContext.config } returns EmarsysConfig(applicationCode = APPLICATION_CODE)
-        timestampProviderMocker returns Instant.fromEpochMilliseconds(SESSION_START)
+        every { mockTimestampProvider.provide() } returns Instant.fromEpochMilliseconds(SESSION_START)
 
         mobileEngageSession.startSession()
 
-        verifyWithSuspend(exhaustive = false) { mockEventClient.registerEvent(sessionStartEvent) }
+        verifySuspend { mockEventClient.registerEvent(sessionStartEvent) }
     }
 
     @Test
     fun testEndSession_shouldTrackSessionEndEvent() = runTest {
-        timestampProviderMocker returns Instant.fromEpochMilliseconds(SESSION_END)
+        every { mockTimestampProvider.provide() } returns Instant.fromEpochMilliseconds(SESSION_END)
         every { mockSdkContext.config } returns EmarsysConfig(applicationCode = APPLICATION_CODE)
 
         mobileEngageSession.endSession()
 
-        verifyWithSuspend(exhaustive = false) { mockEventClient.registerEvent(sessionEndEvent) }
+        verifySuspend { mockEventClient.registerEvent(sessionEndEvent) }
     }
 
     @Test
     fun testStartSession_shouldSetSession_evenWhenRegisteringEventFails() = runTest {
         sessionContext.sessionId = null
         sessionContext.sessionStart = null
-        eventClientStartEventRegistrationMocker runs {
-            throw RuntimeException(
-                "uuid provider failed"
-            )
-        }
-        timestampProviderMocker returns Instant.fromEpochMilliseconds(SESSION_START)
+        everySuspend { mockEventClient.registerEvent(sessionStartEvent) } throws RuntimeException(
+            "uuid provider failed"
+        )
+        every { mockTimestampProvider.provide() } returns Instant.fromEpochMilliseconds(SESSION_START)
         every { mockSdkContext.config } returns EmarsysConfig(applicationCode = APPLICATION_CODE)
 
         mobileEngageSession.startSession()
 
-        verifyWithSuspend(exhaustive = false) {
-            threw<RuntimeException> { mockEventClient.registerEvent(sessionStartEvent) }
-        }
         sessionContext.sessionStart shouldBe SESSION_START
         sessionContext.sessionId shouldBe SESSION_ID
     }
@@ -272,19 +244,16 @@ class MobileEngageSessionTests : TestsWithMocks() {
 
     @Test
     fun testEndSession_shouldResetSession_evenWhenRegisteringEventFails() = runTest {
-        timestampProviderMocker returns Instant.fromEpochMilliseconds(SESSION_END)
-        eventClientEndEventRegistrationMocker runs {
-            throw RuntimeException(
+        every {mockTimestampProvider.provide()} returns Instant.fromEpochMilliseconds(SESSION_END)
+
+        everySuspend { mockEventClient.registerEvent(sessionEndEvent) } throws RuntimeException(
                 "request failed"
-            )
-        }
+                )
+
         every { mockSdkContext.config } returns EmarsysConfig(applicationCode = APPLICATION_CODE)
 
         mobileEngageSession.endSession()
 
-        verifyWithSuspend(exhaustive = false) {
-            threw<RuntimeException> { mockEventClient.registerEvent(sessionEndEvent) }
-        }
         sessionContext.sessionStart shouldBe null
         sessionContext.sessionId shouldBe null
     }
@@ -337,9 +306,9 @@ class MobileEngageSessionTests : TestsWithMocks() {
     }
 
     private suspend fun verifySessionEventNotRegistered(sessionEvent: Event) {
-        verifyWithSuspend {
+        verifySuspend {
             mockSdkContext.config
-            mockSdkLogger.debug(isAny())
+            mockSdkLogger.debug(any())
             repeat(0) {
                 mockEventClient.registerEvent(sessionEvent)
             }

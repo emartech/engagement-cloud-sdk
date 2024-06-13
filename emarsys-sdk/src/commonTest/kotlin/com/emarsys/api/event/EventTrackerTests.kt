@@ -6,6 +6,11 @@ import com.emarsys.context.DefaultUrls
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.log.LogLevel
+import dev.mokkery.answering.returns
+import dev.mokkery.answering.throws
+import dev.mokkery.everySuspend
+import dev.mokkery.mock
+import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -13,31 +18,21 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.kodein.mock.Mock
-import org.kodein.mock.tests.TestsWithMocks
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class EventTrackerTests : TestsWithMocks() {
-    override fun setUpMocks() = injectMocks(mocker)
+class EventTrackerTests {
 
     private companion object {
         val event = CustomEvent("testEvent", mapOf("testAttribute" to "testValue"))
     }
 
-    @Mock
-    lateinit var mockLoggingEventTracker: EventTrackerInstance
-
-    @Mock
-    lateinit var mockEventTrackerGatherer: EventTrackerInstance
-
-    @Mock
-    lateinit var mockEventTrackerInternal: EventTrackerInstance
-
+    private lateinit var mockLoggingEventTracker: EventTrackerInstance
+    private lateinit var mockEventTrackerGatherer: EventTrackerInstance
+    private lateinit var mockEventTrackerInternal: EventTrackerInstance
     private lateinit var sdkContext: SdkContextApi
-
     private lateinit var eventTracker: EventTracker<EventTrackerInstance, EventTrackerInstance, EventTrackerInstance>
 
     init {
@@ -46,6 +41,10 @@ class EventTrackerTests : TestsWithMocks() {
 
     @BeforeTest
     fun setup() = runTest {
+        mockLoggingEventTracker = mock()
+        mockEventTrackerGatherer = mock()
+        mockEventTrackerInternal = mock()
+
         sdkContext = SdkContext(
             StandardTestDispatcher(),
             DefaultUrls("", "", "", "", "", "", ""),
@@ -53,9 +52,9 @@ class EventTrackerTests : TestsWithMocks() {
             mutableSetOf()
         )
 
-        everySuspending { mockLoggingEventTracker.activate() } returns Unit
-        everySuspending { mockEventTrackerGatherer.activate() } returns Unit
-        everySuspending { mockEventTrackerInternal.activate() } returns Unit
+        everySuspend { mockLoggingEventTracker.activate() } returns Unit
+        everySuspend { mockEventTrackerGatherer.activate() } returns Unit
+        everySuspend { mockEventTrackerInternal.activate() } returns Unit
 
         eventTracker =
             EventTracker(
@@ -70,25 +69,24 @@ class EventTrackerTests : TestsWithMocks() {
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
-        mocker.reset()
     }
 
     @Test
     fun testTrackEvent_inactiveState() = runTest {
-        everySuspending {
+        everySuspend {
             mockLoggingEventTracker.trackEvent(event)
         } returns Unit
 
         eventTracker.trackEvent(event)
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockLoggingEventTracker.trackEvent(event)
         }
     }
 
     @Test
     fun testTrackEvent_onHoldState() = runTest {
-        everySuspending {
+        everySuspend {
             mockEventTrackerGatherer.trackEvent(event)
         } returns Unit
 
@@ -96,21 +94,21 @@ class EventTrackerTests : TestsWithMocks() {
         sdkContext.setSdkState(SdkState.onHold)
         eventTracker.trackEvent(event)
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockEventTrackerGatherer.trackEvent(event)
         }
     }
 
     @Test
     fun testTrackEvent_activeState() = runTest {
-        everySuspending {
+        everySuspend {
             mockEventTrackerInternal.trackEvent(event)
         } returns Unit
 
         sdkContext.setSdkState(SdkState.active)
         eventTracker.trackEvent(event)
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockEventTrackerInternal.trackEvent(event)
         }
     }
@@ -118,11 +116,9 @@ class EventTrackerTests : TestsWithMocks() {
     @Test
     fun testTrackEvent_activeState_shouldReturnErrorInResult() = runTest {
         val expectException = Exception()
-        everySuspending {
+        everySuspend {
             mockEventTrackerInternal.trackEvent(event)
-        } runs {
-            throw expectException
-        }
+        } throws expectException
 
         sdkContext.setSdkState(SdkState.active)
         val result = eventTracker.trackEvent(event)

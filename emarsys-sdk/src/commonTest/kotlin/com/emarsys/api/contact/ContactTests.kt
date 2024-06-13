@@ -5,6 +5,11 @@ import com.emarsys.context.DefaultUrls
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.log.LogLevel
+import dev.mokkery.answering.returns
+import dev.mokkery.answering.throws
+import dev.mokkery.everySuspend
+import dev.mokkery.mock
+import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -12,16 +17,12 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.kodein.mock.Mock
-import org.kodein.mock.tests.TestsWithMocks
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class ContactTests : TestsWithMocks() {
-    override fun setUpMocks() = injectMocks(mocker)
-
+class ContactTests {
     private companion object {
         const val CONTACT_FIELD_ID = 42
         const val CONTACT_FIELD_VALUE = "testContactFieldValue"
@@ -29,17 +30,10 @@ class ContactTests : TestsWithMocks() {
         val testException = Exception()
     }
 
-    @Mock
-    lateinit var mockLoggingContact: ContactInstance
-
-    @Mock
-    lateinit var mockGathererContact: ContactInstance
-
-    @Mock
-    lateinit var mockContactInternal: ContactInstance
-
     private lateinit var sdkContext: SdkContextApi
-
+    private lateinit var mockLoggingContact: ContactInstance
+    private lateinit var mockGathererContact: ContactInstance
+    private lateinit var mockContactInternal: ContactInstance
     private lateinit var contact: Contact<ContactInstance, ContactInstance, ContactInstance>
 
     init {
@@ -48,6 +42,9 @@ class ContactTests : TestsWithMocks() {
 
     @BeforeTest
     fun setup() = runTest {
+        mockLoggingContact = mock()
+        mockGathererContact = mock()
+        mockContactInternal = mock()
         sdkContext = SdkContext(
             StandardTestDispatcher(),
             DefaultUrls("", "", "", "", "", "", ""),
@@ -55,9 +52,9 @@ class ContactTests : TestsWithMocks() {
             mutableSetOf()
         )
 
-        everySuspending { mockLoggingContact.activate() } returns Unit
-        everySuspending { mockGathererContact.activate() } returns Unit
-        everySuspending { mockContactInternal.activate() } returns Unit
+        everySuspend { mockLoggingContact.activate() } returns Unit
+        everySuspend { mockGathererContact.activate() } returns Unit
+        everySuspend { mockContactInternal.activate() } returns Unit
         contact =
             Contact(mockLoggingContact, mockGathererContact, mockContactInternal, sdkContext)
         contact.registerOnContext()
@@ -66,12 +63,11 @@ class ContactTests : TestsWithMocks() {
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
-        mocker.reset()
     }
 
     @Test
     fun testLinkContact_inactiveState() = runTest {
-        everySuspending {
+        everySuspend {
             mockLoggingContact.linkContact(
                 CONTACT_FIELD_ID,
                 CONTACT_FIELD_VALUE
@@ -81,7 +77,7 @@ class ContactTests : TestsWithMocks() {
         sdkContext.setSdkState(SdkState.inactive)
         contact.linkContact(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE)
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockLoggingContact.linkContact(
                 CONTACT_FIELD_ID,
                 CONTACT_FIELD_VALUE
@@ -91,7 +87,7 @@ class ContactTests : TestsWithMocks() {
 
     @Test
     fun testLinkContact_onHoldState() = runTest {
-        everySuspending {
+        everySuspend {
             mockGathererContact.linkContact(
                 CONTACT_FIELD_ID,
                 CONTACT_FIELD_VALUE
@@ -101,7 +97,7 @@ class ContactTests : TestsWithMocks() {
         sdkContext.setSdkState(SdkState.onHold)
         contact.linkContact(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE)
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockGathererContact.linkContact(
                 CONTACT_FIELD_ID,
                 CONTACT_FIELD_VALUE
@@ -111,7 +107,7 @@ class ContactTests : TestsWithMocks() {
 
     @Test
     fun testLinkContact_activeState() = runTest {
-        everySuspending {
+        everySuspend {
             mockContactInternal.linkContact(
                 CONTACT_FIELD_ID,
                 CONTACT_FIELD_VALUE
@@ -121,7 +117,7 @@ class ContactTests : TestsWithMocks() {
         sdkContext.setSdkState(SdkState.active)
         contact.linkContact(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE)
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockContactInternal.linkContact(
                 CONTACT_FIELD_ID,
                 CONTACT_FIELD_VALUE
@@ -131,14 +127,12 @@ class ContactTests : TestsWithMocks() {
 
     @Test
     fun testLinkContact_activeState_throws() = runTest {
-        everySuspending {
+        everySuspend {
             mockContactInternal.linkContact(
                 CONTACT_FIELD_ID,
                 CONTACT_FIELD_VALUE
             )
-        } runs {
-            throw testException
-        }
+        } throws testException
 
         sdkContext.setSdkState(SdkState.active)
         val result = contact.linkContact(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE)
@@ -148,7 +142,7 @@ class ContactTests : TestsWithMocks() {
 
     @Test
     fun testLinkAuthenticatedContact_inactiveState() = runTest {
-        everySuspending {
+        everySuspend {
             mockLoggingContact.linkAuthenticatedContact(
                 CONTACT_FIELD_ID,
                 OPEN_ID_TOKEN
@@ -158,7 +152,7 @@ class ContactTests : TestsWithMocks() {
         sdkContext.setSdkState(SdkState.inactive)
         contact.linkAuthenticatedContact(CONTACT_FIELD_ID, OPEN_ID_TOKEN)
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockLoggingContact.linkAuthenticatedContact(
                 CONTACT_FIELD_ID,
                 OPEN_ID_TOKEN
@@ -168,7 +162,7 @@ class ContactTests : TestsWithMocks() {
 
     @Test
     fun testLinkAuthenticatedContact_onHoldState() = runTest {
-        everySuspending {
+        everySuspend {
             mockGathererContact.linkAuthenticatedContact(
                 CONTACT_FIELD_ID,
                 OPEN_ID_TOKEN
@@ -178,7 +172,7 @@ class ContactTests : TestsWithMocks() {
         sdkContext.setSdkState(SdkState.onHold)
         contact.linkAuthenticatedContact(CONTACT_FIELD_ID, OPEN_ID_TOKEN)
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockGathererContact.linkAuthenticatedContact(
                 CONTACT_FIELD_ID,
                 OPEN_ID_TOKEN
@@ -188,7 +182,7 @@ class ContactTests : TestsWithMocks() {
 
     @Test
     fun testLinkAuthenticatedContact_activeState() = runTest {
-        everySuspending {
+        everySuspend {
             mockContactInternal.linkAuthenticatedContact(
                 CONTACT_FIELD_ID,
                 OPEN_ID_TOKEN
@@ -198,7 +192,7 @@ class ContactTests : TestsWithMocks() {
         sdkContext.setSdkState(SdkState.active)
         contact.linkAuthenticatedContact(CONTACT_FIELD_ID, OPEN_ID_TOKEN)
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockContactInternal.linkAuthenticatedContact(
                 CONTACT_FIELD_ID,
                 OPEN_ID_TOKEN
@@ -208,12 +202,12 @@ class ContactTests : TestsWithMocks() {
 
     @Test
     fun testLinkAuthenticatedContact_activeState_throws() = runTest {
-        everySuspending {
+        everySuspend {
             mockContactInternal.linkAuthenticatedContact(
                 CONTACT_FIELD_ID,
                 OPEN_ID_TOKEN
             )
-        } runs { throw testException }
+        } throws testException
 
         sdkContext.setSdkState(SdkState.active)
         val result = contact.linkAuthenticatedContact(CONTACT_FIELD_ID, OPEN_ID_TOKEN)
@@ -223,51 +217,51 @@ class ContactTests : TestsWithMocks() {
 
     @Test
     fun testUnlinkContact_inactiveState() = runTest {
-        everySuspending {
+        everySuspend {
             mockLoggingContact.unlinkContact()
         } returns Unit
 
         sdkContext.setSdkState(SdkState.inactive)
         contact.unlinkContact()
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockLoggingContact.unlinkContact()
         }
     }
 
     @Test
     fun testUnlinkContact_onHoldState() = runTest {
-        everySuspending {
+        everySuspend {
             mockGathererContact.unlinkContact()
         } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
         contact.unlinkContact()
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockGathererContact.unlinkContact()
         }
     }
 
     @Test
     fun test_unlinkContact_activeState() = runTest {
-        everySuspending {
+        everySuspend {
             mockContactInternal.unlinkContact()
         } returns Unit
 
         sdkContext.setSdkState(SdkState.active)
         contact.unlinkContact()
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockContactInternal.unlinkContact()
         }
     }
 
     @Test
     fun test_unlinkContact_activeState_throws() = runTest {
-        everySuspending {
+        everySuspend {
             mockContactInternal.unlinkContact()
-        } runs { throw testException }
+        } throws testException
 
         sdkContext.setSdkState(SdkState.active)
         val result = contact.unlinkContact()
