@@ -1,10 +1,14 @@
 package com.emarsys.api.contact
 
+import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.Logger
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
-import dev.mokkery.matcher.any
+import dev.mokkery.matcher.capture.Capture
+import dev.mokkery.matcher.capture.capture
+import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
+import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -18,11 +22,12 @@ class LoggingContactTests {
 
     private lateinit var mockSdkLogger: Logger
     private lateinit var loggingContact: LoggingContact
+    private var slot = Capture.slot<LogEntry>()
 
     @BeforeTest
     fun setup() = runTest {
         mockSdkLogger = mock()
-        everySuspend { mockSdkLogger.debug(any()) } returns Unit
+        everySuspend { mockSdkLogger.debug(capture(slot)) } returns Unit
 
         loggingContact = LoggingContact(mockSdkLogger)
     }
@@ -50,17 +55,13 @@ class LoggingContactTests {
 
     @Test
     fun testActive() = runTest {
-        loggingContact.linkAuthenticatedContact(CONTACT_FIELD_ID, OPEN_ID_TOKEN)
+        loggingContact.activate()
 
         verifyLogging()
     }
 
     private fun verifyLogging() {
-        //TODO: figure out argument capturing
-//        val slot = Capture.slot<LogEntry>()
-//        verifySuspend { mockSdkLogger.debug(capture(slot)) }
-//
-//        val capturedLogEntry = slot.get()
-//        capturedLogEntry.topic shouldBe "log_method_not_allowed"
+        val capturedLogEntry = slot.get()
+        capturedLogEntry.topic shouldBe "log_method_not_allowed"
     }
 }

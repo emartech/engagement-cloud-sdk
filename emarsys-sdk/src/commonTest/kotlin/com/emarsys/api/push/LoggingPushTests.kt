@@ -1,10 +1,14 @@
 package com.emarsys.api.push
 
 import com.emarsys.api.AppEvent
+import com.emarsys.core.log.LogEntry
+import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
 import dev.mokkery.answering.returns
 import dev.mokkery.every
-import dev.mokkery.matcher.any
+import dev.mokkery.matcher.capture.Capture
+import dev.mokkery.matcher.capture.capture
+import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -21,11 +25,12 @@ class LoggingPushTests {
     private lateinit var mockLogger: Logger
     private lateinit var loggingPush: LoggingPush
     private val notificationEvents: MutableSharedFlow<AppEvent> = MutableSharedFlow()
+    private var slot = Capture.slot<LogEntry>()
 
     @BeforeTest
     fun setup() = runTest {
         mockLogger = mock()
-        every { mockLogger.log(any(), any()) } returns Unit
+        every { mockLogger.log(capture(slot), LogLevel.Debug) } returns Unit
 
         loggingPush = LoggingPush(mockLogger, notificationEvents)
     }
@@ -61,12 +66,8 @@ class LoggingPushTests {
     }
 
     private fun verifyLogging() {
-//        TODO: figure out argument capturing
-//        val slot = Capture.slot<LogEntry>()
-//        verify { mockLogger.log(capture(slot), eq(LogLevel.Debug)) }
-//
-//        val capturedLogEntry = slot.get()
-//        capturedLogEntry.topic shouldBe "log_method_not_allowed"
+        val capturedLogEntry = slot.get()
+        capturedLogEntry.topic shouldBe "log_method_not_allowed"
     }
 
 }
