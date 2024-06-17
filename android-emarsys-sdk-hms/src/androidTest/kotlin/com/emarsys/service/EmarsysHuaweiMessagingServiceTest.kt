@@ -1,8 +1,9 @@
 package com.emarsys.service
 
+import android.os.Looper
 import androidx.test.platform.app.InstrumentationRegistry
-import com.google.firebase.messaging.FirebaseMessagingService
-import com.google.firebase.messaging.RemoteMessage
+import com.huawei.hms.push.HmsMessageService
+import com.huawei.hms.push.RemoteMessage
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -11,58 +12,64 @@ import org.junit.Before
 import org.junit.Test
 import java.lang.reflect.Field
 
-class EmarsysFirebaseMessagingServiceTest {
-    private lateinit var emarsysFirebaseMessagingService: EmarsysFirebaseMessagingService
+class EmarsysHuaweiMessagingServiceTest {
+
+    private lateinit var huaweiMessagingService: EmarsysHuaweiMessagingService
 
     @Before
     fun setup() {
-        emarsysFirebaseMessagingService = EmarsysFirebaseMessagingService()
+        if (Looper.myLooper() == null) {
+            Looper.prepare()
+        }
+
+        huaweiMessagingService = EmarsysHuaweiMessagingService()
         setField(
-            emarsysFirebaseMessagingService,
-            EmarsysFirebaseMessagingService::class.java,
+            huaweiMessagingService,
+            EmarsysHuaweiMessagingService::class.java,
             "application",
             InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
         )
     }
 
     @Test
-    fun registerMessagingService_shouldAddMessagingService_toList() {
-        val testMessagingService1 = FirebaseMessagingService()
-        val testMessagingService2 = FirebaseMessagingService()
-        EmarsysFirebaseMessagingService.registerMessagingService(testMessagingService1)
-        EmarsysFirebaseMessagingService.registerMessagingService(testMessagingService2, true)
+    fun registerMessagingService_shouldAddMessagingServiceToList() {
+        val testService1 = HmsMessageService()
+        val testService2 = HmsMessageService()
 
-        val result = EmarsysFirebaseMessagingService.messagingServices
+        EmarsysHuaweiMessagingService.registerMessagingService(testService1)
+        EmarsysHuaweiMessagingService.registerMessagingService(testService2, true)
+
+        val result = EmarsysHuaweiMessagingService.messagingServices
 
         result.size shouldBe 2
         result[0].first shouldBe false
-        result[0].second shouldBe testMessagingService1
+        result[0].second shouldBe testService1
         result[1].first shouldBe true
-        result[1].second shouldBe testMessagingService2
+        result[1].second shouldBe testService2
     }
 
     @Test
     fun onMessageReceived_shouldCallRegisteredMessagingServices() {
-        val mockMessagingService = mockk<FirebaseMessagingService>(relaxed = true)
+        val mockMessagingService = mockk<HmsMessageService>(relaxed = true)
         val mockMessage = mockk<RemoteMessage>(relaxed = true)
-        every { mockMessage.data } returns mapOf()
-        EmarsysFirebaseMessagingService.registerMessagingService(mockMessagingService, true)
+        every { mockMessage.dataOfMap } returns mapOf()
+        EmarsysHuaweiMessagingService.registerMessagingService(mockMessagingService, true)
 
-        emarsysFirebaseMessagingService.onMessageReceived(mockMessage)
+        huaweiMessagingService.onMessageReceived(mockMessage)
         verify { mockMessagingService.onMessageReceived(mockMessage) }
     }
 
     @Test
     fun onMessageReceived_shouldFilterEmarsysMessages() {
-        val mockMessagingService = mockk<FirebaseMessagingService>(relaxed = true)
+        val mockMessagingService = mockk<HmsMessageService>(relaxed = true)
         val mockMessage1 = mockk<RemoteMessage>(relaxed = true)
-        every { mockMessage1.data } returns mapOf("ems.version" to "version1")
+        every { mockMessage1.dataOfMap } returns mapOf("ems_msg" to "true")
         val mockMessage2 = mockk<RemoteMessage>(relaxed = true)
-        every { mockMessage2.data } returns mapOf()
-        EmarsysFirebaseMessagingService.registerMessagingService(mockMessagingService, false)
+        every { mockMessage2.dataOfMap } returns mapOf()
+        EmarsysHuaweiMessagingService.registerMessagingService(mockMessagingService, false)
 
-        emarsysFirebaseMessagingService.onMessageReceived(mockMessage1)
-        emarsysFirebaseMessagingService.onMessageReceived(mockMessage2)
+        huaweiMessagingService.onMessageReceived(mockMessage1)
+        huaweiMessagingService.onMessageReceived(mockMessage2)
         verify(exactly = 0) {
             mockMessagingService.onMessageReceived(mockMessage1)
         }

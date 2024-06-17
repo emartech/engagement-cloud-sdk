@@ -62,7 +62,7 @@ clean: check-env ## clean all build artifacts
 create-apks: check-env ## create apks for testing
 	@./gradlew assembleAndroidTest -x :composeApp:test
 
-test: check-env ## run common tests on all platforms (jvm,web)
+test: check-env test-android ## run common tests on all platforms (jvm,web)
 	@./gradlew :emarsys-sdk:allTests -x :composeApp:test
 
 test-web: check-env ## run common tests on web
@@ -78,8 +78,14 @@ test-web: check-env ## run common tests on web
 test-jvm: check-env ## run common tests on jvm
 	@./gradlew :emarsys-sdk:test -x :composeApp:test
 
-test-android: check-env ## run Android Instrumented tests
+test-android: check-env test-fcm test-hms ## run Android Instrumented tests
 	@./gradlew :emarsys-sdk:connectedAndroidTest -x :composeApp:test
+
+test-fcm: check-env ## run FCM module tests
+	@./gradlew :android-emarsys-sdk-fcm:connectedAndroidTest
+
+test-hms: check-env ## run Huawei module tests
+	@./gradlew :android-emarsys-sdk-hms:connectedAndroidTest
 
 test-android-firebase: check-env ## run Android Instrumented tests on Firebase Test Lab
 	@gcloud firebase test android run \

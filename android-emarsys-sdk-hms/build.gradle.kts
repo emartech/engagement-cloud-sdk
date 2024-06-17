@@ -7,6 +7,13 @@ plugins {
 dependencies {
     implementation(libs.hms)
     implementation(libs.agconnect.core)
+
+    implementation(kotlin("test"))
+    implementation(libs.mockk.android)
+    implementation(libs.androidx.runner)
+    implementation(libs.kotest.assertions.core)
+
+    androidTestImplementation(libs.junit)
 }
 android {
     namespace = "com.emarsys.hms"
@@ -14,6 +21,15 @@ android {
 
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/LICENSE.md"
+            excludes += "/META-INF/LICENSE-notice.md"
+        }
     }
 
     kotlinOptions {
