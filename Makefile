@@ -1,5 +1,6 @@
 .PHONY: build build-pipeline check-env clean create-apks help lint test test-web test-android test-android-firebase test-jvm
 .DEFAULT_GOAL := help
+SHELL := /bin/bash
 
 ifneq (,$(wildcard .env))
 include .env
