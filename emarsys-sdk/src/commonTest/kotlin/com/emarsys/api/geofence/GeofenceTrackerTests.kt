@@ -7,6 +7,13 @@ import com.emarsys.context.DefaultUrls
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.log.LogLevel
+import dev.mokkery.answering.returns
+import dev.mokkery.answering.throws
+import dev.mokkery.every
+import dev.mokkery.everySuspend
+import dev.mokkery.mock
+import dev.mokkery.verify
+import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -16,16 +23,12 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.kodein.mock.Mock
-import org.kodein.mock.tests.TestsWithMocks
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class GeofenceTrackerTests : TestsWithMocks() {
-
-    override fun setUpMocks() = injectMocks(mocker)
+class GeofenceTrackerTests {
 
     private companion object {
         const val SET_ENABLED = true
@@ -34,15 +37,9 @@ class GeofenceTrackerTests : TestsWithMocks() {
         val testException = Exception()
     }
 
-    @Mock
-    lateinit var mockLoggingGeofenceTracker: GeofenceTrackerInstance
-
-    @Mock
-    lateinit var mockGathererGeofenceTracker: GeofenceTrackerInstance
-
-    @Mock
-    lateinit var mockGeofenceTrackerInternal: GeofenceTrackerInstance
-
+    private lateinit var mockLoggingGeofenceTracker: GeofenceTrackerInstance
+    private lateinit var mockGathererGeofenceTracker: GeofenceTrackerInstance
+    private lateinit var mockGeofenceTrackerInternal: GeofenceTrackerInstance
     private lateinit var sdkContext: SdkContextApi
 
     private lateinit var geofenceTracker: GeofenceTracker<GeofenceTrackerInstance, GeofenceTrackerInstance, GeofenceTrackerInstance>
@@ -53,6 +50,10 @@ class GeofenceTrackerTests : TestsWithMocks() {
 
     @BeforeTest
     fun setup() = runTest {
+        mockLoggingGeofenceTracker = mock()
+        mockGathererGeofenceTracker = mock()
+        mockGeofenceTrackerInternal = mock()
+        
         sdkContext = SdkContext(
             StandardTestDispatcher(),
             DefaultUrls("", "", "", "", "", "", ""),
@@ -60,9 +61,9 @@ class GeofenceTrackerTests : TestsWithMocks() {
             mutableSetOf()
         )
 
-        everySuspending { mockLoggingGeofenceTracker.activate() } returns Unit
-        everySuspending { mockGathererGeofenceTracker.activate() } returns Unit
-        everySuspending { mockGeofenceTrackerInternal.activate() } returns Unit
+        everySuspend { mockLoggingGeofenceTracker.activate() } returns Unit
+        everySuspend { mockGathererGeofenceTracker.activate() } returns Unit
+        everySuspend { mockGeofenceTrackerInternal.activate() } returns Unit
 
         geofenceTracker =
             GeofenceTracker(
@@ -77,7 +78,6 @@ class GeofenceTrackerTests : TestsWithMocks() {
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
-        mocker.reset()
     }
 
     @Test
@@ -97,7 +97,7 @@ class GeofenceTrackerTests : TestsWithMocks() {
 
         geofenceTracker.registeredGeofences shouldBe listOf(testGeofence)
 
-        verify(exhaustive = false) { mockGathererGeofenceTracker.registeredGeofences }
+        verify { mockGathererGeofenceTracker.registeredGeofences }
     }
 
     @Test
@@ -108,7 +108,7 @@ class GeofenceTrackerTests : TestsWithMocks() {
 
         geofenceTracker.registeredGeofences shouldBe listOf(testGeofence)
 
-        verify(exhaustive = false) { mockGeofenceTrackerInternal.registeredGeofences }
+        verify { mockGeofenceTrackerInternal.registeredGeofences }
     }
 
     @Test
@@ -128,7 +128,7 @@ class GeofenceTrackerTests : TestsWithMocks() {
 
         geofenceTracker.events shouldBe emptyFlow()
 
-        verify(exhaustive = false) { mockGathererGeofenceTracker.events }
+        verify { mockGathererGeofenceTracker.events }
     }
 
     @Test
@@ -139,7 +139,7 @@ class GeofenceTrackerTests : TestsWithMocks() {
 
         geofenceTracker.events shouldBe testEvents
 
-        verify(exhaustive = false) { mockGeofenceTrackerInternal.events }
+        verify { mockGeofenceTrackerInternal.events }
     }
 
     @Test
@@ -159,7 +159,7 @@ class GeofenceTrackerTests : TestsWithMocks() {
 
         geofenceTracker.isEnabled shouldBe true
 
-        verify(exhaustive = false) { mockGathererGeofenceTracker.isEnabled }
+        verify { mockGathererGeofenceTracker.isEnabled }
     }
 
     @Test
@@ -170,45 +170,43 @@ class GeofenceTrackerTests : TestsWithMocks() {
 
         geofenceTracker.isEnabled shouldBe false
 
-        verify(exhaustive = false) { mockGeofenceTrackerInternal.isEnabled }
+        verify { mockGeofenceTrackerInternal.isEnabled }
     }
 
     @Test
     fun testEnable_inactiveState() = runTest {
-        everySuspending { mockLoggingGeofenceTracker.enable() } returns Unit
+        everySuspend { mockLoggingGeofenceTracker.enable() } returns Unit
 
         geofenceTracker.enable()
 
-        verifyWithSuspend { mockLoggingGeofenceTracker.enable() }
+        verifySuspend { mockLoggingGeofenceTracker.enable() }
     }
 
     @Test
     fun testEnable_onHoldState() = runTest {
-        everySuspending { mockGathererGeofenceTracker.enable() } returns Unit
+        everySuspend { mockGathererGeofenceTracker.enable() } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
 
         geofenceTracker.enable()
 
-        verifyWithSuspend(exhaustive = false) { mockGathererGeofenceTracker.enable() }
+        verifySuspend { mockGathererGeofenceTracker.enable() }
     }
 
     @Test
     fun testEnable_activeState() = runTest {
-        everySuspending { mockGeofenceTrackerInternal.enable() } returns Unit
+        everySuspend { mockGeofenceTrackerInternal.enable() } returns Unit
 
         sdkContext.setSdkState(SdkState.active)
 
         geofenceTracker.enable()
 
-        verifyWithSuspend(exhaustive = false) { mockGeofenceTrackerInternal.enable() }
+        verifySuspend { mockGeofenceTrackerInternal.enable() }
     }
 
     @Test
     fun testEnable_activeState_throws() = runTest {
-        everySuspending { mockGeofenceTrackerInternal.enable() } runs {
-            throw testException
-        }
+        everySuspend { mockGeofenceTrackerInternal.enable() } throws testException
 
         sdkContext.setSdkState(SdkState.active)
 
@@ -219,40 +217,38 @@ class GeofenceTrackerTests : TestsWithMocks() {
 
     @Test
     fun testDisable_inactiveState() = runTest {
-        everySuspending { mockLoggingGeofenceTracker.disable() } returns Unit
+        everySuspend { mockLoggingGeofenceTracker.disable() } returns Unit
 
         geofenceTracker.disable()
 
-        verifyWithSuspend { mockLoggingGeofenceTracker.disable() }
+        verifySuspend { mockLoggingGeofenceTracker.disable() }
     }
 
     @Test
     fun testDisable_onHoldState() = runTest {
-        everySuspending { mockGathererGeofenceTracker.disable() } returns Unit
+        everySuspend { mockGathererGeofenceTracker.disable() } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
 
         geofenceTracker.disable()
 
-        verifyWithSuspend(exhaustive = false) { mockGathererGeofenceTracker.disable() }
+        verifySuspend { mockGathererGeofenceTracker.disable() }
     }
 
     @Test
     fun testDisable_activeState() = runTest {
-        everySuspending { mockGeofenceTrackerInternal.disable() } returns Unit
+        everySuspend { mockGeofenceTrackerInternal.disable() } returns Unit
 
         sdkContext.setSdkState(SdkState.active)
 
         geofenceTracker.disable()
 
-        verifyWithSuspend(exhaustive = false) { mockGeofenceTrackerInternal.disable() }
+        verifySuspend { mockGeofenceTrackerInternal.disable() }
     }
 
     @Test
     fun testDisable_activeState_throws() = runTest {
-        everySuspending { mockGeofenceTrackerInternal.disable() } runs {
-            throw testException
-        }
+        everySuspend { mockGeofenceTrackerInternal.disable() } throws testException
 
         sdkContext.setSdkState(SdkState.active)
 
@@ -263,24 +259,24 @@ class GeofenceTrackerTests : TestsWithMocks() {
 
     @Test
     fun testSetInitialEnterTriggerEnabled_inactiveState() = runTest {
-        everySuspending {
+        everySuspend {
             mockLoggingGeofenceTracker.setInitialEnterTriggerEnabled(SET_ENABLED)
         } returns Unit
 
         geofenceTracker.setInitialEnterTriggerEnabled(SET_ENABLED)
 
-        verifyWithSuspend { mockLoggingGeofenceTracker.setInitialEnterTriggerEnabled(SET_ENABLED) }
+        verifySuspend { mockLoggingGeofenceTracker.setInitialEnterTriggerEnabled(SET_ENABLED) }
     }
 
     @Test
     fun testSetInitialEnterTriggerEnabled_onHoldState() = runTest {
-        everySuspending { mockGathererGeofenceTracker.setInitialEnterTriggerEnabled(SET_ENABLED) } returns Unit
+        everySuspend { mockGathererGeofenceTracker.setInitialEnterTriggerEnabled(SET_ENABLED) } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
 
         geofenceTracker.setInitialEnterTriggerEnabled(SET_ENABLED)
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockGathererGeofenceTracker.setInitialEnterTriggerEnabled(
                 SET_ENABLED
             )
@@ -289,13 +285,13 @@ class GeofenceTrackerTests : TestsWithMocks() {
 
     @Test
     fun testSetInitialEnterTriggerEnabled_activeState() = runTest {
-        everySuspending { mockGeofenceTrackerInternal.setInitialEnterTriggerEnabled(SET_ENABLED) } returns Unit
+        everySuspend { mockGeofenceTrackerInternal.setInitialEnterTriggerEnabled(SET_ENABLED) } returns Unit
 
         sdkContext.setSdkState(SdkState.active)
 
         geofenceTracker.setInitialEnterTriggerEnabled(SET_ENABLED)
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockGeofenceTrackerInternal.setInitialEnterTriggerEnabled(
                 SET_ENABLED
             )
@@ -304,9 +300,7 @@ class GeofenceTrackerTests : TestsWithMocks() {
 
     @Test
     fun testSetInitialEnterTriggerEnabled_activeState_throws() = runTest {
-        everySuspending { mockGeofenceTrackerInternal.setInitialEnterTriggerEnabled(SET_ENABLED) } runs {
-            throw testException
-        }
+        everySuspend { mockGeofenceTrackerInternal.setInitialEnterTriggerEnabled(SET_ENABLED) } throws testException
 
         sdkContext.setSdkState(SdkState.active)
 

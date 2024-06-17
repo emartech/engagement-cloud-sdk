@@ -8,34 +8,37 @@ import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
+import dev.mokkery.answering.returns
+import dev.mokkery.every
+import dev.mokkery.everySuspend
+import dev.mokkery.mock
+import dev.mokkery.verifySuspend
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
-import org.kodein.mock.Mock
-import org.kodein.mock.tests.TestsWithMocks
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 
-class PushClientTests : TestsWithMocks() {
-    override fun setUpMocks() = injectMocks(mocker)
+class PushClientTests {
 
-    @Mock
-    lateinit var mockEmarsysClient: NetworkClientApi
+    private lateinit var mockEmarsysClient: NetworkClientApi
+    private lateinit var mockDefaultUrls: DefaultUrlsApi
+    private lateinit var mockSdkContext: SdkContextApi
+    private lateinit var mockUrlFactory: UrlFactoryApi
+    private lateinit var pushClient: PushClient
 
-    @Mock
-    lateinit var mockDefaultUrls: DefaultUrlsApi
+    @BeforeTest
+    fun setUp() {
+        mockEmarsysClient = mock()
+        mockDefaultUrls = mock()
+        mockSdkContext = mock()
+        mockUrlFactory = mock()
 
-    @Mock
-    lateinit var mockSdkContext: SdkContextApi
-
-    @Mock
-    lateinit var mockUrlFactory: UrlFactoryApi
-
-    private var pushClient: PushClient by withMocks {
-        PushClient(mockEmarsysClient, mockUrlFactory, Json)
+        pushClient = PushClient(mockEmarsysClient, mockUrlFactory, Json)
     }
 
     @Test
@@ -52,7 +55,7 @@ class PushClientTests : TestsWithMocks() {
             HttpMethod.Put,
             """{"pushToken":"test"}"""
         )
-        everySuspending { mockEmarsysClient.send(expectedUrlRequest) } returns Response(
+        everySuspend { mockEmarsysClient.send(expectedUrlRequest) } returns Response(
             expectedUrlRequest,
             HttpStatusCode.OK,
             Headers.Empty,
@@ -61,10 +64,11 @@ class PushClientTests : TestsWithMocks() {
 
         pushClient.registerPushToken("test")
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockEmarsysClient.send(expectedUrlRequest)
         }
     }
+
     @Test
     fun testClearPushToken() = runTest {
         val clientServiceBaseUrl = "https://me-client.eservice.emarsys.net"
@@ -78,7 +82,7 @@ class PushClientTests : TestsWithMocks() {
             Url("$clientServiceBaseUrl/v3/apps/EMS11-C3FD3/client/push-token"),
             HttpMethod.Delete
         )
-        everySuspending { mockEmarsysClient.send(expectedUrlRequest) } returns Response(
+        everySuspend { mockEmarsysClient.send(expectedUrlRequest) } returns Response(
             expectedUrlRequest,
             HttpStatusCode.OK,
             Headers.Empty,
@@ -87,7 +91,7 @@ class PushClientTests : TestsWithMocks() {
 
         pushClient.clearPushToken()
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockEmarsysClient.send(expectedUrlRequest)
         }
     }

@@ -3,46 +3,48 @@ package com.emarsys.setup.states
 import com.emarsys.api.push.PushConstants
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.networking.clients.push.PushClientApi
+import dev.mokkery.answering.returns
+import dev.mokkery.every
+import dev.mokkery.everySuspend
+import dev.mokkery.matcher.any
+import dev.mokkery.mock
+import dev.mokkery.verifySuspend
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.kodein.mock.Mock
-import org.kodein.mock.tests.TestsWithMocks
 import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class RegisterPushTokenStateTests : TestsWithMocks() {
-    override fun setUpMocks() = injectMocks(mocker)
-
-    @Mock
-    lateinit var mockPushClient: PushClientApi
-
-    @Mock
-    lateinit var mockStorage: TypedStorageApi<String?>
-
-    private val registerPushTokenState: RegisterPushTokenState by withMocks {
-        RegisterPushTokenState(mockPushClient, mockStorage)
-    }
-
+class RegisterPushTokenStateTests  {
     private companion object {
         const val PUSH_TOKEN = "testPushToken"
         const val LAST_SENT_PUSH_TOKEN = "testLastSentPushToken"
-
     }
 
     init {
         Dispatchers.setMain(StandardTestDispatcher())
     }
 
+    private lateinit var mockPushClient: PushClientApi
+    private lateinit var mockStorage: TypedStorageApi<String?>
+    private lateinit var registerPushTokenState: RegisterPushTokenState
+
+    @BeforeTest
+    fun setUp() {
+        mockPushClient = mock()
+        mockStorage = mock()
+
+        registerPushTokenState = RegisterPushTokenState(mockPushClient, mockStorage)
+    }
+
     @AfterTest
     fun tearDown() {
-        mocker.reset()
         Dispatchers.resetMain()
-
     }
 
     @Test
@@ -51,11 +53,11 @@ class RegisterPushTokenStateTests : TestsWithMocks() {
         every { mockStorage.get(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns null
         every { mockStorage.put(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
 
-        everySuspending { mockPushClient.registerPushToken(PUSH_TOKEN) } returns Unit
+        everySuspend { mockPushClient.registerPushToken(PUSH_TOKEN) } returns Unit
 
         registerPushTokenState.active()
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockPushClient.registerPushToken(PUSH_TOKEN)
             mockStorage.put(
                 PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY,
@@ -68,13 +70,13 @@ class RegisterPushTokenStateTests : TestsWithMocks() {
     fun testActive_whenBothAvailable_butNotTheSame() = runTest {
         every { mockStorage.get(PushConstants.PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
         every { mockStorage.get(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns LAST_SENT_PUSH_TOKEN
-        every { mockStorage.put(isAny(), isAny()) } returns Unit
+        every { mockStorage.put(any(), any()) } returns Unit
 
-        everySuspending { mockPushClient.registerPushToken(isAny()) } returns Unit
+        everySuspend { mockPushClient.registerPushToken(any()) } returns Unit
 
         registerPushTokenState.active()
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockPushClient.registerPushToken(PUSH_TOKEN)
             mockStorage.put(
                 PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY,
@@ -87,20 +89,20 @@ class RegisterPushTokenStateTests : TestsWithMocks() {
     fun testActive_whenBothAvailable_andTheSame() = runTest {
         every { mockStorage.get(PushConstants.PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
         every { mockStorage.get(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns LAST_SENT_PUSH_TOKEN
-        every { mockStorage.put(isAny(), isAny()) } returns Unit
+        every { mockStorage.put(any(), any()) } returns Unit
 
-        everySuspending { mockPushClient.registerPushToken(isAny()) } returns Unit
+        everySuspend { mockPushClient.registerPushToken(any()) } returns Unit
 
         registerPushTokenState.active()
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             repeat(0) {
-                mockPushClient.registerPushToken(isAny())
+                mockPushClient.registerPushToken(any())
             }
             repeat(0) {
                 mockStorage.put(
-                    isAny(),
-                    isAny()
+                    any(),
+                    any()
                 )
             }
         }

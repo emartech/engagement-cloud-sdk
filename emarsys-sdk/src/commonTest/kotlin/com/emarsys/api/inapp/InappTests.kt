@@ -7,6 +7,13 @@ import com.emarsys.context.DefaultUrls
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.log.LogLevel
+import dev.mokkery.answering.returns
+import dev.mokkery.answering.throws
+import dev.mokkery.every
+import dev.mokkery.everySuspend
+import dev.mokkery.mock
+import dev.mokkery.verify
+import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -14,31 +21,20 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.kodein.mock.Mock
-import org.kodein.mock.tests.TestsWithMocks
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class InappTests : TestsWithMocks() {
+class InappTests {
     private companion object {
         val testException = Exception()
         val testEvents = MutableSharedFlow<AppEvent>()
     }
 
-    override fun setUpMocks() = injectMocks(mocker)
-
-    @Mock
-    lateinit var mockLoggingInApp: InAppInstance
-
-    @Mock
-    lateinit var mockGathererInApp: InAppInstance
-
-    @Mock
-    lateinit var mockInAppInternal: InAppInstance
-
+    private lateinit var mockLoggingInApp: InAppInstance
+    private lateinit var mockGathererInApp: InAppInstance
+    private lateinit var mockInAppInternal: InAppInstance
     private lateinit var sdkContext: SdkContextApi
-
     private lateinit var inApp: InApp<InAppInstance, InAppInstance, InAppInstance>
 
     init {
@@ -47,6 +43,10 @@ class InappTests : TestsWithMocks() {
 
     @BeforeTest
     fun setup() = runTest {
+        mockLoggingInApp = mock()
+        mockGathererInApp = mock()
+        mockInAppInternal = mock()
+
         sdkContext = SdkContext(
             StandardTestDispatcher(),
             DefaultUrls("", "", "", "", "", "", ""),
@@ -54,9 +54,9 @@ class InappTests : TestsWithMocks() {
             mutableSetOf()
         )
 
-        everySuspending { mockLoggingInApp.activate() } returns Unit
-        everySuspending { mockGathererInApp.activate() } returns Unit
-        everySuspending { mockInAppInternal.activate() } returns Unit
+        everySuspend { mockLoggingInApp.activate() } returns Unit
+        everySuspend { mockGathererInApp.activate() } returns Unit
+        everySuspend { mockInAppInternal.activate() } returns Unit
 
         inApp = InApp(mockLoggingInApp, mockGathererInApp, mockInAppInternal, sdkContext)
         inApp.registerOnContext()
@@ -77,7 +77,7 @@ class InappTests : TestsWithMocks() {
         sdkContext.setSdkState(SdkState.onHold)
         inApp.isPaused shouldBe true
 
-        verify(exhaustive = false) { mockGathererInApp.isPaused }
+        verify { mockGathererInApp.isPaused }
     }
 
     @Test
@@ -87,7 +87,7 @@ class InappTests : TestsWithMocks() {
         sdkContext.setSdkState(SdkState.active)
         inApp.isPaused shouldBe true
 
-        verify(exhaustive = false) { mockInAppInternal.isPaused }
+        verify { mockInAppInternal.isPaused }
     }
 
     @Test
@@ -106,7 +106,7 @@ class InappTests : TestsWithMocks() {
 
         inApp.events
 
-        verify(exhaustive = false) { mockGathererInApp.events }
+        verify { mockGathererInApp.events }
     }
 
     @Test
@@ -116,44 +116,42 @@ class InappTests : TestsWithMocks() {
 
         inApp.events
 
-        verify(exhaustive = false) { mockInAppInternal.events }
+        verify { mockInAppInternal.events }
     }
 
     @Test
     fun testPause_when_inactiveState() = runTest {
-        everySuspending { mockLoggingInApp.pause() } returns Unit
+        everySuspend { mockLoggingInApp.pause() } returns Unit
 
         inApp.pause()
 
-        verifyWithSuspend(exhaustive = false) { mockLoggingInApp.pause() }
+        verifySuspend { mockLoggingInApp.pause() }
     }
 
     @Test
     fun testPause_when_onHoldState() = runTest {
-        everySuspending { mockGathererInApp.pause() } returns Unit
+        everySuspend { mockGathererInApp.pause() } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
 
         inApp.pause()
 
-        verifyWithSuspend(exhaustive = false) { mockGathererInApp.pause() }
+        verifySuspend { mockGathererInApp.pause() }
     }
 
     @Test
     fun testPause_when_activeState() = runTest {
-        everySuspending { mockInAppInternal.pause() } returns Unit
+        everySuspend { mockInAppInternal.pause() } returns Unit
         sdkContext.setSdkState(SdkState.active)
 
         inApp.pause()
 
-        verifyWithSuspend(exhaustive = false) { mockInAppInternal.pause() }
+        verifySuspend { mockInAppInternal.pause() }
     }
 
     @Test
     fun testPause_when_activeState_throws() = runTest {
-        everySuspending { mockInAppInternal.pause() } runs {
-            throw testException
-        }
+        everySuspend { mockInAppInternal.pause() } throws testException
 
         sdkContext.setSdkState(SdkState.active)
 
@@ -164,39 +162,37 @@ class InappTests : TestsWithMocks() {
 
     @Test
     fun testResume_when_inactiveState() = runTest {
-        everySuspending { mockLoggingInApp.resume() } returns Unit
+        everySuspend { mockLoggingInApp.resume() } returns Unit
 
         inApp.resume()
 
-        verifyWithSuspend(exhaustive = false) { mockLoggingInApp.resume() }
+        verifySuspend { mockLoggingInApp.resume() }
     }
 
     @Test
     fun testResume_when_onHoldState() = runTest {
-        everySuspending { mockGathererInApp.resume() } returns Unit
+        everySuspend { mockGathererInApp.resume() } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
 
         inApp.resume()
 
-        verifyWithSuspend(exhaustive = false) { mockGathererInApp.resume() }
+        verifySuspend { mockGathererInApp.resume() }
     }
 
     @Test
     fun testResume_when_activeState() = runTest {
-        everySuspending { mockInAppInternal.resume() } returns Unit
+        everySuspend { mockInAppInternal.resume() } returns Unit
         sdkContext.setSdkState(SdkState.active)
 
         inApp.resume()
 
-        verifyWithSuspend(exhaustive = false) { mockInAppInternal.resume() }
+        verifySuspend { mockInAppInternal.resume() }
     }
 
     @Test
     fun testResume_when_activeState_throws() = runTest {
-        everySuspending { mockInAppInternal.resume() } runs {
-            throw testException
-        }
+        everySuspend { mockInAppInternal.resume() } throws testException
 
         sdkContext.setSdkState(SdkState.active)
 

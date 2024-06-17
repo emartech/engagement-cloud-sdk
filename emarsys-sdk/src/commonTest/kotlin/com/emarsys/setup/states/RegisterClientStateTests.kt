@@ -1,41 +1,33 @@
 package com.emarsys.setup.states
 
 import com.emarsys.networking.clients.device.DeviceClientApi
+import dev.mokkery.answering.returns
+import dev.mokkery.everySuspend
+import dev.mokkery.mock
+import dev.mokkery.verifySuspend
 import kotlinx.coroutines.test.runTest
-import org.kodein.mock.Mock
-import org.kodein.mock.tests.TestsWithMocks
-import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class RegisterClientStateTests : TestsWithMocks() {
-    override fun setUpMocks() = injectMocks(mocker)
-
-    @Mock
-    lateinit var mockDeviceClient: DeviceClientApi
-
-    private val registerClientState: RegisterClientState by withMocks {
+class RegisterClientStateTests {
+    private lateinit var mockDeviceClient: DeviceClientApi
+    private val registerClientState: RegisterClientState by lazy {
         RegisterClientState(mockDeviceClient)
     }
 
     @BeforeTest
     fun setup() = runTest {
-        everySuspending { mockDeviceClient.registerDeviceInfo() } returns Unit
-    }
+        mockDeviceClient = mock()
 
-    @AfterTest
-    fun tearDown() {
-        mocker.reset()
+        everySuspend { mockDeviceClient.registerDeviceInfo() } returns Unit
     }
 
     @Test
     fun testActive_should_callDeviceClient() = runTest {
         registerClientState.active()
 
-        verifyWithSuspend {
+        verifySuspend {
             mockDeviceClient.registerDeviceInfo()
         }
     }
-
-
 }

@@ -10,6 +10,11 @@ import com.emarsys.core.device.ChannelSettings
 import com.emarsys.core.device.DeviceInfo
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.log.LogLevel
+import dev.mokkery.answering.returns
+import dev.mokkery.every
+import dev.mokkery.everySuspend
+import dev.mokkery.mock
+import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -19,15 +24,12 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.kodein.mock.Mock
-import org.kodein.mock.tests.TestsWithMocks
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class ConfigTests : TestsWithMocks() {
-    override fun setUpMocks() = injectMocks(mocker)
+class ConfigTest {
 
     private companion object {
         const val CONTACT_FIELD_ID = 42
@@ -49,16 +51,12 @@ class ConfigTests : TestsWithMocks() {
         )
     }
 
-    @Mock
-    lateinit var deviceInfoCollector: DeviceInfoCollectorApi
+    lateinit var mockDeviceInfoCollector: DeviceInfoCollectorApi
 
-    @Mock
     lateinit var mockLoggingConfig: ConfigInstance
 
-    @Mock
     lateinit var mockGathererConfig: ConfigInstance
 
-    @Mock
     lateinit var mockInternalConfig: ConfigInstance
 
     private lateinit var sdkContext: SdkContextApi
@@ -71,6 +69,11 @@ class ConfigTests : TestsWithMocks() {
 
     @BeforeTest
     fun setup() = runTest {
+        mockDeviceInfoCollector = mock()
+        mockLoggingConfig = mock()
+        mockGathererConfig = mock()
+        mockInternalConfig = mock()
+
         sdkContext = SdkContext(
             StandardTestDispatcher(),
             DefaultUrls("", "", "", "", "", "", ""),
@@ -81,20 +84,20 @@ class ConfigTests : TestsWithMocks() {
         sdkContext.config = EmarsysConfig(APPLICATION_CODE, MERCHANT_ID)
 
 
-        every { deviceInfoCollector.collect() } returns Json.encodeToString(DEVICE_INFO)
-        every { deviceInfoCollector.getPushSettings() } returns PUSH_SETTINGS
-        every { deviceInfoCollector.getHardwareId() } returns HW_ID
+        every { mockDeviceInfoCollector.collect() } returns Json.encodeToString(DEVICE_INFO)
+        every { mockDeviceInfoCollector.getPushSettings() } returns PUSH_SETTINGS
+        every { mockDeviceInfoCollector.getHardwareId() } returns HW_ID
 
-        everySuspending { mockLoggingConfig.activate() } returns Unit
-        everySuspending { mockGathererConfig.activate() } returns Unit
-        everySuspending { mockInternalConfig.activate() } returns Unit
+        everySuspend { mockLoggingConfig.activate() } returns Unit
+        everySuspend { mockGathererConfig.activate() } returns Unit
+        everySuspend { mockInternalConfig.activate() } returns Unit
 
         config = Config(
             mockLoggingConfig,
             mockGathererConfig,
             mockInternalConfig,
             sdkContext,
-            deviceInfoCollector
+            mockDeviceInfoCollector
         )
         config.registerOnContext()
     }
@@ -102,7 +105,6 @@ class ConfigTests : TestsWithMocks() {
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
-        mocker.reset()
     }
 
     @Test
@@ -143,12 +145,12 @@ class ConfigTests : TestsWithMocks() {
     @Test
     fun testChangeApplicationCode_delegatesToCorrectInstance() = runTest {
         val newAppCode = "newAppCode"
-        everySuspending { mockGathererConfig.changeApplicationCode(newAppCode) } returns Unit
+        everySuspend { mockGathererConfig.changeApplicationCode(newAppCode) } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
         config.changeApplicationCode(newAppCode)
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockGathererConfig.changeApplicationCode(newAppCode)
         }
     }
@@ -156,12 +158,12 @@ class ConfigTests : TestsWithMocks() {
     @Test
     fun testChangeMerchantId_delegatesToCorrectInstance() = runTest {
         val newMerchantId = "newMerchantId"
-        everySuspending { mockInternalConfig.changeMerchantId(newMerchantId) } returns Unit
+        everySuspend { mockInternalConfig.changeMerchantId(newMerchantId) } returns Unit
 
         sdkContext.setSdkState(SdkState.active)
         config.changeMerchantId(newMerchantId)
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockInternalConfig.changeMerchantId(newMerchantId)
         }
     }

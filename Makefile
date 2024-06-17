@@ -1,5 +1,6 @@
-.PHONY: build-pipeline check-env clean create-apks help lint test test-web test-android test-android-firebase test-jvm
+.PHONY: build build-pipeline check-env clean create-apks help lint test test-web test-android test-android-firebase test-jvm
 .DEFAULT_GOAL := help
+SHELL := /bin/bash
 
 ifneq (,$(wildcard .env))
 include .env
@@ -23,6 +24,9 @@ help: ## Show this help
 	@echo "Targets:"
 	@fgrep -h "##" $(MAKEFILE_LIST) | grep ":" | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/\(.*\):.*##[ \t]*/    \1 ## /' | sort | column -t -s '##'
 	@echo
+
+build: check-env ## build project with yarn actualization
+	@./gradlew kotlinUpgradeYarnLock build
 
 build-pipeline: check-env ## compile and build all modules for all platforms
 	@./gradlew :emarsys-sdk:build \

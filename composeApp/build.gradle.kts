@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.googleServices)
+    alias(libs.plugins.composeCompiler)
 }
 
 kotlin {
@@ -73,8 +74,4 @@ android {
     dependencies {
         debugImplementation(libs.compose.ui.tooling)
     }
-}
-
-compose.experimental {
-    web.application {}
 }

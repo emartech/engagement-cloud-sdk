@@ -2,30 +2,30 @@ package com.emarsys.setup.states
 
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.session.SessionContext
-import com.emarsys.setup.injectMocks
+import dev.mokkery.answering.returns
+import dev.mokkery.every
+import dev.mokkery.mock
+import dev.mokkery.verify
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
-import org.kodein.mock.Mock
-import org.kodein.mock.tests.TestsWithMocks
 import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class CollectDeviceInfoStateTests: TestsWithMocks() {
-    override fun setUpMocks() = injectMocks(mocker)
-
-    @Mock
-    lateinit var mockDeviceInfoCollector: DeviceInfoCollectorApi
-
+class CollectDeviceInfoStateTests {
     private var sessionContext: SessionContext = SessionContext()
+    private lateinit var mockDeviceInfoCollector: DeviceInfoCollectorApi
+    private lateinit var collectDeviceInfoState: CollectDeviceInfoState
 
-    private val collectDeviceInfoState: CollectDeviceInfoState by withMocks {
-        CollectDeviceInfoState(mockDeviceInfoCollector, sessionContext)
+    @BeforeTest
+    fun setUp() {
+        mockDeviceInfoCollector = mock()
+        collectDeviceInfoState = CollectDeviceInfoState(mockDeviceInfoCollector, sessionContext)
     }
 
     @AfterTest
     fun teardown() {
         sessionContext = SessionContext()
-        mocker.reset()
     }
 
     @Test

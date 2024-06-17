@@ -12,6 +12,12 @@ import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.OnEventActionModel
 import com.emarsys.networking.clients.event.model.Event
 import com.emarsys.networking.clients.event.model.EventType
+import dev.mokkery.answering.returns
+import dev.mokkery.every
+import dev.mokkery.everySuspend
+import dev.mokkery.matcher.any
+import dev.mokkery.mock
+import dev.mokkery.verifySuspend
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -26,16 +32,13 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.serialization.json.Json
-import org.kodein.mock.Mock
-import org.kodein.mock.tests.TestsWithMocks
+
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class EventClientTests : TestsWithMocks() {
-    override fun setUpMocks() = injectMocks(mocker)
-
+class EventClientTests {
     private companion object {
         const val DEVICE_EVENT_STATE = "test device event state"
         const val EVENT_NAME = "test event name"
@@ -45,35 +48,28 @@ class EventClientTests : TestsWithMocks() {
         val testEvent = Event(EventType.CUSTOM, EVENT_NAME, testEventAttributes, TIMESTAMP)
     }
 
-    @Mock
-    lateinit var mockEmarsysClient: NetworkClientApi
-
-    @Mock
-    lateinit var mockUrlFactory: UrlFactoryApi
-
-    @Mock
-    lateinit var mockOnEventActionFactory: ActionFactoryApi<OnEventActionModel>
-
-    @Mock
-    lateinit var mockDeviceEventChannel: DeviceEventChannelApi
-
-    @Mock
-    lateinit var mockInAppConfig: InAppConfig
-
-    private lateinit var sdkDispatcher: CoroutineDispatcher
-
-    private lateinit var sessionContext: SessionContext
-
-    private lateinit var json: Json
-
-    private lateinit var eventClient: EventClient
-
     init {
         Dispatchers.setMain(StandardTestDispatcher())
     }
 
+    private lateinit var mockEmarsysClient: NetworkClientApi
+    private lateinit var mockUrlFactory: UrlFactoryApi
+    private lateinit var mockOnEventActionFactory: ActionFactoryApi<OnEventActionModel>
+    private lateinit var mockDeviceEventChannel: DeviceEventChannelApi
+    private lateinit var mockInAppConfig: InAppConfig
+    private lateinit var sdkDispatcher: CoroutineDispatcher
+    private lateinit var sessionContext: SessionContext
+    private lateinit var json: Json
+    private lateinit var eventClient: EventClient
+
     @BeforeTest
     fun setup() = runTest {
+        mockEmarsysClient = mock()
+        mockUrlFactory = mock()
+        mockOnEventActionFactory = mock()
+        mockDeviceEventChannel = mock()
+        mockInAppConfig = mock()
+
         json = Json {
             encodeDefaults = true
         }
@@ -81,8 +77,8 @@ class EventClientTests : TestsWithMocks() {
         sessionContext = SessionContext(deviceEventState = DEVICE_EVENT_STATE)
         every { mockInAppConfig.inAppDnd }.returns(IN_APP_DND)
 
-        everySuspending { mockDeviceEventChannel.consume() }.returns(flowOf(testEvent))
-        everySuspending { mockDeviceEventChannel.send(testEvent) }.runs { }
+        everySuspend { mockDeviceEventChannel.consume() }.returns(flowOf(testEvent))
+        everySuspend { mockDeviceEventChannel.send(testEvent) }.returns(Unit)
     }
 
     @AfterTest
@@ -105,7 +101,7 @@ class EventClientTests : TestsWithMocks() {
 
         eventClient.registerEvent(testEvent)
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockDeviceEventChannel.send(testEvent)
         }
     }
@@ -125,7 +121,7 @@ class EventClientTests : TestsWithMocks() {
 
         advanceUntilIdle()
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockDeviceEventChannel.consume()
         }
     }
@@ -134,7 +130,7 @@ class EventClientTests : TestsWithMocks() {
     fun testConsumer_should_call_client_with_correct_request() = runTest {
         val testBaseUrl = Url("https://test-base-url/")
 
-        everySuspending { mockEmarsysClient.send(isAny()) }.returns(
+        everySuspend { mockEmarsysClient.send(any()) }.returns(
             Response(
                 UrlRequest(
                     testBaseUrl,
@@ -165,7 +161,7 @@ class EventClientTests : TestsWithMocks() {
 
         advanceUntilIdle()
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockEmarsysClient.send(expectedUrlRequest)
         }
     }

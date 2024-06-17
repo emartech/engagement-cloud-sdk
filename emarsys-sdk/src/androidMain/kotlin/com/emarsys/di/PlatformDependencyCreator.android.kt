@@ -34,6 +34,7 @@ import com.emarsys.mobileengage.push.PushMessagePresenter
 import com.emarsys.mobileengage.push.PushTokenBroadcastReceiver
 import com.emarsys.setup.PlatformInitState
 import com.emarsys.watchdog.connection.AndroidConnectionWatchDog
+import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.AndroidLifecycleWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
@@ -47,8 +48,7 @@ actual class PlatformDependencyCreator actual constructor(
     platformContext: PlatformContext,
     private val sdkLogger: Logger,
     private val json: Json
-) :
-    DependencyCreator {
+) : DependencyCreator {
     private val platformContext: CommonPlatformContext = platformContext as CommonPlatformContext
 
 
@@ -60,7 +60,7 @@ actual class PlatformDependencyCreator actual constructor(
         return AndroidPlatformInfoCollector(applicationContext)
     }
 
-    override fun createDeviceInfoCollector(
+    actual override fun createDeviceInfoCollector(
         uuidProvider: Provider<String>,
         timezoneProvider: Provider<String>
     ): DeviceInfoCollector {
@@ -78,7 +78,7 @@ actual class PlatformDependencyCreator actual constructor(
         return ApplicationVersionProvider(applicationContext)
     }
 
-    override fun createPlatformInitState(
+    actual override fun createPlatformInitState(
         pushApi: PushInternalApi,
         sdkDispatcher: CoroutineDispatcher,
         sdkContext: SdkContext,
@@ -99,28 +99,28 @@ actual class PlatformDependencyCreator actual constructor(
         )
     }
 
-    override fun createStorage(): TypedStorageApi<String?> =
+    actual override fun createStorage(): TypedStorageApi<String?> =
         StringStorage(platformContext.sharedPreferences)
 
-    override fun createPermissionHandler(): PermissionHandlerApi {
+    actual override fun createPermissionHandler(): PermissionHandlerApi {
         return AndroidPermissionHandler()
     }
 
-    override fun createBadgeCountHandler(): BadgeCountHandlerApi {
+    actual override fun createBadgeCountHandler(): BadgeCountHandlerApi {
         return AndroidBadgeCountHandler()
     }
 
-    override fun createExternalUrlOpener(): ExternalUrlOpenerApi {
+    actual override fun createExternalUrlOpener(): ExternalUrlOpenerApi {
         return AndroidExternalUrlOpener()
     }
 
-    override fun createConnectionWatchDog(sdkLogger: SdkLogger): AndroidConnectionWatchDog {
+    actual override fun createConnectionWatchDog(sdkLogger: SdkLogger): ConnectionWatchDog {
         val connectivityManager =
             applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         return AndroidConnectionWatchDog(connectivityManager, sdkLogger)
     }
 
-    override fun createLifeCycleWatchDog(): LifecycleWatchDog {
+    actual override fun createLifeCycleWatchDog(): LifecycleWatchDog {
         return AndroidLifecycleWatchDog(
             ProcessLifecycleOwner.get().lifecycle,
             ProcessLifecycleOwner.get().lifecycleScope,

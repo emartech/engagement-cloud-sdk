@@ -32,7 +32,7 @@ actual class DeviceInfoCollector(
         )
     }
 
-    override fun getHardwareId(): String {
+    actual override fun getHardwareId(): String {
         return storage.get(HARDWARE_ID_STORAGE_KEY) ?: run {
             val generatedId = uuidProvider.provide()
             storage.put(HARDWARE_ID_STORAGE_KEY, generatedId)
@@ -40,7 +40,7 @@ actual class DeviceInfoCollector(
         }
     }
 
-    override fun getPushSettings(): PushSettings {
+    actual override fun getPushSettings(): PushSettings {
         TODO("Not yet implemented")
     }
 }

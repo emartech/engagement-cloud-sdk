@@ -3,23 +3,25 @@ package com.emarsys.core.url
 import com.emarsys.EmarsysConfig
 import com.emarsys.context.DefaultUrlsApi
 import com.emarsys.context.SdkContextApi
+import dev.mokkery.answering.returns
+import dev.mokkery.every
+import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import io.ktor.http.Url
-import org.kodein.mock.Mock
-import org.kodein.mock.tests.TestsWithMocks
+import kotlin.test.BeforeTest
+
 import kotlin.test.Test
 
-class UrlFactoryTests : TestsWithMocks() {
-    override fun setUpMocks() = injectMocks(mocker)
+class UrlFactoryTests {
+    private lateinit var mockSdkContext: SdkContextApi
+    private lateinit var mockDefaultUrls: DefaultUrlsApi
+    private lateinit var urlFactory: UrlFactoryApi
 
-    @Mock
-    lateinit var mockSdkContext: SdkContextApi
-
-    @Mock
-    lateinit var mockDefaultUrls: DefaultUrlsApi
-
-    private var urlFactory: UrlFactoryApi by withMocks {
-        UrlFactory(mockSdkContext)
+    @BeforeTest
+    fun setUp() {
+        mockSdkContext = mock()
+        mockDefaultUrls = mock()
+        urlFactory = UrlFactory(mockSdkContext)
     }
 
     @Test

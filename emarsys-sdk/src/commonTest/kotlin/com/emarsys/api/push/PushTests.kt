@@ -5,6 +5,12 @@ import com.emarsys.context.DefaultUrls
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.log.LogLevel
+import dev.mokkery.answering.returns
+import dev.mokkery.answering.throws
+import dev.mokkery.every
+import dev.mokkery.everySuspend
+import dev.mokkery.mock
+import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -13,39 +19,32 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.kodein.mock.Mock
-import org.kodein.mock.tests.TestsWithMocks
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class PushTests : TestsWithMocks() {
-    override fun setUpMocks() = injectMocks(mocker)
-
+class PushTests {
     private companion object {
         const val PUSH_TOKEN = "testPushToken"
     }
-
-    @Mock
-    lateinit var mockLoggingPush: PushInstance
-
-    @Mock
-    lateinit var mockGathererPush: PushInstance
-
-    @Mock
-    lateinit var mockPushInternal: PushInstance
-
-    private lateinit var sdkContext: SdkContextApi
-
-    lateinit var push: Push<PushInstance, PushInstance, PushInstance>
 
     init {
         Dispatchers.setMain(StandardTestDispatcher())
     }
 
+    private lateinit var mockLoggingPush: PushInstance
+    private lateinit var mockGathererPush: PushInstance
+    private lateinit var mockPushInternal: PushInstance
+    private lateinit var sdkContext: SdkContextApi
+    private lateinit var push: Push<PushInstance, PushInstance, PushInstance>
+
     @BeforeTest
     fun setup() = runTest {
+        mockLoggingPush = mock()
+        mockGathererPush = mock()
+        mockPushInternal = mock()
+
         sdkContext = SdkContext(
             StandardTestDispatcher(),
             DefaultUrls("", "", "", "", "", "", ""),
@@ -53,9 +52,9 @@ class PushTests : TestsWithMocks() {
             mutableSetOf()
         )
 
-        everySuspending { mockLoggingPush.activate() } returns Unit
-        everySuspending { mockGathererPush.activate() } returns Unit
-        everySuspending { mockPushInternal.activate() } returns Unit
+        everySuspend { mockLoggingPush.activate() } returns Unit
+        everySuspend { mockGathererPush.activate() } returns Unit
+        everySuspend { mockPushInternal.activate() } returns Unit
 
         every {
             mockLoggingPush.notificationEvents
@@ -75,12 +74,12 @@ class PushTests : TestsWithMocks() {
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
-        mocker.reset()
+
     }
 
     @Test
     fun testRegisterPushToken_inactiveState() = runTest {
-        everySuspending {
+        everySuspend {
             mockLoggingPush.registerPushToken(
                 PUSH_TOKEN
             )
@@ -88,7 +87,7 @@ class PushTests : TestsWithMocks() {
 
         push.registerPushToken(PUSH_TOKEN)
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockLoggingPush.registerPushToken(
                 PUSH_TOKEN
             )
@@ -97,7 +96,7 @@ class PushTests : TestsWithMocks() {
 
     @Test
     fun testRegisterPushToken_onHoldState() = runTest {
-        everySuspending {
+        everySuspend {
             mockGathererPush.registerPushToken(
                 PUSH_TOKEN
             )
@@ -106,7 +105,7 @@ class PushTests : TestsWithMocks() {
         sdkContext.setSdkState(SdkState.onHold)
         push.registerPushToken(PUSH_TOKEN)
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockGathererPush.registerPushToken(
                 PUSH_TOKEN
             )
@@ -115,7 +114,7 @@ class PushTests : TestsWithMocks() {
 
     @Test
     fun testRegisterPushToken_activeState() = runTest {
-        everySuspending {
+        everySuspend {
             mockPushInternal.registerPushToken(
                 PUSH_TOKEN
             )
@@ -124,7 +123,7 @@ class PushTests : TestsWithMocks() {
         sdkContext.setSdkState(SdkState.active)
         push.registerPushToken(PUSH_TOKEN)
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockPushInternal.registerPushToken(
                 PUSH_TOKEN
             )
@@ -134,13 +133,11 @@ class PushTests : TestsWithMocks() {
     @Test
     fun testRegisterPushToken_activeState_when_throws() = runTest {
         val expectedException = Exception()
-        everySuspending {
+        everySuspend {
             mockPushInternal.registerPushToken(
                 PUSH_TOKEN
             )
-        } runs {
-            throw expectedException
-        }
+        } throws expectedException
 
         sdkContext.setSdkState(SdkState.active)
         val result = push.registerPushToken(PUSH_TOKEN)
@@ -152,41 +149,41 @@ class PushTests : TestsWithMocks() {
 
     @Test
     fun testClearPushToken_inactiveState() = runTest {
-        everySuspending {
+        everySuspend {
             mockLoggingPush.clearPushToken()
         } returns Unit
 
         push.clearPushToken()
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockLoggingPush.clearPushToken()
         }
     }
 
     @Test
     fun testClearPushToken_onHoldState() = runTest {
-        everySuspending {
+        everySuspend {
             mockGathererPush.clearPushToken()
         } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
         push.clearPushToken()
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockGathererPush.clearPushToken()
         }
     }
 
     @Test
     fun testClearPushToken_activeState() = runTest {
-        everySuspending {
+        everySuspend {
             mockPushInternal.clearPushToken()
         } returns Unit
 
         sdkContext.setSdkState(SdkState.active)
         push.clearPushToken()
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockPushInternal.clearPushToken()
         }
     }
@@ -194,11 +191,9 @@ class PushTests : TestsWithMocks() {
     @Test
     fun testClearPushToken_activeState_when_throws() = runTest {
         val expectedException = Exception()
-        everySuspending {
+        everySuspend {
             mockPushInternal.clearPushToken()
-        } runs {
-            throw expectedException
-        }
+        } throws expectedException
 
         sdkContext.setSdkState(SdkState.active)
         val result = push.clearPushToken()

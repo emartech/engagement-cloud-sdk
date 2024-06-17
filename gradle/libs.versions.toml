@@ -1,38 +1,39 @@
 [versions]
-agp = "8.3.0"
+agp = "8.3.2"
 android-compileSdk = "34"
 android-minSdk = "28"
 android-targetSdk = "34"
-androidx-activityCompose = "1.8.2"
-androidx-appcompat = "1.6.1"
+androidx-activityCompose = "1.9.0"
+androidx-appcompat = "1.7.0"
 androidx-constraintlayout = "2.1.4"
-androidx-core-ktx = "1.12.0"
+androidx-core-ktx = "1.13.1"
 androidx-espresso-core = "3.5.1"
-androidx-material = "1.11.0"
+androidx-material = "1.12.0"
 androidx-startupRuntime = "1.1.1"
 androidx-test-junit = "1.1.5"
-androidx-lifecycle = "2.7.0"
+androidx-lifecycle = "2.8.2"
 buildConfig = "5.3.5"
-compose = "1.6.3"
+compose = "1.6.8"
 compose-compiler = "1.5.6"
-compose-plugin = "1.6.0"
+compose-plugin = "1.6.10"
 dokka = "1.9.20"
 junit = "4.13.2"
-kotlin = "1.9.22"
-kotlinxCoroutines = "1.7.3"
-kotlinxDatetime = "0.6.0-RC"
-kotlinxSerializationJson = "1.6.3"
-ksp = "1.9.22-1.0.18"
-ktor = "2.3.9"
-kotest = "5.8.0"
+kotlin = "2.0.0"
+kotlinxCoroutines = "1.8.1"
+kotlinxDatetime = "0.6.0"
+kotlinxSerializationJson = "1.7.0"
+ksp = "2.0.0-1.0.21"
+ktor = "2.3.11"
+kotest = "5.9.0"
 mockkAndroid = "1.13.10"
+mokkery = "2.0.0"
 mockmp = "1.17.0"
 runner = "1.5.2"
 uuid = "0.8.2"
-fcm = "23.4.1"
+fcm = "24.0.0"
 agconnect_core = "1.9.1.300"
 hms_push = "6.12.0.300"
-googleServices = "4.4.1"
+googleServices = "4.4.2"
 kotlinWrappers = "1.0.0-pre.697"
 cryptography = "0.3.0"
 
@@ -85,6 +86,7 @@ cryptography-provider-webcrypto = { module = "dev.whyoleg.cryptography:cryptogra
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
+composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
@@ -94,3 +96,4 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 buildConfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildConfig" }
 agconnect = { id = "com.huawei.agconnect", version.ref = "agconnect_core" }
 googleServices = { id = "com.google.gms.google-services", version.ref = "googleServices" }
+mokkery = { id = "dev.mokkery", version.ref = "mokkery" }

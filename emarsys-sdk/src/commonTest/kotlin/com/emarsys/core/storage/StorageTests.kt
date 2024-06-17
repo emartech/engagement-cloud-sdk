@@ -1,5 +1,8 @@
 package com.emarsys.core.storage
 
+import dev.mokkery.answering.returns
+import dev.mokkery.every
+import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.Serializable
@@ -8,8 +11,7 @@ import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.kodein.mock.Mock
-import org.kodein.mock.tests.TestsWithMocks
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @Serializable
@@ -17,29 +19,26 @@ data class TestData(val value: String)
 
 @Serializable
 sealed interface SealedTestData {
+    @Serializable
+    data class DataType1(val value: String) : SealedTestData
 
     @Serializable
-    data class DataType1(val value: String): SealedTestData
-
-    @Serializable
-    data class DataType2(val value: Int): SealedTestData
+    data class DataType2(val value: Int) : SealedTestData
 }
 
-class StorageTests: TestsWithMocks() {
-
+class StorageTests {
     companion object {
-        const val key = "testKey"
+        const val KEY = "testKey"
     }
 
-    override fun setUpMocks() = injectMocks(mocker)
-
-    @Mock
-    lateinit var mockStringStorage: TypedStorageApi<String?>
-
+    private lateinit var mockStringStorage: TypedStorageApi<String?>
     private val json = Json { encodeDefaults = true }
+    private lateinit var storage: StorageApi
 
-    private val storage: StorageApi by withMocks {
-        Storage(mockStringStorage, json)
+    @BeforeTest
+    fun setUp() {
+        mockStringStorage = mock()
+        storage = Storage(mockStringStorage, json)
     }
 
     @Test
@@ -47,12 +46,12 @@ class StorageTests: TestsWithMocks() {
         val expected = true
         val encoded: String = json.encodeToString(expected)
 
-        every { mockStringStorage.put(key, encoded) } returns Unit
-        every { mockStringStorage.get(key) } returns encoded
+        every { mockStringStorage.put(KEY, encoded) } returns Unit
+        every { mockStringStorage.get(KEY) } returns encoded
 
-        storage.put(key, Boolean.serializer(), expected)
+        storage.put(KEY, Boolean.serializer(), expected)
 
-        val result: Boolean? = storage.get(key, Boolean.serializer())
+        val result: Boolean? = storage.get(KEY, Boolean.serializer())
 
         result shouldBe expected
     }
@@ -62,12 +61,12 @@ class StorageTests: TestsWithMocks() {
         val expected = 42
         val encoded = json.encodeToString(expected)
 
-        every { mockStringStorage.put(key, encoded) } returns Unit
-        every { mockStringStorage.get(key) } returns encoded
+        every { mockStringStorage.put(KEY, encoded) } returns Unit
+        every { mockStringStorage.get(KEY) } returns encoded
 
-        storage.put(key, Int.serializer(), expected)
+        storage.put(KEY, Int.serializer(), expected)
 
-        val result: Int? = storage.get(key, Int.serializer())
+        val result: Int? = storage.get(KEY, Int.serializer())
 
         result shouldBe expected
     }
@@ -77,12 +76,12 @@ class StorageTests: TestsWithMocks() {
         val expected = 42.0
         val encoded = json.encodeToString(expected)
 
-        every { mockStringStorage.put(key, encoded) } returns Unit
-        every { mockStringStorage.get(key) } returns encoded
+        every { mockStringStorage.put(KEY, encoded) } returns Unit
+        every { mockStringStorage.get(KEY) } returns encoded
 
-        storage.put(key, Double.serializer(), expected)
+        storage.put(KEY, Double.serializer(), expected)
 
-        val result: Double? = storage.get(key, Double.serializer())
+        val result: Double? = storage.get(KEY, Double.serializer())
 
         result shouldBe expected
     }
@@ -92,12 +91,12 @@ class StorageTests: TestsWithMocks() {
         val expected = "testValue"
         val encoded = json.encodeToString(expected)
 
-        every { mockStringStorage.put(key, encoded) } returns Unit
-        every { mockStringStorage.get(key) } returns encoded
+        every { mockStringStorage.put(KEY, encoded) } returns Unit
+        every { mockStringStorage.get(KEY) } returns encoded
 
-        storage.put(key, String.serializer(), expected)
+        storage.put(KEY, String.serializer(), expected)
 
-        val result: String? = storage.get(key, String.serializer())
+        val result: String? = storage.get(KEY, String.serializer())
 
         result shouldBe expected
     }
@@ -107,12 +106,12 @@ class StorageTests: TestsWithMocks() {
         val expected = listOf("test")
         val encoded = json.encodeToString(expected)
 
-        every { mockStringStorage.put(key, encoded) } returns Unit
-        every { mockStringStorage.get(key) } returns encoded
+        every { mockStringStorage.put(KEY, encoded) } returns Unit
+        every { mockStringStorage.get(KEY) } returns encoded
 
-        storage.put(key, ListSerializer(String.serializer()), expected)
+        storage.put(KEY, ListSerializer(String.serializer()), expected)
 
-        val result: List<String>? = storage.get(key, ListSerializer(String.serializer()))
+        val result: List<String>? = storage.get(KEY, ListSerializer(String.serializer()))
 
         result shouldBe expected
     }
@@ -122,12 +121,13 @@ class StorageTests: TestsWithMocks() {
         val expected = mapOf("testKey" to "testValue")
         val encoded = json.encodeToString(expected)
 
-        every { mockStringStorage.put(key, encoded) } returns Unit
-        every { mockStringStorage.get(key) } returns encoded
+        every { mockStringStorage.put(KEY, encoded) } returns Unit
+        every { mockStringStorage.get(KEY) } returns encoded
 
-        storage.put(key, MapSerializer(String.serializer(), String.serializer()), expected)
+        storage.put(KEY, MapSerializer(String.serializer(), String.serializer()), expected)
 
-        val result: Map<String, String>? = storage.get(key, MapSerializer(String.serializer(), String.serializer()))
+        val result: Map<String, String>? =
+            storage.get(KEY, MapSerializer(String.serializer(), String.serializer()))
 
         result shouldBe expected
     }
@@ -137,12 +137,12 @@ class StorageTests: TestsWithMocks() {
         val expected = TestData("test")
         val encoded = json.encodeToString(expected)
 
-        every { mockStringStorage.put(key, encoded) } returns Unit
-        every { mockStringStorage.get(key) } returns encoded
+        every { mockStringStorage.put(KEY, encoded) } returns Unit
+        every { mockStringStorage.get(KEY) } returns encoded
 
-        storage.put(key, TestData.serializer(), expected)
+        storage.put(KEY, TestData.serializer(), expected)
 
-        val result: TestData? = storage.get(key, TestData.serializer())
+        val result: TestData? = storage.get(KEY, TestData.serializer())
 
         result shouldBe expected
     }
@@ -152,12 +152,13 @@ class StorageTests: TestsWithMocks() {
         val expected = listOf(SealedTestData.DataType1("testValue"), SealedTestData.DataType2(42))
         val encoded = json.encodeToString(expected)
 
-        every { mockStringStorage.put(key, encoded) } returns Unit
-        every { mockStringStorage.get(key) } returns encoded
+        every { mockStringStorage.put(KEY, encoded) } returns Unit
+        every { mockStringStorage.get(KEY) } returns encoded
 
-        storage.put(key, ListSerializer(SealedTestData.serializer()), expected)
+        storage.put(KEY, ListSerializer(SealedTestData.serializer()), expected)
 
-        val result: List<SealedTestData>? = storage.get(key, ListSerializer(SealedTestData.serializer()))
+        val result: List<SealedTestData>? =
+            storage.get(KEY, ListSerializer(SealedTestData.serializer()))
 
         result shouldBe expected
     }

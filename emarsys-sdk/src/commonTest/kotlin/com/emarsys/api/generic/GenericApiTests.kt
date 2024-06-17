@@ -13,25 +13,18 @@ import com.emarsys.context.SdkContext
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
 import com.emarsys.networking.clients.contact.ContactClientApi
+import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.kodein.mock.Mock
-import org.kodein.mock.tests.TestsWithMocks
+
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class GenericApiTests : TestsWithMocks() {
-
-    override fun setUpMocks() = injectMocks(mocker)
-
-    @Mock
-    lateinit var mockContactClient: ContactClientApi
-
-    @Mock
-    lateinit var mockSdkLogger: Logger
-
+class GenericApiTests {
+    private lateinit var mockContactClient: ContactClientApi
+    private lateinit var mockSdkLogger: Logger
     private lateinit var loggingContact: LoggingContact
     private lateinit var contactGatherer: ContactGatherer
     private lateinit var contactInternal: ContactInternal
@@ -41,6 +34,8 @@ class GenericApiTests : TestsWithMocks() {
 
     @BeforeTest
     fun setup() = runTest {
+        mockContactClient = mock()
+        mockSdkLogger = mock()
         contactContext = ContactContext(mutableListOf())
         loggingContact = LoggingContact(mockSdkLogger)
         contactGatherer = ContactGatherer(contactContext)

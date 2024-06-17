@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.mockmp)
     alias(libs.plugins.ksp)
     alias(libs.plugins.buildConfig)
+    alias(libs.plugins.mokkery)
 }
 
 group = "com.emarsys"
@@ -33,6 +34,17 @@ kotlin {
             binaries.executable()
         }
     }
+
+//    listOf(
+//        iosX64(),
+//        iosArm64(),
+//        iosSimulatorArm64()
+//    ).forEach { iosTarget ->
+//        iosTarget.binaries.framework {
+//            baseName = "shared"
+//            isStatic = true
+//        }
+//    }
 
     sourceSets {
         val commonMain by getting {
@@ -85,7 +97,14 @@ kotlin {
                 implementation(libs.kotlinx.coroutines.test)
             }
         }
-
+//        val iosMain by creating {
+//
+//        }
+//        val iosTest by creating {
+//            dependencies {
+//                implementation(kotlin("test"))
+//            }
+//        }
         val jsMain by getting {
             dependencies {
                 implementation(libs.ktor.client.js)

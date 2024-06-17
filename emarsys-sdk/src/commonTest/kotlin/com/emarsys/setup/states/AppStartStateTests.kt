@@ -1,32 +1,35 @@
 package com.emarsys.setup.states
 
+import com.emarsys.core.providers.Provider
 import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.event.model.Event
 import com.emarsys.networking.clients.event.model.EventType
-import com.emarsys.core.providers.Provider
+import dev.mokkery.answering.returns
+import dev.mokkery.every
+import dev.mokkery.everySuspend
+import dev.mokkery.mock
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import org.kodein.mock.Mock
-import org.kodein.mock.tests.TestsWithMocks
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class AppStartStateTests : TestsWithMocks() {
-    override fun setUpMocks() = injectMocks(mocker)
-
+class AppStartStateTests {
     private companion object {
         val timestamp = Clock.System.now()
     }
 
-    @Mock
-    lateinit var mockEventClient: EventClientApi
+    private lateinit var mockEventClient: EventClientApi
+    private lateinit var mockTimestampProvider: Provider<Instant>
+    private lateinit var appStartState: AppStartState
 
-    @Mock
-    lateinit var mockTimestampProvider: Provider<Instant>
-
-    private val appStartState: AppStartState by withMocks {
+    @BeforeTest
+    fun setUp() {
+        mockEventClient = mock()
+        mockTimestampProvider = mock()
         every { mockTimestampProvider.provide() } returns timestamp
-        AppStartState(mockEventClient, mockTimestampProvider)
+
+        appStartState = AppStartState(mockEventClient, mockTimestampProvider)
     }
 
     @Test
@@ -38,11 +41,11 @@ class AppStartStateTests : TestsWithMocks() {
                 null,
                 timestamp.toString()
             )
-            everySuspending { mockEventClient.registerEvent(expectedEvent) } returns Unit
+            everySuspend { mockEventClient.registerEvent(expectedEvent) } returns Unit
 
             appStartState.active()
 
-            everySuspending {
+            everySuspend {
                 mockEventClient.registerEvent(expectedEvent)
             }
         }
@@ -56,12 +59,12 @@ class AppStartStateTests : TestsWithMocks() {
                 null,
                 timestamp.toString()
             )
-            everySuspending { mockEventClient.registerEvent(expectedEvent) } returns Unit
+            everySuspend { mockEventClient.registerEvent(expectedEvent) } returns Unit
 
             appStartState.active()
             appStartState.active()
 
-            everySuspending {
+            everySuspend {
                 repeat(1) {
                     mockEventClient.registerEvent(expectedEvent)
                 }

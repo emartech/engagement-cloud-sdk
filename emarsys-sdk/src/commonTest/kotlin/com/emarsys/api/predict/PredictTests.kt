@@ -9,6 +9,11 @@ import com.emarsys.context.DefaultUrls
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.log.LogLevel
+import dev.mokkery.answering.returns
+import dev.mokkery.answering.throws
+import dev.mokkery.everySuspend
+import dev.mokkery.mock
+import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -16,14 +21,12 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.kodein.mock.Mock
-import org.kodein.mock.tests.TestsWithMocks
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class PredictTests : TestsWithMocks() {
+class PredictTests {
 
     private companion object {
         const val ORDER_ID = "testOrderId"
@@ -52,27 +55,22 @@ class PredictTests : TestsWithMocks() {
 
     }
 
-    override fun setUpMocks() = injectMocks(mocker)
-
-    @Mock
-    lateinit var mockLoggingPredict: PredictInstance
-
-    @Mock
-    lateinit var mockGathererPredict: PredictInstance
-
-    @Mock
-    lateinit var mockPredictInternal: PredictInstance
-
-    private lateinit var sdkContext: SdkContextApi
-
-    private lateinit var predict: Predict<PredictInstance, PredictInstance, PredictInstance>
-
     init {
         Dispatchers.setMain(StandardTestDispatcher())
     }
 
+    private lateinit var mockLoggingPredict: PredictInstance
+    private lateinit var mockGathererPredict: PredictInstance
+    private lateinit var mockPredictInternal: PredictInstance
+    private lateinit var sdkContext: SdkContextApi
+    private lateinit var predict: Predict<PredictInstance, PredictInstance, PredictInstance>
+
     @BeforeTest
     fun setup() = runTest {
+        mockLoggingPredict = mock()
+        mockGathererPredict = mock()
+        mockPredictInternal = mock()
+        
         sdkContext = SdkContext(
             StandardTestDispatcher(),
             DefaultUrls("", "", "", "", "", "", ""),
@@ -80,9 +78,9 @@ class PredictTests : TestsWithMocks() {
             mutableSetOf()
         )
 
-        everySuspending { mockLoggingPredict.activate() } returns Unit
-        everySuspending { mockGathererPredict.activate() } returns Unit
-        everySuspending { mockPredictInternal.activate() } returns Unit
+        everySuspend { mockLoggingPredict.activate() } returns Unit
+        everySuspend { mockGathererPredict.activate() } returns Unit
+        everySuspend { mockPredictInternal.activate() } returns Unit
 
         predict = Predict(mockLoggingPredict, mockGathererPredict, mockPredictInternal, sdkContext)
 
@@ -92,43 +90,43 @@ class PredictTests : TestsWithMocks() {
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
-        mocker.reset()
+        
     }
 
     @Test
     fun testTrackCart_shouldCallLoggingInstance_whenInactive() = runTest {
-        everySuspending { mockLoggingPredict.trackCart(testCartItems) } returns Unit
+        everySuspend { mockLoggingPredict.trackCart(testCartItems) } returns Unit
 
         predict.trackCart(testCartItems)
 
-        verifyWithSuspend(exhaustive = false) { mockLoggingPredict.trackCart(testCartItems) }
+        verifySuspend { mockLoggingPredict.trackCart(testCartItems) }
     }
 
     @Test
     fun testTrackCart_shouldCallGathererInstance_whenOnHold() = runTest {
-        everySuspending { mockGathererPredict.trackCart(testCartItems) } returns Unit
+        everySuspend { mockGathererPredict.trackCart(testCartItems) } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
 
         predict.trackCart(testCartItems)
 
-        verifyWithSuspend(exhaustive = false) { mockGathererPredict.trackCart(testCartItems) }
+        verifySuspend { mockGathererPredict.trackCart(testCartItems) }
     }
 
     @Test
     fun testTrackCart_shouldCallGathererInstance_whenActive() = runTest {
-        everySuspending { mockPredictInternal.trackCart(testCartItems) } returns Unit
+        everySuspend { mockPredictInternal.trackCart(testCartItems) } returns Unit
 
         sdkContext.setSdkState(SdkState.active)
 
         predict.trackCart(testCartItems)
 
-        verifyWithSuspend(exhaustive = false) { mockPredictInternal.trackCart(testCartItems) }
+        verifySuspend { mockPredictInternal.trackCart(testCartItems) }
     }
 
     @Test
     fun testTrackCart_shouldCallGathererInstance_whenActive_whenThrows() = runTest {
-        everySuspending { mockPredictInternal.trackCart(testCartItems) } runs { throw testException }
+        everySuspend { mockPredictInternal.trackCart(testCartItems) } throws testException
 
         sdkContext.setSdkState(SdkState.active)
 
@@ -139,11 +137,11 @@ class PredictTests : TestsWithMocks() {
 
     @Test
     fun testTrackPurchase_shouldCallLoggingInstance_whenInactive() = runTest {
-        everySuspending { mockLoggingPredict.trackPurchase(ORDER_ID, testCartItems) } returns Unit
+        everySuspend { mockLoggingPredict.trackPurchase(ORDER_ID, testCartItems) } returns Unit
 
         predict.trackPurchase(ORDER_ID, testCartItems)
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockLoggingPredict.trackPurchase(
                 ORDER_ID,
                 testCartItems
@@ -153,13 +151,13 @@ class PredictTests : TestsWithMocks() {
 
     @Test
     fun testTrackPurchase_shouldCallGathererInstance_whenOnHold() = runTest {
-        everySuspending { mockGathererPredict.trackPurchase(ORDER_ID, testCartItems) } returns Unit
+        everySuspend { mockGathererPredict.trackPurchase(ORDER_ID, testCartItems) } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
 
         predict.trackPurchase(ORDER_ID, testCartItems)
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockGathererPredict.trackPurchase(
                 ORDER_ID,
                 testCartItems
@@ -169,13 +167,13 @@ class PredictTests : TestsWithMocks() {
 
     @Test
     fun testTrackPurchase_shouldCallGathererInstance_whenActive() = runTest {
-        everySuspending { mockPredictInternal.trackPurchase(ORDER_ID, testCartItems) } returns Unit
+        everySuspend { mockPredictInternal.trackPurchase(ORDER_ID, testCartItems) } returns Unit
 
         sdkContext.setSdkState(SdkState.active)
 
         predict.trackPurchase(ORDER_ID, testCartItems)
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockPredictInternal.trackPurchase(
                 ORDER_ID,
                 testCartItems
@@ -185,12 +183,12 @@ class PredictTests : TestsWithMocks() {
 
     @Test
     fun testTrackPurchase_shouldCallGathererInstance_whenActive_whenThrows() = runTest {
-        everySuspending {
+        everySuspend {
             mockPredictInternal.trackPurchase(
                 ORDER_ID,
                 testCartItems
             )
-        } runs { throw testException }
+        } throws testException
 
         sdkContext.setSdkState(SdkState.active)
 
@@ -201,38 +199,38 @@ class PredictTests : TestsWithMocks() {
 
     @Test
     fun testTrackItemView_shouldCallLoggingInstance_whenInactive() = runTest {
-        everySuspending { mockLoggingPredict.trackItemView(ITEM_VIEW) } returns Unit
+        everySuspend { mockLoggingPredict.trackItemView(ITEM_VIEW) } returns Unit
 
         predict.trackItemView(ITEM_VIEW)
 
-        verifyWithSuspend(exhaustive = false) { mockLoggingPredict.trackItemView(ITEM_VIEW) }
+        verifySuspend { mockLoggingPredict.trackItemView(ITEM_VIEW) }
     }
 
     @Test
     fun testTrackItemView_shouldCallGathererInstance_whenOnHold() = runTest {
-        everySuspending { mockGathererPredict.trackItemView(ITEM_VIEW) } returns Unit
+        everySuspend { mockGathererPredict.trackItemView(ITEM_VIEW) } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
 
         predict.trackItemView(ITEM_VIEW)
 
-        verifyWithSuspend(exhaustive = false) { mockGathererPredict.trackItemView(ITEM_VIEW) }
+        verifySuspend { mockGathererPredict.trackItemView(ITEM_VIEW) }
     }
 
     @Test
     fun testTrackItemView_shouldCallGathererInstance_whenActive() = runTest {
-        everySuspending { mockPredictInternal.trackItemView(ITEM_VIEW) } returns Unit
+        everySuspend { mockPredictInternal.trackItemView(ITEM_VIEW) } returns Unit
 
         sdkContext.setSdkState(SdkState.active)
 
         predict.trackItemView(ITEM_VIEW)
 
-        verifyWithSuspend(exhaustive = false) { mockPredictInternal.trackItemView(ITEM_VIEW) }
+        verifySuspend { mockPredictInternal.trackItemView(ITEM_VIEW) }
     }
 
     @Test
     fun testTrackItemView_shouldCallGathererInstance_whenActive_whenThrows() = runTest {
-        everySuspending { mockPredictInternal.trackItemView(ITEM_VIEW) } runs { throw testException }
+        everySuspend { mockPredictInternal.trackItemView(ITEM_VIEW) } throws testException
 
         sdkContext.setSdkState(SdkState.active)
 
@@ -243,38 +241,38 @@ class PredictTests : TestsWithMocks() {
 
     @Test
     fun testTrackCategoryView_shouldCallLoggingInstance_whenInactive() = runTest {
-        everySuspending { mockLoggingPredict.trackCategoryView(CATEGORY_VIEW) } returns Unit
+        everySuspend { mockLoggingPredict.trackCategoryView(CATEGORY_VIEW) } returns Unit
 
         predict.trackCategoryView(CATEGORY_VIEW)
 
-        verifyWithSuspend(exhaustive = false) { mockLoggingPredict.trackCategoryView(CATEGORY_VIEW) }
+        verifySuspend { mockLoggingPredict.trackCategoryView(CATEGORY_VIEW) }
     }
 
     @Test
     fun testTrackCategoryView_shouldCallGathererInstance_whenOnHold() = runTest {
-        everySuspending { mockGathererPredict.trackCategoryView(CATEGORY_VIEW) } returns Unit
+        everySuspend { mockGathererPredict.trackCategoryView(CATEGORY_VIEW) } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
 
         predict.trackCategoryView(CATEGORY_VIEW)
 
-        verifyWithSuspend(exhaustive = false) { mockGathererPredict.trackCategoryView(CATEGORY_VIEW) }
+        verifySuspend { mockGathererPredict.trackCategoryView(CATEGORY_VIEW) }
     }
 
     @Test
     fun testTrackCategoryView_shouldCallGathererInstance_whenActive() = runTest {
-        everySuspending { mockPredictInternal.trackCategoryView(CATEGORY_VIEW) } returns Unit
+        everySuspend { mockPredictInternal.trackCategoryView(CATEGORY_VIEW) } returns Unit
 
         sdkContext.setSdkState(SdkState.active)
 
         predict.trackCategoryView(CATEGORY_VIEW)
 
-        verifyWithSuspend(exhaustive = false) { mockPredictInternal.trackCategoryView(CATEGORY_VIEW) }
+        verifySuspend { mockPredictInternal.trackCategoryView(CATEGORY_VIEW) }
     }
 
     @Test
     fun testTrackCategoryView_shouldCallGathererInstance_whenActive_whenThrows() = runTest {
-        everySuspending { mockPredictInternal.trackCategoryView(CATEGORY_VIEW) } runs { throw testException }
+        everySuspend { mockPredictInternal.trackCategoryView(CATEGORY_VIEW) } throws testException
 
         sdkContext.setSdkState(SdkState.active)
 
@@ -285,38 +283,38 @@ class PredictTests : TestsWithMocks() {
 
     @Test
     fun testTrackSearchTerm_shouldCallLoggingInstance_whenInactive() = runTest {
-        everySuspending { mockLoggingPredict.trackSearchTerm(SEARCH_TERM) } returns Unit
+        everySuspend { mockLoggingPredict.trackSearchTerm(SEARCH_TERM) } returns Unit
 
         predict.trackSearchTerm(SEARCH_TERM)
 
-        verifyWithSuspend(exhaustive = false) { mockLoggingPredict.trackSearchTerm(SEARCH_TERM) }
+        verifySuspend { mockLoggingPredict.trackSearchTerm(SEARCH_TERM) }
     }
 
     @Test
     fun testTrackSearchTerm_shouldCallGathererInstance_whenOnHold() = runTest {
-        everySuspending { mockGathererPredict.trackSearchTerm(SEARCH_TERM) } returns Unit
+        everySuspend { mockGathererPredict.trackSearchTerm(SEARCH_TERM) } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
 
         predict.trackSearchTerm(SEARCH_TERM)
 
-        verifyWithSuspend(exhaustive = false) { mockGathererPredict.trackSearchTerm(SEARCH_TERM) }
+        verifySuspend { mockGathererPredict.trackSearchTerm(SEARCH_TERM) }
     }
 
     @Test
     fun testTrackSearchTerm_shouldCallGathererInstance_whenActive() = runTest {
-        everySuspending { mockPredictInternal.trackSearchTerm(SEARCH_TERM) } returns Unit
+        everySuspend { mockPredictInternal.trackSearchTerm(SEARCH_TERM) } returns Unit
 
         sdkContext.setSdkState(SdkState.active)
 
         predict.trackSearchTerm(SEARCH_TERM)
 
-        verifyWithSuspend(exhaustive = false) { mockPredictInternal.trackSearchTerm(SEARCH_TERM) }
+        verifySuspend { mockPredictInternal.trackSearchTerm(SEARCH_TERM) }
     }
 
     @Test
     fun testTrackSearchTerm_shouldCallGathererInstance_whenActive_whenThrows() = runTest {
-        everySuspending { mockPredictInternal.trackSearchTerm(SEARCH_TERM) } runs { throw testException }
+        everySuspend { mockPredictInternal.trackSearchTerm(SEARCH_TERM) } throws testException
 
         sdkContext.setSdkState(SdkState.active)
 
@@ -327,43 +325,43 @@ class PredictTests : TestsWithMocks() {
 
     @Test
     fun testTrackTag_shouldCallLoggingInstance_whenInactive() = runTest {
-        everySuspending { mockLoggingPredict.trackTag(TAG, testAttributes) } returns Unit
+        everySuspend { mockLoggingPredict.trackTag(TAG, testAttributes) } returns Unit
 
         predict.trackTag(TAG, testAttributes)
 
-        verifyWithSuspend(exhaustive = false) { mockLoggingPredict.trackTag(TAG, testAttributes) }
+        verifySuspend { mockLoggingPredict.trackTag(TAG, testAttributes) }
     }
 
     @Test
     fun testTrackTag_shouldCallGathererInstance_whenOnHold() = runTest {
-        everySuspending { mockGathererPredict.trackTag(TAG, testAttributes) } returns Unit
+        everySuspend { mockGathererPredict.trackTag(TAG, testAttributes) } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
 
         predict.trackTag(TAG, testAttributes)
 
-        verifyWithSuspend(exhaustive = false) { mockGathererPredict.trackTag(TAG, testAttributes) }
+        verifySuspend { mockGathererPredict.trackTag(TAG, testAttributes) }
     }
 
     @Test
     fun testTrackTag_shouldCallGathererInstance_whenActive() = runTest {
-        everySuspending { mockPredictInternal.trackTag(TAG, testAttributes) } returns Unit
+        everySuspend { mockPredictInternal.trackTag(TAG, testAttributes) } returns Unit
 
         sdkContext.setSdkState(SdkState.active)
 
         predict.trackTag(TAG, testAttributes)
 
-        verifyWithSuspend(exhaustive = false) { mockPredictInternal.trackTag(TAG, testAttributes) }
+        verifySuspend { mockPredictInternal.trackTag(TAG, testAttributes) }
     }
 
     @Test
     fun testTrackTag_shouldCallGathererInstance_whenActive_whenThrows() = runTest {
-        everySuspending {
+        everySuspend {
             mockPredictInternal.trackTag(
                 TAG,
                 testAttributes
             )
-        } runs { throw testException }
+        } throws testException
 
         sdkContext.setSdkState(SdkState.active)
 
@@ -374,11 +372,11 @@ class PredictTests : TestsWithMocks() {
 
     @Test
     fun testTrackRecommendationClick_shouldCallLoggingInstance_whenInactive() = runTest {
-        everySuspending { mockLoggingPredict.trackRecommendationClick(testProduct) } returns Unit
+        everySuspend { mockLoggingPredict.trackRecommendationClick(testProduct) } returns Unit
 
         predict.trackRecommendationClick(testProduct)
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockLoggingPredict.trackRecommendationClick(
                 testProduct
             )
@@ -387,13 +385,13 @@ class PredictTests : TestsWithMocks() {
 
     @Test
     fun testTrackRecommendationClick_shouldCallGathererInstance_whenOnHold() = runTest {
-        everySuspending { mockGathererPredict.trackRecommendationClick(testProduct) } returns Unit
+        everySuspend { mockGathererPredict.trackRecommendationClick(testProduct) } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
 
         predict.trackRecommendationClick(testProduct)
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockGathererPredict.trackRecommendationClick(
                 testProduct
             )
@@ -402,13 +400,13 @@ class PredictTests : TestsWithMocks() {
 
     @Test
     fun testTrackRecommendationClick_shouldCallGathererInstance_whenActive() = runTest {
-        everySuspending { mockPredictInternal.trackRecommendationClick(testProduct) } returns Unit
+        everySuspend { mockPredictInternal.trackRecommendationClick(testProduct) } returns Unit
 
         sdkContext.setSdkState(SdkState.active)
 
         predict.trackRecommendationClick(testProduct)
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockPredictInternal.trackRecommendationClick(
                 testProduct
             )
@@ -417,7 +415,7 @@ class PredictTests : TestsWithMocks() {
 
     @Test
     fun testTrackRecommendationClick_shouldCallGathererInstance_whenActive_whenThrows() = runTest {
-        everySuspending { mockPredictInternal.trackRecommendationClick(testProduct) } runs { throw testException }
+        everySuspend { mockPredictInternal.trackRecommendationClick(testProduct) } throws testException
 
         sdkContext.setSdkState(SdkState.active)
 
@@ -428,7 +426,7 @@ class PredictTests : TestsWithMocks() {
 
     @Test
     fun testRecommendProducts_shouldCallLoggingInstance_whenInactive() = runTest {
-        everySuspending {
+        everySuspend {
             mockLoggingPredict.recommendProducts(
                 testLogic,
                 testFilters,
@@ -439,7 +437,7 @@ class PredictTests : TestsWithMocks() {
 
         predict.recommendProducts(testLogic, testFilters, LIMIT, AVAILABILITY_ZONE)
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockLoggingPredict.recommendProducts(
                 testLogic,
                 testFilters,
@@ -451,7 +449,7 @@ class PredictTests : TestsWithMocks() {
 
     @Test
     fun testRecommendProducts_shouldCallGathererInstance_whenOnHold() = runTest {
-        everySuspending {
+        everySuspend {
             mockGathererPredict.recommendProducts(
                 testLogic,
                 testFilters,
@@ -464,7 +462,7 @@ class PredictTests : TestsWithMocks() {
 
         predict.recommendProducts(testLogic, testFilters, LIMIT, AVAILABILITY_ZONE)
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockGathererPredict.recommendProducts(
                 testLogic,
                 testFilters,
@@ -476,7 +474,7 @@ class PredictTests : TestsWithMocks() {
 
     @Test
     fun testRecommendProducts_shouldCallGathererInstance_whenActive() = runTest {
-        everySuspending {
+        everySuspend {
             mockPredictInternal.recommendProducts(
                 testLogic,
                 testFilters,
@@ -491,7 +489,7 @@ class PredictTests : TestsWithMocks() {
 
         predict.recommendProducts(testLogic, testFilters, LIMIT, AVAILABILITY_ZONE)
 
-        verifyWithSuspend(exhaustive = false) {
+        verifySuspend {
             mockPredictInternal.recommendProducts(
                 testLogic,
                 testFilters,
@@ -503,14 +501,14 @@ class PredictTests : TestsWithMocks() {
 
     @Test
     fun testRecommendProducts_shouldCallGathererInstance_whenActive_whenThrows() = runTest {
-        everySuspending {
+        everySuspend {
             mockPredictInternal.recommendProducts(
                 testLogic,
                 testFilters,
                 LIMIT,
                 AVAILABILITY_ZONE
             )
-        } runs { throw testException }
+        } throws testException
 
         sdkContext.setSdkState(SdkState.active)
 

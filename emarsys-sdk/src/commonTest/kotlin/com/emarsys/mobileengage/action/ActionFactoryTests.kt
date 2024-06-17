@@ -19,37 +19,35 @@ import com.emarsys.mobileengage.action.models.BadgeCountActionModel
 import com.emarsys.mobileengage.action.models.CustomEventActionModel
 import com.emarsys.mobileengage.action.models.DismissActionModel
 import com.emarsys.mobileengage.action.models.OpenExternalUrlActionModel
+import dev.mokkery.mock
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeTypeOf
 import kotlinx.coroutines.test.runTest
-import org.kodein.mock.Mock
-import org.kodein.mock.tests.TestsWithMocks
+import kotlin.test.BeforeTest
+
 import kotlin.test.Test
 
-class ActionFactoryTests : TestsWithMocks() {
+class ActionFactoryTests {
 
-    override fun setUpMocks() = injectMocks(mocker)
+    private lateinit var mockEventChannel: DeviceEventChannelApi
+    private lateinit var mockOnEventActionInternal: OnEventActionInternalApi
+    private lateinit var mockPermissionHandler: PermissionHandlerApi
+    private lateinit var mockBadgeCountHandler: BadgeCountHandlerApi
+    private lateinit var mockExternalUrlOpener: ExternalUrlOpenerApi
+    private lateinit var mockMsgHub: MsgHubApi
 
-    @Mock
-    lateinit var mockEventChannel: DeviceEventChannelApi
+    private lateinit var actionFactory: ActionFactoryApi<ActionModel>
 
-    @Mock
-    lateinit var mockOnEventActionInternal: OnEventActionInternalApi
+    @BeforeTest
+    fun setUp() {
+        mockEventChannel = mock()
+        mockOnEventActionInternal = mock()
+        mockPermissionHandler = mock()
+        mockBadgeCountHandler = mock()
+        mockExternalUrlOpener = mock()
+        mockMsgHub = mock()
 
-    @Mock
-    lateinit var mockPermissionHandler: PermissionHandlerApi
-
-    @Mock
-    lateinit var mockBadgeCountHandler: BadgeCountHandlerApi
-
-    @Mock
-    lateinit var mockExternalUrlOpener: ExternalUrlOpenerApi
-
-    @Mock
-    lateinit var mockMsgHub: MsgHubApi
-
-    private val actionFactory: ActionFactoryApi<ActionModel> by withMocks {
-        ActionFactory(
+        actionFactory = ActionFactory(
             mockOnEventActionInternal,
             mockEventChannel,
             mockPermissionHandler,

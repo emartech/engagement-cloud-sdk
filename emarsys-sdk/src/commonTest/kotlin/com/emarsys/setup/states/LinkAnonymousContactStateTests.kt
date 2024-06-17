@@ -2,35 +2,36 @@ package com.emarsys.setup.states
 
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
-import com.emarsys.networking.clients.contact.ContactClientApi
 import com.emarsys.core.session.SessionContext
+import com.emarsys.networking.clients.contact.ContactClientApi
+import dev.mokkery.answering.returns
+import dev.mokkery.everySuspend
+import dev.mokkery.mock
+import dev.mokkery.verifySuspend
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import io.ktor.http.headersOf
 import kotlinx.coroutines.test.runTest
-import org.kodein.mock.Mock
-import org.kodein.mock.tests.TestsWithMocks
 import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class LinkAnonymousContactStateTests : TestsWithMocks() {
-
+class LinkAnonymousContactStateTests {
     private companion object {
         const val CONTACT_TOKEN = "testContactToken"
         const val OPEN_ID_TOKEN = "testOpenIdToken"
         const val CONTACT_FIELD_VALUE = "testContactFieldValue"
     }
-    override fun setUpMocks() = injectMocks(mocker)
-
-    @Mock
-    lateinit var mockContactClient: ContactClientApi
 
     private var sessionContext = SessionContext()
+    private lateinit var mockContactClient: ContactClientApi
+    private lateinit var linkAnonymousContactState: LinkAnonymousContactState
 
-
-    private val linkAnonymousContactState: LinkAnonymousContactState by withMocks {
-        LinkAnonymousContactState(mockContactClient, sessionContext)
+    @BeforeTest
+    fun setUp() {
+        mockContactClient = mock()
+        linkAnonymousContactState = LinkAnonymousContactState(mockContactClient, sessionContext)
     }
 
     private val testResponse = Response(
@@ -47,7 +48,7 @@ class LinkAnonymousContactStateTests : TestsWithMocks() {
     @AfterTest
     fun tearDown() {
         sessionContext = SessionContext()
-        mocker.reset()
+        
     }
 
     @Test
@@ -56,7 +57,7 @@ class LinkAnonymousContactStateTests : TestsWithMocks() {
 
         linkAnonymousContactState.active()
 
-        verifyWithSuspend {
+        verifySuspend {
             repeat(0) {
                 mockContactClient.unlinkContact()
             }
@@ -69,7 +70,7 @@ class LinkAnonymousContactStateTests : TestsWithMocks() {
 
         linkAnonymousContactState.active()
 
-        verifyWithSuspend {
+        verifySuspend {
             repeat(0) {
                 mockContactClient.unlinkContact()
             }
@@ -82,7 +83,7 @@ class LinkAnonymousContactStateTests : TestsWithMocks() {
 
         linkAnonymousContactState.active()
 
-        verifyWithSuspend {
+        verifySuspend {
             repeat(0) {
                 mockContactClient.unlinkContact()
             }
@@ -96,7 +97,7 @@ class LinkAnonymousContactStateTests : TestsWithMocks() {
 
         linkAnonymousContactState.active()
 
-        verifyWithSuspend {
+        verifySuspend {
             repeat(0) {
                 mockContactClient.unlinkContact()
             }
@@ -110,7 +111,7 @@ class LinkAnonymousContactStateTests : TestsWithMocks() {
 
         linkAnonymousContactState.active()
 
-        verifyWithSuspend {
+        verifySuspend {
             repeat(0) {
                 mockContactClient.unlinkContact()
             }
@@ -124,7 +125,7 @@ class LinkAnonymousContactStateTests : TestsWithMocks() {
 
         linkAnonymousContactState.active()
 
-        verifyWithSuspend {
+        verifySuspend {
             repeat(0) {
                 mockContactClient.unlinkContact()
             }
@@ -133,11 +134,11 @@ class LinkAnonymousContactStateTests : TestsWithMocks() {
 
     @Test
     fun testActive_when_noContactDataIsAvailable_should_callContactClient() = runTest {
-        everySuspending { mockContactClient.unlinkContact() } returns testResponse
+        everySuspend { mockContactClient.unlinkContact() } returns testResponse
 
         linkAnonymousContactState.active()
 
-        verifyWithSuspend {
+        verifySuspend {
             mockContactClient.unlinkContact()
         }
     }

@@ -1,31 +1,35 @@
 package com.emarsys.core.collections
 
 import com.emarsys.core.storage.StorageApi
+import dev.mokkery.answering.returns
+import dev.mokkery.every
+import dev.mokkery.matcher.any
+import dev.mokkery.matcher.eq
+import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.serializer
-import org.kodein.mock.Mock
-import org.kodein.mock.tests.TestsWithMocks
+
 import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class PersistentListTests: TestsWithMocks() {
-
+class PersistentListTests {
     companion object {
-        const val testId = "testId"
+        const val TEST_ID = "testId"
     }
 
-    override fun setUpMocks() = injectMocks(mocker)
-
-    @Mock
-    lateinit var mockStorage: StorageApi
-
+    private lateinit var mockStorage: StorageApi
     private var storedList = mutableListOf("value1", "value2", "value3")
+    private lateinit var persistentList: PersistentList<String>
 
-    private val persistentList: PersistentList<String> by withMocks {
-        every { mockStorage.get(isEqual(testId), isAny<KSerializer<Any>>()) } returns storedList
-        PersistentList(testId, mockStorage, String.serializer())
+    @BeforeTest
+    fun setUp() {
+        mockStorage = mock()
+        every { mockStorage.get(eq(TEST_ID), any<KSerializer<Any>>()) } returns storedList
+
+        persistentList = PersistentList(TEST_ID, mockStorage, String.serializer())
     }
 
     @AfterTest
@@ -58,6 +62,7 @@ class PersistentListTests: TestsWithMocks() {
         persistentList.size shouldBe 6
         result shouldBe true
     }
+
     @Test
     fun testAddAllIndex() = runTest {
         val elements = listOf("value4", "value5", "value6")
@@ -102,7 +107,8 @@ class PersistentListTests: TestsWithMocks() {
 
     @Test
     fun testIsEmpty() = runTest {
-        teachStorage(emptyList()
+        teachStorage(
+            emptyList()
         )
         var result = persistentList.isEmpty()
 
@@ -267,10 +273,11 @@ class PersistentListTests: TestsWithMocks() {
         val value1 = "otherValue1"
         val value2 = "otherValue2"
         val elements = listOf(value1, value2)
-        every { mockStorage.get(isEqual("testId2"), isAny<KSerializer<Any>>()) } returns elements
-        every { mockStorage.put(isEqual("testId2"),  isAny<KSerializer<Any>>(), isEqual(elements)) } returns Unit
+        every { mockStorage.get(eq("testId2"), any<KSerializer<Any>>()) } returns elements
+        every { mockStorage.put(eq("testId2"), any<KSerializer<Any>>(), eq(elements)) } returns Unit
 
-        val persistentList2 = persistentListOf("testId2", mockStorage, String.serializer(), value1, value2)
+        val persistentList2 =
+            persistentListOf("testId2", mockStorage, String.serializer(), value1, value2)
 
         persistentList2.size shouldBe 2
         persistentList2[0] shouldBe value1
@@ -280,8 +287,8 @@ class PersistentListTests: TestsWithMocks() {
     @Test
     fun testSecondaryConstructorWithEmptyVararg() = runTest {
         val elements = listOf<String>()
-        every { mockStorage.get(isEqual("testId2"), isAny<KSerializer<Any>>()) } returns elements
-        every { mockStorage.put(isEqual("testId2"),  isAny<KSerializer<Any>>(), isEqual(elements)) } returns Unit
+        every { mockStorage.get(eq("testId2"), any<KSerializer<Any>>()) } returns elements
+        every { mockStorage.put(eq("testId2"), any<KSerializer<Any>>(), eq(elements)) } returns Unit
 
         val persistentList2 = persistentListOf("testId2", mockStorage, String.serializer())
 
@@ -289,7 +296,7 @@ class PersistentListTests: TestsWithMocks() {
     }
 
     private fun teachStorage(elements: List<String>) {
-        every { mockStorage.put(isEqual(testId),  isAny<KSerializer<Any>>(), isEqual(elements)) } returns Unit
+        every { mockStorage.put(eq(TEST_ID), any<KSerializer<Any>>(), eq(elements)) } returns Unit
     }
 
 }
