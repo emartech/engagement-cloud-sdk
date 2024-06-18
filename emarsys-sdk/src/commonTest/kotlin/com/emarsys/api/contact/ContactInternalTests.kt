@@ -7,6 +7,7 @@ import com.emarsys.networking.clients.contact.ContactClientApi
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
+import dev.mokkery.resetAnswers
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import io.ktor.http.HttpMethod
@@ -14,6 +15,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import io.ktor.http.headersOf
 import kotlinx.coroutines.test.runTest
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -54,6 +56,11 @@ class ContactInternalTests  {
         mockContactClient = mock()
         contactContext = ContactContext(calls)
         contactInternal = ContactInternal(mockContactClient, contactContext)
+    }
+
+    @AfterTest
+    fun tearDown() {
+        resetAnswers(mockContactClient)
     }
 
     @Test
@@ -104,7 +111,7 @@ class ContactInternalTests  {
     @Test
     fun testActivate_should_send_calls_to_client() = runTest {
         everySuspend {
-            mockContactClient.linkContact(linkContact.contactFieldId, linkContact.contactFieldValue)
+            mockContactClient.linkContact(linkContact.contactFieldId, linkContact.contactFieldValue, null)
         } returns testResponse
 
         everySuspend {
@@ -124,7 +131,8 @@ class ContactInternalTests  {
         verifySuspend {
             mockContactClient.linkContact(
                 linkContact.contactFieldId,
-                linkContact.contactFieldValue
+                linkContact.contactFieldValue,
+                null
             )
             mockContactClient.linkContact(
                 linkAuthenticatedContact.contactFieldId,

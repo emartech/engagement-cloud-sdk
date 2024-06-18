@@ -26,7 +26,7 @@ class ContactInternal(
     override suspend fun activate() {
         contactContext.calls.dequeue {
             when(it) {
-                is LinkContact -> contactClient.linkContact(it.contactFieldId, it.contactFieldValue)
+                is LinkContact -> contactClient.linkContact(it.contactFieldId, it.contactFieldValue, null)
                 is LinkAuthenticatedContact -> contactClient.linkContact(it.contactFieldId, null, it.openIdToken)
                 is UnlinkContact -> contactClient.unlinkContact()
             }

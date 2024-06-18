@@ -16,7 +16,6 @@ group = "com.emarsys"
 version = "1.0-SNAPSHOT"
 
 kotlin {
-    //explicitApi()
     jvmToolchain(17)
     androidTarget()
 
@@ -35,16 +34,16 @@ kotlin {
         }
     }
 
-//    listOf(
-//        iosX64(),
-//        iosArm64(),
-//        iosSimulatorArm64()
-//    ).forEach { iosTarget ->
-//        iosTarget.binaries.framework {
-//            baseName = "shared"
-//            isStatic = true
-//        }
-//    }
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { iosTarget ->
+        iosTarget.binaries.framework {
+            baseName = "shared"
+            isStatic = true
+        }
+    }
 
     sourceSets {
         val commonMain by getting {
@@ -97,14 +96,17 @@ kotlin {
                 implementation(libs.kotlinx.coroutines.test)
             }
         }
-//        val iosMain by creating {
-//
-//        }
-//        val iosTest by creating {
-//            dependencies {
-//                implementation(kotlin("test"))
-//            }
-//        }
+        iosMain {
+            dependencies {
+                implementation(libs.ktor.client.apple)
+                implementation(libs.cryptography.provider.apple)
+            }
+        }
+        iosTest {
+            dependencies {
+                implementation(kotlin("test"))
+            }
+        }
         val jsMain by getting {
             dependencies {
                 implementation(libs.ktor.client.js)

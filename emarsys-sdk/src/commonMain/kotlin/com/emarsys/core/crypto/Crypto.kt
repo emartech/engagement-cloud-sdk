@@ -37,6 +37,10 @@ class Crypto(
             KotlinPlatform.Android -> {
                 ECDSA.SignatureFormat.DER to signatureStr.decodeBase64Bytes()
             }
+
+            KotlinPlatform.IOS -> {
+                ECDSA.SignatureFormat.DER to signatureStr.decodeBase64Bytes()
+            }
         }
 
         return decodedKey.signatureVerifier(SHA256, format)
