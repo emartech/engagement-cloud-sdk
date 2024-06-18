@@ -23,7 +23,9 @@ class PushMessageBroadcastReceiverTest {
     private companion object {
         const val TITLE = "testTitle"
         const val BODY = "testBody"
+        const val MESSAGE_ID = "testMessageId"
         val PUSH_MESSAGE_STRING = """{
+        "messageId":"testMessageId",
         "title": "testTitle",
         "body": "testBody"
         }""".trimIndent()
@@ -59,6 +61,7 @@ class PushMessageBroadcastReceiverTest {
     @Test
     fun testOnReceive_shouldGetPushMessageFromIntentAndPresent() = runTest {
         val expectedPushMessage = PushMessage(
+            MESSAGE_ID,
             TITLE,
             BODY,
             null,

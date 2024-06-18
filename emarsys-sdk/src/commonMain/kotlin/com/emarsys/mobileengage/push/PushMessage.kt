@@ -6,6 +6,7 @@ import kotlinx.serialization.json.JsonObject
 
 @Serializable
 data class PushMessage(
+    val messageId: String,
     val title: String,
     val body: String,
     val iconUrlString: String? = null,
@@ -17,11 +18,13 @@ data class PushMessage(
 data class PushData(
     val silent: Boolean = false,
     val sid: String,
+    val campaignId: String,
     val platformContext: JsonObject? = null,
     val defaultAction: ActionModel? = null,
     val actions: List<ActionModel>? = null,
     val inApp: InApp? = null,
-    val rootParams: JsonObject? = null
+    val rootParams: JsonObject? = null,
+    val u: JsonObject? = null
 )
 
 @Serializable
