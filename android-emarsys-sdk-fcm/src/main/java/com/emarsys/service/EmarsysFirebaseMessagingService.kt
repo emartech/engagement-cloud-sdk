@@ -46,7 +46,7 @@ class EmarsysFirebaseMessagingService : FirebaseMessagingService() {
             action = PUSH_MESSAGE_PAYLOAD_INTENT_FILTER_ACTION
             putExtra(
                 PUSH_MESSAGE_PAYLOAD_INTENT_KEY,
-                FirebaseRemoteMessageMapper.map(remoteMessage).toString()
+                FirebaseRemoteMessageMapper.map(remoteMessage.data).toString()
             )
         }
         application?.sendBroadcast(intent)

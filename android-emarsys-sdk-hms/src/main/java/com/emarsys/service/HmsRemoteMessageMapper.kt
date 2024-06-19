@@ -1,10 +1,14 @@
 package com.emarsys.service
 
+import com.emarsys.service.model.NotificationOperation
+import com.emarsys.service.provider.UuidStringProvider
 import org.json.JSONObject
 
 object HmsRemoteMessageMapper {
+    private val uuidStringProvider = UuidStringProvider()
+
     private const val MISSING_MESSAGE_ID = "Missing messageId"
-    private const val EMPTY_JSON = "{}"
+    private const val EMPTY_JSON_STRING = "{}"
     private const val MISSING_SID = "Missing sid"
 
     fun map(remoteMessageContent: Map<String, String>): JSONObject {
@@ -18,7 +22,7 @@ object HmsRemoteMessageMapper {
         val imageUrlString = messageContentCopy.remove("image_url")
         val channelId = messageContentCopy.remove("channel_id")
 
-        val u = messageContentCopy.remove("u") ?: EMPTY_JSON
+        val u = messageContentCopy.remove("u") ?: EMPTY_JSON_STRING
         val sid = JSONObject(u).getNullableString("sid") ?: MISSING_SID
 
         val emsPayload = messageContentCopy.remove("ems")?.let { JSONObject(it) } ?: JSONObject()
@@ -28,25 +32,26 @@ object HmsRemoteMessageMapper {
         val actions = emsPayload.getNullableString("actions")
         val inapp = emsPayload.getNullableString("inapp")
         val style = emsPayload.getNullableString("style")
-        val notificationMethod = emsPayload.getNullableString("notificationMethod")
+        val notificationMethod =
+            parseNotificationMethod(emsPayload.getNullableString("notificationMethod"))
 
         val platformContext = JSONObject()
             .put("channelId", channelId)
+            .put("notificationMethod", notificationMethod)
 
         style?.let { platformContext.put("style", it) }
-        notificationMethod?.let { platformContext.put("notificationMethod", it) }
 
         val data = JSONObject()
             .put("silent", silent)
             .put("sid", sid)
             .put("campaignId", campaignId)
             .put("platformContext", platformContext)
-            .put("rootParams", messageContentCopy)
+            .put("rootParams", JSONObject(messageContentCopy.toMap()))
             .put("u", u)
 
-         defaultAction?.let { data.put("defaultAction", it)}
-         actions?.let { data.put("actions", it)}
-         inapp?.let { data.put("inapp", it)}
+        defaultAction?.let { data.put("defaultAction", it) }
+        actions?.let { data.put("actions", it) }
+        inapp?.let { data.put("inapp", it) }
 
         remoteMessagePayload
             .put("messageId", messageId)
@@ -57,6 +62,17 @@ object HmsRemoteMessageMapper {
             .put("data", data)
 
         return remoteMessagePayload
+    }
+
+    private fun parseNotificationMethod(payload: String?): JSONObject {
+        val json = payload?.let { JSONObject(it) } ?: JSONObject()
+        val collapseId = json.getNullableString("collapseId") ?: uuidStringProvider.provide()
+        val operation = json.getNullableString("operation")?.uppercase()
+            ?: NotificationOperation.INIT.name.uppercase()
+
+        return JSONObject()
+            .put("collapseId", collapseId)
+            .put("operation", operation)
     }
 }
 
