@@ -21,6 +21,7 @@ import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.permission.AndroidPermissionHandler
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.provider.ApplicationVersionProvider
+import com.emarsys.core.providers.HardwareIdProvider
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.StringStorage
@@ -50,7 +51,7 @@ actual class PlatformDependencyCreator actual constructor(
     private val json: Json
 ) : DependencyCreator {
     private val platformContext: CommonPlatformContext = platformContext as CommonPlatformContext
-
+    private val storage = createStorage()
 
     private fun createLanguageProvider(): LanguageProvider {
         return AndroidLanguageProvider(Locale.getDefault())
@@ -65,12 +66,11 @@ actual class PlatformDependencyCreator actual constructor(
         timezoneProvider: Provider<String>
     ): DeviceInfoCollector {
         return DeviceInfoCollector(
-            uuidProvider,
             timezoneProvider,
             createLanguageProvider(),
             createApplicationVersionProvider(),
-            createStorage(),
-            true
+            true,
+            HardwareIdProvider(uuidProvider, storage)
         )
     }
 

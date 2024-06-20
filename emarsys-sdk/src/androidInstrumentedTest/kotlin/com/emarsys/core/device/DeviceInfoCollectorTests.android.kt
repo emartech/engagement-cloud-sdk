@@ -2,7 +2,6 @@ package com.emarsys.core.device
 
 import android.os.Build
 import com.emarsys.core.providers.Provider
-import com.emarsys.core.storage.TypedStorageApi
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -17,17 +16,14 @@ class DeviceInfoCollectorTests {
     private companion object {
         const val LANGUAGE = "en-US"
         const val APP_VERSION = "2.0"
-        const val GENERATED_ID = "test uuid"
-        const val STORED_ID = "stored hardware id"
+        const val HW_ID = "test uuid"
         const val TIMEZONE = "+0300"
-        val PUSH_SETTINGS = AndroidNotificationSettings(true, 1, listOf())
     }
 
     private lateinit var mockLanguageProvider: LanguageProvider
-    private lateinit var mockUuidProvider: Provider<String>
     private lateinit var mockTimezoneProvider: Provider<String>
-    private lateinit var mockStorage: TypedStorageApi<String?>
     private lateinit var mockApplicationVersionProvider: Provider<String>
+    private lateinit var mockHardwareIdProvider: Provider<String>
     private lateinit var deviceInfoCollector: DeviceInfoCollector
 
     @Before
@@ -41,32 +37,21 @@ class DeviceInfoCollectorTests {
         mockApplicationVersionProvider = mockk(relaxed = true)
         every { mockApplicationVersionProvider.provide() } returns APP_VERSION
 
-        mockStorage = mockk(relaxed = true)
-        every { mockStorage.get("hardwareId") } returns null
-
-        mockUuidProvider = mockk(relaxed = true)
-        every { mockUuidProvider.provide() } returns GENERATED_ID
+        mockHardwareIdProvider = mockk(relaxed = true)
+        every { mockHardwareIdProvider.provide() } returns HW_ID
 
         deviceInfoCollector = DeviceInfoCollector(
-            mockUuidProvider,
             mockTimezoneProvider,
             mockLanguageProvider,
             mockApplicationVersionProvider,
-            mockStorage,
             true,
+            mockHardwareIdProvider,
         )
     }
 
     @Test
     fun getHardwareId_shouldReturnGenerateNewId_ifStorageReturnsNull() {
-        deviceInfoCollector.getHardwareId() shouldBe GENERATED_ID
-    }
-
-    @Test
-    fun getHardwareId_shouldReturnStoreValue_ifPresent() {
-        every { mockStorage.get("hardwareId") } returns STORED_ID
-
-        deviceInfoCollector.getHardwareId() shouldBe STORED_ID
+        deviceInfoCollector.getHardwareId() shouldBe HW_ID
     }
 
     @Test
@@ -90,12 +75,11 @@ class DeviceInfoCollectorTests {
     @Test
     fun collect_platformShouldBe_huawei() {
         val deviceInfoCollector = DeviceInfoCollector(
-            mockUuidProvider,
             mockTimezoneProvider,
             mockLanguageProvider,
             mockApplicationVersionProvider,
-            mockStorage,
-            false
+            false,
+            mockHardwareIdProvider
         )
 
         val result = deviceInfoCollector.collect()

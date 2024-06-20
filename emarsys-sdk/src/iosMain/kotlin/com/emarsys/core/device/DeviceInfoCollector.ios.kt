@@ -1,12 +1,15 @@
 package com.emarsys.core.device
 
-actual class DeviceInfoCollector : DeviceInfoCollectorApi {
+import com.emarsys.core.providers.HardwareIdProvider
+
+actual class DeviceInfoCollector(private val hardwareIdProvider: HardwareIdProvider) :
+    DeviceInfoCollectorApi {
     actual override fun collect(): String {
         TODO("Not yet implemented")
     }
 
     actual override fun getHardwareId(): String {
-        TODO("Not yet implemented")
+        return hardwareIdProvider.provide()
     }
 
     actual override fun getPushSettings(): PushSettings {
