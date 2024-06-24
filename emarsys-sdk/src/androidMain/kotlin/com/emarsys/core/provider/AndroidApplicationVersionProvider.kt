@@ -4,7 +4,7 @@ import android.content.Context
 import com.emarsys.core.device.UNKNOWN_VERSION_NAME
 import com.emarsys.core.providers.Provider
 
-class ApplicationVersionProvider(private val context: Context): Provider<String> {
+class AndroidApplicationVersionProvider(private val context: Context): Provider<String> {
     override fun provide(): String {
         return try {
             context.packageManager.getPackageInfo(context.packageName, 0).versionName

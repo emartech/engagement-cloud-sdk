@@ -15,12 +15,11 @@ import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.device.AndroidLanguageProvider
 import com.emarsys.core.device.AndroidPlatformInfoCollector
 import com.emarsys.core.device.DeviceInfoCollector
-import com.emarsys.core.device.LanguageProvider
 import com.emarsys.core.log.Logger
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.permission.AndroidPermissionHandler
 import com.emarsys.core.permission.PermissionHandlerApi
-import com.emarsys.core.provider.ApplicationVersionProvider
+import com.emarsys.core.provider.AndroidApplicationVersionProvider
 import com.emarsys.core.providers.HardwareIdProvider
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.state.State
@@ -47,13 +46,14 @@ import java.util.Locale
 
 actual class PlatformDependencyCreator actual constructor(
     platformContext: PlatformContext,
+    private val uuidProvider: Provider<String>,
     private val sdkLogger: Logger,
     private val json: Json
 ) : DependencyCreator {
     private val platformContext: CommonPlatformContext = platformContext as CommonPlatformContext
     private val storage = createStorage()
 
-    private fun createLanguageProvider(): LanguageProvider {
+    actual override fun createLanguageProvider(): Provider<String> {
         return AndroidLanguageProvider(Locale.getDefault())
     }
 
@@ -62,7 +62,6 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createDeviceInfoCollector(
-        uuidProvider: Provider<String>,
         timezoneProvider: Provider<String>
     ): DeviceInfoCollector {
         return DeviceInfoCollector(
@@ -70,12 +69,13 @@ actual class PlatformDependencyCreator actual constructor(
             createLanguageProvider(),
             createApplicationVersionProvider(),
             true,
-            HardwareIdProvider(uuidProvider, storage)
+            HardwareIdProvider(uuidProvider, storage),
+            json
         )
     }
 
-    private fun createApplicationVersionProvider(): Provider<String> {
-        return ApplicationVersionProvider(applicationContext)
+    actual override fun createApplicationVersionProvider(): Provider<String> {
+        return AndroidApplicationVersionProvider(applicationContext)
     }
 
     actual override fun createPlatformInitState(

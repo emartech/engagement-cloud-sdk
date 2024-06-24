@@ -19,11 +19,15 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.serialization.json.Json
 
 
-expect class PlatformDependencyCreator(platformContext: PlatformContext, sdkLogger: Logger, json: Json): DependencyCreator {
+expect class PlatformDependencyCreator(
+    platformContext: PlatformContext,
+    uuidProvider: Provider<String>,
+    sdkLogger: Logger,
+    json: Json
+) : DependencyCreator {
     override fun createStorage(): TypedStorageApi<String?>
 
     override fun createDeviceInfoCollector(
-        uuidProvider: Provider<String>,
         timezoneProvider: Provider<String>
     ): DeviceInfoCollector
 
@@ -39,7 +43,12 @@ expect class PlatformDependencyCreator(platformContext: PlatformContext, sdkLogg
     override fun createBadgeCountHandler(): BadgeCountHandlerApi
 
     override fun createExternalUrlOpener(): ExternalUrlOpenerApi
+
     override fun createConnectionWatchDog(sdkLogger: SdkLogger): ConnectionWatchDog
 
     override fun createLifeCycleWatchDog(): LifecycleWatchDog
+
+    override fun createApplicationVersionProvider(): Provider<String>
+
+    override fun createLanguageProvider(): Provider<String>
 }

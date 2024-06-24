@@ -151,8 +151,10 @@ class DependencyContainer : DependencyContainerApi {
         }
     }
 
+    override val uuidProvider: Provider<String> by lazy { UUIDProvider() }
+
     private val dependencyCreator: DependencyCreator =
-        PlatformDependencyCreator(platformContext, sdkLogger, json)
+        PlatformDependencyCreator(platformContext, uuidProvider, sdkLogger, json)
 
     private val stringStorage: TypedStorageApi<String?> by lazy { dependencyCreator.createStorage() }
 
@@ -188,13 +190,10 @@ class DependencyContainer : DependencyContainerApi {
 
     val storage: Storage by lazy { Storage(stringStorage, json) }
 
-    override val uuidProvider: Provider<String> by lazy { UUIDProvider() }
-
     override val timezoneProvider: Provider<String> by lazy { TimezoneProvider(timestampProvider) }
 
     private val deviceInfoCollector: DeviceInfoCollectorApi by lazy {
         dependencyCreator.createDeviceInfoCollector(
-            uuidProvider,
             timezoneProvider
         )
     }

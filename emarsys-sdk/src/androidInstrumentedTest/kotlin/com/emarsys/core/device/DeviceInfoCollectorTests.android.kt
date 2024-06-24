@@ -20,16 +20,17 @@ class DeviceInfoCollectorTests {
         const val TIMEZONE = "+0300"
     }
 
-    private lateinit var mockLanguageProvider: LanguageProvider
+    private lateinit var mockLanguageProvider: Provider<String>
     private lateinit var mockTimezoneProvider: Provider<String>
     private lateinit var mockApplicationVersionProvider: Provider<String>
     private lateinit var mockHardwareIdProvider: Provider<String>
     private lateinit var deviceInfoCollector: DeviceInfoCollector
+    private val json = Json
 
     @Before
     fun setup() {
         mockLanguageProvider = mockk(relaxed = true)
-        every { mockLanguageProvider.provideLanguage() } returns LANGUAGE
+        every { mockLanguageProvider.provide() } returns LANGUAGE
 
         mockTimezoneProvider = mockk(relaxed = true)
         every { mockTimezoneProvider.provide() } returns TIMEZONE
@@ -46,6 +47,7 @@ class DeviceInfoCollectorTests {
             mockApplicationVersionProvider,
             true,
             mockHardwareIdProvider,
+            json
         )
     }
 
@@ -69,7 +71,7 @@ class DeviceInfoCollectorTests {
         val result = deviceInfoCollector.collect()
 
         result shouldBe Json.encodeToString(expectedDeviceInfo)
-        verify { mockLanguageProvider.provideLanguage() }
+        verify { mockLanguageProvider.provide() }
     }
 
     @Test
@@ -79,7 +81,8 @@ class DeviceInfoCollectorTests {
             mockLanguageProvider,
             mockApplicationVersionProvider,
             false,
-            mockHardwareIdProvider
+            mockHardwareIdProvider,
+            json
         )
 
         val result = deviceInfoCollector.collect()

@@ -20,7 +20,6 @@ interface DependencyCreator {
     fun createStorage(): TypedStorageApi<String?>
 
     fun createDeviceInfoCollector(
-        uuidProvider: Provider<String>,
         timezoneProvider: Provider<String>
     ): DeviceInfoCollector
 
@@ -40,4 +39,7 @@ interface DependencyCreator {
 
     fun createLifeCycleWatchDog(): LifecycleWatchDog
 
+    fun createApplicationVersionProvider(): Provider<String>
+
+    fun createLanguageProvider(): Provider<String>
 }

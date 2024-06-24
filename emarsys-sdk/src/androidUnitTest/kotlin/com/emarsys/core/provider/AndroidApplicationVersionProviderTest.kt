@@ -12,14 +12,14 @@ import org.junit.Test
 import kotlin.test.BeforeTest
 
 
-class ApplicationVersionProviderTest {
+class AndroidApplicationVersionProviderTest {
     private companion object {
         const val APP_VERSION = "2.0.0"
         const val PACKAGE_NAME = "packageName"
     }
 
     private lateinit var mockContext: Context
-    private lateinit var appVersionProvider: ApplicationVersionProvider
+    private lateinit var appVersionProvider: AndroidApplicationVersionProvider
 
     @BeforeTest
     fun setup() {
@@ -35,7 +35,7 @@ class ApplicationVersionProviderTest {
         val applicationInfo = ApplicationInfo().apply { flags = 0 }
         every { mockContext.applicationInfo } returns applicationInfo
 
-        appVersionProvider = ApplicationVersionProvider(mockContext)
+        appVersionProvider = AndroidApplicationVersionProvider(mockContext)
     }
 
     @Test

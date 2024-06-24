@@ -11,7 +11,9 @@ actual class DeviceInfoCollector(
     private val timezoneProvider: Provider<String>,
     private val webPlatformInfoCollector: WebPlatformInfoCollectorApi,
     private val storage: TypedStorageApi<String?>,
-    private val applicationVersionProvider: Provider<String>
+    private val applicationVersionProvider: Provider<String>,
+    private val languageProvider: Provider<String>,
+    private val json: Json
 ) : DeviceInfoCollectorApi {
     private companion object {
         const val HARDWARE_ID_STORAGE_KEY = "hardwareId"
@@ -19,14 +21,14 @@ actual class DeviceInfoCollector(
 
     actual override fun collect(): String {
         val headerData = webPlatformInfoCollector.collect()
-        return Json.encodeToString(
+        return json.encodeToString(
             DeviceInfo(
                 platform = headerData.browserName,
                 applicationVersion = applicationVersionProvider.provide(),
                 deviceModel = window.navigator.userAgent,
                 osVersion = headerData.browserVersion,
                 sdkVersion = BuildConfig.VERSION_NAME,
-                languageCode = window.navigator.language,
+                languageCode = languageProvider.provide(),
                 timezone = timezoneProvider.provide()
             )
         )

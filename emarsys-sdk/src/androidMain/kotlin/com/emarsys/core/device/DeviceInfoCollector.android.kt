@@ -7,10 +7,11 @@ import kotlinx.serialization.json.Json
 
 actual class DeviceInfoCollector(
     private val timezoneProvider: Provider<String>,
-    private val languageProvider: LanguageProvider,
+    private val languageProvider: Provider<String>,
     private val applicationVersionProvider: Provider<String>,
     private val isGooglePlayServicesAvailable: Boolean,
-    private val hardwareIdProvider: Provider<String>
+    private val hardwareIdProvider: Provider<String>,
+    private val json: Json
 ) : DeviceInfoCollectorApi {
 
     actual override fun collect(): String {
@@ -20,11 +21,11 @@ actual class DeviceInfoCollector(
             deviceModel = Build.MODEL,
             osVersion = SdkBuildConfig.getOsVersion(),
             sdkVersion = BuildConfig.VERSION_NAME,
-            languageCode = languageProvider.provideLanguage(),
+            languageCode = languageProvider.provide(),
             timezone = timezoneProvider.provide()
         )
 
-        return Json.encodeToString(deviceInfo)
+        return json.encodeToString(deviceInfo)
     }
 
     actual override fun getHardwareId(): String {

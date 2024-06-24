@@ -11,6 +11,7 @@ import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.permission.WebPermissionHandler
 import com.emarsys.core.provider.ApplicationVersionProvider
+import com.emarsys.core.provider.WebLanguageProvider
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.StringStorage
@@ -35,7 +36,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.json.Json
 import web.dom.document
 
-actual class PlatformDependencyCreator actual constructor(platformContext: PlatformContext, sdkLogger: Logger, json: Json) :
+actual class PlatformDependencyCreator actual constructor(
+    platformContext: PlatformContext,
+    private val uuidProvider: Provider<String>,
+    sdkLogger: Logger,
+    private val json: Json
+) :
     DependencyCreator {
 
     private val platformContext: CommonPlatformContext = platformContext as CommonPlatformContext
@@ -45,7 +51,6 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
     }
 
     actual override fun createDeviceInfoCollector(
-        uuidProvider: Provider<String>,
         timezoneProvider: Provider<String>
     ): DeviceInfoCollector {
         return DeviceInfoCollector(
@@ -53,7 +58,7 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
             timezoneProvider,
             createWebDeviceInfoCollector(),
             createStorage(),
-            createApplicationVersionProvider(),
+            createApplicationVersionProvider(),createLanguageProvider(), json,
         )
     }
 
@@ -64,7 +69,13 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
         actionFactory: ActionFactoryApi<ActionModel>
     ): State {
         val pushPresenter = PushMessagePresenter(pushServiceContext, actionFactory, sdkDispatcher)
-        val pushService = PushService(pushServiceContext, pushApi, pushMessageMapper, pushPresenter, sdkDispatcher)
+        val pushService = PushService(
+            pushServiceContext,
+            pushApi,
+            pushMessageMapper,
+            pushPresenter,
+            sdkDispatcher
+        )
         return PlatformInitState(pushService, sdkContext)
     }
 
@@ -100,8 +111,12 @@ actual class PlatformDependencyCreator actual constructor(platformContext: Platf
         return WebPlatformInfoCollector(getNavigatorData())
     }
 
-    private fun createApplicationVersionProvider(): ApplicationVersionProvider {
+    actual override fun createApplicationVersionProvider(): Provider<String> {
         return ApplicationVersionProvider()
+    }
+
+    actual override fun createLanguageProvider(): Provider<String> {
+        return WebLanguageProvider()
     }
 
     private fun getNavigatorData(): String {
