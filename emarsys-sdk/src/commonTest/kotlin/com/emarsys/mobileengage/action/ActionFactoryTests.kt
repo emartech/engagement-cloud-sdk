@@ -13,18 +13,17 @@ import com.emarsys.mobileengage.action.actions.CustomEventAction
 import com.emarsys.mobileengage.action.actions.DismissAction
 import com.emarsys.mobileengage.action.actions.OpenExternalUrlAction
 import com.emarsys.mobileengage.action.models.ActionModel
-import com.emarsys.mobileengage.action.models.AppEventActionModel
 import com.emarsys.mobileengage.action.models.AskForPushPermissionActionModel
-import com.emarsys.mobileengage.action.models.BadgeCountActionModel
-import com.emarsys.mobileengage.action.models.CustomEventActionModel
-import com.emarsys.mobileengage.action.models.DismissActionModel
-import com.emarsys.mobileengage.action.models.OpenExternalUrlActionModel
+import com.emarsys.mobileengage.action.models.DefaultAppEventActionModel
+import com.emarsys.mobileengage.action.models.DefaultBadgeCountActionModel
+import com.emarsys.mobileengage.action.models.DefaultCustomEventActionModel
+import com.emarsys.mobileengage.action.models.DefaultDismissActionModel
+import com.emarsys.mobileengage.action.models.DefaultOpenExternalUrlActionModel
 import dev.mokkery.mock
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeTypeOf
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
-
 import kotlin.test.Test
 
 class ActionFactoryTests {
@@ -59,7 +58,7 @@ class ActionFactoryTests {
 
     @Test
     fun testCreate_withAppEventActionModel() = runTest {
-        val action = AppEventActionModel("type", "name", null)
+        val action = DefaultAppEventActionModel("name", null)
 
         val result = actionFactory.create(action)
 
@@ -69,7 +68,7 @@ class ActionFactoryTests {
 
     @Test
     fun testCreate_withCustomEventActionModel() = runTest {
-        val action = CustomEventActionModel("type", "name", null)
+        val action = DefaultCustomEventActionModel("name", null)
 
         val result = actionFactory.create(action)
 
@@ -79,7 +78,7 @@ class ActionFactoryTests {
 
     @Test
     fun testCreate_withAskForPushPermissionActionModel() = runTest {
-        val action = AskForPushPermissionActionModel("type")
+        val action = AskForPushPermissionActionModel
 
         val result = actionFactory.create(action)
 
@@ -89,7 +88,7 @@ class ActionFactoryTests {
 
     @Test
     fun testCreate_withBadgeCountActionModel() = runTest {
-        val action = BadgeCountActionModel("type", "method", 0)
+        val action = DefaultBadgeCountActionModel("method", 0)
 
         val result = actionFactory.create(action)
 
@@ -99,7 +98,7 @@ class ActionFactoryTests {
 
     @Test
     fun testCreate_withDismissActionModel() = runTest {
-        val action = DismissActionModel("type", "testTopic")
+        val action = DefaultDismissActionModel("testTopic")
 
         val result = actionFactory.create(action)
 
@@ -109,7 +108,7 @@ class ActionFactoryTests {
 
     @Test
     fun testCreate_withOpenExternalUrlActionModel() = runTest {
-        val action = OpenExternalUrlActionModel("type", "url")
+        val action = DefaultOpenExternalUrlActionModel("url")
 
         val result = actionFactory.create(action)
 

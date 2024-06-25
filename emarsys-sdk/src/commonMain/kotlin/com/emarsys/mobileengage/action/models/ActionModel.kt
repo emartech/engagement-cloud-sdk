@@ -1,13 +1,22 @@
 package com.emarsys.mobileengage.action.models
 
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
 
+
+sealed interface ActionModel
+
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
-sealed class ActionModel {
-    abstract val type: String // TODO: this should not be here after mapping
+@JsonClassDiscriminator("type")
+sealed class DefaultActionModel: ActionModel
+
+@OptIn(ExperimentalSerializationApi::class)
+@Serializable
+@JsonClassDiscriminator("type")
+sealed class PresentableActionModel: ActionModel {
+    abstract val id: String
+    abstract val title: String
 }
 
-sealed interface InAppActionModel
-sealed interface PushActionModel
-sealed interface SilentPushActionModel
-sealed interface OnEventActionModel

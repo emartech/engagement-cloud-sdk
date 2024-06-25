@@ -1,9 +1,23 @@
 package com.emarsys.mobileengage.action.models
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Serializable
-data class OpenExternalUrlActionModel(
-    override val type: String,
+interface OpenExternalUrlActionModel {
     val url: String
-): ActionModel(), InAppActionModel, PushActionModel
+}
+
+@Serializable
+@SerialName("OpenExternalUrl")
+data class PresentableOpenExternalUrlActionModel(
+    override val id: String,
+    override val title: String,
+    override val url: String
+) : PresentableActionModel(), OpenExternalUrlActionModel
+
+
+@Serializable
+@SerialName("OpenExternalUrl")
+data class DefaultOpenExternalUrlActionModel(
+    override val url: String
+) : DefaultActionModel(), OpenExternalUrlActionModel

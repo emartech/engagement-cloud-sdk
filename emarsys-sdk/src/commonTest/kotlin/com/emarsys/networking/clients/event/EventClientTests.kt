@@ -9,7 +9,7 @@ import com.emarsys.core.session.SessionContext
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
-import com.emarsys.mobileengage.action.models.OnEventActionModel
+import com.emarsys.mobileengage.action.models.DefaultActionModel
 import com.emarsys.networking.clients.event.model.Event
 import com.emarsys.networking.clients.event.model.EventType
 import dev.mokkery.answering.returns
@@ -54,7 +54,7 @@ class EventClientTests {
 
     private lateinit var mockEmarsysClient: NetworkClientApi
     private lateinit var mockUrlFactory: UrlFactoryApi
-    private lateinit var mockOnEventActionFactory: ActionFactoryApi<OnEventActionModel>
+    private lateinit var mockOnEventActionFactory: ActionFactoryApi<DefaultActionModel>
     private lateinit var mockDeviceEventChannel: DeviceEventChannelApi
     private lateinit var mockInAppConfig: InAppConfig
     private lateinit var sdkDispatcher: CoroutineDispatcher

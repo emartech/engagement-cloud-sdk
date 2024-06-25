@@ -1,13 +1,16 @@
 package com.emarsys.mobileengage.push
 
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.core.app.NotificationCompat
 import com.emarsys.api.push.PushConstants.PUSH_NOTIFICATION_ICON_NAME
 import com.emarsys.applicationContext
 import com.emarsys.mobileengage.push.model.AndroidPlatformData
 import com.emarsys.mobileengage.push.model.AndroidPushMessage
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class PushMessagePresenter(
@@ -26,6 +29,29 @@ class PushMessagePresenter(
                 .setContentText(pushMessage.body)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setSmallIcon(iconId)
+
+            pushMessage.data?.actions?.forEach { actionModel ->
+                val intent = Intent(context, NotificationOpenedActivity::class.java)
+                intent.action = actionModel.id
+                intent.putExtra(
+                    "payload",
+                    json.encodeToString(AndroidPushMessage.serializer(), pushMessage)
+                )
+                intent.putExtra(
+                    "action",
+                    json.encodeToString(actionModel)
+                )
+
+                notificationBuilder.addAction(
+                    0,
+                    actionModel.title, PendingIntent.getActivity(
+                        context,
+                        (System.currentTimeMillis() % Int.MAX_VALUE).toInt(),
+                        intent,
+                        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                    )
+                )
+            }
 
             notificationManager.notify(123, notificationBuilder.build())
         }

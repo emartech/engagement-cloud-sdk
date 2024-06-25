@@ -1,8 +1,8 @@
 package com.emarsys.mobileengage.action.models
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class AskForPushPermissionActionModel(
-    override val type: String
-): ActionModel(), InAppActionModel
+@SerialName("RequestPushPermission")
+data object AskForPushPermissionActionModel : DefaultActionModel()

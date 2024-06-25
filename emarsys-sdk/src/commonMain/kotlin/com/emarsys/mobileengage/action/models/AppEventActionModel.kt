@@ -1,10 +1,25 @@
 package com.emarsys.mobileengage.action.models
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Serializable
-data class AppEventActionModel(
-    override val type: String,
-    val name: String,
+interface AppEventActionModel {
+    val name: String
     val payload: Map<String, String>?
-): ActionModel(), OnEventActionModel, SilentPushActionModel, InAppActionModel, PushActionModel
+}
+
+@Serializable
+@SerialName("MEAppEvent")
+data class PresentableAppEventActionModel(
+    override val id: String,
+    override val title: String,
+    override val name: String,
+    override val payload: Map<String, String>?,
+):  PresentableActionModel(), AppEventActionModel
+
+@Serializable
+@SerialName("MEAppEvent")
+data class DefaultAppEventActionModel(
+    override val name: String,
+    override val payload: Map<String, String>?,
+): DefaultActionModel(), AppEventActionModel

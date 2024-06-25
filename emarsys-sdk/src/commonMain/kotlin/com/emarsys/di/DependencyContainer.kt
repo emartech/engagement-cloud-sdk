@@ -95,7 +95,7 @@ import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.mobileengage.action.ActionFactory
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
-import com.emarsys.mobileengage.action.models.OnEventActionModel
+import com.emarsys.mobileengage.action.models.DefaultActionModel
 import com.emarsys.mobileengage.session.MobileEngageSession
 import com.emarsys.mobileengage.session.Session
 import com.emarsys.networking.EmarsysClient
@@ -177,7 +177,7 @@ class DependencyContainer : DependencyContainerApi {
         )
     }
 
-    private val onEventActionFactory: ActionFactoryApi<OnEventActionModel> by lazy {
+    private val onEventActionFactory: ActionFactoryApi<DefaultActionModel> by lazy {
         ActionFactory(
             onEventActionInternal,
             deviceEventChannel,

@@ -1,9 +1,22 @@
 package com.emarsys.mobileengage.action.models
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+interface DismissActionModel {
+    var topic: String?
+}
+
 @Serializable
-data class DismissActionModel(
-    override val type: String,
-    var topic: String? = null,
-): ActionModel(), InAppActionModel, PushActionModel
+@SerialName("Dismiss")
+data class PresentableDismissActionModel(
+    override val id: String,
+    override val title: String,
+    override var topic: String? = null
+) : PresentableActionModel(), DismissActionModel
+
+@Serializable
+@SerialName("Dismiss")
+data class DefaultDismissActionModel(
+    override var topic: String? = null
+) : DefaultActionModel(), DismissActionModel
