@@ -6,15 +6,17 @@ import android.content.pm.PackageManager
 import androidx.core.app.NotificationCompat
 import com.emarsys.api.push.PushConstants.PUSH_NOTIFICATION_ICON_NAME
 import com.emarsys.applicationContext
+import com.emarsys.mobileengage.push.model.AndroidPlatformData
+import com.emarsys.mobileengage.push.model.AndroidPushMessage
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.decodeFromJsonElement
 
 class PushMessagePresenter(
     private val context: Context,
     private val json: Json,
-    private val notificationManager: NotificationManager
-) : PushPresenter {
-    override suspend fun present(pushMessage: PushMessage) {
+    private val notificationManager: NotificationManager,
+) : PushPresenter<AndroidPlatformData, AndroidPushMessage> {
+
+    override suspend fun present(pushMessage: AndroidPushMessage) {
         val iconId = getIconId()
         val channelId = extractChannelId(pushMessage)
 
@@ -29,11 +31,8 @@ class PushMessagePresenter(
         }
     }
 
-    private fun extractChannelId(pushMessage: PushMessage): String? {
-        return pushMessage.data?.platformContext?.let {
-            val platformContext = json.decodeFromJsonElement<Map<String, String>>(it)
-            platformContext.getOrDefault("channelId", null)
-        }
+    private fun extractChannelId(pushMessage: AndroidPushMessage): String? {
+        return pushMessage.data?.platformData?.channelId
     }
 
     private fun getIconId(): Int {

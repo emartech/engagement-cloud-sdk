@@ -1,5 +1,5 @@
 package com.emarsys.mobileengage.push
 
-interface PushPresenter {
-    suspend fun present(pushMessage: PushMessage)
+interface PushPresenter<U : PlatformData, T : PushMessage<U>> {
+    suspend fun present(pushMessage: T)
 }

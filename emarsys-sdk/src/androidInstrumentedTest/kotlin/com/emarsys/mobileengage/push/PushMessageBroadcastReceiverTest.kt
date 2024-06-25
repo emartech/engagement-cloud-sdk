@@ -3,6 +3,8 @@ package com.emarsys.mobileengage.push
 import android.content.Intent
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.emarsys.core.log.Logger
+import com.emarsys.mobileengage.push.model.AndroidPlatformData
+import com.emarsys.mobileengage.push.model.AndroidPushMessage
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.CoroutineDispatcher
@@ -32,7 +34,7 @@ class PushMessageBroadcastReceiverTest {
     }
 
     private val context = getInstrumentation().targetContext
-    private lateinit var mockPresenter: PushPresenter
+    private lateinit var mockPresenter: PushPresenter<AndroidPlatformData, AndroidPushMessage>
     private lateinit var mockLogger: Logger
     private lateinit var sdkDispatcher: CoroutineDispatcher
     private lateinit var json: Json
@@ -47,7 +49,6 @@ class PushMessageBroadcastReceiverTest {
         json = Json {
             ignoreUnknownKeys = true
             encodeDefaults = true
-
         }
         broadcastReceiver =
             PushMessageBroadcastReceiver(mockPresenter, sdkDispatcher, mockLogger, json)
@@ -60,7 +61,7 @@ class PushMessageBroadcastReceiverTest {
 
     @Test
     fun testOnReceive_shouldGetPushMessageFromIntentAndPresent() = runTest {
-        val expectedPushMessage = PushMessage(
+        val expectedPushMessage = AndroidPushMessage(
             MESSAGE_ID,
             TITLE,
             BODY,

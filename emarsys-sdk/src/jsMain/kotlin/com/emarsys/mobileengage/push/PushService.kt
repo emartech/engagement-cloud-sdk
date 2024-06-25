@@ -2,6 +2,8 @@ package com.emarsys.mobileengage.push
 
 import com.emarsys.EmarsysConfig
 import com.emarsys.api.push.PushInternalApi
+import com.emarsys.mobileengage.push.model.JsPlatformData
+import com.emarsys.mobileengage.push.model.JsPushMessage
 import js.buffer.BufferSource
 import js.promise.await
 import js.typedarrays.Uint8Array
@@ -21,7 +23,7 @@ class PushService(
     private val pushServiceContext: PushServiceContext,
     private val pushApi: PushInternalApi,
     private val pushMessageMapper: PushMessageMapper,
-    private val pushPresenter: PushPresenter,
+    private val pushPresenter: PushPresenter<JsPlatformData, JsPushMessage>,
     private val sdkDispatcher: CoroutineDispatcher
 ) {
 
@@ -48,7 +50,8 @@ class PushService(
     private suspend fun subscribeForPushReceiving(config: EmarsysConfig) {
         try {
             val serviceWorkerPath = "/ems-service-worker.js" // TODO: config.serviceWorkerPath
-            pushServiceContext.registration = navigator.serviceWorker.register(serviceWorkerPath).await()
+            pushServiceContext.registration =
+                navigator.serviceWorker.register(serviceWorkerPath).await()
             val options = createPushSubscriptionOptions(config)
             navigator.serviceWorker.ready.await()
             val pushToken = pushServiceContext.registration.pushManager.subscribe(options).await()
@@ -59,7 +62,8 @@ class PushService(
     }
 
     private fun createPushSubscriptionOptions(config: EmarsysConfig): PushSubscriptionOptionsInit {
-        val applicationServerKey = "BDa49_IiPdIo2Kda5cATItp81sOaYg-eFFISMdlSXatDAIZCdtAxUuMVzXo4M2MXXI0sUYQzQI7shyNkKgwyD_I" // TODO: config.applicationServerKey
+        val applicationServerKey =
+            "BDa49_IiPdIo2Kda5cATItp81sOaYg-eFFISMdlSXatDAIZCdtAxUuMVzXo4M2MXXI0sUYQzQI7shyNkKgwyD_I" // TODO: config.applicationServerKey
         return js("{}").unsafeCast<PushSubscriptionOptionsInit>().apply {
             this.applicationServerKey = urlBase64ToUint8Array(applicationServerKey)
             this.userVisibleOnly = true
