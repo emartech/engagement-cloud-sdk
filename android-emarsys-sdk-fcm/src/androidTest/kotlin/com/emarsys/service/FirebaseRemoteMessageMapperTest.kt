@@ -52,7 +52,7 @@ class FirebaseRemoteMessageMapperTest {
         val result = FirebaseRemoteMessageMapper.map(testRemoteMessageContent)
         val resultData: JSONObject = result.get("data") as JSONObject
 
-        resultData.get("u") shouldBe """{"testKey":"testValue"}"""
+        resultData.get("u") shouldBeEqualUsingFields JSONObject("""{"testKey":"testValue"}""")
     }
 
     @Test
@@ -108,7 +108,8 @@ class FirebaseRemoteMessageMapperTest {
 
     @Test
     fun map_shouldAdd_actions_fromMap() {
-        val actions = JSONArray("""[
+        val actions = JSONArray(
+            """[
          {
             "payload":{
                "key":"value"
@@ -126,7 +127,8 @@ class FirebaseRemoteMessageMapperTest {
             "title":"ExternalURL",
             "url":"https:\/\/www.emarsys.com"
          }
-         ]""".trimIndent()).toString()
+         ]""".trimIndent()
+        ).toString()
 
         val testRemoteMessageContent = mapOf(
             "ems.actions" to actions,
@@ -135,7 +137,8 @@ class FirebaseRemoteMessageMapperTest {
         val result = FirebaseRemoteMessageMapper.map(testRemoteMessageContent)
         val resultData: JSONObject = result.get("data") as JSONObject
 
-        resultData.get("actions") shouldBe JSONArray("""[
+        resultData.get("actions") shouldBeEqualUsingFields JSONArray(
+            """[
          {
             "payload":{
                "key":"value"
@@ -152,7 +155,8 @@ class FirebaseRemoteMessageMapperTest {
             "title":"ExternalURL",
             "url":"https:\/\/www.emarsys.com"
          }
-            ]""").toString()
+            ]"""
+        ).toString()
     }
 
     @Test
@@ -174,7 +178,7 @@ class FirebaseRemoteMessageMapperTest {
         val result = FirebaseRemoteMessageMapper.map(testRemoteMessageContent)
         val resultData: JSONObject = result.get("data") as JSONObject
 
-        resultData.get("inapp") shouldBe """{"campaign_id":"testCampaignId","url":"https:\/\/emarsys.hu"}"""
+        resultData.get("inapp") shouldBeEqualUsingFields JSONObject("""{"campaign_id":"testCampaignId","url":"https:\/\/emarsys.hu"}""")
     }
 
     @Test
@@ -210,10 +214,10 @@ class FirebaseRemoteMessageMapperTest {
 
         val result = FirebaseRemoteMessageMapper.map(testRemoteMessageContent)
         val resultData: JSONObject = result.get("data") as JSONObject
-        val context: JSONObject = resultData.get("platformContext") as JSONObject
-        context.get("style") shouldBe "testStyle"
-        context.get("channelId") shouldBe "testChannelId"
-        context.get("notificationMethod") shouldBeEqualUsingFields JSONObject("""{"collapseId":"testCollapseKey","operation":"DELETE"}""")
+        val platformData: JSONObject = resultData.get("platformData") as JSONObject
+        platformData.get("style") shouldBe "testStyle"
+        platformData.get("channelId") shouldBe "testChannelId"
+        platformData.get("notificationMethod") shouldBeEqualUsingFields JSONObject("""{"collapseId":"testCollapseKey","operation":"DELETE"}""")
     }
 
     @Test
@@ -224,9 +228,9 @@ class FirebaseRemoteMessageMapperTest {
 
         val result = FirebaseRemoteMessageMapper.map(testRemoteMessageContent)
         val resultData: JSONObject = result.get("data") as JSONObject
-        val context: JSONObject = resultData.get("platformContext") as JSONObject
+        val platformData: JSONObject = resultData.get("platformData") as JSONObject
 
-        context.keys().forEach { (it == "style") shouldBe false }
+        platformData.keys().forEach { (it == "style") shouldBe false }
     }
 
     @Test
@@ -237,8 +241,8 @@ class FirebaseRemoteMessageMapperTest {
 
         val result = FirebaseRemoteMessageMapper.map(testRemoteMessageContent)
         val resultData: JSONObject = result.get("data") as JSONObject
-        val context: JSONObject = resultData.get("platformContext") as JSONObject
-        val method = context.get("notificationMethod") as JSONObject
+        val platformData: JSONObject = resultData.get("platformData") as JSONObject
+        val method = platformData.get("notificationMethod") as JSONObject
 
         method["operation"] shouldBe "INIT"
         UUID.fromString(method["collapseId"] as String)

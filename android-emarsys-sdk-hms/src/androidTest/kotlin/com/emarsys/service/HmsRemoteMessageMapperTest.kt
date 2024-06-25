@@ -52,7 +52,7 @@ class HmsRemoteMessageMapperTest {
         val result = HmsRemoteMessageMapper.map(testRemoteMessageContent)
         val resultData: JSONObject = result.get("data") as JSONObject
 
-        resultData.get("u") shouldBe """{"sid":"testSid"}"""
+        resultData.get("u") shouldBeEqualUsingFields JSONObject("""{"sid":"testSid"}""")
     }
 
     @Test
@@ -94,7 +94,7 @@ class HmsRemoteMessageMapperTest {
         val result = HmsRemoteMessageMapper.map(testRemoteMessageContent)
         val resultData: JSONObject = result.get("data") as JSONObject
 
-        resultData.get("defaultAction") shouldBe """{"type":"MECustomEvent","name":"testName"}"""
+        resultData.get("defaultAction") shouldBeEqualUsingFields JSONObject("""{"type":"MECustomEvent","name":"testName"}""")
     }
 
     @Test
@@ -141,7 +141,8 @@ class HmsRemoteMessageMapperTest {
         val result = HmsRemoteMessageMapper.map(testRemoteMessageContent)
         val resultData: JSONObject = result.get("data") as JSONObject
 
-        resultData.get("actions") shouldBe JSONArray("""[
+        resultData.get("actions") shouldBeEqualUsingFields JSONArray(
+            """[
          {
             "payload":{
                "key":"value"
@@ -158,7 +159,8 @@ class HmsRemoteMessageMapperTest {
             "title":"ExternalURL",
             "url":"https:\/\/www.emarsys.com"
          }
-            ]""").toString()
+            ]"""
+        ).toString()
     }
 
     @Test
@@ -177,7 +179,8 @@ class HmsRemoteMessageMapperTest {
 
     @Test
     fun map_shouldAdd_inapp_fromMap() {
-        val emsPayload = """{"inapp":{"campaign_id":"testCampaignId","url":"https:\/\/emarsys.hu"}}"""
+        val emsPayload =
+            """{"inapp":{"campaign_id":"testCampaignId","url":"https:\/\/emarsys.hu"}}"""
 
         val testRemoteMessageContent = mapOf(
             "ems" to emsPayload,
@@ -186,7 +189,7 @@ class HmsRemoteMessageMapperTest {
         val result = HmsRemoteMessageMapper.map(testRemoteMessageContent)
         val resultData: JSONObject = result.get("data") as JSONObject
 
-        resultData.get("inapp") shouldBe """{"campaign_id":"testCampaignId","url":"https:\/\/emarsys.hu"}"""
+        resultData.get("inapp") shouldBeEqualUsingFields JSONObject("""{"campaign_id":"testCampaignId","url":"https:\/\/emarsys.hu"}""")
     }
 
     @Test
@@ -228,10 +231,10 @@ class HmsRemoteMessageMapperTest {
 
         val result = HmsRemoteMessageMapper.map(testRemoteMessageContent)
         val resultData: JSONObject = result.get("data") as JSONObject
-        val context: JSONObject = resultData.get("platformContext") as JSONObject
-        context.get("style") shouldBe "testStyle"
-        context.get("channelId") shouldBe "testChannelId"
-        context.get("notificationMethod") shouldBeEqualUsingFields JSONObject("""{"collapseId":"testCollapseKey","operation":"INIT"}""")
+        val platformData: JSONObject = resultData.get("platformData") as JSONObject
+        platformData.get("style") shouldBe "testStyle"
+        platformData.get("channelId") shouldBe "testChannelId"
+        platformData.get("notificationMethod") shouldBeEqualUsingFields JSONObject("""{"collapseId":"testCollapseKey","operation":"INIT"}""")
     }
 
     @Test
@@ -246,9 +249,9 @@ class HmsRemoteMessageMapperTest {
 
         val result = HmsRemoteMessageMapper.map(testRemoteMessageContent)
         val resultData: JSONObject = result.get("data") as JSONObject
-        val context: JSONObject = resultData.get("platformContext") as JSONObject
+        val platformData: JSONObject = resultData.get("platformData") as JSONObject
 
-        context.keys().forEach { (it == "style") shouldBe false }
+        platformData.keys().forEach { (it == "style") shouldBe false }
     }
 
     @Test
@@ -263,8 +266,8 @@ class HmsRemoteMessageMapperTest {
 
         val result = HmsRemoteMessageMapper.map(testRemoteMessageContent)
         val resultData: JSONObject = result.get("data") as JSONObject
-        val context: JSONObject = resultData.get("platformContext") as JSONObject
-        val method = context.get("notificationMethod") as JSONObject
+        val platformData: JSONObject = resultData.get("platformData") as JSONObject
+        val method = platformData.get("notificationMethod") as JSONObject
 
         method["operation"] shouldBe "INIT"
         UUID.fromString(method["collapseId"] as String)

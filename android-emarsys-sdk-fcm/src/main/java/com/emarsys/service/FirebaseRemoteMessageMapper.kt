@@ -2,13 +2,13 @@ package com.emarsys.service
 
 import com.emarsys.service.model.NotificationOperation
 import com.emarsys.service.provider.UuidStringProvider
+import org.json.JSONArray
 import org.json.JSONObject
 
 object FirebaseRemoteMessageMapper {
     private val uuidStringProvider = UuidStringProvider()
 
     private const val MISSING_MESSAGE_ID = "Missing messageId"
-    private const val EMPTY_JSON_STRING = "{}"
     private const val MISSING_SID = "Missing sid"
 
     fun map(remoteMessageContent: Map<String, String>): JSONObject {
@@ -24,27 +24,27 @@ object FirebaseRemoteMessageMapper {
         val sid = messageContentCopy.remove("ems.sid") ?: MISSING_SID
 
         val rootParams = mapRootParams(messageContentCopy.remove("ems.root_params"))
-        val u = rootParams.optString("u") ?: EMPTY_JSON_STRING
+        val u = rootParams.optJSONObject("u") ?: JSONObject()
 
         val silent = messageContentCopy.remove("ems.silent") ?: false
         val campaignId = messageContentCopy.remove("ems.multichannel_id")
         val defaultAction = extractDefaultAction(messageContentCopy)
-        val actions = messageContentCopy.remove("ems.actions")
-        val inapp = messageContentCopy.remove("ems.inapp")
+        val actions = messageContentCopy.remove("ems.actions")?.let { JSONArray(it) }
+        val inapp = messageContentCopy.remove("ems.inapp")?.let { JSONObject(it) }
         val style = messageContentCopy.remove("ems.style")
         val notificationMethod = parseNotificationMethod(messageContentCopy)
 
-        val platformContext = JSONObject()
+        val platformData = JSONObject()
             .put("channelId", channelId)
             .put("notificationMethod", notificationMethod)
 
-        style?.let { platformContext.put("style", it) }
+        style?.let { platformData.put("style", it) }
 
         val data = JSONObject()
             .put("silent", silent)
             .put("sid", sid)
             .put("campaignId", campaignId)
-            .put("platformContext", platformContext)
+            .put("platformData", platformData)
             .put("rootParams", rootParams)
             .put("u", u)
 

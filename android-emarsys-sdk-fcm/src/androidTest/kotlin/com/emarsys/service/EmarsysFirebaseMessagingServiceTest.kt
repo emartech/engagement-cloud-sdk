@@ -20,8 +20,8 @@ class EmarsysFirebaseMessagingServiceTest {
         setField(
             emarsysFirebaseMessagingService,
             EmarsysFirebaseMessagingService::class.java,
-            "application",
-            InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
+            "mBase",
+            InstrumentationRegistry.getInstrumentation().targetContext
         )
     }
 

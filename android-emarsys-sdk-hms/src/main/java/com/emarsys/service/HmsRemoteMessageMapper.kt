@@ -2,13 +2,13 @@ package com.emarsys.service
 
 import com.emarsys.service.model.NotificationOperation
 import com.emarsys.service.provider.UuidStringProvider
+import org.json.JSONArray
 import org.json.JSONObject
 
 object HmsRemoteMessageMapper {
     private val uuidStringProvider = UuidStringProvider()
 
     private const val MISSING_MESSAGE_ID = "Missing messageId"
-    private const val EMPTY_JSON_STRING = "{}"
     private const val MISSING_SID = "Missing sid"
 
     fun map(remoteMessageContent: Map<String, String>): JSONObject {
@@ -22,30 +22,30 @@ object HmsRemoteMessageMapper {
         val imageUrlString = messageContentCopy.remove("image_url")
         val channelId = messageContentCopy.remove("channel_id")
 
-        val u = messageContentCopy.remove("u") ?: EMPTY_JSON_STRING
-        val sid = JSONObject(u).getNullableString("sid") ?: MISSING_SID
+        val u = messageContentCopy.remove("u")?.let { JSONObject(it) } ?: JSONObject()
+        val sid = u.getNullableString("sid") ?: MISSING_SID
 
         val emsPayload = messageContentCopy.remove("ems")?.let { JSONObject(it) } ?: JSONObject()
         val silent = emsPayload.optBoolean("silent", false)
         val campaignId = emsPayload.optString("multichannelId")
-        val defaultAction = emsPayload.getNullableString("default_action")
-        val actions = emsPayload.getNullableString("actions")
-        val inapp = emsPayload.getNullableString("inapp")
+        val defaultAction = emsPayload.getNullableString("default_action")?.let { JSONObject(it) }
+        val actions = emsPayload.getNullableString("actions")?.let { JSONArray(it) }
+        val inapp = emsPayload.getNullableString("inapp")?.let { JSONObject(it) }
         val style = emsPayload.getNullableString("style")
         val notificationMethod =
             parseNotificationMethod(emsPayload.getNullableString("notificationMethod"))
 
-        val platformContext = JSONObject()
+        val platformData = JSONObject()
             .put("channelId", channelId)
             .put("notificationMethod", notificationMethod)
 
-        style?.let { platformContext.put("style", it) }
+        style?.let { platformData.put("style", it) }
 
         val data = JSONObject()
             .put("silent", silent)
             .put("sid", sid)
             .put("campaignId", campaignId)
-            .put("platformContext", platformContext)
+            .put("platformData", platformData)
             .put("rootParams", JSONObject(messageContentCopy.toMap()))
             .put("u", u)
 
