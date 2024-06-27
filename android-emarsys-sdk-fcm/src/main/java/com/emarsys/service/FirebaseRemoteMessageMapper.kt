@@ -48,7 +48,7 @@ object FirebaseRemoteMessageMapper {
             .put("rootParams", rootParams)
             .put("u", u)
 
-        defaultAction?.let { data.put("defaultAction", it) }
+        defaultAction?.let { data.put("defaultTapAction", it) }
         actions?.let { data.put("actions", it) }
         inapp?.let { data.put("inapp", it) }
 

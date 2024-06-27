@@ -94,7 +94,7 @@ class HmsRemoteMessageMapperTest {
         val result = HmsRemoteMessageMapper.map(testRemoteMessageContent)
         val resultData: JSONObject = result.get("data") as JSONObject
 
-        resultData.get("defaultAction") shouldBeEqualUsingFields JSONObject("""{"type":"MECustomEvent","name":"testName"}""")
+        resultData.get("defaultTapAction") shouldBeEqualUsingFields JSONObject("""{"type":"MECustomEvent","name":"testName"}""")
     }
 
     @Test
@@ -108,7 +108,7 @@ class HmsRemoteMessageMapperTest {
         val result = HmsRemoteMessageMapper.map(testRemoteMessageContent)
         val resultData: JSONObject = result.get("data") as JSONObject
 
-        resultData.keys().forEach { (it == "defaultAction") shouldBe false }
+        resultData.keys().forEach { (it == "defaultTapAction") shouldBe false }
     }
 
     @Test
