@@ -22,6 +22,7 @@ import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.provider.AndroidApplicationVersionProvider
 import com.emarsys.core.providers.HardwareIdProvider
 import com.emarsys.core.providers.Provider
+import com.emarsys.core.resource.MetadataReader
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.TypedStorageApi
@@ -86,7 +87,8 @@ actual class PlatformDependencyCreator actual constructor(
     ): State {
         val notificationManager =
             (applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
-        val pushPresenter = PushMessagePresenter(applicationContext, json, notificationManager)
+        val metadataReader = MetadataReader(applicationContext)
+        val pushPresenter = PushMessagePresenter(applicationContext, json, notificationManager, metadataReader)
         val pushTokenBroadcastReceiver = PushTokenBroadcastReceiver(sdkDispatcher, pushApi)
         val pushMessageBroadcastReceiver =
             PushMessageBroadcastReceiver(pushPresenter, sdkDispatcher, sdkLogger, json)
