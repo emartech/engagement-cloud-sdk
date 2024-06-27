@@ -36,7 +36,7 @@ class EmarsysFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
-        println("message received: ${remoteMessage.messageType}")
+        println("message received: ${remoteMessage.messageId}")
         messagingServices
             .filter { it.first || !remoteMessage.data.containsKey(EMS_VERSION_KEY) }
             .forEach { it.second.onMessageReceived(remoteMessage) }

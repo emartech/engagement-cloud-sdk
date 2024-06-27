@@ -11,5 +11,5 @@ data class JsPushMessage(
     override val body: String,
     override val iconUrlString: String? = null,
     override val imageUrlString: String? = null,
-    override val data: PushData<JsPlatformData>? = null,
+    override val data: PushData<JsPlatformData>
 ) : PushMessage<JsPlatformData>

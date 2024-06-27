@@ -1,5 +1,6 @@
 package com.emarsys.mobileengage.push
 
+import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
@@ -10,7 +11,7 @@ interface PushMessage<T: PlatformData> {
     val body: String
     val iconUrlString: String?
     val imageUrlString: String?
-    val data: PushData<T>?
+    val data: PushData<T>
 }
 
 interface PlatformData
@@ -20,8 +21,7 @@ data class PushData<T: PlatformData>(
     val silent: Boolean = false,
     val sid: String,
     val campaignId: String,
-    val platformData: T? = null,
-    val defaultAction: PresentableActionModel? = null,
+    val platformData: T,
     val defaultTapAction: BasicActionModel? = null,
     val actions: List<PresentableActionModel>? = null,
     val inApp: InApp? = null,

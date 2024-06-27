@@ -11,5 +11,5 @@ data class AndroidPushMessage(
     override val body: String,
     override val iconUrlString: String? = null,
     override val imageUrlString: String? = null,
-    override val data: PushData<AndroidPlatformData>? = null,
+    override val data: PushData<AndroidPlatformData>
 ) : PushMessage<AndroidPlatformData>
