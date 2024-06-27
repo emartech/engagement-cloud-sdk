@@ -77,6 +77,7 @@ kotlin {
                 implementation(libs.startup.runtime)
                 implementation(libs.androidx.lifecycle.common)
                 implementation(libs.androidx.lifecycle.process)
+                implementation(libs.androidx.appcompat)
             }
         }
 

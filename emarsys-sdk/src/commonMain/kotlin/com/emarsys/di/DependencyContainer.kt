@@ -144,7 +144,7 @@ class DependencyContainer : DependencyContainerApi {
 
     private val sdkLogger: SdkLogger = SdkLogger(ConsoleLogger())
 
-    private val json: Json by lazy {
+    override val json: Json by lazy {
         Json {
             ignoreUnknownKeys = true
             encodeDefaults = true
@@ -166,7 +166,7 @@ class DependencyContainer : DependencyContainerApi {
 
     private val msgHub: MsgHubApi by lazy { MsgHub(sdkDispatcher) }
 
-    private val actionFactory: ActionFactoryApi<ActionModel> by lazy {
+    override val actionFactory: ActionFactoryApi<ActionModel> by lazy {
         ActionFactory(
             onEventActionInternal,
             deviceEventChannel,
