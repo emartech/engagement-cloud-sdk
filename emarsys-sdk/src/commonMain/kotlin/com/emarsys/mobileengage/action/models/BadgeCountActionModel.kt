@@ -8,7 +8,7 @@ interface BadgeCountActionModel {
 }
 
 @Serializable
-data class DefaultBadgeCountActionModel(
+data class BasicBadgeCountActionModel(
     override val method: String,
     override val value: Int
-): DefaultActionModel(), BadgeCountActionModel
+): BasicActionModel(), BadgeCountActionModel

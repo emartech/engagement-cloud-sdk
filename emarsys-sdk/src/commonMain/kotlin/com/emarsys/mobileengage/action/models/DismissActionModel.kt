@@ -17,6 +17,6 @@ data class PresentableDismissActionModel(
 
 @Serializable
 @SerialName("Dismiss")
-data class DefaultDismissActionModel(
+data class BasicDismissActionModel(
     override var topic: String? = null
-) : DefaultActionModel(), DismissActionModel
+) : BasicActionModel(), DismissActionModel

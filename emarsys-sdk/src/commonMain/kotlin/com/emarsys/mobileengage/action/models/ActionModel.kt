@@ -10,7 +10,7 @@ sealed interface ActionModel
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
 @JsonClassDiscriminator("type")
-sealed class DefaultActionModel: ActionModel
+sealed class BasicActionModel: ActionModel
 
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable

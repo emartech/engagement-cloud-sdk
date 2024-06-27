@@ -22,6 +22,7 @@ data class PushData<T: PlatformData>(
     val campaignId: String,
     val platformData: T? = null,
     val defaultAction: PresentableActionModel? = null,
+    val defaultTapAction: BasicActionModel? = null,
     val actions: List<PresentableActionModel>? = null,
     val inApp: InApp? = null,
     val rootParams: JsonObject? = null,

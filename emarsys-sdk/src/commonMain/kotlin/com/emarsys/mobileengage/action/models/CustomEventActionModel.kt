@@ -19,7 +19,7 @@ data class PresentableCustomEventActionModel(
 
 @Serializable
 @SerialName("MECustomEvent")
-data class DefaultCustomEventActionModel(
+data class BasicCustomEventActionModel(
     override val name: String,
     override val payload: Map<String, String>?,
-): DefaultActionModel(), CustomEventActionModel
+): BasicActionModel(), CustomEventActionModel

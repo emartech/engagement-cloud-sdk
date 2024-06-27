@@ -19,7 +19,7 @@ data class PresentableAppEventActionModel(
 
 @Serializable
 @SerialName("MEAppEvent")
-data class DefaultAppEventActionModel(
+data class BasicAppEventActionModel(
     override val name: String,
     override val payload: Map<String, String>?,
-): DefaultActionModel(), AppEventActionModel
+): BasicActionModel(), AppEventActionModel

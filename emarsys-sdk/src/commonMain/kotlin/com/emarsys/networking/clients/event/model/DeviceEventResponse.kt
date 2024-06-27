@@ -1,6 +1,6 @@
 package com.emarsys.networking.clients.event.model
 
-import com.emarsys.mobileengage.action.models.DefaultActionModel
+import com.emarsys.mobileengage.action.models.BasicActionModel
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -13,5 +13,5 @@ data class DeviceEventResponse(
 @Serializable
 data class OnEventAction(
     val campaignId: String,
-    val actions: List<DefaultActionModel>
+    val actions: List<BasicActionModel>
 )
