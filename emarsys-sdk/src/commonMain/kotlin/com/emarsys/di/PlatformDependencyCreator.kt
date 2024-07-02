@@ -3,6 +3,7 @@ package com.emarsys.di
 import com.emarsys.api.push.PushInternalApi
 import com.emarsys.context.SdkContext
 import com.emarsys.core.badge.BadgeCountHandlerApi
+import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.log.Logger
 import com.emarsys.core.log.SdkLogger
@@ -51,4 +52,6 @@ expect class PlatformDependencyCreator(
     override fun createApplicationVersionProvider(): Provider<String>
 
     override fun createLanguageProvider(): Provider<String>
+
+    override fun createFileCache(): FileCacheApi
 }

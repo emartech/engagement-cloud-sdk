@@ -28,6 +28,7 @@ kotest = "5.9.0"
 mockkAndroid = "1.13.10"
 mokkery = "2.0.0"
 mockmp = "1.17.0"
+okio = "3.9.0"
 runner = "1.5.2"
 uuid = "0.8.2"
 fcm = "24.0.0"
@@ -75,6 +76,8 @@ ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
 ktor-serialization = { module = "io.ktor:ktor-serialization", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockkAndroid" }
+okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
+okio-fakefilesystem = { module = "com.squareup.okio:okio-fakefilesystem", version.ref = "okio" }
 startup-runtime = { module = "androidx.startup:startup-runtime", version.ref = "androidx-startupRuntime" }
 uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
 kotlin-wrapper-browser = { module = "org.jetbrains.kotlin-wrappers:kotlin-browser", version.ref = "kotlinWrappers" }

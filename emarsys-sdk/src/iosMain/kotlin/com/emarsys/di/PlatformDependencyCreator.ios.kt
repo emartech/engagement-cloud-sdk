@@ -4,6 +4,8 @@ import com.emarsys.api.push.PushInternalApi
 import com.emarsys.context.SdkContext
 import com.emarsys.core.IosBadgeCountHandler
 import com.emarsys.core.badge.BadgeCountHandlerApi
+import com.emarsys.core.cache.FileCacheApi
+import com.emarsys.core.cache.IosFileCache
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.UIDevice
 import com.emarsys.core.log.Logger
@@ -28,6 +30,7 @@ import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.serialization.json.Json
+import platform.Foundation.NSFileManager
 
 actual class PlatformDependencyCreator actual constructor(
     platformContext: PlatformContext,
@@ -90,4 +93,7 @@ actual class PlatformDependencyCreator actual constructor(
         return IosLanguageProvider()
     }
 
+    actual override fun createFileCache(): FileCacheApi {
+        return IosFileCache(NSFileManager.defaultManager)
+    }
 }

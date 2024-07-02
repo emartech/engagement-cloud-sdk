@@ -12,6 +12,8 @@ import com.emarsys.applicationContext
 import com.emarsys.context.SdkContext
 import com.emarsys.core.badge.AndroidBadgeCountHandler
 import com.emarsys.core.badge.BadgeCountHandlerApi
+import com.emarsys.core.cache.AndroidFileCache
+import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.device.AndroidLanguageProvider
 import com.emarsys.core.device.AndroidPlatformInfoCollector
 import com.emarsys.core.device.DeviceInfoCollector
@@ -42,6 +44,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.json.Json
+import okio.FileSystem
 import java.util.Locale
 
 
@@ -130,4 +133,7 @@ actual class PlatformDependencyCreator actual constructor(
         )
     }
 
+    actual override fun createFileCache(): FileCacheApi {
+        return AndroidFileCache(applicationContext, FileSystem.SYSTEM)
+    }
 }

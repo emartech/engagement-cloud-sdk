@@ -50,6 +50,7 @@ kotlin {
             dependencies {
                 implementation(libs.kotlinx.datetime)
                 implementation(libs.kotlinx.coroutines.core)
+                implementation(libs.okio)
                 implementation(libs.kotlinx.serialization.json)
                 implementation(libs.ktor.client.core)
                 implementation(libs.ktor.client.content.negotiation)
@@ -95,6 +96,7 @@ kotlin {
                 implementation(libs.androidx.test.junit)
                 implementation(libs.kotest.assertions.core)
                 implementation(libs.kotlinx.coroutines.test)
+                implementation(libs.okio.fakefilesystem)
             }
         }
         iosMain {
@@ -108,6 +110,13 @@ kotlin {
                 implementation(kotlin("test"))
             }
         }
+
+        val iosSimulatorArm64Test by getting {
+            dependencies {
+                implementation(kotlin("test"))
+            }
+        }
+
         val jsMain by getting {
             dependencies {
                 implementation(libs.ktor.client.js)

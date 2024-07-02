@@ -4,6 +4,8 @@ import com.emarsys.api.push.PushInternalApi
 import com.emarsys.context.SdkContext
 import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.badge.WebBadgeCountHandler
+import com.emarsys.core.cache.FileCacheApi
+import com.emarsys.core.cache.WebFileCache
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.WebPlatformInfoCollector
 import com.emarsys.core.log.Logger
@@ -117,6 +119,10 @@ actual class PlatformDependencyCreator actual constructor(
 
     actual override fun createLanguageProvider(): Provider<String> {
         return WebLanguageProvider()
+    }
+
+    actual override fun createFileCache(): FileCacheApi {
+        return WebFileCache()
     }
 
     private fun getNavigatorData(): String {

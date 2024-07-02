@@ -3,6 +3,7 @@ package com.emarsys.di
 import com.emarsys.api.push.PushInternalApi
 import com.emarsys.context.SdkContext
 import com.emarsys.core.badge.BadgeCountHandlerApi
+import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.permission.PermissionHandlerApi
@@ -35,6 +36,7 @@ interface DependencyCreator {
     fun createBadgeCountHandler(): BadgeCountHandlerApi
 
     fun createExternalUrlOpener(): ExternalUrlOpenerApi
+
     fun createConnectionWatchDog(sdkLogger: SdkLogger): ConnectionWatchDog
 
     fun createLifeCycleWatchDog(): LifecycleWatchDog
@@ -42,4 +44,6 @@ interface DependencyCreator {
     fun createApplicationVersionProvider(): Provider<String>
 
     fun createLanguageProvider(): Provider<String>
+
+    fun createFileCache(): FileCacheApi
 }
