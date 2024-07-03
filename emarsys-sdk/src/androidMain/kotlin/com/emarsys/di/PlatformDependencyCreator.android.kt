@@ -30,8 +30,10 @@ import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.AndroidExternalUrlOpener
 import com.emarsys.core.url.ExternalUrlOpenerApi
+import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.push.NotificationCompatStyler
 import com.emarsys.mobileengage.push.PushMessageBroadcastReceiver
 import com.emarsys.mobileengage.push.PushMessagePresenter
 import com.emarsys.mobileengage.push.PushTokenBroadcastReceiver
@@ -52,9 +54,10 @@ actual class PlatformDependencyCreator actual constructor(
     platformContext: PlatformContext,
     private val uuidProvider: Provider<String>,
     private val sdkLogger: Logger,
-    private val json: Json
+    private val json: Json,
 ) : DependencyCreator {
     private val platformContext: CommonPlatformContext = platformContext as CommonPlatformContext
+    private val metadataReader = MetadataReader(applicationContext)
     private val storage = createStorage()
 
     actual override fun createLanguageProvider(): Provider<String> {
@@ -86,12 +89,19 @@ actual class PlatformDependencyCreator actual constructor(
         pushApi: PushInternalApi,
         sdkDispatcher: CoroutineDispatcher,
         sdkContext: SdkContext,
-        actionFactory: ActionFactoryApi<ActionModel>
+        actionFactory: ActionFactoryApi<ActionModel>,
+        downloaderApi: DownloaderApi
     ): State {
         val notificationManager =
             (applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
-        val metadataReader = MetadataReader(applicationContext)
-        val pushPresenter = PushMessagePresenter(applicationContext, json, notificationManager, metadataReader)
+        val notificationCompatStyler = NotificationCompatStyler(downloaderApi)
+        val pushPresenter = PushMessagePresenter(
+            applicationContext,
+            json,
+            notificationManager,
+            metadataReader,
+            notificationCompatStyler
+        )
         val pushTokenBroadcastReceiver = PushTokenBroadcastReceiver(sdkDispatcher, pushApi)
         val pushMessageBroadcastReceiver =
             PushMessageBroadcastReceiver(pushPresenter, sdkDispatcher, sdkLogger, json)

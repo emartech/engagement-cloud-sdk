@@ -6,5 +6,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AndroidPlatformData(
     val channelId: String,
-    val notificationMethod: NotificationMethod
-): PlatformData
+    val notificationMethod: NotificationMethod,
+    val style: NotificationStyle? = null
+) : PlatformData

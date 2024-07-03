@@ -92,6 +92,8 @@ import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.url.UrlFactory
 import com.emarsys.core.url.UrlFactoryApi
+import com.emarsys.core.util.Downloader
+import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.ActionFactory
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
@@ -146,6 +148,8 @@ class DependencyContainer : DependencyContainerApi {
 
     override val json: Json by lazy {
         Json {
+            encodeDefaults = true
+            isLenient = true
             ignoreUnknownKeys = true
             encodeDefaults = true
         }
@@ -387,15 +391,20 @@ class DependencyContainer : DependencyContainerApi {
         )
     }
 
-    private val genericNetworkClient: NetworkClientApi by lazy {
-        val httpClient = HttpClient {
-            install(ContentNegotiation) {
-                json()
-            }
-            install(HttpRequestRetry)
+    private val httpClient = HttpClient {
+        install(ContentNegotiation) {
+            json(json)
         }
+        install(HttpRequestRetry)
+    }
+
+    private val genericNetworkClient: NetworkClientApi by lazy {
         GenericNetworkClient(httpClient)
     }
+
+    override val downloaderApi: DownloaderApi =
+        Downloader(httpClient, dependencyCreator.createFileCache(), sdkLogger)
+
     override val remoteConfigHandler: RemoteConfigHandlerApi by lazy {
         RemoteConfigHandler(
             RemoteConfigClient(genericNetworkClient, urlFactory, crypto, json),
@@ -404,6 +413,7 @@ class DependencyContainer : DependencyContainerApi {
             RandomProvider()
         )
     }
+
     override val setupOrganizerApi: SetupOrganizerApi by lazy {
         val collectDeviceInfoState = CollectDeviceInfoState(deviceInfoCollector, sessionContext)
         val registerClientState = RegisterClientState(deviceClient)
@@ -413,7 +423,8 @@ class DependencyContainer : DependencyContainerApi {
                 pushInternal,
                 sdkDispatcher,
                 sdkContext,
-                actionFactory
+                actionFactory,
+                downloaderApi
             )
         val applyRemoteConfigState = ApplyRemoteConfigState(
             remoteConfigHandler

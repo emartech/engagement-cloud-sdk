@@ -12,6 +12,7 @@ import com.emarsys.core.providers.Provider
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
+import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.watchdog.connection.ConnectionWatchDog
@@ -36,7 +37,8 @@ expect class PlatformDependencyCreator(
         pushApi: PushInternalApi,
         sdkDispatcher: CoroutineDispatcher,
         sdkContext: SdkContext,
-        actionFactory: ActionFactoryApi<ActionModel>
+        actionFactory: ActionFactoryApi<ActionModel>,
+        downloaderApi: DownloaderApi
     ): State
 
     override fun createPermissionHandler(): PermissionHandlerApi

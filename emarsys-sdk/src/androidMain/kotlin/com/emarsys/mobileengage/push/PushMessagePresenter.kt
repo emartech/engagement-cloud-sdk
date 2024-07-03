@@ -21,7 +21,8 @@ class PushMessagePresenter(
     private val context: Context,
     private val json: Json,
     private val notificationManager: NotificationManager,
-    private val metadataReader: MetadataReader
+    private val metadataReader: MetadataReader,
+    private val notificationCompatStyler: NotificationCompatStyler
 ) : PushPresenter<AndroidPlatformData, AndroidPushMessage> {
 
     override suspend fun present(pushMessage: AndroidPushMessage) {
@@ -37,6 +38,8 @@ class PushMessagePresenter(
             .setSmallIcon(iconId)
             .setContentIntent(tapActionPendingIntent)
             .addActions(pushMessage)
+
+        notificationCompatStyler.style(notificationBuilder, pushMessage)
 
         notificationManager.notify(collapseId, collapseId.hashCode(), notificationBuilder.build())
     }

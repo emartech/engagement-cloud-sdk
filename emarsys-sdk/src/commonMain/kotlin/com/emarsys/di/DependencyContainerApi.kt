@@ -10,6 +10,7 @@ import com.emarsys.api.oneventaction.OnEventActionApi
 import com.emarsys.api.predict.PredictApi
 import com.emarsys.api.push.PushApi
 import com.emarsys.core.providers.Provider
+import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.session.Session
@@ -55,6 +56,8 @@ interface DependencyContainerApi {
     val mobileEngageSession: Session
 
     val json: Json
+
+    val downloaderApi: DownloaderApi
 
     suspend fun setup()
 }

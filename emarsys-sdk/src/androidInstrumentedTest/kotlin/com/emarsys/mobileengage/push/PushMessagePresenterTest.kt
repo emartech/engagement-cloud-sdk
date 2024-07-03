@@ -18,6 +18,7 @@ import com.emarsys.mobileengage.push.model.NotificationOperation.INIT
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.CapturingSlot
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
@@ -68,12 +69,14 @@ class PushMessagePresenterTest {
     private lateinit var mockNotificationManager: NotificationManager
     private lateinit var json: Json
     private lateinit var mockMetadataReader: MetadataReader
+    private lateinit var mockNotificationCompatStyler: NotificationCompatStyler
     private lateinit var notificationSlot: CapturingSlot<Notification>
 
     @Before
     fun setup() = runTest {
         mockContext = getInstrumentation().targetContext.applicationContext
         mockNotificationManager = mockk(relaxed = true)
+        mockNotificationCompatStyler = mockk(relaxed = true)
 
         json = Json {
             ignoreUnknownKeys = true
@@ -86,7 +89,8 @@ class PushMessagePresenterTest {
             mockContext,
             json,
             mockNotificationManager,
-            mockMetadataReader
+            mockMetadataReader,
+            mockNotificationCompatStyler
         )
 
         notificationSlot = slot<Notification>()
@@ -118,6 +122,12 @@ class PushMessagePresenterTest {
         notificationSlot.captured.actions[1].title shouldBe testAppEventAction.title
         notificationSlot.captured.actions[2].title shouldBe testOpenExternalUrlAction.title
 
+        coVerify {
+            mockNotificationCompatStyler.style(
+                any<NotificationCompat.Builder>(),
+                testMessage
+            )
+        }
         verify {
             mockNotificationManager.notify(
                 COLLAPSE_ID,
@@ -207,7 +217,9 @@ class PushMessagePresenterTest {
 
     private fun createTestMessage(
         actions: List<PresentableActionModel>? = null,
-        defaultTapAction: BasicAppEventActionModel? = null
+        defaultTapAction: BasicAppEventActionModel? = null,
+        iconUrlString: String? = null,
+        imageUrlString: String? = null
     ): AndroidPushMessage {
         val tesMethod = NotificationMethod(COLLAPSE_ID, INIT)
         val testData = PushData(
@@ -222,6 +234,8 @@ class PushMessagePresenterTest {
             MESSAGE_ID,
             TITLE,
             BODY,
+            iconUrlString,
+            imageUrlString,
             data = testData
         )
     }

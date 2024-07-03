@@ -20,6 +20,7 @@ import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.url.WebExternalUrlOpener
+import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.push.PushMessageMapper
@@ -60,7 +61,7 @@ actual class PlatformDependencyCreator actual constructor(
             timezoneProvider,
             createWebDeviceInfoCollector(),
             createStorage(),
-            createApplicationVersionProvider(),createLanguageProvider(), json,
+            createApplicationVersionProvider(), createLanguageProvider(), json,
         )
     }
 
@@ -68,7 +69,8 @@ actual class PlatformDependencyCreator actual constructor(
         pushApi: PushInternalApi,
         sdkDispatcher: CoroutineDispatcher,
         sdkContext: SdkContext,
-        actionFactory: ActionFactoryApi<ActionModel>
+        actionFactory: ActionFactoryApi<ActionModel>,
+        downloaderApi: DownloaderApi
     ): State {
         val pushPresenter = PushMessagePresenter(pushServiceContext, actionFactory, sdkDispatcher)
         val pushService = PushService(

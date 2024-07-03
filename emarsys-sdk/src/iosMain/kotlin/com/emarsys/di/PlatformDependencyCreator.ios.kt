@@ -22,6 +22,7 @@ import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.url.IosExternalUrlOpener
+import com.emarsys.core.util.DownloaderApi
 import com.emarsys.core.watchdog.connection.IosConnectionWatchdog
 import com.emarsys.core.watchdog.lifecycle.IosLifecycleWatchdog
 import com.emarsys.mobileengage.action.ActionFactoryApi
@@ -60,7 +61,8 @@ actual class PlatformDependencyCreator actual constructor(
         pushApi: PushInternalApi,
         sdkDispatcher: CoroutineDispatcher,
         sdkContext: SdkContext,
-        actionFactory: ActionFactoryApi<ActionModel>
+        actionFactory: ActionFactoryApi<ActionModel>,
+        downloaderApi: DownloaderApi
     ): State {
         return PlatformInitState()
     }
