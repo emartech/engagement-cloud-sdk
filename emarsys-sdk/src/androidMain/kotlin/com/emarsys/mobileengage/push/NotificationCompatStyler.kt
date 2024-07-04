@@ -1,5 +1,6 @@
 package com.emarsys.mobileengage.push
 
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.core.app.NotificationCompat
@@ -18,9 +19,9 @@ class NotificationCompatStyler(
         pushMessage: AndroidPushMessage
     ) {
         val image = pushMessage.imageUrlString
-            ?.let { downloader.download(it)?.toBitmap() }
+            ?.let { downloader.download(it)?.toOptimizedBitmap() }
         val icon = pushMessage.iconUrlString
-            ?.let { downloader.download(it)?.toBitmap() }
+            ?.let { downloader.download(it)?.toOptimizedBitmap() }
 
         val notificationStyle =
             when (pushMessage.data.platformData.style) {
@@ -84,7 +85,27 @@ class NotificationCompatStyler(
         NotificationCompat.BigTextStyle()
             .bigText(pushMessage.body)
             .setBigContentTitle(pushMessage.title)
-
 }
 
-fun ByteArray.toBitmap(): Bitmap = BitmapFactory.decodeByteArray(this, 0, size)
+fun ByteArray.toOptimizedBitmap(): Bitmap? {
+    return try {
+        val options = BitmapFactory.Options().apply {
+            inJustDecodeBounds = true
+        }
+        BitmapFactory.decodeByteArray(this, 0, size, options)
+
+        val displayMetrics = Resources.getSystem().displayMetrics
+        val width = options.outWidth
+        var inSampleSize = 1
+
+        while (displayMetrics.widthPixels <= width / inSampleSize) {
+            inSampleSize *= 2
+        }
+
+        options.inSampleSize = inSampleSize
+        options.inJustDecodeBounds = false
+        BitmapFactory.decodeByteArray(this, 0, size, options)
+    } catch (exception: Exception) {
+        null
+    }
+}

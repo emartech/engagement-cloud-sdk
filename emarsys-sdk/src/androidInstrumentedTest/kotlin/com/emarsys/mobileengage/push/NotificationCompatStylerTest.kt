@@ -200,6 +200,7 @@ class NotificationCompatStylerTest {
             BitmapFactory.decodeByteArray(
                 eq(imageByteArray),
                 eq(0),
+                any(),
                 any()
             )
         } returns expectedImage
