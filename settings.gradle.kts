@@ -32,4 +32,5 @@ include(
     ":emarsys-sdk",
     ":android-emarsys-sdk-hms",
     ":android-emarsys-sdk-fcm",
+    ":ios-notification-service"
 )
