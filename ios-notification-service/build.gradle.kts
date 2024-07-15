@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.mokkery)
 }
 
 kotlin {
@@ -15,10 +16,16 @@ kotlin {
     }
 
     sourceSets {
+        iosMain {
+            dependencies {
+                implementation(libs.kotlinx.coroutines.core)
+            }
+        }
         iosTest {
             dependencies {
                 implementation(kotlin("test"))
                 implementation(libs.kotest.assertions.core)
+                implementation(libs.kotlinx.coroutines.test)
             }
         }
     }
