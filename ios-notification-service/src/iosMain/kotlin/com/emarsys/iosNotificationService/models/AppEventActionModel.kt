@@ -1,7 +1,9 @@
 package com.emarsys.iosNotificationService.models
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 @SerialName("MEAppEvent")
 data class AppEventActionModel(
     override val id: String,
