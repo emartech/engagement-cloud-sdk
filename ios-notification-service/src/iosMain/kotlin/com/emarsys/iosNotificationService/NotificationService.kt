@@ -51,6 +51,7 @@ class NotificationService(private val notificationCenter: NotificationCenterApi 
             val userInfo = bestAttemptContent.userInfo as Map<String, Any>
             createActions(userInfo)
             createAttachments(userInfo)
+            createInApp(userInfo)
         }
 
         contentHandler(bestAttemptContent)
@@ -93,5 +94,22 @@ class NotificationService(private val notificationCenter: NotificationCenterApi 
         bestAttemptContent.setAttachments(listOf(attachment))
     }
 
-}
+    private suspend fun createInApp(userInfo: Map<String, Any>) {
+        val ems = userInfo["ems"] as? Map<String, Any> ?: return
+        val inApp = ems["inapp"] as? Map<String, Any> ?: return
+        val inAppUrlString = inApp["url"] as? String ?: return
 
+        val inAppData = downloader.downloadData(NSURL(string = inAppUrlString)) ?: return
+
+        val mutableInApp = inApp.toMutableMap()
+        val mutableEms = ems.toMutableMap()
+        val mutableUserInfo = userInfo.toMutableMap()
+
+        mutableInApp["inAppData"] = inAppData
+        mutableEms["inapp"] = mutableInApp
+        mutableUserInfo["ems"] = mutableEms
+
+        bestAttemptContent.setUserInfo(mutableUserInfo.toMap())
+    }
+
+}

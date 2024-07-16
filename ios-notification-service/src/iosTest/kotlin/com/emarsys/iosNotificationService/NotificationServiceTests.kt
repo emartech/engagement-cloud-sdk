@@ -67,6 +67,27 @@ class NotificationServiceTests {
 
         result.attachments shouldNotBe expectedAttachments
     }
+
+    @Test
+    fun didReceiveNotificationRequest_shouldSetInAppData() = runTest {
+        val content = UNMutableNotificationContent()
+        content.setUserInfo(
+            mapOf(
+                "ems" to mapOf(
+                    "inapp" to mapOf(
+                        "url" to "https://gist.githubusercontent.com/LasOri/9a2c4eda66ca6a31f7b5afb5e20ba4c1/raw/7d0935addb36e01861a534ef0adc79d9c8a32e53/test.txt"
+                    )
+                )
+            )
+        )
+
+        val request = UNNotificationRequest.requestWithIdentifier("testId", content, null)
+
+        val result = notificationService.didReceiveNotificationRequest(request)
+
+        val inAppData = ((result.userInfo["ems"] as Map<String, Any>)["inapp"] as Map<String, Any>)["inAppData"]
+        inAppData shouldNotBe null
+    }
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
