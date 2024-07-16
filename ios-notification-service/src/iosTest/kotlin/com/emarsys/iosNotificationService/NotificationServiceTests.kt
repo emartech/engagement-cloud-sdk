@@ -8,6 +8,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.test.runTest
 import platform.UserNotifications.UNMutableNotificationContent
+import platform.UserNotifications.UNNotificationAttachment
 import platform.UserNotifications.UNNotificationContent
 import platform.UserNotifications.UNNotificationRequest
 import kotlin.coroutines.resume
@@ -25,7 +26,7 @@ class NotificationServiceTests {
     }
 
     @Test
-    fun didReceiveNotificationRequest_shouldContainNotificationCategory() = runTest {
+    fun didReceiveNotificationRequest_shouldSetNotificationCategory() = runTest {
         val content = UNMutableNotificationContent()
         content.setUserInfo(
             mapOf(
@@ -47,6 +48,24 @@ class NotificationServiceTests {
         val result = notificationService.didReceiveNotificationRequest(request)
 
         result.categoryIdentifier shouldNotBe ""
+    }
+
+    @Test
+    fun didReceiveNotificationRequest_shouldSetNotificationAttachment() = runTest {
+        val expectedAttachments: List<UNNotificationAttachment> = emptyList()
+        val content = UNMutableNotificationContent()
+        content.setUserInfo(
+            mapOf(
+                "image_url" to "https://gist.githubusercontent.com/LasOri/9a2c4eda66ca6a31f7b5afb5e20ba4c1/raw/7d0935addb36e01861a534ef0adc79d9c8a32e53/test.txt"
+            )
+        )
+        content.attachments shouldBe expectedAttachments
+
+        val request = UNNotificationRequest.requestWithIdentifier("testId", content, null)
+
+        val result = notificationService.didReceiveNotificationRequest(request)
+
+        result.attachments shouldNotBe expectedAttachments
     }
 }
 
