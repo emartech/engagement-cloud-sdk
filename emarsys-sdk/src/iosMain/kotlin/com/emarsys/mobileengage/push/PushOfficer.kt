@@ -33,12 +33,17 @@ class PushOfficer(
     private val eventClient: EventClientApi,
     private val json: Json,
     private val sdkDispatcher: CoroutineDispatcher
-) : PushInternalApi, UNUserNotificationCenterDelegateProtocol, NSObject() {
+): PushInternalApi {
 
     private val _pushInformation = MutableSharedFlow<PushInformation>()
     val pushInformation = _pushInformation.asSharedFlow()
 
-    var userNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol? = null
+    val emarsysUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol = InternalNotificationCenterDelegateProxy(
+        willPresentNotification = this::willPresentNotification,
+        didReceiveNotificationResponse = this::didReceiveNotificationResponse,
+        openSettingsForNotification = this::openSettingsForNotification
+    )
+    var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol? = null
 
     override suspend fun registerPushToken(pushToken: String) {
         pushApi.registerPushToken(pushToken)
@@ -54,35 +59,35 @@ class PushOfficer(
     override val notificationEvents: MutableSharedFlow<AppEvent>
         get() = pushApi.notificationEvents
 
-    override fun userNotificationCenter(
+    private fun willPresentNotification(
         center: UNUserNotificationCenter,
-        willPresentNotification: UNNotification,
+        notification: UNNotification,
         withCompletionHandler: (UNNotificationPresentationOptions) -> Unit
     ) {
-        userNotificationCenterDelegate?.let {
+        customerUserNotificationCenterDelegate?.let {
             CoroutineScope(Dispatchers.Main).launch {
-                it.userNotificationCenter(center, willPresentNotification, withCompletionHandler)
+                it.userNotificationCenter(center, notification, withCompletionHandler)
             }
         }
         withCompletionHandler(UNNotificationPresentationOptionBanner + UNNotificationPresentationOptionList)
     }
 
-    override fun userNotificationCenter(
+    private fun didReceiveNotificationResponse(
         center: UNUserNotificationCenter,
-        didReceiveNotificationResponse: UNNotificationResponse,
+        notificationResponse: UNNotificationResponse,
         withCompletionHandler: () -> Unit
     ) {
-        userNotificationCenterDelegate?.let {
+        customerUserNotificationCenterDelegate?.let {
             CoroutineScope(Dispatchers.Main).launch {
                 it.userNotificationCenter(
                     center,
-                    didReceiveNotificationResponse,
+                    notificationResponse,
                     withCompletionHandler
                 )
             }
         }
         CoroutineScope(sdkDispatcher).launch {
-            val userInfo = didReceiveNotificationResponse.notification.request.content.userInfo
+            val userInfo = notificationResponse.notification.request.content.userInfo
             val ems = userInfo["ems"] as? Map<String, Any>
 
             ems?.get("multichannelId")?.let {
@@ -95,13 +100,13 @@ class PushOfficer(
 
             var action: Map<String, Any>? = null
             ems?.get("default_action")?.let {
-                if (didReceiveNotificationResponse.actionIdentifier == UNNotificationDefaultActionIdentifier) {
+                if (notificationResponse.actionIdentifier == UNNotificationDefaultActionIdentifier) {
                     action = it as Map<String, Any>
                 }
             }
             (ems?.get("actions") as? List<Map<String, Any>>)?.let { actionMap ->
                 action = actionMap.firstOrNull {
-                    didReceiveNotificationResponse.actionIdentifier == it["id"]
+                    notificationResponse.actionIdentifier == it["id"]
                 }
             }
             val actionModel: ActionModel? = action?.let {
@@ -128,14 +133,41 @@ class PushOfficer(
         }
     }
 
-    override fun userNotificationCenter(
+    private fun openSettingsForNotification(
         center: UNUserNotificationCenter,
-        openSettingsForNotification: UNNotification?
+        notification: UNNotification?
     ) {
-        userNotificationCenterDelegate?.let {
+        customerUserNotificationCenterDelegate?.let {
             CoroutineScope(Dispatchers.Main).launch {
-                it.userNotificationCenter(center, openSettingsForNotification)
+                it.userNotificationCenter(center, notification)
             }
         }
     }
+
+    private class InternalNotificationCenterDelegateProxy(
+        private val willPresentNotification: (center: UNUserNotificationCenter, notification: UNNotification, handler: (UNNotificationPresentationOptions) -> Unit) -> Unit,
+        private val didReceiveNotificationResponse: (center: UNUserNotificationCenter, response: UNNotificationResponse, handler: () -> Unit) -> Unit,
+        private val openSettingsForNotification: (center: UNUserNotificationCenter, notification: UNNotification?) -> Unit): UNUserNotificationCenterDelegateProtocol, NSObject() {
+
+        override fun userNotificationCenter(
+            center: UNUserNotificationCenter,
+            willPresentNotification: UNNotification,
+            withCompletionHandler: (UNNotificationPresentationOptions) -> Unit) {
+            this.willPresentNotification(center, willPresentNotification, withCompletionHandler)
+        }
+
+        override fun userNotificationCenter(
+            center: UNUserNotificationCenter,
+            didReceiveNotificationResponse: UNNotificationResponse,
+            withCompletionHandler: () -> Unit) {
+            this.didReceiveNotificationResponse(center, didReceiveNotificationResponse, withCompletionHandler)
+        }
+
+        override fun userNotificationCenter(
+            center: UNUserNotificationCenter,
+            openSettingsForNotification: UNNotification?) {
+            this.openSettingsForNotification(center, openSettingsForNotification)
+        }
+    }
+
 }
