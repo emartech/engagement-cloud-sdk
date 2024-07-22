@@ -98,7 +98,8 @@ actual class PlatformDependencyCreator actual constructor(
             json,
             notificationManager,
             metadataReader,
-            notificationCompatStyler
+            notificationCompatStyler,
+            platformInfoCollector
         )
         val pushTokenBroadcastReceiver = PushTokenBroadcastReceiver(sdkDispatcher, pushApi)
         val pushMessageBroadcastReceiver =

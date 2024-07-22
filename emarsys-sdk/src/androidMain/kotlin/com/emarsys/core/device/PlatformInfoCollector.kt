@@ -11,7 +11,7 @@ class PlatformInfoCollector(
 ) : PlatformInfoCollectorApi {
 
     override fun notificationSettings(): AndroidNotificationSettings {
-        TODO("Not yet implemented")
+        return AndroidNotificationSettings(true, 1, emptyList())
     }
 
     override fun displayMetrics(): DisplayMetrics? {

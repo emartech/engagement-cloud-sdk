@@ -5,6 +5,9 @@ import android.app.NotificationManager
 import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import com.emarsys.core.device.AndroidNotificationSettings
+import com.emarsys.core.device.ChannelSettings
+import com.emarsys.core.device.PlatformInfoCollector
 import com.emarsys.core.resource.MetadataReader
 import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
@@ -35,6 +38,7 @@ class PushMessagePresenterTest {
         const val ICON_ID = 10
         const val CHANNEL_ID = "testChannelId"
         const val MESSAGE_ID = "testMessageId"
+        const val DEBUG_CHANNEL_ID = "ems_debug"
         const val TITLE = "testTitle"
         const val BODY = "testBody"
         const val SID = "testSid"
@@ -70,6 +74,7 @@ class PushMessagePresenterTest {
     private lateinit var json: Json
     private lateinit var mockMetadataReader: MetadataReader
     private lateinit var mockNotificationCompatStyler: NotificationCompatStyler
+    private lateinit var mockPlatformInfoCollector: PlatformInfoCollector
     private lateinit var notificationSlot: CapturingSlot<Notification>
 
     @Before
@@ -77,6 +82,7 @@ class PushMessagePresenterTest {
         mockContext = getInstrumentation().targetContext.applicationContext
         mockNotificationManager = mockk(relaxed = true)
         mockNotificationCompatStyler = mockk(relaxed = true)
+        mockPlatformInfoCollector = mockk(relaxed = true)
 
         json = Json {
             ignoreUnknownKeys = true
@@ -90,7 +96,8 @@ class PushMessagePresenterTest {
             json,
             mockNotificationManager,
             mockMetadataReader,
-            mockNotificationCompatStyler
+            mockNotificationCompatStyler,
+            mockPlatformInfoCollector
         )
 
         notificationSlot = slot<Notification>()
@@ -213,6 +220,70 @@ class PushMessagePresenterTest {
                 notificationSlot.captured
             )
         }
+    }
+
+    @Test
+    fun present_shouldCreateDebugChannel_if_debugMode_and_channelId_isInvalid() = runTest {
+        val message = createTestMessage()
+        val testSettings = AndroidNotificationSettings(true, 1, emptyList())
+
+        every { mockPlatformInfoCollector.isDebugMode() } returns true
+        every { mockPlatformInfoCollector.notificationSettings() } returns testSettings
+
+        every {
+            mockNotificationManager.notify(
+                COLLAPSE_ID,
+                COLLAPSE_ID.hashCode(),
+                capture(notificationSlot)
+            )
+        } returns Unit
+
+        pushMessagePresenter.present(message)
+
+        notificationSlot.captured.channelId shouldBe DEBUG_CHANNEL_ID
+    }
+
+    @Test
+    fun present_should_not_CreateDebugChannel_if_debugMode_and_channelId_is_valid() = runTest {
+        val message = createTestMessage()
+        val channelSettings = listOf(ChannelSettings(CHANNEL_ID))
+        val testSettings = AndroidNotificationSettings(true, 1, channelSettings)
+
+        every { mockPlatformInfoCollector.isDebugMode() } returns true
+        every { mockPlatformInfoCollector.notificationSettings() } returns testSettings
+
+        every {
+            mockNotificationManager.notify(
+                COLLAPSE_ID,
+                COLLAPSE_ID.hashCode(),
+                capture(notificationSlot)
+            )
+        } returns Unit
+
+        pushMessagePresenter.present(message)
+
+        notificationSlot.captured.channelId shouldBe CHANNEL_ID
+    }
+
+    @Test
+    fun present_should_not_CreateDebugChannel_if_not_debugMode() = runTest {
+        val message = createTestMessage()
+        val testSettings = AndroidNotificationSettings(true, 1, emptyList())
+
+        every { mockPlatformInfoCollector.isDebugMode() } returns false
+        every { mockPlatformInfoCollector.notificationSettings() } returns testSettings
+
+        every {
+            mockNotificationManager.notify(
+                COLLAPSE_ID,
+                COLLAPSE_ID.hashCode(),
+                capture(notificationSlot)
+            )
+        } returns Unit
+
+        pushMessagePresenter.present(message)
+
+        notificationSlot.captured.channelId shouldBe CHANNEL_ID
     }
 
     private fun createTestMessage(
