@@ -6,20 +6,20 @@ import android.content.res.Resources
 import android.util.DisplayMetrics
 import org.json.JSONObject
 
-class AndroidPlatformInfoCollector(
+class PlatformInfoCollector(
     private val context: Context,
-): PlatformInfoCollectorApi {
+) : PlatformInfoCollectorApi {
 
-    override fun collect(): AndroidPlatformInfo {
-        return AndroidPlatformInfo(
-            osVersion = SdkBuildConfig.getOsVersion(),
-            notificationSettings = null,
-            isDebugMode = 0 != context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE,
-        )
+    override fun notificationSettings(): AndroidNotificationSettings {
+        TODO("Not yet implemented")
     }
 
-    private fun getDisplayMetrics(): DisplayMetrics? {
+    override fun displayMetrics(): DisplayMetrics? {
         return Resources.getSystem().displayMetrics
+    }
+
+    override fun isDebugMode(): Boolean {
+        return 0 != context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE
     }
 
     private fun parseChannelSettings(): Pair<String, Any> {

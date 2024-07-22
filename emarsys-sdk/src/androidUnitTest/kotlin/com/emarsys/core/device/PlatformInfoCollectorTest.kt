@@ -9,21 +9,19 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.unmockkAll
-import kotlinx.serialization.json.Json
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
 
-class AndroidPlatformInfoCollectorTest {
+class PlatformInfoCollectorTest {
     private companion object {
         private const val APP_VERSION = "2.0"
         private const val OS_VERSION = "testOSVersion"
     }
 
     private lateinit var mockContext: Context
-    private lateinit var androidPlatformInfoCollector: AndroidPlatformInfoCollector
-    private val json = Json
+    private lateinit var platformInfoCollector: PlatformInfoCollector
 
     @Before
     fun setup() {
@@ -43,7 +41,7 @@ class AndroidPlatformInfoCollectorTest {
         mockkObject(SdkBuildConfig)
         every { SdkBuildConfig.getOsVersion() } returns OS_VERSION
 
-        androidPlatformInfoCollector = AndroidPlatformInfoCollector(mockContext)
+        platformInfoCollector = PlatformInfoCollector(mockContext)
     }
 
     @After
@@ -52,30 +50,22 @@ class AndroidPlatformInfoCollectorTest {
     }
 
     @Test
-    fun testCollect_should_collect_platformInfo() {
+    fun testIsDebugMode_should_return_true() {
         val applicationInfo = ApplicationInfo().apply { flags = ApplicationInfo.FLAG_DEBUGGABLE }
         every { mockContext.applicationInfo } returns applicationInfo
-        val expected = AndroidPlatformInfo(
-            OS_VERSION,
-            null,
-            true
-        )
 
-        val result = androidPlatformInfoCollector.collect()
+        val result = platformInfoCollector.isDebugMode()
 
-        result shouldBe expected
+        result shouldBe true
     }
 
     @Test
-    fun testCollect_should_collect_platformInfo_debugMode_false() {
-        val expected = AndroidPlatformInfo(
-            OS_VERSION,
-            null,
-            false
-        )
+    fun testIsDebugMode_should_return_false() {
+        val applicationInfo = ApplicationInfo()
+        every { mockContext.applicationInfo } returns applicationInfo
 
-        val result = androidPlatformInfoCollector.collect()
+        val result = platformInfoCollector.isDebugMode()
 
-        result shouldBe expected
+        result shouldBe false
     }
 }

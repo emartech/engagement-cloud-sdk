@@ -1,5 +1,9 @@
 package com.emarsys.core.device
 
+import android.util.DisplayMetrics
+
 interface PlatformInfoCollectorApi {
-    fun collect(): AndroidPlatformInfo
+    fun notificationSettings(): AndroidNotificationSettings
+    fun displayMetrics(): DisplayMetrics?
+    fun isDebugMode(): Boolean
 }
