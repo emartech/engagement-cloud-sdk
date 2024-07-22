@@ -13,12 +13,14 @@ import com.emarsys.mobileengage.action.actions.BadgeCountAction
 import com.emarsys.mobileengage.action.actions.CustomEventAction
 import com.emarsys.mobileengage.action.actions.DismissAction
 import com.emarsys.mobileengage.action.actions.OpenExternalUrlAction
+import com.emarsys.mobileengage.action.actions.PushToInappAction
 import com.emarsys.mobileengage.action.models.AppEventActionModel
 import com.emarsys.mobileengage.action.models.AskForPushPermissionActionModel
 import com.emarsys.mobileengage.action.models.BadgeCountActionModel
 import com.emarsys.mobileengage.action.models.CustomEventActionModel
 import com.emarsys.mobileengage.action.models.DismissActionModel
 import com.emarsys.mobileengage.action.models.OpenExternalUrlActionModel
+import com.emarsys.mobileengage.action.models.PushToInappActionModel
 
 class ActionFactory<ActionModelType>(
     private val onEventActionInternal: OnEventActionInternalApi,
@@ -37,6 +39,7 @@ class ActionFactory<ActionModelType>(
             is BadgeCountActionModel -> BadgeCountAction(action, badgeCountHandler)
             is DismissActionModel -> DismissAction(action, msgHub)
             is OpenExternalUrlActionModel -> OpenExternalUrlAction(action, externalUrlOpener)
+            is PushToInappActionModel -> PushToInappAction()
             else -> throw IllegalArgumentException("Unknown action type: $action")
         }
     }
