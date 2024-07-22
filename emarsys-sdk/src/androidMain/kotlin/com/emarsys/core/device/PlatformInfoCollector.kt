@@ -1,17 +1,24 @@
 package com.emarsys.core.device
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.res.Resources
 import android.util.DisplayMetrics
-import org.json.JSONObject
 
 class PlatformInfoCollector(
     private val context: Context,
 ) : PlatformInfoCollectorApi {
 
     override fun notificationSettings(): AndroidNotificationSettings {
-        return AndroidNotificationSettings(true, 1, emptyList())
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        return AndroidNotificationSettings(
+            notificationManager.areNotificationsEnabled(),
+            notificationManager.importance,
+            parseChannelSettings(notificationManager.notificationChannels)
+        )
     }
 
     override fun displayMetrics(): DisplayMetrics? {
@@ -22,7 +29,16 @@ class PlatformInfoCollector(
         return 0 != context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE
     }
 
-    private fun parseChannelSettings(): Pair<String, Any> {
-        return "channelSettings" to listOf(JSONObject())
+    private fun parseChannelSettings(notificationChannels: List<NotificationChannel>): List<ChannelSettings> {
+        return notificationChannels.map { channel ->
+            ChannelSettings(
+                channelId = channel.id,
+                importance = channel.importance,
+                canBypassDnd = channel.canBypassDnd(),
+                canShowBadge = channel.canShowBadge(),
+                shouldVibrate = channel.shouldVibrate(),
+                shouldShowLights = channel.shouldShowLights()
+            )
+        }
     }
 }
