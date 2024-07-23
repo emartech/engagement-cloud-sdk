@@ -24,6 +24,7 @@ class DeviceInfoCollectorTests {
     private lateinit var mockTimezoneProvider: Provider<String>
     private lateinit var mockApplicationVersionProvider: Provider<String>
     private lateinit var mockHardwareIdProvider: Provider<String>
+    private lateinit var mockPlatformInfoCollector: PlatformInfoCollector
     private lateinit var deviceInfoCollector: DeviceInfoCollector
     private val json = Json
 
@@ -41,12 +42,15 @@ class DeviceInfoCollectorTests {
         mockHardwareIdProvider = mockk(relaxed = true)
         every { mockHardwareIdProvider.provide() } returns HW_ID
 
+        mockPlatformInfoCollector = mockk(relaxed = true)
+
         deviceInfoCollector = DeviceInfoCollector(
             mockTimezoneProvider,
             mockLanguageProvider,
             mockApplicationVersionProvider,
             true,
             mockHardwareIdProvider,
+            mockPlatformInfoCollector,
             json
         )
     }
@@ -82,6 +86,7 @@ class DeviceInfoCollectorTests {
             mockApplicationVersionProvider,
             false,
             mockHardwareIdProvider,
+            mockPlatformInfoCollector,
             json
         )
 
@@ -90,5 +95,18 @@ class DeviceInfoCollectorTests {
         val deviceInfo = Json.decodeFromString<DeviceInfo>(result)
 
         deviceInfo.platform shouldBe "android-huawei"
+    }
+
+    @Test
+    fun getPushSettings_shouldCall_getPushSettings_onPlatformInfoCollector() {
+        val testSettings = AndroidNotificationSettings(
+            true, -1000, listOf(ChannelSettings("testChannelId"))
+        )
+
+        every { mockPlatformInfoCollector.notificationSettings() } returns testSettings
+
+        val result = deviceInfoCollector.getPushSettings()
+
+        result shouldBe testSettings
     }
 }

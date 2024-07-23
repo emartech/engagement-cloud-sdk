@@ -11,6 +11,7 @@ actual class DeviceInfoCollector(
     private val applicationVersionProvider: Provider<String>,
     private val isGooglePlayServicesAvailable: Boolean,
     private val hardwareIdProvider: Provider<String>,
+    private val platformInfoCollector: PlatformInfoCollectorApi,
     private val json: Json
 ) : DeviceInfoCollectorApi {
 
@@ -37,6 +38,6 @@ actual class DeviceInfoCollector(
     }
 
     actual override fun getPushSettings(): PushSettings {
-        TODO("Not yet implemented")
+        return platformInfoCollector.notificationSettings()
     }
 }

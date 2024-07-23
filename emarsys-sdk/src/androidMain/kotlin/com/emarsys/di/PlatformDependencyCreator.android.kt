@@ -75,6 +75,7 @@ actual class PlatformDependencyCreator actual constructor(
             createApplicationVersionProvider(),
             true,
             HardwareIdProvider(uuidProvider, storage),
+            platformInfoCollector,
             json
         )
     }
