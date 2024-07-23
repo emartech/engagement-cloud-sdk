@@ -15,6 +15,7 @@ class PlatformInfoCollectorTest {
     private companion object {
         const val NOTIFICATION_MANAGER_IMPORTANCE = -1000
         const val CHANNEL_IMPORTANCE = 1
+        const val DEBUG_CHANNEL_ID = "ems_debug"
         const val CHANNEL_ID = "testChannelId"
         const val CHANNEL_NAME = "testChannelName"
     }
@@ -28,8 +29,12 @@ class PlatformInfoCollectorTest {
     @Before
     fun setup() {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.deleteNotificationChannel(CHANNEL_ID)
+        notificationManager.deleteNotificationChannel(DEBUG_CHANNEL_ID)
+
         val notificationChannel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, CHANNEL_IMPORTANCE)
         notificationManager.createNotificationChannel(notificationChannel)
+
         platformInfoCollector = PlatformInfoCollector(context)
     }
 
@@ -43,6 +48,17 @@ class PlatformInfoCollectorTest {
         val result = platformInfoCollector.isDebugMode()
 
         result shouldBe true
+    }
+
+    @Test
+    fun testIsDebugMode_should_return_false() {
+        InstrumentationRegistry.getInstrumentation().targetContext.apply {
+            this.applicationInfo.flags = 0
+        }
+
+        val result = platformInfoCollector.isDebugMode()
+
+        result shouldBe false
     }
 
     @Test
