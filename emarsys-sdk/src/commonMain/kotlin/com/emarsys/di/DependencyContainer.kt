@@ -177,7 +177,8 @@ class DependencyContainer : DependencyContainerApi {
             permissionHandler,
             badgeCountHandler,
             externalUrlOpener,
-            msgHub
+            msgHub,
+            sdkLogger
         )
     }
 
@@ -188,7 +189,8 @@ class DependencyContainer : DependencyContainerApi {
             permissionHandler,
             badgeCountHandler,
             externalUrlOpener,
-            msgHub
+            msgHub,
+            sdkLogger
         )
     }
 
