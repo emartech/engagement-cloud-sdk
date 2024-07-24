@@ -3,6 +3,8 @@ package com.emarsys.mobileengage.action
 import com.emarsys.api.oneventaction.OnEventActionInternalApi
 import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.channel.DeviceEventChannelApi
+import com.emarsys.core.log.ConsoleLogger
+import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.message.MsgHubApi
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
@@ -52,7 +54,8 @@ class ActionFactoryTests {
             mockPermissionHandler,
             mockBadgeCountHandler,
             mockExternalUrlOpener,
-            mockMsgHub
+            mockMsgHub,
+            SdkLogger(ConsoleLogger())
         )
     }
 

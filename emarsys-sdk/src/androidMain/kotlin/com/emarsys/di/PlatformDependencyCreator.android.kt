@@ -15,8 +15,8 @@ import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.cache.AndroidFileCache
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.device.AndroidLanguageProvider
-import com.emarsys.core.device.AndroidPlatformInfoCollector
 import com.emarsys.core.device.DeviceInfoCollector
+import com.emarsys.core.device.PlatformInfoCollector
 import com.emarsys.core.log.Logger
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.permission.AndroidPermissionHandler
@@ -59,14 +59,12 @@ actual class PlatformDependencyCreator actual constructor(
     private val platformContext: CommonPlatformContext = platformContext as CommonPlatformContext
     private val metadataReader = MetadataReader(applicationContext)
     private val storage = createStorage()
+    private val platformInfoCollector = PlatformInfoCollector(applicationContext)
 
     actual override fun createLanguageProvider(): Provider<String> {
         return AndroidLanguageProvider(Locale.getDefault())
     }
 
-    private fun createAndroidDeviceInfoCollector(): AndroidPlatformInfoCollector {
-        return AndroidPlatformInfoCollector(applicationContext)
-    }
 
     actual override fun createDeviceInfoCollector(
         timezoneProvider: Provider<String>
@@ -77,6 +75,7 @@ actual class PlatformDependencyCreator actual constructor(
             createApplicationVersionProvider(),
             true,
             HardwareIdProvider(uuidProvider, storage),
+            platformInfoCollector,
             json
         )
     }
@@ -100,7 +99,8 @@ actual class PlatformDependencyCreator actual constructor(
             json,
             notificationManager,
             metadataReader,
-            notificationCompatStyler
+            notificationCompatStyler,
+            platformInfoCollector
         )
         val pushTokenBroadcastReceiver = PushTokenBroadcastReceiver(sdkDispatcher, pushApi)
         val pushMessageBroadcastReceiver =

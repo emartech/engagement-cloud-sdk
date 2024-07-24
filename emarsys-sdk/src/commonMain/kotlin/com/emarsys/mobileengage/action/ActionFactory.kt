@@ -3,6 +3,7 @@ package com.emarsys.mobileengage.action
 import com.emarsys.api.oneventaction.OnEventActionInternalApi
 import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.channel.DeviceEventChannelApi
+import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.message.MsgHubApi
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
@@ -13,12 +14,14 @@ import com.emarsys.mobileengage.action.actions.BadgeCountAction
 import com.emarsys.mobileengage.action.actions.CustomEventAction
 import com.emarsys.mobileengage.action.actions.DismissAction
 import com.emarsys.mobileengage.action.actions.OpenExternalUrlAction
+import com.emarsys.mobileengage.action.actions.PushToInappAction
 import com.emarsys.mobileengage.action.models.AppEventActionModel
 import com.emarsys.mobileengage.action.models.AskForPushPermissionActionModel
 import com.emarsys.mobileengage.action.models.BadgeCountActionModel
 import com.emarsys.mobileengage.action.models.CustomEventActionModel
 import com.emarsys.mobileengage.action.models.DismissActionModel
 import com.emarsys.mobileengage.action.models.OpenExternalUrlActionModel
+import com.emarsys.mobileengage.action.models.PushToInappActionModel
 
 class ActionFactory<ActionModelType>(
     private val onEventActionInternal: OnEventActionInternalApi,
@@ -26,7 +29,8 @@ class ActionFactory<ActionModelType>(
     private val permissionHandler: PermissionHandlerApi,
     private val badgeCountHandler: BadgeCountHandlerApi,
     private val externalUrlOpener: ExternalUrlOpenerApi,
-    private val msgHub: MsgHubApi
+    private val msgHub: MsgHubApi,
+    private val sdkLogger: SdkLogger
 ): ActionFactoryApi<ActionModelType> {
 
     override suspend fun create(action: ActionModelType): Action<*> {
@@ -37,6 +41,7 @@ class ActionFactory<ActionModelType>(
             is BadgeCountActionModel -> BadgeCountAction(action, badgeCountHandler)
             is DismissActionModel -> DismissAction(action, msgHub)
             is OpenExternalUrlActionModel -> OpenExternalUrlAction(action, externalUrlOpener)
+            is PushToInappActionModel -> PushToInappAction(sdkLogger)
             else -> throw IllegalArgumentException("Unknown action type: $action")
         }
     }

@@ -1,5 +1,6 @@
 package com.emarsys.mobileengage.push
 
+import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
@@ -10,6 +11,8 @@ import com.emarsys.api.push.PushConstants.INTENT_EXTRA_ACTION_KEY
 import com.emarsys.api.push.PushConstants.INTENT_EXTRA_DEFAULT_TAP_ACTION_KEY
 import com.emarsys.api.push.PushConstants.INTENT_EXTRA_PAYLOAD_KEY
 import com.emarsys.api.push.PushConstants.PUSH_NOTIFICATION_ICON_NAME
+import com.emarsys.core.device.AndroidNotificationSettings
+import com.emarsys.core.device.PlatformInfoCollector
 import com.emarsys.core.resource.MetadataReader
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.push.model.AndroidPlatformData
@@ -22,24 +25,31 @@ class PushMessagePresenter(
     private val json: Json,
     private val notificationManager: NotificationManager,
     private val metadataReader: MetadataReader,
-    private val notificationCompatStyler: NotificationCompatStyler
+    private val notificationCompatStyler: NotificationCompatStyler,
+    private val platformInfoCollector: PlatformInfoCollector
 ) : PushPresenter<AndroidPlatformData, AndroidPushMessage> {
+    private companion object {
+        const val DEBUG_CHANNEL_ID = "ems_debug"
+        const val DEBUG_CHANNEL_NAME = "Emarsys SDK Debug Messages"
+    }
 
     override suspend fun present(pushMessage: AndroidPushMessage) {
+        val message = handleChannelIdMismatch(pushMessage, platformInfoCollector.notificationSettings(), context)
+
         val iconId = metadataReader.getInt(PUSH_NOTIFICATION_ICON_NAME)
-        val channelId = pushMessage.data.platformData.channelId
-        val collapseId = pushMessage.data.platformData.notificationMethod.collapseId
-        val tapActionPendingIntent = createTapActionPendingIntent(pushMessage)
+        val channelId = message.data.platformData.channelId
+        val collapseId = message.data.platformData.notificationMethod.collapseId
+        val tapActionPendingIntent = createTapActionPendingIntent(message)
 
         val notificationBuilder = NotificationCompat.Builder(context, channelId)
-            .setContentTitle(pushMessage.title)
-            .setContentText(pushMessage.body)
+            .setContentTitle(message.title)
+            .setContentText(message.body)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setSmallIcon(iconId)
             .setContentIntent(tapActionPendingIntent)
-            .addActions(pushMessage)
+            .addActions(message)
 
-        notificationCompatStyler.style(notificationBuilder, pushMessage)
+        notificationCompatStyler.style(notificationBuilder, message)
 
         notificationManager.notify(collapseId, collapseId.hashCode(), notificationBuilder.build())
     }
@@ -110,5 +120,44 @@ class PushMessagePresenter(
             intent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
+    }
+
+    private fun shouldCreateDebugChannel(
+        channelId: String,
+        notificationSettings: AndroidNotificationSettings
+    ): Boolean {
+        return platformInfoCollector.isDebugMode() && !notificationSettings.channelSettings.any { channelSettings -> channelSettings.channelId == channelId }
+    }
+
+    private fun handleChannelIdMismatch(
+        pushMessage: AndroidPushMessage,
+        notificationSettings: AndroidNotificationSettings,
+        context: Context
+    ): AndroidPushMessage {
+        val channelId = pushMessage.data.platformData.channelId
+        return if (shouldCreateDebugChannel(channelId, notificationSettings)) {
+            val debugChannelId = createDebugChannel(context)
+            val platformData = pushMessage.data.platformData.copy(channelId = debugChannelId)
+            val pushData = pushMessage.data.copy(platformData = platformData)
+            pushMessage.copy(
+                body = "DEBUG - channel_id mismatch: $channelId not found!",
+                data = pushData,
+                title = "Emarsys SDK"
+            )
+        } else {
+            pushMessage
+        }
+    }
+
+    private fun createDebugChannel(context: Context): String {
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationChannel = NotificationChannel(
+            DEBUG_CHANNEL_ID,
+            DEBUG_CHANNEL_NAME,
+            NotificationManager.IMPORTANCE_HIGH
+        )
+        notificationManager.createNotificationChannel(notificationChannel)
+        return notificationChannel.id
     }
 }
