@@ -159,7 +159,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
     private val dependencyCreator: DependencyCreator =
         PlatformDependencyCreator(platformContext, uuidProvider, sdkLogger, json)
 
-    private val stringStorage: TypedStorageApi<String?> by lazy { dependencyCreator.createStorage() }
+    override val stringStorage: TypedStorageApi<String?> by lazy { dependencyCreator.createStorage() }
 
     private val permissionHandler: PermissionHandlerApi by lazy { dependencyCreator.createPermissionHandler() }
 
@@ -193,7 +193,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         )
     }
 
-    val storage: Storage by lazy { Storage(stringStorage, json) }
+    override val storage: Storage by lazy { Storage(stringStorage, json) }
 
     override val timezoneProvider: Provider<String> by lazy { TimezoneProvider(timestampProvider) }
 
@@ -372,7 +372,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         Push(loggingPush, pushGatherer, pushInternal, sdkContext)
     }
 
-    private val pushClient: PushClientApi by lazy {
+    override val pushClient: PushClientApi by lazy {
         PushClient(emarsysClient, urlFactory, json)
     }
 

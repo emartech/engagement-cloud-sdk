@@ -89,6 +89,7 @@ class PushInternalTests {
     @Test
     fun testClearPushToken() = runTest {
         everySuspend { mockPushClient.clearPushToken() } returns Unit
+        everySuspend { mockStorage.put(PushConstants.PUSH_TOKEN_STORAGE_KEY, null) } returns Unit
 
         pushInternal.clearPushToken()
 

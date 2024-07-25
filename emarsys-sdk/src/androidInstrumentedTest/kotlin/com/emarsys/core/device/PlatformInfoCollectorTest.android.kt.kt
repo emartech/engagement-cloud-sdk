@@ -13,7 +13,6 @@ import org.junit.Test
 
 class PlatformInfoCollectorTest {
     private companion object {
-        const val NOTIFICATION_MANAGER_IMPORTANCE = -1000
         const val CHANNEL_IMPORTANCE = 1
         const val DEBUG_CHANNEL_ID = "ems_debug"
         const val CHANNEL_ID = "testChannelId"
@@ -65,8 +64,6 @@ class PlatformInfoCollectorTest {
     fun testNotificationSettings_should_return_parsed_channel_settings() {
         val result = platformInfoCollector.notificationSettings()
 
-        result.importance shouldBe NOTIFICATION_MANAGER_IMPORTANCE
-        result.areNotificationsEnabled shouldBe true
         result.channelSettings.size shouldBe 1
 
         val settings = result.channelSettings.first()

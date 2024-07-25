@@ -27,6 +27,7 @@ class PushInternal(
 
     override suspend fun clearPushToken() {
         pushClient.clearPushToken()
+        storage.put(PUSH_TOKEN_STORAGE_KEY, null)
     }
 
     override val pushToken: String?
