@@ -120,7 +120,6 @@ import com.emarsys.setup.SetupOrganizerApi
 import com.emarsys.setup.states.AppStartState
 import com.emarsys.setup.states.ApplyRemoteConfigState
 import com.emarsys.setup.states.CollectDeviceInfoState
-import com.emarsys.setup.states.LinkAnonymousContactState
 import com.emarsys.setup.states.RegisterClientState
 import com.emarsys.setup.states.RegisterPushTokenState
 import com.emarsys.watchdog.connection.ConnectionWatchDog
@@ -136,7 +135,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 
-class DependencyContainer : DependencyContainerApi {
+class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateApi {
     private companion object {
         const val PUBLIC_KEY =
             "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAELjWEUIBX9zlm1OI4gF1hMCBLzpaBwgs9HlmSIBAqP4MDGy4ibOOV3FVDrnAY0Q34LZTbPBlp3gRNZJ19UoSy2Q=="
@@ -220,7 +219,7 @@ class DependencyContainer : DependencyContainerApi {
         SdkContext(sdkDispatcher, defaultUrls, LogLevel.Error, mutableSetOf())
     }
 
-    private val sessionContext: SessionContext by lazy {
+    override val sessionContext: SessionContext by lazy {
         SessionContext(clientState = null, deviceEventState = null)
     }
 
@@ -245,7 +244,7 @@ class DependencyContainer : DependencyContainerApi {
         ContactTokenHandler(sessionContext)
     }
 
-    private val deviceClient: DeviceClientApi by lazy {
+    override val deviceClient: DeviceClientApi by lazy {
         DeviceClient(emarsysClient, urlFactory, deviceInfoCollector, contactTokenHandler)
     }
 
@@ -383,7 +382,7 @@ class DependencyContainer : DependencyContainerApi {
 
     private val defaultUrls: DefaultUrlsApi by lazy {
         DefaultUrls(
-            "https://me-client.eservice.emarsys.net",
+            "https://me-client.gservice.emarsys.net",
             "https://mobile-events.eservice.emarsys.net",
             "https://recommender.scarabresearch.com/merchants",
             "https://deep-link.eservice.emarsys.net",
@@ -431,7 +430,6 @@ class DependencyContainer : DependencyContainerApi {
         val applyRemoteConfigState = ApplyRemoteConfigState(
             remoteConfigHandler
         )
-        val linkAnonymousContactState = LinkAnonymousContactState(contactClient, sessionContext)
         val appStartState = AppStartState(eventClient, timestampProvider)
         val stateMachine =
             StateMachine(
@@ -441,7 +439,6 @@ class DependencyContainer : DependencyContainerApi {
                     platformInitState,
                     registerClientState,
                     registerPushTokenState,
-                    linkAnonymousContactState,
                     appStartState
                 )
             )

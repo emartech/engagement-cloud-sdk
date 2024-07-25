@@ -32,7 +32,7 @@ class UrlFactory(
                 sdkContext.defaultUrls.clientServiceBaseUrl,
                 "contact",
                 "client/contact"
-            ).apply { parameters.append("anonymous", "true") }.build()
+            ).build()
 
             REFRESH_TOKEN -> createUrlBasedOnPredict(
                 sdkContext.defaultUrls.clientServiceBaseUrl,
@@ -40,8 +40,8 @@ class UrlFactory(
                 "contact-token"
             ).build()
 
-            PUSH_TOKEN -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V3_API/apps/${sdkContext.config?.applicationCode}/client/push-token")
-            REGISTER_DEVICE_INFO -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V3_API/apps/${sdkContext.config?.applicationCode}/client")
+            PUSH_TOKEN -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${sdkContext.config?.applicationCode}/client/push-token")
+            REGISTER_DEVICE_INFO -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${sdkContext.config?.applicationCode}/client")
             EVENT -> {
                 Url("${sdkContext.defaultUrls.eventServiceBaseUrl}/$V4_API/apps/${sdkContext.config?.applicationCode}/client/events")
             }
@@ -59,7 +59,7 @@ class UrlFactory(
         return if (isPredictOnly()) {
             URLBuilder("$baseUrl/$V3_API/$predictPath")
         } else {
-            URLBuilder("$baseUrl/$V3_API/apps/${sdkContext.config?.applicationCode}/$mePath")
+            URLBuilder("$baseUrl/$V4_API/apps/${sdkContext.config?.applicationCode}/$mePath")
         }
     }
 

@@ -78,7 +78,7 @@ class EmarsysClientTests {
                     status = HttpStatusCode.OK,
                     headers = headers {
                         append("Content-Type", "application/json")
-                        append("X-Client-State", "testClientState")
+                        append("ems-client-state", "testClientState")
                     }
                 )
             }
@@ -113,7 +113,7 @@ class EmarsysClientTests {
         )
         val expectedRequest = request.copy(
             headers = mapOf(
-                "X-Contact-Token" to "testContactToken",
+                "ems-contact" to "testContactToken",
                 "X-Request-Order" to now.toEpochMilliseconds()
             )
         )
@@ -123,7 +123,7 @@ class EmarsysClientTests {
             HttpStatusCode.OK,
             headers {
                 append("Content-Type", "application/json")
-                append("X-Client-State", "testClientState")
+                append("ems-client-state", "testClientState")
             },
             json.encodeToString(testData)
         )

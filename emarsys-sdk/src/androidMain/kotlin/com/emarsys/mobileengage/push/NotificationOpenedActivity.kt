@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.emarsys.api.push.PushConstants.INTENT_EXTRA_ACTION_KEY
 import com.emarsys.api.push.PushConstants.INTENT_EXTRA_DEFAULT_TAP_ACTION_KEY
+import com.emarsys.di.DependencyContainerPrivateApi
 import com.emarsys.di.DependencyInjection
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BasicActionModel
@@ -13,8 +14,9 @@ import com.emarsys.mobileengage.action.models.PresentableActionModel
 import kotlinx.coroutines.launch
 
 class NotificationOpenedActivity : AppCompatActivity() {
-    private val json = DependencyInjection.container.json
-    private val actionFactory = DependencyInjection.container.actionFactory
+    private val container = DependencyInjection.container as DependencyContainerPrivateApi
+    private val json = container.json
+    private val actionFactory = container.actionFactory
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

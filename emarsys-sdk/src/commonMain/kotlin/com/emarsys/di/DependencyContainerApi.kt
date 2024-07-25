@@ -9,16 +9,7 @@ import com.emarsys.api.inbox.InboxApi
 import com.emarsys.api.oneventaction.OnEventActionApi
 import com.emarsys.api.predict.PredictApi
 import com.emarsys.api.push.PushApi
-import com.emarsys.core.providers.Provider
-import com.emarsys.core.util.DownloaderApi
-import com.emarsys.mobileengage.action.ActionFactoryApi
-import com.emarsys.mobileengage.action.models.ActionModel
-import com.emarsys.mobileengage.session.Session
-import com.emarsys.remoteConfig.RemoteConfigHandlerApi
 import com.emarsys.setup.SetupOrganizerApi
-import com.emarsys.watchdog.connection.ConnectionWatchDog
-import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
-import kotlinx.serialization.json.Json
 
 interface DependencyContainerApi {
     val contactApi: ContactApi
@@ -39,25 +30,7 @@ interface DependencyContainerApi {
 
     val onEventActionApi: OnEventActionApi
 
-    val actionFactory: ActionFactoryApi<ActionModel>
-
-    val uuidProvider: Provider<String>
-
-    val timezoneProvider: Provider<String>
-
     val setupOrganizerApi: SetupOrganizerApi
-
-    val remoteConfigHandler: RemoteConfigHandlerApi
-
-    val connectionWatchDog: ConnectionWatchDog
-
-    val lifecycleWatchDog: LifecycleWatchDog
-
-    val mobileEngageSession: Session
-
-    val json: Json
-
-    val downloaderApi: DownloaderApi
 
     suspend fun setup()
 }
