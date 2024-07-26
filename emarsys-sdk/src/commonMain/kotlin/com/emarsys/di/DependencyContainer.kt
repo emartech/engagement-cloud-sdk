@@ -376,7 +376,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         PushClient(emarsysClient, urlFactory, json)
     }
 
-    private val contactClient: ContactClientApi by lazy {
+    override val contactClient: ContactClientApi by lazy {
         ContactClient(emarsysClient, urlFactory, sdkContext, contactTokenHandler, json)
     }
 

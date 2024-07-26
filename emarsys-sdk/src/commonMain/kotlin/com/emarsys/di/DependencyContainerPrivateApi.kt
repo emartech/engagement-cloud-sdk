@@ -8,6 +8,7 @@ import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.session.Session
+import com.emarsys.networking.clients.contact.ContactClientApi
 import com.emarsys.networking.clients.device.DeviceClientApi
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.remoteConfig.RemoteConfigHandlerApi
@@ -38,6 +39,8 @@ interface DependencyContainerPrivateApi {
     val deviceClient: DeviceClientApi
 
     val pushClient: PushClientApi
+
+    val contactClient: ContactClientApi
 
     val sessionContext: SessionContext
 

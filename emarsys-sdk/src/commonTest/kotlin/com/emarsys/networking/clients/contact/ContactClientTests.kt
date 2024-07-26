@@ -172,7 +172,7 @@ class ContactClientTests  {
 
         val expectedUrlRequest = UrlRequest(
             testUrl,
-            HttpMethod.Post,
+            HttpMethod.Delete,
             null,
             mapOf()
         )
@@ -212,7 +212,7 @@ class ContactClientTests  {
 
         val expectedUrlRequest = UrlRequest(
             testUrl,
-            HttpMethod.Post,
+            HttpMethod.Delete,
             null,
             mapOf("X-Merchant-Id" to MERCHANT_ID)
         )

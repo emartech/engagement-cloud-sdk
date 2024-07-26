@@ -4,9 +4,9 @@ import com.emarsys.context.SdkContextApi
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
-import com.emarsys.networking.EmarsysHeaders
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
+import com.emarsys.networking.EmarsysHeaders
 import io.ktor.http.HttpMethod
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -58,7 +58,7 @@ class ContactClient(
             headers[EmarsysHeaders.MERCHANT_ID_HEADER] = sdkContext.config!!.merchantId
         }
 
-        val request = UrlRequest(url, HttpMethod.Post, null, headers)
+        val request = UrlRequest(url, HttpMethod.Delete, null, headers)
 
         val response = emarsysClient.send(request)
 
