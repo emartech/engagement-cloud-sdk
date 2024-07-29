@@ -215,7 +215,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         DeviceEventChannel(eventChannel)
     }
 
-    val sdkContext: SdkContext by lazy {
+    override val sdkContext: SdkContext by lazy {
         SdkContext(sdkDispatcher, defaultUrls, LogLevel.Error, mutableSetOf())
     }
 
@@ -431,7 +431,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             remoteConfigHandler
         )
         val appStartState = AppStartState(eventClient, timestampProvider)
-        val stateMachine =
+        val meStateMachine =
             StateMachine(
                 listOf(
                     collectDeviceInfoState,
@@ -442,7 +442,14 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
                     appStartState
                 )
             )
-        SetupOrganizer(stateMachine, sdkContext)
+        val predictStateMachine =
+            StateMachine(
+                listOf(
+                    collectDeviceInfoState,
+                    platformInitState,
+                )
+            )
+        SetupOrganizer(meStateMachine, predictStateMachine, sdkContext)
     }
 
     override val contactApi: ContactApi by lazy {

@@ -33,6 +33,26 @@ class ContactClientIntegrationTests {
     }
 
     @Test
+    fun testLinkContact_predictOnly() = runTest {
+        container.sessionContext.contactToken = null
+        container.sessionContext.refreshToken = null
+        container.sessionContext.clientState = null
+        container.sessionContext.deviceEventState = null
+        container.sessionContext.sessionId = null
+        container.sessionContext.clientId = null
+        container.sessionContext.contactFieldValue = null
+        container.sessionContext.openIdToken = null
+        container.sdkContext.config = null
+
+        Emarsys.enableTracking(EmarsysConfig(merchantId = "1DF86BF95CBE8F19"))
+
+        container.contactClient.linkContact(2575, "test2@test.com")
+
+        container.sessionContext.contactToken shouldNotBe null
+        container.sessionContext.refreshToken shouldNotBe null
+    }
+
+    @Test
     fun testUnlinkContact() = runTest {
         container.contactClient.linkContact(2575, "test2@test.com")
 

@@ -1,5 +1,6 @@
 package com.emarsys.di
 
+import com.emarsys.context.SdkContextApi
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.storage.Storage
@@ -47,4 +48,6 @@ interface DependencyContainerPrivateApi {
     val storage: Storage
 
     val stringStorage: TypedStorageApi<String?>
+
+    val sdkContext: SdkContextApi
 }

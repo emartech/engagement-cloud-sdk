@@ -1,6 +1,7 @@
 package com.emarsys.core.url
 
 import com.emarsys.context.SdkContextApi
+import com.emarsys.context.isConfigPredictOnly
 import com.emarsys.core.url.EmarsysUrlType.EVENT
 import com.emarsys.core.url.EmarsysUrlType.LINK_CONTACT
 import com.emarsys.core.url.EmarsysUrlType.PUSH_TOKEN
@@ -16,7 +17,6 @@ class UrlFactory(
     private val sdkContext: SdkContextApi
 ) : UrlFactoryApi {
     private companion object {
-        const val V3_API = "v3"
         const val V4_API = "v4"
     }
 
@@ -24,7 +24,7 @@ class UrlFactory(
         return when (urlType) {
             LINK_CONTACT -> createUrlBasedOnPredict(
                 sdkContext.defaultUrls.clientServiceBaseUrl,
-                "contact",
+                "contact-token",
                 "client/contact"
             ).build()
 
@@ -56,14 +56,10 @@ class UrlFactory(
         predictPath: String,
         mePath: String
     ): URLBuilder {
-        return if (isPredictOnly()) {
-            URLBuilder("$baseUrl/$V3_API/$predictPath")
+        return if (sdkContext.isConfigPredictOnly()) {
+            URLBuilder("$baseUrl/$V4_API/$predictPath")
         } else {
             URLBuilder("$baseUrl/$V4_API/apps/${sdkContext.config?.applicationCode}/$mePath")
         }
-    }
-
-    private fun isPredictOnly(): Boolean {
-        return sdkContext.config?.applicationCode == null && sdkContext.config?.merchantId != null
     }
 }

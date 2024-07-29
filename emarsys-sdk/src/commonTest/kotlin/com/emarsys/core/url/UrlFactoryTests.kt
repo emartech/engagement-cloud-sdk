@@ -46,7 +46,7 @@ class UrlFactoryTests {
         every { mockSdkContext.config } returns config
         val result = urlFactory.create(EmarsysUrlType.REFRESH_TOKEN)
 
-        result shouldBe Url("https://me-client.eservice.emarsys.net/v3/contact-token")
+        result shouldBe Url("https://me-client.eservice.emarsys.net/v4/contact-token")
     }
 
     @Test
@@ -94,7 +94,7 @@ class UrlFactoryTests {
         every { mockSdkContext.config } returns config
         val result = urlFactory.create(EmarsysUrlType.LINK_CONTACT)
 
-        result shouldBe Url("https://me-client.eservice.emarsys.net/v3/contact")
+        result shouldBe Url("https://me-client.eservice.emarsys.net/v4/contact-token")
     }
 
     @Test

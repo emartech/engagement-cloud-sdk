@@ -25,3 +25,7 @@ class SdkContext(
     }
 }
 
+fun SdkContextApi.isConfigPredictOnly(): Boolean {
+    return this.config?.applicationCode == null && this.config?.merchantId != null
+}
+

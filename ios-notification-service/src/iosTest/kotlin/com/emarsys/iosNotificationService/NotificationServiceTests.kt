@@ -4,6 +4,7 @@ import com.emarsys.iosNotificationService.notification.FakeNotificationCenter
 import com.emarsys.iosNotificationService.notification.NotificationCenterApi
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import kotlinx.cinterop.BetaInteropApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.test.runTest
@@ -15,6 +16,7 @@ import kotlin.coroutines.resume
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
+@OptIn(BetaInteropApi::class)
 class NotificationServiceTests {
 
     private lateinit var notificationService: NotificationService
@@ -56,7 +58,7 @@ class NotificationServiceTests {
         val content = UNMutableNotificationContent()
         content.setUserInfo(
             mapOf(
-                "image_url" to "https://gist.githubusercontent.com/LasOri/9a2c4eda66ca6a31f7b5afb5e20ba4c1/raw/7d0935addb36e01861a534ef0adc79d9c8a32e53/test.txt"
+                "image_url" to "https://mobile-sdk-config-staging.gservice.emarsys.com/testing/Emarsys.png"
             )
         )
         content.attachments shouldBe expectedAttachments
@@ -75,7 +77,7 @@ class NotificationServiceTests {
             mapOf(
                 "ems" to mapOf(
                     "inapp" to mapOf(
-                        "url" to "https://gist.githubusercontent.com/LasOri/9a2c4eda66ca6a31f7b5afb5e20ba4c1/raw/7d0935addb36e01861a534ef0adc79d9c8a32e53/test.txt"
+                        "url" to "https://mobile-sdk-config-staging.gservice.emarsys.com/testing/Emarsys.png"
                     )
                 )
             )
