@@ -4,14 +4,14 @@ import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.networking.model.body
-import com.emarsys.networking.EmarsysHeaders.CLIENT_ID_HEADER
-import com.emarsys.networking.EmarsysHeaders.CLIENT_STATE_HEADER
-import com.emarsys.networking.EmarsysHeaders.CONTACT_TOKEN_HEADER
-import com.emarsys.networking.EmarsysHeaders.REQUEST_ORDER_HEADER
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
+import com.emarsys.networking.EmarsysHeaders.CLIENT_ID_HEADER
+import com.emarsys.networking.EmarsysHeaders.CLIENT_STATE_HEADER
+import com.emarsys.networking.EmarsysHeaders.CONTACT_TOKEN_HEADER
+import com.emarsys.networking.EmarsysHeaders.REQUEST_ORDER_HEADER
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
@@ -85,9 +85,10 @@ class EmarsysClient(
             REQUEST_ORDER_HEADER to timestampProvider.provide().toEpochMilliseconds()
         ).filterValues { it != null }
 
-        request.headers?.let {
+        val headers = request.headers?.let {
             emarsysHeaders + it
-        }
-        return request.copy(headers = emarsysHeaders)
+        } ?: emarsysHeaders
+
+        return request.copy(headers = headers)
     }
 }

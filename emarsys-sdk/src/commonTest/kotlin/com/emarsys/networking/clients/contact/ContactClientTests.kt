@@ -132,14 +132,14 @@ class ContactClientTests  {
             testUrl,
             HttpMethod.Post,
             testBody,
-            mapOf("X-Merchant-Id" to MERCHANT_ID)
+            mapOf("ems-merchant-id" to MERCHANT_ID)
         )
 
         val expectedResponse = Response(
             expectedUrlRequest,
             HttpStatusCode.OK,
             headers {
-                append("X-Merchant-Id", MERCHANT_ID)
+                append("ems-merchant-id", MERCHANT_ID)
             },
             """{"refreshToken":"testRefreshToken", "contactToken":"testContactToken"}"""
         )
@@ -148,7 +148,7 @@ class ContactClientTests  {
             expectedUrlRequest,
             HttpStatusCode.OK,
             headers {
-                append("X-Merchant-Id", MERCHANT_ID)
+                append("ems-merchant-id", MERCHANT_ID)
             },
             """{"refreshToken":"testRefreshToken", "contactToken":"testContactToken"}"""
         )
@@ -214,14 +214,14 @@ class ContactClientTests  {
             testUrl,
             HttpMethod.Delete,
             null,
-            mapOf("X-Merchant-Id" to MERCHANT_ID)
+            mapOf("ems-merchant-id" to MERCHANT_ID)
         )
         every { mockUrlFactory.create(EmarsysUrlType.UNLINK_CONTACT) } returns testUrl
         everySuspend { mockEmarsysClient.send(expectedUrlRequest) } returns Response(
             expectedUrlRequest,
             HttpStatusCode.OK,
             headers {
-                append("X-Merchant-Id", MERCHANT_ID)
+                append("ems-merchant-id", MERCHANT_ID)
             },
             """{"refreshToken":"testRefreshToken", "contactToken":"testContactToken"}"""
         )
@@ -230,7 +230,7 @@ class ContactClientTests  {
             expectedUrlRequest,
             HttpStatusCode.OK,
             headers {
-                append("X-Merchant-Id", MERCHANT_ID)
+                append("ems-merchant-id", MERCHANT_ID)
             },
             """{"refreshToken":"testRefreshToken", "contactToken":"testContactToken"}"""
         )

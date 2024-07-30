@@ -5,5 +5,5 @@ object EmarsysHeaders {
     const val CLIENT_STATE_HEADER = "ems-client-state"
     const val CONTACT_TOKEN_HEADER = "ems-contact"
     const val REQUEST_ORDER_HEADER = "X-Request-Order"
-    const val MERCHANT_ID_HEADER = "X-Merchant-Id"
+    const val MERCHANT_ID_HEADER = "ems-merchant-id"
 }

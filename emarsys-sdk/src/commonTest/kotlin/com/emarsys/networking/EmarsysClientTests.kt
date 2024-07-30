@@ -10,6 +10,9 @@ import com.emarsys.core.session.SessionContext
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.model.TestDataClass
+import com.emarsys.networking.EmarsysHeaders.CLIENT_ID_HEADER
+import com.emarsys.networking.EmarsysHeaders.CLIENT_STATE_HEADER
+import com.emarsys.networking.EmarsysHeaders.CONTACT_TOKEN_HEADER
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.mock
@@ -37,9 +40,12 @@ import kotlin.test.Test
 
 class EmarsysClientTests {
     private companion object {
-        const val id = "testId"
-        const val name = "testName"
-        val testData = TestDataClass(id, name)
+        const val ID = "testId"
+        const val NAME = "testName"
+        const val CLIENT_ID = "testClientId"
+        const val CLIENT_STATE = "testClientState"
+        const val CONTACT_TOKEN = "testContactToken"
+        val testData = TestDataClass(ID, NAME)
     }
 
     private lateinit var mockTimestampProvider: Provider<Instant>
@@ -104,6 +110,7 @@ class EmarsysClientTests {
 
     @Test
     fun testSend_should_retry_on401_and_try_to_get_refreshToken() = runTest {
+        sessionContext.clientState = null
         val urlString =
             URLBuilder("https://testUrl.com").build()
         val request = UrlRequest(
@@ -133,6 +140,31 @@ class EmarsysClientTests {
         response shouldBe expectedResponse
         response.body<TestDataClass>() shouldBe testData
         sessionContext.clientState shouldBe "testClientState"
+    }
+
+    @Test
+    fun testSend_should_addEmarsysHeaders() = runTest {
+        sessionContext.contactToken = CONTACT_TOKEN
+        sessionContext.clientState = CLIENT_STATE
+        sessionContext.clientId = CLIENT_ID
+
+        val urlString =
+            URLBuilder("https://testUrl.com").build()
+        val request = UrlRequest(
+            urlString,
+            HttpMethod.Get,
+            null,
+            mapOf(
+                "test-header" to "testHeader"
+            )
+        )
+
+        val response: Response = emarsysClient.send(request)
+
+        response.originalRequest.headers?.get("test-header") shouldBe "testHeader"
+        response.originalRequest.headers?.get(CLIENT_ID_HEADER) shouldBe CLIENT_ID
+        response.originalRequest.headers?.get(CLIENT_STATE_HEADER) shouldBe CLIENT_STATE
+        response.originalRequest.headers?.get(CONTACT_TOKEN_HEADER) shouldBe CONTACT_TOKEN
     }
 
 }

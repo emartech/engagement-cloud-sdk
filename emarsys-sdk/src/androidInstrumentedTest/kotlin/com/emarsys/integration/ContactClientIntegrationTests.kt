@@ -18,11 +18,11 @@ class ContactClientIntegrationTests {
         container = DependencyInjection.container as DependencyContainerPrivateApi
 
         Emarsys.initialize()
-        Emarsys.enableTracking(EmarsysConfig("EMS11-C3FD3"))
     }
 
     @Test
     fun testLinkContact() = runTest {
+        Emarsys.enableTracking(EmarsysConfig("EMS11-C3FD3"))
         container.sessionContext.contactToken = null
         container.sessionContext.refreshToken = null
 
@@ -54,6 +54,7 @@ class ContactClientIntegrationTests {
 
     @Test
     fun testUnlinkContact() = runTest {
+        Emarsys.enableTracking(EmarsysConfig("EMS11-C3FD3"))
         container.contactClient.linkContact(2575, "test2@test.com")
 
         val contactToken = container.sessionContext.contactToken
