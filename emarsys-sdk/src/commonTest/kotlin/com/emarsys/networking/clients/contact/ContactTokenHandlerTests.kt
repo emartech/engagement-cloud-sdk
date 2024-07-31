@@ -3,6 +3,7 @@ package com.emarsys.networking.clients.contact
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.session.SessionContext
+import com.emarsys.util.JsonUtil
 import io.kotest.matchers.shouldBe
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -17,7 +18,7 @@ class ContactTokenHandlerTests {
 
     private lateinit var sessionContext: SessionContext
     private lateinit var contactTokenHandler: ContactTokenHandlerApi
-    private val json: Json = Json
+    private val json: Json = JsonUtil.json
 
     @BeforeTest
     fun setUp() {

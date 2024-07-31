@@ -1,5 +1,6 @@
 package com.emarsys.core.storage
 
+import com.emarsys.util.JsonUtil
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.mock
@@ -10,7 +11,6 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -32,7 +32,7 @@ class StorageTests {
     }
 
     private lateinit var mockStringStorage: TypedStorageApi<String?>
-    private val json = Json { encodeDefaults = true }
+    private val json = JsonUtil.json
     private lateinit var storage: StorageApi
 
     @BeforeTest

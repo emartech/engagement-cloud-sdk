@@ -2,6 +2,7 @@ package com.emarsys.core.device
 
 import android.os.Build
 import com.emarsys.core.providers.Provider
+import com.emarsys.util.JsonUtil
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -26,7 +27,7 @@ class DeviceInfoCollectorTests {
     private lateinit var mockHardwareIdProvider: Provider<String>
     private lateinit var mockPlatformInfoCollector: PlatformInfoCollector
     private lateinit var deviceInfoCollector: DeviceInfoCollector
-    private val json = Json
+    private val json = JsonUtil.json
 
     @Before
     fun setup() {
@@ -92,7 +93,7 @@ class DeviceInfoCollectorTests {
 
         val result = deviceInfoCollector.collect()
 
-        val deviceInfo = Json.decodeFromString<DeviceInfo>(result)
+        val deviceInfo = json.decodeFromString<DeviceInfo>(result)
 
         deviceInfo.platform shouldBe "android-huawei"
     }

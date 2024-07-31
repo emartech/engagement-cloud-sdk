@@ -7,6 +7,7 @@ import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.networking.model.body
 import com.emarsys.model.TestDataClass
+import com.emarsys.util.JsonUtil
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.ktor.client.HttpClient
@@ -31,12 +32,12 @@ import kotlin.test.Test
 class GenericNetworkClientTests {
     private lateinit var genericNetworkClient: GenericNetworkClient
 
-    private val json: Json = Json
+    private val json: Json = JsonUtil.json
 
     private companion object {
-        const val id = "testId"
-        const val name = "testName"
-        val testData = TestDataClass(id, name)
+        const val ID = "testId"
+        const val NAME = "testName"
+        val testData = TestDataClass(ID, NAME)
     }
 
 

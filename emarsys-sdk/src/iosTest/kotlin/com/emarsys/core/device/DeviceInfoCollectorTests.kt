@@ -2,6 +2,7 @@ package com.emarsys.core.device
 
 import com.emarsys.KotlinPlatform
 import com.emarsys.core.providers.Provider
+import com.emarsys.util.JsonUtil
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.mock
@@ -43,7 +44,7 @@ class DeviceInfoCollectorTests {
         mockDeviceInformation = mock()
         every { mockDeviceInformation.osVersion() } returns OS_VERSION
         every { mockDeviceInformation.deviceModel() } returns DEVICE_MODEL
-        json = Json
+        json = JsonUtil.json
 
         deviceInfoCollector = DeviceInfoCollector(
             mockHardwareIdProvider,

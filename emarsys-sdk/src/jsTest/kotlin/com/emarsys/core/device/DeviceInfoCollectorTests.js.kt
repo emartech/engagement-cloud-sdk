@@ -2,6 +2,7 @@ package com.emarsys.core.device
 
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.storage.TypedStorageApi
+import com.emarsys.util.JsonUtil
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.matcher.any
@@ -41,7 +42,7 @@ class DeviceInfoCollectorTests {
     private lateinit var mockApplicationVersionProvider: Provider<String>
     private lateinit var mockLanguageProvider: Provider<String>
     private lateinit var deviceInfoCollector: DeviceInfoCollector
-    private val json: Json = Json
+    private val json: Json = JsonUtil.json
 
     @BeforeTest
     fun setup() {

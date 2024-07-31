@@ -7,6 +7,7 @@ import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
+import com.emarsys.util.JsonUtil
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
@@ -31,7 +32,7 @@ class ContactClientTests  {
         const val MERCHANT_ID = "testMerchantId"
     }
 
-    private val json: Json = Json
+    private val json: Json = JsonUtil.json
     private lateinit var mockEmarsysClient: NetworkClientApi
     private lateinit var mockUrlFactory: UrlFactoryApi
     private lateinit var mockSdkContext: SdkContextApi
@@ -54,7 +55,7 @@ class ContactClientTests  {
         )
         val testUrl = Url("https://www.testUrl.com/testAppCode/client")
         val testBody =
-            """{"contactFieldId":2575,"contactFieldValue":"testContactFieldValue"}"""
+            """{"contactFieldId":2575,"contactFieldValue":"testContactFieldValue","openIdToken":null}"""
         val expectedUrlRequest = UrlRequest(
             testUrl,
             HttpMethod.Post,
@@ -87,7 +88,7 @@ class ContactClientTests  {
         )
         val testUrl = Url("https://www.testUrl.com/testAppCode/client")
         val testBody =
-            """{"contactFieldId":2575,"openIdToken":"$OPEN_ID_TOKEN"}"""
+            """{"contactFieldId":2575,"contactFieldValue":null,"openIdToken":"$OPEN_ID_TOKEN"}"""
         val expectedUrlRequest = UrlRequest(
             testUrl,
             HttpMethod.Post,
@@ -127,7 +128,7 @@ class ContactClientTests  {
 
         val testUrl = Url("https://www.testUrl.com/testAppCode/client")
         val testBody =
-            """{"contactFieldId":2575,"openIdToken":"$OPEN_ID_TOKEN"}"""
+            """{"contactFieldId":2575,"contactFieldValue":null,"openIdToken":"$OPEN_ID_TOKEN"}"""
         val expectedUrlRequest = UrlRequest(
             testUrl,
             HttpMethod.Post,

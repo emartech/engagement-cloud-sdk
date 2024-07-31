@@ -122,6 +122,7 @@ import com.emarsys.setup.states.ApplyRemoteConfigState
 import com.emarsys.setup.states.CollectDeviceInfoState
 import com.emarsys.setup.states.RegisterClientState
 import com.emarsys.setup.states.RegisterPushTokenState
+import com.emarsys.util.JsonUtil
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import io.ktor.client.HttpClient
@@ -146,12 +147,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
     private val sdkLogger: SdkLogger = SdkLogger(ConsoleLogger())
 
     override val json: Json by lazy {
-        Json {
-            encodeDefaults = true
-            isLenient = true
-            ignoreUnknownKeys = true
-            encodeDefaults = true
-        }
+        JsonUtil.json
     }
 
     override val uuidProvider: Provider<String> by lazy { UUIDProvider() }
