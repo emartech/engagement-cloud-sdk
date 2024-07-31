@@ -25,7 +25,7 @@ open class PushMessagePresenter(
 
         window.addEventListener(NotificationEvent.NOTIFICATION_CLICK, { event ->
             CoroutineScope(sdkDispatcher).launch {
-                val actionModel = pushMessage.data?.actions?.first { it.id == event.action }
+                val actionModel = pushMessage.data.actions?.first { it.id == event.action }
                 actionModel?.let {
                     val action = actionFactory.create(it)
                     action()

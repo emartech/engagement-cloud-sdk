@@ -108,7 +108,7 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     private val pushMessageMapper: PushMessageMapper by lazy {
-        PushMessageMapper()
+        PushMessageMapper(json, sdkLogger)
     }
 
     private fun createWebDeviceInfoCollector(): WebPlatformInfoCollector {

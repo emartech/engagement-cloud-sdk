@@ -1,0 +1,35 @@
+package com.emarsys.mobileengage.push.model
+
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonObject
+
+@Serializable
+data class RemoteWebPushMessage(
+    val title: String? = null,
+    val message: String,
+    val messageData: WebPushMessageData
+)
+
+@Serializable
+data class WebPushMessageData(
+    val id: String,
+    val sid: String,
+    val applicationCode: String,
+    val treatments: JsonObject,
+    val notificationSettings: WebPushNotificationSettings
+)
+
+@Serializable
+data class WebPushNotificationSettings(
+    val icon: String? = null,
+    val link: String? = null,
+    val image: String? = null,
+    val actions: List<RemoteWebPushAction>? = null
+)
+
+@Serializable
+data class RemoteWebPushAction(
+    val id: String,
+    val title: String,
+    val url: String
+)

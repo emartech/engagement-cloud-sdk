@@ -16,6 +16,7 @@ import org.w3c.notifications.GRANTED
 import org.w3c.notifications.Notification
 import org.w3c.notifications.NotificationPermission
 import web.navigator.navigator
+import web.push.PushMessageData
 import web.push.PushSubscriptionOptionsInit
 
 //TODO: add logger instead of console log
@@ -37,9 +38,8 @@ class PushService(
         try {
             navigator.serviceWorker.onmessage = {
                 CoroutineScope(sdkDispatcher).launch {
-                    val pushMessage = pushMessageMapper.map(JSON.parse(JSON.stringify(it.data)))
-                    pushPresenter.present(pushMessage)
-                    console.log("MESSAGE: ${JSON.stringify(it.data)}")
+                    val pushMessage = pushMessageMapper.map((it.data as PushMessageData).text())
+                    pushMessage?.let { pushPresenter.present(it) }
                 }
             }
         } catch (e: Throwable) {

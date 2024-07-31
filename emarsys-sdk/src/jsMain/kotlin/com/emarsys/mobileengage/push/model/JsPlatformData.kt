@@ -4,4 +4,4 @@ import com.emarsys.mobileengage.push.PlatformData
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object JsPlatformData : PlatformData
+data class JsPlatformData(val applicationCode: String) : PlatformData
