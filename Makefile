@@ -62,7 +62,7 @@ clean: check-env ## clean all build artifacts
 create-apks: check-env ## create apks for testing
 	@./gradlew assembleAndroidTest -x :composeApp:test
 
-test: check-env test-android ## run common tests on all platforms (jvm,web)
+test: check-env test-android test-web test-jvm ## run common tests on all platforms (jvm,web)
 	@./gradlew :emarsys-sdk:allTests -x :composeApp:test
 
 test-web: check-env ## run common tests on web
