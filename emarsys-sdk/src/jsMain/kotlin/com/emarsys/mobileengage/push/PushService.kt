@@ -26,9 +26,9 @@ class PushService(
     private val pushMessageMapper: PushMessageMapper,
     private val pushPresenter: PushPresenter<JsPlatformData, JsPushMessage>,
     private val sdkDispatcher: CoroutineDispatcher
-) {
+) : PushServiceApi {
 
-    suspend fun register(config: EmarsysConfig) {
+    override suspend fun register(config: EmarsysConfig) {
         if (Notification.requestPermission().await() != NotificationPermission.GRANTED) return
         subscribeForPushReceiving(config)
         subscribeForPushMessages()
