@@ -23,6 +23,7 @@ import com.emarsys.core.url.WebExternalUrlOpener
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.inapp.InappJsBridge
 import com.emarsys.mobileengage.push.PushMessageMapper
 import com.emarsys.mobileengage.push.PushMessagePresenter
 import com.emarsys.mobileengage.push.PushService
@@ -72,6 +73,8 @@ actual class PlatformDependencyCreator actual constructor(
         actionFactory: ActionFactoryApi<ActionModel>,
         downloaderApi: DownloaderApi
     ): State {
+        val scope = CoroutineScope(sdkDispatcher)
+        val inappJsBridge = InappJsBridge(actionFactory, sdkDispatcher, json, scope)
         val pushPresenter = PushMessagePresenter(pushServiceContext, actionFactory, sdkDispatcher)
         val pushService = PushService(
             pushServiceContext,
@@ -80,7 +83,7 @@ actual class PlatformDependencyCreator actual constructor(
             pushPresenter,
             sdkDispatcher
         )
-        return PlatformInitState(pushService, sdkContext)
+        return PlatformInitState(pushService, sdkContext, inappJsBridge)
     }
 
     actual override fun createPermissionHandler(): PermissionHandlerApi {
