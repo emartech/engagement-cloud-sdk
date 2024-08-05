@@ -20,7 +20,7 @@ class DeviceInfoCollectorTests {
         const val TEST_UUID = "test uuid"
         const val STORED_ID = "stored hardware id"
         const val TIMEZONE = "+0600"
-        const val BROWSER_NAME = "Chrome"
+        const val BROWSER_NAME = "chrome"
         const val BROWSER_VERSION = "160.5.12"
         const val APPLICATION_VERSION = "2.0.0"
         const val LANGUAGE = "testLanguage"

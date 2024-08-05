@@ -5,7 +5,7 @@ self.addEventListener('push', function (event) {
         .then(all => all.map(client => {
             client.postMessage({
             type: "emsPush",
-            message: event.data.text()
+            message: event.data.json()
         })}));
     })());
 });

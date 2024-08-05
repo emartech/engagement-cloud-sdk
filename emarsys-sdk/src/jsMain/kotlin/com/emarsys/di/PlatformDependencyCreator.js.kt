@@ -48,6 +48,7 @@ actual class PlatformDependencyCreator actual constructor(
     DependencyCreator {
 
     private val platformContext: CommonPlatformContext = platformContext as CommonPlatformContext
+    private val storage = createStorage()
 
     actual override fun createStorage(): TypedStorageApi<String?> {
         return StringStorage(platformContext.storage)
@@ -60,7 +61,7 @@ actual class PlatformDependencyCreator actual constructor(
             uuidProvider,
             timezoneProvider,
             createWebDeviceInfoCollector(),
-            createStorage(),
+            storage,
             createApplicationVersionProvider(), createLanguageProvider(), json,
         )
     }
@@ -78,6 +79,7 @@ actual class PlatformDependencyCreator actual constructor(
             pushApi,
             pushMessageMapper,
             pushPresenter,
+            storage,
             sdkDispatcher
         )
         return PlatformInitState(pushService, sdkContext)

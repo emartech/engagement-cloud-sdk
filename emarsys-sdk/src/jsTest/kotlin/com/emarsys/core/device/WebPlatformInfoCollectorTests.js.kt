@@ -21,7 +21,7 @@ class WebPlatformInfoCollectorTests {
                 false,
                 it.name,
                 "1.2.3",
-                BrowserInfo.Chrome.name,
+                "chrome",
                 "3.4.5"
             )
 
@@ -42,7 +42,7 @@ class WebPlatformInfoCollectorTests {
                 false,
                 OsInfo.Android.name,
                 "1.2.3",
-                it.name,
+                it.name.lowercase(),
                 "5.6.7"
             )
 
@@ -61,7 +61,7 @@ class WebPlatformInfoCollectorTests {
             false,
             OsInfo.IPhone.name,
             "6.5.4",
-            BrowserInfo.Unknown.name,
+            "unknown",
             "0"
         )
 
@@ -79,7 +79,7 @@ class WebPlatformInfoCollectorTests {
             false,
             OsInfo.Unknown.name,
             "0",
-            BrowserInfo.Chrome.name,
+            "chrome",
             "9.8.7"
         )
 

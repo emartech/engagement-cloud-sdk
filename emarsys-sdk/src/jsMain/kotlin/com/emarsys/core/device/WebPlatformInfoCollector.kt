@@ -15,7 +15,7 @@ class WebPlatformInfoCollector(private val navigatorData: String) : WebPlatformI
             false,
             headerData.osName,
             headerData.osVersion,
-            headerData.browserName,
+            headerData.browserName.lowercase(),
             headerData.browserVersion
         )
     }
