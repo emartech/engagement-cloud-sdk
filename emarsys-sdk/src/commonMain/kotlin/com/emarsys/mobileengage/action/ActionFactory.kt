@@ -11,6 +11,7 @@ import com.emarsys.mobileengage.action.actions.Action
 import com.emarsys.mobileengage.action.actions.AppEventAction
 import com.emarsys.mobileengage.action.actions.AskForPushPermissionAction
 import com.emarsys.mobileengage.action.actions.BadgeCountAction
+import com.emarsys.mobileengage.action.actions.ButtonClickedAction
 import com.emarsys.mobileengage.action.actions.CustomEventAction
 import com.emarsys.mobileengage.action.actions.DismissAction
 import com.emarsys.mobileengage.action.actions.OpenExternalUrlAction
@@ -18,6 +19,7 @@ import com.emarsys.mobileengage.action.actions.PushToInappAction
 import com.emarsys.mobileengage.action.models.AppEventActionModel
 import com.emarsys.mobileengage.action.models.AskForPushPermissionActionModel
 import com.emarsys.mobileengage.action.models.BadgeCountActionModel
+import com.emarsys.mobileengage.action.models.ButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.CustomEventActionModel
 import com.emarsys.mobileengage.action.models.DismissActionModel
 import com.emarsys.mobileengage.action.models.OpenExternalUrlActionModel
@@ -42,6 +44,7 @@ class ActionFactory<ActionModelType>(
             is DismissActionModel -> DismissAction(action, msgHub)
             is OpenExternalUrlActionModel -> OpenExternalUrlAction(action, externalUrlOpener)
             is PushToInappActionModel -> PushToInappAction(sdkLogger)
+            is ButtonClickedActionModel -> ButtonClickedAction(action)
             else -> throw IllegalArgumentException("Unknown action type: $action")
         }
     }
