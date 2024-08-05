@@ -1,10 +1,10 @@
 package com.emarsys.mobileengage.action.actions
 
 import com.emarsys.core.permission.PermissionHandlerApi
-import com.emarsys.mobileengage.action.models.AskForPushPermissionActionModel
+import com.emarsys.mobileengage.action.models.RequestPushPermissionActionModel
 
-class AskForPushPermissionAction(
-    private val action: AskForPushPermissionActionModel,
+class RequestPushPermissionAction(
+    private val action: RequestPushPermissionActionModel,
     private val permissionHandler: PermissionHandlerApi
 ): Action<Unit> {
     override suspend fun invoke(value: Unit?) {

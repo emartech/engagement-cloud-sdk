@@ -9,18 +9,18 @@ import com.emarsys.core.message.MsgHubApi
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.mobileengage.action.actions.AppEventAction
-import com.emarsys.mobileengage.action.actions.AskForPushPermissionAction
 import com.emarsys.mobileengage.action.actions.BadgeCountAction
 import com.emarsys.mobileengage.action.actions.CustomEventAction
 import com.emarsys.mobileengage.action.actions.DismissAction
 import com.emarsys.mobileengage.action.actions.OpenExternalUrlAction
+import com.emarsys.mobileengage.action.actions.RequestPushPermissionAction
 import com.emarsys.mobileengage.action.models.ActionModel
-import com.emarsys.mobileengage.action.models.AskForPushPermissionActionModel
 import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
 import com.emarsys.mobileengage.action.models.BasicBadgeCountActionModel
 import com.emarsys.mobileengage.action.models.BasicCustomEventActionModel
 import com.emarsys.mobileengage.action.models.BasicDismissActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
+import com.emarsys.mobileengage.action.models.RequestPushPermissionActionModel
 import dev.mokkery.mock
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeTypeOf
@@ -81,12 +81,12 @@ class ActionFactoryTests {
 
     @Test
     fun testCreate_withAskForPushPermissionActionModel() = runTest {
-        val action = AskForPushPermissionActionModel
+        val action = RequestPushPermissionActionModel
 
         val result = actionFactory.create(action)
 
         result shouldNotBe null
-        result.shouldBeTypeOf<AskForPushPermissionAction>()
+        result.shouldBeTypeOf<RequestPushPermissionAction>()
     }
 
     @Test

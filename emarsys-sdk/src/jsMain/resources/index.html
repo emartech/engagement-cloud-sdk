@@ -8,12 +8,16 @@
 <div style="width: 300px; height: 300px">
     <script src="js-bridge.js"></script>
     <button type="button" id="button2" me-button-clicked="buttonId">Click this button!</button>
-    <button type="button" id="button3" me-trigger-event="{&quot;type&quot;:&quot;customEvent&quot;,&quot;name&quot;:&quot;event name&quot;,&quot;payload&quot;:{&quot;key&quot;:&quot;value&quot;}}">Click me for custom event!</button>
+    <button type="button" id="button3" me-trigger-event="{&quot;type&quot;:&quot;customEvent&quot;,&quot;name&quot;:&quot;custom event name&quot;,&quot;payload&quot;:{&quot;key&quot;:&quot;value&quot;}}">Click me for custom event!</button>
+    <button type="button" id="button4" me-trigger-app-event="{&quot;type&quot;:&quot;appEvent&quot;,&quot;name&quot;:&quot;app event name&quot;,&quot;payload&quot;:{&quot;key&quot;:&quot;value&quot;}}">Click me for app event!</button>
+    <button type="button" id="button5" me-request-push-permission="{}">Click me for push permission!</button>
+    <button type="button" id="button6" href="https://sap.com">To SAP home page!</button>
+    <button type="button" id="button7" me-close>Close!</button>
+    <button type="button" id="button8" me-copy-to-clipboard="copied text for clipboard">Copy some text to clipboard</button>
 </div>
 </body>
 
 <script>
     document.getElementById("button1").onclick = async () => {await new window["emarsys-sdk"].com.emarsys.EmarsysJs().enableTracking()}
-    document.getElementById("button2").onclick = () => { console.log('event button was clicked')}
 </script>
 </html>
