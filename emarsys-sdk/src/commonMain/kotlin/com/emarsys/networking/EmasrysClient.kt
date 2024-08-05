@@ -12,6 +12,9 @@ import com.emarsys.networking.EmarsysHeaders.CLIENT_ID_HEADER
 import com.emarsys.networking.EmarsysHeaders.CLIENT_STATE_HEADER
 import com.emarsys.networking.EmarsysHeaders.CONTACT_TOKEN_HEADER
 import com.emarsys.networking.EmarsysHeaders.REQUEST_ORDER_HEADER
+import com.emarsys.networking.EmarsysHeaders.X_CLIENT_ID_HEADER
+import com.emarsys.networking.EmarsysHeaders.X_CLIENT_STATE_HEADER
+import com.emarsys.networking.EmarsysHeaders.X_CONTACT_TOKEN_HEADER
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
@@ -80,8 +83,11 @@ class EmarsysClient(
     private fun addEmarsysHeaders(request: UrlRequest): UrlRequest {
         val emarsysHeaders = mutableMapOf(
             CLIENT_ID_HEADER to sessionContext.clientId,
+            X_CLIENT_ID_HEADER to sessionContext.clientId,
             CLIENT_STATE_HEADER to sessionContext.clientState,
+            X_CLIENT_STATE_HEADER to sessionContext.clientState,
             CONTACT_TOKEN_HEADER to sessionContext.contactToken,
+            X_CONTACT_TOKEN_HEADER to sessionContext.contactToken,
             REQUEST_ORDER_HEADER to timestampProvider.provide().toEpochMilliseconds()
         ).filterValues { it != null }
 

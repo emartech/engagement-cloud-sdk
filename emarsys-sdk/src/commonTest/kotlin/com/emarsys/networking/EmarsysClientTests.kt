@@ -121,6 +121,7 @@ class EmarsysClientTests {
         val expectedRequest = request.copy(
             headers = mapOf(
                 "ems-contact" to "testContactToken",
+                "X-Contact-Token" to "testContactToken",
                 "X-Request-Order" to now.toEpochMilliseconds()
             )
         )
