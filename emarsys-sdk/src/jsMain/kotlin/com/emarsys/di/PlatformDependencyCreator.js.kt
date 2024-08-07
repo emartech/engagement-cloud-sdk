@@ -25,8 +25,6 @@ import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.inapp.InappJsBridge
 import com.emarsys.mobileengage.push.PushMessageMapper
-import com.emarsys.mobileengage.push.PushMessagePresenter
-import com.emarsys.mobileengage.push.PushService
 import com.emarsys.mobileengage.push.PushServiceContext
 import com.emarsys.setup.PlatformInitState
 import com.emarsys.watchdog.connection.ConnectionWatchDog
@@ -76,16 +74,8 @@ actual class PlatformDependencyCreator actual constructor(
     ): State {
         val scope = CoroutineScope(sdkDispatcher)
         val inappJsBridge = InappJsBridge(actionFactory, sdkDispatcher, json, scope)
-        val pushPresenter = PushMessagePresenter(pushServiceContext, actionFactory, sdkDispatcher)
-        val pushService = PushService(
-            pushServiceContext,
-            pushApi,
-            pushMessageMapper,
-            pushPresenter,
-            storage,
-            sdkDispatcher
-        )
-        return PlatformInitState(pushService, sdkContext, inappJsBridge)
+
+        return PlatformInitState(inappJsBridge)
     }
 
     actual override fun createPermissionHandler(): PermissionHandlerApi {

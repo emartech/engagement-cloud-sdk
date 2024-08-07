@@ -1,8 +1,8 @@
 package com.emarsys.mobileengage.push
 
-import com.emarsys.EmarsysConfig
+import com.emarsys.JsEmarsysConfig
+import com.emarsys.ServiceWorkerOptions
 import com.emarsys.api.push.PushConstants
-import com.emarsys.api.push.PushInternalApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.mobileengage.push.model.JsPlatformData
 import com.emarsys.mobileengage.push.model.JsPushMessage
@@ -24,17 +24,18 @@ import web.push.PushSubscriptionOptionsInit
 //TODO: add logger instead of console log
 class PushService(
     private val pushServiceContext: PushServiceContext,
-    private val pushApi: PushInternalApi,
     private val pushMessageMapper: PushMessageMapper,
     private val pushPresenter: PushPresenter<JsPlatformData, JsPushMessage>,
     private val storage: TypedStorageApi<String?>,
     private val sdkDispatcher: CoroutineDispatcher
 ) : PushServiceApi {
 
-    override suspend fun register(config: EmarsysConfig) {
+    override suspend fun register(config: JsEmarsysConfig) {
         if (Notification.requestPermission().await() != NotificationPermission.GRANTED) return
-        subscribeForPushReceiving(config)
-        subscribeForPushMessages()
+        config.serviceWorkerOptions?.let {
+            subscribeForPushReceiving(it)
+            subscribeForPushMessages()
+        }
     }
 
     private fun subscribeForPushMessages() {
@@ -50,25 +51,24 @@ class PushService(
         }
     }
 
-    private suspend fun subscribeForPushReceiving(config: EmarsysConfig) {
+    private suspend fun subscribeForPushReceiving(serviceWorkerOptions: ServiceWorkerOptions) {
         try {
-            val serviceWorkerPath = "/ems-service-worker.js" // TODO: config.serviceWorkerPath
             pushServiceContext.registration =
-                navigator.serviceWorker.register(serviceWorkerPath).await()
-            val options = createPushSubscriptionOptions(config)
+                navigator.serviceWorker.register(serviceWorkerOptions.serviceWorkerPath).await()
+            val options = createPushSubscriptionOptions(serviceWorkerOptions)
             navigator.serviceWorker.ready.await()
-            val pushToken = pushServiceContext.registration.pushManager.subscribe(options).await()
+            val pushToken =
+                pushServiceContext.registration.pushManager.subscribe(options).await()
             storage.put(PushConstants.PUSH_TOKEN_STORAGE_KEY, pushToken.toJSON().toString())
         } catch (throwable: Throwable) {
             console.log("service worker registration failed: $throwable")
         }
     }
 
-    private fun createPushSubscriptionOptions(config: EmarsysConfig): PushSubscriptionOptionsInit {
-        val applicationServerKey =
-            "BDa49_IiPdIo2Kda5cATItp81sOaYg-eFFISMdlSXatDAIZCdtAxUuMVzXo4M2MXXI0sUYQzQI7shyNkKgwyD_I" // TODO: config.applicationServerKey
+    private fun createPushSubscriptionOptions(serviceWorkerOptions: ServiceWorkerOptions): PushSubscriptionOptionsInit {
         return js("{}").unsafeCast<PushSubscriptionOptionsInit>().apply {
-            this.applicationServerKey = urlBase64ToUint8Array(applicationServerKey)
+            this.applicationServerKey =
+                urlBase64ToUint8Array(serviceWorkerOptions.applicationServerKey)
             this.userVisibleOnly = true
         }
     }
