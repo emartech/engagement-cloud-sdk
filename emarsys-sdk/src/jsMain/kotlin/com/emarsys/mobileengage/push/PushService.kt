@@ -1,7 +1,9 @@
 package com.emarsys.mobileengage.push
 
 import com.emarsys.EmarsysConfig
+import com.emarsys.api.push.PushConstants
 import com.emarsys.api.push.PushInternalApi
+import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.mobileengage.push.model.JsPlatformData
 import com.emarsys.mobileengage.push.model.JsPushMessage
 import js.buffer.BufferSource
@@ -25,6 +27,7 @@ class PushService(
     private val pushApi: PushInternalApi,
     private val pushMessageMapper: PushMessageMapper,
     private val pushPresenter: PushPresenter<JsPlatformData, JsPushMessage>,
+    private val storage: TypedStorageApi<String?>,
     private val sdkDispatcher: CoroutineDispatcher
 ) : PushServiceApi {
 
@@ -55,7 +58,7 @@ class PushService(
             val options = createPushSubscriptionOptions(config)
             navigator.serviceWorker.ready.await()
             val pushToken = pushServiceContext.registration.pushManager.subscribe(options).await()
-            pushApi.registerPushToken(pushToken.toString())
+            storage.put(PushConstants.PUSH_TOKEN_STORAGE_KEY, pushToken.toJSON().toString())
         } catch (throwable: Throwable) {
             console.log("service worker registration failed: $throwable")
         }
@@ -71,7 +74,7 @@ class PushService(
     }
 
     private fun urlBase64ToUint8Array(base64String: String): BufferSource {
-        val padding = "=".repeat((4 - base64String.length % 4) % 4);
+        val padding = "=".repeat((4 - base64String.length % 4) % 4)
         val base64 = (base64String + padding)
             .replace('-', '+')
             .replace('_', '/')

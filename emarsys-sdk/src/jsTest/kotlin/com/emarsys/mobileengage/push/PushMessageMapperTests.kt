@@ -4,6 +4,7 @@ import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.mobileengage.push.model.JsPlatformData
 import com.emarsys.mobileengage.push.model.JsPushMessage
+import com.emarsys.util.JsonUtil
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
@@ -32,12 +33,7 @@ class PushMessageMapperTests {
 
     @BeforeTest
     fun setUp() = runTest {
-        json = Json {
-            encodeDefaults = true
-            isLenient = true
-            ignoreUnknownKeys = true
-            encodeDefaults = true
-        }
+        json = JsonUtil.json
         logger = SdkLogger(ConsoleLogger())
         pushMessageMapper = PushMessageMapper(json, logger)
     }

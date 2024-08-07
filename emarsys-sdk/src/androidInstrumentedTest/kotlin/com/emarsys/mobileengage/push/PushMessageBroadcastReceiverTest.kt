@@ -7,6 +7,7 @@ import com.emarsys.mobileengage.push.model.AndroidPlatformData
 import com.emarsys.mobileengage.push.model.AndroidPushMessage
 import com.emarsys.mobileengage.push.model.NotificationMethod
 import com.emarsys.mobileengage.push.model.NotificationOperation
+import com.emarsys.util.JsonUtil
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.CoroutineDispatcher
@@ -63,10 +64,7 @@ class PushMessageBroadcastReceiverTest {
         mockLogger = mockk(relaxed = true)
         sdkDispatcher = StandardTestDispatcher()
         Dispatchers.setMain(sdkDispatcher)
-        json = Json {
-            ignoreUnknownKeys = true
-            encodeDefaults = true
-        }
+        json = JsonUtil.json
         broadcastReceiver =
             PushMessageBroadcastReceiver(mockPresenter, sdkDispatcher, mockLogger, json)
     }

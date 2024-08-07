@@ -32,5 +32,6 @@ include(
     ":emarsys-sdk",
     ":android-emarsys-sdk-hms",
     ":android-emarsys-sdk-fcm",
-    ":ios-notification-service"
+    ":ios-notification-service",
+    ":web-push-service-worker"
 )

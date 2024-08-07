@@ -18,6 +18,7 @@ import com.emarsys.mobileengage.push.model.AndroidPlatformData
 import com.emarsys.mobileengage.push.model.AndroidPushMessage
 import com.emarsys.mobileengage.push.model.NotificationMethod
 import com.emarsys.mobileengage.push.model.NotificationOperation.INIT
+import com.emarsys.util.JsonUtil
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.CapturingSlot
@@ -84,10 +85,7 @@ class PushMessagePresenterTest {
         mockNotificationCompatStyler = mockk(relaxed = true)
         mockPlatformInfoCollector = mockk(relaxed = true)
 
-        json = Json {
-            ignoreUnknownKeys = true
-            encodeDefaults = true
-        }
+        json = JsonUtil.json
         mockMetadataReader = mockk(relaxed = true)
         every { mockMetadataReader.getInt(any()) } returns ICON_ID
 

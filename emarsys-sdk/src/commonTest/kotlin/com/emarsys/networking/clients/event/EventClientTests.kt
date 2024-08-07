@@ -12,6 +12,7 @@ import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.networking.clients.event.model.Event
 import com.emarsys.networking.clients.event.model.EventType
+import com.emarsys.util.JsonUtil
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
@@ -70,9 +71,7 @@ class EventClientTests {
         mockDeviceEventChannel = mock()
         mockInAppConfig = mock()
 
-        json = Json {
-            encodeDefaults = true
-        }
+        json = JsonUtil.json
         sdkDispatcher = StandardTestDispatcher()
         sessionContext = SessionContext(deviceEventState = DEVICE_EVENT_STATE)
         every { mockInAppConfig.inAppDnd }.returns(IN_APP_DND)
