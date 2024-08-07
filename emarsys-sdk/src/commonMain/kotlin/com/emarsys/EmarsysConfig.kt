@@ -3,9 +3,13 @@ package com.emarsys
 import com.emarsys.core.exceptions.PreconditionFailedException
 
 
-data class EmarsysConfig(val applicationCode: String? = null, val merchantId: String? = null, val sharedSecret: String? = null)
+data class EmarsysConfig(
+    override val applicationCode: String? = null,
+    override val merchantId: String? = null,
+    override val sharedSecret: String? = null
+): SdkConfig
 
-fun EmarsysConfig.isValid(): Boolean {
+fun SdkConfig.isValid(): Boolean {
     val invalidCases = listOf("null", "", "0", "test")
     if (invalidCases.contains(applicationCode)) {
         throw PreconditionFailedException("ApplicationCode should be valid!")
