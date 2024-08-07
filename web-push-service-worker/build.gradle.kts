@@ -5,7 +5,6 @@ plugins {
 
 kotlin {
     js {
-        useEsModules()
         browser {
             commonWebpackConfig {
                 outputFileName = "ems-service-worker.js"

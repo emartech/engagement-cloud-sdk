@@ -21,7 +21,6 @@ kotlin {
 
     js(IR) {
         moduleName = "emarsys-sdk"
-        useEsModules()
         browser {
             commonWebpackConfig {
                 outputFileName = "emarsys-sdk.js"
