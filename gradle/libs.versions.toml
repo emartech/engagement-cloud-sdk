@@ -84,7 +84,7 @@ kotlin-wrapper-browser = { module = "org.jetbrains.kotlin-wrappers:kotlin-browse
 cryptography = { module = "dev.whyoleg.cryptography:cryptography-bom", version.ref= "cryptography" }
 cryptography-core = { module = "dev.whyoleg.cryptography:cryptography-core" }
 cryptography-provider-jdk = { module = "dev.whyoleg.cryptography:cryptography-provider-jdk" }
-cryptography-provider-apple = { module = "dev.whyoleg.cryptography:cryptography-provider-apple" }
+cryptography-provider-apple = { module = "dev.whyoleg.cryptography:cryptography-provider-openssl3-prebuilt" }
 cryptography-provider-webcrypto = { module = "dev.whyoleg.cryptography:cryptography-provider-webcrypto" }
 
 [plugins]
