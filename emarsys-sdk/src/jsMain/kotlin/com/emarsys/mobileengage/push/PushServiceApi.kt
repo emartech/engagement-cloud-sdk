@@ -4,4 +4,5 @@ import com.emarsys.JsEmarsysConfig
 
 interface PushServiceApi {
     suspend fun register(config: JsEmarsysConfig)
+    suspend fun subscribeForPushMessages(config: JsEmarsysConfig)
 }
