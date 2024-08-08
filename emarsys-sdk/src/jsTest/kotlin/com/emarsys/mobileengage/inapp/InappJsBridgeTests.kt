@@ -1,4 +1,4 @@
-package com.emarsys.mobileengage.inapp
+package com.emarsys.mobileengage.inApp
 
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.actions.ButtonClickedAction
@@ -15,7 +15,6 @@ import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -40,18 +39,16 @@ class InappJsBridgeTests {
     private lateinit var inappJsBridge: InappJsBridgeApi
     private lateinit var mockActionFactory: ActionFactoryApi<ActionModel>
     private lateinit var json: Json
-    private lateinit var sdkDispatcher: CoroutineDispatcher
     private lateinit var sdkScope: CoroutineScope
 
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(StandardTestDispatcher())
         sdkScope = TestScope(StandardTestDispatcher())
-        sdkDispatcher = StandardTestDispatcher()
         json = JsonUtil.json
         mockActionFactory = mock()
 
-        inappJsBridge = InappJsBridge(mockActionFactory, sdkDispatcher, json, sdkScope)
+        inappJsBridge = InappJsBridge(mockActionFactory, json, sdkScope)
     }
 
     @AfterTest

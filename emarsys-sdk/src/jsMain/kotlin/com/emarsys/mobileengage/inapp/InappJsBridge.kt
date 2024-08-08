@@ -1,4 +1,4 @@
-package com.emarsys.mobileengage.inapp
+package com.emarsys.mobileengage.inApp
 
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
@@ -9,7 +9,6 @@ import com.emarsys.mobileengage.action.models.BasicCustomEventActionModel
 import com.emarsys.mobileengage.action.models.BasicDismissActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.action.models.RequestPushPermissionActionModel
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
@@ -17,7 +16,6 @@ import web.window.window
 
 class InappJsBridge(
     private val actionFactory: ActionFactoryApi<ActionModel>,
-    private val sdkDispatcher: CoroutineDispatcher,
     private val json: Json,
     private val sdkScope: CoroutineScope
 ) : InappJsBridgeApi {
@@ -30,7 +28,7 @@ class InappJsBridge(
 
         @JsName("triggerMEEvent")
         fun triggerMEEvent(jsonString: String) {
-            CoroutineScope(sdkDispatcher).launch {
+            sdkScope.launch {
                 val actionModel = json.decodeFromString<BasicCustomEventActionModel>(jsonString)
                 actionFactory.create(actionModel)()
             }

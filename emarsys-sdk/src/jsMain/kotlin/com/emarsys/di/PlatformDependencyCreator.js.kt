@@ -23,7 +23,7 @@ import com.emarsys.core.url.WebExternalUrlOpener
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
-import com.emarsys.mobileengage.inapp.InappJsBridge
+import com.emarsys.mobileengage.inApp.InappJsBridge
 import com.emarsys.mobileengage.push.PushMessageMapper
 import com.emarsys.mobileengage.push.PushServiceContext
 import com.emarsys.setup.PlatformInitState
@@ -43,8 +43,7 @@ actual class PlatformDependencyCreator actual constructor(
     private val uuidProvider: Provider<String>,
     sdkLogger: Logger,
     private val json: Json
-) :
-    DependencyCreator {
+): DependencyCreator {
 
     private val platformContext: CommonPlatformContext = platformContext as CommonPlatformContext
     private val storage = createStorage()
@@ -73,7 +72,7 @@ actual class PlatformDependencyCreator actual constructor(
         downloaderApi: DownloaderApi
     ): State {
         val scope = CoroutineScope(sdkDispatcher)
-        val inappJsBridge = InappJsBridge(actionFactory, sdkDispatcher, json, scope)
+        val inappJsBridge = InappJsBridge(actionFactory, json, scope)
 
         return PlatformInitState(inappJsBridge)
     }

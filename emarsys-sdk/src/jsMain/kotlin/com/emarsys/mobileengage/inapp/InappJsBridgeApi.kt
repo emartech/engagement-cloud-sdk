@@ -1,4 +1,4 @@
-package com.emarsys.mobileengage.inapp
+package com.emarsys.mobileengage.inApp
 
 interface InappJsBridgeApi {
     fun register()

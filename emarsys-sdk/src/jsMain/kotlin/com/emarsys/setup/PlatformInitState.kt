@@ -1,7 +1,7 @@
 package com.emarsys.setup
 
 import com.emarsys.core.state.State
-import com.emarsys.mobileengage.inapp.InappJsBridgeApi
+import com.emarsys.mobileengage.inApp.InappJsBridgeApi
 
 class PlatformInitState(
     private val inappJsBridge: InappJsBridgeApi
