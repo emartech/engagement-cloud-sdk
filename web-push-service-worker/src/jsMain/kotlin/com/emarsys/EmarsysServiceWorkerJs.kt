@@ -1,18 +1,25 @@
 package com.emarsys
 
-import web.serviceworker.ServiceWorkerGlobalScope
 import web.events.EventType
 import web.push.PushEvent
 
-external var self: ServiceWorkerGlobalScope
+val worker = EmarsysServiceWorker()
 
 fun main() {
     self.addEventListener(EventType("push"), { event: PushEvent ->
-        EmarsysServiceWorker().onPush(event)
-        console.log("push")
+        val promise = worker.onPush(event)
+        event.waitUntil(promise)
     })
 
     self.addEventListener(EventType("install"), {
         console.log("install")
+    })
+
+    self.addEventListener(EventType("notificationclick"), {
+        console.log("notificationclick")
+    })
+
+    self.addEventListener(EventType("pushsubscriptionchange"), {
+        console.log("pushsubscriptionchange")
     })
 }
