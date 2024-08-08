@@ -18,6 +18,6 @@
 </body>
 
 <script>
-    document.getElementById("button1").onclick = async () => {await new window["emarsys-sdk"].EmarsysJs().enableTracking()}
+    document.getElementById("button1").onclick = async () => {await new window["emarsys-sdk"].com.emarsys.EmarsysJs().enableTracking({applicationCode: "EMS8B-0891D", serviceWorkerOptions: { serviceWorkerPath: "/ems-service-worker.js", applicationServerKey: "test" }})}
 </script>
 </html>

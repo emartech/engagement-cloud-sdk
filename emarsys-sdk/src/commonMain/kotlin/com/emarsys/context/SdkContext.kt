@@ -1,6 +1,6 @@
 package com.emarsys.context
 
-import com.emarsys.EmarsysConfig
+import com.emarsys.SdkConfig
 import com.emarsys.api.SdkState
 import com.emarsys.core.Observable
 import com.emarsys.core.log.LogLevel
@@ -15,7 +15,7 @@ class SdkContext(
 
     override var contactFieldId: Int? = null
 
-    override var config: EmarsysConfig? = null
+    override var config: SdkConfig? = null
 
     override val currentSdkState
         get() = this.value

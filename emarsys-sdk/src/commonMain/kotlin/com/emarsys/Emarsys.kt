@@ -16,7 +16,7 @@ object Emarsys {
         DependencyInjection.container.setup()
     }
 
-    suspend fun enableTracking(config: EmarsysConfig) {
+    suspend fun enableTracking(config: SdkConfig) {
         config.isValid()
         DependencyInjection.container.setupOrganizerApi.setup(config)
     }

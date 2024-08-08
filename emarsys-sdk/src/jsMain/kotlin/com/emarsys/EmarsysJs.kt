@@ -12,11 +12,10 @@ class EmarsysJs {
 
     private val coroutineScope: CoroutineScope = CoroutineScope(SupervisorJob())
 
-    fun enableTracking(): Promise<Any> {
+    fun enableTracking(jsEmarsysConfig: JsEmarsysConfig): Promise<Any> {
         return coroutineScope.promise {
             Emarsys.initialize()
-            Emarsys.enableTracking(EmarsysConfig("EMS8B-0891D"))
-
+            Emarsys.enableTracking(jsEmarsysConfig)
         }
     }
 

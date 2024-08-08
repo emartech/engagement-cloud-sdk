@@ -1,6 +1,6 @@
 package com.emarsys.context
 
-import com.emarsys.EmarsysConfig
+import com.emarsys.SdkConfig
 import com.emarsys.api.SdkState
 import com.emarsys.core.ObservableApi
 import com.emarsys.core.Observer
@@ -11,7 +11,7 @@ interface SdkContextApi: ObservableApi<SdkState> {
     val currentSdkState: SdkState
     val sdkDispatcher: CoroutineDispatcher
     var contactFieldId: Int?
-    var config: EmarsysConfig?
+    var config: SdkConfig?
     var defaultUrls: DefaultUrlsApi
     var remoteLogLevel: LogLevel
     val features: MutableSet<Features>

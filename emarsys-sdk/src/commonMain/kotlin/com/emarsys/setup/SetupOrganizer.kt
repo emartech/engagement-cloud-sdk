@@ -1,6 +1,6 @@
 package com.emarsys.setup
 
-import com.emarsys.EmarsysConfig
+import com.emarsys.SdkConfig
 import com.emarsys.api.SdkState
 import com.emarsys.context.SdkContextApi
 import com.emarsys.context.isConfigPredictOnly
@@ -12,7 +12,7 @@ class SetupOrganizer(
     override val sdkContext: SdkContextApi
 ) : SetupOrganizerApi {
 
-    override suspend fun setup(config: EmarsysConfig) {
+    override suspend fun setup(config: SdkConfig) {
         sdkContext.config = config
         if (sdkContext.isConfigPredictOnly()) {
             predictStateMachine.activate()

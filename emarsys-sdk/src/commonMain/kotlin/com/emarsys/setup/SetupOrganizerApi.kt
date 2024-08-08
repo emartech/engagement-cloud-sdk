@@ -1,6 +1,6 @@
 package com.emarsys.setup
 
-import com.emarsys.EmarsysConfig
+import com.emarsys.SdkConfig
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.state.StateMachineApi
 
@@ -9,5 +9,5 @@ interface SetupOrganizerApi {
     val predictStateMachine: StateMachineApi
     val sdkContext: SdkContextApi
 
-    suspend fun setup(config: EmarsysConfig)
+    suspend fun setup(config: SdkConfig)
 }
