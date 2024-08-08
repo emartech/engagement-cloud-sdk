@@ -6,7 +6,14 @@ import kotlin.test.Test
 class InAppMessageTests {
 
     @Test
-    fun content_shouldReturn_html_ifPresent() {
+    fun content_shouldReturn_html_ifOnlyHtmlIsPresent() {
+        val testMessage = InAppMessage("html", null)
+
+        testMessage.content() shouldBe "html"
+    }
+
+    @Test
+    fun content_shouldReturn_html_ifPresent_withUrl() {
         val testMessage = InAppMessage("html", "url")
 
         testMessage.content() shouldBe "html"
