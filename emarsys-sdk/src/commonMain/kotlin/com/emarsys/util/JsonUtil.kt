@@ -7,6 +7,5 @@ object JsonUtil {
         encodeDefaults = true
         isLenient = true
         ignoreUnknownKeys = true
-        encodeDefaults = true
     }
 }
