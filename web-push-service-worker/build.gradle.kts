@@ -24,3 +24,14 @@ kotlin {
         }
     }
 }
+
+tasks.register<Copy>("copyServiceWorkerToEmarsysSDKResources") {
+    println("copying service worker to emarsys-sdk resources")
+    from(
+        layout.buildDirectory.file("dist/js/productionExecutable/ems-service-worker.js"),
+        layout.buildDirectory.file("dist/js/productionExecutable/ems-service-worker.js.map")
+    )
+    into(project(":emarsys-sdk").layout.projectDirectory.dir("src/jsMain/resources"))
+}
+
+tasks.findByName("jsBrowserDistribution")?.finalizedBy("copyServiceWorkerToEmarsysSDKResources")
