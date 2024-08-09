@@ -98,6 +98,8 @@ import com.emarsys.mobileengage.action.ActionFactory
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BasicActionModel
+import com.emarsys.mobileengage.inapp.InAppPresenterApi
+import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.mobileengage.session.MobileEngageSession
 import com.emarsys.mobileengage.session.Session
 import com.emarsys.networking.EmarsysClient
@@ -253,8 +255,18 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             onEventActionFactory,
             sessionContext,
             inAppContext,
+            inAppPresenter,
+            inAppViewProvider,
             sdkDispatcher
         )
+    }
+
+    private val inAppPresenter: InAppPresenterApi by lazy {
+        dependencyCreator.createInAppPresenter()
+    }
+
+    private val inAppViewProvider: InAppViewProviderApi by lazy {
+        dependencyCreator.createInAppViewProvider(actionFactory)
     }
 
     private val onEventActionInternal: OnEventActionInternal by lazy {

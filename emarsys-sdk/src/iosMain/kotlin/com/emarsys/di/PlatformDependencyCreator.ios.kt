@@ -27,6 +27,8 @@ import com.emarsys.core.watchdog.connection.IosConnectionWatchdog
 import com.emarsys.core.watchdog.lifecycle.IosLifecycleWatchdog
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.inapp.InAppPresenterApi
+import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
@@ -97,5 +99,13 @@ actual class PlatformDependencyCreator actual constructor(
 
     actual override fun createFileCache(): FileCacheApi {
         return IosFileCache(NSFileManager.defaultManager)
+    }
+
+    actual override fun createInAppViewProvider(actionFactory: ActionFactoryApi<ActionModel>): InAppViewProviderApi {
+        TODO("Not yet implemented")
+    }
+
+    actual override fun createInAppPresenter(): InAppPresenterApi {
+        TODO("Not yet implemented")
     }
 }

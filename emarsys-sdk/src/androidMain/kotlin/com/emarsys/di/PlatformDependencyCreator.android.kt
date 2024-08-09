@@ -151,4 +151,12 @@ actual class PlatformDependencyCreator actual constructor(
     actual override fun createFileCache(): FileCacheApi {
         return AndroidFileCache(applicationContext, FileSystem.SYSTEM)
     }
+
+    actual override fun createInAppViewProvider(actionFactory: ActionFactoryApi<ActionModel>): InAppViewProviderApi {
+        return InAppViewProvider(applicationContext, InAppJsBridgeProvider())
+    }
+
+    actual override fun createInAppPresenter(): InAppPresenterApi {
+        return InAppPresenter()
+    }
 }

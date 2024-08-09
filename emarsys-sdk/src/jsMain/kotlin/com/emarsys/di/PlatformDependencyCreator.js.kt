@@ -23,7 +23,13 @@ import com.emarsys.core.url.WebExternalUrlOpener
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
-import com.emarsys.mobileengage.inApp.InappJsBridge
+import com.emarsys.mobileengage.inapp.InAppPresenterApi
+import com.emarsys.mobileengage.inapp.InAppViewProviderApi
+import com.emarsys.mobileengage.inapp.InappJsBridge
+import com.emarsys.mobileengage.inapp.InappScriptExtractor
+import com.emarsys.mobileengage.inapp.InappScriptExtractorApi
+import com.emarsys.mobileengage.inapp.WebInappPresenter
+import com.emarsys.mobileengage.inapp.WebInappViewProvider
 import com.emarsys.mobileengage.push.PushMessageMapper
 import com.emarsys.mobileengage.push.PushServiceContext
 import com.emarsys.setup.PlatformInitState
@@ -119,6 +125,18 @@ actual class PlatformDependencyCreator actual constructor(
 
     actual override fun createFileCache(): FileCacheApi {
         return WebFileCache()
+    }
+
+    private val inappScriptExtractor: InappScriptExtractorApi by lazy {
+        InappScriptExtractor()
+    }
+
+    actual override fun createInAppViewProvider(actionFactory: ActionFactoryApi<ActionModel>): InAppViewProviderApi {
+        return WebInappViewProvider(inappScriptExtractor)
+    }
+
+    actual override fun createInAppPresenter(): InAppPresenterApi {
+       return WebInappPresenter()
     }
 
     private fun getNavigatorData(): String {

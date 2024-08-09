@@ -168,6 +168,13 @@
 
   exports.MEIAM = meiam
 
+   if (window.EMSInappWebBridge) {
+    const attrs = meActions.map(function (action) { return action.attr })
+    document.querySelectorAll('[' + attrs.join('],[') + ']').forEach(function (el) {
+         el.addEventListener('click', onClick.bind(el))
+       })
+   }
+
   // Previously we used event delegation, where we registered a click event listener on the document
   // (git commit 7b5c4bf38c2992ea43bbeb91d88aeba0ca4ca3ac).
   // Unfortunately, that solution does not work on non-interactive elements like div/span on Ios
