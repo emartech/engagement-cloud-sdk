@@ -11,6 +11,10 @@ import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.BasicActionModel
+import com.emarsys.mobileengage.inapp.InAppMessage
+import com.emarsys.mobileengage.inapp.InAppPresentationMode
+import com.emarsys.mobileengage.inapp.InAppPresenterApi
+import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.networking.clients.event.model.DeviceEventRequestBody
 import com.emarsys.networking.clients.event.model.DeviceEventResponse
 import com.emarsys.networking.clients.event.model.Event
@@ -30,6 +34,8 @@ class EventClient(
     private val onEventActionFactory: ActionFactoryApi<BasicActionModel>,
     private val sessionContext: SessionContext,
     private val inAppConfig: InAppConfig,
+    private val inAppPresenter: InAppPresenterApi,
+    private val inAppViewProvider: InAppViewProviderApi,
     sdkDispatcher: CoroutineDispatcher
 ) : EventClientApi {
 
@@ -51,9 +57,9 @@ class EventClient(
             val body = json.encodeToString(requestBody)
             val result: DeviceEventResponse =
                 emarsysNetworkClient.send(UrlRequest(url, HttpMethod.Post, body)).body()
+            handleDeviceEventState(result)
+            handleInApp(result.message)
             handleOnAppEventAction(result)
-            // handleInapp(result)
-            // handleDeviceEventState(result)
         }
     }
 
@@ -71,5 +77,18 @@ class EventClient(
 
     private suspend fun reportOnEventAction(campaignId: String) {
         registerEvent(Event(EventType.INTERNAL, "inapp:viewed", mapOf("campaignId" to campaignId)))
+    }
+
+    private fun handleDeviceEventState(deviceEventResponse: DeviceEventResponse) {
+        sessionContext.deviceEventState = deviceEventResponse.deviceEventState
+    }
+
+    private suspend fun handleInApp(message: Map<String, String?>?) {
+        val html = message?.get("html")
+        if (!html.isNullOrEmpty()) {
+            val view = inAppViewProvider.provide()
+            view.load(InAppMessage(html = html))
+            inAppPresenter.present(view, InAppPresentationMode.Overlay)
+        }
     }
 }

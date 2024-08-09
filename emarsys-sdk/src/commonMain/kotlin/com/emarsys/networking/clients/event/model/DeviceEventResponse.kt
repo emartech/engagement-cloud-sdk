@@ -2,12 +2,13 @@ package com.emarsys.networking.clients.event.model
 
 import com.emarsys.mobileengage.action.models.BasicActionModel
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonObject
 
 @Serializable
 data class DeviceEventResponse(
     val message: Map<String, String?>? = null,
     val onEventAction: OnEventAction? = null,
-    val deviceEventState: String?
+    val deviceEventState: JsonObject? = null
 )
 
 @Serializable

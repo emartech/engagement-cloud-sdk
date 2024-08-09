@@ -1,5 +1,7 @@
 package com.emarsys.core.session
 
+import kotlinx.serialization.json.JsonObject
+
 data class SessionContext(
     var contactToken: String? = null,
     var refreshToken: String? = null,
@@ -7,7 +9,7 @@ data class SessionContext(
     var openIdToken: String? = null,
     var clientId: String? = null,
     var clientState: String? = null,
-    var deviceEventState: String? = null,
+    var deviceEventState: JsonObject? = null,
     var sessionId: SessionId? = null,
     var sessionStart: Long? = null
 ) {
