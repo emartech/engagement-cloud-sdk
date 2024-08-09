@@ -33,6 +33,11 @@ import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.inapp.InAppJsBridgeProvider
+import com.emarsys.mobileengage.inapp.InAppPresenter
+import com.emarsys.mobileengage.inapp.InAppPresenterApi
+import com.emarsys.mobileengage.inapp.InAppViewProvider
+import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.mobileengage.push.NotificationCompatStyler
 import com.emarsys.mobileengage.push.PushMessageBroadcastReceiver
 import com.emarsys.mobileengage.push.PushMessagePresenter

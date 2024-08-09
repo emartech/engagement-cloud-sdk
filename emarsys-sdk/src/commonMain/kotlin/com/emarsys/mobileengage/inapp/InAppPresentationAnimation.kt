@@ -1,4 +1,4 @@
-package com.emarsys.mobileengage.inApp
+package com.emarsys.mobileengage.inapp
 
 sealed class InAppPresentationAnimation {
     data object Fade: InAppPresentationAnimation()

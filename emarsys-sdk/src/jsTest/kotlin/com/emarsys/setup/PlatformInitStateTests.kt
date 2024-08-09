@@ -1,6 +1,6 @@
 package com.emarsys.setup
 
-import com.emarsys.mobileengage.inApp.InappJsBridgeApi
+import com.emarsys.mobileengage.inapp.InappJsBridgeApi
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.mock

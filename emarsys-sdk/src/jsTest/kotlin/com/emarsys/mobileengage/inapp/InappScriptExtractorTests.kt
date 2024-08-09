@@ -1,4 +1,4 @@
-package com.emarsys.mobileengage.inApp
+package com.emarsys.mobileengage.inapp
 
 import io.kotest.matchers.shouldBe
 import web.dom.document

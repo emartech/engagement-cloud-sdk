@@ -1,4 +1,4 @@
-package com.emarsys.mobileengage.inApp
+package com.emarsys.mobileengage.inapp
 
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
