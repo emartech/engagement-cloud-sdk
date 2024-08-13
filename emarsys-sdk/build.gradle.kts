@@ -183,4 +183,8 @@ skie {
     build {
         produceDistributableFramework()
     }
+
+    analytics {
+        disableUpload.set(true)
+    }
 }

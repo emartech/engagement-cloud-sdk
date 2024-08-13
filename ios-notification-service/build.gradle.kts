@@ -1,7 +1,10 @@
+import co.touchlab.skie.configuration.DefaultArgumentInterop
+
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.mokkery)
+    alias(libs.plugins.skie)
 }
 
 kotlin {
@@ -11,7 +14,7 @@ kotlin {
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "shared"
+            baseName = "EmarsysNotificationService"
             isStatic = true
         }
     }
@@ -30,6 +33,21 @@ kotlin {
                 implementation(libs.kotlinx.coroutines.test)
             }
         }
+    }
+}
+
+skie {
+    features {
+        group {
+            DefaultArgumentInterop.Enabled(true)
+        }
+    }
+
+    build {
+        produceDistributableFramework()
+    }
+    analytics {
+        disableUpload.set(true)
     }
 }
 

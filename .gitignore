@@ -473,3 +473,5 @@ gradle-app.setting
 /resources/ems-service-worker.js.map
 /EmarsysSDK.xcframework/
 /lipo/
+/EmarsysNotificationService.xcframework/
+/buildedFrameworks/
