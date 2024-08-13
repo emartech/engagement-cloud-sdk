@@ -1,4 +1,4 @@
-.PHONY: build build-pipeline check-env clean create-apks help lint test test-web test-android test-android-firebase test-jvm
+.PHONY: build build-pipeline check-env clean create-apks help lint test test-web test-android test-android-firebase test-jvm link-ios ios-framework lipo-merge copy-lipo-output remove-temp-lipo temp-lipo-dir remove-old-output
 .DEFAULT_GOAL := help
 SHELL := /bin/bash
 
@@ -97,6 +97,33 @@ test-android-firebase: check-env ## run Android Instrumented tests on Firebase T
        --device model=bluejay,version=32,locale=en,orientation=portrait \
        --device model=b4q,version=33,locale=en,orientation=portrait \
        --client-details matrixLabel="Unified SDK"
+
+link-ios: ## runs gradle clean and then links iOS frameworks for supported arch types
+	@./gradlew :emarsys-sdk:linkReleaseFrameworkIosX64 :emarsys-sdk:linkReleaseFrameworkIosArm64 :emarsys-sdk:linkReleaseFrameworkIosSimulatorArm64
+
+remove-temp-lipo:
+	@rm -rf lipo
+
+remove-old-output:
+	@rm -rf ./EmarsysSDK.xcframework
+
+temp-lipo-dir:
+	@mkdir -p lipo
+
+lipo-merge: ## merges conflicting archs for simulator
+	@lipo -create \
+        emarsys-sdk/build/bin/iosX64/releaseFramework/EmarsysSDK.framework/EmarsysSDK \
+        emarsys-sdk/build/bin/iosSimulatorArm64/releaseFramework/EmarsysSDK.framework/EmarsysSDK \
+        -output lipo/EmarsysSDK
+
+copy-lipo-output: ## copies the lipo output file and replaces the existing one in destination
+	@\cp ./lipo/EmarsysSDK emarsys-sdk/build/bin/iosSimulatorArm64/releaseFramework/EmarsysSDK.framework/EmarsysSDK
+
+ios-framework: link-ios remove-temp-lipo remove-old-output temp-lipo-dir lipo-merge copy-lipo-output
+	@xcodebuild -create-xcframework \
+         -framework emarsys-sdk/build/bin/iosArm64/releaseFramework/EmarsysSDK.framework \
+          -framework emarsys-sdk/build/bin/iosSimulatorArm64/releaseFramework/EmarsysSDK.framework \
+          -output EmarsysSDK.xcframework
 
 lint: check-env ## run Android Instrumented tests
 	@./gradlew :emarsys-sdk:lint -x :composeApp:lint

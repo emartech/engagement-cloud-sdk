@@ -1,3 +1,4 @@
+import co.touchlab.skie.configuration.DefaultArgumentInterop
 import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
 import com.github.gmazzo.buildconfig.BuildConfigTask
 
@@ -10,6 +11,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.buildConfig)
     alias(libs.plugins.mokkery)
+    alias(libs.plugins.skie)
 }
 
 group = "com.emarsys"
@@ -40,7 +42,7 @@ kotlin {
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "shared"
+            baseName = "EmarsysSDK"
             isStatic = true
         }
     }
@@ -169,4 +171,16 @@ afterEvaluate {
 mockmp {
     usesHelper = true
     installWorkaround()
+}
+
+skie {
+    features {
+        group {
+            DefaultArgumentInterop.Enabled(true)
+        }
+    }
+
+    build {
+        produceDistributableFramework()
+    }
 }

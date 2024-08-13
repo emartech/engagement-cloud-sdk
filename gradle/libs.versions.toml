@@ -30,6 +30,7 @@ mokkery = "2.0.0"
 mockmp = "1.17.0"
 okio = "3.9.0"
 runner = "1.6.1"
+skie = "0.8.4"
 uuid = "0.8.2"
 fcm = "24.0.0"
 agconnect_core = "1.9.1.300"
@@ -102,3 +103,4 @@ buildConfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildConfig
 agconnect = { id = "com.huawei.agconnect", version.ref = "agconnect_core" }
 googleServices = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 mokkery = { id = "dev.mokkery", version.ref = "mokkery" }
+skie = { id = "co.touchlab.skie", version.ref = "skie"}

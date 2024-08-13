@@ -471,3 +471,5 @@ gradle-app.setting
 /composeApp/google-services.json
 /resources/ems-service-worker.js
 /resources/ems-service-worker.js.map
+/EmarsysSDK.xcframework/
+/lipo/
