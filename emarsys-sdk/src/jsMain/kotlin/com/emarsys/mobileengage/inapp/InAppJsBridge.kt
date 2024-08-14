@@ -14,11 +14,11 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import web.window.window
 
-class InappJsBridge(
+class InAppJsBridge(
     private val actionFactory: ActionFactoryApi<ActionModel>,
     private val json: Json,
     private val sdkScope: CoroutineScope
-) : InappJsBridgeApi {
+) : InAppJsBridgeApi {
 
     override fun register() {
         window.asDynamic()["EMSInappWebBridge"] = EMSInappWebBridge()

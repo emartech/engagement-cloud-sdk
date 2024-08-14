@@ -24,13 +24,13 @@ import com.emarsys.core.url.WebExternalUrlOpener
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.inapp.InAppJsBridge
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
+import com.emarsys.mobileengage.inapp.InAppScriptExtractor
+import com.emarsys.mobileengage.inapp.InAppScriptExtractorApi
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
-import com.emarsys.mobileengage.inapp.InappJsBridge
-import com.emarsys.mobileengage.inapp.InappScriptExtractor
-import com.emarsys.mobileengage.inapp.InappScriptExtractorApi
-import com.emarsys.mobileengage.inapp.WebInappPresenter
-import com.emarsys.mobileengage.inapp.WebInappViewProvider
+import com.emarsys.mobileengage.inapp.WebInAppPresenter
+import com.emarsys.mobileengage.inapp.WebInAppViewProvider
 import com.emarsys.mobileengage.push.PushMessageMapper
 import com.emarsys.mobileengage.push.PushServiceContext
 import com.emarsys.setup.PlatformInitState
@@ -80,7 +80,7 @@ actual class PlatformDependencyCreator actual constructor(
         downloaderApi: DownloaderApi
     ): State {
         val scope = CoroutineScope(sdkDispatcher)
-        val inappJsBridge = InappJsBridge(actionFactory, json, scope)
+        val inappJsBridge = InAppJsBridge(actionFactory, json, scope)
 
         return PlatformInitState(inappJsBridge)
     }
@@ -129,16 +129,16 @@ actual class PlatformDependencyCreator actual constructor(
         return WebFileCache()
     }
 
-    private val inappScriptExtractor: InappScriptExtractorApi by lazy {
-        InappScriptExtractor()
+    private val inappScriptExtractor: InAppScriptExtractorApi by lazy {
+        InAppScriptExtractor()
     }
 
     actual override fun createInAppViewProvider(actionFactory: ActionFactoryApi<ActionModel>): InAppViewProviderApi {
-        return WebInappViewProvider(inappScriptExtractor)
+        return WebInAppViewProvider(inappScriptExtractor)
     }
 
     actual override fun createInAppPresenter(): InAppPresenterApi {
-       return WebInappPresenter(msgHub)
+       return WebInAppPresenter(msgHub)
     }
 
     private fun getNavigatorData(): String {

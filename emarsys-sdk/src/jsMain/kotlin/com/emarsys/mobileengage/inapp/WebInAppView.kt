@@ -3,7 +3,7 @@ package com.emarsys.mobileengage.inapp
 import web.dom.document
 import web.html.HTMLElement
 
-class WebInappView(private val inappScriptExtractor: InappScriptExtractorApi) : InAppViewApi {
+class WebInAppView(private val inappScriptExtractor: InAppScriptExtractorApi) : InAppViewApi {
     var inappView: HTMLElement? = null
 
     override suspend fun load(message: InAppMessage) {

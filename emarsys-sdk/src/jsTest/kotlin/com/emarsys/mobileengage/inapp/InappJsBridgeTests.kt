@@ -36,7 +36,7 @@ class InappJsBridgeTests {
         val testAction = ButtonClickedAction(BasicButtonClickedActionModel("1", "testId"))
     }
 
-    private lateinit var inappJsBridge: InappJsBridgeApi
+    private lateinit var inappJsBridge: InAppJsBridgeApi
     private lateinit var mockActionFactory: ActionFactoryApi<ActionModel>
     private lateinit var json: Json
     private lateinit var sdkScope: CoroutineScope
@@ -48,7 +48,7 @@ class InappJsBridgeTests {
         json = JsonUtil.json
         mockActionFactory = mock()
 
-        inappJsBridge = InappJsBridge(mockActionFactory, json, sdkScope)
+        inappJsBridge = InAppJsBridge(mockActionFactory, json, sdkScope)
     }
 
     @AfterTest

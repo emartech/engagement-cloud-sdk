@@ -6,11 +6,11 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class InappScriptExtractorTests {
-    private lateinit var inappScriptExtractor: InappScriptExtractor
+    private lateinit var inappScriptExtractor: InAppScriptExtractor
 
     @BeforeTest
     fun setup() {
-        inappScriptExtractor = InappScriptExtractor()
+        inappScriptExtractor = InAppScriptExtractor()
     }
 
     @Test

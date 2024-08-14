@@ -8,13 +8,13 @@ import kotlin.test.Test
 
 class WebInappViewTests {
 
-    private lateinit var webInappView: WebInappView
-    private lateinit var inappScriptExtractor: InappScriptExtractorApi
+    private lateinit var webInappView: WebInAppView
+    private lateinit var inappScriptExtractor: InAppScriptExtractorApi
 
     @BeforeTest
     fun setup() {
-        inappScriptExtractor = InappScriptExtractor()
-        webInappView = WebInappView(inappScriptExtractor)
+        inappScriptExtractor = InAppScriptExtractor()
+        webInappView = WebInAppView(inappScriptExtractor)
     }
 
     @Test

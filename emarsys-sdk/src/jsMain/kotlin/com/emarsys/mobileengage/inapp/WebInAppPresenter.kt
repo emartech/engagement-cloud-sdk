@@ -4,13 +4,13 @@ import com.emarsys.core.message.MsgHubApi
 import web.dom.document
 import web.html.HTMLElement
 
-class WebInappPresenter(private val msgHubApi: MsgHubApi) : InAppPresenterApi {
+class WebInAppPresenter(private val msgHubApi: MsgHubApi) : InAppPresenterApi {
     override suspend fun present(
         view: InAppViewApi,
         mode: InAppPresentationMode,
         animation: InAppPresentationAnimation?
     ) {
-        val inappView = (view as WebInappView).inappView
+        val inappView = (view as WebInAppView).inappView
         val styledInappView = inappView?.let {
             if (mode == InAppPresentationMode.Overlay) {
                 applyOverlayStyle(inappView)

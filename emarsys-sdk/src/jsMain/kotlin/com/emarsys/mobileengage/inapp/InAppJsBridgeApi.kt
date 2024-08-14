@@ -1,5 +1,5 @@
 package com.emarsys.mobileengage.inapp
 
-interface InappJsBridgeApi {
+interface InAppJsBridgeApi {
     fun register()
 }

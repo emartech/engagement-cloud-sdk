@@ -1,6 +1,6 @@
 package com.emarsys.setup
 
-import com.emarsys.mobileengage.inapp.InappJsBridgeApi
+import com.emarsys.mobileengage.inapp.InAppJsBridgeApi
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
@@ -12,7 +12,7 @@ import kotlin.test.Test
 class PlatformInitStateTests {
 
     private lateinit var platformInitState: PlatformInitState
-    private lateinit var mockJsBridge: InappJsBridgeApi
+    private lateinit var mockJsBridge: InAppJsBridgeApi
 
     @BeforeTest
     fun setup() = runTest {

@@ -2,6 +2,6 @@ package com.emarsys.mobileengage.inapp
 
 import web.html.HTMLElement
 
-interface InappScriptExtractorApi {
+interface InAppScriptExtractorApi {
     fun extract(htmlElement: HTMLElement): List<String>
 }

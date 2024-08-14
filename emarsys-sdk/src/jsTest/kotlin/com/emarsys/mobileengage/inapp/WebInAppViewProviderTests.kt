@@ -5,16 +5,16 @@ import kotlin.test.Test
 
 class WebInAppViewProviderTests {
 
-    private lateinit var webInappViewProvider: WebInappViewProvider
-    private lateinit var inappScriptExtractor: InappScriptExtractor
+    private lateinit var webInappViewProvider: WebInAppViewProvider
+    private lateinit var inappScriptExtractor: InAppScriptExtractor
 
     @Test
     fun provide_shouldReturn_webInappViewInstance() {
-        inappScriptExtractor = InappScriptExtractor()
-        webInappViewProvider = WebInappViewProvider(inappScriptExtractor)
+        inappScriptExtractor = InAppScriptExtractor()
+        webInappViewProvider = WebInAppViewProvider(inappScriptExtractor)
 
         val view = webInappViewProvider.provide()
 
-        (view is WebInappView) shouldBe true
+        (view is WebInAppView) shouldBe true
     }
 }
