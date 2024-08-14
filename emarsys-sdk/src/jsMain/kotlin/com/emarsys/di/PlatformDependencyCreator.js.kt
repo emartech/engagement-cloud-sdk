@@ -10,6 +10,7 @@ import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.WebPlatformInfoCollector
 import com.emarsys.core.log.Logger
 import com.emarsys.core.log.SdkLogger
+import com.emarsys.core.message.MsgHubApi
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.permission.WebPermissionHandler
 import com.emarsys.core.provider.ApplicationVersionProvider
@@ -48,7 +49,8 @@ actual class PlatformDependencyCreator actual constructor(
     platformContext: PlatformContext,
     private val uuidProvider: Provider<String>,
     sdkLogger: Logger,
-    private val json: Json
+    private val json: Json,
+    private val msgHub: MsgHubApi
 ): DependencyCreator {
 
     private val platformContext: CommonPlatformContext = platformContext as CommonPlatformContext
@@ -136,7 +138,7 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createInAppPresenter(): InAppPresenterApi {
-       return WebInappPresenter()
+       return WebInappPresenter(msgHub)
     }
 
     private fun getNavigatorData(): String {

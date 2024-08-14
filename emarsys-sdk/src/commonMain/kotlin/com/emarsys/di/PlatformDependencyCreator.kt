@@ -7,6 +7,7 @@ import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.log.Logger
 import com.emarsys.core.log.SdkLogger
+import com.emarsys.core.message.MsgHubApi
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.state.State
@@ -27,7 +28,8 @@ expect class PlatformDependencyCreator(
     platformContext: PlatformContext,
     uuidProvider: Provider<String>,
     sdkLogger: Logger,
-    json: Json
+    json: Json,
+    msgHub: MsgHubApi
 ) : DependencyCreator {
     override fun createStorage(): TypedStorageApi<String?>
 

@@ -153,9 +153,15 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
     }
 
     override val uuidProvider: Provider<String> by lazy { UUIDProvider() }
+    val sdkDispatcher: CoroutineDispatcher by lazy {
+        Dispatchers.Default
+    }
+
+    private val msgHub: MsgHubApi by lazy { MsgHub(sdkDispatcher) }
 
     private val dependencyCreator: DependencyCreator =
-        PlatformDependencyCreator(platformContext, uuidProvider, sdkLogger, json)
+        PlatformDependencyCreator(platformContext, uuidProvider, sdkLogger, json, msgHub)
+
 
     override val stringStorage: TypedStorageApi<String?> by lazy { dependencyCreator.createStorage() }
 
@@ -165,7 +171,6 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
 
     private val externalUrlOpener: ExternalUrlOpenerApi by lazy { dependencyCreator.createExternalUrlOpener() }
 
-    private val msgHub: MsgHubApi by lazy { MsgHub(sdkDispatcher) }
 
     override val actionFactory: ActionFactoryApi<ActionModel> by lazy {
         ActionFactory(
@@ -199,10 +204,6 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         dependencyCreator.createDeviceInfoCollector(
             timezoneProvider
         )
-    }
-
-    val sdkDispatcher: CoroutineDispatcher by lazy {
-        Dispatchers.Default
     }
 
     private val eventChannel: Channel<Event> by lazy {

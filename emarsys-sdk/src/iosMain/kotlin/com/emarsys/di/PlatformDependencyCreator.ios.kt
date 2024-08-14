@@ -10,6 +10,7 @@ import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.UIDevice
 import com.emarsys.core.log.Logger
 import com.emarsys.core.log.SdkLogger
+import com.emarsys.core.message.MsgHubApi
 import com.emarsys.core.permission.IosPermissionHandler
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.provider.IosApplicationVersionProvider
@@ -39,7 +40,8 @@ actual class PlatformDependencyCreator actual constructor(
     platformContext: PlatformContext,
     private val uuidProvider: Provider<String>,
     sdkLogger: Logger,
-    private val json: Json
+    private val json: Json,
+    private val msgHub: MsgHubApi
 ) : DependencyCreator {
 
     actual override fun createStorage(): TypedStorageApi<String?> {

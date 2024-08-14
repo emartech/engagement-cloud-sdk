@@ -22,6 +22,7 @@ import com.emarsys.networking.clients.event.model.EventType
 import io.ktor.http.HttpMethod
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -50,16 +51,25 @@ class EventClient(
     }
 
     private suspend fun startEventConsumer() {
-        deviceEventChannel.consume().naturalBatching().collect {
-            val url = urlFactory.create(EmarsysUrlType.EVENT)
-            val requestBody =
-                DeviceEventRequestBody(inAppConfig.inAppDnd, it, sessionContext.deviceEventState)
-            val body = json.encodeToString(requestBody)
-            val result: DeviceEventResponse =
-                emarsysNetworkClient.send(UrlRequest(url, HttpMethod.Post, body)).body()
-            handleDeviceEventState(result)
-            handleInApp(result.message)
-            handleOnAppEventAction(result)
+        deviceEventChannel.consume().naturalBatching().onEach {
+            try {
+                val url = urlFactory.create(EmarsysUrlType.EVENT)
+                val requestBody =
+                    DeviceEventRequestBody(
+                        inAppConfig.inAppDnd,
+                        it,
+                        sessionContext.deviceEventState
+                    )
+                val body = json.encodeToString(requestBody)
+                val result: DeviceEventResponse =
+                    emarsysNetworkClient.send(UrlRequest(url, HttpMethod.Post, body)).body()
+                handleDeviceEventState(result)
+                handleInApp(result.message)
+                handleOnAppEventAction(result)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }.collect {
         }
     }
 
@@ -92,3 +102,4 @@ class EventClient(
         }
     }
 }
+

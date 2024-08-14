@@ -1,9 +1,10 @@
 package com.emarsys.mobileengage.inapp
 
+import com.emarsys.core.message.MsgHubApi
 import web.dom.document
 import web.html.HTMLElement
 
-class WebInappPresenter : InAppPresenterApi {
+class WebInappPresenter(private val msgHubApi: MsgHubApi) : InAppPresenterApi {
     override suspend fun present(
         view: InAppViewApi,
         mode: InAppPresentationMode,
@@ -17,7 +18,9 @@ class WebInappPresenter : InAppPresenterApi {
                 applyRibbonStyle(inappView)
             }
         }
-
+        msgHubApi.subscribe("dismiss") {
+            styledInappView?.remove()
+        }
         styledInappView?.let { document.body.appendChild(it) }
     }
 
