@@ -18,6 +18,8 @@
 </body>
 
 <script>
-    document.getElementById("button1").onclick = async () => {await new window["emarsys-sdk"].com.emarsys.EmarsysJs().enableTracking({applicationCode: "EMSC4-56233", serviceWorkerOptions: { serviceWorkerPath: "/ems-service-worker.js", applicationServerKey: "BHrFKdMsgSKMxUaWeituSxUO1GauXIqvYhbAo53QFk-0-UsZJwig_Ev-meZBMtWxt022rkI_oVkDPkHX7KQeq5o" }})}
+    document.getElementById("button1").onclick = async () => {await new window["emarsys-sdk"].com.emarsys.EmarsysJs().enableTracking({applicationCode: "EMS11-C3FD3", serviceWorkerOptions: { serviceWorkerPath: "/ems-service-worker.js", applicationServerKey: "BHrFKdMsgSKMxUaWeituSxUO1GauXIqvYhbAo53QFk-0-UsZJwig_Ev-meZBMtWxt022rkI_oVkDPkHX7KQeq5o" }})}
+    document.getElementById("button3").onclick = async () => { await new window["emarsys-sdk"].com.emarsys.EmarsysJs().trackCustomEvent("mysy3",null)}
+
 </script>
 </html>

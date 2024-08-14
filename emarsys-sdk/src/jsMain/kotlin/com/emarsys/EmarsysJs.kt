@@ -19,4 +19,10 @@ class EmarsysJs {
         }
     }
 
+    fun trackCustomEvent(eventName: String, eventPayload: Map<String, String>?): Promise<Any> {
+        return coroutineScope.promise {
+            Emarsys.trackCustomEvent(eventName, eventPayload)
+        }
+    }
+
 }

@@ -32,7 +32,6 @@
       name: 'triggerMEEvent',
       attr: 'me-trigger-event',
       exec: function (params, element, cb) {
-      console.log('custom event triggered')
         submitToPlatform('triggerMEEvent', { name: params.type, payload: params.payload }, cb)
       },
       fnWrap: function (type, payload, cb) {
