@@ -1,12 +1,36 @@
 package com.emarsys.mobileengage.inapp
 
-class InAppPresenter: InAppPresenterApi {
+import android.app.Activity
+import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
+import com.emarsys.watchdog.activity.TransitionSafeCurrentActivityWatchdog
+
+class InAppPresenter(
+    private val currentActivityWatchdog: TransitionSafeCurrentActivityWatchdog
+) : InAppPresenterApi {
 
     override suspend fun present(
         view: InAppViewApi,
         mode: InAppPresentationMode,
-        animation: InAppPresentationAnimation?) {
-        TODO("Not yet implemented")
+        animation: InAppPresentationAnimation?
+    ) {
+        val inAppDialog = InAppDialog(view as InAppView)
+        currentActivityWatchdog.currentActivity?.fragmentManager()?.let {
+            it.beginTransaction().run {
+                setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                add(android.R.id.content, inAppDialog, InAppDialog.TAG)
+                addToBackStack(null)
+                commit()
+            }
+        }
     }
+}
 
+fun Activity.fragmentManager(): FragmentManager? {
+    var fragmentManager: FragmentManager? = null
+    if (this is FragmentActivity) {
+        fragmentManager = this.supportFragmentManager
+    }
+    return fragmentManager
 }

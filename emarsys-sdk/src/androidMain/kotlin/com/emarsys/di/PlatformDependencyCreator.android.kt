@@ -10,6 +10,7 @@ import com.emarsys.api.push.PushConstants
 import com.emarsys.api.push.PushInternalApi
 import com.emarsys.applicationContext
 import com.emarsys.context.SdkContext
+import com.emarsys.context.SdkContextApi
 import com.emarsys.core.badge.AndroidBadgeCountHandler
 import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.cache.AndroidFileCache
@@ -39,11 +40,13 @@ import com.emarsys.mobileengage.inapp.InAppPresenter
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppViewProvider
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
+import com.emarsys.mobileengage.inapp.WebViewProvider
 import com.emarsys.mobileengage.push.NotificationCompatStyler
 import com.emarsys.mobileengage.push.PushMessageBroadcastReceiver
 import com.emarsys.mobileengage.push.PushMessagePresenter
 import com.emarsys.mobileengage.push.PushTokenBroadcastReceiver
 import com.emarsys.setup.PlatformInitState
+import com.emarsys.watchdog.activity.TransitionSafeCurrentActivityWatchdog
 import com.emarsys.watchdog.connection.AndroidConnectionWatchDog
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.AndroidLifecycleWatchDog
@@ -58,6 +61,7 @@ import java.util.Locale
 
 actual class PlatformDependencyCreator actual constructor(
     platformContext: PlatformContext,
+    private val sdkContext: SdkContextApi,
     private val uuidProvider: Provider<String>,
     private val sdkLogger: Logger,
     private val json: Json,
@@ -67,6 +71,9 @@ actual class PlatformDependencyCreator actual constructor(
     private val metadataReader = MetadataReader(applicationContext)
     private val storage = createStorage()
     private val platformInfoCollector = PlatformInfoCollector(applicationContext)
+
+    private val currentActivityWatchdog =
+        TransitionSafeCurrentActivityWatchdog().also { it.register() }
 
     actual override fun createLanguageProvider(): Provider<String> {
         return AndroidLanguageProvider(Locale.getDefault())
@@ -155,10 +162,15 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createInAppViewProvider(actionFactory: ActionFactoryApi<ActionModel>): InAppViewProviderApi {
-        return InAppViewProvider(applicationContext, InAppJsBridgeProvider())
+        return InAppViewProvider(
+            applicationContext,
+            InAppJsBridgeProvider(),
+            sdkContext.mainDispatcher,
+            WebViewProvider(applicationContext, sdkContext.mainDispatcher)
+        )
     }
 
     actual override fun createInAppPresenter(): InAppPresenterApi {
-        return InAppPresenter()
+        return InAppPresenter(currentActivityWatchdog)
     }
 }
