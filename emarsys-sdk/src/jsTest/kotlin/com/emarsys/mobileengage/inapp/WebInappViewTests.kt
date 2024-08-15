@@ -33,7 +33,7 @@ class WebInappViewTests {
             </body>
             </html>"""
 
-        val testMessage = InAppMessage(url = testHtml)
+        val testMessage = InAppMessage(testHtml)
 
         webInappView.load(testMessage)
 
@@ -62,7 +62,7 @@ class WebInappViewTests {
             </body>
             </html>"""
 
-        val testMessage = InAppMessage(url = testHtml)
+        val testMessage = InAppMessage(testHtml)
 
         webInappView.load(testMessage)
 

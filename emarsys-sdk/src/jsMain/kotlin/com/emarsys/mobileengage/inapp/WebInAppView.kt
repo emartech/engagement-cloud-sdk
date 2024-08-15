@@ -8,7 +8,7 @@ class WebInAppView(private val inappScriptExtractor: InAppScriptExtractorApi) : 
 
     override suspend fun load(message: InAppMessage) {
         val view = document.createElement("div")
-        view.innerHTML = message.content()
+        view.innerHTML = message.html
 
         val scriptContents = inappScriptExtractor.extract(view)
         createScriptElements(scriptContents).forEach { scriptElement ->
