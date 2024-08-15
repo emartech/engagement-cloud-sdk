@@ -153,14 +153,12 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
     }
 
     override val uuidProvider: Provider<String> by lazy { UUIDProvider() }
+    
     val sdkDispatcher: CoroutineDispatcher by lazy {
         Dispatchers.Default
     }
 
     private val msgHub: MsgHubApi by lazy { MsgHub(sdkDispatcher) }
-
-    private val dependencyCreator: DependencyCreator =
-        PlatformDependencyCreator(platformContext, uuidProvider, sdkLogger, json, msgHub)
 
 
     override val stringStorage: TypedStorageApi<String?> by lazy { dependencyCreator.createStorage() }
@@ -206,6 +204,14 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         )
     }
 
+    val sdkDispatcher: CoroutineDispatcher by lazy {
+        Dispatchers.Default
+    }
+
+    val mainDispatcher: CoroutineDispatcher by lazy {
+        Dispatchers.Main
+    }
+
     private val eventChannel: Channel<Event> by lazy {
         Channel()
     }
@@ -214,9 +220,23 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         DeviceEventChannel(eventChannel)
     }
 
-    override val sdkContext: SdkContext by lazy {
-        SdkContext(sdkDispatcher, defaultUrls, LogLevel.Error, mutableSetOf())
-    }
+    private val defaultUrls: DefaultUrlsApi =
+        DefaultUrls(
+            "https://me-client.gservice.emarsys.net",
+            "https://mobile-events.eservice.emarsys.net",
+            "https://recommender.scarabresearch.com/merchants",
+            "https://deep-link.eservice.emarsys.net",
+            "https://me-inbox.eservice.emarsys.net",
+            "https://mobile-sdk-config.gservice.emarsys.net",
+            "https://log-dealer.eservice.emarsys.net"
+        )
+
+    override val sdkContext: SdkContext =
+        SdkContext(sdkDispatcher, mainDispatcher, defaultUrls, LogLevel.Error, mutableSetOf())
+
+
+    private val dependencyCreator: DependencyCreator =
+        PlatformDependencyCreator(platformContext, sdkContext, uuidProvider, sdkLogger, json)
 
     override val sessionContext: SessionContext by lazy {
         SessionContext(clientState = null, deviceEventState = null)
@@ -387,18 +407,6 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
 
     override val contactClient: ContactClientApi by lazy {
         ContactClient(emarsysClient, urlFactory, sdkContext, contactTokenHandler, json)
-    }
-
-    private val defaultUrls: DefaultUrlsApi by lazy {
-        DefaultUrls(
-            "https://me-client.gservice.emarsys.net",
-            "https://mobile-events.eservice.emarsys.net",
-            "https://recommender.scarabresearch.com/merchants",
-            "https://deep-link.eservice.emarsys.net",
-            "https://me-inbox.eservice.emarsys.net",
-            "https://mobile-sdk-config.gservice.emarsys.net",
-            "https://log-dealer.eservice.emarsys.net"
-        )
     }
 
     private val httpClient = HttpClient {

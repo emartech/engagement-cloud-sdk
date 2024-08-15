@@ -11,21 +11,21 @@ class PlatformInitState(
     private val pushTokenIntentFilter: IntentFilter,
     private val pushMessageBroadcastReceiver: BroadcastReceiver,
     private val pushMessageIntentFilter: IntentFilter,
-    private val context: Context
+    private val applicationContext: Context
 ) : State {
 
     override val name: String = "androidInitState"
 
     override fun prepare() {
         ContextCompat.registerReceiver(
-            context,
+            applicationContext,
             pushTokenBroadcastReceiver,
             pushTokenIntentFilter,
             ContextCompat.RECEIVER_NOT_EXPORTED
         )
 
         ContextCompat.registerReceiver(
-            context,
+            applicationContext,
             pushMessageBroadcastReceiver,
             pushMessageIntentFilter,
             ContextCompat.RECEIVER_NOT_EXPORTED

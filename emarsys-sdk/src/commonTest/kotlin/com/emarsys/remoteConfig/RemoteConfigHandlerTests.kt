@@ -12,13 +12,28 @@ import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class RemoteConfigHandlerTests {
-    private val sdkContext = SdkContext(StandardTestDispatcher(), DefaultUrls("", "", "", "", "", "", ""), LogLevel.Debug, mutableSetOf())
+
+    private val mainDispatcher = StandardTestDispatcher()
+
+    init {
+        Dispatchers.setMain(mainDispatcher)
+    }
+
+    private val sdkContext = SdkContext(
+        StandardTestDispatcher(),
+        mainDispatcher,
+        DefaultUrls("", "", "", "", "", "", ""),
+        LogLevel.Debug,
+        mutableSetOf()
+    )
     private lateinit var mockRemoteConfigClient: RemoteConfigClientApi
     private lateinit var mockDeviceInfoCollector: DeviceInfoCollectorApi
     private lateinit var mockRandomProvider: Provider<Double>

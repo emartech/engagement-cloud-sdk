@@ -55,8 +55,10 @@ class PredictTests {
 
     }
 
+    private val mainDispatcher = StandardTestDispatcher()
+
     init {
-        Dispatchers.setMain(StandardTestDispatcher())
+        Dispatchers.setMain(mainDispatcher)
     }
 
     private lateinit var mockLoggingPredict: PredictInstance
@@ -73,6 +75,7 @@ class PredictTests {
         
         sdkContext = SdkContext(
             StandardTestDispatcher(),
+            mainDispatcher,
             DefaultUrls("", "", "", "", "", "", ""),
             LogLevel.Error,
             mutableSetOf()

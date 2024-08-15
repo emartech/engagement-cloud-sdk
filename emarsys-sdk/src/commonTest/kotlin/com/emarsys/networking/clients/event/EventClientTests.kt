@@ -93,7 +93,7 @@ class EventClientTests {
         sessionContext = SessionContext()
         every { mockInAppConfig.inAppDnd }.returns(IN_APP_DND)
         every { mockUrlFactory.create(EmarsysUrlType.EVENT) }.returns(TEST_BASE_URL)
-        every { mockInAppViewProvider.provide() } returns mockInAppView
+        everySuspend { mockInAppViewProvider.provide() } returns mockInAppView
         everySuspend { mockInAppView.load(any()) } returns Unit
 
         everySuspend { mockDeviceEventChannel.consume() }.returns(flowOf(testEvent))

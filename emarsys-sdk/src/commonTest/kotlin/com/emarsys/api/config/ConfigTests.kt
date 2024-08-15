@@ -63,8 +63,10 @@ class ConfigTest {
 
     private lateinit var config: Config<ConfigInstance, ConfigInstance, ConfigInstance>
 
+    private val mainDispatcher = StandardTestDispatcher()
+
     init {
-        Dispatchers.setMain(StandardTestDispatcher())
+        Dispatchers.setMain(mainDispatcher)
     }
 
     @BeforeTest
@@ -76,6 +78,7 @@ class ConfigTest {
 
         sdkContext = SdkContext(
             StandardTestDispatcher(),
+            mainDispatcher,
             DefaultUrls("", "", "", "", "", "", ""),
             LogLevel.Error,
             mutableSetOf()

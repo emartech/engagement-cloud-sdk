@@ -2,6 +2,7 @@ package com.emarsys.di
 
 import com.emarsys.api.push.PushInternalApi
 import com.emarsys.context.SdkContext
+import com.emarsys.context.SdkContextApi
 import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.device.DeviceInfoCollector
@@ -26,6 +27,7 @@ import kotlinx.serialization.json.Json
 
 expect class PlatformDependencyCreator(
     platformContext: PlatformContext,
+    sdkContext: SdkContextApi,
     uuidProvider: Provider<String>,
     sdkLogger: Logger,
     json: Json,

@@ -31,8 +31,10 @@ class InboxTests {
         val testException = Exception()
     }
 
+    private val mainDispatcher = StandardTestDispatcher()
+
     init {
-        Dispatchers.setMain(StandardTestDispatcher())
+        Dispatchers.setMain(mainDispatcher)
     }
 
     private lateinit var mockLoggingInbox: InboxInstance
@@ -49,6 +51,7 @@ class InboxTests {
         
         sdkContext = SdkContext(
             StandardTestDispatcher(),
+            mainDispatcher,
             DefaultUrls("", "", "", "", "", "", ""),
             LogLevel.Error,
             mutableSetOf()

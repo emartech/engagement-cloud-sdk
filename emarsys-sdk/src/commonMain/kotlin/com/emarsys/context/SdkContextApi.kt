@@ -10,6 +10,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 interface SdkContextApi: ObservableApi<SdkState> {
     val currentSdkState: SdkState
     val sdkDispatcher: CoroutineDispatcher
+    val mainDispatcher: CoroutineDispatcher
     var contactFieldId: Int?
     var config: SdkConfig?
     var defaultUrls: DefaultUrlsApi

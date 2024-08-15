@@ -13,12 +13,21 @@ import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class SetupOrganizerTests {
+
+    private val mainDispatcher = StandardTestDispatcher()
+
+    init {
+        Dispatchers.setMain(mainDispatcher)
+    }
+
     private lateinit var mockMeStateMachine: StateMachineApi
     private lateinit var mockPredictStateMachine: StateMachineApi
     private lateinit var sdkContext: SdkContextApi
@@ -30,6 +39,7 @@ class SetupOrganizerTests {
         mockPredictStateMachine = mock()
         sdkContext = SdkContext(
             StandardTestDispatcher(),
+            mainDispatcher,
             DefaultUrls("", "", "", "", "", "", ""),
             LogLevel.Error,
             mutableSetOf()

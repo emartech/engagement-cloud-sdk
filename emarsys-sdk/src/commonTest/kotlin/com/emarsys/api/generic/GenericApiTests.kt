@@ -15,9 +15,11 @@ import com.emarsys.core.log.Logger
 import com.emarsys.networking.clients.contact.ContactClientApi
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -32,6 +34,12 @@ class GenericApiTests {
     private lateinit var genericApi: GenericApi<LoggingContact, ContactGatherer, ContactInternal>
     private lateinit var contactContext: ApiContext<ContactCall>
 
+    private val mainDispatcher = StandardTestDispatcher()
+
+    init {
+        Dispatchers.setMain(mainDispatcher)
+    }
+
     @BeforeTest
     fun setup() = runTest {
         mockContactClient = mock()
@@ -42,6 +50,7 @@ class GenericApiTests {
         contactInternal = ContactInternal(mockContactClient, contactContext)
         sdkContext = SdkContext(
             StandardTestDispatcher(),
+            mainDispatcher,
             DefaultUrls(
                 "",
                 "",

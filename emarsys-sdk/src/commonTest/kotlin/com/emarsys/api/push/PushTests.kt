@@ -29,8 +29,10 @@ class PushTests {
         const val PUSH_TOKEN = "testPushToken"
     }
 
+    private val mainDispatcher = StandardTestDispatcher()
+
     init {
-        Dispatchers.setMain(StandardTestDispatcher())
+        Dispatchers.setMain(mainDispatcher)
     }
 
     private lateinit var mockLoggingPush: PushInstance
@@ -47,6 +49,7 @@ class PushTests {
 
         sdkContext = SdkContext(
             StandardTestDispatcher(),
+            mainDispatcher,
             DefaultUrls("", "", "", "", "", "", ""),
             LogLevel.Error,
             mutableSetOf()

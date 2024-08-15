@@ -37,8 +37,10 @@ class InappTests {
     private lateinit var sdkContext: SdkContextApi
     private lateinit var inApp: InApp<InAppInstance, InAppInstance, InAppInstance>
 
+    private val mainDispatcher = StandardTestDispatcher()
+
     init {
-        Dispatchers.setMain(StandardTestDispatcher())
+        Dispatchers.setMain(mainDispatcher)
     }
 
     @BeforeTest
@@ -49,6 +51,7 @@ class InappTests {
 
         sdkContext = SdkContext(
             StandardTestDispatcher(),
+            mainDispatcher,
             DefaultUrls("", "", "", "", "", "", ""),
             LogLevel.Error,
             mutableSetOf()

@@ -8,6 +8,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 
 class SdkContext(
     override val sdkDispatcher: CoroutineDispatcher,
+    override val mainDispatcher: CoroutineDispatcher,
     override var defaultUrls: DefaultUrlsApi,
     override var remoteLogLevel: LogLevel,
     override val features: MutableSet<Features>,

@@ -36,8 +36,10 @@ class ContactTests {
     private lateinit var mockContactInternal: ContactInstance
     private lateinit var contact: Contact<ContactInstance, ContactInstance, ContactInstance>
 
+    private val mainDispatcher = StandardTestDispatcher()
+
     init {
-        Dispatchers.setMain(StandardTestDispatcher())
+        Dispatchers.setMain(mainDispatcher)
     }
 
     @BeforeTest
@@ -47,6 +49,7 @@ class ContactTests {
         mockContactInternal = mock()
         sdkContext = SdkContext(
             StandardTestDispatcher(),
+            mainDispatcher,
             DefaultUrls("", "", "", "", "", "", ""),
             LogLevel.Error,
             mutableSetOf()

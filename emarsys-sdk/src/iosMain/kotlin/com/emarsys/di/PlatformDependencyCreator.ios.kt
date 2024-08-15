@@ -2,6 +2,7 @@ package com.emarsys.di
 
 import com.emarsys.api.push.PushInternalApi
 import com.emarsys.context.SdkContext
+import com.emarsys.context.SdkContextApi
 import com.emarsys.core.IosBadgeCountHandler
 import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.cache.FileCacheApi
@@ -38,6 +39,7 @@ import platform.Foundation.NSFileManager
 
 actual class PlatformDependencyCreator actual constructor(
     platformContext: PlatformContext,
+    sdkContext: SdkContextApi,
     private val uuidProvider: Provider<String>,
     sdkLogger: Logger,
     private val json: Json,

@@ -44,8 +44,10 @@ class GeofenceTrackerTests {
 
     private lateinit var geofenceTracker: GeofenceTracker<GeofenceTrackerInstance, GeofenceTrackerInstance, GeofenceTrackerInstance>
 
+    private val mainDispatcher = StandardTestDispatcher()
+
     init {
-        Dispatchers.setMain(StandardTestDispatcher())
+        Dispatchers.setMain(mainDispatcher)
     }
 
     @BeforeTest
@@ -53,9 +55,10 @@ class GeofenceTrackerTests {
         mockLoggingGeofenceTracker = mock()
         mockGathererGeofenceTracker = mock()
         mockGeofenceTrackerInternal = mock()
-        
+
         sdkContext = SdkContext(
             StandardTestDispatcher(),
+            mainDispatcher,
             DefaultUrls("", "", "", "", "", "", ""),
             LogLevel.Error,
             mutableSetOf()
