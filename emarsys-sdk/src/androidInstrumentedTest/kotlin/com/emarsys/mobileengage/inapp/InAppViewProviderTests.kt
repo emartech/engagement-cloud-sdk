@@ -28,7 +28,8 @@ class InAppViewProviderTests {
                 InAppViewProvider(
                     it.applicationContext,
                     mockInAppJsBridgeProvider,
-                    Dispatchers.Main
+                    Dispatchers.Main,
+                    WebViewProvider(it.applicationContext, Dispatchers.Main)
                 )
         }
     }

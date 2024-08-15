@@ -7,11 +7,12 @@ import kotlinx.coroutines.CoroutineDispatcher
 class InAppViewProvider(
     private val applicationContext: Context,
     private val jsBridgeProvider: Provider<InAppJsBridge>,
-    private val mainDispatcher: CoroutineDispatcher
+    private val mainDispatcher: CoroutineDispatcher,
+    private val webViewProvider: WebViewProvider
 ) : InAppViewProviderApi {
     override suspend fun provide(): InAppViewApi {
-            val inAppView = InAppView(applicationContext, mainDispatcher)
-            inAppView.connectBridge(jsBridgeProvider.provide())
-            return inAppView
+        val inAppView = InAppView(applicationContext, mainDispatcher, webViewProvider)
+        inAppView.connectBridge(jsBridgeProvider.provide())
+        return inAppView
     }
 }

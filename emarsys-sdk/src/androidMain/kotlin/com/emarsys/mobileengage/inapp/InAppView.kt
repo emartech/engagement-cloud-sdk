@@ -5,34 +5,36 @@ import android.content.Context
 import android.util.AttributeSet
 import android.webkit.WebView
 import android.widget.LinearLayout
-import android.widget.LinearLayout.LayoutParams.MATCH_PARENT
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 
 @SuppressLint("SetJavaScriptEnabled")
 class InAppView @JvmOverloads constructor(
     context: Context,
+    private val mainDispatcher: CoroutineDispatcher,
+    private val webViewProvider: WebViewProvider,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr), InAppViewApi {
 
-
-    var webView: WebView = WebView(context).apply {
-        settings.javaScriptEnabled = true
-        settings.loadWithOverviewMode = true
-        settings.useWideViewPort = true
-        settings.domStorageEnabled = true
+    companion object {
+        const val JS_BRIDGE_NAME = "Android"
     }
 
-
-    init {
-        webView.layoutParams = LayoutParams(MATCH_PARENT, MATCH_PARENT)
-        addView(webView)
-    }
-
-    internal fun connectBridge(bridge: InAppJsBridge) {
-        webView.addJavascriptInterface(bridge, "Android")
-    }
+    private var webView: WebView? = null
 
     override suspend fun load(message: InAppMessage) {
-        // TODO
+        withContext(mainDispatcher) {
+            webView = webViewProvider.provide().also {
+                it.loadDataWithBaseURL(null, message.html, "text/html", "UTF-8", null)
+            }
+            addView(webView)
+        }
+    }
+
+    internal suspend fun connectBridge(bridge: InAppJsBridge) {
+        withContext(mainDispatcher) {
+            webView?.addJavascriptInterface(bridge, JS_BRIDGE_NAME)
+        }
     }
 }
