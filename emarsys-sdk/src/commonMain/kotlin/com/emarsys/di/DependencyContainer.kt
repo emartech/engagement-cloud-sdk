@@ -158,6 +158,10 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         Dispatchers.Default
     }
 
+    val mainDispatcher: CoroutineDispatcher by lazy {
+        Dispatchers.Main
+    }
+
     private val msgHub: MsgHubApi by lazy { MsgHub(sdkDispatcher) }
 
 
@@ -204,14 +208,6 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         )
     }
 
-    val sdkDispatcher: CoroutineDispatcher by lazy {
-        Dispatchers.Default
-    }
-
-    val mainDispatcher: CoroutineDispatcher by lazy {
-        Dispatchers.Main
-    }
-
     private val eventChannel: Channel<Event> by lazy {
         Channel()
     }
@@ -236,7 +232,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
 
 
     private val dependencyCreator: DependencyCreator =
-        PlatformDependencyCreator(platformContext, sdkContext, uuidProvider, sdkLogger, json)
+        PlatformDependencyCreator(platformContext, sdkContext, uuidProvider, sdkLogger, json, msgHub)
 
     override val sessionContext: SessionContext by lazy {
         SessionContext(clientState = null, deviceEventState = null)
