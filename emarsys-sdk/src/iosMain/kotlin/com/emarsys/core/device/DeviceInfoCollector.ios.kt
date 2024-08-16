@@ -1,9 +1,14 @@
 package com.emarsys.core.device
 
 import com.emarsys.KotlinPlatform
+import com.emarsys.core.device.IosNotificationConstant.Companion.fromLong
 import com.emarsys.core.providers.Provider
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import platform.UserNotifications.UNUserNotificationCenter
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 actual class DeviceInfoCollector(
     private val hardwareIdProvider: Provider<String>,
@@ -30,8 +35,32 @@ actual class DeviceInfoCollector(
         return hardwareIdProvider.provide()
     }
 
-    actual override fun getPushSettings(): PushSettings {
-        TODO("Not yet implemented")
+    actual override suspend fun getPushSettings(): PushSettings {
+        return suspendCancellableCoroutine { continuation ->
+            UNUserNotificationCenter.currentNotificationCenter()
+                .getNotificationSettingsWithCompletionHandler { settings ->
+                    if (settings != null) {
+                        val iosNotificationSettings = IosNotificationSettings(
+                            fromLong<IosAuthorizationStatus>(settings.authorizationStatus),
+                            fromLong<IosNotificationSetting>(settings.soundSetting),
+                            fromLong<IosNotificationSetting>(settings.badgeSetting),
+                            fromLong<IosNotificationSetting>(settings.alertSetting),
+                            fromLong<IosNotificationSetting>(settings.notificationCenterSetting),
+                            fromLong<IosNotificationSetting>(settings.lockScreenSetting),
+                            fromLong<IosNotificationSetting>(settings.carPlaySetting),
+                            fromLong<IosAlertStyle>(settings.alertStyle),
+                            settings.showPreviewsSetting.name.toShowPreviewSetting(),
+                            fromLong<IosNotificationSetting>(settings.criticalAlertSetting),
+                            settings.providesAppNotificationSettings,
+                            fromLong<IosNotificationSetting>(settings.scheduledDeliverySetting),
+                            fromLong<IosNotificationSetting>(settings.timeSensitiveSetting)
+                        )
+                        println(json.encodeToString(iosNotificationSettings))
+                        continuation.resume(iosNotificationSettings)
+                    } else {
+                        continuation.resumeWithException(Exception("Failed to retrieve notification settings"))
+                    }
+                }
+        }
     }
-
 }

@@ -7,6 +7,7 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.Before
@@ -99,7 +100,7 @@ class DeviceInfoCollectorTests {
     }
 
     @Test
-    fun getPushSettings_shouldCall_getPushSettings_onPlatformInfoCollector() {
+    fun getPushSettings_shouldCall_getPushSettings_onPlatformInfoCollector() = runTest {
         val testSettings = AndroidNotificationSettings(
             true, -1000, listOf(ChannelSettings("testChannelId"))
         )

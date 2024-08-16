@@ -5,5 +5,5 @@ expect class DeviceInfoCollector: DeviceInfoCollectorApi {
 
     override fun getHardwareId(): String
 
-    override fun getPushSettings(): PushSettings
+    override suspend fun getPushSettings(): PushSettings
 }

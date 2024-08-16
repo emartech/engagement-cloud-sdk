@@ -5,5 +5,5 @@ interface DeviceInfoCollectorApi {
 
     fun getHardwareId(): String
 
-    fun getPushSettings(): PushSettings
+    suspend fun getPushSettings(): PushSettings
 }

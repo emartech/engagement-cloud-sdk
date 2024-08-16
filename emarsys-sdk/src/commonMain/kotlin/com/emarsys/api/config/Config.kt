@@ -33,8 +33,6 @@ class Config<Logging : ConfigInstance, Gatherer : ConfigInstance, Internal : Con
         get() = deviceInfoCollector.getHardwareId()
     override val languageCode: String
         get() = getDeviceInfo().languageCode
-    override val pushSettings: PushSettings
-        get() = deviceInfoCollector.getPushSettings()
 
     override val sdkVersion: String
         get() = getDeviceInfo().sdkVersion
@@ -50,6 +48,10 @@ class Config<Logging : ConfigInstance, Gatherer : ConfigInstance, Internal : Con
         withContext(sdkContext.sdkDispatcher) {
             activeInstance<ConfigInternalApi>().changeMerchantId(merchantId)
         }
+    }
+
+    override suspend fun getPushSettings(): PushSettings {
+        return deviceInfoCollector.getPushSettings()
     }
 
     private fun getDeviceInfo(): DeviceInfo {

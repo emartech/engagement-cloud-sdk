@@ -14,11 +14,11 @@ interface ConfigApi {
 
     val languageCode: String
 
-    val pushSettings: PushSettings
-
     val sdkVersion: String
 
     suspend fun changeApplicationCode(applicationCode: String): Result<Unit>
 
     suspend fun changeMerchantId(merchantId: String): Result<Unit>
+
+    suspend fun getPushSettings(): PushSettings
 }

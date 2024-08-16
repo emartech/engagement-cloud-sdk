@@ -51,13 +51,13 @@ class ConfigTest {
         )
     }
 
-    lateinit var mockDeviceInfoCollector: DeviceInfoCollectorApi
+    private lateinit var mockDeviceInfoCollector: DeviceInfoCollectorApi
 
-    lateinit var mockLoggingConfig: ConfigInstance
+    private lateinit var mockLoggingConfig: ConfigInstance
 
-    lateinit var mockGathererConfig: ConfigInstance
+    private lateinit var mockGathererConfig: ConfigInstance
 
-    lateinit var mockInternalConfig: ConfigInstance
+    private lateinit var mockInternalConfig: ConfigInstance
 
     private lateinit var sdkContext: SdkContextApi
 
@@ -88,7 +88,7 @@ class ConfigTest {
 
 
         every { mockDeviceInfoCollector.collect() } returns Json.encodeToString(DEVICE_INFO)
-        every { mockDeviceInfoCollector.getPushSettings() } returns PUSH_SETTINGS
+        everySuspend { mockDeviceInfoCollector.getPushSettings() } returns PUSH_SETTINGS
         every { mockDeviceInfoCollector.getHardwareId() } returns HW_ID
 
         everySuspend { mockLoggingConfig.activate() } returns Unit
@@ -137,7 +137,7 @@ class ConfigTest {
 
     @Test
     fun testPushSettings_returnsCorrectValue() = runTest {
-        config.pushSettings shouldBe PUSH_SETTINGS
+        config.getPushSettings() shouldBe PUSH_SETTINGS
     }
 
     @Test

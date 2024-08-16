@@ -42,7 +42,7 @@ actual class DeviceInfoCollector(
         }
     }
 
-    actual override fun getPushSettings(): PushSettings {
+    actual override suspend fun getPushSettings(): PushSettings {
         TODO("Not yet implemented")
     }
 }
