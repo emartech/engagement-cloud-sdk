@@ -148,7 +148,7 @@ class InappJsBridgeTests {
 
     @Test
     fun dismiss_shouldTrigger_actionFactory() = runTest {
-        val testActionModel = BasicDismissActionModel()
+        val testActionModel = BasicDismissActionModel("dismiss")
         everySuspend {
             mockActionFactory.create(action = testActionModel)
         } returns testAction

@@ -1,6 +1,7 @@
 package com.emarsys.mobileengage.inapp
 
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
 class WebInAppViewProviderTests {
@@ -9,7 +10,7 @@ class WebInAppViewProviderTests {
     private lateinit var inappScriptExtractor: InAppScriptExtractor
 
     @Test
-    fun provide_shouldReturn_webInappViewInstance() {
+    fun provide_shouldReturn_webInappViewInstance() = runTest {
         inappScriptExtractor = InAppScriptExtractor()
         webInappViewProvider = WebInAppViewProvider(inappScriptExtractor)
 

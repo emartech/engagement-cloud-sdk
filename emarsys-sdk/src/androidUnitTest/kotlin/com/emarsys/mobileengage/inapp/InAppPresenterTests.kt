@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.emarsys.watchdog.activity.TransitionSafeCurrentActivityWatchdog
 import io.mockk.Called
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
@@ -38,7 +39,7 @@ class InAppPresenterTests {
             val mockActivity = mockk<FragmentActivity> {
                 every { supportFragmentManager } returns mockFragmentManager
             }
-            every { mockCurrentActivityWatchdog.currentActivity } returns mockActivity
+            coEvery { mockCurrentActivityWatchdog.getCurrentActivity() } returns mockActivity
             val mockView = mockk<InAppView>()
 
             inAppPresenter.present(mockView, InAppPresentationMode.Overlay)
@@ -61,7 +62,7 @@ class InAppPresenterTests {
         runTest {
             mockkStatic("com.emarsys.mobileengage.inapp.InAppPresenterKt")
             val mockActivity = mockk<Activity>()
-            every { mockCurrentActivityWatchdog.currentActivity } returns mockActivity
+            coEvery { mockCurrentActivityWatchdog.getCurrentActivity() } returns mockActivity
             val mockView = mockk<InAppView>()
 
             inAppPresenter.present(mockView, InAppPresentationMode.Overlay)
