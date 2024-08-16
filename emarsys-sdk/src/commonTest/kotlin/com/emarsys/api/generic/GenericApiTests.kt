@@ -24,6 +24,7 @@ import kotlinx.coroutines.test.setMain
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class GenericApiTests {
     private lateinit var mockContactClient: ContactClientApi
     private lateinit var mockSdkLogger: Logger

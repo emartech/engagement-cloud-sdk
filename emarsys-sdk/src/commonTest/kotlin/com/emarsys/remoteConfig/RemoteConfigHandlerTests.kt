@@ -19,6 +19,7 @@ import kotlinx.coroutines.test.setMain
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class RemoteConfigHandlerTests {
 
     private val mainDispatcher = StandardTestDispatcher()
