@@ -5,47 +5,61 @@ import android.app.Application
 import android.app.Application.ActivityLifecycleCallbacks
 import android.os.Bundle
 import com.emarsys.applicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 
 class TransitionSafeCurrentActivityWatchdog : ActivityLifecycleCallbacks {
-
-    var currentActivity: Activity? = null
-        private set
-
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private var setActivityJob: Job? = null
+    private val currentActivityFlow: MutableStateFlow<Activity?> = MutableStateFlow(null)
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-        currentActivity = null
+        currentActivityFlow.value = null
     }
 
     override fun onActivityStarted(activity: Activity) {
-        currentActivity = null
+        currentActivityFlow.value = null
     }
 
     override fun onActivityResumed(activity: Activity) {
-        currentActivity = activity
+        setActivityJob = scope.launch {
+            delay(500)
+            currentActivityFlow.value = activity
+        }
     }
 
     override fun onActivityPaused(activity: Activity) {
-        if (currentActivity === activity) {
-            currentActivity = null
+        if (activity == currentActivityFlow.value) {
+            currentActivityFlow.value = null
+            setActivityJob?.cancel()
         }
     }
 
     override fun onActivityStopped(activity: Activity) {
-        if (activity == currentActivity) {
-            currentActivity = null
+        if (activity == currentActivityFlow.value) {
+            currentActivityFlow.value = null
+            setActivityJob?.cancel()
         }
     }
 
     override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
-        if (activity == currentActivity) {
-            currentActivity = null
+        if (activity == currentActivityFlow.value) {
+            currentActivityFlow.value = null
+            setActivityJob?.cancel()
         }
     }
 
     override fun onActivityDestroyed(activity: Activity) {
-        if (activity == currentActivity) {
-            currentActivity = null
+        if (activity == currentActivityFlow.value) {
+            currentActivityFlow.value = null
+            setActivityJob?.cancel()
         }
     }
 
@@ -53,4 +67,7 @@ class TransitionSafeCurrentActivityWatchdog : ActivityLifecycleCallbacks {
         (applicationContext as Application).registerActivityLifecycleCallbacks(this)
     }
 
+    suspend fun getCurrentActivity(): Activity {
+       return currentActivityFlow.first { activity -> activity != null}!!
+    }
 }
