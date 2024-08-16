@@ -164,7 +164,7 @@ actual class PlatformDependencyCreator actual constructor(
     actual override fun createInAppViewProvider(actionFactory: ActionFactoryApi<ActionModel>): InAppViewProviderApi {
         return InAppViewProvider(
             applicationContext,
-            InAppJsBridgeProvider(),
+            InAppJsBridgeProvider(actionFactory),
             sdkContext.mainDispatcher,
             WebViewProvider(applicationContext, sdkContext.mainDispatcher)
         )
