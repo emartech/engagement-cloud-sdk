@@ -6,6 +6,8 @@ import android.util.AttributeSet
 import android.webkit.WebView
 import android.widget.LinearLayout
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -23,11 +25,17 @@ class InAppView @JvmOverloads constructor(
 
     private var webView: WebView? = null
 
+    init {
+        CoroutineScope(mainDispatcher).launch {
+            webView = webViewProvider.provide()
+        }
+    }
+
     override suspend fun load(message: InAppMessage) {
         withContext(mainDispatcher) {
-            webView = webViewProvider.provide().also {
-                it.loadDataWithBaseURL(null, message.html, "text/html", "UTF-8", null)
-            }
+
+            webView?.loadDataWithBaseURL(null, message.html, "text/html", "UTF-8", null)
+
             addView(webView)
         }
     }

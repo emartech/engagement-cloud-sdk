@@ -164,13 +164,13 @@ actual class PlatformDependencyCreator actual constructor(
     actual override fun createInAppViewProvider(actionFactory: ActionFactoryApi<ActionModel>): InAppViewProviderApi {
         return InAppViewProvider(
             applicationContext,
-            InAppJsBridgeProvider(actionFactory),
+            InAppJsBridgeProvider(actionFactory, json, CoroutineScope(sdkContext.sdkDispatcher)),
             sdkContext.mainDispatcher,
             WebViewProvider(applicationContext, sdkContext.mainDispatcher)
         )
     }
 
     actual override fun createInAppPresenter(): InAppPresenterApi {
-        return InAppPresenter(currentActivityWatchdog)
+        return InAppPresenter(currentActivityWatchdog, msgHub)
     }
 }

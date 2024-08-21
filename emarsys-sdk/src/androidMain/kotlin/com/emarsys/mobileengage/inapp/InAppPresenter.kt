@@ -4,10 +4,12 @@ import android.app.Activity
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import com.emarsys.core.message.MsgHubApi
 import com.emarsys.watchdog.activity.TransitionSafeCurrentActivityWatchdog
 
 class InAppPresenter(
-    private val currentActivityWatchdog: TransitionSafeCurrentActivityWatchdog
+    private val currentActivityWatchdog: TransitionSafeCurrentActivityWatchdog,
+    private val msgHub: MsgHubApi
 ) : InAppPresenterApi {
 
     override suspend fun present(
@@ -24,6 +26,10 @@ class InAppPresenter(
                 addToBackStack(null)
                 commit()
             }
+        }
+
+        msgHub.subscribe("dismiss") {
+            inAppDialog.dismiss()
         }
     }
 }
