@@ -13,21 +13,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import com.emarsys.Emarsys
-import com.emarsys.EmarsysConfig
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        CoroutineScope(Dispatchers.Default).launch {
-            val config = EmarsysConfig("EMS11-C3FD3")
-            Emarsys.enableTracking(config)
-            Emarsys.linkContact(2575, "test2@test.com")
-        }
 
         setContent {
             App()
