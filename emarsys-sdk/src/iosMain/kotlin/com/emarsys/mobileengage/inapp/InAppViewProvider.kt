@@ -1,7 +1,7 @@
 package com.emarsys.mobileengage.inapp
 
-class InAppViewProvider: InAppViewProviderApi {
+class InAppViewProvider : InAppViewProviderApi {
     override suspend fun provide(): InAppViewApi {
-        return InAppView()
+        TODO("Not yet implemented")
     }
 }
