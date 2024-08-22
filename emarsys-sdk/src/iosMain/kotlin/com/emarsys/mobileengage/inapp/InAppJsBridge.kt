@@ -1,11 +1,22 @@
 package com.emarsys.mobileengage.inapp
 
+import com.emarsys.core.log.Logger
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
+import com.emarsys.mobileengage.action.models.BasicButtonClickedActionModel
+import com.emarsys.mobileengage.action.models.BasicCopyToClipboardActionModel
 import com.emarsys.mobileengage.action.models.BasicCustomEventActionModel
+import com.emarsys.mobileengage.action.models.BasicDismissActionModel
+import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
+import com.emarsys.mobileengage.action.models.RequestPushPermissionActionModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import platform.Foundation.NSDictionary
+import platform.Foundation.allKeys
 import platform.WebKit.WKScriptMessage
 import platform.WebKit.WKScriptMessageHandlerProtocol
 import platform.WebKit.WKUserContentController
@@ -14,7 +25,9 @@ import platform.darwin.NSObject
 class InAppJsBridge(
     private val actionFactory: ActionFactoryApi<ActionModel>,
     private val json: Json,
-    private val sdkScope: CoroutineScope
+    private val mainScope: CoroutineScope,
+    private val sdkScope: CoroutineScope,
+    private val logger: Logger
 ) : NSObject(), WKScriptMessageHandlerProtocol {
 
     private val jsCommandNames = listOf(
@@ -29,9 +42,70 @@ class InAppJsBridge(
 
     private fun handleActions(didReceiveScriptMessage: WKScriptMessage) {
         sdkScope.launch {
-            val actionModel =
-                json.decodeFromString<BasicCustomEventActionModel>(didReceiveScriptMessage.body.toString())
-            actionFactory.create(actionModel)()
+            val body: String = withContext(mainScope.coroutineContext) {
+                (didReceiveScriptMessage.body as NSDictionary).toJsonString()
+            }
+            val name = withContext(mainScope.coroutineContext) {
+                didReceiveScriptMessage.name
+            }
+            logger.debug(
+                "JsBridge",
+                "Received action: name(${name}), body(${body})"
+            )
+            when (name) {
+                "triggerMEEvent" -> {
+                    val actionModel =
+                        json.decodeFromString<BasicCustomEventActionModel>(body)
+                    actionFactory.create(actionModel)()
+                }
+
+                "buttonClicked" -> {
+                    val actionModel =
+                        json.decodeFromString<BasicButtonClickedActionModel>(body)
+                    actionFactory.create(actionModel)()
+                }
+
+                "triggerAppEvent" -> {
+                    val actionModel =
+                        json.decodeFromString<BasicAppEventActionModel>(body)
+                    actionFactory.create(actionModel)()
+                }
+
+                "requestPushPermission" -> {
+                    val actionModel =
+                        json.decodeFromString<RequestPushPermissionActionModel>(
+                            body
+                        )
+                    actionFactory.create(actionModel)()
+                }
+
+                "openExternalLink" -> {
+                    val actionModel =
+                        json.decodeFromString<BasicOpenExternalUrlActionModel>(
+                            body
+                        )
+                    actionFactory.create(actionModel)()
+                }
+
+                "close" -> {
+                    val actionModel =
+                        json.decodeFromString<BasicDismissActionModel>(body)
+                    actionModel.topic = "dismiss"
+                    actionFactory.create(actionModel)()
+                }
+
+                "copyToClipboard" -> {
+                    val actionModel =
+                        json.decodeFromString<BasicCopyToClipboardActionModel>(
+                            body
+                        )
+                    actionFactory.create(actionModel)()
+                }
+
+                else -> {
+                    logger.info("JsBridge", "Unknown action: ${didReceiveScriptMessage.name}")
+                }
+            }
         }
     }
 
@@ -50,4 +124,24 @@ class InAppJsBridge(
         handleActions(didReceiveScriptMessage)
     }
 
+    private fun NSDictionary.toMap(): Map<String, String?>
+    {
+        val map = mutableMapOf<String, String?>()
+        val keys = this.allKeys
+        for (key in keys) {
+            val keyString = key as? String ?: continue
+            val value = this.objectForKey(keyString)
+            map[keyString] = value.toString()
+        }
+        return map
+    }
+
+    private fun NSDictionary.toJsonString(): String {
+        val map = this.toMap()
+        return convertMapToJsonString(map)
+    }
+
+    private fun convertMapToJsonString(map: Map<String, String?>): String {
+        return Json.encodeToString(map)
+    }
 }

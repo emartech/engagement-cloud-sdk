@@ -51,7 +51,7 @@ actual class PlatformDependencyCreator actual constructor(
     platformContext: PlatformContext,
     private val sdkContext: SdkContextApi,
     private val uuidProvider: Provider<String>,
-    sdkLogger: Logger,
+    private val sdkLogger: Logger,
     private val json: Json,
     private val msgHub: MsgHubApi
 ) : DependencyCreator {
@@ -120,7 +120,13 @@ actual class PlatformDependencyCreator actual constructor(
             sdkContext.mainDispatcher,
             WebViewProvider(
                 sdkContext.mainDispatcher,
-                InAppJsBridge(actionFactory, json, CoroutineScope(sdkContext.sdkDispatcher))
+                InAppJsBridge(
+                    actionFactory,
+                    json,
+                    CoroutineScope(sdkContext.mainDispatcher),
+                    CoroutineScope(sdkContext.sdkDispatcher),
+                    sdkLogger
+                )
             )
         )
     }

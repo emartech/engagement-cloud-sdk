@@ -36,7 +36,9 @@ class WebViewProviderTests {
             StandardTestDispatcher(), InAppJsBridge(
                 mock(), JsonUtil.json, CoroutineScope(
                     StandardTestDispatcher()
-                )
+                ), CoroutineScope(
+                    StandardTestDispatcher()
+                ), mock()
             )
         )
 
