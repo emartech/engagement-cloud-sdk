@@ -24,7 +24,7 @@ class NWPathMonitorWrapper(
     private val sdkDispatcher: CoroutineDispatcher
 ) : Reachability {
     private val pathMonitor: nw_path_monitor_t = nw_path_monitor_create()
-    private var connectionStatus: NetworkConnection = NetworkConnection.NONE
+    private var connectionStatus: NetworkConnection = NetworkConnection.None
     private var isSatisfied: Boolean = true
 
     init {
@@ -38,27 +38,27 @@ class NWPathMonitorWrapper(
                 val status = nw_path_get_status(path)
                 isSatisfied = status == nw_path_status_satisfied
 
-                connectionStatus = NetworkConnection.NONE
+                connectionStatus = NetworkConnection.None
                 if (isSatisfied) {
                     when {
                         nw_path_uses_interface_type(path, nw_interface_type_wifi) -> {
-                            connectionStatus = NetworkConnection.WIFI
+                            connectionStatus = NetworkConnection.Wifi
                         }
 
                         nw_path_uses_interface_type(path, nw_interface_type_cellular) -> {
-                            connectionStatus = NetworkConnection.CELLULAR
+                            connectionStatus = NetworkConnection.Cellular
                         }
 
                         nw_path_uses_interface_type(path, nw_interface_type_wired) -> {
-                            connectionStatus = NetworkConnection.WIRED
+                            connectionStatus = NetworkConnection.Wired
                         }
 
                         nw_path_uses_interface_type(path, nw_interface_type_loopback) -> {
-                            connectionStatus = NetworkConnection.LOOPBACK
+                            connectionStatus = NetworkConnection.Loopback
                         }
 
                         nw_path_uses_interface_type(path, nw_interface_type_other) -> {
-                            connectionStatus = NetworkConnection.OTHER
+                            connectionStatus = NetworkConnection.Other
                         }
                     }
                 }

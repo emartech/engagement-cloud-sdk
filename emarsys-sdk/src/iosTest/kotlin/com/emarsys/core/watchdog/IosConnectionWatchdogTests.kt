@@ -43,7 +43,7 @@ class IosConnectionWatchdogTests {
             }
 
             override fun getNetworkConnection(): NetworkConnection {
-                return NetworkConnection.WIFI
+                return NetworkConnection.Wifi
             }
         }
 
@@ -67,7 +67,7 @@ class IosConnectionWatchdogTests {
             }
 
             override fun getNetworkConnection(): NetworkConnection {
-                return NetworkConnection.WIFI
+                return NetworkConnection.Wifi
             }
         }
 
