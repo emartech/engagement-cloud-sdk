@@ -4,6 +4,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import com.emarsys.Emarsys
+import com.emarsys.EmarsysConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,6 +24,21 @@ fun App() {
                 }
             }) {
                 Text("trackCustomEvent")
+            }
+            Button(onClick = {
+                CoroutineScope(Dispatchers.Default).launch {
+                    Emarsys.enableTracking(EmarsysConfig("EMS11-C3FD3"))
+                    Emarsys.linkContact(2575, "test2@test.com")
+                }
+            }) {
+                Text("enable SDK & link contact")
+            }
+            Button(onClick = {
+                CoroutineScope(Dispatchers.Default).launch {
+                    Emarsys.initialize()
+                }
+            }) {
+                Text("Init SDK")
             }
         }
     }
