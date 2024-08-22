@@ -26,6 +26,7 @@ import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.url.IosExternalUrlOpener
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.core.watchdog.connection.IosConnectionWatchdog
+import com.emarsys.core.watchdog.connection.ReachabilityWrapper
 import com.emarsys.core.watchdog.lifecycle.IosLifecycleWatchdog
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
@@ -36,12 +37,14 @@ import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.Json
 import platform.Foundation.NSFileManager
+import platform.UIKit.UIApplication
 
 actual class PlatformDependencyCreator actual constructor(
     platformContext: PlatformContext,
-    sdkContext: SdkContextApi,
+    private val sdkContext: SdkContextApi,
     private val uuidProvider: Provider<String>,
     sdkLogger: Logger,
     private val json: Json,
@@ -88,7 +91,7 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createConnectionWatchDog(sdkLogger: SdkLogger): ConnectionWatchDog {
-        return IosConnectionWatchdog()
+        return IosConnectionWatchdog(ReachabilityWrapper(sdkLogger, sdkContext.sdkDispatcher))
     }
 
     actual override fun createLifeCycleWatchDog(): LifecycleWatchDog {
