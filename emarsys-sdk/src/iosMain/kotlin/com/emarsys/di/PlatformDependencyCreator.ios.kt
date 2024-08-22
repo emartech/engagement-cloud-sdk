@@ -30,10 +30,15 @@ import com.emarsys.core.watchdog.connection.ReachabilityWrapper
 import com.emarsys.core.watchdog.lifecycle.IosLifecycleWatchdog
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.inapp.InAppJsBridge
 import com.emarsys.mobileengage.inapp.InAppPresenter
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppViewProvider
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
+import com.emarsys.mobileengage.inapp.providers.SceneProvider
+import com.emarsys.mobileengage.inapp.providers.ViewControllerProvider
+import com.emarsys.mobileengage.inapp.providers.WebViewProvider
+import com.emarsys.mobileengage.inapp.providers.WindowProvider
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
@@ -111,10 +116,23 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createInAppViewProvider(actionFactory: ActionFactoryApi<ActionModel>): InAppViewProviderApi {
-        return InAppViewProvider()
+        return InAppViewProvider(
+            sdkContext.mainDispatcher,
+            WebViewProvider(
+                sdkContext.mainDispatcher,
+                InAppJsBridge(actionFactory, json, CoroutineScope(sdkContext.sdkDispatcher))
+            )
+        )
     }
 
     actual override fun createInAppPresenter(): InAppPresenterApi {
-        return InAppPresenter()
+        return InAppPresenter(
+            WindowProvider(
+                sceneProvider = SceneProvider(UIApplication.sharedApplication),
+                viewControllerProvider = ViewControllerProvider(),
+                mainDispatcher = sdkContext.mainDispatcher
+            ), mainDispatcher = sdkContext.mainDispatcher,
+            msgHub = msgHub
+        )
     }
 }

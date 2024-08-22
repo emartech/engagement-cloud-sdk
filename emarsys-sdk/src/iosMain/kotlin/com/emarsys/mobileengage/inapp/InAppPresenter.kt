@@ -1,11 +1,111 @@
 package com.emarsys.mobileengage.inapp
 
-class InAppPresenter : InAppPresenterApi {
+import com.emarsys.core.message.MsgHubApi
+import com.emarsys.mobileengage.inapp.providers.WindowProvider
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import platform.UIKit.NSLayoutAttributeHeight
+import platform.UIKit.NSLayoutAttributeLeft
+import platform.UIKit.NSLayoutAttributeTop
+import platform.UIKit.NSLayoutAttributeWidth
+import platform.UIKit.NSLayoutConstraint
+import platform.UIKit.NSLayoutRelationEqual
+import platform.UIKit.UIApplication
+import platform.UIKit.UIView
+import platform.UIKit.UIWindow
+
+class InAppPresenter(
+    private val windowProvider: WindowProvider,
+    private val mainDispatcher: CoroutineDispatcher,
+    private val msgHub: MsgHubApi
+) : InAppPresenterApi {
     override suspend fun present(
         view: InAppViewApi,
         mode: InAppPresentationMode,
         animation: InAppPresentationAnimation?
     ) {
-        TODO("Not yet implemented")
+        val window = windowProvider.provide()
+        val webView = (view as InAppView).webView
+        if (webView != null) {
+            window.addView(webView)
+        }
+
+        val originalWindow = withContext(CoroutineScope(mainDispatcher).coroutineContext) {
+            val originalWindow =
+                UIApplication.sharedApplication.windows.filter { (it as UIWindow).isKeyWindow() }
+                    .map { it as UIWindow }.firstOrNull()
+
+
+            window.makeKeyAndVisible()
+            originalWindow
+        }
+
+        msgHub.subscribe("dismiss") {
+            CoroutineScope(mainDispatcher).launch {
+                window.removeFromSuperview()
+                originalWindow?.makeKeyAndVisible()
+            }
+        }
+    }
+
+
+    fun UIWindow.addView(view: UIView) {
+        CoroutineScope(mainDispatcher).launch {
+
+            rootViewController?.view?.addSubview(view)
+            view.translatesAutoresizingMaskIntoConstraints = false
+
+            val topConstraint = NSLayoutConstraint.constraintWithItem(
+                view,
+                NSLayoutAttributeTop,
+                NSLayoutRelationEqual,
+                rootViewController?.view,
+                NSLayoutAttributeTop,
+                1.0,
+                0.0
+            )
+
+            val leftConstraint = NSLayoutConstraint.constraintWithItem(
+                view,
+                NSLayoutAttributeLeft,
+                NSLayoutRelationEqual,
+                rootViewController?.view,
+                NSLayoutAttributeLeft,
+                1.0,
+                0.0
+            )
+
+            val widthConstraint = NSLayoutConstraint.constraintWithItem(
+                view,
+                NSLayoutAttributeWidth,
+                NSLayoutRelationEqual,
+                rootViewController?.view,
+                NSLayoutAttributeWidth,
+                1.0,
+                0.0
+            )
+
+            val heightConstraint = NSLayoutConstraint.constraintWithItem(
+                view,
+                NSLayoutAttributeHeight,
+                NSLayoutRelationEqual,
+                rootViewController?.view,
+                NSLayoutAttributeHeight,
+                1.0,
+                0.0
+            )
+
+            rootViewController?.view?.addConstraints(
+                listOf(
+                    topConstraint,
+                    leftConstraint,
+                    widthConstraint,
+                    heightConstraint
+                )
+            )
+            rootViewController?.view?.layoutIfNeeded()
+        }
     }
 }
