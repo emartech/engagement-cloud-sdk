@@ -20,7 +20,7 @@ actual class DeviceInfoCollector(
 ) : DeviceInfoCollectorApi {
     actual override fun collect(): String {
         val deviceInfo = DeviceInfo(
-            KotlinPlatform.IOS.name,
+            KotlinPlatform.IOS.name.lowercase(),
             applicationVersion = applicationVersionProvider.provide(),
             deviceModel = deviceInformation.deviceModel(),
             osVersion = deviceInformation.osVersion(),
