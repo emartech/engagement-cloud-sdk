@@ -4,4 +4,7 @@ enum class NetworkConnection {
     NONE,
     WIFI,
     CELLULAR,
+    WIRED,
+    LOOPBACK,
+    OTHER
 }

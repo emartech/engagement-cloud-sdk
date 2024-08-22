@@ -26,7 +26,7 @@ import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.url.IosExternalUrlOpener
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.core.watchdog.connection.IosConnectionWatchdog
-import com.emarsys.core.watchdog.connection.ReachabilityWrapper
+import com.emarsys.core.watchdog.connection.NWPathMonitorWrapper
 import com.emarsys.core.watchdog.lifecycle.IosLifecycleWatchdog
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
@@ -96,7 +96,7 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createConnectionWatchDog(sdkLogger: SdkLogger): ConnectionWatchDog {
-        return IosConnectionWatchdog(ReachabilityWrapper(sdkLogger, sdkContext.sdkDispatcher))
+        return IosConnectionWatchdog(NWPathMonitorWrapper(sdkContext.sdkDispatcher))
     }
 
     actual override fun createLifeCycleWatchDog(): LifecycleWatchDog {
