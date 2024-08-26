@@ -59,7 +59,7 @@ class DeviceInfoCollectorTests {
     @Test
     fun collect_shouldCollectDeviceInfo() {
         val deviceInfo = DeviceInfo(
-            KotlinPlatform.IOS.name,
+            KotlinPlatform.IOS.name.lowercase(),
             APP_VERSION,
             DEVICE_MODEL,
             OS_VERSION,
