@@ -1,10 +1,13 @@
 package com.emarsys.core.storage
 
-class StringStorage: TypedStorageApi<String?> {
+import platform.Foundation.NSUserDefaults
+
+class StringStorage(private val userDefaults: NSUserDefaults): TypedStorageApi<String?> {
     override fun put(key: String, value: String?) {
+        userDefaults.setObject(value, key)
     }
 
     override fun get(key: String): String? {
-        return null
+        return userDefaults.stringForKey(key)
     }
 }

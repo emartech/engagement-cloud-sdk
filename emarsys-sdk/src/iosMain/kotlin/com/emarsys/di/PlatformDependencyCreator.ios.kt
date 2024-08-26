@@ -55,9 +55,10 @@ actual class PlatformDependencyCreator actual constructor(
     private val json: Json,
     private val msgHub: MsgHubApi
 ) : DependencyCreator {
+    private val platformContext: CommonPlatformContext = platformContext as CommonPlatformContext
 
     actual override fun createStorage(): TypedStorageApi<String?> {
-        return StringStorage()
+        return StringStorage(platformContext.userDefaults)
     }
 
     actual override fun createDeviceInfoCollector(
