@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import com.emarsys.core.message.MsgHubApi
 import com.emarsys.watchdog.activity.TransitionSafeCurrentActivityWatchdog
 import io.mockk.Called
 import io.mockk.coEvery
@@ -19,6 +20,7 @@ import org.junit.Test
 class InAppPresenterTests {
 
     private lateinit var mockCurrentActivityWatchdog: TransitionSafeCurrentActivityWatchdog
+    private lateinit var mockMsgHub: MsgHubApi
 
     private lateinit var inAppPresenter: InAppPresenterApi
 
@@ -26,7 +28,8 @@ class InAppPresenterTests {
     @Before
     fun setup() {
         mockCurrentActivityWatchdog = mockk<TransitionSafeCurrentActivityWatchdog>()
-        inAppPresenter = InAppPresenter(mockCurrentActivityWatchdog)
+        mockMsgHub = mockk(relaxed = true)
+        inAppPresenter = InAppPresenter(mockCurrentActivityWatchdog, mockMsgHub)
     }
 
     @Test
