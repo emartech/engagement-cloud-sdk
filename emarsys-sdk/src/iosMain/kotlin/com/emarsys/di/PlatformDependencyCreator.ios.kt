@@ -93,7 +93,7 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createExternalUrlOpener(): ExternalUrlOpenerApi {
-        return IosExternalUrlOpener()
+        return IosExternalUrlOpener(UIApplication.sharedApplication, sdkContext.mainDispatcher)
     }
 
     actual override fun createConnectionWatchDog(sdkLogger: SdkLogger): ConnectionWatchDog {
