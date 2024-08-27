@@ -52,6 +52,10 @@ class SdkLogger(private val consoleLogger: ConsoleLogger): Logger {
         log(tag, LogLevel.Error, throwable = throwable)
     }
 
+    override suspend fun error(tag: String, throwable: Throwable, data: Map<String, Any>) {
+        log(tag, LogLevel.Error, throwable = throwable, data = data)
+    }
+
     override suspend fun error(tag: String, message: String, data: Map<String, Any>) {
         log(tag, LogLevel.Error, message, data = data)
     }

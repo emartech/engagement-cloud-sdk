@@ -16,5 +16,6 @@ interface Logger {
     suspend fun error(logEntry: LogEntry)
     suspend fun error(tag: String, message: String)
     suspend fun error(tag: String, throwable: Throwable)
+    suspend fun error(tag: String, throwable: Throwable, data: Map<String, Any>)
     suspend fun error(tag: String, message: String, data: Map<String, Any>)
 }

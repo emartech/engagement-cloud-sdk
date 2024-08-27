@@ -50,7 +50,7 @@ actual class PlatformDependencyCreator actual constructor(
     platformContext: PlatformContext,
     sdkContext: SdkContextApi,
     private val uuidProvider: Provider<String>,
-    sdkLogger: Logger,
+    private val sdkLogger: Logger,
     private val json: Json,
     private val msgHub: MsgHubApi
 ): DependencyCreator {
@@ -96,7 +96,7 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createExternalUrlOpener(): ExternalUrlOpenerApi {
-        return WebExternalUrlOpener()
+        return WebExternalUrlOpener(window, sdkLogger)
     }
 
     actual override fun createConnectionWatchDog(sdkLogger: SdkLogger): ConnectionWatchDog {
