@@ -113,12 +113,6 @@ kotlin {
             }
         }
 
-        val iosSimulatorArm64Test by getting {
-            dependencies {
-                implementation(kotlin("test"))
-            }
-        }
-
         val jsMain by getting {
             dependencies {
                 implementation(libs.ktor.client.js)

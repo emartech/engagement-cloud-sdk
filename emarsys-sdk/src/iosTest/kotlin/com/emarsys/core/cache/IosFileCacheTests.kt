@@ -1,6 +1,5 @@
-package core.cache
+package com.emarsys.core.cache
 
-import com.emarsys.core.cache.IosFileCache
 import io.kotest.matchers.shouldBe
 import io.ktor.utils.io.core.toByteArray
 import platform.Foundation.NSFileManager
