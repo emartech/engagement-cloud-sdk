@@ -140,7 +140,7 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createExternalUrlOpener(): ExternalUrlOpenerApi {
-        return AndroidExternalUrlOpener()
+        return AndroidExternalUrlOpener(applicationContext)
     }
 
     actual override fun createConnectionWatchDog(sdkLogger: SdkLogger): ConnectionWatchDog {

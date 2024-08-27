@@ -1,14 +1,28 @@
 package com.emarsys.core.url
 
+import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import com.emarsys.applicationContext
+import android.webkit.URLUtil
 
-class AndroidExternalUrlOpener : ExternalUrlOpenerApi {
-    override fun open(url: String) {
+class AndroidExternalUrlOpener(
+    private val applicationContext: Context
+) : ExternalUrlOpenerApi {
+
+    override suspend fun open(url: String): Boolean {
+        if (!URLUtil.isValidUrl(url)) {
+            return false
+        }
         val link = Uri.parse(url)
-        val externalUrlIntent = Intent(Intent.ACTION_VIEW, link)
-        externalUrlIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        applicationContext.startActivity(externalUrlIntent)
+        val externalUrlIntent = Intent(Intent.ACTION_VIEW, link).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        return try {
+            applicationContext.startActivity(externalUrlIntent)
+            true
+        } catch (e: ActivityNotFoundException) {
+            false
+        }
     }
 }
