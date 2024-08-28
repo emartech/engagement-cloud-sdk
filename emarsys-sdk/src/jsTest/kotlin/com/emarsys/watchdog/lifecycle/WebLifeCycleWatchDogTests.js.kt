@@ -9,11 +9,13 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import web.dom.document
 import web.events.Event
 import web.events.EventType
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -26,6 +28,12 @@ class WebConnectionWatchDogTests {
     fun setup() {
         Dispatchers.setMain(StandardTestDispatcher())
     }
+
+    @AfterTest
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
 
     @Test
     fun testStart_shouldAddVisibilityChangeEventListener() = runTest {
