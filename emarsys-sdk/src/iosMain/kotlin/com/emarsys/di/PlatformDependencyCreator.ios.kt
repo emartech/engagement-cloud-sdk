@@ -7,6 +7,8 @@ import com.emarsys.core.IosBadgeCountHandler
 import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.cache.IosFileCache
+import com.emarsys.core.clipboard.ClipboardHandlerApi
+import com.emarsys.core.clipboard.IosClipboardHandler
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.UIDevice
 import com.emarsys.core.log.Logger
@@ -46,6 +48,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.Json
 import platform.Foundation.NSFileManager
 import platform.UIKit.UIApplication
+import platform.UIKit.UIPasteboard
 
 actual class PlatformDependencyCreator actual constructor(
     platformContext: PlatformContext,
@@ -141,5 +144,9 @@ actual class PlatformDependencyCreator actual constructor(
             ), mainDispatcher = sdkContext.mainDispatcher,
             msgHub = msgHub
         )
+    }
+
+    actual override fun createClipboardHandler(): ClipboardHandlerApi {
+        return IosClipboardHandler(UIPasteboard.generalPasteboard)
     }
 }
