@@ -3,6 +3,7 @@ package com.emarsys.mobileengage.action
 import com.emarsys.api.oneventaction.OnEventActionInternalApi
 import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.channel.DeviceEventChannelApi
+import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.message.MsgHubApi
 import com.emarsys.core.permission.PermissionHandlerApi
@@ -34,9 +35,9 @@ class ActionFactory<ActionModelType>(
     private val badgeCountHandler: BadgeCountHandlerApi,
     private val externalUrlOpener: ExternalUrlOpenerApi,
     private val msgHub: MsgHubApi,
+    private val clipboardHandler: ClipboardHandlerApi,
     private val sdkLogger: SdkLogger
 ): ActionFactoryApi<ActionModelType> {
-
     override suspend fun create(action: ActionModelType): Action<*> {
         return when (action) {
             is AppEventActionModel -> AppEventAction(action, onEventActionInternal)
@@ -47,7 +48,7 @@ class ActionFactory<ActionModelType>(
             is OpenExternalUrlActionModel -> OpenExternalUrlAction(action, externalUrlOpener)
             is PushToInappActionModel -> PushToInappAction(sdkLogger)
             is ButtonClickedActionModel -> ButtonClickedAction(action)
-            is CopyToClipboardActionModel -> CopyToClipboardAction(action)
+            is CopyToClipboardActionModel -> CopyToClipboardAction(action, clipboardHandler)
             else -> throw IllegalArgumentException("Unknown action type: $action")
         }
     }

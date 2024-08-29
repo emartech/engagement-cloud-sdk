@@ -3,6 +3,7 @@ package com.emarsys.mobileengage.action
 import com.emarsys.api.oneventaction.OnEventActionInternalApi
 import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.channel.DeviceEventChannelApi
+import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.message.MsgHubApi
@@ -36,6 +37,7 @@ class ActionFactoryTests {
     private lateinit var mockBadgeCountHandler: BadgeCountHandlerApi
     private lateinit var mockExternalUrlOpener: ExternalUrlOpenerApi
     private lateinit var mockMsgHub: MsgHubApi
+    private lateinit var mockClipboardHandler: ClipboardHandlerApi
 
     private lateinit var actionFactory: ActionFactoryApi<ActionModel>
 
@@ -47,6 +49,7 @@ class ActionFactoryTests {
         mockBadgeCountHandler = mock()
         mockExternalUrlOpener = mock()
         mockMsgHub = mock()
+        mockClipboardHandler = mock()
 
         actionFactory = ActionFactory(
             mockOnEventActionInternal,
@@ -55,6 +58,7 @@ class ActionFactoryTests {
             mockBadgeCountHandler,
             mockExternalUrlOpener,
             mockMsgHub,
+            mockClipboardHandler,
             SdkLogger(ConsoleLogger())
         )
     }

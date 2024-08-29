@@ -5,6 +5,7 @@ import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.cache.FileCacheApi
+import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.log.Logger
 import com.emarsys.core.log.SdkLogger
@@ -66,4 +67,6 @@ expect class PlatformDependencyCreator(
     override fun createInAppViewProvider(actionFactory: ActionFactoryApi<ActionModel>): InAppViewProviderApi
 
     override fun createInAppPresenter(): InAppPresenterApi
+
+    override fun createClipboardHandler(): ClipboardHandlerApi
 }

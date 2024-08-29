@@ -1,9 +1,13 @@
 package com.emarsys.mobileengage.action.actions
 
+import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.mobileengage.action.models.CopyToClipboardActionModel
 
-class CopyToClipboardAction(private val action: CopyToClipboardActionModel) :Action<String> {
+class CopyToClipboardAction(
+    private val action: CopyToClipboardActionModel,
+    private val clipBoardHandler: ClipboardHandlerApi
+) : Action<String> {
     override suspend fun invoke(value: String?) {
-        println("Copied value: ${action.text}. Should be implemented later.")
+        clipBoardHandler.copyToClipboard(action.text)
     }
 }

@@ -68,6 +68,7 @@ import com.emarsys.context.SdkContext
 import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.channel.DeviceEventChannel
 import com.emarsys.core.channel.DeviceEventChannelApi
+import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.collections.persistentListOf
 import com.emarsys.core.crypto.Crypto
 import com.emarsys.core.crypto.CryptoApi
@@ -153,7 +154,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
     }
 
     override val uuidProvider: Provider<String> by lazy { UUIDProvider() }
-    
+
     val sdkDispatcher: CoroutineDispatcher by lazy {
         Dispatchers.Default
     }
@@ -173,6 +174,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
 
     private val externalUrlOpener: ExternalUrlOpenerApi by lazy { dependencyCreator.createExternalUrlOpener() }
 
+    private val clipboardHandler: ClipboardHandlerApi by lazy { dependencyCreator.createClipboardHandler() }
 
     override val actionFactory: ActionFactoryApi<ActionModel> by lazy {
         ActionFactory(
@@ -182,6 +184,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             badgeCountHandler,
             externalUrlOpener,
             msgHub,
+            clipboardHandler,
             sdkLogger
         )
     }
@@ -194,6 +197,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             badgeCountHandler,
             externalUrlOpener,
             msgHub,
+            clipboardHandler,
             sdkLogger
         )
     }
@@ -232,7 +236,14 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
 
 
     private val dependencyCreator: DependencyCreator =
-        PlatformDependencyCreator(platformContext, sdkContext, uuidProvider, sdkLogger, json, msgHub)
+        PlatformDependencyCreator(
+            platformContext,
+            sdkContext,
+            uuidProvider,
+            sdkLogger,
+            json,
+            msgHub
+        )
 
     override val sessionContext: SessionContext by lazy {
         SessionContext(clientState = null, deviceEventState = null)
