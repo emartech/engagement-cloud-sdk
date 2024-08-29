@@ -173,4 +173,10 @@ actual class PlatformDependencyCreator actual constructor(
     actual override fun createInAppPresenter(): InAppPresenterApi {
         return InAppPresenter(currentActivityWatchdog, msgHub)
     }
+
+    actual override fun createClipboardHandler(): ClipboardHandlerApi {
+        val clipboardManager =
+            applicationContext.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+        return AndroidClipboardHandler(clipboardManager)
+    }
 }
