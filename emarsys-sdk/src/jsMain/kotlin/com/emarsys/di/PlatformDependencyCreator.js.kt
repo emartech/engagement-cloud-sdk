@@ -7,6 +7,8 @@ import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.badge.WebBadgeCountHandler
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.cache.WebFileCache
+import com.emarsys.core.clipboard.ClipboardHandlerApi
+import com.emarsys.core.clipboard.WebClipboardHandler
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.WebPlatformInfoCollector
 import com.emarsys.core.log.Logger
@@ -53,7 +55,7 @@ actual class PlatformDependencyCreator actual constructor(
     private val sdkLogger: Logger,
     private val json: Json,
     private val msgHub: MsgHubApi
-): DependencyCreator {
+) : DependencyCreator {
 
     private val platformContext: CommonPlatformContext = platformContext as CommonPlatformContext
     private val storage = createStorage()
@@ -140,7 +142,11 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createInAppPresenter(): InAppPresenterApi {
-       return WebInAppPresenter(msgHub)
+        return WebInAppPresenter(msgHub)
+    }
+
+    actual override fun createClipboardHandler(): ClipboardHandlerApi {
+        return WebClipboardHandler(window.navigator.clipboard)
     }
 
     private fun getNavigatorData(): String {
