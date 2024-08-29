@@ -2,7 +2,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import com.emarsys.Emarsys
 import com.emarsys.EmarsysConfig
 import kotlinx.coroutines.CoroutineScope
@@ -13,18 +15,19 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 @Preview
 fun App() {
+    val eventName = mutableStateOf("")
+
     MaterialTheme {
         Column {
-
             Text("Hello Team SDK!")
             Button(onClick = {
                 CoroutineScope(Dispatchers.Default).launch {
-                    Emarsys.trackCustomEvent("mysy3", null)
-
+                    Emarsys.initialize()
                 }
             }) {
-                Text("trackCustomEvent")
+                Text("Init SDK")
             }
+
             Button(onClick = {
                 CoroutineScope(Dispatchers.Default).launch {
                     Emarsys.enableTracking(EmarsysConfig("EMS11-C3FD3"))
@@ -33,12 +36,19 @@ fun App() {
             }) {
                 Text("enable SDK & link contact")
             }
+
+            TextField(value = eventName.value, onValueChange = {
+                eventName.value = it
+            })
             Button(onClick = {
-                CoroutineScope(Dispatchers.Default).launch {
-                    Emarsys.initialize()
+                if (eventName.value.isNotBlank()) {
+                    CoroutineScope(Dispatchers.Default).launch {
+                        Emarsys.trackCustomEvent(eventName.value, null)
+
+                    }
                 }
             }) {
-                Text("Init SDK")
+                Text("trackCustomEvent")
             }
         }
     }
