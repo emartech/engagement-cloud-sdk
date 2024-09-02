@@ -1,4 +1,4 @@
-.PHONY: build build-pipeline check-env clean create-apks help lint test test-web test-android test-android-firebase test-jvm link-ios-sdk link-ios-notification-service remove-temp-lipo remove-previous-frameworks temp-dirs lipo-merge-ios-sdk lipo-merge-ios-notification-service copy-lipo-ios-emarsys-sdk-output copy-lipo-notification-service-output ios-sdk-framework ios-notification-service-framework
+.PHONY: build build-pipeline check-env clean create-apks help lint test test-web test-android test-android-firebase test-jvm link-ios-sdk link-ios-notification-service remove-temp-lipo temp-dirs lipo-merge-ios-sdk lipo-merge-ios-notification-service copy-lipo-ios-emarsys-sdk-output copy-lipo-notification-service-output ios-sdk-framework ios-notification-service-framework
 .DEFAULT_GOAL := help
 SHELL := /bin/bash
 
@@ -110,9 +110,6 @@ link-ios-notification-service: ## links iOS frameworks for supported arch types
 remove-temp-lipo: ## clean up lipo output directory
 	@rm -rf lipo
 
-remove-previous-frameworks: ## clean up previous frameworks builds
-	@rm -rf buildedFrameworks
-
 temp-dirs: ## create temporary directories
 	@mkdir -p lipo buildedFrameworks
 
@@ -134,17 +131,21 @@ copy-lipo-ios-emarsys-sdk-output: ## copies the lipo output file for the sdk and
 copy-lipo-notification-service-output: ## copies the lipo output file for the notification-service and replaces the existing one at the destination
 	@\cp ./lipo/EmarsysNotificationService  ios-notification-service/build/bin/iosSimulatorArm64/releaseFramework/EmarsysNotificationService.framework/EmarsysNotificationService
 
-ios-sdk-framework: link-ios-sdk remove-temp-lipo remove-previous-frameworks temp-dirs lipo-merge-ios-sdk copy-lipo-ios-emarsys-sdk-output
-	@xcodebuild -create-xcframework \
+ios-sdk-framework: link-ios-sdk remove-temp-lipo temp-dirs lipo-merge-ios-sdk copy-lipo-ios-emarsys-sdk-output
+	@rm -rf buildedFrameworks/EmarsysSDK.xcframework && \
+	xcodebuild -create-xcframework \
          -framework emarsys-sdk/build/bin/iosArm64/releaseFramework/EmarsysSDK.framework \
           -framework emarsys-sdk/build/bin/iosSimulatorArm64/releaseFramework/EmarsysSDK.framework \
           -output buildedFrameworks/EmarsysSDK.xcframework
 
-ios-notification-service-framework: link-ios-notification-service remove-temp-lipo remove-previous-frameworks temp-dirs lipo-merge-ios-notification-service copy-lipo-notification-service-output
-	@xcodebuild -create-xcframework \
+ios-notification-service-framework: link-ios-notification-service remove-temp-lipo temp-dirs lipo-merge-ios-notification-service copy-lipo-notification-service-output
+	@rm -rf buildedFrameworks/EmarsysNotificationService.xcframework && \
+	xcodebuild -create-xcframework \
          -framework ios-notification-service/build/bin/iosArm64/releaseFramework/EmarsysNotificationService.framework \
           -framework ios-notification-service/build/bin/iosSimulatorArm64/releaseFramework/EmarsysNotificationService.framework \
           -output buildedFrameworks/EmarsysNotificationService.xcframework
+
+ios-frameworks: ios-sdk-framework ios-notification-service-framework
 
 lint: check-env ## run Android Instrumented tests
 	@./gradlew :emarsys-sdk:lint -x :composeApp:lint
