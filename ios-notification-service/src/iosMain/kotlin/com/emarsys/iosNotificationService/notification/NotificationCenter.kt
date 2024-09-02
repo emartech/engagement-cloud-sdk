@@ -9,14 +9,14 @@ interface NotificationCenterApi {
     suspend fun addCategory(category: UNNotificationCategory)
 }
 
-class NotificationCenter: NotificationCenterApi {
+class NotificationCenter : NotificationCenterApi {
 
     override suspend fun addCategory(category: UNNotificationCategory) {
         val notificationCenter = UNUserNotificationCenter.currentNotificationCenter()
 
         val categories = notificationCenter.notificationCategories()
         categories.add(category)
-        notificationCenter.setNotificationCategories(categories)
+        notificationCenter.setNotificationCategories(categories.toSet())
     }
 
 }
@@ -24,6 +24,8 @@ class NotificationCenter: NotificationCenterApi {
 suspend fun UNUserNotificationCenter.notificationCategories(): MutableSet<UNNotificationCategory> =
     suspendCancellableCoroutine { continuation ->
         getNotificationCategoriesWithCompletionHandler { categories ->
-            continuation.resume((categories as Set<UNNotificationCategory>).toMutableSet())
+            val result =
+                if (!categories.isNullOrEmpty()) emptySet<UNNotificationCategory>() else categories
+            continuation.resume((result as Set<UNNotificationCategory>).toMutableSet())
         }
     }

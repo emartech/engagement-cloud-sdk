@@ -1,3 +1,5 @@
+@file:OptIn(BetaInteropApi::class)
+
 package com.emarsys.iosNotificationService
 
 import com.emarsys.iosNotificationService.notification.FakeNotificationCenter
@@ -5,7 +7,6 @@ import com.emarsys.iosNotificationService.notification.NotificationCenterApi
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import kotlinx.cinterop.BetaInteropApi
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.test.runTest
 import platform.UserNotifications.UNMutableNotificationContent
@@ -19,12 +20,12 @@ import kotlin.test.Test
 @OptIn(BetaInteropApi::class)
 class NotificationServiceTests {
 
-    private lateinit var notificationService: NotificationService
+    private lateinit var emarsysNotificationService: EmarsysNotificationService
     private val fakeNotificationCenter: NotificationCenterApi = FakeNotificationCenter()
 
     @BeforeTest
     fun setup() = runTest {
-        notificationService = NotificationService(fakeNotificationCenter)
+        emarsysNotificationService = EmarsysNotificationService(fakeNotificationCenter)
     }
 
     @Test
@@ -47,7 +48,7 @@ class NotificationServiceTests {
 
         val request = UNNotificationRequest.requestWithIdentifier("testId", content, null)
 
-        val result = notificationService.didReceiveNotificationRequest(request)
+        val result = emarsysNotificationService.didReceiveNotificationRequest(request)
 
         result.categoryIdentifier shouldNotBe ""
     }
@@ -65,9 +66,34 @@ class NotificationServiceTests {
 
         val request = UNNotificationRequest.requestWithIdentifier("testId", content, null)
 
-        val result = notificationService.didReceiveNotificationRequest(request)
+        val result = emarsysNotificationService.didReceiveNotificationRequest(request)
 
         result.attachments shouldNotBe expectedAttachments
+    }
+
+
+    @Test
+    fun didReceiveNotificationRequest_shouldNotCrash_whenImageUrlIsNull() = runTest {
+        val content = UNMutableNotificationContent()
+        content.setUserInfo(mapOf("image_url" to null))
+
+        val request = UNNotificationRequest.requestWithIdentifier("testId", content, null)
+
+        val result = emarsysNotificationService.didReceiveNotificationRequest(request)
+
+        result.attachments shouldBe emptyList<UNNotificationAttachment>()
+    }
+
+    @Test
+    fun didReceiveNotificationRequest_shouldNotCrash_whenImageUrlIsEmptyString() = runTest {
+        val content = UNMutableNotificationContent()
+        content.setUserInfo(mapOf("image_url" to ""))
+
+        val request = UNNotificationRequest.requestWithIdentifier("testId", content, null)
+
+        val result = emarsysNotificationService.didReceiveNotificationRequest(request)
+
+        result.attachments shouldBe emptyList<UNNotificationAttachment>()
     }
 
     @Test
@@ -85,17 +111,17 @@ class NotificationServiceTests {
 
         val request = UNNotificationRequest.requestWithIdentifier("testId", content, null)
 
-        val result = notificationService.didReceiveNotificationRequest(request)
+        val result = emarsysNotificationService.didReceiveNotificationRequest(request)
 
-        val inAppData = ((result.userInfo["ems"] as Map<String, Any>)["inapp"] as Map<String, Any>)["inAppData"]
+        val inAppData =
+            ((result.userInfo["ems"] as Map<String, Any>)["inapp"] as Map<String, Any>)["inAppData"]
         inAppData shouldNotBe null
     }
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
-suspend fun NotificationService.didReceiveNotificationRequest(request: UNNotificationRequest): UNNotificationContent =
+suspend fun EmarsysNotificationService.didReceiveNotificationRequest(request: UNNotificationRequest): UNNotificationContent =
     suspendCancellableCoroutine { continuation ->
         didReceiveNotificationRequest(request) { content ->
-            continuation.resume(content!!)
+            continuation.resume(content)
         }
     }

@@ -34,15 +34,20 @@ import platform.UserNotifications.UNNotificationCategory
 import platform.UserNotifications.UNNotificationCategoryOptionNone
 import platform.UserNotifications.UNNotificationContent
 import platform.UserNotifications.UNNotificationRequest
-import platform.UserNotifications.UNNotificationServiceExtension
 
 @BetaInteropApi
-class NotificationService(private val notificationCenter: NotificationCenterApi = NotificationCenter()) :
-    UNNotificationServiceExtension() {
+class EmarsysNotificationService(
+    private val notificationCenter: NotificationCenterApi = NotificationCenter()
+) {
 
     private val mutex = Mutex()
+    private val json = Json {
+        encodeDefaults = true
+        isLenient = true
+        ignoreUnknownKeys = true
+    }
 
-    private lateinit var contentHandler: (UNNotificationContent?) -> Unit
+    private lateinit var contentHandler: (UNNotificationContent) -> Unit
     private lateinit var bestAttemptContent: UNMutableNotificationContent
 
     private val uuidProvider: UUIDProvider by lazy { UUIDProvider() }
@@ -50,14 +55,15 @@ class NotificationService(private val notificationCenter: NotificationCenterApi 
     private val fileSmith: FileSmith by lazy { FileSmith(uuidProvider) }
     private val downloader: Downloader by lazy { Downloader(sessionProvider.provide(), fileSmith) }
 
-    override fun didReceiveNotificationRequest(
+    fun didReceiveNotificationRequest(
         request: UNNotificationRequest,
-        withContentHandler: (UNNotificationContent?) -> Unit
+        withContentHandler: (UNNotificationContent) -> Unit
     ) {
         runBlocking {
             withContext(Dispatchers.Default) {
                 contentHandler = withContentHandler
-                bestAttemptContent = request.content.mutableCopy() as UNMutableNotificationContent
+                bestAttemptContent =
+                    request.content.mutableCopy() as UNMutableNotificationContent
 
                 val userInfo = bestAttemptContent.userInfo as Map<String, Any>
                 val actions = async { createActions(userInfo) }
@@ -65,12 +71,13 @@ class NotificationService(private val notificationCenter: NotificationCenterApi 
                 val inApp = async { createInApp(userInfo) }
 
                 awaitAll(actions, attachments, inApp)
+
+                contentHandler(bestAttemptContent)
             }
         }
-        contentHandler(bestAttemptContent)
     }
 
-    override fun serviceExtensionTimeWillExpire() {
+    fun serviceExtensionTimeWillExpire() {
         contentHandler(bestAttemptContent)
     }
 
@@ -84,17 +91,18 @@ class NotificationService(private val notificationCenter: NotificationCenterApi 
             null
         )
         val actionsJson = NSString.create(data!!, NSUTF8StringEncoding)!!.toString()
-        val actionModels: List<ActionModel> = Json.decodeFromString(actionsJson)
+        val actionModels: List<ActionModel> = json.decodeFromString(actionsJson)
 
         val notificationActions = actionModels.map {
             val options =
                 if (it is DismissActionModel) UNNotificationActionOptionDestructive else UNNotificationActionOptionForeground
             UNNotificationAction.actionWithIdentifier(it.id, it.title, options)
         }
+
         val category = UNNotificationCategory.categoryWithIdentifier(
             uuidProvider.provide().UUIDString(),
-            actions,
             notificationActions,
+            emptyList<String>(),
             UNNotificationCategoryOptionNone
         )
 
@@ -108,16 +116,21 @@ class NotificationService(private val notificationCenter: NotificationCenterApi 
 
     @OptIn(ExperimentalForeignApi::class)
     private suspend fun createAttachments(userInfo: Map<String, Any>) {
-        val mediaUrlString = userInfo["image_url"] as? String ?: return
-        val mediaUrl = downloader.downloadFile(NSURL(string = mediaUrlString))
-        val attachment = UNNotificationAttachment.attachmentWithIdentifier(
-            mediaUrl!!.lastPathComponent!!,
-            mediaUrl,
-            null,
-            null
-        )
-        mutex.withLock {
-            bestAttemptContent.setAttachments(listOf(attachment))
+        val mediaUrlString = userInfo["image_url"] as String?
+        if (!mediaUrlString.isNullOrEmpty()) {
+            val mediaUrl = downloader.downloadFile(NSURL(string = mediaUrlString))
+
+            mediaUrl?.let {
+                val attachment = UNNotificationAttachment.attachmentWithIdentifier(
+                    it.lastPathComponent!!,
+                    it,
+                    null,
+                    null
+                )
+                mutex.withLock {
+                    bestAttemptContent.setAttachments(listOf(attachment))
+                }
+            }
         }
     }
 
