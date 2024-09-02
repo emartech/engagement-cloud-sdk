@@ -6,8 +6,8 @@ import com.emarsys.context.SdkContextApi
 import com.emarsys.core.device.DeviceInfo
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.device.PushSettings
+import com.emarsys.util.JsonUtil
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
 
 interface ConfigInstance : ConfigInternalApi, Activatable
 
@@ -55,6 +55,6 @@ class Config<Logging : ConfigInstance, Gatherer : ConfigInstance, Internal : Con
     }
 
     private fun getDeviceInfo(): DeviceInfo {
-        return Json.decodeFromString<DeviceInfo>(deviceInfoCollector.collect())
+        return JsonUtil.json.decodeFromString<DeviceInfo>(deviceInfoCollector.collect())
     }
 }

@@ -10,6 +10,7 @@ import com.emarsys.mobileengage.action.models.BasicCustomEventActionModel
 import com.emarsys.mobileengage.action.models.BasicDismissActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.action.models.RequestPushPermissionActionModel
+import com.emarsys.util.JsonUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -142,6 +143,6 @@ class InAppJsBridge(
     }
 
     private fun convertMapToJsonString(map: Map<String, String?>): String {
-        return Json.encodeToString(map)
+        return JsonUtil.json.encodeToString(map)
     }
 }

@@ -1,7 +1,8 @@
 package com.emarsys.core.networking.model
 
-import io.ktor.http.*
-import kotlinx.serialization.json.Json
+import com.emarsys.util.JsonUtil
+import io.ktor.http.Headers
+import io.ktor.http.HttpStatusCode
 
 data class Response(
     val originalRequest: UrlRequest,
@@ -11,5 +12,5 @@ data class Response(
 )
 
 inline fun <reified T> Response.body(): T {
-    return Json.decodeFromString<T>(this.bodyAsText)
+    return JsonUtil.json.decodeFromString<T>(this.bodyAsText)
 }
