@@ -23,7 +23,7 @@ class NotificationOpenedActivity : AppCompatActivity() {
         processIntent()
     }
 
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         processIntent()
     }

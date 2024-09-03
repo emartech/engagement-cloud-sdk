@@ -136,7 +136,7 @@ actual class PlatformDependencyCreator actual constructor(
         StringStorage(platformContext.sharedPreferences)
 
     actual override fun createPermissionHandler(): PermissionHandlerApi {
-        return AndroidPermissionHandler()
+        return AndroidPermissionHandler(applicationContext, currentActivityWatchdog)
     }
 
     actual override fun createBadgeCountHandler(): BadgeCountHandlerApi {
