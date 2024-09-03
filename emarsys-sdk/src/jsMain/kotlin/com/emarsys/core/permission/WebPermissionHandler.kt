@@ -1,7 +1,11 @@
 package com.emarsys.core.permission
 
-class WebPermissionHandler: PermissionHandlerApi {
-    override fun requestPushPermission() {
-        TODO("Not yet implemented")
+import kotlinx.coroutines.await
+import org.w3c.notifications.Notification
+
+class WebPermissionHandler : PermissionHandlerApi {
+
+    override suspend fun requestPushPermission() {
+        Notification.requestPermission().await()
     }
 }
