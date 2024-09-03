@@ -49,6 +49,7 @@ import kotlinx.serialization.json.Json
 import platform.Foundation.NSFileManager
 import platform.UIKit.UIApplication
 import platform.UIKit.UIPasteboard
+import platform.UserNotifications.UNUserNotificationCenter
 
 actual class PlatformDependencyCreator actual constructor(
     platformContext: PlatformContext,
@@ -88,7 +89,7 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createPermissionHandler(): PermissionHandlerApi {
-        return IosPermissionHandler()
+        return IosPermissionHandler(UNUserNotificationCenter.currentNotificationCenter())
     }
 
     actual override fun createBadgeCountHandler(): BadgeCountHandlerApi {
