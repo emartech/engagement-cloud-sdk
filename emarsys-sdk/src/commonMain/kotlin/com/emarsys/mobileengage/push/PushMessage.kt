@@ -24,13 +24,13 @@ data class PushData<T: PlatformData>(
     val platformData: T,
     val defaultTapAction: BasicActionModel? = null,
     val actions: List<PresentableActionModel>? = null,
-    val inApp: InApp? = null,
+    val pushToInApp: PushToInApp? = null,
     val rootParams: JsonObject? = null,
     val u: JsonObject? = null
 )
 
 @Serializable
-data class InApp(
+data class PushToInApp(
     val campaignId: String,
     val urlString: String,
     val ignoreViewedEvent: Boolean? = null

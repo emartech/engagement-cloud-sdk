@@ -6,7 +6,7 @@ import kotlinx.serialization.json.JsonObject
 
 @Serializable
 data class DeviceEventResponse(
-    val message: Map<String, String?>? = null,
+    val message: EventResponseInApp? = null,
     val onEventAction: OnEventAction? = null,
     val deviceEventState: JsonObject? = null
 )
@@ -15,4 +15,10 @@ data class DeviceEventResponse(
 data class OnEventAction(
     val campaignId: String,
     val actions: List<BasicActionModel>
+)
+
+@Serializable
+data class EventResponseInApp(
+    val campaignId: String,
+    val html: String
 )

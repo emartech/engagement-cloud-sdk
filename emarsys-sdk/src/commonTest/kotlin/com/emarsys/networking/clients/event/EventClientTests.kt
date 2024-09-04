@@ -16,6 +16,7 @@ import com.emarsys.mobileengage.inapp.InAppViewApi
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.networking.clients.event.model.DeviceEventResponse
 import com.emarsys.networking.clients.event.model.Event
+import com.emarsys.networking.clients.event.model.EventResponseInApp
 import com.emarsys.networking.clients.event.model.EventType
 import com.emarsys.util.JsonUtil
 import dev.mokkery.answering.returns
@@ -55,6 +56,7 @@ class EventClientTests {
         const val EVENT_NAME = "test event name"
         const val IN_APP_DND = false
         const val TIMESTAMP = "testTimestamp"
+        const val CAMPAIGN_ID = "testTimestamp"
         val TEST_BASE_URL = Url("https://test-base-url/")
         val testEventAttributes = mapOf("key" to "value")
         val testEvent = Event(EventType.CUSTOM, EVENT_NAME, testEventAttributes, TIMESTAMP)
@@ -149,7 +151,7 @@ class EventClientTests {
             put("key2", "value2")
         }
 
-        val deviceEventResponse = DeviceEventResponse(emptyMap(), null, expectedDeviceEventState)
+        val deviceEventResponse = DeviceEventResponse(null, null, expectedDeviceEventState)
         val responseBody = json.encodeToString(deviceEventResponse)
 
         everySuspend { mockEmarsysClient.send(any()) }.returns(createTestResponse(responseBody))
@@ -170,9 +172,9 @@ class EventClientTests {
     @Test
     fun testConsumer_shouldHandleInApp_whenHtml_isPresent() = runTest {
         val html = "testHtml"
-        val message = mapOf("html" to html)
+        val testInapp = EventResponseInApp(CAMPAIGN_ID, html)
         val expectedInAppMessage = InAppMessage(html)
-        val deviceEventResponse = DeviceEventResponse(message, null, null)
+        val deviceEventResponse = DeviceEventResponse(testInapp, null, null)
         val body = json.encodeToString(deviceEventResponse)
 
         everySuspend { mockEmarsysClient.send(any()) }.returns(createTestResponse(body))
@@ -191,10 +193,10 @@ class EventClientTests {
     }
 
     @Test
-    fun testConsumer_shouldHandleInApp_whenHtml_IsEmpty() = runTest {
+    fun testConsumer_shouldNotHandleInApp_whenHtml_IsEmpty() = runTest {
         val html = ""
-        val message = mapOf("html" to html)
-        val deviceEventResponse = DeviceEventResponse(message, null, null)
+        val testInapp = EventResponseInApp(CAMPAIGN_ID, html)
+        val deviceEventResponse = DeviceEventResponse(testInapp, null, null)
         val body = json.encodeToString(deviceEventResponse)
 
         everySuspend { mockEmarsysClient.send(any()) }.returns(createTestResponse(body))

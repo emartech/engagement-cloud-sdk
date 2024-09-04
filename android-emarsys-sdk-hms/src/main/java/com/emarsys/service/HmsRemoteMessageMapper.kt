@@ -51,7 +51,7 @@ object HmsRemoteMessageMapper {
 
         defaultAction?.let { data.put("defaultTapAction", it) }
         actions?.let { data.put("actions", it) }
-        inapp?.let { data.put("inapp", it) }
+        inapp?.let { data.put("pushToInApp", it) }
 
         remoteMessagePayload
             .put("messageId", messageId)

@@ -178,7 +178,7 @@ class FirebaseRemoteMessageMapperTest {
         val result = FirebaseRemoteMessageMapper.map(testRemoteMessageContent)
         val resultData: JSONObject = result.get("data") as JSONObject
 
-        resultData.get("inapp") shouldBeEqualUsingFields JSONObject("""{"campaign_id":"testCampaignId","url":"https:\/\/emarsys.hu"}""")
+        resultData.get("pushToInApp") shouldBeEqualUsingFields JSONObject("""{"campaign_id":"testCampaignId","url":"https:\/\/emarsys.hu"}""")
     }
 
     @Test
@@ -188,7 +188,7 @@ class FirebaseRemoteMessageMapperTest {
         val result = FirebaseRemoteMessageMapper.map(testRemoteMessageContent)
         val resultData: JSONObject = result.get("data") as JSONObject
 
-        resultData.keys().forEach { (it == "inapp") shouldBe false }
+        resultData.keys().forEach { (it == "pushToInApp") shouldBe false }
     }
 
     @Test

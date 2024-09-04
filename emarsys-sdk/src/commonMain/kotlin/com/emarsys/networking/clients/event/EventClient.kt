@@ -18,6 +18,7 @@ import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.networking.clients.event.model.DeviceEventRequestBody
 import com.emarsys.networking.clients.event.model.DeviceEventResponse
 import com.emarsys.networking.clients.event.model.Event
+import com.emarsys.networking.clients.event.model.EventResponseInApp
 import com.emarsys.networking.clients.event.model.EventType
 import io.ktor.http.HttpMethod
 import kotlinx.coroutines.CoroutineDispatcher
@@ -93,11 +94,10 @@ class EventClient(
         sessionContext.deviceEventState = deviceEventResponse.deviceEventState
     }
 
-    private suspend fun handleInApp(message: Map<String, String?>?) {
-        val html = message?.get("html")
-        if (!html.isNullOrEmpty()) {
+    private suspend fun handleInApp(message: EventResponseInApp?) {
+        if (message != null && message.html.isNotEmpty()) {
             val view = inAppViewProvider.provide()
-            view.load(InAppMessage(html = html))
+            view.load(InAppMessage(html = message.html))
             inAppPresenter.present(view, InAppPresentationMode.Overlay)
         }
     }
