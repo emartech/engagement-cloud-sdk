@@ -10,10 +10,10 @@
 		058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557BA273AAA24004C7B11 /* Assets.xcassets */; };
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
-		2A918DE12C85E88400B1AF36 /* EmarsysSDK.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A918DE02C85E88400B1AF36 /* EmarsysSDK.xcframework */; };
+		2A7F00B02C87556800B9677C /* EmarsysNotificationService.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A7F00AF2C87556800B9677C /* EmarsysNotificationService.xcframework */; };
+		2A7F00B22C87556F00B9677C /* EmarsysSDK.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A7F00B12C87556F00B9677C /* EmarsysSDK.xcframework */; };
 		2A918DE92C85E8FE00B1AF36 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A918DE82C85E8FE00B1AF36 /* NotificationService.swift */; };
 		2A918DED2C85E8FE00B1AF36 /* NotificationService.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2A918DE62C85E8FE00B1AF36 /* NotificationService.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		2A918DF12C85E91600B1AF36 /* EmarsysNotificationService.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A918DDE2C85E87F00B1AF36 /* EmarsysNotificationService.xcframework */; };
 		2AED9EEE2C7F6A7300A9AB2C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AED9EED2C7F6A7300A9AB2C /* AppDelegate.swift */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
 /* End PBXBuildFile section */
@@ -46,8 +46,8 @@
 		058557BA273AAA24004C7B11 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		2152FB032600AC8F00CF470E /* iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSApp.swift; sourceTree = "<group>"; };
-		2A918DDE2C85E87F00B1AF36 /* EmarsysNotificationService.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = EmarsysNotificationService.xcframework; path = ../buildedFrameworks/EmarsysNotificationService.xcframework; sourceTree = "<group>"; };
-		2A918DE02C85E88400B1AF36 /* EmarsysSDK.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = EmarsysSDK.xcframework; path = ../buildedFrameworks/EmarsysSDK.xcframework; sourceTree = "<group>"; };
+		2A7F00AF2C87556800B9677C /* EmarsysNotificationService.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = EmarsysNotificationService.xcframework; path = ../buildedFrameworks/EmarsysNotificationService.xcframework; sourceTree = "<group>"; };
+		2A7F00B12C87556F00B9677C /* EmarsysSDK.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = EmarsysSDK.xcframework; path = ../buildedFrameworks/EmarsysSDK.xcframework; sourceTree = "<group>"; };
 		2A918DE62C85E8FE00B1AF36 /* NotificationService.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NotificationService.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		2A918DE82C85E8FE00B1AF36 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		2A918DEA2C85E8FE00B1AF36 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -64,7 +64,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2A918DF12C85E91600B1AF36 /* EmarsysNotificationService.xcframework in Frameworks */,
+				2A7F00B02C87556800B9677C /* EmarsysNotificationService.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -72,7 +72,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2A918DE12C85E88400B1AF36 /* EmarsysSDK.xcframework in Frameworks */,
+				2A7F00B22C87556F00B9677C /* EmarsysSDK.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -99,8 +99,8 @@
 		42799AB246E5F90AF97AA0EF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				2A918DDE2C85E87F00B1AF36 /* EmarsysNotificationService.xcframework */,
-				2A918DE02C85E88400B1AF36 /* EmarsysSDK.xcframework */,
+				2A7F00AF2C87556800B9677C /* EmarsysNotificationService.xcframework */,
+				2A7F00B12C87556F00B9677C /* EmarsysSDK.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

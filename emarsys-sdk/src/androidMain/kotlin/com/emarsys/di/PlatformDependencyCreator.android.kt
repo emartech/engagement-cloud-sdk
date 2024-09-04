@@ -8,7 +8,16 @@ import android.content.IntentFilter
 import android.net.ConnectivityManager
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import com.emarsys.api.AppEvent
+import com.emarsys.api.generic.ApiContext
+import com.emarsys.api.push.LoggingPush
+import com.emarsys.api.push.Push
+import com.emarsys.api.push.PushApi
+import com.emarsys.api.push.PushCall
 import com.emarsys.api.push.PushConstants
+import com.emarsys.api.push.PushGatherer
+import com.emarsys.api.push.PushInstance
+import com.emarsys.api.push.PushInternal
 import com.emarsys.api.push.PushInternalApi
 import com.emarsys.applicationContext
 import com.emarsys.context.SdkContext
@@ -49,6 +58,7 @@ import com.emarsys.mobileengage.push.NotificationCompatStyler
 import com.emarsys.mobileengage.push.PushMessageBroadcastReceiver
 import com.emarsys.mobileengage.push.PushMessagePresenter
 import com.emarsys.mobileengage.push.PushTokenBroadcastReceiver
+import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.PlatformInitState
 import com.emarsys.watchdog.activity.TransitionSafeCurrentActivityWatchdog
 import com.emarsys.watchdog.connection.AndroidConnectionWatchDog
@@ -58,6 +68,7 @@ import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.Json
 import okio.FileSystem
 import java.util.Locale
@@ -182,5 +193,26 @@ actual class PlatformDependencyCreator actual constructor(
         val clipboardManager =
             applicationContext.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         return AndroidClipboardHandler(clipboardManager)
+    }
+
+    actual override fun createPushInternal(
+        pushClient: PushClientApi,
+        storage: TypedStorageApi<String?>,
+        pushContext: ApiContext<PushCall>,
+        notificationEvents: MutableSharedFlow<AppEvent>
+    ): PushInstance {
+        return PushInternal(pushClient, storage, pushContext, notificationEvents)
+    }
+
+    actual override fun createPushApi(
+        pushClient: PushClientApi,
+        storage: TypedStorageApi<String?>,
+        pushContext: ApiContext<PushCall>,
+        notificationEvents: MutableSharedFlow<AppEvent>
+    ): PushApi {
+        val loggingPush = LoggingPush(sdkLogger, notificationEvents)
+        val pushGatherer = PushGatherer(pushContext, storage, notificationEvents)
+        val pushInternal = PushInternal(pushClient, storage, pushContext, notificationEvents)
+        return Push(loggingPush, pushGatherer, pushInternal, sdkContext)
     }
 }

@@ -1,5 +1,14 @@
 package com.emarsys.di
 
+import com.emarsys.api.AppEvent
+import com.emarsys.api.generic.ApiContext
+import com.emarsys.api.push.LoggingPush
+import com.emarsys.api.push.Push
+import com.emarsys.api.push.PushApi
+import com.emarsys.api.push.PushCall
+import com.emarsys.api.push.PushGatherer
+import com.emarsys.api.push.PushInstance
+import com.emarsys.api.push.PushInternal
 import com.emarsys.api.push.PushInternalApi
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
@@ -36,6 +45,7 @@ import com.emarsys.mobileengage.inapp.WebInAppPresenter
 import com.emarsys.mobileengage.inapp.WebInAppViewProvider
 import com.emarsys.mobileengage.push.PushMessageMapper
 import com.emarsys.mobileengage.push.PushServiceContext
+import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.PlatformInitState
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.connection.WebConnectionWatchDog
@@ -45,12 +55,13 @@ import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.Json
 import web.dom.document
 
 actual class PlatformDependencyCreator actual constructor(
     platformContext: PlatformContext,
-    sdkContext: SdkContextApi,
+    private val sdkContext: SdkContextApi,
     private val uuidProvider: Provider<String>,
     private val sdkLogger: Logger,
     private val json: Json,
@@ -149,6 +160,27 @@ actual class PlatformDependencyCreator actual constructor(
         return WebClipboardHandler(window.navigator.clipboard)
     }
 
+    actual override fun createPushInternal(
+        pushClient: PushClientApi,
+        storage: TypedStorageApi<String?>,
+        pushContext: ApiContext<PushCall>,
+        notificationEvents: MutableSharedFlow<AppEvent>
+    ): PushInstance {
+        return PushInternal(pushClient, storage, pushContext, notificationEvents)
+    }
+
+    actual override fun createPushApi(
+        pushClient: PushClientApi,
+        storage: TypedStorageApi<String?>,
+        pushContext: ApiContext<PushCall>,
+        notificationEvents: MutableSharedFlow<AppEvent>
+    ): PushApi {
+        val loggingPush = LoggingPush(sdkLogger, notificationEvents)
+        val pushGatherer = PushGatherer(pushContext, storage, notificationEvents)
+        val pushInternal = createPushInternal(pushClient, storage, pushContext, notificationEvents)
+        return Push(loggingPush, pushGatherer, pushInternal, sdkContext)
+    }
+
     private fun getNavigatorData(): String {
         return listOf(
             window.navigator.platform,
@@ -157,5 +189,4 @@ actual class PlatformDependencyCreator actual constructor(
             window.navigator.vendor,
         ).joinToString(" ")
     }
-
 }

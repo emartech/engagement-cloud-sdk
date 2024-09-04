@@ -6,7 +6,7 @@ import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
 import kotlinx.coroutines.flow.MutableSharedFlow
 
-class LoggingPush(
+open class LoggingPush(
     private val logger: Logger,
     override val notificationEvents: MutableSharedFlow<AppEvent>
 ) : PushInstance {

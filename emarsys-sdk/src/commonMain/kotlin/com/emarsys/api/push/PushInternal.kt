@@ -10,7 +10,7 @@ import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.networking.clients.push.PushClientApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 
-class PushInternal(
+open class PushInternal(
     private val pushClient: PushClientApi,
     private val storage: TypedStorageApi<String?>,
     private val pushContext: ApiContext<PushCall>,

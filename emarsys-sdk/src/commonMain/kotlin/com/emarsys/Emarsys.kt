@@ -9,7 +9,11 @@ import com.emarsys.api.oneventaction.OnEventActionApi
 import com.emarsys.api.predict.PredictApi
 import com.emarsys.api.push.PushApi
 import com.emarsys.di.DependencyInjection
+import kotlin.experimental.ExperimentalObjCRefinement
+import kotlin.native.HiddenFromObjC
 
+@HiddenFromObjC
+@OptIn(ExperimentalObjCRefinement::class)
 object Emarsys {
 
     suspend fun initialize() {
@@ -26,7 +30,10 @@ object Emarsys {
     }
 
     suspend fun linkAuthenticatedContact(contactFieldId: Int, openIdToken: String) {
-        DependencyInjection.container.contactApi.linkAuthenticatedContact(contactFieldId, openIdToken)
+        DependencyInjection.container.contactApi.linkAuthenticatedContact(
+            contactFieldId,
+            openIdToken
+        )
     }
 
     suspend fun unlinkContact() {

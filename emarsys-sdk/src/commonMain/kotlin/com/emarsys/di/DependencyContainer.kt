@@ -54,14 +54,10 @@ import com.emarsys.api.predict.PredictApi
 import com.emarsys.api.predict.PredictCall
 import com.emarsys.api.predict.PredictContext
 import com.emarsys.api.predict.PredictInternal
-import com.emarsys.api.push.LoggingPush
-import com.emarsys.api.push.Push
 import com.emarsys.api.push.PushApi
 import com.emarsys.api.push.PushCall
 import com.emarsys.api.push.PushContext
-import com.emarsys.api.push.PushGatherer
 import com.emarsys.api.push.PushInstance
-import com.emarsys.api.push.PushInternal
 import com.emarsys.context.DefaultUrls
 import com.emarsys.context.DefaultUrlsApi
 import com.emarsys.context.SdkContext
@@ -310,7 +306,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         MutableSharedFlow(replay = 100)
     }
     private val pushInternal: PushInstance by lazy {
-        PushInternal(pushClient, stringStorage, pushContext, notificationEvents)
+        dependencyCreator.createPushInternal(pushClient, stringStorage, pushContext, notificationEvents)
     }
 
     override val inAppApi: InAppApi by lazy {
@@ -403,9 +399,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
     }
 
     override val pushApi: PushApi by lazy {
-        val loggingPush = LoggingPush(sdkLogger, notificationEvents)
-        val pushGatherer = PushGatherer(pushContext, stringStorage, notificationEvents)
-        Push(loggingPush, pushGatherer, pushInternal, sdkContext)
+        dependencyCreator.createPushApi(pushClient, stringStorage, pushContext, notificationEvents)
     }
 
     override val pushClient: PushClientApi by lazy {

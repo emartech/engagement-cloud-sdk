@@ -1,0 +1,57 @@
+package com.emarsys
+
+import com.emarsys.api.config.ConfigApi
+import com.emarsys.api.geofence.GeofenceTrackerApi
+import com.emarsys.api.inapp.InAppApi
+import com.emarsys.api.inbox.InboxApi
+import com.emarsys.api.oneventaction.OnEventActionApi
+import com.emarsys.api.predict.PredictApi
+import com.emarsys.mobileengage.push.IosPushApi
+import kotlin.experimental.ExperimentalObjCName
+
+@OptIn(ExperimentalObjCName::class)
+@ObjCName("Emarsys")
+object IosEmarsys {
+     val push: IosPushApi
+        get() = Emarsys.push as IosPushApi
+     val inApp: InAppApi
+        get() = Emarsys.inApp
+     val inbox: InboxApi
+        get() = Emarsys.inbox
+     val config: ConfigApi
+        get() = Emarsys.config
+     val geofence: GeofenceTrackerApi
+        get() = Emarsys.geofence
+     val onEventAction: OnEventActionApi
+        get() = Emarsys.onEventAction
+     val predict: PredictApi
+        get() = Emarsys.predict
+
+     suspend fun initialize() {
+        Emarsys.initialize()
+    }
+
+     suspend fun enableTracking(config: SdkConfig) {
+        Emarsys.enableTracking(config)
+    }
+
+     suspend fun linkContact(contactFieldId: Int, contactFieldValue: String) {
+        Emarsys.linkContact(contactFieldId, contactFieldValue)
+    }
+
+     suspend fun linkAuthenticatedContact(contactFieldId: Int, openIdToken: String) {
+        Emarsys.linkAuthenticatedContact(contactFieldId, openIdToken)
+    }
+
+     suspend fun unlinkContact() {
+        Emarsys.unlinkContact()
+    }
+
+     suspend fun trackCustomEvent(event: String, attributes: Map<String, String>?) {
+        Emarsys.trackCustomEvent(event, attributes)
+    }
+
+     suspend fun trackDeepLink() {
+        Emarsys.trackDeepLink()
+    }
+}

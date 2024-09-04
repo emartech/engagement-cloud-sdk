@@ -5,7 +5,7 @@ import com.emarsys.api.generic.ApiContext
 import com.emarsys.core.storage.TypedStorageApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 
-class PushGatherer(
+open class PushGatherer(
     private val context: ApiContext<PushCall>, private val storage: TypedStorageApi<String?>,
     override val notificationEvents: MutableSharedFlow<AppEvent>
 ) : PushInstance {

@@ -1,5 +1,10 @@
 package com.emarsys.di
 
+import com.emarsys.api.AppEvent
+import com.emarsys.api.generic.ApiContext
+import com.emarsys.api.push.PushApi
+import com.emarsys.api.push.PushCall
+import com.emarsys.api.push.PushInstance
 import com.emarsys.api.push.PushInternalApi
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
@@ -41,10 +46,16 @@ import com.emarsys.mobileengage.inapp.providers.SceneProvider
 import com.emarsys.mobileengage.inapp.providers.ViewControllerProvider
 import com.emarsys.mobileengage.inapp.providers.WebViewProvider
 import com.emarsys.mobileengage.inapp.providers.WindowProvider
+import com.emarsys.mobileengage.push.IosGathererPush
+import com.emarsys.mobileengage.push.IosLoggingPush
+import com.emarsys.mobileengage.push.IosPush
+import com.emarsys.mobileengage.push.IosPushInternal
+import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.Json
 import platform.Foundation.NSFileManager
 import platform.UIKit.UIApplication
@@ -150,4 +161,27 @@ actual class PlatformDependencyCreator actual constructor(
     actual override fun createClipboardHandler(): ClipboardHandlerApi {
         return IosClipboardHandler(UIPasteboard.generalPasteboard)
     }
+
+    actual override fun createPushInternal(
+        pushClient: PushClientApi,
+        storage: TypedStorageApi<String?>,
+        pushContext: ApiContext<PushCall>,
+        notificationEvents: MutableSharedFlow<AppEvent>
+    ): PushInstance {
+        return IosPushInternal(pushClient, storage, pushContext, notificationEvents)
+    }
+
+    actual override fun createPushApi(
+        pushClient: PushClientApi,
+        storage: TypedStorageApi<String?>,
+        pushContext: ApiContext<PushCall>,
+        notificationEvents: MutableSharedFlow<AppEvent>
+    ): PushApi {
+        val loggingPush = IosLoggingPush(sdkLogger, notificationEvents)
+        val pushGatherer = IosGathererPush(pushContext, storage, notificationEvents)
+        val pushInternal = IosPushInternal(pushClient, storage, pushContext, notificationEvents)
+        return IosPush(loggingPush, pushGatherer, pushInternal, sdkContext)
+    }
+
+
 }
