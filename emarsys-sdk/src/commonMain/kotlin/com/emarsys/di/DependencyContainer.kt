@@ -306,7 +306,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         MutableSharedFlow(replay = 100)
     }
     private val pushInternal: PushInstance by lazy {
-        dependencyCreator.createPushInternal(pushClient, stringStorage, pushContext, notificationEvents)
+        dependencyCreator.createPushInternal(pushClient, stringStorage, pushContext, notificationEvents, eventClient, actionFactory, json, sdkDispatcher)
     }
 
     override val inAppApi: InAppApi by lazy {
@@ -399,7 +399,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
     }
 
     override val pushApi: PushApi by lazy {
-        dependencyCreator.createPushApi(pushClient, stringStorage, pushContext, notificationEvents)
+        dependencyCreator.createPushApi(pushInternal, stringStorage, pushContext, notificationEvents)
     }
 
     override val pushClient: PushClientApi by lazy {

@@ -25,6 +25,7 @@ import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
+import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
@@ -81,11 +82,15 @@ expect class PlatformDependencyCreator(
         pushClient: PushClientApi,
         storage: TypedStorageApi<String?>,
         pushContext: ApiContext<PushCall>,
-        notificationEvents: MutableSharedFlow<AppEvent>
+        notificationEvents: MutableSharedFlow<AppEvent>,
+        eventClient: EventClientApi,
+        actionFactory: ActionFactoryApi<ActionModel>,
+        json: Json,
+        sdkDispatcher: CoroutineDispatcher
     ): PushInstance
 
     override fun createPushApi(
-        pushClient: PushClientApi,
+        pushInternal: PushInstance,
         storage: TypedStorageApi<String?>,
         pushContext: ApiContext<PushCall>,
         notificationEvents: MutableSharedFlow<AppEvent>

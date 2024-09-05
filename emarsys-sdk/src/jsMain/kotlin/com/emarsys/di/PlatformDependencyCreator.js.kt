@@ -45,6 +45,7 @@ import com.emarsys.mobileengage.inapp.WebInAppPresenter
 import com.emarsys.mobileengage.inapp.WebInAppViewProvider
 import com.emarsys.mobileengage.push.PushMessageMapper
 import com.emarsys.mobileengage.push.PushServiceContext
+import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.PlatformInitState
 import com.emarsys.watchdog.connection.ConnectionWatchDog
@@ -164,20 +165,23 @@ actual class PlatformDependencyCreator actual constructor(
         pushClient: PushClientApi,
         storage: TypedStorageApi<String?>,
         pushContext: ApiContext<PushCall>,
-        notificationEvents: MutableSharedFlow<AppEvent>
+        notificationEvents: MutableSharedFlow<AppEvent>,
+        eventClient: EventClientApi,
+        actionFactory: ActionFactoryApi<ActionModel>,
+        json: Json,
+        sdkDispatcher: CoroutineDispatcher
     ): PushInstance {
         return PushInternal(pushClient, storage, pushContext, notificationEvents)
     }
 
     actual override fun createPushApi(
-        pushClient: PushClientApi,
+        pushInternal: PushInstance,
         storage: TypedStorageApi<String?>,
         pushContext: ApiContext<PushCall>,
         notificationEvents: MutableSharedFlow<AppEvent>
     ): PushApi {
         val loggingPush = LoggingPush(sdkLogger, notificationEvents)
         val pushGatherer = PushGatherer(pushContext, storage, notificationEvents)
-        val pushInternal = createPushInternal(pushClient, storage, pushContext, notificationEvents)
         return Push(loggingPush, pushGatherer, pushInternal, sdkContext)
     }
 

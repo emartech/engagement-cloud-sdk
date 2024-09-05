@@ -22,11 +22,13 @@ import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
+import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.serialization.json.Json
 
 interface DependencyCreator {
     fun createStorage(): TypedStorageApi<String?>
@@ -65,13 +67,20 @@ interface DependencyCreator {
 
     fun createClipboardHandler(): ClipboardHandlerApi
 
-    fun createPushInternal(pushClient: PushClientApi,
-                           storage: TypedStorageApi<String?>,
-                           pushContext: ApiContext<PushCall>,
-                           notificationEvents: MutableSharedFlow<AppEvent>): PushInstance
+    fun createPushInternal(
+        pushClient: PushClientApi,
+        storage: TypedStorageApi<String?>,
+        pushContext: ApiContext<PushCall>,
+        notificationEvents: MutableSharedFlow<AppEvent>,
+        eventClient: EventClientApi,
+        actionFactory: ActionFactoryApi<ActionModel>,
+        json: Json,
+        sdkDispatcher: CoroutineDispatcher
+    ): PushInstance
 
-    fun createPushApi(pushClient: PushClientApi,
-                      storage: TypedStorageApi<String?>,
-                      pushContext: ApiContext<PushCall>,
-                      notificationEvents: MutableSharedFlow<AppEvent>): PushApi
+    fun createPushApi(
+        pushInternal: PushInstance,
+        storage: TypedStorageApi<String?>,
+        pushContext: ApiContext<PushCall>,
+        notificationEvents: MutableSharedFlow<AppEvent>): PushApi
 }

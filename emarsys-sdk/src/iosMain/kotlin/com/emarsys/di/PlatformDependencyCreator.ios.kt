@@ -50,6 +50,7 @@ import com.emarsys.mobileengage.push.IosGathererPush
 import com.emarsys.mobileengage.push.IosLoggingPush
 import com.emarsys.mobileengage.push.IosPush
 import com.emarsys.mobileengage.push.IosPushInternal
+import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
@@ -166,22 +167,24 @@ actual class PlatformDependencyCreator actual constructor(
         pushClient: PushClientApi,
         storage: TypedStorageApi<String?>,
         pushContext: ApiContext<PushCall>,
-        notificationEvents: MutableSharedFlow<AppEvent>
+        notificationEvents: MutableSharedFlow<AppEvent>,
+        eventClient: EventClientApi,
+        actionFactory: ActionFactoryApi<ActionModel>,
+        json: Json,
+        sdkDispatcher: CoroutineDispatcher
     ): PushInstance {
-        return IosPushInternal(pushClient, storage, pushContext, notificationEvents)
+        return IosPushInternal(pushClient, storage, pushContext, sdkContext, notificationEvents, eventClient, actionFactory, json, sdkDispatcher)
     }
 
     actual override fun createPushApi(
-        pushClient: PushClientApi,
+        pushInternal: PushInstance,
         storage: TypedStorageApi<String?>,
         pushContext: ApiContext<PushCall>,
         notificationEvents: MutableSharedFlow<AppEvent>
     ): PushApi {
         val loggingPush = IosLoggingPush(sdkLogger, notificationEvents)
         val pushGatherer = IosGathererPush(pushContext, storage, notificationEvents)
-        val pushInternal = IosPushInternal(pushClient, storage, pushContext, notificationEvents)
-        return IosPush(loggingPush, pushGatherer, pushInternal, sdkContext)
+        return IosPush(loggingPush, pushGatherer, pushInternal as IosPushInternal, sdkContext)
     }
-
 
 }
