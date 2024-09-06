@@ -1,10 +1,5 @@
-package com.emarsys.mobileengage.inApp
+package com.emarsys.mobileengage.inapp
 
-import com.emarsys.mobileengage.inapp.InAppMessage
-import com.emarsys.mobileengage.inapp.InAppPresentationMode
-import com.emarsys.mobileengage.inapp.InAppPresenterApi
-import com.emarsys.mobileengage.inapp.InAppViewApi
-import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.mock

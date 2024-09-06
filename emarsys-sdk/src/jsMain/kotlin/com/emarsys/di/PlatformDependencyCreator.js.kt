@@ -28,6 +28,7 @@ import com.emarsys.core.permission.WebPermissionHandler
 import com.emarsys.core.provider.ApplicationVersionProvider
 import com.emarsys.core.provider.WebLanguageProvider
 import com.emarsys.core.providers.Provider
+import com.emarsys.core.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.TypedStorageApi
@@ -36,6 +37,8 @@ import com.emarsys.core.url.WebExternalUrlOpener
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.inapp.InAppDownloaderApi
+import com.emarsys.mobileengage.inapp.InAppHandlerApi
 import com.emarsys.mobileengage.inapp.InAppJsBridge
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppScriptExtractor
@@ -66,7 +69,7 @@ actual class PlatformDependencyCreator actual constructor(
     private val uuidProvider: Provider<String>,
     private val sdkLogger: Logger,
     private val json: Json,
-    private val msgHub: MsgHubApi
+    private val msgHub: MsgHubApi,
 ) : DependencyCreator {
 
     private val platformContext: CommonPlatformContext = platformContext as CommonPlatformContext
@@ -93,7 +96,8 @@ actual class PlatformDependencyCreator actual constructor(
         sdkDispatcher: CoroutineDispatcher,
         sdkContext: SdkContext,
         actionFactory: ActionFactoryApi<ActionModel>,
-        downloaderApi: DownloaderApi
+        downloaderApi: DownloaderApi,
+        inAppDownloader: InAppDownloaderApi
     ): State {
         val scope = CoroutineScope(sdkDispatcher)
         val inappJsBridge = InAppJsBridge(actionFactory, json, scope)
@@ -111,6 +115,13 @@ actual class PlatformDependencyCreator actual constructor(
 
     actual override fun createExternalUrlOpener(): ExternalUrlOpenerApi {
         return WebExternalUrlOpener(window, sdkLogger)
+    }
+
+    actual override fun createPushToInAppHandler(
+        inAppDownloader: InAppDownloaderApi,
+        inAppHandler: InAppHandlerApi
+    ): PushToInAppHandlerApi {
+        TODO("Not yet implemented")
     }
 
     actual override fun createConnectionWatchDog(sdkLogger: SdkLogger): ConnectionWatchDog {

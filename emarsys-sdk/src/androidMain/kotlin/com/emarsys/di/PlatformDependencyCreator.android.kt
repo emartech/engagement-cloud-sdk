@@ -39,6 +39,8 @@ import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.provider.AndroidApplicationVersionProvider
 import com.emarsys.core.providers.HardwareIdProvider
 import com.emarsys.core.providers.Provider
+import com.emarsys.core.pushtoinapp.PushToInAppHandler
+import com.emarsys.core.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.resource.MetadataReader
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.StringStorage
@@ -48,6 +50,8 @@ import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.inapp.InAppDownloaderApi
+import com.emarsys.mobileengage.inapp.InAppHandlerApi
 import com.emarsys.mobileengage.inapp.InAppJsBridgeProvider
 import com.emarsys.mobileengage.inapp.InAppPresenter
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
@@ -119,7 +123,8 @@ actual class PlatformDependencyCreator actual constructor(
         sdkDispatcher: CoroutineDispatcher,
         sdkContext: SdkContext,
         actionFactory: ActionFactoryApi<ActionModel>,
-        downloaderApi: DownloaderApi
+        downloaderApi: DownloaderApi,
+        inAppDownloader: InAppDownloaderApi
     ): State {
         val notificationManager =
             (applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
@@ -130,7 +135,8 @@ actual class PlatformDependencyCreator actual constructor(
             notificationManager,
             metadataReader,
             notificationCompatStyler,
-            platformInfoCollector
+            platformInfoCollector,
+            inAppDownloader
         )
         val pushTokenBroadcastReceiver = PushTokenBroadcastReceiver(sdkDispatcher, pushApi)
         val pushMessageBroadcastReceiver =
@@ -157,6 +163,13 @@ actual class PlatformDependencyCreator actual constructor(
 
     actual override fun createExternalUrlOpener(): ExternalUrlOpenerApi {
         return AndroidExternalUrlOpener(applicationContext)
+    }
+
+    actual override fun createPushToInAppHandler(
+        inAppDownloader: InAppDownloaderApi,
+        inAppHandler: InAppHandlerApi
+    ): PushToInAppHandlerApi {
+        return PushToInAppHandler(inAppDownloader, inAppHandler)
     }
 
     actual override fun createConnectionWatchDog(sdkLogger: SdkLogger): ConnectionWatchDog {

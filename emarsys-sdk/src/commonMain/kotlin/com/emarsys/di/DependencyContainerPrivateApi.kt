@@ -8,6 +8,7 @@ import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.session.Session
 import com.emarsys.networking.clients.contact.ContactClientApi
 import com.emarsys.networking.clients.device.DeviceClientApi
@@ -19,7 +20,7 @@ import kotlinx.serialization.json.Json
 
 interface DependencyContainerPrivateApi {
 
-    val actionFactory: ActionFactoryApi<ActionModel>
+    val pushActionFactory: ActionFactoryApi<ActionModel>
 
     val uuidProvider: Provider<String>
 
@@ -36,6 +37,8 @@ interface DependencyContainerPrivateApi {
     val json: Json
 
     val downloaderApi: DownloaderApi
+
+    val inAppDownloader: InAppDownloaderApi
 
     val deviceClient: DeviceClientApi
 

@@ -17,12 +17,15 @@ import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.message.MsgHubApi
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.providers.Provider
+import com.emarsys.core.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.inapp.InAppDownloaderApi
+import com.emarsys.mobileengage.inapp.InAppHandlerApi
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.networking.clients.event.EventClientApi
@@ -53,7 +56,8 @@ expect class PlatformDependencyCreator(
         sdkDispatcher: CoroutineDispatcher,
         sdkContext: SdkContext,
         actionFactory: ActionFactoryApi<ActionModel>,
-        downloaderApi: DownloaderApi
+        downloaderApi: DownloaderApi,
+        inAppDownloader: InAppDownloaderApi
     ): State
 
     override fun createPermissionHandler(): PermissionHandlerApi
@@ -61,6 +65,11 @@ expect class PlatformDependencyCreator(
     override fun createBadgeCountHandler(): BadgeCountHandlerApi
 
     override fun createExternalUrlOpener(): ExternalUrlOpenerApi
+
+    override fun createPushToInAppHandler(
+        inAppDownloader: InAppDownloaderApi,
+        inAppHandler: InAppHandlerApi
+    ): PushToInAppHandlerApi
 
     override fun createConnectionWatchDog(sdkLogger: SdkLogger): ConnectionWatchDog
 

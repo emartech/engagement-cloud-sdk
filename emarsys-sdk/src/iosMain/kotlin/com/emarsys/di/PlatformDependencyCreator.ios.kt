@@ -25,6 +25,7 @@ import com.emarsys.core.provider.IosApplicationVersionProvider
 import com.emarsys.core.provider.IosLanguageProvider
 import com.emarsys.core.providers.HardwareIdProvider
 import com.emarsys.core.providers.Provider
+import com.emarsys.core.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.setup.PlatformInitState
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.StringStorage
@@ -37,6 +38,8 @@ import com.emarsys.core.watchdog.connection.NWPathMonitorWrapper
 import com.emarsys.core.watchdog.lifecycle.IosLifecycleWatchdog
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.inapp.InAppDownloaderApi
+import com.emarsys.mobileengage.inapp.InAppHandlerApi
 import com.emarsys.mobileengage.inapp.InAppJsBridge
 import com.emarsys.mobileengage.inapp.InAppPresenter
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
@@ -95,7 +98,8 @@ actual class PlatformDependencyCreator actual constructor(
         sdkDispatcher: CoroutineDispatcher,
         sdkContext: SdkContext,
         actionFactory: ActionFactoryApi<ActionModel>,
-        downloaderApi: DownloaderApi
+        downloaderApi: DownloaderApi,
+        inAppDownloader: InAppDownloaderApi
     ): State {
         return PlatformInitState()
     }
@@ -110,6 +114,13 @@ actual class PlatformDependencyCreator actual constructor(
 
     actual override fun createExternalUrlOpener(): ExternalUrlOpenerApi {
         return IosExternalUrlOpener(UIApplication.sharedApplication, sdkContext.mainDispatcher)
+    }
+
+    actual override fun createPushToInAppHandler(
+        inAppDownloader: InAppDownloaderApi,
+        inAppHandler: InAppHandlerApi
+    ): PushToInAppHandlerApi {
+        TODO("Not yet implemented")
     }
 
     actual override fun createConnectionWatchDog(sdkLogger: SdkLogger): ConnectionWatchDog {

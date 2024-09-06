@@ -82,6 +82,7 @@ import com.emarsys.core.providers.RandomProvider
 import com.emarsys.core.providers.TimestampProvider
 import com.emarsys.core.providers.TimezoneProvider
 import com.emarsys.core.providers.UUIDProvider
+import com.emarsys.core.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.state.StateMachine
 import com.emarsys.core.storage.Storage
@@ -91,12 +92,14 @@ import com.emarsys.core.url.UrlFactory
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.core.util.Downloader
 import com.emarsys.core.util.DownloaderApi
-import com.emarsys.mobileengage.action.ActionFactory
 import com.emarsys.mobileengage.action.ActionFactoryApi
+import com.emarsys.mobileengage.action.EventActionFactory
+import com.emarsys.mobileengage.action.PushActionFactory
 import com.emarsys.mobileengage.action.models.ActionModel
-import com.emarsys.mobileengage.action.models.BasicActionModel
-import com.emarsys.mobileengage.inApp.InAppHandler
-import com.emarsys.mobileengage.inApp.InAppHandlerApi
+import com.emarsys.mobileengage.inapp.InAppDownloader
+import com.emarsys.mobileengage.inapp.InAppDownloaderApi
+import com.emarsys.mobileengage.inapp.InAppHandler
+import com.emarsys.mobileengage.inapp.InAppHandlerApi
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.mobileengage.session.MobileEngageSession
@@ -163,61 +166,6 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
 
     private val msgHub: MsgHubApi by lazy { MsgHub(sdkDispatcher) }
 
-
-    override val stringStorage: TypedStorageApi<String?> by lazy { dependencyCreator.createStorage() }
-
-    private val permissionHandler: PermissionHandlerApi by lazy { dependencyCreator.createPermissionHandler() }
-
-    private val badgeCountHandler: BadgeCountHandlerApi by lazy { dependencyCreator.createBadgeCountHandler() }
-
-    private val externalUrlOpener: ExternalUrlOpenerApi by lazy { dependencyCreator.createExternalUrlOpener() }
-
-    private val clipboardHandler: ClipboardHandlerApi by lazy { dependencyCreator.createClipboardHandler() }
-
-    override val actionFactory: ActionFactoryApi<ActionModel> by lazy {
-        ActionFactory(
-            onEventActionInternal,
-            deviceEventChannel,
-            permissionHandler,
-            badgeCountHandler,
-            externalUrlOpener,
-            msgHub,
-            clipboardHandler,
-            sdkLogger
-        )
-    }
-
-    private val onEventActionFactory: ActionFactoryApi<BasicActionModel> by lazy {
-        ActionFactory(
-            onEventActionInternal,
-            deviceEventChannel,
-            permissionHandler,
-            badgeCountHandler,
-            externalUrlOpener,
-            msgHub,
-            clipboardHandler,
-            sdkLogger
-        )
-    }
-
-    override val storage: Storage by lazy { Storage(stringStorage, json) }
-
-    override val timezoneProvider: Provider<String> by lazy { TimezoneProvider(timestampProvider) }
-
-    private val deviceInfoCollector: DeviceInfoCollectorApi by lazy {
-        dependencyCreator.createDeviceInfoCollector(
-            timezoneProvider
-        )
-    }
-
-    private val eventChannel: Channel<Event> by lazy {
-        Channel()
-    }
-
-    private val deviceEventChannel: DeviceEventChannelApi by lazy {
-        DeviceEventChannel(eventChannel)
-    }
-
     private val defaultUrls: DefaultUrlsApi =
         DefaultUrls(
             "https://me-client.gservice.emarsys.net",
@@ -229,9 +177,24 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             "https://log-dealer.eservice.emarsys.net"
         )
 
+    private val eventChannel: Channel<Event> by lazy {
+        Channel()
+    }
+
+    private val deviceEventChannel: DeviceEventChannelApi =
+        DeviceEventChannel(eventChannel)
+
     override val sdkContext: SdkContext =
         SdkContext(sdkDispatcher, mainDispatcher, defaultUrls, LogLevel.Error, mutableSetOf())
 
+    private val onEventActionInternal: OnEventActionInternal = OnEventActionInternal()
+
+    private val httpClient = HttpClient {
+        install(ContentNegotiation) {
+            json(json)
+        }
+        install(HttpRequestRetry)
+    }
 
     private val dependencyCreator: DependencyCreator =
         PlatformDependencyCreator(
@@ -243,6 +206,60 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             msgHub
         )
 
+    private val inAppPresenter: InAppPresenterApi by lazy {
+        dependencyCreator.createInAppPresenter()
+    }
+
+    override val stringStorage: TypedStorageApi<String?> = dependencyCreator.createStorage()
+
+
+    private val badgeCountHandler: BadgeCountHandlerApi =
+        dependencyCreator.createBadgeCountHandler()
+
+    private val externalUrlOpener: ExternalUrlOpenerApi =
+        dependencyCreator.createExternalUrlOpener()
+
+    private val clipboardHandler: ClipboardHandlerApi = dependencyCreator.createClipboardHandler()
+
+    private val permissionHandler: PermissionHandlerApi =
+        dependencyCreator.createPermissionHandler()
+
+    private val eventActionFactory: ActionFactoryApi<ActionModel> =
+        EventActionFactory(
+            onEventActionInternal,
+            deviceEventChannel,
+            permissionHandler,
+            badgeCountHandler,
+            externalUrlOpener,
+            msgHub,
+            clipboardHandler,
+            sdkLogger
+        )
+
+    override val downloaderApi: DownloaderApi =
+        Downloader(httpClient, dependencyCreator.createFileCache(), sdkLogger)
+
+    override val inAppDownloader: InAppDownloaderApi = InAppDownloader(downloaderApi)
+    private val inAppViewProvider: InAppViewProviderApi = dependencyCreator.createInAppViewProvider(eventActionFactory)
+    private val inAppHandler: InAppHandlerApi = InAppHandler(inAppViewProvider, inAppPresenter)
+    private val pushToInAppHandler: PushToInAppHandlerApi = dependencyCreator.createPushToInAppHandler(inAppDownloader, inAppHandler)
+
+    override val pushActionFactory: ActionFactoryApi<ActionModel> =
+        PushActionFactory(
+            pushToInAppHandler,
+            eventActionFactory
+        )
+
+    override val storage: Storage by lazy { Storage(stringStorage, json) }
+
+    override val timezoneProvider: Provider<String> by lazy { TimezoneProvider(timestampProvider) }
+
+    private val deviceInfoCollector: DeviceInfoCollectorApi by lazy {
+        dependencyCreator.createDeviceInfoCollector(
+            timezoneProvider
+        )
+    }
+
     override val sessionContext: SessionContext by lazy {
         SessionContext(clientState = null, deviceEventState = null)
     }
@@ -250,7 +267,6 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
     private val urlFactory: UrlFactoryApi by lazy {
         UrlFactory(sdkContext)
     }
-
 
     private val crypto: CryptoApi by lazy {
         Crypto(PUBLIC_KEY)
@@ -278,7 +294,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             urlFactory,
             json,
             deviceEventChannel,
-            onEventActionFactory,
+            eventActionFactory,
             sessionContext,
             inAppContext,
             inAppPresenter,
@@ -286,23 +302,6 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             sdkDispatcher
         )
     }
-
-    private val inAppPresenter: InAppPresenterApi by lazy {
-        dependencyCreator.createInAppPresenter()
-    }
-
-    private val inAppViewProvider: InAppViewProviderApi by lazy {
-        dependencyCreator.createInAppViewProvider(actionFactory)
-    }
-
-    private val inAppHandler: InAppHandlerApi by lazy {
-        InAppHandler(inAppViewProvider, inAppPresenter)
-    }
-
-    private val onEventActionInternal: OnEventActionInternal by lazy {
-        OnEventActionInternal()
-    }
-
 
     private val pushContext: ApiContext<PushCall> by lazy {
         PushContext(persistentListOf("pushContextPersistentId", storage, PushCall.serializer()))
@@ -312,7 +311,16 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         MutableSharedFlow(replay = 100)
     }
     private val pushInternal: PushInstance by lazy {
-        dependencyCreator.createPushInternal(pushClient, stringStorage, pushContext, notificationEvents, eventClient, actionFactory, json, sdkDispatcher)
+        dependencyCreator.createPushInternal(
+            pushClient,
+            stringStorage,
+            pushContext,
+            notificationEvents,
+            eventClient,
+            pushActionFactory,
+            json,
+            sdkDispatcher
+        )
     }
 
     override val inAppApi: InAppApi by lazy {
@@ -416,19 +424,9 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         ContactClient(emarsysClient, urlFactory, sdkContext, contactTokenHandler, json)
     }
 
-    private val httpClient = HttpClient {
-        install(ContentNegotiation) {
-            json(json)
-        }
-        install(HttpRequestRetry)
-    }
-
     private val genericNetworkClient: NetworkClientApi by lazy {
         GenericNetworkClient(httpClient)
     }
-
-    override val downloaderApi: DownloaderApi =
-        Downloader(httpClient, dependencyCreator.createFileCache(), sdkLogger)
 
     override val remoteConfigHandler: RemoteConfigHandlerApi by lazy {
         RemoteConfigHandler(
@@ -448,8 +446,9 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
                 pushInternal,
                 sdkDispatcher,
                 sdkContext,
-                actionFactory,
-                downloaderApi
+                eventActionFactory,
+                downloaderApi,
+                inAppDownloader
             )
         val applyRemoteConfigState = ApplyRemoteConfigState(
             remoteConfigHandler

@@ -14,12 +14,15 @@ import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.providers.Provider
+import com.emarsys.core.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.inapp.InAppDownloaderApi
+import com.emarsys.mobileengage.inapp.InAppHandlerApi
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.networking.clients.event.EventClientApi
@@ -42,7 +45,8 @@ interface DependencyCreator {
         sdkDispatcher: CoroutineDispatcher,
         sdkContext: SdkContext,
         actionFactory: ActionFactoryApi<ActionModel>,
-        downloaderApi: DownloaderApi
+        downloaderApi: DownloaderApi,
+        inAppDownloader: InAppDownloaderApi
     ): State
 
     fun createPermissionHandler(): PermissionHandlerApi
@@ -50,6 +54,8 @@ interface DependencyCreator {
     fun createBadgeCountHandler(): BadgeCountHandlerApi
 
     fun createExternalUrlOpener(): ExternalUrlOpenerApi
+
+    fun createPushToInAppHandler(inAppDownloader: InAppDownloaderApi, inAppHandler: InAppHandlerApi): PushToInAppHandlerApi
 
     fun createConnectionWatchDog(sdkLogger: SdkLogger): ConnectionWatchDog
 

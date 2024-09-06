@@ -1,9 +1,6 @@
-package com.emarsys.mobileengage.inApp
+package com.emarsys.mobileengage.inapp
 
-import com.emarsys.mobileengage.inapp.InAppMessage
 import com.emarsys.mobileengage.inapp.InAppPresentationMode.Overlay
-import com.emarsys.mobileengage.inapp.InAppPresenterApi
-import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 
 class InAppHandler(
     private val inAppViewProvider: InAppViewProviderApi,
