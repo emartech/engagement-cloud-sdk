@@ -51,7 +51,7 @@ class ActionFactoryTests {
         mockMsgHub = mock()
         mockClipboardHandler = mock()
 
-        actionFactory = ActionFactory(
+        actionFactory = EventActionFactory(
             mockOnEventActionInternal,
             mockEventChannel,
             mockPermissionHandler,

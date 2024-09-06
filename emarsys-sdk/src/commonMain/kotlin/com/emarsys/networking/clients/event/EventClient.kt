@@ -10,7 +10,7 @@ import com.emarsys.core.session.SessionContext
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
-import com.emarsys.mobileengage.action.models.BasicActionModel
+import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.inapp.InAppMessage
 import com.emarsys.mobileengage.inapp.InAppPresentationMode
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
@@ -33,7 +33,7 @@ class EventClient(
     private val urlFactory: UrlFactoryApi,
     private val json: Json,
     private val deviceEventChannel: DeviceEventChannelApi,
-    private val onEventActionFactory: ActionFactoryApi<BasicActionModel>,
+    private val onEventActionFactory: ActionFactoryApi<ActionModel>,
     private val sessionContext: SessionContext,
     private val inAppConfig: InAppConfig,
     private val inAppPresenter: InAppPresenterApi,

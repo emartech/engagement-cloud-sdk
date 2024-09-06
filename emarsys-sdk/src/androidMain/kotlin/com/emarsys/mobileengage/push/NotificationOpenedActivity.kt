@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 class NotificationOpenedActivity : AppCompatActivity() {
     private val container = DependencyInjection.container as DependencyContainerPrivateApi
     private val json = container.json
-    private val actionFactory = container.actionFactory
+    private val actionFactory = container.pushActionFactory
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +34,6 @@ class NotificationOpenedActivity : AppCompatActivity() {
         if (intent != null) {
             lifecycleScope.launch {
                 val actionModel = getActionModel(intent)
-                println("Action was clicked: $actionModel")
                 actionModel?.let { actionFactory.create(it).invoke() }
                 finish()
             }

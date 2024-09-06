@@ -16,7 +16,6 @@ import com.emarsys.mobileengage.action.actions.CopyToClipboardAction
 import com.emarsys.mobileengage.action.actions.CustomEventAction
 import com.emarsys.mobileengage.action.actions.DismissAction
 import com.emarsys.mobileengage.action.actions.OpenExternalUrlAction
-import com.emarsys.mobileengage.action.actions.PushToInappAction
 import com.emarsys.mobileengage.action.actions.RequestPushPermissionAction
 import com.emarsys.mobileengage.action.models.AppEventActionModel
 import com.emarsys.mobileengage.action.models.BadgeCountActionModel
@@ -25,10 +24,9 @@ import com.emarsys.mobileengage.action.models.CopyToClipboardActionModel
 import com.emarsys.mobileengage.action.models.CustomEventActionModel
 import com.emarsys.mobileengage.action.models.DismissActionModel
 import com.emarsys.mobileengage.action.models.OpenExternalUrlActionModel
-import com.emarsys.mobileengage.action.models.PushToInappActionModel
 import com.emarsys.mobileengage.action.models.RequestPushPermissionActionModel
 
-class ActionFactory<ActionModelType>(
+class EventActionFactory<ActionModelType>(
     private val onEventActionInternal: OnEventActionInternalApi,
     private val eventChannel: DeviceEventChannelApi,
     private val permissionHandler: PermissionHandlerApi,
@@ -46,7 +44,6 @@ class ActionFactory<ActionModelType>(
             is BadgeCountActionModel -> BadgeCountAction(action, badgeCountHandler)
             is DismissActionModel -> DismissAction(action, msgHub)
             is OpenExternalUrlActionModel -> OpenExternalUrlAction(action, externalUrlOpener)
-            is PushToInappActionModel -> PushToInappAction(sdkLogger)
             is ButtonClickedActionModel -> ButtonClickedAction(action)
             is CopyToClipboardActionModel -> CopyToClipboardAction(action, clipboardHandler)
             else -> throw IllegalArgumentException("Unknown action type: $action")
