@@ -1,9 +1,13 @@
 package com.emarsys.mobileengage.action.actions
 
-import com.emarsys.core.log.SdkLogger
+import com.emarsys.core.pushtoinapp.PushToInAppHandlerApi
+import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
 
-class PushToInappAction(private val sdkLogger: SdkLogger) : Action<Unit> {
+class PushToInappAction(
+    private val actionModel: InternalPushToInappActionModel,
+    private val pushToInAppHandler: PushToInAppHandlerApi
+) : Action<Unit> {
     override suspend fun invoke(value: Unit?) {
-        sdkLogger.info("pushToInappAction", "PushToInappAction received as DefaultTapAction")
+        pushToInAppHandler.handle(actionModel)
     }
 }

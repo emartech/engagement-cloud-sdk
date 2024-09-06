@@ -14,6 +14,7 @@ import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.action.models.PresentableAppEventActionModel
 import com.emarsys.mobileengage.action.models.PresentableCustomEventActionModel
 import com.emarsys.mobileengage.action.models.PresentableOpenExternalUrlActionModel
+import com.emarsys.mobileengage.inapp.InAppDownloader
 import com.emarsys.mobileengage.push.model.AndroidPlatformData
 import com.emarsys.mobileengage.push.model.AndroidPushMessage
 import com.emarsys.mobileengage.push.model.NotificationMethod
@@ -76,6 +77,7 @@ class PushMessagePresenterTest {
     private lateinit var mockMetadataReader: MetadataReader
     private lateinit var mockNotificationCompatStyler: NotificationCompatStyler
     private lateinit var mockPlatformInfoCollector: PlatformInfoCollector
+    private lateinit var mockInAppDownloader: InAppDownloader
     private lateinit var notificationSlot: CapturingSlot<Notification>
 
     @Before
@@ -84,6 +86,7 @@ class PushMessagePresenterTest {
         mockNotificationManager = mockk(relaxed = true)
         mockNotificationCompatStyler = mockk(relaxed = true)
         mockPlatformInfoCollector = mockk(relaxed = true)
+        mockInAppDownloader = mockk(relaxed = true)
 
         json = JsonUtil.json
         mockMetadataReader = mockk(relaxed = true)
@@ -95,7 +98,8 @@ class PushMessagePresenterTest {
             mockNotificationManager,
             mockMetadataReader,
             mockNotificationCompatStyler,
-            mockPlatformInfoCollector
+            mockPlatformInfoCollector,
+            mockInAppDownloader
         )
 
         notificationSlot = slot<Notification>()

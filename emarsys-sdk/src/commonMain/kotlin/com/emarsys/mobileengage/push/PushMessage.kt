@@ -31,7 +31,7 @@ data class PushData<T: PlatformData>(
 
 @Serializable
 data class PushToInApp(
-    val campaignId: String,
-    val urlString: String,
+    val campaign_id: String,
+    val url: String,
     val ignoreViewedEvent: Boolean? = null
 )

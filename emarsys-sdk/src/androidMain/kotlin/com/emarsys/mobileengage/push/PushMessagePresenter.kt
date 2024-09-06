@@ -14,7 +14,10 @@ import com.emarsys.api.push.PushConstants.PUSH_NOTIFICATION_ICON_NAME
 import com.emarsys.core.device.AndroidNotificationSettings
 import com.emarsys.core.device.PlatformInfoCollector
 import com.emarsys.core.resource.MetadataReader
+import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
+import com.emarsys.mobileengage.action.models.PushToInappActionModel
+import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.push.model.AndroidPlatformData
 import com.emarsys.mobileengage.push.model.AndroidPushMessage
 import kotlinx.serialization.encodeToString
@@ -26,7 +29,8 @@ class PushMessagePresenter(
     private val notificationManager: NotificationManager,
     private val metadataReader: MetadataReader,
     private val notificationCompatStyler: NotificationCompatStyler,
-    private val platformInfoCollector: PlatformInfoCollector
+    private val platformInfoCollector: PlatformInfoCollector,
+    private val inAppDownloader: InAppDownloaderApi
 ) : PushPresenter<AndroidPlatformData, AndroidPushMessage> {
     private companion object {
         const val DEBUG_CHANNEL_ID = "ems_debug"
@@ -34,7 +38,11 @@ class PushMessagePresenter(
     }
 
     override suspend fun present(pushMessage: AndroidPushMessage) {
-        val message = handleChannelIdMismatch(pushMessage, platformInfoCollector.notificationSettings(), context)
+        val message = handleChannelIdMismatch(
+            pushMessage,
+            platformInfoCollector.notificationSettings(),
+            context
+        )
 
         val iconId = metadataReader.getInt(PUSH_NOTIFICATION_ICON_NAME)
         val channelId = message.data.platformData.channelId
@@ -97,7 +105,7 @@ class PushMessagePresenter(
         return intent
     }
 
-    private fun createTapActionPendingIntent(
+    private suspend fun createTapActionPendingIntent(
         pushMessage: AndroidPushMessage
     ): PendingIntent {
         val intent = Intent(context, NotificationOpenedActivity::class.java)
@@ -107,11 +115,19 @@ class PushMessagePresenter(
             json.encodeToString(pushMessage)
         )
 
-        pushMessage.data.defaultTapAction?.let {
-            intent.putExtra(
-                INTENT_EXTRA_DEFAULT_TAP_ACTION_KEY,
-                json.encodeToString(it)
-            )
+        pushMessage.data.defaultTapAction?.let { tapAction ->
+            val defaultActionModel = if (tapAction !is PushToInappActionModel) {
+                tapAction
+            } else {
+                pushMessage.data.pushToInApp?.toInternalPushToInappActionModel()
+            }
+
+            defaultActionModel?.let {
+                intent.putExtra(
+                    INTENT_EXTRA_DEFAULT_TAP_ACTION_KEY,
+                    json.encodeToString(it)
+                )
+            }
         }
 
         return PendingIntent.getActivity(
@@ -119,6 +135,16 @@ class PushMessagePresenter(
             (System.currentTimeMillis() % Int.MAX_VALUE).toInt(),
             intent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+    }
+
+    private suspend fun PushToInApp.toInternalPushToInappActionModel(): InternalPushToInappActionModel {
+        val inappHtml = inAppDownloader.download(this.url)
+        return InternalPushToInappActionModel(
+            campaign_id,
+            url,
+            inappHtml,
+            ignoreViewedEvent
         )
     }
 
