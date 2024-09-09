@@ -2,6 +2,7 @@ package com.emarsys.mobileengage.push
 
 import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.SdkLogger
+import com.emarsys.mobileengage.action.models.PresentableOpenExternalUrlActionModel
 import com.emarsys.mobileengage.inapp.PushToInApp
 import com.emarsys.mobileengage.push.model.JsPlatformData
 import com.emarsys.mobileengage.push.model.JsPushMessage
@@ -9,6 +10,8 @@ import com.emarsys.util.JsonUtil
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.addJsonObject
+import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
@@ -54,6 +57,14 @@ class PushMessageMapperTests {
             put("icon", ICON)
             put("link", "https://sap.com")
             put("image", IMAGE)
+            put("actions", buildJsonArray {
+                addJsonObject {
+                    put("type", "openExternalUrl")
+                    put("id", "actionId1")
+                    put("title", "actionTitle1")
+                    put("url", "https://www.sap.com")
+                }
+            })
         }
 
         val inAppJson = buildJsonObject {
@@ -94,6 +105,13 @@ class PushMessageMapperTests {
                     DEFAULT_CAMPAIGN_ID,
                     URL,
                     true
+                ),
+                actions = listOf(
+                    PresentableOpenExternalUrlActionModel(
+                        id = "actionId1",
+                        title = "actionTitle1",
+                        url = "https://www.sap.com"
+                    ),
                 )
             )
         )

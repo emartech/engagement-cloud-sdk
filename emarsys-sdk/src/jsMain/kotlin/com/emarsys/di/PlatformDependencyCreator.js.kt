@@ -46,6 +46,7 @@ import com.emarsys.mobileengage.inapp.InAppScriptExtractorApi
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.mobileengage.inapp.WebInAppPresenter
 import com.emarsys.mobileengage.inapp.WebInAppViewProvider
+import com.emarsys.mobileengage.inapp.WebPushToInAppHandler
 import com.emarsys.mobileengage.push.PushMessageMapper
 import com.emarsys.mobileengage.push.PushServiceContext
 import com.emarsys.networking.clients.event.EventClientApi
@@ -121,7 +122,7 @@ actual class PlatformDependencyCreator actual constructor(
         inAppDownloader: InAppDownloaderApi,
         inAppHandler: InAppHandlerApi
     ): PushToInAppHandlerApi {
-        TODO("Not yet implemented")
+        return WebPushToInAppHandler()
     }
 
     actual override fun createConnectionWatchDog(sdkLogger: SdkLogger): ConnectionWatchDog {
