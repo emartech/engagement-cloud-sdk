@@ -1,5 +1,6 @@
 package com.emarsys.mobileengage.push.model
 
+import com.emarsys.mobileengage.inapp.PushToInApp
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 
@@ -16,7 +17,8 @@ data class WebPushMessageData(
     val sid: String,
     val applicationCode: String,
     val treatments: JsonObject,
-    val notificationSettings: WebPushNotificationSettings
+    val notificationSettings: WebPushNotificationSettings,
+    val inApp: PushToInApp? = null
 )
 
 @Serializable

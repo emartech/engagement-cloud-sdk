@@ -35,7 +35,8 @@ class PushMessageMapper(private val json: Json, private val logger: Logger) :
                             remoteWebPushAction.url
                         )
                     },
-                    platformData = JsPlatformData(remoteWebPushMessage.messageData.applicationCode)
+                    platformData = JsPlatformData(remoteWebPushMessage.messageData.applicationCode),
+                    pushToInApp = remoteWebPushMessage.messageData.inApp
                 )
             )
         } catch (exception: Exception) {

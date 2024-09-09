@@ -18,6 +18,7 @@ import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.action.models.PushToInappActionModel
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
+import com.emarsys.mobileengage.inapp.PushToInApp
 import com.emarsys.mobileengage.push.model.AndroidPlatformData
 import com.emarsys.mobileengage.push.model.AndroidPushMessage
 import kotlinx.serialization.encodeToString
@@ -141,7 +142,7 @@ class PushMessagePresenter(
     private suspend fun PushToInApp.toInternalPushToInappActionModel(): InternalPushToInappActionModel {
         val inappHtml = inAppDownloader.download(this.url)
         return InternalPushToInappActionModel(
-            campaign_id,
+            campaignId,
             url,
             inappHtml,
             ignoreViewedEvent

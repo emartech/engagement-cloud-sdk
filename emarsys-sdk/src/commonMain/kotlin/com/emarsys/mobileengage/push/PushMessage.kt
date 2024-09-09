@@ -2,6 +2,7 @@ package com.emarsys.mobileengage.push
 
 import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
+import com.emarsys.mobileengage.inapp.PushToInApp
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 
@@ -27,11 +28,4 @@ data class PushData<T: PlatformData>(
     val pushToInApp: PushToInApp? = null,
     val rootParams: JsonObject? = null,
     val u: JsonObject? = null
-)
-
-@Serializable
-data class PushToInApp(
-    val campaign_id: String,
-    val url: String,
-    val ignoreViewedEvent: Boolean? = null
 )

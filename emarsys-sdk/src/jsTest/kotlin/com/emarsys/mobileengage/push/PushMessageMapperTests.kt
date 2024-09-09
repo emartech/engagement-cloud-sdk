@@ -2,6 +2,7 @@ package com.emarsys.mobileengage.push
 
 import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.SdkLogger
+import com.emarsys.mobileengage.inapp.PushToInApp
 import com.emarsys.mobileengage.push.model.JsPlatformData
 import com.emarsys.mobileengage.push.model.JsPushMessage
 import com.emarsys.util.JsonUtil
@@ -22,6 +23,7 @@ class PushMessageMapperTests {
         const val MESSAGE = "TestMessage"
         const val ID = "testId"
         const val SID = "testSid"
+        const val URL = "https://www.sap.com"
         const val APPLICATION_CODE = "testAppCode"
         const val ICON = "https://trunk-int.s.emarsys.com/custloads/218524530/md_100008588.png"
         const val IMAGE = "https://trunk-int.s.emarsys.com/custloads/218524530/md_100008589.png"
@@ -53,12 +55,20 @@ class PushMessageMapperTests {
             put("link", "https://sap.com")
             put("image", IMAGE)
         }
+
+        val inAppJson = buildJsonObject {
+            put("campaign_id", DEFAULT_CAMPAIGN_ID)
+            put("url", URL)
+            put("ignoreViewedEvent", true)
+        }
+
         val messageData = buildJsonObject {
             put("id", ID)
             put("sid", SID)
             put("applicationCode", APPLICATION_CODE)
             put("treatments", treatments)
             put("notificationSettings", notificationSettings)
+            put("inApp", inAppJson)
         }
 
         val testRemoteMessage = buildJsonObject {
@@ -79,6 +89,11 @@ class PushMessageMapperTests {
                 DEFAULT_CAMPAIGN_ID,
                 JsPlatformData(
                     APPLICATION_CODE
+                ),
+                pushToInApp = PushToInApp(
+                    DEFAULT_CAMPAIGN_ID,
+                    URL,
+                    true
                 )
             )
         )
