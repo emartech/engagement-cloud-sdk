@@ -101,7 +101,8 @@ actual class PlatformDependencyCreator actual constructor(
 
 
     actual override fun createDeviceInfoCollector(
-        timezoneProvider: Provider<String>
+        timezoneProvider: Provider<String>,
+        storage: TypedStorageApi<String?>
     ): DeviceInfoCollector {
         return DeviceInfoCollector(
             timezoneProvider,
@@ -124,7 +125,8 @@ actual class PlatformDependencyCreator actual constructor(
         sdkContext: SdkContext,
         actionFactory: ActionFactoryApi<ActionModel>,
         downloaderApi: DownloaderApi,
-        inAppDownloader: InAppDownloaderApi
+        inAppDownloader: InAppDownloaderApi,
+        storage: TypedStorageApi<String?>
     ): State {
         val notificationManager =
             (applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)

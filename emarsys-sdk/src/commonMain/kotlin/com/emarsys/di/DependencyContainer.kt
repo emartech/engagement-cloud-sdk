@@ -256,7 +256,8 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
 
     private val deviceInfoCollector: DeviceInfoCollectorApi by lazy {
         dependencyCreator.createDeviceInfoCollector(
-            timezoneProvider
+            timezoneProvider,
+            stringStorage
         )
     }
 
@@ -413,7 +414,12 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
     }
 
     override val pushApi: PushApi by lazy {
-        dependencyCreator.createPushApi(pushInternal, stringStorage, pushContext, notificationEvents)
+        dependencyCreator.createPushApi(
+            pushInternal,
+            stringStorage,
+            pushContext,
+            notificationEvents
+        )
     }
 
     override val pushClient: PushClientApi by lazy {
@@ -448,7 +454,8 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
                 sdkContext,
                 eventActionFactory,
                 downloaderApi,
-                inAppDownloader
+                inAppDownloader,
+                stringStorage
             )
         val applyRemoteConfigState = ApplyRemoteConfigState(
             remoteConfigHandler

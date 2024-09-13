@@ -81,7 +81,8 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createDeviceInfoCollector(
-        timezoneProvider: Provider<String>
+        timezoneProvider: Provider<String>,
+        storage: TypedStorageApi<String?>
     ): DeviceInfoCollector {
         return DeviceInfoCollector(
             HardwareIdProvider(uuidProvider, createStorage()),
@@ -99,7 +100,8 @@ actual class PlatformDependencyCreator actual constructor(
         sdkContext: SdkContext,
         actionFactory: ActionFactoryApi<ActionModel>,
         downloaderApi: DownloaderApi,
-        inAppDownloader: InAppDownloaderApi
+        inAppDownloader: InAppDownloaderApi,
+        storage: TypedStorageApi<String?>
     ): State {
         return PlatformInitState()
     }

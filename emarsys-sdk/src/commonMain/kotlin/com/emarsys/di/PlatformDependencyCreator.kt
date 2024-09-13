@@ -48,7 +48,8 @@ expect class PlatformDependencyCreator(
     override fun createStorage(): TypedStorageApi<String?>
 
     override fun createDeviceInfoCollector(
-        timezoneProvider: Provider<String>
+        timezoneProvider: Provider<String>,
+        storage: TypedStorageApi<String?>
     ): DeviceInfoCollector
 
     override fun createPlatformInitState(
@@ -57,7 +58,8 @@ expect class PlatformDependencyCreator(
         sdkContext: SdkContext,
         actionFactory: ActionFactoryApi<ActionModel>,
         downloaderApi: DownloaderApi,
-        inAppDownloader: InAppDownloaderApi
+        inAppDownloader: InAppDownloaderApi,
+        storage: TypedStorageApi<String?>
     ): State
 
     override fun createPermissionHandler(): PermissionHandlerApi

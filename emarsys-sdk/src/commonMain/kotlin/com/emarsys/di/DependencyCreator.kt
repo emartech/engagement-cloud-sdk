@@ -37,7 +37,8 @@ interface DependencyCreator {
     fun createStorage(): TypedStorageApi<String?>
 
     fun createDeviceInfoCollector(
-        timezoneProvider: Provider<String>
+        timezoneProvider: Provider<String>,
+        storage: TypedStorageApi<String?>
     ): DeviceInfoCollector
 
     fun createPlatformInitState(
@@ -46,7 +47,8 @@ interface DependencyCreator {
         sdkContext: SdkContext,
         actionFactory: ActionFactoryApi<ActionModel>,
         downloaderApi: DownloaderApi,
-        inAppDownloader: InAppDownloaderApi
+        inAppDownloader: InAppDownloaderApi,
+        storage: TypedStorageApi<String?>
     ): State
 
     fun createPermissionHandler(): PermissionHandlerApi

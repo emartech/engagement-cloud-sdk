@@ -35,6 +35,7 @@ import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.url.WebExternalUrlOpener
 import com.emarsys.core.util.DownloaderApi
+import com.emarsys.emarsysWindow
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
@@ -72,15 +73,13 @@ actual class PlatformDependencyCreator actual constructor(
     private val msgHub: MsgHubApi,
 ) : DependencyCreator {
 
-    private val platformContext: CommonPlatformContext = platformContext as CommonPlatformContext
-    private val storage = createStorage()
-
     actual override fun createStorage(): TypedStorageApi<String?> {
-        return StringStorage(platformContext.storage)
+        return StringStorage(emarsysWindow.localStorage)
     }
 
     actual override fun createDeviceInfoCollector(
-        timezoneProvider: Provider<String>
+        timezoneProvider: Provider<String>,
+        storage: TypedStorageApi<String?>
     ): DeviceInfoCollector {
         return DeviceInfoCollector(
             uuidProvider,
@@ -97,7 +96,8 @@ actual class PlatformDependencyCreator actual constructor(
         sdkContext: SdkContext,
         actionFactory: ActionFactoryApi<ActionModel>,
         downloaderApi: DownloaderApi,
-        inAppDownloader: InAppDownloaderApi
+        inAppDownloader: InAppDownloaderApi,
+        storage: TypedStorageApi<String?>
     ): State {
         val scope = CoroutineScope(sdkDispatcher)
         val inappJsBridge = InAppJsBridge(actionFactory, json, scope)
