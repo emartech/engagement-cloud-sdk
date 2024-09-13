@@ -56,7 +56,6 @@ import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.connection.WebConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import com.emarsys.watchdog.lifecycle.WebLifeCycleWatchDog
-import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -115,7 +114,7 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createExternalUrlOpener(): ExternalUrlOpenerApi {
-        return WebExternalUrlOpener(window, sdkLogger)
+        return WebExternalUrlOpener(emarsysWindow, sdkLogger)
     }
 
     actual override fun createPushToInAppHandler(
@@ -126,7 +125,7 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createConnectionWatchDog(sdkLogger: SdkLogger): ConnectionWatchDog {
-        return WebConnectionWatchDog(window)
+        return WebConnectionWatchDog(emarsysWindow)
     }
 
     actual override fun createLifeCycleWatchDog(): LifecycleWatchDog {
@@ -170,7 +169,7 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createClipboardHandler(): ClipboardHandlerApi {
-        return WebClipboardHandler(window.navigator.clipboard)
+        return WebClipboardHandler(emarsysWindow.navigator.clipboard)
     }
 
     actual override fun createPushInternal(
@@ -199,10 +198,10 @@ actual class PlatformDependencyCreator actual constructor(
 
     private fun getNavigatorData(): String {
         return listOf(
-            window.navigator.platform,
-            window.navigator.userAgent,
-            window.navigator.appVersion,
-            window.navigator.vendor,
+            emarsysWindow.navigator.platform,
+            emarsysWindow.navigator.userAgent,
+            emarsysWindow.navigator.appVersion,
+            emarsysWindow.navigator.vendor,
         ).joinToString(" ")
     }
 }

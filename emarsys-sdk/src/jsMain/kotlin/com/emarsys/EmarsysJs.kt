@@ -3,7 +3,10 @@ package com.emarsys
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.promise
+import org.w3c.dom.Window
 import kotlin.js.Promise
+
+lateinit var emarsysWindow: Window
 
 @OptIn(ExperimentalJsExport::class)
 @JsExport
@@ -12,10 +15,17 @@ class EmarsysJs {
 
     private val coroutineScope: CoroutineScope = CoroutineScope(SupervisorJob())
 
-    fun enableTracking(jsEmarsysConfig: JsEmarsysConfig): Promise<Any> {
+    fun init(window: Window): Promise<Any> {
+        emarsysWindow = window
         return coroutineScope.promise {
             Emarsys.initialize()
+        }
+    }
+
+    fun enableTracking(jsEmarsysConfig: JsEmarsysConfig): Promise<Any> {
+        return coroutineScope.promise {
             Emarsys.enableTracking(jsEmarsysConfig)
+            Emarsys.linkContact(2575, "test@test.com")
         }
     }
 
