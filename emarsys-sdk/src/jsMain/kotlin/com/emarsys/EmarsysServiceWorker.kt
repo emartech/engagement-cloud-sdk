@@ -1,37 +1,41 @@
 package com.emarsys
 
-import com.emarsys.core.log.ConsoleLogger
-import com.emarsys.core.log.SdkLogger
+import com.emarsys.core.log.Logger
 import com.emarsys.mobileengage.push.PushMessageMapper
 import com.emarsys.mobileengage.push.PushMessagePresenter
-import com.emarsys.mobileengage.push.ServiceWorkerRegistrationWrapper
-import com.emarsys.util.JsonUtil
 import js.promise.Promise
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.promise
-import web.push.PushEvent
+import web.broadcast.BroadcastChannel
 import web.serviceworker.ServiceWorkerGlobalScope
 
 external var self: ServiceWorkerGlobalScope
 
-@OptIn(ExperimentalJsExport::class)
-@JsExport
 @JsName("EmarsysServiceWorker")
-class EmarsysServiceWorker {
-
-    // TODO creating these in the dependency container
-    private val pushMessagePresenter = PushMessagePresenter(ServiceWorkerRegistrationWrapper())
-    private val pushMessageMapper = PushMessageMapper(JsonUtil.json, SdkLogger(ConsoleLogger()))
+class EmarsysServiceWorker(
+    private val pushMessagePresenter: PushMessagePresenter,
+    private val pushMessageMapper: PushMessageMapper,
+    private val sdkLogger: Logger
+) {
     private val scope = CoroutineScope(SupervisorJob())
+    private val pushBroadcastChannel = BroadcastChannel("emarsys-service-worker-push-channel")
 
-    fun onPush(event: PushEvent): Promise<Any?> {
+    init {
+        pushBroadcastChannel.onmessage = {
+            onPush(it.data as String)
+        }
+    }
+
+    fun onPush(event: String): Promise<Any?> {
         return Promise { resolve, reject ->
             scope.promise {
-                val jsPushMessage = pushMessageMapper.map(JSON.stringify(event.data?.json()))
-                jsPushMessage?.let {
-                    pushMessagePresenter.present(it)
-                    null
+                try {
+                    pushMessageMapper.map(event)?.let {
+                        pushMessagePresenter.present(it)
+                    }
+                } catch (exception: Exception) {
+                    sdkLogger.error("EmarsysServiceWorker - onPush", exception)
                 }
             }
                 .then { resolve(it) }

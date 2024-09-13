@@ -1,5 +1,6 @@
 package com.emarsys.di
 
+import com.emarsys.EmarsysServiceWorker
 import com.emarsys.api.AppEvent
 import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.LoggingPush
@@ -49,6 +50,8 @@ import com.emarsys.mobileengage.inapp.WebInAppPresenter
 import com.emarsys.mobileengage.inapp.WebInAppViewProvider
 import com.emarsys.mobileengage.inapp.WebPushToInAppHandler
 import com.emarsys.mobileengage.push.PushMessageMapper
+import com.emarsys.mobileengage.push.PushMessagePresenter
+import com.emarsys.mobileengage.push.PushService
 import com.emarsys.mobileengage.push.PushServiceContext
 import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.push.PushClientApi
@@ -76,6 +79,20 @@ actual class PlatformDependencyCreator actual constructor(
     actual override fun createStorage(): TypedStorageApi<String?> {
         return StringStorage(emarsysWindow.localStorage)
     }
+
+    private val pushMessagePresenter: PushMessagePresenter by lazy {
+        PushMessagePresenter()
+    }
+
+    private val pushMessageMapper: PushMessageMapper by lazy {
+        PushMessageMapper(json, sdkLogger)
+    }
+
+    private val emarsysServiceWorker = EmarsysServiceWorker(
+        pushMessagePresenter,
+        pushMessageMapper,
+        sdkLogger
+    )
 
     actual override fun createDeviceInfoCollector(
         timezoneProvider: Provider<String>,
@@ -134,10 +151,6 @@ actual class PlatformDependencyCreator actual constructor(
 
     private val pushServiceContext: PushServiceContext by lazy {
         PushServiceContext()
-    }
-
-    private val pushMessageMapper: PushMessageMapper by lazy {
-        PushMessageMapper(json, sdkLogger)
     }
 
     private fun createWebDeviceInfoCollector(): WebPlatformInfoCollector {
