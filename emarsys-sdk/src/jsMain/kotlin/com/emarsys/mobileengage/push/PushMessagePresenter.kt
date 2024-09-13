@@ -1,72 +1,48 @@
 package com.emarsys.mobileengage.push
 
 
-import com.emarsys.mobileengage.push.model.JsNotificationAction
-import com.emarsys.mobileengage.push.model.JsNotificationOptions
+import com.emarsys.mobileengage.action.models.PresentableActionModel
+import com.emarsys.mobileengage.inapp.PushToInApp
 import com.emarsys.mobileengage.push.model.JsPlatformData
 import com.emarsys.mobileengage.push.model.JsPushMessage
-import org.w3c.dom.BroadcastChannel
+import com.emarsys.mobileengage.push.model.WebPushNotificationData
 import org.w3c.notifications.NotificationAction
 import org.w3c.notifications.NotificationOptions
 
-open class PushMessagePresenter : PushPresenter<JsPlatformData, JsPushMessage> {
-    val processedPushBroadcastChannel =
-        BroadcastChannel("emarsys-service-worker-processed-push-channel")
+open class PushMessagePresenter(private val pushBroadcaster: PushBroadcasterApi) :
+    PushPresenter<JsPlatformData, JsPushMessage> {
 
     override suspend fun present(pushMessage: JsPushMessage) {
-        val jsNotificationOptions = JsNotificationOptions(
-            body = pushMessage.body,
-            icon = pushMessage.iconUrlString,
-            badge = pushMessage.imageUrlString,
-            actions = pushMessage.data.actions?.map {
-                JsNotificationAction(
-                    action = it.id,
-                    title = it.title
-                )
-            } ?: emptyList(),
-            pushToInApp = pushMessage.data.pushToInApp
-        )
-
-        broadcastNotificationData(
-            pushMessage.title,
-            jsNotificationOptions
-        )
-    }
-
-    private fun broadcastNotificationData(
-        notificationTitle: String,
-        jsNotificationOptions: JsNotificationOptions
-    ) {
         val notificationOptions = js("{}").unsafeCast<NotificationOptions>().apply {
-            body = jsNotificationOptions.body
-            icon = jsNotificationOptions.icon
-            badge = jsNotificationOptions.badge
+            body = pushMessage.body
+            icon = pushMessage.iconUrlString
+            badge = pushMessage.imageUrlString
         }
 
-        notificationOptions.asDynamic().actions = notificationActions(jsNotificationOptions)
-
-        jsNotificationOptions.pushToInApp?.let { pushToInApp ->
-            val data = js("{}")
-            data["campaignId"] = pushToInApp.campaignId
-            data["url"] = pushToInApp.url
-            data["ignoreViewedEvent"] = pushToInApp.ignoreViewedEvent
-
-            notificationOptions.asDynamic().data = data
+        pushMessage.data.actions?.let {
+            notificationOptions.asDynamic().actions = createNotificationActions(it)
         }
 
-        val processedPushMessage = js("{}")
-        processedPushMessage["title"] = notificationTitle
-        processedPushMessage["options"] = notificationOptions
+        pushMessage.data.pushToInApp?.let {
+            notificationOptions.asDynamic().data = createPushToInApp(it)
+        }
 
-        processedPushBroadcastChannel.postMessage(JSON.stringify(processedPushMessage))
+        pushBroadcaster.broadcast(WebPushNotificationData(pushMessage.title, notificationOptions))
     }
 
-    private fun notificationActions(jsNotificationOptions: JsNotificationOptions) =
-        jsNotificationOptions.actions.map {
+    private fun createNotificationActions(actions: List<PresentableActionModel>) =
+        actions.map {
             js("{}").unsafeCast<NotificationAction>().apply {
-                action = it.action
+                action = it.id
                 title = it.title
             }
         }
 
+    private fun createPushToInApp(it: PushToInApp): dynamic {
+        val data = js("{}")
+        data["campaignId"] = it.campaignId
+        data["url"] = it.url
+        data["ignoreViewedEvent"] = it.ignoreViewedEvent
+        return data
+    }
 }

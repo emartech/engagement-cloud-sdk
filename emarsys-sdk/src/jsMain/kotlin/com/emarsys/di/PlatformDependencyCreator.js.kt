@@ -7,6 +7,7 @@ import com.emarsys.api.push.LoggingPush
 import com.emarsys.api.push.Push
 import com.emarsys.api.push.PushApi
 import com.emarsys.api.push.PushCall
+import com.emarsys.api.push.PushConstants.WEB_PUSH_PROCESSED_PUSH_CHANNEL_NAME
 import com.emarsys.api.push.PushGatherer
 import com.emarsys.api.push.PushInstance
 import com.emarsys.api.push.PushInternal
@@ -53,6 +54,7 @@ import com.emarsys.mobileengage.push.PushMessageMapper
 import com.emarsys.mobileengage.push.PushMessagePresenter
 import com.emarsys.mobileengage.push.PushService
 import com.emarsys.mobileengage.push.PushServiceContext
+import com.emarsys.mobileengage.push.WebPushBroadcaster
 import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.PlatformInitState
@@ -65,6 +67,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.Json
+import org.w3c.dom.BroadcastChannel
 import web.dom.document
 
 actual class PlatformDependencyCreator actual constructor(
@@ -80,8 +83,11 @@ actual class PlatformDependencyCreator actual constructor(
         return StringStorage(emarsysWindow.localStorage)
     }
 
+    private val processedPushBroadcastChannel =
+        BroadcastChannel(WEB_PUSH_PROCESSED_PUSH_CHANNEL_NAME)
+
     private val pushMessagePresenter: PushMessagePresenter by lazy {
-        PushMessagePresenter()
+        PushMessagePresenter(WebPushBroadcaster(processedPushBroadcastChannel))
     }
 
     private val pushMessageMapper: PushMessageMapper by lazy {
