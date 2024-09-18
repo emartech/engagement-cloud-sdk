@@ -21,8 +21,7 @@ data class PushUserInfoEms(
 
 @Serializable
 data class PushUserInfoInApp(
-    val inAppData: ByteArray? = null,
     @SerialName("campaign_id")
-    val campaignId: String? = null,
-    val url: String? = null
+    val campaignId: String,
+    val url: String
 )

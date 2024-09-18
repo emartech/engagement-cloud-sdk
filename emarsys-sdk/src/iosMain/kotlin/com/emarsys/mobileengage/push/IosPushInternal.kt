@@ -9,7 +9,7 @@ import com.emarsys.context.SdkContextApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
-import com.emarsys.networking.clients.event.EventClientApi
+import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
 import com.emarsys.networking.clients.push.PushClientApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CoroutineDispatcher
@@ -42,30 +42,37 @@ class IosPushInternal(
     pushContext: ApiContext<PushCall>,
     sdkContext: SdkContextApi,
     override val notificationEvents: MutableSharedFlow<AppEvent>,
-    val eventClient: EventClientApi,
     private val actionFactory: ActionFactoryApi<ActionModel>,
     private val json: Json,
     private val sdkDispatcher: CoroutineDispatcher
-): PushInternal(pushClient, storage, pushContext, notificationEvents), IosPushInstance {
-    override var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol? = null
+) : PushInternal(pushClient, storage, pushContext, notificationEvents), IosPushInstance {
+    override var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol? =
+        null
         set(value) {
-            (emarsysUserNotificationCenterDelegate as InternalNotificationCenterDelegateProxy).customerDelegate = value
+            (emarsysUserNotificationCenterDelegate as InternalNotificationCenterDelegateProxy).customerDelegate =
+                value
             field = value
         }
 
-    override val emarsysUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol = InternalNotificationCenterDelegateProxy(
-        didReceiveNotificationResponse = this::didReceiveNotificationResponse,
-        sdkContext,
-        customerUserNotificationCenterDelegate
-    )
+    override val emarsysUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol =
+        InternalNotificationCenterDelegateProxy(
+            didReceiveNotificationResponse = this::didReceiveNotificationResponse,
+            sdkContext,
+            customerUserNotificationCenterDelegate
+        )
 
     @OptIn(ExperimentalForeignApi::class)
     fun didReceiveNotificationResponse(
         actionIdentifier: String,
         userInfo: Map<String, Any>,
-        withCompletionHandler: () -> Unit) {
+        withCompletionHandler: () -> Unit
+    ) {
         CoroutineScope(sdkDispatcher).launch {
-            val userInfoData = platform.Foundation.NSJSONSerialization.dataWithJSONObject(userInfo, NSJSONWritingPrettyPrinted, null)
+            val userInfoData = platform.Foundation.NSJSONSerialization.dataWithJSONObject(
+                userInfo,
+                NSJSONWritingPrettyPrinted,
+                null
+            )
             val userInfoJson = NSString.create(userInfoData!!, NSUTF8StringEncoding).toString()
             val pushUserInfo: PushUserInfo = json.decodeFromString(userInfoJson)
 
@@ -83,7 +90,7 @@ class IosPushInternal(
     ) {
         val actionModel: ActionModel? =
             if (actionIdentifier == UNNotificationDefaultActionIdentifier) {
-                pushUserInfo.ems?.defaultAction
+                extractDefaultAction(pushUserInfo)
             } else {
                 pushUserInfo.ems?.actions?.firstOrNull {
                     it.id == actionIdentifier
@@ -94,19 +101,37 @@ class IosPushInternal(
         }
     }
 
+    private fun extractDefaultAction(
+        pushUserInfo: PushUserInfo,
+    ): ActionModel? {
+        return if (pushUserInfo.ems?.inapp != null) {
+            InternalPushToInappActionModel(
+                campaignId = pushUserInfo.ems.inapp.campaignId,
+                url = pushUserInfo.ems.inapp.url
+            )
+        } else {
+            pushUserInfo.ems?.defaultAction
+        }
+    }
+
     private class InternalNotificationCenterDelegateProxy(
         private val didReceiveNotificationResponse: (actionIdentifier: String, userInfo: Map<String, Any>, handler: () -> Unit) -> Unit,
         private val sdkContext: SdkContextApi,
         var customerDelegate: UNUserNotificationCenterDelegateProtocol?
-    ): UNUserNotificationCenterDelegateProtocol, NSObject() {
+    ) : UNUserNotificationCenterDelegateProtocol, NSObject() {
 
         override fun userNotificationCenter(
             center: UNUserNotificationCenter,
             willPresentNotification: UNNotification,
-            withCompletionHandler: (UNNotificationPresentationOptions) -> Unit) {
+            withCompletionHandler: (UNNotificationPresentationOptions) -> Unit
+        ) {
             customerDelegate?.let {
                 CoroutineScope(Dispatchers.Main).launch {
-                    it.userNotificationCenter(center, willPresentNotification, withCompletionHandler)
+                    it.userNotificationCenter(
+                        center,
+                        willPresentNotification,
+                        withCompletionHandler
+                    )
                 }
             }
             if (sdkContext.currentSdkState == SdkState.active) {
@@ -117,7 +142,8 @@ class IosPushInternal(
         override fun userNotificationCenter(
             center: UNUserNotificationCenter,
             didReceiveNotificationResponse: UNNotificationResponse,
-            withCompletionHandler: () -> Unit) {
+            withCompletionHandler: () -> Unit
+        ) {
             customerDelegate?.let {
                 CoroutineScope(Dispatchers.Main).launch {
                     it.userNotificationCenter(
@@ -128,13 +154,18 @@ class IosPushInternal(
                 }
             }
             if (sdkContext.currentSdkState == SdkState.active) {
-                this.didReceiveNotificationResponse(didReceiveNotificationResponse.actionIdentifier, didReceiveNotificationResponse.notification.request.content.userInfo as Map<String, Any>, withCompletionHandler)
+                this.didReceiveNotificationResponse(
+                    didReceiveNotificationResponse.actionIdentifier,
+                    didReceiveNotificationResponse.notification.request.content.userInfo as Map<String, Any>,
+                    withCompletionHandler
+                )
             }
         }
 
         override fun userNotificationCenter(
             center: UNUserNotificationCenter,
-            openSettingsForNotification: UNNotification?) {
+            openSettingsForNotification: UNNotification?
+        ) {
             customerDelegate?.let {
                 CoroutineScope(Dispatchers.Main).launch {
                     it.userNotificationCenter(center, openSettingsForNotification)

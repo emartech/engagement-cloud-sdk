@@ -186,7 +186,16 @@ actual class PlatformDependencyCreator actual constructor(
         json: Json,
         sdkDispatcher: CoroutineDispatcher
     ): PushInstance {
-        return IosPushInternal(pushClient, storage, pushContext, sdkContext, notificationEvents, eventClient, actionFactory, json, sdkDispatcher)
+        return IosPushInternal(
+            pushClient,
+            storage,
+            pushContext,
+            sdkContext,
+            notificationEvents,
+            actionFactory,
+            json,
+            sdkDispatcher
+        )
     }
 
     actual override fun createPushApi(

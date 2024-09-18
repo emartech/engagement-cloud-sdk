@@ -68,9 +68,8 @@ class EmarsysNotificationService(
                 val userInfo = bestAttemptContent.userInfo as Map<String, Any>
                 val actions = async { createActions(userInfo) }
                 val attachments = async { createAttachments(userInfo) }
-                val inApp = async { createInApp(userInfo) }
 
-                awaitAll(actions, attachments, inApp)
+                awaitAll(actions, attachments)
 
                 contentHandler(bestAttemptContent)
             }
@@ -131,26 +130,6 @@ class EmarsysNotificationService(
                     bestAttemptContent.setAttachments(listOf(attachment))
                 }
             }
-        }
-    }
-
-    private suspend fun createInApp(userInfo: Map<String, Any>) {
-        val ems = userInfo["ems"] as? Map<String, Any> ?: return
-        val inApp = ems["inapp"] as? Map<String, Any> ?: return
-        val inAppUrlString = inApp["url"] as? String ?: return
-
-        val inAppData = downloader.downloadData(NSURL(string = inAppUrlString)) ?: return
-
-        val mutableInApp = inApp.toMutableMap()
-        val mutableEms = ems.toMutableMap()
-        val mutableUserInfo = userInfo.toMutableMap()
-
-        mutableInApp["inAppData"] = inAppData
-        mutableEms["inapp"] = mutableInApp
-        mutableUserInfo["ems"] = mutableEms
-
-        mutex.withLock {
-            bestAttemptContent.setUserInfo(mutableUserInfo.toMap())
         }
     }
 }
