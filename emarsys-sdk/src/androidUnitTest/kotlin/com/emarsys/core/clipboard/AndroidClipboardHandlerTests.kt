@@ -2,7 +2,8 @@ package com.emarsys.core.clipboard
 
 import android.content.ClipData
 import android.content.ClipboardManager
-import com.emarsys.core.clipboard.AndroidClipboardHandler.Companion.TEXT_LABEL
+import com.emarsys.mobileengage.clipboard.AndroidClipboardHandler
+import com.emarsys.mobileengage.clipboard.AndroidClipboardHandler.Companion.TEXT_LABEL
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic

@@ -1,4 +1,4 @@
-package com.emarsys.core.permission
+package com.emarsys.mobileengage.permission
 
 import android.Manifest
 import android.content.Context
@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.emarsys.core.device.AndroidVersionUtils.isTiramisuOrAbove
+import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.watchdog.activity.TransitionSafeCurrentActivityWatchdog
 
 class AndroidPermissionHandler(

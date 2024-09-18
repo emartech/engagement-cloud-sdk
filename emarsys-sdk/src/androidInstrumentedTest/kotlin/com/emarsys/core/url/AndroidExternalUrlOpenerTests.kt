@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+import com.emarsys.mobileengage.url.AndroidExternalUrlOpener
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk

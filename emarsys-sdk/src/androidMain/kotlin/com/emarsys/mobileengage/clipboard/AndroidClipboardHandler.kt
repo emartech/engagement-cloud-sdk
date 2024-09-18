@@ -1,7 +1,8 @@
-package com.emarsys.core.clipboard
+package com.emarsys.mobileengage.clipboard
 
 import android.content.ClipData
 import android.content.ClipboardManager
+import com.emarsys.core.clipboard.ClipboardHandlerApi
 
 class AndroidClipboardHandler(private val clipboardManager: ClipboardManager) :
     ClipboardHandlerApi {

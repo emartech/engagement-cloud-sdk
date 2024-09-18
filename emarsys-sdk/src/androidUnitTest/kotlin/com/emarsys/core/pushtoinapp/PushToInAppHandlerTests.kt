@@ -3,6 +3,7 @@ package com.emarsys.core.pushtoinapp
 import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandlerApi
+import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

@@ -1,4 +1,6 @@
-package com.emarsys.core.badge
+package com.emarsys.mobileengage.badge
+
+import com.emarsys.core.badge.BadgeCountHandlerApi
 
 class AndroidBadgeCountHandler: BadgeCountHandlerApi {
 

@@ -1,10 +1,11 @@
-package com.emarsys.core.url
+package com.emarsys.mobileengage.url
 
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.webkit.URLUtil
+import com.emarsys.core.url.ExternalUrlOpenerApi
 
 class AndroidExternalUrlOpener(
     private val applicationContext: Context

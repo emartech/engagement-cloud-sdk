@@ -7,7 +7,8 @@ import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.emarsys.core.device.AndroidVersionUtils
-import com.emarsys.core.permission.AndroidPermissionHandler.Companion.PERMISSION_REQUEST_CODE
+import com.emarsys.mobileengage.permission.AndroidPermissionHandler
+import com.emarsys.mobileengage.permission.AndroidPermissionHandler.Companion.PERMISSION_REQUEST_CODE
 import com.emarsys.watchdog.activity.TransitionSafeCurrentActivityWatchdog
 import io.mockk.coEvery
 import io.mockk.every
