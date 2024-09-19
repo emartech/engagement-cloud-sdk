@@ -6,12 +6,8 @@ import com.emarsys.mobileengage.inapp.PushToInApp
 import com.emarsys.mobileengage.push.model.JsPlatformData
 import com.emarsys.mobileengage.push.model.JsPushMessage
 import com.emarsys.mobileengage.push.model.WebPushNotificationData
-import dev.mokkery.answering.returns
-import dev.mokkery.every
 import dev.mokkery.matcher.capture.Capture
-import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
-import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import org.w3c.notifications.NotificationAction
@@ -27,15 +23,11 @@ class PushMessagePresenterTests {
     }
 
     private val slot = Capture.slot<WebPushNotificationData>()
-    private lateinit var mockPushBroadcaster: PushBroadcasterApi
     private lateinit var pushMessagePresenter: PushMessagePresenter
 
     @BeforeTest
     fun setup() = runTest {
-        mockPushBroadcaster = mock()
-        every { mockPushBroadcaster.broadcast(capture(slot)) } returns Unit
-
-        pushMessagePresenter = PushMessagePresenter(mockPushBroadcaster)
+        pushMessagePresenter = PushMessagePresenter()
     }
 
     @Test
