@@ -18,4 +18,6 @@ class IosGathererPush(context: ApiContext<PushCall>,
         set(value) {}
     override val emarsysUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol
         get() = object: NSObject(), UNUserNotificationCenterDelegateProtocol {}
+
+    override fun registerEmarsysNotificationCenterDelegate() {}
 }

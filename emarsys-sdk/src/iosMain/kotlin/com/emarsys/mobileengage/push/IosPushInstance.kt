@@ -6,4 +6,6 @@ import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 interface IosPushInstance: PushInstance {
     var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol?
     val emarsysUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol
+
+    fun registerEmarsysNotificationCenterDelegate()
 }

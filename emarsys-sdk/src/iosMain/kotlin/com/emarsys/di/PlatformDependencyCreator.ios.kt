@@ -52,7 +52,9 @@ import com.emarsys.mobileengage.inapp.providers.WindowProvider
 import com.emarsys.mobileengage.push.IosGathererPush
 import com.emarsys.mobileengage.push.IosLoggingPush
 import com.emarsys.mobileengage.push.IosPush
+import com.emarsys.mobileengage.push.IosPushInstance
 import com.emarsys.mobileengage.push.IosPushInternal
+import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
 import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
@@ -103,7 +105,7 @@ actual class PlatformDependencyCreator actual constructor(
         inAppDownloader: InAppDownloaderApi,
         storage: TypedStorageApi<String?>
     ): State {
-        return PlatformInitState()
+        return PlatformInitState(pushApi as IosPushInstance)
     }
 
     actual override fun createPermissionHandler(): PermissionHandlerApi {
@@ -122,7 +124,7 @@ actual class PlatformDependencyCreator actual constructor(
         inAppDownloader: InAppDownloaderApi,
         inAppHandler: InAppHandlerApi
     ): PushToInAppHandlerApi {
-        TODO("Not yet implemented")
+        return PushToInAppHandler(inAppDownloader, inAppHandler)
     }
 
     actual override fun createConnectionWatchDog(sdkLogger: SdkLogger): ConnectionWatchDog {
@@ -194,7 +196,8 @@ actual class PlatformDependencyCreator actual constructor(
             notificationEvents,
             actionFactory,
             json,
-            sdkDispatcher
+            sdkDispatcher,
+            sdkLogger
         )
     }
 

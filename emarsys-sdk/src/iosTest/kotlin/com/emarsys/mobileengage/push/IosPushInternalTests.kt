@@ -69,7 +69,8 @@ class IosPushInternalTests {
             notificationEvents,
             mockActionFactory,
             json,
-            sdkDispatcher
+            sdkDispatcher,
+            mock()
         )
     }
 

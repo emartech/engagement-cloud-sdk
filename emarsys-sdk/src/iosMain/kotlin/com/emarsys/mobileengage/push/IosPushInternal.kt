@@ -6,11 +6,13 @@ import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.PushCall
 import com.emarsys.api.push.PushInternal
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.log.Logger
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
 import com.emarsys.networking.clients.push.PushClientApi
+import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -44,7 +46,8 @@ class IosPushInternal(
     override val notificationEvents: MutableSharedFlow<AppEvent>,
     private val actionFactory: ActionFactoryApi<ActionModel>,
     private val json: Json,
-    private val sdkDispatcher: CoroutineDispatcher
+    private val sdkDispatcher: CoroutineDispatcher,
+    private val sdkLogger: Logger
 ) : PushInternal(pushClient, storage, pushContext, notificationEvents), IosPushInstance {
     override var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol? =
         null
@@ -61,25 +64,34 @@ class IosPushInternal(
             customerUserNotificationCenterDelegate
         )
 
-    @OptIn(ExperimentalForeignApi::class)
+    override fun registerEmarsysNotificationCenterDelegate() {
+        (emarsysUserNotificationCenterDelegate as InternalNotificationCenterDelegateProxy).registerAsDelegate()
+    }
+
+    @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
     fun didReceiveNotificationResponse(
         actionIdentifier: String,
         userInfo: Map<String, Any>,
         withCompletionHandler: () -> Unit
     ) {
         CoroutineScope(sdkDispatcher).launch {
-            val userInfoData = platform.Foundation.NSJSONSerialization.dataWithJSONObject(
-                userInfo,
-                NSJSONWritingPrettyPrinted,
-                null
-            )
-            val userInfoJson = NSString.create(userInfoData!!, NSUTF8StringEncoding).toString()
-            val pushUserInfo: PushUserInfo = json.decodeFromString(userInfoJson)
+            try {
+                val userInfoData = platform.Foundation.NSJSONSerialization.dataWithJSONObject(
+                    userInfo,
+                    NSJSONWritingPrettyPrinted,
+                    null
+                )
 
-            handleActions(actionIdentifier, pushUserInfo)
+                val userInfoJson = NSString.create(userInfoData!!, NSUTF8StringEncoding).toString()
+                val pushUserInfo: PushUserInfo = json.decodeFromString(userInfoJson)
 
-            withContext(Dispatchers.Main) {
-                withCompletionHandler()
+                handleActions(actionIdentifier, pushUserInfo)
+
+                withContext(Dispatchers.Main) {
+                    withCompletionHandler()
+                }
+            } catch (exception: Exception) {
+                sdkLogger.error("IosPushInternal - didReceiveNotificationResponse", exception)
             }
         }
     }
@@ -119,6 +131,10 @@ class IosPushInternal(
         private val sdkContext: SdkContextApi,
         var customerDelegate: UNUserNotificationCenterDelegateProtocol?
     ) : UNUserNotificationCenterDelegateProtocol, NSObject() {
+
+        fun registerAsDelegate() {
+            UNUserNotificationCenter.currentNotificationCenter().delegate = this
+        }
 
         override fun userNotificationCenter(
             center: UNUserNotificationCenter,
