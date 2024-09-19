@@ -16,6 +16,8 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(project(":emarsys-sdk"))
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.kotlinx.coroutines.core)
         }
         jsMain {
             dependencies {

@@ -83,23 +83,6 @@ actual class PlatformDependencyCreator actual constructor(
         return StringStorage(emarsysWindow.localStorage)
     }
 
-    private val processedPushBroadcastChannel =
-        BroadcastChannel(WEB_PUSH_PROCESSED_PUSH_CHANNEL_NAME)
-
-    private val pushMessagePresenter: PushMessagePresenter by lazy {
-        PushMessagePresenter(WebPushBroadcaster(processedPushBroadcastChannel))
-    }
-
-    private val pushMessageMapper: PushMessageMapper by lazy {
-        PushMessageMapper(json, sdkLogger)
-    }
-
-    private val emarsysServiceWorker = EmarsysServiceWorker(
-        pushMessagePresenter,
-        pushMessageMapper,
-        sdkLogger
-    )
-
     actual override fun createDeviceInfoCollector(
         timezoneProvider: Provider<String>,
         storage: TypedStorageApi<String?>

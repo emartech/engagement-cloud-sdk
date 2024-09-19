@@ -20,13 +20,20 @@
 
 <script>
     let emarsys = new window["emarsys-sdk"].com.emarsys.EmarsysJs();
-    document.getElementById("buttonInit").onclick = async () => {await emarsys.init(window)}
+    (async () => {
+    try {
+        await emarsys.init(window);
+    } catch (e) {
+
+    }
+    })();
+    //document.getElementById("buttonInit").onclick = async () => {await emarsys.init(window)}
     document.getElementById("button1").onclick = async () => {
         await emarsys.enableTracking({
-            applicationCode: "EMS11-C3FD3",
+            applicationCode: "EMS04-F3514",
             serviceWorkerOptions: {
                 serviceWorkerPath: "/ems-service-worker.js",
-                applicationServerKey: "BHrFKdMsgSKMxUaWeituSxUO1GauXIqvYhbAo53QFk-0-UsZJwig_Ev-meZBMtWxt022rkI_oVkDPkHX7KQeq5o"
+                applicationServerKey: "BKlWDU3MxVpAEp7rjC5p9VYOhGBauYPO7K7b0117suJAoxaFzIwV4FT45eFI_hHBXgPlgKHyHDrbi1BpoKuiUww"
             }
         });
     }

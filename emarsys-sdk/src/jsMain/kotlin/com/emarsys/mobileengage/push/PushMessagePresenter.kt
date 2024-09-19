@@ -5,11 +5,11 @@ import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.inapp.PushToInApp
 import com.emarsys.mobileengage.push.model.JsPlatformData
 import com.emarsys.mobileengage.push.model.JsPushMessage
-import com.emarsys.mobileengage.push.model.WebPushNotificationData
+import com.emarsys.self
 import org.w3c.notifications.NotificationAction
 import org.w3c.notifications.NotificationOptions
 
-open class PushMessagePresenter(private val pushBroadcaster: PushBroadcasterApi) :
+open class PushMessagePresenter :
     PushPresenter<JsPlatformData, JsPushMessage> {
 
     override suspend fun present(pushMessage: JsPushMessage) {
@@ -20,23 +20,27 @@ open class PushMessagePresenter(private val pushBroadcaster: PushBroadcasterApi)
         }
 
         pushMessage.data.actions?.let {
-            notificationOptions.asDynamic().actions = createNotificationActions(it)
+            notificationOptions.actions = createNotificationActions(it)
         }
 
         pushMessage.data.pushToInApp?.let {
-            notificationOptions.asDynamic().data = createPushToInApp(it)
+            notificationOptions.data = createPushToInApp(it)
         }
 
-        pushBroadcaster.broadcast(WebPushNotificationData(pushMessage.title, notificationOptions))
+        self.registration.showNotification(
+            pushMessage.title,
+            notificationOptions.unsafeCast<web.notifications.NotificationOptions>()
+        )
     }
 
-    private fun createNotificationActions(actions: List<PresentableActionModel>) =
-        actions.map {
+    private fun createNotificationActions(actions: List<PresentableActionModel>): Array<NotificationAction> {
+        return actions.map {
             js("{}").unsafeCast<NotificationAction>().apply {
                 action = it.id
                 title = it.title
             }
-        }
+        }.toTypedArray()
+    }
 
     private fun createPushToInApp(it: PushToInApp): dynamic {
         val data = js("{}")
