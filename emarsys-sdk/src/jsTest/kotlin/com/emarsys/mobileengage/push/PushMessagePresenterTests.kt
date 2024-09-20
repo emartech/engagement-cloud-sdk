@@ -6,14 +6,21 @@ import com.emarsys.mobileengage.inapp.PushToInApp
 import com.emarsys.mobileengage.push.model.JsPlatformData
 import com.emarsys.mobileengage.push.model.JsPushMessage
 import com.emarsys.mobileengage.push.model.WebPushNotificationData
+import com.emarsys.util.JsonUtil
+import dev.mokkery.answering.returns
+import dev.mokkery.everySuspend
 import dev.mokkery.matcher.capture.Capture
+import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
+import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.encodeToString
 import org.w3c.notifications.NotificationAction
 import org.w3c.notifications.NotificationOptions
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+
 
 class PushMessagePresenterTests {
 
@@ -23,11 +30,19 @@ class PushMessagePresenterTests {
     }
 
     private val slot = Capture.slot<WebPushNotificationData>()
+    private lateinit var mockWebPushNotificationPresenter: WebPushNotificationPresenterApi
     private lateinit var pushMessagePresenter: PushMessagePresenter
 
     @BeforeTest
-    fun setup() = runTest {
-        pushMessagePresenter = PushMessagePresenter()
+    fun setup() {
+        mockWebPushNotificationPresenter = mock()
+        everySuspend {
+            mockWebPushNotificationPresenter.showNotification(
+                capture(slot)
+            )
+        } returns Unit
+
+        pushMessagePresenter = PushMessagePresenter(mockWebPushNotificationPresenter)
     }
 
     @Test
@@ -39,8 +54,9 @@ class PushMessagePresenterTests {
 
             pushMessagePresenter.present(testPushMessage)
 
-            slot.get().title shouldBe testPushMessage.title
-            JSON.stringify(slot.get().options) shouldBe JSON.stringify(expectedNotificationOptions)
+            val slotCapture = slot.get()
+            slotCapture.title shouldBe testPushMessage.title
+            JSON.stringify(slotCapture.options) shouldBe JSON.stringify(expectedNotificationOptions)
         }
 
     @Test
@@ -74,17 +90,12 @@ class PushMessagePresenterTests {
             "https://www.sap.com",
             false
         )
-        val testPushMessage = getTestJsPushMessage(image = IMAGE, icon = ICON, pushToInApp = pushToInApp)
+        val testPushMessage =
+            getTestJsPushMessage(image = IMAGE, icon = ICON, pushToInApp = pushToInApp)
         val expectedNotificationOptions: NotificationOptions =
             getTestNotificationOptions(testPushMessage, emptyArray())
-        val data = js("{}")
-        data["campaignId"] = pushToInApp.campaignId
-        data["url"] = pushToInApp.url
-        data["ignoreViewedEvent"] = pushToInApp.ignoreViewedEvent
-        expectedNotificationOptions.asDynamic().data = data
 
-
-            pushMessagePresenter.present(testPushMessage)
+        pushMessagePresenter.present(testPushMessage)
 
         slot.get().title shouldBe testPushMessage.title
         JSON.stringify(slot.get().options) shouldBe JSON.stringify(expectedNotificationOptions)
@@ -157,6 +168,7 @@ class PushMessagePresenterTests {
                 icon = testPushMessage.iconUrlString
                 badge = testPushMessage.imageUrlString
                 actions = notificationActions
+                data = JsonUtil.json.encodeToString<JsPushMessage>(testPushMessage)
             }
         return notificationOptions
     }

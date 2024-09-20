@@ -2,14 +2,15 @@ package com.emarsys.mobileengage.push
 
 
 import com.emarsys.mobileengage.action.models.PresentableActionModel
-import com.emarsys.mobileengage.inapp.PushToInApp
 import com.emarsys.mobileengage.push.model.JsPlatformData
 import com.emarsys.mobileengage.push.model.JsPushMessage
-import com.emarsys.self
+import com.emarsys.mobileengage.push.model.WebPushNotificationData
+import com.emarsys.util.JsonUtil
+import kotlinx.serialization.encodeToString
 import org.w3c.notifications.NotificationAction
 import org.w3c.notifications.NotificationOptions
 
-open class PushMessagePresenter :
+open class PushMessagePresenter(private val webPushNotificationPresenter: WebPushNotificationPresenterApi) :
     PushPresenter<JsPlatformData, JsPushMessage> {
 
     override suspend fun present(pushMessage: JsPushMessage) {
@@ -23,13 +24,13 @@ open class PushMessagePresenter :
             notificationOptions.actions = createNotificationActions(it)
         }
 
-        pushMessage.data.pushToInApp?.let {
-            notificationOptions.data = createPushToInApp(it)
-        }
+        notificationOptions.data = JsonUtil.json.encodeToString<JsPushMessage>(pushMessage)
 
-        self.registration.showNotification(
-            pushMessage.title,
-            notificationOptions.unsafeCast<web.notifications.NotificationOptions>()
+        webPushNotificationPresenter.showNotification(
+            WebPushNotificationData(
+                pushMessage.title,
+                notificationOptions
+            )
         )
     }
 
