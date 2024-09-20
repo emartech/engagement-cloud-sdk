@@ -1,12 +1,17 @@
 package com.emarsys
 
+import com.emarsys.api.push.PushConstants.WEB_PUSH_ON_NOTIFICATION_CLICKED_CHANNEL_NAME
 import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.mobileengage.push.PushMessageMapper
 import com.emarsys.mobileengage.push.PushMessagePresenter
+import com.emarsys.mobileengage.push.WebPushNotificationPresenter
+import com.emarsys.mobileengage.push.model.JsNotificationClickedData
+import com.emarsys.mobileengage.push.model.JsPushMessage
 import com.emarsys.util.JsonUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.serialization.encodeToString
 import web.broadcast.BroadcastChannel
 import web.events.EventType
 import web.push.PushEvent
@@ -14,12 +19,11 @@ import web.serviceworker.NotificationEvent
 
 
 fun main() {
-    val pushBroadcastChannel = BroadcastChannel("emarsys-service-worker-push-channel")
-
-
+    val onNotificationClickedBroadcastChannel =
+        BroadcastChannel(WEB_PUSH_ON_NOTIFICATION_CLICKED_CHANNEL_NAME)
 
     val sdkLogger = SdkLogger(ConsoleLogger())
-    val pushMessagePresenter = PushMessagePresenter()
+    val pushMessagePresenter = PushMessagePresenter(WebPushNotificationPresenter())
     val pushMessageMapper = PushMessageMapper(JsonUtil.json, sdkLogger)
 
     val emarsysServiceWorker = EmarsysServiceWorker(
@@ -28,7 +32,6 @@ fun main() {
         CoroutineScope(SupervisorJob()),
         SdkLogger(ConsoleLogger())
     )
-
 
     self.addEventListener(EventType("push"), { event: PushEvent ->
         event.data?.let {
@@ -44,19 +47,20 @@ fun main() {
     })
 
     self.addEventListener(EventType("notificationclick"), { event: NotificationEvent ->
-        console.log("notificationclick")
+        // TODO implement opening window in case it is not open
+        val jsPushMessage =
+            JsonUtil.json.decodeFromString<JsPushMessage>(event.notification.data.unsafeCast<String>())
+        onNotificationClickedBroadcastChannel.postMessage(
+            JsonUtil.json.encodeToString(
+                JsNotificationClickedData(
+                    event.action,
+                    jsPushMessage
+                )
+            )
+        )
     })
 
     self.addEventListener(EventType("pushsubscriptionchange"), {
         console.log("pushsubscriptionchange")
     })
-
-    processedPushBroadcastChannel.onmessage = { event ->
-        val notificationData = JSON.parse<WebPushNotificationData>(event.data as String)
-
-        self.registration.showNotification(
-            notificationData.title,
-            notificationData.options.asDynamic()
-        )
-    }
 }
