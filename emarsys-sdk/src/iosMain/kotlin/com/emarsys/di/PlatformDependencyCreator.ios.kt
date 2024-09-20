@@ -57,6 +57,8 @@ import com.emarsys.mobileengage.push.IosPushInternal
 import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
 import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.push.PushClientApi
+import com.emarsys.setup.PlatformInitializer
+import com.emarsys.setup.PlatformInitializerApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
@@ -77,6 +79,10 @@ actual class PlatformDependencyCreator actual constructor(
     private val msgHub: MsgHubApi
 ) : DependencyCreator {
     private val platformContext: CommonPlatformContext = platformContext as CommonPlatformContext
+
+    actual override fun createPlatformInitializer(pushActionFactory: ActionFactoryApi<ActionModel>): PlatformInitializerApi {
+        return PlatformInitializer()
+    }
 
     actual override fun createStorage(): TypedStorageApi<String?> {
         return StringStorage(platformContext.userDefaults)

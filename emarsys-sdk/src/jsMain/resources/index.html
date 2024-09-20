@@ -4,8 +4,7 @@
 
 </head>
 <body>
-<button type="button" id="buttonInit">Init</button>
-<button type="button" id="button1">Click me!</button>
+<button type="button" id="button1">Enable Tracking</button>
 <div style="width: 300px; height: 300px">
     <script src="js-bridge.js"></script>
     <button type="button" id="button2" me-button-clicked="buttonId">Click this button!</button>
@@ -20,14 +19,6 @@
 
 <script>
     let emarsys = new window["emarsys-sdk"].com.emarsys.EmarsysJs();
-    (async () => {
-    try {
-        await emarsys.init(window);
-    } catch (e) {
-
-    }
-    })();
-    //document.getElementById("buttonInit").onclick = async () => {await emarsys.init(window)}
     document.getElementById("button1").onclick = async () => {
         await emarsys.enableTracking({
             applicationCode: "EMS04-F3514",

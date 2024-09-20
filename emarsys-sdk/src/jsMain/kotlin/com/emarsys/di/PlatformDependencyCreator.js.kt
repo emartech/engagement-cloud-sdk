@@ -1,13 +1,12 @@
 package com.emarsys.di
 
-import com.emarsys.EmarsysServiceWorker
 import com.emarsys.api.AppEvent
 import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.LoggingPush
 import com.emarsys.api.push.Push
 import com.emarsys.api.push.PushApi
 import com.emarsys.api.push.PushCall
-import com.emarsys.api.push.PushConstants.WEB_PUSH_PROCESSED_PUSH_CHANNEL_NAME
+import com.emarsys.api.push.PushConstants.WEB_PUSH_ON_NOTIFICATION_CLICKED_CHANNEL_NAME
 import com.emarsys.api.push.PushGatherer
 import com.emarsys.api.push.PushInstance
 import com.emarsys.api.push.PushInternal
@@ -37,7 +36,6 @@ import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.url.WebExternalUrlOpener
 import com.emarsys.core.util.DownloaderApi
-import com.emarsys.emarsysWindow
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
@@ -50,24 +48,26 @@ import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.mobileengage.inapp.WebInAppPresenter
 import com.emarsys.mobileengage.inapp.WebInAppViewProvider
 import com.emarsys.mobileengage.inapp.WebPushToInAppHandler
-import com.emarsys.mobileengage.push.PushMessageMapper
-import com.emarsys.mobileengage.push.PushMessagePresenter
+import com.emarsys.mobileengage.push.PushNotificationClickHandler
 import com.emarsys.mobileengage.push.PushService
 import com.emarsys.mobileengage.push.PushServiceContext
-import com.emarsys.mobileengage.push.WebPushBroadcaster
 import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.PlatformInitState
+import com.emarsys.setup.PlatformInitializer
+import com.emarsys.setup.PlatformInitializerApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.connection.WebConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import com.emarsys.watchdog.lifecycle.WebLifeCycleWatchDog
+import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.Json
-import org.w3c.dom.BroadcastChannel
+import web.broadcast.BroadcastChannel
 import web.dom.document
 
 actual class PlatformDependencyCreator actual constructor(
@@ -79,8 +79,20 @@ actual class PlatformDependencyCreator actual constructor(
     private val msgHub: MsgHubApi,
 ) : DependencyCreator {
 
+    actual override fun createPlatformInitializer(
+        pushActionFactory: ActionFactoryApi<ActionModel>
+    ): PlatformInitializerApi {
+        val pushNotificationClickHandler = PushNotificationClickHandler(
+            pushActionFactory,
+            BroadcastChannel(WEB_PUSH_ON_NOTIFICATION_CLICKED_CHANNEL_NAME),
+            CoroutineScope(Dispatchers.Default + SupervisorJob())
+        )
+        return PlatformInitializer(pushNotificationClickHandler)
+
+    }
+
     actual override fun createStorage(): TypedStorageApi<String?> {
-        return StringStorage(emarsysWindow.localStorage)
+        return StringStorage(window.localStorage)
     }
 
     actual override fun createDeviceInfoCollector(
@@ -108,7 +120,7 @@ actual class PlatformDependencyCreator actual constructor(
         val scope = CoroutineScope(sdkDispatcher)
         val inappJsBridge = InAppJsBridge(actionFactory, json, scope)
 
-        return PlatformInitState(inappJsBridge)
+        return PlatformInitState(inappJsBridge, PushService(pushApi, pushServiceContext, storage))
     }
 
     actual override fun createPermissionHandler(): PermissionHandlerApi {
@@ -120,7 +132,7 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createExternalUrlOpener(): ExternalUrlOpenerApi {
-        return WebExternalUrlOpener(emarsysWindow, sdkLogger)
+        return WebExternalUrlOpener(window, sdkLogger)
     }
 
     actual override fun createPushToInAppHandler(
@@ -131,7 +143,7 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createConnectionWatchDog(sdkLogger: SdkLogger): ConnectionWatchDog {
-        return WebConnectionWatchDog(emarsysWindow)
+        return WebConnectionWatchDog(window)
     }
 
     actual override fun createLifeCycleWatchDog(): LifecycleWatchDog {
@@ -171,7 +183,7 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createClipboardHandler(): ClipboardHandlerApi {
-        return WebClipboardHandler(emarsysWindow.navigator.clipboard)
+        return WebClipboardHandler(window.navigator.clipboard)
     }
 
     actual override fun createPushInternal(
@@ -200,10 +212,10 @@ actual class PlatformDependencyCreator actual constructor(
 
     private fun getNavigatorData(): String {
         return listOf(
-            emarsysWindow.navigator.platform,
-            emarsysWindow.navigator.userAgent,
-            emarsysWindow.navigator.appVersion,
-            emarsysWindow.navigator.vendor,
+            window.navigator.platform,
+            window.navigator.userAgent,
+            window.navigator.appVersion,
+            window.navigator.vendor,
         ).joinToString(" ")
     }
 }

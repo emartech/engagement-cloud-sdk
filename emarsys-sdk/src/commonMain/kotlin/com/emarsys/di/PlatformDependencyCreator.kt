@@ -30,6 +30,7 @@ import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.push.PushClientApi
+import com.emarsys.setup.PlatformInitializerApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
@@ -45,6 +46,9 @@ expect class PlatformDependencyCreator(
     json: Json,
     msgHub: MsgHubApi
 ) : DependencyCreator {
+
+    override fun createPlatformInitializer(pushActionFactory: ActionFactoryApi<ActionModel>): PlatformInitializerApi
+
     override fun createStorage(): TypedStorageApi<String?>
 
     override fun createDeviceInfoCollector(

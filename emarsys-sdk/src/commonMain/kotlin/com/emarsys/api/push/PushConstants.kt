@@ -12,5 +12,5 @@ object PushConstants {
     const val INTENT_EXTRA_ACTION_KEY = "action"
     const val INTENT_EXTRA_DEFAULT_TAP_ACTION_KEY = "defaultTapAction"
     const val INTENT_EXTRA_PAYLOAD_KEY = "payload"
-    const val WEB_PUSH_PROCESSED_PUSH_CHANNEL_NAME = "emarsys-service-worker-processed-push-channel"
+    const val WEB_PUSH_ON_NOTIFICATION_CLICKED_CHANNEL_NAME = "emarsys-sdk-on-notification-clicked-channel"
 }

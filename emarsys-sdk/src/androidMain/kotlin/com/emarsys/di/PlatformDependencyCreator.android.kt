@@ -65,6 +65,8 @@ import com.emarsys.mobileengage.url.AndroidExternalUrlOpener
 import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.PlatformInitState
+import com.emarsys.setup.PlatformInitializer
+import com.emarsys.setup.PlatformInitializerApi
 import com.emarsys.watchdog.activity.TransitionSafeCurrentActivityWatchdog
 import com.emarsys.watchdog.connection.AndroidConnectionWatchDog
 import com.emarsys.watchdog.connection.ConnectionWatchDog
@@ -89,11 +91,14 @@ actual class PlatformDependencyCreator actual constructor(
 ) : DependencyCreator {
     private val platformContext: CommonPlatformContext = platformContext as CommonPlatformContext
     private val metadataReader = MetadataReader(applicationContext)
-    private val storage = createStorage()
     private val platformInfoCollector = PlatformInfoCollector(applicationContext)
 
     private val currentActivityWatchdog =
         TransitionSafeCurrentActivityWatchdog().also { it.register() }
+
+    actual override fun createPlatformInitializer(pushActionFactory: ActionFactoryApi<ActionModel>): PlatformInitializerApi {
+        return PlatformInitializer()
+    }
 
     actual override fun createLanguageProvider(): Provider<String> {
         return AndroidLanguageProvider(Locale.getDefault())

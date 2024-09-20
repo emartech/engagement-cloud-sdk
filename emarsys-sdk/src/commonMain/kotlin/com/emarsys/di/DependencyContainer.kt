@@ -119,6 +119,7 @@ import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.networking.clients.remoteConfig.RemoteConfigClient
 import com.emarsys.remoteConfig.RemoteConfigHandler
 import com.emarsys.remoteConfig.RemoteConfigHandlerApi
+import com.emarsys.setup.PlatformInitializerApi
 import com.emarsys.setup.SetupOrganizer
 import com.emarsys.setup.SetupOrganizerApi
 import com.emarsys.setup.states.AppStartState
@@ -240,9 +241,11 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         Downloader(httpClient, dependencyCreator.createFileCache(), sdkLogger)
 
     override val inAppDownloader: InAppDownloaderApi = InAppDownloader(downloaderApi)
-    private val inAppViewProvider: InAppViewProviderApi = dependencyCreator.createInAppViewProvider(eventActionFactory)
+    private val inAppViewProvider: InAppViewProviderApi =
+        dependencyCreator.createInAppViewProvider(eventActionFactory)
     private val inAppHandler: InAppHandlerApi = InAppHandler(inAppViewProvider, inAppPresenter)
-    private val pushToInAppHandler: PushToInAppHandlerApi = dependencyCreator.createPushToInAppHandler(inAppDownloader, inAppHandler)
+    private val pushToInAppHandler: PushToInAppHandlerApi =
+        dependencyCreator.createPushToInAppHandler(inAppDownloader, inAppHandler)
 
     override val pushActionFactory: ActionFactoryApi<ActionModel> =
         PushActionFactory(
@@ -533,6 +536,9 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         )
     }
 
+    private val platformInitializer: PlatformInitializerApi =
+        dependencyCreator.createPlatformInitializer(pushActionFactory)
+
 
     override suspend fun setup() {
         eventTrackerApi.registerOnContext()
@@ -543,5 +549,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         lifecycleWatchDog.register()
 
         mobileEngageSession.subscribe(lifecycleWatchDog)
+
+        platformInitializer.init()
     }
 }

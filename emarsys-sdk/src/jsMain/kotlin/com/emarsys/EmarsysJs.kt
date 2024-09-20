@@ -3,10 +3,11 @@ package com.emarsys
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.promise
-import org.w3c.dom.Window
 import kotlin.js.Promise
 
-lateinit var emarsysWindow: Window
+fun main() {
+    EmarsysJs().init()
+}
 
 @OptIn(ExperimentalJsExport::class)
 @JsExport
@@ -15,8 +16,7 @@ class EmarsysJs {
 
     private val coroutineScope: CoroutineScope = CoroutineScope(SupervisorJob())
 
-    fun init(window: Window): Promise<Any> {
-        emarsysWindow = window
+    fun init(): Promise<Any> {
         return coroutineScope.promise {
             Emarsys.initialize()
         }
