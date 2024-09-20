@@ -35,18 +35,27 @@ class EventActionFactory<ActionModelType>(
     private val msgHub: MsgHubApi,
     private val clipboardHandler: ClipboardHandlerApi,
     private val sdkLogger: SdkLogger
-): ActionFactoryApi<ActionModelType> {
+) : ActionFactoryApi<ActionModelType> {
     override suspend fun create(action: ActionModelType): Action<*> {
         return when (action) {
             is AppEventActionModel -> AppEventAction(action, onEventActionInternal)
             is CustomEventActionModel -> CustomEventAction(action, eventChannel)
-            is RequestPushPermissionActionModel -> RequestPushPermissionAction(action, permissionHandler)
+            is RequestPushPermissionActionModel -> RequestPushPermissionAction(
+                action,
+                permissionHandler
+            )
+
             is BadgeCountActionModel -> BadgeCountAction(action, badgeCountHandler)
             is DismissActionModel -> DismissAction(action, msgHub)
             is OpenExternalUrlActionModel -> OpenExternalUrlAction(action, externalUrlOpener)
             is ButtonClickedActionModel -> ButtonClickedAction(action)
             is CopyToClipboardActionModel -> CopyToClipboardAction(action, clipboardHandler)
-            else -> throw IllegalArgumentException("Unknown action type: $action")
+            else -> {
+                val exception = IllegalArgumentException("Unknown action type: $action")
+                sdkLogger.error("EventActionFactory", exception)
+                throw exception
+
+            }
         }
     }
 
