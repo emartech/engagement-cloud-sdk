@@ -1,10 +1,17 @@
 package com.emarsys.setup
 
+import com.emarsys.JsEmarsysConfig
+import com.emarsys.context.SdkContext
+import com.emarsys.core.log.LogLevel
 import com.emarsys.mobileengage.inapp.InAppJsBridgeApi
+import com.emarsys.mobileengage.push.PushServiceApi
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
+import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -13,29 +20,47 @@ class PlatformInitStateTests {
 
     private lateinit var platformInitState: PlatformInitState
     private lateinit var mockJsBridge: InAppJsBridgeApi
+    private lateinit var mockPushService: PushServiceApi
+    private lateinit var testSdkContext: SdkContext
 
     @BeforeTest
     fun setup() = runTest {
         mockJsBridge = mock()
+        testSdkContext = SdkContext(
+            StandardTestDispatcher(),
+            StandardTestDispatcher(),
+            mock(),
+            LogLevel.Info,
+            mutableSetOf()
+        )
+        mockPushService = mock()
         everySuspend { mockJsBridge.register() } returns Unit
-        platformInitState = PlatformInitState(mockJsBridge)
+        everySuspend { mockPushService.register(any()) } returns Unit
+        everySuspend { mockPushService.subscribeForPushMessages(any()) } returns Unit
+        platformInitState = PlatformInitState(mockJsBridge, mockPushService, testSdkContext)
     }
 
     @Test
     fun activate_shouldCallRegister_onJsBridge_ifSdkContext_hasConfig() = runTest {
-        platformInitState.active()
+        val testConfig = JsEmarsysConfig()
+        testSdkContext.config = testConfig
 
-        verifySuspend { mockJsBridge.register() }
-    }
-
-    @Test
-    fun activate_shouldNot_callRegister_onJsBridge_ifSdkContext_hasNoConfig() = runTest {
         platformInitState.active()
 
         verifySuspend {
-            repeat(0) {
-                mockJsBridge.register()
-            }
+            mockJsBridge.register()
+            mockPushService.register(testConfig)
+            mockPushService.subscribeForPushMessages(testConfig)
+        }
+    }
+
+    @Test
+    fun activate_shouldNot_callRegister_onPushService_ifSdkContext_hasNoConfig() = runTest {
+        platformInitState.active()
+
+        verifySuspend(VerifyMode.exactly(0)) {
+            mockPushService.register(any())
+            mockPushService.subscribeForPushMessages(any())
         }
     }
 }

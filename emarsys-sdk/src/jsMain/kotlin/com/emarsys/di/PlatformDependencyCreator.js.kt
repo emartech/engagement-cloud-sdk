@@ -121,7 +121,7 @@ actual class PlatformDependencyCreator actual constructor(
         val scope = CoroutineScope(sdkDispatcher)
         val inappJsBridge = InAppJsBridge(actionFactory, json, scope)
 
-        return PlatformInitState(inappJsBridge, PushService(pushApi, pushServiceContext, storage))
+        return PlatformInitState(inappJsBridge, PushService(pushApi, pushServiceContext, storage), sdkContext)
     }
 
     actual override fun createPermissionHandler(): PermissionHandlerApi {

@@ -3,8 +3,8 @@ package com.emarsys.mobileengage.push
 import com.emarsys.JsEmarsysConfig
 import com.emarsys.ServiceWorkerOptions
 import com.emarsys.api.push.PushConstants
+import com.emarsys.api.push.PushInternalApi
 import com.emarsys.core.storage.TypedStorageApi
-import com.emarsys.networking.clients.push.PushClientApi
 import js.buffer.BufferSource
 import js.promise.await
 import js.typedarrays.Uint8Array
@@ -14,7 +14,7 @@ import web.push.PushSubscriptionOptionsInit
 
 //TODO: add logger instead of console log
 class PushService(
-    private val pushClient: PushClientApi,
+    private val pushClient: PushInternalApi,
     private val pushServiceContext: PushServiceContext,
     private val storage: TypedStorageApi<String?>
 ) : PushServiceApi {
