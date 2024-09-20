@@ -85,7 +85,8 @@ actual class PlatformDependencyCreator actual constructor(
         val pushNotificationClickHandler = PushNotificationClickHandler(
             pushActionFactory,
             BroadcastChannel(WEB_PUSH_ON_NOTIFICATION_CLICKED_CHANNEL_NAME),
-            CoroutineScope(Dispatchers.Default + SupervisorJob())
+            CoroutineScope(Dispatchers.Default + SupervisorJob()),
+            sdkLogger
         )
         return PlatformInitializer(pushNotificationClickHandler)
 
