@@ -21,6 +21,7 @@ import com.emarsys.networking.clients.event.model.Event
 import com.emarsys.networking.clients.event.model.EventResponseInApp
 import com.emarsys.networking.clients.event.model.EventType
 import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.onEach
@@ -62,8 +63,13 @@ class EventClient(
                         sessionContext.deviceEventState
                     )
                 val body = json.encodeToString(requestBody)
-                val result: DeviceEventResponse =
-                    emarsysNetworkClient.send(UrlRequest(url, HttpMethod.Post, body)).body()
+                val response = emarsysNetworkClient.send(UrlRequest(url, HttpMethod.Post, body))
+
+                if(response.status == HttpStatusCode.NoContent) {
+                    return@onEach
+                }
+
+                val result: DeviceEventResponse = response.body()
                 handleDeviceEventState(result)
                 handleInApp(result.message)
                 handleOnAppEventAction(result)

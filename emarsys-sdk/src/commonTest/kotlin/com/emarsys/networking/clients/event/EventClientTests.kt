@@ -214,6 +214,29 @@ class EventClientTests {
         verifySuspend(VerifyMode.exactly(0)) { mockInAppView.load(any()) }
     }
 
+    @Test
+    fun testConsumer_shouldNotDoAnything_whenResponseStatusCodeIs204() = runTest {
+        everySuspend { mockEmarsysClient.send(any()) }.returns(
+            createTestResponse(
+                statusCode = HttpStatusCode.NoContent,
+                body = ""
+            )
+        )
+        val expectedUrlRequest = createTestRequest(null)
+
+        eventClient = createEventClient()
+
+        eventClient.registerEvent(testEvent)
+
+        advanceUntilIdle()
+
+        verifySuspend { mockEmarsysClient.send(expectedUrlRequest) }
+        verifySuspend(VerifyMode.exactly(0)) { mockInAppViewProvider.provide() }
+        verifySuspend(VerifyMode.exactly(0)) { mockInAppView.load(any()) }
+        verifySuspend(VerifyMode.exactly(0)) { mockOnEventActionFactory.create(any()) }
+        sessionContext.deviceEventState shouldBe null
+    }
+
     private fun createTestRequest(deviceEventState: JsonObject? = null): UrlRequest {
         val expectedUrlRequest = UrlRequest(
             TEST_BASE_URL,
@@ -223,11 +246,14 @@ class EventClientTests {
         return expectedUrlRequest
     }
 
-    private fun createTestResponse(body: String = "") = Response(
+    private fun createTestResponse(
+        body: String = "",
+        statusCode: HttpStatusCode = HttpStatusCode.OK
+    ) = Response(
         UrlRequest(
             TEST_BASE_URL,
             HttpMethod.Post
-        ), HttpStatusCode.OK, Headers.Empty, bodyAsText = body
+        ), statusCode, Headers.Empty, bodyAsText = body
     )
 
     private fun createEventClient() = EventClient(
