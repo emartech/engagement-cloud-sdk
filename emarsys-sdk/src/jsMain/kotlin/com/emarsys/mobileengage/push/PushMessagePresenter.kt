@@ -42,12 +42,4 @@ open class PushMessagePresenter(private val webPushNotificationPresenter: WebPus
             }
         }.toTypedArray()
     }
-
-    private fun createPushToInApp(it: PushToInApp): dynamic {
-        val data = js("{}")
-        data["campaignId"] = it.campaignId
-        data["url"] = it.url
-        data["ignoreViewedEvent"] = it.ignoreViewedEvent
-        return data
-    }
 }
