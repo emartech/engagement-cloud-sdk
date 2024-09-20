@@ -2,6 +2,7 @@ package com.emarsys.mobileengage.push
 
 import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.SdkLogger
+import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.action.models.PresentableOpenExternalUrlActionModel
 import com.emarsys.mobileengage.inapp.PushToInApp
 import com.emarsys.mobileengage.push.model.JsPlatformData
@@ -112,7 +113,8 @@ class PushMessageMapperTests {
                         title = "actionTitle1",
                         url = "https://www.sap.com"
                     ),
-                )
+                ),
+                defaultTapAction = BasicOpenExternalUrlActionModel("https://sap.com")
             )
         )
 
