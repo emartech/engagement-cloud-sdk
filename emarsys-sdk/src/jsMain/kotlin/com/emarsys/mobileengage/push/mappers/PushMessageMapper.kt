@@ -1,9 +1,10 @@
-package com.emarsys.mobileengage.push
+package com.emarsys.mobileengage.push.mappers
 
 import com.emarsys.core.log.Logger
 import com.emarsys.core.mapper.Mapper
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.action.models.PresentableOpenExternalUrlActionModel
+import com.emarsys.mobileengage.push.PushData
 import com.emarsys.mobileengage.push.model.JsPlatformData
 import com.emarsys.mobileengage.push.model.JsPushMessage
 import com.emarsys.mobileengage.push.model.RemoteWebPushMessage

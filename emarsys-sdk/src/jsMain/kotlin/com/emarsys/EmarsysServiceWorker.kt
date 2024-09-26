@@ -1,8 +1,10 @@
 package com.emarsys
 
 import com.emarsys.core.log.Logger
-import com.emarsys.mobileengage.push.PushMessageMapper
 import com.emarsys.mobileengage.push.PushMessagePresenter
+import com.emarsys.mobileengage.push.mappers.PushMessageMapper
+import com.emarsys.mobileengage.push.mappers.PushMessageWebV1Mapper
+import com.emarsys.mobileengage.push.model.JsPushMessage
 import js.promise.Promise
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.promise
@@ -15,6 +17,7 @@ external var self: ServiceWorkerGlobalScope
 class EmarsysServiceWorker(
     private val pushMessagePresenter: PushMessagePresenter,
     private val pushMessageMapper: PushMessageMapper,
+    private val pushMessageWebV1Mapper: PushMessageWebV1Mapper,
     private val coroutineScope: CoroutineScope,
     private val sdkLogger: Logger
 ) {
@@ -28,7 +31,9 @@ class EmarsysServiceWorker(
         return Promise { resolve, reject ->
             coroutineScope.promise {
                 try {
-                    pushMessageMapper.map(event)?.let {
+                    val pushMessage: JsPushMessage? =
+                        pushMessageMapper.map(event) ?: pushMessageWebV1Mapper.map(event)
+                    pushMessage?.let {
                         pushMessagePresenter.present(it)
                     }
                 } catch (exception: Exception) {

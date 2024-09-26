@@ -3,9 +3,10 @@ package com.emarsys
 import com.emarsys.api.push.PushConstants.WEB_PUSH_ON_NOTIFICATION_CLICKED_CHANNEL_NAME
 import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.SdkLogger
-import com.emarsys.mobileengage.push.PushMessageMapper
 import com.emarsys.mobileengage.push.PushMessagePresenter
 import com.emarsys.mobileengage.push.WebPushNotificationPresenter
+import com.emarsys.mobileengage.push.mappers.PushMessageMapper
+import com.emarsys.mobileengage.push.mappers.PushMessageWebV1Mapper
 import com.emarsys.mobileengage.push.model.JsNotificationClickedData
 import com.emarsys.mobileengage.push.model.JsPushMessage
 import com.emarsys.util.JsonUtil
@@ -25,10 +26,12 @@ fun main() {
     val sdkLogger = SdkLogger(ConsoleLogger())
     val pushMessagePresenter = PushMessagePresenter(WebPushNotificationPresenter())
     val pushMessageMapper = PushMessageMapper(JsonUtil.json, sdkLogger)
+    val pushMessageWebV1Mapper = PushMessageWebV1Mapper(JsonUtil.json, sdkLogger)
 
     val emarsysServiceWorker = EmarsysServiceWorker(
         pushMessagePresenter,
         pushMessageMapper,
+        pushMessageWebV1Mapper,
         CoroutineScope(SupervisorJob()),
         SdkLogger(ConsoleLogger())
     )

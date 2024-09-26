@@ -1,10 +1,11 @@
-package com.emarsys.mobileengage.push
+package com.emarsys.mobileengage.push.mappers
 
 import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.action.models.PresentableOpenExternalUrlActionModel
 import com.emarsys.mobileengage.inapp.PushToInApp
+import com.emarsys.mobileengage.push.PushData
 import com.emarsys.mobileengage.push.model.JsPlatformData
 import com.emarsys.mobileengage.push.model.JsPushMessage
 import com.emarsys.util.JsonUtil
