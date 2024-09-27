@@ -8,8 +8,8 @@ import com.emarsys.api.push.PushInstance
 import com.emarsys.api.push.PushInternalApi
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
-import com.emarsys.core.IosBadgeCountHandler
 import com.emarsys.core.badge.BadgeCountHandlerApi
+import com.emarsys.core.badge.IosBadgeCountHandler
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.cache.IosFileCache
 import com.emarsys.core.clipboard.ClipboardHandlerApi
@@ -66,6 +66,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.Json
 import platform.Foundation.NSFileManager
+import platform.Foundation.NSProcessInfo
 import platform.UIKit.UIApplication
 import platform.UIKit.UIPasteboard
 import platform.UserNotifications.UNUserNotificationCenter
@@ -79,6 +80,9 @@ actual class PlatformDependencyCreator actual constructor(
     private val msgHub: MsgHubApi
 ) : DependencyCreator {
     private val platformContext: CommonPlatformContext = platformContext as CommonPlatformContext
+    private val notificationCenter = UNUserNotificationCenter.currentNotificationCenter()
+    private val processInfo = NSProcessInfo()
+    private val uiDevice = UIDevice(processInfo)
 
     actual override fun createPlatformInitializer(pushActionFactory: ActionFactoryApi<ActionModel>): PlatformInitializerApi {
         return PlatformInitializer()
@@ -97,7 +101,7 @@ actual class PlatformDependencyCreator actual constructor(
             createApplicationVersionProvider(),
             createLanguageProvider(),
             timezoneProvider,
-            UIDevice(),
+            uiDevice,
             json,
         )
     }
@@ -115,11 +119,11 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createPermissionHandler(): PermissionHandlerApi {
-        return IosPermissionHandler(UNUserNotificationCenter.currentNotificationCenter())
+        return IosPermissionHandler(notificationCenter)
     }
 
     actual override fun createBadgeCountHandler(): BadgeCountHandlerApi {
-        return IosBadgeCountHandler()
+        return IosBadgeCountHandler(notificationCenter, uiDevice, sdkContext.mainDispatcher)
     }
 
     actual override fun createExternalUrlOpener(): ExternalUrlOpenerApi {

@@ -2,8 +2,8 @@ package com.emarsys.core.badge
 
 interface BadgeCountHandlerApi {
 
-    fun add(value: Int)
+    suspend fun add(increment: Int)
 
-    fun set(value: Int)
+    suspend fun set(value: Int)
 
 }

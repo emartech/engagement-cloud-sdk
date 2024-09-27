@@ -2,11 +2,11 @@ package com.emarsys.core.badge
 
 class WebBadgeCountHandler: BadgeCountHandlerApi {
 
-    override fun add(value: Int) {
+    override suspend fun add(increment: Int) {
         TODO("Not yet implemented")
     }
 
-    override fun set(value: Int) {
+    override suspend fun set(value: Int) {
         TODO("Not yet implemented")
     }
 }
