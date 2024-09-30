@@ -25,3 +25,14 @@ data class PresentablePushToInAppActionModel(
     val name: String,
     val payload: PushToInApp
 ) : PresentableActionModel()
+
+@Serializable
+@SerialName("MEInApp")
+data class BasicPushToInAppActionModel(
+    val name: String,
+    val payload: PushToInApp
+) : BasicActionModel()
+
+fun BasicPushToInAppActionModel.toInternalPushToInAppActionModel(): InternalPushToInappActionModel {
+    return InternalPushToInappActionModel(payload.campaignId, payload.url)
+}

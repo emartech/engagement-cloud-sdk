@@ -4,12 +4,15 @@ import com.emarsys.core.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.mobileengage.action.actions.CustomEventAction
 import com.emarsys.mobileengage.action.actions.PushToInappAction
 import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.action.models.BasicPushToInAppActionModel
 import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
 import com.emarsys.mobileengage.action.models.PresentableCustomEventActionModel
+import com.emarsys.mobileengage.inapp.PushToInApp
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
@@ -18,6 +21,10 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class PushActionFactoryTests {
+    private companion object {
+        const val URL = "url"
+        const val CAMPAIGN_ID = "campaignId"
+    }
 
     private lateinit var pushActionFactory: PushActionFactory
     private lateinit var mockEventActionFactory: ActionFactoryApi<ActionModel>
@@ -32,15 +39,25 @@ class PushActionFactoryTests {
 
     @Test
     fun create_shouldReturn_pushToInAppAction() = runTest {
-        val testActionModel = InternalPushToInappActionModel("campaignId", "url")
+        val testActionModel = InternalPushToInappActionModel(CAMPAIGN_ID, URL)
 
         val result = pushActionFactory.create(testActionModel)
 
         result.shouldBeTypeOf<PushToInappAction>()
-        verifySuspend {
-            repeat(0) {
-                mockEventActionFactory.create(any())
-            }
+        verifySuspend(VerifyMode.exactly(0)) {
+            mockEventActionFactory.create(any())
+        }
+    }
+
+    @Test
+    fun create_shouldReturn_pushToInAppAction_fromBasicPushToInAppActionModel() = runTest {
+        val testBasicActionModel = BasicPushToInAppActionModel("pushToInApp", PushToInApp(CAMPAIGN_ID, URL))
+
+        val result = pushActionFactory.create(testBasicActionModel)
+
+        result.shouldBeTypeOf<PushToInappAction>()
+        verifySuspend(VerifyMode.exactly(0)) {
+            mockEventActionFactory.create(any())
         }
     }
 
