@@ -1,35 +1,45 @@
-<html>
+<html lang="en">
 <head>
+    <title>Emarsys SDK demo</title>
     <script src="emarsys-sdk.js"></script>
-
 </head>
 <body>
-<button type="button" id="button1">Enable Tracking</button>
-<div style="width: 300px; height: 300px">
-    <script src="js-bridge.js"></script>
-    <button type="button" id="button2" me-button-clicked="buttonId">Click this button!</button>
-    <button type="button" id="button3"
-            me-trigger-event="{&quot;type&quot;:&quot;customEvent&quot;,&quot;name&quot;:&quot;custom event name&quot;,&quot;payload&quot;:{&quot;key&quot;:&quot;value&quot;}}">
-        Click me for custom event!
-    </button>
-    <button type="button" id="button4"
-            me-trigger-app-event="{&quot;type&quot;:&quot;appEvent&quot;,&quot;name&quot;:&quot;app event name&quot;,&quot;payload&quot;:{&quot;key&quot;:&quot;value&quot;}}">
-        Click me for app event!
-    </button>
-    <button type="button" id="button5" me-request-push-permission="{}">Click me for push
-        permission!
-    </button>
-    <button type="button" id="button6" href="https://sap.com">To SAP home page!</button>
-    <button type="button" id="button7" me-close>Close!</button>
-    <button type="button" id="button8" me-copy-to-clipboard="copied text for clipboard">Copy some
-        text to clipboard
-    </button>
+<div style="display: flex; gap:1rem; flex-wrap:no-wrap">
+    <div style="flex: 1;">
+        <button type="button" id="button-sdk-test">Enable Tracking with <strong>sdk-test</strong>
+            account
+        </button>
+    </div>
+    <div style="flex: 1;">
+        <button type="button" id="button-integration-demo">Enable Tracking with
+            <strong>integration-demo</strong> account
+        </button>
+        <small>For testing with old push payload only</small>
+    </div>
 </div>
+<hr>
+<label>CustomEventName:
+    <input id="customEventNameInput" name="customEventName" type="text">
+</label>
+<button type="button" id="button-custom-event">Track!</button>
 </body>
 
 <script>
     let emarsys = new window["emarsys-sdk"].com.emarsys.EmarsysJs();
-    document.getElementById("button1").onclick = async () => {
+    document.getElementById("button-sdk-test").onclick = async () => {
+        const config = new window["emarsys-sdk"].com.emarsys.JsEmarsysConfig(
+            "EMSE3-B4341",
+            null,
+            null,
+            new window["emarsys-sdk"].com.emarsys.ServiceWorkerOptions(
+                "BKlWDU3MxVpAEp7rjC5p9VYOhGBauYPO7K7b0117suJAoxaFzIwV4FT45eFI_hHBXgPlgKHyHDrbi1BpoKuiUww",
+                "/ems-service-worker.js"
+            )
+        )
+        await emarsys.enableTracking(config);
+    }
+
+    document.getElementById("button-integration-demo").onclick = async () => {
         const config = new window["emarsys-sdk"].com.emarsys.JsEmarsysConfig(
             "EMS04-F3514",
             null,
@@ -40,6 +50,10 @@
             )
         )
         await emarsys.enableTracking(config);
+    }
+
+    document.getElementById("button-custom-event").onclick = async () => {
+        await emarsys.trackCustomEvent(document.getElementById("customEventNameInput").value);
     }
 </script>
 </html>
