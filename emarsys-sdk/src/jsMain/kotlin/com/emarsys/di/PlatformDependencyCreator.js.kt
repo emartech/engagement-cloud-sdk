@@ -47,10 +47,10 @@ import com.emarsys.mobileengage.inapp.InAppScriptExtractorApi
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.mobileengage.inapp.WebInAppPresenter
 import com.emarsys.mobileengage.inapp.WebInAppViewProvider
-import com.emarsys.mobileengage.inapp.WebPushToInAppHandler
 import com.emarsys.mobileengage.push.PushNotificationClickHandler
 import com.emarsys.mobileengage.push.PushService
 import com.emarsys.mobileengage.push.PushServiceContext
+import com.emarsys.mobileengage.pushtoinapp.WebPushToInAppHandler
 import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.PlatformInitState
@@ -140,7 +140,7 @@ actual class PlatformDependencyCreator actual constructor(
         inAppDownloader: InAppDownloaderApi,
         inAppHandler: InAppHandlerApi
     ): PushToInAppHandlerApi {
-        return WebPushToInAppHandler()
+        return WebPushToInAppHandler(inAppDownloader, inAppHandler)
     }
 
     actual override fun createConnectionWatchDog(sdkLogger: SdkLogger): ConnectionWatchDog {
