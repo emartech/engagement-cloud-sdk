@@ -26,7 +26,7 @@ class AndroidPermissionHandler(
             )
             if (isPushPermissionGranted != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(
-                    currentActivityWatchdog.getCurrentActivity(),
+                    currentActivityWatchdog.waitForActivity(),
                     arrayOf(Manifest.permission.POST_NOTIFICATIONS),
                     PERMISSION_REQUEST_CODE
                 )

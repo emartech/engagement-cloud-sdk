@@ -91,7 +91,7 @@ class AndroidPermissionHandlerTests {
             } returns PackageManager.PERMISSION_DENIED
             every { ActivityCompat.requestPermissions(any(), any(), any()) } returns Unit
             val mockActivity = mockk<Activity>()
-            coEvery { mockCurrentActivityWatchdog.getCurrentActivity() } returns mockActivity
+            coEvery { mockCurrentActivityWatchdog.waitForActivity() } returns mockActivity
 
             androidPermissionHandler.requestPushPermission()
 

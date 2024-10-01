@@ -78,7 +78,11 @@ class TransitionSafeCurrentActivityWatchdog : ActivityLifecycleCallbacks {
         (applicationContext as Application).registerActivityLifecycleCallbacks(this)
     }
 
-    suspend fun getCurrentActivity(): Activity {
+    suspend fun waitForActivity(): Activity {
         return currentActivityFlow.first { activity -> activity != null}!!
+    }
+
+    suspend fun currentActivity(): Activity? {
+        return currentActivityFlow.first()
     }
 }

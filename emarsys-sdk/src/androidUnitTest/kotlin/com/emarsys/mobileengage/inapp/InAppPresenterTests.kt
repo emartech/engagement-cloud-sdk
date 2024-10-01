@@ -42,7 +42,7 @@ class InAppPresenterTests {
             val mockActivity = mockk<FragmentActivity> {
                 every { supportFragmentManager } returns mockFragmentManager
             }
-            coEvery { mockCurrentActivityWatchdog.getCurrentActivity() } returns mockActivity
+            coEvery { mockCurrentActivityWatchdog.waitForActivity() } returns mockActivity
             val mockView = mockk<InAppView>()
 
             inAppPresenter.present(mockView, InAppPresentationMode.Overlay)
@@ -65,7 +65,7 @@ class InAppPresenterTests {
         runTest {
             mockkStatic("com.emarsys.mobileengage.inapp.InAppPresenterKt")
             val mockActivity = mockk<Activity>()
-            coEvery { mockCurrentActivityWatchdog.getCurrentActivity() } returns mockActivity
+            coEvery { mockCurrentActivityWatchdog.waitForActivity() } returns mockActivity
             val mockView = mockk<InAppView>()
 
             inAppPresenter.present(mockView, InAppPresentationMode.Overlay)
