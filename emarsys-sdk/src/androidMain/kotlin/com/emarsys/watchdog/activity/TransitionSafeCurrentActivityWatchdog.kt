@@ -13,25 +13,32 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.lang.ref.WeakReference
 
 
 class TransitionSafeCurrentActivityWatchdog : ActivityLifecycleCallbacks {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private var setActivityJob: Job? = null
+    private var currentActivity: WeakReference<Activity?> = WeakReference(null)
     private val currentActivityFlow: MutableStateFlow<Activity?> = MutableStateFlow(null)
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
         currentActivityFlow.value = null
+        currentActivity = WeakReference(null)
     }
 
     override fun onActivityStarted(activity: Activity) {
         currentActivityFlow.value = null
+        currentActivity = WeakReference(null)
     }
 
     override fun onActivityResumed(activity: Activity) {
+        currentActivity = WeakReference(activity)
         setActivityJob = scope.launch {
             delay(500)
-            currentActivityFlow.value = activity
+            currentActivity.get()?.let {
+                currentActivityFlow.value = it
+            }
         }
     }
 
@@ -39,6 +46,7 @@ class TransitionSafeCurrentActivityWatchdog : ActivityLifecycleCallbacks {
         if (activity == currentActivityFlow.value) {
             currentActivityFlow.value = null
             setActivityJob?.cancel()
+            currentActivity = WeakReference(null)
         }
     }
 
@@ -46,6 +54,7 @@ class TransitionSafeCurrentActivityWatchdog : ActivityLifecycleCallbacks {
         if (activity == currentActivityFlow.value) {
             currentActivityFlow.value = null
             setActivityJob?.cancel()
+            currentActivity = WeakReference(null)
         }
     }
 
@@ -53,6 +62,7 @@ class TransitionSafeCurrentActivityWatchdog : ActivityLifecycleCallbacks {
         if (activity == currentActivityFlow.value) {
             currentActivityFlow.value = null
             setActivityJob?.cancel()
+            currentActivity = WeakReference(null)
         }
     }
 
@@ -60,6 +70,7 @@ class TransitionSafeCurrentActivityWatchdog : ActivityLifecycleCallbacks {
         if (activity == currentActivityFlow.value) {
             currentActivityFlow.value = null
             setActivityJob?.cancel()
+            currentActivity = WeakReference(null)
         }
     }
 
@@ -68,6 +79,6 @@ class TransitionSafeCurrentActivityWatchdog : ActivityLifecycleCallbacks {
     }
 
     suspend fun getCurrentActivity(): Activity {
-       return currentActivityFlow.first { activity -> activity != null}!!
+        return currentActivityFlow.first { activity -> activity != null}!!
     }
 }
