@@ -1,7 +1,7 @@
 package com.emarsys.mobileengage.session
 
 import com.emarsys.context.SdkContextApi
-import com.emarsys.core.actions.LifecycleEvent
+import com.emarsys.core.lifecycle.LifecycleEvent
 import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.Provider

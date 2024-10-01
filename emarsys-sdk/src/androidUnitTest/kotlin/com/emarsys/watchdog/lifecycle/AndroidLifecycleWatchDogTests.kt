@@ -1,7 +1,7 @@
 package com.emarsys.watchdog.lifecycle
 
 import androidx.lifecycle.Lifecycle
-import com.emarsys.core.actions.LifecycleEvent
+import com.emarsys.core.lifecycle.LifecycleEvent
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import io.mockk.verify

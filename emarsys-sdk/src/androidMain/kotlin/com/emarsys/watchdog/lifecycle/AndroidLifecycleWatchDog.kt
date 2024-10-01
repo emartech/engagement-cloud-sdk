@@ -3,7 +3,7 @@ package com.emarsys.watchdog.lifecycle
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
-import com.emarsys.core.actions.LifecycleEvent
+import com.emarsys.core.lifecycle.LifecycleEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow

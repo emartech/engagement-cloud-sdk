@@ -1,6 +1,6 @@
 package com.emarsys.watchdog.lifecycle
 
-import com.emarsys.core.actions.LifecycleEvent
+import com.emarsys.core.lifecycle.LifecycleEvent
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

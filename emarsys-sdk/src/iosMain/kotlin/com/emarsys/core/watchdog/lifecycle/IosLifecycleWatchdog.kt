@@ -1,6 +1,6 @@
 package com.emarsys.core.watchdog.lifecycle
 
-import com.emarsys.core.actions.LifecycleEvent
+import com.emarsys.core.lifecycle.LifecycleEvent
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 
 import kotlinx.coroutines.CoroutineScope

@@ -1,4 +1,4 @@
-package com.emarsys.core.actions
+package com.emarsys.core.lifecycle
 
 enum class LifecycleEvent {
     OnForeground, OnBackground
