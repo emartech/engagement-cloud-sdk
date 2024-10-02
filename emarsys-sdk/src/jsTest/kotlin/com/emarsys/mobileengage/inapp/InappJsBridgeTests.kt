@@ -4,10 +4,10 @@ import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.actions.ButtonClickedAction
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
-import com.emarsys.mobileengage.action.models.BasicButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.BasicCopyToClipboardActionModel
 import com.emarsys.mobileengage.action.models.BasicCustomEventActionModel
 import com.emarsys.mobileengage.action.models.BasicDismissActionModel
+import com.emarsys.mobileengage.action.models.BasicInAppButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.action.models.RequestPushPermissionActionModel
 import com.emarsys.util.JsonUtil
@@ -33,7 +33,8 @@ import kotlin.test.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class InappJsBridgeTests {
     private companion object {
-        val testAction = ButtonClickedAction(BasicButtonClickedActionModel("1", "testId"))
+        const val CAMPAIGN_ID = "testCampaignId"
+        val testAction = ButtonClickedAction(BasicInAppButtonClickedActionModel("1", CAMPAIGN_ID))
     }
 
     private lateinit var inappJsBridge: InAppJsBridgeApi
@@ -58,14 +59,14 @@ class InappJsBridgeTests {
 
     @Test
     fun buttonClicked_shouldTrigger_actionFactory() = runTest {
-        val testActionModel = BasicButtonClickedActionModel("1", "inputButtonId")
+        val testActionModel = BasicInAppButtonClickedActionModel("1", CAMPAIGN_ID)
         everySuspend {
             mockActionFactory.create(action = testActionModel)
         } returns testAction
 
         inappJsBridge.register()
 
-        window.asDynamic()["EMSInappWebBridge"].buttonClicked("""{"id":"1","buttonId":"inputButtonId"}""")
+        window.asDynamic()["EMSInappWebBridge"].buttonClicked("""{"id":"1","campaignId":"$CAMPAIGN_ID"}""")
 
         advanceUntilIdle()
 
