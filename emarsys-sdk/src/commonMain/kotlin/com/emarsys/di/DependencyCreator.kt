@@ -38,6 +38,8 @@ interface DependencyCreator {
 
     fun createPlatformInitializer(pushActionFactory: ActionFactoryApi<ActionModel>): PlatformInitializerApi
 
+    fun createPlatformContext(pushActionFactory: ActionFactoryApi<ActionModel>): PlatformContext
+
     fun createStorage(): TypedStorageApi<String?>
 
     fun createDeviceInfoCollector(

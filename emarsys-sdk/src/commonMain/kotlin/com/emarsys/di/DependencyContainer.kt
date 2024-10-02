@@ -61,6 +61,8 @@ import com.emarsys.api.push.PushInstance
 import com.emarsys.context.DefaultUrls
 import com.emarsys.context.DefaultUrlsApi
 import com.emarsys.context.SdkContext
+import com.emarsys.core.actions.ActionHandler
+import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.channel.DeviceEventChannel
 import com.emarsys.core.channel.DeviceEventChannelApi
@@ -195,12 +197,6 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         OnEventActionInternal()
     }
 
-    private val httpClient = HttpClient {
-        install(ContentNegotiation) {
-            json(json)
-        }
-        install(HttpRequestRetry)
-    }
     private val httpClient by lazy {
         HttpClient {
             install(ContentNegotiation) {
@@ -210,15 +206,16 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         }
     }
 
+    override val pushActionHandler: ActionHandlerApi by lazy { ActionHandler() }
 
     private val dependencyCreator: DependencyCreator by lazy {
         PlatformDependencyCreator(
-            platformContext,
             sdkContext,
             uuidProvider,
             sdkLogger,
             json,
-            msgHub
+            msgHub,
+            pushActionHandler
         )
     }
 
@@ -244,7 +241,9 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         dependencyCreator.createInAppPresenter()
     }
 
-    override val stringStorage: TypedStorageApi<String?> = dependencyCreator.createStorage()
+    override val platformContext: PlatformContext by lazy {
+        dependencyCreator.createPlatformContext(pushActionFactory)
+    }
 
     override val stringStorage: TypedStorageApi<String?> by lazy {
         dependencyCreator.createStorage()

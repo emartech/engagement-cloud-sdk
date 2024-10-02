@@ -13,6 +13,7 @@ import com.emarsys.api.push.PushInternal
 import com.emarsys.api.push.PushInternalApi
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.badge.WebBadgeCountHandler
 import com.emarsys.core.cache.FileCacheApi
@@ -71,12 +72,12 @@ import web.broadcast.BroadcastChannel
 import web.dom.document
 
 actual class PlatformDependencyCreator actual constructor(
-    platformContext: PlatformContext,
     private val sdkContext: SdkContextApi,
     private val uuidProvider: Provider<String>,
     private val sdkLogger: Logger,
     private val json: Json,
     private val msgHub: MsgHubApi,
+    actionHandler: ActionHandlerApi
 ) : DependencyCreator {
 
     actual override fun createPlatformInitializer(
@@ -90,6 +91,10 @@ actual class PlatformDependencyCreator actual constructor(
         )
         return PlatformInitializer(pushNotificationClickHandler)
 
+    }
+
+    actual override fun createPlatformContext(pushActionFactory: ActionFactoryApi<ActionModel>): PlatformContext {
+        return JSPlatformContext()
     }
 
     actual override fun createStorage(): TypedStorageApi<String?> {

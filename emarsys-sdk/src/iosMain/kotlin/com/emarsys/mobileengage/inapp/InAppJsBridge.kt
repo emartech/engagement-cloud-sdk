@@ -4,10 +4,10 @@ import com.emarsys.core.log.Logger
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
-import com.emarsys.mobileengage.action.models.BasicButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.BasicCopyToClipboardActionModel
 import com.emarsys.mobileengage.action.models.BasicCustomEventActionModel
 import com.emarsys.mobileengage.action.models.BasicDismissActionModel
+import com.emarsys.mobileengage.action.models.BasicInAppButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.action.models.RequestPushPermissionActionModel
 import com.emarsys.util.JsonUtil
@@ -62,7 +62,7 @@ class InAppJsBridge(
 
                 "buttonClicked" -> {
                     val actionModel =
-                        json.decodeFromString<BasicButtonClickedActionModel>(body)
+                        json.decodeFromString<BasicInAppButtonClickedActionModel>(body)
                     actionFactory.create(actionModel)()
                 }
 

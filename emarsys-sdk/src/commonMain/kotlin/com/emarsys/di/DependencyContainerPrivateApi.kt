@@ -1,6 +1,7 @@
 package com.emarsys.di
 
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.storage.Storage
@@ -21,6 +22,10 @@ import kotlinx.serialization.json.Json
 interface DependencyContainerPrivateApi {
 
     val pushActionFactory: ActionFactoryApi<ActionModel>
+
+    val platformContext: PlatformContext
+
+    val pushActionHandler: ActionHandlerApi
 
     val uuidProvider: Provider<String>
 

@@ -8,6 +8,8 @@ import com.emarsys.api.push.PushInstance
 import com.emarsys.api.push.PushInternalApi
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.IosBadgeCountHandler
+import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.badge.IosBadgeCountHandler
 import com.emarsys.core.cache.FileCacheApi
@@ -72,20 +74,21 @@ import platform.UIKit.UIPasteboard
 import platform.UserNotifications.UNUserNotificationCenter
 
 actual class PlatformDependencyCreator actual constructor(
-    platformContext: PlatformContext,
     private val sdkContext: SdkContextApi,
     private val uuidProvider: Provider<String>,
     private val sdkLogger: Logger,
     private val json: Json,
-    private val msgHub: MsgHubApi
+    private val msgHub: MsgHubApi,
+    actionHandler: ActionHandlerApi
 ) : DependencyCreator {
-    private val platformContext: CommonPlatformContext = platformContext as CommonPlatformContext
-    private val notificationCenter = UNUserNotificationCenter.currentNotificationCenter()
-    private val processInfo = NSProcessInfo()
-    private val uiDevice = UIDevice(processInfo)
+    private val platformContext: IosPlatformContext = IosPlatformContext()
 
     actual override fun createPlatformInitializer(pushActionFactory: ActionFactoryApi<ActionModel>): PlatformInitializerApi {
         return PlatformInitializer()
+    }
+
+    actual override fun createPlatformContext(pushActionFactory: ActionFactoryApi<ActionModel>): PlatformContext {
+        return platformContext
     }
 
     actual override fun createStorage(): TypedStorageApi<String?> {

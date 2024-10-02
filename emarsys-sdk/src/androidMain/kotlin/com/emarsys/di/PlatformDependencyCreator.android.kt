@@ -22,6 +22,7 @@ import com.emarsys.api.push.PushInternalApi
 import com.emarsys.applicationContext
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.cache.AndroidFileCache
 import com.emarsys.core.cache.FileCacheApi
@@ -39,6 +40,7 @@ import com.emarsys.core.providers.Provider
 import com.emarsys.core.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.resource.MetadataReader
 import com.emarsys.core.state.State
+import com.emarsys.core.storage.StorageConstants
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
@@ -82,28 +84,31 @@ import java.util.Locale
 
 
 actual class PlatformDependencyCreator actual constructor(
-    platformContext: PlatformContext,
     private val sdkContext: SdkContextApi,
     private val uuidProvider: Provider<String>,
     private val sdkLogger: Logger,
     private val json: Json,
-    private val msgHub: MsgHubApi
+    private val msgHub: MsgHubApi,
+    private val actionHandler: ActionHandlerApi
 ) : DependencyCreator {
-    private val platformContext: CommonPlatformContext = platformContext as CommonPlatformContext
     private val metadataReader = MetadataReader(applicationContext)
     private val platformInfoCollector = PlatformInfoCollector(applicationContext)
-
     private val currentActivityWatchdog =
         TransitionSafeCurrentActivityWatchdog().also { it.register() }
+    private val sharedPreferences =
+        applicationContext.getSharedPreferences(StorageConstants.SUITE_NAME, Context.MODE_PRIVATE)
 
     actual override fun createPlatformInitializer(pushActionFactory: ActionFactoryApi<ActionModel>): PlatformInitializerApi {
         return PlatformInitializer()
     }
 
+    actual override fun createPlatformContext(pushActionFactory: ActionFactoryApi<ActionModel>): PlatformContext {
+        return AndroidPlatformContext(json, pushActionFactory, actionHandler)
+    }
+
     actual override fun createLanguageProvider(): Provider<String> {
         return AndroidLanguageProvider(Locale.getDefault())
     }
-
 
     actual override fun createDeviceInfoCollector(
         timezoneProvider: Provider<String>,
@@ -158,7 +163,7 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createStorage(): TypedStorageApi<String?> =
-        StringStorage(platformContext.sharedPreferences)
+        StringStorage(sharedPreferences)
 
     actual override fun createPermissionHandler(): PermissionHandlerApi {
         return AndroidPermissionHandler(applicationContext, currentActivityWatchdog)
