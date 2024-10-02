@@ -29,7 +29,7 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class ActionFactoryTests {
+class EventActionFactoryTests {
 
     private lateinit var mockEventChannel: DeviceEventChannelApi
     private lateinit var mockOnEventActionInternal: OnEventActionInternalApi
