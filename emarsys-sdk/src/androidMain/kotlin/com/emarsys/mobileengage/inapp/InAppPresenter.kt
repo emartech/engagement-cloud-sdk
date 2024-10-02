@@ -18,7 +18,7 @@ class InAppPresenter(
         animation: InAppPresentationAnimation?
     ) {
         val inAppDialog = InAppDialog(view as InAppView)
-        val currentActivity = currentActivityWatchdog.getCurrentActivity()
+        val currentActivity = currentActivityWatchdog.waitForActivity()
         currentActivity.fragmentManager()?.let {
             it.beginTransaction().run {
                 setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)

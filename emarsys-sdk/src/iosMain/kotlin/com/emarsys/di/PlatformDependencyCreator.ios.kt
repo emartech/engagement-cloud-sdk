@@ -8,7 +8,6 @@ import com.emarsys.api.push.PushInstance
 import com.emarsys.api.push.PushInternalApi
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
-import com.emarsys.core.IosBadgeCountHandler
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.badge.IosBadgeCountHandler
@@ -82,6 +81,9 @@ actual class PlatformDependencyCreator actual constructor(
     actionHandler: ActionHandlerApi
 ) : DependencyCreator {
     private val platformContext: IosPlatformContext = IosPlatformContext()
+    private val processInfo = NSProcessInfo()
+    private val uiDevice = UIDevice(processInfo)
+    private val notificationCenter = UNUserNotificationCenter.currentNotificationCenter()
 
     actual override fun createPlatformInitializer(pushActionFactory: ActionFactoryApi<ActionModel>): PlatformInitializerApi {
         return PlatformInitializer()
