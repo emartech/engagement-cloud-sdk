@@ -71,6 +71,7 @@ import com.emarsys.core.collections.persistentListOf
 import com.emarsys.core.crypto.Crypto
 import com.emarsys.core.crypto.CryptoApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
+import com.emarsys.core.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.SdkLogger
@@ -264,6 +265,10 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
 
     private val permissionHandler: PermissionHandlerApi by lazy {
         dependencyCreator.createPermissionHandler()
+    }
+
+    private val launchApplicationHandler: LaunchApplicationHandlerApi by lazy {
+        dependencyCreator.createLaunchApplicationHandler()
     }
 
     private val eventActionFactory: ActionFactoryApi<ActionModel> by lazy {

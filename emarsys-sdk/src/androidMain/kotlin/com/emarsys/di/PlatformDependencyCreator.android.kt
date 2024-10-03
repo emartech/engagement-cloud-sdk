@@ -31,6 +31,7 @@ import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.device.AndroidLanguageProvider
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.PlatformInfoCollector
+import com.emarsys.core.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.message.MsgHubApi
@@ -221,6 +222,10 @@ actual class PlatformDependencyCreator actual constructor(
         val clipboardManager =
             applicationContext.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         return AndroidClipboardHandler(clipboardManager)
+    }
+
+    override fun createLaunchApplicationHandler(): LaunchApplicationHandlerApi {
+        TODO("Not yet implemented")
     }
 
     actual override fun createPushInternal(

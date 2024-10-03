@@ -18,6 +18,7 @@ import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.clipboard.IosClipboardHandler
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.UIDevice
+import com.emarsys.core.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.message.MsgHubApi
@@ -193,6 +194,10 @@ actual class PlatformDependencyCreator actual constructor(
 
     actual override fun createClipboardHandler(): ClipboardHandlerApi {
         return IosClipboardHandler(UIPasteboard.generalPasteboard)
+    }
+
+    override fun createLaunchApplicationHandler(): LaunchApplicationHandlerApi {
+        TODO("Not yet implemented")
     }
 
     actual override fun createPushInternal(
