@@ -1,6 +1,5 @@
 package com.emarsys.core.providers
 
-import com.emarsys.core.providers.UUIDProvider
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.test.runTest

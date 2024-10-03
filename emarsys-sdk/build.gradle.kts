@@ -58,7 +58,6 @@ kotlin {
                 implementation(libs.ktor.client.content.negotiation)
                 implementation(libs.ktor.serialization.kotlinx.json)
                 implementation(libs.ktor.serialization)
-                implementation(libs.uuid)
                 implementation(project.dependencies.platform(libs.cryptography))
                 implementation(libs.cryptography.core)
             }
