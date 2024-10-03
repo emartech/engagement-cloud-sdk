@@ -2,7 +2,7 @@ package com.emarsys.mobileengage.action
 
 import com.emarsys.api.oneventaction.OnEventActionInternalApi
 import com.emarsys.core.badge.BadgeCountHandlerApi
-import com.emarsys.core.channel.DeviceEventChannelApi
+import com.emarsys.core.channel.CustomEventChannelApi
 import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.message.MsgHubApi
@@ -28,7 +28,7 @@ import com.emarsys.mobileengage.action.models.RequestPushPermissionActionModel
 
 class EventActionFactory<ActionModelType>(
     private val onEventActionInternal: OnEventActionInternalApi,
-    private val eventChannel: DeviceEventChannelApi,
+    private val eventChannel: CustomEventChannelApi,
     private val permissionHandler: PermissionHandlerApi,
     private val badgeCountHandler: BadgeCountHandlerApi,
     private val externalUrlOpener: ExternalUrlOpenerApi,
@@ -48,7 +48,7 @@ class EventActionFactory<ActionModelType>(
             is BadgeCountActionModel -> BadgeCountAction(action, badgeCountHandler)
             is DismissActionModel -> DismissAction(action, msgHub)
             is OpenExternalUrlActionModel -> OpenExternalUrlAction(action, externalUrlOpener)
-            is ButtonClickedActionModel -> ButtonClickedAction(action)
+            is ButtonClickedActionModel -> ButtonClickedAction(action, eventChannel)
             is CopyToClipboardActionModel -> CopyToClipboardAction(action, clipboardHandler)
             else -> {
                 val exception = IllegalArgumentException("Unknown action type: $action")

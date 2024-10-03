@@ -5,6 +5,7 @@ import com.emarsys.api.push.PushConstants.INTENT_EXTRA_ACTION_KEY
 import com.emarsys.api.push.PushConstants.INTENT_EXTRA_DEFAULT_TAP_ACTION_KEY
 import com.emarsys.api.push.PushConstants.INTENT_EXTRA_PAYLOAD_KEY
 import com.emarsys.core.actions.ActionHandlerApi
+import com.emarsys.core.channel.CustomEventChannelApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.actions.Action
 import com.emarsys.mobileengage.action.actions.ButtonClickedAction
@@ -20,7 +21,8 @@ import kotlinx.serialization.json.Json
 class NotificationIntentProcessor(
     private val json: Json,
     private val actionFactory: ActionFactoryApi<ActionModel>,
-    private val actionHandler: ActionHandlerApi
+    private val actionHandler: ActionHandlerApi,
+    private val eventChannel: CustomEventChannelApi
 ) {
     fun processIntent(intent: Intent?, lifecycleScope: CoroutineScope) {
         //TODO: check if SDK setup has been completed
@@ -52,7 +54,15 @@ class NotificationIntentProcessor(
 
         pushMessage?.data?.sid?.let {
             if (actionModel is PresentableActionModel) {
-                result.add(ButtonClickedAction(BasicPushButtonClickedActionModel(actionModel.id, it)))
+                result.add(
+                    ButtonClickedAction(
+                        BasicPushButtonClickedActionModel(
+                            actionModel.id,
+                            it
+                        ),
+                        eventChannel
+                    )
+                )
             }
         }
 

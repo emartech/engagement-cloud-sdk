@@ -26,6 +26,7 @@ import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.cache.AndroidFileCache
 import com.emarsys.core.cache.FileCacheApi
+import com.emarsys.core.channel.CustomEventChannelApi
 import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.device.AndroidLanguageProvider
 import com.emarsys.core.device.DeviceInfoCollector
@@ -89,7 +90,8 @@ actual class PlatformDependencyCreator actual constructor(
     private val sdkLogger: Logger,
     private val json: Json,
     private val msgHub: MsgHubApi,
-    private val actionHandler: ActionHandlerApi
+    private val actionHandler: ActionHandlerApi,
+    private val eventChannel: CustomEventChannelApi
 ) : DependencyCreator {
     private val metadataReader = MetadataReader(applicationContext)
     private val platformInfoCollector = PlatformInfoCollector(applicationContext)
@@ -103,7 +105,7 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createPlatformContext(pushActionFactory: ActionFactoryApi<ActionModel>): PlatformContext {
-        return AndroidPlatformContext(json, pushActionFactory, actionHandler)
+        return AndroidPlatformContext(json, pushActionFactory, actionHandler, eventChannel)
     }
 
     actual override fun createLanguageProvider(): Provider<String> {

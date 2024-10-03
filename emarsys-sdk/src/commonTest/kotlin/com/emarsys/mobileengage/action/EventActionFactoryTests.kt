@@ -2,7 +2,7 @@ package com.emarsys.mobileengage.action
 
 import com.emarsys.api.oneventaction.OnEventActionInternalApi
 import com.emarsys.core.badge.BadgeCountHandlerApi
-import com.emarsys.core.channel.DeviceEventChannelApi
+import com.emarsys.core.channel.CustomEventChannelApi
 import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.SdkLogger
@@ -31,7 +31,7 @@ import kotlin.test.Test
 
 class EventActionFactoryTests {
 
-    private lateinit var mockEventChannel: DeviceEventChannelApi
+    private lateinit var mockEventChannel: CustomEventChannelApi
     private lateinit var mockOnEventActionInternal: OnEventActionInternalApi
     private lateinit var mockPermissionHandler: PermissionHandlerApi
     private lateinit var mockBadgeCountHandler: BadgeCountHandlerApi

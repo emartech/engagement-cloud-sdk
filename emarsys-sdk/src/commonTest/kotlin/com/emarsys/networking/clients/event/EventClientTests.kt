@@ -1,7 +1,7 @@
 package com.emarsys.networking.clients.event
 
 import com.emarsys.api.inapp.InAppConfig
-import com.emarsys.core.channel.DeviceEventChannelApi
+import com.emarsys.core.channel.CustomEventChannelApi
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
@@ -69,7 +69,7 @@ class EventClientTests {
     private lateinit var mockEmarsysClient: NetworkClientApi
     private lateinit var mockUrlFactory: UrlFactoryApi
     private lateinit var mockOnEventActionFactory: ActionFactoryApi<ActionModel>
-    private lateinit var mockDeviceEventChannel: DeviceEventChannelApi
+    private lateinit var mockDeviceEventChannel: CustomEventChannelApi
     private lateinit var mockInAppConfig: InAppConfig
     private lateinit var mockInAppPresenter: InAppPresenterApi
     private lateinit var mockInAppViewProvider: InAppViewProviderApi

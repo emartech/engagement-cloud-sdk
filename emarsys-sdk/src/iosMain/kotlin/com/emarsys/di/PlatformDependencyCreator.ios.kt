@@ -13,6 +13,7 @@ import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.badge.IosBadgeCountHandler
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.cache.IosFileCache
+import com.emarsys.core.channel.CustomEventChannelApi
 import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.clipboard.IosClipboardHandler
 import com.emarsys.core.device.DeviceInfoCollector
@@ -78,7 +79,8 @@ actual class PlatformDependencyCreator actual constructor(
     private val sdkLogger: Logger,
     private val json: Json,
     private val msgHub: MsgHubApi,
-    actionHandler: ActionHandlerApi
+    actionHandler: ActionHandlerApi,
+    eventChannel: CustomEventChannelApi
 ) : DependencyCreator {
     private val platformContext: IosPlatformContext = IosPlatformContext()
     private val processInfo = NSProcessInfo()

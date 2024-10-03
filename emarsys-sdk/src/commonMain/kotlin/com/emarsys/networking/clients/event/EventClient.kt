@@ -1,7 +1,7 @@
 package com.emarsys.networking.clients.event
 
 import com.emarsys.api.inapp.InAppConfig
-import com.emarsys.core.channel.DeviceEventChannelApi
+import com.emarsys.core.channel.CustomEventChannelApi
 import com.emarsys.core.channel.naturalBatching
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.UrlRequest
@@ -33,7 +33,7 @@ class EventClient(
     private val emarsysNetworkClient: NetworkClientApi,
     private val urlFactory: UrlFactoryApi,
     private val json: Json,
-    private val deviceEventChannel: DeviceEventChannelApi,
+    private val deviceEventChannel: CustomEventChannelApi,
     private val onEventActionFactory: ActionFactoryApi<ActionModel>,
     private val sessionContext: SessionContext,
     private val inAppConfig: InAppConfig,

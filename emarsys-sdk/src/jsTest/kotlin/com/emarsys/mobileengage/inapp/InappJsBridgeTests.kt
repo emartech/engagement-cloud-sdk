@@ -33,8 +33,10 @@ import kotlin.test.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class InappJsBridgeTests {
     private companion object {
+        const val ID = "1"
         const val CAMPAIGN_ID = "testCampaignId"
-        val testAction = ButtonClickedAction(BasicInAppButtonClickedActionModel("1", CAMPAIGN_ID))
+        val TEST_ACTION =
+            ButtonClickedAction(BasicInAppButtonClickedActionModel(ID, CAMPAIGN_ID), mock())
     }
 
     private lateinit var inappJsBridge: InAppJsBridgeApi
@@ -59,14 +61,14 @@ class InappJsBridgeTests {
 
     @Test
     fun buttonClicked_shouldTrigger_actionFactory() = runTest {
-        val testActionModel = BasicInAppButtonClickedActionModel("1", CAMPAIGN_ID)
+        val testActionModel = BasicInAppButtonClickedActionModel(ID, CAMPAIGN_ID)
         everySuspend {
             mockActionFactory.create(action = testActionModel)
-        } returns testAction
+        } returns TEST_ACTION
 
         inappJsBridge.register()
 
-        window.asDynamic()["EMSInappWebBridge"].buttonClicked("""{"id":"1","campaignId":"$CAMPAIGN_ID"}""")
+        window.asDynamic()["EMSInappWebBridge"].buttonClicked("""{"id":"$ID","campaignId":"$CAMPAIGN_ID"}""")
 
         advanceUntilIdle()
 
@@ -77,14 +79,15 @@ class InappJsBridgeTests {
 
     @Test
     fun triggerMEEvent_shouldTrigger_actionFactory() = runTest {
-        val testActionModel = BasicCustomEventActionModel("customEventName", mapOf("key" to "value"))
+        val testActionModel =
+            BasicCustomEventActionModel("customEventName", mapOf("key" to "value"))
         everySuspend {
             mockActionFactory.create(action = testActionModel)
-        } returns testAction
+        } returns TEST_ACTION
 
         inappJsBridge.register()
 
-        window.asDynamic()["EMSInappWebBridge"].triggerMEEvent("""{"name":"customEventName","payload":{"key":"value"},"id":"1"}""")
+        window.asDynamic()["EMSInappWebBridge"].triggerMEEvent("""{"name":"customEventName","payload":{"key":"value"},"id":"$ID"}""")
 
         advanceUntilIdle()
 
@@ -98,11 +101,11 @@ class InappJsBridgeTests {
         val testActionModel = BasicAppEventActionModel("appEventName", mapOf("key" to "value"))
         everySuspend {
             mockActionFactory.create(action = testActionModel)
-        } returns testAction
+        } returns TEST_ACTION
 
         inappJsBridge.register()
 
-        window.asDynamic()["EMSInappWebBridge"].triggerAppEvent("""{"name":"appEventName","payload":{"key":"value"},"id":"1"}""")
+        window.asDynamic()["EMSInappWebBridge"].triggerAppEvent("""{"name":"appEventName","payload":{"key":"value"},"id":"$ID"}""")
 
         advanceUntilIdle()
 
@@ -116,11 +119,11 @@ class InappJsBridgeTests {
         val testActionModel = RequestPushPermissionActionModel
         everySuspend {
             mockActionFactory.create(action = testActionModel)
-        } returns testAction
+        } returns TEST_ACTION
 
         inappJsBridge.register()
 
-        window.asDynamic()["EMSInappWebBridge"].requestPushPermission("""{"id":"1"}""")
+        window.asDynamic()["EMSInappWebBridge"].requestPushPermission("""{"id":"$ID"}""")
 
         advanceUntilIdle()
 
@@ -134,11 +137,11 @@ class InappJsBridgeTests {
         val testActionModel = BasicOpenExternalUrlActionModel("https://sap.com")
         everySuspend {
             mockActionFactory.create(action = testActionModel)
-        } returns testAction
+        } returns TEST_ACTION
 
         inappJsBridge.register()
 
-        window.asDynamic()["EMSInappWebBridge"].openExternalLink("""{"url":"https://sap.com","id":"1"}""")
+        window.asDynamic()["EMSInappWebBridge"].openExternalLink("""{"url":"https://sap.com","id":"$ID"}""")
 
         advanceUntilIdle()
 
@@ -152,11 +155,11 @@ class InappJsBridgeTests {
         val testActionModel = BasicDismissActionModel("dismiss")
         everySuspend {
             mockActionFactory.create(action = testActionModel)
-        } returns testAction
+        } returns TEST_ACTION
 
         inappJsBridge.register()
 
-        window.asDynamic()["EMSInappWebBridge"].close("""{"id":"1"}""")
+        window.asDynamic()["EMSInappWebBridge"].close("""{"id":"$ID"}""")
 
         advanceUntilIdle()
 
@@ -170,11 +173,11 @@ class InappJsBridgeTests {
         val testActionModel = BasicCopyToClipboardActionModel("testValue")
         everySuspend {
             mockActionFactory.create(action = testActionModel)
-        } returns testAction
+        } returns TEST_ACTION
 
         inappJsBridge.register()
 
-        window.asDynamic()["EMSInappWebBridge"].copyToClipboard("""{"text":"testValue","id":"1"}""")
+        window.asDynamic()["EMSInappWebBridge"].copyToClipboard("""{"text":"testValue","id":"$ID"}""")
 
         advanceUntilIdle()
 

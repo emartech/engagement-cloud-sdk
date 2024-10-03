@@ -5,6 +5,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.emarsys.api.push.PushConstants.INTENT_EXTRA_ACTION_KEY
 import com.emarsys.api.push.PushConstants.INTENT_EXTRA_PAYLOAD_KEY
 import com.emarsys.core.actions.ActionHandlerApi
+import com.emarsys.core.channel.CustomEventChannelApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.actions.Action
 import com.emarsys.mobileengage.action.actions.ButtonClickedAction
@@ -47,6 +48,7 @@ class NotificationIntentProcessorTests {
     private lateinit var testScope: CoroutineScope
     private lateinit var mockActionFactory: ActionFactoryApi<ActionModel>
     private lateinit var mockActionHandler: ActionHandlerApi
+    private lateinit var mockEventChannel: CustomEventChannelApi
     private lateinit var notificationIntentProcessor: NotificationIntentProcessor
 
     @Before
@@ -56,8 +58,9 @@ class NotificationIntentProcessorTests {
         testScope = CoroutineScope(testDispatcher)
         mockActionFactory = mockk(relaxed = true)
         mockActionHandler = mockk(relaxed = true)
+        mockEventChannel = mockk(relaxed = true)
         notificationIntentProcessor =
-            NotificationIntentProcessor(json, mockActionFactory, mockActionHandler)
+            NotificationIntentProcessor(json, mockActionFactory, mockActionHandler, mockEventChannel)
     }
 
     @After
@@ -84,7 +87,7 @@ class NotificationIntentProcessorTests {
     fun testProcessIntent_shouldHandleAction_withActionHandler_withMandatoryActions() = runTest {
         val actionModel = PresentableAppEventActionModel(ID, TITLE, NAME, PAYLOAD)
         val buttonClickedActionModel = BasicPushButtonClickedActionModel(ID, SID)
-        val buttonClickedAction = ButtonClickedAction(buttonClickedActionModel)
+        val buttonClickedAction = ButtonClickedAction(buttonClickedActionModel, mockEventChannel)
 
         val intent = createTestIntent(actionModel)
 

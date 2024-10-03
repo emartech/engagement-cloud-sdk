@@ -22,12 +22,12 @@ class DeviceEventChannelTests {
     }
 
     private lateinit var testChannel: Channel<Event>
-    private lateinit var deviceEventChannel: DeviceEventChannel
+    private lateinit var deviceEventChannel: CustomEventChannel
 
     @BeforeTest
     fun setup() {
         testChannel = Channel()
-        deviceEventChannel = DeviceEventChannel(testChannel)
+        deviceEventChannel = CustomEventChannel(testChannel)
     }
 
     @AfterTest

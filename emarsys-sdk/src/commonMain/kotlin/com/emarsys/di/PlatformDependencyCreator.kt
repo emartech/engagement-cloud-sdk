@@ -11,6 +11,7 @@ import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.cache.FileCacheApi
+import com.emarsys.core.channel.CustomEventChannelApi
 import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.log.Logger
@@ -45,7 +46,8 @@ expect class PlatformDependencyCreator(
     sdkLogger: Logger,
     json: Json,
     msgHub: MsgHubApi,
-    actionHandler: ActionHandlerApi
+    actionHandler: ActionHandlerApi,
+    eventChannel: CustomEventChannelApi
 ) : DependencyCreator {
 
     override fun createPlatformInitializer(pushActionFactory: ActionFactoryApi<ActionModel>): PlatformInitializerApi

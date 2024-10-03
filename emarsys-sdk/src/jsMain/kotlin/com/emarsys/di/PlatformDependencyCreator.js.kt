@@ -18,6 +18,7 @@ import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.badge.WebBadgeCountHandler
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.cache.WebFileCache
+import com.emarsys.core.channel.CustomEventChannelApi
 import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.clipboard.WebClipboardHandler
 import com.emarsys.core.device.DeviceInfoCollector
@@ -77,7 +78,8 @@ actual class PlatformDependencyCreator actual constructor(
     private val sdkLogger: Logger,
     private val json: Json,
     private val msgHub: MsgHubApi,
-    actionHandler: ActionHandlerApi
+    actionHandler: ActionHandlerApi,
+    eventChannel: CustomEventChannelApi
 ) : DependencyCreator {
 
     actual override fun createPlatformInitializer(

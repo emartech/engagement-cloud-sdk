@@ -64,8 +64,8 @@ import com.emarsys.context.SdkContext
 import com.emarsys.core.actions.ActionHandler
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.badge.BadgeCountHandlerApi
-import com.emarsys.core.channel.DeviceEventChannel
-import com.emarsys.core.channel.DeviceEventChannelApi
+import com.emarsys.core.channel.CustomEventChannel
+import com.emarsys.core.channel.CustomEventChannelApi
 import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.collections.persistentListOf
 import com.emarsys.core.crypto.Crypto
@@ -185,8 +185,8 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         Channel()
     }
 
-    private val deviceEventChannel: DeviceEventChannelApi by lazy {
-        DeviceEventChannel(eventChannel)
+    private val customEventChannel: CustomEventChannelApi by lazy {
+        CustomEventChannel(eventChannel)
     }
 
     override val sdkContext: SdkContext by lazy {
@@ -215,7 +215,8 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             sdkLogger,
             json,
             msgHub,
-            pushActionHandler
+            pushActionHandler,
+            customEventChannel
         )
     }
 
@@ -268,7 +269,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
     private val eventActionFactory: ActionFactoryApi<ActionModel> by lazy {
         EventActionFactory(
             onEventActionInternal,
-            deviceEventChannel,
+            customEventChannel,
             permissionHandler,
             badgeCountHandler,
             externalUrlOpener,
@@ -326,7 +327,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             emarsysClient,
             urlFactory,
             json,
-            deviceEventChannel,
+            customEventChannel,
             eventActionFactory,
             sessionContext,
             inAppContext,

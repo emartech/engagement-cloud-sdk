@@ -5,9 +5,9 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.consumeAsFlow
 
-class DeviceEventChannel(
+class CustomEventChannel(
     private val eventChannel: Channel<Event>,
-) : DeviceEventChannelApi {
+) : CustomEventChannelApi {
 
     override suspend fun send(event: Event) {
         eventChannel.send(event)
