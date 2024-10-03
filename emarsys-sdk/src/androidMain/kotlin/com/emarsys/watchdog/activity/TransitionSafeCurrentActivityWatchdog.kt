@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 
 
-class TransitionSafeCurrentActivityWatchdog : ActivityLifecycleCallbacks {
+class TransitionSafeCurrentActivityWatchdog : ActivityLifecycleCallbacks, ActivityFinderApi {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private var setActivityJob: Job? = null
     private var currentActivity: WeakReference<Activity?> = WeakReference(null)
@@ -78,11 +78,11 @@ class TransitionSafeCurrentActivityWatchdog : ActivityLifecycleCallbacks {
         (applicationContext as Application).registerActivityLifecycleCallbacks(this)
     }
 
-    suspend fun waitForActivity(): Activity {
+    override suspend fun waitForActivity(): Activity {
         return currentActivityFlow.first { activity -> activity != null}!!
     }
 
-    suspend fun currentActivity(): Activity? {
+    override suspend fun currentActivity(): Activity? {
         return currentActivityFlow.first()
     }
 }

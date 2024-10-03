@@ -1,10 +1,8 @@
 package com.emarsys
 
-import android.app.Activity
-
 data class AndroidEmarsysConfig(
-    override val applicationCode: String?,
-    override val merchantId: String?,
-    override val sharedSecret: String?,
-    val launchActivityClass: Class<Activity>? = null
+    override val applicationCode: String? = null,
+    override val merchantId: String? = null,
+    override val sharedSecret: String? = null,
+    val launchActivityClass: Class<*>? = null
 ): SdkConfig
