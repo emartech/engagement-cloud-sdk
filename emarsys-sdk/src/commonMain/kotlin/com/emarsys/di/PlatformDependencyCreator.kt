@@ -14,6 +14,7 @@ import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.channel.CustomEventChannelApi
 import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.device.DeviceInfoCollector
+import com.emarsys.core.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.message.MsgHubApi
@@ -97,6 +98,8 @@ expect class PlatformDependencyCreator(
     override fun createInAppPresenter(): InAppPresenterApi
 
     override fun createClipboardHandler(): ClipboardHandlerApi
+
+    override fun createLaunchApplicationHandler(): LaunchApplicationHandlerApi
 
     override fun createPushInternal(
         pushClient: PushClientApi,

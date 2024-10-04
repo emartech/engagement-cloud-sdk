@@ -23,6 +23,7 @@ import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.clipboard.WebClipboardHandler
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.WebPlatformInfoCollector
+import com.emarsys.core.launchapplication.JsLaunchApplicationHandler
 import com.emarsys.core.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.log.SdkLogger
@@ -195,8 +196,8 @@ actual class PlatformDependencyCreator actual constructor(
         return WebClipboardHandler(window.navigator.clipboard)
     }
 
-    override fun createLaunchApplicationHandler(): LaunchApplicationHandlerApi {
-        TODO("Not yet implemented")
+    actual override fun createLaunchApplicationHandler(): LaunchApplicationHandlerApi {
+        return JsLaunchApplicationHandler()
     }
 
     actual override fun createPushInternal(
