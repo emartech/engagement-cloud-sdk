@@ -6,10 +6,11 @@ import com.emarsys.api.contact.ContactApi
 import com.emarsys.api.geofence.GeofenceTrackerApi
 import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.inbox.InboxApi
-import com.emarsys.api.oneventaction.OnEventActionApi
 import com.emarsys.api.predict.PredictApi
 import com.emarsys.api.push.PushApi
+import com.emarsys.mobileengage.events.SdkEvent
 import com.emarsys.setup.SetupOrganizerApi
+import kotlinx.coroutines.flow.SharedFlow
 
 interface DependencyContainerApi {
     val contactApi: ContactApi
@@ -28,9 +29,9 @@ interface DependencyContainerApi {
 
     val configApi: ConfigApi
 
-    val onEventActionApi: OnEventActionApi
-
     val setupOrganizerApi: SetupOrganizerApi
+
+    val events: SharedFlow<SdkEvent>
 
     suspend fun setup()
 }

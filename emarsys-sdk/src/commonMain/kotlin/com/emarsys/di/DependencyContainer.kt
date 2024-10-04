@@ -1,7 +1,6 @@
 package com.emarsys.di
 
 import EventTrackerApi
-import com.emarsys.api.AppEvent
 import com.emarsys.api.config.Config
 import com.emarsys.api.config.ConfigApi
 import com.emarsys.api.config.ConfigCall
@@ -44,9 +43,6 @@ import com.emarsys.api.inbox.InboxCall
 import com.emarsys.api.inbox.InboxContext
 import com.emarsys.api.inbox.InboxInternal
 import com.emarsys.api.inbox.LoggingInbox
-import com.emarsys.api.oneventaction.OnEventAction
-import com.emarsys.api.oneventaction.OnEventActionApi
-import com.emarsys.api.oneventaction.OnEventActionInternal
 import com.emarsys.api.predict.GathererPredict
 import com.emarsys.api.predict.LoggingPredict
 import com.emarsys.api.predict.Predict
@@ -99,6 +95,7 @@ import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.EventActionFactory
 import com.emarsys.mobileengage.action.PushActionFactory
 import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.events.SdkEvent
 import com.emarsys.mobileengage.inapp.InAppDownloader
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandler
@@ -141,6 +138,8 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 
@@ -192,10 +191,6 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
 
     override val sdkContext: SdkContext by lazy {
         SdkContext(sdkDispatcher, mainDispatcher, defaultUrls, LogLevel.Error, mutableSetOf())
-    }
-
-    private val onEventActionInternal: OnEventActionInternal by lazy {
-        OnEventActionInternal()
     }
 
     private val httpClient by lazy {
@@ -273,7 +268,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
 
     private val eventActionFactory: ActionFactoryApi<ActionModel> by lazy {
         EventActionFactory(
-            onEventActionInternal,
+            sdkEventFlow,
             customEventChannel,
             permissionHandler,
             badgeCountHandler,
@@ -346,15 +341,11 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         PushContext(persistentListOf("pushContextPersistentId", storage, PushCall.serializer()))
     }
 
-    val notificationEvents: MutableSharedFlow<AppEvent> by lazy {
-        MutableSharedFlow(replay = 100)
-    }
     private val pushInternal: PushInstance by lazy {
         dependencyCreator.createPushInternal(
             pushClient,
             stringStorage,
             pushContext,
-            notificationEvents,
             eventClient,
             pushActionFactory,
             json,
@@ -363,11 +354,9 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
     }
 
     override val inAppApi: InAppApi by lazy {
-        val events = MutableSharedFlow<AppEvent>(replay = 100)
-
         val loggingInApp = LoggingInApp(sdkContext, sdkLogger)
-        val gathererInApp = GathererInApp(inAppContext, events)
-        val inAppInternal = InAppInternal(events)
+        val gathererInApp = GathererInApp(inAppContext)
+        val inAppInternal = InAppInternal()
         InApp(loggingInApp, gathererInApp, inAppInternal, sdkContext)
     }
 
@@ -416,11 +405,9 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
     }
 
     override val geofenceTrackerApi: GeofenceTrackerApi by lazy {
-        val geofenceEvents = MutableSharedFlow<AppEvent>(replay = 100)
-
         val loggingGeofenceTracker = LoggingGeofenceTracker(sdkContext, sdkLogger)
         val gathererGeofenceTracker =
-            GathererGeofenceTracker(geofenceTrackerContext, geofenceEvents)
+            GathererGeofenceTracker(geofenceTrackerContext)
         val geofenceTrackerInternal = GeofenceTrackerInternal()
 
         GeofenceTracker(
@@ -441,9 +428,6 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         )
     }
 
-    override val onEventActionApi: OnEventActionApi by lazy {
-        OnEventAction(onEventActionInternal)
-    }
     override val configApi: ConfigApi by lazy {
         val loggingConfig = LoggingConfig(sdkLogger)
         val gathererConfig = GathererConfig(
@@ -463,8 +447,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         dependencyCreator.createPushApi(
             pushInternal,
             stringStorage,
-            pushContext,
-            notificationEvents
+            pushContext
         )
     }
 
@@ -526,6 +509,15 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
                 )
             )
         SetupOrganizer(meStateMachine, predictStateMachine, sdkContext)
+    }
+
+    override val sdkEventFlow: MutableSharedFlow<SdkEvent> by lazy {
+        MutableSharedFlow()
+    }
+
+
+    override val events: SharedFlow<SdkEvent> by lazy {
+        sdkEventFlow.asSharedFlow()
     }
 
     override val contactApi: ContactApi by lazy {

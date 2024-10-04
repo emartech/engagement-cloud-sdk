@@ -5,10 +5,11 @@ import com.emarsys.api.event.model.CustomEvent
 import com.emarsys.api.geofence.GeofenceTrackerApi
 import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.inbox.InboxApi
-import com.emarsys.api.oneventaction.OnEventActionApi
 import com.emarsys.api.predict.PredictApi
 import com.emarsys.api.push.PushApi
 import com.emarsys.di.DependencyInjection
+import com.emarsys.mobileengage.events.SdkEvent
+import kotlinx.coroutines.flow.SharedFlow
 import kotlin.experimental.ExperimentalObjCRefinement
 import kotlin.native.HiddenFromObjC
 
@@ -48,6 +49,9 @@ object Emarsys {
         TODO("Not yet implemented")
     }
 
+    val events: SharedFlow<SdkEvent>
+        get()=DependencyInjection.container.events
+
     val push: PushApi
         get() = DependencyInjection.container.pushApi
 
@@ -62,9 +66,6 @@ object Emarsys {
 
     val geofence: GeofenceTrackerApi
         get() = DependencyInjection.container.geofenceTrackerApi
-
-    val onEventAction: OnEventActionApi
-        get() = DependencyInjection.container.onEventActionApi
 
     val predict: PredictApi
         get() = DependencyInjection.container.predictApi

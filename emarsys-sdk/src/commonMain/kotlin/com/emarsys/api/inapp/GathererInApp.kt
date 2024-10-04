@@ -1,11 +1,8 @@
 package com.emarsys.api.inapp
 
-import com.emarsys.api.AppEvent
-import kotlinx.coroutines.flow.MutableSharedFlow
 
 class GathererInApp(
     private val inAppContext: InAppApiContext,
-    override val events: MutableSharedFlow<AppEvent>
 ) : InAppInstance {
     override val isPaused: Boolean
         get() = inAppContext.inAppDnd

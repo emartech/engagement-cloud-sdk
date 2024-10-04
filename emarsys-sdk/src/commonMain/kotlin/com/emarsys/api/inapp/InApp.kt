@@ -1,11 +1,8 @@
 package com.emarsys.api.inapp
 
 import Activatable
-import com.emarsys.api.AppEvent
 import com.emarsys.api.generic.GenericApi
 import com.emarsys.context.SdkContextApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.withContext
 
 interface InAppInstance : InAppInternalApi, Activatable
@@ -32,7 +29,4 @@ class InApp<Logging : InAppInstance, Gatherer : InAppInstance, Internal : InAppI
 
     override val isPaused: Boolean
         get() = activeInstance<InAppInstance>().isPaused
-
-    override val events: Flow<AppEvent>
-        get() = activeInstance<InAppInstance>().events.asSharedFlow()
 }

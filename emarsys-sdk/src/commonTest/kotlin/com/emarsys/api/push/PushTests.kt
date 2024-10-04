@@ -14,7 +14,6 @@ import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -58,16 +57,6 @@ class PushTests {
         everySuspend { mockLoggingPush.activate() } returns Unit
         everySuspend { mockGathererPush.activate() } returns Unit
         everySuspend { mockPushInternal.activate() } returns Unit
-
-        every {
-            mockLoggingPush.notificationEvents
-        } returns MutableSharedFlow()
-        every {
-            mockGathererPush.notificationEvents
-        } returns MutableSharedFlow()
-        every {
-            mockPushInternal.notificationEvents
-        } returns MutableSharedFlow()
 
         push =
             Push(mockLoggingPush, mockGathererPush, mockPushInternal, sdkContext)

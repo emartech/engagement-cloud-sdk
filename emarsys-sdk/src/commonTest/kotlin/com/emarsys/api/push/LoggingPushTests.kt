@@ -1,6 +1,5 @@
 package com.emarsys.api.push
 
-import com.emarsys.api.AppEvent
 import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
@@ -11,7 +10,6 @@ import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -24,7 +22,6 @@ class LoggingPushTests {
 
     private lateinit var mockLogger: Logger
     private lateinit var loggingPush: LoggingPush
-    private val notificationEvents: MutableSharedFlow<AppEvent> = MutableSharedFlow()
     private var slot = Capture.slot<LogEntry>()
 
     @BeforeTest
@@ -32,7 +29,7 @@ class LoggingPushTests {
         mockLogger = mock()
         every { mockLogger.log(capture(slot), LogLevel.Debug) } returns Unit
 
-        loggingPush = LoggingPush(mockLogger, notificationEvents)
+        loggingPush = LoggingPush(mockLogger)
     }
 
     @Test

@@ -4,7 +4,6 @@ import com.emarsys.api.config.ConfigApi
 import com.emarsys.api.geofence.GeofenceTrackerApi
 import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.inbox.InboxApi
-import com.emarsys.api.oneventaction.OnEventActionApi
 import com.emarsys.api.predict.PredictApi
 import com.emarsys.mobileengage.push.IosPushApi
 import kotlin.experimental.ExperimentalObjCName
@@ -22,8 +21,6 @@ object IosEmarsys {
         get() = Emarsys.config
      val geofence: GeofenceTrackerApi
         get() = Emarsys.geofence
-     val onEventAction: OnEventActionApi
-        get() = Emarsys.onEventAction
      val predict: PredictApi
         get() = Emarsys.predict
 

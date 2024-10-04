@@ -1,12 +1,9 @@
 package com.emarsys.api.geofence
 
-import com.emarsys.api.AppEvent
 import com.emarsys.api.geofence.model.Geofence
-import kotlinx.coroutines.flow.Flow
 
 class GathererGeofenceTracker(
-    private val geofenceTrackerContext: GeofenceContext,
-    override val events: Flow<AppEvent>
+    private val geofenceTrackerContext: GeofenceContext
 ) : GeofenceTrackerInstance {
     override val registeredGeofences: List<Geofence>
         get() = geofenceTrackerContext.registeredGeofences

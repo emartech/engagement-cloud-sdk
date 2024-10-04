@@ -1,6 +1,5 @@
 package com.emarsys.mobileengage.push
 
-import com.emarsys.api.AppEvent
 import com.emarsys.api.SdkState
 import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.PushCall
@@ -17,7 +16,6 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
@@ -43,12 +41,11 @@ class IosPushInternal(
     storage: TypedStorageApi<String?>,
     pushContext: ApiContext<PushCall>,
     sdkContext: SdkContextApi,
-    override val notificationEvents: MutableSharedFlow<AppEvent>,
     private val actionFactory: ActionFactoryApi<ActionModel>,
     private val json: Json,
     private val sdkDispatcher: CoroutineDispatcher,
     private val sdkLogger: Logger
-) : PushInternal(pushClient, storage, pushContext, notificationEvents), IosPushInstance {
+) : PushInternal(pushClient, storage, pushContext), IosPushInstance {
     override var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol? =
         null
         set(value) {

@@ -1,6 +1,5 @@
 package com.emarsys.di
 
-import com.emarsys.api.AppEvent
 import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.LoggingPush
 import com.emarsys.api.push.Push
@@ -69,7 +68,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.Json
 import web.broadcast.BroadcastChannel
 import web.dom.document
@@ -204,23 +202,21 @@ actual class PlatformDependencyCreator actual constructor(
         pushClient: PushClientApi,
         storage: TypedStorageApi<String?>,
         pushContext: ApiContext<PushCall>,
-        notificationEvents: MutableSharedFlow<AppEvent>,
         eventClient: EventClientApi,
         actionFactory: ActionFactoryApi<ActionModel>,
         json: Json,
         sdkDispatcher: CoroutineDispatcher
     ): PushInstance {
-        return PushInternal(pushClient, storage, pushContext, notificationEvents)
+        return PushInternal(pushClient, storage, pushContext)
     }
 
     actual override fun createPushApi(
         pushInternal: PushInstance,
         storage: TypedStorageApi<String?>,
         pushContext: ApiContext<PushCall>,
-        notificationEvents: MutableSharedFlow<AppEvent>
     ): PushApi {
-        val loggingPush = LoggingPush(sdkLogger, notificationEvents)
-        val pushGatherer = PushGatherer(pushContext, storage, notificationEvents)
+        val loggingPush = LoggingPush(sdkLogger)
+        val pushGatherer = PushGatherer(pushContext, storage)
         return Push(loggingPush, pushGatherer, pushInternal, sdkContext)
     }
 

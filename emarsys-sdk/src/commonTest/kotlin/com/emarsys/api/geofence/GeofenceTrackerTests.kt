@@ -1,6 +1,5 @@
 package com.emarsys.api.geofence
 
-import com.emarsys.api.AppEvent
 import com.emarsys.api.SdkState
 import com.emarsys.api.geofence.model.Geofence
 import com.emarsys.context.DefaultUrls
@@ -17,8 +16,6 @@ import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -33,7 +30,6 @@ class GeofenceTrackerTests {
     private companion object {
         const val SET_ENABLED = true
         val testGeofence = Geofence("testGeofence", 12.3, 34.5, 10.0, null, listOf())
-        val testEvents = flowOf(AppEvent("testGeofence", mapOf("key" to "value")))
         val testException = Exception()
     }
 
@@ -112,37 +108,6 @@ class GeofenceTrackerTests {
         geofenceTracker.registeredGeofences shouldBe listOf(testGeofence)
 
         verify { mockGeofenceTrackerInternal.registeredGeofences }
-    }
-
-    @Test
-    fun testEvents_inactiveState() = runTest {
-        every { mockLoggingGeofenceTracker.events } returns emptyFlow()
-
-        geofenceTracker.events
-
-        verify { mockLoggingGeofenceTracker.events }
-    }
-
-    @Test
-    fun testEvents_onHoldState() = runTest {
-        every { mockGathererGeofenceTracker.events } returns emptyFlow()
-
-        sdkContext.setSdkState(SdkState.onHold)
-
-        geofenceTracker.events shouldBe emptyFlow()
-
-        verify { mockGathererGeofenceTracker.events }
-    }
-
-    @Test
-    fun testEvents_activeState() = runTest {
-        every { mockGeofenceTrackerInternal.events } returns testEvents
-
-        sdkContext.setSdkState(SdkState.active)
-
-        geofenceTracker.events shouldBe testEvents
-
-        verify { mockGeofenceTrackerInternal.events }
     }
 
     @Test

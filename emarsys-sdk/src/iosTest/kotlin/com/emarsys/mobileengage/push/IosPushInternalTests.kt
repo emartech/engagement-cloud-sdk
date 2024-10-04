@@ -1,6 +1,5 @@
 package com.emarsys.mobileengage.push
 
-import com.emarsys.api.AppEvent
 import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.PushCall
 import com.emarsys.context.SdkContextApi
@@ -23,7 +22,6 @@ import dev.mokkery.verifySuspend
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -42,7 +40,6 @@ class IosPushInternalTests {
     private lateinit var mockStorage: TypedStorageApi<String?>
     private lateinit var mockPushContext: ApiContext<PushCall>
     private lateinit var mockSdkContext: SdkContextApi
-    private lateinit var notificationEvents: MutableSharedFlow<AppEvent>
     private lateinit var mockActionFactory: ActionFactoryApi<ActionModel>
     private lateinit var json: Json
     private lateinit var sdkDispatcher: CoroutineDispatcher
@@ -56,7 +53,6 @@ class IosPushInternalTests {
         mockStorage = mock()
         mockPushContext = mock()
         mockSdkContext = mock()
-        notificationEvents = MutableSharedFlow()
         mockActionFactory = mock()
         json = JsonUtil.json
         sdkDispatcher = dispatcher
@@ -66,7 +62,6 @@ class IosPushInternalTests {
             mockStorage,
             mockPushContext,
             mockSdkContext,
-            notificationEvents,
             mockActionFactory,
             json,
             sdkDispatcher,

@@ -1,16 +1,12 @@
 package com.emarsys.api.inapp
 
-import com.emarsys.api.AppEvent
+
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class GathererInAppTests {
-    private companion object {
-        val testEvents = MutableSharedFlow<AppEvent>()
-    }
 
     private lateinit var inAppContext: InAppApiContext
 
@@ -19,7 +15,7 @@ class GathererInAppTests {
     @BeforeTest
     fun setup() = runTest {
         inAppContext = InAppContext(mutableListOf())
-        gathererInApp = GathererInApp(inAppContext, testEvents)
+        gathererInApp = GathererInApp(inAppContext)
     }
 
     @Test
@@ -29,11 +25,6 @@ class GathererInAppTests {
         inAppContext.inAppDnd = true
 
         gathererInApp.isPaused shouldBe true
-    }
-
-    @Test
-    fun testEvent() = runTest {
-        gathererInApp.events shouldBe testEvents
     }
 
     @Test

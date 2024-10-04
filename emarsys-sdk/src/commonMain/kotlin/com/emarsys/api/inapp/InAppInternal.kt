@@ -1,9 +1,7 @@
 package com.emarsys.api.inapp
 
-import com.emarsys.api.AppEvent
-import kotlinx.coroutines.flow.MutableSharedFlow
 
-class InAppInternal(override val events: MutableSharedFlow<AppEvent>) : InAppInstance {
+class InAppInternal : InAppInstance {
     override suspend fun pause() {
         TODO("Not yet implemented")
     }

@@ -1,13 +1,11 @@
 package com.emarsys.api.push
 
-import com.emarsys.api.AppEvent
 import com.emarsys.api.push.PushConstants.PUSH_TOKEN_STORAGE_KEY
 import com.emarsys.core.storage.TypedStorageApi
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 
@@ -27,14 +25,13 @@ class PushGathererTests {
 
     private lateinit var mockStringStorage: TypedStorageApi<String?>
     private lateinit var pushContext: PushContext
-    private val notificationEvents: MutableSharedFlow<AppEvent> = MutableSharedFlow()
     private lateinit var pushGatherer: PushGatherer
 
     @BeforeTest
     fun setUp() {
         mockStringStorage = mock()
         pushContext = PushContext(expected)
-        pushGatherer = PushGatherer(pushContext, mockStringStorage, notificationEvents)
+        pushGatherer = PushGatherer(pushContext, mockStringStorage)
     }
 
     @Test

@@ -1,10 +1,8 @@
 package com.emarsys.api.push
 
 import Activatable
-import com.emarsys.api.AppEvent
 import com.emarsys.api.generic.GenericApi
 import com.emarsys.context.SdkContextApi
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.withContext
 
 interface PushInstance : PushInternalApi, Activatable
@@ -30,8 +28,4 @@ class Push<Logging : PushInstance, Gatherer : PushInstance, Internal : PushInsta
 
     override val pushToken: Result<String?>
         get() = runCatching { activeInstance<PushInternalApi>().pushToken }
-
-    override val notificationEvents: MutableSharedFlow<AppEvent> =
-        activeInstance<PushInstance>().notificationEvents
-
 }

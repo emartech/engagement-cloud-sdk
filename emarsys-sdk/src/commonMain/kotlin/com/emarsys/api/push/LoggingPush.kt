@@ -1,14 +1,11 @@
 package com.emarsys.api.push
 
-import com.emarsys.api.AppEvent
 import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
-import kotlinx.coroutines.flow.MutableSharedFlow
 
 open class LoggingPush(
     private val logger: Logger,
-    override val notificationEvents: MutableSharedFlow<AppEvent>
 ) : PushInstance {
     override suspend fun registerPushToken(pushToken: String) {
         val entry = LogEntry.createMethodNotAllowed(

@@ -1,6 +1,5 @@
 package com.emarsys.di
 
-import com.emarsys.api.AppEvent
 import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.PushApi
 import com.emarsys.api.push.PushCall
@@ -37,7 +36,6 @@ import com.emarsys.setup.PlatformInitializerApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.Json
 
 
@@ -105,7 +103,6 @@ expect class PlatformDependencyCreator(
         pushClient: PushClientApi,
         storage: TypedStorageApi<String?>,
         pushContext: ApiContext<PushCall>,
-        notificationEvents: MutableSharedFlow<AppEvent>,
         eventClient: EventClientApi,
         actionFactory: ActionFactoryApi<ActionModel>,
         json: Json,
@@ -116,6 +113,5 @@ expect class PlatformDependencyCreator(
         pushInternal: PushInstance,
         storage: TypedStorageApi<String?>,
         pushContext: ApiContext<PushCall>,
-        notificationEvents: MutableSharedFlow<AppEvent>
     ): PushApi
 }

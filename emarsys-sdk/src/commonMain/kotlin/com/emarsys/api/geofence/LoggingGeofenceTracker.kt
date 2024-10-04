@@ -1,13 +1,10 @@
 package com.emarsys.api.geofence
 
-import com.emarsys.api.AppEvent
 import com.emarsys.api.geofence.model.Geofence
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.Logger
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 
 class LoggingGeofenceTracker(
@@ -23,17 +20,6 @@ class LoggingGeofenceTracker(
                 logger.debug(entry)
             }
             return listOf()
-        }
-
-    override val events: Flow<AppEvent>
-        get() {
-            val entry = LogEntry.createMethodNotAllowed<LoggingGeofenceTracker>(
-                this, this::events.name
-            )
-            CoroutineScope(sdkContext.sdkDispatcher).launch {
-                logger.debug(entry)
-            }
-            return emptyFlow()
         }
 
     override val isEnabled: Boolean

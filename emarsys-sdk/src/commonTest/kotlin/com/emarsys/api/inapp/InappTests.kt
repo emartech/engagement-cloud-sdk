@@ -1,7 +1,6 @@
 
 package com.emarsys.api.inapp
 
-import com.emarsys.api.AppEvent
 import com.emarsys.api.SdkState
 import com.emarsys.context.DefaultUrls
 import com.emarsys.context.SdkContext
@@ -17,7 +16,6 @@ import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -28,7 +26,6 @@ import kotlin.test.Test
 class InappTests {
     private companion object {
         val testException = Exception()
-        val testEvents = MutableSharedFlow<AppEvent>()
     }
 
     private lateinit var mockLoggingInApp: InAppInstance
@@ -91,35 +88,6 @@ class InappTests {
         inApp.isPaused shouldBe true
 
         verify { mockInAppInternal.isPaused }
-    }
-
-    @Test
-    fun testEvents_when_inactiveState() = runTest {
-        every { mockLoggingInApp.events } returns testEvents
-
-        inApp.events
-
-        verify { mockLoggingInApp.events }
-    }
-
-    @Test
-    fun testEvents_when_onHoldState() = runTest {
-        every { mockGathererInApp.events } returns testEvents
-        sdkContext.setSdkState(SdkState.onHold)
-
-        inApp.events
-
-        verify { mockGathererInApp.events }
-    }
-
-    @Test
-    fun testEvents_when_activeState() = runTest {
-        every { mockInAppInternal.events } returns testEvents
-        sdkContext.setSdkState(SdkState.active)
-
-        inApp.events
-
-        verify { mockInAppInternal.events }
     }
 
     @Test

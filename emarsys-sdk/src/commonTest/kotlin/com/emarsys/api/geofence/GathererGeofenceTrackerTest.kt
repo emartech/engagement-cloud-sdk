@@ -2,7 +2,6 @@ package com.emarsys.api.geofence
 
 import com.emarsys.api.geofence.model.Geofence
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -16,7 +15,7 @@ class GathererGeofenceTrackerTest {
     fun setup() {
         geofenceContext = GeofenceTrackerContext(mutableListOf())
 
-        gathererGeofenceTracker = GathererGeofenceTracker(geofenceContext, emptyFlow())
+        gathererGeofenceTracker = GathererGeofenceTracker(geofenceContext)
     }
 
     @Test

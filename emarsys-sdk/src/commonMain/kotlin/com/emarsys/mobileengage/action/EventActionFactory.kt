@@ -1,6 +1,5 @@
 package com.emarsys.mobileengage.action
 
-import com.emarsys.api.oneventaction.OnEventActionInternalApi
 import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.channel.CustomEventChannelApi
 import com.emarsys.core.clipboard.ClipboardHandlerApi
@@ -25,9 +24,11 @@ import com.emarsys.mobileengage.action.models.CustomEventActionModel
 import com.emarsys.mobileengage.action.models.DismissActionModel
 import com.emarsys.mobileengage.action.models.OpenExternalUrlActionModel
 import com.emarsys.mobileengage.action.models.RequestPushPermissionActionModel
+import com.emarsys.mobileengage.events.SdkEvent
+import kotlinx.coroutines.flow.MutableSharedFlow
 
 class EventActionFactory<ActionModelType>(
-    private val onEventActionInternal: OnEventActionInternalApi,
+    private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
     private val eventChannel: CustomEventChannelApi,
     private val permissionHandler: PermissionHandlerApi,
     private val badgeCountHandler: BadgeCountHandlerApi,
@@ -38,7 +39,7 @@ class EventActionFactory<ActionModelType>(
 ) : ActionFactoryApi<ActionModelType> {
     override suspend fun create(action: ActionModelType): Action<*> {
         return when (action) {
-            is AppEventActionModel -> AppEventAction(action, onEventActionInternal)
+            is AppEventActionModel -> AppEventAction(action, sdkEventFlow)
             is CustomEventActionModel -> CustomEventAction(action, eventChannel)
             is RequestPushPermissionActionModel -> RequestPushPermissionAction(
                 action,

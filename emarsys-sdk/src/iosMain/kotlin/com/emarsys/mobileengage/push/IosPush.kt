@@ -1,11 +1,8 @@
 package com.emarsys.mobileengage.push
 
-import com.emarsys.api.AppEvent
 import com.emarsys.api.generic.GenericApi
-import com.emarsys.api.push.PushInstance
 import com.emarsys.api.push.PushInternalApi
 import com.emarsys.context.SdkContextApi
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 
@@ -30,9 +27,6 @@ class IosPush<Logging : IosPushInstance, Gatherer : IosPushInstance, Internal : 
 
     override val pushToken: Result<String?>
         get() = runCatching { activeInstance<PushInternalApi>().pushToken }
-
-    override val notificationEvents: Flow<AppEvent>
-        get() = activeInstance<PushInstance>().notificationEvents
 
     override var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol?
         get() = activeInstance<IosPushInstance>().customerUserNotificationCenterDelegate
