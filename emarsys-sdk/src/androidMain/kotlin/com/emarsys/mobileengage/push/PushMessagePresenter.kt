@@ -94,6 +94,7 @@ class PushMessagePresenter(
         pushMessage: AndroidPushMessage
     ): Intent {
         val intent = Intent(context, NotificationOpenedActivity::class.java)
+        intent.setPackage(context.packageName)
         intent.action = actionModel.id
         intent.putExtra(
             INTENT_EXTRA_PAYLOAD_KEY,
