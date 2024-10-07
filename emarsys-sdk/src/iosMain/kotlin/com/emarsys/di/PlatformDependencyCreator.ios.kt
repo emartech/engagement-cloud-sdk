@@ -79,7 +79,7 @@ actual class PlatformDependencyCreator actual constructor(
     private val sdkLogger: Logger,
     private val json: Json,
     private val msgHub: MsgHubApi,
-    actionHandler: ActionHandlerApi,
+    private val actionHandler: ActionHandlerApi,
     eventChannel: CustomEventChannelApi
 ) : DependencyCreator {
     private val platformContext: IosPlatformContext = IosPlatformContext()
@@ -214,6 +214,7 @@ actual class PlatformDependencyCreator actual constructor(
             pushContext,
             sdkContext,
             actionFactory,
+            actionHandler,
             json,
             sdkDispatcher,
             sdkLogger

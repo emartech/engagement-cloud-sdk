@@ -5,11 +5,15 @@ import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.PushCall
 import com.emarsys.api.push.PushInternal
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
+import com.emarsys.mobileengage.action.actions.Action
 import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
+import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.networking.clients.push.PushClientApi
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -42,6 +46,7 @@ class IosPushInternal(
     pushContext: ApiContext<PushCall>,
     sdkContext: SdkContextApi,
     private val actionFactory: ActionFactoryApi<ActionModel>,
+    private val actionHandler: ActionHandlerApi,
     private val json: Json,
     private val sdkDispatcher: CoroutineDispatcher,
     private val sdkLogger: Logger
@@ -106,7 +111,8 @@ class IosPushInternal(
                 }
             }
         actionModel?.let {
-            actionFactory.create(it).invoke()
+            val triggeredAction = actionFactory.create(it)
+            actionHandler.handleActions(listOf(), triggeredAction)
         }
     }
 

@@ -3,6 +3,7 @@ package com.emarsys.mobileengage.push
 import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.PushCall
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
@@ -41,6 +42,7 @@ class IosPushInternalTests {
     private lateinit var mockPushContext: ApiContext<PushCall>
     private lateinit var mockSdkContext: SdkContextApi
     private lateinit var mockActionFactory: ActionFactoryApi<ActionModel>
+    private lateinit var mockActionHandler: ActionHandlerApi
     private lateinit var json: Json
     private lateinit var sdkDispatcher: CoroutineDispatcher
 
@@ -54,8 +56,11 @@ class IosPushInternalTests {
         mockPushContext = mock()
         mockSdkContext = mock()
         mockActionFactory = mock()
+        mockActionHandler = mock()
         json = JsonUtil.json
         sdkDispatcher = dispatcher
+
+        everySuspend { mockActionHandler.handleActions(any(), any()) } returns Unit
 
         iosPushInternal = IosPushInternal(
             mockPushClient,
@@ -63,6 +68,7 @@ class IosPushInternalTests {
             mockPushContext,
             mockSdkContext,
             mockActionFactory,
+            mockActionHandler,
             json,
             sdkDispatcher,
             mock()
@@ -104,7 +110,7 @@ class IosPushInternalTests {
 
         verifySuspend {
             mockActionFactory.create(actionModel)
-            mockUrlOpener.open("https://www.emarsys.com")
+            mockActionHandler.handleActions(any(), action)
         }
     }
 
@@ -151,7 +157,7 @@ class IosPushInternalTests {
 
         verifySuspend {
             mockActionFactory.create(actionModel)
-            mockUrlOpener.open("https://www.emarsys.com")
+            mockActionHandler.handleActions(any(), action)
         }
     }
 
@@ -186,7 +192,7 @@ class IosPushInternalTests {
 
         verifySuspend {
             mockActionFactory.create(actionModel)
-            mockPushToInAppHandler.handle(actionModel)
+            mockActionHandler.handleActions(any(), action)
         }
     }
 }
