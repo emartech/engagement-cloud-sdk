@@ -44,7 +44,7 @@ class ButtonClickedActionTests {
             EventType.INTERNAL,
             PUSH_EVENT_NAME,
             mapOf(
-                "button_id" to ID,
+                "buttonId" to ID,
                 "sid" to SID,
                 "origin" to BUTTON_ORIGIN
             )

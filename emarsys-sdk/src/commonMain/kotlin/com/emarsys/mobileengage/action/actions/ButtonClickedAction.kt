@@ -22,7 +22,7 @@ data class ButtonClickedAction(
                         EventType.INTERNAL,
                         BUTTON_CLICKED_EVENT_NAME,
                         mapOf(
-                            "button_id" to action.id,
+                            "buttonId" to action.id,
                             "sid" to action.sid,
                             "origin" to BUTTON_CLICK_ORIGIN
                         )
