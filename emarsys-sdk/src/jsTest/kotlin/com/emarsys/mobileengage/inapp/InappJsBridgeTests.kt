@@ -1,7 +1,7 @@
 package com.emarsys.mobileengage.inapp
 
 import com.emarsys.mobileengage.action.ActionFactoryApi
-import com.emarsys.mobileengage.action.actions.ButtonClickedAction
+import com.emarsys.mobileengage.action.actions.ReportingAction
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
 import com.emarsys.mobileengage.action.models.BasicCopyToClipboardActionModel
@@ -36,7 +36,7 @@ class InappJsBridgeTests {
         const val ID = "1"
         const val CAMPAIGN_ID = "testCampaignId"
         val TEST_ACTION =
-            ButtonClickedAction(BasicInAppButtonClickedActionModel(ID, CAMPAIGN_ID), mock())
+            ReportingAction(BasicInAppButtonClickedActionModel(ID, CAMPAIGN_ID), mock())
     }
 
     private lateinit var inappJsBridge: InAppJsBridgeApi

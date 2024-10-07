@@ -3,14 +3,14 @@ package com.emarsys.mobileengage.action.models
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-interface ButtonClickedActionModel
+interface ReportingActionModel
 
-interface PushButtonClickedActionModel: ButtonClickedActionModel {
+interface PushButtonClickedActionModel: ReportingActionModel {
     val id: String
     val sid: String
 }
 
-interface InAppButtonClickedActionModel: ButtonClickedActionModel {
+interface InAppButtonClickedActionModel: ReportingActionModel {
     val id: String
     val campaignId: String
     val sid: String?

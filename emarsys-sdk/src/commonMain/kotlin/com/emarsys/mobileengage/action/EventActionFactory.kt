@@ -10,19 +10,19 @@ import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.mobileengage.action.actions.Action
 import com.emarsys.mobileengage.action.actions.AppEventAction
 import com.emarsys.mobileengage.action.actions.BadgeCountAction
-import com.emarsys.mobileengage.action.actions.ButtonClickedAction
 import com.emarsys.mobileengage.action.actions.CopyToClipboardAction
 import com.emarsys.mobileengage.action.actions.CustomEventAction
 import com.emarsys.mobileengage.action.actions.DismissAction
 import com.emarsys.mobileengage.action.actions.OpenExternalUrlAction
+import com.emarsys.mobileengage.action.actions.ReportingAction
 import com.emarsys.mobileengage.action.actions.RequestPushPermissionAction
 import com.emarsys.mobileengage.action.models.AppEventActionModel
 import com.emarsys.mobileengage.action.models.BadgeCountActionModel
-import com.emarsys.mobileengage.action.models.ButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.CopyToClipboardActionModel
 import com.emarsys.mobileengage.action.models.CustomEventActionModel
 import com.emarsys.mobileengage.action.models.DismissActionModel
 import com.emarsys.mobileengage.action.models.OpenExternalUrlActionModel
+import com.emarsys.mobileengage.action.models.ReportingActionModel
 import com.emarsys.mobileengage.action.models.RequestPushPermissionActionModel
 import com.emarsys.mobileengage.events.SdkEvent
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -49,7 +49,7 @@ class EventActionFactory<ActionModelType>(
             is BadgeCountActionModel -> BadgeCountAction(action, badgeCountHandler)
             is DismissActionModel -> DismissAction(action, msgHub)
             is OpenExternalUrlActionModel -> OpenExternalUrlAction(action, externalUrlOpener)
-            is ButtonClickedActionModel -> ButtonClickedAction(action, eventChannel)
+            is ReportingActionModel -> ReportingAction(action, eventChannel)
             is CopyToClipboardActionModel -> CopyToClipboardAction(action, clipboardHandler)
             else -> {
                 val exception = IllegalArgumentException("Unknown action type: $action")

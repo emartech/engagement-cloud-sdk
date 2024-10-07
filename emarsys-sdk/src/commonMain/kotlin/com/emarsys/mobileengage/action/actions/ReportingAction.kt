@@ -6,12 +6,12 @@ import com.emarsys.SdkConstants.IN_APP_BUTTON_CLICKED_EVENT_NAME
 import com.emarsys.core.channel.CustomEventChannelApi
 import com.emarsys.mobileengage.action.models.BasicInAppButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
-import com.emarsys.mobileengage.action.models.ButtonClickedActionModel
+import com.emarsys.mobileengage.action.models.ReportingActionModel
 import com.emarsys.networking.clients.event.model.Event
 import com.emarsys.networking.clients.event.model.EventType
 
-data class ButtonClickedAction(
-    private val action: ButtonClickedActionModel,
+data class ReportingAction(
+    private val action: ReportingActionModel,
     private val eventChannel: CustomEventChannelApi
 ) : Action<Unit> {
     override suspend fun invoke(value: Unit?) {

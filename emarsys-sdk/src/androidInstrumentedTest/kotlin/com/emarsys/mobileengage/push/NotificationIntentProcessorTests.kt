@@ -8,7 +8,7 @@ import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.channel.CustomEventChannelApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.actions.Action
-import com.emarsys.mobileengage.action.actions.ButtonClickedAction
+import com.emarsys.mobileengage.action.actions.ReportingAction
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.PresentableAppEventActionModel
@@ -87,7 +87,7 @@ class NotificationIntentProcessorTests {
     fun testProcessIntent_shouldHandleAction_withActionHandler_withMandatoryActions() = runTest {
         val actionModel = PresentableAppEventActionModel(ID, TITLE, NAME, PAYLOAD)
         val buttonClickedActionModel = BasicPushButtonClickedActionModel(ID, SID)
-        val buttonClickedAction = ButtonClickedAction(buttonClickedActionModel, mockEventChannel)
+        val reportingAction = ReportingAction(buttonClickedActionModel, mockEventChannel)
 
         val intent = createTestIntent(actionModel)
 
@@ -101,7 +101,7 @@ class NotificationIntentProcessorTests {
         advanceUntilIdle()
 
         coVerify { mockActionFactory.create(actionModel) }
-        coVerify { mockActionHandler.handleActions(listOf(buttonClickedAction), mockAction) }
+        coVerify { mockActionHandler.handleActions(listOf(reportingAction), mockAction) }
     }
 
     private fun createTestIntent(actionModel: PresentableAppEventActionModel): Intent {

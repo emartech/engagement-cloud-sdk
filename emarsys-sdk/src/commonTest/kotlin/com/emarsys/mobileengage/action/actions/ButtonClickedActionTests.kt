@@ -39,7 +39,7 @@ class ButtonClickedActionTests {
     @Test
     fun testInvoke_shouldSendEventWithProperPayload_whenActionModel_pushButtonClicked() = runTest {
         val pushButtonClickedActionModel = BasicPushButtonClickedActionModel(ID, SID)
-        val action = ButtonClickedAction(pushButtonClickedActionModel, mockCustomEventChannel)
+        val action = ReportingAction(pushButtonClickedActionModel, mockCustomEventChannel)
         val expectedEvent = Event(
             EventType.INTERNAL,
             PUSH_EVENT_NAME,
@@ -62,7 +62,7 @@ class ButtonClickedActionTests {
     @Test
     fun testInvoke_shouldSendEventWithProperPayload_whenActionModel_inAppButtonClicked() = runTest {
         val inAppButtonClickedActionModel = BasicInAppButtonClickedActionModel(ID, CAMPAIGN_ID, SID, TEST_URL)
-        val action = ButtonClickedAction(inAppButtonClickedActionModel, mockCustomEventChannel)
+        val action = ReportingAction(inAppButtonClickedActionModel, mockCustomEventChannel)
         val expectedEvent = Event(
             EventType.INTERNAL,
             IN_APP_EVENT_NAME,
@@ -86,7 +86,7 @@ class ButtonClickedActionTests {
     @Test
     fun testInvoke_shouldSendEventWithProperPayload_whenActionModel_inAppButtonClicked_noSidAndUrl() = runTest {
         val inAppButtonClickedActionModel = BasicInAppButtonClickedActionModel(ID, CAMPAIGN_ID)
-        val action = ButtonClickedAction(inAppButtonClickedActionModel, mockCustomEventChannel)
+        val action = ReportingAction(inAppButtonClickedActionModel, mockCustomEventChannel)
         val expectedEvent = Event(
             EventType.INTERNAL,
             IN_APP_EVENT_NAME,

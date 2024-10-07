@@ -8,7 +8,7 @@ import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.channel.CustomEventChannelApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.actions.Action
-import com.emarsys.mobileengage.action.actions.ButtonClickedAction
+import com.emarsys.mobileengage.action.actions.ReportingAction
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
@@ -55,7 +55,7 @@ class NotificationIntentProcessor(
         pushMessage?.data?.sid?.let {
             if (actionModel is PresentableActionModel) {
                 result.add(
-                    ButtonClickedAction(
+                    ReportingAction(
                         BasicPushButtonClickedActionModel(
                             actionModel.id,
                             it
