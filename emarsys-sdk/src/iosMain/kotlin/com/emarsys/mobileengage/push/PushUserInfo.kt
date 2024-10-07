@@ -6,22 +6,30 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PushUserInfo(
-    val ems: PushUserInfoEms? = null
+    val ems: PushUserInfoEms? = null,
+    val u: U? = null
 )
 
 @Serializable
 data class PushUserInfoEms(
     val multichannelId: String? = null,
     val inapp: PushUserInfoInApp? = null,
+    val sid: String? = null,
     @SerialName("default_action")
     val defaultAction: PresentableActionModel? = null,
     val actions: List<PresentableActionModel>? = null
 )
-
 
 @Serializable
 data class PushUserInfoInApp(
     @SerialName("campaign_id")
     val campaignId: String,
     val url: String
+)
+
+@Serializable
+data class U(
+    @SerialName("product-id")
+    val productId: String? = null,
+    val sid: String? = null
 )
