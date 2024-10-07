@@ -110,10 +110,31 @@ class IosPushInternal(
                     it.id == actionIdentifier
                 }
             }
+
         actionModel?.let {
             val triggeredAction = actionFactory.create(it)
-            actionHandler.handleActions(listOf(), triggeredAction)
+            val mandatoryActions = createMandatoryActions(pushUserInfo, it)
+            actionHandler.handleActions(mandatoryActions, triggeredAction)
         }
+    }
+
+    private suspend fun createMandatoryActions(
+        pushUserInfo: PushUserInfo,
+        actionModel: ActionModel
+    ): List<Action<*>> {
+        val result = mutableListOf<Action<*>>()
+        val sid: String? = pushUserInfo.u?.sid ?: pushUserInfo.ems?.sid
+
+        sid?.let {
+            if (actionModel is PresentableActionModel) {
+                val model = BasicPushButtonClickedActionModel(
+                    actionModel.id,
+                    it
+                )
+                result.add(actionFactory.create(model))
+            }
+        }
+        return result
     }
 
     private fun extractDefaultAction(

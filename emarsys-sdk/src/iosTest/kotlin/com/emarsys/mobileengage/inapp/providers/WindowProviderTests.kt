@@ -24,9 +24,9 @@ import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class WindowProviderTest {
-    lateinit var mockSceneProvider: Provider<UIScene>
-    lateinit var mockViewControllerProvider: Provider<UIViewController>
-    lateinit var mainDispatcher: CoroutineDispatcher
+    private lateinit var mockSceneProvider: Provider<UIScene>
+    private lateinit var mockViewControllerProvider: Provider<UIViewController>
+    private lateinit var mainDispatcher: CoroutineDispatcher
 
     @BeforeTest
     fun setUp() {

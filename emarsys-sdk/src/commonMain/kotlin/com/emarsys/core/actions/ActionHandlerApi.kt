@@ -4,5 +4,5 @@ import com.emarsys.mobileengage.action.actions.Action
 
 interface ActionHandlerApi {
 
-    suspend fun handleActions(mandatoryActions: List<Action<Unit>>, triggeredAction: Action<*>)
+    suspend fun handleActions(mandatoryActions: List<Action<*>>, triggeredAction: Action<*>)
 }
