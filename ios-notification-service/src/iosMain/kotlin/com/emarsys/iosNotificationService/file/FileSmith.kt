@@ -5,7 +5,6 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSURL
 import platform.Foundation.NSUUID
-import platform.Foundation.URLByAppendingPathComponent
 
 class FileSmith(private val uuidProvider: Provider<NSUUID>) {
 
