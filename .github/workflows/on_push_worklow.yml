@@ -55,7 +55,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           cache-overwrite-existing: true
-          cache-cleanup: true
+          cache-cleanup: always
 
       - name: Gradle Build
         run: make build-pipeline
