@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import com.emarsys.AndroidEmarsysConfig
 import com.emarsys.FakeActivity
+import com.emarsys.context.SdkContextApi
 import com.emarsys.watchdog.activity.ActivityFinderApi
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
@@ -23,12 +24,18 @@ class LaunchApplicationHandlerTest {
 
     private lateinit var mockApplicationContext: Context
     private lateinit var mockActivityFinder: ActivityFinderApi
+    private lateinit var mockSdkContext: SdkContextApi
 
     @Before
     fun setUp() {
         mockActivityFinder = mockk(relaxed = true)
         mockApplicationContext = mockk(relaxed = true)
-        launchApplicationHandler = LaunchApplicationHandler(mockApplicationContext, mockActivityFinder)
+        mockSdkContext = mockk(relaxed = true)
+        launchApplicationHandler = LaunchApplicationHandler(
+            mockApplicationContext,
+            mockActivityFinder,
+            mockSdkContext
+        )
 
         coEvery { mockActivityFinder.currentActivity() } returns null
     }
@@ -36,13 +43,14 @@ class LaunchApplicationHandlerTest {
     @Test
     fun testLaunchApplication_when_activityIsNull_inConfig() = runTest {
         val config = AndroidEmarsysConfig("testAppCode")
+        every { mockSdkContext.config } returns config
 
         val mockIntent: Intent = mockk(relaxed = true)
         val mockPackageManager: PackageManager = mockk(relaxed = true)
         every { mockApplicationContext.packageManager } returns mockPackageManager
         every { mockPackageManager.getLaunchIntentForPackage(any()) } returns mockIntent
 
-        launchApplicationHandler.launchApplication(config)
+        launchApplicationHandler.launchApplication()
 
         verify { mockPackageManager.getLaunchIntentForPackage(any()) }
         verify { mockApplicationContext.startActivity(mockIntent) }
@@ -52,11 +60,12 @@ class LaunchApplicationHandlerTest {
     @Test
     fun testLaunchApplication_when_activityIsSet_inConfig() = runTest {
         val config = AndroidEmarsysConfig("testAppCode", launchActivityClass = FakeActivity::class.java)
+        every { mockSdkContext.config } returns config
 
         val intentCaptor = slot<Intent>()
         every { mockApplicationContext.startActivity(capture(intentCaptor)) } returns Unit
 
-        launchApplicationHandler.launchApplication(config)
+        launchApplicationHandler.launchApplication()
 
         val intent = intentCaptor.captured
         val expectedIntent = Intent(mockApplicationContext, FakeActivity::class.java)

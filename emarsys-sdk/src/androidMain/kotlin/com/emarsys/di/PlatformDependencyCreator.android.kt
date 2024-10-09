@@ -224,7 +224,7 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createLaunchApplicationHandler(): LaunchApplicationHandlerApi {
-        return LaunchApplicationHandler(applicationContext, currentActivityWatchdog)
+        return LaunchApplicationHandler(applicationContext, currentActivityWatchdog, sdkContext)
     }
 
     actual override fun createPushInternal(

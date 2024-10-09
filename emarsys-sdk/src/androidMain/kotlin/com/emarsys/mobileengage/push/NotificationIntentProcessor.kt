@@ -32,7 +32,7 @@ class NotificationIntentProcessor(
                 val actionModel = getActionModel(intent)
                 actionModel?.let {
                     val triggeredAction = actionFactory.create(it)
-                    val mandatoryActions = getMandatoryAction(intent, actionModel)
+                    val mandatoryActions = getMandatoryActions(intent, actionModel)
                     actionHandler.handleActions(mandatoryActions, triggeredAction)
                 }
             }
@@ -47,7 +47,7 @@ class NotificationIntentProcessor(
             ?: defaultAction?.let { json.decodeFromString<BasicActionModel>(it) }
     }
 
-    private fun getMandatoryAction(intent: Intent, actionModel: ActionModel): List<Action<Unit>> {
+    private fun getMandatoryActions(intent: Intent, actionModel: ActionModel): List<Action<Unit>> {
         val result = mutableListOf<Action<Unit>>()
         val pushMessageString = intent.getStringExtra(INTENT_EXTRA_PAYLOAD_KEY)
         val pushMessage = pushMessageString?.let { json.decodeFromString<AndroidPushMessage>(it) }
