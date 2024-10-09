@@ -1,8 +1,11 @@
 package com.emarsys.mobileengage.action.actions
 
-class LaunchApplicationAction(): Action<Unit> {
+import com.emarsys.core.launchapplication.LaunchApplicationHandlerApi
+
+class LaunchApplicationAction(private val launchApplicationHandler: LaunchApplicationHandlerApi) :
+    Action<Unit> {
 
     override suspend fun invoke(value: Unit?) {
-
+        launchApplicationHandler.launchApplication()
     }
 }
