@@ -105,7 +105,7 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createPlatformContext(pushActionFactory: ActionFactoryApi<ActionModel>): PlatformContext {
-        return AndroidPlatformContext(json, pushActionFactory, actionHandler, eventChannel)
+        return AndroidPlatformContext(json, pushActionFactory, actionHandler)
     }
 
     actual override fun createLanguageProvider(): Provider<String> {

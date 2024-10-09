@@ -8,8 +8,10 @@ import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.channel.CustomEventChannelApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.actions.Action
+import com.emarsys.mobileengage.action.actions.LaunchApplicationAction
 import com.emarsys.mobileengage.action.actions.ReportingAction
 import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.action.models.BasicLaunchApplicationActionModel
 import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.PresentableAppEventActionModel
 import com.emarsys.mobileengage.push.model.NotificationOperation
@@ -60,7 +62,7 @@ class NotificationIntentProcessorTests {
         mockActionHandler = mockk(relaxed = true)
         mockEventChannel = mockk(relaxed = true)
         notificationIntentProcessor =
-            NotificationIntentProcessor(json, mockActionFactory, mockActionHandler, mockEventChannel)
+            NotificationIntentProcessor(json, mockActionFactory, mockActionHandler)
     }
 
     @After
@@ -88,6 +90,10 @@ class NotificationIntentProcessorTests {
         val actionModel = PresentableAppEventActionModel(ID, TITLE, NAME, PAYLOAD)
         val buttonClickedActionModel = BasicPushButtonClickedActionModel(ID, SID)
         val reportingAction = ReportingAction(buttonClickedActionModel, mockEventChannel)
+        val mockLaunchApplicationAction: LaunchApplicationAction = mockk(relaxed = true)
+
+        coEvery { mockActionFactory.create(BasicLaunchApplicationActionModel) } returns mockLaunchApplicationAction
+        coEvery { mockActionFactory.create(buttonClickedActionModel) } returns reportingAction
 
         val intent = createTestIntent(actionModel)
 
@@ -101,7 +107,7 @@ class NotificationIntentProcessorTests {
         advanceUntilIdle()
 
         coVerify { mockActionFactory.create(actionModel) }
-        coVerify { mockActionHandler.handleActions(listOf(reportingAction), mockAction) }
+        coVerify { mockActionHandler.handleActions(listOf(mockLaunchApplicationAction, reportingAction), mockAction) }
     }
 
     private fun createTestIntent(actionModel: PresentableAppEventActionModel): Intent {
