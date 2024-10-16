@@ -100,7 +100,10 @@ actual class PlatformDependencyCreator actual constructor(
     private val sharedPreferences =
         applicationContext.getSharedPreferences(StorageConstants.SUITE_NAME, Context.MODE_PRIVATE)
 
-    actual override fun createPlatformInitializer(pushActionFactory: ActionFactoryApi<ActionModel>): PlatformInitializerApi {
+    actual override fun createPlatformInitializer(
+        pushActionFactory: ActionFactoryApi<ActionModel>,
+        pushActionHandler: ActionHandlerApi
+    ): PlatformInitializerApi {
         return PlatformInitializer()
     }
 

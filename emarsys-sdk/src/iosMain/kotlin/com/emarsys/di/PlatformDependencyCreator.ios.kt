@@ -87,7 +87,10 @@ actual class PlatformDependencyCreator actual constructor(
     private val uiDevice = UIDevice(processInfo)
     private val notificationCenter = UNUserNotificationCenter.currentNotificationCenter()
 
-    actual override fun createPlatformInitializer(pushActionFactory: ActionFactoryApi<ActionModel>): PlatformInitializerApi {
+    actual override fun createPlatformInitializer(
+        pushActionFactory: ActionFactoryApi<ActionModel>,
+        pushActionHandler: ActionHandlerApi
+    ): PlatformInitializerApi {
         return PlatformInitializer()
     }
 

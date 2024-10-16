@@ -49,7 +49,10 @@ expect class PlatformDependencyCreator(
     eventChannel: CustomEventChannelApi
 ) : DependencyCreator {
 
-    override fun createPlatformInitializer(pushActionFactory: ActionFactoryApi<ActionModel>): PlatformInitializerApi
+    override fun createPlatformInitializer(
+        pushActionFactory: ActionFactoryApi<ActionModel>,
+        pushActionHandler: ActionHandlerApi
+    ): PlatformInitializerApi
 
     override fun createPlatformContext(pushActionFactory: ActionFactoryApi<ActionModel>): PlatformContext
 

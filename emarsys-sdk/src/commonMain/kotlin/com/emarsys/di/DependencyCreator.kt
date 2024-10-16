@@ -6,6 +6,7 @@ import com.emarsys.api.push.PushCall
 import com.emarsys.api.push.PushInstance
 import com.emarsys.api.push.PushInternalApi
 import com.emarsys.context.SdkContext
+import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.clipboard.ClipboardHandlerApi
@@ -35,7 +36,10 @@ import kotlinx.serialization.json.Json
 
 interface DependencyCreator {
 
-    fun createPlatformInitializer(pushActionFactory: ActionFactoryApi<ActionModel>): PlatformInitializerApi
+    fun createPlatformInitializer(
+        pushActionFactory: ActionFactoryApi<ActionModel>,
+        pushActionHandler: ActionHandlerApi
+    ): PlatformInitializerApi
 
     fun createPlatformContext(pushActionFactory: ActionFactoryApi<ActionModel>): PlatformContext
 

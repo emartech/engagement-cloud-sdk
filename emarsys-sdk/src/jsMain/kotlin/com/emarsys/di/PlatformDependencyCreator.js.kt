@@ -83,10 +83,12 @@ actual class PlatformDependencyCreator actual constructor(
 ) : DependencyCreator {
 
     actual override fun createPlatformInitializer(
-        pushActionFactory: ActionFactoryApi<ActionModel>
+        pushActionFactory: ActionFactoryApi<ActionModel>,
+        pushActionHandler: ActionHandlerApi
     ): PlatformInitializerApi {
         val pushNotificationClickHandler = PushNotificationClickHandler(
             pushActionFactory,
+            pushActionHandler,
             BroadcastChannel(WEB_PUSH_ON_NOTIFICATION_CLICKED_CHANNEL_NAME),
             CoroutineScope(Dispatchers.Default + SupervisorJob()),
             sdkLogger

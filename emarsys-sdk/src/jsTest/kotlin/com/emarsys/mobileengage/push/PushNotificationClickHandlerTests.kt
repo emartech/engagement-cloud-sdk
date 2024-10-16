@@ -1,9 +1,11 @@
 package com.emarsys.mobileengage.push
 
+import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.actions.Action
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
+import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.action.models.PresentableOpenExternalUrlActionModel
 import com.emarsys.mobileengage.push.model.JsNotificationClickedData
@@ -34,6 +36,9 @@ class PushNotificationClickHandlerTests {
 
     private lateinit var mockActionFactory: ActionFactoryApi<ActionModel>
     private lateinit var mockAction: Action<*>
+    private lateinit var mockDefaultTapAction: Action<*>
+    private lateinit var mockButtonClickedAction: Action<*>
+    private lateinit var mockActionHandler: ActionHandlerApi
     private lateinit var onNotificationClickedBroadcastChannel: BroadcastChannel
     private lateinit var pushNotificationClickHandler: PushNotificationClickHandler
 
@@ -42,7 +47,9 @@ class PushNotificationClickHandlerTests {
     fun setup() = runTest {
         mockActionFactory = mock<ActionFactoryApi<ActionModel>>()
         mockAction = createMockAction()
-        everySuspend { mockActionFactory.create(any()) } returns mockAction
+        mockDefaultTapAction = createMockAction()
+        mockButtonClickedAction = createMockAction()
+        mockActionHandler = mock<ActionHandlerApi>()
 
         onNotificationClickedBroadcastChannel =
             BroadcastChannel("emarsys-sdk-on-notification-clicked-channel")
@@ -50,6 +57,7 @@ class PushNotificationClickHandlerTests {
         pushNotificationClickHandler =
             PushNotificationClickHandler(
                 mockActionFactory,
+                mockActionHandler,
                 onNotificationClickedBroadcastChannel,
                 TestScope(),
                 sdkLogger = mock {
@@ -72,34 +80,54 @@ class PushNotificationClickHandlerTests {
         }
 
     @Test
-    fun handleNotificationClick_shouldCallActionFactory_whenDefaultTapAction_isPresent() = runTest {
+    fun handleNotificationClick_shouldHandleDefaultTapAction_andNotHandlePushButtonClickedAction_whenDefaultTapAction_isPresent() = runTest {
         val defaultTapActionModel = BasicOpenExternalUrlActionModel("https://www.google.com")
         val notificationClickedData =
             createTestJsNotificationClickedData("", defaultTapActionModel = defaultTapActionModel)
         val event =
             JsonUtil.json.encodeToString<JsNotificationClickedData>(notificationClickedData)
+        everySuspend { mockActionFactory.create(defaultTapActionModel) } returns mockDefaultTapAction
 
         pushNotificationClickHandler.handleNotificationClick(event)
 
         verifySuspend { mockActionFactory.create(defaultTapActionModel) }
-        verifySuspend { mockAction.invoke() }
+        verifySuspend {
+            mockActionHandler.handleActions(
+                emptyList(),
+                mockDefaultTapAction
+            )
+        }
     }
 
     @Test
-    fun handleNotificationClick_shouldCallActionFactory_whenActionWithId_isPresent() = runTest {
-        val actionId = "testActionId"
-        val actionModel =
-            PresentableOpenExternalUrlActionModel(actionId, "title", "https://www.google.com")
-        val notificationClickedData =
-            createTestJsNotificationClickedData(actionId, actionModels = listOf(actionModel))
-        val event =
-            JsonUtil.json.encodeToString<JsNotificationClickedData>(notificationClickedData)
+    fun handleNotificationClick_shouldHandleActionAndMandatoryAction_whenActionWithId_isPresent() =
+        runTest {
+            val actionId = "testActionId"
+            val actionModel =
+                PresentableOpenExternalUrlActionModel(actionId, "title", "https://www.google.com")
+            val notificationClickedData =
+                createTestJsNotificationClickedData(actionId, actionModels = listOf(actionModel))
+            val event =
+                JsonUtil.json.encodeToString<JsNotificationClickedData>(notificationClickedData)
+            everySuspend { mockActionFactory.create(actionModel) } returns mockAction
+            everySuspend {
+                mockActionFactory.create(
+                    BasicPushButtonClickedActionModel(
+                        actionId,
+                        notificationClickedData.jsPushMessage.data.sid
+                    )
+                )
+            } returns mockButtonClickedAction
 
-        pushNotificationClickHandler.handleNotificationClick(event)
+            pushNotificationClickHandler.handleNotificationClick(event)
 
-        verifySuspend { mockActionFactory.create(actionModel) }
-        verifySuspend { mockAction.invoke() }
-    }
+            verifySuspend {
+                mockActionHandler.handleActions(
+                    listOf(mockButtonClickedAction),
+                    mockAction
+                )
+            }
+        }
 
     @Test
     fun handleNotificationClick_shouldNotCallActionFactory_whenActionWithId_isNotPresent() =
@@ -116,8 +144,8 @@ class PushNotificationClickHandlerTests {
 
             pushNotificationClickHandler.handleNotificationClick(event)
 
-            verifySuspend(VerifyMode.exactly(0)) { mockActionFactory.create(actionModel) }
-            verifySuspend(VerifyMode.exactly(0)) { mockAction.invoke() }
+            verifySuspend(VerifyMode.exactly(0)) { mockActionFactory.create(any()) }
+            verifySuspend(VerifyMode.exactly(0)) { mockActionHandler.handleActions(any(), any()) }
         }
 
     @Test
@@ -136,8 +164,8 @@ class PushNotificationClickHandlerTests {
 
             pushNotificationClickHandler.handleNotificationClick(event)
 
-            verifyNoMoreCalls(mockActionFactory)
-            verifyNoMoreCalls(mockAction)
+            verifySuspend(VerifyMode.exactly(0)) { mockActionFactory.create(any()) }
+            verifySuspend(VerifyMode.exactly(0)) { mockActionHandler.handleActions(any(), any()) }
         }
 
     @Test
@@ -147,7 +175,8 @@ class PushNotificationClickHandlerTests {
 
             pushNotificationClickHandler.handleNotificationClick(event)
 
-            verifyNoMoreCalls(mockActionFactory)
+            verifySuspend(VerifyMode.exactly(0)) { mockActionFactory.create(any()) }
+            verifySuspend(VerifyMode.exactly(0)) { mockActionHandler.handleActions(any(), any()) }
         }
 
     @Test
