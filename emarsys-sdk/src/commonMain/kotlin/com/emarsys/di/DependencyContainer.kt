@@ -572,7 +572,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
     }
 
     private val platformInitializer: PlatformInitializerApi by lazy {
-        dependencyCreator.createPlatformInitializer(pushActionFactory)
+        dependencyCreator.createPlatformInitializer(pushActionFactory, pushActionHandler)
     }
 
     override suspend fun setup() {
