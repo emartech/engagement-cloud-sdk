@@ -1,8 +1,10 @@
 package com.emarsys.mobileengage.action.actions
 
+import com.emarsys.SdkConstants.PUSH_CLICKED_EVENT_NAME
 import com.emarsys.core.channel.CustomEventChannelApi
 import com.emarsys.mobileengage.action.models.BasicInAppButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
+import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.networking.clients.event.model.Event
 import com.emarsys.networking.clients.event.model.EventType
 import dev.mokkery.answering.returns
@@ -18,7 +20,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 
-class ButtonClickedActionTests {
+class ReportingActionTests {
     private companion object {
         const val ID = "testId"
         const val SID = "testSid"
@@ -93,6 +95,28 @@ class ButtonClickedActionTests {
             mapOf(
                 "buttonId" to ID,
                 "campaignId" to CAMPAIGN_ID,
+            )
+        )
+
+        val eventSlot = slot<Event>()
+
+        everySuspend { mockCustomEventChannel.send(capture(eventSlot)) } returns Unit
+
+        action.invoke()
+
+        verifyArguments(eventSlot, expectedEvent)
+    }
+
+    @Test
+    fun testInvoke_shouldSendEventWithProperPayload_whenActionModel_isNotificationOpenedActionModel() = runTest {
+        val notificationOpenedActionModel = NotificationOpenedActionModel(SID)
+        val action = ReportingAction(notificationOpenedActionModel, mockCustomEventChannel)
+        val expectedEvent = Event(
+            EventType.INTERNAL,
+            PUSH_CLICKED_EVENT_NAME,
+            mapOf(
+                "sid" to SID,
+                "origin" to "main"
             )
         )
 
