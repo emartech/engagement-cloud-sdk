@@ -1,5 +1,6 @@
 package com.emarsys.mobileengage.push
 
+import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -16,7 +17,7 @@ data class PushUserInfoEms(
     val inapp: PushUserInfoInApp? = null,
     val sid: String? = null,
     @SerialName("default_action")
-    val defaultAction: PresentableActionModel? = null,
+    val defaultAction: BasicActionModel? = null,
     val actions: List<PresentableActionModel>? = null
 )
 

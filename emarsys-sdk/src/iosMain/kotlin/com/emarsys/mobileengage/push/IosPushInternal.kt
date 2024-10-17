@@ -11,8 +11,10 @@ import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.actions.Action
 import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
+import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.networking.clients.push.PushClientApi
 import kotlinx.cinterop.BetaInteropApi
@@ -126,13 +128,20 @@ class IosPushInternal(
         val sid: String? = pushUserInfo.u?.sid ?: pushUserInfo.ems?.sid
 
         sid?.let {
-            if (actionModel is PresentableActionModel) {
-                val model = BasicPushButtonClickedActionModel(
-                    actionModel.id,
-                    it
-                )
-                result.add(actionFactory.create(model))
+            val model = when (actionModel) {
+                is PresentableActionModel -> {
+                    BasicPushButtonClickedActionModel(
+                        actionModel.id,
+                        it
+                    )
+                }
+                is BasicActionModel -> {
+                    NotificationOpenedActionModel(it)
+                }
+                else -> null
             }
+
+            model?.let { result.add(actionFactory.create(model)) }
         }
         return result
     }
