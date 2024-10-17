@@ -251,6 +251,57 @@ class IosPushInternalTests {
     }
 
     @Test
+    fun `didReceiveNotificationResponse should report buttonClick_withNewApnsPayload`() = runTest {
+        val mockUrlOpener: ExternalUrlOpenerApi = mock()
+        val actionModel = PresentableOpenExternalUrlActionModel(
+            id = "testId",
+            title = "testTitle",
+            url = "https://www.emarsys.com"
+        )
+        val action = OpenExternalUrlAction(actionModel, mockUrlOpener)
+
+        everySuspend {
+            mockActionFactory.create(actionModel)
+        } returns action
+        everySuspend {
+            mockUrlOpener.open(any())
+        } returns true
+
+        val actionIdentifier = "testId"
+        val userInfo = mapOf(
+            "ems" to mapOf(
+                "sid" to SID,
+                "actions" to listOf(
+                    mapOf(
+                        "type" to "OpenExternalUrl",
+                        "title" to "testTitle",
+                        "id" to "testId",
+                        "url" to "https://www.emarsys.com"
+                    )
+                )
+            )
+        )
+
+        val buttonClickedActionModel = BasicPushButtonClickedActionModel(
+            actionModel.id,
+            SID
+        )
+        val reportingAction = ReportingAction(buttonClickedActionModel, mock())
+
+        everySuspend { mockActionFactory.create(buttonClickedActionModel) } returns reportingAction
+
+
+        iosPushInternal.didReceiveNotificationResponse(actionIdentifier, userInfo) {}
+
+        advanceUntilIdle()
+
+        verifySuspend {
+            mockActionFactory.create(actionModel)
+            mockActionHandler.handleActions(listOf(reportingAction), action)
+        }
+    }
+
+    @Test
     fun `didReceiveNotificationResponse should report defaultAction_withOldApnsPayload`() = runTest {
         val mockUrlOpener: ExternalUrlOpenerApi = mock()
         val actionModel = BasicOpenExternalUrlActionModel(url = "https://www.emarsys.com")
@@ -297,26 +348,22 @@ class IosPushInternalTests {
     }
 
     @Test
-    fun `didReceiveNotificationResponse should report buttonClick_withNewApnsPayload`() = runTest {
+    fun `didReceiveNotificationResponse should report defaultAction_withNewApnsPayload`() = runTest {
         val mockUrlOpener: ExternalUrlOpenerApi = mock()
-        val actionModel = PresentableOpenExternalUrlActionModel(
-            id = "testId",
-            title = "testTitle",
-            url = "https://www.emarsys.com"
-        )
+        val actionModel = BasicOpenExternalUrlActionModel(url = "https://www.emarsys.com")
         val action = OpenExternalUrlAction(actionModel, mockUrlOpener)
 
-        everySuspend {
-            mockActionFactory.create(actionModel)
-        } returns action
-        everySuspend {
-            mockUrlOpener.open(any())
-        } returns true
+        everySuspend { mockActionFactory.create(actionModel) } returns action
+        everySuspend { mockUrlOpener.open(any()) } returns true
 
-        val actionIdentifier = "testId"
+        val actionIdentifier = UNNotificationDefaultActionIdentifier
         val userInfo = mapOf(
             "ems" to mapOf(
                 "sid" to SID,
+                "defaultAction" to mapOf(
+                    "type" to "OpenExternalUrl",
+                    "url" to "https://www.emarsys.com"
+                ),
                 "actions" to listOf(
                     mapOf(
                         "type" to "OpenExternalUrl",
@@ -328,14 +375,11 @@ class IosPushInternalTests {
             )
         )
 
-        val buttonClickedActionModel = BasicPushButtonClickedActionModel(
-            actionModel.id,
-            SID
-        )
-        val reportingAction = ReportingAction(buttonClickedActionModel, mock())
+        val notificationOpenedActionModel = NotificationOpenedActionModel(SID)
 
-        everySuspend { mockActionFactory.create(buttonClickedActionModel) } returns reportingAction
+        val reportingAction = ReportingAction(notificationOpenedActionModel, mock())
 
+        everySuspend { mockActionFactory.create(notificationOpenedActionModel) } returns reportingAction
 
         iosPushInternal.didReceiveNotificationResponse(actionIdentifier, userInfo) {}
 

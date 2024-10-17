@@ -2,8 +2,10 @@ package com.emarsys.mobileengage.push
 
 import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 
 @Serializable
 data class PushUserInfo(
@@ -12,11 +14,12 @@ data class PushUserInfo(
 )
 
 @Serializable
+@OptIn(ExperimentalSerializationApi::class)
 data class PushUserInfoEms(
     val multichannelId: String? = null,
     val inapp: PushUserInfoInApp? = null,
     val sid: String? = null,
-    @SerialName("default_action")
+    @JsonNames("default_action")
     val defaultAction: BasicActionModel? = null,
     val actions: List<PresentableActionModel>? = null
 )
