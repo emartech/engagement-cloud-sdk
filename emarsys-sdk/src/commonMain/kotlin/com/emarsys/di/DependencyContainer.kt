@@ -465,7 +465,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
 
     override val remoteConfigHandler: RemoteConfigHandlerApi by lazy {
         RemoteConfigHandler(
-            RemoteConfigClient(genericNetworkClient, urlFactory, crypto, json),
+            RemoteConfigClient(genericNetworkClient, urlFactory, crypto, json, sdkLogger),
             deviceInfoCollector,
             sdkContext,
             RandomProvider()
