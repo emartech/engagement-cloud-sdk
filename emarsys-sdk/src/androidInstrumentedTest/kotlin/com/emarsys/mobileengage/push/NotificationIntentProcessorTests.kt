@@ -2,7 +2,9 @@ package com.emarsys.mobileengage.push
 
 import android.content.Intent
 import androidx.test.platform.app.InstrumentationRegistry
+import com.emarsys.api.push.PushConstants.DEFAULT_TAP_ACTION_ID
 import com.emarsys.api.push.PushConstants.INTENT_EXTRA_ACTION_KEY
+import com.emarsys.api.push.PushConstants.INTENT_EXTRA_DEFAULT_TAP_ACTION_KEY
 import com.emarsys.api.push.PushConstants.INTENT_EXTRA_PAYLOAD_KEY
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.channel.CustomEventChannelApi
@@ -11,8 +13,11 @@ import com.emarsys.mobileengage.action.actions.Action
 import com.emarsys.mobileengage.action.actions.LaunchApplicationAction
 import com.emarsys.mobileengage.action.actions.ReportingAction
 import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
 import com.emarsys.mobileengage.action.models.BasicLaunchApplicationActionModel
 import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
+import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
+import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.action.models.PresentableAppEventActionModel
 import com.emarsys.mobileengage.push.model.NotificationOperation
 import com.emarsys.util.JsonUtil
@@ -110,7 +115,37 @@ class NotificationIntentProcessorTests {
         coVerify { mockActionHandler.handleActions(listOf(mockLaunchApplicationAction, reportingAction), mockAction) }
     }
 
-    private fun createTestIntent(actionModel: PresentableAppEventActionModel): Intent {
+    @Test
+    fun testProcessIntent_shouldHandleAction_withActionHandler_withMandatoryActions_whenTriggeredWithDefaultAction() = runTest {
+        val actionModel = BasicAppEventActionModel(NAME, PAYLOAD)
+        val actionJsonString = """{"type": "MEAppEvent", "name":"$NAME","payload":{"testKey":"testValue"}}"""
+        val notificationOpenedActionModel = NotificationOpenedActionModel(SID)
+        val reportingAction = ReportingAction(notificationOpenedActionModel, mockEventChannel)
+        val mockLaunchApplicationAction: LaunchApplicationAction = mockk(relaxed = true)
+
+        coEvery { mockActionFactory.create(BasicLaunchApplicationActionModel) } returns mockLaunchApplicationAction
+        coEvery { mockActionFactory.create(notificationOpenedActionModel) } returns reportingAction
+
+        val intent = Intent(context, NotificationOpenedActivity::class.java)
+        intent.action = DEFAULT_TAP_ACTION_ID
+        intent.putExtra(
+            INTENT_EXTRA_DEFAULT_TAP_ACTION_KEY,
+            actionJsonString
+        )
+        intent.putExtra(INTENT_EXTRA_PAYLOAD_KEY, createTestMessage())
+
+        val mockAction: Action<Unit> = mockk(relaxed = true)
+        coEvery { mockActionFactory.create(actionModel) } returns mockAction
+
+        notificationIntentProcessor.processIntent(intent, testScope)
+
+        advanceUntilIdle()
+
+        coVerify { mockActionFactory.create(actionModel) }
+        coVerify { mockActionHandler.handleActions(listOf(mockLaunchApplicationAction, reportingAction), mockAction) }
+    }
+
+    private fun createTestIntent(actionModel: PresentableActionModel): Intent {
         val intent = Intent(context, NotificationOpenedActivity::class.java)
         intent.action = actionModel.id
         intent.putExtra(

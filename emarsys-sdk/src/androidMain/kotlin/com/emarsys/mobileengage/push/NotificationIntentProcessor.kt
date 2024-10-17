@@ -11,6 +11,7 @@ import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.action.models.BasicLaunchApplicationActionModel
 import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
+import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.push.model.AndroidPushMessage
 import kotlinx.coroutines.CoroutineScope
@@ -57,14 +58,22 @@ class NotificationIntentProcessor(
         result.add(launchApplicationAction)
 
         pushMessage?.data?.sid?.let {
-            if (actionModel is PresentableActionModel) {
-                result.add(
-                    actionFactory.create(
-                        BasicPushButtonClickedActionModel(
-                            actionModel.id,
-                            it
-                        )
+            val reportingAction = when (actionModel) {
+                is PresentableActionModel -> {
+                    BasicPushButtonClickedActionModel(
+                        actionModel.id,
+                        it
                     )
+                }
+                is BasicActionModel -> {
+                    NotificationOpenedActionModel(it)
+                }
+                else -> null
+            }
+
+            reportingAction?.let {
+                result.add(
+                    actionFactory.create(reportingAction)
                 )
             }
         }
