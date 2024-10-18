@@ -3,9 +3,11 @@ package com.emarsys.mobileengage.push
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.actions.Action
+import com.emarsys.mobileengage.action.actions.ReportingAction
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
+import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.action.models.PresentableOpenExternalUrlActionModel
 import com.emarsys.mobileengage.push.model.JsNotificationClickedData
@@ -86,14 +88,40 @@ class PushNotificationClickHandlerTests {
             createTestJsNotificationClickedData("", defaultTapActionModel = defaultTapActionModel)
         val event =
             JsonUtil.json.encodeToString<JsNotificationClickedData>(notificationClickedData)
+        val notificationOpenedActionModel = NotificationOpenedActionModel("sid")
+        val expectedReportingAction = ReportingAction(notificationOpenedActionModel, mock())
         everySuspend { mockActionFactory.create(defaultTapActionModel) } returns mockDefaultTapAction
+        everySuspend { mockActionFactory.create(notificationOpenedActionModel) } returns expectedReportingAction
 
         pushNotificationClickHandler.handleNotificationClick(event)
 
         verifySuspend { mockActionFactory.create(defaultTapActionModel) }
         verifySuspend {
             mockActionHandler.handleActions(
-                emptyList(),
+                listOf(expectedReportingAction),
+                mockDefaultTapAction
+            )
+        }
+    }
+
+    @Test
+    fun handleNotificationClick_shouldAddReportingAction_forNotificationOpened_whenDefaultTapAction_wasTriggering() = runTest {
+        val defaultTapActionModel = BasicOpenExternalUrlActionModel("https://www.google.com")
+        val notificationClickedData =
+            createTestJsNotificationClickedData("", defaultTapActionModel = defaultTapActionModel)
+        val event =
+            JsonUtil.json.encodeToString<JsNotificationClickedData>(notificationClickedData)
+        val notificationOpenedActionModel = NotificationOpenedActionModel("sid")
+        val expectedReportingAction = ReportingAction(notificationOpenedActionModel, mock())
+        everySuspend { mockActionFactory.create(defaultTapActionModel) } returns mockDefaultTapAction
+        everySuspend { mockActionFactory.create(notificationOpenedActionModel) } returns expectedReportingAction
+
+        pushNotificationClickHandler.handleNotificationClick(event)
+
+        verifySuspend { mockActionFactory.create(defaultTapActionModel) }
+        verifySuspend {
+            mockActionHandler.handleActions(
+                listOf(expectedReportingAction),
                 mockDefaultTapAction
             )
         }
