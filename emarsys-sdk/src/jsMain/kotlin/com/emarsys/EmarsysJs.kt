@@ -25,7 +25,12 @@ class EmarsysJs {
     fun enableTracking(jsEmarsysConfig: JsEmarsysConfig): Promise<Any> {
         return coroutineScope.promise {
             Emarsys.enableTracking(jsEmarsysConfig)
-            Emarsys.linkContact(2575, "test@test.com")
+        }
+    }
+
+    fun linkContact(contactFieldId: Int, contactFieldValue: String): Promise<Any> {
+        return coroutineScope.promise {
+            Emarsys.linkContact(contactFieldId, contactFieldValue)
         }
     }
 

@@ -172,7 +172,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
     private val defaultUrls: DefaultUrlsApi by lazy {
         DefaultUrls(
             "https://me-client.gservice.emarsys.net",
-            "https://me-device-events.gservice.emarsys.net",
+            "https://me-device-event.gservice.emarsys.net",
             "https://recommender.scarabresearch.com/merchants",
             "https://deep-link.eservice.emarsys.net",
             "https://me-inbox.gservice.emarsys.net",

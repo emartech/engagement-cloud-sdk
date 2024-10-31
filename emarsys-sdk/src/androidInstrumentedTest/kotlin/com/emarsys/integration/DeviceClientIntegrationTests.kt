@@ -12,8 +12,9 @@ import kotlin.test.Test
 
 class DeviceClientIntegrationTests {
 
+    @Ignore //TODO: V4 client endpoint does not return tokens at the moment(31.10.2024); test should pass after BE is fixed
     @Test
-    fun testRegisterDeviceInfo_whenAnonymContactIsTurnedOn() = runTest {
+    fun testRegisterDeviceInfo_whenAnonymousContactIsTurnedOn() = runTest {
         val container = DependencyInjection.container as DependencyContainerPrivateApi
 
         Emarsys.initialize()
@@ -32,7 +33,7 @@ class DeviceClientIntegrationTests {
 
     @Ignore //TODO: this is a real test case when the backend get rid off their inner flipper "SET_ANON_CONTACT_ON_CLIENT_REGISTRATION"
     @Test
-    fun testRegisterDeviceInfo_whenAnonymContactIsTurnedOff() = runTest {
+    fun testRegisterDeviceInfo_whenAnonymousContactIsTurnedOff() = runTest {
         val container = DependencyInjection.container as DependencyContainerPrivateApi
 
         Emarsys.initialize()
