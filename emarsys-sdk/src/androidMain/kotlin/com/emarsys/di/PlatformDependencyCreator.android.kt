@@ -179,7 +179,7 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createExternalUrlOpener(): ExternalUrlOpenerApi {
-        return AndroidExternalUrlOpener(applicationContext)
+        return AndroidExternalUrlOpener(applicationContext, sdkLogger)
     }
 
     actual override fun createPushToInAppHandler(

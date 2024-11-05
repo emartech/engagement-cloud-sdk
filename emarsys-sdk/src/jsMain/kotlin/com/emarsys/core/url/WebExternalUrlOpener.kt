@@ -14,14 +14,12 @@ class WebExternalUrlOpener(
         const val BLANK_TARGET = "_blank"
     }
 
-    override suspend fun open(url: String): Boolean {
-        return try {
+    override suspend fun open(url: String) {
+        try {
             val parsedUrl = URL(url)
-            val openedWindow = window.open(parsedUrl.href, BLANK_TARGET)?.also { it.focus() }
-            openedWindow != null
+            window.open(parsedUrl.href, BLANK_TARGET)?.also { it.focus() }
         } catch (e: Throwable) {
             sdkLogger.error("open-external-url-failed", e, mapOf("url" to url))
-            false
         }
     }
 }

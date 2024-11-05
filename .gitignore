@@ -475,3 +475,5 @@ gradle-app.setting
 /lipo/
 /EmarsysNotificationService.xcframework/
 /buildedFrameworks/
+/iOSApp/EmarsysNotificationService.xcframework/
+/iOSApp/EmarsysSDK.xcframework/

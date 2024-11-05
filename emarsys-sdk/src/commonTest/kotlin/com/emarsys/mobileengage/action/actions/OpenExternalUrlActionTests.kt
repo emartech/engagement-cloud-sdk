@@ -15,7 +15,7 @@ class OpenExternalUrlActionTests {
     fun invoke_shouldCallExternalUrlOpener() = runTest {
         val url = "https://www.emarsys.com"
         val mockExternalUrlOpener = mock<ExternalUrlOpenerApi> {
-            everySuspend { open(url) } returns true
+            everySuspend { open(url) } returns Unit
         }
 
         val openExternalUrlAction = OpenExternalUrlAction(

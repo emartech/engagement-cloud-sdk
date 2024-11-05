@@ -137,7 +137,11 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createExternalUrlOpener(): ExternalUrlOpenerApi {
-        return IosExternalUrlOpener(UIApplication.sharedApplication, sdkContext.mainDispatcher)
+        return IosExternalUrlOpener(
+            UIApplication.sharedApplication,
+            sdkContext.mainDispatcher,
+            sdkLogger
+        )
     }
 
     actual override fun createPushToInAppHandler(

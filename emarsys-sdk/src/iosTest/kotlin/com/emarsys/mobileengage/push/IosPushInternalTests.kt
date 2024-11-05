@@ -93,7 +93,7 @@ class IosPushInternalTests {
         } returns action
         everySuspend {
             mockUrlOpener.open(any())
-        } returns true
+        } returns Unit
 
         val actionIdentifier = UNNotificationDefaultActionIdentifier
         val userInfo = mapOf(
@@ -130,7 +130,7 @@ class IosPushInternalTests {
         } returns action
         everySuspend {
             mockUrlOpener.open(any())
-        } returns true
+        } returns Unit
 
         val actionIdentifier = "testId"
         val userInfo = mapOf(
@@ -212,7 +212,7 @@ class IosPushInternalTests {
         } returns action
         everySuspend {
             mockUrlOpener.open(any())
-        } returns true
+        } returns Unit
 
         val actionIdentifier = "testId"
         val userInfo = mapOf(
@@ -265,7 +265,7 @@ class IosPushInternalTests {
         } returns action
         everySuspend {
             mockUrlOpener.open(any())
-        } returns true
+        } returns Unit
 
         val actionIdentifier = "testId"
         val userInfo = mapOf(
@@ -308,7 +308,7 @@ class IosPushInternalTests {
         val action = OpenExternalUrlAction(actionModel, mockUrlOpener)
 
         everySuspend { mockActionFactory.create(actionModel) } returns action
-        everySuspend { mockUrlOpener.open(any()) } returns true
+        everySuspend { mockUrlOpener.open(any()) } returns Unit
 
         val actionIdentifier = UNNotificationDefaultActionIdentifier
         val userInfo = mapOf(
@@ -354,7 +354,7 @@ class IosPushInternalTests {
         val action = OpenExternalUrlAction(actionModel, mockUrlOpener)
 
         everySuspend { mockActionFactory.create(actionModel) } returns action
-        everySuspend { mockUrlOpener.open(any()) } returns true
+        everySuspend { mockUrlOpener.open(any()) } returns Unit
 
         val actionIdentifier = UNNotificationDefaultActionIdentifier
         val userInfo = mapOf(
