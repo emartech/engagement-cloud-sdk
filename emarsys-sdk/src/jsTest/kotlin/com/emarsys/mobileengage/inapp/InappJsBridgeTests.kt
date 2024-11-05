@@ -61,14 +61,14 @@ class InappJsBridgeTests {
 
     @Test
     fun buttonClicked_shouldTrigger_actionFactory() = runTest {
-        val testActionModel = BasicInAppButtonClickedActionModel(ID, CAMPAIGN_ID)
+        val testActionModel = BasicInAppButtonClickedActionModel(ID)
         everySuspend {
             mockActionFactory.create(action = testActionModel)
         } returns TEST_ACTION
 
         inappJsBridge.register()
 
-        window.asDynamic()["EMSInappWebBridge"].buttonClicked("""{"id":"$ID","campaignId":"$CAMPAIGN_ID"}""")
+        window.asDynamic()["EMSInappWebBridge"].buttonClicked("""{"id":"$ID"}""")
 
         advanceUntilIdle()
 
