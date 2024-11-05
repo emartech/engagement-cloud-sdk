@@ -33,8 +33,7 @@ data class ReportingAction(
 
             is BasicInAppButtonClickedActionModel -> {
                 val attributes = mutableMapOf(
-                    "buttonId" to action.id,
-                    "campaignId" to action.campaignId
+                    "buttonId" to action.id
                 )
 
                 action.sid?.let { attributes["sid"] = it }

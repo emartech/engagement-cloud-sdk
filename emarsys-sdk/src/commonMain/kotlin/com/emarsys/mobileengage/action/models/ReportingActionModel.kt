@@ -10,7 +10,6 @@ interface PushButtonClickedActionModel: ReportingActionModel {
 }
 
 interface InAppButtonClickedActionModel: ReportingActionModel {
-    val campaignId: String
     val sid: String?
     val url: String?
 }
@@ -26,7 +25,6 @@ data class BasicPushButtonClickedActionModel(
 @SerialName("inAppButtonClicked")
 data class BasicInAppButtonClickedActionModel(
     val id: String,
-    override val campaignId: String,
     override val sid: String? = null,
     override val url: String? = null
 ): BasicActionModel(), InAppButtonClickedActionModel

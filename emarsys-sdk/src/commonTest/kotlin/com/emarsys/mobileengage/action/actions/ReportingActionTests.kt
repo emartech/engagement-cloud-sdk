@@ -27,7 +27,6 @@ class ReportingActionTests {
         const val PUSH_EVENT_NAME = "push:click"
         const val IN_APP_EVENT_NAME = "inapp:click"
         const val BUTTON_ORIGIN = "button"
-        const val CAMPAIGN_ID = "testCampaignId"
         const val TEST_URL = "testUrl"
     }
 
@@ -63,7 +62,7 @@ class ReportingActionTests {
 
     @Test
     fun testInvoke_shouldSendEventWithProperPayload_whenActionModel_inAppButtonClicked() = runTest {
-        val inAppButtonClickedActionModel = BasicInAppButtonClickedActionModel(ID, CAMPAIGN_ID, SID, TEST_URL)
+        val inAppButtonClickedActionModel = BasicInAppButtonClickedActionModel(ID, SID, TEST_URL)
         val action = ReportingAction(inAppButtonClickedActionModel, mockCustomEventChannel)
         val expectedEvent = Event(
             EventType.INTERNAL,
@@ -71,7 +70,6 @@ class ReportingActionTests {
             mapOf(
                 "buttonId" to ID,
                 "sid" to SID,
-                "campaignId" to CAMPAIGN_ID,
                 "url" to TEST_URL
             )
         )
@@ -87,14 +85,14 @@ class ReportingActionTests {
 
     @Test
     fun testInvoke_shouldSendEventWithProperPayload_whenActionModel_inAppButtonClicked_noSidAndUrl() = runTest {
-        val inAppButtonClickedActionModel = BasicInAppButtonClickedActionModel(ID, CAMPAIGN_ID)
+        val inAppButtonClickedActionModel = BasicInAppButtonClickedActionModel(ID, SID)
         val action = ReportingAction(inAppButtonClickedActionModel, mockCustomEventChannel)
         val expectedEvent = Event(
             EventType.INTERNAL,
             IN_APP_EVENT_NAME,
             mapOf(
                 "buttonId" to ID,
-                "campaignId" to CAMPAIGN_ID,
+                "sid" to SID,
             )
         )
 
