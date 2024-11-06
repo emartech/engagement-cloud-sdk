@@ -73,10 +73,10 @@ test-web: check-env ## run common tests on web
 		 	-x :composeApp:jsPublicPackageJson \
 		 	-x :composeApp:jsTestPublicPackageJson \
 		 	-x :kotlinStoreYarnLock \
- 			-x :kotlinUpgradeYarnLock
+ 			-x :kotlinUpgradeYarnLock --debug --stacktrace
 
 test-jvm: check-env ## run common tests on jvm
-	@./gradlew :emarsys-sdk:test -x :composeApp:test
+	@./gradlew :emarsys-sdk:test -x :composeApp:test --debug --stacktrace
 
 test-android: check-env test-fcm test-hms ## run Android Instrumented tests
 	@./gradlew :emarsys-sdk:connectedAndroidTest -x :composeApp:test
@@ -88,7 +88,7 @@ test-hms: check-env ## run Huawei module tests
 	@./gradlew :android-emarsys-sdk-hms:connectedAndroidTest
 
 test-ios: check-env ## run iOS tests
-	@./gradlew :emarsys-sdk:iosSimulatorArm64Test
+	@./gradlew :emarsys-sdk:iosSimulatorArm64Test --debug --stacktrace
 
 test-android-firebase: check-env ## run Android Instrumented tests on Firebase Test Lab
 	@gcloud firebase test android run \
