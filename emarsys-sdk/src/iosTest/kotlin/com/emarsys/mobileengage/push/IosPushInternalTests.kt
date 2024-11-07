@@ -4,6 +4,7 @@ import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.PushCall
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
+import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
@@ -12,9 +13,11 @@ import com.emarsys.mobileengage.action.actions.OpenExternalUrlAction
 import com.emarsys.mobileengage.action.actions.PushToInappAction
 import com.emarsys.mobileengage.action.actions.ReportingAction
 import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.action.models.BadgeCount
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
+import com.emarsys.mobileengage.action.models.Method.SET
 import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableOpenExternalUrlActionModel
 import com.emarsys.networking.clients.push.PushClientApi
@@ -50,6 +53,7 @@ class IosPushInternalTests {
     private lateinit var mockSdkContext: SdkContextApi
     private lateinit var mockActionFactory: ActionFactoryApi<ActionModel>
     private lateinit var mockActionHandler: ActionHandlerApi
+    private lateinit var mockBadgeCountHandler: BadgeCountHandlerApi
     private lateinit var json: Json
     private lateinit var sdkDispatcher: CoroutineDispatcher
 
@@ -64,6 +68,7 @@ class IosPushInternalTests {
         mockSdkContext = mock()
         mockActionFactory = mock()
         mockActionHandler = mock()
+        mockBadgeCountHandler = mock()
         json = JsonUtil.json
         sdkDispatcher = dispatcher
 
@@ -76,6 +81,7 @@ class IosPushInternalTests {
             mockSdkContext,
             mockActionFactory,
             mockActionHandler,
+            mockBadgeCountHandler,
             json,
             sdkDispatcher,
             mock()
@@ -194,6 +200,26 @@ class IosPushInternalTests {
         verifySuspend {
             mockActionFactory.create(actionModel)
             mockActionHandler.handleActions(any(), action)
+        }
+    }
+
+    @Test
+    fun `didReceiveNotificationResponse should handle badgeCount if present`() = runTest {
+        val actionIdentifier = UNNotificationDefaultActionIdentifier
+        val userInfo = mapOf(
+            "ems" to mapOf(
+                "badgeCount" to mapOf("method" to "SET", "value" to "42")
+            )
+        )
+        everySuspend { mockBadgeCountHandler.handle(any()) } returns Unit
+        val expectedBadgeCount = BadgeCount(SET, 42)
+
+        iosPushInternal.didReceiveNotificationResponse(actionIdentifier, userInfo) {}
+
+        advanceUntilIdle()
+
+        verifySuspend {
+            mockBadgeCountHandler.handle(expectedBadgeCount)
         }
     }
 

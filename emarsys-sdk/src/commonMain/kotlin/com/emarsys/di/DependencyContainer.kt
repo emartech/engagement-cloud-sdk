@@ -348,6 +348,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             pushContext,
             eventClient,
             pushActionFactory,
+            badgeCountHandler,
             json,
             sdkDispatcher
         )

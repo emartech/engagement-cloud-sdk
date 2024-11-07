@@ -6,6 +6,7 @@ import com.emarsys.api.push.PushCall
 import com.emarsys.api.push.PushInternal
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
+import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
@@ -49,6 +50,7 @@ class IosPushInternal(
     sdkContext: SdkContextApi,
     private val actionFactory: ActionFactoryApi<ActionModel>,
     private val actionHandler: ActionHandlerApi,
+    private val badgeCountHandler: BadgeCountHandlerApi,
     private val json: Json,
     private val sdkDispatcher: CoroutineDispatcher,
     private val sdkLogger: Logger
@@ -90,6 +92,7 @@ class IosPushInternal(
                 val pushUserInfo: PushUserInfo = json.decodeFromString(userInfoJson)
 
                 handleActions(actionIdentifier, pushUserInfo)
+                pushUserInfo.ems?.badgeCount?.let { badgeCountHandler.handle(it) }
 
                 withContext(Dispatchers.Main) {
                     withCompletionHandler()
@@ -135,9 +138,11 @@ class IosPushInternal(
                         it
                     )
                 }
+
                 is BasicActionModel -> {
                     NotificationOpenedActionModel(it)
                 }
+
                 else -> null
             }
 

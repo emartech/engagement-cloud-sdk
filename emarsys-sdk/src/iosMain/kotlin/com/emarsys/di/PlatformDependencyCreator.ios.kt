@@ -212,6 +212,7 @@ actual class PlatformDependencyCreator actual constructor(
         pushContext: ApiContext<PushCall>,
         eventClient: EventClientApi,
         actionFactory: ActionFactoryApi<ActionModel>,
+        badgeCountHandler: BadgeCountHandlerApi,
         json: Json,
         sdkDispatcher: CoroutineDispatcher
     ): PushInstance {
@@ -222,6 +223,7 @@ actual class PlatformDependencyCreator actual constructor(
             sdkContext,
             actionFactory,
             actionHandler,
+            badgeCountHandler,
             json,
             sdkDispatcher,
             sdkLogger
