@@ -75,7 +75,7 @@ test-web: check-env ## run tests on web
  			-x :composeApp:jsBrowserTest
 
 build-android: check-env ##
-	@./gradlew assemble -x :composeApp:assemble
+	@./gradlew assembleRelease -x :composeApp:assembleRelease
 
 test-android: check-env ## run Android tests for all modules
 	@./gradlew connectedAndroidTest -x :composeApp:connectedAndroidTest
