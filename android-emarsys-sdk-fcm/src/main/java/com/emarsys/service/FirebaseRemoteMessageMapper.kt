@@ -21,6 +21,7 @@ object FirebaseRemoteMessageMapper {
         val iconUrlString = messageContentCopy.remove("notification.icon")
         val imageUrlString = messageContentCopy.remove("notification.image")
         val channelId = messageContentCopy.remove("notification.channel_id")
+        val badgeCountOperation = messageContentCopy.remove("notification.badgeCountOperation")?.let { JSONObject(it) }
         val sid = messageContentCopy.remove("ems.sid") ?: MISSING_SID
 
         val rootParams = mapRootParams(messageContentCopy.remove("ems.root_params"))
@@ -50,6 +51,7 @@ object FirebaseRemoteMessageMapper {
 
         defaultAction?.let { data.put("defaultTapAction", it) }
         actions?.let { data.put("actions", it) }
+        badgeCountOperation?.let { data.put("badgeCountOperation", it) }
         inapp?.let { data.put("pushToInApp", it) }
 
         remoteMessagePayload

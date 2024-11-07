@@ -178,6 +178,29 @@ class HmsRemoteMessageMapperTest {
     }
 
     @Test
+    fun map_shouldAdd_badgeCountOperation_fromMap() {
+        val badgeCountOperation = mapOf("method" to "ADD", "value" to "8").toString()
+        val testRemoteMessageContent =
+            mapOf("badgeCountOperation" to badgeCountOperation)
+        val expectation = JSONObject().put("method", "ADD").put("value", 8)
+
+        val result = HmsRemoteMessageMapper.map(testRemoteMessageContent)
+        val resultData: JSONObject = result.get("data") as JSONObject
+
+        resultData["badgeCountOperation"] shouldBeEqualUsingFields expectation
+    }
+
+    @Test
+    fun map_shouldOmit_badgeCountOperation_fromMap() {
+        val testRemoteMessageContent = emptyMap<String, String>()
+
+        val result = HmsRemoteMessageMapper.map(testRemoteMessageContent)
+        val resultData: JSONObject = result.get("data") as JSONObject
+
+        resultData.keys().forEach { (it == "badgeCountOperation") shouldBe false }
+    }
+
+    @Test
     fun map_shouldAdd_inapp_fromMap() {
         val emsPayload =
             """{"inapp":{"campaign_id":"testCampaignId","url":"https:\/\/emarsys.hu"}}"""
