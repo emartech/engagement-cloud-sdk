@@ -9,14 +9,12 @@ import com.emarsys.core.message.MsgHubApi
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.mobileengage.action.actions.AppEventAction
-import com.emarsys.mobileengage.action.actions.BadgeCountAction
 import com.emarsys.mobileengage.action.actions.CustomEventAction
 import com.emarsys.mobileengage.action.actions.DismissAction
 import com.emarsys.mobileengage.action.actions.OpenExternalUrlAction
 import com.emarsys.mobileengage.action.actions.RequestPushPermissionAction
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
-import com.emarsys.mobileengage.action.models.BasicBadgeCountActionModel
 import com.emarsys.mobileengage.action.models.BasicCustomEventActionModel
 import com.emarsys.mobileengage.action.models.BasicDismissActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
@@ -56,7 +54,6 @@ class EventActionFactoryTests {
             mockSdkEventFlow,
             mockEventChannel,
             mockPermissionHandler,
-            mockBadgeCountHandler,
             mockExternalUrlOpener,
             mockMsgHub,
             mockClipboardHandler,
@@ -92,16 +89,6 @@ class EventActionFactoryTests {
 
         result shouldNotBe null
         result.shouldBeTypeOf<RequestPushPermissionAction>()
-    }
-
-    @Test
-    fun testCreate_withBadgeCountActionModel() = runTest {
-        val action = BasicBadgeCountActionModel("method", 0)
-
-        val result = actionFactory.create(action)
-
-        result shouldNotBe null
-        result.shouldBeTypeOf<BadgeCountAction>()
     }
 
     @Test

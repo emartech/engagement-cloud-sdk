@@ -86,6 +86,7 @@ actual class PlatformDependencyCreator actual constructor(
     private val processInfo = NSProcessInfo()
     private val uiDevice = UIDevice(processInfo)
     private val notificationCenter = UNUserNotificationCenter.currentNotificationCenter()
+    private val badgeCountHandler: BadgeCountHandlerApi = IosBadgeCountHandler(notificationCenter, uiDevice, sdkContext.mainDispatcher)
 
     actual override fun createPlatformInitializer(
         pushActionFactory: ActionFactoryApi<ActionModel>,
@@ -130,10 +131,6 @@ actual class PlatformDependencyCreator actual constructor(
 
     actual override fun createPermissionHandler(): PermissionHandlerApi {
         return IosPermissionHandler(notificationCenter)
-    }
-
-    actual override fun createBadgeCountHandler(): BadgeCountHandlerApi {
-        return IosBadgeCountHandler(notificationCenter, uiDevice, sdkContext.mainDispatcher)
     }
 
     actual override fun createExternalUrlOpener(): ExternalUrlOpenerApi {
@@ -212,7 +209,6 @@ actual class PlatformDependencyCreator actual constructor(
         pushContext: ApiContext<PushCall>,
         eventClient: EventClientApi,
         actionFactory: ActionFactoryApi<ActionModel>,
-        badgeCountHandler: BadgeCountHandlerApi,
         json: Json,
         sdkDispatcher: CoroutineDispatcher
     ): PushInstance {

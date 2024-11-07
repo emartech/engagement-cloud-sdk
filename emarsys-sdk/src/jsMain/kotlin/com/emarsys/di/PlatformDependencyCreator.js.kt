@@ -13,8 +13,6 @@ import com.emarsys.api.push.PushInternalApi
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
-import com.emarsys.core.badge.BadgeCountHandlerApi
-import com.emarsys.core.badge.WebBadgeCountHandler
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.cache.WebFileCache
 import com.emarsys.core.channel.CustomEventChannelApi
@@ -137,10 +135,6 @@ actual class PlatformDependencyCreator actual constructor(
         return WebPermissionHandler()
     }
 
-    actual override fun createBadgeCountHandler(): BadgeCountHandlerApi {
-        return WebBadgeCountHandler()
-    }
-
     actual override fun createExternalUrlOpener(): ExternalUrlOpenerApi {
         return WebExternalUrlOpener(window, sdkLogger)
     }
@@ -206,7 +200,6 @@ actual class PlatformDependencyCreator actual constructor(
         pushContext: ApiContext<PushCall>,
         eventClient: EventClientApi,
         actionFactory: ActionFactoryApi<ActionModel>,
-        badgeCountHandler: BadgeCountHandlerApi,
         json: Json,
         sdkDispatcher: CoroutineDispatcher
     ): PushInstance {

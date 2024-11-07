@@ -8,7 +8,6 @@ import com.emarsys.api.push.PushInternalApi
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
-import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.channel.CustomEventChannelApi
 import com.emarsys.core.clipboard.ClipboardHandlerApi
@@ -75,8 +74,6 @@ expect class PlatformDependencyCreator(
 
     override fun createPermissionHandler(): PermissionHandlerApi
 
-    override fun createBadgeCountHandler(): BadgeCountHandlerApi
-
     override fun createExternalUrlOpener(): ExternalUrlOpenerApi
 
     override fun createPushToInAppHandler(
@@ -108,7 +105,6 @@ expect class PlatformDependencyCreator(
         pushContext: ApiContext<PushCall>,
         eventClient: EventClientApi,
         actionFactory: ActionFactoryApi<ActionModel>,
-        badgeCountHandler: BadgeCountHandlerApi,
         json: Json,
         sdkDispatcher: CoroutineDispatcher
     ): PushInstance

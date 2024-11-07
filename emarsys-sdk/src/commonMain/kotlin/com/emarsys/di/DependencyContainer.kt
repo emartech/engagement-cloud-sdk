@@ -59,7 +59,6 @@ import com.emarsys.context.DefaultUrlsApi
 import com.emarsys.context.SdkContext
 import com.emarsys.core.actions.ActionHandler
 import com.emarsys.core.actions.ActionHandlerApi
-import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.channel.CustomEventChannel
 import com.emarsys.core.channel.CustomEventChannelApi
 import com.emarsys.core.clipboard.ClipboardHandlerApi
@@ -246,10 +245,6 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         dependencyCreator.createStorage()
     }
 
-    private val badgeCountHandler: BadgeCountHandlerApi by lazy {
-        dependencyCreator.createBadgeCountHandler()
-    }
-
     private val externalUrlOpener: ExternalUrlOpenerApi by lazy {
         dependencyCreator.createExternalUrlOpener()
     }
@@ -271,7 +266,6 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             sdkEventFlow,
             customEventChannel,
             permissionHandler,
-            badgeCountHandler,
             externalUrlOpener,
             msgHub,
             clipboardHandler,
@@ -348,7 +342,6 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             pushContext,
             eventClient,
             pushActionFactory,
-            badgeCountHandler,
             json,
             sdkDispatcher
         )

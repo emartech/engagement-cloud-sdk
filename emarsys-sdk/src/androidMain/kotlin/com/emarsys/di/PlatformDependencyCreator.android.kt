@@ -22,7 +22,6 @@ import com.emarsys.applicationContext
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
-import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.cache.AndroidFileCache
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.channel.CustomEventChannelApi
@@ -49,7 +48,6 @@ import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
-import com.emarsys.mobileengage.badge.AndroidBadgeCountHandler
 import com.emarsys.mobileengage.clipboard.AndroidClipboardHandler
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandlerApi
@@ -174,10 +172,6 @@ actual class PlatformDependencyCreator actual constructor(
         return AndroidPermissionHandler(applicationContext, currentActivityWatchdog)
     }
 
-    actual override fun createBadgeCountHandler(): BadgeCountHandlerApi {
-        return AndroidBadgeCountHandler()
-    }
-
     actual override fun createExternalUrlOpener(): ExternalUrlOpenerApi {
         return AndroidExternalUrlOpener(applicationContext, sdkLogger)
     }
@@ -236,7 +230,6 @@ actual class PlatformDependencyCreator actual constructor(
         pushContext: ApiContext<PushCall>,
         eventClient: EventClientApi,
         actionFactory: ActionFactoryApi<ActionModel>,
-        badgeCountHandler: BadgeCountHandlerApi,
         json: Json,
         sdkDispatcher: CoroutineDispatcher
     ): PushInstance {
