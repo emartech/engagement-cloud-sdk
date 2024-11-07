@@ -1,5 +1,6 @@
 package com.emarsys.mobileengage.push
 
+import com.emarsys.mobileengage.action.models.BadgeCount
 import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -21,7 +22,8 @@ data class PushUserInfoEms(
     val sid: String? = null,
     @JsonNames("default_action")
     val defaultAction: BasicActionModel? = null,
-    val actions: List<PresentableActionModel>? = null
+    val actions: List<PresentableActionModel>? = null,
+    val badgeCount: BadgeCount? = null
 )
 
 @Serializable

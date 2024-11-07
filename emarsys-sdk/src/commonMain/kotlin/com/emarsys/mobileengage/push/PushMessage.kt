@@ -1,5 +1,6 @@
 package com.emarsys.mobileengage.push
 
+import com.emarsys.mobileengage.action.models.BadgeCount
 import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.inapp.PushToInApp
@@ -25,6 +26,7 @@ data class PushData<T: PlatformData>(
     val platformData: T,
     val defaultTapAction: BasicActionModel? = null,
     val actions: List<PresentableActionModel>? = null,
+    val badgeCount: BadgeCount? = null,
     val pushToInApp: PushToInApp? = null,
     val rootParams: JsonObject? = null,
     val u: JsonObject? = null

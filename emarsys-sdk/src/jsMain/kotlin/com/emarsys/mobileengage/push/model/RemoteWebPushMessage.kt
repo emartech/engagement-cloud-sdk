@@ -1,5 +1,6 @@
 package com.emarsys.mobileengage.push.model
 
+import com.emarsys.mobileengage.action.models.BadgeCount
 import com.emarsys.mobileengage.inapp.PushToInApp
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
@@ -26,7 +27,8 @@ data class WebPushNotificationSettings(
     val icon: String? = null,
     val link: String? = null,
     val image: String? = null,
-    val actions: List<RemoteWebPushAction>? = null
+    val actions: List<RemoteWebPushAction>? = null,
+    val badgeCount: BadgeCount? = null
 )
 
 @Serializable

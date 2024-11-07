@@ -1,5 +1,6 @@
 package com.emarsys.mobileengage.push.model.v1
 
+import com.emarsys.mobileengage.action.models.BadgeCount
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
@@ -17,8 +18,9 @@ data class RemoteWebPushNotificationV1(
     val body: String,
     val icon: String,
     val imageUrl: String,
-    val defaultAction: PresentableActionModel?,
-    val actions: List<PresentableActionModel>?,
+    val defaultAction: PresentableActionModel? = null,
+    val actions: List<PresentableActionModel>? = null,
+    val badgeCount: BadgeCount? = null
 )
 
 @Serializable
@@ -31,5 +33,5 @@ data class EmsPushData(
     val multiChannelId: String,
     val sid: String,
     val treatments: JsonObject,
-    val rootParams: JsonObject?
+    val rootParams: JsonObject? = null
 )
