@@ -34,7 +34,8 @@ class PushMessageWebV1Mapper(
                     actions = remoteMessage.notification.actions,
                     platformData = JsPlatformData(remoteMessage.ems.applicationCode),
                     pushToInApp = null,
-                    defaultTapAction = basicDefaultActionModel
+                    defaultTapAction = basicDefaultActionModel,
+                    badgeCount = remoteMessage.notification.badgeCount
                 )
             )
         } catch (exception: Exception) {

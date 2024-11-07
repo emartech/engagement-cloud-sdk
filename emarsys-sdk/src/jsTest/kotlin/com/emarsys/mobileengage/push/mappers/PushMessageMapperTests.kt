@@ -2,7 +2,9 @@ package com.emarsys.mobileengage.push.mappers
 
 import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.SdkLogger
+import com.emarsys.mobileengage.action.models.BadgeCount
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
+import com.emarsys.mobileengage.action.models.Method
 import com.emarsys.mobileengage.action.models.PresentableOpenExternalUrlActionModel
 import com.emarsys.mobileengage.inapp.PushToInApp
 import com.emarsys.mobileengage.push.PushData
@@ -67,6 +69,10 @@ class PushMessageMapperTests {
                     put("url", "https://www.sap.com")
                 }
             })
+            put("badgeCount", buildJsonObject {
+                put("method", "SET")
+                put("value", 8)
+            })
         }
 
         val inAppJson = buildJsonObject {
@@ -115,7 +121,8 @@ class PushMessageMapperTests {
                         url = "https://www.sap.com"
                     ),
                 ),
-                defaultTapAction = BasicOpenExternalUrlActionModel("https://sap.com")
+                defaultTapAction = BasicOpenExternalUrlActionModel("https://sap.com"),
+                badgeCount = BadgeCount(Method.SET, 8)
             )
         )
 

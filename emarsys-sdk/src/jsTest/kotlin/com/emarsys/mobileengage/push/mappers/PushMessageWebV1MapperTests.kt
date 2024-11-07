@@ -2,7 +2,9 @@ package com.emarsys.mobileengage.push.mappers
 
 import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.SdkLogger
+import com.emarsys.mobileengage.action.models.BadgeCount
 import com.emarsys.mobileengage.action.models.BasicCustomEventActionModel
+import com.emarsys.mobileengage.action.models.Method
 import com.emarsys.mobileengage.action.models.PresentableAppEventActionModel
 import com.emarsys.mobileengage.push.PushData
 import com.emarsys.mobileengage.push.model.JsPlatformData
@@ -35,6 +37,7 @@ class PushMessageWebV1MapperTests {
         const val ICON = "https://trunk-int.s.emarsys.com/custloads/218524530/md_100008588.png"
         const val IMAGE = "https://trunk-int.s.emarsys.com/custloads/218524530/md_100008589.png"
         const val ACTION_TITLE = "actionTitle"
+        const val BADGE_VALUE = 10
     }
 
     private lateinit var json: Json
@@ -76,6 +79,10 @@ class PushMessageWebV1MapperTests {
                         put("actionPayloadKey", "actionPayloadValue")
                     }
                 }
+            }
+            putJsonObject("badgeCount") {
+                put("method", "ADD")
+                put("value", BADGE_VALUE)
             }
         }
 
@@ -122,7 +129,8 @@ class PushMessageWebV1MapperTests {
                         ACTION_NAME,
                         mapOf("actionPayloadKey" to "actionPayloadValue")
                     )
-                )
+                ),
+                badgeCount = BadgeCount(Method.ADD, BADGE_VALUE)
             )
         )
 

@@ -41,7 +41,8 @@ class PushMessageMapper(private val json: Json, private val logger: Logger) :
                     pushToInApp = remoteWebPushMessage.messageData.inApp,
                     defaultTapAction = remoteWebPushMessage.messageData.notificationSettings.link?.let {
                         BasicOpenExternalUrlActionModel(it)
-                    }
+                    },
+                    badgeCount = remoteWebPushMessage.messageData.notificationSettings.badgeCount
                 )
             )
         } catch (exception: Exception) {
