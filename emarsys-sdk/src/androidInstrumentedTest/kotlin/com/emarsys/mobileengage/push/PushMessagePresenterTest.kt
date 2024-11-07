@@ -9,7 +9,9 @@ import com.emarsys.core.device.AndroidNotificationSettings
 import com.emarsys.core.device.ChannelSettings
 import com.emarsys.core.device.PlatformInfoCollector
 import com.emarsys.core.resource.MetadataReader
+import com.emarsys.mobileengage.action.models.BadgeCount
 import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
+import com.emarsys.mobileengage.action.models.Method
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.action.models.PresentableAppEventActionModel
 import com.emarsys.mobileengage.action.models.PresentableCustomEventActionModel
@@ -223,6 +225,34 @@ class PushMessagePresenterTest {
             )
         }
     }
+    @Test
+    fun present_shouldShowNotification_withCorrectData_withBadgeCount() = runTest {
+        val testValue = 8
+        val testMessage = createTestMessage(testActions, testDefaultTapAction, BadgeCount(Method.SET, testValue))
+
+        every {
+            mockNotificationManager.notify(
+                COLLAPSE_ID,
+                COLLAPSE_ID.hashCode(),
+                capture(notificationSlot)
+            )
+        } returns Unit
+
+        pushMessagePresenter.present(testMessage)
+
+        assertNotificationFields(notificationSlot.captured)
+        notificationSlot.captured.actions.size shouldBe 3
+
+        verify {
+            mockNotificationManager.notify(
+                COLLAPSE_ID,
+                COLLAPSE_ID.hashCode(),
+                notificationSlot.captured
+            )
+        }
+
+        notificationSlot.captured.number shouldBe testValue
+    }
 
     @Test
     fun present_shouldCreateDebugChannel_if_debugMode_and_channelId_isInvalid() = runTest {
@@ -291,6 +321,7 @@ class PushMessagePresenterTest {
     private fun createTestMessage(
         actions: List<PresentableActionModel>? = null,
         defaultTapAction: BasicAppEventActionModel? = null,
+        badgeCount: BadgeCount? = null,
         iconUrlString: String? = null,
         imageUrlString: String? = null
     ): AndroidPushMessage {
@@ -301,7 +332,8 @@ class PushMessagePresenterTest {
             CAMPAIGN_ID,
             AndroidPlatformData(CHANNEL_ID, tesMethod),
             defaultTapAction = defaultTapAction,
-            actions = actions
+            actions = actions,
+            badgeCount
         )
         return AndroidPushMessage(
             MESSAGE_ID,

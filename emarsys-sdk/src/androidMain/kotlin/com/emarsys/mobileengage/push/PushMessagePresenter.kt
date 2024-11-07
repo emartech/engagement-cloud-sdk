@@ -56,6 +56,7 @@ class PushMessagePresenter(
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setSmallIcon(iconId)
             .setContentIntent(tapActionPendingIntent)
+            .setBadgeCount(message)
             .addActions(message)
 
         notificationCompatStyler.style(notificationBuilder, message)
@@ -69,6 +70,13 @@ class PushMessagePresenter(
             val action = createNotificationAction(actionModel, actionIntent)
 
             this.addAction(action)
+        }
+        return this
+    }
+
+    private fun NotificationCompat.Builder.setBadgeCount(pushMessage: AndroidPushMessage): NotificationCompat.Builder {
+        pushMessage.data.badgeCount?.let { badgeCount ->
+            this.setNumber(badgeCount.value)
         }
         return this
     }
