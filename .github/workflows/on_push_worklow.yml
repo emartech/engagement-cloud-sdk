@@ -37,6 +37,13 @@ env:
 jobs:
   build:
     runs-on: macos-13
+    strategy:
+      matrix:
+        include:
+          - platform: android
+          - platform: web
+          - platform: ios
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -53,12 +60,9 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          cache-overwrite-existing: true
-          cache-cleanup: always
 
-      - name: Gradle Build
-        run: make build-pipeline
+      - name: Build
+        run: make build-${{ matrix.platform }}
 
   lint:
     needs: build
@@ -89,7 +93,6 @@ jobs:
       matrix:
         include:
           - platform: android
-          - platform: jvm
           - platform: web
           - platform: ios
 
@@ -119,10 +122,6 @@ jobs:
         with:
           api-level: 29
           script: make test-android
-
-      - name: Test JVM
-        if: matrix.platform == 'jvm'
-        run: make test-jvm
 
       - name: Test iOS
         if: matrix.platform == 'ios'

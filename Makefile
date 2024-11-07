@@ -28,6 +28,7 @@ help: ## Show this help
 build: check-env ## build project with yarn actualization
 	@./gradlew kotlinUpgradeYarnLock build
 
+
 build-pipeline: check-env ## compile and build all modules for all platforms
 	@./gradlew :emarsys-sdk:build \
 				:emarsys-sdk:javaPreCompileRelease \
@@ -60,35 +61,33 @@ clean: check-env ## clean all build artifacts
 	@./gradlew clean
 
 create-apks: check-env ## create apks for testing
-	@./gradlew assembleAndroidTest -x :composeApp:test
+	@./gradlew assembleAndroidTest -x :composeApp:assembleAndroidTest
 
 test: check-env test-android test-web test-jvm test-ios ## run common tests on all platforms (jvm,web,android, ios)
 	@./gradlew :emarsys-sdk:allTests -x :composeApp:test
 
-test-web: check-env ## run common tests on web
-	@./gradlew :emarsys-sdk:jsBrowserTest \
- 			-x :composeApp:test \
-		 	-x :composeApp:jsPackageJson \
-		 	-x :composeApp:jsTestPackageJson \
-		 	-x :composeApp:jsPublicPackageJson \
-		 	-x :composeApp:jsTestPublicPackageJson \
-		 	-x :kotlinStoreYarnLock \
- 			-x :kotlinUpgradeYarnLock
+build-web: check-env ## run tests on web
+	@./gradlew jsBrowserProductionWebpack \
+ 			-x :composeApp:jsBrowserProductionWebpack
 
-test-jvm: check-env ## run common tests on jvm
-	@./gradlew :emarsys-sdk:test -x :composeApp:test
+test-web: check-env ## run tests on web
+	@./gradlew jsBrowserTest \
+ 			-x :composeApp:jsBrowserTest
 
-test-android: check-env test-fcm test-hms ## run Android Instrumented tests
-	@./gradlew :emarsys-sdk:connectedAndroidTest -x :composeApp:test
+build-android: check-env ##
+	@./gradlew assemble -x :composeApp:assemble
 
-test-fcm: check-env ## run FCM module tests
-	@./gradlew :android-emarsys-sdk-fcm:connectedAndroidTest
+test-android: check-env ## run Android tests for all modules
+	@./gradlew connectedAndroidTest -x :composeApp:connectedAndroidTest
 
-test-hms: check-env ## run Huawei module tests
-	@./gradlew :android-emarsys-sdk-hms:connectedAndroidTest
+build-ios: check-env ## build iOS
+	@./gradlew linkReleaseFrameworkIosArm64 linkReleaseFrameworkIosX64 linkReleaseFrameworkIosSimulatorArm64 \
+	        -x :composeApp:linkReleaseFrameworkIosArm64 \
+	        -x :composeApp:linkReleaseFrameworkIosX64 \
+	        -x :composeApp:linkReleaseFrameworkIosSimulatorArm64
 
 test-ios: check-env ## run iOS tests
-	@./gradlew :emarsys-sdk:iosSimulatorArm64Test
+	@./gradlew iosSimulatorArm64Test -x :composeApp:iosSimulatorArm64Test
 
 test-android-firebase: check-env ## run Android Instrumented tests on Firebase Test Lab
 	@gcloud firebase test android run \
