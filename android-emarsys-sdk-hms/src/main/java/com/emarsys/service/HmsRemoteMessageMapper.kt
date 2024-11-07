@@ -21,7 +21,7 @@ object HmsRemoteMessageMapper {
         val iconUrlString = messageContentCopy.remove("icon_url")
         val imageUrlString = messageContentCopy.remove("image_url")
         val channelId = messageContentCopy.remove("channel_id")
-        val badgeCountOperation = messageContentCopy.remove("badgeCountOperation")?.let { JSONObject(it) }
+        val badgeCount = messageContentCopy.remove("badgeCount")?.let { JSONObject(it) }
 
         val u = messageContentCopy.remove("u")?.let { JSONObject(it) } ?: JSONObject()
         val sid = u.getNullableString("sid") ?: MISSING_SID
@@ -52,7 +52,7 @@ object HmsRemoteMessageMapper {
 
         defaultAction?.let { data.put("defaultTapAction", it) }
         actions?.let { data.put("actions", it) }
-        badgeCountOperation?.let { data.put("badgeCountOperation", it) }
+        badgeCount?.let { data.put("badgeCount", it) }
         inapp?.let { data.put("pushToInApp", it) }
 
         remoteMessagePayload

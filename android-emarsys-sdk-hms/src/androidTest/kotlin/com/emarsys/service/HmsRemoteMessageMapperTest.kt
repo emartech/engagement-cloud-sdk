@@ -178,16 +178,16 @@ class HmsRemoteMessageMapperTest {
     }
 
     @Test
-    fun map_shouldAdd_badgeCountOperation_fromMap() {
-        val badgeCountOperation = mapOf("method" to "ADD", "value" to "8").toString()
+    fun map_shouldAdd_badgeCount_fromMap() {
+        val badgeCount = mapOf("method" to "ADD", "value" to "8").toString()
         val testRemoteMessageContent =
-            mapOf("badgeCountOperation" to badgeCountOperation)
+            mapOf("badgeCount" to badgeCount)
         val expectation = JSONObject().put("method", "ADD").put("value", 8)
 
         val result = HmsRemoteMessageMapper.map(testRemoteMessageContent)
         val resultData: JSONObject = result.get("data") as JSONObject
 
-        resultData["badgeCountOperation"] shouldBeEqualUsingFields expectation
+        resultData["badgeCount"] shouldBeEqualUsingFields expectation
     }
 
     @Test
@@ -197,7 +197,7 @@ class HmsRemoteMessageMapperTest {
         val result = HmsRemoteMessageMapper.map(testRemoteMessageContent)
         val resultData: JSONObject = result.get("data") as JSONObject
 
-        resultData.keys().forEach { (it == "badgeCountOperation") shouldBe false }
+        resultData.keys().forEach { (it == "badgeCount") shouldBe false }
     }
 
     @Test
