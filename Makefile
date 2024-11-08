@@ -61,7 +61,7 @@ clean: check-env ## clean all build artifacts
 	@./gradlew clean
 
 create-apks: check-env ## create apks for testing
-	@./gradlew assembleAndroidTest -x :composeApp:assembleAndroidTest
+	@./gradlew assembleAndroidTest
 
 test: check-env test-android test-web test-jvm test-ios ## run common tests on all platforms (jvm,web,android, ios)
 	@./gradlew :emarsys-sdk:allTests -x :composeApp:test
@@ -81,6 +81,10 @@ test-android: check-env ## run Android tests for all modules
 	@./gradlew connectedAndroidTest -x :composeApp:connectedAndroidTest
 
 build-ios: check-env ## build iOS
+	@./gradlew linkReleaseFrameworkIosArm64 \
+	        -x :composeApp:linkReleaseFrameworkIosArm64
+
+build-ios-all-archtypes: check-env ## build iOS
 	@./gradlew linkReleaseFrameworkIosArm64 linkReleaseFrameworkIosX64 linkReleaseFrameworkIosSimulatorArm64 \
 	        -x :composeApp:linkReleaseFrameworkIosArm64 \
 	        -x :composeApp:linkReleaseFrameworkIosX64 \
