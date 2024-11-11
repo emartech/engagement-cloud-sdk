@@ -23,7 +23,7 @@ class PushNotificationClickHandler(
     private val sdkLogger: Logger
 ) : PushNotificationClickHandlerApi {
 
-    override fun register() {
+    override suspend fun register() {
         onNotificationClickedBroadcastChannel.onmessage = { event ->
             coroutineScope.launch {
                 handleNotificationClick(event.data.unsafeCast<String>())

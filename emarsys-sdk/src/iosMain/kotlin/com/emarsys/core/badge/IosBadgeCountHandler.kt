@@ -2,8 +2,8 @@ package com.emarsys.core.badge
 
 import com.emarsys.core.device.UIDevice
 import com.emarsys.mobileengage.action.models.BadgeCount
-import com.emarsys.mobileengage.action.models.Method.ADD
-import com.emarsys.mobileengage.action.models.Method.SET
+import com.emarsys.mobileengage.action.models.BadgeCountMethod.ADD
+import com.emarsys.mobileengage.action.models.BadgeCountMethod.SET
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import platform.UIKit.UIApplication
@@ -14,6 +14,7 @@ class IosBadgeCountHandler(
     private val uiDevice: UIDevice,
     private val mainCoroutineDispatcher: CoroutineDispatcher
 ) : BadgeCountHandlerApi {
+
     override suspend fun handle(badgeCount: BadgeCount) {
         when(badgeCount.method) {
             ADD -> add(badgeCount.value)
@@ -21,13 +22,13 @@ class IosBadgeCountHandler(
         }
     }
 
-    override suspend fun add(increment: Int) {
+    private suspend fun add(increment: Int) {
         val currentBadgeCount =
             withContext(mainCoroutineDispatcher) { UIApplication.sharedApplication.applicationIconBadgeNumber.toInt() }
         set(currentBadgeCount + increment)
     }
 
-    override suspend fun set(value: Int) {
+    private suspend fun set(value: Int) {
         if (uiDevice hasOsVersionAtLeast 16) {
             notificationCenter.setBadgeCount(value.toLong(), null)
         } else {

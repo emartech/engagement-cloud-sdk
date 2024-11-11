@@ -10,8 +10,8 @@ import com.emarsys.core.device.ChannelSettings
 import com.emarsys.core.device.PlatformInfoCollector
 import com.emarsys.core.resource.MetadataReader
 import com.emarsys.mobileengage.action.models.BadgeCount
+import com.emarsys.mobileengage.action.models.BadgeCountMethod
 import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
-import com.emarsys.mobileengage.action.models.Method
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.action.models.PresentableAppEventActionModel
 import com.emarsys.mobileengage.action.models.PresentableCustomEventActionModel
@@ -228,7 +228,7 @@ class PushMessagePresenterTest {
     @Test
     fun present_shouldShowNotification_withCorrectData_withBadgeCount() = runTest {
         val testValue = 8
-        val testMessage = createTestMessage(testActions, testDefaultTapAction, BadgeCount(Method.SET, testValue))
+        val testMessage = createTestMessage(testActions, testDefaultTapAction, BadgeCount(BadgeCountMethod.SET, testValue))
 
         every {
             mockNotificationManager.notify(

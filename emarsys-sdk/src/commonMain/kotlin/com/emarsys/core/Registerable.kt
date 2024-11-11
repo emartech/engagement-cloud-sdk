@@ -1,4 +1,4 @@
-package com.emarsys.watchdog
+package com.emarsys.core
 
 interface Registerable {
     suspend fun register()

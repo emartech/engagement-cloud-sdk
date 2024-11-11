@@ -1,7 +1,7 @@
 package com.emarsys.watchdog.lifecycle
 
+import com.emarsys.core.Registerable
 import com.emarsys.core.lifecycle.LifecycleEvent
-import com.emarsys.watchdog.Registerable
 import kotlinx.coroutines.flow.SharedFlow
 
 interface LifecycleWatchDog : Registerable {

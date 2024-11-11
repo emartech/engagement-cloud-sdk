@@ -1,7 +1,5 @@
 package com.emarsys.mobileengage.push
 
-interface PushNotificationClickHandlerApi {
+import com.emarsys.core.Registerable
 
-    fun register()
-
-}
+interface PushNotificationClickHandlerApi: Registerable

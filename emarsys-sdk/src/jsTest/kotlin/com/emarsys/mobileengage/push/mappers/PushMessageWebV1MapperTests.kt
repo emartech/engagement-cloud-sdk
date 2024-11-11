@@ -3,8 +3,8 @@ package com.emarsys.mobileengage.push.mappers
 import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.mobileengage.action.models.BadgeCount
+import com.emarsys.mobileengage.action.models.BadgeCountMethod
 import com.emarsys.mobileengage.action.models.BasicCustomEventActionModel
-import com.emarsys.mobileengage.action.models.Method
 import com.emarsys.mobileengage.action.models.PresentableAppEventActionModel
 import com.emarsys.mobileengage.push.PushData
 import com.emarsys.mobileengage.push.model.JsPlatformData
@@ -130,7 +130,7 @@ class PushMessageWebV1MapperTests {
                         mapOf("actionPayloadKey" to "actionPayloadValue")
                     )
                 ),
-                badgeCount = BadgeCount(Method.ADD, BADGE_VALUE)
+                badgeCount = BadgeCount(BadgeCountMethod.ADD, BADGE_VALUE)
             )
         )
 
