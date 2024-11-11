@@ -49,6 +49,7 @@ import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.clipboard.AndroidClipboardHandler
+import com.emarsys.mobileengage.events.SdkEvent
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandlerApi
 import com.emarsys.mobileengage.inapp.InAppJsBridgeProvider
@@ -77,6 +78,7 @@ import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.Json
 import okio.FileSystem
 import java.util.Locale
@@ -99,6 +101,7 @@ actual class PlatformDependencyCreator actual constructor(
         applicationContext.getSharedPreferences(StorageConstants.SUITE_NAME, Context.MODE_PRIVATE)
 
     actual override fun createPlatformInitializer(
+        sdkEventFlow: MutableSharedFlow<SdkEvent>,
         pushActionFactory: ActionFactoryApi<ActionModel>,
         pushActionHandler: ActionHandlerApi
     ): PlatformInitializerApi {

@@ -6,8 +6,4 @@ interface BadgeCountHandlerApi {
 
     suspend fun handle(badgeCount: BadgeCount)
 
-    suspend fun add(increment: Int)
-
-    suspend fun set(value: Int)
-
 }

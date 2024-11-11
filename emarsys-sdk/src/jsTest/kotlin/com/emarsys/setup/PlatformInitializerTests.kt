@@ -1,5 +1,6 @@
 package com.emarsys.setup
 
+import com.emarsys.core.badge.WebBadgeCountHandlerApi
 import com.emarsys.mobileengage.push.PushNotificationClickHandlerApi
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -15,11 +16,15 @@ class PlatformInitializerTests {
         val pushNotificationClickHandler = mock<PushNotificationClickHandlerApi> {
             everySuspend { register() } returns Unit
         }
-        val platformInitializer = PlatformInitializer(pushNotificationClickHandler)
+        val webBadgeCountHandler = mock<WebBadgeCountHandlerApi> {
+            everySuspend { register() } returns Unit
+        }
+        val platformInitializer = PlatformInitializer(pushNotificationClickHandler, webBadgeCountHandler)
 
         platformInitializer.init()
 
         verifySuspend { pushNotificationClickHandler.register() }
+        verifySuspend { webBadgeCountHandler.register() }
     }
 
 }

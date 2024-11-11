@@ -5,6 +5,7 @@ import com.emarsys.api.push.LoggingPush
 import com.emarsys.api.push.Push
 import com.emarsys.api.push.PushApi
 import com.emarsys.api.push.PushCall
+import com.emarsys.api.push.PushConstants.WEB_PUSH_ON_BADGE_COUNT_UPDATE_RECEIVED
 import com.emarsys.api.push.PushConstants.WEB_PUSH_ON_NOTIFICATION_CLICKED_CHANNEL_NAME
 import com.emarsys.api.push.PushGatherer
 import com.emarsys.api.push.PushInstance
@@ -13,6 +14,7 @@ import com.emarsys.api.push.PushInternalApi
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
+import com.emarsys.core.badge.WebBadgeCountHandler
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.cache.WebFileCache
 import com.emarsys.core.channel.CustomEventChannelApi
@@ -39,6 +41,7 @@ import com.emarsys.core.url.WebExternalUrlOpener
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.events.SdkEvent
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandlerApi
 import com.emarsys.mobileengage.inapp.InAppJsBridge
@@ -66,6 +69,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.Json
 import web.broadcast.BroadcastChannel
 import web.dom.document
@@ -81,6 +85,7 @@ actual class PlatformDependencyCreator actual constructor(
 ) : DependencyCreator {
 
     actual override fun createPlatformInitializer(
+        sdkEventFlow: MutableSharedFlow<SdkEvent>,
         pushActionFactory: ActionFactoryApi<ActionModel>,
         pushActionHandler: ActionHandlerApi
     ): PlatformInitializerApi {
@@ -91,7 +96,13 @@ actual class PlatformDependencyCreator actual constructor(
             CoroutineScope(Dispatchers.Default + SupervisorJob()),
             sdkLogger
         )
-        return PlatformInitializer(pushNotificationClickHandler)
+        val webBadgeCountHandler = WebBadgeCountHandler(
+            BroadcastChannel(WEB_PUSH_ON_BADGE_COUNT_UPDATE_RECEIVED),
+            sdkEventFlow,
+            CoroutineScope(Dispatchers.Default + SupervisorJob()),
+            sdkLogger
+        )
+        return PlatformInitializer(pushNotificationClickHandler, webBadgeCountHandler)
 
     }
 
