@@ -119,6 +119,7 @@ class PushMessagePresenter(
         pushMessage: AndroidPushMessage
     ): PendingIntent {
         val intent = Intent(context, NotificationOpenedActivity::class.java)
+        intent.setPackage(context.packageName)
         intent.action = DEFAULT_TAP_ACTION_ID
         intent.putExtra(
             INTENT_EXTRA_PAYLOAD_KEY,
