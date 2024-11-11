@@ -1,5 +1,6 @@
 package com.emarsys
 
+import com.emarsys.api.push.PushConstants.WEB_PUSH_ON_BADGE_COUNT_UPDATE_RECEIVED
 import com.emarsys.api.push.PushConstants.WEB_PUSH_ON_NOTIFICATION_CLICKED_CHANNEL_NAME
 import com.emarsys.api.push.PushConstants.WEB_PUSH_SDK_READY_CHANNEL_NAME
 import com.emarsys.core.log.ConsoleLogger
@@ -29,6 +30,8 @@ fun main() {
 
     val onNotificationClickedBroadcastChannel =
         BroadcastChannel(WEB_PUSH_ON_NOTIFICATION_CLICKED_CHANNEL_NAME)
+    val onBadgeCountUpdateReceivedBroadcastChannel =
+        BroadcastChannel(WEB_PUSH_ON_BADGE_COUNT_UPDATE_RECEIVED)
     val sdkReadyBroadcastChannel = BroadcastChannel(WEB_PUSH_SDK_READY_CHANNEL_NAME)
 
     val sdkLogger = SdkLogger(ConsoleLogger())
@@ -40,6 +43,8 @@ fun main() {
         pushMessagePresenter,
         pushMessageMapper,
         pushMessageWebV1Mapper,
+        onBadgeCountUpdateReceivedBroadcastChannel,
+        JsonUtil.json,
         CoroutineScope(SupervisorJob()),
         SdkLogger(ConsoleLogger())
     )
