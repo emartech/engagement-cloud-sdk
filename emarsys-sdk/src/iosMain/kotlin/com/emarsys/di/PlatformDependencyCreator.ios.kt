@@ -41,6 +41,7 @@ import com.emarsys.core.watchdog.connection.NWPathMonitorWrapper
 import com.emarsys.core.watchdog.lifecycle.IosLifecycleWatchdog
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.events.SdkEvent
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandlerApi
 import com.emarsys.mobileengage.inapp.InAppJsBridge
@@ -66,6 +67,7 @@ import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.Json
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSProcessInfo
@@ -86,9 +88,11 @@ actual class PlatformDependencyCreator actual constructor(
     private val processInfo = NSProcessInfo()
     private val uiDevice = UIDevice(processInfo)
     private val notificationCenter = UNUserNotificationCenter.currentNotificationCenter()
-    private val badgeCountHandler: BadgeCountHandlerApi = IosBadgeCountHandler(notificationCenter, uiDevice, sdkContext.mainDispatcher)
+    private val badgeCountHandler: BadgeCountHandlerApi =
+        IosBadgeCountHandler(notificationCenter, uiDevice, sdkContext.mainDispatcher)
 
     actual override fun createPlatformInitializer(
+        sdkEventFlow: MutableSharedFlow<SdkEvent>,
         pushActionFactory: ActionFactoryApi<ActionModel>,
         pushActionHandler: ActionHandlerApi
     ): PlatformInitializerApi {
