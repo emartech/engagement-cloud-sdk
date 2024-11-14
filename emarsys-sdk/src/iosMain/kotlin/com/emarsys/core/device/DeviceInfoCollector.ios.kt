@@ -11,7 +11,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 actual class DeviceInfoCollector(
-    private val hardwareIdProvider: Provider<String>,
+    private val clientIdProvider: Provider<String>,
     private val applicationVersionProvider: Provider<String>,
     private val languageProvider: Provider<String>,
     private val timezoneProvider: Provider<String>,
@@ -26,13 +26,14 @@ actual class DeviceInfoCollector(
             osVersion = deviceInformation.osVersion(),
             sdkVersion = BuildConfig.VERSION_NAME,
             languageCode = languageProvider.provide(),
-            timezone = timezoneProvider.provide()
+            timezone = timezoneProvider.provide(),
+            clientId = clientIdProvider.provide()
         )
         return json.encodeToString(deviceInfo)
     }
 
-    actual override fun getHardwareId(): String {
-        return hardwareIdProvider.provide()
+    actual override fun getClientId(): String {
+        return clientIdProvider.provide()
     }
 
     actual override suspend fun getPushSettings(): PushSettings {

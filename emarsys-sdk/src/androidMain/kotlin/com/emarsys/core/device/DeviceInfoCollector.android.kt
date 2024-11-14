@@ -10,7 +10,7 @@ actual class DeviceInfoCollector(
     private val languageProvider: Provider<String>,
     private val applicationVersionProvider: Provider<String>,
     private val isGooglePlayServicesAvailable: Boolean,
-    private val hardwareIdProvider: Provider<String>,
+    private val clientIdProvider: Provider<String>,
     private val platformInfoCollector: PlatformInfoCollectorApi,
     private val json: Json
 ) : DeviceInfoCollectorApi {
@@ -23,14 +23,15 @@ actual class DeviceInfoCollector(
             osVersion = SdkBuildConfig.getOsVersion(),
             sdkVersion = BuildConfig.VERSION_NAME,
             languageCode = languageProvider.provide(),
-            timezone = timezoneProvider.provide()
+            timezone = timezoneProvider.provide(),
+            clientId = clientIdProvider.provide()
         )
 
         return json.encodeToString(deviceInfo)
     }
 
-    actual override fun getHardwareId(): String {
-        return hardwareIdProvider.provide()
+    actual override fun getClientId(): String {
+        return clientIdProvider.provide()
     }
 
     private fun getPlatform(): String {

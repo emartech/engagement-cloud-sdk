@@ -18,14 +18,14 @@ class DeviceInfoCollectorTests {
     private companion object {
         const val LANGUAGE = "en-US"
         const val APP_VERSION = "2.0"
-        const val HW_ID = "test uuid"
+        const val CLIENT_ID = "test uuid"
         const val TIMEZONE = "+0300"
     }
 
     private lateinit var mockLanguageProvider: Provider<String>
     private lateinit var mockTimezoneProvider: Provider<String>
     private lateinit var mockApplicationVersionProvider: Provider<String>
-    private lateinit var mockHardwareIdProvider: Provider<String>
+    private lateinit var mockClientIdProvider: Provider<String>
     private lateinit var mockPlatformInfoCollector: PlatformInfoCollector
     private lateinit var deviceInfoCollector: DeviceInfoCollector
     private val json = JsonUtil.json
@@ -41,8 +41,8 @@ class DeviceInfoCollectorTests {
         mockApplicationVersionProvider = mockk(relaxed = true)
         every { mockApplicationVersionProvider.provide() } returns APP_VERSION
 
-        mockHardwareIdProvider = mockk(relaxed = true)
-        every { mockHardwareIdProvider.provide() } returns HW_ID
+        mockClientIdProvider = mockk(relaxed = true)
+        every { mockClientIdProvider.provide() } returns CLIENT_ID
 
         mockPlatformInfoCollector = mockk(relaxed = true)
 
@@ -51,15 +51,15 @@ class DeviceInfoCollectorTests {
             mockLanguageProvider,
             mockApplicationVersionProvider,
             true,
-            mockHardwareIdProvider,
+            mockClientIdProvider,
             mockPlatformInfoCollector,
             json
         )
     }
 
     @Test
-    fun getHardwareId_shouldReturnGenerateNewId_ifStorageReturnsNull() {
-        deviceInfoCollector.getHardwareId() shouldBe HW_ID
+    fun getClientId_shouldReturnGenerateNewId_ifStorageReturnsNull() {
+        deviceInfoCollector.getClientId() shouldBe CLIENT_ID
     }
 
     @Test
@@ -71,7 +71,8 @@ class DeviceInfoCollectorTests {
             osVersion = SdkBuildConfig.getOsVersion(),
             sdkVersion = BuildConfig.VERSION_NAME,
             languageCode = LANGUAGE,
-            timezone = TIMEZONE
+            timezone = TIMEZONE,
+            clientId = CLIENT_ID
         )
 
         val result = deviceInfoCollector.collect()
@@ -87,7 +88,7 @@ class DeviceInfoCollectorTests {
             mockLanguageProvider,
             mockApplicationVersionProvider,
             false,
-            mockHardwareIdProvider,
+            mockClientIdProvider,
             mockPlatformInfoCollector,
             json
         )

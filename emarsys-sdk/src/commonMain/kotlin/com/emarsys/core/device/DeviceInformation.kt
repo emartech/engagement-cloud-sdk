@@ -11,7 +11,7 @@ data class DeviceInformation(
     val sdkVersion: String,
     val language: String,
     val timezone: String,
-    val hardwareId: String,
+    val clientId: String,
     val platformInfo: String,
     val applicationVersion: String
 )

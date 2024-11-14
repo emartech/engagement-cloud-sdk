@@ -1,6 +1,7 @@
 package com.emarsys.core.device
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 
 const val UNKNOWN_VERSION_NAME = "unknown"
 
@@ -12,7 +13,9 @@ data class DeviceInfo(
     val osVersion: String,
     val sdkVersion: String,
     val languageCode: String,
-    val timezone: String
+    val timezone: String,
+    @JsonNames("hwId")
+    val clientId:String
 )
 
 @Serializable

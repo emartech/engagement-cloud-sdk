@@ -29,8 +29,8 @@ class Config<Logging : ConfigInstance, Gatherer : ConfigInstance, Internal : Con
         get() = sdkContext.config?.applicationCode
     override val merchantId: String?
         get() = sdkContext.config?.merchantId
-    override val hardwareId: String
-        get() = deviceInfoCollector.getHardwareId()
+    override val clientId: String
+        get() = deviceInfoCollector.getClientId()
     override val languageCode: String
         get() = getDeviceInfo().languageCode
 

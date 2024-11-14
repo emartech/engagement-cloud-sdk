@@ -16,13 +16,13 @@ class DeviceInfoCollectorTests {
     private companion object {
         const val LANGUAGE = "en-US"
         const val APP_VERSION = "2.0"
-        const val HW_ID = "test uuid"
+        const val CLIENT_ID = "test uuid"
         const val DEVICE_MODEL = "iPhone16"
         const val OS_VERSION = "testOsVersion"
         const val TIMEZONE = "+0300"
     }
 
-    private lateinit var mockHardwareIdProvider: Provider<String>
+    private lateinit var mockClientIdProvider: Provider<String>
     private lateinit var mockApplicationVersionProvider: Provider<String>
     private lateinit var mockLanguageProvider: Provider<String>
     private lateinit var mockTimezoneProvider: Provider<String>
@@ -33,8 +33,8 @@ class DeviceInfoCollectorTests {
 
     @BeforeTest
     fun setUp() {
-        mockHardwareIdProvider = mock()
-        every { mockHardwareIdProvider.provide() } returns HW_ID
+        mockClientIdProvider = mock()
+        every { mockClientIdProvider.provide() } returns CLIENT_ID
         mockApplicationVersionProvider = mock()
         every { mockApplicationVersionProvider.provide() } returns APP_VERSION
         mockLanguageProvider = mock()
@@ -47,7 +47,7 @@ class DeviceInfoCollectorTests {
         json = JsonUtil.json
 
         deviceInfoCollector = DeviceInfoCollector(
-            mockHardwareIdProvider,
+            mockClientIdProvider,
             mockApplicationVersionProvider,
             mockLanguageProvider,
             mockTimezoneProvider,
@@ -65,7 +65,8 @@ class DeviceInfoCollectorTests {
             OS_VERSION,
             BuildConfig.VERSION_NAME,
             LANGUAGE,
-            TIMEZONE
+            TIMEZONE,
+            CLIENT_ID
         )
         val expected = json.encodeToString(deviceInfo)
 
@@ -73,7 +74,7 @@ class DeviceInfoCollectorTests {
     }
 
     @Test
-    fun getHardwareId_shouldReturnHardwareId_fromProvider() {
-        deviceInfoCollector.getHardwareId() shouldBe HW_ID
+    fun getClientId_shouldReturnClientId_fromProvider() {
+        deviceInfoCollector.getClientId() shouldBe CLIENT_ID
     }
 }

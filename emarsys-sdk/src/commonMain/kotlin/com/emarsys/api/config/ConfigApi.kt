@@ -10,7 +10,7 @@ interface ConfigApi {
 
     val merchantId: String?
 
-    val hardwareId: String
+    val clientId: String
 
     val languageCode: String
 

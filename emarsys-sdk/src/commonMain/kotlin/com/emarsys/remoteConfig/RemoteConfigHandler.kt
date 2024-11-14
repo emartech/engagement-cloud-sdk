@@ -5,8 +5,8 @@ import com.emarsys.context.SdkContextApi
 import com.emarsys.context.copyWith
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.log.LogLevel
-import com.emarsys.networking.clients.remoteConfig.RemoteConfigClientApi
 import com.emarsys.core.providers.Provider
+import com.emarsys.networking.clients.remoteConfig.RemoteConfigClientApi
 
 class RemoteConfigHandler(
     private val remoteConfigClient: RemoteConfigClientApi,
@@ -16,7 +16,7 @@ class RemoteConfigHandler(
 ) : RemoteConfigHandlerApi {
     override suspend fun handle() {
         val config = remoteConfigClient.fetchRemoteConfig() ?: return
-        val hardwareId = deviceInfoCollector.getHardwareId()
+        val clientId = deviceInfoCollector.getClientId()
 
         applyServiceUrls(config.serviceUrls)
         applyLogLevel(config.logLevel)
@@ -24,7 +24,7 @@ class RemoteConfigHandler(
         applyLuckyLogger(config.luckyLogger)
 
         config.overrides?.let {
-            it[hardwareId]?.let { override ->
+            it[clientId]?.let { override ->
                 applyServiceUrls(override.serviceUrls)
                 applyLogLevel(override.logLevel)
                 applyFeatures(override.features)

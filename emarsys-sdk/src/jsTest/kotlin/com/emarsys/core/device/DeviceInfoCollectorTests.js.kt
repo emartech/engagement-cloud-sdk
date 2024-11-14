@@ -18,12 +18,13 @@ class DeviceInfoCollectorTests {
 
     private companion object {
         const val TEST_UUID = "test uuid"
-        const val STORED_ID = "stored hardware id"
         const val TIMEZONE = "+0600"
         const val BROWSER_NAME = "chrome"
         const val BROWSER_VERSION = "160.5.12"
         const val APPLICATION_VERSION = "2.0.0"
         const val LANGUAGE = "testLanguage"
+        const val CLIENT_ID = "stored client id"
+
         val navigator = window.navigator
         val testWebPlatformInfo = WebPlatformInfo(
             null,
@@ -71,6 +72,8 @@ class DeviceInfoCollectorTests {
 
     @Test
     fun collect_shouldReturn_deviceInfo() {
+        every { mockStorage.get("clientId") } returns CLIENT_ID
+
         val expectedDeviceInfo = DeviceInfo(
             platform = BROWSER_NAME,
             deviceModel = navigator.userAgent,
@@ -79,6 +82,7 @@ class DeviceInfoCollectorTests {
             languageCode = LANGUAGE,
             timezone = TIMEZONE,
             applicationVersion = APPLICATION_VERSION,
+            clientId = CLIENT_ID
         )
 
         val result = deviceInfoCollector.collect()
@@ -87,14 +91,14 @@ class DeviceInfoCollectorTests {
     }
 
     @Test
-    fun getHardwareId_shouldGenerateNewId_ifStoredId_isNull() {
+    fun getClientId_shouldGenerateNewId_ifStoredId_isNull() {
         every { mockStorage.get(any()) } returns null
-        deviceInfoCollector.getHardwareId() shouldBe TEST_UUID
+        deviceInfoCollector.getClientId() shouldBe TEST_UUID
     }
 
     @Test
-    fun getHardwareId_shouldReturnStoredId_ifPresent() {
-        every { mockStorage.get("hardwareId") } returns STORED_ID
+    fun getClientId_shouldReturnStoredId_ifPresent() {
+        every { mockStorage.get("clientId") } returns CLIENT_ID
 
         val testCollector = DeviceInfoCollector(
             mockUuidProvider,
@@ -106,6 +110,6 @@ class DeviceInfoCollectorTests {
             json
         )
 
-        testCollector.getHardwareId() shouldBe STORED_ID
+        testCollector.getClientId() shouldBe CLIENT_ID
     }
 }

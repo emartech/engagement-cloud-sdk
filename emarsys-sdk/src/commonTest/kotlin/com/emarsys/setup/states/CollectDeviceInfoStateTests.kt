@@ -24,18 +24,18 @@ class CollectDeviceInfoStateTests {
     }
 
     @AfterTest
-    fun teardown() {
+    fun tearDown() {
         sessionContext = SessionContext()
     }
 
     @Test
     fun activate_should_collect_deviceInfo_and_set_sessionContext() = runTest {
-        val hwId = "testHardwareId"
-        every { mockDeviceInfoCollector.getHardwareId() } returns hwId
+        val clientId = "testClientId"
+        every { mockDeviceInfoCollector.getClientId() } returns clientId
 
         collectDeviceInfoState.active()
 
-        verify { mockDeviceInfoCollector.getHardwareId() }
-        sessionContext.clientId shouldBe hwId
+        verify { mockDeviceInfoCollector.getClientId() }
+        sessionContext.clientId shouldBe clientId
     }
 }

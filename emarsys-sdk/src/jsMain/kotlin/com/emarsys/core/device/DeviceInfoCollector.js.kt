@@ -16,7 +16,7 @@ actual class DeviceInfoCollector(
     private val json: Json
 ) : DeviceInfoCollectorApi {
     private companion object {
-        const val HARDWARE_ID_STORAGE_KEY = "hardwareId"
+        const val CLIENT_ID_STORAGE_KEY = "clientId"
     }
 
     actual override fun collect(): String {
@@ -29,15 +29,16 @@ actual class DeviceInfoCollector(
                 osVersion = headerData.browserVersion,
                 sdkVersion = BuildConfig.VERSION_NAME,
                 languageCode = languageProvider.provide(),
-                timezone = timezoneProvider.provide()
+                timezone = timezoneProvider.provide(),
+                clientId = getClientId()
             )
         )
     }
 
-    actual override fun getHardwareId(): String {
-        return storage.get(HARDWARE_ID_STORAGE_KEY) ?: run {
+    actual override fun getClientId(): String {
+        return storage.get(CLIENT_ID_STORAGE_KEY) ?: run {
             val generatedId = uuidProvider.provide()
-            storage.put(HARDWARE_ID_STORAGE_KEY, generatedId)
+            storage.put(CLIENT_ID_STORAGE_KEY, generatedId)
             generatedId
         }
     }

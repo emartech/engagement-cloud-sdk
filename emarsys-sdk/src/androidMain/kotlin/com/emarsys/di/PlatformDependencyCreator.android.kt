@@ -36,7 +36,7 @@ import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.message.MsgHubApi
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.provider.AndroidApplicationVersionProvider
-import com.emarsys.core.providers.HardwareIdProvider
+import com.emarsys.core.providers.ClientIdProvider
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.resource.MetadataReader
@@ -125,7 +125,7 @@ actual class PlatformDependencyCreator actual constructor(
             createLanguageProvider(),
             createApplicationVersionProvider(),
             true,
-            HardwareIdProvider(uuidProvider, storage),
+            ClientIdProvider(uuidProvider, storage),
             platformInfoCollector,
             json
         )

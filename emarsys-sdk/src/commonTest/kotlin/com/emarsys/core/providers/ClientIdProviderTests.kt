@@ -10,38 +10,38 @@ import io.kotest.matchers.shouldBe
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class HardwareIdProviderTests {
+class ClientIdProviderTests {
     private companion object {
         const val UUID = "testUUID"
-        const val HW_ID = "testHW_ID"
+        const val CLIENT_ID = "testHW_ID"
     }
 
     private lateinit var mockStorage: TypedStorageApi<String?>
     private lateinit var mockUUIDProvider: Provider<String>
-    private lateinit var provider: HardwareIdProvider
+    private lateinit var provider: ClientIdProvider
 
     @BeforeTest
     fun setup() {
         mockStorage = mock()
         mockUUIDProvider = mock()
         every { mockUUIDProvider.provide() } returns UUID
-        provider = HardwareIdProvider(mockUUIDProvider, mockStorage)
+        provider = ClientIdProvider(mockUUIDProvider, mockStorage)
     }
 
     @Test
-    fun testProvide_shouldProvideHwId_from_storage() {
-        every { mockStorage.get(SdkConstants.HARDWARE_ID_STORAGE_KEY) } returns HW_ID
+    fun testProvide_shouldProvideClientId_from_storage() {
+        every { mockStorage.get(SdkConstants.CLIENT_ID_STORAGE_KEY) } returns CLIENT_ID
 
-        provider.provide() shouldBe HW_ID
+        provider.provide() shouldBe CLIENT_ID
     }
 
     @Test
-    fun testProvide_shouldGenerate_andStoreNewId_when_no_hwid_in_storage() {
-        every { mockStorage.get(SdkConstants.HARDWARE_ID_STORAGE_KEY) } returns null
-        every { mockStorage.put(SdkConstants.HARDWARE_ID_STORAGE_KEY, UUID) } returns Unit
+    fun testProvide_shouldGenerate_andStoreNewId_when_no_clientId_in_storage() {
+        every { mockStorage.get(SdkConstants.CLIENT_ID_STORAGE_KEY) } returns null
+        every { mockStorage.put(SdkConstants.CLIENT_ID_STORAGE_KEY, UUID) } returns Unit
         every { mockUUIDProvider.provide() } returns UUID
 
         provider.provide() shouldBe UUID
-        verify { mockStorage.put(SdkConstants.HARDWARE_ID_STORAGE_KEY, UUID) }
+        verify { mockStorage.put(SdkConstants.CLIENT_ID_STORAGE_KEY, UUID) }
     }
 }

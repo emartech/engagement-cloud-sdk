@@ -58,7 +58,7 @@ class RemoteConfigHandlerTests {
     fun testHandle() = runTest {
         val clientServiceUrl = "testClientServiceUrl"
         val predictServiceUrl = "testPredictServiceUrl"
-        val hardwareId = "testHardwareId"
+        val clientId = "testClientId"
         val config = RemoteConfigResponse(
             ServiceUrls(
                 clientService = clientServiceUrl
@@ -66,16 +66,16 @@ class RemoteConfigHandlerTests {
             LuckyLogger(LogLevel.Error, 1.0),
             RemoteConfigFeatures(mobileEngage = true),
             overrides = mapOf(
-                hardwareId to RemoteConfig(
+                clientId to RemoteConfig(
                     ServiceUrls(predictService = predictServiceUrl)
                 ),
-                "differentHardwareId" to RemoteConfig(
+                "differentClientId" to RemoteConfig(
                     ServiceUrls(clientService = "differentClientServiceUrl")
                 )
             )
         )
 
-        every { mockDeviceInfoCollector.getHardwareId() } returns hardwareId
+        every { mockDeviceInfoCollector.getClientId() } returns clientId
         everySuspend { mockRemoteConfigClient.fetchRemoteConfig() } returns config
         every { mockRandomProvider.provide() } returns 0.1
 

@@ -35,7 +35,7 @@ class ConfigTest {
         const val CONTACT_FIELD_ID = 42
         const val APPLICATION_CODE = "testApplicationCode"
         const val MERCHANT_ID = "testMerchantId"
-        const val HW_ID = "testHwId"
+        const val CLIENT_ID = "testClientId"
         const val LANGUAGE_CODE = "testLanguageCode"
         const val SDK_VERSION = "testSdkVersion"
         val PUSH_SETTINGS =
@@ -47,7 +47,8 @@ class ConfigTest {
             "testOsVersion",
             "testSdkVersion",
             "testLanguageCode",
-            "testTimeZone"
+            "testTimeZone",
+            "testClientId"
         )
     }
 
@@ -89,7 +90,7 @@ class ConfigTest {
 
         every { mockDeviceInfoCollector.collect() } returns Json.encodeToString(DEVICE_INFO)
         everySuspend { mockDeviceInfoCollector.getPushSettings() } returns PUSH_SETTINGS
-        every { mockDeviceInfoCollector.getHardwareId() } returns HW_ID
+        every { mockDeviceInfoCollector.getClientId() } returns CLIENT_ID
 
         everySuspend { mockLoggingConfig.activate() } returns Unit
         everySuspend { mockGathererConfig.activate() } returns Unit
@@ -126,8 +127,8 @@ class ConfigTest {
     }
 
     @Test
-    fun testHardwareId_returnsCorrectValue() = runTest {
-        config.hardwareId shouldBe HW_ID
+    fun testClientId_returnsCorrectValue() = runTest {
+        config.clientId shouldBe CLIENT_ID
     }
 
     @Test
