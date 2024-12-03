@@ -1,55 +1,14 @@
 package com.emarsys.di
 
 import EventTrackerApi
-import com.emarsys.api.config.Config
-import com.emarsys.api.config.ConfigApi
-import com.emarsys.api.config.ConfigCall
-import com.emarsys.api.config.ConfigContext
-import com.emarsys.api.config.ConfigInternal
-import com.emarsys.api.config.GathererConfig
-import com.emarsys.api.config.LoggingConfig
-import com.emarsys.api.contact.Contact
-import com.emarsys.api.contact.ContactApi
-import com.emarsys.api.contact.ContactCall
-import com.emarsys.api.contact.ContactContext
-import com.emarsys.api.contact.ContactGatherer
-import com.emarsys.api.contact.ContactInternal
-import com.emarsys.api.contact.LoggingContact
-import com.emarsys.api.event.EventTracker
-import com.emarsys.api.event.EventTrackerCall
-import com.emarsys.api.event.EventTrackerContext
-import com.emarsys.api.event.EventTrackerGatherer
-import com.emarsys.api.event.EventTrackerInternal
-import com.emarsys.api.event.LoggingEventTracker
+import com.emarsys.api.config.*
+import com.emarsys.api.contact.*
+import com.emarsys.api.event.*
 import com.emarsys.api.generic.ApiContext
-import com.emarsys.api.geofence.GathererGeofenceTracker
-import com.emarsys.api.geofence.GeofenceTracker
-import com.emarsys.api.geofence.GeofenceTrackerApi
-import com.emarsys.api.geofence.GeofenceTrackerCall
-import com.emarsys.api.geofence.GeofenceTrackerContext
-import com.emarsys.api.geofence.GeofenceTrackerInternal
-import com.emarsys.api.geofence.LoggingGeofenceTracker
-import com.emarsys.api.inapp.GathererInApp
-import com.emarsys.api.inapp.InApp
-import com.emarsys.api.inapp.InAppApi
-import com.emarsys.api.inapp.InAppCall
-import com.emarsys.api.inapp.InAppContext
-import com.emarsys.api.inapp.InAppInternal
-import com.emarsys.api.inapp.LoggingInApp
-import com.emarsys.api.inbox.GathererInbox
-import com.emarsys.api.inbox.Inbox
-import com.emarsys.api.inbox.InboxApi
-import com.emarsys.api.inbox.InboxCall
-import com.emarsys.api.inbox.InboxContext
-import com.emarsys.api.inbox.InboxInternal
-import com.emarsys.api.inbox.LoggingInbox
-import com.emarsys.api.predict.GathererPredict
-import com.emarsys.api.predict.LoggingPredict
-import com.emarsys.api.predict.Predict
-import com.emarsys.api.predict.PredictApi
-import com.emarsys.api.predict.PredictCall
-import com.emarsys.api.predict.PredictContext
-import com.emarsys.api.predict.PredictInternal
+import com.emarsys.api.geofence.*
+import com.emarsys.api.inapp.*
+import com.emarsys.api.inbox.*
+import com.emarsys.api.predict.*
 import com.emarsys.api.push.PushApi
 import com.emarsys.api.push.PushCall
 import com.emarsys.api.push.PushContext
@@ -75,11 +34,7 @@ import com.emarsys.core.message.MsgHubApi
 import com.emarsys.core.networking.clients.GenericNetworkClient
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.permission.PermissionHandlerApi
-import com.emarsys.core.providers.Provider
-import com.emarsys.core.providers.RandomProvider
-import com.emarsys.core.providers.TimestampProvider
-import com.emarsys.core.providers.TimezoneProvider
-import com.emarsys.core.providers.UUIDProvider
+import com.emarsys.core.providers.*
 import com.emarsys.core.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.state.StateMachine
@@ -95,12 +50,7 @@ import com.emarsys.mobileengage.action.EventActionFactory
 import com.emarsys.mobileengage.action.PushActionFactory
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.events.SdkEvent
-import com.emarsys.mobileengage.inapp.InAppDownloader
-import com.emarsys.mobileengage.inapp.InAppDownloaderApi
-import com.emarsys.mobileengage.inapp.InAppHandler
-import com.emarsys.mobileengage.inapp.InAppHandlerApi
-import com.emarsys.mobileengage.inapp.InAppPresenterApi
-import com.emarsys.mobileengage.inapp.InAppViewProviderApi
+import com.emarsys.mobileengage.inapp.*
 import com.emarsys.mobileengage.session.MobileEngageSession
 import com.emarsys.mobileengage.session.Session
 import com.emarsys.networking.EmarsysClient
@@ -121,18 +71,14 @@ import com.emarsys.remoteConfig.RemoteConfigHandlerApi
 import com.emarsys.setup.PlatformInitializerApi
 import com.emarsys.setup.SetupOrganizer
 import com.emarsys.setup.SetupOrganizerApi
-import com.emarsys.setup.states.AppStartState
-import com.emarsys.setup.states.ApplyRemoteConfigState
-import com.emarsys.setup.states.CollectDeviceInfoState
-import com.emarsys.setup.states.RegisterClientState
-import com.emarsys.setup.states.RegisterPushTokenState
+import com.emarsys.setup.states.*
 import com.emarsys.util.JsonUtil
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
-import io.ktor.client.HttpClient
-import io.ktor.client.plugins.HttpRequestRetry
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.serialization.kotlinx.json.json
+import io.ktor.client.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -297,7 +243,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
     }
 
     private val crypto: CryptoApi by lazy {
-        Crypto(PUBLIC_KEY)
+        Crypto(sdkLogger, PUBLIC_KEY)
     }
 
     private val timestampProvider: Provider<Instant> by lazy {

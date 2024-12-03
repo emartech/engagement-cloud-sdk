@@ -20,7 +20,9 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.promise
 import kotlinx.serialization.encodeToString
 import web.broadcast.BroadcastChannel
+import web.events.EventHandler
 import web.events.EventType
+import web.events.addEventListener
 import web.push.PushEvent
 import web.serviceworker.NotificationEvent
 
@@ -88,7 +90,7 @@ fun main() {
         })
     })
 
-    sdkReadyBroadcastChannel.onmessage = {
+    sdkReadyBroadcastChannel.onmessage = EventHandler {
         notificationClickHandler.postStoredMessageToSDK()
     }
 

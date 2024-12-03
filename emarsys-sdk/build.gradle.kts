@@ -7,7 +7,6 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.dokka)
-    alias(libs.plugins.mockmp)
     alias(libs.plugins.ksp)
     alias(libs.plugins.buildConfig)
     alias(libs.plugins.mokkery)
@@ -159,11 +158,6 @@ afterEvaluate {
         .configureEach {// https://github.com/gmazzo/gradle-buildconfig-plugin/issues/67
             mustRunAfter(tasks.withType<BuildConfigTask>())
         }
-}
-
-mockmp {
-    usesHelper = true
-    installWorkaround()
 }
 
 skie {

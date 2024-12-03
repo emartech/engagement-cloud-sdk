@@ -4,16 +4,13 @@ import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.log.Logger
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.actions.Action
-import com.emarsys.mobileengage.action.models.ActionModel
-import com.emarsys.mobileengage.action.models.BasicActionModel
-import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
-import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
-import com.emarsys.mobileengage.action.models.PresentableActionModel
+import com.emarsys.mobileengage.action.models.*
 import com.emarsys.mobileengage.push.model.JsNotificationClickedData
 import com.emarsys.util.JsonUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import web.broadcast.BroadcastChannel
+import web.events.EventHandler
 
 class PushNotificationClickHandler(
     private val actionFactory: ActionFactoryApi<ActionModel>,
@@ -24,7 +21,7 @@ class PushNotificationClickHandler(
 ) : PushNotificationClickHandlerApi {
 
     override suspend fun register() {
-        onNotificationClickedBroadcastChannel.onmessage = { event ->
+        onNotificationClickedBroadcastChannel.onmessage = EventHandler { event ->
             coroutineScope.launch {
                 handleNotificationClick(event.data.unsafeCast<String>())
             }

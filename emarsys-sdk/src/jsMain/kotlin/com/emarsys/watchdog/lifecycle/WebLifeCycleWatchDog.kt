@@ -10,6 +10,7 @@ import web.dom.Document
 import web.dom.DocumentVisibilityState
 import web.events.Event
 import web.events.EventType
+import web.events.addEventListener
 
 class WebLifeCycleWatchDog(
     private val document: Document,

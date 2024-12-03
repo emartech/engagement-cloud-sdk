@@ -2,18 +2,15 @@ package com.emarsys.core.crypto
 
 import com.emarsys.KotlinPlatform
 import com.emarsys.core.exceptions.DecryptionFailedException
+import com.emarsys.core.log.Logger
 import com.emarsys.currentPlatform
 import dev.whyoleg.cryptography.CryptographyProvider
-import dev.whyoleg.cryptography.algorithms.asymmetric.EC
-import dev.whyoleg.cryptography.algorithms.asymmetric.ECDSA
-import dev.whyoleg.cryptography.algorithms.digest.SHA256
-import dev.whyoleg.cryptography.algorithms.digest.SHA512
-import dev.whyoleg.cryptography.algorithms.symmetric.AES
-import dev.whyoleg.cryptography.operations.hash.Hasher
-import io.ktor.util.decodeBase64Bytes
-import io.ktor.util.encodeBase64
+import dev.whyoleg.cryptography.algorithms.*
+import dev.whyoleg.cryptography.operations.Hasher
+import io.ktor.util.*
 
 class Crypto(
+    private val logger: Logger,
     private val publicKey: String
 ) : CryptoApi {
     private companion object {
@@ -28,7 +25,7 @@ class Crypto(
 
     override suspend fun verify(message: String, signatureStr: String): Boolean {
         val decodedKey = ecdsaProvider.publicKeyDecoder(EC.Curve.P256)
-            .decodeFrom(EC.PublicKey.Format.DER, publicKey.decodeBase64Bytes())
+            .decodeFromByteArray(EC.PublicKey.Format.DER, publicKey.decodeBase64Bytes())
         val (format: ECDSA.SignatureFormat, signature: ByteArray) = when (currentPlatform) {
             KotlinPlatform.JS -> {
                 ECDSA.SignatureFormat.RAW to derToRawSignature(signatureStr.decodeBase64Bytes())
@@ -42,15 +39,16 @@ class Crypto(
                 ECDSA.SignatureFormat.DER to signatureStr.decodeBase64Bytes()
             }
         }
+        val verifier = decodedKey.signatureVerifier(SHA256, format)
 
-        return decodedKey.signatureVerifier(SHA256, format)
-            .verifySignature(
+        return verifier
+            .tryVerifySignature(
                 message.encodeToByteArray(),
                 signature
             )
     }
 
-    private fun derToRawSignature(derSignature: ByteArray): ByteArray {
+    private suspend fun derToRawSignature(derSignature: ByteArray): ByteArray {
         val derSequenceHeaderToSkip = 2
         if (derSignature.size < 8 || derSignature[0] != 0x30.toByte()) {
             throw IllegalArgumentException("Invalid DER signature format")
@@ -96,7 +94,7 @@ class Crypto(
 
         val key = hasher.hash(secret.encodeToByteArray())
         val decodedKey: AES.GCM.Key =
-            aesGcm.keyDecoder().decodeFrom(
+            aesGcm.keyDecoder().decodeFromByteArray(
                 AES.Key.Format.RAW,
                 key.copyOfRange(SECRET_START_INDEX, SECRET_END_INDEX)
             )
@@ -111,7 +109,7 @@ class Crypto(
         val decrypted: ByteArray = try {
             val decodedKey: AES.GCM.Key =
                 aesGcm.keyDecoder()
-                    .decodeFrom(
+                    .decodeFromByteArray(
                         AES.Key.Format.RAW,
                         key.copyOfRange(SECRET_START_INDEX, SECRET_END_INDEX)
                     )

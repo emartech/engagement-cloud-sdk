@@ -14,29 +14,27 @@ androidx-test-junit = "1.2.1"
 androidx-lifecycle = "2.8.7"
 buildConfig = "5.5.0"
 compose = "1.7.5"
-compose-compiler = "1.5.6"
-compose-plugin = "1.7.0"
+compose-plugin = "1.7.1"
 dokka = "1.9.20"
 junit = "4.13.2"
-kotlin = "2.0.21"
+kotlin = "2.1.0"
 kotlinxCoroutines = "1.9.0"
 kotlinxDatetime = "0.6.1"
 kotlinxSerializationJson = "1.7.3"
-ksp = "2.0.21-1.0.26"
+ksp = "2.1.0-1.0.29"
 ktor = "3.0.1"
 kotest = "5.9.1"
 mockkAndroid = "1.13.13"
-mokkery = "2.5.1"
-mockmp = "1.17.0"
+mokkery = "2.6.0"
 okio = "3.9.1"
 runner = "1.6.2"
-skie = "0.9.3"
-fcm = "24.0.3"
-agconnect_core = "1.9.1.300"
+skie = "0.9.5"
+fcm = "24.1.0"
+agconnect_core = "1.9.1.304"
 hms_push = "6.12.0.300"
 googleServices = "4.4.2"
-kotlinWrappers = "1.0.0-pre.697"
-cryptography = "0.3.1"
+kotlinWrappers = "1.0.0-pre.842"
+cryptography = "0.4.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
@@ -95,7 +93,6 @@ kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref =
 kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
-mockmp = { id = "org.kodein.mock.mockmp", version.ref = "mockmp" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 buildConfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildConfig" }
 agconnect = { id = "com.huawei.agconnect", version.ref = "agconnect_core" }

@@ -7,7 +7,6 @@ plugins {
     alias(libs.plugins.kotlin) apply false
     alias(libs.plugins.kotlinSerialization) apply false
     alias(libs.plugins.dokka) apply false
-    alias(libs.plugins.mockmp) apply false
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.buildConfig) apply false
     alias(libs.plugins.googleServices) apply false

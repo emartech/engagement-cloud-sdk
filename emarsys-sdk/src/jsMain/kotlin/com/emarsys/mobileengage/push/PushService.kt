@@ -5,8 +5,7 @@ import com.emarsys.ServiceWorkerOptions
 import com.emarsys.api.push.PushConstants
 import com.emarsys.core.storage.TypedStorageApi
 import js.buffer.BufferSource
-import js.promise.await
-import js.typedarrays.Uint8Array
+import js.typedarrays.toUint8Array
 import kotlinx.browser.window
 import web.navigator.navigator
 import web.push.PushSubscriptionOptionsInit
@@ -20,7 +19,7 @@ class PushService(
     override suspend fun register(config: JsEmarsysConfig) {
         config.serviceWorkerOptions?.let {
             pushServiceContext.registration =
-                navigator.serviceWorker.register(it.serviceWorkerPath).await()
+                navigator.serviceWorker.register(it.serviceWorkerPath)
             navigator.serviceWorker.ready.await()
         }
     }
@@ -30,7 +29,7 @@ class PushService(
             config.serviceWorkerOptions?.let {
                 val options = createPushSubscriptionOptions(it)
                 val pushSubscription =
-                    pushServiceContext.registration.pushManager.subscribe(options).await()
+                    pushServiceContext.registration.pushManager.subscribe(options)
                 val pushToken = JSON.stringify(pushSubscription.toJSON())
                 storage.put(PushConstants.PUSH_TOKEN_STORAGE_KEY, pushToken)
             }
@@ -40,11 +39,11 @@ class PushService(
     }
 
     private fun createPushSubscriptionOptions(serviceWorkerOptions: ServiceWorkerOptions): PushSubscriptionOptionsInit {
-        return js("{}").unsafeCast<PushSubscriptionOptionsInit>().apply {
-            this.applicationServerKey =
-                urlBase64ToUint8Array(serviceWorkerOptions.applicationServerKey)
-            this.userVisibleOnly = true
-        }
+        val options = PushSubscriptionOptionsInit(
+            applicationServerKey = urlBase64ToUint8Array(serviceWorkerOptions.applicationServerKey),
+            userVisibleOnly = true
+        )
+        return options
     }
 
     private fun urlBase64ToUint8Array(base64String: String): BufferSource {
@@ -54,12 +53,12 @@ class PushService(
             .replace('_', '/')
 
         val rawData = window.atob(base64)
-        val outputArray = Uint8Array(rawData.length)
+        val outputArray = byteArrayOf()
 
         for (i in rawData.indices) {
             outputArray[i] = rawData[i].code.toByte()
         }
-        return outputArray
+        return outputArray.toUint8Array()
     }
 
 }

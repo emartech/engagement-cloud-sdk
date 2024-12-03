@@ -9,6 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import web.broadcast.BroadcastChannel
+import web.events.EventHandler
 
 class WebBadgeCountHandler(
     private val onBadgeCountUpdateReceivedBroadcastChannel: BroadcastChannel,
@@ -18,7 +19,7 @@ class WebBadgeCountHandler(
 ) : WebBadgeCountHandlerApi {
 
     override suspend fun register() {
-        onBadgeCountUpdateReceivedBroadcastChannel.onmessage = { event ->
+        onBadgeCountUpdateReceivedBroadcastChannel.onmessage = EventHandler { event ->
             coroutineScope.launch {
                 handleBadgeCount(event.data.unsafeCast<String>())
             }

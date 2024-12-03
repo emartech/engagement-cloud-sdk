@@ -2,7 +2,6 @@
 
 import com.emarsys.self
 import com.emarsys.window.BrowserWindowHandlerApi
-import js.promise.await
 import web.broadcast.BroadcastChannel
 import web.serviceworker.WindowClient
 
@@ -36,7 +35,7 @@ class NotificationClickHandler(
         openWindow: WindowClient,
         jsNotificationClickedData: String
     ) {
-        openWindow.focus().await()
+        openWindow.focus()
         onNotificationClickedBroadcastChannel.postMessage(
             jsNotificationClickedData
         )
@@ -47,6 +46,6 @@ class NotificationClickHandler(
     ): WindowClient? {
         storedNotificationClickedMessage = jsNotificationClickedData
         val windowClient = browserWindowHandler.openWindow(self.location.origin)
-        return windowClient?.focus()?.await()
+        return windowClient?.focus()
     }
 }
