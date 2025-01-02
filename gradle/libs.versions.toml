@@ -33,7 +33,7 @@ fcm = "24.1.0"
 agconnect_core = "1.9.1.304"
 hms_push = "6.13.0.300"
 googleServices = "4.4.2"
-kotlinWrappers = "1.0.0-pre.856"
+kotlinWrappers = "1.0.0-pre.858"
 cryptography = "0.4.0"
 
 [libraries]
