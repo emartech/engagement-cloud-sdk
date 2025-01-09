@@ -20,7 +20,8 @@ class InAppViewProviderTest {
 
     @Test
     fun `test provide returns non-null InAppView`() = runTest {
-        everySuspend { webViewProvider.provide() } returns WKWebView()
+        val webView = WKWebView()
+        everySuspend { webViewProvider.provide() } returns webView
 
         val inAppViewProvider = InAppViewProvider(mainDispatcher, webViewProvider)
         val result = inAppViewProvider.provide()
