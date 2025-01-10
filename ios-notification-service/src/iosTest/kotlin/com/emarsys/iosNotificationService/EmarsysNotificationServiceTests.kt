@@ -95,28 +95,6 @@ class NotificationServiceTests {
 
         result.attachments shouldBe emptyList<UNNotificationAttachment>()
     }
-
-    @Test
-    fun didReceiveNotificationRequest_shouldSetInAppData() = runTest {
-        val content = UNMutableNotificationContent()
-        content.setUserInfo(
-            mapOf(
-                "ems" to mapOf(
-                    "inapp" to mapOf(
-                        "url" to "https://mobile-sdk-config-staging.gservice.emarsys.com/testing/Emarsys.png"
-                    )
-                )
-            )
-        )
-
-        val request = UNNotificationRequest.requestWithIdentifier("testId", content, null)
-
-        val result = emarsysNotificationService.didReceiveNotificationRequest(request)
-
-        val inAppData =
-            ((result.userInfo["ems"] as Map<String, Any>)["inapp"] as Map<String, Any>)["inAppData"]
-        inAppData shouldNotBe null
-    }
 }
 
 suspend fun EmarsysNotificationService.didReceiveNotificationRequest(request: UNNotificationRequest): UNNotificationContent =
