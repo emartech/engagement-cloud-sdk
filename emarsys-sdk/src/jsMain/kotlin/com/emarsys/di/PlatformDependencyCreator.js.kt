@@ -134,12 +134,17 @@ actual class PlatformDependencyCreator actual constructor(
         actionFactory: ActionFactoryApi<ActionModel>,
         downloaderApi: DownloaderApi,
         inAppDownloader: InAppDownloaderApi,
-        storage: TypedStorageApi<String?>
+        storage: TypedStorageApi<String?>,
+        sdkEventFlow: MutableSharedFlow<SdkEvent>
     ): State {
         val scope = CoroutineScope(sdkDispatcher)
         val inappJsBridge = InAppJsBridge(actionFactory, json, scope)
 
-        return PlatformInitState(inappJsBridge, PushService(pushServiceContext, storage), sdkContext)
+        return PlatformInitState(
+            inappJsBridge,
+            PushService(pushServiceContext, storage),
+            sdkContext
+        )
     }
 
     actual override fun createPermissionHandler(): PermissionHandlerApi {
@@ -212,7 +217,8 @@ actual class PlatformDependencyCreator actual constructor(
         eventClient: EventClientApi,
         actionFactory: ActionFactoryApi<ActionModel>,
         json: Json,
-        sdkDispatcher: CoroutineDispatcher
+        sdkDispatcher: CoroutineDispatcher,
+        sdkEventFlow: MutableSharedFlow<SdkEvent>
     ): PushInstance {
         return PushInternal(pushClient, storage, pushContext)
     }

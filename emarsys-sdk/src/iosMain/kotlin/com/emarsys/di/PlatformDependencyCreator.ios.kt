@@ -128,7 +128,8 @@ actual class PlatformDependencyCreator actual constructor(
         actionFactory: ActionFactoryApi<ActionModel>,
         downloaderApi: DownloaderApi,
         inAppDownloader: InAppDownloaderApi,
-        storage: TypedStorageApi<String?>
+        storage: TypedStorageApi<String?>,
+        sdkEventFlow: MutableSharedFlow<SdkEvent>
     ): State {
         return PlatformInitState(pushApi as IosPushInstance)
     }
@@ -214,7 +215,8 @@ actual class PlatformDependencyCreator actual constructor(
         eventClient: EventClientApi,
         actionFactory: ActionFactoryApi<ActionModel>,
         json: Json,
-        sdkDispatcher: CoroutineDispatcher
+        sdkDispatcher: CoroutineDispatcher,
+        sdkEventFlow: MutableSharedFlow<SdkEvent>
     ): PushInstance {
         return IosPushInternal(
             pushClient,
@@ -226,7 +228,8 @@ actual class PlatformDependencyCreator actual constructor(
             badgeCountHandler,
             json,
             sdkDispatcher,
-            sdkLogger
+            sdkLogger,
+            sdkEventFlow
         )
     }
 

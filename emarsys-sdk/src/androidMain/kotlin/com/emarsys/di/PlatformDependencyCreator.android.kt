@@ -143,7 +143,8 @@ actual class PlatformDependencyCreator actual constructor(
         actionFactory: ActionFactoryApi<ActionModel>,
         downloaderApi: DownloaderApi,
         inAppDownloader: InAppDownloaderApi,
-        storage: TypedStorageApi<String?>
+        storage: TypedStorageApi<String?>,
+        sdkEventFlow: MutableSharedFlow<SdkEvent>
     ): State {
         val notificationManager =
             (applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
@@ -157,10 +158,16 @@ actual class PlatformDependencyCreator actual constructor(
             platformInfoCollector,
             inAppDownloader
         )
-        val silentPushHandler = SilentPushMessageHandler(actionFactory)
+        val silentPushHandler = SilentPushMessageHandler(actionFactory, sdkEventFlow)
         val pushTokenBroadcastReceiver = PushTokenBroadcastReceiver(sdkDispatcher, pushApi)
         val pushMessageBroadcastReceiver =
-            PushMessageBroadcastReceiver(pushPresenter, silentPushHandler, sdkDispatcher, sdkLogger, json,)
+            PushMessageBroadcastReceiver(
+                pushPresenter,
+                silentPushHandler,
+                sdkDispatcher,
+                sdkLogger,
+                json,
+            )
         return PlatformInitState(
             pushTokenBroadcastReceiver,
             IntentFilter(PushConstants.PUSH_TOKEN_INTENT_FILTER_ACTION),
@@ -236,7 +243,8 @@ actual class PlatformDependencyCreator actual constructor(
         eventClient: EventClientApi,
         actionFactory: ActionFactoryApi<ActionModel>,
         json: Json,
-        sdkDispatcher: CoroutineDispatcher
+        sdkDispatcher: CoroutineDispatcher,
+        sdkEventFlow: MutableSharedFlow<SdkEvent>
     ): PushInstance {
         return PushInternal(pushClient, storage, pushContext)
     }

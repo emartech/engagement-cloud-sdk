@@ -59,7 +59,8 @@ interface DependencyCreator {
         actionFactory: ActionFactoryApi<ActionModel>,
         downloaderApi: DownloaderApi,
         inAppDownloader: InAppDownloaderApi,
-        storage: TypedStorageApi<String?>
+        storage: TypedStorageApi<String?>,
+        sdkEventFlow: MutableSharedFlow<SdkEvent>
     ): State
 
     fun createPermissionHandler(): PermissionHandlerApi
@@ -96,11 +97,13 @@ interface DependencyCreator {
         eventClient: EventClientApi,
         actionFactory: ActionFactoryApi<ActionModel>,
         json: Json,
-        sdkDispatcher: CoroutineDispatcher
+        sdkDispatcher: CoroutineDispatcher,
+        sdkEventFlow: MutableSharedFlow<SdkEvent>
     ): PushInstance
 
     fun createPushApi(
         pushInternal: PushInstance,
         storage: TypedStorageApi<String?>,
-        pushContext: ApiContext<PushCall>): PushApi
+        pushContext: ApiContext<PushCall>
+    ): PushApi
 }

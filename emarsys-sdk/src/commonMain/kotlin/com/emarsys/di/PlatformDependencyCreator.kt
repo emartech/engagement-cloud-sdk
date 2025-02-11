@@ -72,7 +72,8 @@ expect class PlatformDependencyCreator(
         actionFactory: ActionFactoryApi<ActionModel>,
         downloaderApi: DownloaderApi,
         inAppDownloader: InAppDownloaderApi,
-        storage: TypedStorageApi<String?>
+        storage: TypedStorageApi<String?>,
+        sdkEventFlow: MutableSharedFlow<SdkEvent>
     ): State
 
     override fun createPermissionHandler(): PermissionHandlerApi
@@ -109,7 +110,8 @@ expect class PlatformDependencyCreator(
         eventClient: EventClientApi,
         actionFactory: ActionFactoryApi<ActionModel>,
         json: Json,
-        sdkDispatcher: CoroutineDispatcher
+        sdkDispatcher: CoroutineDispatcher,
+        sdkEventFlow: MutableSharedFlow<SdkEvent>
     ): PushInstance
 
     override fun createPushApi(

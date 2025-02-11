@@ -17,15 +17,19 @@ import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
 import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
+import com.emarsys.mobileengage.events.SdkEvent
+import com.emarsys.mobileengage.events.SdkEventSource
 import com.emarsys.networking.clients.push.PushClientApi
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import platform.Foundation.NSJSONSerialization
 import platform.Foundation.NSJSONWritingPrettyPrinted
 import platform.Foundation.NSString
 import platform.Foundation.NSUTF8StringEncoding
@@ -53,7 +57,8 @@ class IosPushInternal(
     private val badgeCountHandler: BadgeCountHandlerApi,
     private val json: Json,
     private val sdkDispatcher: CoroutineDispatcher,
-    private val sdkLogger: Logger
+    private val sdkLogger: Logger,
+    private val sdkEventFlow: MutableSharedFlow<SdkEvent>
 ) : PushInternal(pushClient, storage, pushContext), IosPushInstance {
     override var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol? =
         null
@@ -74,6 +79,48 @@ class IosPushInternal(
         (emarsysUserNotificationCenterDelegate as InternalNotificationCenterDelegateProxy).registerAsDelegate()
     }
 
+    suspend fun handleSilentMessageWithUserInfo(rawUserInfo: Map<String, Any>) {
+
+        val userInfo = rawUserInfo.toBasicUserInfo()
+        val actions = userInfo.ems?.actions
+        actions?.forEach {
+            actionFactory.create(it).invoke()
+        }
+        userInfo.ems?.multichannelId?.let {
+            sdkEventFlow.emit(
+                SdkEvent(
+                    SdkEventSource.SilentPush,
+                    "campaignId",
+                    mapOf("campaignId" to it)
+                )
+            )
+        }
+    }
+
+    @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
+    private fun Map<String, Any>.toPresentableUserInfo(): PresentablePushUserInfo {
+        val userInfoString = NSString.create(
+            NSJSONSerialization.dataWithJSONObject(
+                this,
+                NSJSONWritingPrettyPrinted,
+                null
+            )!!, NSUTF8StringEncoding
+        ).toString()
+        return json.decodeFromString<PresentablePushUserInfo>(userInfoString)
+    }
+
+    @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
+    private fun Map<String, Any>.toBasicUserInfo(): BasicPushUserInfo {
+        val userInfoString = NSString.create(
+            NSJSONSerialization.dataWithJSONObject(
+                this,
+                NSJSONWritingPrettyPrinted,
+                null
+            )!!, NSUTF8StringEncoding
+        ).toString()
+        return json.decodeFromString<BasicPushUserInfo>(userInfoString)
+    }
+
     @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
     fun didReceiveNotificationResponse(
         actionIdentifier: String,
@@ -82,15 +129,7 @@ class IosPushInternal(
     ) {
         CoroutineScope(sdkDispatcher).launch {
             try {
-                val userInfoData = platform.Foundation.NSJSONSerialization.dataWithJSONObject(
-                    userInfo,
-                    NSJSONWritingPrettyPrinted,
-                    null
-                )
-
-                val userInfoJson = NSString.create(userInfoData!!, NSUTF8StringEncoding).toString()
-                val pushUserInfo: PushUserInfo = json.decodeFromString(userInfoJson)
-
+                val pushUserInfo = userInfo.toPresentableUserInfo()
                 handleActions(actionIdentifier, pushUserInfo)
                 pushUserInfo.ems?.badgeCount?.let { badgeCountHandler.handle(it) }
 
@@ -105,7 +144,7 @@ class IosPushInternal(
 
     private suspend fun handleActions(
         actionIdentifier: String,
-        pushUserInfo: PushUserInfo
+        pushUserInfo: PresentablePushUserInfo
     ) {
         val actionModel: ActionModel? =
             if (actionIdentifier == UNNotificationDefaultActionIdentifier) {
@@ -124,7 +163,7 @@ class IosPushInternal(
     }
 
     private suspend fun createMandatoryActions(
-        pushUserInfo: PushUserInfo,
+        pushUserInfo: PresentablePushUserInfo,
         actionModel: ActionModel
     ): List<Action<*>> {
         val result = mutableListOf<Action<*>>()
@@ -152,7 +191,7 @@ class IosPushInternal(
     }
 
     private fun extractDefaultAction(
-        pushUserInfo: PushUserInfo,
+        pushUserInfo: PresentablePushUserInfo,
     ): ActionModel? {
         return if (pushUserInfo.ems?.inapp != null) {
             InternalPushToInappActionModel(

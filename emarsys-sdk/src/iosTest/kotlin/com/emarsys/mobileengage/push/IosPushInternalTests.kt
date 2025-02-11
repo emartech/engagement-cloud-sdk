@@ -9,17 +9,21 @@ import com.emarsys.core.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
+import com.emarsys.mobileengage.action.actions.Action
 import com.emarsys.mobileengage.action.actions.OpenExternalUrlAction
 import com.emarsys.mobileengage.action.actions.PushToInappAction
 import com.emarsys.mobileengage.action.actions.ReportingAction
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BadgeCount
 import com.emarsys.mobileengage.action.models.BadgeCountMethod.SET
+import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
 import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableOpenExternalUrlActionModel
+import com.emarsys.mobileengage.events.SdkEvent
+import com.emarsys.mobileengage.events.SdkEventSource
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.util.JsonUtil
 import dev.mokkery.answering.returns
@@ -30,6 +34,7 @@ import dev.mokkery.verifySuspend
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -38,6 +43,7 @@ import kotlinx.serialization.json.Json
 import platform.UserNotifications.UNNotificationDefaultActionIdentifier
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+
 
 @ExperimentalCoroutinesApi
 class IosPushInternalTests {
@@ -56,6 +62,7 @@ class IosPushInternalTests {
     private lateinit var mockBadgeCountHandler: BadgeCountHandlerApi
     private lateinit var json: Json
     private lateinit var sdkDispatcher: CoroutineDispatcher
+    private lateinit var mockSdkEventFlow: MutableSharedFlow<SdkEvent>
 
     @BeforeTest
     fun setup() = runTest {
@@ -71,7 +78,7 @@ class IosPushInternalTests {
         mockBadgeCountHandler = mock()
         json = JsonUtil.json
         sdkDispatcher = dispatcher
-
+        mockSdkEventFlow = mock()
         everySuspend { mockActionHandler.handleActions(any(), any()) } returns Unit
 
         iosPushInternal = IosPushInternal(
@@ -84,7 +91,8 @@ class IosPushInternalTests {
             mockBadgeCountHandler,
             json,
             sdkDispatcher,
-            mock()
+            mock(),
+            mockSdkEventFlow
         )
     }
 
@@ -328,92 +336,153 @@ class IosPushInternalTests {
     }
 
     @Test
-    fun `didReceiveNotificationResponse should report defaultAction_withOldApnsPayload`() = runTest {
-        val mockUrlOpener: ExternalUrlOpenerApi = mock()
-        val actionModel = BasicOpenExternalUrlActionModel(url = "https://www.emarsys.com")
-        val action = OpenExternalUrlAction(actionModel, mockUrlOpener)
+    fun `didReceiveNotificationResponse should report defaultAction_withOldApnsPayload`() =
+        runTest {
+            val mockUrlOpener: ExternalUrlOpenerApi = mock()
+            val actionModel = BasicOpenExternalUrlActionModel(url = "https://www.emarsys.com")
+            val action = OpenExternalUrlAction(actionModel, mockUrlOpener)
 
-        everySuspend { mockActionFactory.create(actionModel) } returns action
-        everySuspend { mockUrlOpener.open(any()) } returns Unit
+            everySuspend { mockActionFactory.create(actionModel) } returns action
+            everySuspend { mockUrlOpener.open(any()) } returns Unit
 
-        val actionIdentifier = UNNotificationDefaultActionIdentifier
-        val userInfo = mapOf(
-            "u" to mapOf(
-                "sid" to SID,
-            ),
-            "ems" to mapOf(
-                "default_action" to mapOf(
-                    "type" to "OpenExternalUrl",
-                    "url" to "https://www.emarsys.com"
+            val actionIdentifier = UNNotificationDefaultActionIdentifier
+            val userInfo = mapOf(
+                "u" to mapOf(
+                    "sid" to SID,
                 ),
+                "ems" to mapOf(
+                    "default_action" to mapOf(
+                        "type" to "OpenExternalUrl",
+                        "url" to "https://www.emarsys.com"
+                    ),
+                    "actions" to listOf(
+                        mapOf(
+                            "type" to "OpenExternalUrl",
+                            "title" to "testTitle",
+                            "id" to "testId",
+                            "url" to "https://www.emarsys.com"
+                        )
+                    )
+                )
+            )
+
+            val notificationOpenedActionModel = NotificationOpenedActionModel(SID)
+
+            val reportingAction = ReportingAction(notificationOpenedActionModel, mock())
+
+            everySuspend { mockActionFactory.create(notificationOpenedActionModel) } returns reportingAction
+
+            iosPushInternal.didReceiveNotificationResponse(actionIdentifier, userInfo) {}
+
+            advanceUntilIdle()
+
+            verifySuspend {
+                mockActionFactory.create(actionModel)
+                mockActionHandler.handleActions(listOf(reportingAction), action)
+            }
+        }
+
+    @Test
+    fun `didReceiveNotificationResponse should report defaultAction_withNewApnsPayload`() =
+        runTest {
+            val mockUrlOpener: ExternalUrlOpenerApi = mock()
+            val actionModel = BasicOpenExternalUrlActionModel(url = "https://www.emarsys.com")
+            val action = OpenExternalUrlAction(actionModel, mockUrlOpener)
+
+            everySuspend { mockActionFactory.create(actionModel) } returns action
+            everySuspend { mockUrlOpener.open(any()) } returns Unit
+
+            val actionIdentifier = UNNotificationDefaultActionIdentifier
+            val userInfo = mapOf(
+                "ems" to mapOf(
+                    "sid" to SID,
+                    "defaultAction" to mapOf(
+                        "type" to "OpenExternalUrl",
+                        "url" to "https://www.emarsys.com"
+                    ),
+                    "actions" to listOf(
+                        mapOf(
+                            "type" to "OpenExternalUrl",
+                            "title" to "testTitle",
+                            "id" to "testId",
+                            "url" to "https://www.emarsys.com"
+                        )
+                    )
+                )
+            )
+
+            val notificationOpenedActionModel = NotificationOpenedActionModel(SID)
+
+            val reportingAction = ReportingAction(notificationOpenedActionModel, mock())
+
+            everySuspend { mockActionFactory.create(notificationOpenedActionModel) } returns reportingAction
+
+            iosPushInternal.didReceiveNotificationResponse(actionIdentifier, userInfo) {}
+
+            advanceUntilIdle()
+
+            verifySuspend {
+                mockActionFactory.create(actionModel)
+                mockActionHandler.handleActions(listOf(reportingAction), action)
+            }
+        }
+
+    @Test
+    fun `handleMessageWithUserInfo should should execute actions`() = runTest {
+        val userInfo = mapOf(
+            "ems" to mapOf(
+                "sid" to SID,
                 "actions" to listOf(
                     mapOf(
                         "type" to "OpenExternalUrl",
-                        "title" to "testTitle",
-                        "id" to "testId",
                         "url" to "https://www.emarsys.com"
+                    ),
+                    mapOf(
+                        "type" to "MEAppEvent",
+                        "name" to "name",
+                        "payload" to mapOf("key" to "value")
                     )
                 )
             )
         )
+        val openExternalActionModel =
+            BasicOpenExternalUrlActionModel(url = "https://www.emarsys.com")
+        val appEventActionModel = BasicAppEventActionModel("name", mapOf("key" to "value"))
+        val mockOpenExternalUrlAction: Action<*> = mock()
+        val mockAppEventAction: Action<*> = mock()
+        everySuspend { mockOpenExternalUrlAction.invoke() } returns Unit
+        everySuspend { mockAppEventAction.invoke() } returns Unit
+        everySuspend { mockActionFactory.create(openExternalActionModel) } returns mockOpenExternalUrlAction
+        everySuspend { mockActionFactory.create(appEventActionModel) } returns mockAppEventAction
 
-        val notificationOpenedActionModel = NotificationOpenedActionModel(SID)
+        iosPushInternal.handleSilentMessageWithUserInfo(userInfo)
 
-        val reportingAction = ReportingAction(notificationOpenedActionModel, mock())
-
-        everySuspend { mockActionFactory.create(notificationOpenedActionModel) } returns reportingAction
-
-        iosPushInternal.didReceiveNotificationResponse(actionIdentifier, userInfo) {}
-
-        advanceUntilIdle()
-
-        verifySuspend {
-            mockActionFactory.create(actionModel)
-            mockActionHandler.handleActions(listOf(reportingAction), action)
-        }
+        verifySuspend { mockActionFactory.create(openExternalActionModel) }
+        verifySuspend { mockActionFactory.create(appEventActionModel) }
+        verifySuspend { mockOpenExternalUrlAction.invoke() }
+        verifySuspend { mockAppEventAction.invoke() }
     }
 
     @Test
-    fun `didReceiveNotificationResponse should report defaultAction_withNewApnsPayload`() = runTest {
-        val mockUrlOpener: ExternalUrlOpenerApi = mock()
-        val actionModel = BasicOpenExternalUrlActionModel(url = "https://www.emarsys.com")
-        val action = OpenExternalUrlAction(actionModel, mockUrlOpener)
-
-        everySuspend { mockActionFactory.create(actionModel) } returns action
-        everySuspend { mockUrlOpener.open(any()) } returns Unit
-
-        val actionIdentifier = UNNotificationDefaultActionIdentifier
+    fun `handleMessageWithUserInfo should emit event with campaignId`() = runTest {
         val userInfo = mapOf(
             "ems" to mapOf(
                 "sid" to SID,
-                "defaultAction" to mapOf(
-                    "type" to "OpenExternalUrl",
-                    "url" to "https://www.emarsys.com"
-                ),
-                "actions" to listOf(
-                    mapOf(
-                        "type" to "OpenExternalUrl",
-                        "title" to "testTitle",
-                        "id" to "testId",
-                        "url" to "https://www.emarsys.com"
-                    )
-                )
+                "multichannelId" to "testMultichannelId",
+                "actions" to emptyList<Map<String, Any>>()
             )
         )
-
-        val notificationOpenedActionModel = NotificationOpenedActionModel(SID)
-
-        val reportingAction = ReportingAction(notificationOpenedActionModel, mock())
-
-        everySuspend { mockActionFactory.create(notificationOpenedActionModel) } returns reportingAction
-
-        iosPushInternal.didReceiveNotificationResponse(actionIdentifier, userInfo) {}
-
-        advanceUntilIdle()
+        everySuspend { mockSdkEventFlow.emit(any()) } returns Unit
+        iosPushInternal.handleSilentMessageWithUserInfo(userInfo)
 
         verifySuspend {
-            mockActionFactory.create(actionModel)
-            mockActionHandler.handleActions(listOf(reportingAction), action)
+            mockSdkEventFlow.emit(
+                SdkEvent(
+                    SdkEventSource.SilentPush,
+                    "campaignId",
+                    mapOf("campaignId" to "testMultichannelId")
+                )
+            )
         }
     }
 }
