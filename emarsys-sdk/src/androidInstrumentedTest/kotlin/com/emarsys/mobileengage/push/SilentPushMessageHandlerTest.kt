@@ -9,15 +9,19 @@ import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
 import com.emarsys.mobileengage.action.models.BasicCustomEventActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
+import com.emarsys.mobileengage.events.SdkEvent
+import com.emarsys.mobileengage.events.SdkEventSource
 import com.emarsys.mobileengage.inapp.InAppDownloader
 import com.emarsys.mobileengage.push.model.AndroidPlatformData
 import com.emarsys.mobileengage.push.model.AndroidSilentPushMessage
 import com.emarsys.mobileengage.push.model.NotificationMethod
 import com.emarsys.mobileengage.push.model.NotificationOperation.INIT
 import com.emarsys.util.JsonUtil
+import dev.mokkery.verifySuspend
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import org.junit.Before
@@ -59,6 +63,7 @@ class SilentPushMessageHandlerTest {
     private lateinit var json: Json
     private lateinit var mockInAppDownloader: InAppDownloader
     private lateinit var mockPushActionFactory: PushActionFactory
+    private lateinit var mockSdkEventFlow: MutableSharedFlow<SdkEvent>
 
 
     @Before
@@ -66,11 +71,13 @@ class SilentPushMessageHandlerTest {
         mockContext = getInstrumentation().targetContext.applicationContext
         mockInAppDownloader = mockk(relaxed = true)
         mockPushActionFactory = mockk(relaxed = true)
+        mockSdkEventFlow = mockk(relaxed = true)
 
         json = JsonUtil.json
 
         silentPushMessageHandler = SilentPushMessageHandler(
-            mockPushActionFactory
+            mockPushActionFactory,
+            mockSdkEventFlow
         )
     }
 
@@ -85,6 +92,23 @@ class SilentPushMessageHandlerTest {
         silentPushMessageHandler.handle(message)
 
         coVerify(exactly = 3) { mockAction.invoke() }
+    }
+
+    @Test
+    fun handle_should_emit_event_with_campaignId() = runTest {
+        val message = createTestSilentMessage()
+
+        silentPushMessageHandler.handle(message)
+
+        verifySuspend {
+            mockSdkEventFlow.emit(
+                SdkEvent(
+                    SdkEventSource.SilentPush,
+                    "campaignId",
+                    mapOf("campaignId" to CAMPAIGN_ID)
+                )
+            )
+        }
     }
 
     private fun createTestSilentMessage(
