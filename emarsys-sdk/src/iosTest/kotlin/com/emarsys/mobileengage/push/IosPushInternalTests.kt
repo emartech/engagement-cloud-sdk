@@ -49,6 +49,7 @@ import kotlin.test.Test
 class IosPushInternalTests {
     private companion object {
         const val SID = "testSid"
+        const val CAMPAIGN_ID = "campaignId"
     }
 
     private lateinit var iosPushInternal: IosPushInternal
@@ -432,6 +433,7 @@ class IosPushInternalTests {
         val userInfo = mapOf(
             "ems" to mapOf(
                 "sid" to SID,
+                "multichannelId" to CAMPAIGN_ID,
                 "actions" to listOf(
                     mapOf(
                         "type" to "OpenExternalUrl",
@@ -450,6 +452,8 @@ class IosPushInternalTests {
         val appEventActionModel = BasicAppEventActionModel("name", mapOf("key" to "value"))
         val mockOpenExternalUrlAction: Action<*> = mock()
         val mockAppEventAction: Action<*> = mock()
+        everySuspend { mockSdkEventFlow.emit(any()) } returns Unit
+
         everySuspend { mockOpenExternalUrlAction.invoke() } returns Unit
         everySuspend { mockAppEventAction.invoke() } returns Unit
         everySuspend { mockActionFactory.create(openExternalActionModel) } returns mockOpenExternalUrlAction
