@@ -6,7 +6,7 @@ import com.emarsys.mobileengage.action.models.BadgeCount
 import com.emarsys.mobileengage.action.models.BadgeCountMethod
 import com.emarsys.mobileengage.action.models.BasicCustomEventActionModel
 import com.emarsys.mobileengage.action.models.PresentableAppEventActionModel
-import com.emarsys.mobileengage.push.PushData
+import com.emarsys.mobileengage.push.PresentablePushData
 import com.emarsys.mobileengage.push.model.JsPlatformData
 import com.emarsys.mobileengage.push.model.JsPushMessage
 import com.emarsys.util.JsonUtil
@@ -113,7 +113,7 @@ class PushMessageWebV1MapperTests {
             BODY,
             ICON,
             IMAGE,
-            PushData(
+            PresentablePushData(
                 false,
                 SID,
                 CAMPAIGN_ID,

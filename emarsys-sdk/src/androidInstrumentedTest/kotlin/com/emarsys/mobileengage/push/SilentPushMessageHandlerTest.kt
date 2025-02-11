@@ -1,0 +1,108 @@
+package com.emarsys.mobileengage.push
+
+import android.content.Context
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import com.emarsys.mobileengage.action.PushActionFactory
+import com.emarsys.mobileengage.action.actions.Action
+import com.emarsys.mobileengage.action.models.BadgeCount
+import com.emarsys.mobileengage.action.models.BasicActionModel
+import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
+import com.emarsys.mobileengage.action.models.BasicCustomEventActionModel
+import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
+import com.emarsys.mobileengage.inapp.InAppDownloader
+import com.emarsys.mobileengage.push.model.AndroidPlatformData
+import com.emarsys.mobileengage.push.model.AndroidSilentPushMessage
+import com.emarsys.mobileengage.push.model.NotificationMethod
+import com.emarsys.mobileengage.push.model.NotificationOperation.INIT
+import com.emarsys.util.JsonUtil
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
+import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.Json
+import org.junit.Before
+import org.junit.Test
+
+
+class SilentPushMessageHandlerTest {
+    private companion object {
+        const val COLLAPSE_ID = "testCollapseId"
+        const val CHANNEL_ID = "testChannelId"
+        const val MESSAGE_ID = "testMessageId"
+        const val SID = "testSid"
+        const val CAMPAIGN_ID = "testCampaignId"
+
+        val testOpenExternalUrlBasicAction =
+            BasicOpenExternalUrlActionModel(
+                "https://example.com"
+            )
+        val testCustomEventBasicAction =
+            BasicCustomEventActionModel(
+                "customAction",
+                mapOf("key" to "value")
+            )
+        val testAppEventBasicAction =
+            BasicAppEventActionModel(
+                "appAction",
+                mapOf("key2" to "value2")
+            )
+
+        val testBasicActions = listOf(
+            testOpenExternalUrlBasicAction,
+            testCustomEventBasicAction,
+            testAppEventBasicAction
+        )
+    }
+
+    private lateinit var silentPushMessageHandler: SilentPushMessageHandler
+    private lateinit var mockContext: Context
+    private lateinit var json: Json
+    private lateinit var mockInAppDownloader: InAppDownloader
+    private lateinit var mockPushActionFactory: PushActionFactory
+
+
+    @Before
+    fun setup() = runTest {
+        mockContext = getInstrumentation().targetContext.applicationContext
+        mockInAppDownloader = mockk(relaxed = true)
+        mockPushActionFactory = mockk(relaxed = true)
+
+        json = JsonUtil.json
+
+        silentPushMessageHandler = SilentPushMessageHandler(
+            mockPushActionFactory
+        )
+    }
+
+    @Test
+    fun handle_should_invoke_actions_when_silentPush() = runTest {
+        val message = createTestSilentMessage(actions = testBasicActions)
+        val mockAction: Action<*> = mockk(relaxed = true)
+        coEvery { mockPushActionFactory.create(testCustomEventBasicAction) } returns mockAction
+        coEvery { mockPushActionFactory.create(testAppEventBasicAction) } returns mockAction
+        coEvery { mockPushActionFactory.create(testOpenExternalUrlBasicAction) } returns mockAction
+
+        silentPushMessageHandler.handle(message)
+
+        coVerify(exactly = 3) { mockAction.invoke() }
+    }
+
+    private fun createTestSilentMessage(
+        actions: List<BasicActionModel>? = null,
+        badgeCount: BadgeCount? = null,
+    ): AndroidSilentPushMessage {
+        val tesMethod = NotificationMethod(COLLAPSE_ID, INIT)
+        val testData = PushData(
+            true,
+            SID,
+            CAMPAIGN_ID,
+            AndroidPlatformData(CHANNEL_ID, tesMethod),
+            actions = actions,
+            badgeCount
+        )
+        return AndroidSilentPushMessage(
+            MESSAGE_ID,
+            data = testData
+        )
+    }
+}

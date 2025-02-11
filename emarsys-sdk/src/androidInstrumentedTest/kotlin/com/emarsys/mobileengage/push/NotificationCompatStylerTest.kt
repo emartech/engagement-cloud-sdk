@@ -176,12 +176,12 @@ class NotificationCompatStylerTest {
         iconUrlString: String? = null,
         imageUrlString: String? = null
     ) = AndroidPushMessage(
-        "collapseId",
-        "title",
-        "body",
+        messageId = "collapseId",
+        title = "title",
+        body = "body",
         iconUrlString = iconUrlString,
         imageUrlString = imageUrlString,
-        data = PushData(
+        data = PresentablePushData(
             campaignId = "campaignId",
             sid = "sid",
             platformData = AndroidPlatformData(

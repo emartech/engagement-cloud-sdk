@@ -1,7 +1,7 @@
 package com.emarsys.mobileengage.push.model
 
-import com.emarsys.mobileengage.push.PushData
-import com.emarsys.mobileengage.push.PushMessage
+import com.emarsys.mobileengage.push.PresentablePushData
+import com.emarsys.mobileengage.push.PresentablePushMessage
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -11,5 +11,5 @@ data class JsPushMessage(
     override val body: String,
     override val iconUrlString: String? = null,
     override val imageUrlString: String? = null,
-    override val data: PushData<JsPlatformData>
-) : PushMessage<JsPlatformData>
+    override val data: PresentablePushData<JsPlatformData>
+) : PresentablePushMessage<JsPlatformData>

@@ -3,10 +3,13 @@ package com.emarsys.mobileengage.push
 import android.content.Intent
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.emarsys.core.log.Logger
+import com.emarsys.mobileengage.action.models.BadgeCount
+import com.emarsys.mobileengage.action.models.BadgeCountMethod
 import com.emarsys.mobileengage.push.model.AndroidPlatformData
 import com.emarsys.mobileengage.push.model.AndroidPushMessage
+import com.emarsys.mobileengage.push.model.AndroidSilentPushMessage
 import com.emarsys.mobileengage.push.model.NotificationMethod
-import com.emarsys.mobileengage.push.model.NotificationOperation
+import com.emarsys.mobileengage.push.model.NotificationOperation.INIT
 import com.emarsys.util.JsonUtil
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -44,8 +47,28 @@ class PushMessageBroadcastReceiverTest {
                 "channelId":"$CHANNEL_ID",
                 "notificationMethod":{
                     "collapseId":"$COLLAPSE_ID",
-                    "operation":"${NotificationOperation.INIT}"
+                    "operation":"$INIT"
                     }
+                }
+            }
+        }""".trimIndent()
+
+        val SILENT_PUSH_MESSAGE_STRING = """{
+        "messageId":"testMessageId",
+        "data":{
+            "silent":true,
+            "sid":"$SID",
+            "campaignId":"$CAMPAIGN_ID",
+            "platformData":{
+                "channelId":"$CHANNEL_ID",
+                "notificationMethod":{
+                    "collapseId":"$COLLAPSE_ID",
+                    "operation":"$INIT"
+                    }
+                },
+                "badgeCount":{
+                    "method":"ADD",
+                    "value":1
                 }
             }
         }""".trimIndent()
@@ -53,6 +76,7 @@ class PushMessageBroadcastReceiverTest {
 
     private val context = getInstrumentation().targetContext
     private lateinit var mockPresenter: PushPresenter<AndroidPlatformData, AndroidPushMessage>
+    private lateinit var mockHandler: PushHandler<AndroidPlatformData, AndroidSilentPushMessage>
     private lateinit var mockLogger: Logger
     private lateinit var sdkDispatcher: CoroutineDispatcher
     private lateinit var json: Json
@@ -61,12 +85,19 @@ class PushMessageBroadcastReceiverTest {
     @Before
     fun setUp() {
         mockPresenter = mockk(relaxed = true)
+        mockHandler = mockk(relaxed = true)
         mockLogger = mockk(relaxed = true)
         sdkDispatcher = StandardTestDispatcher()
         Dispatchers.setMain(sdkDispatcher)
         json = JsonUtil.json
         broadcastReceiver =
-            PushMessageBroadcastReceiver(mockPresenter, sdkDispatcher, mockLogger, json)
+            PushMessageBroadcastReceiver(
+                mockPresenter,
+                mockHandler,
+                sdkDispatcher,
+                mockLogger,
+                json
+            )
     }
 
     @After
@@ -76,11 +107,8 @@ class PushMessageBroadcastReceiverTest {
 
     @Test
     fun testOnReceive_shouldGetPushMessageFromIntentAndPresent() = runTest {
-        val tesMethod = NotificationMethod(
-            COLLAPSE_ID,
-            NotificationOperation.INIT
-        )
-        val testData = PushData(
+        val tesMethod = NotificationMethod(COLLAPSE_ID, INIT)
+        val testData = PresentablePushData(
             false,
             SID,
             CAMPAIGN_ID, AndroidPlatformData(CHANNEL_ID, tesMethod)
@@ -103,7 +131,38 @@ class PushMessageBroadcastReceiverTest {
 
         advanceUntilIdle()
 
+        coVerify(exactly = 0) { mockHandler.handle(any()) }
         coVerify { mockPresenter.present(expectedPushMessage) }
+    }
+
+    @Test
+    fun testOnReceive_shouldHandleSilentPushMessage() = runTest {
+        val tesMethod = NotificationMethod(COLLAPSE_ID, INIT)
+        val testData = PushData(
+            true,
+            SID,
+            CAMPAIGN_ID,
+            AndroidPlatformData(CHANNEL_ID, tesMethod),
+            actions = null,
+            badgeCount = BadgeCount(BadgeCountMethod.ADD, 1)
+        )
+
+        val expectedPushMessage = AndroidSilentPushMessage(
+            MESSAGE_ID,
+            data = testData
+        )
+
+        val intent = Intent().apply {
+            action = "com.emarsys.sdk.PUSH_MESSAGE_PAYLOAD"
+            putExtra("pushPayload", SILENT_PUSH_MESSAGE_STRING)
+        }
+
+        broadcastReceiver.onReceive(context, intent)
+
+        advanceUntilIdle()
+
+        coVerify { mockHandler.handle(expectedPushMessage) }
+        coVerify(exactly = 0) { mockPresenter.present(any()) }
     }
 
     @Test

@@ -29,7 +29,6 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlinx.serialization.encodeToString
 import web.broadcast.BroadcastChannel
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -238,7 +237,7 @@ class PushNotificationClickHandlerTests {
                 messageId = "messageId",
                 title = "title",
                 body = "body",
-                data = PushData(
+                data = PresentablePushData(
                     sid = "sid",
                     campaignId = "campaignId",
                     platformData = JsPlatformData(

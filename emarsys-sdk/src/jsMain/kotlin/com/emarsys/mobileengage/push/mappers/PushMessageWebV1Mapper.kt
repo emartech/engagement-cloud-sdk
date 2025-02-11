@@ -3,11 +3,10 @@ package com.emarsys.mobileengage.push.mappers
 import com.emarsys.core.log.Logger
 import com.emarsys.core.mapper.Mapper
 import com.emarsys.mobileengage.action.models.BasicActionModel
-import com.emarsys.mobileengage.push.PushData
+import com.emarsys.mobileengage.push.PresentablePushData
 import com.emarsys.mobileengage.push.model.JsPlatformData
 import com.emarsys.mobileengage.push.model.JsPushMessage
 import com.emarsys.mobileengage.push.model.v1.RemoteWebPushMessageV1
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class PushMessageWebV1Mapper(
@@ -28,7 +27,7 @@ class PushMessageWebV1Mapper(
                 remoteMessage.notification.body,
                 remoteMessage.notification.icon,
                 remoteMessage.notification.imageUrl,
-                PushData(
+                PresentablePushData(
                     sid = remoteMessage.ems.sid,
                     campaignId = remoteMessage.ems.campaignId,
                     actions = remoteMessage.notification.actions,

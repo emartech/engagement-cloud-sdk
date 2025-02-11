@@ -67,8 +67,10 @@ class PushMessagePresenterTest {
                 "openExternalUrl",
                 "https://example.com"
             )
-        val testActions =
+
+        val testPresentableActions: List<PresentableActionModel> =
             listOf(testCustomEventAction, testAppEventAction, testOpenExternalUrlAction)
+
         val testDefaultTapAction = BasicAppEventActionModel("testName", null)
     }
 
@@ -115,7 +117,7 @@ class PushMessagePresenterTest {
 
     @Test
     fun present_shouldShowNotification_withCorrectData_withActions() = runTest {
-        val testMessage = createTestMessage(testActions)
+        val testMessage = createTestMessage(testPresentableActions)
 
         every {
             mockNotificationManager.notify(
@@ -202,7 +204,7 @@ class PushMessagePresenterTest {
 
     @Test
     fun present_shouldShowNotification_withCorrectData_withActionsAndDefaultAction() = runTest {
-        val testMessage = createTestMessage(testActions, testDefaultTapAction)
+        val testMessage = createTestMessage(testPresentableActions, testDefaultTapAction)
 
         every {
             mockNotificationManager.notify(
@@ -225,10 +227,15 @@ class PushMessagePresenterTest {
             )
         }
     }
+
     @Test
     fun present_shouldShowNotification_withCorrectData_withBadgeCount() = runTest {
         val testValue = 8
-        val testMessage = createTestMessage(testActions, testDefaultTapAction, BadgeCount(BadgeCountMethod.SET, testValue))
+        val testMessage = createTestMessage(
+            testPresentableActions,
+            testDefaultTapAction,
+            BadgeCount(BadgeCountMethod.SET, testValue)
+        )
 
         every {
             mockNotificationManager.notify(
@@ -326,7 +333,7 @@ class PushMessagePresenterTest {
         imageUrlString: String? = null
     ): AndroidPushMessage {
         val tesMethod = NotificationMethod(COLLAPSE_ID, INIT)
-        val testData = PushData(
+        val testData = PresentablePushData(
             false,
             SID,
             CAMPAIGN_ID,
@@ -341,7 +348,7 @@ class PushMessagePresenterTest {
             BODY,
             iconUrlString,
             imageUrlString,
-            data = testData
+            data = testData,
         )
     }
 

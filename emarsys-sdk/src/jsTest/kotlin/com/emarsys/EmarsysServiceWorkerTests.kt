@@ -5,7 +5,7 @@ import com.emarsys.core.log.Logger
 import com.emarsys.core.mapper.Mapper
 import com.emarsys.mobileengage.action.models.BadgeCount
 import com.emarsys.mobileengage.action.models.BadgeCountMethod
-import com.emarsys.mobileengage.push.PushData
+import com.emarsys.mobileengage.push.PresentablePushData
 import com.emarsys.mobileengage.push.PushMessagePresenter
 import com.emarsys.mobileengage.push.model.JsPlatformData
 import com.emarsys.mobileengage.push.model.JsPushMessage
@@ -20,7 +20,11 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.test.*
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestResult
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import kotlinx.serialization.StringFormat
 import kotlinx.serialization.encodeToString
 import web.broadcast.BroadcastChannel
@@ -144,7 +148,7 @@ class EmarsysServiceWorkerTests {
         "message",
         "icon",
         "image",
-        PushData(
+        PresentablePushData(
             sid = "sid",
             campaignId = "campaignId",
             actions = null,

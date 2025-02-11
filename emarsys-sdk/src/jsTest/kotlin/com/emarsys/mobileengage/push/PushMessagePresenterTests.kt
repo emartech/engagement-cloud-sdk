@@ -15,7 +15,6 @@ import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.encodeToString
 import org.w3c.notifications.NotificationAction
 import org.w3c.notifications.NotificationOptions
 import kotlin.test.BeforeTest
@@ -146,7 +145,7 @@ class PushMessagePresenterTests {
             body = "body",
             iconUrlString = icon,
             imageUrlString = image,
-            data = PushData(
+            data = PresentablePushData(
                 sid = "sid",
                 campaignId = "campaignId",
                 platformData = JsPlatformData(

@@ -4,7 +4,7 @@ import com.emarsys.core.log.Logger
 import com.emarsys.core.mapper.Mapper
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.action.models.PresentableOpenExternalUrlActionModel
-import com.emarsys.mobileengage.push.PushData
+import com.emarsys.mobileengage.push.PresentablePushData
 import com.emarsys.mobileengage.push.model.JsPlatformData
 import com.emarsys.mobileengage.push.model.JsPushMessage
 import com.emarsys.mobileengage.push.model.RemoteWebPushMessage
@@ -27,7 +27,7 @@ class PushMessageMapper(private val json: Json, private val logger: Logger) :
                 remoteWebPushMessage.message,
                 remoteWebPushMessage.messageData.notificationSettings.icon,
                 remoteWebPushMessage.messageData.notificationSettings.image,
-                PushData(
+                PresentablePushData(
                     sid = remoteWebPushMessage.messageData.sid,
                     campaignId = DEFAULT_CAMPAIGN_ID,
                     actions = remoteWebPushMessage.messageData.notificationSettings.actions?.map { remoteWebPushAction ->

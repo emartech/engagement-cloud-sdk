@@ -7,19 +7,37 @@ import com.emarsys.mobileengage.inapp.PushToInApp
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 
-interface PushMessage<T: PlatformData> {
+interface SilentPushMessage<T : PlatformData> {
+    val messageId: String
+    val data: PushData<T>
+}
+
+interface PresentablePushMessage<T : PlatformData> {
     val messageId: String
     val title: String
     val body: String
     val iconUrlString: String?
     val imageUrlString: String?
-    val data: PushData<T>
+    val data: PresentablePushData<T>
 }
 
 interface PlatformData
 
 @Serializable
-data class PushData<T: PlatformData>(
+data class PushData<T : PlatformData>(
+    val silent: Boolean = false,
+    val sid: String,
+    val campaignId: String,
+    val platformData: T,
+    val actions: List<BasicActionModel>? = null,
+    val badgeCount: BadgeCount? = null,
+    val pushToInApp: PushToInApp? = null,
+    val rootParams: JsonObject? = null,
+    val u: JsonObject? = null
+)
+
+@Serializable
+data class PresentablePushData<T : PlatformData>(
     val silent: Boolean = false,
     val sid: String,
     val campaignId: String,

@@ -21,7 +21,6 @@ import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.PushToInApp
 import com.emarsys.mobileengage.push.model.AndroidPlatformData
 import com.emarsys.mobileengage.push.model.AndroidPushMessage
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class PushMessagePresenter(
