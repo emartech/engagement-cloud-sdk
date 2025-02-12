@@ -28,7 +28,7 @@ data class PresentablePushUserInfoEms(
 
 @Serializable
 data class BasicPushUserInfo(
-    val ems: BasicPushUserInfoEms? = null,
+    val ems: BasicPushUserInfoEms,
     val u: U? = null
 )
 

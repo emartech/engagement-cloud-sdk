@@ -5,6 +5,7 @@ import com.emarsys.api.push.PushCall
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.badge.BadgeCountHandlerApi
+import com.emarsys.core.log.Logger
 import com.emarsys.core.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
@@ -64,6 +65,7 @@ class IosPushInternalTests {
     private lateinit var json: Json
     private lateinit var sdkDispatcher: CoroutineDispatcher
     private lateinit var mockSdkEventFlow: MutableSharedFlow<SdkEvent>
+    private lateinit var mockSdkLogger: Logger
 
     @BeforeTest
     fun setup() = runTest {
@@ -80,6 +82,7 @@ class IosPushInternalTests {
         json = JsonUtil.json
         sdkDispatcher = dispatcher
         mockSdkEventFlow = mock()
+        mockSdkLogger = mock()
         everySuspend { mockActionHandler.handleActions(any(), any()) } returns Unit
 
         iosPushInternal = IosPushInternal(
@@ -92,7 +95,7 @@ class IosPushInternalTests {
             mockBadgeCountHandler,
             json,
             sdkDispatcher,
-            mock(),
+            mockSdkLogger,
             mockSdkEventFlow
         )
     }
@@ -429,7 +432,7 @@ class IosPushInternalTests {
         }
 
     @Test
-    fun `handleMessageWithUserInfo should should execute actions`() = runTest {
+    fun `handleMessageWithUserInfo should execute actions`() = runTest {
         val userInfo = mapOf(
             "ems" to mapOf(
                 "sid" to SID,
@@ -465,6 +468,16 @@ class IosPushInternalTests {
         verifySuspend { mockActionFactory.create(appEventActionModel) }
         verifySuspend { mockOpenExternalUrlAction.invoke() }
         verifySuspend { mockAppEventAction.invoke() }
+    }
+
+    @Test
+    fun `handleMessageWithUserInfo should not crash when userInfo cannot be parsed`() = runTest {
+        everySuspend { mockSdkLogger.error(any(), any<Throwable>()) } returns Unit
+        val invalidUserInfo = mapOf("key" to "value")
+
+        iosPushInternal.handleSilentMessageWithUserInfo(invalidUserInfo)
+
+        verifySuspend { mockSdkLogger.error("IosPushInternal - toBasicUserInfo", any<Throwable>()) }
     }
 
     @Test

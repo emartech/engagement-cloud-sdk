@@ -81,11 +81,11 @@ class IosPushInternal(
 
     override suspend fun handleSilentMessageWithUserInfo(rawUserInfo: Map<String, Any>) {
         val userInfo = rawUserInfo.toBasicUserInfo()
-        val actions = userInfo.ems?.actions
+        val actions = userInfo?.ems?.actions
         actions?.forEach {
             actionFactory.create(it).invoke()
         }
-        userInfo.ems?.multichannelId?.let {
+        userInfo?.ems?.multichannelId?.let {
             sdkEventFlow.emit(
                 SdkEvent(
                     SdkEventSource.SilentPush,
@@ -109,18 +109,22 @@ class IosPushInternal(
     }
 
     @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
-    private fun Map<String, Any>.toBasicUserInfo(): BasicPushUserInfo {
-        val userInfoString = NSString.create(
-            NSJSONSerialization.dataWithJSONObject(
-                this,
-                NSJSONWritingPrettyPrinted,
-                null
-            )!!, NSUTF8StringEncoding
-        ).toString()
-        return json.decodeFromString<BasicPushUserInfo>(userInfoString)
+    private suspend fun Map<String, Any>.toBasicUserInfo(): BasicPushUserInfo? {
+        try {
+            val userInfoString = NSString.create(
+                NSJSONSerialization.dataWithJSONObject(
+                    this,
+                    NSJSONWritingPrettyPrinted,
+                    null
+                )!!, NSUTF8StringEncoding
+            ).toString()
+            return json.decodeFromString<BasicPushUserInfo>(userInfoString)
+        } catch (exception: Exception) {
+            sdkLogger.error("IosPushInternal - toBasicUserInfo", exception)
+            return null
+        }
     }
 
-    @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
     fun didReceiveNotificationResponse(
         actionIdentifier: String,
         userInfo: Map<String, Any>,
