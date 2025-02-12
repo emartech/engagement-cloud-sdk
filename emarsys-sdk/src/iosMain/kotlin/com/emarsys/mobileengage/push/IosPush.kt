@@ -3,6 +3,8 @@ package com.emarsys.mobileengage.push
 import com.emarsys.api.generic.GenericApi
 import com.emarsys.api.push.PushInternalApi
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.exceptions.PreconditionFailedException
+import com.emarsys.util.JsonUtil
 import kotlinx.coroutines.withContext
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 
@@ -26,16 +28,29 @@ class IosPush<Logging : IosPushInstance, Gatherer : IosPushInstance, Internal : 
     }
 
     override val pushToken: Result<String?>
-        get() = runCatching { activeInstance<PushInternalApi>().pushToken }
-
-    override var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol?
-        get() = activeInstance<IosPushInstance>().customerUserNotificationCenterDelegate
-        set(value) {
-            activeInstance<IosPushInstance>().customerUserNotificationCenterDelegate = value
+        get() = runCatching {
+            activeInstance<PushInternalApi>().pushToken
         }
-    override val emarsysUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol
-        get() = activeInstance<IosPushInstance>().emarsysUserNotificationCenterDelegate
 
-    override suspend fun handleSilentMessageWithUserInfo(rawUserInfo: Map<String, Any>) {
-    }
+    override var customerUserNotificationCenterDelegate: Result<UNUserNotificationCenterDelegateProtocol?>
+        get() = runCatching { activeInstance<IosPushInstance>().customerUserNotificationCenterDelegate }
+        set(value) {
+            activeInstance<IosPushInstance>().customerUserNotificationCenterDelegate =
+                value.getOrNull()
+        }
+
+    override val emarsysUserNotificationCenterDelegate: Result<UNUserNotificationCenterDelegateProtocol>
+        get() = runCatching { activeInstance<IosPushInstance>().emarsysUserNotificationCenterDelegate }
+
+    override suspend fun handleSilentMessageWithUserInfo(rawUserInfo: Map<String, Any>): Result<Unit> =
+        runCatching {
+            withContext(sdkContext.sdkDispatcher) {
+                try {
+                    val basicUserInfo = rawUserInfo.toBasicPushUserInfo(JsonUtil.json)
+                    activeInstance<IosPushInstance>().handleSilentMessageWithUserInfo(basicUserInfo)
+                } catch (e: Exception) {
+                    throw PreconditionFailedException("Error while handling silent push message, the userInfo can't be parsed")
+                }
+            }
+        }
 }
