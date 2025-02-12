@@ -240,7 +240,13 @@ actual class PlatformDependencyCreator actual constructor(
     ): PushApi {
         val loggingPush = IosLoggingPush(sdkLogger)
         val pushGatherer = IosGathererPush(pushContext, storage)
-        return IosPush(loggingPush, pushGatherer, pushInternal as IosPushInternal, sdkContext)
+        return IosPush(
+            loggingPush,
+            pushGatherer,
+            pushInternal as IosPushInternal,
+            sdkContext,
+            sdkLogger
+        )
     }
 
 }

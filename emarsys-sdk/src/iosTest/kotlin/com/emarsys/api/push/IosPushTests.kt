@@ -6,6 +6,7 @@ import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.exceptions.PreconditionFailedException
 import com.emarsys.core.log.LogLevel
+import com.emarsys.core.log.Logger
 import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.push.BasicPushUserInfo
@@ -70,6 +71,7 @@ class IosPushTests {
     private lateinit var mockLoggingPush: IosPushInstance
     private lateinit var mockGathererPush: IosPushInstance
     private lateinit var mockPushInternal: IosPushInstance
+    private lateinit var mockSdkLogger: Logger
     private lateinit var testUNUserNotificationCenterDelegateProtocol: UNUserNotificationCenterDelegateProtocol
     private lateinit var sdkContext: SdkContextApi
     private lateinit var iosPush: IosPush<IosPushInstance, IosPushInstance, IosPushInstance>
@@ -82,6 +84,9 @@ class IosPushTests {
         mockLoggingPush = mock()
         mockGathererPush = mock()
         mockPushInternal = mock()
+        mockSdkLogger = mock()
+        everySuspend { mockSdkLogger.error(any(), any<Throwable>()) } returns Unit
+
         testUNUserNotificationCenterDelegateProtocol = TestUserNotificationCenterDelegate()
 
         sdkContext = SdkContext(
@@ -96,7 +101,7 @@ class IosPushTests {
         everySuspend { mockGathererPush.activate() } returns Unit
         everySuspend { mockPushInternal.activate() } returns Unit
 
-        iosPush = IosPush(mockLoggingPush, mockGathererPush, mockPushInternal, sdkContext)
+        iosPush = IosPush(mockLoggingPush, mockGathererPush, mockPushInternal, sdkContext, mockSdkLogger)
         iosPush.registerOnContext()
     }
 
@@ -400,6 +405,7 @@ class IosPushTests {
 
             result.isFailure shouldBe true
             result.exceptionOrNull() shouldBe PreconditionFailedException("Error while handling silent push message, the userInfo can't be parsed")
+            verifySuspend { mockSdkLogger.error(any(), any<Throwable>()) }
             verifySuspend(exactly(0)) { mockPushInternal.handleSilentMessageWithUserInfo(any()) }
         }
 }

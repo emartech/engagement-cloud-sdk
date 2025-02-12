@@ -4,6 +4,7 @@ import com.emarsys.api.generic.GenericApi
 import com.emarsys.api.push.PushInternalApi
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.exceptions.PreconditionFailedException
+import com.emarsys.core.log.Logger
 import com.emarsys.util.JsonUtil
 import kotlinx.coroutines.withContext
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
@@ -12,7 +13,8 @@ class IosPush<Logging : IosPushInstance, Gatherer : IosPushInstance, Internal : 
     loggingApi: Logging,
     gathererApi: Gatherer,
     internalApi: Internal,
-    sdkContext: SdkContextApi
+    sdkContext: SdkContextApi,
+    private val sdkLogger: Logger
 ) : GenericApi<Logging, Gatherer, Internal>(loggingApi, gathererApi, internalApi, sdkContext),
     IosPushApi {
     override suspend fun registerPushToken(pushToken: String): Result<Unit> = runCatching {
@@ -49,6 +51,7 @@ class IosPush<Logging : IosPushInstance, Gatherer : IosPushInstance, Internal : 
                     val basicUserInfo = rawUserInfo.toBasicPushUserInfo(JsonUtil.json)
                     activeInstance<IosPushInstance>().handleSilentMessageWithUserInfo(basicUserInfo)
                 } catch (e: Exception) {
+                    sdkLogger.error("IosPush - handleSilentMessageWithUserInfo", e)
                     throw PreconditionFailedException("Error while handling silent push message, the userInfo can't be parsed")
                 }
             }
