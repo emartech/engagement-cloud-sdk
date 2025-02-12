@@ -397,6 +397,7 @@ class IosPushInternalTests {
             everySuspend { mockUrlOpener.open(any()) } returns Unit
 
             val actionIdentifier = UNNotificationDefaultActionIdentifier
+
             val userInfo = mapOf(
                 "ems" to mapOf(
                     "sid" to SID,
@@ -433,23 +434,17 @@ class IosPushInternalTests {
 
     @Test
     fun `handleMessageWithUserInfo should execute actions`() = runTest {
-        val userInfo = mapOf(
-            "ems" to mapOf(
-                "sid" to SID,
-                "multichannelId" to CAMPAIGN_ID,
-                "actions" to listOf(
-                    mapOf(
-                        "type" to "OpenExternalUrl",
-                        "url" to "https://www.emarsys.com"
-                    ),
-                    mapOf(
-                        "type" to "MEAppEvent",
-                        "name" to "name",
-                        "payload" to mapOf("key" to "value")
-                    )
+        val userInfo = BasicPushUserInfo(
+            ems = BasicPushUserInfoEms(
+                multichannelId = CAMPAIGN_ID,
+                sid = SID,
+                actions = listOf(
+                    BasicOpenExternalUrlActionModel(url = "https://www.emarsys.com"),
+                    BasicAppEventActionModel("name", mapOf("key" to "value"))
                 )
             )
         )
+
         val openExternalActionModel =
             BasicOpenExternalUrlActionModel(url = "https://www.emarsys.com")
         val appEventActionModel = BasicAppEventActionModel("name", mapOf("key" to "value"))
@@ -471,24 +466,15 @@ class IosPushInternalTests {
     }
 
     @Test
-    fun `handleMessageWithUserInfo should not crash when userInfo cannot be parsed`() = runTest {
-        everySuspend { mockSdkLogger.error(any(), any<Throwable>()) } returns Unit
-        val invalidUserInfo = mapOf("key" to "value")
-
-        iosPushInternal.handleSilentMessageWithUserInfo(invalidUserInfo)
-
-        verifySuspend { mockSdkLogger.error("IosPushInternal - toBasicUserInfo", any<Throwable>()) }
-    }
-
-    @Test
     fun `handleMessageWithUserInfo should emit event with campaignId`() = runTest {
-        val userInfo = mapOf(
-            "ems" to mapOf(
-                "sid" to SID,
-                "multichannelId" to "testMultichannelId",
-                "actions" to emptyList<Map<String, Any>>()
+        val userInfo = BasicPushUserInfo(
+            ems = BasicPushUserInfoEms(
+                multichannelId = CAMPAIGN_ID,
+                sid = SID,
+                actions = emptyList()
             )
         )
+
         everySuspend { mockSdkEventFlow.emit(any()) } returns Unit
         iosPushInternal.handleSilentMessageWithUserInfo(userInfo)
 
@@ -497,7 +483,7 @@ class IosPushInternalTests {
                 SdkEvent(
                     SdkEventSource.SilentPush,
                     "campaignId",
-                    mapOf("campaignId" to "testMultichannelId")
+                    mapOf("campaignId" to CAMPAIGN_ID)
                 )
             )
         }

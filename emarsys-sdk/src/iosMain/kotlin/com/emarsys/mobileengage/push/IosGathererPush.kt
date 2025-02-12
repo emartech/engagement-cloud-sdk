@@ -18,7 +18,7 @@ class IosGathererPush(context: ApiContext<PushCall>,
 
     override fun registerEmarsysNotificationCenterDelegate() {}
 
-    override suspend fun handleSilentMessageWithUserInfo(rawUserInfo: Map<String, Any>) {
+    override suspend fun handleSilentMessageWithUserInfo(userInfo: BasicPushUserInfo) {
 
     }
 }

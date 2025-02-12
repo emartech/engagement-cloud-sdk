@@ -79,8 +79,7 @@ class IosPushInternal(
         (emarsysUserNotificationCenterDelegate as InternalNotificationCenterDelegateProxy).registerAsDelegate()
     }
 
-    override suspend fun handleSilentMessageWithUserInfo(rawUserInfo: Map<String, Any>) {
-        val userInfo = rawUserInfo.toBasicUserInfo()
+    override suspend fun handleSilentMessageWithUserInfo(userInfo: BasicPushUserInfo) {
         val actions = userInfo?.ems?.actions
         actions?.forEach {
             actionFactory.create(it).invoke()
@@ -106,23 +105,6 @@ class IosPushInternal(
             )!!, NSUTF8StringEncoding
         ).toString()
         return json.decodeFromString<PresentablePushUserInfo>(userInfoString)
-    }
-
-    @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
-    private suspend fun Map<String, Any>.toBasicUserInfo(): BasicPushUserInfo? {
-        try {
-            val userInfoString = NSString.create(
-                NSJSONSerialization.dataWithJSONObject(
-                    this,
-                    NSJSONWritingPrettyPrinted,
-                    null
-                )!!, NSUTF8StringEncoding
-            ).toString()
-            return json.decodeFromString<BasicPushUserInfo>(userInfoString)
-        } catch (exception: Exception) {
-            sdkLogger.error("IosPushInternal - toBasicUserInfo", exception)
-            return null
-        }
     }
 
     fun didReceiveNotificationResponse(
