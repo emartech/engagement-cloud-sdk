@@ -79,8 +79,7 @@ class IosPushInternal(
         (emarsysUserNotificationCenterDelegate as InternalNotificationCenterDelegateProxy).registerAsDelegate()
     }
 
-    suspend fun handleSilentMessageWithUserInfo(rawUserInfo: Map<String, Any>) {
-
+    override suspend fun handleSilentMessageWithUserInfo(rawUserInfo: Map<String, Any>) {
         val userInfo = rawUserInfo.toBasicUserInfo()
         val actions = userInfo.ems?.actions
         actions?.forEach {

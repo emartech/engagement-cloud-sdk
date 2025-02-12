@@ -8,4 +8,5 @@ interface IosPushInstance: PushInstance {
     val emarsysUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol
 
     fun registerEmarsysNotificationCenterDelegate()
+    suspend fun handleSilentMessageWithUserInfo(rawUserInfo: Map<String, Any>)
 }

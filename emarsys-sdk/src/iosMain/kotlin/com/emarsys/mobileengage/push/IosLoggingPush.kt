@@ -30,4 +30,9 @@ class IosLoggingPush(private val logger: Logger) : LoggingPush(logger), IosPushI
         val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)
         logger.log(entry, LogLevel.Debug)
     }
+
+    override suspend fun handleSilentMessageWithUserInfo(rawUserInfo: Map<String, Any>) {
+        val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)
+        logger.log(entry, LogLevel.Debug)
+    }
 }

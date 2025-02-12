@@ -33,7 +33,6 @@ data class BasicPushUserInfo(
 )
 
 @Serializable
-@OptIn(ExperimentalSerializationApi::class)
 data class BasicPushUserInfoEms(
     val multichannelId: String,
     val inapp: PushUserInfoInApp? = null,

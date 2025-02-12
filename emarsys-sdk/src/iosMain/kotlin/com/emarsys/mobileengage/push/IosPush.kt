@@ -35,4 +35,10 @@ class IosPush<Logging : IosPushInstance, Gatherer : IosPushInstance, Internal : 
         }
     override val emarsysUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol
         get() = activeInstance<IosPushInstance>().emarsysUserNotificationCenterDelegate
+
+    override suspend fun handleSilentMessageWithUserInfo(rawUserInfo: Map<String, Any>) {
+        withContext(sdkContext.sdkDispatcher) {
+            activeInstance<IosPushInstance>().handleSilentMessageWithUserInfo(rawUserInfo)
+        }
+    }
 }
