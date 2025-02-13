@@ -1,20 +1,12 @@
-package com.emarsys.mobileengage.push
+package com.emarsys.api.push
 
 import com.emarsys.mobileengage.action.models.BadgeCount
 import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
-import kotlinx.cinterop.BetaInteropApi
-import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNames
-import platform.Foundation.NSJSONSerialization
-import platform.Foundation.NSJSONWritingPrettyPrinted
-import platform.Foundation.NSString
-import platform.Foundation.NSUTF8StringEncoding
-import platform.Foundation.create
 
 @Serializable
 data class PresentablePushUserInfo(
@@ -62,15 +54,3 @@ data class U(
     val productId: String? = null,
     val sid: String? = null
 )
-
-@OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
-fun Map<String, Any>.toBasicPushUserInfo(json: Json): BasicPushUserInfo {
-    val userInfoString = NSString.create(
-        NSJSONSerialization.dataWithJSONObject(
-            this,
-            NSJSONWritingPrettyPrinted,
-            null
-        )!!, NSUTF8StringEncoding
-    ).toString()
-    return json.decodeFromString<BasicPushUserInfo>(userInfoString)
-}

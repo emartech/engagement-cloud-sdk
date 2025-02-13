@@ -1,5 +1,7 @@
 package com.emarsys.mobileengage.push
 
+import com.emarsys.api.push.BasicPushUserInfo
+import com.emarsys.api.push.BasicPushUserInfoEms
 import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger

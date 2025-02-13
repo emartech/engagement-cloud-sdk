@@ -1,5 +1,6 @@
 package com.emarsys.mobileengage.push
 
+import com.emarsys.api.push.BasicPushUserInfo
 import com.emarsys.api.push.PushInstance
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 

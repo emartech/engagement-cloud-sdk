@@ -5,6 +5,7 @@ import com.emarsys.api.push.PushInternalApi
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.exceptions.PreconditionFailedException
 import com.emarsys.core.log.Logger
+import com.emarsys.mobileengage.push.extension.toBasicPushUserInfo
 import com.emarsys.util.JsonUtil
 import kotlinx.coroutines.withContext
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol

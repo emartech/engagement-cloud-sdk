@@ -1,5 +1,7 @@
-package com.emarsys.mobileengage.push
+package com.emarsys.mobileengage.push.extension
 
+import com.emarsys.api.push.BasicPushUserInfo
+import com.emarsys.api.push.BasicPushUserInfoEms
 import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.util.JsonUtil

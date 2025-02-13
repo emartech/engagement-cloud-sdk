@@ -9,8 +9,6 @@ import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
 import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
-import com.emarsys.mobileengage.push.BasicPushUserInfo
-import com.emarsys.mobileengage.push.BasicPushUserInfoEms
 import com.emarsys.mobileengage.push.IosPush
 import com.emarsys.mobileengage.push.IosPushInstance
 import dev.mokkery.answering.returns

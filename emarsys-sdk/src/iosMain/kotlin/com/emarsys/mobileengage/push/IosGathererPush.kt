@@ -1,6 +1,7 @@
 package com.emarsys.mobileengage.push
 
 import com.emarsys.api.generic.ApiContext
+import com.emarsys.api.push.BasicPushUserInfo
 import com.emarsys.api.push.PushCall
 import com.emarsys.api.push.PushGatherer
 import com.emarsys.core.storage.TypedStorageApi
