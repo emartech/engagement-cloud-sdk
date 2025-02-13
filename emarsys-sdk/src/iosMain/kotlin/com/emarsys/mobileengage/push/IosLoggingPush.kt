@@ -5,11 +5,12 @@ import com.emarsys.api.push.LoggingPush
 import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
+import com.emarsys.core.storage.TypedStorageApi
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 import platform.darwin.NSObject
 
 
-class IosLoggingPush(private val logger: Logger) : LoggingPush(logger), IosPushInstance {
+class IosLoggingPush(private val logger: Logger, storage: TypedStorageApi<String?>) : LoggingPush(logger, storage), IosPushInstance {
     override var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol?
         get() {
             val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)
