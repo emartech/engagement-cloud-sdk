@@ -17,8 +17,6 @@ class IosGathererPush(context: ApiContext<PushCall>,
     override val emarsysUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol
         get() = object: NSObject(), UNUserNotificationCenterDelegateProtocol {}
 
-    override fun registerEmarsysNotificationCenterDelegate() {}
-
     override suspend fun handleSilentMessageWithUserInfo(userInfo: BasicPushUserInfo) {
 
     }

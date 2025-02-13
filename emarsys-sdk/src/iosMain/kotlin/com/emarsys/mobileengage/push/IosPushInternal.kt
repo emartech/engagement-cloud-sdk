@@ -77,10 +77,6 @@ class IosPushInternal(
             customerUserNotificationCenterDelegate
         )
 
-    override fun registerEmarsysNotificationCenterDelegate() {
-        (emarsysUserNotificationCenterDelegate as InternalNotificationCenterDelegateProxy).registerAsDelegate()
-    }
-
     override suspend fun handleSilentMessageWithUserInfo(userInfo: BasicPushUserInfo) {
         val actions = userInfo?.ems?.actions
         actions?.forEach {
@@ -195,10 +191,6 @@ class IosPushInternal(
         private val sdkContext: SdkContextApi,
         var customerDelegate: UNUserNotificationCenterDelegateProtocol?
     ) : UNUserNotificationCenterDelegateProtocol, NSObject() {
-
-        fun registerAsDelegate() {
-            UNUserNotificationCenter.currentNotificationCenter().delegate = this
-        }
 
         override fun userNotificationCenter(
             center: UNUserNotificationCenter,

@@ -46,13 +46,6 @@ class IosLoggingPushTests {
     }
 
     @Test
-    fun testRegisterEmarsysNotificationCenterDelegate() = runTest {
-        iosLoggingPush.registerEmarsysNotificationCenterDelegate()
-
-        verifyLogging()
-    }
-
-    @Test
     fun testHandleSilentMessageWithUserInfo() = runTest {
         val userInfo = BasicPushUserInfo(BasicPushUserInfoEms("test", null))
         iosLoggingPush.handleSilentMessageWithUserInfo(userInfo)

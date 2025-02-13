@@ -27,11 +27,6 @@ class IosLoggingPush(private val logger: Logger) : LoggingPush(logger), IosPushI
             return object: NSObject(), UNUserNotificationCenterDelegateProtocol {}
         }
 
-    override fun registerEmarsysNotificationCenterDelegate() {
-        val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)
-        logger.log(entry, LogLevel.Debug)
-    }
-
     override suspend fun handleSilentMessageWithUserInfo(userInfo: BasicPushUserInfo) {
         val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)
         logger.log(entry, LogLevel.Debug)

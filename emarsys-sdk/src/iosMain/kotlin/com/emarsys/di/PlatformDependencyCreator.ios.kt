@@ -56,7 +56,6 @@ import com.emarsys.mobileengage.inapp.providers.WindowProvider
 import com.emarsys.mobileengage.push.IosGathererPush
 import com.emarsys.mobileengage.push.IosLoggingPush
 import com.emarsys.mobileengage.push.IosPush
-import com.emarsys.mobileengage.push.IosPushInstance
 import com.emarsys.mobileengage.push.IosPushInternal
 import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
 import com.emarsys.networking.clients.event.EventClientApi
@@ -131,7 +130,7 @@ actual class PlatformDependencyCreator actual constructor(
         storage: TypedStorageApi<String?>,
         sdkEventFlow: MutableSharedFlow<SdkEvent>
     ): State {
-        return PlatformInitState(pushApi as IosPushInstance)
+        return PlatformInitState()
     }
 
     actual override fun createPermissionHandler(): PermissionHandlerApi {
