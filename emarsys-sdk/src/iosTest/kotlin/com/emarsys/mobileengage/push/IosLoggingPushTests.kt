@@ -5,6 +5,7 @@ import com.emarsys.api.push.BasicPushUserInfoEms
 import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
+import com.emarsys.core.storage.TypedStorageApi
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.matcher.capture.Capture
@@ -19,6 +20,7 @@ import kotlin.test.Test
 class IosLoggingPushTests {
     private lateinit var mockLogger: Logger
     private lateinit var iosLoggingPush: IosLoggingPush
+    private lateinit var mockStorage: TypedStorageApi<String?>
     private var slot = Capture.slot<LogEntry>()
 
     @BeforeTest
@@ -26,7 +28,9 @@ class IosLoggingPushTests {
         mockLogger = mock()
         every { mockLogger.log(capture(slot), LogLevel.Debug) } returns Unit
 
-        iosLoggingPush = IosLoggingPush(mockLogger)
+        mockStorage = mock()
+
+        iosLoggingPush = IosLoggingPush(mockLogger, mockStorage)
     }
 
     @Test
