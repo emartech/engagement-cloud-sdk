@@ -6,18 +6,21 @@ import com.emarsys.api.push.PushCall
 import com.emarsys.api.push.PushGatherer
 import com.emarsys.core.storage.TypedStorageApi
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
-import platform.darwin.NSObject
 
-class IosGathererPush(context: ApiContext<PushCall>,
-                      storage: TypedStorageApi<String?>
+class IosGathererPush(
+    private val context: ApiContext<PushCall>,
+    storage: TypedStorageApi<String?>,
+    private val iosPushInternal: IosPushInstance
 ) : PushGatherer(context, storage), IosPushInstance {
     override var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol?
-        get() = null
-        set(value) {}
+        get() = iosPushInternal.customerUserNotificationCenterDelegate
+        set(value) {
+            iosPushInternal.customerUserNotificationCenterDelegate = value
+        }
     override val emarsysUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol
-        get() = object: NSObject(), UNUserNotificationCenterDelegateProtocol {}
+        get() = iosPushInternal.emarsysUserNotificationCenterDelegate
 
     override suspend fun handleSilentMessageWithUserInfo(userInfo: BasicPushUserInfo) {
-
+        context.calls.add(PushCall.HandleMessageWithUserInfo(userInfo))
     }
 }

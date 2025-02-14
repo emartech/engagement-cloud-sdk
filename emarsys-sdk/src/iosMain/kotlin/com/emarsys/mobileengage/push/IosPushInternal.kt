@@ -5,10 +5,14 @@ import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.BasicPushUserInfo
 import com.emarsys.api.push.PresentablePushUserInfo
 import com.emarsys.api.push.PushCall
+import com.emarsys.api.push.PushCall.ClearPushToken
+import com.emarsys.api.push.PushCall.HandleMessageWithUserInfo
+import com.emarsys.api.push.PushCall.RegisterPushToken
 import com.emarsys.api.push.PushInternal
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.badge.BadgeCountHandlerApi
+import com.emarsys.core.collections.dequeue
 import com.emarsys.core.log.Logger
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
@@ -50,9 +54,9 @@ import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 import platform.darwin.NSObject
 
 class IosPushInternal(
-    pushClient: PushClientApi,
+    private val pushClient: PushClientApi,
     storage: TypedStorageApi<String?>,
-    pushContext: ApiContext<PushCall>,
+    private val pushContext: ApiContext<PushCall>,
     sdkContext: SdkContextApi,
     private val actionFactory: ActionFactoryApi<ActionModel>,
     private val actionHandler: ActionHandlerApi,
@@ -61,7 +65,7 @@ class IosPushInternal(
     private val sdkDispatcher: CoroutineDispatcher,
     private val sdkLogger: Logger,
     private val sdkEventFlow: MutableSharedFlow<SdkEvent>
-) : PushInternal(pushClient, storage, pushContext), IosPushInstance {
+) : PushInternal(pushClient, storage, pushContext, sdkLogger), IosPushInstance {
     override var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol? =
         null
         set(value) {
@@ -78,18 +82,26 @@ class IosPushInternal(
         )
 
     override suspend fun handleSilentMessageWithUserInfo(userInfo: BasicPushUserInfo) {
-        val actions = userInfo?.ems?.actions
-        actions?.forEach {
+        userInfo.ems.actions?.forEach {
             actionFactory.create(it).invoke()
         }
-        userInfo?.ems?.multichannelId?.let {
-            sdkEventFlow.emit(
-                SdkEvent(
-                    SdkEventSource.SilentPush,
-                    "campaignId",
-                    mapOf("campaignId" to it)
-                )
+
+        sdkEventFlow.emit(
+            SdkEvent(
+                SdkEventSource.SilentPush,
+                "campaignId",
+                mapOf("campaignId" to userInfo.ems.multichannelId)
             )
+        )
+    }
+
+    override suspend fun activate() {
+        pushContext.calls.dequeue { call ->
+            when (call) {
+                is RegisterPushToken -> pushClient.registerPushToken(call.pushToken)
+                is ClearPushToken -> pushClient.clearPushToken()
+                is HandleMessageWithUserInfo -> handleSilentMessageWithUserInfo(call.userInfo)
+            }
         }
     }
 

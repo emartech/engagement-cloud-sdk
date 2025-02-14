@@ -37,7 +37,7 @@ class PushInternalTests {
         mockStorage = mock()
 
         pushContext = PushContext(expected)
-        pushInternal = PushInternal(mockPushClient, mockStorage, pushContext)
+        pushInternal = PushInternal(mockPushClient, mockStorage, pushContext, mock())
     }
 
     @Test

@@ -4,6 +4,10 @@ import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.BasicPushUserInfo
 import com.emarsys.api.push.BasicPushUserInfoEms
 import com.emarsys.api.push.PushCall
+import com.emarsys.api.push.PushCall.ClearPushToken
+import com.emarsys.api.push.PushCall.HandleMessageWithUserInfo
+import com.emarsys.api.push.PushCall.RegisterPushToken
+import com.emarsys.api.push.PushContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.badge.BadgeCountHandlerApi
@@ -53,13 +57,33 @@ class IosPushInternalTests {
     private companion object {
         const val SID = "testSid"
         const val CAMPAIGN_ID = "campaignId"
+
+        const val PUSH_TOKEN = "testPushToken"
+        val REGISTER_PUSH_TOKEN = RegisterPushToken(PUSH_TOKEN)
+        val CLEAR_PUSH_TOKEN = ClearPushToken()
+        val HANDLE_MESSAGE_WITH_USER_INFO = HandleMessageWithUserInfo(
+            BasicPushUserInfo(
+                ems = BasicPushUserInfoEms(
+                    multichannelId = CAMPAIGN_ID,
+                    sid = SID,
+                    actions = emptyList()
+                )
+            )
+        )
+
+        val pushCalls = mutableListOf(
+            REGISTER_PUSH_TOKEN,
+            CLEAR_PUSH_TOKEN,
+            HANDLE_MESSAGE_WITH_USER_INFO
+
+        )
     }
 
     private lateinit var iosPushInternal: IosPushInternal
 
     private lateinit var mockPushClient: PushClientApi
     private lateinit var mockStorage: TypedStorageApi<String?>
-    private lateinit var mockPushContext: ApiContext<PushCall>
+    private lateinit var pushContext: ApiContext<PushCall>
     private lateinit var mockSdkContext: SdkContextApi
     private lateinit var mockActionFactory: ActionFactoryApi<ActionModel>
     private lateinit var mockActionHandler: ActionHandlerApi
@@ -76,7 +100,7 @@ class IosPushInternalTests {
 
         mockPushClient = mock()
         mockStorage = mock()
-        mockPushContext = mock()
+        pushContext = PushContext(pushCalls)
         mockSdkContext = mock()
         mockActionFactory = mock()
         mockActionHandler = mock()
@@ -90,7 +114,7 @@ class IosPushInternalTests {
         iosPushInternal = IosPushInternal(
             mockPushClient,
             mockStorage,
-            mockPushContext,
+            pushContext,
             mockSdkContext,
             mockActionFactory,
             mockActionHandler,
@@ -469,17 +493,49 @@ class IosPushInternalTests {
 
     @Test
     fun `handleMessageWithUserInfo should emit event with campaignId`() = runTest {
+        val openExternalUrlActionModel =
+            BasicOpenExternalUrlActionModel(url = "https://www.emarsys.com")
+        val mockOpenExternalUrlAction = mock<Action<*>>()
+        everySuspend { mockOpenExternalUrlAction.invoke() } returns Unit
+
         val userInfo = BasicPushUserInfo(
             ems = BasicPushUserInfoEms(
                 multichannelId = CAMPAIGN_ID,
                 sid = SID,
-                actions = emptyList()
+                actions = listOf(
+                    openExternalUrlActionModel
+                )
             )
         )
-
+        everySuspend { mockActionFactory.create(openExternalUrlActionModel) } returns mockOpenExternalUrlAction
         everySuspend { mockSdkEventFlow.emit(any()) } returns Unit
+
         iosPushInternal.handleSilentMessageWithUserInfo(userInfo)
 
+        verifySuspend { mockOpenExternalUrlAction.invoke() }
+        verifySuspend {
+            mockSdkEventFlow.emit(
+                SdkEvent(
+                    SdkEventSource.SilentPush,
+                    "campaignId",
+                    mapOf("campaignId" to CAMPAIGN_ID)
+                )
+            )
+        }
+    }
+
+    @Test
+    fun `testActivate should handle pushCalls`() = runTest {
+        everySuspend { mockPushClient.registerPushToken(any()) } returns Unit
+        everySuspend { mockPushClient.clearPushToken() } returns Unit
+        everySuspend { mockSdkEventFlow.emit(any()) } returns Unit
+
+        iosPushInternal.activate()
+
+        advanceUntilIdle()
+
+        verifySuspend { mockPushClient.registerPushToken(PUSH_TOKEN) }
+        verifySuspend { mockPushClient.clearPushToken() }
         verifySuspend {
             mockSdkEventFlow.emit(
                 SdkEvent(

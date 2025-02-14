@@ -220,7 +220,7 @@ actual class PlatformDependencyCreator actual constructor(
         sdkDispatcher: CoroutineDispatcher,
         sdkEventFlow: MutableSharedFlow<SdkEvent>
     ): PushInstance {
-        return PushInternal(pushClient, storage, pushContext)
+        return PushInternal(pushClient, storage, pushContext, sdkLogger)
     }
 
     actual override fun createPushApi(

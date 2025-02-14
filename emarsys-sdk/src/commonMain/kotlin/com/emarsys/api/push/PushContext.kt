@@ -12,6 +12,9 @@ sealed interface PushCall {
     data class RegisterPushToken(val pushToken: String) : PushCall
 
     @Serializable
+    data class HandleMessageWithUserInfo(val userInfo: BasicPushUserInfo) : PushCall
+
+    @Serializable
     class ClearPushToken : PushCall {
         override fun equals(other: Any?): Boolean {
             return other is ClearPushToken
