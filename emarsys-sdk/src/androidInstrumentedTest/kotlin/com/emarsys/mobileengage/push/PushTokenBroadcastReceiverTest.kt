@@ -2,7 +2,7 @@ package com.emarsys.mobileengage.push
 
 import android.content.Intent
 import androidx.test.platform.app.InstrumentationRegistry
-import com.emarsys.api.push.PushInternalApi
+import com.emarsys.api.push.PushApi
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.CoroutineDispatcher
@@ -24,7 +24,7 @@ class PushTokenBroadcastReceiverTest {
     }
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
-    private lateinit var mockPushApi: PushInternalApi
+    private lateinit var mockPushApi: PushApi
     private lateinit var sdkDispatcher: CoroutineDispatcher
     private lateinit var broadcastReceiver: PushTokenBroadcastReceiver
 

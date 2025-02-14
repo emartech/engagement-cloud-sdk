@@ -4,7 +4,6 @@ import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.PushApi
 import com.emarsys.api.push.PushCall
 import com.emarsys.api.push.PushInstance
-import com.emarsys.api.push.PushInternalApi
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
@@ -66,7 +65,7 @@ expect class PlatformDependencyCreator(
     ): DeviceInfoCollector
 
     override fun createPlatformInitState(
-        pushApi: PushInternalApi,
+        pushApi: PushApi,
         sdkDispatcher: CoroutineDispatcher,
         sdkContext: SdkContext,
         actionFactory: ActionFactoryApi<ActionModel>,

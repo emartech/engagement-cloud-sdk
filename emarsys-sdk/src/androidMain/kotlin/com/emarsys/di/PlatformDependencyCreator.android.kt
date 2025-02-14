@@ -17,7 +17,6 @@ import com.emarsys.api.push.PushConstants
 import com.emarsys.api.push.PushGatherer
 import com.emarsys.api.push.PushInstance
 import com.emarsys.api.push.PushInternal
-import com.emarsys.api.push.PushInternalApi
 import com.emarsys.applicationContext
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
@@ -137,7 +136,7 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createPlatformInitState(
-        pushApi: PushInternalApi,
+        pushApi: PushApi,
         sdkDispatcher: CoroutineDispatcher,
         sdkContext: SdkContext,
         actionFactory: ActionFactoryApi<ActionModel>,

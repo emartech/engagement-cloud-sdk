@@ -473,7 +473,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         val registerPushTokenState = RegisterPushTokenState(pushClient, stringStorage)
         val platformInitState =
             dependencyCreator.createPlatformInitState(
-                pushInternal,
+                pushApi,
                 sdkDispatcher,
                 sdkContext,
                 eventActionFactory,
