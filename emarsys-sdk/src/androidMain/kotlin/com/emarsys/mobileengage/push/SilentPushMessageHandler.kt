@@ -1,5 +1,6 @@
 package com.emarsys.mobileengage.push
 
+import com.emarsys.SdkConstants.PUSH_RECEIVED_EVENT_NAME
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.events.SdkEvent
@@ -21,7 +22,7 @@ class SilentPushMessageHandler(
         sdkEventFlow.emit(
             SdkEvent(
                 SdkEventSource.SilentPush,
-                "campaignId",
+                PUSH_RECEIVED_EVENT_NAME,
                 mapOf("campaignId" to pushMessage.data.campaignId)
             )
         )

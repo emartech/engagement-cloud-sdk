@@ -2,6 +2,7 @@ package com.emarsys.mobileengage.push
 
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import com.emarsys.SdkConstants.PUSH_RECEIVED_EVENT_NAME
 import com.emarsys.mobileengage.action.PushActionFactory
 import com.emarsys.mobileengage.action.actions.Action
 import com.emarsys.mobileengage.action.models.BadgeCount
@@ -104,7 +105,7 @@ class SilentPushMessageHandlerTest {
             mockSdkEventFlow.emit(
                 SdkEvent(
                     SdkEventSource.SilentPush,
-                    "campaignId",
+                    PUSH_RECEIVED_EVENT_NAME,
                     mapOf("campaignId" to CAMPAIGN_ID)
                 )
             )

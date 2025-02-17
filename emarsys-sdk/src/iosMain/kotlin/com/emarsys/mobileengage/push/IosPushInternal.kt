@@ -1,5 +1,6 @@
 package com.emarsys.mobileengage.push
 
+import com.emarsys.SdkConstants.PUSH_RECEIVED_EVENT_NAME
 import com.emarsys.api.SdkState
 import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.BasicPushUserInfo
@@ -89,7 +90,7 @@ class IosPushInternal(
         sdkEventFlow.emit(
             SdkEvent(
                 SdkEventSource.SilentPush,
-                "campaignId",
+                PUSH_RECEIVED_EVENT_NAME,
                 mapOf("campaignId" to userInfo.ems.multichannelId)
             )
         )
