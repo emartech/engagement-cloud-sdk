@@ -11,7 +11,6 @@ import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.badge.IosBadgeCountHandler
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.cache.IosFileCache
-import com.emarsys.core.channel.CustomEventChannelApi
 import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.clipboard.IosClipboardHandler
 import com.emarsys.core.device.DeviceInfoCollector
@@ -40,7 +39,6 @@ import com.emarsys.core.watchdog.connection.NWPathMonitorWrapper
 import com.emarsys.core.watchdog.lifecycle.IosLifecycleWatchdog
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
-import com.emarsys.mobileengage.events.SdkEvent
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandlerApi
 import com.emarsys.mobileengage.inapp.InAppJsBridge
@@ -58,6 +56,7 @@ import com.emarsys.mobileengage.push.IosPush
 import com.emarsys.mobileengage.push.IosPushInternal
 import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
 import com.emarsys.networking.clients.event.EventClientApi
+import com.emarsys.networking.clients.event.model.Event
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.PlatformInitializer
 import com.emarsys.setup.PlatformInitializerApi
@@ -80,7 +79,7 @@ actual class PlatformDependencyCreator actual constructor(
     private val json: Json,
     private val msgHub: MsgHubApi,
     private val actionHandler: ActionHandlerApi,
-    eventChannel: CustomEventChannelApi
+    sdkEventFlow: MutableSharedFlow<Event>
 ) : DependencyCreator {
     private val platformContext: IosPlatformContext = IosPlatformContext()
     private val processInfo = NSProcessInfo()
@@ -90,7 +89,7 @@ actual class PlatformDependencyCreator actual constructor(
         IosBadgeCountHandler(notificationCenter, uiDevice, sdkContext.mainDispatcher)
 
     actual override fun createPlatformInitializer(
-        sdkEventFlow: MutableSharedFlow<SdkEvent>,
+        sdkEventFlow: MutableSharedFlow<Event>,
         pushActionFactory: ActionFactoryApi<ActionModel>,
         pushActionHandler: ActionHandlerApi
     ): PlatformInitializerApi {
@@ -127,7 +126,7 @@ actual class PlatformDependencyCreator actual constructor(
         downloaderApi: DownloaderApi,
         inAppDownloader: InAppDownloaderApi,
         storage: TypedStorageApi<String?>,
-        sdkEventFlow: MutableSharedFlow<SdkEvent>
+        sdkEventFlow: MutableSharedFlow<Event>
     ): State {
         return PlatformInitState()
     }
@@ -214,7 +213,7 @@ actual class PlatformDependencyCreator actual constructor(
         actionFactory: ActionFactoryApi<ActionModel>,
         json: Json,
         sdkDispatcher: CoroutineDispatcher,
-        sdkEventFlow: MutableSharedFlow<SdkEvent>
+        sdkEventFlow: MutableSharedFlow<Event>
     ): PushInstance {
         return IosPushInternal(
             pushClient,

@@ -8,7 +8,6 @@ import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.cache.FileCacheApi
-import com.emarsys.core.channel.CustomEventChannelApi
 import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.launchapplication.LaunchApplicationHandlerApi
@@ -24,12 +23,12 @@ import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
-import com.emarsys.mobileengage.events.SdkEvent
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandlerApi
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.networking.clients.event.EventClientApi
+import com.emarsys.networking.clients.event.model.Event
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.PlatformInitializerApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
@@ -46,11 +45,11 @@ expect class PlatformDependencyCreator(
     json: Json,
     msgHub: MsgHubApi,
     actionHandler: ActionHandlerApi,
-    eventChannel: CustomEventChannelApi
+    sdkEventFlow: MutableSharedFlow<Event>
 ) : DependencyCreator {
 
     override fun createPlatformInitializer(
-        sdkEventFlow: MutableSharedFlow<SdkEvent>,
+        sdkEventFlow: MutableSharedFlow<Event>,
         pushActionFactory: ActionFactoryApi<ActionModel>,
         pushActionHandler: ActionHandlerApi
     ): PlatformInitializerApi
@@ -72,7 +71,7 @@ expect class PlatformDependencyCreator(
         downloaderApi: DownloaderApi,
         inAppDownloader: InAppDownloaderApi,
         storage: TypedStorageApi<String?>,
-        sdkEventFlow: MutableSharedFlow<SdkEvent>
+        sdkEventFlow: MutableSharedFlow<Event>
     ): State
 
     override fun createPermissionHandler(): PermissionHandlerApi
@@ -110,7 +109,7 @@ expect class PlatformDependencyCreator(
         actionFactory: ActionFactoryApi<ActionModel>,
         json: Json,
         sdkDispatcher: CoroutineDispatcher,
-        sdkEventFlow: MutableSharedFlow<SdkEvent>
+        sdkEventFlow: MutableSharedFlow<Event>
     ): PushInstance
 
     override fun createPushApi(

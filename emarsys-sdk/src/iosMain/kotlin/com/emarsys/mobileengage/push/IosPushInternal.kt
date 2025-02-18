@@ -24,8 +24,8 @@ import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
 import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
-import com.emarsys.mobileengage.events.SdkEvent
-import com.emarsys.mobileengage.events.SdkEventSource
+import com.emarsys.networking.clients.event.model.Event
+import com.emarsys.networking.clients.event.model.EventType
 import com.emarsys.networking.clients.push.PushClientApi
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -65,7 +65,7 @@ class IosPushInternal(
     private val json: Json,
     private val sdkDispatcher: CoroutineDispatcher,
     private val sdkLogger: Logger,
-    private val sdkEventFlow: MutableSharedFlow<SdkEvent>
+    private val sdkEventFlow: MutableSharedFlow<Event>
 ) : PushInternal(pushClient, storage, pushContext, sdkLogger), IosPushInstance {
     override var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol? =
         null
@@ -88,8 +88,8 @@ class IosPushInternal(
         }
 
         sdkEventFlow.emit(
-            SdkEvent(
-                SdkEventSource.SilentPush,
+            Event(
+                EventType.CUSTOM,
                 PUSH_RECEIVED_EVENT_NAME,
                 mapOf("campaignId" to userInfo.ems.multichannelId)
             )

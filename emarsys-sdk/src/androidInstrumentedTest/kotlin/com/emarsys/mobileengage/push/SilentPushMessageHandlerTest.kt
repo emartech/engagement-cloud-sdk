@@ -10,13 +10,13 @@ import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
 import com.emarsys.mobileengage.action.models.BasicCustomEventActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
-import com.emarsys.mobileengage.events.SdkEvent
-import com.emarsys.mobileengage.events.SdkEventSource
 import com.emarsys.mobileengage.inapp.InAppDownloader
 import com.emarsys.mobileengage.push.model.AndroidPlatformData
 import com.emarsys.mobileengage.push.model.AndroidSilentPushMessage
 import com.emarsys.mobileengage.push.model.NotificationMethod
 import com.emarsys.mobileengage.push.model.NotificationOperation.INIT
+import com.emarsys.networking.clients.event.model.Event
+import com.emarsys.networking.clients.event.model.EventType
 import com.emarsys.util.JsonUtil
 import dev.mokkery.verifySuspend
 import io.mockk.coEvery
@@ -64,7 +64,7 @@ class SilentPushMessageHandlerTest {
     private lateinit var json: Json
     private lateinit var mockInAppDownloader: InAppDownloader
     private lateinit var mockPushActionFactory: PushActionFactory
-    private lateinit var mockSdkEventFlow: MutableSharedFlow<SdkEvent>
+    private lateinit var mockSdkEventFlow: MutableSharedFlow<Event>
 
 
     @Before
@@ -103,8 +103,8 @@ class SilentPushMessageHandlerTest {
 
         verifySuspend {
             mockSdkEventFlow.emit(
-                SdkEvent(
-                    SdkEventSource.SilentPush,
+                Event(
+                    EventType.CUSTOM,
                     PUSH_RECEIVED_EVENT_NAME,
                     mapOf("campaignId" to CAMPAIGN_ID)
                 )

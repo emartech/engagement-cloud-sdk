@@ -8,7 +8,7 @@ import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.inbox.InboxApi
 import com.emarsys.api.predict.PredictApi
 import com.emarsys.api.push.PushApi
-import com.emarsys.mobileengage.events.SdkEvent
+import com.emarsys.networking.clients.event.model.Event
 import com.emarsys.setup.SetupOrganizerApi
 import kotlinx.coroutines.flow.SharedFlow
 
@@ -31,7 +31,7 @@ interface DependencyContainerApi {
 
     val setupOrganizerApi: SetupOrganizerApi
 
-    val events: SharedFlow<SdkEvent>
+    val events: SharedFlow<Event>
 
     suspend fun setup()
 }

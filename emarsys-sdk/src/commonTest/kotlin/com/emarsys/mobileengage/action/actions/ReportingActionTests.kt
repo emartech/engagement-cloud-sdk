@@ -1,7 +1,6 @@
 package com.emarsys.mobileengage.action.actions
 
 import com.emarsys.SdkConstants.PUSH_CLICKED_EVENT_NAME
-import com.emarsys.core.channel.CustomEventChannelApi
 import com.emarsys.mobileengage.action.models.BasicInAppButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
@@ -15,6 +14,7 @@ import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -30,7 +30,7 @@ class ReportingActionTests {
         const val TEST_URL = "testUrl"
     }
 
-    private lateinit var mockCustomEventChannel: CustomEventChannelApi
+    private lateinit var mockCustomEventChannel: MutableSharedFlow<Event>
 
     @BeforeTest
     fun setUp() = runTest {
@@ -53,7 +53,7 @@ class ReportingActionTests {
 
         val eventSlot = slot<Event>()
 
-        everySuspend { mockCustomEventChannel.send(capture(eventSlot)) } returns Unit
+        everySuspend { mockCustomEventChannel.emit(capture(eventSlot)) } returns Unit
 
         action.invoke()
 
@@ -76,7 +76,7 @@ class ReportingActionTests {
 
         val eventSlot = slot<Event>()
 
-        everySuspend { mockCustomEventChannel.send(capture(eventSlot)) } returns Unit
+        everySuspend { mockCustomEventChannel.emit(capture(eventSlot)) } returns Unit
 
         action.invoke()
 
@@ -98,7 +98,7 @@ class ReportingActionTests {
 
         val eventSlot = slot<Event>()
 
-        everySuspend { mockCustomEventChannel.send(capture(eventSlot)) } returns Unit
+        everySuspend { mockCustomEventChannel.emit(capture(eventSlot)) } returns Unit
 
         action.invoke()
 
@@ -120,7 +120,7 @@ class ReportingActionTests {
 
         val eventSlot = slot<Event>()
 
-        everySuspend { mockCustomEventChannel.send(capture(eventSlot)) } returns Unit
+        everySuspend { mockCustomEventChannel.emit(capture(eventSlot)) } returns Unit
 
         action.invoke()
 

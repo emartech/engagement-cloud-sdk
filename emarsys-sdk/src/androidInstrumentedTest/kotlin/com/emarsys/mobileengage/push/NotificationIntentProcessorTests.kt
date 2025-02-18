@@ -7,7 +7,6 @@ import com.emarsys.api.push.PushConstants.INTENT_EXTRA_ACTION_KEY
 import com.emarsys.api.push.PushConstants.INTENT_EXTRA_DEFAULT_TAP_ACTION_KEY
 import com.emarsys.api.push.PushConstants.INTENT_EXTRA_PAYLOAD_KEY
 import com.emarsys.core.actions.ActionHandlerApi
-import com.emarsys.core.channel.CustomEventChannelApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.actions.Action
 import com.emarsys.mobileengage.action.actions.LaunchApplicationAction
@@ -20,6 +19,7 @@ import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.action.models.PresentableAppEventActionModel
 import com.emarsys.mobileengage.push.model.NotificationOperation
+import com.emarsys.networking.clients.event.model.Event
 import com.emarsys.util.JsonUtil
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -27,6 +27,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -55,7 +56,7 @@ class NotificationIntentProcessorTests {
     private lateinit var testScope: CoroutineScope
     private lateinit var mockActionFactory: ActionFactoryApi<ActionModel>
     private lateinit var mockActionHandler: ActionHandlerApi
-    private lateinit var mockEventChannel: CustomEventChannelApi
+    private lateinit var mockSdkEventFlow: MutableSharedFlow<Event>
     private lateinit var notificationIntentProcessor: NotificationIntentProcessor
 
     @Before
@@ -65,7 +66,7 @@ class NotificationIntentProcessorTests {
         testScope = CoroutineScope(testDispatcher)
         mockActionFactory = mockk(relaxed = true)
         mockActionHandler = mockk(relaxed = true)
-        mockEventChannel = mockk(relaxed = true)
+        mockSdkEventFlow = mockk(relaxed = true)
         notificationIntentProcessor =
             NotificationIntentProcessor(json, mockActionFactory, mockActionHandler)
     }
@@ -94,7 +95,7 @@ class NotificationIntentProcessorTests {
     fun testProcessIntent_shouldHandleAction_withActionHandler_withMandatoryActions() = runTest {
         val actionModel = PresentableAppEventActionModel(ID, TITLE, NAME, PAYLOAD)
         val buttonClickedActionModel = BasicPushButtonClickedActionModel(ID, SID)
-        val reportingAction = ReportingAction(buttonClickedActionModel, mockEventChannel)
+        val reportingAction = ReportingAction(buttonClickedActionModel, mockSdkEventFlow)
         val mockLaunchApplicationAction: LaunchApplicationAction = mockk(relaxed = true)
 
         coEvery { mockActionFactory.create(BasicLaunchApplicationActionModel) } returns mockLaunchApplicationAction
@@ -112,38 +113,54 @@ class NotificationIntentProcessorTests {
         advanceUntilIdle()
 
         coVerify { mockActionFactory.create(actionModel) }
-        coVerify { mockActionHandler.handleActions(listOf(mockLaunchApplicationAction, reportingAction), mockAction) }
+        coVerify {
+            mockActionHandler.handleActions(
+                listOf(
+                    mockLaunchApplicationAction,
+                    reportingAction
+                ), mockAction
+            )
+        }
     }
 
     @Test
-    fun testProcessIntent_shouldHandleAction_withActionHandler_withMandatoryActions_whenTriggeredWithDefaultAction() = runTest {
-        val actionModel = BasicAppEventActionModel(NAME, PAYLOAD)
-        val actionJsonString = """{"type": "MEAppEvent", "name":"$NAME","payload":{"testKey":"testValue"}}"""
-        val notificationOpenedActionModel = NotificationOpenedActionModel(SID)
-        val reportingAction = ReportingAction(notificationOpenedActionModel, mockEventChannel)
-        val mockLaunchApplicationAction: LaunchApplicationAction = mockk(relaxed = true)
+    fun testProcessIntent_shouldHandleAction_withActionHandler_withMandatoryActions_whenTriggeredWithDefaultAction() =
+        runTest {
+            val actionModel = BasicAppEventActionModel(NAME, PAYLOAD)
+            val actionJsonString =
+                """{"type": "MEAppEvent", "name":"$NAME","payload":{"testKey":"testValue"}}"""
+            val notificationOpenedActionModel = NotificationOpenedActionModel(SID)
+            val reportingAction = ReportingAction(notificationOpenedActionModel, mockSdkEventFlow)
+            val mockLaunchApplicationAction: LaunchApplicationAction = mockk(relaxed = true)
 
-        coEvery { mockActionFactory.create(BasicLaunchApplicationActionModel) } returns mockLaunchApplicationAction
-        coEvery { mockActionFactory.create(notificationOpenedActionModel) } returns reportingAction
+            coEvery { mockActionFactory.create(BasicLaunchApplicationActionModel) } returns mockLaunchApplicationAction
+            coEvery { mockActionFactory.create(notificationOpenedActionModel) } returns reportingAction
 
-        val intent = Intent(context, NotificationOpenedActivity::class.java)
-        intent.action = DEFAULT_TAP_ACTION_ID
-        intent.putExtra(
-            INTENT_EXTRA_DEFAULT_TAP_ACTION_KEY,
-            actionJsonString
-        )
-        intent.putExtra(INTENT_EXTRA_PAYLOAD_KEY, createTestMessage())
+            val intent = Intent(context, NotificationOpenedActivity::class.java)
+            intent.action = DEFAULT_TAP_ACTION_ID
+            intent.putExtra(
+                INTENT_EXTRA_DEFAULT_TAP_ACTION_KEY,
+                actionJsonString
+            )
+            intent.putExtra(INTENT_EXTRA_PAYLOAD_KEY, createTestMessage())
 
-        val mockAction: Action<Unit> = mockk(relaxed = true)
-        coEvery { mockActionFactory.create(actionModel) } returns mockAction
+            val mockAction: Action<Unit> = mockk(relaxed = true)
+            coEvery { mockActionFactory.create(actionModel) } returns mockAction
 
-        notificationIntentProcessor.processIntent(intent, testScope)
+            notificationIntentProcessor.processIntent(intent, testScope)
 
-        advanceUntilIdle()
+            advanceUntilIdle()
 
-        coVerify { mockActionFactory.create(actionModel) }
-        coVerify { mockActionHandler.handleActions(listOf(mockLaunchApplicationAction, reportingAction), mockAction) }
-    }
+            coVerify { mockActionFactory.create(actionModel) }
+            coVerify {
+                mockActionHandler.handleActions(
+                    listOf(
+                        mockLaunchApplicationAction,
+                        reportingAction
+                    ), mockAction
+                )
+            }
+        }
 
     private fun createTestIntent(actionModel: PresentableActionModel): Intent {
         val intent = Intent(context, NotificationOpenedActivity::class.java)

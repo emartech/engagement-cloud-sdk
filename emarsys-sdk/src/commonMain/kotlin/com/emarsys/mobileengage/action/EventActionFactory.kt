@@ -1,6 +1,5 @@
 package com.emarsys.mobileengage.action
 
-import com.emarsys.core.channel.CustomEventChannelApi
 import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.message.MsgHubApi
@@ -21,12 +20,11 @@ import com.emarsys.mobileengage.action.models.DismissActionModel
 import com.emarsys.mobileengage.action.models.OpenExternalUrlActionModel
 import com.emarsys.mobileengage.action.models.ReportingActionModel
 import com.emarsys.mobileengage.action.models.RequestPushPermissionActionModel
-import com.emarsys.mobileengage.events.SdkEvent
+import com.emarsys.networking.clients.event.model.Event
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 class EventActionFactory<ActionModelType>(
-    private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
-    private val eventChannel: CustomEventChannelApi,
+    private val sdkEventFlow: MutableSharedFlow<Event>,
     private val permissionHandler: PermissionHandlerApi,
     private val externalUrlOpener: ExternalUrlOpenerApi,
     private val msgHub: MsgHubApi,
@@ -36,7 +34,7 @@ class EventActionFactory<ActionModelType>(
     override suspend fun create(action: ActionModelType): Action<*> {
         return when (action) {
             is AppEventActionModel -> AppEventAction(action, sdkEventFlow)
-            is CustomEventActionModel -> CustomEventAction(action, eventChannel)
+            is CustomEventActionModel -> CustomEventAction(action, sdkEventFlow)
             is RequestPushPermissionActionModel -> RequestPushPermissionAction(
                 action,
                 permissionHandler
@@ -44,7 +42,7 @@ class EventActionFactory<ActionModelType>(
 
             is DismissActionModel -> DismissAction(action, msgHub)
             is OpenExternalUrlActionModel -> OpenExternalUrlAction(action, externalUrlOpener)
-            is ReportingActionModel -> ReportingAction(action, eventChannel)
+            is ReportingActionModel -> ReportingAction(action, sdkEventFlow)
             is CopyToClipboardActionModel -> CopyToClipboardAction(action, clipboardHandler)
             else -> {
                 val exception = IllegalArgumentException("Unknown action type: $action")

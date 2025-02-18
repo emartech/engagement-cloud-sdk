@@ -1,7 +1,6 @@
 package com.emarsys.mobileengage.action
 
 import com.emarsys.core.badge.BadgeCountHandlerApi
-import com.emarsys.core.channel.CustomEventChannelApi
 import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.SdkLogger
@@ -19,7 +18,7 @@ import com.emarsys.mobileengage.action.models.BasicCustomEventActionModel
 import com.emarsys.mobileengage.action.models.BasicDismissActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.action.models.RequestPushPermissionActionModel
-import com.emarsys.mobileengage.events.SdkEvent
+import com.emarsys.networking.clients.event.model.Event
 import dev.mokkery.mock
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeTypeOf
@@ -30,8 +29,7 @@ import kotlin.test.Test
 
 class EventActionFactoryTests {
 
-    private lateinit var mockEventChannel: CustomEventChannelApi
-    private lateinit var mockSdkEventFlow: MutableSharedFlow<SdkEvent>
+    private lateinit var mockSdkEventFlow: MutableSharedFlow<Event>
     private lateinit var mockPermissionHandler: PermissionHandlerApi
     private lateinit var mockBadgeCountHandler: BadgeCountHandlerApi
     private lateinit var mockExternalUrlOpener: ExternalUrlOpenerApi
@@ -42,7 +40,6 @@ class EventActionFactoryTests {
 
     @BeforeTest
     fun setUp() {
-        mockEventChannel = mock()
         mockSdkEventFlow = mock()
         mockPermissionHandler = mock()
         mockBadgeCountHandler = mock()
@@ -52,7 +49,6 @@ class EventActionFactoryTests {
 
         actionFactory = EventActionFactory(
             mockSdkEventFlow,
-            mockEventChannel,
             mockPermissionHandler,
             mockExternalUrlOpener,
             mockMsgHub,

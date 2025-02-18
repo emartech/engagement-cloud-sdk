@@ -1,7 +1,6 @@
 package com.emarsys.networking.clients.event
 
 import com.emarsys.api.inapp.InAppConfig
-import com.emarsys.core.channel.CustomEventChannelApi
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
@@ -34,13 +33,14 @@ import io.ktor.http.Url
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
@@ -69,7 +69,7 @@ class EventClientTests {
     private lateinit var mockEmarsysClient: NetworkClientApi
     private lateinit var mockUrlFactory: UrlFactoryApi
     private lateinit var mockOnEventActionFactory: ActionFactoryApi<ActionModel>
-    private lateinit var mockDeviceEventChannel: CustomEventChannelApi
+    private lateinit var mockSdkEventFlow: MutableSharedFlow<Event>
     private lateinit var mockInAppConfig: InAppConfig
     private lateinit var mockInAppPresenter: InAppPresenterApi
     private lateinit var mockInAppViewProvider: InAppViewProviderApi
@@ -84,7 +84,7 @@ class EventClientTests {
         mockEmarsysClient = mock()
         mockUrlFactory = mock()
         mockOnEventActionFactory = mock()
-        mockDeviceEventChannel = mock()
+        mockSdkEventFlow = mock()
         mockInAppConfig = mock()
         mockInAppPresenter = mock()
         mockInAppViewProvider = mock()
@@ -98,8 +98,8 @@ class EventClientTests {
         everySuspend { mockInAppViewProvider.provide() } returns mockInAppView
         everySuspend { mockInAppView.load(any()) } returns Unit
 
-        everySuspend { mockDeviceEventChannel.consume() }.returns(flowOf(testEvent))
-        everySuspend { mockDeviceEventChannel.send(testEvent) }.returns(Unit)
+        everySuspend { mockSdkEventFlow.filter(any()) }.returns(flowOf(testEvent))
+        everySuspend { mockSdkEventFlow.emit(testEvent) }.returns(Unit)
     }
 
     @AfterTest
@@ -113,7 +113,7 @@ class EventClientTests {
 
         eventClient.registerEvent(testEvent)
 
-        verifySuspend { mockDeviceEventChannel.send(testEvent) }
+        verifySuspend { mockSdkEventFlow.emit(testEvent) }
     }
 
     @Test
@@ -122,7 +122,7 @@ class EventClientTests {
 
         advanceUntilIdle()
 
-        verifySuspend { mockDeviceEventChannel.consume() }
+        verifySuspend { mockSdkEventFlow.filter(any()) }
     }
 
     @Test
@@ -260,12 +260,12 @@ class EventClientTests {
         mockEmarsysClient,
         mockUrlFactory,
         json,
-        mockDeviceEventChannel,
         mockOnEventActionFactory,
         sessionContext,
         mockInAppConfig,
         mockInAppPresenter,
         mockInAppViewProvider,
+        mockSdkEventFlow,
         sdkDispatcher
     )
 }

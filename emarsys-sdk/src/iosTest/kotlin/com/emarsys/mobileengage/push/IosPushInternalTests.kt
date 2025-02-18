@@ -30,8 +30,8 @@ import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
 import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableOpenExternalUrlActionModel
-import com.emarsys.mobileengage.events.SdkEvent
-import com.emarsys.mobileengage.events.SdkEventSource
+import com.emarsys.networking.clients.event.model.Event
+import com.emarsys.networking.clients.event.model.EventType
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.util.JsonUtil
 import dev.mokkery.answering.returns
@@ -91,7 +91,7 @@ class IosPushInternalTests {
     private lateinit var mockBadgeCountHandler: BadgeCountHandlerApi
     private lateinit var json: Json
     private lateinit var sdkDispatcher: CoroutineDispatcher
-    private lateinit var mockSdkEventFlow: MutableSharedFlow<SdkEvent>
+    private lateinit var mockSdkEventFlow: MutableSharedFlow<Event>
     private lateinit var mockSdkLogger: Logger
 
     @BeforeTest
@@ -516,8 +516,8 @@ class IosPushInternalTests {
         verifySuspend { mockOpenExternalUrlAction.invoke() }
         verifySuspend {
             mockSdkEventFlow.emit(
-                SdkEvent(
-                    SdkEventSource.SilentPush,
+                Event(
+                    EventType.CUSTOM,
                     PUSH_RECEIVED_EVENT_NAME,
                     mapOf("campaignId" to CAMPAIGN_ID)
                 )
@@ -539,9 +539,9 @@ class IosPushInternalTests {
         verifySuspend { mockPushClient.clearPushToken() }
         verifySuspend {
             mockSdkEventFlow.emit(
-                SdkEvent(
-                    SdkEventSource.SilentPush,
-                    "campaignId",
+                Event(
+                    EventType.CUSTOM,
+                    PUSH_RECEIVED_EVENT_NAME,
                     mapOf("campaignId" to CAMPAIGN_ID)
                 )
             )

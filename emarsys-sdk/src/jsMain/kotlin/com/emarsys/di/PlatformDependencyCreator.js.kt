@@ -16,7 +16,6 @@ import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.badge.WebBadgeCountHandler
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.cache.WebFileCache
-import com.emarsys.core.channel.CustomEventChannelApi
 import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.clipboard.WebClipboardHandler
 import com.emarsys.core.device.DeviceInfoCollector
@@ -55,6 +54,7 @@ import com.emarsys.mobileengage.push.PushService
 import com.emarsys.mobileengage.push.PushServiceContext
 import com.emarsys.mobileengage.pushtoinapp.WebPushToInAppHandler
 import com.emarsys.networking.clients.event.EventClientApi
+import com.emarsys.networking.clients.event.model.Event
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.PlatformInitState
 import com.emarsys.setup.PlatformInitializer
@@ -80,7 +80,7 @@ actual class PlatformDependencyCreator actual constructor(
     private val json: Json,
     private val msgHub: MsgHubApi,
     actionHandler: ActionHandlerApi,
-    eventChannel: CustomEventChannelApi
+    sdkEventFlow: MutableSharedFlow<Event>
 ) : DependencyCreator {
 
     actual override fun createPlatformInitializer(

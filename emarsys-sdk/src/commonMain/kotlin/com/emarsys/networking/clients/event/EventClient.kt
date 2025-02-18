@@ -1,7 +1,6 @@
 package com.emarsys.networking.clients.event
 
 import com.emarsys.api.inapp.InAppConfig
-import com.emarsys.core.channel.CustomEventChannelApi
 import com.emarsys.core.channel.naturalBatching
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.UrlRequest
@@ -24,21 +23,22 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class EventClient(
     private val emarsysNetworkClient: NetworkClientApi,
     private val urlFactory: UrlFactoryApi,
     private val json: Json,
-    private val deviceEventChannel: CustomEventChannelApi,
     private val onEventActionFactory: ActionFactoryApi<ActionModel>,
     private val sessionContext: SessionContext,
     private val inAppConfig: InAppConfig,
     private val inAppPresenter: InAppPresenterApi,
     private val inAppViewProvider: InAppViewProviderApi,
+    private val sdkEventFlow: MutableSharedFlow<Event>,
     sdkDispatcher: CoroutineDispatcher
 ) : EventClientApi {
 
@@ -49,11 +49,12 @@ class EventClient(
     }
 
     override suspend fun registerEvent(event: Event) {
-        deviceEventChannel.send(event)
+        sdkEventFlow.emit(event)
     }
 
     private suspend fun startEventConsumer() {
-        deviceEventChannel.consume().naturalBatching().onEach {
+        sdkEventFlow.filter { it.type == EventType.INTERNAL || it.type == EventType.CUSTOM }
+            .naturalBatching().onEach {
             try {
                 val url = urlFactory.create(EmarsysUrlType.EVENT)
                 val requestBody =
@@ -65,7 +66,7 @@ class EventClient(
                 val body = json.encodeToString(requestBody)
                 val response = emarsysNetworkClient.send(UrlRequest(url, HttpMethod.Post, body))
 
-                if(response.status == HttpStatusCode.NoContent) {
+                if (response.status == HttpStatusCode.NoContent) {
                     return@onEach
                 }
 

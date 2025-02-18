@@ -23,7 +23,6 @@ import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.cache.AndroidFileCache
 import com.emarsys.core.cache.FileCacheApi
-import com.emarsys.core.channel.CustomEventChannelApi
 import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.device.AndroidLanguageProvider
 import com.emarsys.core.device.DeviceInfoCollector
@@ -48,7 +47,6 @@ import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.clipboard.AndroidClipboardHandler
-import com.emarsys.mobileengage.events.SdkEvent
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandlerApi
 import com.emarsys.mobileengage.inapp.InAppJsBridgeProvider
@@ -66,6 +64,7 @@ import com.emarsys.mobileengage.push.SilentPushMessageHandler
 import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
 import com.emarsys.mobileengage.url.AndroidExternalUrlOpener
 import com.emarsys.networking.clients.event.EventClientApi
+import com.emarsys.networking.clients.event.model.Event
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.PlatformInitState
 import com.emarsys.setup.PlatformInitializer
@@ -91,7 +90,7 @@ actual class PlatformDependencyCreator actual constructor(
     private val json: Json,
     private val msgHub: MsgHubApi,
     private val actionHandler: ActionHandlerApi,
-    private val eventChannel: CustomEventChannelApi
+    private val sdkEventFlow: MutableSharedFlow<Event>
 ) : DependencyCreator {
     private val metadataReader = MetadataReader(applicationContext)
     private val platformInfoCollector = PlatformInfoCollector(applicationContext)
@@ -101,7 +100,7 @@ actual class PlatformDependencyCreator actual constructor(
         applicationContext.getSharedPreferences(StorageConstants.SUITE_NAME, Context.MODE_PRIVATE)
 
     actual override fun createPlatformInitializer(
-        sdkEventFlow: MutableSharedFlow<SdkEvent>,
+        sdkEventFlow: MutableSharedFlow<Event>,
         pushActionFactory: ActionFactoryApi<ActionModel>,
         pushActionHandler: ActionHandlerApi
     ): PlatformInitializerApi {
@@ -143,7 +142,7 @@ actual class PlatformDependencyCreator actual constructor(
         downloaderApi: DownloaderApi,
         inAppDownloader: InAppDownloaderApi,
         storage: TypedStorageApi<String?>,
-        sdkEventFlow: MutableSharedFlow<SdkEvent>
+        sdkEventFlow: MutableSharedFlow<Event>
     ): State {
         val notificationManager =
             (applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
@@ -243,7 +242,7 @@ actual class PlatformDependencyCreator actual constructor(
         actionFactory: ActionFactoryApi<ActionModel>,
         json: Json,
         sdkDispatcher: CoroutineDispatcher,
-        sdkEventFlow: MutableSharedFlow<SdkEvent>
+        sdkEventFlow: MutableSharedFlow<Event>
     ): PushInstance {
         return PushInternal(pushClient, storage, pushContext, sdkLogger)
     }

@@ -59,8 +59,6 @@ import com.emarsys.context.DefaultUrlsApi
 import com.emarsys.context.SdkContext
 import com.emarsys.core.actions.ActionHandler
 import com.emarsys.core.actions.ActionHandlerApi
-import com.emarsys.core.channel.CustomEventChannel
-import com.emarsys.core.channel.CustomEventChannelApi
 import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.collections.persistentListOf
 import com.emarsys.core.crypto.Crypto
@@ -94,7 +92,6 @@ import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.EventActionFactory
 import com.emarsys.mobileengage.action.PushActionFactory
 import com.emarsys.mobileengage.action.models.ActionModel
-import com.emarsys.mobileengage.events.SdkEvent
 import com.emarsys.mobileengage.inapp.InAppDownloader
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandler
@@ -184,10 +181,6 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         Channel()
     }
 
-    private val customEventChannel: CustomEventChannelApi by lazy {
-        CustomEventChannel(eventChannel)
-    }
-
     override val sdkContext: SdkContext by lazy {
         SdkContext(sdkDispatcher, mainDispatcher, defaultUrls, LogLevel.Error, mutableSetOf())
     }
@@ -211,7 +204,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             json,
             msgHub,
             pushActionHandler,
-            customEventChannel
+            sdkEventFlow
         )
     }
 
@@ -264,7 +257,6 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
     private val eventActionFactory: ActionFactoryApi<ActionModel> by lazy {
         EventActionFactory(
             sdkEventFlow,
-            customEventChannel,
             permissionHandler,
             externalUrlOpener,
             msgHub,
@@ -321,13 +313,13 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             emarsysClient,
             urlFactory,
             json,
-            customEventChannel,
             eventActionFactory,
             sessionContext,
             inAppContext,
             inAppPresenter,
             inAppViewProvider,
-            sdkDispatcher
+            sdkEventFlow,
+            sdkDispatcher,
         )
     }
 
@@ -507,12 +499,12 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         SetupOrganizer(meStateMachine, predictStateMachine, sdkContext)
     }
 
-    override val sdkEventFlow: MutableSharedFlow<SdkEvent> by lazy {
+    override val sdkEventFlow: MutableSharedFlow<Event> by lazy {
         MutableSharedFlow()
     }
 
 
-    override val events: SharedFlow<SdkEvent> by lazy {
+    override val events: SharedFlow<Event> by lazy {
         sdkEventFlow.asSharedFlow()
     }
 

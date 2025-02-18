@@ -20,12 +20,12 @@ import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
-import com.emarsys.mobileengage.events.SdkEvent
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandlerApi
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.networking.clients.event.EventClientApi
+import com.emarsys.networking.clients.event.model.Event
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.PlatformInitializerApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
@@ -37,7 +37,7 @@ import kotlinx.serialization.json.Json
 interface DependencyCreator {
 
     fun createPlatformInitializer(
-        sdkEventFlow: MutableSharedFlow<SdkEvent>,
+        sdkEventFlow: MutableSharedFlow<Event>,
         pushActionFactory: ActionFactoryApi<ActionModel>,
         pushActionHandler: ActionHandlerApi
     ): PlatformInitializerApi
@@ -59,7 +59,7 @@ interface DependencyCreator {
         downloaderApi: DownloaderApi,
         inAppDownloader: InAppDownloaderApi,
         storage: TypedStorageApi<String?>,
-        sdkEventFlow: MutableSharedFlow<SdkEvent>
+        sdkEventFlow: MutableSharedFlow<Event>
     ): State
 
     fun createPermissionHandler(): PermissionHandlerApi
@@ -97,7 +97,7 @@ interface DependencyCreator {
         actionFactory: ActionFactoryApi<ActionModel>,
         json: Json,
         sdkDispatcher: CoroutineDispatcher,
-        sdkEventFlow: MutableSharedFlow<SdkEvent>
+        sdkEventFlow: MutableSharedFlow<Event>
     ): PushInstance
 
     fun createPushApi(
