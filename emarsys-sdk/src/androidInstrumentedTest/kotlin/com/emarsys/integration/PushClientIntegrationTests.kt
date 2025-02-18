@@ -2,6 +2,7 @@ package com.emarsys.integration
 
 import com.emarsys.Emarsys
 import com.emarsys.EmarsysConfig
+import com.emarsys.api.push.PushConstants
 import com.emarsys.api.push.PushConstants.PUSH_TOKEN_STORAGE_KEY
 import com.emarsys.di.DependencyContainerPrivateApi
 import com.emarsys.di.DependencyInjection
@@ -38,7 +39,7 @@ class PushClientIntegrationTests {
 
         Emarsys.push.clearPushToken()
 
-        container.stringStorage.get(PUSH_TOKEN_STORAGE_KEY) shouldBe null
+        container.stringStorage.get(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY) shouldBe null
     }
 
 }

@@ -3,6 +3,7 @@ package com.emarsys.api.push
 import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.PushCall.ClearPushToken
 import com.emarsys.api.push.PushCall.RegisterPushToken
+import com.emarsys.api.push.PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY
 import com.emarsys.api.push.PushConstants.PUSH_TOKEN_STORAGE_KEY
 import com.emarsys.core.collections.dequeue
 import com.emarsys.core.log.Logger
@@ -17,20 +18,21 @@ open class PushInternal(
 ) : PushInstance {
 
     override suspend fun registerPushToken(pushToken: String) {
-        val storedPushToken = storage.get(PUSH_TOKEN_STORAGE_KEY)
-        if (storedPushToken != pushToken) {
+        storage.put(PUSH_TOKEN_STORAGE_KEY, pushToken)
+        val lastSentPushToken = storage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY)
+        if (lastSentPushToken != pushToken) {
             pushClient.registerPushToken(pushToken)
-            storage.put(PUSH_TOKEN_STORAGE_KEY, pushToken)
+            storage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, pushToken)
         }
     }
 
     override suspend fun clearPushToken() {
         pushClient.clearPushToken()
-        storage.put(PUSH_TOKEN_STORAGE_KEY, null)
+        storage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, null)
     }
 
     override val pushToken: String?
-        get() = storage.get(PUSH_TOKEN_STORAGE_KEY)
+        get() = storage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) ?: storage.get(PUSH_TOKEN_STORAGE_KEY)
 
 
     override suspend fun activate() {

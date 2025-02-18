@@ -47,22 +47,19 @@ sealed interface SdkEvent {
                 override val name: String,
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-            ) :
-                Api
+            ) : Api
 
             data class OnEventAction(
                 override val name: String,
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-            ) :
-                Api
+            ) : Api
 
             data class BadgeCount(
                 override val name: String,
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-            ) :
-                Api
+            ) : Api
         }
     }
 
