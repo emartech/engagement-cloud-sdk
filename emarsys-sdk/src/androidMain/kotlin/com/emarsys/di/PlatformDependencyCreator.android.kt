@@ -59,7 +59,6 @@ import com.emarsys.mobileengage.permission.AndroidPermissionHandler
 import com.emarsys.mobileengage.push.NotificationCompatStyler
 import com.emarsys.mobileengage.push.PushMessageBroadcastReceiver
 import com.emarsys.mobileengage.push.PushMessagePresenter
-import com.emarsys.mobileengage.push.PushTokenBroadcastReceiver
 import com.emarsys.mobileengage.push.SilentPushMessageHandler
 import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
 import com.emarsys.mobileengage.url.AndroidExternalUrlOpener
@@ -161,7 +160,6 @@ actual class PlatformDependencyCreator actual constructor(
             inAppDownloader
         )
         val silentPushHandler = SilentPushMessageHandler(actionFactory, sdkEventFlow)
-        val pushTokenBroadcastReceiver = PushTokenBroadcastReceiver()
         val pushMessageBroadcastReceiver =
             PushMessageBroadcastReceiver(
                 pushPresenter,
@@ -171,8 +169,6 @@ actual class PlatformDependencyCreator actual constructor(
                 json,
             )
         return PlatformInitState(
-            pushTokenBroadcastReceiver,
-            IntentFilter(PushConstants.PUSH_TOKEN_INTENT_FILTER_ACTION),
             pushMessageBroadcastReceiver,
             IntentFilter(PushConstants.PUSH_MESSAGE_PAYLOAD_INTENT_FILTER_ACTION),
             applicationContext,

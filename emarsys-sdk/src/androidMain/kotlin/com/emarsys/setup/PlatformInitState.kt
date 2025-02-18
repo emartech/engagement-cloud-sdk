@@ -7,8 +7,6 @@ import androidx.core.content.ContextCompat
 import com.emarsys.core.state.State
 
 class PlatformInitState(
-    private val pushTokenBroadcastReceiver: BroadcastReceiver,
-    private val pushTokenIntentFilter: IntentFilter,
     private val pushMessageBroadcastReceiver: BroadcastReceiver,
     private val pushMessageIntentFilter: IntentFilter,
     private val applicationContext: Context
@@ -17,13 +15,6 @@ class PlatformInitState(
     override val name: String = "androidInitState"
 
     override fun prepare() {
-        ContextCompat.registerReceiver(
-            applicationContext,
-            pushTokenBroadcastReceiver,
-            pushTokenIntentFilter,
-            ContextCompat.RECEIVER_NOT_EXPORTED
-        )
-
         ContextCompat.registerReceiver(
             applicationContext,
             pushMessageBroadcastReceiver,

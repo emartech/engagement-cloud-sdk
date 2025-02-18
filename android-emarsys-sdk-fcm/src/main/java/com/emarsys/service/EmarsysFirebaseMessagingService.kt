@@ -30,6 +30,7 @@ class EmarsysFirebaseMessagingService : FirebaseMessagingService() {
         val intent = Intent().apply {
             action = PUSH_TOKEN_INTENT_FILTER_ACTION
             putExtra(PUSH_TOKEN_INTENT_KEY, token)
+            setPackage(applicationContext.packageName)
         }
         applicationContext.sendBroadcast(intent)
     }
@@ -47,6 +48,7 @@ class EmarsysFirebaseMessagingService : FirebaseMessagingService() {
                 PUSH_MESSAGE_PAYLOAD_INTENT_KEY,
                 FirebaseRemoteMessageMapper.map(remoteMessage.data).toString()
             )
+            setPackage(applicationContext.packageName)
         }
         applicationContext.sendBroadcast(intent)
     }

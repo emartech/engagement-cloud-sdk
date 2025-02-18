@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import androidx.core.content.ContextCompat
 import com.emarsys.mobileengage.push.PushMessageBroadcastReceiver
-import com.emarsys.mobileengage.push.PushTokenBroadcastReceiver
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
@@ -18,11 +17,7 @@ import kotlin.test.BeforeTest
 
 class PlatformInitStateTests {
 
-    private lateinit var mockPushTokenBroadcastReceiver: PushTokenBroadcastReceiver
-
     private lateinit var mockPushMessageBroadcastReceiver: PushMessageBroadcastReceiver
-
-    private lateinit var mockTokenIntentFilter: IntentFilter
 
     private lateinit var mockPushMessageIntentFilter: IntentFilter
 
@@ -32,9 +27,7 @@ class PlatformInitStateTests {
 
     @BeforeTest
     fun setup() = runTest {
-        mockPushTokenBroadcastReceiver = mockk(relaxed = true)
         mockPushMessageBroadcastReceiver = mockk(relaxed = true)
-        mockTokenIntentFilter = mockk(relaxed = true)
         mockPushMessageIntentFilter = mockk(relaxed = true)
         mockContext = mockk(relaxed = true)
 
@@ -42,8 +35,6 @@ class PlatformInitStateTests {
 
         platformInitState =
             PlatformInitState(
-                mockPushTokenBroadcastReceiver,
-                mockTokenIntentFilter,
                 mockPushMessageBroadcastReceiver,
                 mockPushMessageIntentFilter,
                 mockContext
@@ -53,29 +44,6 @@ class PlatformInitStateTests {
     @AfterTest
     fun tearDown() {
         unmockkAll()
-    }
-
-    @Test
-    fun testPrepare_should_registerPushTokenBroadcastReceiver() = runTest {
-        every {
-            ContextCompat.registerReceiver(
-                mockContext,
-                mockPushTokenBroadcastReceiver,
-                mockTokenIntentFilter,
-                ContextCompat.RECEIVER_NOT_EXPORTED
-            )
-        } returns Intent()
-
-        platformInitState.prepare()
-
-        verify {
-            ContextCompat.registerReceiver(
-                mockContext,
-                mockPushTokenBroadcastReceiver,
-                mockTokenIntentFilter,
-                ContextCompat.RECEIVER_NOT_EXPORTED
-            )
-        }
     }
 
     @Test
