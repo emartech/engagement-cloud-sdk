@@ -70,7 +70,7 @@ class InAppJsBridge(
         fun dismiss(jsonString: String) {
             sdkScope.launch {
                 val actionModel = json.decodeFromString<BasicDismissActionModel>(jsonString)
-                actionModel.topic = "dismiss"
+                actionModel.campaignId = "dismiss"
                 actionFactory.create(actionModel)()
             }
         }

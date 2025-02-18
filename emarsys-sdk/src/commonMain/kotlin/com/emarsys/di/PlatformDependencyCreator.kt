@@ -13,7 +13,6 @@ import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.log.SdkLogger
-import com.emarsys.core.message.MsgHubApi
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.pushtoinapp.PushToInAppHandlerApi
@@ -45,14 +44,12 @@ expect class PlatformDependencyCreator(
     uuidProvider: Provider<String>,
     sdkLogger: Logger,
     json: Json,
-    msgHub: MsgHubApi,
-    actionHandler: ActionHandlerApi,
     sdkEventFlow: MutableSharedFlow<SdkEvent>,
+    actionHandler: ActionHandlerApi,
     timestampProvider: Provider<Instant>
 ) : DependencyCreator {
 
     override fun createPlatformInitializer(
-        sdkEventFlow: MutableSharedFlow<SdkEvent>,
         pushActionFactory: ActionFactoryApi<ActionModel>,
         pushActionHandler: ActionHandlerApi
     ): PlatformInitializerApi
@@ -73,8 +70,7 @@ expect class PlatformDependencyCreator(
         actionFactory: ActionFactoryApi<ActionModel>,
         downloaderApi: DownloaderApi,
         inAppDownloader: InAppDownloaderApi,
-        storage: TypedStorageApi<String?>,
-        sdkEventFlow: MutableSharedFlow<SdkEvent>
+        storage: TypedStorageApi<String?>
     ): State
 
     override fun createPermissionHandler(): PermissionHandlerApi
@@ -111,8 +107,7 @@ expect class PlatformDependencyCreator(
         eventClient: EventClientApi,
         actionFactory: ActionFactoryApi<ActionModel>,
         json: Json,
-        sdkDispatcher: CoroutineDispatcher,
-        sdkEventFlow: MutableSharedFlow<SdkEvent>
+        sdkDispatcher: CoroutineDispatcher
     ): PushInstance
 
     override fun createPushApi(

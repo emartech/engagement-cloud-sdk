@@ -31,7 +31,6 @@ import com.emarsys.core.launchapplication.LaunchApplicationHandler
 import com.emarsys.core.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.log.SdkLogger
-import com.emarsys.core.message.MsgHubApi
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.provider.AndroidApplicationVersionProvider
 import com.emarsys.core.providers.ClientIdProvider
@@ -78,6 +77,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import okio.FileSystem
@@ -89,11 +89,9 @@ actual class PlatformDependencyCreator actual constructor(
     private val uuidProvider: Provider<String>,
     private val sdkLogger: Logger,
     private val json: Json,
-    private val msgHub: MsgHubApi,
-    private val actionHandler: ActionHandlerApi,
     private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
+    private val actionHandler: ActionHandlerApi,
     private val timestampProvider: Provider<Instant>
-
 ) : DependencyCreator {
     private val metadataReader = MetadataReader(applicationContext)
     private val platformInfoCollector = PlatformInfoCollector(applicationContext)
@@ -103,7 +101,6 @@ actual class PlatformDependencyCreator actual constructor(
         applicationContext.getSharedPreferences(StorageConstants.SUITE_NAME, Context.MODE_PRIVATE)
 
     actual override fun createPlatformInitializer(
-        sdkEventFlow: MutableSharedFlow<SdkEvent>,
         pushActionFactory: ActionFactoryApi<ActionModel>,
         pushActionHandler: ActionHandlerApi
     ): PlatformInitializerApi {
@@ -144,8 +141,7 @@ actual class PlatformDependencyCreator actual constructor(
         actionFactory: ActionFactoryApi<ActionModel>,
         downloaderApi: DownloaderApi,
         inAppDownloader: InAppDownloaderApi,
-        storage: TypedStorageApi<String?>,
-        sdkEventFlow: MutableSharedFlow<SdkEvent>
+        storage: TypedStorageApi<String?>
     ): State {
         val notificationManager =
             (applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
@@ -221,7 +217,7 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createInAppPresenter(): InAppPresenterApi {
-        return InAppPresenter(currentActivityWatchdog, msgHub)
+        return InAppPresenter(currentActivityWatchdog, sdkEventFlow.asSharedFlow())
     }
 
     actual override fun createClipboardHandler(): ClipboardHandlerApi {
@@ -241,8 +237,7 @@ actual class PlatformDependencyCreator actual constructor(
         eventClient: EventClientApi,
         actionFactory: ActionFactoryApi<ActionModel>,
         json: Json,
-        sdkDispatcher: CoroutineDispatcher,
-        sdkEventFlow: MutableSharedFlow<SdkEvent>
+        sdkDispatcher: CoroutineDispatcher
     ): PushInstance {
         return PushInternal(pushClient, storage, pushContext, sdkLogger)
     }

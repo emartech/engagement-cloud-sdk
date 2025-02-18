@@ -24,7 +24,6 @@ import com.emarsys.core.launchapplication.JsLaunchApplicationHandler
 import com.emarsys.core.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.log.SdkLogger
-import com.emarsys.core.message.MsgHubApi
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.permission.WebPermissionHandler
 import com.emarsys.core.provider.ApplicationVersionProvider
@@ -78,14 +77,12 @@ actual class PlatformDependencyCreator actual constructor(
     private val uuidProvider: Provider<String>,
     private val sdkLogger: Logger,
     private val json: Json,
-    private val msgHub: MsgHubApi,
+    private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
     actionHandler: ActionHandlerApi,
-    sdkEventFlow: MutableSharedFlow<SdkEvent>,
     timestampProvider: Provider<Instant>
 ) : DependencyCreator {
 
     actual override fun createPlatformInitializer(
-        sdkEventFlow: MutableSharedFlow<SdkEvent>,
         pushActionFactory: ActionFactoryApi<ActionModel>,
         pushActionHandler: ActionHandlerApi
     ): PlatformInitializerApi {
@@ -134,8 +131,7 @@ actual class PlatformDependencyCreator actual constructor(
         actionFactory: ActionFactoryApi<ActionModel>,
         downloaderApi: DownloaderApi,
         inAppDownloader: InAppDownloaderApi,
-        storage: TypedStorageApi<String?>,
-        sdkEventFlow: MutableSharedFlow<SdkEvent>
+        storage: TypedStorageApi<String?>
     ): State {
         val scope = CoroutineScope(sdkDispatcher)
         val inappJsBridge = InAppJsBridge(actionFactory, json, scope)
@@ -199,7 +195,7 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createInAppPresenter(): InAppPresenterApi {
-        return WebInAppPresenter(msgHub)
+        return WebInAppPresenter(sdkEventFlow)
     }
 
     actual override fun createClipboardHandler(): ClipboardHandlerApi {
@@ -217,8 +213,7 @@ actual class PlatformDependencyCreator actual constructor(
         eventClient: EventClientApi,
         actionFactory: ActionFactoryApi<ActionModel>,
         json: Json,
-        sdkDispatcher: CoroutineDispatcher,
-        sdkEventFlow: MutableSharedFlow<SdkEvent>
+        sdkDispatcher: CoroutineDispatcher
     ): PushInstance {
         return PushInternal(pushClient, storage, pushContext, sdkLogger)
     }

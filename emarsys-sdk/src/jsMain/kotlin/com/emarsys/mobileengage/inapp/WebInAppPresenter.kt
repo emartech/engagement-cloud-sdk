@@ -1,10 +1,11 @@
 package com.emarsys.mobileengage.inapp
 
-import com.emarsys.core.message.MsgHubApi
+import com.emarsys.networking.clients.event.model.SdkEvent
+import kotlinx.coroutines.flow.SharedFlow
 import web.dom.document
 import web.html.HTMLElement
 
-class WebInAppPresenter(private val msgHubApi: MsgHubApi) : InAppPresenterApi {
+class WebInAppPresenter(private val sdkEventFlow: SharedFlow<SdkEvent>) : InAppPresenterApi {
     override suspend fun present(
         view: InAppViewApi,
         mode: InAppPresentationMode,
@@ -18,9 +19,7 @@ class WebInAppPresenter(private val msgHubApi: MsgHubApi) : InAppPresenterApi {
                 applyRibbonStyle(inappView)
             }
         }
-        msgHubApi.subscribe("dismiss") {
-            styledInappView?.remove()
-        }
+        // todo consume flow and dismiss
         styledInappView?.let { document.body.appendChild(it) }
     }
 

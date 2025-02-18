@@ -19,7 +19,6 @@ import com.emarsys.core.launchapplication.IosLaunchApplicationHandler
 import com.emarsys.core.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.log.SdkLogger
-import com.emarsys.core.message.MsgHubApi
 import com.emarsys.core.permission.IosPermissionHandler
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.provider.IosApplicationVersionProvider
@@ -79,9 +78,8 @@ actual class PlatformDependencyCreator actual constructor(
     private val uuidProvider: Provider<String>,
     private val sdkLogger: Logger,
     private val json: Json,
-    private val msgHub: MsgHubApi,
-    private val actionHandler: ActionHandlerApi,
     private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
+    private val actionHandler: ActionHandlerApi,
     private val timestampProvider: Provider<Instant>,
 ) : DependencyCreator {
     private val platformContext: IosPlatformContext = IosPlatformContext()
@@ -92,7 +90,6 @@ actual class PlatformDependencyCreator actual constructor(
         IosBadgeCountHandler(notificationCenter, uiDevice, sdkContext.mainDispatcher)
 
     actual override fun createPlatformInitializer(
-        sdkEventFlow: MutableSharedFlow<SdkEvent>,
         pushActionFactory: ActionFactoryApi<ActionModel>,
         pushActionHandler: ActionHandlerApi
     ): PlatformInitializerApi {
@@ -128,8 +125,7 @@ actual class PlatformDependencyCreator actual constructor(
         actionFactory: ActionFactoryApi<ActionModel>,
         downloaderApi: DownloaderApi,
         inAppDownloader: InAppDownloaderApi,
-        storage: TypedStorageApi<String?>,
-        sdkEventFlow: MutableSharedFlow<SdkEvent>
+        storage: TypedStorageApi<String?>
     ): State {
         return PlatformInitState()
     }
@@ -196,7 +192,7 @@ actual class PlatformDependencyCreator actual constructor(
                 viewControllerProvider = ViewControllerProvider(),
                 mainDispatcher = sdkContext.mainDispatcher
             ), mainDispatcher = sdkContext.mainDispatcher,
-            msgHub = msgHub
+            sdkEventFlow
         )
     }
 
@@ -215,8 +211,7 @@ actual class PlatformDependencyCreator actual constructor(
         eventClient: EventClientApi,
         actionFactory: ActionFactoryApi<ActionModel>,
         json: Json,
-        sdkDispatcher: CoroutineDispatcher,
-        sdkEventFlow: MutableSharedFlow<SdkEvent>
+        sdkDispatcher: CoroutineDispatcher
     ): PushInstance {
         return IosPushInternal(
             pushClient,

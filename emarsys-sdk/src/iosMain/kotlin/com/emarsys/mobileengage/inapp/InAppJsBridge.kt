@@ -14,7 +14,6 @@ import com.emarsys.util.JsonUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import platform.Foundation.NSDictionary
 import platform.Foundation.allKeys
@@ -91,7 +90,7 @@ class InAppJsBridge(
                 "close" -> {
                     val actionModel =
                         json.decodeFromString<BasicDismissActionModel>(body)
-                    actionModel.topic = "dismiss"
+                    actionModel.campaignId = "dismiss"
                     actionFactory.create(actionModel)()
                 }
 

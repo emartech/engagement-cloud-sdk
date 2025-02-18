@@ -4,12 +4,13 @@ import android.app.Activity
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
-import com.emarsys.core.message.MsgHubApi
+import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.watchdog.activity.TransitionSafeCurrentActivityWatchdog
+import kotlinx.coroutines.flow.SharedFlow
 
 class InAppPresenter(
     private val currentActivityWatchdog: TransitionSafeCurrentActivityWatchdog,
-    private val msgHub: MsgHubApi
+    private val sdkEventFlow: SharedFlow<SdkEvent>
 ) : InAppPresenterApi {
 
     override suspend fun present(
@@ -28,9 +29,7 @@ class InAppPresenter(
             }
         }
 
-        msgHub.subscribe("dismiss") {
-            inAppDialog.dismiss()
-        }
+        // todo consume flow and dismiss
     }
 }
 

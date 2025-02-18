@@ -1,9 +1,10 @@
 package com.emarsys.mobileengage.inapp
 
-import com.emarsys.core.message.MsgHubApi
 import com.emarsys.mobileengage.inapp.providers.WindowProvider
+import com.emarsys.networking.clients.event.model.SdkEvent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import platform.UIKit.NSLayoutAttributeHeight
@@ -19,7 +20,7 @@ import platform.UIKit.UIWindow
 class InAppPresenter(
     private val windowProvider: WindowProvider,
     private val mainDispatcher: CoroutineDispatcher,
-    private val msgHub: MsgHubApi
+    private val sdkEventFlow: SharedFlow<SdkEvent>
 ) : InAppPresenterApi {
     override suspend fun present(
         view: InAppViewApi,
@@ -42,12 +43,13 @@ class InAppPresenter(
             originalWindow
         }
 
-        msgHub.subscribe("dismiss") {
-            CoroutineScope(mainDispatcher).launch {
-                window.removeFromSuperview()
-                originalWindow?.makeKeyAndVisible()
-            }
-        }
+        // todo consume flow and dismiss
+//        sdkEventFlow.subscribe("dismiss") {
+//            CoroutineScope(mainDispatcher).launch {
+//                window.removeFromSuperview()
+//                originalWindow?.makeKeyAndVisible()
+//            }
+//        }
     }
 
 

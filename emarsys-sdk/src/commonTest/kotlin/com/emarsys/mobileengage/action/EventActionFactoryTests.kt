@@ -4,7 +4,6 @@ import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.SdkLogger
-import com.emarsys.core.message.MsgHubApi
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.mobileengage.action.actions.AppEventAction
@@ -19,7 +18,6 @@ import com.emarsys.mobileengage.action.models.BasicDismissActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.action.models.RequestPushPermissionActionModel
 import com.emarsys.networking.clients.event.model.SdkEvent
-
 import dev.mokkery.mock
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeTypeOf
@@ -34,7 +32,6 @@ class EventActionFactoryTests {
     private lateinit var mockPermissionHandler: PermissionHandlerApi
     private lateinit var mockBadgeCountHandler: BadgeCountHandlerApi
     private lateinit var mockExternalUrlOpener: ExternalUrlOpenerApi
-    private lateinit var mockMsgHub: MsgHubApi
     private lateinit var mockClipboardHandler: ClipboardHandlerApi
 
     private lateinit var actionFactory: ActionFactoryApi<ActionModel>
@@ -45,14 +42,12 @@ class EventActionFactoryTests {
         mockPermissionHandler = mock()
         mockBadgeCountHandler = mock()
         mockExternalUrlOpener = mock()
-        mockMsgHub = mock()
         mockClipboardHandler = mock()
 
         actionFactory = EventActionFactory(
             mockSdkEventFlow,
             mockPermissionHandler,
             mockExternalUrlOpener,
-            mockMsgHub,
             mockClipboardHandler,
             SdkLogger(ConsoleLogger())
         )

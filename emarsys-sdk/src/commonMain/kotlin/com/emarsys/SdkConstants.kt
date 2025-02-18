@@ -11,4 +11,5 @@ object SdkConstants {
     const val SESSION_END_EVENT_NAME = "session:end"
     const val APP_START_EVENT_NAME = "app:start"
     const val INAPP_VIEWED_EVENT_NAME = "inapp:viewed"
+    const val DISMISS_EVENT_NAME = "dismiss"
 }

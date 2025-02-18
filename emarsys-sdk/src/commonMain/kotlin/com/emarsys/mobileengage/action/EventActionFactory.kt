@@ -2,7 +2,6 @@ package com.emarsys.mobileengage.action
 
 import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.log.SdkLogger
-import com.emarsys.core.message.MsgHubApi
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.mobileengage.action.actions.Action
@@ -28,7 +27,6 @@ class EventActionFactory<ActionModelType>(
     private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
     private val permissionHandler: PermissionHandlerApi,
     private val externalUrlOpener: ExternalUrlOpenerApi,
-    private val msgHub: MsgHubApi,
     private val clipboardHandler: ClipboardHandlerApi,
     private val sdkLogger: SdkLogger
 ) : ActionFactoryApi<ActionModelType> {
@@ -41,7 +39,7 @@ class EventActionFactory<ActionModelType>(
                 permissionHandler
             )
 
-            is DismissActionModel -> DismissAction(action, msgHub)
+            is DismissActionModel -> DismissAction(action, sdkEventFlow)
             is OpenExternalUrlActionModel -> OpenExternalUrlAction(action, externalUrlOpener)
             is ReportingActionModel -> ReportingAction(action, sdkEventFlow)
             is CopyToClipboardActionModel -> CopyToClipboardAction(action, clipboardHandler)

@@ -68,8 +68,6 @@ import com.emarsys.core.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.SdkLogger
-import com.emarsys.core.message.MsgHub
-import com.emarsys.core.message.MsgHubApi
 import com.emarsys.core.networking.clients.GenericNetworkClient
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.permission.PermissionHandlerApi
@@ -163,8 +161,6 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         Dispatchers.Main
     }
 
-    private val msgHub: MsgHubApi by lazy { MsgHub(sdkDispatcher) }
-
     private val defaultUrls: DefaultUrlsApi by lazy {
         DefaultUrls(
             "https://me-client.gservice.emarsys.net",
@@ -198,9 +194,8 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             uuidProvider,
             sdkLogger,
             json,
-            msgHub,
-            pushActionHandler,
             sdkEventFlow,
+            pushActionHandler,
             timestampProvider
         )
     }
@@ -256,7 +251,6 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             sdkEventFlow,
             permissionHandler,
             externalUrlOpener,
-            msgHub,
             clipboardHandler,
             sdkLogger
         )
@@ -333,8 +327,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             eventClient,
             pushActionFactory,
             json,
-            sdkDispatcher,
-            sdkEventFlow
+            sdkDispatcher
         )
     }
 
@@ -469,8 +462,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
                 eventActionFactory,
                 downloaderApi,
                 inAppDownloader,
-                stringStorage,
-                sdkEventFlow
+                stringStorage
             )
         val applyRemoteConfigState = ApplyRemoteConfigState(
             remoteConfigHandler
@@ -498,7 +490,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
     }
 
     override val sdkEventFlow: MutableSharedFlow<SdkEvent> by lazy {
-        MutableSharedFlow()
+        MutableSharedFlow(replay = 10)  // TODO: configure replay cache
     }
 
 
@@ -559,7 +551,6 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
 
     private val platformInitializer: PlatformInitializerApi by lazy {
         dependencyCreator.createPlatformInitializer(
-            sdkEventFlow,
             pushActionFactory,
             pushActionHandler
         )
