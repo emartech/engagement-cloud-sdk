@@ -1,21 +1,44 @@
 package com.emarsys.service
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
+import io.mockk.CapturingSlot
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkObject
+import io.mockk.slot
+import io.mockk.unmockkAll
 import io.mockk.verify
+import org.json.JSONObject
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import java.lang.reflect.Field
 
 class EmarsysFirebaseMessagingServiceTest {
+    companion object {
+        const val PACKAGE_NAME = "com.emarsys.package"
+    }
+
     private lateinit var emarsysFirebaseMessagingService: EmarsysFirebaseMessagingService
+    private lateinit var mockContext: Context
+    private lateinit var mockReceiver: BroadcastReceiver
 
     @Before
     fun setup() {
+        mockReceiver = mockk(relaxed = true)
+
+        mockContext = mockk(relaxed = true)
+        every { mockContext.applicationContext } returns mockContext
+        every { mockContext.packageName } returns PACKAGE_NAME
+
         emarsysFirebaseMessagingService = EmarsysFirebaseMessagingService()
         setField(
             emarsysFirebaseMessagingService,
@@ -23,6 +46,12 @@ class EmarsysFirebaseMessagingServiceTest {
             "mBase",
             InstrumentationRegistry.getInstrumentation().targetContext
         )
+    }
+
+    @After
+    fun tearDown() {
+        unmockkAll()
+        EmarsysFirebaseMessagingService.messagingServices.clear()
     }
 
     @Test
@@ -42,6 +71,53 @@ class EmarsysFirebaseMessagingServiceTest {
     }
 
     @Test
+    fun onNewToken_shouldSendBroadcast() {
+        val pushToken = "testPushToken"
+        val intentSlot: CapturingSlot<Intent> = slot()
+        setField(
+            emarsysFirebaseMessagingService,
+            EmarsysFirebaseMessagingService::class.java,
+            "mBase",
+            mockContext
+        )
+
+        emarsysFirebaseMessagingService.onNewToken(pushToken)
+
+        verify { mockContext.sendBroadcast(capture(intentSlot)) }
+
+        with(intentSlot.captured) {
+            getStringExtra("pushToken") shouldBe pushToken
+            action shouldBe "com.emarsys.sdk.PUSH_TOKEN"
+            `package` shouldBe PACKAGE_NAME
+        }
+    }
+
+    @Test
+    fun onNewToken_shouldSendBroadcast_withAnIntentContaining_thePackageName() {
+        val pushToken = "testPushToken"
+        val intentSlot: CapturingSlot<Intent> = slot()
+
+        registerReceiver("com.emarsys.sdk.PUSH_TOKEN")
+
+        emarsysFirebaseMessagingService.onNewToken(pushToken)
+
+        verify {
+            mockReceiver.onReceive(
+                InstrumentationRegistry.getInstrumentation().targetContext,
+                capture(intentSlot)
+            )
+        }
+
+        with(intentSlot.captured) {
+            getStringExtra("pushToken") shouldBe pushToken
+            action shouldBe "com.emarsys.sdk.PUSH_TOKEN"
+            `package` shouldNotBe null
+        }
+
+        InstrumentationRegistry.getInstrumentation().targetContext.unregisterReceiver(mockReceiver)
+    }
+
+    @Test
     fun onMessageReceived_shouldCallRegisteredMessagingServices() {
         val mockMessagingService = mockk<FirebaseMessagingService>(relaxed = true)
         val mockMessage = mockk<RemoteMessage>(relaxed = true)
@@ -50,6 +126,38 @@ class EmarsysFirebaseMessagingServiceTest {
 
         emarsysFirebaseMessagingService.onMessageReceived(mockMessage)
         verify { mockMessagingService.onMessageReceived(mockMessage) }
+    }
+
+    @Test
+    fun onMessageReceived_shouldSendBroadcast_withAnIntentContaining_thePackageName() {
+        val testPayload = JSONObject("""{"key":"testPayload"}""")
+        mockkObject(FirebaseRemoteMessageMapper)
+        every { FirebaseRemoteMessageMapper.map(any()) } returns testPayload
+        val intentSlot: CapturingSlot<Intent> = slot()
+        val mockMessagingService = mockk<FirebaseMessagingService>(relaxed = true)
+        val mockMessage = mockk<RemoteMessage>(relaxed = true)
+        every { mockMessage.data } returns mapOf()
+
+        registerReceiver("com.emarsys.sdk.PUSH_MESSAGE_PAYLOAD")
+
+        EmarsysFirebaseMessagingService.registerMessagingService(mockMessagingService, true)
+
+        emarsysFirebaseMessagingService.onMessageReceived(mockMessage)
+
+        verify {
+            mockReceiver.onReceive(
+                InstrumentationRegistry.getInstrumentation().targetContext,
+                capture(intentSlot)
+            )
+        }
+
+        with(intentSlot.captured) {
+            getStringExtra("pushPayload") shouldBe testPayload.toString()
+            action shouldBe "com.emarsys.sdk.PUSH_MESSAGE_PAYLOAD"
+            `package` shouldNotBe null
+        }
+
+        InstrumentationRegistry.getInstrumentation().targetContext.unregisterReceiver(mockReceiver)
     }
 
     @Test
@@ -91,5 +199,11 @@ class EmarsysFirebaseMessagingServiceTest {
             is Field -> result
             else -> throw IllegalStateException("Unrecognized type: ${result.javaClass}")
         }
+    }
+
+    private fun registerReceiver(intentFilterAction: String) {
+        InstrumentationRegistry.getInstrumentation().targetContext.registerReceiver(
+            mockReceiver, IntentFilter(intentFilterAction), 4
+        )
     }
 }
