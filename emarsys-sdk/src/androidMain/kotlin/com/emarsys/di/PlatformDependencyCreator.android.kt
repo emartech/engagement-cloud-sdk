@@ -158,7 +158,7 @@ actual class PlatformDependencyCreator actual constructor(
             inAppDownloader
         )
         val silentPushHandler = SilentPushMessageHandler(actionFactory, sdkEventFlow)
-        val pushTokenBroadcastReceiver = PushTokenBroadcastReceiver(sdkDispatcher, pushApi)
+        val pushTokenBroadcastReceiver = PushTokenBroadcastReceiver()
         val pushMessageBroadcastReceiver =
             PushMessageBroadcastReceiver(
                 pushPresenter,

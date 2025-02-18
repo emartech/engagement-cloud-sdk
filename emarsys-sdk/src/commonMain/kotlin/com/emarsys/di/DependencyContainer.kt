@@ -158,7 +158,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
 
     override val uuidProvider: Provider<String> by lazy { UUIDProvider() }
 
-    val sdkDispatcher: CoroutineDispatcher by lazy {
+    override val sdkDispatcher: CoroutineDispatcher by lazy {
         Dispatchers.Default
     }
 

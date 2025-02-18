@@ -1,5 +1,6 @@
 package com.emarsys.di
 
+import com.emarsys.api.push.PushApi
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.providers.Provider
@@ -18,6 +19,7 @@ import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.remoteConfig.RemoteConfigHandlerApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.Json
 
@@ -62,4 +64,8 @@ interface DependencyContainerPrivateApi {
     val sdkContext: SdkContextApi
 
     val sdkEventFlow: MutableSharedFlow<SdkEvent>
+
+    val sdkDispatcher: CoroutineDispatcher
+
+    val pushApi: PushApi
 }
