@@ -15,8 +15,8 @@ import com.emarsys.mobileengage.push.model.AndroidPlatformData
 import com.emarsys.mobileengage.push.model.AndroidSilentPushMessage
 import com.emarsys.mobileengage.push.model.NotificationMethod
 import com.emarsys.mobileengage.push.model.NotificationOperation.INIT
-import com.emarsys.networking.clients.event.model.Event
-import com.emarsys.networking.clients.event.model.EventType
+
+import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.util.JsonUtil
 import dev.mokkery.verifySuspend
 import io.mockk.coEvery
@@ -25,6 +25,8 @@ import io.mockk.mockk
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 import org.junit.Before
 import org.junit.Test
 
@@ -64,7 +66,7 @@ class SilentPushMessageHandlerTest {
     private lateinit var json: Json
     private lateinit var mockInAppDownloader: InAppDownloader
     private lateinit var mockPushActionFactory: PushActionFactory
-    private lateinit var mockSdkEventFlow: MutableSharedFlow<Event>
+    private lateinit var mockSdkEventFlow: MutableSharedFlow<SdkEvent>
 
 
     @Before
@@ -103,11 +105,9 @@ class SilentPushMessageHandlerTest {
 
         verifySuspend {
             mockSdkEventFlow.emit(
-                Event(
-                    EventType.CUSTOM,
-                    PUSH_RECEIVED_EVENT_NAME,
-                    mapOf("campaignId" to CAMPAIGN_ID)
-                )
+                SdkEvent.External.Outgoing.SilentPush(
+                    name = PUSH_RECEIVED_EVENT_NAME,
+                    attributes = buildJsonObject { put("campaignId", JsonPrimitive(CAMPAIGN_ID)) })
             )
         }
     }

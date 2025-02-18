@@ -3,8 +3,7 @@ package com.emarsys.core.badge
 import com.emarsys.api.push.PushConstants.WEB_PUSH_ON_BADGE_COUNT_UPDATE_RECEIVED
 import com.emarsys.mobileengage.action.models.BadgeCount
 import com.emarsys.mobileengage.action.models.BadgeCountMethod
-import com.emarsys.mobileengage.events.SdkEvent
-import com.emarsys.mobileengage.events.SdkEventSource
+import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.util.JsonUtil
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -21,7 +20,8 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.int
+import kotlinx.serialization.json.jsonPrimitive
 import web.broadcast.BroadcastChannel
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -81,9 +81,9 @@ class WebBadgeCountHandlerTest {
 
         events.size shouldBe 1
         events[0].let {
-            it.source shouldBe SdkEventSource.BadgeCount
+            (it is SdkEvent.External.Outgoing.BadgeCount) shouldBe true
             it.name shouldBe testBadgeCount.method.name
-            it.payload?.get("badgeCount") shouldBe testBadgeCount.value
+            it.attributes?.get("badgeCount")?.jsonPrimitive?.int shouldBe testBadgeCount.value
         }
     }
 

@@ -1,6 +1,7 @@
 package com.emarsys.networking.clients.event
 
 import com.emarsys.api.inapp.InAppConfig
+import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
@@ -14,15 +15,17 @@ import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppViewApi
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.networking.clients.event.model.DeviceEventResponse
-import com.emarsys.networking.clients.event.model.Event
 import com.emarsys.networking.clients.event.model.EventResponseInApp
-import com.emarsys.networking.clients.event.model.EventType
+import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.util.JsonUtil
+import dev.mokkery.annotations.DelicateMokkeryApi
+import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.spy
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
@@ -35,14 +38,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlin.test.AfterTest
@@ -52,14 +56,14 @@ import kotlin.test.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class EventClientTests {
     private companion object {
-        val DEVICE_EVENT_STATE = buildJsonObject { }
+        val DEVICE_EVENT_STATE = JsonObject(mapOf("key" to JsonPrimitive("value")))
         const val EVENT_NAME = "test event name"
         const val IN_APP_DND = false
-        const val TIMESTAMP = "testTimestamp"
+        val TIMESTAMP = Clock.System.now()
         const val CAMPAIGN_ID = "testTimestamp"
         val TEST_BASE_URL = Url("https://test-base-url/")
-        val testEventAttributes = mapOf("key" to "value")
-        val testEvent = Event(EventType.CUSTOM, EVENT_NAME, testEventAttributes, TIMESTAMP)
+        val testEventAttributes = buildJsonObject { put("key", JsonPrimitive("value")) }
+        val testEvent = SdkEvent.External.Incoming(EVENT_NAME, testEventAttributes, TIMESTAMP)
     }
 
     init {
@@ -69,7 +73,7 @@ class EventClientTests {
     private lateinit var mockEmarsysClient: NetworkClientApi
     private lateinit var mockUrlFactory: UrlFactoryApi
     private lateinit var mockOnEventActionFactory: ActionFactoryApi<ActionModel>
-    private lateinit var mockSdkEventFlow: MutableSharedFlow<Event>
+    private lateinit var sdkEventFlow: MutableSharedFlow<SdkEvent>
     private lateinit var mockInAppConfig: InAppConfig
     private lateinit var mockInAppPresenter: InAppPresenterApi
     private lateinit var mockInAppViewProvider: InAppViewProviderApi
@@ -78,28 +82,32 @@ class EventClientTests {
     private lateinit var sessionContext: SessionContext
     private lateinit var json: Json
     private lateinit var eventClient: EventClient
+    private lateinit var mockSdkLogger: Logger
 
+    @OptIn(DelicateMokkeryApi::class)
     @BeforeTest
     fun setup() = runTest {
         mockEmarsysClient = mock()
         mockUrlFactory = mock()
         mockOnEventActionFactory = mock()
-        mockSdkEventFlow = mock()
+        sdkEventFlow = spy(MutableSharedFlow(replay = 5))
         mockInAppConfig = mock()
         mockInAppPresenter = mock()
         mockInAppViewProvider = mock()
         mockInAppView = mock()
-
+        mockSdkLogger = mock()
         json = JsonUtil.json
-        sdkDispatcher = StandardTestDispatcher()
+        sdkDispatcher =
+            StandardTestDispatcher()
         sessionContext = SessionContext()
         every { mockInAppConfig.inAppDnd }.returns(IN_APP_DND)
         every { mockUrlFactory.create(EmarsysUrlType.EVENT) }.returns(TEST_BASE_URL)
+        everySuspend { mockSdkLogger.error(any(), any<Throwable>()) } calls {
+            (it.args[1] as Throwable).printStackTrace()
+            throw it.args[1] as Throwable
+        }
         everySuspend { mockInAppViewProvider.provide() } returns mockInAppView
         everySuspend { mockInAppView.load(any()) } returns Unit
-
-        everySuspend { mockSdkEventFlow.filter(any()) }.returns(flowOf(testEvent))
-        everySuspend { mockSdkEventFlow.emit(testEvent) }.returns(Unit)
     }
 
     @AfterTest
@@ -111,9 +119,13 @@ class EventClientTests {
     fun testRegisterEvent_should_send_event_to_channel() = runTest {
         eventClient = createEventClient()
 
+        everySuspend { mockEmarsysClient.send(any()) }.returns(createTestResponse("{}"))
+
         eventClient.registerEvent(testEvent)
 
-        verifySuspend { mockSdkEventFlow.emit(testEvent) }
+        verifySuspend { sdkEventFlow.emit(testEvent) }
+        verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
+
     }
 
     @Test
@@ -122,14 +134,16 @@ class EventClientTests {
 
         advanceUntilIdle()
 
-        verifySuspend { mockSdkEventFlow.filter(any()) }
+        verifySuspend { sdkEventFlow.filter(any()) }
+        verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
+
     }
 
     @Test
     fun testConsumer_should_call_client_with_correct_request() = runTest {
         sessionContext.deviceEventState = DEVICE_EVENT_STATE
 
-        everySuspend { mockEmarsysClient.send(any()) }.returns(createTestResponse())
+        everySuspend { mockEmarsysClient.send(any()) }.returns(createTestResponse("{}"))
         every { mockUrlFactory.create(EmarsysUrlType.EVENT) }.returns(TEST_BASE_URL)
 
         val expectedUrlRequest = createTestRequest(DEVICE_EVENT_STATE)
@@ -141,6 +155,8 @@ class EventClientTests {
         advanceUntilIdle()
 
         verifySuspend { mockEmarsysClient.send(expectedUrlRequest) }
+        verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
+
     }
 
     @Test
@@ -166,6 +182,8 @@ class EventClientTests {
         advanceUntilIdle()
 
         verifySuspend { mockEmarsysClient.send(expectedUrlRequest) }
+        verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
+
         sessionContext.deviceEventState shouldBe expectedDeviceEventState
     }
 
@@ -178,18 +196,19 @@ class EventClientTests {
         val body = json.encodeToString(deviceEventResponse)
 
         everySuspend { mockEmarsysClient.send(any()) }.returns(createTestResponse(body))
+        everySuspend { mockInAppPresenter.present(any(), any()) }.returns(Unit)
 
         val expectedUrlRequest = createTestRequest(null)
 
         eventClient = createEventClient()
 
         eventClient.registerEvent(testEvent)
-
         advanceUntilIdle()
 
         verifySuspend { mockEmarsysClient.send(expectedUrlRequest) }
         verifySuspend { mockInAppViewProvider.provide() }
         verifySuspend { mockInAppView.load(expectedInAppMessage) }
+        verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
     }
 
     @Test
@@ -212,6 +231,8 @@ class EventClientTests {
         verifySuspend { mockEmarsysClient.send(expectedUrlRequest) }
         verifySuspend(VerifyMode.exactly(0)) { mockInAppViewProvider.provide() }
         verifySuspend(VerifyMode.exactly(0)) { mockInAppView.load(any()) }
+        verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
+
     }
 
     @Test
@@ -234,6 +255,8 @@ class EventClientTests {
         verifySuspend(VerifyMode.exactly(0)) { mockInAppViewProvider.provide() }
         verifySuspend(VerifyMode.exactly(0)) { mockInAppView.load(any()) }
         verifySuspend(VerifyMode.exactly(0)) { mockOnEventActionFactory.create(any()) }
+        verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
+
         sessionContext.deviceEventState shouldBe null
     }
 
@@ -241,13 +264,13 @@ class EventClientTests {
         val expectedUrlRequest = UrlRequest(
             TEST_BASE_URL,
             HttpMethod.Post,
-            """{"dnd":$IN_APP_DND,"events":[{"type":"${testEvent.type}","name":"${testEvent.name}","attributes":{"key":"value"},"timestamp":"$TIMESTAMP"}],"deviceEventState":$deviceEventState}""",
+            """{"dnd":$IN_APP_DND,"events":[{"type":"custom","name":"${testEvent.name}","attributes":{"key":"value"},"timestamp":"$TIMESTAMP"}],"deviceEventState":$deviceEventState}""",
         )
         return expectedUrlRequest
     }
 
     private fun createTestResponse(
-        body: String = "",
+        body: String = "{}",
         statusCode: HttpStatusCode = HttpStatusCode.OK
     ) = Response(
         UrlRequest(
@@ -265,7 +288,8 @@ class EventClientTests {
         mockInAppConfig,
         mockInAppPresenter,
         mockInAppViewProvider,
-        mockSdkEventFlow,
+        sdkEventFlow,
+        mockSdkLogger,
         sdkDispatcher
     )
 }

@@ -8,7 +8,8 @@ import com.emarsys.core.providers.Provider
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.session.SessionId
 import com.emarsys.networking.clients.event.EventClientApi
-import com.emarsys.networking.clients.event.model.Event
+
+import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -43,7 +44,7 @@ class MobileEngageSession(
         if (canStartSession()) {
             val sessionStart = timestampProvider.provide()
             try {
-                eventClient.registerEvent(Event.createSessionStart(sessionStart))
+                eventClient.registerEvent(SdkEvent.Internal.Sdk.SessionStart(timestamp = sessionStart))
             } catch (exception: Exception) {
                 sdkLogger.error(
                     LogEntry(
@@ -100,11 +101,11 @@ class MobileEngageSession(
         sessionContext.sessionId = null
     }
 
-    private fun createSessionEndEvent(): Event {
+    private fun createSessionEndEvent(): SdkEvent {
         val sessionEnd = timestampProvider.provide()
         val duration =
             sessionEnd.toEpochMilliseconds() - sessionContext.sessionStart!!
-        return Event.createSessionEnd(duration, sessionEnd)
+        return SdkEvent.Internal.Sdk.SessionEnd(duration, timestamp = sessionEnd)
     }
 
 

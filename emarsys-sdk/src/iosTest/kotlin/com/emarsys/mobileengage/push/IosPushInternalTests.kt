@@ -13,6 +13,7 @@ import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.log.Logger
+import com.emarsys.core.providers.Provider
 import com.emarsys.core.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
@@ -30,8 +31,7 @@ import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
 import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableOpenExternalUrlActionModel
-import com.emarsys.networking.clients.event.model.Event
-import com.emarsys.networking.clients.event.model.EventType
+import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.util.JsonUtil
 import dev.mokkery.answering.returns
@@ -47,7 +47,10 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 import platform.UserNotifications.UNNotificationDefaultActionIdentifier
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -91,8 +94,9 @@ class IosPushInternalTests {
     private lateinit var mockBadgeCountHandler: BadgeCountHandlerApi
     private lateinit var json: Json
     private lateinit var sdkDispatcher: CoroutineDispatcher
-    private lateinit var mockSdkEventFlow: MutableSharedFlow<Event>
+    private lateinit var mockSdkEventFlow: MutableSharedFlow<SdkEvent>
     private lateinit var mockSdkLogger: Logger
+    private lateinit var mockTimestampProvider: Provider<Instant>
 
     @BeforeTest
     fun setup() = runTest {
@@ -107,11 +111,12 @@ class IosPushInternalTests {
         mockActionHandler = mock()
         mockBadgeCountHandler = mock()
         json = JsonUtil.json
+        mockTimestampProvider = mock()
         sdkDispatcher = dispatcher
         mockSdkEventFlow = mock()
         mockSdkLogger = mock()
         everySuspend { mockActionHandler.handleActions(any(), any()) } returns Unit
-
+        everySuspend { mockTimestampProvider.provide() } returns Instant.DISTANT_PAST
         iosPushInternal = IosPushInternal(
             mockPushClient,
             mockStorage,
@@ -123,7 +128,8 @@ class IosPushInternalTests {
             json,
             sdkDispatcher,
             mockSdkLogger,
-            mockSdkEventFlow
+            mockSdkEventFlow,
+            mockTimestampProvider
         )
     }
 
@@ -516,10 +522,10 @@ class IosPushInternalTests {
         verifySuspend { mockOpenExternalUrlAction.invoke() }
         verifySuspend {
             mockSdkEventFlow.emit(
-                Event(
-                    EventType.CUSTOM,
-                    PUSH_RECEIVED_EVENT_NAME,
-                    mapOf("campaignId" to CAMPAIGN_ID)
+                SdkEvent.External.Outgoing.SilentPush(
+                    name = PUSH_RECEIVED_EVENT_NAME,
+                    attributes = buildJsonObject { put("campaignId", JsonPrimitive(CAMPAIGN_ID)) },
+                    timestamp = Instant.DISTANT_PAST
                 )
             )
         }
@@ -539,10 +545,10 @@ class IosPushInternalTests {
         verifySuspend { mockPushClient.clearPushToken() }
         verifySuspend {
             mockSdkEventFlow.emit(
-                Event(
-                    EventType.CUSTOM,
-                    PUSH_RECEIVED_EVENT_NAME,
-                    mapOf("campaignId" to CAMPAIGN_ID)
+                SdkEvent.External.Outgoing.SilentPush(
+                    name = PUSH_RECEIVED_EVENT_NAME,
+                    attributes = buildJsonObject { put("campaignId", JsonPrimitive(CAMPAIGN_ID)) },
+                    timestamp = Instant.DISTANT_PAST
                 )
             )
         }

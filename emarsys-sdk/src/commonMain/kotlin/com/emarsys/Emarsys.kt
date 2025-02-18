@@ -8,7 +8,8 @@ import com.emarsys.api.inbox.InboxApi
 import com.emarsys.api.predict.PredictApi
 import com.emarsys.api.push.PushApi
 import com.emarsys.di.DependencyInjection
-import com.emarsys.networking.clients.event.model.Event
+
+import com.emarsys.networking.clients.event.model.SdkEvent
 import kotlinx.coroutines.flow.SharedFlow
 import kotlin.experimental.ExperimentalObjCRefinement
 import kotlin.native.HiddenFromObjC
@@ -49,7 +50,7 @@ object Emarsys {
         TODO("Not yet implemented")
     }
 
-    val events: SharedFlow<Event>
+    val events: SharedFlow<SdkEvent>
         get()=DependencyInjection.container.events
 
     val push: PushApi

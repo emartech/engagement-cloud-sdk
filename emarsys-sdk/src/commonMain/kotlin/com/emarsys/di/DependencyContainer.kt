@@ -109,7 +109,8 @@ import com.emarsys.networking.clients.device.DeviceClient
 import com.emarsys.networking.clients.device.DeviceClientApi
 import com.emarsys.networking.clients.event.EventClient
 import com.emarsys.networking.clients.event.EventClientApi
-import com.emarsys.networking.clients.event.model.Event
+
+import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClient
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.networking.clients.remoteConfig.RemoteConfigClient
@@ -132,7 +133,6 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -177,10 +177,6 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         )
     }
 
-    private val eventChannel: Channel<Event> by lazy {
-        Channel()
-    }
-
     override val sdkContext: SdkContext by lazy {
         SdkContext(sdkDispatcher, mainDispatcher, defaultUrls, LogLevel.Error, mutableSetOf())
     }
@@ -204,7 +200,8 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             json,
             msgHub,
             pushActionHandler,
-            sdkEventFlow
+            sdkEventFlow,
+            timestampProvider
         )
     }
 
@@ -319,6 +316,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             inAppPresenter,
             inAppViewProvider,
             sdkEventFlow,
+            sdkLogger,
             sdkDispatcher,
         )
     }
@@ -499,12 +497,12 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         SetupOrganizer(meStateMachine, predictStateMachine, sdkContext)
     }
 
-    override val sdkEventFlow: MutableSharedFlow<Event> by lazy {
+    override val sdkEventFlow: MutableSharedFlow<SdkEvent> by lazy {
         MutableSharedFlow()
     }
 
 
-    override val events: SharedFlow<Event> by lazy {
+    override val events: SharedFlow<SdkEvent> by lazy {
         sdkEventFlow.asSharedFlow()
     }
 

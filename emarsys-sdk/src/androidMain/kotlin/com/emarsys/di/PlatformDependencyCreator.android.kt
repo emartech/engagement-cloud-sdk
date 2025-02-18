@@ -64,7 +64,8 @@ import com.emarsys.mobileengage.push.SilentPushMessageHandler
 import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
 import com.emarsys.mobileengage.url.AndroidExternalUrlOpener
 import com.emarsys.networking.clients.event.EventClientApi
-import com.emarsys.networking.clients.event.model.Event
+
+import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.PlatformInitState
 import com.emarsys.setup.PlatformInitializer
@@ -78,6 +79,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import okio.FileSystem
 import java.util.Locale
@@ -90,7 +92,9 @@ actual class PlatformDependencyCreator actual constructor(
     private val json: Json,
     private val msgHub: MsgHubApi,
     private val actionHandler: ActionHandlerApi,
-    private val sdkEventFlow: MutableSharedFlow<Event>
+    private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
+    private val timestampProvider: Provider<Instant>
+
 ) : DependencyCreator {
     private val metadataReader = MetadataReader(applicationContext)
     private val platformInfoCollector = PlatformInfoCollector(applicationContext)
@@ -100,7 +104,7 @@ actual class PlatformDependencyCreator actual constructor(
         applicationContext.getSharedPreferences(StorageConstants.SUITE_NAME, Context.MODE_PRIVATE)
 
     actual override fun createPlatformInitializer(
-        sdkEventFlow: MutableSharedFlow<Event>,
+        sdkEventFlow: MutableSharedFlow<SdkEvent>,
         pushActionFactory: ActionFactoryApi<ActionModel>,
         pushActionHandler: ActionHandlerApi
     ): PlatformInitializerApi {
@@ -142,7 +146,7 @@ actual class PlatformDependencyCreator actual constructor(
         downloaderApi: DownloaderApi,
         inAppDownloader: InAppDownloaderApi,
         storage: TypedStorageApi<String?>,
-        sdkEventFlow: MutableSharedFlow<Event>
+        sdkEventFlow: MutableSharedFlow<SdkEvent>
     ): State {
         val notificationManager =
             (applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
@@ -242,7 +246,7 @@ actual class PlatformDependencyCreator actual constructor(
         actionFactory: ActionFactoryApi<ActionModel>,
         json: Json,
         sdkDispatcher: CoroutineDispatcher,
-        sdkEventFlow: MutableSharedFlow<Event>
+        sdkEventFlow: MutableSharedFlow<SdkEvent>
     ): PushInstance {
         return PushInternal(pushClient, storage, pushContext, sdkLogger)
     }

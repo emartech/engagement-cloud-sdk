@@ -2,8 +2,8 @@ package com.emarsys.api.event
 
 import com.emarsys.api.event.model.CustomEvent
 import com.emarsys.core.providers.Provider
-import com.emarsys.networking.clients.event.model.Event
-import com.emarsys.networking.clients.event.model.EventType
+
+import com.emarsys.networking.clients.event.model.SdkEvent
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.mock
@@ -11,26 +11,27 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 import kotlin.test.Test
 
-class EventTrackerGathererTests  {
+class EventTrackerGathererTests {
 
     private companion object {
         val customEvent = CustomEvent("testEvent", mapOf("testAttribute" to "testValue"))
         val timestamp = Clock.System.now()
 
         val trackEvent = EventTrackerCall.TrackEvent(
-            Event(
-                EventType.CUSTOM,
+            SdkEvent.External.Incoming(
                 "testEvent",
-                mapOf("testAttribute" to "testValue"),
-                timestamp.toString()
+                buildJsonObject { put("testAttribute", JsonPrimitive("testValue")) },
+                timestamp
             )
         )
         val expected: MutableList<EventTrackerCall> = mutableListOf(trackEvent)
     }
 
-    
+
     private lateinit var mockTimestampProvider: Provider<Instant>
     private lateinit var context: EventTrackerContext
     private val gatherer: EventTrackerGatherer by lazy {
@@ -46,7 +47,6 @@ class EventTrackerGathererTests  {
     @Test
     fun testGathering() = runTest {
         gatherer.trackEvent(customEvent)
-
         context.calls shouldBe expected
     }
 }

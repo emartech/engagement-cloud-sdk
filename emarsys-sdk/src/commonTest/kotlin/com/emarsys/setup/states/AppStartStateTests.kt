@@ -2,8 +2,8 @@ package com.emarsys.setup.states
 
 import com.emarsys.core.providers.Provider
 import com.emarsys.networking.clients.event.EventClientApi
-import com.emarsys.networking.clients.event.model.Event
-import com.emarsys.networking.clients.event.model.EventType
+
+import com.emarsys.networking.clients.event.model.SdkEvent
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
@@ -35,12 +35,7 @@ class AppStartStateTests {
     @Test
     fun testActivate_should_send_appStartEvent_with_eventClient_when_it_was_not_completed_yet() =
         runTest {
-            val expectedEvent = Event(
-                EventType.INTERNAL,
-                "app:start",
-                null,
-                timestamp.toString()
-            )
+            val expectedEvent = SdkEvent.Internal.Sdk.AppStart(timestamp = timestamp)
             everySuspend { mockEventClient.registerEvent(expectedEvent) } returns Unit
 
             appStartState.active()
@@ -53,12 +48,7 @@ class AppStartStateTests {
     @Test
     fun testActivate_should_not_send_appStartEvent_with_eventClient_when_it_was_already_completed_yet() =
         runTest {
-            val expectedEvent = Event(
-                EventType.INTERNAL,
-                "app:start",
-                null,
-                timestamp.toString()
-            )
+            val expectedEvent = SdkEvent.Internal.Sdk.AppStart(timestamp = timestamp)
             everySuspend { mockEventClient.registerEvent(expectedEvent) } returns Unit
 
             appStartState.active()

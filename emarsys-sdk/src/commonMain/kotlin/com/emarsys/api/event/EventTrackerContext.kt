@@ -1,7 +1,8 @@
 package com.emarsys.api.event
 
 import com.emarsys.api.generic.ApiContext
-import com.emarsys.networking.clients.event.model.Event
+
+import com.emarsys.networking.clients.event.model.SdkEvent
 import kotlinx.serialization.Serializable
 
 class EventTrackerContext(override val calls: MutableList<EventTrackerCall>) : ApiContext<EventTrackerCall>
@@ -10,5 +11,5 @@ class EventTrackerContext(override val calls: MutableList<EventTrackerCall>) : A
 sealed interface EventTrackerCall {
 
     @Serializable
-    data class TrackEvent(val event: Event) : EventTrackerCall
+    data class TrackEvent(val event: SdkEvent) : EventTrackerCall
 }

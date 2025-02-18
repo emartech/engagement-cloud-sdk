@@ -5,13 +5,15 @@ import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.push.model.AndroidPlatformData
 import com.emarsys.mobileengage.push.model.AndroidSilentPushMessage
-import com.emarsys.networking.clients.event.model.Event
-import com.emarsys.networking.clients.event.model.EventType
+
+import com.emarsys.networking.clients.event.model.SdkEvent
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 
 class SilentPushMessageHandler(
     private val pushActionFactory: ActionFactoryApi<ActionModel>,
-    private val sdkEventFlow: MutableSharedFlow<Event>
+    private val sdkEventFlow: MutableSharedFlow<SdkEvent>
 ) : PushHandler<AndroidPlatformData, AndroidSilentPushMessage> {
 
     override suspend fun handle(pushMessage: AndroidSilentPushMessage) {
@@ -20,12 +22,14 @@ class SilentPushMessageHandler(
         }
 
         sdkEventFlow.emit(
-            Event(
-                EventType.INTERNAL,
-                PUSH_RECEIVED_EVENT_NAME,
-                mapOf("campaignId" to pushMessage.data.campaignId)
-            )
+            SdkEvent.External.Outgoing.SilentPush(
+                name = PUSH_RECEIVED_EVENT_NAME,
+                attributes = buildJsonObject {
+                    put(
+                        "campaignId",
+                        JsonPrimitive(pushMessage.data.campaignId)
+                    )
+                })
         )
-
     }
 }

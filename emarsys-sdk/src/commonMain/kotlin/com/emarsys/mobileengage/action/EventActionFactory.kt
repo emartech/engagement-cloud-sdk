@@ -20,11 +20,12 @@ import com.emarsys.mobileengage.action.models.DismissActionModel
 import com.emarsys.mobileengage.action.models.OpenExternalUrlActionModel
 import com.emarsys.mobileengage.action.models.ReportingActionModel
 import com.emarsys.mobileengage.action.models.RequestPushPermissionActionModel
-import com.emarsys.networking.clients.event.model.Event
+
+import com.emarsys.networking.clients.event.model.SdkEvent
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 class EventActionFactory<ActionModelType>(
-    private val sdkEventFlow: MutableSharedFlow<Event>,
+    private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
     private val permissionHandler: PermissionHandlerApi,
     private val externalUrlOpener: ExternalUrlOpenerApi,
     private val msgHub: MsgHubApi,

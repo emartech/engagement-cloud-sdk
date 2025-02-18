@@ -6,6 +6,6 @@ import kotlinx.serialization.json.JsonObject
 @Serializable
 data class DeviceEventRequestBody(
     val dnd: Boolean = false,
-    val events: List<Event>,
+    val events: List<SdkEvent>,
     val deviceEventState: JsonObject? = null
 )

@@ -39,7 +39,6 @@ import com.emarsys.core.url.WebExternalUrlOpener
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
-import com.emarsys.mobileengage.events.SdkEvent
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandlerApi
 import com.emarsys.mobileengage.inapp.InAppJsBridge
@@ -54,7 +53,7 @@ import com.emarsys.mobileengage.push.PushService
 import com.emarsys.mobileengage.push.PushServiceContext
 import com.emarsys.mobileengage.pushtoinapp.WebPushToInAppHandler
 import com.emarsys.networking.clients.event.EventClientApi
-import com.emarsys.networking.clients.event.model.Event
+import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.PlatformInitState
 import com.emarsys.setup.PlatformInitializer
@@ -69,6 +68,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import web.broadcast.BroadcastChannel
 import web.dom.document
@@ -80,7 +80,8 @@ actual class PlatformDependencyCreator actual constructor(
     private val json: Json,
     private val msgHub: MsgHubApi,
     actionHandler: ActionHandlerApi,
-    sdkEventFlow: MutableSharedFlow<Event>
+    sdkEventFlow: MutableSharedFlow<SdkEvent>,
+    timestampProvider: Provider<Instant>
 ) : DependencyCreator {
 
     actual override fun createPlatformInitializer(

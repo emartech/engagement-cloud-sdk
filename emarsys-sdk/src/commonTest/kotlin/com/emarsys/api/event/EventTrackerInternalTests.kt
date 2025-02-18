@@ -4,8 +4,8 @@ import com.emarsys.api.event.model.CustomEvent
 import com.emarsys.api.generic.ApiContext
 import com.emarsys.core.providers.Provider
 import com.emarsys.networking.clients.event.EventClientApi
-import com.emarsys.networking.clients.event.model.Event
-import com.emarsys.networking.clients.event.model.EventType
+
+import com.emarsys.networking.clients.event.model.SdkEvent
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
@@ -13,6 +13,8 @@ import dev.mokkery.verifySuspend
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -20,19 +22,17 @@ class EventTrackerInternalTests {
     private companion object {
         val timestamp = Clock.System.now()
         val customEvent = CustomEvent("testEvent", mapOf("testAttribute" to "testValue"))
-        val event = Event(
-            EventType.CUSTOM,
+        val event = SdkEvent.External.Incoming(
             "testEvent",
-            mapOf("testAttribute" to "testValue"),
-            timestamp.toString()
+            buildJsonObject { put("testAttribute", JsonPrimitive("testValue")) },
+            timestamp,
         )
-        val event2 =
-            Event(
-                EventType.INTERNAL,
-                "testEvent2",
-                mapOf("testAttribute2" to "testValue2"),
-                timestamp.toString()
-            )
+
+        val event2 = SdkEvent.Internal.Sdk.AppStart(
+            buildJsonObject { put("testAttribute2", JsonPrimitive("testValue2")) },
+            timestamp
+        )
+
         val trackEvent = EventTrackerCall.TrackEvent(event)
         val trackEvent2 = EventTrackerCall.TrackEvent(event2)
         val expectedEvents: MutableList<EventTrackerCall> = mutableListOf(trackEvent, trackEvent2)

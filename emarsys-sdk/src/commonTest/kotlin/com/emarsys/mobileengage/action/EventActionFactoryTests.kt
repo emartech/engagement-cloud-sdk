@@ -18,7 +18,8 @@ import com.emarsys.mobileengage.action.models.BasicCustomEventActionModel
 import com.emarsys.mobileengage.action.models.BasicDismissActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.action.models.RequestPushPermissionActionModel
-import com.emarsys.networking.clients.event.model.Event
+import com.emarsys.networking.clients.event.model.SdkEvent
+
 import dev.mokkery.mock
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeTypeOf
@@ -29,7 +30,7 @@ import kotlin.test.Test
 
 class EventActionFactoryTests {
 
-    private lateinit var mockSdkEventFlow: MutableSharedFlow<Event>
+    private lateinit var mockSdkEventFlow: MutableSharedFlow<SdkEvent>
     private lateinit var mockPermissionHandler: PermissionHandlerApi
     private lateinit var mockBadgeCountHandler: BadgeCountHandlerApi
     private lateinit var mockExternalUrlOpener: ExternalUrlOpenerApi

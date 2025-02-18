@@ -15,6 +15,7 @@ import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.badge.BadgeCountHandlerApi
 import com.emarsys.core.collections.dequeue
 import com.emarsys.core.log.Logger
+import com.emarsys.core.providers.Provider
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.actions.Action
@@ -24,8 +25,8 @@ import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
 import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
-import com.emarsys.networking.clients.event.model.Event
-import com.emarsys.networking.clients.event.model.EventType
+
+import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -35,7 +36,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 import platform.Foundation.NSJSONSerialization
 import platform.Foundation.NSJSONWritingPrettyPrinted
 import platform.Foundation.NSString
@@ -65,7 +69,8 @@ class IosPushInternal(
     private val json: Json,
     private val sdkDispatcher: CoroutineDispatcher,
     private val sdkLogger: Logger,
-    private val sdkEventFlow: MutableSharedFlow<Event>
+    private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
+    private val timestampProvider: Provider<Instant>
 ) : PushInternal(pushClient, storage, pushContext, sdkLogger), IosPushInstance {
     override var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol? =
         null
@@ -88,10 +93,15 @@ class IosPushInternal(
         }
 
         sdkEventFlow.emit(
-            Event(
-                EventType.CUSTOM,
-                PUSH_RECEIVED_EVENT_NAME,
-                mapOf("campaignId" to userInfo.ems.multichannelId)
+            SdkEvent.External.Outgoing.SilentPush(
+                name = PUSH_RECEIVED_EVENT_NAME,
+                attributes = buildJsonObject {
+                    put(
+                        "campaignId",
+                        JsonPrimitive(userInfo.ems.multichannelId)
+                    )
+                },
+                timestamp = timestampProvider.provide()
             )
         )
     }

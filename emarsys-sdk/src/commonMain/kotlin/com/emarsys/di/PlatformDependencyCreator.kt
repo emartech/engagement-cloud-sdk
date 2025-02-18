@@ -28,13 +28,15 @@ import com.emarsys.mobileengage.inapp.InAppHandlerApi
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.networking.clients.event.EventClientApi
-import com.emarsys.networking.clients.event.model.Event
+
+import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.PlatformInitializerApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 
 
@@ -45,11 +47,12 @@ expect class PlatformDependencyCreator(
     json: Json,
     msgHub: MsgHubApi,
     actionHandler: ActionHandlerApi,
-    sdkEventFlow: MutableSharedFlow<Event>
+    sdkEventFlow: MutableSharedFlow<SdkEvent>,
+    timestampProvider: Provider<Instant>
 ) : DependencyCreator {
 
     override fun createPlatformInitializer(
-        sdkEventFlow: MutableSharedFlow<Event>,
+        sdkEventFlow: MutableSharedFlow<SdkEvent>,
         pushActionFactory: ActionFactoryApi<ActionModel>,
         pushActionHandler: ActionHandlerApi
     ): PlatformInitializerApi
@@ -71,7 +74,7 @@ expect class PlatformDependencyCreator(
         downloaderApi: DownloaderApi,
         inAppDownloader: InAppDownloaderApi,
         storage: TypedStorageApi<String?>,
-        sdkEventFlow: MutableSharedFlow<Event>
+        sdkEventFlow: MutableSharedFlow<SdkEvent>
     ): State
 
     override fun createPermissionHandler(): PermissionHandlerApi
@@ -109,7 +112,7 @@ expect class PlatformDependencyCreator(
         actionFactory: ActionFactoryApi<ActionModel>,
         json: Json,
         sdkDispatcher: CoroutineDispatcher,
-        sdkEventFlow: MutableSharedFlow<Event>
+        sdkEventFlow: MutableSharedFlow<SdkEvent>
     ): PushInstance
 
     override fun createPushApi(

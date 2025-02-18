@@ -14,7 +14,8 @@ import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.session.Session
 import com.emarsys.networking.clients.contact.ContactClientApi
 import com.emarsys.networking.clients.device.DeviceClientApi
-import com.emarsys.networking.clients.event.model.Event
+
+import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.remoteConfig.RemoteConfigHandlerApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog

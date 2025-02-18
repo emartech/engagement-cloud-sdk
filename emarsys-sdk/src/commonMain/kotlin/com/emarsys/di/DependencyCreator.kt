@@ -25,7 +25,7 @@ import com.emarsys.mobileengage.inapp.InAppHandlerApi
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.networking.clients.event.EventClientApi
-import com.emarsys.networking.clients.event.model.Event
+import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.PlatformInitializerApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
@@ -37,7 +37,7 @@ import kotlinx.serialization.json.Json
 interface DependencyCreator {
 
     fun createPlatformInitializer(
-        sdkEventFlow: MutableSharedFlow<Event>,
+        sdkEventFlow: MutableSharedFlow<SdkEvent>,
         pushActionFactory: ActionFactoryApi<ActionModel>,
         pushActionHandler: ActionHandlerApi
     ): PlatformInitializerApi
@@ -59,7 +59,7 @@ interface DependencyCreator {
         downloaderApi: DownloaderApi,
         inAppDownloader: InAppDownloaderApi,
         storage: TypedStorageApi<String?>,
-        sdkEventFlow: MutableSharedFlow<Event>
+        sdkEventFlow: MutableSharedFlow<SdkEvent>
     ): State
 
     fun createPermissionHandler(): PermissionHandlerApi
@@ -97,7 +97,7 @@ interface DependencyCreator {
         actionFactory: ActionFactoryApi<ActionModel>,
         json: Json,
         sdkDispatcher: CoroutineDispatcher,
-        sdkEventFlow: MutableSharedFlow<Event>
+        sdkEventFlow: MutableSharedFlow<SdkEvent>
     ): PushInstance
 
     fun createPushApi(

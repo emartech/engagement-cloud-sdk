@@ -19,7 +19,7 @@ import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.action.models.PresentableAppEventActionModel
 import com.emarsys.mobileengage.push.model.NotificationOperation
-import com.emarsys.networking.clients.event.model.Event
+import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.util.JsonUtil
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -56,7 +56,7 @@ class NotificationIntentProcessorTests {
     private lateinit var testScope: CoroutineScope
     private lateinit var mockActionFactory: ActionFactoryApi<ActionModel>
     private lateinit var mockActionHandler: ActionHandlerApi
-    private lateinit var mockSdkEventFlow: MutableSharedFlow<Event>
+    private lateinit var mockSdkEventFlow: MutableSharedFlow<SdkEvent>
     private lateinit var notificationIntentProcessor: NotificationIntentProcessor
 
     @Before
