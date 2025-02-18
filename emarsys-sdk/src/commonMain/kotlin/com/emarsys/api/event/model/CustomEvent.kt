@@ -10,19 +10,15 @@ data class CustomEvent(
     val attributes: Map<String, String>? = null
 )
 
-//TODO are there any better way?
-fun CustomEvent.toSdkEvent(timestamp: Instant): SdkEvent {
-    val deviceEvent = SdkEvent.External.Incoming(
-        name,
-        buildJsonObject {
-            attributes?.forEach { (key, value) ->
-                put(
-                    key,
-                    JsonPrimitive(value)
-                )
-            }
-        },
-        timestamp
-    )
-    return deviceEvent
-}
+fun CustomEvent.toSdkEvent(timestamp: Instant): SdkEvent = SdkEvent.External.Custom(
+    name,
+    buildJsonObject {
+        attributes?.forEach { (key, value) ->
+            put(
+                key,
+                JsonPrimitive(value)
+            )
+        }
+    },
+    timestamp
+)

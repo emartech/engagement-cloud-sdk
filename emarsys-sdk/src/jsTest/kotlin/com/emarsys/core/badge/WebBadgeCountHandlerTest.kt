@@ -81,7 +81,7 @@ class WebBadgeCountHandlerTest {
 
         events.size shouldBe 1
         events[0].let {
-            (it is SdkEvent.External.Outgoing.BadgeCount) shouldBe true
+            (it is SdkEvent.External.Api.BadgeCount) shouldBe true
             it.name shouldBe testBadgeCount.method.name
             it.attributes?.get("badgeCount")?.jsonPrimitive?.int shouldBe testBadgeCount.value
         }

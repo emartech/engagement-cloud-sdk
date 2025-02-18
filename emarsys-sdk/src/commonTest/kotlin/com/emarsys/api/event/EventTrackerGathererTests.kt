@@ -22,7 +22,7 @@ class EventTrackerGathererTests {
         val timestamp = Clock.System.now()
 
         val trackEvent = EventTrackerCall.TrackEvent(
-            SdkEvent.External.Incoming(
+            SdkEvent.External.Custom(
                 "testEvent",
                 buildJsonObject { put("testAttribute", JsonPrimitive("testValue")) },
                 timestamp

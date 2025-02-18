@@ -58,7 +58,7 @@ class EventClient(
 
     private suspend fun startEventConsumer() {
         sdkEventFlow
-            .filter { it is SdkEvent.Internal.Reporting || it is SdkEvent.Internal.Sdk || it is SdkEvent.External.Incoming }
+            .filter { it is SdkEvent.Internal.Reporting || it is SdkEvent.Internal.Sdk || it is SdkEvent.External.Custom }
             .naturalBatching().onEach {
                 try {
                     val url = urlFactory.create(EmarsysUrlType.EVENT)

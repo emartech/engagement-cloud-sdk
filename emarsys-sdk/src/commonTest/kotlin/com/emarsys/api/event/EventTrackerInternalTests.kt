@@ -22,7 +22,7 @@ class EventTrackerInternalTests {
     private companion object {
         val timestamp = Clock.System.now()
         val customEvent = CustomEvent("testEvent", mapOf("testAttribute" to "testValue"))
-        val event = SdkEvent.External.Incoming(
+        val event = SdkEvent.External.Custom(
             "testEvent",
             buildJsonObject { put("testAttribute", JsonPrimitive("testValue")) },
             timestamp,

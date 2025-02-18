@@ -93,7 +93,7 @@ class IosPushInternal(
         }
 
         sdkEventFlow.emit(
-            SdkEvent.External.Outgoing.SilentPush(
+            SdkEvent.External.Api.SilentPush(
                 name = PUSH_RECEIVED_EVENT_NAME,
                 attributes = buildJsonObject {
                     put(

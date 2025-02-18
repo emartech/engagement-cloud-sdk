@@ -63,7 +63,7 @@ class EventClientTests {
         const val CAMPAIGN_ID = "testTimestamp"
         val TEST_BASE_URL = Url("https://test-base-url/")
         val testEventAttributes = buildJsonObject { put("key", JsonPrimitive("value")) }
-        val testEvent = SdkEvent.External.Incoming(EVENT_NAME, testEventAttributes, TIMESTAMP)
+        val testEvent = SdkEvent.External.Custom(EVENT_NAME, testEventAttributes, TIMESTAMP)
     }
 
     init {

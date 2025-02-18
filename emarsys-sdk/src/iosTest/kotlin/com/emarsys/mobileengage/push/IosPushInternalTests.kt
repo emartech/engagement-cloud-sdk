@@ -522,7 +522,7 @@ class IosPushInternalTests {
         verifySuspend { mockOpenExternalUrlAction.invoke() }
         verifySuspend {
             mockSdkEventFlow.emit(
-                SdkEvent.External.Outgoing.SilentPush(
+                SdkEvent.External.Api.SilentPush(
                     name = PUSH_RECEIVED_EVENT_NAME,
                     attributes = buildJsonObject { put("campaignId", JsonPrimitive(CAMPAIGN_ID)) },
                     timestamp = Instant.DISTANT_PAST
@@ -545,7 +545,7 @@ class IosPushInternalTests {
         verifySuspend { mockPushClient.clearPushToken() }
         verifySuspend {
             mockSdkEventFlow.emit(
-                SdkEvent.External.Outgoing.SilentPush(
+                SdkEvent.External.Api.SilentPush(
                     name = PUSH_RECEIVED_EVENT_NAME,
                     attributes = buildJsonObject { put("campaignId", JsonPrimitive(CAMPAIGN_ID)) },
                     timestamp = Instant.DISTANT_PAST

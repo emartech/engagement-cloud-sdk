@@ -23,45 +23,45 @@ sealed interface SdkEvent {
     sealed interface External : SdkEvent {
         @Serializable
         @SerialName("custom")
-        data class Incoming(
+        data class Custom(
             override val name: String,
             override val attributes: JsonObject? = null,
             override val timestamp: Instant = TimestampProvider().provide(),
         ) : External
 
-        sealed interface Outgoing : External {
+        sealed interface Api : External {
             data class Push(
                 override val name: String,
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Outgoing
+            ) : Api
 
             data class InApp(
                 override val name: String,
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Outgoing
+            ) : Api
 
             data class SilentPush(
                 override val name: String,
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
             ) :
-                Outgoing
+                Api
 
             data class OnEventAction(
                 override val name: String,
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
             ) :
-                Outgoing
+                Api
 
             data class BadgeCount(
                 override val name: String,
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
             ) :
-                Outgoing
+                Api
         }
     }
 

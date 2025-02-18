@@ -14,7 +14,7 @@ class AppEventAction(
     override suspend fun invoke(value: SdkEvent?) {
         value?.let {
             sdkEvents.emit(
-                SdkEvent.External.Outgoing.InApp(
+                SdkEvent.External.Api.InApp(
                     action.name,
                     buildJsonObject {
                         action.payload?.forEach { (key, value) ->
