@@ -1,7 +1,7 @@
 package com.emarsys.mobileengage.inapp
 
 interface InAppViewApi {
-
-    suspend fun load(message: InAppMessage)
+    val inAppMessage: InAppMessage
+    suspend fun load(message: InAppMessage): WebViewHolder
 
 }

@@ -40,7 +40,7 @@ import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandlerApi
-import com.emarsys.mobileengage.inapp.InAppJsBridge
+import com.emarsys.mobileengage.inapp.InAppJsBridgeFactory
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppScriptExtractor
 import com.emarsys.mobileengage.inapp.InAppScriptExtractorApi
@@ -133,11 +133,7 @@ actual class PlatformDependencyCreator actual constructor(
         inAppDownloader: InAppDownloaderApi,
         storage: TypedStorageApi<String?>
     ): State {
-        val scope = CoroutineScope(sdkDispatcher)
-        val inappJsBridge = InAppJsBridge(actionFactory, json, scope)
-
         return PlatformInitState(
-            inappJsBridge,
             PushService(pushServiceContext, storage),
             sdkContext
         )
@@ -191,11 +187,14 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createInAppViewProvider(actionFactory: ActionFactoryApi<ActionModel>): InAppViewProviderApi {
-        return WebInAppViewProvider(inappScriptExtractor)
+        return WebInAppViewProvider(
+            inappScriptExtractor,
+            InAppJsBridgeFactory(actionFactory, json, Dispatchers.Main)
+        )
     }
 
     actual override fun createInAppPresenter(): InAppPresenterApi {
-        return WebInAppPresenter(sdkEventFlow)
+        return WebInAppPresenter(sdkEventFlow, sdkContext.sdkDispatcher)
     }
 
     actual override fun createClipboardHandler(): ClipboardHandlerApi {

@@ -28,7 +28,7 @@ class WebPushToInAppHandlerTests {
     fun setup() {
         mockInAppDownloader = mock()
         mockInAppHandler = mock()
-        everySuspend { mockInAppHandler.handle(any()) } returns Unit
+        everySuspend { mockInAppHandler.handle(CAMPAIGN_ID, any()) } returns Unit
 
         webPushToInAppHandler = WebPushToInAppHandler(mockInAppDownloader, mockInAppHandler)
     }
@@ -40,8 +40,8 @@ class WebPushToInAppHandlerTests {
 
         webPushToInAppHandler.handle(testActionModel)
 
-       verifySuspend { mockInAppDownloader.download(URL) }
-       verifySuspend { mockInAppHandler.handle(HTML) }
+        verifySuspend { mockInAppDownloader.download(URL) }
+        verifySuspend { mockInAppHandler.handle(CAMPAIGN_ID, HTML) }
     }
 
     @Test
@@ -51,8 +51,8 @@ class WebPushToInAppHandlerTests {
 
         webPushToInAppHandler.handle(testActionModel)
 
-       verifySuspend { mockInAppDownloader.download(URL) }
-       verifySuspend(VerifyMode.exactly(0)) { mockInAppHandler.handle(any()) }
+        verifySuspend { mockInAppDownloader.download(URL) }
+        verifySuspend(VerifyMode.exactly(0)) { mockInAppHandler.handle(any(), any()) }
     }
 
     @Test
@@ -62,7 +62,7 @@ class WebPushToInAppHandlerTests {
 
         webPushToInAppHandler.handle(testActionModel)
 
-       verifySuspend { mockInAppDownloader.download(URL) }
-       verifySuspend(VerifyMode.exactly(0)) { mockInAppHandler.handle(any()) }
+        verifySuspend { mockInAppDownloader.download(URL) }
+        verifySuspend(VerifyMode.exactly(0)) { mockInAppHandler.handle(any(), any()) }
     }
 }

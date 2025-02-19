@@ -11,6 +11,6 @@ class PushToInAppHandler(
 ) : PushToInAppHandlerApi {
     override suspend fun handle(actionModel: InternalPushToInappActionModel) {
         val html = downloader.download(actionModel.url)
-        html?.let { inAppHandler.handle(it) }
+        html?.let { inAppHandler.handle(actionModel.campaignId, it) }
     }
 }

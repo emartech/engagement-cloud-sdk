@@ -26,17 +26,36 @@ class InAppHandlerTests {
     @Test
     fun handle_shouldPresentInAppHtml() = runTest {
         val html = """<html></html>"""
-
+        val campaignId = "testCampaignId"
         val mockInAppView: InAppViewApi = mock()
-        everySuspend { mockInAppView.load(InAppMessage(html)) } returns Unit
+        val mockWebViewHolder: WebViewHolder = mock()
+        everySuspend {
+            mockInAppView.load(
+                InAppMessage(
+                    campaignId,
+                    html
+                )
+            )
+        } returns mockWebViewHolder
         everySuspend { mockInAppViewProvider.provide() } returns mockInAppView
-        everySuspend { mockInAppPresenter.present(mockInAppView, InAppPresentationMode.Overlay) } returns Unit
+        everySuspend {
+            mockInAppPresenter.present(
+                mockInAppView, mockWebViewHolder,
+                InAppPresentationMode.Overlay
+            )
+        } returns Unit
 
-        inAppHandler.handle(html)
+        inAppHandler.handle(campaignId, html)
 
-        verifySuspend { mockInAppView.load(InAppMessage(html)) }
+        verifySuspend { mockInAppView.load(InAppMessage(campaignId, html)) }
         verifySuspend { mockInAppViewProvider.provide() }
-        verifySuspend { mockInAppPresenter.present(mockInAppView, InAppPresentationMode.Overlay) }
+        verifySuspend {
+            mockInAppPresenter.present(
+                mockInAppView,
+                mockWebViewHolder,
+                InAppPresentationMode.Overlay
+            )
+        }
     }
 
 }

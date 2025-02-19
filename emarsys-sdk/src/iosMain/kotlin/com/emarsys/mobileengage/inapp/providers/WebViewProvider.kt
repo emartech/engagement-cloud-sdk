@@ -1,6 +1,7 @@
 package com.emarsys.mobileengage.inapp.providers
 
-import com.emarsys.core.providers.SuspendProvider
+import com.emarsys.core.factory.Factory
+import com.emarsys.core.factory.SuspendFactory
 import com.emarsys.mobileengage.inapp.InAppJsBridge
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.readValue
@@ -15,12 +16,13 @@ import platform.WebKit.WKWebViewConfiguration
 
 class WebViewProvider(
     private val mainDispatcher: CoroutineDispatcher,
-    private val inAppJsBridge: InAppJsBridge
-) : SuspendProvider<WKWebView> {
+    private val inAppJsBridgeFactory: Factory<String, InAppJsBridge>
+) : SuspendFactory<String, WKWebView> {
 
     @OptIn(ExperimentalForeignApi::class)
-    override suspend fun provide(): WKWebView {
+    override suspend fun create(campaignId: String): WKWebView {
         return withContext(mainDispatcher) {
+            val inAppJsBridge = inAppJsBridgeFactory.create(campaignId)
             val webView =
                 WKWebView(CGRectZero.readValue(), WKWebViewConfiguration().apply {
                     userContentController = inAppJsBridge.registerContentController()

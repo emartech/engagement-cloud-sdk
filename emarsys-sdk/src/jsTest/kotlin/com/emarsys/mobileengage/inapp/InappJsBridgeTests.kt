@@ -51,7 +51,7 @@ class InappJsBridgeTests {
         json = JsonUtil.json
         mockActionFactory = mock()
 
-        inappJsBridge = InAppJsBridge(mockActionFactory, json, sdkScope)
+        inappJsBridge = InAppJsBridge(mockActionFactory, json, sdkScope, CAMPAIGN_ID)
     }
 
     @AfterTest
@@ -152,7 +152,7 @@ class InappJsBridgeTests {
 
     @Test
     fun dismiss_shouldTrigger_actionFactory() = runTest {
-        val testActionModel = BasicDismissActionModel("dismiss")
+        val testActionModel = BasicDismissActionModel(CAMPAIGN_ID)
         everySuspend {
             mockActionFactory.create(action = testActionModel)
         } returns TEST_ACTION

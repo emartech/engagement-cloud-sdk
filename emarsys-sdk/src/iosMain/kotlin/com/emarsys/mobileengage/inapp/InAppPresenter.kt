@@ -5,6 +5,7 @@ import com.emarsys.networking.clients.event.model.SdkEvent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import platform.UIKit.NSLayoutAttributeHeight
@@ -20,38 +21,36 @@ import platform.UIKit.UIWindow
 class InAppPresenter(
     private val windowProvider: WindowProvider,
     private val mainDispatcher: CoroutineDispatcher,
+    private val sdkDispatcher: CoroutineDispatcher,
     private val sdkEventFlow: SharedFlow<SdkEvent>
 ) : InAppPresenterApi {
     override suspend fun present(
-        view: InAppViewApi,
+        inAppView: InAppViewApi,
+        webViewHolder: WebViewHolder,
         mode: InAppPresentationMode,
         animation: InAppPresentationAnimation?
     ) {
         val window = windowProvider.provide()
-        val webView = (view as InAppView).webView
-        if (webView != null) {
-            window.addView(webView)
-        }
+        val webView = (webViewHolder as IosWebViewHolder).webView
+        window.addView(webView)
 
         val originalWindow = withContext(CoroutineScope(mainDispatcher).coroutineContext) {
             val originalWindow =
                 UIApplication.sharedApplication.windows.filter { (it as UIWindow).isKeyWindow() }
                     .map { it as UIWindow }.firstOrNull()
-
-
             window.makeKeyAndVisible()
             originalWindow
         }
+        CoroutineScope(sdkDispatcher).launch {
+            sdkEventFlow.first { it is SdkEvent.Internal.Sdk.Dismiss && it.campaignId == inAppView.inAppMessage.campaignId }
 
-        // todo consume flow and dismiss
-//        sdkEventFlow.subscribe("dismiss") {
-//            CoroutineScope(mainDispatcher).launch {
-//                window.removeFromSuperview()
-//                originalWindow?.makeKeyAndVisible()
-//            }
-//        }
+            withContext(mainDispatcher) {
+                window.removeFromSuperview()
+                originalWindow?.makeKeyAndVisible()
+            }
+
+        }
     }
-
 
     fun UIWindow.addView(view: UIView) {
         CoroutineScope(mainDispatcher).launch {

@@ -13,11 +13,18 @@ import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
 import io.mockk.verify
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Test
+import kotlin.test.AfterTest
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class InAppPresenterTests {
 
     private lateinit var mockCurrentActivityWatchdog: TransitionSafeCurrentActivityWatchdog
@@ -28,9 +35,23 @@ class InAppPresenterTests {
 
     @Before
     fun setup() {
+        val mainDispatcher = StandardTestDispatcher()
+        val sdkDispatcher = StandardTestDispatcher()
+        Dispatchers.setMain(mainDispatcher)
         mockCurrentActivityWatchdog = mockk<TransitionSafeCurrentActivityWatchdog>()
         sdkEventFlow = MutableSharedFlow(replay = 10)
-        inAppPresenter = InAppPresenter(mockCurrentActivityWatchdog, sdkEventFlow)
+        inAppPresenter = InAppPresenter(
+            mockCurrentActivityWatchdog,
+            mainDispatcher,
+            sdkDispatcher,
+            sdkEventFlow,
+            mockk()
+        )
+    }
+
+    @AfterTest
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test
@@ -45,8 +66,9 @@ class InAppPresenterTests {
             }
             coEvery { mockCurrentActivityWatchdog.waitForActivity() } returns mockActivity
             val mockView = mockk<InAppView>()
-
-            inAppPresenter.present(mockView, InAppPresentationMode.Overlay)
+            val mockWebViewHolder = mockk<WebViewHolder>()
+            coEvery { mockView.load(any()) } returns mockWebViewHolder
+            inAppPresenter.present(mockView, mockWebViewHolder, InAppPresentationMode.Overlay)
 
             verify { mockFragmentManager.beginTransaction() }
             verify { mockFragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN) }
@@ -68,8 +90,9 @@ class InAppPresenterTests {
             val mockActivity = mockk<Activity>()
             coEvery { mockCurrentActivityWatchdog.waitForActivity() } returns mockActivity
             val mockView = mockk<InAppView>()
-
-            inAppPresenter.present(mockView, InAppPresentationMode.Overlay)
+            val mockWebViewHolder = mockk<WebViewHolder>()
+            coEvery { mockView.load(any()) } returns mockWebViewHolder
+            inAppPresenter.present(mockView, mockWebViewHolder, InAppPresentationMode.Overlay)
 
             verify { mockActivity.fragmentManager() }
             verify { mockActivity wasNot Called }

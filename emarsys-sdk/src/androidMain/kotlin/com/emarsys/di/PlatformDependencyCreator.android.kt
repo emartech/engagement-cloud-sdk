@@ -217,7 +217,13 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createInAppPresenter(): InAppPresenterApi {
-        return InAppPresenter(currentActivityWatchdog, sdkEventFlow.asSharedFlow())
+        return InAppPresenter(
+            currentActivityWatchdog,
+            sdkContext.mainDispatcher,
+            sdkContext.sdkDispatcher,
+            sdkEventFlow.asSharedFlow(),
+            sdkLogger
+        )
     }
 
     actual override fun createClipboardHandler(): ClipboardHandlerApi {

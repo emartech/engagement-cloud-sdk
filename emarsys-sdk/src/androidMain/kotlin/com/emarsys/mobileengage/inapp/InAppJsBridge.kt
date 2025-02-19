@@ -17,7 +17,8 @@ import kotlinx.serialization.json.Json
 class InAppJsBridge(
     private val actionFactory: ActionFactoryApi<ActionModel>,
     private val json: Json,
-    private val sdkScope: CoroutineScope
+    private val sdkScope: CoroutineScope,
+    private val campaignId: String
 ) {
 
 
@@ -68,7 +69,7 @@ class InAppJsBridge(
     fun close(jsonString: String) {
         sdkScope.launch {
             val actionModel = json.decodeFromString<BasicDismissActionModel>(jsonString)
-            actionModel.campaignId = "dismiss"
+            actionModel.campaignId = campaignId
             actionFactory.create(actionModel)()
         }
     }

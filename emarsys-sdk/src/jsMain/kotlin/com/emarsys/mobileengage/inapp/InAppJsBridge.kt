@@ -17,7 +17,8 @@ import web.window.window
 class InAppJsBridge(
     private val actionFactory: ActionFactoryApi<ActionModel>,
     private val json: Json,
-    private val sdkScope: CoroutineScope
+    private val sdkScope: CoroutineScope,
+    private val campaignId: String
 ) : InAppJsBridgeApi {
 
     override fun register() {
@@ -37,7 +38,8 @@ class InAppJsBridge(
         @JsName("buttonClicked")
         fun buttonClicked(jsonString: String) {
             sdkScope.launch {
-                val actionModel = json.decodeFromString<BasicInAppButtonClickedActionModel>(jsonString)
+                val actionModel =
+                    json.decodeFromString<BasicInAppButtonClickedActionModel>(jsonString)
                 actionFactory.create(actionModel)()
             }
         }
@@ -53,7 +55,8 @@ class InAppJsBridge(
         @JsName("requestPushPermission")
         fun requestPushPermission(jsonString: String) {
             sdkScope.launch {
-                val actionModel = json.decodeFromString<RequestPushPermissionActionModel>(jsonString)
+                val actionModel =
+                    json.decodeFromString<RequestPushPermissionActionModel>(jsonString)
                 actionFactory.create(actionModel)()
             }
         }
@@ -70,7 +73,7 @@ class InAppJsBridge(
         fun dismiss(jsonString: String) {
             sdkScope.launch {
                 val actionModel = json.decodeFromString<BasicDismissActionModel>(jsonString)
-                actionModel.campaignId = "dismiss"
+                actionModel.campaignId = campaignId
                 actionFactory.create(actionModel)()
             }
         }

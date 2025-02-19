@@ -4,21 +4,31 @@ import android.app.Activity
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import com.emarsys.core.log.Logger
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.watchdog.activity.TransitionSafeCurrentActivityWatchdog
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class InAppPresenter(
     private val currentActivityWatchdog: TransitionSafeCurrentActivityWatchdog,
-    private val sdkEventFlow: SharedFlow<SdkEvent>
+    private val mainDispatcher: CoroutineDispatcher,
+    private val sdkDispatcher: CoroutineDispatcher,
+    private val sdkEventFlow: SharedFlow<SdkEvent>,
+    private val logger: Logger
 ) : InAppPresenterApi {
 
     override suspend fun present(
-        view: InAppViewApi,
+        inAppView: InAppViewApi,
+        webViewHolder: WebViewHolder,
         mode: InAppPresentationMode,
         animation: InAppPresentationAnimation?
     ) {
-        val inAppDialog = InAppDialog(view as InAppView)
+        val inAppDialog = InAppDialog(inAppView as InAppView)
         val currentActivity = currentActivityWatchdog.waitForActivity()
         currentActivity.fragmentManager()?.let {
             it.beginTransaction().run {
@@ -28,8 +38,13 @@ class InAppPresenter(
                 commit()
             }
         }
-
-        // todo consume flow and dismiss
+        CoroutineScope(sdkDispatcher).launch {
+            sdkEventFlow.first { it is SdkEvent.Internal.Sdk.Dismiss && it.campaignId == inAppView.inAppMessage.campaignId }
+            withContext(mainDispatcher) {
+                logger.debug("InAppPresenter", "dismiss inapp dialog")
+                inAppDialog.dismiss()
+            }
+        }
     }
 }
 

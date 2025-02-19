@@ -11,6 +11,9 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
 class InAppJsBridgeProviderTest {
+    private companion object {
+        const val CAMPAIGN_ID = "campaignId"
+    }
 
     @Test
     fun provide_shouldReturn_inAppJsBridgeApi() = runTest {
@@ -21,6 +24,6 @@ class InAppJsBridgeProviderTest {
             CoroutineScope(StandardTestDispatcher())
         )
 
-        inAppJsBridgeProvider.provide()::class.java shouldBe InAppJsBridge::class.java
+        inAppJsBridgeProvider.create(CAMPAIGN_ID)::class.java shouldBe InAppJsBridge::class.java
     }
 }

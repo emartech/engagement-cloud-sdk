@@ -1,12 +1,21 @@
 package com.emarsys.mobileengage.inapp
 
+import com.emarsys.core.factory.Factory
 import web.dom.document
 import web.html.HTMLElement
 
-class WebInAppView(private val inappScriptExtractor: InAppScriptExtractorApi) : InAppViewApi {
-    var inappView: HTMLElement? = null
+class WebInAppView(
+    private val inappScriptExtractor: InAppScriptExtractorApi,
+    private val inAppJsBridgeFactory: Factory<String, InAppJsBridge>
+) : InAppViewApi {
 
-    override suspend fun load(message: InAppMessage) {
+    private lateinit var mInAppMessage: InAppMessage
+    override val inAppMessage: InAppMessage
+        get() = mInAppMessage
+
+    override suspend fun load(message: InAppMessage): WebViewHolder {
+        val jsBridge = inAppJsBridgeFactory.create(message.campaignId)
+        jsBridge.register()
         val view = document.createElement("div")
         view.innerHTML = message.html
 
@@ -15,7 +24,7 @@ class WebInAppView(private val inappScriptExtractor: InAppScriptExtractorApi) : 
             view.appendChild(scriptElement)
         }
 
-        inappView = view
+        return WebWebViewHolder(view)
     }
 
     private fun createScriptElements(scriptTexts: List<String>): List<HTMLElement> {

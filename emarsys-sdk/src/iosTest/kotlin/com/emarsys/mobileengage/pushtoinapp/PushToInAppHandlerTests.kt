@@ -27,7 +27,7 @@ class PushToInAppHandlerTests {
     @BeforeTest
     fun setup() {
         mockInAppHandler = mock()
-        everySuspend { mockInAppHandler.handle(HTML) } returns Unit
+        everySuspend { mockInAppHandler.handle(CAMPAIGN_ID, HTML) } returns Unit
         mockInAppDownLoader = mock()
         pushToInAppHandler = PushToInAppHandler(mockInAppDownLoader, mockInAppHandler)
     }
@@ -40,7 +40,7 @@ class PushToInAppHandlerTests {
 
         verifySuspend {
             mockInAppDownLoader.download(URL)
-            mockInAppHandler.handle(HTML)
+            mockInAppHandler.handle(CAMPAIGN_ID, HTML)
         }
     }
 
@@ -55,7 +55,7 @@ class PushToInAppHandlerTests {
         }
 
         verifySuspend(VerifyMode.exactly(0)) {
-            mockInAppHandler.handle(HTML)
+            mockInAppHandler.handle(CAMPAIGN_ID, HTML)
         }
     }
 }

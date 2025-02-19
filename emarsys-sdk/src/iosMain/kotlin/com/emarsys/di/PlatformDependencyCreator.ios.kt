@@ -40,11 +40,11 @@ import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandlerApi
-import com.emarsys.mobileengage.inapp.InAppJsBridge
 import com.emarsys.mobileengage.inapp.InAppPresenter
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppViewProvider
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
+import com.emarsys.mobileengage.inapp.providers.InAppJsBridgeProvider
 import com.emarsys.mobileengage.inapp.providers.SceneProvider
 import com.emarsys.mobileengage.inapp.providers.ViewControllerProvider
 import com.emarsys.mobileengage.inapp.providers.WebViewProvider
@@ -56,14 +56,12 @@ import com.emarsys.mobileengage.push.IosPushInternal
 import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
 import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.event.model.SdkEvent
-
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.PlatformInitializer
 import com.emarsys.setup.PlatformInitializerApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
@@ -174,11 +172,11 @@ actual class PlatformDependencyCreator actual constructor(
             sdkContext.mainDispatcher,
             WebViewProvider(
                 sdkContext.mainDispatcher,
-                InAppJsBridge(
+                InAppJsBridgeProvider(
                     actionFactory,
                     json,
-                    CoroutineScope(sdkContext.mainDispatcher),
-                    CoroutineScope(sdkContext.sdkDispatcher),
+                    sdkContext.mainDispatcher,
+                    sdkContext.sdkDispatcher,
                     sdkLogger
                 )
             )
@@ -191,8 +189,10 @@ actual class PlatformDependencyCreator actual constructor(
                 sceneProvider = SceneProvider(UIApplication.sharedApplication),
                 viewControllerProvider = ViewControllerProvider(),
                 mainDispatcher = sdkContext.mainDispatcher
-            ), mainDispatcher = sdkContext.mainDispatcher,
-            sdkEventFlow
+            ),
+            sdkContext.mainDispatcher,
+            sdkContext.sdkDispatcher,
+            sdkEventFlow,
         )
     }
 

@@ -2,9 +2,8 @@ package com.emarsys.mobileengage.inapp
 
 import androidx.test.core.app.ActivityScenario
 import com.emarsys.FakeActivity
-import com.emarsys.core.providers.Provider
+import com.emarsys.core.factory.Factory
 import io.kotest.matchers.shouldBe
-import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.runTest
@@ -18,9 +17,7 @@ class InAppViewProviderTests {
 
     @Before
     fun setup() {
-        val mockJsBridge: InAppJsBridge = mockk(relaxed = true)
-        val mockInAppJsBridgeProvider: Provider<InAppJsBridge> = mockk(relaxed = true)
-        every { mockInAppJsBridgeProvider.provide() } returns mockJsBridge
+        val mockInAppJsBridgeProvider: Factory<String, InAppJsBridge> = mockk(relaxed = true)
         activityScenario =
             ActivityScenario.launch(FakeActivity::class.java)
         activityScenario.onActivity {
@@ -39,6 +36,5 @@ class InAppViewProviderTests {
         val view = provider.provide()
 
         (view is InAppView) shouldBe true
-
     }
 }

@@ -70,22 +70,26 @@ sealed interface SdkEvent {
         @Serializable
         @SerialName("internal")
         sealed class Sdk(override val name: String) : Internal {
+
             data class Metric(
                 override val name: String,
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
             ) : Sdk(name)
 
+            @Serializable
             data class AppStart(
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
             ) : Sdk(APP_START_EVENT_NAME)
 
+            @Serializable
             data class SessionStart(
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
             ) : Sdk(SESSION_START_EVENT_NAME)
 
+            @Serializable
             data class SessionEnd(
                 val duration: Long,
                 override val attributes: JsonObject? = buildJsonObject {
@@ -97,6 +101,7 @@ sealed interface SdkEvent {
                 override val timestamp: Instant = TimestampProvider().provide(),
             ) : Sdk(SESSION_END_EVENT_NAME)
 
+            @Serializable
             data class Dismiss(
                 val campaignId: String,
                 override val attributes: JsonObject? = null,
@@ -104,39 +109,47 @@ sealed interface SdkEvent {
             ) : Sdk(DISMISS_EVENT_NAME)
         }
 
+        @Serializable
         sealed class Push(
             override val name: String
         ) : Internal {
+            @Serializable
             data class Clicked(
                 override val attributes: JsonObject?,
                 override val timestamp: Instant = TimestampProvider().provide(),
             ) : Push(PUSH_CLICKED_EVENT_NAME), Reporting
         }
 
+        @Serializable
         sealed class InApp(override val name: String) : Internal {
+            @Serializable
             data class Viewed(
                 override val attributes: JsonObject?,
                 override val timestamp: Instant = TimestampProvider().provide(),
             ) : InApp(INAPP_VIEWED_EVENT_NAME), Reporting
 
+            @Serializable
             data class ButtonClicked(
                 override val attributes: JsonObject?,
                 override val timestamp: Instant = TimestampProvider().provide(),
             ) : InApp(IN_APP_BUTTON_CLICKED_EVENT_NAME), Reporting
         }
 
+        @Serializable
         data class SilentPush(
             override val name: String,
             override val attributes: JsonObject?,
             override val timestamp: Instant,
         ) : Internal
 
+        @Serializable
         data class OnEventAction(
             override val name: String,
             override val attributes: JsonObject?,
             override val timestamp: Instant,
         ) : Internal
 
+        @Serializable
         data class BadgeCount(
             override val name: String,
             override val attributes: JsonObject?,

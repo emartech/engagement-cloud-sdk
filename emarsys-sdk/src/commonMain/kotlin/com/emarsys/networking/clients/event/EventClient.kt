@@ -113,8 +113,8 @@ class EventClient(
     private suspend fun handleInApp(message: EventResponseInApp?) {
         if (message != null && message.html.isNotEmpty()) {
             val view = inAppViewProvider.provide()
-            view.load(InAppMessage(html = message.html))
-            inAppPresenter.present(view, InAppPresentationMode.Overlay)
+            val webViewHolder = view.load(InAppMessage(message.campaignId, message.html))
+            inAppPresenter.present(view, webViewHolder, InAppPresentationMode.Overlay)
         }
     }
 }

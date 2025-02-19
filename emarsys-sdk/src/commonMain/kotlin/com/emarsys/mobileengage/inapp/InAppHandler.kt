@@ -4,11 +4,12 @@ import com.emarsys.mobileengage.inapp.InAppPresentationMode.Overlay
 
 class InAppHandler(
     private val inAppViewProvider: InAppViewProviderApi,
-    private val inAppPresenter: InAppPresenterApi): InAppHandlerApi {
+    private val inAppPresenter: InAppPresenterApi
+) : InAppHandlerApi {
 
-    override suspend fun handle(html: String) {
+    override suspend fun handle(campaignId: String, html: String) {
         val view = inAppViewProvider.provide()
-        view.load(InAppMessage(html))
-        inAppPresenter.present(view, Overlay)
+        val webViewHolder = view.load(InAppMessage(campaignId, html))
+        inAppPresenter.present(view, webViewHolder, Overlay)
     }
 }

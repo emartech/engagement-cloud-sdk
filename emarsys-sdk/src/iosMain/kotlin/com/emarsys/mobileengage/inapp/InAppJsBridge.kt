@@ -11,6 +11,7 @@ import com.emarsys.mobileengage.action.models.BasicInAppButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.action.models.RequestPushPermissionActionModel
 import com.emarsys.util.JsonUtil
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -25,9 +26,10 @@ import platform.darwin.NSObject
 class InAppJsBridge(
     private val actionFactory: ActionFactoryApi<ActionModel>,
     private val json: Json,
-    private val mainScope: CoroutineScope,
-    private val sdkScope: CoroutineScope,
-    private val logger: Logger
+    private val mainDispatcher: CoroutineDispatcher,
+    private val sdkDispatcher: CoroutineDispatcher,
+    private val logger: Logger,
+    private val campaignId: String
 ) : NSObject(), WKScriptMessageHandlerProtocol {
 
     private val jsCommandNames = listOf(
@@ -41,6 +43,8 @@ class InAppJsBridge(
     )
 
     private fun handleActions(didReceiveScriptMessage: WKScriptMessage) {
+        val sdkScope = CoroutineScope(sdkDispatcher)
+        val mainScope = CoroutineScope(mainDispatcher)
         sdkScope.launch {
             val body: String = withContext(mainScope.coroutineContext) {
                 (didReceiveScriptMessage.body as NSDictionary).toJsonString()
@@ -90,7 +94,7 @@ class InAppJsBridge(
                 "close" -> {
                     val actionModel =
                         json.decodeFromString<BasicDismissActionModel>(body)
-                    actionModel.campaignId = "dismiss"
+                    actionModel.campaignId = campaignId
                     actionFactory.create(actionModel)()
                 }
 
@@ -124,8 +128,7 @@ class InAppJsBridge(
         handleActions(didReceiveScriptMessage)
     }
 
-    private fun NSDictionary.toMap(): Map<String, String?>
-    {
+    private fun NSDictionary.toMap(): Map<String, String?> {
         val map = mutableMapOf<String, String?>()
         val keys = this.allKeys
         for (key in keys) {

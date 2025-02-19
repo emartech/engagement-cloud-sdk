@@ -1,22 +1,40 @@
 package com.emarsys.mobileengage.inapp
 
+import com.emarsys.core.factory.Factory
+import com.emarsys.util.JsonUtil
+import dev.mokkery.answering.returns
+import dev.mokkery.every
+import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class WebInappViewTests {
+    private companion object {
+        const val CAMPAIGN_ID = "campaignId"
+    }
 
     private lateinit var webInappView: WebInAppView
     private lateinit var inappScriptExtractor: InAppScriptExtractorApi
+    private lateinit var mockInAppJsBridgeFactory: Factory<String, InAppJsBridge>
 
     @BeforeTest
     fun setup() {
         inappScriptExtractor = InAppScriptExtractor()
-        webInappView = WebInAppView(inappScriptExtractor)
+        mockInAppJsBridgeFactory = mock()
+        every { mockInAppJsBridgeFactory.create(CAMPAIGN_ID) } returns InAppJsBridge(
+            mock(),
+            JsonUtil.json,
+            mock(),
+            CAMPAIGN_ID
+        )
+        webInappView = WebInAppView(inappScriptExtractor, mockInAppJsBridgeFactory)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun load_shouldSetTheHtmlContent_andAddScripts() = runTest {
         val testScriptContent1 = "script1"
@@ -33,21 +51,19 @@ class WebInappViewTests {
             </body>
             </html>"""
 
-        val testMessage = InAppMessage(testHtml)
+        val testMessage = InAppMessage(CAMPAIGN_ID, testHtml)
 
-        webInappView.load(testMessage)
-
-        webInappView.inappView shouldNotBe null
-
-        webInappView.inappView?.let {
-            it.querySelectorAll("script").length shouldBe 4
-            it.innerHTML.contains("<script>$testScriptContent1</script>") shouldBe true
-            it.innerHTML.contains("<script>$testScriptContent2</script>") shouldBe true
-            it.querySelector("div") shouldNotBe null
-            it.querySelector("button") shouldNotBe null
-            it.querySelector("h3") shouldNotBe null
-        }
+        val webViewHolder: WebWebViewHolder = webInappView.load(testMessage) as WebWebViewHolder
+        val webView = webViewHolder.webView
+        webView shouldNotBe null
+        webView.querySelectorAll("script").length shouldBe 4
+        webView.innerHTML.contains("<script>$testScriptContent1</script>") shouldBe true
+        webView.innerHTML.contains("<script>$testScriptContent2</script>") shouldBe true
+        webView.querySelector("div") shouldNotBe null
+        webView.querySelector("button") shouldNotBe null
+        webView.querySelector("h3") shouldNotBe null
     }
+
 
     @Test
     fun load_shouldSetTheHtmlContent_withOutScripts() = runTest {
@@ -62,13 +78,13 @@ class WebInappViewTests {
             </body>
             </html>"""
 
-        val testMessage = InAppMessage(testHtml)
+        val testMessage = InAppMessage(CAMPAIGN_ID, testHtml)
 
-        webInappView.load(testMessage)
+        val webViewHolder: WebWebViewHolder = webInappView.load(testMessage) as WebWebViewHolder
 
-        webInappView.inappView shouldNotBe null
+        webViewHolder.webView shouldNotBe null
 
-        webInappView.inappView?.let {
+        webViewHolder.webView.let {
             it.querySelectorAll("script").length shouldBe 0
             it.querySelector("div") shouldNotBe null
             it.querySelector("button") shouldNotBe null

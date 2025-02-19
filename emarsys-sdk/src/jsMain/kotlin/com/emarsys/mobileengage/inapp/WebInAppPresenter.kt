@@ -1,26 +1,38 @@
 package com.emarsys.mobileengage.inapp
 
 import com.emarsys.networking.clients.event.model.SdkEvent
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import web.dom.document
 import web.html.HTMLElement
 
-class WebInAppPresenter(private val sdkEventFlow: SharedFlow<SdkEvent>) : InAppPresenterApi {
+class WebInAppPresenter(
+    private val sdkEventFlow: SharedFlow<SdkEvent>,
+    private val sdkDispatcher: CoroutineDispatcher
+) : InAppPresenterApi {
     override suspend fun present(
         view: InAppViewApi,
+        webViewHolder: WebViewHolder,
         mode: InAppPresentationMode,
         animation: InAppPresentationAnimation?
     ) {
-        val inappView = (view as WebInAppView).inappView
-        val styledInappView = inappView?.let {
+        val inappView = (webViewHolder as WebWebViewHolder).webView
+        val styledInappView = inappView.let {
             if (mode == InAppPresentationMode.Overlay) {
                 applyOverlayStyle(inappView)
             } else {
                 applyRibbonStyle(inappView)
             }
         }
-        // todo consume flow and dismiss
-        styledInappView?.let { document.body.appendChild(it) }
+        CoroutineScope(sdkDispatcher).launch {
+            sdkEventFlow.first { it is SdkEvent.Internal.Sdk.Dismiss && it.campaignId == view.inAppMessage.campaignId }
+            styledInappView.remove()
+        }
+
+        styledInappView.let { document.body.appendChild(it) }
     }
 
     private fun applyOverlayStyle(viewContainer: HTMLElement): HTMLElement {

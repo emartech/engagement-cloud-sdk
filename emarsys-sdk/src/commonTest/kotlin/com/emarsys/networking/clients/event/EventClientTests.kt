@@ -14,6 +14,7 @@ import com.emarsys.mobileengage.inapp.InAppMessage
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppViewApi
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
+import com.emarsys.mobileengage.inapp.WebViewHolder
 import com.emarsys.networking.clients.event.model.DeviceEventResponse
 import com.emarsys.networking.clients.event.model.EventResponseInApp
 import com.emarsys.networking.clients.event.model.SdkEvent
@@ -83,6 +84,7 @@ class EventClientTests {
     private lateinit var json: Json
     private lateinit var eventClient: EventClient
     private lateinit var mockSdkLogger: Logger
+    private lateinit var mockWebViewHolder: WebViewHolder
 
     @OptIn(DelicateMokkeryApi::class)
     @BeforeTest
@@ -97,6 +99,7 @@ class EventClientTests {
         mockInAppView = mock()
         mockSdkLogger = mock()
         json = JsonUtil.json
+        mockWebViewHolder = mock()
         sdkDispatcher =
             StandardTestDispatcher()
         sessionContext = SessionContext()
@@ -107,7 +110,7 @@ class EventClientTests {
             throw it.args[1] as Throwable
         }
         everySuspend { mockInAppViewProvider.provide() } returns mockInAppView
-        everySuspend { mockInAppView.load(any()) } returns Unit
+        everySuspend { mockInAppView.load(any()) } returns mockWebViewHolder
     }
 
     @AfterTest
@@ -191,12 +194,12 @@ class EventClientTests {
     fun testConsumer_shouldHandleInApp_whenHtml_isPresent() = runTest {
         val html = "testHtml"
         val testInapp = EventResponseInApp(CAMPAIGN_ID, html)
-        val expectedInAppMessage = InAppMessage(html)
+        val expectedInAppMessage = InAppMessage(CAMPAIGN_ID, html)
         val deviceEventResponse = DeviceEventResponse(testInapp, null, null)
         val body = json.encodeToString(deviceEventResponse)
 
         everySuspend { mockEmarsysClient.send(any()) }.returns(createTestResponse(body))
-        everySuspend { mockInAppPresenter.present(any(), any()) }.returns(Unit)
+        everySuspend { mockInAppPresenter.present(any(), any(), any()) }.returns(Unit)
 
         val expectedUrlRequest = createTestRequest(null)
 

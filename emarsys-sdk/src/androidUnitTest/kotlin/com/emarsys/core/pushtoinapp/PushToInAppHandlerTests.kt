@@ -40,7 +40,7 @@ class PushToInAppHandlerTests {
 
         pushToInAppHandler.handle(testInappAction)
 
-        coVerify { mockInAppHandler.handle(HTML) }
+        coVerify { mockInAppHandler.handle(CAMPAIGN_ID, HTML) }
     }
 
     @Test
@@ -51,7 +51,7 @@ class PushToInAppHandlerTests {
 
         pushToInAppHandler.handle(testInappAction)
 
-        coVerify(exactly = 0) { mockInAppHandler.handle(any()) }
+        coVerify(exactly = 0) { mockInAppHandler.handle(any(), any()) }
     }
 
     @Test
@@ -65,7 +65,7 @@ class PushToInAppHandlerTests {
         pushToInAppHandler.handle(testInappAction)
 
         coVerify { mockInAppDownloader.download(INAPP_URL) }
-        coVerify { mockInAppHandler.handle(HTML) }
+        coVerify { mockInAppHandler.handle(CAMPAIGN_ID, HTML) }
     }
 
     @Test
@@ -79,6 +79,6 @@ class PushToInAppHandlerTests {
         pushToInAppHandler.handle(testInappAction)
 
         coVerify { mockInAppDownloader.download(INAPP_URL) }
-        coVerify(exactly = 0) { mockInAppHandler.handle(any()) }
+        coVerify(exactly = 0) { mockInAppHandler.handle(any(), any()) }
     }
 }

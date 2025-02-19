@@ -8,16 +8,12 @@ import com.emarsys.mobileengage.inapp.InAppHandlerApi
 class WebPushToInAppHandler(
     private val downloader: InAppDownloaderApi,
     private val inAppHandler: InAppHandlerApi
-): PushToInAppHandlerApi {
+) : PushToInAppHandlerApi {
     override suspend fun handle(actionModel: InternalPushToInappActionModel) {
         val html = actionModel.html ?: downloader.download(actionModel.url)
-
-        presentInApp(html)
-    }
-
-    private suspend fun presentInApp(html: String?) {
+        val campaignId = actionModel.campaignId
         if (!html.isNullOrEmpty()) {
-            inAppHandler.handle(html)
+            inAppHandler.handle(campaignId, html)
         }
     }
 }

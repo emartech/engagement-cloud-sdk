@@ -3,11 +3,9 @@ package com.emarsys.setup
 import com.emarsys.JsEmarsysConfig
 import com.emarsys.context.SdkContext
 import com.emarsys.core.state.State
-import com.emarsys.mobileengage.inapp.InAppJsBridgeApi
 import com.emarsys.mobileengage.push.PushServiceApi
 
 class PlatformInitState(
-    private val inappJsBridge: InAppJsBridgeApi,
     private val pushService: PushServiceApi,
     val sdkContext: SdkContext,
 ) : State {
@@ -19,7 +17,6 @@ class PlatformInitState(
     }
 
     override suspend fun active() {
-        inappJsBridge.register()
         sdkContext.config?.let {
             val jsEmarsysConfig = sdkContext.config as JsEmarsysConfig
             pushService.register(jsEmarsysConfig)

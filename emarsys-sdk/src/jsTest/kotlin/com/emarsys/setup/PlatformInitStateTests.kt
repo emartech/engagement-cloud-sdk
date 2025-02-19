@@ -3,7 +3,6 @@ package com.emarsys.setup
 import com.emarsys.JsEmarsysConfig
 import com.emarsys.context.SdkContext
 import com.emarsys.core.log.LogLevel
-import com.emarsys.mobileengage.inapp.InAppJsBridgeApi
 import com.emarsys.mobileengage.push.PushServiceApi
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -19,13 +18,11 @@ import kotlin.test.Test
 class PlatformInitStateTests {
 
     private lateinit var platformInitState: PlatformInitState
-    private lateinit var mockJsBridge: InAppJsBridgeApi
     private lateinit var mockPushService: PushServiceApi
     private lateinit var testSdkContext: SdkContext
 
     @BeforeTest
     fun setup() = runTest {
-        mockJsBridge = mock()
         testSdkContext = SdkContext(
             StandardTestDispatcher(),
             StandardTestDispatcher(),
@@ -34,10 +31,9 @@ class PlatformInitStateTests {
             mutableSetOf()
         )
         mockPushService = mock()
-        everySuspend { mockJsBridge.register() } returns Unit
         everySuspend { mockPushService.register(any()) } returns Unit
         everySuspend { mockPushService.subscribeForPushMessages(any()) } returns Unit
-        platformInitState = PlatformInitState(mockJsBridge, mockPushService, testSdkContext)
+        platformInitState = PlatformInitState(mockPushService, testSdkContext)
     }
 
     @Test
@@ -48,7 +44,6 @@ class PlatformInitStateTests {
         platformInitState.active()
 
         verifySuspend {
-            mockJsBridge.register()
             mockPushService.register(testConfig)
             mockPushService.subscribeForPushMessages(testConfig)
         }
