@@ -1,15 +1,30 @@
-import UIKit
 import SwiftUI
 import EmarsysSDK
 
     
     struct ContentView: View {
+        @SwiftUICore.State private var eventName = ""
+        
         var body: some View {
             Button {
                 startSDK()
             } label: {
                 Text("enable sdk")
             }
+            HStack {
+                TextField(
+                        "Event name",
+                        text: $eventName
+                )
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .textInputAutocapitalization(TextInputAutocapitalization.never)
+                Button {
+                    trackEvent(eventName: eventName)
+                } label: {
+                    Text("track event")
+                }
+            }.padding(8)
+            
         }
         
         func startSDK() {
@@ -23,11 +38,18 @@ import EmarsysSDK
                     
                     
                     let result = try await Emarsys.shared.push.registerPushToken(pushToken: AppDelegate.pushToken)
+                    
                     print("push token track result: \(result)")
                 } catch {
                     print(error)
                     print("setup failed")
                 }
+            }
+        }
+        
+        func trackEvent(eventName: String) {
+            Task {
+                try await Emarsys.shared.trackCustomEvent(event: eventName, attributes: nil)
             }
         }
         
