@@ -4,7 +4,6 @@ import com.emarsys.core.providers.Provider
 import com.emarsys.core.providers.SuspendProvider
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
 import platform.UIKit.UIScene
 import platform.UIKit.UIScreen
@@ -19,8 +18,7 @@ class WindowProvider(
 ) : SuspendProvider<UIWindow> {
     @OptIn(ExperimentalForeignApi::class)
     override suspend fun provide(): UIWindow {
-        val window = withContext(CoroutineScope(mainDispatcher).coroutineContext) {
-
+        val window = withContext(mainDispatcher) {
             val window = UIWindow(sceneProvider.provide() as UIWindowScene)
             val width: Int = window.frame.size
             val height: Int = window.frame.size

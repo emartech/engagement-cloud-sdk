@@ -34,7 +34,7 @@ class InAppPresenter(
         val webView = (webViewHolder as IosWebViewHolder).webView
         window.addView(webView)
 
-        val originalWindow = withContext(CoroutineScope(mainDispatcher).coroutineContext) {
+        val originalWindow = withContext(mainDispatcher) {
             val originalWindow =
                 UIApplication.sharedApplication.windows.filter { (it as UIWindow).isKeyWindow() }
                     .map { it as UIWindow }.firstOrNull()
@@ -52,8 +52,8 @@ class InAppPresenter(
         }
     }
 
-    fun UIWindow.addView(view: UIView) {
-        CoroutineScope(mainDispatcher).launch {
+    private suspend fun UIWindow.addView(view: UIView) {
+        withContext(mainDispatcher) {
 
             rootViewController?.view?.addSubview(view)
             view.translatesAutoresizingMaskIntoConstraints = false
