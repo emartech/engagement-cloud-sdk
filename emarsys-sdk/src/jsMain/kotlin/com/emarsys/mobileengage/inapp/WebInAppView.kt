@@ -14,6 +14,7 @@ class WebInAppView(
         get() = mInAppMessage
 
     override suspend fun load(message: InAppMessage): WebViewHolder {
+        mInAppMessage = message
         val jsBridge = inAppJsBridgeFactory.create(message.campaignId)
         jsBridge.register()
         val view = document.createElement("div")

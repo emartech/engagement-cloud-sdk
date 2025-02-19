@@ -7,7 +7,6 @@ import dev.mokkery.every
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -34,7 +33,6 @@ class WebInappViewTests {
         webInappView = WebInAppView(inappScriptExtractor, mockInAppJsBridgeFactory)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun load_shouldSetTheHtmlContent_andAddScripts() = runTest {
         val testScriptContent1 = "script1"
@@ -54,6 +52,8 @@ class WebInappViewTests {
         val testMessage = InAppMessage(CAMPAIGN_ID, testHtml)
 
         val webViewHolder: WebWebViewHolder = webInappView.load(testMessage) as WebWebViewHolder
+
+        webInappView.inAppMessage shouldBe testMessage
         val webView = webViewHolder.webView
         webView shouldNotBe null
         webView.querySelectorAll("script").length shouldBe 4
@@ -82,6 +82,7 @@ class WebInappViewTests {
 
         val webViewHolder: WebWebViewHolder = webInappView.load(testMessage) as WebWebViewHolder
 
+        webInappView.inAppMessage shouldBe testMessage
         webViewHolder.webView shouldNotBe null
 
         webViewHolder.webView.let {
