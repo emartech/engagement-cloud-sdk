@@ -15,12 +15,21 @@
                 android:name="com.emarsys.EmarsysSdkInitializer"
                 android:value="androidx.startup" />
         </provider>
+
         <receiver
             android:name="com.emarsys.mobileengage.push.PushTokenBroadcastReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.emarsys.sdk.PUSH_TOKEN" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name="com.emarsys.mobileengage.push.PushMessageBroadcastReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.emarsys.sdk.PUSH_MESSAGE_PAYLOAD" />
             </intent-filter>
         </receiver>
         <receiver
@@ -31,6 +40,7 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+
         <activity
             android:name="com.emarsys.mobileengage.push.NotificationOpenedActivity"
             android:exported="false"
