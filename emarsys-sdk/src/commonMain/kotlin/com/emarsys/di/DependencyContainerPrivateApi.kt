@@ -3,6 +3,7 @@ package com.emarsys.di
 import com.emarsys.api.push.PushApi
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
+import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.storage.Storage
@@ -69,4 +70,6 @@ interface DependencyContainerPrivateApi {
     val sdkDispatcher: CoroutineDispatcher
 
     val pushApi: PushApi
+
+    val sdkLogger: Logger
 }

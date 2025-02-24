@@ -39,7 +39,11 @@ interface DependencyCreator {
         pushActionHandler: ActionHandlerApi
     ): PlatformInitializerApi
 
-    fun createPlatformContext(pushActionFactory: ActionFactoryApi<ActionModel>): PlatformContext
+    fun createPlatformContext(
+        pushActionFactory: ActionFactoryApi<ActionModel>,
+        downloaderApi: DownloaderApi,
+        inAppDownloader: InAppDownloaderApi,
+    ): PlatformContext
 
     fun createStorage(): TypedStorageApi<String?>
 
@@ -53,8 +57,6 @@ interface DependencyCreator {
         sdkDispatcher: CoroutineDispatcher,
         sdkContext: SdkContext,
         actionFactory: ActionFactoryApi<ActionModel>,
-        downloaderApi: DownloaderApi,
-        inAppDownloader: InAppDownloaderApi,
         storage: TypedStorageApi<String?>
     ): State
 

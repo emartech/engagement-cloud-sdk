@@ -9,7 +9,7 @@ class DismissAction(
     private val sdkEventFlow: MutableSharedFlow<SdkEvent>
 ): Action<Unit> {
     override suspend fun invoke(value: Unit?) {
-        action.campaignId?.let {
+        action.dismissId?.let {
             sdkEventFlow.emit(
                 SdkEvent.Internal.Sdk.Dismiss(it)
             )

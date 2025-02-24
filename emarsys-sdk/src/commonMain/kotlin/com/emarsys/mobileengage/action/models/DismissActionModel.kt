@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 interface DismissActionModel {
-    var campaignId: String?
+    var dismissId: String?
 }
 
 @Serializable
@@ -12,11 +12,11 @@ interface DismissActionModel {
 data class PresentableDismissActionModel(
     override val id: String,
     override val title: String,
-    override var campaignId: String? = null
+    override var dismissId: String? = null
 ) : PresentableActionModel(), DismissActionModel
 
 @Serializable
 @SerialName("Dismiss")
 data class BasicDismissActionModel(
-    override var campaignId: String? = null
+    override var dismissId: String? = null
 ) : BasicActionModel(), DismissActionModel

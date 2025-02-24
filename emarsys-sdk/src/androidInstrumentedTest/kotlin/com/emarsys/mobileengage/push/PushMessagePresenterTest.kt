@@ -15,6 +15,7 @@ import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.action.models.PresentableAppEventActionModel
 import com.emarsys.mobileengage.action.models.PresentableCustomEventActionModel
+import com.emarsys.mobileengage.action.models.PresentableDismissActionModel
 import com.emarsys.mobileengage.action.models.PresentableOpenExternalUrlActionModel
 import com.emarsys.mobileengage.inapp.InAppDownloader
 import com.emarsys.mobileengage.push.model.AndroidPlatformData
@@ -29,6 +30,7 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
+import io.mockk.spyk
 import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
@@ -262,6 +264,39 @@ class PushMessagePresenterTest {
     }
 
     @Test
+    fun present_shouldShowNotification_withCorrectData_withDismissActionModel_filledWithId() =
+        runTest {
+            val dismissActionModelSpy = spyk(PresentableDismissActionModel("dismissId", "Dismiss", null))
+            val testMessage = createTestMessage(
+                listOf(dismissActionModelSpy),
+                testDefaultTapAction,
+            )
+
+            every {
+                mockNotificationManager.notify(
+                    COLLAPSE_ID,
+                    COLLAPSE_ID.hashCode(),
+                    capture(notificationSlot)
+                )
+            } returns Unit
+
+            pushMessagePresenter.present(testMessage)
+
+            assertNotificationFields(notificationSlot.captured)
+            notificationSlot.captured.actions.size shouldBe 1
+            notificationSlot.captured.actions[0].title shouldBe "Dismiss"
+
+            verify { dismissActionModelSpy.dismissId = COLLAPSE_ID }
+            verify {
+                mockNotificationManager.notify(
+                    COLLAPSE_ID,
+                    COLLAPSE_ID.hashCode(),
+                    notificationSlot.captured
+                )
+            }
+        }
+
+    @Test
     fun present_shouldCreateDebugChannel_if_debugMode_and_channelId_isInvalid() = runTest {
         val message = createTestMessage()
         val testSettings = AndroidNotificationSettings(true, 1, emptyList())
@@ -332,12 +367,12 @@ class PushMessagePresenterTest {
         iconUrlString: String? = null,
         imageUrlString: String? = null
     ): AndroidPushMessage {
-        val tesMethod = NotificationMethod(COLLAPSE_ID, INIT)
+        val testMethod = NotificationMethod(COLLAPSE_ID, INIT)
         val testData = PresentablePushData(
             false,
             SID,
             CAMPAIGN_ID,
-            AndroidPlatformData(CHANNEL_ID, tesMethod),
+            AndroidPlatformData(CHANNEL_ID, testMethod),
             defaultTapAction = defaultTapAction,
             actions = actions,
             badgeCount

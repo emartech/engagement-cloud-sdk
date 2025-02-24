@@ -4,7 +4,6 @@ import android.app.NotificationManager
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Context.CLIPBOARD_SERVICE
-import android.content.IntentFilter
 import android.net.ConnectivityManager
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -13,7 +12,6 @@ import com.emarsys.api.push.LoggingPush
 import com.emarsys.api.push.Push
 import com.emarsys.api.push.PushApi
 import com.emarsys.api.push.PushCall
-import com.emarsys.api.push.PushConstants
 import com.emarsys.api.push.PushGatherer
 import com.emarsys.api.push.PushInstance
 import com.emarsys.api.push.PushInternal
@@ -55,10 +53,6 @@ import com.emarsys.mobileengage.inapp.InAppViewProvider
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.mobileengage.inapp.WebViewProvider
 import com.emarsys.mobileengage.permission.AndroidPermissionHandler
-import com.emarsys.mobileengage.push.NotificationCompatStyler
-import com.emarsys.mobileengage.push.PushMessageBroadcastReceiver
-import com.emarsys.mobileengage.push.PushMessagePresenter
-import com.emarsys.mobileengage.push.SilentPushMessageHandler
 import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
 import com.emarsys.mobileengage.url.AndroidExternalUrlOpener
 import com.emarsys.networking.clients.event.EventClientApi
@@ -91,7 +85,7 @@ actual class PlatformDependencyCreator actual constructor(
     private val json: Json,
     private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
     private val actionHandler: ActionHandlerApi,
-    private val timestampProvider: Provider<Instant>
+    timestampProvider: Provider<Instant>
 ) : DependencyCreator {
     private val metadataReader = MetadataReader(applicationContext)
     private val platformInfoCollector = PlatformInfoCollector(applicationContext)
@@ -99,16 +93,32 @@ actual class PlatformDependencyCreator actual constructor(
         TransitionSafeCurrentActivityWatchdog().also { it.register() }
     private val sharedPreferences =
         applicationContext.getSharedPreferences(StorageConstants.SUITE_NAME, Context.MODE_PRIVATE)
+    private val notificationManager =
+        (applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
 
     actual override fun createPlatformInitializer(
         pushActionFactory: ActionFactoryApi<ActionModel>,
-        pushActionHandler: ActionHandlerApi
+        pushActionHandler: ActionHandlerApi,
     ): PlatformInitializerApi {
-        return PlatformInitializer()
+        return PlatformInitializer(sdkEventFlow, notificationManager, sdkContext.sdkDispatcher)
     }
 
-    actual override fun createPlatformContext(pushActionFactory: ActionFactoryApi<ActionModel>): PlatformContext {
-        return AndroidPlatformContext(json, pushActionFactory, actionHandler)
+    actual override fun createPlatformContext(
+        pushActionFactory: ActionFactoryApi<ActionModel>,
+        downloaderApi: DownloaderApi,
+        inAppDownloader: InAppDownloaderApi,
+    ): PlatformContext {
+        return AndroidPlatformContext(
+            json,
+            pushActionFactory,
+            actionHandler,
+            notificationManager,
+            metadataReader,
+            downloaderApi,
+            platformInfoCollector,
+            inAppDownloader,
+            sdkEventFlow
+        )
     }
 
     actual override fun createLanguageProvider(): Provider<String> {
@@ -139,36 +149,9 @@ actual class PlatformDependencyCreator actual constructor(
         sdkDispatcher: CoroutineDispatcher,
         sdkContext: SdkContext,
         actionFactory: ActionFactoryApi<ActionModel>,
-        downloaderApi: DownloaderApi,
-        inAppDownloader: InAppDownloaderApi,
         storage: TypedStorageApi<String?>
     ): State {
-        val notificationManager =
-            (applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
-        val notificationCompatStyler = NotificationCompatStyler(downloaderApi)
-        val pushPresenter = PushMessagePresenter(
-            applicationContext,
-            json,
-            notificationManager,
-            metadataReader,
-            notificationCompatStyler,
-            platformInfoCollector,
-            inAppDownloader
-        )
-        val silentPushHandler = SilentPushMessageHandler(actionFactory, sdkEventFlow)
-        val pushMessageBroadcastReceiver =
-            PushMessageBroadcastReceiver(
-                pushPresenter,
-                silentPushHandler,
-                sdkDispatcher,
-                sdkLogger,
-                json,
-            )
-        return PlatformInitState(
-            pushMessageBroadcastReceiver,
-            IntentFilter(PushConstants.PUSH_MESSAGE_PAYLOAD_INTENT_FILTER_ACTION),
-            applicationContext,
-        )
+        return PlatformInitState()
     }
 
     actual override fun createStorage(): TypedStorageApi<String?> =

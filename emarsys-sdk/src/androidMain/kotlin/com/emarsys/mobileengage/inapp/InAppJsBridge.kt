@@ -18,7 +18,7 @@ class InAppJsBridge(
     private val actionFactory: ActionFactoryApi<ActionModel>,
     private val json: Json,
     private val sdkScope: CoroutineScope,
-    private val campaignId: String
+    private val dismissId: String
 ) {
 
 
@@ -69,7 +69,7 @@ class InAppJsBridge(
     fun close(jsonString: String) {
         sdkScope.launch {
             val actionModel = json.decodeFromString<BasicDismissActionModel>(jsonString)
-            actionModel.campaignId = campaignId
+            actionModel.dismissId = dismissId
             actionFactory.create(actionModel)()
         }
     }

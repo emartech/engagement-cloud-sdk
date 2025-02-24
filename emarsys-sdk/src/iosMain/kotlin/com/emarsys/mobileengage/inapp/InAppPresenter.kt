@@ -42,7 +42,7 @@ class InAppPresenter(
             originalWindow
         }
         CoroutineScope(sdkDispatcher).launch {
-            sdkEventFlow.first { it is SdkEvent.Internal.Sdk.Dismiss && it.campaignId == inAppView.inAppMessage.campaignId }
+            sdkEventFlow.first { it is SdkEvent.Internal.Sdk.Dismiss && it.dismissId == inAppView.inAppMessage.campaignId }
 
             withContext(mainDispatcher) {
                 window.removeFromSuperview()

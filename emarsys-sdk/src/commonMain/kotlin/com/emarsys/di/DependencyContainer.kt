@@ -143,9 +143,14 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAELjWEUIBX9zlm1OI4gF1hMCBLzpaBwgs9HlmSIBAqP4MDGy4ibOOV3FVDrnAY0Q34LZTbPBlp3gRNZJ19UoSy2Q=="
     }
 
-    private val sdkLogger: SdkLogger by lazy {
+    override val sdkLogger: SdkLogger by lazy {
         SdkLogger(ConsoleLogger())
     }
+
+    private val timestampProvider: Provider<Instant> = TimestampProvider()
+
+    override val sdkEventFlow: MutableSharedFlow<SdkEvent> =
+        MutableSharedFlow(replay = 10)  // TODO: configure replay cache
 
     override val json: Json by lazy {
         JsonUtil.json
@@ -186,9 +191,9 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         }
     }
 
-    override val pushActionHandler: ActionHandlerApi by lazy { ActionHandler() }
+    override val pushActionHandler: ActionHandlerApi = ActionHandler()
 
-    private val dependencyCreator: DependencyCreator by lazy {
+    private val dependencyCreator: DependencyCreator =
         PlatformDependencyCreator(
             sdkContext,
             uuidProvider,
@@ -198,37 +203,18 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             pushActionHandler,
             timestampProvider
         )
-    }
 
-    override val inAppDownloader: InAppDownloaderApi by lazy {
-        InAppDownloader(downloaderApi)
-    }
-    private val inAppViewProvider: InAppViewProviderApi by lazy {
-        dependencyCreator.createInAppViewProvider(eventActionFactory)
-    }
-    private val inAppHandler: InAppHandlerApi by lazy {
-        InAppHandler(inAppViewProvider, inAppPresenter)
-    }
+    private val fileCache = dependencyCreator.createFileCache()
 
-    private val pushToInAppHandler: PushToInAppHandlerApi by lazy {
-        dependencyCreator.createPushToInAppHandler(inAppDownloader, inAppHandler)
-    }
+    override val downloaderApi: DownloaderApi =
+        Downloader(httpClient, fileCache, sdkLogger)
 
-    override val pushActionFactory: ActionFactoryApi<ActionModel> by lazy {
-        PushActionFactory(pushToInAppHandler, eventActionFactory)
-    }
+    override val inAppDownloader: InAppDownloaderApi = InAppDownloader(downloaderApi)
 
-    private val inAppPresenter: InAppPresenterApi by lazy {
-        dependencyCreator.createInAppPresenter()
-    }
 
-    override val platformContext: PlatformContext by lazy {
-        dependencyCreator.createPlatformContext(pushActionFactory)
-    }
+    private val launchApplicationHandler: LaunchApplicationHandlerApi =
+        dependencyCreator.createLaunchApplicationHandler()
 
-    override val stringStorage: TypedStorageApi<String?> by lazy {
-        dependencyCreator.createStorage()
-    }
 
     private val externalUrlOpener: ExternalUrlOpenerApi by lazy {
         dependencyCreator.createExternalUrlOpener()
@@ -242,11 +228,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         dependencyCreator.createPermissionHandler()
     }
 
-    private val launchApplicationHandler: LaunchApplicationHandlerApi by lazy {
-        dependencyCreator.createLaunchApplicationHandler()
-    }
-
-    private val eventActionFactory: ActionFactoryApi<ActionModel> by lazy {
+    private val eventActionFactory: ActionFactoryApi<ActionModel> =
         EventActionFactory(
             sdkEventFlow,
             permissionHandler,
@@ -254,10 +236,29 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             clipboardHandler,
             sdkLogger
         )
-    }
 
-    override val downloaderApi: DownloaderApi by lazy {
-        Downloader(httpClient, dependencyCreator.createFileCache(), sdkLogger)
+    private val inAppPresenter: InAppPresenterApi =
+        dependencyCreator.createInAppPresenter()
+
+    private val inAppViewProvider: InAppViewProviderApi =
+        dependencyCreator.createInAppViewProvider(eventActionFactory)
+
+    private val inAppHandler: InAppHandlerApi =
+        InAppHandler(inAppViewProvider, inAppPresenter)
+
+    private val pushToInAppHandler: PushToInAppHandlerApi =
+        dependencyCreator.createPushToInAppHandler(inAppDownloader, inAppHandler)
+
+    override val pushActionFactory: ActionFactoryApi<ActionModel> =
+        PushActionFactory(pushToInAppHandler, eventActionFactory, launchApplicationHandler)
+
+
+    override val platformContext: PlatformContext =
+        dependencyCreator.createPlatformContext(pushActionFactory, downloaderApi, inAppDownloader)
+
+
+    override val stringStorage: TypedStorageApi<String?> by lazy {
+        dependencyCreator.createStorage()
     }
 
     override val storage: Storage by lazy { Storage(stringStorage, json) }
@@ -281,10 +282,6 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
 
     private val crypto: CryptoApi by lazy {
         Crypto(sdkLogger, PUBLIC_KEY)
-    }
-
-    private val timestampProvider: Provider<Instant> by lazy {
-        TimestampProvider()
     }
 
     private val emarsysClient: NetworkClientApi by lazy {
@@ -460,8 +457,6 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
                 sdkDispatcher,
                 sdkContext,
                 eventActionFactory,
-                downloaderApi,
-                inAppDownloader,
                 stringStorage
             )
         val applyRemoteConfigState = ApplyRemoteConfigState(
@@ -472,7 +467,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             StateMachine(
                 listOf(
                     collectDeviceInfoState,
-                    applyRemoteConfigState,
+                    // applyRemoteConfigState,
                     platformInitState,
                     registerClientState,
                     registerPushTokenState,
@@ -487,10 +482,6 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
                 )
             )
         SetupOrganizer(meStateMachine, predictStateMachine, sdkContext)
-    }
-
-    override val sdkEventFlow: MutableSharedFlow<SdkEvent> by lazy {
-        MutableSharedFlow(replay = 10)  // TODO: configure replay cache
     }
 
 

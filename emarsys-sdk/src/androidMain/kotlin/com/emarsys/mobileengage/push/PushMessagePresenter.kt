@@ -14,6 +14,7 @@ import com.emarsys.api.push.PushConstants.PUSH_NOTIFICATION_ICON_NAME
 import com.emarsys.core.device.AndroidNotificationSettings
 import com.emarsys.core.device.PlatformInfoCollector
 import com.emarsys.core.resource.MetadataReader
+import com.emarsys.mobileengage.action.models.DismissActionModel
 import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.action.models.PushToInappActionModel
@@ -65,6 +66,9 @@ class PushMessagePresenter(
 
     private fun NotificationCompat.Builder.addActions(pushMessage: AndroidPushMessage): NotificationCompat.Builder {
         pushMessage.data.actions?.forEach { actionModel ->
+            if(actionModel is DismissActionModel) {
+                actionModel.dismissId = pushMessage.data.platformData.notificationMethod.collapseId
+            }
             val actionIntent = createActionIntent(actionModel, pushMessage)
             val action = createNotificationAction(actionModel, actionIntent)
 

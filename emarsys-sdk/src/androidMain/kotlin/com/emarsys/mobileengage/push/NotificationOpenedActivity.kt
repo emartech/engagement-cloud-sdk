@@ -19,10 +19,12 @@ class NotificationOpenedActivity(
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         notificationIntentProcessor.processIntent(intent, lifecycleScope)
+        finish()
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         notificationIntentProcessor.processIntent(intent, lifecycleScope)
+        finish()
     }
 }

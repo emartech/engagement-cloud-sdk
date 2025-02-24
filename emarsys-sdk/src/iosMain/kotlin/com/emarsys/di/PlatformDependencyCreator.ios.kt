@@ -94,7 +94,11 @@ actual class PlatformDependencyCreator actual constructor(
         return PlatformInitializer()
     }
 
-    actual override fun createPlatformContext(pushActionFactory: ActionFactoryApi<ActionModel>): PlatformContext {
+    actual override fun createPlatformContext(
+        pushActionFactory: ActionFactoryApi<ActionModel>,
+        downloaderApi: DownloaderApi,
+        inAppDownloader: InAppDownloaderApi,
+    ): PlatformContext {
         return platformContext
     }
 
@@ -121,8 +125,6 @@ actual class PlatformDependencyCreator actual constructor(
         sdkDispatcher: CoroutineDispatcher,
         sdkContext: SdkContext,
         actionFactory: ActionFactoryApi<ActionModel>,
-        downloaderApi: DownloaderApi,
-        inAppDownloader: InAppDownloaderApi,
         storage: TypedStorageApi<String?>
     ): State {
         return PlatformInitState()

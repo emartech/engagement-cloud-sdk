@@ -102,8 +102,9 @@ sealed interface SdkEvent {
             ) : Sdk(SESSION_END_EVENT_NAME)
 
             @Serializable
+            @SerialName("internal")
             data class Dismiss(
-                val campaignId: String,
+                val dismissId: String,
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
             ) : Sdk(DISMISS_EVENT_NAME)

@@ -54,7 +54,11 @@ expect class PlatformDependencyCreator(
         pushActionHandler: ActionHandlerApi
     ): PlatformInitializerApi
 
-    override fun createPlatformContext(pushActionFactory: ActionFactoryApi<ActionModel>): PlatformContext
+    override fun createPlatformContext(
+        pushActionFactory: ActionFactoryApi<ActionModel>,
+        downloaderApi: DownloaderApi,
+        inAppDownloader: InAppDownloaderApi,
+    ): PlatformContext
 
     override fun createStorage(): TypedStorageApi<String?>
 
@@ -68,8 +72,6 @@ expect class PlatformDependencyCreator(
         sdkDispatcher: CoroutineDispatcher,
         sdkContext: SdkContext,
         actionFactory: ActionFactoryApi<ActionModel>,
-        downloaderApi: DownloaderApi,
-        inAppDownloader: InAppDownloaderApi,
         storage: TypedStorageApi<String?>
     ): State
 

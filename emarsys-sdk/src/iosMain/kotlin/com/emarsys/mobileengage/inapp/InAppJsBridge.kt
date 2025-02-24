@@ -94,7 +94,7 @@ class InAppJsBridge(
                 "close" -> {
                     val actionModel =
                         json.decodeFromString<BasicDismissActionModel>(body)
-                    actionModel.campaignId = campaignId
+                    actionModel.dismissId = campaignId
                     actionFactory.create(actionModel)()
                 }
 

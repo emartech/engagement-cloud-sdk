@@ -14,8 +14,7 @@ data class InternalPushToInappActionModel(
     val url: String,
     val html: String? = null,
     val ignoreViewedEvent: Boolean? = null
-) : BasicActionModel() {
-}
+) : BasicActionModel()
 
 @Serializable
 @SerialName("MEInApp")
