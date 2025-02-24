@@ -28,6 +28,7 @@ import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.permission.WebPermissionHandler
 import com.emarsys.core.provider.ApplicationVersionProvider
 import com.emarsys.core.provider.WebLanguageProvider
+import com.emarsys.core.providers.ClientIdProvider
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.state.State
@@ -116,11 +117,11 @@ actual class PlatformDependencyCreator actual constructor(
         storage: TypedStorageApi<String?>
     ): DeviceInfoCollector {
         return DeviceInfoCollector(
-            uuidProvider,
+            ClientIdProvider(uuidProvider, storage),
             timezoneProvider,
             createWebDeviceInfoCollector(),
-            storage,
-            createApplicationVersionProvider(), createLanguageProvider(), json,
+            createApplicationVersionProvider(),
+            createLanguageProvider(), json,
         )
     }
 

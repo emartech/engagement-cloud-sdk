@@ -1,15 +1,12 @@
 package com.emarsys.core.device
 
 import com.emarsys.core.providers.Provider
-import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.util.JsonUtil
 import dev.mokkery.answering.returns
 import dev.mokkery.every
-import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.browser.window
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -17,7 +14,6 @@ import kotlin.test.Test
 class DeviceInfoCollectorTests {
 
     private companion object {
-        const val TEST_UUID = "test uuid"
         const val TIMEZONE = "+0600"
         const val BROWSER_NAME = "chrome"
         const val BROWSER_VERSION = "160.5.12"
@@ -37,8 +33,7 @@ class DeviceInfoCollectorTests {
     }
 
     private lateinit var mockWebPlatformInfoCollector: WebPlatformInfoCollectorApi
-    private lateinit var mockStorage: TypedStorageApi<String?>
-    private lateinit var mockUuidProvider: Provider<String>
+    private lateinit var mockClientIdProvider: Provider<String>
     private lateinit var mockTimezoneProvider: Provider<String>
     private lateinit var mockApplicationVersionProvider: Provider<String>
     private lateinit var mockLanguageProvider: Provider<String>
@@ -47,10 +42,8 @@ class DeviceInfoCollectorTests {
 
     @BeforeTest
     fun setup() {
-        mockStorage = mock()
-        every { mockStorage.put(any(), any()) } returns Unit
-        mockUuidProvider = mock()
-        every { mockUuidProvider.provide() } returns TEST_UUID
+        mockClientIdProvider = mock()
+        every { mockClientIdProvider.provide() } returns CLIENT_ID
         mockTimezoneProvider = mock()
         every { mockTimezoneProvider.provide() } returns TIMEZONE
         mockApplicationVersionProvider = mock()
@@ -60,10 +53,9 @@ class DeviceInfoCollectorTests {
         mockLanguageProvider = mock()
         every { mockLanguageProvider.provide() } returns LANGUAGE
         deviceInfoCollector = DeviceInfoCollector(
-            mockUuidProvider,
+            mockClientIdProvider,
             mockTimezoneProvider,
             mockWebPlatformInfoCollector,
-            mockStorage,
             mockApplicationVersionProvider,
             mockLanguageProvider,
             json
@@ -72,8 +64,6 @@ class DeviceInfoCollectorTests {
 
     @Test
     fun collect_shouldReturn_deviceInfo() {
-        every { mockStorage.get("clientId") } returns CLIENT_ID
-
         val expectedDeviceInfo = DeviceInfo(
             platform = BROWSER_NAME,
             deviceModel = navigator.userAgent,
@@ -88,28 +78,5 @@ class DeviceInfoCollectorTests {
         val result = deviceInfoCollector.collect()
 
         result shouldBe json.encodeToString(expectedDeviceInfo)
-    }
-
-    @Test
-    fun getClientId_shouldGenerateNewId_ifStoredId_isNull() {
-        every { mockStorage.get(any()) } returns null
-        deviceInfoCollector.getClientId() shouldBe TEST_UUID
-    }
-
-    @Test
-    fun getClientId_shouldReturnStoredId_ifPresent() {
-        every { mockStorage.get("clientId") } returns CLIENT_ID
-
-        val testCollector = DeviceInfoCollector(
-            mockUuidProvider,
-            mockTimezoneProvider,
-            mockWebPlatformInfoCollector,
-            mockStorage,
-            mockApplicationVersionProvider,
-            mockLanguageProvider,
-            json
-        )
-
-        testCollector.getClientId() shouldBe CLIENT_ID
     }
 }
