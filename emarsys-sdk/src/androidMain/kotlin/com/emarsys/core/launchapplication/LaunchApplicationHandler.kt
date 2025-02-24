@@ -21,7 +21,6 @@ class LaunchApplicationHandler(
                 applicationContext.packageManager.getLaunchIntentForPackage(applicationContext.packageName)
             }
             applicationContext.startActivity(intent)
-            activityFinder.waitForActivity()
         }
     }
 }

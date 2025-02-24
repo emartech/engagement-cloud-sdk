@@ -1,9 +1,12 @@
 package com.emarsys.mobileengage.action
 
+import com.emarsys.core.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.mobileengage.action.actions.CustomEventAction
+import com.emarsys.mobileengage.action.actions.LaunchApplicationAction
 import com.emarsys.mobileengage.action.actions.PushToInappAction
 import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.action.models.BasicLaunchApplicationActionModel
 import com.emarsys.mobileengage.action.models.BasicPushToInAppActionModel
 import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
 import com.emarsys.mobileengage.action.models.PresentableCustomEventActionModel
@@ -29,12 +32,18 @@ class PushActionFactoryTests {
     private lateinit var pushActionFactory: PushActionFactory
     private lateinit var mockEventActionFactory: ActionFactoryApi<ActionModel>
     private lateinit var mockPushToInAppHandler: PushToInAppHandlerApi
+    private lateinit var mockLaunchApplicationHandler: LaunchApplicationHandlerApi
 
     @BeforeTest
     fun setup() {
         mockEventActionFactory = mock()
         mockPushToInAppHandler = mock()
-        pushActionFactory = PushActionFactory(mockPushToInAppHandler, mockEventActionFactory)
+        mockLaunchApplicationHandler = mock()
+        pushActionFactory = PushActionFactory(
+            mockPushToInAppHandler,
+            mockEventActionFactory,
+            mockLaunchApplicationHandler
+        )
     }
 
     @Test
@@ -51,11 +60,24 @@ class PushActionFactoryTests {
 
     @Test
     fun create_shouldReturn_pushToInAppAction_fromBasicPushToInAppActionModel() = runTest {
-        val testBasicActionModel = BasicPushToInAppActionModel("pushToInApp", PushToInApp(CAMPAIGN_ID, URL))
+        val testBasicActionModel =
+            BasicPushToInAppActionModel("pushToInApp", PushToInApp(CAMPAIGN_ID, URL))
 
         val result = pushActionFactory.create(testBasicActionModel)
 
         result.shouldBeTypeOf<PushToInappAction>()
+        verifySuspend(VerifyMode.exactly(0)) {
+            mockEventActionFactory.create(any())
+        }
+    }
+
+    @Test
+    fun create_shouldReturn_LaunchApplicationAction_fromLaunchApplicationActionModel() = runTest {
+        val testBasicActionModel = BasicLaunchApplicationActionModel
+
+        val result = pushActionFactory.create(testBasicActionModel)
+
+        result.shouldBeTypeOf<LaunchApplicationAction>()
         verifySuspend(VerifyMode.exactly(0)) {
             mockEventActionFactory.create(any())
         }

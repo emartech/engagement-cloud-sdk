@@ -9,7 +9,6 @@ import com.emarsys.context.SdkContextApi
 import com.emarsys.watchdog.activity.ActivityFinderApi
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
-import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
@@ -54,7 +53,6 @@ class LaunchApplicationHandlerTest {
 
         verify { mockPackageManager.getLaunchIntentForPackage(any()) }
         verify { mockApplicationContext.startActivity(mockIntent) }
-        coVerify { mockActivityFinder.waitForActivity() }
     }
 
     @Test
@@ -72,7 +70,6 @@ class LaunchApplicationHandlerTest {
 
         intent.component!!.className shouldBe expectedIntent.component!!.className
         verify { mockApplicationContext.startActivity(any()) }
-        coVerify { mockActivityFinder.waitForActivity() }
     }
 
 }
