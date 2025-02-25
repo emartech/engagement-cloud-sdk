@@ -9,15 +9,18 @@ import com.emarsys.api.push.PushConstants.INTENT_EXTRA_PAYLOAD_KEY
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.actions.Action
+import com.emarsys.mobileengage.action.actions.DismissAction
 import com.emarsys.mobileengage.action.actions.LaunchApplicationAction
 import com.emarsys.mobileengage.action.actions.ReportingAction
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
+import com.emarsys.mobileengage.action.models.BasicDismissActionModel
 import com.emarsys.mobileengage.action.models.BasicLaunchApplicationActionModel
 import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.action.models.PresentableAppEventActionModel
+import com.emarsys.mobileengage.action.models.PresentableDismissActionModel
 import com.emarsys.mobileengage.push.model.NotificationOperation
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.util.JsonUtil
@@ -45,8 +48,9 @@ class NotificationIntentProcessorTests {
         const val TITLE = "testTitle"
         const val NAME = "testName"
         const val SID = "testSid"
+        const val COLLAPSE_ID = "testCollapseId"
         val PAYLOAD = mapOf("testKey" to "testValue")
-        const val ACTION_MODEL_JSON =
+        const val APP_EVENT_ACTION_MODEL_JSON =
             """{"type":"MEAppEvent", "id":"$ID","title":"$TITLE","name":"$NAME","payload":{"testKey":"testValue"}}"""
     }
 
@@ -95,11 +99,14 @@ class NotificationIntentProcessorTests {
     fun testProcessIntent_shouldHandleAction_withActionHandler_withMandatoryActions() = runTest {
         val actionModel = PresentableAppEventActionModel(ID, TITLE, NAME, PAYLOAD)
         val buttonClickedActionModel = BasicPushButtonClickedActionModel(ID, SID)
+        val basicDismissActionModel = BasicDismissActionModel(COLLAPSE_ID)
         val reportingAction = ReportingAction(buttonClickedActionModel, mockSdkEventFlow)
         val mockLaunchApplicationAction: LaunchApplicationAction = mockk(relaxed = true)
+        val dismissAction = DismissAction(basicDismissActionModel, mockSdkEventFlow)
 
         coEvery { mockActionFactory.create(BasicLaunchApplicationActionModel) } returns mockLaunchApplicationAction
         coEvery { mockActionFactory.create(buttonClickedActionModel) } returns reportingAction
+        coEvery { mockActionFactory.create(basicDismissActionModel) } returns dismissAction
 
         val intent = createTestIntent(actionModel)
 
@@ -117,11 +124,49 @@ class NotificationIntentProcessorTests {
             mockActionHandler.handleActions(
                 listOf(
                     mockLaunchApplicationAction,
-                    reportingAction
+                    dismissAction,
+                    reportingAction,
                 ), mockAction
             )
         }
     }
+
+    @Test
+    fun testProcessIntent_shouldNotIncludeLaunchApplication_andBasicDismissAction_InMandatoryActions_whenActionIsDismiss() =
+        runTest {
+            val dismissId = "collapseId"
+            val dismissActionModel = PresentableDismissActionModel(ID, TITLE, dismissId)
+            val dismissActionModelJson = """{
+                    "type":"Dismiss",
+                    "id":"$ID",
+                    "title":"$TITLE",
+                    "dismissId":"$dismissId"
+                }""".trimIndent()
+            val buttonClickedActionModel = BasicPushButtonClickedActionModel(ID, SID)
+            val reportingAction = ReportingAction(buttonClickedActionModel, mockSdkEventFlow)
+
+            coEvery { mockActionFactory.create(buttonClickedActionModel) } returns reportingAction
+
+            val intent = createTestIntent(dismissActionModel, dismissActionModelJson)
+
+            intent.putExtra(INTENT_EXTRA_PAYLOAD_KEY, createTestMessage(dismissActionModelJson))
+
+            val mockAction: Action<Unit> = mockk(relaxed = true)
+            coEvery { mockActionFactory.create(dismissActionModel) } returns mockAction
+
+            notificationIntentProcessor.processIntent(intent, testScope)
+
+            advanceUntilIdle()
+
+            coVerify { mockActionFactory.create(dismissActionModel) }
+            coVerify {
+                mockActionHandler.handleActions(
+                    listOf(
+                        reportingAction
+                    ), mockAction
+                )
+            }
+        }
 
     @Test
     fun testProcessIntent_shouldHandleAction_withActionHandler_withMandatoryActions_whenTriggeredWithDefaultAction() =
@@ -130,11 +175,14 @@ class NotificationIntentProcessorTests {
             val actionJsonString =
                 """{"type": "MEAppEvent", "name":"$NAME","payload":{"testKey":"testValue"}}"""
             val notificationOpenedActionModel = NotificationOpenedActionModel(SID)
+            val basicDismissActionModel = BasicDismissActionModel(COLLAPSE_ID)
             val reportingAction = ReportingAction(notificationOpenedActionModel, mockSdkEventFlow)
+            val basicDismissAction = DismissAction(basicDismissActionModel, mockSdkEventFlow)
             val mockLaunchApplicationAction: LaunchApplicationAction = mockk(relaxed = true)
 
             coEvery { mockActionFactory.create(BasicLaunchApplicationActionModel) } returns mockLaunchApplicationAction
             coEvery { mockActionFactory.create(notificationOpenedActionModel) } returns reportingAction
+            coEvery { mockActionFactory.create(basicDismissActionModel) } returns basicDismissAction
 
             val intent = Intent(context, NotificationOpenedActivity::class.java)
             intent.action = DEFAULT_TAP_ACTION_ID
@@ -156,23 +204,35 @@ class NotificationIntentProcessorTests {
                 mockActionHandler.handleActions(
                     listOf(
                         mockLaunchApplicationAction,
-                        reportingAction
+                        basicDismissAction,
+                        reportingAction,
                     ), mockAction
                 )
             }
         }
 
-    private fun createTestIntent(actionModel: PresentableActionModel): Intent {
+    private fun createTestIntent(
+        actionModel: PresentableActionModel,
+        actionModelJson: String = APP_EVENT_ACTION_MODEL_JSON
+    ): Intent {
         val intent = Intent(context, NotificationOpenedActivity::class.java)
         intent.action = actionModel.id
         intent.putExtra(
             INTENT_EXTRA_ACTION_KEY,
-            ACTION_MODEL_JSON
+            actionModelJson
         )
         return intent
     }
 
-    private fun createTestMessage(): String {
+    private fun createTestMessage(
+        actionModelString: String = """{
+                    "type":"MEAppEvent",
+                    "id":"$ID",
+                    "title":"$TITLE",
+                    "name":"$NAME",
+                    "payload":{"testKey":"testValue"}
+                }""".trimIndent()
+    ): String {
         return """{
         "messageId":"testMessageId",
         "title": "testTitle",
@@ -183,19 +243,13 @@ class NotificationIntentProcessorTests {
             "platformData":{
                 "channelId":"testChannelId",
                 "notificationMethod":{
-                    "collapseId":"testCollapseId",
+                    "collapseId":"$COLLAPSE_ID",
                     "operation":"${NotificationOperation.INIT}"
                     }
                 }
             }
             "actions": [
-                {
-                    "type":"MEAppEvent",
-                    "id":"$ID",
-                    "title":"$TITLE",
-                    "name":"$NAME",
-                    "payload":{"testKey":"testValue"}
-                }
+                $actionModelString
             ]
         }""".trimIndent()
     }

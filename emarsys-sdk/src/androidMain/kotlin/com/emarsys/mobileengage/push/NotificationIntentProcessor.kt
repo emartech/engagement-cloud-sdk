@@ -9,8 +9,10 @@ import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.actions.Action
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BasicActionModel
+import com.emarsys.mobileengage.action.models.BasicDismissActionModel
 import com.emarsys.mobileengage.action.models.BasicLaunchApplicationActionModel
 import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
+import com.emarsys.mobileengage.action.models.DismissActionModel
 import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.push.model.AndroidPushMessage
@@ -28,10 +30,10 @@ class NotificationIntentProcessor(
 
         if (intent != null) {
             lifecycleScope.launch {
-                val actionModel = getActionModel(intent)
-                actionModel?.let {
+                val triggeredActionModel = getActionModel(intent)
+                triggeredActionModel?.let {
                     val triggeredAction = actionFactory.create(it)
-                    val mandatoryActions = getMandatoryActions(intent, actionModel)
+                    val mandatoryActions = getMandatoryActions(intent, triggeredActionModel)
                     actionHandler.handleActions(mandatoryActions, triggeredAction)
                 }
             }
@@ -48,26 +50,35 @@ class NotificationIntentProcessor(
 
     private suspend fun getMandatoryActions(
         intent: Intent,
-        actionModel: ActionModel
+        triggeredActionModel: ActionModel
     ): List<Action<*>> {
         val result = mutableListOf<Action<*>>()
         val pushMessageString = intent.getStringExtra(INTENT_EXTRA_PAYLOAD_KEY)
         val pushMessage = pushMessageString?.let { json.decodeFromString<AndroidPushMessage>(it) }
 
-        val launchApplicationAction = actionFactory.create(BasicLaunchApplicationActionModel)
-        result.add(launchApplicationAction)
+        if (triggeredActionModel !is DismissActionModel) {
+            val launchApplicationAction = actionFactory.create(BasicLaunchApplicationActionModel)
+            result.add(launchApplicationAction)
+            pushMessage?.data?.platformData?.notificationMethod?.collapseId?.let {
+                val dismissAction =
+                    actionFactory.create(BasicDismissActionModel(it))
+                result.add(dismissAction)
+            }
+        }
 
         pushMessage?.data?.sid?.let {
-            val reportingAction = when (actionModel) {
+            val reportingAction = when (triggeredActionModel) {
                 is PresentableActionModel -> {
                     BasicPushButtonClickedActionModel(
-                        actionModel.id,
+                        triggeredActionModel.id,
                         it
                     )
                 }
+
                 is BasicActionModel -> {
                     NotificationOpenedActionModel(it)
                 }
+
                 else -> null
             }
 
