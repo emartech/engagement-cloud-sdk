@@ -14,6 +14,7 @@ import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.session.Session
 import com.emarsys.networking.clients.contact.ContactClientApi
+import com.emarsys.networking.clients.deepLink.DeepLinkClientApi
 import com.emarsys.networking.clients.device.DeviceClientApi
 
 import com.emarsys.networking.clients.event.model.SdkEvent
@@ -56,6 +57,8 @@ interface DependencyContainerPrivateApi {
     val pushClient: PushClientApi
 
     val contactClient: ContactClientApi
+
+    val deepLinkClient: DeepLinkClientApi
 
     val sessionContext: SessionContext
 

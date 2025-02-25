@@ -8,5 +8,6 @@ enum class EmarsysUrlType {
     EVENT,
     REGISTER_DEVICE_INFO,
     REMOTE_CONFIG_SIGNATURE,
-    REMOTE_CONFIG
+    REMOTE_CONFIG,
+    DEEP_LINK
 }

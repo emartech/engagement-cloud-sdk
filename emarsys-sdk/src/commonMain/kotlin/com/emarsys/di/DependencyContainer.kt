@@ -15,6 +15,8 @@ import com.emarsys.api.contact.ContactContext
 import com.emarsys.api.contact.ContactGatherer
 import com.emarsys.api.contact.ContactInternal
 import com.emarsys.api.contact.LoggingContact
+import com.emarsys.api.deepLink.DeepLinkApi
+import com.emarsys.api.deepLink.DeepLinkInternal
 import com.emarsys.api.event.EventTracker
 import com.emarsys.api.event.EventTrackerCall
 import com.emarsys.api.event.EventTrackerContext
@@ -68,11 +70,13 @@ import com.emarsys.core.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.SdkLogger
+import com.emarsys.core.networking.UserAgentProvider
 import com.emarsys.core.networking.clients.GenericNetworkClient
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.providers.RandomProvider
+import com.emarsys.core.providers.SuspendProvider
 import com.emarsys.core.providers.TimestampProvider
 import com.emarsys.core.providers.TimezoneProvider
 import com.emarsys.core.providers.UUIDProvider
@@ -103,6 +107,8 @@ import com.emarsys.networking.clients.contact.ContactClient
 import com.emarsys.networking.clients.contact.ContactClientApi
 import com.emarsys.networking.clients.contact.ContactTokenHandler
 import com.emarsys.networking.clients.contact.ContactTokenHandlerApi
+import com.emarsys.networking.clients.deepLink.DeepLinkClient
+import com.emarsys.networking.clients.deepLink.DeepLinkClientApi
 import com.emarsys.networking.clients.device.DeviceClient
 import com.emarsys.networking.clients.device.DeviceClientApi
 import com.emarsys.networking.clients.event.EventClient
@@ -157,6 +163,10 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
     }
 
     override val uuidProvider: Provider<String> by lazy { UUIDProvider() }
+
+    private val userAgentProvider: SuspendProvider<String> by lazy {
+        UserAgentProvider(deviceInfoCollector, json)
+    }
 
     override val sdkDispatcher: CoroutineDispatcher by lazy {
         Dispatchers.Default
@@ -418,6 +428,10 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         Config(loggingConfig, gathererConfig, configInternal, sdkContext, deviceInfoCollector)
     }
 
+    override val deepLinkApi: DeepLinkApi by lazy {
+        DeepLinkInternal(sdkContext, deepLinkClient)
+    }
+
     override val pushApi: PushApi by lazy {
         dependencyCreator.createPushApi(
             pushInternal,
@@ -432,6 +446,10 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
 
     override val contactClient: ContactClientApi by lazy {
         ContactClient(emarsysClient, urlFactory, sdkContext, contactTokenHandler, json)
+    }
+
+    override val deepLinkClient: DeepLinkClientApi by lazy {
+        DeepLinkClient(genericNetworkClient, urlFactory, userAgentProvider, json, sdkLogger)
     }
 
     private val genericNetworkClient: NetworkClientApi by lazy {

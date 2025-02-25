@@ -1,6 +1,7 @@
 package com.emarsys
 
 import com.emarsys.api.config.ConfigApi
+import com.emarsys.api.deepLink.DeepLinkApi
 import com.emarsys.api.event.model.CustomEvent
 import com.emarsys.api.geofence.GeofenceTrackerApi
 import com.emarsys.api.inapp.InAppApi
@@ -70,5 +71,8 @@ object Emarsys {
 
     val predict: PredictApi
         get() = DependencyInjection.container.predictApi
+
+    val deepLink: DeepLinkApi
+        get() = DependencyInjection.container.deepLinkApi
 
 }

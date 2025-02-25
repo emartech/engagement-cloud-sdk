@@ -2,6 +2,7 @@ package com.emarsys.core.url
 
 import com.emarsys.context.SdkContextApi
 import com.emarsys.context.isConfigPredictOnly
+import com.emarsys.core.url.EmarsysUrlType.DEEP_LINK
 import com.emarsys.core.url.EmarsysUrlType.EVENT
 import com.emarsys.core.url.EmarsysUrlType.LINK_CONTACT
 import com.emarsys.core.url.EmarsysUrlType.PUSH_TOKEN
@@ -48,6 +49,7 @@ class UrlFactory(
 
             REMOTE_CONFIG_SIGNATURE -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/signature/${sdkContext.config?.applicationCode}")
             REMOTE_CONFIG -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/${sdkContext.config?.applicationCode}")
+            DEEP_LINK -> Url(sdkContext.defaultUrls.deepLinkBaseUrl)
         }
     }
 

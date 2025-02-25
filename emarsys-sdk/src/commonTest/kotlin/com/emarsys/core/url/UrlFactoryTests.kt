@@ -120,4 +120,14 @@ class UrlFactoryTests {
 
         result shouldBe Url("testRemoteConfigBaseUrl/signature/testAppCode")
     }
+
+    @Test
+    fun testCreate_deepLink_should_return_url_for_trackDeepLink() {
+        every { mockDefaultUrls.deepLinkBaseUrl } returns "testDeepLinkBaseUrl"
+        every { mockSdkContext.defaultUrls } returns mockDefaultUrls
+
+        val result = urlFactory.create(EmarsysUrlType.DEEP_LINK)
+
+        result shouldBe Url("testDeepLinkBaseUrl")
+    }
 }

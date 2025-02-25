@@ -3,6 +3,7 @@ package com.emarsys.di
 import EventTrackerApi
 import com.emarsys.api.config.ConfigApi
 import com.emarsys.api.contact.ContactApi
+import com.emarsys.api.deepLink.DeepLinkApi
 import com.emarsys.api.geofence.GeofenceTrackerApi
 import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.inbox.InboxApi
@@ -29,6 +30,8 @@ interface DependencyContainerApi {
     val geofenceTrackerApi: GeofenceTrackerApi
 
     val configApi: ConfigApi
+
+    val deepLinkApi: DeepLinkApi
 
     val setupOrganizerApi: SetupOrganizerApi
 

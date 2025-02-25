@@ -6,6 +6,8 @@ import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.inbox.InboxApi
 import com.emarsys.api.predict.PredictApi
 import com.emarsys.mobileengage.push.IosPushApi
+import io.ktor.http.Url
+import platform.Foundation.NSUserActivity
 import kotlin.experimental.ExperimentalObjCName
 
 @OptIn(ExperimentalObjCName::class)
@@ -48,7 +50,9 @@ object IosEmarsys {
         Emarsys.trackCustomEvent(event, attributes)
     }
 
-     suspend fun trackDeepLink() {
-        Emarsys.trackDeepLink()
+     suspend fun trackDeepLink(userActivity: NSUserActivity) {
+        userActivity.webpageURL?.absoluteString()?.let {
+            Emarsys.deepLink.trackDeepLink(Url(it))
+        }
     }
 }
