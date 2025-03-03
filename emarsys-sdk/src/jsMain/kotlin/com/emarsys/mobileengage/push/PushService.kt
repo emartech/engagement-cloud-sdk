@@ -5,7 +5,7 @@ import com.emarsys.ServiceWorkerOptions
 import com.emarsys.api.push.PushConstants
 import com.emarsys.core.storage.TypedStorageApi
 import js.buffer.BufferSource
-import js.typedarrays.toUint8Array
+import js.typedarrays.Uint8Array
 import kotlinx.browser.window
 import web.navigator.navigator
 import web.push.PushSubscriptionOptionsInit
@@ -47,18 +47,15 @@ class PushService(
     }
 
     private fun urlBase64ToUint8Array(base64String: String): BufferSource {
-        val padding = "=".repeat((4 - base64String.length % 4) % 4)
+        val padding = "=".repeat((4 - base64String.length % 4) % 4);
         val base64 = (base64String + padding)
             .replace('-', '+')
-            .replace('_', '/')
+            .replace('_', '/');
 
-        val rawData = window.atob(base64)
-        val outputArray = byteArrayOf()
+        val rawData = window.atob(base64);
+        val outputArray = Uint8Array.fromBase64(rawData).unsafeCast<BufferSource>();
 
-        for (i in rawData.indices) {
-            outputArray[i] = rawData[i].code.toByte()
-        }
-        return outputArray.toUint8Array()
+        return outputArray;
     }
 
 }

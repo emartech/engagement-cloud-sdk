@@ -6,7 +6,6 @@ import com.emarsys.mobileengage.push.model.JsPlatformData
 import com.emarsys.mobileengage.push.model.JsPushMessage
 import com.emarsys.mobileengage.push.model.WebPushNotificationData
 import com.emarsys.util.JsonUtil
-import kotlinx.serialization.encodeToString
 import org.w3c.notifications.NotificationAction
 import org.w3c.notifications.NotificationOptions
 
@@ -18,6 +17,7 @@ open class PushMessagePresenter(private val webPushNotificationPresenter: WebPus
             body = pushMessage.body
             icon = pushMessage.iconUrlString
             badge = pushMessage.imageUrlString
+            tag = pushMessage.messageId
         }
 
         pushMessage.data.actions?.let {
