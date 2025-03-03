@@ -47,10 +47,6 @@ object Emarsys {
         DependencyInjection.container.eventTrackerApi.trackEvent(CustomEvent(event, attributes))
     }
 
-    suspend fun trackDeepLink() {
-        TODO("Not yet implemented")
-    }
-
     val events: SharedFlow<SdkEvent>
         get()=DependencyInjection.container.events
 

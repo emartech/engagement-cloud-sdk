@@ -12,4 +12,5 @@ object SdkConstants {
     const val APP_START_EVENT_NAME = "app:start"
     const val INAPP_VIEWED_EVENT_NAME = "inapp:viewed"
     const val DISMISS_EVENT_NAME = "dismiss"
+    const val EMS_DEEP_LINK_TRACKED_KEY = "ems_deep_link_tracked"
 }
