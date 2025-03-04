@@ -9,6 +9,7 @@ import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.inbox.InboxApi
 import com.emarsys.api.predict.PredictApi
 import com.emarsys.api.push.PushApi
+import com.emarsys.init.InitOrganizerApi
 
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.setup.SetupOrganizerApi
@@ -34,6 +35,8 @@ interface DependencyContainerApi {
     val deepLinkApi: DeepLinkApi
 
     val setupOrganizerApi: SetupOrganizerApi
+
+    val initOrganizer: InitOrganizerApi
 
     val events: SharedFlow<SdkEvent>
 

@@ -23,7 +23,7 @@ class RemoteConfigIntegrationTests {
     fun testRemoteConfig_with_integrationTest_app_code() = runTest {
         val dependencyContainer = DependencyContainer()
         dependencyContainer.sdkContext.config = EmarsysConfig(INTEGRATION_TEST_APP_CODE)
-        dependencyContainer.remoteConfigHandler.handle()
+        dependencyContainer.remoteConfigHandler.handleAppCodeBased()
         val defaultUrls = dependencyContainer.sdkContext.defaultUrls
         val clientServiceBaseUrl = defaultUrls.clientServiceBaseUrl
         val eventServiceBaseUrl = defaultUrls.eventServiceBaseUrl

@@ -21,9 +21,9 @@ class RemoteConfigClient(
     private val json: Json,
     private val sdkLogger: Logger
 ) : RemoteConfigClientApi {
-    override suspend fun fetchRemoteConfig(): RemoteConfigResponse? {
-        val toBeConfigBytes = fetchConfig()
-        val toBeSignatureBytes = fetchSignature()
+    override suspend fun fetchRemoteConfig(global: Boolean): RemoteConfigResponse? {
+        val toBeConfigBytes = fetchConfig(global)
+        val toBeSignatureBytes = fetchSignature(global)
         val config = toBeConfigBytes.await()
         val signature = toBeSignatureBytes.await()
         if (config == null || signature == null) {
@@ -37,18 +37,21 @@ class RemoteConfigClient(
         }
     }
 
-    private suspend fun fetchConfig(): Deferred<String?> = coroutineScope {
+    private suspend fun fetchConfig(global: Boolean): Deferred<String?> = coroutineScope {
         async {
             val request =
-                UrlRequest(urlFactoryApi.create(EmarsysUrlType.REMOTE_CONFIG), HttpMethod.Get)
+                UrlRequest(
+                    urlFactoryApi.create(if (global) EmarsysUrlType.GLOBAL_REMOTE_CONFIG else EmarsysUrlType.REMOTE_CONFIG),
+                    HttpMethod.Get
+                )
             executeRequest(request)
         }
     }
 
-    private suspend fun fetchSignature(): Deferred<String?> = coroutineScope {
+    private suspend fun fetchSignature(global: Boolean): Deferred<String?> = coroutineScope {
         async {
             val request = UrlRequest(
-                urlFactoryApi.create(EmarsysUrlType.REMOTE_CONFIG_SIGNATURE),
+                urlFactoryApi.create(if (global) EmarsysUrlType.GLOBAL_REMOTE_CONFIG_SIGNATURE else EmarsysUrlType.REMOTE_CONFIG_SIGNATURE),
                 HttpMethod.Get
             )
             executeRequest(request)

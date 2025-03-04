@@ -1,0 +1,36 @@
+package com.emarsys.init.states
+
+import com.emarsys.remoteConfig.RemoteConfigHandlerApi
+import dev.mokkery.answering.returns
+import dev.mokkery.everySuspend
+import dev.mokkery.mock
+import dev.mokkery.verifySuspend
+import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.test.runTest
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+
+
+class ApplyGlobalRemoteConfigStateTests {
+    private lateinit var applyGlobalRemoteConfigState: ApplyGlobalRemoteConfigState
+    private lateinit var mockRemoteConfigHandler: RemoteConfigHandlerApi
+
+    @BeforeTest
+    fun setup() {
+        mockRemoteConfigHandler = mock()
+
+        applyGlobalRemoteConfigState = ApplyGlobalRemoteConfigState(mockRemoteConfigHandler)
+    }
+
+    @Test
+    fun testName() = runTest {
+        applyGlobalRemoteConfigState.name shouldBe "applyGlobalRemoteConfig"
+    }
+
+    @Test
+    fun testActive_should_handleGlobal_with_remoteConfigHandler() = runTest {
+        everySuspend { mockRemoteConfigHandler.handleGlobal() } returns Unit
+        applyGlobalRemoteConfigState.active()
+        verifySuspend { mockRemoteConfigHandler.handleGlobal() }
+    }
+}

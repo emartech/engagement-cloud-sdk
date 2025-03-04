@@ -12,7 +12,7 @@ class SdkContext(
     override var defaultUrls: DefaultUrlsApi,
     override var remoteLogLevel: LogLevel,
     override val features: MutableSet<Features>,
-): SdkContextApi, Observable<SdkState>(SdkState.inactive) {
+) : SdkContextApi, Observable<SdkState>(SdkState.inactive) {
 
     override var contactFieldId: Int? = null
 

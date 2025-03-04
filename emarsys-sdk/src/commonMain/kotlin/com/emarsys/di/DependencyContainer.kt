@@ -90,6 +90,13 @@ import com.emarsys.core.url.UrlFactory
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.core.util.Downloader
 import com.emarsys.core.util.DownloaderApi
+import com.emarsys.init.InitOrganizer
+import com.emarsys.init.InitOrganizerApi
+import com.emarsys.init.states.ApplyGlobalRemoteConfigState
+import com.emarsys.init.states.PlatformInitState
+import com.emarsys.init.states.RegisterInstancesState
+import com.emarsys.init.states.RegisterWatchdogsState
+import com.emarsys.init.states.SessionSubscriptionState
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.EventActionFactory
 import com.emarsys.mobileengage.action.PushActionFactory
@@ -124,7 +131,7 @@ import com.emarsys.setup.PlatformInitializerApi
 import com.emarsys.setup.SetupOrganizer
 import com.emarsys.setup.SetupOrganizerApi
 import com.emarsys.setup.states.AppStartState
-import com.emarsys.setup.states.ApplyRemoteConfigState
+import com.emarsys.setup.states.ApplyAppCodeBasedRemoteConfigState
 import com.emarsys.setup.states.CollectDeviceInfoState
 import com.emarsys.setup.states.RegisterClientState
 import com.emarsys.setup.states.RegisterPushTokenState
@@ -461,7 +468,8 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             RemoteConfigClient(genericNetworkClient, urlFactory, crypto, json, sdkLogger),
             deviceInfoCollector,
             sdkContext,
-            RandomProvider()
+            RandomProvider(),
+            sdkLogger
         )
     }
 
@@ -477,7 +485,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
                 eventActionFactory,
                 stringStorage
             )
-        val applyRemoteConfigState = ApplyRemoteConfigState(
+        val applyAppCodeBasedRemoteConfigState = ApplyAppCodeBasedRemoteConfigState(
             remoteConfigHandler
         )
         val appStartState = AppStartState(eventClient, timestampProvider)
@@ -564,17 +572,25 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             pushActionHandler
         )
     }
+    override val initOrganizer: InitOrganizerApi by lazy {
+        InitOrganizer(
+            StateMachine(
+                listOf(
+                    ApplyGlobalRemoteConfigState(remoteConfigHandler),
+                    RegisterInstancesState(eventTrackerApi, contactApi, pushApi),
+                    RegisterWatchdogsState(lifecycleWatchDog, connectionWatchDog),
+                    SessionSubscriptionState(
+                        mobileEngageSession,
+                        lifecycleWatchDog
+                    ),
+                    PlatformInitState(platformInitializer),
+                )
+            ),
+            sdkContext
+        )
+    }
 
     override suspend fun setup() {
-        eventTrackerApi.registerOnContext()
-        contactApi.registerOnContext()
-        pushApi.registerOnContext()
-
-        connectionWatchDog.register()
-        lifecycleWatchDog.register()
-
-        mobileEngageSession.subscribe(lifecycleWatchDog)
-
-        platformInitializer.init()
+        initOrganizer.init()
     }
 }

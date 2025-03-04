@@ -10,27 +10,27 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class ApplyRemoteConfigStateTests {
+class ApplyAppCodeBasedRemoteConfigStateTests {
     private lateinit var mockRemoteConfigHandler: RemoteConfigHandlerApi
-    private lateinit var applyRemoteConfigState: ApplyRemoteConfigState
+    private lateinit var applyAppCodeBasedRemoteConfigState: ApplyAppCodeBasedRemoteConfigState
 
     @BeforeTest
     fun setUp() {
         mockRemoteConfigHandler = mock()
-        applyRemoteConfigState = ApplyRemoteConfigState(mockRemoteConfigHandler)
+        applyAppCodeBasedRemoteConfigState = ApplyAppCodeBasedRemoteConfigState(mockRemoteConfigHandler)
     }
 
     @Test
     fun testName() = runTest {
-        applyRemoteConfigState.name shouldBe "applyRemoteConfig"
+        applyAppCodeBasedRemoteConfigState.name shouldBe "applyRemoteConfig"
     }
 
     @Test
     fun testActive() = runTest {
-        everySuspend { mockRemoteConfigHandler.handle() } returns Unit
+        everySuspend { mockRemoteConfigHandler.handleAppCodeBased() } returns Unit
 
-        applyRemoteConfigState.active()
+        applyAppCodeBasedRemoteConfigState.active()
 
-        verifySuspend { mockRemoteConfigHandler.handle() }
+        verifySuspend { mockRemoteConfigHandler.handleAppCodeBased() }
     }
 }

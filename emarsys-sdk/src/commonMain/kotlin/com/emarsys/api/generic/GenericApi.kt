@@ -41,6 +41,7 @@ open class GenericApi<Logging : Activatable, Gatherer : Activatable, Internal : 
                 SdkState.active -> internalApi
                 SdkState.onHold -> gathererApi
                 SdkState.inactive -> loggingApi
+                SdkState.initialized -> loggingApi
             }
         )
     }

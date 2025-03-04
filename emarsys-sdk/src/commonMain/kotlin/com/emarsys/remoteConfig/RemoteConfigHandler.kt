@@ -5,6 +5,7 @@ import com.emarsys.context.SdkContextApi
 import com.emarsys.context.copyWith
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.log.LogLevel
+import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.Provider
 import com.emarsys.networking.clients.remoteConfig.RemoteConfigClientApi
 
@@ -12,11 +13,14 @@ class RemoteConfigHandler(
     private val remoteConfigClient: RemoteConfigClientApi,
     private val deviceInfoCollector: DeviceInfoCollectorApi,
     private val sdkContext: SdkContextApi,
-    private val randomProvider: Provider<Double>
+    private val randomProvider: Provider<Double>,
+    private val logger: Logger
 ) : RemoteConfigHandlerApi {
-    override suspend fun handle() {
-        val config = remoteConfigClient.fetchRemoteConfig() ?: return
-        val clientId = deviceInfoCollector.getClientId()
+    private suspend fun handle(config: RemoteConfigResponse?, clientId: String?) {
+        if (config == null) {
+            logger.error("RemoteConfigHandler - handle", "config is null")
+            return
+        }
 
         applyServiceUrls(config.serviceUrls)
         applyLogLevel(config.logLevel)
@@ -70,6 +74,19 @@ class RemoteConfigHandler(
         } else {
             sdkContext.features.remove(feature)
         }
+    }
+
+    override suspend fun handleAppCodeBased() {
+        val config = remoteConfigClient.fetchRemoteConfig() ?: return
+        val clientId = deviceInfoCollector.getClientId()
+        handle(config, clientId)
+    }
+
+    override suspend fun handleGlobal() {
+        val config = remoteConfigClient.fetchRemoteConfig(true) ?: return
+        val clientId = deviceInfoCollector.getClientId()
+
+        handle(config, clientId)
     }
 
 }

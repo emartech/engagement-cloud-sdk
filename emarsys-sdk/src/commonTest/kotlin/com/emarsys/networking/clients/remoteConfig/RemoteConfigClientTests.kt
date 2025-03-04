@@ -77,6 +77,27 @@ class RemoteConfigClientTests {
     }
 
     @Test
+    fun testFetchRemoteConfig_shouldReturnGlobalRemoteConfig() = runTest {
+        val configResponse = Response(configRequest, HttpStatusCode.OK, Headers.Empty, configResult)
+        val configSignatureResponse = Response(
+            configSignatureRequest,
+            HttpStatusCode.OK,
+            Headers.Empty,
+            configSignatureResult
+        )
+
+        every { mockUrlFactory.create(EmarsysUrlType.GLOBAL_REMOTE_CONFIG) } returns configUrl
+        every { mockUrlFactory.create(EmarsysUrlType.GLOBAL_REMOTE_CONFIG_SIGNATURE) } returns configSignatureUrl
+        everySuspend { mockNetworkClient.send(configRequest) } returns configResponse
+        everySuspend { mockNetworkClient.send(configSignatureRequest) } returns configSignatureResponse
+        everySuspend { mockCrypto.verify(any(), any()) } returns true
+
+        val result = remoteConfigClient.fetchRemoteConfig(global=true)
+
+        result shouldBe RemoteConfigResponse(logLevel = LogLevel.Error)
+    }
+
+    @Test
     fun testFetchRemoteConfig_shouldReturnNull() = runTest {
         val configResponse = Response(configRequest, HttpStatusCode.OK, Headers.Empty, configResult)
         val configSignatureResponse = Response(
