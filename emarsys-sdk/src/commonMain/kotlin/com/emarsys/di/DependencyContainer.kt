@@ -163,7 +163,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
     private val timestampProvider: Provider<Instant> = TimestampProvider()
 
     override val sdkEventFlow: MutableSharedFlow<SdkEvent> =
-        MutableSharedFlow(replay = 10)  // TODO: configure replay cache
+        MutableSharedFlow(replay = 100)
 
     override val json: Json by lazy {
         JsonUtil.json
