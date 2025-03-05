@@ -429,9 +429,10 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
                     storage,
                     ConfigCall.serializer()
                 )
-            )
+            ),
+            sdkLogger
         )
-        val configInternal = ConfigInternal()
+        val configInternal = ConfigInternal(sdkLogger)
         Config(loggingConfig, gathererConfig, configInternal, sdkContext, deviceInfoCollector)
     }
 

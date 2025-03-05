@@ -9,6 +9,7 @@ import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.remoteConfig.RemoteConfigResponse
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
 import dev.mokkery.every
@@ -48,7 +49,7 @@ class RemoteConfigClientTests {
         mockNetworkClient = mock()
         mockUrlFactory = mock()
         mockCrypto = mock()
-        mockSdkLogger = mock()
+        mockSdkLogger = mock(MockMode.autofill)
         everySuspend { mockSdkLogger.error(any<String>(), any<Throwable>()) } returns Unit
 
         remoteConfigClient =
