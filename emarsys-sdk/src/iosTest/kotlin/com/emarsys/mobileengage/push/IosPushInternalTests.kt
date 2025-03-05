@@ -34,6 +34,7 @@ import com.emarsys.mobileengage.action.models.PresentableOpenExternalUrlActionMo
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.util.JsonUtil
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
@@ -114,7 +115,7 @@ class IosPushInternalTests {
         mockTimestampProvider = mock()
         sdkDispatcher = dispatcher
         mockSdkEventFlow = mock()
-        mockSdkLogger = mock()
+        mockSdkLogger = mock(MockMode.autofill)
         everySuspend { mockActionHandler.handleActions(any(), any()) } returns Unit
         everySuspend { mockTimestampProvider.provide() } returns Instant.DISTANT_PAST
         iosPushInternal = IosPushInternal(

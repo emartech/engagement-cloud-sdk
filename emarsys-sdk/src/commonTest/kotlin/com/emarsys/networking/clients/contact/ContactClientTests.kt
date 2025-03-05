@@ -8,6 +8,7 @@ import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.util.JsonUtil
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
@@ -24,7 +25,7 @@ import kotlinx.serialization.json.Json
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class ContactClientTests  {
+class ContactClientTests {
     private companion object {
         const val OPEN_ID_TOKEN = "testOpenIdToken"
         const val CONTACT_FIELD_VALUE = "testContactFieldValue"
@@ -45,7 +46,14 @@ class ContactClientTests  {
         mockUrlFactory = mock()
         mockSdkContext = mock()
         mockContactTokenHandler = mock()
-        contactClient = ContactClient(mockEmarsysClient, mockUrlFactory, mockSdkContext, mockContactTokenHandler, json)
+        contactClient = ContactClient(
+            mockEmarsysClient,
+            mockUrlFactory,
+            mockSdkContext,
+            mockContactTokenHandler,
+            json,
+            sdkLogger = mock(MockMode.autofill)
+        )
     }
 
     @Test
@@ -70,7 +78,7 @@ class ContactClientTests  {
         )
         every { mockUrlFactory.create(EmarsysUrlType.LINK_CONTACT) } returns testUrl
         everySuspend { mockEmarsysClient.send(expectedUrlRequest) } returns expectedResponse
-        every { mockContactTokenHandler.handleContactTokens(expectedResponse) } returns Unit
+        everySuspend { mockContactTokenHandler.handleContactTokens(expectedResponse) } returns Unit
 
         contactClient.linkContact(CONTACT_FIELD_ID, contactFieldValue = CONTACT_FIELD_VALUE)
 
@@ -108,7 +116,7 @@ class ContactClientTests  {
             Headers.Empty,
             """{"refreshToken":"testRefreshToken", "contactToken":"testContactToken"}"""
         )
-        every { mockContactTokenHandler.handleContactTokens(expectedResponse) } returns Unit
+        everySuspend { mockContactTokenHandler.handleContactTokens(expectedResponse) } returns Unit
 
 
         val response = contactClient.linkContact(CONTACT_FIELD_ID, openIdToken = OPEN_ID_TOKEN)
@@ -121,48 +129,49 @@ class ContactClientTests  {
     }
 
     @Test
-    fun testLinkContact_should_send_request_to_client_service_with_openId_and_merchantIdAvailable() = runTest {
-        every { mockSdkContext.config } returns EmarsysConfig(
-            merchantId = MERCHANT_ID
-        )
+    fun testLinkContact_should_send_request_to_client_service_with_openId_and_merchantIdAvailable() =
+        runTest {
+            every { mockSdkContext.config } returns EmarsysConfig(
+                merchantId = MERCHANT_ID
+            )
 
-        val testUrl = Url("https://www.testUrl.com/testAppCode/client")
-        val testBody =
-            """{"contactFieldId":2575,"contactFieldValue":null,"openIdToken":"$OPEN_ID_TOKEN"}"""
-        val expectedUrlRequest = UrlRequest(
-            testUrl,
-            HttpMethod.Post,
-            testBody,
-            mapOf("ems-merchant-id" to MERCHANT_ID)
-        )
+            val testUrl = Url("https://www.testUrl.com/testAppCode/client")
+            val testBody =
+                """{"contactFieldId":2575,"contactFieldValue":null,"openIdToken":"$OPEN_ID_TOKEN"}"""
+            val expectedUrlRequest = UrlRequest(
+                testUrl,
+                HttpMethod.Post,
+                testBody,
+                mapOf("ems-merchant-id" to MERCHANT_ID)
+            )
 
-        val expectedResponse = Response(
-            expectedUrlRequest,
-            HttpStatusCode.OK,
-            headers {
-                append("ems-merchant-id", MERCHANT_ID)
-            },
-            """{"refreshToken":"testRefreshToken", "contactToken":"testContactToken"}"""
-        )
-        every { mockUrlFactory.create(EmarsysUrlType.LINK_CONTACT) } returns testUrl
-        everySuspend { mockEmarsysClient.send(expectedUrlRequest) } returns Response(
-            expectedUrlRequest,
-            HttpStatusCode.OK,
-            headers {
-                append("ems-merchant-id", MERCHANT_ID)
-            },
-            """{"refreshToken":"testRefreshToken", "contactToken":"testContactToken"}"""
-        )
-        every { mockContactTokenHandler.handleContactTokens(expectedResponse) } returns Unit
+            val expectedResponse = Response(
+                expectedUrlRequest,
+                HttpStatusCode.OK,
+                headers {
+                    append("ems-merchant-id", MERCHANT_ID)
+                },
+                """{"refreshToken":"testRefreshToken", "contactToken":"testContactToken"}"""
+            )
+            every { mockUrlFactory.create(EmarsysUrlType.LINK_CONTACT) } returns testUrl
+            everySuspend { mockEmarsysClient.send(expectedUrlRequest) } returns Response(
+                expectedUrlRequest,
+                HttpStatusCode.OK,
+                headers {
+                    append("ems-merchant-id", MERCHANT_ID)
+                },
+                """{"refreshToken":"testRefreshToken", "contactToken":"testContactToken"}"""
+            )
+            everySuspend { mockContactTokenHandler.handleContactTokens(expectedResponse) } returns Unit
 
-        val response = contactClient.linkContact(CONTACT_FIELD_ID, openIdToken = OPEN_ID_TOKEN)
+            val response = contactClient.linkContact(CONTACT_FIELD_ID, openIdToken = OPEN_ID_TOKEN)
 
-        verifySuspend {
-            mockEmarsysClient.send(expectedUrlRequest)
+            verifySuspend {
+                mockEmarsysClient.send(expectedUrlRequest)
+            }
+
+            response shouldBe expectedResponse
         }
-
-        response shouldBe expectedResponse
-    }
 
     @Test
     fun testUnLinkContact_should_send_request_to_client_service_andHandleContactTokens() = runTest {
@@ -191,7 +200,7 @@ class ContactClientTests  {
             Headers.Empty,
             """{"refreshToken":"testRefreshToken", "contactToken":"testContactToken"}"""
         )
-        every { mockContactTokenHandler.handleContactTokens(expectedResponse) } returns Unit
+        everySuspend { mockContactTokenHandler.handleContactTokens(expectedResponse) } returns Unit
 
         val response = contactClient.unlinkContact()
 
@@ -204,46 +213,47 @@ class ContactClientTests  {
     }
 
     @Test
-    fun testUnLinkContact_should_send_request_to_client_service_with_merchantIdAvailable() = runTest {
-        every { mockSdkContext.config } returns EmarsysConfig(
-            merchantId = MERCHANT_ID
-        )
+    fun testUnLinkContact_should_send_request_to_client_service_with_merchantIdAvailable() =
+        runTest {
+            every { mockSdkContext.config } returns EmarsysConfig(
+                merchantId = MERCHANT_ID
+            )
 
-        val testUrl = Url("https://www.testUrl.com/testAppCode/client")
+            val testUrl = Url("https://www.testUrl.com/testAppCode/client")
 
-        val expectedUrlRequest = UrlRequest(
-            testUrl,
-            HttpMethod.Delete,
-            null,
-            mapOf("ems-merchant-id" to MERCHANT_ID)
-        )
-        every { mockUrlFactory.create(EmarsysUrlType.UNLINK_CONTACT) } returns testUrl
-        everySuspend { mockEmarsysClient.send(expectedUrlRequest) } returns Response(
-            expectedUrlRequest,
-            HttpStatusCode.OK,
-            headers {
-                append("ems-merchant-id", MERCHANT_ID)
-            },
-            """{"refreshToken":"testRefreshToken", "contactToken":"testContactToken"}"""
-        )
+            val expectedUrlRequest = UrlRequest(
+                testUrl,
+                HttpMethod.Delete,
+                null,
+                mapOf("ems-merchant-id" to MERCHANT_ID)
+            )
+            every { mockUrlFactory.create(EmarsysUrlType.UNLINK_CONTACT) } returns testUrl
+            everySuspend { mockEmarsysClient.send(expectedUrlRequest) } returns Response(
+                expectedUrlRequest,
+                HttpStatusCode.OK,
+                headers {
+                    append("ems-merchant-id", MERCHANT_ID)
+                },
+                """{"refreshToken":"testRefreshToken", "contactToken":"testContactToken"}"""
+            )
 
-        val expectedResponse = Response(
-            expectedUrlRequest,
-            HttpStatusCode.OK,
-            headers {
-                append("ems-merchant-id", MERCHANT_ID)
-            },
-            """{"refreshToken":"testRefreshToken", "contactToken":"testContactToken"}"""
-        )
-        every { mockContactTokenHandler.handleContactTokens(expectedResponse) } returns Unit
+            val expectedResponse = Response(
+                expectedUrlRequest,
+                HttpStatusCode.OK,
+                headers {
+                    append("ems-merchant-id", MERCHANT_ID)
+                },
+                """{"refreshToken":"testRefreshToken", "contactToken":"testContactToken"}"""
+            )
+            everySuspend { mockContactTokenHandler.handleContactTokens(expectedResponse) } returns Unit
 
-        val response = contactClient.unlinkContact()
+            val response = contactClient.unlinkContact()
 
-        verifySuspend {
-            mockEmarsysClient.send(expectedUrlRequest)
-            mockContactTokenHandler.handleContactTokens(expectedResponse)
+            verifySuspend {
+                mockEmarsysClient.send(expectedUrlRequest)
+                mockContactTokenHandler.handleContactTokens(expectedResponse)
+            }
+
+            response shouldBe expectedResponse
         }
-
-        response shouldBe expectedResponse
-    }
 }

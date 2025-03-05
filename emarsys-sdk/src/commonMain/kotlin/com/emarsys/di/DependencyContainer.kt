@@ -302,11 +302,11 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
     }
 
     private val emarsysClient: NetworkClientApi by lazy {
-        EmarsysClient(genericNetworkClient, sessionContext, timestampProvider, urlFactory, json)
+        EmarsysClient(genericNetworkClient, sessionContext, timestampProvider, urlFactory, json, sdkLogger)
     }
 
     private val contactTokenHandler: ContactTokenHandlerApi by lazy {
-        ContactTokenHandler(sessionContext)
+        ContactTokenHandler(sessionContext, sdkLogger)
     }
 
     override val deviceClient: DeviceClientApi by lazy {
@@ -453,7 +453,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
     }
 
     override val contactClient: ContactClientApi by lazy {
-        ContactClient(emarsysClient, urlFactory, sdkContext, contactTokenHandler, json)
+        ContactClient(emarsysClient, urlFactory, sdkContext, contactTokenHandler, json, sdkLogger)
     }
 
     override val deepLinkClient: DeepLinkClientApi by lazy {
@@ -461,7 +461,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
     }
 
     private val genericNetworkClient: NetworkClientApi by lazy {
-        GenericNetworkClient(httpClient)
+        GenericNetworkClient(httpClient, sdkLogger)
     }
 
     override val remoteConfigHandler: RemoteConfigHandlerApi by lazy {
@@ -518,7 +518,14 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
 
     override val contactApi: ContactApi by lazy {
         val contactClient =
-            ContactClient(emarsysClient, urlFactory, sdkContext, contactTokenHandler, json)
+            ContactClient(
+                emarsysClient,
+                urlFactory,
+                sdkContext,
+                contactTokenHandler,
+                json,
+                sdkLogger
+            )
         val contactContext =
             ContactContext(
                 persistentListOf(
@@ -528,8 +535,8 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
                 )
             )
         val loggingContact = LoggingContact(sdkLogger)
-        val contactGatherer = ContactGatherer(contactContext)
-        val contactInternal = ContactInternal(contactClient, contactContext)
+        val contactGatherer = ContactGatherer(contactContext, sdkLogger)
+        val contactInternal = ContactInternal(contactClient, contactContext, sdkLogger)
         Contact(loggingContact, contactGatherer, contactInternal, sdkContext)
     }
 

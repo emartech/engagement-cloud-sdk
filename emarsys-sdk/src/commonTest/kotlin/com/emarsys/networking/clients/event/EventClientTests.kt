@@ -19,6 +19,7 @@ import com.emarsys.networking.clients.event.model.DeviceEventResponse
 import com.emarsys.networking.clients.event.model.EventResponseInApp
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.util.JsonUtil
+import dev.mokkery.MockMode
 import dev.mokkery.annotations.DelicateMokkeryApi
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
@@ -97,7 +98,7 @@ class EventClientTests {
         mockInAppPresenter = mock()
         mockInAppViewProvider = mock()
         mockInAppView = mock()
-        mockSdkLogger = mock()
+        mockSdkLogger = mock(MockMode.autofill)
         json = JsonUtil.json
         mockWebViewHolder = mock()
         sdkDispatcher =

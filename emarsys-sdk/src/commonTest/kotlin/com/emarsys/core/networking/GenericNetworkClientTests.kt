@@ -8,6 +8,8 @@ import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.networking.model.body
 import com.emarsys.model.TestDataClass
 import com.emarsys.util.JsonUtil
+import dev.mokkery.MockMode
+import dev.mokkery.mock
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.ktor.client.HttpClient
@@ -25,7 +27,6 @@ import io.ktor.http.headersOf
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 
@@ -109,7 +110,8 @@ class GenericNetworkClientTests {
     @Test
     fun testSend_should_send_request_that_fails_withoutRetries() = runTest {
         createHttpClient(HttpStatusCode.NotFound)
-        val urlString = URLBuilder("https://denna.gservice.emarsys.net/customResponseCode/500").build()
+        val urlString =
+            URLBuilder("https://denna.gservice.emarsys.net/customResponseCode/500").build()
         val request = UrlRequest(
             urlString,
             HttpMethod.Get,
@@ -148,8 +150,9 @@ class GenericNetworkClientTests {
             }
             install(HttpRequestRetry)
         }
-        genericNetworkClient = GenericNetworkClient(httpClient)
-        val urlString = URLBuilder("https://denna.gservice.emarsys.net/customResponseCode/500").build()
+        genericNetworkClient = GenericNetworkClient(httpClient, sdkLogger = mock(MockMode.autofill))
+        val urlString =
+            URLBuilder("https://denna.gservice.emarsys.net/customResponseCode/500").build()
         val request = UrlRequest(
             urlString,
             HttpMethod.Get,
@@ -189,9 +192,10 @@ class GenericNetworkClientTests {
             }
             install(HttpRequestRetry)
         }
-        genericNetworkClient = GenericNetworkClient(httpClient)
+        genericNetworkClient = GenericNetworkClient(httpClient, sdkLogger = mock(MockMode.autofill))
 
-        val urlString = URLBuilder("https://denna.gservice.emarsys.net/customResponseCode/500").build()
+        val urlString =
+            URLBuilder("https://denna.gservice.emarsys.net/customResponseCode/500").build()
         val request = UrlRequest(
             urlString,
             HttpMethod.Get,
@@ -229,7 +233,7 @@ class GenericNetworkClientTests {
             }
             install(HttpRequestRetry)
         }
-        genericNetworkClient = GenericNetworkClient(httpClient)
+        genericNetworkClient = GenericNetworkClient(httpClient, sdkLogger = mock(MockMode.autofill))
     }
 }
 
