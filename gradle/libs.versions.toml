@@ -36,8 +36,7 @@ hms_push = "6.13.0.300"
 googleServices = "4.4.2"
 kotlinWrappers = "2025.2.5"
 cryptography = "0.4.0"
-sqlDelight = "2.0.2"
-webWorkerDriver = "2.0.2"
+sqlDelight = "2.1.0-SNAPSHOT"
 
 [libraries]
 sqlDelight-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqlDelight" }

@@ -1,5 +1,6 @@
 package com.emarsys.di
 
+import app.cash.sqldelight.db.SqlDriver
 import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.PushApi
 import com.emarsys.api.push.PushCall
@@ -61,6 +62,8 @@ expect class PlatformDependencyCreator(
     ): PlatformContext
 
     override fun createStorage(): TypedStorageApi<String?>
+
+    override fun createDriver(): SqlDriver
 
     override fun createDeviceInfoCollector(
         timezoneProvider: Provider<String>,

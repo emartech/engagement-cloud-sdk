@@ -7,6 +7,9 @@ import android.content.Context.CLIPBOARD_SERVICE
 import android.net.ConnectivityManager
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import app.cash.sqldelight.db.SqlDriver
+import app.cash.sqldelight.driver.android.AndroidSqliteDriver
+import com.emarsys.SdkConstants.DB_NAME
 import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.LoggingPush
 import com.emarsys.api.push.Push
@@ -62,6 +65,7 @@ import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.PlatformInitState
 import com.emarsys.setup.PlatformInitializer
 import com.emarsys.setup.PlatformInitializerApi
+import com.emarsys.sqldelight.EmarsysDB
 import com.emarsys.watchdog.activity.TransitionSafeCurrentActivityWatchdog
 import com.emarsys.watchdog.connection.AndroidConnectionWatchDog
 import com.emarsys.watchdog.connection.ConnectionWatchDog
@@ -156,6 +160,10 @@ actual class PlatformDependencyCreator actual constructor(
 
     actual override fun createStorage(): TypedStorageApi<String?> =
         StringStorage(sharedPreferences)
+
+    actual override fun createDriver(): SqlDriver {
+        return AndroidSqliteDriver(EmarsysDB.Schema, applicationContext, DB_NAME)
+    }
 
     actual override fun createPermissionHandler(): PermissionHandlerApi {
         return AndroidPermissionHandler(applicationContext, currentActivityWatchdog)

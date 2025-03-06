@@ -167,8 +167,8 @@ afterEvaluate {
 
 sqldelight {
     databases {
-        create("Database") {
-            packageName.set("com.emarsys")
+        create("EmarsysDB") {
+            packageName.set("com.emarsys.sqldelight")
         }
     }
 }

@@ -1,5 +1,8 @@
 package com.emarsys.di
 
+import app.cash.sqldelight.db.SqlDriver
+import app.cash.sqldelight.driver.native.NativeSqliteDriver
+import com.emarsys.SdkConstants.DB_NAME
 import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.PushApi
 import com.emarsys.api.push.PushCall
@@ -59,6 +62,7 @@ import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.PlatformInitializer
 import com.emarsys.setup.PlatformInitializerApi
+import com.emarsys.sqldelight.EmarsysDB
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
@@ -104,6 +108,10 @@ actual class PlatformDependencyCreator actual constructor(
 
     actual override fun createStorage(): TypedStorageApi<String?> {
         return StringStorage(platformContext.userDefaults)
+    }
+
+    actual override fun createDriver(): SqlDriver {
+        return NativeSqliteDriver(EmarsysDB.Schema, DB_NAME)
     }
 
     actual override fun createDeviceInfoCollector(

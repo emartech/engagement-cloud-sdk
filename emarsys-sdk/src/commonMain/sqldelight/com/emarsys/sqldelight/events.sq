@@ -1,0 +1,8 @@
+CREATE TABLE events (
+  id TEXT PRIMARY KEY NOT NULL,
+  name TEXT NOT NULL,
+  attributes TEXT,
+  timestamp INTEGER NOT NULL
+);
+
+CREATE INDEX id ON events(id);
