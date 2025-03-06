@@ -1,11 +1,5 @@
 package com.emarsys.di
 
-import app.cash.sqldelight.Query
-import app.cash.sqldelight.Transacter
-import app.cash.sqldelight.db.QueryResult
-import app.cash.sqldelight.db.SqlCursor
-import app.cash.sqldelight.db.SqlDriver
-import app.cash.sqldelight.db.SqlPreparedStatement
 import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.LoggingPush
 import com.emarsys.api.push.Push
@@ -24,6 +18,8 @@ import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.cache.WebFileCache
 import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.clipboard.WebClipboardHandler
+import com.emarsys.core.db.EventsDaoApi
+import com.emarsys.core.db.events.JSEventsDao
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.WebPlatformInfoCollector
 import com.emarsys.core.launchapplication.JsLaunchApplicationHandler
@@ -122,51 +118,8 @@ actual class PlatformDependencyCreator actual constructor(
         return StringStorage(window.localStorage)
     }
 
-    actual override fun createDriver(): SqlDriver {
-        return object : SqlDriver {
-            override fun addListener(vararg queryKeys: String, listener: Query.Listener) {
-                TODO("Not yet implemented")
-            }
-
-            override fun close() {
-                TODO("Not yet implemented")
-            }
-
-            override fun currentTransaction(): Transacter.Transaction? {
-                TODO("Not yet implemented")
-            }
-
-            override fun execute(
-                identifier: Int?,
-                sql: String,
-                parameters: Int,
-                binders: (SqlPreparedStatement.() -> Unit)?
-            ): QueryResult<Long> {
-                TODO("Not yet implemented")
-            }
-
-            override fun <R> executeQuery(
-                identifier: Int?,
-                sql: String,
-                mapper: (SqlCursor) -> QueryResult<R>,
-                parameters: Int,
-                binders: (SqlPreparedStatement.() -> Unit)?
-            ): QueryResult<R> {
-                TODO("Not yet implemented")
-            }
-
-            override fun newTransaction(): QueryResult<Transacter.Transaction> {
-                TODO("Not yet implemented")
-            }
-
-            override fun notifyListeners(vararg queryKeys: String) {
-                TODO("Not yet implemented")
-            }
-
-            override fun removeListener(vararg queryKeys: String, listener: Query.Listener) {
-                TODO("Not yet implemented")
-            }
-        }
+    actual override fun createEventsDao(): EventsDaoApi {
+        return JSEventsDao()
     }
 
     actual override fun createDeviceInfoCollector(

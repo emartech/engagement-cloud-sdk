@@ -1,6 +1,5 @@
 package com.emarsys.di
 
-import app.cash.sqldelight.db.SqlDriver
 import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.PushApi
 import com.emarsys.api.push.PushCall
@@ -9,6 +8,7 @@ import com.emarsys.context.SdkContext
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.clipboard.ClipboardHandlerApi
+import com.emarsys.core.db.EventsDaoApi
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.log.SdkLogger
@@ -48,7 +48,7 @@ interface DependencyCreator {
 
     fun createStorage(): TypedStorageApi<String?>
 
-    fun createDriver(): SqlDriver
+    fun createEventsDao(): EventsDaoApi
 
     fun createDeviceInfoCollector(
         timezoneProvider: Provider<String>,

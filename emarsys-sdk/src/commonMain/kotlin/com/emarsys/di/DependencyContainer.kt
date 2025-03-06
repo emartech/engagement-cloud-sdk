@@ -65,6 +65,7 @@ import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.collections.persistentListOf
 import com.emarsys.core.crypto.Crypto
 import com.emarsys.core.crypto.CryptoApi
+import com.emarsys.core.db.EventsDaoApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.log.ConsoleLogger
@@ -221,6 +222,8 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             timestampProvider
         )
 
+    override val eventDbHelper: EventsDaoApi = dependencyCreator.createEventsDao()
+
     private val fileCache = dependencyCreator.createFileCache()
 
     override val downloaderApi: DownloaderApi =
@@ -302,7 +305,14 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
     }
 
     private val emarsysClient: NetworkClientApi by lazy {
-        EmarsysClient(genericNetworkClient, sessionContext, timestampProvider, urlFactory, json, sdkLogger)
+        EmarsysClient(
+            genericNetworkClient,
+            sessionContext,
+            timestampProvider,
+            urlFactory,
+            json,
+            sdkLogger
+        )
     }
 
     private val contactTokenHandler: ContactTokenHandlerApi by lazy {

@@ -119,8 +119,6 @@ kotlin {
                 implementation(libs.ktor.client.js)
                 implementation(libs.kotlin.wrapper.browser)
                 implementation(libs.cryptography.provider.webcrypto)
-                implementation(libs.sqlDelight.web)
-                implementation(devNpm("copy-webpack-plugin", "9.1.0"))
             }
         }
         val jsTest by getting {

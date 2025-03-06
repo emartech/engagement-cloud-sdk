@@ -7,7 +7,6 @@ import android.content.Context.CLIPBOARD_SERVICE
 import android.net.ConnectivityManager
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import com.emarsys.SdkConstants.DB_NAME
 import com.emarsys.api.generic.ApiContext
@@ -25,6 +24,8 @@ import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.cache.AndroidFileCache
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.clipboard.ClipboardHandlerApi
+import com.emarsys.core.db.EventsDaoApi
+import com.emarsys.core.db.events.AndroidSqlDelightEventsDao
 import com.emarsys.core.device.AndroidLanguageProvider
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.PlatformInfoCollector
@@ -59,7 +60,6 @@ import com.emarsys.mobileengage.permission.AndroidPermissionHandler
 import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
 import com.emarsys.mobileengage.url.AndroidExternalUrlOpener
 import com.emarsys.networking.clients.event.EventClientApi
-
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.PlatformInitState
@@ -161,8 +161,9 @@ actual class PlatformDependencyCreator actual constructor(
     actual override fun createStorage(): TypedStorageApi<String?> =
         StringStorage(sharedPreferences)
 
-    actual override fun createDriver(): SqlDriver {
-        return AndroidSqliteDriver(EmarsysDB.Schema, applicationContext, DB_NAME)
+    actual override fun createEventsDao(): EventsDaoApi {
+        val driver = AndroidSqliteDriver(EmarsysDB.Schema, applicationContext, DB_NAME)
+        return AndroidSqlDelightEventsDao(EmarsysDB(driver))
     }
 
     actual override fun createPermissionHandler(): PermissionHandlerApi {

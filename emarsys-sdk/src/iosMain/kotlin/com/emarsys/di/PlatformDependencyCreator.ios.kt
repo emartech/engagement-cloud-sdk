@@ -1,6 +1,5 @@
 package com.emarsys.di
 
-import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.native.NativeSqliteDriver
 import com.emarsys.SdkConstants.DB_NAME
 import com.emarsys.api.generic.ApiContext
@@ -16,6 +15,8 @@ import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.cache.IosFileCache
 import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.clipboard.IosClipboardHandler
+import com.emarsys.core.db.EventsDaoApi
+import com.emarsys.core.db.events.IosSqDelightEventsDao
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.UIDevice
 import com.emarsys.core.launchapplication.IosLaunchApplicationHandler
@@ -110,8 +111,9 @@ actual class PlatformDependencyCreator actual constructor(
         return StringStorage(platformContext.userDefaults)
     }
 
-    actual override fun createDriver(): SqlDriver {
-        return NativeSqliteDriver(EmarsysDB.Schema, DB_NAME)
+    actual override fun createEventsDao(): EventsDaoApi {
+        val driver = NativeSqliteDriver(EmarsysDB.Schema, DB_NAME)
+        return IosSqDelightEventsDao(EmarsysDB(driver))
     }
 
     actual override fun createDeviceInfoCollector(
