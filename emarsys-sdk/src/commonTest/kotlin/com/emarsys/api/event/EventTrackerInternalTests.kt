@@ -2,6 +2,9 @@ package com.emarsys.api.event
 
 import com.emarsys.api.event.model.CustomEvent
 import com.emarsys.api.generic.ApiContext
+import com.emarsys.core.log.ConsoleLogger
+import com.emarsys.core.log.Logger
+import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.providers.Provider
 import com.emarsys.networking.clients.event.EventClientApi
 
@@ -42,15 +45,21 @@ class EventTrackerInternalTests {
     private lateinit var mockTimestampProvider: Provider<Instant>
     private lateinit var eventTrackerContext: ApiContext<EventTrackerCall>
     private lateinit var eventTrackerInternal: EventTrackerInstance
+    private lateinit var logger: Logger
 
     @BeforeTest
     fun setUp() {
         mockEventClient = mock()
         mockTimestampProvider = mock()
         eventTrackerContext = EventTrackerContext(expectedEvents)
-
+        logger = SdkLogger(ConsoleLogger())
         eventTrackerInternal =
-            EventTrackerInternal(mockEventClient, eventTrackerContext, mockTimestampProvider)
+            EventTrackerInternal(
+                mockEventClient,
+                eventTrackerContext,
+                mockTimestampProvider,
+                logger
+            )
     }
 
     @Test

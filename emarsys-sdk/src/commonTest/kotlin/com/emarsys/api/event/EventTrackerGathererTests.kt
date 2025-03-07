@@ -1,6 +1,8 @@
 package com.emarsys.api.event
 
 import com.emarsys.api.event.model.CustomEvent
+import com.emarsys.core.log.ConsoleLogger
+import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.providers.Provider
 
 import com.emarsys.networking.clients.event.model.SdkEvent
@@ -39,8 +41,8 @@ class EventTrackerGathererTests {
 
         every { mockTimestampProvider.provide() } returns timestamp
         context = EventTrackerContext(mutableListOf())
-
-        EventTrackerGatherer(context, mockTimestampProvider)
+        val logger = SdkLogger(ConsoleLogger())
+        EventTrackerGatherer(context, mockTimestampProvider, logger)
     }
 
 

@@ -559,9 +559,9 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             )
         )
         val loggingEvent = LoggingEventTracker(sdkLogger)
-        val gathererEvent = EventTrackerGatherer(eventTrackerContext, timestampProvider)
+        val gathererEvent = EventTrackerGatherer(eventTrackerContext, timestampProvider, sdkLogger)
         val eventInternal =
-            EventTrackerInternal(eventClient, eventTrackerContext, timestampProvider)
+            EventTrackerInternal(eventClient, eventTrackerContext, timestampProvider, sdkLogger)
         EventTracker(loggingEvent, gathererEvent, eventInternal, sdkContext)
     }
     override val connectionWatchDog: ConnectionWatchDog by lazy {
