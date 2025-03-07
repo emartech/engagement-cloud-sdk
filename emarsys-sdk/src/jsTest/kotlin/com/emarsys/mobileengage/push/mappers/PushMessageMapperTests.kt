@@ -7,7 +7,8 @@ import com.emarsys.mobileengage.action.models.BadgeCountMethod
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.action.models.PresentableOpenExternalUrlActionModel
 import com.emarsys.mobileengage.inapp.PushToInApp
-import com.emarsys.mobileengage.push.PresentablePushData
+import com.emarsys.mobileengage.push.ActionableData
+import com.emarsys.mobileengage.push.DisplayableData
 import com.emarsys.mobileengage.push.model.JsPlatformData
 import com.emarsys.mobileengage.push.model.JsPushMessage
 import com.emarsys.util.JsonUtil
@@ -97,23 +98,11 @@ class PushMessageMapperTests {
         }
 
         val expectedJsMessage = JsPushMessage(
-            ID,
-            TITLE,
-            MESSAGE,
-            ICON,
-            IMAGE,
-            data = PresentablePushData(
-                false,
-                SID,
-                DEFAULT_CAMPAIGN_ID,
-                JsPlatformData(
-                    APPLICATION_CODE
-                ),
-                pushToInApp = PushToInApp(
-                    DEFAULT_CAMPAIGN_ID,
-                    URL,
-                    true
-                ),
+            sid = SID,
+            campaignId = DEFAULT_CAMPAIGN_ID,
+            platformData = JsPlatformData(APPLICATION_CODE),
+            badgeCount = BadgeCount(BadgeCountMethod.SET, 8),
+            actionableData = ActionableData(
                 actions = listOf(
                     PresentableOpenExternalUrlActionModel(
                         id = "actionId1",
@@ -121,8 +110,18 @@ class PushMessageMapperTests {
                         url = "https://www.sap.com"
                     ),
                 ),
+                pushToInApp = PushToInApp(
+                    DEFAULT_CAMPAIGN_ID,
+                    URL,
+                    true
+                ),
                 defaultTapAction = BasicOpenExternalUrlActionModel("https://sap.com"),
-                badgeCount = BadgeCount(BadgeCountMethod.SET, 8)
+            ),
+            displayableData = DisplayableData(
+                TITLE,
+                MESSAGE,
+                iconUrlString = ICON,
+                imageUrlString = IMAGE
             )
         )
 

@@ -4,7 +4,11 @@ import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.log.Logger
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.actions.Action
-import com.emarsys.mobileengage.action.models.*
+import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.action.models.BasicActionModel
+import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
+import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
+import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.push.model.JsNotificationClickedData
 import com.emarsys.util.JsonUtil
 import kotlinx.coroutines.CoroutineScope
@@ -34,11 +38,11 @@ class PushNotificationClickHandler(
                 JsonUtil.json.decodeFromString<JsNotificationClickedData>(event)
 
             val actionModel = if (hasDefaultTapActionId(jsNotificationClickedData)) {
-                jsNotificationClickedData.jsPushMessage.data.defaultTapAction
+                jsNotificationClickedData.jsPushMessage.actionableData?.defaultTapAction
             } else {
                 findAction(
                     jsNotificationClickedData.actionId,
-                    jsNotificationClickedData.jsPushMessage.data.actions
+                    jsNotificationClickedData.jsPushMessage.actionableData?.actions
                 )
             }
             actionModel?.let {
@@ -60,13 +64,13 @@ class PushNotificationClickHandler(
             is PresentableActionModel -> {
                 val model = BasicPushButtonClickedActionModel(
                     actionModel.id,
-                    jsNotificationClickedData.jsPushMessage.data.sid
+                    jsNotificationClickedData.jsPushMessage.sid
                 )
                 listOf(actionFactory.create(model))
             }
 
             is BasicActionModel -> {
-                listOf(actionFactory.create(NotificationOpenedActionModel(jsNotificationClickedData.jsPushMessage.data.sid)))
+                listOf(actionFactory.create(NotificationOpenedActionModel(jsNotificationClickedData.jsPushMessage.sid)))
             }
 
             else -> emptyList()

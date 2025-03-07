@@ -33,7 +33,7 @@ class EmarsysServiceWorker(
                         pushMessageMapper.map(event) ?: pushMessageWebV1Mapper.map(event)
                     pushMessage?.let {
                         pushMessagePresenter.present(it)
-                        pushMessage.data.badgeCount?.let { badgeCount ->
+                        pushMessage.badgeCount?.let { badgeCount ->
                             val badgeCountString = json.encodeToString(badgeCount)
                             onBadgeCountUpdateReceivedBroadcastChannel.postMessage(badgeCountString)
                         }

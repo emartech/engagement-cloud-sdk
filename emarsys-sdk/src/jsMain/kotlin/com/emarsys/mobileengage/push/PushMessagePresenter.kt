@@ -6,7 +6,6 @@ import com.emarsys.mobileengage.push.model.JsPlatformData
 import com.emarsys.mobileengage.push.model.JsPushMessage
 import com.emarsys.mobileengage.push.model.WebPushNotificationData
 import com.emarsys.util.JsonUtil
-import kotlinx.serialization.encodeToString
 import org.w3c.notifications.NotificationAction
 import org.w3c.notifications.NotificationOptions
 
@@ -14,24 +13,26 @@ open class PushMessagePresenter(private val webPushNotificationPresenter: WebPus
     PushPresenter<JsPlatformData, JsPushMessage> {
 
     override suspend fun present(pushMessage: JsPushMessage) {
-        val notificationOptions = js("{}").unsafeCast<NotificationOptions>().apply {
-            body = pushMessage.body
-            icon = pushMessage.iconUrlString
-            badge = pushMessage.imageUrlString
-        }
+        pushMessage.displayableData?.let {
+            val notificationOptions = js("{}").unsafeCast<NotificationOptions>().apply {
+                body = it.body
+                icon = it.iconUrlString
+                badge = it.imageUrlString
+            }
 
-        pushMessage.data.actions?.let {
-            notificationOptions.actions = createNotificationActions(it)
-        }
+            pushMessage.actionableData?.actions?.let {
+                notificationOptions.actions = createNotificationActions(it)
+            }
 
-        notificationOptions.data = JsonUtil.json.encodeToString<JsPushMessage>(pushMessage)
+            notificationOptions.data = JsonUtil.json.encodeToString<JsPushMessage>(pushMessage)
 
-        webPushNotificationPresenter.showNotification(
-            WebPushNotificationData(
-                pushMessage.title,
-                notificationOptions
+            webPushNotificationPresenter.showNotification(
+                WebPushNotificationData(
+                    it.title,
+                    notificationOptions
+                )
             )
-        )
+        }
     }
 
     private fun createNotificationActions(actions: List<PresentableActionModel>): Array<NotificationAction> {

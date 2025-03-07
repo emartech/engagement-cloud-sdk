@@ -11,11 +11,10 @@ import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
 import com.emarsys.mobileengage.action.models.BasicCustomEventActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.inapp.InAppDownloader
+import com.emarsys.mobileengage.push.NotificationOperation.INIT
 import com.emarsys.mobileengage.push.model.AndroidPlatformData
-import com.emarsys.mobileengage.push.model.AndroidSilentPushMessage
 import com.emarsys.mobileengage.push.model.NotificationMethod
-import com.emarsys.mobileengage.push.model.NotificationOperation.INIT
-
+import com.emarsys.mobileengage.push.model.SilentAndroidPushMessage
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.util.JsonUtil
 import dev.mokkery.verifySuspend
@@ -31,11 +30,10 @@ import org.junit.Before
 import org.junit.Test
 
 
-class SilentPushMessageHandlerTest {
+class PushMessageHandlerTest {
     private companion object {
         const val COLLAPSE_ID = "testCollapseId"
         const val CHANNEL_ID = "testChannelId"
-        const val MESSAGE_ID = "testMessageId"
         const val SID = "testSid"
         const val CAMPAIGN_ID = "testCampaignId"
 
@@ -115,19 +113,16 @@ class SilentPushMessageHandlerTest {
     private fun createTestSilentMessage(
         actions: List<BasicActionModel>? = null,
         badgeCount: BadgeCount? = null,
-    ): AndroidSilentPushMessage {
+    ): SilentAndroidPushMessage {
         val tesMethod = NotificationMethod(COLLAPSE_ID, INIT)
-        val testData = PushData(
-            true,
+        return SilentAndroidPushMessage(
             SID,
             CAMPAIGN_ID,
             AndroidPlatformData(CHANNEL_ID, tesMethod),
-            actions = actions,
-            badgeCount
-        )
-        return AndroidSilentPushMessage(
-            MESSAGE_ID,
-            data = testData
+            badgeCount,
+            ActionableData(
+                actions = actions
+            )
         )
     }
 }

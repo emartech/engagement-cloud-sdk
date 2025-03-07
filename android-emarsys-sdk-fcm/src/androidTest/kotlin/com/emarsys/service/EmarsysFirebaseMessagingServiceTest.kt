@@ -12,7 +12,6 @@ import io.kotest.matchers.shouldNotBe
 import io.mockk.CapturingSlot
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.mockkObject
 import io.mockk.slot
 import io.mockk.unmockkAll
 import io.mockk.verify
@@ -130,13 +129,11 @@ class EmarsysFirebaseMessagingServiceTest {
 
     @Test
     fun onMessageReceived_shouldSendBroadcast_withAnIntentContaining_thePackageName() {
-        val testPayload = JSONObject("""{"key":"testPayload"}""")
-        mockkObject(FirebaseRemoteMessageMapper)
-        every { FirebaseRemoteMessageMapper.map(any()) } returns testPayload
+        val testPayload = JSONObject("""{"ems":"payload"}""")
         val intentSlot: CapturingSlot<Intent> = slot()
         val mockMessagingService = mockk<FirebaseMessagingService>(relaxed = true)
         val mockMessage = mockk<RemoteMessage>(relaxed = true)
-        every { mockMessage.data } returns mapOf()
+        every { mockMessage.data } returns mapOf("ems" to "payload")
 
         registerReceiver("com.emarsys.sdk.PUSH_MESSAGE_PAYLOAD")
 

@@ -6,7 +6,8 @@ import com.emarsys.mobileengage.action.models.BadgeCount
 import com.emarsys.mobileengage.action.models.BadgeCountMethod
 import com.emarsys.mobileengage.action.models.BasicCustomEventActionModel
 import com.emarsys.mobileengage.action.models.PresentableAppEventActionModel
-import com.emarsys.mobileengage.push.PresentablePushData
+import com.emarsys.mobileengage.push.ActionableData
+import com.emarsys.mobileengage.push.DisplayableData
 import com.emarsys.mobileengage.push.model.JsPlatformData
 import com.emarsys.mobileengage.push.model.JsPushMessage
 import com.emarsys.util.JsonUtil
@@ -20,7 +21,6 @@ import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-
 
 class PushMessageWebV1MapperTests {
     private companion object {
@@ -108,29 +108,29 @@ class PushMessageWebV1MapperTests {
         }
 
         val expectedMessage = JsPushMessage(
-            ID,
-            TITLE,
-            BODY,
-            ICON,
-            IMAGE,
-            PresentablePushData(
-                false,
-                SID,
-                CAMPAIGN_ID,
-                JsPlatformData(APPLICATION_CODE),
-                BasicCustomEventActionModel(
+            sid = SID,
+            campaignId = CAMPAIGN_ID,
+            platformData = JsPlatformData(APPLICATION_CODE),
+            badgeCount = BadgeCount(BadgeCountMethod.ADD, BADGE_VALUE),
+            actionableData = ActionableData(
+                defaultTapAction = BasicCustomEventActionModel(
                     DEFAULT_ACTION_NAME,
                     mapOf("defaultActionPayloadKey" to "defaultActionPayloadValue")
                 ),
-                listOf(
+                actions = listOf(
                     PresentableAppEventActionModel(
                         ACTION_ID,
                         ACTION_TITLE,
                         ACTION_NAME,
                         mapOf("actionPayloadKey" to "actionPayloadValue")
                     )
-                ),
-                badgeCount = BadgeCount(BadgeCountMethod.ADD, BADGE_VALUE)
+                )
+            ),
+            displayableData = DisplayableData(
+                TITLE,
+                BODY,
+                ICON,
+                IMAGE
             )
         )
 

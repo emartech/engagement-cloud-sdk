@@ -21,7 +21,6 @@ import com.emarsys.mobileengage.inapp.InAppDownloader
 import com.emarsys.mobileengage.push.model.AndroidPlatformData
 import com.emarsys.mobileengage.push.model.AndroidPushMessage
 import com.emarsys.mobileengage.push.model.NotificationMethod
-import com.emarsys.mobileengage.push.model.NotificationOperation.INIT
 import com.emarsys.util.JsonUtil
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -367,23 +366,17 @@ class PushMessagePresenterTest {
         iconUrlString: String? = null,
         imageUrlString: String? = null
     ): AndroidPushMessage {
-        val testMethod = NotificationMethod(COLLAPSE_ID, INIT)
-        val testData = PresentablePushData(
-            false,
+        val testMethod = NotificationMethod(COLLAPSE_ID, NotificationOperation.INIT)
+        return AndroidPushMessage(
             SID,
             CAMPAIGN_ID,
             AndroidPlatformData(CHANNEL_ID, testMethod),
-            defaultTapAction = defaultTapAction,
-            actions = actions,
-            badgeCount
-        )
-        return AndroidPushMessage(
-            MESSAGE_ID,
-            TITLE,
-            BODY,
-            iconUrlString,
-            imageUrlString,
-            data = testData,
+            badgeCount,
+            DisplayableData(TITLE, BODY, iconUrlString, imageUrlString),
+            ActionableData(
+                actions = actions,
+                defaultTapAction = defaultTapAction
+            )
         )
     }
 

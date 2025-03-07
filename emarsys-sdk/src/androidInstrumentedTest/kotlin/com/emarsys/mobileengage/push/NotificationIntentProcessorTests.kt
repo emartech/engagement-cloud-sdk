@@ -21,7 +21,9 @@ import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.action.models.PresentableAppEventActionModel
 import com.emarsys.mobileengage.action.models.PresentableDismissActionModel
-import com.emarsys.mobileengage.push.model.NotificationOperation
+import com.emarsys.mobileengage.push.model.AndroidPlatformData
+import com.emarsys.mobileengage.push.model.AndroidPushMessage
+import com.emarsys.mobileengage.push.model.NotificationMethod
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.util.JsonUtil
 import io.mockk.coEvery
@@ -52,6 +54,27 @@ class NotificationIntentProcessorTests {
         val PAYLOAD = mapOf("testKey" to "testValue")
         const val APP_EVENT_ACTION_MODEL_JSON =
             """{"type":"MEAppEvent", "id":"$ID","title":"$TITLE","name":"$NAME","payload":{"testKey":"testValue"}}"""
+        val PUSH_MESSAGE = AndroidPushMessage(
+            sid = SID,
+            campaignId = "testCampaignId",
+            platformData = AndroidPlatformData(
+                channelId = "testChannelId",
+                notificationMethod = NotificationMethod(
+                    collapseId = COLLAPSE_ID,
+                    operation = NotificationOperation.INIT
+                )
+            ),
+            actionableData = ActionableData(
+                actions = listOf(PresentableAppEventActionModel(ID, TITLE, NAME, PAYLOAD))
+            ),
+            badgeCount = null,
+            displayableData = DisplayableData(
+                title = "testTitle",
+                body = "testBody",
+                iconUrlString = null,
+                imageUrlString = null
+            )
+        )
     }
 
     private val json = JsonUtil.json
@@ -61,6 +84,7 @@ class NotificationIntentProcessorTests {
     private lateinit var mockActionFactory: ActionFactoryApi<ActionModel>
     private lateinit var mockActionHandler: ActionHandlerApi
     private lateinit var mockSdkEventFlow: MutableSharedFlow<SdkEvent>
+    private lateinit var mockPushMessageFactory: AndroidPushMessageFactory
     private lateinit var notificationIntentProcessor: NotificationIntentProcessor
 
     @Before
@@ -71,8 +95,10 @@ class NotificationIntentProcessorTests {
         mockActionFactory = mockk(relaxed = true)
         mockActionHandler = mockk(relaxed = true)
         mockSdkEventFlow = mockk(relaxed = true)
+        mockPushMessageFactory = mockk(relaxed = true)
+        coEvery { mockPushMessageFactory.create(any()) } returns PUSH_MESSAGE
         notificationIntentProcessor =
-            NotificationIntentProcessor(json, mockActionFactory, mockActionHandler)
+            NotificationIntentProcessor(json, mockActionFactory, mockActionHandler, mockPushMessageFactory)
     }
 
     @After
@@ -247,7 +273,7 @@ class NotificationIntentProcessorTests {
                     "operation":"${NotificationOperation.INIT}"
                     }
                 }
-            }
+            },
             "actions": [
                 $actionModelString
             ]

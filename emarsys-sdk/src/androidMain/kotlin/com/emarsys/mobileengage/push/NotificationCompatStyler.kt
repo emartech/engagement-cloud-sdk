@@ -18,13 +18,13 @@ class NotificationCompatStyler(
         builder: NotificationCompat.Builder,
         pushMessage: AndroidPushMessage
     ) {
-        val image = pushMessage.imageUrlString
+        val image = pushMessage.displayableData?.imageUrlString
             ?.let { downloader.download(it)?.toOptimizedBitmap() }
-        val icon = pushMessage.iconUrlString
+        val icon = pushMessage.displayableData?.iconUrlString
             ?.let { downloader.download(it)?.toOptimizedBitmap() }
 
         val notificationStyle =
-            when (pushMessage.data.platformData.style) {
+            when (pushMessage.platformData.style) {
                 NotificationStyle.BIG_TEXT ->
                     getBigTextStyle(pushMessage)
 
@@ -61,12 +61,12 @@ class NotificationCompatStyler(
         pushMessage: AndroidPushMessage,
     ): NotificationCompat.MessagingStyle {
         val user = Person.Builder()
-            .setName(pushMessage.title)
+            .setName(pushMessage.displayableData?.title)
             .setIcon(image?.let { IconCompat.createWithAdaptiveBitmap(it) })
             .build()
         return NotificationCompat.MessagingStyle(user)
             .addMessage(
-                pushMessage.body,
+                pushMessage.displayableData?.body,
                 System.currentTimeMillis(),
                 user
             )
@@ -78,13 +78,13 @@ class NotificationCompatStyler(
         pushMessage: AndroidPushMessage
     ) = NotificationCompat.BigPictureStyle()
         .bigPicture(image)
-        .setBigContentTitle(pushMessage.title)
-        .setSummaryText(pushMessage.body)
+        .setBigContentTitle(pushMessage.displayableData?.title)
+        .setSummaryText(pushMessage.displayableData?.body)
 
     private fun getBigTextStyle(pushMessage: AndroidPushMessage) =
         NotificationCompat.BigTextStyle()
-            .bigText(pushMessage.body)
-            .setBigContentTitle(pushMessage.title)
+            .bigText(pushMessage.displayableData?.body)
+            .setBigContentTitle(pushMessage.displayableData?.title)
 }
 
 fun ByteArray.toOptimizedBitmap(): Bitmap? {

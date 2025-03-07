@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlin)
     alias(libs.plugins.googleServices)
+    alias(libs.plugins.kotlinSerialization)
 }
 
 dependencies {
@@ -11,6 +12,7 @@ dependencies {
     implementation(libs.mockk.android)
     implementation(libs.androidx.runner)
     implementation(libs.kotest.assertions.core)
+    implementation(libs.kotlinx.serialization.json)
 
     androidTestImplementation(libs.junit)
 }

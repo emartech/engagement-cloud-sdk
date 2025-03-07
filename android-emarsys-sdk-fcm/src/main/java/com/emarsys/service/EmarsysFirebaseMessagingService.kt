@@ -3,6 +3,7 @@ package com.emarsys.service
 import android.content.Intent
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import kotlinx.serialization.json.Json
 
 
 class EmarsysFirebaseMessagingService : FirebaseMessagingService() {
@@ -13,6 +14,7 @@ class EmarsysFirebaseMessagingService : FirebaseMessagingService() {
         private const val PUSH_MESSAGE_PAYLOAD_INTENT_FILTER_ACTION =
             "com.emarsys.sdk.PUSH_MESSAGE_PAYLOAD"
         const val PUSH_MESSAGE_PAYLOAD_INTENT_KEY = "pushPayload"
+        private const val EMS_KEY = "ems"
         private const val EMS_VERSION_KEY = "ems.version"
         internal val messagingServices = mutableListOf<Pair<Boolean, FirebaseMessagingService>>()
 
@@ -27,11 +29,7 @@ class EmarsysFirebaseMessagingService : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         super.onNewToken(token)
         println("token received: $token")
-        val intent = Intent().apply {
-            action = PUSH_TOKEN_INTENT_FILTER_ACTION
-            putExtra(PUSH_TOKEN_INTENT_KEY, token)
-            setPackage(applicationContext.packageName)
-        }
+        val intent = createIntent(PUSH_TOKEN_INTENT_FILTER_ACTION, PUSH_TOKEN_INTENT_KEY, token)
         applicationContext.sendBroadcast(intent)
     }
 
@@ -39,17 +37,31 @@ class EmarsysFirebaseMessagingService : FirebaseMessagingService() {
         super.onMessageReceived(remoteMessage)
         println("message received: ${remoteMessage.messageId}")
         messagingServices
-            .filter { it.first || !remoteMessage.data.containsKey(EMS_VERSION_KEY) }
+            .filter {
+                it.first || !isEmarsysMessage(remoteMessage.data)
+            }
             .forEach { it.second.onMessageReceived(remoteMessage) }
-
-        val intent = Intent().apply {
-            action = PUSH_MESSAGE_PAYLOAD_INTENT_FILTER_ACTION
-            putExtra(
+        if (isEmarsysMessage(remoteMessage.data)) {
+            val messagePayload = Json.encodeToString(remoteMessage.data)
+            val intent = createIntent(
+                PUSH_MESSAGE_PAYLOAD_INTENT_FILTER_ACTION,
                 PUSH_MESSAGE_PAYLOAD_INTENT_KEY,
-                FirebaseRemoteMessageMapper.map(remoteMessage.data).toString()
+                messagePayload
             )
+            applicationContext.sendBroadcast(intent)
+        }
+    }
+
+    private fun createIntent(action: String, extraKey: String, extraValue: String): Intent {
+        return Intent().apply {
+            this.action = action
+            putExtra(extraKey, extraValue)
             setPackage(applicationContext.packageName)
         }
-        applicationContext.sendBroadcast(intent)
     }
+
+    private fun isEmarsysMessage(remoteMessage: Map<String, String>): Boolean {
+        return remoteMessage.containsKey(EMS_VERSION_KEY) || remoteMessage.containsKey(EMS_KEY)
+    }
+
 }

@@ -46,13 +46,13 @@ class PushMessagePresenter(
         )
 
         val iconId = metadataReader.getInt(PUSH_NOTIFICATION_ICON_NAME)
-        val channelId = message.data.platformData.channelId
-        val collapseId = message.data.platformData.notificationMethod.collapseId
+        val channelId = message.platformData.channelId
+        val collapseId = message.platformData.notificationMethod.collapseId
         val tapActionPendingIntent = createTapActionPendingIntent(message)
 
         val notificationBuilder = NotificationCompat.Builder(context, channelId)
-            .setContentTitle(message.title)
-            .setContentText(message.body)
+            .setContentTitle(message.displayableData?.title)
+            .setContentText(message.displayableData?.body)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setSmallIcon(iconId)
             .setContentIntent(tapActionPendingIntent)
@@ -65,9 +65,9 @@ class PushMessagePresenter(
     }
 
     private fun NotificationCompat.Builder.addActions(pushMessage: AndroidPushMessage): NotificationCompat.Builder {
-        pushMessage.data.actions?.forEach { actionModel ->
+        pushMessage.actionableData?.actions?.forEach { actionModel ->
             if(actionModel is DismissActionModel) {
-                actionModel.dismissId = pushMessage.data.platformData.notificationMethod.collapseId
+                actionModel.dismissId = pushMessage.platformData.notificationMethod.collapseId
             }
             val actionIntent = createActionIntent(actionModel, pushMessage)
             val action = createNotificationAction(actionModel, actionIntent)
@@ -78,7 +78,7 @@ class PushMessagePresenter(
     }
 
     private fun NotificationCompat.Builder.setBadgeCount(pushMessage: AndroidPushMessage): NotificationCompat.Builder {
-        pushMessage.data.badgeCount?.let { badgeCount ->
+        pushMessage.badgeCount?.let { badgeCount ->
             this.setNumber(badgeCount.value)
         }
         return this
@@ -129,11 +129,11 @@ class PushMessagePresenter(
             json.encodeToString(pushMessage)
         )
 
-        pushMessage.data.defaultTapAction?.let { tapAction ->
+        pushMessage.actionableData?.defaultTapAction?.let { tapAction ->
             val defaultActionModel = if (tapAction !is PushToInappActionModel) {
                 tapAction
             } else {
-                pushMessage.data.pushToInApp?.toInternalPushToInappActionModel()
+                pushMessage.actionableData.pushToInApp?.toInternalPushToInappActionModel()
             }
 
             defaultActionModel?.let {
@@ -174,16 +174,15 @@ class PushMessagePresenter(
         notificationSettings: AndroidNotificationSettings,
         context: Context
     ): AndroidPushMessage {
-        val channelId = pushMessage.data.platformData.channelId
+        val channelId = pushMessage.platformData.channelId
         return if (shouldCreateDebugChannel(channelId, notificationSettings)) {
             val debugChannelId = createDebugChannel(context)
-            val platformData = pushMessage.data.platformData.copy(channelId = debugChannelId)
-            val pushData = pushMessage.data.copy(platformData = platformData)
-            pushMessage.copy(
+            val platformData = pushMessage.platformData.copy(channelId = debugChannelId)
+            val displayableData = pushMessage.displayableData.copy(
+                title = "Emarsys SDK",
                 body = "DEBUG - channel_id mismatch: $channelId not found!",
-                data = pushData,
-                title = "Emarsys SDK"
             )
+            pushMessage.copy(platformData = platformData, displayableData = displayableData)
         } else {
             pushMessage
         }

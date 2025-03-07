@@ -18,13 +18,17 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonPrimitive
 import platform.Foundation.NSJSONSerialization
 import platform.Foundation.NSJSONWritingPrettyPrinted
 import platform.Foundation.NSString
 import platform.Foundation.NSURL
 import platform.Foundation.NSUTF8StringEncoding
 import platform.Foundation.create
-import platform.Foundation.lastPathComponent
 import platform.UserNotifications.UNMutableNotificationContent
 import platform.UserNotifications.UNNotificationAction
 import platform.UserNotifications.UNNotificationActionOptionDestructive
@@ -34,6 +38,11 @@ import platform.UserNotifications.UNNotificationCategory
 import platform.UserNotifications.UNNotificationCategoryOptionNone
 import platform.UserNotifications.UNNotificationContent
 import platform.UserNotifications.UNNotificationRequest
+
+enum class PayloadVersion {
+    V1,
+    V2
+}
 
 @BetaInteropApi
 class EmarsysNotificationService(
@@ -49,6 +58,9 @@ class EmarsysNotificationService(
 
     private lateinit var contentHandler: (UNNotificationContent) -> Unit
     private lateinit var bestAttemptContent: UNMutableNotificationContent
+    private var payloadVersion: PayloadVersion? = null
+    private var emsJson: JsonObject? = null
+    private var notificationJson: JsonObject? = null
 
     private val uuidProvider: UUIDProvider by lazy { UUIDProvider() }
     private val sessionProvider: SessionProvider by lazy { SessionProvider() }
@@ -66,7 +78,10 @@ class EmarsysNotificationService(
                     request.content.mutableCopy() as UNMutableNotificationContent
 
                 val userInfo = bestAttemptContent.userInfo as Map<String, Any>
-                val actions = async { createActions(userInfo) }
+                emsJson = extractJsonObject(userInfo, "ems")
+                notificationJson = extractJsonObject(userInfo, "notification")
+                payloadVersion = if (emsJson != null && emsJson!!.keys.contains("version")) { PayloadVersion.V2 } else { PayloadVersion.V1 }
+                val actions = async { createActions() }
                 val attachments = async { createAttachments(userInfo) }
 
                 awaitAll(actions, attachments)
@@ -80,44 +95,33 @@ class EmarsysNotificationService(
         contentHandler(bestAttemptContent)
     }
 
-    @OptIn(ExperimentalForeignApi::class)
-    private suspend fun createActions(userInfo: Map<String, Any>) {
-        val ems = userInfo["ems"] as? Map<String, Any> ?: return
-        val actions = ems["actions"] as? List<Map<String, Any>> ?: return
-        val data = NSJSONSerialization.dataWithJSONObject(
-            actions,
-            NSJSONWritingPrettyPrinted,
-            null
-        )
-        val actionsJson = NSString.create(data!!, NSUTF8StringEncoding)!!.toString()
-        val actionModels: List<ActionModel> = json.decodeFromString(actionsJson)
+    private suspend fun createActions() {
+        actionModels()?.let { actionModels ->
+            val notificationActions = actionModels.map {
+                val options =
+                    if (it is DismissActionModel) UNNotificationActionOptionDestructive else UNNotificationActionOptionForeground
+                UNNotificationAction.actionWithIdentifier(it.id, it.title, options)
+            }
 
-        val notificationActions = actionModels.map {
-            val options =
-                if (it is DismissActionModel) UNNotificationActionOptionDestructive else UNNotificationActionOptionForeground
-            UNNotificationAction.actionWithIdentifier(it.id, it.title, options)
+            val category = UNNotificationCategory.categoryWithIdentifier(
+                uuidProvider.provide().UUIDString(),
+                notificationActions,
+                emptyList<String>(),
+                UNNotificationCategoryOptionNone
+            )
+
+            notificationCenter.addCategory(category)
+
+            mutex.withLock {
+                bestAttemptContent.setCategoryIdentifier(category.identifier)
+            }
         }
-
-        val category = UNNotificationCategory.categoryWithIdentifier(
-            uuidProvider.provide().UUIDString(),
-            notificationActions,
-            emptyList<String>(),
-            UNNotificationCategoryOptionNone
-        )
-
-        notificationCenter.addCategory(category)
-
-        mutex.withLock {
-            bestAttemptContent.setCategoryIdentifier(category.identifier)
-        }
-
     }
 
     @OptIn(ExperimentalForeignApi::class)
     private suspend fun createAttachments(userInfo: Map<String, Any>) {
-        val mediaUrlString = userInfo["image_url"] as String?
-        if (!mediaUrlString.isNullOrEmpty()) {
-            val mediaUrl = downloader.downloadFile(NSURL(string = mediaUrlString))
+        imageUrl(userInfo)?.let { imageUrl ->
+            val mediaUrl = downloader.downloadFile(imageUrl)
 
             mediaUrl?.let {
                 val attachment = UNNotificationAttachment.attachmentWithIdentifier(
@@ -128,6 +132,45 @@ class EmarsysNotificationService(
                 )
                 mutex.withLock {
                     bestAttemptContent.setAttachments(listOf(attachment))
+                }
+            }
+        }
+    }
+
+    private fun actionModels(): List<ActionModel>? {
+        return if (payloadVersion == PayloadVersion.V1) {
+            emsJson?.get("actions")?.jsonArray?.let {
+                json.decodeFromJsonElement(it)
+            }
+        } else {
+            notificationJson?.get("actions")?.jsonArray?.let {
+                json.decodeFromJsonElement(it)
+            }
+        }
+    }
+
+    private fun imageUrl(userInfo: Map<String, Any>): NSURL? {
+        return if (payloadVersion == PayloadVersion.V1) {
+            (userInfo["image_url"] as String?)?.let {
+                if (it.isNotBlank()) {
+                    NSURL(string = it)
+                } else null
+            }
+        } else {
+            notificationJson?.get("imageUrl")?.jsonPrimitive?.contentOrNull?.let {
+                if (it.isNotBlank()) {
+                    NSURL(string = it)
+                } else null
+            }
+        }
+    }
+
+    @OptIn(ExperimentalForeignApi::class)
+    private fun extractJsonObject(userInfo: Map<String, Any>, key: String): JsonObject? {
+        return userInfo[key]?.let { extractedMap ->
+            NSJSONSerialization.dataWithJSONObject(extractedMap, NSJSONWritingPrettyPrinted, null)?.let { data ->
+                NSString.create(data, NSUTF8StringEncoding)?.let { jsonString ->
+                    json.decodeFromString(jsonString.toString())
                 }
             }
         }

@@ -9,12 +9,10 @@ import com.emarsys.core.log.Logger
 import com.emarsys.di.AndroidPlatformContext
 import com.emarsys.di.DependencyContainerPrivateApi
 import com.emarsys.di.DependencyInjection
-import com.emarsys.mobileengage.push.model.AndroidPush
 import com.emarsys.mobileengage.push.model.AndroidPushMessage
-import com.emarsys.mobileengage.push.model.AndroidSilentPushMessage
-import com.emarsys.util.JsonUtil
+import com.emarsys.mobileengage.push.model.SilentAndroidPushMessage
 import kotlinx.serialization.json.Json
-
+import kotlinx.serialization.json.JsonObject
 
 class PushMessageBroadcastReceiver : BroadcastReceiver() {
     private val dependencyContainer = DependencyInjection.container as DependencyContainerPrivateApi
@@ -22,16 +20,24 @@ class PushMessageBroadcastReceiver : BroadcastReceiver() {
         (dependencyContainer.platformContext as AndroidPlatformContext).pushMessagePresenter
     private val silentPushHandler =
         (dependencyContainer.platformContext as AndroidPlatformContext).silentPushHandler
+    private val pushMessageFactory = (dependencyContainer.platformContext as AndroidPlatformContext).androidPushMessageFactory
     private val sdkDispatcher = dependencyContainer.sdkDispatcher
     private val logger: Logger = dependencyContainer.sdkLogger
-    private val json: Json = JsonUtil.json
+    private val json: Json = dependencyContainer.json
 
     override fun onReceive(context: Context, intent: Intent) = goAsync(sdkDispatcher) {
         intent.getStringExtra(PushConstants.PUSH_MESSAGE_PAYLOAD_INTENT_KEY)?.let {
             try {
-                when (val parsedMessage = json.decodeFromString<AndroidPush>(it)) {
-                    is AndroidPushMessage -> pushPresenter.present(parsedMessage)
-                    is AndroidSilentPushMessage -> silentPushHandler.handle(parsedMessage)
+                val pushPayload = json.decodeFromString<JsonObject>(it)
+                pushMessageFactory.create(pushPayload)?.let { pushMessage ->
+                    when (pushMessage) {
+                        is SilentAndroidPushMessage -> {
+                            silentPushHandler.handle(pushMessage)
+                        }
+                        is AndroidPushMessage -> {
+                            pushPresenter.present(pushMessage)
+                        }
+                    }
                 }
             } catch (exception: Exception) {
                 logger.error("PushMessageBroadcastReceiver", exception)

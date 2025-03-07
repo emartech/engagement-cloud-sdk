@@ -20,7 +20,6 @@ import org.w3c.notifications.NotificationOptions
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-
 class PushMessagePresenterTests {
 
     companion object {
@@ -54,7 +53,7 @@ class PushMessagePresenterTests {
             pushMessagePresenter.present(testPushMessage)
 
             val slotCapture = slot.get()
-            slotCapture.title shouldBe testPushMessage.title
+            slotCapture.title shouldBe testPushMessage.displayableData?.title
             JSON.stringify(slotCapture.options) shouldBe JSON.stringify(expectedNotificationOptions)
         }
 
@@ -66,7 +65,7 @@ class PushMessagePresenterTests {
 
         pushMessagePresenter.present(testPushMessage)
 
-        slot.get().title shouldBe testPushMessage.title
+        slot.get().title shouldBe testPushMessage.displayableData?.title
         JSON.stringify(slot.get().options) shouldBe JSON.stringify(expectedNotificationOptions)
     }
 
@@ -78,7 +77,7 @@ class PushMessagePresenterTests {
 
         pushMessagePresenter.present(testPushMessage)
 
-        slot.get().title shouldBe testPushMessage.title
+        slot.get().title shouldBe testPushMessage.displayableData?.title
         JSON.stringify(slot.get().options) shouldBe JSON.stringify(expectedNotificationOptions)
     }
 
@@ -96,7 +95,7 @@ class PushMessagePresenterTests {
 
         pushMessagePresenter.present(testPushMessage)
 
-        slot.get().title shouldBe testPushMessage.title
+        slot.get().title shouldBe testPushMessage.displayableData?.title
         JSON.stringify(slot.get().options) shouldBe JSON.stringify(expectedNotificationOptions)
     }
 
@@ -129,7 +128,7 @@ class PushMessagePresenterTests {
 
         pushMessagePresenter.present(testPushMessage)
 
-        slot.get().title shouldBe testPushMessage.title
+        slot.get().title shouldBe testPushMessage.displayableData?.title
         JSON.stringify(slot.get().options) shouldBe JSON.stringify(expectedNotificationOptions)
     }
 
@@ -140,20 +139,20 @@ class PushMessagePresenterTests {
         pushToInApp: PushToInApp? = null
     ): JsPushMessage {
         return JsPushMessage(
-            messageId = "messageId",
-            title = "title",
-            body = "body",
-            iconUrlString = icon,
-            imageUrlString = image,
-            data = PresentablePushData(
-                sid = "sid",
-                campaignId = "campaignId",
-                platformData = JsPlatformData(
-                    "testApplicationCode"
-                ),
+            sid = "sid",
+            campaignId = "campaignId",
+            platformData = JsPlatformData("testApplicationCode"),
+            badgeCount = null,
+            actionableData = ActionableData(
                 actions = actions,
-                pushToInApp = pushToInApp
+                pushToInApp = pushToInApp,
+                defaultTapAction = null
             ),
+            displayableData = DisplayableData(
+                title = "title",
+                body = "body",
+                iconUrlString = icon,
+                imageUrlString = image)
         )
     }
 
@@ -163,9 +162,9 @@ class PushMessagePresenterTests {
     ): NotificationOptions {
         val notificationOptions: NotificationOptions =
             js("{}").unsafeCast<NotificationOptions>().apply {
-                body = testPushMessage.body
-                icon = testPushMessage.iconUrlString
-                badge = testPushMessage.imageUrlString
+                body = testPushMessage.displayableData?.body
+                icon = testPushMessage.displayableData?.iconUrlString
+                badge = testPushMessage.displayableData?.imageUrlString
                 actions = notificationActions
                 data = JsonUtil.json.encodeToString<JsPushMessage>(testPushMessage)
             }

@@ -112,6 +112,7 @@ actual class PlatformDependencyCreator actual constructor(
             json,
             pushActionFactory,
             actionHandler,
+            sdkLogger,
             notificationManager,
             metadataReader,
             downloaderApi,

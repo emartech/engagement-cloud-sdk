@@ -2,8 +2,10 @@ package com.emarsys.mobileengage.push.mappers
 
 import com.emarsys.core.log.Logger
 import com.emarsys.core.mapper.Mapper
-import com.emarsys.mobileengage.action.models.BasicActionModel
-import com.emarsys.mobileengage.push.PresentablePushData
+import com.emarsys.mobileengage.action.models.PresentableActionModel
+import com.emarsys.mobileengage.inapp.PushToInApp
+import com.emarsys.mobileengage.push.ActionableData
+import com.emarsys.mobileengage.push.DisplayableData
 import com.emarsys.mobileengage.push.model.JsPlatformData
 import com.emarsys.mobileengage.push.model.JsPushMessage
 import com.emarsys.mobileengage.push.model.v1.RemoteWebPushMessageV1
@@ -18,24 +20,27 @@ class PushMessageWebV1Mapper(
         return try {
             val remoteMessage = json.decodeFromString<RemoteWebPushMessageV1>(from)
 
-            val defaultAction = json.encodeToString(remoteMessage.notification.defaultAction)
-            val basicDefaultActionModel: BasicActionModel = json.decodeFromString(defaultAction)
-
-            JsPushMessage(
-                remoteMessage.ems.id,
-                remoteMessage.notification.title,
-                remoteMessage.notification.body,
-                remoteMessage.notification.icon,
-                remoteMessage.notification.imageUrl,
-                PresentablePushData(
-                    sid = remoteMessage.ems.sid,
-                    campaignId = remoteMessage.ems.campaignId,
-                    actions = remoteMessage.notification.actions,
-                    platformData = JsPlatformData(remoteMessage.ems.applicationCode),
-                    pushToInApp = null,
-                    defaultTapAction = basicDefaultActionModel,
-                    badgeCount = remoteMessage.notification.badgeCount
+            val defaultTapAction = remoteMessage.notification.defaultAction
+            val actions: List<PresentableActionModel>? = remoteMessage.notification.actions
+            val pushToInApp: PushToInApp? = null
+            val actionableData = if (actions != null || defaultTapAction != null || pushToInApp != null) {
+                ActionableData(
+                    actions = actions,
+                    defaultTapAction = defaultTapAction,
+                    pushToInApp = pushToInApp
                 )
+            } else null
+
+            return JsPushMessage(
+                remoteMessage.ems.sid,
+                remoteMessage.ems.campaignId,
+                JsPlatformData(remoteMessage.ems.applicationCode),
+                remoteMessage.notification.badgeCount,
+                actionableData = actionableData,
+                DisplayableData(remoteMessage.notification.title,
+                    remoteMessage.notification.body,
+                    iconUrlString = remoteMessage.notification.icon,
+                    imageUrlString = remoteMessage.notification.imageUrl)
             )
         } catch (exception: Exception) {
             logger.error("WebPushMessageV1Mapper", exception)

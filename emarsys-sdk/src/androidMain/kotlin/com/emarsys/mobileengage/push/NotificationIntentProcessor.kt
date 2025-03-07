@@ -15,15 +15,16 @@ import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.DismissActionModel
 import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
-import com.emarsys.mobileengage.push.model.AndroidPushMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
 
 class NotificationIntentProcessor(
     private val json: Json,
     private val actionFactory: ActionFactoryApi<ActionModel>,
-    private val actionHandler: ActionHandlerApi
+    private val actionHandler: ActionHandlerApi,
+    private val pushMessageFactory: AndroidPushMessageFactory
 ) {
     fun processIntent(intent: Intent?, lifecycleScope: CoroutineScope) {
         //TODO: check if SDK setup has been completed
@@ -53,20 +54,23 @@ class NotificationIntentProcessor(
         triggeredActionModel: ActionModel
     ): List<Action<*>> {
         val result = mutableListOf<Action<*>>()
-        val pushMessageString = intent.getStringExtra(INTENT_EXTRA_PAYLOAD_KEY)
-        val pushMessage = pushMessageString?.let { json.decodeFromString<AndroidPushMessage>(it) }
+        val pushMessage = intent.getStringExtra(INTENT_EXTRA_PAYLOAD_KEY)?.let { pushString ->
+            json.decodeFromString<JsonObject>(pushString).let { pushJson ->
+                pushMessageFactory.create(pushJson)
+            }
+        }
 
         if (triggeredActionModel !is DismissActionModel) {
             val launchApplicationAction = actionFactory.create(BasicLaunchApplicationActionModel)
             result.add(launchApplicationAction)
-            pushMessage?.data?.platformData?.notificationMethod?.collapseId?.let {
+            pushMessage?.platformData?.notificationMethod?.collapseId?.let {
                 val dismissAction =
                     actionFactory.create(BasicDismissActionModel(it))
                 result.add(dismissAction)
             }
         }
 
-        pushMessage?.data?.sid?.let {
+        pushMessage?.sid?.let {
             val reportingAction = when (triggeredActionModel) {
                 is PresentableActionModel -> {
                     BasicPushButtonClickedActionModel(

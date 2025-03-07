@@ -5,6 +5,7 @@ import com.emarsys.api.SdkState
 import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.BasicPushUserInfo
 import com.emarsys.api.push.PresentablePushUserInfo
+import com.emarsys.api.push.PresentablePushUserInfoEms
 import com.emarsys.api.push.PushCall
 import com.emarsys.api.push.PushCall.ClearPushToken
 import com.emarsys.api.push.PushCall.HandleMessageWithUserInfo
@@ -25,10 +26,8 @@ import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
 import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
-
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
-import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -38,8 +37,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import platform.Foundation.NSJSONSerialization
 import platform.Foundation.NSJSONWritingPrettyPrinted
 import platform.Foundation.NSString
@@ -116,16 +121,52 @@ class IosPushInternal(
         }
     }
 
-    @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
+    @OptIn(ExperimentalForeignApi::class)
     private fun Map<String, Any>.toPresentableUserInfo(): PresentablePushUserInfo {
-        val userInfoString = NSString.create(
-            NSJSONSerialization.dataWithJSONObject(
-                this,
-                NSJSONWritingPrettyPrinted,
-                null
-            )!!, NSUTF8StringEncoding
-        ).toString()
-        return json.decodeFromString<PresentablePushUserInfo>(userInfoString)
+        val emsJson = extractJsonObject(this, "ems")
+        return if (emsJson != null && emsJson.keys.contains("version")) {
+            val notificationJson = extractJsonObject(this, "notification")
+            val treatments: JsonObject? = emsJson["treatments"]?.jsonObject
+            PresentablePushUserInfo(
+                PresentablePushUserInfoEms(
+                    multichannelId = emsJson["campaignId"]?.jsonPrimitive?.contentOrNull,
+                    inapp = notificationJson?.get("inapp")?.jsonObject?.let {
+                        json.decodeFromJsonElement(it)
+                    },
+                    sid = treatments?.get("sid")?.jsonPrimitive?.contentOrNull,
+                    defaultAction = notificationJson?.get("defaultAction")?.jsonObject?.let {
+                        json.decodeFromJsonElement(it)
+                    },
+                    actions = notificationJson?.get("actions")?.jsonArray?.let {
+                        json.decodeFromJsonElement(it)
+                    },
+                    badgeCount = notificationJson?.get("badgeCount")?.jsonObject?.let {
+                        json.decodeFromJsonElement(it)
+                    }
+                )
+            )
+        } else {
+            val userInfoString = NSString.create(
+                NSJSONSerialization.dataWithJSONObject(
+                    this,
+                    NSJSONWritingPrettyPrinted,
+                    null
+                )!!, NSUTF8StringEncoding
+            ).toString()
+            return json.decodeFromString<PresentablePushUserInfo>(userInfoString)
+        }
+    }
+
+    @OptIn(ExperimentalForeignApi::class)
+    private fun extractJsonObject(userInfo: Map<String, Any>, key: String): JsonObject? {
+        return userInfo[key]?.let { extractedMap ->
+            NSJSONSerialization.dataWithJSONObject(extractedMap, NSJSONWritingPrettyPrinted, null)
+                ?.let { data ->
+                    NSString.create(data, NSUTF8StringEncoding)?.let { jsonString ->
+                        json.decodeFromString(jsonString.toString())
+                    }
+                }
+        }
     }
 
     fun didReceiveNotificationResponse(

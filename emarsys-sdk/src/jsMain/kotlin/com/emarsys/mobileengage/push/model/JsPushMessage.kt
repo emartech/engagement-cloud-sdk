@@ -1,15 +1,20 @@
 package com.emarsys.mobileengage.push.model
 
-import com.emarsys.mobileengage.push.PresentablePushData
-import com.emarsys.mobileengage.push.PresentablePushMessage
+import com.emarsys.mobileengage.action.models.BadgeCount
+import com.emarsys.mobileengage.action.models.PresentableActionModel
+import com.emarsys.mobileengage.push.ActionableData
+import com.emarsys.mobileengage.push.ActionablePush
+import com.emarsys.mobileengage.push.DisplayableData
+import com.emarsys.mobileengage.push.DisplayablePush
+import com.emarsys.mobileengage.push.PushMessage
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class JsPushMessage(
-    override val messageId: String,
-    override val title: String,
-    override val body: String,
-    override val iconUrlString: String? = null,
-    override val imageUrlString: String? = null,
-    override val data: PresentablePushData<JsPlatformData>
-) : PresentablePushMessage<JsPlatformData>
+    override val sid: String,
+    override val campaignId: String,
+    override val platformData: JsPlatformData,
+    override val badgeCount: BadgeCount?,
+    override val actionableData: ActionableData<PresentableActionModel>?,
+    override val displayableData: DisplayableData?
+): PushMessage<JsPlatformData>, ActionablePush<PresentableActionModel>, DisplayablePush

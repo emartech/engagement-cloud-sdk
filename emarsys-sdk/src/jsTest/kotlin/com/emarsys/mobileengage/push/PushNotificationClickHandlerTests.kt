@@ -141,7 +141,7 @@ class PushNotificationClickHandlerTests {
                 mockActionFactory.create(
                     BasicPushButtonClickedActionModel(
                         actionId,
-                        notificationClickedData.jsPushMessage.data.sid
+                        notificationClickedData.jsPushMessage.sid
                     )
                 )
             } returns mockButtonClickedAction
@@ -234,17 +234,20 @@ class PushNotificationClickHandlerTests {
         JsNotificationClickedData(
             actionId = actionId,
             jsPushMessage = JsPushMessage(
-                messageId = "messageId",
-                title = "title",
-                body = "body",
-                data = PresentablePushData(
-                    sid = "sid",
-                    campaignId = "campaignId",
-                    platformData = JsPlatformData(
-                        applicationCode = "applicationCode",
-                    ),
+                sid = "sid",
+                campaignId = "campaignId",
+                platformData = JsPlatformData("applicationCode"),
+                badgeCount = null,
+                actionableData = ActionableData(
                     actions = actionModels,
-                    defaultTapAction = defaultTapActionModel
+                    defaultTapAction = defaultTapActionModel,
+                    pushToInApp = null
+                ),
+                displayableData = DisplayableData(
+                    title = "title",
+                    body = "body",
+                    iconUrlString = null,
+                    imageUrlString = null
                 )
             )
         )

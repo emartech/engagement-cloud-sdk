@@ -3,8 +3,11 @@ package com.emarsys.mobileengage.push.mappers
 import com.emarsys.core.log.Logger
 import com.emarsys.core.mapper.Mapper
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
+import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.action.models.PresentableOpenExternalUrlActionModel
-import com.emarsys.mobileengage.push.PresentablePushData
+import com.emarsys.mobileengage.inapp.PushToInApp
+import com.emarsys.mobileengage.push.ActionableData
+import com.emarsys.mobileengage.push.DisplayableData
 import com.emarsys.mobileengage.push.model.JsPlatformData
 import com.emarsys.mobileengage.push.model.JsPushMessage
 import com.emarsys.mobileengage.push.model.RemoteWebPushMessage
@@ -21,29 +24,35 @@ class PushMessageMapper(private val json: Json, private val logger: Logger) :
         return try {
             val remoteWebPushMessage = json.decodeFromString<RemoteWebPushMessage>(from)
 
-            return JsPushMessage(
-                remoteWebPushMessage.messageData.id,
-                remoteWebPushMessage.title ?: DEFAULT_TITLE,
-                remoteWebPushMessage.message,
-                remoteWebPushMessage.messageData.notificationSettings.icon,
-                remoteWebPushMessage.messageData.notificationSettings.image,
-                PresentablePushData(
-                    sid = remoteWebPushMessage.messageData.sid,
-                    campaignId = DEFAULT_CAMPAIGN_ID,
-                    actions = remoteWebPushMessage.messageData.notificationSettings.actions?.map { remoteWebPushAction ->
+            val defaultTapAction = remoteWebPushMessage.messageData.notificationSettings.link?.let {
+                        BasicOpenExternalUrlActionModel(it)
+                    }
+            val actions: List<PresentableActionModel>? = remoteWebPushMessage.messageData.notificationSettings.actions?.map { remoteWebPushAction ->
                         PresentableOpenExternalUrlActionModel(
                             remoteWebPushAction.id,
                             remoteWebPushAction.title,
                             remoteWebPushAction.url
                         )
-                    },
-                    platformData = JsPlatformData(remoteWebPushMessage.messageData.applicationCode),
-                    pushToInApp = remoteWebPushMessage.messageData.inApp,
-                    defaultTapAction = remoteWebPushMessage.messageData.notificationSettings.link?.let {
-                        BasicOpenExternalUrlActionModel(it)
-                    },
-                    badgeCount = remoteWebPushMessage.messageData.notificationSettings.badgeCount
+                    }
+            val pushToInApp: PushToInApp? = remoteWebPushMessage.messageData.inApp
+            val actionableData = if (actions != null || defaultTapAction != null || pushToInApp != null) {
+                ActionableData(
+                    actions = actions,
+                    defaultTapAction = defaultTapAction,
+                    pushToInApp = pushToInApp
                 )
+            } else null
+
+            return JsPushMessage(
+                remoteWebPushMessage.messageData.sid,
+                DEFAULT_CAMPAIGN_ID,
+                JsPlatformData(remoteWebPushMessage.messageData.applicationCode),
+                remoteWebPushMessage.messageData.notificationSettings.badgeCount,
+                actionableData = actionableData,
+                DisplayableData(remoteWebPushMessage.title ?: DEFAULT_TITLE,
+                    remoteWebPushMessage.message,
+                    iconUrlString = remoteWebPushMessage.messageData.notificationSettings.icon,
+                    imageUrlString = remoteWebPushMessage.messageData.notificationSettings.image)
             )
         } catch (exception: Exception) {
             logger.error("WebPushMessageMapper", exception)

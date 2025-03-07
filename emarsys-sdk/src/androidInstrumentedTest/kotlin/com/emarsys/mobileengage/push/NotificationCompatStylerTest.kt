@@ -8,7 +8,6 @@ import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.push.model.AndroidPlatformData
 import com.emarsys.mobileengage.push.model.AndroidPushMessage
 import com.emarsys.mobileengage.push.model.NotificationMethod
-import com.emarsys.mobileengage.push.model.NotificationOperation
 import com.emarsys.mobileengage.push.model.NotificationStyle
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
@@ -71,7 +70,7 @@ class NotificationCompatStylerTest {
         runTest {
             val pushMessage =
                 createPushMessage(NotificationStyle.BIG_PICTURE, iconUrlString = ICON_URL)
-            val expectedIcon = mockImageDownload(pushMessage.iconUrlString!!)
+            val expectedIcon = mockImageDownload(pushMessage.displayableData.iconUrlString!!)
 
             notificationCompatStyler.style(
                 mockNotificationBuilder, pushMessage
@@ -114,7 +113,7 @@ class NotificationCompatStylerTest {
         runTest {
             val pushMessage =
                 createPushMessage(NotificationStyle.THUMBNAIL, imageUrlString = IMAGE_URL)
-            val expectedImage = mockImageDownload(pushMessage.imageUrlString!!)
+            val expectedImage = mockImageDownload(pushMessage.displayableData.imageUrlString!!)
 
             notificationCompatStyler.style(
                 mockNotificationBuilder, pushMessage
@@ -159,7 +158,7 @@ class NotificationCompatStylerTest {
         runTest {
             val pushMessage =
                 createPushMessage(style = null, imageUrlString = IMAGE_URL)
-            val expectedImage = mockImageDownload(pushMessage.imageUrlString!!)
+            val expectedImage = mockImageDownload(pushMessage.displayableData.imageUrlString!!)
 
             notificationCompatStyler.style(
                 mockNotificationBuilder, pushMessage
@@ -176,20 +175,21 @@ class NotificationCompatStylerTest {
         iconUrlString: String? = null,
         imageUrlString: String? = null
     ) = AndroidPushMessage(
-        messageId = "collapseId",
-        title = "title",
-        body = "body",
-        iconUrlString = iconUrlString,
-        imageUrlString = imageUrlString,
-        data = PresentablePushData(
-            campaignId = "campaignId",
-            sid = "sid",
-            platformData = AndroidPlatformData(
-                CHANNEL_ID,
-                NotificationMethod("collapseId", NotificationOperation.INIT),
-                style = style
-            )
-        )
+        sid = "sid",
+        campaignId = "campaignId",
+        platformData = AndroidPlatformData(
+            channelId = CHANNEL_ID,
+            notificationMethod = NotificationMethod("collapseId", NotificationOperation.INIT),
+            style = style
+        ),
+        displayableData = DisplayableData(
+            title = "title",
+            body = "body",
+            iconUrlString = iconUrlString,
+            imageUrlString = imageUrlString
+        ),
+        actionableData = null,
+        badgeCount = null
     )
 
     private fun mockImageDownload(urlString: String): Bitmap {

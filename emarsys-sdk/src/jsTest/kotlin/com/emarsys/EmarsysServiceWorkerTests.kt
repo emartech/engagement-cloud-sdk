@@ -5,7 +5,7 @@ import com.emarsys.core.log.Logger
 import com.emarsys.core.mapper.Mapper
 import com.emarsys.mobileengage.action.models.BadgeCount
 import com.emarsys.mobileengage.action.models.BadgeCountMethod
-import com.emarsys.mobileengage.push.PresentablePushData
+import com.emarsys.mobileengage.push.DisplayableData
 import com.emarsys.mobileengage.push.PushMessagePresenter
 import com.emarsys.mobileengage.push.model.JsPlatformData
 import com.emarsys.mobileengage.push.model.JsPushMessage
@@ -143,21 +143,17 @@ class EmarsysServiceWorkerTests {
         }
 
     private fun getJsPushMessage(badgeCount: BadgeCount? = null) = JsPushMessage(
-        "id",
-        "title",
-        "message",
-        "icon",
-        "image",
-        PresentablePushData(
-            sid = "sid",
-            campaignId = "campaignId",
-            actions = null,
-            platformData = JsPlatformData("applicationCode"),
-            pushToInApp = null,
-            defaultTapAction = null,
-            badgeCount = badgeCount
+        sid = "sid",
+        campaignId = "campaignId",
+        platformData = JsPlatformData("applicationCode"),
+        badgeCount = badgeCount,
+        actionableData = null,
+        displayableData = DisplayableData(
+            "title",
+            "message",
+            "icon",
+            "image"
         )
     )
-
 
 }

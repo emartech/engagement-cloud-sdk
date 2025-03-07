@@ -1,5 +1,7 @@
 package com.emarsys.mobileengage.push
 
-interface PushHandler<U : PlatformData, T : SilentPushMessage<U>> {
-    suspend fun handle(pushMessage: T)
+import com.emarsys.mobileengage.action.models.BasicActionModel
+
+interface PushHandler<T: PlatformData, U> where U: PushMessage<T>, U: ActionablePush<BasicActionModel> {
+    suspend fun handle(pushMessage: U)
 }

@@ -1,51 +1,38 @@
 package com.emarsys.mobileengage.push
 
+import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BadgeCount
 import com.emarsys.mobileengage.action.models.BasicActionModel
-import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.inapp.PushToInApp
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonObject
-
-interface SilentPushMessage<T : PlatformData> {
-    val messageId: String
-    val data: PushData<T>
-}
-
-interface PresentablePushMessage<T : PlatformData> {
-    val messageId: String
-    val title: String
-    val body: String
-    val iconUrlString: String?
-    val imageUrlString: String?
-    val data: PresentablePushData<T>
-}
 
 interface PlatformData
 
+interface PushMessage<T : PlatformData> {
+    val sid: String
+    val campaignId: String
+    val platformData: T
+    val badgeCount: BadgeCount?
+}
+
+interface DisplayablePush {
+    val displayableData: DisplayableData?
+}
+interface ActionablePush<A: ActionModel> {
+    val actionableData: ActionableData<A>?
+}
+
 @Serializable
-data class PushData<T : PlatformData>(
-    val silent: Boolean = false,
-    val sid: String,
-    val campaignId: String,
-    val platformData: T,
-    val actions: List<BasicActionModel>? = null,
-    val badgeCount: BadgeCount? = null,
-    val pushToInApp: PushToInApp? = null,
-    val rootParams: JsonObject? = null,
-    val u: JsonObject? = null
+data class DisplayableData(
+    val title: String,
+    val body: String,
+    val iconUrlString: String? = null,
+    val imageUrlString: String? = null
 )
 
 @Serializable
-data class PresentablePushData<T : PlatformData>(
-    val silent: Boolean = false,
-    val sid: String,
-    val campaignId: String,
-    val platformData: T,
+data class ActionableData<A: ActionModel>(
+    val actions: List<A>? = null,
     val defaultTapAction: BasicActionModel? = null,
-    val actions: List<PresentableActionModel>? = null,
-    val badgeCount: BadgeCount? = null,
-    val pushToInApp: PushToInApp? = null,
-    val rootParams: JsonObject? = null,
-    val u: JsonObject? = null
+    val pushToInApp: PushToInApp? = null
 )
