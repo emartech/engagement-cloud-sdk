@@ -22,6 +22,8 @@ class RemoteConfigClient(
     private val sdkLogger: Logger
 ) : RemoteConfigClientApi {
     override suspend fun fetchRemoteConfig(global: Boolean): RemoteConfigResponse? {
+        sdkLogger.debug("RemoteConfigClient - fetchRemoteConfig", mapOf("global" to global))
+
         val toBeConfigBytes = fetchConfig(global)
         val toBeSignatureBytes = fetchSignature(global)
         val config = toBeConfigBytes.await()

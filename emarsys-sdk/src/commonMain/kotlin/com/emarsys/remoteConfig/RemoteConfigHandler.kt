@@ -14,23 +14,30 @@ class RemoteConfigHandler(
     private val deviceInfoCollector: DeviceInfoCollectorApi,
     private val sdkContext: SdkContextApi,
     private val randomProvider: Provider<Double>,
-    private val logger: Logger
+    private val sdkLogger: Logger
 ) : RemoteConfigHandlerApi {
     private suspend fun handle(config: RemoteConfigResponse?, clientId: String?) {
         if (config == null) {
-            logger.error("RemoteConfigHandler - handle", "config is null")
+            sdkLogger.error("RemoteConfigHandler - handle", "config is null")
             return
         }
 
+        sdkLogger.debug("RemoteConfigHandler - handle", "applyServiceUrls")
         applyServiceUrls(config.serviceUrls)
+        sdkLogger.debug("RemoteConfigHandler - handle", "applyLogLevel")
         applyLogLevel(config.logLevel)
+        sdkLogger.debug("RemoteConfigHandler - handle", "applyFeatures")
         applyFeatures(config.features)
+        sdkLogger.debug("RemoteConfigHandler - handle", "applyLuckyLoger")
         applyLuckyLogger(config.luckyLogger)
 
         config.overrides?.let {
             it[clientId]?.let { override ->
+                sdkLogger.debug("RemoteConfigHandler - handle", "override applyServiceUrls")
                 applyServiceUrls(override.serviceUrls)
+                sdkLogger.debug("RemoteConfigHandler - handle", "override applyLogLevel")
                 applyLogLevel(override.logLevel)
+                sdkLogger.debug("RemoteConfigHandler - handle", "override applyFeatures")
                 applyFeatures(override.features)
             }
         }
