@@ -8,6 +8,8 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.emarsys.core.device.AndroidNotificationSettings
 import com.emarsys.core.device.ChannelSettings
 import com.emarsys.core.device.PlatformInfoCollector
+import com.emarsys.core.log.ConsoleLogger
+import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.resource.MetadataReader
 import com.emarsys.mobileengage.action.models.BadgeCount
 import com.emarsys.mobileengage.action.models.BadgeCountMethod
@@ -104,7 +106,8 @@ class PushMessagePresenterTest {
             mockMetadataReader,
             mockNotificationCompatStyler,
             mockPlatformInfoCollector,
-            mockInAppDownloader
+            mockInAppDownloader,
+            SdkLogger(ConsoleLogger())
         )
 
         notificationSlot = slot<Notification>()

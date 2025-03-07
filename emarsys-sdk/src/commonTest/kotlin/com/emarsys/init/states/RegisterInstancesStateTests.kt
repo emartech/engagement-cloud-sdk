@@ -3,6 +3,8 @@ package com.emarsys.init.states
 import EventTrackerApi
 import com.emarsys.api.contact.ContactApi
 import com.emarsys.api.push.PushApi
+import com.emarsys.core.log.ConsoleLogger
+import com.emarsys.core.log.SdkLogger
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
@@ -23,7 +25,9 @@ class RegisterInstancesStateTests {
         mockEventTrackerApi = mock()
         mockContactApi = mock()
         mockPushApi = mock()
-        registerInstancesState = RegisterInstancesState(mockEventTrackerApi, mockContactApi, mockPushApi)
+        registerInstancesState = RegisterInstancesState(mockEventTrackerApi, mockContactApi, mockPushApi,
+            SdkLogger(ConsoleLogger())
+        )
     }
 
     @Test

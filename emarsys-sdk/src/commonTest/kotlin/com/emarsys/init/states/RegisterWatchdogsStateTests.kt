@@ -1,6 +1,8 @@
 package com.emarsys.init.states
 
 import com.emarsys.core.Registerable
+import com.emarsys.core.log.ConsoleLogger
+import com.emarsys.core.log.SdkLogger
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
@@ -19,7 +21,9 @@ class RegisterWatchdogsStateTests {
     fun setup() {
         lifecycleWatchDog = mock()
         connectionWatchDog = mock()
-        registerWatchDogsState = RegisterWatchdogsState(lifecycleWatchDog, connectionWatchDog)
+        registerWatchDogsState = RegisterWatchdogsState(lifecycleWatchDog, connectionWatchDog,
+            SdkLogger(ConsoleLogger())
+        )
     }
 
     @Test

@@ -518,7 +518,10 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
                     platformInitState,
                 )
             )
-        SetupOrganizer(meStateMachine, predictStateMachine, sdkContext)
+        SetupOrganizer(
+            meStateMachine, predictStateMachine, sdkContext,
+            sdkLogger
+        )
     }
 
 
@@ -601,17 +604,31 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         InitOrganizer(
             StateMachine(
                 listOf(
-                    ApplyGlobalRemoteConfigState(remoteConfigHandler),
-                    RegisterInstancesState(eventTrackerApi, contactApi, pushApi),
-                    RegisterWatchdogsState(lifecycleWatchDog, connectionWatchDog),
+                    ApplyGlobalRemoteConfigState(
+                        remoteConfigHandler,
+                        sdkLogger
+                    ),
+                    RegisterInstancesState(
+                        eventTrackerApi, contactApi, pushApi,
+                        sdkLogger
+                    ),
+                    RegisterWatchdogsState(
+                        lifecycleWatchDog, connectionWatchDog,
+                        sdkLogger
+                    ),
                     SessionSubscriptionState(
                         mobileEngageSession,
-                        lifecycleWatchDog
+                        lifecycleWatchDog,
+                        sdkLogger
                     ),
-                    PlatformInitState(platformInitializer),
+                    PlatformInitState(
+                        platformInitializer,
+                        sdkLogger
+                    ),
                 )
             ),
-            sdkContext
+            sdkContext,
+            sdkLogger
         )
     }
 

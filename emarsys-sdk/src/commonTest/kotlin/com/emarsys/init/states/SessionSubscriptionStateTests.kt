@@ -1,5 +1,7 @@
 package com.emarsys.init.states
 
+import com.emarsys.core.log.ConsoleLogger
+import com.emarsys.core.log.SdkLogger
 import com.emarsys.mobileengage.session.Session
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import dev.mokkery.answering.returns
@@ -22,7 +24,7 @@ class SessionSubscriptionStateTests {
         mockLifecycleWatchDog = mock()
 
         sessionSubscriptionState =
-            SessionSubscriptionState(mockMobileEngageSession, mockLifecycleWatchDog)
+            SessionSubscriptionState(mockMobileEngageSession, mockLifecycleWatchDog, SdkLogger(ConsoleLogger()))
     }
 
     @Test
