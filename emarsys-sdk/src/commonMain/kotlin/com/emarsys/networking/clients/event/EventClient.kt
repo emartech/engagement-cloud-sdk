@@ -42,7 +42,7 @@ class EventClient(
     private val inAppPresenter: InAppPresenterApi,
     private val inAppViewProvider: InAppViewProviderApi,
     private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
-    private val logger: Logger,
+    private val sdkLogger: Logger,
     sdkDispatcher: CoroutineDispatcher
 ) : EventClientApi {
 
@@ -61,6 +61,7 @@ class EventClient(
             .filter { it is SdkEvent.Internal.Reporting || it is SdkEvent.Internal.Sdk || it is SdkEvent.External.Custom }
             .naturalBatching().onEach {
                 try {
+                    sdkLogger.debug("EventClient - consumeEvents", "Batch size: ${it.size}")
                     val url = urlFactory.create(EmarsysUrlType.EVENT)
                     val requestBody =
                         DeviceEventRequestBody(
@@ -80,13 +81,15 @@ class EventClient(
                     handleInApp(result.message)
                     handleOnAppEventAction(result)
                 } catch (e: Exception) {
-                    logger.error("EventClient: Error during event consumption", e)
+                    sdkLogger.error("EventClient: Error during event consumption", e)
                 }
             }.collect()
     }
 
     private suspend fun handleOnAppEventAction(deviceEventResponse: DeviceEventResponse) {
         deviceEventResponse.onEventAction?.let {
+            sdkLogger.debug("EventClient - handleOnAppEventAction", deviceEventResponse.toString())
+
             val actions = it.actions
             val campaignId = it.campaignId
 
@@ -98,6 +101,8 @@ class EventClient(
     }
 
     private suspend fun reportOnEventAction(campaignId: String) {
+        sdkLogger.debug("EventClient - reportOnEventAction")
+
         registerEvent(SdkEvent.Internal.InApp.Viewed(attributes = buildJsonObject {
             put(
                 "campaignId",
@@ -106,12 +111,16 @@ class EventClient(
         }))
     }
 
-    private fun handleDeviceEventState(deviceEventResponse: DeviceEventResponse) {
+    private suspend fun handleDeviceEventState(deviceEventResponse: DeviceEventResponse) {
+        sdkLogger.debug("EventClient - handleDeviceEventState", deviceEventResponse.toString())
+
         sessionContext.deviceEventState = deviceEventResponse.deviceEventState
     }
 
     private suspend fun handleInApp(message: EventResponseInApp?) {
         if (message != null && message.html.isNotEmpty()) {
+            sdkLogger.debug("EventClient - handleInApp", mapOf("campaignId" to message.campaignId))
+
             val view = inAppViewProvider.provide()
             val webViewHolder = view.load(InAppMessage(message.campaignId, message.html))
             inAppPresenter.present(view, webViewHolder, InAppPresentationMode.Overlay)

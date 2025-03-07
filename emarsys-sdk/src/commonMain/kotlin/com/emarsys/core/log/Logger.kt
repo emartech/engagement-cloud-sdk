@@ -11,6 +11,7 @@ interface Logger {
     suspend fun debug(logEntry: LogEntry)
     suspend fun debug(tag: String)
     suspend fun debug(tag: String, message: String)
+    suspend fun debug(tag: String, data: Map<String,Any>)
     suspend fun debug(tag: String, throwable: Throwable)
     suspend fun debug(tag: String, message: String, data: Map<String, Any>)
 

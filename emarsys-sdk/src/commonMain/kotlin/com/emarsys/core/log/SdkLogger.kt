@@ -32,6 +32,10 @@ class SdkLogger(private val consoleLogger: ConsoleLogger): Logger {
         log(tag, LogLevel.Debug, message)
     }
 
+    override suspend fun debug(tag: String, data: Map<String, Any>) {
+        log(tag, LogLevel.Debug, data = data)
+    }
+
     override suspend fun debug(tag: String) {
         log(tag, LogLevel.Debug)
     }
