@@ -237,7 +237,8 @@ actual class PlatformDependencyCreator actual constructor(
             sdkDispatcher,
             sdkLogger,
             sdkEventFlow,
-            timestampProvider
+            timestampProvider,
+            uuidProvider
         )
     }
 

@@ -14,12 +14,25 @@ class EventTrackerInternal(
     private val eventClient: EventClientApi,
     private val eventTrackerContext: ApiContext<EventTrackerCall>,
     private val timestampProvider: Provider<Instant>,
+    private val uuidProvider: Provider<String>,
     private val sdkLogger: Logger
 ) : EventTrackerInstance {
 
     override suspend fun trackEvent(event: CustomEvent) {
+        eventClient.registerEvent(
+            event.toSdkEvent(
+                uuidProvider.provide(),
+                timestampProvider.provide()
+            )
+        )
+        //TODO handle error
         sdkLogger.debug("EventTrackerGatherer - trackEvent")
-        eventClient.registerEvent(event.toSdkEvent(timestampProvider.provide()))
+        eventClient.registerEvent(
+            event.toSdkEvent(
+                uuidProvider.provide(),
+                timestampProvider.provide()
+            )
+        )
     }
 
     override suspend fun activate() {

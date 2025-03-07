@@ -70,7 +70,8 @@ class IosPushInternal(
     private val sdkDispatcher: CoroutineDispatcher,
     private val sdkLogger: Logger,
     private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
-    private val timestampProvider: Provider<Instant>
+    private val timestampProvider: Provider<Instant>,
+    private val uuidProvider: Provider<String>
 ) : PushInternal(pushClient, storage, pushContext, sdkLogger), IosPushInstance {
     override var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol? =
         null
@@ -94,6 +95,7 @@ class IosPushInternal(
 
         sdkEventFlow.emit(
             SdkEvent.External.Api.SilentPush(
+                id = uuidProvider.provide(),
                 name = PUSH_RECEIVED_EVENT_NAME,
                 attributes = buildJsonObject {
                     put(

@@ -33,8 +33,13 @@ class WebBadgeCountHandler(
                 JsonUtil.json.decodeFromString<BadgeCount>(badgeCountString)
             sdkEventFlow.emit(
                 SdkEvent.External.Api.BadgeCount(
-                    badgeCount.method.name,
-                    buildJsonObject { put("badgeCount", JsonPrimitive(badgeCount.value)) }
+                    name = badgeCount.method.name,
+                    attributes = buildJsonObject {
+                        put(
+                            "badgeCount",
+                            JsonPrimitive(badgeCount.value)
+                        )
+                    }
                 )
             )
         } catch (e: Exception) {

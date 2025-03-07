@@ -17,25 +17,29 @@ import kotlin.test.Test
 class AppStartStateTests {
     private companion object {
         val timestamp = Clock.System.now()
+        const val UUID = "testUUID"
     }
 
     private lateinit var mockEventClient: EventClientApi
     private lateinit var mockTimestampProvider: Provider<Instant>
+    private lateinit var mockUuidProvider: Provider<String>
     private lateinit var appStartState: AppStartState
 
     @BeforeTest
     fun setUp() {
         mockEventClient = mock()
         mockTimestampProvider = mock()
+        mockUuidProvider = mock()
         every { mockTimestampProvider.provide() } returns timestamp
+        every { mockUuidProvider.provide() } returns UUID
 
-        appStartState = AppStartState(mockEventClient, mockTimestampProvider)
+        appStartState = AppStartState(mockEventClient, mockTimestampProvider, mockUuidProvider)
     }
 
     @Test
     fun testActivate_should_send_appStartEvent_with_eventClient_when_it_was_not_completed_yet() =
         runTest {
-            val expectedEvent = SdkEvent.Internal.Sdk.AppStart(timestamp = timestamp)
+            val expectedEvent = SdkEvent.Internal.Sdk.AppStart(id = UUID, timestamp = timestamp)
             everySuspend { mockEventClient.registerEvent(expectedEvent) } returns Unit
 
             appStartState.active()
@@ -48,7 +52,7 @@ class AppStartStateTests {
     @Test
     fun testActivate_should_not_send_appStartEvent_with_eventClient_when_it_was_already_completed_yet() =
         runTest {
-            val expectedEvent = SdkEvent.Internal.Sdk.AppStart(timestamp = timestamp)
+            val expectedEvent = SdkEvent.Internal.Sdk.AppStart(id = UUID, timestamp = timestamp)
             everySuspend { mockEventClient.registerEvent(expectedEvent) } returns Unit
 
             appStartState.active()

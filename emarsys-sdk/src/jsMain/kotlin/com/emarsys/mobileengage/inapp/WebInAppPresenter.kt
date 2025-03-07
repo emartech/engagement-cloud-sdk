@@ -28,7 +28,7 @@ class WebInAppPresenter(
             }
         }
         CoroutineScope(sdkDispatcher).launch {
-            sdkEventFlow.first { it is SdkEvent.Internal.Sdk.Dismiss && it.dismissId == view.inAppMessage.campaignId }
+            sdkEventFlow.first { it is SdkEvent.Internal.Sdk.Dismiss && it.id == view.inAppMessage.campaignId }
             styledInappView.remove()
         }
 

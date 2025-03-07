@@ -62,7 +62,7 @@ class IosPushInternalTests {
     private companion object {
         const val SID = "testSid"
         const val CAMPAIGN_ID = "campaignId"
-
+        const val UUID = "testUUID"
         const val PUSH_TOKEN = "testPushToken"
         val REGISTER_PUSH_TOKEN = RegisterPushToken(PUSH_TOKEN)
         val CLEAR_PUSH_TOKEN = ClearPushToken()
@@ -98,6 +98,7 @@ class IosPushInternalTests {
     private lateinit var mockSdkEventFlow: MutableSharedFlow<SdkEvent>
     private lateinit var mockSdkLogger: Logger
     private lateinit var mockTimestampProvider: Provider<Instant>
+    private lateinit var mockUuidProvider: Provider<String>
 
     @BeforeTest
     fun setup() = runTest {
@@ -113,11 +114,13 @@ class IosPushInternalTests {
         mockBadgeCountHandler = mock()
         json = JsonUtil.json
         mockTimestampProvider = mock()
+        mockUuidProvider = mock()
         sdkDispatcher = dispatcher
         mockSdkEventFlow = mock()
         mockSdkLogger = mock(MockMode.autofill)
         everySuspend { mockActionHandler.handleActions(any(), any()) } returns Unit
         everySuspend { mockTimestampProvider.provide() } returns Instant.DISTANT_PAST
+        everySuspend { mockUuidProvider.provide() } returns UUID
         iosPushInternal = IosPushInternal(
             mockPushClient,
             mockStorage,
@@ -130,7 +133,8 @@ class IosPushInternalTests {
             sdkDispatcher,
             mockSdkLogger,
             mockSdkEventFlow,
-            mockTimestampProvider
+            mockTimestampProvider,
+            mockUuidProvider
         )
     }
 
@@ -524,6 +528,7 @@ class IosPushInternalTests {
         verifySuspend {
             mockSdkEventFlow.emit(
                 SdkEvent.External.Api.SilentPush(
+                    id = UUID,
                     name = PUSH_RECEIVED_EVENT_NAME,
                     attributes = buildJsonObject { put("campaignId", JsonPrimitive(CAMPAIGN_ID)) },
                     timestamp = Instant.DISTANT_PAST
@@ -547,6 +552,7 @@ class IosPushInternalTests {
         verifySuspend {
             mockSdkEventFlow.emit(
                 SdkEvent.External.Api.SilentPush(
+                    id = UUID,
                     name = PUSH_RECEIVED_EVENT_NAME,
                     attributes = buildJsonObject { put("campaignId", JsonPrimitive(CAMPAIGN_ID)) },
                     timestamp = Instant.DISTANT_PAST

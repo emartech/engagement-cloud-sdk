@@ -499,7 +499,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         val applyAppCodeBasedRemoteConfigState = ApplyAppCodeBasedRemoteConfigState(
             remoteConfigHandler
         )
-        val appStartState = AppStartState(eventClient, timestampProvider)
+        val appStartState = AppStartState(eventClient, timestampProvider, uuidProvider)
         val meStateMachine =
             StateMachine(
                 listOf(
@@ -559,9 +559,16 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             )
         )
         val loggingEvent = LoggingEventTracker(sdkLogger)
-        val gathererEvent = EventTrackerGatherer(eventTrackerContext, timestampProvider, sdkLogger)
+        val gathererEvent =
+            EventTrackerGatherer(eventTrackerContext, timestampProvider, uuidProvider, sdkLogger)
         val eventInternal =
-            EventTrackerInternal(eventClient, eventTrackerContext, timestampProvider, sdkLogger)
+            EventTrackerInternal(
+                eventClient,
+                eventTrackerContext,
+                timestampProvider,
+                uuidProvider,
+                sdkLogger
+            )
         EventTracker(loggingEvent, gathererEvent, eventInternal, sdkContext)
     }
     override val connectionWatchDog: ConnectionWatchDog by lazy {

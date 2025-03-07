@@ -41,7 +41,7 @@ class ReportingActionTests {
         val pushButtonClickedActionModel = BasicPushButtonClickedActionModel(ID, SID)
         val action = ReportingAction(pushButtonClickedActionModel, mockCustomEventChannel)
         val expectedEvent = SdkEvent.Internal.Push.Clicked(
-            buildJsonObject {
+            attributes = buildJsonObject {
                 put(
                     "buttonId", JsonPrimitive((ID))
                 )
@@ -68,7 +68,7 @@ class ReportingActionTests {
         val inAppButtonClickedActionModel = BasicInAppButtonClickedActionModel(ID, SID, TEST_URL)
         val action = ReportingAction(inAppButtonClickedActionModel, mockCustomEventChannel)
         val expectedEvent = SdkEvent.Internal.InApp.ButtonClicked(
-            buildJsonObject {
+            attributes = buildJsonObject {
                 put(
                     "buttonId", JsonPrimitive((ID))
                 )
@@ -96,7 +96,7 @@ class ReportingActionTests {
             val inAppButtonClickedActionModel = BasicInAppButtonClickedActionModel(ID, SID)
             val action = ReportingAction(inAppButtonClickedActionModel, mockCustomEventChannel)
             val expectedEvent = SdkEvent.Internal.InApp.ButtonClicked(
-                buildJsonObject {
+                attributes = buildJsonObject {
                     put(
                         "buttonId", JsonPrimitive((ID))
                     )
@@ -121,7 +121,7 @@ class ReportingActionTests {
             val notificationOpenedActionModel = NotificationOpenedActionModel(SID)
             val action = ReportingAction(notificationOpenedActionModel, mockCustomEventChannel)
             val expectedEvent = SdkEvent.Internal.Push.Clicked(
-                buildJsonObject {
+                attributes = buildJsonObject {
                     put(
                         "sid", JsonPrimitive(SID)
                     )

@@ -9,7 +9,8 @@ import kotlinx.datetime.Instant
 
 class AppStartState(
     private val eventClient: EventClientApi,
-    private val timestampProvider: Provider<Instant>
+    private val timestampProvider: Provider<Instant>,
+    private val uuidProvider: Provider<String>
 ) : State {
     private var alreadyCompleted = false
 
@@ -19,7 +20,10 @@ class AppStartState(
 
     override suspend fun active() {
         if (!alreadyCompleted) {
-            val appStartEvent = SdkEvent.Internal.Sdk.AppStart(timestamp = timestampProvider.provide())
+            val appStartEvent = SdkEvent.Internal.Sdk.AppStart(
+                id = uuidProvider.provide(),
+                timestamp = timestampProvider.provide()
+            )
             eventClient.registerEvent(appStartEvent)
             alreadyCompleted = true
         }

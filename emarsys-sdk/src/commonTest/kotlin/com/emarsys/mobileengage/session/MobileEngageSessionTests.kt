@@ -31,6 +31,8 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.Instant
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -46,10 +48,17 @@ class MobileEngageSessionTests {
         const val SESSION_DURATION = 1000L
         val SESSION_ID = SessionId("testSessionId")
         val sessionStartEvent = SdkEvent.Internal.Sdk.SessionStart(
+            id = SESSION_ID.value,
             timestamp = SESSION_START_UTC
         )
         val sessionEndEvent = SdkEvent.Internal.Sdk.SessionEnd(
-            duration = SESSION_DURATION,
+            id = SESSION_ID.value,
+            attributes = buildJsonObject {
+                put(
+                    "duration",
+                    JsonPrimitive(SESSION_DURATION.toString())
+                )
+            },
             timestamp = SESSION_END_UTC
         )
     }

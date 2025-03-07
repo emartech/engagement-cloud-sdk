@@ -37,19 +37,19 @@ class PlatformInitializerTest {
 
     @Test
     fun init_should_cancelNotification_whenSdkEvent_isDismiss() = runTest {
-        val testDismissId1 = "dismissId1"
-        val testDismissId2 = "dismissId2"
+        val testId2 = "dismissId2"
+        val testId1 = "dismissId1"
 
         platformInitializer.init()
 
-        sdkEventFlow.emit(SdkEvent.Internal.Sdk.Dismiss(dismissId = testDismissId1))
-        sdkEventFlow.emit(SdkEvent.Internal.Sdk.Dismiss(dismissId = testDismissId2))
+        sdkEventFlow.emit(SdkEvent.Internal.Sdk.Dismiss(id = testId1))
+        sdkEventFlow.emit(SdkEvent.Internal.Sdk.Dismiss(id = testId2))
 
         advanceUntilIdle()
 
         verify {
-            mockNotificationManager.cancel(testDismissId1, testDismissId1.hashCode())
-            mockNotificationManager.cancel(testDismissId2, testDismissId2.hashCode())
+            mockNotificationManager.cancel(testId1, testId1.hashCode())
+            mockNotificationManager.cancel(testId2, testId2.hashCode())
         }
     }
 
@@ -57,7 +57,7 @@ class PlatformInitializerTest {
     fun init_should_doNothing_whenSdkEvent_isNotDismiss() = runTest {
         platformInitializer.init()
 
-        sdkEventFlow.emit(SdkEvent.Internal.Sdk.Metric("metric"))
+        sdkEventFlow.emit(SdkEvent.Internal.Sdk.Metric(name = "metric"))
 
         advanceUntilIdle()
 

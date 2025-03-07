@@ -12,11 +12,19 @@ import kotlinx.datetime.Instant
 class EventTrackerGatherer(
     private val context: ApiContext<EventTrackerCall>,
     private val timestampProvider: Provider<Instant>,
+    private val uuidProvider: Provider<String>,
     private val sdkLogger: Logger
 ) : EventTrackerInstance {
     override suspend fun trackEvent(event: CustomEvent) {
+        context.calls.add(
+            TrackEvent(
+                event.toSdkEvent(
+                    uuidProvider.provide(),
+                    timestampProvider.provide(),
+                )
+            )
+        )
         sdkLogger.debug("EventTrackerGatherer - trackEvent")
-        context.calls.add(TrackEvent(event.toSdkEvent(timestampProvider.provide())))
     }
 
     override suspend fun activate() {
