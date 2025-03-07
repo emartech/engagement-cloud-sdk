@@ -2,7 +2,17 @@ CREATE TABLE events (
   id TEXT PRIMARY KEY NOT NULL,
   name TEXT NOT NULL,
   attributes TEXT,
-  timestamp INTEGER NOT NULL
+  timestamp INTEGER NOT NULL,
+  json TEXT NOT NULL
 );
 
 CREATE INDEX id ON events(id);
+
+selectAll:
+SELECT json FROM events;
+
+insertEvent:
+INSERT INTO events (id, name, attributes, timestamp, json) VALUES (?, ?, ?, ?, ?);
+
+deleteAll:
+DELETE FROM events;

@@ -24,8 +24,7 @@ import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.cache.AndroidFileCache
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.clipboard.ClipboardHandlerApi
-import com.emarsys.core.db.EventsDaoApi
-import com.emarsys.core.db.events.AndroidSqlDelightEventsDao
+import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.device.AndroidLanguageProvider
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.PlatformInfoCollector
@@ -164,7 +163,7 @@ actual class PlatformDependencyCreator actual constructor(
 
     actual override fun createEventsDao(): EventsDaoApi {
         val driver = AndroidSqliteDriver(EmarsysDB.Schema, applicationContext, DB_NAME)
-        return AndroidSqlDelightEventsDao(EmarsysDB(driver))
+        return com.emarsys.core.db.events.AndroidSqlDelightEventsDao(EmarsysDB(driver), json)
     }
 
     actual override fun createPermissionHandler(): PermissionHandlerApi {

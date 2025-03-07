@@ -8,7 +8,7 @@ import com.emarsys.context.SdkContext
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.clipboard.ClipboardHandlerApi
-import com.emarsys.core.db.EventsDaoApi
+import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.log.SdkLogger

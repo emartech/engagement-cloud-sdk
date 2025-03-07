@@ -1,0 +1,70 @@
+package com.emarsys.core.db.events
+
+import app.cash.sqldelight.driver.android.AndroidSqliteDriver
+import com.emarsys.applicationContext
+import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.sqldelight.EmarsysDB
+import com.emarsys.util.JsonUtil
+import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
+import kotlinx.datetime.Clock
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import org.junit.Test
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
+
+@OptIn(ExperimentalCoroutinesApi::class)
+class AndroidSqlDelightEventsDaoTests {
+    private companion object {
+        const val DB_NAME = "test.db"
+        val TIMESTAMP = Clock.System.now()
+        val ATTRIBUTES = buildJsonObject {
+            put("key", "value")
+        }
+    }
+    private lateinit var eventsDao: EventsDaoApi
+    private lateinit var db: EmarsysDB
+
+    @BeforeTest
+    fun setup() {
+        val driver = AndroidSqliteDriver(EmarsysDB.Schema, applicationContext, DB_NAME)
+        db = EmarsysDB(driver)
+        eventsDao = AndroidSqlDelightEventsDao(db, JsonUtil.json)
+    }
+
+    @AfterTest
+    fun tearDown() {
+        db.eventsQueries.deleteAll()
+    }
+
+    @Test
+    fun testInsertEvent() = runTest {
+        val event = SdkEvent.External.Custom(
+            id = "testId",
+            name = "test",
+            attributes = ATTRIBUTES,
+            timestamp = TIMESTAMP
+        )
+
+        eventsDao.insertEvent(event)
+
+        val result = eventsDao.getEvents().firstOrNull()
+
+        advanceUntilIdle()
+
+        result shouldBe event
+    }
+
+    @Test
+    fun testGetEvents_whenNothingWasInserted() = runTest {
+        val result = eventsDao.getEvents().firstOrNull()
+
+        advanceUntilIdle()
+
+        result shouldBe null
+    }
+}

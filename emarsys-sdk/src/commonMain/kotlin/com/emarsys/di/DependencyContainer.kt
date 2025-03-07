@@ -65,7 +65,7 @@ import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.collections.persistentListOf
 import com.emarsys.core.crypto.Crypto
 import com.emarsys.core.crypto.CryptoApi
-import com.emarsys.core.db.EventsDaoApi
+import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.log.ConsoleLogger

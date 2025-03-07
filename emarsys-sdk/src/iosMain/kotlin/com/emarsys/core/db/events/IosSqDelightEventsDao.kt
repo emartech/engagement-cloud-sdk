@@ -1,15 +1,6 @@
 package com.emarsys.core.db.events
 
-import com.emarsys.core.db.EventsDaoApi
-import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.sqldelight.EmarsysDB
+import kotlinx.serialization.json.Json
 
-class IosSqDelightEventsDao(private val db: EmarsysDB): EventsDaoApi {
-
-    override fun insertEvent(event: SdkEvent) {
-    }
-
-    override fun getEvents(): List<SdkEvent> {
-        return emptyList()
-    }
-}
+class IosSqDelightEventsDao(db: EmarsysDB, val json: Json): AbstractSqlDelightEventsDao(db, json)

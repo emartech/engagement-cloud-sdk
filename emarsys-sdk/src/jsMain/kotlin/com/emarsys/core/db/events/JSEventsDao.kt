@@ -1,14 +1,15 @@
 package com.emarsys.core.db.events
 
-import com.emarsys.core.db.EventsDaoApi
 import com.emarsys.networking.clients.event.model.SdkEvent
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
-class JSEventsDao: EventsDaoApi {
+class JSEventsDao : EventsDaoApi {
 
-    override fun insertEvent(event: SdkEvent) {
+    override suspend fun insertEvent(event: SdkEvent) {
     }
 
-    override fun getEvents(): List<SdkEvent> {
-        return emptyList()
+    override suspend fun getEvents(): Flow<SdkEvent> {
+        return flowOf()
     }
 }
