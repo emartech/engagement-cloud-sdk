@@ -119,7 +119,9 @@ class EventClient(
 
     private suspend fun handleInApp(message: EventResponseInApp?) {
         if (message != null && message.html.isNotEmpty()) {
-            sdkLogger.debug("EventClient - handleInApp", mapOf("campaignId" to message.campaignId))
+            sdkLogger.debug(
+                "EventClient - handleInApp",
+                buildJsonObject { put("campaignId", JsonPrimitive(message.campaignId)) })
 
             val view = inAppViewProvider.provide()
             val webViewHolder = view.load(InAppMessage(message.campaignId, message.html))

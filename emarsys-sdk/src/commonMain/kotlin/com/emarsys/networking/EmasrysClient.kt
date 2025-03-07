@@ -22,6 +22,8 @@ import io.ktor.http.isSuccess
 import kotlinx.coroutines.delay
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 import kotlin.time.Duration.Companion.seconds
 
 class EmarsysClient(
@@ -54,7 +56,10 @@ class EmarsysClient(
             sdkLogger.debug(
                 "EmarsysClient - refreshContactToken",
                 "refreshing contact token",
-                mapOf("retryCount" to retryCount, "response" to response)
+                buildJsonObject {
+                    put("retryCount", JsonPrimitive(retryCount))
+                    put("status", JsonPrimitive(response.status.value))
+                }
             )
             delay((retryCount + 1).seconds)
             val request = createRefreshContactTokenRequest()

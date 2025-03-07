@@ -7,6 +7,8 @@ import android.net.Uri
 import android.webkit.URLUtil
 import com.emarsys.core.log.Logger
 import com.emarsys.core.url.ExternalUrlOpenerApi
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 
 class AndroidExternalUrlOpener(
     private val applicationContext: Context,
@@ -22,7 +24,11 @@ class AndroidExternalUrlOpener(
             try {
                 applicationContext.startActivity(externalUrlIntent)
             } catch (exception: ActivityNotFoundException) {
-                sdkLogger.error("AndroidExternalUrlOpener", exception, mapOf("url" to url))
+
+                sdkLogger.error(
+                    "AndroidExternalUrlOpener",
+                    exception,
+                    buildJsonObject { put("url", JsonPrimitive(url)) })
             }
         }
     }

@@ -56,7 +56,12 @@ class MobileEngageSession(
                 sdkLogger.error(
                     LogEntry(
                         "mobile-engage-session-start-request-failed",
-                        mapOf("error" to (exception.message ?: "Start session failed."))
+                        buildJsonObject {
+                            put(
+                                "error",
+                                JsonPrimitive(exception.message ?: "Start session failed.")
+                            )
+                        }
                     )
                 )
                 resetSessionContext()
@@ -78,7 +83,12 @@ class MobileEngageSession(
                 sdkLogger.error(
                     LogEntry(
                         "mobile-engage-session-end-request-failed",
-                        mapOf("error" to (exception.message ?: "End session failed"))
+                        buildJsonObject {
+                            put(
+                                "error",
+                                JsonPrimitive(exception.message ?: "End session failed")
+                            )
+                        }
                     )
                 )
             } finally {

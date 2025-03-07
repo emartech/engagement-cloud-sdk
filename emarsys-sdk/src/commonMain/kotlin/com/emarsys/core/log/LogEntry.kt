@@ -1,23 +1,31 @@
 package com.emarsys.core.log
 
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 import kotlin.reflect.typeOf
 
 data class LogEntry(
     val topic: String,
-    val data: Map<String, Any> = mapOf()
+    val data: JsonObject = JsonObject(mapOf())
 ) {
-    
+
     companion object {
-        inline fun <reified Source>createMethodNotAllowed(source: Source, functionName: String, params: Map<String, Any>? = null): LogEntry {
-            val data = mutableMapOf<String, Any>(
-                "className" to typeOf<Source>().toString(),
-                "functionName" to functionName
-            )
-            params?.let {
-                data.put("parameters", it)
+        inline fun <reified Source> createMethodNotAllowed(
+            source: Source,
+            functionName: String,
+            params: JsonObject? = null
+        ): LogEntry {
+            val data = buildJsonObject {
+                put("className", JsonPrimitive(typeOf<Source>().toString()))
+                put("functionName", JsonPrimitive(functionName))
+
+                params?.let {
+                    put("parameters", it)
+                }
             }
-            return LogEntry("log_method_not_allowed", data)
+            return LogEntry("log_method_not_allowed", JsonObject(data))
         }
     }
-    
+
 }

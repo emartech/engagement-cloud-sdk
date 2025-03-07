@@ -3,33 +3,45 @@ package com.emarsys.mobileengage.push
 import com.emarsys.api.push.BasicPushUserInfo
 import com.emarsys.api.push.LoggingPush
 import com.emarsys.core.log.LogEntry
-import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
 import com.emarsys.core.storage.TypedStorageApi
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 import platform.darwin.NSObject
 
 
-class IosLoggingPush(private val logger: Logger, storage: TypedStorageApi<String?>) : LoggingPush(logger, storage), IosPushInstance {
+class IosLoggingPush(
+    private val logger: Logger,
+    storage: TypedStorageApi<String?>,
+    private val sdkDispatcher: CoroutineDispatcher
+) : LoggingPush(logger, storage, sdkDispatcher), IosPushInstance {
     override var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol?
         get() {
             val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)
-            logger.log(entry, LogLevel.Debug)
+            CoroutineScope(sdkDispatcher).launch {
+                logger.debug(entry)
+            }
             return null
         }
         set(_) {
             val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)
-            logger.log(entry, LogLevel.Debug)
+            CoroutineScope(sdkDispatcher).launch {
+                logger.debug(entry)
+            }
         }
     override val emarsysUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol
         get() {
             val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)
-            logger.log(entry, LogLevel.Debug)
-            return object: NSObject(), UNUserNotificationCenterDelegateProtocol {}
+            CoroutineScope(sdkDispatcher).launch {
+                logger.debug(entry)
+            }
+            return object : NSObject(), UNUserNotificationCenterDelegateProtocol {}
         }
 
     override suspend fun handleSilentMessageWithUserInfo(userInfo: BasicPushUserInfo) {
         val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)
-        logger.log(entry, LogLevel.Debug)
+        logger.debug(entry)
     }
 }

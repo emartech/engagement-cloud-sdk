@@ -6,6 +6,8 @@ import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 
 class LoggingGeofenceTracker(
     private val sdkContext: SdkContextApi,
@@ -49,9 +51,9 @@ class LoggingGeofenceTracker(
 
     override suspend fun setInitialEnterTriggerEnabled(enabled: Boolean) {
         val entry = LogEntry.createMethodNotAllowed(
-            this, this::setInitialEnterTriggerEnabled.name, mapOf(
-                "enabled" to enabled,
-            )
+            this, this::setInitialEnterTriggerEnabled.name, buildJsonObject {
+                put("enabled", JsonPrimitive(enabled))
+            }
         )
         logger.debug(entry)
     }

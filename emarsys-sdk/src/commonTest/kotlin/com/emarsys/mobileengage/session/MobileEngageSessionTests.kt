@@ -95,7 +95,7 @@ class MobileEngageSessionTests {
         every { mockUuidProvider.provide() } returns SESSION_ID.value
         everySuspend { mockEventClient.registerEvent(sessionStartEvent) } returns Unit
         everySuspend { mockEventClient.registerEvent(sessionEndEvent) } returns Unit
-        every { mockSdkLogger.log(any(), any()) } returns Unit
+        everySuspend { mockSdkLogger.debug(any<LogEntry>()) } returns Unit
         everySuspend { mockSdkLogger.debug(any<LogEntry>()) } returns Unit
         everySuspend { mockSdkLogger.error(any()) } returns Unit
 

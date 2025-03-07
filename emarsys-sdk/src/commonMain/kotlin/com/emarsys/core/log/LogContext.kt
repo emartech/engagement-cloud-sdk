@@ -2,29 +2,34 @@ package com.emarsys.core.log
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonObject
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.coroutineContext
 
-class LogContext(val contextMap: Map<String, Any>) :
+class LogContext(val contextMap: JsonObject) :
     AbstractCoroutineContextElement(Key) {
     companion object Key : CoroutineContext.Key<LogContext>
 }
 
 suspend fun <T> withLogContext(
-    contextMap: Map<String, Any>,
+    contextMap: JsonObject,
     block: suspend CoroutineScope.() -> T
 ): T {
-    val extendedContext = mutableMapOf<String, Any>()
-    extendedContext.putAll(contextMap)
-    coroutineContext[LogContext.Key]?.contextMap?.let {
-        extendedContext.putAll(it)
+    val extendedContext = buildJsonObject {
+        contextMap.forEach { contextMapEntry -> put(contextMapEntry.key, contextMapEntry.value) }
+        coroutineContext[LogContext.Key]?.contextMap?.let { coroutineContextEntries ->
+            coroutineContextEntries.entries.forEach {
+                put(it.key, it.value)
+            }
+        }
     }
     return withContext(coroutineContext + extendedContext.toContext()) {
         block()
     }
 }
 
-fun Map<String, Any>.toContext(): CoroutineContext {
+fun JsonObject.toContext(): CoroutineContext {
     return LogContext(this)
 }

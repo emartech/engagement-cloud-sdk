@@ -1,16 +1,19 @@
 package com.emarsys.core.url
 
-import com.emarsys.core.log.LogEntry
-import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 import platform.Foundation.NSURL
 import platform.UIKit.UIApplication
 
 class IosExternalUrlOpener(
     private val uiApplication: UIApplication,
     private val mainDispatcher: CoroutineDispatcher,
+    private val sdkDispatcher: CoroutineDispatcher,
     private val sdkLogger: Logger
 ) : ExternalUrlOpenerApi {
 
@@ -20,12 +23,18 @@ class IosExternalUrlOpener(
             withContext(mainDispatcher) {
                 uiApplication.openURL(nsUrl, emptyMap<Any?, Any?>()) { success ->
                     if (!success) {
-                        sdkLogger.log(
-                            LogEntry(
+                        CoroutineScope(sdkDispatcher).launch {
+                            sdkLogger.error(
                                 "IosExternalUrlOpener",
-                                mapOf("message" to "Failed to open url: $url")
-                            ), LogLevel.Error
-                        )
+                                buildJsonObject {
+                                    put(
+                                        "message",
+                                        JsonPrimitive("Failed to open url: $url")
+                                    )
+                                }
+
+                            )
+                        }
                     }
                 }
             }

@@ -13,6 +13,8 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 import org.junit.Before
 import org.junit.Test
 
@@ -62,7 +64,7 @@ class AndroidExternalUrlOpenerTests {
             mockLogger.error(
                 "AndroidExternalUrlOpener",
                 exception,
-                mapOf("url" to url)
+                buildJsonObject { put("url", JsonPrimitive(url)) }
             )
         }
     }

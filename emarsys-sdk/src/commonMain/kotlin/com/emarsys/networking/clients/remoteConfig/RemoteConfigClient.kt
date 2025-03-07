@@ -13,6 +13,8 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 
 class RemoteConfigClient(
     private val networkClient: NetworkClientApi,
@@ -22,7 +24,9 @@ class RemoteConfigClient(
     private val sdkLogger: Logger
 ) : RemoteConfigClientApi {
     override suspend fun fetchRemoteConfig(global: Boolean): RemoteConfigResponse? {
-        sdkLogger.debug("RemoteConfigClient - fetchRemoteConfig", mapOf("global" to global))
+        sdkLogger.debug(
+            "RemoteConfigClient - fetchRemoteConfig",
+            buildJsonObject { put("global", JsonPrimitive(global)) })
 
         val toBeConfigBytes = fetchConfig(global)
         val toBeSignatureBytes = fetchSignature(global)

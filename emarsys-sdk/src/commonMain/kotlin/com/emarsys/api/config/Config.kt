@@ -9,6 +9,8 @@ import com.emarsys.core.device.PushSettings
 import com.emarsys.core.log.withLogContext
 import com.emarsys.util.JsonUtil
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 
 interface ConfigInstance : ConfigInternalApi, Activatable
 
@@ -41,7 +43,12 @@ class Config<Logging : ConfigInstance, Gatherer : ConfigInstance, Internal : Con
     override suspend fun changeApplicationCode(applicationCode: String): Result<Unit> =
         runCatching {
             withContext(sdkContext.sdkDispatcher) {
-                withLogContext(mapOf("applicationCode" to applicationCode)) {
+                withLogContext(buildJsonObject {
+                    put(
+                        "applicationCode",
+                        JsonPrimitive(applicationCode)
+                    )
+                }) {
                     activeInstance<ConfigInternalApi>().changeApplicationCode(applicationCode)
                 }
             }
@@ -49,7 +56,9 @@ class Config<Logging : ConfigInstance, Gatherer : ConfigInstance, Internal : Con
 
     override suspend fun changeMerchantId(merchantId: String): Result<Unit> = runCatching {
         withContext(sdkContext.sdkDispatcher) {
-            withLogContext(mapOf("merchantId" to merchantId)) {
+            withLogContext(buildJsonObject {
+                put("merchantId", JsonPrimitive(merchantId))
+            }) {
                 activeInstance<ConfigInternalApi>().changeMerchantId(merchantId)
             }
         }

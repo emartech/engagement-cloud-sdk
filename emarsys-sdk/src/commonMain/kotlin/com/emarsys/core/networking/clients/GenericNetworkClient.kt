@@ -19,6 +19,8 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 import kotlin.time.Duration.Companion.seconds
 
 class GenericNetworkClient(private val client: HttpClient, private val sdkLogger: Logger) :
@@ -33,7 +35,7 @@ class GenericNetworkClient(private val client: HttpClient, private val sdkLogger
         sdkLogger.debug(
             LogEntry(
                 "GenericNetworkClient - send",
-                mapOf("request" to request)
+                buildJsonObject { put("request", JsonPrimitive(request.toString())) }
             )
         )
         var retries = 0
@@ -66,10 +68,13 @@ class GenericNetworkClient(private val client: HttpClient, private val sdkLogger
             httpResponse.headers,
             httpResponse.bodyAsText()
         )
-        sdkLogger.debug(
+        sdkLogger.info(
             LogEntry(
                 "GenericNetworkClient - response",
-                mapOf("response" to response)
+                buildJsonObject {
+                    put("status", JsonPrimitive(response.status.value))
+                    put("url", JsonPrimitive(response.originalRequest.url.toString()))
+                }
             )
         )
         if (!httpResponse.status.isSuccess() && httpResponse.status != HttpStatusCode.Unauthorized) {
@@ -77,7 +82,10 @@ class GenericNetworkClient(private val client: HttpClient, private val sdkLogger
                 sdkLogger.error(
                     LogEntry(
                         "GenericNetworkClient - Request retry limit reached!",
-                        mapOf("response" to response)
+                        buildJsonObject {
+                            put("status", JsonPrimitive(response.status.value))
+                            put("url", JsonPrimitive(response.originalRequest.url.toString()))
+                        }
                     )
                 )
                 throw RetryLimitReachedException("Request retry limit reached! Response: ${httpResponse.bodyAsText()}")
@@ -85,7 +93,10 @@ class GenericNetworkClient(private val client: HttpClient, private val sdkLogger
             sdkLogger.error(
                 LogEntry(
                     "GenericNetworkClient: Request failed with status code: ${httpResponse.status.value}",
-                    mapOf("response" to response)
+                    buildJsonObject {
+                        put("status", JsonPrimitive(response.status.value))
+                        put("url", JsonPrimitive(response.originalRequest.url.toString()))
+                    }
                 )
             )
             throw FailedRequestException(response)

@@ -3,11 +3,14 @@ package com.emarsys.watchdog.connection
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
-import com.emarsys.core.log.LogEntry
-import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 
 class AndroidConnectionWatchDog(
     private val connectivityManager: ConnectivityManager,
@@ -19,17 +22,21 @@ class AndroidConnectionWatchDog(
 
     override val isOnline = _isOnline.asStateFlow()
     override suspend fun register() {
-        logger.log(LogEntry("log_network_monitoring_start", mapOf()), LogLevel.Debug)
+        logger.debug("log_network_monitoring_start")
         connectivityManager.registerDefaultNetworkCallback(this)
     }
 
     override fun onAvailable(network: Network) {
-        logger.log(LogEntry("log_network_connection_available", mapOf()), LogLevel.Debug)
+        CoroutineScope(Dispatchers.IO).launch {
+            logger.debug("log_network_connection_available")
+        }
         _isOnline.value = true
     }
 
     override fun onLost(network: Network) {
-        logger.log(LogEntry("log_network_connection_NOT_available", mapOf()), LogLevel.Debug)
+        CoroutineScope(Dispatchers.IO).launch {
+            logger.debug("log_network_connection_NOT_available")
+        }
         _isOnline.value = false
     }
 
@@ -39,12 +46,17 @@ class AndroidConnectionWatchDog(
                 ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
         } ?: false
     } catch (ignored: Exception) {
-        logger.log(
-            LogEntry(
+        CoroutineScope(Dispatchers.IO).launch {
+            logger.debug(
                 "log_error_getting_network_connection",
-                mapOf("message" to (ignored.message ?: "Error getting network connection"))
-            ), LogLevel.Debug
-        )
+                buildJsonObject {
+                    put(
+                        "message",
+                        JsonPrimitive(ignored.message ?: "Error getting network connection")
+                    )
+                }
+            )
+        }
         false
     }
 

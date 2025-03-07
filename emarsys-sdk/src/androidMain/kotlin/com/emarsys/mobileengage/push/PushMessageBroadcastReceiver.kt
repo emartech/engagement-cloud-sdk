@@ -13,6 +13,8 @@ import com.emarsys.mobileengage.push.model.AndroidPushMessage
 import com.emarsys.mobileengage.push.model.SilentAndroidPushMessage
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 
 class PushMessageBroadcastReceiver : BroadcastReceiver() {
     private val dependencyContainer = DependencyInjection.container as DependencyContainerPrivateApi
@@ -37,15 +39,20 @@ class PushMessageBroadcastReceiver : BroadcastReceiver() {
                         is SilentAndroidPushMessage -> {
                             logger.debug(
                                 "PushMessageBroadcastReceiver - onReceive",
-                                mapOf("type" to "silent", "message" to pushMessage)
-                            )
+                                buildJsonObject {
+                                    put("type", JsonPrimitive("silent"))
+                                    put("message", JsonPrimitive(pushMessage.toString()))
+                                })
                             silentPushHandler.handle(pushMessage)
                         }
 
                         is AndroidPushMessage -> {
                             logger.debug(
                                 "PushMessageBroadcastReceiver - onReceive",
-                                mapOf("type" to "notification", "message" to pushMessage)
+                                buildJsonObject {
+                                    put("type", JsonPrimitive("notification"))
+                                    put("message", JsonPrimitive(pushMessage.toString()))
+                                }
                             )
                             pushPresenter.present(pushMessage)
                         }

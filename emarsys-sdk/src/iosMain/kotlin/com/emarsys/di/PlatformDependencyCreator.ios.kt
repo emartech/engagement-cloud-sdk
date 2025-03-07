@@ -148,6 +148,7 @@ actual class PlatformDependencyCreator actual constructor(
         return IosExternalUrlOpener(
             UIApplication.sharedApplication,
             sdkContext.mainDispatcher,
+            sdkContext.sdkDispatcher,
             sdkLogger
         )
     }
@@ -247,7 +248,7 @@ actual class PlatformDependencyCreator actual constructor(
         storage: TypedStorageApi<String?>,
         pushContext: ApiContext<PushCall>,
     ): PushApi {
-        val loggingPush = IosLoggingPush(sdkLogger, storage)
+        val loggingPush = IosLoggingPush(sdkLogger, storage, sdkContext.sdkDispatcher)
         val pushGatherer = IosGathererPush(pushContext, storage, pushInternal as IosPushInternal)
         return IosPush(
             loggingPush,

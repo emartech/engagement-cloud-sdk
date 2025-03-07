@@ -5,6 +5,8 @@ import com.emarsys.api.generic.GenericApi
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.log.withLogContext
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 
 interface ContactInstance : ContactInternalApi, Activatable
 
@@ -23,11 +25,14 @@ class Contact<Logging : ContactInstance, Gatherer : ContactInstance, Internal : 
         runCatching {
             withContext(sdkContext.sdkDispatcher) {
                 withLogContext(
-                    mapOf(
-                        "contactFieldId" to contactFieldId,
-                        "contactFieldValue" to contactFieldValue
-                    )
-                ) {
+                    buildJsonObject {
+                        put(
+                            "contactFieldId", JsonPrimitive(contactFieldId)
+                        )
+                        put(
+                            "contactFieldValue", JsonPrimitive(contactFieldValue)
+                        )
+                    }) {
                     activeInstance<ContactInternalApi>().linkContact(
                         contactFieldId,
                         contactFieldValue
@@ -43,11 +48,14 @@ class Contact<Logging : ContactInstance, Gatherer : ContactInstance, Internal : 
         runCatching {
             withContext(sdkContext.sdkDispatcher) {
                 withLogContext(
-                    mapOf(
-                        "contactFieldId" to contactFieldId,
-                        "openIdToken" to openIdToken
-                    )
-                ) {
+                    buildJsonObject {
+                        put(
+                            "contactFieldId", JsonPrimitive(contactFieldId)
+                        )
+                        put(
+                            "openIdToken", JsonPrimitive(openIdToken)
+                        )
+                    }) {
                     activeInstance<ContactInternalApi>().linkAuthenticatedContact(
                         contactFieldId,
                         openIdToken

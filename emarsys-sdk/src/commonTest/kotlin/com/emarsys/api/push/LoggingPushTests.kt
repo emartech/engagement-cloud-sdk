@@ -1,22 +1,29 @@
 package com.emarsys.api.push
 
 import com.emarsys.core.log.LogEntry
-import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
 import com.emarsys.core.storage.TypedStorageApi
 import dev.mokkery.answering.returns
 import dev.mokkery.every
+import dev.mokkery.everySuspend
 import dev.mokkery.matcher.capture.Capture
 import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import dev.mokkery.verify
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-
+@OptIn(ExperimentalCoroutinesApi::class)
 class LoggingPushTests {
     private companion object {
         const val PUSH_TOKEN = "testPushToken"
@@ -27,15 +34,28 @@ class LoggingPushTests {
     private lateinit var loggingPush: LoggingPush
     private var slot = Capture.slot<LogEntry>()
 
+    private val mainDispatcher = StandardTestDispatcher()
+
+    init {
+        Dispatchers.setMain(mainDispatcher)
+    }
+
     @BeforeTest
     fun setup() = runTest {
         mockLogger = mock()
-        every { mockLogger.log(capture(slot), LogLevel.Debug) } returns Unit
+        Dispatchers.setMain(mainDispatcher)
+
+        everySuspend { mockLogger.debug(capture(slot)) } returns Unit
 
         mockStorage = mock()
         every { mockStorage.put(PushConstants.PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
 
-        loggingPush = LoggingPush(mockLogger, mockStorage)
+        loggingPush = LoggingPush(mockLogger, mockStorage, mainDispatcher)
+    }
+
+    @AfterTest
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test
@@ -56,6 +76,8 @@ class LoggingPushTests {
     @Test
     fun testPushToken() = runTest {
         val result = loggingPush.pushToken
+
+        advanceUntilIdle()
 
         verifyLogging()
 

@@ -1,6 +1,5 @@
 package com.emarsys.mobileengage.push.mapper
 
-import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.Logger
 import com.emarsys.core.mapper.Mapper
 import com.emarsys.mobileengage.action.models.BasicActionModel
@@ -77,7 +76,7 @@ class AndroidPushV2Mapper(
                 actionableData = actionableData
             )
         } catch (e: Exception) {
-            logger.error(LogEntry("error", mapOf("reason" to e.localizedMessage)))
+            logger.error("AndroidPushV2Mapper", e)
             null
         }
     }

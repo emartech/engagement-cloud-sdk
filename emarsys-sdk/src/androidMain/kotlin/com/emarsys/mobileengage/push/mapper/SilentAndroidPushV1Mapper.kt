@@ -1,6 +1,5 @@
 package com.emarsys.mobileengage.push.mapper
 
-import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.Logger
 import com.emarsys.core.mapper.Mapper
 import com.emarsys.mobileengage.push.ActionableData
@@ -36,7 +35,7 @@ class SilentAndroidPushV1Mapper(
                 )
             )
         } catch (e: Exception) {
-            logger.error(LogEntry("error", mapOf("reason" to e.localizedMessage)))
+            logger.error("SilentAndroidPushV1Mapper", e)
             null
         }
     }

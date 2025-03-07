@@ -76,6 +76,12 @@ sealed interface SdkEvent {
         @Serializable
         @SerialName("internal")
         sealed class Sdk(override val name: String) : Internal {
+            data class Log(
+                override val id: String = UUIDProvider().provide(),
+                override val name: String,
+                override val attributes: JsonObject? = null,
+                override val timestamp: Instant = TimestampProvider().provide(),
+            ) : Sdk(name)
 
             data class Metric(
                 override val id: String = UUIDProvider().provide(),
