@@ -1,5 +1,7 @@
 package com.emarsys.init.states
 
+import com.emarsys.core.log.ConsoleLogger
+import com.emarsys.core.log.SdkLogger
 import com.emarsys.remoteConfig.RemoteConfigHandlerApi
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -19,7 +21,10 @@ class ApplyGlobalRemoteConfigStateTests {
     fun setup() {
         mockRemoteConfigHandler = mock()
 
-        applyGlobalRemoteConfigState = ApplyGlobalRemoteConfigState(mockRemoteConfigHandler)
+        applyGlobalRemoteConfigState = ApplyGlobalRemoteConfigState(
+            mockRemoteConfigHandler,
+            SdkLogger(ConsoleLogger())
+        )
     }
 
     @Test

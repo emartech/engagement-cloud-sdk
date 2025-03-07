@@ -5,13 +5,13 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.LogLevel
-import com.emarsys.core.log.SdkLogger
+import com.emarsys.core.log.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class AndroidConnectionWatchDog(
     private val connectivityManager: ConnectivityManager,
-    private val logger: SdkLogger
+    private val logger: Logger
 ) :
     ConnectionWatchDog, ConnectivityManager.NetworkCallback() {
 

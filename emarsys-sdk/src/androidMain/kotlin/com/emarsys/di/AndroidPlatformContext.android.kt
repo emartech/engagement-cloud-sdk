@@ -49,7 +49,8 @@ class AndroidPlatformContext(
         metadataReader,
         NotificationCompatStyler(downloaderApi),
         platformInfoCollector,
-        inAppDownloader
+        inAppDownloader,
+        sdkLogger
     )
 
     val androidPushMessageFactory = AndroidPushMessageFactory(

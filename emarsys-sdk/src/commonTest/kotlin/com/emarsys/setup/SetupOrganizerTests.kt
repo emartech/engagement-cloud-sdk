@@ -5,7 +5,9 @@ import com.emarsys.api.SdkState
 import com.emarsys.context.DefaultUrls
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.LogLevel
+import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.state.StateMachineApi
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -45,7 +47,7 @@ class SetupOrganizerTests {
             LogLevel.Error,
             mutableSetOf()
         )
-        setupOrganizer = SetupOrganizer(mockMeStateMachine, mockPredictStateMachine, sdkContext)
+        setupOrganizer = SetupOrganizer(mockMeStateMachine, mockPredictStateMachine, sdkContext, SdkLogger(ConsoleLogger()))
     }
 
     @Test

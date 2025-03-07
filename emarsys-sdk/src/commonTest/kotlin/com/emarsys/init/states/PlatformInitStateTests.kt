@@ -1,5 +1,7 @@
 package com.emarsys.init.states
 
+import com.emarsys.core.log.ConsoleLogger
+import com.emarsys.core.log.SdkLogger
 import com.emarsys.setup.PlatformInitializerApi
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -18,7 +20,7 @@ class PlatformInitStateTests {
     fun setup() {
         mockPlatformInitializer = mock()
 
-        platformInitState = PlatformInitState(mockPlatformInitializer)
+        platformInitState = PlatformInitState(mockPlatformInitializer, SdkLogger(ConsoleLogger()))
     }
 
     @Test

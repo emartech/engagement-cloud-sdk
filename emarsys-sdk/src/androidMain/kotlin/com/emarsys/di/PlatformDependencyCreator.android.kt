@@ -179,7 +179,7 @@ actual class PlatformDependencyCreator actual constructor(
         inAppDownloader: InAppDownloaderApi,
         inAppHandler: InAppHandlerApi
     ): PushToInAppHandlerApi {
-        return PushToInAppHandler(inAppDownloader, inAppHandler)
+        return PushToInAppHandler(inAppDownloader, inAppHandler, sdkLogger)
     }
 
     actual override fun createConnectionWatchDog(sdkLogger: SdkLogger): ConnectionWatchDog {
@@ -226,7 +226,12 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createLaunchApplicationHandler(): LaunchApplicationHandlerApi {
-        return LaunchApplicationHandler(applicationContext, currentActivityWatchdog, sdkContext, sdkLogger)
+        return LaunchApplicationHandler(
+            applicationContext,
+            currentActivityWatchdog,
+            sdkContext,
+            sdkLogger
+        )
     }
 
     actual override fun createPushInternal(

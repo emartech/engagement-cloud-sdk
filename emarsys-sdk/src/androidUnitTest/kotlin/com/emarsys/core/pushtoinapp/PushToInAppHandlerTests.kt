@@ -1,5 +1,7 @@
 package com.emarsys.core.pushtoinapp
 
+import com.emarsys.core.log.ConsoleLogger
+import com.emarsys.core.log.SdkLogger
 import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandlerApi
@@ -29,7 +31,8 @@ class PushToInAppHandlerTests {
 
         pushToInAppHandler = PushToInAppHandler(
             mockInAppDownloader,
-            mockInAppHandler
+            mockInAppHandler,
+            SdkLogger(ConsoleLogger())
         )
     }
 

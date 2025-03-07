@@ -4,7 +4,9 @@ import com.emarsys.api.SdkState
 import com.emarsys.context.DefaultUrls
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.LogLevel
+import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.state.StateMachineApi
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -43,7 +45,7 @@ class InitOrganizerTests {
             LogLevel.Error,
             mutableSetOf()
         )
-        initOrganizer = InitOrganizer(mockStateMachine, sdkContext)
+        initOrganizer = InitOrganizer(mockStateMachine, sdkContext, SdkLogger(ConsoleLogger()))
     }
 
     @Test

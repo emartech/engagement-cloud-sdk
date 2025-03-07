@@ -4,12 +4,15 @@ import com.emarsys.SdkConfig
 import com.emarsys.api.SdkState
 import com.emarsys.context.SdkContextApi
 import com.emarsys.context.isConfigPredictOnly
+import com.emarsys.core.log.Logger
 import com.emarsys.core.state.StateMachineApi
 
 class SetupOrganizer(
     override val meStateMachine: StateMachineApi,
     override val predictStateMachine: StateMachineApi,
-    override val sdkContext: SdkContextApi
+    override val sdkContext: SdkContextApi,
+    private val sdkLogger: Logger
+
 ) : SetupOrganizerApi {
 
     override suspend fun setup(config: SdkConfig) {
@@ -20,5 +23,7 @@ class SetupOrganizer(
             meStateMachine.activate()
         }
         sdkContext.setSdkState(SdkState.active)
+        sdkLogger.debug("SetupOrganizer", "SDK Setup Completed")
+
     }
 }
