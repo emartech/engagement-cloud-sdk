@@ -13,6 +13,7 @@ import com.emarsys.api.push.PushConstants.INTENT_EXTRA_PAYLOAD_KEY
 import com.emarsys.api.push.PushConstants.PUSH_NOTIFICATION_ICON_NAME
 import com.emarsys.core.device.AndroidNotificationSettings
 import com.emarsys.core.device.PlatformInfoCollector
+import com.emarsys.core.log.Logger
 import com.emarsys.core.resource.MetadataReader
 import com.emarsys.mobileengage.action.models.DismissActionModel
 import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
@@ -31,7 +32,8 @@ class PushMessagePresenter(
     private val metadataReader: MetadataReader,
     private val notificationCompatStyler: NotificationCompatStyler,
     private val platformInfoCollector: PlatformInfoCollector,
-    private val inAppDownloader: InAppDownloaderApi
+    private val inAppDownloader: InAppDownloaderApi,
+    private val sdkLogger: Logger
 ) : PushPresenter<AndroidPlatformData, AndroidPushMessage> {
     private companion object {
         const val DEBUG_CHANNEL_ID = "ems_debug"
@@ -51,8 +53,8 @@ class PushMessagePresenter(
         val tapActionPendingIntent = createTapActionPendingIntent(message)
 
         val notificationBuilder = NotificationCompat.Builder(context, channelId)
-            .setContentTitle(message.displayableData?.title)
-            .setContentText(message.displayableData?.body)
+            .setContentTitle(message.displayableData.title)
+            .setContentText(message.displayableData.body)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setSmallIcon(iconId)
             .setContentIntent(tapActionPendingIntent)
@@ -60,13 +62,13 @@ class PushMessagePresenter(
             .addActions(message)
 
         notificationCompatStyler.style(notificationBuilder, message)
-
+        sdkLogger.debug("PushMessagePresenter", "Notification created and displayed")
         notificationManager.notify(collapseId, collapseId.hashCode(), notificationBuilder.build())
     }
 
     private fun NotificationCompat.Builder.addActions(pushMessage: AndroidPushMessage): NotificationCompat.Builder {
         pushMessage.actionableData?.actions?.forEach { actionModel ->
-            if(actionModel is DismissActionModel) {
+            if (actionModel is DismissActionModel) {
                 actionModel.dismissId = pushMessage.platformData.notificationMethod.collapseId
             }
             val actionIntent = createActionIntent(actionModel, pushMessage)

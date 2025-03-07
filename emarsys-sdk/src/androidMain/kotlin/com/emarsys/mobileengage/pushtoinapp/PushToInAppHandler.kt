@@ -1,5 +1,6 @@
 package com.emarsys.mobileengage.pushtoinapp
 
+import com.emarsys.core.log.Logger
 import com.emarsys.core.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
@@ -7,9 +8,11 @@ import com.emarsys.mobileengage.inapp.InAppHandlerApi
 
 class PushToInAppHandler(
     private val downloader: InAppDownloaderApi,
-    private val inAppHandler: InAppHandlerApi
+    private val inAppHandler: InAppHandlerApi,
+    private val sdkLogger: Logger
 ) : PushToInAppHandlerApi {
     override suspend fun handle(actionModel: InternalPushToInappActionModel) {
+        sdkLogger.debug("PushToInAppHandler", "Handling push to in-app action")
         val html = actionModel.html ?: downloader.download(actionModel.url)
         val campaignId = actionModel.campaignId
         if (!html.isNullOrEmpty()) {
