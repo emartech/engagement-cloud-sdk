@@ -1,5 +1,6 @@
 package com.emarsys.networking
 
+import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
@@ -20,7 +21,6 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.delay
 import kotlinx.datetime.Instant
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.time.Duration.Companion.seconds
 
@@ -29,7 +29,8 @@ class EmarsysClient(
     private val sessionContext: SessionContext,
     private val timestampProvider: Provider<Instant>,
     private val urlFactory: UrlFactoryApi,
-    private val json: Json
+    private val json: Json,
+    private val sdkLogger: Logger
 ) : NetworkClientApi {
     private companion object {
         private const val MAX_RETRY_COUNT = 3
@@ -50,6 +51,11 @@ class EmarsysClient(
     ): Response {
         val response = callback()
         return if (response.status == HttpStatusCode.Unauthorized && sessionContext.refreshToken != null && retryCount < MAX_RETRY_COUNT) {
+            sdkLogger.debug(
+                "EmarsysClient - refreshContactToken",
+                "refreshing contact token",
+                mapOf("retryCount" to retryCount, "response" to response)
+            )
             delay((retryCount + 1).seconds)
             val request = createRefreshContactTokenRequest()
             val refreshResponse = networkClient.send(request)

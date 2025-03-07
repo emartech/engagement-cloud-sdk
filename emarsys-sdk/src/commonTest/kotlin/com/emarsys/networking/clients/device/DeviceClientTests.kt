@@ -68,7 +68,7 @@ class DeviceClientTests {
         every { mockDeviceInfoCollector.collect() } returns testDeviceInfoString
         every { mockUrlFactory.create(REGISTER_DEVICE_INFO) } returns testUrl
         everySuspend { mockEmarsysClient.send(any()) } returns expectedResponse
-        every { mockContactTokenHandler.handleContactTokens(expectedResponse) } returns Unit
+        everySuspend { mockContactTokenHandler.handleContactTokens(expectedResponse) } returns Unit
 
         deviceClient.registerDeviceInfo()
 

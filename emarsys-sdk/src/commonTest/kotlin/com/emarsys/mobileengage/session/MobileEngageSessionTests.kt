@@ -3,6 +3,7 @@ package com.emarsys.mobileengage.session
 import com.emarsys.EmarsysConfig
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.lifecycle.LifecycleEvent
+import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.session.SessionContext
@@ -11,6 +12,7 @@ import com.emarsys.networking.clients.event.EventClientApi
 
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
 import dev.mokkery.every
@@ -29,6 +31,8 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.Instant
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -44,10 +48,17 @@ class MobileEngageSessionTests {
         const val SESSION_DURATION = 1000L
         val SESSION_ID = SessionId("testSessionId")
         val sessionStartEvent = SdkEvent.Internal.Sdk.SessionStart(
+            id = SESSION_ID.value,
             timestamp = SESSION_START_UTC
         )
         val sessionEndEvent = SdkEvent.Internal.Sdk.SessionEnd(
-            duration = SESSION_DURATION,
+            id = SESSION_ID.value,
+            attributes = buildJsonObject {
+                put(
+                    "duration",
+                    JsonPrimitive(SESSION_DURATION.toString())
+                )
+            },
             timestamp = SESSION_END_UTC
         )
     }
@@ -71,7 +82,7 @@ class MobileEngageSessionTests {
     fun setUp() = runTest {
         mockTimestampProvider = mock()
         mockUuidProvider = mock()
-        mockSdkLogger = mock()
+        mockSdkLogger = mock(MockMode.autofill)
         mockEventClient = mock()
         mockSdkContext = mock()
         sdkDispatcher = StandardTestDispatcher()
@@ -85,7 +96,7 @@ class MobileEngageSessionTests {
         everySuspend { mockEventClient.registerEvent(sessionStartEvent) } returns Unit
         everySuspend { mockEventClient.registerEvent(sessionEndEvent) } returns Unit
         every { mockSdkLogger.log(any(), any()) } returns Unit
-        everySuspend { mockSdkLogger.debug(any()) } returns Unit
+        everySuspend { mockSdkLogger.debug(any<LogEntry>()) } returns Unit
         everySuspend { mockSdkLogger.error(any()) } returns Unit
 
         mobileEngageSession = MobileEngageSession(
@@ -311,7 +322,7 @@ class MobileEngageSessionTests {
     private fun verifySessionEventNotRegistered(sessionEvent: SdkEvent) {
         verifySuspend {
             mockSdkContext.config
-            mockSdkLogger.debug(any())
+            mockSdkLogger.debug(any<LogEntry>())
             repeat(0) {
                 mockEventClient.registerEvent(sessionEvent)
             }

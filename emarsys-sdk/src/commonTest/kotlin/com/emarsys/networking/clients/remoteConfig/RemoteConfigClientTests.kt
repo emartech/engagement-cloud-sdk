@@ -9,6 +9,7 @@ import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.remoteConfig.RemoteConfigResponse
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
 import dev.mokkery.every
@@ -48,7 +49,7 @@ class RemoteConfigClientTests {
         mockNetworkClient = mock()
         mockUrlFactory = mock()
         mockCrypto = mock()
-        mockSdkLogger = mock()
+        mockSdkLogger = mock(MockMode.autofill)
         everySuspend { mockSdkLogger.error(any<String>(), any<Throwable>()) } returns Unit
 
         remoteConfigClient =
@@ -72,6 +73,27 @@ class RemoteConfigClientTests {
         everySuspend { mockCrypto.verify(any(), any()) } returns true
 
         val result = remoteConfigClient.fetchRemoteConfig()
+
+        result shouldBe RemoteConfigResponse(logLevel = LogLevel.Error)
+    }
+
+    @Test
+    fun testFetchRemoteConfig_shouldReturnGlobalRemoteConfig() = runTest {
+        val configResponse = Response(configRequest, HttpStatusCode.OK, Headers.Empty, configResult)
+        val configSignatureResponse = Response(
+            configSignatureRequest,
+            HttpStatusCode.OK,
+            Headers.Empty,
+            configSignatureResult
+        )
+
+        every { mockUrlFactory.create(EmarsysUrlType.GLOBAL_REMOTE_CONFIG) } returns configUrl
+        every { mockUrlFactory.create(EmarsysUrlType.GLOBAL_REMOTE_CONFIG_SIGNATURE) } returns configSignatureUrl
+        everySuspend { mockNetworkClient.send(configRequest) } returns configResponse
+        everySuspend { mockNetworkClient.send(configSignatureRequest) } returns configSignatureResponse
+        everySuspend { mockCrypto.verify(any(), any()) } returns true
+
+        val result = remoteConfigClient.fetchRemoteConfig(global=true)
 
         result shouldBe RemoteConfigResponse(logLevel = LogLevel.Error)
     }

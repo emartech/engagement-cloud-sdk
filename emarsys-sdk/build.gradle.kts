@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.buildConfig)
     alias(libs.plugins.mokkery)
     alias(libs.plugins.skie)
+    alias(libs.plugins.sqlDelight)
 }
 
 group = "com.emarsys"
@@ -79,6 +80,7 @@ kotlin {
                 implementation(libs.androidx.lifecycle.common)
                 implementation(libs.androidx.lifecycle.process)
                 implementation(libs.androidx.appcompat)
+                implementation(libs.sqlDelight.android)
             }
         }
 
@@ -103,6 +105,7 @@ kotlin {
             dependencies {
                 implementation(libs.ktor.client.apple)
                 implementation(libs.cryptography.provider.apple)
+                implementation(libs.sqlDelight.native)
             }
         }
         iosTest {
@@ -158,6 +161,14 @@ afterEvaluate {
         .configureEach {// https://github.com/gmazzo/gradle-buildconfig-plugin/issues/67
             mustRunAfter(tasks.withType<BuildConfigTask>())
         }
+}
+
+sqldelight {
+    databases {
+        create("EmarsysDB") {
+            packageName.set("com.emarsys.sqldelight")
+        }
+    }
 }
 
 skie {

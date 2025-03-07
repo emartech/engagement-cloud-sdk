@@ -4,6 +4,6 @@ import com.emarsys.remoteConfig.RemoteConfigResponse
 
 interface RemoteConfigClientApi {
 
-    suspend fun fetchRemoteConfig(): RemoteConfigResponse?
+    suspend fun fetchRemoteConfig(global:Boolean=false): RemoteConfigResponse?
 
 }

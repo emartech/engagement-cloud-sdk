@@ -19,7 +19,7 @@ import com.emarsys.networking.clients.event.model.DeviceEventResponse
 import com.emarsys.networking.clients.event.model.EventResponseInApp
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.util.JsonUtil
-import dev.mokkery.annotations.DelicateMokkeryApi
+import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -59,12 +59,18 @@ class EventClientTests {
     private companion object {
         val DEVICE_EVENT_STATE = JsonObject(mapOf("key" to JsonPrimitive("value")))
         const val EVENT_NAME = "test event name"
+        const val UUID = "testUuid"
         const val IN_APP_DND = false
         val TIMESTAMP = Clock.System.now()
         const val CAMPAIGN_ID = "testTimestamp"
         val TEST_BASE_URL = Url("https://test-base-url/")
         val testEventAttributes = buildJsonObject { put("key", JsonPrimitive("value")) }
-        val testEvent = SdkEvent.External.Custom(EVENT_NAME, testEventAttributes, TIMESTAMP)
+        val testEvent = SdkEvent.External.Custom(
+            id = UUID,
+            name = EVENT_NAME,
+            attributes = testEventAttributes,
+            timestamp = TIMESTAMP
+        )
     }
 
     init {
@@ -86,7 +92,6 @@ class EventClientTests {
     private lateinit var mockSdkLogger: Logger
     private lateinit var mockWebViewHolder: WebViewHolder
 
-    @OptIn(DelicateMokkeryApi::class)
     @BeforeTest
     fun setup() = runTest {
         mockEmarsysClient = mock()
@@ -97,7 +102,7 @@ class EventClientTests {
         mockInAppPresenter = mock()
         mockInAppViewProvider = mock()
         mockInAppView = mock()
-        mockSdkLogger = mock()
+        mockSdkLogger = mock(MockMode.autofill)
         json = JsonUtil.json
         mockWebViewHolder = mock()
         sdkDispatcher =
@@ -267,7 +272,7 @@ class EventClientTests {
         val expectedUrlRequest = UrlRequest(
             TEST_BASE_URL,
             HttpMethod.Post,
-            """{"dnd":$IN_APP_DND,"events":[{"type":"custom","name":"${testEvent.name}","attributes":{"key":"value"},"timestamp":"$TIMESTAMP"}],"deviceEventState":$deviceEventState}""",
+            """{"dnd":$IN_APP_DND,"events":[{"type":"custom","id":"$UUID","name":"${testEvent.name}","attributes":{"key":"value"},"timestamp":"$TIMESTAMP"}],"deviceEventState":$deviceEventState}""",
         )
         return expectedUrlRequest
     }

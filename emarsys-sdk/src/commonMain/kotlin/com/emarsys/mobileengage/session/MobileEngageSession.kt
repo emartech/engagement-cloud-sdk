@@ -16,6 +16,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 
 class MobileEngageSession(
     private val timestampProvider: Provider<Instant>,
@@ -44,7 +46,12 @@ class MobileEngageSession(
         if (canStartSession()) {
             val sessionStart = timestampProvider.provide()
             try {
-                eventClient.registerEvent(SdkEvent.Internal.Sdk.SessionStart(timestamp = sessionStart))
+                eventClient.registerEvent(
+                    SdkEvent.Internal.Sdk.SessionStart(
+                        id = uuidProvider.provide(),
+                        timestamp = sessionStart
+                    )
+                )
             } catch (exception: Exception) {
                 sdkLogger.error(
                     LogEntry(
@@ -105,7 +112,16 @@ class MobileEngageSession(
         val sessionEnd = timestampProvider.provide()
         val duration =
             sessionEnd.toEpochMilliseconds() - sessionContext.sessionStart!!
-        return SdkEvent.Internal.Sdk.SessionEnd(duration, timestamp = sessionEnd)
+        return SdkEvent.Internal.Sdk.SessionEnd(
+            id = uuidProvider.provide(),
+            attributes = buildJsonObject {
+                put(
+                    "duration",
+                    JsonPrimitive(duration.toString())
+                )
+            },
+            timestamp = sessionEnd
+        )
     }
 
 

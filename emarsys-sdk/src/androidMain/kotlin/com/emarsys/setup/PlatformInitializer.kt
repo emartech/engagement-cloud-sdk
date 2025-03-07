@@ -19,7 +19,7 @@ class PlatformInitializer(
         CoroutineScope(sdkDispatcher).launch(start = CoroutineStart.UNDISPATCHED) {
             sdkEventFlow.filter { it is SdkEvent.Internal.Sdk.Dismiss }.collect {
                 val event = it as SdkEvent.Internal.Sdk.Dismiss
-                notificationManager.cancel(event.dismissId, event.dismissId.hashCode())
+                notificationManager.cancel(event.id, event.id.hashCode())
             }
         }
     }

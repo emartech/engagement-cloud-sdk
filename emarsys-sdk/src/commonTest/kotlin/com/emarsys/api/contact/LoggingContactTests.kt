@@ -2,6 +2,7 @@ package com.emarsys.api.contact
 
 import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.Logger
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.capture.Capture
@@ -26,8 +27,8 @@ class LoggingContactTests {
 
     @BeforeTest
     fun setup() = runTest {
-        mockSdkLogger = mock()
-        everySuspend { mockSdkLogger.debug(capture(slot)) } returns Unit
+        mockSdkLogger = mock(MockMode.autofill)
+        everySuspend { mockSdkLogger.debug(capture<LogEntry>(slot)) } returns Unit
 
         loggingContact = LoggingContact(mockSdkLogger)
     }

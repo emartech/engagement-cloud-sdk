@@ -65,6 +65,7 @@ import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.collections.persistentListOf
 import com.emarsys.core.crypto.Crypto
 import com.emarsys.core.crypto.CryptoApi
+import com.emarsys.core.db.EventsDaoApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.log.ConsoleLogger
@@ -90,6 +91,13 @@ import com.emarsys.core.url.UrlFactory
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.core.util.Downloader
 import com.emarsys.core.util.DownloaderApi
+import com.emarsys.init.InitOrganizer
+import com.emarsys.init.InitOrganizerApi
+import com.emarsys.init.states.ApplyGlobalRemoteConfigState
+import com.emarsys.init.states.PlatformInitState
+import com.emarsys.init.states.RegisterInstancesState
+import com.emarsys.init.states.RegisterWatchdogsState
+import com.emarsys.init.states.SessionSubscriptionState
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.EventActionFactory
 import com.emarsys.mobileengage.action.PushActionFactory
@@ -124,7 +132,7 @@ import com.emarsys.setup.PlatformInitializerApi
 import com.emarsys.setup.SetupOrganizer
 import com.emarsys.setup.SetupOrganizerApi
 import com.emarsys.setup.states.AppStartState
-import com.emarsys.setup.states.ApplyRemoteConfigState
+import com.emarsys.setup.states.ApplyAppCodeBasedRemoteConfigState
 import com.emarsys.setup.states.CollectDeviceInfoState
 import com.emarsys.setup.states.RegisterClientState
 import com.emarsys.setup.states.RegisterPushTokenState
@@ -156,7 +164,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
     private val timestampProvider: Provider<Instant> = TimestampProvider()
 
     override val sdkEventFlow: MutableSharedFlow<SdkEvent> =
-        MutableSharedFlow(replay = 10)  // TODO: configure replay cache
+        MutableSharedFlow(replay = 100)
 
     override val json: Json by lazy {
         JsonUtil.json
@@ -213,6 +221,8 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             pushActionHandler,
             timestampProvider
         )
+
+    override val eventDbHelper: EventsDaoApi = dependencyCreator.createEventsDao()
 
     private val fileCache = dependencyCreator.createFileCache()
 
@@ -295,11 +305,18 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
     }
 
     private val emarsysClient: NetworkClientApi by lazy {
-        EmarsysClient(genericNetworkClient, sessionContext, timestampProvider, urlFactory, json)
+        EmarsysClient(
+            genericNetworkClient,
+            sessionContext,
+            timestampProvider,
+            urlFactory,
+            json,
+            sdkLogger
+        )
     }
 
     private val contactTokenHandler: ContactTokenHandlerApi by lazy {
-        ContactTokenHandler(sessionContext)
+        ContactTokenHandler(sessionContext, sdkLogger)
     }
 
     override val deviceClient: DeviceClientApi by lazy {
@@ -422,9 +439,10 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
                     storage,
                     ConfigCall.serializer()
                 )
-            )
+            ),
+            sdkLogger
         )
-        val configInternal = ConfigInternal()
+        val configInternal = ConfigInternal(sdkLogger)
         Config(loggingConfig, gathererConfig, configInternal, sdkContext, deviceInfoCollector)
     }
 
@@ -445,7 +463,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
     }
 
     override val contactClient: ContactClientApi by lazy {
-        ContactClient(emarsysClient, urlFactory, sdkContext, contactTokenHandler, json)
+        ContactClient(emarsysClient, urlFactory, sdkContext, contactTokenHandler, json, sdkLogger)
     }
 
     override val deepLinkClient: DeepLinkClientApi by lazy {
@@ -453,7 +471,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
     }
 
     private val genericNetworkClient: NetworkClientApi by lazy {
-        GenericNetworkClient(httpClient)
+        GenericNetworkClient(httpClient, sdkLogger)
     }
 
     override val remoteConfigHandler: RemoteConfigHandlerApi by lazy {
@@ -461,7 +479,8 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             RemoteConfigClient(genericNetworkClient, urlFactory, crypto, json, sdkLogger),
             deviceInfoCollector,
             sdkContext,
-            RandomProvider()
+            RandomProvider(),
+            sdkLogger
         )
     }
 
@@ -477,10 +496,10 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
                 eventActionFactory,
                 stringStorage
             )
-        val applyRemoteConfigState = ApplyRemoteConfigState(
+        val applyAppCodeBasedRemoteConfigState = ApplyAppCodeBasedRemoteConfigState(
             remoteConfigHandler
         )
-        val appStartState = AppStartState(eventClient, timestampProvider)
+        val appStartState = AppStartState(eventClient, timestampProvider, uuidProvider)
         val meStateMachine =
             StateMachine(
                 listOf(
@@ -509,7 +528,14 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
 
     override val contactApi: ContactApi by lazy {
         val contactClient =
-            ContactClient(emarsysClient, urlFactory, sdkContext, contactTokenHandler, json)
+            ContactClient(
+                emarsysClient,
+                urlFactory,
+                sdkContext,
+                contactTokenHandler,
+                json,
+                sdkLogger
+            )
         val contactContext =
             ContactContext(
                 persistentListOf(
@@ -519,8 +545,8 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
                 )
             )
         val loggingContact = LoggingContact(sdkLogger)
-        val contactGatherer = ContactGatherer(contactContext)
-        val contactInternal = ContactInternal(contactClient, contactContext)
+        val contactGatherer = ContactGatherer(contactContext, sdkLogger)
+        val contactInternal = ContactInternal(contactClient, contactContext, sdkLogger)
         Contact(loggingContact, contactGatherer, contactInternal, sdkContext)
     }
 
@@ -533,9 +559,16 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             )
         )
         val loggingEvent = LoggingEventTracker(sdkLogger)
-        val gathererEvent = EventTrackerGatherer(eventTrackerContext, timestampProvider)
+        val gathererEvent =
+            EventTrackerGatherer(eventTrackerContext, timestampProvider, uuidProvider, sdkLogger)
         val eventInternal =
-            EventTrackerInternal(eventClient, eventTrackerContext, timestampProvider)
+            EventTrackerInternal(
+                eventClient,
+                eventTrackerContext,
+                timestampProvider,
+                uuidProvider,
+                sdkLogger
+            )
         EventTracker(loggingEvent, gathererEvent, eventInternal, sdkContext)
     }
     override val connectionWatchDog: ConnectionWatchDog by lazy {
@@ -564,17 +597,25 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             pushActionHandler
         )
     }
+    override val initOrganizer: InitOrganizerApi by lazy {
+        InitOrganizer(
+            StateMachine(
+                listOf(
+                    ApplyGlobalRemoteConfigState(remoteConfigHandler),
+                    RegisterInstancesState(eventTrackerApi, contactApi, pushApi),
+                    RegisterWatchdogsState(lifecycleWatchDog, connectionWatchDog),
+                    SessionSubscriptionState(
+                        mobileEngageSession,
+                        lifecycleWatchDog
+                    ),
+                    PlatformInitState(platformInitializer),
+                )
+            ),
+            sdkContext
+        )
+    }
 
     override suspend fun setup() {
-        eventTrackerApi.registerOnContext()
-        contactApi.registerOnContext()
-        pushApi.registerOnContext()
-
-        connectionWatchDog.register()
-        lifecycleWatchDog.register()
-
-        mobileEngageSession.subscribe(lifecycleWatchDog)
-
-        platformInitializer.init()
+        initOrganizer.init()
     }
 }

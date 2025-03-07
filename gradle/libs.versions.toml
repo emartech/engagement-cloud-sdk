@@ -1,8 +1,9 @@
 [versions]
-agp = "8.8.1"
+agp = "8.8.2"
 android-compileSdk = "35"
 android-minSdk = "28"
 android-targetSdk = "35"
+androidDriver = "2.0.2"
 androidx-activityCompose = "1.10.0"
 androidx-appcompat = "1.7.0"
 androidx-constraintlayout = "2.2.0"
@@ -21,8 +22,8 @@ kotlin = "2.1.10"
 kotlinxCoroutines = "1.10.1"
 kotlinxDatetime = "0.6.2"
 kotlinxSerializationJson = "1.8.0"
-ksp = "2.1.10-1.0.29"
-ktor = "3.0.3"
+ksp = "2.1.10-1.0.31"
+ktor = "3.1.1"
 kotest = "5.9.1"
 mockkAndroid = "1.13.16"
 mokkery = "2.7.0"
@@ -35,8 +36,12 @@ hms_push = "6.13.0.300"
 googleServices = "4.4.2"
 kotlinWrappers = "2025.2.5"
 cryptography = "0.4.0"
+sqlDelight = "2.1.0-SNAPSHOT"
 
 [libraries]
+sqlDelight-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqlDelight" }
+sqlDelight-native = { module = "app.cash.sqldelight:native-driver", version.ref = "sqlDelight" }
+sqlDelight-web = { module = "app.cash.sqldelight:web-worker-driver", version.ref = "sqlDelight" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
 androidx-runner = { module = "androidx.test:runner", version.ref = "runner" }
 androidx-test-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-junit" }
@@ -99,3 +104,4 @@ agconnect = { id = "com.huawei.agconnect", version.ref = "agconnect_core" }
 googleServices = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 mokkery = { id = "dev.mokkery", version.ref = "mokkery" }
 skie = { id = "co.touchlab.skie", version.ref = "skie"}
+sqlDelight = { id = "app.cash.sqldelight", version.ref = "sqlDelight" }

@@ -2,11 +2,15 @@ package com.emarsys.api.event
 
 import com.emarsys.api.event.model.CustomEvent
 import com.emarsys.api.generic.ApiContext
+import com.emarsys.core.log.ConsoleLogger
+import com.emarsys.core.log.Logger
+import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.providers.Provider
 import com.emarsys.networking.clients.event.EventClientApi
 
 import com.emarsys.networking.clients.event.model.SdkEvent
 import dev.mokkery.answering.returns
+import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
@@ -20,17 +24,20 @@ import kotlin.test.Test
 
 class EventTrackerInternalTests {
     private companion object {
+        const val UUID = "testUUID"
         val timestamp = Clock.System.now()
         val customEvent = CustomEvent("testEvent", mapOf("testAttribute" to "testValue"))
         val event = SdkEvent.External.Custom(
-            "testEvent",
-            buildJsonObject { put("testAttribute", JsonPrimitive("testValue")) },
-            timestamp,
+            id = UUID,
+            name = "testEvent",
+            attributes = buildJsonObject { put("testAttribute", JsonPrimitive("testValue")) },
+            timestamp = timestamp,
         )
 
         val event2 = SdkEvent.Internal.Sdk.AppStart(
-            buildJsonObject { put("testAttribute2", JsonPrimitive("testValue2")) },
-            timestamp
+            id = UUID,
+            attributes = buildJsonObject { put("testAttribute2", JsonPrimitive("testValue2")) },
+            timestamp = timestamp
         )
 
         val trackEvent = EventTrackerCall.TrackEvent(event)
@@ -40,17 +47,27 @@ class EventTrackerInternalTests {
 
     private lateinit var mockEventClient: EventClientApi
     private lateinit var mockTimestampProvider: Provider<Instant>
+    private lateinit var mockUuidProvider: Provider<String>
     private lateinit var eventTrackerContext: ApiContext<EventTrackerCall>
     private lateinit var eventTrackerInternal: EventTrackerInstance
+    private lateinit var logger: Logger
 
     @BeforeTest
     fun setUp() {
         mockEventClient = mock()
         mockTimestampProvider = mock()
+        mockUuidProvider = mock()
+        every { mockUuidProvider.provide() } returns UUID
         eventTrackerContext = EventTrackerContext(expectedEvents)
-
+        logger = SdkLogger(ConsoleLogger())
         eventTrackerInternal =
-            EventTrackerInternal(mockEventClient, eventTrackerContext, mockTimestampProvider)
+            EventTrackerInternal(
+                mockEventClient,
+                eventTrackerContext,
+                mockTimestampProvider,
+                mockUuidProvider,
+                logger
+            )
     }
 
     @Test

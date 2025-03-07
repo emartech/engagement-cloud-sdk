@@ -18,6 +18,8 @@ import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.cache.WebFileCache
 import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.clipboard.WebClipboardHandler
+import com.emarsys.core.db.EventsDaoApi
+import com.emarsys.core.db.events.JSEventsDao
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.WebPlatformInfoCollector
 import com.emarsys.core.launchapplication.JsLaunchApplicationHandler
@@ -114,6 +116,10 @@ actual class PlatformDependencyCreator actual constructor(
 
     actual override fun createStorage(): TypedStorageApi<String?> {
         return StringStorage(window.localStorage)
+    }
+
+    actual override fun createEventsDao(): EventsDaoApi {
+        return JSEventsDao()
     }
 
     actual override fun createDeviceInfoCollector(

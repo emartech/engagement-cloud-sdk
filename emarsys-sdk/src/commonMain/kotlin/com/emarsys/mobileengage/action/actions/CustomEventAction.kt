@@ -13,8 +13,8 @@ class CustomEventAction(
     override suspend fun invoke(value: Unit?) {
         sdkEventFlow.emit(
             SdkEvent.External.Custom(
-                action.name,
-                buildJsonObject {
+                name = action.name,
+                attributes = buildJsonObject {
                     action.payload?.forEach { (key, value) ->
                         put(
                             key,

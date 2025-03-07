@@ -15,8 +15,8 @@ class AppEventAction(
         value?.let {
             sdkEvents.emit(
                 SdkEvent.External.Api.InApp(
-                    action.name,
-                    buildJsonObject {
+                    name = action.name,
+                    attributes = buildJsonObject {
                         action.payload?.forEach { (key, value) ->
                             put(
                                 key,

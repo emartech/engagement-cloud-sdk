@@ -13,6 +13,7 @@ import com.emarsys.model.TestDataClass
 import com.emarsys.networking.EmarsysHeaders.CLIENT_ID_HEADER
 import com.emarsys.networking.EmarsysHeaders.CLIENT_STATE_HEADER
 import com.emarsys.networking.EmarsysHeaders.CONTACT_TOKEN_HEADER
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.mock
@@ -33,7 +34,6 @@ import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -98,13 +98,14 @@ class EmarsysClientTests {
         every { mockTimestampProvider.provide() } returns now
         every { mockUrlFactory.create(EmarsysUrlType.REFRESH_TOKEN) } returns Url("https://testUrl.com")
 
-        networkClient = GenericNetworkClient(httpClient)
+        networkClient = GenericNetworkClient(httpClient, sdkLogger = mock(MockMode.autofill))
         emarsysClient = EmarsysClient(
             networkClient,
             sessionContext,
             mockTimestampProvider,
             mockUrlFactory,
-            json
+            json,
+            sdkLogger = mock(MockMode.autofill)
         )
     }
 

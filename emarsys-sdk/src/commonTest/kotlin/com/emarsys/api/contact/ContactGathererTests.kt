@@ -1,5 +1,7 @@
 package com.emarsys.api.contact
 
+import dev.mokkery.MockMode
+import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
@@ -32,7 +34,7 @@ class ContactGathererTests {
     @BeforeTest
     fun setup() {
         contactContext = ContactContext(expected)
-        contactGatherer = ContactGatherer(contactContext)
+        contactGatherer = ContactGatherer(contactContext, sdkLogger = mock(MockMode.autofill))
     }
 
     @Test

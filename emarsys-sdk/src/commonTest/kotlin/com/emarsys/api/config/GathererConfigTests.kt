@@ -1,5 +1,7 @@
 package com.emarsys.api.config
 
+import dev.mokkery.MockMode
+import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
@@ -17,7 +19,7 @@ class GathererConfigTests {
     @BeforeTest
     fun setUp() = runTest {
         configContext = ConfigContext(mutableListOf())
-        gathererConfig = GathererConfig(configContext)
+        gathererConfig = GathererConfig(configContext, sdkLogger = mock(MockMode.autofill))
     }
 
     @Test

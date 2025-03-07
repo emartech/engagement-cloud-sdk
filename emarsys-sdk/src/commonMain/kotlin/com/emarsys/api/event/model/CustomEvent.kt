@@ -10,9 +10,10 @@ data class CustomEvent(
     val attributes: Map<String, String>? = null
 )
 
-fun CustomEvent.toSdkEvent(timestamp: Instant): SdkEvent = SdkEvent.External.Custom(
-    name,
-    buildJsonObject {
+fun CustomEvent.toSdkEvent(uuid: String, timestamp: Instant): SdkEvent = SdkEvent.External.Custom(
+    id  = uuid,
+    name = name,
+    attributes = buildJsonObject {
         attributes?.forEach { (key, value) ->
             put(
                 key,
@@ -20,5 +21,5 @@ fun CustomEvent.toSdkEvent(timestamp: Instant): SdkEvent = SdkEvent.External.Cus
             )
         }
     },
-    timestamp
+    timestamp = timestamp
 )

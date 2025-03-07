@@ -4,6 +4,7 @@ import com.emarsys.api.generic.ApiContext
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.networking.clients.contact.ContactClientApi
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
@@ -55,7 +56,8 @@ class ContactInternalTests  {
     fun setUp() {
         mockContactClient = mock()
         contactContext = ContactContext(calls)
-        contactInternal = ContactInternal(mockContactClient, contactContext)
+        contactInternal = ContactInternal(mockContactClient, contactContext, sdkLogger = mock(
+            MockMode.autofill))
     }
 
     @AfterTest

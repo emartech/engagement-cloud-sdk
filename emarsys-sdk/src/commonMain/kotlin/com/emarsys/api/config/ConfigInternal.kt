@@ -1,15 +1,20 @@
 package com.emarsys.api.config
 
-class ConfigInternal: ConfigInstance {
+import com.emarsys.core.log.Logger
+
+class ConfigInternal(val sdkLogger: Logger) : ConfigInstance {
+
     override suspend fun changeApplicationCode(applicationCode: String) {
+        sdkLogger.debug("ConfigInternal - changeApplicationCode")
         TODO("Not yet implemented")
     }
 
     override suspend fun changeMerchantId(merchantId: String) {
+        sdkLogger.debug("ConfigInternal - changeMerchantId")
         TODO("Not yet implemented")
     }
 
     override suspend fun activate() {
-        TODO("Not yet implemented")
+        sdkLogger.debug("ConfigInternal - activate")
     }
 }

@@ -20,7 +20,7 @@ data class ReportingAction(
             is BasicPushButtonClickedActionModel -> {
                 sdkEventFlow.emit(
                     SdkEvent.Internal.Push.Clicked(
-                        buildJsonObject {
+                        attributes = buildJsonObject {
                             put("buttonId", JsonPrimitive(action.id))
                             put("sid", JsonPrimitive(action.sid))
                             put("origin", JsonPrimitive(BUTTON_CLICK_ORIGIN))
@@ -39,11 +39,11 @@ data class ReportingAction(
 
                 sdkEventFlow.emit(
                     SdkEvent.Internal.InApp.ButtonClicked(
-                        buildJsonObject {
+                       attributes = buildJsonObject {
                             attributes.forEach { (key, value) ->
                                 put(key, JsonPrimitive(value))
                             }
-                        }
+                       }
                     )
                 )
             }
@@ -57,7 +57,7 @@ data class ReportingAction(
 
                 sdkEventFlow.emit(
                     SdkEvent.Internal.Push.Clicked(
-                        buildJsonObject {
+                        attributes = buildJsonObject {
                             attributes.forEach { (key, value) ->
                                 put(key, JsonPrimitive(value))
                             }

@@ -4,12 +4,14 @@ import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.session.SessionContext
 import com.emarsys.util.JsonUtil
+import dev.mokkery.MockMode
+import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import io.ktor.http.headersOf
-import kotlinx.serialization.encodeToString
+import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -23,11 +25,11 @@ class ContactTokenHandlerTests {
     @BeforeTest
     fun setUp() {
         sessionContext = SessionContext()
-        contactTokenHandler = ContactTokenHandler(sessionContext)
+        contactTokenHandler = ContactTokenHandler(sessionContext, sdkLogger = mock(MockMode.autofill))
     }
 
     @Test
-    fun testHandleContactTokens_should_set_tokens_to_sessionContext() {
+    fun testHandleContactTokens_should_set_tokens_to_sessionContext() = runTest {
         val refreshToken = "testRefreshToken"
         val contactToken = "testContactToken"
         val response = Response(
@@ -44,7 +46,7 @@ class ContactTokenHandlerTests {
     }
 
     @Test
-    fun testHandleContactTokens_should_not_crash_when_response_does_not_contain_tokens() {
+    fun testHandleContactTokens_should_not_crash_when_response_does_not_contain_tokens() = runTest {
         val response = Response(
             UrlRequest(Url(""), HttpMethod.Post, null, null),
             HttpStatusCode.OK,

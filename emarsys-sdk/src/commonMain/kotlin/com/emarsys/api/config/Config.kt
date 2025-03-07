@@ -6,6 +6,7 @@ import com.emarsys.context.SdkContextApi
 import com.emarsys.core.device.DeviceInfo
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.device.PushSettings
+import com.emarsys.core.log.withLogContext
 import com.emarsys.util.JsonUtil
 import kotlinx.coroutines.withContext
 
@@ -40,13 +41,17 @@ class Config<Logging : ConfigInstance, Gatherer : ConfigInstance, Internal : Con
     override suspend fun changeApplicationCode(applicationCode: String): Result<Unit> =
         runCatching {
             withContext(sdkContext.sdkDispatcher) {
-                activeInstance<ConfigInternalApi>().changeApplicationCode(applicationCode)
+                withLogContext(mapOf("applicationCode" to applicationCode)) {
+                    activeInstance<ConfigInternalApi>().changeApplicationCode(applicationCode)
+                }
             }
         }
 
     override suspend fun changeMerchantId(merchantId: String): Result<Unit> = runCatching {
         withContext(sdkContext.sdkDispatcher) {
-            activeInstance<ConfigInternalApi>().changeMerchantId(merchantId)
+            withLogContext(mapOf("merchantId" to merchantId)) {
+                activeInstance<ConfigInternalApi>().changeMerchantId(merchantId)
+            }
         }
     }
 

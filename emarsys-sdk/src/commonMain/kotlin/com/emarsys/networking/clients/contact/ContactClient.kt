@@ -1,6 +1,7 @@
 package com.emarsys.networking.clients.contact
 
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
@@ -8,7 +9,6 @@ import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.networking.EmarsysHeaders
 import io.ktor.http.HttpMethod
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.collections.set
 
@@ -17,13 +17,15 @@ class ContactClient(
     private val urlFactory: UrlFactoryApi,
     private val sdkContext: SdkContextApi,
     private val contactTokenHandler: ContactTokenHandlerApi,
-    private val json: Json
+    private val json: Json,
+    private val sdkLogger: Logger
 ) : ContactClientApi {
     override suspend fun linkContact(
         contactFieldId: Int,
         contactFieldValue: String?,
         openIdToken: String?
     ): Response {
+        sdkLogger.debug("ContactClient - linkContact")
         val requestBody = json.encodeToString(
             LinkContactRequestBody(
                 contactFieldId,
@@ -51,6 +53,7 @@ class ContactClient(
     }
 
     override suspend fun unlinkContact(): Response {
+        sdkLogger.debug("ContactClient - unlinkContact")
         val url = urlFactory.create(EmarsysUrlType.UNLINK_CONTACT)
         val headers = mutableMapOf<String, Any?>()
 

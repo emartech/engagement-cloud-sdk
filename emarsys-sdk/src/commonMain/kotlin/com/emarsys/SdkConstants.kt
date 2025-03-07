@@ -1,6 +1,7 @@
 package com.emarsys
 
 object SdkConstants {
+    const val DB_NAME = "emarsys_sdk.db"
     const val PUSH_CLICKED_EVENT_NAME = "push:click"
     const val BUTTON_CLICK_ORIGIN = "button"
     const val CACHE_DIR_NAME = "emarsys_sdk_cache"
@@ -12,4 +13,5 @@ object SdkConstants {
     const val APP_START_EVENT_NAME = "app:start"
     const val INAPP_VIEWED_EVENT_NAME = "inapp:viewed"
     const val DISMISS_EVENT_NAME = "dismiss"
+    const val EMS_DEEP_LINK_TRACKED_KEY = "ems_deep_link_tracked"
 }

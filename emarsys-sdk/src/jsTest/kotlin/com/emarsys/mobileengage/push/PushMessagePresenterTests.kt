@@ -165,6 +165,7 @@ class PushMessagePresenterTests {
                 body = testPushMessage.displayableData?.body
                 icon = testPushMessage.displayableData?.iconUrlString
                 badge = testPushMessage.displayableData?.imageUrlString
+                tag = testPushMessage.displayableData?.tag
                 actions = notificationActions
                 data = JsonUtil.json.encodeToString<JsPushMessage>(testPushMessage)
             }

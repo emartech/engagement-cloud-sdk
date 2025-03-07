@@ -2,6 +2,8 @@ package com.emarsys.core.networking.clients
 
 import com.emarsys.core.exceptions.FailedRequestException
 import com.emarsys.core.exceptions.RetryLimitReachedException
+import com.emarsys.core.log.LogEntry
+import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import io.ktor.client.HttpClient
@@ -19,7 +21,8 @@ import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import kotlin.time.Duration.Companion.seconds
 
-class GenericNetworkClient(private val client: HttpClient) : NetworkClientApi {
+class GenericNetworkClient(private val client: HttpClient, private val sdkLogger: Logger) :
+    NetworkClientApi {
 
     private companion object {
         const val MAX_RETRY_COUNT = 5
@@ -27,9 +30,16 @@ class GenericNetworkClient(private val client: HttpClient) : NetworkClientApi {
     }
 
     override suspend fun send(request: UrlRequest): Response {
+        sdkLogger.debug(
+            LogEntry(
+                "GenericNetworkClient - send",
+                mapOf("request" to request)
+            )
+        )
         var retries = 0
         val httpResponse = client.request {
-            val shouldAddDefaultHeader = request.headers?.get(HttpHeaders.ContentType)?.toString().isNullOrEmpty()
+            val shouldAddDefaultHeader =
+                request.headers?.get(HttpHeaders.ContentType)?.toString().isNullOrEmpty()
             if (shouldAddDefaultHeader) {
                 contentType(ContentType.Application.Json)
             }
@@ -56,10 +66,28 @@ class GenericNetworkClient(private val client: HttpClient) : NetworkClientApi {
             httpResponse.headers,
             httpResponse.bodyAsText()
         )
+        sdkLogger.debug(
+            LogEntry(
+                "GenericNetworkClient - response",
+                mapOf("response" to response)
+            )
+        )
         if (!httpResponse.status.isSuccess() && httpResponse.status != HttpStatusCode.Unauthorized) {
             if (retries == MAX_RETRY_COUNT) {
+                sdkLogger.error(
+                    LogEntry(
+                        "GenericNetworkClient - Request retry limit reached!",
+                        mapOf("response" to response)
+                    )
+                )
                 throw RetryLimitReachedException("Request retry limit reached! Response: ${httpResponse.bodyAsText()}")
             }
+            sdkLogger.error(
+                LogEntry(
+                    "GenericNetworkClient: Request failed with status code: ${httpResponse.status.value}",
+                    mapOf("response" to response)
+                )
+            )
             throw FailedRequestException(response)
         }
 

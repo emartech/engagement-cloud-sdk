@@ -18,7 +18,6 @@ import js.promise.Promise
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.promise
-import kotlinx.serialization.encodeToString
 import web.broadcast.BroadcastChannel
 import web.events.EventHandler
 import web.events.EventType
@@ -82,6 +81,7 @@ fun main() {
         event.waitUntil(Promise { resolve, reject ->
             serviceWorkerScope.promise {
                 notificationClickHandler.handleNotificationClick(jsNotificationClickedData)
+                event.notification.close()
             }.then {
                 resolve(Unit)
             }.catch {

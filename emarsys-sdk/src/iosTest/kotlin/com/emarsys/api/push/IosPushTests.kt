@@ -11,6 +11,7 @@ import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.push.IosPush
 import com.emarsys.mobileengage.push.IosPushInstance
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
 import dev.mokkery.every
@@ -82,7 +83,7 @@ class IosPushTests {
         mockLoggingPush = mock()
         mockGathererPush = mock()
         mockPushInternal = mock()
-        mockSdkLogger = mock()
+        mockSdkLogger = mock(MockMode.autofill)
         everySuspend { mockSdkLogger.error(any(), any<Throwable>()) } returns Unit
 
         testUNUserNotificationCenterDelegateProtocol = TestUserNotificationCenterDelegate()
