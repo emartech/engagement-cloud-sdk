@@ -7,13 +7,13 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 
 @Serializable
-data class RemoteWebPushMessageV1(
-    val notification: RemoteWebPushNotificationV1,
+data class RemoteWebPushMessageV2(
+    val notification: RemoteWebPushNotificationV2,
     val ems: EmsPushData
 )
 
 @Serializable
-data class RemoteWebPushNotificationV1(
+data class RemoteWebPushNotificationV2(
     val silent: Boolean,
     val title: String,
     val body: String,
