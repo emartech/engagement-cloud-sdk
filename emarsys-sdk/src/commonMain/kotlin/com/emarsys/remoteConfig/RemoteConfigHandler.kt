@@ -28,7 +28,7 @@ class RemoteConfigHandler(
         applyLogLevel(config.logLevel)
         sdkLogger.debug("RemoteConfigHandler - handle", "applyFeatures")
         applyFeatures(config.features)
-        sdkLogger.debug("RemoteConfigHandler - handle", "applyLuckyLoger")
+        sdkLogger.debug("RemoteConfigHandler - handle", "applyLuckyLogger")
         applyLuckyLogger(config.luckyLogger)
 
         config.overrides?.let {
