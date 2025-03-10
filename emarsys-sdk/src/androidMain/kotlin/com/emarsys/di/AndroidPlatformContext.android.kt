@@ -5,6 +5,7 @@ import com.emarsys.applicationContext
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.device.PlatformInfoCollector
 import com.emarsys.core.log.Logger
+import com.emarsys.core.providers.Provider
 import com.emarsys.core.resource.MetadataReader
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
@@ -27,6 +28,7 @@ class AndroidPlatformContext(
     private val json: Json,
     private val pushActionFactory: ActionFactoryApi<ActionModel>,
     private val actionHandler: ActionHandlerApi,
+    uuidProvider: Provider<String>,
     sdkLogger: Logger,
     notificationManager: NotificationManager,
     metadataReader: MetadataReader,
@@ -54,9 +56,9 @@ class AndroidPlatformContext(
     )
 
     val androidPushMessageFactory = AndroidPushMessageFactory(
-        androidPushV1Mapper = AndroidPushV1Mapper(sdkLogger),
-        silentAndroidPushV1Mapper = SilentAndroidPushV1Mapper(sdkLogger),
-        androidPushV2Mapper = AndroidPushV2Mapper(sdkLogger),
-        silentAndroidPushV2Mapper = SilentAndroidPushV2Mapper(sdkLogger)
+        androidPushV1Mapper = AndroidPushV1Mapper(sdkLogger, json, uuidProvider),
+        silentAndroidPushV1Mapper = SilentAndroidPushV1Mapper(sdkLogger, json),
+        androidPushV2Mapper = AndroidPushV2Mapper(sdkLogger, json),
+        silentAndroidPushV2Mapper = SilentAndroidPushV2Mapper(sdkLogger, json)
     )
 }

@@ -8,13 +8,15 @@ import com.emarsys.mobileengage.push.model.AndroidPlatformData
 import com.emarsys.mobileengage.push.model.NotificationMethod
 import com.emarsys.mobileengage.push.model.NotificationStyle
 import com.emarsys.mobileengage.push.model.SilentAndroidPushMessage
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
 class SilentAndroidPushV2Mapper(
-    private val logger: Logger
+    private val logger: Logger,
+    private val json: Json
 ): Mapper<JsonObject, SilentAndroidPushMessage> {
 
     companion object {
@@ -30,7 +32,7 @@ class SilentAndroidPushV2Mapper(
 
     override suspend fun map(from: JsonObject): SilentAndroidPushMessage? {
         return try {
-            val ems: JsonObject = from.getValue(EMS).jsonPrimitive.content.fromString()!!
+            val ems: JsonObject = from.getValue(EMS).jsonPrimitive.content.fromString(json)!!
             val treatments: JsonObject? = ems["treatments"]?.jsonObject
 
             SilentAndroidPushMessage(
@@ -44,9 +46,9 @@ class SilentAndroidPushV2Mapper(
                     ),
                     style = from[STYLE]?.jsonPrimitive?.contentOrNull?.let { NotificationStyle.valueOf(it) }
                 ),
-                badgeCount = from[BADGE_COUNT]?.jsonPrimitive?.contentOrNull.fromString(),
+                badgeCount = from[BADGE_COUNT]?.jsonPrimitive?.contentOrNull.fromString(json),
                 actionableData = ActionableData(
-                    actions = from.getValue(ACTIONS).jsonPrimitive.content.fromString(),
+                    actions = from.getValue(ACTIONS).jsonPrimitive.content.fromString(json),
                 )
             )
         } catch (e: Exception) {

@@ -19,7 +19,8 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
 class AndroidPushV2Mapper(
-    private val logger: Logger
+    private val logger: Logger,
+    private val json: Json
 ): Mapper<JsonObject, AndroidPushMessage> {
 
     companion object {
@@ -41,12 +42,12 @@ class AndroidPushV2Mapper(
 
     override suspend fun map(from: JsonObject): AndroidPushMessage? {
         return try {
-            val ems: JsonObject = from.getValue(EMS).jsonPrimitive.content.fromString()!!
+            val ems: JsonObject = from.getValue(EMS).jsonPrimitive.content.fromString(json)!!
             val treatments: JsonObject? = ems["treatments"]?.jsonObject
 
-            val defaultTapAction: BasicActionModel? = from[DEFAULT_ACTION]?.jsonPrimitive?.contentOrNull.fromString()
-            val actions: List<PresentableActionModel>? = from[ACTIONS]?.jsonPrimitive?.contentOrNull.fromString()
-            val pushToInApp: PushToInApp? = from[IN_APP]?.jsonPrimitive?.contentOrNull.fromString()
+            val defaultTapAction: BasicActionModel? = from[DEFAULT_ACTION]?.jsonPrimitive?.contentOrNull.fromString(json)
+            val actions: List<PresentableActionModel>? = from[ACTIONS]?.jsonPrimitive?.contentOrNull.fromString(json)
+            val pushToInApp: PushToInApp? = from[IN_APP]?.jsonPrimitive?.contentOrNull.fromString(json)
 
             val actionableData = if (actions != null || defaultTapAction != null || pushToInApp != null) {
                 ActionableData(
@@ -67,7 +68,7 @@ class AndroidPushV2Mapper(
                     ),
                     style = from[STYLE]?.jsonPrimitive?.contentOrNull?.let { NotificationStyle.valueOf(it) }
                 ),
-                badgeCount = from[BADGE_COUNT]?.jsonPrimitive?.contentOrNull.fromString(),
+                badgeCount = from[BADGE_COUNT]?.jsonPrimitive?.contentOrNull.fromString(json),
                 displayableData = DisplayableData(
                     from.getValue(TITLE).jsonPrimitive.content,
                     from.getValue(BODY).jsonPrimitive.content,
@@ -82,6 +83,6 @@ class AndroidPushV2Mapper(
     }
 }
 
-inline fun <reified T> String?.fromString(): T? {
-    return this?.let { Json.decodeFromString<T>(it) }
+inline fun <reified T> String?.fromString(json: Json): T? {
+    return this?.let { json.decodeFromString<T>(it) }
 }

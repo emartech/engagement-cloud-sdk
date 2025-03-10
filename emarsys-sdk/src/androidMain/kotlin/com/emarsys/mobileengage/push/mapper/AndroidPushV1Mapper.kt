@@ -2,6 +2,7 @@ package com.emarsys.mobileengage.push.mapper
 
 import com.emarsys.core.log.Logger
 import com.emarsys.core.mapper.Mapper
+import com.emarsys.core.providers.Provider
 import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.inapp.PushToInApp
@@ -20,16 +21,18 @@ import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonPrimitive
 
 class AndroidPushV1Mapper(
-    private val logger: Logger
+    private val logger: Logger,
+    private val json: Json,
+    private val uuidProvider: Provider<String>
 ) : Mapper<JsonObject, AndroidPushMessage> {
 
     override suspend fun map(from: JsonObject): AndroidPushMessage? {
         return try {
             val defaultTapAction = extractDefaultAction(from)
             val actions: List<PresentableActionModel>? =
-                from["ems.actions"]?.jsonPrimitive?.contentOrNull.fromString()
+                from["ems.actions"]?.jsonPrimitive?.contentOrNull.fromString(json)
             val pushToInApp: PushToInApp? =
-                from["ems.inapp"]?.jsonPrimitive?.contentOrNull.fromString()
+                from["ems.inapp"]?.jsonPrimitive?.contentOrNull.fromString(json)
             val actionableData =
                 if (actions != null || defaultTapAction != null || pushToInApp != null) {
                     ActionableData(
@@ -45,12 +48,8 @@ class AndroidPushV1Mapper(
                 platformData = AndroidPlatformData(
                     channelId = from.getValue("notification.channel_id").jsonPrimitive.content,
                     notificationMethod = NotificationMethod(
-                        collapseId = from.getValue("ems.notification_method.collapse_key").jsonPrimitive.content,
-                        operation = from.getValue("ems.notification_method.operation").jsonPrimitive.content.let {
-                            NotificationOperation.valueOf(
-                                it
-                            )
-                        }
+                        collapseId = from["ems.notification_method.collapse_key"]?.jsonPrimitive?.contentOrNull ?: uuidProvider.provide(),
+                        operation = from["ems.notification_method.operation"]?.jsonPrimitive?.contentOrNull?.let { NotificationOperation.valueOf(it) } ?: NotificationOperation.INIT
                     ),
                     style = from["ems.style"]?.jsonPrimitive?.content?.let {
                         NotificationStyle.valueOf(
@@ -58,7 +57,7 @@ class AndroidPushV1Mapper(
                         )
                     }
                 ),
-                badgeCount = from["notification.badgeCount"]?.jsonPrimitive?.contentOrNull.fromString(),
+                badgeCount = from["notification.badgeCount"]?.jsonPrimitive?.contentOrNull.fromString(json),
                 displayableData = DisplayableData(
                     from.getValue("notification.title").jsonPrimitive.content,
                     from.getValue("notification.body").jsonPrimitive.content,

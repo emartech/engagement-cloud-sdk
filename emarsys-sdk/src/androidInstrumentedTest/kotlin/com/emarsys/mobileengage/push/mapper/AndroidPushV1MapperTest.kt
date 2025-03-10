@@ -1,5 +1,6 @@
 package com.emarsys.mobileengage.push.mapper
 
+import com.emarsys.core.providers.Provider
 import com.emarsys.mobileengage.action.models.BadgeCount
 import com.emarsys.mobileengage.action.models.BadgeCountMethod
 import com.emarsys.mobileengage.action.models.BasicCustomEventActionModel
@@ -12,6 +13,7 @@ import com.emarsys.mobileengage.push.model.AndroidPlatformData
 import com.emarsys.mobileengage.push.model.AndroidPushMessage
 import com.emarsys.mobileengage.push.model.NotificationMethod
 import com.emarsys.mobileengage.push.model.NotificationStyle
+import com.emarsys.util.JsonUtil
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
@@ -23,11 +25,13 @@ import org.junit.Test
 
 class AndroidPushV1MapperTest {
 
+    private lateinit var uuidProvider: Provider<String>
     private lateinit var mapper: AndroidPushV1Mapper
 
     @Before
     fun setup() = runTest {
-        mapper = AndroidPushV1Mapper(mockk(relaxed = true))
+        uuidProvider = mockk(relaxed = true)
+        mapper = AndroidPushV1Mapper(mockk(relaxed = true), JsonUtil.json, mockk(relaxed = true))
     }
 
     @Test

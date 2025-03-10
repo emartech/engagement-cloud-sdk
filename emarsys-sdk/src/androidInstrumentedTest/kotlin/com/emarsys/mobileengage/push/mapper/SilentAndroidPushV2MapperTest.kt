@@ -9,6 +9,7 @@ import com.emarsys.mobileengage.push.model.AndroidPlatformData
 import com.emarsys.mobileengage.push.model.NotificationMethod
 import com.emarsys.mobileengage.push.model.NotificationStyle
 import com.emarsys.mobileengage.push.model.SilentAndroidPushMessage
+import com.emarsys.util.JsonUtil
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
@@ -24,7 +25,7 @@ class SilentAndroidPushV2MapperTest {
 
     @Before
     fun setup() = runTest {
-        mapper = SilentAndroidPushV2Mapper(mockk(relaxed = true))
+        mapper = SilentAndroidPushV2Mapper(mockk(relaxed = true), JsonUtil.json)
     }
 
     @Test
