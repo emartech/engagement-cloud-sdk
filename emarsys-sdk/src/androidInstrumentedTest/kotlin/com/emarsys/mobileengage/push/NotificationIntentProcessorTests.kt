@@ -7,6 +7,7 @@ import com.emarsys.api.push.PushConstants.INTENT_EXTRA_ACTION_KEY
 import com.emarsys.api.push.PushConstants.INTENT_EXTRA_DEFAULT_TAP_ACTION_KEY
 import com.emarsys.api.push.PushConstants.INTENT_EXTRA_PAYLOAD_KEY
 import com.emarsys.core.actions.ActionHandlerApi
+import com.emarsys.core.log.Logger
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.actions.Action
 import com.emarsys.mobileengage.action.actions.DismissAction
@@ -21,9 +22,6 @@ import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.action.models.PresentableAppEventActionModel
 import com.emarsys.mobileengage.action.models.PresentableDismissActionModel
-import com.emarsys.mobileengage.push.model.AndroidPlatformData
-import com.emarsys.mobileengage.push.model.AndroidPushMessage
-import com.emarsys.mobileengage.push.model.NotificationMethod
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.util.JsonUtil
 import io.mockk.coEvery
@@ -54,27 +52,6 @@ class NotificationIntentProcessorTests {
         val PAYLOAD = mapOf("testKey" to "testValue")
         const val APP_EVENT_ACTION_MODEL_JSON =
             """{"type":"MEAppEvent", "id":"$ID","title":"$TITLE","name":"$NAME","payload":{"testKey":"testValue"}}"""
-        val PUSH_MESSAGE = AndroidPushMessage(
-            sid = SID,
-            campaignId = "testCampaignId",
-            platformData = AndroidPlatformData(
-                channelId = "testChannelId",
-                notificationMethod = NotificationMethod(
-                    collapseId = COLLAPSE_ID,
-                    operation = NotificationOperation.INIT
-                )
-            ),
-            actionableData = ActionableData(
-                actions = listOf(PresentableAppEventActionModel(ID, TITLE, NAME, PAYLOAD))
-            ),
-            badgeCount = null,
-            displayableData = DisplayableData(
-                title = "testTitle",
-                body = "testBody",
-                iconUrlString = null,
-                imageUrlString = null
-            )
-        )
     }
 
     private val json = JsonUtil.json
@@ -84,7 +61,7 @@ class NotificationIntentProcessorTests {
     private lateinit var mockActionFactory: ActionFactoryApi<ActionModel>
     private lateinit var mockActionHandler: ActionHandlerApi
     private lateinit var mockSdkEventFlow: MutableSharedFlow<SdkEvent>
-    private lateinit var mockPushMessageFactory: AndroidPushMessageFactory
+    private lateinit var mockLogger: Logger
     private lateinit var notificationIntentProcessor: NotificationIntentProcessor
 
     @Before
@@ -95,10 +72,9 @@ class NotificationIntentProcessorTests {
         mockActionFactory = mockk(relaxed = true)
         mockActionHandler = mockk(relaxed = true)
         mockSdkEventFlow = mockk(relaxed = true)
-        mockPushMessageFactory = mockk(relaxed = true)
-        coEvery { mockPushMessageFactory.create(any()) } returns PUSH_MESSAGE
+        mockLogger = mockk(relaxed = true)
         notificationIntentProcessor =
-            NotificationIntentProcessor(json, mockActionFactory, mockActionHandler, mockPushMessageFactory)
+            NotificationIntentProcessor(json, mockActionFactory, mockActionHandler, mockLogger)
     }
 
     @After
@@ -155,6 +131,19 @@ class NotificationIntentProcessorTests {
                 ), mockAction
             )
         }
+    }
+
+    @Test
+    fun testProcessIntent_shouldNotCrash_whenIntentContains_invalidJsonString() = runTest {
+        val actionModel = PresentableAppEventActionModel(ID, TITLE, NAME, PAYLOAD)
+
+        val intent = createTestIntent(actionModel)
+
+        intent.putExtra(INTENT_EXTRA_PAYLOAD_KEY, """{"missing":"keys"}""")
+
+        notificationIntentProcessor.processIntent(intent, testScope)
+
+        advanceUntilIdle()
     }
 
     @Test
@@ -260,10 +249,6 @@ class NotificationIntentProcessorTests {
                 }""".trimIndent()
     ): String {
         return """{
-        "messageId":"testMessageId",
-        "title": "testTitle",
-        "body": "testBody",
-        "data":{
             "sid":"$SID",
             "campaignId":"testCampaignId",
             "platformData":{
@@ -271,12 +256,18 @@ class NotificationIntentProcessorTests {
                 "notificationMethod":{
                     "collapseId":"$COLLAPSE_ID",
                     "operation":"${NotificationOperation.INIT}"
-                    }
                 }
             },
-            "actions": [
-                $actionModelString
-            ]
+            "displayableData":{
+                "title": "testTitle",
+                "body": "testBody",
+            },
+            "actionableData": {
+                "actions":
+                     [
+                        $actionModelString
+                    ],
+            }
         }""".trimIndent()
     }
 }

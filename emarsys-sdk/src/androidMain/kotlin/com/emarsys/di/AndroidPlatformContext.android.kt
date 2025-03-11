@@ -39,7 +39,7 @@ class AndroidPlatformContext(
 ) : PlatformContext {
 
     val notificationIntentProcessor: NotificationIntentProcessor by lazy {
-        NotificationIntentProcessor(json, pushActionFactory, actionHandler, androidPushMessageFactory)
+        NotificationIntentProcessor(json, pushActionFactory, actionHandler, sdkLogger)
     }
 
     val silentPushHandler = SilentPushMessageHandler(pushActionFactory, sdkEventFlow)
