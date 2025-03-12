@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import com.emarsys.AndroidEmarsysConfig
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.device.AndroidVersionUtils.isUpsideDownCake
 import com.emarsys.core.device.AndroidVersionUtils.isUpsideDownCakeOrAbove
 import com.emarsys.core.log.Logger
 import com.emarsys.watchdog.activity.ActivityFinderApi
@@ -30,9 +31,13 @@ class LaunchApplicationHandler(
 
             launchIntent?.let {
                 val activityOptions = if (isUpsideDownCakeOrAbove) {
-                    ActivityOptions.makeBasic()
-                        .setPendingIntentCreatorBackgroundActivityStartMode(ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED)
-                        .toBundle()
+                    ActivityOptions.makeBasic().apply {
+                        if (isUpsideDownCake) {
+                            this.setPendingIntentBackgroundActivityStartMode(ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED)
+                        } else  {
+                            this.setPendingIntentCreatorBackgroundActivityStartMode(ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED)
+                        }
+                    }.toBundle()
                 } else null
 
                 PendingIntent.getActivity(

@@ -11,6 +11,7 @@ import com.emarsys.AndroidEmarsysConfig
 import com.emarsys.FakeActivity
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.device.AndroidVersionUtils.isBelowUpsideDownCake
+import com.emarsys.core.device.AndroidVersionUtils.isUpsideDownCake
 import com.emarsys.watchdog.activity.ActivityFinderApi
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
@@ -37,8 +38,9 @@ class LaunchApplicationHandlerTest {
     private val bundleCaptor = slot<Bundle>()
 
     companion object {
-        const val BACKGROUND_ACTIVITY_START_MODE_KEY =
+        const val BACKGROUND_ACTIVITY_CREATOR_START_MODE_KEY =
             "android.activity.pendingIntentCreatorBackgroundActivityStartMode"
+        const val BACKGROUND_ACTIVITY_START_MODE_KEY = "android.pendingIntent.backgroundActivityAllowed"
     }
 
     @Before
@@ -108,7 +110,11 @@ class LaunchApplicationHandlerTest {
                     capture(bundleCaptor)
                 )
             }
-            bundleCaptor.captured.getInt(BACKGROUND_ACTIVITY_START_MODE_KEY) shouldBe 1
+            if (isUpsideDownCake) {
+                bundleCaptor.captured.getBoolean(BACKGROUND_ACTIVITY_START_MODE_KEY) shouldBe true
+            } else {
+                bundleCaptor.captured.getInt(BACKGROUND_ACTIVITY_CREATOR_START_MODE_KEY) shouldBe 1
+            }
         }
         verify { mockPendingIntent.send() }
     }
@@ -179,7 +185,12 @@ class LaunchApplicationHandlerTest {
                     capture(bundleCaptor)
                 )
             }
-            bundleCaptor.captured.getInt(BACKGROUND_ACTIVITY_START_MODE_KEY) shouldBe 1
+            if (isUpsideDownCake) {
+                bundleCaptor.captured.getBoolean(BACKGROUND_ACTIVITY_START_MODE_KEY) shouldBe true
+            } else {
+                bundleCaptor.captured.getInt(BACKGROUND_ACTIVITY_CREATOR_START_MODE_KEY) shouldBe 1
+            }
+
         }
         verify { mockPendingIntent.send() }
         intentCaptor.captured.component?.className shouldBe FakeActivity::class.qualifiedName
