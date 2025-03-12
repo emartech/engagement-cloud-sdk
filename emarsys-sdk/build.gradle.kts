@@ -60,7 +60,6 @@ kotlin {
                 implementation(libs.ktor.serialization)
                 implementation(project.dependencies.platform(libs.cryptography))
                 implementation(libs.cryptography.core)
-                implementation(libs.sqlDelight.coroutines.extensions)
             }
         }
         val commonTest by getting {

@@ -18,6 +18,9 @@ import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.cache.WebFileCache
 import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.clipboard.WebClipboardHandler
+import com.emarsys.core.db.EmarsysIndexedDb
+import com.emarsys.core.db.EmarsysIndexedDbObjectStore
+import com.emarsys.core.db.EmarsysObjectStoreConfig
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.db.events.JSEventsDao
 import com.emarsys.core.device.DeviceInfoCollector
@@ -74,6 +77,7 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import web.broadcast.BroadcastChannel
 import web.dom.document
+import web.idb.indexedDB
 
 actual class PlatformDependencyCreator actual constructor(
     private val sdkContext: SdkContextApi,
@@ -84,6 +88,7 @@ actual class PlatformDependencyCreator actual constructor(
     actionHandler: ActionHandlerApi,
     timestampProvider: Provider<Instant>
 ) : DependencyCreator {
+    private val emarsysIndexedDb = EmarsysIndexedDb(indexedDB, sdkLogger)
 
     actual override fun createPlatformInitializer(
         pushActionFactory: ActionFactoryApi<ActionModel>,
@@ -119,7 +124,14 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createEventsDao(): EventsDaoApi {
-        return JSEventsDao()
+        val emarsysIndexedDbObjectStore = EmarsysIndexedDbObjectStore(
+            emarsysIndexedDb,
+            EmarsysObjectStoreConfig.Events,
+            json,
+            sdkLogger,
+            sdkContext.sdkDispatcher
+        )
+        return JSEventsDao(emarsysIndexedDbObjectStore, sdkLogger)
     }
 
     actual override fun createDeviceInfoCollector(

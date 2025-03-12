@@ -18,7 +18,7 @@ data class AndroidPushMessage(
     override val sid: String,
     override val campaignId: String,
     override val platformData: AndroidPlatformData,
-    override val badgeCount: BadgeCount?,
+    override val badgeCount: BadgeCount? = null,
     override val displayableData: DisplayableData,
     override val actionableData: ActionableData<PresentableActionModel>? = null
 ): AndroidPush(), DisplayablePush, ActionablePush<PresentableActionModel>
