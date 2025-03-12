@@ -28,11 +28,12 @@ class EmarsysIndexedDbTest {
     }
 
     @Test
-    fun open_shouldOpenDatabase_WithEventsObjectStore() = runTest {
+    fun open_shouldOpenDatabase_WithEventsObjectStores() = runTest {
         val database = emarsysIndexedDb.open()
 
         database shouldNotBe null
         database.objectStoreNames.contains("events") shouldBe true
+        database.objectStoreNames.contains("clientId") shouldBe true
     }
 
     @Test

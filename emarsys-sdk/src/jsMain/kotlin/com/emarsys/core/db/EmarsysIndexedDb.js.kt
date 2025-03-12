@@ -45,8 +45,12 @@ class EmarsysIndexedDb(
                 openIndexedDBRequest.onupgradeneeded = EventHandler {
                     val database = openIndexedDBRequest.result
                     database.createObjectStore(
-                        "events",
-                        js("{}").unsafeCast<IDBObjectStoreParameters>().copy(keyPath = "id")
+                        EmarsysObjectStoreConfig.Events.name,
+                        js("{}").unsafeCast<IDBObjectStoreParameters>()
+                    )
+                    database.createObjectStore(
+                        EmarsysObjectStoreConfig.ClientId.name,
+                        js("{}").unsafeCast<IDBObjectStoreParameters>()
                     )
                 }
             }
