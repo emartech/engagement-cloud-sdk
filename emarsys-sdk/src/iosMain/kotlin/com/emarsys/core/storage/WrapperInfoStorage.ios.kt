@@ -1,7 +1,5 @@
 package com.emarsys.core.storage
 
-import android.content.SharedPreferences
-import androidx.core.content.edit
 import com.emarsys.SdkConstants.UNKNOWN_WRAPPER_INFO
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.log.Logger
@@ -10,23 +8,21 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
+import platform.Foundation.NSUserDefaults
 
 class WrapperInfoStorage(
-    private val sharedPreferences: SharedPreferences,
+    private val userDefaults: NSUserDefaults,
     private val sdkContext: SdkContextApi,
     private val sdkLogger: Logger,
     private val json: Json
-) :
-    TypedStorageApi<WrapperInfo?> {
+): TypedStorageApi<WrapperInfo?> {
     override fun put(key: String, value: WrapperInfo?) {
-        sharedPreferences.edit {
-            putString(key, json.encodeToString(value))
-        }
+        userDefaults.setObject(json.encodeToString(value), key)
     }
 
     override fun get(key: String): WrapperInfo? {
         return try {
-            sharedPreferences.getString(key, null)?.let {
+            userDefaults.stringForKey(key)?.let {
                 json.decodeFromString(it)
             }
         } catch (exception: SerializationException) {

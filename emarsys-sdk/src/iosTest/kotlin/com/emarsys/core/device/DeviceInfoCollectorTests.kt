@@ -3,6 +3,9 @@ package com.emarsys.core.device
 import com.emarsys.KotlinPlatform
 import com.emarsys.SdkConstants
 import com.emarsys.core.providers.Provider
+import com.emarsys.core.storage.StorageConstants
+import com.emarsys.core.storage.TypedStorageApi
+import com.emarsys.core.wrapper.WrapperInfo
 import com.emarsys.util.JsonUtil
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -27,6 +30,7 @@ class DeviceInfoCollectorTests {
     private lateinit var mockLanguageProvider: Provider<String>
     private lateinit var mockTimezoneProvider: Provider<String>
     private lateinit var mockDeviceInformation: UIDeviceApi
+    private lateinit var mockWrapperStorage: TypedStorageApi<WrapperInfo?>
     private lateinit var json: Json
 
     private lateinit var deviceInfoCollector: DeviceInfoCollector
@@ -39,6 +43,8 @@ class DeviceInfoCollectorTests {
         every { mockApplicationVersionProvider.provide() } returns APP_VERSION
         mockLanguageProvider = mock()
         every { mockLanguageProvider.provide() } returns LANGUAGE
+        mockWrapperStorage = mock()
+        every { mockWrapperStorage.get(StorageConstants.WRAPPER_INFO_KEY) } returns null
         mockTimezoneProvider = mock()
         every { mockTimezoneProvider.provide() } returns TIMEZONE
         mockDeviceInformation = mock()
@@ -52,6 +58,7 @@ class DeviceInfoCollectorTests {
             mockLanguageProvider,
             mockTimezoneProvider,
             mockDeviceInformation,
+            mockWrapperStorage,
             json
         )
     }

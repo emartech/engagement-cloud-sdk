@@ -4,6 +4,9 @@ import com.emarsys.KotlinPlatform
 import com.emarsys.SdkConstants
 import com.emarsys.core.device.IosNotificationConstant.Companion.fromLong
 import com.emarsys.core.providers.Provider
+import com.emarsys.core.storage.StorageConstants
+import com.emarsys.core.storage.TypedStorageApi
+import com.emarsys.core.wrapper.WrapperInfo
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.serialization.json.Json
 import platform.UserNotifications.UNUserNotificationCenter
@@ -16,14 +19,15 @@ actual class DeviceInfoCollector(
     private val languageProvider: Provider<String>,
     private val timezoneProvider: Provider<String>,
     private val deviceInformation: UIDeviceApi,
+    private val wrapperInfoStorage: TypedStorageApi<WrapperInfo?>,
     private val json: Json
 ) : DeviceInfoCollectorApi {
     actual override fun collect(): String {
         val deviceInfo = DeviceInfo(
             KotlinPlatform.IOS.name.lowercase(),
             platformCategory = SdkConstants.MOBILE_PLATFORM_CATEGORY,
-            null,
-            null,
+            platformWrapper = getWrapperInfo()?.platformWrapper,
+            platformWrapperVersion = getWrapperInfo()?.wrapperVersion,
             applicationVersion = applicationVersionProvider.provide(),
             deviceModel = deviceInformation.deviceModel(),
             osVersion = deviceInformation.osVersion(),
@@ -33,6 +37,10 @@ actual class DeviceInfoCollector(
             clientId = clientIdProvider.provide()
         )
         return json.encodeToString(deviceInfo)
+    }
+
+    private fun getWrapperInfo(): WrapperInfo? {
+        return wrapperInfoStorage.get(StorageConstants.WRAPPER_INFO_KEY)
     }
 
     actual override fun getClientId(): String {

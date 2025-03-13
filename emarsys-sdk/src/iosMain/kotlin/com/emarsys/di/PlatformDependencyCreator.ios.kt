@@ -34,6 +34,7 @@ import com.emarsys.core.state.State
 import com.emarsys.core.storage.StorageConstants.DB_NAME
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.TypedStorageApi
+import com.emarsys.core.storage.WrapperInfoStorage
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.url.IosExternalUrlOpener
 import com.emarsys.core.util.DownloaderApi
@@ -120,13 +121,16 @@ actual class PlatformDependencyCreator actual constructor(
         timezoneProvider: Provider<String>,
         storage: TypedStorageApi<String?>
     ): DeviceInfoCollector {
+        val wrapperInfoStorage =
+            WrapperInfoStorage(platformContext.userDefaults, sdkContext, sdkLogger, json)
         return DeviceInfoCollector(
             ClientIdProvider(uuidProvider, createStorage()),
             createApplicationVersionProvider(),
             createLanguageProvider(),
             timezoneProvider,
             uiDevice,
-            json,
+            wrapperInfoStorage,
+            json
         )
     }
 
