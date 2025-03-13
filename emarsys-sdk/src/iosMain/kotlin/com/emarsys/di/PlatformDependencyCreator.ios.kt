@@ -1,7 +1,6 @@
 package com.emarsys.di
 
 import app.cash.sqldelight.driver.native.NativeSqliteDriver
-import com.emarsys.SdkConstants.DB_NAME
 import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.PushApi
 import com.emarsys.api.push.PushCall
@@ -32,6 +31,7 @@ import com.emarsys.core.providers.Provider
 import com.emarsys.core.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.setup.PlatformInitState
 import com.emarsys.core.state.State
+import com.emarsys.core.storage.StorageConstants.DB_NAME
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi

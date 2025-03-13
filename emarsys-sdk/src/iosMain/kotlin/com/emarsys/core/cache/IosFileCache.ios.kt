@@ -1,6 +1,6 @@
 package com.emarsys.core.cache
 
-import com.emarsys.SdkConstants.CACHE_DIR_NAME
+import com.emarsys.core.storage.StorageConstants.CACHE_DIR_NAME
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf

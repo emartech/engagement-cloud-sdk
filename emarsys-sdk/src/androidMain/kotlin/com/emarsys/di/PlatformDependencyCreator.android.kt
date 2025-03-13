@@ -8,7 +8,6 @@ import android.net.ConnectivityManager
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
-import com.emarsys.SdkConstants.DB_NAME
 import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.LoggingPush
 import com.emarsys.api.push.Push
@@ -40,6 +39,7 @@ import com.emarsys.core.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.resource.MetadataReader
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.StorageConstants
+import com.emarsys.core.storage.StorageConstants.DB_NAME
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
