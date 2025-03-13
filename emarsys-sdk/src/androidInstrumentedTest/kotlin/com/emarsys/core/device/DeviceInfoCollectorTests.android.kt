@@ -2,14 +2,15 @@ package com.emarsys.core.device
 
 import android.os.Build
 import com.emarsys.core.providers.Provider
+import com.emarsys.core.storage.StorageConstants
+import com.emarsys.core.storage.TypedStorageApi
+import com.emarsys.core.wrapper.WrapperInfo
 import com.emarsys.util.JsonUtil
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import org.junit.Before
 import org.junit.Test
 
@@ -20,6 +21,8 @@ class DeviceInfoCollectorTests {
         const val APP_VERSION = "2.0"
         const val CLIENT_ID = "test uuid"
         const val TIMEZONE = "+0300"
+        const val WRAPPER_PLATFORM = "flutter"
+        const val WRAPPER_VERSION = "1.0.0"
     }
 
     private lateinit var mockLanguageProvider: Provider<String>
@@ -27,6 +30,7 @@ class DeviceInfoCollectorTests {
     private lateinit var mockApplicationVersionProvider: Provider<String>
     private lateinit var mockClientIdProvider: Provider<String>
     private lateinit var mockPlatformInfoCollector: PlatformInfoCollector
+    private lateinit var mockStorage: TypedStorageApi<WrapperInfo?>
     private lateinit var deviceInfoCollector: DeviceInfoCollector
     private val json = JsonUtil.json
 
@@ -46,6 +50,9 @@ class DeviceInfoCollectorTests {
 
         mockPlatformInfoCollector = mockk(relaxed = true)
 
+        mockStorage = mockk(relaxed = true)
+        every { mockStorage.get(any()) } returns null
+
         deviceInfoCollector = DeviceInfoCollector(
             mockTimezoneProvider,
             mockLanguageProvider,
@@ -53,6 +60,7 @@ class DeviceInfoCollectorTests {
             true,
             mockClientIdProvider,
             mockPlatformInfoCollector,
+            mockStorage,
             json
         )
     }
@@ -63,21 +71,49 @@ class DeviceInfoCollectorTests {
     }
 
     @Test
-    fun collect_shouldReturn_deviceInfo() {
+    fun collect_shouldReturn_deviceInfo_whenNative() {
         val expectedDeviceInfo = DeviceInfo(
             platform = "android",
+            platformCategory = "mobile",
+            platformWrapper = null,
+            platformWrapperVersion = null,
             applicationVersion = APP_VERSION,
             deviceModel = Build.MODEL,
             osVersion = SdkBuildConfig.getOsVersion(),
             sdkVersion = BuildConfig.VERSION_NAME,
-            languageCode = LANGUAGE,
+            language = LANGUAGE,
             timezone = TIMEZONE,
             clientId = CLIENT_ID
         )
 
         val result = deviceInfoCollector.collect()
 
-        result shouldBe Json.encodeToString(expectedDeviceInfo)
+        result shouldBe json.encodeToString(expectedDeviceInfo)
+        verify { mockLanguageProvider.provide() }
+    }
+
+    @Test
+    fun collect_shouldReturn_deviceInfo_whenWrapper() {
+        val expectedWrapperInfo = WrapperInfo(WRAPPER_PLATFORM, WRAPPER_VERSION)
+        every { mockStorage.get(StorageConstants.WRAPPER_INFO_KEY) } returns expectedWrapperInfo
+
+        val expectedDeviceInfo = DeviceInfo(
+            platform = "android",
+            platformCategory = "mobile",
+            platformWrapper = WRAPPER_PLATFORM,
+            platformWrapperVersion = WRAPPER_VERSION,
+            applicationVersion = APP_VERSION,
+            deviceModel = Build.MODEL,
+            osVersion = SdkBuildConfig.getOsVersion(),
+            sdkVersion = BuildConfig.VERSION_NAME,
+            language = LANGUAGE,
+            timezone = TIMEZONE,
+            clientId = CLIENT_ID
+        )
+
+        val result = deviceInfoCollector.collect()
+
+        result shouldBe json.encodeToString(expectedDeviceInfo)
         verify { mockLanguageProvider.provide() }
     }
 
@@ -90,6 +126,7 @@ class DeviceInfoCollectorTests {
             false,
             mockClientIdProvider,
             mockPlatformInfoCollector,
+            mockStorage,
             json
         )
 

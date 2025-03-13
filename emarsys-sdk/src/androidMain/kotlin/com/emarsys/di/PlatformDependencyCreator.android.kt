@@ -42,6 +42,7 @@ import com.emarsys.core.storage.StorageConstants
 import com.emarsys.core.storage.StorageConstants.DB_NAME
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.TypedStorageApi
+import com.emarsys.core.storage.WrapperInfoStorage
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
@@ -134,6 +135,7 @@ actual class PlatformDependencyCreator actual constructor(
         timezoneProvider: Provider<String>,
         storage: TypedStorageApi<String?>
     ): DeviceInfoCollector {
+        val wrapperStorage = WrapperInfoStorage(sharedPreferences, sdkContext, sdkLogger, json)
         return DeviceInfoCollector(
             timezoneProvider,
             createLanguageProvider(),
@@ -141,6 +143,7 @@ actual class PlatformDependencyCreator actual constructor(
             true,
             ClientIdProvider(uuidProvider, storage),
             platformInfoCollector,
+            wrapperStorage,
             json
         )
     }
@@ -251,7 +254,7 @@ actual class PlatformDependencyCreator actual constructor(
         storage: TypedStorageApi<String?>,
         pushContext: ApiContext<PushCall>,
     ): PushApi {
-        val loggingPush = LoggingPush(sdkLogger, storage,sdkContext.sdkDispatcher)
+        val loggingPush = LoggingPush(sdkLogger, storage, sdkContext.sdkDispatcher)
         val pushGatherer = PushGatherer(pushContext, storage)
         return Push(loggingPush, pushGatherer, pushInternal, sdkContext)
     }

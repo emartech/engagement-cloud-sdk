@@ -1,10 +1,10 @@
 package com.emarsys.core.device
 
 import com.emarsys.KotlinPlatform
+import com.emarsys.SdkConstants
 import com.emarsys.core.device.IosNotificationConstant.Companion.fromLong
 import com.emarsys.core.providers.Provider
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import platform.UserNotifications.UNUserNotificationCenter
 import kotlin.coroutines.resume
@@ -21,11 +21,14 @@ actual class DeviceInfoCollector(
     actual override fun collect(): String {
         val deviceInfo = DeviceInfo(
             KotlinPlatform.IOS.name.lowercase(),
+            platformCategory = SdkConstants.MOBILE_PLATFORM_CATEGORY,
+            null,
+            null,
             applicationVersion = applicationVersionProvider.provide(),
             deviceModel = deviceInformation.deviceModel(),
             osVersion = deviceInformation.osVersion(),
             sdkVersion = BuildConfig.VERSION_NAME,
-            languageCode = languageProvider.provide(),
+            language = languageProvider.provide(),
             timezone = timezoneProvider.provide(),
             clientId = clientIdProvider.provide()
         )

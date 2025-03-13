@@ -1,6 +1,7 @@
 package com.emarsys.api.config
 
 import com.emarsys.EmarsysConfig
+import com.emarsys.SdkConstants
 import com.emarsys.api.SdkState
 import com.emarsys.context.DefaultUrls
 import com.emarsys.context.SdkContext
@@ -22,7 +23,6 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -42,6 +42,9 @@ class ConfigTest {
             AndroidNotificationSettings(true, 1, listOf(ChannelSettings("testChannelId")))
         val DEVICE_INFO = DeviceInfo(
             "testPlatform",
+            SdkConstants.WEB_PLATFORM_CATEGORY,
+            null,
+            null,
             "testAppVersion",
             "testDeviceModel",
             "testOsVersion",

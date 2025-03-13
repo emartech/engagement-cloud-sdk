@@ -35,7 +35,7 @@ class Config<Logging : ConfigInstance, Gatherer : ConfigInstance, Internal : Con
     override val clientId: String
         get() = deviceInfoCollector.getClientId()
     override val languageCode: String
-        get() = getDeviceInfo().languageCode
+        get() = getDeviceInfo().language
 
     override val sdkVersion: String
         get() = getDeviceInfo().sdkVersion

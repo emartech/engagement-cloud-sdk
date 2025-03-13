@@ -10,5 +10,6 @@ object JsonUtil {
         isLenient = true
         ignoreUnknownKeys = true
         allowTrailingComma = true
+        explicitNulls = false
     }
 }

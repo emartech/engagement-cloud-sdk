@@ -63,7 +63,7 @@ class ContactClientTests {
         )
         val testUrl = Url("https://www.testUrl.com/testAppCode/client")
         val testBody =
-            """{"contactFieldId":2575,"contactFieldValue":"testContactFieldValue","openIdToken":null}"""
+            """{"contactFieldId":2575,"contactFieldValue":"testContactFieldValue"}"""
         val expectedUrlRequest = UrlRequest(
             testUrl,
             HttpMethod.Post,
@@ -96,7 +96,7 @@ class ContactClientTests {
         )
         val testUrl = Url("https://www.testUrl.com/testAppCode/client")
         val testBody =
-            """{"contactFieldId":2575,"contactFieldValue":null,"openIdToken":"$OPEN_ID_TOKEN"}"""
+            """{"contactFieldId":2575,"openIdToken":"$OPEN_ID_TOKEN"}"""
         val expectedUrlRequest = UrlRequest(
             testUrl,
             HttpMethod.Post,
@@ -137,7 +137,7 @@ class ContactClientTests {
 
             val testUrl = Url("https://www.testUrl.com/testAppCode/client")
             val testBody =
-                """{"contactFieldId":2575,"contactFieldValue":null,"openIdToken":"$OPEN_ID_TOKEN"}"""
+                """{"contactFieldId":2575,"openIdToken":"$OPEN_ID_TOKEN"}"""
             val expectedUrlRequest = UrlRequest(
                 testUrl,
                 HttpMethod.Post,

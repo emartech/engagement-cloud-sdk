@@ -154,7 +154,11 @@ class EventClientTests {
         everySuspend { mockEmarsysClient.send(any()) }.returns(createTestResponse("{}"))
         every { mockUrlFactory.create(EmarsysUrlType.EVENT) }.returns(TEST_BASE_URL)
 
-        val expectedUrlRequest = createTestRequest(DEVICE_EVENT_STATE)
+        val expectedUrlRequest = UrlRequest(
+            TEST_BASE_URL,
+            HttpMethod.Post,
+            """{"dnd":$IN_APP_DND,"events":[{"type":"custom","id":"$UUID","name":"${testEvent.name}","attributes":{"key":"value"},"timestamp":"$TIMESTAMP"}],"deviceEventState":{"key":"value"}}""",
+        )
 
         eventClient = createEventClient()
 
@@ -181,7 +185,7 @@ class EventClientTests {
         everySuspend { mockEmarsysClient.send(any()) }.returns(createTestResponse(responseBody))
         every { mockUrlFactory.create(EmarsysUrlType.EVENT) }.returns(TEST_BASE_URL)
 
-        val expectedUrlRequest = createTestRequest(null)
+        val expectedUrlRequest = createTestRequest()
 
         eventClient = createEventClient()
 
@@ -206,7 +210,7 @@ class EventClientTests {
         everySuspend { mockEmarsysClient.send(any()) }.returns(createTestResponse(body))
         everySuspend { mockInAppPresenter.present(any(), any(), any()) }.returns(Unit)
 
-        val expectedUrlRequest = createTestRequest(null)
+        val expectedUrlRequest = createTestRequest()
 
         eventClient = createEventClient()
 
@@ -228,7 +232,7 @@ class EventClientTests {
 
         everySuspend { mockEmarsysClient.send(any()) }.returns(createTestResponse(body))
 
-        val expectedUrlRequest = createTestRequest(null)
+        val expectedUrlRequest = createTestRequest()
 
         eventClient = createEventClient()
 
@@ -251,7 +255,7 @@ class EventClientTests {
                 body = ""
             )
         )
-        val expectedUrlRequest = createTestRequest(null)
+        val expectedUrlRequest = createTestRequest()
 
         eventClient = createEventClient()
 
@@ -268,11 +272,11 @@ class EventClientTests {
         sessionContext.deviceEventState shouldBe null
     }
 
-    private fun createTestRequest(deviceEventState: JsonObject? = null): UrlRequest {
+    private fun createTestRequest(): UrlRequest {
         val expectedUrlRequest = UrlRequest(
             TEST_BASE_URL,
             HttpMethod.Post,
-            """{"dnd":$IN_APP_DND,"events":[{"type":"custom","id":"$UUID","name":"${testEvent.name}","attributes":{"key":"value"},"timestamp":"$TIMESTAMP"}],"deviceEventState":$deviceEventState}""",
+            """{"dnd":$IN_APP_DND,"events":[{"type":"custom","id":"$UUID","name":"${testEvent.name}","attributes":{"key":"value"},"timestamp":"$TIMESTAMP"}]}""",
         )
         return expectedUrlRequest
     }

@@ -1,8 +1,11 @@
 package com.emarsys.core.device
 
 import android.os.Build
+import com.emarsys.SdkConstants
 import com.emarsys.core.providers.Provider
-import kotlinx.serialization.encodeToString
+import com.emarsys.core.storage.StorageConstants
+import com.emarsys.core.storage.TypedStorageApi
+import com.emarsys.core.wrapper.WrapperInfo
 import kotlinx.serialization.json.Json
 
 actual class DeviceInfoCollector(
@@ -12,22 +15,30 @@ actual class DeviceInfoCollector(
     private val isGooglePlayServicesAvailable: Boolean,
     private val clientIdProvider: Provider<String>,
     private val platformInfoCollector: PlatformInfoCollectorApi,
+    private val wrapperInfoStorage: TypedStorageApi<WrapperInfo?>,
     private val json: Json
 ) : DeviceInfoCollectorApi {
 
     actual override fun collect(): String {
         val deviceInfo = DeviceInfo(
             platform = getPlatform(),
+            platformCategory = SdkConstants.MOBILE_PLATFORM_CATEGORY,
+            platformWrapper = getWrapperInfo()?.platformWrapper,
+            platformWrapperVersion = getWrapperInfo()?.wrapperVersion,
             applicationVersion = applicationVersionProvider.provide(),
             deviceModel = Build.MODEL,
             osVersion = SdkBuildConfig.getOsVersion(),
             sdkVersion = BuildConfig.VERSION_NAME,
-            languageCode = languageProvider.provide(),
+            language = languageProvider.provide(),
             timezone = timezoneProvider.provide(),
             clientId = clientIdProvider.provide()
         )
 
         return json.encodeToString(deviceInfo)
+    }
+
+    private fun getWrapperInfo(): WrapperInfo? {
+        return wrapperInfoStorage.get(StorageConstants.WRAPPER_INFO_KEY)
     }
 
     actual override fun getClientId(): String {

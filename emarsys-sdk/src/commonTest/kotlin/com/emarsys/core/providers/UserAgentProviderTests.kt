@@ -1,5 +1,6 @@
 package com.emarsys.core.providers
 
+import com.emarsys.SdkConstants
 import com.emarsys.core.device.DeviceInfo
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.networking.UserAgentProvider
@@ -18,6 +19,9 @@ class UserAgentProviderTests {
     private companion object {
         val DEVICE_INFO = DeviceInfo(
             "testPlatform",
+            SdkConstants.WEB_PLATFORM_CATEGORY,
+            null,
+            null,
             "testAppVersion",
             "testDeviceModel",
             "testOsVersion",

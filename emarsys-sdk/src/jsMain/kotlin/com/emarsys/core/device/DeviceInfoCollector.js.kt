@@ -1,5 +1,6 @@
 package com.emarsys.core.device
 
+import com.emarsys.SdkConstants
 import com.emarsys.core.providers.Provider
 import kotlinx.browser.window
 import kotlinx.serialization.json.Json
@@ -18,11 +19,14 @@ actual class DeviceInfoCollector(
         return json.encodeToString(
             DeviceInfo(
                 platform = headerData.browserName,
+                platformCategory = SdkConstants.WEB_PLATFORM_CATEGORY,
+                platformWrapper = null,
+                platformWrapperVersion = null,
                 applicationVersion = applicationVersionProvider.provide(),
                 deviceModel = window.navigator.userAgent,
                 osVersion = headerData.browserVersion,
                 sdkVersion = BuildConfig.VERSION_NAME,
-                languageCode = languageProvider.provide(),
+                language = languageProvider.provide(),
                 timezone = timezoneProvider.provide(),
                 clientId = getClientId()
             )

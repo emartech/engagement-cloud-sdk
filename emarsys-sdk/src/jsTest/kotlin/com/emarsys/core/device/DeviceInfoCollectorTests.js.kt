@@ -1,5 +1,6 @@
 package com.emarsys.core.device
 
+import com.emarsys.SdkConstants
 import com.emarsys.core.providers.Provider
 import com.emarsys.util.JsonUtil
 import dev.mokkery.answering.returns
@@ -66,12 +67,15 @@ class DeviceInfoCollectorTests {
     fun collect_shouldReturn_deviceInfo() {
         val expectedDeviceInfo = DeviceInfo(
             platform = BROWSER_NAME,
-            deviceModel = navigator.userAgent,
-            sdkVersion = BuildConfig.VERSION_NAME,
-            osVersion = BROWSER_VERSION,
-            languageCode = LANGUAGE,
-            timezone = TIMEZONE,
+            platformCategory = SdkConstants.WEB_PLATFORM_CATEGORY,
+            platformWrapper = null,
+            platformWrapperVersion = null,
             applicationVersion = APPLICATION_VERSION,
+            deviceModel = navigator.userAgent,
+            osVersion = BROWSER_VERSION,
+            sdkVersion = BuildConfig.VERSION_NAME,
+            language = LANGUAGE,
+            timezone = TIMEZONE,
             clientId = CLIENT_ID
         )
 

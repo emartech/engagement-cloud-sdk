@@ -1,13 +1,13 @@
 package com.emarsys.core.device
 
 import com.emarsys.KotlinPlatform
+import com.emarsys.SdkConstants
 import com.emarsys.core.providers.Provider
 import com.emarsys.util.JsonUtil
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -60,6 +60,9 @@ class DeviceInfoCollectorTests {
     fun collect_shouldCollectDeviceInfo() {
         val deviceInfo = DeviceInfo(
             KotlinPlatform.IOS.name.lowercase(),
+            SdkConstants.MOBILE_PLATFORM_CATEGORY,
+            null,
+            null,
             APP_VERSION,
             DEVICE_MODEL,
             OS_VERSION,
