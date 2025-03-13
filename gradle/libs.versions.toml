@@ -34,7 +34,7 @@ fcm = "24.1.0"
 agconnect_core = "1.9.1.304"
 hms_push = "6.13.0.300"
 googleServices = "4.4.2"
-kotlinWrappers = "2025.2.5"
+kotlinWrappers = "2025.3.11"
 cryptography = "0.4.0"
 sqlDelight = "2.1.0-SNAPSHOT"
 
