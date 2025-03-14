@@ -47,7 +47,7 @@ class MobileEngageSession(
             val sessionStart = timestampProvider.provide()
             try {
                 eventClient.registerEvent(
-                    SdkEvent.Internal.Sdk.SessionStart(
+                    SdkEvent.Internal.Sdk.Custom.SessionStart(
                         id = uuidProvider.provide(),
                         timestamp = sessionStart
                     )
@@ -122,7 +122,7 @@ class MobileEngageSession(
         val sessionEnd = timestampProvider.provide()
         val duration =
             sessionEnd.toEpochMilliseconds() - sessionContext.sessionStart!!
-        return SdkEvent.Internal.Sdk.SessionEnd(
+        return SdkEvent.Internal.Sdk.Custom.SessionEnd(
             id = uuidProvider.provide(),
             attributes = buildJsonObject {
                 put(

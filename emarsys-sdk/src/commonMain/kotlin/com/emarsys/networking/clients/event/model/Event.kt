@@ -93,11 +93,11 @@ sealed interface SdkEvent {
             ) : Sdk(name)
 
             @Serializable
-            data class AppStart(
+            data class Dismiss(
                 override val id: String = UUIDProvider().provide(),
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Sdk(APP_START_EVENT_NAME)
+            ) : Sdk(DISMISS_EVENT_NAME)
 
             @Serializable
             data class ChangeAppCode(
@@ -113,27 +113,32 @@ sealed interface SdkEvent {
                 override val timestamp: Instant = TimestampProvider().provide(),
             ) : Sdk(CHANGE_MERCHANT_ID_NAME)
 
-            @Serializable
-            data class SessionStart(
-                override val id: String = UUIDProvider().provide(),
-                override val attributes: JsonObject? = null,
-                override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Sdk(SESSION_START_EVENT_NAME)
-
-            @Serializable
-            data class SessionEnd(
-                override val id: String = UUIDProvider().provide(),
-                override val attributes: JsonObject? = null,
-                override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Sdk(SESSION_END_EVENT_NAME)
-
-            @Serializable
             @SerialName("internal")
-            data class Dismiss(
-                override val id: String = UUIDProvider().provide(),
-                override val attributes: JsonObject? = null,
-                override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Sdk(DISMISS_EVENT_NAME)
+            sealed interface Custom {
+
+                @Serializable
+                data class AppStart(
+                    override val id: String = UUIDProvider().provide(),
+                    override val attributes: JsonObject? = null,
+                    override val timestamp: Instant = TimestampProvider().provide(),
+                ) : Sdk(APP_START_EVENT_NAME), Custom
+
+                @Serializable
+                data class SessionStart(
+                    override val id: String = UUIDProvider().provide(),
+                    override val attributes: JsonObject? = null,
+                    override val timestamp: Instant = TimestampProvider().provide(),
+                ) : Sdk(SESSION_START_EVENT_NAME), Custom
+
+                @Serializable
+                data class SessionEnd(
+                    override val id: String = UUIDProvider().provide(),
+                    override val attributes: JsonObject? = null,
+                    override val timestamp: Instant = TimestampProvider().provide(),
+                ) : Sdk(SESSION_END_EVENT_NAME), Custom
+            }
+
+
         }
 
         @Serializable

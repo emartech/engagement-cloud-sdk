@@ -47,11 +47,11 @@ class MobileEngageSessionTests {
         val SESSION_END_UTC = Instant.parse("1970-01-02T10:17:37.789Z")
         const val SESSION_DURATION = 1000L
         val SESSION_ID = SessionId("testSessionId")
-        val sessionStartEvent = SdkEvent.Internal.Sdk.SessionStart(
+        val sessionStartEvent = SdkEvent.Internal.Sdk.Custom.SessionStart(
             id = SESSION_ID.value,
             timestamp = SESSION_START_UTC
         )
-        val sessionEndEvent = SdkEvent.Internal.Sdk.SessionEnd(
+        val sessionEndEvent = SdkEvent.Internal.Sdk.Custom.SessionEnd(
             id = SESSION_ID.value,
             attributes = buildJsonObject {
                 put(

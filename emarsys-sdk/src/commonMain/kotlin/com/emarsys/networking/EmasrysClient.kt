@@ -73,7 +73,7 @@ class EmarsysClient(
     }
 
     private fun createRefreshContactTokenRequest() = UrlRequest(
-        urlFactory.create(EmarsysUrlType.REFRESH_TOKEN, null),
+        urlFactory.create(EmarsysUrlType.REFRESH_TOKEN),
         HttpMethod.Post,
         json.encodeToString(RefreshTokenRequestBody(sessionContext.refreshToken!!)),
         mapOf(
