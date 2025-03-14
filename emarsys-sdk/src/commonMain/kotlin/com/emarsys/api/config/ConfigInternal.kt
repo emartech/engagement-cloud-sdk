@@ -34,7 +34,18 @@ class ConfigInternal(
 
     override suspend fun changeMerchantId(merchantId: String) {
         sdkLogger.debug("ConfigInternal - changeMerchantId")
-        TODO("Not yet implemented")
+        sdkEventFlow.emit(
+            SdkEvent.Internal.Sdk.ChangeMerchantId(
+                uuidProvider.provide(),
+                buildJsonObject {
+                    put(
+                        "merchantId",
+                        JsonPrimitive(merchantId)
+                    )
+                },
+                timestampProvider.provide()
+            )
+        )
     }
 
     override suspend fun activate() {

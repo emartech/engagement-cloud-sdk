@@ -27,6 +27,7 @@ class ConfigInternalTests {
         const val UUID = "testUUID"
         val TIMESTAMP = Clock.System.now()
         const val APPCODE = "testApplicationCode"
+        const val MERCHANT_ID = "testMerchantId"
     }
 
     private val eventFlow = MutableSharedFlow<SdkEvent>()
@@ -54,6 +55,20 @@ class ConfigInternalTests {
         }, TIMESTAMP)
         CoroutineScope(Dispatchers.Default).launch {
             configInternal.changeApplicationCode(APPCODE)
+        }
+
+        val result = eventFlow.first()
+
+        result shouldBe expectedEvent
+    }
+
+    @Test
+    fun testChangeMerchantId_shouldEmitChangeMerchantIdEvent_toSdkEventFlow() = runTest {
+        val expectedEvent = SdkEvent.Internal.Sdk.ChangeMerchantId(UUID, buildJsonObject {
+            put("merchantId", JsonPrimitive(MERCHANT_ID))
+        }, TIMESTAMP)
+        CoroutineScope(Dispatchers.Default).launch {
+            configInternal.changeMerchantId(MERCHANT_ID)
         }
 
         val result = eventFlow.first()

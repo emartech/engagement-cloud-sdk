@@ -10,6 +10,7 @@ object SdkConstants {
     const val SESSION_END_EVENT_NAME = "session:end"
     const val APP_START_EVENT_NAME = "app:start"
     const val CHANGE_APP_CODE_NAME = "changeApplicationCode"
+    const val CHANGE_MERCHANT_ID_NAME = "changeMerchantId"
     const val INAPP_VIEWED_EVENT_NAME = "inapp:viewed"
     const val DISMISS_EVENT_NAME = "dismiss"
     const val EMS_DEEP_LINK_TRACKED_KEY = "ems_deep_link_tracked"
