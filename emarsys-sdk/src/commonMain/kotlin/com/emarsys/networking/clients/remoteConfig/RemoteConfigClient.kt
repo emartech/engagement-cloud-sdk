@@ -47,7 +47,10 @@ class RemoteConfigClient(
         async {
             val request =
                 UrlRequest(
-                    urlFactoryApi.create(if (global) EmarsysUrlType.GLOBAL_REMOTE_CONFIG else EmarsysUrlType.REMOTE_CONFIG),
+                    urlFactoryApi.create(
+                        if (global) EmarsysUrlType.GLOBAL_REMOTE_CONFIG else EmarsysUrlType.REMOTE_CONFIG,
+                        null
+                    ),
                     HttpMethod.Get
                 )
             executeRequest(request)
@@ -57,7 +60,10 @@ class RemoteConfigClient(
     private suspend fun fetchSignature(global: Boolean): Deferred<String?> = coroutineScope {
         async {
             val request = UrlRequest(
-                urlFactoryApi.create(if (global) EmarsysUrlType.GLOBAL_REMOTE_CONFIG_SIGNATURE else EmarsysUrlType.REMOTE_CONFIG_SIGNATURE),
+                urlFactoryApi.create(
+                    if (global) EmarsysUrlType.GLOBAL_REMOTE_CONFIG_SIGNATURE else EmarsysUrlType.REMOTE_CONFIG_SIGNATURE,
+                    null
+                ),
                 HttpMethod.Get
             )
             executeRequest(request)

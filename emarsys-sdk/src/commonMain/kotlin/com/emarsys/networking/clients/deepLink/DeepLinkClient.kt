@@ -21,7 +21,7 @@ class DeepLinkClient(private val networkClient: NetworkClientApi,
     override suspend fun trackDeepLink(trackingId: String) {
         val requestBody = buildJsonObject { put("ems_dl", JsonPrimitive(trackingId)) }
         val headers = mapOf(UserAgentProvider.USER_AGENT_HEADER_NAME to userAgentProvider.provide())
-        val request = UrlRequest(urlFactory.create(EmarsysUrlType.DEEP_LINK), method = HttpMethod.Post, headers = headers,
+        val request = UrlRequest(urlFactory.create(EmarsysUrlType.DEEP_LINK, null), method = HttpMethod.Post, headers = headers,
             bodyString = json.encodeToString(requestBody)
         )
         try {

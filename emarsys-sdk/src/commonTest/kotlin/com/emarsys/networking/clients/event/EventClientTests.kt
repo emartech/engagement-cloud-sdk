@@ -109,7 +109,7 @@ class EventClientTests {
             StandardTestDispatcher()
         sessionContext = SessionContext()
         every { mockInAppConfig.inAppDnd }.returns(IN_APP_DND)
-        every { mockUrlFactory.create(EmarsysUrlType.EVENT) }.returns(TEST_BASE_URL)
+        every { mockUrlFactory.create(EmarsysUrlType.EVENT, null) }.returns(TEST_BASE_URL)
         everySuspend { mockSdkLogger.error(any(), any<Throwable>()) } calls {
             (it.args[1] as Throwable).printStackTrace()
             throw it.args[1] as Throwable
@@ -152,7 +152,7 @@ class EventClientTests {
         sessionContext.deviceEventState = DEVICE_EVENT_STATE
 
         everySuspend { mockEmarsysClient.send(any()) }.returns(createTestResponse("{}"))
-        every { mockUrlFactory.create(EmarsysUrlType.EVENT) }.returns(TEST_BASE_URL)
+        every { mockUrlFactory.create(EmarsysUrlType.EVENT, null) }.returns(TEST_BASE_URL)
 
         val expectedUrlRequest = UrlRequest(
             TEST_BASE_URL,
@@ -183,7 +183,7 @@ class EventClientTests {
         val responseBody = json.encodeToString(deviceEventResponse)
 
         everySuspend { mockEmarsysClient.send(any()) }.returns(createTestResponse(responseBody))
-        every { mockUrlFactory.create(EmarsysUrlType.EVENT) }.returns(TEST_BASE_URL)
+        every { mockUrlFactory.create(EmarsysUrlType.EVENT, null) }.returns(TEST_BASE_URL)
 
         val expectedUrlRequest = createTestRequest()
 

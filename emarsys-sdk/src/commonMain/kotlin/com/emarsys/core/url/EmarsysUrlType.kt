@@ -1,6 +1,7 @@
 package com.emarsys.core.url
 
 enum class EmarsysUrlType {
+    CHANGE_APPLICATION_CODE,
     LINK_CONTACT,
     UNLINK_CONTACT,
     REFRESH_TOKEN,

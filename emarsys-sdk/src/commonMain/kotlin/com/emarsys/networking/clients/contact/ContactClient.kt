@@ -33,7 +33,7 @@ class ContactClient(
                 openIdToken
             )
         )
-        val url = urlFactory.create(EmarsysUrlType.LINK_CONTACT)
+        val url = urlFactory.create(EmarsysUrlType.LINK_CONTACT, null)
         val headers = mutableMapOf<String, Any?>()
 
         if (sdkContext.config?.merchantId != null) {
@@ -54,7 +54,7 @@ class ContactClient(
 
     override suspend fun unlinkContact(): Response {
         sdkLogger.debug("ContactClient - unlinkContact")
-        val url = urlFactory.create(EmarsysUrlType.UNLINK_CONTACT)
+        val url = urlFactory.create(EmarsysUrlType.UNLINK_CONTACT, null)
         val headers = mutableMapOf<String, Any?>()
 
         if (sdkContext.config?.merchantId != null) {

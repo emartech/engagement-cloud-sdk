@@ -1,6 +1,7 @@
 package com.emarsys.networking.clients.event.model
 
 import com.emarsys.SdkConstants.APP_START_EVENT_NAME
+import com.emarsys.SdkConstants.CHANGE_APP_CODE_NAME
 import com.emarsys.SdkConstants.DISMISS_EVENT_NAME
 import com.emarsys.SdkConstants.INAPP_VIEWED_EVENT_NAME
 import com.emarsys.SdkConstants.IN_APP_BUTTON_CLICKED_EVENT_NAME
@@ -96,6 +97,13 @@ sealed interface SdkEvent {
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
             ) : Sdk(APP_START_EVENT_NAME)
+
+            @Serializable
+            data class ChangeAppCode(
+                override val id: String = UUIDProvider().provide(),
+                override val attributes: JsonObject? = null,
+                override val timestamp: Instant = TimestampProvider().provide(),
+            ) : Sdk(CHANGE_APP_CODE_NAME)
 
             @Serializable
             data class SessionStart(

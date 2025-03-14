@@ -6,7 +6,6 @@ import com.emarsys.core.url.EmarsysUrlType.PUSH_TOKEN
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.networking.clients.push.model.PushToken
 import io.ktor.http.HttpMethod
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class PushClient(
@@ -15,13 +14,13 @@ class PushClient(
     private val json: Json
 ) : PushClientApi {
     override suspend fun registerPushToken(pushToken: String) {
-        val url = urlFactory.create(PUSH_TOKEN)
+        val url = urlFactory.create(PUSH_TOKEN, null)
         val body = json.encodeToString(PushToken(pushToken))
         emarsysClient.send(UrlRequest(url, HttpMethod.Put, body))
     }
 
     override suspend fun clearPushToken() {
-        val url = urlFactory.create(PUSH_TOKEN)
+        val url = urlFactory.create(PUSH_TOKEN, null)
         emarsysClient.send(UrlRequest(url, HttpMethod.Delete))
     }
 }

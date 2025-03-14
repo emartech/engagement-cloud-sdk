@@ -96,7 +96,7 @@ class EmarsysClientTests {
             install(HttpRequestRetry)
         }
         every { mockTimestampProvider.provide() } returns now
-        every { mockUrlFactory.create(EmarsysUrlType.REFRESH_TOKEN) } returns Url("https://testUrl.com")
+        every { mockUrlFactory.create(EmarsysUrlType.REFRESH_TOKEN, null) } returns Url("https://testUrl.com")
 
         networkClient = GenericNetworkClient(httpClient, sdkLogger = mock(MockMode.autofill))
         emarsysClient = EmarsysClient(

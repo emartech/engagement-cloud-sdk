@@ -76,7 +76,7 @@ class ContactClientTests {
             Headers.Empty,
             """{"refreshToken":"testRefreshToken", "contactToken":"testContactToken"}"""
         )
-        every { mockUrlFactory.create(EmarsysUrlType.LINK_CONTACT) } returns testUrl
+        every { mockUrlFactory.create(EmarsysUrlType.LINK_CONTACT, null) } returns testUrl
         everySuspend { mockEmarsysClient.send(expectedUrlRequest) } returns expectedResponse
         everySuspend { mockContactTokenHandler.handleContactTokens(expectedResponse) } returns Unit
 
@@ -109,7 +109,7 @@ class ContactClientTests {
             Headers.Empty,
             """{"refreshToken":"testRefreshToken", "contactToken":"testContactToken"}"""
         )
-        every { mockUrlFactory.create(EmarsysUrlType.LINK_CONTACT) } returns testUrl
+        every { mockUrlFactory.create(EmarsysUrlType.LINK_CONTACT, null) } returns testUrl
         everySuspend { mockEmarsysClient.send(expectedUrlRequest) } returns Response(
             expectedUrlRequest,
             HttpStatusCode.OK,
@@ -153,7 +153,7 @@ class ContactClientTests {
                 },
                 """{"refreshToken":"testRefreshToken", "contactToken":"testContactToken"}"""
             )
-            every { mockUrlFactory.create(EmarsysUrlType.LINK_CONTACT) } returns testUrl
+            every { mockUrlFactory.create(EmarsysUrlType.LINK_CONTACT, null) } returns testUrl
             everySuspend { mockEmarsysClient.send(expectedUrlRequest) } returns Response(
                 expectedUrlRequest,
                 HttpStatusCode.OK,
@@ -186,7 +186,7 @@ class ContactClientTests {
             null,
             mapOf()
         )
-        every { mockUrlFactory.create(EmarsysUrlType.UNLINK_CONTACT) } returns testUrl
+        every { mockUrlFactory.create(EmarsysUrlType.UNLINK_CONTACT, null) } returns testUrl
         everySuspend { mockEmarsysClient.send(expectedUrlRequest) } returns Response(
             expectedUrlRequest,
             HttpStatusCode.OK,
@@ -227,7 +227,7 @@ class ContactClientTests {
                 null,
                 mapOf("ems-merchant-id" to MERCHANT_ID)
             )
-            every { mockUrlFactory.create(EmarsysUrlType.UNLINK_CONTACT) } returns testUrl
+            every { mockUrlFactory.create(EmarsysUrlType.UNLINK_CONTACT, null) } returns testUrl
             everySuspend { mockEmarsysClient.send(expectedUrlRequest) } returns Response(
                 expectedUrlRequest,
                 HttpStatusCode.OK,

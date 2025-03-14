@@ -2,6 +2,7 @@ package com.emarsys.core.url
 
 import com.emarsys.context.SdkContextApi
 import com.emarsys.context.isConfigPredictOnly
+import com.emarsys.core.url.EmarsysUrlType.CHANGE_APPLICATION_CODE
 import com.emarsys.core.url.EmarsysUrlType.DEEP_LINK
 import com.emarsys.core.url.EmarsysUrlType.EVENT
 import com.emarsys.core.url.EmarsysUrlType.GLOBAL_REMOTE_CONFIG
@@ -23,34 +24,41 @@ class UrlFactory(
         const val V4_API = "v4"
     }
 
-    override fun create(urlType: EmarsysUrlType): Url {
+    override fun create(urlType: EmarsysUrlType, applicationCode: String?): Url {
+        val appCode = applicationCode ?: sdkContext.config?.applicationCode
         return when (urlType) {
+            CHANGE_APPLICATION_CODE -> {
+                URLBuilder("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/$appCode/client/app").build()
+            }
             LINK_CONTACT -> createUrlBasedOnPredict(
                 sdkContext.defaultUrls.clientServiceBaseUrl,
                 "contact-token",
-                "client/contact"
+                "client/contact",
+                appCode
             ).build()
 
             UNLINK_CONTACT -> createUrlBasedOnPredict(
                 sdkContext.defaultUrls.clientServiceBaseUrl,
                 "contact",
-                "client/contact"
+                "client/contact",
+                appCode
             ).build()
 
             REFRESH_TOKEN -> createUrlBasedOnPredict(
                 sdkContext.defaultUrls.clientServiceBaseUrl,
                 "contact-token",
-                "contact-token"
+                "contact-token",
+                appCode
             ).build()
 
-            PUSH_TOKEN -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${sdkContext.config?.applicationCode}/client/push-token")
-            REGISTER_DEVICE_INFO -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${sdkContext.config?.applicationCode}/client")
+            PUSH_TOKEN -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/$appCode/client/push-token")
+            REGISTER_DEVICE_INFO -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/$appCode/client")
             EVENT -> {
-                Url("${sdkContext.defaultUrls.eventServiceBaseUrl}/$V4_API/apps/${sdkContext.config?.applicationCode}/client/events")
+                Url("${sdkContext.defaultUrls.eventServiceBaseUrl}/$V4_API/apps/$appCode/client/events")
             }
 
-            REMOTE_CONFIG_SIGNATURE -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/signature/${sdkContext.config?.applicationCode}")
-            REMOTE_CONFIG -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/${sdkContext.config?.applicationCode}")
+            REMOTE_CONFIG_SIGNATURE -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/signature/$appCode")
+            REMOTE_CONFIG -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/$appCode")
             GLOBAL_REMOTE_CONFIG_SIGNATURE -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/signature/GLOBAL")
             GLOBAL_REMOTE_CONFIG -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/GLOBAL")
             DEEP_LINK -> Url(sdkContext.defaultUrls.deepLinkBaseUrl)
@@ -60,12 +68,13 @@ class UrlFactory(
     private fun createUrlBasedOnPredict(
         baseUrl: String,
         predictPath: String,
-        mePath: String
+        mePath: String,
+        appCode: String? = null
     ): URLBuilder {
         return if (sdkContext.isConfigPredictOnly()) {
             URLBuilder("$baseUrl/$V4_API/$predictPath")
         } else {
-            URLBuilder("$baseUrl/$V4_API/apps/${sdkContext.config?.applicationCode}/$mePath")
+            URLBuilder("$baseUrl/$V4_API/apps/$appCode/$mePath")
         }
     }
 }

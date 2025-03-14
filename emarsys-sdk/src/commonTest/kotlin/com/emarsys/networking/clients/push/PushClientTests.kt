@@ -47,7 +47,7 @@ class PushClientTests {
         every { mockDefaultUrls.clientServiceBaseUrl } returns clientServiceBaseUrl
         every { mockSdkContext.config } returns EmarsysConfig("EMS11-C3FD3")
         every {
-            mockUrlFactory.create(EmarsysUrlType.PUSH_TOKEN)
+            mockUrlFactory.create(EmarsysUrlType.PUSH_TOKEN, null)
         } returns Url("$clientServiceBaseUrl/v3/apps/EMS11-C3FD3/client/push-token")
 
         val expectedUrlRequest = UrlRequest(
@@ -75,7 +75,7 @@ class PushClientTests {
         every { mockDefaultUrls.clientServiceBaseUrl } returns clientServiceBaseUrl
         every { mockSdkContext.config } returns EmarsysConfig("EMS11-C3FD3")
         every {
-            mockUrlFactory.create(EmarsysUrlType.PUSH_TOKEN)
+            mockUrlFactory.create(EmarsysUrlType.PUSH_TOKEN, null)
         } returns Url("$clientServiceBaseUrl/v3/apps/EMS11-C3FD3/client/push-token")
 
         val expectedUrlRequest = UrlRequest(
