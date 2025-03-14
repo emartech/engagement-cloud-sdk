@@ -1,6 +1,6 @@
 package com.emarsys.mobileengage.action.actions
 
-import com.emarsys.core.pushtoinapp.PushToInAppHandlerApi
+import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
 
 class PushToInappAction(

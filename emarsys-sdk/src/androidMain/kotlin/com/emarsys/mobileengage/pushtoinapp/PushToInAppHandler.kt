@@ -1,7 +1,7 @@
 package com.emarsys.mobileengage.pushtoinapp
 
+import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.log.Logger
-import com.emarsys.core.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandlerApi

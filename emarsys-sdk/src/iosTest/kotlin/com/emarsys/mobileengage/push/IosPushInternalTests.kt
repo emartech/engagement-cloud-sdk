@@ -11,10 +11,10 @@ import com.emarsys.api.push.PushCall.RegisterPushToken
 import com.emarsys.api.push.PushContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
-import com.emarsys.core.badge.BadgeCountHandlerApi
+import com.emarsys.core.actions.badge.BadgeCountHandlerApi
+import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.Provider
-import com.emarsys.core.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.mobileengage.action.ActionFactoryApi

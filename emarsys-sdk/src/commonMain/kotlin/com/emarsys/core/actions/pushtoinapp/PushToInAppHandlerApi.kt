@@ -1,4 +1,4 @@
-package com.emarsys.core.pushtoinapp
+package com.emarsys.core.actions.pushtoinapp
 
 import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
 

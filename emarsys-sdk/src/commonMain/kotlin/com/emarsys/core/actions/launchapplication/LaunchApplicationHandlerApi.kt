@@ -1,4 +1,4 @@
-package com.emarsys.core.launchapplication
+package com.emarsys.core.actions.launchapplication
 
 interface LaunchApplicationHandlerApi {
 

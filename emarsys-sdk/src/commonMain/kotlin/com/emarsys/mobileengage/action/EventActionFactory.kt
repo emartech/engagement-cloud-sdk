@@ -1,6 +1,6 @@
 package com.emarsys.mobileengage.action
 
-import com.emarsys.core.clipboard.ClipboardHandlerApi
+import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.url.ExternalUrlOpenerApi

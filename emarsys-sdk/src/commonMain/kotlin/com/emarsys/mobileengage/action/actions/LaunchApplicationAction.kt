@@ -1,6 +1,6 @@
 package com.emarsys.mobileengage.action.actions
 
-import com.emarsys.core.launchapplication.LaunchApplicationHandlerApi
+import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
 
 class LaunchApplicationAction(private val launchApplicationHandler: LaunchApplicationHandlerApi) :
     Action<Unit> {

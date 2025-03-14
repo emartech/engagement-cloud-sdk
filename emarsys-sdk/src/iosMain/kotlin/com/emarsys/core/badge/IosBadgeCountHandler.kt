@@ -1,5 +1,6 @@
 package com.emarsys.core.badge
 
+import com.emarsys.core.actions.badge.BadgeCountHandlerApi
 import com.emarsys.core.device.UIDevice
 import com.emarsys.mobileengage.action.models.BadgeCount
 import com.emarsys.mobileengage.action.models.BadgeCountMethod.ADD

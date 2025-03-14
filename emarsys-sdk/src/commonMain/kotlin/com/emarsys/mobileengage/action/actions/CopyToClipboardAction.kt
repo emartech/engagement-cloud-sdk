@@ -1,6 +1,6 @@
 package com.emarsys.mobileengage.action.actions
 
-import com.emarsys.core.clipboard.ClipboardHandlerApi
+import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.mobileengage.action.models.CopyToClipboardActionModel
 
 class CopyToClipboardAction(

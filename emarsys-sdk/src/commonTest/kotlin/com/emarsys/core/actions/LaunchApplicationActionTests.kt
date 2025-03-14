@@ -1,6 +1,6 @@
 package com.emarsys.core.actions
 
-import com.emarsys.core.launchapplication.LaunchApplicationHandlerApi
+import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.mobileengage.action.actions.LaunchApplicationAction
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend

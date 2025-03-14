@@ -13,7 +13,7 @@ import com.emarsys.api.push.PushCall.RegisterPushToken
 import com.emarsys.api.push.PushInternal
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
-import com.emarsys.core.badge.BadgeCountHandlerApi
+import com.emarsys.core.actions.badge.BadgeCountHandlerApi
 import com.emarsys.core.collections.dequeue
 import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.Provider

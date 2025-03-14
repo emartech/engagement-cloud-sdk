@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import com.emarsys.AndroidEmarsysConfig
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.device.AndroidVersionUtils.isUpsideDownCake
 import com.emarsys.core.device.AndroidVersionUtils.isUpsideDownCakeOrAbove
 import com.emarsys.core.log.Logger

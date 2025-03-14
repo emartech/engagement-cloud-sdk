@@ -1,5 +1,6 @@
 package com.emarsys.core.clipboard
 
+import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import kotlinx.coroutines.await
 import org.w3c.dom.clipboard.Clipboard
 

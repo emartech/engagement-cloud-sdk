@@ -61,13 +61,14 @@ import com.emarsys.context.DefaultUrlsApi
 import com.emarsys.context.SdkContext
 import com.emarsys.core.actions.ActionHandler
 import com.emarsys.core.actions.ActionHandlerApi
-import com.emarsys.core.clipboard.ClipboardHandlerApi
+import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
+import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
+import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.collections.persistentListOf
 import com.emarsys.core.crypto.Crypto
 import com.emarsys.core.crypto.CryptoApi
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
-import com.emarsys.core.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.SdkLogger
@@ -81,7 +82,6 @@ import com.emarsys.core.providers.SuspendProvider
 import com.emarsys.core.providers.TimestampProvider
 import com.emarsys.core.providers.TimezoneProvider
 import com.emarsys.core.providers.UUIDProvider
-import com.emarsys.core.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.state.StateMachine
 import com.emarsys.core.storage.Storage
@@ -121,7 +121,6 @@ import com.emarsys.networking.clients.device.DeviceClient
 import com.emarsys.networking.clients.device.DeviceClientApi
 import com.emarsys.networking.clients.event.EventClient
 import com.emarsys.networking.clients.event.EventClientApi
-
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClient
 import com.emarsys.networking.clients.push.PushClientApi

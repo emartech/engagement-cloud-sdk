@@ -13,10 +13,12 @@ import com.emarsys.api.push.PushInternal
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
+import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
+import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
+import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.badge.WebBadgeCountHandler
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.cache.WebFileCache
-import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.clipboard.WebClipboardHandler
 import com.emarsys.core.db.EmarsysIndexedDb
 import com.emarsys.core.db.EmarsysIndexedDbObjectStore
@@ -26,7 +28,6 @@ import com.emarsys.core.db.events.JSEventsDao
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.WebPlatformInfoCollector
 import com.emarsys.core.launchapplication.JsLaunchApplicationHandler
-import com.emarsys.core.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.permission.PermissionHandlerApi
@@ -35,7 +36,6 @@ import com.emarsys.core.provider.ApplicationVersionProvider
 import com.emarsys.core.provider.WebLanguageProvider
 import com.emarsys.core.providers.ClientIdProvider
 import com.emarsys.core.providers.Provider
-import com.emarsys.core.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.TypedStorageApi

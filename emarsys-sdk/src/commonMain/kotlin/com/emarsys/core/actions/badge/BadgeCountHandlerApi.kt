@@ -1,4 +1,4 @@
-package com.emarsys.core.badge
+package com.emarsys.core.actions.badge
 
 import com.emarsys.mobileengage.action.models.BadgeCount
 

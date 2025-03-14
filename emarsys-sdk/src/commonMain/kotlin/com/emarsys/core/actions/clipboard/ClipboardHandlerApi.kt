@@ -1,4 +1,4 @@
-package com.emarsys.core.clipboard
+package com.emarsys.core.actions.clipboard
 
 interface ClipboardHandlerApi {
 

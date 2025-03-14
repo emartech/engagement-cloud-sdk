@@ -1,7 +1,7 @@
 package com.emarsys.mobileengage.action
 
-import com.emarsys.core.badge.BadgeCountHandlerApi
-import com.emarsys.core.clipboard.ClipboardHandlerApi
+import com.emarsys.core.actions.badge.BadgeCountHandlerApi
+import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.permission.PermissionHandlerApi

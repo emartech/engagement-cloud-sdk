@@ -1,7 +1,7 @@
 package com.emarsys.mobileengage.action
 
-import com.emarsys.core.launchapplication.LaunchApplicationHandlerApi
-import com.emarsys.core.pushtoinapp.PushToInAppHandlerApi
+import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
+import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.mobileengage.action.actions.Action
 import com.emarsys.mobileengage.action.actions.LaunchApplicationAction
 import com.emarsys.mobileengage.action.actions.PushToInappAction
