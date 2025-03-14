@@ -2,6 +2,9 @@ package com.emarsys.core.device
 
 import com.emarsys.SdkConstants
 import com.emarsys.core.providers.Provider
+import com.emarsys.core.storage.StorageConstants
+import com.emarsys.core.storage.TypedStorageApi
+import com.emarsys.core.wrapper.WrapperInfo
 import com.emarsys.util.JsonUtil
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -21,6 +24,8 @@ class DeviceInfoCollectorTests {
         const val APPLICATION_VERSION = "2.0.0"
         const val LANGUAGE = "testLanguage"
         const val CLIENT_ID = "stored client id"
+        const val WRAPPER_PLATFORM = "flutter"
+        const val WRAPPER_VERSION = "1.0.0"
 
         val navigator = window.navigator
         val testWebPlatformInfo = WebPlatformInfo(
@@ -38,6 +43,7 @@ class DeviceInfoCollectorTests {
     private lateinit var mockTimezoneProvider: Provider<String>
     private lateinit var mockApplicationVersionProvider: Provider<String>
     private lateinit var mockLanguageProvider: Provider<String>
+    private lateinit var mockWrapperInfoStorage: TypedStorageApi<WrapperInfo?>
     private lateinit var deviceInfoCollector: DeviceInfoCollector
     private val json: Json = JsonUtil.json
 
@@ -53,13 +59,17 @@ class DeviceInfoCollectorTests {
         every { mockWebPlatformInfoCollector.collect() } returns testWebPlatformInfo
         mockLanguageProvider = mock()
         every { mockLanguageProvider.provide() } returns LANGUAGE
+        mockWrapperInfoStorage = mock()
+        every { mockWrapperInfoStorage.get(StorageConstants.WRAPPER_INFO_KEY) } returns null
+
         deviceInfoCollector = DeviceInfoCollector(
             mockClientIdProvider,
             mockTimezoneProvider,
             mockWebPlatformInfoCollector,
             mockApplicationVersionProvider,
             mockLanguageProvider,
-            json
+            mockWrapperInfoStorage,
+            json,
         )
     }
 
@@ -70,6 +80,32 @@ class DeviceInfoCollectorTests {
             platformCategory = SdkConstants.WEB_PLATFORM_CATEGORY,
             platformWrapper = null,
             platformWrapperVersion = null,
+            applicationVersion = APPLICATION_VERSION,
+            deviceModel = navigator.userAgent,
+            osVersion = BROWSER_VERSION,
+            sdkVersion = BuildConfig.VERSION_NAME,
+            language = LANGUAGE,
+            timezone = TIMEZONE,
+            clientId = CLIENT_ID
+        )
+
+        val result = deviceInfoCollector.collect()
+
+        result shouldBe json.encodeToString(expectedDeviceInfo)
+    }
+
+    @Test
+    fun collect_shouldReturn_deviceInfo_whenWrapper() {
+        every { mockWrapperInfoStorage.get(StorageConstants.WRAPPER_INFO_KEY) } returns WrapperInfo(
+            platformWrapper = WRAPPER_PLATFORM,
+            wrapperVersion = WRAPPER_VERSION
+        )
+
+        val expectedDeviceInfo = DeviceInfo(
+            platform = BROWSER_NAME,
+            platformCategory = SdkConstants.WEB_PLATFORM_CATEGORY,
+            platformWrapper = WRAPPER_PLATFORM,
+            platformWrapperVersion = WRAPPER_VERSION,
             applicationVersion = APPLICATION_VERSION,
             deviceModel = navigator.userAgent,
             osVersion = BROWSER_VERSION,
