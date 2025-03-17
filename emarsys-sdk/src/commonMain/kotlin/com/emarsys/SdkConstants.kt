@@ -13,6 +13,8 @@ object SdkConstants {
     const val CHANGE_MERCHANT_ID_NAME = "changeMerchantId"
     const val INAPP_VIEWED_EVENT_NAME = "inapp:viewed"
     const val DISMISS_EVENT_NAME = "dismiss"
+    const val REREGISTRATION_REQUIRED_EVENT_NAME = "ReregistrationRequired"
+    const val REMOTE_CONFIG_UPDATE_REQUIRED_EVENT_NAME = "RemoteConfigUpdateRequired"
     const val EMS_DEEP_LINK_TRACKED_KEY = "ems_deep_link_tracked"
 
     const val MOBILE_PLATFORM_CATEGORY = "mobile"

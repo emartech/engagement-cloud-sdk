@@ -7,6 +7,8 @@ import com.emarsys.SdkConstants.DISMISS_EVENT_NAME
 import com.emarsys.SdkConstants.INAPP_VIEWED_EVENT_NAME
 import com.emarsys.SdkConstants.IN_APP_BUTTON_CLICKED_EVENT_NAME
 import com.emarsys.SdkConstants.PUSH_CLICKED_EVENT_NAME
+import com.emarsys.SdkConstants.REMOTE_CONFIG_UPDATE_REQUIRED_EVENT_NAME
+import com.emarsys.SdkConstants.REREGISTRATION_REQUIRED_EVENT_NAME
 import com.emarsys.SdkConstants.SESSION_END_EVENT_NAME
 import com.emarsys.SdkConstants.SESSION_START_EVENT_NAME
 import com.emarsys.core.providers.TimestampProvider
@@ -98,6 +100,20 @@ sealed interface SdkEvent {
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
             ) : Sdk(DISMISS_EVENT_NAME)
+
+            @Serializable
+            data class ReregistrationRequired(
+                override val id: String = UUIDProvider().provide(),
+                override val attributes: JsonObject? = null,
+                override val timestamp: Instant = TimestampProvider().provide(),
+            ) : Sdk(REREGISTRATION_REQUIRED_EVENT_NAME)
+
+            @Serializable
+            data class RemoteConfigUpdateRequired(
+                override val id: String = UUIDProvider().provide(),
+                override val attributes: JsonObject? = null,
+                override val timestamp: Instant = TimestampProvider().provide(),
+            ) : Sdk(REMOTE_CONFIG_UPDATE_REQUIRED_EVENT_NAME)
 
             @Serializable
             data class ChangeAppCode(

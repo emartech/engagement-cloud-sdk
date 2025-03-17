@@ -16,10 +16,12 @@ import com.emarsys.networking.EmarsysHeaders.REQUEST_ORDER_HEADER
 import com.emarsys.networking.EmarsysHeaders.X_CLIENT_ID_HEADER
 import com.emarsys.networking.EmarsysHeaders.X_CLIENT_STATE_HEADER
 import com.emarsys.networking.EmarsysHeaders.X_CONTACT_TOKEN_HEADER
+import com.emarsys.networking.clients.event.model.SdkEvent
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
@@ -32,7 +34,8 @@ class EmarsysClient(
     private val timestampProvider: Provider<Instant>,
     private val urlFactory: UrlFactoryApi,
     private val json: Json,
-    private val sdkLogger: Logger
+    private val sdkLogger: Logger,
+    private val sdkEventFlow: MutableSharedFlow<SdkEvent>
 ) : NetworkClientApi {
     private companion object {
         private const val MAX_RETRY_COUNT = 3
@@ -42,6 +45,7 @@ class EmarsysClient(
         return refreshContactToken {
             val emarsysRequest = addEmarsysHeaders(request)
             val response = networkClient.send(emarsysRequest)
+            handleEmarsysResponse(response)
             handleClientState(response)
             response
         }
@@ -82,6 +86,21 @@ class EmarsysClient(
             REQUEST_ORDER_HEADER to timestampProvider.provide().toEpochMilliseconds()
         )
     )
+
+    private suspend fun handleEmarsysResponse(response: Response) {
+        val event = when (response.status.value) {
+            in 1100..1199 -> SdkEvent.Internal.Sdk.ReregistrationRequired()
+            in 1200..1299 -> SdkEvent.Internal.Sdk.RemoteConfigUpdateRequired()
+            else -> null
+        }
+        sdkLogger.debug(
+            "EmarsysClient - handleEmarsysResponse",
+            "Received ${response.status.value} status code, mapped to ${event?.name ?: "unknown"} event",
+        )
+        event?.let {
+            sdkEventFlow.emit(event)
+        }
+    }
 
     private fun handleClientState(response: Response) {
         if (response.status.isSuccess()) {

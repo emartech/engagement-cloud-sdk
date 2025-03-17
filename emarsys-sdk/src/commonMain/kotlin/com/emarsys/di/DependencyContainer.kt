@@ -310,7 +310,8 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             timestampProvider,
             urlFactory,
             json,
-            sdkLogger
+            sdkLogger,
+            sdkEventFlow
         )
     }
 
