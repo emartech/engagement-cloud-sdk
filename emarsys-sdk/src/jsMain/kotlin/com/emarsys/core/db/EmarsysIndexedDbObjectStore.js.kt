@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.StringFormat
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import web.events.EventHandler
 import web.idb.IDBTransactionMode
 import web.idb.IDBValidKey
@@ -57,8 +58,8 @@ class EmarsysIndexedDbObjectStore<T>(
             }
         }
         logger.debug("EmarsysIndexedDbObjectStore - put", buildJsonObject {
-            put("value", JsonPrimitive(value.toString()))
-            put("id", JsonPrimitive(id))
+            put("value", value.toString())
+            put("id", id)
         })
         return savedId
     }
@@ -107,7 +108,7 @@ class EmarsysIndexedDbObjectStore<T>(
     suspend fun get(id: String): T? {
         val database = emarsysIndexedDb.open()
         logger.debug("EmarsysIndexedDbObjectStore - get", buildJsonObject {
-            put("id", JsonPrimitive(id))
+            put("id", id)
         })
         return suspendCoroutine { continuation ->
             val transaction = database.transaction(
@@ -139,6 +140,38 @@ class EmarsysIndexedDbObjectStore<T>(
                         "EmarsysIndexedDbObjectStore - get",
                         buildJsonObject {
                             put("id", JsonPrimitive(id))
+                        }
+                    )
+                }
+                continuation.resumeWithException(request.error!!)
+            }
+        }
+    }
+
+    override suspend fun delete(id: String) {
+        val database = emarsysIndexedDb.open()
+        logger.debug("EmarsysIndexedDbObjectStore - delete", buildJsonObject {
+            put("id", id)
+        })
+        return suspendCoroutine { continuation ->
+            val transaction = database.transaction(
+                emarsysObjectStoreConfig.name,
+                IDBTransactionMode.readwrite
+            )
+
+            val request =
+                transaction.objectStore(emarsysObjectStoreConfig.name).delete(IDBValidKey(id))
+
+            transaction.oncomplete = EventHandler {
+                continuation.resume(Unit)
+            }
+
+            transaction.onerror = EventHandler {
+                CoroutineScope(sdkDispatcher).launch {
+                    logger.error(
+                        "EmarsysIndexedDbObjectStore - delete",
+                        buildJsonObject {
+                            put("id", id)
                         }
                     )
                 }

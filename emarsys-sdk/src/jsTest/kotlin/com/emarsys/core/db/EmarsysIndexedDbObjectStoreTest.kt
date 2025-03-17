@@ -327,8 +327,49 @@ class EmarsysIndexedDbObjectStoreTest {
         result shouldBe null
     }
 
+    @Test
+    fun delete_shouldDeleteSdkEvent_whenItExists() = runTest {
+        clearDatabase()
+        val objectStoreConfig = EmarsysObjectStoreConfig.Events
+        val emarsysIndexedDbObjectStore = EmarsysIndexedDbObjectStore(
+            emarsysIndexedDb,
+            objectStoreConfig,
+            json,
+            mockLogger,
+            StandardTestDispatcher()
+        )
+
+        val event = SdkEvent.External.Custom(
+            "id",
+            "name",
+            buildJsonObject { put("key", JsonPrimitive("value")) })
+
+        emarsysIndexedDbObjectStore.put("id", event)
+
+        emarsysIndexedDbObjectStore.delete("id")
+
+        checkDb(null, EmarsysObjectStoreConfig.Events)
+    }
+
+    @Test
+    fun delete_shouldDoNothing_whenSdkEventDoesNotExist() = runTest {
+        clearDatabase()
+        val objectStoreConfig = EmarsysObjectStoreConfig.Events
+        val emarsysIndexedDbObjectStore = EmarsysIndexedDbObjectStore(
+            emarsysIndexedDb,
+            objectStoreConfig,
+            json,
+            mockLogger,
+            StandardTestDispatcher()
+        )
+
+        emarsysIndexedDbObjectStore.delete("notExistingId")
+
+        checkDb(null, EmarsysObjectStoreConfig.Events)
+    }
+
     private suspend fun <T> checkDb(
-        expectedValue: T,
+        expectedValue: T?,
         objectStoreConfig: EmarsysObjectStoreConfig<T>
     ) {
         val database = emarsysIndexedDb.open()
@@ -339,10 +380,14 @@ class EmarsysIndexedDbObjectStoreTest {
                 .get(IDBValidKey("id"))
 
             transaction.oncomplete = EventHandler {
-                JsonUtil.json.decodeFromString(
-                    objectStoreConfig.serializer,
-                    JSON.stringify(request.result)
-                ) shouldBe expectedValue
+                if(expectedValue == null) {
+                    request.result shouldBe null
+                } else {
+                    JsonUtil.json.decodeFromString(
+                        objectStoreConfig.serializer,
+                        JSON.stringify(request.result)
+                    ) shouldBe expectedValue
+                }
                 continuation.resume(Unit)
             }
 

@@ -7,6 +7,7 @@ import com.emarsys.util.JsonUtil
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
@@ -66,5 +67,20 @@ class IosSqDelightEventsDaoTests {
         advanceUntilIdle()
 
         result shouldBe null
+    }
+
+    @Test
+    fun testRemoveEvent_shouldDoNothing_whenNothingWasInserted() = runTest {
+        eventsDao.removeEvent(SdkEvent.External.Custom("testId", "test", ATTRIBUTES, TIMESTAMP))
+    }
+
+    @Test
+    fun testRemoveEvent_shouldRemoveEvent_ById() = runTest {
+        val testEvent = SdkEvent.External.Custom("testId", "test", ATTRIBUTES, TIMESTAMP)
+        eventsDao.insertEvent(testEvent)
+
+        eventsDao.removeEvent(testEvent)
+
+        eventsDao.getEvents().toList() shouldBe emptyList()
     }
 }

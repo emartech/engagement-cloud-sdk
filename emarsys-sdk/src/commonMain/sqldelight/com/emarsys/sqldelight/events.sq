@@ -9,10 +9,13 @@ CREATE TABLE events (
 CREATE INDEX id ON events(id);
 
 selectAll:
-SELECT json FROM events;
+SELECT json FROM events ORDER BY timestamp ASC;
 
 insertEvent:
 INSERT INTO events (id, name, attributes, timestamp, json) VALUES (?, ?, ?, ?, ?);
 
 deleteAll:
 DELETE FROM events;
+
+deleteById:
+DELETE FROM events WHERE id = ?;

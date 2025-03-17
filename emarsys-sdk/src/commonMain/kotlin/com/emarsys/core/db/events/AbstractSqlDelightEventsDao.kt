@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.serialization.json.Json
 
-abstract class AbstractSqlDelightEventsDao(db: EmarsysDB, private val json: Json): EventsDaoApi {
+abstract class AbstractSqlDelightEventsDao(db: EmarsysDB, private val json: Json) : EventsDaoApi {
     private val queries = db.eventsQueries
 
     override suspend fun insertEvent(event: SdkEvent) {
@@ -26,5 +26,9 @@ abstract class AbstractSqlDelightEventsDao(db: EmarsysDB, private val json: Json
                 json.decodeFromString<SdkEvent>(it)
             }
             .asFlow()
+    }
+
+    override suspend fun removeEvent(event: SdkEvent) {
+        queries.deleteById(event.id)
     }
 }
