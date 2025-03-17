@@ -61,11 +61,10 @@ import com.emarsys.context.DefaultUrlsApi
 import com.emarsys.context.SdkContext
 import com.emarsys.core.actions.ActionHandler
 import com.emarsys.core.actions.ActionHandlerApi
-import com.emarsys.core.channel.SdkEventDistributor
-import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
+import com.emarsys.core.channel.SdkEventDistributor
 import com.emarsys.core.collections.persistentListOf
 import com.emarsys.core.crypto.Crypto
 import com.emarsys.core.crypto.CryptoApi
