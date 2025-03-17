@@ -24,6 +24,7 @@ import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.onEach
@@ -42,6 +43,7 @@ class EventClient(
     private val inAppPresenter: InAppPresenterApi,
     private val inAppViewProvider: InAppViewProviderApi,
     private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
+    private val onlineSdkEventFlow: SharedFlow<SdkEvent>,
     private val sdkLogger: Logger,
     sdkDispatcher: CoroutineDispatcher
 ) : EventClientApi {
@@ -57,7 +59,7 @@ class EventClient(
     }
 
     private suspend fun startEventConsumer() {
-        sdkEventFlow
+        onlineSdkEventFlow
             .filter { it is SdkEvent.Internal.Reporting || it is SdkEvent.Internal.Sdk.Custom || it is SdkEvent.External.Custom }
             .naturalBatching().onEach {
                 try {
@@ -81,6 +83,7 @@ class EventClient(
                     handleInApp(result.message)
                     handleOnAppEventAction(result)
                 } catch (e: Exception) {
+                    // todo re-emit event to SdkEventFlow
                     sdkLogger.error("EventClient: Error during event consumption", e)
                 }
             }.collect()

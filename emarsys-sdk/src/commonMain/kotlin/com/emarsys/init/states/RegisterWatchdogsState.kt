@@ -7,8 +7,8 @@ import com.emarsys.core.state.State
 class RegisterWatchdogsState(
     private val lifecycleWatchDog: Registerable,
     private val connectionWatchDog: Registerable,
+    private val eventDistributor: Registerable,
     private val sdkLogger: Logger
-
 ) :
     State {
     override val name: String = "registerWatchdogsState"
@@ -21,6 +21,7 @@ class RegisterWatchdogsState(
 
         connectionWatchDog.register()
         lifecycleWatchDog.register()
+        eventDistributor.register()
     }
 
     override fun relax() {

@@ -81,6 +81,7 @@ class EventClientTests {
     private lateinit var mockUrlFactory: UrlFactoryApi
     private lateinit var mockOnEventActionFactory: ActionFactoryApi<ActionModel>
     private lateinit var sdkEventFlow: MutableSharedFlow<SdkEvent>
+    private lateinit var onlineSdkEvents: MutableSharedFlow<SdkEvent>
     private lateinit var mockInAppConfig: InAppConfig
     private lateinit var mockInAppPresenter: InAppPresenterApi
     private lateinit var mockInAppViewProvider: InAppViewProviderApi
@@ -98,6 +99,7 @@ class EventClientTests {
         mockUrlFactory = mock()
         mockOnEventActionFactory = mock()
         sdkEventFlow = spy(MutableSharedFlow(replay = 5))
+        onlineSdkEvents = spy(MutableSharedFlow(replay = 5))
         mockInAppConfig = mock()
         mockInAppPresenter = mock()
         mockInAppViewProvider = mock()
@@ -129,7 +131,7 @@ class EventClientTests {
 
         everySuspend { mockEmarsysClient.send(any()) }.returns(createTestResponse("{}"))
 
-        eventClient.registerEvent(testEvent)
+        sdkEventFlow.emit(testEvent)
 
         verifySuspend { sdkEventFlow.emit(testEvent) }
         verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
@@ -162,7 +164,7 @@ class EventClientTests {
 
         eventClient = createEventClient()
 
-        eventClient.registerEvent(testEvent)
+        onlineSdkEvents.emit(testEvent)
 
         advanceUntilIdle()
 
@@ -189,7 +191,7 @@ class EventClientTests {
 
         eventClient = createEventClient()
 
-        eventClient.registerEvent(testEvent)
+        onlineSdkEvents.emit(testEvent)
 
         advanceUntilIdle()
 
@@ -214,7 +216,7 @@ class EventClientTests {
 
         eventClient = createEventClient()
 
-        eventClient.registerEvent(testEvent)
+        onlineSdkEvents.emit(testEvent)
         advanceUntilIdle()
 
         verifySuspend { mockEmarsysClient.send(expectedUrlRequest) }
@@ -236,7 +238,7 @@ class EventClientTests {
 
         eventClient = createEventClient()
 
-        eventClient.registerEvent(testEvent)
+        onlineSdkEvents.emit(testEvent)
 
         advanceUntilIdle()
 
@@ -259,7 +261,7 @@ class EventClientTests {
 
         eventClient = createEventClient()
 
-        eventClient.registerEvent(testEvent)
+        onlineSdkEvents.emit(testEvent)
 
         advanceUntilIdle()
 
@@ -301,6 +303,7 @@ class EventClientTests {
         mockInAppPresenter,
         mockInAppViewProvider,
         sdkEventFlow,
+        onlineSdkEvents,
         mockSdkLogger,
         sdkDispatcher
     )

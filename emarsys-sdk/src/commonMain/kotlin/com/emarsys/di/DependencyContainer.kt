@@ -61,6 +61,8 @@ import com.emarsys.context.DefaultUrlsApi
 import com.emarsys.context.SdkContext
 import com.emarsys.core.actions.ActionHandler
 import com.emarsys.core.actions.ActionHandlerApi
+import com.emarsys.core.channel.SdkEventDistributor
+import com.emarsys.core.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
@@ -144,6 +146,7 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -163,7 +166,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
     private val timestampProvider: Provider<Instant> = TimestampProvider()
 
     override val sdkEventFlow: MutableSharedFlow<SdkEvent> =
-        MutableSharedFlow(replay = 100)
+        MutableSharedFlow(replay = Channel.UNLIMITED)
 
     override val json: Json by lazy {
         JsonUtil.json
@@ -323,6 +326,22 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         DeviceClient(emarsysClient, urlFactory, deviceInfoCollector, contactTokenHandler)
     }
 
+    override val connectionWatchDog: ConnectionWatchDog by lazy {
+        dependencyCreator.createConnectionWatchDog(sdkLogger)
+    }
+
+    override val lifecycleWatchDog: LifecycleWatchDog by lazy {
+        dependencyCreator.createLifeCycleWatchDog()
+    }
+
+    private val eventDistributor: SdkEventDistributor = SdkEventDistributor(
+        sdkEventFlow,
+        connectionWatchDog.isOnline,
+        eventDbHelper,
+        sdkDispatcher,
+        sdkLogger,
+    )
+
     private val eventClient: EventClientApi by lazy {
         EventClient(
             emarsysClient,
@@ -334,6 +353,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             inAppPresenter,
             inAppViewProvider,
             sdkEventFlow,
+            eventDistributor.onlineEvents,
             sdkLogger,
             sdkDispatcher,
         )
@@ -574,13 +594,6 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             )
         EventTracker(loggingEvent, gathererEvent, eventInternal, sdkContext)
     }
-    override val connectionWatchDog: ConnectionWatchDog by lazy {
-        dependencyCreator.createConnectionWatchDog(sdkLogger)
-    }
-
-    override val lifecycleWatchDog: LifecycleWatchDog by lazy {
-        dependencyCreator.createLifeCycleWatchDog()
-    }
 
     override val mobileEngageSession: Session by lazy {
         MobileEngageSession(
@@ -600,6 +613,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             pushActionHandler
         )
     }
+
     override val initOrganizer: InitOrganizerApi by lazy {
         InitOrganizer(
             StateMachine(
@@ -613,7 +627,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
                         sdkLogger
                     ),
                     RegisterWatchdogsState(
-                        lifecycleWatchDog, connectionWatchDog,
+                        lifecycleWatchDog, connectionWatchDog, eventDistributor,
                         sdkLogger
                     ),
                     SessionSubscriptionState(
