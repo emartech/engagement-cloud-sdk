@@ -61,12 +61,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build iOS
-        if: matrix.platform == 'ios'
-        run: make build-ios-all-archtypes
-
-      - name: Build { matrix.platform }
-        if: matrix.platform != 'ios'
+      - name: Build
         run: make build-${{ matrix.platform }}
 
   lint:
