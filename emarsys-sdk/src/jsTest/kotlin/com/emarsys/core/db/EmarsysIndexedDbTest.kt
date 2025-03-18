@@ -2,9 +2,11 @@ package com.emarsys.core.db
 
 import dev.mokkery.MockMode
 import dev.mokkery.mock
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.test.runTest
+import web.idb.IDBDatabase
 import web.idb.indexedDB
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -19,8 +21,8 @@ class EmarsysIndexedDbTest {
     }
 
     @Test
-    fun open_shouldOpenDatabase_andReturnDatabaseInstance() = runTest {
-        val database = emarsysIndexedDb.open()
+    fun execute_shouldOpenDatabase_andReturnDatabaseInstance() = runTest {
+        val database = emarsysIndexedDb.execute { database -> database }
 
         database shouldNotBe null
         database.name shouldBe "EMARSYS_SDK_DB"
@@ -28,8 +30,8 @@ class EmarsysIndexedDbTest {
     }
 
     @Test
-    fun open_shouldOpenDatabase_WithEventsObjectStores() = runTest {
-        val database = emarsysIndexedDb.open()
+    fun execute_shouldOpenDatabase_WithEventsObjectStores() = runTest {
+        val database = emarsysIndexedDb.execute { database -> database }
 
         database shouldNotBe null
         database.objectStoreNames.contains("events") shouldBe true
@@ -37,11 +39,41 @@ class EmarsysIndexedDbTest {
     }
 
     @Test
-    fun open_shouldReturnExistingDatabaseInstance_whenItHasAlreadyBeenOpened() = runTest {
-        val database1 = emarsysIndexedDb.open()
-        val database2 = emarsysIndexedDb.open()
+    fun execute_shouldOpenDatabase_callCallback_andCloseDatabase() = runTest {
+        val testResult = "testResult"
+        var database: IDBDatabase? = null
 
-        database1 shouldNotBe null
-        database1 shouldBe database2
+        val result = emarsysIndexedDb.execute { db ->
+            database = db
+            testResult
+        }
+
+        result shouldBe testResult
+        assertDatabaseIsClosed(database)
+    }
+
+    @Test
+    fun execute_shouldOpenDatabase_AndCloseIt_evenIfExceptionIsThrownDuringExecution() = runTest {
+        val testExceptionMessage = "testMessage"
+        var database: IDBDatabase? = null
+        val exception = shouldThrow<Exception> {
+            emarsysIndexedDb.execute { db ->
+                database = db
+                throw Exception(testExceptionMessage)
+            }
+        }
+
+        exception.message shouldBe testExceptionMessage
+        assertDatabaseIsClosed(database)
+    }
+
+    private fun assertDatabaseIsClosed(database: IDBDatabase?) {
+        val throwable = try {
+            database!!.transaction("events")
+        } catch (throwable: Throwable) {
+            throwable
+        }
+
+        throwable.unsafeCast<Error>().message shouldBe "Failed to execute 'transaction' on 'IDBDatabase': The database connection is closing."
     }
 }

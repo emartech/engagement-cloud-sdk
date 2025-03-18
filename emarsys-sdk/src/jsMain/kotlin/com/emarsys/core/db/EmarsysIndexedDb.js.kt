@@ -19,23 +19,15 @@ class EmarsysIndexedDb(
         private const val DATABASE_VERSION = 1.0
     }
 
-    private var indexedDbInstance: IDBDatabase? = null
-
-    suspend fun open(): IDBDatabase {
+    suspend fun <T> execute(block: suspend (IDBDatabase) -> T): T {
         sdkLogger.debug("EmarsysIndexedDb - open", "Opening indexedDB")
-        return try {
-            suspendCoroutine { continuation ->
-                indexedDbInstance?.let {
-                    continuation.resume(it)
-                    return@suspendCoroutine
-                }
-
+        val database = try {
+            suspendCoroutine<IDBDatabase> { continuation ->
                 val openIndexedDBRequest =
                     indexedDBFactory.open(DATABASE_NAME, DATABASE_VERSION)
 
                 openIndexedDBRequest.onsuccess = EventHandler {
-                    indexedDbInstance = openIndexedDBRequest.result
-                    continuation.resume(indexedDbInstance!!)
+                    continuation.resume(openIndexedDBRequest.result)
                 }
 
                 openIndexedDBRequest.onerror = EventHandler {
@@ -57,6 +49,12 @@ class EmarsysIndexedDb(
         } catch (exception: Exception) {
             sdkLogger.error("EmarsysIndexedDb - open", exception)
             throw exception
+        }
+
+        return try {
+            block(database)
+        } finally {
+            database.close()
         }
     }
 

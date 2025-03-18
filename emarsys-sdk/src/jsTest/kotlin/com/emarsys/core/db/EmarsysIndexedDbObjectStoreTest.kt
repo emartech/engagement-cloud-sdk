@@ -378,45 +378,47 @@ class EmarsysIndexedDbObjectStoreTest {
         expectedValue: T?,
         objectStoreConfig: EmarsysObjectStoreConfig<T>
     ) {
-        val database = emarsysIndexedDb.open()
-        return suspendCoroutine { continuation ->
-            val transaction = database
-                .transaction(objectStoreConfig.name, IDBTransactionMode.readonly)
-            val request = transaction.objectStore(objectStoreConfig.name)
-                .get(IDBValidKey("id"))
-
-            transaction.oncomplete = EventHandler {
-                if (expectedValue == null) {
-                    request.result shouldBe null
-                } else {
-                    JsonUtil.json.decodeFromString(
-                        objectStoreConfig.serializer,
-                        JSON.stringify(request.result)
-                    ) shouldBe expectedValue
-                }
-                continuation.resume(Unit)
-            }
-
-            transaction.onerror = EventHandler {
-                continuation.resumeWithException(request.error!!)
-            }
-        }
-    }
-
-    private suspend fun clearDatabase() {
-        val database = emarsysIndexedDb.open()
-        database.objectStoreNames.asList().forEach {
+        return emarsysIndexedDb.execute { database ->
             suspendCoroutine { continuation ->
-                val transaction = database.transaction(it, IDBTransactionMode.readwrite)
-                val request =
-                    transaction.objectStore(it).clear()
+                val transaction = database
+                    .transaction(objectStoreConfig.name, IDBTransactionMode.readonly)
+                val request = transaction.objectStore(objectStoreConfig.name)
+                    .get(IDBValidKey("id"))
 
                 transaction.oncomplete = EventHandler {
+                    if (expectedValue == null) {
+                        request.result shouldBe null
+                    } else {
+                        JsonUtil.json.decodeFromString(
+                            objectStoreConfig.serializer,
+                            JSON.stringify(request.result)
+                        ) shouldBe expectedValue
+                    }
                     continuation.resume(Unit)
                 }
 
                 transaction.onerror = EventHandler {
                     continuation.resumeWithException(request.error!!)
+                }
+            }
+        }
+    }
+
+    private suspend fun clearDatabase() {
+        emarsysIndexedDb.execute { database ->
+            database.objectStoreNames.asList().forEach {
+                suspendCoroutine { continuation ->
+                    val transaction = database.transaction(it, IDBTransactionMode.readwrite)
+                    val request =
+                        transaction.objectStore(it).clear()
+
+                    transaction.oncomplete = EventHandler {
+                        continuation.resume(Unit)
+                    }
+
+                    transaction.onerror = EventHandler {
+                        continuation.resumeWithException(request.error!!)
+                    }
                 }
             }
         }
