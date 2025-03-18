@@ -14,62 +14,68 @@ import com.emarsys.SdkConstants.SESSION_START_EVENT_NAME
 import com.emarsys.core.providers.TimestampProvider
 import com.emarsys.core.providers.UUIDProvider
 import kotlinx.datetime.Instant
-import kotlinx.serialization.SerialName
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
 import kotlinx.serialization.json.JsonObject
 
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
+@JsonClassDiscriminator("fullClassName")
 sealed interface SdkEvent {
     val id: String
+    val type: String
     val name: String
     val timestamp: Instant
     val attributes: JsonObject?
 
     sealed interface External : SdkEvent {
         @Serializable
-        @SerialName("custom")
         data class Custom(
+            override val type: String = "custom",
             override val id: String = UUIDProvider().provide(),
             override val name: String,
             override val attributes: JsonObject? = null,
             override val timestamp: Instant = TimestampProvider().provide(),
         ) : External
 
-        sealed interface Api : External {
+        sealed class Api : External {
+            override val type: String = "custom"
+
             data class Push(
                 override val id: String = UUIDProvider().provide(),
                 override val name: String,
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Api
+            ) : Api()
 
             data class InApp(
                 override val id: String = UUIDProvider().provide(),
                 override val name: String,
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Api
+            ) : Api()
 
             data class SilentPush(
                 override val id: String = UUIDProvider().provide(),
                 override val name: String,
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Api
+            ) : Api()
 
             data class OnEventAction(
                 override val id: String = UUIDProvider().provide(),
                 override val name: String,
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Api
+            ) : Api()
 
             data class BadgeCount(
                 override val id: String = UUIDProvider().provide(),
                 override val name: String,
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Api
+            ) : Api()
         }
     }
 
@@ -77,9 +83,12 @@ sealed interface SdkEvent {
 
         interface Reporting : Internal
 
+        interface Custom : Internal
+
         @Serializable
-        @SerialName("internal")
         sealed class Sdk(override val name: String) : Internal {
+           override val type: String = "internal"
+
             data class Log(
                 override val id: String = UUIDProvider().provide(),
                 override val name: String,
@@ -129,38 +138,33 @@ sealed interface SdkEvent {
                 override val timestamp: Instant = TimestampProvider().provide(),
             ) : Sdk(CHANGE_MERCHANT_ID_NAME)
 
-            @SerialName("internal")
-            sealed interface Custom {
+            @Serializable
+            data class AppStart(
+                override val id: String = UUIDProvider().provide(),
+                override val attributes: JsonObject? = null,
+                override val timestamp: Instant = TimestampProvider().provide(),
+            ) : Sdk(APP_START_EVENT_NAME), Custom
 
-                @Serializable
-                data class AppStart(
-                    override val id: String = UUIDProvider().provide(),
-                    override val attributes: JsonObject? = null,
-                    override val timestamp: Instant = TimestampProvider().provide(),
-                ) : Sdk(APP_START_EVENT_NAME), Custom
+            @Serializable
+            data class SessionStart(
+                override val id: String = UUIDProvider().provide(),
+                override val attributes: JsonObject? = null,
+                override val timestamp: Instant = TimestampProvider().provide(),
+            ) : Sdk(SESSION_START_EVENT_NAME), Custom
 
-                @Serializable
-                data class SessionStart(
-                    override val id: String = UUIDProvider().provide(),
-                    override val attributes: JsonObject? = null,
-                    override val timestamp: Instant = TimestampProvider().provide(),
-                ) : Sdk(SESSION_START_EVENT_NAME), Custom
-
-                @Serializable
-                data class SessionEnd(
-                    override val id: String = UUIDProvider().provide(),
-                    override val attributes: JsonObject? = null,
-                    override val timestamp: Instant = TimestampProvider().provide(),
-                ) : Sdk(SESSION_END_EVENT_NAME), Custom
-            }
-
-
+            @Serializable
+            data class SessionEnd(
+                override val id: String = UUIDProvider().provide(),
+                override val attributes: JsonObject? = null,
+                override val timestamp: Instant = TimestampProvider().provide(),
+            ) : Sdk(SESSION_END_EVENT_NAME), Custom
         }
 
         @Serializable
         sealed class Push(
             override val name: String
         ) : Internal {
+            override val type: String = "internal"
             @Serializable
             data class Clicked(
                 override val id: String = UUIDProvider().provide(),
@@ -171,6 +175,8 @@ sealed interface SdkEvent {
 
         @Serializable
         sealed class InApp(override val name: String) : Internal {
+           override val type: String = "internal"
+
             @Serializable
             data class Viewed(
                 override val id: String = UUIDProvider().provide(),
@@ -188,6 +194,7 @@ sealed interface SdkEvent {
 
         @Serializable
         data class SilentPush(
+           override val type: String = "internal",
             override val id: String = UUIDProvider().provide(),
             override val name: String,
             override val attributes: JsonObject?,
@@ -196,6 +203,7 @@ sealed interface SdkEvent {
 
         @Serializable
         data class OnEventAction(
+            override val type: String = "internal",
             override val id: String = UUIDProvider().provide(),
             override val name: String,
             override val attributes: JsonObject?,
@@ -204,6 +212,7 @@ sealed interface SdkEvent {
 
         @Serializable
         data class BadgeCount(
+            override val type: String = "internal",
             override val id: String = UUIDProvider().provide(),
             override val name: String,
             override val attributes: JsonObject?,

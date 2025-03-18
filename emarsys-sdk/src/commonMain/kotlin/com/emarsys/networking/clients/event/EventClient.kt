@@ -60,7 +60,7 @@ class EventClient(
 
     private suspend fun startEventConsumer() {
         onlineSdkEventFlow
-            .filter { it is SdkEvent.Internal.Reporting || it is SdkEvent.Internal.Sdk.Custom || it is SdkEvent.External.Custom }
+            .filter { it is SdkEvent.Internal.Reporting || it is SdkEvent.Internal.Sdk || it is SdkEvent.External.Custom }
             .naturalBatching().onEach {
                 try {
                     sdkLogger.debug("EventClient - consumeEvents", "Batch size: ${it.size}")

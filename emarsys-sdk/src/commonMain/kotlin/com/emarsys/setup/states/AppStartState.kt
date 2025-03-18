@@ -20,7 +20,7 @@ class AppStartState(
 
     override suspend fun active() {
         if (!alreadyCompleted) {
-            val appStartEvent = SdkEvent.Internal.Sdk.Custom.AppStart(
+            val appStartEvent = SdkEvent.Internal.Sdk.AppStart(
                 id = uuidProvider.provide(),
                 timestamp = timestampProvider.provide()
             )

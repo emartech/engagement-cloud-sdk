@@ -46,6 +46,7 @@ class AndroidSqlDelightEventsDaoTests {
     @Test
     fun testInsertEvent() = runTest {
         val event = SdkEvent.External.Custom(
+            type = "custom",
             id = "testId",
             name = "test",
             attributes = ATTRIBUTES,
@@ -72,12 +73,16 @@ class AndroidSqlDelightEventsDaoTests {
 
     @Test
     fun testRemoveEvent_shouldDoNothing_whenNothingWasInserted() = runTest {
-        eventsDao.removeEvent(SdkEvent.External.Custom("testId", "test", ATTRIBUTES, TIMESTAMP))
+        val testEvent =
+            SdkEvent.External.Custom(type = "custom", "testId", "test", ATTRIBUTES, TIMESTAMP)
+
+        eventsDao.removeEvent(testEvent)
     }
 
     @Test
     fun testRemoveEvent_shouldRemoveEvent_ById() = runTest {
-        val testEvent = SdkEvent.External.Custom("testId", "test", ATTRIBUTES, TIMESTAMP)
+        val testEvent =
+            SdkEvent.External.Custom(type = "custom", "testId", "test", ATTRIBUTES, TIMESTAMP)
         eventsDao.insertEvent(testEvent)
 
         eventsDao.removeEvent(testEvent)

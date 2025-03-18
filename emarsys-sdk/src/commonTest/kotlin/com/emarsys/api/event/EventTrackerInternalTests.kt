@@ -34,7 +34,7 @@ class EventTrackerInternalTests {
             timestamp = timestamp,
         )
 
-        val event2 = SdkEvent.Internal.Sdk.Custom.AppStart(
+        val event2 = SdkEvent.Internal.Sdk.AppStart(
             id = UUID,
             attributes = buildJsonObject { put("testAttribute2", JsonPrimitive("testValue2")) },
             timestamp = timestamp

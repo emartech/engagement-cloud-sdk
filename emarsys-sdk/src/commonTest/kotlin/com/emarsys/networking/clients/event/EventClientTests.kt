@@ -159,7 +159,7 @@ class EventClientTests {
         val expectedUrlRequest = UrlRequest(
             TEST_BASE_URL,
             HttpMethod.Post,
-            """{"dnd":$IN_APP_DND,"events":[{"type":"custom","id":"$UUID","name":"${testEvent.name}","attributes":{"key":"value"},"timestamp":"$TIMESTAMP"}],"deviceEventState":{"key":"value"}}""",
+            """{"dnd":$IN_APP_DND,"events":[{"fullClassName":"com.emarsys.networking.clients.event.model.SdkEvent.External.Custom","type":"custom","id":"$UUID","name":"${testEvent.name}","attributes":{"key":"value"},"timestamp":"$TIMESTAMP"}],"deviceEventState":{"key":"value"}}""",
         )
 
         eventClient = createEventClient()
@@ -278,7 +278,7 @@ class EventClientTests {
         val expectedUrlRequest = UrlRequest(
             TEST_BASE_URL,
             HttpMethod.Post,
-            """{"dnd":$IN_APP_DND,"events":[{"type":"custom","id":"$UUID","name":"${testEvent.name}","attributes":{"key":"value"},"timestamp":"$TIMESTAMP"}]}""",
+            """{"dnd":$IN_APP_DND,"events":[{"fullClassName":"com.emarsys.networking.clients.event.model.SdkEvent.External.Custom","type":"custom","id":"$UUID","name":"${testEvent.name}","attributes":{"key":"value"},"timestamp":"$TIMESTAMP"}]}""",
         )
         return expectedUrlRequest
     }

@@ -39,7 +39,7 @@ class AppStartStateTests {
     @Test
     fun testActivate_should_send_appStartEvent_with_eventClient_when_it_was_not_completed_yet() =
         runTest {
-            val expectedEvent = SdkEvent.Internal.Sdk.Custom.AppStart(id = UUID, timestamp = timestamp)
+            val expectedEvent = SdkEvent.Internal.Sdk.AppStart(id = UUID, timestamp = timestamp)
             everySuspend { mockEventClient.registerEvent(expectedEvent) } returns Unit
 
             appStartState.active()
@@ -52,7 +52,7 @@ class AppStartStateTests {
     @Test
     fun testActivate_should_not_send_appStartEvent_with_eventClient_when_it_was_already_completed_yet() =
         runTest {
-            val expectedEvent = SdkEvent.Internal.Sdk.Custom.AppStart(id = UUID, timestamp = timestamp)
+            val expectedEvent = SdkEvent.Internal.Sdk.AppStart(id = UUID, timestamp = timestamp)
             everySuspend { mockEventClient.registerEvent(expectedEvent) } returns Unit
 
             appStartState.active()

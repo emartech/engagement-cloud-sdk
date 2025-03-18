@@ -27,12 +27,6 @@ class EventTrackerInternal(
         )
         //TODO handle error
         sdkLogger.debug("EventTrackerGatherer - trackEvent")
-        eventClient.registerEvent(
-            event.toSdkEvent(
-                uuidProvider.provide(),
-                timestampProvider.provide()
-            )
-        )
     }
 
     override suspend fun activate() {

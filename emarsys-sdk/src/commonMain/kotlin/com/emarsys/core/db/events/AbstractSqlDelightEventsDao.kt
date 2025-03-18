@@ -12,6 +12,7 @@ abstract class AbstractSqlDelightEventsDao(db: EmarsysDB, private val json: Json
     override suspend fun insertEvent(event: SdkEvent) {
         queries.insertEvent(
             id = event.id,
+            type = event.type,
             name = event.name,
             timestamp = event.timestamp.toEpochMilliseconds(),
             attributes = event.attributes.toString(),

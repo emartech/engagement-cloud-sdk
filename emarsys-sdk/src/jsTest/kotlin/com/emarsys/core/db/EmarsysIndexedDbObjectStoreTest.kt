@@ -65,6 +65,7 @@ class EmarsysIndexedDbObjectStoreTest {
         )
 
         val event = SdkEvent.External.Custom(
+            type = "custom",
             "id",
             "name",
             buildJsonObject { put("key", JsonPrimitive("value")) })
@@ -173,11 +174,13 @@ class EmarsysIndexedDbObjectStoreTest {
         )
 
         val event1 = SdkEvent.External.Custom(
+            type = "custom",
             "id1",
             "name1",
             buildJsonObject { put("key1", JsonPrimitive("value1")) })
 
         val event2 = SdkEvent.External.Custom(
+            type = "custom",
             "id2",
             "name2",
             buildJsonObject { put("key2", JsonPrimitive("value2")) })
@@ -271,6 +274,7 @@ class EmarsysIndexedDbObjectStoreTest {
         )
 
         val event = SdkEvent.External.Custom(
+            type = "custom",
             "id",
             "name",
             buildJsonObject { put("key", JsonPrimitive("value")) })
@@ -295,6 +299,7 @@ class EmarsysIndexedDbObjectStoreTest {
         )
 
         val event = SdkEvent.External.Custom(
+            type = "custom",
             "id",
             "name",
             buildJsonObject { put("key", JsonPrimitive("value")) })
@@ -340,6 +345,7 @@ class EmarsysIndexedDbObjectStoreTest {
         )
 
         val event = SdkEvent.External.Custom(
+            type = "custom",
             "id",
             "name",
             buildJsonObject { put("key", JsonPrimitive("value")) })
@@ -380,7 +386,7 @@ class EmarsysIndexedDbObjectStoreTest {
                 .get(IDBValidKey("id"))
 
             transaction.oncomplete = EventHandler {
-                if(expectedValue == null) {
+                if (expectedValue == null) {
                     request.result shouldBe null
                 } else {
                     JsonUtil.json.decodeFromString(

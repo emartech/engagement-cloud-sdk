@@ -1,5 +1,6 @@
 CREATE TABLE events (
   id TEXT PRIMARY KEY NOT NULL,
+  type TEXT NOT NULL,
   name TEXT NOT NULL,
   attributes TEXT,
   timestamp INTEGER NOT NULL,
@@ -12,7 +13,7 @@ selectAll:
 SELECT json FROM events ORDER BY timestamp ASC;
 
 insertEvent:
-INSERT INTO events (id, name, attributes, timestamp, json) VALUES (?, ?, ?, ?, ?);
+INSERT INTO events (id, type, name, attributes, timestamp, json) VALUES (?, ?, ?, ?, ?, ?);
 
 deleteAll:
 DELETE FROM events;
