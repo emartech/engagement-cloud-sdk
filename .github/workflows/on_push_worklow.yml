@@ -120,7 +120,8 @@ jobs:
         if: matrix.platform == 'android'
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 34
+          api-level: 33
+          target: google_apis
           script: make test-android
 
       - name: Test iOS
