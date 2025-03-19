@@ -1,8 +1,11 @@
 package com.emarsys
 
+import kotlinx.serialization.Serializable
+
 
 @OptIn(ExperimentalJsExport::class)
 @JsExport
+@Serializable
 data class JsEmarsysConfig(
     override val applicationCode: String? = null,
     override val merchantId: String? = null,
@@ -24,6 +27,7 @@ data class JsEmarsysConfig(
 
 @OptIn(ExperimentalJsExport::class)
 @JsExport
+@Serializable
 data class ServiceWorkerOptions(
     val applicationServerKey: String,
     val serviceWorkerPath: String,

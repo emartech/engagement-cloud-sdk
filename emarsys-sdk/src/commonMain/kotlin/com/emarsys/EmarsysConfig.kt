@@ -1,8 +1,10 @@
 package com.emarsys
 
 import com.emarsys.core.exceptions.PreconditionFailedException
+import kotlinx.serialization.Serializable
 
 
+@Serializable
 data class EmarsysConfig(
     override val applicationCode: String? = null,
     override val merchantId: String? = null,
