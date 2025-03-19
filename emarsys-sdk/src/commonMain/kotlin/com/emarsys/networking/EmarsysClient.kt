@@ -41,10 +41,10 @@ class EmarsysClient(
         private const val MAX_RETRY_COUNT = 3
     }
 
-    override suspend fun send(request: UrlRequest): Response {
+    override suspend fun send(request: UrlRequest, onNetworkError: (suspend () -> Unit)?): Response {
         return refreshContactToken {
             val emarsysRequest = addEmarsysHeaders(request)
-            val response = networkClient.send(emarsysRequest)
+            val response = networkClient.send(emarsysRequest, onNetworkError)
             handleEmarsysResponse(response)
             handleClientState(response)
             response

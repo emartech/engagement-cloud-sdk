@@ -10,6 +10,8 @@ import com.emarsys.model.TestDataClass
 import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.mock
+import dev.mokkery.verify.VerifyMode
+import dev.mokkery.verifySuspend
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.ktor.client.HttpClient
@@ -27,6 +29,7 @@ import io.ktor.http.headersOf
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.test.runTest
+import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 
@@ -122,6 +125,80 @@ class GenericNetworkClientTests {
         shouldThrow<FailedRequestException> {
             genericNetworkClient.send(request)
         }
+    }
+
+    @Test
+    fun testSend_shouldCallOnRecoverCallback_andRethrowException_whenThereIsNoInternetConnection_andIOExceptionIsThrown() =
+        runTest {
+            val genericNetworkClient = GenericNetworkClient(
+                HttpClient(MockEngine {
+                    throw IOException("No internet connection")
+                }),
+                sdkLogger = mock(MockMode.autofill)
+            )
+            val urlString =
+                URLBuilder("https://denna.gservice.emarsys.net/customResponseCode/500").build()
+            val request = UrlRequest(
+                urlString,
+                HttpMethod.Get,
+                null,
+                mapOf("Content-Type" to "application/json")
+            )
+            val onNetworkError = mock<suspend () -> Unit>(MockMode.autofill)
+
+            shouldThrow<IOException> {
+                genericNetworkClient.send(request, onNetworkError)
+            }
+            verifySuspend { onNetworkError() }
+        }
+
+    @Test
+    fun testSend_shouldCallOnRecoverCallback_andRethrowIOException_whenThereIsNoInternetConnection_andThrowableIsThrown() =
+        runTest {
+            val genericNetworkClient = GenericNetworkClient(
+                HttpClient(MockEngine {
+                    throw Throwable("No internet connection")
+                }),
+                sdkLogger = mock(MockMode.autofill)
+            )
+            val urlString =
+                URLBuilder("https://denna.gservice.emarsys.net/customResponseCode/500").build()
+            val request = UrlRequest(
+                urlString,
+                HttpMethod.Get,
+                null,
+                mapOf("Content-Type" to "application/json")
+            )
+            val onNetworkError = mock<suspend () -> Unit>(MockMode.autofill)
+
+            shouldThrow<IOException> {
+                genericNetworkClient.send(request, onNetworkError)
+            }
+            verifySuspend { onNetworkError() }
+        }
+
+    @Test
+    fun testSend_rethrowException_whenThereIsNoInternetConnection_andExceptionIsThrown() = runTest {
+        val genericNetworkClient = GenericNetworkClient(
+            HttpClient(MockEngine {
+                throw Exception("No internet connection")
+            }),
+            sdkLogger = mock(MockMode.autofill)
+        )
+        val urlString =
+            URLBuilder("https://denna.gservice.emarsys.net/customResponseCode/500").build()
+        val request = UrlRequest(
+            urlString,
+            HttpMethod.Get,
+            null,
+            mapOf("Content-Type" to "application/json")
+        )
+        val onNetworkError = mock<suspend () -> Unit>(MockMode.autofill)
+
+        shouldThrow<Exception> {
+            genericNetworkClient.send(request, onNetworkError)
+        }
+        verifySuspend(VerifyMode.exactly(0)) { onNetworkError() }
     }
 
     @Test

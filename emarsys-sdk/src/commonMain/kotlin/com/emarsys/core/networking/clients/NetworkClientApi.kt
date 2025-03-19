@@ -4,5 +4,5 @@ import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 
 interface NetworkClientApi {
-    suspend fun send(request: UrlRequest): Response
+    suspend fun send(request: UrlRequest, onNetworkError: (suspend () -> Unit)? = null): Response
 }

@@ -79,7 +79,6 @@ class SdkEventDistributor(
                 buildJsonObject {
                     put("sdkEvent", sdkEvent.toString())
                 })
-            // todo think about handling the error
         }
     }
 

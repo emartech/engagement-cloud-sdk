@@ -19,8 +19,9 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
-import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.io.IOException
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import kotlin.time.Duration.Companion.seconds
 
 class GenericNetworkClient(private val client: HttpClient, private val sdkLogger: Logger) :
@@ -31,35 +32,57 @@ class GenericNetworkClient(private val client: HttpClient, private val sdkLogger
         val RETRY_DELAY = 2.seconds
     }
 
-    override suspend fun send(request: UrlRequest): Response {
+    override suspend fun send(
+        request: UrlRequest,
+        onNetworkError: (suspend () -> Unit)?
+    ): Response {
         sdkLogger.debug(
             LogEntry(
                 "GenericNetworkClient - send",
-                buildJsonObject { put("request", JsonPrimitive(request.toString())) }
+                buildJsonObject { put("request", request.toString()) }
             )
         )
         var retries = 0
-        val httpResponse = client.request {
-            val shouldAddDefaultHeader =
-                request.headers?.get(HttpHeaders.ContentType)?.toString().isNullOrEmpty()
-            if (shouldAddDefaultHeader) {
-                contentType(ContentType.Application.Json)
-            }
-            if (request.shouldRetryOnFail) {
-                retry {
-                    constantDelay(RETRY_DELAY.inWholeMilliseconds)
-                    retryIf(MAX_RETRY_COUNT) { _, httpResponse ->
-                        retries++
-                        shouldRetry(httpResponse)
+        val httpResponse = try {
+            client.request {
+                val shouldAddDefaultHeader =
+                    request.headers?.get(HttpHeaders.ContentType)?.toString().isNullOrEmpty()
+                if (shouldAddDefaultHeader) {
+                    contentType(ContentType.Application.Json)
+                }
+                if (request.shouldRetryOnFail) {
+                    retry {
+                        constantDelay(RETRY_DELAY.inWholeMilliseconds)
+                        retryIf(MAX_RETRY_COUNT) { _, httpResponse ->
+                            retries++
+                            shouldRetry(httpResponse)
+                        }
                     }
                 }
+                method = request.method
+                url(request.url)
+                request.headers?.forEach {
+                    header(it.key, it.value)
+                }
+                request.bodyString?.let { setBody(request.bodyString) }
             }
-            method = request.method
-            url(request.url)
-            request.headers?.forEach {
-                header(it.key, it.value)
-            }
-            request.bodyString?.let { setBody(request.bodyString) }
+        } catch (exception: IOException) {
+            onNetworkError?.invoke()
+            sdkLogger.debug(
+                "EventClient - consumeEvents: IOException during event consumption (iOS, Android)",
+                exception
+            )
+            throw exception
+        } catch (exception: Exception) {
+            sdkLogger.error("EventClient - consumeEvents: Exception during event consumption", exception)
+            throw exception
+        } catch (throwable: Throwable) {
+            onNetworkError?.invoke()
+            sdkLogger.error(
+                "EventClient - consumeEvents: Throwable during event consumption (JavaScript)",
+                throwable
+            )
+            throw IOException(throwable)
         }
 
         val response = Response(
@@ -72,8 +95,8 @@ class GenericNetworkClient(private val client: HttpClient, private val sdkLogger
             LogEntry(
                 "GenericNetworkClient - response",
                 buildJsonObject {
-                    put("status", JsonPrimitive(response.status.value))
-                    put("url", JsonPrimitive(response.originalRequest.url.toString()))
+                    put("status", response.status.value)
+                    put("url", response.originalRequest.url.toString())
                 }
             )
         )
@@ -83,8 +106,8 @@ class GenericNetworkClient(private val client: HttpClient, private val sdkLogger
                     LogEntry(
                         "GenericNetworkClient - Request retry limit reached!",
                         buildJsonObject {
-                            put("status", JsonPrimitive(response.status.value))
-                            put("url", JsonPrimitive(response.originalRequest.url.toString()))
+                            put("status", response.status.value)
+                            put("url", response.originalRequest.url.toString())
                         }
                     )
                 )
@@ -94,8 +117,8 @@ class GenericNetworkClient(private val client: HttpClient, private val sdkLogger
                 LogEntry(
                     "GenericNetworkClient: Request failed with status code: ${httpResponse.status.value}",
                     buildJsonObject {
-                        put("status", JsonPrimitive(response.status.value))
-                        put("url", JsonPrimitive(response.originalRequest.url.toString()))
+                        put("status", response.status.value)
+                        put("url", response.originalRequest.url.toString())
                     }
                 )
             )

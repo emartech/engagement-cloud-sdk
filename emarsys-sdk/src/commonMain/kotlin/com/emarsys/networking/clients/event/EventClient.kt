@@ -61,18 +61,24 @@ class EventClient(
     private suspend fun startEventConsumer() {
         onlineSdkEventFlow
             .filter { it is SdkEvent.Internal.Reporting || it is SdkEvent.Internal.Sdk || it is SdkEvent.External.Custom }
-            .naturalBatching().onEach {
+            .naturalBatching().onEach { sdkEvents ->
                 try {
-                    sdkLogger.debug("EventClient - consumeEvents", "Batch size: ${it.size}")
+                    sdkLogger.debug("EventClient - consumeEvents", "Batch size: ${sdkEvents.size}")
                     val url = urlFactory.create(EmarsysUrlType.EVENT, null)
                     val requestBody =
                         DeviceEventRequestBody(
                             inAppConfig.inAppDnd,
-                            it,
+                            sdkEvents,
                             sessionContext.deviceEventState
                         )
                     val body = json.encodeToString(requestBody)
-                    val response = emarsysNetworkClient.send(UrlRequest(url, HttpMethod.Post, body))
+                    val response = emarsysNetworkClient.send(
+                        UrlRequest(
+                            url,
+                            HttpMethod.Post,
+                            body
+                        )
+                    ) { reEmitSdkEventsOnNetworkError(sdkEvents) }
 
                     if (response.status == HttpStatusCode.NoContent) {
                         return@onEach
@@ -82,11 +88,14 @@ class EventClient(
                     handleDeviceEventState(result)
                     handleInApp(result.message)
                     handleOnAppEventAction(result)
-                } catch (e: Exception) {
-                    // todo re-emit event to SdkEventFlow
-                    sdkLogger.error("EventClient: Error during event consumption", e)
+                } catch (throwable: Throwable) {
+                    sdkLogger.error("EventClient: Error during event consumption", throwable)
                 }
             }.collect()
+    }
+
+    private suspend fun reEmitSdkEventsOnNetworkError(it: List<SdkEvent>) {
+        it.forEach { sdkEvent -> registerEvent(sdkEvent) }
     }
 
     private suspend fun handleOnAppEventAction(deviceEventResponse: DeviceEventResponse) {

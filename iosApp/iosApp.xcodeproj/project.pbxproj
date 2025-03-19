@@ -11,11 +11,12 @@
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
 		2A7F00B02C87556800B9677C /* EmarsysNotificationService.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A7F00AF2C87556800B9677C /* EmarsysNotificationService.xcframework */; };
-		2A7F00B22C87556F00B9677C /* EmarsysSDK.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A7F00B12C87556F00B9677C /* EmarsysSDK.xcframework */; };
 		2A918DE92C85E8FE00B1AF36 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A918DE82C85E8FE00B1AF36 /* NotificationService.swift */; };
 		2A918DED2C85E8FE00B1AF36 /* NotificationService.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2A918DE62C85E8FE00B1AF36 /* NotificationService.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2AED9EEE2C7F6A7300A9AB2C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AED9EED2C7F6A7300A9AB2C /* AppDelegate.swift */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
+		E4F328A32D89795E00259951 /* EmarsysSDK.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A7F00B12C87556F00B9677C /* EmarsysSDK.xcframework */; };
+		E4F328A42D89795E00259951 /* EmarsysSDK.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2A7F00B12C87556F00B9677C /* EmarsysSDK.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +39,17 @@
 				2A918DED2C85E8FE00B1AF36 /* NotificationService.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E4F328A52D89795E00259951 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				E4F328A42D89795E00259951 /* EmarsysSDK.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -72,7 +84,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2A7F00B22C87556F00B9677C /* EmarsysSDK.xcframework in Frameworks */,
+				E4F328A32D89795E00259951 /* EmarsysSDK.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -176,6 +188,7 @@
 				B92378962B6B1156000C7307 /* Frameworks */,
 				7555FF79242A565900829871 /* Resources */,
 				2AED9EF62C808B6300A9AB2C /* Embed Foundation Extensions */,
+				E4F328A52D89795E00259951 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
