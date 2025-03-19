@@ -1,5 +1,6 @@
 package com.emarsys.di
 
+import com.emarsys.SdkConfig
 import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.PushApi
 import com.emarsys.api.push.PushCall
@@ -16,6 +17,7 @@ import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.state.State
+import com.emarsys.core.storage.SuspendTypedStorageApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.util.DownloaderApi
@@ -47,6 +49,8 @@ interface DependencyCreator {
     ): PlatformContext
 
     fun createStorage(): TypedStorageApi<String?>
+
+    fun createSdkConfigStorage(): SuspendTypedStorageApi<SdkConfig?>
 
     fun createEventsDao(): EventsDaoApi
 

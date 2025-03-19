@@ -6,4 +6,5 @@ object StorageConstants {
     const val SUITE_NAME = "emarsys-sdk"
 
     const val WRAPPER_INFO_KEY = "wrapper_info"
+    const val SDK_CONFIG_KEY = "sdk_config"
 }

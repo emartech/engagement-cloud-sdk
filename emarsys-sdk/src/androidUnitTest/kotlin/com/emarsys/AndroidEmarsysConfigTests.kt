@@ -1,6 +1,5 @@
 package com.emarsys
 
-import android.app.Activity
 import com.emarsys.util.JsonUtil
 import io.kotest.matchers.shouldBe
 import org.junit.Test
@@ -25,6 +24,4 @@ class AndroidEmarsysConfigTests {
         deserialized.sharedSecret shouldBe config.sharedSecret
         deserialized.launchActivityClass shouldBe config.launchActivityClass
     }
-
-    private class TestClass: Activity()
 }
