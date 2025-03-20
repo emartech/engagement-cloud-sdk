@@ -8,7 +8,7 @@ import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.storage.Storage
-import com.emarsys.core.storage.TypedStorageApi
+import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
@@ -17,7 +17,6 @@ import com.emarsys.mobileengage.session.Session
 import com.emarsys.networking.clients.contact.ContactClientApi
 import com.emarsys.networking.clients.deepLink.DeepLinkClientApi
 import com.emarsys.networking.clients.device.DeviceClientApi
-
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.remoteConfig.RemoteConfigHandlerApi
@@ -65,7 +64,7 @@ interface DependencyContainerPrivateApi {
 
     val storage: Storage
 
-    val stringStorage: TypedStorageApi<String?>
+    val stringStorage: StringStorageApi
 
     val sdkContext: SdkContextApi
 

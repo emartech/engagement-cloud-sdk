@@ -2,9 +2,8 @@ package com.emarsys.api.push
 
 import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.Logger
-import com.emarsys.core.storage.TypedStorageApi
+import com.emarsys.core.storage.StringStorageApi
 import dev.mokkery.answering.returns
-import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.capture.Capture
 import dev.mokkery.matcher.capture.capture
@@ -30,7 +29,7 @@ class LoggingPushTests {
     }
 
     private lateinit var mockLogger: Logger
-    private lateinit var mockStorage: TypedStorageApi<String?>
+    private lateinit var mockStringStorage: StringStorageApi
     private lateinit var loggingPush: LoggingPush
     private var slot = Capture.slot<LogEntry>()
 
@@ -45,12 +44,12 @@ class LoggingPushTests {
         mockLogger = mock()
         Dispatchers.setMain(mainDispatcher)
 
-        everySuspend { mockLogger.debug(capture(slot)) } returns Unit
+        everySuspend { mockLogger.debug(logEntry = capture(slot)) } returns Unit
 
-        mockStorage = mock()
-        every { mockStorage.put(PushConstants.PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
+        mockStringStorage = mock()
+        everySuspend { mockStringStorage.put(PushConstants.PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
 
-        loggingPush = LoggingPush(mockLogger, mockStorage, mainDispatcher)
+        loggingPush = LoggingPush(mockLogger, mockStringStorage)
     }
 
     @AfterTest
@@ -62,7 +61,7 @@ class LoggingPushTests {
     fun testSetPushToken() = runTest {
         loggingPush.registerPushToken(PUSH_TOKEN)
 
-        verify { mockStorage.put(PushConstants.PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) }
+        verify { mockStringStorage.put(PushConstants.PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) }
         verifyLogging()
     }
 
@@ -75,7 +74,7 @@ class LoggingPushTests {
 
     @Test
     fun testPushToken() = runTest {
-        val result = loggingPush.pushToken
+        val result = loggingPush.getPushToken()
 
         advanceUntilIdle()
 

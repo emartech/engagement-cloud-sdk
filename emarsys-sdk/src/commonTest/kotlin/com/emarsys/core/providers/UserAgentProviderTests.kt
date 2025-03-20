@@ -5,7 +5,7 @@ import com.emarsys.core.device.DeviceInfo
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.networking.UserAgentProvider
 import dev.mokkery.answering.returns
-import dev.mokkery.every
+import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import dev.mokkery.resetAnswers
 import io.kotest.matchers.shouldBe
@@ -38,7 +38,7 @@ class UserAgentProviderTests {
     @BeforeTest
     fun setUp() {
         mockDeviceInfoCollector = mock()
-        every { mockDeviceInfoCollector.collect() } returns Json.encodeToString(DEVICE_INFO)
+        everySuspend { mockDeviceInfoCollector.collect() } returns Json.encodeToString(DEVICE_INFO)
 
         userAgentProvider = UserAgentProvider(mockDeviceInfoCollector, Json)
     }

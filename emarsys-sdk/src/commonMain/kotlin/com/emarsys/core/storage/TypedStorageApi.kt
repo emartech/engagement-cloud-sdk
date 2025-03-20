@@ -2,8 +2,7 @@ package com.emarsys.core.storage
 
 interface TypedStorageApi<Value> {
 
-    fun put(key: String, value: Value)
+    suspend fun put(key: String, value: Value)
 
-    fun get(key: String): Value
-
+    suspend fun get(key: String): Value
 }

@@ -86,7 +86,7 @@ import com.emarsys.core.providers.UUIDProvider
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.state.StateMachine
 import com.emarsys.core.storage.Storage
-import com.emarsys.core.storage.TypedStorageApi
+import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.url.UrlFactory
 import com.emarsys.core.url.UrlFactoryApi
@@ -278,8 +278,8 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         dependencyCreator.createPlatformContext(pushActionFactory, downloaderApi, inAppDownloader)
 
 
-    override val stringStorage: TypedStorageApi<String?> by lazy {
-        dependencyCreator.createStorage()
+    override val stringStorage: StringStorageApi by lazy {
+        dependencyCreator.createStringStorage()
     }
 
     override val storage: Storage by lazy { Storage(stringStorage, json) }

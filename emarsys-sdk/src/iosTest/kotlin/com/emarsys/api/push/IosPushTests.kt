@@ -231,11 +231,11 @@ class IosPushTests {
 
     @Test
     fun testPushToken_inactiveState() = runTest {
-        every {
-            mockLoggingPush.pushToken
+        everySuspend {
+            mockLoggingPush.getPushToken()
         } returns null
 
-        val result = iosPush.pushToken
+        val result = iosPush.getPushToken()
 
         result.onSuccess {
             it shouldBe null
@@ -244,13 +244,13 @@ class IosPushTests {
 
     @Test
     fun testPushToken_onHoldState() = runTest {
-        every {
-            mockGathererPush.pushToken
+        everySuspend {
+            mockGathererPush.getPushToken()
         } returns PUSH_TOKEN
 
         sdkContext.setSdkState(SdkState.onHold)
 
-        val result = iosPush.pushToken
+        val result = iosPush.getPushToken()
 
         result.onSuccess {
             it shouldBe PUSH_TOKEN
@@ -259,13 +259,13 @@ class IosPushTests {
 
     @Test
     fun testPushToken_activeState() = runTest {
-        every {
-            mockPushInternal.pushToken
+        everySuspend {
+            mockPushInternal.getPushToken()
         } returns PUSH_TOKEN
 
         sdkContext.setSdkState(SdkState.active)
 
-        val result = iosPush.pushToken
+        val result = iosPush.getPushToken()
 
         result.onSuccess {
             it shouldBe PUSH_TOKEN

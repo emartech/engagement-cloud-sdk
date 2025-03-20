@@ -1,14 +1,13 @@
 package com.emarsys.api.push
 
 import com.emarsys.api.push.PushConstants.PUSH_TOKEN_STORAGE_KEY
-import com.emarsys.core.storage.TypedStorageApi
+import com.emarsys.core.storage.StringStorageApi
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
-
 import kotlin.test.Test
 
 class PushGathererTests {
@@ -23,7 +22,7 @@ class PushGathererTests {
         )
     }
 
-    private lateinit var mockStringStorage: TypedStorageApi<String?>
+    private lateinit var mockStringStorage: StringStorageApi
     private lateinit var pushContext: PushContext
     private lateinit var pushGatherer: PushGatherer
 
@@ -46,7 +45,7 @@ class PushGathererTests {
     fun testPushToken() = runTest {
         every { mockStringStorage.get(PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
 
-        pushGatherer.pushToken shouldBe PUSH_TOKEN
+        pushGatherer.getPushToken() shouldBe PUSH_TOKEN
     }
 
 }

@@ -39,7 +39,7 @@ import com.emarsys.core.providers.ClientIdProvider
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.StringStorage
-import com.emarsys.core.storage.SuspendTypedStorageApi
+import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.storage.WrapperInfoStorage
 import com.emarsys.core.url.ExternalUrlOpenerApi
@@ -122,11 +122,11 @@ actual class PlatformDependencyCreator actual constructor(
         return JSPlatformContext()
     }
 
-    actual override fun createStorage(): TypedStorageApi<String?> {
+    actual override fun createStringStorage(): StringStorageApi {
         return StringStorage(window.localStorage)
     }
 
-    actual override fun createSdkConfigStorage(): SuspendTypedStorageApi<SdkConfig?> {
+    actual override fun createSdkConfigStorage(): TypedStorageApi<SdkConfig?> {
         TODO("Not yet implemented")
     }
 
@@ -143,7 +143,7 @@ actual class PlatformDependencyCreator actual constructor(
 
     actual override fun createDeviceInfoCollector(
         timezoneProvider: Provider<String>,
-        storage: TypedStorageApi<String?>
+        storage: StringStorageApi
     ): DeviceInfoCollector {
         val wrapperInfoStorage =
             WrapperInfoStorage(window.localStorage, sdkContext, sdkLogger, json)
@@ -163,7 +163,7 @@ actual class PlatformDependencyCreator actual constructor(
         sdkDispatcher: CoroutineDispatcher,
         sdkContext: SdkContext,
         actionFactory: ActionFactoryApi<ActionModel>,
-        storage: TypedStorageApi<String?>
+        storage: StringStorageApi
     ): State {
         return PlatformInitState(
             PushService(pushServiceContext, storage),
@@ -239,7 +239,7 @@ actual class PlatformDependencyCreator actual constructor(
 
     actual override fun createPushInternal(
         pushClient: PushClientApi,
-        storage: TypedStorageApi<String?>,
+        storage: StringStorageApi,
         pushContext: ApiContext<PushCall>,
         eventClient: EventClientApi,
         actionFactory: ActionFactoryApi<ActionModel>,
@@ -251,10 +251,10 @@ actual class PlatformDependencyCreator actual constructor(
 
     actual override fun createPushApi(
         pushInternal: PushInstance,
-        storage: TypedStorageApi<String?>,
+        storage: StringStorageApi,
         pushContext: ApiContext<PushCall>,
     ): PushApi {
-        val loggingPush = LoggingPush(sdkLogger, storage, sdkContext.sdkDispatcher)
+        val loggingPush = LoggingPush(sdkLogger, storage)
         val pushGatherer = PushGatherer(pushContext, storage)
         return Push(loggingPush, pushGatherer, pushInternal, sdkContext)
     }

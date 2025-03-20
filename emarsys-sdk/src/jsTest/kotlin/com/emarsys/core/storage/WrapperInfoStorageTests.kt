@@ -12,6 +12,7 @@ import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.browser.window
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.w3c.dom.Storage
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -44,7 +45,7 @@ class WrapperInfoStorageTests {
     }
 
     @Test
-    fun testStorage() {
+    fun testStorage() = runTest {
         val expectedWrapperInfo = WrapperInfo(WRAPPER_PLATFORM, WRAPPER_VERSION)
         wrapperInfoStorage.put(StorageConstants.WRAPPER_INFO_KEY, expectedWrapperInfo)
 
@@ -54,7 +55,7 @@ class WrapperInfoStorageTests {
     }
 
     @Test
-    fun testStorage_withNull() {
+    fun testStorage_withNull() = runTest {
         val expectedWrapperInfo = WrapperInfo(WRAPPER_PLATFORM, WRAPPER_VERSION)
         wrapperInfoStorage.put(StorageConstants.WRAPPER_INFO_KEY, expectedWrapperInfo)
         wrapperInfoStorage.put(StorageConstants.WRAPPER_INFO_KEY, null)
@@ -65,7 +66,7 @@ class WrapperInfoStorageTests {
     }
 
     @Test
-    fun testStorage_shouldNotCrashOnSerializationError() {
+    fun testStorage_shouldNotCrashOnSerializationError() = runTest {
         val expectedWrapperInfo = WrapperInfo("unknown", "unknown")
         val wrongWrapperInfoString =
             """{"wrongPropertyName: "wrongPropertyValue","wrapperVersion":"1.0.0"}"""

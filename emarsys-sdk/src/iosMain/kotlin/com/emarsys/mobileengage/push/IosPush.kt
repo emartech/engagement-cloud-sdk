@@ -30,10 +30,9 @@ class IosPush<Logging : IosPushInstance, Gatherer : IosPushInstance, Internal : 
         }
     }
 
-    override val pushToken: Result<String?>
-        get() = runCatching {
-            activeInstance<PushInternalApi>().pushToken
-        }
+    override suspend fun getPushToken(): Result<String?> {
+        return kotlin.runCatching {  activeInstance<PushInternalApi>().getPushToken() }
+    }
 
     override var customerUserNotificationCenterDelegate: Result<UNUserNotificationCenterDelegateProtocol?>
         get() = runCatching { activeInstance<IosPushInstance>().customerUserNotificationCenterDelegate }

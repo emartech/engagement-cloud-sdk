@@ -10,7 +10,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
-import kotlinx.serialization.encodeToString
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -31,7 +30,7 @@ class StorageTests {
         const val KEY = "testKey"
     }
 
-    private lateinit var mockStringStorage: TypedStorageApi<String?>
+    private lateinit var mockStringStorage: StringStorageApi
     private val json = JsonUtil.json
     private lateinit var storage: StorageApi
 

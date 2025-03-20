@@ -9,7 +9,7 @@ class AndroidSdkConfigStorage(
     private val stringStorage: TypedStorageApi<String?>,
     private val sdkLogger: Logger,
     private val json: Json
-) : SuspendTypedStorageApi<SdkConfig?> {
+) : TypedStorageApi<SdkConfig?> {
     override suspend fun put(key: String, value: SdkConfig?) {
         try {
             stringStorage.put(key, json.encodeToString(value))

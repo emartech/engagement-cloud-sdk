@@ -18,7 +18,7 @@ actual class DeviceInfoCollector(
     private val json: Json
 ) : DeviceInfoCollectorApi {
 
-    actual override fun collect(): String {
+    actual override suspend fun collect(): String {
         val headerData = webPlatformInfoCollector.collect()
         return json.encodeToString(
             DeviceInfo(
@@ -37,11 +37,11 @@ actual class DeviceInfoCollector(
         )
     }
 
-    private fun getWrapperInfo(): WrapperInfo? {
+    private suspend fun getWrapperInfo(): WrapperInfo? {
         return wrapperInfoStorage.get(StorageConstants.WRAPPER_INFO_KEY)
     }
 
-    actual override fun getClientId(): String {
+    actual override suspend fun getClientId(): String {
         return clientIdProvider.provide()
     }
 

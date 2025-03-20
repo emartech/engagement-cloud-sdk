@@ -1,6 +1,7 @@
 package com.emarsys.core.storage
 
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.test.runTest
 import platform.Foundation.NSUserDefaults
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -27,14 +28,14 @@ class StringStorageTests {
     }
 
     @Test
-    fun testStorage_usesInjectedUserDefaults() {
+    fun testStorage_usesInjectedUserDefaults() = runTest {
         storage.put(TEST_KEY, TEST_VALUE)
 
         storage.get(TEST_KEY) shouldBe TEST_VALUE
     }
 
     @Test
-    fun testStorage_withNull() {
+    fun testStorage_withNull() = runTest {
         storage.put(TEST_KEY, TEST_VALUE)
         storage.put(TEST_KEY, null)
 
@@ -42,7 +43,7 @@ class StringStorageTests {
     }
 
     @Test
-    fun testStorage_shouldReturnNull_whenNoValueWasStored() {
+    fun testStorage_shouldReturnNull_whenNoValueWasStored() = runTest {
         storage.get(TEST_KEY) shouldBe null
     }
 }

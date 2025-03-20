@@ -7,7 +7,6 @@ import com.emarsys.context.SdkContextApi
 import com.emarsys.core.log.LogLevel
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
-import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
@@ -197,11 +196,11 @@ class PushTests {
 
     @Test
     fun testPushToken_inactiveState() = runTest {
-        every {
-            mockLoggingPush.pushToken
+        everySuspend {
+            mockLoggingPush.getPushToken()
         } returns null
 
-        val result = push.pushToken
+        val result = push.getPushToken()
 
         result.onSuccess {
             it shouldBe null
@@ -210,13 +209,13 @@ class PushTests {
 
     @Test
     fun testPushToken_onHoldState() = runTest {
-        every {
-            mockGathererPush.pushToken
+        everySuspend {
+            mockGathererPush.getPushToken()
         } returns PUSH_TOKEN
 
         sdkContext.setSdkState(SdkState.onHold)
 
-        val result = push.pushToken
+        val result = push.getPushToken()
 
         result.onSuccess {
             it shouldBe PUSH_TOKEN
@@ -225,13 +224,13 @@ class PushTests {
 
     @Test
     fun testPushToken_activeState() = runTest {
-        every {
-            mockPushInternal.pushToken
+        everySuspend {
+            mockPushInternal.getPushToken()
         } returns PUSH_TOKEN
 
         sdkContext.setSdkState(SdkState.active)
 
-        val result = push.pushToken
+        val result = push.getPushToken()
 
         result.onSuccess {
             it shouldBe PUSH_TOKEN

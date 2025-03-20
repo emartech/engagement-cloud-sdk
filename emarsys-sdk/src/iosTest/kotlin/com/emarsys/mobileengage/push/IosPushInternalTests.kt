@@ -15,7 +15,7 @@ import com.emarsys.core.actions.badge.BadgeCountHandlerApi
 import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.Provider
-import com.emarsys.core.storage.TypedStorageApi
+import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.actions.Action
@@ -87,7 +87,7 @@ class IosPushInternalTests {
     private lateinit var iosPushInternal: IosPushInternal
 
     private lateinit var mockPushClient: PushClientApi
-    private lateinit var mockStorage: TypedStorageApi<String?>
+    private lateinit var mockStorage: StringStorageApi
     private lateinit var pushContext: ApiContext<PushCall>
     private lateinit var mockSdkContext: SdkContextApi
     private lateinit var mockActionFactory: ActionFactoryApi<ActionModel>

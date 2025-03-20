@@ -66,7 +66,7 @@ class Config<Logging : ConfigInstance, Gatherer : ConfigInstance, Internal : Con
         return deviceInfoCollector.getPushSettings()
     }
 
-    private fun getDeviceInfo(): DeviceInfo {
+    private suspend fun getDeviceInfo(): DeviceInfo {
         return JsonUtil.json.decodeFromString<DeviceInfo>(deviceInfoCollector.collect())
     }
 }

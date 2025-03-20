@@ -65,7 +65,7 @@ class DeviceClientTests {
             },
             """{"refreshToken":"$testRefreshToken", "contactToken":"$testContactToken"}"""
         )
-        every { mockDeviceInfoCollector.collect() } returns testDeviceInfoString
+        everySuspend { mockDeviceInfoCollector.collect() } returns testDeviceInfoString
         every { mockUrlFactory.create(REGISTER_DEVICE_INFO, null) } returns testUrl
         everySuspend { mockEmarsysClient.send(any()) } returns expectedResponse
         everySuspend { mockContactTokenHandler.handleContactTokens(expectedResponse) } returns Unit

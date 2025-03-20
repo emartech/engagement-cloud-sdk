@@ -2,6 +2,7 @@ package com.emarsys.core.storage
 
 import io.kotest.matchers.shouldBe
 import kotlinx.browser.window
+import kotlinx.coroutines.test.runTest
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -24,7 +25,7 @@ class StringStorageTests {
     }
     
     @Test
-    fun testStorage() {
+    fun testStorage() = runTest {
         val expected = "testValue"
         
         storage.put(KEY, expected)

@@ -79,7 +79,7 @@ class RemoteConfigHandlerTests {
             )
         )
 
-        every { mockDeviceInfoCollector.getClientId() } returns clientId
+        everySuspend { mockDeviceInfoCollector.getClientId() } returns clientId
         everySuspend { mockRemoteConfigClient.fetchRemoteConfig() } returns config
         every { mockRandomProvider.provide() } returns 0.1
 
@@ -112,7 +112,7 @@ class RemoteConfigHandlerTests {
             )
         )
 
-        every { mockDeviceInfoCollector.getClientId() } returns clientId
+        everySuspend { mockDeviceInfoCollector.getClientId() } returns clientId
         everySuspend { mockRemoteConfigClient.fetchRemoteConfig(any()) } returns config
         every { mockRandomProvider.provide() } returns 0.1
 

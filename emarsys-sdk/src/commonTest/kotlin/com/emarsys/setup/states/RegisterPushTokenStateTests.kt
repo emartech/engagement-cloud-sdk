@@ -1,7 +1,7 @@
 package com.emarsys.setup.states
 
 import com.emarsys.api.push.PushConstants
-import com.emarsys.core.storage.TypedStorageApi
+import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.networking.clients.push.PushClientApi
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -31,15 +31,15 @@ class RegisterPushTokenStateTests  {
     }
 
     private lateinit var mockPushClient: PushClientApi
-    private lateinit var mockStorage: TypedStorageApi<String?>
+    private lateinit var mockStringStorage: StringStorageApi
     private lateinit var registerPushTokenState: RegisterPushTokenState
 
     @BeforeTest
     fun setUp() {
         mockPushClient = mock()
-        mockStorage = mock()
+        mockStringStorage = mock()
 
-        registerPushTokenState = RegisterPushTokenState(mockPushClient, mockStorage)
+        registerPushTokenState = RegisterPushTokenState(mockPushClient, mockStringStorage)
     }
 
     @AfterTest
@@ -49,9 +49,9 @@ class RegisterPushTokenStateTests  {
 
     @Test
     fun testActive_whenLastSentPushTokenIsMissing_pushTokenIsAvailable() = runTest {
-        every { mockStorage.get(PushConstants.PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
-        every { mockStorage.get(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns null
-        every { mockStorage.put(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
+        every { mockStringStorage.get(PushConstants.PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
+        every { mockStringStorage.get(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns null
+        every { mockStringStorage.put(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
 
         everySuspend { mockPushClient.registerPushToken(PUSH_TOKEN) } returns Unit
 
@@ -59,7 +59,7 @@ class RegisterPushTokenStateTests  {
 
         verifySuspend {
             mockPushClient.registerPushToken(PUSH_TOKEN)
-            mockStorage.put(
+            mockStringStorage.put(
                 PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY,
                 PUSH_TOKEN
             )
@@ -68,9 +68,9 @@ class RegisterPushTokenStateTests  {
 
     @Test
     fun testActive_whenBothAvailable_butNotTheSame() = runTest {
-        every { mockStorage.get(PushConstants.PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
-        every { mockStorage.get(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns LAST_SENT_PUSH_TOKEN
-        every { mockStorage.put(any(), any()) } returns Unit
+        every { mockStringStorage.get(PushConstants.PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
+        every { mockStringStorage.get(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns LAST_SENT_PUSH_TOKEN
+        every { mockStringStorage.put(any(), any()) } returns Unit
 
         everySuspend { mockPushClient.registerPushToken(any()) } returns Unit
 
@@ -78,7 +78,7 @@ class RegisterPushTokenStateTests  {
 
         verifySuspend {
             mockPushClient.registerPushToken(PUSH_TOKEN)
-            mockStorage.put(
+            mockStringStorage.put(
                 PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY,
                 PUSH_TOKEN
             )
@@ -87,9 +87,9 @@ class RegisterPushTokenStateTests  {
 
     @Test
     fun testActive_whenBothAvailable_andTheSame() = runTest {
-        every { mockStorage.get(PushConstants.PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
-        every { mockStorage.get(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns LAST_SENT_PUSH_TOKEN
-        every { mockStorage.put(any(), any()) } returns Unit
+        every { mockStringStorage.get(PushConstants.PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
+        every { mockStringStorage.get(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns LAST_SENT_PUSH_TOKEN
+        every { mockStringStorage.put(any(), any()) } returns Unit
 
         everySuspend { mockPushClient.registerPushToken(any()) } returns Unit
 
@@ -100,7 +100,7 @@ class RegisterPushTokenStateTests  {
                 mockPushClient.registerPushToken(any())
             }
             repeat(0) {
-                mockStorage.put(
+                mockStringStorage.put(
                     any(),
                     any()
                 )

@@ -19,7 +19,7 @@ import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.state.State
-import com.emarsys.core.storage.SuspendTypedStorageApi
+import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.util.DownloaderApi
@@ -62,15 +62,15 @@ expect class PlatformDependencyCreator(
         inAppDownloader: InAppDownloaderApi,
     ): PlatformContext
 
-    override fun createStorage(): TypedStorageApi<String?>
+    override fun createStringStorage(): StringStorageApi
 
-    override fun createSdkConfigStorage(): SuspendTypedStorageApi<SdkConfig?>
+    override fun createSdkConfigStorage(): TypedStorageApi<SdkConfig?>
 
     override fun createEventsDao(): EventsDaoApi
 
     override fun createDeviceInfoCollector(
         timezoneProvider: Provider<String>,
-        storage: TypedStorageApi<String?>
+        storage: StringStorageApi
     ): DeviceInfoCollector
 
     override fun createPlatformInitState(
@@ -78,7 +78,7 @@ expect class PlatformDependencyCreator(
         sdkDispatcher: CoroutineDispatcher,
         sdkContext: SdkContext,
         actionFactory: ActionFactoryApi<ActionModel>,
-        storage: TypedStorageApi<String?>
+        storage: StringStorageApi
     ): State
 
     override fun createPermissionHandler(): PermissionHandlerApi
@@ -110,7 +110,7 @@ expect class PlatformDependencyCreator(
 
     override fun createPushInternal(
         pushClient: PushClientApi,
-        storage: TypedStorageApi<String?>,
+        storage: StringStorageApi,
         pushContext: ApiContext<PushCall>,
         eventClient: EventClientApi,
         actionFactory: ActionFactoryApi<ActionModel>,
@@ -120,7 +120,7 @@ expect class PlatformDependencyCreator(
 
     override fun createPushApi(
         pushInternal: PushInstance,
-        storage: TypedStorageApi<String?>,
+        storage: StringStorageApi,
         pushContext: ApiContext<PushCall>,
     ): PushApi
 }

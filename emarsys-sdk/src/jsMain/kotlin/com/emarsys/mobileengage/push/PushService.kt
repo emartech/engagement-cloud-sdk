@@ -3,7 +3,7 @@ package com.emarsys.mobileengage.push
 import com.emarsys.JsEmarsysConfig
 import com.emarsys.ServiceWorkerOptions
 import com.emarsys.api.push.PushConstants
-import com.emarsys.core.storage.TypedStorageApi
+import com.emarsys.core.storage.StringStorageApi
 import js.buffer.BufferSource
 import js.typedarrays.Uint8Array
 import kotlinx.browser.window
@@ -13,7 +13,7 @@ import web.push.PushSubscriptionOptionsInit
 //TODO: add logger instead of console log
 class PushService(
     private val pushServiceContext: PushServiceContext,
-    private val storage: TypedStorageApi<String?>
+    private val storage: StringStorageApi
 ) : PushServiceApi {
 
     override suspend fun register(config: JsEmarsysConfig) {

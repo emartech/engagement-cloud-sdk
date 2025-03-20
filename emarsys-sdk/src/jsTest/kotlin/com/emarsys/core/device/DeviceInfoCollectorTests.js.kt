@@ -8,9 +8,11 @@ import com.emarsys.core.wrapper.WrapperInfo
 import com.emarsys.util.JsonUtil
 import dev.mokkery.answering.returns
 import dev.mokkery.every
+import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.browser.window
+import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -60,7 +62,7 @@ class DeviceInfoCollectorTests {
         mockLanguageProvider = mock()
         every { mockLanguageProvider.provide() } returns LANGUAGE
         mockWrapperInfoStorage = mock()
-        every { mockWrapperInfoStorage.get(StorageConstants.WRAPPER_INFO_KEY) } returns null
+        everySuspend { mockWrapperInfoStorage.get(StorageConstants.WRAPPER_INFO_KEY) } returns null
 
         deviceInfoCollector = DeviceInfoCollector(
             mockClientIdProvider,
@@ -74,7 +76,7 @@ class DeviceInfoCollectorTests {
     }
 
     @Test
-    fun collect_shouldReturn_deviceInfo() {
+    fun collect_shouldReturn_deviceInfo() = runTest {
         val expectedDeviceInfo = DeviceInfo(
             platform = BROWSER_NAME,
             platformCategory = SdkConstants.WEB_PLATFORM_CATEGORY,
@@ -95,8 +97,8 @@ class DeviceInfoCollectorTests {
     }
 
     @Test
-    fun collect_shouldReturn_deviceInfo_whenWrapper() {
-        every { mockWrapperInfoStorage.get(StorageConstants.WRAPPER_INFO_KEY) } returns WrapperInfo(
+    fun collect_shouldReturn_deviceInfo_whenWrapper() = runTest {
+        everySuspend { mockWrapperInfoStorage.get(StorageConstants.WRAPPER_INFO_KEY) } returns WrapperInfo(
             platformWrapper = WRAPPER_PLATFORM,
             wrapperVersion = WRAPPER_VERSION
         )

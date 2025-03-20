@@ -5,11 +5,11 @@ import com.emarsys.core.storage.TypedStorageApi
 class FakeStorage: TypedStorageApi<String?> {
     private val storedValue: MutableMap<String, String?> = mutableMapOf()
 
-    override fun put(key: String, value: String?) {
+    override suspend fun put(key: String, value: String?) {
         storedValue[key] = value
     }
 
-    override fun get(key: String): String? {
+    override suspend fun get(key: String): String? {
         return storedValue[key]
     }
 

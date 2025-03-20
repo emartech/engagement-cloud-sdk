@@ -7,7 +7,6 @@ import com.emarsys.util.JsonUtil
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
@@ -39,7 +38,7 @@ class AndroidSdkConfigStorageTests {
 
     @Test
     fun testStorage() = runTest {
-        every { mockStringStorage.get(StorageConstants.SDK_CONFIG_KEY) } returns json.encodeToString(
+        coEvery { mockStringStorage.get(StorageConstants.SDK_CONFIG_KEY) } returns json.encodeToString(
             CONFIG
         )
 

@@ -9,8 +9,10 @@ import com.emarsys.core.wrapper.WrapperInfo
 import com.emarsys.util.JsonUtil
 import dev.mokkery.answering.returns
 import dev.mokkery.every
+import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -44,7 +46,7 @@ class DeviceInfoCollectorTests {
         mockLanguageProvider = mock()
         every { mockLanguageProvider.provide() } returns LANGUAGE
         mockWrapperStorage = mock()
-        every { mockWrapperStorage.get(StorageConstants.WRAPPER_INFO_KEY) } returns null
+        everySuspend { mockWrapperStorage.get(StorageConstants.WRAPPER_INFO_KEY) } returns null
         mockTimezoneProvider = mock()
         every { mockTimezoneProvider.provide() } returns TIMEZONE
         mockDeviceInformation = mock()
@@ -64,7 +66,7 @@ class DeviceInfoCollectorTests {
     }
 
     @Test
-    fun collect_shouldCollectDeviceInfo() {
+    fun collect_shouldCollectDeviceInfo() = runTest {
         val deviceInfo = DeviceInfo(
             KotlinPlatform.IOS.name.lowercase(),
             SdkConstants.MOBILE_PLATFORM_CATEGORY,
@@ -84,7 +86,7 @@ class DeviceInfoCollectorTests {
     }
 
     @Test
-    fun getClientId_shouldReturnClientId_fromProvider() {
+    fun getClientId_shouldReturnClientId_fromProvider() = runTest {
         deviceInfoCollector.getClientId() shouldBe CLIENT_ID
     }
 }

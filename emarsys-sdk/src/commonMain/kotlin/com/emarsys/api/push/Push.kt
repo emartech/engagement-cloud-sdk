@@ -26,6 +26,7 @@ class Push<Logging : PushInstance, Gatherer : PushInstance, Internal : PushInsta
         }
     }
 
-    override val pushToken: Result<String?>
-        get() = runCatching { activeInstance<PushInternalApi>().pushToken }
+    override suspend fun getPushToken(): Result<String?> {
+        return runCatching { activeInstance<PushInternalApi>().getPushToken() }
+    }
 }

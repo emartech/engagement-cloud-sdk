@@ -11,6 +11,7 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -47,7 +48,7 @@ class WrapperInfoStorageTests {
     }
 
     @Test
-    fun testStorage() {
+    fun testStorage() = runTest {
         val expectedWrapperInfo = WrapperInfo(WRAPPER_PLATFORM, WRAPPER_VERSION)
         storage.put(StorageConstants.WRAPPER_INFO_KEY, expectedWrapperInfo)
 
@@ -57,7 +58,7 @@ class WrapperInfoStorageTests {
     }
 
     @Test
-    fun testStorage_shouldNotCrashOnSerializationError() {
+    fun testStorage_shouldNotCrashOnSerializationError() = runTest {
         val expectedWrapperInfo = WrapperInfo("unknown", "unknown")
         val wrongWrapperInfoString =
             """{"wrongPropertyName: "wrongPropertyValue","wrapperVersion":"1.0.0"}"""

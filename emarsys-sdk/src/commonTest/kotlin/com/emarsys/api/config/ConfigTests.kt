@@ -12,7 +12,6 @@ import com.emarsys.core.device.DeviceInfo
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.log.LogLevel
 import dev.mokkery.answering.returns
-import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
@@ -91,9 +90,9 @@ class ConfigTest {
         sdkContext.config = EmarsysConfig(APPLICATION_CODE, MERCHANT_ID)
 
 
-        every { mockDeviceInfoCollector.collect() } returns Json.encodeToString(DEVICE_INFO)
+        everySuspend { mockDeviceInfoCollector.collect() } returns Json.encodeToString(DEVICE_INFO)
         everySuspend { mockDeviceInfoCollector.getPushSettings() } returns PUSH_SETTINGS
-        every { mockDeviceInfoCollector.getClientId() } returns CLIENT_ID
+        everySuspend { mockDeviceInfoCollector.getClientId() } returns CLIENT_ID
 
         everySuspend { mockLoggingConfig.activate() } returns Unit
         everySuspend { mockGathererConfig.activate() } returns Unit

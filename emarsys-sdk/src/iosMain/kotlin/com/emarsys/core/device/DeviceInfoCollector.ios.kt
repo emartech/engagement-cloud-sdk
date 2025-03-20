@@ -22,7 +22,7 @@ actual class DeviceInfoCollector(
     private val wrapperInfoStorage: TypedStorageApi<WrapperInfo?>,
     private val json: Json
 ) : DeviceInfoCollectorApi {
-    actual override fun collect(): String {
+    actual override suspend fun collect(): String {
         val deviceInfo = DeviceInfo(
             KotlinPlatform.IOS.name.lowercase(),
             platformCategory = SdkConstants.MOBILE_PLATFORM_CATEGORY,
@@ -39,11 +39,11 @@ actual class DeviceInfoCollector(
         return json.encodeToString(deviceInfo)
     }
 
-    private fun getWrapperInfo(): WrapperInfo? {
+    private suspend fun getWrapperInfo(): WrapperInfo? {
         return wrapperInfoStorage.get(StorageConstants.WRAPPER_INFO_KEY)
     }
 
-    actual override fun getClientId(): String {
+    actual override suspend fun getClientId(): String {
         return clientIdProvider.provide()
     }
 

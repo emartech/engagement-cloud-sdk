@@ -7,6 +7,7 @@ import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.wrapper.WrapperInfo
 import com.emarsys.util.JsonUtil
 import io.kotest.matchers.shouldBe
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -46,12 +47,12 @@ class DeviceInfoCollectorTests {
         every { mockApplicationVersionProvider.provide() } returns APP_VERSION
 
         mockClientIdProvider = mockk(relaxed = true)
-        every { mockClientIdProvider.provide() } returns CLIENT_ID
+        coEvery { mockClientIdProvider.provide() } returns CLIENT_ID
 
         mockPlatformInfoCollector = mockk(relaxed = true)
 
         mockStorage = mockk(relaxed = true)
-        every { mockStorage.get(any()) } returns null
+        coEvery { mockStorage.get(any()) } returns null
 
         deviceInfoCollector = DeviceInfoCollector(
             mockTimezoneProvider,
@@ -66,12 +67,12 @@ class DeviceInfoCollectorTests {
     }
 
     @Test
-    fun getClientId_shouldReturnGenerateNewId_ifStorageReturnsNull() {
+    fun getClientId_shouldReturnGenerateNewId_ifStorageReturnsNull() = runTest {
         deviceInfoCollector.getClientId() shouldBe CLIENT_ID
     }
 
     @Test
-    fun collect_shouldReturn_deviceInfo_whenNative() {
+    fun collect_shouldReturn_deviceInfo_whenNative() = runTest {
         val expectedDeviceInfo = DeviceInfo(
             platform = "android",
             platformCategory = "mobile",
@@ -93,9 +94,9 @@ class DeviceInfoCollectorTests {
     }
 
     @Test
-    fun collect_shouldReturn_deviceInfo_whenWrapper() {
+    fun collect_shouldReturn_deviceInfo_whenWrapper() = runTest {
         val expectedWrapperInfo = WrapperInfo(WRAPPER_PLATFORM, WRAPPER_VERSION)
-        every { mockStorage.get(StorageConstants.WRAPPER_INFO_KEY) } returns expectedWrapperInfo
+        coEvery { mockStorage.get(StorageConstants.WRAPPER_INFO_KEY) } returns expectedWrapperInfo
 
         val expectedDeviceInfo = DeviceInfo(
             platform = "android",
@@ -118,7 +119,7 @@ class DeviceInfoCollectorTests {
     }
 
     @Test
-    fun collect_platformShouldBe_huawei() {
+    fun collect_platformShouldBe_huawei() = runTest {
         val deviceInfoCollector = DeviceInfoCollector(
             mockTimezoneProvider,
             mockLanguageProvider,

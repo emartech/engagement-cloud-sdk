@@ -4,7 +4,7 @@ import com.emarsys.api.push.BasicPushUserInfo
 import com.emarsys.api.push.BasicPushUserInfoEms
 import com.emarsys.api.push.PushCall
 import com.emarsys.api.push.PushContext
-import com.emarsys.core.storage.TypedStorageApi
+import com.emarsys.core.storage.StringStorageApi
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.matcher.any
@@ -19,7 +19,7 @@ import kotlin.test.Test
 
 
 class IosGathererPushTests {
-    private lateinit var mockStorage: TypedStorageApi<String?>
+    private lateinit var mockStorage: StringStorageApi
     private lateinit var pushContext: PushContext
     private lateinit var mockIosPushInternal: IosPushInstance
     private lateinit var iosGathererPush: IosGathererPush

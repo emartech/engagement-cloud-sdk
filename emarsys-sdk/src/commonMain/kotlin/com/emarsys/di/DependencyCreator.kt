@@ -17,7 +17,7 @@ import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.state.State
-import com.emarsys.core.storage.SuspendTypedStorageApi
+import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.util.DownloaderApi
@@ -48,15 +48,15 @@ interface DependencyCreator {
         inAppDownloader: InAppDownloaderApi,
     ): PlatformContext
 
-    fun createStorage(): TypedStorageApi<String?>
+    fun createStringStorage(): StringStorageApi
 
-    fun createSdkConfigStorage(): SuspendTypedStorageApi<SdkConfig?>
+    fun createSdkConfigStorage(): TypedStorageApi<SdkConfig?>
 
     fun createEventsDao(): EventsDaoApi
 
     fun createDeviceInfoCollector(
         timezoneProvider: Provider<String>,
-        storage: TypedStorageApi<String?>
+        storage: StringStorageApi
     ): DeviceInfoCollector
 
     fun createPlatformInitState(
@@ -64,7 +64,7 @@ interface DependencyCreator {
         sdkDispatcher: CoroutineDispatcher,
         sdkContext: SdkContext,
         actionFactory: ActionFactoryApi<ActionModel>,
-        storage: TypedStorageApi<String?>
+        storage: StringStorageApi
     ): State
 
     fun createPermissionHandler(): PermissionHandlerApi
@@ -96,7 +96,7 @@ interface DependencyCreator {
 
     fun createPushInternal(
         pushClient: PushClientApi,
-        storage: TypedStorageApi<String?>,
+        storage: StringStorageApi,
         pushContext: ApiContext<PushCall>,
         eventClient: EventClientApi,
         actionFactory: ActionFactoryApi<ActionModel>,
@@ -106,7 +106,7 @@ interface DependencyCreator {
 
     fun createPushApi(
         pushInternal: PushInstance,
-        storage: TypedStorageApi<String?>,
+        storage: StringStorageApi,
         pushContext: ApiContext<PushCall>
     ): PushApi
 }

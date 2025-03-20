@@ -7,12 +7,12 @@ import com.emarsys.api.push.PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY
 import com.emarsys.api.push.PushConstants.PUSH_TOKEN_STORAGE_KEY
 import com.emarsys.core.collections.dequeue
 import com.emarsys.core.log.Logger
-import com.emarsys.core.storage.TypedStorageApi
+import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.networking.clients.push.PushClientApi
 
 open class PushInternal(
     private val pushClient: PushClientApi,
-    private val storage: TypedStorageApi<String?>,
+    private val storage: StringStorageApi,
     private val pushContext: ApiContext<PushCall>,
     private val sdkLogger: Logger,
 ) : PushInstance {
@@ -31,9 +31,9 @@ open class PushInternal(
         storage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, null)
     }
 
-    override val pushToken: String?
-        get() = storage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) ?: storage.get(PUSH_TOKEN_STORAGE_KEY)
-
+    override suspend fun getPushToken(): String? {
+        return storage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) ?: storage.get(PUSH_TOKEN_STORAGE_KEY)
+    }
 
     override suspend fun activate() {
         pushContext.calls.dequeue { call ->

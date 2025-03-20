@@ -16,11 +16,11 @@ class WrapperInfoStorage(
     private val sdkLogger: Logger,
     private val json: Json
 ): TypedStorageApi<WrapperInfo?> {
-    override fun put(key: String, value: WrapperInfo?) {
+    override suspend fun put(key: String, value: WrapperInfo?) {
         userDefaults.setObject(json.encodeToString(value), key)
     }
 
-    override fun get(key: String): WrapperInfo? {
+    override suspend fun get(key: String): WrapperInfo? {
         return try {
             userDefaults.stringForKey(key)?.let {
                 json.decodeFromString(it)

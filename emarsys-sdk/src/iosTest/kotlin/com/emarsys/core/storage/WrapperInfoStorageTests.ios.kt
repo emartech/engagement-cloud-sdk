@@ -44,7 +44,7 @@ class WrapperInfoStorageTests {
     }
 
     @Test
-    fun testStorage() {
+    fun testStorage() = runTest {
         val expectedWrapperInfo = WrapperInfo(WRAPPER_PLATFORM, WRAPPER_VERSION)
         storage.put(StorageConstants.WRAPPER_INFO_KEY, expectedWrapperInfo)
 
@@ -54,7 +54,7 @@ class WrapperInfoStorageTests {
     }
 
     @Test
-    fun testStorage_withNull() {
+    fun testStorage_withNull() = runTest {
         storage.put(StorageConstants.WRAPPER_INFO_KEY, null)
 
         val result = storage.get(StorageConstants.WRAPPER_INFO_KEY)
@@ -63,7 +63,7 @@ class WrapperInfoStorageTests {
     }
 
     @Test
-    fun testStorage_shouldNotCrashOnSerializationError() {
+    fun testStorage_shouldNotCrashOnSerializationError() = runTest {
         val expectedWrapperInfo = WrapperInfo("unknown", "unknown")
         val wrongWrapperInfoString =
             """{"wrongPropertyName: "wrongPropertyValue","wrapperVersion":"1.0.0"}"""

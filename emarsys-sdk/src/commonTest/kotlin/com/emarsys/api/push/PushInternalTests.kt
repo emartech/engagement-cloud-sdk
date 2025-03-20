@@ -3,14 +3,12 @@ package com.emarsys.api.push
 import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY
 import com.emarsys.api.push.PushConstants.PUSH_TOKEN_STORAGE_KEY
-import com.emarsys.core.storage.TypedStorageApi
+import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.networking.clients.push.PushClientApi
 import dev.mokkery.answering.returns
-import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
-import dev.mokkery.verify
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
@@ -31,25 +29,25 @@ class PushInternalTests {
     }
 
     private lateinit var mockPushClient: PushClientApi
-    private lateinit var mockStorage: TypedStorageApi<String?>
+    private lateinit var mockStringStorage: StringStorageApi
     private lateinit var pushContext: ApiContext<PushCall>
     private lateinit var pushInternal: PushInternal
 
     @BeforeTest
     fun setup() = runTest {
         mockPushClient = mock()
-        mockStorage = mock()
+        mockStringStorage = mock()
 
         pushContext = PushContext(expected)
-        pushInternal = PushInternal(mockPushClient, mockStorage, pushContext, mock())
+        pushInternal = PushInternal(mockPushClient, mockStringStorage, pushContext, mock())
     }
 
     @Test
     fun testRegisterPushToken_shouldNotDoAnything_whenPushTokenStoredAlready() = runTest {
-        every { mockStorage.get(PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
-        every { mockStorage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
-        every { mockStorage.put(PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
-        every { mockStorage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
+        everySuspend { mockStringStorage.get(PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
+        everySuspend { mockStringStorage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
+        everySuspend { mockStringStorage.put(PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
+        everySuspend { mockStringStorage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
         everySuspend { mockPushClient.registerPushToken(any()) } returns Unit
 
         pushInternal.registerPushToken(PUSH_TOKEN)
@@ -62,40 +60,40 @@ class PushInternalTests {
     @Test
     fun testRegisterPushToken_shouldRegisterPushToken_whenPushTokenWasNotStoredPreviously() =
         runTest {
-            every { mockStorage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns null
-            every { mockStorage.put(PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
-            every { mockStorage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
+            everySuspend { mockStringStorage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns null
+            everySuspend { mockStringStorage.put(PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
+            everySuspend { mockStringStorage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
             everySuspend { mockPushClient.registerPushToken(any()) } returns Unit
 
             pushInternal.registerPushToken(PUSH_TOKEN)
 
             verifySuspend(VerifyMode.order) {
-                mockStorage.put(PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN)
+                mockStringStorage.put(PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN)
                 mockPushClient.registerPushToken(PUSH_TOKEN)
-                mockStorage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN)
+                mockStringStorage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN)
             }
         }
 
     @Test
     fun testRegisterPushToken_shouldRegisterPushToken_whenStoredPushTokenIsDifferent() = runTest {
-        every { mockStorage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns "<differentTestPushToken>"
-        every { mockStorage.put(PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
-        every { mockStorage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
+        everySuspend { mockStringStorage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns "<differentTestPushToken>"
+        everySuspend { mockStringStorage.put(PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
+        everySuspend { mockStringStorage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
         everySuspend { mockPushClient.registerPushToken(any()) } returns Unit
 
         pushInternal.registerPushToken(PUSH_TOKEN)
 
         verifySuspend(VerifyMode.order) {
-            mockStorage.put(PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN)
+            mockStringStorage.put(PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN)
             mockPushClient.registerPushToken(PUSH_TOKEN)
-            mockStorage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN)
+            mockStringStorage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN)
         }
     }
 
     @Test
     fun testClearPushToken() = runTest {
         everySuspend { mockPushClient.clearPushToken() } returns Unit
-        every { mockStorage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, null) } returns Unit
+        everySuspend { mockStringStorage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, null) } returns Unit
 
         pushInternal.clearPushToken()
 
@@ -103,19 +101,19 @@ class PushInternalTests {
             mockPushClient.clearPushToken()
         }
 
-        verify { mockStorage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, null) }
+        verifySuspend { mockStringStorage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, null) }
     }
 
     @Test
     fun testPushToken() = runTest {
-        every { mockStorage.get(PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
-        every { mockStorage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns null
-        every { mockStorage.put(PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
-        every { mockStorage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
+        everySuspend { mockStringStorage.get(PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
+        everySuspend { mockStringStorage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns null
+        everySuspend { mockStringStorage.put(PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
+        everySuspend { mockStringStorage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
         everySuspend { mockPushClient.registerPushToken(any()) } returns Unit
 
         pushInternal.registerPushToken(PUSH_TOKEN)
-        pushInternal.pushToken shouldBe PUSH_TOKEN
+        pushInternal.getPushToken() shouldBe PUSH_TOKEN
     }
 
     @Test

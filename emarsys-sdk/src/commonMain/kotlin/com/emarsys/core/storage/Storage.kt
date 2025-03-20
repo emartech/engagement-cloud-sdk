@@ -3,7 +3,7 @@ package com.emarsys.core.storage
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 
-class Storage(private val stringStorage: TypedStorageApi<String?>, val json: Json): StorageApi {
+class Storage(private val stringStorage: StringStorageApi, val json: Json): StorageApi {
 
     override fun <Value>put(key: String, serializer: KSerializer<Value>, value: Value?) {
         val encodedValue = value?.let {

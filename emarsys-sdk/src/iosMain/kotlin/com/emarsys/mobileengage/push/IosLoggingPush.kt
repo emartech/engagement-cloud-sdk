@@ -4,7 +4,7 @@ import com.emarsys.api.push.BasicPushUserInfo
 import com.emarsys.api.push.LoggingPush
 import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.Logger
-import com.emarsys.core.storage.TypedStorageApi
+import com.emarsys.core.storage.StringStorageApi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -14,9 +14,9 @@ import platform.darwin.NSObject
 
 class IosLoggingPush(
     private val logger: Logger,
-    storage: TypedStorageApi<String?>,
+    storage: StringStorageApi,
     private val sdkDispatcher: CoroutineDispatcher
-) : LoggingPush(logger, storage, sdkDispatcher), IosPushInstance {
+) : LoggingPush(logger, storage), IosPushInstance {
     override var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol?
         get() {
             val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)

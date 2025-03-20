@@ -18,13 +18,13 @@ class WrapperInfoStorage(
     private val json: Json
 ) :
     TypedStorageApi<WrapperInfo?> {
-    override fun put(key: String, value: WrapperInfo?) {
+    override suspend fun put(key: String, value: WrapperInfo?) {
         sharedPreferences.edit {
             putString(key, json.encodeToString(value))
         }
     }
 
-    override fun get(key: String): WrapperInfo? {
+    override suspend fun get(key: String): WrapperInfo? {
         return try {
             sharedPreferences.getString(key, null)?.let {
                 json.decodeFromString(it)

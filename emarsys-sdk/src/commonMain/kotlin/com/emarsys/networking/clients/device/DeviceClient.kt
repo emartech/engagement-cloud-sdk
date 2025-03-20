@@ -19,7 +19,7 @@ class DeviceClient(
         contactTokenHandler.handleContactTokens(emarsysClient.send(request))
     }
 
-    private fun createRequest(): UrlRequest {
+    private suspend fun createRequest(): UrlRequest {
         val deviceInfoString = deviceInfoCollector.collect()
         val url = urlFactory.create(REGISTER_DEVICE_INFO, null)
         return UrlRequest(

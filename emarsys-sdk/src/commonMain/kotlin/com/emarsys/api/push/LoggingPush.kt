@@ -2,17 +2,13 @@ package com.emarsys.api.push
 
 import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.Logger
-import com.emarsys.core.storage.TypedStorageApi
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import com.emarsys.core.storage.StringStorageApi
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 
 open class LoggingPush(
     private val logger: Logger,
-    private val storage: TypedStorageApi<String?>,
-    private val sdkDispatcher: CoroutineDispatcher,
+    private val storage: StringStorageApi,
 ) : PushInstance {
     override suspend fun registerPushToken(pushToken: String) {
         storage.put(PushConstants.PUSH_TOKEN_STORAGE_KEY, pushToken)
@@ -31,15 +27,11 @@ open class LoggingPush(
         logger.debug(entry)
     }
 
-    override val pushToken: String?
-        get() {
-            val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)
-            CoroutineScope(sdkDispatcher).launch {
-                logger.debug(entry)
-            }
-            return null
-        }
-
+    override suspend fun getPushToken(): String? {
+        val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)
+        logger.debug(entry)
+        return null
+    }
 
     override suspend fun activate() {
         val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)

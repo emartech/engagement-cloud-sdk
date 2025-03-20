@@ -5,5 +5,5 @@ interface PushInternalApi {
     suspend fun registerPushToken(pushToken: String)
     suspend fun clearPushToken()
 
-    val pushToken: String?
+    suspend fun getPushToken(): String?
 }
