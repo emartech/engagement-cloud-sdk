@@ -116,27 +116,27 @@ class ConfigTest {
 
     @Test
     fun testContactFieldId_returnsCorrectValue() = runTest {
-        config.contactFieldId shouldBe CONTACT_FIELD_ID
+        config.getContactFieldId() shouldBe CONTACT_FIELD_ID
     }
 
     @Test
     fun testApplicationCode_returnsCorrectValue() = runTest {
-        config.applicationCode shouldBe APPLICATION_CODE
+        config.getApplicationCode() shouldBe APPLICATION_CODE
     }
 
     @Test
     fun testMerchantId_returnsCorrectValue() = runTest {
-        config.merchantId shouldBe MERCHANT_ID
+        config.getMerchantId() shouldBe MERCHANT_ID
     }
 
     @Test
     fun testClientId_returnsCorrectValue() = runTest {
-        config.clientId shouldBe CLIENT_ID
+        config.getClientId() shouldBe CLIENT_ID
     }
 
     @Test
     fun testLanguageCode_returnsCorrectValue() = runTest {
-        config.languageCode shouldBe LANGUAGE_CODE
+        config.getLanguageCode() shouldBe LANGUAGE_CODE
     }
 
     @Test
@@ -146,7 +146,7 @@ class ConfigTest {
 
     @Test
     fun testSdkVersion_returnsCorrectValue() = runTest {
-        config.sdkVersion shouldBe SDK_VERSION
+        config.getSdkVersion() shouldBe SDK_VERSION
     }
 
     @Test

@@ -6,8 +6,7 @@ import com.emarsys.core.log.Logger
 class GathererConfig(
     val context: ApiContext<ConfigCall>,
     private val sdkLogger: Logger
-) :
-    ConfigInstance {
+) : ConfigInstance {
     override suspend fun changeApplicationCode(applicationCode: String) {
         sdkLogger.debug("GathererConfig - changeApplicationCode")
         context.calls.add(ConfigCall.ChangeApplicationCode(applicationCode))

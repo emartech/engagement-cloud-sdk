@@ -13,8 +13,7 @@ class ConfigInternal(
     private val uuidProvider: Provider<String>,
     private val timestampProvider: Provider<Instant>,
     private val sdkLogger: Logger
-) :
-    ConfigInstance {
+) : ConfigInstance {
 
     override suspend fun changeApplicationCode(applicationCode: String) {
         sdkLogger.debug("ConfigInternal - changeApplicationCode")

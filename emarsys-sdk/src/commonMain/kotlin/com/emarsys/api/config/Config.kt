@@ -26,19 +26,17 @@ class Config<Logging : ConfigInstance, Gatherer : ConfigInstance, Internal : Con
     internalApi,
     sdkContext
 ), ConfigApi {
-    override val contactFieldId: Int?
-        get() = sdkContext.contactFieldId
-    override val applicationCode: String?
-        get() = sdkContext.config?.applicationCode
-    override val merchantId: String?
-        get() = sdkContext.config?.merchantId
-    override val clientId: String
-        get() = deviceInfoCollector.getClientId()
-    override val languageCode: String
-        get() = getDeviceInfo().language
+    override suspend fun getContactFieldId(): Int? = sdkContext.contactFieldId
 
-    override val sdkVersion: String
-        get() = getDeviceInfo().sdkVersion
+    override suspend fun getApplicationCode(): String? = sdkContext.config?.applicationCode
+
+    override suspend fun getMerchantId(): String? = sdkContext.config?.merchantId
+
+    override suspend fun getClientId(): String = deviceInfoCollector.getClientId()
+
+    override suspend fun getLanguageCode(): String = getDeviceInfo().language
+
+    override suspend fun getSdkVersion(): String = getDeviceInfo().sdkVersion
 
     override suspend fun changeApplicationCode(applicationCode: String): Result<Unit> =
         runCatching {
