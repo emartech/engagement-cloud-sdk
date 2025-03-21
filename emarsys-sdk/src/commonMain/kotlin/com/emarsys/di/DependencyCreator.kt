@@ -1,6 +1,5 @@
 package com.emarsys.di
 
-import com.emarsys.SdkConfig
 import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.PushApi
 import com.emarsys.api.push.PushCall
@@ -50,12 +49,11 @@ interface DependencyCreator {
 
     fun createStringStorage(): StringStorageApi
 
-    fun createSdkConfigStorage(): TypedStorageApi<SdkConfig?>
-
     fun createEventsDao(): EventsDaoApi
 
     fun createDeviceInfoCollector(
         timezoneProvider: Provider<String>,
+        typedStorage: TypedStorageApi,
         storage: StringStorageApi
     ): DeviceInfoCollector
 

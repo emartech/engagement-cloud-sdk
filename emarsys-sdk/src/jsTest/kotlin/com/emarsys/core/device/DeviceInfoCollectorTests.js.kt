@@ -45,7 +45,7 @@ class DeviceInfoCollectorTests {
     private lateinit var mockTimezoneProvider: Provider<String>
     private lateinit var mockApplicationVersionProvider: Provider<String>
     private lateinit var mockLanguageProvider: Provider<String>
-    private lateinit var mockWrapperInfoStorage: TypedStorageApi<WrapperInfo?>
+    private lateinit var mockWrapperInfoStorage: TypedStorageApi
     private lateinit var deviceInfoCollector: DeviceInfoCollector
     private val json: Json = JsonUtil.json
 
@@ -62,7 +62,7 @@ class DeviceInfoCollectorTests {
         mockLanguageProvider = mock()
         every { mockLanguageProvider.provide() } returns LANGUAGE
         mockWrapperInfoStorage = mock()
-        everySuspend { mockWrapperInfoStorage.get(StorageConstants.WRAPPER_INFO_KEY) } returns null
+        everySuspend { mockWrapperInfoStorage.get(StorageConstants.WRAPPER_INFO_KEY, WrapperInfo.serializer()) } returns null
 
         deviceInfoCollector = DeviceInfoCollector(
             mockClientIdProvider,
@@ -98,7 +98,7 @@ class DeviceInfoCollectorTests {
 
     @Test
     fun collect_shouldReturn_deviceInfo_whenWrapper() = runTest {
-        everySuspend { mockWrapperInfoStorage.get(StorageConstants.WRAPPER_INFO_KEY) } returns WrapperInfo(
+        everySuspend { mockWrapperInfoStorage.get(StorageConstants.WRAPPER_INFO_KEY, WrapperInfo.serializer()) } returns WrapperInfo(
             platformWrapper = WRAPPER_PLATFORM,
             wrapperVersion = WRAPPER_VERSION
         )

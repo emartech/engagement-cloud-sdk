@@ -1,6 +1,5 @@
 package com.emarsys.di
 
-import com.emarsys.SdkConfig
 import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.LoggingPush
 import com.emarsys.api.push.Push
@@ -41,7 +40,6 @@ import com.emarsys.core.state.State
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
-import com.emarsys.core.storage.WrapperInfoStorage
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.url.WebExternalUrlOpener
 import com.emarsys.core.util.DownloaderApi
@@ -126,10 +124,6 @@ actual class PlatformDependencyCreator actual constructor(
         return StringStorage(window.localStorage)
     }
 
-    actual override fun createSdkConfigStorage(): TypedStorageApi<SdkConfig?> {
-        TODO("Not yet implemented")
-    }
-
     actual override fun createEventsDao(): EventsDaoApi {
         val emarsysIndexedDbObjectStore = EmarsysIndexedDbObjectStore(
             emarsysIndexedDb,
@@ -143,17 +137,16 @@ actual class PlatformDependencyCreator actual constructor(
 
     actual override fun createDeviceInfoCollector(
         timezoneProvider: Provider<String>,
+        typedStorage: TypedStorageApi,
         storage: StringStorageApi
     ): DeviceInfoCollector {
-        val wrapperInfoStorage =
-            WrapperInfoStorage(window.localStorage, sdkContext, sdkLogger, json)
         return DeviceInfoCollector(
             ClientIdProvider(uuidProvider, storage),
             timezoneProvider,
             createWebDeviceInfoCollector(),
             createApplicationVersionProvider(),
             createLanguageProvider(),
-            wrapperInfoStorage,
+            typedStorage,
             json
         )
     }

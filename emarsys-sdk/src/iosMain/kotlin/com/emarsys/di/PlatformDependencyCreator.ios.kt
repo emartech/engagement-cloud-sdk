@@ -1,7 +1,6 @@
 package com.emarsys.di
 
 import app.cash.sqldelight.driver.native.NativeSqliteDriver
-import com.emarsys.SdkConfig
 import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.PushApi
 import com.emarsys.api.push.PushCall
@@ -36,7 +35,6 @@ import com.emarsys.core.storage.StorageConstants.DB_NAME
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
-import com.emarsys.core.storage.WrapperInfoStorage
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.url.IosExternalUrlOpener
 import com.emarsys.core.util.DownloaderApi
@@ -114,10 +112,6 @@ actual class PlatformDependencyCreator actual constructor(
         return StringStorage(platformContext.userDefaults)
     }
 
-    actual override fun createSdkConfigStorage(): TypedStorageApi<SdkConfig?> {
-        TODO("Not yet implemented")
-    }
-
     actual override fun createEventsDao(): EventsDaoApi {
         val driver = NativeSqliteDriver(EmarsysDB.Schema, DB_NAME)
         return IosSqDelightEventsDao(EmarsysDB(driver), json)
@@ -125,17 +119,16 @@ actual class PlatformDependencyCreator actual constructor(
 
     actual override fun createDeviceInfoCollector(
         timezoneProvider: Provider<String>,
+        typedStorage: TypedStorageApi,
         storage: StringStorageApi
     ): DeviceInfoCollector {
-        val wrapperInfoStorage =
-            WrapperInfoStorage(platformContext.userDefaults, sdkContext, sdkLogger, json)
         return DeviceInfoCollector(
             ClientIdProvider(uuidProvider, createStringStorage()),
             createApplicationVersionProvider(),
             createLanguageProvider(),
             timezoneProvider,
             uiDevice,
-            wrapperInfoStorage,
+            typedStorage,
             json
         )
     }

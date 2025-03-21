@@ -15,7 +15,7 @@ actual class DeviceInfoCollector(
     private val isGooglePlayServicesAvailable: Boolean,
     private val clientIdProvider: Provider<String>,
     private val platformInfoCollector: PlatformInfoCollectorApi,
-    private val wrapperInfoStorage: TypedStorageApi<WrapperInfo?>,
+    private val wrapperInfoStorage: TypedStorageApi,
     private val json: Json
 ) : DeviceInfoCollectorApi {
 
@@ -38,7 +38,7 @@ actual class DeviceInfoCollector(
     }
 
     private suspend fun getWrapperInfo(): WrapperInfo? {
-        return wrapperInfoStorage.get(StorageConstants.WRAPPER_INFO_KEY)
+        return wrapperInfoStorage.get(StorageConstants.WRAPPER_INFO_KEY, WrapperInfo.serializer())
     }
 
     actual override suspend fun getClientId(): String {

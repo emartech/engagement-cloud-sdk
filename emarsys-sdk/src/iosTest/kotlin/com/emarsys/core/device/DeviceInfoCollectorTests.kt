@@ -32,7 +32,7 @@ class DeviceInfoCollectorTests {
     private lateinit var mockLanguageProvider: Provider<String>
     private lateinit var mockTimezoneProvider: Provider<String>
     private lateinit var mockDeviceInformation: UIDeviceApi
-    private lateinit var mockWrapperStorage: TypedStorageApi<WrapperInfo?>
+    private lateinit var mockWrapperStorage: TypedStorageApi
     private lateinit var json: Json
 
     private lateinit var deviceInfoCollector: DeviceInfoCollector
@@ -46,7 +46,7 @@ class DeviceInfoCollectorTests {
         mockLanguageProvider = mock()
         every { mockLanguageProvider.provide() } returns LANGUAGE
         mockWrapperStorage = mock()
-        everySuspend { mockWrapperStorage.get(StorageConstants.WRAPPER_INFO_KEY) } returns null
+        everySuspend { mockWrapperStorage.get(StorageConstants.WRAPPER_INFO_KEY, WrapperInfo.serializer()) } returns null
         mockTimezoneProvider = mock()
         every { mockTimezoneProvider.provide() } returns TIMEZONE
         mockDeviceInformation = mock()

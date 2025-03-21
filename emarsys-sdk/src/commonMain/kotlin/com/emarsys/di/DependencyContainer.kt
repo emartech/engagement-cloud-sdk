@@ -87,6 +87,8 @@ import com.emarsys.core.session.SessionContext
 import com.emarsys.core.state.StateMachine
 import com.emarsys.core.storage.Storage
 import com.emarsys.core.storage.StringStorageApi
+import com.emarsys.core.storage.TypedStorage
+import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.url.UrlFactory
 import com.emarsys.core.url.UrlFactoryApi
@@ -284,11 +286,20 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
 
     override val storage: Storage by lazy { Storage(stringStorage, json) }
 
+    override val typedStorage: TypedStorageApi by lazy {
+        TypedStorage(
+            stringStorage,
+            json,
+            sdkLogger
+        )
+    }
+
     override val timezoneProvider: Provider<String> by lazy { TimezoneProvider(timestampProvider) }
 
     private val deviceInfoCollector: DeviceInfoCollectorApi by lazy {
         dependencyCreator.createDeviceInfoCollector(
             timezoneProvider,
+            typedStorage,
             stringStorage
         )
     }
@@ -461,7 +472,8 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             ),
             sdkLogger
         )
-        val configInternal = ConfigInternal(sdkEventFlow, uuidProvider, timestampProvider, sdkLogger)
+        val configInternal =
+            ConfigInternal(sdkEventFlow, uuidProvider, timestampProvider, sdkLogger)
         Config(loggingConfig, gathererConfig, configInternal, sdkContext, deviceInfoCollector)
     }
 

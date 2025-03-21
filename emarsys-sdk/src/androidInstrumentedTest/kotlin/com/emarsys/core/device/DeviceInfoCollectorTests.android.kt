@@ -31,7 +31,7 @@ class DeviceInfoCollectorTests {
     private lateinit var mockApplicationVersionProvider: Provider<String>
     private lateinit var mockClientIdProvider: Provider<String>
     private lateinit var mockPlatformInfoCollector: PlatformInfoCollector
-    private lateinit var mockStorage: TypedStorageApi<WrapperInfo?>
+    private lateinit var mockStorage: TypedStorageApi
     private lateinit var deviceInfoCollector: DeviceInfoCollector
     private val json = JsonUtil.json
 
@@ -52,7 +52,7 @@ class DeviceInfoCollectorTests {
         mockPlatformInfoCollector = mockk(relaxed = true)
 
         mockStorage = mockk(relaxed = true)
-        coEvery { mockStorage.get(any()) } returns null
+        coEvery { mockStorage.get(any<String>(), WrapperInfo.serializer()) } returns null
 
         deviceInfoCollector = DeviceInfoCollector(
             mockTimezoneProvider,
@@ -96,7 +96,7 @@ class DeviceInfoCollectorTests {
     @Test
     fun collect_shouldReturn_deviceInfo_whenWrapper() = runTest {
         val expectedWrapperInfo = WrapperInfo(WRAPPER_PLATFORM, WRAPPER_VERSION)
-        coEvery { mockStorage.get(StorageConstants.WRAPPER_INFO_KEY) } returns expectedWrapperInfo
+        coEvery { mockStorage.get(StorageConstants.WRAPPER_INFO_KEY, WrapperInfo.serializer()) } returns expectedWrapperInfo
 
         val expectedDeviceInfo = DeviceInfo(
             platform = "android",

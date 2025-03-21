@@ -19,7 +19,7 @@ actual class DeviceInfoCollector(
     private val languageProvider: Provider<String>,
     private val timezoneProvider: Provider<String>,
     private val deviceInformation: UIDeviceApi,
-    private val wrapperInfoStorage: TypedStorageApi<WrapperInfo?>,
+    private val wrapperInfoStorage: TypedStorageApi,
     private val json: Json
 ) : DeviceInfoCollectorApi {
     actual override suspend fun collect(): String {
@@ -40,7 +40,7 @@ actual class DeviceInfoCollector(
     }
 
     private suspend fun getWrapperInfo(): WrapperInfo? {
-        return wrapperInfoStorage.get(StorageConstants.WRAPPER_INFO_KEY)
+        return wrapperInfoStorage.get(StorageConstants.WRAPPER_INFO_KEY, WrapperInfo.serializer())
     }
 
     actual override suspend fun getClientId(): String {

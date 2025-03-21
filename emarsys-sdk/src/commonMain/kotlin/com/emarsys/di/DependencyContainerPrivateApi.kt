@@ -9,6 +9,7 @@ import com.emarsys.core.providers.Provider
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.storage.Storage
 import com.emarsys.core.storage.StringStorageApi
+import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
@@ -63,6 +64,8 @@ interface DependencyContainerPrivateApi {
     val sessionContext: SessionContext
 
     val storage: Storage
+
+    val typedStorage: TypedStorageApi
 
     val stringStorage: StringStorageApi
 

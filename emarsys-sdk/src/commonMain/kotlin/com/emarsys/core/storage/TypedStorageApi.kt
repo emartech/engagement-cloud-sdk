@@ -1,8 +1,11 @@
 package com.emarsys.core.storage
 
-interface TypedStorageApi<Value> {
+import kotlinx.serialization.KSerializer
 
-    suspend fun put(key: String, value: Value)
+interface TypedStorageApi {
 
-    suspend fun get(key: String): Value
+    suspend fun <Value>put(key: String, serializer: KSerializer<Value>, value: Value)
+
+    suspend fun <Value>get(key: String, serializer: KSerializer<Value>): Value?
+
 }

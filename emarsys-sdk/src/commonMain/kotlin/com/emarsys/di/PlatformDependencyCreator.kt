@@ -1,6 +1,5 @@
 package com.emarsys.di
 
-import com.emarsys.SdkConfig
 import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.PushApi
 import com.emarsys.api.push.PushCall
@@ -64,12 +63,11 @@ expect class PlatformDependencyCreator(
 
     override fun createStringStorage(): StringStorageApi
 
-    override fun createSdkConfigStorage(): TypedStorageApi<SdkConfig?>
-
     override fun createEventsDao(): EventsDaoApi
 
     override fun createDeviceInfoCollector(
         timezoneProvider: Provider<String>,
+        typedStorage: TypedStorageApi,
         storage: StringStorageApi
     ): DeviceInfoCollector
 
