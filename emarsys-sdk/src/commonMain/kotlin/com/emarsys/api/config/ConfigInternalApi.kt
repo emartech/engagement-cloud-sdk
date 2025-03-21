@@ -4,4 +4,8 @@ interface ConfigInternalApi {
     suspend fun changeApplicationCode(applicationCode: String)
 
     suspend fun changeMerchantId(merchantId: String)
+
+    suspend fun setLanguage(language: String)
+
+    suspend fun resetLanguage()
 }

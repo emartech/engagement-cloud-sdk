@@ -1,5 +1,6 @@
 package com.emarsys.api.config
 
+import com.emarsys.core.language.LanguageHandlerApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.Provider
 import com.emarsys.networking.clients.event.model.SdkEvent
@@ -8,9 +9,8 @@ import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -30,22 +30,25 @@ class ConfigInternalTests {
         const val MERCHANT_ID = "testMerchantId"
     }
 
-    private val eventFlow = MutableSharedFlow<SdkEvent>()
+    private lateinit var eventFlow: MutableSharedFlow<SdkEvent>
     private lateinit var mockUuidProvider: Provider<String>
     private lateinit var mockTimestampProvider: Provider<Instant>
     private lateinit var mockLogger: Logger
+    private lateinit var mockLanguageHandler: LanguageHandlerApi
     private lateinit var configInternal: ConfigInternal
 
     @BeforeTest
-    fun setUp() {
+    fun setUp() = runTest {
         mockLogger = mock()
         everySuspend { mockLogger.debug(tag = any()) } returns Unit
         mockUuidProvider = mock()
         every { mockUuidProvider.provide() } returns UUID
         mockTimestampProvider = mock()
         every { mockTimestampProvider.provide() } returns TIMESTAMP
+        mockLanguageHandler = mock()
+        eventFlow = MutableSharedFlow()
         configInternal =
-            ConfigInternal(eventFlow, mockUuidProvider, mockTimestampProvider, mockLogger)
+            ConfigInternal(eventFlow, mockUuidProvider, mockTimestampProvider, mockLogger, mockLanguageHandler)
     }
 
     @Test
@@ -53,7 +56,8 @@ class ConfigInternalTests {
         val expectedEvent = SdkEvent.Internal.Sdk.ChangeAppCode(UUID, buildJsonObject {
             put("applicationCode", JsonPrimitive(APPCODE))
         }, TIMESTAMP)
-        CoroutineScope(Dispatchers.Default).launch {
+
+        backgroundScope.launch {
             configInternal.changeApplicationCode(APPCODE)
         }
 
@@ -67,7 +71,8 @@ class ConfigInternalTests {
         val expectedEvent = SdkEvent.Internal.Sdk.ChangeMerchantId(UUID, buildJsonObject {
             put("merchantId", JsonPrimitive(MERCHANT_ID))
         }, TIMESTAMP)
-        CoroutineScope(Dispatchers.Default).launch {
+
+        backgroundScope.launch {
             configInternal.changeMerchantId(MERCHANT_ID)
         }
 
@@ -75,4 +80,29 @@ class ConfigInternalTests {
 
         result shouldBe expectedEvent
     }
+
+    @Test
+    fun testSetLanguage_shouldCallHandleLanguage_onLanguageHandler() = runTest {
+        val language = "hu-HU"
+
+        everySuspend { mockLanguageHandler.handleLanguage(language) } returns Unit
+
+        configInternal.setLanguage(language)
+
+        verifySuspend {
+            mockLanguageHandler.handleLanguage(language)
+        }
+    }
+
+    @Test
+    fun testResetLanguage_shouldCallHandleLanguage_withNull_inLanguageHandler() = runTest {
+        everySuspend { mockLanguageHandler.handleLanguage(null) } returns Unit
+
+        configInternal.resetLanguage()
+
+        verifySuspend {
+            mockLanguageHandler.handleLanguage(null)
+        }
+    }
+
 }

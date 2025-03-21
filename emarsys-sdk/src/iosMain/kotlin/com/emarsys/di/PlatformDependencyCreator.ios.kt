@@ -20,6 +20,7 @@ import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.db.events.IosSqDelightEventsDao
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.UIDevice
+import com.emarsys.core.language.SupportedLanguagesProvider
 import com.emarsys.core.launchapplication.IosLaunchApplicationHandler
 import com.emarsys.core.log.Logger
 import com.emarsys.core.log.SdkLogger
@@ -84,7 +85,7 @@ actual class PlatformDependencyCreator actual constructor(
     private val json: Json,
     private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
     private val actionHandler: ActionHandlerApi,
-    private val timestampProvider: Provider<Instant>,
+    private val timestampProvider: Provider<Instant>
 ) : DependencyCreator {
     private val platformContext: IosPlatformContext = IosPlatformContext()
     private val processInfo = NSProcessInfo()
@@ -92,6 +93,10 @@ actual class PlatformDependencyCreator actual constructor(
     private val notificationCenter = UNUserNotificationCenter.currentNotificationCenter()
     private val badgeCountHandler: BadgeCountHandlerApi =
         IosBadgeCountHandler(notificationCenter, uiDevice, sdkContext.mainDispatcher)
+
+    private val stringStorage: StringStorageApi by lazy {
+        StringStorage(platformContext.userDefaults)
+    }
 
     actual override fun createPlatformInitializer(
         pushActionFactory: ActionFactoryApi<ActionModel>,
@@ -109,7 +114,7 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createStringStorage(): StringStorageApi {
-        return StringStorage(platformContext.userDefaults)
+        return stringStorage
     }
 
     actual override fun createEventsDao(): EventsDaoApi {
@@ -130,6 +135,9 @@ actual class PlatformDependencyCreator actual constructor(
             uiDevice,
             typedStorage,
             json
+            wrapperInfoStorage,
+            json,
+            stringStorage
         )
     }
 
@@ -218,6 +226,10 @@ actual class PlatformDependencyCreator actual constructor(
 
     actual override fun createLaunchApplicationHandler(): LaunchApplicationHandlerApi {
         return IosLaunchApplicationHandler()
+    }
+
+    override fun createSupportedLanguagesProvider(): Provider<List<String>> {
+        return SupportedLanguagesProvider()
     }
 
     actual override fun createPushInternal(

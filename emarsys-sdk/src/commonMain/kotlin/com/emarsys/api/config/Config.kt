@@ -62,6 +62,24 @@ class Config<Logging : ConfigInstance, Gatherer : ConfigInstance, Internal : Con
         }
     }
 
+    override suspend fun setLanguage(language: String): Result<Unit> = runCatching {
+        withContext(sdkContext.sdkDispatcher) {
+            withLogContext(buildJsonObject {
+                put("language", JsonPrimitive(language))
+            }) {
+                activeInstance<ConfigInternalApi>().setLanguage(language)
+            }
+        }
+    }
+
+    override suspend fun resetLanguage(): Result<Unit> = runCatching {
+        withContext(sdkContext.sdkDispatcher) {
+            withLogContext(buildJsonObject {}) {
+                activeInstance<ConfigInternalApi>().resetLanguage()
+            }
+        }
+    }
+
     override suspend fun getPushSettings(): PushSettings {
         return deviceInfoCollector.getPushSettings()
     }

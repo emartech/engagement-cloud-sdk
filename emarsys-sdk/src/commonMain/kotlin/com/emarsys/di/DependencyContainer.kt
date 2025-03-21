@@ -70,6 +70,8 @@ import com.emarsys.core.crypto.Crypto
 import com.emarsys.core.crypto.CryptoApi
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
+import com.emarsys.core.language.LanguageHandler
+import com.emarsys.core.language.LanguageHandlerApi
 import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.SdkLogger
@@ -474,6 +476,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         )
         val configInternal =
             ConfigInternal(sdkEventFlow, uuidProvider, timestampProvider, sdkLogger)
+        val configInternal = ConfigInternal(sdkEventFlow, uuidProvider, timestampProvider, sdkLogger, languageHandler)
         Config(loggingConfig, gathererConfig, configInternal, sdkContext, deviceInfoCollector)
     }
 
@@ -513,6 +516,14 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             RandomProvider(),
             sdkLogger
         )
+    }
+
+    private val supportedLanguagesProvider: Provider<List<String>> by lazy {
+        dependencyCreator.createSupportedLanguagesProvider()
+    }
+
+    private val languageHandler: LanguageHandlerApi by lazy {
+        LanguageHandler(supportedLanguagesProvider, stringStorage, sdkEventFlow, sdkLogger)
     }
 
     override val setupOrganizerApi: SetupOrganizerApi by lazy {

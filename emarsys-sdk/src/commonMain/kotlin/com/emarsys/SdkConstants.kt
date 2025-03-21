@@ -21,4 +21,7 @@ object SdkConstants {
     const val WEB_PLATFORM_CATEGORY = "web"
 
     const val UNKNOWN_WRAPPER_INFO = "unknown"
+
+    const val LANGUAGE_STORAGE_KEY = "customerOverwroteLanguageCodeKey"
+    const val DEVICE_INFO_UPDATE_REQUIRED_EVENT_NAME = "deviceInfoUpdateRequired"
 }

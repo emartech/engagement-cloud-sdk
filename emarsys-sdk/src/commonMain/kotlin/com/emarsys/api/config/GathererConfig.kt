@@ -17,5 +17,15 @@ class GathererConfig(
         context.calls.add(ConfigCall.ChangeMerchantId(merchantId))
     }
 
+    override suspend fun setLanguage(language: String) {
+        sdkLogger.debug("GathererConfig - setLanguage")
+        context.calls.add(ConfigCall.SetLanguage(language))
+    }
+
+    override suspend fun resetLanguage() {
+        sdkLogger.debug("GathererConfig - resetLanguage")
+        context.calls.add(ConfigCall.ResetLanguage)
+    }
+
     override suspend fun activate() {}
 }

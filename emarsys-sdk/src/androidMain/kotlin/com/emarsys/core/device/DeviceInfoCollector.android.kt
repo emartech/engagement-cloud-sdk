@@ -4,6 +4,7 @@ import android.os.Build
 import com.emarsys.SdkConstants
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.storage.StorageConstants
+import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.wrapper.WrapperInfo
 import kotlinx.serialization.json.Json
@@ -17,6 +18,9 @@ actual class DeviceInfoCollector(
     private val platformInfoCollector: PlatformInfoCollectorApi,
     private val wrapperInfoStorage: TypedStorageApi,
     private val json: Json
+    private val wrapperInfoStorage: TypedStorageApi<WrapperInfo?>,
+    private val json: Json,
+    private val stringStorage: StringStorageApi
 ) : DeviceInfoCollectorApi {
 
     actual override suspend fun collect(): String {
@@ -29,12 +33,16 @@ actual class DeviceInfoCollector(
             deviceModel = Build.MODEL,
             osVersion = SdkBuildConfig.getOsVersion(),
             sdkVersion = BuildConfig.VERSION_NAME,
-            language = languageProvider.provide(),
+            language = language(),
             timezone = timezoneProvider.provide(),
             clientId = clientIdProvider.provide()
         )
 
         return json.encodeToString(deviceInfo)
+    }
+
+    private suspend fun language(): String {
+        return stringStorage.get(SdkConstants.LANGUAGE_STORAGE_KEY) ?: languageProvider.provide()
     }
 
     private suspend fun getWrapperInfo(): WrapperInfo? {

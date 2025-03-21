@@ -3,12 +3,14 @@ package com.emarsys.core.device
 import com.emarsys.SdkConstants
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.storage.StorageConstants
+import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.wrapper.WrapperInfo
 import com.emarsys.util.JsonUtil
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
+import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.browser.window
@@ -47,6 +49,7 @@ class DeviceInfoCollectorTests {
     private lateinit var mockLanguageProvider: Provider<String>
     private lateinit var mockWrapperInfoStorage: TypedStorageApi
     private lateinit var deviceInfoCollector: DeviceInfoCollector
+    private lateinit var mockStringStorage: StringStorageApi
     private val json: Json = JsonUtil.json
 
     @BeforeTest
@@ -62,6 +65,9 @@ class DeviceInfoCollectorTests {
         mockLanguageProvider = mock()
         every { mockLanguageProvider.provide() } returns LANGUAGE
         mockWrapperInfoStorage = mock()
+        mockStringStorage = mock()
+        every { mockStringStorage.get(any()) } returns null
+        everySuspend { mockWrapperInfoStorage.get(StorageConstants.WRAPPER_INFO_KEY) } returns null
         everySuspend { mockWrapperInfoStorage.get(StorageConstants.WRAPPER_INFO_KEY, WrapperInfo.serializer()) } returns null
 
         deviceInfoCollector = DeviceInfoCollector(
@@ -72,6 +78,7 @@ class DeviceInfoCollectorTests {
             mockLanguageProvider,
             mockWrapperInfoStorage,
             json,
+            mockStringStorage
         )
     }
 
@@ -113,6 +120,29 @@ class DeviceInfoCollectorTests {
             osVersion = BROWSER_VERSION,
             sdkVersion = BuildConfig.VERSION_NAME,
             language = LANGUAGE,
+            timezone = TIMEZONE,
+            clientId = CLIENT_ID
+        )
+
+        val result = deviceInfoCollector.collect()
+
+        result shouldBe json.encodeToString(expectedDeviceInfo)
+    }
+
+    @Test
+    fun collect_shouldReturn_with_overriddenLanguage() = runTest {
+        every { mockStringStorage.get(SdkConstants.LANGUAGE_STORAGE_KEY) } returns "hu-HU"
+
+        val expectedDeviceInfo = DeviceInfo(
+            platform = BROWSER_NAME,
+            platformCategory = SdkConstants.WEB_PLATFORM_CATEGORY,
+            platformWrapper = null,
+            platformWrapperVersion = null,
+            applicationVersion = APPLICATION_VERSION,
+            deviceModel = navigator.userAgent,
+            osVersion = BROWSER_VERSION,
+            sdkVersion = BuildConfig.VERSION_NAME,
+            language = "hu-HU",
             timezone = TIMEZONE,
             clientId = CLIENT_ID
         )

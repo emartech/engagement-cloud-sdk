@@ -39,4 +39,22 @@ class GathererConfigTests {
 
         configContext.calls.contains(expectedCall) shouldBe true
     }
+
+    @Test
+    fun testSetLanguage_shouldStoreCall() = runTest {
+        val expectedCall = ConfigCall.SetLanguage("hu-HU")
+
+        gathererConfig.setLanguage("hu-HU")
+
+        configContext.calls.contains(expectedCall) shouldBe true
+    }
+
+    @Test
+    fun testResetLanguage_shouldStoreCall() = runTest {
+        val expectedCall = ConfigCall.ResetLanguage
+
+        gathererConfig.resetLanguage()
+
+        configContext.calls.contains(expectedCall) shouldBe true
+    }
 }

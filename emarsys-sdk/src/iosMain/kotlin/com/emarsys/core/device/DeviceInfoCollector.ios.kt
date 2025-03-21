@@ -5,6 +5,7 @@ import com.emarsys.SdkConstants
 import com.emarsys.core.device.IosNotificationConstant.Companion.fromLong
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.storage.StorageConstants
+import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.wrapper.WrapperInfo
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -21,6 +22,9 @@ actual class DeviceInfoCollector(
     private val deviceInformation: UIDeviceApi,
     private val wrapperInfoStorage: TypedStorageApi,
     private val json: Json
+    private val wrapperInfoStorage: TypedStorageApi<WrapperInfo?>,
+    private val json: Json,
+    private val stringStorage: StringStorageApi
 ) : DeviceInfoCollectorApi {
     actual override suspend fun collect(): String {
         val deviceInfo = DeviceInfo(
@@ -32,7 +36,7 @@ actual class DeviceInfoCollector(
             deviceModel = deviceInformation.deviceModel(),
             osVersion = deviceInformation.osVersion(),
             sdkVersion = BuildConfig.VERSION_NAME,
-            language = languageProvider.provide(),
+            language = stringStorage.get(SdkConstants.LANGUAGE_STORAGE_KEY) ?: languageProvider.provide(),
             timezone = timezoneProvider.provide(),
             clientId = clientIdProvider.provide()
         )

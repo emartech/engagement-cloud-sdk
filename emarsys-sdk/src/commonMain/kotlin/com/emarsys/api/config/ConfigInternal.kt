@@ -1,5 +1,6 @@
 package com.emarsys.api.config
 
+import com.emarsys.core.language.LanguageHandlerApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.Provider
 import com.emarsys.networking.clients.event.model.SdkEvent
@@ -8,12 +9,13 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 
-class ConfigInternal(
+internal class ConfigInternal(
     private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
     private val uuidProvider: Provider<String>,
     private val timestampProvider: Provider<Instant>,
-    private val sdkLogger: Logger
-) : ConfigInstance {
+    private val sdkLogger: Logger,
+    private val languageHandler: LanguageHandlerApi
+): ConfigInstance {
 
     override suspend fun changeApplicationCode(applicationCode: String) {
         sdkLogger.debug("ConfigInternal - changeApplicationCode")
@@ -45,6 +47,14 @@ class ConfigInternal(
                 timestampProvider.provide()
             )
         )
+    }
+
+    override suspend fun setLanguage(language: String) {
+        languageHandler.handleLanguage(language)
+    }
+
+    override suspend fun resetLanguage() {
+        languageHandler.handleLanguage(null)
     }
 
     override suspend fun activate() {

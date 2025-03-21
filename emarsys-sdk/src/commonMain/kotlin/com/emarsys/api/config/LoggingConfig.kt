@@ -24,6 +24,22 @@ class LoggingConfig(private val logger: Logger) : ConfigInstance {
         logger.debug(entry)
     }
 
+    override suspend fun setLanguage(language: String) {
+        val entry = LogEntry.createMethodNotAllowed(
+            this, this::setLanguage.name, buildJsonObject {
+                put("language", JsonPrimitive(language))
+            }
+        )
+        logger.debug(entry)
+    }
+
+    override suspend fun resetLanguage() {
+        val entry = LogEntry.createMethodNotAllowed(
+            this, this::resetLanguage.name, buildJsonObject {}
+        )
+        logger.debug(entry)
+    }
+
     override suspend fun activate() {
         val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)
         logger.debug(entry)

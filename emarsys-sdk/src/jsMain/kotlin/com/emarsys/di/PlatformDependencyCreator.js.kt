@@ -27,6 +27,7 @@ import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.db.events.JSEventsDao
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.WebPlatformInfoCollector
+import com.emarsys.core.language.SupportedLanguagesProvider
 import com.emarsys.core.launchapplication.JsLaunchApplicationHandler
 import com.emarsys.core.log.Logger
 import com.emarsys.core.log.SdkLogger
@@ -91,6 +92,10 @@ actual class PlatformDependencyCreator actual constructor(
 ) : DependencyCreator {
     private val emarsysIndexedDb = EmarsysIndexedDb(indexedDB, sdkLogger)
 
+    private val stringStorage: StringStorageApi by lazy {
+        StringStorage(window.localStorage)
+    }
+
     actual override fun createPlatformInitializer(
         pushActionFactory: ActionFactoryApi<ActionModel>,
         pushActionHandler: ActionHandlerApi
@@ -121,7 +126,7 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createStringStorage(): StringStorageApi {
-        return StringStorage(window.localStorage)
+        return stringStorage
     }
 
     actual override fun createEventsDao(): EventsDaoApi {
@@ -148,6 +153,9 @@ actual class PlatformDependencyCreator actual constructor(
             createLanguageProvider(),
             typedStorage,
             json
+            wrapperInfoStorage,
+            json,
+            stringStorage
         )
     }
 
@@ -228,6 +236,10 @@ actual class PlatformDependencyCreator actual constructor(
 
     actual override fun createLaunchApplicationHandler(): LaunchApplicationHandlerApi {
         return JsLaunchApplicationHandler()
+    }
+
+    override fun createSupportedLanguagesProvider(): Provider<List<String>> {
+        return SupportedLanguagesProvider()
     }
 
     actual override fun createPushInternal(

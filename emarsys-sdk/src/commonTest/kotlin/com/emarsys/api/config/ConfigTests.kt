@@ -173,4 +173,15 @@ class ConfigTest {
             mockInternalConfig.changeMerchantId(newMerchantId)
         }
     }
+    @Test
+    fun testResetLanguage_delegatesToCorrectInstance() = runTest {
+        everySuspend { mockGathererConfig.resetLanguage() } returns Unit
+
+        sdkContext.setSdkState(SdkState.onHold)
+        config.resetLanguage()
+
+        verifySuspend {
+            mockGathererConfig.resetLanguage()
+        }
+    }
 }

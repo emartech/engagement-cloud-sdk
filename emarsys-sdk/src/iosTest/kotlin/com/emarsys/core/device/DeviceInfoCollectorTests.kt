@@ -4,12 +4,14 @@ import com.emarsys.KotlinPlatform
 import com.emarsys.SdkConstants
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.storage.StorageConstants
+import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.wrapper.WrapperInfo
 import com.emarsys.util.JsonUtil
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
+import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
@@ -34,6 +36,7 @@ class DeviceInfoCollectorTests {
     private lateinit var mockDeviceInformation: UIDeviceApi
     private lateinit var mockWrapperStorage: TypedStorageApi
     private lateinit var json: Json
+    private lateinit var mockStringStorage: StringStorageApi
 
     private lateinit var deviceInfoCollector: DeviceInfoCollector
 
@@ -53,6 +56,8 @@ class DeviceInfoCollectorTests {
         every { mockDeviceInformation.osVersion() } returns OS_VERSION
         every { mockDeviceInformation.deviceModel() } returns DEVICE_MODEL
         json = JsonUtil.json
+        mockStringStorage = mock()
+        every { mockStringStorage.get(any()) } returns null
 
         deviceInfoCollector = DeviceInfoCollector(
             mockClientIdProvider,
@@ -61,7 +66,8 @@ class DeviceInfoCollectorTests {
             mockTimezoneProvider,
             mockDeviceInformation,
             mockWrapperStorage,
-            json
+            json,
+            mockStringStorage
         )
     }
 
@@ -88,5 +94,27 @@ class DeviceInfoCollectorTests {
     @Test
     fun getClientId_shouldReturnClientId_fromProvider() = runTest {
         deviceInfoCollector.getClientId() shouldBe CLIENT_ID
+    }
+
+    @Test
+    fun collect_shouldReturnWithOverriddenLanguage() = runTest {
+        every { mockStringStorage.get(SdkConstants.LANGUAGE_STORAGE_KEY) } returns "hu-HU"
+
+        val deviceInfo = DeviceInfo(
+            KotlinPlatform.IOS.name.lowercase(),
+            SdkConstants.MOBILE_PLATFORM_CATEGORY,
+            null,
+            null,
+            APP_VERSION,
+            DEVICE_MODEL,
+            OS_VERSION,
+            BuildConfig.VERSION_NAME,
+            "hu-HU",
+            TIMEZONE,
+            CLIENT_ID
+        )
+        val expected = json.encodeToString(deviceInfo)
+
+        deviceInfoCollector.collect() shouldBe expected
     }
 }

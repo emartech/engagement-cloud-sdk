@@ -29,6 +29,7 @@ import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.device.AndroidLanguageProvider
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.PlatformInfoCollector
+import com.emarsys.core.language.SupportedLanguagesProvider
 import com.emarsys.core.launchapplication.LaunchApplicationHandler
 import com.emarsys.core.log.Logger
 import com.emarsys.core.log.SdkLogger
@@ -89,7 +90,7 @@ actual class PlatformDependencyCreator actual constructor(
     private val json: Json,
     private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
     private val actionHandler: ActionHandlerApi,
-    timestampProvider: Provider<Instant>
+    timestampProvider: Provider<Instant>,
 ) : DependencyCreator {
     private val metadataReader = MetadataReader(applicationContext)
     private val platformInfoCollector = PlatformInfoCollector(applicationContext)
@@ -99,6 +100,10 @@ actual class PlatformDependencyCreator actual constructor(
         applicationContext.getSharedPreferences(StorageConstants.SUITE_NAME, Context.MODE_PRIVATE)
     private val notificationManager =
         (applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+
+    private val stringStorage: StringStorageApi by lazy {
+        StringStorage(sharedPreferences)
+    }
 
     actual override fun createPlatformInitializer(
         pushActionFactory: ActionFactoryApi<ActionModel>,
@@ -145,6 +150,9 @@ actual class PlatformDependencyCreator actual constructor(
             platformInfoCollector,
             typedStorage,
             json
+            wrapperStorage,
+            json,
+            stringStorage
         )
     }
 
@@ -162,8 +170,7 @@ actual class PlatformDependencyCreator actual constructor(
         return PlatformInitState()
     }
 
-    actual override fun createStringStorage(): StringStorageApi =
-        StringStorage(sharedPreferences)
+    actual override fun createStringStorage(): StringStorageApi = stringStorage
 
     actual override fun createEventsDao(): EventsDaoApi {
         val driver = AndroidSqliteDriver(EmarsysDB.Schema, applicationContext, DB_NAME)
@@ -235,6 +242,10 @@ actual class PlatformDependencyCreator actual constructor(
             sdkContext,
             sdkLogger
         )
+    }
+
+    override fun createSupportedLanguagesProvider(): Provider<List<String>> {
+        return SupportedLanguagesProvider()
     }
 
     actual override fun createPushInternal(

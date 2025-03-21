@@ -34,7 +34,7 @@ import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.serialization.json.Json
 
-interface DependencyCreator {
+internal interface DependencyCreator {
 
     fun createPlatformInitializer(
         pushActionFactory: ActionFactoryApi<ActionModel>,
@@ -91,6 +91,8 @@ interface DependencyCreator {
     fun createClipboardHandler(): ClipboardHandlerApi
 
     fun createLaunchApplicationHandler(): LaunchApplicationHandlerApi
+
+    fun createSupportedLanguagesProvider(): Provider<List<String>>
 
     fun createPushInternal(
         pushClient: PushClientApi,

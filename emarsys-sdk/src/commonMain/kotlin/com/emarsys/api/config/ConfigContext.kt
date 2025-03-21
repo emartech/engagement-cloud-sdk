@@ -12,4 +12,10 @@ sealed interface ConfigCall {
 
     @Serializable
     data class ChangeMerchantId(val merchantId: String) : ConfigCall
+
+    @Serializable
+    data class SetLanguage(val language: String) : ConfigCall
+
+    @Serializable
+    object ResetLanguage : ConfigCall
 }

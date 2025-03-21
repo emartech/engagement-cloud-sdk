@@ -1,8 +1,10 @@
 package com.emarsys.core.device
 
 import android.os.Build
+import com.emarsys.SdkConstants
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.storage.StorageConstants
+import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.wrapper.WrapperInfo
 import com.emarsys.util.JsonUtil
@@ -32,6 +34,8 @@ class DeviceInfoCollectorTests {
     private lateinit var mockClientIdProvider: Provider<String>
     private lateinit var mockPlatformInfoCollector: PlatformInfoCollector
     private lateinit var mockStorage: TypedStorageApi
+    private lateinit var mockStorage: TypedStorageApi<WrapperInfo?>
+    private lateinit var mockStringStorage: StringStorageApi
     private lateinit var deviceInfoCollector: DeviceInfoCollector
     private val json = JsonUtil.json
 
@@ -54,6 +58,9 @@ class DeviceInfoCollectorTests {
         mockStorage = mockk(relaxed = true)
         coEvery { mockStorage.get(any<String>(), WrapperInfo.serializer()) } returns null
 
+        mockStringStorage = mockk(relaxed = true)
+        every { mockStringStorage.get(any()) } returns null
+
         deviceInfoCollector = DeviceInfoCollector(
             mockTimezoneProvider,
             mockLanguageProvider,
@@ -62,7 +69,8 @@ class DeviceInfoCollectorTests {
             mockClientIdProvider,
             mockPlatformInfoCollector,
             mockStorage,
-            json
+            json,
+            mockStringStorage
         )
     }
 
@@ -128,7 +136,8 @@ class DeviceInfoCollectorTests {
             mockClientIdProvider,
             mockPlatformInfoCollector,
             mockStorage,
-            json
+            json,
+            mockStringStorage
         )
 
         val result = deviceInfoCollector.collect()
@@ -149,5 +158,31 @@ class DeviceInfoCollectorTests {
         val result = deviceInfoCollector.getPushSettings()
 
         result shouldBe testSettings
+    }
+
+    @Test
+    fun collect_shouldReturn_overWritten_language() = runTest {
+        every {
+            mockStringStorage.get(SdkConstants.LANGUAGE_STORAGE_KEY)
+        } returns "hu-HU"
+
+
+        val expectedDeviceInfo = DeviceInfo(
+            platform = "android",
+            platformCategory = "mobile",
+            platformWrapper = null,
+            platformWrapperVersion = null,
+            applicationVersion = APP_VERSION,
+            deviceModel = Build.MODEL,
+            osVersion = SdkBuildConfig.getOsVersion(),
+            sdkVersion = BuildConfig.VERSION_NAME,
+            language = "hu-HU",
+            timezone = TIMEZONE,
+            clientId = CLIENT_ID
+        )
+
+        val result = deviceInfoCollector.collect()
+
+        result shouldBe json.encodeToString(expectedDeviceInfo)
     }
 }
