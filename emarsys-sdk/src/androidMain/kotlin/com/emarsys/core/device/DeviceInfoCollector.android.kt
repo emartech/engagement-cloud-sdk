@@ -17,8 +17,6 @@ actual class DeviceInfoCollector(
     private val clientIdProvider: Provider<String>,
     private val platformInfoCollector: PlatformInfoCollectorApi,
     private val wrapperInfoStorage: TypedStorageApi,
-    private val json: Json
-    private val wrapperInfoStorage: TypedStorageApi<WrapperInfo?>,
     private val json: Json,
     private val stringStorage: StringStorageApi
 ) : DeviceInfoCollectorApi {

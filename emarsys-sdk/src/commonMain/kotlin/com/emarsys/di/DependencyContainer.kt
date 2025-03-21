@@ -474,8 +474,6 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             ),
             sdkLogger
         )
-        val configInternal =
-            ConfigInternal(sdkEventFlow, uuidProvider, timestampProvider, sdkLogger)
         val configInternal = ConfigInternal(sdkEventFlow, uuidProvider, timestampProvider, sdkLogger, languageHandler)
         Config(loggingConfig, gathererConfig, configInternal, sdkContext, deviceInfoCollector)
     }

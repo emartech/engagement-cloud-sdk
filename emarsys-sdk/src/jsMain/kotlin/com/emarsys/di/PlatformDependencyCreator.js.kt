@@ -152,8 +152,6 @@ actual class PlatformDependencyCreator actual constructor(
             createApplicationVersionProvider(),
             createLanguageProvider(),
             typedStorage,
-            json
-            wrapperInfoStorage,
             json,
             stringStorage
         )

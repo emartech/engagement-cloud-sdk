@@ -149,8 +149,6 @@ actual class PlatformDependencyCreator actual constructor(
             ClientIdProvider(uuidProvider, storage),
             platformInfoCollector,
             typedStorage,
-            json
-            wrapperStorage,
             json,
             stringStorage
         )

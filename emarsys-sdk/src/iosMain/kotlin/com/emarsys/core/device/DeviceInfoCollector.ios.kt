@@ -21,8 +21,6 @@ actual class DeviceInfoCollector(
     private val timezoneProvider: Provider<String>,
     private val deviceInformation: UIDeviceApi,
     private val wrapperInfoStorage: TypedStorageApi,
-    private val json: Json
-    private val wrapperInfoStorage: TypedStorageApi<WrapperInfo?>,
     private val json: Json,
     private val stringStorage: StringStorageApi
 ) : DeviceInfoCollectorApi {

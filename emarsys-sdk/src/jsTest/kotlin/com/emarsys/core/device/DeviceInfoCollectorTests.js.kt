@@ -67,7 +67,6 @@ class DeviceInfoCollectorTests {
         mockWrapperInfoStorage = mock()
         mockStringStorage = mock()
         every { mockStringStorage.get(any()) } returns null
-        everySuspend { mockWrapperInfoStorage.get(StorageConstants.WRAPPER_INFO_KEY) } returns null
         everySuspend { mockWrapperInfoStorage.get(StorageConstants.WRAPPER_INFO_KEY, WrapperInfo.serializer()) } returns null
 
         deviceInfoCollector = DeviceInfoCollector(

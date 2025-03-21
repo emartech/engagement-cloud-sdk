@@ -134,8 +134,6 @@ actual class PlatformDependencyCreator actual constructor(
             timezoneProvider,
             uiDevice,
             typedStorage,
-            json
-            wrapperInfoStorage,
             json,
             stringStorage
         )

@@ -15,11 +15,9 @@ actual class DeviceInfoCollector(
     private val webPlatformInfoCollector: WebPlatformInfoCollectorApi,
     private val applicationVersionProvider: Provider<String>,
     private val languageProvider: Provider<String>,
-    private val wrapperInfoStorage: TypedStorageApi<WrapperInfo?>,
+    private val wrapperInfoStorage: TypedStorageApi,
     private val json: Json,
     private val stringStorage: StringStorageApi
-    private val wrapperInfoStorage: TypedStorageApi,
-    private val json: Json
 ) : DeviceInfoCollectorApi {
 
     actual override suspend fun collect(): String {

@@ -34,7 +34,6 @@ class DeviceInfoCollectorTests {
     private lateinit var mockClientIdProvider: Provider<String>
     private lateinit var mockPlatformInfoCollector: PlatformInfoCollector
     private lateinit var mockStorage: TypedStorageApi
-    private lateinit var mockStorage: TypedStorageApi<WrapperInfo?>
     private lateinit var mockStringStorage: StringStorageApi
     private lateinit var deviceInfoCollector: DeviceInfoCollector
     private val json = JsonUtil.json
