@@ -20,7 +20,8 @@ import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.db.events.IosSqDelightEventsDao
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.UIDevice
-import com.emarsys.core.language.SupportedLanguagesProvider
+import com.emarsys.core.language.LanguageTagValidator
+import com.emarsys.core.language.LanguageTagValidatorApi
 import com.emarsys.core.launchapplication.IosLaunchApplicationHandler
 import com.emarsys.core.log.Logger
 import com.emarsys.core.log.SdkLogger
@@ -226,8 +227,8 @@ actual class PlatformDependencyCreator actual constructor(
         return IosLaunchApplicationHandler()
     }
 
-    override fun createSupportedLanguagesProvider(): Provider<List<String>> {
-        return SupportedLanguagesProvider()
+    override fun createLanguageTagValidator(): LanguageTagValidatorApi {
+        return LanguageTagValidator()
     }
 
     actual override fun createPushInternal(

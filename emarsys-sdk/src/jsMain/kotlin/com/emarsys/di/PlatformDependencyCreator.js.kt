@@ -27,7 +27,8 @@ import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.db.events.JSEventsDao
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.WebPlatformInfoCollector
-import com.emarsys.core.language.SupportedLanguagesProvider
+import com.emarsys.core.language.LanguageTagValidator
+import com.emarsys.core.language.LanguageTagValidatorApi
 import com.emarsys.core.launchapplication.JsLaunchApplicationHandler
 import com.emarsys.core.log.Logger
 import com.emarsys.core.log.SdkLogger
@@ -236,8 +237,8 @@ actual class PlatformDependencyCreator actual constructor(
         return JsLaunchApplicationHandler()
     }
 
-    override fun createSupportedLanguagesProvider(): Provider<List<String>> {
-        return SupportedLanguagesProvider()
+    override fun createLanguageTagValidator(): LanguageTagValidatorApi {
+        return LanguageTagValidator()
     }
 
     actual override fun createPushInternal(

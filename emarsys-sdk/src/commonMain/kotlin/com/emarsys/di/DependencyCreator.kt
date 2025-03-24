@@ -12,6 +12,7 @@ import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.device.DeviceInfoCollector
+import com.emarsys.core.language.LanguageTagValidatorApi
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.providers.Provider
@@ -92,7 +93,7 @@ internal interface DependencyCreator {
 
     fun createLaunchApplicationHandler(): LaunchApplicationHandlerApi
 
-    fun createSupportedLanguagesProvider(): Provider<List<String>>
+    fun createLanguageTagValidator(): LanguageTagValidatorApi
 
     fun createPushInternal(
         pushClient: PushClientApi,

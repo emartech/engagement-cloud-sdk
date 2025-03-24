@@ -72,6 +72,7 @@ import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.language.LanguageHandler
 import com.emarsys.core.language.LanguageHandlerApi
+import com.emarsys.core.language.LanguageTagValidatorApi
 import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.SdkLogger
@@ -516,12 +517,12 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         )
     }
 
-    private val supportedLanguagesProvider: Provider<List<String>> by lazy {
-        dependencyCreator.createSupportedLanguagesProvider()
+    private val languageTagValidator: LanguageTagValidatorApi by lazy {
+        dependencyCreator.createLanguageTagValidator()
     }
 
     private val languageHandler: LanguageHandlerApi by lazy {
-        LanguageHandler(supportedLanguagesProvider, stringStorage, sdkEventFlow, sdkLogger)
+        LanguageHandler(languageTagValidator, stringStorage, sdkEventFlow, sdkLogger)
     }
 
     override val setupOrganizerApi: SetupOrganizerApi by lazy {
