@@ -27,7 +27,7 @@ class SdkEventDistributor(
     private val sdkLogger: Logger
 ) : Registerable {
     private val _onlineEvents =
-        MutableSharedFlow<SdkEvent>(extraBufferCapacity = Channel.UNLIMITED)
+        MutableSharedFlow<SdkEvent>(replay = 100, extraBufferCapacity = Channel.UNLIMITED)
     val onlineEvents = _onlineEvents.asSharedFlow()
 
     private val isDbReemissionInProgress = MutableStateFlow(false)

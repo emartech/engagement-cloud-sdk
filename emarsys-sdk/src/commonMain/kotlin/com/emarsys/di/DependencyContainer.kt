@@ -173,7 +173,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
     private val timestampProvider: Provider<Instant> = TimestampProvider()
 
     override val sdkEventFlow: MutableSharedFlow<SdkEvent> =
-        MutableSharedFlow(extraBufferCapacity = Channel.UNLIMITED)
+        MutableSharedFlow(replay = 100, extraBufferCapacity = Channel.UNLIMITED)
 
     override val json: Json by lazy {
         JsonUtil.json
@@ -569,7 +569,8 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
                 )
             )
         SetupOrganizer(
-            meStateMachine, predictStateMachine, sdkContext, sdkConfigStore, sdkLogger)
+            meStateMachine, predictStateMachine, sdkContext, sdkConfigStore, sdkLogger
+        )
     }
 
 
