@@ -6,7 +6,6 @@ import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import com.emarsys.Emarsys
-import com.emarsys.EmarsysConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,7 +29,7 @@ fun App() {
 
             Button(onClick = {
                 CoroutineScope(Dispatchers.Default).launch {
-                    Emarsys.enableTracking(EmarsysConfig("EMSE3-B4341"))
+                    enableTracking()
                     Emarsys.linkContact(100027299, "test@test.com")
                 }
             }) {
