@@ -58,7 +58,7 @@ class AndroidPlatformContext(
     val androidPushMessageFactory = AndroidPushMessageFactory(
         androidPushV1Mapper = AndroidPushV1Mapper(sdkLogger, json, uuidProvider),
         silentAndroidPushV1Mapper = SilentAndroidPushV1Mapper(sdkLogger, json),
-        androidPushV2Mapper = AndroidPushV2Mapper(sdkLogger, json),
+        androidPushV2Mapper = AndroidPushV2Mapper(uuidProvider, sdkLogger, json),
         silentAndroidPushV2Mapper = SilentAndroidPushV2Mapper(sdkLogger, json)
     )
 }

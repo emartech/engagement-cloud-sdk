@@ -32,7 +32,7 @@ data class DisplayableData(
 
 @Serializable
 data class ActionableData<A: ActionModel>(
-    val actions: List<A>? = null,
+    val actions: List<A>? = emptyList<A>(),
     val defaultTapAction: BasicActionModel? = null,
     val pushToInApp: PushToInApp? = null
 )

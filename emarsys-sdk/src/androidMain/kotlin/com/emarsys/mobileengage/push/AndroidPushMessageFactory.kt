@@ -8,7 +8,6 @@ import com.emarsys.mobileengage.push.mapper.SilentAndroidPushV2Mapper
 import com.emarsys.mobileengage.push.model.AndroidPush
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
 class AndroidPushMessageFactory(
@@ -19,12 +18,11 @@ class AndroidPushMessageFactory(
 ): SuspendFactory<JsonObject, AndroidPush?> {
 
     private companion object {
-        private const val EMS = "ems"
+        private const val VERSION_KEY = "ems.version"
     }
 
     override suspend fun create(value: JsonObject): AndroidPush? {
-        val ems: JsonObject? = value[EMS]?.jsonObject
-        return if (ems?.get("version")?.jsonPrimitive?.contentOrNull != null) {
+        return if (value[VERSION_KEY]?.jsonPrimitive?.contentOrNull != null) {
             if (value["notification.silent"]?.jsonPrimitive?.contentOrNull == "true") {
                 silentAndroidPushV2Mapper.map(value)
             } else {

@@ -76,9 +76,7 @@ class AndroidPushMessageFactoryTest {
     @Test
     fun map_shouldDelegate_toSilentMapperV2() = runTest {
         val input = buildJsonObject {
-            put("ems", buildJsonObject {
-                put("version", JsonPrimitive("value"))
-            })
+            put("ems.version", JsonPrimitive("value"))
             put("notification.silent", JsonPrimitive("true"))
         }
 
@@ -92,9 +90,7 @@ class AndroidPushMessageFactoryTest {
     @Test
     fun map_shouldDelegate_toMapperV2() = runTest {
         val input = buildJsonObject {
-            put("ems", buildJsonObject {
-                put("version", JsonPrimitive("value"))
-            })
+            put("ems.version", JsonPrimitive("value"))
             put("notification.silent", JsonPrimitive("false"))
         }
 
