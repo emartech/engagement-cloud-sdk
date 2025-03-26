@@ -1,6 +1,7 @@
 package com.emarsys.di
 
 import EventTrackerApi
+import com.emarsys.SdkConfig
 import com.emarsys.api.config.Config
 import com.emarsys.api.config.ConfigApi
 import com.emarsys.api.config.ConfigCall
@@ -103,6 +104,7 @@ import com.emarsys.init.states.ApplyGlobalRemoteConfigState
 import com.emarsys.init.states.PlatformInitState
 import com.emarsys.init.states.RegisterInstancesState
 import com.emarsys.init.states.RegisterWatchdogsState
+import com.emarsys.init.states.SdkConfigLoaderState
 import com.emarsys.init.states.SessionSubscriptionState
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.EventActionFactory
@@ -136,6 +138,7 @@ import com.emarsys.remoteConfig.RemoteConfigHandlerApi
 import com.emarsys.setup.PlatformInitializerApi
 import com.emarsys.setup.SetupOrganizer
 import com.emarsys.setup.SetupOrganizerApi
+import com.emarsys.setup.config.SdkConfigStoreApi
 import com.emarsys.setup.states.AppStartState
 import com.emarsys.setup.states.ApplyAppCodeBasedRemoteConfigState
 import com.emarsys.setup.states.CollectDeviceInfoState
@@ -170,7 +173,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
     private val timestampProvider: Provider<Instant> = TimestampProvider()
 
     override val sdkEventFlow: MutableSharedFlow<SdkEvent> =
-        MutableSharedFlow(replay = Channel.UNLIMITED)
+        MutableSharedFlow(extraBufferCapacity = Channel.UNLIMITED)
 
     override val json: Json by lazy {
         JsonUtil.json
@@ -475,7 +478,13 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
             ),
             sdkLogger
         )
-        val configInternal = ConfigInternal(sdkEventFlow, uuidProvider, timestampProvider, sdkLogger, languageHandler)
+        val configInternal = ConfigInternal(
+            sdkEventFlow,
+            uuidProvider,
+            timestampProvider,
+            sdkLogger,
+            languageHandler
+        )
         Config(loggingConfig, gathererConfig, configInternal, sdkContext, deviceInfoCollector)
     }
 
@@ -560,9 +569,7 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
                 )
             )
         SetupOrganizer(
-            meStateMachine, predictStateMachine, sdkContext,
-            sdkLogger
-        )
+            meStateMachine, predictStateMachine, sdkContext, sdkConfigStore, sdkLogger)
     }
 
 
@@ -635,6 +642,10 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
         )
     }
 
+    private val sdkConfigStore: SdkConfigStoreApi<SdkConfig> by lazy {
+        dependencyCreator.createSdkConfigStore(typedStorage)
+    }
+
     override val initOrganizer: InitOrganizerApi by lazy {
         InitOrganizer(
             StateMachine(
@@ -660,6 +671,11 @@ class DependencyContainer : DependencyContainerApi, DependencyContainerPrivateAp
                         platformInitializer,
                         sdkLogger
                     ),
+                    SdkConfigLoaderState(
+                        sdkConfigStore,
+                        setupOrganizerApi,
+                        sdkLogger
+                    )
                 )
             ),
             sdkContext,

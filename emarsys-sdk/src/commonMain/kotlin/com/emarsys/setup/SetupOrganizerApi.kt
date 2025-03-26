@@ -10,4 +10,6 @@ interface SetupOrganizerApi {
     val sdkContext: SdkContextApi
 
     suspend fun setup(config: SdkConfig)
+
+    suspend fun setupWithValidation(config: SdkConfig)
 }

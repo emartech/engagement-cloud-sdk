@@ -1,6 +1,7 @@
 package com.emarsys.di
 
 import app.cash.sqldelight.driver.native.NativeSqliteDriver
+import com.emarsys.SdkConfig
 import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.PushApi
 import com.emarsys.api.push.PushCall
@@ -66,6 +67,8 @@ import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.PlatformInitializer
 import com.emarsys.setup.PlatformInitializerApi
+import com.emarsys.setup.config.IosSdkConfigStore
+import com.emarsys.setup.config.SdkConfigStoreApi
 import com.emarsys.sqldelight.EmarsysDB
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
@@ -271,6 +274,10 @@ actual class PlatformDependencyCreator actual constructor(
             sdkContext,
             sdkLogger
         )
+    }
+
+    override fun createSdkConfigStore(typedStorage: TypedStorageApi): SdkConfigStoreApi<SdkConfig> {
+        return IosSdkConfigStore(typedStorage)
     }
 
 }

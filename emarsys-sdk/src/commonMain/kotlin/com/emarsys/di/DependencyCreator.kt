@@ -1,5 +1,6 @@
 package com.emarsys.di
 
+import com.emarsys.SdkConfig
 import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.PushApi
 import com.emarsys.api.push.PushCall
@@ -30,6 +31,7 @@ import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.PlatformInitializerApi
+import com.emarsys.setup.config.SdkConfigStoreApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
@@ -110,4 +112,6 @@ internal interface DependencyCreator {
         storage: StringStorageApi,
         pushContext: ApiContext<PushCall>
     ): PushApi
+
+    fun createSdkConfigStore(typedStorage: TypedStorageApi): SdkConfigStoreApi<SdkConfig>
 }

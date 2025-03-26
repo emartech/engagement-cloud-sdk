@@ -1,7 +1,7 @@
 package com.emarsys.integration
 
+import com.emarsys.AndroidEmarsysConfig
 import com.emarsys.Emarsys
-import com.emarsys.EmarsysConfig
 import com.emarsys.api.push.PushConstants
 import com.emarsys.api.push.PushConstants.PUSH_TOKEN_STORAGE_KEY
 import com.emarsys.di.DependencyContainerPrivateApi
@@ -21,7 +21,7 @@ class PushClientIntegrationTests {
         container = DependencyInjection.container as DependencyContainerPrivateApi
 
         Emarsys.initialize()
-        Emarsys.enableTracking(EmarsysConfig("EMS11-C3FD3"))
+        Emarsys.enableTracking(AndroidEmarsysConfig("EMS11-C3FD3"))
     }
 
     @Test

@@ -8,6 +8,7 @@ import android.net.ConnectivityManager
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
+import com.emarsys.SdkConfig
 import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.LoggingPush
 import com.emarsys.api.push.Push
@@ -67,6 +68,8 @@ import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.PlatformInitState
 import com.emarsys.setup.PlatformInitializer
 import com.emarsys.setup.PlatformInitializerApi
+import com.emarsys.setup.config.AndroidSdkConfigStore
+import com.emarsys.setup.config.SdkConfigStoreApi
 import com.emarsys.sqldelight.EmarsysDB
 import com.emarsys.watchdog.activity.TransitionSafeCurrentActivityWatchdog
 import com.emarsys.watchdog.connection.AndroidConnectionWatchDog
@@ -267,5 +270,9 @@ actual class PlatformDependencyCreator actual constructor(
         val loggingPush = LoggingPush(sdkLogger, storage)
         val pushGatherer = PushGatherer(pushContext, storage)
         return Push(loggingPush, pushGatherer, pushInternal, sdkContext)
+    }
+
+    override fun createSdkConfigStore(typedStorage: TypedStorageApi): SdkConfigStoreApi<SdkConfig> {
+        return AndroidSdkConfigStore(typedStorage)
     }
 }

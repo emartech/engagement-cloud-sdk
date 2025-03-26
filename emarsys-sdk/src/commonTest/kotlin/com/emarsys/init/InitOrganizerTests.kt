@@ -8,6 +8,7 @@ import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.state.StateMachineApi
+import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
@@ -59,5 +60,20 @@ class InitOrganizerTests {
                 mockStateMachine.activate()
             }
             sdkContext.currentSdkState shouldBe SdkState.initialized
+        }
+
+    @Test
+    fun init_should_not_move_sdkState_backwards_whenInitStateMachine_alreadyActivatedTheSDK() =
+        runTest {
+            everySuspend { mockStateMachine.activate() } calls {
+                sdkContext.setSdkState(SdkState.active)
+            }
+
+            initOrganizer.init()
+
+            verifySuspend {
+                mockStateMachine.activate()
+            }
+            sdkContext.currentSdkState shouldBe SdkState.active
         }
 }

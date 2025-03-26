@@ -1,5 +1,6 @@
 package com.emarsys.di
 
+import com.emarsys.SdkConfig
 import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.LoggingPush
 import com.emarsys.api.push.Push
@@ -66,6 +67,8 @@ import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.PlatformInitState
 import com.emarsys.setup.PlatformInitializer
 import com.emarsys.setup.PlatformInitializerApi
+import com.emarsys.setup.config.JsEmarsysConfigStore
+import com.emarsys.setup.config.SdkConfigStoreApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.connection.WebConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
@@ -261,6 +264,10 @@ actual class PlatformDependencyCreator actual constructor(
         val loggingPush = LoggingPush(sdkLogger, storage)
         val pushGatherer = PushGatherer(pushContext, storage)
         return Push(loggingPush, pushGatherer, pushInternal, sdkContext)
+    }
+
+    override fun createSdkConfigStore(typedStorage: TypedStorageApi): SdkConfigStoreApi<SdkConfig> {
+        return JsEmarsysConfigStore(typedStorage)
     }
 
     private fun getNavigatorData(): String {

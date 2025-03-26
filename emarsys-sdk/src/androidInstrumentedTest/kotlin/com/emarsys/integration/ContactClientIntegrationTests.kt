@@ -1,11 +1,13 @@
 package com.emarsys.integration
 
+import com.emarsys.AndroidEmarsysConfig
 import com.emarsys.Emarsys
-import com.emarsys.EmarsysConfig
+import com.emarsys.core.storage.StorageConstants
 import com.emarsys.di.DependencyContainerPrivateApi
 import com.emarsys.di.DependencyInjection
 import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.test.runTest
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -20,9 +22,15 @@ class ContactClientIntegrationTests {
         Emarsys.initialize()
     }
 
+    @AfterTest
+    fun tearDown() = runTest {
+        container.sdkContext.config = null
+        container.stringStorage.put(StorageConstants.SDK_CONFIG_KEY, null)
+    }
+
     @Test
     fun testLinkContact() = runTest {
-        Emarsys.enableTracking(EmarsysConfig("EMS11-C3FD3"))
+        Emarsys.enableTracking(AndroidEmarsysConfig("EMS11-C3FD3"))
         container.sessionContext.contactToken = null
         container.sessionContext.refreshToken = null
 
@@ -44,7 +52,7 @@ class ContactClientIntegrationTests {
         container.sessionContext.openIdToken = null
         container.sdkContext.config = null
 
-        Emarsys.enableTracking(EmarsysConfig(merchantId = "1DF86BF95CBE8F19"))
+        Emarsys.enableTracking(AndroidEmarsysConfig(merchantId = "1DF86BF95CBE8F19"))
 
         container.contactClient.linkContact(2575, "test2@test.com")
 
@@ -54,7 +62,7 @@ class ContactClientIntegrationTests {
 
     @Test
     fun testUnlinkContact() = runTest {
-        Emarsys.enableTracking(EmarsysConfig("EMS11-C3FD3"))
+        Emarsys.enableTracking(AndroidEmarsysConfig("EMS11-C3FD3"))
         container.contactClient.linkContact(2575, "test2@test.com")
 
         val contactToken = container.sessionContext.contactToken

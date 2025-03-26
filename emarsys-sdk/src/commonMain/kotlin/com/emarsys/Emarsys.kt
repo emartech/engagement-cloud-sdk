@@ -8,6 +8,7 @@ import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.inbox.InboxApi
 import com.emarsys.api.predict.PredictApi
 import com.emarsys.api.push.PushApi
+import com.emarsys.core.exceptions.SdkAlreadyEnabledException
 import com.emarsys.di.DependencyInjection
 
 import com.emarsys.networking.clients.event.model.SdkEvent
@@ -25,7 +26,11 @@ object Emarsys {
 
     suspend fun enableTracking(config: SdkConfig) {
         config.isValid()
-        DependencyInjection.container.setupOrganizerApi.setup(config)
+        try {
+            DependencyInjection.container.setupOrganizerApi.setupWithValidation(config)
+        } catch (exception: SdkAlreadyEnabledException) {
+            // TODO define error handling and api
+        }
     }
 
     suspend fun linkContact(contactFieldId: Int, contactFieldValue: String) {
@@ -48,7 +53,7 @@ object Emarsys {
     }
 
     val events: SharedFlow<SdkEvent>
-        get()=DependencyInjection.container.events
+        get() = DependencyInjection.container.events
 
     val push: PushApi
         get() = DependencyInjection.container.pushApi
