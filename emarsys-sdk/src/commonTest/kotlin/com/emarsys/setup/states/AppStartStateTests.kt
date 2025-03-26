@@ -1,8 +1,8 @@
 package com.emarsys.setup.states
 
-import com.emarsys.core.providers.Provider
+import com.emarsys.core.providers.InstantProvider
+import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.networking.clients.event.EventClientApi
-
 import com.emarsys.networking.clients.event.model.SdkEvent
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -10,7 +10,6 @@ import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -21,8 +20,8 @@ class AppStartStateTests {
     }
 
     private lateinit var mockEventClient: EventClientApi
-    private lateinit var mockTimestampProvider: Provider<Instant>
-    private lateinit var mockUuidProvider: Provider<String>
+    private lateinit var mockTimestampProvider: InstantProvider
+    private lateinit var mockUuidProvider: UuidProviderApi
     private lateinit var appStartState: AppStartState
 
     @BeforeTest

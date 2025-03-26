@@ -1,13 +1,13 @@
 package com.emarsys.setup
 
 import com.emarsys.JsEmarsysConfig
-import com.emarsys.context.SdkContext
+import com.emarsys.context.SdkContextApi
 import com.emarsys.core.state.State
 import com.emarsys.mobileengage.push.PushServiceApi
 
-class PlatformInitState(
+internal class PlatformInitState(
     private val pushService: PushServiceApi,
-    val sdkContext: SdkContext,
+    val sdkContext: SdkContextApi,
 ) : State {
 
     override val name: String = "jsInitState"

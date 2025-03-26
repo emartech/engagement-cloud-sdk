@@ -1,16 +1,16 @@
 package com.emarsys.setup.states
 
-import com.emarsys.core.providers.Provider
+import com.emarsys.core.providers.InstantProvider
+import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.state.State
 import com.emarsys.networking.clients.event.EventClientApi
 
 import com.emarsys.networking.clients.event.model.SdkEvent
-import kotlinx.datetime.Instant
 
-class AppStartState(
+internal class AppStartState(
     private val eventClient: EventClientApi,
-    private val timestampProvider: Provider<Instant>,
-    private val uuidProvider: Provider<String>
+    private val timestampProvider: InstantProvider,
+    private val uuidProvider: UuidProviderApi
 ) : State {
     private var alreadyCompleted = false
 

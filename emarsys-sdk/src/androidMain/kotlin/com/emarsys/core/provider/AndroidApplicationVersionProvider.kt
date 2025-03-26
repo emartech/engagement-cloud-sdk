@@ -2,9 +2,9 @@ package com.emarsys.core.provider
 
 import android.content.Context
 import com.emarsys.core.device.UNKNOWN_VERSION_NAME
-import com.emarsys.core.providers.Provider
+import com.emarsys.core.providers.ApplicationVersionProviderApi
 
-class AndroidApplicationVersionProvider(private val context: Context): Provider<String> {
+internal class AndroidApplicationVersionProvider(private val context: Context): ApplicationVersionProviderApi {
     override fun provide(): String {
         return try {
             context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: UNKNOWN_VERSION_NAME

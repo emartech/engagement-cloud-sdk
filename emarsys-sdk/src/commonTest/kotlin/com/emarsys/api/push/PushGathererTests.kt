@@ -23,8 +23,8 @@ class PushGathererTests {
     }
 
     private lateinit var mockStringStorage: StringStorageApi
-    private lateinit var pushContext: PushContext
-    private lateinit var pushGatherer: PushGatherer
+    private lateinit var pushContext: PushContextApi
+    private lateinit var pushGatherer: PushInstance
 
     @BeforeTest
     fun setUp() {

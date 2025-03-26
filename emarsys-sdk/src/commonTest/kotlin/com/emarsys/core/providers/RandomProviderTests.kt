@@ -1,6 +1,5 @@
 package com.emarsys.core.providers
 
-import com.emarsys.core.providers.RandomProvider
 import io.kotest.matchers.doubles.shouldBeGreaterThanOrEqual
 import io.kotest.matchers.doubles.shouldBeLessThanOrEqual
 import io.kotest.matchers.shouldBe
@@ -10,7 +9,7 @@ import kotlin.test.Test
 
 class RandomProviderTests {
 
-    lateinit var provider: RandomProvider
+    private lateinit var provider: RandomProvider
 
     @BeforeTest
     fun setup() = runTest {

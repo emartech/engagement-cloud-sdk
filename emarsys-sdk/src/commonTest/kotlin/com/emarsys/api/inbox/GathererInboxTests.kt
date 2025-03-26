@@ -6,22 +6,35 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class GathererInboxTests {
-
+class GathererInboxTest {
     private companion object {
         const val TAG = "testTag"
         const val MESSAGE_ID = "testMessageId"
-        val testMessages = mutableListOf(Message("testId", "testCampaignId", null,"testTitle", "testBody", null,123456789,null,null,null,null,null))
-        val testInboxCalls = mutableListOf<InboxCall>()
+        val testMessages = mutableListOf(
+            Message(
+                "testId",
+                "testCampaignId",
+                null,
+                "testTitle",
+                "testBody",
+                null,
+                123456789,
+                null,
+                null,
+                null,
+                null,
+                null
+            )
+        )
     }
 
-    private lateinit var inboxContext: InboxContext
-
     private lateinit var gathererInbox: GathererInbox
+    private lateinit var inboxContext: InboxContextApi
 
     @BeforeTest
     fun setup() = runTest {
-        inboxContext = InboxContext(testInboxCalls, testMessages)
+        inboxContext = InboxContext(mutableListOf())
+        inboxContext.messages.addAll(testMessages)
         gathererInbox = GathererInbox(inboxContext)
     }
 

@@ -2,9 +2,8 @@ package com.emarsys.core.providers
 
 import kotlin.random.Random
 
-class RandomProvider: Provider<Double> {
+internal class RandomProvider: DoubleProvider {
     override fun provide(): Double {
         return Random.nextDouble()
     }
-
 }

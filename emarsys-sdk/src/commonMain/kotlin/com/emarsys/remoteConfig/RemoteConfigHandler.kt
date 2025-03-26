@@ -6,14 +6,14 @@ import com.emarsys.context.copyWith
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
-import com.emarsys.core.providers.Provider
+import com.emarsys.core.providers.DoubleProvider
 import com.emarsys.networking.clients.remoteConfig.RemoteConfigClientApi
 
-class RemoteConfigHandler(
+internal class RemoteConfigHandler(
     private val remoteConfigClient: RemoteConfigClientApi,
     private val deviceInfoCollector: DeviceInfoCollectorApi,
     private val sdkContext: SdkContextApi,
-    private val randomProvider: Provider<Double>,
+    private val randomProvider: DoubleProvider,
     private val sdkLogger: Logger
 ) : RemoteConfigHandlerApi {
     private suspend fun handle(config: RemoteConfigResponse?, clientId: String?) {

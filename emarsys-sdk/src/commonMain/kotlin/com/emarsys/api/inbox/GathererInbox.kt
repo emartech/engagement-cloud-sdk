@@ -2,7 +2,7 @@ package com.emarsys.api.inbox
 
 import com.emarsys.api.inbox.model.Message
 
-class GathererInbox(private val inboxContext: InboxContext) : InboxInstance {
+internal class GathererInbox(private val inboxContext: InboxContextApi) : InboxInstance {
     override suspend fun fetchMessages(): List<Message> {
         inboxContext.calls.add(InboxCall.FetchMessages())
         return inboxContext.messages

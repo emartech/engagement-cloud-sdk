@@ -1,0 +1,62 @@
+package com.emarsys.di
+
+import com.emarsys.api.inapp.GathererInApp
+import com.emarsys.api.inapp.InApp
+import com.emarsys.api.inapp.InAppApi
+import com.emarsys.api.inapp.InAppCall
+import com.emarsys.api.inapp.InAppConfigApi
+import com.emarsys.api.inapp.InAppContext
+import com.emarsys.api.inapp.InAppContextApi
+import com.emarsys.api.inapp.InAppInstance
+import com.emarsys.api.inapp.InAppInternal
+import com.emarsys.api.inapp.InappConfig
+import com.emarsys.api.inapp.LoggingInApp
+import com.emarsys.core.collections.PersistentList
+import com.emarsys.mobileengage.inapp.InAppHandler
+import com.emarsys.mobileengage.inapp.InAppHandlerApi
+import org.koin.core.module.dsl.bind
+import org.koin.core.module.dsl.singleOf
+import org.koin.core.parameter.parametersOf
+import org.koin.core.qualifier.named
+import org.koin.dsl.module
+
+object InAppInjection {
+    val inAppModules = module {
+        singleOf(::InAppHandler) { bind<InAppHandlerApi>() }
+        single<MutableList<InAppCall>>(named(PersistentListTypes.InAppCall)) {
+            PersistentList(
+                id = PersistentListIds.INAPP_CONTEXT_PERSISTENT_ID,
+                storage = get(),
+                elementSerializer = InAppCall.serializer(),
+                elements = listOf()
+            )
+        }
+        single<InAppConfigApi> { InappConfig }
+        single<InAppContextApi> {
+            InAppContext(
+                calls = get(named(PersistentListTypes.InAppCall))
+            )
+        }
+        single<InAppInstance>(named(InstanceType.Logging)) {
+            LoggingInApp(
+                sdkContext = get(),
+                logger = get { parametersOf(LoggingInApp::class.simpleName) },
+            )
+        }
+        single<InAppInstance>(named(InstanceType.Gatherer)) {
+            GathererInApp(
+                inAppConfig = get(),
+                inAppContext = get(),
+            )
+        }
+        single<InAppInstance>(named(InstanceType.Internal)) { InAppInternal() }
+        single<InAppApi> {
+            InApp(
+                loggingApi = get(named(InstanceType.Logging)),
+                gathererApi = get(named(InstanceType.Gatherer)),
+                internalApi = get(named(InstanceType.Internal)),
+                sdkContext = get()
+            )
+        }
+    }
+}

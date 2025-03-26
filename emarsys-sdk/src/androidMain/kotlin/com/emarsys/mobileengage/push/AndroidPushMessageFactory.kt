@@ -10,7 +10,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
 
-class AndroidPushMessageFactory(
+internal class AndroidPushMessageFactory(
     private val androidPushV1Mapper: AndroidPushV1Mapper,
     private val silentAndroidPushV1Mapper: SilentAndroidPushV1Mapper,
     private val androidPushV2Mapper: AndroidPushV2Mapper,

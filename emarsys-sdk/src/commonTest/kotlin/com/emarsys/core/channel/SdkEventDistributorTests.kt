@@ -42,8 +42,7 @@ class SdkEventDistributorTests {
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(StandardTestDispatcher())
-        sdkEventFlow =
-            MutableSharedFlow(replay = 100)
+        sdkEventFlow = MutableSharedFlow<SdkEvent>(replay = 100)
         sdkDispatcher = StandardTestDispatcher()
         mockEventsDao = mock(MockMode.autofill)
         mockSdkLogger = mock(MockMode.autofill)

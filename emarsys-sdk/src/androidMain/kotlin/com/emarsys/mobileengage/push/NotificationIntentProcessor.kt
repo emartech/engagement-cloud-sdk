@@ -6,7 +6,7 @@ import com.emarsys.api.push.PushConstants.INTENT_EXTRA_DEFAULT_TAP_ACTION_KEY
 import com.emarsys.api.push.PushConstants.INTENT_EXTRA_PAYLOAD_KEY
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.log.Logger
-import com.emarsys.mobileengage.action.ActionFactoryApi
+import com.emarsys.mobileengage.action.PushActionFactoryApi
 import com.emarsys.mobileengage.action.actions.Action
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BasicActionModel
@@ -21,9 +21,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
-class NotificationIntentProcessor(
+internal class NotificationIntentProcessor(
     private val json: Json,
-    private val actionFactory: ActionFactoryApi<ActionModel>,
+    private val actionFactory: PushActionFactoryApi,
     private val actionHandler: ActionHandlerApi,
     private val sdkLogger: Logger
 ) {

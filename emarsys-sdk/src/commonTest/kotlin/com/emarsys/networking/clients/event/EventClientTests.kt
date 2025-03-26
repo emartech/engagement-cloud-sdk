@@ -1,6 +1,6 @@
 package com.emarsys.networking.clients.event
 
-import com.emarsys.api.inapp.InAppConfig
+import com.emarsys.api.inapp.InAppConfigApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
@@ -8,8 +8,7 @@ import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
-import com.emarsys.mobileengage.action.ActionFactoryApi
-import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.inapp.InAppMessage
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppViewApi
@@ -84,10 +83,10 @@ class EventClientTests {
 
     private lateinit var mockEmarsysClient: NetworkClientApi
     private lateinit var mockUrlFactory: UrlFactoryApi
-    private lateinit var mockOnEventActionFactory: ActionFactoryApi<ActionModel>
+    private lateinit var mockOnEventActionFactory: EventActionFactoryApi
     private lateinit var sdkEventFlow: MutableSharedFlow<SdkEvent>
     private lateinit var onlineSdkEvents: MutableSharedFlow<SdkEvent>
-    private lateinit var mockInAppConfig: InAppConfig
+    private lateinit var mockInAppConfigApi: InAppConfigApi
     private lateinit var mockInAppPresenter: InAppPresenterApi
     private lateinit var mockInAppViewProvider: InAppViewProviderApi
     private lateinit var mockInAppView: InAppViewApi
@@ -105,7 +104,7 @@ class EventClientTests {
         mockOnEventActionFactory = mock()
         sdkEventFlow = spy(MutableSharedFlow(replay = 5))
         onlineSdkEvents = spy(MutableSharedFlow(replay = 5))
-        mockInAppConfig = mock()
+        mockInAppConfigApi = mock()
         mockInAppPresenter = mock()
         mockInAppViewProvider = mock()
         mockInAppView = mock()
@@ -115,7 +114,7 @@ class EventClientTests {
         sdkDispatcher =
             StandardTestDispatcher()
         sessionContext = SessionContext()
-        every { mockInAppConfig.inAppDnd }.returns(IN_APP_DND)
+        every { mockInAppConfigApi.inAppDnd }.returns(IN_APP_DND)
         every { mockUrlFactory.create(EmarsysUrlType.EVENT, null) }.returns(TEST_BASE_URL)
         everySuspend { mockSdkLogger.error(any(), any<Throwable>()) } calls {
             (it.args[1] as Throwable).printStackTrace()
@@ -338,7 +337,7 @@ class EventClientTests {
         json,
         mockOnEventActionFactory,
         sessionContext,
-        mockInAppConfig,
+        mockInAppConfigApi,
         mockInAppPresenter,
         mockInAppViewProvider,
         sdkEventFlow,

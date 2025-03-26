@@ -5,7 +5,7 @@ import com.emarsys.api.predict.model.Logic
 import com.emarsys.api.predict.model.Product
 import com.emarsys.api.predict.model.RecommendationFilter
 
-class GathererPredict(private val predictContext: PredictContext): PredictInstance {
+internal class GathererPredict(private val predictContext: PredictContextApi): PredictInstance {
     override suspend fun trackCart(items: List<CartItem>) {
         predictContext.calls.add(PredictCall.TrackCart(items))
     }

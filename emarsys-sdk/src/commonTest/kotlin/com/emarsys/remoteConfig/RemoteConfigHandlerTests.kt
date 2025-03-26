@@ -7,7 +7,7 @@ import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.SdkLogger
-import com.emarsys.core.providers.Provider
+import com.emarsys.core.providers.DoubleProvider
 import com.emarsys.networking.clients.remoteConfig.RemoteConfigClientApi
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -40,7 +40,7 @@ class RemoteConfigHandlerTests {
     )
     private lateinit var mockRemoteConfigClient: RemoteConfigClientApi
     private lateinit var mockDeviceInfoCollector: DeviceInfoCollectorApi
-    private lateinit var mockRandomProvider: Provider<Double>
+    private lateinit var mockRandomProvider: DoubleProvider
     private lateinit var remoteConfigHandler: RemoteConfigHandler
 
     @BeforeTest

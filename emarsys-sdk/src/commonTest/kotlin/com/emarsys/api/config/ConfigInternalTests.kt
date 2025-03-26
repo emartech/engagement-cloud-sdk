@@ -2,7 +2,8 @@ package com.emarsys.api.config
 
 import com.emarsys.core.language.LanguageHandlerApi
 import com.emarsys.core.log.Logger
-import com.emarsys.core.providers.Provider
+import com.emarsys.core.providers.InstantProvider
+import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -16,7 +17,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlin.test.BeforeTest
@@ -31,8 +31,8 @@ class ConfigInternalTests {
     }
 
     private lateinit var eventFlow: MutableSharedFlow<SdkEvent>
-    private lateinit var mockUuidProvider: Provider<String>
-    private lateinit var mockTimestampProvider: Provider<Instant>
+    private lateinit var mockUuidProvider: UuidProviderApi
+    private lateinit var mockTimestampProvider: InstantProvider
     private lateinit var mockLogger: Logger
     private lateinit var mockLanguageHandler: LanguageHandlerApi
     private lateinit var configInternal: ConfigInternal

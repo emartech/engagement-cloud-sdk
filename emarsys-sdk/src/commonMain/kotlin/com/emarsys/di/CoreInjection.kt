@@ -1,0 +1,177 @@
+package com.emarsys.di
+
+import com.emarsys.context.DefaultUrls
+import com.emarsys.context.DefaultUrlsApi
+import com.emarsys.context.SdkContext
+import com.emarsys.context.SdkContextApi
+import com.emarsys.core.channel.SdkEventDistributor
+import com.emarsys.core.crypto.Crypto
+import com.emarsys.core.crypto.CryptoApi
+import com.emarsys.core.log.ConsoleLogger
+import com.emarsys.core.log.LogLevel
+import com.emarsys.core.log.Logger
+import com.emarsys.core.log.SdkLogger
+import com.emarsys.core.networking.UserAgentProvider
+import com.emarsys.core.networking.UserAgentProviderApi
+import com.emarsys.core.providers.DoubleProvider
+import com.emarsys.core.providers.InstantProvider
+import com.emarsys.core.providers.RandomProvider
+import com.emarsys.core.providers.TimestampProvider
+import com.emarsys.core.providers.TimezoneProvider
+import com.emarsys.core.providers.TimezoneProviderApi
+import com.emarsys.core.providers.UUIDProvider
+import com.emarsys.core.providers.UuidProviderApi
+import com.emarsys.core.session.SessionContext
+import com.emarsys.core.storage.Storage
+import com.emarsys.core.storage.StorageApi
+import com.emarsys.core.storage.TypedStorage
+import com.emarsys.core.storage.TypedStorageApi
+import com.emarsys.core.url.UrlFactory
+import com.emarsys.core.url.UrlFactoryApi
+import com.emarsys.core.util.Downloader
+import com.emarsys.core.util.DownloaderApi
+import com.emarsys.mobileengage.action.EventActionFactory
+import com.emarsys.mobileengage.action.EventActionFactoryApi
+import com.emarsys.mobileengage.inapp.InAppDownloader
+import com.emarsys.mobileengage.inapp.InAppDownloaderApi
+import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.util.JsonUtil
+import com.emarsys.watchdog.connection.ConnectionWatchDog
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.HttpRequestRetry
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.serialization.json.Json
+import org.koin.core.module.dsl.bind
+import org.koin.core.module.dsl.singleOf
+import org.koin.core.parameter.parametersOf
+import org.koin.core.qualifier.named
+import org.koin.dsl.module
+
+object CoreInjection {
+    private const val PUBLIC_KEY =
+        "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAELjWEUIBX9zlm1OI4gF1hMCBLzpaBwgs9HlmSIBAqP4MDGy4ibOOV3FVDrnAY0Q34LZTbPBlp3gRNZJ19UoSy2Q=="
+
+    val coreModules = module {
+        single<CoroutineDispatcher>(named(DispatcherTypes.Sdk)) { Dispatchers.Default }
+        single<CoroutineDispatcher>(named(DispatcherTypes.Main)) { Dispatchers.Main }
+        factory<Logger> { (name: String) -> SdkLogger(ConsoleLogger()) }
+        singleOf(::TimestampProvider) { bind<InstantProvider>() }
+        singleOf(::UUIDProvider) { bind<UuidProviderApi>() }
+        singleOf(::TimezoneProvider) { bind<TimezoneProviderApi>() }
+        singleOf(::RandomProvider) { bind<DoubleProvider>() }
+        single<TypedStorageApi> {
+            TypedStorage(
+                stringStorage = get(),
+                json = get(),
+                sdkLogger = get { parametersOf(TypedStorage::class.simpleName) }
+            )
+        }
+        single<MutableSharedFlow<SdkEvent>>(named(EventFlowTypes.InternalEventFlow)) { MutableSharedFlow<SdkEvent>() }
+        single<Json> { JsonUtil.json }
+        singleOf(::Storage) { bind<StorageApi>() }
+        singleOf(::UserAgentProvider) { bind<UserAgentProviderApi>() }
+        single<DefaultUrlsApi> {
+            DefaultUrls(
+                "https://me-client.gservice.emarsys.net",
+                "https://me-device-event.gservice.emarsys.net",
+                "https://recommender.scarabresearch.com/merchants",
+                "https://deep-link.eservice.emarsys.net",
+                "https://me-inbox.gservice.emarsys.net",
+                "https://mobile-sdk-config.gservice.emarsys.net",
+                "https://log-dealer.gservice.emarsys.net"
+            )
+        }
+        single<SdkEventDistributor> {
+            SdkEventDistributor(
+                sdkEventFlow = get<MutableSharedFlow<SdkEvent>>(named(EventFlowTypes.InternalEventFlow)),
+                get<ConnectionWatchDog>().isOnline,
+                eventsDao = get(),
+                sdkDispatcher = get(named(DispatcherTypes.Sdk)),
+                sdkLogger = get<Logger> { parametersOf(SdkEventDistributor::class.simpleName) },
+            )
+        }
+        single<SdkContextApi> {
+            SdkContext(
+                sdkDispatcher = get(named(DispatcherTypes.Sdk)),
+                mainDispatcher = get(named(DispatcherTypes.Main)),
+                defaultUrls = get(),
+                remoteLogLevel = LogLevel.Error,
+                features = mutableSetOf()
+            )
+        }
+        single<HttpClient> {
+            HttpClient {
+                install(ContentNegotiation) {
+                    json(get<Json>())
+                }
+                install(HttpRequestRetry)
+            }
+        }
+        single<DependencyCreator> {
+            PlatformDependencyCreator(
+                sdkContext = get(),
+                uuidProvider = get(),
+                sdkLogger = get<Logger> { parametersOf(PlatformDependencyCreator::class.simpleName) },
+                json = get(),
+                sdkEventFlow = get<MutableSharedFlow<SdkEvent>>(named(EventFlowTypes.InternalEventFlow)),
+                actionHandler = get(),
+                timestampProvider = get()
+            )
+        }
+        single<DownloaderApi> { Downloader(
+            client = get<HttpClient>(),
+            fileCache = get(),
+            logger = get<Logger> { parametersOf(Downloader::class.simpleName) },
+        ) }
+        singleOf(::InAppDownloader) { bind<InAppDownloaderApi>() }
+        single<EventActionFactoryApi> {
+            EventActionFactory(
+                sdkEventFlow = get<MutableSharedFlow<SdkEvent>>(named(EventFlowTypes.InternalEventFlow)),
+                permissionHandler = get(),
+                externalUrlOpener = get(),
+                clipboardHandler = get(),
+                sdkLogger = get<Logger> { parametersOf(EventActionFactory::class.simpleName) },
+            )
+        }
+        single<SessionContext> { SessionContext() }
+        singleOf(::UrlFactory) { bind<UrlFactoryApi>() }
+        single<CryptoApi> {
+            Crypto(
+                logger = get<Logger> { parametersOf(Crypto::class.simpleName) },
+                PUBLIC_KEY
+            )
+        }
+    }
+}
+
+enum class DispatcherTypes {
+    Sdk, Main
+}
+
+enum class PersistentListTypes {
+    PushCall, InAppCall, InboxCall, PredictCall, GeofenceTrackerCall, ConfigCall, ContactCall, EventTrackerCall
+}
+
+enum class NetworkClientTypes {
+    Generic, Emarsys
+}
+
+enum class EventFlowTypes {
+    InternalEventFlow, Public
+}
+
+object PersistentListIds {
+    const val PUSH_CONTEXT_PERSISTENT_ID = "pushContextPersistentId"
+    const val INAPP_CONTEXT_PERSISTENT_ID = "inAppContextPersistentId"
+    const val INBOX_CONTEXT_PERSISTENT_ID = "inboxContextPersistentId"
+    const val PREDICT_CONTEXT_PERSISTENT_ID = "predictContextPersistentId"
+    const val GEOFENCE_TRACKER_CONTEXT_PERSISTENT_ID = "geofenceTrackerContextPersistentId"
+    const val CONFIG_CONTEXT_PERSISTENT_ID = "configContextPersistentId"
+    const val CONTACT_CONTEXT_PERSISTENT_ID = "contactContextPersistentId"
+    const val EVENT_TRACKER_CONTEXT_PERSISTENT_ID = "eventTrackerContextPersistentId"
+
+}

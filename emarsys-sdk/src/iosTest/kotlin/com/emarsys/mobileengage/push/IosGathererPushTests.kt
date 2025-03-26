@@ -4,6 +4,7 @@ import com.emarsys.api.push.BasicPushUserInfo
 import com.emarsys.api.push.BasicPushUserInfoEms
 import com.emarsys.api.push.PushCall
 import com.emarsys.api.push.PushContext
+import com.emarsys.api.push.PushContextApi
 import com.emarsys.core.storage.StringStorageApi
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -17,21 +18,20 @@ import platform.darwin.NSObject
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-
 class IosGathererPushTests {
     private lateinit var mockStorage: StringStorageApi
-    private lateinit var pushContext: PushContext
     private lateinit var mockIosPushInternal: IosPushInstance
     private lateinit var iosGathererPush: IosGathererPush
+    private lateinit var pushContext: PushContextApi
     private lateinit var testNotificationCenterDelegateProtocol: UNUserNotificationCenterDelegateProtocol
 
     @BeforeTest
     fun setup() {
         mockStorage = mock()
         mockIosPushInternal = mock()
-        pushContext = PushContext(mutableListOf())
         testNotificationCenterDelegateProtocol =
             object : NSObject(), UNUserNotificationCenterDelegateProtocol {}
+        pushContext = PushContext(mutableListOf())
         iosGathererPush = IosGathererPush(pushContext, mockStorage, mockIosPushInternal)
     }
 

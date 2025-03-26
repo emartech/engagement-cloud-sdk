@@ -8,12 +8,11 @@ import com.emarsys.api.push.PushConstants.INTENT_EXTRA_DEFAULT_TAP_ACTION_KEY
 import com.emarsys.api.push.PushConstants.INTENT_EXTRA_PAYLOAD_KEY
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.log.Logger
-import com.emarsys.mobileengage.action.ActionFactoryApi
+import com.emarsys.mobileengage.action.PushActionFactoryApi
 import com.emarsys.mobileengage.action.actions.Action
 import com.emarsys.mobileengage.action.actions.DismissAction
 import com.emarsys.mobileengage.action.actions.LaunchApplicationAction
 import com.emarsys.mobileengage.action.actions.ReportingAction
-import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
 import com.emarsys.mobileengage.action.models.BasicDismissActionModel
 import com.emarsys.mobileengage.action.models.BasicLaunchApplicationActionModel
@@ -58,7 +57,7 @@ class NotificationIntentProcessorTests {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private lateinit var testDispatcher: TestDispatcher
     private lateinit var testScope: CoroutineScope
-    private lateinit var mockActionFactory: ActionFactoryApi<ActionModel>
+    private lateinit var mockActionFactory: PushActionFactoryApi
     private lateinit var mockActionHandler: ActionHandlerApi
     private lateinit var mockSdkEventFlow: MutableSharedFlow<SdkEvent>
     private lateinit var mockLogger: Logger

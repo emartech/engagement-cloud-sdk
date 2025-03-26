@@ -12,7 +12,7 @@ import com.emarsys.api.push.PushConstants.INTENT_EXTRA_DEFAULT_TAP_ACTION_KEY
 import com.emarsys.api.push.PushConstants.INTENT_EXTRA_PAYLOAD_KEY
 import com.emarsys.api.push.PushConstants.PUSH_NOTIFICATION_ICON_NAME
 import com.emarsys.core.device.AndroidNotificationSettings
-import com.emarsys.core.device.PlatformInfoCollector
+import com.emarsys.core.device.PlatformInfoCollectorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.resource.MetadataReader
 import com.emarsys.mobileengage.action.models.DismissActionModel
@@ -25,13 +25,13 @@ import com.emarsys.mobileengage.push.model.AndroidPlatformData
 import com.emarsys.mobileengage.push.model.AndroidPushMessage
 import kotlinx.serialization.json.Json
 
-class PushMessagePresenter(
+internal class PushMessagePresenter(
     private val context: Context,
     private val json: Json,
     private val notificationManager: NotificationManager,
     private val metadataReader: MetadataReader,
     private val notificationCompatStyler: NotificationCompatStyler,
-    private val platformInfoCollector: PlatformInfoCollector,
+    private val platformInfoCollector: PlatformInfoCollectorApi,
     private val inAppDownloader: InAppDownloaderApi,
     private val sdkLogger: Logger
 ) : PushPresenter<AndroidPlatformData, AndroidPushMessage> {

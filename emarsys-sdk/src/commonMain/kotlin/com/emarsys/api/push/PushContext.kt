@@ -1,9 +1,9 @@
 package com.emarsys.api.push
 
-import com.emarsys.api.generic.ApiContext
+import com.emarsys.di.SdkComponent
 import kotlinx.serialization.Serializable
 
-class PushContext(override val calls: MutableList<PushCall>) : ApiContext<PushCall>
+internal class PushContext(override val calls: MutableList<PushCall>) : PushContextApi, SdkComponent
 
 @Serializable
 sealed interface PushCall {

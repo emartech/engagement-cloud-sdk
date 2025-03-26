@@ -1,6 +1,6 @@
 package com.emarsys.networking.clients.event
 
-import com.emarsys.api.inapp.InAppConfig
+import com.emarsys.api.inapp.InAppConfigApi
 import com.emarsys.core.channel.naturalBatching
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
@@ -9,8 +9,7 @@ import com.emarsys.core.networking.model.body
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
-import com.emarsys.mobileengage.action.ActionFactoryApi
-import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.inapp.InAppMessage
 import com.emarsys.mobileengage.inapp.InAppPresentationMode
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
@@ -33,13 +32,13 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 
-class EventClient(
+internal class EventClient(
     private val emarsysNetworkClient: NetworkClientApi,
     private val urlFactory: UrlFactoryApi,
     private val json: Json,
-    private val onEventActionFactory: ActionFactoryApi<ActionModel>,
+    private val eventActionFactory: EventActionFactoryApi,
     private val sessionContext: SessionContext,
-    private val inAppConfig: InAppConfig,
+    private val inAppConfigApi: InAppConfigApi,
     private val inAppPresenter: InAppPresenterApi,
     private val inAppViewProvider: InAppViewProviderApi,
     private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
@@ -67,7 +66,7 @@ class EventClient(
                     val url = urlFactory.create(EmarsysUrlType.EVENT, null)
                     val requestBody =
                         DeviceEventRequestBody(
-                            inAppConfig.inAppDnd,
+                            inAppConfigApi.inAppDnd,
                             sdkEvents,
                             sessionContext.deviceEventState
                         )
@@ -106,7 +105,7 @@ class EventClient(
             val campaignId = it.campaignId
 
             actions.forEach { action ->
-                onEventActionFactory.create(action).invoke()
+                eventActionFactory.create(action).invoke()
             }
             reportOnEventAction(campaignId)
         }

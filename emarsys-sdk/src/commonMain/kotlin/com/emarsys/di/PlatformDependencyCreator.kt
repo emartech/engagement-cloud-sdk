@@ -1,10 +1,9 @@
 package com.emarsys.di
 
-import com.emarsys.api.generic.ApiContext
+import com.emarsys.SdkConfig
 import com.emarsys.api.push.PushApi
-import com.emarsys.api.push.PushCall
+import com.emarsys.api.push.PushContextApi
 import com.emarsys.api.push.PushInstance
-import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
@@ -13,17 +12,20 @@ import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.device.DeviceInfoCollector
+import com.emarsys.core.language.LanguageTagValidatorApi
 import com.emarsys.core.log.Logger
-import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.permission.PermissionHandlerApi
-import com.emarsys.core.providers.Provider
+import com.emarsys.core.providers.ApplicationVersionProviderApi
+import com.emarsys.core.providers.InstantProvider
+import com.emarsys.core.providers.LanguageProviderApi
+import com.emarsys.core.providers.TimezoneProviderApi
+import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
-import com.emarsys.core.util.DownloaderApi
-import com.emarsys.mobileengage.action.ActionFactoryApi
-import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.action.EventActionFactoryApi
+import com.emarsys.mobileengage.action.PushActionFactoryApi
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandlerApi
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
@@ -32,50 +34,43 @@ import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.PlatformInitializerApi
+import com.emarsys.setup.config.SdkConfigStoreApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 
 
-expect class PlatformDependencyCreator(
+internal expect class PlatformDependencyCreator(
     sdkContext: SdkContextApi,
-    uuidProvider: Provider<String>,
+    uuidProvider: UuidProviderApi,
     sdkLogger: Logger,
     json: Json,
     sdkEventFlow: MutableSharedFlow<SdkEvent>,
     actionHandler: ActionHandlerApi,
-    timestampProvider: Provider<Instant>
+    timestampProvider: InstantProvider
 ) : DependencyCreator {
 
     override fun createPlatformInitializer(
-        pushActionFactory: ActionFactoryApi<ActionModel>,
+        pushActionFactory: PushActionFactoryApi,
         pushActionHandler: ActionHandlerApi
     ): PlatformInitializerApi
-
-    override fun createPlatformContext(
-        pushActionFactory: ActionFactoryApi<ActionModel>,
-        downloaderApi: DownloaderApi,
-        inAppDownloader: InAppDownloaderApi,
-    ): PlatformContext
 
     override fun createStringStorage(): StringStorageApi
 
     override fun createEventsDao(): EventsDaoApi
 
     override fun createDeviceInfoCollector(
-        timezoneProvider: Provider<String>,
-        typedStorage: TypedStorageApi,
-        storage: StringStorageApi
+        timezoneProvider: TimezoneProviderApi,
+        typedStorage: TypedStorageApi
     ): DeviceInfoCollector
 
     override fun createPlatformInitState(
         pushApi: PushApi,
         sdkDispatcher: CoroutineDispatcher,
-        sdkContext: SdkContext,
-        actionFactory: ActionFactoryApi<ActionModel>,
+        sdkContext: SdkContextApi,
+        actionFactory: EventActionFactoryApi,
         storage: StringStorageApi
     ): State
 
@@ -88,17 +83,17 @@ expect class PlatformDependencyCreator(
         inAppHandler: InAppHandlerApi
     ): PushToInAppHandlerApi
 
-    override fun createConnectionWatchDog(sdkLogger: SdkLogger): ConnectionWatchDog
+    override fun createConnectionWatchDog(sdkLogger: Logger): ConnectionWatchDog
 
     override fun createLifeCycleWatchDog(): LifecycleWatchDog
 
-    override fun createApplicationVersionProvider(): Provider<String>
+    override fun createApplicationVersionProvider(): ApplicationVersionProviderApi
 
-    override fun createLanguageProvider(): Provider<String>
+    override fun createLanguageProvider(): LanguageProviderApi
 
     override fun createFileCache(): FileCacheApi
 
-    override fun createInAppViewProvider(actionFactory: ActionFactoryApi<ActionModel>): InAppViewProviderApi
+    override fun createInAppViewProvider(eventActionFactory: EventActionFactoryApi): InAppViewProviderApi
 
     override fun createInAppPresenter(): InAppPresenterApi
 
@@ -106,12 +101,15 @@ expect class PlatformDependencyCreator(
 
     override fun createLaunchApplicationHandler(): LaunchApplicationHandlerApi
 
+    override fun createLanguageTagValidator(): LanguageTagValidatorApi
+
+
     override fun createPushInternal(
         pushClient: PushClientApi,
         storage: StringStorageApi,
-        pushContext: ApiContext<PushCall>,
+        pushContext: PushContextApi,
         eventClient: EventClientApi,
-        actionFactory: ActionFactoryApi<ActionModel>,
+        pushActionFactory: PushActionFactoryApi,
         json: Json,
         sdkDispatcher: CoroutineDispatcher
     ): PushInstance
@@ -119,6 +117,8 @@ expect class PlatformDependencyCreator(
     override fun createPushApi(
         pushInternal: PushInstance,
         storage: StringStorageApi,
-        pushContext: ApiContext<PushCall>,
+        pushContext: PushContextApi,
     ): PushApi
+
+    override fun createSdkConfigStore(typedStorage: TypedStorageApi): SdkConfigStoreApi<SdkConfig>
 }

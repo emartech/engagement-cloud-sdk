@@ -5,11 +5,11 @@ import com.emarsys.context.SdkContextApi
 import com.emarsys.core.lifecycle.LifecycleEvent
 import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.Logger
-import com.emarsys.core.providers.Provider
+import com.emarsys.core.providers.InstantProvider
+import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.session.SessionId
 import com.emarsys.networking.clients.event.EventClientApi
-
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import dev.mokkery.MockMode
@@ -63,8 +63,8 @@ class MobileEngageSessionTests {
         )
     }
 
-    private lateinit var mockTimestampProvider: Provider<Instant>
-    private lateinit var mockUuidProvider: Provider<String>
+    private lateinit var mockTimestampProvider: InstantProvider
+    private lateinit var mockUuidProvider: UuidProviderApi
     private lateinit var mockSdkLogger: Logger
     private lateinit var mockEventClient: EventClientApi
     private lateinit var mockSdkContext: SdkContextApi
@@ -119,7 +119,6 @@ class MobileEngageSessionTests {
         every { mockTimestampProvider.provide() } returns Instant.fromEpochMilliseconds(
             SESSION_START
         )
-//        mockTimestampProvider returns Instant.fromEpochMilliseconds(SESSION_START)
         val sharedFlow = MutableSharedFlow<LifecycleEvent>()
         mobileEngageSession.subscribe(object : LifecycleWatchDog {
             override val lifecycleEvents: SharedFlow<LifecycleEvent> = sharedFlow

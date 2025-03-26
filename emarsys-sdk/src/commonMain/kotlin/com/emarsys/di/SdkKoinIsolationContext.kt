@@ -1,0 +1,55 @@
+package com.emarsys.di
+
+import com.emarsys.core.log.Logger
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import org.koin.core.Koin
+import org.koin.core.KoinApplication
+import org.koin.core.context.startKoin
+import org.koin.core.module.Module
+import org.koin.core.parameter.parametersOf
+import org.koin.core.qualifier.named
+import org.koin.dsl.koinApplication
+
+object SdkKoinIsolationContext {
+    private var runningApp: KoinApplication? = null
+
+    private val koinApp = koinApplication {
+        modules(
+            InitInjection.initModules,
+            SetupInjection.setupModules,
+            CoreInjection.coreModules,
+            PlatformInjection.platformModules,
+            NetworkInjection.networkModules,
+            RemoteConfigInjection.remoteConfigModules,
+            ConfigInjection.configModules,
+            ContactInjection.contactModules,
+            EventInjection.eventModules,
+            PushInjection.pushModules,
+            InAppInjection.inAppModules,
+            InboxInjection.inboxModules,
+            GeofenceTrackerInjection.geofenceTrackerModules,
+            DeepLinkInjection.deepLinkModules,
+            PredictInjection.predictModules
+        )
+    }
+
+    val koin = koinApp.koin
+
+    fun init(): Koin {
+        if (runningApp == null) {
+            koinApp.koin.loadModules(loadPlatformModules())
+            runningApp = startKoin(koinApp)
+        }
+        val sdkDispatcher = koin.get<CoroutineDispatcher>(named(DispatcherTypes.Sdk))
+        CoroutineScope(sdkDispatcher).launch {
+            koin.get<Logger> { parametersOf(SdkKoinIsolationContext::class.simpleName) }
+                .debug("SDK DI initialized")
+        }
+
+        return koin
+    }
+}
+
+expect fun SdkKoinIsolationContext.loadPlatformModules():List<Module>

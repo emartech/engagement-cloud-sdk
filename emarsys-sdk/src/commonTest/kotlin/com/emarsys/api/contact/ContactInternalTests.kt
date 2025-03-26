@@ -1,6 +1,5 @@
 package com.emarsys.api.contact
 
-import com.emarsys.api.generic.ApiContext
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.networking.clients.contact.ContactClientApi
@@ -20,24 +19,17 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class ContactInternalTests  {
+class ContactInternalTests {
     private companion object {
         const val CONTACT_FIELD_ID = 2575
         const val CONTACT_FIELD_VALUE = "testContactFieldValue"
         const val OPEN_ID_TOKEN = "testOpenIdToken"
-        const val contactFieldId = 42
-        const val contactFieldValue = "testContactFieldValue"
-        const val openIdToken = "testOpenIdToken"
-        val linkContact = ContactCall.LinkContact(contactFieldId, contactFieldValue)
+        val linkContact = ContactCall.LinkContact(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE)
         val linkAuthenticatedContact =
-            ContactCall.LinkAuthenticatedContact(contactFieldId, openIdToken)
+            ContactCall.LinkAuthenticatedContact(CONTACT_FIELD_ID, OPEN_ID_TOKEN)
         val unlinkContact = ContactCall.UnlinkContact()
         val calls = mutableListOf(linkContact, linkAuthenticatedContact, unlinkContact)
     }
-
-    private lateinit var mockContactClient: ContactClientApi
-
-    private lateinit var contactContext: ApiContext<ContactCall>
 
     private val testResponse = Response(
         UrlRequest(
@@ -50,14 +42,19 @@ class ContactInternalTests  {
         ""
     )
 
+    private lateinit var contactContext: ContactContextApi
+    private lateinit var mockContactClient: ContactClientApi
     private lateinit var contactInternal: ContactInstance
 
     @BeforeTest
     fun setUp() {
         mockContactClient = mock()
         contactContext = ContactContext(calls)
-        contactInternal = ContactInternal(mockContactClient, contactContext, sdkLogger = mock(
-            MockMode.autofill))
+        contactInternal = ContactInternal(
+            mockContactClient, contactContext, sdkLogger = mock(
+                MockMode.autofill
+            )
+        )
     }
 
     @AfterTest
@@ -113,7 +110,11 @@ class ContactInternalTests  {
     @Test
     fun testActivate_should_send_calls_to_client() = runTest {
         everySuspend {
-            mockContactClient.linkContact(linkContact.contactFieldId, linkContact.contactFieldValue, null)
+            mockContactClient.linkContact(
+                linkContact.contactFieldId,
+                linkContact.contactFieldValue,
+                null
+            )
         } returns testResponse
 
         everySuspend {

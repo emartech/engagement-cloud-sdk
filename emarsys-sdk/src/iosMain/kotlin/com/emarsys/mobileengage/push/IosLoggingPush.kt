@@ -12,11 +12,11 @@ import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 import platform.darwin.NSObject
 
 
-class IosLoggingPush(
+internal class IosLoggingPush(
     private val logger: Logger,
     storage: StringStorageApi,
     private val sdkDispatcher: CoroutineDispatcher
-) : LoggingPush(logger, storage), IosPushInstance {
+) : LoggingPush(storage, logger), IosPushInstance {
     override var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol?
         get() {
             val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)

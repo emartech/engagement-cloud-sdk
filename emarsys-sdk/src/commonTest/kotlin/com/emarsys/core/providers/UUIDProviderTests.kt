@@ -11,7 +11,7 @@ class UUIDProviderTests {
         val uuidRegex = """[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}""".toRegex(RegexOption.IGNORE_CASE)
     }
 
-    lateinit var provider: UUIDProvider
+    private lateinit var provider: UUIDProvider
 
     @BeforeTest
     fun setup() = runTest {

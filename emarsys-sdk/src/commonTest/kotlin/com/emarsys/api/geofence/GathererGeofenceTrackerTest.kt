@@ -9,19 +9,19 @@ import kotlin.test.Test
 class GathererGeofenceTrackerTest {
 
     private lateinit var gathererGeofenceTracker: GathererGeofenceTracker
-    private lateinit var geofenceContext: GeofenceContext
+    private lateinit var geofenceTrackerContext: GeofenceContextApi
 
     @BeforeTest
     fun setup() {
-        geofenceContext = GeofenceTrackerContext(mutableListOf())
-
-        gathererGeofenceTracker = GathererGeofenceTracker(geofenceContext)
+        geofenceTrackerContext = GeofenceTrackerContext(mutableListOf())
+        gathererGeofenceTracker =
+            GathererGeofenceTracker(geofenceTrackerContext, GeofenceTrackerConfig)
     }
 
     @Test
     fun testRegisteredGeofences() = runTest {
         val testGeofence = Geofence("testGeofence", 12.3, 34.5, 10.0, null, listOf())
-        geofenceContext.registeredGeofences.add(testGeofence)
+        GeofenceTrackerConfig.registeredGeofences.add(testGeofence)
 
         val result = gathererGeofenceTracker.registeredGeofences
 
@@ -30,7 +30,7 @@ class GathererGeofenceTrackerTest {
 
     @Test
     fun testIsEnabled() = runTest {
-        geofenceContext.isGeofenceTrackerEnabled = true
+        GeofenceTrackerConfig.isGeofenceTrackerEnabled = true
 
         gathererGeofenceTracker.isEnabled shouldBe true
     }
@@ -41,7 +41,7 @@ class GathererGeofenceTrackerTest {
 
         gathererGeofenceTracker.enable()
 
-        geofenceContext.calls.contains(testCall) shouldBe true
+        geofenceTrackerContext.calls.contains(testCall) shouldBe true
     }
 
     @Test
@@ -50,7 +50,7 @@ class GathererGeofenceTrackerTest {
 
         gathererGeofenceTracker.disable()
 
-        geofenceContext.calls.contains(testCall) shouldBe true
+        geofenceTrackerContext.calls.contains(testCall) shouldBe true
     }
 
     @Test
@@ -59,6 +59,6 @@ class GathererGeofenceTrackerTest {
 
         gathererGeofenceTracker.setInitialEnterTriggerEnabled(true)
 
-        geofenceContext.calls.contains(testCall) shouldBe true
+        geofenceTrackerContext.calls.contains(testCall) shouldBe true
     }
 }

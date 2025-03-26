@@ -5,7 +5,6 @@ import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.mobileengage.action.actions.CustomEventAction
 import com.emarsys.mobileengage.action.actions.LaunchApplicationAction
 import com.emarsys.mobileengage.action.actions.PushToInappAction
-import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BasicLaunchApplicationActionModel
 import com.emarsys.mobileengage.action.models.BasicPushToInAppActionModel
 import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
@@ -30,7 +29,7 @@ class PushActionFactoryTests {
     }
 
     private lateinit var pushActionFactory: PushActionFactory
-    private lateinit var mockEventActionFactory: ActionFactoryApi<ActionModel>
+    private lateinit var mockEventActionFactory: EventActionFactoryApi
     private lateinit var mockPushToInAppHandler: PushToInAppHandlerApi
     private lateinit var mockLaunchApplicationHandler: LaunchApplicationHandlerApi
 

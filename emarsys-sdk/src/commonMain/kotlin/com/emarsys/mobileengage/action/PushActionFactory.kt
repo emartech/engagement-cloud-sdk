@@ -11,11 +11,11 @@ import com.emarsys.mobileengage.action.models.BasicPushToInAppActionModel
 import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
 import com.emarsys.mobileengage.action.models.toInternalPushToInAppActionModel
 
-class PushActionFactory(
+internal class PushActionFactory(
     private val pushToInAppHandler: PushToInAppHandlerApi,
-    private val eventActionFactory: ActionFactoryApi<ActionModel>,
+    private val eventActionFactory: EventActionFactoryApi,
     private val launchApplicationHandler: LaunchApplicationHandlerApi
-) : ActionFactoryApi<ActionModel> {
+) : PushActionFactoryApi {
     override suspend fun create(action: ActionModel): Action<*> {
         return when (action) {
             is InternalPushToInappActionModel -> PushToInappAction(action, pushToInAppHandler)

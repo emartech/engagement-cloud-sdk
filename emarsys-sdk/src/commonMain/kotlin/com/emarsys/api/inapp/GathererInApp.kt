@@ -1,11 +1,11 @@
 package com.emarsys.api.inapp
 
-
-class GathererInApp(
-    private val inAppContext: InAppApiContext,
+internal class GathererInApp(
+    private val inAppContext: InAppContextApi,
+    private val inAppConfig: InAppConfigApi,
 ) : InAppInstance {
     override val isPaused: Boolean
-        get() = inAppContext.inAppDnd
+        get() = inAppConfig.inAppDnd
 
     override suspend fun pause() {
         inAppContext.calls.add(InAppCall.Pause())

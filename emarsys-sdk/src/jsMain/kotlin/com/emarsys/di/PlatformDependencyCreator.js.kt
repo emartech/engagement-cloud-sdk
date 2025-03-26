@@ -1,17 +1,15 @@
 package com.emarsys.di
 
 import com.emarsys.SdkConfig
-import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.LoggingPush
 import com.emarsys.api.push.Push
 import com.emarsys.api.push.PushApi
-import com.emarsys.api.push.PushCall
 import com.emarsys.api.push.PushConstants.WEB_PUSH_ON_BADGE_COUNT_UPDATE_RECEIVED
 import com.emarsys.api.push.PushConstants.WEB_PUSH_ON_NOTIFICATION_CLICKED_CHANNEL_NAME
+import com.emarsys.api.push.PushContextApi
 import com.emarsys.api.push.PushGatherer
 import com.emarsys.api.push.PushInstance
 import com.emarsys.api.push.PushInternal
-import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
@@ -32,22 +30,24 @@ import com.emarsys.core.language.LanguageTagValidator
 import com.emarsys.core.language.LanguageTagValidatorApi
 import com.emarsys.core.launchapplication.JsLaunchApplicationHandler
 import com.emarsys.core.log.Logger
-import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.permission.WebPermissionHandler
 import com.emarsys.core.provider.ApplicationVersionProvider
 import com.emarsys.core.provider.WebLanguageProvider
+import com.emarsys.core.providers.ApplicationVersionProviderApi
 import com.emarsys.core.providers.ClientIdProvider
-import com.emarsys.core.providers.Provider
+import com.emarsys.core.providers.InstantProvider
+import com.emarsys.core.providers.LanguageProviderApi
+import com.emarsys.core.providers.TimezoneProviderApi
+import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.url.WebExternalUrlOpener
-import com.emarsys.core.util.DownloaderApi
-import com.emarsys.mobileengage.action.ActionFactoryApi
-import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.action.EventActionFactoryApi
+import com.emarsys.mobileengage.action.PushActionFactoryApi
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandlerApi
 import com.emarsys.mobileengage.inapp.InAppJsBridgeFactory
@@ -79,20 +79,19 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import web.broadcast.BroadcastChannel
 import web.dom.document
 import web.idb.indexedDB
 
-actual class PlatformDependencyCreator actual constructor(
+internal actual class PlatformDependencyCreator actual constructor(
     private val sdkContext: SdkContextApi,
-    private val uuidProvider: Provider<String>,
+    private val uuidProvider: UuidProviderApi,
     private val sdkLogger: Logger,
     private val json: Json,
     private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
     actionHandler: ActionHandlerApi,
-    timestampProvider: Provider<Instant>
+    timestampProvider: InstantProvider
 ) : DependencyCreator {
     private val emarsysIndexedDb = EmarsysIndexedDb(indexedDB, sdkLogger)
 
@@ -101,7 +100,7 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createPlatformInitializer(
-        pushActionFactory: ActionFactoryApi<ActionModel>,
+        pushActionFactory: PushActionFactoryApi,
         pushActionHandler: ActionHandlerApi
     ): PlatformInitializerApi {
         val pushNotificationClickHandler = PushNotificationClickHandler(
@@ -121,14 +120,6 @@ actual class PlatformDependencyCreator actual constructor(
 
     }
 
-    actual override fun createPlatformContext(
-        pushActionFactory: ActionFactoryApi<ActionModel>,
-        downloaderApi: DownloaderApi,
-        inAppDownloader: InAppDownloaderApi,
-    ): PlatformContext {
-        return JSPlatformContext()
-    }
-
     actual override fun createStringStorage(): StringStorageApi {
         return stringStorage
     }
@@ -145,12 +136,11 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createDeviceInfoCollector(
-        timezoneProvider: Provider<String>,
-        typedStorage: TypedStorageApi,
-        storage: StringStorageApi
+        timezoneProvider: TimezoneProviderApi,
+        typedStorage: TypedStorageApi
     ): DeviceInfoCollector {
         return DeviceInfoCollector(
-            ClientIdProvider(uuidProvider, storage),
+            ClientIdProvider(uuidProvider, stringStorage),
             timezoneProvider,
             createWebDeviceInfoCollector(),
             createApplicationVersionProvider(),
@@ -164,8 +154,8 @@ actual class PlatformDependencyCreator actual constructor(
     actual override fun createPlatformInitState(
         pushApi: PushApi,
         sdkDispatcher: CoroutineDispatcher,
-        sdkContext: SdkContext,
-        actionFactory: ActionFactoryApi<ActionModel>,
+        sdkContext: SdkContextApi,
+        actionFactory: EventActionFactoryApi,
         storage: StringStorageApi
     ): State {
         return PlatformInitState(
@@ -189,7 +179,7 @@ actual class PlatformDependencyCreator actual constructor(
         return WebPushToInAppHandler(inAppDownloader, inAppHandler)
     }
 
-    actual override fun createConnectionWatchDog(sdkLogger: SdkLogger): ConnectionWatchDog {
+    actual override fun createConnectionWatchDog(sdkLogger: Logger): ConnectionWatchDog {
         return WebConnectionWatchDog(window)
     }
 
@@ -205,11 +195,11 @@ actual class PlatformDependencyCreator actual constructor(
         return WebPlatformInfoCollector(getNavigatorData())
     }
 
-    actual override fun createApplicationVersionProvider(): Provider<String> {
+    actual override fun createApplicationVersionProvider(): ApplicationVersionProviderApi {
         return ApplicationVersionProvider()
     }
 
-    actual override fun createLanguageProvider(): Provider<String> {
+    actual override fun createLanguageProvider(): LanguageProviderApi {
         return WebLanguageProvider()
     }
 
@@ -221,10 +211,10 @@ actual class PlatformDependencyCreator actual constructor(
         InAppScriptExtractor()
     }
 
-    actual override fun createInAppViewProvider(actionFactory: ActionFactoryApi<ActionModel>): InAppViewProviderApi {
+    actual override fun createInAppViewProvider(eventActionFactory: EventActionFactoryApi): InAppViewProviderApi {
         return WebInAppViewProvider(
             inappScriptExtractor,
-            InAppJsBridgeFactory(actionFactory, json, Dispatchers.Main)
+            InAppJsBridgeFactory(eventActionFactory, json, Dispatchers.Main)
         )
     }
 
@@ -240,33 +230,33 @@ actual class PlatformDependencyCreator actual constructor(
         return JsLaunchApplicationHandler()
     }
 
-    override fun createLanguageTagValidator(): LanguageTagValidatorApi {
+    actual override fun createLanguageTagValidator(): LanguageTagValidatorApi {
         return LanguageTagValidator()
     }
 
     actual override fun createPushInternal(
         pushClient: PushClientApi,
         storage: StringStorageApi,
-        pushContext: ApiContext<PushCall>,
+        pushContext: PushContextApi,
         eventClient: EventClientApi,
-        actionFactory: ActionFactoryApi<ActionModel>,
+        pushActionFactory: PushActionFactoryApi,
         json: Json,
         sdkDispatcher: CoroutineDispatcher
     ): PushInstance {
-        return PushInternal(pushClient, storage, pushContext, sdkLogger)
+        return PushInternal(pushClient, storage, pushContext)
     }
 
     actual override fun createPushApi(
         pushInternal: PushInstance,
         storage: StringStorageApi,
-        pushContext: ApiContext<PushCall>,
+        pushContext: PushContextApi,
     ): PushApi {
-        val loggingPush = LoggingPush(sdkLogger, storage)
+        val loggingPush = LoggingPush(storage, sdkLogger)
         val pushGatherer = PushGatherer(pushContext, storage)
         return Push(loggingPush, pushGatherer, pushInternal, sdkContext)
     }
 
-    override fun createSdkConfigStore(typedStorage: TypedStorageApi): SdkConfigStoreApi<SdkConfig> {
+    actual override fun createSdkConfigStore(typedStorage: TypedStorageApi): SdkConfigStoreApi<SdkConfig> {
         return JsEmarsysConfigStore(typedStorage)
     }
 

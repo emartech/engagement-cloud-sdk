@@ -5,9 +5,8 @@ import kotlin.uuid.Uuid
 
 
 @OptIn(ExperimentalUuidApi::class)
-class UUIDProvider: Provider<String> {
+internal class UUIDProvider: UuidProviderApi {
     override fun provide(): String {
         return Uuid.random().toString()
     }
-
 }

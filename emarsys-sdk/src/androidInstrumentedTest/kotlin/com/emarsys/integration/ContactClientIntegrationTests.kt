@@ -2,74 +2,84 @@ package com.emarsys.integration
 
 import com.emarsys.AndroidEmarsysConfig
 import com.emarsys.Emarsys
+import com.emarsys.context.SdkContextApi
+import com.emarsys.core.session.SessionContext
 import com.emarsys.core.storage.StorageConstants
-import com.emarsys.di.DependencyContainerPrivateApi
-import com.emarsys.di.DependencyInjection
+import com.emarsys.core.storage.StringStorageApi
+import com.emarsys.networking.clients.contact.ContactClientApi
 import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.test.runTest
+import org.koin.core.component.get
+import org.koin.test.KoinTest
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class ContactClientIntegrationTests {
+class ContactClientIntegrationTests : KoinTest {
 
-    private lateinit var container: DependencyContainerPrivateApi
+    private lateinit var sessionContext: SessionContext
+    private lateinit var sdkContext: SdkContextApi
+    private lateinit var contactClient: ContactClientApi
+    private lateinit var stringStorage: StringStorageApi
 
     @BeforeTest
     fun setup() = runTest {
-        container = DependencyInjection.container as DependencyContainerPrivateApi
-
         Emarsys.initialize()
+
+        sessionContext = get<SessionContext>()
+        sdkContext = get<SdkContextApi>()
+        contactClient = get<ContactClientApi>()
+        stringStorage = get<StringStorageApi>()
     }
 
     @AfterTest
     fun tearDown() = runTest {
-        container.sdkContext.config = null
-        container.stringStorage.put(StorageConstants.SDK_CONFIG_KEY, null)
+        sdkContext.config = null
+        stringStorage.put(StorageConstants.SDK_CONFIG_KEY, null)
     }
 
     @Test
     fun testLinkContact() = runTest {
         Emarsys.enableTracking(AndroidEmarsysConfig("EMS11-C3FD3"))
-        container.sessionContext.contactToken = null
-        container.sessionContext.refreshToken = null
+        sessionContext.contactToken = null
+        sessionContext.refreshToken = null
 
-        container.contactClient.linkContact(2575, "test2@test.com")
+        contactClient.linkContact(2575, "test2@test.com")
 
-        container.sessionContext.contactToken shouldNotBe null
-        container.sessionContext.refreshToken shouldNotBe null
+        sessionContext.contactToken shouldNotBe null
+        sessionContext.refreshToken shouldNotBe null
     }
 
     @Test
     fun testLinkContact_predictOnly() = runTest {
-        container.sessionContext.contactToken = null
-        container.sessionContext.refreshToken = null
-        container.sessionContext.clientState = null
-        container.sessionContext.deviceEventState = null
-        container.sessionContext.sessionId = null
-        container.sessionContext.clientId = null
-        container.sessionContext.contactFieldValue = null
-        container.sessionContext.openIdToken = null
-        container.sdkContext.config = null
+        sessionContext.contactToken = null
+        sessionContext.refreshToken = null
+        sessionContext.clientState = null
+        sessionContext.deviceEventState = null
+        sessionContext.sessionId = null
+        sessionContext.clientId = null
+        sessionContext.contactFieldValue = null
+        sessionContext.openIdToken = null
+        sdkContext.config = null
 
         Emarsys.enableTracking(AndroidEmarsysConfig(merchantId = "1DF86BF95CBE8F19"))
 
-        container.contactClient.linkContact(2575, "test2@test.com")
+        contactClient.linkContact(2575, "test2@test.com")
 
-        container.sessionContext.contactToken shouldNotBe null
-        container.sessionContext.refreshToken shouldNotBe null
+        sessionContext.contactToken shouldNotBe null
+        sessionContext.refreshToken shouldNotBe null
     }
 
     @Test
     fun testUnlinkContact() = runTest {
         Emarsys.enableTracking(AndroidEmarsysConfig("EMS11-C3FD3"))
-        container.contactClient.linkContact(2575, "test2@test.com")
+        contactClient.linkContact(2575, "test2@test.com")
 
-        val contactToken = container.sessionContext.contactToken
+        val contactToken = sessionContext.contactToken
 
-        container.contactClient.unlinkContact()
+        contactClient.unlinkContact()
 
-        container.sessionContext.contactToken shouldNotBe contactToken
+        sessionContext.contactToken shouldNotBe contactToken
     }
 
 }

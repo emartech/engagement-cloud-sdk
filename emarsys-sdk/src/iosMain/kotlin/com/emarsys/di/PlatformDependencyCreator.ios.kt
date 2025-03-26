@@ -2,11 +2,9 @@ package com.emarsys.di
 
 import app.cash.sqldelight.driver.native.NativeSqliteDriver
 import com.emarsys.SdkConfig
-import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.PushApi
-import com.emarsys.api.push.PushCall
+import com.emarsys.api.push.PushContextApi
 import com.emarsys.api.push.PushInstance
-import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.actions.badge.BadgeCountHandlerApi
@@ -25,13 +23,16 @@ import com.emarsys.core.language.LanguageTagValidator
 import com.emarsys.core.language.LanguageTagValidatorApi
 import com.emarsys.core.launchapplication.IosLaunchApplicationHandler
 import com.emarsys.core.log.Logger
-import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.permission.IosPermissionHandler
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.provider.IosApplicationVersionProvider
 import com.emarsys.core.provider.IosLanguageProvider
+import com.emarsys.core.providers.ApplicationVersionProviderApi
 import com.emarsys.core.providers.ClientIdProvider
-import com.emarsys.core.providers.Provider
+import com.emarsys.core.providers.InstantProvider
+import com.emarsys.core.providers.LanguageProviderApi
+import com.emarsys.core.providers.TimezoneProviderApi
+import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.setup.PlatformInitState
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.StorageConstants.DB_NAME
@@ -40,12 +41,11 @@ import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.url.IosExternalUrlOpener
-import com.emarsys.core.util.DownloaderApi
 import com.emarsys.core.watchdog.connection.IosConnectionWatchdog
 import com.emarsys.core.watchdog.connection.NWPathMonitorWrapper
 import com.emarsys.core.watchdog.lifecycle.IosLifecycleWatchdog
-import com.emarsys.mobileengage.action.ActionFactoryApi
-import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.action.EventActionFactoryApi
+import com.emarsys.mobileengage.action.PushActionFactoryApi
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandlerApi
 import com.emarsys.mobileengage.inapp.InAppPresenter
@@ -74,47 +74,40 @@ import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
+import org.koin.core.component.inject
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSProcessInfo
+import platform.Foundation.NSUserDefaults
 import platform.UIKit.UIApplication
 import platform.UIKit.UIPasteboard
 import platform.UserNotifications.UNUserNotificationCenter
 
-actual class PlatformDependencyCreator actual constructor(
+internal actual class PlatformDependencyCreator actual constructor(
     private val sdkContext: SdkContextApi,
-    private val uuidProvider: Provider<String>,
+    private val uuidProvider: UuidProviderApi,
     private val sdkLogger: Logger,
     private val json: Json,
     private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
     private val actionHandler: ActionHandlerApi,
-    private val timestampProvider: Provider<Instant>
-) : DependencyCreator {
-    private val platformContext: IosPlatformContext = IosPlatformContext()
+    private val timestampProvider: InstantProvider,
+) : DependencyCreator, SdkComponent {
     private val processInfo = NSProcessInfo()
     private val uiDevice = UIDevice(processInfo)
     private val notificationCenter = UNUserNotificationCenter.currentNotificationCenter()
     private val badgeCountHandler: BadgeCountHandlerApi =
         IosBadgeCountHandler(notificationCenter, uiDevice, sdkContext.mainDispatcher)
+    private val userDefaults: NSUserDefaults by inject()
 
     private val stringStorage: StringStorageApi by lazy {
-        StringStorage(platformContext.userDefaults)
+        StringStorage(userDefaults)
     }
 
     actual override fun createPlatformInitializer(
-        pushActionFactory: ActionFactoryApi<ActionModel>,
+        pushActionFactory: PushActionFactoryApi,
         pushActionHandler: ActionHandlerApi
     ): PlatformInitializerApi {
         return PlatformInitializer()
-    }
-
-    actual override fun createPlatformContext(
-        pushActionFactory: ActionFactoryApi<ActionModel>,
-        downloaderApi: DownloaderApi,
-        inAppDownloader: InAppDownloaderApi,
-    ): PlatformContext {
-        return platformContext
     }
 
     actual override fun createStringStorage(): StringStorageApi {
@@ -127,9 +120,8 @@ actual class PlatformDependencyCreator actual constructor(
     }
 
     actual override fun createDeviceInfoCollector(
-        timezoneProvider: Provider<String>,
-        typedStorage: TypedStorageApi,
-        storage: StringStorageApi
+        timezoneProvider: TimezoneProviderApi,
+        typedStorage: TypedStorageApi
     ): DeviceInfoCollector {
         return DeviceInfoCollector(
             ClientIdProvider(uuidProvider, createStringStorage()),
@@ -146,8 +138,8 @@ actual class PlatformDependencyCreator actual constructor(
     actual override fun createPlatformInitState(
         pushApi: PushApi,
         sdkDispatcher: CoroutineDispatcher,
-        sdkContext: SdkContext,
-        actionFactory: ActionFactoryApi<ActionModel>,
+        sdkContext: SdkContextApi,
+        actionFactory: EventActionFactoryApi,
         storage: StringStorageApi
     ): State {
         return PlatformInitState()
@@ -173,7 +165,7 @@ actual class PlatformDependencyCreator actual constructor(
         return PushToInAppHandler(inAppDownloader, inAppHandler)
     }
 
-    actual override fun createConnectionWatchDog(sdkLogger: SdkLogger): ConnectionWatchDog {
+    actual override fun createConnectionWatchDog(sdkLogger: Logger): ConnectionWatchDog {
         return IosConnectionWatchdog(NWPathMonitorWrapper(sdkContext.sdkDispatcher))
     }
 
@@ -181,11 +173,11 @@ actual class PlatformDependencyCreator actual constructor(
         return IosLifecycleWatchdog()
     }
 
-    actual override fun createApplicationVersionProvider(): Provider<String> {
+    actual override fun createApplicationVersionProvider(): ApplicationVersionProviderApi {
         return IosApplicationVersionProvider()
     }
 
-    actual override fun createLanguageProvider(): Provider<String> {
+    actual override fun createLanguageProvider(): LanguageProviderApi {
         return IosLanguageProvider()
     }
 
@@ -193,13 +185,13 @@ actual class PlatformDependencyCreator actual constructor(
         return IosFileCache(NSFileManager.defaultManager)
     }
 
-    actual override fun createInAppViewProvider(actionFactory: ActionFactoryApi<ActionModel>): InAppViewProviderApi {
+    actual override fun createInAppViewProvider(eventActionFactory: EventActionFactoryApi): InAppViewProviderApi {
         return InAppViewProvider(
             sdkContext.mainDispatcher,
             WebViewProvider(
                 sdkContext.mainDispatcher,
                 InAppJsBridgeProvider(
-                    actionFactory,
+                    eventActionFactory,
                     json,
                     sdkContext.mainDispatcher,
                     sdkContext.sdkDispatcher,
@@ -230,16 +222,16 @@ actual class PlatformDependencyCreator actual constructor(
         return IosLaunchApplicationHandler()
     }
 
-    override fun createLanguageTagValidator(): LanguageTagValidatorApi {
+    actual override fun createLanguageTagValidator(): LanguageTagValidatorApi {
         return LanguageTagValidator()
     }
 
     actual override fun createPushInternal(
         pushClient: PushClientApi,
         storage: StringStorageApi,
-        pushContext: ApiContext<PushCall>,
+        pushContext: PushContextApi,
         eventClient: EventClientApi,
-        actionFactory: ActionFactoryApi<ActionModel>,
+        pushActionFactory: PushActionFactoryApi,
         json: Json,
         sdkDispatcher: CoroutineDispatcher
     ): PushInstance {
@@ -248,7 +240,7 @@ actual class PlatformDependencyCreator actual constructor(
             storage,
             pushContext,
             sdkContext,
-            actionFactory,
+            pushActionFactory,
             actionHandler,
             badgeCountHandler,
             json,
@@ -263,7 +255,7 @@ actual class PlatformDependencyCreator actual constructor(
     actual override fun createPushApi(
         pushInternal: PushInstance,
         storage: StringStorageApi,
-        pushContext: ApiContext<PushCall>,
+        pushContext: PushContextApi,
     ): PushApi {
         val loggingPush = IosLoggingPush(sdkLogger, storage, sdkContext.sdkDispatcher)
         val pushGatherer = IosGathererPush(pushContext, storage, pushInternal as IosPushInternal)
@@ -276,7 +268,7 @@ actual class PlatformDependencyCreator actual constructor(
         )
     }
 
-    override fun createSdkConfigStore(typedStorage: TypedStorageApi): SdkConfigStoreApi<SdkConfig> {
+    actual override fun createSdkConfigStore(typedStorage: TypedStorageApi): SdkConfigStoreApi<SdkConfig> {
         return IosSdkConfigStore(typedStorage)
     }
 

@@ -5,7 +5,7 @@ import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.networking.model.body
-import com.emarsys.core.providers.Provider
+import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
@@ -22,16 +22,15 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlin.time.Duration.Companion.seconds
 
-class EmarsysClient(
+internal class EmarsysClient(
     private val networkClient: NetworkClientApi,
     private val sessionContext: SessionContext,
-    private val timestampProvider: Provider<Instant>,
+    private val timestampProvider: InstantProvider,
     private val urlFactory: UrlFactoryApi,
     private val json: Json,
     private val sdkLogger: Logger,

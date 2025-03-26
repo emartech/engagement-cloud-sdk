@@ -4,17 +4,11 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.emarsys.di.AndroidPlatformContext
-import com.emarsys.di.DependencyContainerPrivateApi
-import com.emarsys.di.DependencyInjection
+import com.emarsys.di.SdkComponent
+import org.koin.core.component.inject
 
-class NotificationOpenedActivity(
-    private val notificationIntentProcessor: NotificationIntentProcessor
-) : AppCompatActivity() {
-
-    constructor() : this(
-        ((DependencyInjection.container as DependencyContainerPrivateApi).platformContext as AndroidPlatformContext).notificationIntentProcessor
-    )
+class NotificationOpenedActivity() : AppCompatActivity(), SdkComponent {
+    private val notificationIntentProcessor: NotificationIntentProcessor by inject()
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

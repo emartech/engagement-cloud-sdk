@@ -3,14 +3,13 @@ package com.emarsys.api.contact
 import com.emarsys.api.contact.ContactCall.LinkAuthenticatedContact
 import com.emarsys.api.contact.ContactCall.LinkContact
 import com.emarsys.api.contact.ContactCall.UnlinkContact
-import com.emarsys.api.generic.ApiContext
 import com.emarsys.core.collections.dequeue
 import com.emarsys.core.log.Logger
 import com.emarsys.networking.clients.contact.ContactClientApi
 
-class ContactInternal(
+internal class ContactInternal(
     private val contactClient: ContactClientApi,
-    private val contactContext: ApiContext<ContactCall>,
+    private val contactContext: ContactContextApi,
     private val sdkLogger: Logger
 ) : ContactInstance {
     override suspend fun linkContact(contactFieldId: Int, contactFieldValue: String) {

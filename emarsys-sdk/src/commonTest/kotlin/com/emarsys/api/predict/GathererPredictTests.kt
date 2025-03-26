@@ -14,9 +14,8 @@ class GathererPredictTests {
         val testCartItems = listOf(PredictCartItem("testItemId", 1.23, 2.34))
     }
 
-    private lateinit var predictContext: PredictContext
-
     private lateinit var gathererPredict: GathererPredict
+    private lateinit var predictContext: PredictContextApi
 
     @BeforeTest
     fun setup() = runTest {
@@ -116,14 +115,21 @@ class GathererPredictTests {
 
     @Test
     fun testRecommendProducts_shouldAddCallToContext() = runTest {
-        val testFilters = listOf(RecommendationFilter.include("testField").hasValue("otherTestField"))
+        val testFilters =
+            listOf(RecommendationFilter.include("testField").hasValue("otherTestField"))
         val testLogic = RecommendationLogic.alsoBought("itemId")
         val testLimit = 60
         val testAvailabilityZone = "here"
 
-        val expectedCall = PredictCall.RecommendProducts(testLogic, testFilters, testLimit, testAvailabilityZone)
+        val expectedCall =
+            PredictCall.RecommendProducts(testLogic, testFilters, testLimit, testAvailabilityZone)
 
-        val result = gathererPredict.recommendProducts(testLogic, testFilters, testLimit, testAvailabilityZone)
+        val result = gathererPredict.recommendProducts(
+            testLogic,
+            testFilters,
+            testLimit,
+            testAvailabilityZone
+        )
 
         predictContext.calls.contains(expectedCall) shouldBe true
 

@@ -2,7 +2,7 @@ package com.emarsys.mobileengage.push.mapper
 
 import com.emarsys.core.log.Logger
 import com.emarsys.core.mapper.Mapper
-import com.emarsys.core.providers.Provider
+import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.inapp.PushToInApp
@@ -18,8 +18,8 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
 
-class AndroidPushV2Mapper(
-    private val uuidProvider: Provider<String>,
+internal class AndroidPushV2Mapper(
+    private val uuidProvider: UuidProviderApi,
     private val logger: Logger,
     private val json: Json
 ) : Mapper<JsonObject, AndroidPushMessage> {

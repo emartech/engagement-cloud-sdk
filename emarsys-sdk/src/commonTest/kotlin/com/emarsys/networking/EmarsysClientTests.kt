@@ -7,7 +7,7 @@ import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.networking.model.body
-import com.emarsys.core.providers.Provider
+import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
@@ -47,7 +47,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -63,7 +62,7 @@ class EmarsysClientTests {
         val testData = TestDataClass(ID, NAME)
     }
 
-    private lateinit var mockTimestampProvider: Provider<Instant>
+    private lateinit var mockTimestampProvider: InstantProvider
     private lateinit var mockUrlFactory: UrlFactoryApi
     private lateinit var mockNetworkClient: NetworkClientApi
     private lateinit var json: Json
@@ -78,7 +77,7 @@ class EmarsysClientTests {
         mockTimestampProvider = mock()
         mockUrlFactory = mock()
         mockNetworkClient = mock()
-        sdkEventFlow = MutableSharedFlow()
+        sdkEventFlow = MutableSharedFlow<SdkEvent>()
         sessionContext = SessionContext(refreshToken = "testRefreshToken", deviceEventState = null)
         json = Json
 

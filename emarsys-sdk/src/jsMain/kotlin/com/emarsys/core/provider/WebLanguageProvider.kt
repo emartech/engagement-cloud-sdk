@@ -1,9 +1,9 @@
 package com.emarsys.core.provider
 
-import com.emarsys.core.providers.Provider
+import com.emarsys.core.providers.LanguageProviderApi
 import kotlinx.browser.window
 
-class WebLanguageProvider: Provider<String> {
+internal class WebLanguageProvider: LanguageProviderApi {
     override fun provide(): String {
         return window.navigator.language
     }

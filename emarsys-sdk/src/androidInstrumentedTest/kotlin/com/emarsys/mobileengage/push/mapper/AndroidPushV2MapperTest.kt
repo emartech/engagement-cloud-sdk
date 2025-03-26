@@ -1,7 +1,7 @@
 package com.emarsys.mobileengage.push.mapper
 
 import com.emarsys.core.log.Logger
-import com.emarsys.core.providers.Provider
+import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.mobileengage.action.models.BadgeCount
 import com.emarsys.mobileengage.action.models.BadgeCountMethod
 import com.emarsys.mobileengage.action.models.BasicCustomEventActionModel
@@ -34,7 +34,7 @@ class AndroidPushV2MapperTest {
         const val SID = "testSid"
         const val CAMPAIGN_ID = "testCampaignId"
     }
-    private lateinit var mockUUIDProvider: Provider<String>
+    private lateinit var mockUUIDProvider: UuidProviderApi
     private lateinit var mockLogger: Logger
     private lateinit var mapper: AndroidPushV2Mapper
 

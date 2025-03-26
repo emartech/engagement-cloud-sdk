@@ -3,10 +3,9 @@ package com.emarsys.api.contact
 import com.emarsys.api.contact.ContactCall.LinkAuthenticatedContact
 import com.emarsys.api.contact.ContactCall.LinkContact
 import com.emarsys.api.contact.ContactCall.UnlinkContact
-import com.emarsys.api.generic.ApiContext
 import com.emarsys.core.log.Logger
 
-class ContactGatherer(val context: ApiContext<ContactCall>, private val sdkLogger: Logger) :
+internal class ContactGatherer(val context: ContactContextApi, private val sdkLogger: Logger) :
     ContactInstance {
     override suspend fun linkContact(contactFieldId: Int, contactFieldValue: String) {
         sdkLogger.debug("ContactGatherer - linkContact")

@@ -4,6 +4,7 @@ import dev.mokkery.MockMode
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -13,13 +14,18 @@ class GathererConfigTests {
         const val MERCHANT_ID = "testMerchantId"
     }
 
-    private lateinit var configContext: ConfigContext
     private lateinit var gathererConfig: GathererConfig
+    private lateinit var configContext: ConfigContextApi
 
     @BeforeTest
     fun setUp() = runTest {
         configContext = ConfigContext(mutableListOf())
         gathererConfig = GathererConfig(configContext, sdkLogger = mock(MockMode.autofill))
+    }
+
+    @AfterTest
+    fun tearDown() {
+        configContext.calls.clear()
     }
 
     @Test

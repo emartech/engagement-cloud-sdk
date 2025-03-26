@@ -51,6 +51,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(libs.kotlinx.datetime)
+                implementation(libs.koin.core)
                 implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.okio)
                 implementation(libs.kotlinx.serialization.json)
@@ -65,6 +66,7 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
+                implementation(libs.koin.test)
                 implementation(libs.ktor.client.mock)
                 implementation(libs.kotest.framework.engine)
                 implementation(libs.kotest.assertions.core)
@@ -72,6 +74,8 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
+//                implementation(libs.koin.android.startup)
+                implementation(libs.koin.android)
                 implementation(libs.kotlinx.coroutines.android)
                 implementation(libs.ktor.client.android)
                 implementation(libs.androidx.core.ktx)
@@ -93,6 +97,8 @@ kotlin {
         val androidInstrumentedTest by getting {
             dependencies {
                 implementation(kotlin("test"))
+                implementation(libs.koin.test)
+//                implementation(libs.koin.android.startup)
                 implementation(libs.mockk.android)
                 implementation(libs.androidx.runner)
                 implementation(libs.androidx.test.junit)
@@ -135,7 +141,8 @@ android {
 
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+//        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.emarsys.SdkTestInstrumentationRunner"
     }
     packaging {
         resources {

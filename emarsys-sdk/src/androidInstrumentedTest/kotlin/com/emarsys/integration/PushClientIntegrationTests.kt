@@ -4,42 +4,46 @@ import com.emarsys.AndroidEmarsysConfig
 import com.emarsys.Emarsys
 import com.emarsys.api.push.PushConstants
 import com.emarsys.api.push.PushConstants.PUSH_TOKEN_STORAGE_KEY
-import com.emarsys.di.DependencyContainerPrivateApi
-import com.emarsys.di.DependencyInjection
+import com.emarsys.core.storage.StringStorageApi
+import com.emarsys.di.SdkKoinIsolationContext.koin
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.test.runTest
+import org.koin.core.Koin
+import org.koin.core.component.get
+import org.koin.test.KoinTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class PushClientIntegrationTests {
+class PushClientIntegrationTests : KoinTest {
+    override fun getKoin(): Koin = koin
 
-    private lateinit var container: DependencyContainerPrivateApi
+    private lateinit var stringStorage: StringStorageApi
 
     @BeforeTest
     fun setup() = runTest {
-        container = DependencyInjection.container as DependencyContainerPrivateApi
-
         Emarsys.initialize()
+
+        stringStorage = get<StringStorageApi>()
         Emarsys.enableTracking(AndroidEmarsysConfig("EMS11-C3FD3"))
     }
 
     @Test
     fun testRegisterPushToken() = runTest {
-        container.stringStorage.put(PUSH_TOKEN_STORAGE_KEY, null)
+        stringStorage.put(PUSH_TOKEN_STORAGE_KEY, null)
 
         Emarsys.push.registerPushToken("testPushToken")
 
-        container.stringStorage.get(PUSH_TOKEN_STORAGE_KEY) shouldNotBe null
+        stringStorage.get(PUSH_TOKEN_STORAGE_KEY) shouldNotBe null
     }
 
     @Test
     fun testClearPushToken() = runTest {
-        container.stringStorage.put(PUSH_TOKEN_STORAGE_KEY, "testPushToken")
+        stringStorage.put(PUSH_TOKEN_STORAGE_KEY, "testPushToken")
 
         Emarsys.push.clearPushToken()
 
-        container.stringStorage.get(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY) shouldBe null
+        stringStorage.get(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY) shouldBe null
     }
 
 }

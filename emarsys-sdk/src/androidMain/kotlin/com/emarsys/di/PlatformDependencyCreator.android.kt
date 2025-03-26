@@ -4,21 +4,20 @@ import android.app.NotificationManager
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Context.CLIPBOARD_SERVICE
+import android.content.SharedPreferences
 import android.net.ConnectivityManager
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import com.emarsys.SdkConfig
-import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.LoggingPush
 import com.emarsys.api.push.Push
 import com.emarsys.api.push.PushApi
-import com.emarsys.api.push.PushCall
+import com.emarsys.api.push.PushContextApi
 import com.emarsys.api.push.PushGatherer
 import com.emarsys.api.push.PushInstance
 import com.emarsys.api.push.PushInternal
 import com.emarsys.applicationContext
-import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
@@ -29,27 +28,27 @@ import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.device.AndroidLanguageProvider
 import com.emarsys.core.device.DeviceInfoCollector
-import com.emarsys.core.device.PlatformInfoCollector
+import com.emarsys.core.device.PlatformInfoCollectorApi
 import com.emarsys.core.language.LanguageTagValidator
 import com.emarsys.core.language.LanguageTagValidatorApi
 import com.emarsys.core.launchapplication.LaunchApplicationHandler
 import com.emarsys.core.log.Logger
-import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.provider.AndroidApplicationVersionProvider
+import com.emarsys.core.providers.ApplicationVersionProviderApi
 import com.emarsys.core.providers.ClientIdProvider
-import com.emarsys.core.providers.Provider
-import com.emarsys.core.resource.MetadataReader
+import com.emarsys.core.providers.InstantProvider
+import com.emarsys.core.providers.LanguageProviderApi
+import com.emarsys.core.providers.TimezoneProviderApi
+import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.state.State
-import com.emarsys.core.storage.StorageConstants
 import com.emarsys.core.storage.StorageConstants.DB_NAME
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
-import com.emarsys.core.util.DownloaderApi
-import com.emarsys.mobileengage.action.ActionFactoryApi
-import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.action.EventActionFactoryApi
+import com.emarsys.mobileengage.action.PushActionFactoryApi
 import com.emarsys.mobileengage.clipboard.AndroidClipboardHandler
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandlerApi
@@ -81,76 +80,51 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import okio.FileSystem
+import org.koin.core.component.inject
 import java.util.Locale
 
 
-actual class PlatformDependencyCreator actual constructor(
+internal actual class PlatformDependencyCreator actual constructor(
     private val sdkContext: SdkContextApi,
-    private val uuidProvider: Provider<String>,
+    private val uuidProvider: UuidProviderApi,
     private val sdkLogger: Logger,
     private val json: Json,
     private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
     private val actionHandler: ActionHandlerApi,
-    timestampProvider: Provider<Instant>,
-) : DependencyCreator {
-    private val metadataReader = MetadataReader(applicationContext)
-    private val platformInfoCollector = PlatformInfoCollector(applicationContext)
-    private val currentActivityWatchdog =
-        TransitionSafeCurrentActivityWatchdog().also { it.register() }
-    private val sharedPreferences =
-        applicationContext.getSharedPreferences(StorageConstants.SUITE_NAME, Context.MODE_PRIVATE)
-    private val notificationManager =
-        (applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+    timestampProvider: InstantProvider
+) : DependencyCreator, SdkComponent {
+    private val platformInfoCollector: PlatformInfoCollectorApi by inject()
+    private val currentActivityWatchdog: TransitionSafeCurrentActivityWatchdog by inject()
+    private val sharedPreferences: SharedPreferences by inject()
+    private val notificationManager: NotificationManager by inject()
 
     private val stringStorage: StringStorageApi by lazy {
         StringStorage(sharedPreferences)
     }
 
     actual override fun createPlatformInitializer(
-        pushActionFactory: ActionFactoryApi<ActionModel>,
+        pushActionFactory: PushActionFactoryApi,
         pushActionHandler: ActionHandlerApi,
     ): PlatformInitializerApi {
         return PlatformInitializer(sdkEventFlow, notificationManager, sdkContext.sdkDispatcher)
     }
 
-    actual override fun createPlatformContext(
-        pushActionFactory: ActionFactoryApi<ActionModel>,
-        downloaderApi: DownloaderApi,
-        inAppDownloader: InAppDownloaderApi,
-    ): PlatformContext {
-        return AndroidPlatformContext(
-            json,
-            pushActionFactory,
-            actionHandler,
-            uuidProvider,
-            sdkLogger,
-            notificationManager,
-            metadataReader,
-            downloaderApi,
-            platformInfoCollector,
-            inAppDownloader,
-            sdkEventFlow
-        )
-    }
-
-    actual override fun createLanguageProvider(): Provider<String> {
+    actual override fun createLanguageProvider(): LanguageProviderApi {
         return AndroidLanguageProvider(Locale.getDefault())
     }
 
     actual override fun createDeviceInfoCollector(
-        timezoneProvider: Provider<String>,
+        timezoneProvider: TimezoneProviderApi,
         typedStorage: TypedStorageApi,
-        storage: StringStorageApi
     ): DeviceInfoCollector {
         return DeviceInfoCollector(
             timezoneProvider,
             createLanguageProvider(),
             createApplicationVersionProvider(),
             true,
-            ClientIdProvider(uuidProvider, storage),
+            ClientIdProvider(uuidProvider, stringStorage),
             platformInfoCollector,
             typedStorage,
             json,
@@ -158,15 +132,15 @@ actual class PlatformDependencyCreator actual constructor(
         )
     }
 
-    actual override fun createApplicationVersionProvider(): Provider<String> {
+    actual override fun createApplicationVersionProvider(): ApplicationVersionProviderApi {
         return AndroidApplicationVersionProvider(applicationContext)
     }
 
     actual override fun createPlatformInitState(
         pushApi: PushApi,
         sdkDispatcher: CoroutineDispatcher,
-        sdkContext: SdkContext,
-        actionFactory: ActionFactoryApi<ActionModel>,
+        sdkContext: SdkContextApi,
+        actionFactory: EventActionFactoryApi,
         storage: StringStorageApi
     ): State {
         return PlatformInitState()
@@ -194,7 +168,7 @@ actual class PlatformDependencyCreator actual constructor(
         return PushToInAppHandler(inAppDownloader, inAppHandler, sdkLogger)
     }
 
-    actual override fun createConnectionWatchDog(sdkLogger: SdkLogger): ConnectionWatchDog {
+    actual override fun createConnectionWatchDog(sdkLogger: Logger): ConnectionWatchDog {
         val connectivityManager =
             applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         return AndroidConnectionWatchDog(connectivityManager, sdkLogger)
@@ -212,10 +186,14 @@ actual class PlatformDependencyCreator actual constructor(
         return AndroidFileCache(applicationContext, FileSystem.SYSTEM)
     }
 
-    actual override fun createInAppViewProvider(actionFactory: ActionFactoryApi<ActionModel>): InAppViewProviderApi {
+    actual override fun createInAppViewProvider(eventActionFactory: EventActionFactoryApi): InAppViewProviderApi {
         return InAppViewProvider(
             applicationContext,
-            InAppJsBridgeProvider(actionFactory, json, CoroutineScope(sdkContext.sdkDispatcher)),
+            InAppJsBridgeProvider(
+                eventActionFactory,
+                json,
+                CoroutineScope(sdkContext.sdkDispatcher)
+            ),
             sdkContext.mainDispatcher,
             WebViewProvider(applicationContext, sdkContext.mainDispatcher)
         )
@@ -246,33 +224,33 @@ actual class PlatformDependencyCreator actual constructor(
         )
     }
 
-    override fun createLanguageTagValidator(): LanguageTagValidatorApi {
+    actual override fun createLanguageTagValidator(): LanguageTagValidatorApi {
         return LanguageTagValidator()
     }
 
     actual override fun createPushInternal(
         pushClient: PushClientApi,
         storage: StringStorageApi,
-        pushContext: ApiContext<PushCall>,
+        pushContext: PushContextApi,
         eventClient: EventClientApi,
-        actionFactory: ActionFactoryApi<ActionModel>,
+        pushActionFactory: PushActionFactoryApi,
         json: Json,
         sdkDispatcher: CoroutineDispatcher
     ): PushInstance {
-        return PushInternal(pushClient, storage, pushContext, sdkLogger)
+        return PushInternal(pushClient, storage, pushContext)
     }
 
     actual override fun createPushApi(
         pushInternal: PushInstance,
         storage: StringStorageApi,
-        pushContext: ApiContext<PushCall>,
+        pushContext: PushContextApi,
     ): PushApi {
-        val loggingPush = LoggingPush(sdkLogger, storage)
+        val loggingPush = LoggingPush(storage, sdkLogger)
         val pushGatherer = PushGatherer(pushContext, storage)
         return Push(loggingPush, pushGatherer, pushInternal, sdkContext)
     }
 
-    override fun createSdkConfigStore(typedStorage: TypedStorageApi): SdkConfigStoreApi<SdkConfig> {
+    actual override fun createSdkConfigStore(typedStorage: TypedStorageApi): SdkConfigStoreApi<SdkConfig> {
         return AndroidSdkConfigStore(typedStorage)
     }
 }

@@ -2,17 +2,17 @@ package com.emarsys.api.config
 
 import com.emarsys.core.language.LanguageHandlerApi
 import com.emarsys.core.log.Logger
-import com.emarsys.core.providers.Provider
+import com.emarsys.core.providers.InstantProvider
+import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.datetime.Instant
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 
 internal class ConfigInternal(
     private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
-    private val uuidProvider: Provider<String>,
-    private val timestampProvider: Provider<Instant>,
+    private val uuidProvider: UuidProviderApi,
+    private val timestampProvider: InstantProvider,
     private val sdkLogger: Logger,
     private val languageHandler: LanguageHandlerApi
 ): ConfigInstance {

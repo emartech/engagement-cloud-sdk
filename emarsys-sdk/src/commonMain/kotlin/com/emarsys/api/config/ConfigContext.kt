@@ -1,9 +1,9 @@
 package com.emarsys.api.config
 
-import com.emarsys.api.generic.ApiContext
+import com.emarsys.di.SdkComponent
 import kotlinx.serialization.Serializable
 
-class ConfigContext(override val calls: MutableList<ConfigCall>) : ApiContext<ConfigCall>
+internal class ConfigContext(override val calls: MutableList<ConfigCall>) : ConfigContextApi, SdkComponent
 
 @Serializable
 sealed interface ConfigCall {

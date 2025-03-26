@@ -1,28 +1,26 @@
 package com.emarsys.api.inapp
 
-
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class GathererInAppTests {
-
-    private lateinit var inAppContext: InAppApiContext
-
     private lateinit var gathererInApp: GathererInApp
+    private lateinit var inAppContext: InAppContextApi
 
     @BeforeTest
     fun setup() = runTest {
         inAppContext = InAppContext(mutableListOf())
-        gathererInApp = GathererInApp(inAppContext)
+
+        gathererInApp = GathererInApp(inAppContext, InappConfig)
     }
 
     @Test
     fun testIsPaused() = runTest {
         gathererInApp.isPaused shouldBe false
 
-        inAppContext.inAppDnd = true
+        InappConfig.inAppDnd = true
 
         gathererInApp.isPaused shouldBe true
     }
@@ -32,7 +30,6 @@ class GathererInAppTests {
         val testCall = InAppCall.Pause()
 
         gathererInApp.pause()
-
         inAppContext.calls.contains(testCall) shouldBe true
     }
 
@@ -43,5 +40,6 @@ class GathererInAppTests {
         gathererInApp.resume()
 
         inAppContext.calls.contains(testCall) shouldBe true
+        inAppContext.calls.size shouldBe 1
     }
 }

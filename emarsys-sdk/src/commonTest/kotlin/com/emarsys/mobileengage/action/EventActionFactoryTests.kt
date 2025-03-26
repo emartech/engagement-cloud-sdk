@@ -11,7 +11,6 @@ import com.emarsys.mobileengage.action.actions.CustomEventAction
 import com.emarsys.mobileengage.action.actions.DismissAction
 import com.emarsys.mobileengage.action.actions.OpenExternalUrlAction
 import com.emarsys.mobileengage.action.actions.RequestPushPermissionAction
-import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
 import com.emarsys.mobileengage.action.models.BasicCustomEventActionModel
 import com.emarsys.mobileengage.action.models.BasicDismissActionModel
@@ -34,7 +33,7 @@ class EventActionFactoryTests {
     private lateinit var mockExternalUrlOpener: ExternalUrlOpenerApi
     private lateinit var mockClipboardHandler: ClipboardHandlerApi
 
-    private lateinit var actionFactory: ActionFactoryApi<ActionModel>
+    private lateinit var actionFactory: EventActionFactoryApi
 
     @BeforeTest
     fun setUp() {

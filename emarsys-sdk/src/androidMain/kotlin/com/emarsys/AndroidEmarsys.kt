@@ -9,9 +9,8 @@ import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.inbox.InboxApi
 import com.emarsys.api.predict.PredictApi
 import com.emarsys.api.push.PushApi
-import com.emarsys.di.DependencyContainerPrivateApi
-import com.emarsys.di.DependencyInjection
-
+import com.emarsys.core.log.Logger
+import com.emarsys.di.SdkKoinIsolationContext.koin
 import io.ktor.http.Url
 
 object AndroidEmarsys {
@@ -62,7 +61,7 @@ object AndroidEmarsys {
             Emarsys.deepLink.trackDeepLink(Url(uri.toString()))
             intentFromActivity?.putExtra(EMS_DEEP_LINK_TRACKED_KEY, true)
         } else {
-            (DependencyInjection.container as DependencyContainerPrivateApi).sdkLogger.info(
+            koin.get<Logger>().info(
                 "AndroidEmarsys - trackDeepLink",
                 "Cannot track deeplink with uri: $uri"
             )

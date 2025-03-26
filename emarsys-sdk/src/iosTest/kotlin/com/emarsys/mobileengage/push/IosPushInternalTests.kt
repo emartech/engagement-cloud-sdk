@@ -1,28 +1,27 @@
 package com.emarsys.mobileengage.push
 
 import com.emarsys.SdkConstants.PUSH_RECEIVED_EVENT_NAME
-import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.BasicPushUserInfo
 import com.emarsys.api.push.BasicPushUserInfoEms
-import com.emarsys.api.push.PushCall
 import com.emarsys.api.push.PushCall.ClearPushToken
 import com.emarsys.api.push.PushCall.HandleMessageWithUserInfo
 import com.emarsys.api.push.PushCall.RegisterPushToken
 import com.emarsys.api.push.PushContext
+import com.emarsys.api.push.PushContextApi
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.actions.badge.BadgeCountHandlerApi
 import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.log.Logger
-import com.emarsys.core.providers.Provider
+import com.emarsys.core.providers.InstantProvider
+import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
-import com.emarsys.mobileengage.action.ActionFactoryApi
+import com.emarsys.mobileengage.action.PushActionFactoryApi
 import com.emarsys.mobileengage.action.actions.Action
 import com.emarsys.mobileengage.action.actions.OpenExternalUrlAction
 import com.emarsys.mobileengage.action.actions.PushToInappAction
 import com.emarsys.mobileengage.action.actions.ReportingAction
-import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BadgeCount
 import com.emarsys.mobileengage.action.models.BadgeCountMethod.SET
 import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
@@ -56,9 +55,8 @@ import platform.UserNotifications.UNNotificationDefaultActionIdentifier
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-
 @ExperimentalCoroutinesApi
-class IosPushInternalTests {
+internal class IosPushInternalTests {
     private companion object {
         const val SID = "testSid"
         const val CAMPAIGN_ID = "campaignId"
@@ -88,17 +86,17 @@ class IosPushInternalTests {
 
     private lateinit var mockPushClient: PushClientApi
     private lateinit var mockStorage: StringStorageApi
-    private lateinit var pushContext: ApiContext<PushCall>
+    private lateinit var pushContext: PushContextApi
     private lateinit var mockSdkContext: SdkContextApi
-    private lateinit var mockActionFactory: ActionFactoryApi<ActionModel>
+    private lateinit var mockActionFactory: PushActionFactoryApi
     private lateinit var mockActionHandler: ActionHandlerApi
     private lateinit var mockBadgeCountHandler: BadgeCountHandlerApi
     private lateinit var json: Json
     private lateinit var sdkDispatcher: CoroutineDispatcher
     private lateinit var mockSdkEventFlow: MutableSharedFlow<SdkEvent>
     private lateinit var mockSdkLogger: Logger
-    private lateinit var mockTimestampProvider: Provider<Instant>
-    private lateinit var mockUuidProvider: Provider<String>
+    private lateinit var mockTimestampProvider: InstantProvider
+    private lateinit var mockUuidProvider: UuidProviderApi
 
     @BeforeTest
     fun setup() = runTest {
@@ -107,7 +105,6 @@ class IosPushInternalTests {
 
         mockPushClient = mock()
         mockStorage = mock()
-        pushContext = PushContext(pushCalls)
         mockSdkContext = mock()
         mockActionFactory = mock()
         mockActionHandler = mock()
@@ -121,6 +118,8 @@ class IosPushInternalTests {
         everySuspend { mockActionHandler.handleActions(any(), any()) } returns Unit
         everySuspend { mockTimestampProvider.provide() } returns Instant.DISTANT_PAST
         everySuspend { mockUuidProvider.provide() } returns UUID
+
+        pushContext = PushContext(pushCalls)
         iosPushInternal = IosPushInternal(
             mockPushClient,
             mockStorage,

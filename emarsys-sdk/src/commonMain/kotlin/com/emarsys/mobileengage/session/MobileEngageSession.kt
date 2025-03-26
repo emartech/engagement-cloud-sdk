@@ -4,7 +4,8 @@ import com.emarsys.context.SdkContextApi
 import com.emarsys.core.lifecycle.LifecycleEvent
 import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.Logger
-import com.emarsys.core.providers.Provider
+import com.emarsys.core.providers.InstantProvider
+import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.session.SessionId
 import com.emarsys.networking.clients.event.EventClientApi
@@ -15,13 +16,12 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Instant
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 
-class MobileEngageSession(
-    private val timestampProvider: Provider<Instant>,
-    private val uuidProvider: Provider<String>,
+internal class MobileEngageSession(
+    private val timestampProvider: InstantProvider,
+    private val uuidProvider: UuidProviderApi,
     private val sessionContext: SessionContext,
     private val sdkContext: SdkContextApi,
     private val eventClient: EventClientApi,

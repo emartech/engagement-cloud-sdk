@@ -23,7 +23,7 @@ import kotlinx.serialization.json.buildJsonObject
 import org.junit.Before
 import org.junit.Test
 
-class AndroidPushV1MapperTest {
+internal class AndroidPushV1MapperTest {
 
     private lateinit var uuidProvider: Provider<String>
     private lateinit var mapper: AndroidPushV1Mapper
@@ -31,7 +31,7 @@ class AndroidPushV1MapperTest {
     @Before
     fun setup() = runTest {
         uuidProvider = mockk(relaxed = true)
-        mapper = AndroidPushV1Mapper(mockk(relaxed = true), JsonUtil.json, mockk(relaxed = true))
+        mapper = AndroidPushV1Mapper(JsonUtil.json, mockk(relaxed = true), mockk(relaxed = true))
     }
 
     @Test

@@ -21,7 +21,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
 
-class ConfigClient(
+internal class ConfigClient(
     private val emarsysNetworkClient: NetworkClientApi,
     private val urlFactory: UrlFactoryApi,
     private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
@@ -31,7 +31,7 @@ class ConfigClient(
     private val json: Json,
     private val sdkLogger: Logger,
     sdkDispatcher: CoroutineDispatcher
-) {
+):ConfigClientApi {
     init {
         CoroutineScope(sdkDispatcher).launch {
             startEventConsumer()

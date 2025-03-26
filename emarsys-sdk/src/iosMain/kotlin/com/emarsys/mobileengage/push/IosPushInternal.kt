@@ -2,21 +2,21 @@ package com.emarsys.mobileengage.push
 
 import com.emarsys.SdkConstants.PUSH_RECEIVED_EVENT_NAME
 import com.emarsys.api.SdkState
-import com.emarsys.api.generic.ApiContext
 import com.emarsys.api.push.BasicPushUserInfo
 import com.emarsys.api.push.PresentablePushUserInfo
 import com.emarsys.api.push.PresentablePushUserInfoEms
-import com.emarsys.api.push.PushCall
 import com.emarsys.api.push.PushCall.ClearPushToken
 import com.emarsys.api.push.PushCall.HandleMessageWithUserInfo
 import com.emarsys.api.push.PushCall.RegisterPushToken
+import com.emarsys.api.push.PushContextApi
 import com.emarsys.api.push.PushInternal
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.actions.badge.BadgeCountHandlerApi
 import com.emarsys.core.collections.dequeue
 import com.emarsys.core.log.Logger
-import com.emarsys.core.providers.Provider
+import com.emarsys.core.providers.InstantProvider
+import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.actions.Action
@@ -35,7 +35,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -63,10 +62,10 @@ import platform.UserNotifications.UNUserNotificationCenter
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 import platform.darwin.NSObject
 
-class IosPushInternal(
+internal class IosPushInternal(
     private val pushClient: PushClientApi,
     storage: StringStorageApi,
-    private val pushContext: ApiContext<PushCall>,
+    private val pushContext: PushContextApi,
     sdkContext: SdkContextApi,
     private val actionFactory: ActionFactoryApi<ActionModel>,
     private val actionHandler: ActionHandlerApi,
@@ -75,9 +74,9 @@ class IosPushInternal(
     private val sdkDispatcher: CoroutineDispatcher,
     private val sdkLogger: Logger,
     private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
-    private val timestampProvider: Provider<Instant>,
-    private val uuidProvider: Provider<String>
-) : PushInternal(pushClient, storage, pushContext, sdkLogger), IosPushInstance {
+    private val timestampProvider: InstantProvider,
+    private val uuidProvider: UuidProviderApi
+) : PushInternal(pushClient, storage, pushContext), IosPushInstance {
     override var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol? =
         null
         set(value) {

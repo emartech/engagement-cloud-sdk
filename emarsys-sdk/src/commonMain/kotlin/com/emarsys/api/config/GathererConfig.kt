@@ -1,30 +1,29 @@
 package com.emarsys.api.config
 
-import com.emarsys.api.generic.ApiContext
 import com.emarsys.core.log.Logger
 
-class GathererConfig(
-    val context: ApiContext<ConfigCall>,
+internal class GathererConfig(
+    val configContext: ConfigContextApi,
     private val sdkLogger: Logger
 ) : ConfigInstance {
     override suspend fun changeApplicationCode(applicationCode: String) {
         sdkLogger.debug("GathererConfig - changeApplicationCode")
-        context.calls.add(ConfigCall.ChangeApplicationCode(applicationCode))
+        configContext.calls.add(ConfigCall.ChangeApplicationCode(applicationCode))
     }
 
     override suspend fun changeMerchantId(merchantId: String) {
         sdkLogger.debug("GathererConfig - changeMerchantId")
-        context.calls.add(ConfigCall.ChangeMerchantId(merchantId))
+        configContext.calls.add(ConfigCall.ChangeMerchantId(merchantId))
     }
 
     override suspend fun setLanguage(language: String) {
         sdkLogger.debug("GathererConfig - setLanguage")
-        context.calls.add(ConfigCall.SetLanguage(language))
+        configContext.calls.add(ConfigCall.SetLanguage(language))
     }
 
     override suspend fun resetLanguage() {
         sdkLogger.debug("GathererConfig - resetLanguage")
-        context.calls.add(ConfigCall.ResetLanguage)
+        configContext.calls.add(ConfigCall.ResetLanguage)
     }
 
     override suspend fun activate() {}

@@ -6,6 +6,7 @@ import com.emarsys.core.storage.StringStorageApi
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.capture.Capture
+import dev.mokkery.matcher.capture.SlotCapture
 import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
@@ -18,6 +19,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import org.koin.core.context.stopKoin
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -31,7 +33,7 @@ class LoggingPushTests {
     private lateinit var mockLogger: Logger
     private lateinit var mockStringStorage: StringStorageApi
     private lateinit var loggingPush: LoggingPush
-    private var slot = Capture.slot<LogEntry>()
+    private lateinit var slot: SlotCapture<LogEntry>
 
     private val mainDispatcher = StandardTestDispatcher()
 
@@ -42,19 +44,28 @@ class LoggingPushTests {
     @BeforeTest
     fun setup() = runTest {
         mockLogger = mock()
+        slot = Capture.slot()
+
         Dispatchers.setMain(mainDispatcher)
 
         everySuspend { mockLogger.debug(logEntry = capture(slot)) } returns Unit
 
         mockStringStorage = mock()
-        everySuspend { mockStringStorage.put(PushConstants.PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
+        everySuspend {
+            mockStringStorage.put(
+                PushConstants.PUSH_TOKEN_STORAGE_KEY,
+                PUSH_TOKEN
+            )
+        } returns Unit
 
-        loggingPush = LoggingPush(mockLogger, mockStringStorage)
+
+        loggingPush = LoggingPush(mockStringStorage, mockLogger)
     }
 
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
+        stopKoin()
     }
 
     @Test

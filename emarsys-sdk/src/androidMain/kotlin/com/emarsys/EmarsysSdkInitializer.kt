@@ -7,12 +7,16 @@ import kotlinx.coroutines.runBlocking
 internal lateinit var applicationContext: Context
     private set
 
-class EmarsysSdkInitializer : Initializer<Unit> {
+internal class EmarsysSdkInitializer : Initializer<Unit> {
     override fun create(context: Context) {
-        applicationContext = context.applicationContext
+        setContext(context)
         return runBlocking {
             Emarsys.initialize()
         }
+    }
+
+    private fun setContext(context: Context) {
+        applicationContext = context.applicationContext
     }
 
     override fun dependencies(): List<Class<out Initializer<*>>> {

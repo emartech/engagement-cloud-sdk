@@ -2,14 +2,15 @@ package com.emarsys.api.geofence
 
 import com.emarsys.api.geofence.model.Geofence
 
-class GathererGeofenceTracker(
-    private val geofenceTrackerContext: GeofenceContext
+internal class GathererGeofenceTracker(
+    private val geofenceTrackerContext: GeofenceContextApi,
+    val geofenceTrackerConfig: GeofenceTrackerConfigApi
 ) : GeofenceTrackerInstance {
     override val registeredGeofences: List<Geofence>
-        get() = geofenceTrackerContext.registeredGeofences
+        get() = geofenceTrackerConfig.registeredGeofences
 
     override val isEnabled: Boolean
-        get() = geofenceTrackerContext.isGeofenceTrackerEnabled
+        get() = geofenceTrackerConfig.isGeofenceTrackerEnabled
 
     override suspend fun enable() {
         geofenceTrackerContext.calls.add(GeofenceTrackerCall.Enable())

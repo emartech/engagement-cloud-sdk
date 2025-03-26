@@ -1,8 +1,7 @@
 package com.emarsys.mobileengage.push
 
 import com.emarsys.SdkConstants.PUSH_RECEIVED_EVENT_NAME
-import com.emarsys.mobileengage.action.ActionFactoryApi
-import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.action.PushActionFactoryApi
 import com.emarsys.mobileengage.push.model.AndroidPlatformData
 import com.emarsys.mobileengage.push.model.SilentAndroidPushMessage
 
@@ -11,8 +10,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 
-class SilentPushMessageHandler(
-    private val pushActionFactory: ActionFactoryApi<ActionModel>,
+internal class SilentPushMessageHandler(
+    private val pushActionFactory: PushActionFactoryApi,
     private val sdkEventFlow: MutableSharedFlow<SdkEvent>
 ): PushHandler<AndroidPlatformData, SilentAndroidPushMessage> {
 

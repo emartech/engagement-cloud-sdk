@@ -4,13 +4,13 @@ import android.content.Intent
 import androidx.test.platform.app.InstrumentationRegistry
 import com.emarsys.api.push.PushApi
 import com.emarsys.api.push.PushConstants
+import com.emarsys.core.log.Logger
 import com.emarsys.core.storage.StringStorage
-import com.emarsys.di.DependencyContainer
-import com.emarsys.di.DependencyInjection
+import com.emarsys.core.storage.StringStorageApi
+import com.emarsys.di.DispatcherTypes
+import com.emarsys.di.SdkKoinIsolationContext.koin
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.mockk
-import io.mockk.mockkObject
 import io.mockk.unmockkAll
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -23,9 +23,15 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.koin.core.Koin
+import org.koin.core.qualifier.named
+import org.koin.dsl.module
+import org.koin.test.KoinTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class PushTokenBroadcastReceiverTest {
+class PushTokenBroadcastReceiverTest: KoinTest  {
+    override fun getKoin(): Koin = koin
+
     private companion object {
         const val PUSH_TOKEN = "testToken"
     }
@@ -33,24 +39,26 @@ class PushTokenBroadcastReceiverTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private lateinit var sdkDispatcher: CoroutineDispatcher
     private lateinit var broadcastReceiver: PushTokenBroadcastReceiver
-    private lateinit var mockDependencyContainer: DependencyContainer
     private lateinit var mockPushApi: PushApi
     private lateinit var mockStringStorage: StringStorage
+    private lateinit var mockLogger: Logger
 
     @Before
     fun setUp() {
-        mockkObject(DependencyInjection)
+        Dispatchers.setMain(StandardTestDispatcher())
         sdkDispatcher = StandardTestDispatcher()
-        Dispatchers.setMain(sdkDispatcher)
 
         mockStringStorage = mockk(relaxed = true)
         mockPushApi = mockk(relaxed = true)
-        mockDependencyContainer = mockk(relaxed = true)
-        every { mockDependencyContainer.pushApi } returns mockPushApi
-        every { mockDependencyContainer.sdkDispatcher } returns sdkDispatcher
-        every { mockDependencyContainer.stringStorage } returns mockStringStorage
+        mockLogger = mockk(relaxed = true)
 
-        every { DependencyInjection.container } returns mockDependencyContainer
+        val testModules = module {
+            single<PushApi> { mockPushApi }
+            single<StringStorageApi> { mockStringStorage }
+            single<CoroutineDispatcher>(named(DispatcherTypes.Sdk)) { sdkDispatcher }
+            single<Logger> { mockLogger }
+        }
+        koin.loadModules(listOf(testModules))
 
         broadcastReceiver = PushTokenBroadcastReceiver()
     }
