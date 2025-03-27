@@ -59,7 +59,7 @@ class InitOrganizerTests {
             verifySuspend {
                 mockStateMachine.activate()
             }
-            sdkContext.currentSdkState shouldBe SdkState.initialized
+            sdkContext.currentSdkState.value shouldBe SdkState.initialized
         }
 
     @Test
@@ -74,6 +74,6 @@ class InitOrganizerTests {
             verifySuspend {
                 mockStateMachine.activate()
             }
-            sdkContext.currentSdkState shouldBe SdkState.active
+            sdkContext.currentSdkState.value shouldBe SdkState.active
         }
 }

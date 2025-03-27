@@ -1,5 +1,5 @@
 package com.emarsys.api
 
 interface AutoRegisterable {
-    fun registerOnContext()
+    suspend fun registerOnContext()
 }

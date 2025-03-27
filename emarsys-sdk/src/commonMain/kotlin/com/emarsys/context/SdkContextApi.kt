@@ -2,13 +2,12 @@ package com.emarsys.context
 
 import com.emarsys.SdkConfig
 import com.emarsys.api.SdkState
-import com.emarsys.core.ObservableApi
-import com.emarsys.core.Observer
 import com.emarsys.core.log.LogLevel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.StateFlow
 
-interface SdkContextApi: ObservableApi<SdkState> {
-    val currentSdkState: SdkState
+interface SdkContextApi {
+    val currentSdkState: StateFlow<SdkState>
     val sdkDispatcher: CoroutineDispatcher
     val mainDispatcher: CoroutineDispatcher
     var contactFieldId: Int?
@@ -18,8 +17,4 @@ interface SdkContextApi: ObservableApi<SdkState> {
     val features: MutableSet<Features>
 
     suspend fun setSdkState(sdkState: SdkState)
-
-    override fun addObserver(observer: Observer<SdkState>)
-
-    override fun removeObserver(observer: Observer<SdkState>)
 }

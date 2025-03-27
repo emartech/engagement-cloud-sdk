@@ -18,6 +18,7 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -110,6 +111,7 @@ class PredictTests {
         everySuspend { mockGathererPredict.trackCart(testCartItems) } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
+        advanceUntilIdle()
 
         predict.trackCart(testCartItems)
 
@@ -121,6 +123,7 @@ class PredictTests {
         everySuspend { mockPredictInternal.trackCart(testCartItems) } returns Unit
 
         sdkContext.setSdkState(SdkState.active)
+        advanceUntilIdle()
 
         predict.trackCart(testCartItems)
 
@@ -132,6 +135,7 @@ class PredictTests {
         everySuspend { mockPredictInternal.trackCart(testCartItems) } throws testException
 
         sdkContext.setSdkState(SdkState.active)
+        advanceUntilIdle()
 
         val result = predict.trackCart(testCartItems)
 
@@ -157,6 +161,7 @@ class PredictTests {
         everySuspend { mockGathererPredict.trackPurchase(ORDER_ID, testCartItems) } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
+        advanceUntilIdle()
 
         predict.trackPurchase(ORDER_ID, testCartItems)
 
@@ -173,6 +178,7 @@ class PredictTests {
         everySuspend { mockPredictInternal.trackPurchase(ORDER_ID, testCartItems) } returns Unit
 
         sdkContext.setSdkState(SdkState.active)
+        advanceUntilIdle()
 
         predict.trackPurchase(ORDER_ID, testCartItems)
 
@@ -194,6 +200,7 @@ class PredictTests {
         } throws testException
 
         sdkContext.setSdkState(SdkState.active)
+        advanceUntilIdle()
 
         val result = predict.trackPurchase(ORDER_ID, testCartItems)
 
@@ -214,6 +221,7 @@ class PredictTests {
         everySuspend { mockGathererPredict.trackItemView(ITEM_VIEW) } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
+        advanceUntilIdle()
 
         predict.trackItemView(ITEM_VIEW)
 
@@ -225,6 +233,7 @@ class PredictTests {
         everySuspend { mockPredictInternal.trackItemView(ITEM_VIEW) } returns Unit
 
         sdkContext.setSdkState(SdkState.active)
+        advanceUntilIdle()
 
         predict.trackItemView(ITEM_VIEW)
 
@@ -236,6 +245,7 @@ class PredictTests {
         everySuspend { mockPredictInternal.trackItemView(ITEM_VIEW) } throws testException
 
         sdkContext.setSdkState(SdkState.active)
+        advanceUntilIdle()
 
         val result = predict.trackItemView(ITEM_VIEW)
 
@@ -256,6 +266,7 @@ class PredictTests {
         everySuspend { mockGathererPredict.trackCategoryView(CATEGORY_VIEW) } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
+        advanceUntilIdle()
 
         predict.trackCategoryView(CATEGORY_VIEW)
 
@@ -267,6 +278,7 @@ class PredictTests {
         everySuspend { mockPredictInternal.trackCategoryView(CATEGORY_VIEW) } returns Unit
 
         sdkContext.setSdkState(SdkState.active)
+        advanceUntilIdle()
 
         predict.trackCategoryView(CATEGORY_VIEW)
 
@@ -278,6 +290,7 @@ class PredictTests {
         everySuspend { mockPredictInternal.trackCategoryView(CATEGORY_VIEW) } throws testException
 
         sdkContext.setSdkState(SdkState.active)
+        advanceUntilIdle()
 
         val result = predict.trackCategoryView(CATEGORY_VIEW)
 
@@ -298,6 +311,7 @@ class PredictTests {
         everySuspend { mockGathererPredict.trackSearchTerm(SEARCH_TERM) } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
+        advanceUntilIdle()
 
         predict.trackSearchTerm(SEARCH_TERM)
 
@@ -309,6 +323,7 @@ class PredictTests {
         everySuspend { mockPredictInternal.trackSearchTerm(SEARCH_TERM) } returns Unit
 
         sdkContext.setSdkState(SdkState.active)
+        advanceUntilIdle()
 
         predict.trackSearchTerm(SEARCH_TERM)
 
@@ -320,6 +335,7 @@ class PredictTests {
         everySuspend { mockPredictInternal.trackSearchTerm(SEARCH_TERM) } throws testException
 
         sdkContext.setSdkState(SdkState.active)
+        advanceUntilIdle()
 
         val result = predict.trackSearchTerm(SEARCH_TERM)
 
@@ -340,6 +356,7 @@ class PredictTests {
         everySuspend { mockGathererPredict.trackTag(TAG, testAttributes) } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
+        advanceUntilIdle()
 
         predict.trackTag(TAG, testAttributes)
 
@@ -351,6 +368,7 @@ class PredictTests {
         everySuspend { mockPredictInternal.trackTag(TAG, testAttributes) } returns Unit
 
         sdkContext.setSdkState(SdkState.active)
+        advanceUntilIdle()
 
         predict.trackTag(TAG, testAttributes)
 
@@ -367,6 +385,7 @@ class PredictTests {
         } throws testException
 
         sdkContext.setSdkState(SdkState.active)
+        advanceUntilIdle()
 
         val result = predict.trackTag(TAG, testAttributes)
 
@@ -391,6 +410,7 @@ class PredictTests {
         everySuspend { mockGathererPredict.trackRecommendationClick(testProduct) } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
+        advanceUntilIdle()
 
         predict.trackRecommendationClick(testProduct)
 
@@ -406,6 +426,7 @@ class PredictTests {
         everySuspend { mockPredictInternal.trackRecommendationClick(testProduct) } returns Unit
 
         sdkContext.setSdkState(SdkState.active)
+        advanceUntilIdle()
 
         predict.trackRecommendationClick(testProduct)
 
@@ -421,6 +442,7 @@ class PredictTests {
         everySuspend { mockPredictInternal.trackRecommendationClick(testProduct) } throws testException
 
         sdkContext.setSdkState(SdkState.active)
+        advanceUntilIdle()
 
         val result = predict.trackRecommendationClick(testProduct)
 
@@ -462,6 +484,7 @@ class PredictTests {
         } returns listOf(testProduct)
 
         sdkContext.setSdkState(SdkState.onHold)
+        advanceUntilIdle()
 
         predict.recommendProducts(testLogic, testFilters, LIMIT, AVAILABILITY_ZONE)
 
@@ -489,6 +512,7 @@ class PredictTests {
         )
 
         sdkContext.setSdkState(SdkState.active)
+        advanceUntilIdle()
 
         predict.recommendProducts(testLogic, testFilters, LIMIT, AVAILABILITY_ZONE)
 
@@ -514,6 +538,7 @@ class PredictTests {
         } throws testException
 
         sdkContext.setSdkState(SdkState.active)
+        advanceUntilIdle()
 
         val result = predict.recommendProducts(testLogic, testFilters, LIMIT, AVAILABILITY_ZONE)
 

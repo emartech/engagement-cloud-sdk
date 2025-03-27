@@ -17,6 +17,7 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -93,6 +94,7 @@ class GeofenceTrackerTests {
         every { mockGathererGeofenceTracker.registeredGeofences } returns listOf(testGeofence)
 
         sdkContext.setSdkState(SdkState.onHold)
+        advanceUntilIdle()
 
         geofenceTracker.registeredGeofences shouldBe listOf(testGeofence)
 
@@ -104,6 +106,7 @@ class GeofenceTrackerTests {
         every { mockGeofenceTrackerInternal.registeredGeofences } returns listOf(testGeofence)
 
         sdkContext.setSdkState(SdkState.active)
+        advanceUntilIdle()
 
         geofenceTracker.registeredGeofences shouldBe listOf(testGeofence)
 
@@ -124,6 +127,7 @@ class GeofenceTrackerTests {
         every { mockGathererGeofenceTracker.isEnabled } returns true
 
         sdkContext.setSdkState(SdkState.onHold)
+        advanceUntilIdle()
 
         geofenceTracker.isEnabled shouldBe true
 
@@ -135,6 +139,7 @@ class GeofenceTrackerTests {
         every { mockGeofenceTrackerInternal.isEnabled } returns false
 
         sdkContext.setSdkState(SdkState.active)
+        advanceUntilIdle()
 
         geofenceTracker.isEnabled shouldBe false
 
@@ -155,6 +160,7 @@ class GeofenceTrackerTests {
         everySuspend { mockGathererGeofenceTracker.enable() } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
+        advanceUntilIdle()
 
         geofenceTracker.enable()
 
@@ -166,6 +172,7 @@ class GeofenceTrackerTests {
         everySuspend { mockGeofenceTrackerInternal.enable() } returns Unit
 
         sdkContext.setSdkState(SdkState.active)
+        advanceUntilIdle()
 
         geofenceTracker.enable()
 
@@ -177,6 +184,7 @@ class GeofenceTrackerTests {
         everySuspend { mockGeofenceTrackerInternal.enable() } throws testException
 
         sdkContext.setSdkState(SdkState.active)
+        advanceUntilIdle()
 
         val result = geofenceTracker.enable()
 
@@ -197,6 +205,7 @@ class GeofenceTrackerTests {
         everySuspend { mockGathererGeofenceTracker.disable() } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
+        advanceUntilIdle()
 
         geofenceTracker.disable()
 
@@ -208,6 +217,7 @@ class GeofenceTrackerTests {
         everySuspend { mockGeofenceTrackerInternal.disable() } returns Unit
 
         sdkContext.setSdkState(SdkState.active)
+        advanceUntilIdle()
 
         geofenceTracker.disable()
 
@@ -219,6 +229,7 @@ class GeofenceTrackerTests {
         everySuspend { mockGeofenceTrackerInternal.disable() } throws testException
 
         sdkContext.setSdkState(SdkState.active)
+        advanceUntilIdle()
 
         val result = geofenceTracker.disable()
 
@@ -241,6 +252,7 @@ class GeofenceTrackerTests {
         everySuspend { mockGathererGeofenceTracker.setInitialEnterTriggerEnabled(SET_ENABLED) } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
+        advanceUntilIdle()
 
         geofenceTracker.setInitialEnterTriggerEnabled(SET_ENABLED)
 
@@ -256,6 +268,7 @@ class GeofenceTrackerTests {
         everySuspend { mockGeofenceTrackerInternal.setInitialEnterTriggerEnabled(SET_ENABLED) } returns Unit
 
         sdkContext.setSdkState(SdkState.active)
+        advanceUntilIdle()
 
         geofenceTracker.setInitialEnterTriggerEnabled(SET_ENABLED)
 
@@ -271,6 +284,7 @@ class GeofenceTrackerTests {
         everySuspend { mockGeofenceTrackerInternal.setInitialEnterTriggerEnabled(SET_ENABLED) } throws testException
 
         sdkContext.setSdkState(SdkState.active)
+        advanceUntilIdle()
 
         val result = geofenceTracker.setInitialEnterTriggerEnabled(SET_ENABLED)
 

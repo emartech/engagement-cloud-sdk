@@ -6,6 +6,9 @@ import com.emarsys.api.AutoRegisterable
 import com.emarsys.api.SdkState
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.exceptions.PreconditionFailedException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.launch
 import kotlin.reflect.typeOf
 
 open class GenericApi<Logging : Activatable, Gatherer : Activatable, Internal : Activatable>(
@@ -21,9 +24,11 @@ open class GenericApi<Logging : Activatable, Gatherer : Activatable, Internal : 
         activeInstance = instance
     }
 
-    override fun registerOnContext() {
-        sdkContext.addObserver {
-            setActiveInstance(it)
+    override suspend fun registerOnContext() {
+        CoroutineScope(sdkContext.sdkDispatcher).launch(start = CoroutineStart.UNDISPATCHED) {
+            sdkContext.currentSdkState.collect {
+                setActiveInstance(it)
+            }
         }
     }
 

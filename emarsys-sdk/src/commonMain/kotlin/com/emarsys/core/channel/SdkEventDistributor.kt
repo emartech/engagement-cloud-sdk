@@ -76,11 +76,11 @@ class SdkEventDistributor(
         try {
             eventsDao.insertEvent(sdkEvent)
         } catch (exception: Exception) {
-            sdkLogger.error("SdkEventDistributor - persistSdkEvent", exception,
+            sdkLogger.error(
+                "SdkEventDistributor - persistSdkEvent", exception,
                 buildJsonObject {
                     put("sdkEvent", sdkEvent.toString())
                 })
         }
     }
-
 }

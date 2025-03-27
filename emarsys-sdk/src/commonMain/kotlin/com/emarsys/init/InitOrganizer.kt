@@ -13,7 +13,7 @@ class InitOrganizer(
 ) : InitOrganizerApi {
     override suspend fun init() {
         initStateMachine.activate()
-        if (sdkContext.currentSdkState == SdkState.inactive) {
+        if (sdkContext.currentSdkState.value == SdkState.inactive) {
             sdkContext.setSdkState(SdkState.initialized)
         }
         sdkLogger.debug("InitOrganizer", "SDK initialized")

@@ -17,6 +17,7 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlin.test.BeforeTest
@@ -75,6 +76,8 @@ class InappTests {
         every { mockGathererInApp.isPaused } returns true
 
         sdkContext.setSdkState(SdkState.onHold)
+        advanceUntilIdle()
+
         inApp.isPaused shouldBe true
 
         verify { mockGathererInApp.isPaused }
@@ -85,6 +88,7 @@ class InappTests {
         every { mockInAppInternal.isPaused } returns true
 
         sdkContext.setSdkState(SdkState.active)
+        advanceUntilIdle()
         inApp.isPaused shouldBe true
 
         verify { mockInAppInternal.isPaused }
@@ -104,6 +108,7 @@ class InappTests {
         everySuspend { mockGathererInApp.pause() } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
+        advanceUntilIdle()
 
         inApp.pause()
 
@@ -114,6 +119,7 @@ class InappTests {
     fun testPause_when_activeState() = runTest {
         everySuspend { mockInAppInternal.pause() } returns Unit
         sdkContext.setSdkState(SdkState.active)
+        advanceUntilIdle()
 
         inApp.pause()
 
@@ -125,6 +131,7 @@ class InappTests {
         everySuspend { mockInAppInternal.pause() } throws testException
 
         sdkContext.setSdkState(SdkState.active)
+        advanceUntilIdle()
 
         val result = inApp.pause()
 
@@ -145,6 +152,7 @@ class InappTests {
         everySuspend { mockGathererInApp.resume() } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
+        advanceUntilIdle()
 
         inApp.resume()
 
@@ -155,6 +163,7 @@ class InappTests {
     fun testResume_when_activeState() = runTest {
         everySuspend { mockInAppInternal.resume() } returns Unit
         sdkContext.setSdkState(SdkState.active)
+        advanceUntilIdle()
 
         inApp.resume()
 
@@ -166,6 +175,7 @@ class InappTests {
         everySuspend { mockInAppInternal.resume() } throws testException
 
         sdkContext.setSdkState(SdkState.active)
+        advanceUntilIdle()
 
         val result = inApp.resume()
 

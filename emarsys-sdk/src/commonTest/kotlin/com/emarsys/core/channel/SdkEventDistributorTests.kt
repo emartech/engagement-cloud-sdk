@@ -185,7 +185,9 @@ class SdkEventDistributorTests {
             }
         }
 
-    private fun createEventDistributor(connectionState: MutableStateFlow<Boolean>): SdkEventDistributor {
+    private fun createEventDistributor(
+        connectionState: MutableStateFlow<Boolean>,
+    ): SdkEventDistributor {
         return SdkEventDistributor(
             sdkEventFlow,
             connectionState,

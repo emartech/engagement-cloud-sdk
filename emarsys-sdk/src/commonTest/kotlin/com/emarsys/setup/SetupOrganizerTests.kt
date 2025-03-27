@@ -76,7 +76,7 @@ class SetupOrganizerTests {
                 mockMeStateMachine.activate()
             }
             sdkContext.config shouldBe config
-            sdkContext.currentSdkState shouldBe SdkState.active
+            sdkContext.currentSdkState.value shouldBe SdkState.active
         }
 
     @Test
@@ -111,7 +111,7 @@ class SetupOrganizerTests {
                 mockMeStateMachine.activate()
             }
             sdkContext.config shouldBe config
-            sdkContext.currentSdkState shouldBe SdkState.active
+            sdkContext.currentSdkState.value shouldBe SdkState.active
         }
 
     @Test
@@ -129,6 +129,6 @@ class SetupOrganizerTests {
                 mockMeStateMachine.activate()
             }
             sdkContext.config shouldBe config
-            sdkContext.currentSdkState shouldBe SdkState.active
+            sdkContext.currentSdkState.value shouldBe SdkState.active
         }
 }

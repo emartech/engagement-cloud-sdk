@@ -2,6 +2,7 @@ package com.emarsys.api.generic
 
 import com.emarsys.api.SdkState.active
 import com.emarsys.api.SdkState.inactive
+import com.emarsys.api.SdkState.initialized
 import com.emarsys.api.SdkState.onHold
 import com.emarsys.api.contact.ContactContext
 import com.emarsys.api.contact.ContactContextApi
@@ -17,8 +18,8 @@ import dev.mokkery.MockMode
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlin.test.BeforeTest
@@ -35,15 +36,10 @@ class GenericApiTests {
     private lateinit var contactContext: ContactContextApi
     private lateinit var genericApi: GenericApi<LoggingContact, ContactGatherer, ContactInternal>
 
-    private val mainDispatcher = StandardTestDispatcher()
-
-    init {
-        Dispatchers.setMain(mainDispatcher)
-    }
-
     @BeforeTest
     fun setup() = runTest {
-
+        val mainDispatcher = StandardTestDispatcher()
+        Dispatchers.setMain(mainDispatcher)
         contactContext = ContactContext(mutableListOf())
         mockContactClient = mock()
         mockSdkLogger = mock(MockMode.autofill)
@@ -66,32 +62,42 @@ class GenericApiTests {
             mutableSetOf()
         )
         genericApi = GenericApi(loggingContact, contactGatherer, contactInternal, sdkContext)
+        genericApi.registerOnContext()
     }
 
     @Test
     fun testActive_whenSdkState_isInactive() = runTest {
         sdkContext.setSdkState(inactive)
 
-        while (!sdkContext.sdkDispatcher.isActive)
+        advanceUntilIdle()
 
-            genericApi.activeInstance shouldBe loggingContact
+        genericApi.activeInstance shouldBe loggingContact
     }
 
     @Test
     fun testActive_whenSdkState_isOnHold() = runTest {
         sdkContext.setSdkState(onHold)
 
-        while (!sdkContext.sdkDispatcher.isActive)
+        advanceUntilIdle()
 
-            genericApi.activeInstance shouldBe contactGatherer
+        genericApi.activeInstance shouldBe contactGatherer
     }
 
     @Test
     fun testActive_whenSdkState_isActive() = runTest {
         sdkContext.setSdkState(active)
 
-        while (!sdkContext.sdkDispatcher.isActive)
+        advanceUntilIdle()
 
-            genericApi.activeInstance shouldBe contactInternal
+        genericApi.activeInstance shouldBe contactInternal
+    }
+
+    @Test
+    fun testActive_whenSdkState_isInitialized() = runTest {
+        sdkContext.setSdkState(initialized)
+
+        advanceUntilIdle()
+
+        genericApi.activeInstance shouldBe loggingContact
     }
 }
