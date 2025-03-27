@@ -4,6 +4,8 @@ import com.emarsys.core.channel.SdkEventDistributor
 import com.emarsys.core.networking.clients.GenericNetworkClient
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.networking.EmarsysClient
+import com.emarsys.networking.clients.config.ConfigClient
+import com.emarsys.networking.clients.config.ConfigClientApi
 import com.emarsys.networking.clients.device.DeviceClient
 import com.emarsys.networking.clients.device.DeviceClientApi
 import com.emarsys.networking.clients.event.EventClient
@@ -71,5 +73,6 @@ object NetworkInjection {
                 sdkLogger = get { parametersOf(RemoteConfigClient::class.simpleName) }
             )
         }
+        single<ConfigClientApi> { ConfigClient }
     }
 }

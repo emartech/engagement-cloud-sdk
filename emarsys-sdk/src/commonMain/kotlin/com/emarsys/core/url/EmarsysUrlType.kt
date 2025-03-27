@@ -5,6 +5,7 @@ enum class EmarsysUrlType {
     LINK_CONTACT,
     UNLINK_CONTACT,
     REFRESH_TOKEN,
+    CHANGE_MERCHANT_ID,
     PUSH_TOKEN,
     EVENT,
     REGISTER_DEVICE_INFO,

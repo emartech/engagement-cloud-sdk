@@ -7,6 +7,10 @@ import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
+import com.emarsys.di.DispatcherTypes
+import com.emarsys.di.EventFlowTypes
+import com.emarsys.di.NetworkClientTypes
+import com.emarsys.di.SdkComponent
 import com.emarsys.networking.RefreshTokenRequestBody
 import com.emarsys.networking.clients.contact.ContactTokenHandlerApi
 import com.emarsys.networking.clients.event.model.SdkEvent
@@ -20,18 +24,21 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
+import org.koin.core.component.inject
+import org.koin.core.parameter.parametersOf
+import org.koin.core.qualifier.named
 
-internal class ConfigClient(
-    private val emarsysNetworkClient: NetworkClientApi,
-    private val urlFactory: UrlFactoryApi,
-    private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
-    private val sessionContext: SessionContext,
-    private val sdkContext: SdkContextApi,
-    private val contactTokenHandler: ContactTokenHandlerApi,
-    private val json: Json,
-    private val sdkLogger: Logger,
-    sdkDispatcher: CoroutineDispatcher
-):ConfigClientApi {
+internal object ConfigClient : ConfigClientApi, SdkComponent {
+    private val emarsysNetworkClient: NetworkClientApi by inject(named(NetworkClientTypes.Emarsys))
+    private val urlFactory: UrlFactoryApi by inject()
+    private val sdkEventFlow: MutableSharedFlow<SdkEvent> by inject(named(EventFlowTypes.InternalEventFlow))
+    private val sessionContext: SessionContext by inject()
+    private val sdkContext: SdkContextApi by inject()
+    private val contactTokenHandler: ContactTokenHandlerApi by inject()
+    private val json: Json by inject()
+    private val sdkLogger: Logger by inject { parametersOf(ConfigClient::class.simpleName) }
+    private val sdkDispatcher: CoroutineDispatcher by inject(named(DispatcherTypes.Sdk))
+
     init {
         CoroutineScope(sdkDispatcher).launch {
             startEventConsumer()

@@ -3,6 +3,7 @@ package com.emarsys.core.url
 import com.emarsys.context.SdkContextApi
 import com.emarsys.context.isConfigPredictOnly
 import com.emarsys.core.url.EmarsysUrlType.CHANGE_APPLICATION_CODE
+import com.emarsys.core.url.EmarsysUrlType.CHANGE_MERCHANT_ID
 import com.emarsys.core.url.EmarsysUrlType.DEEP_LINK
 import com.emarsys.core.url.EmarsysUrlType.EVENT
 import com.emarsys.core.url.EmarsysUrlType.GLOBAL_REMOTE_CONFIG
@@ -45,6 +46,13 @@ class UrlFactory(
             ).build()
 
             REFRESH_TOKEN -> createUrlBasedOnPredict(
+                sdkContext.defaultUrls.clientServiceBaseUrl,
+                "contact-token",
+                "contact-token",
+                appCode
+            ).build()
+
+            CHANGE_MERCHANT_ID -> createUrlBasedOnPredict(
                 sdkContext.defaultUrls.clientServiceBaseUrl,
                 "contact-token",
                 "contact-token",
