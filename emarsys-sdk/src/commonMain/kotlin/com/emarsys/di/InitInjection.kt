@@ -11,6 +11,7 @@ import com.emarsys.init.states.ApplyGlobalRemoteConfigState
 import com.emarsys.init.states.PlatformInitState
 import com.emarsys.init.states.RegisterInstancesState
 import com.emarsys.init.states.RegisterWatchdogsState
+import com.emarsys.init.states.SdkConfigLoaderState
 import com.emarsys.init.states.SessionSubscriptionState
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
@@ -55,6 +56,13 @@ object InitInjection {
                 sdkLogger = get { parametersOf(PlatformInitState::class.simpleName) }
             )
         }
+        single<State>(named(InitStateTypes.SdkConfigLoader)) {
+            SdkConfigLoaderState(
+                sdkConfigStore = get<DependencyCreator>().createSdkConfigStore(typedStorage = get()),
+                setupOrganizer = get(),
+                sdkLogger = get { parametersOf(SdkConfigLoaderState::class.simpleName) }
+            )
+        }
         single<StateMachineApi>(named(StateMachineTypes.Init)) {
             StateMachine(
                 states = listOf(
@@ -62,7 +70,8 @@ object InitInjection {
                     get(named(InitStateTypes.RegisterInstances)),
                     get(named(InitStateTypes.RegisterWatchdogs)),
                     get(named(InitStateTypes.SessionSubscription)),
-                    get(named(InitStateTypes.PlatformInit))
+                    get(named(InitStateTypes.PlatformInit)),
+                    get(named(InitStateTypes.SdkConfigLoader))
                 )
             )
         }
@@ -77,5 +86,5 @@ object InitInjection {
 }
 
 enum class InitStateTypes {
-    ApplyGlobalRemoteConfig, RegisterInstances, RegisterWatchdogs, SessionSubscription, PlatformInit
+    ApplyGlobalRemoteConfig, RegisterInstances, RegisterWatchdogs, SessionSubscription, PlatformInit, SdkConfigLoader
 }

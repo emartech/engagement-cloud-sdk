@@ -47,11 +47,13 @@ object SetupInjection {
                 remoteConfigHandler = get()
             )
         }
-        single<State>(named(StateTypes.AppStart)) { AppStartState(
-            eventClient = get(),
-            timestampProvider = get(),
-            uuidProvider = get()
-        ) }
+        single<State>(named(StateTypes.AppStart)) {
+            AppStartState(
+                eventClient = get(),
+                timestampProvider = get(),
+                uuidProvider = get()
+            )
+        }
         single<StateMachineApi>(named(StateMachineTypes.ME)) {
             StateMachine(
                 states = listOf(
@@ -79,7 +81,7 @@ object SetupInjection {
                 predictStateMachine = get(named(StateMachineTypes.Predict)),
                 sdkContext = get(),
                 sdkLogger = get { parametersOf(SetupOrganizer::class.simpleName) },
-                sdkConfigLoader = get()
+                sdkConfigStore = get<DependencyCreator>().createSdkConfigStore(typedStorage = get())
             )
         }
     }

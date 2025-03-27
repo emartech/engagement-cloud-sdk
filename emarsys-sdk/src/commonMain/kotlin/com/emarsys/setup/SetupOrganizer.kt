@@ -13,12 +13,12 @@ class SetupOrganizer(
     override val meStateMachine: StateMachineApi,
     override val predictStateMachine: StateMachineApi,
     override val sdkContext: SdkContextApi,
-    private val sdkConfigLoader: SdkConfigStoreApi<SdkConfig>,
+    private val sdkConfigStore: SdkConfigStoreApi<SdkConfig>,
     private val sdkLogger: Logger
 ) : SetupOrganizerApi {
 
     override suspend fun setupWithValidation(config: SdkConfig) {
-        if (sdkConfigLoader.load() != null) {
+        if (sdkConfigStore.load() != null) {
             sdkLogger.debug("SetupOrganizer", "SDK already enabled")
             throw SdkAlreadyEnabledException("Emarsys SDK was already enabled!")
         }
@@ -27,7 +27,7 @@ class SetupOrganizer(
     }
 
     override suspend fun setup(config: SdkConfig) {
-        sdkConfigLoader.store(config)
+        sdkConfigStore.store(config)
         sdkContext.config = config
         if (sdkContext.isConfigPredictOnly()) {
             predictStateMachine.activate()

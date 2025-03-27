@@ -7,7 +7,7 @@ import com.emarsys.setup.SetupOrganizerApi
 import com.emarsys.setup.config.SdkConfigStoreApi
 
 class SdkConfigLoaderState(
-    private val sdkConfigLoader: SdkConfigStoreApi<SdkConfig>,
+    private val sdkConfigStore: SdkConfigStoreApi<SdkConfig>,
     private val setupOrganizer: SetupOrganizerApi,
     private val sdkLogger: Logger
 ) : State {
@@ -21,7 +21,7 @@ class SdkConfigLoaderState(
             "SdkConfigLoaderState",
             "Load SdkConfig from storage and try to setup the SDK"
         )
-        sdkConfigLoader.load()?.let {
+        sdkConfigStore.load()?.let {
             setupOrganizer.setup(it)
         }
     }
