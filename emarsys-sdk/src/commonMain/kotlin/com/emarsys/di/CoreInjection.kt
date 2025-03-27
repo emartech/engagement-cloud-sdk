@@ -43,6 +43,7 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.Json
 import org.koin.core.module.dsl.bind
@@ -70,7 +71,7 @@ object CoreInjection {
                 sdkLogger = get { parametersOf(TypedStorage::class.simpleName) }
             )
         }
-        single<MutableSharedFlow<SdkEvent>>(named(EventFlowTypes.InternalEventFlow)) { MutableSharedFlow<SdkEvent>() }
+        single<MutableSharedFlow<SdkEvent>>(named(EventFlowTypes.InternalEventFlow)) { MutableSharedFlow<SdkEvent>(replay = 100, extraBufferCapacity = Channel.UNLIMITED) }
         single<Json> { JsonUtil.json }
         singleOf(::Storage) { bind<StorageApi>() }
         singleOf(::UserAgentProvider) { bind<UserAgentProviderApi>() }
