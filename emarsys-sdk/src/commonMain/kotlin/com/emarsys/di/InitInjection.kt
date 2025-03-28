@@ -1,7 +1,6 @@
 package com.emarsys.di
 
 import com.emarsys.core.Registerable
-import com.emarsys.core.channel.SdkEventDistributor
 import com.emarsys.core.state.State
 import com.emarsys.core.state.StateMachine
 import com.emarsys.core.state.StateMachineApi
@@ -39,7 +38,6 @@ object InitInjection {
             RegisterWatchdogsState(
                 lifecycleWatchDog = get<LifecycleWatchDog>() as Registerable,
                 connectionWatchDog = get<ConnectionWatchDog>() as Registerable,
-                eventDistributor = get<SdkEventDistributor>() as Registerable,
                 sdkLogger = get { parametersOf(RegisterWatchdogsState::class.simpleName) }
             )
         }

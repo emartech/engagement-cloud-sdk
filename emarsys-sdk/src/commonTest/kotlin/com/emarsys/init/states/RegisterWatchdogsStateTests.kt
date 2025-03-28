@@ -16,15 +16,14 @@ class RegisterWatchdogsStateTests {
     private lateinit var registerWatchDogsState: RegisterWatchdogsState
     private lateinit var lifecycleWatchDog: Registerable
     private lateinit var connectionWatchDog: Registerable
-    private lateinit var eventDistributor: Registerable
 
     @BeforeTest
     fun setup() {
         lifecycleWatchDog = mock()
         connectionWatchDog = mock()
-        eventDistributor = mock()
         registerWatchDogsState = RegisterWatchdogsState(
-            lifecycleWatchDog, connectionWatchDog, eventDistributor,
+            lifecycleWatchDog,
+            connectionWatchDog,
             SdkLogger(ConsoleLogger())
         )
     }
@@ -38,12 +37,10 @@ class RegisterWatchdogsStateTests {
     fun testActive_should_call_register_on_watchdogs() = runTest {
         everySuspend { lifecycleWatchDog.register() } returns Unit
         everySuspend { connectionWatchDog.register() } returns Unit
-        everySuspend { eventDistributor.register() } returns Unit
 
         registerWatchDogsState.active()
 
         verifySuspend { lifecycleWatchDog.register() }
         verifySuspend { connectionWatchDog.register() }
-        verifySuspend { eventDistributor.register() }
     }
 }
