@@ -71,7 +71,12 @@ object CoreInjection {
                 sdkLogger = get { parametersOf(TypedStorage::class.simpleName) }
             )
         }
-        single<MutableSharedFlow<SdkEvent>>(named(EventFlowTypes.InternalEventFlow)) { MutableSharedFlow<SdkEvent>(replay = 100, extraBufferCapacity = Channel.UNLIMITED) }
+        single<MutableSharedFlow<SdkEvent>>(named(EventFlowTypes.InternalEventFlow)) {
+            MutableSharedFlow<SdkEvent>(
+                replay = 100,
+                extraBufferCapacity = Channel.UNLIMITED
+            )
+        }
         single<Json> { JsonUtil.json }
         singleOf(::Storage) { bind<StorageApi>() }
         singleOf(::UserAgentProvider) { bind<UserAgentProviderApi>() }
@@ -90,6 +95,7 @@ object CoreInjection {
             SdkEventDistributor(
                 sdkEventFlow = get<MutableSharedFlow<SdkEvent>>(named(EventFlowTypes.InternalEventFlow)),
                 get<ConnectionWatchDog>().isOnline,
+                sdkContext = get(),
                 eventsDao = get(),
                 sdkDispatcher = get(named(DispatcherTypes.Sdk)),
                 sdkLogger = get<Logger> { parametersOf(SdkEventDistributor::class.simpleName) },
@@ -123,11 +129,13 @@ object CoreInjection {
                 timestampProvider = get()
             )
         }
-        single<DownloaderApi> { Downloader(
-            client = get<HttpClient>(),
-            fileCache = get(),
-            logger = get<Logger> { parametersOf(Downloader::class.simpleName) },
-        ) }
+        single<DownloaderApi> {
+            Downloader(
+                client = get<HttpClient>(),
+                fileCache = get(),
+                logger = get<Logger> { parametersOf(Downloader::class.simpleName) },
+            )
+        }
         singleOf(::InAppDownloader) { bind<InAppDownloaderApi>() }
         single<EventActionFactoryApi> {
             EventActionFactory(

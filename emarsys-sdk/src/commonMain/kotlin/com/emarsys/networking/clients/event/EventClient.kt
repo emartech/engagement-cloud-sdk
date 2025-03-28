@@ -22,8 +22,8 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.onEach
@@ -42,7 +42,7 @@ internal class EventClient(
     private val inAppPresenter: InAppPresenterApi,
     private val inAppViewProvider: InAppViewProviderApi,
     private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
-    private val onlineSdkEventFlow: SharedFlow<SdkEvent>,
+    private val onlineSdkEventFlow: Flow<SdkEvent>,
     private val sdkLogger: Logger,
     sdkDispatcher: CoroutineDispatcher
 ) : EventClientApi {
