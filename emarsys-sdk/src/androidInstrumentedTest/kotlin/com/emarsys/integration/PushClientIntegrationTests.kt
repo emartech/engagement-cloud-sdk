@@ -8,6 +8,8 @@ import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.koin.core.Koin
 import org.koin.core.component.get
@@ -15,6 +17,7 @@ import org.koin.test.KoinTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class PushClientIntegrationTests : KoinTest {
     override fun getKoin(): Koin = koin
 
@@ -34,7 +37,9 @@ class PushClientIntegrationTests : KoinTest {
 
         Emarsys.push.registerPushToken("testPushToken")
 
-        stringStorage.get(PUSH_TOKEN_STORAGE_KEY) shouldNotBe null
+        backgroundScope.launch {
+            stringStorage.get(PUSH_TOKEN_STORAGE_KEY) shouldNotBe null
+        }
     }
 
     @Test
@@ -43,7 +48,9 @@ class PushClientIntegrationTests : KoinTest {
 
         Emarsys.push.clearPushToken()
 
-        stringStorage.get(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY) shouldBe null
+        backgroundScope.launch {
+            stringStorage.get(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY) shouldBe null
+        }
     }
 
 }

@@ -6,20 +6,24 @@ import com.emarsys.context.SdkContextApi
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.storage.StorageConstants
 import com.emarsys.core.storage.StringStorageApi
-import com.emarsys.networking.clients.contact.ContactClientApi
+import com.emarsys.di.SdkKoinIsolationContext.koin
 import io.kotest.matchers.shouldNotBe
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
+import org.koin.core.Koin
 import org.koin.core.component.get
 import org.koin.test.KoinTest
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ContactClientIntegrationTests : KoinTest {
+    override fun getKoin(): Koin = koin
 
     private lateinit var sessionContext: SessionContext
     private lateinit var sdkContext: SdkContextApi
-    private lateinit var contactClient: ContactClientApi
     private lateinit var stringStorage: StringStorageApi
 
     @BeforeTest
@@ -28,7 +32,6 @@ class ContactClientIntegrationTests : KoinTest {
 
         sessionContext = get<SessionContext>()
         sdkContext = get<SdkContextApi>()
-        contactClient = get<ContactClientApi>()
         stringStorage = get<StringStorageApi>()
     }
 
@@ -44,10 +47,12 @@ class ContactClientIntegrationTests : KoinTest {
         sessionContext.contactToken = null
         sessionContext.refreshToken = null
 
-        contactClient.linkContact(2575, "test2@test.com")
+        Emarsys.linkContact(2575, "test2@test.com")
 
-        sessionContext.contactToken shouldNotBe null
-        sessionContext.refreshToken shouldNotBe null
+        backgroundScope.launch {
+            sessionContext.contactToken shouldNotBe null
+            sessionContext.refreshToken shouldNotBe null
+        }
     }
 
     @Test
@@ -64,22 +69,26 @@ class ContactClientIntegrationTests : KoinTest {
 
         Emarsys.enableTracking(AndroidEmarsysConfig(merchantId = "1DF86BF95CBE8F19"))
 
-        contactClient.linkContact(2575, "test2@test.com")
+        Emarsys.linkContact(2575, "test2@test.com")
 
-        sessionContext.contactToken shouldNotBe null
-        sessionContext.refreshToken shouldNotBe null
+        backgroundScope.launch {
+            sessionContext.contactToken shouldNotBe null
+            sessionContext.refreshToken shouldNotBe null
+        }
     }
 
     @Test
     fun testUnlinkContact() = runTest {
         Emarsys.enableTracking(AndroidEmarsysConfig("EMS11-C3FD3"))
-        contactClient.linkContact(2575, "test2@test.com")
+        Emarsys.linkContact(2575, "test2@test.com")
 
         val contactToken = sessionContext.contactToken
 
-        contactClient.unlinkContact()
+        Emarsys.unlinkContact()
 
-        sessionContext.contactToken shouldNotBe contactToken
+        backgroundScope.launch {
+            sessionContext.contactToken shouldNotBe contactToken
+        }
     }
 
 }

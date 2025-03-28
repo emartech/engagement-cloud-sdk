@@ -5,7 +5,7 @@ import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.body
 import com.emarsys.core.session.SessionContext
 
-class ContactTokenHandler(
+internal class ContactTokenHandler(
     private val sessionContext: SessionContext,
     private val sdkLogger: Logger
 ) : ContactTokenHandlerApi {

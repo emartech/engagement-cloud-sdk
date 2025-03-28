@@ -1,7 +1,6 @@
 package com.emarsys.api.event
 
 import Activatable
-import EventTrackerApi
 import com.emarsys.api.event.model.CustomEvent
 import com.emarsys.api.generic.GenericApi
 import com.emarsys.context.SdkContextApi

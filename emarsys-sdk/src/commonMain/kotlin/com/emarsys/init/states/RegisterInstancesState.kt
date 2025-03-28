@@ -1,12 +1,12 @@
 package com.emarsys.init.states
 
-import EventTrackerApi
 import com.emarsys.api.contact.ContactApi
+import com.emarsys.api.event.EventTrackerApi
 import com.emarsys.api.push.PushApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.state.State
 
-class RegisterInstancesState(
+internal class RegisterInstancesState(
     private val eventTrackerApi: EventTrackerApi,
     private val contactApi: ContactApi,
     private val pushApi: PushApi,

@@ -7,11 +7,14 @@ import com.emarsys.SdkConstants.DEVICE_INFO_UPDATE_REQUIRED_EVENT_NAME
 import com.emarsys.SdkConstants.DISMISS_EVENT_NAME
 import com.emarsys.SdkConstants.INAPP_VIEWED_EVENT_NAME
 import com.emarsys.SdkConstants.IN_APP_BUTTON_CLICKED_EVENT_NAME
+import com.emarsys.SdkConstants.LINK_AUTHENTICATED_CONTACT_NAME
+import com.emarsys.SdkConstants.LINK_CONTACT_NAME
 import com.emarsys.SdkConstants.PUSH_CLICKED_EVENT_NAME
 import com.emarsys.SdkConstants.REMOTE_CONFIG_UPDATE_REQUIRED_EVENT_NAME
 import com.emarsys.SdkConstants.REREGISTRATION_REQUIRED_EVENT_NAME
 import com.emarsys.SdkConstants.SESSION_END_EVENT_NAME
 import com.emarsys.SdkConstants.SESSION_START_EVENT_NAME
+import com.emarsys.SdkConstants.UNLINK_CONTACT_NAME
 import com.emarsys.core.providers.TimestampProvider
 import com.emarsys.core.providers.UUIDProvider
 import kotlinx.datetime.Instant
@@ -88,7 +91,7 @@ sealed interface SdkEvent {
 
         @Serializable
         sealed class Sdk(override val name: String) : Internal {
-           override val type: String = "internal"
+            override val type: String = "internal"
 
 
             data class DeviceInfoUpdateRequired(
@@ -147,6 +150,27 @@ sealed interface SdkEvent {
             ) : Sdk(CHANGE_MERCHANT_ID_NAME)
 
             @Serializable
+            data class LinkContact(
+                override val id: String = UUIDProvider().provide(),
+                override val timestamp: Instant = TimestampProvider().provide(),
+                override val attributes: JsonObject? = null
+            ) : Sdk(LINK_CONTACT_NAME)
+
+            @Serializable
+            data class LinkAuthenticatedContact(
+                override val id: String = UUIDProvider().provide(),
+                override val timestamp: Instant = TimestampProvider().provide(),
+                override val attributes: JsonObject? = null
+            ) : Sdk(LINK_AUTHENTICATED_CONTACT_NAME)
+
+            @Serializable
+            data class UnlinkContact(
+                override val id: String = UUIDProvider().provide(),
+                override val timestamp: Instant = TimestampProvider().provide(),
+                override val attributes: JsonObject? = null
+            ) : Sdk(UNLINK_CONTACT_NAME)
+
+            @Serializable
             data class AppStart(
                 override val id: String = UUIDProvider().provide(),
                 override val attributes: JsonObject? = null,
@@ -173,6 +197,7 @@ sealed interface SdkEvent {
             override val name: String
         ) : Internal {
             override val type: String = "internal"
+
             @Serializable
             data class Clicked(
                 override val id: String = UUIDProvider().provide(),
@@ -183,7 +208,7 @@ sealed interface SdkEvent {
 
         @Serializable
         sealed class InApp(override val name: String) : Internal {
-           override val type: String = "internal"
+            override val type: String = "internal"
 
             @Serializable
             data class Viewed(
@@ -202,7 +227,7 @@ sealed interface SdkEvent {
 
         @Serializable
         data class SilentPush(
-           override val type: String = "internal",
+            override val type: String = "internal",
             override val id: String = UUIDProvider().provide(),
             override val name: String,
             override val attributes: JsonObject?,

@@ -26,16 +26,7 @@ object ContactInjection {
                 sdkLogger = get { parametersOf(ContactTokenHandler::class.simpleName) }
             )
         }
-        single<ContactClientApi> {
-            ContactClient(
-                emarsysClient = get(named(NetworkClientTypes.Emarsys)),
-                urlFactory = get(),
-                sdkContext = get(),
-                contactTokenHandler = get(),
-                json = get(),
-                sdkLogger = get { parametersOf(ContactClient::class.simpleName) }
-            )
-        }
+        single<ContactClientApi> { ContactClient }
         single<MutableList<ContactCall>>(named(PersistentListTypes.ContactCall)) {
             PersistentList(
                 id = PersistentListIds.CONTACT_CONTEXT_PERSISTENT_ID,
@@ -62,9 +53,9 @@ object ContactInjection {
         }
         single<ContactInstance>(named(InstanceType.Internal)) {
             ContactInternal(
-                contactClient = get(),
                 contactContext = get(),
                 sdkLogger = get { parametersOf(ContactInternal::class.simpleName) },
+                sdkEventFlow = get(named(EventFlowTypes.InternalEventFlow))
             )
         }
         single<ContactApi> {

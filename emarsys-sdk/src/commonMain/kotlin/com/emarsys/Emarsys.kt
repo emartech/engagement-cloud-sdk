@@ -1,9 +1,9 @@
 package com.emarsys
 
-import EventTrackerApi
 import com.emarsys.api.config.ConfigApi
 import com.emarsys.api.contact.ContactApi
 import com.emarsys.api.deepLink.DeepLinkApi
+import com.emarsys.api.event.EventTrackerApi
 import com.emarsys.api.event.model.CustomEvent
 import com.emarsys.api.geofence.GeofenceTrackerApi
 import com.emarsys.api.inapp.InAppApi
