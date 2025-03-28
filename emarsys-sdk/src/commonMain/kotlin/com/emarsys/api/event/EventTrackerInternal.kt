@@ -24,11 +24,11 @@ internal class EventTrackerInternal(
             )
         )
         //TODO handle error
-        sdkLogger.debug("EventTrackerGatherer - trackEvent")
+        sdkLogger.debug("EventTrackerInternal - trackEvent")
     }
 
     override suspend fun activate() {
-        sdkLogger.debug("EventTrackerGatherer - activate")
+        sdkLogger.debug("EventTrackerInternal - activate")
 
         eventTrackerContext.calls.dequeue { call ->
             when (call) {

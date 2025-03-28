@@ -21,9 +21,7 @@ class SdkContext(
     override val currentSdkState = MutableStateFlow(SdkState.inactive)
 
     override suspend fun setSdkState(sdkState: SdkState) {
-        println("setSdkState: $sdkState")
         currentSdkState.value = sdkState
-        println("setSdkState after: $sdkState")
     }
 }
 

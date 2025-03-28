@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -32,8 +33,10 @@ class SdkEventDistributor(
         MutableSharedFlow<SdkEvent>(replay = 100, extraBufferCapacity = Channel.UNLIMITED)
 
     val onlineEvents =
-        _onlineEvents.onEach {
-            sdkContext.currentSdkState.first { it == SdkState.active }
+        sdkEventFlow.onEach {
+            sdkContext.currentSdkState.combine(connectionStatus) { sdkState, isConnected ->
+                sdkState == SdkState.active && isConnected
+            }.first { it }
         }
 
     private val isDbReemissionInProgress = MutableStateFlow(false)
