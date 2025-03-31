@@ -11,6 +11,7 @@ import com.emarsys.networking.clients.device.DeviceClientApi
 import com.emarsys.networking.clients.event.EventClient
 import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.networking.clients.logging.LoggingClient
 import com.emarsys.networking.clients.remoteConfig.RemoteConfigClient
 import com.emarsys.networking.clients.remoteConfig.RemoteConfigClientApi
 import io.ktor.client.HttpClient
@@ -74,5 +75,14 @@ object NetworkInjection {
             )
         }
         single<ConfigClientApi> { ConfigClient }
+        single<LoggingClient> { LoggingClient(
+            emarsysNetworkClient = get(named(NetworkClientTypes.Emarsys)),
+            urlFactory = get(),
+            sdkEventFlow = get<MutableSharedFlow<SdkEvent>>(named(EventFlowTypes.InternalEventFlow)),
+            json = get(),
+            sdkLogger = get { parametersOf(LoggingClient::class.simpleName) },
+            sdkDispatcher = get(named(DispatcherTypes.Sdk)),
+            deviceInfoCollector = get()
+        ) }
     }
 }

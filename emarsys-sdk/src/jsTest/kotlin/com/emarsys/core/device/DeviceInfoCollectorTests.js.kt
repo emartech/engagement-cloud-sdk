@@ -1,6 +1,8 @@
 package com.emarsys.core.device
 
+import com.emarsys.SdkConfig
 import com.emarsys.SdkConstants
+import com.emarsys.context.SdkContextApi
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.storage.StorageConstants
 import com.emarsys.core.storage.StringStorageApi
@@ -50,6 +52,7 @@ class DeviceInfoCollectorTests {
     private lateinit var mockWrapperInfoStorage: TypedStorageApi
     private lateinit var deviceInfoCollector: DeviceInfoCollector
     private lateinit var mockStringStorage: StringStorageApi
+    private lateinit var mockSdkContext: SdkContextApi
     private val json: Json = JsonUtil.json
 
     @BeforeTest
@@ -67,8 +70,17 @@ class DeviceInfoCollectorTests {
         mockWrapperInfoStorage = mock()
         mockStringStorage = mock()
         every { mockStringStorage.get(any()) } returns null
-        everySuspend { mockWrapperInfoStorage.get(StorageConstants.WRAPPER_INFO_KEY, WrapperInfo.serializer()) } returns null
-
+        everySuspend {
+            mockWrapperInfoStorage.get(
+                StorageConstants.WRAPPER_INFO_KEY,
+                WrapperInfo.serializer()
+            )
+        } returns null
+        mockSdkContext = mock()
+        val mockConfig: SdkConfig = mock()
+        every { mockSdkContext.config } returns mockConfig
+        every { mockConfig.applicationCode } returns "testAppCode"
+        every { mockConfig.merchantId } returns "testMerchantId"
         deviceInfoCollector = DeviceInfoCollector(
             mockClientIdProvider,
             mockTimezoneProvider,
@@ -77,7 +89,8 @@ class DeviceInfoCollectorTests {
             mockLanguageProvider,
             mockWrapperInfoStorage,
             json,
-            mockStringStorage
+            mockStringStorage,
+            mockSdkContext
         )
     }
 
@@ -104,7 +117,12 @@ class DeviceInfoCollectorTests {
 
     @Test
     fun collect_shouldReturn_deviceInfo_whenWrapper() = runTest {
-        everySuspend { mockWrapperInfoStorage.get(StorageConstants.WRAPPER_INFO_KEY, WrapperInfo.serializer()) } returns WrapperInfo(
+        everySuspend {
+            mockWrapperInfoStorage.get(
+                StorageConstants.WRAPPER_INFO_KEY,
+                WrapperInfo.serializer()
+            )
+        } returns WrapperInfo(
             platformWrapper = WRAPPER_PLATFORM,
             wrapperVersion = WRAPPER_VERSION
         )
@@ -149,5 +167,29 @@ class DeviceInfoCollectorTests {
         val result = deviceInfoCollector.collect()
 
         result shouldBe json.encodeToString(expectedDeviceInfo)
+    }
+
+    @Test
+    fun collectAsDeviceInfoForLogs_shouldReturn_deviceInfo() = runTest {
+        val expectedDeviceInfo = DeviceInfoForLogs(
+            platform = BROWSER_NAME,
+            platformCategory = SdkConstants.WEB_PLATFORM_CATEGORY,
+            platformWrapper = null,
+            platformWrapperVersion = null,
+            applicationVersion = APPLICATION_VERSION,
+            deviceModel = navigator.userAgent,
+            osVersion = BROWSER_VERSION,
+            sdkVersion = BuildConfig.VERSION_NAME,
+            isDebugMode = false,
+            applicationCode = "testAppCode",
+            merchantId = "testMerchantId",
+            language = LANGUAGE,
+            timezone = TIMEZONE,
+            clientId = CLIENT_ID
+        )
+
+        val result = deviceInfoCollector.collectAsDeviceInfoForLogs()
+
+        result shouldBe expectedDeviceInfo
     }
 }

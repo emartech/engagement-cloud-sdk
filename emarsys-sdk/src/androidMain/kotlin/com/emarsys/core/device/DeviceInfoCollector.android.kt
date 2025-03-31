@@ -1,7 +1,10 @@
 package com.emarsys.core.device
 
+import android.content.pm.ApplicationInfo
 import android.os.Build
 import com.emarsys.SdkConstants
+import com.emarsys.applicationContext
+import com.emarsys.context.SdkContextApi
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.storage.StorageConstants
 import com.emarsys.core.storage.StringStorageApi
@@ -18,11 +21,16 @@ actual class DeviceInfoCollector(
     private val platformInfoCollector: PlatformInfoCollectorApi,
     private val wrapperInfoStorage: TypedStorageApi,
     private val json: Json,
-    private val stringStorage: StringStorageApi
+    private val stringStorage: StringStorageApi,
+    private val sdkContext: SdkContextApi
 ) : DeviceInfoCollectorApi {
 
     actual override suspend fun collect(): String {
-        val deviceInfo = DeviceInfo(
+        return json.encodeToString(collectAsDeviceInfo())
+    }
+
+    actual override suspend fun collectAsDeviceInfo(): DeviceInfo {
+        return DeviceInfo(
             platform = getPlatform(),
             platformCategory = SdkConstants.MOBILE_PLATFORM_CATEGORY,
             platformWrapper = getWrapperInfo()?.platformWrapper,
@@ -35,8 +43,25 @@ actual class DeviceInfoCollector(
             timezone = timezoneProvider.provide(),
             clientId = clientIdProvider.provide()
         )
+    }
 
-        return json.encodeToString(deviceInfo)
+    actual override suspend fun collectAsDeviceInfoForLogs(): DeviceInfoForLogs {
+        return DeviceInfoForLogs(
+            platform = getPlatform(),
+            platformCategory = SdkConstants.MOBILE_PLATFORM_CATEGORY,
+            platformWrapper = getWrapperInfo()?.platformWrapper,
+            platformWrapperVersion = getWrapperInfo()?.wrapperVersion,
+            applicationVersion = applicationVersionProvider.provide(),
+            deviceModel = Build.MODEL,
+            osVersion = SdkBuildConfig.getOsVersion(),
+            sdkVersion = BuildConfig.VERSION_NAME,
+            isDebugMode = (0 != applicationContext.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE),
+            applicationCode = sdkContext.config?.applicationCode,
+            merchantId = sdkContext.config?.merchantId,
+            language = language(),
+            timezone = timezoneProvider.provide(),
+            clientId = clientIdProvider.provide()
+        )
     }
 
     private suspend fun language(): String {

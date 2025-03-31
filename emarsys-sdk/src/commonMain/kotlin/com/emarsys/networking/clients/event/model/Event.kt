@@ -15,6 +15,7 @@ import com.emarsys.SdkConstants.REREGISTRATION_REQUIRED_EVENT_NAME
 import com.emarsys.SdkConstants.SESSION_END_EVENT_NAME
 import com.emarsys.SdkConstants.SESSION_START_EVENT_NAME
 import com.emarsys.SdkConstants.UNLINK_CONTACT_NAME
+import com.emarsys.core.log.LogLevel
 import com.emarsys.core.providers.TimestampProvider
 import com.emarsys.core.providers.UUIDProvider
 import kotlinx.datetime.Instant
@@ -101,6 +102,7 @@ sealed interface SdkEvent {
             ) : Sdk(DEVICE_INFO_UPDATE_REQUIRED_EVENT_NAME)
 
             data class Log(
+                val level: LogLevel,
                 override val id: String = UUIDProvider().provide(),
                 override val name: String,
                 override val attributes: JsonObject? = null,
@@ -108,6 +110,7 @@ sealed interface SdkEvent {
             ) : Sdk(name)
 
             data class Metric(
+                val level: LogLevel = LogLevel.Metric,
                 override val id: String = UUIDProvider().provide(),
                 override val name: String,
                 override val attributes: JsonObject? = null,

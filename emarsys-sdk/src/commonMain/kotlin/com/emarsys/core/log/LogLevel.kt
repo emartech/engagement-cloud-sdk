@@ -5,12 +5,18 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class LogLevel {
-    @SerialName("INFO")
-    Info,
+    @SerialName("TRACE")
+    Trace,
 
     @SerialName("DEBUG")
     Debug,
 
+    @SerialName("INFO")
+    Info,
+
     @SerialName("ERROR")
-    Error
+    Error,
+
+    @SerialName("METRIC")
+    Metric
 }

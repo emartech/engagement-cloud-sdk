@@ -20,6 +20,24 @@ data class DeviceInfo(
 )
 
 @Serializable
+data class DeviceInfoForLogs(
+    val platform: String,
+    val platformCategory: String,
+    val platformWrapper: String?,
+    val platformWrapperVersion: String?,
+    val applicationVersion: String,
+    val deviceModel: String,
+    val osVersion: String,
+    val sdkVersion: String,
+    val isDebugMode: Boolean,
+    val applicationCode: String?,
+    val merchantId: String?,
+    val language: String,
+    val timezone: String,
+    val clientId: String
+)
+
+@Serializable
 sealed interface PushSettings
 
 @Serializable

@@ -2,6 +2,7 @@ package com.emarsys.core.device
 
 import com.emarsys.KotlinPlatform
 import com.emarsys.SdkConstants
+import com.emarsys.context.SdkContextApi
 import com.emarsys.core.device.IosNotificationConstant.Companion.fromLong
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.storage.StorageConstants
@@ -13,6 +14,7 @@ import kotlinx.serialization.json.Json
 import platform.UserNotifications.UNUserNotificationCenter
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import kotlin.experimental.ExperimentalNativeApi
 
 actual class DeviceInfoCollector(
     private val clientIdProvider: Provider<String>,
@@ -22,10 +24,15 @@ actual class DeviceInfoCollector(
     private val deviceInformation: UIDeviceApi,
     private val wrapperInfoStorage: TypedStorageApi,
     private val json: Json,
-    private val stringStorage: StringStorageApi
+    private val stringStorage: StringStorageApi,
+    private val sdkContext: SdkContextApi,
 ) : DeviceInfoCollectorApi {
     actual override suspend fun collect(): String {
-        val deviceInfo = DeviceInfo(
+        return json.encodeToString(collectAsDeviceInfo())
+    }
+
+    actual override suspend fun collectAsDeviceInfo(): DeviceInfo {
+        return DeviceInfo(
             KotlinPlatform.IOS.name.lowercase(),
             platformCategory = SdkConstants.MOBILE_PLATFORM_CATEGORY,
             platformWrapper = getWrapperInfo()?.platformWrapper,
@@ -34,11 +41,32 @@ actual class DeviceInfoCollector(
             deviceModel = deviceInformation.deviceModel(),
             osVersion = deviceInformation.osVersion(),
             sdkVersion = BuildConfig.VERSION_NAME,
-            language = stringStorage.get(SdkConstants.LANGUAGE_STORAGE_KEY) ?: languageProvider.provide(),
+            language = stringStorage.get(SdkConstants.LANGUAGE_STORAGE_KEY)
+                ?: languageProvider.provide(),
             timezone = timezoneProvider.provide(),
             clientId = clientIdProvider.provide()
         )
-        return json.encodeToString(deviceInfo)
+    }
+
+    @OptIn(ExperimentalNativeApi::class)
+    actual override suspend fun collectAsDeviceInfoForLogs(): DeviceInfoForLogs {
+        val deviceInfo = collectAsDeviceInfo()
+        return DeviceInfoForLogs(
+            platform = deviceInfo.platform,
+            platformCategory = deviceInfo.platformCategory,
+            platformWrapper = deviceInfo.platformWrapper,
+            platformWrapperVersion = deviceInfo.platformWrapperVersion,
+            applicationVersion = deviceInfo.applicationVersion,
+            deviceModel = deviceInfo.deviceModel,
+            osVersion = deviceInfo.osVersion,
+            sdkVersion = deviceInfo.sdkVersion,
+            isDebugMode = Platform.isDebugBinary,
+            applicationCode = sdkContext.config?.applicationCode,
+            merchantId = sdkContext.config?.merchantId,
+            language = deviceInfo.language,
+            timezone = deviceInfo.timezone,
+            clientId = clientIdProvider.provide()
+        )
     }
 
     private suspend fun getWrapperInfo(): WrapperInfo? {

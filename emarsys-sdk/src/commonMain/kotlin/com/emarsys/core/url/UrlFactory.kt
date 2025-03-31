@@ -70,6 +70,7 @@ class UrlFactory(
             GLOBAL_REMOTE_CONFIG_SIGNATURE -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/signature/GLOBAL")
             GLOBAL_REMOTE_CONFIG -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/GLOBAL")
             DEEP_LINK -> Url(sdkContext.defaultUrls.deepLinkBaseUrl)
+            EmarsysUrlType.LOGGING -> Url("${sdkContext.defaultUrls.loggingUrl}/v1/log")
         }
     }
 

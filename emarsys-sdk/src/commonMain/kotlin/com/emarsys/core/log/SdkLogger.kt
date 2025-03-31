@@ -117,11 +117,16 @@ class SdkLogger(
                     put(it.key, it.value)
                 }
             }
+            put("breadcrumbs", buildJsonObject {
+                queue.forEachIndexed { index, entry ->
+                    put("entry_$index", entry.second)
+                }
+            })
         }
 
 
         val logString = createLogString(level, tag, message, throwable, extendedMap)
-        remoteLogger?.logToRemote(tag to extendedMap)
+        remoteLogger?.logToRemote(level, tag to extendedMap)
         consoleLogger.logToConsole(level, logString)
     }
 

@@ -1,7 +1,9 @@
 package com.emarsys.core.device
 
 import com.emarsys.KotlinPlatform
+import com.emarsys.SdkConfig
 import com.emarsys.SdkConstants
+import com.emarsys.context.SdkContextApi
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.storage.StorageConstants
 import com.emarsys.core.storage.StringStorageApi
@@ -37,7 +39,7 @@ class DeviceInfoCollectorTests {
     private lateinit var mockWrapperStorage: TypedStorageApi
     private lateinit var json: Json
     private lateinit var mockStringStorage: StringStorageApi
-
+    private lateinit var mockSdkContext: SdkContextApi
     private lateinit var deviceInfoCollector: DeviceInfoCollector
 
     @BeforeTest
@@ -49,7 +51,12 @@ class DeviceInfoCollectorTests {
         mockLanguageProvider = mock()
         every { mockLanguageProvider.provide() } returns LANGUAGE
         mockWrapperStorage = mock()
-        everySuspend { mockWrapperStorage.get(StorageConstants.WRAPPER_INFO_KEY, WrapperInfo.serializer()) } returns null
+        everySuspend {
+            mockWrapperStorage.get(
+                StorageConstants.WRAPPER_INFO_KEY,
+                WrapperInfo.serializer()
+            )
+        } returns null
         mockTimezoneProvider = mock()
         every { mockTimezoneProvider.provide() } returns TIMEZONE
         mockDeviceInformation = mock()
@@ -58,7 +65,11 @@ class DeviceInfoCollectorTests {
         json = JsonUtil.json
         mockStringStorage = mock()
         every { mockStringStorage.get(any()) } returns null
-
+        mockSdkContext = mock()
+        val mockConfig: SdkConfig = mock()
+        every { mockSdkContext.config } returns mockConfig
+        every { mockConfig.applicationCode } returns "testAppCode"
+        every { mockConfig.merchantId } returns "testMerchantId"
         deviceInfoCollector = DeviceInfoCollector(
             mockClientIdProvider,
             mockApplicationVersionProvider,
@@ -67,7 +78,8 @@ class DeviceInfoCollectorTests {
             mockDeviceInformation,
             mockWrapperStorage,
             json,
-            mockStringStorage
+            mockStringStorage,
+            mockSdkContext
         )
     }
 
@@ -116,5 +128,29 @@ class DeviceInfoCollectorTests {
         val expected = json.encodeToString(deviceInfo)
 
         deviceInfoCollector.collect() shouldBe expected
+    }
+
+    @Test
+    fun collectAsDeviceInfoForLogs_shouldReturnDeviceInfo() = runTest {
+        val expectedDeviceInfo = DeviceInfoForLogs(
+            platform = "ios",
+            platformCategory = "mobile",
+            platformWrapper = null,
+            platformWrapperVersion = null,
+            applicationVersion = APP_VERSION,
+            deviceModel = DEVICE_MODEL,
+            osVersion = OS_VERSION,
+            sdkVersion = BuildConfig.VERSION_NAME,
+            isDebugMode = false,
+            applicationCode = "testAppCode",
+            merchantId = "testMerchantId",
+            language = LANGUAGE,
+            timezone = TIMEZONE,
+            clientId = CLIENT_ID
+        )
+
+        val result = deviceInfoCollector.collectAsDeviceInfoForLogs()
+
+        result shouldBe expectedDeviceInfo
     }
 }
