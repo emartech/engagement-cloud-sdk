@@ -7,16 +7,20 @@ import com.emarsys.core.url.EmarsysUrlType.REGISTER_DEVICE_INFO
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.networking.clients.contact.ContactTokenHandlerApi
 import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
 
 internal class DeviceClient(
     private val emarsysClient: NetworkClientApi,
     private val urlFactory: UrlFactoryApi,
     private val deviceInfoCollector: DeviceInfoCollectorApi,
     private val contactTokenHandler: ContactTokenHandlerApi
-    ) : DeviceClientApi {
+) : DeviceClientApi {
     override suspend fun registerDeviceInfo() {
         val request = createRequest()
-        contactTokenHandler.handleContactTokens(emarsysClient.send(request))
+        val response = emarsysClient.send(request)
+        if (response.status == HttpStatusCode.OK) {
+            contactTokenHandler.handleContactTokens(response)
+        }
     }
 
     private suspend fun createRequest(): UrlRequest {

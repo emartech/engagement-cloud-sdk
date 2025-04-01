@@ -13,6 +13,7 @@ import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -78,5 +79,37 @@ class DeviceClientTests {
             mockEmarsysClient.send(request)
             mockContactTokenHandler.handleContactTokens(expectedResponse)
         }
+    }
+
+    @Test
+    fun testRegisterDeviceInfo_should_not_call_contactTokenHandler_when_response_is_204() = runTest {
+        val testUrl = Url("https://www.testUrl.com/testAppCode/client")
+        val testDeviceInfoString = "testDeviceInfo"
+        val request = UrlRequest(
+            testUrl,
+            HttpMethod.Post,
+            testDeviceInfoString
+        )
+        val expectedResponse = Response(
+            request,
+            HttpStatusCode.NoContent,
+            headers {
+                append("Content-Type", "application/json")
+                append("X-Client-State", "testClientState")
+            },
+            ""
+        )
+        everySuspend { mockDeviceInfoCollector.collect() } returns testDeviceInfoString
+        every { mockUrlFactory.create(REGISTER_DEVICE_INFO, null) } returns testUrl
+        everySuspend { mockEmarsysClient.send(any()) } returns expectedResponse
+
+        deviceClient.registerDeviceInfo()
+
+        verifySuspend {
+            mockDeviceInfoCollector.collect()
+            mockUrlFactory.create(REGISTER_DEVICE_INFO, null)
+            mockEmarsysClient.send(request)
+        }
+        verifySuspend(VerifyMode.exactly(0)) { mockContactTokenHandler.handleContactTokens(expectedResponse) }
     }
 }
