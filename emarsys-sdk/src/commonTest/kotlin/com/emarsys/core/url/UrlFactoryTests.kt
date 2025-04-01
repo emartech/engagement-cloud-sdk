@@ -6,10 +6,14 @@ import com.emarsys.context.SdkContextApi
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.mock
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.data.forAll
+import io.kotest.data.headers
+import io.kotest.data.row
+import io.kotest.data.table
 import io.kotest.matchers.shouldBe
 import io.ktor.http.Url
 import kotlin.test.BeforeTest
-
 import kotlin.test.Test
 
 class UrlFactoryTests {
@@ -22,6 +26,39 @@ class UrlFactoryTests {
         mockSdkContext = mock()
         mockDefaultUrls = mock()
         urlFactory = UrlFactory(mockSdkContext)
+    }
+
+    @Test
+    fun testCreate_shouldTrowException_whenApplicationCode_isNull() {
+        forAll(
+            table(
+                headers("urls"),
+                listOf(
+                    row(EmarsysUrlType.REFRESH_TOKEN),
+                    row(EmarsysUrlType.CHANGE_APPLICATION_CODE),
+                    row(EmarsysUrlType.LINK_CONTACT),
+                    row(EmarsysUrlType.UNLINK_CONTACT),
+                    row(EmarsysUrlType.REFRESH_TOKEN),
+                    row(EmarsysUrlType.PUSH_TOKEN),
+                    row(EmarsysUrlType.REGISTER_DEVICE_INFO),
+                    row(EmarsysUrlType.EVENT),
+                    row(EmarsysUrlType.REMOTE_CONFIG_SIGNATURE),
+                    row(EmarsysUrlType.REMOTE_CONFIG),
+                )
+            )
+        ) {
+            val testUrl = "https://me-client.gservice.emarsys.net"
+            every { mockSdkContext.defaultUrls } returns mockDefaultUrls
+            every { mockDefaultUrls.clientServiceBaseUrl } returns testUrl
+            every { mockDefaultUrls.eventServiceBaseUrl } returns testUrl
+            every { mockDefaultUrls.remoteConfigBaseUrl } returns testUrl
+            val config = EmarsysConfig(null, null)
+            every { mockSdkContext.config } returns config
+
+            shouldThrow<IllegalArgumentException> {
+                urlFactory.create(it, null)
+            }
+        }
     }
 
     @Test

@@ -26,52 +26,56 @@ class UrlFactory(
     }
 
     override fun create(urlType: EmarsysUrlType, applicationCode: String?): Url {
-        val appCode = applicationCode ?: sdkContext.config?.applicationCode
         return when (urlType) {
             CHANGE_APPLICATION_CODE -> {
-                URLBuilder("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/$appCode/client/app").build()
+                URLBuilder("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode(applicationCode)}/client/app").build()
             }
             LINK_CONTACT -> createUrlBasedOnPredict(
                 sdkContext.defaultUrls.clientServiceBaseUrl,
                 "contact-token",
                 "client/contact",
-                appCode
+                applicationCode
             ).build()
 
             UNLINK_CONTACT -> createUrlBasedOnPredict(
                 sdkContext.defaultUrls.clientServiceBaseUrl,
                 "contact",
                 "client/contact",
-                appCode
+                applicationCode
             ).build()
 
             REFRESH_TOKEN -> createUrlBasedOnPredict(
                 sdkContext.defaultUrls.clientServiceBaseUrl,
                 "contact-token",
                 "contact-token",
-                appCode
+                applicationCode
             ).build()
 
             CHANGE_MERCHANT_ID -> createUrlBasedOnPredict(
                 sdkContext.defaultUrls.clientServiceBaseUrl,
                 "contact-token",
                 "contact-token",
-                appCode
+                applicationCode
             ).build()
 
-            PUSH_TOKEN -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/$appCode/client/push-token")
-            REGISTER_DEVICE_INFO -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/$appCode/client")
+            PUSH_TOKEN -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode(applicationCode)}/client/push-token")
+            REGISTER_DEVICE_INFO -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode(applicationCode)}/client")
             EVENT -> {
-                Url("${sdkContext.defaultUrls.eventServiceBaseUrl}/$V4_API/apps/$appCode/client/events")
+                Url("${sdkContext.defaultUrls.eventServiceBaseUrl}/$V4_API/apps/${getApplicationCode(applicationCode)}/client/events")
             }
 
-            REMOTE_CONFIG_SIGNATURE -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/signature/$appCode")
-            REMOTE_CONFIG -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/$appCode")
+            REMOTE_CONFIG_SIGNATURE -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/signature/${getApplicationCode(applicationCode)}")
+            REMOTE_CONFIG -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/${getApplicationCode(applicationCode)}")
             GLOBAL_REMOTE_CONFIG_SIGNATURE -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/signature/GLOBAL")
             GLOBAL_REMOTE_CONFIG -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/GLOBAL")
             DEEP_LINK -> Url(sdkContext.defaultUrls.deepLinkBaseUrl)
             EmarsysUrlType.LOGGING -> Url("${sdkContext.defaultUrls.loggingUrl}/v1/log")
         }
+    }
+
+    private fun getApplicationCode(applicationCode: String?): String? {
+        val appCode = applicationCode ?: sdkContext.config?.applicationCode
+        return appCode ?: throw IllegalArgumentException("Application code is missing!")
     }
 
     private fun createUrlBasedOnPredict(
@@ -83,7 +87,7 @@ class UrlFactory(
         return if (sdkContext.isConfigPredictOnly()) {
             URLBuilder("$baseUrl/$V4_API/$predictPath")
         } else {
-            URLBuilder("$baseUrl/$V4_API/apps/$appCode/$mePath")
+            URLBuilder("$baseUrl/$V4_API/apps/${getApplicationCode(appCode)}/$mePath")
         }
     }
 }
