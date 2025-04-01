@@ -1,10 +1,9 @@
 package com.emarsys.mobileengage.push
 
 import com.emarsys.core.actions.ActionHandlerApi
-import com.emarsys.mobileengage.action.ActionFactoryApi
+import com.emarsys.mobileengage.action.PushActionFactoryApi
 import com.emarsys.mobileengage.action.actions.Action
 import com.emarsys.mobileengage.action.actions.ReportingAction
-import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
@@ -35,7 +34,7 @@ import kotlin.test.Test
 
 class PushNotificationClickHandlerTests {
 
-    private lateinit var mockActionFactory: ActionFactoryApi<ActionModel>
+    private lateinit var mockActionFactory: PushActionFactoryApi
     private lateinit var mockAction: Action<*>
     private lateinit var mockDefaultTapAction: Action<*>
     private lateinit var mockButtonClickedAction: Action<*>
@@ -46,7 +45,7 @@ class PushNotificationClickHandlerTests {
     @OptIn(ExperimentalCoroutinesApi::class)
     @BeforeTest
     fun setup() = runTest {
-        mockActionFactory = mock<ActionFactoryApi<ActionModel>>()
+        mockActionFactory = mock()
         mockAction = createMockAction()
         mockDefaultTapAction = createMockAction()
         mockButtonClickedAction = createMockAction()

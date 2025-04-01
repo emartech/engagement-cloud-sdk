@@ -13,13 +13,11 @@ import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.providers.ApplicationVersionProviderApi
 import com.emarsys.core.providers.LanguageProviderApi
 import com.emarsys.core.state.State
-import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandlerApi
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
-import com.emarsys.setup.PlatformInitializerApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import org.koin.core.parameter.parametersOf
@@ -28,13 +26,6 @@ import org.koin.dsl.module
 
 object PlatformInjection {
     val platformModules = module {
-        single<PlatformInitializerApi> {
-            get<DependencyCreator>().createPlatformInitializer(
-                pushActionFactory = get(),
-                pushActionHandler = get()
-            )
-        }
-        single<StringStorageApi> { get<DependencyCreator>().createStringStorage() }
         single<EventsDaoApi> { get<DependencyCreator>().createEventsDao() }
         single<DeviceInfoCollectorApi> {
             get<DependencyCreator>().createDeviceInfoCollector(

@@ -2,7 +2,7 @@ package com.emarsys.mobileengage.push
 
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.log.Logger
-import com.emarsys.mobileengage.action.ActionFactoryApi
+import com.emarsys.mobileengage.action.PushActionFactoryApi
 import com.emarsys.mobileengage.action.actions.Action
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BasicActionModel
@@ -16,8 +16,8 @@ import kotlinx.coroutines.launch
 import web.broadcast.BroadcastChannel
 import web.events.EventHandler
 
-class PushNotificationClickHandler(
-    private val actionFactory: ActionFactoryApi<ActionModel>,
+internal class PushNotificationClickHandler(
+    private val actionFactory: PushActionFactoryApi,
     private val actionHandler: ActionHandlerApi,
     private val onNotificationClickedBroadcastChannel: BroadcastChannel,
     private val coroutineScope: CoroutineScope,

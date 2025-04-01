@@ -65,8 +65,6 @@ import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
 import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
-import com.emarsys.setup.PlatformInitializer
-import com.emarsys.setup.PlatformInitializerApi
 import com.emarsys.setup.config.IosSdkConfigStore
 import com.emarsys.setup.config.SdkConfigStoreApi
 import com.emarsys.sqldelight.EmarsysDB
@@ -103,17 +101,6 @@ internal actual class PlatformDependencyCreator actual constructor(
         StringStorage(userDefaults)
     }
 
-    actual override fun createPlatformInitializer(
-        pushActionFactory: PushActionFactoryApi,
-        pushActionHandler: ActionHandlerApi
-    ): PlatformInitializerApi {
-        return PlatformInitializer()
-    }
-
-    actual override fun createStringStorage(): StringStorageApi {
-        return stringStorage
-    }
-
     actual override fun createEventsDao(): EventsDaoApi {
         val driver = NativeSqliteDriver(EmarsysDB.Schema, DB_NAME)
         return IosSqDelightEventsDao(EmarsysDB(driver), json)
@@ -124,7 +111,7 @@ internal actual class PlatformDependencyCreator actual constructor(
         typedStorage: TypedStorageApi
     ): DeviceInfoCollector {
         return DeviceInfoCollector(
-            ClientIdProvider(uuidProvider, createStringStorage()),
+            ClientIdProvider(uuidProvider, stringStorage),
             createApplicationVersionProvider(),
             createLanguageProvider(),
             timezoneProvider,

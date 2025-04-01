@@ -33,7 +33,6 @@ import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
-import com.emarsys.setup.PlatformInitializerApi
 import com.emarsys.setup.config.SdkConfigStoreApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
@@ -51,13 +50,6 @@ internal expect class PlatformDependencyCreator(
     actionHandler: ActionHandlerApi,
     timestampProvider: InstantProvider
 ) : DependencyCreator {
-
-    override fun createPlatformInitializer(
-        pushActionFactory: PushActionFactoryApi,
-        pushActionHandler: ActionHandlerApi
-    ): PlatformInitializerApi
-
-    override fun createStringStorage(): StringStorageApi
 
     override fun createEventsDao(): EventsDaoApi
 

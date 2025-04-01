@@ -1,10 +1,8 @@
 package com.emarsys.di
 
-import android.app.NotificationManager
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Context.CLIPBOARD_SERVICE
-import android.content.SharedPreferences
 import android.net.ConnectivityManager
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -43,7 +41,6 @@ import com.emarsys.core.providers.TimezoneProviderApi
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.StorageConstants.DB_NAME
-import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
@@ -65,8 +62,6 @@ import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.PlatformInitState
-import com.emarsys.setup.PlatformInitializer
-import com.emarsys.setup.PlatformInitializerApi
 import com.emarsys.setup.config.AndroidSdkConfigStore
 import com.emarsys.setup.config.SdkConfigStoreApi
 import com.emarsys.sqldelight.EmarsysDB
@@ -97,19 +92,7 @@ internal actual class PlatformDependencyCreator actual constructor(
 ) : DependencyCreator, SdkComponent {
     private val platformInfoCollector: PlatformInfoCollectorApi by inject()
     private val currentActivityWatchdog: TransitionSafeCurrentActivityWatchdog by inject()
-    private val sharedPreferences: SharedPreferences by inject()
-    private val notificationManager: NotificationManager by inject()
-
-    private val stringStorage: StringStorageApi by lazy {
-        StringStorage(sharedPreferences)
-    }
-
-    actual override fun createPlatformInitializer(
-        pushActionFactory: PushActionFactoryApi,
-        pushActionHandler: ActionHandlerApi,
-    ): PlatformInitializerApi {
-        return PlatformInitializer(sdkEventFlow, notificationManager, sdkContext.sdkDispatcher)
-    }
+    private val stringStorage: StringStorageApi by inject()
 
     actual override fun createLanguageProvider(): LanguageProviderApi {
         return AndroidLanguageProvider(Locale.getDefault())
@@ -147,7 +130,7 @@ internal actual class PlatformDependencyCreator actual constructor(
         return PlatformInitState()
     }
 
-    actual override fun createStringStorage(): StringStorageApi = stringStorage
+//    actual override fun createStringStorage(): StringStorageApi = stringStorage
 
     actual override fun createEventsDao(): EventsDaoApi {
         val driver = AndroidSqliteDriver(EmarsysDB.Schema, applicationContext, DB_NAME)

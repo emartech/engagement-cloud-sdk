@@ -9,6 +9,8 @@ import com.emarsys.core.device.PlatformInfoCollector
 import com.emarsys.core.device.PlatformInfoCollectorApi
 import com.emarsys.core.resource.MetadataReader
 import com.emarsys.core.storage.StorageConstants
+import com.emarsys.core.storage.StringStorage
+import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.mobileengage.push.AndroidPushMessageFactory
 import com.emarsys.mobileengage.push.NotificationCompatStyler
 import com.emarsys.mobileengage.push.NotificationIntentProcessor
@@ -18,6 +20,8 @@ import com.emarsys.mobileengage.push.mapper.AndroidPushV1Mapper
 import com.emarsys.mobileengage.push.mapper.AndroidPushV2Mapper
 import com.emarsys.mobileengage.push.mapper.SilentAndroidPushV1Mapper
 import com.emarsys.mobileengage.push.mapper.SilentAndroidPushV2Mapper
+import com.emarsys.setup.PlatformInitializer
+import com.emarsys.setup.PlatformInitializerApi
 import com.emarsys.setup.config.AndroidSdkConfigStore
 import com.emarsys.setup.config.SdkConfigStoreApi
 import com.emarsys.watchdog.activity.TransitionSafeCurrentActivityWatchdog
@@ -35,6 +39,14 @@ object AndroidInjection {
             applicationContext.getSharedPreferences(
                 StorageConstants.SUITE_NAME,
                 Context.MODE_PRIVATE
+            )
+        }
+        single<StringStorageApi> { StringStorage( sharedPreferences = get()) }
+        single<PlatformInitializerApi> {
+            PlatformInitializer(
+                sdkEventFlow = get(named(EventFlowTypes.InternalEventFlow)),
+                notificationManager = get(),
+                sdkDispatcher = get(named(DispatcherTypes.Sdk))
             )
         }
         single<NotificationManager> { (applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager) }

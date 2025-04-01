@@ -4,8 +4,6 @@ import com.emarsys.SdkConfig
 import com.emarsys.api.push.LoggingPush
 import com.emarsys.api.push.Push
 import com.emarsys.api.push.PushApi
-import com.emarsys.api.push.PushConstants.WEB_PUSH_ON_BADGE_COUNT_UPDATE_RECEIVED
-import com.emarsys.api.push.PushConstants.WEB_PUSH_ON_NOTIFICATION_CLICKED_CHANNEL_NAME
 import com.emarsys.api.push.PushContextApi
 import com.emarsys.api.push.PushGatherer
 import com.emarsys.api.push.PushInstance
@@ -15,7 +13,6 @@ import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
-import com.emarsys.core.badge.WebBadgeCountHandler
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.cache.WebFileCache
 import com.emarsys.core.clipboard.WebClipboardHandler
@@ -57,7 +54,6 @@ import com.emarsys.mobileengage.inapp.InAppScriptExtractorApi
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.mobileengage.inapp.WebInAppPresenter
 import com.emarsys.mobileengage.inapp.WebInAppViewProvider
-import com.emarsys.mobileengage.push.PushNotificationClickHandler
 import com.emarsys.mobileengage.push.PushService
 import com.emarsys.mobileengage.push.PushServiceContext
 import com.emarsys.mobileengage.pushtoinapp.WebPushToInAppHandler
@@ -65,8 +61,6 @@ import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.PlatformInitState
-import com.emarsys.setup.PlatformInitializer
-import com.emarsys.setup.PlatformInitializerApi
 import com.emarsys.setup.config.JsEmarsysConfigStore
 import com.emarsys.setup.config.SdkConfigStoreApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
@@ -77,10 +71,8 @@ import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.Json
-import web.broadcast.BroadcastChannel
 import web.dom.document
 import web.idb.indexedDB
 
@@ -97,31 +89,6 @@ internal actual class PlatformDependencyCreator actual constructor(
 
     private val stringStorage: StringStorageApi by lazy {
         StringStorage(window.localStorage)
-    }
-
-    actual override fun createPlatformInitializer(
-        pushActionFactory: PushActionFactoryApi,
-        pushActionHandler: ActionHandlerApi
-    ): PlatformInitializerApi {
-        val pushNotificationClickHandler = PushNotificationClickHandler(
-            pushActionFactory,
-            pushActionHandler,
-            BroadcastChannel(WEB_PUSH_ON_NOTIFICATION_CLICKED_CHANNEL_NAME),
-            CoroutineScope(Dispatchers.Default + SupervisorJob()),
-            sdkLogger
-        )
-        val webBadgeCountHandler = WebBadgeCountHandler(
-            BroadcastChannel(WEB_PUSH_ON_BADGE_COUNT_UPDATE_RECEIVED),
-            sdkEventFlow,
-            CoroutineScope(Dispatchers.Default + SupervisorJob()),
-            sdkLogger
-        )
-        return PlatformInitializer(pushNotificationClickHandler, webBadgeCountHandler)
-
-    }
-
-    actual override fun createStringStorage(): StringStorageApi {
-        return stringStorage
     }
 
     actual override fun createEventsDao(): EventsDaoApi {
