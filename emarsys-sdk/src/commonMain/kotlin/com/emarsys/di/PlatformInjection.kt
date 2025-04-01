@@ -5,13 +5,10 @@ import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.cache.FileCacheApi
-import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.language.LanguageTagValidatorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.permission.PermissionHandlerApi
-import com.emarsys.core.providers.ApplicationVersionProviderApi
-import com.emarsys.core.providers.LanguageProviderApi
 import com.emarsys.core.state.State
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
@@ -26,7 +23,6 @@ import org.koin.dsl.module
 
 object PlatformInjection {
     val platformModules = module {
-        single<EventsDaoApi> { get<DependencyCreator>().createEventsDao() }
         single<DeviceInfoCollectorApi> {
             get<DependencyCreator>().createDeviceInfoCollector(
                 timezoneProvider = get(),
@@ -57,8 +53,6 @@ object PlatformInjection {
             get<DependencyCreator>().createConnectionWatchDog(logger)
         }
         single<LifecycleWatchDog> { get<DependencyCreator>().createLifeCycleWatchDog() }
-        single<ApplicationVersionProviderApi> { get<DependencyCreator>().createApplicationVersionProvider() }
-        single<LanguageProviderApi> { get<DependencyCreator>().createLanguageProvider() }
         single<LanguageTagValidatorApi> { get<DependencyCreator>().createLanguageTagValidator() }
         single<FileCacheApi> { get<DependencyCreator>().createFileCache() }
         single<InAppViewProviderApi> {

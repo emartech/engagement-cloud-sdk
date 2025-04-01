@@ -1,6 +1,5 @@
 package com.emarsys.di
 
-import app.cash.sqldelight.driver.native.NativeSqliteDriver
 import com.emarsys.SdkConfig
 import com.emarsys.api.push.PushApi
 import com.emarsys.api.push.PushContextApi
@@ -15,8 +14,6 @@ import com.emarsys.core.badge.IosBadgeCountHandler
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.cache.IosFileCache
 import com.emarsys.core.clipboard.IosClipboardHandler
-import com.emarsys.core.db.events.EventsDaoApi
-import com.emarsys.core.db.events.IosSqDelightEventsDao
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.UIDevice
 import com.emarsys.core.language.LanguageTagValidator
@@ -27,15 +24,12 @@ import com.emarsys.core.permission.IosPermissionHandler
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.provider.IosApplicationVersionProvider
 import com.emarsys.core.provider.IosLanguageProvider
-import com.emarsys.core.providers.ApplicationVersionProviderApi
 import com.emarsys.core.providers.ClientIdProvider
 import com.emarsys.core.providers.InstantProvider
-import com.emarsys.core.providers.LanguageProviderApi
 import com.emarsys.core.providers.TimezoneProviderApi
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.setup.PlatformInitState
 import com.emarsys.core.state.State
-import com.emarsys.core.storage.StorageConstants.DB_NAME
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
@@ -67,7 +61,6 @@ import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.config.IosSdkConfigStore
 import com.emarsys.setup.config.SdkConfigStoreApi
-import com.emarsys.sqldelight.EmarsysDB
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
@@ -101,19 +94,14 @@ internal actual class PlatformDependencyCreator actual constructor(
         StringStorage(userDefaults)
     }
 
-    actual override fun createEventsDao(): EventsDaoApi {
-        val driver = NativeSqliteDriver(EmarsysDB.Schema, DB_NAME)
-        return IosSqDelightEventsDao(EmarsysDB(driver), json)
-    }
-
     actual override fun createDeviceInfoCollector(
         timezoneProvider: TimezoneProviderApi,
         typedStorage: TypedStorageApi
     ): DeviceInfoCollector {
         return DeviceInfoCollector(
             ClientIdProvider(uuidProvider, stringStorage),
-            createApplicationVersionProvider(),
-            createLanguageProvider(),
+            IosApplicationVersionProvider(),
+            IosLanguageProvider(),
             timezoneProvider,
             uiDevice,
             typedStorage,
@@ -161,13 +149,6 @@ internal actual class PlatformDependencyCreator actual constructor(
         return IosLifecycleWatchdog()
     }
 
-    actual override fun createApplicationVersionProvider(): ApplicationVersionProviderApi {
-        return IosApplicationVersionProvider()
-    }
-
-    actual override fun createLanguageProvider(): LanguageProviderApi {
-        return IosLanguageProvider()
-    }
 
     actual override fun createFileCache(): FileCacheApi {
         return IosFileCache(NSFileManager.defaultManager)

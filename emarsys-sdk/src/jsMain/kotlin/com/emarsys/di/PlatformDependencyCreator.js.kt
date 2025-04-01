@@ -16,11 +16,6 @@ import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.cache.WebFileCache
 import com.emarsys.core.clipboard.WebClipboardHandler
-import com.emarsys.core.db.EmarsysIndexedDb
-import com.emarsys.core.db.EmarsysIndexedDbObjectStore
-import com.emarsys.core.db.EmarsysObjectStoreConfig
-import com.emarsys.core.db.events.EventsDaoApi
-import com.emarsys.core.db.events.JSEventsDao
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.WebPlatformInfoCollector
 import com.emarsys.core.language.LanguageTagValidator
@@ -29,12 +24,10 @@ import com.emarsys.core.launchapplication.JsLaunchApplicationHandler
 import com.emarsys.core.log.Logger
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.permission.WebPermissionHandler
-import com.emarsys.core.provider.ApplicationVersionProvider
+import com.emarsys.core.provider.WebApplicationVersionProvider
 import com.emarsys.core.provider.WebLanguageProvider
-import com.emarsys.core.providers.ApplicationVersionProviderApi
 import com.emarsys.core.providers.ClientIdProvider
 import com.emarsys.core.providers.InstantProvider
-import com.emarsys.core.providers.LanguageProviderApi
 import com.emarsys.core.providers.TimezoneProviderApi
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.state.State
@@ -74,7 +67,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.Json
 import web.dom.document
-import web.idb.indexedDB
 
 internal actual class PlatformDependencyCreator actual constructor(
     private val sdkContext: SdkContextApi,
@@ -85,21 +77,8 @@ internal actual class PlatformDependencyCreator actual constructor(
     actionHandler: ActionHandlerApi,
     timestampProvider: InstantProvider
 ) : DependencyCreator {
-    private val emarsysIndexedDb = EmarsysIndexedDb(indexedDB, sdkLogger)
-
     private val stringStorage: StringStorageApi by lazy {
         StringStorage(window.localStorage)
-    }
-
-    actual override fun createEventsDao(): EventsDaoApi {
-        val emarsysIndexedDbObjectStore = EmarsysIndexedDbObjectStore(
-            emarsysIndexedDb,
-            EmarsysObjectStoreConfig.Events,
-            json,
-            sdkLogger,
-            sdkContext.sdkDispatcher
-        )
-        return JSEventsDao(emarsysIndexedDbObjectStore, sdkLogger)
     }
 
     actual override fun createDeviceInfoCollector(
@@ -110,8 +89,8 @@ internal actual class PlatformDependencyCreator actual constructor(
             ClientIdProvider(uuidProvider, stringStorage),
             timezoneProvider,
             createWebDeviceInfoCollector(),
-            createApplicationVersionProvider(),
-            createLanguageProvider(),
+            WebApplicationVersionProvider(),
+            WebLanguageProvider(),
             typedStorage,
             json,
             stringStorage,
@@ -161,14 +140,6 @@ internal actual class PlatformDependencyCreator actual constructor(
 
     private fun createWebDeviceInfoCollector(): WebPlatformInfoCollector {
         return WebPlatformInfoCollector(getNavigatorData())
-    }
-
-    actual override fun createApplicationVersionProvider(): ApplicationVersionProviderApi {
-        return ApplicationVersionProvider()
-    }
-
-    actual override fun createLanguageProvider(): LanguageProviderApi {
-        return WebLanguageProvider()
     }
 
     actual override fun createFileCache(): FileCacheApi {

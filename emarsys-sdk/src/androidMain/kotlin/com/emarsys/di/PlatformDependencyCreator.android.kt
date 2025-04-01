@@ -6,7 +6,6 @@ import android.content.Context.CLIPBOARD_SERVICE
 import android.net.ConnectivityManager
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import com.emarsys.SdkConfig
 import com.emarsys.api.push.LoggingPush
 import com.emarsys.api.push.Push
@@ -23,7 +22,6 @@ import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.cache.AndroidFileCache
 import com.emarsys.core.cache.FileCacheApi
-import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.device.AndroidLanguageProvider
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.PlatformInfoCollectorApi
@@ -33,14 +31,11 @@ import com.emarsys.core.launchapplication.LaunchApplicationHandler
 import com.emarsys.core.log.Logger
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.provider.AndroidApplicationVersionProvider
-import com.emarsys.core.providers.ApplicationVersionProviderApi
 import com.emarsys.core.providers.ClientIdProvider
 import com.emarsys.core.providers.InstantProvider
-import com.emarsys.core.providers.LanguageProviderApi
 import com.emarsys.core.providers.TimezoneProviderApi
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.state.State
-import com.emarsys.core.storage.StorageConstants.DB_NAME
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
@@ -64,7 +59,6 @@ import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.PlatformInitState
 import com.emarsys.setup.config.AndroidSdkConfigStore
 import com.emarsys.setup.config.SdkConfigStoreApi
-import com.emarsys.sqldelight.EmarsysDB
 import com.emarsys.watchdog.activity.TransitionSafeCurrentActivityWatchdog
 import com.emarsys.watchdog.connection.AndroidConnectionWatchDog
 import com.emarsys.watchdog.connection.ConnectionWatchDog
@@ -94,18 +88,14 @@ internal actual class PlatformDependencyCreator actual constructor(
     private val currentActivityWatchdog: TransitionSafeCurrentActivityWatchdog by inject()
     private val stringStorage: StringStorageApi by inject()
 
-    actual override fun createLanguageProvider(): LanguageProviderApi {
-        return AndroidLanguageProvider(Locale.getDefault())
-    }
-
     actual override fun createDeviceInfoCollector(
         timezoneProvider: TimezoneProviderApi,
         typedStorage: TypedStorageApi,
     ): DeviceInfoCollector {
         return DeviceInfoCollector(
             timezoneProvider,
-            createLanguageProvider(),
-            createApplicationVersionProvider(),
+            AndroidLanguageProvider(Locale.getDefault()),
+            AndroidApplicationVersionProvider(applicationContext),
             true,
             ClientIdProvider(uuidProvider, stringStorage),
             platformInfoCollector,
@@ -116,10 +106,6 @@ internal actual class PlatformDependencyCreator actual constructor(
         )
     }
 
-    actual override fun createApplicationVersionProvider(): ApplicationVersionProviderApi {
-        return AndroidApplicationVersionProvider(applicationContext)
-    }
-
     actual override fun createPlatformInitState(
         pushApi: PushApi,
         sdkDispatcher: CoroutineDispatcher,
@@ -128,13 +114,6 @@ internal actual class PlatformDependencyCreator actual constructor(
         storage: StringStorageApi
     ): State {
         return PlatformInitState()
-    }
-
-//    actual override fun createStringStorage(): StringStorageApi = stringStorage
-
-    actual override fun createEventsDao(): EventsDaoApi {
-        val driver = AndroidSqliteDriver(EmarsysDB.Schema, applicationContext, DB_NAME)
-        return com.emarsys.core.db.events.AndroidSqlDelightEventsDao(EmarsysDB(driver), json)
     }
 
     actual override fun createPermissionHandler(): PermissionHandlerApi {

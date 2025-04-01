@@ -3,12 +3,20 @@ package com.emarsys.di
 import android.app.NotificationManager
 import android.content.Context
 import android.content.SharedPreferences
+import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import com.emarsys.AndroidEmarsysConfig
 import com.emarsys.applicationContext
+import com.emarsys.core.db.events.AndroidSqlDelightEventsDao
+import com.emarsys.core.db.events.EventsDaoApi
+import com.emarsys.core.device.AndroidLanguageProvider
 import com.emarsys.core.device.PlatformInfoCollector
 import com.emarsys.core.device.PlatformInfoCollectorApi
+import com.emarsys.core.provider.AndroidApplicationVersionProvider
+import com.emarsys.core.providers.ApplicationVersionProviderApi
+import com.emarsys.core.providers.LanguageProviderApi
 import com.emarsys.core.resource.MetadataReader
 import com.emarsys.core.storage.StorageConstants
+import com.emarsys.core.storage.StorageConstants.DB_NAME
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.mobileengage.push.AndroidPushMessageFactory
@@ -24,24 +32,35 @@ import com.emarsys.setup.PlatformInitializer
 import com.emarsys.setup.PlatformInitializerApi
 import com.emarsys.setup.config.AndroidSdkConfigStore
 import com.emarsys.setup.config.SdkConfigStoreApi
+import com.emarsys.sqldelight.EmarsysDB
 import com.emarsys.watchdog.activity.TransitionSafeCurrentActivityWatchdog
 import org.koin.core.module.Module
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import java.util.Locale
 
 object AndroidInjection {
     val androidModules = module {
         single<MetadataReader> { MetadataReader(applicationContext) }
         single<PlatformInfoCollectorApi> { PlatformInfoCollector(applicationContext) }
+        single<ApplicationVersionProviderApi> { AndroidApplicationVersionProvider(applicationContext) }
+        single<LanguageProviderApi> { AndroidLanguageProvider(Locale.getDefault()) }
         single<TransitionSafeCurrentActivityWatchdog> { TransitionSafeCurrentActivityWatchdog().also { it.register() } }
+        single<EventsDaoApi> {
+            val driver = AndroidSqliteDriver(EmarsysDB.Schema, applicationContext, DB_NAME)
+            AndroidSqlDelightEventsDao(
+                db = EmarsysDB(driver),
+                json = get()
+            )
+        }
         single<SharedPreferences> {
             applicationContext.getSharedPreferences(
                 StorageConstants.SUITE_NAME,
                 Context.MODE_PRIVATE
             )
         }
-        single<StringStorageApi> { StringStorage( sharedPreferences = get()) }
+        single<StringStorageApi> { StringStorage(sharedPreferences = get()) }
         single<PlatformInitializerApi> {
             PlatformInitializer(
                 sdkEventFlow = get(named(EventFlowTypes.InternalEventFlow)),

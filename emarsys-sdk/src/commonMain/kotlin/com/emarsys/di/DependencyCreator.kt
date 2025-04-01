@@ -9,13 +9,10 @@ import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.cache.FileCacheApi
-import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.language.LanguageTagValidatorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.permission.PermissionHandlerApi
-import com.emarsys.core.providers.ApplicationVersionProviderApi
-import com.emarsys.core.providers.LanguageProviderApi
 import com.emarsys.core.providers.TimezoneProviderApi
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.StringStorageApi
@@ -36,8 +33,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.serialization.json.Json
 
 internal interface DependencyCreator {
-
-    fun createEventsDao(): EventsDaoApi
 
     fun createDeviceInfoCollector(
         timezoneProvider: TimezoneProviderApi,
@@ -64,10 +59,6 @@ internal interface DependencyCreator {
     fun createConnectionWatchDog(sdkLogger: Logger): ConnectionWatchDog
 
     fun createLifeCycleWatchDog(): LifecycleWatchDog
-
-    fun createApplicationVersionProvider(): ApplicationVersionProviderApi
-
-    fun createLanguageProvider(): LanguageProviderApi
 
     fun createFileCache(): FileCacheApi
 

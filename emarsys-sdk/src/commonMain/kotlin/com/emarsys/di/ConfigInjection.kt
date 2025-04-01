@@ -12,7 +12,6 @@ import com.emarsys.api.config.LoggingConfig
 import com.emarsys.core.collections.PersistentList
 import com.emarsys.core.language.LanguageHandler
 import com.emarsys.core.language.LanguageHandlerApi
-import com.emarsys.core.providers.LanguageProviderApi
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -49,9 +48,6 @@ object ConfigInjection {
                 sdkLogger = get { parametersOf(ConfigInternal::class.simpleName) },
                 languageHandler = get()
             )
-        }
-        single<LanguageProviderApi> {
-            get<DependencyCreator>().createLanguageProvider()
         }
         single<LanguageHandlerApi> {
             LanguageHandler(

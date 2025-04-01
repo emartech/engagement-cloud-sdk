@@ -2,7 +2,7 @@ package com.emarsys.core.provider
 
 import com.emarsys.core.providers.ApplicationVersionProviderApi
 
-internal class ApplicationVersionProvider: ApplicationVersionProviderApi {
+internal class WebApplicationVersionProvider: ApplicationVersionProviderApi {
     private companion object {
         const val UNKNOWN_VERSION = "0.0.0"
     }

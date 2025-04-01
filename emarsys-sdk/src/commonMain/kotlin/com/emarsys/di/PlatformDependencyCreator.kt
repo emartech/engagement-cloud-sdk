@@ -10,14 +10,11 @@ import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.cache.FileCacheApi
-import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.language.LanguageTagValidatorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.permission.PermissionHandlerApi
-import com.emarsys.core.providers.ApplicationVersionProviderApi
 import com.emarsys.core.providers.InstantProvider
-import com.emarsys.core.providers.LanguageProviderApi
 import com.emarsys.core.providers.TimezoneProviderApi
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.state.State
@@ -51,8 +48,6 @@ internal expect class PlatformDependencyCreator(
     timestampProvider: InstantProvider
 ) : DependencyCreator {
 
-    override fun createEventsDao(): EventsDaoApi
-
     override fun createDeviceInfoCollector(
         timezoneProvider: TimezoneProviderApi,
         typedStorage: TypedStorageApi
@@ -78,10 +73,6 @@ internal expect class PlatformDependencyCreator(
     override fun createConnectionWatchDog(sdkLogger: Logger): ConnectionWatchDog
 
     override fun createLifeCycleWatchDog(): LifecycleWatchDog
-
-    override fun createApplicationVersionProvider(): ApplicationVersionProviderApi
-
-    override fun createLanguageProvider(): LanguageProviderApi
 
     override fun createFileCache(): FileCacheApi
 

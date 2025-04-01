@@ -5,6 +5,15 @@ import com.emarsys.api.push.PushConstants.WEB_PUSH_ON_BADGE_COUNT_UPDATE_RECEIVE
 import com.emarsys.api.push.PushConstants.WEB_PUSH_ON_NOTIFICATION_CLICKED_CHANNEL_NAME
 import com.emarsys.core.badge.WebBadgeCountHandler
 import com.emarsys.core.badge.WebBadgeCountHandlerApi
+import com.emarsys.core.db.EmarsysIndexedDb
+import com.emarsys.core.db.EmarsysIndexedDbObjectStore
+import com.emarsys.core.db.EmarsysObjectStoreConfig
+import com.emarsys.core.db.events.EventsDaoApi
+import com.emarsys.core.db.events.JSEventsDao
+import com.emarsys.core.provider.WebApplicationVersionProvider
+import com.emarsys.core.provider.WebLanguageProvider
+import com.emarsys.core.providers.ApplicationVersionProviderApi
+import com.emarsys.core.providers.LanguageProviderApi
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.mobileengage.push.PushNotificationClickHandler
@@ -17,11 +26,13 @@ import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.serialization.json.Json
 import org.koin.core.module.Module
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import web.broadcast.BroadcastChannel
+import web.idb.indexedDB
 
 object WebInjection {
     val webModules = module {
@@ -29,6 +40,24 @@ object WebInjection {
         single<SdkConfigStoreApi<JsEmarsysConfig>> {
             JsEmarsysConfigStore(
                 typedStorage = get()
+            )
+        }
+        single<LanguageProviderApi> { WebLanguageProvider() }
+        single<ApplicationVersionProviderApi> { WebApplicationVersionProvider() }
+        single<EventsDaoApi> {
+            val emarsysIndexedDb = EmarsysIndexedDb(
+                indexedDBFactory = indexedDB,
+                sdkLogger = get { parametersOf(EmarsysIndexedDb::class.simpleName) })
+            val emarsysIndexedDbObjectStore = EmarsysIndexedDbObjectStore(
+                emarsysIndexedDb,
+                EmarsysObjectStoreConfig.Events,
+                json = get<Json>(),
+                logger = get { parametersOf(EmarsysIndexedDbObjectStore::class.simpleName) },
+                get(named(DispatcherTypes.Sdk))
+            )
+            JSEventsDao(
+                emarsysIndexedDbObjectStore = emarsysIndexedDbObjectStore,
+                logger = get { parametersOf(JSEventsDao::class.simpleName) }
             )
         }
         single<PushNotificationClickHandlerApi> {
