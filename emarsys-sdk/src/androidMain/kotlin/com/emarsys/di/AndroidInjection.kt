@@ -13,6 +13,7 @@ import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.device.PlatformInfoCollector
 import com.emarsys.core.device.PlatformInfoCollectorApi
+import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.provider.AndroidApplicationVersionProvider
 import com.emarsys.core.providers.ApplicationVersionProviderApi
 import com.emarsys.core.providers.ClientIdProvider
@@ -23,6 +24,7 @@ import com.emarsys.core.storage.StorageConstants
 import com.emarsys.core.storage.StorageConstants.DB_NAME
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.StringStorageApi
+import com.emarsys.mobileengage.permission.AndroidPermissionHandler
 import com.emarsys.mobileengage.push.AndroidPushMessageFactory
 import com.emarsys.mobileengage.push.NotificationCompatStyler
 import com.emarsys.mobileengage.push.NotificationIntentProcessor
@@ -64,6 +66,9 @@ object AndroidInjection {
                 StorageConstants.SUITE_NAME,
                 Context.MODE_PRIVATE
             )
+        }
+        single<PermissionHandlerApi> {
+            AndroidPermissionHandler(applicationContext, get<TransitionSafeCurrentActivityWatchdog>())
         }
         single<StringStorageApi> { StringStorage(sharedPreferences = get()) }
         single<DeviceInfoCollectorApi> { DeviceInfoCollector(

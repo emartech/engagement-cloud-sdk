@@ -19,8 +19,6 @@ import com.emarsys.core.language.LanguageTagValidator
 import com.emarsys.core.language.LanguageTagValidatorApi
 import com.emarsys.core.launchapplication.IosLaunchApplicationHandler
 import com.emarsys.core.log.Logger
-import com.emarsys.core.permission.IosPermissionHandler
-import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.storage.StringStorageApi
@@ -78,10 +76,6 @@ internal actual class PlatformDependencyCreator actual constructor(
     private val notificationCenter = UNUserNotificationCenter.currentNotificationCenter()
     private val badgeCountHandler: BadgeCountHandlerApi =
         IosBadgeCountHandler(notificationCenter, uiDevice, sdkContext.mainDispatcher)
-
-    actual override fun createPermissionHandler(): PermissionHandlerApi {
-        return IosPermissionHandler(notificationCenter)
-    }
 
     actual override fun createExternalUrlOpener(): ExternalUrlOpenerApi {
         return IosExternalUrlOpener(

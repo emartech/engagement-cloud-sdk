@@ -26,7 +26,6 @@ import com.emarsys.core.language.LanguageTagValidator
 import com.emarsys.core.language.LanguageTagValidatorApi
 import com.emarsys.core.launchapplication.LaunchApplicationHandler
 import com.emarsys.core.log.Logger
-import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.storage.StringStorageApi
@@ -43,7 +42,6 @@ import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppViewProvider
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.mobileengage.inapp.WebViewProvider
-import com.emarsys.mobileengage.permission.AndroidPermissionHandler
 import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
 import com.emarsys.mobileengage.url.AndroidExternalUrlOpener
 import com.emarsys.networking.clients.event.EventClientApi
@@ -76,10 +74,6 @@ internal actual class PlatformDependencyCreator actual constructor(
     timestampProvider: InstantProvider
 ) : DependencyCreator, SdkComponent {
     private val currentActivityWatchdog: TransitionSafeCurrentActivityWatchdog by inject()
-
-    actual override fun createPermissionHandler(): PermissionHandlerApi {
-        return AndroidPermissionHandler(applicationContext, currentActivityWatchdog)
-    }
 
     actual override fun createExternalUrlOpener(): ExternalUrlOpenerApi {
         return AndroidExternalUrlOpener(applicationContext, sdkLogger)

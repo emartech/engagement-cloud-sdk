@@ -13,6 +13,8 @@ import com.emarsys.core.db.events.JSEventsDao
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.device.WebPlatformInfoCollector
+import com.emarsys.core.permission.PermissionHandlerApi
+import com.emarsys.core.permission.WebPermissionHandler
 import com.emarsys.core.provider.WebApplicationVersionProvider
 import com.emarsys.core.provider.WebLanguageProvider
 import com.emarsys.core.providers.ApplicationVersionProviderApi
@@ -68,6 +70,7 @@ object WebInjection {
                 logger = get { parametersOf(JSEventsDao::class.simpleName) }
             )
         }
+        single<PermissionHandlerApi> { WebPermissionHandler() }
         single<DeviceInfoCollectorApi> {
             DeviceInfoCollector(
                 clientIdProvider = ClientIdProvider(uuidProvider = get(), storage = get()),

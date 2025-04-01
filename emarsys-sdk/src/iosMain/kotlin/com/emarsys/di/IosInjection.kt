@@ -8,6 +8,8 @@ import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.device.UIDevice
 import com.emarsys.core.device.UIDeviceApi
+import com.emarsys.core.permission.IosPermissionHandler
+import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.provider.IosApplicationVersionProvider
 import com.emarsys.core.provider.IosLanguageProvider
 import com.emarsys.core.providers.ApplicationVersionProviderApi
@@ -29,16 +31,19 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import platform.Foundation.NSProcessInfo
 import platform.Foundation.NSUserDefaults
+import platform.UserNotifications.UNUserNotificationCenter
 
 object IosInjection {
     val iosModules = module {
         single<NSUserDefaults> { NSUserDefaults(StorageConstants.SUITE_NAME) }
+        single<UNUserNotificationCenter> { UNUserNotificationCenter.currentNotificationCenter() }
         single<StringStorageApi> { StringStorage(userDefaults = get()) }
         single<SdkConfigStoreApi<EmarsysConfig>> {
             IosSdkConfigStore(
                 typedStorage = get()
             )
         }
+        single<PermissionHandlerApi> { IosPermissionHandler(notificationCenter = get()) }
         single<UIDeviceApi> { UIDevice(NSProcessInfo()) }
         single<DeviceInfoCollectorApi> {
             DeviceInfoCollector(

@@ -10,7 +10,6 @@ import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.language.LanguageTagValidatorApi
 import com.emarsys.core.log.Logger
-import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
@@ -29,8 +28,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.serialization.json.Json
 
 internal interface DependencyCreator {
-
-    fun createPermissionHandler(): PermissionHandlerApi
 
     fun createExternalUrlOpener(): ExternalUrlOpenerApi
 
