@@ -1,5 +1,6 @@
 package com.emarsys.di
 
+import com.emarsys.core.SdkEventEmitterApi
 import com.emarsys.core.state.State
 import com.emarsys.core.state.StateMachine
 import com.emarsys.core.state.StateMachineApi
@@ -10,6 +11,7 @@ import com.emarsys.setup.states.ApplyAppCodeBasedRemoteConfigState
 import com.emarsys.setup.states.CollectDeviceInfoState
 import com.emarsys.setup.states.RegisterClientState
 import com.emarsys.setup.states.RegisterPushTokenState
+import com.emarsys.setup.states.RestoreSavedSdkEventsState
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -47,6 +49,13 @@ object SetupInjection {
                 remoteConfigHandler = get()
             )
         }
+        single<State>(named(StateTypes.RestoreSavedSdkEvents)) {
+            RestoreSavedSdkEventsState(
+                eventsDao = get(),
+                sdkEventEmitter = get<SdkEventEmitterApi>(),
+                sdkLogger = get { parametersOf(RestoreSavedSdkEventsState::class.simpleName) }
+            )
+        }
         single<State>(named(StateTypes.AppStart)) {
             AppStartState(
                 eventClient = get(),
@@ -62,6 +71,7 @@ object SetupInjection {
                     get<State>(named(StateTypes.PlatformInit)),
                     get<State>(named(StateTypes.RegisterClient)),
                     get<State>(named(StateTypes.RegisterPushToken)),
+                    get<State>(named(StateTypes.RestoreSavedSdkEvents)),
                     get<State>(named(StateTypes.AppStart))
                 )
             )
@@ -70,8 +80,8 @@ object SetupInjection {
             StateMachine(
                 states = listOf(
                     get<State>(named(StateTypes.CollectDeviceInfo)),
-                    get<State>(named(StateTypes.PlatformInit))
-
+                    get<State>(named(StateTypes.PlatformInit)),
+                    get<State>(named(StateTypes.RestoreSavedSdkEvents)),
                 )
             )
         }
@@ -92,5 +102,5 @@ enum class StateMachineTypes {
 }
 
 enum class StateTypes {
-    CollectDeviceInfo, ApplyAppCodeBasedRemoteConfig, PlatformInit, RegisterClient, RegisterPushToken, AppStart
+    CollectDeviceInfo, ApplyAppCodeBasedRemoteConfig, PlatformInit, RegisterClient, RegisterPushToken, AppStart, RestoreSavedSdkEvents
 }

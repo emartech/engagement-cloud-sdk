@@ -9,7 +9,9 @@ import com.emarsys.core.log.Logger
 import com.emarsys.networking.clients.event.model.SdkEvent
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
+import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend
+import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
@@ -97,7 +99,7 @@ class SdkEventDistributorTests {
         }
 
     @Test
-    fun registerEvent_shouldEmitSdkEvent_toSdkEventFlow() = runTest {
+    fun registerEvent_shouldPersistEventsToDb_andEmitSdkEvent_toSdkEventFlow() = runTest {
         val testEvent = SdkEvent.External.Custom(id = "testId", name = "testEventName")
         val eventDistributor = createEventDistributor(MutableStateFlow(false), sdkContext)
 
@@ -108,6 +110,54 @@ class SdkEventDistributorTests {
         eventDistributor.registerEvent(testEvent)
 
         emittedEvents.await() shouldBe listOf(testEvent)
+        verifySuspend {
+            mockEventsDao.insertEvent(testEvent)
+        }
+    }
+
+    @Test
+    fun registerEvent_shouldLogError_andNotEmitIntoSdkEventFlow_whenPersistingEventFails() =
+        runTest {
+            val testEvent = SdkEvent.External.Custom(id = "testId", name = "testEventName")
+            val testException = RuntimeException("DB error")
+            everySuspend { mockEventsDao.insertEvent(testEvent) } throws testException
+            val eventDistributor = createEventDistributor(MutableStateFlow(false), sdkContext)
+
+            eventDistributor.registerEvent(testEvent)
+
+            verifySuspend {
+                mockEventsDao.insertEvent(testEvent)
+                mockSdkLogger.error(any(), testException, any())
+            }
+        }
+
+    @Test
+    fun emitEvent_shouldEmitSdkEvent_toSdkEventFlow() = runTest {
+        val testEvent = SdkEvent.External.Custom(id = "testId", name = "testEventName")
+        val eventDistributor = createEventDistributor(MutableStateFlow(false), sdkContext)
+
+        val emittedEvents = backgroundScope.async {
+            sdkEventFlow.take(1).toList()
+        }
+
+        eventDistributor.emitEvent(testEvent)
+
+        emittedEvents.await() shouldBe listOf(testEvent)
+    }
+
+    @Test
+    fun emitEvent_shouldLog_andSwallowException_whenEmitFails() = runTest {
+        val testEvent = SdkEvent.External.Custom(id = "testId", name = "testEventName")
+        val mockFlow = mock<MutableSharedFlow<SdkEvent>>()
+        everySuspend { mockFlow.emit(testEvent) } throws Exception("Emit failed")
+        val eventDistributor = createEventDistributor(MutableStateFlow(false), sdkContext, mockFlow)
+
+        eventDistributor.emitEvent(testEvent)
+
+        verifySuspend {
+            mockFlow.emit(testEvent)
+            mockSdkLogger.error(any<String>(), any<Exception>(), any())
+        }
     }
 
     @OptIn(FlowPreview::class)
@@ -225,15 +275,15 @@ class SdkEventDistributorTests {
 
     private suspend fun createEventDistributor(
         connectionState: MutableStateFlow<Boolean>,
-        sdkContext: SdkContextApi
+        sdkContext: SdkContextApi,
+        eventFlow: MutableSharedFlow<SdkEvent> = sdkEventFlow,
     ): SdkEventDistributor {
         sdkContext.setSdkState(SdkState.active)
         return SdkEventDistributor(
-            sdkEventFlow,
+            eventFlow,
             connectionState,
             sdkContext,
             mockEventsDao,
-            sdkDispatcher,
             mockSdkLogger
         )
     }

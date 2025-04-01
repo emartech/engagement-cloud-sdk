@@ -13,7 +13,7 @@ selectAll:
 SELECT json FROM events ORDER BY timestamp ASC;
 
 insertEvent:
-INSERT INTO events (id, type, name, attributes, timestamp, json) VALUES (?, ?, ?, ?, ?, ?);
+INSERT OR IGNORE INTO events (id, type, name, attributes, timestamp, json) VALUES (?, ?, ?, ?, ?, ?);
 
 deleteAll:
 DELETE FROM events;

@@ -4,7 +4,9 @@ import com.emarsys.context.DefaultUrls
 import com.emarsys.context.DefaultUrlsApi
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.SdkEventEmitterApi
 import com.emarsys.core.channel.SdkEventDistributor
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.crypto.Crypto
 import com.emarsys.core.crypto.CryptoApi
 import com.emarsys.core.log.ConsoleLogger
@@ -97,9 +99,14 @@ object CoreInjection {
                 get<ConnectionWatchDog>().isOnline,
                 sdkContext = get(),
                 eventsDao = get(),
-                sdkDispatcher = get(named(DispatcherTypes.Sdk)),
                 sdkLogger = get<Logger> { parametersOf(SdkEventDistributor::class.simpleName) },
             )
+        }
+        single<SdkEventEmitterApi> {
+            get<SdkEventDistributor>()
+        }
+        single<SdkEventDistributorApi> {
+            get<SdkEventDistributor>()
         }
         single<SdkContextApi> {
             SdkContext(
