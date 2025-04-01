@@ -5,11 +5,9 @@ import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.cache.FileCacheApi
-import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.language.LanguageTagValidatorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.permission.PermissionHandlerApi
-import com.emarsys.core.state.State
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandlerApi
@@ -23,21 +21,6 @@ import org.koin.dsl.module
 
 object PlatformInjection {
     val platformModules = module {
-        single<DeviceInfoCollectorApi> {
-            get<DependencyCreator>().createDeviceInfoCollector(
-                timezoneProvider = get(),
-                typedStorage = get()
-            )
-        }
-        single<State> {
-            get<DependencyCreator>().createPlatformInitState(
-                pushApi = get(),
-                sdkDispatcher = get(),
-                sdkContext = get(),
-                actionFactory = get(),
-                storage = get()
-            )
-        }
         single<PermissionHandlerApi> { get<DependencyCreator>().createPermissionHandler() }
         single<ExternalUrlOpenerApi> { get<DependencyCreator>().createExternalUrlOpener() }
         single<ClipboardHandlerApi> { get<DependencyCreator>().createClipboardHandler() }

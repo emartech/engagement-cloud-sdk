@@ -1,6 +1,6 @@
 package com.emarsys.core.device
 
-expect class DeviceInfoCollector: DeviceInfoCollectorApi {
+internal expect class DeviceInfoCollector: DeviceInfoCollectorApi {
     override suspend fun collect(): String
 
     override suspend fun collectAsDeviceInfo(): DeviceInfo

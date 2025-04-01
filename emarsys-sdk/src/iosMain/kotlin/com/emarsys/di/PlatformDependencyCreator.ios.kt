@@ -14,7 +14,6 @@ import com.emarsys.core.badge.IosBadgeCountHandler
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.cache.IosFileCache
 import com.emarsys.core.clipboard.IosClipboardHandler
-import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.UIDevice
 import com.emarsys.core.language.LanguageTagValidator
 import com.emarsys.core.language.LanguageTagValidatorApi
@@ -22,15 +21,8 @@ import com.emarsys.core.launchapplication.IosLaunchApplicationHandler
 import com.emarsys.core.log.Logger
 import com.emarsys.core.permission.IosPermissionHandler
 import com.emarsys.core.permission.PermissionHandlerApi
-import com.emarsys.core.provider.IosApplicationVersionProvider
-import com.emarsys.core.provider.IosLanguageProvider
-import com.emarsys.core.providers.ClientIdProvider
 import com.emarsys.core.providers.InstantProvider
-import com.emarsys.core.providers.TimezoneProviderApi
 import com.emarsys.core.providers.UuidProviderApi
-import com.emarsys.core.setup.PlatformInitState
-import com.emarsys.core.state.State
-import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
@@ -66,10 +58,8 @@ import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.Json
-import org.koin.core.component.inject
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSProcessInfo
-import platform.Foundation.NSUserDefaults
 import platform.UIKit.UIApplication
 import platform.UIKit.UIPasteboard
 import platform.UserNotifications.UNUserNotificationCenter
@@ -88,38 +78,6 @@ internal actual class PlatformDependencyCreator actual constructor(
     private val notificationCenter = UNUserNotificationCenter.currentNotificationCenter()
     private val badgeCountHandler: BadgeCountHandlerApi =
         IosBadgeCountHandler(notificationCenter, uiDevice, sdkContext.mainDispatcher)
-    private val userDefaults: NSUserDefaults by inject()
-
-    private val stringStorage: StringStorageApi by lazy {
-        StringStorage(userDefaults)
-    }
-
-    actual override fun createDeviceInfoCollector(
-        timezoneProvider: TimezoneProviderApi,
-        typedStorage: TypedStorageApi
-    ): DeviceInfoCollector {
-        return DeviceInfoCollector(
-            ClientIdProvider(uuidProvider, stringStorage),
-            IosApplicationVersionProvider(),
-            IosLanguageProvider(),
-            timezoneProvider,
-            uiDevice,
-            typedStorage,
-            json,
-            stringStorage,
-            sdkContext
-        )
-    }
-
-    actual override fun createPlatformInitState(
-        pushApi: PushApi,
-        sdkDispatcher: CoroutineDispatcher,
-        sdkContext: SdkContextApi,
-        actionFactory: EventActionFactoryApi,
-        storage: StringStorageApi
-    ): State {
-        return PlatformInitState()
-    }
 
     actual override fun createPermissionHandler(): PermissionHandlerApi {
         return IosPermissionHandler(notificationCenter)

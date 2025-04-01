@@ -4,7 +4,7 @@ import com.emarsys.core.log.Logger
 import com.emarsys.core.state.State
 import com.emarsys.setup.PlatformInitializerApi
 
-class PlatformInitState(
+internal class InitializerState(
     private val platformInitializer: PlatformInitializerApi,
     private val sdkLogger: Logger
 ) : State {

@@ -10,14 +10,22 @@ import com.emarsys.core.db.EmarsysIndexedDbObjectStore
 import com.emarsys.core.db.EmarsysObjectStoreConfig
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.db.events.JSEventsDao
+import com.emarsys.core.device.DeviceInfoCollector
+import com.emarsys.core.device.DeviceInfoCollectorApi
+import com.emarsys.core.device.WebPlatformInfoCollector
 import com.emarsys.core.provider.WebApplicationVersionProvider
 import com.emarsys.core.provider.WebLanguageProvider
 import com.emarsys.core.providers.ApplicationVersionProviderApi
+import com.emarsys.core.providers.ClientIdProvider
 import com.emarsys.core.providers.LanguageProviderApi
+import com.emarsys.core.state.State
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.mobileengage.push.PushNotificationClickHandler
 import com.emarsys.mobileengage.push.PushNotificationClickHandlerApi
+import com.emarsys.mobileengage.push.PushService
+import com.emarsys.mobileengage.push.PushServiceContext
+import com.emarsys.setup.PlatformInitState
 import com.emarsys.setup.PlatformInitializer
 import com.emarsys.setup.PlatformInitializerApi
 import com.emarsys.setup.config.JsEmarsysConfigStore
@@ -60,6 +68,26 @@ object WebInjection {
                 logger = get { parametersOf(JSEventsDao::class.simpleName) }
             )
         }
+        single<DeviceInfoCollectorApi> {
+            DeviceInfoCollector(
+                clientIdProvider = ClientIdProvider(uuidProvider = get(), storage = get()),
+                timezoneProvider = get(),
+                webPlatformInfoCollector = WebPlatformInfoCollector(getNavigatorData()),
+                applicationVersionProvider = get(),
+                languageProvider = get(),
+                wrapperInfoStorage = get(),
+                json = get(),
+                stringStorage = get(),
+                sdkContext = get()
+            )
+        }
+        single<State>(named(StateTypes.PlatformInit)) {
+            val pushService = PushService(PushServiceContext(), storage = get<StringStorageApi>())
+            PlatformInitState(
+                pushService = pushService,
+                sdkContext = get()
+            )
+        }
         single<PushNotificationClickHandlerApi> {
             PushNotificationClickHandler(
                 actionFactory = get(),
@@ -88,6 +116,15 @@ object WebInjection {
                 webBadgeCountHandler = get()
             )
         }
+    }
+
+    private fun getNavigatorData(): String {
+        return listOf(
+            window.navigator.platform,
+            window.navigator.userAgent,
+            window.navigator.appVersion,
+            window.navigator.vendor,
+        ).joinToString(" ")
     }
 }
 

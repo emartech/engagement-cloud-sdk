@@ -4,7 +4,10 @@ import com.emarsys.KotlinPlatform
 import com.emarsys.SdkConstants
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.device.IosNotificationConstant.Companion.fromLong
+import com.emarsys.core.providers.ApplicationVersionProviderApi
+import com.emarsys.core.providers.LanguageProviderApi
 import com.emarsys.core.providers.Provider
+import com.emarsys.core.providers.TimezoneProviderApi
 import com.emarsys.core.storage.StorageConstants
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
@@ -16,11 +19,11 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.experimental.ExperimentalNativeApi
 
-actual class DeviceInfoCollector(
+internal actual class DeviceInfoCollector(
     private val clientIdProvider: Provider<String>,
-    private val applicationVersionProvider: Provider<String>,
-    private val languageProvider: Provider<String>,
-    private val timezoneProvider: Provider<String>,
+    private val applicationVersionProvider: ApplicationVersionProviderApi,
+    private val languageProvider: LanguageProviderApi,
+    private val timezoneProvider: TimezoneProviderApi,
     private val deviceInformation: UIDeviceApi,
     private val wrapperInfoStorage: TypedStorageApi,
     private val json: Json,

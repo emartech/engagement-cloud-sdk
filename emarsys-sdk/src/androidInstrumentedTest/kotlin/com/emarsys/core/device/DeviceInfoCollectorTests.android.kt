@@ -3,7 +3,10 @@ package com.emarsys.core.device
 import android.os.Build
 import com.emarsys.SdkConstants
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.providers.ApplicationVersionProviderApi
+import com.emarsys.core.providers.LanguageProviderApi
 import com.emarsys.core.providers.Provider
+import com.emarsys.core.providers.TimezoneProviderApi
 import com.emarsys.core.storage.StorageConstants
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
@@ -29,9 +32,9 @@ class DeviceInfoCollectorTests {
         const val WRAPPER_VERSION = "1.0.0"
     }
 
-    private lateinit var mockLanguageProvider: Provider<String>
-    private lateinit var mockTimezoneProvider: Provider<String>
-    private lateinit var mockApplicationVersionProvider: Provider<String>
+    private lateinit var mockLanguageProvider: LanguageProviderApi
+    private lateinit var mockTimezoneProvider: TimezoneProviderApi
+    private lateinit var mockApplicationVersionProvider: ApplicationVersionProviderApi
     private lateinit var mockClientIdProvider: Provider<String>
     private lateinit var mockPlatformInfoCollector: PlatformInfoCollector
     private lateinit var mockStorage: TypedStorageApi

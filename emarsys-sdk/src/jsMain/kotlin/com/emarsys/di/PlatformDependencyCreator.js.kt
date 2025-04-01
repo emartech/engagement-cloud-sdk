@@ -16,22 +16,14 @@ import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.cache.WebFileCache
 import com.emarsys.core.clipboard.WebClipboardHandler
-import com.emarsys.core.device.DeviceInfoCollector
-import com.emarsys.core.device.WebPlatformInfoCollector
 import com.emarsys.core.language.LanguageTagValidator
 import com.emarsys.core.language.LanguageTagValidatorApi
 import com.emarsys.core.launchapplication.JsLaunchApplicationHandler
 import com.emarsys.core.log.Logger
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.permission.WebPermissionHandler
-import com.emarsys.core.provider.WebApplicationVersionProvider
-import com.emarsys.core.provider.WebLanguageProvider
-import com.emarsys.core.providers.ClientIdProvider
 import com.emarsys.core.providers.InstantProvider
-import com.emarsys.core.providers.TimezoneProviderApi
 import com.emarsys.core.providers.UuidProviderApi
-import com.emarsys.core.state.State
-import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
@@ -47,13 +39,10 @@ import com.emarsys.mobileengage.inapp.InAppScriptExtractorApi
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.mobileengage.inapp.WebInAppPresenter
 import com.emarsys.mobileengage.inapp.WebInAppViewProvider
-import com.emarsys.mobileengage.push.PushService
-import com.emarsys.mobileengage.push.PushServiceContext
 import com.emarsys.mobileengage.pushtoinapp.WebPushToInAppHandler
 import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
-import com.emarsys.setup.PlatformInitState
 import com.emarsys.setup.config.JsEmarsysConfigStore
 import com.emarsys.setup.config.SdkConfigStoreApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
@@ -77,39 +66,6 @@ internal actual class PlatformDependencyCreator actual constructor(
     actionHandler: ActionHandlerApi,
     timestampProvider: InstantProvider
 ) : DependencyCreator {
-    private val stringStorage: StringStorageApi by lazy {
-        StringStorage(window.localStorage)
-    }
-
-    actual override fun createDeviceInfoCollector(
-        timezoneProvider: TimezoneProviderApi,
-        typedStorage: TypedStorageApi
-    ): DeviceInfoCollector {
-        return DeviceInfoCollector(
-            ClientIdProvider(uuidProvider, stringStorage),
-            timezoneProvider,
-            createWebDeviceInfoCollector(),
-            WebApplicationVersionProvider(),
-            WebLanguageProvider(),
-            typedStorage,
-            json,
-            stringStorage,
-            sdkContext
-        )
-    }
-
-    actual override fun createPlatformInitState(
-        pushApi: PushApi,
-        sdkDispatcher: CoroutineDispatcher,
-        sdkContext: SdkContextApi,
-        actionFactory: EventActionFactoryApi,
-        storage: StringStorageApi
-    ): State {
-        return PlatformInitState(
-            PushService(pushServiceContext, storage),
-            sdkContext
-        )
-    }
 
     actual override fun createPermissionHandler(): PermissionHandlerApi {
         return WebPermissionHandler()
@@ -132,14 +88,6 @@ internal actual class PlatformDependencyCreator actual constructor(
 
     actual override fun createLifeCycleWatchDog(): LifecycleWatchDog {
         return WebLifeCycleWatchDog(document, CoroutineScope(Dispatchers.Default))
-    }
-
-    private val pushServiceContext: PushServiceContext by lazy {
-        PushServiceContext()
-    }
-
-    private fun createWebDeviceInfoCollector(): WebPlatformInfoCollector {
-        return WebPlatformInfoCollector(getNavigatorData())
     }
 
     actual override fun createFileCache(): FileCacheApi {
@@ -197,14 +145,5 @@ internal actual class PlatformDependencyCreator actual constructor(
 
     actual override fun createSdkConfigStore(typedStorage: TypedStorageApi): SdkConfigStoreApi<SdkConfig> {
         return JsEmarsysConfigStore(typedStorage)
-    }
-
-    private fun getNavigatorData(): String {
-        return listOf(
-            window.navigator.platform,
-            window.navigator.userAgent,
-            window.navigator.appVersion,
-            window.navigator.vendor,
-        ).joinToString(" ")
     }
 }

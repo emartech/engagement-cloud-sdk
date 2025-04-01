@@ -19,7 +19,7 @@ class ClientIdProviderTests {
     }
 
     private lateinit var mockStringStorage: StringStorageApi
-    private lateinit var mockUUIDProvider: Provider<String>
+    private lateinit var mockUUIDProvider: UuidProviderApi
     private lateinit var provider: ClientIdProvider
 
     @BeforeTest

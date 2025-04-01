@@ -14,24 +14,24 @@ import kotlin.test.Test
 
 class PlatformInitStateTests {
     private lateinit var mockPlatformInitializer: PlatformInitializerApi
-    private lateinit var platformInitState: PlatformInitState
+    private lateinit var initializerState: InitializerState
 
     @BeforeTest
     fun setup() {
         mockPlatformInitializer = mock()
 
-        platformInitState = PlatformInitState(mockPlatformInitializer, SdkLogger(ConsoleLogger()))
+        initializerState = InitializerState(mockPlatformInitializer, SdkLogger(ConsoleLogger()))
     }
 
     @Test
     fun testName() = runTest {
-        platformInitState.name shouldBe "platformInitState"
+        initializerState.name shouldBe "platformInitState"
     }
 
     @Test
     fun testActive_should_call_init_on_platformInitializer() = runTest {
         everySuspend { mockPlatformInitializer.init() } returns Unit
-        platformInitState.active()
+        initializerState.active()
         verifySuspend { mockPlatformInitializer.init() }
     }
 }

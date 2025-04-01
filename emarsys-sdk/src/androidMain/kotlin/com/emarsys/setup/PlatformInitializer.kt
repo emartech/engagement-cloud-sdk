@@ -6,12 +6,12 @@ import com.emarsys.networking.clients.event.model.SdkEvent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 internal class PlatformInitializer(
-    private val sdkEventFlow: SharedFlow<SdkEvent>,
+    private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
     private val notificationManager: NotificationManager,
     private val sdkDispatcher: CoroutineDispatcher
 ) : PlatformInitializerApi, SdkComponent {

@@ -35,15 +35,6 @@ object SetupInjection {
                 deviceClient = get()
             )
         }
-        single<State>(named(StateTypes.PlatformInit)) {
-            get<DependencyCreator>().createPlatformInitState(
-                pushApi = get(),
-                sdkDispatcher = get(named(DispatcherTypes.Sdk)),
-                sdkContext = get(),
-                actionFactory = get(),
-                storage = get()
-            )
-        }
         single<State>(named(StateTypes.ApplyAppCodeBasedRemoteConfig)) {
             ApplyAppCodeBasedRemoteConfigState(
                 remoteConfigHandler = get()

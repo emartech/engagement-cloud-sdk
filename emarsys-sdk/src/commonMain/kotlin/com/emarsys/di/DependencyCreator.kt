@@ -4,17 +4,13 @@ import com.emarsys.SdkConfig
 import com.emarsys.api.push.PushApi
 import com.emarsys.api.push.PushContextApi
 import com.emarsys.api.push.PushInstance
-import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.cache.FileCacheApi
-import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.language.LanguageTagValidatorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.permission.PermissionHandlerApi
-import com.emarsys.core.providers.TimezoneProviderApi
-import com.emarsys.core.state.State
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
@@ -33,19 +29,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.serialization.json.Json
 
 internal interface DependencyCreator {
-
-    fun createDeviceInfoCollector(
-        timezoneProvider: TimezoneProviderApi,
-        typedStorage: TypedStorageApi
-    ): DeviceInfoCollector
-
-    fun createPlatformInitState(
-        pushApi: PushApi,
-        sdkDispatcher: CoroutineDispatcher,
-        sdkContext: SdkContextApi,
-        actionFactory: EventActionFactoryApi,
-        storage: StringStorageApi
-    ): State
 
     fun createPermissionHandler(): PermissionHandlerApi
 

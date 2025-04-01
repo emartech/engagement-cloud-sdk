@@ -10,14 +10,11 @@ import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.cache.FileCacheApi
-import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.language.LanguageTagValidatorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.providers.InstantProvider
-import com.emarsys.core.providers.TimezoneProviderApi
 import com.emarsys.core.providers.UuidProviderApi
-import com.emarsys.core.state.State
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
@@ -47,19 +44,6 @@ internal expect class PlatformDependencyCreator(
     actionHandler: ActionHandlerApi,
     timestampProvider: InstantProvider
 ) : DependencyCreator {
-
-    override fun createDeviceInfoCollector(
-        timezoneProvider: TimezoneProviderApi,
-        typedStorage: TypedStorageApi
-    ): DeviceInfoCollector
-
-    override fun createPlatformInitState(
-        pushApi: PushApi,
-        sdkDispatcher: CoroutineDispatcher,
-        sdkContext: SdkContextApi,
-        actionFactory: EventActionFactoryApi,
-        storage: StringStorageApi
-    ): State
 
     override fun createPermissionHandler(): PermissionHandlerApi
 

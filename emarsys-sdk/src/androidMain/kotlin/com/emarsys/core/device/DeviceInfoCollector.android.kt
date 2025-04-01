@@ -5,17 +5,20 @@ import android.os.Build
 import com.emarsys.SdkConstants
 import com.emarsys.applicationContext
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.providers.ApplicationVersionProviderApi
+import com.emarsys.core.providers.LanguageProviderApi
 import com.emarsys.core.providers.Provider
+import com.emarsys.core.providers.TimezoneProviderApi
 import com.emarsys.core.storage.StorageConstants
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.wrapper.WrapperInfo
 import kotlinx.serialization.json.Json
 
-actual class DeviceInfoCollector(
-    private val timezoneProvider: Provider<String>,
-    private val languageProvider: Provider<String>,
-    private val applicationVersionProvider: Provider<String>,
+internal actual class DeviceInfoCollector(
+    private val timezoneProvider: TimezoneProviderApi,
+    private val languageProvider: LanguageProviderApi,
+    private val applicationVersionProvider: ApplicationVersionProviderApi,
     private val isGooglePlayServicesAvailable: Boolean,
     private val clientIdProvider: Provider<String>,
     private val platformInfoCollector: PlatformInfoCollectorApi,

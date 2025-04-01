@@ -22,20 +22,13 @@ import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.cache.AndroidFileCache
 import com.emarsys.core.cache.FileCacheApi
-import com.emarsys.core.device.AndroidLanguageProvider
-import com.emarsys.core.device.DeviceInfoCollector
-import com.emarsys.core.device.PlatformInfoCollectorApi
 import com.emarsys.core.language.LanguageTagValidator
 import com.emarsys.core.language.LanguageTagValidatorApi
 import com.emarsys.core.launchapplication.LaunchApplicationHandler
 import com.emarsys.core.log.Logger
 import com.emarsys.core.permission.PermissionHandlerApi
-import com.emarsys.core.provider.AndroidApplicationVersionProvider
-import com.emarsys.core.providers.ClientIdProvider
 import com.emarsys.core.providers.InstantProvider
-import com.emarsys.core.providers.TimezoneProviderApi
 import com.emarsys.core.providers.UuidProviderApi
-import com.emarsys.core.state.State
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
@@ -56,7 +49,6 @@ import com.emarsys.mobileengage.url.AndroidExternalUrlOpener
 import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
-import com.emarsys.setup.PlatformInitState
 import com.emarsys.setup.config.AndroidSdkConfigStore
 import com.emarsys.setup.config.SdkConfigStoreApi
 import com.emarsys.watchdog.activity.TransitionSafeCurrentActivityWatchdog
@@ -72,7 +64,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.serialization.json.Json
 import okio.FileSystem
 import org.koin.core.component.inject
-import java.util.Locale
 
 
 internal actual class PlatformDependencyCreator actual constructor(
@@ -84,37 +75,7 @@ internal actual class PlatformDependencyCreator actual constructor(
     private val actionHandler: ActionHandlerApi,
     timestampProvider: InstantProvider
 ) : DependencyCreator, SdkComponent {
-    private val platformInfoCollector: PlatformInfoCollectorApi by inject()
     private val currentActivityWatchdog: TransitionSafeCurrentActivityWatchdog by inject()
-    private val stringStorage: StringStorageApi by inject()
-
-    actual override fun createDeviceInfoCollector(
-        timezoneProvider: TimezoneProviderApi,
-        typedStorage: TypedStorageApi,
-    ): DeviceInfoCollector {
-        return DeviceInfoCollector(
-            timezoneProvider,
-            AndroidLanguageProvider(Locale.getDefault()),
-            AndroidApplicationVersionProvider(applicationContext),
-            true,
-            ClientIdProvider(uuidProvider, stringStorage),
-            platformInfoCollector,
-            typedStorage,
-            json,
-            stringStorage,
-            sdkContext
-        )
-    }
-
-    actual override fun createPlatformInitState(
-        pushApi: PushApi,
-        sdkDispatcher: CoroutineDispatcher,
-        sdkContext: SdkContextApi,
-        actionFactory: EventActionFactoryApi,
-        storage: StringStorageApi
-    ): State {
-        return PlatformInitState()
-    }
 
     actual override fun createPermissionHandler(): PermissionHandlerApi {
         return AndroidPermissionHandler(applicationContext, currentActivityWatchdog)

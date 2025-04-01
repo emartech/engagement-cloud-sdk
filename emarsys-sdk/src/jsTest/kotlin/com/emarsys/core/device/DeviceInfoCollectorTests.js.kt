@@ -3,7 +3,10 @@ package com.emarsys.core.device
 import com.emarsys.SdkConfig
 import com.emarsys.SdkConstants
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.providers.ApplicationVersionProviderApi
+import com.emarsys.core.providers.LanguageProviderApi
 import com.emarsys.core.providers.Provider
+import com.emarsys.core.providers.TimezoneProviderApi
 import com.emarsys.core.storage.StorageConstants
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
@@ -46,9 +49,9 @@ class DeviceInfoCollectorTests {
 
     private lateinit var mockWebPlatformInfoCollector: WebPlatformInfoCollectorApi
     private lateinit var mockClientIdProvider: Provider<String>
-    private lateinit var mockTimezoneProvider: Provider<String>
-    private lateinit var mockApplicationVersionProvider: Provider<String>
-    private lateinit var mockLanguageProvider: Provider<String>
+    private lateinit var mockTimezoneProvider: TimezoneProviderApi
+    private lateinit var mockApplicationVersionProvider: ApplicationVersionProviderApi
+    private lateinit var mockLanguageProvider: LanguageProviderApi
     private lateinit var mockWrapperInfoStorage: TypedStorageApi
     private lateinit var deviceInfoCollector: DeviceInfoCollector
     private lateinit var mockStringStorage: StringStorageApi

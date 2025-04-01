@@ -9,12 +9,16 @@ import com.emarsys.applicationContext
 import com.emarsys.core.db.events.AndroidSqlDelightEventsDao
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.device.AndroidLanguageProvider
+import com.emarsys.core.device.DeviceInfoCollector
+import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.device.PlatformInfoCollector
 import com.emarsys.core.device.PlatformInfoCollectorApi
 import com.emarsys.core.provider.AndroidApplicationVersionProvider
 import com.emarsys.core.providers.ApplicationVersionProviderApi
+import com.emarsys.core.providers.ClientIdProvider
 import com.emarsys.core.providers.LanguageProviderApi
 import com.emarsys.core.resource.MetadataReader
+import com.emarsys.core.state.State
 import com.emarsys.core.storage.StorageConstants
 import com.emarsys.core.storage.StorageConstants.DB_NAME
 import com.emarsys.core.storage.StringStorage
@@ -28,6 +32,7 @@ import com.emarsys.mobileengage.push.mapper.AndroidPushV1Mapper
 import com.emarsys.mobileengage.push.mapper.AndroidPushV2Mapper
 import com.emarsys.mobileengage.push.mapper.SilentAndroidPushV1Mapper
 import com.emarsys.mobileengage.push.mapper.SilentAndroidPushV2Mapper
+import com.emarsys.setup.PlatformInitState
 import com.emarsys.setup.PlatformInitializer
 import com.emarsys.setup.PlatformInitializerApi
 import com.emarsys.setup.config.AndroidSdkConfigStore
@@ -61,6 +66,19 @@ object AndroidInjection {
             )
         }
         single<StringStorageApi> { StringStorage(sharedPreferences = get()) }
+        single<DeviceInfoCollectorApi> { DeviceInfoCollector(
+            timezoneProvider = get(),
+            languageProvider = get(),
+            applicationVersionProvider = get(),
+            isGooglePlayServicesAvailable = true,
+            clientIdProvider = ClientIdProvider(uuidProvider = get(), storage = get()),
+            platformInfoCollector = get(),
+            wrapperInfoStorage = get(),
+            json = get(),
+            stringStorage = get(),
+            sdkContext = get()
+        ) }
+        single<State>(named(StateTypes.PlatformInit)) { PlatformInitState() }
         single<PlatformInitializerApi> {
             PlatformInitializer(
                 sdkEventFlow = get(named(EventFlowTypes.InternalEventFlow)),

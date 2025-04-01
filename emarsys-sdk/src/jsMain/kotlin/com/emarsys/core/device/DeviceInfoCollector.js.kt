@@ -2,7 +2,10 @@ package com.emarsys.core.device
 
 import com.emarsys.SdkConstants
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.providers.ApplicationVersionProviderApi
+import com.emarsys.core.providers.LanguageProviderApi
 import com.emarsys.core.providers.Provider
+import com.emarsys.core.providers.TimezoneProviderApi
 import com.emarsys.core.storage.StorageConstants
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
@@ -10,12 +13,12 @@ import com.emarsys.core.wrapper.WrapperInfo
 import kotlinx.browser.window
 import kotlinx.serialization.json.Json
 
-actual class DeviceInfoCollector(
+internal actual class DeviceInfoCollector(
     private val clientIdProvider: Provider<String>,
-    private val timezoneProvider: Provider<String>,
+    private val timezoneProvider: TimezoneProviderApi,
     private val webPlatformInfoCollector: WebPlatformInfoCollectorApi,
-    private val applicationVersionProvider: Provider<String>,
-    private val languageProvider: Provider<String>,
+    private val applicationVersionProvider: ApplicationVersionProviderApi,
+    private val languageProvider: LanguageProviderApi,
     private val wrapperInfoStorage: TypedStorageApi,
     private val json: Json,
     private val stringStorage: StringStorageApi,
