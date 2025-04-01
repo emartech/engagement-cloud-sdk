@@ -141,7 +141,7 @@ class DeviceInfoCollectorTests {
             deviceModel = DEVICE_MODEL,
             osVersion = OS_VERSION,
             sdkVersion = BuildConfig.VERSION_NAME,
-            isDebugMode = false,
+            isDebugMode = true,
             applicationCode = "testAppCode",
             merchantId = "testMerchantId",
             language = LANGUAGE,

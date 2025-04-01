@@ -4,6 +4,8 @@ import com.emarsys.AndroidEmarsysConfig
 import com.emarsys.Emarsys
 import com.emarsys.api.push.PushConstants
 import com.emarsys.api.push.PushConstants.PUSH_TOKEN_STORAGE_KEY
+import com.emarsys.context.SdkContextApi
+import com.emarsys.core.storage.StorageConstants
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import io.kotest.matchers.shouldBe
@@ -14,6 +16,7 @@ import kotlinx.coroutines.test.runTest
 import org.koin.core.Koin
 import org.koin.core.component.get
 import org.koin.test.KoinTest
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -22,13 +25,21 @@ class PushClientIntegrationTests : KoinTest {
     override fun getKoin(): Koin = koin
 
     private lateinit var stringStorage: StringStorageApi
+    private lateinit var sdkContext: SdkContextApi
 
     @BeforeTest
     fun setup() = runTest {
-        Emarsys.initialize()
-
+        sdkContext = get<SdkContextApi>()
         stringStorage = get<StringStorageApi>()
+
+        Emarsys.initialize()
         Emarsys.enableTracking(AndroidEmarsysConfig("EMS11-C3FD3"))
+    }
+
+    @AfterTest
+    fun tearDown() = runTest {
+        sdkContext.config = null
+        stringStorage.put(StorageConstants.SDK_CONFIG_KEY, null)
     }
 
     @Test

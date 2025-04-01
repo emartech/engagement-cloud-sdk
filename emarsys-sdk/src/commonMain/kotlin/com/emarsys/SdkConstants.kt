@@ -14,6 +14,7 @@ object SdkConstants {
     const val LINK_CONTACT_NAME = "linkContact"
     const val LINK_AUTHENTICATED_CONTACT_NAME = "linAuthenticatedContact"
     const val UNLINK_CONTACT_NAME = "unlinkContact"
+    const val TRACK_DEEPLINK_NAME = "trackDeepLink"
     const val INAPP_VIEWED_EVENT_NAME = "inapp:viewed"
     const val DISMISS_EVENT_NAME = "dismiss"
     const val REREGISTRATION_REQUIRED_EVENT_NAME = "ReregistrationRequired"

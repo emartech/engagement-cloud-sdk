@@ -1,6 +1,5 @@
 package com.emarsys.api.contact
 
-import com.emarsys.networking.clients.contact.ContactClientApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -11,7 +10,6 @@ import dev.mokkery.matcher.capture.SlotCapture
 import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
-import dev.mokkery.resetAnswers
 import dev.mokkery.spy
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
@@ -19,7 +17,6 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.jsonPrimitive
-import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -36,14 +33,12 @@ class ContactInternalTests {
     }
 
     private lateinit var contactContext: ContactContextApi
-    private lateinit var mockContactClient: ContactClientApi
     private lateinit var sdkEventFlow: MutableSharedFlow<SdkEvent>
     private lateinit var eventSlot: SlotCapture<SdkEvent>
     private lateinit var contactInternal: ContactInstance
 
     @BeforeTest
     fun setUp() {
-        mockContactClient = mock()
         contactContext = ContactContext(calls)
         eventSlot = slot<SdkEvent>()
         sdkEventFlow = spy(MutableSharedFlow(replay = 5))
@@ -53,11 +48,6 @@ class ContactInternalTests {
             sdkLogger = mock(MockMode.autofill),
             sdkEventFlow
         )
-    }
-
-    @AfterTest
-    fun tearDown() {
-        resetAnswers(mockContactClient)
     }
 
     @Test

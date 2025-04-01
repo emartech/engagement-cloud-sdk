@@ -5,7 +5,6 @@ import com.emarsys.core.networking.clients.GenericNetworkClient
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.networking.EmarsysClient
 import com.emarsys.networking.clients.config.ConfigClient
-import com.emarsys.networking.clients.config.ConfigClientApi
 import com.emarsys.networking.clients.device.DeviceClient
 import com.emarsys.networking.clients.device.DeviceClientApi
 import com.emarsys.networking.clients.event.EventClient
@@ -74,7 +73,19 @@ object NetworkInjection {
                 sdkLogger = get { parametersOf(RemoteConfigClient::class.simpleName) }
             )
         }
-        single<ConfigClientApi> { ConfigClient }
+        single<ConfigClient> {
+            ConfigClient(
+                emarsysNetworkClient = get(named(NetworkClientTypes.Emarsys)),
+                urlFactory = get(),
+                sdkEventFlow = get(named(EventFlowTypes.InternalEventFlow)),
+                sessionContext = get(),
+                sdkContext = get(),
+                contactTokenHandler = get(),
+                json = get(),
+                sdkLogger = get { parametersOf(ConfigClient::class.simpleName) },
+                sdkDispatcher = get(named(DispatcherTypes.Sdk))
+            )
+        }
         single<LoggingClient> { LoggingClient(
             emarsysNetworkClient = get(named(NetworkClientTypes.Emarsys)),
             urlFactory = get(),

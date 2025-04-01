@@ -117,11 +117,11 @@ class SdkLogger(
                     put(it.key, it.value)
                 }
             }
-            put("breadcrumbs", buildJsonObject {
-                queue.forEachIndexed { index, entry ->
-                    put("entry_$index", entry.second)
-                }
-            })
+//            put("breadcrumbs", buildJsonObject {
+//                queue.forEachIndexed { index, entry ->
+//                    put("entry_$index", entry.second)
+//                }
+//            })
         }
 
 

@@ -11,7 +11,6 @@ import com.emarsys.api.contact.ContactInternal
 import com.emarsys.api.contact.LoggingContact
 import com.emarsys.core.collections.PersistentList
 import com.emarsys.networking.clients.contact.ContactClient
-import com.emarsys.networking.clients.contact.ContactClientApi
 import com.emarsys.networking.clients.contact.ContactTokenHandler
 import com.emarsys.networking.clients.contact.ContactTokenHandlerApi
 import org.koin.core.parameter.parametersOf
@@ -26,7 +25,18 @@ object ContactInjection {
                 sdkLogger = get { parametersOf(ContactTokenHandler::class.simpleName) }
             )
         }
-        single<ContactClientApi> { ContactClient }
+        single<ContactClient> {
+            ContactClient(
+                emarsysClient = get(named(NetworkClientTypes.Emarsys)),
+                sdkEventFlow = get(named(EventFlowTypes.InternalEventFlow)),
+                urlFactory = get(),
+                sdkContext = get(),
+                contactTokenHandler = get(),
+                json = get(),
+                sdkLogger = get { parametersOf(ContactClient::class.simpleName) },
+                sdkDispatcher = get(named(DispatcherTypes.Sdk))
+            )
+        }
         single<MutableList<ContactCall>>(named(PersistentListTypes.ContactCall)) {
             PersistentList(
                 id = PersistentListIds.CONTACT_CONTEXT_PERSISTENT_ID,

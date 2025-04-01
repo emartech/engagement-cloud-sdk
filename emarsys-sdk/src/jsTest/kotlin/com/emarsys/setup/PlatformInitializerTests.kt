@@ -19,7 +19,8 @@ class PlatformInitializerTests {
         val webBadgeCountHandler = mock<WebBadgeCountHandlerApi> {
             everySuspend { register() } returns Unit
         }
-        val platformInitializer = PlatformInitializer(pushNotificationClickHandler, webBadgeCountHandler)
+        val platformInitializer =
+            PlatformInitializer(pushNotificationClickHandler, webBadgeCountHandler)
 
         platformInitializer.init()
 

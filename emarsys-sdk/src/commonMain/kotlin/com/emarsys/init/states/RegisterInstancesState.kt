@@ -19,7 +19,6 @@ internal class RegisterInstancesState(
 
     override suspend fun active() {
         sdkLogger.debug("RegisterInstancesState", "Registering instances")
-
         eventTrackerApi.registerOnContext()
         contactApi.registerOnContext()
         pushApi.registerOnContext()

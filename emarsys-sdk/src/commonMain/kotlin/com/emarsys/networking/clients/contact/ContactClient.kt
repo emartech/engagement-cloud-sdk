@@ -6,9 +6,6 @@ import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
-import com.emarsys.di.DispatcherTypes
-import com.emarsys.di.EventFlowTypes
-import com.emarsys.di.NetworkClientTypes
 import com.emarsys.di.SdkComponent
 import com.emarsys.networking.EmarsysHeaders
 import com.emarsys.networking.clients.event.model.SdkEvent
@@ -22,19 +19,17 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
-import org.koin.core.component.inject
-import org.koin.core.parameter.parametersOf
-import org.koin.core.qualifier.named
 
-internal object ContactClient : ContactClientApi, SdkComponent {
-    private val emarsysClient: NetworkClientApi by inject(named(NetworkClientTypes.Emarsys))
-    private val sdkEventFlow: MutableSharedFlow<SdkEvent> by inject(named(EventFlowTypes.InternalEventFlow))
-    private val urlFactory: UrlFactoryApi by inject()
-    private val sdkContext: SdkContextApi by inject()
-    private val contactTokenHandler: ContactTokenHandlerApi by inject()
-    private val json: Json by inject()
-    private val sdkLogger: Logger by inject { parametersOf(ContactClient::class.simpleName) }
-    private val sdkDispatcher: CoroutineDispatcher by inject(named(DispatcherTypes.Sdk))
+internal class ContactClient(
+    private val emarsysClient: NetworkClientApi,
+    private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
+    private val urlFactory: UrlFactoryApi,
+    private val sdkContext: SdkContextApi,
+    private val contactTokenHandler: ContactTokenHandlerApi,
+    private val json: Json,
+    private val sdkLogger: Logger,
+    sdkDispatcher: CoroutineDispatcher
+) : SdkComponent {
 
     init {
         CoroutineScope(sdkDispatcher).launch {
@@ -46,16 +41,20 @@ internal object ContactClient : ContactClientApi, SdkComponent {
         sdkEventFlow
             .filter { isContactEvent(it) }
             .collect {
-                sdkLogger.debug("ContactClient - consumeContactChanges")
-                val request = createUrlRequest(it)
-                val response = emarsysClient.send(request)
+                try {
+                    sdkLogger.debug("ContactClient - consumeContactChanges")
+                    val request = createUrlRequest(it)
+                    val response = emarsysClient.send(request)
 
-                if (response.status == HttpStatusCode.OK) {
-                    contactTokenHandler.handleContactTokens(response)
-                    sdkContext.contactFieldId =
-                        it.attributes?.get("contactFieldId")?.jsonPrimitive?.content?.toInt()
+                    if (response.status == HttpStatusCode.OK) {
+                        contactTokenHandler.handleContactTokens(response)
+                        sdkContext.contactFieldId =
+                            it.attributes?.get("contactFieldId")?.jsonPrimitive?.content?.toInt()
+                    }
+                    return@collect
+                } catch (exception: Exception) {
+                    sdkLogger.error("ContactClient - consumeContactChanges", exception)
                 }
-                return@collect
             }
     }
 

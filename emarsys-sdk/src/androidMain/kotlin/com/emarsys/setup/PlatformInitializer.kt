@@ -1,9 +1,7 @@
 package com.emarsys.setup
 
 import android.app.NotificationManager
-import com.emarsys.di.AndroidInjection
 import com.emarsys.di.SdkComponent
-import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.networking.clients.event.model.SdkEvent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -19,8 +17,6 @@ internal class PlatformInitializer(
 ) : PlatformInitializerApi, SdkComponent {
 
     override suspend fun init() {
-        koin.loadModules(listOf(AndroidInjection.androidModules))
-
         CoroutineScope(sdkDispatcher).launch(start = CoroutineStart.UNDISPATCHED) {
             sdkEventFlow.filter { it is SdkEvent.Internal.Sdk.Dismiss }.collect {
                 val event = it as SdkEvent.Internal.Sdk.Dismiss

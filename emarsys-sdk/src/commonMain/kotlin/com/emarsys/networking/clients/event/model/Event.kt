@@ -14,6 +14,7 @@ import com.emarsys.SdkConstants.REMOTE_CONFIG_UPDATE_REQUIRED_EVENT_NAME
 import com.emarsys.SdkConstants.REREGISTRATION_REQUIRED_EVENT_NAME
 import com.emarsys.SdkConstants.SESSION_END_EVENT_NAME
 import com.emarsys.SdkConstants.SESSION_START_EVENT_NAME
+import com.emarsys.SdkConstants.TRACK_DEEPLINK_NAME
 import com.emarsys.SdkConstants.UNLINK_CONTACT_NAME
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.providers.TimestampProvider
@@ -172,6 +173,13 @@ sealed interface SdkEvent {
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override val attributes: JsonObject? = null
             ) : Sdk(UNLINK_CONTACT_NAME)
+
+            @Serializable
+            data class TrackDeepLink(
+                override val id: String = UUIDProvider().provide(),
+                override val timestamp: Instant = TimestampProvider().provide(),
+                override val attributes: JsonObject? = null
+            ) : Sdk(TRACK_DEEPLINK_NAME)
 
             @Serializable
             data class AppStart(

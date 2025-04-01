@@ -17,7 +17,6 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PlatformInitializerTest {
-
     private lateinit var sdkEventFlow: MutableSharedFlow<SdkEvent>
     private lateinit var mockNotificationManager: NotificationManager
 

@@ -9,10 +9,6 @@ import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
-import com.emarsys.di.DispatcherTypes
-import com.emarsys.di.EventFlowTypes
-import com.emarsys.di.NetworkClientTypes
-import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
@@ -48,19 +44,12 @@ import kotlinx.coroutines.test.setMain
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
-import org.koin.core.Koin
-import org.koin.core.module.Module
-import org.koin.core.qualifier.named
-import org.koin.dsl.module
-import org.koin.test.KoinTest
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class ContactClientTests : KoinTest {
-    override fun getKoin(): Koin = koin
-
+class ContactClientTests {
     init {
         Dispatchers.setMain(StandardTestDispatcher())
     }
@@ -71,43 +60,34 @@ class ContactClientTests : KoinTest {
         const val CONTACT_FIELD_VALUE = "testContactFieldValue"
         const val CONTACT_FIELD_ID = 2575
         const val MERCHANT_ID = "testMerchantId"
-        val mockEmarsysClient: NetworkClientApi = mock()
-        val mockUrlFactory: UrlFactoryApi = mock()
-        val mockSdkContext: SdkContextApi = mock()
-        val mockConfig: SdkConfig = mock()
-        val mockContactTokenHandler: ContactTokenHandlerApi = mock()
-        val mockLogger: Logger = mock(MockMode.autofill)
-        val sessionContext = SessionContext(refreshToken = "testRefreshToken")
-        val json: Json = JsonUtil.json
-        val sdkEventFlow: MutableSharedFlow<SdkEvent> = spy(MutableSharedFlow(replay = 5))
     }
 
+    private lateinit var mockEmarsysClient: NetworkClientApi
+    private lateinit var mockUrlFactory: UrlFactoryApi
+    private lateinit var mockSdkContext: SdkContextApi
+    private lateinit var mockConfig: SdkConfig
+    private lateinit var mockContactTokenHandler: ContactTokenHandlerApi
+    private lateinit var mockLogger: Logger
+    private lateinit var sessionContext: SessionContext
+    private lateinit var json: Json
+    private lateinit var sdkEventFlow: MutableSharedFlow<SdkEvent>
     private lateinit var sdkDispatcher: CoroutineDispatcher
-    private lateinit var testModules: Module
-
-    private fun createContactClientTestModules() {
-        testModules = module {
-            single<NetworkClientApi>(named(NetworkClientTypes.Emarsys)) { mockEmarsysClient }
-            single<UrlFactoryApi> { mockUrlFactory }
-            single<ContactTokenHandlerApi> { mockContactTokenHandler }
-            single<SdkContextApi> { mockSdkContext }
-            single<Logger> { mockLogger }
-            single<SdkConfig> { mockConfig }
-            single<Json> { json }
-            single<SessionContext> { sessionContext }
-            single<CoroutineDispatcher>(named(DispatcherTypes.Sdk)) { sdkDispatcher }
-            single<MutableSharedFlow<SdkEvent>>(named(EventFlowTypes.InternalEventFlow)) { sdkEventFlow }
-        }
-        koin.loadModules(listOf(testModules))
-    }
-
 
     @BeforeTest
     fun setUp() {
+        mockEmarsysClient = mock()
+        mockUrlFactory = mock()
+        mockSdkContext = mock()
+        mockConfig = mock()
+        mockContactTokenHandler = mock()
+        mockLogger = mock(MockMode.autofill)
+        sessionContext = SessionContext(refreshToken = "testRefreshToken")
+        json = JsonUtil.json
+        sdkEventFlow = spy(MutableSharedFlow(replay = 5))
         sdkDispatcher = StandardTestDispatcher()
         every { mockSdkContext.config } returns mockConfig
         everySuspend { mockContactTokenHandler.handleContactTokens(any()) } returns Unit
-        everySuspend { mockEmarsysClient.send(any()) }.returns(createTestResponse("{}"))
+        everySuspend { mockEmarsysClient.send(any()) } returns (createTestResponse("{}"))
         every { mockConfig.merchantId } returns null
         every { mockSdkContext.contactFieldId = any() } returns Unit
         every { mockUrlFactory.create(EmarsysUrlType.LINK_CONTACT, null) } returns TEST_BASE_URL
@@ -116,15 +96,23 @@ class ContactClientTests : KoinTest {
             (it.args[1] as Throwable).printStackTrace()
             throw it.args[1] as Throwable
         }
-        createContactClientTestModules()
-        ContactClient
+
+        ContactClient(
+            mockEmarsysClient,
+            sdkEventFlow,
+            mockUrlFactory,
+            mockSdkContext,
+            mockContactTokenHandler,
+            json,
+            mockLogger,
+            sdkDispatcher
+        )
     }
 
     @AfterTest
     fun tearDown() {
         resetCalls()
         resetAnswers()
-        koin.unloadModules(listOf(testModules))
     }
 
     @Test
