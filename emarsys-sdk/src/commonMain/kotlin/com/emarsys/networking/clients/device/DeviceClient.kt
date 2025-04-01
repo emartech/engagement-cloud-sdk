@@ -8,7 +8,7 @@ import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.networking.clients.contact.ContactTokenHandlerApi
 import io.ktor.http.HttpMethod
 
-class DeviceClient(
+internal class DeviceClient(
     private val emarsysClient: NetworkClientApi,
     private val urlFactory: UrlFactoryApi,
     private val deviceInfoCollector: DeviceInfoCollectorApi,

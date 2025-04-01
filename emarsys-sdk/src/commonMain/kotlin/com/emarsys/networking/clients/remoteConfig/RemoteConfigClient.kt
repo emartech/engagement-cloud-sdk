@@ -16,7 +16,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 
-class RemoteConfigClient(
+internal class RemoteConfigClient(
     private val networkClient: NetworkClientApi,
     private val urlFactoryApi: UrlFactoryApi,
     private val crypto: CryptoApi,

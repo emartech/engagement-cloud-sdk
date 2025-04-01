@@ -8,7 +8,7 @@ import com.emarsys.networking.clients.push.model.PushToken
 import io.ktor.http.HttpMethod
 import kotlinx.serialization.json.Json
 
-class PushClient(
+internal class PushClient(
     private val emarsysClient: NetworkClientApi,
     private val urlFactory: UrlFactoryApi,
     private val json: Json
