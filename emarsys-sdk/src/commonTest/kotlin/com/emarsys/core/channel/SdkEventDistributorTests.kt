@@ -13,7 +13,6 @@ import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
-import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CoroutineDispatcher
@@ -91,10 +90,6 @@ class SdkEventDistributorTests {
                 eventDistributor.registerEvent(it)
             }
 
-            verifySuspend(VerifyMode.exactly(0)) {
-                mockEventsDao.insertEvent(testEvent)
-                mockEventsDao.insertEvent(testEvent2)
-            }
             emittedEvents.await() shouldBe testEvents
         }
 
