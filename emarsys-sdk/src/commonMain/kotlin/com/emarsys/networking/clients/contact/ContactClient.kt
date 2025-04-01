@@ -11,6 +11,7 @@ import com.emarsys.networking.EmarsysHeaders
 import com.emarsys.networking.clients.event.model.SdkEvent
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.isSuccess
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -46,8 +47,10 @@ internal class ContactClient(
                     val request = createUrlRequest(it)
                     val response = emarsysClient.send(request)
 
-                    if (response.status == HttpStatusCode.OK) {
-                        contactTokenHandler.handleContactTokens(response)
+                    if (response.status.isSuccess()) {
+                        if(response.status != HttpStatusCode.NoContent) {
+                            contactTokenHandler.handleContactTokens(response)
+                        }
                         sdkContext.contactFieldId =
                             it.attributes?.get("contactFieldId")?.jsonPrimitive?.content?.toInt()
                     }

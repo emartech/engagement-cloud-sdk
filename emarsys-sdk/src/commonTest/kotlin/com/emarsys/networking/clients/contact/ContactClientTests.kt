@@ -135,6 +135,31 @@ class ContactClientTests {
     }
 
     @Test
+    fun testConsumer_should_not_call_contactTokenHandler_when_client_responds_with_204() = runTest {
+        val requestSlot = slot<UrlRequest>()
+        everySuspend { mockEmarsysClient.send(capture(requestSlot)) }.returns(createTestResponse("{}", HttpStatusCode.NoContent))
+        every { mockConfig.merchantId } returns MERCHANT_ID
+        val linkContact = SdkEvent.Internal.Sdk.LinkContact(
+            "linkContact",
+            attributes = buildJsonObject {
+                put("contactFieldId", JsonPrimitive(CONTACT_FIELD_ID))
+                put("contactFieldValue", JsonPrimitive(CONTACT_FIELD_VALUE))
+            })
+
+        sdkEventFlow.emit(linkContact)
+
+        advanceUntilIdle()
+
+        verify { mockUrlFactory.create(any()) }
+        verifySuspend { mockEmarsysClient.send(any()) }
+        verifySuspend(VerifyMode.exactly(0)) { mockContactTokenHandler.handleContactTokens(any()) }
+        verifySuspend { mockSdkContext.contactFieldId = CONTACT_FIELD_ID }
+
+        val request = requestSlot.get()
+        request.headers?.containsValue(MERCHANT_ID) shouldBe true
+    }
+
+    @Test
     fun testConsumer_should_call_client_with_linkAuthenticatedContact_request() = runTest {
         val requestSlot = slot<UrlRequest>()
         everySuspend { mockEmarsysClient.send(capture(requestSlot)) }.returns(createTestResponse("{}"))
