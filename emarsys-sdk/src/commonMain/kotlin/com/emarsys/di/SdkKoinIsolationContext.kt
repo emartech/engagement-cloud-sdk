@@ -20,7 +20,6 @@ object SdkKoinIsolationContext {
             InitInjection.initModules,
             SetupInjection.setupModules,
             CoreInjection.coreModules,
-            PlatformInjection.platformModules,
             NetworkInjection.networkModules,
             RemoteConfigInjection.remoteConfigModules,
             ConfigInjection.configModules,

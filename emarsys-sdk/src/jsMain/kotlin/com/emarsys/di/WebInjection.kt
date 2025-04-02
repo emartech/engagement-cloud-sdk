@@ -183,7 +183,11 @@ object WebInjection {
         single<ClipboardHandlerApi> { WebClipboardHandler(window.navigator.clipboard) }
         single<LaunchApplicationHandlerApi> { JsLaunchApplicationHandler() }
         single<LanguageTagValidatorApi> { WebLanguageTagValidator() }
-        single<SdkConfigStoreApi<JsEmarsysConfig>> { JsEmarsysConfigStore(typedStorage = get()) }
+        single<SdkConfigStoreApi<JsEmarsysConfig>>(named(SdkConfigStoreTypes.Web)) {
+            JsEmarsysConfigStore(
+                typedStorage = get()
+            )
+        }
         single<PushInstance>(named(InstanceType.Internal)) {
             PushInternal(
                 pushClient = get(),

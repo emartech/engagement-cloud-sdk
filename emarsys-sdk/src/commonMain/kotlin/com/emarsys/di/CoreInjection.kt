@@ -125,17 +125,6 @@ object CoreInjection {
                 install(HttpRequestRetry)
             }
         }
-        single<DependencyCreator> {
-            PlatformDependencyCreator(
-                sdkContext = get(),
-                uuidProvider = get(),
-                sdkLogger = get<Logger> { parametersOf(PlatformDependencyCreator::class.simpleName) },
-                json = get(),
-                sdkEventFlow = get<MutableSharedFlow<SdkEvent>>(named(EventFlowTypes.InternalEventFlow)),
-                actionHandler = get(),
-                timestampProvider = get()
-            )
-        }
         single<DownloaderApi> {
             Downloader(
                 client = get<HttpClient>(),
