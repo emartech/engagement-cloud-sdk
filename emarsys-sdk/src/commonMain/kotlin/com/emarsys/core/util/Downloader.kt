@@ -4,7 +4,7 @@ import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.log.Logger
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
-import io.ktor.client.statement.readBytes
+import io.ktor.client.statement.readRawBytes
 import io.ktor.http.Url
 import io.ktor.http.isSuccess
 
@@ -30,7 +30,7 @@ class Downloader(
     private suspend fun downloadAndCache(url: Url, fileName: String): ByteArray? {
         val response = client.get(url)
         return if (response.status.isSuccess()) {
-            val result = response.readBytes()
+            val result = response.readRawBytes()
             fileCache.cache(fileName, result)
             result
         } else {

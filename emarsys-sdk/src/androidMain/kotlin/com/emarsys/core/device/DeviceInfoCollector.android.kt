@@ -15,6 +15,7 @@ import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.wrapper.WrapperInfo
 import kotlinx.serialization.json.Json
 
+@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 internal actual class DeviceInfoCollector(
     private val timezoneProvider: TimezoneProviderApi,
     private val languageProvider: LanguageProviderApi,

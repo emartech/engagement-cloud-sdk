@@ -2,7 +2,6 @@ package com.emarsys.mobileengage.inapp.providers
 
 import io.kotest.matchers.shouldBe
 import platform.UIKit.UIColor
-import platform.UIKit.UIViewController
 import kotlin.test.Test
 
 class ViewControllerProviderTests {
@@ -14,7 +13,6 @@ class ViewControllerProviderTests {
 
         val viewController = provider.provide()
 
-        (viewController is UIViewController) shouldBe true
         viewController.view.backgroundColor shouldBe UIColor.clearColor
     }
 }

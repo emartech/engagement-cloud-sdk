@@ -50,7 +50,7 @@ fun Map<String, Any>.toBasicPushUserInfo(json: Json): BasicPushUserInfo {
     }
 }
 
-@OptIn(ExperimentalForeignApi::class)
+@OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 private fun extractJsonObject(userInfo: Map<String, Any>, key: String, json: Json): JsonObject? {
     return userInfo[key]?.let { extractedMap ->
         NSJSONSerialization.dataWithJSONObject(extractedMap, NSJSONWritingPrettyPrinted, null)

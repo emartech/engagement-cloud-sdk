@@ -29,6 +29,7 @@ import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
+import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -122,7 +123,7 @@ internal class IosPushInternal(
         }
     }
 
-    @OptIn(ExperimentalForeignApi::class)
+    @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
     private fun Map<String, Any>.toPresentableUserInfo(): PresentablePushUserInfo {
         val emsJson = extractJsonObject(this, "ems")
         return if (emsJson != null && emsJson.keys.contains("version")) {
@@ -158,7 +159,7 @@ internal class IosPushInternal(
         }
     }
 
-    @OptIn(ExperimentalForeignApi::class)
+    @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
     private fun extractJsonObject(userInfo: Map<String, Any>, key: String): JsonObject? {
         return userInfo[key]?.let { extractedMap ->
             NSJSONSerialization.dataWithJSONObject(extractedMap, NSJSONWritingPrettyPrinted, null)

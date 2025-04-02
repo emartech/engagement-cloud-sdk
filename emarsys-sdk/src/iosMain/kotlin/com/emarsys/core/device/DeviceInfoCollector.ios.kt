@@ -19,6 +19,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.experimental.ExperimentalNativeApi
 
+@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 internal actual class DeviceInfoCollector(
     private val clientIdProvider: Provider<String>,
     private val applicationVersionProvider: ApplicationVersionProviderApi,

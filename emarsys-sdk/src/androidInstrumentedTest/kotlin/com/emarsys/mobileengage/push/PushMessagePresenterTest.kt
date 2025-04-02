@@ -268,7 +268,8 @@ class PushMessagePresenterTest {
     @Test
     fun present_shouldShowNotification_withCorrectData_withDismissActionModel_filledWithId() =
         runTest {
-            val dismissActionModelSpy = spyk(PresentableDismissActionModel("dismissId", "Dismiss", null))
+            val dismissActionModelSpy =
+                spyk(PresentableDismissActionModel("dismissId", "Dismiss", null))
             val testMessage = createTestMessage(
                 listOf(dismissActionModelSpy),
                 testDefaultTapAction,
