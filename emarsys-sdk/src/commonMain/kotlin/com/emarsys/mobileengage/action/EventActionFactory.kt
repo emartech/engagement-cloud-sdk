@@ -1,6 +1,7 @@
 package com.emarsys.mobileengage.action
 
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
@@ -21,11 +22,8 @@ import com.emarsys.mobileengage.action.models.OpenExternalUrlActionModel
 import com.emarsys.mobileengage.action.models.ReportingActionModel
 import com.emarsys.mobileengage.action.models.RequestPushPermissionActionModel
 
-import com.emarsys.networking.clients.event.model.SdkEvent
-import kotlinx.coroutines.flow.MutableSharedFlow
-
 internal class EventActionFactory(
-    private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
+    private val sdkEventDistributor: SdkEventDistributorApi,
     private val permissionHandler: PermissionHandlerApi,
     private val externalUrlOpener: ExternalUrlOpenerApi,
     private val clipboardHandler: ClipboardHandlerApi,
@@ -33,16 +31,16 @@ internal class EventActionFactory(
 ) : EventActionFactoryApi {
     override suspend fun create(action: ActionModel): Action<*> {
         return when (action) {
-            is AppEventActionModel -> AppEventAction(action, sdkEventFlow)
-            is CustomEventActionModel -> CustomEventAction(action, sdkEventFlow)
+            is AppEventActionModel -> AppEventAction(action, sdkEventDistributor)
+            is CustomEventActionModel -> CustomEventAction(action, sdkEventDistributor)
             is RequestPushPermissionActionModel -> RequestPushPermissionAction(
                 action,
                 permissionHandler
             )
 
-            is DismissActionModel -> DismissAction(action, sdkEventFlow)
+            is DismissActionModel -> DismissAction(action, sdkEventDistributor)
             is OpenExternalUrlActionModel -> OpenExternalUrlAction(action, externalUrlOpener)
-            is ReportingActionModel -> ReportingAction(action, sdkEventFlow)
+            is ReportingActionModel -> ReportingAction(action, sdkEventDistributor)
             is CopyToClipboardActionModel -> CopyToClipboardAction(action, clipboardHandler)
             else -> {
                 val exception = IllegalArgumentException("Unknown action type: $action")

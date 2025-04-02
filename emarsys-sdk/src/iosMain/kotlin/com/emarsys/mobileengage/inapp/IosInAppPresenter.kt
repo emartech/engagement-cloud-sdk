@@ -1,10 +1,10 @@
 package com.emarsys.mobileengage.inapp
 
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.mobileengage.inapp.providers.WindowProvider
 import com.emarsys.networking.clients.event.model.SdkEvent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -22,7 +22,7 @@ internal class IosInAppPresenter(
     private val windowProvider: WindowProvider,
     private val mainDispatcher: CoroutineDispatcher,
     private val sdkDispatcher: CoroutineDispatcher,
-    private val sdkEventFlow: MutableSharedFlow<SdkEvent>
+    private val sdkEventDistributor: SdkEventDistributorApi
 ) : InAppPresenterApi {
     override suspend fun present(
         inAppView: InAppViewApi,
@@ -42,7 +42,7 @@ internal class IosInAppPresenter(
             originalWindow
         }
         CoroutineScope(sdkDispatcher).launch {
-            sdkEventFlow.first { it is SdkEvent.Internal.Sdk.Dismiss && it.id == inAppView.inAppMessage.campaignId }
+            sdkEventDistributor.sdkEventFlow.first { it is SdkEvent.Internal.Sdk.Dismiss && it.id == inAppView.inAppMessage.campaignId }
 
             withContext(mainDispatcher) {
                 window.removeFromSuperview()

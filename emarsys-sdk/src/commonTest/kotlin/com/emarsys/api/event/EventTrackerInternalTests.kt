@@ -1,12 +1,12 @@
 package com.emarsys.api.event
 
 import com.emarsys.api.event.model.CustomEvent
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.Logger
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
-import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -44,7 +44,7 @@ class EventTrackerInternalTests {
         val expectedEvents: MutableList<EventTrackerCall> = mutableListOf(trackEvent, trackEvent2)
     }
 
-    private lateinit var mockEventClient: EventClientApi
+    private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
     private lateinit var mockTimestampProvider: InstantProvider
     private lateinit var mockUuidProvider: UuidProviderApi
     private lateinit var eventTrackerInternal: EventTrackerInstance
@@ -53,7 +53,7 @@ class EventTrackerInternalTests {
 
     @BeforeTest
     fun setUp() {
-        mockEventClient = mock()
+        mockSdkEventDistributor = mock()
         mockTimestampProvider = mock()
         mockUuidProvider = mock()
         every { mockUuidProvider.provide() } returns UUID
@@ -63,7 +63,7 @@ class EventTrackerInternalTests {
 
         eventTrackerInternal =
             EventTrackerInternal(
-                mockEventClient,
+                mockSdkEventDistributor,
                 eventTrackerContext,
                 mockTimestampProvider,
                 mockUuidProvider,
@@ -73,27 +73,27 @@ class EventTrackerInternalTests {
 
     @Test
     fun testTrackEvent_shouldMakeCall_onClient() = runTest {
-        everySuspend { mockEventClient.registerEvent(event) } returns Unit
+        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(event) } returns Unit
         everySuspend { mockTimestampProvider.provide() } returns timestamp
 
         eventTrackerInternal.trackEvent(customEvent)
 
         verifySuspend {
             mockTimestampProvider.provide()
-            mockEventClient.registerEvent(event)
+            mockSdkEventDistributor.registerAndStoreEvent(event)
         }
     }
 
     @Test
     fun testActivate_should_send_calls_to_client() = runTest {
-        everySuspend { mockEventClient.registerEvent(event) } returns Unit
-        everySuspend { mockEventClient.registerEvent(event2) } returns Unit
+        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(event) } returns Unit
+        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(event2) } returns Unit
 
         eventTrackerInternal.activate()
 
         verifySuspend {
-            mockEventClient.registerEvent(event)
-            mockEventClient.registerEvent(event2)
+            mockSdkEventDistributor.registerAndStoreEvent(event)
+            mockSdkEventDistributor.registerAndStoreEvent(event2)
         }
     }
 }

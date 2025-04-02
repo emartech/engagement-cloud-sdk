@@ -1,12 +1,12 @@
 package com.emarsys.networking.clients.contact
 
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
-import com.emarsys.di.SdkComponent
 import com.emarsys.networking.EmarsysHeaders
 import com.emarsys.networking.clients.event.model.SdkEvent
 import io.ktor.http.HttpMethod
@@ -14,7 +14,6 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
@@ -23,14 +22,14 @@ import kotlinx.serialization.json.jsonPrimitive
 
 internal class ContactClient(
     private val emarsysClient: NetworkClientApi,
-    private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
+    private val sdkEventDistributor: SdkEventDistributorApi,
     private val urlFactory: UrlFactoryApi,
     private val sdkContext: SdkContextApi,
     private val contactTokenHandler: ContactTokenHandlerApi,
     private val json: Json,
     private val sdkLogger: Logger,
     sdkDispatcher: CoroutineDispatcher
-) : SdkComponent {
+) {
 
     init {
         CoroutineScope(sdkDispatcher).launch {
@@ -39,7 +38,7 @@ internal class ContactClient(
     }
 
     private suspend fun startEventConsumer() {
-        sdkEventFlow
+        sdkEventDistributor.onlineEvents
             .filter { isContactEvent(it) }
             .collect {
                 try {

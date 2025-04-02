@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.watchdog.activity.TransitionSafeCurrentActivityWatchdog
 import io.mockk.Called
@@ -17,6 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -28,6 +30,7 @@ import kotlin.test.AfterTest
 class InAppPresenterTests {
 
     private lateinit var mockCurrentActivityWatchdog: TransitionSafeCurrentActivityWatchdog
+    private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
     private lateinit var sdkEventFlow: MutableSharedFlow<SdkEvent>
 
     private lateinit var inAppPresenter: InAppPresenterApi
@@ -36,16 +39,18 @@ class InAppPresenterTests {
     @Before
     fun setup() {
         val mainDispatcher = StandardTestDispatcher()
-        val sdkDispatcher = StandardTestDispatcher()
         Dispatchers.setMain(mainDispatcher)
+        val sdkDispatcher = StandardTestDispatcher()
         mockCurrentActivityWatchdog = mockk<TransitionSafeCurrentActivityWatchdog>()
-        sdkEventFlow = MutableSharedFlow(replay = 10)
+        mockSdkEventDistributor = mockk(relaxed = true)
+        sdkEventFlow = MutableSharedFlow()
+        every { mockSdkEventDistributor.sdkEventFlow } returns sdkEventFlow
         inAppPresenter = InAppPresenter(
             mockCurrentActivityWatchdog,
             mainDispatcher,
             sdkDispatcher,
-            sdkEventFlow,
-            mockk()
+            mockSdkEventDistributor,
+            logger = mockk(relaxed = true)
         )
     }
 
@@ -57,6 +62,7 @@ class InAppPresenterTests {
     @Test
     fun present_shouldAddInAppDialog_inFragmentTransaction_whenFragmentManagerIsAvailable() =
         runTest {
+            val testId = "testId"
             val mockFragmentTransaction = mockk<FragmentTransaction>(relaxed = true)
             val mockFragmentManager = mockk<FragmentManager>(relaxed = true) {
                 every { beginTransaction() } returns mockFragmentTransaction
@@ -68,7 +74,12 @@ class InAppPresenterTests {
             val mockView = mockk<InAppView>()
             val mockWebViewHolder = mockk<WebViewHolder>()
             coEvery { mockView.load(any()) } returns mockWebViewHolder
+            every { mockView.inAppMessage } returns
+                    mockk<InAppMessage>(relaxed = true) {
+                        every { campaignId } returns testId
+                    }
             inAppPresenter.present(mockView, mockWebViewHolder, InAppPresentationMode.Overlay)
+            advanceUntilIdle()
 
             verify { mockFragmentManager.beginTransaction() }
             verify { mockFragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN) }

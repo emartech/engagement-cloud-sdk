@@ -42,7 +42,7 @@ object ConfigInjection {
         }
         single<ConfigInstance>(named(InstanceType.Internal)) {
             ConfigInternal(
-                sdkEventFlow = get(named(EventFlowTypes.InternalEventFlow)),
+                sdkEventDistributor = get(),
                 uuidProvider = get(),
                 timestampProvider = get(),
                 sdkLogger = get { parametersOf(ConfigInternal::class.simpleName) },
@@ -53,7 +53,7 @@ object ConfigInjection {
             LanguageHandler(
                 stringStorage = get(),
                 languageTagValidator = get(),
-                sdkEvents = get(named(EventFlowTypes.InternalEventFlow)),
+                sdkEventDistributor = get(),
                 logger = get { parametersOf(LanguageHandler::class.simpleName) }
             )
         }

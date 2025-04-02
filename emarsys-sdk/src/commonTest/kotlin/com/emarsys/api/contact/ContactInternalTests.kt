@@ -1,5 +1,6 @@
 package com.emarsys.api.contact
 
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -10,11 +11,9 @@ import dev.mokkery.matcher.capture.SlotCapture
 import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
-import dev.mokkery.spy
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.jsonPrimitive
 import kotlin.test.BeforeTest
@@ -33,26 +32,25 @@ class ContactInternalTests {
     }
 
     private lateinit var contactContext: ContactContextApi
-    private lateinit var sdkEventFlow: MutableSharedFlow<SdkEvent>
+    private lateinit var sdkEventDistributor: SdkEventDistributorApi
     private lateinit var eventSlot: SlotCapture<SdkEvent>
     private lateinit var contactInternal: ContactInstance
 
     @BeforeTest
     fun setUp() {
+        eventSlot = slot()
         contactContext = ContactContext(calls)
-        eventSlot = slot<SdkEvent>()
-        sdkEventFlow = spy(MutableSharedFlow(replay = 5))
-        everySuspend { sdkEventFlow.emit(capture(eventSlot)) } returns Unit
+        sdkEventDistributor = mock(MockMode.autofill)
+        everySuspend { sdkEventDistributor.registerAndStoreEvent(capture(eventSlot)) } returns Unit
         contactInternal = ContactInternal(
             contactContext,
             sdkLogger = mock(MockMode.autofill),
-            sdkEventFlow
+            sdkEventDistributor
         )
     }
 
     @Test
     fun testLinkContact_should_emit_linkContact_event_into_sdkFlow() = runTest {
-
         contactInternal.linkContact(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE)
 
         val emitted = eventSlot.get()
@@ -64,7 +62,6 @@ class ContactInternalTests {
     @Test
     fun testLinkAuthenticatedContact_should_emit_linkAuthenticatedContact_event_into_sdkFlow() =
         runTest {
-
             contactInternal.linkAuthenticatedContact(CONTACT_FIELD_ID, OPEN_ID_TOKEN)
 
             val emitted = eventSlot.get()
@@ -88,7 +85,7 @@ class ContactInternalTests {
     fun testActivate_should_emit_stored_calls_as_events_to_event_flow() = runTest {
         contactInternal.activate()
 
-        verifySuspend(VerifyMode.exactly(3)) { sdkEventFlow.emit(any()) }
+        verifySuspend(VerifyMode.exactly(3)) { sdkEventDistributor.registerAndStoreEvent(any()) }
 
         contactContext.calls.size shouldBe 0
     }

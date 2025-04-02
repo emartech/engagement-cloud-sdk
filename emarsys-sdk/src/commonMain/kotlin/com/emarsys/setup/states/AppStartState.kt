@@ -1,14 +1,14 @@
 package com.emarsys.setup.states
 
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.state.State
-import com.emarsys.networking.clients.event.EventClientApi
 
 import com.emarsys.networking.clients.event.model.SdkEvent
 
 internal class AppStartState(
-    private val eventClient: EventClientApi,
+    private val sdkEventDistributor: SdkEventDistributorApi,
     private val timestampProvider: InstantProvider,
     private val uuidProvider: UuidProviderApi
 ) : State {
@@ -24,7 +24,7 @@ internal class AppStartState(
                 id = uuidProvider.provide(),
                 timestamp = timestampProvider.provide()
             )
-            eventClient.registerEvent(appStartEvent)
+            sdkEventDistributor.registerAndStoreEvent(appStartEvent)
             alreadyCompleted = true
         }
     }

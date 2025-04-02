@@ -1,5 +1,6 @@
 package com.emarsys.networking.clients.deeplink
 
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.UserAgentProviderApi
 import com.emarsys.core.networking.clients.NetworkClientApi
@@ -19,7 +20,6 @@ import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.resetAnswers
 import dev.mokkery.resetCalls
-import dev.mokkery.spy
 import dev.mokkery.verify
 import dev.mokkery.verifySuspend
 import io.ktor.http.Headers
@@ -60,7 +60,8 @@ class DeepLinkClientTests {
     private lateinit var mockLogger: Logger
     private lateinit var mockUserAgentProvider: UserAgentProviderApi
     private lateinit var json: Json
-    private lateinit var sdkEventFlow: MutableSharedFlow<SdkEvent>
+    private lateinit var onlineEvents: MutableSharedFlow<SdkEvent>
+    private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
 
     @BeforeTest
     fun setUp() {
@@ -70,7 +71,9 @@ class DeepLinkClientTests {
         mockLogger = mock(MockMode.autofill)
         mockUserAgentProvider = mock(MockMode.autofill)
         json = JsonUtil.json
-        sdkEventFlow = spy(MutableSharedFlow(replay = 5))
+        mockSdkEventDistributor = mock()
+        onlineEvents = MutableSharedFlow(replay = 5)
+        everySuspend { mockSdkEventDistributor.onlineEvents } returns onlineEvents
         everySuspend { mockUserAgentProvider.provide() } returns TEST_USER_AGENT
         every { mockUrlFactory.create(EmarsysUrlType.DEEP_LINK, null) } returns TEST_BASE_URL
         everySuspend { mockLogger.error(any(), any<Throwable>()) } calls {
@@ -80,7 +83,7 @@ class DeepLinkClientTests {
 
         DeepLinkClient(
             mockNetworkClient,
-            sdkEventFlow,
+            mockSdkEventDistributor,
             mockUrlFactory,
             mockUserAgentProvider,
             json,
@@ -111,7 +114,7 @@ class DeepLinkClientTests {
                 put("trackingId", JsonPrimitive(TRACKING_ID))
             })
 
-        sdkEventFlow.emit(trackDeepLink)
+        onlineEvents.emit(trackDeepLink)
 
         advanceUntilIdle()
 

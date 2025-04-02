@@ -1,6 +1,7 @@
 package com.emarsys.mobileengage.session
 
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.lifecycle.LifecycleEvent
 import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.Logger
@@ -8,7 +9,6 @@ import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.session.SessionId
-import com.emarsys.networking.clients.event.EventClientApi
 
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
@@ -24,7 +24,7 @@ internal class MobileEngageSession(
     private val uuidProvider: UuidProviderApi,
     private val sessionContext: SessionContext,
     private val sdkContext: SdkContextApi,
-    private val eventClient: EventClientApi,
+    private val sdkEventDistributor: SdkEventDistributorApi,
     private val sdkDispatcher: CoroutineDispatcher,
     private val sdkLogger: Logger
 ) : Session {
@@ -46,7 +46,7 @@ internal class MobileEngageSession(
         if (canStartSession()) {
             val sessionStart = timestampProvider.provide()
             try {
-                eventClient.registerEvent(
+                sdkEventDistributor.registerAndStoreEvent(
                     SdkEvent.Internal.Sdk.SessionStart(
                         id = uuidProvider.provide(),
                         timestamp = sessionStart
@@ -78,7 +78,7 @@ internal class MobileEngageSession(
         if (canEndSession()) {
             return try {
                 val event = createSessionEndEvent()
-                eventClient.registerEvent(event)
+                sdkEventDistributor.registerAndStoreEvent(event)
             } catch (exception: Exception) {
                 sdkLogger.error(
                     LogEntry(

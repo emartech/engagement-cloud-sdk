@@ -1,9 +1,8 @@
 package com.emarsys.api.geofence
 
-import com.emarsys.di.SdkComponent
 import kotlinx.serialization.Serializable
 
-internal class GeofenceTrackerContext(override val calls: MutableList<GeofenceTrackerCall>) : GeofenceContextApi, SdkComponent
+internal class GeofenceTrackerContext(override val calls: MutableList<GeofenceTrackerCall>) : GeofenceContextApi
 
 @Serializable
 sealed interface GeofenceTrackerCall {

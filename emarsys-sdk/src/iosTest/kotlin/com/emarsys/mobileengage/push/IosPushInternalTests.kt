@@ -12,6 +12,7 @@ import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.actions.badge.BadgeCountHandlerApi
 import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
@@ -42,7 +43,6 @@ import dev.mokkery.verifySuspend
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -93,7 +93,7 @@ internal class IosPushInternalTests {
     private lateinit var mockBadgeCountHandler: BadgeCountHandlerApi
     private lateinit var json: Json
     private lateinit var sdkDispatcher: CoroutineDispatcher
-    private lateinit var mockSdkEventFlow: MutableSharedFlow<SdkEvent>
+    private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
     private lateinit var mockSdkLogger: Logger
     private lateinit var mockTimestampProvider: InstantProvider
     private lateinit var mockUuidProvider: UuidProviderApi
@@ -113,7 +113,7 @@ internal class IosPushInternalTests {
         mockTimestampProvider = mock()
         mockUuidProvider = mock()
         sdkDispatcher = dispatcher
-        mockSdkEventFlow = mock()
+        mockSdkEventDistributor = mock()
         mockSdkLogger = mock(MockMode.autofill)
         everySuspend { mockActionHandler.handleActions(any(), any()) } returns Unit
         everySuspend { mockTimestampProvider.provide() } returns Instant.DISTANT_PAST
@@ -131,7 +131,7 @@ internal class IosPushInternalTests {
             json,
             sdkDispatcher,
             mockSdkLogger,
-            mockSdkEventFlow,
+            mockSdkEventDistributor,
             mockTimestampProvider,
             mockUuidProvider
         )
@@ -487,7 +487,7 @@ internal class IosPushInternalTests {
         val appEventActionModel = BasicAppEventActionModel("name", mapOf("key" to "value"))
         val mockOpenExternalUrlAction: Action<*> = mock()
         val mockAppEventAction: Action<*> = mock()
-        everySuspend { mockSdkEventFlow.emit(any()) } returns Unit
+        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(any()) } returns Unit
 
         everySuspend { mockOpenExternalUrlAction.invoke() } returns Unit
         everySuspend { mockAppEventAction.invoke() } returns Unit
@@ -519,13 +519,13 @@ internal class IosPushInternalTests {
             )
         )
         everySuspend { mockActionFactory.create(openExternalUrlActionModel) } returns mockOpenExternalUrlAction
-        everySuspend { mockSdkEventFlow.emit(any()) } returns Unit
+        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(any()) } returns Unit
 
         iosPushInternal.handleSilentMessageWithUserInfo(userInfo)
 
         verifySuspend { mockOpenExternalUrlAction.invoke() }
         verifySuspend {
-            mockSdkEventFlow.emit(
+            mockSdkEventDistributor.registerAndStoreEvent(
                 SdkEvent.External.Api.SilentPush(
                     id = UUID,
                     name = PUSH_RECEIVED_EVENT_NAME,
@@ -540,7 +540,7 @@ internal class IosPushInternalTests {
     fun `testActivate should handle pushCalls`() = runTest {
         everySuspend { mockPushClient.registerPushToken(any()) } returns Unit
         everySuspend { mockPushClient.clearPushToken() } returns Unit
-        everySuspend { mockSdkEventFlow.emit(any()) } returns Unit
+        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(any()) } returns Unit
 
         iosPushInternal.activate()
 
@@ -549,7 +549,7 @@ internal class IosPushInternalTests {
         verifySuspend { mockPushClient.registerPushToken(PUSH_TOKEN) }
         verifySuspend { mockPushClient.clearPushToken() }
         verifySuspend {
-            mockSdkEventFlow.emit(
+            mockSdkEventDistributor.registerAndStoreEvent(
                 SdkEvent.External.Api.SilentPush(
                     id = UUID,
                     name = PUSH_RECEIVED_EVENT_NAME,

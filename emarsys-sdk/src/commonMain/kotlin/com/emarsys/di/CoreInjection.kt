@@ -4,9 +4,10 @@ import com.emarsys.context.DefaultUrls
 import com.emarsys.context.DefaultUrlsApi
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
-import com.emarsys.core.SdkEventEmitterApi
 import com.emarsys.core.channel.SdkEventDistributor
 import com.emarsys.core.channel.SdkEventDistributorApi
+import com.emarsys.core.channel.SdkEventEmitterApi
+import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.crypto.Crypto
 import com.emarsys.core.crypto.CryptoApi
 import com.emarsys.core.log.ConsoleLogger
@@ -36,7 +37,6 @@ import com.emarsys.mobileengage.action.EventActionFactory
 import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.inapp.InAppDownloader
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
-import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.util.JsonUtil
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import io.ktor.client.HttpClient
@@ -45,13 +45,12 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.Json
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
+import org.koin.dsl.binds
 import org.koin.dsl.module
 
 object CoreInjection {
@@ -73,12 +72,6 @@ object CoreInjection {
                 sdkLogger = get { parametersOf(TypedStorage::class.simpleName) }
             )
         }
-        single<MutableSharedFlow<SdkEvent>>(named(EventFlowTypes.InternalEventFlow)) {
-            MutableSharedFlow<SdkEvent>(
-                replay = 100,
-                extraBufferCapacity = Channel.UNLIMITED
-            )
-        }
         single<Json> { JsonUtil.json }
         singleOf(::Storage) { bind<StorageApi>() }
         singleOf(::UserAgentProvider) { bind<UserAgentProviderApi>() }
@@ -95,19 +88,16 @@ object CoreInjection {
         }
         single<SdkEventDistributor> {
             SdkEventDistributor(
-                sdkEventFlow = get<MutableSharedFlow<SdkEvent>>(named(EventFlowTypes.InternalEventFlow)),
                 get<ConnectionWatchDog>().isOnline,
                 sdkContext = get(),
                 eventsDao = get(),
-                sdkLogger = get<Logger> { parametersOf(SdkEventDistributor::class.simpleName) },
+                sdkLogger = get { parametersOf(SdkEventDistributor::class.simpleName) },
             )
-        }
-        single<SdkEventEmitterApi> {
-            get<SdkEventDistributor>()
-        }
-        single<SdkEventDistributorApi> {
-            get<SdkEventDistributor>()
-        }
+        } binds arrayOf(
+            SdkEventDistributorApi::class,
+            SdkEventEmitterApi::class,
+            SdkEventManagerApi::class
+        )
         single<SdkContextApi> {
             SdkContext(
                 sdkDispatcher = get(named(DispatcherTypes.Sdk)),
@@ -135,7 +125,7 @@ object CoreInjection {
         singleOf(::InAppDownloader) { bind<InAppDownloaderApi>() }
         single<EventActionFactoryApi> {
             EventActionFactory(
-                sdkEventFlow = get<MutableSharedFlow<SdkEvent>>(named(EventFlowTypes.InternalEventFlow)),
+                sdkEventDistributor = get(),
                 permissionHandler = get(),
                 externalUrlOpener = get(),
                 clipboardHandler = get(),
@@ -166,7 +156,7 @@ enum class NetworkClientTypes {
 }
 
 enum class EventFlowTypes {
-    InternalEventFlow, Public
+    Public
 }
 
 enum class SdkConfigStoreTypes {

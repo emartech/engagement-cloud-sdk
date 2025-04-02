@@ -133,7 +133,7 @@ object WebInjection {
                 onBadgeCountUpdateReceivedBroadcastChannel = BroadcastChannel(
                     WEB_PUSH_ON_BADGE_COUNT_UPDATE_RECEIVED
                 ),
-                sdkEventFlow = get(named(EventFlowTypes.InternalEventFlow)),
+                sdkEventDistributor = get(),
                 coroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob()),
                 sdkLogger = get { parametersOf(WebBadgeCountHandler::class.simpleName) }
 
@@ -176,7 +176,7 @@ object WebInjection {
         }
         single<InAppPresenterApi> {
             WebInAppPresenter(
-                sdkEventFlow = get(named(EventFlowTypes.InternalEventFlow)),
+                sdkEventDistributor = get(),
                 sdkDispatcher = get(named(DispatcherTypes.Sdk))
             )
         }

@@ -1,6 +1,6 @@
 package com.emarsys.di
 
-import com.emarsys.core.SdkEventEmitterApi
+import com.emarsys.core.channel.SdkEventEmitterApi
 import com.emarsys.core.state.State
 import com.emarsys.core.state.StateMachine
 import com.emarsys.core.state.StateMachineApi
@@ -49,7 +49,7 @@ object SetupInjection {
         }
         single<State>(named(StateTypes.AppStart)) {
             AppStartState(
-                eventClient = get(),
+                sdkEventDistributor = get(),
                 timestampProvider = get(),
                 uuidProvider = get()
             )

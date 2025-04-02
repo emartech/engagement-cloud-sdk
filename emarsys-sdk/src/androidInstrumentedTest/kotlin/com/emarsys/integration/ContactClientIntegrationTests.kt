@@ -8,7 +8,6 @@ import com.emarsys.core.storage.StorageConstants
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import io.kotest.matchers.shouldNotBe
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.koin.core.Koin
@@ -18,7 +17,6 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class ContactClientIntegrationTests : KoinTest {
     override fun getKoin(): Koin = koin
 

@@ -9,13 +9,12 @@ import com.emarsys.api.event.EventTrackerGatherer
 import com.emarsys.api.event.EventTrackerInstance
 import com.emarsys.api.event.EventTrackerInternal
 import com.emarsys.api.event.LoggingEventTracker
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.collections.PersistentList
 import com.emarsys.mobileengage.session.MobileEngageSession
 import com.emarsys.mobileengage.session.Session
 import com.emarsys.networking.clients.event.model.SdkEvent
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -30,9 +29,11 @@ object EventInjection {
                 elements = listOf()
             )
         }
-        single<EventTrackerContextApi> { EventTrackerContext(
-            calls = get(named(PersistentListTypes.EventTrackerCall))
-        ) }
+        single<EventTrackerContextApi> {
+            EventTrackerContext(
+                calls = get(named(PersistentListTypes.EventTrackerCall))
+            )
+        }
         single<EventTrackerInstance>(named(InstanceType.Logging)) {
             LoggingEventTracker(
                 logger = get { parametersOf(LoggingEventTracker::class.simpleName) },
@@ -48,7 +49,7 @@ object EventInjection {
         }
         single<EventTrackerInstance>(named(InstanceType.Internal)) {
             EventTrackerInternal(
-                eventClient = get(),
+                sdkEventDistributor = get(),
                 eventTrackerContext = get(),
                 timestampProvider = get(),
                 uuidProvider = get(),
@@ -69,15 +70,13 @@ object EventInjection {
                 uuidProvider = get(),
                 sessionContext = get(),
                 sdkContext = get(),
-                eventClient = get(),
+                sdkEventDistributor = get(),
                 sdkDispatcher = get(named(DispatcherTypes.Sdk)),
                 sdkLogger = get { parametersOf(MobileEngageSession::class.simpleName) },
             )
         }
         single<SharedFlow<SdkEvent>>(named(EventFlowTypes.Public)) {
-            get<MutableSharedFlow<SdkEvent>>(
-                named(EventFlowTypes.InternalEventFlow)
-            ).asSharedFlow()
+            get<SdkEventDistributorApi>().sdkEventFlow
         }
     }
 }

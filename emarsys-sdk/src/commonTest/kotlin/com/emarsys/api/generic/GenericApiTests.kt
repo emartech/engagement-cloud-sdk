@@ -17,7 +17,6 @@ import dev.mokkery.MockMode
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -43,7 +42,8 @@ class GenericApiTests {
         mockSdkLogger = mock(MockMode.autofill)
         loggingContact = LoggingContact(mockSdkLogger)
         contactGatherer = ContactGatherer(contactContext, mockSdkLogger)
-        contactInternal = ContactInternal(contactContext, mockSdkLogger, MutableSharedFlow())
+        contactInternal =
+            ContactInternal(contactContext, mockSdkLogger, sdkEventDistributor = mock())
         sdkContext = SdkContext(
             StandardTestDispatcher(),
             mainDispatcher,

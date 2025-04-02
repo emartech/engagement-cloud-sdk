@@ -1,5 +1,6 @@
 package com.emarsys.networking
 
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
@@ -21,7 +22,6 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
@@ -34,7 +34,7 @@ internal class EmarsysClient(
     private val urlFactory: UrlFactoryApi,
     private val json: Json,
     private val sdkLogger: Logger,
-    private val sdkEventFlow: MutableSharedFlow<SdkEvent>
+    private val sdkEventDistributor: SdkEventDistributorApi
 ) : NetworkClientApi {
     private companion object {
         private const val MAX_RETRY_COUNT = 3
@@ -97,7 +97,7 @@ internal class EmarsysClient(
             "Received ${response.status.value} status code, mapped to ${event?.name ?: "unknown"} event",
         )
         event?.let {
-            sdkEventFlow.emit(event)
+            sdkEventDistributor.registerAndStoreEvent(event)
         }
     }
 

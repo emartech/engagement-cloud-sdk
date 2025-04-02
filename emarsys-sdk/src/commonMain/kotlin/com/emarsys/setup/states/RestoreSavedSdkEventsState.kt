@@ -1,6 +1,6 @@
 package com.emarsys.setup.states
 
-import com.emarsys.core.SdkEventEmitterApi
+import com.emarsys.core.channel.SdkEventEmitterApi
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.state.State

@@ -1,9 +1,8 @@
 package com.emarsys.core.storage
 
-import com.emarsys.di.SdkComponent
 import platform.Foundation.NSUserDefaults
 
-internal class StringStorage(private val userDefaults: NSUserDefaults): StringStorageApi, SdkComponent {
+internal class StringStorage(private val userDefaults: NSUserDefaults): StringStorageApi {
     override fun put(key: String, value: String?) {
         userDefaults.setObject(value, key)
     }

@@ -1,9 +1,8 @@
 package com.emarsys.api.contact
 
-import com.emarsys.di.SdkComponent
 import kotlinx.serialization.Serializable
 
-internal class ContactContext(override val calls: MutableList<ContactCall>) : ContactContextApi, SdkComponent
+internal class ContactContext(override val calls: MutableList<ContactCall>) : ContactContextApi
 
 @Serializable
 sealed interface ContactCall {

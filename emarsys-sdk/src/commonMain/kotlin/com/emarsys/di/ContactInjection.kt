@@ -28,7 +28,7 @@ object ContactInjection {
         single<ContactClient> {
             ContactClient(
                 emarsysClient = get(named(NetworkClientTypes.Emarsys)),
-                sdkEventFlow = get(named(EventFlowTypes.InternalEventFlow)),
+                sdkEventDistributor = get(),
                 urlFactory = get(),
                 sdkContext = get(),
                 contactTokenHandler = get(),
@@ -65,7 +65,7 @@ object ContactInjection {
             ContactInternal(
                 contactContext = get(),
                 sdkLogger = get { parametersOf(ContactInternal::class.simpleName) },
-                sdkEventFlow = get(named(EventFlowTypes.InternalEventFlow))
+                sdkEventDistributor = get()
             )
         }
         single<ContactApi> {

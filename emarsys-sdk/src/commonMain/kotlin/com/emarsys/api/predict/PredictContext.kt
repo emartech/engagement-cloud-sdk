@@ -4,11 +4,9 @@ import com.emarsys.api.predict.model.CartItem
 import com.emarsys.api.predict.model.Logic
 import com.emarsys.api.predict.model.Product
 import com.emarsys.api.predict.model.RecommendationFilter
-import com.emarsys.di.SdkComponent
 import kotlinx.serialization.Serializable
 
-internal class PredictContext(override val calls: MutableList<PredictCall>) : PredictContextApi,
-    SdkComponent
+internal class PredictContext(override val calls: MutableList<PredictCall>) : PredictContextApi
 
 @Serializable
 sealed interface PredictCall {

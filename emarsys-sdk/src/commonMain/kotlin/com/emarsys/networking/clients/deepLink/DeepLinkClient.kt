@@ -1,5 +1,6 @@
 package com.emarsys.networking.clients.deepLink
 
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.UserAgentProvider
 import com.emarsys.core.networking.UserAgentProviderApi
@@ -7,12 +8,10 @@ import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
-import com.emarsys.di.SdkComponent
 import com.emarsys.networking.clients.event.model.SdkEvent
 import io.ktor.http.HttpMethod
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
@@ -22,13 +21,13 @@ import kotlinx.serialization.json.jsonPrimitive
 
 internal class DeepLinkClient(
     private val networkClient: NetworkClientApi,
-    private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
+    private val sdkEventDistributor: SdkEventDistributorApi,
     private val urlFactory: UrlFactoryApi,
     private val userAgentProvider: UserAgentProviderApi,
     private val json: Json,
     private val sdkLogger: Logger,
     sdkDispatcher: CoroutineDispatcher,
-) : SdkComponent {
+) {
 
     init {
         CoroutineScope(sdkDispatcher).launch {
@@ -37,7 +36,7 @@ internal class DeepLinkClient(
     }
 
     private suspend fun startEventConsumer() {
-        sdkEventFlow
+        sdkEventDistributor.onlineEvents
             .filter { it is SdkEvent.Internal.Sdk.TrackDeepLink }
             .collect {
                 val trackingId = it.attributes?.get("trackingId")?.jsonPrimitive?.content

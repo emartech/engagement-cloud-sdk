@@ -2,6 +2,7 @@ package com.emarsys.networking.clients.contact
 
 import com.emarsys.SdkConfig
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
@@ -23,7 +24,6 @@ import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import dev.mokkery.resetAnswers
 import dev.mokkery.resetCalls
-import dev.mokkery.spy
 import dev.mokkery.verify
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
@@ -70,7 +70,8 @@ class ContactClientTests {
     private lateinit var mockLogger: Logger
     private lateinit var sessionContext: SessionContext
     private lateinit var json: Json
-    private lateinit var sdkEventFlow: MutableSharedFlow<SdkEvent>
+    private lateinit var onlineEvents: MutableSharedFlow<SdkEvent>
+    private lateinit var sdkEventDistributor: SdkEventDistributorApi
     private lateinit var sdkDispatcher: CoroutineDispatcher
 
     @BeforeTest
@@ -83,7 +84,9 @@ class ContactClientTests {
         mockLogger = mock(MockMode.autofill)
         sessionContext = SessionContext(refreshToken = "testRefreshToken")
         json = JsonUtil.json
-        sdkEventFlow = spy(MutableSharedFlow(replay = 5))
+        onlineEvents = MutableSharedFlow(replay = 5)
+        sdkEventDistributor = mock()
+        everySuspend { sdkEventDistributor.onlineEvents } returns onlineEvents
         sdkDispatcher = StandardTestDispatcher()
         every { mockSdkContext.config } returns mockConfig
         everySuspend { mockContactTokenHandler.handleContactTokens(any()) } returns Unit
@@ -99,7 +102,7 @@ class ContactClientTests {
 
         ContactClient(
             mockEmarsysClient,
-            sdkEventFlow,
+            sdkEventDistributor,
             mockUrlFactory,
             mockSdkContext,
             mockContactTokenHandler,
@@ -124,7 +127,7 @@ class ContactClientTests {
                 put("contactFieldValue", JsonPrimitive(CONTACT_FIELD_VALUE))
             })
 
-        sdkEventFlow.emit(linkContact)
+        onlineEvents.emit(linkContact)
 
         advanceUntilIdle()
 
@@ -137,7 +140,12 @@ class ContactClientTests {
     @Test
     fun testConsumer_should_not_call_contactTokenHandler_when_client_responds_with_204() = runTest {
         val requestSlot = slot<UrlRequest>()
-        everySuspend { mockEmarsysClient.send(capture(requestSlot)) }.returns(createTestResponse("{}", HttpStatusCode.NoContent))
+        everySuspend { mockEmarsysClient.send(capture(requestSlot)) }.returns(
+            createTestResponse(
+                "{}",
+                HttpStatusCode.NoContent
+            )
+        )
         every { mockConfig.merchantId } returns MERCHANT_ID
         val linkContact = SdkEvent.Internal.Sdk.LinkContact(
             "linkContact",
@@ -146,7 +154,7 @@ class ContactClientTests {
                 put("contactFieldValue", JsonPrimitive(CONTACT_FIELD_VALUE))
             })
 
-        sdkEventFlow.emit(linkContact)
+        onlineEvents.emit(linkContact)
 
         advanceUntilIdle()
 
@@ -171,7 +179,7 @@ class ContactClientTests {
                 put("openIdToken", JsonPrimitive(OPEN_ID_TOKEN))
             })
 
-        sdkEventFlow.emit(linkAuthenticatedContact)
+        onlineEvents.emit(linkAuthenticatedContact)
 
         advanceUntilIdle()
 
@@ -188,7 +196,7 @@ class ContactClientTests {
     fun testConsumer_should_call_client_with_unlinkContact_request() = runTest {
         val unlinkContact = SdkEvent.Internal.Sdk.UnlinkContact("unlinkContact")
 
-        sdkEventFlow.emit(unlinkContact)
+        onlineEvents.emit(unlinkContact)
 
         advanceUntilIdle()
 
@@ -204,7 +212,7 @@ class ContactClientTests {
             everySuspend { mockEmarsysClient.send(any()) } returns createTestResponse(statusCode = HttpStatusCode.BadRequest)
             val unlinkContact = SdkEvent.Internal.Sdk.UnlinkContact("unlinkContact")
 
-            sdkEventFlow.emit(unlinkContact)
+            onlineEvents.emit(unlinkContact)
 
             advanceUntilIdle()
 

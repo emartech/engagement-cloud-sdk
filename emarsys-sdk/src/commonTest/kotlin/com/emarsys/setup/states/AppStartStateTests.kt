@@ -1,8 +1,8 @@
 package com.emarsys.setup.states
 
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
-import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -19,32 +19,32 @@ class AppStartStateTests {
         const val UUID = "testUUID"
     }
 
-    private lateinit var mockEventClient: EventClientApi
+    private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
     private lateinit var mockTimestampProvider: InstantProvider
     private lateinit var mockUuidProvider: UuidProviderApi
     private lateinit var appStartState: AppStartState
 
     @BeforeTest
     fun setUp() {
-        mockEventClient = mock()
+        mockSdkEventDistributor = mock()
         mockTimestampProvider = mock()
         mockUuidProvider = mock()
         every { mockTimestampProvider.provide() } returns timestamp
         every { mockUuidProvider.provide() } returns UUID
 
-        appStartState = AppStartState(mockEventClient, mockTimestampProvider, mockUuidProvider)
+        appStartState = AppStartState(mockSdkEventDistributor, mockTimestampProvider, mockUuidProvider)
     }
 
     @Test
     fun testActivate_should_send_appStartEvent_with_eventClient_when_it_was_not_completed_yet() =
         runTest {
             val expectedEvent = SdkEvent.Internal.Sdk.AppStart(id = UUID, timestamp = timestamp)
-            everySuspend { mockEventClient.registerEvent(expectedEvent) } returns Unit
+            everySuspend { mockSdkEventDistributor.registerAndStoreEvent(expectedEvent) } returns Unit
 
             appStartState.active()
 
             everySuspend {
-                mockEventClient.registerEvent(expectedEvent)
+                mockSdkEventDistributor.registerAndStoreEvent(expectedEvent)
             }
         }
 
@@ -52,14 +52,14 @@ class AppStartStateTests {
     fun testActivate_should_not_send_appStartEvent_with_eventClient_when_it_was_already_completed_yet() =
         runTest {
             val expectedEvent = SdkEvent.Internal.Sdk.AppStart(id = UUID, timestamp = timestamp)
-            everySuspend { mockEventClient.registerEvent(expectedEvent) } returns Unit
+            everySuspend { mockSdkEventDistributor.registerAndStoreEvent(expectedEvent) } returns Unit
 
             appStartState.active()
             appStartState.active()
 
             everySuspend {
                 repeat(1) {
-                    mockEventClient.registerEvent(expectedEvent)
+                    mockSdkEventDistributor.registerAndStoreEvent(expectedEvent)
                 }
             }
         }

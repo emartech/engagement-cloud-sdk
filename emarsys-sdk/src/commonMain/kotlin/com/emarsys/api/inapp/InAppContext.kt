@@ -1,10 +1,8 @@
 package com.emarsys.api.inapp
 
-import com.emarsys.di.SdkComponent
 import kotlinx.serialization.Serializable
 
-internal class InAppContext(override val calls: MutableList<InAppCall>) : InAppContextApi,
-    SdkComponent
+internal class InAppContext(override val calls: MutableList<InAppCall>) : InAppContextApi
 
 @Serializable
 sealed interface InAppCall {

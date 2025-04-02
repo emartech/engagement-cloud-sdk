@@ -1,5 +1,6 @@
 package com.emarsys.networking.clients.logging
 
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.device.DeviceInfoForLogs
 import com.emarsys.core.log.LogLevel
@@ -20,7 +21,6 @@ import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.resetAnswers
 import dev.mokkery.resetCalls
-import dev.mokkery.spy
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.ktor.http.Headers
@@ -53,7 +53,6 @@ class LoggingClientTests {
         val mockSdkLogger: Logger = mock(MockMode.autofill)
         val mockDeviceInfoCollector: DeviceInfoCollectorApi = mock()
         val json = JsonUtil.json
-        val sdkEventFlow: MutableSharedFlow<SdkEvent> = spy(MutableSharedFlow(replay = 5))
         val deviceInfoForLogs: DeviceInfoForLogs = DeviceInfoForLogs(
             "test",
             "mobile",
@@ -77,6 +76,8 @@ class LoggingClientTests {
     }
 
     private lateinit var sdkDispatcher: CoroutineDispatcher
+    private lateinit var sdkEventDistributor: SdkEventDistributorApi
+    private lateinit var onlineEvents: MutableSharedFlow<SdkEvent>
 
     @BeforeTest
     fun setup() = runTest {
@@ -85,11 +86,14 @@ class LoggingClientTests {
             (it.args[1] as Throwable).printStackTrace()
             throw it.args[1] as Throwable
         }
+        sdkEventDistributor = mock()
+        onlineEvents = MutableSharedFlow()
+        everySuspend { sdkEventDistributor.onlineEvents } returns onlineEvents
 
         LoggingClient(
             mockEmarsysClient,
             mockUrlFactory,
-            sdkEventFlow,
+            sdkEventDistributor,
             json,
             mockSdkLogger,
             sdkDispatcher,
@@ -122,7 +126,7 @@ class LoggingClientTests {
             attributes = testLogAttributes
         )
         CoroutineScope(sdkDispatcher).launch {
-            sdkEventFlow.emit(logEvent)
+            onlineEvents.emit(logEvent)
         }
 
         advanceUntilIdle()
@@ -147,8 +151,8 @@ class LoggingClientTests {
             name = "metric",
             attributes = testLogAttributes
         )
-        sdkEventFlow.emit(logEvent)
 
+        onlineEvents.emit(logEvent)
         advanceUntilIdle()
 
         verifySuspend { mockEmarsysClient.send(any()) }

@@ -1,24 +1,24 @@
 package com.emarsys.mobileengage.action.actions
 
 import com.emarsys.SdkConstants.BUTTON_CLICK_ORIGIN
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.mobileengage.action.models.BasicInAppButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.ReportingActionModel
 
 import com.emarsys.networking.clients.event.model.SdkEvent
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 
 data class ReportingAction(
     private val action: ReportingActionModel,
-    private val sdkEventFlow: MutableSharedFlow<SdkEvent>
+    private val sdkEventDistributor: SdkEventDistributorApi
 ) : Action<Unit> {
     override suspend fun invoke(value: Unit?) {
         when (action) {
             is BasicPushButtonClickedActionModel -> {
-                sdkEventFlow.emit(
+                sdkEventDistributor.registerAndStoreEvent(
                     SdkEvent.Internal.Push.Clicked(
                         attributes = buildJsonObject {
                             put("buttonId", JsonPrimitive(action.id))
@@ -37,7 +37,7 @@ data class ReportingAction(
                 action.sid?.let { attributes["sid"] = it }
                 action.url?.let { attributes["url"] = it }
 
-                sdkEventFlow.emit(
+                sdkEventDistributor.registerAndStoreEvent(
                     SdkEvent.Internal.InApp.ButtonClicked(
                        attributes = buildJsonObject {
                             attributes.forEach { (key, value) ->
@@ -55,7 +55,7 @@ data class ReportingAction(
 
                 action.sid?.let { attributes["sid"] = it }
 
-                sdkEventFlow.emit(
+                sdkEventDistributor.registerAndStoreEvent(
                     SdkEvent.Internal.Push.Clicked(
                         attributes = buildJsonObject {
                             attributes.forEach { (key, value) ->

@@ -41,7 +41,7 @@ object Emarsys {
     }
 
     suspend fun linkContact(contactFieldId: Int, contactFieldValue: String) {
-       koin.get<ContactApi>().linkContact(contactFieldId, contactFieldValue)
+        koin.get<ContactApi>().linkContact(contactFieldId, contactFieldValue)
     }
 
     suspend fun linkAuthenticatedContact(contactFieldId: Int, openIdToken: String) {
@@ -60,7 +60,7 @@ object Emarsys {
     }
 
     val events: SharedFlow<SdkEvent>
-        get()= koin.get<MutableSharedFlow<SdkEvent>>(named(EventFlowTypes.Public))
+        get() = koin.get<MutableSharedFlow<SdkEvent>>(named(EventFlowTypes.Public))
 
     val push: PushApi
         get() = koin.get<PushApi>()

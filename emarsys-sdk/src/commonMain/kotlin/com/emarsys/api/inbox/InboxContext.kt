@@ -1,11 +1,9 @@
 package com.emarsys.api.inbox
 
 import com.emarsys.api.inbox.model.Message
-import com.emarsys.di.SdkComponent
 import kotlinx.serialization.Serializable
 
-internal class InboxContext(override val calls: MutableList<InboxCall>) : InboxContextApi,
-    SdkComponent {
+internal class InboxContext(override val calls: MutableList<InboxCall>) : InboxContextApi {
     override val messages: MutableList<Message> = mutableListOf()
 }
 

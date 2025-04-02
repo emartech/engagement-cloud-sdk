@@ -51,4 +51,4 @@ object SdkKoinIsolationContext {
     }
 }
 
-expect fun SdkKoinIsolationContext.loadPlatformModules():List<Module>
+expect fun SdkKoinIsolationContext.loadPlatformModules(): List<Module>

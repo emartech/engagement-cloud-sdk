@@ -1,5 +1,6 @@
 package com.emarsys.networking.clients.logging
 
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
@@ -10,7 +11,7 @@ import com.emarsys.networking.clients.event.model.SdkEvent
 import io.ktor.http.HttpMethod
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
@@ -21,7 +22,7 @@ import kotlinx.serialization.json.jsonPrimitive
 internal class LoggingClient(
     private val emarsysNetworkClient: NetworkClientApi,
     private val urlFactory: UrlFactoryApi,
-    private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
+    private val sdkEventDistributor: SdkEventDistributorApi,
     private val json: Json,
     private val sdkLogger: Logger,
     sdkDispatcher: CoroutineDispatcher,
@@ -29,13 +30,13 @@ internal class LoggingClient(
 ) {
 
     init {
-        CoroutineScope(sdkDispatcher).launch {
+        CoroutineScope(sdkDispatcher).launch(start = CoroutineStart.UNDISPATCHED) {
             startEventConsumer()
         }
     }
 
     private suspend fun startEventConsumer() {
-        sdkEventFlow
+        sdkEventDistributor.onlineEvents
             .filter { it is SdkEvent.Internal.Sdk.Log || it is SdkEvent.Internal.Sdk.Metric }
             .collect {
                 sdkLogger.debug("LoggingClient - consumeLogsAndMetrics")

@@ -3,6 +3,7 @@ package com.emarsys.mobileengage.push
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.emarsys.SdkConstants.PUSH_RECEIVED_EVENT_NAME
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.mobileengage.action.PushActionFactory
 import com.emarsys.mobileengage.action.actions.Action
 import com.emarsys.mobileengage.action.models.BadgeCount
@@ -21,7 +22,6 @@ import dev.mokkery.verifySuspend
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
@@ -64,7 +64,7 @@ class PushMessageHandlerTest {
     private lateinit var json: Json
     private lateinit var mockInAppDownloader: InAppDownloader
     private lateinit var mockPushActionFactory: PushActionFactory
-    private lateinit var mockSdkEventFlow: MutableSharedFlow<SdkEvent>
+    private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
 
 
     @Before
@@ -72,13 +72,13 @@ class PushMessageHandlerTest {
         mockContext = getInstrumentation().targetContext.applicationContext
         mockInAppDownloader = mockk(relaxed = true)
         mockPushActionFactory = mockk(relaxed = true)
-        mockSdkEventFlow = mockk(relaxed = true)
+        mockSdkEventDistributor = mockk(relaxed = true)
 
         json = JsonUtil.json
 
         silentPushMessageHandler = SilentPushMessageHandler(
             mockPushActionFactory,
-            mockSdkEventFlow
+            mockSdkEventDistributor
         )
     }
 
@@ -102,7 +102,7 @@ class PushMessageHandlerTest {
         silentPushMessageHandler.handle(message)
 
         verifySuspend {
-            mockSdkEventFlow.emit(
+            mockSdkEventDistributor.registerAndStoreEvent(
                 SdkEvent.External.Api.SilentPush(
                     name = PUSH_RECEIVED_EVENT_NAME,
                     attributes = buildJsonObject { put("campaignId", JsonPrimitive(CAMPAIGN_ID)) })

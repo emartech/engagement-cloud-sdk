@@ -1,6 +1,7 @@
 package com.emarsys.networking.clients.event
 
 import com.emarsys.api.inapp.InAppConfigApi
+import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.channel.naturalBatching
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
@@ -22,8 +23,7 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.onEach
@@ -41,24 +41,19 @@ internal class EventClient(
     private val inAppConfigApi: InAppConfigApi,
     private val inAppPresenter: InAppPresenterApi,
     private val inAppViewProvider: InAppViewProviderApi,
-    private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
-    private val onlineSdkEventFlow: Flow<SdkEvent>,
+    private val sdkEventDistributor: SdkEventManagerApi,
     private val sdkLogger: Logger,
     sdkDispatcher: CoroutineDispatcher
 ) : EventClientApi {
 
     init {
-        CoroutineScope(sdkDispatcher).launch {
+        CoroutineScope(sdkDispatcher).launch(start = CoroutineStart.UNDISPATCHED) {
             startEventConsumer()
         }
     }
 
-    override suspend fun registerEvent(event: SdkEvent) {
-        sdkEventFlow.emit(event)
-    }
-
     private suspend fun startEventConsumer() {
-        onlineSdkEventFlow
+        sdkEventDistributor.onlineEvents
             .filter { it is SdkEvent.Internal.Reporting || it is SdkEvent.Internal.Custom || it is SdkEvent.External.Custom }
             .naturalBatching().onEach { sdkEvents ->
                 try {
@@ -94,7 +89,7 @@ internal class EventClient(
     }
 
     private suspend fun reEmitSdkEventsOnNetworkError(it: List<SdkEvent>) {
-        it.forEach { sdkEvent -> registerEvent(sdkEvent) }
+        it.forEach { sdkEvent -> sdkEventDistributor.emitEvent(sdkEvent) }
     }
 
     private suspend fun handleOnAppEventAction(deviceEventResponse: DeviceEventResponse) {
@@ -114,7 +109,7 @@ internal class EventClient(
     private suspend fun reportOnEventAction(campaignId: String) {
         sdkLogger.debug("EventClient - reportOnEventAction")
 
-        registerEvent(SdkEvent.Internal.InApp.Viewed(attributes = buildJsonObject {
+        sdkEventDistributor.registerAndStoreEvent(SdkEvent.Internal.InApp.Viewed(attributes = buildJsonObject {
             put(
                 "campaignId",
                 JsonPrimitive(campaignId)

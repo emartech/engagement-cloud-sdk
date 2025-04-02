@@ -1,6 +1,7 @@
 package com.emarsys.networking.clients.config
 
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.UrlRequest
@@ -14,7 +15,6 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
@@ -24,7 +24,7 @@ import kotlinx.serialization.json.jsonPrimitive
 internal class ConfigClient(
     private val emarsysNetworkClient: NetworkClientApi,
     private val urlFactory: UrlFactoryApi,
-    private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
+    private val sdkEventDistributor: SdkEventDistributorApi,
     private val sessionContext: SessionContext,
     private val sdkContext: SdkContextApi,
     private val contactTokenHandler: ContactTokenHandlerApi,
@@ -40,7 +40,7 @@ internal class ConfigClient(
     }
 
     private suspend fun startEventConsumer() {
-        sdkEventFlow
+        sdkEventDistributor.onlineEvents
             .filter { it is SdkEvent.Internal.Sdk.ChangeAppCode || it is SdkEvent.Internal.Sdk.ChangeMerchantId }
             .collect {
                 sdkLogger.debug("ConfigClient - consumeConfigChanges")

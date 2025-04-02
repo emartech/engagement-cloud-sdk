@@ -4,12 +4,13 @@ import android.app.Activity
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.watchdog.activity.TransitionSafeCurrentActivityWatchdog
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -18,7 +19,7 @@ class InAppPresenter(
     private val currentActivityWatchdog: TransitionSafeCurrentActivityWatchdog,
     private val mainDispatcher: CoroutineDispatcher,
     private val sdkDispatcher: CoroutineDispatcher,
-    private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
+    private val sdkEventDistributor: SdkEventDistributorApi,
     private val logger: Logger
 ) : InAppPresenterApi {
 
@@ -37,14 +38,14 @@ class InAppPresenter(
                 addToBackStack(null)
                 commit()
             }
-        }
-        CoroutineScope(sdkDispatcher).launch {
-            sdkEventFlow.first {
-                it is SdkEvent.Internal.Sdk.Dismiss && it.id == inAppView.inAppMessage.campaignId
-            }
-            withContext(mainDispatcher) {
-                logger.debug("InAppPresenter", "dismiss inapp dialog")
-                inAppDialog.dismiss()
+            CoroutineScope(sdkDispatcher).launch(start = CoroutineStart.UNDISPATCHED) {
+                sdkEventDistributor.sdkEventFlow.first { sdkEvent ->
+                    sdkEvent is SdkEvent.Internal.Sdk.Dismiss && sdkEvent.id == inAppView.inAppMessage.campaignId
+                }
+                withContext(mainDispatcher) {
+                    logger.debug("InAppPresenter", "dismiss inapp dialog")
+                    inAppDialog.dismiss()
+                }
             }
         }
     }

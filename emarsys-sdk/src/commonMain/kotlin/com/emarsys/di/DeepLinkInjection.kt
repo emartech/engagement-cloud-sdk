@@ -14,7 +14,7 @@ object DeepLinkInjection {
         single<DeepLinkClient> {
             DeepLinkClient(
                 networkClient = get(named(NetworkClientTypes.Generic)),
-                sdkEventFlow = get(named(EventFlowTypes.InternalEventFlow)),
+                sdkEventDistributor = get(),
                 urlFactory = get(),
                 userAgentProvider = get(),
                 json = get(),

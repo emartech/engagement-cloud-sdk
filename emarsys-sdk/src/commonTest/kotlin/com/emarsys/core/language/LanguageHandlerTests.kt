@@ -1,6 +1,7 @@
 package com.emarsys.core.language
 
 import com.emarsys.SdkConstants.LANGUAGE_STORAGE_KEY
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.exceptions.PreconditionFailedException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.storage.StringStorageApi
@@ -11,7 +12,6 @@ import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
 import io.kotest.assertions.throwables.shouldThrow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -20,7 +20,7 @@ class LanguageHandlerTests {
 
     private lateinit var mockLanguageTagValidator: LanguageTagValidatorApi
     private lateinit var mockStringStorage: StringStorageApi
-    private lateinit var mockSdkEvents: MutableSharedFlow<SdkEvent>
+    private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
     private lateinit var mockLogger: Logger
 
     private lateinit var languageHandler: LanguageHandlerApi
@@ -29,7 +29,7 @@ class LanguageHandlerTests {
     fun setUp() = runTest {
         mockLanguageTagValidator = mock()
         mockStringStorage = mock()
-        mockSdkEvents = mock()
+        mockSdkEventDistributor = mock()
         mockLogger = mock()
         everySuspend {
             mockLogger.debug(any(), any<String>())
@@ -38,7 +38,7 @@ class LanguageHandlerTests {
         languageHandler = LanguageHandler(
             mockLanguageTagValidator,
             mockStringStorage,
-            mockSdkEvents,
+            mockSdkEventDistributor,
             mockLogger
         )
     }
@@ -53,30 +53,32 @@ class LanguageHandlerTests {
     }
 
     @Test
-    fun testHandleLanguage_should_clearStorage_and_emit_deviceInfoUpdateRequired_event_when_language_is_null() = runTest {
-        everySuspend { mockStringStorage.put(any(), any()) } returns Unit
-        everySuspend { mockSdkEvents.emit(any()) } returns Unit
+    fun testHandleLanguage_should_clearStorage_and_emit_deviceInfoUpdateRequired_event_when_language_is_null() =
+        runTest {
+            everySuspend { mockStringStorage.put(any(), any()) } returns Unit
+            everySuspend { mockSdkEventDistributor.registerAndStoreEvent(any()) } returns Unit
 
-        languageHandler.handleLanguage(null)
+            languageHandler.handleLanguage(null)
 
-        verifySuspend {
-            mockStringStorage.put(LANGUAGE_STORAGE_KEY, null)
-            mockSdkEvents.emit(any<SdkEvent.Internal.Sdk.DeviceInfoUpdateRequired>())
+            verifySuspend {
+                mockStringStorage.put(LANGUAGE_STORAGE_KEY, null)
+                mockSdkEventDistributor.registerAndStoreEvent(any<SdkEvent.Internal.Sdk.DeviceInfoUpdateRequired>())
+            }
         }
-    }
 
     @Test
-    fun testHandleLanguage_should_store_language_and_emit_deviceInfoUpdateRequired_event_when_language_is_valid() = runTest {
-        everySuspend { mockStringStorage.put(any(), any()) } returns Unit
-        everySuspend { mockSdkEvents.emit(any()) } returns Unit
-        everySuspend { mockLanguageTagValidator.isValid("zh-Hant-HK") } returns true
+    fun testHandleLanguage_should_store_language_and_emit_deviceInfoUpdateRequired_event_when_language_is_valid() =
+        runTest {
+            everySuspend { mockStringStorage.put(any(), any()) } returns Unit
+            everySuspend { mockSdkEventDistributor.registerAndStoreEvent(any()) } returns Unit
+            everySuspend { mockLanguageTagValidator.isValid("zh-Hant-HK") } returns true
 
-        languageHandler.handleLanguage("zh-Hant-HK")
+            languageHandler.handleLanguage("zh-Hant-HK")
 
-        verifySuspend {
-            mockStringStorage.put(LANGUAGE_STORAGE_KEY, "zh-Hant-HK")
-            mockSdkEvents.emit(any<SdkEvent.Internal.Sdk.DeviceInfoUpdateRequired>())
+            verifySuspend {
+                mockStringStorage.put(LANGUAGE_STORAGE_KEY, "zh-Hant-HK")
+                mockSdkEventDistributor.registerAndStoreEvent(any<SdkEvent.Internal.Sdk.DeviceInfoUpdateRequired>())
+            }
         }
-    }
 
 }

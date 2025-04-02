@@ -1,11 +1,11 @@
 package com.emarsys.core.badge
 
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.mobileengage.action.models.BadgeCount
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.util.JsonUtil
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
@@ -14,7 +14,7 @@ import web.events.EventHandler
 
 class WebBadgeCountHandler(
     private val onBadgeCountUpdateReceivedBroadcastChannel: BroadcastChannel,
-    private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
+    private val sdkEventDistributor: SdkEventDistributorApi,
     private val coroutineScope: CoroutineScope,
     private val sdkLogger: Logger
 ) : WebBadgeCountHandlerApi {
@@ -31,7 +31,7 @@ class WebBadgeCountHandler(
         try {
             val badgeCount =
                 JsonUtil.json.decodeFromString<BadgeCount>(badgeCountString)
-            sdkEventFlow.emit(
+            sdkEventDistributor.registerAndStoreEvent(
                 SdkEvent.External.Api.BadgeCount(
                     name = badgeCount.method.name,
                     attributes = buildJsonObject {

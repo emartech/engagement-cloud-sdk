@@ -13,6 +13,7 @@ import com.emarsys.api.push.PushInternal
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.actions.badge.BadgeCountHandlerApi
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.collections.dequeue
 import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.InstantProvider
@@ -32,7 +33,6 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
@@ -73,7 +73,7 @@ internal class IosPushInternal(
     private val json: Json,
     private val sdkDispatcher: CoroutineDispatcher,
     private val sdkLogger: Logger,
-    private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
+    private val sdkEventDistributor: SdkEventDistributorApi,
     private val timestampProvider: InstantProvider,
     private val uuidProvider: UuidProviderApi
 ) : PushInternal(pushClient, storage, pushContext, sdkLogger), IosPushInstance {
@@ -97,7 +97,7 @@ internal class IosPushInternal(
             actionFactory.create(it).invoke()
         }
 
-        sdkEventFlow.emit(
+        sdkEventDistributor.registerAndStoreEvent(
             SdkEvent.External.Api.SilentPush(
                 id = uuidProvider.provide(),
                 name = PUSH_RECEIVED_EVENT_NAME,

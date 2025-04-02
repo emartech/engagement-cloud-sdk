@@ -1,8 +1,10 @@
 package com.emarsys.setup
 
 import android.app.NotificationManager
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import io.mockk.Called
+import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
@@ -17,6 +19,7 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PlatformInitializerTest {
+    private lateinit var sdkEventDistributor: SdkEventDistributorApi
     private lateinit var sdkEventFlow: MutableSharedFlow<SdkEvent>
     private lateinit var mockNotificationManager: NotificationManager
 
@@ -25,10 +28,13 @@ class PlatformInitializerTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
-        sdkEventFlow = MutableSharedFlow(replay = 10)
+        sdkEventFlow = MutableSharedFlow()
+        sdkEventDistributor = mockk()
+        every { sdkEventDistributor.sdkEventFlow } returns sdkEventFlow
+
         mockNotificationManager = mockk(relaxed = true)
         platformInitializer = PlatformInitializer(
-            sdkEventFlow,
+            sdkEventDistributor,
             mockNotificationManager,
             StandardTestDispatcher()
         )

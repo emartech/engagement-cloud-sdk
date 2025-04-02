@@ -2,6 +2,7 @@ package com.emarsys.networking.clients.config
 
 import com.emarsys.SdkConfig
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
@@ -63,7 +64,8 @@ class ConfigClientTests {
     private lateinit var mockConfig: SdkConfig
     private lateinit var sessionContext: SessionContext
     private lateinit var json: Json
-    private lateinit var sdkEventFlow: MutableSharedFlow<SdkEvent>
+    private lateinit var onlineEvents: MutableSharedFlow<SdkEvent>
+    private lateinit var sdkEventDistributor: SdkEventDistributorApi
 
 
     @BeforeTest
@@ -76,7 +78,9 @@ class ConfigClientTests {
         mockConfig = mock()
         sessionContext = SessionContext(refreshToken = "testRefreshToken")
         json = JsonUtil.json
-        sdkEventFlow = spy(MutableSharedFlow(replay = 5))
+        onlineEvents = spy(MutableSharedFlow(replay = 5))
+        sdkEventDistributor = mock()
+        every { sdkEventDistributor.onlineEvents } returns onlineEvents
         sdkDispatcher = StandardTestDispatcher()
 
         everySuspend { mockContactTokenHandler.handleContactTokens(any()) } returns Unit
@@ -90,7 +94,7 @@ class ConfigClientTests {
         ConfigClient(
             mockEmarsysClient,
             mockUrlFactory,
-            sdkEventFlow,
+            sdkEventDistributor,
             sessionContext,
             mockSdkContext,
             mockContactTokenHandler,
@@ -120,7 +124,7 @@ class ConfigClientTests {
             "changeApplicationCode",
             buildJsonObject { put("applicationCode", JsonPrimitive("NewAppCode")) })
 
-        sdkEventFlow.emit(changeAppCode)
+        onlineEvents.emit(changeAppCode)
 
         advanceUntilIdle()
 
@@ -143,7 +147,7 @@ class ConfigClientTests {
             "changeMerchantId",
             buildJsonObject { put("merchantId", JsonPrimitive("newMerchantId")) })
 
-        sdkEventFlow.emit(changeMerchantId)
+        onlineEvents.emit(changeMerchantId)
 
         advanceUntilIdle()
 

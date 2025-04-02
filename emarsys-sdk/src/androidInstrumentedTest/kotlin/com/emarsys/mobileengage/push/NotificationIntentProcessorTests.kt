@@ -7,6 +7,7 @@ import com.emarsys.api.push.PushConstants.INTENT_EXTRA_ACTION_KEY
 import com.emarsys.api.push.PushConstants.INTENT_EXTRA_DEFAULT_TAP_ACTION_KEY
 import com.emarsys.api.push.PushConstants.INTENT_EXTRA_PAYLOAD_KEY
 import com.emarsys.core.actions.ActionHandlerApi
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.mobileengage.action.PushActionFactoryApi
 import com.emarsys.mobileengage.action.actions.Action
@@ -21,7 +22,6 @@ import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.action.models.PresentableAppEventActionModel
 import com.emarsys.mobileengage.action.models.PresentableDismissActionModel
-import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.util.JsonUtil
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -29,7 +29,6 @@ import io.mockk.mockk
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -59,7 +58,7 @@ class NotificationIntentProcessorTests {
     private lateinit var testScope: CoroutineScope
     private lateinit var mockActionFactory: PushActionFactoryApi
     private lateinit var mockActionHandler: ActionHandlerApi
-    private lateinit var mockSdkEventFlow: MutableSharedFlow<SdkEvent>
+    private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
     private lateinit var mockLogger: Logger
     private lateinit var notificationIntentProcessor: NotificationIntentProcessor
 
@@ -70,7 +69,7 @@ class NotificationIntentProcessorTests {
         testScope = CoroutineScope(testDispatcher)
         mockActionFactory = mockk(relaxed = true)
         mockActionHandler = mockk(relaxed = true)
-        mockSdkEventFlow = mockk(relaxed = true)
+        mockSdkEventDistributor = mockk(relaxed = true)
         mockLogger = mockk(relaxed = true)
         notificationIntentProcessor =
             NotificationIntentProcessor(json, mockActionFactory, mockActionHandler, mockLogger)
@@ -101,9 +100,9 @@ class NotificationIntentProcessorTests {
         val actionModel = PresentableAppEventActionModel(ID, TITLE, NAME, PAYLOAD)
         val buttonClickedActionModel = BasicPushButtonClickedActionModel(ID, SID)
         val basicDismissActionModel = BasicDismissActionModel(COLLAPSE_ID)
-        val reportingAction = ReportingAction(buttonClickedActionModel, mockSdkEventFlow)
+        val reportingAction = ReportingAction(buttonClickedActionModel, mockSdkEventDistributor)
         val mockLaunchApplicationAction: LaunchApplicationAction = mockk(relaxed = true)
-        val dismissAction = DismissAction(basicDismissActionModel, mockSdkEventFlow)
+        val dismissAction = DismissAction(basicDismissActionModel, mockSdkEventDistributor)
 
         coEvery { mockActionFactory.create(BasicLaunchApplicationActionModel) } returns mockLaunchApplicationAction
         coEvery { mockActionFactory.create(buttonClickedActionModel) } returns reportingAction
@@ -157,7 +156,7 @@ class NotificationIntentProcessorTests {
                     "dismissId":"$dismissId"
                 }""".trimIndent()
             val buttonClickedActionModel = BasicPushButtonClickedActionModel(ID, SID)
-            val reportingAction = ReportingAction(buttonClickedActionModel, mockSdkEventFlow)
+            val reportingAction = ReportingAction(buttonClickedActionModel, mockSdkEventDistributor)
 
             coEvery { mockActionFactory.create(buttonClickedActionModel) } returns reportingAction
 
@@ -190,8 +189,8 @@ class NotificationIntentProcessorTests {
                 """{"type": "MEAppEvent", "name":"$NAME","payload":{"testKey":"testValue"}}"""
             val notificationOpenedActionModel = NotificationOpenedActionModel(SID)
             val basicDismissActionModel = BasicDismissActionModel(COLLAPSE_ID)
-            val reportingAction = ReportingAction(notificationOpenedActionModel, mockSdkEventFlow)
-            val basicDismissAction = DismissAction(basicDismissActionModel, mockSdkEventFlow)
+            val reportingAction = ReportingAction(notificationOpenedActionModel, mockSdkEventDistributor)
+            val basicDismissAction = DismissAction(basicDismissActionModel, mockSdkEventDistributor)
             val mockLaunchApplicationAction: LaunchApplicationAction = mockk(relaxed = true)
 
             coEvery { mockActionFactory.create(BasicLaunchApplicationActionModel) } returns mockLaunchApplicationAction

@@ -124,7 +124,7 @@ object AndroidInjection {
         single<State>(named(StateTypes.PlatformInit)) { PlatformInitState() }
         single<PlatformInitializerApi> {
             PlatformInitializer(
-                sdkEventFlow = get(named(EventFlowTypes.InternalEventFlow)),
+                sdkEventDistributor = get(),
                 notificationManager = get(),
                 sdkDispatcher = get(named(DispatcherTypes.Sdk))
             )
@@ -141,7 +141,7 @@ object AndroidInjection {
         single<SilentPushMessageHandler> {
             SilentPushMessageHandler(
                 pushActionFactory = get(),
-                sdkEventFlow = get(named(EventFlowTypes.InternalEventFlow))
+                sdkEventDistributor = get()
             )
         }
         single<NotificationCompatStyler> {
@@ -247,7 +247,7 @@ object AndroidInjection {
                 currentActivityWatchdog = get(),
                 mainDispatcher = get(named(DispatcherTypes.Main)),
                 sdkDispatcher = get(named(DispatcherTypes.Sdk)),
-                sdkEventFlow = get(named(EventFlowTypes.InternalEventFlow)),
+                sdkEventDistributor = get(),
                 logger = get { parametersOf(InAppPresenter::class.simpleName) }
             )
         }

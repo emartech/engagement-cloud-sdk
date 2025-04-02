@@ -1,20 +1,18 @@
 package com.emarsys.api.config
 
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.language.LanguageHandlerApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.networking.clients.event.model.SdkEvent
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
-import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import kotlinx.serialization.json.JsonPrimitive
@@ -30,7 +28,7 @@ class ConfigInternalTests {
         const val MERCHANT_ID = "testMerchantId"
     }
 
-    private lateinit var eventFlow: MutableSharedFlow<SdkEvent>
+    private lateinit var sdkEventDistributor: SdkEventDistributorApi
     private lateinit var mockUuidProvider: UuidProviderApi
     private lateinit var mockTimestampProvider: InstantProvider
     private lateinit var mockLogger: Logger
@@ -46,9 +44,15 @@ class ConfigInternalTests {
         mockTimestampProvider = mock()
         every { mockTimestampProvider.provide() } returns TIMESTAMP
         mockLanguageHandler = mock()
-        eventFlow = MutableSharedFlow()
+        sdkEventDistributor = mock(MockMode.autofill)
         configInternal =
-            ConfigInternal(eventFlow, mockUuidProvider, mockTimestampProvider, mockLogger, mockLanguageHandler)
+            ConfigInternal(
+                sdkEventDistributor,
+                mockUuidProvider,
+                mockTimestampProvider,
+                mockLogger,
+                mockLanguageHandler
+            )
     }
 
     @Test
@@ -57,13 +61,9 @@ class ConfigInternalTests {
             put("applicationCode", JsonPrimitive(APPCODE))
         }, TIMESTAMP)
 
-        backgroundScope.launch {
-            configInternal.changeApplicationCode(APPCODE)
-        }
+        configInternal.changeApplicationCode(APPCODE)
 
-        val result = eventFlow.first()
-
-        result shouldBe expectedEvent
+        verifySuspend { sdkEventDistributor.registerAndStoreEvent(expectedEvent) }
     }
 
     @Test
@@ -72,13 +72,9 @@ class ConfigInternalTests {
             put("merchantId", JsonPrimitive(MERCHANT_ID))
         }, TIMESTAMP)
 
-        backgroundScope.launch {
-            configInternal.changeMerchantId(MERCHANT_ID)
-        }
+        configInternal.changeMerchantId(MERCHANT_ID)
 
-        val result = eventFlow.first()
-
-        result shouldBe expectedEvent
+        verifySuspend { sdkEventDistributor.registerAndStoreEvent(expectedEvent) }
     }
 
     @Test

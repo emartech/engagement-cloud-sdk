@@ -2,14 +2,14 @@ package com.emarsys.api.event
 
 import com.emarsys.api.event.model.CustomEvent
 import com.emarsys.api.event.model.toSdkEvent
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.collections.dequeue
 import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
-import com.emarsys.networking.clients.event.EventClientApi
 
 internal class EventTrackerInternal(
-    private val eventClient: EventClientApi,
+    private val sdkEventDistributor: SdkEventDistributorApi,
     private val eventTrackerContext: EventTrackerContextApi,
     private val timestampProvider: InstantProvider,
     private val uuidProvider: UuidProviderApi,
@@ -17,7 +17,7 @@ internal class EventTrackerInternal(
 ) : EventTrackerInstance {
 
     override suspend fun trackEvent(event: CustomEvent) {
-        eventClient.registerEvent(
+        sdkEventDistributor.registerAndStoreEvent(
             event.toSdkEvent(
                 uuidProvider.provide(),
                 timestampProvider.provide()
@@ -32,7 +32,7 @@ internal class EventTrackerInternal(
 
         eventTrackerContext.calls.dequeue { call ->
             when (call) {
-                is EventTrackerCall.TrackEvent -> eventClient.registerEvent(call.event)
+                is EventTrackerCall.TrackEvent -> sdkEventDistributor.registerAndStoreEvent(call.event)
             }
         }
     }

@@ -3,19 +3,20 @@ package com.emarsys.api.deepLink
 import com.emarsys.context.DefaultUrls
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.LogLevel
 import com.emarsys.networking.clients.event.model.SdkEvent
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.capture.Capture.Companion.slot
 import dev.mokkery.matcher.capture.SlotCapture
 import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
-import dev.mokkery.spy
+import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import io.ktor.http.Url
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -28,7 +29,7 @@ class DeepLinkInternalTests {
 
     private lateinit var sdkContext: SdkContextApi
     private lateinit var deepLinkInternal: DeepLinkInternal
-    private lateinit var sdkEventFlow: MutableSharedFlow<SdkEvent>
+    private lateinit var sdkEventDistributor: SdkEventDistributorApi
     private lateinit var eventSlot: SlotCapture<SdkEvent>
     private val mainDispatcher = StandardTestDispatcher()
 
@@ -46,10 +47,10 @@ class DeepLinkInternalTests {
             mutableSetOf()
         )
 
-        eventSlot = slot<SdkEvent>()
-        sdkEventFlow = spy(MutableSharedFlow(replay = 5))
-        everySuspend { sdkEventFlow.emit(capture(eventSlot)) } returns Unit
-        deepLinkInternal = DeepLinkInternal(sdkContext, sdkEventFlow)
+        eventSlot = slot()
+        sdkEventDistributor = mock(MockMode.autofill)
+        everySuspend { sdkEventDistributor.registerAndStoreEvent(capture(eventSlot)) } returns Unit
+        deepLinkInternal = DeepLinkInternal(sdkContext, sdkEventDistributor)
     }
 
     @Test

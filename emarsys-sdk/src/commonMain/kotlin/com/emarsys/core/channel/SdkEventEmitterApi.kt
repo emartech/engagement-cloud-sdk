@@ -1,4 +1,4 @@
-package com.emarsys.core
+package com.emarsys.core.channel
 
 import com.emarsys.networking.clients.event.model.SdkEvent
 

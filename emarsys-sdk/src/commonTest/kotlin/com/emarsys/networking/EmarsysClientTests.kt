@@ -2,6 +2,7 @@
 
 package com.emarsys.networking
 
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.networking.clients.GenericNetworkClient
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
@@ -22,6 +23,7 @@ import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.config
@@ -36,12 +38,8 @@ import io.ktor.http.Url
 import io.ktor.http.headers
 import io.ktor.http.headersOf
 import io.ktor.utils.io.ByteReadChannel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -69,7 +67,7 @@ class EmarsysClientTests {
     private lateinit var sessionContext: SessionContext
     private lateinit var emarsysClient: EmarsysClient
     private val now = Clock.System.now()
-    private lateinit var sdkEventFlow: MutableSharedFlow<SdkEvent>
+    private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
 
     @BeforeTest
     fun setup() {
@@ -77,7 +75,7 @@ class EmarsysClientTests {
         mockTimestampProvider = mock()
         mockUrlFactory = mock()
         mockNetworkClient = mock()
-        sdkEventFlow = MutableSharedFlow<SdkEvent>()
+        mockSdkEventDistributor = mock(MockMode.autofill)
         sessionContext = SessionContext(refreshToken = "testRefreshToken", deviceEventState = null)
         json = Json
 
@@ -96,7 +94,7 @@ class EmarsysClientTests {
             mockUrlFactory,
             json,
             mock(MockMode.autofill),
-            sdkEventFlow,
+            mockSdkEventDistributor,
         )
     }
 
@@ -147,7 +145,7 @@ class EmarsysClientTests {
             mockUrlFactory,
             json,
             mock(MockMode.autofill),
-            sdkEventFlow,
+            mockSdkEventDistributor,
         )
 
         sessionContext.clientState = null
@@ -208,7 +206,7 @@ class EmarsysClientTests {
             mockUrlFactory,
             json,
             mock(MockMode.autofill),
-            sdkEventFlow,
+            mockSdkEventDistributor,
         )
 
         sessionContext.contactToken = CONTACT_TOKEN
@@ -247,11 +245,16 @@ class EmarsysClientTests {
                 headersOf("Content-Type", "application/json"),
                 ""
             )
-            CoroutineScope(Dispatchers.Main).launch {
-                emarsysClient.send(UrlRequest(Url("https://testUrl.com"), HttpMethod.Get, null))
+
+            emarsysClient.send(UrlRequest(Url("https://testUrl.com"), HttpMethod.Get, null))
+
+            verifySuspend {
+                mockSdkEventDistributor.registerAndStoreEvent(
+                    SdkEvent.Internal.Sdk.ReregistrationRequired(
+                        id = any()
+                    )
+                )
             }
-            val event = sdkEventFlow.first()
-            event.name shouldBe "ReregistrationRequired"
         }
 
     @Test
@@ -267,10 +270,15 @@ class EmarsysClientTests {
                 headersOf("Content-Type", "application/json"),
                 ""
             )
-            CoroutineScope(Dispatchers.Main).launch {
-                emarsysClient.send(UrlRequest(Url("https://testUrl.com"), HttpMethod.Get, null))
+
+            emarsysClient.send(UrlRequest(Url("https://testUrl.com"), HttpMethod.Get, null))
+
+            verifySuspend {
+                mockSdkEventDistributor.registerAndStoreEvent(
+                    SdkEvent.Internal.Sdk.RemoteConfigUpdateRequired(
+                        id = any()
+                    )
+                )
             }
-            val event = sdkEventFlow.first()
-            event.name shouldBe "RemoteConfigUpdateRequired"
         }
 }

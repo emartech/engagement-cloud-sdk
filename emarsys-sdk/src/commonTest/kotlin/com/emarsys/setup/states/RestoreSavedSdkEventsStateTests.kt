@@ -1,6 +1,6 @@
 package com.emarsys.setup.states
 
-import com.emarsys.core.SdkEventEmitterApi
+import com.emarsys.core.channel.SdkEventEmitterApi
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import dev.mokkery.MockMode

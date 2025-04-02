@@ -21,9 +21,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.async
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
@@ -42,7 +40,6 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SdkEventDistributorTests {
-    private lateinit var sdkEventFlow: MutableSharedFlow<SdkEvent>
     private lateinit var sdkContext: SdkContextApi
     private lateinit var sdkDispatcher: CoroutineDispatcher
     private lateinit var mockEventsDao: EventsDaoApi
@@ -52,7 +49,6 @@ class SdkEventDistributorTests {
     fun setup() {
         val mainDispatcher = StandardTestDispatcher()
         Dispatchers.setMain(mainDispatcher)
-        sdkEventFlow = MutableSharedFlow(replay = 100, extraBufferCapacity = Channel.UNLIMITED)
         sdkDispatcher = StandardTestDispatcher()
         sdkContext =
             SdkContext(
@@ -80,14 +76,14 @@ class SdkEventDistributorTests {
             val testEvents = listOf(testEvent, testEvent2)
             val testConnectionState = MutableStateFlow(true)
             sdkContext.setSdkState(SdkState.active)
-            val eventDistributor = createEventDistributor(testConnectionState, sdkContext)
+            val sdkEventDistributor = createEventDistributor(testConnectionState, sdkContext)
 
             val emittedEvents = backgroundScope.async {
-                eventDistributor.onlineEvents.take(2).toList()
+                sdkEventDistributor.onlineEvents.take(2).toList()
             }
 
             testEvents.forEach {
-                eventDistributor.registerEvent(it)
+                sdkEventDistributor.registerAndStoreEvent(it)
             }
 
             emittedEvents.await() shouldBe testEvents
@@ -96,13 +92,13 @@ class SdkEventDistributorTests {
     @Test
     fun registerEvent_shouldPersistEventsToDb_andEmitSdkEvent_toSdkEventFlow() = runTest {
         val testEvent = SdkEvent.External.Custom(id = "testId", name = "testEventName")
-        val eventDistributor = createEventDistributor(MutableStateFlow(false), sdkContext)
+        val sdkEventDistributor = createEventDistributor(MutableStateFlow(false), sdkContext)
 
         val emittedEvents = backgroundScope.async {
-            sdkEventFlow.take(1).toList()
+            sdkEventDistributor.sdkEventFlow.take(1).toList()
         }
 
-        eventDistributor.registerEvent(testEvent)
+        sdkEventDistributor.registerAndStoreEvent(testEvent)
 
         emittedEvents.await() shouldBe listOf(testEvent)
         verifySuspend {
@@ -116,9 +112,9 @@ class SdkEventDistributorTests {
             val testEvent = SdkEvent.External.Custom(id = "testId", name = "testEventName")
             val testException = RuntimeException("DB error")
             everySuspend { mockEventsDao.insertEvent(testEvent) } throws testException
-            val eventDistributor = createEventDistributor(MutableStateFlow(false), sdkContext)
+            val sdkEventDistributor = createEventDistributor(MutableStateFlow(false), sdkContext)
 
-            eventDistributor.registerEvent(testEvent)
+            sdkEventDistributor.registerAndStoreEvent(testEvent)
 
             verifySuspend {
                 mockEventsDao.insertEvent(testEvent)
@@ -129,30 +125,15 @@ class SdkEventDistributorTests {
     @Test
     fun emitEvent_shouldEmitSdkEvent_toSdkEventFlow() = runTest {
         val testEvent = SdkEvent.External.Custom(id = "testId", name = "testEventName")
-        val eventDistributor = createEventDistributor(MutableStateFlow(false), sdkContext)
+        val sdkEventDistributor = createEventDistributor(MutableStateFlow(false), sdkContext)
 
         val emittedEvents = backgroundScope.async {
-            sdkEventFlow.take(1).toList()
+            sdkEventDistributor.sdkEventFlow.take(1).toList()
         }
 
-        eventDistributor.emitEvent(testEvent)
+        sdkEventDistributor.emitEvent(testEvent)
 
         emittedEvents.await() shouldBe listOf(testEvent)
-    }
-
-    @Test
-    fun emitEvent_shouldLog_andSwallowException_whenEmitFails() = runTest {
-        val testEvent = SdkEvent.External.Custom(id = "testId", name = "testEventName")
-        val mockFlow = mock<MutableSharedFlow<SdkEvent>>()
-        everySuspend { mockFlow.emit(testEvent) } throws Exception("Emit failed")
-        val eventDistributor = createEventDistributor(MutableStateFlow(false), sdkContext, mockFlow)
-
-        eventDistributor.emitEvent(testEvent)
-
-        verifySuspend {
-            mockFlow.emit(testEvent)
-            mockSdkLogger.error(any<String>(), any<Exception>(), any())
-        }
     }
 
     @OptIn(FlowPreview::class)
@@ -160,7 +141,7 @@ class SdkEventDistributorTests {
     fun distributor_shouldPauseOnlineEvents_whenSdkStateIsOnHold_andConnectionIsOnline_withTwoCollectors() =
         runTest {
             everySuspend { mockEventsDao.getEvents() } returns flowOf()
-            val eventDistributor =
+            val sdkEventDistributor =
                 createEventDistributor(connectionState = MutableStateFlow(true), sdkContext)
             val testEvent1 = SdkEvent.External.Custom(id = "testId", name = "testEventName")
             val testEvent2 = SdkEvent.External.Custom(id = "testId1", name = "testEventName")
@@ -168,27 +149,27 @@ class SdkEventDistributorTests {
 
             val onHoldCollected1 = backgroundScope.async {
                 try {
-                    eventDistributor.onlineEvents.timeout(500.milliseconds).firstOrNull()
+                    sdkEventDistributor.onlineEvents.timeout(500.milliseconds).firstOrNull()
                 } catch (e: TimeoutCancellationException) {
                     null
                 }
             }
             val onHoldCollected2 = backgroundScope.async {
                 try {
-                    eventDistributor.onlineEvents.timeout(500.milliseconds).firstOrNull()
+                    sdkEventDistributor.onlineEvents.timeout(500.milliseconds).firstOrNull()
                 } catch (e: TimeoutCancellationException) {
                     null
                 }
             }
 
-            eventDistributor.registerEvent(testEvent1)
-            eventDistributor.registerEvent(testEvent2)
+            sdkEventDistributor.registerAndStoreEvent(testEvent1)
+            sdkEventDistributor.registerAndStoreEvent(testEvent2)
 
             onHoldCollected1.await() shouldBe null
             onHoldCollected2.await() shouldBe null
 
             val emittedOnlineEventsWhenActive = backgroundScope.async {
-                eventDistributor.onlineEvents.take(2).toList()
+                sdkEventDistributor.onlineEvents.take(2).toList()
             }
 
             sdkContext.setSdkState(SdkState.active)
@@ -204,25 +185,25 @@ class SdkEventDistributorTests {
         runTest {
             everySuspend { mockEventsDao.getEvents() } returns flowOf()
             val connectionState = MutableStateFlow(false)
-            val eventDistributor =
+            val sdkEventDistributor =
                 createEventDistributor(connectionState = connectionState, sdkContext)
             val testEvent = SdkEvent.External.Custom(id = "testId", name = "testEventName")
             sdkContext.setSdkState(SdkState.active)
 
             val offlineCollected = backgroundScope.async {
                 try {
-                    eventDistributor.onlineEvents.timeout(500.milliseconds).firstOrNull()
+                    sdkEventDistributor.onlineEvents.timeout(500.milliseconds).firstOrNull()
                 } catch (e: TimeoutCancellationException) {
                     null
                 }
             }
 
-            eventDistributor.registerEvent(testEvent)
+            sdkEventDistributor.registerAndStoreEvent(testEvent)
 
             offlineCollected.await() shouldBe null
 
             val emittedOnlineEventsWhenOnline = backgroundScope.async {
-                eventDistributor.onlineEvents.take(1).toList()
+                sdkEventDistributor.onlineEvents.take(1).toList()
             }
 
             connectionState.value = true
@@ -237,25 +218,25 @@ class SdkEventDistributorTests {
         runTest {
             everySuspend { mockEventsDao.getEvents() } returns flowOf()
             val connectionState = MutableStateFlow(false)
-            val eventDistributor =
+            val sdkEventDistributor =
                 createEventDistributor(connectionState = connectionState, sdkContext)
             val testEvent = SdkEvent.External.Custom(id = "testId", name = "testEventName")
             sdkContext.setSdkState(SdkState.onHold)
 
             val offlineCollected = backgroundScope.async {
                 try {
-                    eventDistributor.onlineEvents.timeout(500.milliseconds).firstOrNull()
+                    sdkEventDistributor.onlineEvents.timeout(500.milliseconds).firstOrNull()
                 } catch (e: TimeoutCancellationException) {
                     null
                 }
             }
 
-            eventDistributor.registerEvent(testEvent)
+            sdkEventDistributor.registerAndStoreEvent(testEvent)
 
             offlineCollected.await() shouldBe null
 
             val emittedOnlineEventsWhenOnline = backgroundScope.async {
-                eventDistributor.onlineEvents.take(1).toList()
+                sdkEventDistributor.onlineEvents.take(1).toList()
             }
 
             connectionState.value = true
@@ -271,11 +252,9 @@ class SdkEventDistributorTests {
     private suspend fun createEventDistributor(
         connectionState: MutableStateFlow<Boolean>,
         sdkContext: SdkContextApi,
-        eventFlow: MutableSharedFlow<SdkEvent> = sdkEventFlow,
     ): SdkEventDistributor {
         sdkContext.setSdkState(SdkState.active)
         return SdkEventDistributor(
-            eventFlow,
             connectionState,
             sdkContext,
             mockEventsDao,

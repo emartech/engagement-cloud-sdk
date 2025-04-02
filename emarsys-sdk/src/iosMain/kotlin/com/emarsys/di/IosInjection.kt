@@ -151,7 +151,7 @@ object IosInjection {
                 windowProvider = windowProvider,
                 mainDispatcher = get(named(DispatcherTypes.Main)),
                 sdkDispatcher = get(named(DispatcherTypes.Sdk)),
-                sdkEventFlow = get(named(EventFlowTypes.InternalEventFlow))
+                sdkEventDistributor = get()
             )
         }
         single<ClipboardHandlerApi> { IosClipboardHandler(UIPasteboard.generalPasteboard) }
@@ -177,7 +177,7 @@ object IosInjection {
                 json = get(),
                 sdkDispatcher = get(named(DispatcherTypes.Sdk)),
                 sdkLogger = get { parametersOf(IosPushInternal::class.simpleName) },
-                sdkEventFlow = get(named(EventFlowTypes.InternalEventFlow)),
+                sdkEventDistributor = get(),
                 timestampProvider = get(),
                 uuidProvider = get()
             )
