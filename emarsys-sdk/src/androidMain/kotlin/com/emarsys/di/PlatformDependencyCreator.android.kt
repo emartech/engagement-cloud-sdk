@@ -19,7 +19,6 @@ import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
-import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.cache.AndroidFileCache
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.language.LanguageTagValidator
@@ -30,20 +29,15 @@ import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
-import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.action.PushActionFactoryApi
 import com.emarsys.mobileengage.clipboard.AndroidClipboardHandler
-import com.emarsys.mobileengage.inapp.InAppDownloaderApi
-import com.emarsys.mobileengage.inapp.InAppHandlerApi
 import com.emarsys.mobileengage.inapp.InAppJsBridgeProvider
 import com.emarsys.mobileengage.inapp.InAppPresenter
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppViewProvider
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.mobileengage.inapp.WebViewProvider
-import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
-import com.emarsys.mobileengage.url.AndroidExternalUrlOpener
 import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
@@ -74,17 +68,6 @@ internal actual class PlatformDependencyCreator actual constructor(
     timestampProvider: InstantProvider
 ) : DependencyCreator, SdkComponent {
     private val currentActivityWatchdog: TransitionSafeCurrentActivityWatchdog by inject()
-
-    actual override fun createExternalUrlOpener(): ExternalUrlOpenerApi {
-        return AndroidExternalUrlOpener(applicationContext, sdkLogger)
-    }
-
-    actual override fun createPushToInAppHandler(
-        inAppDownloader: InAppDownloaderApi,
-        inAppHandler: InAppHandlerApi
-    ): PushToInAppHandlerApi {
-        return PushToInAppHandler(inAppDownloader, inAppHandler, sdkLogger)
-    }
 
     actual override fun createConnectionWatchDog(sdkLogger: Logger): ConnectionWatchDog {
         val connectivityManager =

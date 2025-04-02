@@ -3,13 +3,9 @@ package com.emarsys.di
 import com.emarsys.api.push.PushApi
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
-import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.language.LanguageTagValidatorApi
 import com.emarsys.core.log.Logger
-import com.emarsys.core.url.ExternalUrlOpenerApi
-import com.emarsys.mobileengage.inapp.InAppDownloaderApi
-import com.emarsys.mobileengage.inapp.InAppHandlerApi
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
@@ -20,15 +16,8 @@ import org.koin.dsl.module
 
 object PlatformInjection {
     val platformModules = module {
-        single<ExternalUrlOpenerApi> { get<DependencyCreator>().createExternalUrlOpener() }
         single<ClipboardHandlerApi> { get<DependencyCreator>().createClipboardHandler() }
         single<LaunchApplicationHandlerApi> { get<DependencyCreator>().createLaunchApplicationHandler() }
-        single<PushToInAppHandlerApi> {
-            get<DependencyCreator>().createPushToInAppHandler(
-                get<InAppDownloaderApi>(),
-                get<InAppHandlerApi>()
-            )
-        }
         single<ConnectionWatchDog> {
             val logger: Logger = get { parametersOf(ConnectionWatchDog::class.simpleName) }
             get<DependencyCreator>().createConnectionWatchDog(logger)

@@ -2,6 +2,7 @@ package com.emarsys.di
 
 import app.cash.sqldelight.driver.native.NativeSqliteDriver
 import com.emarsys.EmarsysConfig
+import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.db.events.IosSqDelightEventsDao
 import com.emarsys.core.device.DeviceInfoCollector
@@ -21,16 +22,21 @@ import com.emarsys.core.storage.StorageConstants
 import com.emarsys.core.storage.StorageConstants.DB_NAME
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.StringStorageApi
+import com.emarsys.core.url.ExternalUrlOpenerApi
+import com.emarsys.core.url.IosExternalUrlOpener
+import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
 import com.emarsys.setup.PlatformInitializer
 import com.emarsys.setup.PlatformInitializerApi
 import com.emarsys.setup.config.IosSdkConfigStore
 import com.emarsys.setup.config.SdkConfigStoreApi
 import com.emarsys.sqldelight.EmarsysDB
 import org.koin.core.module.Module
+import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import platform.Foundation.NSProcessInfo
 import platform.Foundation.NSUserDefaults
+import platform.UIKit.UIApplication
 import platform.UserNotifications.UNUserNotificationCenter
 
 object IosInjection {
@@ -68,6 +74,20 @@ object IosInjection {
         single<ApplicationVersionProviderApi> { IosApplicationVersionProvider() }
         single<LanguageProviderApi> { IosLanguageProvider() }
         single<PlatformInitializerApi> { PlatformInitializer() }
+        single<ExternalUrlOpenerApi> {
+            IosExternalUrlOpener(
+                uiApplication = UIApplication.sharedApplication,
+                mainDispatcher = get(named(DispatcherTypes.Main)),
+                sdkDispatcher = get(named(DispatcherTypes.Sdk)),
+                sdkLogger = get { parametersOf(IosExternalUrlOpener::class.simpleName) }
+            )
+        }
+        single<PushToInAppHandlerApi> {
+            PushToInAppHandler(
+                downloader = get(),
+                inAppHandler = get()
+            )
+        }
     }
 }
 

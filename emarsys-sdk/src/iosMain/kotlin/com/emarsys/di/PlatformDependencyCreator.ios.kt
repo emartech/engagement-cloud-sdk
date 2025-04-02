@@ -9,7 +9,6 @@ import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.actions.badge.BadgeCountHandlerApi
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
-import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.badge.IosBadgeCountHandler
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.cache.IosFileCache
@@ -23,15 +22,11 @@ import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
-import com.emarsys.core.url.ExternalUrlOpenerApi
-import com.emarsys.core.url.IosExternalUrlOpener
 import com.emarsys.core.watchdog.connection.IosConnectionWatchdog
 import com.emarsys.core.watchdog.connection.NWPathMonitorWrapper
 import com.emarsys.core.watchdog.lifecycle.IosLifecycleWatchdog
 import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.action.PushActionFactoryApi
-import com.emarsys.mobileengage.inapp.InAppDownloaderApi
-import com.emarsys.mobileengage.inapp.InAppHandlerApi
 import com.emarsys.mobileengage.inapp.InAppPresenter
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppViewProvider
@@ -45,7 +40,6 @@ import com.emarsys.mobileengage.push.IosGathererPush
 import com.emarsys.mobileengage.push.IosLoggingPush
 import com.emarsys.mobileengage.push.IosPush
 import com.emarsys.mobileengage.push.IosPushInternal
-import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
 import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
@@ -76,22 +70,6 @@ internal actual class PlatformDependencyCreator actual constructor(
     private val notificationCenter = UNUserNotificationCenter.currentNotificationCenter()
     private val badgeCountHandler: BadgeCountHandlerApi =
         IosBadgeCountHandler(notificationCenter, uiDevice, sdkContext.mainDispatcher)
-
-    actual override fun createExternalUrlOpener(): ExternalUrlOpenerApi {
-        return IosExternalUrlOpener(
-            UIApplication.sharedApplication,
-            sdkContext.mainDispatcher,
-            sdkContext.sdkDispatcher,
-            sdkLogger
-        )
-    }
-
-    actual override fun createPushToInAppHandler(
-        inAppDownloader: InAppDownloaderApi,
-        inAppHandler: InAppHandlerApi
-    ): PushToInAppHandlerApi {
-        return PushToInAppHandler(inAppDownloader, inAppHandler)
-    }
 
     actual override fun createConnectionWatchDog(sdkLogger: Logger): ConnectionWatchDog {
         return IosConnectionWatchdog(NWPathMonitorWrapper(sdkContext.sdkDispatcher))

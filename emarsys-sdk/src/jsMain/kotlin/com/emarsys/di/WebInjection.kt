@@ -3,6 +3,7 @@ package com.emarsys.di
 import com.emarsys.JsEmarsysConfig
 import com.emarsys.api.push.PushConstants.WEB_PUSH_ON_BADGE_COUNT_UPDATE_RECEIVED
 import com.emarsys.api.push.PushConstants.WEB_PUSH_ON_NOTIFICATION_CLICKED_CHANNEL_NAME
+import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.badge.WebBadgeCountHandler
 import com.emarsys.core.badge.WebBadgeCountHandlerApi
 import com.emarsys.core.db.EmarsysIndexedDb
@@ -23,10 +24,13 @@ import com.emarsys.core.providers.LanguageProviderApi
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.StringStorageApi
+import com.emarsys.core.url.ExternalUrlOpenerApi
+import com.emarsys.core.url.WebExternalUrlOpener
 import com.emarsys.mobileengage.push.PushNotificationClickHandler
 import com.emarsys.mobileengage.push.PushNotificationClickHandlerApi
 import com.emarsys.mobileengage.push.PushService
 import com.emarsys.mobileengage.push.PushServiceContext
+import com.emarsys.mobileengage.pushtoinapp.WebPushToInAppHandler
 import com.emarsys.setup.PlatformInitState
 import com.emarsys.setup.PlatformInitializer
 import com.emarsys.setup.PlatformInitializerApi
@@ -117,6 +121,17 @@ object WebInjection {
             PlatformInitializer(
                 pushNotificationClickHandler = get(),
                 webBadgeCountHandler = get()
+            )
+        }
+        single<ExternalUrlOpenerApi> {
+            WebExternalUrlOpener(
+                window = window,
+                sdkLogger = get { parametersOf(WebExternalUrlOpener::class.simpleName) })
+        }
+        single<PushToInAppHandlerApi> {
+            WebPushToInAppHandler(
+                downloader = get(),
+                inAppHandler = get()
             )
         }
     }

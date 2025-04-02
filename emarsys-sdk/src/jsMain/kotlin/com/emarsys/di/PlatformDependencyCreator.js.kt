@@ -12,7 +12,6 @@ import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
-import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.cache.WebFileCache
 import com.emarsys.core.clipboard.WebClipboardHandler
@@ -24,12 +23,8 @@ import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
-import com.emarsys.core.url.ExternalUrlOpenerApi
-import com.emarsys.core.url.WebExternalUrlOpener
 import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.action.PushActionFactoryApi
-import com.emarsys.mobileengage.inapp.InAppDownloaderApi
-import com.emarsys.mobileengage.inapp.InAppHandlerApi
 import com.emarsys.mobileengage.inapp.InAppJsBridgeFactory
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppScriptExtractor
@@ -37,7 +32,6 @@ import com.emarsys.mobileengage.inapp.InAppScriptExtractorApi
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.mobileengage.inapp.WebInAppPresenter
 import com.emarsys.mobileengage.inapp.WebInAppViewProvider
-import com.emarsys.mobileengage.pushtoinapp.WebPushToInAppHandler
 import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
@@ -64,16 +58,6 @@ internal actual class PlatformDependencyCreator actual constructor(
     actionHandler: ActionHandlerApi,
     timestampProvider: InstantProvider
 ) : DependencyCreator {
-    actual override fun createExternalUrlOpener(): ExternalUrlOpenerApi {
-        return WebExternalUrlOpener(window, sdkLogger)
-    }
-
-    actual override fun createPushToInAppHandler(
-        inAppDownloader: InAppDownloaderApi,
-        inAppHandler: InAppHandlerApi
-    ): PushToInAppHandlerApi {
-        return WebPushToInAppHandler(inAppDownloader, inAppHandler)
-    }
 
     actual override fun createConnectionWatchDog(sdkLogger: Logger): ConnectionWatchDog {
         return WebConnectionWatchDog(window)

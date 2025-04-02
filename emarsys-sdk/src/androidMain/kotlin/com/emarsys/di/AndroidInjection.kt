@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import com.emarsys.AndroidEmarsysConfig
 import com.emarsys.applicationContext
+import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.db.events.AndroidSqlDelightEventsDao
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.device.AndroidLanguageProvider
@@ -24,6 +25,7 @@ import com.emarsys.core.storage.StorageConstants
 import com.emarsys.core.storage.StorageConstants.DB_NAME
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.StringStorageApi
+import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.mobileengage.permission.AndroidPermissionHandler
 import com.emarsys.mobileengage.push.AndroidPushMessageFactory
 import com.emarsys.mobileengage.push.NotificationCompatStyler
@@ -34,6 +36,8 @@ import com.emarsys.mobileengage.push.mapper.AndroidPushV1Mapper
 import com.emarsys.mobileengage.push.mapper.AndroidPushV2Mapper
 import com.emarsys.mobileengage.push.mapper.SilentAndroidPushV1Mapper
 import com.emarsys.mobileengage.push.mapper.SilentAndroidPushV2Mapper
+import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
+import com.emarsys.mobileengage.url.AndroidExternalUrlOpener
 import com.emarsys.setup.PlatformInitState
 import com.emarsys.setup.PlatformInitializer
 import com.emarsys.setup.PlatformInitializerApi
@@ -68,21 +72,26 @@ object AndroidInjection {
             )
         }
         single<PermissionHandlerApi> {
-            AndroidPermissionHandler(applicationContext, get<TransitionSafeCurrentActivityWatchdog>())
+            AndroidPermissionHandler(
+                applicationContext,
+                get<TransitionSafeCurrentActivityWatchdog>()
+            )
         }
         single<StringStorageApi> { StringStorage(sharedPreferences = get()) }
-        single<DeviceInfoCollectorApi> { DeviceInfoCollector(
-            timezoneProvider = get(),
-            languageProvider = get(),
-            applicationVersionProvider = get(),
-            isGooglePlayServicesAvailable = true,
-            clientIdProvider = ClientIdProvider(uuidProvider = get(), storage = get()),
-            platformInfoCollector = get(),
-            wrapperInfoStorage = get(),
-            json = get(),
-            stringStorage = get(),
-            sdkContext = get()
-        ) }
+        single<DeviceInfoCollectorApi> {
+            DeviceInfoCollector(
+                timezoneProvider = get(),
+                languageProvider = get(),
+                applicationVersionProvider = get(),
+                isGooglePlayServicesAvailable = true,
+                clientIdProvider = ClientIdProvider(uuidProvider = get(), storage = get()),
+                platformInfoCollector = get(),
+                wrapperInfoStorage = get(),
+                json = get(),
+                stringStorage = get(),
+                sdkContext = get()
+            )
+        }
         single<State>(named(StateTypes.PlatformInit)) { PlatformInitState() }
         single<PlatformInitializerApi> {
             PlatformInitializer(
@@ -160,6 +169,19 @@ object AndroidInjection {
         single<SdkConfigStoreApi<AndroidEmarsysConfig>> {
             AndroidSdkConfigStore(
                 typedStorage = get()
+            )
+        }
+        single<ExternalUrlOpenerApi> {
+            AndroidExternalUrlOpener(
+                applicationContext = applicationContext,
+                sdkLogger = get { parametersOf(AndroidExternalUrlOpener::class.simpleName) }
+            )
+        }
+        single<PushToInAppHandlerApi> {
+            PushToInAppHandler(
+                downloader = get(),
+                inAppHandler = get(),
+                sdkLogger = get { parametersOf(PushToInAppHandler::class.simpleName) }
             )
         }
     }

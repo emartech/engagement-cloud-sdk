@@ -6,17 +6,13 @@ import com.emarsys.api.push.PushContextApi
 import com.emarsys.api.push.PushInstance
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
-import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.language.LanguageTagValidatorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
-import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.action.PushActionFactoryApi
-import com.emarsys.mobileengage.inapp.InAppDownloaderApi
-import com.emarsys.mobileengage.inapp.InAppHandlerApi
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.networking.clients.event.EventClientApi
@@ -29,12 +25,12 @@ import kotlinx.serialization.json.Json
 
 internal interface DependencyCreator {
 
-    fun createExternalUrlOpener(): ExternalUrlOpenerApi
+//    fun createExternalUrlOpener(): ExternalUrlOpenerApi
 
-    fun createPushToInAppHandler(
-        inAppDownloader: InAppDownloaderApi,
-        inAppHandler: InAppHandlerApi
-    ): PushToInAppHandlerApi
+//    fun createPushToInAppHandler(
+//        inAppDownloader: InAppDownloaderApi,
+//        inAppHandler: InAppHandlerApi
+//    ): PushToInAppHandlerApi
 
     fun createConnectionWatchDog(sdkLogger: Logger): ConnectionWatchDog
 
