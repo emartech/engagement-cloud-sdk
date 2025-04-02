@@ -4,7 +4,7 @@ import android.content.Context
 import com.emarsys.core.factory.Factory
 import kotlinx.coroutines.CoroutineDispatcher
 
-class InAppViewProvider(
+internal class InAppViewProvider(
     private val applicationContext: Context,
     private val jsBridgeProvider: Factory<String,InAppJsBridge>,
     private val mainDispatcher: CoroutineDispatcher,

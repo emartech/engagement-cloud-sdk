@@ -5,13 +5,12 @@ import com.emarsys.mobileengage.action.EventActionFactoryApi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.serialization.json.Json
 
-internal class InAppJsBridgeProvider(
+internal class WebInAppJsBridgeFactory(
     private val actionFactory: EventActionFactoryApi,
     private val json: Json,
     private val sdkDispatcher: CoroutineDispatcher
-) :
-    Factory<String, InAppJsBridge> {
-    override fun create(value: String): InAppJsBridge {
-        return InAppJsBridge(actionFactory, json, sdkDispatcher, value)
+) : Factory<String, WebInAppJsBridge> {
+    override fun create(campaignId: String): WebInAppJsBridge {
+        return WebInAppJsBridge(actionFactory, json, sdkDispatcher, campaignId)
     }
 }

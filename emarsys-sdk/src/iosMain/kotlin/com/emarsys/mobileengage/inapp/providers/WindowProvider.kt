@@ -11,7 +11,7 @@ import platform.UIKit.UIViewController
 import platform.UIKit.UIWindow
 import platform.UIKit.UIWindowScene
 
-class WindowProvider(
+internal class WindowProvider(
     private val sceneProvider: Provider<UIScene>,
     private val viewControllerProvider: Provider<UIViewController>,
     private val mainDispatcher: CoroutineDispatcher

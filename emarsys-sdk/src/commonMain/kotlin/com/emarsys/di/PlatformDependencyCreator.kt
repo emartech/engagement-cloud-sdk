@@ -14,10 +14,7 @@ import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
-import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.action.PushActionFactoryApi
-import com.emarsys.mobileengage.inapp.InAppPresenterApi
-import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
@@ -36,10 +33,6 @@ internal expect class PlatformDependencyCreator(
     actionHandler: ActionHandlerApi,
     timestampProvider: InstantProvider
 ) : DependencyCreator {
-
-    override fun createInAppViewProvider(eventActionFactory: EventActionFactoryApi): InAppViewProviderApi
-
-    override fun createInAppPresenter(): InAppPresenterApi
 
     override fun createClipboardHandler(): ClipboardHandlerApi
 

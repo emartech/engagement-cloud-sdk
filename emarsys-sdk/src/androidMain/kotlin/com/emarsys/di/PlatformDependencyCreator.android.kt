@@ -23,15 +23,8 @@ import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
-import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.action.PushActionFactoryApi
 import com.emarsys.mobileengage.clipboard.AndroidClipboardHandler
-import com.emarsys.mobileengage.inapp.InAppJsBridgeProvider
-import com.emarsys.mobileengage.inapp.InAppPresenter
-import com.emarsys.mobileengage.inapp.InAppPresenterApi
-import com.emarsys.mobileengage.inapp.InAppViewProvider
-import com.emarsys.mobileengage.inapp.InAppViewProviderApi
-import com.emarsys.mobileengage.inapp.WebViewProvider
 import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
@@ -39,9 +32,7 @@ import com.emarsys.setup.config.AndroidSdkConfigStore
 import com.emarsys.setup.config.SdkConfigStoreApi
 import com.emarsys.watchdog.activity.TransitionSafeCurrentActivityWatchdog
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.serialization.json.Json
 import org.koin.core.component.inject
 
@@ -56,29 +47,6 @@ internal actual class PlatformDependencyCreator actual constructor(
     timestampProvider: InstantProvider
 ) : DependencyCreator, SdkComponent {
     private val currentActivityWatchdog: TransitionSafeCurrentActivityWatchdog by inject()
-
-    actual override fun createInAppViewProvider(eventActionFactory: EventActionFactoryApi): InAppViewProviderApi {
-        return InAppViewProvider(
-            applicationContext,
-            InAppJsBridgeProvider(
-                eventActionFactory,
-                json,
-                CoroutineScope(sdkContext.sdkDispatcher)
-            ),
-            sdkContext.mainDispatcher,
-            WebViewProvider(applicationContext, sdkContext.mainDispatcher)
-        )
-    }
-
-    actual override fun createInAppPresenter(): InAppPresenterApi {
-        return InAppPresenter(
-            currentActivityWatchdog,
-            sdkContext.mainDispatcher,
-            sdkContext.sdkDispatcher,
-            sdkEventFlow.asSharedFlow(),
-            sdkLogger
-        )
-    }
 
     actual override fun createClipboardHandler(): ClipboardHandlerApi {
         val clipboardManager =

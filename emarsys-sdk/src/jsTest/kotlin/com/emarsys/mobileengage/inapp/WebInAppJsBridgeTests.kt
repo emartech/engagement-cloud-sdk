@@ -1,8 +1,7 @@
 package com.emarsys.mobileengage.inapp
 
-import com.emarsys.mobileengage.action.ActionFactoryApi
+import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.action.actions.ReportingAction
-import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
 import com.emarsys.mobileengage.action.models.BasicCopyToClipboardActionModel
 import com.emarsys.mobileengage.action.models.BasicCustomEventActionModel
@@ -11,15 +10,15 @@ import com.emarsys.mobileengage.action.models.BasicInAppButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.action.models.RequestPushPermissionActionModel
 import com.emarsys.util.JsonUtil
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -31,27 +30,27 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class InappJsBridgeTests {
+class WebInAppJsBridgeTests {
     private companion object {
         const val ID = "1"
         const val CAMPAIGN_ID = "testCampaignId"
         val TEST_ACTION =
-            ReportingAction(BasicInAppButtonClickedActionModel(ID, CAMPAIGN_ID), mock())
+            ReportingAction(BasicInAppButtonClickedActionModel(ID, CAMPAIGN_ID), mock(MockMode.autoUnit))
     }
 
     private lateinit var inappJsBridge: InAppJsBridgeApi
-    private lateinit var mockActionFactory: ActionFactoryApi<ActionModel>
+    private lateinit var mockActionFactory: EventActionFactoryApi
     private lateinit var json: Json
-    private lateinit var sdkScope: CoroutineScope
+    private lateinit var sdkDispatcher: CoroutineDispatcher
 
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(StandardTestDispatcher())
-        sdkScope = TestScope(StandardTestDispatcher())
+        sdkDispatcher = StandardTestDispatcher()
         json = JsonUtil.json
-        mockActionFactory = mock()
+        mockActionFactory = mock(MockMode.autoUnit)
 
-        inappJsBridge = InAppJsBridge(mockActionFactory, json, sdkScope, CAMPAIGN_ID)
+        inappJsBridge = WebInAppJsBridge(mockActionFactory, json, sdkDispatcher, CAMPAIGN_ID)
     }
 
     @AfterTest

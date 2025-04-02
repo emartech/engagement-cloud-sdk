@@ -9,10 +9,7 @@ import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.language.LanguageTagValidatorApi
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
-import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.action.PushActionFactoryApi
-import com.emarsys.mobileengage.inapp.InAppPresenterApi
-import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.config.SdkConfigStoreApi
@@ -20,10 +17,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.serialization.json.Json
 
 internal interface DependencyCreator {
-
-    fun createInAppViewProvider(eventActionFactory: EventActionFactoryApi): InAppViewProviderApi
-
-    fun createInAppPresenter(): InAppPresenterApi
 
     fun createClipboardHandler(): ClipboardHandlerApi
 

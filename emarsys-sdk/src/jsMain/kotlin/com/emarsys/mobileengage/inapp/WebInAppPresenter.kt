@@ -3,14 +3,14 @@ package com.emarsys.mobileengage.inapp
 import com.emarsys.networking.clients.event.model.SdkEvent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import web.dom.document
 import web.html.HTMLElement
 
 class WebInAppPresenter(
-    private val sdkEventFlow: SharedFlow<SdkEvent>,
+    private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
     private val sdkDispatcher: CoroutineDispatcher
 ) : InAppPresenterApi {
     override suspend fun present(

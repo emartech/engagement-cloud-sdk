@@ -10,13 +10,13 @@ class WebInAppViewProviderTests {
 
     private lateinit var webInappViewProvider: WebInAppViewProvider
     private lateinit var inappScriptExtractor: InAppScriptExtractor
-    private lateinit var mockInAppJsBridgeFactory: Factory<String, InAppJsBridge>
+    private lateinit var mockWebInAppJsBridgeFactory: Factory<String, WebInAppJsBridge>
 
     @Test
     fun provide_shouldReturn_webInappViewInstance() = runTest {
         inappScriptExtractor = InAppScriptExtractor()
-        mockInAppJsBridgeFactory = mock()
-        webInappViewProvider = WebInAppViewProvider(inappScriptExtractor,mockInAppJsBridgeFactory)
+        mockWebInAppJsBridgeFactory = mock()
+        webInappViewProvider = WebInAppViewProvider(inappScriptExtractor,mockWebInAppJsBridgeFactory)
 
         val view = webInappViewProvider.provide()
 

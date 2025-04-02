@@ -7,6 +7,8 @@ import dev.mokkery.every
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -18,19 +20,21 @@ class WebInappViewTests {
 
     private lateinit var webInappView: WebInAppView
     private lateinit var inappScriptExtractor: InAppScriptExtractorApi
-    private lateinit var mockInAppJsBridgeFactory: Factory<String, InAppJsBridge>
+    private lateinit var mockWebInAppJsBridgeFactory: Factory<String, WebInAppJsBridge>
+    private lateinit var sdkDispatcher: CoroutineDispatcher
 
     @BeforeTest
     fun setup() {
+        sdkDispatcher = StandardTestDispatcher()
         inappScriptExtractor = InAppScriptExtractor()
-        mockInAppJsBridgeFactory = mock()
-        every { mockInAppJsBridgeFactory.create(CAMPAIGN_ID) } returns InAppJsBridge(
+        mockWebInAppJsBridgeFactory = mock()
+        every { mockWebInAppJsBridgeFactory.create(CAMPAIGN_ID) } returns WebInAppJsBridge(
             mock(),
             JsonUtil.json,
-            mock(),
+            sdkDispatcher,
             CAMPAIGN_ID
         )
-        webInappView = WebInAppView(inappScriptExtractor, mockInAppJsBridgeFactory)
+        webInappView = WebInAppView(inappScriptExtractor, mockWebInAppJsBridgeFactory)
     }
 
     @Test

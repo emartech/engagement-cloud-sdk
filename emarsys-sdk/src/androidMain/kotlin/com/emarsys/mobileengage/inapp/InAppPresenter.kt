@@ -9,7 +9,7 @@ import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.watchdog.activity.TransitionSafeCurrentActivityWatchdog
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -18,7 +18,7 @@ class InAppPresenter(
     private val currentActivityWatchdog: TransitionSafeCurrentActivityWatchdog,
     private val mainDispatcher: CoroutineDispatcher,
     private val sdkDispatcher: CoroutineDispatcher,
-    private val sdkEventFlow: SharedFlow<SdkEvent>,
+    private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
     private val logger: Logger
 ) : InAppPresenterApi {
 

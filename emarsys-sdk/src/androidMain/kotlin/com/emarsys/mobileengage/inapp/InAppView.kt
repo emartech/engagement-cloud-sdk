@@ -9,7 +9,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
 @SuppressLint("SetJavaScriptEnabled")
-class InAppView @JvmOverloads constructor(
+internal class InAppView @JvmOverloads constructor(
     context: Context,
     private val mainDispatcher: CoroutineDispatcher,
     private val webViewProvider: WebViewProvider,

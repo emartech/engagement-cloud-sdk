@@ -4,9 +4,9 @@ import com.emarsys.core.factory.Factory
 import web.dom.document
 import web.html.HTMLElement
 
-class WebInAppView(
+internal class WebInAppView(
     private val inappScriptExtractor: InAppScriptExtractorApi,
-    private val inAppJsBridgeFactory: Factory<String, InAppJsBridge>
+    private val webInAppJsBridgeFactory: Factory<String, WebInAppJsBridge>
 ) : InAppViewApi {
 
     private lateinit var mInAppMessage: InAppMessage
@@ -15,7 +15,7 @@ class WebInAppView(
 
     override suspend fun load(message: InAppMessage): WebViewHolder {
         mInAppMessage = message
-        val jsBridge = inAppJsBridgeFactory.create(message.campaignId)
+        val jsBridge = webInAppJsBridgeFactory.create(message.campaignId)
         jsBridge.register()
         val view = document.createElement("div")
         view.innerHTML = message.html

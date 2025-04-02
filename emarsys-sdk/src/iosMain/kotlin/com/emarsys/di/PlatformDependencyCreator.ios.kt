@@ -20,17 +20,7 @@ import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
-import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.action.PushActionFactoryApi
-import com.emarsys.mobileengage.inapp.InAppPresenter
-import com.emarsys.mobileengage.inapp.InAppPresenterApi
-import com.emarsys.mobileengage.inapp.InAppViewProvider
-import com.emarsys.mobileengage.inapp.InAppViewProviderApi
-import com.emarsys.mobileengage.inapp.providers.InAppJsBridgeProvider
-import com.emarsys.mobileengage.inapp.providers.SceneProvider
-import com.emarsys.mobileengage.inapp.providers.ViewControllerProvider
-import com.emarsys.mobileengage.inapp.providers.WebViewProvider
-import com.emarsys.mobileengage.inapp.providers.WindowProvider
 import com.emarsys.mobileengage.push.IosGathererPush
 import com.emarsys.mobileengage.push.IosLoggingPush
 import com.emarsys.mobileengage.push.IosPush
@@ -44,7 +34,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.Json
 import platform.Foundation.NSProcessInfo
-import platform.UIKit.UIApplication
 import platform.UIKit.UIPasteboard
 import platform.UserNotifications.UNUserNotificationCenter
 
@@ -62,35 +51,6 @@ internal actual class PlatformDependencyCreator actual constructor(
     private val notificationCenter = UNUserNotificationCenter.currentNotificationCenter()
     private val badgeCountHandler: BadgeCountHandlerApi =
         IosBadgeCountHandler(notificationCenter, uiDevice, sdkContext.mainDispatcher)
-
-    actual override fun createInAppViewProvider(eventActionFactory: EventActionFactoryApi): InAppViewProviderApi {
-        return InAppViewProvider(
-            sdkContext.mainDispatcher,
-            WebViewProvider(
-                sdkContext.mainDispatcher,
-                InAppJsBridgeProvider(
-                    eventActionFactory,
-                    json,
-                    sdkContext.mainDispatcher,
-                    sdkContext.sdkDispatcher,
-                    sdkLogger
-                )
-            )
-        )
-    }
-
-    actual override fun createInAppPresenter(): InAppPresenterApi {
-        return InAppPresenter(
-            WindowProvider(
-                sceneProvider = SceneProvider(UIApplication.sharedApplication),
-                viewControllerProvider = ViewControllerProvider(),
-                mainDispatcher = sdkContext.mainDispatcher
-            ),
-            sdkContext.mainDispatcher,
-            sdkContext.sdkDispatcher,
-            sdkEventFlow,
-        )
-    }
 
     actual override fun createClipboardHandler(): ClipboardHandlerApi {
         return IosClipboardHandler(UIPasteboard.generalPasteboard)

@@ -29,6 +29,16 @@ import com.emarsys.core.url.IosExternalUrlOpener
 import com.emarsys.core.watchdog.connection.IosConnectionWatchdog
 import com.emarsys.core.watchdog.connection.NWPathMonitorWrapper
 import com.emarsys.core.watchdog.lifecycle.IosLifecycleWatchdog
+import com.emarsys.mobileengage.action.EventActionFactoryApi
+import com.emarsys.mobileengage.inapp.InAppPresenterApi
+import com.emarsys.mobileengage.inapp.InAppViewProvider
+import com.emarsys.mobileengage.inapp.InAppViewProviderApi
+import com.emarsys.mobileengage.inapp.IosInAppPresenter
+import com.emarsys.mobileengage.inapp.providers.InAppJsBridgeProvider
+import com.emarsys.mobileengage.inapp.providers.SceneProvider
+import com.emarsys.mobileengage.inapp.providers.ViewControllerProvider
+import com.emarsys.mobileengage.inapp.providers.WebViewProvider
+import com.emarsys.mobileengage.inapp.providers.WindowProvider
 import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
 import com.emarsys.setup.PlatformInitializer
 import com.emarsys.setup.PlatformInitializerApi
@@ -105,6 +115,35 @@ object IosInjection {
         }
         single<LifecycleWatchDog> { IosLifecycleWatchdog() }
         single<FileCacheApi> { IosFileCache(NSFileManager.defaultManager) }
+        single<InAppViewProviderApi> {
+            val webViewProvider = WebViewProvider(
+                mainDispatcher = get(named(DispatcherTypes.Main)),
+                InAppJsBridgeProvider(
+                    actionFactory = get<EventActionFactoryApi>(),
+                    json = get(),
+                    mainDispatcher = get(named(DispatcherTypes.Main)),
+                    sdkDispatcher = get(named(DispatcherTypes.Sdk)),
+                    sdkLogger = get { parametersOf(InAppJsBridgeProvider::class.simpleName) }
+                )
+            )
+            InAppViewProvider(
+                mainDispatcher = get(named(DispatcherTypes.Main)),
+                webViewProvider = webViewProvider
+            )
+        }
+        single<InAppPresenterApi> {
+            val windowProvider = WindowProvider(
+                sceneProvider = SceneProvider(UIApplication.sharedApplication),
+                viewControllerProvider = ViewControllerProvider(),
+                mainDispatcher = get(named(DispatcherTypes.Main))
+            )
+            IosInAppPresenter(
+                windowProvider = windowProvider,
+                mainDispatcher = get(named(DispatcherTypes.Main)),
+                sdkDispatcher = get(named(DispatcherTypes.Sdk)),
+                sdkEventFlow = get(named(EventFlowTypes.InternalEventFlow))
+            )
+        }
     }
 }
 

@@ -21,15 +21,7 @@ import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
-import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.action.PushActionFactoryApi
-import com.emarsys.mobileengage.inapp.InAppJsBridgeFactory
-import com.emarsys.mobileengage.inapp.InAppPresenterApi
-import com.emarsys.mobileengage.inapp.InAppScriptExtractor
-import com.emarsys.mobileengage.inapp.InAppScriptExtractorApi
-import com.emarsys.mobileengage.inapp.InAppViewProviderApi
-import com.emarsys.mobileengage.inapp.WebInAppPresenter
-import com.emarsys.mobileengage.inapp.WebInAppViewProvider
 import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
@@ -37,7 +29,6 @@ import com.emarsys.setup.config.JsEmarsysConfigStore
 import com.emarsys.setup.config.SdkConfigStoreApi
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.Json
 
@@ -50,21 +41,6 @@ internal actual class PlatformDependencyCreator actual constructor(
     actionHandler: ActionHandlerApi,
     timestampProvider: InstantProvider
 ) : DependencyCreator {
-
-    private val inappScriptExtractor: InAppScriptExtractorApi by lazy {
-        InAppScriptExtractor()
-    }
-
-    actual override fun createInAppViewProvider(eventActionFactory: EventActionFactoryApi): InAppViewProviderApi {
-        return WebInAppViewProvider(
-            inappScriptExtractor,
-            InAppJsBridgeFactory(eventActionFactory, json, Dispatchers.Main)
-        )
-    }
-
-    actual override fun createInAppPresenter(): InAppPresenterApi {
-        return WebInAppPresenter(sdkEventFlow, sdkContext.sdkDispatcher)
-    }
 
     actual override fun createClipboardHandler(): ClipboardHandlerApi {
         return WebClipboardHandler(window.navigator.clipboard)

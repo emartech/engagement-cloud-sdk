@@ -31,6 +31,13 @@ import com.emarsys.core.storage.StorageConstants.DB_NAME
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
+import com.emarsys.mobileengage.action.EventActionFactoryApi
+import com.emarsys.mobileengage.inapp.InAppJsBridgeProvider
+import com.emarsys.mobileengage.inapp.InAppPresenter
+import com.emarsys.mobileengage.inapp.InAppPresenterApi
+import com.emarsys.mobileengage.inapp.InAppViewProvider
+import com.emarsys.mobileengage.inapp.InAppViewProviderApi
+import com.emarsys.mobileengage.inapp.WebViewProvider
 import com.emarsys.mobileengage.permission.AndroidPermissionHandler
 import com.emarsys.mobileengage.push.AndroidPushMessageFactory
 import com.emarsys.mobileengage.push.NotificationCompatStyler
@@ -212,6 +219,28 @@ object AndroidInjection {
             )
         }
         single<FileCacheApi> { AndroidFileCache(applicationContext, FileSystem.SYSTEM) }
+        single<InAppViewProviderApi> {
+            val inAppJsBridgeProvider = InAppJsBridgeProvider(
+                actionFactory = get<EventActionFactoryApi>(),
+                json = get(),
+                sdkDispatcher = get(named(DispatcherTypes.Sdk))
+            )
+            InAppViewProvider(
+                applicationContext,
+                inAppJsBridgeProvider,
+                mainDispatcher = get(named(DispatcherTypes.Main)),
+                WebViewProvider(applicationContext, get(named(DispatcherTypes.Main)))
+            )
+        }
+        single<InAppPresenterApi> {
+            InAppPresenter(
+                currentActivityWatchdog = get(),
+                mainDispatcher = get(named(DispatcherTypes.Main)),
+                sdkDispatcher = get(named(DispatcherTypes.Sdk)),
+                sdkEventFlow = get(named(EventFlowTypes.InternalEventFlow)),
+                logger = get { parametersOf(InAppPresenter::class.simpleName) }
+            )
+        }
     }
 }
 

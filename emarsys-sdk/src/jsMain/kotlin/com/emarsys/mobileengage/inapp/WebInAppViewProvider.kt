@@ -2,12 +2,12 @@ package com.emarsys.mobileengage.inapp
 
 import com.emarsys.core.factory.Factory
 
-class WebInAppViewProvider(
+internal class WebInAppViewProvider(
     private val inappScriptExtractor: InAppScriptExtractorApi,
-    private val inAppJsBridgeFactory: Factory<String, InAppJsBridge>
+    private val webInAppJsBridgeFactory: Factory<String, WebInAppJsBridge>
 ) :
     InAppViewProviderApi {
     override suspend fun provide(): InAppViewApi {
-        return WebInAppView(inappScriptExtractor, inAppJsBridgeFactory)
+        return WebInAppView(inappScriptExtractor, webInAppJsBridgeFactory)
     }
 }

@@ -28,6 +28,13 @@ import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.url.WebExternalUrlOpener
+import com.emarsys.mobileengage.action.EventActionFactoryApi
+import com.emarsys.mobileengage.inapp.InAppPresenterApi
+import com.emarsys.mobileengage.inapp.InAppScriptExtractor
+import com.emarsys.mobileengage.inapp.InAppViewProviderApi
+import com.emarsys.mobileengage.inapp.WebInAppJsBridgeFactory
+import com.emarsys.mobileengage.inapp.WebInAppPresenter
+import com.emarsys.mobileengage.inapp.WebInAppViewProvider
 import com.emarsys.mobileengage.push.PushNotificationClickHandler
 import com.emarsys.mobileengage.push.PushNotificationClickHandlerApi
 import com.emarsys.mobileengage.push.PushService
@@ -149,6 +156,22 @@ object WebInjection {
             )
         }
         single<FileCacheApi> { WebFileCache() }
+        single<InAppViewProviderApi> {
+            WebInAppViewProvider(
+                InAppScriptExtractor(),
+                WebInAppJsBridgeFactory(
+                    actionFactory = get<EventActionFactoryApi>(),
+                    json = get(),
+                    sdkDispatcher = get(named(DispatcherTypes.Sdk))
+                )
+            )
+        }
+        single<InAppPresenterApi> {
+            WebInAppPresenter(
+                sdkEventFlow = get(named(EventFlowTypes.InternalEventFlow)),
+                sdkDispatcher = get(named(DispatcherTypes.Sdk))
+            )
+        }
     }
 
     private fun getNavigatorData(): String {
