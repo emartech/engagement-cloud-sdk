@@ -10,8 +10,6 @@ import com.emarsys.core.actions.badge.BadgeCountHandlerApi
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.badge.IosBadgeCountHandler
-import com.emarsys.core.cache.FileCacheApi
-import com.emarsys.core.cache.IosFileCache
 import com.emarsys.core.clipboard.IosClipboardHandler
 import com.emarsys.core.device.UIDevice
 import com.emarsys.core.language.LanguageTagValidator
@@ -22,9 +20,6 @@ import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
-import com.emarsys.core.watchdog.connection.IosConnectionWatchdog
-import com.emarsys.core.watchdog.connection.NWPathMonitorWrapper
-import com.emarsys.core.watchdog.lifecycle.IosLifecycleWatchdog
 import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.action.PushActionFactoryApi
 import com.emarsys.mobileengage.inapp.InAppPresenter
@@ -45,12 +40,9 @@ import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.config.IosSdkConfigStore
 import com.emarsys.setup.config.SdkConfigStoreApi
-import com.emarsys.watchdog.connection.ConnectionWatchDog
-import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.Json
-import platform.Foundation.NSFileManager
 import platform.Foundation.NSProcessInfo
 import platform.UIKit.UIApplication
 import platform.UIKit.UIPasteboard
@@ -70,19 +62,6 @@ internal actual class PlatformDependencyCreator actual constructor(
     private val notificationCenter = UNUserNotificationCenter.currentNotificationCenter()
     private val badgeCountHandler: BadgeCountHandlerApi =
         IosBadgeCountHandler(notificationCenter, uiDevice, sdkContext.mainDispatcher)
-
-    actual override fun createConnectionWatchDog(sdkLogger: Logger): ConnectionWatchDog {
-        return IosConnectionWatchdog(NWPathMonitorWrapper(sdkContext.sdkDispatcher))
-    }
-
-    actual override fun createLifeCycleWatchDog(): LifecycleWatchDog {
-        return IosLifecycleWatchdog()
-    }
-
-
-    actual override fun createFileCache(): FileCacheApi {
-        return IosFileCache(NSFileManager.defaultManager)
-    }
 
     actual override fun createInAppViewProvider(eventActionFactory: EventActionFactoryApi): InAppViewProviderApi {
         return InAppViewProvider(

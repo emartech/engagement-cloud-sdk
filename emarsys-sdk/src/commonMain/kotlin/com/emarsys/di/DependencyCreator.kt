@@ -6,9 +6,7 @@ import com.emarsys.api.push.PushContextApi
 import com.emarsys.api.push.PushInstance
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
-import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.language.LanguageTagValidatorApi
-import com.emarsys.core.log.Logger
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.mobileengage.action.EventActionFactoryApi
@@ -18,25 +16,10 @@ import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.config.SdkConfigStoreApi
-import com.emarsys.watchdog.connection.ConnectionWatchDog
-import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.serialization.json.Json
 
 internal interface DependencyCreator {
-
-//    fun createExternalUrlOpener(): ExternalUrlOpenerApi
-
-//    fun createPushToInAppHandler(
-//        inAppDownloader: InAppDownloaderApi,
-//        inAppHandler: InAppHandlerApi
-//    ): PushToInAppHandlerApi
-
-    fun createConnectionWatchDog(sdkLogger: Logger): ConnectionWatchDog
-
-    fun createLifeCycleWatchDog(): LifecycleWatchDog
-
-    fun createFileCache(): FileCacheApi
 
     fun createInAppViewProvider(eventActionFactory: EventActionFactoryApi): InAppViewProviderApi
 

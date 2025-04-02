@@ -6,6 +6,8 @@ import com.emarsys.api.push.PushConstants.WEB_PUSH_ON_NOTIFICATION_CLICKED_CHANN
 import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.badge.WebBadgeCountHandler
 import com.emarsys.core.badge.WebBadgeCountHandlerApi
+import com.emarsys.core.cache.FileCacheApi
+import com.emarsys.core.cache.WebFileCache
 import com.emarsys.core.db.EmarsysIndexedDb
 import com.emarsys.core.db.EmarsysIndexedDbObjectStore
 import com.emarsys.core.db.EmarsysObjectStoreConfig
@@ -36,6 +38,10 @@ import com.emarsys.setup.PlatformInitializer
 import com.emarsys.setup.PlatformInitializerApi
 import com.emarsys.setup.config.JsEmarsysConfigStore
 import com.emarsys.setup.config.SdkConfigStoreApi
+import com.emarsys.watchdog.connection.ConnectionWatchDog
+import com.emarsys.watchdog.connection.WebConnectionWatchDog
+import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
+import com.emarsys.watchdog.lifecycle.WebLifeCycleWatchDog
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -46,6 +52,7 @@ import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import web.broadcast.BroadcastChannel
+import web.dom.document
 import web.idb.indexedDB
 
 object WebInjection {
@@ -134,6 +141,14 @@ object WebInjection {
                 inAppHandler = get()
             )
         }
+        single<ConnectionWatchDog> { WebConnectionWatchDog(window) }
+        single<LifecycleWatchDog> {
+            WebLifeCycleWatchDog(
+                document = document,
+                CoroutineScope(Dispatchers.Default)
+            )
+        }
+        single<FileCacheApi> { WebFileCache() }
     }
 
     private fun getNavigatorData(): String {

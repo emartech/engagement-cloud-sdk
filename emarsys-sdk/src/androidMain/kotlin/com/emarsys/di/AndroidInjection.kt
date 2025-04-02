@@ -3,10 +3,15 @@ package com.emarsys.di
 import android.app.NotificationManager
 import android.content.Context
 import android.content.SharedPreferences
+import android.net.ConnectivityManager
+import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import com.emarsys.AndroidEmarsysConfig
 import com.emarsys.applicationContext
 import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
+import com.emarsys.core.cache.AndroidFileCache
+import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.db.events.AndroidSqlDelightEventsDao
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.device.AndroidLanguageProvider
@@ -45,6 +50,13 @@ import com.emarsys.setup.config.AndroidSdkConfigStore
 import com.emarsys.setup.config.SdkConfigStoreApi
 import com.emarsys.sqldelight.EmarsysDB
 import com.emarsys.watchdog.activity.TransitionSafeCurrentActivityWatchdog
+import com.emarsys.watchdog.connection.AndroidConnectionWatchDog
+import com.emarsys.watchdog.connection.ConnectionWatchDog
+import com.emarsys.watchdog.lifecycle.AndroidLifecycleWatchDog
+import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import okio.FileSystem
 import org.koin.core.module.Module
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
@@ -184,6 +196,22 @@ object AndroidInjection {
                 sdkLogger = get { parametersOf(PushToInAppHandler::class.simpleName) }
             )
         }
+        single<ConnectionWatchDog> {
+            val connectivityManager =
+                applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            AndroidConnectionWatchDog(
+                connectivityManager = connectivityManager,
+                logger = get { parametersOf(ConnectionWatchDog::class.simpleName) }
+            )
+        }
+        single<LifecycleWatchDog> {
+            AndroidLifecycleWatchDog(
+                ProcessLifecycleOwner.get().lifecycle,
+                ProcessLifecycleOwner.get().lifecycleScope,
+                lifecycleWatchDogScope = CoroutineScope(Dispatchers.Default)
+            )
+        }
+        single<FileCacheApi> { AndroidFileCache(applicationContext, FileSystem.SYSTEM) }
     }
 }
 

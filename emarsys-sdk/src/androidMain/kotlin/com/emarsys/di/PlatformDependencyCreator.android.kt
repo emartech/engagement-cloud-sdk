@@ -1,11 +1,7 @@
 package com.emarsys.di
 
 import android.content.ClipboardManager
-import android.content.Context
 import android.content.Context.CLIPBOARD_SERVICE
-import android.net.ConnectivityManager
-import androidx.lifecycle.ProcessLifecycleOwner
-import androidx.lifecycle.lifecycleScope
 import com.emarsys.SdkConfig
 import com.emarsys.api.push.LoggingPush
 import com.emarsys.api.push.Push
@@ -19,8 +15,6 @@ import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
-import com.emarsys.core.cache.AndroidFileCache
-import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.language.LanguageTagValidator
 import com.emarsys.core.language.LanguageTagValidatorApi
 import com.emarsys.core.launchapplication.LaunchApplicationHandler
@@ -44,17 +38,11 @@ import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.config.AndroidSdkConfigStore
 import com.emarsys.setup.config.SdkConfigStoreApi
 import com.emarsys.watchdog.activity.TransitionSafeCurrentActivityWatchdog
-import com.emarsys.watchdog.connection.AndroidConnectionWatchDog
-import com.emarsys.watchdog.connection.ConnectionWatchDog
-import com.emarsys.watchdog.lifecycle.AndroidLifecycleWatchDog
-import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.serialization.json.Json
-import okio.FileSystem
 import org.koin.core.component.inject
 
 
@@ -68,24 +56,6 @@ internal actual class PlatformDependencyCreator actual constructor(
     timestampProvider: InstantProvider
 ) : DependencyCreator, SdkComponent {
     private val currentActivityWatchdog: TransitionSafeCurrentActivityWatchdog by inject()
-
-    actual override fun createConnectionWatchDog(sdkLogger: Logger): ConnectionWatchDog {
-        val connectivityManager =
-            applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        return AndroidConnectionWatchDog(connectivityManager, sdkLogger)
-    }
-
-    actual override fun createLifeCycleWatchDog(): LifecycleWatchDog {
-        return AndroidLifecycleWatchDog(
-            ProcessLifecycleOwner.get().lifecycle,
-            ProcessLifecycleOwner.get().lifecycleScope,
-            CoroutineScope(Dispatchers.Default)
-        )
-    }
-
-    actual override fun createFileCache(): FileCacheApi {
-        return AndroidFileCache(applicationContext, FileSystem.SYSTEM)
-    }
 
     actual override fun createInAppViewProvider(eventActionFactory: EventActionFactoryApi): InAppViewProviderApi {
         return InAppViewProvider(

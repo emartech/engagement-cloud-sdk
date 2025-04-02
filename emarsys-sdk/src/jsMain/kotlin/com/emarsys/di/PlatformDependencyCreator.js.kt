@@ -12,8 +12,6 @@ import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
-import com.emarsys.core.cache.FileCacheApi
-import com.emarsys.core.cache.WebFileCache
 import com.emarsys.core.clipboard.WebClipboardHandler
 import com.emarsys.core.language.LanguageTagValidator
 import com.emarsys.core.language.LanguageTagValidatorApi
@@ -37,17 +35,11 @@ import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.config.JsEmarsysConfigStore
 import com.emarsys.setup.config.SdkConfigStoreApi
-import com.emarsys.watchdog.connection.ConnectionWatchDog
-import com.emarsys.watchdog.connection.WebConnectionWatchDog
-import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
-import com.emarsys.watchdog.lifecycle.WebLifeCycleWatchDog
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.Json
-import web.dom.document
 
 internal actual class PlatformDependencyCreator actual constructor(
     private val sdkContext: SdkContextApi,
@@ -58,18 +50,6 @@ internal actual class PlatformDependencyCreator actual constructor(
     actionHandler: ActionHandlerApi,
     timestampProvider: InstantProvider
 ) : DependencyCreator {
-
-    actual override fun createConnectionWatchDog(sdkLogger: Logger): ConnectionWatchDog {
-        return WebConnectionWatchDog(window)
-    }
-
-    actual override fun createLifeCycleWatchDog(): LifecycleWatchDog {
-        return WebLifeCycleWatchDog(document, CoroutineScope(Dispatchers.Default))
-    }
-
-    actual override fun createFileCache(): FileCacheApi {
-        return WebFileCache()
-    }
 
     private val inappScriptExtractor: InAppScriptExtractorApi by lazy {
         InAppScriptExtractor()

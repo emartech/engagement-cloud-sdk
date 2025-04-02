@@ -3,6 +3,8 @@ package com.emarsys.di
 import app.cash.sqldelight.driver.native.NativeSqliteDriver
 import com.emarsys.EmarsysConfig
 import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
+import com.emarsys.core.cache.FileCacheApi
+import com.emarsys.core.cache.IosFileCache
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.db.events.IosSqDelightEventsDao
 import com.emarsys.core.device.DeviceInfoCollector
@@ -24,16 +26,22 @@ import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.url.IosExternalUrlOpener
+import com.emarsys.core.watchdog.connection.IosConnectionWatchdog
+import com.emarsys.core.watchdog.connection.NWPathMonitorWrapper
+import com.emarsys.core.watchdog.lifecycle.IosLifecycleWatchdog
 import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
 import com.emarsys.setup.PlatformInitializer
 import com.emarsys.setup.PlatformInitializerApi
 import com.emarsys.setup.config.IosSdkConfigStore
 import com.emarsys.setup.config.SdkConfigStoreApi
 import com.emarsys.sqldelight.EmarsysDB
+import com.emarsys.watchdog.connection.ConnectionWatchDog
+import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import org.koin.core.module.Module
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import platform.Foundation.NSFileManager
 import platform.Foundation.NSProcessInfo
 import platform.Foundation.NSUserDefaults
 import platform.UIKit.UIApplication
@@ -88,6 +96,15 @@ object IosInjection {
                 inAppHandler = get()
             )
         }
+        single<ConnectionWatchDog> {
+            IosConnectionWatchdog(
+                NWPathMonitorWrapper(
+                    sdkDispatcher = get(named(DispatcherTypes.Sdk))
+                )
+            )
+        }
+        single<LifecycleWatchDog> { IosLifecycleWatchdog() }
+        single<FileCacheApi> { IosFileCache(NSFileManager.defaultManager) }
     }
 }
 

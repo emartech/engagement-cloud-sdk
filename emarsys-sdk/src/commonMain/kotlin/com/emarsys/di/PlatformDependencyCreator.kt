@@ -8,7 +8,6 @@ import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
-import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.language.LanguageTagValidatorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.InstantProvider
@@ -23,8 +22,6 @@ import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.setup.config.SdkConfigStoreApi
-import com.emarsys.watchdog.connection.ConnectionWatchDog
-import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.Json
@@ -39,12 +36,6 @@ internal expect class PlatformDependencyCreator(
     actionHandler: ActionHandlerApi,
     timestampProvider: InstantProvider
 ) : DependencyCreator {
-
-    override fun createConnectionWatchDog(sdkLogger: Logger): ConnectionWatchDog
-
-    override fun createLifeCycleWatchDog(): LifecycleWatchDog
-
-    override fun createFileCache(): FileCacheApi
 
     override fun createInAppViewProvider(eventActionFactory: EventActionFactoryApi): InAppViewProviderApi
 

@@ -3,14 +3,9 @@ package com.emarsys.di
 import com.emarsys.api.push.PushApi
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
-import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.language.LanguageTagValidatorApi
-import com.emarsys.core.log.Logger
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
-import com.emarsys.watchdog.connection.ConnectionWatchDog
-import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
-import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
@@ -18,13 +13,7 @@ object PlatformInjection {
     val platformModules = module {
         single<ClipboardHandlerApi> { get<DependencyCreator>().createClipboardHandler() }
         single<LaunchApplicationHandlerApi> { get<DependencyCreator>().createLaunchApplicationHandler() }
-        single<ConnectionWatchDog> {
-            val logger: Logger = get { parametersOf(ConnectionWatchDog::class.simpleName) }
-            get<DependencyCreator>().createConnectionWatchDog(logger)
-        }
-        single<LifecycleWatchDog> { get<DependencyCreator>().createLifeCycleWatchDog() }
         single<LanguageTagValidatorApi> { get<DependencyCreator>().createLanguageTagValidator() }
-        single<FileCacheApi> { get<DependencyCreator>().createFileCache() }
         single<InAppViewProviderApi> {
             get<DependencyCreator>().createInAppViewProvider(eventActionFactory = get())
         }
