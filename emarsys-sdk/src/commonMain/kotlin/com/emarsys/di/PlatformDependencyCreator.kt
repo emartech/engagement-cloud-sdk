@@ -1,19 +1,11 @@
 package com.emarsys.di
 
-import com.emarsys.api.push.PushApi
-import com.emarsys.api.push.PushContextApi
-import com.emarsys.api.push.PushInstance
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
-import com.emarsys.core.storage.StringStorageApi
-import com.emarsys.mobileengage.action.PushActionFactoryApi
-import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.event.model.SdkEvent
-import com.emarsys.networking.clients.push.PushClientApi
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.Json
 
@@ -28,19 +20,4 @@ internal expect class PlatformDependencyCreator(
     timestampProvider: InstantProvider
 ) : DependencyCreator {
 
-    override fun createPushInternal(
-        pushClient: PushClientApi,
-        storage: StringStorageApi,
-        pushContext: PushContextApi,
-        eventClient: EventClientApi,
-        pushActionFactory: PushActionFactoryApi,
-        json: Json,
-        sdkDispatcher: CoroutineDispatcher
-    ): PushInstance
-
-    override fun createPushApi(
-        pushInternal: PushInstance,
-        storage: StringStorageApi,
-        pushContext: PushContextApi,
-    ): PushApi
 }

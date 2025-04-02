@@ -1,7 +1,7 @@
 package com.emarsys.core.badge
 
 import com.emarsys.core.actions.badge.BadgeCountHandlerApi
-import com.emarsys.core.device.UIDevice
+import com.emarsys.core.device.UIDeviceApi
 import com.emarsys.mobileengage.action.models.BadgeCount
 import com.emarsys.mobileengage.action.models.BadgeCountMethod.ADD
 import com.emarsys.mobileengage.action.models.BadgeCountMethod.SET
@@ -10,9 +10,9 @@ import kotlinx.coroutines.withContext
 import platform.UIKit.UIApplication
 import platform.UserNotifications.UNUserNotificationCenter
 
-class IosBadgeCountHandler(
+internal class IosBadgeCountHandler(
     private val notificationCenter: UNUserNotificationCenter,
-    private val uiDevice: UIDevice,
+    private val uiDevice: UIDeviceApi,
     private val mainCoroutineDispatcher: CoroutineDispatcher
 ) : BadgeCountHandlerApi {
 

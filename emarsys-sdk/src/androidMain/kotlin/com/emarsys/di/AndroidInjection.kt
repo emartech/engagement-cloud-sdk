@@ -10,6 +10,8 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import com.emarsys.AndroidEmarsysConfig
+import com.emarsys.api.push.PushInstance
+import com.emarsys.api.push.PushInternal
 import com.emarsys.applicationContext
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
@@ -265,6 +267,14 @@ object AndroidInjection {
         single<LanguageTagValidatorApi> { AndroidLanguageTagValidator() }
         single<SdkConfigStoreApi<AndroidEmarsysConfig>>(named(SdkConfigStoreTypes.Android)) {
             AndroidSdkConfigStore(typedStorage = get())
+        }
+        single<PushInstance>(named(InstanceType.Internal)) {
+            PushInternal(
+                pushClient = get(),
+                storage = get(),
+                pushContext = get(),
+                sdkLogger = get { parametersOf(PushInternal::class.simpleName) }
+            )
         }
     }
 }

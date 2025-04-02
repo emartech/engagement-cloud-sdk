@@ -1,6 +1,8 @@
 package com.emarsys.di
 
 import com.emarsys.api.push.LoggingPush
+import com.emarsys.api.push.Push
+import com.emarsys.api.push.PushApi
 import com.emarsys.api.push.PushCall
 import com.emarsys.api.push.PushContext
 import com.emarsys.api.push.PushContextApi
@@ -53,20 +55,17 @@ object PushInjection {
                 storage = get()
             )
         }
-        single<PushInstance>(named(InstanceType.Internal)) {
-            get<DependencyCreator>().createPushInternal(
-                pushClient = get(),
-                storage = get(),
-                pushContext = get(),
-                eventClient = get(),
-                pushActionFactory = get(),
-                json = get(),
-                sdkDispatcher = get(named(DispatcherTypes.Sdk))
-            )
-        }
         single<PushContextApi> {
             PushContext(
                 calls = get(named(PersistentListTypes.PushCall))
+            )
+        }
+        single<PushApi> {
+            Push(
+                loggingApi = get(named(InstanceType.Logging)),
+                gathererApi = get(named(InstanceType.Gatherer)),
+                internalApi = get(named(InstanceType.Internal)),
+                sdkContext = get()
             )
         }
     }

@@ -2,6 +2,7 @@ package com.emarsys.api.push
 
 import com.emarsys.api.push.PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY
 import com.emarsys.api.push.PushConstants.PUSH_TOKEN_STORAGE_KEY
+import com.emarsys.core.log.Logger
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.networking.clients.push.PushClientApi
 import dev.mokkery.answering.returns
@@ -28,6 +29,7 @@ class PushInternalTests {
 
     private lateinit var mockPushClient: PushClientApi
     private lateinit var mockStringStorage: StringStorageApi
+    private lateinit var mockLogger: Logger
     private lateinit var pushContext: PushContextApi
     private lateinit var pushInternal: PushInternal
 
@@ -35,11 +37,13 @@ class PushInternalTests {
     fun setup() {
         mockPushClient = mock()
         mockStringStorage = mock()
+        mockLogger = mock()
         pushContext = PushContext(mutableListOf())
         pushInternal = PushInternal(
             mockPushClient,
             mockStringStorage,
-            pushContext
+            pushContext,
+            mockLogger
         )
     }
 

@@ -18,7 +18,7 @@ import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.storage.StringStorageApi
-import com.emarsys.mobileengage.action.ActionFactoryApi
+import com.emarsys.mobileengage.action.PushActionFactoryApi
 import com.emarsys.mobileengage.action.actions.Action
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BasicActionModel
@@ -67,7 +67,7 @@ internal class IosPushInternal(
     storage: StringStorageApi,
     private val pushContext: PushContextApi,
     sdkContext: SdkContextApi,
-    private val actionFactory: ActionFactoryApi<ActionModel>,
+    private val actionFactory: PushActionFactoryApi,
     private val actionHandler: ActionHandlerApi,
     private val badgeCountHandler: BadgeCountHandlerApi,
     private val json: Json,
@@ -76,7 +76,7 @@ internal class IosPushInternal(
     private val sdkEventFlow: MutableSharedFlow<SdkEvent>,
     private val timestampProvider: InstantProvider,
     private val uuidProvider: UuidProviderApi
-) : PushInternal(pushClient, storage, pushContext), IosPushInstance {
+) : PushInternal(pushClient, storage, pushContext, sdkLogger), IosPushInstance {
     override var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol? =
         null
         set(value) {

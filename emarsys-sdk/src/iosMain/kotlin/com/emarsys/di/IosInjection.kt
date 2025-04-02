@@ -2,9 +2,11 @@ package com.emarsys.di
 
 import app.cash.sqldelight.driver.native.NativeSqliteDriver
 import com.emarsys.EmarsysConfig
+import com.emarsys.api.push.PushInstance
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
+import com.emarsys.core.badge.IosBadgeCountHandler
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.cache.IosFileCache
 import com.emarsys.core.clipboard.IosClipboardHandler
@@ -45,6 +47,7 @@ import com.emarsys.mobileengage.inapp.providers.SceneProvider
 import com.emarsys.mobileengage.inapp.providers.ViewControllerProvider
 import com.emarsys.mobileengage.inapp.providers.WebViewProvider
 import com.emarsys.mobileengage.inapp.providers.WindowProvider
+import com.emarsys.mobileengage.push.IosPushInternal
 import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
 import com.emarsys.setup.PlatformInitializer
 import com.emarsys.setup.PlatformInitializerApi
@@ -155,6 +158,30 @@ object IosInjection {
         single<LaunchApplicationHandlerApi> { IosLaunchApplicationHandler() }
         single<LanguageTagValidatorApi> { IosLanguageTagValidator() }
         single<SdkConfigStoreApi<EmarsysConfig>> { IosSdkConfigStore(typedStorage = get()) }
+        single<PushInstance>(named(InstanceType.Internal)) {
+            val badgeCountHandler = IosBadgeCountHandler(
+                notificationCenter = get(),
+                uiDevice = get(),
+                mainCoroutineDispatcher = get(
+                    named(DispatcherTypes.Main)
+                )
+            )
+            IosPushInternal(
+                pushClient = get(),
+                storage = get(),
+                pushContext = get(),
+                sdkContext = get(),
+                actionFactory = get(),
+                actionHandler = get(),
+                badgeCountHandler = badgeCountHandler,
+                json = get(),
+                sdkDispatcher = get(named(DispatcherTypes.Sdk)),
+                sdkLogger = get { parametersOf(IosPushInternal::class.simpleName) },
+                sdkEventFlow = get(named(EventFlowTypes.InternalEventFlow)),
+                timestampProvider = get(),
+                uuidProvider = get()
+            )
+        }
     }
 }
 

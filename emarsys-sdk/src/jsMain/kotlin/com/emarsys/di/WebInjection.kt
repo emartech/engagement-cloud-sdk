@@ -3,6 +3,8 @@ package com.emarsys.di
 import com.emarsys.JsEmarsysConfig
 import com.emarsys.api.push.PushConstants.WEB_PUSH_ON_BADGE_COUNT_UPDATE_RECEIVED
 import com.emarsys.api.push.PushConstants.WEB_PUSH_ON_NOTIFICATION_CLICKED_CHANNEL_NAME
+import com.emarsys.api.push.PushInstance
+import com.emarsys.api.push.PushInternal
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
@@ -182,6 +184,14 @@ object WebInjection {
         single<LaunchApplicationHandlerApi> { JsLaunchApplicationHandler() }
         single<LanguageTagValidatorApi> { WebLanguageTagValidator() }
         single<SdkConfigStoreApi<JsEmarsysConfig>> { JsEmarsysConfigStore(typedStorage = get()) }
+        single<PushInstance>(named(InstanceType.Internal)) {
+            PushInternal(
+                pushClient = get(),
+                storage = get(),
+                pushContext = get(),
+                sdkLogger = get { parametersOf(PushInternal::class.simpleName) }
+            )
+        }
     }
 
     private fun getNavigatorData(): String {

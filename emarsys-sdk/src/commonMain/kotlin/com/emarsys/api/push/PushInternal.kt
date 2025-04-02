@@ -9,15 +9,13 @@ import com.emarsys.core.log.Logger
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.networking.clients.push.PushClientApi
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.koin.core.parameter.parametersOf
 
 internal open class PushInternal(
     private val pushClient: PushClientApi,
     private val storage: StringStorageApi,
     private val pushContext: PushContextApi,
+    private val sdkLogger: Logger
 ) : PushInstance, KoinComponent {
-    private val sdkLogger: Logger by inject { parametersOf(PushInternal::class.simpleName) }
 
     override suspend fun registerPushToken(pushToken: String) {
         storage.put(PUSH_TOKEN_STORAGE_KEY, pushToken)
