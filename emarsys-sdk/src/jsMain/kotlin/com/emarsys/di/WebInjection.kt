@@ -3,11 +3,14 @@ package com.emarsys.di
 import com.emarsys.JsEmarsysConfig
 import com.emarsys.api.push.PushConstants.WEB_PUSH_ON_BADGE_COUNT_UPDATE_RECEIVED
 import com.emarsys.api.push.PushConstants.WEB_PUSH_ON_NOTIFICATION_CLICKED_CHANNEL_NAME
+import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
+import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.badge.WebBadgeCountHandler
 import com.emarsys.core.badge.WebBadgeCountHandlerApi
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.cache.WebFileCache
+import com.emarsys.core.clipboard.WebClipboardHandler
 import com.emarsys.core.db.EmarsysIndexedDb
 import com.emarsys.core.db.EmarsysIndexedDbObjectStore
 import com.emarsys.core.db.EmarsysObjectStoreConfig
@@ -16,6 +19,9 @@ import com.emarsys.core.db.events.JSEventsDao
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.device.WebPlatformInfoCollector
+import com.emarsys.core.language.LanguageTagValidatorApi
+import com.emarsys.core.language.WebLanguageTagValidator
+import com.emarsys.core.launchapplication.JsLaunchApplicationHandler
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.permission.WebPermissionHandler
 import com.emarsys.core.provider.WebApplicationVersionProvider
@@ -172,6 +178,10 @@ object WebInjection {
                 sdkDispatcher = get(named(DispatcherTypes.Sdk))
             )
         }
+        single<ClipboardHandlerApi> { WebClipboardHandler(window.navigator.clipboard) }
+        single<LaunchApplicationHandlerApi> { JsLaunchApplicationHandler() }
+        single<LanguageTagValidatorApi> { WebLanguageTagValidator() }
+        single<SdkConfigStoreApi<JsEmarsysConfig>> { JsEmarsysConfigStore(typedStorage = get()) }
     }
 
     private fun getNavigatorData(): String {

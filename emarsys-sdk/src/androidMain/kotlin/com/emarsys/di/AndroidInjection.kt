@@ -1,7 +1,9 @@
 package com.emarsys.di
 
 import android.app.NotificationManager
+import android.content.ClipboardManager
 import android.content.Context
+import android.content.Context.CLIPBOARD_SERVICE
 import android.content.SharedPreferences
 import android.net.ConnectivityManager
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -9,6 +11,8 @@ import androidx.lifecycle.lifecycleScope
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import com.emarsys.AndroidEmarsysConfig
 import com.emarsys.applicationContext
+import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
+import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.cache.AndroidFileCache
 import com.emarsys.core.cache.FileCacheApi
@@ -19,6 +23,9 @@ import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.device.PlatformInfoCollector
 import com.emarsys.core.device.PlatformInfoCollectorApi
+import com.emarsys.core.language.AndroidLanguageTagValidator
+import com.emarsys.core.language.LanguageTagValidatorApi
+import com.emarsys.core.launchapplication.LaunchApplicationHandler
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.provider.AndroidApplicationVersionProvider
 import com.emarsys.core.providers.ApplicationVersionProviderApi
@@ -32,6 +39,7 @@ import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.mobileengage.action.EventActionFactoryApi
+import com.emarsys.mobileengage.clipboard.AndroidClipboardHandler
 import com.emarsys.mobileengage.inapp.InAppJsBridgeProvider
 import com.emarsys.mobileengage.inapp.InAppPresenter
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
@@ -240,6 +248,23 @@ object AndroidInjection {
                 sdkEventFlow = get(named(EventFlowTypes.InternalEventFlow)),
                 logger = get { parametersOf(InAppPresenter::class.simpleName) }
             )
+        }
+        single<ClipboardHandlerApi> {
+            val clipboardManager =
+                applicationContext.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+            AndroidClipboardHandler(clipboardManager)
+        }
+        single<LaunchApplicationHandlerApi> {
+            LaunchApplicationHandler(
+                applicationContext,
+                activityFinder = get<TransitionSafeCurrentActivityWatchdog>(),
+                sdkContext = get(),
+                sdkLogger = get { parametersOf(LaunchApplicationHandler::class.simpleName) }
+            )
+        }
+        single<LanguageTagValidatorApi> { AndroidLanguageTagValidator() }
+        single<SdkConfigStoreApi<AndroidEmarsysConfig>>(named(SdkConfigStoreTypes.Android)) {
+            AndroidSdkConfigStore(typedStorage = get())
         }
     }
 }

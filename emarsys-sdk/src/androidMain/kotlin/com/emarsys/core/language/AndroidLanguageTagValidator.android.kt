@@ -2,7 +2,7 @@ package com.emarsys.core.language
 
 import java.util.Locale
 
-class LanguageTagValidator: LanguageTagValidatorApi {
+internal class AndroidLanguageTagValidator: LanguageTagValidatorApi {
 
     override suspend fun isValid(languageTag: String): Boolean {
         val locale = Locale.forLanguageTag(languageTag)

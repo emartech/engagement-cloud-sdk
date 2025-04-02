@@ -56,7 +56,7 @@ object InitInjection {
         }
         single<State>(named(InitStateTypes.SdkConfigLoader)) {
             SdkConfigLoaderState(
-                sdkConfigStore = get<DependencyCreator>().createSdkConfigStore(typedStorage = get()),
+                sdkConfigStore = get(),
                 setupOrganizer = get(),
                 sdkLogger = get { parametersOf(SdkConfigLoaderState::class.simpleName) }
             )

@@ -1,25 +1,17 @@
 package com.emarsys.di
 
-import com.emarsys.SdkConfig
 import com.emarsys.api.push.PushApi
 import com.emarsys.api.push.PushContextApi
 import com.emarsys.api.push.PushInstance
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.actions.badge.BadgeCountHandlerApi
-import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
-import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.badge.IosBadgeCountHandler
-import com.emarsys.core.clipboard.IosClipboardHandler
 import com.emarsys.core.device.UIDevice
-import com.emarsys.core.language.LanguageTagValidator
-import com.emarsys.core.language.LanguageTagValidatorApi
-import com.emarsys.core.launchapplication.IosLaunchApplicationHandler
 import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.storage.StringStorageApi
-import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.mobileengage.action.PushActionFactoryApi
 import com.emarsys.mobileengage.push.IosGathererPush
 import com.emarsys.mobileengage.push.IosLoggingPush
@@ -28,13 +20,10 @@ import com.emarsys.mobileengage.push.IosPushInternal
 import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
-import com.emarsys.setup.config.IosSdkConfigStore
-import com.emarsys.setup.config.SdkConfigStoreApi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.Json
 import platform.Foundation.NSProcessInfo
-import platform.UIKit.UIPasteboard
 import platform.UserNotifications.UNUserNotificationCenter
 
 internal actual class PlatformDependencyCreator actual constructor(
@@ -51,18 +40,6 @@ internal actual class PlatformDependencyCreator actual constructor(
     private val notificationCenter = UNUserNotificationCenter.currentNotificationCenter()
     private val badgeCountHandler: BadgeCountHandlerApi =
         IosBadgeCountHandler(notificationCenter, uiDevice, sdkContext.mainDispatcher)
-
-    actual override fun createClipboardHandler(): ClipboardHandlerApi {
-        return IosClipboardHandler(UIPasteboard.generalPasteboard)
-    }
-
-    actual override fun createLaunchApplicationHandler(): LaunchApplicationHandlerApi {
-        return IosLaunchApplicationHandler()
-    }
-
-    actual override fun createLanguageTagValidator(): LanguageTagValidatorApi {
-        return LanguageTagValidator()
-    }
 
     actual override fun createPushInternal(
         pushClient: PushClientApi,
@@ -104,10 +81,6 @@ internal actual class PlatformDependencyCreator actual constructor(
             sdkContext,
             sdkLogger
         )
-    }
-
-    actual override fun createSdkConfigStore(typedStorage: TypedStorageApi): SdkConfigStoreApi<SdkConfig> {
-        return IosSdkConfigStore(typedStorage)
     }
 
 }

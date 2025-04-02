@@ -9,25 +9,25 @@ import kotlinx.coroutines.test.setMain
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class LanguageTagValidatorTests {
+class WebLanguageTagValidatorTests {
 
-    private lateinit var languageTagValidator: LanguageTagValidator
+    private lateinit var webLanguageTagValidator: WebLanguageTagValidator
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @BeforeTest
     fun setup() = runTest {
         Dispatchers.setMain(StandardTestDispatcher())
-        languageTagValidator = LanguageTagValidator()
+        webLanguageTagValidator = WebLanguageTagValidator()
     }
 
     @Test
     fun testIsValid_shouldReturnTrue() = runTest {
-        languageTagValidator.isValid("zh-Hans-CN") shouldBe true
+        webLanguageTagValidator.isValid("zh-Hans-CN") shouldBe true
     }
 
     @Test
     fun testIsValid_shouldReturnFalse() = runTest {
-        languageTagValidator.isValid("invalid") shouldBe false
+        webLanguageTagValidator.isValid("invalid") shouldBe false
     }
 
 }

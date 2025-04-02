@@ -2,15 +2,21 @@ package com.emarsys.di
 
 import app.cash.sqldelight.driver.native.NativeSqliteDriver
 import com.emarsys.EmarsysConfig
+import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
+import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.cache.IosFileCache
+import com.emarsys.core.clipboard.IosClipboardHandler
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.db.events.IosSqDelightEventsDao
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.device.UIDevice
 import com.emarsys.core.device.UIDeviceApi
+import com.emarsys.core.language.IosLanguageTagValidator
+import com.emarsys.core.language.LanguageTagValidatorApi
+import com.emarsys.core.launchapplication.IosLaunchApplicationHandler
 import com.emarsys.core.permission.IosPermissionHandler
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.provider.IosApplicationVersionProvider
@@ -55,6 +61,7 @@ import platform.Foundation.NSFileManager
 import platform.Foundation.NSProcessInfo
 import platform.Foundation.NSUserDefaults
 import platform.UIKit.UIApplication
+import platform.UIKit.UIPasteboard
 import platform.UserNotifications.UNUserNotificationCenter
 
 object IosInjection {
@@ -144,6 +151,10 @@ object IosInjection {
                 sdkEventFlow = get(named(EventFlowTypes.InternalEventFlow))
             )
         }
+        single<ClipboardHandlerApi> { IosClipboardHandler(UIPasteboard.generalPasteboard) }
+        single<LaunchApplicationHandlerApi> { IosLaunchApplicationHandler() }
+        single<LanguageTagValidatorApi> { IosLanguageTagValidator() }
+        single<SdkConfigStoreApi<EmarsysConfig>> { IosSdkConfigStore(typedStorage = get()) }
     }
 }
 

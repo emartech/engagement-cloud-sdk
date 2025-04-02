@@ -180,6 +180,10 @@ enum class EventFlowTypes {
     InternalEventFlow, Public
 }
 
+enum class SdkConfigStoreTypes {
+    Emarsys, Android, Web
+}
+
 object PersistentListIds {
     const val PUSH_CONTEXT_PERSISTENT_ID = "pushContextPersistentId"
     const val INAPP_CONTEXT_PERSISTENT_ID = "inAppContextPersistentId"

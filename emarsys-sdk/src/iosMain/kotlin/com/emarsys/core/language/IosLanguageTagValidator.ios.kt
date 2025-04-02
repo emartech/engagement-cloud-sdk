@@ -6,7 +6,7 @@ import platform.Foundation.NSLocale
 import platform.Foundation.countryCode
 import platform.Foundation.languageCode
 
-class LanguageTagValidator: LanguageTagValidatorApi {
+internal class IosLanguageTagValidator: LanguageTagValidatorApi {
 
     override suspend fun isValid(languageTag: String): Boolean {
         val locale = NSLocale(languageTag)

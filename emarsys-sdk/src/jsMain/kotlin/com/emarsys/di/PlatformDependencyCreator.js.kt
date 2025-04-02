@@ -1,6 +1,5 @@
 package com.emarsys.di
 
-import com.emarsys.SdkConfig
 import com.emarsys.api.push.LoggingPush
 import com.emarsys.api.push.Push
 import com.emarsys.api.push.PushApi
@@ -10,24 +9,14 @@ import com.emarsys.api.push.PushInstance
 import com.emarsys.api.push.PushInternal
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
-import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
-import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
-import com.emarsys.core.clipboard.WebClipboardHandler
-import com.emarsys.core.language.LanguageTagValidator
-import com.emarsys.core.language.LanguageTagValidatorApi
-import com.emarsys.core.launchapplication.JsLaunchApplicationHandler
 import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.storage.StringStorageApi
-import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.mobileengage.action.PushActionFactoryApi
 import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.push.PushClientApi
-import com.emarsys.setup.config.JsEmarsysConfigStore
-import com.emarsys.setup.config.SdkConfigStoreApi
-import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.Json
@@ -41,18 +30,6 @@ internal actual class PlatformDependencyCreator actual constructor(
     actionHandler: ActionHandlerApi,
     timestampProvider: InstantProvider
 ) : DependencyCreator {
-
-    actual override fun createClipboardHandler(): ClipboardHandlerApi {
-        return WebClipboardHandler(window.navigator.clipboard)
-    }
-
-    actual override fun createLaunchApplicationHandler(): LaunchApplicationHandlerApi {
-        return JsLaunchApplicationHandler()
-    }
-
-    actual override fun createLanguageTagValidator(): LanguageTagValidatorApi {
-        return LanguageTagValidator()
-    }
 
     actual override fun createPushInternal(
         pushClient: PushClientApi,
@@ -76,7 +53,4 @@ internal actual class PlatformDependencyCreator actual constructor(
         return Push(loggingPush, pushGatherer, pushInternal, sdkContext)
     }
 
-    actual override fun createSdkConfigStore(typedStorage: TypedStorageApi): SdkConfigStoreApi<SdkConfig> {
-        return JsEmarsysConfigStore(typedStorage)
-    }
 }

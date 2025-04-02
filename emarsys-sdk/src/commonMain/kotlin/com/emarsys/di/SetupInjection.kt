@@ -82,7 +82,7 @@ object SetupInjection {
                 predictStateMachine = get(named(StateMachineTypes.Predict)),
                 sdkContext = get(),
                 sdkLogger = get { parametersOf(SetupOrganizer::class.simpleName) },
-                sdkConfigStore = get<DependencyCreator>().createSdkConfigStore(typedStorage = get())
+                sdkConfigStore = get()
             )
         }
     }

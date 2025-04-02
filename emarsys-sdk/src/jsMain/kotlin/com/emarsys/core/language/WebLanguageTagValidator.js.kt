@@ -1,6 +1,6 @@
 package com.emarsys.core.language
 
-class LanguageTagValidator: LanguageTagValidatorApi {
+internal class WebLanguageTagValidator: LanguageTagValidatorApi {
 
     override suspend fun isValid(languageTag: String): Boolean {
         return try {

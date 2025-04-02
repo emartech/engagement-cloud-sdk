@@ -5,23 +5,23 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class LanguageTagValidatorTests {
+class IosLanguageTagValidatorTests {
 
-    private lateinit var languageTagValidator: LanguageTagValidator
+    private lateinit var iosLanguageTagValidator: IosLanguageTagValidator
 
     @BeforeTest
     fun setup() = runTest {
-        languageTagValidator = LanguageTagValidator()
+        iosLanguageTagValidator = IosLanguageTagValidator()
     }
 
     @Test
     fun testIsValid_shouldReturnTrue() = runTest {
-        languageTagValidator.isValid("zh-Hans-CN") shouldBe true
+        iosLanguageTagValidator.isValid("en-US") shouldBe true
     }
 
     @Test
     fun testIsValid_shouldReturnFalse() = runTest {
-        languageTagValidator.isValid("invalid") shouldBe false
+        iosLanguageTagValidator.isValid("invalid") shouldBe false
     }
 
 }
