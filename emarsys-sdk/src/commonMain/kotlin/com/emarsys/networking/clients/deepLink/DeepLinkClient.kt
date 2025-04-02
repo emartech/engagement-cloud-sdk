@@ -1,5 +1,6 @@
 package com.emarsys.networking.clients.deepLink
 
+import com.emarsys.core.Registerable
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.UserAgentProvider
@@ -12,6 +13,7 @@ import com.emarsys.networking.clients.event.model.SdkEvent
 import io.ktor.http.HttpMethod
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
@@ -26,11 +28,11 @@ internal class DeepLinkClient(
     private val userAgentProvider: UserAgentProviderApi,
     private val json: Json,
     private val sdkLogger: Logger,
-    sdkDispatcher: CoroutineDispatcher,
-) {
+    private val sdkDispatcher: CoroutineDispatcher,
+): Registerable {
 
-    init {
-        CoroutineScope(sdkDispatcher).launch {
+    override suspend fun register() {
+        CoroutineScope(sdkDispatcher).launch(start = CoroutineStart.UNDISPATCHED) {
             startEventConsumer()
         }
     }

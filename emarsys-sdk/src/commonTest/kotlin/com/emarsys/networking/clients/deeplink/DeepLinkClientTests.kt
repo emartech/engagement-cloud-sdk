@@ -43,11 +43,6 @@ import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DeepLinkClientTests {
-
-    init {
-        Dispatchers.setMain(StandardTestDispatcher())
-    }
-
     private companion object {
         const val TRACKING_ID = "trackingId"
         const val TEST_USER_AGENT = "userAgent"
@@ -62,9 +57,11 @@ class DeepLinkClientTests {
     private lateinit var json: Json
     private lateinit var onlineEvents: MutableSharedFlow<SdkEvent>
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
+    private lateinit var deepLinkClient: DeepLinkClient
 
     @BeforeTest
     fun setUp() {
+        Dispatchers.setMain(StandardTestDispatcher())
         sdkDispatcher = StandardTestDispatcher()
         mockNetworkClient = mock()
         mockUrlFactory = mock()
@@ -81,7 +78,7 @@ class DeepLinkClientTests {
             throw it.args[1] as Throwable
         }
 
-        DeepLinkClient(
+        deepLinkClient = DeepLinkClient(
             mockNetworkClient,
             mockSdkEventDistributor,
             mockUrlFactory,
@@ -101,6 +98,8 @@ class DeepLinkClientTests {
 
     @Test
     fun testConsumer_should_call_client_with_trackDeepLink_request() = runTest {
+        deepLinkClient.register()
+
         val response = Response(
             UrlRequest(TEST_BASE_URL, HttpMethod.Post),
             HttpStatusCode.OK,

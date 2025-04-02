@@ -1,6 +1,7 @@
 package com.emarsys.networking.clients.event
 
 import com.emarsys.api.inapp.InAppConfigApi
+import com.emarsys.core.Registerable
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.channel.naturalBatching
 import com.emarsys.core.log.Logger
@@ -43,10 +44,10 @@ internal class EventClient(
     private val inAppViewProvider: InAppViewProviderApi,
     private val sdkEventDistributor: SdkEventManagerApi,
     private val sdkLogger: Logger,
-    sdkDispatcher: CoroutineDispatcher
-) : EventClientApi {
+    private val sdkDispatcher: CoroutineDispatcher
+) : EventClientApi, Registerable {
 
-    init {
+    override suspend fun register() {
         CoroutineScope(sdkDispatcher).launch(start = CoroutineStart.UNDISPATCHED) {
             startEventConsumer()
         }

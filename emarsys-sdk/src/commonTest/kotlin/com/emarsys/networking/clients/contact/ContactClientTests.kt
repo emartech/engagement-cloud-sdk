@@ -50,10 +50,6 @@ import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ContactClientTests {
-    init {
-        Dispatchers.setMain(StandardTestDispatcher())
-    }
-
     private companion object {
         val TEST_BASE_URL = Url("https://test-base-url/")
         const val OPEN_ID_TOKEN = "testOpenIdToken"
@@ -73,9 +69,11 @@ class ContactClientTests {
     private lateinit var onlineEvents: MutableSharedFlow<SdkEvent>
     private lateinit var sdkEventDistributor: SdkEventDistributorApi
     private lateinit var sdkDispatcher: CoroutineDispatcher
+    private lateinit var contactClient: ContactClient
 
     @BeforeTest
     fun setUp() {
+        Dispatchers.setMain(StandardTestDispatcher())
         mockEmarsysClient = mock()
         mockUrlFactory = mock()
         mockSdkContext = mock()
@@ -100,7 +98,7 @@ class ContactClientTests {
             throw it.args[1] as Throwable
         }
 
-        ContactClient(
+        contactClient = ContactClient(
             mockEmarsysClient,
             sdkEventDistributor,
             mockUrlFactory,
@@ -120,6 +118,8 @@ class ContactClientTests {
 
     @Test
     fun testConsumer_should_call_client_with_linkContact_request() = runTest {
+        contactClient.register()
+
         val linkContact = SdkEvent.Internal.Sdk.LinkContact(
             "linkContact",
             attributes = buildJsonObject {
@@ -139,6 +139,8 @@ class ContactClientTests {
 
     @Test
     fun testConsumer_should_not_call_contactTokenHandler_when_client_responds_with_204() = runTest {
+        contactClient.register()
+
         val requestSlot = slot<UrlRequest>()
         everySuspend { mockEmarsysClient.send(capture(requestSlot)) }.returns(
             createTestResponse(
@@ -169,6 +171,8 @@ class ContactClientTests {
 
     @Test
     fun testConsumer_should_call_client_with_linkAuthenticatedContact_request() = runTest {
+        contactClient.register()
+
         val requestSlot = slot<UrlRequest>()
         everySuspend { mockEmarsysClient.send(capture(requestSlot)) }.returns(createTestResponse("{}"))
         every { mockConfig.merchantId } returns MERCHANT_ID
@@ -194,6 +198,8 @@ class ContactClientTests {
 
     @Test
     fun testConsumer_should_call_client_with_unlinkContact_request() = runTest {
+        contactClient.register()
+
         val unlinkContact = SdkEvent.Internal.Sdk.UnlinkContact("unlinkContact")
 
         onlineEvents.emit(unlinkContact)
@@ -209,6 +215,8 @@ class ContactClientTests {
     @Test
     fun testConsumer_not_should_call_handleTokens_and_should_not_store_contactFieldId_if_request_fails() =
         runTest {
+            contactClient.register()
+
             everySuspend { mockEmarsysClient.send(any()) } returns createTestResponse(statusCode = HttpStatusCode.BadRequest)
             val unlinkContact = SdkEvent.Internal.Sdk.UnlinkContact("unlinkContact")
 

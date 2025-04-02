@@ -1,6 +1,7 @@
 package com.emarsys.networking.clients.config
 
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.Registerable
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
@@ -15,6 +16,7 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
@@ -30,11 +32,11 @@ internal class ConfigClient(
     private val contactTokenHandler: ContactTokenHandlerApi,
     private val json: Json,
     private val sdkLogger: Logger,
-    sdkDispatcher: CoroutineDispatcher
-) {
+    private val sdkDispatcher: CoroutineDispatcher
+) : Registerable {
 
-    init {
-        CoroutineScope(sdkDispatcher).launch {
+    override suspend fun register() {
+        CoroutineScope(sdkDispatcher).launch(start = CoroutineStart.UNDISPATCHED) {
             startEventConsumer()
         }
     }
