@@ -3,6 +3,7 @@ package com.emarsys.core.url
 import com.emarsys.EmarsysConfig
 import com.emarsys.context.DefaultUrlsApi
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.exceptions.MissingApplicationCodeException
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.mock
@@ -55,7 +56,7 @@ class UrlFactoryTests {
             val config = EmarsysConfig(null, null)
             every { mockSdkContext.config } returns config
 
-            shouldThrow<IllegalArgumentException> {
+            shouldThrow<MissingApplicationCodeException> {
                 urlFactory.create(it, null)
             }
         }

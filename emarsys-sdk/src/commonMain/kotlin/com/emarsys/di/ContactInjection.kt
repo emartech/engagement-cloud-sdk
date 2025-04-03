@@ -28,10 +28,11 @@ object ContactInjection {
         single<ContactClient> {
             ContactClient(
                 emarsysClient = get(named(NetworkClientTypes.Emarsys)),
-                sdkEventDistributor = get(),
+                sdkEventManager = get(),
                 urlFactory = get(),
                 sdkContext = get(),
                 contactTokenHandler = get(),
+                eventsDao = get(),
                 json = get(),
                 sdkLogger = get { parametersOf(ContactClient::class.simpleName) },
                 sdkDispatcher = get(named(DispatcherTypes.Sdk))

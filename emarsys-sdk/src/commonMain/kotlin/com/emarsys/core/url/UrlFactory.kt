@@ -2,6 +2,7 @@ package com.emarsys.core.url
 
 import com.emarsys.context.SdkContextApi
 import com.emarsys.context.isConfigPredictOnly
+import com.emarsys.core.exceptions.MissingApplicationCodeException
 import com.emarsys.core.url.EmarsysUrlType.CHANGE_APPLICATION_CODE
 import com.emarsys.core.url.EmarsysUrlType.CHANGE_MERCHANT_ID
 import com.emarsys.core.url.EmarsysUrlType.DEEP_LINK
@@ -73,9 +74,9 @@ class UrlFactory(
         }
     }
 
-    private fun getApplicationCode(applicationCode: String?): String? {
+    private fun getApplicationCode(applicationCode: String?): String {
         val appCode = applicationCode ?: sdkContext.config?.applicationCode
-        return appCode ?: throw IllegalArgumentException("Application code is missing!")
+        return appCode ?: throw MissingApplicationCodeException("Application code is missing!")
     }
 
     private fun createUrlBasedOnPredict(

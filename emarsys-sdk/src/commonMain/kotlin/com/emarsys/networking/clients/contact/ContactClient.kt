@@ -2,17 +2,21 @@ package com.emarsys.networking.clients.contact
 
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.Registerable
-import com.emarsys.core.channel.SdkEventDistributorApi
+import com.emarsys.core.channel.SdkEventManagerApi
+import com.emarsys.core.db.events.EventsDaoApi
+import com.emarsys.core.exceptions.FailedRequestException
+import com.emarsys.core.exceptions.MissingApplicationCodeException
+import com.emarsys.core.exceptions.RetryLimitReachedException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.networking.EmarsysHeaders
+import com.emarsys.networking.clients.event.model.OnlineSdkEvent
 import com.emarsys.networking.clients.event.model.SdkEvent
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.isSuccess
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -24,14 +28,15 @@ import kotlinx.serialization.json.jsonPrimitive
 
 internal class ContactClient(
     private val emarsysClient: NetworkClientApi,
-    private val sdkEventDistributor: SdkEventDistributorApi,
+    private val sdkEventManager: SdkEventManagerApi,
     private val urlFactory: UrlFactoryApi,
     private val sdkContext: SdkContextApi,
     private val contactTokenHandler: ContactTokenHandlerApi,
+    private val eventsDao: EventsDaoApi,
     private val json: Json,
     private val sdkLogger: Logger,
     private val sdkDispatcher: CoroutineDispatcher
-): Registerable {
+) : Registerable {
 
     override suspend fun register() {
         CoroutineScope(sdkDispatcher).launch(start = CoroutineStart.UNDISPATCHED) {
@@ -41,29 +46,36 @@ internal class ContactClient(
     }
 
     private suspend fun startEventConsumer() {
-        sdkEventDistributor.onlineSdkEvents
+        sdkEventManager.onlineSdkEvents
             .filter { isContactEvent(it) }
             .collect {
                 try {
                     sdkLogger.debug("ContactClient - consumeContactChanges")
                     val request = createUrlRequest(it)
-                    val response = emarsysClient.send(request)
+                    val response = emarsysClient.send(
+                        request,
+                        onNetworkError = { sdkEventManager.emitEvent(it) })
 
-                    if (response.status.isSuccess()) {
-                        if(response.status != HttpStatusCode.NoContent) {
-                            contactTokenHandler.handleContactTokens(response)
-                        }
-                        sdkContext.contactFieldId =
-                            it.attributes?.get("contactFieldId")?.jsonPrimitive?.content?.toInt()
+                    if (response.status != HttpStatusCode.NoContent) {
+                        contactTokenHandler.handleContactTokens(response)
                     }
-                    return@collect
+                    sdkContext.contactFieldId =
+                        it.attributes?.get("contactFieldId")?.jsonPrimitive?.content?.toInt()
+                    it.ack(eventsDao, sdkLogger)
                 } catch (exception: Exception) {
-                    sdkLogger.error("ContactClient - consumeContactChanges", exception)
+                    when (exception) {
+                        is FailedRequestException, is RetryLimitReachedException, is MissingApplicationCodeException -> it.ack(
+                            eventsDao,
+                            sdkLogger
+                        )
+
+                        else -> sdkLogger.error("ContactClient - consumeContactChanges", exception)
+                    }
                 }
             }
     }
 
-    private fun isContactEvent(event: SdkEvent): Boolean {
+    private fun isContactEvent(event: OnlineSdkEvent): Boolean {
         return event is SdkEvent.Internal.Sdk.LinkContact || event is SdkEvent.Internal.Sdk.LinkAuthenticatedContact || event is SdkEvent.Internal.Sdk.UnlinkContact
     }
 
