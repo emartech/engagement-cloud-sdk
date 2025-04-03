@@ -38,7 +38,7 @@ internal class DeepLinkClient(
     }
 
     private suspend fun startEventConsumer() {
-        sdkEventDistributor.onlineEvents
+        sdkEventDistributor.onlineSdkEvents
             .filter { it is SdkEvent.Internal.Sdk.TrackDeepLink }
             .collect {
                 val trackingId = it.attributes?.get("trackingId")?.jsonPrimitive?.content

@@ -9,6 +9,7 @@ import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.networking.clients.deepLink.DeepLinkClient
+import com.emarsys.networking.clients.event.model.OnlineSdkEvent
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
@@ -55,7 +56,7 @@ class DeepLinkClientTests {
     private lateinit var mockLogger: Logger
     private lateinit var mockUserAgentProvider: UserAgentProviderApi
     private lateinit var json: Json
-    private lateinit var onlineEvents: MutableSharedFlow<SdkEvent>
+    private lateinit var onlineEvents: MutableSharedFlow<OnlineSdkEvent>
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
     private lateinit var deepLinkClient: DeepLinkClient
 
@@ -70,7 +71,7 @@ class DeepLinkClientTests {
         json = JsonUtil.json
         mockSdkEventDistributor = mock()
         onlineEvents = MutableSharedFlow(replay = 5)
-        everySuspend { mockSdkEventDistributor.onlineEvents } returns onlineEvents
+        everySuspend { mockSdkEventDistributor.onlineSdkEvents } returns onlineEvents
         everySuspend { mockUserAgentProvider.provide() } returns TEST_USER_AGENT
         every { mockUrlFactory.create(EmarsysUrlType.DEEP_LINK, null) } returns TEST_BASE_URL
         everySuspend { mockLogger.error(any(), any<Throwable>()) } calls {

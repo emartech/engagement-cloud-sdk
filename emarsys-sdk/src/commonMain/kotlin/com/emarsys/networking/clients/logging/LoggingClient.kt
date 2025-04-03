@@ -36,7 +36,7 @@ internal class LoggingClient(
     }
 
     private suspend fun startEventConsumer() {
-        sdkEventDistributor.onlineEvents
+        sdkEventDistributor.onlineSdkEvents
             .filter { it is SdkEvent.Internal.Sdk.Log || it is SdkEvent.Internal.Sdk.Metric }
             .collect {
                 sdkLogger.debug("LoggingClient - consumeLogsAndMetrics")

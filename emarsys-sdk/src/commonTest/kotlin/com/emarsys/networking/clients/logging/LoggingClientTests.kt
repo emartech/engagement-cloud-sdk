@@ -10,6 +10,7 @@ import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
+import com.emarsys.networking.clients.event.model.OnlineSdkEvent
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
@@ -77,7 +78,7 @@ class LoggingClientTests {
 
     private lateinit var sdkDispatcher: CoroutineDispatcher
     private lateinit var sdkEventDistributor: SdkEventDistributorApi
-    private lateinit var onlineEvents: MutableSharedFlow<SdkEvent>
+    private lateinit var onlineEvents: MutableSharedFlow<OnlineSdkEvent>
 
     @BeforeTest
     fun setup() = runTest {
@@ -88,7 +89,7 @@ class LoggingClientTests {
         }
         sdkEventDistributor = mock()
         onlineEvents = MutableSharedFlow()
-        everySuspend { sdkEventDistributor.onlineEvents } returns onlineEvents
+        everySuspend { sdkEventDistributor.onlineSdkEvents } returns onlineEvents
 
         LoggingClient(
             mockEmarsysClient,

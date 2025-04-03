@@ -10,6 +10,7 @@ import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
+import com.emarsys.networking.clients.event.model.OnlineSdkEvent
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
@@ -66,7 +67,7 @@ class ContactClientTests {
     private lateinit var mockLogger: Logger
     private lateinit var sessionContext: SessionContext
     private lateinit var json: Json
-    private lateinit var onlineEvents: MutableSharedFlow<SdkEvent>
+    private lateinit var onlineEvents: MutableSharedFlow<OnlineSdkEvent>
     private lateinit var sdkEventDistributor: SdkEventDistributorApi
     private lateinit var sdkDispatcher: CoroutineDispatcher
     private lateinit var contactClient: ContactClient
@@ -84,7 +85,7 @@ class ContactClientTests {
         json = JsonUtil.json
         onlineEvents = MutableSharedFlow(replay = 5)
         sdkEventDistributor = mock()
-        everySuspend { sdkEventDistributor.onlineEvents } returns onlineEvents
+        everySuspend { sdkEventDistributor.onlineSdkEvents } returns onlineEvents
         sdkDispatcher = StandardTestDispatcher()
         every { mockSdkContext.config } returns mockConfig
         everySuspend { mockContactTokenHandler.handleContactTokens(any()) } returns Unit

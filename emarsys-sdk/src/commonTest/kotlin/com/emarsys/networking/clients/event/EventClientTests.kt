@@ -160,7 +160,7 @@ class EventClientTests {
     fun testInit_should_start_consume_on_channel() = runTest {
         eventClient.register()
 
-        verifySuspend { sdkEventDistributor.onlineEvents.filter(any()) }
+        verifySuspend { sdkEventDistributor.onlineSdkEvents.filter(any()) }
         verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
 
     }

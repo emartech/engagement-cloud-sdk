@@ -4,12 +4,15 @@ import com.emarsys.api.SdkState
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.log.Logger
+import com.emarsys.networking.clients.event.model.OnlineSdkEvent
 import com.emarsys.networking.clients.event.model.SdkEvent
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.json.buildJsonObject
@@ -30,22 +33,26 @@ class SdkEventDistributor(
 
     override val sdkEventFlow = _sdkEventFlow.asSharedFlow()
 
-    override val onlineEvents =
-        _sdkEventFlow.onEach {
-            combine(
-                sdkContext.currentSdkState,
-                connectionStatus
-            ) { sdkState, isConnected ->
-                sdkState == SdkState.active && isConnected
-            }.first { it }
-        }
+    override val onlineSdkEvents: Flow<OnlineSdkEvent> =
+        _sdkEventFlow
+            .filterIsInstance<OnlineSdkEvent>()
+            .onEach {
+                combine(
+                    sdkContext.currentSdkState,
+                    connectionStatus
+                ) { sdkState, isConnected ->
+                    sdkState == SdkState.active && isConnected
+                }.first { it }
+            }
 
 
     override suspend fun registerAndStoreEvent(sdkEvent: SdkEvent) {
         try {
             // todo remove
             measureTime {
-                eventsDao.insertEvent(sdkEvent)
+                if (sdkEvent is OnlineSdkEvent) {
+                    eventsDao.insertEvent(sdkEvent)
+                }
             }.let {
                 sdkLogger.debug(
                     "SdkEventDistributor - Event inserted into DB in ${it.inWholeMilliseconds} ms"

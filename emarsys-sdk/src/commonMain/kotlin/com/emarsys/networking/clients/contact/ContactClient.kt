@@ -41,7 +41,7 @@ internal class ContactClient(
     }
 
     private suspend fun startEventConsumer() {
-        sdkEventDistributor.onlineEvents
+        sdkEventDistributor.onlineSdkEvents
             .filter { isContactEvent(it) }
             .collect {
                 try {

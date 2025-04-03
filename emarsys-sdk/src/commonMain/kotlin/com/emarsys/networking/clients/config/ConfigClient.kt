@@ -42,7 +42,7 @@ internal class ConfigClient(
     }
 
     private suspend fun startEventConsumer() {
-        sdkEventDistributor.onlineEvents
+        sdkEventDistributor.onlineSdkEvents
             .filter { it is SdkEvent.Internal.Sdk.ChangeAppCode || it is SdkEvent.Internal.Sdk.ChangeMerchantId }
             .collect {
                 sdkLogger.debug("ConfigClient - consumeConfigChanges")

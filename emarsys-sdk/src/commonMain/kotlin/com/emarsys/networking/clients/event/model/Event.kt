@@ -16,7 +16,9 @@ import com.emarsys.SdkConstants.SESSION_END_EVENT_NAME
 import com.emarsys.SdkConstants.SESSION_START_EVENT_NAME
 import com.emarsys.SdkConstants.TRACK_DEEPLINK_NAME
 import com.emarsys.SdkConstants.UNLINK_CONTACT_NAME
+import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.log.LogLevel
+import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.TimestampProvider
 import com.emarsys.core.providers.UUIDProvider
 import kotlinx.datetime.Instant
@@ -24,6 +26,25 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+
+sealed interface OnlineSdkEvent : SdkEvent {
+
+    suspend fun ack(eventsDao: EventsDaoApi, sdkLogger: Logger) {
+        try {
+            eventsDao.removeEvent(this)
+        } catch (exception: Exception) {
+            sdkLogger.error(
+                "OnlineSdkEvent - ack: error acking OnlineSdkEvent",
+                exception,
+                buildJsonObject {
+                    put("event", this.toString())
+                })
+        }
+    }
+
+}
 
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
@@ -36,6 +57,7 @@ sealed interface SdkEvent {
     val attributes: JsonObject?
 
     sealed interface External : SdkEvent {
+
         @Serializable
         data class Custom(
             override val type: String = "custom",
@@ -43,7 +65,7 @@ sealed interface SdkEvent {
             override val name: String,
             override val attributes: JsonObject? = null,
             override val timestamp: Instant = TimestampProvider().provide(),
-        ) : External
+        ) : External, OnlineSdkEvent
 
         sealed class Api : External {
             override val type: String = "custom"
@@ -87,9 +109,9 @@ sealed interface SdkEvent {
 
     sealed interface Internal : SdkEvent {
 
-        interface Reporting : Internal
+        interface Reporting : Internal, OnlineSdkEvent
 
-        interface Custom : Internal
+        interface Custom : Internal, OnlineSdkEvent
 
         @Serializable
         sealed class Sdk(override val name: String) : Internal {
@@ -108,7 +130,7 @@ sealed interface SdkEvent {
                 override val name: String,
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Sdk(name)
+            ) : Sdk(name), OnlineSdkEvent
 
             data class Metric(
                 val level: LogLevel = LogLevel.Metric,
@@ -116,7 +138,7 @@ sealed interface SdkEvent {
                 override val name: String,
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Sdk(name)
+            ) : Sdk(name), OnlineSdkEvent
 
             @Serializable
             data class Dismiss(
@@ -144,42 +166,42 @@ sealed interface SdkEvent {
                 override val id: String = UUIDProvider().provide(),
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Sdk(CHANGE_APP_CODE_NAME)
+            ) : Sdk(CHANGE_APP_CODE_NAME), OnlineSdkEvent
 
             @Serializable
             data class ChangeMerchantId(
                 override val id: String = UUIDProvider().provide(),
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Sdk(CHANGE_MERCHANT_ID_NAME)
+            ) : Sdk(CHANGE_MERCHANT_ID_NAME), OnlineSdkEvent
 
             @Serializable
             data class LinkContact(
                 override val id: String = UUIDProvider().provide(),
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override val attributes: JsonObject? = null
-            ) : Sdk(LINK_CONTACT_NAME)
+            ) : Sdk(LINK_CONTACT_NAME), OnlineSdkEvent
 
             @Serializable
             data class LinkAuthenticatedContact(
                 override val id: String = UUIDProvider().provide(),
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override val attributes: JsonObject? = null
-            ) : Sdk(LINK_AUTHENTICATED_CONTACT_NAME)
+            ) : Sdk(LINK_AUTHENTICATED_CONTACT_NAME), OnlineSdkEvent
 
             @Serializable
             data class UnlinkContact(
                 override val id: String = UUIDProvider().provide(),
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override val attributes: JsonObject? = null
-            ) : Sdk(UNLINK_CONTACT_NAME)
+            ) : Sdk(UNLINK_CONTACT_NAME), OnlineSdkEvent
 
             @Serializable
             data class TrackDeepLink(
                 override val id: String = UUIDProvider().provide(),
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override val attributes: JsonObject? = null
-            ) : Sdk(TRACK_DEEPLINK_NAME)
+            ) : Sdk(TRACK_DEEPLINK_NAME), OnlineSdkEvent
 
             @Serializable
             data class AppStart(

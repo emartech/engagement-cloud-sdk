@@ -54,7 +54,7 @@ internal class EventClient(
     }
 
     private suspend fun startEventConsumer() {
-        sdkEventDistributor.onlineEvents
+        sdkEventDistributor.onlineSdkEvents
             .filter { it is SdkEvent.Internal.Reporting || it is SdkEvent.Internal.Custom || it is SdkEvent.External.Custom }
             .naturalBatching().onEach { sdkEvents ->
                 try {
