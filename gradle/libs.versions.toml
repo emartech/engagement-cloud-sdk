@@ -23,7 +23,7 @@ kotlinxCoroutines = "1.10.1"
 kotlinxDatetime = "0.6.2"
 kotlinxSerializationJson = "1.8.0"
 ksp = "2.1.10-1.0.31"
-ktor = "3.1.1"
+ktor = "3.1.2"
 koin = "4.0.2"
 kotest = "5.9.1"
 mockkAndroid = "1.13.17"
@@ -38,6 +38,7 @@ googleServices = "4.4.2"
 kotlinWrappers = "2025.3.16"
 cryptography = "0.4.0"
 sqlDelight = "2.1.0-SNAPSHOT"
+mavenPublish = "0.30.0"
 
 [libraries]
 sqlDelight-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqlDelight" }
@@ -88,7 +89,7 @@ okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 okio-fakefilesystem = { module = "com.squareup.okio:okio-fakefilesystem", version.ref = "okio" }
 startup-runtime = { module = "androidx.startup:startup-runtime", version.ref = "androidx-startupRuntime" }
 kotlin-wrapper-browser = { module = "org.jetbrains.kotlin-wrappers:kotlin-browser", version.ref = "kotlinWrappers" }
-cryptography = { module = "dev.whyoleg.cryptography:cryptography-bom", version.ref= "cryptography" }
+cryptography = { module = "dev.whyoleg.cryptography:cryptography-bom", version.ref = "cryptography" }
 cryptography-core = { module = "dev.whyoleg.cryptography:cryptography-core" }
 cryptography-provider-jdk = { module = "dev.whyoleg.cryptography:cryptography-provider-jdk" }
 cryptography-provider-apple = { module = "dev.whyoleg.cryptography:cryptography-provider-openssl3-prebuilt" }
@@ -108,5 +109,6 @@ buildConfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildConfig
 agconnect = { id = "com.huawei.agconnect", version.ref = "agconnect_core" }
 googleServices = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 mokkery = { id = "dev.mokkery", version.ref = "mokkery" }
-skie = { id = "co.touchlab.skie", version.ref = "skie"}
+skie = { id = "co.touchlab.skie", version.ref = "skie" }
 sqlDelight = { id = "app.cash.sqldelight", version.ref = "sqlDelight" }
+mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }

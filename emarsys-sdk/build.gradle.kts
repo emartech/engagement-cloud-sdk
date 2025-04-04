@@ -12,15 +12,17 @@ plugins {
     alias(libs.plugins.mokkery)
     alias(libs.plugins.skie)
     alias(libs.plugins.sqlDelight)
+    alias(libs.plugins.mavenPublish)
 }
 
 group = "com.emarsys"
-version = "1.0-SNAPSHOT"
+version = "4.0.0"
 
 kotlin {
     jvmToolchain(17)
-    androidTarget()
-
+    androidTarget {
+        publishLibraryVariants("release")
+    }
     js(IR) {
         moduleName = "emarsys-sdk"
         browser {
@@ -160,7 +162,7 @@ android {
 
 buildConfig {
     packageName("com.emarsys.core.device")
-    buildConfigField("String", "VERSION_NAME", "\"4.0.0\"")
+    buildConfigField("String", "VERSION_NAME", "\"$version\"")
 }
 
 afterEvaluate {
@@ -191,5 +193,34 @@ skie {
 
     analytics {
         disableUpload.set(true)
+    }
+}
+mavenPublishing {
+    coordinates(group.toString(), "emarsys-sdk", version.toString())
+
+    pom {
+        name = "Emarsys SDK"
+        description = "Emarsys SDK"
+        inceptionYear = "2025"
+        url = "https://github.com/emartech/kmp-emarsys-sdk/"
+        licenses {
+            license {
+                name = "Mozilla Public License 2.0"
+                url = "https://github.com/emartech/kmp-emarsys-sdk/blob/main/LICENSE"
+                distribution = "https://github.com/emartech/kmp-emarsys-sdk/blob/main/LICENSE"
+            }
+        }
+        developers {
+            developer {
+                id = "emarsys"
+                name = "Emarsys"
+                url = "https://emarsys.com"
+            }
+        }
+        scm {
+            url = "https://github.com/emartech/kmp-emarsys-sdk"
+            connection = "scm:git:https://github.com/emartech/kmp-emarsys-sdk.git"
+            developerConnection = "scm:git:https://github.com/emartech/kmp-emarsys-sdk.git"
+        }
     }
 }
