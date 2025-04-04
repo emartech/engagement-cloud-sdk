@@ -69,10 +69,8 @@ class ContactClientIntegrationTests : KoinTest {
 
         Emarsys.linkContact(2575, "test2@test.com")
 
-        backgroundScope.launch {
-            sessionContext.contactToken shouldNotBe null
-            sessionContext.refreshToken shouldNotBe null
-        }
+        sessionContext.contactToken shouldNotBe null
+        sessionContext.refreshToken shouldNotBe null
     }
 
     @Test

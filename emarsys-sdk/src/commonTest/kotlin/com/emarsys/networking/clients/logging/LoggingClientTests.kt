@@ -33,7 +33,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -85,19 +84,20 @@ class LoggingClientTests {
         sdkDispatcher = StandardTestDispatcher()
         everySuspend { mockSdkLogger.error(any(), any<Throwable>()) } calls {
             (it.args[1] as Throwable).printStackTrace()
-            throw it.args[1] as Throwable
         }
         sdkEventDistributor = mock()
         onlineEvents = MutableSharedFlow()
         everySuspend { sdkEventDistributor.onlineSdkEvents } returns onlineEvents
+    }
 
-        LoggingClient(
+    private fun createLoggingClient(applicationScope: CoroutineScope): LoggingClient {
+        return LoggingClient(
             mockEmarsysClient,
             mockUrlFactory,
             sdkEventDistributor,
             json,
             mockSdkLogger,
-            sdkDispatcher,
+            applicationScope,
             mockDeviceInfoCollector
         )
     }
@@ -110,6 +110,7 @@ class LoggingClientTests {
 
     @Test
     fun testConsumer_should_call_client_with_logEvent() = runTest {
+        createLoggingClient(backgroundScope).register()
         every { mockUrlFactory.create(EmarsysUrlType.LOGGING, null) } returns TEST_BASE_URL
         everySuspend { mockEmarsysClient.send(any()) } returns createTestResponse("{}")
         everySuspend { mockDeviceInfoCollector.collectAsDeviceInfoForLogs() } returns deviceInfoForLogs
@@ -126,9 +127,7 @@ class LoggingClientTests {
             name = "log",
             attributes = testLogAttributes
         )
-        CoroutineScope(sdkDispatcher).launch {
-            onlineEvents.emit(logEvent)
-        }
+        onlineEvents.emit(logEvent)
 
         advanceUntilIdle()
 
@@ -138,6 +137,7 @@ class LoggingClientTests {
 
     @Test
     fun testConsumer_should_call_client_with_metricEvent() = runTest {
+        createLoggingClient(backgroundScope).register()
         every { mockUrlFactory.create(EmarsysUrlType.LOGGING, null) } returns TEST_BASE_URL
         everySuspend { mockEmarsysClient.send(any()) } returns createTestResponse("{}")
         everySuspend { mockDeviceInfoCollector.collectAsDeviceInfoForLogs() } returns deviceInfoForLogs

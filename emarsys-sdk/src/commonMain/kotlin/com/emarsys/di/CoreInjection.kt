@@ -44,7 +44,9 @@ import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.serialization.json.Json
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
@@ -60,6 +62,9 @@ object CoreInjection {
     val coreModules = module {
         single<CoroutineDispatcher>(named(DispatcherTypes.Sdk)) { Dispatchers.Default }
         single<CoroutineDispatcher>(named(DispatcherTypes.Main)) { Dispatchers.Main }
+        single<CoroutineScope>(named(CoroutineScopeTypes.Application)) {
+            CoroutineScope(SupervisorJob() + Dispatchers.Default)
+        }
         factory<Logger> { (name: String) -> SdkLogger(ConsoleLogger()) }
         singleOf(::TimestampProvider) { bind<InstantProvider>() }
         singleOf(::UUIDProvider) { bind<UuidProviderApi>() }
@@ -145,6 +150,10 @@ object CoreInjection {
 
 enum class DispatcherTypes {
     Sdk, Main
+}
+
+enum class CoroutineScopeTypes {
+    Application
 }
 
 enum class PersistentListTypes {

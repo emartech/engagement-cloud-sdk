@@ -47,9 +47,10 @@ object NetworkInjection {
                 inAppConfigApi = get(),
                 inAppPresenter = get(),
                 inAppViewProvider = get(),
-                sdkEventDistributor = get(),
+                sdkEventManager = get(),
+                eventsDao = get(),
                 sdkLogger = get { parametersOf(EventClient::class.simpleName) },
-                sdkDispatcher = get(named(DispatcherTypes.Sdk))
+                applicationScope = get(named(CoroutineScopeTypes.Application))
             )
         }
         single<DeviceClientApi> {
@@ -79,17 +80,19 @@ object NetworkInjection {
                 contactTokenHandler = get(),
                 json = get(),
                 sdkLogger = get { parametersOf(ConfigClient::class.simpleName) },
-                sdkDispatcher = get(named(DispatcherTypes.Sdk))
+                applicationScope = get(named(CoroutineScopeTypes.Application))
             )
         }
-        single<LoggingClient> { LoggingClient(
-            emarsysNetworkClient = get(named(NetworkClientTypes.Emarsys)),
-            urlFactory = get(),
-            sdkEventDistributor = get(),
-            json = get(),
-            sdkLogger = get { parametersOf(LoggingClient::class.simpleName) },
-            sdkDispatcher = get(named(DispatcherTypes.Sdk)),
-            deviceInfoCollector = get()
-        ) }
+        single<LoggingClient> {
+            LoggingClient(
+                emarsysNetworkClient = get(named(NetworkClientTypes.Emarsys)),
+                urlFactory = get(),
+                sdkEventDistributor = get(),
+                json = get(),
+                sdkLogger = get { parametersOf(LoggingClient::class.simpleName) },
+                applicationScope = get(named(CoroutineScopeTypes.Application)),
+                deviceInfoCollector = get()
+            )
+        }
     }
 }

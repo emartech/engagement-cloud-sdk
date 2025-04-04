@@ -43,7 +43,12 @@ sealed interface OnlineSdkEvent : SdkEvent {
                 })
         }
     }
+}
 
+suspend fun List<OnlineSdkEvent>.ack(eventsDao: EventsDaoApi, sdkLogger: Logger) {  // todo test
+    this.forEach {
+        it.ack(eventsDao, sdkLogger)
+    }
 }
 
 @OptIn(ExperimentalSerializationApi::class)

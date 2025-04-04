@@ -14,12 +14,13 @@ object DeepLinkInjection {
         single<DeepLinkClient> {
             DeepLinkClient(
                 networkClient = get(named(NetworkClientTypes.Generic)),
-                sdkEventDistributor = get(),
+                sdkEventManager = get(),
                 urlFactory = get(),
                 userAgentProvider = get(),
+                eventsDao = get(),
                 json = get(),
                 sdkLogger = get { parametersOf(DeepLinkClient::class.simpleName) },
-                sdkDispatcher = get(named(DispatcherTypes.Sdk))
+                applicationScope = get(named(CoroutineScopeTypes.Application))
             )
         }
         singleOf(::DeepLinkInternal) { bind<DeepLinkApi>() }

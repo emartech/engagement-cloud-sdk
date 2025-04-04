@@ -14,7 +14,6 @@ import com.emarsys.networking.clients.contact.ContactTokenHandlerApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.filter
@@ -32,11 +31,11 @@ internal class ConfigClient(
     private val contactTokenHandler: ContactTokenHandlerApi,
     private val json: Json,
     private val sdkLogger: Logger,
-    private val sdkDispatcher: CoroutineDispatcher
+    private val applicationScope: CoroutineScope
 ) : Registerable {
 
     override suspend fun register() {
-        CoroutineScope(sdkDispatcher).launch(start = CoroutineStart.UNDISPATCHED) {
+        applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
             startEventConsumer()
         }
     }

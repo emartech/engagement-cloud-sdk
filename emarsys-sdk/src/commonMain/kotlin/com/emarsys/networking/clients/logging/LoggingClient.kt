@@ -9,7 +9,6 @@ import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import io.ktor.http.HttpMethod
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.filter
@@ -25,12 +24,12 @@ internal class LoggingClient(
     private val sdkEventDistributor: SdkEventDistributorApi,
     private val json: Json,
     private val sdkLogger: Logger,
-    sdkDispatcher: CoroutineDispatcher,
+    private val applicationScope: CoroutineScope,
     private val deviceInfoCollector: DeviceInfoCollectorApi,
 ) {
 
-    init {
-        CoroutineScope(sdkDispatcher).launch(start = CoroutineStart.UNDISPATCHED) {
+    fun register() {
+        applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
             startEventConsumer()
         }
     }

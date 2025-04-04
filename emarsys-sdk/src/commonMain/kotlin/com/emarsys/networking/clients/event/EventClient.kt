@@ -4,6 +4,10 @@ import com.emarsys.api.inapp.InAppConfigApi
 import com.emarsys.core.Registerable
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.channel.naturalBatching
+import com.emarsys.core.db.events.EventsDaoApi
+import com.emarsys.core.exceptions.FailedRequestException
+import com.emarsys.core.exceptions.MissingApplicationCodeException
+import com.emarsys.core.exceptions.RetryLimitReachedException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.UrlRequest
@@ -20,9 +24,9 @@ import com.emarsys.networking.clients.event.model.DeviceEventRequestBody
 import com.emarsys.networking.clients.event.model.DeviceEventResponse
 import com.emarsys.networking.clients.event.model.EventResponseInApp
 import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.networking.clients.event.model.ack
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.collect
@@ -42,19 +46,20 @@ internal class EventClient(
     private val inAppConfigApi: InAppConfigApi,
     private val inAppPresenter: InAppPresenterApi,
     private val inAppViewProvider: InAppViewProviderApi,
-    private val sdkEventDistributor: SdkEventManagerApi,
+    private val sdkEventManager: SdkEventManagerApi,
+    private val eventsDao: EventsDaoApi,
     private val sdkLogger: Logger,
-    private val sdkDispatcher: CoroutineDispatcher
+    private val applicationScope: CoroutineScope
 ) : EventClientApi, Registerable {
 
     override suspend fun register() {
-        CoroutineScope(sdkDispatcher).launch(start = CoroutineStart.UNDISPATCHED) {
+        applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
             startEventConsumer()
         }
     }
 
     private suspend fun startEventConsumer() {
-        sdkEventDistributor.onlineSdkEvents
+        sdkEventManager.onlineSdkEvents
             .filter { it is SdkEvent.Internal.Reporting || it is SdkEvent.Internal.Custom || it is SdkEvent.External.Custom }
             .naturalBatching().onEach { sdkEvents ->
                 try {
@@ -76,6 +81,7 @@ internal class EventClient(
                     ) { reEmitSdkEventsOnNetworkError(sdkEvents) }
 
                     if (response.status == HttpStatusCode.NoContent) {
+                        sdkEvents.ack(eventsDao, sdkLogger)
                         return@onEach
                     }
 
@@ -83,14 +89,25 @@ internal class EventClient(
                     handleDeviceEventState(result)
                     handleInApp(result.message)
                     handleOnAppEventAction(result)
+
+                    sdkEvents.ack(eventsDao, sdkLogger)
                 } catch (throwable: Throwable) {
-                    sdkLogger.error("EventClient: Error during event consumption", throwable)
+                    when (throwable) {
+                        is FailedRequestException, is RetryLimitReachedException, is MissingApplicationCodeException -> {
+                            sdkEvents.ack(eventsDao, sdkLogger)
+                        }
+
+                        else -> sdkLogger.error(
+                            "EventClient: Error during event consumption",
+                            throwable
+                        )
+                    }
                 }
             }.collect()
     }
 
     private suspend fun reEmitSdkEventsOnNetworkError(it: List<SdkEvent>) {
-        it.forEach { sdkEvent -> sdkEventDistributor.emitEvent(sdkEvent) }
+        it.forEach { sdkEvent -> sdkEventManager.emitEvent(sdkEvent) }
     }
 
     private suspend fun handleOnAppEventAction(deviceEventResponse: DeviceEventResponse) {
@@ -110,7 +127,7 @@ internal class EventClient(
     private suspend fun reportOnEventAction(campaignId: String) {
         sdkLogger.debug("EventClient - reportOnEventAction")
 
-        sdkEventDistributor.registerAndStoreEvent(SdkEvent.Internal.InApp.Viewed(attributes = buildJsonObject {
+        sdkEventManager.registerAndStoreEvent(SdkEvent.Internal.InApp.Viewed(attributes = buildJsonObject {
             put(
                 "campaignId",
                 JsonPrimitive(campaignId)

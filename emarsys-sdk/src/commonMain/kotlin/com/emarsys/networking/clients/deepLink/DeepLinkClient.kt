@@ -1,7 +1,11 @@
 package com.emarsys.networking.clients.deepLink
 
 import com.emarsys.core.Registerable
-import com.emarsys.core.channel.SdkEventDistributorApi
+import com.emarsys.core.channel.SdkEventManagerApi
+import com.emarsys.core.db.events.EventsDaoApi
+import com.emarsys.core.exceptions.FailedRequestException
+import com.emarsys.core.exceptions.MissingApplicationCodeException
+import com.emarsys.core.exceptions.RetryLimitReachedException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.UserAgentProvider
 import com.emarsys.core.networking.UserAgentProviderApi
@@ -11,38 +15,38 @@ import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import io.ktor.http.HttpMethod
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
 
 internal class DeepLinkClient(
     private val networkClient: NetworkClientApi,
-    private val sdkEventDistributor: SdkEventDistributorApi,
+    private val sdkEventManager: SdkEventManagerApi,
     private val urlFactory: UrlFactoryApi,
     private val userAgentProvider: UserAgentProviderApi,
+    private val eventsDao: EventsDaoApi,
     private val json: Json,
     private val sdkLogger: Logger,
-    private val sdkDispatcher: CoroutineDispatcher,
-): Registerable {
+    private val applicationScope: CoroutineScope,
+) : Registerable {
 
     override suspend fun register() {
-        CoroutineScope(sdkDispatcher).launch(start = CoroutineStart.UNDISPATCHED) {
+        applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
             startEventConsumer()
         }
     }
 
     private suspend fun startEventConsumer() {
-        sdkEventDistributor.onlineSdkEvents
+        sdkEventManager.onlineSdkEvents
             .filter { it is SdkEvent.Internal.Sdk.TrackDeepLink }
             .collect {
                 val trackingId = it.attributes?.get("trackingId")?.jsonPrimitive?.content
-                val requestBody = buildJsonObject { put("ems_dl", JsonPrimitive(trackingId)) }
+                val requestBody = buildJsonObject { put("ems_dl", trackingId) }
                 val headers =
                     mapOf(UserAgentProvider.USER_AGENT_HEADER_NAME to userAgentProvider.provide())
                 val request = UrlRequest(
@@ -52,9 +56,22 @@ internal class DeepLinkClient(
                     bodyString = json.encodeToString(requestBody)
                 )
                 try {
-                    networkClient.send(request)
-                } catch (e: Exception) {
-                    sdkLogger.error("DeepLinkClient - trackDeepLink(trackId: \"$trackingId\")", e)
+                    networkClient.send(
+                        request,
+                        onNetworkError = { sdkEventManager.emitEvent(it) })
+                    it.ack(eventsDao, sdkLogger)
+                } catch (exception: Exception) {
+                    when (exception) {
+                        is FailedRequestException, is RetryLimitReachedException, is MissingApplicationCodeException -> it.ack(
+                            eventsDao,
+                            sdkLogger
+                        )
+
+                        else -> sdkLogger.error(
+                            "DeepLinkClient - trackDeepLink(trackId: \"$trackingId\")",
+                            exception
+                        )
+                    }
                 }
             }
     }

@@ -1,7 +1,9 @@
 package com.emarsys.networking.clients.deeplink
 
-import com.emarsys.core.channel.SdkEventDistributorApi
+import com.emarsys.core.channel.SdkEventManagerApi
+import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.log.Logger
+import com.emarsys.core.networking.UserAgentProvider
 import com.emarsys.core.networking.UserAgentProviderApi
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
@@ -15,6 +17,7 @@ import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
+import dev.mokkery.answering.throws
 import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
@@ -22,22 +25,30 @@ import dev.mokkery.mock
 import dev.mokkery.resetAnswers
 import dev.mokkery.resetCalls
 import dev.mokkery.verify
+import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
+import io.kotest.matchers.shouldBe
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -55,9 +66,10 @@ class DeepLinkClientTests {
     private lateinit var mockUrlFactory: UrlFactoryApi
     private lateinit var mockLogger: Logger
     private lateinit var mockUserAgentProvider: UserAgentProviderApi
+    private lateinit var mockEventsDao: EventsDaoApi
     private lateinit var json: Json
     private lateinit var onlineEvents: MutableSharedFlow<OnlineSdkEvent>
-    private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
+    private lateinit var mockSdkEventManager: SdkEventManagerApi
     private lateinit var deepLinkClient: DeepLinkClient
 
     @BeforeTest
@@ -68,27 +80,29 @@ class DeepLinkClientTests {
         mockUrlFactory = mock()
         mockLogger = mock(MockMode.autofill)
         mockUserAgentProvider = mock(MockMode.autofill)
+        mockEventsDao = mock()
         json = JsonUtil.json
-        mockSdkEventDistributor = mock()
+        mockSdkEventManager = mock(MockMode.autofill)
         onlineEvents = MutableSharedFlow(replay = 5)
-        everySuspend { mockSdkEventDistributor.onlineSdkEvents } returns onlineEvents
+        everySuspend { mockSdkEventManager.onlineSdkEvents } returns onlineEvents
         everySuspend { mockUserAgentProvider.provide() } returns TEST_USER_AGENT
         every { mockUrlFactory.create(EmarsysUrlType.DEEP_LINK, null) } returns TEST_BASE_URL
         everySuspend { mockLogger.error(any(), any<Throwable>()) } calls {
             (it.args[1] as Throwable).printStackTrace()
-            throw it.args[1] as Throwable
         }
+    }
 
-        deepLinkClient = DeepLinkClient(
+    private fun createDeepLinkClient(applicationScope: CoroutineScope) =
+        DeepLinkClient(
             mockNetworkClient,
-            mockSdkEventDistributor,
+            mockSdkEventManager,
             mockUrlFactory,
             mockUserAgentProvider,
+            mockEventsDao,
             json,
             mockLogger,
-            sdkDispatcher
+            applicationScope
         )
-    }
 
     @AfterTest
     fun tearDown() {
@@ -96,29 +110,95 @@ class DeepLinkClientTests {
         resetAnswers()
     }
 
-
     @Test
-    fun testConsumer_should_call_client_with_trackDeepLink_request() = runTest {
+    fun testConsumer_should_call_client_with_trackDeepLink_request_and_ack_event() = runTest {
+        deepLinkClient = createDeepLinkClient(TestScope(sdkDispatcher))
         deepLinkClient.register()
 
+        val expectedRequest = UrlRequest(
+            TEST_BASE_URL,
+            method = HttpMethod.Post,
+            headers = mapOf(UserAgentProvider.USER_AGENT_HEADER_NAME to TEST_USER_AGENT),
+            bodyString = json.encodeToString(buildJsonObject { put("ems_dl", TRACKING_ID) })
+        )
         val response = Response(
             UrlRequest(TEST_BASE_URL, HttpMethod.Post),
             HttpStatusCode.OK,
             Headers.Empty,
             bodyAsText = "{}"
         )
-        everySuspend { mockNetworkClient.send(any()) } returns response
+        everySuspend { mockNetworkClient.send(expectedRequest, any()) } returns response
         val trackDeepLink = SdkEvent.Internal.Sdk.TrackDeepLink(
             "trackDeepLink",
             attributes = buildJsonObject {
-                put("trackingId", JsonPrimitive(TRACKING_ID))
+                put("trackingId", TRACKING_ID)
             })
+        val onlineSdkEvents = backgroundScope.async {
+            onlineEvents.take(1).toList()
+        }
 
         onlineEvents.emit(trackDeepLink)
 
         advanceUntilIdle()
 
+        onlineSdkEvents.await() shouldBe listOf(trackDeepLink)
         verify { mockUrlFactory.create(any()) }
-        verifySuspend { mockNetworkClient.send(any()) }
+        verifySuspend { mockNetworkClient.send(expectedRequest, any()) }
+        verifySuspend { trackDeepLink.ack(mockEventsDao, mockLogger) }
+    }
+
+    @Test
+    fun testConsumer_shouldReEmitEvent_throughSdkEventDistributor_inCaseOfNetworkError() = runTest {
+        deepLinkClient = createDeepLinkClient(backgroundScope)
+        deepLinkClient.register()
+
+        everySuspend { mockNetworkClient.send(any(), any()) } calls { args ->
+            (args.arg(1) as suspend () -> Unit).invoke()
+            throw IOException("No Internet")
+        }
+        val trackDeepLink = SdkEvent.Internal.Sdk.TrackDeepLink(
+            "trackDeepLink",
+            attributes = buildJsonObject {
+                put("trackingId", TRACKING_ID)
+            })
+        val onlineSdkEvents = backgroundScope.async {
+            onlineEvents.take(1).toList()
+        }
+
+        onlineEvents.emit(trackDeepLink)
+
+        advanceUntilIdle()
+
+        onlineSdkEvents.await() shouldBe listOf(trackDeepLink)
+        verify { mockUrlFactory.create(any()) }
+        verifySuspend { mockNetworkClient.send(any(), any()) }
+        verifySuspend { mockSdkEventManager.emitEvent(trackDeepLink) }
+        verifySuspend(VerifyMode.exactly(0)) { trackDeepLink.ack(mockEventsDao, mockLogger) }
+    }
+
+    @Test
+    fun testConsumer_shouldNotAckEvent_inCaseOfException() = runTest {
+        deepLinkClient = createDeepLinkClient(backgroundScope)
+        deepLinkClient.register()
+
+        everySuspend { mockNetworkClient.send(any(), any()) } throws Exception("Request error")
+        val trackDeepLink = SdkEvent.Internal.Sdk.TrackDeepLink(
+            "trackDeepLink",
+            attributes = buildJsonObject {
+                put("trackingId", TRACKING_ID)
+            })
+        val onlineSdkEvents = backgroundScope.async {
+            onlineEvents.take(1).toList()
+        }
+
+        onlineEvents.emit(trackDeepLink)
+
+        advanceUntilIdle()
+
+        onlineSdkEvents.await() shouldBe listOf(trackDeepLink)
+        verify { mockUrlFactory.create(any()) }
+        verifySuspend { mockNetworkClient.send(any(), any()) }
+        verifySuspend(VerifyMode.exactly(0)) { mockSdkEventManager.emitEvent(trackDeepLink) }
+        verifySuspend(VerifyMode.exactly(0)) { trackDeepLink.ack(mockEventsDao, mockLogger) }
     }
 }
