@@ -45,17 +45,17 @@ internal class DeepLinkClient(
         sdkEventManager.onlineSdkEvents
             .filter { it is SdkEvent.Internal.Sdk.TrackDeepLink }
             .collect {
-                val trackingId = it.attributes?.get("trackingId")?.jsonPrimitive?.content
-                val requestBody = buildJsonObject { put("ems_dl", trackingId) }
-                val headers =
-                    mapOf(UserAgentProvider.USER_AGENT_HEADER_NAME to userAgentProvider.provide())
-                val request = UrlRequest(
-                    urlFactory.create(EmarsysUrlType.DEEP_LINK, null),
-                    method = HttpMethod.Post,
-                    headers = headers,
-                    bodyString = json.encodeToString(requestBody)
-                )
                 try {
+                    val trackingId = it.attributes?.get("trackingId")?.jsonPrimitive?.content
+                    val requestBody = buildJsonObject { put("ems_dl", trackingId) }
+                    val headers =
+                        mapOf(UserAgentProvider.USER_AGENT_HEADER_NAME to userAgentProvider.provide())
+                    val request = UrlRequest(
+                        urlFactory.create(EmarsysUrlType.DEEP_LINK, null),
+                        method = HttpMethod.Post,
+                        headers = headers,
+                        bodyString = json.encodeToString(requestBody)
+                    )
                     networkClient.send(
                         request,
                         onNetworkError = { sdkEventManager.emitEvent(it) })
@@ -68,7 +68,7 @@ internal class DeepLinkClient(
                         )
 
                         else -> sdkLogger.error(
-                            "DeepLinkClient - trackDeepLink(trackId: \"$trackingId\")",
+                            "DeepLinkClient - trackDeepLink(trackId: \"${it.attributes?.get("trackingId")?.jsonPrimitive?.content}\")",
                             exception
                         )
                     }
