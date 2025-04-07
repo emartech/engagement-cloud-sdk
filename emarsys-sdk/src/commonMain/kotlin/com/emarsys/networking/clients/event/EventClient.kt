@@ -77,8 +77,9 @@ internal class EventClient(
                             url,
                             HttpMethod.Post,
                             body
-                        )
-                    ) { reEmitSdkEventsOnNetworkError(sdkEvents) }
+                        ),
+                        onNetworkError = { reEmitSdkEventsOnNetworkError(sdkEvents) }
+                    )
 
                     if (response.status == HttpStatusCode.NoContent) {
                         sdkEvents.ack(eventsDao, sdkLogger)
