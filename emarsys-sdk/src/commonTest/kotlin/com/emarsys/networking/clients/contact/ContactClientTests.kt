@@ -49,6 +49,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
@@ -96,6 +97,7 @@ class ContactClientTests {
         mockSdkEventManager = mock()
         mockEventsDao = mock(MockMode.autofill)
         everySuspend { mockSdkEventManager.onlineSdkEvents } returns onlineEvents
+        everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
         sdkDispatcher = StandardTestDispatcher()
         every { mockSdkContext.config } returns mockConfig
         everySuspend { mockContactTokenHandler.handleContactTokens(any()) } returns Unit
@@ -146,7 +148,7 @@ class ContactClientTests {
         verifySuspend { mockEmarsysClient.send(any(), any()) }
         verifySuspend { mockContactTokenHandler.handleContactTokens(any()) }
         verifySuspend { mockSdkContext.contactFieldId = CONTACT_FIELD_ID }
-        verifySuspend { linkContactEvent.ack(mockEventsDao, mockLogger) }
+        verifySuspend { mockEventsDao.removeEvent(linkContactEvent) }
 
     }
 
@@ -177,7 +179,7 @@ class ContactClientTests {
         verifySuspend { mockEmarsysClient.send(any(), any()) }
         verifySuspend(VerifyMode.exactly(0)) { mockContactTokenHandler.handleContactTokens(any()) }
         verifySuspend { mockSdkContext.contactFieldId = CONTACT_FIELD_ID }
-        verifySuspend { linkContactEvent.ack(mockEventsDao, mockLogger) }
+        verifySuspend { mockEventsDao.removeEvent(linkContactEvent) }
 
         val request = requestSlot.get()
         request.headers?.containsValue(MERCHANT_ID) shouldBe true
@@ -207,7 +209,7 @@ class ContactClientTests {
         verifySuspend { mockEmarsysClient.send(any(), any()) }
         verifySuspend { mockContactTokenHandler.handleContactTokens(any()) }
         verifySuspend { mockSdkContext.contactFieldId = CONTACT_FIELD_ID }
-        verifySuspend { linkAuthenticatedContactEvent.ack(mockEventsDao, mockLogger) }
+        verifySuspend { mockEventsDao.removeEvent(linkAuthenticatedContactEvent) }
 
         val request = requestSlot.get()
         request.headers?.containsValue(MERCHANT_ID) shouldBe true
@@ -242,10 +244,7 @@ class ContactClientTests {
                 mockSdkContext.contactFieldId = CONTACT_FIELD_ID
             }
             verifySuspend(VerifyMode.exactly(0)) {
-                linkAuthenticatedContactEvent.ack(
-                    mockEventsDao,
-                    mockLogger
-                )
+                mockEventsDao.removeEvent(linkAuthenticatedContactEvent)
             }
         }
 
@@ -261,9 +260,30 @@ class ContactClientTests {
 
         verify { mockUrlFactory.create(any()) }
         verifySuspend { mockEmarsysClient.send(any(), any()) }
-        verifySuspend { mockContactTokenHandler.handleContactTokens(any()) }
+        verifySuspend(VerifyMode.exactly(0)) { mockContactTokenHandler.handleContactTokens(any()) }
         verifySuspend { mockSdkContext.contactFieldId = null }
-        verifySuspend { unlinkContactEvent.ack(mockEventsDao, mockLogger) }
+        verifySuspend { mockEventsDao.removeEvent(unlinkContactEvent) }
+    }
+
+    @Test
+    fun testConsumer_should_reEmit_events_into_flow_when_there_is_a_network_error() = runTest {
+        contactClient.register()
+
+        val unlinkContactEvent = SdkEvent.Internal.Sdk.UnlinkContact("unlinkContact")
+        everySuspend { mockEmarsysClient.send(any(), any()) } calls { args ->
+            (args.arg(1) as suspend () -> Unit).invoke()
+            throw IOException("No Internet")
+        }
+
+        onlineEvents.emit(unlinkContactEvent)
+
+        advanceUntilIdle()
+
+        verify { mockUrlFactory.create(any()) }
+        verifySuspend { mockEmarsysClient.send(any(), any()) }
+        verifySuspend(VerifyMode.exactly(0)) { mockContactTokenHandler.handleContactTokens(any()) }
+        verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(unlinkContactEvent) }
+        verifySuspend { mockSdkEventManager.emitEvent(unlinkContactEvent) }
     }
 
     @Test
@@ -295,7 +315,7 @@ class ContactClientTests {
 
                 verify { mockUrlFactory.create(any(), any()) }
                 verifySuspend { mockEmarsysClient.send(any(), any()) }
-                verifySuspend { unlinkContact.ack(mockEventsDao, mockLogger) }
+                verifySuspend { mockEventsDao.removeEvent(unlinkContact) }
 
                 verifySuspend(VerifyMode.exactly(0)) {
                     mockContactTokenHandler.handleContactTokens(any())
