@@ -260,7 +260,7 @@ class ContactClientTests {
 
         verify { mockUrlFactory.create(any()) }
         verifySuspend { mockEmarsysClient.send(any(), any()) }
-        verifySuspend { mockContactTokenHandler.handleContactTokens(any()) }
+        verifySuspend(VerifyMode.exactly(0)) { mockContactTokenHandler.handleContactTokens(any()) }
         verifySuspend { mockSdkContext.contactFieldId = null }
         verifySuspend { mockEventsDao.removeEvent(unlinkContactEvent) }
     }
