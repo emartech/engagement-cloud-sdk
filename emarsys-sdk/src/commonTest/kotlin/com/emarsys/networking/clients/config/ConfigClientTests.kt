@@ -2,7 +2,11 @@ package com.emarsys.networking.clients.config
 
 import com.emarsys.SdkConfig
 import com.emarsys.context.SdkContextApi
-import com.emarsys.core.channel.SdkEventDistributorApi
+import com.emarsys.core.channel.SdkEventManagerApi
+import com.emarsys.core.db.events.EventsDaoApi
+import com.emarsys.core.exceptions.FailedRequestException
+import com.emarsys.core.exceptions.MissingApplicationCodeException
+import com.emarsys.core.exceptions.RetryLimitReachedException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
@@ -17,6 +21,7 @@ import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
+import dev.mokkery.answering.throws
 import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
@@ -27,6 +32,10 @@ import dev.mokkery.spy
 import dev.mokkery.verify
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
+import io.kotest.data.forAll
+import io.kotest.data.headers
+import io.kotest.data.row
+import io.kotest.data.table
 import io.kotest.matchers.shouldBe
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
@@ -44,6 +53,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
@@ -61,13 +71,14 @@ class ConfigClientTests {
     private lateinit var mockEmarsysClient: NetworkClientApi
     private lateinit var mockUrlFactory: UrlFactoryApi
     private lateinit var mockContactTokenHandler: ContactTokenHandlerApi
+    private lateinit var mockEventsDao: EventsDaoApi
     private lateinit var mockSdkContext: SdkContextApi
     private lateinit var mockSdkLogger: Logger
     private lateinit var mockConfig: SdkConfig
     private lateinit var sessionContext: SessionContext
     private lateinit var json: Json
     private lateinit var onlineEvents: MutableSharedFlow<OnlineSdkEvent>
-    private lateinit var sdkEventDistributor: SdkEventDistributorApi
+    private lateinit var mockSdkEventManager: SdkEventManagerApi
     private lateinit var configClient: ConfigClient
 
     @BeforeTest
@@ -81,9 +92,10 @@ class ConfigClientTests {
         mockConfig = mock()
         sessionContext = SessionContext(refreshToken = "testRefreshToken")
         json = JsonUtil.json
-        onlineEvents = spy(MutableSharedFlow(replay = 5))
-        sdkEventDistributor = mock()
-        every { sdkEventDistributor.onlineSdkEvents } returns onlineEvents
+        mockEventsDao = mock()
+        onlineEvents = spy(MutableSharedFlow())
+        mockSdkEventManager = mock()
+        every { mockSdkEventManager.onlineSdkEvents } returns onlineEvents
         sdkDispatcher = StandardTestDispatcher()
 
         everySuspend { mockContactTokenHandler.handleContactTokens(any()) } returns Unit
@@ -104,24 +116,25 @@ class ConfigClientTests {
         ConfigClient(
             mockEmarsysClient,
             mockUrlFactory,
-            sdkEventDistributor,
+            mockSdkEventManager,
             sessionContext,
             mockSdkContext,
             mockContactTokenHandler,
+            mockEventsDao,
             json,
             mockSdkLogger,
-            applicationScope
+            applicationScope,
         )
 
     @Test
-    fun testConsumer_should_call_client_with_change_appcode_request() = runTest {
+    fun testConsumer_should_call_client_with_change_appcode_request_and_ack_event() = runTest {
         configClient = createConfigClient(backgroundScope)
         configClient.register()
 
         every { mockUrlFactory.create(EmarsysUrlType.CHANGE_APPLICATION_CODE, null) }.returns(
             TEST_BASE_URL
         )
-        everySuspend { mockEmarsysClient.send(any()) }.returns(createTestResponse("{}"))
+        everySuspend { mockEmarsysClient.send(any(), any()) }.returns(createTestResponse("{}"))
         every { mockConfig.copyWith("NewAppCode", null, null) } returns mockConfig
         every { mockConfig.merchantId } returns null
         every { mockConfig.applicationCode } returns "testApplicationCode"
@@ -139,19 +152,20 @@ class ConfigClientTests {
         advanceUntilIdle()
 
         onlineSdkEvents.await() shouldBe listOf(changeAppCode)
-        verifySuspend { mockEmarsysClient.send(any()) }
+        verifySuspend { mockEmarsysClient.send(any(), any()) }
         verify { mockConfig.copyWith(applicationCode = "NewAppCode", null, null) }
         verify { mockSdkContext.config = mockConfig }
         verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
+        verifySuspend { mockEventsDao.removeEvent(changeAppCode) }
     }
 
     @Test
-    fun testConsumer_should_call_client_with_change_merchantId_request() = runTest {
+    fun testConsumer_should_call_client_with_change_merchantId_request_and_ack_event() = runTest {
         configClient = createConfigClient(backgroundScope)
         configClient.register()
 
         every { mockUrlFactory.create(EmarsysUrlType.REFRESH_TOKEN, null) }.returns(TEST_BASE_URL)
-        everySuspend { mockEmarsysClient.send(any()) }.returns(createTestResponse("{}"))
+        everySuspend { mockEmarsysClient.send(any(), any()) }.returns(createTestResponse("{}"))
         every { mockConfig.copyWith(null, "newMerchantId", null) } returns mockConfig
         every { mockConfig.merchantId } returns "testMerchantId"
         every { mockConfig.applicationCode } returns null
@@ -169,7 +183,7 @@ class ConfigClientTests {
         advanceUntilIdle()
 
         onlineSdkEvents.await() shouldBe listOf(changeMerchantId)
-        verifySuspend { mockEmarsysClient.send(any()) }
+        verifySuspend { mockEmarsysClient.send(any(), any()) }
         verify {
             mockConfig.copyWith(
                 merchantId = "newMerchantId",
@@ -179,6 +193,117 @@ class ConfigClientTests {
         }
         verify { mockSdkContext.config = mockConfig }
         verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
+        verifySuspend { mockEventsDao.removeEvent(changeMerchantId) }
+    }
+
+    @Test
+    fun testConsumer_should_reEmit_events_into_flow_when_there_is_a_network_error() = runTest {
+        configClient = createConfigClient(backgroundScope)
+        configClient.register()
+
+        every { mockUrlFactory.create(EmarsysUrlType.REFRESH_TOKEN, null) } returns TEST_BASE_URL
+        everySuspend { mockEmarsysClient.send(any(), any()) } calls { args ->
+            (args.arg(1) as suspend () -> Unit).invoke()
+            throw IOException("No Internet")
+        }
+
+        val changeMerchantId = SdkEvent.Internal.Sdk.ChangeMerchantId(
+            "changeMerchantId",
+            buildJsonObject { put("merchantId", JsonPrimitive("newMerchantId")) })
+        everySuspend { mockSdkEventManager.emitEvent(changeMerchantId) } returns Unit
+
+        val onlineSdkEvents = backgroundScope.async {
+            onlineEvents.take(1).toList()
+        }
+
+        onlineEvents.emit(changeMerchantId)
+
+        advanceUntilIdle()
+
+        onlineSdkEvents.await() shouldBe listOf(changeMerchantId)
+        verifySuspend { mockEmarsysClient.send(any(), any()) }
+        verifySuspend { mockSdkLogger.error(any(), any<Throwable>()) }
+        verifySuspend { mockSdkEventManager.emitEvent(changeMerchantId) }
+        verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(changeMerchantId) }
+
+    }
+
+    @Test
+    fun testConsumer_should_not_ack_event_when_unknown_exception_happens() = runTest {
+        configClient = createConfigClient(backgroundScope)
+        configClient.register()
+
+        every {
+            mockUrlFactory.create(
+                EmarsysUrlType.REFRESH_TOKEN,
+                null
+            )
+        } throws RuntimeException("exception")
+        val changeMerchantId = SdkEvent.Internal.Sdk.ChangeMerchantId(
+            "changeMerchantId",
+            buildJsonObject { put("merchantId", JsonPrimitive("newMerchantId")) })
+
+        val onlineSdkEvents = backgroundScope.async {
+            onlineEvents.take(1).toList()
+        }
+
+        onlineEvents.emit(changeMerchantId)
+
+        advanceUntilIdle()
+
+        onlineSdkEvents.await() shouldBe listOf(changeMerchantId)
+        verifySuspend(VerifyMode.exactly(0)) { mockEmarsysClient.send(any(), any()) }
+        verifySuspend { mockSdkLogger.error(any(), any<Throwable>()) }
+        verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(changeMerchantId) }
+
+    }
+
+    @Test
+    fun testConsumer_should_ack_event_when_known_exception_happens() = forAll(
+        table(
+            headers("exception"),
+            listOf(
+                row(
+                    FailedRequestException(
+                        createTestResponse(
+                            statusCode = HttpStatusCode.BadRequest
+                        )
+                    )
+                ),
+                row(RetryLimitReachedException("Retry limit reached")),
+                row(
+                    MissingApplicationCodeException("Missing app code")
+                ),
+            )
+        )
+    ) { testException ->
+        runTest {
+            configClient = createConfigClient(backgroundScope)
+            configClient.register()
+
+            every {
+                mockUrlFactory.create(
+                    EmarsysUrlType.REFRESH_TOKEN,
+                    null
+                )
+            } throws testException
+            val changeMerchantId = SdkEvent.Internal.Sdk.ChangeMerchantId(
+                "changeMerchantId",
+                buildJsonObject { put("merchantId", JsonPrimitive("newMerchantId")) })
+
+            val onlineSdkEvents = backgroundScope.async {
+                onlineEvents.take(1).toList()
+            }
+
+            onlineEvents.emit(changeMerchantId)
+
+            advanceUntilIdle()
+
+            onlineSdkEvents.await() shouldBe listOf(changeMerchantId)
+            verifySuspend(VerifyMode.exactly(0)) { mockEmarsysClient.send(any(), any()) }
+            verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
+            verifySuspend { mockEventsDao.removeEvent(changeMerchantId) }
+        }
     }
 
     private fun createTestResponse(

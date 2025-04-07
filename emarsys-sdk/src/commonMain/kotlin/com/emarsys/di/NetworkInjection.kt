@@ -74,13 +74,14 @@ object NetworkInjection {
             ConfigClient(
                 emarsysNetworkClient = get(named(NetworkClientTypes.Emarsys)),
                 urlFactory = get(),
-                sdkEventDistributor = get(),
+                sdkEventManager = get(),
                 sessionContext = get(),
                 sdkContext = get(),
                 contactTokenHandler = get(),
+                eventsDao = get(),
                 json = get(),
                 sdkLogger = get { parametersOf(ConfigClient::class.simpleName) },
-                applicationScope = get(named(CoroutineScopeTypes.Application))
+                applicationScope = get(named(CoroutineScopeTypes.Application)),
             )
         }
         single<LoggingClient> {
