@@ -14,9 +14,8 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 
 internal class LoggingClient(
     private val emarsysNetworkClient: NetworkClientApi,
@@ -45,34 +44,22 @@ internal class LoggingClient(
                 } else {
                     (it as SdkEvent.Internal.Sdk.Metric).level
                 }
+                val logRequestJson = buildJsonObject {
+                    put("type", JsonPrimitive("log_request"))
+                    put("level", JsonPrimitive(logLevel.name))
+                    put(
+                        "deviceInfo",
+                        JsonPrimitive(json.encodeToString(deviceInfoCollector.collectAsDeviceInfoForLogs()))
+                    )
+                    it.attributes?.forEach { attribute ->
+                        put(attribute.key, attribute.value)
+                    }
+                }
                 val request = UrlRequest(
                     url, HttpMethod.Post,
                     json.encodeToString(
                         listOf(
-                            LogRequest(
-                                deviceInfo = deviceInfoCollector.collectAsDeviceInfoForLogs(),
-                                level = logLevel,
-                                message = it.attributes?.get("message")?.jsonPrimitive?.contentOrNull,
-                                type = "log_request",
-                                url = it.attributes?.get("url")?.jsonPrimitive?.contentOrNull,
-                                statusCode = it.attributes?.get("statusCode")?.jsonPrimitive?.contentOrNull,
-                                networkingDuration = it.attributes?.get("networkingDuration")?.jsonPrimitive?.contentOrNull,
-                                networkingEnd = it.attributes?.get("networkingEnd")?.jsonPrimitive?.contentOrNull,
-                                networkingStart = it.attributes?.get("networkingStart")?.jsonPrimitive?.contentOrNull,
-                                inDbDuration = it.attributes?.get("inDbDuration")?.jsonPrimitive?.contentOrNull,
-                                inDbEnd = it.attributes?.get("inDbEnd")?.jsonPrimitive?.contentOrNull,
-                                inDbStart = it.attributes?.get("inDbStart")?.jsonPrimitive?.contentOrNull,
-                                loadingTimeDuration = it.attributes?.get("loadingTimeDuration")?.jsonPrimitive?.contentOrNull,
-                                loadingTimeEnd = it.attributes?.get("loadingTimeEnd")?.jsonPrimitive?.contentOrNull,
-                                loadingTimeStart = it.attributes?.get("loadingTimeStart")?.jsonPrimitive?.contentOrNull,
-                                onScreenDuration = it.attributes?.get("onScreenDuration")?.jsonPrimitive?.contentOrNull,
-                                onScreenEnd = it.attributes?.get("onScreenEnd")?.jsonPrimitive?.contentOrNull,
-                                onScreenStart = it.attributes?.get("onScreenStart")?.jsonPrimitive?.contentOrNull,
-                                exception = it.attributes?.get("exception")?.jsonPrimitive?.contentOrNull,
-                                reason = it.attributes?.get("reason")?.jsonPrimitive?.contentOrNull,
-                                stackTrace = it.attributes?.get("stackTrace")?.jsonPrimitive?.contentOrNull,
-                                breadcrumbs = it.attributes?.get("breadcrumbs") as JsonObject?,
-                            )
+                            logRequestJson
                         )
                     )
                 )
