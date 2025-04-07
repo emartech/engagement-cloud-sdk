@@ -3,6 +3,7 @@ package com.emarsys.networking.clients.event
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.log.Logger
 import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.networking.clients.event.model.ack
 import dev.mokkery.MockMode
 import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend
@@ -46,6 +47,20 @@ class EventTests {
         verifySuspend {
             mockEventsDao.removeEvent(onlineSdkEvent)
             mockSdkLogger.error(any(), any<Exception>(), any())
+        }
+    }
+
+    @Test
+    fun ack_onList_shouldAckAllEvents() = runTest {
+        val onlineSdkEvent1 = SdkEvent.Internal.Sdk.AppStart()
+        val onlineSdkEvent2 = SdkEvent.Internal.Sdk.AppStart()
+        val eventsList = listOf(onlineSdkEvent1, onlineSdkEvent2)
+
+        eventsList.ack(mockEventsDao, mockSdkLogger)
+
+        verifySuspend {
+            mockEventsDao.removeEvent(onlineSdkEvent1)
+            mockEventsDao.removeEvent(onlineSdkEvent2)
         }
     }
 

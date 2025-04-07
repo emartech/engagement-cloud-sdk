@@ -87,11 +87,12 @@ object NetworkInjection {
             LoggingClient(
                 emarsysNetworkClient = get(named(NetworkClientTypes.Emarsys)),
                 urlFactory = get(),
-                sdkEventDistributor = get(),
+                sdkEventManager = get(),
                 json = get(),
                 sdkLogger = get { parametersOf(LoggingClient::class.simpleName) },
                 applicationScope = get(named(CoroutineScopeTypes.Application)),
-                deviceInfoCollector = get()
+                deviceInfoCollector = get(),
+                eventsDao = get()
             )
         }
     }

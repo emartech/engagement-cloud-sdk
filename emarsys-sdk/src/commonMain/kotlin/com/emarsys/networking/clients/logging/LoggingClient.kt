@@ -1,7 +1,11 @@
 package com.emarsys.networking.clients.logging
 
-import com.emarsys.core.channel.SdkEventDistributorApi
+import com.emarsys.core.channel.SdkEventManagerApi
+import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
+import com.emarsys.core.exceptions.FailedRequestException
+import com.emarsys.core.exceptions.MissingApplicationCodeException
+import com.emarsys.core.exceptions.RetryLimitReachedException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.UrlRequest
@@ -20,11 +24,12 @@ import kotlinx.serialization.json.buildJsonObject
 internal class LoggingClient(
     private val emarsysNetworkClient: NetworkClientApi,
     private val urlFactory: UrlFactoryApi,
-    private val sdkEventDistributor: SdkEventDistributorApi,
+    private val sdkEventManager: SdkEventManagerApi,
     private val json: Json,
     private val sdkLogger: Logger,
     private val applicationScope: CoroutineScope,
     private val deviceInfoCollector: DeviceInfoCollectorApi,
+    private val eventsDao: EventsDaoApi,
 ) {
 
     fun register() {
@@ -34,16 +39,17 @@ internal class LoggingClient(
     }
 
     private suspend fun startEventConsumer() {
-        sdkEventDistributor.onlineSdkEvents
+        sdkEventManager.onlineSdkEvents
             .filter { it is SdkEvent.Internal.Sdk.Log || it is SdkEvent.Internal.Sdk.Metric }
-            .collect {
-                sdkLogger.debug("LoggingClient - consumeLogsAndMetrics")
-                val url = urlFactory.create(EmarsysUrlType.LOGGING)
-                val logLevel = if (it is SdkEvent.Internal.Sdk.Log) {
-                    it.level
-                } else {
-                    (it as SdkEvent.Internal.Sdk.Metric).level
-                }
+            .collect { sdkEvent ->
+                try {
+                    sdkLogger.debug("LoggingClient - consumeLogsAndMetrics")
+                    val url = urlFactory.create(EmarsysUrlType.LOGGING)
+                    val logLevel = if (sdkEvent is SdkEvent.Internal.Sdk.Log) {
+                        sdkEvent.level
+                    } else {
+                        (sdkEvent as SdkEvent.Internal.Sdk.Metric).level
+                    }
                 val logRequestJson = buildJsonObject {
                     put("type", JsonPrimitive("log_request"))
                     put("level", JsonPrimitive(logLevel.name))
@@ -51,19 +57,34 @@ internal class LoggingClient(
                         "deviceInfo",
                         JsonPrimitive(json.encodeToString(deviceInfoCollector.collectAsDeviceInfoForLogs()))
                     )
-                    it.attributes?.forEach { attribute ->
+                    sdkEvent.attributes?.forEach { attribute ->
                         put(attribute.key, attribute.value)
                     }
                 }
-                val request = UrlRequest(
-                    url, HttpMethod.Post,
-                    json.encodeToString(
-                        listOf(
+                    val request = UrlRequest(
+                        url, HttpMethod.Post,
+                        json.encodeToString(
+                            listOf(
                             logRequestJson
+                            )
                         )
                     )
-                )
-                emarsysNetworkClient.send(request)
+                    emarsysNetworkClient.send(
+                        request,
+                        onNetworkError = { sdkEventManager.emitEvent(sdkEvent) })
+                    sdkEvent.ack(eventsDao, sdkLogger)
+                } catch (exception: Exception) {
+                    when (exception) {
+                        is FailedRequestException, is RetryLimitReachedException, is MissingApplicationCodeException -> {
+                            sdkEvent.ack(eventsDao, sdkLogger)
+                        }
+
+                        else -> sdkLogger.error(
+                            "LoggingClient - consumeLogsAndMetrics",
+                            exception
+                        )
+                    }
+                }
             }
     }
 }

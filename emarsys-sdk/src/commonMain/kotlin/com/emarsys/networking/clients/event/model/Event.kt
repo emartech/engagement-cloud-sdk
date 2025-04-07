@@ -33,6 +33,7 @@ sealed interface OnlineSdkEvent : SdkEvent {
 
     suspend fun ack(eventsDao: EventsDaoApi, sdkLogger: Logger) {
         try {
+            println("remove")
             eventsDao.removeEvent(this)
         } catch (exception: Exception) {
             sdkLogger.error(
@@ -45,7 +46,7 @@ sealed interface OnlineSdkEvent : SdkEvent {
     }
 }
 
-suspend fun List<OnlineSdkEvent>.ack(eventsDao: EventsDaoApi, sdkLogger: Logger) {  // todo test
+suspend fun List<OnlineSdkEvent>.ack(eventsDao: EventsDaoApi, sdkLogger: Logger) {
     this.forEach {
         it.ack(eventsDao, sdkLogger)
     }
