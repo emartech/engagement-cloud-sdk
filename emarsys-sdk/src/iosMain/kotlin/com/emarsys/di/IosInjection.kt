@@ -167,7 +167,6 @@ object IosInjection {
                 )
             )
             IosPushInternal(
-                pushClient = get(),
                 storage = get(),
                 pushContext = get(),
                 sdkContext = get(),

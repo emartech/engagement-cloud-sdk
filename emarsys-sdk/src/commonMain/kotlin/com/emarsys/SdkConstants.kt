@@ -19,6 +19,8 @@ object SdkConstants {
     const val DISMISS_EVENT_NAME = "dismiss"
     const val REREGISTRATION_REQUIRED_EVENT_NAME = "reregistrationRequired"
     const val REGISTER_DEVICE_INFO_EVENT_NAME = "registerDeviceInfo"
+    const val REGISTER_PUSH_TOKEN_EVENT_NAME = "registerPushToken"
+    const val CLEAR_PUSH_TOKEN_EVENT_NAME = "clearPushToken"
     const val REMOTE_CONFIG_UPDATE_REQUIRED_EVENT_NAME = "remoteConfigUpdateRequired"
     const val EMS_DEEP_LINK_TRACKED_KEY = "ems_deep_link_tracked"
 

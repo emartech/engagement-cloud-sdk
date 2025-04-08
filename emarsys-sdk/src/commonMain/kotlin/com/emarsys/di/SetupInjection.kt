@@ -26,8 +26,8 @@ object SetupInjection {
         }
         single<State>(named(StateTypes.RegisterPushToken)) {
             RegisterPushTokenState(
-                pushClient = get(),
-                storage = get()
+                storage = get(),
+                sdkEventDistributor = get(),
             )
         }
         single<State>(named(StateTypes.RegisterClient)) {

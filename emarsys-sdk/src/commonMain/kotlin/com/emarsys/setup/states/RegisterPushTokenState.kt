@@ -1,13 +1,16 @@
 package com.emarsys.setup.states
 
 import com.emarsys.api.push.PushConstants
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.StringStorageApi
-import com.emarsys.networking.clients.push.PushClientApi
+import com.emarsys.networking.clients.event.model.SdkEvent
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 class RegisterPushTokenState(
-    private val pushClient: PushClientApi,
-    private val storage: StringStorageApi
+    private val storage: StringStorageApi,
+    private val sdkEventDistributor: SdkEventDistributorApi
 ) : State {
     override val name: String
         get() = "registerPushToken"
@@ -20,7 +23,13 @@ class RegisterPushTokenState(
         val lastSentPushToken = storage.get(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY)
 
         if (pushToken != null && pushToken != lastSentPushToken) {
-            pushClient.registerPushToken(pushToken)
+            sdkEventDistributor.registerAndStoreEvent(
+                SdkEvent.Internal.Sdk.RegisterPushToken(
+                    attributes = buildJsonObject {
+                        put(PushConstants.PUSH_TOKEN_KEY, pushToken)
+                    }
+                )
+            )
             storage.put(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY, pushToken)
         }
     }

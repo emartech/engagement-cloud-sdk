@@ -38,7 +38,6 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import io.ktor.http.headers
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -70,14 +69,12 @@ class DeviceClientTests {
     private lateinit var mockContactTokenHandler: ContactTokenHandlerApi
     private lateinit var mockSdkEventManager: SdkEventManagerApi
     private lateinit var mockEventsDao: EventsDaoApi
-    private lateinit var sdkDispatcher: CoroutineDispatcher
     private lateinit var mockSdkLogger: Logger
     private lateinit var onlineEvents: MutableSharedFlow<OnlineSdkEvent>
 
     @BeforeTest
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
-        sdkDispatcher = StandardTestDispatcher()
         mockEmarsysClient = mock()
         mockUrlFactory = mock()
         every { mockUrlFactory.create(REGISTER_DEVICE_INFO, null) } returns URL

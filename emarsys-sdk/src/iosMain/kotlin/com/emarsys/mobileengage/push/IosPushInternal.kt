@@ -8,6 +8,7 @@ import com.emarsys.api.push.PresentablePushUserInfoEms
 import com.emarsys.api.push.PushCall.ClearPushToken
 import com.emarsys.api.push.PushCall.HandleMessageWithUserInfo
 import com.emarsys.api.push.PushCall.RegisterPushToken
+import com.emarsys.api.push.PushConstants.PUSH_TOKEN_KEY
 import com.emarsys.api.push.PushContextApi
 import com.emarsys.api.push.PushInternal
 import com.emarsys.context.SdkContextApi
@@ -28,7 +29,6 @@ import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
 import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.networking.clients.event.model.SdkEvent
-import com.emarsys.networking.clients.push.PushClientApi
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CoroutineDispatcher
@@ -64,7 +64,6 @@ import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 import platform.darwin.NSObject
 
 internal class IosPushInternal(
-    private val pushClient: PushClientApi,
     storage: StringStorageApi,
     private val pushContext: PushContextApi,
     sdkContext: SdkContextApi,
@@ -77,7 +76,7 @@ internal class IosPushInternal(
     private val sdkEventDistributor: SdkEventDistributorApi,
     private val timestampProvider: InstantProvider,
     private val uuidProvider: UuidProviderApi
-) : PushInternal(pushClient, storage, pushContext, sdkLogger), IosPushInstance {
+) : PushInternal(storage, pushContext, sdkEventDistributor, sdkLogger), IosPushInstance {
     override var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol? =
         null
         set(value) {
@@ -116,8 +115,14 @@ internal class IosPushInternal(
     override suspend fun activate() {
         pushContext.calls.dequeue { call ->
             when (call) {
-                is RegisterPushToken -> pushClient.registerPushToken(call.pushToken)
-                is ClearPushToken -> pushClient.clearPushToken()
+                is RegisterPushToken -> sdkEventDistributor.registerAndStoreEvent(
+                    SdkEvent.Internal.Sdk.RegisterPushToken(
+                        attributes = buildJsonObject {
+                            put(PUSH_TOKEN_KEY, JsonPrimitive(call.pushToken))
+                        }
+                    )
+                )
+                is ClearPushToken -> sdkEventDistributor.registerAndStoreEvent(SdkEvent.Internal.Sdk.ClearPushToken())
                 is HandleMessageWithUserInfo -> handleSilentMessageWithUserInfo(call.userInfo)
             }
         }

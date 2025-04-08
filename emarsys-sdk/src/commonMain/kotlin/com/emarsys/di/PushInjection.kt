@@ -15,8 +15,8 @@ import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.mobileengage.action.PushActionFactory
 import com.emarsys.mobileengage.action.PushActionFactoryApi
+import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.push.PushClient
-import com.emarsys.networking.clients.push.PushClientApi
 import kotlinx.serialization.json.Json
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
@@ -28,11 +28,15 @@ object PushInjection {
     val pushModules = module {
         singleOf(::PushActionFactory) { bind<PushActionFactoryApi>() }
         singleOf(::ActionHandler) { bind<ActionHandlerApi>() }
-        single<PushClientApi> {
+        single<EventBasedClientApi>(named(EventBasedClientTypes.Push)) {
             PushClient(
-                get<NetworkClientApi>(named(NetworkClientTypes.Emarsys)),
-                get<UrlFactoryApi>(),
-                get<Json>()
+                emarsysClient = get<NetworkClientApi>(named(NetworkClientTypes.Emarsys)),
+                urlFactory = get<UrlFactoryApi>(),
+                sdkEventManager = get(),
+                eventsDao = get(),
+                applicationScope = get(named(CoroutineScopeTypes.Application)),
+                sdkLogger = get { parametersOf(PushClient::class.simpleName) },
+                json = get<Json>()
             )
         }
         single<MutableList<PushCall>>(named(PersistentListTypes.PushCall)) {

@@ -6,6 +6,7 @@ import com.emarsys.api.push.BasicPushUserInfoEms
 import com.emarsys.api.push.PushCall.ClearPushToken
 import com.emarsys.api.push.PushCall.HandleMessageWithUserInfo
 import com.emarsys.api.push.PushCall.RegisterPushToken
+import com.emarsys.api.push.PushConstants.PUSH_TOKEN_KEY
 import com.emarsys.api.push.PushContext
 import com.emarsys.api.push.PushContextApi
 import com.emarsys.context.SdkContextApi
@@ -32,14 +33,17 @@ import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
 import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableOpenExternalUrlActionModel
 import com.emarsys.networking.clients.event.model.SdkEvent
-import com.emarsys.networking.clients.push.PushClientApi
 import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
+import dev.mokkery.matcher.capture.Capture
+import dev.mokkery.matcher.capture.capture
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -51,6 +55,7 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import platform.UserNotifications.UNNotificationDefaultActionIdentifier
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -84,7 +89,6 @@ internal class IosPushInternalTests {
 
     private lateinit var iosPushInternal: IosPushInternal
 
-    private lateinit var mockPushClient: PushClientApi
     private lateinit var mockStorage: StringStorageApi
     private lateinit var pushContext: PushContextApi
     private lateinit var mockSdkContext: SdkContextApi
@@ -103,7 +107,6 @@ internal class IosPushInternalTests {
         val dispatcher = StandardTestDispatcher()
         Dispatchers.setMain(dispatcher)
 
-        mockPushClient = mock()
         mockStorage = mock()
         mockSdkContext = mock()
         mockActionFactory = mock()
@@ -121,7 +124,6 @@ internal class IosPushInternalTests {
 
         pushContext = PushContext(pushCalls)
         iosPushInternal = IosPushInternal(
-            mockPushClient,
             mockStorage,
             pushContext,
             mockSdkContext,
@@ -538,25 +540,20 @@ internal class IosPushInternalTests {
 
     @Test
     fun `testActivate should handle pushCalls`() = runTest {
-        everySuspend { mockPushClient.registerPushToken(any()) } returns Unit
-        everySuspend { mockPushClient.clearPushToken() } returns Unit
-        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(any()) } returns Unit
+        val eventContainer = Capture.container<SdkEvent>()
+        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(capture(eventContainer)) } returns Unit
 
         iosPushInternal.activate()
 
         advanceUntilIdle()
 
-        verifySuspend { mockPushClient.registerPushToken(PUSH_TOKEN) }
-        verifySuspend { mockPushClient.clearPushToken() }
-        verifySuspend {
-            mockSdkEventDistributor.registerAndStoreEvent(
-                SdkEvent.External.Api.SilentPush(
-                    id = UUID,
-                    name = PUSH_RECEIVED_EVENT_NAME,
-                    attributes = buildJsonObject { put("campaignId", JsonPrimitive(CAMPAIGN_ID)) },
-                    timestamp = Instant.DISTANT_PAST
-                )
-            )
+        val emittedValues = eventContainer.values
+        emittedValues.first { it is SdkEvent.Internal.Sdk.RegisterPushToken }.apply {
+            this.attributes?.get(PUSH_TOKEN_KEY)?.jsonPrimitive?.content shouldBe PUSH_TOKEN
+        }
+        emittedValues.firstOrNull { it is SdkEvent.Internal.Sdk.ClearPushToken } shouldNotBe null
+        emittedValues.first { it is SdkEvent.External.Api.SilentPush }.apply {
+            this.attributes?.get("campaignId")?.jsonPrimitive?.content shouldBe CAMPAIGN_ID
         }
     }
 }

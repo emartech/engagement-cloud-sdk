@@ -190,9 +190,9 @@ object WebInjection {
         }
         single<PushInstance>(named(InstanceType.Internal)) {
             PushInternal(
-                pushClient = get(),
                 storage = get(),
                 pushContext = get(),
+                sdkEventDistributor = get(),
                 sdkLogger = get { parametersOf(PushInternal::class.simpleName) }
             )
         }

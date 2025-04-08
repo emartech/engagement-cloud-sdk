@@ -3,6 +3,7 @@ package com.emarsys.networking.clients.event.model
 import com.emarsys.SdkConstants.APP_START_EVENT_NAME
 import com.emarsys.SdkConstants.CHANGE_APP_CODE_NAME
 import com.emarsys.SdkConstants.CHANGE_MERCHANT_ID_NAME
+import com.emarsys.SdkConstants.CLEAR_PUSH_TOKEN_EVENT_NAME
 import com.emarsys.SdkConstants.DEVICE_INFO_UPDATE_REQUIRED_EVENT_NAME
 import com.emarsys.SdkConstants.DISMISS_EVENT_NAME
 import com.emarsys.SdkConstants.INAPP_VIEWED_EVENT_NAME
@@ -11,6 +12,7 @@ import com.emarsys.SdkConstants.LINK_AUTHENTICATED_CONTACT_NAME
 import com.emarsys.SdkConstants.LINK_CONTACT_NAME
 import com.emarsys.SdkConstants.PUSH_CLICKED_EVENT_NAME
 import com.emarsys.SdkConstants.REGISTER_DEVICE_INFO_EVENT_NAME
+import com.emarsys.SdkConstants.REGISTER_PUSH_TOKEN_EVENT_NAME
 import com.emarsys.SdkConstants.REMOTE_CONFIG_UPDATE_REQUIRED_EVENT_NAME
 import com.emarsys.SdkConstants.REREGISTRATION_REQUIRED_EVENT_NAME
 import com.emarsys.SdkConstants.SESSION_END_EVENT_NAME
@@ -166,6 +168,20 @@ sealed interface SdkEvent {
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
             ) : Sdk(REGISTER_DEVICE_INFO_EVENT_NAME), OnlineSdkEvent
+
+            @Serializable
+            data class RegisterPushToken(
+                override val id: String = UUIDProvider().provide(),
+                override val attributes: JsonObject? = null,
+                override val timestamp: Instant = TimestampProvider().provide(),
+            ) : Sdk(REGISTER_PUSH_TOKEN_EVENT_NAME), OnlineSdkEvent
+
+            @Serializable
+            data class ClearPushToken(
+                override val id: String = UUIDProvider().provide(),
+                override val attributes: JsonObject? = null,
+                override val timestamp: Instant = TimestampProvider().provide(),
+            ) : Sdk(CLEAR_PUSH_TOKEN_EVENT_NAME), OnlineSdkEvent
 
             @Serializable
             data class RemoteConfigUpdateRequired(

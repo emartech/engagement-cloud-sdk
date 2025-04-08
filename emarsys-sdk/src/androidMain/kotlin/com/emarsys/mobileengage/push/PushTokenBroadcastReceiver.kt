@@ -22,7 +22,7 @@ internal class PushTokenBroadcastReceiver : BroadcastReceiver(), SdkComponent {
     private val logger: Logger = get { parametersOf(PushTokenBroadcastReceiver::class.simpleName) }
 
     override fun onReceive(context: Context, intent: Intent) = goAsync(sdkDispatcher) {
-        intent.getStringExtra(PushConstants.PUSH_TOKEN_INTENT_KEY)?.let {
+        intent.getStringExtra(PushConstants.PUSH_TOKEN_KEY)?.let {
                 logger.debug("push token received: token: $it")
                 stringStorage.put(PushConstants.PUSH_TOKEN_STORAGE_KEY, it)
                 pushApi.registerPushToken(it)
