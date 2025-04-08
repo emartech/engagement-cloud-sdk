@@ -57,19 +57,18 @@ val deviceName = project.findProperty("iosDevice") as? String ?: "iPhone 15 Pro"
 
 tasks.register<Exec>("bootIOSSimulator") {
     isIgnoreExitValue = true
-    val errorBuffer = ByteArrayOutputStream()
-    errorOutput = ByteArrayOutputStream()
+    standardOutput = System.out
     commandLine("xcrun", "simctl", "boot", deviceName)
     val invalidDeviceError = 148
     val deviceAlreadyBootedError = 149
     doLast {
         val result = executionResult.get()
         if (result.exitValue != invalidDeviceError && result.exitValue != deviceAlreadyBootedError) {
-            println(errorBuffer.toString())
             result.assertNormalExitValue()
         }
     }
 }
+
 tasks.withType<KotlinNativeSimulatorTest>().configureEach {
     dependsOn("bootIOSSimulator")
     standalone.set(false)
