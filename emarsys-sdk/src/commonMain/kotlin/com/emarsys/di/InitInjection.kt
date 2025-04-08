@@ -70,6 +70,7 @@ object InitInjection {
                     get(named(EventBasedClientTypes.DeepLink)),
                     get(named(EventBasedClientTypes.Contact)),
                     get(named(EventBasedClientTypes.Event)),
+                    get(named(EventBasedClientTypes.Push)),
                 ),
             )
         }
