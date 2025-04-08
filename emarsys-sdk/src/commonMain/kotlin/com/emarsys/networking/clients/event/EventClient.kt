@@ -1,7 +1,6 @@
 package com.emarsys.networking.clients.event
 
 import com.emarsys.api.inapp.InAppConfigApi
-import com.emarsys.core.Registerable
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.channel.naturalBatching
 import com.emarsys.core.db.events.EventsDaoApi
@@ -20,6 +19,7 @@ import com.emarsys.mobileengage.inapp.InAppMessage
 import com.emarsys.mobileengage.inapp.InAppPresentationMode
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
+import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.event.model.DeviceEventRequestBody
 import com.emarsys.networking.clients.event.model.DeviceEventResponse
 import com.emarsys.networking.clients.event.model.EventResponseInApp
@@ -50,7 +50,7 @@ internal class EventClient(
     private val eventsDao: EventsDaoApi,
     private val sdkLogger: Logger,
     private val applicationScope: CoroutineScope
-) : EventClientApi, Registerable {
+) : EventBasedClientApi {
 
     override suspend fun register() {
         applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {

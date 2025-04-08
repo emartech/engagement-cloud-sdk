@@ -2,6 +2,7 @@ package com.emarsys.di
 
 import com.emarsys.api.deepLink.DeepLinkApi
 import com.emarsys.api.deepLink.DeepLinkInternal
+import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.deepLink.DeepLinkClient
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
@@ -11,7 +12,7 @@ import org.koin.dsl.module
 
 object DeepLinkInjection {
     val deepLinkModules = module {
-        single<DeepLinkClient> {
+        single<EventBasedClientApi>(named(EventBasedClientTypes.DeepLink)) {
             DeepLinkClient(
                 networkClient = get(named(NetworkClientTypes.Generic)),
                 sdkEventManager = get(),

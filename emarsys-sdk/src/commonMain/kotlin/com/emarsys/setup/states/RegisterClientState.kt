@@ -1,10 +1,11 @@
 package com.emarsys.setup.states
 
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.state.State
-import com.emarsys.networking.clients.device.DeviceClientApi
+import com.emarsys.networking.clients.event.model.SdkEvent
 
-class RegisterClientState(
-    private val deviceClient: DeviceClientApi
+internal class RegisterClientState(
+    private val sdkEventDistributor: SdkEventDistributorApi
 ) : State {
     override val name: String
         get() = "registerClientState"
@@ -13,7 +14,7 @@ class RegisterClientState(
     }
 
     override suspend fun active() {
-        deviceClient.registerDeviceInfo()
+        sdkEventDistributor.registerAndStoreEvent(SdkEvent.Internal.Sdk.RegisterDeviceInfo())
     }
 
     override fun relax() {

@@ -10,6 +10,7 @@ import com.emarsys.api.contact.ContactInstance
 import com.emarsys.api.contact.ContactInternal
 import com.emarsys.api.contact.LoggingContact
 import com.emarsys.core.collections.PersistentList
+import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.contact.ContactClient
 import com.emarsys.networking.clients.contact.ContactTokenHandler
 import com.emarsys.networking.clients.contact.ContactTokenHandlerApi
@@ -25,7 +26,7 @@ object ContactInjection {
                 sdkLogger = get { parametersOf(ContactTokenHandler::class.simpleName) }
             )
         }
-        single<ContactClient> {
+        single<EventBasedClientApi>(named(EventBasedClientTypes.Contact)) {
             ContactClient(
                 emarsysClient = get(named(NetworkClientTypes.Emarsys)),
                 sdkEventManager = get(),

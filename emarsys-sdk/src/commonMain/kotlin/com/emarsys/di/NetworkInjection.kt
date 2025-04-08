@@ -3,11 +3,10 @@ package com.emarsys.di
 import com.emarsys.core.networking.clients.GenericNetworkClient
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.networking.EmarsysClient
+import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.config.ConfigClient
 import com.emarsys.networking.clients.device.DeviceClient
-import com.emarsys.networking.clients.device.DeviceClientApi
 import com.emarsys.networking.clients.event.EventClient
-import com.emarsys.networking.clients.event.EventClientApi
 import com.emarsys.networking.clients.logging.LoggingClient
 import com.emarsys.networking.clients.remoteConfig.RemoteConfigClient
 import com.emarsys.networking.clients.remoteConfig.RemoteConfigClientApi
@@ -37,7 +36,7 @@ object NetworkInjection {
                 sdkEventDistributor = get()
             )
         }
-        single<EventClientApi> {
+        single<EventBasedClientApi>(named(EventBasedClientTypes.Event)) {
             EventClient(
                 emarsysNetworkClient = get(named(NetworkClientTypes.Emarsys)),
                 urlFactory = get(),
@@ -53,12 +52,16 @@ object NetworkInjection {
                 applicationScope = get(named(CoroutineScopeTypes.Application))
             )
         }
-        single<DeviceClientApi> {
+        single<EventBasedClientApi>(named(EventBasedClientTypes.Device)) {
             DeviceClient(
                 emarsysClient = get(named(NetworkClientTypes.Emarsys)),
                 urlFactory = get(),
                 deviceInfoCollector = get(),
-                contactTokenHandler = get()
+                contactTokenHandler = get(),
+                sdkEventManager = get(),
+                eventsDao = get(),
+                applicationScope = get(named(CoroutineScopeTypes.Application)),
+                sdkLogger = get { parametersOf(DeviceClient::class.simpleName) }
             )
         }
         single<RemoteConfigClientApi> {
@@ -70,7 +73,7 @@ object NetworkInjection {
                 sdkLogger = get { parametersOf(RemoteConfigClient::class.simpleName) }
             )
         }
-        single<ConfigClient> {
+        single<EventBasedClientApi>(named(EventBasedClientTypes.Config)) {
             ConfigClient(
                 emarsysNetworkClient = get(named(NetworkClientTypes.Emarsys)),
                 urlFactory = get(),

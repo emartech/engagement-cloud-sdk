@@ -10,6 +10,7 @@ import com.emarsys.SdkConstants.IN_APP_BUTTON_CLICKED_EVENT_NAME
 import com.emarsys.SdkConstants.LINK_AUTHENTICATED_CONTACT_NAME
 import com.emarsys.SdkConstants.LINK_CONTACT_NAME
 import com.emarsys.SdkConstants.PUSH_CLICKED_EVENT_NAME
+import com.emarsys.SdkConstants.REGISTER_DEVICE_INFO_EVENT_NAME
 import com.emarsys.SdkConstants.REMOTE_CONFIG_UPDATE_REQUIRED_EVENT_NAME
 import com.emarsys.SdkConstants.REREGISTRATION_REQUIRED_EVENT_NAME
 import com.emarsys.SdkConstants.SESSION_END_EVENT_NAME
@@ -33,7 +34,6 @@ sealed interface OnlineSdkEvent : SdkEvent {
 
     suspend fun ack(eventsDao: EventsDaoApi, sdkLogger: Logger) {
         try {
-            println("remove")
             eventsDao.removeEvent(this)
         } catch (exception: Exception) {
             sdkLogger.error(
@@ -159,6 +159,13 @@ sealed interface SdkEvent {
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
             ) : Sdk(REREGISTRATION_REQUIRED_EVENT_NAME)
+
+            @Serializable
+            data class RegisterDeviceInfo(
+                override val id: String = UUIDProvider().provide(),
+                override val attributes: JsonObject? = null,
+                override val timestamp: Instant = TimestampProvider().provide(),
+            ) : Sdk(REGISTER_DEVICE_INFO_EVENT_NAME), OnlineSdkEvent
 
             @Serializable
             data class RemoteConfigUpdateRequired(

@@ -12,6 +12,7 @@ import com.emarsys.init.states.RegisterInstancesState
 import com.emarsys.init.states.RegisterWatchdogsState
 import com.emarsys.init.states.SdkConfigLoaderState
 import com.emarsys.init.states.SessionSubscriptionState
+import com.emarsys.setup.states.RegisterEventBasedClientsState
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import org.koin.core.parameter.parametersOf
@@ -61,6 +62,17 @@ object InitInjection {
                 sdkLogger = get { parametersOf(SdkConfigLoaderState::class.simpleName) }
             )
         }
+        single<State>(named(InitStateTypes.RegisterEventBasedClients)) {
+            RegisterEventBasedClientsState(
+                clients = listOf(
+                    get(named(EventBasedClientTypes.Device)),
+                    get(named(EventBasedClientTypes.Config)),
+                    get(named(EventBasedClientTypes.DeepLink)),
+                    get(named(EventBasedClientTypes.Contact)),
+                    get(named(EventBasedClientTypes.Event)),
+                ),
+            )
+        }
         single<StateMachineApi>(named(StateMachineTypes.Init)) {
             StateMachine(
                 states = listOf(
@@ -69,7 +81,8 @@ object InitInjection {
                     get(named(InitStateTypes.RegisterWatchdogs)),
                     get(named(InitStateTypes.SessionSubscription)),
                     get(named(InitStateTypes.Initializer)),
-                    get(named(InitStateTypes.SdkConfigLoader))
+                    get(named(InitStateTypes.SdkConfigLoader)),
+                    get(named(InitStateTypes.RegisterEventBasedClients))
                 )
             )
         }
@@ -84,5 +97,5 @@ object InitInjection {
 }
 
 enum class InitStateTypes {
-    ApplyGlobalRemoteConfig, RegisterInstances, RegisterWatchdogs, SessionSubscription, Initializer, SdkConfigLoader
+    ApplyGlobalRemoteConfig, RegisterInstances, RegisterWatchdogs, SessionSubscription, Initializer, SdkConfigLoader, RegisterEventBasedClients
 }

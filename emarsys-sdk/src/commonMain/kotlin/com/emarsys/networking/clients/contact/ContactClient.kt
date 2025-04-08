@@ -1,7 +1,6 @@
 package com.emarsys.networking.clients.contact
 
 import com.emarsys.context.SdkContextApi
-import com.emarsys.core.Registerable
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.exceptions.FailedRequestException
@@ -13,6 +12,7 @@ import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.networking.EmarsysHeaders
+import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.event.model.OnlineSdkEvent
 import com.emarsys.networking.clients.event.model.SdkEvent
 import io.ktor.http.HttpMethod
@@ -36,7 +36,7 @@ internal class ContactClient(
     private val json: Json,
     private val sdkLogger: Logger,
     private val sdkDispatcher: CoroutineDispatcher
-) : Registerable {
+) : EventBasedClientApi {
 
     override suspend fun register() {
         CoroutineScope(sdkDispatcher).launch(start = CoroutineStart.UNDISPATCHED) {
