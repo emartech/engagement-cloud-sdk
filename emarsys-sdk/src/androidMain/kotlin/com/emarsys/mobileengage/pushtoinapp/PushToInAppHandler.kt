@@ -12,7 +12,7 @@ class PushToInAppHandler(
     private val sdkLogger: Logger
 ) : PushToInAppHandlerApi {
     override suspend fun handle(actionModel: InternalPushToInappActionModel) {
-        sdkLogger.debug("PushToInAppHandler", "Handling push to in-app action")
+        sdkLogger.debug("Handling push to in-app action")
         val html = actionModel.html ?: downloader.download(actionModel.url)
         val campaignId = actionModel.campaignId
         if (!html.isNullOrEmpty()) {

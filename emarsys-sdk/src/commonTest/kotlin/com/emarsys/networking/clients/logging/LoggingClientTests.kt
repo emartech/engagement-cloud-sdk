@@ -40,6 +40,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
@@ -47,7 +48,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.io.IOException
@@ -128,6 +129,7 @@ class LoggingClientTests {
     @Test
     fun testConsumer_should_call_client_with_logEvent() = runTest {
         createLoggingClient(backgroundScope).register()
+
         every { mockUrlFactory.create(EmarsysUrlType.LOGGING, null) } returns TEST_BASE_URL
         everySuspend { mockEmarsysClient.send(any(), any()) } returns createTestResponse("{}")
         everySuspend { mockDeviceInfoCollector.collectAsDeviceInfoForLogs() } returns deviceInfoForLogs
@@ -144,10 +146,16 @@ class LoggingClientTests {
             name = "log",
             attributes = testLogAttributes
         )
+
+        val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
+            onlineEvents.take(1).toList()
+        }
+
         onlineEvents.emit(logEvent)
 
-        advanceUntilIdle()
+        advanceTimeBy(1000)
 
+        onlineSdkEvents.await() shouldBe listOf(logEvent)
         verifySuspend { mockEmarsysClient.send(any(), any()) }
         verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
         verifySuspend { mockEventsDao.removeEvent(logEvent) }
@@ -170,10 +178,14 @@ class LoggingClientTests {
             name = "metric",
             attributes = testLogAttributes
         )
+        val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
+            onlineEvents.take(1).toList()
+        }
 
         onlineEvents.emit(logEvent)
-        advanceUntilIdle()
+        advanceTimeBy(1000)
 
+        onlineSdkEvents.await() shouldBe listOf(logEvent)
         verifySuspend { mockEmarsysClient.send(any(), any()) }
         verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
         verifySuspend { mockEventsDao.removeEvent(logEvent) }
@@ -200,10 +212,14 @@ class LoggingClientTests {
             attributes = testLogAttributes
         )
         everySuspend { mockSdkEventManager.emitEvent(logEvent) } returns Unit
+        val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
+            onlineEvents.take(1).toList()
+        }
 
         onlineEvents.emit(logEvent)
-        advanceUntilIdle()
+        advanceTimeBy(5000)
 
+        onlineSdkEvents.await() shouldBe listOf(logEvent)
         verifySuspend { mockEmarsysClient.send(any(), any()) }
         verifySuspend { mockSdkLogger.error(any(), any<Throwable>()) }
         verifySuspend { mockSdkEventManager.emitEvent(logEvent) }
@@ -221,13 +237,13 @@ class LoggingClientTests {
             name = "metric",
         )
 
-        val onlineSdkEvents = backgroundScope.async {
+        val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
             onlineEvents.take(1).toList()
         }
 
         onlineEvents.emit(logEvent)
 
-        advanceUntilIdle()
+        advanceTimeBy(1000)
 
         onlineSdkEvents.await() shouldBe listOf(logEvent)
         verifySuspend(VerifyMode.exactly(0)) { mockEmarsysClient.send(any(), any()) }
@@ -263,13 +279,13 @@ class LoggingClientTests {
                 name = "metric"
             )
 
-            val onlineSdkEvents = backgroundScope.async {
+            val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
                 onlineEvents.take(1).toList()
             }
 
             onlineEvents.emit(logEvent)
 
-            advanceUntilIdle()
+            advanceTimeBy(1000)
 
             onlineSdkEvents.await() shouldBe listOf(logEvent)
             verifySuspend(VerifyMode.exactly(0)) { mockEmarsysClient.send(any(), any()) }

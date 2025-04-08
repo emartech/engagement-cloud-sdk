@@ -60,7 +60,7 @@ class SetupOrganizerTests {
             mockPredictStateMachine,
             sdkContext,
             mockSdkConfigLoader,
-            SdkLogger(ConsoleLogger())
+            SdkLogger("TestLoggerName", ConsoleLogger())
         )
     }
 

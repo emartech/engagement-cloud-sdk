@@ -38,7 +38,7 @@ class ConfigInternalTests {
     @BeforeTest
     fun setUp() = runTest {
         mockLogger = mock()
-        everySuspend { mockLogger.debug(tag = any()) } returns Unit
+        everySuspend { mockLogger.debug(message = any()) } returns Unit
         mockUuidProvider = mock()
         every { mockUuidProvider.provide() } returns UUID
         mockTimestampProvider = mock()

@@ -23,7 +23,7 @@ class ApplyGlobalRemoteConfigStateTests {
 
         applyGlobalRemoteConfigState = ApplyGlobalRemoteConfigState(
             mockRemoteConfigHandler,
-            SdkLogger(ConsoleLogger())
+            SdkLogger("TestLoggerName", ConsoleLogger())
         )
     }
 

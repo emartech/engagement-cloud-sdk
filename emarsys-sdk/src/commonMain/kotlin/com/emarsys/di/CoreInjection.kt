@@ -65,7 +65,7 @@ object CoreInjection {
         single<CoroutineScope>(named(CoroutineScopeTypes.Application)) {
             CoroutineScope(SupervisorJob() + Dispatchers.Default)
         }
-        factory<Logger> { (name: String) -> SdkLogger(ConsoleLogger()) }
+        factory<Logger> { (loggerName: String) -> SdkLogger(loggerName, ConsoleLogger()) }  // todo remotelogger
         singleOf(::TimestampProvider) { bind<InstantProvider>() }
         singleOf(::UUIDProvider) { bind<UuidProviderApi>() }
         singleOf(::TimezoneProvider) { bind<TimezoneProviderApi>() }

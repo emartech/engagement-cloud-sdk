@@ -20,7 +20,7 @@ class EmarsysIndexedDb(
     }
 
     suspend fun <T> execute(block: suspend (IDBDatabase) -> T): T {
-        sdkLogger.debug("EmarsysIndexedDb - open", "Opening indexedDB")
+        sdkLogger.debug("Opening indexedDB")
         val database = try {
             suspendCoroutine<IDBDatabase> { continuation ->
                 val openIndexedDBRequest =

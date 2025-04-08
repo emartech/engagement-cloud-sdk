@@ -32,7 +32,7 @@ class PushToInAppHandlerTests {
         pushToInAppHandler = PushToInAppHandler(
             mockInAppDownloader,
             mockInAppHandler,
-            SdkLogger(ConsoleLogger())
+            SdkLogger("TestLoggerName", ConsoleLogger())
         )
     }
 

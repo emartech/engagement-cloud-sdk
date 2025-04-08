@@ -19,7 +19,7 @@ class SetupOrganizer(
 
     override suspend fun setupWithValidation(config: SdkConfig) {
         if (sdkConfigStore.load() != null) {
-            sdkLogger.debug("SetupOrganizer", "SDK already enabled")
+            sdkLogger.debug("SDK already enabled")
             throw SdkAlreadyEnabledException("Emarsys SDK was already enabled!")
         }
 
@@ -35,6 +35,6 @@ class SetupOrganizer(
             meStateMachine.activate()
         }
         sdkContext.setSdkState(SdkState.active)
-        sdkLogger.debug("SetupOrganizer", "SDK Setup Completed")
+        sdkLogger.debug("SDK Setup Completed")
     }
 }

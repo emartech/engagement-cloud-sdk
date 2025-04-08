@@ -43,7 +43,7 @@ class InAppPresenter(
                     sdkEvent is SdkEvent.Internal.Sdk.Dismiss && sdkEvent.id == inAppView.inAppMessage.campaignId
                 }
                 withContext(mainDispatcher) {
-                    logger.debug("InAppPresenter", "dismiss inapp dialog")
+                    logger.debug("dismiss in-app dialog")
                     inAppDialog.dismiss()
                 }
             }

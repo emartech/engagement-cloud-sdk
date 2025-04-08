@@ -47,7 +47,7 @@ class PushMessageWebV1MapperTests {
     @BeforeTest
     fun setUp() = runTest {
         json = JsonUtil.json
-        logger = SdkLogger(ConsoleLogger())
+        logger = SdkLogger("TestLoggerName", ConsoleLogger())
         pushMessageWebV1Mapper = PushMessageWebV1Mapper(json, logger)
     }
 

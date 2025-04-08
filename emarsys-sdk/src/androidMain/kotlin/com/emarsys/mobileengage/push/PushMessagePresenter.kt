@@ -62,7 +62,7 @@ internal class PushMessagePresenter(
             .addActions(message)
 
         notificationCompatStyler.style(notificationBuilder, message)
-        sdkLogger.debug("PushMessagePresenter", "Notification created and displayed")
+        sdkLogger.debug("Notification created and displayed")
         notificationManager.notify(collapseId, collapseId.hashCode(), notificationBuilder.build())
     }
 

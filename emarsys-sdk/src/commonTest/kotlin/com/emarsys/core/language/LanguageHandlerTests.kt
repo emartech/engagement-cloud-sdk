@@ -32,7 +32,7 @@ class LanguageHandlerTests {
         mockSdkEventDistributor = mock()
         mockLogger = mock()
         everySuspend {
-            mockLogger.debug(any(), any<String>())
+            mockLogger.debug(any<String>())
         } returns Unit
 
         languageHandler = LanguageHandler(

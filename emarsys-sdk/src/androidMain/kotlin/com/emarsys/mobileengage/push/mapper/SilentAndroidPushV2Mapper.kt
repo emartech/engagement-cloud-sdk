@@ -17,7 +17,7 @@ import kotlinx.serialization.json.jsonPrimitive
 class SilentAndroidPushV2Mapper(
     private val logger: Logger,
     private val json: Json
-): Mapper<JsonObject, SilentAndroidPushMessage> {
+) : Mapper<JsonObject, SilentAndroidPushMessage> {
 
     companion object {
         private const val DEFAULT_CHANNEL_ID = "Missing Channel Id"
@@ -39,12 +39,21 @@ class SilentAndroidPushV2Mapper(
                 sid = treatments?.getValue("sid")?.jsonPrimitive?.content ?: "",
                 campaignId = ems.getValue("campaignId").jsonPrimitive.content,
                 platformData = AndroidPlatformData(
-                    channelId = from[CHANNEL_ID]?.jsonPrimitive?.contentOrNull ?: DEFAULT_CHANNEL_ID,
+                    channelId = from[CHANNEL_ID]?.jsonPrimitive?.contentOrNull
+                        ?: DEFAULT_CHANNEL_ID,
                     notificationMethod = NotificationMethod(
                         collapseId = from.getValue(COLLAPSE_ID).jsonPrimitive.content,
-                        operation = from.getValue(OPERATION).jsonPrimitive.content.let { NotificationOperation.valueOf(it) }
+                        operation = from.getValue(OPERATION).jsonPrimitive.content.let {
+                            NotificationOperation.valueOf(
+                                it
+                            )
+                        }
                     ),
-                    style = from[STYLE]?.jsonPrimitive?.contentOrNull?.let { NotificationStyle.valueOf(it) }
+                    style = from[STYLE]?.jsonPrimitive?.contentOrNull?.let {
+                        NotificationStyle.valueOf(
+                            it
+                        )
+                    }
                 ),
                 badgeCount = from[BADGE_COUNT]?.jsonPrimitive?.contentOrNull.fromString(json),
                 actionableData = ActionableData(
@@ -52,7 +61,7 @@ class SilentAndroidPushV2Mapper(
                 )
             )
         } catch (e: Exception) {
-            logger.error("SilentAndroidPushV2Mapper", e)
+            logger.error("push mapping failed", e)
             null
         }
     }

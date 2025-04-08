@@ -20,7 +20,7 @@ class PlatformInitStateTests {
     fun setup() {
         mockPlatformInitializer = mock()
 
-        initializerState = InitializerState(mockPlatformInitializer, SdkLogger(ConsoleLogger()))
+        initializerState = InitializerState(mockPlatformInitializer, SdkLogger("TestLoggerName", ConsoleLogger()))
     }
 
     @Test

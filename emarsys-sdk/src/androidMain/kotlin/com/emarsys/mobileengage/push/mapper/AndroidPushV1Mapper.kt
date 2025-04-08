@@ -72,7 +72,7 @@ internal class AndroidPushV1Mapper(
                 actionableData = actionableData
             )
         } catch (e: Exception) {
-            logger.error("AndroidPushV1Mapper", e)
+            logger.error("push mapping failed", e)
             null
         }
     }

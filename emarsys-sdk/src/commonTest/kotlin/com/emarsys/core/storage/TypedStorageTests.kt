@@ -31,7 +31,7 @@ class TypedStorageTests {
     fun setUp() {
         mockStringStorage = mock()
         mockLogger = mock()
-        everySuspend { mockLogger.error(tag = any(), throwable = any()) } returns Unit
+        everySuspend { mockLogger.error(message = any(), throwable = any()) } returns Unit
         typedStorage = TypedStorage(mockStringStorage, JsonUtil.json, mockLogger)
     }
 

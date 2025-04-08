@@ -52,10 +52,7 @@ class InAppJsBridge(
             val name = withContext(mainScope.coroutineContext) {
                 didReceiveScriptMessage.name
             }
-            logger.debug(
-                "JsBridge",
-                "Received action: name(${name}), body(${body})"
-            )
+            logger.debug("Received action: name(${name}), body(${body})")
             when (name) {
                 "triggerMEEvent" -> {
                     val actionModel =
@@ -107,7 +104,7 @@ class InAppJsBridge(
                 }
 
                 else -> {
-                    logger.info("JsBridge", "Unknown action: ${didReceiveScriptMessage.name}")
+                    logger.info("Unknown action: ${didReceiveScriptMessage.name}")
                 }
             }
         }

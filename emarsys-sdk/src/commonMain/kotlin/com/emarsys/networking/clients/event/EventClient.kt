@@ -63,7 +63,7 @@ internal class EventClient(
             .filter { it is SdkEvent.Internal.Reporting || it is SdkEvent.Internal.Custom || it is SdkEvent.External.Custom }
             .naturalBatching().onEach { sdkEvents ->
                 try {
-                    sdkLogger.debug("EventClient - consumeEvents", "Batch size: ${sdkEvents.size}")
+                    sdkLogger.debug("Consume Events, Batch size: ${sdkEvents.size}")
                     val url = urlFactory.create(EmarsysUrlType.EVENT, null)
                     val requestBody =
                         DeviceEventRequestBody(
@@ -113,7 +113,7 @@ internal class EventClient(
 
     private suspend fun handleOnAppEventAction(deviceEventResponse: DeviceEventResponse) {
         deviceEventResponse.onEventAction?.let {
-            sdkLogger.debug("EventClient - handleOnAppEventAction", deviceEventResponse.toString())
+            sdkLogger.debug(deviceEventResponse.toString())
 
             val actions = it.actions
             val campaignId = it.campaignId
@@ -137,7 +137,7 @@ internal class EventClient(
     }
 
     private suspend fun handleDeviceEventState(deviceEventResponse: DeviceEventResponse) {
-        sdkLogger.debug("EventClient - handleDeviceEventState", deviceEventResponse.toString())
+        sdkLogger.debug(deviceEventResponse.toString())
 
         sessionContext.deviceEventState = deviceEventResponse.deviceEventState
     }

@@ -29,7 +29,7 @@ class RegisterInstancesStateTests {
             mockEventTrackerApi,
             mockContactApi,
             mockPushApi,
-            SdkLogger(ConsoleLogger())
+            SdkLogger("TestLoggerName", ConsoleLogger())
         )
     }
 

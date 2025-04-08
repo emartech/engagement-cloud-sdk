@@ -48,7 +48,7 @@ class LaunchApplicationHandler(
                     FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE,
                     activityOptions
                 ).send()
-            } ?: sdkLogger.debug("LaunchApplicationHandler", "Could not create LaunchIntent")
+            } ?: sdkLogger.debug("Could not create LaunchIntent")
         }
     }
 }

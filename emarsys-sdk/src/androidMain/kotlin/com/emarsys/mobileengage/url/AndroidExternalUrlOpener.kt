@@ -26,7 +26,7 @@ class AndroidExternalUrlOpener(
             } catch (exception: ActivityNotFoundException) {
 
                 sdkLogger.error(
-                    "AndroidExternalUrlOpener",
+                    "Failed to open url: $url",
                     exception,
                     buildJsonObject { put("url", JsonPrimitive(url)) })
             }

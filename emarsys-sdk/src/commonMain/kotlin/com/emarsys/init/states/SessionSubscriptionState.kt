@@ -17,7 +17,7 @@ class SessionSubscriptionState(
     }
 
     override suspend fun active() {
-        sdkLogger.debug("SessionSubscriptionState", "Subscribing to session")
+        sdkLogger.debug("Subscribing to session")
 
         mobileEngageSession.subscribe(lifecycleWatchDog)
     }

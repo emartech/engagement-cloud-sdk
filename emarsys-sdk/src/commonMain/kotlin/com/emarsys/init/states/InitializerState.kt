@@ -14,7 +14,7 @@ internal class InitializerState(
     }
 
     override suspend fun active() {
-        sdkLogger.debug("PlatformInitState", "Initializing platforms")
+        sdkLogger.debug("Initializing platforms")
         platformInitializer.init()
     }
 

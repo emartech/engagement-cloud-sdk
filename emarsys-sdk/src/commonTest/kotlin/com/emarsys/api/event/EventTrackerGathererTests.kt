@@ -47,7 +47,7 @@ class EventTrackerGathererTests {
 
         every { mockTimestampProvider.provide() } returns timestamp
         every { mockUuidProvider.provide() } returns UUID
-        val logger = SdkLogger(ConsoleLogger())
+        val logger = SdkLogger("TestLoggerName", ConsoleLogger())
 
         eventTrackerContext = EventTrackerContext(mutableListOf())
 

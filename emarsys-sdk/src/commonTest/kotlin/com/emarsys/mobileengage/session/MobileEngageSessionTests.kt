@@ -97,7 +97,7 @@ class MobileEngageSessionTests {
         everySuspend { mockSdkEventDistributor.registerAndStoreEvent(sessionEndEvent) } returns Unit
         everySuspend { mockSdkLogger.debug(any<LogEntry>()) } returns Unit
         everySuspend { mockSdkLogger.debug(any<LogEntry>()) } returns Unit
-        everySuspend { mockSdkLogger.error(any()) } returns Unit
+        everySuspend { mockSdkLogger.error(message = any()) } returns Unit
 
         mobileEngageSession = MobileEngageSession(
             mockTimestampProvider,

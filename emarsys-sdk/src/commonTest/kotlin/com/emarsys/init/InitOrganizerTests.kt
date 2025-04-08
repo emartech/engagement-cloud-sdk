@@ -46,7 +46,7 @@ class InitOrganizerTests {
             LogLevel.Error,
             mutableSetOf()
         )
-        initOrganizer = InitOrganizer(mockStateMachine, sdkContext, SdkLogger(ConsoleLogger()))
+        initOrganizer = InitOrganizer(mockStateMachine, sdkContext, SdkLogger("TestLoggerName", ConsoleLogger()))
     }
 
     @Test

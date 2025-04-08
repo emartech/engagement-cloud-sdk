@@ -40,7 +40,10 @@ internal class EmarsysClient(
         private const val MAX_RETRY_COUNT = 3
     }
 
-    override suspend fun send(request: UrlRequest, onNetworkError: (suspend () -> Unit)?): Response {
+    override suspend fun send(
+        request: UrlRequest,
+        onNetworkError: (suspend () -> Unit)?
+    ): Response {
         return refreshContactToken {
             val emarsysRequest = addEmarsysHeaders(request)
             val response = networkClient.send(emarsysRequest, onNetworkError)
@@ -57,7 +60,6 @@ internal class EmarsysClient(
         val response = callback()
         return if (response.status == HttpStatusCode.Unauthorized && sessionContext.refreshToken != null && retryCount < MAX_RETRY_COUNT) {
             sdkLogger.debug(
-                "EmarsysClient - refreshContactToken",
                 "refreshing contact token",
                 buildJsonObject {
                     put("retryCount", JsonPrimitive(retryCount))
@@ -93,7 +95,6 @@ internal class EmarsysClient(
             else -> null
         }
         sdkLogger.debug(
-            "EmarsysClient - handleEmarsysResponse",
             "Received ${response.status.value} status code, mapped to ${event?.name ?: "unknown"} event",
         )
         event?.let {

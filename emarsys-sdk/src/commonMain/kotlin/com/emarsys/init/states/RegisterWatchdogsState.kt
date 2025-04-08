@@ -16,7 +16,7 @@ class RegisterWatchdogsState(
     }
 
     override suspend fun active() {
-        sdkLogger.debug("RegisterWatchdogsState", "Registering watchdogs")
+        sdkLogger.debug("Registering watchdogs")
 
         connectionWatchDog.register()
         lifecycleWatchDog.register()

@@ -29,15 +29,15 @@ internal class PushMessageBroadcastReceiver : BroadcastReceiver(), SdkComponent 
 
     override fun onReceive(context: Context, intent: Intent) = goAsync(sdkDispatcher) {
         intent.getStringExtra(PushConstants.PUSH_MESSAGE_PAYLOAD_INTENT_KEY)?.let {
-            logger.debug("PushMessageBroadcastReceiver - onReceive")
+            logger.debug("push message received")
             try {
                 val pushPayload = json.decodeFromString<JsonObject>(it)
-                logger.debug("PushMessageBroadcastReceiver - onReceive", "parsed successfully")
+                logger.debug("parsed successfully")
                 pushMessageFactory.create(pushPayload)?.let { pushMessage ->
                     when (pushMessage) {
                         is SilentAndroidPushMessage -> {
                             logger.debug(
-                                "PushMessageBroadcastReceiver - onReceive:Silent",
+                                "handling Silent message",
                                 buildJsonObject {
                                     put("type", JsonPrimitive("silent"))
                                     put("message", JsonPrimitive(pushMessage.toString()))
@@ -47,7 +47,7 @@ internal class PushMessageBroadcastReceiver : BroadcastReceiver(), SdkComponent 
 
                         is AndroidPushMessage -> {
                             logger.debug(
-                                "PushMessageBroadcastReceiver - onReceive:Android",
+                                "presenting Android message",
                                 buildJsonObject {
                                     put("type", JsonPrimitive("notification"))
                                     put("message", JsonPrimitive(pushMessage.toString()))
@@ -58,7 +58,7 @@ internal class PushMessageBroadcastReceiver : BroadcastReceiver(), SdkComponent 
                     }
                 }
             } catch (exception: Exception) {
-                logger.error("PushMessageBroadcastReceiver", exception)
+                logger.error("push presentation failed", exception)
             }
         }
     }

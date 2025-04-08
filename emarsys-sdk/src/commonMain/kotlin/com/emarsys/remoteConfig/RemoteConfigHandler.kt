@@ -18,26 +18,26 @@ internal class RemoteConfigHandler(
 ) : RemoteConfigHandlerApi {
     private suspend fun handle(config: RemoteConfigResponse?, clientId: String?) {
         if (config == null) {
-            sdkLogger.error("RemoteConfigHandler - handle", "config is null")
+            sdkLogger.error("config is null")
             return
         }
 
-        sdkLogger.debug("RemoteConfigHandler - handle", "applyServiceUrls")
+        sdkLogger.debug("applyServiceUrls")
         applyServiceUrls(config.serviceUrls)
-        sdkLogger.debug("RemoteConfigHandler - handle", "applyLogLevel")
+        sdkLogger.debug("applyLogLevel")
         applyLogLevel(config.logLevel)
-        sdkLogger.debug("RemoteConfigHandler - handle", "applyFeatures")
+        sdkLogger.debug("applyFeatures")
         applyFeatures(config.features)
-        sdkLogger.debug("RemoteConfigHandler - handle", "applyLuckyLogger")
+        sdkLogger.debug("applyLuckyLogger")
         applyLuckyLogger(config.luckyLogger)
 
         config.overrides?.let {
             it[clientId]?.let { override ->
-                sdkLogger.debug("RemoteConfigHandler - handle", "override applyServiceUrls")
+                sdkLogger.debug("override applyServiceUrls")
                 applyServiceUrls(override.serviceUrls)
-                sdkLogger.debug("RemoteConfigHandler - handle", "override applyLogLevel")
+                sdkLogger.debug("override applyLogLevel")
                 applyLogLevel(override.logLevel)
-                sdkLogger.debug("RemoteConfigHandler - handle", "override applyFeatures")
+                sdkLogger.debug("override applyFeatures")
                 applyFeatures(override.features)
             }
         }

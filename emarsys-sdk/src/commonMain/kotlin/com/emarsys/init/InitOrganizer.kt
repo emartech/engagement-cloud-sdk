@@ -16,7 +16,7 @@ class InitOrganizer(
         if (sdkContext.currentSdkState.value == SdkState.inactive) {
             sdkContext.setSdkState(SdkState.initialized)
         }
-        sdkLogger.debug("InitOrganizer", "SDK initialized")
+        sdkLogger.debug("SDK initialized")
     }
 
 }

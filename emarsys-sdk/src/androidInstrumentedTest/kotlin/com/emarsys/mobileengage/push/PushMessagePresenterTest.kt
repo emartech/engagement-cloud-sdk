@@ -107,7 +107,7 @@ class PushMessagePresenterTest {
             mockNotificationCompatStyler,
             mockPlatformInfoCollector,
             mockInAppDownloader,
-            SdkLogger(ConsoleLogger())
+            SdkLogger("TestLoggerName", ConsoleLogger())
         )
 
         notificationSlot = slot<Notification>()

@@ -54,7 +54,7 @@ class RemoteConfigHandlerTests {
             mockDeviceInfoCollector,
             sdkContext,
             mockRandomProvider,
-            SdkLogger(ConsoleLogger())
+            SdkLogger("TestLoggerName", ConsoleLogger())
         )
     }
 

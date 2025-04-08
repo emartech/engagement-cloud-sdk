@@ -75,7 +75,7 @@ class AndroidPushV2MapperTest {
         val result = mapper.map(input)
 
         result shouldBe expected
-        coVerify { mockLogger.error(tag = "AndroidPushV2Mapper - extractStringWithFallback", throwable = any<Exception>()) }
+        coVerify { mockLogger.error(message = "Failed to extract sid from push message", throwable = any<Exception>()) }
     }
 
     @Test
@@ -86,7 +86,7 @@ class AndroidPushV2MapperTest {
         val result = mapper.map(input)
 
         result shouldBe expected
-        coVerify { mockLogger.error(tag = "AndroidPushV2Mapper - extractStringWithFallback", throwable = any<Exception>()) }
+        coVerify { mockLogger.error(message = "Failed to extract campaignId from push message", throwable = any<Exception>()) }
     }
 
     private fun createExpectedAndroidPushMessage(sid: String, campaignId: String): AndroidPushMessage = AndroidPushMessage(

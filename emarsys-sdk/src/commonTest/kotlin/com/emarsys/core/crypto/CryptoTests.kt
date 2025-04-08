@@ -15,7 +15,7 @@ class CryptoTests {
             "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAELjWEUIBX9zlm1OI4gF1hMCBLzpaBwgs9HlmSIBAqP4MDGy4ibOOV3FVDrnAY0Q34LZTbPBlp3gRNZJ19UoSy2Q=="
         const val TEST_SECRET = "test secret"
     }
-    private val sdkLogger = SdkLogger(ConsoleLogger())
+    private val sdkLogger = SdkLogger("TestLoggerName", ConsoleLogger())
     private val crypto = Crypto(sdkLogger,PUBLIC_KEY)
 
     @Test

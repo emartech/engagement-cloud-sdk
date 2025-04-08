@@ -8,19 +8,24 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class SdkLoggerTests {
+
+    companion object {
+        private val LOGGER_NAME = SdkLoggerTests::class.simpleName!!
+    }
+
     private lateinit var logger: SdkLogger
 
     @BeforeTest
     fun setup() = runTest {
-        logger = SdkLogger(ConsoleLogger())
+        logger = SdkLogger(LOGGER_NAME, ConsoleLogger(), remoteLogger = null)
     }
 
     @Test
     fun testLogger() = runTest {
-        logger.info("info log topic", "this is an info log")
+        logger.info("this is an info log")
 
         logger.debug(
-            "test_tag", "this is a testMessage",
+            "this is a testMessage",
             buildJsonObject {
                 put("testField", JsonPrimitive("testValue"))
                 put("contactFieldId", JsonPrimitive(1234))
@@ -75,7 +80,7 @@ class SdkLoggerTests {
     private suspend fun contextTestMethod3() {
         val logContext = buildJsonObject { put("key3", JsonPrimitive("789")) }
         withLogContext(logContext) {
-            logger.debug("test", "check if context works")
+            logger.debug("check if context works")
         }
     }
 }

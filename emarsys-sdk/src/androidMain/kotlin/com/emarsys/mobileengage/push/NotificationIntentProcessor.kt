@@ -76,16 +76,21 @@ internal class NotificationIntentProcessor(
                         is PresentableActionModel -> {
                             BasicPushButtonClickedActionModel(triggeredActionModel.id, it)
                         }
+
                         is BasicActionModel -> {
                             NotificationOpenedActionModel(it)
                         }
+
                         else -> null
                     }
 
                     reportingAction?.let { add(actionFactory.create(reportingAction)) }
                 }
             } catch (exception: Exception) {
-                sdkLogger.error("NotificationIntentProcessor - getMandatoryActions", exception)
+                sdkLogger.error(
+                    "Notification intent processor failed",
+                    exception
+                )
             }
         }
     }

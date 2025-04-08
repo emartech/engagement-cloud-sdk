@@ -62,7 +62,6 @@ object AndroidEmarsys {
             intentFromActivity?.putExtra(EMS_DEEP_LINK_TRACKED_KEY, true)
         } else {
             koin.get<Logger>().info(
-                "AndroidEmarsys - trackDeepLink",
                 "Cannot track deeplink with uri: $uri"
             )
         }

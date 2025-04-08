@@ -67,10 +67,7 @@ class EmarsysIndexedDbObjectStore<T>(
 
     override suspend fun getAll(): Flow<T> {
         return emarsysIndexedDb.execute { database ->
-            logger.debug(
-                "EmarsysIndexedDbObjectStore - getAll",
-                "Fetching all data from store: ${emarsysObjectStoreConfig.name}"
-            )
+            logger.debug("Fetching all data from store: ${emarsysObjectStoreConfig.name}")
             suspendCoroutine { continuation ->
                 val transaction = database.transaction(
                     emarsysObjectStoreConfig.name,
@@ -96,10 +93,7 @@ class EmarsysIndexedDbObjectStore<T>(
 
                 transaction.onerror = EventHandler {
                     CoroutineScope(sdkDispatcher).launch {
-                        logger.error(
-                            "EmarsysIndexedDbObjectStore - getAll",
-                            "Failed to retrieve data from store: ${emarsysObjectStoreConfig.name}"
-                        )
+                        logger.error("Failed to retrieve data from store: ${emarsysObjectStoreConfig.name}")
                     }
                     continuation.resumeWithException(request.error!!)
                 }

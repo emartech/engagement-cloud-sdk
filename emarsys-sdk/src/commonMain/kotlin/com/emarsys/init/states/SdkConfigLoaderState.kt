@@ -18,7 +18,6 @@ class SdkConfigLoaderState(
 
     override suspend fun active() {
         sdkLogger.debug(
-            "SdkConfigLoaderState",
             "Load SdkConfig from storage and try to setup the SDK"
         )
         sdkConfigStore.load()?.let {

@@ -122,7 +122,7 @@ class PushMessageBroadcastReceiverTest : KoinTest {
         Dispatchers.setMain(StandardTestDispatcher())
         mockPresenter = mockk(relaxed = true)
         mockSilentPushHandler = mockk(relaxed = true)
-        mockLogger = SdkLogger(ConsoleLogger())
+        mockLogger = SdkLogger("TestLoggerName", ConsoleLogger())
         mockPushMessageFactory = mockk()
         coEvery { mockPushMessageFactory.create(Json.decodeFromString(SILENT_PUSH_MESSAGE_STRING)) } returns expectedSilentPushMessage
         coEvery { mockPushMessageFactory.create(Json.decodeFromString(PUSH_MESSAGE_STRING)) } returns expectedPushMessage

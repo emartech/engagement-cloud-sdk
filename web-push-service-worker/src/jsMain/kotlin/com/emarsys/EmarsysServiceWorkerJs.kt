@@ -35,10 +35,11 @@ fun main() {
         BroadcastChannel(WEB_PUSH_ON_BADGE_COUNT_UPDATE_RECEIVED)
     val sdkReadyBroadcastChannel = BroadcastChannel(WEB_PUSH_SDK_READY_CHANNEL_NAME)
 
-    val sdkLogger = SdkLogger(ConsoleLogger())
     val pushMessagePresenter = PushMessagePresenter(WebPushNotificationPresenter())
-    val pushMessageMapper = PushMessageMapper(JsonUtil.json, sdkLogger)
-    val pushMessageWebV1Mapper = PushMessageWebV1Mapper(JsonUtil.json, sdkLogger)
+    val pushMessageMapper =
+        PushMessageMapper(JsonUtil.json, SdkLogger("PushMessageMapper", ConsoleLogger()))
+    val pushMessageWebV1Mapper =
+        PushMessageWebV1Mapper(JsonUtil.json, SdkLogger("PushMessageWebV1Mapper", ConsoleLogger()))
 
     val emarsysServiceWorker = EmarsysServiceWorker(
         pushMessagePresenter,
@@ -47,7 +48,7 @@ fun main() {
         onBadgeCountUpdateReceivedBroadcastChannel,
         JsonUtil.json,
         CoroutineScope(SupervisorJob()),
-        SdkLogger(ConsoleLogger())
+        SdkLogger("EmarsysServiceWorker", ConsoleLogger())
     )
 
     val notificationClickHandler = NotificationClickHandler(

@@ -18,7 +18,7 @@ class RestoreSavedSdkEventsState(
     override fun prepare() {}
 
     override suspend fun active() {
-        sdkLogger.debug("RestoreSavedSdkEventsState - active", "Restoring saved SDK events")
+        sdkLogger.debug("Restoring saved SDK events")
         eventsDao.getEvents().collect {
             try {
                 sdkEventEmitter.emitEvent(it)

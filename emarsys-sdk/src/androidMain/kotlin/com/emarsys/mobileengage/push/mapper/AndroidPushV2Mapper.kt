@@ -65,7 +65,11 @@ internal class AndroidPushV2Mapper(
 
             AndroidPushMessage(
                 sid = extractStringWithFallback(treatments, SID_KEY, MISSING_SID),
-                campaignId = extractStringWithFallback(treatments, CAMPAIGN_ID_KEY, MISSING_CAMPAIGN_ID),
+                campaignId = extractStringWithFallback(
+                    treatments,
+                    CAMPAIGN_ID_KEY,
+                    MISSING_CAMPAIGN_ID
+                ),
                 platformData = AndroidPlatformData(
                     channelId = from[CHANNEL_ID]?.jsonPrimitive?.contentOrNull
                         ?: DEFAULT_CHANNEL_ID,
@@ -94,17 +98,24 @@ internal class AndroidPushV2Mapper(
                 actionableData = actionableData
             )
         } catch (e: Exception) {
-            logger.error("AndroidPushV2Mapper - map", e)
+            logger.error("push mapping failed", e)
             null
         }
     }
 
-    private suspend fun extractStringWithFallback(from: JsonObject?, key: String, fallback: String): String {
+    private suspend fun extractStringWithFallback(
+        from: JsonObject?,
+        key: String,
+        fallback: String
+    ): String {
         val result = from?.get(key)?.jsonPrimitive?.contentOrNull
         return if (result != null) {
             result
         } else {
-            logger.error("AndroidPushV2Mapper - extractStringWithFallback", Exception("Missing key: $key"))
+            logger.error(
+                "Failed to extract $key from push message",
+                Exception("Missing key: $key")
+            )
             fallback
         }
     }

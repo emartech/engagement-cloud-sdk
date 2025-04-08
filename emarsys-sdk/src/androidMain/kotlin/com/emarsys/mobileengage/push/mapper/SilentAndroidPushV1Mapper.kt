@@ -16,7 +16,7 @@ import kotlinx.serialization.json.jsonPrimitive
 class SilentAndroidPushV1Mapper(
     private val logger: Logger,
     private val json: Json
-): Mapper<JsonObject, SilentAndroidPushMessage> {
+) : Mapper<JsonObject, SilentAndroidPushMessage> {
 
     override suspend fun map(from: JsonObject): SilentAndroidPushMessage? {
         return try {
@@ -27,17 +27,27 @@ class SilentAndroidPushV1Mapper(
                     channelId = from.getValue("notification.channel_id").jsonPrimitive.content,
                     notificationMethod = NotificationMethod(
                         collapseId = from.getValue("ems.notification_method.collapse_key").jsonPrimitive.content,
-                        operation = from.getValue("ems.notification_method.operation").jsonPrimitive.content.let { NotificationOperation.valueOf(it) }
+                        operation = from.getValue("ems.notification_method.operation").jsonPrimitive.content.let {
+                            NotificationOperation.valueOf(
+                                it
+                            )
+                        }
                     ),
-                    style = from["ems.style"]?.jsonPrimitive?.content?.let { NotificationStyle.valueOf(it) }
+                    style = from["ems.style"]?.jsonPrimitive?.content?.let {
+                        NotificationStyle.valueOf(
+                            it
+                        )
+                    }
                 ),
-                badgeCount = from["notification.badgeCount"]?.jsonPrimitive?.contentOrNull.fromString(json),
+                badgeCount = from["notification.badgeCount"]?.jsonPrimitive?.contentOrNull.fromString(
+                    json
+                ),
                 actionableData = ActionableData(
                     actions = from.getValue("ems.actions").jsonPrimitive.content.fromString(json)
                 )
             )
         } catch (e: Exception) {
-            logger.error("SilentAndroidPushV1Mapper", e)
+            logger.error("push mapping failed", e)
             null
         }
     }

@@ -12,7 +12,7 @@ class ApplyGlobalRemoteConfigState(private val remoteConfigHandler: RemoteConfig
     }
 
     override suspend fun active() {
-        sdkLogger.debug("ApplyGlobalRemoteConfigState", "Applying global remote config")
+        sdkLogger.debug("Applying global remote config")
         remoteConfigHandler.handleGlobal()
     }
 

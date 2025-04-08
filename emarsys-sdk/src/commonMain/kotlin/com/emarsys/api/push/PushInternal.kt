@@ -42,7 +42,6 @@ internal open class PushInternal(
                 is ClearPushToken -> pushClient.clearPushToken()
                 is PushCall.HandleMessageWithUserInfo -> {
                     sdkLogger.debug(
-                        "PushInternal - activate",
                         "Common PushInternal: shouldn't handle message with user info: $call"
                     )
                 }
