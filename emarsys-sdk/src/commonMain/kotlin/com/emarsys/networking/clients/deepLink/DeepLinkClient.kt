@@ -1,6 +1,5 @@
 package com.emarsys.networking.clients.deepLink
 
-import com.emarsys.core.Registerable
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.exceptions.FailedRequestException
@@ -13,6 +12,7 @@ import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
+import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import io.ktor.http.HttpMethod
 import kotlinx.coroutines.CoroutineScope
@@ -33,7 +33,7 @@ internal class DeepLinkClient(
     private val json: Json,
     private val sdkLogger: Logger,
     private val applicationScope: CoroutineScope,
-) : Registerable {
+) : EventBasedClientApi {
 
     override suspend fun register() {
         applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {

@@ -32,7 +32,7 @@ object SetupInjection {
         }
         single<State>(named(StateTypes.RegisterClient)) {
             RegisterClientState(
-                deviceClient = get()
+                sdkEventDistributor = get()
             )
         }
         single<State>(named(StateTypes.ApplyAppCodeBasedRemoteConfig)) {

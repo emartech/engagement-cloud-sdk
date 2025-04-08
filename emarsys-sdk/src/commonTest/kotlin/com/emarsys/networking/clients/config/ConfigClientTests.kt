@@ -41,7 +41,6 @@ import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -67,7 +66,6 @@ class ConfigClientTests {
         val TEST_BASE_URL = Url("https://test-base-url/")
     }
 
-    private lateinit var sdkDispatcher: CoroutineDispatcher
     private lateinit var mockEmarsysClient: NetworkClientApi
     private lateinit var mockUrlFactory: UrlFactoryApi
     private lateinit var mockContactTokenHandler: ContactTokenHandlerApi
@@ -96,7 +94,6 @@ class ConfigClientTests {
         onlineEvents = spy(MutableSharedFlow())
         mockSdkEventManager = mock()
         every { mockSdkEventManager.onlineSdkEvents } returns onlineEvents
-        sdkDispatcher = StandardTestDispatcher()
 
         everySuspend { mockContactTokenHandler.handleContactTokens(any()) } returns Unit
         everySuspend { mockSdkContext.config } returns mockConfig

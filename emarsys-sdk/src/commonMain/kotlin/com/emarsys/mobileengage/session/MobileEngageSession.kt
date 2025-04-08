@@ -133,6 +133,4 @@ internal class MobileEngageSession(
             timestamp = sessionEnd
         )
     }
-
-
 }

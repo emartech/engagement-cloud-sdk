@@ -17,8 +17,9 @@ object SdkConstants {
     const val TRACK_DEEPLINK_NAME = "trackDeepLink"
     const val INAPP_VIEWED_EVENT_NAME = "inapp:viewed"
     const val DISMISS_EVENT_NAME = "dismiss"
-    const val REREGISTRATION_REQUIRED_EVENT_NAME = "ReregistrationRequired"
-    const val REMOTE_CONFIG_UPDATE_REQUIRED_EVENT_NAME = "RemoteConfigUpdateRequired"
+    const val REREGISTRATION_REQUIRED_EVENT_NAME = "reregistrationRequired"
+    const val REGISTER_DEVICE_INFO_EVENT_NAME = "registerDeviceInfo"
+    const val REMOTE_CONFIG_UPDATE_REQUIRED_EVENT_NAME = "remoteConfigUpdateRequired"
     const val EMS_DEEP_LINK_TRACKED_KEY = "ems_deep_link_tracked"
 
     const val MOBILE_PLATFORM_CATEGORY = "mobile"

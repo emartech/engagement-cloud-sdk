@@ -1,7 +1,6 @@
 package com.emarsys.networking.clients.config
 
 import com.emarsys.context.SdkContextApi
-import com.emarsys.core.Registerable
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.exceptions.FailedRequestException
@@ -14,6 +13,7 @@ import com.emarsys.core.session.SessionContext
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.networking.RefreshTokenRequestBody
+import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.contact.ContactTokenHandlerApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import io.ktor.http.HttpMethod
@@ -36,7 +36,7 @@ internal class ConfigClient(
     private val json: Json,
     private val sdkLogger: Logger,
     private val applicationScope: CoroutineScope
-) : Registerable {
+) : EventBasedClientApi {
 
     override suspend fun register() {
         applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {

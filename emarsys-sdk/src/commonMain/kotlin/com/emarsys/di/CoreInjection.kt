@@ -164,6 +164,10 @@ enum class NetworkClientTypes {
     Generic, Emarsys
 }
 
+enum class EventBasedClientTypes {
+    Device, Config, DeepLink, Contact, Event
+}
+
 enum class EventFlowTypes {
     Public
 }
