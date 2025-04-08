@@ -1,6 +1,7 @@
 package com.emarsys.networking.clients.logging
 
 import com.emarsys.core.channel.SdkEventManagerApi
+import com.emarsys.core.channel.batched
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.exceptions.FailedRequestException
@@ -30,6 +31,7 @@ internal class LoggingClient(
     private val applicationScope: CoroutineScope,
     private val deviceInfoCollector: DeviceInfoCollectorApi,
     private val eventsDao: EventsDaoApi,
+    private val batchSize: Int = 1
 ) {
 
     fun register() {
@@ -41,42 +43,42 @@ internal class LoggingClient(
     private suspend fun startEventConsumer() {
         sdkEventManager.onlineSdkEvents
             .filter { it is SdkEvent.Internal.Sdk.Log || it is SdkEvent.Internal.Sdk.Metric }
-            .collect { sdkEvent ->
+            .batched(batchSize = batchSize, batchIntervalMillis = 10000L)
+            .collect { sdkEvents ->
                 try {
                     sdkLogger.debug("LoggingClient - consumeLogsAndMetrics")
                     val url = urlFactory.create(EmarsysUrlType.LOGGING)
-                    val logLevel = if (sdkEvent is SdkEvent.Internal.Sdk.Log) {
-                        sdkEvent.level
-                    } else {
-                        (sdkEvent as SdkEvent.Internal.Sdk.Metric).level
+                    val logRequestsJson = sdkEvents.map { sdkEvent ->
+                        val logLevel = if (sdkEvent is SdkEvent.Internal.Sdk.Log) {
+                            sdkEvent.level
+                        } else {
+                            (sdkEvent as SdkEvent.Internal.Sdk.Metric).level
+                        }
+                        buildJsonObject {
+                            put("type", JsonPrimitive("log_request"))
+                            put("level", JsonPrimitive(logLevel.name))
+                            put(
+                                "deviceInfo",
+                                JsonPrimitive(json.encodeToString(deviceInfoCollector.collectAsDeviceInfoForLogs()))
+                            )
+                            sdkEvent.attributes?.forEach { attribute ->
+                                put(attribute.key, attribute.value)
+                            }
+                        }
                     }
-                val logRequestJson = buildJsonObject {
-                    put("type", JsonPrimitive("log_request"))
-                    put("level", JsonPrimitive(logLevel.name))
-                    put(
-                        "deviceInfo",
-                        JsonPrimitive(json.encodeToString(deviceInfoCollector.collectAsDeviceInfoForLogs()))
-                    )
-                    sdkEvent.attributes?.forEach { attribute ->
-                        put(attribute.key, attribute.value)
-                    }
-                }
                     val request = UrlRequest(
                         url, HttpMethod.Post,
-                        json.encodeToString(
-                            listOf(
-                            logRequestJson
-                            )
-                        )
+                        json.encodeToString(logRequestsJson)
                     )
                     emarsysNetworkClient.send(
                         request,
-                        onNetworkError = { sdkEventManager.emitEvent(sdkEvent) })
-                    sdkEvent.ack(eventsDao, sdkLogger)
+                        onNetworkError = { sdkEvents.forEach { sdkEventManager.emitEvent(it) } }
+                    )
+                    sdkEvents.forEach { it.ack(eventsDao, sdkLogger) }
                 } catch (exception: Exception) {
                     when (exception) {
                         is FailedRequestException, is RetryLimitReachedException, is MissingApplicationCodeException -> {
-                            sdkEvent.ack(eventsDao, sdkLogger)
+                            sdkEvents.forEach { it.ack(eventsDao, sdkLogger) }
                         }
 
                         else -> sdkLogger.error(
