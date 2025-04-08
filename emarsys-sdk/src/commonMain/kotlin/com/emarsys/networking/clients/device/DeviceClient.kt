@@ -27,7 +27,7 @@ internal class DeviceClient(
     private val deviceInfoCollector: DeviceInfoCollectorApi,
     private val contactTokenHandler: ContactTokenHandlerApi,
     private val sdkEventManager: SdkEventManagerApi,
-    val eventsDao: EventsDaoApi,
+    private val eventsDao: EventsDaoApi,
     private val applicationScope: CoroutineScope,
     private val sdkLogger: Logger
 ) : EventBasedClientApi {
@@ -57,7 +57,7 @@ internal class DeviceClient(
                         )
 
                         else -> sdkLogger.error(
-                            "ConfigClient - consumeConfigChanges",
+                            "DeviceClient - consumeRegisterDeviceInfo",
                             exception
                         )
                     }
