@@ -417,6 +417,7 @@ class EventClientTests {
 
                 advanceUntilIdle()
 
+                delay(1000)
                 onlineSdkEvents.await() shouldBe listOf(testEvent, testEvent1)
                 verifySuspend(VerifyMode.exactly(0)) {
                     mockSdkLogger.error(
