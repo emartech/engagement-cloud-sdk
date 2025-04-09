@@ -1,5 +1,7 @@
 package com.emarsys.networking.clients.event.model
 
+import com.emarsys.SdkConstants.APPLY_APPCODE_BASED_REMOTE_CONFIG_EVENT_NAME
+import com.emarsys.SdkConstants.APPLY_GLOBAL_REMOTE_CONFIG_EVENT_NAME
 import com.emarsys.SdkConstants.APP_START_EVENT_NAME
 import com.emarsys.SdkConstants.CHANGE_APP_CODE_NAME
 import com.emarsys.SdkConstants.CHANGE_MERCHANT_ID_NAME
@@ -192,6 +194,20 @@ sealed interface SdkEvent {
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
             ) : Sdk(REMOTE_CONFIG_UPDATE_REQUIRED_EVENT_NAME)
+
+            @Serializable
+            data class ApplyAppCodeBasedRemoteConfig(
+                override val id: String = UUIDProvider().provide(),
+                override val attributes: JsonObject? = null,
+                override val timestamp: Instant = TimestampProvider().provide(),
+            ) : Sdk(APPLY_APPCODE_BASED_REMOTE_CONFIG_EVENT_NAME), OnlineSdkEvent
+
+            @Serializable
+            data class ApplyGlobalRemoteConfig(
+                override val id: String = UUIDProvider().provide(),
+                override val attributes: JsonObject? = null,
+                override val timestamp: Instant = TimestampProvider().provide(),
+            ) : Sdk(APPLY_GLOBAL_REMOTE_CONFIG_EVENT_NAME), OnlineSdkEvent
 
             @Serializable
             data class ChangeAppCode(

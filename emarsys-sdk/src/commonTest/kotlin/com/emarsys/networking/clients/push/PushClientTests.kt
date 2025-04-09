@@ -232,7 +232,7 @@ class PushClientTests {
                     FailedRequestException(
                         Response(
                             UrlRequest(URL, HttpMethod.Delete),
-                            HttpStatusCode.OK,
+                            HttpStatusCode.BadRequest,
                             Headers.Empty,
                             bodyAsText = ""
                         ),

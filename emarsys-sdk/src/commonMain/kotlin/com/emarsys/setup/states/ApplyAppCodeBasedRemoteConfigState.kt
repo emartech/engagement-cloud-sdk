@@ -1,17 +1,19 @@
 package com.emarsys.setup.states
 
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.state.State
-import com.emarsys.remoteConfig.RemoteConfigHandlerApi
+import com.emarsys.networking.clients.event.model.SdkEvent
 
-class ApplyAppCodeBasedRemoteConfigState(private val remoteConfigHandler: RemoteConfigHandlerApi) : State {
+class ApplyAppCodeBasedRemoteConfigState(private val sdkEventDistributor: SdkEventDistributorApi) :
+    State {
 
-    override val name = "applyRemoteConfig"
+    override val name = "applyAppCodeBasedRemoteConfig"
 
     override fun prepare() {
     }
 
     override suspend fun active() {
-        remoteConfigHandler.handleAppCodeBased()
+        sdkEventDistributor.registerAndStoreEvent(SdkEvent.Internal.Sdk.ApplyAppCodeBasedRemoteConfig())
     }
 
     override fun relax() {

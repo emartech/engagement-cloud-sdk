@@ -1,36 +1,42 @@
 package com.emarsys.setup.states
 
-import com.emarsys.remoteConfig.RemoteConfigHandlerApi
+import com.emarsys.core.channel.SdkEventDistributorApi
+import com.emarsys.networking.clients.event.model.SdkEvent
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
+import dev.mokkery.matcher.capture.Capture.Companion.slot
+import dev.mokkery.matcher.capture.SlotCapture
+import dev.mokkery.matcher.capture.capture
+import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
-import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class ApplyAppCodeBasedRemoteConfigStateTests {
-    private lateinit var mockRemoteConfigHandler: RemoteConfigHandlerApi
+    private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
+    private lateinit var eventSlot: SlotCapture<SdkEvent>
     private lateinit var applyAppCodeBasedRemoteConfigState: ApplyAppCodeBasedRemoteConfigState
 
     @BeforeTest
     fun setUp() {
-        mockRemoteConfigHandler = mock()
-        applyAppCodeBasedRemoteConfigState = ApplyAppCodeBasedRemoteConfigState(mockRemoteConfigHandler)
+        eventSlot = slot()
+        mockSdkEventDistributor = mock()
+        applyAppCodeBasedRemoteConfigState = ApplyAppCodeBasedRemoteConfigState(mockSdkEventDistributor)
     }
 
     @Test
     fun testName() = runTest {
-        applyAppCodeBasedRemoteConfigState.name shouldBe "applyRemoteConfig"
+        applyAppCodeBasedRemoteConfigState.name shouldBe "applyAppCodeBasedRemoteConfig"
     }
 
     @Test
     fun testActive() = runTest {
-        everySuspend { mockRemoteConfigHandler.handleAppCodeBased() } returns Unit
+        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(capture(eventSlot)) } returns Unit
 
         applyAppCodeBasedRemoteConfigState.active()
 
-        verifySuspend { mockRemoteConfigHandler.handleAppCodeBased() }
+        (eventSlot.get() is SdkEvent.Internal.Sdk.ApplyAppCodeBasedRemoteConfig) shouldBe true
     }
 }

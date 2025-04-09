@@ -33,6 +33,7 @@ internal class DeviceClient(
 ) : EventBasedClientApi {
     override suspend fun register() {
         applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
+            sdkLogger.debug("Register")
             startEventConsumer()
         }
     }

@@ -36,9 +36,7 @@ object SetupInjection {
             )
         }
         single<State>(named(StateTypes.ApplyAppCodeBasedRemoteConfig)) {
-            ApplyAppCodeBasedRemoteConfigState(
-                remoteConfigHandler = get()
-            )
+            ApplyAppCodeBasedRemoteConfigState( sdkEventDistributor = get())
         }
         single<State>(named(StateTypes.RestoreSavedSdkEvents)) {
             RestoreSavedSdkEventsState(
@@ -58,9 +56,9 @@ object SetupInjection {
             StateMachine(
                 states = listOf(
                     get<State>(named(StateTypes.CollectDeviceInfo)),
+                    get<State>(named(StateTypes.RegisterClient)),
                     get<State>(named(StateTypes.ApplyAppCodeBasedRemoteConfig)),
                     get<State>(named(StateTypes.PlatformInit)),
-                    get<State>(named(StateTypes.RegisterClient)),
                     get<State>(named(StateTypes.RegisterPushToken)),
                     get<State>(named(StateTypes.RestoreSavedSdkEvents)),
                     get<State>(named(StateTypes.AppStart))

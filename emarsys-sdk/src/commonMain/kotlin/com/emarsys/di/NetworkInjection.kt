@@ -9,7 +9,6 @@ import com.emarsys.networking.clients.device.DeviceClient
 import com.emarsys.networking.clients.event.EventClient
 import com.emarsys.networking.clients.logging.LoggingClient
 import com.emarsys.networking.clients.remoteConfig.RemoteConfigClient
-import com.emarsys.networking.clients.remoteConfig.RemoteConfigClientApi
 import io.ktor.client.HttpClient
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
@@ -64,13 +63,17 @@ object NetworkInjection {
                 sdkLogger = get { parametersOf(DeviceClient::class.simpleName) }
             )
         }
-        single<RemoteConfigClientApi> {
+        single<EventBasedClientApi>(named(EventBasedClientTypes.RemoteConfig)) {
             RemoteConfigClient(
                 networkClient = get(named(NetworkClientTypes.Generic)),
                 urlFactoryApi = get(),
+                sdkEventManager = get(),
+                applicationScope = get(named(CoroutineScopeTypes.Application)),
+                eventsDao = get(),
                 crypto = get(),
                 json = get(),
-                sdkLogger = get { parametersOf(RemoteConfigClient::class.simpleName) }
+                sdkLogger = get { parametersOf(RemoteConfigClient::class.simpleName) },
+                remoteConfigResponseHandler = get()
             )
         }
         single<EventBasedClientApi>(named(EventBasedClientTypes.Config)) {

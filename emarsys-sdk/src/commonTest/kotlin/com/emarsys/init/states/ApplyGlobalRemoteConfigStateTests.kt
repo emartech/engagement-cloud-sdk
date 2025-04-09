@@ -1,12 +1,16 @@
 package com.emarsys.init.states
 
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.SdkLogger
-import com.emarsys.remoteConfig.RemoteConfigHandlerApi
+import com.emarsys.networking.clients.event.model.SdkEvent
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
+import dev.mokkery.matcher.capture.Capture.Companion.slot
+import dev.mokkery.matcher.capture.SlotCapture
+import dev.mokkery.matcher.capture.capture
+import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
-import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
@@ -15,14 +19,16 @@ import kotlin.test.Test
 
 class ApplyGlobalRemoteConfigStateTests {
     private lateinit var applyGlobalRemoteConfigState: ApplyGlobalRemoteConfigState
-    private lateinit var mockRemoteConfigHandler: RemoteConfigHandlerApi
+    private lateinit var eventSlot: SlotCapture<SdkEvent>
+    private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
 
     @BeforeTest
     fun setup() {
-        mockRemoteConfigHandler = mock()
+        eventSlot = slot()
+        mockSdkEventDistributor = mock()
 
         applyGlobalRemoteConfigState = ApplyGlobalRemoteConfigState(
-            mockRemoteConfigHandler,
+            mockSdkEventDistributor,
             SdkLogger("TestLoggerName", ConsoleLogger(), sdkContext = mock())
         )
     }
@@ -34,8 +40,10 @@ class ApplyGlobalRemoteConfigStateTests {
 
     @Test
     fun testActive_should_handleGlobal_with_remoteConfigHandler() = runTest {
-        everySuspend { mockRemoteConfigHandler.handleGlobal() } returns Unit
+        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(capture(eventSlot)) } returns Unit
+
         applyGlobalRemoteConfigState.active()
-        verifySuspend { mockRemoteConfigHandler.handleGlobal() }
+
+        (eventSlot.get() is SdkEvent.Internal.Sdk.ApplyGlobalRemoteConfig) shouldBe true
     }
 }
