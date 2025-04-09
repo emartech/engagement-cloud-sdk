@@ -57,7 +57,7 @@ class EventTrackerInternalTests {
         mockTimestampProvider = mock()
         mockUuidProvider = mock()
         every { mockUuidProvider.provide() } returns UUID
-        logger = SdkLogger("TestLoggerName", ConsoleLogger())
+        logger = SdkLogger("TestLoggerName", ConsoleLogger(), sdkContext = mock())
 
         eventTrackerContext = EventTrackerContext(expectedEvents)
 

@@ -143,7 +143,6 @@ class LoggingClientTests {
         }
         val logEvent = SdkEvent.Internal.Sdk.Log(
             level = LogLevel.Debug,
-            name = "log",
             attributes = testLogAttributes
         )
 
@@ -175,7 +174,6 @@ class LoggingClientTests {
         }
         val logEvent = SdkEvent.Internal.Sdk.Metric(
             level = LogLevel.Metric,
-            name = "metric",
             attributes = testLogAttributes
         )
         val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
@@ -208,7 +206,6 @@ class LoggingClientTests {
         }
         val logEvent = SdkEvent.Internal.Sdk.Metric(
             level = LogLevel.Metric,
-            name = "metric",
             attributes = testLogAttributes
         )
         everySuspend { mockSdkEventManager.emitEvent(logEvent) } returns Unit
@@ -234,7 +231,6 @@ class LoggingClientTests {
         everySuspend { mockDeviceInfoCollector.collectAsDeviceInfoForLogs() } returns deviceInfoForLogs
         val logEvent = SdkEvent.Internal.Sdk.Metric(
             level = LogLevel.Metric,
-            name = "metric",
         )
 
         val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
@@ -275,8 +271,7 @@ class LoggingClientTests {
 
             every { mockUrlFactory.create(EmarsysUrlType.LOGGING, null) } throws testException
             val logEvent = SdkEvent.Internal.Sdk.Metric(
-                level = LogLevel.Metric,
-                name = "metric"
+                level = LogLevel.Metric
             )
 
             val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {

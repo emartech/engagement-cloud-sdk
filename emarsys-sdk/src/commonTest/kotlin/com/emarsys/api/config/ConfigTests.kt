@@ -84,7 +84,8 @@ class ConfigTest {
             mainDispatcher,
             DefaultUrls("", "", "", "", "", "", ""),
             LogLevel.Error,
-            mutableSetOf()
+            mutableSetOf(),
+            logBreadcrumbsQueueSize = 10
         )
         sdkContext.contactFieldId = CONTACT_FIELD_ID
         sdkContext.config = EmarsysConfig(APPLICATION_CODE, MERCHANT_ID)

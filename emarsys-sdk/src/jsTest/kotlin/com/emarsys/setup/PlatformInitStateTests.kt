@@ -28,7 +28,8 @@ class PlatformInitStateTests {
             StandardTestDispatcher(),
             mock(),
             LogLevel.Info,
-            mutableSetOf()
+            mutableSetOf(),
+            logBreadcrumbsQueueSize = 10
         )
         mockPushService = mock()
         everySuspend { mockPushService.register(any()) } returns Unit

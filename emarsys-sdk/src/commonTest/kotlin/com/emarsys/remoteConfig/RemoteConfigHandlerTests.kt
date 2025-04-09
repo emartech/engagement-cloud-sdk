@@ -36,7 +36,8 @@ class RemoteConfigHandlerTests {
         mainDispatcher,
         DefaultUrls("", "", "", "", "", "", ""),
         LogLevel.Debug,
-        mutableSetOf()
+        mutableSetOf(),
+        logBreadcrumbsQueueSize = 10
     )
     private lateinit var mockRemoteConfigClient: RemoteConfigClientApi
     private lateinit var mockDeviceInfoCollector: DeviceInfoCollectorApi
@@ -54,7 +55,7 @@ class RemoteConfigHandlerTests {
             mockDeviceInfoCollector,
             sdkContext,
             mockRandomProvider,
-            SdkLogger("TestLoggerName", ConsoleLogger())
+            SdkLogger("TestLoggerName", ConsoleLogger(), sdkContext = mock())
         )
     }
 

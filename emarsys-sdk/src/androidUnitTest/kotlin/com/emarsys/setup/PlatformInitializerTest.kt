@@ -62,7 +62,7 @@ class PlatformInitializerTest {
     fun init_should_doNothing_whenSdkEvent_isNotDismiss() = runTest {
         platformInitializer.init()
 
-        sdkEventFlow.emit(SdkEvent.Internal.Sdk.Metric(name = "metric"))
+        sdkEventFlow.emit(SdkEvent.Internal.Sdk.Metric())
 
         advanceUntilIdle()
 

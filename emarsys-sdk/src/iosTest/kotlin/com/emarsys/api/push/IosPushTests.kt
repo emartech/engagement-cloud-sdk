@@ -93,7 +93,8 @@ class IosPushTests {
             StandardTestDispatcher(),
             DefaultUrls("", "", "", "", "", "", ""),
             LogLevel.Error,
-            mutableSetOf()
+            mutableSetOf(),
+            logBreadcrumbsQueueSize = 10
         )
 
         everySuspend { mockLoggingPush.activate() } returns Unit

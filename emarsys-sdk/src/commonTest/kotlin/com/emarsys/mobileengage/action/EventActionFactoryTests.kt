@@ -47,7 +47,7 @@ class EventActionFactoryTests {
             mockPermissionHandler,
             mockExternalUrlOpener,
             mockClipboardHandler,
-            SdkLogger("TestLoggerName", ConsoleLogger())
+            SdkLogger("TestLoggerName", ConsoleLogger(), sdkContext = mock())
         )
     }
 

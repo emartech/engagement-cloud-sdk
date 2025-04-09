@@ -1,7 +1,6 @@
 package com.emarsys.mobileengage.push.mappers
 
-import com.emarsys.core.log.ConsoleLogger
-import com.emarsys.core.log.SdkLogger
+import com.emarsys.core.log.Logger
 import com.emarsys.mobileengage.action.models.BadgeCount
 import com.emarsys.mobileengage.action.models.BadgeCountMethod
 import com.emarsys.mobileengage.action.models.BasicCustomEventActionModel
@@ -11,6 +10,8 @@ import com.emarsys.mobileengage.push.DisplayableData
 import com.emarsys.mobileengage.push.model.JsPlatformData
 import com.emarsys.mobileengage.push.model.JsPushMessage
 import com.emarsys.util.JsonUtil
+import dev.mokkery.MockMode
+import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
@@ -41,13 +42,13 @@ class PushMessageWebV1MapperTests {
     }
 
     private lateinit var json: Json
-    private lateinit var logger: SdkLogger
+    private lateinit var logger: Logger
     private lateinit var pushMessageWebV1Mapper: PushMessageWebV1Mapper
 
     @BeforeTest
     fun setUp() = runTest {
         json = JsonUtil.json
-        logger = SdkLogger("TestLoggerName", ConsoleLogger())
+        logger = mock(MockMode.autofill)
         pushMessageWebV1Mapper = PushMessageWebV1Mapper(json, logger)
     }
 

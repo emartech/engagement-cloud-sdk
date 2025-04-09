@@ -58,7 +58,8 @@ class GeofenceTrackerTests {
             mainDispatcher,
             DefaultUrls("", "", "", "", "", "", ""),
             LogLevel.Error,
-            mutableSetOf()
+            mutableSetOf(),
+            logBreadcrumbsQueueSize = 10
         )
 
         everySuspend { mockLoggingGeofenceTracker.activate() } returns Unit

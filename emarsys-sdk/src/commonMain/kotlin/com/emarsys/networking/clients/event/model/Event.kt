@@ -10,6 +10,8 @@ import com.emarsys.SdkConstants.INAPP_VIEWED_EVENT_NAME
 import com.emarsys.SdkConstants.IN_APP_BUTTON_CLICKED_EVENT_NAME
 import com.emarsys.SdkConstants.LINK_AUTHENTICATED_CONTACT_NAME
 import com.emarsys.SdkConstants.LINK_CONTACT_NAME
+import com.emarsys.SdkConstants.LOG_EVENT_NAME
+import com.emarsys.SdkConstants.METRIC_EVENT_NAME
 import com.emarsys.SdkConstants.PUSH_CLICKED_EVENT_NAME
 import com.emarsys.SdkConstants.REGISTER_DEVICE_INFO_EVENT_NAME
 import com.emarsys.SdkConstants.REGISTER_PUSH_TOKEN_EVENT_NAME
@@ -115,6 +117,7 @@ sealed interface SdkEvent {
         }
     }
 
+    @Serializable
     sealed interface Internal : SdkEvent {
 
         interface Reporting : Internal, OnlineSdkEvent
@@ -125,28 +128,28 @@ sealed interface SdkEvent {
         sealed class Sdk(override val name: String) : Internal {
             override val type: String = "internal"
 
-
+            @Serializable
             data class DeviceInfoUpdateRequired(
                 override val id: String = UUIDProvider().provide(),
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
             ) : Sdk(DEVICE_INFO_UPDATE_REQUIRED_EVENT_NAME)
 
+            @Serializable
             data class Log(
                 val level: LogLevel,
                 override val id: String = UUIDProvider().provide(),
-                override val name: String,
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Sdk(name), OnlineSdkEvent
+            ) : Sdk(LOG_EVENT_NAME), OnlineSdkEvent
 
+            @Serializable
             data class Metric(
                 val level: LogLevel = LogLevel.Metric,
                 override val id: String = UUIDProvider().provide(),
-                override val name: String,
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Sdk(name), OnlineSdkEvent
+            ) : Sdk(METRIC_EVENT_NAME), OnlineSdkEvent
 
             @Serializable
             data class Dismiss(

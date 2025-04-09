@@ -44,7 +44,8 @@ class DeepLinkInternalTests {
             mainDispatcher,
             DefaultUrls("", "", "", "", "", "", ""),
             LogLevel.Error,
-            mutableSetOf()
+            mutableSetOf(),
+            logBreadcrumbsQueueSize = 10
         )
 
         eventSlot = slot()

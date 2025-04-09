@@ -52,7 +52,8 @@ class InappTests {
             mainDispatcher,
             DefaultUrls("", "", "", "", "", "", ""),
             LogLevel.Error,
-            mutableSetOf()
+            mutableSetOf(),
+            logBreadcrumbsQueueSize = 10
         )
 
         everySuspend { mockLoggingInApp.activate() } returns Unit

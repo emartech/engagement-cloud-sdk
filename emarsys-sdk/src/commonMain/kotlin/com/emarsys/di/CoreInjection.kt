@@ -13,6 +13,8 @@ import com.emarsys.core.crypto.CryptoApi
 import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
+import com.emarsys.core.log.RemoteLogger
+import com.emarsys.core.log.RemoteLoggerApi
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.networking.UserAgentProvider
 import com.emarsys.core.networking.UserAgentProviderApi
@@ -65,7 +67,20 @@ object CoreInjection {
         single<CoroutineScope>(named(CoroutineScopeTypes.Application)) {
             CoroutineScope(SupervisorJob() + Dispatchers.Default)
         }
-        factory<Logger> { (loggerName: String) -> SdkLogger(loggerName, ConsoleLogger()) }  // todo remotelogger
+        single<ConsoleLogger> {
+            ConsoleLogger()
+        }
+        single<RemoteLoggerApi> {
+            RemoteLogger()
+        }
+        factory<Logger> { (loggerName: String) ->
+            SdkLogger(
+                loggerName,
+                consoleLogger = get(),
+                remoteLogger = get(),
+                sdkContext = get()
+            )
+        }
         singleOf(::TimestampProvider) { bind<InstantProvider>() }
         singleOf(::UUIDProvider) { bind<UuidProviderApi>() }
         singleOf(::TimezoneProvider) { bind<TimezoneProviderApi>() }
@@ -109,7 +124,8 @@ object CoreInjection {
                 mainDispatcher = get(named(DispatcherTypes.Main)),
                 defaultUrls = get(),
                 remoteLogLevel = LogLevel.Error,
-                features = mutableSetOf()
+                features = mutableSetOf(),
+                logBreadcrumbsQueueSize = 10
             )
         }
         single<HttpClient> {

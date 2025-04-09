@@ -53,14 +53,15 @@ class SetupOrganizerTests {
             mainDispatcher,
             DefaultUrls("", "", "", "", "", "", ""),
             LogLevel.Error,
-            mutableSetOf()
+            mutableSetOf(),
+            logBreadcrumbsQueueSize = 10
         )
         setupOrganizer = SetupOrganizer(
             mockMeStateMachine,
             mockPredictStateMachine,
             sdkContext,
             mockSdkConfigLoader,
-            SdkLogger("TestLoggerName", ConsoleLogger())
+            SdkLogger("TestLoggerName", ConsoleLogger(), sdkContext = mock())
         )
     }
 

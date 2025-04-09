@@ -54,7 +54,8 @@ class InboxTests {
             mainDispatcher,
             DefaultUrls("", "", "", "", "", "", ""),
             LogLevel.Error,
-            mutableSetOf()
+            mutableSetOf(),
+            logBreadcrumbsQueueSize = 10
         )
 
         everySuspend { mockLoggingInbox.activate() } returns Unit

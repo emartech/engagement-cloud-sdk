@@ -7,6 +7,7 @@ import com.emarsys.core.log.Logger
 import com.emarsys.networking.clients.event.model.OnlineSdkEvent
 import com.emarsys.networking.clients.event.model.SdkEvent
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,7 +18,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
-import kotlin.time.measureTime
+import kotlin.coroutines.coroutineContext
 
 class SdkEventDistributor(
     private val connectionStatus: StateFlow<Boolean>,
@@ -48,18 +49,13 @@ class SdkEventDistributor(
 
     override suspend fun registerAndStoreEvent(sdkEvent: SdkEvent) {
         try {
-            // todo remove
-            measureTime {
-                if (sdkEvent is OnlineSdkEvent) {
-                    eventsDao.insertEvent(sdkEvent)
-                }
-            }.let {
-                sdkLogger.debug(
-                    "SdkEventDistributor - Event inserted into DB in ${it.inWholeMilliseconds} ms"
-                )
+            if (sdkEvent is OnlineSdkEvent) {
+                eventsDao.insertEvent(sdkEvent)
             }
+
             _sdkEventFlow.emit(sdkEvent)
         } catch (exception: Exception) {
+            coroutineContext.ensureActive()
             sdkLogger.error(
                 "SdkEventDistributor - Failed to register event",
                 exception,
@@ -67,10 +63,21 @@ class SdkEventDistributor(
         }
     }
 
+    override suspend fun registerAndStoreLogEvent(sdkEvent: SdkEvent) {
+        try {
+            eventsDao.insertEvent(sdkEvent)
+            _sdkEventFlow.emit(sdkEvent)
+        } catch (exception: Exception) {
+            coroutineContext.ensureActive()
+            exception.printStackTrace()
+        }
+    }
+
     override suspend fun emitEvent(sdkEvent: SdkEvent) {
         try {
             _sdkEventFlow.emit(sdkEvent)
         } catch (exception: Exception) {
+            coroutineContext.ensureActive()
             sdkLogger.error(
                 "SdkEventDistributor - Failed to emit event",
                 exception,

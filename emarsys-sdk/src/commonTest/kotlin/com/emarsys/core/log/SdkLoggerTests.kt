@@ -1,9 +1,26 @@
 package com.emarsys.core.log
 
+import com.emarsys.context.SdkContextApi
+import com.emarsys.core.log.SdkLogger.Companion.breadcrumbsQueue
+import dev.mokkery.MockMode
+import dev.mokkery.answering.returns
+import dev.mokkery.every
+import dev.mokkery.mock
+import dev.mokkery.resetCalls
+import dev.mokkery.verifySuspend
+import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -13,11 +30,26 @@ class SdkLoggerTests {
         private val LOGGER_NAME = SdkLoggerTests::class.simpleName!!
     }
 
-    private lateinit var logger: SdkLogger
+    private lateinit var mockSdkContext: SdkContextApi
+    private lateinit var mockRemoteLogger: RemoteLoggerApi
+    private lateinit var logger: Logger
 
     @BeforeTest
     fun setup() = runTest {
-        logger = SdkLogger(LOGGER_NAME, ConsoleLogger(), remoteLogger = null)
+        mockSdkContext = mock()
+        every { mockSdkContext.logBreadcrumbsQueueSize } returns 10
+        mockRemoteLogger = mock(MockMode.autofill)
+        logger = SdkLogger(
+            LOGGER_NAME,
+            ConsoleLogger(),
+            remoteLogger = mockRemoteLogger,
+            sdkContext = mockSdkContext
+        )
+    }
+
+    @AfterTest
+    fun tearDown() = runTest {
+        breadcrumbsQueue.clear()
     }
 
     @Test
@@ -57,6 +89,103 @@ class SdkLoggerTests {
         }) {
             contextTestMethod2()
         }
+    }
+
+    @Test
+    fun testBreadCrumbsQueue_shouldFillUp_whenThereIsMoreThanConfiguredParallelLogs() = runTest {
+        val testLogBreadcrumbsQueueSize = 10
+        every { mockSdkContext.logBreadcrumbsQueueSize } returns testLogBreadcrumbsQueueSize
+
+        val numberOfLogs = mockSdkContext.logBreadcrumbsQueueSize + 5
+        val jobs = (0..numberOfLogs).map {
+            CoroutineScope(Dispatchers.Default + CoroutineName("coroutine $it")).launch {
+                logger.info("log number $it")
+            }
+        }
+
+        jobs.joinAll()
+
+        breadcrumbsQueue.size shouldBe testLogBreadcrumbsQueueSize
+    }
+
+    @Test
+    fun testBreadCrumbsQueue_shouldContainLatestArrivingLogs() = runTest {
+        val testLogBreadcrumbsQueueSize = 10
+        every { mockSdkContext.logBreadcrumbsQueueSize } returns testLogBreadcrumbsQueueSize
+
+        val numberOfLogs = mockSdkContext.logBreadcrumbsQueueSize + 5
+        (0..numberOfLogs).map {
+            logger.info("log number $it")
+        }
+
+        breadcrumbsQueue.size shouldBe testLogBreadcrumbsQueueSize
+        breadcrumbsQueue.forEachIndexed { i, breadcrumb ->
+            breadcrumb.second["message"]?.jsonPrimitive?.content shouldBe "log number ${numberOfLogs - i}"
+        }
+    }
+
+    @Test
+    fun logToRemote_shouldContainAllAttributes() = runTest {
+        val breadcrumbTestMessage = "breadcrumb test message"
+        logger.info(breadcrumbTestMessage)
+        resetCalls(mockRemoteLogger)
+
+        val testMessage = "test message"
+        val testException = RuntimeException("test exception")
+        val expectedLogObject = buildJsonObject {
+            put("loggerName", LOGGER_NAME)
+            put("level", LogLevel.Error.name)
+            put("message", testMessage)
+            put("exception", testException.toString())
+            put("reason", testException.message)
+            put("stackTrace", testException.stackTraceToString())
+            put("contextKey1", 123)
+            put("contextKey2", "456")
+            put("key1", "value")
+            put("key2", buildJsonObject { put("innerKey", "innerValue") })
+            put("breadcrumbs", buildJsonObject {
+                put("entry_0", buildJsonObject {
+                    put("loggerName", LOGGER_NAME)
+                    put("message", breadcrumbTestMessage)
+                    put("level", LogLevel.Info.name)
+                })
+            })
+
+        }
+
+        val logContext = buildJsonObject {
+            put("contextKey1", 123)
+            put("contextKey2", "456")
+        }
+        withLogContext(logContext) {
+            logger.error(
+                "test message",
+                testException,
+                data = buildJsonObject {
+                    put("key1", "value")
+                    put("key2", buildJsonObject { put("innerKey", "innerValue") })
+                })
+        }
+
+        verifySuspend {
+            mockRemoteLogger.logToRemote(
+                LogLevel.Error, expectedLogObject
+            )
+        }
+    }
+
+    @Test
+    fun sdkLogger_shouldNotCollectBreadcrumbs_inCaseThereIsNoRemoteLogger() = runTest {
+        val logger = SdkLogger(
+            LOGGER_NAME,
+            ConsoleLogger(),
+            remoteLogger = null,
+            sdkContext = mockSdkContext
+        )
+
+        logger.info("test")
+
+        breadcrumbsQueue.size shouldBe 0
     }
 
     private suspend fun contextTestMethod1() {

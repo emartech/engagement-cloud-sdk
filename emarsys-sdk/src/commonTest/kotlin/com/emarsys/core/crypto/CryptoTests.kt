@@ -3,6 +3,7 @@ package com.emarsys.core.crypto
 import com.emarsys.core.exceptions.DecryptionFailedException
 import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.SdkLogger
+import dev.mokkery.mock
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -15,7 +16,7 @@ class CryptoTests {
             "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAELjWEUIBX9zlm1OI4gF1hMCBLzpaBwgs9HlmSIBAqP4MDGy4ibOOV3FVDrnAY0Q34LZTbPBlp3gRNZJ19UoSy2Q=="
         const val TEST_SECRET = "test secret"
     }
-    private val sdkLogger = SdkLogger("TestLoggerName", ConsoleLogger())
+    private val sdkLogger = SdkLogger("TestLoggerName", ConsoleLogger(), sdkContext = mock())
     private val crypto = Crypto(sdkLogger,PUBLIC_KEY)
 
     @Test

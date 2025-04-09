@@ -23,7 +23,6 @@ internal class EventTrackerInternal(
                 timestampProvider.provide()
             )
         )
-        //TODO handle error
         sdkLogger.debug("EventTrackerInternal - trackEvent")
     }
 

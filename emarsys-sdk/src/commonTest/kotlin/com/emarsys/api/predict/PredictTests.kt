@@ -79,7 +79,8 @@ class PredictTests {
             mainDispatcher,
             DefaultUrls("", "", "", "", "", "", ""),
             LogLevel.Error,
-            mutableSetOf()
+            mutableSetOf(),
+            logBreadcrumbsQueueSize = 10
         )
 
         everySuspend { mockLoggingPredict.activate() } returns Unit

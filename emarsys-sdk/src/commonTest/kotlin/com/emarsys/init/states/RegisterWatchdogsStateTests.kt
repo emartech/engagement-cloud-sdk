@@ -24,7 +24,7 @@ class RegisterWatchdogsStateTests {
         registerWatchDogsState = RegisterWatchdogsState(
             lifecycleWatchDog,
             connectionWatchDog,
-            SdkLogger("TestLoggerName", ConsoleLogger())
+            SdkLogger("TestLoggerName", ConsoleLogger(), sdkContext = mock())
         )
     }
 

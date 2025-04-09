@@ -15,6 +15,7 @@ interface SdkContextApi {
     var defaultUrls: DefaultUrlsApi
     var remoteLogLevel: LogLevel
     val features: MutableSet<Features>
+    var logBreadcrumbsQueueSize: Int
 
     suspend fun setSdkState(sdkState: SdkState)
 }

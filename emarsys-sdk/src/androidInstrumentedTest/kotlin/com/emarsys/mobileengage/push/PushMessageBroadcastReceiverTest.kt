@@ -2,7 +2,6 @@ package com.emarsys.mobileengage.push
 
 import android.content.Intent
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
-import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.Logger
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.di.DispatcherTypes
@@ -122,7 +121,7 @@ class PushMessageBroadcastReceiverTest : KoinTest {
         Dispatchers.setMain(StandardTestDispatcher())
         mockPresenter = mockk(relaxed = true)
         mockSilentPushHandler = mockk(relaxed = true)
-        mockLogger = SdkLogger("TestLoggerName", ConsoleLogger())
+        mockLogger = mockk(relaxed = true)
         mockPushMessageFactory = mockk()
         coEvery { mockPushMessageFactory.create(Json.decodeFromString(SILENT_PUSH_MESSAGE_STRING)) } returns expectedSilentPushMessage
         coEvery { mockPushMessageFactory.create(Json.decodeFromString(PUSH_MESSAGE_STRING)) } returns expectedPushMessage

@@ -57,7 +57,8 @@ class GenericApiTests {
                 ""
             ),
             LogLevel.Error,
-            mutableSetOf()
+            mutableSetOf(),
+            logBreadcrumbsQueueSize = 10
         )
         genericApi = GenericApi(loggingContact, contactGatherer, contactInternal, sdkContext)
         genericApi.registerOnContext()

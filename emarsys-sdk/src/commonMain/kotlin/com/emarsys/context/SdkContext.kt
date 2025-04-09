@@ -12,6 +12,7 @@ class SdkContext(
     override var defaultUrls: DefaultUrlsApi,
     override var remoteLogLevel: LogLevel,
     override val features: MutableSet<Features>,
+    override var logBreadcrumbsQueueSize: Int,
 ) : SdkContextApi {
 
     override var contactFieldId: Int? = null

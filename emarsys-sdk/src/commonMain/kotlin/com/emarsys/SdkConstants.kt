@@ -22,6 +22,8 @@ object SdkConstants {
     const val REGISTER_PUSH_TOKEN_EVENT_NAME = "registerPushToken"
     const val CLEAR_PUSH_TOKEN_EVENT_NAME = "clearPushToken"
     const val REMOTE_CONFIG_UPDATE_REQUIRED_EVENT_NAME = "remoteConfigUpdateRequired"
+    const val LOG_EVENT_NAME = "log"
+    const val METRIC_EVENT_NAME = "metric"
     const val EMS_DEEP_LINK_TRACKED_KEY = "ems_deep_link_tracked"
 
     const val MOBILE_PLATFORM_CATEGORY = "mobile"

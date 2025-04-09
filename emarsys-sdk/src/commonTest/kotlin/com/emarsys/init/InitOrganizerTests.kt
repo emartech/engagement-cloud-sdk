@@ -44,9 +44,10 @@ class InitOrganizerTests {
             mainDispatcher,
             DefaultUrls("", "", "", "", "", "", ""),
             LogLevel.Error,
-            mutableSetOf()
+            mutableSetOf(),
+            logBreadcrumbsQueueSize = 10
         )
-        initOrganizer = InitOrganizer(mockStateMachine, sdkContext, SdkLogger("TestLoggerName", ConsoleLogger()))
+        initOrganizer = InitOrganizer(mockStateMachine, sdkContext, SdkLogger("TestLoggerName", ConsoleLogger(), sdkContext = mock()))
     }
 
     @Test
