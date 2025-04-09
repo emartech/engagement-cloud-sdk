@@ -1,19 +1,18 @@
 package com.emarsys.di
 
-import com.emarsys.remoteConfig.RemoteConfigHandler
-import com.emarsys.remoteConfig.RemoteConfigHandlerApi
+import com.emarsys.remoteConfig.RemoteConfigResponseHandler
+import com.emarsys.remoteConfig.RemoteConfigResponseHandlerApi
 import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
 
 object RemoteConfigInjection {
     val remoteConfigModules = module {
-        single<RemoteConfigHandlerApi> {
-            RemoteConfigHandler(
-                remoteConfigClient = get(),
+        single<RemoteConfigResponseHandlerApi> {
+            RemoteConfigResponseHandler(
                 deviceInfoCollector = get(),
                 sdkContext = get(),
                 randomProvider = get(),
-                sdkLogger = get { parametersOf(RemoteConfigHandler::class.simpleName) }
+                sdkLogger = get { parametersOf(RemoteConfigResponseHandler::class.simpleName) }
             )
         }
     }

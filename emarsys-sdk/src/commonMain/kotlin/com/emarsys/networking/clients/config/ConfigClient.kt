@@ -40,6 +40,7 @@ internal class ConfigClient(
 
     override suspend fun register() {
         applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
+            sdkLogger.debug("Register")
             startEventConsumer()
         }
     }

@@ -7,31 +7,31 @@ import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.DoubleProvider
-import com.emarsys.networking.clients.remoteConfig.RemoteConfigClientApi
 
-internal class RemoteConfigHandler(
-    private val remoteConfigClient: RemoteConfigClientApi,
+internal class RemoteConfigResponseHandler(
     private val deviceInfoCollector: DeviceInfoCollectorApi,
     private val sdkContext: SdkContextApi,
     private val randomProvider: DoubleProvider,
     private val sdkLogger: Logger
-) : RemoteConfigHandlerApi {
-    private suspend fun handle(config: RemoteConfigResponse?, clientId: String?) {
-        if (config == null) {
+) : RemoteConfigResponseHandlerApi {
+    override suspend fun handle(response: RemoteConfigResponse?) {
+        if (response == null) {
             sdkLogger.error("config is null")
             return
         }
 
-        sdkLogger.debug("applyServiceUrls")
-        applyServiceUrls(config.serviceUrls)
-        sdkLogger.debug("applyLogLevel")
-        applyLogLevel(config.logLevel)
-        sdkLogger.debug("applyFeatures")
-        applyFeatures(config.features)
-        sdkLogger.debug("applyLuckyLogger")
-        applyLuckyLogger(config.luckyLogger)
+        val clientId = deviceInfoCollector.getClientId()
 
-        config.overrides?.let {
+        sdkLogger.debug("applyServiceUrls")
+        applyServiceUrls(response.serviceUrls)
+        sdkLogger.debug("applyLogLevel")
+        applyLogLevel(response.logLevel)
+        sdkLogger.debug("applyFeatures")
+        applyFeatures(response.features)
+        sdkLogger.debug("applyLuckyLogger")
+        applyLuckyLogger(response.luckyLogger)
+
+        response.overrides?.let {
             it[clientId]?.let { override ->
                 sdkLogger.debug("override applyServiceUrls")
                 applyServiceUrls(override.serviceUrls)
@@ -82,18 +82,4 @@ internal class RemoteConfigHandler(
             sdkContext.features.remove(feature)
         }
     }
-
-    override suspend fun handleAppCodeBased() {
-        val config = remoteConfigClient.fetchRemoteConfig() ?: return
-        val clientId = deviceInfoCollector.getClientId()
-        handle(config, clientId)
-    }
-
-    override suspend fun handleGlobal() {
-        val config = remoteConfigClient.fetchRemoteConfig(true) ?: return
-        val clientId = deviceInfoCollector.getClientId()
-
-        handle(config, clientId)
-    }
-
 }
