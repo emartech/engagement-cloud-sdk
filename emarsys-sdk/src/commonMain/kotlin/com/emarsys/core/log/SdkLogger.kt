@@ -76,6 +76,13 @@ class SdkLogger(
         log(LogLevel.Error, message = message, throwable = throwable, data = data)
     }
 
+    override suspend fun metric(
+        message: String,
+        data: JsonObject
+    ) {
+        log(LogLevel.Metric, message = message, data = data)
+    }
+
     private suspend fun log(
         level: LogLevel,
         message: String? = null,

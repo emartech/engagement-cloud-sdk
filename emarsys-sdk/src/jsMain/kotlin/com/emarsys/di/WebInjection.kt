@@ -171,13 +171,15 @@ object WebInjection {
                     actionFactory = get<EventActionFactoryApi>(),
                     json = get(),
                     sdkDispatcher = get(named(DispatcherTypes.Sdk))
-                )
+                ),
+                timestampProvider = get()
             )
         }
         single<InAppPresenterApi> {
             WebInAppPresenter(
                 sdkEventDistributor = get(),
-                sdkDispatcher = get(named(DispatcherTypes.Sdk))
+                sdkDispatcher = get(named(DispatcherTypes.Sdk)),
+                logger = get { parametersOf(WebInAppPresenter::class.simpleName) }
             )
         }
         single<ClipboardHandlerApi> { WebClipboardHandler(window.navigator.clipboard) }

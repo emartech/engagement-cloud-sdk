@@ -6,6 +6,8 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.Logger
+import com.emarsys.core.providers.InstantProvider
+import com.emarsys.core.providers.TimestampProvider
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.watchdog.activity.TransitionSafeCurrentActivityWatchdog
 import kotlinx.coroutines.CoroutineDispatcher
@@ -14,14 +16,48 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 
-class InAppPresenter(
+internal class InAppPresenter(
     private val currentActivityWatchdog: TransitionSafeCurrentActivityWatchdog,
     private val mainDispatcher: CoroutineDispatcher,
-    private val sdkDispatcher: CoroutineDispatcher,
     private val sdkEventDistributor: SdkEventDistributorApi,
-    private val logger: Logger
+    private val timestampProvider: InstantProvider,
+    private val logger: Logger,
+    private val applicationScope: CoroutineScope
 ) : InAppPresenterApi {
+    override suspend fun trackMetric(
+        campaignId: String,
+        loadingMetric: InAppLoadingMetric,
+        onScreenTimeStart: Long,
+        onScreenTimeEnd: Long
+    ) {
+        logger.metric(
+            message = "InAppMetric",
+            data = buildJsonObject {
+                put("campaignId", JsonPrimitive(campaignId))
+                put(
+                    "loadingTimeStart",
+                    JsonPrimitive(loadingMetric.loadingStarted)
+                )
+                put(
+                    "loadingTimeEnd",
+                    JsonPrimitive(loadingMetric.loadingEnded)
+                )
+                put(
+                    "loadingTimeDuration",
+                    JsonPrimitive(loadingMetric.loadingEnded - loadingMetric.loadingStarted)
+                )
+                put("onScreenTimeStart", JsonPrimitive(onScreenTimeStart))
+                put("onScreenTimeEnd", JsonPrimitive(onScreenTimeEnd))
+                put(
+                    "onScreenTimeDuration",
+                    JsonPrimitive(onScreenTimeEnd - onScreenTimeStart)
+                )
+            }
+        )
+    }
 
     override suspend fun present(
         inAppView: InAppViewApi,
@@ -31,6 +67,7 @@ class InAppPresenter(
     ) {
         val inAppDialog = InAppDialog(inAppView as InAppView)
         val currentActivity = currentActivityWatchdog.waitForActivity()
+        val onScreenTimeStart = timestampProvider.provide().toEpochMilliseconds()
         currentActivity.fragmentManager()?.let {
             it.beginTransaction().run {
                 setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
@@ -38,12 +75,19 @@ class InAppPresenter(
                 addToBackStack(null)
                 commit()
             }
-            CoroutineScope(sdkDispatcher).launch(start = CoroutineStart.UNDISPATCHED) {
+            applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
                 sdkEventDistributor.sdkEventFlow.first { sdkEvent ->
                     sdkEvent is SdkEvent.Internal.Sdk.Dismiss && sdkEvent.id == inAppView.inAppMessage.campaignId
                 }
+                val onScreenTimeEnd = timestampProvider.provide().toEpochMilliseconds()
+                logger.debug("dismiss in-app dialog")
+                trackMetric(
+                    inAppView.inAppMessage.campaignId,
+                    webViewHolder.metrics,
+                    onScreenTimeStart,
+                    onScreenTimeEnd
+                )
                 withContext(mainDispatcher) {
-                    logger.debug("dismiss in-app dialog")
                     inAppDialog.dismiss()
                 }
             }

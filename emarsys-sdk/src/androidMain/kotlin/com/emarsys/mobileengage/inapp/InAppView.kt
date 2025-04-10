@@ -5,6 +5,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.LinearLayout
 import com.emarsys.core.factory.Factory
+import com.emarsys.core.providers.InstantProvider
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
@@ -14,6 +15,7 @@ internal class InAppView @JvmOverloads constructor(
     private val mainDispatcher: CoroutineDispatcher,
     private val webViewProvider: WebViewProvider,
     private val jsBridgeProvider: Factory<String, InAppJsBridge>,
+    private val timestampProvider: InstantProvider,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
 ) : LinearLayout(context, attrs, defStyleAttr), InAppViewApi {
@@ -23,10 +25,20 @@ internal class InAppView @JvmOverloads constructor(
     }
 
     private lateinit var mInAppMessage: InAppMessage
+
+    private var loadingStarted: Long? = null
     override val inAppMessage: InAppMessage
         get() = mInAppMessage
 
+    private fun inAppLoadingMetric(): InAppLoadingMetric {
+        return InAppLoadingMetric(
+            loadingStarted = loadingStarted ?: 0,
+            loadingEnded = timestampProvider.provide().toEpochMilliseconds()
+        )
+    }
+
     override suspend fun load(message: InAppMessage): WebViewHolder {
+        loadingStarted = timestampProvider.provide().toEpochMilliseconds()
         mInAppMessage = message
 
         return withContext(mainDispatcher) {
@@ -39,7 +51,7 @@ internal class InAppView @JvmOverloads constructor(
                 JS_BRIDGE_NAME
             )
 
-            AndroidWebViewHolder(webView)
+            AndroidWebViewHolder(webView, inAppLoadingMetric())
         }
     }
 }

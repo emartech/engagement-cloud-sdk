@@ -222,16 +222,18 @@ object AndroidInjection {
                 applicationContext,
                 inAppJsBridgeProvider,
                 mainDispatcher = get(named(DispatcherTypes.Main)),
-                WebViewProvider(applicationContext, get(named(DispatcherTypes.Main)))
+                WebViewProvider(applicationContext, get(named(DispatcherTypes.Main))),
+                timestampProvider = get()
             )
         }
         single<InAppPresenterApi> {
             InAppPresenter(
                 currentActivityWatchdog = get(),
                 mainDispatcher = get(named(DispatcherTypes.Main)),
-                sdkDispatcher = get(named(DispatcherTypes.Sdk)),
                 sdkEventDistributor = get(),
-                logger = get { parametersOf(InAppPresenter::class.simpleName) }
+                timestampProvider = get(),
+                logger = get { parametersOf(InAppPresenter::class.simpleName) },
+                applicationScope = get(named(CoroutineScopeTypes.Application))
             )
         }
         single<ClipboardHandlerApi> {

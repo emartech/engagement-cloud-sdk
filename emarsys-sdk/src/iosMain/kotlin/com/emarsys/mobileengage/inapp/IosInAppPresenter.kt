@@ -1,6 +1,7 @@
 package com.emarsys.mobileengage.inapp
 
 import com.emarsys.core.channel.SdkEventDistributorApi
+import com.emarsys.core.log.Logger
 import com.emarsys.mobileengage.inapp.providers.WindowProvider
 import com.emarsys.networking.clients.event.model.SdkEvent
 import kotlinx.coroutines.CoroutineDispatcher
@@ -8,6 +9,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 import platform.UIKit.NSLayoutAttributeHeight
 import platform.UIKit.NSLayoutAttributeLeft
 import platform.UIKit.NSLayoutAttributeTop
@@ -22,8 +25,41 @@ internal class IosInAppPresenter(
     private val windowProvider: WindowProvider,
     private val mainDispatcher: CoroutineDispatcher,
     private val sdkDispatcher: CoroutineDispatcher,
-    private val sdkEventDistributor: SdkEventDistributorApi
+    private val sdkEventDistributor: SdkEventDistributorApi,
+    private val logger: Logger
 ) : InAppPresenterApi {
+    override suspend fun trackMetric(
+        campaignId: String,
+        loadingMetric: InAppLoadingMetric,
+        onScreenTimeStart: Long,
+        onScreenTimeEnd: Long
+    ) {
+        logger.metric(
+            message = "InAppMetric",
+            data = buildJsonObject {
+                put("campaignId", JsonPrimitive(campaignId))
+                put(
+                    "loadingTimeStart",
+                    JsonPrimitive(loadingMetric.loadingStarted)
+                )
+                put(
+                    "loadingTimeEnd",
+                    JsonPrimitive(loadingMetric.loadingEnded)
+                )
+                put(
+                    "loadingTimeDuration",
+                    JsonPrimitive(loadingMetric.loadingEnded - loadingMetric.loadingStarted)
+                )
+                put("onScreenTimeStart", JsonPrimitive(onScreenTimeStart))
+                put("onScreenTimeEnd", JsonPrimitive(onScreenTimeEnd))
+                put(
+                    "onScreenTimeDuration",
+                    JsonPrimitive(onScreenTimeEnd - onScreenTimeStart)
+                )
+            }
+        )
+    }
+
     override suspend fun present(
         inAppView: InAppViewApi,
         webViewHolder: WebViewHolder,

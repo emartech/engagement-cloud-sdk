@@ -3,6 +3,7 @@ package com.emarsys.mobileengage.inapp
 import androidx.test.core.app.ActivityScenario
 import com.emarsys.FakeActivity
 import com.emarsys.core.factory.Factory
+import com.emarsys.core.providers.TimestampProvider
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -26,7 +27,8 @@ class InAppViewProviderTests {
                     it.applicationContext,
                     mockInAppJsBridgeProvider,
                     Dispatchers.Main,
-                    WebViewProvider(it.applicationContext, Dispatchers.Main)
+                    WebViewProvider(it.applicationContext, Dispatchers.Main),
+                    TimestampProvider()
                 )
         }
     }

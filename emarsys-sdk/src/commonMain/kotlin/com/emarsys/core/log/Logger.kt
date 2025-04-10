@@ -18,4 +18,6 @@ interface Logger {
     suspend fun error(message: String, data: JsonObject)
     suspend fun error(message: String, throwable: Throwable)
     suspend fun error(message: String, throwable: Throwable, data: JsonObject)
+
+    suspend fun metric(message: String, data: JsonObject)
 }

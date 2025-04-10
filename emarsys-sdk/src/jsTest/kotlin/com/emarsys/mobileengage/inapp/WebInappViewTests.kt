@@ -1,6 +1,7 @@
 package com.emarsys.mobileengage.inapp
 
 import com.emarsys.core.factory.Factory
+import com.emarsys.core.providers.TimestampProvider
 import com.emarsys.util.JsonUtil
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -34,7 +35,11 @@ class WebInappViewTests {
             sdkDispatcher,
             CAMPAIGN_ID
         )
-        webInappView = WebInAppView(inappScriptExtractor, mockWebInAppJsBridgeFactory)
+        webInappView = WebInAppView(
+            inappScriptExtractor,
+            mockWebInAppJsBridgeFactory,
+            TimestampProvider()
+        )
     }
 
     @Test

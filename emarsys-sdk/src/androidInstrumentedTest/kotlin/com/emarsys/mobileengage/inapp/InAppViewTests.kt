@@ -4,6 +4,7 @@ import android.webkit.WebView
 import androidx.core.view.children
 import com.emarsys.applicationContext
 import com.emarsys.core.factory.Factory
+import com.emarsys.core.providers.TimestampProvider
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -34,7 +35,7 @@ class InAppViewTests {
             Dispatchers.Main,
             WebViewProvider(
                 applicationContext, Dispatchers.Main
-            ), mockJsBridgeProvider
+            ), mockJsBridgeProvider, TimestampProvider()
         )
 
         inAppView.load(InAppMessage(CAMPAIGN_ID, "testHtml"))

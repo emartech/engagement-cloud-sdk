@@ -1,18 +1,54 @@
 package com.emarsys.mobileengage.inapp
 
 import com.emarsys.core.channel.SdkEventDistributorApi
+import com.emarsys.core.log.Logger
 import com.emarsys.networking.clients.event.model.SdkEvent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 import web.dom.document
 import web.html.HTMLElement
 
 class WebInAppPresenter(
     private val sdkEventDistributor: SdkEventDistributorApi,
-    private val sdkDispatcher: CoroutineDispatcher
+    private val sdkDispatcher: CoroutineDispatcher,
+    private val logger: Logger
 ) : InAppPresenterApi {
+    override suspend fun trackMetric(
+        campaignId: String,
+        loadingMetric: InAppLoadingMetric,
+        onScreenTimeStart: Long,
+        onScreenTimeEnd: Long
+    ) {
+        logger.metric(
+            message = "InAppMetric",
+            data = buildJsonObject {
+                put("campaignId", JsonPrimitive(campaignId))
+                put(
+                    "loadingTimeStart",
+                    JsonPrimitive(loadingMetric.loadingStarted)
+                )
+                put(
+                    "loadingTimeEnd",
+                    JsonPrimitive(loadingMetric.loadingEnded)
+                )
+                put(
+                    "loadingTimeDuration",
+                    JsonPrimitive(loadingMetric.loadingEnded - loadingMetric.loadingStarted)
+                )
+                put("onScreenTimeStart", JsonPrimitive(onScreenTimeStart))
+                put("onScreenTimeEnd", JsonPrimitive(onScreenTimeEnd))
+                put(
+                    "onScreenTimeDuration",
+                    JsonPrimitive(onScreenTimeEnd - onScreenTimeStart)
+                )
+            }
+        )
+    }
+
     override suspend fun present(
         view: InAppViewApi,
         webViewHolder: WebViewHolder,
