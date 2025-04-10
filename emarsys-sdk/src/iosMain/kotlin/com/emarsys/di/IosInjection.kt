@@ -151,7 +151,8 @@ object IosInjection {
                 windowProvider = windowProvider,
                 mainDispatcher = get(named(DispatcherTypes.Main)),
                 sdkDispatcher = get(named(DispatcherTypes.Sdk)),
-                sdkEventDistributor = get()
+                sdkEventDistributor = get(),
+                logger = get { parametersOf(IosInAppPresenter::class.simpleName) }
             )
         }
         single<ClipboardHandlerApi> { IosClipboardHandler(UIPasteboard.generalPasteboard) }
