@@ -23,7 +23,7 @@ import kotlin.test.Test
 class ReportingActionTests {
     private companion object {
         const val ID = "testId"
-        const val SID = "testSid"
+        const val TRACKING_INFO = """{"key:"value"}"""
         const val BUTTON_ORIGIN = "button"
         const val TEST_URL = "testUrl"
     }
@@ -37,15 +37,12 @@ class ReportingActionTests {
 
     @Test
     fun testInvoke_shouldSendEventWithProperPayload_whenActionModel_pushButtonClicked() = runTest {
-        val pushButtonClickedActionModel = BasicPushButtonClickedActionModel(ID, SID)
+        val pushButtonClickedActionModel = BasicPushButtonClickedActionModel(ID, TRACKING_INFO)
         val action = ReportingAction(pushButtonClickedActionModel, mockSdkEventDistributor)
         val expectedEvent = SdkEvent.Internal.Push.Clicked(
             attributes = buildJsonObject {
                 put(
                     "buttonId", JsonPrimitive((ID))
-                )
-                put(
-                    "sid", JsonPrimitive(SID)
                 )
                 put(
                     "origin", JsonPrimitive(BUTTON_ORIGIN)
@@ -64,15 +61,12 @@ class ReportingActionTests {
 
     @Test
     fun testInvoke_shouldSendEventWithProperPayload_whenActionModel_inAppButtonClicked() = runTest {
-        val inAppButtonClickedActionModel = BasicInAppButtonClickedActionModel(ID, SID, TEST_URL)
+        val inAppButtonClickedActionModel = BasicInAppButtonClickedActionModel(ID, TRACKING_INFO, TEST_URL)
         val action = ReportingAction(inAppButtonClickedActionModel, mockSdkEventDistributor)
         val expectedEvent = SdkEvent.Internal.InApp.ButtonClicked(
             attributes = buildJsonObject {
                 put(
                     "buttonId", JsonPrimitive((ID))
-                )
-                put(
-                    "sid", JsonPrimitive(SID)
                 )
                 put(
                     "url", JsonPrimitive(TEST_URL)
@@ -92,15 +86,12 @@ class ReportingActionTests {
     @Test
     fun testInvoke_shouldSendEventWithProperPayload_whenActionModel_inAppButtonClicked_noSidAndUrl() =
         runTest {
-            val inAppButtonClickedActionModel = BasicInAppButtonClickedActionModel(ID, SID)
+            val inAppButtonClickedActionModel = BasicInAppButtonClickedActionModel(ID, TRACKING_INFO)
             val action = ReportingAction(inAppButtonClickedActionModel, mockSdkEventDistributor)
             val expectedEvent = SdkEvent.Internal.InApp.ButtonClicked(
                 attributes = buildJsonObject {
                     put(
                         "buttonId", JsonPrimitive((ID))
-                    )
-                    put(
-                        "sid", JsonPrimitive(SID)
                     )
                 }
             )
@@ -117,13 +108,10 @@ class ReportingActionTests {
     @Test
     fun testInvoke_shouldSendEventWithProperPayload_whenActionModel_isNotificationOpenedActionModel() =
         runTest {
-            val notificationOpenedActionModel = NotificationOpenedActionModel(SID)
+            val notificationOpenedActionModel = NotificationOpenedActionModel(TRACKING_INFO)
             val action = ReportingAction(notificationOpenedActionModel, mockSdkEventDistributor)
             val expectedEvent = SdkEvent.Internal.Push.Clicked(
                 attributes = buildJsonObject {
-                    put(
-                        "sid", JsonPrimitive(SID)
-                    )
                     put(
                         "origin", JsonPrimitive("main")
                     )

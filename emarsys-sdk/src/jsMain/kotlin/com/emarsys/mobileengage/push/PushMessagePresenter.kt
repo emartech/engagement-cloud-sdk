@@ -18,7 +18,7 @@ open class PushMessagePresenter(private val webPushNotificationPresenter: WebPus
                 body = it.body
                 icon = it.iconUrlString
                 badge = it.imageUrlString
-                tag = pushMessage.campaignId
+                tag = pushMessage.trackingInfo
             }
 
             pushMessage.actionableData?.actions?.let {

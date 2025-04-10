@@ -17,12 +17,12 @@ data class ReportingAction(
 ) : Action<Unit> {
     override suspend fun invoke(value: Unit?) {
         when (action) {
+            //TODO: follow up reporting changes
             is BasicPushButtonClickedActionModel -> {
                 sdkEventDistributor.registerAndStoreEvent(
                     SdkEvent.Internal.Push.Clicked(
                         attributes = buildJsonObject {
                             put("buttonId", JsonPrimitive(action.id))
-                            put("sid", JsonPrimitive(action.sid))
                             put("origin", JsonPrimitive(BUTTON_CLICK_ORIGIN))
                         }
                     )
@@ -34,7 +34,8 @@ data class ReportingAction(
                     "buttonId" to action.id
                 )
 
-                action.sid?.let { attributes["sid"] = it }
+                //TODO: follow up reporting changes
+//                action.sid?.let { attributes["sid"] = it }
                 action.url?.let { attributes["url"] = it }
 
                 sdkEventDistributor.registerAndStoreEvent(
@@ -53,7 +54,8 @@ data class ReportingAction(
                     "origin" to "main"
                 )
 
-                action.sid?.let { attributes["sid"] = it }
+                //TODO: follow up reporting changes
+//                action.sid?.let { attributes["sid"] = it }
 
                 sdkEventDistributor.registerAndStoreEvent(
                     SdkEvent.Internal.Push.Clicked(

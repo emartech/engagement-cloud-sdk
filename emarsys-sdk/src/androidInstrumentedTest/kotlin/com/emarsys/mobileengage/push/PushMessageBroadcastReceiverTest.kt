@@ -46,15 +46,12 @@ class PushMessageBroadcastReceiverTest : KoinTest {
         const val BODY = "testBody"
         const val COLLAPSE_ID = "testCollapseId"
         const val CHANNEL_ID = "testChannelId"
-        const val SID = "testSid"
-        const val CAMPAIGN_ID = "testCampaignId"
+        const val TRACKING_INFO = """{"trackingInfoKey":"trackingInfoValue"}"""
         val PUSH_MESSAGE_STRING = """{
         "messageId":"testMessageId",
         "title": "testTitle",
         "body": "testBody",
         "data":{
-            "sid":"$SID",
-            "campaignId":"$CAMPAIGN_ID",
             "platformData":{
                 "channelId":"$CHANNEL_ID",
                 "notificationMethod":{
@@ -69,8 +66,6 @@ class PushMessageBroadcastReceiverTest : KoinTest {
         "messageId":"testMessageId",
         "data":{
             "silent":true,
-            "sid":"$SID",
-            "campaignId":"$CAMPAIGN_ID",
             "platformData":{
                 "channelId":"$CHANNEL_ID",
                 "notificationMethod":{
@@ -86,16 +81,14 @@ class PushMessageBroadcastReceiverTest : KoinTest {
         }""".trimIndent()
         val tesMethod = NotificationMethod(COLLAPSE_ID, INIT)
         val expectedPushMessage = AndroidPushMessage(
-            SID,
-            CAMPAIGN_ID,
+            TRACKING_INFO,
             AndroidPlatformData(CHANNEL_ID, tesMethod),
             null,
             DisplayableData(TITLE, BODY),
             null
         )
         val expectedSilentPushMessage = SilentAndroidPushMessage(
-            SID,
-            CAMPAIGN_ID,
+            TRACKING_INFO,
             AndroidPlatformData(CHANNEL_ID, tesMethod),
             BadgeCount(BadgeCountMethod.ADD, 1),
             actionableData = ActionableData()

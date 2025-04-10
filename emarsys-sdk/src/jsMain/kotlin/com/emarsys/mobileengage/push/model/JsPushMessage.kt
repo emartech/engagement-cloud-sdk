@@ -11,8 +11,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class JsPushMessage(
-    override val sid: String,
-    override val campaignId: String,
+    override val trackingInfo: String,
     override val platformData: JsPlatformData,
     override val badgeCount: BadgeCount?,
     override val actionableData: ActionableData<PresentableActionModel>?,

@@ -175,21 +175,20 @@ class NotificationCompatStylerTest {
         iconUrlString: String? = null,
         imageUrlString: String? = null
     ) = AndroidPushMessage(
-        sid = "sid",
-        campaignId = "campaignId",
+        trackingInfo = """{"trackingInfoKey":"trackingInfoValue"}""",
         platformData = AndroidPlatformData(
             channelId = CHANNEL_ID,
             notificationMethod = NotificationMethod("collapseId", NotificationOperation.INIT),
             style = style
         ),
+        badgeCount = null,
         displayableData = DisplayableData(
             title = "title",
             body = "body",
             iconUrlString = iconUrlString,
             imageUrlString = imageUrlString
         ),
-        actionableData = null,
-        badgeCount = null
+        actionableData = null
     )
 
     private fun mockImageDownload(urlString: String): Bitmap {

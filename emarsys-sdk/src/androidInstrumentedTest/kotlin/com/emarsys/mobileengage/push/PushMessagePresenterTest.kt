@@ -40,14 +40,12 @@ import org.junit.Test
 class PushMessagePresenterTest {
     private companion object {
         const val COLLAPSE_ID = "testCollapseId"
+        const val TRACKING_INFO = """{"trackingInfoKey":"trackingInfoValue"}"""
         const val ICON_ID = 10
         const val CHANNEL_ID = "testChannelId"
-        const val MESSAGE_ID = "testMessageId"
         const val DEBUG_CHANNEL_ID = "ems_debug"
         const val TITLE = "testTitle"
         const val BODY = "testBody"
-        const val SID = "testSid"
-        const val CAMPAIGN_ID = "testCampaignId"
         val testCustomEventAction =
             PresentableCustomEventActionModel(
                 "customEventId",
@@ -370,8 +368,7 @@ class PushMessagePresenterTest {
     ): AndroidPushMessage {
         val testMethod = NotificationMethod(COLLAPSE_ID, NotificationOperation.INIT)
         return AndroidPushMessage(
-            SID,
-            CAMPAIGN_ID,
+            TRACKING_INFO,
             AndroidPlatformData(CHANNEL_ID, testMethod),
             badgeCount,
             DisplayableData(TITLE, BODY, iconUrlString, imageUrlString),

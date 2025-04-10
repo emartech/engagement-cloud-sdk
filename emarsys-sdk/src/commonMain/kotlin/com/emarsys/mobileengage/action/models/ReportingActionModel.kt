@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 interface ReportingActionModel
 
 interface PushButtonClickedActionModel: ReportingActionModel {
-    val sid: String
+    val trackingInfo: String
 }
 
 interface InAppButtonClickedActionModel: ReportingActionModel {
@@ -18,7 +18,7 @@ interface InAppButtonClickedActionModel: ReportingActionModel {
 @SerialName("pushButtonClicked")
 data class BasicPushButtonClickedActionModel(
     val id: String,
-    override val sid: String
+    override val trackingInfo: String
 ): BasicActionModel(), PushButtonClickedActionModel
 
 @Serializable
@@ -32,5 +32,5 @@ data class BasicInAppButtonClickedActionModel(
 @Serializable
 @SerialName("notificationOpened")
 data class NotificationOpenedActionModel(
-    val sid: String? = null
+    val trackingInfo: String
 ): BasicActionModel(), ReportingActionModel

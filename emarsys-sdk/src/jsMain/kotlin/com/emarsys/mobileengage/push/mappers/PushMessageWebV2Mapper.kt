@@ -11,7 +11,7 @@ import com.emarsys.mobileengage.push.model.JsPushMessage
 import com.emarsys.mobileengage.push.model.v1.RemoteWebPushMessageV2
 import kotlinx.serialization.json.Json
 
-class PushMessageWebV1Mapper(
+class PushMessageWebV2Mapper(
     private val json: Json,
     private val logger: Logger
 ) : Mapper<String, JsPushMessage> {
@@ -23,24 +23,26 @@ class PushMessageWebV1Mapper(
             val defaultTapAction = remoteMessage.notification.defaultAction
             val actions: List<PresentableActionModel>? = remoteMessage.notification.actions
             val pushToInApp: PushToInApp? = null
-            val actionableData = if (actions != null || defaultTapAction != null || pushToInApp != null) {
-                ActionableData(
-                    actions = actions,
-                    defaultTapAction = defaultTapAction,
-                    pushToInApp = pushToInApp
-                )
-            } else null
+            val actionableData =
+                if (actions != null || defaultTapAction != null || pushToInApp != null) {
+                    ActionableData(
+                        actions = actions,
+                        defaultTapAction = defaultTapAction,
+                        pushToInApp = pushToInApp
+                    )
+                } else null
 
             return JsPushMessage(
-                remoteMessage.ems.sid,
-                remoteMessage.ems.campaignId,
-                JsPlatformData(remoteMessage.ems.applicationCode),
+                remoteMessage.ems.trackingInfo,
+                JsPlatformData,
                 remoteMessage.notification.badgeCount,
-                actionableData = actionableData,
-                DisplayableData(remoteMessage.notification.title,
+                actionableData,
+                DisplayableData(
+                    remoteMessage.notification.title,
                     remoteMessage.notification.body,
                     iconUrlString = remoteMessage.notification.icon,
-                    imageUrlString = remoteMessage.notification.imageUrl)
+                    imageUrlString = remoteMessage.notification.imageUrl
+                )
             )
         } catch (exception: Exception) {
             logger.error("WebPushMessageV1Mapper", exception)

@@ -27,12 +27,7 @@ data class RemoteWebPushNotificationV2(
 @Serializable
 data class EmsPushData(
     val version: String,
-    val id: String,
-    val applicationCode: String,
-    val campaignId: String,
-    val productId: String,
-    val multiChannelId: String,
-    val sid: String,
-    val treatments: JsonObject,
-    val rootParams: JsonObject? = null
+    val trackingInfo: String,
+    val rootParams: JsonObject? = null,
+    val customData: JsonObject? = null
 )

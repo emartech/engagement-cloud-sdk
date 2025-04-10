@@ -11,7 +11,6 @@ import com.emarsys.mobileengage.push.model.SilentAndroidPushMessage
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
 class SilentAndroidPushV2Mapper(
@@ -28,16 +27,15 @@ class SilentAndroidPushV2Mapper(
         private const val ACTIONS = "notification.actions"
         private const val BADGE_COUNT = "notification.badgeCount"
         private const val EMS = "ems"
+        private const val TRACKING_INFO = "trackingInfo"
     }
 
     override suspend fun map(from: JsonObject): SilentAndroidPushMessage? {
         return try {
             val ems: JsonObject = from.getValue(EMS).jsonPrimitive.content.fromString(json)!!
-            val treatments: JsonObject? = ems["treatments"]?.jsonObject
 
             SilentAndroidPushMessage(
-                sid = treatments?.getValue("sid")?.jsonPrimitive?.content ?: "",
-                campaignId = ems.getValue("campaignId").jsonPrimitive.content,
+                trackingInfo = ems.getValue(TRACKING_INFO).jsonPrimitive.content,
                 platformData = AndroidPlatformData(
                     channelId = from[CHANNEL_ID]?.jsonPrimitive?.contentOrNull
                         ?: DEFAULT_CHANNEL_ID,

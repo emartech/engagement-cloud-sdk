@@ -15,8 +15,7 @@ sealed class AndroidPush: PushMessage<AndroidPlatformData>
 
 @Serializable
 data class AndroidPushMessage(
-    override val sid: String,
-    override val campaignId: String,
+    override val trackingInfo: String,
     override val platformData: AndroidPlatformData,
     override val badgeCount: BadgeCount? = null,
     override val displayableData: DisplayableData,
@@ -25,8 +24,7 @@ data class AndroidPushMessage(
 
 @Serializable
 data class SilentAndroidPushMessage(
-    override val sid: String,
-    override val campaignId: String,
+    override val trackingInfo: String,
     override val platformData: AndroidPlatformData,
     override val badgeCount: BadgeCount?,
     override val actionableData: ActionableData<BasicActionModel>?

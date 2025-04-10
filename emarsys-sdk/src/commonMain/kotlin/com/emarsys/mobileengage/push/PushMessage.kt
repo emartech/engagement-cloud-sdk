@@ -9,8 +9,7 @@ import kotlinx.serialization.Serializable
 interface PlatformData
 
 interface PushMessage<T : PlatformData> {
-    val sid: String
-    val campaignId: String
+    val trackingInfo: String
     val platformData: T
     val badgeCount: BadgeCount?
 }

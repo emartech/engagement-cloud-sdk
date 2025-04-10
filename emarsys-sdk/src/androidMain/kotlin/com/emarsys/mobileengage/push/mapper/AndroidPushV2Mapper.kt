@@ -35,20 +35,15 @@ internal class AndroidPushV2Mapper(
         private const val COLLAPSE_ID = "notification.collapseId"
         private const val OPERATION = "notification.operation"
         private const val DEFAULT_ACTION = "notification.defaultAction"
-        private const val TREATMENTS = "ems.treatments"
         private const val ACTIONS = "notification.actions"
         private const val IN_APP = "notification.inapp"
         private const val BADGE_COUNT = "notification.badgeCount"
-        private const val SID_KEY = "sid"
-        private const val CAMPAIGN_ID_KEY = "campaignId"
-        private const val MISSING_CAMPAIGN_ID = "missingCampaignId"
-        private const val MISSING_SID = "missingSID"
+        private const val TRACKING_INFO = "ems.trackingInfo"
     }
 
     override suspend fun map(from: JsonObject): AndroidPushMessage? {
         return try {
-            val treatments: JsonObject? =
-                from[TREATMENTS]?.jsonPrimitive?.contentOrNull.fromString(json)
+            val trackingInfo: String = from[TRACKING_INFO]?.jsonPrimitive?.content ?: "{}"
             val defaultTapAction: BasicActionModel? =
                 from[DEFAULT_ACTION]?.jsonPrimitive?.contentOrNull.fromString(json)
             val actions: List<PresentableActionModel>? =
@@ -64,12 +59,7 @@ internal class AndroidPushV2Mapper(
                 )
 
             AndroidPushMessage(
-                sid = extractStringWithFallback(treatments, SID_KEY, MISSING_SID),
-                campaignId = extractStringWithFallback(
-                    treatments,
-                    CAMPAIGN_ID_KEY,
-                    MISSING_CAMPAIGN_ID
-                ),
+                trackingInfo = trackingInfo,
                 platformData = AndroidPlatformData(
                     channelId = from[CHANNEL_ID]?.jsonPrimitive?.contentOrNull
                         ?: DEFAULT_CHANNEL_ID,
@@ -100,23 +90,6 @@ internal class AndroidPushV2Mapper(
         } catch (e: Exception) {
             logger.error("push mapping failed", e)
             null
-        }
-    }
-
-    private suspend fun extractStringWithFallback(
-        from: JsonObject?,
-        key: String,
-        fallback: String
-    ): String {
-        val result = from?.get(key)?.jsonPrimitive?.contentOrNull
-        return if (result != null) {
-            result
-        } else {
-            logger.error(
-                "Failed to extract $key from push message",
-                Exception("Missing key: $key")
-            )
-            fallback
         }
     }
 }

@@ -71,6 +71,7 @@ object InitInjection {
                     get(named(EventBasedClientTypes.Contact)),
                     get(named(EventBasedClientTypes.Event)),
                     get(named(EventBasedClientTypes.Push)),
+                    get(named(EventBasedClientTypes.RemoteConfig)),
                     get(named(EventBasedClientTypes.Logging)),
                 ),
             )

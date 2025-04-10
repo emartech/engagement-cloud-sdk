@@ -24,7 +24,6 @@ import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import org.junit.Before
 import org.junit.Test
@@ -34,8 +33,7 @@ class PushMessageHandlerTest {
     private companion object {
         const val COLLAPSE_ID = "testCollapseId"
         const val CHANNEL_ID = "testChannelId"
-        const val SID = "testSid"
-        const val CAMPAIGN_ID = "testCampaignId"
+        const val TRACKING_INFO = """{"trackingInfoKey":"trackingInfoValue"}"""
 
         val testOpenExternalUrlBasicAction =
             BasicOpenExternalUrlActionModel(
@@ -105,7 +103,9 @@ class PushMessageHandlerTest {
             mockSdkEventDistributor.registerAndStoreEvent(
                 SdkEvent.External.Api.SilentPush(
                     name = PUSH_RECEIVED_EVENT_NAME,
-                    attributes = buildJsonObject { put("campaignId", JsonPrimitive(CAMPAIGN_ID)) })
+                    attributes = buildJsonObject {
+//                        put("campaignId", JsonPrimitive(CAMPAIGN_ID))
+                    })
             )
         }
     }
@@ -116,8 +116,7 @@ class PushMessageHandlerTest {
     ): SilentAndroidPushMessage {
         val tesMethod = NotificationMethod(COLLAPSE_ID, INIT)
         return SilentAndroidPushMessage(
-            SID,
-            CAMPAIGN_ID,
+            TRACKING_INFO,
             AndroidPlatformData(CHANNEL_ID, tesMethod),
             badgeCount,
             ActionableData(

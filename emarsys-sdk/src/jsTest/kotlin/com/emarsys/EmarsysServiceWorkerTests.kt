@@ -39,7 +39,6 @@ class EmarsysServiceWorkerTests {
     }
 
     private lateinit var mockPushMessagePresenter: PushMessagePresenter
-    private lateinit var mockPushMessageMapper: Mapper<String, JsPushMessage>
     private lateinit var mockPushMessageWebV1Mapper: Mapper<String, JsPushMessage>
     private lateinit var mockJson: StringFormat
     private lateinit var onBadgeCountUpdateReceivedBroadcastChannel: BroadcastChannel
@@ -58,7 +57,6 @@ class EmarsysServiceWorkerTests {
             } returns Unit
         }
         mockPushMessagePresenter = mock()
-        mockPushMessageMapper = mock()
         mockJson = mock()
 
         mockPushMessageWebV1Mapper = mock()
@@ -67,7 +65,6 @@ class EmarsysServiceWorkerTests {
 
         emarsysServiceWorker = EmarsysServiceWorker(
             mockPushMessagePresenter,
-            mockPushMessageMapper,
             mockPushMessageWebV1Mapper,
             onBadgeCountUpdateReceivedBroadcastChannel,
             mockJson,
@@ -79,7 +76,6 @@ class EmarsysServiceWorkerTests {
     @Test
     fun onPush_shouldReturnNullAndNotCallPresent_whenPushMessageIsInvalid() = runTest {
         val invalidPushMessage = "invalidPushMessage"
-        everySuspend { mockPushMessageMapper.map(invalidPushMessage) } returns null
         everySuspend { mockPushMessageWebV1Mapper.map(invalidPushMessage) } returns null
 
         val result = emarsysServiceWorker.onPush(invalidPushMessage).await()
@@ -91,23 +87,8 @@ class EmarsysServiceWorkerTests {
     }
 
     @Test
-    fun onPush_shouldCallPresent_whenPushMessageIsValid_forPushMessageMapper() = runTest {
-        val testJsPushMessage = getJsPushMessage()
-        everySuspend { mockPushMessageMapper.map(TEST_PUSH_MESSAGE_STRING) } returns testJsPushMessage
-        everySuspend { mockPushMessageWebV1Mapper.map(TEST_PUSH_MESSAGE_STRING) } returns null
-        everySuspend { mockPushMessagePresenter.present(any()) } returns Unit
-
-        emarsysServiceWorker.onPush(TEST_PUSH_MESSAGE_STRING).await()
-
-        verifySuspend(VerifyMode.exactly(1)) {
-            mockPushMessagePresenter.present(testJsPushMessage)
-        }
-    }
-
-    @Test
     fun onPush_shouldCallPresent_whenPushMessageIsValid_forPushMessageWebV1Mapper() = runTest {
         val testJsPushMessage = getJsPushMessage()
-        everySuspend { mockPushMessageMapper.map(TEST_PUSH_MESSAGE_STRING) } returns null
         everySuspend { mockPushMessageWebV1Mapper.map(TEST_PUSH_MESSAGE_STRING) } returns testJsPushMessage
         everySuspend { mockPushMessagePresenter.present(any()) } returns Unit
 
@@ -123,8 +104,7 @@ class EmarsysServiceWorkerTests {
         runTest {
             val testBadgeCount = BadgeCount(BadgeCountMethod.ADD, 1)
             val testJsPushMessage = getJsPushMessage(testBadgeCount)
-            everySuspend { mockPushMessageMapper.map(TEST_PUSH_MESSAGE_STRING) } returns testJsPushMessage
-            everySuspend { mockPushMessageWebV1Mapper.map(TEST_PUSH_MESSAGE_STRING) } returns null
+            everySuspend { mockPushMessageWebV1Mapper.map(TEST_PUSH_MESSAGE_STRING) } returns testJsPushMessage
             everySuspend { mockPushMessagePresenter.present(any()) } returns Unit
             everySuspend { mockJson.serializersModule } returns JsonUtil.json.serializersModule
             everySuspend {
@@ -143,9 +123,8 @@ class EmarsysServiceWorkerTests {
         }
 
     private fun getJsPushMessage(badgeCount: BadgeCount? = null) = JsPushMessage(
-        sid = "sid",
-        campaignId = "campaignId",
-        platformData = JsPlatformData("applicationCode"),
+        trackingInfo = """{"trackingInfoKey":"trackingInfoValue"}""",
+        platformData = JsPlatformData,
         badgeCount = badgeCount,
         actionableData = null,
         displayableData = DisplayableData(

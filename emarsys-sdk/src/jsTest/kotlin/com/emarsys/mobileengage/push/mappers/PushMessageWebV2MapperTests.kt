@@ -23,33 +23,29 @@ import kotlinx.serialization.json.putJsonObject
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class PushMessageWebV1MapperTests {
+class PushMessageWebV2MapperTests {
     private companion object {
         const val ACTION_NAME = "testActionName"
         const val TITLE = "Title"
         const val BODY = "TestMessage"
-        const val ID = "testId"
-        const val SID = "testSid"
-        const val APPLICATION_CODE = "testAppCode"
-        const val CAMPAIGN_ID = "testCampaignId"
-        const val PRODUCT_ID = "testProductId"
         const val DEFAULT_ACTION_NAME = "testDefaultActionName"
         const val ACTION_ID = "testActionId"
         const val ICON = "https://trunk-int.s.emarsys.com/custloads/218524530/md_100008588.png"
         const val IMAGE = "https://trunk-int.s.emarsys.com/custloads/218524530/md_100008589.png"
         const val ACTION_TITLE = "actionTitle"
         const val BADGE_VALUE = 10
+        const val TRACKING_INFO = """{"key":"value"}"""
     }
 
     private lateinit var json: Json
     private lateinit var logger: Logger
-    private lateinit var pushMessageWebV1Mapper: PushMessageWebV1Mapper
+    private lateinit var pushMessageWebV2Mapper: PushMessageWebV2Mapper
 
     @BeforeTest
     fun setUp() = runTest {
         json = JsonUtil.json
         logger = mock(MockMode.autofill)
-        pushMessageWebV1Mapper = PushMessageWebV1Mapper(json, logger)
+        pushMessageWebV2Mapper = PushMessageWebV2Mapper(json, logger)
     }
 
 
@@ -88,18 +84,15 @@ class PushMessageWebV1MapperTests {
         }
 
         val ems = buildJsonObject {
-            put("version", "WEB_V1")
-            put("id", ID)
-            put("applicationCode", APPLICATION_CODE)
-            put("campaignId", CAMPAIGN_ID)
-            put("productId", PRODUCT_ID)
-            put("multiChannelId", "testMultiChannelId")
-            put("sid", SID)
-            putJsonObject("treatments") {
+            put("version", "WEB_V2")
+            put("trackingInfo", buildJsonObject {
                 put("key", "value")
-            }
+            }.toString())
             putJsonObject("rootParams") {
                 put("rootKey", "rootValue")
+            }
+            putJsonObject("customData") {
+                put("customKey", "customValue")
             }
         }
 
@@ -109,9 +102,8 @@ class PushMessageWebV1MapperTests {
         }
 
         val expectedMessage = JsPushMessage(
-            sid = SID,
-            campaignId = CAMPAIGN_ID,
-            platformData = JsPlatformData(APPLICATION_CODE),
+            TRACKING_INFO,
+            platformData = JsPlatformData,
             badgeCount = BadgeCount(BadgeCountMethod.ADD, BADGE_VALUE),
             actionableData = ActionableData(
                 defaultTapAction = BasicCustomEventActionModel(
@@ -135,7 +127,7 @@ class PushMessageWebV1MapperTests {
             )
         )
 
-        val result = pushMessageWebV1Mapper.map(testMessage.toString())
+        val result = pushMessageWebV2Mapper.map(testMessage.toString())
 
         result shouldBe expectedMessage
     }
@@ -145,6 +137,6 @@ class PushMessageWebV1MapperTests {
     fun map_shouldReturnNull_whenRemoteMessage_canNotBeDecoded() = runTest {
         val testMessage = "this cannot be decoded"
 
-        pushMessageWebV1Mapper.map(testMessage) shouldBe null
+        pushMessageWebV2Mapper.map(testMessage) shouldBe null
     }
 }

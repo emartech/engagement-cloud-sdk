@@ -1,8 +1,6 @@
 package com.emarsys.mobileengage.push
 
-import com.emarsys.mobileengage.push.mapper.AndroidPushV1Mapper
 import com.emarsys.mobileengage.push.mapper.AndroidPushV2Mapper
-import com.emarsys.mobileengage.push.mapper.SilentAndroidPushV1Mapper
 import com.emarsys.mobileengage.push.mapper.SilentAndroidPushV2Mapper
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -17,8 +15,6 @@ import org.junit.Test
 
 class AndroidPushMessageFactoryTest {
 
-    private lateinit var mockV1Mapper: AndroidPushV1Mapper
-    private lateinit var mockSilentV1Mapper: SilentAndroidPushV1Mapper
     private lateinit var mockV2Mapper: AndroidPushV2Mapper
     private lateinit var mockSilentV2Mapper: SilentAndroidPushV2Mapper
 
@@ -26,17 +22,15 @@ class AndroidPushMessageFactoryTest {
 
     @Before
     fun setup() = runTest {
-        mockV1Mapper = mockk(relaxed = true)
-        mockSilentV1Mapper = mockk(relaxed = true)
         mockV2Mapper = mockk(relaxed = true)
         mockSilentV2Mapper = mockk(relaxed = true)
 
-        factory = AndroidPushMessageFactory(mockV1Mapper, mockSilentV1Mapper, mockV2Mapper, mockSilentV2Mapper)
+        factory = AndroidPushMessageFactory(mockV2Mapper, mockSilentV2Mapper)
     }
 
     @Test
     fun map_shouldReturnNull() = runTest {
-        coEvery { mockV1Mapper.map(any()) } returns null
+        coEvery { mockV2Mapper.map(any()) } returns null
 
         val input = buildJsonObject {
             put("noNecessaryKeys4U", JsonPrimitive("NO"))
@@ -45,32 +39,6 @@ class AndroidPushMessageFactoryTest {
         val result = factory.create(input)
 
         result shouldBe null
-    }
-
-    @Test
-    fun map_shouldDelegate_toSilentMapperV1() = runTest {
-        val input = buildJsonObject {
-            put("ems.silent", JsonPrimitive("true"))
-        }
-
-        val result = factory.create(input)
-
-        result shouldNotBe null
-
-        coVerify { mockSilentV1Mapper.map(any()) }
-    }
-
-    @Test
-    fun map_shouldDelegate_toMapperV1() = runTest {
-        val input = buildJsonObject {
-            put("ems.silent", JsonPrimitive("false"))
-        }
-
-        val result = factory.create(input)
-
-        result shouldNotBe null
-
-        coVerify { mockV1Mapper.map(any()) }
     }
 
     @Test

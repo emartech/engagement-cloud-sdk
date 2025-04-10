@@ -33,6 +33,9 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class PushNotificationClickHandlerTests {
+    private companion object {
+        const val TRACKING_INFO = """{"trackingInfoKey":"trackingInfoValue"}"""
+    }
 
     private lateinit var mockActionFactory: PushActionFactoryApi
     private lateinit var mockAction: Action<*>
@@ -80,50 +83,58 @@ class PushNotificationClickHandlerTests {
         }
 
     @Test
-    fun handleNotificationClick_shouldHandleDefaultTapAction_andNotHandlePushButtonClickedAction_whenDefaultTapAction_isPresent() = runTest {
-        val defaultTapActionModel = BasicOpenExternalUrlActionModel("https://www.google.com")
-        val notificationClickedData =
-            createTestJsNotificationClickedData("", defaultTapActionModel = defaultTapActionModel)
-        val event =
-            JsonUtil.json.encodeToString<JsNotificationClickedData>(notificationClickedData)
-        val notificationOpenedActionModel = NotificationOpenedActionModel("sid")
-        val expectedReportingAction = ReportingAction(notificationOpenedActionModel, mock())
-        everySuspend { mockActionFactory.create(defaultTapActionModel) } returns mockDefaultTapAction
-        everySuspend { mockActionFactory.create(notificationOpenedActionModel) } returns expectedReportingAction
+    fun handleNotificationClick_shouldHandleDefaultTapAction_andNotHandlePushButtonClickedAction_whenDefaultTapAction_isPresent() =
+        runTest {
+            val defaultTapActionModel = BasicOpenExternalUrlActionModel("https://www.google.com")
+            val notificationClickedData =
+                createTestJsNotificationClickedData(
+                    "",
+                    defaultTapActionModel = defaultTapActionModel
+                )
+            val event =
+                JsonUtil.json.encodeToString<JsNotificationClickedData>(notificationClickedData)
+            val notificationOpenedActionModel = NotificationOpenedActionModel(TRACKING_INFO)
+            val expectedReportingAction = ReportingAction(notificationOpenedActionModel, mock())
+            everySuspend { mockActionFactory.create(defaultTapActionModel) } returns mockDefaultTapAction
+            everySuspend { mockActionFactory.create(notificationOpenedActionModel) } returns expectedReportingAction
 
-        pushNotificationClickHandler.handleNotificationClick(event)
+            pushNotificationClickHandler.handleNotificationClick(event)
 
-        verifySuspend { mockActionFactory.create(defaultTapActionModel) }
-        verifySuspend {
-            mockActionHandler.handleActions(
-                listOf(expectedReportingAction),
-                mockDefaultTapAction
-            )
+            verifySuspend { mockActionFactory.create(defaultTapActionModel) }
+            verifySuspend {
+                mockActionHandler.handleActions(
+                    listOf(expectedReportingAction),
+                    mockDefaultTapAction
+                )
+            }
         }
-    }
 
     @Test
-    fun handleNotificationClick_shouldAddReportingAction_forNotificationOpened_whenDefaultTapAction_wasTriggering() = runTest {
-        val defaultTapActionModel = BasicOpenExternalUrlActionModel("https://www.google.com")
-        val notificationClickedData =
-            createTestJsNotificationClickedData("", defaultTapActionModel = defaultTapActionModel)
-        val event =
-            JsonUtil.json.encodeToString<JsNotificationClickedData>(notificationClickedData)
-        val notificationOpenedActionModel = NotificationOpenedActionModel("sid")
-        val expectedReportingAction = ReportingAction(notificationOpenedActionModel, mock())
-        everySuspend { mockActionFactory.create(defaultTapActionModel) } returns mockDefaultTapAction
-        everySuspend { mockActionFactory.create(notificationOpenedActionModel) } returns expectedReportingAction
+    fun handleNotificationClick_shouldAddReportingAction_forNotificationOpened_whenDefaultTapAction_wasTriggering() =
+        runTest {
+            val defaultTapActionModel = BasicOpenExternalUrlActionModel("https://www.google.com")
+            val notificationClickedData =
+                createTestJsNotificationClickedData(
+                    "",
+                    defaultTapActionModel = defaultTapActionModel
+                )
+            val event =
+                JsonUtil.json.encodeToString<JsNotificationClickedData>(notificationClickedData)
+            val notificationOpenedActionModel = NotificationOpenedActionModel(TRACKING_INFO)
+            val expectedReportingAction = ReportingAction(notificationOpenedActionModel, mock())
+            everySuspend { mockActionFactory.create(defaultTapActionModel) } returns mockDefaultTapAction
+            everySuspend { mockActionFactory.create(notificationOpenedActionModel) } returns expectedReportingAction
 
-        pushNotificationClickHandler.handleNotificationClick(event)
+            pushNotificationClickHandler.handleNotificationClick(event)
 
-        verifySuspend { mockActionFactory.create(defaultTapActionModel) }
-        verifySuspend {
-            mockActionHandler.handleActions(
-                listOf(expectedReportingAction),
-                mockDefaultTapAction
-            )
+            verifySuspend { mockActionFactory.create(defaultTapActionModel) }
+            verifySuspend {
+                mockActionHandler.handleActions(
+                    listOf(expectedReportingAction),
+                    mockDefaultTapAction
+                )
+            }
         }
-    }
 
     @Test
     fun handleNotificationClick_shouldHandleActionAndMandatoryAction_whenActionWithId_isPresent() =
@@ -140,7 +151,7 @@ class PushNotificationClickHandlerTests {
                 mockActionFactory.create(
                     BasicPushButtonClickedActionModel(
                         actionId,
-                        notificationClickedData.jsPushMessage.sid
+                        notificationClickedData.jsPushMessage.trackingInfo
                     )
                 )
             } returns mockButtonClickedAction
@@ -233,9 +244,8 @@ class PushNotificationClickHandlerTests {
         JsNotificationClickedData(
             actionId = actionId,
             jsPushMessage = JsPushMessage(
-                sid = "sid",
-                campaignId = "campaignId",
-                platformData = JsPlatformData("applicationCode"),
+                trackingInfo = TRACKING_INFO,
+                platformData = JsPlatformData,
                 badgeCount = null,
                 actionableData = ActionableData(
                     actions = actionModels,

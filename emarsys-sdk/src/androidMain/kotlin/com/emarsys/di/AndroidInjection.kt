@@ -54,9 +54,7 @@ import com.emarsys.mobileengage.push.NotificationCompatStyler
 import com.emarsys.mobileengage.push.NotificationIntentProcessor
 import com.emarsys.mobileengage.push.PushMessagePresenter
 import com.emarsys.mobileengage.push.SilentPushMessageHandler
-import com.emarsys.mobileengage.push.mapper.AndroidPushV1Mapper
 import com.emarsys.mobileengage.push.mapper.AndroidPushV2Mapper
-import com.emarsys.mobileengage.push.mapper.SilentAndroidPushV1Mapper
 import com.emarsys.mobileengage.push.mapper.SilentAndroidPushV2Mapper
 import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
 import com.emarsys.mobileengage.url.AndroidExternalUrlOpener
@@ -161,24 +159,11 @@ object AndroidInjection {
                 sdkLogger = get { parametersOf(PushMessagePresenter::class.simpleName) }
             )
         }
-        single<AndroidPushV1Mapper> {
-            AndroidPushV1Mapper(
-                json = get(),
-                uuidProvider = get(),
-                logger = get { parametersOf(AndroidPushV1Mapper::class.simpleName) }
-            )
-        }
         single<AndroidPushV2Mapper> {
             AndroidPushV2Mapper(
                 json = get(),
                 logger = get { parametersOf(AndroidPushV2Mapper::class.simpleName) },
                 uuidProvider = get()
-            )
-        }
-        single<SilentAndroidPushV1Mapper> {
-            SilentAndroidPushV1Mapper(
-                json = get(),
-                logger = get { parametersOf(SilentAndroidPushV1Mapper::class.simpleName) }
             )
         }
         single<SilentAndroidPushV2Mapper> {
@@ -189,8 +174,6 @@ object AndroidInjection {
         }
         single<AndroidPushMessageFactory> {
             AndroidPushMessageFactory(
-                androidPushV1Mapper = get(),
-                silentAndroidPushV1Mapper = get(),
                 androidPushV2Mapper = get(),
                 silentAndroidPushV2Mapper = get(),
             )

@@ -71,14 +71,14 @@ internal class NotificationIntentProcessor(
                     }
                 }
 
-                pushMessage?.sid?.let {
+                pushMessage?.let {
                     val reportingAction = when (triggeredActionModel) {
                         is PresentableActionModel -> {
-                            BasicPushButtonClickedActionModel(triggeredActionModel.id, it)
+                            BasicPushButtonClickedActionModel(triggeredActionModel.id, it.trackingInfo)
                         }
 
                         is BasicActionModel -> {
-                            NotificationOpenedActionModel(it)
+                            NotificationOpenedActionModel(it.trackingInfo)
                         }
 
                         else -> null

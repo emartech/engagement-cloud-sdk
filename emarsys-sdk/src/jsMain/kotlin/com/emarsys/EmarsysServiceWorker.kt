@@ -17,7 +17,6 @@ external var self: ServiceWorkerGlobalScope
 @JsName("EmarsysServiceWorker")
 class EmarsysServiceWorker(
     private val pushMessagePresenter: PushMessagePresenter,
-    private val pushMessageMapper: Mapper<String, JsPushMessage>,
     private val pushMessageWebV1Mapper: Mapper<String, JsPushMessage>,
     private val onBadgeCountUpdateReceivedBroadcastChannel: BroadcastChannel,
     private val json: StringFormat,
@@ -29,8 +28,7 @@ class EmarsysServiceWorker(
         return Promise { resolve, reject ->
             coroutineScope.promise {
                 try {
-                    val pushMessage: JsPushMessage? =
-                        pushMessageMapper.map(event) ?: pushMessageWebV1Mapper.map(event)
+                    val pushMessage: JsPushMessage? = pushMessageWebV1Mapper.map(event)
                     pushMessage?.let {
                         pushMessagePresenter.present(it)
                         pushMessage.badgeCount?.let { badgeCount ->

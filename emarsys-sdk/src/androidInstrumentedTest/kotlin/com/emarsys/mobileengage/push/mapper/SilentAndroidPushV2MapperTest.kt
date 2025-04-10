@@ -16,6 +16,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import org.junit.Before
 import org.junit.Test
 
@@ -42,33 +43,31 @@ class SilentAndroidPushV2MapperTest {
     @Test
     fun map_shouldReturnAndroidPushMessage_whenInputIsValid() = runTest {
         val input = buildJsonObject {
-            put("ems", JsonPrimitive(buildJsonObject {
-                put("treatments", buildJsonObject {
-                    put("sid", JsonPrimitive("sid"))
-                })
-                put("campaignId", JsonPrimitive("campaignId"))
-            }.toString()))
-            put("notification.channelId", JsonPrimitive("channelId"))
-            put("notification.collapseId", JsonPrimitive("collapseKey"))
-            put("notification.operation", JsonPrimitive("INIT"))
-            put("notification.style", JsonPrimitive("BIG_TEXT"))
-            put("notification.badgeCount", JsonPrimitive(buildJsonObject {
-                put("method", JsonPrimitive("ADD"))
-                put("value", JsonPrimitive(1))
-            }.toString()))
-            put("notification.actions", JsonPrimitive(buildJsonArray {
+            put("ems", buildJsonObject {
+                put("trackingInfo", buildJsonObject {
+                    put("trackingInfoKey", "trackingInfoValue")
+                }.toString())
+            }.toString())
+            put("notification.channelId", "channelId")
+            put("notification.collapseId", "collapseKey")
+            put("notification.operation", "INIT")
+            put("notification.style", "BIG_TEXT")
+            put("notification.badgeCount", buildJsonObject {
+                put("method", "ADD")
+                put("value", 1)
+            }.toString())
+            put("notification.actions", buildJsonArray {
                 add(buildJsonObject {
-                    put("type", JsonPrimitive("MEAppEvent"))
-                    put("name", JsonPrimitive("testEvent"))
+                    put("type", "MEAppEvent")
+                    put("name", "testEvent")
                     put("payload", buildJsonObject {
-                        put("key", JsonPrimitive("value"))
+                        put("key", "value")
                     })
                 })
-            }.toString()))
+            }.toString())
         }
         val expected = SilentAndroidPushMessage(
-            sid = "sid",
-            campaignId = "campaignId",
+            trackingInfo = """{"trackingInfoKey":"trackingInfoValue"}""",
             platformData = AndroidPlatformData(
                 channelId = "channelId",
                 notificationMethod = NotificationMethod(

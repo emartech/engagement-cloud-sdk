@@ -64,13 +64,13 @@ internal class PushNotificationClickHandler(
             is PresentableActionModel -> {
                 val model = BasicPushButtonClickedActionModel(
                     actionModel.id,
-                    jsNotificationClickedData.jsPushMessage.sid
+                    jsNotificationClickedData.jsPushMessage.trackingInfo
                 )
                 listOf(actionFactory.create(model))
             }
 
             is BasicActionModel -> {
-                listOf(actionFactory.create(NotificationOpenedActionModel(jsNotificationClickedData.jsPushMessage.sid)))
+                listOf(actionFactory.create(NotificationOpenedActionModel(jsNotificationClickedData.jsPushMessage.trackingInfo)))
             }
 
             else -> emptyList()

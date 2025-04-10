@@ -139,9 +139,8 @@ class PushMessagePresenterTests {
         pushToInApp: PushToInApp? = null
     ): JsPushMessage {
         return JsPushMessage(
-            sid = "sid",
-            campaignId = "campaignId",
-            platformData = JsPlatformData("testApplicationCode"),
+            trackingInfo = """{"trackingInfoKey":"trackingInfoValue"}""",
+            platformData = JsPlatformData,
             badgeCount = null,
             actionableData = ActionableData(
                 actions = actions,
@@ -165,7 +164,7 @@ class PushMessagePresenterTests {
                 body = testPushMessage.displayableData?.body
                 icon = testPushMessage.displayableData?.iconUrlString
                 badge = testPushMessage.displayableData?.imageUrlString
-                tag = testPushMessage.campaignId
+                tag = testPushMessage.trackingInfo
                 actions = notificationActions
                 data = JsonUtil.json.encodeToString<JsPushMessage>(testPushMessage)
             }

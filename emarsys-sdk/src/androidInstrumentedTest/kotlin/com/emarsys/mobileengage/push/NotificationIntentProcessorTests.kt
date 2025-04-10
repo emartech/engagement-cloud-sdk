@@ -35,6 +35,9 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -42,12 +45,12 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class NotificationIntentProcessorTests {
     private companion object {
+        val PAYLOAD = mapOf("testKey" to "testValue")
         const val ID = "testId"
         const val TITLE = "testTitle"
         const val NAME = "testName"
-        const val SID = "testSid"
         const val COLLAPSE_ID = "testCollapseId"
-        val PAYLOAD = mapOf("testKey" to "testValue")
+        const val TRACKING_INFO = """{"trackingInfoKey":"trackingInfoValue"}"""
         const val APP_EVENT_ACTION_MODEL_JSON =
             """{"type":"MEAppEvent", "id":"$ID","title":"$TITLE","name":"$NAME","payload":{"testKey":"testValue"}}"""
     }
@@ -98,7 +101,7 @@ class NotificationIntentProcessorTests {
     @Test
     fun testProcessIntent_shouldHandleAction_withActionHandler_withMandatoryActions() = runTest {
         val actionModel = PresentableAppEventActionModel(ID, TITLE, NAME, PAYLOAD)
-        val buttonClickedActionModel = BasicPushButtonClickedActionModel(ID, SID)
+        val buttonClickedActionModel = BasicPushButtonClickedActionModel(ID, TRACKING_INFO)
         val basicDismissActionModel = BasicDismissActionModel(COLLAPSE_ID)
         val reportingAction = ReportingAction(buttonClickedActionModel, mockSdkEventDistributor)
         val mockLaunchApplicationAction: LaunchApplicationAction = mockk(relaxed = true)
@@ -155,7 +158,7 @@ class NotificationIntentProcessorTests {
                     "title":"$TITLE",
                     "dismissId":"$dismissId"
                 }""".trimIndent()
-            val buttonClickedActionModel = BasicPushButtonClickedActionModel(ID, SID)
+            val buttonClickedActionModel = BasicPushButtonClickedActionModel(ID, TRACKING_INFO)
             val reportingAction = ReportingAction(buttonClickedActionModel, mockSdkEventDistributor)
 
             coEvery { mockActionFactory.create(buttonClickedActionModel) } returns reportingAction
@@ -187,9 +190,10 @@ class NotificationIntentProcessorTests {
             val actionModel = BasicAppEventActionModel(NAME, PAYLOAD)
             val actionJsonString =
                 """{"type": "MEAppEvent", "name":"$NAME","payload":{"testKey":"testValue"}}"""
-            val notificationOpenedActionModel = NotificationOpenedActionModel(SID)
+            val notificationOpenedActionModel = NotificationOpenedActionModel(TRACKING_INFO)
             val basicDismissActionModel = BasicDismissActionModel(COLLAPSE_ID)
-            val reportingAction = ReportingAction(notificationOpenedActionModel, mockSdkEventDistributor)
+            val reportingAction =
+                ReportingAction(notificationOpenedActionModel, mockSdkEventDistributor)
             val basicDismissAction = DismissAction(basicDismissActionModel, mockSdkEventDistributor)
             val mockLaunchApplicationAction: LaunchApplicationAction = mockk(relaxed = true)
 
@@ -246,26 +250,32 @@ class NotificationIntentProcessorTests {
                     "payload":{"testKey":"testValue"}
                 }""".trimIndent()
     ): String {
-        return """{
-            "sid":"$SID",
-            "campaignId":"testCampaignId",
-            "platformData":{
-                "channelId":"testChannelId",
-                "notificationMethod":{
-                    "collapseId":"$COLLAPSE_ID",
-                    "operation":"${NotificationOperation.INIT}"
-                }
-            },
-            "displayableData":{
-                "title": "testTitle",
-                "body": "testBody",
-            },
-            "actionableData": {
-                "actions":
-                     [
-                        $actionModelString
-                    ],
-            }
-        }""".trimIndent()
+        val jsonMessage = buildJsonObject {
+            put("trackingInfo", """{"trackingInfoKey":"trackingInfoValue"}""")
+            put("platformData", buildJsonObject {
+                put("channelId", "testChannelId")
+                put("notificationMethod", buildJsonObject {
+                    put("collapseId", COLLAPSE_ID)
+                    put("operation", NotificationOperation.INIT.name)
+                })
+            })
+            put("displayableData", buildJsonObject {
+                put("title", TITLE)
+                put("body", "testBody")
+            })
+            put("actionableData", buildJsonObject {
+                put(
+                    "actions",
+                    buildJsonArray {
+                        buildJsonObject {
+                            put(
+                                "actionModelString",
+                                actionModelString
+                            )
+                        }
+                    })
+            })
+        }
+        return json.encodeToString(jsonMessage)
     }
 }

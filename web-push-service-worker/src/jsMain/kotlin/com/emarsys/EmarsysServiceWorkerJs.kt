@@ -7,8 +7,7 @@ import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.mobileengage.push.PushMessagePresenter
 import com.emarsys.mobileengage.push.WebPushNotificationPresenter
-import com.emarsys.mobileengage.push.mappers.PushMessageMapper
-import com.emarsys.mobileengage.push.mappers.PushMessageWebV1Mapper
+import com.emarsys.mobileengage.push.mappers.PushMessageWebV2Mapper
 import com.emarsys.mobileengage.push.model.JsNotificationClickedData
 import com.emarsys.mobileengage.push.model.JsPushMessage
 import com.emarsys.notification.NotificationClickHandler
@@ -37,15 +36,12 @@ fun main() {
 
     val consoleLogger = ConsoleLogger()
     val pushMessagePresenter = PushMessagePresenter(WebPushNotificationPresenter())
-    val pushMessageMapper =
-        PushMessageMapper(JsonUtil.json, SdkLogger("PushMessageMapper", consoleLogger))
-    val pushMessageWebV1Mapper =
-        PushMessageWebV1Mapper(JsonUtil.json, SdkLogger("PushMessageWebV1Mapper", consoleLogger))
+    val pushMessageWebV2Mapper =
+        PushMessageWebV2Mapper(JsonUtil.json, SdkLogger("PushMessageWebV1Mapper", consoleLogger))
 
     val emarsysServiceWorker = EmarsysServiceWorker(
         pushMessagePresenter,
-        pushMessageMapper,
-        pushMessageWebV1Mapper,
+        pushMessageWebV2Mapper,
         onBadgeCountUpdateReceivedBroadcastChannel,
         JsonUtil.json,
         CoroutineScope(SupervisorJob()),
