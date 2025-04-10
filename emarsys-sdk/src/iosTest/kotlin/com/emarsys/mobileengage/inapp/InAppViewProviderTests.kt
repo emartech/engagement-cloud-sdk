@@ -1,6 +1,7 @@
 package com.emarsys.mobileengage.inapp
 
 import com.emarsys.core.factory.SuspendFactory
+import com.emarsys.core.providers.TimestampProvider
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
@@ -24,7 +25,8 @@ class InAppViewProviderTest {
         val webView = WKWebView()
         everySuspend { webViewProvider.create(any()) } returns webView
 
-        val inAppViewProvider = InAppViewProvider(mainDispatcher, webViewProvider)
+        val inAppViewProvider =
+            InAppViewProvider(mainDispatcher, webViewProvider, TimestampProvider())
         val result = inAppViewProvider.provide()
 
         result shouldNotBe null

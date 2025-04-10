@@ -54,7 +54,6 @@ class WebViewProviderTests {
 
         val webView = provider.create(CAMPAIGN_ID)
 
-        (webView is WKWebView) shouldBe true
         webView.backgroundColor shouldBe UIColor.clearColor
     }
 }
