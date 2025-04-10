@@ -90,7 +90,7 @@ object NetworkInjection {
                 applicationScope = get(named(CoroutineScopeTypes.Application)),
             )
         }
-        single<LoggingClient> {
+        single<EventBasedClientApi>(named(EventBasedClientTypes.Logging)) {
             LoggingClient(
                 emarsysNetworkClient = get(named(NetworkClientTypes.Emarsys)),
                 urlFactory = get(),

@@ -19,10 +19,12 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
+import kotlinx.coroutines.ensureActive
 import kotlinx.io.IOException
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
+import kotlin.coroutines.coroutineContext
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
 
@@ -72,6 +74,7 @@ class GenericNetworkClient(private val client: HttpClient, private val sdkLogger
                 )
                 throw exception
             } catch (exception: Exception) {
+                coroutineContext.ensureActive()
                 sdkLogger.error(
                     "EventClient - consumeEvents: Exception during event consumption",
                     exception

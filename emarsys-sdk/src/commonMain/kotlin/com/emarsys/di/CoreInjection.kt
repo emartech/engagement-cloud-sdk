@@ -181,7 +181,7 @@ enum class NetworkClientTypes {
 }
 
 enum class EventBasedClientTypes {
-    Device, Config, DeepLink, Contact, Event, Push, RemoteConfig
+    Device, Config, DeepLink, Contact, Event, Push, RemoteConfig, Logging
 }
 
 enum class EventFlowTypes {

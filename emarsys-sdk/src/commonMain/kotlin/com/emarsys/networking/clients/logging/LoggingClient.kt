@@ -12,15 +12,18 @@ import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
+import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import io.ktor.http.HttpMethod
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
+import kotlin.coroutines.coroutineContext
 
 internal class LoggingClient(
     private val emarsysNetworkClient: NetworkClientApi,
@@ -32,9 +35,9 @@ internal class LoggingClient(
     private val deviceInfoCollector: DeviceInfoCollectorApi,
     private val eventsDao: EventsDaoApi,
     private val batchSize: Int = 1
-) {
+) : EventBasedClientApi {
 
-    fun register() {
+    override suspend fun register() {
         applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
             sdkLogger.debug("Register")
             startEventConsumer()
@@ -47,7 +50,7 @@ internal class LoggingClient(
             .batched(batchSize = batchSize, batchIntervalMillis = 10000L)
             .collect { sdkEvents ->
                 try {
-                    sdkLogger.debug("LoggingClient - consumeLogsAndMetrics")
+                    sdkLogger.debug("consumeLogsAndMetrics")
                     val url = urlFactory.create(EmarsysUrlType.LOGGING)
                     val logRequestsJson = sdkEvents.map { sdkEvent ->
                         val logLevel = if (sdkEvent is SdkEvent.Internal.Sdk.Log) {
@@ -77,13 +80,14 @@ internal class LoggingClient(
                     )
                     sdkEvents.forEach { it.ack(eventsDao, sdkLogger) }
                 } catch (exception: Exception) {
+                    coroutineContext.ensureActive()
                     when (exception) {
                         is FailedRequestException, is RetryLimitReachedException, is MissingApplicationCodeException -> {
                             sdkEvents.forEach { it.ack(eventsDao, sdkLogger) }
                         }
 
                         else -> sdkLogger.error(
-                            "LoggingClient - consumeLogsAndMetrics",
+                            "consumeLogsAndMetrics error",
                             exception
                         )
                     }
