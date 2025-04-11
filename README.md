@@ -1,22 +1,108 @@
-This is a Kotlin Multiplatform project targeting Android, iOS, Web.
+# KMP Emarsys SDK
 
-* `/composeApp` is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - `commonMain` is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    `iosMain` would be the right folder for such calls.
+The **KMP Emarsys SDK** is a Kotlin Multiplatform SDK designed to integrate with the Emarsys platform. It provides a unified interface for managing events, push notifications, and other functionalities across Android, iOS, and Web platforms.
 
-* `/iosApp` contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform, 
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+## Features
 
+- **Event Management**: Track and manage various SDK events.
+- **Push Notifications**: Handle push notifications, including silent pushes and user interactions.
+- **Cross-Platform Support**: Built using Kotlin Multiplatform, enabling seamless integration across Android, iOS, and Web platforms.
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html),
-[Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#compose-multiplatform),
-[Kotlin/Wasm](https://kotl.in/wasm/)…
+---
 
-**Note:** Compose/Web is Experimental and may be changed at any time. Use it only for evaluation purposes.
-We would appreciate your feedback on Compose/Web and Kotlin/Wasm in the public Slack channel [#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
-If you face any issues, please report them on [GitHub](https://github.com/JetBrains/compose-multiplatform/issues).
+## Installation
 
-You can open the web application by running the `:composeApp:wasmJsBrowserDevelopmentRun` Gradle task.
+### Android
+
+The SDK is available on Maven Central. Add the following dependency to your `build.gradle.kts` file:
+
+```kotlin
+dependencies {
+    implementation("com.emarsys:emarsys-sdk-android:4.0.0")
+}
+```
+
+Ensure you have the following permissions in your `AndroidManifest.xml`:
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+```
+
+### iOS
+
+The SDK is distributed via Swift Package Manager (SPM). Add the following to your `Package.swift`:
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/emartech/kmp-emarsys-sdk.git", from: "4.0.0")
+]
+```
+
+Then, import the SDK in your Swift code:
+
+```swift
+import EmarsysSDK
+```
+
+### Web
+
+The SDK is available on NPM. Install it using the following command:
+
+```bash
+npm install @emarsys/kmp-emarsys-sdk
+```
+
+Import and initialize the SDK in your JavaScript or TypeScript code:
+
+```javascript
+import { EmarsysJs } from "@emarsys/kmp-emarsys-sdk";
+
+const emarsys = new EmarsysJs();
+await emarsys.enableTracking({
+    account: "YOUR_ACCOUNT_ID",
+});
+```
+
+### Kotlin Multiplatform (KMP)
+
+For KMP projects, the SDK is available on Maven Central. Add the following to your `build.gradle.kts`:
+
+```kotlin
+kotlin {
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                implementation("com.emarsys:emarsys-sdk:4.0.0")
+            }
+        }
+    }
+}
+```
+
+---
+
+## Usage
+TBD
+
+---
+
+## License
+
+This project is licensed under the [Mozilla Public License, Version 2.0](LICENSE).
+
+---
+
+## Support
+
+For any issues or questions, please open an issue in the repository or contact the support team.
+
+---
+
+## Additional Resources
+
+- [Emarsys Documentation](https://www.emarsys.com/)
+- [Kotlin Multiplatform Documentation](https://kotlinlang.org/docs/multiplatform.html)
+- [Swift Package Manager Documentation](https://swift.org/package-manager/)
+- [NPM Documentation](https://www.npmjs.com/)
