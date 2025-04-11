@@ -139,7 +139,7 @@ class AndroidPushV2MapperTest {
                 })
             }.toString())
             put("notification.inapp", buildJsonObject {
-                put("campaign_id", "campaignId")
+                put("campaignId", "campaignId")
                 put("url", "url")
                 put("ignoreViewedEvent", true)
             }.toString())

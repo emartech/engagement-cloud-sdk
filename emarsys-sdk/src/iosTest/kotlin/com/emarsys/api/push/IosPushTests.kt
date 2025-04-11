@@ -7,8 +7,8 @@ import com.emarsys.context.SdkContextApi
 import com.emarsys.core.exceptions.PreconditionFailedException
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
-import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
-import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
+import com.emarsys.mobileengage.action.models.PresentableAppEventActionModel
+import com.emarsys.mobileengage.action.models.PresentableOpenExternalUrlActionModel
 import com.emarsys.mobileengage.push.IosPush
 import com.emarsys.mobileengage.push.IosPushInstance
 import dev.mokkery.MockMode
@@ -36,32 +36,47 @@ import kotlin.test.Test
 class IosPushTests {
     private companion object {
         const val PUSH_TOKEN = "testPushToken"
-        const val SID = "testSID"
-        const val CAMPAIGN_ID = "testCampaignId"
-        val USER_INFO_MAP = mapOf(
-            "ems" to mapOf(
-                "sid" to SID,
-                "multichannelId" to CAMPAIGN_ID,
-                "actions" to listOf(
+        const val VERSION = "APNS_V2"
+        const val TRACKING_INFO = """{"trackingInfo":"testTrackingInfo"}"""
+        const val ID = "testID"
+        const val TITLE = "testTitle"
+        const val NAME = "testName"
+        val PAYLOAD = mapOf("key" to "value")
+        const val URL_STRING = "https://www.emarsys.com"
+        val USER_INFO_MAP = buildMap {
+            put(
+                "ems", mapOf(
+                    "version" to VERSION,
+                    "trackingInfo" to TRACKING_INFO
+                )
+            )
+            put("notification", buildMap {
+                put("actions", listOf(
                     mapOf(
                         "type" to "OpenExternalUrl",
-                        "url" to "https://www.emarsys.com"
+                        "id" to ID,
+                        "title" to TITLE,
+                        "url" to URL_STRING
                     ),
                     mapOf(
                         "type" to "MEAppEvent",
-                        "name" to "name",
-                        "payload" to mapOf("key" to "value")
+                        "id" to ID,
+                        "title" to TITLE,
+                        "name" to NAME,
+                        "payload" to PAYLOAD
                     )
-                )
-            )
-        )
-        val PUSH_USER_INFO = BasicPushUserInfo(
-            ems = BasicPushUserInfoEms(
-                sid = SID,
-                multichannelId = CAMPAIGN_ID,
+                ))
+            })
+        }
+        val PUSH_USER_INFO = PushUserInfo(
+            ems = Ems(
+                version = VERSION,
+                trackingInfo = TRACKING_INFO),
+                Notification(
+                silent = false,
                 actions = listOf(
-                    BasicOpenExternalUrlActionModel("https://www.emarsys.com"),
-                    BasicAppEventActionModel("name", mapOf("key" to "value"))
+                    PresentableOpenExternalUrlActionModel(ID,TITLE, URL_STRING),
+                    PresentableAppEventActionModel(ID, TITLE, NAME, PAYLOAD)
                 )
             )
         )

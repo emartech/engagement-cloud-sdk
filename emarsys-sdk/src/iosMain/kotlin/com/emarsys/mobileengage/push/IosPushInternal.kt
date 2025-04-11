@@ -2,15 +2,13 @@ package com.emarsys.mobileengage.push
 
 import com.emarsys.SdkConstants.PUSH_RECEIVED_EVENT_NAME
 import com.emarsys.api.SdkState
-import com.emarsys.api.push.BasicPushUserInfo
-import com.emarsys.api.push.PresentablePushUserInfo
-import com.emarsys.api.push.PresentablePushUserInfoEms
 import com.emarsys.api.push.PushCall.ClearPushToken
-import com.emarsys.api.push.PushCall.HandleMessageWithUserInfo
+import com.emarsys.api.push.PushCall.HandleSilentMessageWithUserInfo
 import com.emarsys.api.push.PushCall.RegisterPushToken
 import com.emarsys.api.push.PushConstants.PUSH_TOKEN_KEY
 import com.emarsys.api.push.PushContextApi
 import com.emarsys.api.push.PushInternal
+import com.emarsys.api.push.PushUserInfo
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.actions.badge.BadgeCountHandlerApi
@@ -25,31 +23,19 @@ import com.emarsys.mobileengage.action.actions.Action
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
-import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
 import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
+import com.emarsys.mobileengage.action.models.PresentablePushToInAppActionModel
+import com.emarsys.mobileengage.push.extension.toPushUserInfo
 import com.emarsys.networking.clients.event.model.SdkEvent
-import kotlinx.cinterop.BetaInteropApi
-import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.decodeFromJsonElement
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
-import platform.Foundation.NSJSONSerialization
-import platform.Foundation.NSJSONWritingPrettyPrinted
-import platform.Foundation.NSString
-import platform.Foundation.NSUTF8StringEncoding
-import platform.Foundation.create
 import platform.UserNotifications.UNNotification
 import platform.UserNotifications.UNNotificationDefaultActionIdentifier
 import platform.UserNotifications.UNNotificationPresentationOptionAlert
@@ -92,21 +78,16 @@ internal class IosPushInternal(
             customerUserNotificationCenterDelegate
         )
 
-    override suspend fun handleSilentMessageWithUserInfo(userInfo: BasicPushUserInfo) {
-        userInfo.ems.actions?.forEach {
+    override suspend fun handleSilentMessageWithUserInfo(userInfo: PushUserInfo) {
+        userInfo.notification.actions?.forEach {
             actionFactory.create(it).invoke()
         }
 
+        //TODO: revisit what we want to send in attributes after API discovery
         sdkEventDistributor.registerAndStoreEvent(
             SdkEvent.External.Api.SilentPush(
                 id = uuidProvider.provide(),
                 name = PUSH_RECEIVED_EVENT_NAME,
-                attributes = buildJsonObject {
-                    put(
-                        "campaignId",
-                        JsonPrimitive(userInfo.ems.multichannelId)
-                    )
-                },
                 timestamp = timestampProvider.provide()
             )
         )
@@ -122,57 +103,10 @@ internal class IosPushInternal(
                         }
                     )
                 )
+
                 is ClearPushToken -> sdkEventDistributor.registerAndStoreEvent(SdkEvent.Internal.Sdk.ClearPushToken())
-                is HandleMessageWithUserInfo -> handleSilentMessageWithUserInfo(call.userInfo)
+                is HandleSilentMessageWithUserInfo -> handleSilentMessageWithUserInfo(call.userInfo)
             }
-        }
-    }
-
-    @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
-    private fun Map<String, Any>.toPresentableUserInfo(): PresentablePushUserInfo {
-        val emsJson = extractJsonObject(this, "ems")
-        return if (emsJson != null && emsJson.keys.contains("version")) {
-            val notificationJson = extractJsonObject(this, "notification")
-            val treatments: JsonObject? = emsJson["treatments"]?.jsonObject
-            PresentablePushUserInfo(
-                PresentablePushUserInfoEms(
-                    multichannelId = emsJson["campaignId"]?.jsonPrimitive?.contentOrNull,
-                    inapp = notificationJson?.get("inapp")?.jsonObject?.let {
-                        json.decodeFromJsonElement(it)
-                    },
-                    sid = treatments?.get("sid")?.jsonPrimitive?.contentOrNull,
-                    defaultAction = notificationJson?.get("defaultAction")?.jsonObject?.let {
-                        json.decodeFromJsonElement(it)
-                    },
-                    actions = notificationJson?.get("actions")?.jsonArray?.let {
-                        json.decodeFromJsonElement(it)
-                    },
-                    badgeCount = notificationJson?.get("badgeCount")?.jsonObject?.let {
-                        json.decodeFromJsonElement(it)
-                    }
-                )
-            )
-        } else {
-            val userInfoString = NSString.create(
-                NSJSONSerialization.dataWithJSONObject(
-                    this,
-                    NSJSONWritingPrettyPrinted,
-                    null
-                )!!, NSUTF8StringEncoding
-            ).toString()
-            return json.decodeFromString<PresentablePushUserInfo>(userInfoString)
-        }
-    }
-
-    @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
-    private fun extractJsonObject(userInfo: Map<String, Any>, key: String): JsonObject? {
-        return userInfo[key]?.let { extractedMap ->
-            NSJSONSerialization.dataWithJSONObject(extractedMap, NSJSONWritingPrettyPrinted, null)
-                ?.let { data ->
-                    NSString.create(data, NSUTF8StringEncoding)?.let { jsonString ->
-                        json.decodeFromString(jsonString.toString())
-                    }
-                }
         }
     }
 
@@ -183,28 +117,30 @@ internal class IosPushInternal(
     ) {
         CoroutineScope(sdkDispatcher).launch {
             try {
-                val pushUserInfo = userInfo.toPresentableUserInfo()
-                handleActions(actionIdentifier, pushUserInfo)
-                pushUserInfo.ems?.badgeCount?.let { badgeCountHandler.handle(it) }
+                val pushUserInfo = userInfo.toPushUserInfo(json)
+                pushUserInfo?.let {
+                    handleActions(actionIdentifier, pushUserInfo)
+                    pushUserInfo.notification.badgeCount?.let { badgeCountHandler.handle(it) }
 
-                withContext(Dispatchers.Main) {
-                    withCompletionHandler()
+                    withContext(Dispatchers.Main) {
+                        withCompletionHandler()
+                    }
                 }
             } catch (exception: Exception) {
-                sdkLogger.error("IosPushInternal - didReceiveNotificationResponse", exception)
+                sdkLogger.error("DidReceiveNotificationResponse", exception)
             }
         }
     }
 
     private suspend fun handleActions(
         actionIdentifier: String,
-        pushUserInfo: PresentablePushUserInfo
+        pushUserInfo: PushUserInfo
     ) {
         val actionModel: ActionModel? =
             if (actionIdentifier == UNNotificationDefaultActionIdentifier) {
                 extractDefaultAction(pushUserInfo)
             } else {
-                pushUserInfo.ems?.actions?.firstOrNull {
+                pushUserInfo.notification.actions?.firstOrNull {
                     it.id == actionIdentifier
                 }
             }
@@ -217,44 +153,33 @@ internal class IosPushInternal(
     }
 
     private suspend fun createMandatoryActions(
-        pushUserInfo: PresentablePushUserInfo,
+        pushUserInfo: PushUserInfo,
         actionModel: ActionModel
     ): List<Action<*>> {
-        val result = mutableListOf<Action<*>>()
-        val sid: String? = pushUserInfo.u?.sid ?: pushUserInfo.ems?.sid
-
-        sid?.let {
+        return buildList {
             val model = when (actionModel) {
                 is PresentableActionModel -> {
                     BasicPushButtonClickedActionModel(
                         actionModel.id,
-                        it
+                        pushUserInfo.ems.trackingInfo
                     )
                 }
-
                 is BasicActionModel -> {
-                    NotificationOpenedActionModel(it)
+                    NotificationOpenedActionModel(pushUserInfo.ems.trackingInfo)
                 }
-
                 else -> null
             }
 
-            model?.let { result.add(actionFactory.create(model)) }
+            model?.let { add(actionFactory.create(model)) }
         }
-        return result
     }
 
     private fun extractDefaultAction(
-        pushUserInfo: PresentablePushUserInfo,
+        pushUserInfo: PushUserInfo,
     ): ActionModel? {
-        return if (pushUserInfo.ems?.inapp != null) {
-            InternalPushToInappActionModel(
-                campaignId = pushUserInfo.ems.inapp.campaignId,
-                url = pushUserInfo.ems.inapp.url
-            )
-        } else {
-            pushUserInfo.ems?.defaultAction
-        }
+        val pushToInApp =
+            pushUserInfo.notification.actions?.firstOrNull { it is PresentablePushToInAppActionModel }
+        return pushToInApp ?: pushUserInfo.notification.defaultAction
     }
 
     private class InternalNotificationCenterDelegateProxy(
@@ -317,3 +242,4 @@ internal class IosPushInternal(
         }
     }
 }
+

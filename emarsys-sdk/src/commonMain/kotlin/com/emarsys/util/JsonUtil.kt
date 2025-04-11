@@ -11,5 +11,6 @@ object JsonUtil {
         ignoreUnknownKeys = true
         allowTrailingComma = true
         explicitNulls = false
+        decodeEnumsCaseInsensitive = true
     }
 }

@@ -54,9 +54,9 @@ internal open class PushInternal(
                     )
                 )
                 is ClearPushToken -> sdkEventDistributor.registerAndStoreEvent(SdkEvent.Internal.Sdk.ClearPushToken())
-                is PushCall.HandleMessageWithUserInfo -> {
+                is PushCall.HandleSilentMessageWithUserInfo -> {
                     sdkLogger.debug(
-                        "Common PushInternal: shouldn't handle message with user info: $call"
+                        "Common PushInternal: shouldn't handle silent message with user info: $call"
                     )
                 }
             }

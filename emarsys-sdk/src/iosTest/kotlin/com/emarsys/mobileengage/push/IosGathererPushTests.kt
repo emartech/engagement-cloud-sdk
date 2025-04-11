@@ -1,10 +1,11 @@
 package com.emarsys.mobileengage.push
 
-import com.emarsys.api.push.BasicPushUserInfo
-import com.emarsys.api.push.BasicPushUserInfoEms
+import com.emarsys.api.push.Ems
+import com.emarsys.api.push.Notification
 import com.emarsys.api.push.PushCall
 import com.emarsys.api.push.PushContext
 import com.emarsys.api.push.PushContextApi
+import com.emarsys.api.push.PushUserInfo
 import com.emarsys.core.storage.StringStorageApi
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -68,11 +69,19 @@ class IosGathererPushTests {
 
     @Test
     fun testHandleSilentMessageWithUserInfo_shouldStoreCallInContext() = runTest {
-        val userInfo = BasicPushUserInfo(BasicPushUserInfoEms("testId"))
+        val userInfo = PushUserInfo(
+            Ems(version = "testVersion", trackingInfo = "testTrackingInfo"),
+            Notification(
+                silent = true,
+                defaultAction = null,
+                actions = null,
+                badgeCount = null
+            )
+        )
 
         iosGathererPush.handleSilentMessageWithUserInfo(userInfo)
 
-        pushContext.calls.contains(PushCall.HandleMessageWithUserInfo(userInfo)) shouldBe true
+        pushContext.calls.contains(PushCall.HandleSilentMessageWithUserInfo(userInfo)) shouldBe true
         pushContext.calls.size shouldBe 1
     }
 }
