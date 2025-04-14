@@ -14,7 +14,6 @@ import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
-import com.emarsys.networking.clients.event.model.OnlineSdkEvent
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
@@ -95,7 +94,7 @@ class LoggingClientTests {
 
     private lateinit var sdkDispatcher: CoroutineDispatcher
     private lateinit var mockSdkEventManager: SdkEventManagerApi
-    private lateinit var onlineEvents: MutableSharedFlow<OnlineSdkEvent>
+    private lateinit var logEvents: MutableSharedFlow<SdkEvent.Internal.LogEvent>
     private lateinit var mockEventsDao: EventsDaoApi
 
     @BeforeTest
@@ -105,8 +104,8 @@ class LoggingClientTests {
             (it.args[1] as Throwable).printStackTrace()
         }
         mockSdkEventManager = mock()
-        onlineEvents = MutableSharedFlow()
-        everySuspend { mockSdkEventManager.onlineSdkEvents } returns onlineEvents
+        logEvents = MutableSharedFlow()
+        everySuspend { mockSdkEventManager.logEvents } returns logEvents
         mockEventsDao = mock(MockMode.autofill)
     }
 
@@ -171,10 +170,10 @@ class LoggingClientTests {
         )
 
         val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
-            onlineEvents.take(1).toList()
+            logEvents.take(1).toList()
         }
 
-        onlineEvents.emit(logEvent)
+        logEvents.emit(logEvent)
 
         advanceTimeBy(11000)
 
@@ -222,10 +221,10 @@ class LoggingClientTests {
             isLogRequest = true
         )
         val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
-            onlineEvents.take(1).toList()
+            logEvents.take(1).toList()
         }
 
-        onlineEvents.emit(logEvent)
+        logEvents.emit(logEvent)
         advanceTimeBy(11000)
 
         onlineSdkEvents.await() shouldBe listOf(logEvent)
@@ -255,10 +254,10 @@ class LoggingClientTests {
         )
         everySuspend { mockSdkEventManager.emitEvent(logEvent) } returns Unit
         val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
-            onlineEvents.take(1).toList()
+            logEvents.take(1).toList()
         }
 
-        onlineEvents.emit(logEvent)
+        logEvents.emit(logEvent)
         advanceTimeBy(11000)
 
         onlineSdkEvents.await() shouldBe listOf(logEvent)
@@ -280,10 +279,10 @@ class LoggingClientTests {
             )
 
             val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
-                onlineEvents.take(1).toList()
+                logEvents.take(1).toList()
             }
 
-            onlineEvents.emit(logEvent)
+            logEvents.emit(logEvent)
 
             advanceTimeBy(11000)
 
@@ -321,10 +320,10 @@ class LoggingClientTests {
             )
 
             val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
-                onlineEvents.take(1).toList()
+                logEvents.take(1).toList()
             }
 
-            onlineEvents.emit(logEvent)
+            logEvents.emit(logEvent)
 
             advanceTimeBy(11000)
 

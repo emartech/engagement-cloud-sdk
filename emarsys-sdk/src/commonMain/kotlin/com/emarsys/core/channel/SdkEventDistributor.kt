@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onEach
@@ -37,6 +38,9 @@ class SdkEventDistributor(
     override val onlineSdkEvents: Flow<OnlineSdkEvent> =
         _sdkEventFlow
             .filterIsInstance<OnlineSdkEvent>()
+            .filter {
+                it !is SdkEvent.Internal.LogEvent
+            }
             .onEach {
                 combine(
                     sdkContext.currentSdkState,
@@ -46,6 +50,11 @@ class SdkEventDistributor(
                 }.first { it }
             }
 
+    override val logEvents = _sdkEventFlow
+        .filterIsInstance<SdkEvent.Internal.LogEvent>()
+        .onEach {
+            connectionStatus.first { it }
+        }
 
     override suspend fun registerAndStoreEvent(sdkEvent: SdkEvent) {
         try {

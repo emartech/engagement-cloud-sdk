@@ -97,7 +97,7 @@ class SdkLogger(
         message: String,
         data: JsonObject
     ) {
-        log(LogLevel.Metric, message = message, data = data)
+        log(LogLevel.Metric, message = message, data = data, isRemoteLog = true)
     }
 
     private suspend fun log(

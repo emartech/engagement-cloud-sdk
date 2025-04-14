@@ -18,7 +18,6 @@ import io.ktor.http.HttpMethod
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
@@ -47,8 +46,7 @@ internal class LoggingClient(
     }
 
     private suspend fun startEventConsumer() {
-        sdkEventManager.onlineSdkEvents
-            .filterIsInstance<SdkEvent.Internal.LogEvent>()
+        sdkEventManager.logEvents
             .batched(batchSize = batchSize, batchIntervalMillis = 10000L)
             .collect { sdkEvents ->
                 try {

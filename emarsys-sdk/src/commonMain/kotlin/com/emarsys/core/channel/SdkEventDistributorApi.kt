@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.SharedFlow
 interface SdkEventDistributorApi {
     val sdkEventFlow: SharedFlow<SdkEvent>
     val onlineSdkEvents: Flow<OnlineSdkEvent>
+    val logEvents: Flow<SdkEvent.Internal.LogEvent>
 
     suspend fun registerAndStoreEvent(sdkEvent: SdkEvent)
 
