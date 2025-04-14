@@ -21,14 +21,16 @@ import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.ensureActive
 import kotlinx.io.IOException
-import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlin.coroutines.coroutineContext
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
 
-class GenericNetworkClient(private val client: HttpClient, private val sdkLogger: Logger) :
+class GenericNetworkClient(
+    private val client: HttpClient,
+    private val sdkLogger: Logger,
+) :
     NetworkClientApi {
 
     private companion object {
@@ -70,21 +72,24 @@ class GenericNetworkClient(private val client: HttpClient, private val sdkLogger
                 onNetworkError?.invoke()
                 sdkLogger.debug(
                     "EventClient - consumeEvents: IOException during event consumption (iOS, Android)",
-                    exception
+                    exception,
+                    isRemoteLog = !request.isLogRequest
                 )
                 throw exception
             } catch (exception: Exception) {
                 coroutineContext.ensureActive()
                 sdkLogger.error(
                     "EventClient - consumeEvents: Exception during event consumption",
-                    exception
+                    exception,
+                    isRemoteLog = !request.isLogRequest
                 )
                 throw exception
             } catch (throwable: Throwable) {
                 onNetworkError?.invoke()
                 sdkLogger.error(
                     "EventClient - consumeEvents: Throwable during event consumption (JavaScript)",
-                    throwable
+                    throwable,
+                    isRemoteLog = !request.isLogRequest
                 )
                 throw IOException(throwable)
             }
@@ -99,24 +104,26 @@ class GenericNetworkClient(private val client: HttpClient, private val sdkLogger
         sdkLogger.debug(
             "log_request",
             buildJsonObject {
-                put("url", JsonPrimitive(request.url.toString()))
-                put("method", JsonPrimitive(request.method.value))
-                put("request", JsonPrimitive(request.toString()))
-                put("statusCode", JsonPrimitive(response.status.value))
-                put("payload", JsonPrimitive(request.bodyString))
-                put("header", JsonPrimitive(request.headers.toString()))
-                put("networkingDuration", JsonPrimitive(networkDuration.inWholeMilliseconds))
-            }
+                put("url", request.url.toString())
+                put("method", request.method.value)
+                put("request", request.toString())
+                put("statusCode", response.status.value)
+                put("payload", request.bodyString)
+                put("header", request.headers.toString())
+                put("networkingDuration", networkDuration.inWholeMilliseconds)
+            },
+            isRemoteLog = !request.isLogRequest
         )
         sdkLogger.info(
             "log_request",
             buildJsonObject {
-                put("url", JsonPrimitive(request.url.toString()))
-                put("method", JsonPrimitive(request.method.value))
-                put("statusCode", JsonPrimitive(response.status.value))
-                put("networkingDuration", JsonPrimitive(networkDuration.inWholeMilliseconds))
-                put("retries", JsonPrimitive(retries))
-            }
+                put("url", request.url.toString())
+                put("method", request.method.value)
+                put("statusCode", response.status.value)
+                put("networkingDuration", networkDuration.inWholeMilliseconds)
+                put("retries", retries)
+            },
+            isRemoteLog = !request.isLogRequest
         )
 
         if (!httpResponse.status.isSuccess() && httpResponse.status != HttpStatusCode.Unauthorized) {
@@ -128,12 +135,13 @@ class GenericNetworkClient(private val client: HttpClient, private val sdkLogger
                             put("status", response.status.value)
                             put(
                                 "networkingDuration",
-                                JsonPrimitive(networkDuration.inWholeMilliseconds)
+                                networkDuration.inWholeMilliseconds
                             )
-                            put("retries", JsonPrimitive(retries))
+                            put("retries", retries)
                             put("url", response.originalRequest.url.toString())
                         }
-                    )
+                    ),
+                    isRemoteLog = !request.isLogRequest
                 )
                 throw RetryLimitReachedException("Request retry limit reached! Response: ${httpResponse.bodyAsText()}")
             }
@@ -144,12 +152,13 @@ class GenericNetworkClient(private val client: HttpClient, private val sdkLogger
                         put("status", response.status.value)
                         put(
                             "networkingDuration",
-                            JsonPrimitive(networkDuration.inWholeMilliseconds)
+                            networkDuration.inWholeMilliseconds
                         )
-                        put("retries", JsonPrimitive(retries))
+                        put("retries", retries)
                         put("url", response.originalRequest.url.toString())
                     }
-                )
+                ),
+                isRemoteLog = !request.isLogRequest
             )
             throw FailedRequestException(response)
         }

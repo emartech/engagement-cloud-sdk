@@ -52,8 +52,11 @@ import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.io.IOException
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.put
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -145,6 +148,27 @@ class LoggingClientTests {
             level = LogLevel.Debug,
             attributes = testLogAttributes
         )
+        val expectedRequest = UrlRequest(
+            TEST_BASE_URL,
+            HttpMethod.Post,
+            json.encodeToString(
+                buildJsonObject {
+                    put("logs", JsonArray(listOf(buildJsonObject {
+                        put("type", "log_request")
+                        put("level", logEvent.level.name.uppercase())
+                        put(
+                            "deviceInfo",
+                            json.encodeToJsonElement(deviceInfoForLogs)
+                        )
+                        testLogAttributes.forEach { attribute ->
+                            put(attribute.key, attribute.value)
+                        }
+                    })))
+                }
+
+            ),
+            isLogRequest = true
+        )
 
         val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
             onlineEvents.take(1).toList()
@@ -152,10 +176,10 @@ class LoggingClientTests {
 
         onlineEvents.emit(logEvent)
 
-        advanceTimeBy(1000)
+        advanceTimeBy(11000)
 
         onlineSdkEvents.await() shouldBe listOf(logEvent)
-        verifySuspend { mockEmarsysClient.send(any(), any()) }
+        verifySuspend { mockEmarsysClient.send(expectedRequest, any()) }
         verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
         verifySuspend { mockEventsDao.removeEvent(logEvent) }
     }
@@ -176,15 +200,36 @@ class LoggingClientTests {
             level = LogLevel.Metric,
             attributes = testLogAttributes
         )
+        val expectedRequest = UrlRequest(
+            TEST_BASE_URL,
+            HttpMethod.Post,
+            json.encodeToString(
+                buildJsonObject {
+                    put("logs", JsonArray(listOf(buildJsonObject {
+                        put("type", "log_request")
+                        put("level", logEvent.level.name.uppercase())
+                        put(
+                            "deviceInfo",
+                            json.encodeToJsonElement(deviceInfoForLogs)
+                        )
+                        testLogAttributes.forEach { attribute ->
+                            put(attribute.key, attribute.value)
+                        }
+                    })))
+                }
+
+            ),
+            isLogRequest = true
+        )
         val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
             onlineEvents.take(1).toList()
         }
 
         onlineEvents.emit(logEvent)
-        advanceTimeBy(1000)
+        advanceTimeBy(11000)
 
         onlineSdkEvents.await() shouldBe listOf(logEvent)
-        verifySuspend { mockEmarsysClient.send(any(), any()) }
+        verifySuspend { mockEmarsysClient.send(expectedRequest, any()) }
         verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
         verifySuspend { mockEventsDao.removeEvent(logEvent) }
     }
@@ -214,38 +259,39 @@ class LoggingClientTests {
         }
 
         onlineEvents.emit(logEvent)
-        advanceTimeBy(5000)
+        advanceTimeBy(11000)
 
         onlineSdkEvents.await() shouldBe listOf(logEvent)
         verifySuspend { mockEmarsysClient.send(any(), any()) }
-        verifySuspend { mockSdkLogger.error(any(), any<Throwable>()) }
+        verifySuspend { mockSdkLogger.error(any(), any<Throwable>(), false) }
         verifySuspend { mockSdkEventManager.emitEvent(logEvent) }
         verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(logEvent) }
     }
 
     @Test
-    fun testConsumer_should_not_ack_event_when_unknown_exception_happens() = runTest {
-        createLoggingClient(backgroundScope).register()
+    fun testConsumer_should_not_ack_event_and_log_locally_when_unknown_exception_happens() =
+        runTest {
+            createLoggingClient(backgroundScope).register()
 
-        every { mockUrlFactory.create(EmarsysUrlType.LOGGING, null) } throws RuntimeException()
-        everySuspend { mockDeviceInfoCollector.collectAsDeviceInfoForLogs() } returns deviceInfoForLogs
-        val logEvent = SdkEvent.Internal.Sdk.Metric(
-            level = LogLevel.Metric,
-        )
+            every { mockUrlFactory.create(EmarsysUrlType.LOGGING, null) } throws RuntimeException()
+            everySuspend { mockDeviceInfoCollector.collectAsDeviceInfoForLogs() } returns deviceInfoForLogs
+            val logEvent = SdkEvent.Internal.Sdk.Metric(
+                level = LogLevel.Metric,
+            )
 
-        val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
-            onlineEvents.take(1).toList()
+            val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
+                onlineEvents.take(1).toList()
+            }
+
+            onlineEvents.emit(logEvent)
+
+            advanceTimeBy(11000)
+
+            onlineSdkEvents.await() shouldBe listOf(logEvent)
+            verifySuspend(VerifyMode.exactly(0)) { mockEmarsysClient.send(any(), any()) }
+            verifySuspend { mockSdkLogger.error(any(), any<Throwable>(), false) }
+            verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(logEvent) }
         }
-
-        onlineEvents.emit(logEvent)
-
-        advanceTimeBy(1000)
-
-        onlineSdkEvents.await() shouldBe listOf(logEvent)
-        verifySuspend(VerifyMode.exactly(0)) { mockEmarsysClient.send(any(), any()) }
-        verifySuspend { mockSdkLogger.error(any(), any<Throwable>()) }
-        verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(logEvent) }
-    }
 
     @Test
     fun testConsumer_should_ack_event_when_known_exception_happens() = forAll(
@@ -280,11 +326,17 @@ class LoggingClientTests {
 
             onlineEvents.emit(logEvent)
 
-            advanceTimeBy(1000)
+            advanceTimeBy(11000)
 
             onlineSdkEvents.await() shouldBe listOf(logEvent)
             verifySuspend(VerifyMode.exactly(0)) { mockEmarsysClient.send(any(), any()) }
-            verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
+            verifySuspend(VerifyMode.exactly(0)) {
+                mockSdkLogger.error(
+                    any(),
+                    any<Throwable>(),
+                    false
+                )
+            }
             verifySuspend { mockEventsDao.removeEvent(logEvent) }
         }
     }

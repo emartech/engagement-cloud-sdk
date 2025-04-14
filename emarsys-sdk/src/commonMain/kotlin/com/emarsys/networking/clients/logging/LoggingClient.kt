@@ -18,15 +18,17 @@ import io.ktor.http.HttpMethod
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.put
 import kotlin.coroutines.coroutineContext
 
 internal class LoggingClient(
-    private val emarsysNetworkClient: NetworkClientApi,
+    private val genericNetworkClient: NetworkClientApi,
     private val urlFactory: UrlFactoryApi,
     private val sdkEventManager: SdkEventManagerApi,
     private val json: Json,
@@ -34,7 +36,7 @@ internal class LoggingClient(
     private val applicationScope: CoroutineScope,
     private val deviceInfoCollector: DeviceInfoCollectorApi,
     private val eventsDao: EventsDaoApi,
-    private val batchSize: Int = 1
+    private val batchSize: Int = 10
 ) : EventBasedClientApi {
 
     override suspend fun register() {
@@ -46,35 +48,41 @@ internal class LoggingClient(
 
     private suspend fun startEventConsumer() {
         sdkEventManager.onlineSdkEvents
-            .filter { it is SdkEvent.Internal.Sdk.Log || it is SdkEvent.Internal.Sdk.Metric }
+            .filterIsInstance<SdkEvent.Internal.LogEvent>()
             .batched(batchSize = batchSize, batchIntervalMillis = 10000L)
             .collect { sdkEvents ->
                 try {
-                    sdkLogger.debug("consumeLogsAndMetrics")
+                    sdkLogger.debug("consumeLogsAndMetrics", isRemoteLog = false)
                     val url = urlFactory.create(EmarsysUrlType.LOGGING)
-                    val logRequestsJson = sdkEvents.map { sdkEvent ->
-                        val logLevel = if (sdkEvent is SdkEvent.Internal.Sdk.Log) {
-                            sdkEvent.level
-                        } else {
-                            (sdkEvent as SdkEvent.Internal.Sdk.Metric).level
-                        }
+                    val logRequestsJson =
                         buildJsonObject {
-                            put("type", JsonPrimitive("log_request"))
-                            put("level", JsonPrimitive(logLevel.name))
-                            put(
-                                "deviceInfo",
-                                JsonPrimitive(json.encodeToString(deviceInfoCollector.collectAsDeviceInfoForLogs()))
-                            )
-                            sdkEvent.attributes?.forEach { attribute ->
-                                put(attribute.key, attribute.value)
+                            val logRequestJsonArray = sdkEvents.map { sdkEvent ->
+                                val logLevel = if (sdkEvent is SdkEvent.Internal.Sdk.Log) {
+                                    sdkEvent.level
+                                } else {
+                                    (sdkEvent as SdkEvent.Internal.Sdk.Metric).level
+                                }
+                                buildJsonObject {
+                                    put("type", "log_request")
+                                    put("level", logLevel.name.uppercase())
+                                    put(
+                                        "deviceInfo",
+                                        json.encodeToJsonElement(deviceInfoCollector.collectAsDeviceInfoForLogs())
+                                    )
+                                    sdkEvent.attributes?.forEach { attribute ->
+                                        put(attribute.key, attribute.value)
+                                    }
+                                }
                             }
+                            put("logs", JsonArray(logRequestJsonArray))
                         }
-                    }
+
                     val request = UrlRequest(
                         url, HttpMethod.Post,
-                        json.encodeToString(logRequestsJson)
+                        json.encodeToString(logRequestsJson),
+                        isLogRequest = true
                     )
-                    emarsysNetworkClient.send(
+                    genericNetworkClient.send(
                         request,
                         onNetworkError = { sdkEvents.forEach { sdkEventManager.emitEvent(it) } }
                     )
@@ -88,7 +96,8 @@ internal class LoggingClient(
 
                         else -> sdkLogger.error(
                             "consumeLogsAndMetrics error",
-                            exception
+                            exception,
+                            isRemoteLog = false
                         )
                     }
                 }

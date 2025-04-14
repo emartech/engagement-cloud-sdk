@@ -47,7 +47,9 @@ sealed interface OnlineSdkEvent : SdkEvent {
                 exception,
                 buildJsonObject {
                     put("event", this.toString())
-                })
+                },
+                isRemoteLog = this !is SdkEvent.Internal.LogEvent
+            )
         }
     }
 }
@@ -126,6 +128,8 @@ sealed interface SdkEvent {
 
         interface Custom : Internal, OnlineSdkEvent
 
+        interface LogEvent : Internal, OnlineSdkEvent
+
         @Serializable
         sealed class Sdk(override val name: String) : Internal {
             override val type: String = "internal"
@@ -143,7 +147,7 @@ sealed interface SdkEvent {
                 override val id: String = UUIDProvider().provide(),
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Sdk(LOG_EVENT_NAME), OnlineSdkEvent
+            ) : Sdk(LOG_EVENT_NAME), LogEvent
 
             @Serializable
             data class Metric(
@@ -151,7 +155,7 @@ sealed interface SdkEvent {
                 override val id: String = UUIDProvider().provide(),
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Sdk(METRIC_EVENT_NAME), OnlineSdkEvent
+            ) : Sdk(METRIC_EVENT_NAME), LogEvent
 
             @Serializable
             data class Dismiss(

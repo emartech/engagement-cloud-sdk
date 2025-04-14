@@ -110,24 +110,6 @@ class SdkEventDistributorTests {
         }
 
     @Test
-    fun registerAndStoreLogEvent_shouldPersistOnlineEventsToDb_andEmitSdkEvent_toSdkEventFlow() =
-        runTest {
-            val testEvent = SdkEvent.External.Custom(id = "testId", name = "testEventName")
-            val sdkEventDistributor = createEventDistributor(MutableStateFlow(false), sdkContext)
-
-            val emittedEvents = backgroundScope.async {
-                sdkEventDistributor.sdkEventFlow.take(1).toList()
-            }
-
-            sdkEventDistributor.registerAndStoreLogEvent(testEvent)
-
-            emittedEvents.await() shouldBe listOf(testEvent)
-            verifySuspend {
-                mockEventsDao.insertEvent(testEvent)
-            }
-        }
-
-    @Test
     fun registerAndStoreEvent_shouldNotPersistNotOnlineEvents_andEmitSdkEvent_toSdkEventFlow() =
         runTest {
             val testEvent = SdkEvent.External.Api.BadgeCount(name = "testEventName")
@@ -157,22 +139,7 @@ class SdkEventDistributorTests {
 
             verifySuspend {
                 mockEventsDao.insertEvent(testEvent)
-                mockSdkLogger.error(any(), testException, any())
-            }
-        }
-
-    @Test
-    fun registerAndStoreLogEvent_shouldLogError_andNotEmitIntoSdkEventFlow_whenPersistingEventFails() =
-        runTest {
-            val testEvent = SdkEvent.External.Custom(id = "testId", name = "testEventName")
-            val testException = RuntimeException("DB error")
-            everySuspend { mockEventsDao.insertEvent(testEvent) } throws testException
-            val sdkEventDistributor = createEventDistributor(MutableStateFlow(false), sdkContext)
-
-            sdkEventDistributor.registerAndStoreEvent(testEvent)
-
-            verifySuspend {
-                mockEventsDao.insertEvent(testEvent)
+                mockSdkLogger.error(any(), testException, any(), true)
             }
         }
 

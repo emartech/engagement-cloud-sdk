@@ -20,60 +20,77 @@ class SdkLogger(
         val breadcrumbsQueue = ArrayDeque<Pair<String, JsonObject>>(10)
     }
 
-    override suspend fun info(logEntry: LogEntry) {
-        log(LogLevel.Info, data = logEntry.data)
+    override suspend fun info(logEntry: LogEntry, isRemoteLog: Boolean) {
+        log(LogLevel.Info, data = logEntry.data, isRemoteLog = isRemoteLog)
     }
 
-    override suspend fun info(message: String) {
-        log(LogLevel.Info, message)
+    override suspend fun info(message: String, isRemoteLog: Boolean) {
+        log(LogLevel.Info, message, isRemoteLog = isRemoteLog)
     }
 
-    override suspend fun info(message: String, throwable: Throwable) {
-        log(LogLevel.Info, throwable = throwable, message = message)
+    override suspend fun info(message: String, throwable: Throwable, isRemoteLog: Boolean) {
+        log(LogLevel.Info, throwable = throwable, message = message, isRemoteLog = isRemoteLog)
     }
 
-    override suspend fun info(message: String, data: JsonObject) {
-        log(LogLevel.Info, message, data = data)
+    override suspend fun info(message: String, data: JsonObject, isRemoteLog: Boolean) {
+        log(LogLevel.Info, message, data = data, isRemoteLog = isRemoteLog)
     }
 
-    override suspend fun debug(logEntry: LogEntry) {
-        log(LogLevel.Debug, message = logEntry.topic, data = logEntry.data)
+    override suspend fun debug(logEntry: LogEntry, isRemoteLog: Boolean) {
+        log(
+            LogLevel.Debug,
+            message = logEntry.topic,
+            data = logEntry.data,
+            isRemoteLog = isRemoteLog
+        )
     }
 
-    override suspend fun debug(message: String) {
-        log(LogLevel.Debug, message)
+    override suspend fun debug(message: String, isRemoteLog: Boolean) {
+        log(LogLevel.Debug, message, isRemoteLog = isRemoteLog)
     }
 
-    override suspend fun debug(message: String, data: JsonObject) {
-        log(LogLevel.Debug, message, data = data)
+    override suspend fun debug(message: String, data: JsonObject, isRemoteLog: Boolean) {
+        log(LogLevel.Debug, message, data = data, isRemoteLog = isRemoteLog)
     }
 
-    override suspend fun debug(message: String, throwable: Throwable) {
-        log(LogLevel.Debug, message = message, throwable = throwable)
+    override suspend fun debug(message: String, throwable: Throwable, isRemoteLog: Boolean) {
+        log(LogLevel.Debug, message = message, throwable = throwable, isRemoteLog = isRemoteLog)
     }
 
-    override suspend fun error(logEntry: LogEntry) {
-        log(LogLevel.Error, message = logEntry.topic, data = logEntry.data)
+    override suspend fun error(logEntry: LogEntry, isRemoteLog: Boolean) {
+        log(
+            LogLevel.Error,
+            message = logEntry.topic,
+            data = logEntry.data,
+            isRemoteLog = isRemoteLog
+        )
     }
 
-    override suspend fun error(message: String) {
-        log(LogLevel.Error, message)
+    override suspend fun error(message: String, isRemoteLog: Boolean) {
+        log(LogLevel.Error, message, isRemoteLog = isRemoteLog)
     }
 
-    override suspend fun error(message: String, data: JsonObject) {
-        log(LogLevel.Error, message = message, data = data)
+    override suspend fun error(message: String, data: JsonObject, isRemoteLog: Boolean) {
+        log(LogLevel.Error, message = message, data = data, isRemoteLog = isRemoteLog)
     }
 
-    override suspend fun error(message: String, throwable: Throwable) {
-        log(LogLevel.Error, throwable = throwable, message = message)
+    override suspend fun error(message: String, throwable: Throwable, isRemoteLog: Boolean) {
+        log(LogLevel.Error, throwable = throwable, message = message, isRemoteLog = isRemoteLog)
     }
 
     override suspend fun error(
         message: String,
         throwable: Throwable,
-        data: JsonObject
+        data: JsonObject,
+        isRemoteLog: Boolean
     ) {
-        log(LogLevel.Error, message = message, throwable = throwable, data = data)
+        log(
+            LogLevel.Error,
+            message = message,
+            throwable = throwable,
+            data = data,
+            isRemoteLog = isRemoteLog
+        )
     }
 
     override suspend fun metric(
@@ -87,12 +104,13 @@ class SdkLogger(
         level: LogLevel,
         message: String? = null,
         throwable: Throwable? = null,
-        data: JsonObject = JsonObject(mapOf())
+        data: JsonObject = JsonObject(mapOf()),
+        isRemoteLog: Boolean = true
     ) {
         val contextMap = coroutineContext[LogContext.Key]?.contextMap
         val extendedData = mergeContext(data, contextMap)
 
-        if (remoteLogger != null) {
+        if (remoteLogger != null && isRemoteLog) {
             if (level == LogLevel.Debug || level == LogLevel.Info) {
                 mutex.withLock {
                     if (breadcrumbsQueue.size >= (sdkContext?.logBreadcrumbsQueueSize ?: 10)) {
@@ -155,7 +173,7 @@ class SdkLogger(
         includeBreadcrumbs: Boolean = false
     ) = buildJsonObject {
         put("loggerName", loggerName)
-        put("level", level.name)
+        put("level", level.name.uppercase())
         put("message", message ?: "")
         throwable?.let {
             put("exception", throwable.toString())

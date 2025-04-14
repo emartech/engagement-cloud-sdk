@@ -5,8 +5,10 @@ import com.emarsys.core.log.SdkLogger.Companion.breadcrumbsQueue
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
+import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.resetCalls
+import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CoroutineName
@@ -134,7 +136,7 @@ class SdkLoggerTests {
         val testException = RuntimeException("test exception")
         val expectedLogObject = buildJsonObject {
             put("loggerName", LOGGER_NAME)
-            put("level", LogLevel.Error.name)
+            put("level", LogLevel.Error.name.uppercase())
             put("message", testMessage)
             put("exception", testException.toString())
             put("reason", testException.message)
@@ -147,7 +149,7 @@ class SdkLoggerTests {
                 put("entry_0", buildJsonObject {
                     put("loggerName", LOGGER_NAME)
                     put("message", breadcrumbTestMessage)
-                    put("level", LogLevel.Info.name)
+                    put("level", LogLevel.Info.name.uppercase())
                 })
             })
 
@@ -186,6 +188,25 @@ class SdkLoggerTests {
         logger.info("test")
 
         breadcrumbsQueue.size shouldBe 0
+        verifySuspend(VerifyMode.exactly(0)) {
+            mockRemoteLogger.logToRemote(LogLevel.Info, any())
+        }
+    }
+
+    @Test
+    fun sdkLogger_shouldNotLogToRemote_ifIsRemoteLogFlag_isFalse() = runTest {
+        val logger = SdkLogger(
+            LOGGER_NAME,
+            ConsoleLogger(),
+            remoteLogger = mockRemoteLogger,
+            sdkContext = mockSdkContext
+        )
+
+        logger.info("test", isRemoteLog = false)
+
+        verifySuspend(VerifyMode.exactly(0)) {
+            mockRemoteLogger.logToRemote(LogLevel.Info, any())
+        }
     }
 
     private suspend fun contextTestMethod1() {

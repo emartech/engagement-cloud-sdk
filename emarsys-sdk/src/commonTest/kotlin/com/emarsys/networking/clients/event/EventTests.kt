@@ -1,6 +1,7 @@
 package com.emarsys.networking.clients.event
 
 import com.emarsys.core.db.events.EventsDaoApi
+import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.event.model.ack
@@ -46,7 +47,21 @@ class EventTests {
 
         verifySuspend {
             mockEventsDao.removeEvent(onlineSdkEvent)
-            mockSdkLogger.error(any(), any<Exception>(), any())
+            mockSdkLogger.error(any(), any<Exception>(), any(), true)
+        }
+    }
+
+    @Test
+    fun ack_shouldLogError_onlyLocally_whenRemovingLogEventEventFromDbFails() = runTest {
+        val logEvent = SdkEvent.Internal.Sdk.Log(level = LogLevel.Error)
+        everySuspend { mockEventsDao.removeEvent(logEvent) } throws Exception("Error removing element from db")
+
+
+        logEvent.ack(mockEventsDao, mockSdkLogger)
+
+        verifySuspend {
+            mockEventsDao.removeEvent(logEvent)
+            mockSdkLogger.error(any(), any<Exception>(), any(), false)
         }
     }
 

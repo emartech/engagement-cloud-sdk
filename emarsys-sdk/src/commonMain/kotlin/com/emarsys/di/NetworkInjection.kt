@@ -92,14 +92,15 @@ object NetworkInjection {
         }
         single<EventBasedClientApi>(named(EventBasedClientTypes.Logging)) {
             LoggingClient(
-                emarsysNetworkClient = get(named(NetworkClientTypes.Emarsys)),
+                genericNetworkClient = get(named(NetworkClientTypes.Generic)),
                 urlFactory = get(),
                 sdkEventManager = get(),
                 json = get(),
                 sdkLogger = get { parametersOf(LoggingClient::class.simpleName) },
                 applicationScope = get(named(CoroutineScopeTypes.Application)),
                 deviceInfoCollector = get(),
-                eventsDao = get()
+                eventsDao = get(),
+                batchSize = 10
             )
         }
     }

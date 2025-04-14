@@ -11,5 +11,4 @@ interface SdkEventDistributorApi {
 
     suspend fun registerAndStoreEvent(sdkEvent: SdkEvent)
 
-    suspend fun registerAndStoreLogEvent(sdkEvent: SdkEvent)
 }

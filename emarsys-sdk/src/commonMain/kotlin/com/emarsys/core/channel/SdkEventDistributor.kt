@@ -59,17 +59,9 @@ class SdkEventDistributor(
             sdkLogger.error(
                 "SdkEventDistributor - Failed to register event",
                 exception,
-                buildJsonObject { put("event", sdkEvent.toString()) })
-        }
-    }
-
-    override suspend fun registerAndStoreLogEvent(sdkEvent: SdkEvent) {
-        try {
-            eventsDao.insertEvent(sdkEvent)
-            _sdkEventFlow.emit(sdkEvent)
-        } catch (exception: Exception) {
-            coroutineContext.ensureActive()
-            exception.printStackTrace()
+                buildJsonObject { put("event", sdkEvent.toString()) },
+                isRemoteLog = sdkEvent !is SdkEvent.Internal.LogEvent
+            )
         }
     }
 
