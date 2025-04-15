@@ -1,6 +1,5 @@
 package com.emarsys.mobileengage.inapp
 
-import `<dynamic>`.get
 import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.action.actions.ReportingAction
 import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
