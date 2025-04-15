@@ -145,16 +145,17 @@ internal class IosPushInternal(
                 }
             }
 
-        actionModel?.let {
-            val triggeredAction = actionFactory.create(it)
-            val mandatoryActions = createMandatoryActions(pushUserInfo, it)
-            actionHandler.handleActions(mandatoryActions, triggeredAction)
+        val triggeredAction = actionModel?.let {
+            actionFactory.create(it)
         }
+        val mandatoryActions = createMandatoryActions(pushUserInfo, actionModel)
+        actionHandler.handleActions(mandatoryActions, triggeredAction)
     }
+
 
     private suspend fun createMandatoryActions(
         pushUserInfo: PushUserInfo,
-        actionModel: ActionModel
+        actionModel: ActionModel?
     ): List<Action<*>> {
         return buildList {
             val model = when (actionModel) {
@@ -164,9 +165,12 @@ internal class IosPushInternal(
                         pushUserInfo.ems.trackingInfo
                     )
                 }
-                is BasicActionModel -> {
+
+                is BasicActionModel,
+                null -> {
                     NotificationOpenedActionModel(pushUserInfo.ems.trackingInfo)
                 }
+
                 else -> null
             }
 

@@ -266,6 +266,7 @@ internal class IosPushInternalTests {
     @Test
     fun `didReceiveNotificationResponse should handle badgeCount if present`() = runTest {
         val actionIdentifier = UNNotificationDefaultActionIdentifier
+        everySuspend { mockActionFactory.create(NotificationOpenedActionModel(TRACKING_INFO)) } returns mock()
         val userInfo = createUserInfoMap(
             null,
             null,
@@ -372,6 +373,30 @@ internal class IosPushInternalTests {
             verifySuspend {
                 mockActionFactory.create(actionModel)
                 mockActionHandler.handleActions(listOf(reportingAction), action)
+            }
+        }
+
+    @Test
+    fun `didReceiveNotificationResponse should execute mandatory actions event if there was no action triggered`() =
+        runTest {
+            val actionIdentifier = UNNotificationDefaultActionIdentifier
+            val userInfo = createUserInfoMap(
+                defaultAction = null,
+                actions = null
+            )
+
+            val notificationOpenedActionModel = NotificationOpenedActionModel(TRACKING_INFO)
+
+            val reportingAction = ReportingAction(notificationOpenedActionModel, mock())
+
+            everySuspend { mockActionFactory.create(notificationOpenedActionModel) } returns reportingAction
+
+            iosPushInternal.didReceiveNotificationResponse(actionIdentifier, userInfo) {}
+
+            advanceUntilIdle()
+
+            verifySuspend {
+                mockActionHandler.handleActions(listOf(reportingAction), null)
             }
         }
 
