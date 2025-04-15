@@ -22,6 +22,6 @@ class CustomEventAction(
                         )
                     }
                 })
-        )
+        )?.await()
     }
 }

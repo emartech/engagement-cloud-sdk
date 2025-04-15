@@ -90,7 +90,9 @@ internal class EventClient(
                     handleDeviceEventState(result)
                     handleInApp(result.message)
                     handleOnAppEventAction(result)
-
+                    sdkEvents.forEach {
+                        sdkEventManager.emitEvent(SdkEvent.Internal.Sdk.Answer.Ready(originId = it.id))
+                    }
                     sdkEvents.ack(eventsDao, sdkLogger)
                 } catch (throwable: Throwable) {
                     when (throwable) {

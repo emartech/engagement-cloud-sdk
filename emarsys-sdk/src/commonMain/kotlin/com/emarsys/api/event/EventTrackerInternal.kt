@@ -22,7 +22,7 @@ internal class EventTrackerInternal(
                 uuidProvider.provide(),
                 timestampProvider.provide()
             )
-        )
+        )?.await()
         sdkLogger.debug("EventTrackerInternal - trackEvent")
     }
 
