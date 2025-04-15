@@ -1,6 +1,7 @@
 package com.emarsys.core.db
 
 import com.emarsys.core.log.Logger
+import com.emarsys.networking.clients.event.model.SdkEvent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -52,7 +53,7 @@ class EmarsysIndexedDbObjectStore<T>(
                         logger.error("EmarsysIndexedDbObjectStore - put", buildJsonObject {
                             put("value", JsonPrimitive(value.toString()))
                             put("id", JsonPrimitive(id))
-                        })
+                        }, isRemoteLog = value !is SdkEvent.Internal.LogEvent)
                     }
                     continuation.resumeWithException(request.error!!)
                 }
@@ -60,7 +61,7 @@ class EmarsysIndexedDbObjectStore<T>(
             logger.debug("EmarsysIndexedDbObjectStore - put", buildJsonObject {
                 put("value", value.toString())
                 put("id", id)
-            })
+            }, isRemoteLog = value !is SdkEvent.Internal.LogEvent)
             savedId
         }
     }

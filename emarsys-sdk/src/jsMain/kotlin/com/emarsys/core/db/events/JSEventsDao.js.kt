@@ -15,7 +15,9 @@ class JSEventsDao(
     override suspend fun insertEvent(event: SdkEvent) {
         logger.debug(
             "JSEventsDao - insertEvent",
-            buildJsonObject { put("event", event.toString()) })
+            buildJsonObject { put("event", event.toString()) },
+            isRemoteLog = event !is SdkEvent.Internal.LogEvent
+        )
         emarsysIndexedDbObjectStore.put(event.id, event)
     }
 
@@ -25,10 +27,13 @@ class JSEventsDao(
     }
 
     override suspend fun removeEvent(event: SdkEvent) {
-        logger.debug(
-            "JSEventsDao - removeEvent",
-            buildJsonObject { put("event", event.toString()) }
-        )
+        if (event !is SdkEvent.Internal.LogEvent) {
+            logger.debug(
+                "JSEventsDao - removeEvent",
+                buildJsonObject { put("event", event.toString()) },
+                isRemoteLog = event !is SdkEvent.Internal.LogEvent
+            )
+        }
         emarsysIndexedDbObjectStore.delete(event.id)
     }
 
