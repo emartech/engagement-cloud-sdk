@@ -9,6 +9,7 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 @JsonClassDiscriminator("type")
 sealed interface ActionModel {
     val id: String
+    val reporting: String
     val title: String
     val type: String
 }

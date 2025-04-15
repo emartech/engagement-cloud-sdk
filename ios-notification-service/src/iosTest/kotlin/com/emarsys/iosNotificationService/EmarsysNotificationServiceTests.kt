@@ -37,6 +37,7 @@ class NotificationServiceTests {
                     "actions" to listOf(
                         mapOf(
                             "id" to "testId",
+                            "reporting" to """{"reportingKey":"reportingValue"}""",
                             "title" to "testTitle",
                             "type" to "Dismiss"
                         )
