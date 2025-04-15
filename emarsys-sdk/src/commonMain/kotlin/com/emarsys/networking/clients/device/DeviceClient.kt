@@ -51,7 +51,7 @@ internal class DeviceClient(
                     if (response.status == HttpStatusCode.OK) {
                         contactTokenHandler.handleContactTokens(response)
                     }
-                    sdkEventManager.emitEvent(SdkEvent.Internal.Sdk.Answer.DeviceInfoReady(originId = it.id))
+                    sdkEventManager.emitEvent(SdkEvent.Internal.Sdk.Answer.Ready(originId = it.id))
                     it.ack(eventsDao, sdkLogger)
                 } catch (exception: Exception) {
                     when (exception) {

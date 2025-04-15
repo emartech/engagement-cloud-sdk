@@ -51,7 +51,7 @@ internal class PushClient(
                             request,
                             onNetworkError = { sdkEventManager.emitEvent(it) })
                     }
-
+                    sdkEventManager.emitEvent(SdkEvent.Internal.Sdk.Answer.Ready(originId = it.id))
                     it.ack(eventsDao, sdkLogger)
                 } catch (exception: Exception) {
                     when (exception) {

@@ -57,6 +57,7 @@ internal class RemoteConfigClient(
                     remoteConfigResponse?.let {
                         remoteConfigResponseHandler.handle(remoteConfigResponse)
                     }
+                    sdkEventManager.emitEvent(SdkEvent.Internal.Sdk.Answer.Ready(originId = it.id))
                     it.ack(eventsDao, sdkLogger)
                 } catch (exception: Exception) {
                     when (exception) {

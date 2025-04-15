@@ -89,6 +89,7 @@ class RemoteConfigClientTests {
         mockSdkEventManager = mock()
         onlineEvents = spy(MutableSharedFlow(replay = 5))
         every { mockSdkEventManager.onlineSdkEvents } returns onlineEvents
+        everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
         mockRemoteConfigResponseHandler = mock(MockMode.autoUnit)
         mockEventsDao = mock(MockMode.autoUnit)
         mockSdkLogger = mock(MockMode.autofill)

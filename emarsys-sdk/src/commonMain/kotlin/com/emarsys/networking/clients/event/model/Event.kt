@@ -140,7 +140,7 @@ sealed interface SdkEvent {
                 open val success:Boolean = true
                 open val throwable:Throwable? = null
 
-                data class DeviceInfoReady(
+                data class Ready(
                     override val id: String = UUIDProvider().provide(),
                     override val originId: String,
                     override val attributes: JsonObject? = null,

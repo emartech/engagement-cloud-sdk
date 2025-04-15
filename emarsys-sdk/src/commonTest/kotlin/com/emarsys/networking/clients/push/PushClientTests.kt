@@ -81,6 +81,7 @@ class PushClientTests {
         onlineEvents = spy(MutableSharedFlow(replay = 5))
         mockSdkEventManager = mock()
         every { mockSdkEventManager.onlineSdkEvents } returns onlineEvents
+        everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
         mockEventsDao = mock(MockMode.autoUnit)
         mockSdkLogger = mock(MockMode.autofill)
         everySuspend { mockSdkLogger.error(any(), any<Throwable>()) } calls {

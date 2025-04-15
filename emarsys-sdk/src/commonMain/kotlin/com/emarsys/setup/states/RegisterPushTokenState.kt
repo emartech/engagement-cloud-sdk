@@ -29,7 +29,7 @@ class RegisterPushTokenState(
                         put(PushConstants.PUSH_TOKEN_KEY, pushToken)
                     }
                 )
-            )
+            )?.await()
             storage.put(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY, pushToken)
         }
     }
