@@ -173,8 +173,10 @@ class PushNotificationClickHandlerTests {
         }
 
     @Test
-    fun handleNotificationClick_shouldNotCallActionFactory_whenActionWithId_isNotPresent() =
+    fun handleNotificationClick_shouldStillExecuteReportingAction_whenActionWithId_isNotPresent() =
         runTest {
+            val mockReportingAction = mock<Action<*>>()
+            everySuspend { mockActionFactory.create(NotificationOpenedActionModel(TRACKING_INFO)) } returns mockReportingAction
             val actionModel =
                 PresentableOpenExternalUrlActionModel(
                     "actionId",
@@ -192,33 +194,34 @@ class PushNotificationClickHandlerTests {
 
             pushNotificationClickHandler.handleNotificationClick(event)
 
-            verifySuspend(VerifyMode.exactly(0)) { mockActionFactory.create(any()) }
-            verifySuspend(VerifyMode.exactly(0)) { mockActionHandler.handleActions(any(), any()) }
+            verifySuspend { mockActionFactory.create(NotificationOpenedActionModel(TRACKING_INFO)) }
+            verifySuspend {
+                mockActionHandler.handleActions(
+                    listOf(
+                        mockReportingAction
+                    ), null
+                )
+            }
         }
 
     @Test
-    fun handleNotificationClick_shouldNotCallActionFactory_whenDefaultTapAction_isNotPresent() =
+    fun handleNotificationClick_shouldReportOpen_whenNeitherDefaultTapAction_norAnyOtherAction_arePresent() =
         runTest {
-            val actionModel =
-                PresentableOpenExternalUrlActionModel(
-                    "actionId",
-                    REPORTING,
-                    "title",
-                    "https://www.google.com"
-                )
+            val mockReportingAction = mock<Action<*>>()
+            everySuspend { mockActionFactory.create(NotificationOpenedActionModel(TRACKING_INFO)) } returns mockReportingAction
             val notificationClickedData =
                 createTestJsNotificationClickedData(
                     "",
                     defaultTapActionModel = null,
-                    actionModels = listOf(actionModel)
+                    actionModels = null
                 )
             val event =
                 JsonUtil.json.encodeToString<JsNotificationClickedData>(notificationClickedData)
 
             pushNotificationClickHandler.handleNotificationClick(event)
 
-            verifySuspend(VerifyMode.exactly(0)) { mockActionFactory.create(any()) }
-            verifySuspend(VerifyMode.exactly(0)) { mockActionHandler.handleActions(any(), any()) }
+            verifySuspend { mockActionFactory.create(NotificationOpenedActionModel(TRACKING_INFO)) }
+            verifySuspend { mockActionHandler.handleActions(listOf(mockReportingAction), null) }
         }
 
     @Test

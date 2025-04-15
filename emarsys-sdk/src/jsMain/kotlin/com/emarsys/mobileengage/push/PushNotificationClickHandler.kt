@@ -45,11 +45,12 @@ internal class PushNotificationClickHandler(
                     jsNotificationClickedData.jsPushMessage.actionableData?.actions
                 )
             }
-            actionModel?.let {
-                val triggeredAction = actionFactory.create(it)
-                val mandatoryActions = createMandatoryActions(jsNotificationClickedData, it)
-                actionHandler.handleActions(mandatoryActions, triggeredAction)
+            val triggeredAction = actionModel?.let {
+                actionFactory.create(it)
             }
+            val mandatoryActions = createMandatoryActions(jsNotificationClickedData, actionModel)
+            actionHandler.handleActions(mandatoryActions, triggeredAction)
+
         } catch (e: Exception) {
             sdkLogger.error("PushNotificationClickHandler - handleNotificationClick", e)
         }
@@ -57,7 +58,7 @@ internal class PushNotificationClickHandler(
 
     private suspend fun createMandatoryActions(
         jsNotificationClickedData: JsNotificationClickedData,
-        actionModel: ActionModel
+        actionModel: ActionModel?
     ): List<Action<*>> {
         return when (actionModel) {
 
@@ -69,7 +70,8 @@ internal class PushNotificationClickHandler(
                 listOf(actionFactory.create(model))
             }
 
-            is BasicActionModel -> {
+            is BasicActionModel,
+            null -> {
                 listOf(actionFactory.create(NotificationOpenedActionModel(jsNotificationClickedData.jsPushMessage.trackingInfo)))
             }
 
