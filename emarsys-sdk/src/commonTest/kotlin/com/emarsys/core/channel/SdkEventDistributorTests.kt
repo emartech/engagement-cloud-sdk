@@ -174,49 +174,6 @@ class SdkEventDistributorTests {
 
     @OptIn(FlowPreview::class)
     @Test
-    fun distributor_shouldPauseOnlineEvents_whenSdkStateIsOnHold_andConnectionIsOnline_withTwoCollectors() =
-        runTest {
-            everySuspend { mockEventsDao.getEvents() } returns flowOf()
-            val sdkEventDistributor =
-                createEventDistributor(connectionState = MutableStateFlow(true), sdkContext)
-            val testEvent1 = SdkEvent.External.Custom(id = "testId", name = "testEventName")
-            val testEvent2 = SdkEvent.External.Custom(id = "testId1", name = "testEventName")
-            sdkContext.setSdkState(SdkState.onHold)
-
-            val onHoldCollected1 = backgroundScope.async {
-                try {
-                    sdkEventDistributor.onlineSdkEvents.timeout(500.milliseconds).firstOrNull()
-                } catch (e: TimeoutCancellationException) {
-                    null
-                }
-            }
-            val onHoldCollected2 = backgroundScope.async {
-                try {
-                    sdkEventDistributor.onlineSdkEvents.timeout(500.milliseconds).firstOrNull()
-                } catch (e: TimeoutCancellationException) {
-                    null
-                }
-            }
-
-            sdkEventDistributor.registerEvent(testEvent1)
-            sdkEventDistributor.registerEvent(testEvent2)
-
-            onHoldCollected1.await() shouldBe null
-            onHoldCollected2.await() shouldBe null
-
-            val emittedOnlineEventsWhenActive = backgroundScope.async {
-                sdkEventDistributor.onlineSdkEvents.take(2).toList()
-            }
-
-            sdkContext.setSdkState(SdkState.active)
-            advanceUntilIdle()
-
-            emittedOnlineEventsWhenActive.await() shouldBe listOf(testEvent1, testEvent2)
-        }
-
-
-    @OptIn(FlowPreview::class)
-    @Test
     fun distributor_shouldPauseOnlineEvents_whenSdkStateIsActive_andConnection_isOffline() =
         runTest {
             everySuspend { mockEventsDao.getEvents() } returns flowOf()

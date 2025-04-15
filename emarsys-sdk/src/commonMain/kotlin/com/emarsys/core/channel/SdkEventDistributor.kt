@@ -1,6 +1,5 @@
 package com.emarsys.core.channel
 
-import com.emarsys.api.SdkState
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.log.Logger
@@ -46,7 +45,7 @@ class SdkEventDistributor(
                     sdkContext.currentSdkState,
                     connectionStatus
                 ) { sdkState, isConnected ->
-                    sdkState == SdkState.active && isConnected
+                    isConnected
                 }.first { it }
             }
 

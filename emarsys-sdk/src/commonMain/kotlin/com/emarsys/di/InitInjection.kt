@@ -79,13 +79,13 @@ object InitInjection {
         single<StateMachineApi>(named(StateMachineTypes.Init)) {
             StateMachine(
                 states = listOf(
+                    get(named(InitStateTypes.RegisterEventBasedClients)),
                     get(named(InitStateTypes.ApplyGlobalRemoteConfig)),
                     get(named(InitStateTypes.RegisterInstances)),
                     get(named(InitStateTypes.RegisterWatchdogs)),
                     get(named(InitStateTypes.SessionSubscription)),
                     get(named(InitStateTypes.Initializer)),
-                    get(named(InitStateTypes.SdkConfigLoader)),
-                    get(named(InitStateTypes.RegisterEventBasedClients))
+                    get(named(InitStateTypes.SdkConfigLoader))
                 )
             )
         }
