@@ -56,13 +56,13 @@ class SdkEventDistributor(
             connectionStatus.first { it }
         }
 
-    override suspend fun registerAndStoreEvent(sdkEvent: SdkEvent) {
-        try {
+    override suspend fun registerEvent(sdkEvent: SdkEvent): SdkEventWaiterApi? {
+        return try {
             if (sdkEvent is OnlineSdkEvent) {
                 eventsDao.insertEvent(sdkEvent)
             }
-
             _sdkEventFlow.emit(sdkEvent)
+            SdkEventWaiter(this@SdkEventDistributor, sdkEvent)
         } catch (exception: Exception) {
             coroutineContext.ensureActive()
             sdkLogger.error(
@@ -71,6 +71,18 @@ class SdkEventDistributor(
                 buildJsonObject { put("event", sdkEvent.toString()) },
                 isRemoteLog = sdkEvent !is SdkEvent.Internal.LogEvent
             )
+                buildJsonObject { put("event", sdkEvent.toString()) })
+            null
+        }
+    }
+
+    override suspend fun registerAndStoreLogEvent(sdkEvent: SdkEvent) {
+        try {
+            eventsDao.insertEvent(sdkEvent)
+            _sdkEventFlow.emit(sdkEvent)
+        } catch (exception: Exception) {
+            coroutineContext.ensureActive()
+            exception.printStackTrace()
         }
     }
 

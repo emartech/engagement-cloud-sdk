@@ -16,7 +16,7 @@ internal class DeepLinkInternal(
     override suspend fun trackDeepLink(url: Url): Result<Unit> = runCatching {
         withContext(sdkContext.sdkDispatcher) {
             url.parameters["ems_dl"]?.let {
-                sdkEventDistributor.registerAndStoreEvent(
+                sdkEventDistributor.registerEvent(
                     SdkEvent.Internal.Sdk.TrackDeepLink(
                         attributes = buildJsonObject { put("trackingId", JsonPrimitive(it)) }
                     ))

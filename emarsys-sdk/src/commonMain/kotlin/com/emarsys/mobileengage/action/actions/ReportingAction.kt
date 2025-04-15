@@ -19,7 +19,7 @@ data class ReportingAction(
         when (action) {
             //TODO: follow up reporting changes
             is BasicPushButtonClickedActionModel -> {
-                sdkEventDistributor.registerAndStoreEvent(
+                sdkEventDistributor.registerEvent(
                     SdkEvent.Internal.Push.Clicked(
                         attributes = buildJsonObject {
                             put("buttonId", JsonPrimitive(action.id))
@@ -38,7 +38,7 @@ data class ReportingAction(
 //                action.sid?.let { attributes["sid"] = it }
                 action.url?.let { attributes["url"] = it }
 
-                sdkEventDistributor.registerAndStoreEvent(
+                sdkEventDistributor.registerEvent(
                     SdkEvent.Internal.InApp.ButtonClicked(
                        attributes = buildJsonObject {
                             attributes.forEach { (key, value) ->
@@ -57,7 +57,7 @@ data class ReportingAction(
                 //TODO: follow up reporting changes
 //                action.sid?.let { attributes["sid"] = it }
 
-                sdkEventDistributor.registerAndStoreEvent(
+                sdkEventDistributor.registerEvent(
                     SdkEvent.Internal.Push.Clicked(
                         attributes = buildJsonObject {
                             attributes.forEach { (key, value) ->

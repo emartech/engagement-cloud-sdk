@@ -10,7 +10,7 @@ class DismissAction(
 ): Action<Unit> {
     override suspend fun invoke(value: Unit?) {
         action.dismissId?.let {
-            sdkEventDistributor.registerAndStoreEvent(
+            sdkEventDistributor.registerEvent(
                 SdkEvent.Internal.Sdk.Dismiss(it)
             )
         }

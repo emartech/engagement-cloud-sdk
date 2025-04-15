@@ -41,7 +41,7 @@ class ContactInternalTests {
         eventSlot = slot()
         contactContext = ContactContext(calls)
         sdkEventDistributor = mock(MockMode.autofill)
-        everySuspend { sdkEventDistributor.registerAndStoreEvent(capture(eventSlot)) } returns Unit
+        everySuspend { sdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(MockMode.autofill)
         contactInternal = ContactInternal(
             contactContext,
             sdkLogger = mock(MockMode.autofill),
@@ -85,7 +85,7 @@ class ContactInternalTests {
     fun testActivate_should_emit_stored_calls_as_events_to_event_flow() = runTest {
         contactInternal.activate()
 
-        verifySuspend(VerifyMode.exactly(3)) { sdkEventDistributor.registerAndStoreEvent(any()) }
+        verifySuspend(VerifyMode.exactly(3)) { sdkEventDistributor.registerEvent(any()) }
 
         contactContext.calls.size shouldBe 0
     }

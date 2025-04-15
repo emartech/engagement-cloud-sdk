@@ -6,6 +6,7 @@ import com.emarsys.SdkConstants.APP_START_EVENT_NAME
 import com.emarsys.SdkConstants.CHANGE_APP_CODE_NAME
 import com.emarsys.SdkConstants.CHANGE_MERCHANT_ID_NAME
 import com.emarsys.SdkConstants.CLEAR_PUSH_TOKEN_EVENT_NAME
+import com.emarsys.SdkConstants.DEVICE_INFO_READY_EVENT_NAME
 import com.emarsys.SdkConstants.DEVICE_INFO_UPDATE_REQUIRED_EVENT_NAME
 import com.emarsys.SdkConstants.DISMISS_EVENT_NAME
 import com.emarsys.SdkConstants.INAPP_VIEWED_EVENT_NAME
@@ -133,6 +134,19 @@ sealed interface SdkEvent {
         @Serializable
         sealed class Sdk(override val name: String) : Internal {
             override val type: String = "internal"
+
+            sealed class Answer(val eventName: String): Sdk(eventName) {
+                open val originId: String = UUIDProvider().provide()
+                open val success:Boolean = true
+                open val throwable:Throwable? = null
+
+                data class DeviceInfoReady(
+                    override val id: String = UUIDProvider().provide(),
+                    override val originId: String,
+                    override val attributes: JsonObject? = null,
+                    override val timestamp: Instant = TimestampProvider().provide(),
+                ) : Answer(DEVICE_INFO_READY_EVENT_NAME)
+            }
 
             @Serializable
             data class DeviceInfoUpdateRequired(

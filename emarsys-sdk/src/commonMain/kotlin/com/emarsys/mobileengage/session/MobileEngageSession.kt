@@ -46,7 +46,7 @@ internal class MobileEngageSession(
         if (canStartSession()) {
             val sessionStart = timestampProvider.provide()
             try {
-                sdkEventDistributor.registerAndStoreEvent(
+                sdkEventDistributor.registerEvent(
                     SdkEvent.Internal.Sdk.SessionStart(
                         id = uuidProvider.provide(),
                         timestamp = sessionStart
@@ -76,9 +76,9 @@ internal class MobileEngageSession(
 
     override suspend fun endSession() {
         if (canEndSession()) {
-            return try {
+            try {
                 val event = createSessionEndEvent()
-                sdkEventDistributor.registerAndStoreEvent(event)
+                sdkEventDistributor.registerEvent(event)
             } catch (exception: Exception) {
                 sdkLogger.error(
                     LogEntry(

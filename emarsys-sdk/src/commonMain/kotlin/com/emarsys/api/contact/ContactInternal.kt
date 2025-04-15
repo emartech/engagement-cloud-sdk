@@ -17,7 +17,7 @@ internal class ContactInternal(
 ) : ContactInstance {
     override suspend fun linkContact(contactFieldId: Int, contactFieldValue: String) {
         sdkLogger.debug("ContactInternal - linkContact")
-        sdkEventDistributor.registerAndStoreEvent(
+        sdkEventDistributor.registerEvent(
             SdkEvent.Internal.Sdk.LinkContact(
                 attributes = buildJsonObject {
                     put("contactFieldId", contactFieldId)
@@ -28,7 +28,7 @@ internal class ContactInternal(
 
     override suspend fun linkAuthenticatedContact(contactFieldId: Int, openIdToken: String) {
         sdkLogger.debug("ContactInternal - linkAuthenticatedContact")
-        sdkEventDistributor.registerAndStoreEvent(
+        sdkEventDistributor.registerEvent(
             SdkEvent.Internal.Sdk.LinkAuthenticatedContact(
                 attributes = buildJsonObject {
                     put("contactFieldId", contactFieldId)
@@ -39,14 +39,14 @@ internal class ContactInternal(
 
     override suspend fun unlinkContact() {
         sdkLogger.debug("ContactInternal - linkContact")
-        sdkEventDistributor.registerAndStoreEvent(SdkEvent.Internal.Sdk.UnlinkContact())
+        sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.UnlinkContact())
     }
 
     override suspend fun activate() {
         sdkLogger.debug("ContactInternal - activate")
         contactContext.calls.dequeue {
             when (it) {
-                is LinkContact -> sdkEventDistributor.registerAndStoreEvent(
+                is LinkContact -> sdkEventDistributor.registerEvent(
                     SdkEvent.Internal.Sdk.LinkContact(
                         attributes = buildJsonObject {
                             put("contactFieldId", it.contactFieldId)
@@ -54,7 +54,7 @@ internal class ContactInternal(
                         })
                 )
 
-                is LinkAuthenticatedContact -> sdkEventDistributor.registerAndStoreEvent(
+                is LinkAuthenticatedContact -> sdkEventDistributor.registerEvent(
                     SdkEvent.Internal.Sdk.LinkContact(
                         attributes = buildJsonObject {
                             put("contactFieldId", it.contactFieldId)
@@ -62,7 +62,7 @@ internal class ContactInternal(
                         })
                 )
 
-                is UnlinkContact -> sdkEventDistributor.registerAndStoreEvent(
+                is UnlinkContact -> sdkEventDistributor.registerEvent(
                     SdkEvent.Internal.Sdk.UnlinkContact()
                 )
             }

@@ -11,7 +11,7 @@ class CustomEventAction(
     private val sdkEventDistributor: SdkEventDistributorApi
 ) : Action<Unit> {
     override suspend fun invoke(value: Unit?) {
-        sdkEventDistributor.registerAndStoreEvent(
+        sdkEventDistributor.registerEvent(
             SdkEvent.External.Custom(
                 name = action.name,
                 attributes = buildJsonObject {

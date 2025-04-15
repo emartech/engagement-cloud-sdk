@@ -2,6 +2,7 @@ package com.emarsys.setup.states
 
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.networking.clients.event.model.SdkEvent
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
@@ -28,7 +29,7 @@ class RegisterClientStateTests {
     fun setup() = runTest {
         mockEventDistributor = mock()
         eventSlot = slot()
-        everySuspend { mockEventDistributor.registerAndStoreEvent(capture(eventSlot)) } returns Unit
+        everySuspend { mockEventDistributor.registerEvent(capture(eventSlot)) } returns mock(MockMode.autofill)
         registerClientState = RegisterClientState(mockEventDistributor)
     }
 
@@ -39,7 +40,7 @@ class RegisterClientStateTests {
         advanceUntilIdle()
 
         verifySuspend {
-            mockEventDistributor.registerAndStoreEvent(any())
+            mockEventDistributor.registerEvent(any())
         }
 
         (eventSlot.get() is SdkEvent.Internal.Sdk.RegisterDeviceInfo) shouldBe true

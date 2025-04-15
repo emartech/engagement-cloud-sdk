@@ -23,7 +23,7 @@ class RegisterPushTokenState(
         val lastSentPushToken = storage.get(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY)
 
         if (pushToken != null && pushToken != lastSentPushToken) {
-            sdkEventDistributor.registerAndStoreEvent(
+            sdkEventDistributor.registerEvent(
                 SdkEvent.Internal.Sdk.RegisterPushToken(
                     attributes = buildJsonObject {
                         put(PushConstants.PUSH_TOKEN_KEY, pushToken)

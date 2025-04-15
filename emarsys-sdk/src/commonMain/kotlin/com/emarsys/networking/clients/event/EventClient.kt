@@ -128,7 +128,7 @@ internal class EventClient(
     private suspend fun reportOnEventAction(campaignId: String) {
         sdkLogger.debug("EventClient - reportOnEventAction")
 
-        sdkEventManager.registerAndStoreEvent(SdkEvent.Internal.InApp.Viewed(attributes = buildJsonObject {
+        sdkEventManager.registerEvent(SdkEvent.Internal.InApp.Viewed(attributes = buildJsonObject {
             put(
                 "campaignId",
                 JsonPrimitive(campaignId)

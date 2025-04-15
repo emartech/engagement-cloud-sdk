@@ -4,6 +4,7 @@ import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.networking.clients.event.model.SdkEvent
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.capture.Capture.Companion.slot
@@ -40,7 +41,8 @@ class ApplyGlobalRemoteConfigStateTests {
 
     @Test
     fun testActive_should_handleGlobal_with_remoteConfigHandler() = runTest {
-        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(capture(eventSlot)) } returns Unit
+        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(
+            MockMode.autofill)
 
         applyGlobalRemoteConfigState.active()
 

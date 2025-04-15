@@ -4,6 +4,7 @@ import com.emarsys.api.push.PushConstants
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.networking.clients.event.model.SdkEvent
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
@@ -56,7 +57,7 @@ class RegisterPushTokenStateTests {
 
     @Test
     fun testActive_whenLastSentPushTokenIsMissing_pushTokenIsAvailable() = runTest {
-        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(capture(eventSlot)) } returns Unit
+        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(MockMode.autofill)
         every { mockStringStorage.get(PushConstants.PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
         every { mockStringStorage.get(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns null
         every {
@@ -82,7 +83,7 @@ class RegisterPushTokenStateTests {
 
     @Test
     fun testActive_whenBothAvailable_butNotTheSame() = runTest {
-        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(capture(eventSlot)) } returns Unit
+        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(MockMode.autofill)
         every { mockStringStorage.get(PushConstants.PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
         every { mockStringStorage.get(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns LAST_SENT_PUSH_TOKEN
         every { mockStringStorage.put(any(), any()) } returns Unit
@@ -103,14 +104,14 @@ class RegisterPushTokenStateTests {
 
     @Test
     fun testActive_whenBothAvailable_andTheSame() = runTest {
-        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(any()) } returns Unit
+        everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mock(MockMode.autofill)
         every { mockStringStorage.get(PushConstants.PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
         every { mockStringStorage.get(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
         every { mockStringStorage.put(any(), any()) } returns Unit
 
         registerPushTokenState.active()
 
-        verifySuspend(VerifyMode.exactly(0)) { mockSdkEventDistributor.registerAndStoreEvent(any()) }
+        verifySuspend(VerifyMode.exactly(0)) { mockSdkEventDistributor.registerEvent(any()) }
         verifySuspend(VerifyMode.exactly(0)) { mockStringStorage.put(any(), any()) }
     }
 }

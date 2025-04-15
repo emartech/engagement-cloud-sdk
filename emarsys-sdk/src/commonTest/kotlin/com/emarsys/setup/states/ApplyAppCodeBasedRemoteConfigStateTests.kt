@@ -2,6 +2,7 @@ package com.emarsys.setup.states
 
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.networking.clients.event.model.SdkEvent
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.capture.Capture.Companion.slot
@@ -33,7 +34,8 @@ class ApplyAppCodeBasedRemoteConfigStateTests {
 
     @Test
     fun testActive() = runTest {
-        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(capture(eventSlot)) } returns Unit
+        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(
+            MockMode.autofill)
 
         applyAppCodeBasedRemoteConfigState.active()
 

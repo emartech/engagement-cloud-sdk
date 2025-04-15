@@ -45,6 +45,7 @@ class ConfigInternalTests {
         every { mockTimestampProvider.provide() } returns TIMESTAMP
         mockLanguageHandler = mock()
         sdkEventDistributor = mock(MockMode.autofill)
+        everySuspend { sdkEventDistributor.registerEvent(any()) } returns mock(MockMode.autofill)
         configInternal =
             ConfigInternal(
                 sdkEventDistributor,
@@ -63,7 +64,7 @@ class ConfigInternalTests {
 
         configInternal.changeApplicationCode(APPCODE)
 
-        verifySuspend { sdkEventDistributor.registerAndStoreEvent(expectedEvent) }
+        verifySuspend { sdkEventDistributor.registerEvent(expectedEvent) }
     }
 
     @Test
@@ -74,7 +75,7 @@ class ConfigInternalTests {
 
         configInternal.changeMerchantId(MERCHANT_ID)
 
-        verifySuspend { sdkEventDistributor.registerAndStoreEvent(expectedEvent) }
+        verifySuspend { sdkEventDistributor.registerEvent(expectedEvent) }
     }
 
     @Test

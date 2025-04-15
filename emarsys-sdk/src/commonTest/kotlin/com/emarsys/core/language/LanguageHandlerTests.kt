@@ -6,6 +6,7 @@ import com.emarsys.core.exceptions.PreconditionFailedException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.networking.clients.event.model.SdkEvent
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
@@ -56,13 +57,13 @@ class LanguageHandlerTests {
     fun testHandleLanguage_should_clearStorage_and_emit_deviceInfoUpdateRequired_event_when_language_is_null() =
         runTest {
             everySuspend { mockStringStorage.put(any(), any()) } returns Unit
-            everySuspend { mockSdkEventDistributor.registerAndStoreEvent(any()) } returns Unit
+            everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mock(MockMode.autofill)
 
             languageHandler.handleLanguage(null)
 
             verifySuspend {
                 mockStringStorage.put(LANGUAGE_STORAGE_KEY, null)
-                mockSdkEventDistributor.registerAndStoreEvent(any<SdkEvent.Internal.Sdk.DeviceInfoUpdateRequired>())
+                mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.Sdk.DeviceInfoUpdateRequired>())
             }
         }
 
@@ -70,14 +71,14 @@ class LanguageHandlerTests {
     fun testHandleLanguage_should_store_language_and_emit_deviceInfoUpdateRequired_event_when_language_is_valid() =
         runTest {
             everySuspend { mockStringStorage.put(any(), any()) } returns Unit
-            everySuspend { mockSdkEventDistributor.registerAndStoreEvent(any()) } returns Unit
+            everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mock(MockMode.autofill)
             everySuspend { mockLanguageTagValidator.isValid("zh-Hant-HK") } returns true
 
             languageHandler.handleLanguage("zh-Hant-HK")
 
             verifySuspend {
                 mockStringStorage.put(LANGUAGE_STORAGE_KEY, "zh-Hant-HK")
-                mockSdkEventDistributor.registerAndStoreEvent(any<SdkEvent.Internal.Sdk.DeviceInfoUpdateRequired>())
+                mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.Sdk.DeviceInfoUpdateRequired>())
             }
         }
 

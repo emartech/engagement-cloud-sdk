@@ -93,8 +93,8 @@ class MobileEngageSessionTests {
         )
 
         every { mockUuidProvider.provide() } returns SESSION_ID.value
-        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(sessionStartEvent) } returns Unit
-        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(sessionEndEvent) } returns Unit
+        everySuspend { mockSdkEventDistributor.registerEvent(sessionStartEvent) } returns mock()
+        everySuspend { mockSdkEventDistributor.registerEvent(sessionEndEvent) } returns mock()
         everySuspend { mockSdkLogger.debug(any<LogEntry>()) } returns Unit
         everySuspend { mockSdkLogger.debug(any<LogEntry>()) } returns Unit
         everySuspend { mockSdkLogger.error(message = any()) } returns Unit
@@ -135,8 +135,8 @@ class MobileEngageSessionTests {
 
     @Test
     fun testSubscribe_shouldCallEndSession() = runTest {
-        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(sessionStartEvent) } returns Unit
-        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(sessionEndEvent) } returns Unit
+        everySuspend { mockSdkEventDistributor.registerEvent(sessionStartEvent) } returns mock(MockMode.autofill)
+        everySuspend { mockSdkEventDistributor.registerEvent(sessionEndEvent) } returns mock(MockMode.autofill)
         every { mockSdkContext.config } returns EmarsysConfig(applicationCode = APPLICATION_CODE)
         every { mockTimestampProvider.provide() } returns Instant.fromEpochMilliseconds(
             SESSION_START
@@ -175,7 +175,7 @@ class MobileEngageSessionTests {
 
         mobileEngageSession.startSession()
 
-        verifySuspend { mockSdkEventDistributor.registerAndStoreEvent(sessionStartEvent) }
+        verifySuspend { mockSdkEventDistributor.registerEvent(sessionStartEvent) }
     }
 
     @Test
@@ -185,14 +185,14 @@ class MobileEngageSessionTests {
 
         mobileEngageSession.endSession()
 
-        verifySuspend { mockSdkEventDistributor.registerAndStoreEvent(sessionEndEvent) }
+        verifySuspend { mockSdkEventDistributor.registerEvent(sessionEndEvent) }
     }
 
     @Test
     fun testStartSession_shouldSetSession_evenWhenRegisteringEventFails() = runTest {
         sessionContext.sessionId = null
         sessionContext.sessionStart = null
-        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(sessionStartEvent) } throws RuntimeException(
+        everySuspend { mockSdkEventDistributor.registerEvent(sessionStartEvent) } throws RuntimeException(
             "uuid provider failed"
         )
         every { mockTimestampProvider.provide() } returns Instant.fromEpochMilliseconds(
@@ -259,7 +259,7 @@ class MobileEngageSessionTests {
     fun testEndSession_shouldResetSession_evenWhenRegisteringEventFails() = runTest {
         every { mockTimestampProvider.provide() } returns Instant.fromEpochMilliseconds(SESSION_END)
 
-        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(sessionEndEvent) } throws RuntimeException(
+        everySuspend { mockSdkEventDistributor.registerEvent(sessionEndEvent) } throws RuntimeException(
             "request failed"
         )
 
@@ -323,7 +323,7 @@ class MobileEngageSessionTests {
             mockSdkContext.config
             mockSdkLogger.debug(any<LogEntry>())
             repeat(0) {
-                mockSdkEventDistributor.registerAndStoreEvent(sessionEvent)
+                mockSdkEventDistributor.registerEvent(sessionEvent)
             }
         }
     }

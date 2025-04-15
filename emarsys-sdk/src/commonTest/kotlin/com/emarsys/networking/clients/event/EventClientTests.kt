@@ -122,8 +122,9 @@ class EventClientTests {
         mockSdkEventManager = mock()
         every { mockSdkEventManager.onlineSdkEvents } returns onlineEvents
         everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
-        everySuspend { mockSdkEventManager.registerAndStoreEvent(any()) } calls {
+        everySuspend { mockSdkEventManager.registerEvent(any()) } calls {
             onlineEvents.emit(it.args[0] as OnlineSdkEvent)
+            mock(MockMode.autofill)
         }
         every { mockInAppConfigApi.inAppDnd }.returns(IN_APP_DND)
         every { mockUrlFactory.create(EmarsysUrlType.EVENT, null) }.returns(TEST_BASE_URL)
@@ -180,7 +181,7 @@ class EventClientTests {
             onlineEvents.take(1).toList()
         }
 
-        mockSdkEventManager.registerAndStoreEvent(testEvent)
+        mockSdkEventManager.registerEvent(testEvent)
 
         advanceUntilIdle()
 
@@ -214,7 +215,7 @@ class EventClientTests {
             onlineEvents.take(1).toList()
         }
 
-        mockSdkEventManager.registerAndStoreEvent(testEvent)
+        mockSdkEventManager.registerEvent(testEvent)
 
         advanceUntilIdle()
 
@@ -243,7 +244,7 @@ class EventClientTests {
             onlineEvents.take(1).toList()
         }
 
-        mockSdkEventManager.registerAndStoreEvent(testEvent)
+        mockSdkEventManager.registerEvent(testEvent)
         advanceUntilIdle()
 
         onlineSdkEvents.await() shouldBe listOf(testEvent)
@@ -269,7 +270,7 @@ class EventClientTests {
             onlineEvents.take(1).toList()
         }
 
-        mockSdkEventManager.registerAndStoreEvent(testEvent)
+        mockSdkEventManager.registerEvent(testEvent)
 
         advanceUntilIdle()
 
@@ -298,7 +299,7 @@ class EventClientTests {
             onlineEvents.take(1).toList()
         }
 
-        mockSdkEventManager.registerAndStoreEvent(testEvent)
+        mockSdkEventManager.registerEvent(testEvent)
 
         advanceUntilIdle()
 
@@ -327,8 +328,8 @@ class EventClientTests {
         }
         val testEvent1 = testEvent.copy(id = "testId1")
 
-        mockSdkEventManager.registerAndStoreEvent(testEvent)
-        mockSdkEventManager.registerAndStoreEvent(testEvent1)
+        mockSdkEventManager.registerEvent(testEvent)
+        mockSdkEventManager.registerEvent(testEvent1)
 
         advanceUntilIdle()
 
@@ -364,8 +365,8 @@ class EventClientTests {
         }
         val testEvent1 = testEvent.copy(id = "testId1")
 
-        mockSdkEventManager.registerAndStoreEvent(testEvent)
-        mockSdkEventManager.registerAndStoreEvent(testEvent1)
+        mockSdkEventManager.registerEvent(testEvent)
+        mockSdkEventManager.registerEvent(testEvent1)
 
         advanceUntilIdle()
 
@@ -412,8 +413,8 @@ class EventClientTests {
                 }
                 val testEvent1 = testEvent.copy(id = "testId1")
 
-                mockSdkEventManager.registerAndStoreEvent(testEvent)
-                mockSdkEventManager.registerAndStoreEvent(testEvent1)
+                mockSdkEventManager.registerEvent(testEvent)
+                mockSdkEventManager.registerEvent(testEvent1)
 
                 advanceUntilIdle()
 

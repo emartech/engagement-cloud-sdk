@@ -4,6 +4,7 @@ import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.networking.clients.event.model.SdkEvent
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
@@ -39,12 +40,12 @@ class AppStartStateTests {
     fun testActivate_should_send_appStartEvent_with_eventClient_when_it_was_not_completed_yet() =
         runTest {
             val expectedEvent = SdkEvent.Internal.Sdk.AppStart(id = UUID, timestamp = timestamp)
-            everySuspend { mockSdkEventDistributor.registerAndStoreEvent(expectedEvent) } returns Unit
+            everySuspend { mockSdkEventDistributor.registerEvent(expectedEvent) } returns mock(MockMode.autofill)
 
             appStartState.active()
 
             everySuspend {
-                mockSdkEventDistributor.registerAndStoreEvent(expectedEvent)
+                mockSdkEventDistributor.registerEvent(expectedEvent)
             }
         }
 
@@ -52,14 +53,15 @@ class AppStartStateTests {
     fun testActivate_should_not_send_appStartEvent_with_eventClient_when_it_was_already_completed_yet() =
         runTest {
             val expectedEvent = SdkEvent.Internal.Sdk.AppStart(id = UUID, timestamp = timestamp)
-            everySuspend { mockSdkEventDistributor.registerAndStoreEvent(expectedEvent) } returns Unit
+            everySuspend { mockSdkEventDistributor.registerEvent(expectedEvent) } returns mock(
+                MockMode.autofill)
 
             appStartState.active()
             appStartState.active()
 
             everySuspend {
                 repeat(1) {
-                    mockSdkEventDistributor.registerAndStoreEvent(expectedEvent)
+                    mockSdkEventDistributor.registerEvent(expectedEvent)
                 }
             }
         }

@@ -100,7 +100,7 @@ class PushMessageHandlerTest {
         silentPushMessageHandler.handle(message)
 
         verifySuspend {
-            mockSdkEventDistributor.registerAndStoreEvent(
+            mockSdkEventDistributor.registerEvent(
                 SdkEvent.External.Api.SilentPush(
                     name = PUSH_RECEIVED_EVENT_NAME,
                     attributes = buildJsonObject {

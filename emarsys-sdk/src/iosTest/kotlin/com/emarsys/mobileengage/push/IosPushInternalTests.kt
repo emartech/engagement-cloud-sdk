@@ -115,7 +115,7 @@ internal class IosPushInternalTests {
         mockTimestampProvider = mock()
         mockUuidProvider = mock()
         sdkDispatcher = StandardTestDispatcher()
-        mockSdkEventDistributor = mock()
+        mockSdkEventDistributor = mock(MockMode.autofill)
         mockSdkLogger = mock(MockMode.autofill)
         everySuspend { mockActionHandler.handleActions(any(), any()) } returns Unit
         everySuspend { mockTimestampProvider.provide() } returns Instant.DISTANT_PAST
@@ -396,7 +396,7 @@ internal class IosPushInternalTests {
 
         val mockOpenExternalUrlAction: Action<*> = mock(MockMode.autoUnit)
         val mockAppEventAction: Action<*> = mock(MockMode.autoUnit)
-        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(any()) } returns Unit
+        everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mock(MockMode.autofill)
 
         everySuspend { mockActionFactory.create(openExternalUrlActionModel) } returns mockOpenExternalUrlAction
         everySuspend { mockActionFactory.create(appEventActionModel) } returns mockAppEventAction
@@ -428,13 +428,13 @@ internal class IosPushInternalTests {
             ),
         )
         everySuspend { mockActionFactory.create(openExternalUrlActionModel) } returns mockOpenExternalUrlAction
-        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(any()) } returns Unit
+        everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mock(MockMode.autofill)
 
         iosPushInternal.handleSilentMessageWithUserInfo(userInfo)
 
         verifySuspend { mockOpenExternalUrlAction.invoke() }
         verifySuspend {
-            mockSdkEventDistributor.registerAndStoreEvent(
+            mockSdkEventDistributor.registerEvent(
                 SdkEvent.External.Api.SilentPush(
                     id = UUID,
                     name = PUSH_RECEIVED_EVENT_NAME,
@@ -447,7 +447,7 @@ internal class IosPushInternalTests {
     @Test
     fun `testActivate should handle pushCalls`() = runTest {
         val eventContainer = Capture.container<SdkEvent>()
-        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(capture(eventContainer)) } returns Unit
+        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventContainer)) } returns mock(MockMode.autofill)
 
         iosPushInternal.activate()
 

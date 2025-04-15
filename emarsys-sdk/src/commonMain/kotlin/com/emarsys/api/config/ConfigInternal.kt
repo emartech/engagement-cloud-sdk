@@ -19,7 +19,7 @@ internal class ConfigInternal(
 
     override suspend fun changeApplicationCode(applicationCode: String) {
         sdkLogger.debug("ConfigInternal - changeApplicationCode")
-        sdkEventDistributor.registerAndStoreEvent(
+        sdkEventDistributor.registerEvent(
             SdkEvent.Internal.Sdk.ChangeAppCode(
                 uuidProvider.provide(),
                 buildJsonObject {
@@ -35,7 +35,7 @@ internal class ConfigInternal(
 
     override suspend fun changeMerchantId(merchantId: String) {
         sdkLogger.debug("ConfigInternal - changeMerchantId")
-        sdkEventDistributor.registerAndStoreEvent(
+        sdkEventDistributor.registerEvent(
             SdkEvent.Internal.Sdk.ChangeMerchantId(
                 uuidProvider.provide(),
                 buildJsonObject {

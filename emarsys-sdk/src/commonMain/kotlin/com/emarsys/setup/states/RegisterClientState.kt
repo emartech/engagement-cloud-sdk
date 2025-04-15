@@ -14,7 +14,7 @@ internal class RegisterClientState(
     }
 
     override suspend fun active() {
-        sdkEventDistributor.registerAndStoreEvent(SdkEvent.Internal.Sdk.RegisterDeviceInfo())
+        sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.RegisterDeviceInfo())?.await()
     }
 
     override fun relax() {

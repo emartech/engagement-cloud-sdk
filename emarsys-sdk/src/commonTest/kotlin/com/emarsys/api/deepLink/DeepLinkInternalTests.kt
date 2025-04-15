@@ -50,7 +50,7 @@ class DeepLinkInternalTests {
 
         eventSlot = slot()
         sdkEventDistributor = mock(MockMode.autofill)
-        everySuspend { sdkEventDistributor.registerAndStoreEvent(capture(eventSlot)) } returns Unit
+        everySuspend { sdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(MockMode.autofill)
         deepLinkInternal = DeepLinkInternal(sdkContext, sdkEventDistributor)
     }
 

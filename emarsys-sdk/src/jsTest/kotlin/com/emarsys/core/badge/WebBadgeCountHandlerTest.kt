@@ -6,6 +6,7 @@ import com.emarsys.mobileengage.action.models.BadgeCount
 import com.emarsys.mobileengage.action.models.BadgeCountMethod
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.util.JsonUtil
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
@@ -66,12 +67,12 @@ class WebBadgeCountHandlerTest {
     fun handleBadgeCount_shouldEmitSdkEvent_whenBadgeCountReceived() = runTest {
         val testBadgeCount = BadgeCount(BadgeCountMethod.SET, 1)
         val testBadgeCountString = JsonUtil.json.encodeToString(testBadgeCount)
-        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(any()) } returns Unit
+        everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mock(MockMode.autofill)
 
         webBadgeCountHandler.handleBadgeCount(testBadgeCountString)
 
         verifySuspend {
-            mockSdkEventDistributor.registerAndStoreEvent(
+            mockSdkEventDistributor.registerEvent(
                 SdkEvent.External.Api.BadgeCount(
                     id = any(),
                     name = testBadgeCount.method.name,

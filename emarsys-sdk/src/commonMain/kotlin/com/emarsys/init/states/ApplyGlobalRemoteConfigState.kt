@@ -17,7 +17,7 @@ class ApplyGlobalRemoteConfigState(
 
     override suspend fun active() {
         sdkLogger.debug("Applying global remote config")
-        sdkEventDistributor.registerAndStoreEvent(SdkEvent.Internal.Sdk.ApplyGlobalRemoteConfig())
+        sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.ApplyGlobalRemoteConfig())
     }
 
     override fun relax() {

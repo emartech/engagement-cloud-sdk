@@ -13,7 +13,7 @@ class ApplyAppCodeBasedRemoteConfigState(private val sdkEventDistributor: SdkEve
     }
 
     override suspend fun active() {
-        sdkEventDistributor.registerAndStoreEvent(SdkEvent.Internal.Sdk.ApplyAppCodeBasedRemoteConfig())
+        sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.ApplyAppCodeBasedRemoteConfig())
     }
 
     override fun relax() {

@@ -85,7 +85,7 @@ class SdkEventDistributorTests {
             }
 
             testEvents.forEach {
-                sdkEventDistributor.registerAndStoreEvent(it)
+                sdkEventDistributor.registerEvent(it)
             }
 
             emittedEvents.await() shouldBe testEvents
@@ -101,7 +101,7 @@ class SdkEventDistributorTests {
                 sdkEventDistributor.sdkEventFlow.take(1).toList()
             }
 
-            sdkEventDistributor.registerAndStoreEvent(testEvent)
+            sdkEventDistributor.registerEvent(testEvent)
 
             emittedEvents.await() shouldBe listOf(testEvent)
             verifySuspend {
@@ -119,7 +119,7 @@ class SdkEventDistributorTests {
                 sdkEventDistributor.sdkEventFlow.take(1).toList()
             }
 
-            sdkEventDistributor.registerAndStoreEvent(testEvent)
+            sdkEventDistributor.registerEvent(testEvent)
 
             emittedEvents.await() shouldBe listOf(testEvent)
             verifySuspend(VerifyMode.exactly(0)) {
@@ -135,11 +135,26 @@ class SdkEventDistributorTests {
             everySuspend { mockEventsDao.insertEvent(testEvent) } throws testException
             val sdkEventDistributor = createEventDistributor(MutableStateFlow(false), sdkContext)
 
-            sdkEventDistributor.registerAndStoreEvent(testEvent)
+            sdkEventDistributor.registerEvent(testEvent)
 
             verifySuspend {
                 mockEventsDao.insertEvent(testEvent)
                 mockSdkLogger.error(any(), testException, any(), true)
+            }
+        }
+
+    @Test
+    fun registerAndStoreLogEvent_shouldLogError_andNotEmitIntoSdkEventFlow_whenPersistingEventFails() =
+        runTest {
+            val testEvent = SdkEvent.External.Custom(id = "testId", name = "testEventName")
+            val testException = RuntimeException("DB error")
+            everySuspend { mockEventsDao.insertEvent(testEvent) } throws testException
+            val sdkEventDistributor = createEventDistributor(MutableStateFlow(false), sdkContext)
+
+            sdkEventDistributor.registerEvent(testEvent)
+
+            verifySuspend {
+                mockEventsDao.insertEvent(testEvent)
             }
         }
 
@@ -183,8 +198,8 @@ class SdkEventDistributorTests {
                 }
             }
 
-            sdkEventDistributor.registerAndStoreEvent(testEvent1)
-            sdkEventDistributor.registerAndStoreEvent(testEvent2)
+            sdkEventDistributor.registerEvent(testEvent1)
+            sdkEventDistributor.registerEvent(testEvent2)
 
             onHoldCollected1.await() shouldBe null
             onHoldCollected2.await() shouldBe null
@@ -219,7 +234,7 @@ class SdkEventDistributorTests {
                 }
             }
 
-            sdkEventDistributor.registerAndStoreEvent(testEvent)
+            sdkEventDistributor.registerEvent(testEvent)
 
             offlineCollected.await() shouldBe null
 
@@ -252,7 +267,7 @@ class SdkEventDistributorTests {
                 }
             }
 
-            sdkEventDistributor.registerAndStoreEvent(testEvent)
+            sdkEventDistributor.registerEvent(testEvent)
 
             offlineCollected.await() shouldBe null
 

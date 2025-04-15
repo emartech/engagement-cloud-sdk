@@ -45,10 +45,13 @@ internal class DeviceClient(
                 try {
                     sdkLogger.debug("DeviceClient - consumeRegisterDeviceInfo")
                     val request = createRequest()
-                    val response = emarsysClient.send(request, onNetworkError =  { sdkEventManager.emitEvent(it) })
+                    val response = emarsysClient.send(
+                        request,
+                        onNetworkError = { sdkEventManager.emitEvent(it) })
                     if (response.status == HttpStatusCode.OK) {
                         contactTokenHandler.handleContactTokens(response)
                     }
+                    sdkEventManager.emitEvent(SdkEvent.Internal.Sdk.Answer.DeviceInfoReady(originId = it.id))
                     it.ack(eventsDao, sdkLogger)
                 } catch (exception: Exception) {
                     when (exception) {

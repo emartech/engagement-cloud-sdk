@@ -5,6 +5,7 @@ import com.emarsys.mobileengage.action.models.BasicInAppButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.networking.clients.event.model.SdkEvent
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.capture.Capture.Companion.slot
@@ -52,7 +53,7 @@ class ReportingActionTests {
 
         val eventSlot = slot<SdkEvent>()
 
-        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(capture(eventSlot)) } returns Unit
+        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(MockMode.autofill)
 
         action.invoke()
 
@@ -76,7 +77,7 @@ class ReportingActionTests {
 
         val eventSlot = slot<SdkEvent>()
 
-        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(capture(eventSlot)) } returns Unit
+        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(MockMode.autofill)
 
         action.invoke()
 
@@ -98,7 +99,7 @@ class ReportingActionTests {
 
             val eventSlot = slot<SdkEvent>()
 
-            everySuspend { mockSdkEventDistributor.registerAndStoreEvent(capture(eventSlot)) } returns Unit
+            everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(MockMode.autofill)
 
             action.invoke()
 
@@ -120,7 +121,8 @@ class ReportingActionTests {
 
             val eventSlot = slot<SdkEvent>()
 
-            everySuspend { mockSdkEventDistributor.registerAndStoreEvent(capture(eventSlot)) } returns Unit
+            everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(
+                MockMode.autofill)
 
             action.invoke()
 

@@ -10,6 +10,6 @@ interface SdkEventDistributorApi {
     val onlineSdkEvents: Flow<OnlineSdkEvent>
     val logEvents: Flow<SdkEvent.Internal.LogEvent>
 
-    suspend fun registerAndStoreEvent(sdkEvent: SdkEvent)
+    suspend fun registerEvent(sdkEvent: SdkEvent): SdkEventWaiterApi?
 
 }

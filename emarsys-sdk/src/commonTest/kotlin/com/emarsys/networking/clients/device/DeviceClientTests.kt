@@ -86,7 +86,7 @@ class DeviceClientTests {
             (it.args[1] as Throwable).printStackTrace()
         }
         onlineEvents = spy(MutableSharedFlow(replay = 5))
-        mockSdkEventManager = mock()
+        mockSdkEventManager = mock(MockMode.autofill)
         every { mockSdkEventManager.onlineSdkEvents } returns onlineEvents
         mockEventsDao = mock(MockMode.autoUnit)
     }

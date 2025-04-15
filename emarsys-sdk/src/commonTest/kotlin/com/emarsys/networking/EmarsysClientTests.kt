@@ -87,6 +87,8 @@ class EmarsysClientTests {
             )
         } returns Url("https://testUrl.com")
 
+        everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mock(MockMode.autofill)
+
         emarsysClient = EmarsysClient(
             mockNetworkClient,
             sessionContext,
@@ -249,7 +251,7 @@ class EmarsysClientTests {
             emarsysClient.send(UrlRequest(Url("https://testUrl.com"), HttpMethod.Get, null))
 
             verifySuspend {
-                mockSdkEventDistributor.registerAndStoreEvent(
+                mockSdkEventDistributor.registerEvent(
                     SdkEvent.Internal.Sdk.ReregistrationRequired(
                         id = any()
                     )
@@ -274,7 +276,7 @@ class EmarsysClientTests {
             emarsysClient.send(UrlRequest(Url("https://testUrl.com"), HttpMethod.Get, null))
 
             verifySuspend {
-                mockSdkEventDistributor.registerAndStoreEvent(
+                mockSdkEventDistributor.registerEvent(
                     SdkEvent.Internal.Sdk.RemoteConfigUpdateRequired(
                         id = any()
                     )

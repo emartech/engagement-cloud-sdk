@@ -24,7 +24,7 @@ internal open class PushInternal(
         storage.put(PUSH_TOKEN_STORAGE_KEY, pushToken)
         val lastSentPushToken = storage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY)
         if (lastSentPushToken != pushToken) {
-            sdkEventDistributor.registerAndStoreEvent(
+            sdkEventDistributor.registerEvent(
                 SdkEvent.Internal.Sdk.RegisterPushToken(
                     attributes = buildJsonObject {
                         put(PUSH_TOKEN_KEY, JsonPrimitive(pushToken))
@@ -35,7 +35,7 @@ internal open class PushInternal(
     }
 
     override suspend fun clearPushToken() {
-        sdkEventDistributor.registerAndStoreEvent(SdkEvent.Internal.Sdk.ClearPushToken())
+        sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.ClearPushToken())
         storage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, null)
     }
 
@@ -46,14 +46,14 @@ internal open class PushInternal(
     override suspend fun activate() {
         pushContext.calls.dequeue { call ->
             when (call) {
-                is RegisterPushToken -> sdkEventDistributor.registerAndStoreEvent(
+                is RegisterPushToken -> sdkEventDistributor.registerEvent(
                     SdkEvent.Internal.Sdk.RegisterPushToken(
                         attributes = buildJsonObject {
                             put(PUSH_TOKEN_KEY, JsonPrimitive(call.pushToken))
                         }
                     )
                 )
-                is ClearPushToken -> sdkEventDistributor.registerAndStoreEvent(SdkEvent.Internal.Sdk.ClearPushToken())
+                is ClearPushToken -> sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.ClearPushToken())
                 is PushCall.HandleSilentMessageWithUserInfo -> {
                     sdkLogger.debug(
                         "Common PushInternal: shouldn't handle silent message with user info: $call"

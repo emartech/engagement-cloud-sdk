@@ -84,7 +84,7 @@ internal class IosPushInternal(
         }
 
         //TODO: revisit what we want to send in attributes after API discovery
-        sdkEventDistributor.registerAndStoreEvent(
+        sdkEventDistributor.registerEvent(
             SdkEvent.External.Api.SilentPush(
                 id = uuidProvider.provide(),
                 name = PUSH_RECEIVED_EVENT_NAME,
@@ -96,7 +96,7 @@ internal class IosPushInternal(
     override suspend fun activate() {
         pushContext.calls.dequeue { call ->
             when (call) {
-                is RegisterPushToken -> sdkEventDistributor.registerAndStoreEvent(
+                is RegisterPushToken -> sdkEventDistributor.registerEvent(
                     SdkEvent.Internal.Sdk.RegisterPushToken(
                         attributes = buildJsonObject {
                             put(PUSH_TOKEN_KEY, JsonPrimitive(call.pushToken))
@@ -104,7 +104,7 @@ internal class IosPushInternal(
                     )
                 )
 
-                is ClearPushToken -> sdkEventDistributor.registerAndStoreEvent(SdkEvent.Internal.Sdk.ClearPushToken())
+                is ClearPushToken -> sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.ClearPushToken())
                 is HandleSilentMessageWithUserInfo -> handleSilentMessageWithUserInfo(call.userInfo)
             }
         }

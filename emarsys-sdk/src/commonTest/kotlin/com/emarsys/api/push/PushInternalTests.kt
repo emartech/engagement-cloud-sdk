@@ -11,6 +11,7 @@ import com.emarsys.networking.clients.event.model.SdkEvent
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
+import dev.mokkery.matcher.any
 import dev.mokkery.matcher.capture.Capture
 import dev.mokkery.matcher.capture.Capture.Companion.slot
 import dev.mokkery.matcher.capture.SlotCapture
@@ -72,7 +73,7 @@ class PushInternalTests {
 
     @Test
     fun testRegisterPushToken_shouldNotDoAnything_whenPushTokenStoredAlready() = runTest {
-        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(capture(eventSlot)) } returns Unit
+        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(MockMode.autofill)
         everySuspend { mockStringStorage.get(PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
         everySuspend { mockStringStorage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
         everySuspend { mockStringStorage.put(PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
@@ -91,7 +92,7 @@ class PushInternalTests {
     @Test
     fun testRegisterPushToken_shouldRegisterPushToken_whenPushTokenWasNotStoredPreviously() =
         runTest {
-            everySuspend { mockSdkEventDistributor.registerAndStoreEvent(capture(eventSlot)) } returns Unit
+            everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(MockMode.autofill)
             everySuspend { mockStringStorage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns null
             everySuspend { mockStringStorage.put(PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
             everySuspend {
@@ -114,7 +115,7 @@ class PushInternalTests {
 
     @Test
     fun testRegisterPushToken_shouldRegisterPushToken_whenStoredPushTokenIsDifferent() = runTest {
-        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(capture(eventSlot)) } returns Unit
+        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(MockMode.autofill)
         everySuspend { mockStringStorage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns "<differentTestPushToken>"
         everySuspend { mockStringStorage.put(PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
         everySuspend {
@@ -137,7 +138,7 @@ class PushInternalTests {
 
     @Test
     fun testClearPushToken() = runTest {
-        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(capture(eventSlot)) } returns Unit
+        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(MockMode.autofill)
         everySuspend { mockStringStorage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, null) } returns Unit
 
         pushInternal.clearPushToken()
@@ -149,6 +150,7 @@ class PushInternalTests {
 
     @Test
     fun testPushToken() = runTest {
+        everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mock(MockMode.autofill)
         everySuspend { mockStringStorage.get(PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
         everySuspend { mockStringStorage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns null
         everySuspend { mockStringStorage.put(PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
@@ -166,7 +168,7 @@ class PushInternalTests {
     @Test
     fun testActivate_should_sendCalls_toPushClient() = runTest {
         val eventContainer = Capture.container<OnlineSdkEvent>()
-        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(capture(eventContainer)) } returns Unit
+        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventContainer)) } returns mock(MockMode.autofill)
 
         pushContext.calls.addAll(expectedCalls)
 

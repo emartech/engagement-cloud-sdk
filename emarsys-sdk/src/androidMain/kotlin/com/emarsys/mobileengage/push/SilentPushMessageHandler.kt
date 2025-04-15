@@ -17,7 +17,7 @@ internal class SilentPushMessageHandler(
             pushActionFactory.create(action).invoke()
         }
 
-        sdkEventDistributor.registerAndStoreEvent(
+        sdkEventDistributor.registerEvent(
             SdkEvent.External.Api.SilentPush(
                 name = PUSH_RECEIVED_EVENT_NAME
             )

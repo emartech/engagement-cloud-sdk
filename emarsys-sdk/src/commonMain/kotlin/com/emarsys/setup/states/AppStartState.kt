@@ -24,7 +24,7 @@ internal class AppStartState(
                 id = uuidProvider.provide(),
                 timestamp = timestampProvider.provide()
             )
-            sdkEventDistributor.registerAndStoreEvent(appStartEvent)
+            sdkEventDistributor.registerEvent(appStartEvent)
             alreadyCompleted = true
         }
     }

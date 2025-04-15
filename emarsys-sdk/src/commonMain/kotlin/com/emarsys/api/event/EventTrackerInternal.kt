@@ -17,7 +17,7 @@ internal class EventTrackerInternal(
 ) : EventTrackerInstance {
 
     override suspend fun trackEvent(event: CustomEvent) {
-        sdkEventDistributor.registerAndStoreEvent(
+        sdkEventDistributor.registerEvent(
             event.toSdkEvent(
                 uuidProvider.provide(),
                 timestampProvider.provide()
@@ -31,7 +31,7 @@ internal class EventTrackerInternal(
 
         eventTrackerContext.calls.dequeue { call ->
             when (call) {
-                is EventTrackerCall.TrackEvent -> sdkEventDistributor.registerAndStoreEvent(call.event)
+                is EventTrackerCall.TrackEvent -> sdkEventDistributor.registerEvent(call.event)
             }
         }
     }

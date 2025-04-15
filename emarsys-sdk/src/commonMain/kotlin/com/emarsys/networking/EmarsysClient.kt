@@ -98,7 +98,7 @@ internal class EmarsysClient(
             "Received ${response.status.value} status code, mapped to ${event?.name ?: "unknown"} event",
         )
         event?.let {
-            sdkEventDistributor.registerAndStoreEvent(event)
+            sdkEventDistributor.registerEvent(event)
         }
     }
 

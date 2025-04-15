@@ -8,6 +8,7 @@ import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.networking.clients.event.model.SdkEvent
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
@@ -73,27 +74,27 @@ class EventTrackerInternalTests {
 
     @Test
     fun testTrackEvent_shouldMakeCall_onClient() = runTest {
-        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(event) } returns Unit
+        everySuspend { mockSdkEventDistributor.registerEvent(event) } returns mock(MockMode.autofill)
         everySuspend { mockTimestampProvider.provide() } returns timestamp
 
         eventTrackerInternal.trackEvent(customEvent)
 
         verifySuspend {
             mockTimestampProvider.provide()
-            mockSdkEventDistributor.registerAndStoreEvent(event)
+            mockSdkEventDistributor.registerEvent(event)
         }
     }
 
     @Test
     fun testActivate_should_send_calls_to_client() = runTest {
-        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(event) } returns Unit
-        everySuspend { mockSdkEventDistributor.registerAndStoreEvent(event2) } returns Unit
+        everySuspend { mockSdkEventDistributor.registerEvent(event) } returns mock(MockMode.autofill)
+        everySuspend { mockSdkEventDistributor.registerEvent(event2) } returns mock(MockMode.autofill)
 
         eventTrackerInternal.activate()
 
         verifySuspend {
-            mockSdkEventDistributor.registerAndStoreEvent(event)
-            mockSdkEventDistributor.registerAndStoreEvent(event2)
+            mockSdkEventDistributor.registerEvent(event)
+            mockSdkEventDistributor.registerEvent(event2)
         }
     }
 }

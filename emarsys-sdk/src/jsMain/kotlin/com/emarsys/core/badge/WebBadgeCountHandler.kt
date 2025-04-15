@@ -31,7 +31,7 @@ class WebBadgeCountHandler(
         try {
             val badgeCount =
                 JsonUtil.json.decodeFromString<BadgeCount>(badgeCountString)
-            sdkEventDistributor.registerAndStoreEvent(
+            sdkEventDistributor.registerEvent(
                 SdkEvent.External.Api.BadgeCount(
                     name = badgeCount.method.name,
                     attributes = buildJsonObject {
