@@ -7,7 +7,7 @@ import androidx.lifecycle.lifecycleScope
 import com.emarsys.di.SdkComponent
 import org.koin.core.component.inject
 
-class NotificationOpenedActivity() : AppCompatActivity(), SdkComponent {
+class NotificationOpenedActivity : AppCompatActivity(), SdkComponent {
     private val notificationIntentProcessor: NotificationIntentProcessor by inject()
 
     public override fun onCreate(savedInstanceState: Bundle?) {

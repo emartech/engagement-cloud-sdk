@@ -36,4 +36,17 @@ class ActionHandlerTests {
             mockCustomEventAction.invoke()
         }
     }
+
+    @Test
+    fun testHandleActions_shouldOnlyExecuteMandatoryActions_whenThereWasNoTriggeredAction() = runTest {
+        val mockDismissAction: Action<Unit> = mock()
+        everySuspend { mockDismissAction.invoke() } returns Unit
+        val mandatoryActions = listOf(mockDismissAction)
+
+        actionHandler.handleActions(mandatoryActions, null)
+
+        verifySuspend(VerifyMode.order) {
+            mockDismissAction.invoke()
+        }
+    }
 }

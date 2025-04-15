@@ -106,6 +106,31 @@ class NotificationIntentProcessorTests {
     }
 
     @Test
+    fun testProcessIntent_shouldHandleMandatoryActions_withActionHandler_whenThereWasNoTriggeredAction() =
+        runTest {
+            val intent = Intent()
+            intent.putExtra(INTENT_EXTRA_PAYLOAD_KEY, createTestMessage())
+            val mockLaunchApplicationAction = mockk<LaunchApplicationAction>(relaxed = true)
+            val mockBasicDismissAction = mockk<DismissAction>(relaxed = true)
+            val mockReportingAction = mockk<DismissAction>(relaxed = true)
+            coEvery { mockActionFactory.create(BasicLaunchApplicationActionModel) } returns mockLaunchApplicationAction
+            coEvery { mockActionFactory.create(BasicDismissActionModel(COLLAPSE_ID)) } returns mockBasicDismissAction
+            coEvery { mockActionFactory.create(NotificationOpenedActionModel(TRACKING_INFO)) } returns mockReportingAction
+            val expectedMandatoryActions =
+                listOf(
+                    mockLaunchApplicationAction,
+                    mockBasicDismissAction,
+                    mockReportingAction
+                )
+
+            notificationIntentProcessor.processIntent(intent, testScope)
+
+            advanceUntilIdle()
+
+            coVerify { mockActionHandler.handleActions(expectedMandatoryActions, null) }
+        }
+
+    @Test
     fun testProcessIntent_shouldHandleAction_withActionHandler_withMandatoryActions() = runTest {
         val actionModel = PresentableAppEventActionModel(
             id = ID,

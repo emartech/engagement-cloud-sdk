@@ -5,9 +5,9 @@ import com.emarsys.mobileengage.action.actions.Action
 class ActionHandler : ActionHandlerApi {
     override suspend fun handleActions(
         mandatoryActions: List<Action<*>>,
-        triggeredAction: Action<*>
+        triggeredAction: Action<*>?
     ) {
         mandatoryActions.forEach { it.invoke() }
-        triggeredAction.invoke()
+        triggeredAction?.invoke()
     }
 }

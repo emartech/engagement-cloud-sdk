@@ -35,11 +35,12 @@ internal class NotificationIntentProcessor(
         if (intent != null) {
             lifecycleScope.launch {
                 val triggeredActionModel = getActionModel(intent)
-                triggeredActionModel?.let {
-                    val triggeredAction = actionFactory.create(it)
-                    val mandatoryActions = getMandatoryActions(intent, triggeredActionModel)
-                    actionHandler.handleActions(mandatoryActions, triggeredAction)
+                val triggeredAction = triggeredActionModel?.let {
+                    actionFactory.create(it)
                 }
+
+                val mandatoryActions = getMandatoryActions(intent, triggeredActionModel)
+                actionHandler.handleActions(mandatoryActions, triggeredAction)
             }
         }
     }
@@ -62,7 +63,7 @@ internal class NotificationIntentProcessor(
 
     private suspend fun getMandatoryActions(
         intent: Intent,
-        triggeredActionModel: ActionModel
+        triggeredActionModel: ActionModel?
     ): List<Action<*>> {
         return buildList {
             try {
@@ -90,7 +91,8 @@ internal class NotificationIntentProcessor(
                             )
                         }
 
-                        is BasicActionModel -> {
+                        is BasicActionModel,
+                        null -> {
                             NotificationOpenedActionModel(it.trackingInfo)
                         }
 
