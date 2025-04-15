@@ -1,5 +1,6 @@
 package com.emarsys.mobileengage.action.models
 
+import com.emarsys.core.providers.UUIDProvider
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -11,7 +12,8 @@ interface CustomEventActionModel {
 @Serializable
 @SerialName("MECustomEvent")
 data class PresentableCustomEventActionModel(
-    override val id: String,
+    override val id: String = UUIDProvider().provide(),
+    override val reporting: String,
     override val title: String,
     override val name: String,
     override val payload: Map<String, String>? = null,

@@ -25,6 +25,8 @@ class PushMessagePresenterTests {
     companion object {
         private const val ICON = "icon"
         private const val IMAGE = "image"
+        private const val REPORTING = """{"reportingKey":"reportingValue"}"""
+        private const val REPORTING2 = """{"reportingKey2":"reportingValue2"}"""
     }
 
     private val slot = Capture.slot<WebPushNotificationData>()
@@ -104,11 +106,13 @@ class PushMessagePresenterTests {
         val testActions = listOf(
             PresentableOpenExternalUrlActionModel(
                 id = "actionId1",
+                reporting = REPORTING,
                 title = "actionTitle1",
                 url = "actionUrl1"
             ),
             PresentableOpenExternalUrlActionModel(
                 id = "actionId2",
+                reporting = REPORTING2,
                 title = "actionTitle2",
                 url = "actionUrl2"
             )

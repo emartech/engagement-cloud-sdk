@@ -35,6 +35,8 @@ class PushMessageWebV2MapperTests {
         const val ACTION_TITLE = "actionTitle"
         const val BADGE_VALUE = 10
         const val TRACKING_INFO = """{"key":"value"}"""
+        const val REPORTING = """{"reportingKey":"reportingValue"}"""
+        const val REPORTING2 = """{"reportingKey2":"reportingValue2"}"""
     }
 
     private lateinit var json: Json
@@ -59,6 +61,7 @@ class PushMessageWebV2MapperTests {
             put("imageUrl", IMAGE)
             putJsonObject("defaultAction") {
                 put("id", "defaultActionId")
+                put("reporting", REPORTING)
                 put("title", ACTION_TITLE)
                 put("name", DEFAULT_ACTION_NAME)
                 put("type", "MECustomEvent")
@@ -69,6 +72,7 @@ class PushMessageWebV2MapperTests {
             putJsonArray("actions") {
                 addJsonObject {
                     put("id", ACTION_ID)
+                    put("reporting", REPORTING2)
                     put("title", ACTION_TITLE)
                     put("name", ACTION_NAME)
                     put("type", "MEAppEvent")
@@ -113,6 +117,7 @@ class PushMessageWebV2MapperTests {
                 actions = listOf(
                     PresentableAppEventActionModel(
                         ACTION_ID,
+                        REPORTING2,
                         ACTION_TITLE,
                         ACTION_NAME,
                         mapOf("actionPayloadKey" to "actionPayloadValue")

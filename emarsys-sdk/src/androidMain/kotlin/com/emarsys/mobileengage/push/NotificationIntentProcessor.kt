@@ -20,6 +20,8 @@ import com.emarsys.mobileengage.push.model.AndroidPushMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 internal class NotificationIntentProcessor(
     private val json: Json,
@@ -42,12 +44,20 @@ internal class NotificationIntentProcessor(
         }
     }
 
-    private fun getActionModel(intent: Intent): ActionModel? {
+    private suspend fun getActionModel(intent: Intent): ActionModel? {
         val action = intent.getStringExtra(INTENT_EXTRA_ACTION_KEY)
         val defaultAction = intent.getStringExtra(INTENT_EXTRA_DEFAULT_TAP_ACTION_KEY)
 
-        return action?.let { json.decodeFromString<PresentableActionModel>(it) }
-            ?: defaultAction?.let { json.decodeFromString<BasicActionModel>(it) }
+        return try {
+            action?.let { json.decodeFromString<PresentableActionModel>(it) }
+                ?: defaultAction?.let { json.decodeFromString<BasicActionModel>(it) }
+        } catch (exception: Exception) {
+            sdkLogger.error("Action parsing failed", exception, buildJsonObject {
+                put("action", action)
+                put("defaultAction", defaultAction)
+            })
+            null
+        }
     }
 
     private suspend fun getMandatoryActions(
@@ -74,7 +84,10 @@ internal class NotificationIntentProcessor(
                 pushMessage?.let {
                     val reportingAction = when (triggeredActionModel) {
                         is PresentableActionModel -> {
-                            BasicPushButtonClickedActionModel(triggeredActionModel.id, it.trackingInfo)
+                            BasicPushButtonClickedActionModel(
+                                triggeredActionModel.reporting,
+                                it.trackingInfo
+                            )
                         }
 
                         is BasicActionModel -> {

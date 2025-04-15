@@ -17,6 +17,7 @@ sealed class BasicActionModel: ActionModel
 @JsonClassDiscriminator("type")
 sealed class PresentableActionModel: ActionModel {
     abstract val id: String
+    abstract val reporting: String
     abstract val title: String
 }
 

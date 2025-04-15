@@ -1,5 +1,6 @@
 package com.emarsys.mobileengage.action.models
 
+import com.emarsys.core.providers.UUIDProvider
 import com.emarsys.mobileengage.inapp.PushToInApp
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -19,8 +20,9 @@ data class InternalPushToInappActionModel(
 @Serializable
 @SerialName("MEInApp")
 data class PresentablePushToInAppActionModel(
+    override val id: String = UUIDProvider().provide(),
     override val title: String,
-    override val id: String,
+    override val reporting: String,
     val name: String,
     val payload: PushToInApp
 ) : PresentableActionModel()

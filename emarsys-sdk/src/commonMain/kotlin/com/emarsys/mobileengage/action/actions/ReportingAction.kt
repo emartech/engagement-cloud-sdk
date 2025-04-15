@@ -40,6 +40,7 @@ data class ReportingAction(
 
                 sdkEventDistributor.registerEvent(
                     SdkEvent.Internal.InApp.ButtonClicked(
+                        id = action.id,
                        attributes = buildJsonObject {
                             attributes.forEach { (key, value) ->
                                 put(key, JsonPrimitive(value))

@@ -1,5 +1,6 @@
 package com.emarsys.mobileengage.action.models
 
+import com.emarsys.core.providers.UUIDProvider
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -10,7 +11,8 @@ interface DismissActionModel {
 @Serializable
 @SerialName("Dismiss")
 data class PresentableDismissActionModel(
-    override val id: String,
+    override val id: String = UUIDProvider().provide(),
+    override val reporting: String,
     override val title: String,
     override var dismissId: String? = null
 ) : PresentableActionModel(), DismissActionModel

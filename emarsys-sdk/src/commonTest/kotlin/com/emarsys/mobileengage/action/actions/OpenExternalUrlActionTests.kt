@@ -19,7 +19,12 @@ class OpenExternalUrlActionTests {
         }
 
         val openExternalUrlAction = OpenExternalUrlAction(
-            PresentableOpenExternalUrlActionModel("123", "Emarsys", url),
+            PresentableOpenExternalUrlActionModel(
+                id = "123",
+                reporting = """{"reportingKey":"reportingValue"}""",
+                title = "Emarsys",
+                url
+            ),
             mockExternalUrlOpener
         )
         openExternalUrlAction()

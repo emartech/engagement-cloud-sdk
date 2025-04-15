@@ -35,6 +35,7 @@ import kotlin.test.Test
 class PushNotificationClickHandlerTests {
     private companion object {
         const val TRACKING_INFO = """{"trackingInfoKey":"trackingInfoValue"}"""
+        const val REPORTING = """{"reportingKey":"reportingValue"}"""
     }
 
     private lateinit var mockActionFactory: PushActionFactoryApi
@@ -141,7 +142,12 @@ class PushNotificationClickHandlerTests {
         runTest {
             val actionId = "testActionId"
             val actionModel =
-                PresentableOpenExternalUrlActionModel(actionId, "title", "https://www.google.com")
+                PresentableOpenExternalUrlActionModel(
+                    actionId,
+                    REPORTING,
+                    "title",
+                    "https://www.google.com"
+                )
             val notificationClickedData =
                 createTestJsNotificationClickedData(actionId, actionModels = listOf(actionModel))
             val event =
@@ -150,7 +156,7 @@ class PushNotificationClickHandlerTests {
             everySuspend {
                 mockActionFactory.create(
                     BasicPushButtonClickedActionModel(
-                        actionId,
+                        REPORTING,
                         notificationClickedData.jsPushMessage.trackingInfo
                     )
                 )
@@ -170,7 +176,12 @@ class PushNotificationClickHandlerTests {
     fun handleNotificationClick_shouldNotCallActionFactory_whenActionWithId_isNotPresent() =
         runTest {
             val actionModel =
-                PresentableOpenExternalUrlActionModel("actionId", "title", "https://www.google.com")
+                PresentableOpenExternalUrlActionModel(
+                    "actionId",
+                    REPORTING,
+                    "title",
+                    "https://www.google.com"
+                )
             val notificationClickedData =
                 createTestJsNotificationClickedData(
                     "differentClickedActionId",
@@ -189,7 +200,12 @@ class PushNotificationClickHandlerTests {
     fun handleNotificationClick_shouldNotCallActionFactory_whenDefaultTapAction_isNotPresent() =
         runTest {
             val actionModel =
-                PresentableOpenExternalUrlActionModel("actionId", "title", "https://www.google.com")
+                PresentableOpenExternalUrlActionModel(
+                    "actionId",
+                    REPORTING,
+                    "title",
+                    "https://www.google.com"
+                )
             val notificationClickedData =
                 createTestJsNotificationClickedData(
                     "",
@@ -220,7 +236,12 @@ class PushNotificationClickHandlerTests {
     fun handleNotificationClick_shouldHandleException_whenActionFactoryThrows() =
         runTest {
             val actionModel =
-                PresentableOpenExternalUrlActionModel("actionId", "title", "https://www.google.com")
+                PresentableOpenExternalUrlActionModel(
+                    "actionId",
+                    REPORTING,
+                    "title",
+                    "https://www.google.com"
+                )
             val notificationClickedData =
                 createTestJsNotificationClickedData(
                     "actionId",

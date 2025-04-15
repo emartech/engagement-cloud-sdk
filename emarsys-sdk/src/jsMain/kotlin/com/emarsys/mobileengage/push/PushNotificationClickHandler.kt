@@ -63,7 +63,7 @@ internal class PushNotificationClickHandler(
 
             is PresentableActionModel -> {
                 val model = BasicPushButtonClickedActionModel(
-                    actionModel.id,
+                    actionModel.reporting,
                     jsNotificationClickedData.jsPushMessage.trackingInfo
                 )
                 listOf(actionFactory.create(model))

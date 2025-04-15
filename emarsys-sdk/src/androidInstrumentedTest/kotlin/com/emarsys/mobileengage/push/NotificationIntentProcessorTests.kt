@@ -46,13 +46,14 @@ import org.junit.Test
 class NotificationIntentProcessorTests {
     private companion object {
         val PAYLOAD = mapOf("testKey" to "testValue")
-        const val ID = "testId"
+        const val REPORTING = "{\"someKey\":\"someValue\"}"
         const val TITLE = "testTitle"
+        const val ID = "testId"
         const val NAME = "testName"
         const val COLLAPSE_ID = "testCollapseId"
         const val TRACKING_INFO = """{"trackingInfoKey":"trackingInfoValue"}"""
         const val APP_EVENT_ACTION_MODEL_JSON =
-            """{"type":"MEAppEvent", "id":"$ID","title":"$TITLE","name":"$NAME","payload":{"testKey":"testValue"}}"""
+            """{"type":"MEAppEvent","id":"$ID","reporting":"{\"someKey\":\"someValue\"}","title":"$TITLE","name":"$NAME","payload":{"testKey":"testValue"}}"""
     }
 
     private val json = JsonUtil.json
@@ -85,7 +86,13 @@ class NotificationIntentProcessorTests {
 
     @Test
     fun testProcessIntent_shouldHandleAction_withActionHandler() = runTest {
-        val actionModel = PresentableAppEventActionModel(ID, TITLE, NAME, PAYLOAD)
+        val actionModel = PresentableAppEventActionModel(
+            id = ID,
+            reporting = REPORTING,
+            title = TITLE,
+            name = NAME,
+            payload = PAYLOAD
+        )
         val intent = createTestIntent(actionModel)
         val mockAction: Action<Unit> = mockk(relaxed = true)
         coEvery { mockActionFactory.create(actionModel) } returns mockAction
@@ -100,8 +107,14 @@ class NotificationIntentProcessorTests {
 
     @Test
     fun testProcessIntent_shouldHandleAction_withActionHandler_withMandatoryActions() = runTest {
-        val actionModel = PresentableAppEventActionModel(ID, TITLE, NAME, PAYLOAD)
-        val buttonClickedActionModel = BasicPushButtonClickedActionModel(ID, TRACKING_INFO)
+        val actionModel = PresentableAppEventActionModel(
+            id = ID,
+            reporting = REPORTING,
+            title = TITLE,
+            name = NAME,
+            payload = PAYLOAD
+        )
+        val buttonClickedActionModel = BasicPushButtonClickedActionModel(REPORTING, TRACKING_INFO)
         val basicDismissActionModel = BasicDismissActionModel(COLLAPSE_ID)
         val reportingAction = ReportingAction(buttonClickedActionModel, mockSdkEventDistributor)
         val mockLaunchApplicationAction: LaunchApplicationAction = mockk(relaxed = true)
@@ -135,30 +148,71 @@ class NotificationIntentProcessorTests {
     }
 
     @Test
-    fun testProcessIntent_shouldNotCrash_whenIntentContains_invalidJsonString() = runTest {
-        val actionModel = PresentableAppEventActionModel(ID, TITLE, NAME, PAYLOAD)
+    fun testProcessIntent_shouldNotCrash_whenIntentContains_invalidJsonString_forThePushMessage() =
+        runTest {
+            val actionModel = PresentableAppEventActionModel(
+                id = ID,
+                reporting = REPORTING,
+                title = TITLE,
+                name = NAME,
+                payload = PAYLOAD
+            )
 
-        val intent = createTestIntent(actionModel)
+            val intent = createTestIntent(actionModel)
 
-        intent.putExtra(INTENT_EXTRA_PAYLOAD_KEY, """{"missing":"keys"}""")
+            intent.putExtra(INTENT_EXTRA_PAYLOAD_KEY, """{"missing":"keys"}""")
 
-        notificationIntentProcessor.processIntent(intent, testScope)
+            notificationIntentProcessor.processIntent(intent, testScope)
 
-        advanceUntilIdle()
-    }
+            advanceUntilIdle()
+        }
+
+    @Test
+    fun testProcessIntent_shouldNotCrash_whenIntentContains_invalidJsonString_forTriggeredAction() =
+        runTest {
+            val actionModel = PresentableAppEventActionModel(
+                id = ID,
+                reporting = REPORTING,
+                title = TITLE,
+                name = NAME,
+                payload = PAYLOAD
+            )
+
+            val intent = createTestIntent(actionModel)
+
+            intent.putExtra(INTENT_EXTRA_ACTION_KEY, """{"missing":"keys"}""")
+
+            notificationIntentProcessor.processIntent(intent, testScope)
+
+            advanceUntilIdle()
+        }
+
+    @Test
+    fun testProcessIntent_shouldNotCrash_whenIntentContains_invalidJsonString_forDefaultAction() =
+        runTest {
+            val intent = Intent(context, NotificationOpenedActivity::class.java)
+
+            intent.putExtra(INTENT_EXTRA_DEFAULT_TAP_ACTION_KEY, """{"missing":"keys"}""")
+
+            notificationIntentProcessor.processIntent(intent, testScope)
+
+            advanceUntilIdle()
+        }
 
     @Test
     fun testProcessIntent_shouldNotIncludeLaunchApplication_andBasicDismissAction_InMandatoryActions_whenActionIsDismiss() =
         runTest {
             val dismissId = "collapseId"
-            val dismissActionModel = PresentableDismissActionModel(ID, TITLE, dismissId)
+            val dismissActionModel = PresentableDismissActionModel(ID, REPORTING, TITLE, dismissId)
             val dismissActionModelJson = """{
                     "type":"Dismiss",
-                    "id":"$ID",
+                    "id":$ID,
+                    "reporting":"{\"someKey\":\"someValue\"}",
                     "title":"$TITLE",
                     "dismissId":"$dismissId"
                 }""".trimIndent()
-            val buttonClickedActionModel = BasicPushButtonClickedActionModel(ID, TRACKING_INFO)
+            val buttonClickedActionModel =
+                BasicPushButtonClickedActionModel(REPORTING, TRACKING_INFO)
             val reportingAction = ReportingAction(buttonClickedActionModel, mockSdkEventDistributor)
 
             coEvery { mockActionFactory.create(buttonClickedActionModel) } returns reportingAction
@@ -233,7 +287,7 @@ class NotificationIntentProcessorTests {
         actionModelJson: String = APP_EVENT_ACTION_MODEL_JSON
     ): Intent {
         val intent = Intent(context, NotificationOpenedActivity::class.java)
-        intent.action = actionModel.id
+        intent.action = actionModel.reporting
         intent.putExtra(
             INTENT_EXTRA_ACTION_KEY,
             actionModelJson
@@ -244,7 +298,7 @@ class NotificationIntentProcessorTests {
     private fun createTestMessage(
         actionModelString: String = """{
                     "type":"MEAppEvent",
-                    "id":"$ID",
+                    "reporting":"$REPORTING",
                     "title":"$TITLE",
                     "name":"$NAME",
                     "payload":{"testKey":"testValue"}

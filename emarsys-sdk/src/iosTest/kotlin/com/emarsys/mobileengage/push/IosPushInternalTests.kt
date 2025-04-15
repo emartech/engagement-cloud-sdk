@@ -56,13 +56,15 @@ import platform.UserNotifications.UNNotificationDefaultActionIdentifier
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-@ExperimentalCoroutinesApi
+@OptIn(ExperimentalCoroutinesApi::class)
 internal class IosPushInternalTests {
     private companion object {
         const val UUID = "testUUID"
         const val PUSH_TOKEN = "testPushToken"
         const val VERSION = "APNS_V2"
         const val TRACKING_INFO = """{"trackingInfo":"testTrackingInfo"}"""
+        const val REPORTING = """{"id":"testId"}"""
+        const val REPORTING2 = """{"id":"testId2"}"""
         val REGISTER_PUSH_TOKEN = RegisterPushToken(PUSH_TOKEN)
         val CLEAR_PUSH_TOKEN = ClearPushToken()
         val HANDLE_SILENT_MESSAGE_WITH_USER_INFO = HandleSilentMessageWithUserInfo(
@@ -173,7 +175,8 @@ internal class IosPushInternalTests {
     fun `didReceiveNotificationResponse should handle action`() = runTest {
         val mockUrlOpener: ExternalUrlOpenerApi = mock(MockMode.autoUnit)
         val actionModel = PresentableOpenExternalUrlActionModel(
-            id = "testId",
+            "testId",
+            reporting = REPORTING,
             title = "testTitle",
             url = "https://www.emarsys.com"
         )
@@ -184,15 +187,17 @@ internal class IosPushInternalTests {
         val actionIdentifier = "testId"
         val defaultActionMap = mapOf(
             "type" to "OpenExternalUrl",
-            "title" to "testTitle2",
             "id" to "testId2",
+            "title" to "testTitle2",
+            "reporting" to REPORTING2,
             "url" to "https://www.sap.com"
         )
         val actions = listOf(
             mapOf(
                 "type" to "OpenExternalUrl",
-                "title" to "testTitle",
                 "id" to "testId",
+                "title" to "testTitle",
+                "reporting" to REPORTING,
                 "url" to "https://www.emarsys.com"
             )
         )
@@ -286,6 +291,7 @@ internal class IosPushInternalTests {
         val mockUrlOpener: ExternalUrlOpenerApi = mock()
         val actionModel = PresentableOpenExternalUrlActionModel(
             id = "testId",
+            reporting = REPORTING,
             title = "testTitle",
             url = "https://www.emarsys.com"
         )
@@ -302,13 +308,14 @@ internal class IosPushInternalTests {
         val userInfo = createUserInfoMap(null, listOf(
             mapOf(
                 "type" to "OpenExternalUrl",
-                "title" to "testTitle",
                 "id" to "testId",
+                "title" to "testTitle",
+                "reporting" to REPORTING,
                 "url" to "https://www.emarsys.com"
             )
         ))
         val buttonClickedActionModel = BasicPushButtonClickedActionModel(
-            actionModel.id,
+            actionModel.reporting,
             TRACKING_INFO
         )
         val reportingAction = ReportingAction(buttonClickedActionModel, mock(MockMode.autoUnit))
@@ -344,8 +351,9 @@ internal class IosPushInternalTests {
                 actions = listOf(
                     mapOf(
                         "type" to "OpenExternalUrl",
-                        "title" to "testTitle",
                         "id" to "testId",
+                        "title" to "testTitle",
+                        "reporting" to REPORTING,
                         "url" to "https://www.emarsys.com"
                     )
                 )
@@ -371,11 +379,13 @@ internal class IosPushInternalTests {
     fun `handleMessageWithUserInfo should execute actions`() = runTest {
         val openExternalUrlActionModel = PresentableOpenExternalUrlActionModel(
             id = "testId",
+            reporting = REPORTING,
             title = "OpenExternalUrlAction",
             url = "https://www.emarsys.com"
         )
         val appEventActionModel = PresentableAppEventActionModel(
             "testId",
+            REPORTING2,
             "testTitle",
             "name",
             mapOf("key" to "value")
@@ -412,7 +422,7 @@ internal class IosPushInternalTests {
     @Test
     fun `handleMessageWithUserInfo should emit event with campaignId`() = runTest {
         val openExternalUrlActionModel =
-            PresentableOpenExternalUrlActionModel("testId", "testTitle", "https://www.emarsys.com")
+            PresentableOpenExternalUrlActionModel("testId", REPORTING, "testTitle", "https://www.emarsys.com")
         val mockOpenExternalUrlAction = mock<Action<*>>()
         everySuspend { mockOpenExternalUrlAction.invoke() } returns Unit
 

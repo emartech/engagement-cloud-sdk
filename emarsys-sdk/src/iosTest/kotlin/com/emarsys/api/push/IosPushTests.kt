@@ -38,6 +38,8 @@ class IosPushTests {
         const val PUSH_TOKEN = "testPushToken"
         const val VERSION = "APNS_V2"
         const val TRACKING_INFO = """{"trackingInfo":"testTrackingInfo"}"""
+        const val REPORTING = """{"reportingKey":"reportingValue"}"""
+        const val REPORTING2 = """{"reportingKey2":"reportingValue2"}"""
         const val ID = "testID"
         const val TITLE = "testTitle"
         const val NAME = "testName"
@@ -51,32 +53,37 @@ class IosPushTests {
                 )
             )
             put("notification", buildMap {
-                put("actions", listOf(
-                    mapOf(
-                        "type" to "OpenExternalUrl",
-                        "id" to ID,
-                        "title" to TITLE,
-                        "url" to URL_STRING
-                    ),
-                    mapOf(
-                        "type" to "MEAppEvent",
-                        "id" to ID,
-                        "title" to TITLE,
-                        "name" to NAME,
-                        "payload" to PAYLOAD
+                put(
+                    "actions", listOf(
+                        mapOf(
+                            "type" to "OpenExternalUrl",
+                            "id" to ID,
+                            "reporting" to REPORTING,
+                            "title" to TITLE,
+                            "url" to URL_STRING
+                        ),
+                        mapOf(
+                            "type" to "MEAppEvent",
+                            "id" to ID,
+                            "reporting" to REPORTING2,
+                            "title" to TITLE,
+                            "name" to NAME,
+                            "payload" to PAYLOAD
+                        )
                     )
-                ))
+                )
             })
         }
         val PUSH_USER_INFO = PushUserInfo(
             ems = Ems(
                 version = VERSION,
-                trackingInfo = TRACKING_INFO),
-                Notification(
+                trackingInfo = TRACKING_INFO
+            ),
+            Notification(
                 silent = false,
                 actions = listOf(
-                    PresentableOpenExternalUrlActionModel(ID,TITLE, URL_STRING),
-                    PresentableAppEventActionModel(ID, TITLE, NAME, PAYLOAD)
+                    PresentableOpenExternalUrlActionModel(ID, REPORTING, TITLE, URL_STRING),
+                    PresentableAppEventActionModel(ID, REPORTING2, TITLE, NAME, PAYLOAD)
                 )
             )
         )
@@ -116,7 +123,8 @@ class IosPushTests {
         everySuspend { mockGathererPush.activate() } returns Unit
         everySuspend { mockPushInternal.activate() } returns Unit
 
-        iosPush = IosPush(mockLoggingPush, mockGathererPush, mockPushInternal, sdkContext, mockSdkLogger)
+        iosPush =
+            IosPush(mockLoggingPush, mockGathererPush, mockPushInternal, sdkContext, mockSdkLogger)
         iosPush.registerOnContext()
     }
 

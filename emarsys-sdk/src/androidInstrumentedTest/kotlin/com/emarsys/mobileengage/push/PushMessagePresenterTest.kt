@@ -41,6 +41,7 @@ class PushMessagePresenterTest {
     private companion object {
         const val COLLAPSE_ID = "testCollapseId"
         const val TRACKING_INFO = """{"trackingInfoKey":"trackingInfoValue"}"""
+        const val REPORTING = """{"reportingKey":"reportingValue"}"""
         const val ICON_ID = 10
         const val CHANNEL_ID = "testChannelId"
         const val DEBUG_CHANNEL_ID = "ems_debug"
@@ -49,6 +50,7 @@ class PushMessagePresenterTest {
         val testCustomEventAction =
             PresentableCustomEventActionModel(
                 "customEventId",
+                REPORTING,
                 "customEvent",
                 "customAction",
                 mapOf("key" to "value")
@@ -56,6 +58,7 @@ class PushMessagePresenterTest {
         val testAppEventAction =
             PresentableAppEventActionModel(
                 "appEventId",
+                REPORTING,
                 "appEvent",
                 "appAction",
                 mapOf("key2" to "value2")
@@ -63,6 +66,7 @@ class PushMessagePresenterTest {
         val testOpenExternalUrlAction =
             PresentableOpenExternalUrlActionModel(
                 "externalUrlId",
+                REPORTING,
                 "openExternalUrl",
                 "https://example.com"
             )
@@ -265,7 +269,7 @@ class PushMessagePresenterTest {
     fun present_shouldShowNotification_withCorrectData_withDismissActionModel_filledWithId() =
         runTest {
             val dismissActionModelSpy =
-                spyk(PresentableDismissActionModel("dismissId", "Dismiss", null))
+                spyk(PresentableDismissActionModel("dismissId", REPORTING, "Dismiss", null))
             val testMessage = createTestMessage(
                 listOf(dismissActionModelSpy),
                 testDefaultTapAction,

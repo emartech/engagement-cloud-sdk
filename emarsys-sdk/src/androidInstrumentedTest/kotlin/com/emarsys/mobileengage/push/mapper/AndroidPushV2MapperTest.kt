@@ -31,6 +31,8 @@ class AndroidPushV2MapperTest {
     private companion object {
         const val UUID = "testUUID"
         const val TRACKING_INFO = """{"trackingInfoKey":"trackingInfoValue"}"""
+        const val REPORTING = """{"reportingKey":"reportingValue"}"""
+        const val ID = "testId"
     }
 
     private lateinit var mockUUIDProvider: UuidProviderApi
@@ -89,8 +91,9 @@ class AndroidPushV2MapperTest {
         actionableData = ActionableData(
             actions = listOf(
                 PresentableAppEventActionModel(
+                    id = ID,
                     title = "testTitle",
-                    id = "testId",
+                    reporting = REPORTING,
                     name = "testEvent",
                     payload = buildMap {
                         put("key", "value")
@@ -130,8 +133,9 @@ class AndroidPushV2MapperTest {
             put("notification.actions", buildJsonArray {
                 add(buildJsonObject {
                     put("type", "MEAppEvent")
+                    put("id", ID)
                     put("title", "testTitle")
-                    put("id", "testId")
+                    put("reporting", REPORTING)
                     put("name", "testEvent")
                     put("payload", buildJsonObject {
                         put("key", "value")

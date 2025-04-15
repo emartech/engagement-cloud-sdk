@@ -26,6 +26,7 @@ class PushActionFactoryTests {
     private companion object {
         const val URL = "url"
         const val CAMPAIGN_ID = "campaignId"
+        const val REPORTING = """{"reportingKey":"reportingValue"}"""
     }
 
     private lateinit var pushActionFactory: PushActionFactory
@@ -84,7 +85,7 @@ class PushActionFactoryTests {
 
     @Test
     fun create_should_callCreate_on_eventActionFactory() = runTest {
-        val testActionModel = PresentableCustomEventActionModel("eventId", "title", "eventName")
+        val testActionModel = PresentableCustomEventActionModel(reporting = REPORTING, title = "title", name =  "eventName")
         val expectedAction = CustomEventAction(testActionModel, mock())
         everySuspend { mockEventActionFactory.create(testActionModel) } returns expectedAction
 

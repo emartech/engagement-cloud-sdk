@@ -160,7 +160,7 @@ internal class IosPushInternal(
             val model = when (actionModel) {
                 is PresentableActionModel -> {
                     BasicPushButtonClickedActionModel(
-                        actionModel.id,
+                        actionModel.reporting,
                         pushUserInfo.ems.trackingInfo
                     )
                 }
