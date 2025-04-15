@@ -13,7 +13,7 @@ internal class RemoteLogger : RemoteLoggerApi, KoinComponent {
 
     override suspend fun logToRemote(level: LogLevel, log: JsonObject) {
         if (sdkContext.remoteLogLevel.priority >= level.priority) {
-            sdkEventDistributor.registerAndStoreEvent(
+            sdkEventDistributor.registerEvent(
                 SdkEvent.Internal.Sdk.Log(
                     level = level,
                     attributes = log

@@ -71,18 +71,7 @@ class SdkEventDistributor(
                 buildJsonObject { put("event", sdkEvent.toString()) },
                 isRemoteLog = sdkEvent !is SdkEvent.Internal.LogEvent
             )
-                buildJsonObject { put("event", sdkEvent.toString()) })
             null
-        }
-    }
-
-    override suspend fun registerAndStoreLogEvent(sdkEvent: SdkEvent) {
-        try {
-            eventsDao.insertEvent(sdkEvent)
-            _sdkEventFlow.emit(sdkEvent)
-        } catch (exception: Exception) {
-            coroutineContext.ensureActive()
-            exception.printStackTrace()
         }
     }
 
