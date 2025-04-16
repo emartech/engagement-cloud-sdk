@@ -1,8 +1,8 @@
 package com.emarsys.mobileengage.push
 
 import com.emarsys.api.push.Ems
-import com.emarsys.api.push.Notification
-import com.emarsys.api.push.PushUserInfo
+import com.emarsys.api.push.SilentNotification
+import com.emarsys.api.push.SilentPushUserInfo
 import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.Logger
 import com.emarsys.core.storage.StringStorageApi
@@ -73,9 +73,9 @@ class IosLoggingPushTests {
 
     @Test
     fun testHandleSilentMessageWithUserInfo() = runTest {
-        val userInfo = PushUserInfo(
+        val userInfo = SilentPushUserInfo(
             Ems(version = "testVersion", trackingInfo = "testTrackingInfo"),
-            Notification(
+            SilentNotification(
                 silent = true,
                 defaultAction = null,
                 actions = null,

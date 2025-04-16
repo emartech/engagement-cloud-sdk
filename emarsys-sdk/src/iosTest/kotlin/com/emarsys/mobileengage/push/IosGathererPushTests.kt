@@ -1,11 +1,11 @@
 package com.emarsys.mobileengage.push
 
 import com.emarsys.api.push.Ems
-import com.emarsys.api.push.Notification
 import com.emarsys.api.push.PushCall
 import com.emarsys.api.push.PushContext
 import com.emarsys.api.push.PushContextApi
-import com.emarsys.api.push.PushUserInfo
+import com.emarsys.api.push.SilentNotification
+import com.emarsys.api.push.SilentPushUserInfo
 import com.emarsys.core.storage.StringStorageApi
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -69,9 +69,9 @@ class IosGathererPushTests {
 
     @Test
     fun testHandleSilentMessageWithUserInfo_shouldStoreCallInContext() = runTest {
-        val userInfo = PushUserInfo(
+        val userInfo = SilentPushUserInfo(
             Ems(version = "testVersion", trackingInfo = "testTrackingInfo"),
-            Notification(
+            SilentNotification(
                 silent = true,
                 defaultAction = null,
                 actions = null,

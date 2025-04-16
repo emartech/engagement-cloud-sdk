@@ -11,7 +11,7 @@ sealed interface PushCall {
     data class RegisterPushToken(val pushToken: String) : PushCall
 
     @Serializable
-    data class HandleSilentMessageWithUserInfo(val userInfo: PushUserInfo) : PushCall
+    data class HandleSilentMessageWithUserInfo(val userInfo: SilentPushUserInfo) : PushCall
 
     @Serializable
     class ClearPushToken : PushCall {

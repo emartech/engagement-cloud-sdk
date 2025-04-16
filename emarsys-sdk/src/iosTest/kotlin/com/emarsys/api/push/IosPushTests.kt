@@ -7,8 +7,8 @@ import com.emarsys.context.SdkContextApi
 import com.emarsys.core.exceptions.PreconditionFailedException
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
-import com.emarsys.mobileengage.action.models.PresentableAppEventActionModel
-import com.emarsys.mobileengage.action.models.PresentableOpenExternalUrlActionModel
+import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
+import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.push.IosPush
 import com.emarsys.mobileengage.push.IosPushInstance
 import dev.mokkery.MockMode
@@ -40,12 +40,10 @@ class IosPushTests {
         const val TRACKING_INFO = """{"trackingInfo":"testTrackingInfo"}"""
         const val REPORTING = """{"reportingKey":"reportingValue"}"""
         const val REPORTING2 = """{"reportingKey2":"reportingValue2"}"""
-        const val ID = "testID"
-        const val TITLE = "testTitle"
         const val NAME = "testName"
         val PAYLOAD = mapOf("key" to "value")
         const val URL_STRING = "https://www.emarsys.com"
-        val USER_INFO_MAP = buildMap {
+        val SILENT_USER_INFO_MAP = buildMap {
             put(
                 "ems", mapOf(
                     "version" to VERSION,
@@ -57,16 +55,12 @@ class IosPushTests {
                     "actions", listOf(
                         mapOf(
                             "type" to "OpenExternalUrl",
-                            "id" to ID,
                             "reporting" to REPORTING,
-                            "title" to TITLE,
                             "url" to URL_STRING
                         ),
                         mapOf(
                             "type" to "MEAppEvent",
-                            "id" to ID,
                             "reporting" to REPORTING2,
-                            "title" to TITLE,
                             "name" to NAME,
                             "payload" to PAYLOAD
                         )
@@ -74,16 +68,16 @@ class IosPushTests {
                 )
             })
         }
-        val PUSH_USER_INFO = PushUserInfo(
+        val SILENT_PUSH_USER_INFO = SilentPushUserInfo(
             ems = Ems(
                 version = VERSION,
                 trackingInfo = TRACKING_INFO
             ),
-            Notification(
+            SilentNotification(
                 silent = false,
                 actions = listOf(
-                    PresentableOpenExternalUrlActionModel(ID, REPORTING, TITLE, URL_STRING),
-                    PresentableAppEventActionModel(ID, REPORTING2, TITLE, NAME, PAYLOAD)
+                    BasicOpenExternalUrlActionModel(REPORTING, URL_STRING),
+                    BasicAppEventActionModel(REPORTING2, NAME, PAYLOAD)
                 )
             )
         )
@@ -384,10 +378,10 @@ class IosPushTests {
             mockLoggingPush.handleSilentMessageWithUserInfo(any())
         } returns Unit
 
-        iosPush.handleSilentMessageWithUserInfo(USER_INFO_MAP)
+        iosPush.handleSilentMessageWithUserInfo(SILENT_USER_INFO_MAP)
 
         verifySuspend {
-            mockLoggingPush.handleSilentMessageWithUserInfo(PUSH_USER_INFO)
+            mockLoggingPush.handleSilentMessageWithUserInfo(SILENT_PUSH_USER_INFO)
         }
     }
 
@@ -398,9 +392,9 @@ class IosPushTests {
         } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
-        iosPush.handleSilentMessageWithUserInfo(USER_INFO_MAP)
+        iosPush.handleSilentMessageWithUserInfo(SILENT_USER_INFO_MAP)
 
-        verifySuspend { mockGathererPush.handleSilentMessageWithUserInfo(PUSH_USER_INFO) }
+        verifySuspend { mockGathererPush.handleSilentMessageWithUserInfo(SILENT_PUSH_USER_INFO) }
     }
 
     @Test
@@ -410,9 +404,9 @@ class IosPushTests {
         } returns Unit
 
         sdkContext.setSdkState(SdkState.active)
-        iosPush.handleSilentMessageWithUserInfo(USER_INFO_MAP)
+        iosPush.handleSilentMessageWithUserInfo(SILENT_USER_INFO_MAP)
 
-        verifySuspend { mockPushInternal.handleSilentMessageWithUserInfo(PUSH_USER_INFO) }
+        verifySuspend { mockPushInternal.handleSilentMessageWithUserInfo(SILENT_PUSH_USER_INFO) }
     }
 
     @Test

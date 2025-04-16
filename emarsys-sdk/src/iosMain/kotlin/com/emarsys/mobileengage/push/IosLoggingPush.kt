@@ -1,7 +1,7 @@
 package com.emarsys.mobileengage.push
 
 import com.emarsys.api.push.LoggingPush
-import com.emarsys.api.push.PushUserInfo
+import com.emarsys.api.push.SilentPushUserInfo
 import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.Logger
 import com.emarsys.core.storage.StringStorageApi
@@ -40,7 +40,7 @@ internal class IosLoggingPush(
             return object : NSObject(), UNUserNotificationCenterDelegateProtocol {}
         }
 
-    override suspend fun handleSilentMessageWithUserInfo(userInfo: PushUserInfo) {
+    override suspend fun handleSilentMessageWithUserInfo(userInfo: SilentPushUserInfo) {
         val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)
         logger.debug(entry)
     }

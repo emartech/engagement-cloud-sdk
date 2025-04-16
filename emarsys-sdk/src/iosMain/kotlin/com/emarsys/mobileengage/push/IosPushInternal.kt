@@ -9,6 +9,7 @@ import com.emarsys.api.push.PushConstants.PUSH_TOKEN_KEY
 import com.emarsys.api.push.PushContextApi
 import com.emarsys.api.push.PushInternal
 import com.emarsys.api.push.PushUserInfo
+import com.emarsys.api.push.SilentPushUserInfo
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.actions.badge.BadgeCountHandlerApi
@@ -25,7 +26,6 @@ import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
-import com.emarsys.mobileengage.action.models.PresentablePushToInAppActionModel
 import com.emarsys.mobileengage.push.extension.toPushUserInfo
 import com.emarsys.networking.clients.event.model.SdkEvent
 import kotlinx.coroutines.CoroutineDispatcher
@@ -78,7 +78,7 @@ internal class IosPushInternal(
             customerUserNotificationCenterDelegate
         )
 
-    override suspend fun handleSilentMessageWithUserInfo(userInfo: PushUserInfo) {
+    override suspend fun handleSilentMessageWithUserInfo(userInfo: SilentPushUserInfo) {
         userInfo.notification.actions?.forEach {
             actionFactory.create(it).invoke()
         }
@@ -138,7 +138,7 @@ internal class IosPushInternal(
     ) {
         val actionModel: ActionModel? =
             if (actionIdentifier == UNNotificationDefaultActionIdentifier) {
-                extractDefaultAction(pushUserInfo)
+                pushUserInfo.notification.defaultAction
             } else {
                 pushUserInfo.notification.actions?.firstOrNull {
                     it.id == actionIdentifier
@@ -176,14 +176,6 @@ internal class IosPushInternal(
 
             model?.let { add(actionFactory.create(model)) }
         }
-    }
-
-    private fun extractDefaultAction(
-        pushUserInfo: PushUserInfo,
-    ): ActionModel? {
-        val pushToInApp =
-            pushUserInfo.notification.actions?.firstOrNull { it is PresentablePushToInAppActionModel }
-        return pushToInApp ?: pushUserInfo.notification.defaultAction
     }
 
     private class InternalNotificationCenterDelegateProxy(

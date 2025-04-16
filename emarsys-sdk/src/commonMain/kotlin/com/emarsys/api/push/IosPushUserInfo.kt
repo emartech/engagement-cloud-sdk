@@ -12,10 +12,24 @@ data class PushUserInfo(
 )
 
 @Serializable
+data class SilentPushUserInfo(
+    val ems: Ems,
+    val notification: SilentNotification
+)
+
+@Serializable
 data class Notification(
     val silent: Boolean = false,
     val defaultAction: BasicActionModel? = null,
     val actions: List<PresentableActionModel>? = null,
+    val badgeCount: BadgeCount? = null
+)
+
+@Serializable
+data class SilentNotification(
+    val silent: Boolean = false,
+    val defaultAction: BasicActionModel? = null,
+    val actions: List<BasicActionModel>? = null,
     val badgeCount: BadgeCount? = null
 )
 

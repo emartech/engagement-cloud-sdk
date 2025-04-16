@@ -5,7 +5,7 @@ import com.emarsys.api.push.PushInternalApi
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.exceptions.PreconditionFailedException
 import com.emarsys.core.log.Logger
-import com.emarsys.mobileengage.push.extension.toPushUserInfo
+import com.emarsys.mobileengage.push.extension.toSilentPushUserInfo
 import com.emarsys.util.JsonUtil
 import kotlinx.coroutines.withContext
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
@@ -48,7 +48,7 @@ class IosPush<Logging : IosPushInstance, Gatherer : IosPushInstance, Internal : 
         runCatching {
             withContext(sdkContext.sdkDispatcher) {
                 try {
-                    val pushUserInfo = rawUserInfo.toPushUserInfo(JsonUtil.json)
+                    val pushUserInfo = rawUserInfo.toSilentPushUserInfo(JsonUtil.json)
                     pushUserInfo?.let {
                         activeInstance<IosPushInstance>().handleSilentMessageWithUserInfo(pushUserInfo)
                     }

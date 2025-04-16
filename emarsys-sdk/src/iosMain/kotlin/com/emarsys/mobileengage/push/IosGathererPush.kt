@@ -3,7 +3,7 @@ package com.emarsys.mobileengage.push
 import com.emarsys.api.push.PushCall
 import com.emarsys.api.push.PushContextApi
 import com.emarsys.api.push.PushGatherer
-import com.emarsys.api.push.PushUserInfo
+import com.emarsys.api.push.SilentPushUserInfo
 import com.emarsys.core.storage.StringStorageApi
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 
@@ -20,7 +20,7 @@ internal class IosGathererPush(
     override val emarsysUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol
         get() = iosPushInternal.emarsysUserNotificationCenterDelegate
 
-    override suspend fun handleSilentMessageWithUserInfo(userInfo: PushUserInfo) {
+    override suspend fun handleSilentMessageWithUserInfo(userInfo: SilentPushUserInfo) {
         context.calls.add(PushCall.HandleSilentMessageWithUserInfo(userInfo))
     }
 }
