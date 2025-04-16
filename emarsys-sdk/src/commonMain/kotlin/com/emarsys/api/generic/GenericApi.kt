@@ -20,8 +20,8 @@ open class GenericApi<Logging : Activatable, Gatherer : Activatable, Internal : 
     var activeInstance: Activatable = loggingApi
 
     private suspend fun activate(instance: Activatable) {
-        instance.activate()
         activeInstance = instance
+        instance.activate()
     }
 
     override suspend fun registerOnContext() {

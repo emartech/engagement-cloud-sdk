@@ -131,6 +131,8 @@ sealed interface SdkEvent {
 
         interface LogEvent : Internal, OnlineSdkEvent
 
+        interface SetupFlow : Internal, OnlineSdkEvent
+
         @Serializable
         sealed class Sdk(override val name: String) : Internal {
             override val type: String = "internal"
@@ -190,14 +192,14 @@ sealed interface SdkEvent {
                 override val id: String = UUIDProvider().provide(),
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Sdk(REGISTER_DEVICE_INFO_EVENT_NAME), OnlineSdkEvent
+            ) : Sdk(REGISTER_DEVICE_INFO_EVENT_NAME), OnlineSdkEvent, SetupFlow
 
             @Serializable
             data class RegisterPushToken(
                 override val id: String = UUIDProvider().provide(),
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Sdk(REGISTER_PUSH_TOKEN_EVENT_NAME), OnlineSdkEvent
+            ) : Sdk(REGISTER_PUSH_TOKEN_EVENT_NAME), OnlineSdkEvent, SetupFlow
 
             @Serializable
             data class ClearPushToken(
@@ -218,14 +220,14 @@ sealed interface SdkEvent {
                 override val id: String = UUIDProvider().provide(),
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Sdk(APPLY_APPCODE_BASED_REMOTE_CONFIG_EVENT_NAME), OnlineSdkEvent
+            ) : Sdk(APPLY_APPCODE_BASED_REMOTE_CONFIG_EVENT_NAME), OnlineSdkEvent, SetupFlow
 
             @Serializable
             data class ApplyGlobalRemoteConfig(
                 override val id: String = UUIDProvider().provide(),
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Sdk(APPLY_GLOBAL_REMOTE_CONFIG_EVENT_NAME), OnlineSdkEvent
+            ) : Sdk(APPLY_GLOBAL_REMOTE_CONFIG_EVENT_NAME), OnlineSdkEvent, SetupFlow
 
             @Serializable
             data class ChangeAppCode(
@@ -274,7 +276,7 @@ sealed interface SdkEvent {
                 override val id: String = UUIDProvider().provide(),
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Sdk(APP_START_EVENT_NAME), Custom
+            ) : Sdk(APP_START_EVENT_NAME), Custom, SetupFlow
 
             @Serializable
             data class SessionStart(

@@ -1,5 +1,6 @@
 package com.emarsys.core.channel
 
+import com.emarsys.api.SdkState
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.log.Logger
@@ -11,10 +12,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -34,20 +35,23 @@ class SdkEventDistributor(
 
     override val sdkEventFlow = _sdkEventFlow.asSharedFlow()
 
-    override val onlineSdkEvents: Flow<OnlineSdkEvent> =
+    private val _onlineSdkEvents: Flow<OnlineSdkEvent> =
         _sdkEventFlow
             .filterIsInstance<OnlineSdkEvent>()
-            .filter {
-                it !is SdkEvent.Internal.LogEvent
-            }
-            .onEach {
-                combine(
-                    sdkContext.currentSdkState,
-                    connectionStatus
-                ) { sdkState, isConnected ->
-                    isConnected
-                }.first { it }
-            }
+            .filter { it !is SdkEvent.Internal.LogEvent }
+            .onEach { connectionStatus.first { it } }
+
+    private val setupFlowOnlineEvents =
+        _onlineSdkEvents
+            .filter { it is SdkEvent.Internal.SetupFlow }
+            .onEach { sdkContext.currentSdkState.first { it == SdkState.active || it == SdkState.onHold } }
+
+    private val nonSetupFlowOnlineEvents =
+        _onlineSdkEvents
+            .filter { it !is SdkEvent.Internal.SetupFlow }
+            .onEach { sdkContext.currentSdkState.first { it == SdkState.active } }
+
+    override val onlineSdkEvents: Flow<OnlineSdkEvent> = merge(setupFlowOnlineEvents, nonSetupFlowOnlineEvents)
 
     override val logEvents = _sdkEventFlow
         .filterIsInstance<SdkEvent.Internal.LogEvent>()

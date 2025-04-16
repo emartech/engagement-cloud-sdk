@@ -22,11 +22,11 @@ class SetupOrganizer(
             sdkLogger.debug("SDK already enabled")
             throw SdkAlreadyEnabledException("Emarsys SDK was already enabled!")
         }
-
         setup(config)
     }
 
     override suspend fun setup(config: SdkConfig) {
+        sdkContext.setSdkState(SdkState.onHold)
         sdkConfigStore.store(config)
         sdkContext.config = config
         if (sdkContext.isConfigPredictOnly()) {
