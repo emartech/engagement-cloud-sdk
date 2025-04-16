@@ -21,6 +21,9 @@ import org.junit.Before
 import org.junit.Test
 
 class SilentAndroidPushV2MapperTest {
+    private companion object {
+        const val REPORTING = """{"reportingKey":"reportingValue"}"""
+    }
 
     private lateinit var mapper: SilentAndroidPushV2Mapper
 
@@ -59,6 +62,7 @@ class SilentAndroidPushV2MapperTest {
             put("notification.actions", buildJsonArray {
                 add(buildJsonObject {
                     put("type", "MEAppEvent")
+                    put("reporting", REPORTING)
                     put("name", "testEvent")
                     put("payload", buildJsonObject {
                         put("key", "value")
@@ -83,6 +87,7 @@ class SilentAndroidPushV2MapperTest {
             actionableData = ActionableData(
                 actions = listOf(
                     BasicAppEventActionModel(
+                        reporting = REPORTING,
                         name = "testEvent",
                         payload = buildMap {
                             put("key", "value")

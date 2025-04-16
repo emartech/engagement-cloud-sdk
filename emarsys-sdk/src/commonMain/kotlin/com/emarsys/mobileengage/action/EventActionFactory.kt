@@ -33,11 +33,7 @@ internal class EventActionFactory(
         return when (action) {
             is AppEventActionModel -> AppEventAction(action, sdkEventDistributor)
             is CustomEventActionModel -> CustomEventAction(action, sdkEventDistributor)
-            is RequestPushPermissionActionModel -> RequestPushPermissionAction(
-                action,
-                permissionHandler
-            )
-
+            is RequestPushPermissionActionModel -> RequestPushPermissionAction(permissionHandler)
             is DismissActionModel -> DismissAction(action, sdkEventDistributor)
             is OpenExternalUrlActionModel -> OpenExternalUrlAction(action, externalUrlOpener)
             is ReportingActionModel -> ReportingAction(action, sdkEventDistributor)

@@ -1,7 +1,6 @@
 package com.emarsys.mobileengage.action.actions
 
 import com.emarsys.core.permission.PermissionHandlerApi
-import com.emarsys.mobileengage.action.models.RequestPushPermissionActionModel
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
@@ -17,10 +16,7 @@ class RequestPushPermissionActionTests {
             everySuspend { requestPushPermission() } returns Unit
         }
 
-        val requestPushPermissionAction = RequestPushPermissionAction(
-            RequestPushPermissionActionModel,
-            mockPermissionHandler
-        )
+        val requestPushPermissionAction = RequestPushPermissionAction(mockPermissionHandler)
         requestPushPermissionAction()
 
         verifySuspend { mockPermissionHandler.requestPushPermission() }

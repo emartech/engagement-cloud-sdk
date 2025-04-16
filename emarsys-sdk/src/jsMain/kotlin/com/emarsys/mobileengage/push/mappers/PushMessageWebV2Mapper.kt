@@ -3,7 +3,7 @@ package com.emarsys.mobileengage.push.mappers
 import com.emarsys.core.log.Logger
 import com.emarsys.core.mapper.Mapper
 import com.emarsys.mobileengage.action.models.PresentableActionModel
-import com.emarsys.mobileengage.inapp.PushToInApp
+import com.emarsys.mobileengage.inapp.PushToInAppPayload
 import com.emarsys.mobileengage.push.ActionableData
 import com.emarsys.mobileengage.push.DisplayableData
 import com.emarsys.mobileengage.push.model.JsPlatformData
@@ -22,13 +22,12 @@ class PushMessageWebV2Mapper(
 
             val defaultTapAction = remoteMessage.notification.defaultAction
             val actions: List<PresentableActionModel>? = remoteMessage.notification.actions
-            val pushToInApp: PushToInApp? = null
+            val pushToInAppPayload: PushToInAppPayload? = null
             val actionableData =
-                if (actions != null || defaultTapAction != null || pushToInApp != null) {
+                if (actions != null || defaultTapAction != null || pushToInAppPayload != null) {
                     ActionableData(
                         actions = actions,
-                        defaultTapAction = defaultTapAction,
-                        pushToInApp = pushToInApp
+                        defaultTapAction = defaultTapAction
                     )
                 } else null
 

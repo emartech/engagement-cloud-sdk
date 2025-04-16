@@ -93,7 +93,10 @@ internal class NotificationIntentProcessor(
 
                         is BasicActionModel,
                         null -> {
-                            NotificationOpenedActionModel(it.trackingInfo)
+                            NotificationOpenedActionModel(
+                                triggeredActionModel?.reporting,
+                                it.trackingInfo
+                            )
                         }
 
                         else -> null

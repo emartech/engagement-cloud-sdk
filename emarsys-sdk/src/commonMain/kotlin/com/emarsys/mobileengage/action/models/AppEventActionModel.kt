@@ -22,6 +22,7 @@ data class PresentableAppEventActionModel(
 @Serializable
 @SerialName("MEAppEvent")
 data class BasicAppEventActionModel(
+    override val reporting: String,
     override val name: String,
-    override val payload: Map<String, String>?,
+    override val payload: Map<String, String>?
 ): BasicActionModel(), AppEventActionModel

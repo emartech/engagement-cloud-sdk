@@ -72,7 +72,7 @@ internal class PushNotificationClickHandler(
 
             is BasicActionModel,
             null -> {
-                listOf(actionFactory.create(NotificationOpenedActionModel(jsNotificationClickedData.jsPushMessage.trackingInfo)))
+                listOf(actionFactory.create(NotificationOpenedActionModel(actionModel?.reporting, jsNotificationClickedData.jsPushMessage.trackingInfo)))
             }
 
             else -> emptyList()

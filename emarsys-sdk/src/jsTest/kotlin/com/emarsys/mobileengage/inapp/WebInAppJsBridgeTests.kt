@@ -24,6 +24,9 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import web.window.window
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -34,8 +37,13 @@ class WebInAppJsBridgeTests {
     private companion object {
         const val ID = "1"
         const val CAMPAIGN_ID = "testCampaignId"
+        const val REPORTING = """{"reportingKey":"reportingValue"}"""
+        const val TRACKING_INFO = """{"trackingInfoKey":"trackingInfoValue"}"""
         val TEST_ACTION =
-            ReportingAction(BasicInAppButtonClickedActionModel(ID, CAMPAIGN_ID), mock(MockMode.autofill))
+            ReportingAction(
+                BasicInAppButtonClickedActionModel(REPORTING, TRACKING_INFO),
+                mock(MockMode.autofill)
+            )
     }
 
     private lateinit var inappJsBridge: InAppJsBridgeApi
@@ -60,14 +68,14 @@ class WebInAppJsBridgeTests {
 
     @Test
     fun buttonClicked_shouldTrigger_actionFactory() = runTest {
-        val testActionModel = BasicInAppButtonClickedActionModel(ID)
+        val testActionModel = BasicInAppButtonClickedActionModel(REPORTING)
         everySuspend {
             mockActionFactory.create(action = testActionModel)
         } returns TEST_ACTION
 
         inappJsBridge.register()
 
-        window.asDynamic()["EMSInappWebBridge"].buttonClicked("""{"id":"$ID"}""")
+        window.asDynamic()["EMSInappWebBridge"].buttonClicked(createTestJson())
 
         advanceUntilIdle()
 
@@ -77,16 +85,18 @@ class WebInAppJsBridgeTests {
     }
 
     @Test
-    fun triggerMEEvent_shouldTrigger_actionFactory() = runTest {
+    fun triggerMECustomEvent_shouldTrigger_actionFactory() = runTest {
         val testActionModel =
-            BasicCustomEventActionModel("customEventName", mapOf("key" to "value"))
+            BasicCustomEventActionModel(REPORTING, "customEventName", mapOf("key" to "value"))
+        val testJsonString =
+            createTestJson(name = "customEventName", payload = buildJsonObject { put("key", "value") })
         everySuspend {
             mockActionFactory.create(action = testActionModel)
         } returns TEST_ACTION
 
         inappJsBridge.register()
 
-        window.asDynamic()["EMSInappWebBridge"].triggerMEEvent("""{"name":"customEventName","payload":{"key":"value"},"id":"$ID"}""")
+        window.asDynamic()["EMSInappWebBridge"].triggerMEEvent(testJsonString)
 
         advanceUntilIdle()
 
@@ -97,14 +107,16 @@ class WebInAppJsBridgeTests {
 
     @Test
     fun triggerAppEvent_shouldTrigger_actionFactory() = runTest {
-        val testActionModel = BasicAppEventActionModel("appEventName", mapOf("key" to "value"))
+        val testActionModel =
+            BasicAppEventActionModel(REPORTING, "appEventName", mapOf("key" to "value"))
+        val testJsonString = createTestJson(name = "appEventName", payload = buildJsonObject { put("key", "value") })
         everySuspend {
             mockActionFactory.create(action = testActionModel)
         } returns TEST_ACTION
 
         inappJsBridge.register()
 
-        window.asDynamic()["EMSInappWebBridge"].triggerAppEvent("""{"name":"appEventName","payload":{"key":"value"},"id":"$ID"}""")
+        window.asDynamic()["EMSInappWebBridge"].triggerAppEvent(testJsonString)
 
         advanceUntilIdle()
 
@@ -122,7 +134,7 @@ class WebInAppJsBridgeTests {
 
         inappJsBridge.register()
 
-        window.asDynamic()["EMSInappWebBridge"].requestPushPermission("""{"id":"$ID"}""")
+        window.asDynamic()["EMSInappWebBridge"].requestPushPermission(createTestJson())
 
         advanceUntilIdle()
 
@@ -133,14 +145,15 @@ class WebInAppJsBridgeTests {
 
     @Test
     fun openExternalLink_shouldTrigger_actionFactory() = runTest {
-        val testActionModel = BasicOpenExternalUrlActionModel("https://sap.com")
+        val testActionModel = BasicOpenExternalUrlActionModel(REPORTING, "https://sap.com")
+        val testJsonString = createTestJson(url = "https://sap.com")
         everySuspend {
             mockActionFactory.create(action = testActionModel)
         } returns TEST_ACTION
 
         inappJsBridge.register()
 
-        window.asDynamic()["EMSInappWebBridge"].openExternalLink("""{"url":"https://sap.com","id":"$ID"}""")
+        window.asDynamic()["EMSInappWebBridge"].openExternalLink(testJsonString)
 
         advanceUntilIdle()
 
@@ -151,14 +164,14 @@ class WebInAppJsBridgeTests {
 
     @Test
     fun dismiss_shouldTrigger_actionFactory() = runTest {
-        val testActionModel = BasicDismissActionModel(CAMPAIGN_ID)
+        val testActionModel = BasicDismissActionModel(REPORTING, CAMPAIGN_ID)
         everySuspend {
             mockActionFactory.create(action = testActionModel)
         } returns TEST_ACTION
 
         inappJsBridge.register()
 
-        window.asDynamic()["EMSInappWebBridge"].close("""{"id":"$ID"}""")
+        window.asDynamic()["EMSInappWebBridge"].close(createTestJson())
 
         advanceUntilIdle()
 
@@ -169,19 +182,36 @@ class WebInAppJsBridgeTests {
 
     @Test
     fun copyToClipboard_shouldTrigger_actionFactory() = runTest {
-        val testActionModel = BasicCopyToClipboardActionModel("testValue")
+        val testActionModel = BasicCopyToClipboardActionModel(REPORTING, "testValue")
+        val testJsonString = createTestJson(text = "testValue")
         everySuspend {
             mockActionFactory.create(action = testActionModel)
         } returns TEST_ACTION
 
         inappJsBridge.register()
 
-        window.asDynamic()["EMSInappWebBridge"].copyToClipboard("""{"text":"testValue","id":"$ID"}""")
+        window.asDynamic()["EMSInappWebBridge"].copyToClipboard(testJsonString)
 
         advanceUntilIdle()
 
         verifySuspend {
             mockActionFactory.create(testActionModel)
         }
+    }
+
+    private fun createTestJson(
+        name: String? = null,
+        payload: JsonObject? = null,
+        url: String? = null,
+        text: String? = null
+    ): String {
+        return buildJsonObject {
+            put("id", ID)
+            put("reporting", buildJsonObject { put("reportingKey", "reportingValue") }.toString())
+            name?.let { put("name", name) }
+            payload?.let { put("payload", payload) }
+            url?.let { put("url", url) }
+            text?.let { put("text", text) }
+        }.toString()
     }
 }

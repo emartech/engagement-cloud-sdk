@@ -1,8 +1,9 @@
 package com.emarsys.mobileengage.pushtoinapp
 
-import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
+import com.emarsys.mobileengage.action.models.PresentablePushToInAppActionModel
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandlerApi
+import com.emarsys.mobileengage.inapp.PushToInAppPayload
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
@@ -16,8 +17,16 @@ class PushToInAppHandlerTests {
     private companion object {
         const val URL = "https://sap.com"
         const val CAMPAIGN_ID = "campaignId"
-        const val HTML = "testHtml"
-        val testActionModel = InternalPushToInappActionModel(CAMPAIGN_ID, URL)
+        const val HTML = "https://sap.com"
+        const val ID = "testId"
+        const val TITLE = "testTitle"
+        const val REPORTING = """{"reportingKey":"reportingValue"}"""
+        val testActionModel = PresentablePushToInAppActionModel(
+            ID,
+            REPORTING,
+            TITLE,
+            PushToInAppPayload(CAMPAIGN_ID, URL)
+        )
     }
 
     private lateinit var pushToInAppHandler: PushToInAppHandler

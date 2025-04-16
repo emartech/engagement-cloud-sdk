@@ -5,4 +5,4 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("RequestPushPermission")
-data object RequestPushPermissionActionModel : BasicActionModel()
+data object RequestPushPermissionActionModel : ActionModel

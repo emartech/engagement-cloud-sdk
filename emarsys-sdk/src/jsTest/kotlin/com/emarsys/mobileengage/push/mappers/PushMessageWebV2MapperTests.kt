@@ -111,6 +111,7 @@ class PushMessageWebV2MapperTests {
             badgeCount = BadgeCount(BadgeCountMethod.ADD, BADGE_VALUE),
             actionableData = ActionableData(
                 defaultTapAction = BasicCustomEventActionModel(
+                    REPORTING,
                     DEFAULT_ACTION_NAME,
                     mapOf("defaultActionPayloadKey" to "defaultActionPayloadValue")
                 ),

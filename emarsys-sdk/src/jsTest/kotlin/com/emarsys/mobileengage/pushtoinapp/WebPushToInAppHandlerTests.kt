@@ -1,8 +1,9 @@
 package com.emarsys.mobileengage.pushtoinapp
 
-import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
+import com.emarsys.mobileengage.action.models.PresentablePushToInAppActionModel
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandlerApi
+import com.emarsys.mobileengage.inapp.PushToInAppPayload
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
@@ -18,6 +19,15 @@ class WebPushToInAppHandlerTests {
         const val URL = "url"
         const val HTML = "https://sap.com"
         const val CAMPAIGN_ID = "campaignId"
+        const val ID = "testId"
+        const val TITLE = "testTitle"
+        const val REPORTING = """{"reportingKey":"reportingValue"}"""
+        val testActionModel = PresentablePushToInAppActionModel(
+            ID,
+            REPORTING,
+            TITLE,
+            PushToInAppPayload(CAMPAIGN_ID, URL)
+        )
     }
 
     private lateinit var webPushToInAppHandler: WebPushToInAppHandler
@@ -35,7 +45,6 @@ class WebPushToInAppHandlerTests {
 
     @Test
     fun handle_shouldCallHandleOnInAppHandler_whenDownloadSucceeds_andHtml_isNotEmpty() = runTest {
-        val testActionModel = InternalPushToInappActionModel(CAMPAIGN_ID, URL)
         everySuspend { mockInAppDownloader.download(URL) } returns HTML
 
         webPushToInAppHandler.handle(testActionModel)
@@ -46,7 +55,6 @@ class WebPushToInAppHandlerTests {
 
     @Test
     fun handle_shouldNotCallHandleOnInAppHandler_whenHtml_isEmpty() = runTest {
-        val testActionModel = InternalPushToInappActionModel(CAMPAIGN_ID, URL)
         everySuspend { mockInAppDownloader.download(URL) } returns ""
 
         webPushToInAppHandler.handle(testActionModel)
@@ -57,7 +65,6 @@ class WebPushToInAppHandlerTests {
 
     @Test
     fun handle_shouldNotCallHandleOnInAppHandler_whenHtml_isNull() = runTest {
-        val testActionModel = InternalPushToInappActionModel(CAMPAIGN_ID, URL)
         everySuspend { mockInAppDownloader.download(URL) } returns null
 
         webPushToInAppHandler.handle(testActionModel)

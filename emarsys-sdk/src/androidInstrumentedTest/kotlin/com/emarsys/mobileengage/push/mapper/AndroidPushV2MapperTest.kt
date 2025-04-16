@@ -4,9 +4,11 @@ import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.mobileengage.action.models.BadgeCount
 import com.emarsys.mobileengage.action.models.BadgeCountMethod
+import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.action.models.BasicCustomEventActionModel
+import com.emarsys.mobileengage.action.models.BasicPushToInAppActionModel
 import com.emarsys.mobileengage.action.models.PresentableAppEventActionModel
-import com.emarsys.mobileengage.inapp.PushToInApp
+import com.emarsys.mobileengage.inapp.PushToInAppPayload
 import com.emarsys.mobileengage.push.ActionableData
 import com.emarsys.mobileengage.push.DisplayableData
 import com.emarsys.mobileengage.push.NotificationOperation
@@ -68,7 +70,40 @@ class AndroidPushV2MapperTest {
         result shouldBe expected
     }
 
-    private fun createExpectedAndroidPushMessage(): AndroidPushMessage = AndroidPushMessage(
+    @Test
+    fun map_shouldReturnAndroidPushMessage_whenInputIsValid_withPushToInApp_defaultAction() =
+        runTest {
+            val input = createTestJson(buildJsonObject {
+                put("type", "MEInApp")
+                put("id", "testId")
+                put("reporting", "{\"reportingKey\":\"reportingValue\"}")
+                put("payload", buildJsonObject {
+                    put("campaignId", "testCampaignId")
+                    put("url", "testUrl")
+                })
+            })
+            val expected = createExpectedAndroidPushMessage(
+                BasicPushToInAppActionModel(
+                    id = "testId",
+                    reporting = REPORTING,
+                    payload = PushToInAppPayload("testCampaignId", "testUrl")
+                )
+            )
+
+            val result = mapper.map(input)
+
+            result shouldBe expected
+        }
+
+    private fun createExpectedAndroidPushMessage(
+        defaultActionModel: BasicActionModel = BasicCustomEventActionModel(
+            reporting = REPORTING,
+            name = "testName",
+            payload = buildMap {
+                put("key", "value")
+            }
+        )
+    ): AndroidPushMessage = AndroidPushMessage(
         trackingInfo = TRACKING_INFO,
         platformData = AndroidPlatformData(
             channelId = "channelId",
@@ -100,21 +135,19 @@ class AndroidPushV2MapperTest {
                     }
                 )
             ),
-            defaultTapAction = BasicCustomEventActionModel(
-                name = "testName",
-                payload = buildMap {
-                    put("key", "value")
-                }
-            ),
-            pushToInApp = PushToInApp(
-                campaignId = "campaignId",
-                url = "url",
-                ignoreViewedEvent = true
-            )
-        )
+            defaultTapAction = defaultActionModel)
     )
 
-    private fun createTestJson(): JsonObject {
+    private fun createTestJson(
+        defaultActionModel: JsonObject? = buildJsonObject {
+            put("type", "MECustomEvent")
+            put("reporting", REPORTING)
+            put("name", "testName")
+            put("payload", buildJsonObject {
+                put("key", "value")
+            })
+        }
+    ): JsonObject {
         val input = buildJsonObject {
             put("ems.version", "version")
             put("ems.trackingInfo", TRACKING_INFO)
@@ -142,18 +175,7 @@ class AndroidPushV2MapperTest {
                     })
                 })
             }.toString())
-            put("notification.inapp", buildJsonObject {
-                put("campaignId", "campaignId")
-                put("url", "url")
-                put("ignoreViewedEvent", true)
-            }.toString())
-            put("notification.defaultAction", buildJsonObject {
-                put("type", "MECustomEvent")
-                put("name", "testName")
-                put("payload", buildJsonObject {
-                    put("key", "value")
-                })
-            }.toString())
+            put("notification.defaultAction", defaultActionModel.toString())
         }
         return input
     }

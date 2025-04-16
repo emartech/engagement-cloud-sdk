@@ -3,7 +3,6 @@ package com.emarsys.mobileengage.push
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BadgeCount
 import com.emarsys.mobileengage.action.models.BasicActionModel
-import com.emarsys.mobileengage.inapp.PushToInApp
 import kotlinx.serialization.Serializable
 
 interface PlatformData
@@ -33,5 +32,4 @@ data class DisplayableData(
 data class ActionableData<A: ActionModel>(
     val actions: List<A>? = emptyList<A>(),
     val defaultTapAction: BasicActionModel? = null,
-    val pushToInApp: PushToInApp? = null
 )

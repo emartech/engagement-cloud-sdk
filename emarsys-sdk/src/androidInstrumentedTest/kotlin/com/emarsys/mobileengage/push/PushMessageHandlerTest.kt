@@ -34,18 +34,22 @@ class PushMessageHandlerTest {
         const val COLLAPSE_ID = "testCollapseId"
         const val CHANNEL_ID = "testChannelId"
         const val TRACKING_INFO = """{"trackingInfoKey":"trackingInfoValue"}"""
+        const val REPORTING = """{"key":"value"}"""
 
         val testOpenExternalUrlBasicAction =
             BasicOpenExternalUrlActionModel(
+                REPORTING,
                 "https://example.com"
             )
         val testCustomEventBasicAction =
             BasicCustomEventActionModel(
+                REPORTING,
                 "customAction",
                 mapOf("key" to "value")
             )
         val testAppEventBasicAction =
             BasicAppEventActionModel(
+                REPORTING,
                 "appAction",
                 mapOf("key2" to "value2")
             )

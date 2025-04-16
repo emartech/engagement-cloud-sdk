@@ -5,7 +5,6 @@ import com.emarsys.core.mapper.Mapper
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
-import com.emarsys.mobileengage.inapp.PushToInApp
 import com.emarsys.mobileengage.push.ActionableData
 import com.emarsys.mobileengage.push.DisplayableData
 import com.emarsys.mobileengage.push.NotificationOperation
@@ -36,7 +35,6 @@ internal class AndroidPushV2Mapper(
         private const val OPERATION = "notification.operation"
         private const val DEFAULT_ACTION = "notification.defaultAction"
         private const val ACTIONS = "notification.actions"
-        private const val IN_APP = "notification.inapp"
         private const val BADGE_COUNT = "notification.badgeCount"
         private const val TRACKING_INFO = "ems.trackingInfo"
     }
@@ -48,15 +46,9 @@ internal class AndroidPushV2Mapper(
                 from[DEFAULT_ACTION]?.jsonPrimitive?.contentOrNull.fromString(json)
             val actions: List<PresentableActionModel>? =
                 from[ACTIONS]?.jsonPrimitive?.contentOrNull.fromString(json)
-            val pushToInApp: PushToInApp? =
-                from[IN_APP]?.jsonPrimitive?.contentOrNull.fromString(json)
 
             val actionableData =
-                ActionableData(
-                    actions = actions,
-                    defaultTapAction = defaultTapAction,
-                    pushToInApp = pushToInApp
-                )
+                ActionableData(actions = actions, defaultTapAction = defaultTapAction)
 
             AndroidPushMessage(
                 trackingInfo = trackingInfo,

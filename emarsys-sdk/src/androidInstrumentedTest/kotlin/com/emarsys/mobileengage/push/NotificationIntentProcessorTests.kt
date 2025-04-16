@@ -115,7 +115,7 @@ class NotificationIntentProcessorTests {
             val mockReportingAction = mockk<DismissAction>(relaxed = true)
             coEvery { mockActionFactory.create(BasicLaunchApplicationActionModel) } returns mockLaunchApplicationAction
             coEvery { mockActionFactory.create(BasicDismissActionModel(COLLAPSE_ID)) } returns mockBasicDismissAction
-            coEvery { mockActionFactory.create(NotificationOpenedActionModel(TRACKING_INFO)) } returns mockReportingAction
+            coEvery { mockActionFactory.create(NotificationOpenedActionModel(null, TRACKING_INFO)) } returns mockReportingAction
             val expectedMandatoryActions =
                 listOf(
                     mockLaunchApplicationAction,
@@ -266,10 +266,10 @@ class NotificationIntentProcessorTests {
     @Test
     fun testProcessIntent_shouldHandleAction_withActionHandler_withMandatoryActions_whenTriggeredWithDefaultAction() =
         runTest {
-            val actionModel = BasicAppEventActionModel(NAME, PAYLOAD)
+            val actionModel = BasicAppEventActionModel(REPORTING, NAME, PAYLOAD)
             val actionJsonString =
-                """{"type": "MEAppEvent", "name":"$NAME","payload":{"testKey":"testValue"}}"""
-            val notificationOpenedActionModel = NotificationOpenedActionModel(TRACKING_INFO)
+                """{"type": "MEAppEvent","reporting":"{\"someKey\":\"someValue\"}","name":"$NAME","payload":{"testKey":"testValue"}}"""
+            val notificationOpenedActionModel = NotificationOpenedActionModel(REPORTING, TRACKING_INFO)
             val basicDismissActionModel = BasicDismissActionModel(COLLAPSE_ID)
             val reportingAction =
                 ReportingAction(notificationOpenedActionModel, mockSdkEventDistributor)

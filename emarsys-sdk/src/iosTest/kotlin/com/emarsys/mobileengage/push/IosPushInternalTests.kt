@@ -142,10 +142,9 @@ internal class IosPushInternalTests {
 
     @Test
     fun `didReceiveNotificationResponse should handle defaultAction`() = runTest {
-        val actionModel = BasicOpenExternalUrlActionModel(
-            url = "https://www.emarsys.com"
-        )
-        val notificationOpenedActionModel = NotificationOpenedActionModel(TRACKING_INFO)
+        val actionModel =
+            BasicOpenExternalUrlActionModel(REPORTING, url = "https://www.emarsys.com")
+        val notificationOpenedActionModel = NotificationOpenedActionModel(REPORTING, TRACKING_INFO)
         val mockAction: Action<Unit> = mock(MockMode.autoUnit)
         val mockReportingAction: Action<Unit> = mock(MockMode.autoUnit)
 
@@ -156,6 +155,7 @@ internal class IosPushInternalTests {
         val userInfo = createUserInfoMap(
             defaultAction = mapOf(
                 "type" to "OpenExternalUrl",
+                "reporting" to REPORTING,
                 "url" to "https://www.emarsys.com"
             ),
             actions = null
@@ -260,13 +260,11 @@ internal class IosPushInternalTests {
 //            mockActionHandler.handleActions(any(), action)
 //        }
 //    }
-//
-
 
     @Test
     fun `didReceiveNotificationResponse should handle badgeCount if present`() = runTest {
         val actionIdentifier = UNNotificationDefaultActionIdentifier
-        everySuspend { mockActionFactory.create(NotificationOpenedActionModel(TRACKING_INFO)) } returns mock()
+        everySuspend { mockActionFactory.create(NotificationOpenedActionModel(null, TRACKING_INFO)) } returns mock()
         val userInfo = createUserInfoMap(
             null,
             null,
@@ -306,15 +304,17 @@ internal class IosPushInternalTests {
         } returns Unit
 
         val actionIdentifier = "testId"
-        val userInfo = createUserInfoMap(null, listOf(
-            mapOf(
-                "type" to "OpenExternalUrl",
-                "id" to "testId",
-                "title" to "testTitle",
-                "reporting" to REPORTING,
-                "url" to "https://www.emarsys.com"
+        val userInfo = createUserInfoMap(
+            null, listOf(
+                mapOf(
+                    "type" to "OpenExternalUrl",
+                    "id" to "testId",
+                    "title" to "testTitle",
+                    "reporting" to REPORTING,
+                    "url" to "https://www.emarsys.com"
+                )
             )
-        ))
+        )
         val buttonClickedActionModel = BasicPushButtonClickedActionModel(
             actionModel.reporting,
             TRACKING_INFO
@@ -337,7 +337,8 @@ internal class IosPushInternalTests {
     fun `didReceiveNotificationResponse should report defaultAction`() =
         runTest {
             val mockUrlOpener: ExternalUrlOpenerApi = mock()
-            val actionModel = BasicOpenExternalUrlActionModel(url = "https://www.emarsys.com")
+            val actionModel =
+                BasicOpenExternalUrlActionModel(REPORTING, url = "https://www.emarsys.com")
             val action = OpenExternalUrlAction(actionModel, mockUrlOpener)
 
             everySuspend { mockActionFactory.create(actionModel) } returns action
@@ -347,6 +348,7 @@ internal class IosPushInternalTests {
             val userInfo = createUserInfoMap(
                 defaultAction = mapOf(
                     "type" to "OpenExternalUrl",
+                    "reporting" to REPORTING,
                     "url" to "https://www.emarsys.com"
                 ),
                 actions = listOf(
@@ -360,7 +362,8 @@ internal class IosPushInternalTests {
                 )
             )
 
-            val notificationOpenedActionModel = NotificationOpenedActionModel(TRACKING_INFO)
+            val notificationOpenedActionModel =
+                NotificationOpenedActionModel(REPORTING, TRACKING_INFO)
 
             val reportingAction = ReportingAction(notificationOpenedActionModel, mock())
 
@@ -385,7 +388,7 @@ internal class IosPushInternalTests {
                 actions = null
             )
 
-            val notificationOpenedActionModel = NotificationOpenedActionModel(TRACKING_INFO)
+            val notificationOpenedActionModel = NotificationOpenedActionModel(null, TRACKING_INFO)
 
             val reportingAction = ReportingAction(notificationOpenedActionModel, mock())
 
@@ -447,7 +450,12 @@ internal class IosPushInternalTests {
     @Test
     fun `handleMessageWithUserInfo should emit event with campaignId`() = runTest {
         val openExternalUrlActionModel =
-            PresentableOpenExternalUrlActionModel("testId", REPORTING, "testTitle", "https://www.emarsys.com")
+            PresentableOpenExternalUrlActionModel(
+                "testId",
+                REPORTING,
+                "testTitle",
+                "https://www.emarsys.com"
+            )
         val mockOpenExternalUrlAction = mock<Action<*>>()
         everySuspend { mockOpenExternalUrlAction.invoke() } returns Unit
 
@@ -482,7 +490,9 @@ internal class IosPushInternalTests {
     @Test
     fun `testActivate should handle pushCalls`() = runTest {
         val eventContainer = Capture.container<SdkEvent>()
-        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventContainer)) } returns mock(MockMode.autofill)
+        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventContainer)) } returns mock(
+            MockMode.autofill
+        )
 
         iosPushInternal.activate()
 

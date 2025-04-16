@@ -2,9 +2,10 @@ package com.emarsys.core.pushtoinapp
 
 import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.SdkLogger
-import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
+import com.emarsys.mobileengage.action.models.PresentablePushToInAppActionModel
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandlerApi
+import com.emarsys.mobileengage.inapp.PushToInAppPayload
 import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
 import dev.mokkery.mock
 import io.mockk.coEvery
@@ -17,6 +18,9 @@ import org.junit.Test
 class PushToInAppHandlerTests {
     private companion object {
         const val CAMPAIGN_ID = "testCampaignId"
+        const val REPORTING = """{"key":"value"}"""
+        const val ID = "testId"
+        const val TITLE = "testTitle"
         const val INAPP_URL = "inapp url"
         const val HTML = "inapp content"
     }
@@ -38,31 +42,15 @@ class PushToInAppHandlerTests {
     }
 
     @Test
-    fun handle_shouldCallHandle_onInAppHandler_ifHtmlIsNotEmpty() = runTest {
-        val testInappAction =
-            InternalPushToInappActionModel(CAMPAIGN_ID, INAPP_URL, HTML, false)
-
-        pushToInAppHandler.handle(testInappAction)
-
-        coVerify { mockInAppHandler.handle(CAMPAIGN_ID, HTML) }
-    }
-
-    @Test
-    fun handle_shouldNotCallHandle_onInAppHandler_ifHtmlIsEmpty() = runTest {
-        val testInAppHtml = ""
-        val testInappAction =
-            InternalPushToInappActionModel(CAMPAIGN_ID, INAPP_URL, testInAppHtml, false)
-
-        pushToInAppHandler.handle(testInappAction)
-
-        coVerify(exactly = 0) { mockInAppHandler.handle(any(), any()) }
-    }
-
-    @Test
     fun handle_shouldDownloadHtml_andCallHandle_ifDownloadSucceeds() = runTest {
-        val testInAppHtml: String? = null
+        val payload = PushToInAppPayload(CAMPAIGN_ID, INAPP_URL)
         val testInappAction =
-            InternalPushToInappActionModel(CAMPAIGN_ID, INAPP_URL, testInAppHtml, false)
+            PresentablePushToInAppActionModel(
+                id = ID,
+                reporting = REPORTING,
+                title = TITLE,
+                payload = payload
+            )
 
         coEvery { mockInAppDownloader.download(INAPP_URL) } returns HTML
 
@@ -74,9 +62,14 @@ class PushToInAppHandlerTests {
 
     @Test
     fun handle_shouldDownloadHtml_andNotCallHandle_ifDownloadFails() = runTest {
-        val testInAppHtml: String? = null
+        val payload = PushToInAppPayload(CAMPAIGN_ID, INAPP_URL)
         val testInappAction =
-            InternalPushToInappActionModel(CAMPAIGN_ID, INAPP_URL, testInAppHtml, false)
+            PresentablePushToInAppActionModel(
+                id = ID,
+                reporting = REPORTING,
+                title = TITLE,
+                payload = payload
+            )
 
         coEvery { mockInAppDownloader.download(INAPP_URL) } returns null
 

@@ -1,5 +1,6 @@
 package com.emarsys.mobileengage.action.actions
 
+import com.emarsys.SdkConstants.BUTTON_CLICK_ORIGIN
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.mobileengage.action.models.BasicInAppButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
@@ -25,6 +26,7 @@ class ReportingActionTests {
     private companion object {
         const val ID = "testId"
         const val TRACKING_INFO = """{"key:"value"}"""
+        const val REPORTING = """{"reportingKey":"reportingValue"}"""
         const val BUTTON_ORIGIN = "button"
         const val TEST_URL = "testUrl"
     }
@@ -41,10 +43,10 @@ class ReportingActionTests {
         val pushButtonClickedActionModel = BasicPushButtonClickedActionModel(ID, TRACKING_INFO)
         val action = ReportingAction(pushButtonClickedActionModel, mockSdkEventDistributor)
         val expectedEvent = SdkEvent.Internal.Push.Clicked(
+            ID,
+            reporting = REPORTING,
+            trackingInfo = TRACKING_INFO,
             attributes = buildJsonObject {
-                put(
-                    "buttonId", JsonPrimitive((ID))
-                )
                 put(
                     "origin", JsonPrimitive(BUTTON_ORIGIN)
                 )
@@ -53,7 +55,9 @@ class ReportingActionTests {
 
         val eventSlot = slot<SdkEvent>()
 
-        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(MockMode.autofill)
+        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(
+            MockMode.autofill
+        )
 
         action.invoke()
 
@@ -62,22 +66,25 @@ class ReportingActionTests {
 
     @Test
     fun testInvoke_shouldSendEventWithProperPayload_whenActionModel_inAppButtonClicked() = runTest {
-        val inAppButtonClickedActionModel = BasicInAppButtonClickedActionModel(ID, TRACKING_INFO, TEST_URL)
+        val inAppButtonClickedActionModel = BasicInAppButtonClickedActionModel(
+            REPORTING,
+            TRACKING_INFO
+        )
         val action = ReportingAction(inAppButtonClickedActionModel, mockSdkEventDistributor)
         val expectedEvent = SdkEvent.Internal.InApp.ButtonClicked(
+            ID,
+            reporting = REPORTING,
+            trackingInfo = TRACKING_INFO,
             attributes = buildJsonObject {
-                put(
-                    "buttonId", JsonPrimitive((ID))
-                )
-                put(
-                    "url", JsonPrimitive(TEST_URL)
-                )
+                put("origin", JsonPrimitive(BUTTON_CLICK_ORIGIN))
             }
         )
 
         val eventSlot = slot<SdkEvent>()
 
-        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(MockMode.autofill)
+        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(
+            MockMode.autofill
+        )
 
         action.invoke()
 
@@ -85,33 +92,14 @@ class ReportingActionTests {
     }
 
     @Test
-    fun testInvoke_shouldSendEventWithProperPayload_whenActionModel_inAppButtonClicked_noSidAndUrl() =
-        runTest {
-            val inAppButtonClickedActionModel = BasicInAppButtonClickedActionModel(ID, TRACKING_INFO)
-            val action = ReportingAction(inAppButtonClickedActionModel, mockSdkEventDistributor)
-            val expectedEvent = SdkEvent.Internal.InApp.ButtonClicked(
-                attributes = buildJsonObject {
-                    put(
-                        "buttonId", JsonPrimitive((ID))
-                    )
-                }
-            )
-
-            val eventSlot = slot<SdkEvent>()
-
-            everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(MockMode.autofill)
-
-            action.invoke()
-
-            verifyArguments(eventSlot, expectedEvent)
-        }
-
-    @Test
     fun testInvoke_shouldSendEventWithProperPayload_whenActionModel_isNotificationOpenedActionModel() =
         runTest {
-            val notificationOpenedActionModel = NotificationOpenedActionModel(TRACKING_INFO)
+            val notificationOpenedActionModel =
+                NotificationOpenedActionModel(REPORTING, TRACKING_INFO)
             val action = ReportingAction(notificationOpenedActionModel, mockSdkEventDistributor)
             val expectedEvent = SdkEvent.Internal.Push.Clicked(
+                reporting = REPORTING,
+                trackingInfo = TRACKING_INFO,
                 attributes = buildJsonObject {
                     put(
                         "origin", JsonPrimitive("main")
@@ -121,8 +109,8 @@ class ReportingActionTests {
 
             val eventSlot = slot<SdkEvent>()
 
-            everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(
-                MockMode.autofill)
+            everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns
+                    mock(MockMode.autofill)
 
             action.invoke()
 

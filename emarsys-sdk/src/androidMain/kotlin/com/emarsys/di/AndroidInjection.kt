@@ -155,7 +155,6 @@ object AndroidInjection {
                 metadataReader = get(),
                 notificationCompatStyler = get(),
                 platformInfoCollector = get(),
-                inAppDownloader = get(),
                 sdkLogger = get { parametersOf(PushMessagePresenter::class.simpleName) }
             )
         }

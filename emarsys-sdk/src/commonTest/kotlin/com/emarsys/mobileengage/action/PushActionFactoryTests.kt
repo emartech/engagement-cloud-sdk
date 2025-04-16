@@ -7,9 +7,9 @@ import com.emarsys.mobileengage.action.actions.LaunchApplicationAction
 import com.emarsys.mobileengage.action.actions.PushToInappAction
 import com.emarsys.mobileengage.action.models.BasicLaunchApplicationActionModel
 import com.emarsys.mobileengage.action.models.BasicPushToInAppActionModel
-import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
 import com.emarsys.mobileengage.action.models.PresentableCustomEventActionModel
-import com.emarsys.mobileengage.inapp.PushToInApp
+import com.emarsys.mobileengage.action.models.PresentablePushToInAppActionModel
+import com.emarsys.mobileengage.inapp.PushToInAppPayload
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
@@ -26,6 +26,8 @@ class PushActionFactoryTests {
     private companion object {
         const val URL = "url"
         const val CAMPAIGN_ID = "campaignId"
+        const val ID = "testId"
+        const val TITLE = "testTitle"
         const val REPORTING = """{"reportingKey":"reportingValue"}"""
     }
 
@@ -48,7 +50,12 @@ class PushActionFactoryTests {
 
     @Test
     fun create_shouldReturn_pushToInAppAction() = runTest {
-        val testActionModel = InternalPushToInappActionModel(CAMPAIGN_ID, URL)
+        val testActionModel = PresentablePushToInAppActionModel(
+            ID,
+            REPORTING,
+            TITLE,
+            PushToInAppPayload(CAMPAIGN_ID, URL)
+        )
 
         val result = pushActionFactory.create(testActionModel)
 
@@ -61,7 +68,7 @@ class PushActionFactoryTests {
     @Test
     fun create_shouldReturn_pushToInAppAction_fromBasicPushToInAppActionModel() = runTest {
         val testBasicActionModel =
-            BasicPushToInAppActionModel("pushToInApp", PushToInApp(CAMPAIGN_ID, URL))
+            BasicPushToInAppActionModel(ID, REPORTING, PushToInAppPayload(CAMPAIGN_ID, URL))
 
         val result = pushActionFactory.create(testBasicActionModel)
 
@@ -85,7 +92,11 @@ class PushActionFactoryTests {
 
     @Test
     fun create_should_callCreate_on_eventActionFactory() = runTest {
-        val testActionModel = PresentableCustomEventActionModel(reporting = REPORTING, title = "title", name =  "eventName")
+        val testActionModel = PresentableCustomEventActionModel(
+            reporting = REPORTING,
+            title = "title",
+            name = "eventName"
+        )
         val expectedAction = CustomEventAction(testActionModel, mock())
         everySuspend { mockEventActionFactory.create(testActionModel) } returns expectedAction
 

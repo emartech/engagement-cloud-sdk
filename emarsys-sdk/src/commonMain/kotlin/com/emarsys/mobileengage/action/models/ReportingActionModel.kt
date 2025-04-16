@@ -5,32 +5,31 @@ import kotlinx.serialization.Serializable
 
 interface ReportingActionModel
 
-interface PushButtonClickedActionModel: ReportingActionModel {
+interface PushButtonClickedActionModel : ReportingActionModel {
     val trackingInfo: String
 }
 
-interface InAppButtonClickedActionModel: ReportingActionModel {
-    val sid: String?
-    val url: String?
+interface InAppButtonClickedActionModel : ReportingActionModel {
+    val trackingInfo: String
 }
 
 @Serializable
 @SerialName("pushButtonClicked")
 data class BasicPushButtonClickedActionModel(
-    val id: String,
+    override val reporting: String,
     override val trackingInfo: String
-): BasicActionModel(), PushButtonClickedActionModel
+) : BasicActionModel(), PushButtonClickedActionModel
 
 @Serializable
 @SerialName("inAppButtonClicked")
 data class BasicInAppButtonClickedActionModel(
-    val id: String,
-    override val sid: String? = null,
-    override val url: String? = null
-): BasicActionModel(), InAppButtonClickedActionModel
+    override val reporting: String,
+    override val trackingInfo: String = "", //TODO: remove default value after push-to-inapp trackingInfo is mapped from ???
+) : BasicActionModel(), InAppButtonClickedActionModel
 
 @Serializable
 @SerialName("notificationOpened")
 data class NotificationOpenedActionModel(
+    val reporting: String? = null,
     val trackingInfo: String
-): BasicActionModel(), ReportingActionModel
+) : ActionModel, ReportingActionModel

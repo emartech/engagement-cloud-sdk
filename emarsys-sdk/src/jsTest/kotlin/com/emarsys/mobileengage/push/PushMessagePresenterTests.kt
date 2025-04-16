@@ -2,7 +2,6 @@ package com.emarsys.mobileengage.push
 
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.action.models.PresentableOpenExternalUrlActionModel
-import com.emarsys.mobileengage.inapp.PushToInApp
 import com.emarsys.mobileengage.push.model.JsPlatformData
 import com.emarsys.mobileengage.push.model.JsPushMessage
 import com.emarsys.mobileengage.push.model.WebPushNotificationData
@@ -84,24 +83,6 @@ class PushMessagePresenterTests {
     }
 
     @Test
-    fun present_shouldCallShowNotification_withPushToInapp_whenPresent() = runTest {
-        val pushToInApp = PushToInApp(
-            "testCampaignId",
-            "https://www.sap.com",
-            false
-        )
-        val testPushMessage =
-            getTestJsPushMessage(image = IMAGE, icon = ICON, pushToInApp = pushToInApp)
-        val expectedNotificationOptions: NotificationOptions =
-            getTestNotificationOptions(testPushMessage, emptyArray())
-
-        pushMessagePresenter.present(testPushMessage)
-
-        slot.get().title shouldBe testPushMessage.displayableData?.title
-        JSON.stringify(slot.get().options) shouldBe JSON.stringify(expectedNotificationOptions)
-    }
-
-    @Test
     fun present_shouldCallShowNotification_withActionMappedCorrectly() = runTest {
         val testActions = listOf(
             PresentableOpenExternalUrlActionModel(
@@ -119,7 +100,8 @@ class PushMessagePresenterTests {
         )
         val testPushMessage = getTestJsPushMessage(actions = testActions)
         val expectedNotificationOptions: NotificationOptions =
-            getTestNotificationOptions(testPushMessage, arrayOf(
+            getTestNotificationOptions(
+                testPushMessage, arrayOf(
                 js("{}").unsafeCast<NotificationAction>().apply {
                     action = "actionId1"
                     title = "actionTitle1"
@@ -140,7 +122,6 @@ class PushMessagePresenterTests {
         icon: String? = null,
         image: String? = null,
         actions: List<PresentableActionModel> = emptyList(),
-        pushToInApp: PushToInApp? = null
     ): JsPushMessage {
         return JsPushMessage(
             trackingInfo = """{"trackingInfoKey":"trackingInfoValue"}""",
@@ -148,14 +129,14 @@ class PushMessagePresenterTests {
             badgeCount = null,
             actionableData = ActionableData(
                 actions = actions,
-                pushToInApp = pushToInApp,
                 defaultTapAction = null
             ),
             displayableData = DisplayableData(
                 title = "title",
                 body = "body",
                 iconUrlString = icon,
-                imageUrlString = image)
+                imageUrlString = image
+            )
         )
     }
 

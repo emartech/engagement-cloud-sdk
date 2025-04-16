@@ -74,7 +74,7 @@ class PushMessagePresenterTest {
         val testPresentableActions: List<PresentableActionModel> =
             listOf(testCustomEventAction, testAppEventAction, testOpenExternalUrlAction)
 
-        val testDefaultTapAction = BasicAppEventActionModel("testName", null)
+        val testDefaultTapAction = BasicAppEventActionModel(REPORTING, "testName", null)
     }
 
     private lateinit var pushMessagePresenter: PushMessagePresenter
@@ -106,7 +106,6 @@ class PushMessagePresenterTest {
             mockMetadataReader,
             mockNotificationCompatStyler,
             mockPlatformInfoCollector,
-            mockInAppDownloader,
             sdkLogger = mockk(relaxed = true)
         )
 

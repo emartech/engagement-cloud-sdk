@@ -25,6 +25,9 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class EventActionFactoryTests {
+    private companion object {
+        const val REPORTING = """{"reportingKey":"reportingValue"}"""
+    }
 
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
     private lateinit var mockPermissionHandler: PermissionHandlerApi
@@ -53,7 +56,7 @@ class EventActionFactoryTests {
 
     @Test
     fun testCreate_withAppEventActionModel() = runTest {
-        val action = BasicAppEventActionModel("name", null)
+        val action = BasicAppEventActionModel(REPORTING, "name", null)
 
         val result = actionFactory.create(action)
 
@@ -63,7 +66,7 @@ class EventActionFactoryTests {
 
     @Test
     fun testCreate_withCustomEventActionModel() = runTest {
-        val action = BasicCustomEventActionModel("name", null)
+        val action = BasicCustomEventActionModel(REPORTING, "name", null)
 
         val result = actionFactory.create(action)
 
@@ -93,7 +96,7 @@ class EventActionFactoryTests {
 
     @Test
     fun testCreate_withOpenExternalUrlActionModel() = runTest {
-        val action = BasicOpenExternalUrlActionModel("url")
+        val action = BasicOpenExternalUrlActionModel(REPORTING, "url")
 
         val result = actionFactory.create(action)
 

@@ -10,7 +10,9 @@ sealed interface ActionModel
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
 @JsonClassDiscriminator("type")
-sealed class BasicActionModel: ActionModel
+sealed class BasicActionModel: ActionModel {
+    abstract val reporting: String
+}
 
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable

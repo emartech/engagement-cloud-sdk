@@ -16,11 +16,7 @@ import com.emarsys.core.device.PlatformInfoCollectorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.resource.MetadataReader
 import com.emarsys.mobileengage.action.models.DismissActionModel
-import com.emarsys.mobileengage.action.models.InternalPushToInappActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
-import com.emarsys.mobileengage.action.models.PushToInappActionModel
-import com.emarsys.mobileengage.inapp.InAppDownloaderApi
-import com.emarsys.mobileengage.inapp.PushToInApp
 import com.emarsys.mobileengage.push.model.AndroidPlatformData
 import com.emarsys.mobileengage.push.model.AndroidPushMessage
 import kotlinx.serialization.json.Json
@@ -32,7 +28,6 @@ internal class PushMessagePresenter(
     private val metadataReader: MetadataReader,
     private val notificationCompatStyler: NotificationCompatStyler,
     private val platformInfoCollector: PlatformInfoCollectorApi,
-    private val inAppDownloader: InAppDownloaderApi,
     private val sdkLogger: Logger
 ) : PushPresenter<AndroidPlatformData, AndroidPushMessage> {
     private companion object {
@@ -120,7 +115,7 @@ internal class PushMessagePresenter(
         return intent
     }
 
-    private suspend fun createTapActionPendingIntent(
+    private fun createTapActionPendingIntent(
         pushMessage: AndroidPushMessage
     ): PendingIntent {
         val intent = Intent(context, NotificationOpenedActivity::class.java)
@@ -131,19 +126,11 @@ internal class PushMessagePresenter(
             json.encodeToString(pushMessage)
         )
 
-        pushMessage.actionableData?.defaultTapAction?.let { tapAction ->
-            val defaultActionModel = if (tapAction !is PushToInappActionModel) {
-                tapAction
-            } else {
-                pushMessage.actionableData.pushToInApp?.toInternalPushToInappActionModel()
-            }
-
-            defaultActionModel?.let {
-                intent.putExtra(
-                    INTENT_EXTRA_DEFAULT_TAP_ACTION_KEY,
-                    json.encodeToString(it)
-                )
-            }
+        pushMessage.actionableData?.defaultTapAction?.let {
+            intent.putExtra(
+                INTENT_EXTRA_DEFAULT_TAP_ACTION_KEY,
+                json.encodeToString(it)
+            )
         }
 
         return PendingIntent.getActivity(
@@ -151,16 +138,6 @@ internal class PushMessagePresenter(
             (System.currentTimeMillis() % Int.MAX_VALUE).toInt(),
             intent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
-    }
-
-    private suspend fun PushToInApp.toInternalPushToInappActionModel(): InternalPushToInappActionModel {
-        val inappHtml = inAppDownloader.download(this.url)
-        return InternalPushToInappActionModel(
-            campaignId,
-            url,
-            inappHtml,
-            ignoreViewedEvent
         )
     }
 
