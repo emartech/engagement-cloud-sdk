@@ -5,7 +5,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 
-actual class ConsoleLogger {
+actual class ConsoleLogger : ConsoleLoggerApi {
 
     @OptIn(ExperimentalSerializationApi::class)
     val prettyJson = Json {
@@ -13,7 +13,7 @@ actual class ConsoleLogger {
         prettyPrintIndent = " "
     }
 
-    actual fun logToConsole(
+    actual override fun logToConsole(
         loggerName: String,
         level: LogLevel,
         message: String?,

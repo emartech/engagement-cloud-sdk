@@ -30,7 +30,7 @@ class ApplyGlobalRemoteConfigStateTests {
 
         applyGlobalRemoteConfigState = ApplyGlobalRemoteConfigState(
             mockSdkEventDistributor,
-            SdkLogger("TestLoggerName", ConsoleLogger(), sdkContext = mock())
+            SdkLogger("TestLoggerName", mock(MockMode.autofill), sdkContext = mock())
         )
     }
 

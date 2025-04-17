@@ -5,6 +5,7 @@ import com.emarsys.api.event.EventTrackerApi
 import com.emarsys.api.push.PushApi
 import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.SdkLogger
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
@@ -29,7 +30,7 @@ class RegisterInstancesStateTests {
             mockEventTrackerApi,
             mockContactApi,
             mockPushApi,
-            SdkLogger("TestLoggerName", ConsoleLogger(), sdkContext = mock())
+            SdkLogger("TestLoggerName", mock(MockMode.autofill), sdkContext = mock())
         )
     }
 

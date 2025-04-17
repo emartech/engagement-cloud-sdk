@@ -8,6 +8,7 @@ import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.state.StateMachineApi
+import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -47,7 +48,7 @@ class InitOrganizerTests {
             mutableSetOf(),
             logBreadcrumbsQueueSize = 10
         )
-        initOrganizer = InitOrganizer(mockStateMachine, sdkContext, SdkLogger("TestLoggerName", ConsoleLogger(), sdkContext = mock()))
+        initOrganizer = InitOrganizer(mockStateMachine, sdkContext, SdkLogger("TestLoggerName", mock(MockMode.autofill), sdkContext = mock()))
     }
 
     @Test

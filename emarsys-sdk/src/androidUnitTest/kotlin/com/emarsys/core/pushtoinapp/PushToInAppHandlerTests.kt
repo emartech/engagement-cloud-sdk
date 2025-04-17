@@ -7,6 +7,7 @@ import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandlerApi
 import com.emarsys.mobileengage.inapp.PushToInAppPayload
 import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
+import dev.mokkery.MockMode
 import dev.mokkery.mock
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -37,7 +38,7 @@ class PushToInAppHandlerTests {
         pushToInAppHandler = PushToInAppHandler(
             mockInAppDownloader,
             mockInAppHandler,
-            SdkLogger("TestLoggerName", ConsoleLogger(), sdkContext = mock())
+            SdkLogger("TestLoggerName", mock(MockMode.autofill), sdkContext = mock())
         )
     }
 

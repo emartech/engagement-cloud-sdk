@@ -6,6 +6,7 @@ import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.networking.clients.event.model.SdkEvent
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.mock
@@ -47,7 +48,7 @@ class EventTrackerGathererTests {
 
         every { mockTimestampProvider.provide() } returns timestamp
         every { mockUuidProvider.provide() } returns UUID
-        val logger = SdkLogger("TestLoggerName", ConsoleLogger(), remoteLogger = null, sdkContext = mock())
+        val logger = SdkLogger("TestLoggerName", mock(MockMode.autofill), remoteLogger = null, sdkContext = mock())
 
         eventTrackerContext = EventTrackerContext(mutableListOf())
 

@@ -11,6 +11,7 @@ import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.crypto.Crypto
 import com.emarsys.core.crypto.CryptoApi
 import com.emarsys.core.log.ConsoleLogger
+import com.emarsys.core.log.ConsoleLoggerApi
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
 import com.emarsys.core.log.RemoteLogger
@@ -67,7 +68,7 @@ object CoreInjection {
         single<CoroutineScope>(named(CoroutineScopeTypes.Application)) {
             CoroutineScope(SupervisorJob() + Dispatchers.Default)
         }
-        single<ConsoleLogger> {
+        single<ConsoleLoggerApi> {
             ConsoleLogger()
         }
         single<RemoteLoggerApi> {

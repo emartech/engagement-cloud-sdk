@@ -43,7 +43,7 @@ class SdkLoggerTests {
         mockRemoteLogger = mock(MockMode.autofill)
         logger = SdkLogger(
             LOGGER_NAME,
-            ConsoleLogger(),
+            mock(MockMode.autofill),
             remoteLogger = mockRemoteLogger,
             sdkContext = mockSdkContext
         )
@@ -180,7 +180,7 @@ class SdkLoggerTests {
     fun sdkLogger_shouldNotCollectBreadcrumbs_inCaseThereIsNoRemoteLogger() = runTest {
         val logger = SdkLogger(
             LOGGER_NAME,
-            ConsoleLogger(),
+            mock(MockMode.autofill),
             remoteLogger = null,
             sdkContext = mockSdkContext
         )
@@ -197,7 +197,7 @@ class SdkLoggerTests {
     fun sdkLogger_shouldNotLogToRemote_ifIsRemoteLogFlag_isFalse() = runTest {
         val logger = SdkLogger(
             LOGGER_NAME,
-            ConsoleLogger(),
+            mock(MockMode.autofill),
             remoteLogger = mockRemoteLogger,
             sdkContext = mockSdkContext
         )

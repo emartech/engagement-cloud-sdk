@@ -3,6 +3,7 @@ package com.emarsys.init.states
 import com.emarsys.core.Registerable
 import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.SdkLogger
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
@@ -24,7 +25,7 @@ class RegisterWatchdogsStateTests {
         registerWatchDogsState = RegisterWatchdogsState(
             lifecycleWatchDog,
             connectionWatchDog,
-            SdkLogger("TestLoggerName", ConsoleLogger(), sdkContext = mock())
+            SdkLogger("TestLoggerName", mock(MockMode.autofill), sdkContext = mock())
         )
     }
 

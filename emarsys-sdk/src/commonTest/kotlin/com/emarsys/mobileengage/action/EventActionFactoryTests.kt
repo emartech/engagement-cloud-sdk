@@ -17,6 +17,7 @@ import com.emarsys.mobileengage.action.models.BasicCustomEventActionModel
 import com.emarsys.mobileengage.action.models.BasicDismissActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.action.models.RequestPushPermissionActionModel
+import dev.mokkery.MockMode
 import dev.mokkery.mock
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeTypeOf
@@ -50,7 +51,7 @@ class EventActionFactoryTests {
             mockPermissionHandler,
             mockExternalUrlOpener,
             mockClipboardHandler,
-            SdkLogger("TestLoggerName", ConsoleLogger(), sdkContext = mock())
+            SdkLogger("TestLoggerName", mock(MockMode.autofill), sdkContext = mock())
         )
     }
 

@@ -9,6 +9,7 @@ import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.providers.DoubleProvider
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
@@ -43,7 +44,7 @@ class RemoteConfigResponseHandlerTests {
             mockDeviceInfoCollector,
             sdkContext,
             mockRandomProvider,
-            SdkLogger("TestLoggerName", ConsoleLogger(), sdkContext = sdkContext)
+            SdkLogger("TestLoggerName", mock(MockMode.autofill), sdkContext = sdkContext)
         )
     }
 

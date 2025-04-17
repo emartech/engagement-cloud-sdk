@@ -10,7 +10,7 @@ import kotlin.coroutines.coroutineContext
 
 class SdkLogger(
     private val loggerName: String,
-    private val consoleLogger: ConsoleLogger,
+    private val consoleLogger: ConsoleLoggerApi,
     private val remoteLogger: RemoteLoggerApi? = null,
     private val sdkContext: SdkContextApi? = null
 ) : Logger {
@@ -126,7 +126,7 @@ class SdkLogger(
             remoteLogger.logToRemote(level, remoteLog)
         }
 
-        consoleLogger.logToConsole(loggerName,level, message, throwable, extendedData)
+        consoleLogger.logToConsole(loggerName, level, message, throwable, extendedData)
     }
 
     private fun mergeContext(
