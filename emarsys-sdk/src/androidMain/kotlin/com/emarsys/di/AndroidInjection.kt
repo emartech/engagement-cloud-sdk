@@ -73,6 +73,8 @@ import com.emarsys.watchdog.connection.AndroidConnectionWatchDog
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.AndroidLifecycleWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailabilityLight
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import okio.FileSystem
@@ -80,6 +82,7 @@ import org.koin.core.module.Module
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import java.lang.reflect.Method
 import java.util.Locale
 
 object AndroidInjection {
@@ -110,11 +113,17 @@ object AndroidInjection {
         }
         single<StringStorageApi> { StringStorage(sharedPreferences = get()) }
         single<DeviceInfoCollectorApi> {
+            val isGoogleAvailable: Boolean = get(named(AvailableServices.Google))
+            val isHuaweiAvailable: Boolean = get(named(AvailableServices.Huawei))
             DeviceInfoCollector(
                 timezoneProvider = get(),
                 languageProvider = get(),
                 applicationVersionProvider = get(),
-                isGooglePlayServicesAvailable = true,
+                isGooglePlayServicesAvailable = if (isGoogleAvailable == isHuaweiAvailable) {
+                    true
+                } else {
+                    !isHuaweiAvailable
+                },
                 clientIdProvider = ClientIdProvider(uuidProvider = get(), storage = get()),
                 platformInfoCollector = get(),
                 wrapperInfoStorage = get(),
@@ -284,7 +293,35 @@ object AndroidInjection {
                 sdkContext = get()
             )
         }
+        single<Boolean>(named(AvailableServices.Google)) {
+            GoogleApiAvailabilityLight.getInstance()
+                .isGooglePlayServicesAvailable(applicationContext) == ConnectionResult.SUCCESS
+        }
+        single<Boolean>(named(AvailableServices.Huawei)) {
+            try {
+                val huaweiServiceCheckerClass =
+                    Class.forName(
+                        "com.emarsys.HuaweiServiceChecker",
+                        true,
+                        applicationContext.classLoader
+                    )
+                val huaweiServiceChecker =
+                    huaweiServiceCheckerClass.getDeclaredConstructor().newInstance()
+
+                val types = listOf<Class<*>>(Context::class.java).toTypedArray()
+                val method: Method = huaweiServiceCheckerClass.getDeclaredMethod("check", *types)
+                method.isAccessible = true
+
+                method.invoke(huaweiServiceChecker, applicationContext) as Boolean
+            } catch (ignored: Exception) {
+                false
+            }
+        }
     }
+}
+
+enum class AvailableServices {
+    Google, Huawei
 }
 
 actual fun SdkKoinIsolationContext.loadPlatformModules(): List<Module> {

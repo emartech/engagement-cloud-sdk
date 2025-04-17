@@ -76,7 +76,6 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-//                implementation(libs.koin.android.startup)
                 implementation(libs.koin.android)
                 implementation(libs.kotlinx.coroutines.android)
                 implementation(libs.ktor.client.android)
@@ -87,6 +86,7 @@ kotlin {
                 implementation(libs.androidx.lifecycle.process)
                 implementation(libs.androidx.appcompat)
                 implementation(libs.sqlDelight.android)
+                implementation(libs.google.play.services.location)
             }
         }
 

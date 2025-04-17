@@ -35,6 +35,7 @@ fcm = "24.1.1"
 agconnect_core = "1.9.1.304"
 hms_push = "6.13.0.300"
 googleServices = "4.4.2"
+google-play-services-location = "21.3.0"
 kotlinWrappers = "2025.3.16"
 cryptography = "0.4.0"
 sqlDelight = "2.1.0-SNAPSHOT"
@@ -94,6 +95,7 @@ cryptography-core = { module = "dev.whyoleg.cryptography:cryptography-core" }
 cryptography-provider-jdk = { module = "dev.whyoleg.cryptography:cryptography-provider-jdk" }
 cryptography-provider-apple = { module = "dev.whyoleg.cryptography:cryptography-provider-openssl3-prebuilt" }
 cryptography-provider-webcrypto = { module = "dev.whyoleg.cryptography:cryptography-provider-webcrypto" }
+google-play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "google-play-services-location" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
