@@ -106,10 +106,13 @@ class GenericNetworkClient(
             buildJsonObject {
                 put("url", request.url.toString())
                 put("method", request.method.value)
-                put("request", request.toString())
                 put("statusCode", response.status.value)
-                put("payload", request.bodyString)
-                put("header", request.headers.toString())
+                if (request.bodyString != null) {
+                    put("payload", request.bodyString)
+                }
+                if (request.headers != null) {
+                    put("header", request.headers.toString())
+                }
                 put("networkingDuration", networkDuration.inWholeMilliseconds)
             },
             isRemoteLog = !request.isLogRequest

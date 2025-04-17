@@ -126,8 +126,7 @@ class SdkLogger(
             remoteLogger.logToRemote(level, remoteLog)
         }
 
-        val logString = createLogString(level, message, throwable, extendedData)
-        consoleLogger.logToConsole(level, logString)
+        consoleLogger.logToConsole(loggerName,level, message, throwable, extendedData)
     }
 
     private fun mergeContext(
@@ -144,26 +143,6 @@ class SdkLogger(
         }
     }
 
-    private fun createLogString(
-        level: LogLevel,
-        message: String?,
-        throwable: Throwable?,
-        data: JsonObject
-    ): String {
-        var logString = "${level.name.uppercase()} (EmarysSDK) - $loggerName: {"
-        message?.let {
-            logString = "$logString message: $message,"
-        }
-        throwable?.let {
-            logString = "$logString reason: ${it.cause}, stackTrace: ${it.stackTraceToString()},"
-        }
-        data.let {
-            if (it.isNotEmpty()) {
-                logString = "$logString data: $it"
-            }
-        }
-        return "$logString }"
-    }
 
     private fun createLogObject(
         level: LogLevel,
