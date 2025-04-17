@@ -2,7 +2,7 @@ package com.emarsys.di
 
 import app.cash.sqldelight.driver.native.NativeSqliteDriver
 import com.emarsys.EmarsysConfig
-import com.emarsys.api.push.PushInstance
+import com.emarsys.api.push.PushApi
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
@@ -47,6 +47,10 @@ import com.emarsys.mobileengage.inapp.providers.SceneProvider
 import com.emarsys.mobileengage.inapp.providers.ViewControllerProvider
 import com.emarsys.mobileengage.inapp.providers.WebViewProvider
 import com.emarsys.mobileengage.inapp.providers.WindowProvider
+import com.emarsys.mobileengage.push.IosGathererPush
+import com.emarsys.mobileengage.push.IosLoggingPush
+import com.emarsys.mobileengage.push.IosPush
+import com.emarsys.mobileengage.push.IosPushInstance
 import com.emarsys.mobileengage.push.IosPushInternal
 import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
 import com.emarsys.setup.PlatformInitializer
@@ -160,7 +164,7 @@ object IosInjection {
         single<LaunchApplicationHandlerApi> { IosLaunchApplicationHandler() }
         single<LanguageTagValidatorApi> { IosLanguageTagValidator() }
         single<SdkConfigStoreApi<EmarsysConfig>> { IosSdkConfigStore(typedStorage = get()) }
-        single<PushInstance>(named(InstanceType.Internal)) {
+        single<IosPushInstance>(named(InstanceType.Internal)) {
             val badgeCountHandler = IosBadgeCountHandler(
                 notificationCenter = get(),
                 uiDevice = get(),
@@ -181,6 +185,29 @@ object IosInjection {
                 sdkEventDistributor = get(),
                 timestampProvider = get(),
                 uuidProvider = get()
+            )
+        }
+        single<IosPushInstance>(named(InstanceType.Gatherer)) {
+            IosGathererPush(
+                storage = get(),
+                iosPushInternal = get(named(InstanceType.Internal)),
+                context = get()
+            )
+        }
+        single<IosPushInstance>(named(InstanceType.Logging)) {
+            IosLoggingPush(
+                storage = get(),
+                sdkDispatcher = get(named(DispatcherTypes.Sdk)),
+                logger = get { parametersOf(IosLoggingPush::class.simpleName) }
+            )
+        }
+        single<PushApi> {
+            IosPush(
+                loggingApi = get(named(InstanceType.Logging)),
+                gathererApi = get(named(InstanceType.Gatherer)),
+                internalApi = get(named(InstanceType.Internal)),
+                sdkContext = get(),
+                sdkLogger = get { parametersOf(IosPush::class.simpleName) }
             )
         }
     }

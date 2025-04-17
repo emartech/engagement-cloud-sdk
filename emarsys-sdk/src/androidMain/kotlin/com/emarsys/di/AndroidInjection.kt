@@ -10,6 +10,10 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import com.emarsys.AndroidEmarsysConfig
+import com.emarsys.api.push.LoggingPush
+import com.emarsys.api.push.Push
+import com.emarsys.api.push.PushApi
+import com.emarsys.api.push.PushGatherer
 import com.emarsys.api.push.PushInstance
 import com.emarsys.api.push.PushInternal
 import com.emarsys.applicationContext
@@ -252,12 +256,32 @@ object AndroidInjection {
         single<SdkConfigStoreApi<AndroidEmarsysConfig>>(named(SdkConfigStoreTypes.Android)) {
             AndroidSdkConfigStore(typedStorage = get())
         }
+        single<PushInstance>(named(InstanceType.Logging)) {
+            LoggingPush(
+                storage = get(),
+                logger = get { parametersOf(LoggingPush::class.simpleName) }
+            )
+        }
+        single<PushInstance>(named(InstanceType.Gatherer)) {
+            PushGatherer(
+                context = get(),
+                storage = get()
+            )
+        }
         single<PushInstance>(named(InstanceType.Internal)) {
             PushInternal(
                 storage = get(),
                 pushContext = get(),
                 sdkEventDistributor = get(),
                 sdkLogger = get { parametersOf(PushInternal::class.simpleName) }
+            )
+        }
+        single<PushApi> {
+            Push(
+                loggingApi = get(named(InstanceType.Logging)),
+                gathererApi = get(named(InstanceType.Gatherer)),
+                internalApi = get(named(InstanceType.Internal)),
+                sdkContext = get()
             )
         }
     }

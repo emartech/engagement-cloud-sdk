@@ -1,13 +1,8 @@
 package com.emarsys.di
 
-import com.emarsys.api.push.LoggingPush
-import com.emarsys.api.push.Push
-import com.emarsys.api.push.PushApi
 import com.emarsys.api.push.PushCall
 import com.emarsys.api.push.PushContext
 import com.emarsys.api.push.PushContextApi
-import com.emarsys.api.push.PushGatherer
-import com.emarsys.api.push.PushInstance
 import com.emarsys.core.actions.ActionHandler
 import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.core.collections.PersistentList
@@ -47,29 +42,9 @@ object PushInjection {
                 elements = listOf()
             )
         }
-        single<PushInstance>(named(InstanceType.Logging)) {
-            LoggingPush(
-                storage = get(),
-                logger = get { parametersOf(LoggingPush::class.simpleName) }
-            )
-        }
-        single<PushInstance>(named(InstanceType.Gatherer)) {
-            PushGatherer(
-                context = get(),
-                storage = get()
-            )
-        }
         single<PushContextApi> {
             PushContext(
                 calls = get(named(PersistentListTypes.PushCall))
-            )
-        }
-        single<PushApi> {
-            Push(
-                loggingApi = get(named(InstanceType.Logging)),
-                gathererApi = get(named(InstanceType.Gatherer)),
-                internalApi = get(named(InstanceType.Internal)),
-                sdkContext = get()
             )
         }
     }
