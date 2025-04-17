@@ -5,10 +5,14 @@ import com.emarsys.core.log.Logger
 import com.emarsys.core.state.State
 import com.emarsys.setup.SetupOrganizerApi
 import com.emarsys.setup.config.SdkConfigStoreApi
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.launch
 
 class SdkConfigLoaderState(
     private val sdkConfigStore: SdkConfigStoreApi<SdkConfig>,
     private val setupOrganizer: SetupOrganizerApi,
+    private val applicationScope: CoroutineScope,
     private val sdkLogger: Logger
 ) : State {
     override val name = "sdkConfigLoader"
@@ -21,7 +25,9 @@ class SdkConfigLoaderState(
             "Load SdkConfig from storage and try to setup the SDK"
         )
         sdkConfigStore.load()?.let {
-            setupOrganizer.setup(it)
+            applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
+                setupOrganizer.setup(it)
+            }
         }
     }
 

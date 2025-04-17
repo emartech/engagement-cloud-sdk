@@ -59,6 +59,7 @@ object InitInjection {
             SdkConfigLoaderState(
                 sdkConfigStore = get(),
                 setupOrganizer = get(),
+                applicationScope = get(named(CoroutineScopeTypes.Application)),
                 sdkLogger = get { parametersOf(SdkConfigLoaderState::class.simpleName) }
             )
         }

@@ -11,10 +11,17 @@ import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class SdkConfigLoaderStateTests {
 
     private lateinit var mockSdkConfigLoader: SdkConfigStoreApi<SdkConfig>
@@ -22,19 +29,28 @@ class SdkConfigLoaderStateTests {
 
     private lateinit var sdkConfigLoaderState: SdkConfigLoaderState
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @BeforeTest
     fun setup() {
+        Dispatchers.setMain(StandardTestDispatcher())
         mockSdkConfigLoader = mock()
         mockSetupOrganizer = mock(MockMode.autofill)
-        sdkConfigLoaderState =
-            SdkConfigLoaderState(mockSdkConfigLoader, mockSetupOrganizer, sdkLogger = mock(MockMode.autofill))
+
     }
 
     @Test
     fun testActive_should_loadSdkConfig_andDoNothing_whenNoConfigIsSaved() = runTest {
+        sdkConfigLoaderState =
+            SdkConfigLoaderState(
+                mockSdkConfigLoader,
+                mockSetupOrganizer,
+                applicationScope = backgroundScope,
+                sdkLogger = mock(MockMode.autofill)
+            )
         everySuspend { mockSdkConfigLoader.load() } returns null
 
         sdkConfigLoaderState.active()
+        advanceUntilIdle()
 
         verifySuspend { mockSdkConfigLoader.load() }
         verifySuspend(VerifyMode.exactly(0)) {
@@ -44,10 +60,17 @@ class SdkConfigLoaderStateTests {
 
     @Test
     fun testActive_should_loadSdkConfig_andSetup_whenConfigIsSaved() = runTest {
+        sdkConfigLoaderState =
+            SdkConfigLoaderState(
+                mockSdkConfigLoader, mockSetupOrganizer, applicationScope = TestScope(
+                    StandardTestDispatcher()
+                ), sdkLogger = mock(MockMode.autofill)
+            )
         val testConfig = EmarsysConfig()
         everySuspend { mockSdkConfigLoader.load() } returns testConfig
 
         sdkConfigLoaderState.active()
+        advanceUntilIdle()
 
         verifySuspend { mockSdkConfigLoader.load() }
         verifySuspend {
