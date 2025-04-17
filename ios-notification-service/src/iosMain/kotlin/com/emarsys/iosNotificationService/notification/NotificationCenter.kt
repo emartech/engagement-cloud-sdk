@@ -16,7 +16,7 @@ class NotificationCenter : NotificationCenterApi {
 
         val categories = notificationCenter.notificationCategories()
         categories.add(category)
-        notificationCenter.setNotificationCategories(categories.toSet())
+        notificationCenter.setNotificationCategories(categories)
     }
 
 }
@@ -25,7 +25,7 @@ suspend fun UNUserNotificationCenter.notificationCategories(): MutableSet<UNNoti
     suspendCancellableCoroutine { continuation ->
         getNotificationCategoriesWithCompletionHandler { categories ->
             val result =
-                if (!categories.isNullOrEmpty()) emptySet<UNNotificationCategory>() else categories
+                if (categories.isNullOrEmpty()) emptySet<UNNotificationCategory>() else categories
             continuation.resume((result as Set<UNNotificationCategory>).toMutableSet())
         }
     }
