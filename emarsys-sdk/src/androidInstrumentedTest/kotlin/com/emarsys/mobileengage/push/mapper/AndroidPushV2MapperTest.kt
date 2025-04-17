@@ -74,7 +74,7 @@ class AndroidPushV2MapperTest {
     fun map_shouldReturnAndroidPushMessage_whenInputIsValid_withPushToInApp_defaultAction() =
         runTest {
             val input = createTestJson(buildJsonObject {
-                put("type", "MEInApp")
+                put("type", "InApp")
                 put("id", "testId")
                 put("reporting", "{\"reportingKey\":\"reportingValue\"}")
                 put("payload", buildJsonObject {

@@ -6,7 +6,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-@SerialName("MEInApp")
+@SerialName("InApp")
 data class BasicPushToInAppActionModel(
     val id: String = UUIDProvider().provide(),
     override val reporting: String,
@@ -14,7 +14,7 @@ data class BasicPushToInAppActionModel(
 ) : BasicActionModel()
 
 @Serializable
-@SerialName("MEInApp")
+@SerialName("InApp")
 data class PresentablePushToInAppActionModel(
     override val id: String = UUIDProvider().provide(),
     override val reporting: String,
