@@ -253,7 +253,7 @@ internal class IosPushInternalTests {
 
         val userInfo = createUserInfoMap(
             defaultAction = mapOf(
-                "type" to "MEInApp",
+                "type" to "InApp",
                 "id" to UUID,
                 "reporting" to REPORTING,
                 "payload" to mapOf(

@@ -17,6 +17,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
@@ -50,10 +51,15 @@ class EmarsysNotificationService(
 ) {
 
     private val mutex = Mutex()
+
+    @OptIn(ExperimentalSerializationApi::class)
     private val json = Json {
         encodeDefaults = true
         isLenient = true
         ignoreUnknownKeys = true
+        allowTrailingComma = true
+        explicitNulls = false
+        decodeEnumsCaseInsensitive = true
     }
 
     private lateinit var contentHandler: (UNNotificationContent) -> Unit
@@ -80,12 +86,11 @@ class EmarsysNotificationService(
                 val userInfo = bestAttemptContent.userInfo as Map<String, Any>
                 emsJson = extractJsonObject(userInfo, "ems")
                 notificationJson = extractJsonObject(userInfo, "notification")
-                payloadVersion = if (emsJson != null && emsJson!!.keys.contains("version")) { PayloadVersion.V2 } else { PayloadVersion.V1 }
+                payloadVersion = PayloadVersion.V2
                 val actions = async { createActions() }
-                val attachments = async { createAttachments(userInfo) }
+                val attachments = async { createAttachments() }
 
                 awaitAll(actions, attachments)
-
                 contentHandler(bestAttemptContent)
             }
         }
@@ -119,8 +124,8 @@ class EmarsysNotificationService(
     }
 
     @OptIn(ExperimentalForeignApi::class)
-    private suspend fun createAttachments(userInfo: Map<String, Any>) {
-        imageUrl(userInfo)?.let { imageUrl ->
+    private suspend fun createAttachments() {
+        imageUrl()?.let { imageUrl ->
             val mediaUrl = downloader.downloadFile(imageUrl)
 
             mediaUrl?.let {
@@ -138,41 +143,28 @@ class EmarsysNotificationService(
     }
 
     private fun actionModels(): List<ActionModel>? {
-        return if (payloadVersion == PayloadVersion.V1) {
-            emsJson?.get("actions")?.jsonArray?.let {
-                json.decodeFromJsonElement(it)
-            }
-        } else {
-            notificationJson?.get("actions")?.jsonArray?.let {
-                json.decodeFromJsonElement(it)
-            }
+        return notificationJson?.get("actions")?.jsonArray?.let {
+            json.decodeFromJsonElement(it)
         }
     }
 
-    private fun imageUrl(userInfo: Map<String, Any>): NSURL? {
-        return if (payloadVersion == PayloadVersion.V1) {
-            (userInfo["image_url"] as String?)?.let {
-                if (it.isNotBlank()) {
-                    NSURL(string = it)
-                } else null
-            }
-        } else {
-            notificationJson?.get("imageUrl")?.jsonPrimitive?.contentOrNull?.let {
-                if (it.isNotBlank()) {
-                    NSURL(string = it)
-                } else null
-            }
+    private fun imageUrl(): NSURL? {
+        return notificationJson?.get("imageUrl")?.jsonPrimitive?.contentOrNull?.let {
+            if (it.isNotBlank()) {
+                NSURL(string = it)
+            } else null
         }
     }
 
     @OptIn(ExperimentalForeignApi::class)
     private fun extractJsonObject(userInfo: Map<String, Any>, key: String): JsonObject? {
         return userInfo[key]?.let { extractedMap ->
-            NSJSONSerialization.dataWithJSONObject(extractedMap, NSJSONWritingPrettyPrinted, null)?.let { data ->
-                NSString.create(data, NSUTF8StringEncoding)?.let { jsonString ->
-                    json.decodeFromString(jsonString.toString())
+            NSJSONSerialization.dataWithJSONObject(extractedMap, NSJSONWritingPrettyPrinted, null)
+                ?.let { data ->
+                    NSString.create(data, NSUTF8StringEncoding)?.let { jsonString ->
+                        json.decodeFromString(jsonString.toString())
+                    }
                 }
-            }
         }
     }
 }

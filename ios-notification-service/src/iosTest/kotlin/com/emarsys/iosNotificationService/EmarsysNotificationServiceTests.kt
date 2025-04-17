@@ -33,7 +33,7 @@ class NotificationServiceTests {
         val content = UNMutableNotificationContent()
         content.setUserInfo(
             mapOf(
-                "ems" to mapOf(
+                "notification" to mapOf(
                     "actions" to listOf(
                         mapOf(
                             "id" to "testId",
@@ -60,7 +60,9 @@ class NotificationServiceTests {
         val content = UNMutableNotificationContent()
         content.setUserInfo(
             mapOf(
-                "image_url" to "https://mobile-sdk-config-staging.gservice.emarsys.com/testing/Emarsys.png"
+                "notification" to mapOf(
+                    "imageUrl" to "https://mobile-sdk-config-staging.gservice.emarsys.com/testing/Emarsys.png"
+                )
             )
         )
         content.attachments shouldBe expectedAttachments
@@ -76,7 +78,7 @@ class NotificationServiceTests {
     @Test
     fun didReceiveNotificationRequest_shouldNotCrash_whenImageUrlIsNull() = runTest {
         val content = UNMutableNotificationContent()
-        content.setUserInfo(mapOf("image_url" to null))
+        content.setUserInfo(mapOf("imageUrl" to null))
 
         val request = UNNotificationRequest.requestWithIdentifier("testId", content, null)
 
@@ -88,7 +90,7 @@ class NotificationServiceTests {
     @Test
     fun didReceiveNotificationRequest_shouldNotCrash_whenImageUrlIsEmptyString() = runTest {
         val content = UNMutableNotificationContent()
-        content.setUserInfo(mapOf("image_url" to ""))
+        content.setUserInfo(mapOf("imageUrl" to ""))
 
         val request = UNNotificationRequest.requestWithIdentifier("testId", content, null)
 
