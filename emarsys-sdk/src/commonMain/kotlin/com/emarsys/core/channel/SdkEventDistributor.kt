@@ -43,15 +43,16 @@ class SdkEventDistributor(
 
     private val setupFlowOnlineEvents =
         _onlineSdkEvents
-            .filter { it is SdkEvent.Internal.SetupFlow }
+            .filterIsInstance<SdkEvent.Internal.SetupFlowEvent>()
             .onEach { sdkContext.currentSdkState.first { it == SdkState.active || it == SdkState.onHold } }
 
     private val nonSetupFlowOnlineEvents =
         _onlineSdkEvents
-            .filter { it !is SdkEvent.Internal.SetupFlow }
+            .filter { it !is SdkEvent.Internal.SetupFlowEvent }
             .onEach { sdkContext.currentSdkState.first { it == SdkState.active } }
 
-    override val onlineSdkEvents: Flow<OnlineSdkEvent> = merge(setupFlowOnlineEvents, nonSetupFlowOnlineEvents)
+    override val onlineSdkEvents: Flow<OnlineSdkEvent> =
+        merge(setupFlowOnlineEvents, nonSetupFlowOnlineEvents)
 
     override val logEvents = _sdkEventFlow
         .filterIsInstance<SdkEvent.Internal.LogEvent>()

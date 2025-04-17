@@ -15,6 +15,7 @@ import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -70,15 +71,15 @@ class SdkEventDistributorTests {
     }
 
     @Test
-    fun distributor_shouldSendEvents_toOnlineFlow_whenConnection_isOnline_andSdkState_isActive() =
+    fun distributor_shouldSendAllEvents_toOnlineFlow_whenConnection_isOnline_andSdkState_isActive() =
         runTest {
             everySuspend { mockEventsDao.getEvents() } returns flowOf()
             val testEvent = SdkEvent.External.Custom(id = "testId", name = "testEventName")
-            val testEvent2 = SdkEvent.External.Custom(id = "testId2", name = "testEventName2")
+            val testEvent2 = SdkEvent.Internal.Sdk.AppStart(id = "testId2")
             val testEvents = listOf(testEvent, testEvent2)
             val testConnectionState = MutableStateFlow(true)
-            sdkContext.setSdkState(SdkState.active)
             val sdkEventDistributor = createEventDistributor(testConnectionState, sdkContext)
+            sdkContext.setSdkState(SdkState.active)
 
             val emittedEvents = backgroundScope.async {
                 sdkEventDistributor.onlineSdkEvents.take(2).toList()
@@ -88,7 +89,27 @@ class SdkEventDistributorTests {
                 sdkEventDistributor.registerEvent(it)
             }
 
-            emittedEvents.await() shouldBe testEvents
+            emittedEvents.await() shouldContainExactlyInAnyOrder testEvents
+        }
+
+    @Test
+    fun distributor_shouldSendEvent_toOnlineFlow_whenConnection_isOnline_andSdkState_isOnHold_andEventIsSetupFlowEvent() =
+        runTest {
+            everySuspend { mockEventsDao.getEvents() } returns flowOf()
+            val testEvent = SdkEvent.External.Custom(id = "testId", name = "testEventName")
+            val testSetupFlowEvent = SdkEvent.Internal.Sdk.AppStart(id = "testId2")
+            val testConnectionState = MutableStateFlow(true)
+            val sdkEventDistributor = createEventDistributor(testConnectionState, sdkContext)
+            sdkContext.setSdkState(SdkState.onHold)
+
+            val emittedEvents = backgroundScope.async {
+                sdkEventDistributor.onlineSdkEvents.take(1).toList()
+            }
+
+            sdkEventDistributor.registerEvent(testEvent)
+            sdkEventDistributor.registerEvent(testSetupFlowEvent)
+
+            emittedEvents.await() shouldBe listOf(testSetupFlowEvent)
         }
 
     @Test
@@ -242,11 +263,10 @@ class SdkEventDistributorTests {
             emittedOnlineEventsWhenOnline.await() shouldBe listOf(testEvent)
         }
 
-    private suspend fun createEventDistributor(
+    private fun createEventDistributor(
         connectionState: MutableStateFlow<Boolean>,
         sdkContext: SdkContextApi,
     ): SdkEventDistributor {
-        sdkContext.setSdkState(SdkState.active)
         return SdkEventDistributor(
             connectionState,
             sdkContext,

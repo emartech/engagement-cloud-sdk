@@ -20,6 +20,7 @@ import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -30,11 +31,7 @@ import kotlin.test.Test
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class SetupOrganizerTests {
 
-    private val mainDispatcher = StandardTestDispatcher()
-
-    init {
-        Dispatchers.setMain(mainDispatcher)
-    }
+    private lateinit var mainDispatcher: CoroutineDispatcher
 
     private lateinit var mockMeStateMachine: StateMachineApi
     private lateinit var mockPredictStateMachine: StateMachineApi
@@ -44,6 +41,8 @@ class SetupOrganizerTests {
 
     @BeforeTest
     fun setUp() {
+        mainDispatcher = StandardTestDispatcher()
+        Dispatchers.setMain(mainDispatcher)
         mockMeStateMachine = mock(MockMode.autofill)
         mockPredictStateMachine = mock(MockMode.autofill)
         mockSdkConfigLoader = mock(MockMode.autoUnit)
