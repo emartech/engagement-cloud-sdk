@@ -7,6 +7,7 @@ import com.emarsys.core.state.StateMachineApi
 import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.reregistration.ReregistrationClient
 import com.emarsys.reregistration.states.ClearSessionContextState
+import com.emarsys.reregistration.states.LinkContactState
 import com.emarsys.setup.SetupOrganizer
 import com.emarsys.setup.SetupOrganizerApi
 import com.emarsys.setup.states.AppStartState
@@ -57,7 +58,16 @@ object SetupInjection {
         }
         single<State>(named(StateTypes.ClearSessionContext)) {
             ClearSessionContextState(
-                sessionContext = get()
+                sessionContext = get(),
+                sdkLogger = get { parametersOf(ClearSessionContextState::class.simpleName) }
+            )
+        }
+        single<State>(named(StateTypes.LinkContact)) {
+            LinkContactState(
+                sessionContext = get(),
+                sdkContext = get(),
+                sdkEventDistributor = get(),
+                sdkLogger = get { parametersOf(LinkContactState::class.simpleName) }
             )
         }
         single<StateMachineApi>(named(StateMachineTypes.ME)) {
@@ -77,11 +87,10 @@ object SetupInjection {
             StateMachine(
                 states = listOf(
                     get<State>(named(StateTypes.ClearSessionContext)),
-                    // clear events ?
                     get<State>(named(StateTypes.RegisterClient)),
                     get<State>(named(StateTypes.ApplyAppCodeBasedRemoteConfig)),
                     get<State>(named(StateTypes.RegisterPushToken)),
-                    // link contact
+                    get<State>(named(StateTypes.LinkContact))
                 )
             )
         }
@@ -89,8 +98,7 @@ object SetupInjection {
             StateMachine(
                 states = listOf(
                     get<State>(named(StateTypes.ClearSessionContext)),
-                    // clear events ?
-                    // link contact
+                    get<State>(named(StateTypes.LinkContact))
                 )
             )
         }
@@ -129,5 +137,13 @@ enum class StateMachineTypes {
 }
 
 enum class StateTypes {
-    CollectDeviceInfo, ApplyAppCodeBasedRemoteConfig, PlatformInit, RegisterClient, RegisterPushToken, AppStart, RestoreSavedSdkEvents, ClearSessionContext
+    CollectDeviceInfo,
+    ApplyAppCodeBasedRemoteConfig,
+    PlatformInit,
+    RegisterClient,
+    RegisterPushToken,
+    AppStart,
+    RestoreSavedSdkEvents,
+    ClearSessionContext,
+    LinkContact
 }
