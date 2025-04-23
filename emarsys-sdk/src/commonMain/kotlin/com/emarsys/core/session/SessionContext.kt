@@ -12,8 +12,13 @@ data class SessionContext(
     var deviceEventState: JsonObject? = null,
     var sessionId: SessionId? = null,
     var sessionStart: Long? = null
-) {
+): SessionContextApi {
 
     fun hasContactIdentification() =
         contactToken != null || contactFieldValue != null || openIdToken != null
+
+    override fun clearSessionTokens() {
+        contactToken = null
+        refreshToken = null
+    }
 }

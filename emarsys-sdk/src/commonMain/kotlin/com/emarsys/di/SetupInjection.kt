@@ -4,6 +4,8 @@ import com.emarsys.core.channel.SdkEventEmitterApi
 import com.emarsys.core.state.State
 import com.emarsys.core.state.StateMachine
 import com.emarsys.core.state.StateMachineApi
+import com.emarsys.networking.clients.EventBasedClientApi
+import com.emarsys.networking.clients.reregistration.ReregistrationClient
 import com.emarsys.reregistration.states.ClearSessionContextState
 import com.emarsys.setup.SetupOrganizer
 import com.emarsys.setup.SetupOrganizerApi
@@ -71,6 +73,27 @@ object SetupInjection {
                 )
             )
         }
+        single<StateMachineApi>(named(StateMachineTypes.MobileEngageReregistration)) {
+            StateMachine(
+                states = listOf(
+                    get<State>(named(StateTypes.ClearSessionContext)),
+                    // clear events ?
+                    get<State>(named(StateTypes.RegisterClient)),
+                    get<State>(named(StateTypes.ApplyAppCodeBasedRemoteConfig)),
+                    get<State>(named(StateTypes.RegisterPushToken)),
+                    // link contact
+                )
+            )
+        }
+        single<StateMachineApi>(named(StateMachineTypes.PredictOnlyReregistration)) {
+            StateMachine(
+                states = listOf(
+                    get<State>(named(StateTypes.ClearSessionContext)),
+                    // clear events ?
+                    // link contact
+                )
+            )
+        }
         single<StateMachineApi>(named(StateMachineTypes.Predict)) {
             StateMachine(
                 states = listOf(
@@ -89,13 +112,22 @@ object SetupInjection {
                 sdkConfigStore = get()
             )
         }
+        single<EventBasedClientApi>(named(EventBasedClientTypes.Reregistration)) {
+            ReregistrationClient(
+                sdkEventManager = get(),
+                sdkContext = get(),
+                mobileEngageReregistrationStateMachine = get(named(StateMachineTypes.MobileEngageReregistration)),
+                predictOnlyReregistrationStateMachine = get(named(StateMachineTypes.PredictOnlyReregistration)),
+                applicationScope = get(named(CoroutineScopeTypes.Application)),
+                sdkLogger = get { parametersOf(ReregistrationClient::class.simpleName) })
+        }
     }
 }
 
 enum class StateMachineTypes {
-    ME, Predict, Init
+    ME, Predict, Init, MobileEngageReregistration, PredictOnlyReregistration
 }
 
 enum class StateTypes {
-    CollectDeviceInfo, ApplyAppCodeBasedRemoteConfig, PlatformInit, RegisterClient, RegisterPushToken, AppStart, RestoreSavedSdkEvents
+    CollectDeviceInfo, ApplyAppCodeBasedRemoteConfig, PlatformInit, RegisterClient, RegisterPushToken, AppStart, RestoreSavedSdkEvents, ClearSessionContext
 }
