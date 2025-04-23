@@ -4,6 +4,7 @@ import com.emarsys.core.channel.SdkEventEmitterApi
 import com.emarsys.core.state.State
 import com.emarsys.core.state.StateMachine
 import com.emarsys.core.state.StateMachineApi
+import com.emarsys.reregistration.states.ClearSessionContextState
 import com.emarsys.setup.SetupOrganizer
 import com.emarsys.setup.SetupOrganizerApi
 import com.emarsys.setup.states.AppStartState
@@ -36,7 +37,7 @@ object SetupInjection {
             )
         }
         single<State>(named(StateTypes.ApplyAppCodeBasedRemoteConfig)) {
-            ApplyAppCodeBasedRemoteConfigState( sdkEventDistributor = get())
+            ApplyAppCodeBasedRemoteConfigState(sdkEventDistributor = get())
         }
         single<State>(named(StateTypes.RestoreSavedSdkEvents)) {
             RestoreSavedSdkEventsState(
@@ -50,6 +51,11 @@ object SetupInjection {
                 sdkEventDistributor = get(),
                 timestampProvider = get(),
                 uuidProvider = get()
+            )
+        }
+        single<State>(named(StateTypes.ClearSessionContext)) {
+            ClearSessionContextState(
+                sessionContext = get()
             )
         }
         single<StateMachineApi>(named(StateMachineTypes.ME)) {
