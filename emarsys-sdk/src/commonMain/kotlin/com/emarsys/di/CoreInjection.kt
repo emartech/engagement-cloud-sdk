@@ -28,6 +28,7 @@ import com.emarsys.core.providers.TimezoneProviderApi
 import com.emarsys.core.providers.UUIDProvider
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.session.SessionContext
+import com.emarsys.core.session.SessionContextApi
 import com.emarsys.core.storage.Storage
 import com.emarsys.core.storage.StorageApi
 import com.emarsys.core.storage.TypedStorage
@@ -154,7 +155,9 @@ object CoreInjection {
                 sdkLogger = get<Logger> { parametersOf(EventActionFactory::class.simpleName) },
             )
         }
-        single<SessionContext> { SessionContext() }
+        single<SessionContextApi> { SessionContext() } binds arrayOf(
+            SessionContext::class
+        )
         singleOf(::UrlFactory) { bind<UrlFactoryApi>() }
         single<CryptoApi> {
             Crypto(

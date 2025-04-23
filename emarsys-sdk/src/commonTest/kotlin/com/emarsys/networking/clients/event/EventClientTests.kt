@@ -156,7 +156,7 @@ class EventClientTests {
     }
 
     @Test
-    fun testInit_should_start_consume_on_channel() = runTest {
+    fun testRegister_should_start_consume_on_channel() = runTest {
         eventClient = createEventClient(backgroundScope)
         eventClient.register()
 
