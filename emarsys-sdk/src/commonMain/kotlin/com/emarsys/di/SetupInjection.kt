@@ -139,8 +139,8 @@ object SetupInjection {
         }
         single<DisableOrganizerApi> {
             DisableOrganizer(
-                meStateMachine = get(named(StateMachineTypes.MobileEngageEnable)),
-                predictStateMachine = get(named(StateMachineTypes.PredictEnable)),
+                mobileEngageDisableStateMachine = get(named(StateMachineTypes.MobileEngageEnable)),
+                predictDisableStateMachine = get(named(StateMachineTypes.PredictEnable)),
                 sdkContext = get(),
                 sdkLogger = get { parametersOf(EnableOrganizer::class.simpleName) },
             )

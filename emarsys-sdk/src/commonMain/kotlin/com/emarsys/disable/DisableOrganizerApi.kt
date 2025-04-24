@@ -4,8 +4,8 @@ import com.emarsys.context.SdkContextApi
 import com.emarsys.core.state.StateMachineApi
 
 interface DisableOrganizerApi {
-    val meStateMachine: StateMachineApi
-    val predictStateMachine: StateMachineApi
+    val mobileEngageDisableStateMachine: StateMachineApi
+    val predictDisableStateMachine: StateMachineApi
     val sdkContext: SdkContextApi
 
     suspend fun disable()

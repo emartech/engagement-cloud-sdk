@@ -6,8 +6,8 @@ import com.emarsys.core.log.Logger
 import com.emarsys.core.state.StateMachineApi
 
 class DisableOrganizer(
-    override val meStateMachine: StateMachineApi,
-    override val predictStateMachine: StateMachineApi,
+    override val mobileEngageDisableStateMachine: StateMachineApi,
+    override val predictDisableStateMachine: StateMachineApi,
     override val sdkContext: SdkContextApi,
     private val sdkLogger: Logger
 ) : DisableOrganizerApi {
@@ -15,6 +15,11 @@ class DisableOrganizer(
     override suspend fun disable() {
         sdkContext.setSdkState(SdkState.inactive)
         sdkLogger.debug("SDK disabled")
-        TODO("Not yet implemented")
+
+        if (sdkContext.isConfigPredictOnly()) {
+            predictDisableStateMachine.activate()
+        } else {
+            mobileEngageDisableStateMachine.activate()
+        }
     }
 }
