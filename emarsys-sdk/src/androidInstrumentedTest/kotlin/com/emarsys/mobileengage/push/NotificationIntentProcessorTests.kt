@@ -68,15 +68,21 @@ class NotificationIntentProcessorTests {
 
     @Before
     fun setUp() {
+        Dispatchers.setMain(StandardTestDispatcher())
         testDispatcher = StandardTestDispatcher()
-        Dispatchers.setMain(testDispatcher)
         testScope = CoroutineScope(testDispatcher)
         mockActionFactory = mockk(relaxed = true)
         mockActionHandler = mockk(relaxed = true)
         mockSdkEventDistributor = mockk(relaxed = true)
         mockLogger = mockk(relaxed = true)
         notificationIntentProcessor =
-            NotificationIntentProcessor(json, mockActionFactory, mockActionHandler, mockLogger)
+            NotificationIntentProcessor(
+                json,
+                mockActionFactory,
+                mockActionHandler,
+                testScope,
+                mockLogger
+            )
     }
 
     @After
@@ -97,7 +103,7 @@ class NotificationIntentProcessorTests {
         val mockAction: Action<Unit> = mockk(relaxed = true)
         coEvery { mockActionFactory.create(actionModel) } returns mockAction
 
-        notificationIntentProcessor.processIntent(intent, testScope)
+        notificationIntentProcessor.processIntent(intent)
 
         advanceUntilIdle()
 
@@ -115,7 +121,14 @@ class NotificationIntentProcessorTests {
             val mockReportingAction = mockk<DismissAction>(relaxed = true)
             coEvery { mockActionFactory.create(BasicLaunchApplicationActionModel) } returns mockLaunchApplicationAction
             coEvery { mockActionFactory.create(BasicDismissActionModel(COLLAPSE_ID)) } returns mockBasicDismissAction
-            coEvery { mockActionFactory.create(NotificationOpenedActionModel(null, TRACKING_INFO)) } returns mockReportingAction
+            coEvery {
+                mockActionFactory.create(
+                    NotificationOpenedActionModel(
+                        null,
+                        TRACKING_INFO
+                    )
+                )
+            } returns mockReportingAction
             val expectedMandatoryActions =
                 listOf(
                     mockLaunchApplicationAction,
@@ -123,7 +136,7 @@ class NotificationIntentProcessorTests {
                     mockReportingAction
                 )
 
-            notificationIntentProcessor.processIntent(intent, testScope)
+            notificationIntentProcessor.processIntent(intent)
 
             advanceUntilIdle()
 
@@ -156,7 +169,7 @@ class NotificationIntentProcessorTests {
         val mockAction: Action<Unit> = mockk(relaxed = true)
         coEvery { mockActionFactory.create(actionModel) } returns mockAction
 
-        notificationIntentProcessor.processIntent(intent, testScope)
+        notificationIntentProcessor.processIntent(intent)
 
         advanceUntilIdle()
 
@@ -187,7 +200,7 @@ class NotificationIntentProcessorTests {
 
             intent.putExtra(INTENT_EXTRA_PAYLOAD_KEY, """{"missing":"keys"}""")
 
-            notificationIntentProcessor.processIntent(intent, testScope)
+            notificationIntentProcessor.processIntent(intent)
 
             advanceUntilIdle()
         }
@@ -207,7 +220,7 @@ class NotificationIntentProcessorTests {
 
             intent.putExtra(INTENT_EXTRA_ACTION_KEY, """{"missing":"keys"}""")
 
-            notificationIntentProcessor.processIntent(intent, testScope)
+            notificationIntentProcessor.processIntent(intent)
 
             advanceUntilIdle()
         }
@@ -219,7 +232,7 @@ class NotificationIntentProcessorTests {
 
             intent.putExtra(INTENT_EXTRA_DEFAULT_TAP_ACTION_KEY, """{"missing":"keys"}""")
 
-            notificationIntentProcessor.processIntent(intent, testScope)
+            notificationIntentProcessor.processIntent(intent)
 
             advanceUntilIdle()
         }
@@ -249,7 +262,7 @@ class NotificationIntentProcessorTests {
             val mockAction: Action<Unit> = mockk(relaxed = true)
             coEvery { mockActionFactory.create(dismissActionModel) } returns mockAction
 
-            notificationIntentProcessor.processIntent(intent, testScope)
+            notificationIntentProcessor.processIntent(intent)
 
             advanceUntilIdle()
 
@@ -269,7 +282,8 @@ class NotificationIntentProcessorTests {
             val actionModel = BasicAppEventActionModel(REPORTING, NAME, PAYLOAD)
             val actionJsonString =
                 """{"type": "MEAppEvent","reporting":"{\"someKey\":\"someValue\"}","name":"$NAME","payload":{"testKey":"testValue"}}"""
-            val notificationOpenedActionModel = NotificationOpenedActionModel(REPORTING, TRACKING_INFO)
+            val notificationOpenedActionModel =
+                NotificationOpenedActionModel(REPORTING, TRACKING_INFO)
             val basicDismissActionModel = BasicDismissActionModel(COLLAPSE_ID)
             val reportingAction =
                 ReportingAction(notificationOpenedActionModel, mockSdkEventDistributor)
@@ -291,7 +305,7 @@ class NotificationIntentProcessorTests {
             val mockAction: Action<Unit> = mockk(relaxed = true)
             coEvery { mockActionFactory.create(actionModel) } returns mockAction
 
-            notificationIntentProcessor.processIntent(intent, testScope)
+            notificationIntentProcessor.processIntent(intent)
 
             advanceUntilIdle()
 

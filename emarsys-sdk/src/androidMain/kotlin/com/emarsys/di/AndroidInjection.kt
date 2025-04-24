@@ -146,6 +146,7 @@ object AndroidInjection {
                 json = get(),
                 actionFactory = get(),
                 actionHandler = get(),
+                applicationScope = get(named(CoroutineScopeTypes.Application)),
                 sdkLogger = get { parametersOf(NotificationIntentProcessor::class.simpleName) }
             )
         }
