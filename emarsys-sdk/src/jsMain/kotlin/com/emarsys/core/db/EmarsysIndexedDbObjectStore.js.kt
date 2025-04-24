@@ -169,11 +169,36 @@ class EmarsysIndexedDbObjectStore<T>(
                 transaction.onerror = EventHandler {
                     CoroutineScope(sdkDispatcher).launch {
                         logger.error(
-                            "EmarsysIndexedDbObjectStore - delete",
+                            "delete",
                             buildJsonObject {
                                 put("id", id)
                             }
                         )
+                    }
+                    continuation.resumeWithException(request.error!!)
+                }
+            }
+        }
+    }
+
+    override suspend fun removeAll() {
+        return emarsysIndexedDb.execute { database ->
+            suspendCoroutine { continuation ->
+                val transaction = database.transaction(
+                    emarsysObjectStoreConfig.name,
+                    IDBTransactionMode.readwrite
+                )
+
+                val request =
+                    transaction.objectStore(emarsysObjectStoreConfig.name).clear()
+
+                transaction.oncomplete = EventHandler {
+                    continuation.resume(Unit)
+                }
+
+                transaction.onerror = EventHandler {
+                    CoroutineScope(sdkDispatcher).launch {
+                        logger.error("clear")
                     }
                     continuation.resumeWithException(request.error!!)
                 }

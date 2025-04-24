@@ -8,6 +8,7 @@ import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
@@ -41,5 +42,12 @@ class JSEventsDaoTest {
         everySuspend { mockEmarsysIndexedDbObjectStore.getAll() } returns expectedEvents
 
         jsEventsDao.getEvents() shouldBe expectedEvents
+    }
+
+    @Test
+    fun removeAll_shouldDelegateToObjectStore() = runTest {
+        jsEventsDao.removeAll()
+
+        verifySuspend { mockEmarsysIndexedDbObjectStore.removeAll() }
     }
 }

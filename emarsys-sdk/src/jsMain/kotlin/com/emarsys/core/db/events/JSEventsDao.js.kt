@@ -4,17 +4,18 @@ import com.emarsys.core.db.EmarsysIndexedDbObjectStoreApi
 import com.emarsys.core.log.Logger
 import com.emarsys.networking.clients.event.model.SdkEvent
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
-class JSEventsDao(
+internal class JSEventsDao(
     private val emarsysIndexedDbObjectStore: EmarsysIndexedDbObjectStoreApi<SdkEvent>,
     private val logger: Logger
 ) : EventsDaoApi {
 
     override suspend fun insertEvent(event: SdkEvent) {
         logger.debug(
-            "JSEventsDao - insertEvent",
+            "insertEvent",
             buildJsonObject { put("event", event.toString()) },
             isRemoteLog = event !is SdkEvent.Internal.LogEvent
         )
@@ -22,19 +23,24 @@ class JSEventsDao(
     }
 
     override suspend fun getEvents(): Flow<SdkEvent> {
-        logger.debug("JSEventsDao - getEvents")
+        logger.debug("getEvents")
         return emarsysIndexedDbObjectStore.getAll()
     }
 
     override suspend fun removeEvent(event: SdkEvent) {
         if (event !is SdkEvent.Internal.LogEvent) {
             logger.debug(
-                "JSEventsDao - removeEvent",
+                "removeEvent",
                 buildJsonObject { put("event", event.toString()) },
                 isRemoteLog = event !is SdkEvent.Internal.LogEvent
             )
         }
         emarsysIndexedDbObjectStore.delete(event.id)
+    }
+
+    override suspend fun removeAll() {
+        logger.debug("removeAll")
+        emarsysIndexedDbObjectStore.removeAll()
     }
 
 
