@@ -1,7 +1,6 @@
 package com.emarsys.core.url
 
 import com.emarsys.context.SdkContextApi
-import com.emarsys.context.isConfigPredictOnly
 import com.emarsys.core.exceptions.MissingApplicationCodeException
 import com.emarsys.core.url.EmarsysUrlType.CHANGE_APPLICATION_CODE
 import com.emarsys.core.url.EmarsysUrlType.CHANGE_MERCHANT_ID

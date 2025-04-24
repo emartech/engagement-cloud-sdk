@@ -14,6 +14,10 @@ import com.emarsys.enable.states.CollectDeviceInfoState
 import com.emarsys.enable.states.RegisterClientState
 import com.emarsys.enable.states.RegisterPushTokenState
 import com.emarsys.enable.states.RestoreSavedSdkEventsState
+import com.emarsys.networking.clients.EventBasedClientApi
+import com.emarsys.networking.clients.reregistration.ReregistrationClient
+import com.emarsys.reregistration.states.ClearSessionContextState
+import com.emarsys.reregistration.states.LinkContactState
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -54,6 +58,21 @@ object SetupInjection {
                 uuidProvider = get()
             )
         }
+        single<State>(named(StateTypes.ClearSessionContext)) {
+            ClearSessionContextState(
+                sessionContext = get(),
+                sdkLogger = get { parametersOf(ClearSessionContextState::class.simpleName) }
+            )
+        }
+        single<State>(named(StateTypes.LinkContact)) {
+            LinkContactState(
+                sessionContext = get(),
+                sdkContext = get(),
+                sdkEventDistributor = get(),
+                sdkLogger = get { parametersOf(LinkContactState::class.simpleName) }
+            )
+        }
+
         single<StateMachineApi>(named(StateMachineTypes.MobileEngageEnable)) {
             StateMachine(
                 states = listOf(
@@ -76,7 +95,25 @@ object SetupInjection {
                 )
             )
         }
-
+        single<StateMachineApi>(named(StateMachineTypes.MobileEngageReregistration)) {
+            StateMachine(
+                states = listOf(
+                    get<State>(named(StateTypes.ClearSessionContext)),
+                    get<State>(named(StateTypes.RegisterClient)),
+                    get<State>(named(StateTypes.ApplyAppCodeBasedRemoteConfig)),
+                    get<State>(named(StateTypes.RegisterPushToken)),
+                    get<State>(named(StateTypes.LinkContact))
+                )
+            )
+        }
+        single<StateMachineApi>(named(StateMachineTypes.PredictOnlyReregistration)) {
+            StateMachine(
+                states = listOf(
+                    get<State>(named(StateTypes.ClearSessionContext)),
+                    get<State>(named(StateTypes.LinkContact))
+                )
+            )
+        }
         single<StateMachineApi>(named(StateMachineTypes.MobileEngageDisable)) {
             StateMachine(
                 states = listOf(
@@ -108,13 +145,31 @@ object SetupInjection {
                 sdkLogger = get { parametersOf(EnableOrganizer::class.simpleName) },
             )
         }
+
+        single<EventBasedClientApi>(named(EventBasedClientTypes.Reregistration)) {
+            ReregistrationClient(
+                sdkEventManager = get(),
+                sdkContext = get(),
+                mobileEngageReregistrationStateMachine = get(named(StateMachineTypes.MobileEngageReregistration)),
+                predictOnlyReregistrationStateMachine = get(named(StateMachineTypes.PredictOnlyReregistration)),
+                applicationScope = get(named(CoroutineScopeTypes.Application)),
+                sdkLogger = get { parametersOf(ReregistrationClient::class.simpleName) })
+        }
     }
 }
 
 enum class StateMachineTypes {
-    MobileEngageEnable, PredictEnable, MobileEngageDisable, PredictDisable, Init
+    MobileEngageEnable, PredictEnable, MobileEngageDisable, PredictDisable, Init, MobileEngageReregistration, PredictOnlyReregistration
 }
 
 enum class StateTypes {
-    CollectDeviceInfo, ApplyAppCodeBasedRemoteConfig, PlatformInit, RegisterClient, RegisterPushToken, AppStart, RestoreSavedSdkEvents
+    CollectDeviceInfo,
+    ApplyAppCodeBasedRemoteConfig,
+    PlatformInit,
+    RegisterClient,
+    RegisterPushToken,
+    AppStart,
+    RestoreSavedSdkEvents,
+    ClearSessionContext,
+    LinkContact
 }

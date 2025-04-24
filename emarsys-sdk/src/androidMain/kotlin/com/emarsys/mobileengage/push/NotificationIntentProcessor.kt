@@ -27,13 +27,14 @@ internal class NotificationIntentProcessor(
     private val json: Json,
     private val actionFactory: PushActionFactoryApi,
     private val actionHandler: ActionHandlerApi,
+    private val applicationScope: CoroutineScope,
     private val sdkLogger: Logger
 ) {
-    fun processIntent(intent: Intent?, lifecycleScope: CoroutineScope) {
+    fun processIntent(intent: Intent?) {
         //TODO: check if SDK setup has been completed
 
         if (intent != null) {
-            lifecycleScope.launch {
+            applicationScope.launch {
                 val triggeredActionModel = getActionModel(intent)
                 val triggeredAction = triggeredActionModel?.let {
                     actionFactory.create(it)

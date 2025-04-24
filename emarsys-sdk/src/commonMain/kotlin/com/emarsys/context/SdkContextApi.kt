@@ -18,4 +18,8 @@ interface SdkContextApi {
     var logBreadcrumbsQueueSize: Int
 
     suspend fun setSdkState(sdkState: SdkState)
+
+    fun isConfigPredictOnly(): Boolean {
+        return this.config?.applicationCode == null && this.config?.merchantId != null
+    }
 }

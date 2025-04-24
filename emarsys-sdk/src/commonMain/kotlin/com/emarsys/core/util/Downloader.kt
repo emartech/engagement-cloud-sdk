@@ -8,7 +8,7 @@ import io.ktor.client.statement.readRawBytes
 import io.ktor.http.Url
 import io.ktor.http.isSuccess
 
-class Downloader(
+internal class Downloader(
     private val client: HttpClient,
     private val fileCache: FileCacheApi,
     private val logger: Logger

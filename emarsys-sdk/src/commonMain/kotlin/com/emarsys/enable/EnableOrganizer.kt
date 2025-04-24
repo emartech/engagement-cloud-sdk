@@ -3,7 +3,6 @@ package com.emarsys.enable
 import com.emarsys.SdkConfig
 import com.emarsys.api.SdkState
 import com.emarsys.context.SdkContextApi
-import com.emarsys.context.isConfigPredictOnly
 import com.emarsys.core.exceptions.SdkAlreadyEnabledException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.state.StateMachineApi

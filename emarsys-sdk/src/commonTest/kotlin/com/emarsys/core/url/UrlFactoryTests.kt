@@ -4,6 +4,7 @@ import com.emarsys.EmarsysConfig
 import com.emarsys.context.DefaultUrlsApi
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.exceptions.MissingApplicationCodeException
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.mock
@@ -24,8 +25,8 @@ class UrlFactoryTests {
 
     @BeforeTest
     fun setUp() {
-        mockSdkContext = mock()
-        mockDefaultUrls = mock()
+        mockSdkContext = mock(MockMode.autofill)
+        mockDefaultUrls = mock(MockMode.autofill)
         urlFactory = UrlFactory(mockSdkContext)
     }
 
@@ -82,6 +83,7 @@ class UrlFactoryTests {
         every { mockSdkContext.defaultUrls } returns mockDefaultUrls
         every { mockDefaultUrls.clientServiceBaseUrl } returns clientServiceBaseUrl
         every { mockSdkContext.config } returns config
+        every { mockSdkContext.isConfigPredictOnly() } returns true
         val result = urlFactory.create(EmarsysUrlType.REFRESH_TOKEN, null)
 
         result shouldBe Url("https://me-client.eservice.emarsys.net/v4/contact-token")
@@ -142,6 +144,7 @@ class UrlFactoryTests {
         every { mockSdkContext.defaultUrls } returns mockDefaultUrls
         every { mockDefaultUrls.clientServiceBaseUrl } returns clientServiceBaseUrl
         every { mockSdkContext.config } returns config
+        every { mockSdkContext.isConfigPredictOnly() } returns true
         val result = urlFactory.create(EmarsysUrlType.LINK_CONTACT, null)
 
         result shouldBe Url("https://me-client.eservice.emarsys.net/v4/contact-token")
