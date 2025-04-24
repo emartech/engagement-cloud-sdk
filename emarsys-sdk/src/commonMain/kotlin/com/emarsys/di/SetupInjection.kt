@@ -6,6 +6,8 @@ import com.emarsys.core.state.StateMachine
 import com.emarsys.core.state.StateMachineApi
 import com.emarsys.disable.DisableOrganizer
 import com.emarsys.disable.DisableOrganizerApi
+import com.emarsys.disable.states.ClearEvents
+import com.emarsys.disable.states.ClearStoredConfig
 import com.emarsys.enable.EnableOrganizer
 import com.emarsys.enable.EnableOrganizerApi
 import com.emarsys.enable.states.AppStartState
@@ -72,6 +74,15 @@ object SetupInjection {
                 sdkLogger = get { parametersOf(LinkContactState::class.simpleName) }
             )
         }
+        single<State>(named(StateTypes.ClearStoredConfig)) {
+            ClearStoredConfig(
+                sdkConfigStore = get(),
+                sdkLogger = get { parametersOf(ClearStoredConfig::class.simpleName) }
+            )
+        }
+        single<State>(named(StateTypes.ClearEvents)) {
+            ClearEvents(eventsDao = get())
+        }
 
         single<StateMachineApi>(named(StateMachineTypes.MobileEngageEnable)) {
             StateMachine(
@@ -117,14 +128,16 @@ object SetupInjection {
         single<StateMachineApi>(named(StateMachineTypes.MobileEngageDisable)) {
             StateMachine(
                 states = listOf(
-                    get<State>(named(StateTypes.CollectDeviceInfo)),
+                    get<State>(named(StateTypes.ClearEvents)),
+                    get<State>(named(StateTypes.ClearStoredConfig)),
                 )
             )
         }
         single<StateMachineApi>(named(StateMachineTypes.PredictDisable)) {
             StateMachine(
                 states = listOf(
-                    get<State>(named(StateTypes.CollectDeviceInfo)),
+                    get<State>(named(StateTypes.ClearEvents)),
+                    get<State>(named(StateTypes.ClearStoredConfig)),
                 )
             )
         }
@@ -171,5 +184,7 @@ enum class StateTypes {
     AppStart,
     RestoreSavedSdkEvents,
     ClearSessionContext,
-    LinkContact
+    LinkContact,
+    ClearStoredConfig,
+    ClearEvents,
 }

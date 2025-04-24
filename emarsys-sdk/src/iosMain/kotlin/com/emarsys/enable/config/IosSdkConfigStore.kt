@@ -6,7 +6,7 @@ import com.emarsys.core.storage.StorageConstants
 import com.emarsys.core.storage.TypedStorageApi
 import kotlinx.serialization.KSerializer
 
-class IosSdkConfigStore(
+internal class IosSdkConfigStore(
     override val typedStorage: TypedStorageApi
 ) : SdkConfigStoreApi<EmarsysConfig> {
     override val deserializer: KSerializer<EmarsysConfig> = EmarsysConfig.serializer()
@@ -17,5 +17,9 @@ class IosSdkConfigStore(
             EmarsysConfig.serializer(),
             config as EmarsysConfig
         )
+    }
+
+    override suspend fun clear() {
+        typedStorage.remove(StorageConstants.SDK_CONFIG_KEY)
     }
 }

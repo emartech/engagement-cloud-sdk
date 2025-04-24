@@ -6,7 +6,7 @@ import com.emarsys.core.storage.StorageConstants
 import com.emarsys.core.storage.TypedStorageApi
 import kotlinx.serialization.KSerializer
 
-class AndroidSdkConfigStore(
+internal class AndroidSdkConfigStore(
     override val typedStorage: TypedStorageApi,
 ) : SdkConfigStoreApi<AndroidEmarsysConfig> {
     override val deserializer: KSerializer<AndroidEmarsysConfig> = AndroidEmarsysConfig.serializer()
@@ -17,5 +17,9 @@ class AndroidSdkConfigStore(
             AndroidEmarsysConfig.serializer(),
             config as AndroidEmarsysConfig
         )
+    }
+
+    override suspend fun clear() {
+        typedStorage.remove(StorageConstants.SDK_CONFIG_KEY)
     }
 }

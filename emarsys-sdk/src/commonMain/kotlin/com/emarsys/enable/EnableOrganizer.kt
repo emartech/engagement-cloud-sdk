@@ -8,7 +8,7 @@ import com.emarsys.core.log.Logger
 import com.emarsys.core.state.StateMachineApi
 import com.emarsys.enable.config.SdkConfigStoreApi
 
-class EnableOrganizer(
+internal class EnableOrganizer(
     override val meStateMachine: StateMachineApi,
     override val predictStateMachine: StateMachineApi,
     override val sdkContext: SdkContextApi,

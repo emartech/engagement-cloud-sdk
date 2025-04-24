@@ -56,6 +56,16 @@ class TypedStorageTests {
 
         typedStorage.get(key, EmarsysConfig.serializer())
 
-        verifySuspend { mockLogger.error("TypedStorage - get", throwable = any()) }
+        verifySuspend { mockLogger.error("get", throwable = any()) }
+    }
+
+    @Test
+    fun testRemove_shouldDelegateToStringStorage() = runTest {
+        val key = "testKey"
+        everySuspend { mockStringStorage.put(key, null) } returns Unit
+
+        typedStorage.remove(key)
+
+        verifySuspend { mockStringStorage.put(key, null) }
     }
 }

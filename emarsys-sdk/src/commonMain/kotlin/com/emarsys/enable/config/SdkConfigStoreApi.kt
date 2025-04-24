@@ -5,7 +5,7 @@ import com.emarsys.core.storage.StorageConstants
 import com.emarsys.core.storage.TypedStorageApi
 import kotlinx.serialization.KSerializer
 
-interface SdkConfigStoreApi<out LoadedType : SdkConfig> {
+internal interface SdkConfigStoreApi<out LoadedType : SdkConfig> {
     val typedStorage: TypedStorageApi
     val deserializer: KSerializer<out LoadedType>
 
@@ -14,5 +14,7 @@ interface SdkConfigStoreApi<out LoadedType : SdkConfig> {
     }
 
     suspend fun store(config: SdkConfig)
+
+    suspend fun clear()
 
 }

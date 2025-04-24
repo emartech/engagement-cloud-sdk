@@ -5,6 +5,7 @@ import com.emarsys.api.geofence.GeofenceTrackerApi
 import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.inbox.InboxApi
 import com.emarsys.api.predict.PredictApi
+import com.emarsys.core.exceptions.SdkAlreadyDisabledException
 import com.emarsys.core.exceptions.SdkAlreadyEnabledException
 import com.emarsys.mobileengage.push.IosPushApi
 import io.ktor.http.Url
@@ -43,6 +44,21 @@ object IosEmarsys {
     @Throws(SdkAlreadyEnabledException::class, CancellationException::class)
     suspend fun enableTracking(config: SdkConfig) {
         val result = Emarsys.enableTracking(config)
+        if (result.isFailure) {
+            result.exceptionOrNull()?.let {
+                throw it
+            }
+        }
+    }
+
+    /**
+     * Disables tracking.
+     *
+     * @param config The SDK configuration to use for enabling tracking.
+     */
+    @Throws(SdkAlreadyDisabledException::class, CancellationException::class)
+    suspend fun disableTracking() {
+        val result = Emarsys.disableTracking()
         if (result.isFailure) {
             result.exceptionOrNull()?.let {
                 throw it
