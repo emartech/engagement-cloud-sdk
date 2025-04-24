@@ -3,15 +3,15 @@ package com.emarsys.init.states
 import com.emarsys.SdkConfig
 import com.emarsys.core.log.Logger
 import com.emarsys.core.state.State
-import com.emarsys.setup.SetupOrganizerApi
-import com.emarsys.setup.config.SdkConfigStoreApi
+import com.emarsys.enable.EnableOrganizerApi
+import com.emarsys.enable.config.SdkConfigStoreApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
 
-class SdkConfigLoaderState(
+internal class SdkConfigLoaderState(
     private val sdkConfigStore: SdkConfigStoreApi<SdkConfig>,
-    private val setupOrganizer: SetupOrganizerApi,
+    private val setupOrganizer: EnableOrganizerApi,
     private val applicationScope: CoroutineScope,
     private val sdkLogger: Logger
 ) : State {
@@ -26,7 +26,7 @@ class SdkConfigLoaderState(
         )
         sdkConfigStore.load()?.let {
             applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
-                setupOrganizer.setup(it)
+                setupOrganizer.enable(it)
             }
         }
     }

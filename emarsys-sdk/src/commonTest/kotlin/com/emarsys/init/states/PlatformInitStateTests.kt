@@ -1,8 +1,7 @@
 package com.emarsys.init.states
 
-import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.SdkLogger
-import com.emarsys.setup.PlatformInitializerApi
+import com.emarsys.enable.PlatformInitializerApi
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend

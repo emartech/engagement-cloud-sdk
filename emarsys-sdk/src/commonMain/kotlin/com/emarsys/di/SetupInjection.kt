@@ -4,14 +4,16 @@ import com.emarsys.core.channel.SdkEventEmitterApi
 import com.emarsys.core.state.State
 import com.emarsys.core.state.StateMachine
 import com.emarsys.core.state.StateMachineApi
-import com.emarsys.setup.SetupOrganizer
-import com.emarsys.setup.SetupOrganizerApi
-import com.emarsys.setup.states.AppStartState
-import com.emarsys.setup.states.ApplyAppCodeBasedRemoteConfigState
-import com.emarsys.setup.states.CollectDeviceInfoState
-import com.emarsys.setup.states.RegisterClientState
-import com.emarsys.setup.states.RegisterPushTokenState
-import com.emarsys.setup.states.RestoreSavedSdkEventsState
+import com.emarsys.disable.DisableOrganizer
+import com.emarsys.disable.DisableOrganizerApi
+import com.emarsys.enable.EnableOrganizer
+import com.emarsys.enable.EnableOrganizerApi
+import com.emarsys.enable.states.AppStartState
+import com.emarsys.enable.states.ApplyAppCodeBasedRemoteConfigState
+import com.emarsys.enable.states.CollectDeviceInfoState
+import com.emarsys.enable.states.RegisterClientState
+import com.emarsys.enable.states.RegisterPushTokenState
+import com.emarsys.enable.states.RestoreSavedSdkEventsState
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -36,7 +38,7 @@ object SetupInjection {
             )
         }
         single<State>(named(StateTypes.ApplyAppCodeBasedRemoteConfig)) {
-            ApplyAppCodeBasedRemoteConfigState( sdkEventDistributor = get())
+            ApplyAppCodeBasedRemoteConfigState(sdkEventDistributor = get())
         }
         single<State>(named(StateTypes.RestoreSavedSdkEvents)) {
             RestoreSavedSdkEventsState(
@@ -52,7 +54,7 @@ object SetupInjection {
                 uuidProvider = get()
             )
         }
-        single<StateMachineApi>(named(StateMachineTypes.ME)) {
+        single<StateMachineApi>(named(StateMachineTypes.MobileEngageEnable)) {
             StateMachine(
                 states = listOf(
                     get<State>(named(StateTypes.CollectDeviceInfo)),
@@ -65,7 +67,7 @@ object SetupInjection {
                 )
             )
         }
-        single<StateMachineApi>(named(StateMachineTypes.Predict)) {
+        single<StateMachineApi>(named(StateMachineTypes.PredictEnable)) {
             StateMachine(
                 states = listOf(
                     get<State>(named(StateTypes.CollectDeviceInfo)),
@@ -74,20 +76,43 @@ object SetupInjection {
                 )
             )
         }
-        single<SetupOrganizerApi> {
-            SetupOrganizer(
-                meStateMachine = get(named(StateMachineTypes.ME)),
-                predictStateMachine = get(named(StateMachineTypes.Predict)),
+
+        single<StateMachineApi>(named(StateMachineTypes.MobileEngageDisable)) {
+            StateMachine(
+                states = listOf(
+                    get<State>(named(StateTypes.CollectDeviceInfo)),
+                )
+            )
+        }
+        single<StateMachineApi>(named(StateMachineTypes.PredictDisable)) {
+            StateMachine(
+                states = listOf(
+                    get<State>(named(StateTypes.CollectDeviceInfo)),
+                )
+            )
+        }
+        single<EnableOrganizerApi> {
+            EnableOrganizer(
+                meStateMachine = get(named(StateMachineTypes.MobileEngageEnable)),
+                predictStateMachine = get(named(StateMachineTypes.PredictEnable)),
                 sdkContext = get(),
-                sdkLogger = get { parametersOf(SetupOrganizer::class.simpleName) },
+                sdkLogger = get { parametersOf(EnableOrganizer::class.simpleName) },
                 sdkConfigStore = get()
+            )
+        }
+        single<DisableOrganizerApi> {
+            DisableOrganizer(
+                meStateMachine = get(named(StateMachineTypes.MobileEngageEnable)),
+                predictStateMachine = get(named(StateMachineTypes.PredictEnable)),
+                sdkContext = get(),
+                sdkLogger = get { parametersOf(EnableOrganizer::class.simpleName) },
             )
         }
     }
 }
 
 enum class StateMachineTypes {
-    ME, Predict, Init
+    MobileEngageEnable, PredictEnable, MobileEngageDisable, PredictDisable, Init
 }
 
 enum class StateTypes {

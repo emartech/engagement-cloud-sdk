@@ -32,4 +32,8 @@ abstract class AbstractSqlDelightEventsDao(db: EmarsysDB, private val json: Json
     override suspend fun removeEvent(event: SdkEvent) {
         queries.deleteById(event.id)
     }
+
+    override suspend fun removeAll() {
+        queries.deleteAll()
+    }
 }

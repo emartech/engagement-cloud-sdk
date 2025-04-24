@@ -12,7 +12,7 @@ import com.emarsys.init.states.RegisterInstancesState
 import com.emarsys.init.states.RegisterWatchdogsState
 import com.emarsys.init.states.SdkConfigLoaderState
 import com.emarsys.init.states.SessionSubscriptionState
-import com.emarsys.setup.states.RegisterEventBasedClientsState
+import com.emarsys.enable.states.RegisterEventBasedClientsState
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import org.koin.core.parameter.parametersOf

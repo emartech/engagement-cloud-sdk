@@ -7,4 +7,5 @@ interface EventsDaoApi {
     suspend fun insertEvent(event: SdkEvent)
     suspend fun getEvents(): Flow<SdkEvent>
     suspend fun removeEvent(event: SdkEvent)
+    suspend fun removeAll()
 }

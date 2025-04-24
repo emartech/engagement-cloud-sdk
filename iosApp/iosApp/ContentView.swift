@@ -3,7 +3,7 @@ import EmarsysSDK
 
     
     struct ContentView: View {
-        @SwiftUICore.State private var eventName = ""
+        @State private var eventName = ""
         
         var body: some View {
             Button {

@@ -5,7 +5,7 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class TestState(override val name: String) : State {
+internal class TestState(override val name: String) : State {
 
     var functionCalls: ((stateName: String, functionName: String) -> Unit)? = null
     override fun prepare() {
@@ -21,7 +21,7 @@ class TestState(override val name: String) : State {
     }
 
 }
-class StateMachineTests {
+internal class StateMachineTests {
 
     companion object {
         val state1 = TestState("state1")

@@ -10,13 +10,15 @@ import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.inbox.InboxApi
 import com.emarsys.api.predict.PredictApi
 import com.emarsys.api.push.PushApi
+import com.emarsys.core.exceptions.SdkAlreadyDisabledException
 import com.emarsys.core.exceptions.SdkAlreadyEnabledException
 import com.emarsys.di.EventFlowTypes
 import com.emarsys.di.SdkKoinIsolationContext
 import com.emarsys.di.SdkKoinIsolationContext.koin
+import com.emarsys.disable.DisableOrganizerApi
 import com.emarsys.init.InitOrganizerApi
 import com.emarsys.networking.clients.event.model.SdkEvent
-import com.emarsys.setup.SetupOrganizerApi
+import com.emarsys.enable.EnableOrganizerApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import org.koin.core.qualifier.named
@@ -42,12 +44,27 @@ object Emarsys {
      * @param config The SDK configuration to use for enabling tracking.
      * @throws SdkAlreadyEnabledException if tracking is already enabled.
      */
-    suspend fun enableTracking(config: SdkConfig) {
+    suspend fun enableTracking(config: SdkConfig): Result<Unit> {
         config.isValid()
         try {
-            koin.get<SetupOrganizerApi>().setupWithValidation(config)
+            koin.get<EnableOrganizerApi>().enableWithValidation(config)
+            return Result.success(Unit)
         } catch (exception: SdkAlreadyEnabledException) {
-            // TODO define error handling and api
+            return Result.failure(exception)
+        }
+    }
+
+    /**
+     * Disables tracking with the provided configuration.
+     *
+     *
+     */
+    suspend fun disableTracking(): Result<Unit> {
+        try {
+            koin.get<DisableOrganizerApi>().disable()
+            return Result.success(Unit)
+        } catch (exception: SdkAlreadyDisabledException) {
+            return Result.failure(exception)
         }
     }
 

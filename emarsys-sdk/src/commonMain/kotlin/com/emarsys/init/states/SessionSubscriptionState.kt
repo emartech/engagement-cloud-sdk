@@ -5,7 +5,7 @@ import com.emarsys.core.state.State
 import com.emarsys.mobileengage.session.Session
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 
-class SessionSubscriptionState(
+internal class SessionSubscriptionState(
     private val mobileEngageSession: Session,
     private val lifecycleWatchDog: LifecycleWatchDog,
     private val sdkLogger: Logger

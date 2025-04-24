@@ -62,11 +62,11 @@ import com.emarsys.mobileengage.push.mapper.AndroidPushV2Mapper
 import com.emarsys.mobileengage.push.mapper.SilentAndroidPushV2Mapper
 import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
 import com.emarsys.mobileengage.url.AndroidExternalUrlOpener
-import com.emarsys.setup.PlatformInitState
-import com.emarsys.setup.PlatformInitializer
-import com.emarsys.setup.PlatformInitializerApi
-import com.emarsys.setup.config.AndroidSdkConfigStore
-import com.emarsys.setup.config.SdkConfigStoreApi
+import com.emarsys.enable.PlatformInitState
+import com.emarsys.enable.PlatformInitializer
+import com.emarsys.enable.PlatformInitializerApi
+import com.emarsys.enable.config.AndroidSdkConfigStore
+import com.emarsys.enable.config.SdkConfigStoreApi
 import com.emarsys.sqldelight.EmarsysDB
 import com.emarsys.watchdog.activity.TransitionSafeCurrentActivityWatchdog
 import com.emarsys.watchdog.connection.AndroidConnectionWatchDog

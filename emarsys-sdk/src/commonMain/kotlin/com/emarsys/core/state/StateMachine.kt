@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class StateMachine(private val states: List<State>): StateMachineApi {
+internal class StateMachine(private val states: List<State>): StateMachineApi {
     private val innerStateLifecycle: MutableStateFlow<Pair<String, StateLifecycle>?> = MutableStateFlow(null)
     override val stateLifecycle: StateFlow<Pair<String, StateLifecycle>?> = innerStateLifecycle.asStateFlow()
 

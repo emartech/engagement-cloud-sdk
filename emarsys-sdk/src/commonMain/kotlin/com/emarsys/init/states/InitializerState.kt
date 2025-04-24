@@ -2,7 +2,7 @@ package com.emarsys.init.states
 
 import com.emarsys.core.log.Logger
 import com.emarsys.core.state.State
-import com.emarsys.setup.PlatformInitializerApi
+import com.emarsys.enable.PlatformInitializerApi
 
 internal class InitializerState(
     private val platformInitializer: PlatformInitializerApi,

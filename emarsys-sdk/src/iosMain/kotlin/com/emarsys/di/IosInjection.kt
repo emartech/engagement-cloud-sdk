@@ -53,10 +53,10 @@ import com.emarsys.mobileengage.push.IosPush
 import com.emarsys.mobileengage.push.IosPushInstance
 import com.emarsys.mobileengage.push.IosPushInternal
 import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
-import com.emarsys.setup.PlatformInitializer
-import com.emarsys.setup.PlatformInitializerApi
-import com.emarsys.setup.config.IosSdkConfigStore
-import com.emarsys.setup.config.SdkConfigStoreApi
+import com.emarsys.enable.PlatformInitializer
+import com.emarsys.enable.PlatformInitializerApi
+import com.emarsys.enable.config.IosSdkConfigStore
+import com.emarsys.enable.config.SdkConfigStoreApi
 import com.emarsys.sqldelight.EmarsysDB
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog

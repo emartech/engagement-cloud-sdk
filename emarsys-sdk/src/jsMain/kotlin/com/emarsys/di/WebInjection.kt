@@ -52,11 +52,11 @@ import com.emarsys.mobileengage.push.PushNotificationClickHandlerApi
 import com.emarsys.mobileengage.push.PushService
 import com.emarsys.mobileengage.push.PushServiceContext
 import com.emarsys.mobileengage.pushtoinapp.WebPushToInAppHandler
-import com.emarsys.setup.PlatformInitState
-import com.emarsys.setup.PlatformInitializer
-import com.emarsys.setup.PlatformInitializerApi
-import com.emarsys.setup.config.JsEmarsysConfigStore
-import com.emarsys.setup.config.SdkConfigStoreApi
+import com.emarsys.enable.PlatformInitState
+import com.emarsys.enable.PlatformInitializer
+import com.emarsys.enable.PlatformInitializerApi
+import com.emarsys.enable.config.JsEmarsysConfigStore
+import com.emarsys.enable.config.SdkConfigStoreApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.connection.WebConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog

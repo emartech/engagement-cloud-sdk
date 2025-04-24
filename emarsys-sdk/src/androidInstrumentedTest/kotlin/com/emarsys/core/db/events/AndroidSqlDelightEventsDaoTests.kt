@@ -14,9 +14,9 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
-import org.junit.Test
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
+import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AndroidSqlDelightEventsDaoTests {
@@ -88,5 +88,18 @@ class AndroidSqlDelightEventsDaoTests {
         eventsDao.removeEvent(testEvent)
 
         eventsDao.getEvents().toList() shouldBe emptyList()
+    }
+
+    @Test
+    fun testRemoveAll_shouldRemoveAllEvents() = runTest {
+        val testEvent1 = SdkEvent.External.Custom("custom1", "testId", "test", ATTRIBUTES, TIMESTAMP)
+        val testEvent2 = SdkEvent.External.Custom("custom2", "testId", "test", ATTRIBUTES, TIMESTAMP)
+        eventsDao.insertEvent(testEvent1)
+        eventsDao.insertEvent(testEvent2)
+
+        eventsDao.removeAll()
+
+        eventsDao.getEvents().toList() shouldBe emptyList()
+
     }
 }

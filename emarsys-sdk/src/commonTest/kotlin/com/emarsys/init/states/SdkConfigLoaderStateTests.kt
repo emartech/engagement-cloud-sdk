@@ -2,8 +2,8 @@ package com.emarsys.init.states
 
 import com.emarsys.EmarsysConfig
 import com.emarsys.SdkConfig
-import com.emarsys.setup.SetupOrganizerApi
-import com.emarsys.setup.config.SdkConfigStoreApi
+import com.emarsys.enable.EnableOrganizerApi
+import com.emarsys.enable.config.SdkConfigStoreApi
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -25,7 +25,7 @@ import kotlin.test.Test
 class SdkConfigLoaderStateTests {
 
     private lateinit var mockSdkConfigLoader: SdkConfigStoreApi<SdkConfig>
-    private lateinit var mockSetupOrganizer: SetupOrganizerApi
+    private lateinit var mockSetupOrganizer: EnableOrganizerApi
 
     private lateinit var sdkConfigLoaderState: SdkConfigLoaderState
 
@@ -54,7 +54,7 @@ class SdkConfigLoaderStateTests {
 
         verifySuspend { mockSdkConfigLoader.load() }
         verifySuspend(VerifyMode.exactly(0)) {
-            mockSetupOrganizer.setup(any())
+            mockSetupOrganizer.enable(any())
         }
     }
 
@@ -74,7 +74,7 @@ class SdkConfigLoaderStateTests {
 
         verifySuspend { mockSdkConfigLoader.load() }
         verifySuspend {
-            mockSetupOrganizer.setup(testConfig)
+            mockSetupOrganizer.enable(testConfig)
         }
     }
 }

@@ -92,4 +92,16 @@ class IosSqDelightEventsDaoTests {
 
         eventsDao.getEvents().toList() shouldBe emptyList()
     }
+
+    @Test
+    fun testRemoveAll_shouldRemoveAllEvents() = runTest {
+        val testEvent1 = SdkEvent.External.Custom("custom1", "testId", "test", ATTRIBUTES, TIMESTAMP)
+        val testEvent2 = SdkEvent.External.Custom("custom2", "testId", "test", ATTRIBUTES, TIMESTAMP)
+        eventsDao.insertEvent(testEvent1)
+        eventsDao.insertEvent(testEvent2)
+
+        eventsDao.removeAll()
+
+        eventsDao.getEvents().toList() shouldBe emptyList()
+    }
 }

@@ -1,6 +1,6 @@
 package com.emarsys.core.state
 
-interface State {
+internal interface State {
 
     val name: String
 

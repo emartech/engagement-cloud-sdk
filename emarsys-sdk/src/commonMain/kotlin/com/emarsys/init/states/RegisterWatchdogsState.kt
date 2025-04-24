@@ -4,7 +4,7 @@ import com.emarsys.core.Registerable
 import com.emarsys.core.log.Logger
 import com.emarsys.core.state.State
 
-class RegisterWatchdogsState(
+internal class RegisterWatchdogsState(
     private val lifecycleWatchDog: Registerable,
     private val connectionWatchDog: Registerable,
     private val sdkLogger: Logger

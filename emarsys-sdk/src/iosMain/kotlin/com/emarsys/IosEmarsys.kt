@@ -5,31 +5,33 @@ import com.emarsys.api.geofence.GeofenceTrackerApi
 import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.inbox.InboxApi
 import com.emarsys.api.predict.PredictApi
+import com.emarsys.core.exceptions.SdkAlreadyEnabledException
 import com.emarsys.mobileengage.push.IosPushApi
 import io.ktor.http.Url
+import io.ktor.utils.io.CancellationException
 import platform.Foundation.NSUserActivity
 import kotlin.experimental.ExperimentalObjCName
 
 @OptIn(ExperimentalObjCName::class)
 @ObjCName("Emarsys")
 object IosEmarsys {
-     val push: IosPushApi
+    val push: IosPushApi
         get() = Emarsys.push as IosPushApi
-     val inApp: InAppApi
+    val inApp: InAppApi
         get() = Emarsys.inApp
-     val inbox: InboxApi
+    val inbox: InboxApi
         get() = Emarsys.inbox
-     val config: ConfigApi
+    val config: ConfigApi
         get() = Emarsys.config
-     val geofence: GeofenceTrackerApi
+    val geofence: GeofenceTrackerApi
         get() = Emarsys.geofence
-     val predict: PredictApi
+    val predict: PredictApi
         get() = Emarsys.predict
 
     /**
      * Initializes the SDK. This method must be called before using any other SDK functionality.
      */
-     suspend fun initialize() {
+    suspend fun initialize() {
         Emarsys.initialize()
     }
 
@@ -38,8 +40,14 @@ object IosEmarsys {
      *
      * @param config The SDK configuration to use for enabling tracking.
      */
-     suspend fun enableTracking(config: SdkConfig) {
-        Emarsys.enableTracking(config)
+    @Throws(SdkAlreadyEnabledException::class, CancellationException::class)
+    suspend fun enableTracking(config: SdkConfig) {
+        val result = Emarsys.enableTracking(config)
+        if (result.isFailure) {
+            result.exceptionOrNull()?.let {
+                throw it
+            }
+        }
     }
 
     /**
@@ -48,7 +56,7 @@ object IosEmarsys {
      * @param contactFieldId The ID of the contact field.
      * @param contactFieldValue The value of the contact field.
      */
-     suspend fun linkContact(contactFieldId: Int, contactFieldValue: String) {
+    suspend fun linkContact(contactFieldId: Int, contactFieldValue: String) {
         Emarsys.linkContact(contactFieldId, contactFieldValue)
     }
 
@@ -59,14 +67,14 @@ object IosEmarsys {
      * @param contactFieldId The ID of the contact field.
      * @param openIdToken The OpenID token for authentication.
      */
-     suspend fun linkAuthenticatedContact(contactFieldId: Int, openIdToken: String) {
+    suspend fun linkAuthenticatedContact(contactFieldId: Int, openIdToken: String) {
         Emarsys.linkAuthenticatedContact(contactFieldId, openIdToken)
     }
 
     /**
      * Unlinks the currently linked contact from the SDK. And replaces it with an anonymous contact
      */
-     suspend fun unlinkContact() {
+    suspend fun unlinkContact() {
         Emarsys.unlinkContact()
     }
 
@@ -76,7 +84,7 @@ object IosEmarsys {
      * @param event The name of the custom event.
      * @param attributes Optional attributes for the event.
      */
-     suspend fun trackCustomEvent(event: String, attributes: Map<String, String>?) {
+    suspend fun trackCustomEvent(event: String, attributes: Map<String, String>?) {
         Emarsys.trackCustomEvent(event, attributes)
     }
 
@@ -85,7 +93,7 @@ object IosEmarsys {
      *
      * @param userActivity The user activity containing the deep link information.
      */
-     suspend fun trackDeepLink(userActivity: NSUserActivity) {
+    suspend fun trackDeepLink(userActivity: NSUserActivity) {
         userActivity.webpageURL?.absoluteString()?.let {
             Emarsys.deepLink.trackDeepLink(Url(it))
         }
