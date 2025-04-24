@@ -1,7 +1,9 @@
 package com.emarsys
 
 import com.emarsys.api.contact.ContactApi
+import com.emarsys.core.exceptions.SdkAlreadyDisabledException
 import com.emarsys.di.SdkKoinIsolationContext.koin
+import io.ktor.utils.io.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.promise
@@ -38,6 +40,16 @@ class EmarsysJs {
     fun enableTracking(jsEmarsysConfig: JsEmarsysConfig): Promise<Any> {
         return coroutineScope.promise {
             Emarsys.enableTracking(jsEmarsysConfig)
+        }
+    }
+
+    /**
+     * Disables tracking.
+     *
+     */
+    fun disableTracking(): Promise<Any> {
+        return coroutineScope.promise {
+            Emarsys.disableTracking()
         }
     }
 

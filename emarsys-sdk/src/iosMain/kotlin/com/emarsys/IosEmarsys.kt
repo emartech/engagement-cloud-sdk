@@ -54,7 +54,6 @@ object IosEmarsys {
     /**
      * Disables tracking.
      *
-     * @param config The SDK configuration to use for enabling tracking.
      */
     @Throws(SdkAlreadyDisabledException::class, CancellationException::class)
     suspend fun disableTracking() {

@@ -57,7 +57,6 @@ object Emarsys {
     /**
      * Disables tracking with the provided configuration.
      *
-     *
      */
     suspend fun disableTracking(): Result<Unit> {
         try {
