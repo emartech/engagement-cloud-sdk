@@ -94,7 +94,7 @@ object CoreInjection {
             )
         }
         single<Json> { JsonUtil.json }
-        singleOf(::Storage) { bind<StorageApi>() }
+        single<StorageApi> { Storage(stringStorage = get(), json = get()) }
         singleOf(::UserAgentProvider) { bind<UserAgentProviderApi>() }
         single<DefaultUrlsApi> {
             DefaultUrls(

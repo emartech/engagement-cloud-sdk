@@ -1,6 +1,8 @@
 package com.emarsys.di
 
 import com.emarsys.JsEmarsysConfig
+import com.emarsys.api.contact.JSContact
+import com.emarsys.api.contact.JSContactApi
 import com.emarsys.api.push.LoggingPush
 import com.emarsys.api.push.Push
 import com.emarsys.api.push.PushApi
@@ -220,6 +222,14 @@ object WebInjection {
                 gathererApi = get(named(InstanceType.Gatherer)),
                 internalApi = get(named(InstanceType.Internal)),
                 sdkContext = get()
+            )
+        }
+        single<JSContactApi> {
+            JSContact(
+                contactApi = get(),
+                applicationScope = get(
+                    named(CoroutineScopeTypes.Application)
+                )
             )
         }
     }

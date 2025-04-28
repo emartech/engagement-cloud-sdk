@@ -1,21 +1,27 @@
 package com.emarsys
 
+import com.emarsys.api.contact.JSContactApi
 import com.emarsys.api.event.model.CustomEvent
+import com.emarsys.di.CoroutineScopeTypes
+import com.emarsys.di.SdkKoinIsolationContext.koin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.await
 import kotlinx.coroutines.promise
+import org.koin.core.qualifier.named
 import kotlin.js.Promise
 
-fun main() {
-    EmarsysJs().init()
+suspend fun main() {
+    EmarsysJs.init().await()
 }
 
 @OptIn(ExperimentalJsExport::class)
 @JsExport
 @JsName("EmarsysJs")
-class EmarsysJs {
+object EmarsysJs {
 
-    private val coroutineScope: CoroutineScope = CoroutineScope(SupervisorJob())
+    private lateinit var applicationScope: CoroutineScope
+    lateinit var contact: JSContactApi
 
     /**
      * Initializes the SDK. This method must be called before using any other SDK functionality.
@@ -23,8 +29,10 @@ class EmarsysJs {
      * @return A promise that resolves when the initialization is complete.
      */
     fun init(): Promise<Any> {
-        return coroutineScope.promise {
+        return CoroutineScope(SupervisorJob()).promise {
             Emarsys.initialize()
+            applicationScope = koin.get<CoroutineScope>(named(CoroutineScopeTypes.Application))
+            contact = koin.get<JSContactApi>()
         }
     }
 
@@ -35,7 +43,7 @@ class EmarsysJs {
      * @return A promise that resolves when tracking is enabled.
      */
     fun enableTracking(jsEmarsysConfig: JsEmarsysConfig): Promise<Any> {
-        return coroutineScope.promise {
+        return applicationScope.promise {
             Emarsys.enableTracking(jsEmarsysConfig)
         }
     }
@@ -45,45 +53,8 @@ class EmarsysJs {
      *
      */
     fun disableTracking(): Promise<Any> {
-        return coroutineScope.promise {
+        return applicationScope.promise {
             Emarsys.disableTracking()
-        }
-    }
-
-    /**
-     * Links a contact to the SDK using the specified contact field ID and value.
-     *
-     * @param contactFieldId The ID of the contact field.
-     * @param contactFieldValue The value of the contact field.
-     * @return A promise that resolves when the contact is linked.
-     */
-    fun linkContact(contactFieldId: Int, contactFieldValue: String): Promise<Any> {
-        return coroutineScope.promise {
-            Emarsys.contact.linkContact(contactFieldId, contactFieldValue)
-        }
-    }
-
-    /**
-     * Links an authenticated contact to the SDK using the specified contact field ID and OpenID token.
-     * Authenticated contacts are already verified through any OpenID provider like Google or Apple
-     *
-     * @param contactFieldId The ID of the contact field.
-     * @param openIdToken The OpenID token for authentication.
-     */
-    fun linkAuthenticatedContact(contactFieldId: Int, openIdToken: String): Promise<Any> {
-        return coroutineScope.promise {
-            Emarsys.contact.linkAuthenticatedContact(contactFieldId, openIdToken)
-        }
-    }
-
-    /**
-     * Unlinks the currently linked contact from the SDK. And replaces it with an anonymous contact
-     *
-     * @return A promise that resolves when the contact is unlinked.
-     */
-    fun unlinkContact(): Promise<Any> {
-        return coroutineScope.promise {
-            Emarsys.contact.unlinkContact()
         }
     }
 
@@ -95,7 +66,7 @@ class EmarsysJs {
      * @return A promise that resolves when the event is tracked.
      */
     fun trackCustomEvent(eventName: String, eventPayload: Map<String, String>?): Promise<Any> {
-        return coroutineScope.promise {
+        return applicationScope.promise {
             Emarsys.tracking.trackCustomEvent(CustomEvent(eventName, eventPayload))
         }
     }
