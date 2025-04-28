@@ -31,18 +31,18 @@ class IosPush<Logging : IosPushInstance, Gatherer : IosPushInstance, Internal : 
     }
 
     override suspend fun getPushToken(): Result<String?> {
-        return kotlin.runCatching {  activeInstance<PushInternalApi>().getPushToken() }
+        return kotlin.runCatching { activeInstance<PushInternalApi>().getPushToken() }
     }
 
-    override var customerUserNotificationCenterDelegate: Result<UNUserNotificationCenterDelegateProtocol?>
-        get() = runCatching { activeInstance<IosPushInstance>().customerUserNotificationCenterDelegate }
+    override var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol?
+        get() = activeInstance<IosPushInstance>().customerUserNotificationCenterDelegate
         set(value) {
             activeInstance<IosPushInstance>().customerUserNotificationCenterDelegate =
-                value.getOrNull()
+                value
         }
 
-    override val emarsysUserNotificationCenterDelegate: Result<UNUserNotificationCenterDelegateProtocol>
-        get() = runCatching { activeInstance<IosPushInstance>().emarsysUserNotificationCenterDelegate }
+    override val emarsysUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol
+        get() = activeInstance<IosPushInstance>().emarsysUserNotificationCenterDelegate
 
     override suspend fun handleSilentMessageWithUserInfo(rawUserInfo: Map<String, Any>): Result<Unit> =
         runCatching {
@@ -50,7 +50,9 @@ class IosPush<Logging : IosPushInstance, Gatherer : IosPushInstance, Internal : 
                 try {
                     val pushUserInfo = rawUserInfo.toSilentPushUserInfo(JsonUtil.json)
                     pushUserInfo?.let {
-                        activeInstance<IosPushInstance>().handleSilentMessageWithUserInfo(pushUserInfo)
+                        activeInstance<IosPushInstance>().handleSilentMessageWithUserInfo(
+                            pushUserInfo
+                        )
                     }
                 } catch (e: Exception) {
                     sdkLogger.error("IosPush - handleSilentMessageWithUserInfo", e)

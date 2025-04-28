@@ -24,6 +24,7 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -298,9 +299,7 @@ class IosPushTests {
 
         val result = iosPush.customerUserNotificationCenterDelegate
 
-        result.onSuccess {
-            it shouldBe null
-        }
+        result shouldBe null
     }
 
     @Test
@@ -310,11 +309,12 @@ class IosPushTests {
         } returns testUNUserNotificationCenterDelegateProtocol
 
         sdkContext.setSdkState(SdkState.onHold)
+
+        advanceUntilIdle()
+
         val result = iosPush.customerUserNotificationCenterDelegate
 
-        result.onSuccess {
-            it shouldBe testUNUserNotificationCenterDelegateProtocol
-        }
+        result shouldBe testUNUserNotificationCenterDelegateProtocol
     }
 
     @Test
@@ -324,11 +324,12 @@ class IosPushTests {
         } returns testUNUserNotificationCenterDelegateProtocol
 
         sdkContext.setSdkState(SdkState.active)
+
+        advanceUntilIdle()
+
         val result = iosPush.customerUserNotificationCenterDelegate
 
-        result.onSuccess {
-            it shouldBe testUNUserNotificationCenterDelegateProtocol
-        }
+        result shouldBe testUNUserNotificationCenterDelegateProtocol
     }
 
     @Test
@@ -337,11 +338,9 @@ class IosPushTests {
             mockLoggingPush.emarsysUserNotificationCenterDelegate
         } returns testUNUserNotificationCenterDelegateProtocol
 
-        val result = iosPush.customerUserNotificationCenterDelegate
+        val result = iosPush.emarsysUserNotificationCenterDelegate
 
-        result.onSuccess {
-            it shouldBe null
-        }
+        result shouldBe null
     }
 
     @Test
@@ -351,11 +350,12 @@ class IosPushTests {
         } returns testUNUserNotificationCenterDelegateProtocol
 
         sdkContext.setSdkState(SdkState.onHold)
-        val result = iosPush.customerUserNotificationCenterDelegate
 
-        result.onSuccess {
-            it shouldBe testUNUserNotificationCenterDelegateProtocol
-        }
+        advanceUntilIdle()
+
+        val result = iosPush.emarsysUserNotificationCenterDelegate
+
+        result shouldBe testUNUserNotificationCenterDelegateProtocol
     }
 
     @Test
@@ -365,11 +365,12 @@ class IosPushTests {
         } returns testUNUserNotificationCenterDelegateProtocol
 
         sdkContext.setSdkState(SdkState.active)
-        val result = iosPush.customerUserNotificationCenterDelegate
 
-        result.onSuccess {
-            it shouldBe testUNUserNotificationCenterDelegateProtocol
-        }
+        advanceUntilIdle()
+
+        val result = iosPush.emarsysUserNotificationCenterDelegate
+
+        result shouldBe testUNUserNotificationCenterDelegateProtocol
     }
 
     @Test

@@ -4,6 +4,8 @@ import app.cash.sqldelight.driver.native.NativeSqliteDriver
 import com.emarsys.EmarsysConfig
 import com.emarsys.api.contact.IosContact
 import com.emarsys.api.contact.IosContactApi
+import com.emarsys.api.push.IosPublicPush
+import com.emarsys.api.push.IosPublicPushApi
 import com.emarsys.api.push.PushApi
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
@@ -77,6 +79,7 @@ object IosInjection {
     val iosModules = module {
         single<NSUserDefaults> { NSUserDefaults(StorageConstants.SUITE_NAME) }
         single<IosContactApi> { IosContact() }
+        single<IosPublicPushApi> { IosPublicPush() }
         single<UNUserNotificationCenter> { UNUserNotificationCenter.currentNotificationCenter() }
         single<StringStorageApi> { StringStorage(userDefaults = get()) }
         single<SdkConfigStoreApi<EmarsysConfig>> {
