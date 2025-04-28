@@ -5,7 +5,7 @@ import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.tracking.TrackingApi
 
 class IosPublicTracking: IosPublicTrackingApi {
-    override suspend fun trackCustomEvent(event: CustomEvent) {
+    override suspend fun track(event: CustomEvent) {
         koin.get<TrackingApi>().trackCustomEvent(event)
     }
 }

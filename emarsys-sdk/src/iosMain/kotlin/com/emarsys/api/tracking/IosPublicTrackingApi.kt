@@ -5,5 +5,5 @@ import io.ktor.utils.io.CancellationException
 
 interface IosPublicTrackingApi {
     @Throws(CancellationException::class)
-    suspend fun trackCustomEvent(event: CustomEvent)
+    suspend fun track(event: CustomEvent)
 }
