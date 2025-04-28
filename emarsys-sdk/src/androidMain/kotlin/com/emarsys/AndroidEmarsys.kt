@@ -37,15 +37,15 @@ object AndroidEmarsys {
     }
 
     suspend fun linkContact(contactFieldId: Int, contactFieldValue: String) {
-        Emarsys.linkContact(contactFieldId, contactFieldValue)
+        Emarsys.contact.linkContact(contactFieldId, contactFieldValue)
     }
 
     suspend fun linkAuthenticatedContact(contactFieldId: Int, openIdToken: String) {
-        Emarsys.linkAuthenticatedContact(contactFieldId, openIdToken)
+        Emarsys.contact.linkAuthenticatedContact(contactFieldId, openIdToken)
     }
 
     suspend fun unlinkContact() {
-        Emarsys.unlinkContact()
+        Emarsys.contact.unlinkContact()
     }
 
     suspend fun trackCustomEvent(event: String, attributes: Map<String, String>?) {

@@ -16,9 +16,9 @@ import com.emarsys.di.EventFlowTypes
 import com.emarsys.di.SdkKoinIsolationContext
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.disable.DisableOrganizerApi
+import com.emarsys.enable.EnableOrganizerApi
 import com.emarsys.init.InitOrganizerApi
 import com.emarsys.networking.clients.event.model.SdkEvent
-import com.emarsys.enable.EnableOrganizerApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import org.koin.core.qualifier.named
@@ -68,34 +68,6 @@ object Emarsys {
     }
 
     /**
-     * Links a contact to the SDK using the specified contact field ID and value.
-     *
-     * @param contactFieldId The ID of the contact field.
-     * @param contactFieldValue The value of the contact field.
-     */
-    suspend fun linkContact(contactFieldId: Int, contactFieldValue: String) {
-        koin.get<ContactApi>().linkContact(contactFieldId, contactFieldValue)
-    }
-
-    /**
-     * Links an authenticated contact to the SDK using the specified contact field ID and OpenID token.
-     * Authenticated contacts are already verified through any OpenID provider like Google or Apple
-     *
-     * @param contactFieldId The ID of the contact field.
-     * @param openIdToken The OpenID token for authentication.
-     */
-    suspend fun linkAuthenticatedContact(contactFieldId: Int, openIdToken: String) {
-        koin.get<ContactApi>().linkAuthenticatedContact(contactFieldId, openIdToken)
-    }
-
-    /**
-     * Unlinks the currently linked contact from the SDK. And replaces it with an anonymous contact
-     */
-    suspend fun unlinkContact() {
-        koin.get<ContactApi>().unlinkContact()
-    }
-
-    /**
      * Tracks a custom event with the specified name and optional attributes. These custom events can be used to trigger In-App campaigns or any automation configured at Emarsys.
      *
      * @param event The name of the custom event.
@@ -107,6 +79,9 @@ object Emarsys {
 
     val events: SharedFlow<SdkEvent>
         get() = koin.get<MutableSharedFlow<SdkEvent>>(named(EventFlowTypes.Public))
+
+    val contact: ContactApi
+        get() = koin.get<ContactApi>()
 
     val push: PushApi
         get() = koin.get<PushApi>()

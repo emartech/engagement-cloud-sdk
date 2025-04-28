@@ -21,6 +21,13 @@ class Contact<Logging : ContactInstance, Gatherer : ContactInstance, Internal : 
     internalApi,
     sdkContext
 ), ContactApi {
+
+    /**
+     * Links a contact to the SDK using the specified contact field ID and value.
+     *
+     * @param contactFieldId The ID of the contact field.
+     * @param contactFieldValue The value of the contact field.
+     */
     override suspend fun linkContact(contactFieldId: Int, contactFieldValue: String): Result<Unit> =
         runCatching {
             withContext(sdkContext.sdkDispatcher) {
@@ -41,6 +48,13 @@ class Contact<Logging : ContactInstance, Gatherer : ContactInstance, Internal : 
             }
         }
 
+    /**
+     * Links an authenticated contact to the SDK using the specified contact field ID and OpenID token.
+     * Authenticated contacts are already verified through any OpenID provider like Google or Apple
+     *
+     * @param contactFieldId The ID of the contact field.
+     * @param openIdToken The OpenID token for authentication.
+     */
     override suspend fun linkAuthenticatedContact(
         contactFieldId: Int,
         openIdToken: String
@@ -64,6 +78,9 @@ class Contact<Logging : ContactInstance, Gatherer : ContactInstance, Internal : 
             }
         }
 
+    /**
+     * Unlinks the currently linked contact from the SDK. And replaces it with an anonymous contact
+     */
     override suspend fun unlinkContact(): Result<Unit> = runCatching {
         withContext(sdkContext.sdkDispatcher) {
             activeInstance<ContactInternalApi>().unlinkContact()

@@ -1,9 +1,5 @@
 package com.emarsys
 
-import com.emarsys.api.contact.ContactApi
-import com.emarsys.core.exceptions.SdkAlreadyDisabledException
-import com.emarsys.di.SdkKoinIsolationContext.koin
-import io.ktor.utils.io.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.promise
@@ -62,7 +58,7 @@ class EmarsysJs {
      */
     fun linkContact(contactFieldId: Int, contactFieldValue: String): Promise<Any> {
         return coroutineScope.promise {
-            Emarsys.linkContact(contactFieldId, contactFieldValue)
+            Emarsys.contact.linkContact(contactFieldId, contactFieldValue)
         }
     }
 
@@ -75,7 +71,7 @@ class EmarsysJs {
      */
     fun linkAuthenticatedContact(contactFieldId: Int, openIdToken: String): Promise<Any> {
         return coroutineScope.promise {
-            Emarsys.linkAuthenticatedContact(contactFieldId, openIdToken)
+            Emarsys.contact.linkAuthenticatedContact(contactFieldId, openIdToken)
         }
     }
 
@@ -86,7 +82,7 @@ class EmarsysJs {
      */
     fun unlinkContact(): Promise<Any> {
         return coroutineScope.promise {
-            Emarsys.unlinkContact()
+            Emarsys.contact.unlinkContact()
         }
     }
 

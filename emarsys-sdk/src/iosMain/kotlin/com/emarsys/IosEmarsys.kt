@@ -1,6 +1,7 @@
 package com.emarsys
 
 import com.emarsys.api.config.ConfigApi
+import com.emarsys.api.contact.ContactApi
 import com.emarsys.api.geofence.GeofenceTrackerApi
 import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.inbox.InboxApi
@@ -16,6 +17,8 @@ import kotlin.experimental.ExperimentalObjCName
 @OptIn(ExperimentalObjCName::class)
 @ObjCName("Emarsys")
 object IosEmarsys {
+    val contact: ContactApi
+        get() = Emarsys.contact
     val push: IosPushApi
         get() = Emarsys.push as IosPushApi
     val inApp: InAppApi
@@ -63,34 +66,6 @@ object IosEmarsys {
                 throw it
             }
         }
-    }
-
-    /**
-     * Links a contact to the SDK using the specified contact field ID and value.
-     *
-     * @param contactFieldId The ID of the contact field.
-     * @param contactFieldValue The value of the contact field.
-     */
-    suspend fun linkContact(contactFieldId: Int, contactFieldValue: String) {
-        Emarsys.linkContact(contactFieldId, contactFieldValue)
-    }
-
-    /**
-     * Links an authenticated contact to the SDK using the specified contact field ID and OpenID token.
-     * Authenticated contacts are already verified through any OpenID provider like Google or Apple
-     *
-     * @param contactFieldId The ID of the contact field.
-     * @param openIdToken The OpenID token for authentication.
-     */
-    suspend fun linkAuthenticatedContact(contactFieldId: Int, openIdToken: String) {
-        Emarsys.linkAuthenticatedContact(contactFieldId, openIdToken)
-    }
-
-    /**
-     * Unlinks the currently linked contact from the SDK. And replaces it with an anonymous contact
-     */
-    suspend fun unlinkContact() {
-        Emarsys.unlinkContact()
     }
 
     /**

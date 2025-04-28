@@ -30,7 +30,7 @@ fun App() {
             Button(onClick = {
                 CoroutineScope(Dispatchers.Default).launch {
                     enableTracking()
-                    Emarsys.linkContact(100027299, "test@test.com")
+                    Emarsys.contact.linkContact(100027299, "test@test.com")
                 }
             }) {
                 Text("enable SDK & link contact")
