@@ -7,6 +7,8 @@ import com.emarsys.api.contact.IosPublicContactApi
 import com.emarsys.api.push.IosPublicPush
 import com.emarsys.api.push.IosPublicPushApi
 import com.emarsys.api.push.PushApi
+import com.emarsys.api.tracking.IosPublicTracking
+import com.emarsys.api.tracking.IosPublicTrackingApi
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
@@ -80,6 +82,7 @@ object IosInjection {
         single<NSUserDefaults> { NSUserDefaults(StorageConstants.SUITE_NAME) }
         single<IosPublicContactApi> { IosPublicContact() }
         single<IosPublicPushApi> { IosPublicPush() }
+        single<IosPublicTrackingApi> { IosPublicTracking() }
         single<UNUserNotificationCenter> { UNUserNotificationCenter.currentNotificationCenter() }
         single<StringStorageApi> { StringStorage(userDefaults = get()) }
         single<SdkConfigStoreApi<EmarsysConfig>> {

@@ -7,10 +7,10 @@ import com.emarsys.api.geofence.GeofenceTrackerApi
 import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.predict.PredictApi
 import com.emarsys.api.push.IosPublicPushApi
+import com.emarsys.api.tracking.IosPublicTrackingApi
 import com.emarsys.core.exceptions.SdkAlreadyDisabledException
 import com.emarsys.core.exceptions.SdkAlreadyEnabledException
 import com.emarsys.di.SdkKoinIsolationContext.koin
-import com.emarsys.tracking.TrackingApi
 import io.ktor.http.Url
 import io.ktor.utils.io.CancellationException
 import platform.Foundation.NSUserActivity
@@ -23,8 +23,8 @@ object IosEmarsys {
         get() = koin.get<IosPublicContactApi>()
     val push: IosPublicPushApi
         get() = koin.get<IosPublicPushApi>()
-    val tracking: TrackingApi
-        get() = Emarsys.tracking
+    val tracking: IosPublicTrackingApi
+        get() = koin.get<IosPublicTrackingApi>()
     val inApp: InAppApi
         get() = Emarsys.inApp
     val config: ConfigApi
