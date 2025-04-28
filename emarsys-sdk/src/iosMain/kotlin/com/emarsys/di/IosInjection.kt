@@ -4,6 +4,8 @@ import app.cash.sqldelight.driver.native.NativeSqliteDriver
 import com.emarsys.EmarsysConfig
 import com.emarsys.api.contact.IosPublicContact
 import com.emarsys.api.contact.IosPublicContactApi
+import com.emarsys.api.inapp.IosPublicInApp
+import com.emarsys.api.inapp.IosPublicInAppApi
 import com.emarsys.api.push.IosPublicPush
 import com.emarsys.api.push.IosPublicPushApi
 import com.emarsys.api.push.PushApi
@@ -60,6 +62,7 @@ import com.emarsys.mobileengage.inapp.providers.WindowProvider
 import com.emarsys.mobileengage.push.IosGathererPush
 import com.emarsys.mobileengage.push.IosLoggingPush
 import com.emarsys.mobileengage.push.IosPush
+import com.emarsys.mobileengage.push.IosPushApi
 import com.emarsys.mobileengage.push.IosPushInstance
 import com.emarsys.mobileengage.push.IosPushInternal
 import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
@@ -69,6 +72,7 @@ import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import org.koin.core.module.Module
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
+import org.koin.dsl.binds
 import org.koin.dsl.module
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSProcessInfo
@@ -83,6 +87,7 @@ object IosInjection {
         single<IosPublicContactApi> { IosPublicContact() }
         single<IosPublicPushApi> { IosPublicPush() }
         single<IosPublicTrackingApi> { IosPublicTracking() }
+        single<IosPublicInAppApi> { IosPublicInApp() }
         single<UNUserNotificationCenter> { UNUserNotificationCenter.currentNotificationCenter() }
         single<StringStorageApi> { StringStorage(userDefaults = get()) }
         single<SdkConfigStoreApi<EmarsysConfig>> {
@@ -218,7 +223,10 @@ object IosInjection {
                 sdkContext = get(),
                 sdkLogger = get { parametersOf(IosPush::class.simpleName) }
             )
-        }
+        } binds arrayOf(
+            IosPushApi::class,
+            PushApi::class
+        )
     }
 }
 

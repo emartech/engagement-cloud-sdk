@@ -4,7 +4,7 @@ import com.emarsys.api.config.ConfigApi
 import com.emarsys.api.contact.IosPublicContactApi
 import com.emarsys.api.extension.throwErrorFromResult
 import com.emarsys.api.geofence.GeofenceTrackerApi
-import com.emarsys.api.inapp.InAppApi
+import com.emarsys.api.inapp.IosPublicInAppApi
 import com.emarsys.api.predict.PredictApi
 import com.emarsys.api.push.IosPublicPushApi
 import com.emarsys.api.tracking.IosPublicTrackingApi
@@ -25,8 +25,8 @@ object IosEmarsys {
         get() = koin.get<IosPublicPushApi>()
     val tracking: IosPublicTrackingApi
         get() = koin.get<IosPublicTrackingApi>()
-    val inApp: InAppApi
-        get() = Emarsys.inApp
+    val inApp: IosPublicInAppApi
+        get() = koin.get<IosPublicInAppApi>()
     val config: ConfigApi
         get() = Emarsys.config
     val geofence: GeofenceTrackerApi
