@@ -1,7 +1,7 @@
 package com.emarsys
 
 import com.emarsys.api.config.ConfigApi
-import com.emarsys.api.contact.IosContactApi
+import com.emarsys.api.contact.IosPublicContactApi
 import com.emarsys.api.extension.throwErrorFromResult
 import com.emarsys.api.geofence.GeofenceTrackerApi
 import com.emarsys.api.inapp.InAppApi
@@ -19,8 +19,8 @@ import kotlin.experimental.ExperimentalObjCName
 @OptIn(ExperimentalObjCName::class)
 @ObjCName("Emarsys")
 object IosEmarsys {
-    val contact: IosContactApi
-        get() = koin.get<IosContactApi>()
+    val contact: IosPublicContactApi
+        get() = koin.get<IosPublicContactApi>()
     val push: IosPublicPushApi
         get() = koin.get<IosPublicPushApi>()
     val tracking: TrackingApi

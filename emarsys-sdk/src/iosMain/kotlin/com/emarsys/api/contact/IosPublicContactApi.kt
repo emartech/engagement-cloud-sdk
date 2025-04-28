@@ -2,7 +2,7 @@ package com.emarsys.api.contact
 
 import io.ktor.utils.io.CancellationException
 
-interface IosContactApi {
+interface IosPublicContactApi {
 
     @Throws(CancellationException::class)
     suspend fun link(contactFieldId: Int, contactFieldValue: String)
