@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import com.emarsys.SdkConstants.EMS_DEEP_LINK_TRACKED_KEY
 import com.emarsys.api.config.ConfigApi
+import com.emarsys.api.contact.ContactApi
 import com.emarsys.api.geofence.GeofenceTrackerApi
 import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.inbox.InboxApi
@@ -15,6 +16,8 @@ import io.ktor.http.Url
 
 object AndroidEmarsys {
 
+    val contact: ContactApi
+        get() = Emarsys.contact
     val push: PushApi
         get() = Emarsys.push
     val inApp: InAppApi
@@ -34,18 +37,6 @@ object AndroidEmarsys {
 
     suspend fun enableTracking(config: SdkConfig) {
         Emarsys.enableTracking(config)
-    }
-
-    suspend fun linkContact(contactFieldId: Int, contactFieldValue: String) {
-        Emarsys.contact.linkContact(contactFieldId, contactFieldValue)
-    }
-
-    suspend fun linkAuthenticatedContact(contactFieldId: Int, openIdToken: String) {
-        Emarsys.contact.linkAuthenticatedContact(contactFieldId, openIdToken)
-    }
-
-    suspend fun unlinkContact() {
-        Emarsys.contact.unlinkContact()
     }
 
     suspend fun trackCustomEvent(event: String, attributes: Map<String, String>?) {
