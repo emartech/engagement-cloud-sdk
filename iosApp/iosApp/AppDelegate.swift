@@ -10,11 +10,21 @@ import EmarsysSDK
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     let center = UNUserNotificationCenter.current()
-    public static var pushToken: String!
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
 
-        center.delegate = self
+        Task {
+            try? await Emarsys.shared.initialize()
+            
+            center.delegate = Emarsys.shared.push.emarsysUserNotificationCenterDelegate
+            do {
+                try await Emarsys.shared.enableTracking(config: EmarsysConfig(applicationCode: "EMS11-C3FD3"))
+                try await Emarsys.shared.contact.link(contactFieldId: 2575, contactFieldValue: "test2@test.com")
+            } catch {
+                print(error)
+            }
+        }
+        
         Task { @MainActor in
             do {
                 let permissionGranted = try await center.requestAuthorization(options: [.alert, .sound, .badge, .provisional])
@@ -36,9 +46,15 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         let tokenString = deviceToken.reduce("", {$0 + String(format: "%02x", $1)})
-    
-        AppDelegate.pushToken = tokenString
         print("Push token - \(tokenString)")
+    
+        Task {
+            do {
+                let result = try await Emarsys.shared.push.registerToken(token: tokenString)
+            } catch {
+                print("push token track failed: \(error)")
+            }
+        }
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
