@@ -12,6 +12,7 @@ import com.emarsys.api.predict.PredictApi
 import com.emarsys.api.push.PushApi
 import com.emarsys.core.log.Logger
 import com.emarsys.di.SdkKoinIsolationContext.koin
+import com.emarsys.tracking.TrackingApi
 import io.ktor.http.Url
 
 object AndroidEmarsys {
@@ -20,6 +21,8 @@ object AndroidEmarsys {
         get() = Emarsys.contact
     val push: PushApi
         get() = Emarsys.push
+    val tracking: TrackingApi
+        get() = Emarsys.tracking
     val inApp: InAppApi
         get() = Emarsys.inApp
     val inbox: InboxApi
@@ -37,10 +40,6 @@ object AndroidEmarsys {
 
     suspend fun enableTracking(config: SdkConfig) {
         Emarsys.enableTracking(config)
-    }
-
-    suspend fun trackCustomEvent(event: String, attributes: Map<String, String>?) {
-        Emarsys.trackCustomEvent(event, attributes)
     }
 
     suspend fun trackDeepLink(activity: Activity, intent: Intent) {

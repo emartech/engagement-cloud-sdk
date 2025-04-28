@@ -1,5 +1,6 @@
 package com.emarsys
 
+import com.emarsys.api.event.model.CustomEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.promise
@@ -95,7 +96,7 @@ class EmarsysJs {
      */
     fun trackCustomEvent(eventName: String, eventPayload: Map<String, String>?): Promise<Any> {
         return coroutineScope.promise {
-            Emarsys.trackCustomEvent(eventName, eventPayload)
+            Emarsys.tracking.trackCustomEvent(CustomEvent(eventName, eventPayload))
         }
     }
 

@@ -3,8 +3,6 @@ package com.emarsys
 import com.emarsys.api.config.ConfigApi
 import com.emarsys.api.contact.ContactApi
 import com.emarsys.api.deepLink.DeepLinkApi
-import com.emarsys.api.event.EventTrackerApi
-import com.emarsys.api.event.model.CustomEvent
 import com.emarsys.api.geofence.GeofenceTrackerApi
 import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.inbox.InboxApi
@@ -19,6 +17,7 @@ import com.emarsys.disable.DisableOrganizerApi
 import com.emarsys.enable.EnableOrganizerApi
 import com.emarsys.init.InitOrganizerApi
 import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.tracking.TrackingApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import org.koin.core.qualifier.named
@@ -67,16 +66,6 @@ object Emarsys {
         }
     }
 
-    /**
-     * Tracks a custom event with the specified name and optional attributes. These custom events can be used to trigger In-App campaigns or any automation configured at Emarsys.
-     *
-     * @param event The name of the custom event.
-     * @param attributes Optional attributes for the event.
-     */
-    suspend fun trackCustomEvent(event: String, attributes: Map<String, String>? = null) {
-        koin.get<EventTrackerApi>().trackEvent(CustomEvent(event, attributes))
-    }
-
     val events: SharedFlow<SdkEvent>
         get() = koin.get<MutableSharedFlow<SdkEvent>>(named(EventFlowTypes.Public))
 
@@ -85,6 +74,9 @@ object Emarsys {
 
     val push: PushApi
         get() = koin.get<PushApi>()
+
+    val tracking: TrackingApi
+        get() = koin.get<TrackingApi>()
 
     val inApp: InAppApi
         get() = koin.get<InAppApi>()

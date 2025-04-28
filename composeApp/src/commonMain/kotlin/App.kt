@@ -6,6 +6,7 @@ import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import com.emarsys.Emarsys
+import com.emarsys.api.event.model.CustomEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -42,7 +43,7 @@ fun App() {
             Button(onClick = {
                 if (eventName.value.isNotBlank()) {
                     CoroutineScope(Dispatchers.Default).launch {
-                        Emarsys.trackCustomEvent(eventName.value, null)
+                        Emarsys.tracking.trackCustomEvent(CustomEvent(eventName.value, null))
 
                     }
                 }

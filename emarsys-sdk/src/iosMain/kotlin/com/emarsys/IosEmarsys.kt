@@ -9,6 +9,7 @@ import com.emarsys.api.predict.PredictApi
 import com.emarsys.core.exceptions.SdkAlreadyDisabledException
 import com.emarsys.core.exceptions.SdkAlreadyEnabledException
 import com.emarsys.mobileengage.push.IosPushApi
+import com.emarsys.tracking.TrackingApi
 import io.ktor.http.Url
 import io.ktor.utils.io.CancellationException
 import platform.Foundation.NSUserActivity
@@ -21,6 +22,8 @@ object IosEmarsys {
         get() = Emarsys.contact
     val push: IosPushApi
         get() = Emarsys.push as IosPushApi
+    val tracking: TrackingApi
+        get() = Emarsys.tracking
     val inApp: InAppApi
         get() = Emarsys.inApp
     val inbox: InboxApi
@@ -66,16 +69,6 @@ object IosEmarsys {
                 throw it
             }
         }
-    }
-
-    /**
-     * Tracks a custom event with the specified name and optional attributes. These custom events can be used to trigger In-App campaigns or any automation configured at Emarsys.
-     *
-     * @param event The name of the custom event.
-     * @param attributes Optional attributes for the event.
-     */
-    suspend fun trackCustomEvent(event: String, attributes: Map<String, String>?) {
-        Emarsys.trackCustomEvent(event, attributes)
     }
 
     /**
