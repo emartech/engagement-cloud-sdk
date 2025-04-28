@@ -1,13 +1,14 @@
 package com.emarsys
 
 import com.emarsys.api.config.ConfigApi
-import com.emarsys.api.contact.ContactApi
+import com.emarsys.api.contact.IosContactApi
+import com.emarsys.api.extension.throwErrorFromResult
 import com.emarsys.api.geofence.GeofenceTrackerApi
 import com.emarsys.api.inapp.InAppApi
-import com.emarsys.api.inbox.InboxApi
 import com.emarsys.api.predict.PredictApi
 import com.emarsys.core.exceptions.SdkAlreadyDisabledException
 import com.emarsys.core.exceptions.SdkAlreadyEnabledException
+import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.mobileengage.push.IosPushApi
 import com.emarsys.tracking.TrackingApi
 import io.ktor.http.Url
@@ -18,16 +19,14 @@ import kotlin.experimental.ExperimentalObjCName
 @OptIn(ExperimentalObjCName::class)
 @ObjCName("Emarsys")
 object IosEmarsys {
-    val contact: ContactApi
-        get() = Emarsys.contact
+    val contact: IosContactApi
+        get() = koin.get<IosContactApi>()
     val push: IosPushApi
         get() = Emarsys.push as IosPushApi
     val tracking: TrackingApi
         get() = Emarsys.tracking
     val inApp: InAppApi
         get() = Emarsys.inApp
-    val inbox: InboxApi
-        get() = Emarsys.inbox
     val config: ConfigApi
         get() = Emarsys.config
     val geofence: GeofenceTrackerApi
@@ -38,6 +37,7 @@ object IosEmarsys {
     /**
      * Initializes the SDK. This method must be called before using any other SDK functionality.
      */
+    @Throws(CancellationException::class)
     suspend fun initialize() {
         Emarsys.initialize()
     }
@@ -49,26 +49,15 @@ object IosEmarsys {
      */
     @Throws(SdkAlreadyEnabledException::class, CancellationException::class)
     suspend fun enableTracking(config: SdkConfig) {
-        val result = Emarsys.enableTracking(config)
-        if (result.isFailure) {
-            result.exceptionOrNull()?.let {
-                throw it
-            }
-        }
+        Emarsys.enableTracking(config).throwErrorFromResult()
     }
 
     /**
      * Disables tracking.
-     *
      */
     @Throws(SdkAlreadyDisabledException::class, CancellationException::class)
     suspend fun disableTracking() {
-        val result = Emarsys.disableTracking()
-        if (result.isFailure) {
-            result.exceptionOrNull()?.let {
-                throw it
-            }
-        }
+        Emarsys.disableTracking().throwErrorFromResult()
     }
 
     /**

@@ -2,6 +2,8 @@ package com.emarsys.di
 
 import app.cash.sqldelight.driver.native.NativeSqliteDriver
 import com.emarsys.EmarsysConfig
+import com.emarsys.api.contact.IosContact
+import com.emarsys.api.contact.IosContactApi
 import com.emarsys.api.push.PushApi
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
@@ -37,6 +39,10 @@ import com.emarsys.core.url.IosExternalUrlOpener
 import com.emarsys.core.watchdog.connection.IosConnectionWatchdog
 import com.emarsys.core.watchdog.connection.NWPathMonitorWrapper
 import com.emarsys.core.watchdog.lifecycle.IosLifecycleWatchdog
+import com.emarsys.enable.PlatformInitializer
+import com.emarsys.enable.PlatformInitializerApi
+import com.emarsys.enable.config.IosSdkConfigStore
+import com.emarsys.enable.config.SdkConfigStoreApi
 import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppViewProvider
@@ -53,10 +59,6 @@ import com.emarsys.mobileengage.push.IosPush
 import com.emarsys.mobileengage.push.IosPushInstance
 import com.emarsys.mobileengage.push.IosPushInternal
 import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
-import com.emarsys.enable.PlatformInitializer
-import com.emarsys.enable.PlatformInitializerApi
-import com.emarsys.enable.config.IosSdkConfigStore
-import com.emarsys.enable.config.SdkConfigStoreApi
 import com.emarsys.sqldelight.EmarsysDB
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
@@ -74,6 +76,7 @@ import platform.UserNotifications.UNUserNotificationCenter
 object IosInjection {
     val iosModules = module {
         single<NSUserDefaults> { NSUserDefaults(StorageConstants.SUITE_NAME) }
+        single<IosContactApi> { IosContact() }
         single<UNUserNotificationCenter> { UNUserNotificationCenter.currentNotificationCenter() }
         single<StringStorageApi> { StringStorage(userDefaults = get()) }
         single<SdkConfigStoreApi<EmarsysConfig>> {
