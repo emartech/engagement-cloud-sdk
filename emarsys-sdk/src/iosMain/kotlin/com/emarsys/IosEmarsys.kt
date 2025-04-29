@@ -4,7 +4,7 @@ import com.emarsys.api.config.IosConfigApi
 import com.emarsys.api.contact.IosContactApi
 import com.emarsys.api.geofence.IosGeofenceApi
 import com.emarsys.api.inapp.IosInAppApi
-import com.emarsys.api.predict.PredictApi
+import com.emarsys.api.predict.IosPredictApi
 import com.emarsys.api.push.IosPushApi
 import com.emarsys.api.tracking.IosTrackingApi
 import com.emarsys.core.exceptions.SdkAlreadyDisabledException
@@ -30,8 +30,8 @@ object IosEmarsys {
         get() = koin.get<IosConfigApi>()
     val geofence: IosGeofenceApi
         get() = koin.get<IosGeofenceApi>()
-    val predict: PredictApi
-        get() = Emarsys.predict
+    val predict: IosPredictApi
+        get() = koin.get<IosPredictApi>()
 
     /**
      * Initializes the SDK. This method must be called before using any other SDK functionality.

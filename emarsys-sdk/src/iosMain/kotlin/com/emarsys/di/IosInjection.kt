@@ -10,6 +10,8 @@ import com.emarsys.api.geofence.IosGeofence
 import com.emarsys.api.geofence.IosGeofenceApi
 import com.emarsys.api.inapp.IosInApp
 import com.emarsys.api.inapp.IosInAppApi
+import com.emarsys.api.predict.IosPredict
+import com.emarsys.api.predict.IosPredictApi
 import com.emarsys.api.push.IosPush
 import com.emarsys.api.push.IosPushApi
 import com.emarsys.api.push.PushApi
@@ -94,6 +96,7 @@ object IosInjection {
         single<IosInAppApi> { IosInApp() }
         single<IosConfigApi> { IosConfig() }
         single<IosGeofenceApi> { IosGeofence() }
+        single<IosPredictApi> { IosPredict() }
         single<UNUserNotificationCenter> { UNUserNotificationCenter.currentNotificationCenter() }
         single<StringStorageApi> { StringStorage(userDefaults = get()) }
         single<SdkConfigStoreApi<EmarsysConfig>> {
