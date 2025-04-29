@@ -5,5 +5,5 @@ import kotlin.coroutines.cancellation.CancellationException
 
 interface IosDeepLinkApi {
     @Throws(CancellationException::class)
-    suspend fun trackDeepLink(userActivity: NSUserActivity)
+    suspend fun track(userActivity: NSUserActivity)
 }

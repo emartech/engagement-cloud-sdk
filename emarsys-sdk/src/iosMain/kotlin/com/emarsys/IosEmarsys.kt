@@ -31,7 +31,7 @@ object IosEmarsys {
         get() = koin.get<IosGeofenceApi>()
     val predict: IosPredictApi
         get() = koin.get<IosPredictApi>()
-    val deeplink: IosDeepLinkApi
+    val deepLink: IosDeepLinkApi
         get() = koin.get<IosDeepLinkApi>()
 
     /**
