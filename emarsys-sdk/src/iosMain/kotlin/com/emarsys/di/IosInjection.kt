@@ -2,6 +2,8 @@ package com.emarsys.di
 
 import app.cash.sqldelight.driver.native.NativeSqliteDriver
 import com.emarsys.EmarsysConfig
+import com.emarsys.api.config.IosConfig
+import com.emarsys.api.config.IosConfigApi
 import com.emarsys.api.contact.IosContact
 import com.emarsys.api.contact.IosContactApi
 import com.emarsys.api.inapp.IosInApp
@@ -88,6 +90,7 @@ object IosInjection {
         single<IosPushApi> { IosPush() }
         single<IosTrackingApi> { IosTracking() }
         single<IosInAppApi> { IosInApp() }
+        single<IosConfigApi> { IosConfig() }
         single<UNUserNotificationCenter> { UNUserNotificationCenter.currentNotificationCenter() }
         single<StringStorageApi> { StringStorage(userDefaults = get()) }
         single<SdkConfigStoreApi<EmarsysConfig>> {

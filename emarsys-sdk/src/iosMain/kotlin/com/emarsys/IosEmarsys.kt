@@ -1,8 +1,7 @@
 package com.emarsys
 
-import com.emarsys.api.config.ConfigApi
+import com.emarsys.api.config.IosConfigApi
 import com.emarsys.api.contact.IosContactApi
-import com.emarsys.api.extension.throwErrorFromResult
 import com.emarsys.api.geofence.GeofenceTrackerApi
 import com.emarsys.api.inapp.IosInAppApi
 import com.emarsys.api.predict.PredictApi
@@ -27,8 +26,8 @@ object IosEmarsys {
         get() = koin.get<IosTrackingApi>()
     val inApp: IosInAppApi
         get() = koin.get<IosInAppApi>()
-    val config: ConfigApi
-        get() = Emarsys.config
+    val config: IosConfigApi
+        get() = koin.get<IosConfigApi>()
     val geofence: GeofenceTrackerApi
         get() = Emarsys.geofence
     val predict: PredictApi
@@ -49,7 +48,7 @@ object IosEmarsys {
      */
     @Throws(SdkAlreadyEnabledException::class, CancellationException::class)
     suspend fun enableTracking(config: SdkConfig) {
-        Emarsys.enableTracking(config).throwErrorFromResult()
+        Emarsys.enableTracking(config).getOrThrow()
     }
 
     /**
@@ -57,7 +56,7 @@ object IosEmarsys {
      */
     @Throws(SdkAlreadyDisabledException::class, CancellationException::class)
     suspend fun disableTracking() {
-        Emarsys.disableTracking().throwErrorFromResult()
+        Emarsys.disableTracking().getOrThrow()
     }
 
     /**
