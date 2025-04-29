@@ -3,6 +3,7 @@ package com.emarsys
 import com.emarsys.api.config.JSConfigApi
 import com.emarsys.api.contact.JSContactApi
 import com.emarsys.api.deeplink.JSDeepLinkApi
+import com.emarsys.api.geofence.JSGeofenceApi
 import com.emarsys.api.push.JSPushApi
 import com.emarsys.api.tracking.JSTrackingApi
 import com.emarsys.di.CoroutineScopeTypes
@@ -29,6 +30,7 @@ object EmarsysJs {
     lateinit var tracking: JSTrackingApi
     lateinit var push: JSPushApi
     lateinit var deepLink: JSDeepLinkApi
+    lateinit var geofence: JSGeofenceApi
 
     /**
      * Initializes the SDK. This method must be called before using any other SDK functionality.
@@ -44,6 +46,7 @@ object EmarsysJs {
             tracking = koin.get<JSTrackingApi>()
             push = koin.get<JSPushApi>()
             deepLink = koin.get<JSDeepLinkApi>()
+            geofence = koin.get<JSGeofenceApi>()
         }
     }
 
