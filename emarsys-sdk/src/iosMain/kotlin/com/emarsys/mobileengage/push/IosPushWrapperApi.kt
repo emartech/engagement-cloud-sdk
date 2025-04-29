@@ -4,7 +4,7 @@ package com.emarsys.mobileengage.push
 import com.emarsys.api.push.PushApi
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 
-internal interface IosPushApi: PushApi {
+internal interface IosPushWrapperApi: PushApi {
     var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol?
     val emarsysUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol
 

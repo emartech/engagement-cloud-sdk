@@ -4,7 +4,7 @@ import com.emarsys.core.exceptions.PreconditionFailedException
 import io.ktor.utils.io.CancellationException
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 
-interface IosPublicPushApi {
+interface IosPushApi {
     var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol?
     val emarsysUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol
 

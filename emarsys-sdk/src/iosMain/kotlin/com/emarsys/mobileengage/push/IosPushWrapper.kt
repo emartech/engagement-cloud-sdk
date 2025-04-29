@@ -10,14 +10,14 @@ import com.emarsys.util.JsonUtil
 import kotlinx.coroutines.withContext
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 
-class IosPush<Logging : IosPushInstance, Gatherer : IosPushInstance, Internal : IosPushInstance>(
+class IosPushWrapper<Logging : IosPushInstance, Gatherer : IosPushInstance, Internal : IosPushInstance>(
     loggingApi: Logging,
     gathererApi: Gatherer,
     internalApi: Internal,
     sdkContext: SdkContextApi,
     private val sdkLogger: Logger
 ) : GenericApi<Logging, Gatherer, Internal>(loggingApi, gathererApi, internalApi, sdkContext),
-    IosPushApi {
+    IosPushWrapperApi {
     override suspend fun registerPushToken(pushToken: String): Result<Unit> = runCatching {
         withContext(sdkContext.sdkDispatcher) {
             activeInstance<PushInternalApi>().registerPushToken(pushToken)

@@ -9,8 +9,8 @@ import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
 import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
-import com.emarsys.mobileengage.push.IosPush
 import com.emarsys.mobileengage.push.IosPushInstance
+import com.emarsys.mobileengage.push.IosPushWrapper
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
@@ -90,7 +90,7 @@ class IosPushTests {
     private lateinit var mockSdkLogger: Logger
     private lateinit var testUNUserNotificationCenterDelegateProtocol: UNUserNotificationCenterDelegateProtocol
     private lateinit var sdkContext: SdkContextApi
-    private lateinit var iosPush: IosPush<IosPushInstance, IosPushInstance, IosPushInstance>
+    private lateinit var iosPushWrapper: IosPushWrapper<IosPushInstance, IosPushInstance, IosPushInstance>
 
     @BeforeTest
     fun setup() = runTest {
@@ -118,9 +118,9 @@ class IosPushTests {
         everySuspend { mockGathererPush.activate() } returns Unit
         everySuspend { mockPushInternal.activate() } returns Unit
 
-        iosPush =
-            IosPush(mockLoggingPush, mockGathererPush, mockPushInternal, sdkContext, mockSdkLogger)
-        iosPush.registerOnContext()
+        iosPushWrapper =
+            IosPushWrapper(mockLoggingPush, mockGathererPush, mockPushInternal, sdkContext, mockSdkLogger)
+        iosPushWrapper.registerOnContext()
     }
 
     @AfterTest
@@ -136,7 +136,7 @@ class IosPushTests {
             )
         } returns Unit
 
-        iosPush.registerPushToken(PUSH_TOKEN)
+        iosPushWrapper.registerPushToken(PUSH_TOKEN)
 
         verifySuspend(exactly(1)) {
             mockLoggingPush.registerPushToken(
@@ -154,7 +154,7 @@ class IosPushTests {
         } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
-        iosPush.registerPushToken(PUSH_TOKEN)
+        iosPushWrapper.registerPushToken(PUSH_TOKEN)
 
         verifySuspend { mockGathererPush.registerPushToken(PUSH_TOKEN) }
     }
@@ -168,7 +168,7 @@ class IosPushTests {
         } returns Unit
 
         sdkContext.setSdkState(SdkState.active)
-        iosPush.registerPushToken(PUSH_TOKEN)
+        iosPushWrapper.registerPushToken(PUSH_TOKEN)
 
         verifySuspend {
             mockPushInternal.registerPushToken(
@@ -187,7 +187,7 @@ class IosPushTests {
         } throws expectedException
 
         sdkContext.setSdkState(SdkState.active)
-        val result = iosPush.registerPushToken(PUSH_TOKEN)
+        val result = iosPushWrapper.registerPushToken(PUSH_TOKEN)
 
         result.isFailure shouldBe true
         result.exceptionOrNull() shouldBe expectedException
@@ -199,7 +199,7 @@ class IosPushTests {
             mockLoggingPush.clearPushToken()
         } returns Unit
 
-        iosPush.clearPushToken()
+        iosPushWrapper.clearPushToken()
 
         verifySuspend {
             mockLoggingPush.clearPushToken()
@@ -213,7 +213,7 @@ class IosPushTests {
         } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
-        iosPush.clearPushToken()
+        iosPushWrapper.clearPushToken()
 
         verifySuspend {
             mockGathererPush.clearPushToken()
@@ -227,7 +227,7 @@ class IosPushTests {
         } returns Unit
 
         sdkContext.setSdkState(SdkState.active)
-        iosPush.clearPushToken()
+        iosPushWrapper.clearPushToken()
 
         verifySuspend {
             mockPushInternal.clearPushToken()
@@ -242,7 +242,7 @@ class IosPushTests {
         } throws expectedException
 
         sdkContext.setSdkState(SdkState.active)
-        val result = iosPush.clearPushToken()
+        val result = iosPushWrapper.clearPushToken()
 
         result.isFailure shouldBe true
         result.exceptionOrNull() shouldBe expectedException
@@ -254,7 +254,7 @@ class IosPushTests {
             mockLoggingPush.getPushToken()
         } returns null
 
-        val result = iosPush.getPushToken()
+        val result = iosPushWrapper.getPushToken()
 
         result.onSuccess {
             it shouldBe null
@@ -269,7 +269,7 @@ class IosPushTests {
 
         sdkContext.setSdkState(SdkState.onHold)
 
-        val result = iosPush.getPushToken()
+        val result = iosPushWrapper.getPushToken()
 
         result.onSuccess {
             it shouldBe PUSH_TOKEN
@@ -284,7 +284,7 @@ class IosPushTests {
 
         sdkContext.setSdkState(SdkState.active)
 
-        val result = iosPush.getPushToken()
+        val result = iosPushWrapper.getPushToken()
 
         result.onSuccess {
             it shouldBe PUSH_TOKEN
@@ -297,7 +297,7 @@ class IosPushTests {
             mockLoggingPush.customerUserNotificationCenterDelegate
         } returns null
 
-        val result = iosPush.customerUserNotificationCenterDelegate
+        val result = iosPushWrapper.customerUserNotificationCenterDelegate
 
         result shouldBe null
     }
@@ -312,7 +312,7 @@ class IosPushTests {
 
         advanceUntilIdle()
 
-        val result = iosPush.customerUserNotificationCenterDelegate
+        val result = iosPushWrapper.customerUserNotificationCenterDelegate
 
         result shouldBe testUNUserNotificationCenterDelegateProtocol
     }
@@ -327,7 +327,7 @@ class IosPushTests {
 
         advanceUntilIdle()
 
-        val result = iosPush.customerUserNotificationCenterDelegate
+        val result = iosPushWrapper.customerUserNotificationCenterDelegate
 
         result shouldBe testUNUserNotificationCenterDelegateProtocol
     }
@@ -338,7 +338,7 @@ class IosPushTests {
             mockLoggingPush.emarsysUserNotificationCenterDelegate
         } returns testUNUserNotificationCenterDelegateProtocol
 
-        val result = iosPush.emarsysUserNotificationCenterDelegate
+        val result = iosPushWrapper.emarsysUserNotificationCenterDelegate
 
         result shouldBe null
     }
@@ -353,7 +353,7 @@ class IosPushTests {
 
         advanceUntilIdle()
 
-        val result = iosPush.emarsysUserNotificationCenterDelegate
+        val result = iosPushWrapper.emarsysUserNotificationCenterDelegate
 
         result shouldBe testUNUserNotificationCenterDelegateProtocol
     }
@@ -368,7 +368,7 @@ class IosPushTests {
 
         advanceUntilIdle()
 
-        val result = iosPush.emarsysUserNotificationCenterDelegate
+        val result = iosPushWrapper.emarsysUserNotificationCenterDelegate
 
         result shouldBe testUNUserNotificationCenterDelegateProtocol
     }
@@ -379,7 +379,7 @@ class IosPushTests {
             mockLoggingPush.handleSilentMessageWithUserInfo(any())
         } returns Unit
 
-        iosPush.handleSilentMessageWithUserInfo(SILENT_USER_INFO_MAP)
+        iosPushWrapper.handleSilentMessageWithUserInfo(SILENT_USER_INFO_MAP)
 
         verifySuspend {
             mockLoggingPush.handleSilentMessageWithUserInfo(SILENT_PUSH_USER_INFO)
@@ -393,7 +393,7 @@ class IosPushTests {
         } returns Unit
 
         sdkContext.setSdkState(SdkState.onHold)
-        iosPush.handleSilentMessageWithUserInfo(SILENT_USER_INFO_MAP)
+        iosPushWrapper.handleSilentMessageWithUserInfo(SILENT_USER_INFO_MAP)
 
         verifySuspend { mockGathererPush.handleSilentMessageWithUserInfo(SILENT_PUSH_USER_INFO) }
     }
@@ -405,7 +405,7 @@ class IosPushTests {
         } returns Unit
 
         sdkContext.setSdkState(SdkState.active)
-        iosPush.handleSilentMessageWithUserInfo(SILENT_USER_INFO_MAP)
+        iosPushWrapper.handleSilentMessageWithUserInfo(SILENT_USER_INFO_MAP)
 
         verifySuspend { mockPushInternal.handleSilentMessageWithUserInfo(SILENT_PUSH_USER_INFO) }
     }
@@ -419,7 +419,7 @@ class IosPushTests {
             } returns Unit
 
             sdkContext.setSdkState(SdkState.active)
-            val result = iosPush.handleSilentMessageWithUserInfo(invalidUserInfoMap)
+            val result = iosPushWrapper.handleSilentMessageWithUserInfo(invalidUserInfoMap)
 
             result.isFailure shouldBe true
             result.exceptionOrNull() shouldBe PreconditionFailedException("Error while handling silent push message, the userInfo can't be parsed")

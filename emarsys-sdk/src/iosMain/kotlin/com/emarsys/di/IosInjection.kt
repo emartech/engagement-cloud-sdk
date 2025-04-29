@@ -2,15 +2,15 @@ package com.emarsys.di
 
 import app.cash.sqldelight.driver.native.NativeSqliteDriver
 import com.emarsys.EmarsysConfig
-import com.emarsys.api.contact.IosPublicContact
-import com.emarsys.api.contact.IosPublicContactApi
-import com.emarsys.api.inapp.IosPublicInApp
-import com.emarsys.api.inapp.IosPublicInAppApi
-import com.emarsys.api.push.IosPublicPush
-import com.emarsys.api.push.IosPublicPushApi
+import com.emarsys.api.contact.IosContact
+import com.emarsys.api.contact.IosContactApi
+import com.emarsys.api.inapp.IosInApp
+import com.emarsys.api.inapp.IosInAppApi
+import com.emarsys.api.push.IosPush
+import com.emarsys.api.push.IosPushApi
 import com.emarsys.api.push.PushApi
-import com.emarsys.api.tracking.IosPublicTracking
-import com.emarsys.api.tracking.IosPublicTrackingApi
+import com.emarsys.api.tracking.IosTracking
+import com.emarsys.api.tracking.IosTrackingApi
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
@@ -61,10 +61,10 @@ import com.emarsys.mobileengage.inapp.providers.WebViewProvider
 import com.emarsys.mobileengage.inapp.providers.WindowProvider
 import com.emarsys.mobileengage.push.IosGathererPush
 import com.emarsys.mobileengage.push.IosLoggingPush
-import com.emarsys.mobileengage.push.IosPush
-import com.emarsys.mobileengage.push.IosPushApi
 import com.emarsys.mobileengage.push.IosPushInstance
 import com.emarsys.mobileengage.push.IosPushInternal
+import com.emarsys.mobileengage.push.IosPushWrapper
+import com.emarsys.mobileengage.push.IosPushWrapperApi
 import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
 import com.emarsys.sqldelight.EmarsysDB
 import com.emarsys.watchdog.connection.ConnectionWatchDog
@@ -84,10 +84,10 @@ import platform.UserNotifications.UNUserNotificationCenter
 object IosInjection {
     val iosModules = module {
         single<NSUserDefaults> { NSUserDefaults(StorageConstants.SUITE_NAME) }
-        single<IosPublicContactApi> { IosPublicContact() }
-        single<IosPublicPushApi> { IosPublicPush() }
-        single<IosPublicTrackingApi> { IosPublicTracking() }
-        single<IosPublicInAppApi> { IosPublicInApp() }
+        single<IosContactApi> { IosContact() }
+        single<IosPushApi> { IosPush() }
+        single<IosTrackingApi> { IosTracking() }
+        single<IosInAppApi> { IosInApp() }
         single<UNUserNotificationCenter> { UNUserNotificationCenter.currentNotificationCenter() }
         single<StringStorageApi> { StringStorage(userDefaults = get()) }
         single<SdkConfigStoreApi<EmarsysConfig>> {
@@ -216,15 +216,15 @@ object IosInjection {
             )
         }
         single<PushApi> {
-            IosPush(
+            IosPushWrapper(
                 loggingApi = get(named(InstanceType.Logging)),
                 gathererApi = get(named(InstanceType.Gatherer)),
                 internalApi = get(named(InstanceType.Internal)),
                 sdkContext = get(),
-                sdkLogger = get { parametersOf(IosPush::class.simpleName) }
+                sdkLogger = get { parametersOf(IosPushWrapper::class.simpleName) }
             )
         } binds arrayOf(
-            IosPushApi::class,
+            IosPushWrapperApi::class,
             PushApi::class
         )
     }

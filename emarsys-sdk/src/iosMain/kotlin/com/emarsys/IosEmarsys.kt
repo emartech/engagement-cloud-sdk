@@ -1,13 +1,13 @@
 package com.emarsys
 
 import com.emarsys.api.config.ConfigApi
-import com.emarsys.api.contact.IosPublicContactApi
+import com.emarsys.api.contact.IosContactApi
 import com.emarsys.api.extension.throwErrorFromResult
 import com.emarsys.api.geofence.GeofenceTrackerApi
-import com.emarsys.api.inapp.IosPublicInAppApi
+import com.emarsys.api.inapp.IosInAppApi
 import com.emarsys.api.predict.PredictApi
-import com.emarsys.api.push.IosPublicPushApi
-import com.emarsys.api.tracking.IosPublicTrackingApi
+import com.emarsys.api.push.IosPushApi
+import com.emarsys.api.tracking.IosTrackingApi
 import com.emarsys.core.exceptions.SdkAlreadyDisabledException
 import com.emarsys.core.exceptions.SdkAlreadyEnabledException
 import com.emarsys.di.SdkKoinIsolationContext.koin
@@ -19,14 +19,14 @@ import kotlin.experimental.ExperimentalObjCName
 @OptIn(ExperimentalObjCName::class)
 @ObjCName("Emarsys")
 object IosEmarsys {
-    val contact: IosPublicContactApi
-        get() = koin.get<IosPublicContactApi>()
-    val push: IosPublicPushApi
-        get() = koin.get<IosPublicPushApi>()
-    val tracking: IosPublicTrackingApi
-        get() = koin.get<IosPublicTrackingApi>()
-    val inApp: IosPublicInAppApi
-        get() = koin.get<IosPublicInAppApi>()
+    val contact: IosContactApi
+        get() = koin.get<IosContactApi>()
+    val push: IosPushApi
+        get() = koin.get<IosPushApi>()
+    val tracking: IosTrackingApi
+        get() = koin.get<IosTrackingApi>()
+    val inApp: IosInAppApi
+        get() = koin.get<IosInAppApi>()
     val config: ConfigApi
         get() = Emarsys.config
     val geofence: GeofenceTrackerApi

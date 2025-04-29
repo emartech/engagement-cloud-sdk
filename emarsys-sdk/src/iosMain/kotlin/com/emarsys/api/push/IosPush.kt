@@ -1,34 +1,34 @@
 package com.emarsys.api.push
 
 import com.emarsys.di.SdkKoinIsolationContext.koin
-import com.emarsys.mobileengage.push.IosPushApi
+import com.emarsys.mobileengage.push.IosPushWrapperApi
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 
-class IosPublicPush : IosPublicPushApi {
+class IosPush : IosPushApi {
     override var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol?
         get() {
-            return koin.get<IosPushApi>().customerUserNotificationCenterDelegate
+            return koin.get<IosPushWrapperApi>().customerUserNotificationCenterDelegate
         }
         set(value) {
-            koin.get<IosPushApi>().customerUserNotificationCenterDelegate = value
+            koin.get<IosPushWrapperApi>().customerUserNotificationCenterDelegate = value
         }
 
     override val emarsysUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol
-        get() = koin.get<IosPushApi>().emarsysUserNotificationCenterDelegate
+        get() = koin.get<IosPushWrapperApi>().emarsysUserNotificationCenterDelegate
 
     override suspend fun getToken(): String? {
-        return koin.get<IosPushApi>().getPushToken().getOrNull()
+        return koin.get<IosPushWrapperApi>().getPushToken().getOrNull()
     }
 
     override suspend fun handleSilentMessageWithUserInfo(rawUserInfo: Map<String, Any>) {
-        koin.get<IosPushApi>().handleSilentMessageWithUserInfo(rawUserInfo)
+        koin.get<IosPushWrapperApi>().handleSilentMessageWithUserInfo(rawUserInfo)
     }
 
     override suspend fun registerToken(token: String) {
-        koin.get<IosPushApi>().registerPushToken(token)
+        koin.get<IosPushWrapperApi>().registerPushToken(token)
     }
 
     override suspend fun clearToken() {
-        koin.get<IosPushApi>().clearPushToken()
+        koin.get<IosPushWrapperApi>().clearPushToken()
     }
 }
