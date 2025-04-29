@@ -2,6 +2,7 @@ package com.emarsys
 
 import com.emarsys.api.config.IosConfigApi
 import com.emarsys.api.contact.IosContactApi
+import com.emarsys.api.deeplink.IosDeeplinkApi
 import com.emarsys.api.geofence.IosGeofenceApi
 import com.emarsys.api.inapp.IosInAppApi
 import com.emarsys.api.predict.IosPredictApi
@@ -10,9 +11,7 @@ import com.emarsys.api.tracking.IosTrackingApi
 import com.emarsys.core.exceptions.SdkAlreadyDisabledException
 import com.emarsys.core.exceptions.SdkAlreadyEnabledException
 import com.emarsys.di.SdkKoinIsolationContext.koin
-import io.ktor.http.Url
 import io.ktor.utils.io.CancellationException
-import platform.Foundation.NSUserActivity
 import kotlin.experimental.ExperimentalObjCName
 
 @OptIn(ExperimentalObjCName::class)
@@ -32,6 +31,8 @@ object IosEmarsys {
         get() = koin.get<IosGeofenceApi>()
     val predict: IosPredictApi
         get() = koin.get<IosPredictApi>()
+    val deeplink: IosDeeplinkApi
+        get() = koin.get<IosDeeplinkApi>()
 
     /**
      * Initializes the SDK. This method must be called before using any other SDK functionality.
@@ -57,16 +58,5 @@ object IosEmarsys {
     @Throws(SdkAlreadyDisabledException::class, CancellationException::class)
     suspend fun disableTracking() {
         Emarsys.disableTracking().getOrThrow()
-    }
-
-    /**
-     * Tracks a deep link using the provided user activity.
-     *
-     * @param userActivity The user activity containing the deep link information.
-     */
-    suspend fun trackDeepLink(userActivity: NSUserActivity) {
-        userActivity.webpageURL?.absoluteString()?.let {
-            Emarsys.deepLink.trackDeepLink(Url(it))
-        }
     }
 }
