@@ -2,7 +2,7 @@ package com.emarsys
 
 import com.emarsys.api.config.IosConfigApi
 import com.emarsys.api.contact.IosContactApi
-import com.emarsys.api.geofence.GeofenceTrackerApi
+import com.emarsys.api.geofence.IosGeofenceApi
 import com.emarsys.api.inapp.IosInAppApi
 import com.emarsys.api.predict.PredictApi
 import com.emarsys.api.push.IosPushApi
@@ -28,8 +28,8 @@ object IosEmarsys {
         get() = koin.get<IosInAppApi>()
     val config: IosConfigApi
         get() = koin.get<IosConfigApi>()
-    val geofence: GeofenceTrackerApi
-        get() = Emarsys.geofence
+    val geofence: IosGeofenceApi
+        get() = koin.get<IosGeofenceApi>()
     val predict: PredictApi
         get() = Emarsys.predict
 
