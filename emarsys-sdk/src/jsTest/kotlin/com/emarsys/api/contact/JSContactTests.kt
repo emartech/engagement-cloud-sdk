@@ -1,8 +1,10 @@
 package com.emarsys.api.contact
 
-import dev.mokkery.MockMode
+import dev.mokkery.answering.returns
+import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
+import io.kotest.assertions.throwables.shouldThrow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.await
@@ -21,6 +23,9 @@ class JSContactTests {
         const val CONTACT_FIELD_ID = 2334
         const val CONTACT_FIELD_VALUE = "testContactFieldValue"
         const val OPEN_ID_TOKEN = "testOpenIdToken"
+        val testException = Exception("testException")
+        val testFailedResult = Result.failure<Unit>(testException)
+        val testSuccessResult = Result.success<Unit>(Unit)
     }
 
     private lateinit var jSContact: JSContactApi
@@ -29,7 +34,7 @@ class JSContactTests {
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(StandardTestDispatcher())
-        mockContactApi = mock(MockMode.autofill)
+        mockContactApi = mock()
         jSContact = JSContact(mockContactApi, TestScope())
     }
 
@@ -40,22 +45,71 @@ class JSContactTests {
 
     @Test
     fun link_shouldCall_linkContact_onEmarsys() = runTest {
+        everySuspend {
+            mockContactApi.linkContact(
+                CONTACT_FIELD_ID,
+                CONTACT_FIELD_VALUE
+            )
+        } returns testSuccessResult
+
         jSContact.link(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE).await()
 
         verifySuspend { mockContactApi.linkContact(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE) }
     }
 
     @Test
+    fun link_shouldThrowException_ifLinkContact_failed() = runTest {
+        everySuspend {
+            mockContactApi.linkContact(
+                CONTACT_FIELD_ID,
+                CONTACT_FIELD_VALUE
+            )
+        } returns testFailedResult
+
+        shouldThrow<Exception> { jSContact.link(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE).await() }
+    }
+
+    @Test
     fun linkAuthenticated_shouldCall_linkAuthenticatedContact_onEmarsys() = runTest {
+        everySuspend {
+            mockContactApi.linkAuthenticatedContact(
+                CONTACT_FIELD_ID,
+                OPEN_ID_TOKEN
+            )
+        } returns testSuccessResult
+
         jSContact.linkAuthenticated(CONTACT_FIELD_ID, OPEN_ID_TOKEN).await()
 
         verifySuspend { mockContactApi.linkAuthenticatedContact(CONTACT_FIELD_ID, OPEN_ID_TOKEN) }
     }
 
     @Test
+    fun linkAuthenticated_shouldThrowException_ifLinkAuthenticatedContact_failed() = runTest {
+        everySuspend {
+            mockContactApi.linkAuthenticatedContact(
+                CONTACT_FIELD_ID,
+                OPEN_ID_TOKEN
+            )
+        } returns testFailedResult
+
+        shouldThrow<Exception> {
+            jSContact.linkAuthenticated(CONTACT_FIELD_ID, OPEN_ID_TOKEN).await()
+        }
+    }
+
+    @Test
     fun unlink_shouldCall_unlinkContact_onEmarsys() = runTest {
+        everySuspend { mockContactApi.unlinkContact() } returns testSuccessResult
+
         jSContact.unlink().await()
 
         verifySuspend { mockContactApi.unlinkContact() }
+    }
+
+    @Test
+    fun unlink_shouldThrowException_ifUnLinkContact_failed() = runTest {
+        everySuspend { mockContactApi.unlinkContact() } returns testFailedResult
+
+        shouldThrow<Exception> { jSContact.unlink().await() }
     }
 }
