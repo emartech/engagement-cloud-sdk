@@ -11,6 +11,8 @@ import com.emarsys.api.push.PushConstants.WEB_PUSH_ON_NOTIFICATION_CLICKED_CHANN
 import com.emarsys.api.push.PushGatherer
 import com.emarsys.api.push.PushInstance
 import com.emarsys.api.push.PushInternal
+import com.emarsys.api.tracking.JSTracking
+import com.emarsys.api.tracking.JSTrackingApi
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
 import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
@@ -227,6 +229,14 @@ object WebInjection {
         single<JSContactApi> {
             JSContact(
                 contactApi = get(),
+                applicationScope = get(
+                    named(CoroutineScopeTypes.Application)
+                )
+            )
+        }
+        single<JSTrackingApi> {
+            JSTracking(
+                trackingApi = get(),
                 applicationScope = get(
                     named(CoroutineScopeTypes.Application)
                 )
