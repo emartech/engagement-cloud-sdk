@@ -1,7 +1,7 @@
 package com.emarsys.di
 
-import com.emarsys.api.deepLink.DeepLinkApi
-import com.emarsys.api.deepLink.DeepLinkInternal
+import com.emarsys.api.deeplink.DeepLinkApi
+import com.emarsys.api.deeplink.DeepLinkInternal
 import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.deepLink.DeepLinkClient
 import org.koin.core.module.dsl.bind

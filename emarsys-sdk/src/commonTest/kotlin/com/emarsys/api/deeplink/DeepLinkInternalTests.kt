@@ -1,4 +1,4 @@
-package com.emarsys.api.deepLink
+package com.emarsys.api.deeplink
 
 import com.emarsys.context.DefaultUrls
 import com.emarsys.context.SdkContext
@@ -17,28 +17,28 @@ import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import io.ktor.http.Url
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.serialization.json.jsonPrimitive
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-@Suppress("OPT_IN_USAGE")
+@OptIn(ExperimentalCoroutinesApi::class)
 class DeepLinkInternalTests {
 
     private lateinit var sdkContext: SdkContextApi
     private lateinit var deepLinkInternal: DeepLinkInternal
     private lateinit var sdkEventDistributor: SdkEventDistributorApi
     private lateinit var eventSlot: SlotCapture<SdkEvent>
-    private val mainDispatcher = StandardTestDispatcher()
-
-    init {
-        Dispatchers.setMain(mainDispatcher)
-    }
 
     @BeforeTest
     fun setUp() {
+        val mainDispatcher = StandardTestDispatcher()
+        Dispatchers.setMain(mainDispatcher)
         sdkContext = SdkContext(
             StandardTestDispatcher(),
             mainDispatcher,
@@ -52,6 +52,11 @@ class DeepLinkInternalTests {
         sdkEventDistributor = mock(MockMode.autofill)
         everySuspend { sdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(MockMode.autofill)
         deepLinkInternal = DeepLinkInternal(sdkContext, sdkEventDistributor)
+    }
+
+    @AfterTest
+    fun teardown() {
+        Dispatchers.resetMain()
     }
 
     @Test

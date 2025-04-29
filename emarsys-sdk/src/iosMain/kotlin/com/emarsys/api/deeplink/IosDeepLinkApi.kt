@@ -3,7 +3,7 @@ package com.emarsys.api.deeplink
 import platform.Foundation.NSUserActivity
 import kotlin.coroutines.cancellation.CancellationException
 
-interface IosDeeplinkApi {
+interface IosDeepLinkApi {
     @Throws(CancellationException::class)
     suspend fun trackDeepLink(userActivity: NSUserActivity)
 }

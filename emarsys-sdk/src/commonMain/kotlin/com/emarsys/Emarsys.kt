@@ -2,7 +2,7 @@ package com.emarsys
 
 import com.emarsys.api.config.ConfigApi
 import com.emarsys.api.contact.ContactApi
-import com.emarsys.api.deepLink.DeepLinkApi
+import com.emarsys.api.deeplink.DeepLinkApi
 import com.emarsys.api.geofence.GeofenceTrackerApi
 import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.inbox.InboxApi

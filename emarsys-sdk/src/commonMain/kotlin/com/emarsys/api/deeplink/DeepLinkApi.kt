@@ -1,4 +1,4 @@
-package com.emarsys.api.deepLink
+package com.emarsys.api.deeplink
 
 import io.ktor.http.Url
 

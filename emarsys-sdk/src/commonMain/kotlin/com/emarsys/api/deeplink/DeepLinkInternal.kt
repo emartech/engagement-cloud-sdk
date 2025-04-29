@@ -1,4 +1,4 @@
-package com.emarsys.api.deepLink
+package com.emarsys.api.deeplink
 
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.SdkEventDistributorApi

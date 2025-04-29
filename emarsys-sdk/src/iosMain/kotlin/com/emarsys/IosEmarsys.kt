@@ -2,7 +2,7 @@ package com.emarsys
 
 import com.emarsys.api.config.IosConfigApi
 import com.emarsys.api.contact.IosContactApi
-import com.emarsys.api.deeplink.IosDeeplinkApi
+import com.emarsys.api.deeplink.IosDeepLinkApi
 import com.emarsys.api.geofence.IosGeofenceApi
 import com.emarsys.api.inapp.IosInAppApi
 import com.emarsys.api.predict.IosPredictApi
@@ -31,8 +31,8 @@ object IosEmarsys {
         get() = koin.get<IosGeofenceApi>()
     val predict: IosPredictApi
         get() = koin.get<IosPredictApi>()
-    val deeplink: IosDeeplinkApi
-        get() = koin.get<IosDeeplinkApi>()
+    val deeplink: IosDeepLinkApi
+        get() = koin.get<IosDeepLinkApi>()
 
     /**
      * Initializes the SDK. This method must be called before using any other SDK functionality.
