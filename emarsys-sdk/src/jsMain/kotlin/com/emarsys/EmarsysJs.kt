@@ -1,6 +1,7 @@
 package com.emarsys
 
 import com.emarsys.api.contact.JSContactApi
+import com.emarsys.api.push.JSPushApi
 import com.emarsys.api.tracking.JSTrackingApi
 import com.emarsys.di.CoroutineScopeTypes
 import com.emarsys.di.SdkKoinIsolationContext.koin
@@ -23,6 +24,7 @@ object EmarsysJs {
     private lateinit var applicationScope: CoroutineScope
     lateinit var contact: JSContactApi
     lateinit var tracking: JSTrackingApi
+    lateinit var push: JSPushApi
 
     /**
      * Initializes the SDK. This method must be called before using any other SDK functionality.
@@ -35,6 +37,7 @@ object EmarsysJs {
             applicationScope = koin.get<CoroutineScope>(named(CoroutineScopeTypes.Application))
             contact = koin.get<JSContactApi>()
             tracking = koin.get<JSTrackingApi>()
+            push = koin.get<JSPushApi>()
         }
     }
 

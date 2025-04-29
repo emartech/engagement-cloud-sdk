@@ -3,6 +3,8 @@ package com.emarsys.di
 import com.emarsys.JsEmarsysConfig
 import com.emarsys.api.contact.JSContact
 import com.emarsys.api.contact.JSContactApi
+import com.emarsys.api.push.JSPush
+import com.emarsys.api.push.JSPushApi
 import com.emarsys.api.push.LoggingPush
 import com.emarsys.api.push.Push
 import com.emarsys.api.push.PushApi
@@ -237,6 +239,14 @@ object WebInjection {
         single<JSTrackingApi> {
             JSTracking(
                 trackingApi = get(),
+                applicationScope = get(
+                    named(CoroutineScopeTypes.Application)
+                )
+            )
+        }
+        single<JSPushApi> {
+            JSPush(
+                pushApi = get(),
                 applicationScope = get(
                     named(CoroutineScopeTypes.Application)
                 )
