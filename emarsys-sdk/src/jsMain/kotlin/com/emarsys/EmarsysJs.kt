@@ -31,7 +31,7 @@ object EmarsysJs {
      *
      * @return A promise that resolves when the initialization is complete.
      */
-    fun init(): Promise<Any> {
+    fun init(): Promise<Unit> {
         return CoroutineScope(SupervisorJob()).promise {
             Emarsys.initialize()
             applicationScope = koin.get<CoroutineScope>(named(CoroutineScopeTypes.Application))
@@ -47,7 +47,7 @@ object EmarsysJs {
      * @param jsEmarsysConfig The SDK configuration to use for enabling tracking.
      * @return A promise that resolves when tracking is enabled.
      */
-    fun enableTracking(jsEmarsysConfig: JsEmarsysConfig): Promise<Any> {
+    fun enableTracking(jsEmarsysConfig: JsEmarsysConfig): Promise<Unit> {
         return applicationScope.promise {
             Emarsys.enableTracking(jsEmarsysConfig)
         }
@@ -57,7 +57,7 @@ object EmarsysJs {
      * Disables tracking.
      *
      */
-    fun disableTracking(): Promise<Any> {
+    fun disableTracking(): Promise<Unit> {
         return applicationScope.promise {
             Emarsys.disableTracking()
         }

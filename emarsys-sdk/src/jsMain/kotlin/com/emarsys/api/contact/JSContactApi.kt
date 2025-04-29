@@ -5,7 +5,7 @@ import kotlin.js.Promise
 @OptIn(ExperimentalJsExport::class)
 @JsExport
 interface JSContactApi {
-    fun link(contactFieldId: Int, contactFieldValue: String): Promise<Any>
-    fun linkAuthenticated(contactFieldId: Int, openIdToken: String): Promise<Any>
-    fun unlink(): Promise<Any>
+    fun link(contactFieldId: Int, contactFieldValue: String): Promise<Unit>
+    fun linkAuthenticated(contactFieldId: Int, openIdToken: String): Promise<Unit>
+    fun unlink(): Promise<Unit>
 }
