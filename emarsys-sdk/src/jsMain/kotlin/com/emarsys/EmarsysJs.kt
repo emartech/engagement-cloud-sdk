@@ -1,7 +1,7 @@
 package com.emarsys
 
 import com.emarsys.api.contact.JSContactApi
-import com.emarsys.api.event.model.CustomEvent
+import com.emarsys.api.tracking.JSTrackingApi
 import com.emarsys.di.CoroutineScopeTypes
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import kotlinx.coroutines.CoroutineScope
@@ -22,6 +22,7 @@ object EmarsysJs {
 
     private lateinit var applicationScope: CoroutineScope
     lateinit var contact: JSContactApi
+    lateinit var tracking: JSTrackingApi
 
     /**
      * Initializes the SDK. This method must be called before using any other SDK functionality.
@@ -33,6 +34,7 @@ object EmarsysJs {
             Emarsys.initialize()
             applicationScope = koin.get<CoroutineScope>(named(CoroutineScopeTypes.Application))
             contact = koin.get<JSContactApi>()
+            tracking = koin.get<JSTrackingApi>()
         }
     }
 
@@ -57,18 +59,4 @@ object EmarsysJs {
             Emarsys.disableTracking()
         }
     }
-
-    /**
-     * Tracks a custom event with the specified name and optional attributes. These custom events can be used to trigger In-App campaigns or any automation configured at Emarsys.
-     *
-     * @param eventName The name of the custom event.
-     * @param eventPayload Optional payload for the event.
-     * @return A promise that resolves when the event is tracked.
-     */
-    fun trackCustomEvent(eventName: String, eventPayload: Map<String, String>?): Promise<Any> {
-        return applicationScope.promise {
-            Emarsys.tracking.trackCustomEvent(CustomEvent(eventName, eventPayload))
-        }
-    }
-
 }

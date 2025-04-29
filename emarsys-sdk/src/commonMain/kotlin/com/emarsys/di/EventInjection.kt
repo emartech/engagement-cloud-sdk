@@ -14,6 +14,8 @@ import com.emarsys.core.collections.PersistentList
 import com.emarsys.mobileengage.session.MobileEngageSession
 import com.emarsys.mobileengage.session.Session
 import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.tracking.Tracking
+import com.emarsys.tracking.TrackingApi
 import kotlinx.coroutines.flow.SharedFlow
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
@@ -78,5 +80,6 @@ object EventInjection {
         single<SharedFlow<SdkEvent>>(named(EventFlowTypes.Public)) {
             get<SdkEventDistributorApi>().sdkEventFlow
         }
+        single<TrackingApi> { Tracking() }
     }
 }
