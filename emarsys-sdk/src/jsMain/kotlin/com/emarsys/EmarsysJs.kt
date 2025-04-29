@@ -1,5 +1,6 @@
 package com.emarsys
 
+import com.emarsys.api.config.JSConfigApi
 import com.emarsys.api.contact.JSContactApi
 import com.emarsys.api.push.JSPushApi
 import com.emarsys.api.tracking.JSTrackingApi
@@ -22,6 +23,7 @@ suspend fun main() {
 object EmarsysJs {
 
     private lateinit var applicationScope: CoroutineScope
+    lateinit var config: JSConfigApi
     lateinit var contact: JSContactApi
     lateinit var tracking: JSTrackingApi
     lateinit var push: JSPushApi
@@ -35,6 +37,7 @@ object EmarsysJs {
         return CoroutineScope(SupervisorJob()).promise {
             Emarsys.initialize()
             applicationScope = koin.get<CoroutineScope>(named(CoroutineScopeTypes.Application))
+            config = koin.get<JSConfigApi>()
             contact = koin.get<JSContactApi>()
             tracking = koin.get<JSTrackingApi>()
             push = koin.get<JSPushApi>()
