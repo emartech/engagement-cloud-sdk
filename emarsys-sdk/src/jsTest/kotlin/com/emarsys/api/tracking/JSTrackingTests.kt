@@ -2,7 +2,6 @@ package com.emarsys.api.tracking
 
 import com.emarsys.api.event.model.CustomEvent
 import com.emarsys.tracking.TrackingApi
-import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.capture.Capture.Companion.slot
@@ -33,7 +32,7 @@ class JSTrackingTests {
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(StandardTestDispatcher())
-        mockEventTrackerApi = mock(MockMode.autofill)
+        mockEventTrackerApi = mock()
         jsTracking = JSTracking(mockEventTrackerApi, TestScope())
     }
 
@@ -70,6 +69,30 @@ class JSTrackingTests {
         testPayload[payloadKey] = payloadValue
 
         shouldThrow<SerializationException> {
+            jsTracking.trackCustomEvent(testName, testPayload).await()
+        }
+    }
+
+    @Test
+    fun trackCustomEvent_shouldCall_throwException_ifEventTrackingFails() = runTest {
+        val testName = "testName"
+        val payloadKey = "testKey"
+        val payloadValue = "testValue"
+        val testPayload = js("{}")
+        testPayload[payloadKey] = payloadValue
+
+        everySuspend {
+            mockEventTrackerApi.trackCustomEvent(
+                CustomEvent(
+                    testName,
+                    mapOf(payloadKey to payloadValue)
+                )
+            )
+        } returns Result.failure(
+            Exception()
+        )
+
+        shouldThrow<Exception> {
             jsTracking.trackCustomEvent(testName, testPayload).await()
         }
     }
