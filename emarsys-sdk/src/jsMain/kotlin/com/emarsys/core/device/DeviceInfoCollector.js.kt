@@ -76,7 +76,7 @@ internal actual class DeviceInfoCollector(
         return clientIdProvider.provide()
     }
 
-    actual override suspend fun getPushSettings(): PushSettings {
+    actual override suspend fun getNotificationSettings(): NotificationSettings {
         TODO("Not yet implemented")
     }
 }

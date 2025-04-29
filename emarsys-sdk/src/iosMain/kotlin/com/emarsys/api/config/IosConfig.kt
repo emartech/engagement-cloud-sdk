@@ -1,6 +1,6 @@
 package com.emarsys.api.config
 
-import com.emarsys.core.device.PushSettings
+import com.emarsys.core.device.IosNotificationSettings
 import com.emarsys.di.SdkKoinIsolationContext.koin
 
 
@@ -17,8 +17,9 @@ class IosConfig : IosConfigApi {
 
     override suspend fun getSdkVersion(): String = koin.get<ConfigApi>().getSdkVersion()
 
-    override suspend fun getPushSettings(): PushSettings = koin.get<ConfigApi>().getPushSettings()
-
+    override suspend fun getNotificationSettings(): IosNotificationSettings {
+        return koin.get<ConfigApi>().getNotificationSettings() as IosNotificationSettings
+    }
 
     override suspend fun changeApplicationCode(applicationCode: String) {
         koin.get<ConfigApi>().changeApplicationCode(applicationCode).getOrThrow()

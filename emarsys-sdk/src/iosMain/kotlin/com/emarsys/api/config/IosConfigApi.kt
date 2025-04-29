@@ -1,6 +1,6 @@
 package com.emarsys.api.config
 
-import com.emarsys.core.device.PushSettings
+import com.emarsys.core.device.IosNotificationSettings
 import kotlin.coroutines.cancellation.CancellationException
 
 interface IosConfigApi {
@@ -10,7 +10,7 @@ interface IosConfigApi {
     suspend fun getClientId(): String
     suspend fun getLanguageCode(): String
     suspend fun getSdkVersion(): String
-    suspend fun getPushSettings(): PushSettings
+    suspend fun getNotificationSettings(): IosNotificationSettings
 
     @Throws(CancellationException::class)
     suspend fun changeApplicationCode(applicationCode: String)

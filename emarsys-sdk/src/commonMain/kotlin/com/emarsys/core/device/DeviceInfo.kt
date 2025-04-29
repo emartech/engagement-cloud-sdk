@@ -38,14 +38,14 @@ data class DeviceInfoForLogs(
 )
 
 @Serializable
-sealed interface PushSettings
+sealed interface NotificationSettings
 
 @Serializable
 data class AndroidNotificationSettings(
     val areNotificationsEnabled: Boolean,
     val importance: Int,
     val channelSettings: List<ChannelSettings>
-): PushSettings
+): NotificationSettings
 
 @Serializable
 data class IosNotificationSettings(
@@ -63,7 +63,7 @@ data class IosNotificationSettings(
     // Last 2 property is only available from iOS 15.0
     val scheduledDeliverySetting: IosNotificationSetting,
     val timeSensitiveSetting: IosNotificationSetting
-): PushSettings
+): NotificationSettings
 
 @Serializable
 data class ChannelSettings(

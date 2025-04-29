@@ -1,6 +1,6 @@
 package com.emarsys.api.config
 
-import com.emarsys.core.device.PushSettings
+import com.emarsys.core.device.NotificationSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.promise
 import kotlin.js.Promise
@@ -67,9 +67,9 @@ class JSConfig(private val configApi: ConfigApi, private val applicationScope: C
         }
     }
 
-    override fun getPushSettings(): Promise<PushSettings> {
+    override fun getPushSettings(): Promise<NotificationSettings> {
         return applicationScope.promise {
-            configApi.getPushSettings()
+            configApi.getNotificationSettings()
         }
     }
 }

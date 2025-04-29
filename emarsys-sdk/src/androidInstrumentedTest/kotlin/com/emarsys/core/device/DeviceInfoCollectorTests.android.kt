@@ -163,14 +163,14 @@ class DeviceInfoCollectorTests {
     }
 
     @Test
-    fun getPushSettings_shouldCall_getPushSettings_onPlatformInfoCollector() = runTest {
+    fun getPushSettings_shouldCall_getNotificationSettings_onPlatformInfoCollector() = runTest {
         val testSettings = AndroidNotificationSettings(
             true, -1000, listOf(ChannelSettings("testChannelId"))
         )
 
         every { mockPlatformInfoCollector.notificationSettings() } returns testSettings
 
-        val result = deviceInfoCollector.getPushSettings()
+        val result = deviceInfoCollector.getNotificationSettings()
 
         result shouldBe testSettings
     }

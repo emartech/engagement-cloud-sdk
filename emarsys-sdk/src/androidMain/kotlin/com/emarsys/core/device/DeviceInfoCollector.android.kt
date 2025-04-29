@@ -84,7 +84,7 @@ internal actual class DeviceInfoCollector(
         return if (isGooglePlayServicesAvailable) "android" else "android-huawei"
     }
 
-    actual override suspend fun getPushSettings(): PushSettings {
+    actual override suspend fun getNotificationSettings(): NotificationSettings {
         return platformInfoCollector.notificationSettings()
     }
 }

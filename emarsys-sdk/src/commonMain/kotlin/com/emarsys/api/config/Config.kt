@@ -5,7 +5,7 @@ import com.emarsys.api.generic.GenericApi
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.device.DeviceInfo
 import com.emarsys.core.device.DeviceInfoCollectorApi
-import com.emarsys.core.device.PushSettings
+import com.emarsys.core.device.NotificationSettings
 import com.emarsys.core.log.withLogContext
 import com.emarsys.util.JsonUtil
 import kotlinx.coroutines.withContext
@@ -80,8 +80,8 @@ class Config<Logging : ConfigInstance, Gatherer : ConfigInstance, Internal : Con
         }
     }
 
-    override suspend fun getPushSettings(): PushSettings {
-        return deviceInfoCollector.getPushSettings()
+    override suspend fun getNotificationSettings(): NotificationSettings {
+        return deviceInfoCollector.getNotificationSettings()
     }
 
     private suspend fun getDeviceInfo(): DeviceInfo {

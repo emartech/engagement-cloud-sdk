@@ -92,7 +92,7 @@ class ConfigTest {
 
 
         everySuspend { mockDeviceInfoCollector.collect() } returns Json.encodeToString(DEVICE_INFO)
-        everySuspend { mockDeviceInfoCollector.getPushSettings() } returns PUSH_SETTINGS
+        everySuspend { mockDeviceInfoCollector.getNotificationSettings() } returns PUSH_SETTINGS
         everySuspend { mockDeviceInfoCollector.getClientId() } returns CLIENT_ID
 
         everySuspend { mockLoggingConfig.activate() } returns Unit
@@ -140,8 +140,8 @@ class ConfigTest {
     }
 
     @Test
-    fun testPushSettings_returnsCorrectValue() = runTest {
-        config.getPushSettings() shouldBe PUSH_SETTINGS
+    fun testGetNotificationSettings_returnsCorrectValue() = runTest {
+        config.getNotificationSettings() shouldBe PUSH_SETTINGS
     }
 
     @Test

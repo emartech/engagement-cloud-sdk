@@ -1,6 +1,6 @@
 package com.emarsys.api.config
 
-import com.emarsys.core.device.PushSettings
+import com.emarsys.core.device.NotificationSettings
 import kotlin.js.Promise
 
 @OptIn(ExperimentalJsExport::class)
@@ -16,5 +16,5 @@ interface JSConfigApi {
     fun changeMerchantId(merchantId: String): Promise<Unit>
     fun setLanguage(language: String): Promise<Unit>
     fun resetLanguage(): Promise<Unit>
-    fun getPushSettings(): Promise<PushSettings>
+    fun getPushSettings(): Promise<NotificationSettings>
 }

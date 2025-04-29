@@ -1,6 +1,6 @@
 package com.emarsys.api.config
 
-import com.emarsys.core.device.PushSettings
+import com.emarsys.core.device.NotificationSettings
 
 interface ConfigApi {
     suspend fun getContactFieldId(): Int?
@@ -18,5 +18,5 @@ interface ConfigApi {
 
     suspend fun resetLanguage(): Result<Unit>
 
-    suspend fun getPushSettings(): PushSettings
+    suspend fun getNotificationSettings(): NotificationSettings
 }

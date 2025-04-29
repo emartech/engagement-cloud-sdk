@@ -9,5 +9,5 @@ interface DeviceInfoCollectorApi {
 
     suspend fun getClientId(): String
 
-    suspend fun getPushSettings(): PushSettings
+    suspend fun getNotificationSettings(): NotificationSettings
 }

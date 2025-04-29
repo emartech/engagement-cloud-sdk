@@ -88,7 +88,7 @@ class JSConfigTests {
     fun getPushSettings_shouldCall_getPushSettings_onConfigApi() = runTest {
         jSConfig.getPushSettings().await()
 
-        verifySuspend { mockConfigApi.getPushSettings() }
+        verifySuspend { mockConfigApi.getNotificationSettings() }
     }
 
     @Test
