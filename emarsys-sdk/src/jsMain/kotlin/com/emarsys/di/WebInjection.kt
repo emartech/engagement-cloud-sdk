@@ -5,6 +5,8 @@ import com.emarsys.api.config.JSConfig
 import com.emarsys.api.config.JSConfigApi
 import com.emarsys.api.contact.JSContact
 import com.emarsys.api.contact.JSContactApi
+import com.emarsys.api.deeplink.JSDeepLink
+import com.emarsys.api.deeplink.JSDeepLinkApi
 import com.emarsys.api.push.JSPush
 import com.emarsys.api.push.JSPushApi
 import com.emarsys.api.push.LoggingPush
@@ -48,6 +50,11 @@ import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.url.WebExternalUrlOpener
+import com.emarsys.enable.PlatformInitState
+import com.emarsys.enable.PlatformInitializer
+import com.emarsys.enable.PlatformInitializerApi
+import com.emarsys.enable.config.JsEmarsysConfigStore
+import com.emarsys.enable.config.SdkConfigStoreApi
 import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppScriptExtractor
@@ -60,11 +67,6 @@ import com.emarsys.mobileengage.push.PushNotificationClickHandlerApi
 import com.emarsys.mobileengage.push.PushService
 import com.emarsys.mobileengage.push.PushServiceContext
 import com.emarsys.mobileengage.pushtoinapp.WebPushToInAppHandler
-import com.emarsys.enable.PlatformInitState
-import com.emarsys.enable.PlatformInitializer
-import com.emarsys.enable.PlatformInitializerApi
-import com.emarsys.enable.config.JsEmarsysConfigStore
-import com.emarsys.enable.config.SdkConfigStoreApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.connection.WebConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
@@ -257,6 +259,14 @@ object WebInjection {
         single<JSPushApi> {
             JSPush(
                 pushApi = get(),
+                applicationScope = get(
+                    named(CoroutineScopeTypes.Application)
+                )
+            )
+        }
+        single<JSDeepLinkApi> {
+            JSDeepLink(
+                deepLinkApi = get(),
                 applicationScope = get(
                     named(CoroutineScopeTypes.Application)
                 )
