@@ -1,6 +1,6 @@
 import com.emarsys.Emarsys
-import com.emarsys.EmarsysConfig
+import com.emarsys.IosEmarsysConfig
 
 actual suspend fun enableTracking() {
-    Emarsys.enableTracking(EmarsysConfig("EMSE3-B434"))
+    Emarsys.enableTracking(IosEmarsysConfig("EMSE3-B434"))
 }

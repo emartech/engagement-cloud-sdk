@@ -9,7 +9,7 @@ class EmarsysConfigTest {
 
     @Test
     fun testEmarsysConfig_isValid_shouldBe_true() {
-        val config = EmarsysConfig("appId", "merchantId")
+        val config = TestEmarsysConfig("appId", "merchantId")
 
         config.applicationCode shouldBe "appId"
         config.merchantId shouldBe "merchantId"
@@ -18,7 +18,7 @@ class EmarsysConfigTest {
 
     @Test
     fun testEmarsysConfig_isValid_shouldBe_false() {
-        val config = EmarsysConfig("null", "merchantId")
+        val config = TestEmarsysConfig("null", "merchantId")
 
         config.applicationCode shouldBe "null"
         config.merchantId shouldBe "merchantId"

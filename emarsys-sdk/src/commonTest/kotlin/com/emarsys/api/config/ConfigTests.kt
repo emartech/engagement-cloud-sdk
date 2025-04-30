@@ -1,7 +1,7 @@
 package com.emarsys.api.config
 
-import com.emarsys.EmarsysConfig
 import com.emarsys.SdkConstants
+import com.emarsys.TestEmarsysConfig
 import com.emarsys.api.SdkState
 import com.emarsys.context.DefaultUrls
 import com.emarsys.context.SdkContext
@@ -88,7 +88,7 @@ class ConfigTest {
             logBreadcrumbsQueueSize = 10
         )
         sdkContext.contactFieldId = CONTACT_FIELD_ID
-        sdkContext.config = EmarsysConfig(APPLICATION_CODE, MERCHANT_ID)
+        sdkContext.config = TestEmarsysConfig(APPLICATION_CODE, MERCHANT_ID)
 
 
         everySuspend { mockDeviceInfoCollector.collect() } returns Json.encodeToString(DEVICE_INFO)

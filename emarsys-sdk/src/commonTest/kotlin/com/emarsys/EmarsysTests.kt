@@ -9,7 +9,7 @@ class EmarsysTests {
 
     @Test
     fun testEnableTracking_shouldValidateConfig() = runTest {
-        val config = EmarsysConfig(applicationCode = "null")
+        val config = TestEmarsysConfig(applicationCode = "null")
         shouldThrow<PreconditionFailedException> {
             Emarsys.enableTracking(config)
         }

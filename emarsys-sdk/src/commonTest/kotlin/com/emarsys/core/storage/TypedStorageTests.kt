@@ -1,6 +1,6 @@
 package com.emarsys.core.storage
 
-import com.emarsys.EmarsysConfig
+import com.emarsys.TestEmarsysConfig
 import com.emarsys.core.log.Logger
 import com.emarsys.util.JsonUtil
 import dev.mokkery.answering.returns
@@ -19,7 +19,7 @@ class TypedStorageTests {
         const val APP_CODE = "testApplicationCode"
         const val MERCHANT_ID = "testMerchantId"
         const val SHARED_SECRET = "testSharedSecret"
-        val CONFIG = EmarsysConfig(APP_CODE, MERCHANT_ID, SHARED_SECRET)
+        val CONFIG = TestEmarsysConfig(APP_CODE, MERCHANT_ID, SHARED_SECRET)
         val CONFIG_STRING = JsonUtil.json.encodeToString(CONFIG)
     }
 
@@ -40,11 +40,11 @@ class TypedStorageTests {
         val key = "testKey"
         every { mockStringStorage.put(any(), any()) } returns Unit
         every { mockStringStorage.get(key) } returns CONFIG_STRING
-        val expected = EmarsysConfig(APP_CODE, MERCHANT_ID, SHARED_SECRET)
+        val expected = TestEmarsysConfig(APP_CODE, MERCHANT_ID, SHARED_SECRET)
 
-        typedStorage.put(key, EmarsysConfig.serializer(), expected)
+        typedStorage.put(key, TestEmarsysConfig.serializer(), expected)
 
-        val result: EmarsysConfig? = typedStorage.get(key, EmarsysConfig.serializer())
+        val result: TestEmarsysConfig? = typedStorage.get(key, TestEmarsysConfig.serializer())
 
         result shouldBe expected
     }
@@ -54,7 +54,7 @@ class TypedStorageTests {
         val key = "testKey"
         every { mockStringStorage.get(key) } returns """{"notValidKey": "testApplicationCode", "applicationCode": {1234}}"""
 
-        typedStorage.get(key, EmarsysConfig.serializer())
+        typedStorage.get(key, TestEmarsysConfig.serializer())
 
         verifySuspend { mockLogger.error("get", throwable = any()) }
     }

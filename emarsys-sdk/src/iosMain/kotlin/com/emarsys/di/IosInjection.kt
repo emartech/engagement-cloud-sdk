@@ -1,7 +1,7 @@
 package com.emarsys.di
 
 import app.cash.sqldelight.driver.native.NativeSqliteDriver
-import com.emarsys.EmarsysConfig
+import com.emarsys.IosEmarsysConfig
 import com.emarsys.api.config.IosConfig
 import com.emarsys.api.config.IosConfigApi
 import com.emarsys.api.contact.IosContact
@@ -102,11 +102,7 @@ object IosInjection {
         single<IosDeepLinkApi> { IosDeepLink() }
         single<UNUserNotificationCenter> { UNUserNotificationCenter.currentNotificationCenter() }
         single<StringStorageApi> { StringStorage(userDefaults = get()) }
-        single<SdkConfigStoreApi<EmarsysConfig>> {
-            IosSdkConfigStore(
-                typedStorage = get()
-            )
-        }
+        single<SdkConfigStoreApi<IosEmarsysConfig>> { IosSdkConfigStore(typedStorage = get()) }
         single<PermissionHandlerApi> { IosPermissionHandler(notificationCenter = get()) }
         single<UIDeviceApi> { UIDevice(NSProcessInfo()) }
         single<DeviceInfoCollectorApi> {
@@ -189,7 +185,7 @@ object IosInjection {
         single<ClipboardHandlerApi> { IosClipboardHandler(UIPasteboard.generalPasteboard) }
         single<LaunchApplicationHandlerApi> { IosLaunchApplicationHandler() }
         single<LanguageTagValidatorApi> { IosLanguageTagValidator() }
-        single<SdkConfigStoreApi<EmarsysConfig>> { IosSdkConfigStore(typedStorage = get()) }
+        single<SdkConfigStoreApi<IosEmarsysConfig>> { IosSdkConfigStore(typedStorage = get()) }
         single<IosPushInstance>(named(InstanceType.Internal)) {
             val badgeCountHandler = IosBadgeCountHandler(
                 notificationCenter = get(),

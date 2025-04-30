@@ -1,7 +1,7 @@
 package com.emarsys.init.states
 
-import com.emarsys.EmarsysConfig
 import com.emarsys.SdkConfig
+import com.emarsys.TestEmarsysConfig
 import com.emarsys.enable.EnableOrganizerApi
 import com.emarsys.enable.config.SdkConfigStoreApi
 import dev.mokkery.MockMode
@@ -35,7 +35,6 @@ class SdkConfigLoaderStateTests {
         Dispatchers.setMain(StandardTestDispatcher())
         mockSdkConfigLoader = mock()
         mockSetupOrganizer = mock(MockMode.autofill)
-
     }
 
     @Test
@@ -66,7 +65,7 @@ class SdkConfigLoaderStateTests {
                     StandardTestDispatcher()
                 ), sdkLogger = mock(MockMode.autofill)
             )
-        val testConfig = EmarsysConfig()
+        val testConfig = TestEmarsysConfig()
         everySuspend { mockSdkConfigLoader.load() } returns testConfig
 
         sdkConfigLoaderState.active()

@@ -1,7 +1,7 @@
 package com.emarsys.enable
 
-import com.emarsys.EmarsysConfig
 import com.emarsys.SdkConfig
+import com.emarsys.TestEmarsysConfig
 import com.emarsys.api.SdkState
 import com.emarsys.context.DefaultUrls
 import com.emarsys.context.SdkContext
@@ -66,7 +66,7 @@ class EnableOrganizerTests {
     @Test
     fun setup_should_call_activate_onMeStateMachine_and_store_config_and_set_config_and_state_on_context() =
         runTest {
-            val config = EmarsysConfig("testAppCode")
+            val config = TestEmarsysConfig("testAppCode")
 
             setupOrganizer.enable(config)
 
@@ -81,7 +81,7 @@ class EnableOrganizerTests {
     @Test
     fun testSetupWithValidation_should_throw_whenAConfigWasAlreadyStored() =
         runTest {
-            val config = EmarsysConfig("testAppCode")
+            val config = TestEmarsysConfig("testAppCode")
             everySuspend { mockSdkConfigLoader.load() } returns config
 
             val exception = shouldThrow<SdkAlreadyEnabledException> {
@@ -101,7 +101,7 @@ class EnableOrganizerTests {
         runTest {
             everySuspend { mockSdkConfigLoader.load() } returns null
 
-            val config = EmarsysConfig("testAppCode")
+            val config = TestEmarsysConfig("testAppCode")
 
             setupOrganizer.enableWithValidation(config)
 
@@ -116,7 +116,7 @@ class EnableOrganizerTests {
     @Test
     fun setup_should_call_activate_onPredictStateMachine_and_set_config_and_state_on_context() =
         runTest {
-            val config = EmarsysConfig(null, "testMerchantId")
+            val config = TestEmarsysConfig(null, "testMerchantId")
 
             setupOrganizer.enable(config)
 

@@ -1,6 +1,6 @@
 package com.emarsys.mobileengage.session
 
-import com.emarsys.EmarsysConfig
+import com.emarsys.TestEmarsysConfig
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.lifecycle.LifecycleEvent
@@ -115,7 +115,7 @@ class MobileEngageSessionTests {
         sessionContext.contactToken = CONTACT_TOKEN
         sessionContext.sessionId = null
         sessionContext.sessionStart = null
-        every { mockSdkContext.config } returns EmarsysConfig(applicationCode = APPLICATION_CODE)
+        every { mockSdkContext.config } returns TestEmarsysConfig(applicationCode = APPLICATION_CODE)
         every { mockTimestampProvider.provide() } returns Instant.fromEpochMilliseconds(
             SESSION_START
         )
@@ -137,7 +137,7 @@ class MobileEngageSessionTests {
     fun testSubscribe_shouldCallEndSession() = runTest {
         everySuspend { mockSdkEventDistributor.registerEvent(sessionStartEvent) } returns mock(MockMode.autofill)
         everySuspend { mockSdkEventDistributor.registerEvent(sessionEndEvent) } returns mock(MockMode.autofill)
-        every { mockSdkContext.config } returns EmarsysConfig(applicationCode = APPLICATION_CODE)
+        every { mockSdkContext.config } returns TestEmarsysConfig(applicationCode = APPLICATION_CODE)
         every { mockTimestampProvider.provide() } returns Instant.fromEpochMilliseconds(
             SESSION_START
         )
@@ -168,7 +168,7 @@ class MobileEngageSessionTests {
     fun testStartSession_shouldTrackSessionStartEvent() = runTest {
         sessionContext.sessionId = null
         sessionContext.sessionStart = null
-        every { mockSdkContext.config } returns EmarsysConfig(applicationCode = APPLICATION_CODE)
+        every { mockSdkContext.config } returns TestEmarsysConfig(applicationCode = APPLICATION_CODE)
         every { mockTimestampProvider.provide() } returns Instant.fromEpochMilliseconds(
             SESSION_START
         )
@@ -181,7 +181,7 @@ class MobileEngageSessionTests {
     @Test
     fun testEndSession_shouldTrackSessionEndEvent() = runTest {
         every { mockTimestampProvider.provide() } returns Instant.fromEpochMilliseconds(SESSION_END)
-        every { mockSdkContext.config } returns EmarsysConfig(applicationCode = APPLICATION_CODE)
+        every { mockSdkContext.config } returns TestEmarsysConfig(applicationCode = APPLICATION_CODE)
 
         mobileEngageSession.endSession()
 
@@ -198,7 +198,7 @@ class MobileEngageSessionTests {
         every { mockTimestampProvider.provide() } returns Instant.fromEpochMilliseconds(
             SESSION_START
         )
-        every { mockSdkContext.config } returns EmarsysConfig(applicationCode = APPLICATION_CODE)
+        every { mockSdkContext.config } returns TestEmarsysConfig(applicationCode = APPLICATION_CODE)
 
         mobileEngageSession.startSession()
 
@@ -210,7 +210,7 @@ class MobileEngageSessionTests {
     fun testStartSession_shouldNotDoAnything_whenApplicationCodeIsNull() = runTest {
         sessionContext.sessionId = null
         sessionContext.sessionStart = null
-        every { mockSdkContext.config } returns EmarsysConfig(applicationCode = null)
+        every { mockSdkContext.config } returns TestEmarsysConfig(applicationCode = null)
 
         mobileEngageSession.startSession()
 
@@ -222,7 +222,7 @@ class MobileEngageSessionTests {
     @Test
     fun testStartSession_shouldNotDoAnything_whenContactTokenIsNull() = runTest {
         sessionContext.contactToken = null
-        every { mockSdkContext.config } returns EmarsysConfig(applicationCode = APPLICATION_CODE)
+        every { mockSdkContext.config } returns TestEmarsysConfig(applicationCode = APPLICATION_CODE)
 
         mobileEngageSession.startSession()
 
@@ -234,7 +234,7 @@ class MobileEngageSessionTests {
     @Test
     fun testStartSession_shouldNotDoAnything_whenSessionIdIsNull() = runTest {
         sessionContext.sessionId = null
-        every { mockSdkContext.config } returns EmarsysConfig(applicationCode = APPLICATION_CODE)
+        every { mockSdkContext.config } returns TestEmarsysConfig(applicationCode = APPLICATION_CODE)
 
         mobileEngageSession.startSession()
 
@@ -246,7 +246,7 @@ class MobileEngageSessionTests {
     @Test
     fun testStartSession_shouldNotDoAnything_whenSessionStartIsNull() = runTest {
         sessionContext.sessionStart = null
-        every { mockSdkContext.config } returns EmarsysConfig(applicationCode = APPLICATION_CODE)
+        every { mockSdkContext.config } returns TestEmarsysConfig(applicationCode = APPLICATION_CODE)
 
         mobileEngageSession.startSession()
 
@@ -263,7 +263,7 @@ class MobileEngageSessionTests {
             "request failed"
         )
 
-        every { mockSdkContext.config } returns EmarsysConfig(applicationCode = APPLICATION_CODE)
+        every { mockSdkContext.config } returns TestEmarsysConfig(applicationCode = APPLICATION_CODE)
 
         mobileEngageSession.endSession()
 
@@ -274,7 +274,7 @@ class MobileEngageSessionTests {
     @Test
     fun testEndSession_shouldNotDoAnything_whenSessionIdIsNull() = runTest {
         sessionContext.sessionId = null
-        every { mockSdkContext.config } returns EmarsysConfig(applicationCode = APPLICATION_CODE)
+        every { mockSdkContext.config } returns TestEmarsysConfig(applicationCode = APPLICATION_CODE)
 
         mobileEngageSession.endSession()
 
@@ -286,7 +286,7 @@ class MobileEngageSessionTests {
     @Test
     fun testEndSession_shouldNotDoAnything_whenSessionStartIsNull() = runTest {
         sessionContext.sessionStart = null
-        every { mockSdkContext.config } returns EmarsysConfig(applicationCode = APPLICATION_CODE)
+        every { mockSdkContext.config } returns TestEmarsysConfig(applicationCode = APPLICATION_CODE)
 
         mobileEngageSession.endSession()
 
@@ -297,7 +297,7 @@ class MobileEngageSessionTests {
 
     @Test
     fun testEndSession_shouldNotDoAnything_whenApplicationCodeIsNull() = runTest {
-        every { mockSdkContext.config } returns EmarsysConfig(applicationCode = null)
+        every { mockSdkContext.config } returns TestEmarsysConfig(applicationCode = null)
 
         mobileEngageSession.endSession()
 
@@ -309,7 +309,7 @@ class MobileEngageSessionTests {
     @Test
     fun testEndSession_shouldNotDoAnything_whenContactTokenIsNull() = runTest {
         sessionContext.contactToken = null
-        every { mockSdkContext.config } returns EmarsysConfig(applicationCode = APPLICATION_CODE)
+        every { mockSdkContext.config } returns TestEmarsysConfig(applicationCode = APPLICATION_CODE)
 
         mobileEngageSession.endSession()
 
