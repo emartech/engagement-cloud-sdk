@@ -10,6 +10,9 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import com.emarsys.AndroidEmarsysConfig
+import com.emarsys.api.deeplink.AndroidDeepLink
+import com.emarsys.api.deeplink.AndroidDeepLinkApi
+import com.emarsys.api.deeplink.DeepLinkApi
 import com.emarsys.api.push.LoggingPush
 import com.emarsys.api.push.Push
 import com.emarsys.api.push.PushApi
@@ -292,6 +295,14 @@ object AndroidInjection {
                 gathererApi = get(named(InstanceType.Gatherer)),
                 internalApi = get(named(InstanceType.Internal)),
                 sdkContext = get()
+            )
+        }
+        single<AndroidDeepLinkApi> {
+            AndroidDeepLink(
+                deepLink = get<DeepLinkApi>(),
+                sdkLogger = get {
+                    parametersOf(AndroidDeepLink::class.simpleName)
+                }
             )
         }
         single<Boolean>(named(AvailableServices.Google)) {

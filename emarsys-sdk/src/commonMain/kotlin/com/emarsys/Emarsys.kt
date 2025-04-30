@@ -26,23 +26,13 @@ import kotlin.native.HiddenFromObjC
 
 @HiddenFromObjC
 @OptIn(ExperimentalObjCRefinement::class)
-object Emarsys {
+internal object Emarsys {
 
-    /**
-     * Initializes the SDK. This method must be called before using any other SDK functionality.
-     * On Android it is being called automatically
-     */
     suspend fun initialize() {
         SdkKoinIsolationContext.init()
         koin.get<InitOrganizerApi>().init()
     }
 
-    /**
-     * Enables tracking with the provided configuration.
-     *
-     * @param config The SDK configuration to use for enabling tracking.
-     * @throws SdkAlreadyEnabledException if tracking is already enabled.
-     */
     suspend fun enableTracking(config: SdkConfig): Result<Unit> {
         config.isValid()
         try {
@@ -53,10 +43,6 @@ object Emarsys {
         }
     }
 
-    /**
-     * Disables tracking with the provided configuration.
-     *
-     */
     suspend fun disableTracking(): Result<Unit> {
         try {
             koin.get<DisableOrganizerApi>().disable()

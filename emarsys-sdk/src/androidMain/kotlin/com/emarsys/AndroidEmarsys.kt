@@ -1,19 +1,16 @@
 package com.emarsys
 
-import android.app.Activity
-import android.content.Intent
-import com.emarsys.SdkConstants.EMS_DEEP_LINK_TRACKED_KEY
 import com.emarsys.api.config.ConfigApi
 import com.emarsys.api.contact.ContactApi
+import com.emarsys.api.deeplink.AndroidDeepLinkApi
 import com.emarsys.api.geofence.GeofenceTrackerApi
 import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.inbox.InboxApi
 import com.emarsys.api.predict.PredictApi
 import com.emarsys.api.push.PushApi
-import com.emarsys.core.log.Logger
+import com.emarsys.core.exceptions.SdkAlreadyEnabledException
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.tracking.TrackingApi
-import io.ktor.http.Url
 
 object AndroidEmarsys {
 
@@ -23,6 +20,8 @@ object AndroidEmarsys {
         get() = Emarsys.push
     val tracking: TrackingApi
         get() = Emarsys.tracking
+    val deepLink: AndroidDeepLinkApi
+        get() = koin.get<AndroidDeepLinkApi>()
     val inApp: InAppApi
         get() = Emarsys.inApp
     val inbox: InboxApi
@@ -34,26 +33,28 @@ object AndroidEmarsys {
     val predict: PredictApi
         get() = Emarsys.predict
 
+    /**
+     * Initializes the SDK. This method must be called before using any other SDK functionality.
+     * On Android it is being called automatically
+     */
     suspend fun initialize() {
         Emarsys.initialize()
     }
 
+    /**
+     * Enables tracking with the provided configuration.
+     *
+     * @param config The SDK configuration to use for enabling tracking.
+     * @throws SdkAlreadyEnabledException if tracking is already enabled.
+     */
     suspend fun enableTracking(config: SdkConfig) {
         Emarsys.enableTracking(config)
     }
 
-    suspend fun trackDeepLink(activity: Activity, intent: Intent) {
-        val uri = intent.data
-        val intentFromActivity: Intent? = activity.intent
-        val isLinkTracked =
-            intentFromActivity?.getBooleanExtra(EMS_DEEP_LINK_TRACKED_KEY, false) ?: false
-        if (!isLinkTracked && uri != null) {
-            Emarsys.deepLink.trackDeepLink(Url(uri.toString()))
-            intentFromActivity?.putExtra(EMS_DEEP_LINK_TRACKED_KEY, true)
-        } else {
-            koin.get<Logger>().info(
-                "Cannot track deeplink with uri: $uri"
-            )
-        }
+    /**
+     * Disables tracking with the provided configuration.
+     */
+    suspend fun disableTracking() {
+        Emarsys.disableTracking()
     }
 }
