@@ -63,10 +63,10 @@ internal class IosPushInternal(
     private val timestampProvider: InstantProvider,
     private val uuidProvider: UuidProviderApi
 ) : PushInternal(storage, pushContext, sdkEventDistributor, sdkLogger), IosPushInstance {
-    override var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol? =
-        null
+    override var customerUserNotificationCenterDelegate: List<UNUserNotificationCenterDelegateProtocol> =
+        listOf()
         set(value) {
-            (emarsysUserNotificationCenterDelegate as InternalNotificationCenterDelegateProxy).customerDelegate =
+            (emarsysUserNotificationCenterDelegate as InternalNotificationCenterDelegateProxy).customerDelegates =
                 value
             field = value
         }
@@ -181,7 +181,7 @@ internal class IosPushInternal(
     private class InternalNotificationCenterDelegateProxy(
         private val didReceiveNotificationResponse: (actionIdentifier: String, userInfo: Map<String, Any>, handler: () -> Unit) -> Unit,
         private val sdkContext: SdkContextApi,
-        var customerDelegate: UNUserNotificationCenterDelegateProtocol?
+        var customerDelegates: List<UNUserNotificationCenterDelegateProtocol> = emptyList()
     ) : UNUserNotificationCenterDelegateProtocol, NSObject() {
 
         override fun userNotificationCenter(
@@ -189,8 +189,8 @@ internal class IosPushInternal(
             willPresentNotification: UNNotification,
             withCompletionHandler: (UNNotificationPresentationOptions) -> Unit
         ) {
-            customerDelegate?.let {
-                CoroutineScope(Dispatchers.Main).launch {
+            CoroutineScope(Dispatchers.Main).launch {
+                customerDelegates.forEach {
                     it.userNotificationCenter(
                         center,
                         willPresentNotification,
@@ -208,8 +208,8 @@ internal class IosPushInternal(
             didReceiveNotificationResponse: UNNotificationResponse,
             withCompletionHandler: () -> Unit
         ) {
-            customerDelegate?.let {
-                CoroutineScope(Dispatchers.Main).launch {
+            CoroutineScope(Dispatchers.Main).launch {
+                customerDelegates.forEach {
                     it.userNotificationCenter(
                         center,
                         didReceiveNotificationResponse,
@@ -230,8 +230,8 @@ internal class IosPushInternal(
             center: UNUserNotificationCenter,
             openSettingsForNotification: UNNotification?
         ) {
-            customerDelegate?.let {
-                CoroutineScope(Dispatchers.Main).launch {
+            CoroutineScope(Dispatchers.Main).launch {
+                customerDelegates.forEach {
                     it.userNotificationCenter(center, openSettingsForNotification)
                 }
             }

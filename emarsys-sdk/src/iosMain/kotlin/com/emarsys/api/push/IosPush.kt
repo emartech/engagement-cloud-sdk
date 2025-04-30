@@ -5,7 +5,7 @@ import com.emarsys.mobileengage.push.IosPushWrapperApi
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 
 class IosPush : IosPushApi {
-    override var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol?
+    override var customerUserNotificationCenterDelegate: List<UNUserNotificationCenterDelegateProtocol>
         get() {
             return koin.get<IosPushWrapperApi>().customerUserNotificationCenterDelegate
         }

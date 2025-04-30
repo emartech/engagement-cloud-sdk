@@ -59,7 +59,7 @@ class IosLoggingPushTests {
 
         verifyLogging()
 
-        result shouldBe null
+        result shouldBe emptyList()
     }
 
     @Test

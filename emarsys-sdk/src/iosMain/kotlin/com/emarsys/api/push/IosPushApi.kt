@@ -5,7 +5,7 @@ import io.ktor.utils.io.CancellationException
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 
 interface IosPushApi {
-    var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol?
+    var customerUserNotificationCenterDelegate: List<UNUserNotificationCenterDelegateProtocol>
     val emarsysUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol
 
     @Throws(CancellationException::class)

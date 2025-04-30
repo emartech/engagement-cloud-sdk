@@ -295,18 +295,18 @@ class IosPushTests {
     fun testCustomerUserNotificationCenterDelegate_inactiveState() = runTest {
         every {
             mockLoggingPush.customerUserNotificationCenterDelegate
-        } returns null
+        } returns emptyList()
 
         val result = iosPushWrapper.customerUserNotificationCenterDelegate
 
-        result shouldBe null
+        result shouldBe emptyList()
     }
 
     @Test
     fun testCustomerUserNotificationCenterDelegate_onHoldState() = runTest {
         every {
             mockGathererPush.customerUserNotificationCenterDelegate
-        } returns testUNUserNotificationCenterDelegateProtocol
+        } returns listOf(testUNUserNotificationCenterDelegateProtocol)
 
         sdkContext.setSdkState(SdkState.onHold)
 
@@ -314,14 +314,14 @@ class IosPushTests {
 
         val result = iosPushWrapper.customerUserNotificationCenterDelegate
 
-        result shouldBe testUNUserNotificationCenterDelegateProtocol
+        result shouldBe listOf(testUNUserNotificationCenterDelegateProtocol)
     }
 
     @Test
     fun testCustomerUserNotificationCenterDelegate_onActiveState() = runTest {
         every {
             mockPushInternal.customerUserNotificationCenterDelegate
-        } returns testUNUserNotificationCenterDelegateProtocol
+        } returns listOf(testUNUserNotificationCenterDelegateProtocol)
 
         sdkContext.setSdkState(SdkState.active)
 
@@ -329,7 +329,7 @@ class IosPushTests {
 
         val result = iosPushWrapper.customerUserNotificationCenterDelegate
 
-        result shouldBe testUNUserNotificationCenterDelegateProtocol
+        result shouldBe listOf(testUNUserNotificationCenterDelegateProtocol)
     }
 
     @Test

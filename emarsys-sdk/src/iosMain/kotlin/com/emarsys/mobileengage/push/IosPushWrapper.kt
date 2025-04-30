@@ -34,7 +34,7 @@ class IosPushWrapper<Logging : IosPushInstance, Gatherer : IosPushInstance, Inte
         return kotlin.runCatching { activeInstance<PushInternalApi>().getPushToken() }
     }
 
-    override var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol?
+    override var customerUserNotificationCenterDelegate: List<UNUserNotificationCenterDelegateProtocol>
         get() = activeInstance<IosPushInstance>().customerUserNotificationCenterDelegate
         set(value) {
             activeInstance<IosPushInstance>().customerUserNotificationCenterDelegate =

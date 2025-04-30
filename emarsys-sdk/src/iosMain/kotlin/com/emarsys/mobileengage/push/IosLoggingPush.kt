@@ -17,13 +17,13 @@ internal class IosLoggingPush(
     storage: StringStorageApi,
     private val sdkDispatcher: CoroutineDispatcher
 ) : LoggingPush(storage, logger), IosPushInstance {
-    override var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol?
+    override var customerUserNotificationCenterDelegate: List<UNUserNotificationCenterDelegateProtocol>
         get() {
             val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)
             CoroutineScope(sdkDispatcher).launch {
                 logger.debug(entry)
             }
-            return null
+            return listOf()
         }
         set(_) {
             val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)

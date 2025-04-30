@@ -38,23 +38,23 @@ class IosGathererPushTests {
 
     @Test
     fun testCustomerUserNotificationCenterDelegate_getter_shouldInvokeOnInternalInstance() {
-        every { mockIosPushInternal.customerUserNotificationCenterDelegate } returns testNotificationCenterDelegateProtocol
+        every { mockIosPushInternal.customerUserNotificationCenterDelegate } returns listOf(testNotificationCenterDelegateProtocol)
         val result = iosGathererPush.customerUserNotificationCenterDelegate
 
         verify { mockIosPushInternal.customerUserNotificationCenterDelegate }
-        result shouldBe testNotificationCenterDelegateProtocol
+        result shouldBe listOf(testNotificationCenterDelegateProtocol)
     }
 
     @Test
     fun testCustomerUserNotificationCenterDelegate_setter_shouldInvokeOnInternalInstance() {
-        every { mockIosPushInternal.customerUserNotificationCenterDelegate } returns null
+        every { mockIosPushInternal.customerUserNotificationCenterDelegate } returns listOf()
         every { mockIosPushInternal.customerUserNotificationCenterDelegate = any() } returns Unit
         iosGathererPush.customerUserNotificationCenterDelegate =
-            testNotificationCenterDelegateProtocol
+            listOf(testNotificationCenterDelegateProtocol)
 
         verify {
             mockIosPushInternal.customerUserNotificationCenterDelegate =
-                testNotificationCenterDelegateProtocol
+                listOf(testNotificationCenterDelegateProtocol)
         }
     }
 

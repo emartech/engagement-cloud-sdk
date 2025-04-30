@@ -5,7 +5,7 @@ import com.emarsys.api.push.SilentPushUserInfo
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 
 interface IosPushInstance: PushInstance {
-    var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol?
+    var customerUserNotificationCenterDelegate: List<UNUserNotificationCenterDelegateProtocol>
     val emarsysUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol
 
     suspend fun handleSilentMessageWithUserInfo(userInfo: SilentPushUserInfo)

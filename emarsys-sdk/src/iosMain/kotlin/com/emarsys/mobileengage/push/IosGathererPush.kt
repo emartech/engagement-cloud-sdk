@@ -12,7 +12,7 @@ internal class IosGathererPush(
     storage: StringStorageApi,
     private val iosPushInternal: IosPushInstance
 ) : PushGatherer(context, storage), IosPushInstance {
-    override var customerUserNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol?
+    override var customerUserNotificationCenterDelegate: List<UNUserNotificationCenterDelegateProtocol>
         get() = iosPushInternal.customerUserNotificationCenterDelegate
         set(value) {
             iosPushInternal.customerUserNotificationCenterDelegate = value
