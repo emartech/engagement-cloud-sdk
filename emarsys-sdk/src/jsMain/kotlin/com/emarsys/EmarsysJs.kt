@@ -6,6 +6,7 @@ import com.emarsys.api.deeplink.JSDeepLinkApi
 import com.emarsys.api.geofence.JSGeofenceApi
 import com.emarsys.api.inapp.JSInAppApi
 import com.emarsys.api.inbox.JSInboxApi
+import com.emarsys.api.predict.JSPredictApi
 import com.emarsys.api.push.JSPushApi
 import com.emarsys.api.tracking.JSTrackingApi
 import com.emarsys.di.CoroutineScopeTypes
@@ -35,6 +36,7 @@ object EmarsysJs {
     lateinit var geofence: JSGeofenceApi
     lateinit var inbox: JSInboxApi
     lateinit var inApp: JSInAppApi
+    lateinit var predict: JSPredictApi
 
     /**
      * Initializes the SDK. This method must be called before using any other SDK functionality.
@@ -53,6 +55,7 @@ object EmarsysJs {
             geofence = koin.get<JSGeofenceApi>()
             inbox = koin.get<JSInboxApi>()
             inApp = koin.get<JSInAppApi>()
+            predict = koin.get<JSPredictApi>()
         }
     }
 

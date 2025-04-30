@@ -2,8 +2,12 @@ package com.emarsys.api.predict.model
 
 import io.ktor.http.Url
 import kotlinx.serialization.Serializable
+import kotlin.js.ExperimentalJsExport
+import kotlin.js.JsExport
 
 @Serializable
+@OptIn(ExperimentalJsExport::class)
+@JsExport
 data class Product(
     val productId: String,
     val title: String,

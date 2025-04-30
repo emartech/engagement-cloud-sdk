@@ -1,8 +1,12 @@
 package com.emarsys.api.predict.model
 
 import kotlinx.serialization.Serializable
+import kotlin.js.ExperimentalJsExport
+import kotlin.js.JsExport
 
 @Serializable
+@OptIn(ExperimentalJsExport::class)
+@JsExport
 class RecommendationFilter {
     companion object {
         private const val IS = "IS"
