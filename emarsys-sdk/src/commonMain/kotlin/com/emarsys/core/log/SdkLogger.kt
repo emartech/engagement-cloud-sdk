@@ -8,7 +8,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlin.coroutines.coroutineContext
 
-class SdkLogger(
+internal class SdkLogger(
     private val loggerName: String,
     private val consoleLogger: ConsoleLoggerApi,
     private val remoteLogger: RemoteLoggerApi? = null,

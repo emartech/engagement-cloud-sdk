@@ -18,7 +18,7 @@ import com.emarsys.core.url.EmarsysUrlType.UNLINK_CONTACT
 import io.ktor.http.URLBuilder
 import io.ktor.http.Url
 
-class UrlFactory(
+internal class UrlFactory(
     private val sdkContext: SdkContextApi
 ) : UrlFactoryApi {
     private companion object {

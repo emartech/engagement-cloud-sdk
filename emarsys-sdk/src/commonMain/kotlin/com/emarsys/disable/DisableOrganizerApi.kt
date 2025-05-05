@@ -3,7 +3,7 @@ package com.emarsys.disable
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.state.StateMachineApi
 
-interface DisableOrganizerApi {
+internal interface DisableOrganizerApi {
     val mobileEngageDisableStateMachine: StateMachineApi
     val predictDisableStateMachine: StateMachineApi
     val sdkContext: SdkContextApi

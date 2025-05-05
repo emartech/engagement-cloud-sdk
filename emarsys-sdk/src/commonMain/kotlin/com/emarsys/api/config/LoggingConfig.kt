@@ -5,7 +5,7 @@ import com.emarsys.core.log.Logger
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 
-class LoggingConfig(private val logger: Logger) : ConfigInstance {
+internal class LoggingConfig(private val logger: Logger) : ConfigInstance {
     override suspend fun changeApplicationCode(applicationCode: String) {
         val entry = LogEntry.createMethodNotAllowed(
             this, this::changeApplicationCode.name, buildJsonObject {

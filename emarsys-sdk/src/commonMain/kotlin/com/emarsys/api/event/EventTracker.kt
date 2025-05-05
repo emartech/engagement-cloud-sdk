@@ -8,7 +8,7 @@ import kotlinx.coroutines.withContext
 
 interface EventTrackerInstance : EventTrackerInternalApi, Activatable
 
-class EventTracker<Logging : EventTrackerInstance, Gatherer : EventTrackerInstance, Internal : EventTrackerInstance>(
+internal class EventTracker<Logging : EventTrackerInstance, Gatherer : EventTrackerInstance, Internal : EventTrackerInstance>(
     loggingApi: Logging,
     gathererApi: Gatherer,
     internalApi: Internal,

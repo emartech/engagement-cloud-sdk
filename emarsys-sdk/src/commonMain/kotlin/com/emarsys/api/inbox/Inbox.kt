@@ -6,9 +6,9 @@ import com.emarsys.api.inbox.model.Message
 import com.emarsys.context.SdkContextApi
 import kotlinx.coroutines.withContext
 
-interface InboxInstance : InboxInternalApi, Activatable
+internal interface InboxInstance : InboxInternalApi, Activatable
 
-class Inbox<Logging : InboxInstance, Gatherer : InboxInstance, Internal : InboxInstance>(
+internal class Inbox<Logging : InboxInstance, Gatherer : InboxInstance, Internal : InboxInstance>(
     loggingApi: Logging,
     gathererApi: Gatherer,
     internalApi: Internal,

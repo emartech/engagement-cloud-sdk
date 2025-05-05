@@ -2,6 +2,6 @@ package com.emarsys.core.log
 
 import kotlinx.serialization.json.JsonObject
 
-interface RemoteLoggerApi {
+internal interface RemoteLoggerApi {
     suspend fun logToRemote(level: LogLevel, log: JsonObject)
 }

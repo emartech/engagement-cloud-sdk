@@ -11,7 +11,7 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
-data class ReportingAction(
+internal data class ReportingAction(
     private val action: ReportingActionModel,
     private val sdkEventDistributor: SdkEventDistributorApi
 ) : Action<Unit> {

@@ -2,7 +2,7 @@ package com.emarsys.core.log
 
 import kotlinx.serialization.json.JsonObject
 
-expect class ConsoleLogger() : ConsoleLoggerApi {
+internal expect class ConsoleLogger() : ConsoleLoggerApi {
 
     override fun logToConsole(
         loggerName: String,

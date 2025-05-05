@@ -11,7 +11,7 @@ import kotlinx.coroutines.withContext
 
 interface PredictInstance : PredictInternalApi, Activatable
 
-class Predict<Logging : PredictInstance, Gatherer : PredictInstance, Internal : PredictInstance>(
+internal class Predict<Logging : PredictInstance, Gatherer : PredictInstance, Internal : PredictInstance>(
     loggingApi: Logging,
     gathererApi: Gatherer,
     internalApi: Internal,

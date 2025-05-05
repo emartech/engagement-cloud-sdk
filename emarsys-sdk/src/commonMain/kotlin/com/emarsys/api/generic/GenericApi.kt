@@ -11,7 +11,7 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
 import kotlin.reflect.typeOf
 
-open class GenericApi<Logging : Activatable, Gatherer : Activatable, Internal : Activatable>(
+internal open class GenericApi<Logging : Activatable, Gatherer : Activatable, Internal : Activatable>(
     private val loggingApi: Logging,
     private val gathererApi: Gatherer,
     private val internalApi: Internal,

@@ -21,7 +21,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlin.coroutines.coroutineContext
 
-class SdkEventDistributor(
+internal class SdkEventDistributor(
     private val connectionStatus: StateFlow<Boolean>,
     private val sdkContext: SdkContextApi,
     private val eventsDao: EventsDaoApi,

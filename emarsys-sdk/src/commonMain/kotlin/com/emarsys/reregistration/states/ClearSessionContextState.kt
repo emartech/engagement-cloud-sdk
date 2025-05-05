@@ -4,7 +4,7 @@ import com.emarsys.core.log.Logger
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.state.State
 
-class ClearSessionContextState(
+internal class ClearSessionContextState(
     private val sessionContext: SessionContext,
     val sdkLogger: Logger
 ) : State {

@@ -7,7 +7,7 @@ import kotlinx.coroutines.withContext
 
 interface PushInstance : PushInternalApi, Activatable
 
-class Push<Logging : PushInstance, Gatherer : PushInstance, Internal : PushInstance>(
+internal class Push<Logging : PushInstance, Gatherer : PushInstance, Internal : PushInstance>(
     loggingApi: Logging,
     gathererApi: Gatherer,
     internalApi: Internal,

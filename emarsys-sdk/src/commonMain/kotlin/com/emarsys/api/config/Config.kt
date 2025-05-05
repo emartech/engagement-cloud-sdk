@@ -14,7 +14,7 @@ import kotlinx.serialization.json.buildJsonObject
 
 interface ConfigInstance : ConfigInternalApi, Activatable
 
-class Config<Logging : ConfigInstance, Gatherer : ConfigInstance, Internal : ConfigInstance>(
+internal class Config<Logging : ConfigInstance, Gatherer : ConfigInstance, Internal : ConfigInstance>(
     loggingApi: Logging,
     gathererApi: Gatherer,
     internalApi: Internal,

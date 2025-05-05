@@ -27,11 +27,10 @@ import kotlin.coroutines.coroutineContext
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
 
-class GenericNetworkClient(
+internal class GenericNetworkClient(
     private val client: HttpClient,
     private val sdkLogger: Logger,
-) :
-    NetworkClientApi {
+) : NetworkClientApi {
 
     private companion object {
         const val MAX_RETRY_COUNT = 5

@@ -12,7 +12,7 @@ import kotlinx.serialization.json.buildJsonObject
 import web.broadcast.BroadcastChannel
 import web.events.EventHandler
 
-class WebBadgeCountHandler(
+internal class WebBadgeCountHandler(
     private val onBadgeCountUpdateReceivedBroadcastChannel: BroadcastChannel,
     private val sdkEventDistributor: SdkEventDistributorApi,
     private val coroutineScope: CoroutineScope,

@@ -6,7 +6,7 @@ import com.emarsys.core.log.Logger
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 
-class LoggingInbox(private val logger: Logger) : InboxInstance {
+internal class LoggingInbox(private val logger: Logger) : InboxInstance {
     override suspend fun fetchMessages(): List<Message> {
         val entry = LogEntry.createMethodNotAllowed(
             this, this::fetchMessages.name

@@ -14,7 +14,7 @@ import com.emarsys.core.device.AndroidVersionUtils.isUpsideDownCakeOrAbove
 import com.emarsys.core.log.Logger
 import com.emarsys.watchdog.activity.ActivityFinderApi
 
-class LaunchApplicationHandler(
+internal class LaunchApplicationHandler(
     private val applicationContext: Context,
     private val activityFinder: ActivityFinderApi,
     private val sdkContext: SdkContextApi,

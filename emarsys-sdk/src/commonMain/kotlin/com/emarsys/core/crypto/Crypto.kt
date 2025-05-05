@@ -9,7 +9,7 @@ import dev.whyoleg.cryptography.algorithms.*
 import dev.whyoleg.cryptography.operations.Hasher
 import io.ktor.util.*
 
-class Crypto(
+internal class Crypto(
     private val logger: Logger,
     private val publicKey: String
 ) : CryptoApi {

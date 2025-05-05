@@ -5,7 +5,7 @@ import com.emarsys.core.log.Logger
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 
-class LoggingContact(private val logger: Logger) : ContactInstance {
+internal class LoggingContact(private val logger: Logger) : ContactInstance {
 
     override suspend fun linkContact(contactFieldId: Int, contactFieldValue: String) {
         val entry = LogEntry.createMethodNotAllowed(

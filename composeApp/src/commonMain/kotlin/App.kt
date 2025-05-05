@@ -16,7 +16,6 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Preview
 fun App() {
     val eventName = mutableStateOf("")
-
     MaterialTheme {
         Column {
             Text("Hello Team SDK!")

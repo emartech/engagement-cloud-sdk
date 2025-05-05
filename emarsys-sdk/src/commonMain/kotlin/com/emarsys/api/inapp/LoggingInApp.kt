@@ -6,7 +6,7 @@ import com.emarsys.core.log.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-class LoggingInApp(private val sdkContext: SdkContextApi, private val logger: Logger) : InAppInstance {
+internal class LoggingInApp(private val sdkContext: SdkContextApi, private val logger: Logger) : InAppInstance {
     override val isPaused: Boolean
         get() {
             val entry = LogEntry.createMethodNotAllowed<LoggingInApp>(

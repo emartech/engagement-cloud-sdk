@@ -5,7 +5,7 @@ import com.emarsys.context.SdkContextApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.state.StateMachineApi
 
-class DisableOrganizer(
+internal class DisableOrganizer(
     override val mobileEngageDisableStateMachine: StateMachineApi,
     override val predictDisableStateMachine: StateMachineApi,
     override val sdkContext: SdkContextApi,

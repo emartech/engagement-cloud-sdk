@@ -10,7 +10,7 @@ import kotlinx.serialization.json.buildJsonObject
 
 interface ContactInstance : ContactInternalApi, Activatable
 
-class Contact<Logging : ContactInstance, Gatherer : ContactInstance, Internal : ContactInstance>(
+internal class Contact<Logging : ContactInstance, Gatherer : ContactInstance, Internal : ContactInstance>(
     loggingApi: Logging,
     gathererApi: Gatherer,
     internalApi: Internal,

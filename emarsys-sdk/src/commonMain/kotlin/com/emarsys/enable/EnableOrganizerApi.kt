@@ -4,7 +4,7 @@ import com.emarsys.SdkConfig
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.state.StateMachineApi
 
-interface EnableOrganizerApi {
+internal interface EnableOrganizerApi {
     val meStateMachine: StateMachineApi
     val predictStateMachine: StateMachineApi
     val sdkContext: SdkContextApi

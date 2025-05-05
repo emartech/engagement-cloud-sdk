@@ -3,7 +3,7 @@ package com.emarsys.init
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.state.StateMachineApi
 
-interface InitOrganizerApi {
+internal interface InitOrganizerApi {
     val initStateMachine: StateMachineApi
     val sdkContext: SdkContextApi
 

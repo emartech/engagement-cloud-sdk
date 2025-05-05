@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
-class ReregistrationClient(
+internal class ReregistrationClient(
     private val sdkEventManager: SdkEventManagerApi,
     private val sdkContext: SdkContextApi,
     private val mobileEngageReregistrationStateMachine: StateMachineApi,

@@ -6,7 +6,7 @@ import com.emarsys.core.log.Logger
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 
-class LoggingEventTracker(private val logger: Logger) : EventTrackerInstance {
+internal class LoggingEventTracker(private val logger: Logger) : EventTrackerInstance {
     override suspend fun trackEvent(event: CustomEvent) {
         val entry = LogEntry.createMethodNotAllowed(
             this, this::trackEvent.name, buildJsonObject {

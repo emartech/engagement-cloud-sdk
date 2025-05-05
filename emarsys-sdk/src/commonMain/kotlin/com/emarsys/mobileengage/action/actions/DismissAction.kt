@@ -4,7 +4,7 @@ import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.mobileengage.action.models.DismissActionModel
 import com.emarsys.networking.clients.event.model.SdkEvent
 
-class DismissAction(
+internal class DismissAction(
     private val action: DismissActionModel,
     private val sdkEventDistributor: SdkEventDistributorApi
 ): Action<Unit> {

@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 
-class LoggingGeofenceTracker(
+internal class LoggingGeofenceTracker(
     private val sdkContext: SdkContextApi,
     private val logger: Logger
 ) : GeofenceTrackerInstance {

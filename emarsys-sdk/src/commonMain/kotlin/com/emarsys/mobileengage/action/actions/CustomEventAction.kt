@@ -6,7 +6,7 @@ import com.emarsys.networking.clients.event.model.SdkEvent
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 
-class CustomEventAction(
+internal class CustomEventAction(
     private val action: CustomEventActionModel,
     private val sdkEventDistributor: SdkEventDistributorApi
 ) : Action<Unit> {

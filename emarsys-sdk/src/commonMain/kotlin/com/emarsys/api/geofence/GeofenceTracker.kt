@@ -8,7 +8,7 @@ import kotlinx.coroutines.withContext
 
 interface GeofenceTrackerInstance : GeofenceTrackerInternalApi, Activatable
 
-class GeofenceTracker<Logging : GeofenceTrackerInstance, Gatherer : GeofenceTrackerInstance, Internal : GeofenceTrackerInstance>(
+internal class GeofenceTracker<Logging : GeofenceTrackerInstance, Gatherer : GeofenceTrackerInstance, Internal : GeofenceTrackerInstance>(
     loggingApi: Logging,
     gathererApi: Gatherer,
     internalApi: Internal,

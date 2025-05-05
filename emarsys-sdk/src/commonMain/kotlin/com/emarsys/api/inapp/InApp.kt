@@ -7,7 +7,7 @@ import kotlinx.coroutines.withContext
 
 interface InAppInstance : InAppInternalApi, Activatable
 
-class InApp<Logging : InAppInstance, Gatherer : InAppInstance, Internal : InAppInstance>(
+internal class InApp<Logging : InAppInstance, Gatherer : InAppInstance, Internal : InAppInstance>(
     loggingApi: Logging,
     gathererApi: Gatherer,
     internalApi: Internal,

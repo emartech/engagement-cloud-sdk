@@ -9,7 +9,7 @@ import com.emarsys.networking.clients.event.model.SdkEvent
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
-class LinkContactState(
+internal class LinkContactState(
     private val sessionContext: SessionContext,
     private val sdkContext: SdkContextApi,
     private val sdkEventDistributor: SdkEventDistributorApi,

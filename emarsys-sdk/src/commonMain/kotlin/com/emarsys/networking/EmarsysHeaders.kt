@@ -1,6 +1,6 @@
 package com.emarsys.networking
 
-object EmarsysHeaders {
+internal object EmarsysHeaders {
     const val CLIENT_ID_HEADER = "ems-client-id"
     const val X_CLIENT_ID_HEADER = "X-Client-Id"
     const val CLIENT_STATE_HEADER = "ems-client-state"

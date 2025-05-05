@@ -10,7 +10,7 @@ import com.emarsys.util.JsonUtil
 import kotlinx.coroutines.withContext
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 
-class IosPushWrapper<Logging : IosPushInstance, Gatherer : IosPushInstance, Internal : IosPushInstance>(
+internal class IosPushWrapper<Logging : IosPushInstance, Gatherer : IosPushInstance, Internal : IosPushInstance>(
     loggingApi: Logging,
     gathererApi: Gatherer,
     internalApi: Internal,

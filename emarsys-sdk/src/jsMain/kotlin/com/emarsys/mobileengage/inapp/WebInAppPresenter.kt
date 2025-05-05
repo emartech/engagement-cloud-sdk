@@ -12,7 +12,7 @@ import kotlinx.serialization.json.buildJsonObject
 import web.dom.document
 import web.html.HTMLElement
 
-class WebInAppPresenter(
+internal class WebInAppPresenter(
     private val sdkEventDistributor: SdkEventDistributorApi,
     private val sdkDispatcher: CoroutineDispatcher,
     private val logger: Logger

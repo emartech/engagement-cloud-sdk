@@ -9,7 +9,7 @@ import com.emarsys.core.log.Logger
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 
-class LoggingPredict(private val logger: Logger) : PredictInstance {
+internal class LoggingPredict(private val logger: Logger) : PredictInstance {
     override suspend fun trackCart(items: List<CartItem>) {
         val entry = LogEntry.createMethodNotAllowed(
             this,

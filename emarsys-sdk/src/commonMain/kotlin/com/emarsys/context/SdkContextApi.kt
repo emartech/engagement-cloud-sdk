@@ -6,7 +6,7 @@ import com.emarsys.core.log.LogLevel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.StateFlow
 
-interface SdkContextApi {
+internal interface SdkContextApi {
     val currentSdkState: StateFlow<SdkState>
     val sdkDispatcher: CoroutineDispatcher
     val mainDispatcher: CoroutineDispatcher
