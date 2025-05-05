@@ -26,7 +26,7 @@ import kotlin.native.HiddenFromObjC
 
 @HiddenFromObjC
 @OptIn(ExperimentalObjCRefinement::class)
-internal object Emarsys {
+object Emarsys {
 
     suspend fun initialize() {
         SdkKoinIsolationContext.init()
