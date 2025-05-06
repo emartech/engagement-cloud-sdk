@@ -5,8 +5,8 @@ plugins {
 }
 
 dependencies {
-    implementation(libs.hms)
-    implementation(libs.agconnect.core)
+    api(libs.hms)
+    api(libs.agconnect.core)
 
     implementation(kotlin("test"))
     implementation(libs.mockk.android)

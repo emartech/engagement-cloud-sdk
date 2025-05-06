@@ -2,6 +2,7 @@ package com.emarsys.service
 
 import android.content.Context
 import android.content.Intent
+import com.emarsys.service.model.HuaweiMessagingServiceRegistrationOptions
 import com.huawei.hms.push.HmsMessageService
 import com.huawei.hms.push.RemoteMessage
 
@@ -15,13 +16,15 @@ class EmarsysHuaweiMessagingService() : HmsMessageService() {
         const val PUSH_MESSAGE_PAYLOAD_INTENT_FILTER_ACTION =
             "com.emarsys.sdk.PUSH_MESSAGE_PAYLOAD"
         const val EMS_MESSAGE_KEY = "ems_msg"
-        internal val messagingServices = mutableListOf<Pair<Boolean, HmsMessageService>>()
+
+        internal val messagingServices =
+            mutableListOf<Pair<HuaweiMessagingServiceRegistrationOptions, HmsMessageService>>()
 
         fun registerMessagingService(
             messagingService: HmsMessageService,
-            includeEmarsysMessages: Boolean = false
+            registrationOptions: HuaweiMessagingServiceRegistrationOptions = HuaweiMessagingServiceRegistrationOptions()
         ) {
-            messagingServices.add(Pair(includeEmarsysMessages, messagingService))
+            messagingServices.add(Pair(registrationOptions, messagingService))
         }
     }
 
@@ -38,7 +41,11 @@ class EmarsysHuaweiMessagingService() : HmsMessageService() {
         super.onMessageReceived(remoteMessage)
 
         messagingServices
-            .filter { it.first || !remoteMessage.dataOfMap.containsKey(EMS_MESSAGE_KEY) }
+            .filter {
+                it.first.includeEmarsysMessages || !remoteMessage.dataOfMap.containsKey(
+                    EMS_MESSAGE_KEY
+                )
+            }
             .forEach { it.second.onMessageReceived(remoteMessage) }
 
         val intent = Intent().apply {

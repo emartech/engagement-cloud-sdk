@@ -1,6 +1,7 @@
 package com.emarsys.service
 
 import android.content.Intent
+import com.emarsys.service.model.FirebaseMessagingServiceRegistrationOptions
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kotlinx.serialization.json.Json
@@ -16,13 +17,15 @@ class EmarsysFirebaseMessagingService : FirebaseMessagingService() {
         const val PUSH_MESSAGE_PAYLOAD_INTENT_KEY = "pushPayload"
         private const val EMS_KEY = "ems"
         private const val EMS_VERSION_KEY = "ems.version"
-        internal val messagingServices = mutableListOf<Pair<Boolean, FirebaseMessagingService>>()
+
+        internal val messagingServices =
+            mutableListOf<Pair<FirebaseMessagingServiceRegistrationOptions, FirebaseMessagingService>>()
 
         fun registerMessagingService(
             messagingService: FirebaseMessagingService,
-            includeEmarsysMessages: Boolean = false
+            registrationOptions: FirebaseMessagingServiceRegistrationOptions = FirebaseMessagingServiceRegistrationOptions()
         ) {
-            messagingServices.add(Pair(includeEmarsysMessages, messagingService))
+            messagingServices.add(Pair(registrationOptions, messagingService))
         }
     }
 
@@ -38,7 +41,7 @@ class EmarsysFirebaseMessagingService : FirebaseMessagingService() {
         println("message received: ${remoteMessage.messageId}")
         messagingServices
             .filter {
-                it.first || !isEmarsysMessage(remoteMessage.data)
+                it.first.includeEmarsysMessages || !isEmarsysMessage(remoteMessage.data)
             }
             .forEach { it.second.onMessageReceived(remoteMessage) }
         if (isEmarsysMessage(remoteMessage.data)) {

@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import androidx.test.platform.app.InstrumentationRegistry
+import com.emarsys.service.model.FirebaseMessagingServiceRegistrationOptions
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import io.kotest.matchers.shouldBe
@@ -58,14 +59,17 @@ class EmarsysFirebaseMessagingServiceTest {
         val testMessagingService1 = FirebaseMessagingService()
         val testMessagingService2 = FirebaseMessagingService()
         EmarsysFirebaseMessagingService.registerMessagingService(testMessagingService1)
-        EmarsysFirebaseMessagingService.registerMessagingService(testMessagingService2, true)
+        EmarsysFirebaseMessagingService.registerMessagingService(
+            testMessagingService2,
+            FirebaseMessagingServiceRegistrationOptions(true)
+        )
 
         val result = EmarsysFirebaseMessagingService.messagingServices
 
         result.size shouldBe 2
-        result[0].first shouldBe false
+        result[0].first.includeEmarsysMessages shouldBe false
         result[0].second shouldBe testMessagingService1
-        result[1].first shouldBe true
+        result[1].first.includeEmarsysMessages shouldBe true
         result[1].second shouldBe testMessagingService2
     }
 
@@ -121,7 +125,10 @@ class EmarsysFirebaseMessagingServiceTest {
         val mockMessagingService = mockk<FirebaseMessagingService>(relaxed = true)
         val mockMessage = mockk<RemoteMessage>(relaxed = true)
         every { mockMessage.data } returns mapOf()
-        EmarsysFirebaseMessagingService.registerMessagingService(mockMessagingService, true)
+        EmarsysFirebaseMessagingService.registerMessagingService(
+            mockMessagingService,
+            FirebaseMessagingServiceRegistrationOptions(true)
+        )
 
         emarsysFirebaseMessagingService.onMessageReceived(mockMessage)
         verify { mockMessagingService.onMessageReceived(mockMessage) }
@@ -137,7 +144,10 @@ class EmarsysFirebaseMessagingServiceTest {
 
         registerReceiver("com.emarsys.sdk.PUSH_MESSAGE_PAYLOAD")
 
-        EmarsysFirebaseMessagingService.registerMessagingService(mockMessagingService, true)
+        EmarsysFirebaseMessagingService.registerMessagingService(
+            mockMessagingService,
+            FirebaseMessagingServiceRegistrationOptions(true)
+        )
 
         emarsysFirebaseMessagingService.onMessageReceived(mockMessage)
 
@@ -164,7 +174,10 @@ class EmarsysFirebaseMessagingServiceTest {
         every { mockMessage1.data } returns mapOf("ems.version" to "version1")
         val mockMessage2 = mockk<RemoteMessage>(relaxed = true)
         every { mockMessage2.data } returns mapOf()
-        EmarsysFirebaseMessagingService.registerMessagingService(mockMessagingService, false)
+        EmarsysFirebaseMessagingService.registerMessagingService(
+            mockMessagingService,
+            FirebaseMessagingServiceRegistrationOptions(false)
+        )
 
         emarsysFirebaseMessagingService.onMessageReceived(mockMessage1)
         emarsysFirebaseMessagingService.onMessageReceived(mockMessage2)

@@ -6,7 +6,7 @@ plugins {
 }
 
 dependencies {
-    implementation(libs.fcm)
+    api(libs.fcm)
 
     implementation(kotlin("test"))
     implementation(libs.mockk.android)

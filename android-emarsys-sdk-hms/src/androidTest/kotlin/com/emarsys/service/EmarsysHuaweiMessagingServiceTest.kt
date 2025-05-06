@@ -2,6 +2,7 @@ package com.emarsys.service
 
 import android.os.Looper
 import androidx.test.platform.app.InstrumentationRegistry
+import com.emarsys.service.model.HuaweiMessagingServiceRegistrationOptions
 import com.huawei.hms.push.HmsMessageService
 import com.huawei.hms.push.RemoteMessage
 import io.kotest.matchers.shouldBe
@@ -37,14 +38,17 @@ class EmarsysHuaweiMessagingServiceTest {
         val testService2 = HmsMessageService()
 
         EmarsysHuaweiMessagingService.registerMessagingService(testService1)
-        EmarsysHuaweiMessagingService.registerMessagingService(testService2, true)
+        EmarsysHuaweiMessagingService.registerMessagingService(
+            testService2,
+            HuaweiMessagingServiceRegistrationOptions(includeEmarsysMessages = true)
+        )
 
         val result = EmarsysHuaweiMessagingService.messagingServices
 
         result.size shouldBe 2
-        result[0].first shouldBe false
+        result[0].first.includeEmarsysMessages shouldBe false
         result[0].second shouldBe testService1
-        result[1].first shouldBe true
+        result[1].first. includeEmarsysMessages shouldBe true
         result[1].second shouldBe testService2
     }
 
@@ -53,7 +57,10 @@ class EmarsysHuaweiMessagingServiceTest {
         val mockMessagingService = mockk<HmsMessageService>(relaxed = true)
         val mockMessage = mockk<RemoteMessage>(relaxed = true)
         every { mockMessage.dataOfMap } returns mapOf()
-        EmarsysHuaweiMessagingService.registerMessagingService(mockMessagingService, true)
+        EmarsysHuaweiMessagingService.registerMessagingService(
+            mockMessagingService,
+            HuaweiMessagingServiceRegistrationOptions(includeEmarsysMessages = true)
+        )
 
         huaweiMessagingService.onMessageReceived(mockMessage)
         verify { mockMessagingService.onMessageReceived(mockMessage) }
@@ -66,7 +73,10 @@ class EmarsysHuaweiMessagingServiceTest {
         every { mockMessage1.dataOfMap } returns mapOf("ems_msg" to "true")
         val mockMessage2 = mockk<RemoteMessage>(relaxed = true)
         every { mockMessage2.dataOfMap } returns mapOf()
-        EmarsysHuaweiMessagingService.registerMessagingService(mockMessagingService, false)
+        EmarsysHuaweiMessagingService.registerMessagingService(
+            mockMessagingService,
+            HuaweiMessagingServiceRegistrationOptions(includeEmarsysMessages = false)
+        )
 
         huaweiMessagingService.onMessageReceived(mockMessage1)
         huaweiMessagingService.onMessageReceived(mockMessage2)
