@@ -1,7 +1,7 @@
 package com.emarsys
 
 import com.emarsys.api.push.PushConstants.WEB_PUSH_ON_BADGE_COUNT_UPDATE_RECEIVED
-import com.emarsys.core.log.Logger
+import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.mapper.Mapper
 import com.emarsys.mobileengage.action.models.BadgeCount
 import com.emarsys.mobileengage.action.models.BadgeCountMethod
@@ -48,14 +48,6 @@ class EmarsysServiceWorkerTests {
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(StandardTestDispatcher())
-        val sdkLogger = mock<Logger> {
-            everySuspend {
-                error(
-                    any<String>(),
-                    any<Throwable>()
-                )
-            } returns Unit
-        }
         mockPushMessagePresenter = mock()
         mockJson = mock()
 
@@ -69,7 +61,7 @@ class EmarsysServiceWorkerTests {
             onBadgeCountUpdateReceivedBroadcastChannel,
             mockJson,
             TestScope(SupervisorJob()),
-            sdkLogger
+            ConsoleLogger()
         )
     }
 

@@ -1,6 +1,7 @@
 package com.emarsys.mobileengage.push.mappers
 
-import com.emarsys.core.log.Logger
+import com.emarsys.core.log.ConsoleLogger
+import com.emarsys.core.log.LogLevel
 import com.emarsys.core.mapper.Mapper
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.inapp.PushToInAppPayload
@@ -10,10 +11,11 @@ import com.emarsys.mobileengage.push.model.JsPlatformData
 import com.emarsys.mobileengage.push.model.JsPushMessage
 import com.emarsys.mobileengage.push.model.v1.RemoteWebPushMessageV2
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
 
 class PushMessageWebV2Mapper(
     private val json: Json,
-    private val logger: Logger
+    private val logger: ConsoleLogger
 ) : Mapper<String, JsPushMessage> {
 
     override suspend fun map(from: String): JsPushMessage? {
@@ -44,7 +46,13 @@ class PushMessageWebV2Mapper(
                 )
             )
         } catch (exception: Exception) {
-            logger.error("WebPushMessageV1Mapper", exception)
+            logger.logToConsole(
+                "WebPushMessageV2Mapper",
+                LogLevel.Error,
+                "Error mapping push message",
+                exception,
+                JsonObject(emptyMap())
+            )
             null
         }
     }

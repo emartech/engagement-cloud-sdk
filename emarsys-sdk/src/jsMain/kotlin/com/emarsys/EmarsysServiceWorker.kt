@@ -1,6 +1,7 @@
 package com.emarsys
 
-import com.emarsys.core.log.Logger
+import com.emarsys.core.log.ConsoleLogger
+import com.emarsys.core.log.LogLevel
 import com.emarsys.core.mapper.Mapper
 import com.emarsys.mobileengage.push.PushMessagePresenter
 import com.emarsys.mobileengage.push.model.JsPushMessage
@@ -9,6 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.promise
 import kotlinx.serialization.StringFormat
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.JsonObject
 import web.broadcast.BroadcastChannel
 import web.serviceworker.ServiceWorkerGlobalScope
 
@@ -21,7 +23,7 @@ class EmarsysServiceWorker(
     private val onBadgeCountUpdateReceivedBroadcastChannel: BroadcastChannel,
     private val json: StringFormat,
     private val coroutineScope: CoroutineScope,
-    private val sdkLogger: Logger
+    private val logger: ConsoleLogger
 ) {
 
     fun onPush(event: String): Promise<Any?> {
@@ -37,7 +39,13 @@ class EmarsysServiceWorker(
                         }
                     }
                 } catch (exception: Exception) {
-                    sdkLogger.error("EmarsysServiceWorker - onPush", exception)
+                    logger.logToConsole(
+                        "EmarsysServiceWorker - onPush",
+                        LogLevel.Error,
+                        "Error processing push message",
+                        exception,
+                        JsonObject(emptyMap())
+                    )
                     throw exception
                 }
             }
