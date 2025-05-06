@@ -128,7 +128,7 @@ class ConfigClientTests {
         configClient = createConfigClient(backgroundScope)
         configClient.register()
 
-        every { mockUrlFactory.create(EmarsysUrlType.CHANGE_APPLICATION_CODE, null) }.returns(
+        every { mockUrlFactory.create(EmarsysUrlType.CHANGE_APPLICATION_CODE) }.returns(
             TEST_BASE_URL
         )
         everySuspend { mockEmarsysClient.send(any(), any()) }.returns(createTestResponse("{}"))
@@ -161,7 +161,7 @@ class ConfigClientTests {
         configClient = createConfigClient(backgroundScope)
         configClient.register()
 
-        every { mockUrlFactory.create(EmarsysUrlType.REFRESH_TOKEN, null) }.returns(TEST_BASE_URL)
+        every { mockUrlFactory.create(EmarsysUrlType.REFRESH_TOKEN) }.returns(TEST_BASE_URL)
         everySuspend { mockEmarsysClient.send(any(), any()) }.returns(createTestResponse("{}"))
         every { mockConfig.copyWith(null, "newMerchantId", null) } returns mockConfig
         every { mockConfig.merchantId } returns "testMerchantId"
@@ -198,7 +198,7 @@ class ConfigClientTests {
         configClient = createConfigClient(backgroundScope)
         configClient.register()
 
-        every { mockUrlFactory.create(EmarsysUrlType.REFRESH_TOKEN, null) } returns TEST_BASE_URL
+        every { mockUrlFactory.create(EmarsysUrlType.REFRESH_TOKEN) } returns TEST_BASE_URL
         everySuspend { mockEmarsysClient.send(any(), any()) } calls { args ->
             (args.arg(1) as suspend () -> Unit).invoke()
             throw IOException("No Internet")
@@ -232,8 +232,7 @@ class ConfigClientTests {
 
         every {
             mockUrlFactory.create(
-                EmarsysUrlType.REFRESH_TOKEN,
-                null
+                EmarsysUrlType.REFRESH_TOKEN
             )
         } throws RuntimeException("exception")
         val changeMerchantId = SdkEvent.Internal.Sdk.ChangeMerchantId(
@@ -280,8 +279,7 @@ class ConfigClientTests {
 
             every {
                 mockUrlFactory.create(
-                    EmarsysUrlType.REFRESH_TOKEN,
-                    null
+                    EmarsysUrlType.REFRESH_TOKEN
                 )
             } throws testException
             val changeMerchantId = SdkEvent.Internal.Sdk.ChangeMerchantId(

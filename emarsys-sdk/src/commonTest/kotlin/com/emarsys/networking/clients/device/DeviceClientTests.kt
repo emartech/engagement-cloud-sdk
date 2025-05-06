@@ -77,7 +77,7 @@ class DeviceClientTests {
         Dispatchers.setMain(StandardTestDispatcher())
         mockEmarsysClient = mock()
         mockUrlFactory = mock()
-        every { mockUrlFactory.create(REGISTER_DEVICE_INFO, null) } returns URL
+        every { mockUrlFactory.create(REGISTER_DEVICE_INFO) } returns URL
         mockDeviceInfoCollector = mock()
         everySuspend { mockDeviceInfoCollector.collect() } returns DEVICE_INFO_STRING
         mockContactTokenHandler = mock()
@@ -146,7 +146,7 @@ class DeviceClientTests {
         onlineSdkEvents.await() shouldBe listOf(registerDeviceInfoEvent)
         verifySuspend {
             mockDeviceInfoCollector.collect()
-            mockUrlFactory.create(REGISTER_DEVICE_INFO, null)
+            mockUrlFactory.create(REGISTER_DEVICE_INFO)
             mockEmarsysClient.send(request, any())
             mockContactTokenHandler.handleContactTokens(expectedResponse)
             mockEventsDao.removeEvent(registerDeviceInfoEvent)
@@ -173,7 +173,7 @@ class DeviceClientTests {
             },
             ""
         )
-        every { mockUrlFactory.create(REGISTER_DEVICE_INFO, null) } returns testUrl
+        every { mockUrlFactory.create(REGISTER_DEVICE_INFO) } returns testUrl
         everySuspend { mockEmarsysClient.send(any(), any()) } returns expectedResponse
         val registerDeviceInfoEvent = SdkEvent.Internal.Sdk.RegisterDeviceInfo()
 
@@ -188,7 +188,7 @@ class DeviceClientTests {
         onlineSdkEvents.await() shouldBe listOf(registerDeviceInfoEvent)
         verifySuspend {
             mockDeviceInfoCollector.collect()
-            mockUrlFactory.create(REGISTER_DEVICE_INFO, null)
+            mockUrlFactory.create(REGISTER_DEVICE_INFO)
             mockEmarsysClient.send(request, any())
             mockEventsDao.removeEvent(registerDeviceInfoEvent)
         }
@@ -221,7 +221,7 @@ class DeviceClientTests {
         onlineSdkEvents.await() shouldBe listOf(registerDeviceInfoEvent)
         verifySuspend {
             mockDeviceInfoCollector.collect()
-            mockUrlFactory.create(REGISTER_DEVICE_INFO, null)
+            mockUrlFactory.create(REGISTER_DEVICE_INFO)
             mockEmarsysClient.send(any(), any())
             mockSdkLogger.error(any(), any<Throwable>())
             mockSdkEventManager.emitEvent(registerDeviceInfoEvent)
@@ -233,7 +233,7 @@ class DeviceClientTests {
     fun testConsumer_should_not_ack_on_unknown_exception() = runTest {
         createDeviceClient(backgroundScope).register()
 
-        every { mockUrlFactory.create(any(), null) } throws RuntimeException("test")
+        every { mockUrlFactory.create(any()) } throws RuntimeException("test")
         val registerDeviceInfoEvent = SdkEvent.Internal.Sdk.RegisterDeviceInfo()
         everySuspend { mockSdkEventManager.emitEvent(registerDeviceInfoEvent) } returns Unit
 
@@ -276,7 +276,7 @@ class DeviceClientTests {
             createDeviceClient(backgroundScope).register()
 
             every {
-                mockUrlFactory.create(REGISTER_DEVICE_INFO, null)
+                mockUrlFactory.create(REGISTER_DEVICE_INFO)
             } throws testException
             val registerDeviceInfoEvent =
                 SdkEvent.Internal.Sdk.RegisterDeviceInfo("testId", null, TIMESTAMP)

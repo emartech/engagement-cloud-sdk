@@ -15,7 +15,6 @@ import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.json.jsonPrimitive
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -55,8 +54,8 @@ class ContactInternalTests {
 
         val emitted = eventSlot.get()
         (emitted is SdkEvent.Internal.Sdk.LinkContact) shouldBe true
-        emitted.attributes?.get("contactFieldId")?.jsonPrimitive?.content?.toInt() shouldBe CONTACT_FIELD_ID
-        emitted.attributes?.get("contactFieldValue")?.jsonPrimitive?.content shouldBe CONTACT_FIELD_VALUE
+        (emitted as SdkEvent.Internal.Sdk.LinkContact).contactFieldId shouldBe CONTACT_FIELD_ID
+        emitted.contactFieldValue shouldBe CONTACT_FIELD_VALUE
     }
 
     @Test
@@ -66,8 +65,8 @@ class ContactInternalTests {
 
             val emitted = eventSlot.get()
             (emitted is SdkEvent.Internal.Sdk.LinkAuthenticatedContact) shouldBe true
-            emitted.attributes?.get("contactFieldId")?.jsonPrimitive?.content?.toInt() shouldBe CONTACT_FIELD_ID
-            emitted.attributes?.get("openIdToken")?.jsonPrimitive?.content shouldBe OPEN_ID_TOKEN
+            (emitted as SdkEvent.Internal.Sdk.LinkAuthenticatedContact).contactFieldId shouldBe CONTACT_FIELD_ID
+            emitted.openIdToken shouldBe OPEN_ID_TOKEN
         }
 
     @Test
@@ -76,9 +75,7 @@ class ContactInternalTests {
 
         val emitted = eventSlot.get()
         (emitted is SdkEvent.Internal.Sdk.UnlinkContact) shouldBe true
-        emitted.attributes?.get("contactFieldId")?.jsonPrimitive?.content?.toInt() shouldBe null
-        emitted.attributes?.get("contactFieldValue")?.jsonPrimitive?.content shouldBe null
-        emitted.attributes?.get("openIdToken")?.jsonPrimitive?.content shouldBe null
+        emitted.attributes shouldBe null
     }
 
     @Test

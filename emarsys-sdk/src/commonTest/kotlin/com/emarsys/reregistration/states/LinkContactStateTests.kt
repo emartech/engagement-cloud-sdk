@@ -18,8 +18,6 @@ import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.jsonPrimitive
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -66,8 +64,8 @@ class LinkContactStateTests {
 
             val registeredEvent = eventSlot.get()
             (registeredEvent is SdkEvent.Internal.Sdk.LinkContact) shouldBe true
-            registeredEvent.attributes?.get("contactFieldId")?.jsonPrimitive?.content?.toInt() shouldBe TEST_CONTACT_FIELD_ID
-            registeredEvent.attributes?.get("contactFieldValue")?.jsonPrimitive?.content shouldBe TEST_CONTACT_FIELD_VALUE
+            (registeredEvent as SdkEvent.Internal.Sdk.LinkContact).contactFieldId shouldBe TEST_CONTACT_FIELD_ID
+            registeredEvent.contactFieldValue shouldBe TEST_CONTACT_FIELD_VALUE
         }
 
     @Test
@@ -81,8 +79,8 @@ class LinkContactStateTests {
 
             val registeredEvent = eventSlot.get()
             (registeredEvent is SdkEvent.Internal.Sdk.LinkAuthenticatedContact) shouldBe true
-            registeredEvent.attributes?.get("contactFieldId")?.jsonPrimitive?.content?.toInt() shouldBe TEST_CONTACT_FIELD_ID
-            registeredEvent.attributes?.get("openIdToken")?.jsonPrimitive?.content shouldBe TEST_OPEN_ID_TOKEN
+            (registeredEvent as SdkEvent.Internal.Sdk.LinkAuthenticatedContact).contactFieldId shouldBe TEST_CONTACT_FIELD_ID
+            registeredEvent.openIdToken shouldBe TEST_OPEN_ID_TOKEN
         }
 
     @Test
@@ -110,8 +108,8 @@ class LinkContactStateTests {
 
             val registeredEvent = eventSlot.get()
             (registeredEvent is SdkEvent.Internal.Sdk.LinkContact) shouldBe true
-            registeredEvent.attributes?.get("contactFieldId") shouldBe JsonNull
-            registeredEvent.attributes?.get("contactFieldValue")?.jsonPrimitive?.content shouldBe TEST_CONTACT_FIELD_VALUE
+            (registeredEvent as SdkEvent.Internal.Sdk.LinkContact).contactFieldId shouldBe null
+            registeredEvent.contactFieldValue shouldBe TEST_CONTACT_FIELD_VALUE
         }
 
 }

@@ -25,47 +25,44 @@ internal class UrlFactory(
         const val V4_API = "v4"
     }
 
-    override fun create(urlType: EmarsysUrlType, applicationCode: String?): Url {
+    override fun create(urlType: EmarsysUrlType): Url {
         return when (urlType) {
             CHANGE_APPLICATION_CODE -> {
-                URLBuilder("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode(applicationCode)}/client/app").build()
+                URLBuilder("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client/app").build()
             }
+
             LINK_CONTACT -> createUrlBasedOnPredict(
                 sdkContext.defaultUrls.clientServiceBaseUrl,
                 "contact-token",
-                "client/contact",
-                applicationCode
+                "client/contact"
             ).build()
 
             UNLINK_CONTACT -> createUrlBasedOnPredict(
                 sdkContext.defaultUrls.clientServiceBaseUrl,
                 "contact",
-                "client/contact",
-                applicationCode
+                "client/contact"
             ).build()
 
             REFRESH_TOKEN -> createUrlBasedOnPredict(
                 sdkContext.defaultUrls.clientServiceBaseUrl,
                 "contact-token",
-                "contact-token",
-                applicationCode
+                "contact-token"
             ).build()
 
             CHANGE_MERCHANT_ID -> createUrlBasedOnPredict(
                 sdkContext.defaultUrls.clientServiceBaseUrl,
                 "contact-token",
-                "contact-token",
-                applicationCode
+                "contact-token"
             ).build()
 
-            PUSH_TOKEN -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode(applicationCode)}/client/push-token")
-            REGISTER_DEVICE_INFO -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode(applicationCode)}/client")
+            PUSH_TOKEN -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client/push-token")
+            REGISTER_DEVICE_INFO -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client")
             EVENT -> {
-                Url("${sdkContext.defaultUrls.eventServiceBaseUrl}/$V4_API/apps/${getApplicationCode(applicationCode)}/client/events")
+                Url("${sdkContext.defaultUrls.eventServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client/events")
             }
 
-            REMOTE_CONFIG_SIGNATURE -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/signature/${getApplicationCode(applicationCode)}")
-            REMOTE_CONFIG -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/${getApplicationCode(applicationCode)}")
+            REMOTE_CONFIG_SIGNATURE -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/signature/${getApplicationCode()}")
+            REMOTE_CONFIG -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/${getApplicationCode()}")
             GLOBAL_REMOTE_CONFIG_SIGNATURE -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/signature/GLOBAL")
             GLOBAL_REMOTE_CONFIG -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/GLOBAL")
             DEEP_LINK -> Url(sdkContext.defaultUrls.deepLinkBaseUrl)
@@ -73,21 +70,20 @@ internal class UrlFactory(
         }
     }
 
-    private fun getApplicationCode(applicationCode: String?): String {
-        val appCode = applicationCode ?: sdkContext.config?.applicationCode
-        return appCode ?: throw MissingApplicationCodeException("Application code is missing!")
+    private fun getApplicationCode(): String {
+        return sdkContext.config?.applicationCode
+            ?: throw MissingApplicationCodeException("Application code is missing!")
     }
 
     private fun createUrlBasedOnPredict(
         baseUrl: String,
         predictPath: String,
-        mePath: String,
-        appCode: String? = null
+        mePath: String
     ): URLBuilder {
         return if (sdkContext.isConfigPredictOnly()) {
             URLBuilder("$baseUrl/$V4_API/$predictPath")
         } else {
-            URLBuilder("$baseUrl/$V4_API/apps/${getApplicationCode(appCode)}/$mePath")
+            URLBuilder("$baseUrl/$V4_API/apps/${getApplicationCode()}/$mePath")
         }
     }
 }

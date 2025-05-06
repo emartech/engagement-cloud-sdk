@@ -51,9 +51,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -104,8 +101,8 @@ class ContactClientTests {
         everySuspend { mockEmarsysClient.send(any(), any()) } returns (createTestResponse("{}"))
         every { mockConfig.merchantId } returns null
         every { mockSdkContext.contactFieldId = any() } returns Unit
-        every { mockUrlFactory.create(EmarsysUrlType.LINK_CONTACT, null) } returns TEST_BASE_URL
-        every { mockUrlFactory.create(EmarsysUrlType.UNLINK_CONTACT, null) } returns TEST_BASE_URL
+        every { mockUrlFactory.create(EmarsysUrlType.LINK_CONTACT) } returns TEST_BASE_URL
+        every { mockUrlFactory.create(EmarsysUrlType.UNLINK_CONTACT) } returns TEST_BASE_URL
         everySuspend { mockLogger.error(any(), any<Throwable>()) } calls {
             (it.args[1] as Throwable).printStackTrace()
         }
@@ -135,10 +132,9 @@ class ContactClientTests {
 
         val linkContactEvent = SdkEvent.Internal.Sdk.LinkContact(
             "linkContact",
-            attributes = buildJsonObject {
-                put("contactFieldId", CONTACT_FIELD_ID)
-                put("contactFieldValue", CONTACT_FIELD_VALUE)
-            })
+            contactFieldId = CONTACT_FIELD_ID,
+            contactFieldValue = CONTACT_FIELD_VALUE
+        )
 
         onlineEvents.emit(linkContactEvent)
 
@@ -166,10 +162,9 @@ class ContactClientTests {
         every { mockConfig.merchantId } returns MERCHANT_ID
         val linkContactEvent = SdkEvent.Internal.Sdk.LinkContact(
             "linkContact",
-            attributes = buildJsonObject {
-                put("contactFieldId", JsonPrimitive(CONTACT_FIELD_ID))
-                put("contactFieldValue", JsonPrimitive(CONTACT_FIELD_VALUE))
-            })
+            contactFieldId = CONTACT_FIELD_ID,
+            contactFieldValue = CONTACT_FIELD_VALUE
+        )
 
         onlineEvents.emit(linkContactEvent)
 
@@ -196,10 +191,9 @@ class ContactClientTests {
         every { mockConfig.merchantId } returns MERCHANT_ID
         val linkAuthenticatedContactEvent = SdkEvent.Internal.Sdk.LinkAuthenticatedContact(
             "linkAuthenticatedContact",
-            attributes = buildJsonObject {
-                put("contactFieldId", JsonPrimitive(CONTACT_FIELD_ID))
-                put("openIdToken", JsonPrimitive(OPEN_ID_TOKEN))
-            })
+            contactFieldId = CONTACT_FIELD_ID,
+            openIdToken = OPEN_ID_TOKEN
+        )
 
         onlineEvents.emit(linkAuthenticatedContactEvent)
 
@@ -228,10 +222,9 @@ class ContactClientTests {
             } throws Exception("Unhandled exception")
             val linkAuthenticatedContactEvent = SdkEvent.Internal.Sdk.LinkAuthenticatedContact(
                 "linkAuthenticatedContact",
-                attributes = buildJsonObject {
-                    put("contactFieldId", JsonPrimitive(CONTACT_FIELD_ID))
-                    put("openIdToken", JsonPrimitive(OPEN_ID_TOKEN))
-                })
+                contactFieldId = CONTACT_FIELD_ID,
+                openIdToken = OPEN_ID_TOKEN
+            )
 
             onlineEvents.emit(linkAuthenticatedContactEvent)
 
@@ -313,7 +306,7 @@ class ContactClientTests {
 
                 advanceUntilIdle()
 
-                verify { mockUrlFactory.create(any(), any()) }
+                verify { mockUrlFactory.create(any()) }
                 verifySuspend { mockEmarsysClient.send(any(), any()) }
                 verifySuspend { mockEventsDao.removeEvent(unlinkContact) }
 

@@ -127,7 +127,7 @@ class EventClientTests {
             mock(MockMode.autofill)
         }
         every { mockInAppConfigApi.inAppDnd }.returns(IN_APP_DND)
-        every { mockUrlFactory.create(EmarsysUrlType.EVENT, null) }.returns(TEST_BASE_URL)
+        every { mockUrlFactory.create(EmarsysUrlType.EVENT) }.returns(TEST_BASE_URL)
         everySuspend { mockSdkLogger.error(any(), any<Throwable>()) } calls {
             (it.args[1] as Throwable).printStackTrace()
         }
@@ -171,7 +171,7 @@ class EventClientTests {
         sessionContext.deviceEventState = DEVICE_EVENT_STATE
 
         everySuspend { mockEmarsysClient.send(any(), any()) } returns createTestResponse("{}")
-        every { mockUrlFactory.create(EmarsysUrlType.EVENT, null) } returns TEST_BASE_URL
+        every { mockUrlFactory.create(EmarsysUrlType.EVENT) } returns TEST_BASE_URL
         val expectedUrlRequest = UrlRequest(
             TEST_BASE_URL,
             HttpMethod.Post,
@@ -209,7 +209,7 @@ class EventClientTests {
                 responseBody
             )
         )
-        every { mockUrlFactory.create(EmarsysUrlType.EVENT, null) }.returns(TEST_BASE_URL)
+        every { mockUrlFactory.create(EmarsysUrlType.EVENT) }.returns(TEST_BASE_URL)
         val expectedUrlRequest = createTestRequest()
         val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
             onlineEvents.take(1).toList()

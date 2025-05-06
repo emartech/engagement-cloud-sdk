@@ -93,7 +93,7 @@ class DeepLinkClientTests {
         onlineEvents = MutableSharedFlow()
         everySuspend { mockSdkEventManager.onlineSdkEvents } returns onlineEvents
         everySuspend { mockUserAgentProvider.provide() } returns TEST_USER_AGENT
-        every { mockUrlFactory.create(EmarsysUrlType.DEEP_LINK, null) } returns TEST_BASE_URL
+        every { mockUrlFactory.create(EmarsysUrlType.DEEP_LINK) } returns TEST_BASE_URL
         everySuspend { mockLogger.error(any(), any<Throwable>()) } calls {
             (it.args[1] as Throwable).printStackTrace()
         }
@@ -228,7 +228,7 @@ class DeepLinkClientTests {
     ) { testException ->
         runTest {
             createDeepLinkClient(backgroundScope).register()
-            every { mockUrlFactory.create(EmarsysUrlType.DEEP_LINK, null) } throws testException
+            every { mockUrlFactory.create(EmarsysUrlType.DEEP_LINK) } throws testException
             val trackDeepLink = SdkEvent.Internal.Sdk.TrackDeepLink(
                 "trackDeepLink",
                 attributes = buildJsonObject {

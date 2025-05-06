@@ -71,7 +71,7 @@ internal class DeviceClient(
 
     private suspend fun createRequest(): UrlRequest {
         val deviceInfoString = deviceInfoCollector.collect()
-        val url = urlFactory.create(REGISTER_DEVICE_INFO, null)
+        val url = urlFactory.create(REGISTER_DEVICE_INFO)
         return UrlRequest(
             url,
             HttpMethod.Post,

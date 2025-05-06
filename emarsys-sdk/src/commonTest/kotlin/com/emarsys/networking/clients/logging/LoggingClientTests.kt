@@ -132,7 +132,7 @@ class LoggingClientTests {
     fun testConsumer_should_call_client_with_logEvent() = runTest {
         createLoggingClient(backgroundScope).register()
 
-        every { mockUrlFactory.create(EmarsysUrlType.LOGGING, null) } returns TEST_BASE_URL
+        every { mockUrlFactory.create(EmarsysUrlType.LOGGING) } returns TEST_BASE_URL
         everySuspend { mockEmarsysClient.send(any(), any()) } returns createTestResponse("{}")
         everySuspend { mockDeviceInfoCollector.collectAsDeviceInfoForLogs() } returns deviceInfoForLogs
         val testLogAttributes = buildJsonObject {
@@ -186,7 +186,7 @@ class LoggingClientTests {
     @Test
     fun testConsumer_should_call_client_with_metricEvent() = runTest {
         createLoggingClient(backgroundScope).register()
-        every { mockUrlFactory.create(EmarsysUrlType.LOGGING, null) } returns TEST_BASE_URL
+        every { mockUrlFactory.create(EmarsysUrlType.LOGGING) } returns TEST_BASE_URL
         everySuspend { mockEmarsysClient.send(any(), any()) } returns createTestResponse("{}")
         everySuspend { mockDeviceInfoCollector.collectAsDeviceInfoForLogs() } returns deviceInfoForLogs
         val testLogAttributes = buildJsonObject {
@@ -236,7 +236,7 @@ class LoggingClientTests {
     @Test
     fun testConsumer_should_reEmit_events_into_flow_when_there_is_a_network_error() = runTest {
         createLoggingClient(backgroundScope).register()
-        every { mockUrlFactory.create(EmarsysUrlType.LOGGING, null) } returns TEST_BASE_URL
+        every { mockUrlFactory.create(EmarsysUrlType.LOGGING) } returns TEST_BASE_URL
         everySuspend { mockEmarsysClient.send(any(), any()) } calls { args ->
             (args.arg(1) as suspend () -> Unit).invoke()
             throw IOException("No Internet")
@@ -272,7 +272,7 @@ class LoggingClientTests {
         runTest {
             createLoggingClient(backgroundScope).register()
 
-            every { mockUrlFactory.create(EmarsysUrlType.LOGGING, null) } throws RuntimeException()
+            every { mockUrlFactory.create(EmarsysUrlType.LOGGING) } throws RuntimeException()
             everySuspend { mockDeviceInfoCollector.collectAsDeviceInfoForLogs() } returns deviceInfoForLogs
             val logEvent = SdkEvent.Internal.Sdk.Metric(
                 level = LogLevel.Metric,
@@ -314,7 +314,7 @@ class LoggingClientTests {
         runTest {
             createLoggingClient(backgroundScope).register()
 
-            every { mockUrlFactory.create(EmarsysUrlType.LOGGING, null) } throws testException
+            every { mockUrlFactory.create(EmarsysUrlType.LOGGING) } throws testException
             val logEvent = SdkEvent.Internal.Sdk.Metric(
                 level = LogLevel.Metric
             )

@@ -106,9 +106,7 @@ internal class RemoteConfigClient(
     private suspend fun fetchConfig(global: Boolean, event: OnlineSdkEvent): String? {
         val request = UrlRequest(
             urlFactoryApi.create(
-                if (global) EmarsysUrlType.GLOBAL_REMOTE_CONFIG else EmarsysUrlType.REMOTE_CONFIG,
-                null
-            ),
+                if (global) EmarsysUrlType.GLOBAL_REMOTE_CONFIG else EmarsysUrlType.REMOTE_CONFIG),
             HttpMethod.Get
         )
         return executeRequest(request, event)
@@ -117,8 +115,7 @@ internal class RemoteConfigClient(
     private suspend fun fetchSignature(global: Boolean, event: OnlineSdkEvent): String? {
         val request = UrlRequest(
             urlFactoryApi.create(
-                if (global) EmarsysUrlType.GLOBAL_REMOTE_CONFIG_SIGNATURE else EmarsysUrlType.REMOTE_CONFIG_SIGNATURE,
-                null
+                if (global) EmarsysUrlType.GLOBAL_REMOTE_CONFIG_SIGNATURE else EmarsysUrlType.REMOTE_CONFIG_SIGNATURE
             ),
             HttpMethod.Get
         )

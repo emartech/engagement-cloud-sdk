@@ -52,7 +52,7 @@ internal class ConfigClient(
                 try {
                     sdkLogger.debug("ConfigClient - consumeConfigChanges")
                     val request = if (it is SdkEvent.Internal.Sdk.ChangeAppCode) {
-                        val url = urlFactory.create(EmarsysUrlType.CHANGE_APPLICATION_CODE, null)
+                        val url = urlFactory.create(EmarsysUrlType.CHANGE_APPLICATION_CODE)
                         UrlRequest(url, HttpMethod.Post)
                     } else {
                         val url = urlFactory.create(EmarsysUrlType.REFRESH_TOKEN)

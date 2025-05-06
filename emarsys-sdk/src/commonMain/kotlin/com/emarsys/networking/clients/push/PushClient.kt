@@ -70,7 +70,7 @@ internal class PushClient(
     }
 
     private fun createRequest(sdkEvent: OnlineSdkEvent): UrlRequest? {
-        val url = urlFactory.create(PUSH_TOKEN, null)
+        val url = urlFactory.create(PUSH_TOKEN)
         return when (sdkEvent) {
             is SdkEvent.Internal.Sdk.RegisterPushToken -> {
                 val pushToken = sdkEvent.attributes?.get(PUSH_TOKEN_KEY)?.jsonPrimitive?.content!!

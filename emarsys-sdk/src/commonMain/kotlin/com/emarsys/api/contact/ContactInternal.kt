@@ -7,8 +7,6 @@ import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.collections.dequeue
 import com.emarsys.core.log.Logger
 import com.emarsys.networking.clients.event.model.SdkEvent
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
 
 internal class ContactInternal(
     private val contactContext: ContactContextApi,
@@ -19,10 +17,9 @@ internal class ContactInternal(
         sdkLogger.debug("ContactInternal - linkContact")
         sdkEventDistributor.registerEvent(
             SdkEvent.Internal.Sdk.LinkContact(
-                attributes = buildJsonObject {
-                    put("contactFieldId", contactFieldId)
-                    put("contactFieldValue", contactFieldValue)
-                })
+                contactFieldId = contactFieldId,
+                contactFieldValue = contactFieldValue
+            )
         )
     }
 
@@ -30,10 +27,9 @@ internal class ContactInternal(
         sdkLogger.debug("ContactInternal - linkAuthenticatedContact")
         sdkEventDistributor.registerEvent(
             SdkEvent.Internal.Sdk.LinkAuthenticatedContact(
-                attributes = buildJsonObject {
-                    put("contactFieldId", contactFieldId)
-                    put("openIdToken", openIdToken)
-                })
+                contactFieldId = contactFieldId,
+                openIdToken = openIdToken
+            )
         )
     }
 
@@ -48,20 +44,16 @@ internal class ContactInternal(
             when (it) {
                 is LinkContact -> sdkEventDistributor.registerEvent(
                     SdkEvent.Internal.Sdk.LinkContact(
-                        attributes = buildJsonObject {
-                            put("contactFieldId", it.contactFieldId)
-                            put("contactFieldValue", it.contactFieldValue)
-                        })
+                        contactFieldId = it.contactFieldId,
+                        contactFieldValue = it.contactFieldValue
+                    )
                 )
-
                 is LinkAuthenticatedContact -> sdkEventDistributor.registerEvent(
-                    SdkEvent.Internal.Sdk.LinkContact(
-                        attributes = buildJsonObject {
-                            put("contactFieldId", it.contactFieldId)
-                            put("openIdToken", it.openIdToken)
-                        })
+                    SdkEvent.Internal.Sdk.LinkAuthenticatedContact(
+                        contactFieldId = it.contactFieldId,
+                        openIdToken = it.openIdToken
+                    )
                 )
-
                 is UnlinkContact -> sdkEventDistributor.registerEvent(
                     SdkEvent.Internal.Sdk.UnlinkContact()
                 )

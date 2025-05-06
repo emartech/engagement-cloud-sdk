@@ -6,8 +6,6 @@ import com.emarsys.core.log.Logger
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.state.State
 import com.emarsys.networking.clients.event.model.SdkEvent
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
 
 internal class LinkContactState(
     private val sessionContext: SessionContext,
@@ -25,19 +23,17 @@ internal class LinkContactState(
             sdkLogger.debug("Register LinkContact event.")
             sdkEventDistributor.registerEvent(
                 SdkEvent.Internal.Sdk.LinkContact(
-                    attributes = buildJsonObject {
-                        put("contactFieldId", sdkContext.contactFieldId)
-                        put("contactFieldValue", sessionContext.contactFieldValue)
-                    })
+                    contactFieldId = sdkContext.contactFieldId,
+                    contactFieldValue = sessionContext.contactFieldValue!!
+                )
             )
         } else if (sessionContext.openIdToken != null) {
             sdkLogger.debug("Register LinkAuthenticatedContact event.")
             sdkEventDistributor.registerEvent(
                 SdkEvent.Internal.Sdk.LinkAuthenticatedContact(
-                    attributes = buildJsonObject {
-                        put("contactFieldId", sdkContext.contactFieldId)
-                        put("openIdToken", sessionContext.openIdToken)
-                    })
+                    contactFieldId = sdkContext.contactFieldId,
+                    openIdToken = sessionContext.openIdToken!!
+                )
             )
         } else {
             sdkLogger.debug("No contactFieldValue or openIdToken available.")

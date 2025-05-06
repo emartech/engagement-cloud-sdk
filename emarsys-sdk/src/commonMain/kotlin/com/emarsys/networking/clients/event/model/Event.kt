@@ -247,14 +247,18 @@ sealed interface SdkEvent {
             data class LinkContact(
                 override val id: String = UUIDProvider().provide(),
                 override val timestamp: Instant = TimestampProvider().provide(),
-                override val attributes: JsonObject? = null
+                override val attributes: JsonObject? = null,
+                val contactFieldId: Int? = null,
+                val contactFieldValue: String
             ) : Sdk(LINK_CONTACT_NAME), OnlineSdkEvent
 
             @Serializable
             data class LinkAuthenticatedContact(
                 override val id: String = UUIDProvider().provide(),
                 override val timestamp: Instant = TimestampProvider().provide(),
-                override val attributes: JsonObject? = null
+                override val attributes: JsonObject? = null,
+                val contactFieldId: Int? = null,
+                val openIdToken: String
             ) : Sdk(LINK_AUTHENTICATED_CONTACT_NAME), OnlineSdkEvent
 
             @Serializable

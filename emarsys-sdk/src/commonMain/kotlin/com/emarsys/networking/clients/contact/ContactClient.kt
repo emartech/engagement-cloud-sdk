@@ -23,8 +23,6 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.jsonPrimitive
 
 internal class ContactClient(
     private val emarsysClient: NetworkClientApi,
@@ -59,8 +57,9 @@ internal class ContactClient(
                     if (response.status != HttpStatusCode.NoContent) {
                         contactTokenHandler.handleContactTokens(response)
                     }
-                    sdkContext.contactFieldId =
-                        it.attributes?.get("contactFieldId")?.jsonPrimitive?.content?.toInt()
+
+                    setContactFieldId(it)
+
                     it.ack(eventsDao, sdkLogger)
                 } catch (exception: Exception) {
                     when (exception) {
@@ -75,6 +74,15 @@ internal class ContactClient(
             }
     }
 
+    private fun setContactFieldId(event: SdkEvent) {
+        val contactFieldId: Int? = when (event) {
+            is SdkEvent.Internal.Sdk.LinkContact -> event.contactFieldId
+            is SdkEvent.Internal.Sdk.LinkAuthenticatedContact -> event.contactFieldId
+            else -> null
+        }
+        sdkContext.contactFieldId = contactFieldId
+    }
+
     private fun isContactEvent(event: OnlineSdkEvent): Boolean {
         return event is SdkEvent.Internal.Sdk.LinkContact || event is SdkEvent.Internal.Sdk.LinkAuthenticatedContact || event is SdkEvent.Internal.Sdk.UnlinkContact
     }
@@ -84,19 +92,35 @@ internal class ContactClient(
         if (sdkContext.config?.merchantId != null) {
             headers[EmarsysHeaders.MERCHANT_ID_HEADER] = sdkContext.config!!.merchantId
         }
-        return if (event is SdkEvent.Internal.Sdk.LinkContact || event is SdkEvent.Internal.Sdk.LinkAuthenticatedContact) {
-            val requestBody = json.encodeToString(
-                LinkContactRequestBody(
-                    event.attributes?.get("contactFieldId")?.jsonPrimitive?.content!!.toInt(),
-                    event.attributes?.get("contactFieldValue")?.jsonPrimitive?.contentOrNull,
-                    event.attributes?.get("openIdToken")?.jsonPrimitive?.contentOrNull,
+        return when (event) {
+            is SdkEvent.Internal.Sdk.LinkContact -> {
+                val requestBody = json.encodeToString(
+                    LinkContactRequestBody(
+                        event.contactFieldId,
+                        event.contactFieldValue,
+                        null
+                    )
                 )
-            )
-            val url = urlFactory.create(EmarsysUrlType.LINK_CONTACT, null)
-            UrlRequest(url, HttpMethod.Post, requestBody, headers)
-        } else {
-            val url = urlFactory.create(EmarsysUrlType.UNLINK_CONTACT, null)
-            UrlRequest(url, HttpMethod.Delete, null, headers)
+                val url = urlFactory.create(EmarsysUrlType.LINK_CONTACT)
+                UrlRequest(url, HttpMethod.Post, requestBody, headers)
+            }
+
+            is SdkEvent.Internal.Sdk.LinkAuthenticatedContact -> {
+                val requestBody = json.encodeToString(
+                    LinkContactRequestBody(
+                        event.contactFieldId,
+                        null,
+                        event.openIdToken
+                    )
+                )
+                val url = urlFactory.create(EmarsysUrlType.LINK_CONTACT)
+                UrlRequest(url, HttpMethod.Post, requestBody, headers)
+            }
+
+            else -> {
+                val url = urlFactory.create(EmarsysUrlType.UNLINK_CONTACT)
+                UrlRequest(url, HttpMethod.Delete, null, headers)
+            }
         }
     }
 }

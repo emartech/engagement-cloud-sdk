@@ -77,7 +77,7 @@ class PushClientTests {
         mockEmarsysClient = mock()
         mockDefaultUrls = mock()
         mockUrlFactory = mock()
-        every { mockUrlFactory.create(EmarsysUrlType.PUSH_TOKEN, null) } returns URL
+        every { mockUrlFactory.create(EmarsysUrlType.PUSH_TOKEN) } returns URL
         onlineEvents = spy(MutableSharedFlow(replay = 5))
         mockSdkEventManager = mock()
         every { mockSdkEventManager.onlineSdkEvents } returns onlineEvents
@@ -205,7 +205,7 @@ class PushClientTests {
     fun testConsumer_should_not_ack_on_unknown_exception() = runTest {
         createPushClient(backgroundScope).register()
 
-        every { mockUrlFactory.create(any(), null) } throws RuntimeException("test")
+        every { mockUrlFactory.create(any()) } throws RuntimeException("test")
         val clearPushTokenEvent = SdkEvent.Internal.Sdk.ClearPushToken(ID, null, TIMESTAMP)
         everySuspend { mockSdkEventManager.emitEvent(clearPushTokenEvent) } returns Unit
 
@@ -248,7 +248,7 @@ class PushClientTests {
             createPushClient(backgroundScope).register()
 
             every {
-                mockUrlFactory.create(EmarsysUrlType.PUSH_TOKEN, null)
+                mockUrlFactory.create(EmarsysUrlType.PUSH_TOKEN)
             } throws testException
             val clearPushTokenEvent =
                 SdkEvent.Internal.Sdk.ClearPushToken(ID, null, TIMESTAMP)
