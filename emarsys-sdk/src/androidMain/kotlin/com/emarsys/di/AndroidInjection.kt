@@ -47,9 +47,14 @@ import com.emarsys.core.storage.StorageConstants.DB_NAME
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
+import com.emarsys.enable.PlatformInitState
+import com.emarsys.enable.PlatformInitializer
+import com.emarsys.enable.PlatformInitializerApi
+import com.emarsys.enable.config.AndroidSdkConfigStore
+import com.emarsys.enable.config.SdkConfigStoreApi
 import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.clipboard.AndroidClipboardHandler
-import com.emarsys.mobileengage.inapp.InAppJsBridgeProvider
+import com.emarsys.mobileengage.inapp.InAppJsBridgeFactory
 import com.emarsys.mobileengage.inapp.InAppPresenter
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppViewProvider
@@ -65,11 +70,6 @@ import com.emarsys.mobileengage.push.mapper.AndroidPushV2Mapper
 import com.emarsys.mobileengage.push.mapper.SilentAndroidPushV2Mapper
 import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
 import com.emarsys.mobileengage.url.AndroidExternalUrlOpener
-import com.emarsys.enable.PlatformInitState
-import com.emarsys.enable.PlatformInitializer
-import com.emarsys.enable.PlatformInitializerApi
-import com.emarsys.enable.config.AndroidSdkConfigStore
-import com.emarsys.enable.config.SdkConfigStoreApi
 import com.emarsys.sqldelight.EmarsysDB
 import com.emarsys.watchdog.activity.TransitionSafeCurrentActivityWatchdog
 import com.emarsys.watchdog.connection.AndroidConnectionWatchDog
@@ -229,14 +229,14 @@ object AndroidInjection {
         }
         single<FileCacheApi> { AndroidFileCache(applicationContext, FileSystem.SYSTEM) }
         single<InAppViewProviderApi> {
-            val inAppJsBridgeProvider = InAppJsBridgeProvider(
+            val inAppJsBridgeFactory = InAppJsBridgeFactory(
                 actionFactory = get<EventActionFactoryApi>(),
                 json = get(),
                 sdkDispatcher = get(named(DispatcherTypes.Sdk))
             )
             InAppViewProvider(
                 applicationContext,
-                inAppJsBridgeProvider,
+                inAppJsBridgeFactory,
                 mainDispatcher = get(named(DispatcherTypes.Main)),
                 WebViewProvider(applicationContext, get(named(DispatcherTypes.Main))),
                 timestampProvider = get()

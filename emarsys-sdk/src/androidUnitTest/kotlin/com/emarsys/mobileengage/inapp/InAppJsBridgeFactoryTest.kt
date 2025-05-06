@@ -8,20 +8,21 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
-class InAppJsBridgeProviderTest {
+class InAppJsBridgeFactoryTest {
     private companion object {
-        const val CAMPAIGN_ID = "campaignId"
+        const val TRACKING_INFO = """{"key1":"value1","key2":"value2"}"""
     }
 
     @Test
     fun provide_shouldReturn_inAppJsBridgeApi() = runTest {
         val mockActionFactory: EventActionFactoryApi = mockk(relaxed = true)
-        val inAppJsBridgeProvider = InAppJsBridgeProvider(
+
+        val inAppJsBridgeProvider = InAppJsBridgeFactory(
             mockActionFactory,
             JsonUtil.json,
             StandardTestDispatcher()
         )
 
-        inAppJsBridgeProvider.create(CAMPAIGN_ID)::class.java shouldBe InAppJsBridge::class.java
+        inAppJsBridgeProvider.create(TRACKING_INFO)::class.java shouldBe InAppJsBridge::class.java
     }
 }

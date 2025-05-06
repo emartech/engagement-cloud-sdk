@@ -15,10 +15,10 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
 internal class InAppJsBridge(
+    private val dismissId: String,
     private val actionFactory: EventActionFactoryApi,
-    private val json: Json,
     private val sdkDispatcher: CoroutineDispatcher,
-    private val dismissId: String
+    private val json: Json
 ) {
 
 
