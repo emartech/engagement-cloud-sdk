@@ -17,11 +17,10 @@ import com.emarsys.networking.clients.event.model.SdkEvent
 import io.ktor.http.HttpMethod
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 
 internal class DeepLinkClient(
@@ -44,10 +43,10 @@ internal class DeepLinkClient(
 
     private suspend fun startEventConsumer() {
         sdkEventManager.onlineSdkEvents
-            .filter { it is SdkEvent.Internal.Sdk.TrackDeepLink }
+            .filterIsInstance<SdkEvent.Internal.Sdk.TrackDeepLink>()
             .collect {
                 try {
-                    val trackingId = it.attributes?.get("trackingId")?.jsonPrimitive?.content
+                    val trackingId = it.trackingId
                     val requestBody = buildJsonObject { put("ems_dl", trackingId) }
                     val headers =
                         mapOf(UserAgentProvider.USER_AGENT_HEADER_NAME to userAgentProvider.provide())
@@ -69,7 +68,7 @@ internal class DeepLinkClient(
                         )
 
                         else -> sdkLogger.error(
-                            "DeepLinkClient - trackDeepLink(trackId: \"${it.attributes?.get("trackingId")?.jsonPrimitive?.content}\")",
+                            "DeepLinkClient - trackDeepLink(trackId: \"${it.trackingId}\")",
                             exception
                         )
                     }

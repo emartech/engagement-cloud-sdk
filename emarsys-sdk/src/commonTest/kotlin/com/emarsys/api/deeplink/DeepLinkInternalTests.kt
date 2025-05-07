@@ -22,7 +22,6 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlinx.serialization.json.jsonPrimitive
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -69,6 +68,6 @@ class DeepLinkInternalTests {
             val emittedEvent = eventSlot.get()
 
             (emittedEvent is SdkEvent.Internal.Sdk.TrackDeepLink) shouldBe true
-            emittedEvent.attributes?.get("trackingId")?.jsonPrimitive?.content shouldBe "123"
+            (emittedEvent as SdkEvent.Internal.Sdk.TrackDeepLink).trackingId shouldBe "123"
         }
 }

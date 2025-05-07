@@ -275,7 +275,8 @@ sealed interface SdkEvent {
             data class TrackDeepLink(
                 override val id: String = UUIDProvider().provide(),
                 override val timestamp: Instant = TimestampProvider().provide(),
-                override val attributes: JsonObject? = null
+                override val attributes: JsonObject? = null,
+                val trackingId: String
             ) : Sdk(TRACK_DEEPLINK_NAME), OnlineSdkEvent
 
             @Serializable

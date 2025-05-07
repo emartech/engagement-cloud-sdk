@@ -136,10 +136,9 @@ class DeepLinkClientTests {
         )
         everySuspend { mockNetworkClient.send(expectedRequest, any()) } returns response
         val trackDeepLink = SdkEvent.Internal.Sdk.TrackDeepLink(
-            "trackDeepLink",
-            attributes = buildJsonObject {
-                put("trackingId", TRACKING_ID)
-            })
+            id = "trackDeepLink",
+            trackingId = TRACKING_ID
+        )
         val onlineSdkEvents = backgroundScope.async {
             onlineEvents.take(1).toList()
         }
@@ -164,10 +163,9 @@ class DeepLinkClientTests {
             throw IOException("No Internet")
         }
         val trackDeepLink = SdkEvent.Internal.Sdk.TrackDeepLink(
-            "trackDeepLink",
-            attributes = buildJsonObject {
-                put("trackingId", TRACKING_ID)
-            })
+            id = "trackDeepLink",
+            trackingId = TRACKING_ID
+        )
         val onlineSdkEvents = backgroundScope.async {
             onlineEvents.take(1).toList()
         }
@@ -190,10 +188,9 @@ class DeepLinkClientTests {
 
         everySuspend { mockNetworkClient.send(any(), any()) } throws Exception("Request error")
         val trackDeepLink = SdkEvent.Internal.Sdk.TrackDeepLink(
-            "trackDeepLink",
-            attributes = buildJsonObject {
-                put("trackingId", TRACKING_ID)
-            })
+            id = "trackDeepLink",
+            trackingId = TRACKING_ID
+        )
         val onlineSdkEvents = backgroundScope.async {
             onlineEvents.take(1).toList()
         }
@@ -230,10 +227,9 @@ class DeepLinkClientTests {
             createDeepLinkClient(backgroundScope).register()
             every { mockUrlFactory.create(EmarsysUrlType.DEEP_LINK) } throws testException
             val trackDeepLink = SdkEvent.Internal.Sdk.TrackDeepLink(
-                "trackDeepLink",
-                attributes = buildJsonObject {
-                    put("trackingId", TRACKING_ID)
-                })
+                id = "trackDeepLink",
+                trackingId = TRACKING_ID
+            )
 
             val onlineSdkEvents = backgroundScope.async {
                 onlineEvents.take(1).toList()

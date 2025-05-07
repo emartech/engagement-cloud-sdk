@@ -5,21 +5,17 @@ import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import io.ktor.http.Url
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonObject
 
 internal class DeepLinkInternal(
-    private val sdkContext: SdkContextApi,
-    private val sdkEventDistributor: SdkEventDistributorApi
+    private val sdkContext: SdkContextApi, private val sdkEventDistributor: SdkEventDistributorApi
 ) : DeepLinkApi {
 
     override suspend fun trackDeepLink(url: Url): Result<Unit> = runCatching {
         withContext(sdkContext.sdkDispatcher) {
             url.parameters["ems_dl"]?.let {
                 sdkEventDistributor.registerEvent(
-                    SdkEvent.Internal.Sdk.TrackDeepLink(
-                        attributes = buildJsonObject { put("trackingId", JsonPrimitive(it)) }
-                    ))
+                    SdkEvent.Internal.Sdk.TrackDeepLink(trackingId = it)
+                )
             }
         }
     }
