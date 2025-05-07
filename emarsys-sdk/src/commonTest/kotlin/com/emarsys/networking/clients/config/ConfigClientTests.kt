@@ -54,8 +54,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonObject
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -137,8 +135,9 @@ class ConfigClientTests {
         every { mockConfig.applicationCode } returns "testApplicationCode"
         every { mockConfig.sharedSecret } returns null
         val changeAppCode = SdkEvent.Internal.Sdk.ChangeAppCode(
-            "changeApplicationCode",
-            buildJsonObject { put("applicationCode", JsonPrimitive("NewAppCode")) })
+            id = "changeApplicationCode",
+            applicationCode = "NewAppCode"
+        )
 
         val onlineSdkEvents = backgroundScope.async {
             onlineEvents.take(1).toList()
@@ -168,8 +167,9 @@ class ConfigClientTests {
         every { mockConfig.applicationCode } returns null
         every { mockConfig.sharedSecret } returns null
         val changeMerchantId = SdkEvent.Internal.Sdk.ChangeMerchantId(
-            "changeMerchantId",
-            buildJsonObject { put("merchantId", JsonPrimitive("newMerchantId")) })
+            id = "changeMerchantId",
+            merchantId = "newMerchantId"
+        )
 
         val onlineSdkEvents = backgroundScope.async {
             onlineEvents.take(1).toList()
@@ -205,8 +205,9 @@ class ConfigClientTests {
         }
 
         val changeMerchantId = SdkEvent.Internal.Sdk.ChangeMerchantId(
-            "changeMerchantId",
-            buildJsonObject { put("merchantId", JsonPrimitive("newMerchantId")) })
+            id = "changeMerchantId",
+            merchantId = "newMerchantId"
+        )
         everySuspend { mockSdkEventManager.emitEvent(changeMerchantId) } returns Unit
 
         val onlineSdkEvents = backgroundScope.async {
@@ -236,8 +237,9 @@ class ConfigClientTests {
             )
         } throws RuntimeException("exception")
         val changeMerchantId = SdkEvent.Internal.Sdk.ChangeMerchantId(
-            "changeMerchantId",
-            buildJsonObject { put("merchantId", JsonPrimitive("newMerchantId")) })
+            id = "changeMerchantId",
+            merchantId = "newMerchantId"
+        )
 
         val onlineSdkEvents = backgroundScope.async {
             onlineEvents.take(1).toList()
@@ -283,8 +285,9 @@ class ConfigClientTests {
                 )
             } throws testException
             val changeMerchantId = SdkEvent.Internal.Sdk.ChangeMerchantId(
-                "changeMerchantId",
-                buildJsonObject { put("merchantId", JsonPrimitive("newMerchantId")) })
+                id = "changeMerchantId",
+                merchantId = "newMerchantId"
+            )
 
             val onlineSdkEvents = backgroundScope.async {
                 onlineEvents.take(1).toList()

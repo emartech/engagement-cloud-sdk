@@ -234,6 +234,7 @@ sealed interface SdkEvent {
                 override val id: String = UUIDProvider().provide(),
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
+                val applicationCode: String
             ) : Sdk(CHANGE_APP_CODE_NAME), OnlineSdkEvent
 
             @Serializable
@@ -241,6 +242,7 @@ sealed interface SdkEvent {
                 override val id: String = UUIDProvider().provide(),
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
+                val merchantId: String
             ) : Sdk(CHANGE_MERCHANT_ID_NAME), OnlineSdkEvent
 
             @Serializable

@@ -22,8 +22,6 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.jsonPrimitive
 
 internal class ConfigClient(
     private val emarsysNetworkClient: NetworkClientApi,
@@ -72,10 +70,10 @@ internal class ConfigClient(
                     contactTokenHandler.handleContactTokens(response)
                     if (it is SdkEvent.Internal.Sdk.ChangeMerchantId) {
                         sdkContext.config =
-                            sdkContext.config?.copyWith(merchantId = it.attributes?.get("merchantId")?.jsonPrimitive?.contentOrNull)
+                            sdkContext.config?.copyWith(merchantId = it.merchantId)
                     } else if (it is SdkEvent.Internal.Sdk.ChangeAppCode) {
                         sdkContext.config =
-                            sdkContext.config?.copyWith(applicationCode = it.attributes?.get("applicationCode")?.jsonPrimitive?.contentOrNull)
+                            sdkContext.config?.copyWith(applicationCode = it.applicationCode)
                     }
                     it.ack(eventsDao, sdkLogger)
                 } catch (exception: Exception) {

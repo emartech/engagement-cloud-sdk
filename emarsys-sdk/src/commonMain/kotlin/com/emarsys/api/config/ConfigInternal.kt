@@ -6,8 +6,6 @@ import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.networking.clients.event.model.SdkEvent
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonObject
 
 internal class ConfigInternal(
     private val sdkEventDistributor: SdkEventDistributorApi,
@@ -15,20 +13,15 @@ internal class ConfigInternal(
     private val timestampProvider: InstantProvider,
     private val sdkLogger: Logger,
     private val languageHandler: LanguageHandlerApi
-): ConfigInstance {
+) : ConfigInstance {
 
     override suspend fun changeApplicationCode(applicationCode: String) {
         sdkLogger.debug("ConfigInternal - changeApplicationCode")
         sdkEventDistributor.registerEvent(
             SdkEvent.Internal.Sdk.ChangeAppCode(
-                uuidProvider.provide(),
-                buildJsonObject {
-                    put(
-                        "applicationCode",
-                        JsonPrimitive(applicationCode)
-                    )
-                },
-                timestampProvider.provide()
+                id = uuidProvider.provide(),
+                timestamp = timestampProvider.provide(),
+                applicationCode = applicationCode
             )
         )
     }
@@ -37,14 +30,9 @@ internal class ConfigInternal(
         sdkLogger.debug("ConfigInternal - changeMerchantId")
         sdkEventDistributor.registerEvent(
             SdkEvent.Internal.Sdk.ChangeMerchantId(
-                uuidProvider.provide(),
-                buildJsonObject {
-                    put(
-                        "merchantId",
-                        JsonPrimitive(merchantId)
-                    )
-                },
-                timestampProvider.provide()
+                id = uuidProvider.provide(),
+                timestamp = timestampProvider.provide(),
+                merchantId = merchantId
             )
         )
     }

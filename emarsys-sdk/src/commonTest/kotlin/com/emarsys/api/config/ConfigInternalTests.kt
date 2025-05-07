@@ -15,8 +15,6 @@ import dev.mokkery.mock
 import dev.mokkery.verifySuspend
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonObject
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -58,9 +56,11 @@ class ConfigInternalTests {
 
     @Test
     fun testChangeApplicationCode_shouldEmitChangeApplicationCodeEvent_toSdkEventFlow() = runTest {
-        val expectedEvent = SdkEvent.Internal.Sdk.ChangeAppCode(UUID, buildJsonObject {
-            put("applicationCode", JsonPrimitive(APPCODE))
-        }, TIMESTAMP)
+        val expectedEvent = SdkEvent.Internal.Sdk.ChangeAppCode(
+            id = UUID,
+            applicationCode = APPCODE,
+            timestamp = TIMESTAMP
+        )
 
         configInternal.changeApplicationCode(APPCODE)
 
@@ -69,9 +69,11 @@ class ConfigInternalTests {
 
     @Test
     fun testChangeMerchantId_shouldEmitChangeMerchantIdEvent_toSdkEventFlow() = runTest {
-        val expectedEvent = SdkEvent.Internal.Sdk.ChangeMerchantId(UUID, buildJsonObject {
-            put("merchantId", JsonPrimitive(MERCHANT_ID))
-        }, TIMESTAMP)
+        val expectedEvent = SdkEvent.Internal.Sdk.ChangeMerchantId(
+            id = UUID,
+            merchantId = MERCHANT_ID,
+            timestamp = TIMESTAMP
+        )
 
         configInternal.changeMerchantId(MERCHANT_ID)
 
