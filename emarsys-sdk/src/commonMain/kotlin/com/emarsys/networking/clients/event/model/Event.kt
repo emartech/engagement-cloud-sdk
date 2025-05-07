@@ -199,6 +199,7 @@ sealed interface SdkEvent {
                 override val id: String = UUIDProvider().provide(),
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
+                val pushToken: String,
             ) : Sdk(REGISTER_PUSH_TOKEN_EVENT_NAME), OnlineSdkEvent, SetupFlowEvent
 
             @Serializable

@@ -5,7 +5,6 @@ import com.emarsys.api.push.Ems
 import com.emarsys.api.push.PushCall.ClearPushToken
 import com.emarsys.api.push.PushCall.HandleSilentMessageWithUserInfo
 import com.emarsys.api.push.PushCall.RegisterPushToken
-import com.emarsys.api.push.PushConstants.PUSH_TOKEN_KEY
 import com.emarsys.api.push.PushContext
 import com.emarsys.api.push.PushContextApi
 import com.emarsys.api.push.SilentNotification
@@ -58,7 +57,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.jsonPrimitive
 import platform.UserNotifications.UNNotificationDefaultActionIdentifier
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -513,7 +511,7 @@ internal class IosPushInternalTests {
 
         val emittedValues = eventContainer.values
         emittedValues.first { it is SdkEvent.Internal.Sdk.RegisterPushToken }.apply {
-            this.attributes?.get(PUSH_TOKEN_KEY)?.jsonPrimitive?.content shouldBe PUSH_TOKEN
+            (this as SdkEvent.Internal.Sdk.RegisterPushToken).pushToken shouldBe PUSH_TOKEN
         }
         emittedValues.firstOrNull { it is SdkEvent.Internal.Sdk.ClearPushToken } shouldNotBe null
         emittedValues.firstOrNull { it is SdkEvent.External.Api.SilentPush } shouldNotBe null

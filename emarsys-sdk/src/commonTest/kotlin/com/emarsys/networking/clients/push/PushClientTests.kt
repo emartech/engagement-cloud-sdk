@@ -1,6 +1,5 @@
 package com.emarsys.networking.clients.push
 
-import com.emarsys.api.push.PushConstants
 import com.emarsys.context.DefaultUrlsApi
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
@@ -48,8 +47,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonObject
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -123,11 +120,9 @@ class PushClientTests {
             ""
         )
         val registerPushTokenEvent = SdkEvent.Internal.Sdk.RegisterPushToken(
-            ID,
-            buildJsonObject {
-                put(PushConstants.PUSH_TOKEN_KEY, JsonPrimitive(TEST_PUSH_TOKEN))
-            },
-            TIMESTAMP
+            id = ID,
+            pushToken = TEST_PUSH_TOKEN,
+            timestamp = TIMESTAMP
         )
 
         val onlineSdkEvents = backgroundScope.async {

@@ -3,15 +3,12 @@ package com.emarsys.api.push
 import com.emarsys.api.push.PushCall.ClearPushToken
 import com.emarsys.api.push.PushCall.RegisterPushToken
 import com.emarsys.api.push.PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY
-import com.emarsys.api.push.PushConstants.PUSH_TOKEN_KEY
 import com.emarsys.api.push.PushConstants.PUSH_TOKEN_STORAGE_KEY
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.collections.dequeue
 import com.emarsys.core.log.Logger
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.networking.clients.event.model.SdkEvent
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonObject
 
 internal open class PushInternal(
     private val storage: StringStorageApi,
@@ -26,9 +23,8 @@ internal open class PushInternal(
         if (lastSentPushToken != pushToken) {
             sdkEventDistributor.registerEvent(
                 SdkEvent.Internal.Sdk.RegisterPushToken(
-                    attributes = buildJsonObject {
-                        put(PUSH_TOKEN_KEY, JsonPrimitive(pushToken))
-                    })
+                    pushToken = pushToken
+                )
             )
             storage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, pushToken)
         }
@@ -48,11 +44,10 @@ internal open class PushInternal(
             when (call) {
                 is RegisterPushToken -> sdkEventDistributor.registerEvent(
                     SdkEvent.Internal.Sdk.RegisterPushToken(
-                        attributes = buildJsonObject {
-                            put(PUSH_TOKEN_KEY, JsonPrimitive(call.pushToken))
-                        }
+                        pushToken = call.pushToken
                     )
                 )
+
                 is ClearPushToken -> sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.ClearPushToken())
                 is PushCall.HandleSilentMessageWithUserInfo -> {
                     sdkLogger.debug(

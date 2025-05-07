@@ -5,7 +5,6 @@ import com.emarsys.api.SdkState
 import com.emarsys.api.push.PushCall.ClearPushToken
 import com.emarsys.api.push.PushCall.HandleSilentMessageWithUserInfo
 import com.emarsys.api.push.PushCall.RegisterPushToken
-import com.emarsys.api.push.PushConstants.PUSH_TOKEN_KEY
 import com.emarsys.api.push.PushContextApi
 import com.emarsys.api.push.PushInternal
 import com.emarsys.api.push.PushUserInfo
@@ -34,8 +33,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonObject
 import platform.UserNotifications.UNNotification
 import platform.UserNotifications.UNNotificationDefaultActionIdentifier
 import platform.UserNotifications.UNNotificationPresentationOptionAlert
@@ -97,13 +94,8 @@ internal class IosPushInternal(
         pushContext.calls.dequeue { call ->
             when (call) {
                 is RegisterPushToken -> sdkEventDistributor.registerEvent(
-                    SdkEvent.Internal.Sdk.RegisterPushToken(
-                        attributes = buildJsonObject {
-                            put(PUSH_TOKEN_KEY, JsonPrimitive(call.pushToken))
-                        }
-                    )
+                    SdkEvent.Internal.Sdk.RegisterPushToken(pushToken = call.pushToken)
                 )
-
                 is ClearPushToken -> sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.ClearPushToken())
                 is HandleSilentMessageWithUserInfo -> handleSilentMessageWithUserInfo(call.userInfo)
             }

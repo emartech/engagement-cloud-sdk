@@ -23,7 +23,6 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlinx.serialization.json.jsonPrimitive
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -78,7 +77,7 @@ class RegisterPushTokenStateTests {
         }
         val emitted = eventSlot.get()
         (emitted is SdkEvent.Internal.Sdk.RegisterPushToken) shouldBe true
-        emitted.attributes?.get(PushConstants.PUSH_TOKEN_KEY)?.jsonPrimitive?.content shouldBe PUSH_TOKEN
+        (emitted as SdkEvent.Internal.Sdk.RegisterPushToken).pushToken shouldBe PUSH_TOKEN
     }
 
     @Test
@@ -99,7 +98,7 @@ class RegisterPushTokenStateTests {
         }
         val emitted = eventSlot.get()
         (emitted is SdkEvent.Internal.Sdk.RegisterPushToken) shouldBe true
-        emitted.attributes?.get(PushConstants.PUSH_TOKEN_KEY)?.jsonPrimitive?.content shouldBe PUSH_TOKEN
+        (emitted as SdkEvent.Internal.Sdk.RegisterPushToken).pushToken shouldBe PUSH_TOKEN
     }
 
     @Test

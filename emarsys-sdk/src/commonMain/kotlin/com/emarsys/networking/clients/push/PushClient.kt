@@ -1,6 +1,5 @@
 package com.emarsys.networking.clients.push
 
-import com.emarsys.api.push.PushConstants.PUSH_TOKEN_KEY
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.exceptions.FailedRequestException
@@ -21,7 +20,6 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.jsonPrimitive
 
 internal class PushClient(
     private val emarsysClient: NetworkClientApi,
@@ -73,7 +71,7 @@ internal class PushClient(
         val url = urlFactory.create(PUSH_TOKEN)
         return when (sdkEvent) {
             is SdkEvent.Internal.Sdk.RegisterPushToken -> {
-                val pushToken = sdkEvent.attributes?.get(PUSH_TOKEN_KEY)?.jsonPrimitive?.content!!
+                val pushToken = sdkEvent.pushToken
                 val body = json.encodeToString(PushToken(pushToken))
                 UrlRequest(url, HttpMethod.Put, body)
             }
