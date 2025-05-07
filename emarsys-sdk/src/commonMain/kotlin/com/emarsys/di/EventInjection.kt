@@ -16,7 +16,8 @@ import com.emarsys.mobileengage.session.Session
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.tracking.Tracking
 import com.emarsys.tracking.TrackingApi
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterIsInstance
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -77,8 +78,8 @@ object EventInjection {
                 sdkLogger = get { parametersOf(MobileEngageSession::class.simpleName) },
             )
         }
-        single<SharedFlow<SdkEvent>>(named(EventFlowTypes.Public)) {
-            get<SdkEventDistributorApi>().sdkEventFlow
+        single<Flow<SdkEvent.External.Api>>(named(EventFlowTypes.Public)) {
+            get<SdkEventDistributorApi>().sdkEventFlow.filterIsInstance<SdkEvent.External.Api>()
         }
         single<TrackingApi> { Tracking() }
     }

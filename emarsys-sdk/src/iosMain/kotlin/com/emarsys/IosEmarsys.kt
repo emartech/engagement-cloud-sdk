@@ -14,15 +14,16 @@ import com.emarsys.di.EventFlowTypes
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.networking.clients.event.model.SdkEvent
 import io.ktor.utils.io.CancellationException
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.Flow
 import org.koin.core.qualifier.named
 import kotlin.experimental.ExperimentalObjCName
+
+typealias EmarsysEventListener = (SdkEvent) -> Unit
 
 @OptIn(ExperimentalObjCName::class)
 @ObjCName("Emarsys")
 object IosEmarsys {
-
-    var events: ((SdkEvent) -> Unit)? = null
+    private var eventListeners: MutableList<EmarsysEventListener> = mutableListOf()
 
     val contact: IosContactApi
         get() = koin.get<IosContactApi>()
@@ -47,8 +48,10 @@ object IosEmarsys {
     @Throws(CancellationException::class)
     suspend fun initialize() {
         Emarsys.initialize()
-        koin.get<MutableSharedFlow<SdkEvent>>(named(EventFlowTypes.Public)).collect {
-            events?.invoke(it)
+        koin.get<Flow<SdkEvent.External.Api>>(named(EventFlowTypes.Public)).collect {
+            eventListeners.forEach { listener ->
+                listener.invoke(it)
+            }
         }
     }
 
@@ -60,6 +63,13 @@ object IosEmarsys {
     @Throws(SdkAlreadyEnabledException::class, CancellationException::class)
     suspend fun enableTracking(config: SdkConfig) {
         Emarsys.enableTracking(config).getOrThrow()
+    }
+
+    /**
+     * Registers an event listener to receive SDK events.
+     */
+    fun registerEventListener(listener: EmarsysEventListener) {
+        eventListeners.add(listener)
     }
 
     /**
