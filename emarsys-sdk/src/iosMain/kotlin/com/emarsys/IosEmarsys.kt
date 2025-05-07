@@ -22,7 +22,7 @@ import kotlin.experimental.ExperimentalObjCName
 @ObjCName("Emarsys")
 object IosEmarsys {
 
-    var events: (suspend (SdkEvent) -> Unit)? = null
+    var events: ((SdkEvent) -> Unit)? = null
 
     val contact: IosContactApi
         get() = koin.get<IosContactApi>()
