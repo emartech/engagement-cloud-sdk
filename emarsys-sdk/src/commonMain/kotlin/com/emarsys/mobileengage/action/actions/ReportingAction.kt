@@ -7,9 +7,6 @@ import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.ReportingActionModel
 import com.emarsys.networking.clients.event.model.SdkEvent
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
 
 internal data class ReportingAction(
     private val action: ReportingActionModel,
@@ -23,9 +20,7 @@ internal data class ReportingAction(
                     SdkEvent.Internal.Push.Clicked(
                         reporting = action.reporting,
                         trackingInfo = action.trackingInfo,
-                        attributes = buildJsonObject {
-                            put("origin", JsonPrimitive(BUTTON_CLICK_ORIGIN))
-                        }
+                        origin = BUTTON_CLICK_ORIGIN
                     )
                 )
             }
@@ -36,9 +31,7 @@ internal data class ReportingAction(
                     SdkEvent.Internal.InApp.ButtonClicked(
                         reporting = action.reporting,
                         trackingInfo = action.trackingInfo,
-                        attributes = buildJsonObject {
-                            put("origin", JsonPrimitive(BUTTON_CLICK_ORIGIN))
-                        }
+                        origin = BUTTON_CLICK_ORIGIN
                     )
                 )
             }
@@ -48,7 +41,7 @@ internal data class ReportingAction(
                     SdkEvent.Internal.Push.Clicked(
                         reporting = action.reporting,
                         trackingInfo = action.trackingInfo,
-                        attributes = buildJsonObject { put("origin", "main") }
+                        origin = "main"
                     )
                 )
             }

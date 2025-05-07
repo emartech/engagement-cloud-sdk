@@ -127,6 +127,7 @@ internal class EventClient(
         }
     }
 
+    //TODO: check what needs to be reported here
     private suspend fun reportOnEventAction(campaignId: String) {
         sdkLogger.debug("EventClient - reportOnEventAction")
 

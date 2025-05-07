@@ -313,7 +313,8 @@ sealed interface SdkEvent {
                 override val id: String = UUIDProvider().provide(),
                 val reporting: String? = null,
                 val trackingInfo: String,
-                override val attributes: JsonObject?,
+                val origin: String,
+                override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
             ) : Push(PUSH_CLICKED_EVENT_NAME), Reporting
         }
@@ -334,7 +335,8 @@ sealed interface SdkEvent {
                 override val id: String = UUIDProvider().provide(),
                 val reporting: String,
                 val trackingInfo: String,
-                override val attributes: JsonObject?,
+                val origin: String,
+                override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
             ) : InApp(IN_APP_BUTTON_CLICKED_EVENT_NAME), Reporting
         }

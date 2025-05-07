@@ -16,8 +16,6 @@ import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonObject
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -27,8 +25,6 @@ class ReportingActionTests {
         const val ID = "testId"
         const val TRACKING_INFO = """{"key:"value"}"""
         const val REPORTING = """{"reportingKey":"reportingValue"}"""
-        const val BUTTON_ORIGIN = "button"
-        const val TEST_URL = "testUrl"
     }
 
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
@@ -46,11 +42,7 @@ class ReportingActionTests {
             ID,
             reporting = REPORTING,
             trackingInfo = TRACKING_INFO,
-            attributes = buildJsonObject {
-                put(
-                    "origin", JsonPrimitive(BUTTON_ORIGIN)
-                )
-            }
+            origin = BUTTON_CLICK_ORIGIN
         )
 
         val eventSlot = slot<SdkEvent>()
@@ -75,9 +67,7 @@ class ReportingActionTests {
             ID,
             reporting = REPORTING,
             trackingInfo = TRACKING_INFO,
-            attributes = buildJsonObject {
-                put("origin", JsonPrimitive(BUTTON_CLICK_ORIGIN))
-            }
+            origin = BUTTON_CLICK_ORIGIN
         )
 
         val eventSlot = slot<SdkEvent>()
@@ -100,11 +90,7 @@ class ReportingActionTests {
             val expectedEvent = SdkEvent.Internal.Push.Clicked(
                 reporting = REPORTING,
                 trackingInfo = TRACKING_INFO,
-                attributes = buildJsonObject {
-                    put(
-                        "origin", JsonPrimitive("main")
-                    )
-                }
+                origin = "main"
             )
 
             val eventSlot = slot<SdkEvent>()
