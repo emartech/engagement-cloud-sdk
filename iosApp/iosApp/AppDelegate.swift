@@ -15,7 +15,10 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
         Task {
             try? await Emarsys.shared.initialize()
-            
+            Emarsys.shared.events = { event in
+                
+            }
+
             center.delegate = Emarsys.shared.push.emarsysUserNotificationCenterDelegate
             do {
                 try await Emarsys.shared.enableTracking(config: EmarsysConfig(applicationCode: "EMS11-C3FD3"))

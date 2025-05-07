@@ -10,13 +10,20 @@ import com.emarsys.api.push.IosPushApi
 import com.emarsys.api.tracking.IosTrackingApi
 import com.emarsys.core.exceptions.SdkAlreadyDisabledException
 import com.emarsys.core.exceptions.SdkAlreadyEnabledException
+import com.emarsys.di.EventFlowTypes
 import com.emarsys.di.SdkKoinIsolationContext.koin
+import com.emarsys.networking.clients.event.model.SdkEvent
 import io.ktor.utils.io.CancellationException
+import kotlinx.coroutines.flow.MutableSharedFlow
+import org.koin.core.qualifier.named
 import kotlin.experimental.ExperimentalObjCName
 
 @OptIn(ExperimentalObjCName::class)
 @ObjCName("Emarsys")
 object IosEmarsys {
+
+    var events: (suspend (SdkEvent) -> Unit)? = null
+
     val contact: IosContactApi
         get() = koin.get<IosContactApi>()
     val push: IosPushApi
@@ -40,6 +47,9 @@ object IosEmarsys {
     @Throws(CancellationException::class)
     suspend fun initialize() {
         Emarsys.initialize()
+        koin.get<MutableSharedFlow<SdkEvent>>(named(EventFlowTypes.Public)).collect {
+            events?.invoke(it)
+        }
     }
 
     /**
