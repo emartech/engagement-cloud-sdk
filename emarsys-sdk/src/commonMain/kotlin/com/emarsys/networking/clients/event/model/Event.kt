@@ -298,6 +298,7 @@ sealed interface SdkEvent {
                 override val id: String = UUIDProvider().provide(),
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
+                val duration: Long
             ) : Sdk(SESSION_END_EVENT_NAME), Custom
         }
 

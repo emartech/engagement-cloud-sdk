@@ -124,12 +124,7 @@ internal class MobileEngageSession(
             sessionEnd.toEpochMilliseconds() - sessionContext.sessionStart!!
         return SdkEvent.Internal.Sdk.SessionEnd(
             id = uuidProvider.provide(),
-            attributes = buildJsonObject {
-                put(
-                    "duration",
-                    JsonPrimitive(duration.toString())
-                )
-            },
+            duration = duration,
             timestamp = sessionEnd
         )
     }
