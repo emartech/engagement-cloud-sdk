@@ -1,6 +1,6 @@
 package com.emarsys.mobileengage.push
 
-import com.emarsys.SdkConstants.PUSH_RECEIVED_EVENT_NAME
+import com.emarsys.SdkConstants.SILENT_PUSH_RECEIVED_EVENT_NAME
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.mobileengage.action.PushActionFactoryApi
 import com.emarsys.mobileengage.push.model.AndroidPlatformData
@@ -18,8 +18,8 @@ internal class SilentPushMessageHandler(
         }
 
         sdkEventDistributor.registerEvent(
-            SdkEvent.External.Api.SilentPush(
-                name = PUSH_RECEIVED_EVENT_NAME
+            SdkEvent.External.Api.AppEvent(
+                name = SILENT_PUSH_RECEIVED_EVENT_NAME
             )
         )
     }

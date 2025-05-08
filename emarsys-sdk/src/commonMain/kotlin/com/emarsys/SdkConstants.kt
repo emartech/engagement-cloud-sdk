@@ -5,7 +5,7 @@ object SdkConstants {
     const val BUTTON_CLICK_ORIGIN = "button"
     const val CLIENT_ID_STORAGE_KEY = "clientId"
     const val IN_APP_BUTTON_CLICKED_EVENT_NAME = "click"
-    const val PUSH_RECEIVED_EVENT_NAME = "push:received"
+    const val SILENT_PUSH_RECEIVED_EVENT_NAME = "push:silentPushReceived"
     const val SESSION_START_EVENT_NAME = "session:start"
     const val SESSION_END_EVENT_NAME = "session:end"
     const val APP_START_EVENT_NAME = "app:start"

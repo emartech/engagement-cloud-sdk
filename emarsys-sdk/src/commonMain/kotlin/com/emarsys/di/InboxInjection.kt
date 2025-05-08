@@ -19,7 +19,7 @@ object InboxInjection {
     const val INBOX_MESSAGES = "inboxMessages"
 
     val inboxModules = module {
-        single<MutableList<InboxCall>>(named(PersistentListTypes.InAppCall)) {
+        single<MutableList<InboxCall>>(named(PersistentListTypes.InboxCall)) {
             PersistentList(
                 id = PersistentListIds.INBOX_CONTEXT_PERSISTENT_ID,
                 storage = get(),
@@ -28,9 +28,7 @@ object InboxInjection {
             )
         }
         single<MutableList<Message>>(named(INBOX_MESSAGES)) { mutableListOf() }
-        single<InboxContextApi> { InboxContext(
-            calls = get(named(PersistentListTypes.InboxCall))
-        ) }
+        single<InboxContextApi> { InboxContext(calls = get(named(PersistentListTypes.InboxCall))) }
         single<InboxInstance>(named(InstanceType.Logging)) {
             LoggingInbox(
                 logger = get { parametersOf(LoggingInbox::class.simpleName) },

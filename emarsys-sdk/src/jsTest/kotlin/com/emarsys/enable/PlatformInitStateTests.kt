@@ -1,6 +1,6 @@
 package com.emarsys.enable
 
-import com.emarsys.JsEmarsysConfig
+import JsEmarsysConfig
 import com.emarsys.context.SdkContext
 import com.emarsys.core.log.LogLevel
 import com.emarsys.mobileengage.push.PushServiceApi

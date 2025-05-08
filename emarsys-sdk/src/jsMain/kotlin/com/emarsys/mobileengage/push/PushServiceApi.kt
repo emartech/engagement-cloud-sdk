@@ -1,6 +1,6 @@
 package com.emarsys.mobileengage.push
 
-import com.emarsys.JsEmarsysConfig
+import JsEmarsysConfig
 
 interface PushServiceApi {
     suspend fun register(config: JsEmarsysConfig)

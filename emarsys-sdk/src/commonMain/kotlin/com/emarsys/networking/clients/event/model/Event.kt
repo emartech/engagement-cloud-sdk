@@ -82,43 +82,25 @@ sealed interface SdkEvent {
             override val timestamp: Instant = TimestampProvider().provide(),
         ) : External, OnlineSdkEvent
 
-        sealed class Api : External {
-            override val type: String = "custom"
+        sealed interface Api : External {
 
-            data class Push(
+            data class AppEvent(
                 override val id: String = UUIDProvider().provide(),
                 override val name: String,
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Api()
+                override val type: String = ExternalEventTypes.APP_EVENT.name.lowercase()
+            ) : Api
 
-            data class InApp(
+            data class BadgeCountEvent(
                 override val id: String = UUIDProvider().provide(),
                 override val name: String,
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Api()
-
-            data class SilentPush(
-                override val id: String = UUIDProvider().provide(),
-                override val name: String,
-                override val attributes: JsonObject? = null,
-                override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Api()
-
-            data class OnEventAction(
-                override val id: String = UUIDProvider().provide(),
-                override val name: String,
-                override val attributes: JsonObject? = null,
-                override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Api()
-
-            data class BadgeCount(
-                override val id: String = UUIDProvider().provide(),
-                override val name: String,
-                override val attributes: JsonObject? = null,
-                override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Api()
+                override val type: String = ExternalEventTypes.BADGE_COUNT.name.lowercase(),
+                val badgeCount: Int,
+                val method: String
+            ) : Api
         }
     }
 

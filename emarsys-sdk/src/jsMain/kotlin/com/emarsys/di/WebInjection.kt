@@ -1,6 +1,6 @@
 package com.emarsys.di
 
-import com.emarsys.JsEmarsysConfig
+import JsEmarsysConfig
 import com.emarsys.api.config.JSConfig
 import com.emarsys.api.config.JSConfigApi
 import com.emarsys.api.contact.JSContact

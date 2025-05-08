@@ -1,6 +1,6 @@
 package com.emarsys.mobileengage.push
 
-import com.emarsys.SdkConstants.PUSH_RECEIVED_EVENT_NAME
+import com.emarsys.SdkConstants.SILENT_PUSH_RECEIVED_EVENT_NAME
 import com.emarsys.api.SdkState
 import com.emarsys.api.push.PushCall.ClearPushToken
 import com.emarsys.api.push.PushCall.HandleSilentMessageWithUserInfo
@@ -82,9 +82,9 @@ internal class IosPushInternal(
 
         //TODO: revisit what we want to send in attributes after API discovery
         sdkEventDistributor.registerEvent(
-            SdkEvent.External.Api.SilentPush(
+            SdkEvent.External.Api.AppEvent(
                 id = uuidProvider.provide(),
-                name = PUSH_RECEIVED_EVENT_NAME,
+                name = SILENT_PUSH_RECEIVED_EVENT_NAME,
                 timestamp = timestampProvider.provide()
             )
         )

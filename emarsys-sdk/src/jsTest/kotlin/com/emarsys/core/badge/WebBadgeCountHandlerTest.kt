@@ -19,8 +19,6 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
 import web.broadcast.BroadcastChannel
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -73,15 +71,11 @@ class WebBadgeCountHandlerTest {
 
         verifySuspend {
             mockSdkEventDistributor.registerEvent(
-                SdkEvent.External.Api.BadgeCount(
+                SdkEvent.External.Api.BadgeCountEvent(
                     id = any(),
-                    name = testBadgeCount.method.name,
-                    attributes = buildJsonObject {
-                        put(
-                            "badgeCount",
-                            testBadgeCount.value
-                        )
-                    }
+                    name = "badgeCount",
+                    method = testBadgeCount.method.name,
+                    badgeCount = testBadgeCount.value
                 ))
         }
     }

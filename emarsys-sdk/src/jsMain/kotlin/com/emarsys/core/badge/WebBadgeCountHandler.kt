@@ -7,8 +7,6 @@ import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.util.JsonUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonObject
 import web.broadcast.BroadcastChannel
 import web.events.EventHandler
 
@@ -32,14 +30,10 @@ internal class WebBadgeCountHandler(
             val badgeCount =
                 JsonUtil.json.decodeFromString<BadgeCount>(badgeCountString)
             sdkEventDistributor.registerEvent(
-                SdkEvent.External.Api.BadgeCount(
-                    name = badgeCount.method.name,
-                    attributes = buildJsonObject {
-                        put(
-                            "badgeCount",
-                            JsonPrimitive(badgeCount.value)
-                        )
-                    }
+                SdkEvent.External.Api.BadgeCountEvent(
+                    name = "badgeCount",
+                    badgeCount = badgeCount.value,
+                    method = badgeCount.method.name,
                 )
             )
         } catch (e: Exception) {

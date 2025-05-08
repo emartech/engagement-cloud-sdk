@@ -1,6 +1,6 @@
 package com.emarsys.mobileengage.push
 
-import com.emarsys.SdkConstants.PUSH_RECEIVED_EVENT_NAME
+import com.emarsys.SdkConstants.SILENT_PUSH_RECEIVED_EVENT_NAME
 import com.emarsys.api.push.Ems
 import com.emarsys.api.push.PushCall.ClearPushToken
 import com.emarsys.api.push.PushCall.HandleSilentMessageWithUserInfo
@@ -489,9 +489,9 @@ internal class IosPushInternalTests {
         verifySuspend { mockOpenExternalUrlAction.invoke() }
         verifySuspend {
             mockSdkEventDistributor.registerEvent(
-                SdkEvent.External.Api.SilentPush(
+                SdkEvent.External.Api.AppEvent(
                     id = UUID,
-                    name = PUSH_RECEIVED_EVENT_NAME,
+                    name = SILENT_PUSH_RECEIVED_EVENT_NAME,
                     timestamp = Instant.DISTANT_PAST
                 )
             )
@@ -514,7 +514,7 @@ internal class IosPushInternalTests {
             (this as SdkEvent.Internal.Sdk.RegisterPushToken).pushToken shouldBe PUSH_TOKEN
         }
         emittedValues.firstOrNull { it is SdkEvent.Internal.Sdk.ClearPushToken } shouldNotBe null
-        emittedValues.firstOrNull { it is SdkEvent.External.Api.SilentPush } shouldNotBe null
+        emittedValues.firstOrNull { it is SdkEvent.External.Api.AppEvent } shouldNotBe null
     }
 
     private fun createUserInfoMap(

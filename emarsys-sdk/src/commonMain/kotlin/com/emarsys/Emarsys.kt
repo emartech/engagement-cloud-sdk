@@ -52,8 +52,8 @@ object Emarsys {
         }
     }
 
-    val events: SharedFlow<SdkEvent>
-        get() = koin.get<MutableSharedFlow<SdkEvent>>(named(EventFlowTypes.Public))
+    val events: SharedFlow<SdkEvent.External.Api>
+        get() = koin.get<MutableSharedFlow<SdkEvent.External.Api>>(named(EventFlowTypes.Public))
 
     val contact: ContactApi
         get() = koin.get<ContactApi>()

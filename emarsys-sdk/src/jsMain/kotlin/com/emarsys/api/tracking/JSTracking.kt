@@ -25,7 +25,7 @@ class JSTracking(
     ): Promise<Unit> {
         return applicationScope.promise {
             val attributes: Map<String, String>? = eventPayload?.let {
-                 JsonUtil.json.decodeFromString(JSON.stringify(it))
+                JsonUtil.json.decodeFromString(JSON.stringify(it))
             }
             trackingApi.trackCustomEvent(CustomEvent(eventName, attributes)).getOrThrow()
         }

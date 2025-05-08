@@ -133,7 +133,11 @@ class SdkEventDistributorTests {
     @Test
     fun registerAndStoreEvent_shouldNotPersistNotOnlineEvents_andEmitSdkEvent_toSdkEventFlow() =
         runTest {
-            val testEvent = SdkEvent.External.Api.BadgeCount(name = "testEventName")
+            val testEvent = SdkEvent.External.Api.BadgeCountEvent(
+                name = "testEventName",
+                badgeCount = 1234,
+                method = "set"
+            )
             val sdkEventDistributor = createEventDistributor(MutableStateFlow(false), sdkContext)
 
             val emittedEvents = backgroundScope.async {
