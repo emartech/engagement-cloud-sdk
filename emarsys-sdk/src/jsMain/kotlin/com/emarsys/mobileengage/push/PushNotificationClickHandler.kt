@@ -7,6 +7,7 @@ import com.emarsys.mobileengage.action.actions.Action
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
+import com.emarsys.mobileengage.action.models.InAppActionModel
 import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.push.model.JsNotificationClickedData
@@ -37,13 +38,17 @@ internal class PushNotificationClickHandler(
             val jsNotificationClickedData =
                 JsonUtil.json.decodeFromString<JsNotificationClickedData>(event)
 
-            val actionModel = if (hasDefaultTapActionId(jsNotificationClickedData)) {
+            val actionModel = if (triggeredByDefaultTap(jsNotificationClickedData)) {
                 jsNotificationClickedData.jsPushMessage.actionableData?.defaultTapAction
             } else {
                 findAction(
                     jsNotificationClickedData.actionId,
                     jsNotificationClickedData.jsPushMessage.actionableData?.actions
                 )
+            }
+
+            if (actionModel is InAppActionModel) {
+                actionModel.trackingInfo = jsNotificationClickedData.jsPushMessage.trackingInfo
             }
             val triggeredAction = actionModel?.let {
                 actionFactory.create(it)
@@ -79,7 +84,7 @@ internal class PushNotificationClickHandler(
         }
     }
 
-    private fun hasDefaultTapActionId(jsNotificationClickedData: JsNotificationClickedData) =
+    private fun triggeredByDefaultTap(jsNotificationClickedData: JsNotificationClickedData) =
         jsNotificationClickedData.actionId.isEmpty()
 
     private fun findAction(

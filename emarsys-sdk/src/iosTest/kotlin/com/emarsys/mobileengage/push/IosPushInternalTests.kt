@@ -235,7 +235,11 @@ internal class IosPushInternalTests {
         val mockPushToInAppHandler: PushToInAppHandlerApi = mock()
 
         val actionModel =
-            BasicPushToInAppActionModel(UUID, REPORTING, PushToInAppPayload(campaignId, url))
+            BasicPushToInAppActionModel(
+                id = UUID,
+                reporting = REPORTING,
+                payload = PushToInAppPayload(campaignId, url)
+            )
         val action = PushToInappAction(
             actionModel.toPresentablePushToInAppActionModel(),
             mockPushToInAppHandler
@@ -266,7 +270,7 @@ internal class IosPushInternalTests {
         advanceUntilIdle()
 
         verifySuspend {
-            mockActionFactory.create(actionModel)
+            mockActionFactory.create(actionModel.copy(trackingInfo = TRACKING_INFO))
             mockActionHandler.handleActions(any(), action)
         }
     }

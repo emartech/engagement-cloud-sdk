@@ -23,6 +23,7 @@ import com.emarsys.mobileengage.action.actions.Action
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
+import com.emarsys.mobileengage.action.models.InAppActionModel
 import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.push.extension.toPushUserInfo
@@ -137,10 +138,16 @@ internal class IosPushInternal(
                 }
             }
 
+        if (actionModel is InAppActionModel) {
+            actionModel.trackingInfo = pushUserInfo.ems.trackingInfo
+        }
+
         val triggeredAction = actionModel?.let {
             actionFactory.create(it)
         }
+
         val mandatoryActions = createMandatoryActions(pushUserInfo, actionModel)
+
         actionHandler.handleActions(mandatoryActions, triggeredAction)
     }
 

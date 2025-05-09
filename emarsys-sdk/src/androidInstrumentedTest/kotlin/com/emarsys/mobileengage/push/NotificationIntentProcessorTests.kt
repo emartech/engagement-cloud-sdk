@@ -18,14 +18,18 @@ import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
 import com.emarsys.mobileengage.action.models.BasicDismissActionModel
 import com.emarsys.mobileengage.action.models.BasicLaunchApplicationActionModel
 import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
+import com.emarsys.mobileengage.action.models.BasicPushToInAppActionModel
 import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.action.models.PresentableAppEventActionModel
 import com.emarsys.mobileengage.action.models.PresentableDismissActionModel
+import com.emarsys.mobileengage.inapp.PushToInAppPayload
 import com.emarsys.util.JsonUtil
+import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import io.mockk.slot
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -310,6 +314,51 @@ class NotificationIntentProcessorTests {
             advanceUntilIdle()
 
             coVerify { mockActionFactory.create(actionModel) }
+            coVerify {
+                mockActionHandler.handleActions(
+                    listOf(
+                        mockLaunchApplicationAction,
+                        basicDismissAction,
+                        reportingAction,
+                    ), mockAction
+                )
+            }
+        }
+
+    @Test
+    fun testProcessIntent_shouldHandleAction_withActionHandler_withMandatoryActions_andIncludeTrackingInfoInActionModel_whenActionIsPushToInApp() =
+        runTest {
+            val actionModelSlot = slot<BasicPushToInAppActionModel>()
+            val actionJsonString =
+                """{"type": "InApp","reporting":"{\"someKey\":\"someValue\"}","payload":{"url":"https://www.sap.com","campaignId":"testCampaignId"}}"""
+            val notificationOpenedActionModel =
+                NotificationOpenedActionModel(REPORTING, TRACKING_INFO)
+            val basicDismissActionModel = BasicDismissActionModel(COLLAPSE_ID)
+            val reportingAction =
+                ReportingAction(notificationOpenedActionModel, mockSdkEventDistributor)
+            val basicDismissAction = DismissAction(basicDismissActionModel, mockSdkEventDistributor)
+            val mockLaunchApplicationAction: LaunchApplicationAction = mockk(relaxed = true)
+
+            coEvery { mockActionFactory.create(BasicLaunchApplicationActionModel) } returns mockLaunchApplicationAction
+            coEvery { mockActionFactory.create(notificationOpenedActionModel) } returns reportingAction
+            coEvery { mockActionFactory.create(basicDismissActionModel) } returns basicDismissAction
+
+            val intent = Intent(context, NotificationOpenedActivity::class.java)
+            intent.action = DEFAULT_TAP_ACTION_ID
+            intent.putExtra(
+                INTENT_EXTRA_DEFAULT_TAP_ACTION_KEY,
+                actionJsonString
+            )
+            intent.putExtra(INTENT_EXTRA_PAYLOAD_KEY, createTestMessage())
+
+            val mockAction: Action<Unit> = mockk(relaxed = true)
+            coEvery { mockActionFactory.create(capture(actionModelSlot)) } returns mockAction
+
+            notificationIntentProcessor.processIntent(intent)
+
+            advanceUntilIdle()
+
+            actionModelSlot.captured.trackingInfo shouldBe TRACKING_INFO
             coVerify {
                 mockActionHandler.handleActions(
                     listOf(

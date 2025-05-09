@@ -4,23 +4,30 @@ import com.emarsys.core.actions.ActionHandlerApi
 import com.emarsys.mobileengage.action.PushActionFactoryApi
 import com.emarsys.mobileengage.action.actions.Action
 import com.emarsys.mobileengage.action.actions.ReportingAction
+import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
+import com.emarsys.mobileengage.action.models.BasicPushToInAppActionModel
 import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.action.models.PresentableOpenExternalUrlActionModel
+import com.emarsys.mobileengage.inapp.PushToInAppPayload
 import com.emarsys.mobileengage.push.model.JsNotificationClickedData
 import com.emarsys.mobileengage.push.model.JsPlatformData
 import com.emarsys.mobileengage.push.model.JsPushMessage
 import com.emarsys.util.JsonUtil
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
+import dev.mokkery.matcher.capture.Capture.Companion.slot
+import dev.mokkery.matcher.capture.capture
 import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifyNoMoreCalls
 import dev.mokkery.verifySuspend
+import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -50,9 +57,9 @@ class PushNotificationClickHandlerTests {
     @BeforeTest
     fun setup() = runTest {
         mockActionFactory = mock()
-        mockAction = createMockAction()
-        mockDefaultTapAction = createMockAction()
-        mockButtonClickedAction = createMockAction()
+        mockAction = mock(MockMode.autofill)
+        mockDefaultTapAction = mock(MockMode.autofill)
+        mockButtonClickedAction = mock(MockMode.autofill)
         mockActionHandler = mock<ActionHandlerApi>()
 
         onNotificationClickedBroadcastChannel =
@@ -177,6 +184,43 @@ class PushNotificationClickHandlerTests {
         }
 
     @Test
+    fun handleNotificationClick_shouldPushToInAppActionAndMandatoryAction_andAddTrackingInfoToActionModel() =
+        runTest {
+            val actionId = ""
+            val actionModel =
+                BasicPushToInAppActionModel(
+                    reporting = REPORTING,
+                    payload = PushToInAppPayload("testCampaignId", "https://www.sap.com"),
+                    trackingInfo = null
+                )
+            val notificationClickedData =
+                createTestJsNotificationClickedData(actionId, defaultTapActionModel = actionModel)
+            val event =
+                JsonUtil.json.encodeToString<JsNotificationClickedData>(notificationClickedData)
+            val actionModelSlot = slot<BasicPushToInAppActionModel>()
+            val mockNotificationOpenedAction: Action<*> = mock(MockMode.autofill)
+            everySuspend { mockActionFactory.create(capture(actionModelSlot)) } returns mockAction
+            everySuspend {
+                mockActionFactory.create(
+                    NotificationOpenedActionModel(
+                        REPORTING,
+                        notificationClickedData.jsPushMessage.trackingInfo
+                    )
+                )
+            } returns mockNotificationOpenedAction
+
+            pushNotificationClickHandler.handleNotificationClick(event)
+
+            actionModelSlot.values.first().trackingInfo shouldBe TRACKING_INFO
+            verifySuspend {
+                mockActionHandler.handleActions(
+                    listOf(mockNotificationOpenedAction),
+                    mockAction
+                )
+            }
+        }
+
+    @Test
     fun handleNotificationClick_shouldStillExecuteReportingAction_whenActionWithId_isNotPresent() =
         runTest {
             val mockReportingAction = mock<Action<*>>()
@@ -289,7 +333,7 @@ class PushNotificationClickHandlerTests {
     private fun createTestJsNotificationClickedData(
         actionId: String,
         actionModels: List<PresentableActionModel>? = null,
-        defaultTapActionModel: BasicOpenExternalUrlActionModel? = null
+        defaultTapActionModel: BasicActionModel? = null
     ) =
         JsNotificationClickedData(
             actionId = actionId,
@@ -309,8 +353,4 @@ class PushNotificationClickHandlerTests {
                 )
             )
         )
-
-    private fun createMockAction(): Action<*> =
-        mock { everySuspend { invoke() } returns Unit }
-
 }
