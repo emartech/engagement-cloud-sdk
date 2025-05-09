@@ -4,6 +4,7 @@ import androidx.test.core.app.ActivityScenario
 import com.emarsys.FakeActivity
 import com.emarsys.core.factory.Factory
 import com.emarsys.core.providers.TimestampProvider
+import com.emarsys.core.providers.UUIDProvider
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +19,8 @@ class InAppViewProviderTests {
 
     @Before
     fun setup() {
-        val mockInAppJsBridgeProvider: Factory<String, InAppJsBridge> = mockk(relaxed = true)
+        val mockInAppJsBridgeProvider: Factory<InAppJsBridgeData, InAppJsBridge> =
+            mockk(relaxed = true)
         activityScenario =
             ActivityScenario.launch(FakeActivity::class.java)
         activityScenario.onActivity {
@@ -28,7 +30,8 @@ class InAppViewProviderTests {
                     mockInAppJsBridgeProvider,
                     Dispatchers.Main,
                     WebViewProvider(it.applicationContext, Dispatchers.Main),
-                    TimestampProvider()
+                    TimestampProvider(),
+                    UUIDProvider()
                 )
         }
     }

@@ -2,6 +2,8 @@ package com.emarsys.mobileengage.inapp
 
 import com.emarsys.core.factory.Factory
 import com.emarsys.core.providers.TimestampProvider
+import com.emarsys.core.providers.UUIDProvider
+import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.util.JsonUtil
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -16,12 +18,18 @@ import kotlin.test.Test
 
 class WebInappViewTests {
     private companion object {
-        const val CAMPAIGN_ID = "campaignId"
+        const val UUID = "testUUID"
+        const val TRACKING_INFO = """{"trackingInfo": "testTrackingInfo"}"""
+        val INAPP_JS_BRIDGE_DATA = InAppJsBridgeData(
+            dismissId = UUID,
+            trackingInfo = TRACKING_INFO
+        )
     }
 
     private lateinit var webInappView: WebInAppView
     private lateinit var inappScriptExtractor: InAppScriptExtractorApi
-    private lateinit var mockWebInAppJsBridgeFactory: Factory<String, WebInAppJsBridge>
+    private lateinit var mockWebInAppJsBridgeFactory: Factory<InAppJsBridgeData, WebInAppJsBridge>
+    private lateinit var mockUUIDProvider: UuidProviderApi
     private lateinit var sdkDispatcher: CoroutineDispatcher
 
     @BeforeTest
@@ -29,16 +37,19 @@ class WebInappViewTests {
         sdkDispatcher = StandardTestDispatcher()
         inappScriptExtractor = InAppScriptExtractor()
         mockWebInAppJsBridgeFactory = mock()
-        every { mockWebInAppJsBridgeFactory.create(CAMPAIGN_ID) } returns WebInAppJsBridge(
+        mockUUIDProvider = mock()
+        every { mockUUIDProvider.provide() } returns UUID
+        every { mockWebInAppJsBridgeFactory.create(INAPP_JS_BRIDGE_DATA) } returns WebInAppJsBridge(
             mock(),
-            JsonUtil.json,
+            INAPP_JS_BRIDGE_DATA,
             sdkDispatcher,
-            CAMPAIGN_ID
+            JsonUtil.json
         )
         webInappView = WebInAppView(
             inappScriptExtractor,
             mockWebInAppJsBridgeFactory,
-            TimestampProvider()
+            TimestampProvider(),
+            mockUUIDProvider
         )
     }
 
@@ -58,7 +69,8 @@ class WebInappViewTests {
             </body>
             </html>"""
 
-        val testMessage = InAppMessage(CAMPAIGN_ID, testHtml)
+        val testMessage =
+            InAppMessage(type = InAppType.OVERLAY, trackingInfo = TRACKING_INFO, content = testHtml)
 
         val webViewHolder: WebWebViewHolder = webInappView.load(testMessage) as WebWebViewHolder
 
@@ -73,7 +85,6 @@ class WebInappViewTests {
         webView.querySelector("h3") shouldNotBe null
     }
 
-
     @Test
     fun load_shouldSetTheHtmlContent_withOutScripts() = runTest {
         val testHtml = """<html><head>
@@ -87,7 +98,8 @@ class WebInappViewTests {
             </body>
             </html>"""
 
-        val testMessage = InAppMessage(CAMPAIGN_ID, testHtml)
+        val testMessage =
+            InAppMessage(type = InAppType.OVERLAY, trackingInfo = TRACKING_INFO, content = testHtml)
 
         val webViewHolder: WebWebViewHolder = webInappView.load(testMessage) as WebWebViewHolder
 

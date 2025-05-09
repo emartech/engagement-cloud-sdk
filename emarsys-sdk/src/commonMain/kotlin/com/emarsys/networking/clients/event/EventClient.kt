@@ -11,6 +11,7 @@ import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.networking.model.body
+import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
@@ -18,6 +19,7 @@ import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.inapp.InAppMessage
 import com.emarsys.mobileengage.inapp.InAppPresentationMode
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
+import com.emarsys.mobileengage.inapp.InAppType
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.event.model.DeviceEventRequestBody
@@ -49,7 +51,8 @@ internal class EventClient(
     private val sdkEventManager: SdkEventManagerApi,
     private val eventsDao: EventsDaoApi,
     private val sdkLogger: Logger,
-    private val applicationScope: CoroutineScope
+    private val applicationScope: CoroutineScope,
+    private val uuidProvider: UuidProviderApi
 ) : EventBasedClientApi {
 
     override suspend fun register() {
@@ -152,7 +155,16 @@ internal class EventClient(
                 buildJsonObject { put("campaignId", JsonPrimitive(message.campaignId)) })
 
             val view = inAppViewProvider.provide()
-            val webViewHolder = view.load(InAppMessage(message.campaignId, message.html))
+            //TODO: will be modified after event service v5 migration
+            val webViewHolder =
+                view.load(
+                    InAppMessage(
+                        dismissId = uuidProvider.provide(),
+                        type = InAppType.OVERLAY,
+                        trackingInfo = message.campaignId,
+                        content = message.html
+                    )
+                )
             inAppPresenter.present(view, webViewHolder, InAppPresentationMode.Overlay)
         }
     }

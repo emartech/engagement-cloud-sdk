@@ -62,10 +62,10 @@ import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppViewProvider
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.mobileengage.inapp.IosInAppPresenter
-import com.emarsys.mobileengage.inapp.providers.InAppJsBridgeProvider
+import com.emarsys.mobileengage.inapp.providers.InAppJsBridgeFactory
 import com.emarsys.mobileengage.inapp.providers.SceneProvider
 import com.emarsys.mobileengage.inapp.providers.ViewControllerProvider
-import com.emarsys.mobileengage.inapp.providers.WebViewProvider
+import com.emarsys.mobileengage.inapp.providers.WebViewFactory
 import com.emarsys.mobileengage.inapp.providers.WindowProvider
 import com.emarsys.mobileengage.push.IosGathererPush
 import com.emarsys.mobileengage.push.IosLoggingPush
@@ -152,19 +152,21 @@ object IosInjection {
         single<LifecycleWatchDog> { IosLifecycleWatchdog() }
         single<FileCacheApi> { IosFileCache(NSFileManager.defaultManager) }
         single<InAppViewProviderApi> {
-            val webViewProvider = WebViewProvider(
+            val inAppJsBridgeFactory = InAppJsBridgeFactory(
+                actionFactory = get<EventActionFactoryApi>(),
+                json = get(),
                 mainDispatcher = get(named(DispatcherTypes.Main)),
-                InAppJsBridgeProvider(
-                    actionFactory = get<EventActionFactoryApi>(),
-                    json = get(),
-                    mainDispatcher = get(named(DispatcherTypes.Main)),
-                    sdkDispatcher = get(named(DispatcherTypes.Sdk)),
-                    sdkLogger = get { parametersOf(InAppJsBridgeProvider::class.simpleName) }
-                )
+                sdkDispatcher = get(named(DispatcherTypes.Sdk)),
+                sdkLogger = get { parametersOf(InAppJsBridgeFactory::class.simpleName) }
+            )
+            val webViewFactory = WebViewFactory(
+                mainDispatcher = get(named(DispatcherTypes.Main)),
+                inAppJsBridgeFactory = inAppJsBridgeFactory,
+                uuidProvider = get()
             )
             InAppViewProvider(
                 mainDispatcher = get(named(DispatcherTypes.Main)),
-                webViewProvider = webViewProvider,
+                webViewProvider = webViewFactory,
                 timestampProvider = get(),
             )
         }

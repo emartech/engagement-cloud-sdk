@@ -13,9 +13,12 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonPrimitive
 
 internal class InAppJsBridge(
-    private val dismissId: String,
+    private val inAppJsBridgeData: InAppJsBridgeData,
     private val actionFactory: EventActionFactoryApi,
     private val sdkDispatcher: CoroutineDispatcher,
     private val json: Json
@@ -32,16 +35,20 @@ internal class InAppJsBridge(
 
     @JavascriptInterface
     fun buttonClicked(jsonString: String) {
-           CoroutineScope(sdkDispatcher).launch {
-            val actionModel =
-                json.decodeFromString<BasicInAppButtonClickedActionModel>(jsonString)
-            actionFactory.create(actionModel)()
+        CoroutineScope(sdkDispatcher).launch {
+            val buttonClickJson = json.decodeFromString<JsonObject>(jsonString)
+            val reporting = buttonClickJson["reporting"]?.jsonPrimitive?.contentOrNull
+            reporting?.let {
+                val actionModel =
+                    BasicInAppButtonClickedActionModel(it, inAppJsBridgeData.trackingInfo)
+                actionFactory.create(actionModel)()
+            }
         }
     }
 
     @JavascriptInterface
     fun triggerAppEvent(jsonString: String) {
-           CoroutineScope(sdkDispatcher).launch {
+        CoroutineScope(sdkDispatcher).launch {
             val actionModel = json.decodeFromString<BasicAppEventActionModel>(jsonString)
             actionFactory.create(actionModel)()
         }
@@ -49,7 +56,7 @@ internal class InAppJsBridge(
 
     @JavascriptInterface
     fun requestPushPermission(jsonString: String) {
-           CoroutineScope(sdkDispatcher).launch {
+        CoroutineScope(sdkDispatcher).launch {
             val actionModel =
                 json.decodeFromString<RequestPushPermissionActionModel>(jsonString)
             actionFactory.create(actionModel)()
@@ -58,7 +65,7 @@ internal class InAppJsBridge(
 
     @JavascriptInterface
     fun openExternalLink(jsonString: String) {
-           CoroutineScope(sdkDispatcher).launch {
+        CoroutineScope(sdkDispatcher).launch {
             val actionModel =
                 json.decodeFromString<BasicOpenExternalUrlActionModel>(jsonString)
             actionFactory.create(actionModel)()
@@ -67,16 +74,16 @@ internal class InAppJsBridge(
 
     @JavascriptInterface
     fun close(jsonString: String) {
-           CoroutineScope(sdkDispatcher).launch {
+        CoroutineScope(sdkDispatcher).launch {
             val actionModel = json.decodeFromString<BasicDismissActionModel>(jsonString)
-            actionModel.dismissId = dismissId
+            actionModel.dismissId = inAppJsBridgeData.dismissId
             actionFactory.create(actionModel)()
         }
     }
 
     @JavascriptInterface
     fun copyToClipboard(jsonString: String) {
-           CoroutineScope(sdkDispatcher).launch {
+        CoroutineScope(sdkDispatcher).launch {
             val actionModel =
                 json.decodeFromString<BasicCopyToClipboardActionModel>(jsonString)
             actionFactory.create(actionModel)()

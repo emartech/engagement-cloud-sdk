@@ -17,16 +17,16 @@ import kotlin.test.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class InAppViewProviderTest {
 
-    private val webViewProvider: SuspendFactory<String, WKWebView> = mock()
+    private val mockWebViewFactory: SuspendFactory<String, WKWebView> = mock()
     private val mainDispatcher = Dispatchers.Unconfined
 
     @Test
     fun `test provide returns non-null InAppView`() = runTest {
         val webView = WKWebView()
-        everySuspend { webViewProvider.create(any()) } returns webView
+        everySuspend { mockWebViewFactory.create(any()) } returns webView
 
         val inAppViewProvider =
-            InAppViewProvider(mainDispatcher, webViewProvider, TimestampProvider())
+            InAppViewProvider(mainDispatcher, mockWebViewFactory, TimestampProvider())
         val result = inAppViewProvider.provide()
 
         result shouldNotBe null

@@ -12,13 +12,16 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonPrimitive
 import web.window.window
 
 internal class WebInAppJsBridge(
     private val actionFactory: EventActionFactoryApi,
-    private val json: Json,
+    private val inAppJsBridgeData: InAppJsBridgeData,
     private val sdkDispatcher: CoroutineDispatcher,
-    private val campaignId: String
+    private val json: Json
 ) : InAppJsBridgeApi {
 
     override fun register() {
@@ -38,9 +41,13 @@ internal class WebInAppJsBridge(
         @JsName("buttonClicked")
         fun buttonClicked(jsonString: String) {
             CoroutineScope(sdkDispatcher).launch {
-                val actionModel =
-                    json.decodeFromString<BasicInAppButtonClickedActionModel>(jsonString)
-                actionFactory.create(actionModel)()
+                val buttonClickJson = json.decodeFromString<JsonObject>(jsonString)
+                val reporting = buttonClickJson["reporting"]?.jsonPrimitive?.contentOrNull
+                reporting?.let {
+                    val actionModel =
+                        BasicInAppButtonClickedActionModel(it, inAppJsBridgeData.trackingInfo)
+                    actionFactory.create(actionModel)()
+                }
             }
         }
 
@@ -73,7 +80,7 @@ internal class WebInAppJsBridge(
         fun dismiss(jsonString: String) {
             CoroutineScope(sdkDispatcher).launch {
                 val actionModel = json.decodeFromString<BasicDismissActionModel>(jsonString)
-                actionModel.dismissId = campaignId
+                actionModel.dismissId = inAppJsBridgeData.dismissId
                 actionFactory.create(actionModel)()
             }
         }

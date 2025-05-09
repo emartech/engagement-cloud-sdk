@@ -10,6 +10,7 @@ import kotlin.test.Test
 
 class InAppJsBridgeFactoryTest {
     private companion object {
+        const val DISMISS_ID = "dismissId"
         const val TRACKING_INFO = """{"key1":"value1","key2":"value2"}"""
     }
 
@@ -23,6 +24,11 @@ class InAppJsBridgeFactoryTest {
             StandardTestDispatcher()
         )
 
-        inAppJsBridgeProvider.create(TRACKING_INFO)::class.java shouldBe InAppJsBridge::class.java
+        inAppJsBridgeProvider.create(
+            InAppJsBridgeData(
+                DISMISS_ID,
+                TRACKING_INFO
+            )
+        )::class.java shouldBe InAppJsBridge::class.java
     }
 }

@@ -9,9 +9,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class InAppHandlerTests {
-
     private lateinit var inAppHandler: InAppHandler
-
     private lateinit var mockInAppPresenter: InAppPresenterApi
     private lateinit var mockInAppViewProvider: InAppViewProviderApi
 
@@ -25,18 +23,18 @@ class InAppHandlerTests {
 
     @Test
     fun handle_shouldPresentInAppHtml() = runTest {
-        val html = """<html></html>"""
-        val campaignId = "testCampaignId"
+        val content = """<html></html>"""
+        val trackingInfo = """{"key":"value"}"""
         val mockInAppView: InAppViewApi = mock()
         val mockWebViewHolder: WebViewHolder = mock()
-        everySuspend {
-            mockInAppView.load(
-                InAppMessage(
-                    campaignId,
-                    html
-                )
+        val inAppMessage =
+            InAppMessage(
+                dismissId = "dismissId",
+                type = InAppType.OVERLAY,
+                trackingInfo = trackingInfo,
+                content = content
             )
-        } returns mockWebViewHolder
+        everySuspend { mockInAppView.load(inAppMessage) } returns mockWebViewHolder
         everySuspend { mockInAppViewProvider.provide() } returns mockInAppView
         everySuspend {
             mockInAppPresenter.present(
@@ -45,9 +43,9 @@ class InAppHandlerTests {
             )
         } returns Unit
 
-        inAppHandler.handle(campaignId, html)
+        inAppHandler.handle(inAppMessage)
 
-        verifySuspend { mockInAppView.load(InAppMessage(campaignId, html)) }
+        verifySuspend { mockInAppView.load(inAppMessage) }
         verifySuspend { mockInAppViewProvider.provide() }
         verifySuspend {
             mockInAppPresenter.present(

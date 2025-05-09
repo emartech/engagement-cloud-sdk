@@ -9,8 +9,7 @@ import platform.WebKit.WKWebView
 internal class InAppView(
     private val mainDispatcher: CoroutineDispatcher,
     private val webViewProvider: SuspendFactory<String, WKWebView>,
-    private val timestampProvider: InstantProvider,
-
+    private val timestampProvider: InstantProvider
     ) : InAppViewApi {
     private lateinit var mInAppMessage: InAppMessage
     private var loadingStarted: Long? = null
@@ -29,8 +28,8 @@ internal class InAppView(
 
         mInAppMessage = message
         return IosWebViewHolder(withContext(mainDispatcher) {
-            val webView = webViewProvider.create(message.campaignId)
-            webView.loadHTMLString(message.html, null)
+            val webView = webViewProvider.create(message.trackingInfo)
+            webView.loadHTMLString(message.content, null)
             webView
         }, inAppLoadingMetric())
     }

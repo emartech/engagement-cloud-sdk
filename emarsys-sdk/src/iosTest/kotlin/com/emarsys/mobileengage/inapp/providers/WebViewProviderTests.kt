@@ -1,8 +1,11 @@
 package com.emarsys.mobileengage.inapp.providers
 
 import com.emarsys.core.factory.Factory
+import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.mobileengage.inapp.InAppJsBridge
+import com.emarsys.mobileengage.inapp.InAppJsBridgeData
 import com.emarsys.util.JsonUtil
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
@@ -15,7 +18,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import platform.UIKit.UIColor
-import platform.WebKit.WKWebView
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -26,18 +28,26 @@ class WebViewProviderTests {
         const val CAMPAIGN_ID = "campaignId"
     }
 
-    private lateinit var mockIamJsBridgeProvider: Factory<String, InAppJsBridge>
+    private lateinit var mockIamJsBridgeProvider: Factory<InAppJsBridgeData, InAppJsBridge>
+    private lateinit var mockUUIDProvider: UuidProviderApi
 
     @BeforeTest
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
         mockIamJsBridgeProvider = mock()
-        everySuspend { mockIamJsBridgeProvider.create(any()) } returns InAppJsBridge(
-            mock(), JsonUtil.json,
-            StandardTestDispatcher(),
-            StandardTestDispatcher(), mock(),
-            CAMPAIGN_ID
-        )
+        mockUUIDProvider = mock(MockMode.autofill)
+        everySuspend { mockIamJsBridgeProvider.create(any()) } returns
+                InAppJsBridge(
+                    actionFactory = mock(),
+                    inAppJsBridgeData = InAppJsBridgeData(
+                        dismissId = "dismissId",
+                        trackingInfo = "trackingInfo",
+                    ),
+                    StandardTestDispatcher(),
+                    StandardTestDispatcher(),
+                    mock(),
+                    JsonUtil.json
+                )
     }
 
     @AfterTest
@@ -47,9 +57,10 @@ class WebViewProviderTests {
 
     @Test
     fun testProvideReturnsWebView() = runTest {
-        val provider = WebViewProvider(
+        val provider = WebViewFactory(
             StandardTestDispatcher(),
-            mockIamJsBridgeProvider
+            mockIamJsBridgeProvider,
+            mockUUIDProvider
         )
 
         val webView = provider.create(CAMPAIGN_ID)

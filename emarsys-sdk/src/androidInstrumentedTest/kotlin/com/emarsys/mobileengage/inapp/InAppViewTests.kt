@@ -5,6 +5,7 @@ import androidx.core.view.children
 import com.emarsys.applicationContext
 import com.emarsys.core.factory.Factory
 import com.emarsys.core.providers.TimestampProvider
+import com.emarsys.core.providers.UUIDProvider
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -15,30 +16,41 @@ import org.junit.Test
 
 class InAppViewTests {
     private companion object {
-        const val CAMPAIGN_ID = "campaignId"
+        const val TRACKING_INFO = """{"key1":"value1","key2":"value2"}"""
+        const val UUID = "testUUID"
     }
 
-    private lateinit var mockJsBridgeProvider: Factory<String, InAppJsBridge>
+    private lateinit var mockJsBridgeFactory: Factory<InAppJsBridgeData, InAppJsBridge>
+    private lateinit var mockUUIDProvider: UUIDProvider
 
     @Before
     fun setUp() {
-
-        mockJsBridgeProvider = mockk()
-
-        every { mockJsBridgeProvider.create(CAMPAIGN_ID) } returns mockk(relaxed = true)
+        mockJsBridgeFactory = mockk()
+        mockUUIDProvider = mockk()
+        every { mockUUIDProvider.provide() } returns UUID
     }
 
     @Test
     fun load_should_createWebView_andAddItToLayout() = runTest {
+        val inAppJsBridgeData = InAppJsBridgeData(UUID, TRACKING_INFO)
+
+        every { mockJsBridgeFactory.create(inAppJsBridgeData) } returns mockk(relaxed = true)
         val inAppView = InAppView(
             applicationContext,
             Dispatchers.Main,
-            WebViewProvider(
-                applicationContext, Dispatchers.Main
-            ), mockJsBridgeProvider, TimestampProvider()
+            WebViewProvider(applicationContext, Dispatchers.Main),
+            mockJsBridgeFactory,
+            TimestampProvider(),
+            mockUUIDProvider
         )
 
-        inAppView.load(InAppMessage(CAMPAIGN_ID, "testHtml"))
+        inAppView.load(
+            InAppMessage(
+                type = InAppType.OVERLAY,
+                trackingInfo = TRACKING_INFO,
+                content = "testHtml"
+            )
+        )
 
         (inAppView.children.first() is WebView) shouldBe true
     }

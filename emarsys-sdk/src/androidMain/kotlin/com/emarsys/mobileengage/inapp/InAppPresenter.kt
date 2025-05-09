@@ -7,7 +7,6 @@ import androidx.fragment.app.FragmentTransaction
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.InstantProvider
-import com.emarsys.core.providers.TimestampProvider
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.watchdog.activity.TransitionSafeCurrentActivityWatchdog
 import kotlinx.coroutines.CoroutineDispatcher
@@ -28,7 +27,7 @@ internal class InAppPresenter(
     private val applicationScope: CoroutineScope
 ) : InAppPresenterApi {
     override suspend fun trackMetric(
-        campaignId: String,
+        trackingInfo: String,
         loadingMetric: InAppLoadingMetric,
         onScreenTimeStart: Long,
         onScreenTimeEnd: Long
@@ -36,7 +35,7 @@ internal class InAppPresenter(
         logger.metric(
             message = "InAppMetric",
             data = buildJsonObject {
-                put("campaignId", JsonPrimitive(campaignId))
+                put("trackingInfo", JsonPrimitive(trackingInfo))
                 put(
                     "loadingTimeStart",
                     JsonPrimitive(loadingMetric.loadingStarted)
@@ -77,12 +76,12 @@ internal class InAppPresenter(
             }
             applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
                 sdkEventDistributor.sdkEventFlow.first { sdkEvent ->
-                    sdkEvent is SdkEvent.Internal.Sdk.Dismiss && sdkEvent.id == inAppView.inAppMessage.campaignId
+                    sdkEvent is SdkEvent.Internal.Sdk.Dismiss && sdkEvent.id == inAppView.inAppMessage.dismissId
                 }
                 val onScreenTimeEnd = timestampProvider.provide().toEpochMilliseconds()
                 logger.debug("dismiss in-app dialog")
                 trackMetric(
-                    inAppView.inAppMessage.campaignId,
+                    inAppView.inAppMessage.trackingInfo,
                     webViewHolder.metrics,
                     onScreenTimeStart,
                     onScreenTimeEnd

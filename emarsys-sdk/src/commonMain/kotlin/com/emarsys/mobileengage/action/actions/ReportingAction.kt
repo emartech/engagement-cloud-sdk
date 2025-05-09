@@ -14,7 +14,6 @@ internal data class ReportingAction(
 ) : Action<Unit> {
     override suspend fun invoke(value: Unit?) {
         when (action) {
-            //TODO: follow up reporting changes
             is BasicPushButtonClickedActionModel -> {
                 sdkEventDistributor.registerEvent(
                     SdkEvent.Internal.Push.Clicked(
@@ -26,7 +25,6 @@ internal data class ReportingAction(
             }
 
             is BasicInAppButtonClickedActionModel -> {
-                //TODO: follow up reporting changes
                 sdkEventDistributor.registerEvent(
                     SdkEvent.Internal.InApp.ButtonClicked(
                         reporting = action.reporting,

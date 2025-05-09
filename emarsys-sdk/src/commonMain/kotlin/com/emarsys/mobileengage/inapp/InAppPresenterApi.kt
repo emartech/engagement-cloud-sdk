@@ -2,7 +2,7 @@ package com.emarsys.mobileengage.inapp
 
 interface InAppPresenterApi {
     suspend fun trackMetric(
-        campaignId: String,
+        trackingInfo: String,
         loadingMetric: InAppLoadingMetric,
         onScreenTimeStart: Long,
         onScreenTimeEnd: Long
@@ -12,9 +12,6 @@ interface InAppPresenterApi {
         inAppView: InAppViewApi,
         webViewHolder: WebViewHolder,
         mode: InAppPresentationMode,
-        animation: InAppPresentationAnimation? = InAppPresentationAnimation.Slide(
-            0.3
-        )
+        animation: InAppPresentationAnimation? = InAppPresentationAnimation.Slide(0.3)
     )
-
 }

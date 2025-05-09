@@ -29,7 +29,7 @@ internal class IosInAppPresenter(
     private val logger: Logger
 ) : InAppPresenterApi {
     override suspend fun trackMetric(
-        campaignId: String,
+        trackingInfo: String,
         loadingMetric: InAppLoadingMetric,
         onScreenTimeStart: Long,
         onScreenTimeEnd: Long
@@ -37,7 +37,7 @@ internal class IosInAppPresenter(
         logger.metric(
             message = "InAppMetric",
             data = buildJsonObject {
-                put("campaignId", JsonPrimitive(campaignId))
+                put("trackingInfo", JsonPrimitive(trackingInfo))
                 put(
                     "loadingTimeStart",
                     JsonPrimitive(loadingMetric.loadingStarted)
@@ -78,7 +78,7 @@ internal class IosInAppPresenter(
             originalWindow
         }
         CoroutineScope(sdkDispatcher).launch {
-            sdkEventDistributor.sdkEventFlow.first { it is SdkEvent.Internal.Sdk.Dismiss && it.id == inAppView.inAppMessage.campaignId }
+            sdkEventDistributor.sdkEventFlow.first { it is SdkEvent.Internal.Sdk.Dismiss && it.id == inAppView.inAppMessage.dismissId }
 
             withContext(mainDispatcher) {
                 window.removeFromSuperview()

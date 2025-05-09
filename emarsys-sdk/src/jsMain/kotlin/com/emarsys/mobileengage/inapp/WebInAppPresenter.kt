@@ -18,7 +18,7 @@ internal class WebInAppPresenter(
     private val logger: Logger
 ) : InAppPresenterApi {
     override suspend fun trackMetric(
-        campaignId: String,
+        trackingInfo: String,
         loadingMetric: InAppLoadingMetric,
         onScreenTimeStart: Long,
         onScreenTimeEnd: Long
@@ -26,7 +26,7 @@ internal class WebInAppPresenter(
         logger.metric(
             message = "InAppMetric",
             data = buildJsonObject {
-                put("campaignId", JsonPrimitive(campaignId))
+                put("trackingInfo", JsonPrimitive(trackingInfo))
                 put(
                     "loadingTimeStart",
                     JsonPrimitive(loadingMetric.loadingStarted)
@@ -64,7 +64,7 @@ internal class WebInAppPresenter(
             }
         }
         CoroutineScope(sdkDispatcher).launch {
-            sdkEventDistributor.sdkEventFlow.first { it is SdkEvent.Internal.Sdk.Dismiss && it.id == view.inAppMessage.campaignId }
+            sdkEventDistributor.sdkEventFlow.first { it is SdkEvent.Internal.Sdk.Dismiss && it.id == view.inAppMessage.dismissId }
             styledInappView.remove()
         }
 

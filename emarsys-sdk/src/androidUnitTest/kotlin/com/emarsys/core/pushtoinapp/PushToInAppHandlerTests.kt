@@ -1,10 +1,11 @@
 package com.emarsys.core.pushtoinapp
 
-import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.mobileengage.action.models.PresentablePushToInAppActionModel
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandlerApi
+import com.emarsys.mobileengage.inapp.InAppMessage
+import com.emarsys.mobileengage.inapp.InAppType
 import com.emarsys.mobileengage.inapp.PushToInAppPayload
 import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
 import dev.mokkery.MockMode
@@ -19,6 +20,7 @@ import org.junit.Test
 class PushToInAppHandlerTests {
     private companion object {
         const val CAMPAIGN_ID = "testCampaignId"
+        const val TRACKING_INFO = """{"key":"value"}"""
         const val REPORTING = """{"key":"value"}"""
         const val ID = "testId"
         const val TITLE = "testTitle"
@@ -45,12 +47,19 @@ class PushToInAppHandlerTests {
     @Test
     fun handle_shouldDownloadHtml_andCallHandle_ifDownloadSucceeds() = runTest {
         val payload = PushToInAppPayload(CAMPAIGN_ID, INAPP_URL)
+        val expectedInAppMessage = InAppMessage(
+            dismissId = ID,
+            type = InAppType.OVERLAY,
+            trackingInfo = TRACKING_INFO,
+            content = HTML
+        )
         val testInappAction =
             PresentablePushToInAppActionModel(
                 id = ID,
                 reporting = REPORTING,
                 title = TITLE,
-                payload = payload
+                payload = payload,
+                trackingInfo = TRACKING_INFO
             )
 
         coEvery { mockInAppDownloader.download(INAPP_URL) } returns HTML
@@ -58,7 +67,7 @@ class PushToInAppHandlerTests {
         pushToInAppHandler.handle(testInappAction)
 
         coVerify { mockInAppDownloader.download(INAPP_URL) }
-        coVerify { mockInAppHandler.handle(CAMPAIGN_ID, HTML) }
+        coVerify { mockInAppHandler.handle(expectedInAppMessage) }
     }
 
     @Test
@@ -69,7 +78,8 @@ class PushToInAppHandlerTests {
                 id = ID,
                 reporting = REPORTING,
                 title = TITLE,
-                payload = payload
+                payload = payload,
+                trackingInfo = TRACKING_INFO
             )
 
         coEvery { mockInAppDownloader.download(INAPP_URL) } returns null
@@ -77,6 +87,25 @@ class PushToInAppHandlerTests {
         pushToInAppHandler.handle(testInappAction)
 
         coVerify { mockInAppDownloader.download(INAPP_URL) }
-        coVerify(exactly = 0) { mockInAppHandler.handle(any(), any()) }
+        coVerify(exactly = 0) { mockInAppHandler.handle(any()) }
+    }
+
+    @Test
+    fun handle_shouldDownloadHtml_andNotCallHandle_ifTrackingInfoIsNull() = runTest {
+        val payload = PushToInAppPayload(CAMPAIGN_ID, INAPP_URL)
+        val testInappAction =
+            PresentablePushToInAppActionModel(
+                id = ID,
+                reporting = REPORTING,
+                title = TITLE,
+                payload = payload,
+                trackingInfo = null
+            )
+        coEvery { mockInAppDownloader.download(INAPP_URL) } returns HTML
+
+        pushToInAppHandler.handle(testInappAction)
+
+        coVerify { mockInAppDownloader.download(INAPP_URL) }
+        coVerify(exactly = 0) { mockInAppHandler.handle(any()) }
     }
 }

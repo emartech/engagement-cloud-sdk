@@ -10,12 +10,14 @@ import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
+import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.inapp.InAppMessage
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
+import com.emarsys.mobileengage.inapp.InAppType
 import com.emarsys.mobileengage.inapp.InAppViewApi
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.mobileengage.inapp.WebViewHolder
@@ -76,7 +78,7 @@ class EventClientTests {
         const val UUID = "testUuid"
         const val IN_APP_DND = false
         val TIMESTAMP = Clock.System.now()
-        const val CAMPAIGN_ID = "testTimestamp"
+        const val CAMPAIGN_ID = "testCampaignId"
         val TEST_BASE_URL = Url("https://test-base-url/")
         val testEventAttributes = buildJsonObject { put("key", JsonPrimitive("value")) }
         val testEvent = SdkEvent.External.Custom(
@@ -102,6 +104,7 @@ class EventClientTests {
     private lateinit var eventClient: EventClient
     private lateinit var mockSdkLogger: Logger
     private lateinit var mockWebViewHolder: WebViewHolder
+    private lateinit var mockUuidProvider: UuidProviderApi
 
     @BeforeTest
     fun setup() {
@@ -120,6 +123,8 @@ class EventClientTests {
         mockEventsDao = mock(MockMode.autofill)
         onlineEvents = MutableSharedFlow()
         mockSdkEventManager = mock()
+        mockUuidProvider = mock()
+        every { mockUuidProvider.provide() } returns UUID
         every { mockSdkEventManager.onlineSdkEvents } returns onlineEvents
         everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
         everySuspend { mockSdkEventManager.registerEvent(any()) } calls {
@@ -147,7 +152,8 @@ class EventClientTests {
         mockSdkEventManager,
         mockEventsDao,
         mockSdkLogger,
-        applicationScope
+        applicationScope,
+        mockUuidProvider
     )
 
     @AfterTest
@@ -233,7 +239,13 @@ class EventClientTests {
 
         val html = "testHtml"
         val testInapp = EventResponseInApp(CAMPAIGN_ID, html)
-        val expectedInAppMessage = InAppMessage(CAMPAIGN_ID, html)
+        val expectedInAppMessage =
+            InAppMessage(
+                dismissId = UUID,
+                InAppType.OVERLAY,
+                trackingInfo = CAMPAIGN_ID,
+                content = html
+            )
         val deviceEventResponse = DeviceEventResponse(testInapp, null, null)
         val body = json.encodeToString(deviceEventResponse)
 

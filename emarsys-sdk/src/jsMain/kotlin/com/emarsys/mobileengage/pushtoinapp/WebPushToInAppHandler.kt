@@ -4,16 +4,26 @@ import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.mobileengage.action.models.PresentablePushToInAppActionModel
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandlerApi
+import com.emarsys.mobileengage.inapp.InAppMessage
+import com.emarsys.mobileengage.inapp.InAppType
 
-class WebPushToInAppHandler(
+internal class WebPushToInAppHandler(
     private val downloader: InAppDownloaderApi,
     private val inAppHandler: InAppHandlerApi
 ) : PushToInAppHandlerApi {
     override suspend fun handle(actionModel: PresentablePushToInAppActionModel) {
-        val html = downloader.download(actionModel.payload.url)
-        val campaignId = actionModel.payload.campaignId
-        if (!html.isNullOrEmpty()) {
-            inAppHandler.handle(campaignId, html)
+        val content = downloader.download(actionModel.payload.url)
+        if (!content.isNullOrEmpty()) {
+            actionModel.trackingInfo?.let {
+                inAppHandler.handle(
+                    InAppMessage(
+                        dismissId = actionModel.id,
+                        type = InAppType.OVERLAY,
+                        trackingInfo = it,
+                        content = content
+                    )
+                )
+            }
         }
     }
 }

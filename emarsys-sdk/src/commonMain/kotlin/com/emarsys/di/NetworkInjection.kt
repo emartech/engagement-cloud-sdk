@@ -48,7 +48,8 @@ object NetworkInjection {
                 sdkEventManager = get(),
                 eventsDao = get(),
                 sdkLogger = get { parametersOf(EventClient::class.simpleName) },
-                applicationScope = get(named(CoroutineScopeTypes.Application))
+                applicationScope = get(named(CoroutineScopeTypes.Application)),
+                uuidProvider = get()
             )
         }
         single<EventBasedClientApi>(named(EventBasedClientTypes.Device)) {

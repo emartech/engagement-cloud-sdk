@@ -2,13 +2,15 @@ package com.emarsys.mobileengage.inapp
 
 import com.emarsys.core.factory.Factory
 import com.emarsys.core.providers.InstantProvider
+import com.emarsys.core.providers.UuidProviderApi
 import web.dom.document
 import web.html.HTMLElement
 
 internal class WebInAppView(
     private val inappScriptExtractor: InAppScriptExtractorApi,
-    private val webInAppJsBridgeFactory: Factory<String, WebInAppJsBridge>,
+    private val webInAppJsBridgeFactory: Factory<InAppJsBridgeData, WebInAppJsBridge>,
     private val timestampProvider: InstantProvider,
+    private val uuidProvider: UuidProviderApi,
 ) : InAppViewApi {
 
     private lateinit var mInAppMessage: InAppMessage
@@ -28,10 +30,15 @@ internal class WebInAppView(
         loadingStarted = timestampProvider.provide().toEpochMilliseconds()
 
         mInAppMessage = message
-        val jsBridge = webInAppJsBridgeFactory.create(message.campaignId)
+        val jsBridge = webInAppJsBridgeFactory.create(
+            InAppJsBridgeData(
+                dismissId = uuidProvider.provide(),
+                trackingInfo = message.trackingInfo
+            )
+        )
         jsBridge.register()
         val view = document.createElement("div")
-        view.innerHTML = message.html
+        view.innerHTML = message.content
 
         val scriptContents = inappScriptExtractor.extract(view)
         createScriptElements(scriptContents).forEach { scriptElement ->

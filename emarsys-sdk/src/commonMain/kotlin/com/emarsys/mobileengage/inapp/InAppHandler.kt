@@ -7,9 +7,9 @@ class InAppHandler(
     private val inAppPresenter: InAppPresenterApi
 ) : InAppHandlerApi {
 
-    override suspend fun handle(campaignId: String, html: String) {
+    override suspend fun handle(inAppMessage: InAppMessage) {
         val view = inAppViewProvider.provide()
-        val webViewHolder = view.load(InAppMessage(campaignId, html))
+        val webViewHolder = view.load(inAppMessage)
         inAppPresenter.present(view, webViewHolder, Overlay)
     }
 }

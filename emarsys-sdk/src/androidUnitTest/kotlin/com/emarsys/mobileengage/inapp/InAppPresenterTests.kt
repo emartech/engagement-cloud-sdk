@@ -18,7 +18,6 @@ import io.mockk.mockkStatic
 import io.mockk.unmockkAll
 import io.mockk.verify
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
@@ -89,7 +88,7 @@ class InAppPresenterTests {
             coEvery { mockView.load(any()) } returns mockWebViewHolder
             every { mockView.inAppMessage } returns
                     mockk<InAppMessage>(relaxed = true) {
-                        every { campaignId } returns testId
+                        every { trackingInfo } returns testId
                     }
 
             val inAppPresenter = InAppPresenter(
@@ -135,12 +134,9 @@ class InAppPresenterTests {
 
     @Test
     fun present_shouldLogMetrics() = runTest {
-        every { mockTimestampProvider.provide().toEpochMilliseconds() } returnsMany
-                listOf(
-                    10L,
-                    20L
-                )
-        val testId = "testId"
+        every { mockTimestampProvider.provide().toEpochMilliseconds() } returnsMany listOf(10L, 20L)
+        val testTrackingInfo = "testId"
+        val testDismissId = "testDismissId"
         val mockFragmentTransaction = mockk<FragmentTransaction>(relaxed = true)
         val mockFragmentManager = mockk<FragmentManager>(relaxed = true) {
             every { beginTransaction() } returns mockFragmentTransaction
@@ -154,10 +150,13 @@ class InAppPresenterTests {
         coEvery { mockView.load(any()) } returns mockWebViewHolder
         every { mockWebViewHolder.metrics } returns InAppLoadingMetric(10, 20)
 
-        every { mockView.inAppMessage } returns
-                mockk<InAppMessage>(relaxed = true) {
-                    every { campaignId } returns testId
-                }
+        val inAppMessage = InAppMessage(
+            dismissId = testDismissId,
+            type = InAppType.OVERLAY,
+            trackingInfo = testTrackingInfo,
+            content = "<html></html>",
+        )
+        every { mockView.inAppMessage } returns inAppMessage
         val inAppPresenter = InAppPresenter(
             mockCurrentActivityWatchdog,
             mainDispatcher,
@@ -170,13 +169,13 @@ class InAppPresenterTests {
         inAppPresenter.present(mockView, mockWebViewHolder, InAppPresentationMode.Overlay)
         advanceUntilIdle()
 
-        sdkEventFlow.emit(SdkEvent.Internal.Sdk.Dismiss(id = testId))
+        sdkEventFlow.emit(SdkEvent.Internal.Sdk.Dismiss(id = testDismissId))
 
         advanceUntilIdle()
 
         coVerify {
             mockLogger.metric("InAppMetric", buildJsonObject {
-                put("campaignId", testId)
+                put("trackingInfo", testTrackingInfo)
                 put("loadingTimeStart", 10)
                 put("loadingTimeEnd", (20))
                 put("loadingTimeDuration", (10))

@@ -25,11 +25,11 @@ import platform.darwin.NSObject
 
 class InAppJsBridge(
     private val actionFactory: ActionFactoryApi<ActionModel>,
-    private val json: Json,
+    private val inAppJsBridgeData: InAppJsBridgeData,
     private val mainDispatcher: CoroutineDispatcher,
     private val sdkDispatcher: CoroutineDispatcher,
     private val logger: Logger,
-    private val campaignId: String
+    private val json: Json
 ) : NSObject(), WKScriptMessageHandlerProtocol {
 
     private val jsCommandNames = listOf(
@@ -91,7 +91,7 @@ class InAppJsBridge(
                 "close" -> {
                     val actionModel =
                         json.decodeFromString<BasicDismissActionModel>(body)
-                    actionModel.dismissId = campaignId
+                    actionModel.dismissId = inAppJsBridgeData.dismissId
                     actionFactory.create(actionModel)()
                 }
 

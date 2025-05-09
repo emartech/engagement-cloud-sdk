@@ -24,7 +24,7 @@ data class BasicPushButtonClickedActionModel(
 @SerialName("inAppButtonClicked")
 data class BasicInAppButtonClickedActionModel(
     override val reporting: String,
-    override val trackingInfo: String = "", //TODO: remove default value after push-to-inapp trackingInfo is mapped from ???
+    override val trackingInfo: String,
 ) : BasicActionModel(), InAppButtonClickedActionModel
 
 @Serializable

@@ -36,9 +36,14 @@ import kotlin.test.Test
 class WebInAppJsBridgeTests {
     private companion object {
         const val ID = "1"
-        const val CAMPAIGN_ID = "testCampaignId"
+        const val DISMISS = "testDismissId"
         const val REPORTING = """{"reportingKey":"reportingValue"}"""
         const val TRACKING_INFO = """{"trackingInfoKey":"trackingInfoValue"}"""
+        val INAPP_JS_BRIDGE_DATA =
+            InAppJsBridgeData(
+                dismissId = DISMISS,
+                trackingInfo = TRACKING_INFO
+            )
         val TEST_ACTION =
             ReportingAction(
                 BasicInAppButtonClickedActionModel(REPORTING, TRACKING_INFO),
@@ -58,7 +63,7 @@ class WebInAppJsBridgeTests {
         json = JsonUtil.json
         mockActionFactory = mock(MockMode.autoUnit)
 
-        inappJsBridge = WebInAppJsBridge(mockActionFactory, json, sdkDispatcher, CAMPAIGN_ID)
+        inappJsBridge = WebInAppJsBridge(mockActionFactory, INAPP_JS_BRIDGE_DATA, sdkDispatcher, json)
     }
 
     @AfterTest
@@ -68,7 +73,7 @@ class WebInAppJsBridgeTests {
 
     @Test
     fun buttonClicked_shouldTrigger_actionFactory() = runTest {
-        val testActionModel = BasicInAppButtonClickedActionModel(REPORTING)
+        val testActionModel = BasicInAppButtonClickedActionModel(REPORTING, TRACKING_INFO)
         everySuspend {
             mockActionFactory.create(action = testActionModel)
         } returns TEST_ACTION
@@ -164,7 +169,7 @@ class WebInAppJsBridgeTests {
 
     @Test
     fun dismiss_shouldTrigger_actionFactory() = runTest {
-        val testActionModel = BasicDismissActionModel(REPORTING, CAMPAIGN_ID)
+        val testActionModel = BasicDismissActionModel(REPORTING, DISMISS)
         everySuspend {
             mockActionFactory.create(action = testActionModel)
         } returns TEST_ACTION

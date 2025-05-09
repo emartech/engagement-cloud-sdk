@@ -9,9 +9,13 @@ internal class InAppJsBridgeFactory(
     private val actionFactory: EventActionFactoryApi,
     private val json: Json,
     private val sdkDispatcher: CoroutineDispatcher
-) :
-    Factory<String, InAppJsBridge> {
-    override fun create(value: String): InAppJsBridge {
-        return InAppJsBridge(value, actionFactory, sdkDispatcher, json)
+) : Factory<InAppJsBridgeData, InAppJsBridge> {
+    override fun create(value: InAppJsBridgeData): InAppJsBridge {
+        return InAppJsBridge(
+            value,
+            actionFactory,
+            sdkDispatcher,
+            json
+        )
     }
 }
