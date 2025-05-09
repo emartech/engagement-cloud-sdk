@@ -15,9 +15,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
         Task {
             try? await Emarsys.shared.initialize()
-            Emarsys.shared.events = { event in
-                
-            }
+
+            try? Emarsys.shared.registerEventListener(listener: {event in print(event)})
 
             center.delegate = Emarsys.shared.push.emarsysUserNotificationCenterDelegate
             do {
