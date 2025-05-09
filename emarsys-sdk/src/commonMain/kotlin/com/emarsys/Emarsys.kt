@@ -18,8 +18,7 @@ import com.emarsys.enable.EnableOrganizerApi
 import com.emarsys.init.InitOrganizerApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.tracking.TrackingApi
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.Flow
 import org.koin.core.qualifier.named
 import kotlin.experimental.ExperimentalObjCRefinement
 import kotlin.native.HiddenFromObjC
@@ -52,8 +51,8 @@ object Emarsys {
         }
     }
 
-    val events: SharedFlow<SdkEvent.External.Api>
-        get() = koin.get<MutableSharedFlow<SdkEvent.External.Api>>(named(EventFlowTypes.Public))
+    val events: Flow<SdkEvent>
+        get() = koin.get<Flow<SdkEvent.External.Api>>(named(EventFlowTypes.Public))
 
     val contact: ContactApi
         get() = koin.get<ContactApi>()

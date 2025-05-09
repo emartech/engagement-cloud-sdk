@@ -9,10 +9,16 @@ import com.emarsys.api.inbox.InboxApi
 import com.emarsys.api.predict.PredictApi
 import com.emarsys.api.push.PushApi
 import com.emarsys.core.exceptions.SdkAlreadyEnabledException
+import com.emarsys.di.EventFlowTypes
 import com.emarsys.di.SdkKoinIsolationContext.koin
+import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.tracking.TrackingApi
+import kotlinx.coroutines.flow.Flow
+import org.koin.core.qualifier.named
 
 object AndroidEmarsys {
+    val events: Flow<SdkEvent>
+        get() = koin.get<Flow<SdkEvent.External.Api>>(named(EventFlowTypes.Public))
 
     val contact: ContactApi
         get() = Emarsys.contact
