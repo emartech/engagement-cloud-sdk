@@ -58,7 +58,7 @@ internal class ContactClient(
                         contactTokenHandler.handleContactTokens(response)
                     }
 
-                    setContactFieldId(it)
+                    setContactFields(it)
 
                     it.ack(eventsDao, sdkLogger)
                 } catch (exception: Exception) {
@@ -74,13 +74,23 @@ internal class ContactClient(
             }
     }
 
-    private fun setContactFieldId(event: SdkEvent) {
-        val contactFieldId: Int? = when (event) {
-            is SdkEvent.Internal.Sdk.LinkContact -> event.contactFieldId
-            is SdkEvent.Internal.Sdk.LinkAuthenticatedContact -> event.contactFieldId
-            else -> null
+    private fun setContactFields(event: SdkEvent) {
+        when (event) {
+            is SdkEvent.Internal.Sdk.LinkContact -> {
+                sdkContext.contactFieldId = event.contactFieldId
+                sdkContext.contactFieldValue = event.contactFieldValue
+            }
+            is SdkEvent.Internal.Sdk.LinkAuthenticatedContact -> {
+                sdkContext.contactFieldId = event.contactFieldId
+                sdkContext.openIdToken = event.openIdToken
+            }
+            is SdkEvent.Internal.Sdk.UnlinkContact -> {
+                sdkContext.contactFieldId = null
+                sdkContext.contactFieldValue = null
+                sdkContext.openIdToken = null
+            }
+            else -> {}
         }
-        sdkContext.contactFieldId = contactFieldId
     }
 
     private fun isContactEvent(event: OnlineSdkEvent): Boolean {

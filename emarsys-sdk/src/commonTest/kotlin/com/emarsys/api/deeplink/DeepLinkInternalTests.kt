@@ -5,7 +5,11 @@ import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.LogLevel
+import com.emarsys.core.storage.StringStorageApi
+import com.emarsys.di.SdkKoinIsolationContext.koin
+import com.emarsys.fake.FakeStringStorage
 import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -22,12 +26,21 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.serialization.json.Json
+import org.koin.core.Koin
+import org.koin.core.module.Module
+import org.koin.dsl.module
+import org.koin.test.KoinTest
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DeepLinkInternalTests {
+class DeepLinkInternalTests: KoinTest {
+
+    override fun getKoin(): Koin = koin
+
+    private lateinit var testModule: Module
 
     private lateinit var sdkContext: SdkContextApi
     private lateinit var deepLinkInternal: DeepLinkInternal
@@ -36,6 +49,12 @@ class DeepLinkInternalTests {
 
     @BeforeTest
     fun setUp() {
+        testModule = module {
+            single<StringStorageApi> { FakeStringStorage() }
+            single<Json> { JsonUtil.json }
+        }
+        koin.loadModules(listOf(testModule))
+
         val mainDispatcher = StandardTestDispatcher()
         Dispatchers.setMain(mainDispatcher)
         sdkContext = SdkContext(
@@ -56,6 +75,7 @@ class DeepLinkInternalTests {
     @AfterTest
     fun teardown() {
         Dispatchers.resetMain()
+        koin.unloadModules(listOf(testModule))
     }
 
     @Test

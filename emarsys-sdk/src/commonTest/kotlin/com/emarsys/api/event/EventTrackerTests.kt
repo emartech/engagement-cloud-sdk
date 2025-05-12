@@ -6,6 +6,10 @@ import com.emarsys.context.DefaultUrls
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.log.LogLevel
+import com.emarsys.core.storage.StringStorageApi
+import com.emarsys.di.SdkKoinIsolationContext.koin
+import com.emarsys.fake.FakeStringStorage
+import com.emarsys.util.JsonUtil
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend
@@ -18,16 +22,25 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.serialization.json.Json
+import org.koin.core.Koin
+import org.koin.core.module.Module
+import org.koin.dsl.module
+import org.koin.test.KoinTest
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class EventTrackerTests {
+class EventTrackerTests: KoinTest {
+
+    override fun getKoin(): Koin = koin
 
     private companion object {
         val event = CustomEvent("testEvent", mapOf("testAttribute" to "testValue"))
     }
+
+    private lateinit var testModule: Module
 
     private lateinit var mockLoggingEventTracker: EventTrackerInstance
     private lateinit var mockEventTrackerGatherer: EventTrackerInstance
@@ -43,6 +56,12 @@ class EventTrackerTests {
 
     @BeforeTest
     fun setup() = runTest {
+        testModule = module {
+            single<StringStorageApi> { FakeStringStorage() }
+            single<Json> { JsonUtil.json }
+        }
+        koin.loadModules(listOf(testModule))
+
         mockLoggingEventTracker = mock()
         mockEventTrackerGatherer = mock()
         mockEventTrackerInternal = mock()
@@ -73,6 +92,7 @@ class EventTrackerTests {
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
+        koin.unloadModules(listOf(testModule))
     }
 
     @Test

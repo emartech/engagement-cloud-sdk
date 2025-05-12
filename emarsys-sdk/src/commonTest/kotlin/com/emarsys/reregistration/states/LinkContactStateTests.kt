@@ -2,7 +2,6 @@ package com.emarsys.reregistration.states
 
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.SdkEventDistributorApi
-import com.emarsys.core.session.SessionContext
 import com.emarsys.networking.clients.event.model.SdkEvent
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -29,7 +28,6 @@ class LinkContactStateTests {
         private const val TEST_OPEN_ID_TOKEN = "testOpenIdToken"
     }
 
-    private lateinit var sessionContext: SessionContext
     private lateinit var mockSdkContext: SdkContextApi
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
     private lateinit var eventSlot: SlotCapture<SdkEvent>
@@ -38,8 +36,7 @@ class LinkContactStateTests {
     @BeforeTest
     fun setUp() {
         eventSlot = slot()
-        sessionContext = SessionContext()
-        mockSdkContext = mock()
+        mockSdkContext = mock(MockMode.autofill)
         mockSdkEventDistributor = mock(MockMode.autofill)
         everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(
             MockMode.autofill
@@ -47,7 +44,6 @@ class LinkContactStateTests {
 
         linkContactState =
             LinkContactState(
-                sessionContext,
                 mockSdkContext,
                 mockSdkEventDistributor,
                 sdkLogger = mock(MockMode.autofill)
@@ -58,7 +54,7 @@ class LinkContactStateTests {
     fun active_shouldRegisterLinkContactEvent_throughSdkEventDistributor_whenContactFieldIdAndValue_areAvailable() =
         runTest {
             every { mockSdkContext.contactFieldId } returns TEST_CONTACT_FIELD_ID
-            sessionContext.contactFieldValue = TEST_CONTACT_FIELD_VALUE
+            every { mockSdkContext.contactFieldValue } returns TEST_CONTACT_FIELD_VALUE
 
             linkContactState.active()
 
@@ -72,8 +68,8 @@ class LinkContactStateTests {
     fun active_shouldRegisterLinkAuthenticatedContactEvent_throughSdkEventDistributor_whenContactFieldIdAndOpenIdToken_areAvailable() =
         runTest {
             every { mockSdkContext.contactFieldId } returns TEST_CONTACT_FIELD_ID
-            sessionContext.contactFieldValue = null
-            sessionContext.openIdToken = TEST_OPEN_ID_TOKEN
+            every { mockSdkContext.contactFieldValue } returns null
+            every { mockSdkContext.openIdToken } returns TEST_OPEN_ID_TOKEN
 
             linkContactState.active()
 
@@ -87,8 +83,8 @@ class LinkContactStateTests {
     fun active_shouldNotEmitEvent_whenNeitherContactFieldValue_norOpenIdToken_areAvailable() =
         runTest {
             every { mockSdkContext.contactFieldId } returns TEST_CONTACT_FIELD_ID
-            sessionContext.contactFieldValue = null
-            sessionContext.openIdToken = null
+            every { mockSdkContext.contactFieldValue } returns null
+            every { mockSdkContext.openIdToken } returns null
 
             linkContactState.active()
 
@@ -101,8 +97,8 @@ class LinkContactStateTests {
     fun active_RegisterLinkAuthenticatedContactEvent_throughSdkEventDistributor_evenWhenContactFieldId_isNotAvailable() =
         runTest {
             every { mockSdkContext.contactFieldId } returns null
-            sessionContext.contactFieldValue = TEST_CONTACT_FIELD_VALUE
-            sessionContext.openIdToken = null
+            every { mockSdkContext.contactFieldValue } returns TEST_CONTACT_FIELD_VALUE
+            every { mockSdkContext.openIdToken } returns null
 
             linkContactState.active()
 

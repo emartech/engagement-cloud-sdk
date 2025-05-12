@@ -3,12 +3,10 @@ package com.emarsys.reregistration.states
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.Logger
-import com.emarsys.core.session.SessionContext
 import com.emarsys.core.state.State
 import com.emarsys.networking.clients.event.model.SdkEvent
 
 internal class LinkContactState(
-    private val sessionContext: SessionContext,
     private val sdkContext: SdkContextApi,
     private val sdkEventDistributor: SdkEventDistributorApi,
     private val sdkLogger: Logger
@@ -19,20 +17,20 @@ internal class LinkContactState(
 
     override suspend fun active() {
         sdkLogger.debug("Linking contact")
-        if (sessionContext.contactFieldValue != null) {
+        if (sdkContext.contactFieldValue != null) {
             sdkLogger.debug("Register LinkContact event.")
             sdkEventDistributor.registerEvent(
                 SdkEvent.Internal.Sdk.LinkContact(
                     contactFieldId = sdkContext.contactFieldId,
-                    contactFieldValue = sessionContext.contactFieldValue!!
+                    contactFieldValue = sdkContext.contactFieldValue!!
                 )
             )
-        } else if (sessionContext.openIdToken != null) {
+        } else if (sdkContext.openIdToken != null) {
             sdkLogger.debug("Register LinkAuthenticatedContact event.")
             sdkEventDistributor.registerEvent(
                 SdkEvent.Internal.Sdk.LinkAuthenticatedContact(
                     contactFieldId = sdkContext.contactFieldId,
-                    openIdToken = sessionContext.openIdToken!!
+                    openIdToken = sdkContext.openIdToken!!
                 )
             )
         } else {

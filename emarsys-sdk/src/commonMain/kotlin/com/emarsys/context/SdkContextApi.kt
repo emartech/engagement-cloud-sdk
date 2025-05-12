@@ -11,6 +11,8 @@ internal interface SdkContextApi {
     val sdkDispatcher: CoroutineDispatcher
     val mainDispatcher: CoroutineDispatcher
     var contactFieldId: Int?
+    var contactFieldValue: String?
+    var openIdToken: String?
     var config: SdkConfig?
     var defaultUrls: DefaultUrlsApi
     var remoteLogLevel: LogLevel

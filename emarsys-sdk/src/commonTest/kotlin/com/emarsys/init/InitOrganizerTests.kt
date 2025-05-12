@@ -4,10 +4,13 @@ import com.emarsys.api.SdkState
 import com.emarsys.context.DefaultUrls
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
-import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.state.StateMachineApi
+import com.emarsys.core.storage.StringStorageApi
+import com.emarsys.di.SdkKoinIsolationContext.koin
+import com.emarsys.fake.FakeStringStorage
+import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
@@ -19,11 +22,21 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.serialization.json.Json
+import org.koin.core.Koin
+import org.koin.core.module.Module
+import org.koin.dsl.module
+import org.koin.test.KoinTest
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-class InitOrganizerTests {
+class InitOrganizerTests: KoinTest {
+
+    override fun getKoin(): Koin = koin
+
+    private lateinit var testModule: Module
 
     private val mainDispatcher = StandardTestDispatcher()
 
@@ -38,6 +51,12 @@ class InitOrganizerTests {
 
     @BeforeTest
     fun setUp() {
+        testModule = module {
+            single<StringStorageApi> { FakeStringStorage() }
+            single<Json> { JsonUtil.json }
+        }
+        koin.loadModules(listOf(testModule))
+
         mockStateMachine = mock()
         mockPredictStateMachine = mock()
         sdkContext = SdkContext(
@@ -49,6 +68,11 @@ class InitOrganizerTests {
             logBreadcrumbsQueueSize = 10
         )
         initOrganizer = InitOrganizer(mockStateMachine, sdkContext, SdkLogger("TestLoggerName", mock(MockMode.autofill), sdkContext = mock()))
+    }
+
+    @AfterTest
+    fun tearDown() {
+        koin.unloadModules(listOf(testModule))
     }
 
     @Test

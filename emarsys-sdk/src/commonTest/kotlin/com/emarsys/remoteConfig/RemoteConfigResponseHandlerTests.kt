@@ -5,10 +5,13 @@ import com.emarsys.context.Features
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
-import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.providers.DoubleProvider
+import com.emarsys.core.storage.StringStorageApi
+import com.emarsys.di.SdkKoinIsolationContext.koin
+import com.emarsys.fake.FakeStringStorage
+import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -17,11 +20,22 @@ import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.Json
+import org.koin.core.Koin
+import org.koin.core.module.Module
+import org.koin.dsl.module
+import org.koin.test.KoinTest
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-class RemoteConfigResponseHandlerTests {
+class RemoteConfigResponseHandlerTests: KoinTest {
+
+    override fun getKoin(): Koin = koin
+
+    private lateinit var testModule: Module
+
     private lateinit var sdkContext: SdkContextApi
     private lateinit var mockDeviceInfoCollector: DeviceInfoCollectorApi
     private lateinit var mockRandomProvider: DoubleProvider
@@ -29,6 +43,12 @@ class RemoteConfigResponseHandlerTests {
 
     @BeforeTest
     fun setUp() {
+        testModule = module {
+            single<StringStorageApi> { FakeStringStorage() }
+            single<Json> { JsonUtil.json }
+        }
+        koin.loadModules(listOf(testModule))
+
         sdkContext = SdkContext(
             StandardTestDispatcher(),
             StandardTestDispatcher(),
@@ -46,6 +66,11 @@ class RemoteConfigResponseHandlerTests {
             mockRandomProvider,
             SdkLogger("TestLoggerName", mock(MockMode.autofill), sdkContext = sdkContext)
         )
+    }
+
+    @AfterTest
+    fun tearDown() {
+        koin.unloadModules(listOf(testModule))
     }
 
     @Test

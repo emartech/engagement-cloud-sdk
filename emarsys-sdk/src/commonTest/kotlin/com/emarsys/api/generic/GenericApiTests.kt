@@ -13,6 +13,10 @@ import com.emarsys.context.DefaultUrls
 import com.emarsys.context.SdkContext
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
+import com.emarsys.core.storage.StringStorageApi
+import com.emarsys.di.SdkKoinIsolationContext.koin
+import com.emarsys.fake.FakeStringStorage
+import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
@@ -21,11 +25,22 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.serialization.json.Json
+import org.koin.core.Koin
+import org.koin.core.module.Module
+import org.koin.dsl.module
+import org.koin.test.KoinTest
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-class GenericApiTests {
+class GenericApiTests: KoinTest {
+
+    override fun getKoin(): Koin = koin
+
+    private lateinit var testModule: Module
+
     private lateinit var mockSdkLogger: Logger
     private lateinit var loggingContact: LoggingContact
     private lateinit var contactGatherer: ContactGatherer
@@ -36,6 +51,12 @@ class GenericApiTests {
 
     @BeforeTest
     fun setup() = runTest {
+        testModule = module {
+            single<StringStorageApi> { FakeStringStorage() }
+            single<Json> { JsonUtil.json }
+        }
+        koin.loadModules(listOf(testModule))
+
         val mainDispatcher = StandardTestDispatcher()
         Dispatchers.setMain(mainDispatcher)
         contactContext = ContactContext(mutableListOf())
@@ -62,6 +83,11 @@ class GenericApiTests {
         )
         genericApi = GenericApi(loggingContact, contactGatherer, contactInternal, sdkContext)
         genericApi.registerOnContext()
+    }
+
+    @AfterTest
+    fun tearDown() {
+        koin.unloadModules(listOf(testModule))
     }
 
     @Test

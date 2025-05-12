@@ -10,7 +10,11 @@ import com.emarsys.core.exceptions.SdkAlreadyEnabledException
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.state.StateMachineApi
+import com.emarsys.core.storage.StringStorageApi
+import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.enable.config.SdkConfigStoreApi
+import com.emarsys.fake.FakeStringStorage
+import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -24,11 +28,21 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.serialization.json.Json
+import org.koin.core.Koin
+import org.koin.core.module.Module
+import org.koin.dsl.module
+import org.koin.test.KoinTest
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-class EnableOrganizerTests {
+class EnableOrganizerTests: KoinTest {
+
+    override fun getKoin(): Koin = koin
+
+    private lateinit var testModule: Module
 
     private lateinit var mainDispatcher: CoroutineDispatcher
 
@@ -40,6 +54,12 @@ class EnableOrganizerTests {
 
     @BeforeTest
     fun setUp() {
+        testModule = module {
+            single<StringStorageApi> { FakeStringStorage() }
+            single<Json> { JsonUtil.json }
+        }
+        koin.loadModules(listOf(testModule))
+
         mainDispatcher = StandardTestDispatcher()
         Dispatchers.setMain(mainDispatcher)
         mockMeStateMachine = mock(MockMode.autofill)
@@ -61,6 +81,11 @@ class EnableOrganizerTests {
             mockSdkConfigLoader,
             SdkLogger("TestLoggerName", mock(MockMode.autofill), sdkContext = mock())
         )
+    }
+
+    @AfterTest
+    fun tearDown() {
+        koin.unloadModules(listOf(testModule))
     }
 
     @Test

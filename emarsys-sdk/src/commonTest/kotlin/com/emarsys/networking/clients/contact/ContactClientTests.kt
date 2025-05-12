@@ -84,7 +84,7 @@ class ContactClientTests {
         Dispatchers.setMain(StandardTestDispatcher())
         mockEmarsysClient = mock()
         mockUrlFactory = mock()
-        mockSdkContext = mock()
+        mockSdkContext = mock(mode = MockMode.autofill)
         mockConfig = mock()
         mockContactTokenHandler = mock()
         mockLogger = mock(MockMode.autofill)
@@ -144,6 +144,7 @@ class ContactClientTests {
         verifySuspend { mockEmarsysClient.send(any(), any()) }
         verifySuspend { mockContactTokenHandler.handleContactTokens(any()) }
         verifySuspend { mockSdkContext.contactFieldId = CONTACT_FIELD_ID }
+        verifySuspend { mockSdkContext.contactFieldValue = CONTACT_FIELD_VALUE }
         verifySuspend { mockEventsDao.removeEvent(linkContactEvent) }
 
     }
@@ -203,6 +204,7 @@ class ContactClientTests {
         verifySuspend { mockEmarsysClient.send(any(), any()) }
         verifySuspend { mockContactTokenHandler.handleContactTokens(any()) }
         verifySuspend { mockSdkContext.contactFieldId = CONTACT_FIELD_ID }
+        verifySuspend { mockSdkContext.openIdToken = OPEN_ID_TOKEN }
         verifySuspend { mockEventsDao.removeEvent(linkAuthenticatedContactEvent) }
 
         val request = requestSlot.get()
@@ -255,6 +257,8 @@ class ContactClientTests {
         verifySuspend { mockEmarsysClient.send(any(), any()) }
         verifySuspend { mockContactTokenHandler.handleContactTokens(any()) }
         verifySuspend { mockSdkContext.contactFieldId = null }
+        verifySuspend { mockSdkContext.contactFieldValue = null }
+        verifySuspend { mockSdkContext.openIdToken = null }
         verifySuspend { mockEventsDao.removeEvent(unlinkContactEvent) }
     }
 

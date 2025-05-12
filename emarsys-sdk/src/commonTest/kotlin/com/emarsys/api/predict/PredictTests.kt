@@ -9,6 +9,10 @@ import com.emarsys.context.DefaultUrls
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.log.LogLevel
+import com.emarsys.core.storage.StringStorageApi
+import com.emarsys.di.SdkKoinIsolationContext.koin
+import com.emarsys.fake.FakeStringStorage
+import com.emarsys.util.JsonUtil
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend
@@ -22,12 +26,19 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.serialization.json.Json
+import org.koin.core.Koin
+import org.koin.core.module.Module
+import org.koin.dsl.module
+import org.koin.test.KoinTest
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class PredictTests {
+class PredictTests: KoinTest {
+
+    override fun getKoin(): Koin = koin
 
     private companion object {
         const val ORDER_ID = "testOrderId"
@@ -53,8 +64,9 @@ class PredictTests {
         val testFilters =
             listOf(RecommendationFilter.include("testField").hasValue("otherTestField"))
         val testLogic = RecommendationLogic.alsoBought("itemId")
-
     }
+
+    private lateinit var testModule: Module
 
     private val mainDispatcher = StandardTestDispatcher()
 
@@ -70,6 +82,12 @@ class PredictTests {
 
     @BeforeTest
     fun setup() = runTest {
+        testModule = module {
+            single<StringStorageApi> { FakeStringStorage() }
+            single<Json> { JsonUtil.json }
+        }
+        koin.loadModules(listOf(testModule))
+
         mockLoggingPredict = mock()
         mockGathererPredict = mock()
         mockPredictInternal = mock()
@@ -95,7 +113,7 @@ class PredictTests {
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
-        
+        koin.unloadModules(listOf(testModule))
     }
 
     @Test

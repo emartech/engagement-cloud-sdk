@@ -6,6 +6,10 @@ import com.emarsys.context.DefaultUrls
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.log.LogLevel
+import com.emarsys.core.storage.StringStorageApi
+import com.emarsys.di.SdkKoinIsolationContext.koin
+import com.emarsys.fake.FakeStringStorage
+import com.emarsys.util.JsonUtil
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend
@@ -18,18 +22,28 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.serialization.json.Json
+import org.koin.core.Koin
+import org.koin.core.module.Module
+import org.koin.dsl.module
+import org.koin.test.KoinTest
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class InboxTests {
+class InboxTests: KoinTest {
+
+    override fun getKoin(): Koin = koin
+
     private companion object {
         const val TAG = "testTag"
         const val MESSAGE_ID = "testMessageId"
         val testMessage = Message("testId", "testCampaignId", null,"testTitle", "testBody", null,123456789,null,null,null,null,null)
         val testException = Exception()
     }
+
+    private lateinit var testModule: Module
 
     private val mainDispatcher = StandardTestDispatcher()
 
@@ -45,6 +59,12 @@ class InboxTests {
 
     @BeforeTest
     fun setup() = runTest {
+        testModule = module {
+            single<StringStorageApi> { FakeStringStorage() }
+            single<Json> { JsonUtil.json }
+        }
+        koin.loadModules(listOf(testModule))
+
         mockLoggingInbox = mock()
         mockGathererInbox = mock()
         mockInboxInternal = mock()
@@ -70,6 +90,7 @@ class InboxTests {
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
+        koin.unloadModules(listOf(testModule))
     }
 
     @Test

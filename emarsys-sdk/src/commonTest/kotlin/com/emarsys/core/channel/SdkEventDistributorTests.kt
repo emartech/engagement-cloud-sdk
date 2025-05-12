@@ -6,7 +6,11 @@ import com.emarsys.context.SdkContextApi
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
+import com.emarsys.core.storage.StringStorageApi
+import com.emarsys.di.SdkKoinIsolationContext.koin
+import com.emarsys.fake.FakeStringStorage
 import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
@@ -35,13 +39,23 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.serialization.json.Json
+import org.koin.core.Koin
+import org.koin.core.module.Module
+import org.koin.dsl.module
+import org.koin.test.KoinTest
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class SdkEventDistributorTests {
+class SdkEventDistributorTests: KoinTest {
+
+    override fun getKoin(): Koin = koin
+
+    private lateinit var testModule: Module
+
     private lateinit var sdkContext: SdkContextApi
     private lateinit var sdkDispatcher: CoroutineDispatcher
     private lateinit var mockEventsDao: EventsDaoApi
@@ -49,6 +63,12 @@ class SdkEventDistributorTests {
 
     @BeforeTest
     fun setup() {
+        testModule = module {
+            single<StringStorageApi> { FakeStringStorage() }
+            single<Json> { JsonUtil.json }
+        }
+        koin.loadModules(listOf(testModule))
+
         val mainDispatcher = StandardTestDispatcher()
         Dispatchers.setMain(mainDispatcher)
         sdkDispatcher = StandardTestDispatcher()
@@ -68,6 +88,7 @@ class SdkEventDistributorTests {
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
+        koin.unloadModules(listOf(testModule))
     }
 
     @Test

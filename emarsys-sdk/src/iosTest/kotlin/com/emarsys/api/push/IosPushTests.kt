@@ -7,10 +7,14 @@ import com.emarsys.context.SdkContextApi
 import com.emarsys.core.exceptions.PreconditionFailedException
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
+import com.emarsys.core.storage.StringStorageApi
+import com.emarsys.di.SdkKoinIsolationContext.koin
+import com.emarsys.fake.FakeStringStorage
 import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.push.IosPushInstance
 import com.emarsys.mobileengage.push.IosPushWrapper
+import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
@@ -28,13 +32,21 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.serialization.json.Json
+import org.koin.core.Koin
+import org.koin.core.module.Module
+import org.koin.dsl.module
+import org.koin.test.KoinTest
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class IosPushTests {
+class IosPushTests: KoinTest {
+
+    override fun getKoin(): Koin = koin
+
     private companion object {
         const val PUSH_TOKEN = "testPushToken"
         const val VERSION = "APNS_V2"
@@ -84,6 +96,8 @@ class IosPushTests {
         )
     }
 
+    private lateinit var testModule: Module
+
     private lateinit var mockLoggingPush: IosPushInstance
     private lateinit var mockGathererPush: IosPushInstance
     private lateinit var mockPushInternal: IosPushInstance
@@ -94,6 +108,12 @@ class IosPushTests {
 
     @BeforeTest
     fun setup() = runTest {
+        testModule = module {
+            single<StringStorageApi> { FakeStringStorage() }
+            single<Json> { JsonUtil.json }
+        }
+        koin.loadModules(listOf(testModule))
+
         val sdkDispatcher = StandardTestDispatcher()
         Dispatchers.setMain(sdkDispatcher)
 
@@ -126,6 +146,7 @@ class IosPushTests {
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
+        koin.unloadModules(listOf(testModule))
     }
 
     @Test

@@ -68,7 +68,6 @@ object SetupInjection {
         }
         single<State>(named(StateTypes.LinkContact)) {
             LinkContactState(
-                sessionContext = get(),
                 sdkContext = get(),
                 sdkEventDistributor = get(),
                 sdkLogger = get { parametersOf(LinkContactState::class.simpleName) }
