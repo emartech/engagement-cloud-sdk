@@ -17,27 +17,17 @@ import com.emarsys.networking.EmarsysHeaders.CLIENT_ID_HEADER
 import com.emarsys.networking.EmarsysHeaders.CLIENT_STATE_HEADER
 import com.emarsys.networking.EmarsysHeaders.CONTACT_TOKEN_HEADER
 import com.emarsys.networking.clients.event.model.SdkEvent
-import dev.mokkery.MockMode
+import dev.mokkery.*
 import dev.mokkery.answering.returns
-import dev.mokkery.every
-import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
-import dev.mokkery.mock
-import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.config
-import io.ktor.client.engine.mock.MockEngine
-import io.ktor.client.engine.mock.respond
-import io.ktor.client.plugins.HttpRequestRetry
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.http.HttpMethod
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.URLBuilder
-import io.ktor.http.Url
-import io.ktor.http.headers
-import io.ktor.http.headersOf
-import io.ktor.utils.io.ByteReadChannel
+import io.ktor.client.*
+import io.ktor.client.engine.*
+import io.ktor.client.engine.mock.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.http.*
+import io.ktor.utils.io.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -45,7 +35,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.Clock
-import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.*
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -76,7 +66,7 @@ class EmarsysClientTests {
         mockUrlFactory = mock()
         mockNetworkClient = mock()
         mockSdkEventDistributor = mock(MockMode.autofill)
-        sessionContext = SessionContext(refreshToken = "testRefreshToken", deviceEventState = null)
+        sessionContext = SessionContext(refreshToken = null, deviceEventState = null)
         json = Json
 
         every { mockTimestampProvider.provide() } returns now
@@ -104,12 +94,24 @@ class EmarsysClientTests {
 
     @Test
     fun testSend_should_retry_on401_and_try_to_get_refreshToken() = runTest {
+        sessionContext.refreshToken = "testRefreshToken"
+
         val mockHttpEngine = MockEngine.config {
             addHandler {
                 respond(
-                    ByteReadChannel(""),
+                    ByteReadChannel(
+                        buildJsonObject {
+                            put("error", buildJsonObject {
+                                put("code", "1000")
+                                put("message", "the contact-token needs to be refreshed")
+                                put("target", "/v4/apps/EMS-1234/client")
+                                put("details", buildJsonArray { })
+                            })
+                        }.toString()
+                    ),
                     status = HttpStatusCode.Unauthorized,
                     headers = headersOf("Content-Type", "application/json")
+
                 )
             }
             addHandler {
@@ -232,17 +234,33 @@ class EmarsysClientTests {
     }
 
     @Test
-    fun testSend_should_emit_ReregistrationRequiredEvent_toSdkEventFlow_whenStatusCodeIs_inRange_1100_1199() =
+    fun testSend_should_emit_ReregistrationRequiredEvent_toSdkEventFlow_whenStatusCodeIs_inRange_400_504_andErrorCodeIsInRange_1100_1199() =
         runTest {
+
             everySuspend { mockNetworkClient.send(any()) } returns Response(
                 UrlRequest(
                     Url("https://testUrl.com"),
                     HttpMethod.Get,
                     null,
                 ),
-                HttpStatusCode(1100, "test"),
+                HttpStatusCode(400, "test"),
                 headersOf("Content-Type", "application/json"),
-                ""
+                buildJsonObject {
+                    put("error", buildJsonObject {
+                        put("code", "1112")
+                        put("message", "The contact-token could be not verified")
+                        put("target", "/v4/apps/EMS-1234/client")
+                        putJsonArray("details") {
+                            add(buildJsonObject {
+                                put("code", "1100")
+                                put(
+                                    "message",
+                                    "refresh token could not be decrypted, complete re-registration required"
+                                )
+                            })
+                        }
+                    })
+                }.toString()
             )
 
             emarsysClient.send(UrlRequest(Url("https://testUrl.com"), HttpMethod.Get, null))
@@ -257,7 +275,7 @@ class EmarsysClientTests {
         }
 
     @Test
-    fun testSend_should_emit_RemoteConfigUpdateRequiredEvent_toSdkEventFlow_whenStatusCodeIs_inRange_1200_1299() =
+    fun testSend_should_emit_RemoteConfigUpdateRequiredEvent_toSdkEventFlow_whenStatusCodeIs_inRange_400_504_andErrorCodeIsInRange_1200_1299() =
         runTest {
             everySuspend { mockNetworkClient.send(any()) } returns Response(
                 UrlRequest(
@@ -265,9 +283,23 @@ class EmarsysClientTests {
                     HttpMethod.Get,
                     null,
                 ),
-                HttpStatusCode(1200, "test"),
+                HttpStatusCode(401, "test"),
                 headersOf("Content-Type", "application/json"),
-                ""
+                buildJsonObject {
+                    put("error", buildJsonObject {
+                        put("code", "1200")
+                        put("message", "The contact-token could be not verified")
+                        put("target", "/v4/apps/EMS-1234/client")
+                        putJsonArray("details") {
+                            add(buildJsonObject {
+                                put("code", "1201")
+                                put(
+                                    "message",
+                                    "refresh token could not be decrypted, complete re-registration required"
+                                )
+                            })
+                        }
+                    })}.toString()
             )
 
             emarsysClient.send(UrlRequest(Url("https://testUrl.com"), HttpMethod.Get, null))

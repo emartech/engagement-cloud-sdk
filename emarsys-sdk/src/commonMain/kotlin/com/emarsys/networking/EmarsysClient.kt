@@ -17,10 +17,9 @@ import com.emarsys.networking.EmarsysHeaders.REQUEST_ORDER_HEADER
 import com.emarsys.networking.EmarsysHeaders.X_CLIENT_ID_HEADER
 import com.emarsys.networking.EmarsysHeaders.X_CLIENT_STATE_HEADER
 import com.emarsys.networking.EmarsysHeaders.X_CONTACT_TOKEN_HEADER
+import com.emarsys.networking.clients.error.ResponseErrorBody
 import com.emarsys.networking.clients.event.model.SdkEvent
-import io.ktor.http.HttpMethod
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.isSuccess
+import io.ktor.http.*
 import kotlinx.coroutines.delay
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
@@ -89,16 +88,21 @@ internal class EmarsysClient(
     )
 
     private suspend fun handleEmarsysResponse(response: Response) {
-        val event = when (response.status.value) {
-            in 1100..1199 -> SdkEvent.Internal.Sdk.ReregistrationRequired()
-            in 1200..1299 -> SdkEvent.Internal.Sdk.RemoteConfigUpdateRequired()
-            else -> null
-        }
-        sdkLogger.debug(
-            "Received ${response.status.value} status code, mapped to ${event?.name ?: "unknown"} event",
-        )
-        event?.let {
-            sdkEventDistributor.registerEvent(event)
+        if (response.status.value in HttpStatusCode.BadRequest.value..HttpStatusCode.GatewayTimeout.value) {
+            val parsedBody = response.body<ResponseErrorBody>()
+
+            val event = when (parsedBody.error.code) {
+                in 1100..1199 -> SdkEvent.Internal.Sdk.ReregistrationRequired()
+                in 1200..1299 -> SdkEvent.Internal.Sdk.RemoteConfigUpdateRequired()
+                else -> null
+            }
+
+            sdkLogger.debug(
+                "Received ${response.status.value} status code, mapped to ${event?.name ?: "unknown"} event",
+            )
+            event?.let {
+                sdkEventDistributor.registerEvent(event)
+            }
         }
     }
 
