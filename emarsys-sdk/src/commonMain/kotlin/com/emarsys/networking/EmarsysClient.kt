@@ -7,7 +7,7 @@ import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.networking.model.body
 import com.emarsys.core.providers.InstantProvider
-import com.emarsys.core.session.SessionContext
+import com.emarsys.core.networking.context.RequestContext
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.networking.EmarsysHeaders.CLIENT_ID_HEADER
@@ -28,7 +28,7 @@ import kotlin.time.Duration.Companion.seconds
 
 internal class EmarsysClient(
     private val networkClient: NetworkClientApi,
-    private val sessionContext: SessionContext,
+    private val requestContext: RequestContext,
     private val timestampProvider: InstantProvider,
     private val urlFactory: UrlFactoryApi,
     private val json: Json,
@@ -57,7 +57,7 @@ internal class EmarsysClient(
         callback: suspend () -> Response
     ): Response {
         val response = callback()
-        return if (response.status == HttpStatusCode.Unauthorized && sessionContext.refreshToken != null && retryCount < MAX_RETRY_COUNT) {
+        return if (response.status == HttpStatusCode.Unauthorized && requestContext.refreshToken != null && retryCount < MAX_RETRY_COUNT) {
             sdkLogger.debug(
                 "refreshing contact token",
                 buildJsonObject {
@@ -69,7 +69,7 @@ internal class EmarsysClient(
             val request = createRefreshContactTokenRequest()
             val refreshResponse = networkClient.send(request)
             val responseBody: RefreshTokenResponseBody = refreshResponse.body()
-            sessionContext.contactToken = responseBody.contactToken
+            requestContext.contactToken = responseBody.contactToken
             refreshContactToken(retryCount + 1, callback)
         } else {
             response
@@ -79,10 +79,10 @@ internal class EmarsysClient(
     private fun createRefreshContactTokenRequest() = UrlRequest(
         urlFactory.create(EmarsysUrlType.REFRESH_TOKEN),
         HttpMethod.Post,
-        json.encodeToString(RefreshTokenRequestBody(sessionContext.refreshToken!!)),
+        json.encodeToString(RefreshTokenRequestBody(requestContext.refreshToken!!)),
         mapOf(
-            CLIENT_ID_HEADER to sessionContext.clientId,
-            CLIENT_STATE_HEADER to sessionContext.clientState,
+            CLIENT_ID_HEADER to requestContext.clientId,
+            CLIENT_STATE_HEADER to requestContext.clientState,
             REQUEST_ORDER_HEADER to timestampProvider.provide().toEpochMilliseconds()
         )
     )
@@ -109,19 +109,19 @@ internal class EmarsysClient(
     private fun handleClientState(response: Response) {
         if (response.status.isSuccess()) {
             response.headers[CLIENT_STATE_HEADER.lowercase()]?.let {
-                sessionContext.clientState = it
+                requestContext.clientState = it
             }
         }
     }
 
     private fun addEmarsysHeaders(request: UrlRequest): UrlRequest {
         val emarsysHeaders = mutableMapOf(
-            CLIENT_ID_HEADER to sessionContext.clientId,
-            X_CLIENT_ID_HEADER to sessionContext.clientId,
-            CLIENT_STATE_HEADER to sessionContext.clientState,
-            X_CLIENT_STATE_HEADER to sessionContext.clientState,
-            CONTACT_TOKEN_HEADER to sessionContext.contactToken,
-            X_CONTACT_TOKEN_HEADER to sessionContext.contactToken,
+            CLIENT_ID_HEADER to requestContext.clientId,
+            X_CLIENT_ID_HEADER to requestContext.clientId,
+            CLIENT_STATE_HEADER to requestContext.clientState,
+            X_CLIENT_STATE_HEADER to requestContext.clientState,
+            CONTACT_TOKEN_HEADER to requestContext.contactToken,
+            X_CONTACT_TOKEN_HEADER to requestContext.contactToken,
             REQUEST_ORDER_HEADER to timestampProvider.provide().toEpochMilliseconds()
         ).filterValues { it != null }
 

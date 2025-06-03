@@ -1,7 +1,7 @@
 package com.emarsys.enable.states
 
 import com.emarsys.core.device.DeviceInfoCollectorApi
-import com.emarsys.core.session.SessionContext
+import com.emarsys.core.networking.context.RequestContext
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
@@ -13,19 +13,19 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class CollectDeviceInfoStateTests {
-    private var sessionContext: SessionContext = SessionContext()
+    private var requestContext: RequestContext = RequestContext()
     private lateinit var mockDeviceInfoCollector: DeviceInfoCollectorApi
     private lateinit var collectDeviceInfoState: CollectDeviceInfoState
 
     @BeforeTest
     fun setUp() {
         mockDeviceInfoCollector = mock()
-        collectDeviceInfoState = CollectDeviceInfoState(mockDeviceInfoCollector, sessionContext)
+        collectDeviceInfoState = CollectDeviceInfoState(mockDeviceInfoCollector, requestContext)
     }
 
     @AfterTest
     fun tearDown() {
-        sessionContext = SessionContext()
+        requestContext = RequestContext()
     }
 
     @Test
@@ -36,6 +36,6 @@ class CollectDeviceInfoStateTests {
         collectDeviceInfoState.active()
 
         verifySuspend { mockDeviceInfoCollector.getClientId() }
-        sessionContext.clientId shouldBe clientId
+        requestContext.clientId shouldBe clientId
     }
 }

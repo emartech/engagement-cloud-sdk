@@ -1,6 +1,5 @@
 package com.emarsys.init.states
 
-import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.mobileengage.session.Session
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog

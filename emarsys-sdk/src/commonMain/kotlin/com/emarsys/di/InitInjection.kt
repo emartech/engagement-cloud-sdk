@@ -44,7 +44,7 @@ object InitInjection {
         }
         single<State>(named(InitStateTypes.SessionSubscription)) {
             SessionSubscriptionState(
-                mobileEngageSession = get(),
+                emarsysSdkSession = get(),
                 lifecycleWatchDog = get(),
                 sdkLogger = get { parametersOf(SessionSubscriptionState::class.simpleName) }
             )

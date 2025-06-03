@@ -1,11 +1,11 @@
 package com.emarsys.reregistration.states
 
 import com.emarsys.core.log.Logger
-import com.emarsys.core.session.SessionContext
+import com.emarsys.core.networking.context.RequestContext
 import com.emarsys.core.state.State
 
 internal class ClearSessionContextState(
-    private val sessionContext: SessionContext,
+    private val requestContext: RequestContext,
     val sdkLogger: Logger
 ) : State {
 
@@ -15,7 +15,7 @@ internal class ClearSessionContextState(
 
     override suspend fun active() {
         sdkLogger.debug("Clearing session tokens")
-        sessionContext.clearSessionTokens()
+        requestContext.clearTokens()
     }
 
     override fun relax() {}

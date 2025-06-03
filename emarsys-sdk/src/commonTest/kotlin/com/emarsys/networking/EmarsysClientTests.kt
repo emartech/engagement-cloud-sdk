@@ -9,7 +9,7 @@ import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.networking.model.body
 import com.emarsys.core.providers.InstantProvider
-import com.emarsys.core.session.SessionContext
+import com.emarsys.core.networking.context.RequestContext
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.model.TestDataClass
@@ -54,7 +54,7 @@ class EmarsysClientTests {
     private lateinit var mockUrlFactory: UrlFactoryApi
     private lateinit var mockNetworkClient: NetworkClientApi
     private lateinit var json: Json
-    private lateinit var sessionContext: SessionContext
+    private lateinit var requestContext: RequestContext
     private lateinit var emarsysClient: EmarsysClient
     private val now = Clock.System.now()
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
@@ -66,7 +66,7 @@ class EmarsysClientTests {
         mockUrlFactory = mock()
         mockNetworkClient = mock()
         mockSdkEventDistributor = mock(MockMode.autofill)
-        sessionContext = SessionContext(refreshToken = null, deviceEventState = null)
+        requestContext = RequestContext(refreshToken = null, deviceEventState = null)
         json = Json
 
         every { mockTimestampProvider.provide() } returns now
@@ -78,7 +78,7 @@ class EmarsysClientTests {
 
         emarsysClient = EmarsysClient(
             mockNetworkClient,
-            sessionContext,
+            requestContext,
             mockTimestampProvider,
             mockUrlFactory,
             json,
@@ -94,7 +94,7 @@ class EmarsysClientTests {
 
     @Test
     fun testSend_should_retry_on401_and_try_to_get_refreshToken() = runTest {
-        sessionContext.refreshToken = "testRefreshToken"
+        requestContext.refreshToken = "testRefreshToken"
 
         val mockHttpEngine = MockEngine.config {
             addHandler {
@@ -141,7 +141,7 @@ class EmarsysClientTests {
         val networkClient = GenericNetworkClient(httpClient, sdkLogger = mock(MockMode.autofill))
         val emarsysClient = EmarsysClient(
             networkClient,
-            sessionContext,
+            requestContext,
             mockTimestampProvider,
             mockUrlFactory,
             json,
@@ -149,7 +149,7 @@ class EmarsysClientTests {
             mockSdkEventDistributor,
         )
 
-        sessionContext.clientState = null
+        requestContext.clientState = null
         val urlString =
             URLBuilder("https://testUrl.com").build()
         val request = UrlRequest(
@@ -179,7 +179,7 @@ class EmarsysClientTests {
 
         response shouldBe expectedResponse
         response.body<TestDataClass>() shouldBe testData
-        sessionContext.clientState shouldBe "testClientState"
+        requestContext.clientState shouldBe "testClientState"
     }
 
     @Test
@@ -202,7 +202,7 @@ class EmarsysClientTests {
         val networkClient = GenericNetworkClient(httpClient, sdkLogger = mock(MockMode.autofill))
         val emarsysClient = EmarsysClient(
             networkClient,
-            sessionContext,
+            requestContext,
             mockTimestampProvider,
             mockUrlFactory,
             json,
@@ -210,9 +210,9 @@ class EmarsysClientTests {
             mockSdkEventDistributor,
         )
 
-        sessionContext.contactToken = CONTACT_TOKEN
-        sessionContext.clientState = CLIENT_STATE
-        sessionContext.clientId = CLIENT_ID
+        requestContext.contactToken = CONTACT_TOKEN
+        requestContext.clientState = CLIENT_STATE
+        requestContext.clientId = CLIENT_ID
 
         val urlString =
             URLBuilder("https://testUrl.com").build()

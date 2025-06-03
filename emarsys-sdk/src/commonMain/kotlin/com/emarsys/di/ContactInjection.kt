@@ -22,7 +22,7 @@ object ContactInjection {
     val contactModules = module {
         single<ContactTokenHandlerApi> {
             ContactTokenHandler(
-                sessionContext = get(),
+                requestContext = get(),
                 sdkLogger = get { parametersOf(ContactTokenHandler::class.simpleName) }
             )
         }

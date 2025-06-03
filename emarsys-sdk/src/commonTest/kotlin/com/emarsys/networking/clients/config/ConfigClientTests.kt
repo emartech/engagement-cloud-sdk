@@ -11,7 +11,7 @@ import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
-import com.emarsys.core.session.SessionContext
+import com.emarsys.core.networking.context.RequestContext
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.networking.clients.contact.ContactTokenHandlerApi
@@ -71,7 +71,7 @@ class ConfigClientTests {
     private lateinit var mockSdkContext: SdkContextApi
     private lateinit var mockSdkLogger: Logger
     private lateinit var mockConfig: SdkConfig
-    private lateinit var sessionContext: SessionContext
+    private lateinit var requestContext: RequestContext
     private lateinit var json: Json
     private lateinit var onlineEvents: MutableSharedFlow<OnlineSdkEvent>
     private lateinit var mockSdkEventManager: SdkEventManagerApi
@@ -86,7 +86,7 @@ class ConfigClientTests {
         mockSdkContext = mock()
         mockSdkLogger = mock(MockMode.autofill)
         mockConfig = mock()
-        sessionContext = SessionContext(refreshToken = "testRefreshToken")
+        requestContext = RequestContext(refreshToken = "testRefreshToken")
         json = JsonUtil.json
         mockEventsDao = mock()
         onlineEvents = spy(MutableSharedFlow())
@@ -112,7 +112,7 @@ class ConfigClientTests {
             mockEmarsysClient,
             mockUrlFactory,
             mockSdkEventManager,
-            sessionContext,
+            requestContext,
             mockSdkContext,
             mockContactTokenHandler,
             mockEventsDao,

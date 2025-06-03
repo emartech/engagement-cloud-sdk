@@ -7,6 +7,7 @@ import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
+import com.emarsys.core.networking.context.RequestContext
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.session.SessionId
 
@@ -19,9 +20,10 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 
-internal class MobileEngageSession(
+internal class EmarsysSdkSession(
     private val timestampProvider: InstantProvider,
     private val uuidProvider: UuidProviderApi,
+    private val requestContext: RequestContext,
     private val sessionContext: SessionContext,
     private val sdkContext: SdkContextApi,
     private val sdkEventDistributor: SdkEventDistributorApi,
@@ -103,13 +105,13 @@ internal class MobileEngageSession(
 
     private fun canStartSession() =
         sdkContext.config?.applicationCode != null
-                && sessionContext.contactToken != null
+                && requestContext.contactToken != null
                 && sessionContext.sessionId == null
                 && sessionContext.sessionStart == null
 
     private fun canEndSession() =
         sdkContext.config?.applicationCode != null
-                && sessionContext.contactToken != null
+                && requestContext.contactToken != null
                 && sessionContext.sessionId != null
                 && sessionContext.sessionStart != null
 

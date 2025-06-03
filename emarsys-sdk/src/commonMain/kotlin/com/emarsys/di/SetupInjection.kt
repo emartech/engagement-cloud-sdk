@@ -29,7 +29,7 @@ object SetupInjection {
         single<State>(named(StateTypes.CollectDeviceInfo)) {
             CollectDeviceInfoState(
                 deviceInfoCollector = get(),
-                sessionContext = get()
+                requestContext = get()
             )
         }
         single<State>(named(StateTypes.RegisterPushToken)) {
@@ -62,7 +62,7 @@ object SetupInjection {
         }
         single<State>(named(StateTypes.ClearSessionContext)) {
             ClearSessionContextState(
-                sessionContext = get(),
+                requestContext = get(),
                 sdkLogger = get { parametersOf(ClearSessionContextState::class.simpleName) }
             )
         }

@@ -11,7 +11,7 @@ import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.providers.UuidProviderApi
-import com.emarsys.core.session.SessionContext
+import com.emarsys.core.networking.context.RequestContext
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.mobileengage.action.EventActionFactoryApi
@@ -99,7 +99,7 @@ class EventClientTests {
     private lateinit var mockInAppPresenter: InAppPresenterApi
     private lateinit var mockInAppViewProvider: InAppViewProviderApi
     private lateinit var mockInAppView: InAppViewApi
-    private lateinit var sessionContext: SessionContext
+    private lateinit var requestContext: RequestContext
     private lateinit var json: Json
     private lateinit var eventClient: EventClient
     private lateinit var mockSdkLogger: Logger
@@ -119,7 +119,7 @@ class EventClientTests {
         mockSdkLogger = mock(MockMode.autofill)
         json = JsonUtil.json
         mockWebViewHolder = mock()
-        sessionContext = SessionContext()
+        requestContext = RequestContext()
         mockEventsDao = mock(MockMode.autofill)
         onlineEvents = MutableSharedFlow()
         mockSdkEventManager = mock()
@@ -145,7 +145,7 @@ class EventClientTests {
         mockUrlFactory,
         json,
         mockOnEventActionFactory,
-        sessionContext,
+        requestContext,
         mockInAppConfigApi,
         mockInAppPresenter,
         mockInAppViewProvider,
@@ -174,7 +174,7 @@ class EventClientTests {
     fun testConsumer_should_call_client_with_correct_request() = runTest {
         createEventClient(backgroundScope).register()
 
-        sessionContext.deviceEventState = DEVICE_EVENT_STATE
+        requestContext.deviceEventState = DEVICE_EVENT_STATE
 
         everySuspend { mockEmarsysClient.send(any(), any()) } returns createTestResponse("{}")
         every { mockUrlFactory.create(EmarsysUrlType.EVENT) } returns TEST_BASE_URL
@@ -201,7 +201,7 @@ class EventClientTests {
         eventClient = createEventClient(backgroundScope)
         eventClient.register()
 
-        sessionContext.deviceEventState = null
+        requestContext.deviceEventState = null
         val expectedDeviceEventState = buildJsonObject {
             put("key1", "value1")
             put("key2", "value2")
@@ -229,7 +229,7 @@ class EventClientTests {
         verifySuspend { mockEmarsysClient.send(expectedUrlRequest, any()) }
         verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
 
-        sessionContext.deviceEventState shouldBe expectedDeviceEventState
+        requestContext.deviceEventState shouldBe expectedDeviceEventState
     }
 
     @Test
@@ -323,7 +323,7 @@ class EventClientTests {
         verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
         verifySuspend { mockEventsDao.removeEvent(testEvent) }
 
-        sessionContext.deviceEventState shouldBe null
+        requestContext.deviceEventState shouldBe null
     }
 
     @Test
@@ -359,7 +359,7 @@ class EventClientTests {
         verifySuspend { mockSdkEventManager.emitEvent(testEvent) }
         verifySuspend { mockSdkEventManager.emitEvent(testEvent1) }
 
-        sessionContext.deviceEventState shouldBe null
+        requestContext.deviceEventState shouldBe null
     }
 
     @Test
@@ -391,7 +391,7 @@ class EventClientTests {
         verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(testEvent) }
         verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(testEvent1) }
 
-        sessionContext.deviceEventState shouldBe null
+        requestContext.deviceEventState shouldBe null
     }
 
     @Test
@@ -445,7 +445,7 @@ class EventClientTests {
                 verifySuspend { mockEventsDao.removeEvent(testEvent) }
                 verifySuspend { mockEventsDao.removeEvent(testEvent1) }
 
-                sessionContext.deviceEventState shouldBe null
+                requestContext.deviceEventState shouldBe null
             }
         }
     }

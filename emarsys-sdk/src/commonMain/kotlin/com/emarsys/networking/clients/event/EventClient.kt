@@ -12,7 +12,7 @@ import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.networking.model.body
 import com.emarsys.core.providers.UuidProviderApi
-import com.emarsys.core.session.SessionContext
+import com.emarsys.core.networking.context.RequestContext
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.mobileengage.action.EventActionFactoryApi
@@ -44,7 +44,7 @@ internal class EventClient(
     private val urlFactory: UrlFactoryApi,
     private val json: Json,
     private val eventActionFactory: EventActionFactoryApi,
-    private val sessionContext: SessionContext,
+    private val requestContext: RequestContext,
     private val inAppConfigApi: InAppConfigApi,
     private val inAppPresenter: InAppPresenterApi,
     private val inAppViewProvider: InAppViewProviderApi,
@@ -72,7 +72,7 @@ internal class EventClient(
                         DeviceEventRequestBody(
                             inAppConfigApi.inAppDnd,
                             sdkEvents,
-                            sessionContext.deviceEventState
+                            requestContext.deviceEventState
                         )
                     val body = json.encodeToString(requestBody)
                     val response = emarsysNetworkClient.send(
@@ -145,7 +145,7 @@ internal class EventClient(
     private suspend fun handleDeviceEventState(deviceEventResponse: DeviceEventResponse) {
         sdkLogger.debug(deviceEventResponse.toString())
 
-        sessionContext.deviceEventState = deviceEventResponse.deviceEventState
+        requestContext.deviceEventState = deviceEventResponse.deviceEventState
     }
 
     private suspend fun handleInApp(message: EventResponseInApp?) {

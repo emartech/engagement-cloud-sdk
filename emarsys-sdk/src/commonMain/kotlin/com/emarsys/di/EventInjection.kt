@@ -11,7 +11,7 @@ import com.emarsys.api.event.EventTrackerInternal
 import com.emarsys.api.event.LoggingEventTracker
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.collections.PersistentList
-import com.emarsys.mobileengage.session.MobileEngageSession
+import com.emarsys.mobileengage.session.EmarsysSdkSession
 import com.emarsys.mobileengage.session.Session
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.tracking.Tracking
@@ -68,15 +68,15 @@ object EventInjection {
             )
         }
         single<Session> {
-            MobileEngageSession(
+            EmarsysSdkSession(
                 timestampProvider = get(),
                 uuidProvider = get(),
+                requestContext = get(),
                 sessionContext = get(),
                 sdkContext = get(),
                 sdkEventDistributor = get(),
                 sdkDispatcher = get(named(DispatcherTypes.Sdk)),
-                sdkLogger = get { parametersOf(MobileEngageSession::class.simpleName) },
-            )
+                sdkLogger = get { parametersOf(EmarsysSdkSession::class.simpleName) })
         }
         single<Flow<SdkEvent.External.Api>>(named(EventFlowTypes.Public)) {
             get<SdkEventDistributorApi>().sdkEventFlow.filterIsInstance<SdkEvent.External.Api>()

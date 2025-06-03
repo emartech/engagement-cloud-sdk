@@ -2,7 +2,7 @@ package com.emarsys.networking.clients.contact
 
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
-import com.emarsys.core.session.SessionContext
+import com.emarsys.core.networking.context.RequestContext
 import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.mock
@@ -18,14 +18,14 @@ import kotlin.test.Test
 
 class ContactTokenHandlerTests {
 
-    private lateinit var sessionContext: SessionContext
+    private lateinit var requestContext: RequestContext
     private lateinit var contactTokenHandler: ContactTokenHandlerApi
     private val json: Json = JsonUtil.json
 
     @BeforeTest
     fun setUp() {
-        sessionContext = SessionContext()
-        contactTokenHandler = ContactTokenHandler(sessionContext, sdkLogger = mock(MockMode.autofill))
+        requestContext = RequestContext()
+        contactTokenHandler = ContactTokenHandler(requestContext, sdkLogger = mock(MockMode.autofill))
     }
 
     @Test
@@ -41,8 +41,8 @@ class ContactTokenHandlerTests {
 
         contactTokenHandler.handleContactTokens(response)
 
-        sessionContext.refreshToken shouldBe refreshToken
-        sessionContext.contactToken shouldBe contactToken
+        requestContext.refreshToken shouldBe refreshToken
+        requestContext.contactToken shouldBe contactToken
     }
 
     @Test

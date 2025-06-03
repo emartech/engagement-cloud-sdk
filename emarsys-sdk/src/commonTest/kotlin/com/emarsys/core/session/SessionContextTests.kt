@@ -1,5 +1,6 @@
 package com.emarsys.core.session
 
+import com.emarsys.core.networking.context.RequestContext
 import io.kotest.matchers.shouldBe
 import kotlin.test.Test
 
@@ -12,12 +13,13 @@ class SessionContextTests {
 
     @Test
     fun testClearSessionTokens() {
-        val sessionContext = SessionContext(contactToken = CONTACT_TOKEN, refreshToken = REFRESH_TOKEN)
+        val requestContext =
+            RequestContext(contactToken = CONTACT_TOKEN, refreshToken = REFRESH_TOKEN)
 
-        sessionContext.clearSessionTokens()
+        requestContext.clearTokens()
 
-        sessionContext.contactToken shouldBe null
-        sessionContext.refreshToken shouldBe null
+        requestContext.contactToken shouldBe null
+        requestContext.refreshToken shouldBe null
     }
 
 }

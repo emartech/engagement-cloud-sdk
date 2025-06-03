@@ -9,7 +9,7 @@ import com.emarsys.core.exceptions.RetryLimitReachedException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.UrlRequest
-import com.emarsys.core.session.SessionContext
+import com.emarsys.core.networking.context.RequestContext
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.networking.RefreshTokenRequestBody
@@ -27,7 +27,7 @@ internal class ConfigClient(
     private val emarsysNetworkClient: NetworkClientApi,
     private val urlFactory: UrlFactoryApi,
     private val sdkEventManager: SdkEventManagerApi,
-    private val sessionContext: SessionContext,
+    private val requestContext: RequestContext,
     private val sdkContext: SdkContextApi,
     private val contactTokenHandler: ContactTokenHandlerApi,
     private val eventsDao: EventsDaoApi,
@@ -58,7 +58,7 @@ internal class ConfigClient(
                         UrlRequest(
                             url, HttpMethod.Post,
                             json.encodeToString(
-                                RefreshTokenRequestBody(sessionContext.refreshToken!!)
+                                RefreshTokenRequestBody(requestContext.refreshToken!!)
                             ),
                         )
                     }

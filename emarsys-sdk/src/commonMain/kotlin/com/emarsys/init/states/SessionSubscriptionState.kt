@@ -6,7 +6,7 @@ import com.emarsys.mobileengage.session.Session
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 
 internal class SessionSubscriptionState(
-    private val mobileEngageSession: Session,
+    private val emarsysSdkSession: Session,
     private val lifecycleWatchDog: LifecycleWatchDog,
     private val sdkLogger: Logger
 
@@ -19,7 +19,7 @@ internal class SessionSubscriptionState(
     override suspend fun active() {
         sdkLogger.debug("Subscribing to session")
 
-        mobileEngageSession.subscribe(lifecycleWatchDog)
+        emarsysSdkSession.subscribe(lifecycleWatchDog)
     }
 
     override fun relax() {

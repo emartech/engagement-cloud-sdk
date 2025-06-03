@@ -27,7 +27,7 @@ object NetworkInjection {
                 networkClient = get<NetworkClientApi>(
                     named(NetworkClientTypes.Generic)
                 ),
-                sessionContext = get(),
+                requestContext = get(),
                 timestampProvider = get(),
                 urlFactory = get(),
                 json = get(),
@@ -41,7 +41,7 @@ object NetworkInjection {
                 urlFactory = get(),
                 json = get(),
                 eventActionFactory = get(),
-                sessionContext = get(),
+                requestContext = get(),
                 inAppConfigApi = get(),
                 inAppPresenter = get(),
                 inAppViewProvider = get(),
@@ -82,7 +82,7 @@ object NetworkInjection {
                 emarsysNetworkClient = get(named(NetworkClientTypes.Emarsys)),
                 urlFactory = get(),
                 sdkEventManager = get(),
-                sessionContext = get(),
+                requestContext = get(),
                 sdkContext = get(),
                 contactTokenHandler = get(),
                 eventsDao = get(),
