@@ -1,12 +1,12 @@
 package com.emarsys.networking.clients.contact
 
 import com.emarsys.core.log.Logger
+import com.emarsys.core.networking.context.RequestContextApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.body
-import com.emarsys.core.networking.context.RequestContext
 
 internal class ContactTokenHandler(
-    private val requestContext: RequestContext,
+    private val requestContext: RequestContextApi,
     private val sdkLogger: Logger
 ) : ContactTokenHandlerApi {
 

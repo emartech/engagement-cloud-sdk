@@ -3,11 +3,11 @@ package com.emarsys.networking
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
+import com.emarsys.core.networking.context.RequestContextApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.networking.model.body
 import com.emarsys.core.providers.InstantProvider
-import com.emarsys.core.networking.context.RequestContext
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.networking.EmarsysHeaders.CLIENT_ID_HEADER
@@ -19,7 +19,9 @@ import com.emarsys.networking.EmarsysHeaders.X_CLIENT_STATE_HEADER
 import com.emarsys.networking.EmarsysHeaders.X_CONTACT_TOKEN_HEADER
 import com.emarsys.networking.clients.error.ResponseErrorBody
 import com.emarsys.networking.clients.event.model.SdkEvent
-import io.ktor.http.*
+import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.isSuccess
 import kotlinx.coroutines.delay
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
@@ -28,7 +30,7 @@ import kotlin.time.Duration.Companion.seconds
 
 internal class EmarsysClient(
     private val networkClient: NetworkClientApi,
-    private val requestContext: RequestContext,
+    private val requestContext: RequestContextApi,
     private val timestampProvider: InstantProvider,
     private val urlFactory: UrlFactoryApi,
     private val json: Json,

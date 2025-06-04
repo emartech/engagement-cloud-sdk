@@ -8,9 +8,9 @@ import com.emarsys.core.exceptions.FailedRequestException
 import com.emarsys.core.exceptions.RetryLimitReachedException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
+import com.emarsys.core.networking.context.RequestContextApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
-import com.emarsys.core.networking.context.RequestContext
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.networking.clients.event.model.OnlineSdkEvent
@@ -71,7 +71,7 @@ class ContactClientTests {
     private lateinit var mockConfig: SdkConfig
     private lateinit var mockContactTokenHandler: ContactTokenHandlerApi
     private lateinit var mockLogger: Logger
-    private lateinit var requestContext: RequestContext
+    private lateinit var mockRequestContext: RequestContextApi
     private lateinit var json: Json
     private lateinit var onlineEvents: MutableSharedFlow<OnlineSdkEvent>
     private lateinit var mockSdkEventManager: SdkEventManagerApi
@@ -88,7 +88,8 @@ class ContactClientTests {
         mockConfig = mock()
         mockContactTokenHandler = mock()
         mockLogger = mock(MockMode.autofill)
-        requestContext = RequestContext(refreshToken = "testRefreshToken")
+        mockRequestContext = mock(MockMode.autofill)
+        every { mockRequestContext.refreshToken } returns "testRefreshToken"
         json = JsonUtil.json
         onlineEvents = MutableSharedFlow(replay = 5)
         mockSdkEventManager = mock()

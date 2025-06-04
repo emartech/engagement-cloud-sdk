@@ -9,10 +9,10 @@ import com.emarsys.core.exceptions.MissingApplicationCodeException
 import com.emarsys.core.exceptions.RetryLimitReachedException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
+import com.emarsys.core.networking.context.RequestContextApi
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.networking.model.body
 import com.emarsys.core.providers.UuidProviderApi
-import com.emarsys.core.networking.context.RequestContext
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.mobileengage.action.EventActionFactoryApi
@@ -44,7 +44,7 @@ internal class EventClient(
     private val urlFactory: UrlFactoryApi,
     private val json: Json,
     private val eventActionFactory: EventActionFactoryApi,
-    private val requestContext: RequestContext,
+    private val requestContext: RequestContextApi,
     private val inAppConfigApi: InAppConfigApi,
     private val inAppPresenter: InAppPresenterApi,
     private val inAppViewProvider: InAppViewProviderApi,

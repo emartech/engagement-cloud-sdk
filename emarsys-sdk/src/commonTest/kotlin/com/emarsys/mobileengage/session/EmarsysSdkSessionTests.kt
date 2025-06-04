@@ -6,9 +6,9 @@ import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.lifecycle.LifecycleEvent
 import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.Logger
+import com.emarsys.core.networking.context.RequestContextApi
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
-import com.emarsys.core.networking.context.RequestContext
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.session.SessionId
 import com.emarsys.networking.clients.event.model.SdkEvent
@@ -36,7 +36,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class MobileEngageSessionTests {
+class EmarsysSdkSessionTests {
     private companion object {
         const val APPLICATION_CODE = "testApplicationCode"
         const val CONTACT_TOKEN = "testContactToken"
@@ -62,7 +62,7 @@ class MobileEngageSessionTests {
     private lateinit var mockSdkLogger: Logger
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
     private lateinit var mockSdkContext: SdkContextApi
-    private lateinit var requestContext: RequestContext
+    private lateinit var mockRequestContext: RequestContextApi
     private lateinit var sessionContext: SessionContext
     private lateinit var sdkDispatcher: CoroutineDispatcher
     private lateinit var emarsysSdkSession: EmarsysSdkSession
@@ -81,7 +81,8 @@ class MobileEngageSessionTests {
         mockSdkEventDistributor = mock()
         mockSdkContext = mock()
         sdkDispatcher = StandardTestDispatcher()
-        requestContext = RequestContext(contactToken = CONTACT_TOKEN)
+        mockRequestContext = mock(MockMode.autofill)
+        every { mockRequestContext.contactToken } returns CONTACT_TOKEN
         sessionContext = SessionContext(
             SESSION_ID,
             SESSION_START
@@ -97,7 +98,7 @@ class MobileEngageSessionTests {
         emarsysSdkSession = EmarsysSdkSession(
             mockTimestampProvider,
             mockUuidProvider,
-            requestContext,
+            mockRequestContext,
             sessionContext,
             mockSdkContext,
             mockSdkEventDistributor,
@@ -108,7 +109,6 @@ class MobileEngageSessionTests {
 
     @Test
     fun testSubscribe_shouldCallStartSession() = runTest {
-        requestContext.contactToken = CONTACT_TOKEN
         sessionContext.sessionId = null
         sessionContext.sessionStart = null
         every { mockSdkContext.config } returns TestEmarsysConfig(applicationCode = APPLICATION_CODE)
@@ -221,7 +221,7 @@ class MobileEngageSessionTests {
 
     @Test
     fun testStartSession_shouldNotDoAnything_whenContactTokenIsNull() = runTest {
-        requestContext.contactToken = null
+        every { mockRequestContext.contactToken } returns null
         every { mockSdkContext.config } returns TestEmarsysConfig(applicationCode = APPLICATION_CODE)
 
         emarsysSdkSession.startSession()
@@ -308,7 +308,7 @@ class MobileEngageSessionTests {
 
     @Test
     fun testEndSession_shouldNotDoAnything_whenContactTokenIsNull() = runTest {
-        requestContext.contactToken = null
+        every { mockRequestContext.contactToken } returns null
         every { mockSdkContext.config } returns TestEmarsysConfig(applicationCode = APPLICATION_CODE)
 
         emarsysSdkSession.endSession()

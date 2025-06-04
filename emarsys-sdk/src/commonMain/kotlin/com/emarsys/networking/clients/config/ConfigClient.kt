@@ -8,8 +8,8 @@ import com.emarsys.core.exceptions.MissingApplicationCodeException
 import com.emarsys.core.exceptions.RetryLimitReachedException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
+import com.emarsys.core.networking.context.RequestContextApi
 import com.emarsys.core.networking.model.UrlRequest
-import com.emarsys.core.networking.context.RequestContext
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.networking.RefreshTokenRequestBody
@@ -27,7 +27,7 @@ internal class ConfigClient(
     private val emarsysNetworkClient: NetworkClientApi,
     private val urlFactory: UrlFactoryApi,
     private val sdkEventManager: SdkEventManagerApi,
-    private val requestContext: RequestContext,
+    private val requestContext: RequestContextApi,
     private val sdkContext: SdkContextApi,
     private val contactTokenHandler: ContactTokenHandlerApi,
     private val eventsDao: EventsDaoApi,

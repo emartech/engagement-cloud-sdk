@@ -5,11 +5,11 @@ package com.emarsys.networking
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.networking.clients.GenericNetworkClient
 import com.emarsys.core.networking.clients.NetworkClientApi
+import com.emarsys.core.networking.context.RequestContextApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.networking.model.body
 import com.emarsys.core.providers.InstantProvider
-import com.emarsys.core.networking.context.RequestContext
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.model.TestDataClass
@@ -17,17 +17,28 @@ import com.emarsys.networking.EmarsysHeaders.CLIENT_ID_HEADER
 import com.emarsys.networking.EmarsysHeaders.CLIENT_STATE_HEADER
 import com.emarsys.networking.EmarsysHeaders.CONTACT_TOKEN_HEADER
 import com.emarsys.networking.clients.event.model.SdkEvent
-import dev.mokkery.*
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
+import dev.mokkery.every
+import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
+import dev.mokkery.mock
+import dev.mokkery.verify
+import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
-import io.ktor.client.*
-import io.ktor.client.engine.*
-import io.ktor.client.engine.mock.*
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.http.*
-import io.ktor.utils.io.*
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.config
+import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.engine.mock.respond
+import io.ktor.client.plugins.HttpRequestRetry
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.URLBuilder
+import io.ktor.http.Url
+import io.ktor.http.headers
+import io.ktor.http.headersOf
+import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -35,7 +46,11 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.Clock
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonArray
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -54,7 +69,7 @@ class EmarsysClientTests {
     private lateinit var mockUrlFactory: UrlFactoryApi
     private lateinit var mockNetworkClient: NetworkClientApi
     private lateinit var json: Json
-    private lateinit var requestContext: RequestContext
+    private lateinit var mockRequestContext: RequestContextApi
     private lateinit var emarsysClient: EmarsysClient
     private val now = Clock.System.now()
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
@@ -66,7 +81,13 @@ class EmarsysClientTests {
         mockUrlFactory = mock()
         mockNetworkClient = mock()
         mockSdkEventDistributor = mock(MockMode.autofill)
-        requestContext = RequestContext(refreshToken = null, deviceEventState = null)
+        mockRequestContext = mock(MockMode.autofill)
+
+        every { mockRequestContext.refreshToken } returns null
+        every { mockRequestContext.contactToken } returns CONTACT_TOKEN
+        every { mockRequestContext.clientState } returns CLIENT_STATE
+        every { mockRequestContext.clientId } returns CLIENT_ID
+
         json = Json
 
         every { mockTimestampProvider.provide() } returns now
@@ -78,7 +99,7 @@ class EmarsysClientTests {
 
         emarsysClient = EmarsysClient(
             mockNetworkClient,
-            requestContext,
+            mockRequestContext,
             mockTimestampProvider,
             mockUrlFactory,
             json,
@@ -94,7 +115,8 @@ class EmarsysClientTests {
 
     @Test
     fun testSend_should_retry_on401_and_try_to_get_refreshToken() = runTest {
-        requestContext.refreshToken = "testRefreshToken"
+        every { mockRequestContext.clientId } returns null
+        every { mockRequestContext.refreshToken } returns "testRefreshToken"
 
         val mockHttpEngine = MockEngine.config {
             addHandler {
@@ -141,7 +163,7 @@ class EmarsysClientTests {
         val networkClient = GenericNetworkClient(httpClient, sdkLogger = mock(MockMode.autofill))
         val emarsysClient = EmarsysClient(
             networkClient,
-            requestContext,
+            mockRequestContext,
             mockTimestampProvider,
             mockUrlFactory,
             json,
@@ -149,7 +171,7 @@ class EmarsysClientTests {
             mockSdkEventDistributor,
         )
 
-        requestContext.clientState = null
+        every { mockRequestContext.clientState } returns null
         val urlString =
             URLBuilder("https://testUrl.com").build()
         val request = UrlRequest(
@@ -179,7 +201,7 @@ class EmarsysClientTests {
 
         response shouldBe expectedResponse
         response.body<TestDataClass>() shouldBe testData
-        requestContext.clientState shouldBe "testClientState"
+        verify { mockRequestContext.clientState = "testClientState" }
     }
 
     @Test
@@ -202,17 +224,13 @@ class EmarsysClientTests {
         val networkClient = GenericNetworkClient(httpClient, sdkLogger = mock(MockMode.autofill))
         val emarsysClient = EmarsysClient(
             networkClient,
-            requestContext,
+            mockRequestContext,
             mockTimestampProvider,
             mockUrlFactory,
             json,
             mock(MockMode.autofill),
             mockSdkEventDistributor,
         )
-
-        requestContext.contactToken = CONTACT_TOKEN
-        requestContext.clientState = CLIENT_STATE
-        requestContext.clientId = CLIENT_ID
 
         val urlString =
             URLBuilder("https://testUrl.com").build()
@@ -299,7 +317,8 @@ class EmarsysClientTests {
                                 )
                             })
                         }
-                    })}.toString()
+                    })
+                }.toString()
             )
 
             emarsysClient.send(UrlRequest(Url("https://testUrl.com"), HttpMethod.Get, null))

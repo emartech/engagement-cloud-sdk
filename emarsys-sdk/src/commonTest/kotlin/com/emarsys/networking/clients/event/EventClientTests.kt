@@ -8,10 +8,10 @@ import com.emarsys.core.exceptions.MissingApplicationCodeException
 import com.emarsys.core.exceptions.RetryLimitReachedException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
+import com.emarsys.core.networking.context.RequestContextApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.providers.UuidProviderApi
-import com.emarsys.core.networking.context.RequestContext
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.mobileengage.action.EventActionFactoryApi
@@ -33,6 +33,7 @@ import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.verify
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.data.forAll
@@ -99,7 +100,7 @@ class EventClientTests {
     private lateinit var mockInAppPresenter: InAppPresenterApi
     private lateinit var mockInAppViewProvider: InAppViewProviderApi
     private lateinit var mockInAppView: InAppViewApi
-    private lateinit var requestContext: RequestContext
+    private lateinit var mockRequestContext: RequestContextApi
     private lateinit var json: Json
     private lateinit var eventClient: EventClient
     private lateinit var mockSdkLogger: Logger
@@ -119,7 +120,8 @@ class EventClientTests {
         mockSdkLogger = mock(MockMode.autofill)
         json = JsonUtil.json
         mockWebViewHolder = mock()
-        requestContext = RequestContext()
+        mockRequestContext = mock(MockMode.autofill)
+        every { mockRequestContext.deviceEventState } returns null
         mockEventsDao = mock(MockMode.autofill)
         onlineEvents = MutableSharedFlow()
         mockSdkEventManager = mock()
@@ -145,7 +147,7 @@ class EventClientTests {
         mockUrlFactory,
         json,
         mockOnEventActionFactory,
-        requestContext,
+        mockRequestContext,
         mockInAppConfigApi,
         mockInAppPresenter,
         mockInAppViewProvider,
@@ -174,7 +176,7 @@ class EventClientTests {
     fun testConsumer_should_call_client_with_correct_request() = runTest {
         createEventClient(backgroundScope).register()
 
-        requestContext.deviceEventState = DEVICE_EVENT_STATE
+        every { mockRequestContext.deviceEventState } returns DEVICE_EVENT_STATE
 
         everySuspend { mockEmarsysClient.send(any(), any()) } returns createTestResponse("{}")
         every { mockUrlFactory.create(EmarsysUrlType.EVENT) } returns TEST_BASE_URL
@@ -201,7 +203,6 @@ class EventClientTests {
         eventClient = createEventClient(backgroundScope)
         eventClient.register()
 
-        requestContext.deviceEventState = null
         val expectedDeviceEventState = buildJsonObject {
             put("key1", "value1")
             put("key2", "value2")
@@ -229,7 +230,7 @@ class EventClientTests {
         verifySuspend { mockEmarsysClient.send(expectedUrlRequest, any()) }
         verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
 
-        requestContext.deviceEventState shouldBe expectedDeviceEventState
+        verify { mockRequestContext.deviceEventState = expectedDeviceEventState }
     }
 
     @Test
@@ -294,7 +295,6 @@ class EventClientTests {
 
     }
 
-    //
     @Test
     fun testConsumer_shouldNotDoAnything_whenResponseStatusCodeIs204() = runTest {
         eventClient = createEventClient(backgroundScope)
@@ -322,8 +322,6 @@ class EventClientTests {
         verifySuspend(VerifyMode.exactly(0)) { mockOnEventActionFactory.create(any()) }
         verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
         verifySuspend { mockEventsDao.removeEvent(testEvent) }
-
-        requestContext.deviceEventState shouldBe null
     }
 
     @Test
@@ -358,8 +356,6 @@ class EventClientTests {
         verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(testEvent1) }
         verifySuspend { mockSdkEventManager.emitEvent(testEvent) }
         verifySuspend { mockSdkEventManager.emitEvent(testEvent1) }
-
-        requestContext.deviceEventState shouldBe null
     }
 
     @Test
@@ -390,8 +386,6 @@ class EventClientTests {
         verifySuspend(VerifyMode.exactly(0)) { mockOnEventActionFactory.create(any()) }
         verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(testEvent) }
         verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(testEvent1) }
-
-        requestContext.deviceEventState shouldBe null
     }
 
     @Test
@@ -444,8 +438,6 @@ class EventClientTests {
                 verifySuspend(VerifyMode.exactly(0)) { mockOnEventActionFactory.create(any()) }
                 verifySuspend { mockEventsDao.removeEvent(testEvent) }
                 verifySuspend { mockEventsDao.removeEvent(testEvent1) }
-
-                requestContext.deviceEventState shouldBe null
             }
         }
     }

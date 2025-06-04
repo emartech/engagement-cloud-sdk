@@ -1,12 +1,12 @@
 package com.emarsys.enable.states
 
 import com.emarsys.core.device.DeviceInfoCollectorApi
-import com.emarsys.core.networking.context.RequestContext
+import com.emarsys.core.networking.context.RequestContextApi
 import com.emarsys.core.state.State
 
 internal class CollectDeviceInfoState(
     private val deviceInfoCollector: DeviceInfoCollectorApi,
-    private val requestContext: RequestContext,
+    private val requestContext: RequestContextApi,
 ) : State {
     override val name: String = "collectDeviceInfoState"
     override fun prepare() {}

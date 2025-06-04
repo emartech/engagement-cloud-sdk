@@ -19,6 +19,8 @@ import com.emarsys.core.log.RemoteLoggerApi
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.networking.UserAgentProvider
 import com.emarsys.core.networking.UserAgentProviderApi
+import com.emarsys.core.networking.context.RequestContext
+import com.emarsys.core.networking.context.RequestContextApi
 import com.emarsys.core.providers.DoubleProvider
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.RandomProvider
@@ -27,7 +29,6 @@ import com.emarsys.core.providers.TimezoneProvider
 import com.emarsys.core.providers.TimezoneProviderApi
 import com.emarsys.core.providers.UUIDProvider
 import com.emarsys.core.providers.UuidProviderApi
-import com.emarsys.core.networking.context.RequestContext
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.storage.Storage
 import com.emarsys.core.storage.StorageApi
@@ -155,7 +156,7 @@ object CoreInjection {
                 sdkLogger = get<Logger> { parametersOf(EventActionFactory::class.simpleName) },
             )
         }
-        single<RequestContext> { RequestContext() }
+        single<RequestContextApi> { RequestContext() }
         single<SessionContext> { SessionContext() }
         singleOf(::UrlFactory) { bind<UrlFactoryApi>() }
         single<CryptoApi> {

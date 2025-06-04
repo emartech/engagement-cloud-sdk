@@ -9,9 +9,9 @@ import com.emarsys.core.exceptions.MissingApplicationCodeException
 import com.emarsys.core.exceptions.RetryLimitReachedException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
+import com.emarsys.core.networking.context.RequestContextApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
-import com.emarsys.core.networking.context.RequestContext
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.networking.clients.contact.ContactTokenHandlerApi
@@ -71,7 +71,7 @@ class ConfigClientTests {
     private lateinit var mockSdkContext: SdkContextApi
     private lateinit var mockSdkLogger: Logger
     private lateinit var mockConfig: SdkConfig
-    private lateinit var requestContext: RequestContext
+    private lateinit var mockRequestContext: RequestContextApi
     private lateinit var json: Json
     private lateinit var onlineEvents: MutableSharedFlow<OnlineSdkEvent>
     private lateinit var mockSdkEventManager: SdkEventManagerApi
@@ -86,7 +86,8 @@ class ConfigClientTests {
         mockSdkContext = mock()
         mockSdkLogger = mock(MockMode.autofill)
         mockConfig = mock()
-        requestContext = RequestContext(refreshToken = "testRefreshToken")
+        mockRequestContext = mock(MockMode.autofill)
+        every { mockRequestContext.refreshToken } returns "testRefreshToken"
         json = JsonUtil.json
         mockEventsDao = mock()
         onlineEvents = spy(MutableSharedFlow())
@@ -112,7 +113,7 @@ class ConfigClientTests {
             mockEmarsysClient,
             mockUrlFactory,
             mockSdkEventManager,
-            requestContext,
+            mockRequestContext,
             mockSdkContext,
             mockContactTokenHandler,
             mockEventsDao,

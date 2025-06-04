@@ -18,7 +18,7 @@ import com.emarsys.enable.states.RegisterPushTokenState
 import com.emarsys.enable.states.RestoreSavedSdkEventsState
 import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.reregistration.ReregistrationClient
-import com.emarsys.reregistration.states.ClearSessionContextState
+import com.emarsys.reregistration.states.ClearRequestContextTokensState
 import com.emarsys.reregistration.states.LinkContactState
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
@@ -60,10 +60,10 @@ object SetupInjection {
                 uuidProvider = get()
             )
         }
-        single<State>(named(StateTypes.ClearSessionContext)) {
-            ClearSessionContextState(
+        single<State>(named(StateTypes.ClearRequestContextTokens)) {
+            ClearRequestContextTokensState(
                 requestContext = get(),
-                sdkLogger = get { parametersOf(ClearSessionContextState::class.simpleName) }
+                sdkLogger = get { parametersOf(ClearRequestContextTokensState::class.simpleName) }
             )
         }
         single<State>(named(StateTypes.LinkContact)) {
@@ -108,7 +108,7 @@ object SetupInjection {
         single<StateMachineApi>(named(StateMachineTypes.MobileEngageReregistration)) {
             StateMachine(
                 states = listOf(
-                    get<State>(named(StateTypes.ClearSessionContext)),
+                    get<State>(named(StateTypes.ClearRequestContextTokens)),
                     get<State>(named(StateTypes.RegisterClient)),
                     get<State>(named(StateTypes.ApplyAppCodeBasedRemoteConfig)),
                     get<State>(named(StateTypes.RegisterPushToken)),
@@ -119,7 +119,7 @@ object SetupInjection {
         single<StateMachineApi>(named(StateMachineTypes.PredictOnlyReregistration)) {
             StateMachine(
                 states = listOf(
-                    get<State>(named(StateTypes.ClearSessionContext)),
+                    get<State>(named(StateTypes.ClearRequestContextTokens)),
                     get<State>(named(StateTypes.LinkContact))
                 )
             )
@@ -182,7 +182,7 @@ enum class StateTypes {
     RegisterPushToken,
     AppStart,
     RestoreSavedSdkEvents,
-    ClearSessionContext,
+    ClearRequestContextTokens,
     LinkContact,
     ClearStoredConfig,
     ClearEvents,
