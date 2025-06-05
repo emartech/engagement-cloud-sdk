@@ -12,7 +12,7 @@ import com.emarsys.api.event.LoggingEventTracker
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.collections.PersistentList
 import com.emarsys.mobileengage.session.EmarsysSdkSession
-import com.emarsys.mobileengage.session.Session
+import com.emarsys.mobileengage.session.SessionApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.tracking.Tracking
 import com.emarsys.tracking.TrackingApi
@@ -67,7 +67,7 @@ object EventInjection {
                 sdkContext = get()
             )
         }
-        single<Session> {
+        single<SessionApi> {
             EmarsysSdkSession(
                 timestampProvider = get(),
                 uuidProvider = get(),

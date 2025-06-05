@@ -28,7 +28,7 @@ internal class EmarsysSdkSession(
     private val sdkEventDistributor: SdkEventDistributorApi,
     private val sdkDispatcher: CoroutineDispatcher,
     private val sdkLogger: Logger
-) : Session {
+) : SessionApi {
 
     override suspend fun subscribe(lifecycleWatchDog: LifecycleWatchDog) {
         CoroutineScope(sdkDispatcher).launch(

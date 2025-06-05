@@ -1,7 +1,7 @@
 package com.emarsys.init.states
 
 import com.emarsys.core.log.SdkLogger
-import com.emarsys.mobileengage.session.Session
+import com.emarsys.mobileengage.session.SessionApi
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -15,7 +15,7 @@ import kotlin.test.Test
 
 class SessionSubscriptionStateTests {
     private lateinit var sessionSubscriptionState: SessionSubscriptionState
-    private lateinit var mockMobileEngageSession: Session
+    private lateinit var mockMobileEngageSession: SessionApi
     private lateinit var mockLifecycleWatchDog: LifecycleWatchDog
 
     @BeforeTest

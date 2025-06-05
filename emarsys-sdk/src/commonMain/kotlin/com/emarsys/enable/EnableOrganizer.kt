@@ -7,12 +7,14 @@ import com.emarsys.core.exceptions.SdkAlreadyEnabledException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.state.StateMachineApi
 import com.emarsys.enable.config.SdkConfigStoreApi
+import com.emarsys.mobileengage.session.SessionApi
 
 internal class EnableOrganizer(
     override val meStateMachine: StateMachineApi,
     override val predictStateMachine: StateMachineApi,
     override val sdkContext: SdkContextApi,
     private val sdkConfigStore: SdkConfigStoreApi<SdkConfig>,
+    private val emarsysSdkSession: SessionApi,
     private val sdkLogger: Logger
 ) : EnableOrganizerApi {
 
@@ -34,6 +36,7 @@ internal class EnableOrganizer(
             meStateMachine.activate()
         }
         sdkContext.setSdkState(SdkState.active)
+        emarsysSdkSession.startSession()
         sdkLogger.debug("SDK Setup Completed")
     }
 }

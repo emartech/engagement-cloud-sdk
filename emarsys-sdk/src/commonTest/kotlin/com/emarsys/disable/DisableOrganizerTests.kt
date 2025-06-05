@@ -4,6 +4,7 @@ import com.emarsys.api.SdkState
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.state.StateMachineApi
+import com.emarsys.mobileengage.session.SessionApi
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -18,6 +19,7 @@ class DisableOrganizerTests {
     private lateinit var disableOrganizer: DisableOrganizer
     private lateinit var mockMEStateMachine: StateMachineApi
     private lateinit var mockPredictStateMachine: StateMachineApi
+    private lateinit var mockSession: SessionApi
     private lateinit var mockSdkContext: SdkContextApi
     private lateinit var mockSdkLogger: Logger
 
@@ -25,6 +27,7 @@ class DisableOrganizerTests {
     fun setup() {
         mockMEStateMachine = mock(MockMode.autofill)
         mockPredictStateMachine = mock(MockMode.autofill)
+        mockSession = mock(MockMode.autofill)
         mockSdkContext = mock(MockMode.autofill)
         mockSdkLogger = mock(MockMode.autofill)
 
@@ -32,6 +35,7 @@ class DisableOrganizerTests {
             mobileEngageDisableStateMachine = mockMEStateMachine,
             predictDisableStateMachine = mockPredictStateMachine,
             sdkContext = mockSdkContext,
+            mockSession,
             sdkLogger = mockSdkLogger
         )
     }
@@ -44,6 +48,7 @@ class DisableOrganizerTests {
 
         verifySuspend { mockSdkContext.setSdkState(SdkState.inactive) }
         verifySuspend { mockMEStateMachine.activate() }
+        verifySuspend { mockSession.endSession() }
     }
 
     @Test
@@ -54,5 +59,6 @@ class DisableOrganizerTests {
 
         verifySuspend { mockSdkContext.setSdkState(SdkState.inactive) }
         verifySuspend { mockPredictStateMachine.activate() }
+        verifySuspend { mockSession.endSession() }
     }
 }

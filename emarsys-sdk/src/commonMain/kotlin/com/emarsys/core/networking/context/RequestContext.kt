@@ -16,10 +16,7 @@ internal class RequestContext(): RequestContextApi {
         serializer = String.serializer()
     )
 
-    override var clientId: String? by Store(
-        key = "clientId",
-        serializer = String.serializer()
-    )
+    override var clientId: String? = null
 
     override var clientState: String? by Store(
         key = "clientState",

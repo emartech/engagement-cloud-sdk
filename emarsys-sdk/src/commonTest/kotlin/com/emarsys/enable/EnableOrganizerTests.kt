@@ -14,6 +14,7 @@ import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.enable.config.SdkConfigStoreApi
 import com.emarsys.fake.FakeStringStorage
+import com.emarsys.mobileengage.session.SessionApi
 import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -49,6 +50,7 @@ class EnableOrganizerTests: KoinTest {
     private lateinit var mockMeStateMachine: StateMachineApi
     private lateinit var mockPredictStateMachine: StateMachineApi
     private lateinit var mockSdkConfigLoader: SdkConfigStoreApi<SdkConfig>
+    private lateinit var mockSession: SessionApi
     private lateinit var sdkContext: SdkContextApi
     private lateinit var setupOrganizer: EnableOrganizerApi
 
@@ -65,6 +67,7 @@ class EnableOrganizerTests: KoinTest {
         mockMeStateMachine = mock(MockMode.autofill)
         mockPredictStateMachine = mock(MockMode.autofill)
         mockSdkConfigLoader = mock(MockMode.autoUnit)
+        mockSession = mock(MockMode.autoUnit)
         everySuspend { mockSdkConfigLoader.load() } returns null
         sdkContext = SdkContext(
             StandardTestDispatcher(),
@@ -79,6 +82,7 @@ class EnableOrganizerTests: KoinTest {
             mockPredictStateMachine,
             sdkContext,
             mockSdkConfigLoader,
+            mockSession,
             SdkLogger("TestLoggerName", mock(MockMode.autofill), sdkContext = mock())
         )
     }
@@ -101,6 +105,7 @@ class EnableOrganizerTests: KoinTest {
             }
             sdkContext.config shouldBe config
             sdkContext.currentSdkState.value shouldBe SdkState.active
+            verifySuspend { mockSession.startSession() }
         }
 
     @Test
