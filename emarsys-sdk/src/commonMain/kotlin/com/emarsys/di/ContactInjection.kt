@@ -33,6 +33,7 @@ object ContactInjection {
                 urlFactory = get(),
                 sdkContext = get(),
                 contactTokenHandler = get(),
+                emarsysSdkSession = get(),
                 eventsDao = get(),
                 json = get(),
                 sdkLogger = get { parametersOf(ContactClient::class.simpleName) },

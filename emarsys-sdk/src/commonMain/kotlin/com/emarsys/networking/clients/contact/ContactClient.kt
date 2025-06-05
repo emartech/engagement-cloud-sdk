@@ -11,6 +11,7 @@ import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
+import com.emarsys.mobileengage.session.SessionApi
 import com.emarsys.networking.EmarsysHeaders
 import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.event.model.OnlineSdkEvent
@@ -30,6 +31,7 @@ internal class ContactClient(
     private val urlFactory: UrlFactoryApi,
     private val sdkContext: SdkContextApi,
     private val contactTokenHandler: ContactTokenHandlerApi,
+    private val emarsysSdkSession: SessionApi,
     private val eventsDao: EventsDaoApi,
     private val json: Json,
     private val sdkLogger: Logger,
@@ -58,9 +60,7 @@ internal class ContactClient(
                         contactTokenHandler.handleContactTokens(response)
                     }
 
-                    setContactFields(it)
-
-                    it.ack(eventsDao, sdkLogger)
+                    handleSuccess(it)
                 } catch (exception: Exception) {
                     when (exception) {
                         is FailedRequestException, is RetryLimitReachedException, is MissingApplicationCodeException -> it.ack(
@@ -74,23 +74,28 @@ internal class ContactClient(
             }
     }
 
-    private fun setContactFields(event: SdkEvent) {
+    private suspend fun handleSuccess(event: OnlineSdkEvent) {
         when (event) {
             is SdkEvent.Internal.Sdk.LinkContact -> {
                 sdkContext.contactFieldId = event.contactFieldId
                 sdkContext.contactFieldValue = event.contactFieldValue
+                emarsysSdkSession.startSession()
             }
             is SdkEvent.Internal.Sdk.LinkAuthenticatedContact -> {
                 sdkContext.contactFieldId = event.contactFieldId
                 sdkContext.openIdToken = event.openIdToken
+                emarsysSdkSession.startSession()
             }
             is SdkEvent.Internal.Sdk.UnlinkContact -> {
                 sdkContext.contactFieldId = null
                 sdkContext.contactFieldValue = null
                 sdkContext.openIdToken = null
+                emarsysSdkSession.endSession()
             }
             else -> {}
         }
+
+        event.ack(eventsDao, sdkLogger)
     }
 
     private fun isContactEvent(event: OnlineSdkEvent): Boolean {
