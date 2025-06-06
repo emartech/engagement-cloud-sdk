@@ -1,5 +1,7 @@
 package com.emarsys.api.config
 
+import com.emarsys.config.ApplicationCode
+import com.emarsys.config.validate
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.language.LanguageHandlerApi
 import com.emarsys.core.log.Logger
@@ -16,12 +18,13 @@ internal class ConfigInternal(
 ) : ConfigInstance {
 
     override suspend fun changeApplicationCode(applicationCode: String) {
-        sdkLogger.debug("ConfigInternal - changeApplicationCode")
+        val appCode = ApplicationCode(applicationCode.uppercase())
+        appCode.validate(sdkLogger)
         sdkEventDistributor.registerEvent(
             SdkEvent.Internal.Sdk.ChangeAppCode(
                 id = uuidProvider.provide(),
                 timestamp = timestampProvider.provide(),
-                applicationCode = applicationCode
+                applicationCode = appCode.value
             )
         )
     }

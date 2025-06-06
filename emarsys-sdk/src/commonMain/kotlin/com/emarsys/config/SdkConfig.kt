@@ -1,4 +1,4 @@
-package com.emarsys
+package com.emarsys.config
 
 import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport

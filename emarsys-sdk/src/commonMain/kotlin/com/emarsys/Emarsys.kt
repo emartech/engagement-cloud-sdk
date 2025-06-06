@@ -8,8 +8,11 @@ import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.inbox.InboxApi
 import com.emarsys.api.predict.PredictApi
 import com.emarsys.api.push.PushApi
+import com.emarsys.config.SdkConfig
+import com.emarsys.config.isValid
 import com.emarsys.core.exceptions.SdkAlreadyDisabledException
 import com.emarsys.core.exceptions.SdkAlreadyEnabledException
+import com.emarsys.core.log.Logger
 import com.emarsys.di.EventFlowTypes
 import com.emarsys.di.SdkKoinIsolationContext
 import com.emarsys.di.SdkKoinIsolationContext.koin
@@ -19,6 +22,7 @@ import com.emarsys.init.InitOrganizerApi
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.tracking.TrackingApi
 import kotlinx.coroutines.flow.Flow
+import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import kotlin.experimental.ExperimentalObjCRefinement
 import kotlin.native.HiddenFromObjC
@@ -33,7 +37,8 @@ object Emarsys {
     }
 
     suspend fun enableTracking(config: SdkConfig): Result<Unit> {
-        config.isValid()
+        val logger = koin.get<Logger> { parametersOf(Emarsys::class.simpleName) }
+        config.isValid(logger)
         try {
             koin.get<EnableOrganizerApi>().enableWithValidation(config)
             return Result.success(Unit)

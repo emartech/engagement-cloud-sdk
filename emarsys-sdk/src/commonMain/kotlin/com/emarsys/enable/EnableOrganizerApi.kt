@@ -1,6 +1,6 @@
 package com.emarsys.enable
 
-import com.emarsys.SdkConfig
+import com.emarsys.config.SdkConfig
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.state.StateMachineApi
 

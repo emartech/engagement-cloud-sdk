@@ -1,7 +1,7 @@
 package com.emarsys.core.device
 
-import com.emarsys.SdkConfig
 import com.emarsys.SdkConstants
+import com.emarsys.config.SdkConfig
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.providers.ApplicationVersionProviderApi
 import com.emarsys.core.providers.LanguageProviderApi

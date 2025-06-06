@@ -8,6 +8,7 @@ import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.inbox.InboxApi
 import com.emarsys.api.predict.PredictApi
 import com.emarsys.api.push.PushApi
+import com.emarsys.config.SdkConfig
 import com.emarsys.core.exceptions.SdkAlreadyEnabledException
 import com.emarsys.di.EventFlowTypes
 import com.emarsys.di.SdkKoinIsolationContext.koin

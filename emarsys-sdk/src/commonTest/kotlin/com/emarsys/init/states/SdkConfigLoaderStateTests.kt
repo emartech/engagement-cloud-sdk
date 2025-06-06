@@ -1,7 +1,7 @@
 package com.emarsys.init.states
 
-import com.emarsys.SdkConfig
 import com.emarsys.TestEmarsysConfig
+import com.emarsys.config.SdkConfig
 import com.emarsys.enable.EnableOrganizerApi
 import com.emarsys.enable.config.SdkConfigStoreApi
 import dev.mokkery.MockMode

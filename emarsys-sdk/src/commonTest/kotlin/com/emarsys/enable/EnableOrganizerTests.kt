@@ -1,8 +1,8 @@
 package com.emarsys.enable
 
-import com.emarsys.SdkConfig
 import com.emarsys.TestEmarsysConfig
 import com.emarsys.api.SdkState
+import com.emarsys.config.SdkConfig
 import com.emarsys.context.DefaultUrls
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi

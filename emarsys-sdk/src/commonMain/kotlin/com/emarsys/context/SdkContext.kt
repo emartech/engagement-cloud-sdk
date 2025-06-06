@@ -1,7 +1,7 @@
 package com.emarsys.context
 
-import com.emarsys.SdkConfig
 import com.emarsys.api.SdkState
+import com.emarsys.config.SdkConfig
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.storage.Store
 import kotlinx.coroutines.CoroutineDispatcher

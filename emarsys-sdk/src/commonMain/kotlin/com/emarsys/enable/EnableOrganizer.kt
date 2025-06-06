@@ -1,7 +1,7 @@
 package com.emarsys.enable
 
-import com.emarsys.SdkConfig
 import com.emarsys.api.SdkState
+import com.emarsys.config.SdkConfig
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.exceptions.SdkAlreadyEnabledException
 import com.emarsys.core.log.Logger

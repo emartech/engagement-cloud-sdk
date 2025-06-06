@@ -1,5 +1,6 @@
 package com.emarsys
 
+import com.emarsys.config.SdkConfig
 import com.emarsys.util.JsonUtil
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable

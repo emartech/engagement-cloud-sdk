@@ -1,4 +1,4 @@
-import com.emarsys.SdkConfig
+import com.emarsys.config.SdkConfig
 import kotlinx.serialization.Serializable
 
 

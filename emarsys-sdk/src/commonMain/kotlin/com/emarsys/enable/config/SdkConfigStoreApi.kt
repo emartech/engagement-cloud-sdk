@@ -1,6 +1,6 @@
 package com.emarsys.enable.config
 
-import com.emarsys.SdkConfig
+import com.emarsys.config.SdkConfig
 import com.emarsys.core.storage.StorageConstants
 import com.emarsys.core.storage.TypedStorageApi
 import kotlinx.serialization.KSerializer

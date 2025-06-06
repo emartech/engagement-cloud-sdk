@@ -1,6 +1,6 @@
 package com.emarsys.networking.clients.config
 
-import com.emarsys.SdkConfig
+import com.emarsys.config.SdkConfig
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi

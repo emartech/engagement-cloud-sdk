@@ -1,5 +1,6 @@
 package com.emarsys
 
+import com.emarsys.config.SdkConfig
 import kotlinx.serialization.Serializable
 
 @Serializable

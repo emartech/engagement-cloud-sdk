@@ -1,9 +1,7 @@
 package com.emarsys.disable.states
 
-import com.emarsys.SdkConfig
-import com.emarsys.core.db.events.EventsDaoApi
+import com.emarsys.config.SdkConfig
 import com.emarsys.core.log.Logger
-import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.state.State
 import com.emarsys.enable.config.SdkConfigStoreApi
 
