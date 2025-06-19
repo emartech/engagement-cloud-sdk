@@ -184,6 +184,21 @@ sqldelight {
     }
 }
 
+tasks.withType<app.cash.sqldelight.gradle.SqlDelightTask>().configureEach {
+    doLast("workaround https://github.com/sqldelight/sqldelight/issues/1333") {
+        outputDirectory.get().asFile.walk()
+            .filter { it.isFile && it.extension == "kt" }
+            .forEach { file ->
+                file.writeText(
+                    file.readText()
+                        .replace("public data class Events", "internal data class Events")
+                        .replace("public interface EmarsysDB", "internal interface EmarsysDB")
+                        .replace("public class EventsQueries", "internal class EventsQueries")
+                )
+            }
+    }
+}
+
 skie {
     features {
         group {
