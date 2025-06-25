@@ -4,7 +4,6 @@ import com.emarsys.core.db.EmarsysIndexedDbObjectStoreApi
 import com.emarsys.core.log.Logger
 import com.emarsys.networking.clients.event.model.SdkEvent
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
@@ -16,6 +15,15 @@ internal class JSEventsDao(
     override suspend fun insertEvent(event: SdkEvent) {
         logger.debug(
             "insertEvent",
+            buildJsonObject { put("event", event.toString()) },
+            isRemoteLog = event !is SdkEvent.Internal.LogEvent
+        )
+        emarsysIndexedDbObjectStore.put(event.id, event)
+    }
+
+    override suspend fun upsertEvent(event: SdkEvent) {
+        logger.debug(
+            "upsertEvent",
             buildJsonObject { put("event", event.toString()) },
             isRemoteLog = event !is SdkEvent.Internal.LogEvent
         )

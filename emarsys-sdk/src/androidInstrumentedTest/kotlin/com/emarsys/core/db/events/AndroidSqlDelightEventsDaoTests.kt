@@ -2,6 +2,7 @@ package com.emarsys.core.db.events
 
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import com.emarsys.applicationContext
+import com.emarsys.networking.clients.event.model.OnlineSdkEvent
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.sqldelight.EmarsysDB
 import com.emarsys.util.JsonUtil
@@ -60,6 +61,28 @@ class AndroidSqlDelightEventsDaoTests {
         advanceUntilIdle()
 
         result shouldBe event
+    }
+
+    @Test
+    fun testUpsertEvent() = runTest {
+        val event = SdkEvent.External.Custom(
+            type = "custom",
+            id = "testId",
+            name = "test",
+            attributes = ATTRIBUTES,
+            timestamp = TIMESTAMP,
+            nackCount = 3
+        )
+
+        eventsDao.insertEvent(event)
+
+        eventsDao.upsertEvent(event.copy(nackCount = 4))
+
+        val result = eventsDao.getEvents().firstOrNull()
+
+        advanceUntilIdle()
+
+        (result as OnlineSdkEvent).nackCount shouldBe 4
     }
 
     @Test

@@ -8,7 +8,6 @@ import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
@@ -26,6 +25,15 @@ class JSEventsDaoTest {
 
     @Test
     fun insertEvent_shouldCallPut_onObjectStore_withCorrectParams() = runTest {
+        val testEvent = SdkEvent.External.Custom("custom", "testId", "testName")
+
+        jsEventsDao.insertEvent(testEvent)
+
+        verifySuspend { mockEmarsysIndexedDbObjectStore.put(testEvent.id, testEvent) }
+    }
+
+    @Test
+    fun upsertEvent_shouldCallPut_onObjectStore_withCorrectParams() = runTest {
         val testEvent = SdkEvent.External.Custom("custom", "testId", "testName")
 
         jsEventsDao.insertEvent(testEvent)

@@ -5,12 +5,14 @@ import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
 import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.networking.clients.event.model.ack
+import com.emarsys.networking.clients.event.model.nack
 import dev.mokkery.MockMode
 import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
+import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -79,4 +81,56 @@ class EventTests {
         }
     }
 
+    @Test
+    fun nack_shouldIncrementNackCount_andUpsertIntoDb_whenNackCountIsUnderThreshold() = runTest {
+        val onlineSdkEvent = SdkEvent.Internal.Sdk.AppStart(nackCount = 1)
+
+        onlineSdkEvent.nack(mockEventsDao, mockSdkLogger)
+
+        onlineSdkEvent.nackCount shouldBe 2
+
+        verifySuspend {
+            mockEventsDao.upsertEvent(onlineSdkEvent)
+        }
+    }
+
+    @Test
+    fun nack_shouldRemoveFromDb_whenNackCountReachesThreshold() = runTest {
+        val onlineSdkEvent = SdkEvent.Internal.Sdk.AppStart(nackCount = 2)
+
+        onlineSdkEvent.nack(mockEventsDao, mockSdkLogger)
+
+        onlineSdkEvent.nackCount shouldBe 3
+
+        verifySuspend {
+            mockEventsDao.removeEvent(onlineSdkEvent)
+        }
+    }
+
+    @Test
+    fun nack_shouldLogError_whenDbOperationFails() = runTest {
+        val onlineSdkEvent = SdkEvent.Internal.Sdk.AppStart(nackCount = 2)
+        everySuspend { mockEventsDao.removeEvent(onlineSdkEvent) } throws Exception("Error removing element from db")
+
+        onlineSdkEvent.nack(mockEventsDao, mockSdkLogger)
+
+        verifySuspend {
+            mockEventsDao.removeEvent(onlineSdkEvent)
+            mockSdkLogger.error(any(), any<Exception>(), any(), true)
+        }
+    }
+
+    @Test
+    fun nack_onList_shouldNackAllEvents() = runTest {
+        val onlineSdkEvent1 = SdkEvent.Internal.Sdk.AppStart()
+        val onlineSdkEvent2 = SdkEvent.Internal.Sdk.AppStart()
+        val eventsList = listOf(onlineSdkEvent1, onlineSdkEvent2)
+
+        eventsList.nack(mockEventsDao, mockSdkLogger)
+
+        verifySuspend {
+            mockEventsDao.upsertEvent(onlineSdkEvent1)
+            mockEventsDao.upsertEvent(onlineSdkEvent2)
+        }
+    }
 }

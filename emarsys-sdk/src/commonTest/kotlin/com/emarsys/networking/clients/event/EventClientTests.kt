@@ -183,7 +183,7 @@ class EventClientTests {
         val expectedUrlRequest = UrlRequest(
             TEST_BASE_URL,
             HttpMethod.Post,
-            """{"dnd":$IN_APP_DND,"events":[{"fullClassName":"com.emarsys.networking.clients.event.model.SdkEvent.External.Custom","type":"custom","id":"$UUID","name":"${testEvent.name}","attributes":{"key":"value"},"timestamp":"$TIMESTAMP"}],"deviceEventState":{"key":"value"}}""",
+            """{"dnd":$IN_APP_DND,"events":[{"fullClassName":"com.emarsys.networking.clients.event.model.SdkEvent.External.Custom","type":"custom","id":"$UUID","name":"${testEvent.name}","attributes":{"key":"value"},"timestamp":"$TIMESTAMP","nackCount":0}],"deviceEventState":{"key":"value"}}""",
         )
         val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
             onlineEvents.take(1).toList()
@@ -447,7 +447,7 @@ class EventClientTests {
         val expectedUrlRequest = UrlRequest(
             TEST_BASE_URL,
             HttpMethod.Post,
-            """{"dnd":$IN_APP_DND,"events":[{"fullClassName":"com.emarsys.networking.clients.event.model.SdkEvent.External.Custom","type":"custom","id":"$UUID","name":"${testEvent.name}","attributes":{"key":"value"},"timestamp":"$TIMESTAMP"}]}""",
+            """{"dnd":$IN_APP_DND,"events":[{"fullClassName":"com.emarsys.networking.clients.event.model.SdkEvent.External.Custom","type":"custom","id":"$UUID","name":"${testEvent.name}","attributes":{"key":"value"},"timestamp":"$TIMESTAMP","nackCount":0}]}""",
         )
         return expectedUrlRequest
     }

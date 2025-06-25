@@ -20,6 +20,17 @@ internal abstract class AbstractSqlDelightEventsDao(db: EmarsysDB, private val j
         )
     }
 
+    override suspend fun upsertEvent(event: SdkEvent) {
+        queries.upsertEvent(
+            id = event.id,
+            type = event.type,
+            name = event.name,
+            timestamp = event.timestamp.toEpochMilliseconds(),
+            attributes = event.attributes.toString(),
+            json = json.encodeToString(event)
+        )
+    }
+
     override suspend fun getEvents(): Flow<SdkEvent> {
         return queries.selectAll()
             .executeAsList()
