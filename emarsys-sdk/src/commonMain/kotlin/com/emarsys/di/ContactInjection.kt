@@ -29,6 +29,7 @@ object ContactInjection {
         single<EventBasedClientApi>(named(EventBasedClientTypes.Contact)) {
             ContactClient(
                 emarsysClient = get(named(NetworkClientTypes.Emarsys)),
+                clientExceptionHandler = get(),
                 sdkEventManager = get(),
                 urlFactory = get(),
                 sdkContext = get(),
@@ -37,7 +38,7 @@ object ContactInjection {
                 eventsDao = get(),
                 json = get(),
                 sdkLogger = get { parametersOf(ContactClient::class.simpleName) },
-                sdkDispatcher = get(named(DispatcherTypes.Sdk))
+                sdkDispatcher = get(named(DispatcherTypes.Sdk)),
             )
         }
         single<MutableList<ContactCall>>(named(PersistentListTypes.ContactCall)) {

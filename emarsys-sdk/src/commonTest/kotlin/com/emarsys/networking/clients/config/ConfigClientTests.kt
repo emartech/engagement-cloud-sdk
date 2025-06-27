@@ -4,9 +4,6 @@ import com.emarsys.config.SdkConfig
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
-import com.emarsys.core.exceptions.FailedRequestException
-import com.emarsys.core.exceptions.MissingApplicationCodeException
-import com.emarsys.core.exceptions.RetryLimitReachedException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.context.RequestContextApi
@@ -33,10 +30,6 @@ import dev.mokkery.spy
 import dev.mokkery.verify
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
-import io.kotest.data.forAll
-import io.kotest.data.headers
-import io.kotest.data.row
-import io.kotest.data.table
 import io.kotest.matchers.shouldBe
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
@@ -231,55 +224,38 @@ class ConfigClientTests {
     }
 
     @Test
-    fun testConsumer_should_call_clientExceptionHandler_when_exception_happens() = forAll(
-        table(
-            headers("exception"),
-            listOf(
-                row(
-                    FailedRequestException(
-                        createTestResponse(
-                            statusCode = HttpStatusCode.BadRequest
-                        )
-                    )
-                ),
-                row(RetryLimitReachedException("Retry limit reached")),
-                row(
-                    MissingApplicationCodeException("Missing app code")
-                ),
+    fun testConsumer_should_call_clientExceptionHandler_when_exception_happens() = runTest {
+        configClient = createConfigClient(backgroundScope)
+        configClient.register()
+
+        val testException = Exception("Test Exception")
+
+        every {
+            mockUrlFactory.create(
+                EmarsysUrlType.REFRESH_TOKEN
             )
+        } throws testException
+        val changeMerchantId = SdkEvent.Internal.Sdk.ChangeMerchantId(
+            id = "changeMerchantId",
+            merchantId = "newMerchantId"
         )
-    ) { testException ->
-        runTest {
-            configClient = createConfigClient(backgroundScope)
-            configClient.register()
 
-            every {
-                mockUrlFactory.create(
-                    EmarsysUrlType.REFRESH_TOKEN
-                )
-            } throws testException
-            val changeMerchantId = SdkEvent.Internal.Sdk.ChangeMerchantId(
-                id = "changeMerchantId",
-                merchantId = "newMerchantId"
+        val onlineSdkEvents = backgroundScope.async {
+            onlineEvents.take(1).toList()
+        }
+
+        onlineEvents.emit(changeMerchantId)
+
+        advanceUntilIdle()
+
+        onlineSdkEvents.await() shouldBe listOf(changeMerchantId)
+        verifySuspend(VerifyMode.exactly(0)) { mockEmarsysClient.send(any(), any()) }
+        verifySuspend {
+            mockClientExceptionHandler.handleException(
+                testException,
+                "ConfigClient - consumeConfigChanges",
+                changeMerchantId
             )
-
-            val onlineSdkEvents = backgroundScope.async {
-                onlineEvents.take(1).toList()
-            }
-
-            onlineEvents.emit(changeMerchantId)
-
-            advanceUntilIdle()
-
-            onlineSdkEvents.await() shouldBe listOf(changeMerchantId)
-            verifySuspend(VerifyMode.exactly(0)) { mockEmarsysClient.send(any(), any()) }
-            verifySuspend {
-                mockClientExceptionHandler.handleException(
-                    testException,
-                    "ConfigClient - consumeConfigChanges",
-                    changeMerchantId
-                )
-            }
         }
     }
 

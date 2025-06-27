@@ -3,9 +3,6 @@ package com.emarsys.networking.clients.contact
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
-import com.emarsys.core.exceptions.FailedRequestException
-import com.emarsys.core.exceptions.MissingApplicationCodeException
-import com.emarsys.core.exceptions.RetryLimitReachedException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.UrlRequest
@@ -16,6 +13,7 @@ import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.session.SessionApi
 import com.emarsys.networking.EmarsysHeaders
 import com.emarsys.networking.clients.EventBasedClientApi
+import com.emarsys.networking.clients.error.ClientExceptionHandler
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineDispatcher
@@ -27,6 +25,7 @@ import kotlinx.serialization.json.Json
 
 internal class ContactClient(
     private val emarsysClient: NetworkClientApi,
+    private val clientExceptionHandler: ClientExceptionHandler,
     private val sdkEventManager: SdkEventManagerApi,
     private val urlFactory: UrlFactoryApi,
     private val sdkContext: SdkContextApi,
@@ -62,14 +61,11 @@ internal class ContactClient(
 
                     handleSuccess(it)
                 } catch (exception: Exception) {
-                    when (exception) {
-                        is FailedRequestException, is RetryLimitReachedException, is MissingApplicationCodeException -> it.ack(
-                            eventsDao,
-                            sdkLogger
-                        )
-
-                        else -> sdkLogger.error("ContactClient - consumeContactChanges", exception)
-                    }
+                    clientExceptionHandler.handleException(
+                        exception,
+                        "ContactClient - consumeContactChanges",
+                        it
+                    )
                 }
             }
     }
@@ -81,17 +77,20 @@ internal class ContactClient(
                 sdkContext.contactFieldValue = event.contactFieldValue
                 emarsysSdkSession.startSession()
             }
+
             is SdkEvent.Internal.Sdk.LinkAuthenticatedContact -> {
                 sdkContext.contactFieldId = event.contactFieldId
                 sdkContext.openIdToken = event.openIdToken
                 emarsysSdkSession.startSession()
             }
+
             is SdkEvent.Internal.Sdk.UnlinkContact -> {
                 sdkContext.contactFieldId = null
                 sdkContext.contactFieldValue = null
                 sdkContext.openIdToken = null
                 emarsysSdkSession.endSession()
             }
+
             else -> {}
         }
 

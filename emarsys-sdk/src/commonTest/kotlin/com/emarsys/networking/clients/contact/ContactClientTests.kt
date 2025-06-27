@@ -4,8 +4,6 @@ import com.emarsys.config.SdkConfig
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
-import com.emarsys.core.exceptions.FailedRequestException
-import com.emarsys.core.exceptions.RetryLimitReachedException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.context.RequestContextApi
@@ -16,6 +14,7 @@ import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.session.SessionApi
+import com.emarsys.networking.clients.error.ClientExceptionHandler
 import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
@@ -33,10 +32,6 @@ import dev.mokkery.resetCalls
 import dev.mokkery.verify
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
-import io.kotest.data.forAll
-import io.kotest.data.headers
-import io.kotest.data.row
-import io.kotest.data.table
 import io.kotest.matchers.shouldBe
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
@@ -74,6 +69,7 @@ class ContactClientTests {
     private lateinit var mockLogger: Logger
     private lateinit var mockRequestContext: RequestContextApi
     private lateinit var mockEmarsysSdkSession: SessionApi
+    private lateinit var mockClientExceptionHandler: ClientExceptionHandler
     private lateinit var json: Json
     private lateinit var onlineEvents: MutableSharedFlow<OnlineSdkEvent>
     private lateinit var mockSdkEventManager: SdkEventManagerApi
@@ -92,6 +88,7 @@ class ContactClientTests {
         mockLogger = mock(MockMode.autofill)
         mockRequestContext = mock(MockMode.autofill)
         mockEmarsysSdkSession = mock(MockMode.autofill)
+        mockClientExceptionHandler = mock(MockMode.autofill)
         every { mockRequestContext.refreshToken } returns "testRefreshToken"
         json = JsonUtil.json
         onlineEvents = MutableSharedFlow(replay = 5)
@@ -113,6 +110,7 @@ class ContactClientTests {
 
         contactClient = ContactClient(
             mockEmarsysClient,
+            mockClientExceptionHandler,
             mockSdkEventManager,
             mockUrlFactory,
             mockSdkContext,
@@ -220,39 +218,6 @@ class ContactClientTests {
     }
 
     @Test
-    fun testConsumer_should_not_fail_flow_collection_when_unhandled_exception_is_thrown() =
-        runTest {
-            contactClient.register()
-
-            everySuspend {
-                mockEmarsysClient.send(
-                    any(),
-                    any()
-                )
-            } throws Exception("Unhandled exception")
-            val linkAuthenticatedContactEvent = SdkEvent.Internal.Sdk.LinkAuthenticatedContact(
-                "linkAuthenticatedContact",
-                contactFieldId = CONTACT_FIELD_ID,
-                openIdToken = OPEN_ID_TOKEN
-            )
-
-            onlineEvents.emit(linkAuthenticatedContactEvent)
-
-            advanceUntilIdle()
-
-            verify { mockUrlFactory.create(any()) }
-            verifySuspend { mockEmarsysClient.send(any(), any()) }
-            verifySuspend(VerifyMode.exactly(0)) { mockContactTokenHandler.handleContactTokens(any()) }
-            verifySuspend(VerifyMode.exactly(0)) {
-                mockSdkContext.contactFieldId = CONTACT_FIELD_ID
-            }
-            verifySuspend(VerifyMode.exactly(0)) { mockEmarsysSdkSession.startSession() }
-            verifySuspend(VerifyMode.exactly(0)) {
-                mockEventsDao.removeEvent(linkAuthenticatedContactEvent)
-            }
-        }
-
-    @Test
     fun testConsumer_should_call_client_with_unlinkContact_request() = runTest {
         contactClient.register()
 
@@ -289,46 +254,35 @@ class ContactClientTests {
         verify { mockUrlFactory.create(any()) }
         verifySuspend { mockEmarsysClient.send(any(), any()) }
         verifySuspend(VerifyMode.exactly(0)) { mockContactTokenHandler.handleContactTokens(any()) }
-        verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(unlinkContactEvent) }
         verifySuspend { mockSdkEventManager.emitEvent(unlinkContactEvent) }
     }
 
     @Test
-    fun testConsumer_not_should_call_handleTokens_and_should_not_store_contactFieldId_and_should_ack_event_if_request_fails_or_retries_are_exhausted() =
-        forAll(
-            table(
-                headers("exception"),
-                listOf(
-                    row(
-                        FailedRequestException(
-                            createTestResponse(
-                                statusCode = HttpStatusCode.BadRequest
-                            )
-                        )
-                    ),
-                    row(RetryLimitReachedException("Retry limit reached"))
+    fun testConsumer_not_should_call_handleTokens_and_should_not_store_contactFieldId_and_should_clientExceptionHandler_on_exception() =
+        runTest {
+            contactClient.register()
+            val testException = Exception("Test exception")
+
+            everySuspend { mockEmarsysClient.send(any(), any()) } throws testException
+            val unlinkContact = SdkEvent.Internal.Sdk.UnlinkContact("unlinkContact")
+
+            onlineEvents.emit(unlinkContact)
+
+            advanceUntilIdle()
+
+            verify { mockUrlFactory.create(any()) }
+            verifySuspend { mockEmarsysClient.send(any(), any()) }
+            verifySuspend {
+                mockClientExceptionHandler.handleException(
+                    testException,
+                    "ContactClient - consumeContactChanges",
+                    unlinkContact
                 )
-            )
-        ) { testException ->
-            runTest {
-                contactClient.register()
-
-                everySuspend { mockEmarsysClient.send(any(), any()) } throws testException
-                val unlinkContact = SdkEvent.Internal.Sdk.UnlinkContact("unlinkContact")
-
-                onlineEvents.emit(unlinkContact)
-
-                advanceUntilIdle()
-
-                verify { mockUrlFactory.create(any()) }
-                verifySuspend { mockEmarsysClient.send(any(), any()) }
-                verifySuspend { mockEventsDao.removeEvent(unlinkContact) }
-
-                verifySuspend(VerifyMode.exactly(0)) {
-                    mockContactTokenHandler.handleContactTokens(any())
-                }
-                verifySuspend(VerifyMode.exactly(0)) { mockSdkContext.contactFieldId = null }
             }
+            verifySuspend(VerifyMode.exactly(0)) {
+                mockContactTokenHandler.handleContactTokens(any())
+            }
+            verifySuspend(VerifyMode.exactly(0)) { mockSdkContext.contactFieldId = null }
         }
 
 
