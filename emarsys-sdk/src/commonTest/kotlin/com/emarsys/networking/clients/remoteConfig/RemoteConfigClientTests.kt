@@ -3,9 +3,6 @@ package com.emarsys.networking.clients.remoteConfig
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.crypto.CryptoApi
 import com.emarsys.core.db.events.EventsDaoApi
-import com.emarsys.core.exceptions.FailedRequestException
-import com.emarsys.core.exceptions.MissingApplicationCodeException
-import com.emarsys.core.exceptions.RetryLimitReachedException
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
@@ -15,6 +12,7 @@ import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
+import com.emarsys.networking.clients.error.ClientExceptionHandler
 import com.emarsys.remoteConfig.RemoteConfigResponse
 import com.emarsys.remoteConfig.RemoteConfigResponseHandlerApi
 import com.emarsys.util.JsonUtil
@@ -31,10 +29,6 @@ import dev.mokkery.resetCalls
 import dev.mokkery.spy
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
-import io.kotest.data.forAll
-import io.kotest.data.headers
-import io.kotest.data.row
-import io.kotest.data.table
 import io.kotest.matchers.shouldBe
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
@@ -66,6 +60,7 @@ class RemoteConfigClientTests {
     private lateinit var mockSdkEventManager: SdkEventManagerApi
     private lateinit var mockRemoteConfigResponseHandler: RemoteConfigResponseHandlerApi
     private lateinit var mockEventsDao: EventsDaoApi
+    private lateinit var mockClientExceptionHandler: ClientExceptionHandler
     private lateinit var mockSdkLogger: Logger
     private lateinit var onlineEvents: MutableSharedFlow<OnlineSdkEvent>
 
@@ -83,7 +78,7 @@ class RemoteConfigClientTests {
     @BeforeTest
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
-        mockNetworkClient = mock()
+        mockNetworkClient = mock(MockMode.autofill)
         mockUrlFactory = mock()
         mockCrypto = mock()
         mockSdkEventManager = mock()
@@ -92,6 +87,7 @@ class RemoteConfigClientTests {
         everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
         mockRemoteConfigResponseHandler = mock(MockMode.autoUnit)
         mockEventsDao = mock(MockMode.autoUnit)
+        mockClientExceptionHandler = mock(MockMode.autoUnit)
         mockSdkLogger = mock(MockMode.autofill)
         everySuspend { mockSdkLogger.error(any<String>(), any<Throwable>()) } returns Unit
     }
@@ -106,6 +102,7 @@ class RemoteConfigClientTests {
     private fun createClient(applicationsScope: CoroutineScope): RemoteConfigClient {
         return RemoteConfigClient(
             mockNetworkClient,
+            mockClientExceptionHandler,
             mockUrlFactory,
             mockSdkEventManager,
             mockRemoteConfigResponseHandler,
@@ -220,7 +217,12 @@ class RemoteConfigClientTests {
             mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG_SIGNATURE)
         } returns configSignatureUrl
         everySuspend { mockNetworkClient.send(configRequest, any()) } returns configResponse
-        everySuspend { mockNetworkClient.send(configSignatureRequest, any()) } returns configSignatureResponse
+        everySuspend {
+            mockNetworkClient.send(
+                configSignatureRequest,
+                any()
+            )
+        } returns configSignatureResponse
         everySuspend { mockCrypto.verify(any(), any()) } returns false
 
 
@@ -257,7 +259,12 @@ class RemoteConfigClientTests {
             )
         } returns configSignatureUrl
         everySuspend { mockNetworkClient.send(configRequest, any()) } returns configResponse
-        everySuspend { mockNetworkClient.send(configSignatureRequest, any()) } returns configSignatureResponse
+        everySuspend {
+            mockNetworkClient.send(
+                configSignatureRequest,
+                any()
+            )
+        } returns configSignatureResponse
 
         val appCodeBasedRemoteConfigEvent = SdkEvent.Internal.Sdk.ApplyAppCodeBasedRemoteConfig()
 
@@ -292,7 +299,12 @@ class RemoteConfigClientTests {
             )
         } returns configSignatureUrl
         everySuspend { mockNetworkClient.send(configRequest, any()) } returns configResponse
-        everySuspend { mockNetworkClient.send(configSignatureRequest, any()) } returns configSignatureResponse
+        everySuspend {
+            mockNetworkClient.send(
+                configSignatureRequest,
+                any()
+            )
+        } returns configSignatureResponse
 
         val appCodeBasedRemoteConfigEvent = SdkEvent.Internal.Sdk.ApplyAppCodeBasedRemoteConfig()
 
@@ -308,97 +320,56 @@ class RemoteConfigClientTests {
     }
 
     @Test
-    fun testConsumer_shouldNotCall_responseHandler_andAckEvent_whenUnknownExceptionIsThrown() =
+    fun testConsumer_shouldNotCall_responseHandler_andCallClientExceptionHandler_whenFetchingSignatureThrows() =
         runTest {
             createClient(backgroundScope).register()
 
-            val configSignatureResponse = Response(
-                configSignatureRequest,
-                HttpStatusCode.OK,
-                Headers.Empty,
-                CONFIG_SIGNATURE_RESULT
-            )
+            val testException = Exception("Test exception")
+            val configResponse =
+                Response(configRequest, HttpStatusCode.OK, Headers.Empty, CONFIG_RESULT)
 
-            every { mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG) } returns configUrl
             every {
-                mockUrlFactory.create(
-                    EmarsysUrlType.REMOTE_CONFIG_SIGNATURE
-                )
+                mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG)
+            } returns configUrl
+            everySuspend { mockNetworkClient.send(configRequest, any()) } returns configResponse
+            every {
+                mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG_SIGNATURE)
             } returns configSignatureUrl
-            everySuspend { mockNetworkClient.send(configRequest) } throws RuntimeException("test-exception")
-            everySuspend { mockNetworkClient.send(configSignatureRequest) } returns configSignatureResponse
+            everySuspend {
+                mockNetworkClient.send(
+                    configSignatureRequest,
+                    any()
+                )
+            } throws testException
 
-            val remoteConfigEvent = SdkEvent.Internal.Sdk.ApplyAppCodeBasedRemoteConfig()
+            val remoteConfigEvent = SdkEvent.Internal.Sdk.ApplyAppCodeBasedRemoteConfig(
+                id = EVENT_ID,
+                timestamp = timestamp
+            )
 
             val onlineSdkEvents = backgroundScope.async {
                 onlineEvents.take(1).toList()
             }
 
             onlineEvents.emit(remoteConfigEvent)
+            advanceUntilIdle()
 
             onlineSdkEvents.await() shouldBe listOf(remoteConfigEvent)
             verifySuspend(VerifyMode.exactly(0)) { mockCrypto.verify(any(), any()) }
             verifySuspend(VerifyMode.exactly(0)) { mockRemoteConfigResponseHandler.handle(any()) }
-            verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(remoteConfigEvent) }
-        }
-
-    @Test
-    fun testConsumer_shouldNotCall_responseHandler_andAckEvent_whenFetchingSignatureThrows_knownException() =
-        forAll(
-            table(
-                headers("exception"),
-                listOf(
-                    row(
-                        FailedRequestException(
-                            Response(
-                                UrlRequest(configUrl, HttpMethod.Get),
-                                HttpStatusCode.OK,
-                                Headers.Empty,
-                                bodyAsText = ""
-                            ),
-                        )
-                    ),
-                    row(RetryLimitReachedException("Retry limit reached")),
-                    row(MissingApplicationCodeException("Missing app code"))
+            verifySuspend {
+                mockClientExceptionHandler.handleException(
+                    any<Exception>(),
+                    "RemoteConfigClient: ConsumeRemoteConfigEvents error",
+                    remoteConfigEvent
                 )
-            )
-        ) { testException ->
-            runTest {
-                createClient(backgroundScope).register()
-
-                val configResponse =
-                    Response(configRequest, HttpStatusCode.OK, Headers.Empty, CONFIG_RESULT)
-
-                every {
-                    mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG)
-                } returns configUrl
-                every {
-                    mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG_SIGNATURE)
-                } returns configSignatureUrl
-                everySuspend { mockNetworkClient.send(configRequest, any()) } returns configResponse
-                everySuspend { mockNetworkClient.send(configSignatureRequest, any()) } throws testException
-
-                val remoteConfigEvent = SdkEvent.Internal.Sdk.ApplyAppCodeBasedRemoteConfig(
-                    id = EVENT_ID,
-                    timestamp = timestamp
-                )
-
-                val onlineSdkEvents = backgroundScope.async {
-                    onlineEvents.take(1).toList()
-                }
-
-                onlineEvents.emit(remoteConfigEvent)
-
-                onlineSdkEvents.await() shouldBe listOf(remoteConfigEvent)
-                verifySuspend(VerifyMode.exactly(0)) { mockCrypto.verify(any(), any()) }
-                verifySuspend(VerifyMode.exactly(0)) { mockRemoteConfigResponseHandler.handle(any()) }
-                verifySuspend { mockEventsDao.removeEvent(remoteConfigEvent) }
             }
         }
 
     @Test
     fun testConsumer_should_reEmit_events_on_network_error() = runTest {
         createClient(backgroundScope).register()
+        val testException = IOException("No Internet")
         every {
             mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG)
         } returns configUrl
@@ -408,7 +379,7 @@ class RemoteConfigClientTests {
 
         everySuspend { mockNetworkClient.send(any(), any()) } calls { args ->
             (args.arg(1) as suspend () -> Unit).invoke()
-            throw IOException("No Internet")
+            throw testException
         }
         val remoteConfigEvent = SdkEvent.Internal.Sdk.ApplyAppCodeBasedRemoteConfig(
             id = EVENT_ID,
@@ -427,9 +398,14 @@ class RemoteConfigClientTests {
         onlineSdkEvents.await() shouldBe listOf(remoteConfigEvent)
         verifySuspend {
             mockNetworkClient.send(any(), any())
-            mockSdkLogger.error(any(), any<Throwable>())
             mockSdkEventManager.emitEvent(remoteConfigEvent)
         }
-        verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(remoteConfigEvent) }
+        verifySuspend {
+            mockClientExceptionHandler.handleException(
+                any<IOException>(),
+                "RemoteConfigClient: ConsumeRemoteConfigEvents error",
+                remoteConfigEvent
+            )
+        }
     }
 }

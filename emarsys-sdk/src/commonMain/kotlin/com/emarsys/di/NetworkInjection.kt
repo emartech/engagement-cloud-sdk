@@ -78,14 +78,15 @@ object NetworkInjection {
         single<EventBasedClientApi>(named(EventBasedClientTypes.RemoteConfig)) {
             RemoteConfigClient(
                 networkClient = get(named(NetworkClientTypes.Generic)),
+                clientExceptionHandler = get(),
                 urlFactoryApi = get(),
                 sdkEventManager = get(),
+                remoteConfigResponseHandler = get(),
                 applicationScope = get(named(CoroutineScopeTypes.Application)),
                 eventsDao = get(),
                 crypto = get(),
                 json = get(),
-                sdkLogger = get { parametersOf(RemoteConfigClient::class.simpleName) },
-                remoteConfigResponseHandler = get()
+                sdkLogger = get { parametersOf(RemoteConfigClient::class.simpleName) }
             )
         }
         single<EventBasedClientApi>(named(EventBasedClientTypes.Config)) {

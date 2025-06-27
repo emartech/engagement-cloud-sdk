@@ -3,9 +3,6 @@ package com.emarsys.networking.clients.remoteConfig
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.crypto.CryptoApi
 import com.emarsys.core.db.events.EventsDaoApi
-import com.emarsys.core.exceptions.FailedRequestException
-import com.emarsys.core.exceptions.MissingApplicationCodeException
-import com.emarsys.core.exceptions.RetryLimitReachedException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.UrlRequest
@@ -14,6 +11,7 @@ import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
 import com.emarsys.networking.clients.EventBasedClientApi
+import com.emarsys.networking.clients.error.ClientExceptionHandler
 import com.emarsys.remoteConfig.RemoteConfigResponse
 import com.emarsys.remoteConfig.RemoteConfigResponseHandlerApi
 import io.ktor.http.HttpMethod
@@ -30,6 +28,7 @@ import kotlinx.serialization.json.buildJsonObject
 
 internal class RemoteConfigClient(
     private val networkClient: NetworkClientApi,
+    private val clientExceptionHandler: ClientExceptionHandler,
     private val urlFactoryApi: UrlFactoryApi,
     private val sdkEventManager: SdkEventManagerApi,
     private val remoteConfigResponseHandler: RemoteConfigResponseHandlerApi,
@@ -60,19 +59,11 @@ internal class RemoteConfigClient(
                     sdkEventManager.emitEvent(SdkEvent.Internal.Sdk.Answer.Ready(originId = it.id))
                     it.ack(eventsDao, sdkLogger)
                 } catch (exception: Exception) {
-                    when (exception) {
-                        is FailedRequestException,
-                        is RetryLimitReachedException,
-                        is MissingApplicationCodeException -> it.ack(
-                            eventsDao,
-                            sdkLogger
-                        )
-
-                        else -> sdkLogger.error(
-                            "ConsumeRemoteConfigEvents",
-                            exception
-                        )
-                    }
+                    clientExceptionHandler.handleException(
+                        exception,
+                        "RemoteConfigClient: ConsumeRemoteConfigEvents error",
+                        it
+                    )
                 }
             }
     }
@@ -87,8 +78,10 @@ internal class RemoteConfigClient(
             "FetchRemoteConfig",
             buildJsonObject { put("global", JsonPrimitive(isGlobal)) })
         return coroutineScope {
-            val toBeConfigBytes = async(start = CoroutineStart.UNDISPATCHED) { fetchConfig(isGlobal, event) }
-            val toBeSignatureBytes = async(start = CoroutineStart.UNDISPATCHED) { fetchSignature(isGlobal, event) }
+            val toBeConfigBytes =
+                async(start = CoroutineStart.UNDISPATCHED) { fetchConfig(isGlobal, event) }
+            val toBeSignatureBytes =
+                async(start = CoroutineStart.UNDISPATCHED) { fetchSignature(isGlobal, event) }
             val config = toBeConfigBytes.await()
             val signature = toBeSignatureBytes.await()
             if (config == null || signature == null) {
@@ -106,7 +99,8 @@ internal class RemoteConfigClient(
     private suspend fun fetchConfig(global: Boolean, event: OnlineSdkEvent): String? {
         val request = UrlRequest(
             urlFactoryApi.create(
-                if (global) EmarsysUrlType.GLOBAL_REMOTE_CONFIG else EmarsysUrlType.REMOTE_CONFIG),
+                if (global) EmarsysUrlType.GLOBAL_REMOTE_CONFIG else EmarsysUrlType.REMOTE_CONFIG
+            ),
             HttpMethod.Get
         )
         return executeRequest(request, event)
