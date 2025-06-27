@@ -67,7 +67,9 @@ import com.emarsys.mobileengage.push.NotificationIntentProcessor
 import com.emarsys.mobileengage.push.PushMessagePresenter
 import com.emarsys.mobileengage.push.SilentPushMessageHandler
 import com.emarsys.mobileengage.push.mapper.AndroidPushV2Mapper
+import com.emarsys.mobileengage.push.mapper.HuaweiPushV2Mapper
 import com.emarsys.mobileengage.push.mapper.SilentAndroidPushV2Mapper
+import com.emarsys.mobileengage.push.mapper.SilentHuaweiPushV2Mapper
 import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
 import com.emarsys.mobileengage.url.AndroidExternalUrlOpener
 import com.emarsys.sqldelight.EmarsysDB
@@ -188,10 +190,26 @@ object AndroidInjection {
                 logger = get { parametersOf(SilentAndroidPushV2Mapper::class.simpleName) }
             )
         }
+        single<HuaweiPushV2Mapper> {
+            HuaweiPushV2Mapper(
+                uuidProvider = get(),
+                logger = get { parametersOf(HuaweiPushV2Mapper::class.simpleName) },
+                json = get()
+            )
+        }
+        single<SilentHuaweiPushV2Mapper> {
+            SilentHuaweiPushV2Mapper(
+                uuidProvider = get(),
+                logger = get { parametersOf(SilentHuaweiPushV2Mapper::class.simpleName) },
+                json = get()
+            )
+        }
         single<AndroidPushMessageFactory> {
             AndroidPushMessageFactory(
                 androidPushV2Mapper = get(),
                 silentAndroidPushV2Mapper = get(),
+                huaweiPushV2Mapper = get(),
+                silentHuaweiPushV2Mapper = get()
             )
         }
         single<SdkConfigStoreApi<AndroidEmarsysConfig>> {
