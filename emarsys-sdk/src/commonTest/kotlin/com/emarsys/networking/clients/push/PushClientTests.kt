@@ -3,9 +3,6 @@ package com.emarsys.networking.clients.push
 import com.emarsys.context.DefaultUrlsApi
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
-import com.emarsys.core.exceptions.FailedRequestException
-import com.emarsys.core.exceptions.MissingApplicationCodeException
-import com.emarsys.core.exceptions.RetryLimitReachedException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
@@ -14,6 +11,7 @@ import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
+import com.emarsys.networking.clients.error.ClientExceptionHandler
 import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
@@ -27,10 +25,6 @@ import dev.mokkery.resetCalls
 import dev.mokkery.spy
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
-import io.kotest.data.forAll
-import io.kotest.data.headers
-import io.kotest.data.row
-import io.kotest.data.table
 import io.kotest.matchers.shouldBe
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
@@ -66,6 +60,7 @@ class PushClientTests {
     private lateinit var mockUrlFactory: UrlFactoryApi
     private lateinit var mockSdkEventManager: SdkEventManagerApi
     private lateinit var mockEventsDao: EventsDaoApi
+    private lateinit var mockClientExceptionHandler: ClientExceptionHandler
     private lateinit var mockSdkLogger: Logger
     private lateinit var onlineEvents: MutableSharedFlow<OnlineSdkEvent>
 
@@ -80,6 +75,7 @@ class PushClientTests {
         every { mockSdkEventManager.onlineSdkEvents } returns onlineEvents
         everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
         mockEventsDao = mock(MockMode.autoUnit)
+        mockClientExceptionHandler = mock(MockMode.autoUnit)
         mockSdkLogger = mock(MockMode.autofill)
         everySuspend { mockSdkLogger.error(any(), any<Throwable>()) } calls {
             (it.args[1] as Throwable).printStackTrace()
@@ -95,12 +91,13 @@ class PushClientTests {
     private fun createPushClient(applicationScope: CoroutineScope): PushClient {
         return PushClient(
             emarsysClient = mockEmarsysClient,
+            clientExceptionHandler = mockClientExceptionHandler,
             urlFactory = mockUrlFactory,
             sdkEventManager = mockSdkEventManager,
             applicationScope = applicationScope,
             eventsDao = mockEventsDao,
-            sdkLogger = mockSdkLogger,
-            json = Json { ignoreUnknownKeys = true }
+            json = Json { ignoreUnknownKeys = true },
+            sdkLogger = mockSdkLogger
         )
     }
 
@@ -171,10 +168,11 @@ class PushClientTests {
     @Test
     fun testConsumer_should_reEmit_events_on_network_error() = runTest {
         createPushClient(backgroundScope).register()
+        val testException = IOException("Network error")
 
         everySuspend { mockEmarsysClient.send(any(), any()) } calls { args ->
             (args.arg(1) as suspend () -> Unit).invoke()
-            throw IOException("No Internet")
+            throw testException
         }
         val clearPushTokenEvent = SdkEvent.Internal.Sdk.ClearPushToken(ID, null, TIMESTAMP)
         everySuspend { mockSdkEventManager.emitEvent(clearPushTokenEvent) } returns Unit
@@ -190,19 +188,27 @@ class PushClientTests {
         onlineSdkEvents.await() shouldBe listOf(clearPushTokenEvent)
         verifySuspend {
             mockEmarsysClient.send(any(), any())
-            mockSdkLogger.error(any(), any<Throwable>())
             mockSdkEventManager.emitEvent(clearPushTokenEvent)
         }
-        verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(clearPushTokenEvent) }
+        verifySuspend {
+            mockClientExceptionHandler.handleException(
+                testException,
+                "PushClient - consumePushEvents",
+                clearPushTokenEvent
+            )
+        }
     }
 
     @Test
-    fun testConsumer_should_not_ack_on_unknown_exception() = runTest {
+    fun testConsumer_should_callClientExceptionHandler_when_exception_happens() = runTest {
         createPushClient(backgroundScope).register()
 
-        every { mockUrlFactory.create(any()) } throws RuntimeException("test")
-        val clearPushTokenEvent = SdkEvent.Internal.Sdk.ClearPushToken(ID, null, TIMESTAMP)
-        everySuspend { mockSdkEventManager.emitEvent(clearPushTokenEvent) } returns Unit
+        val testException = Exception("Test exception")
+        every {
+            mockUrlFactory.create(EmarsysUrlType.PUSH_TOKEN)
+        } throws testException
+        val clearPushTokenEvent =
+            SdkEvent.Internal.Sdk.ClearPushToken(ID, null, TIMESTAMP)
 
         val onlineSdkEvents = backgroundScope.async {
             onlineEvents.take(1).toList()
@@ -214,52 +220,12 @@ class PushClientTests {
 
         onlineSdkEvents.await() shouldBe listOf(clearPushTokenEvent)
         verifySuspend(VerifyMode.exactly(0)) { mockEmarsysClient.send(any(), any()) }
-        verifySuspend { mockSdkLogger.error(any(), any<Throwable>()) }
-        verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(clearPushTokenEvent) }
-    }
-
-
-    @Test
-    fun testConsumer_should_ack_event_when_known_exception_happens() = forAll(
-        table(
-            headers("exception"),
-            listOf(
-                row(
-                    FailedRequestException(
-                        Response(
-                            UrlRequest(URL, HttpMethod.Delete),
-                            HttpStatusCode.BadRequest,
-                            Headers.Empty,
-                            bodyAsText = ""
-                        ),
-                    )
-                ),
-                row(RetryLimitReachedException("Retry limit reached")),
-                row(MissingApplicationCodeException("Missing app code")),
+        verifySuspend {
+            mockClientExceptionHandler.handleException(
+                testException,
+                "PushClient - consumePushEvents",
+                clearPushTokenEvent
             )
-        )
-    ) { testException ->
-        runTest {
-            createPushClient(backgroundScope).register()
-
-            every {
-                mockUrlFactory.create(EmarsysUrlType.PUSH_TOKEN)
-            } throws testException
-            val clearPushTokenEvent =
-                SdkEvent.Internal.Sdk.ClearPushToken(ID, null, TIMESTAMP)
-
-            val onlineSdkEvents = backgroundScope.async {
-                onlineEvents.take(1).toList()
-            }
-
-            onlineEvents.emit(clearPushTokenEvent)
-
-            advanceUntilIdle()
-
-            onlineSdkEvents.await() shouldBe listOf(clearPushTokenEvent)
-            verifySuspend(VerifyMode.exactly(0)) { mockEmarsysClient.send(any(), any()) }
-            verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
-            verifySuspend { mockEventsDao.removeEvent(clearPushTokenEvent) }
         }
     }
 }

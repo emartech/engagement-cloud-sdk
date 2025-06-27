@@ -26,12 +26,13 @@ object PushInjection {
         single<EventBasedClientApi>(named(EventBasedClientTypes.Push)) {
             PushClient(
                 emarsysClient = get<NetworkClientApi>(named(NetworkClientTypes.Emarsys)),
+                clientExceptionHandler = get(),
                 urlFactory = get<UrlFactoryApi>(),
                 sdkEventManager = get(),
-                eventsDao = get(),
                 applicationScope = get(named(CoroutineScopeTypes.Application)),
-                sdkLogger = get { parametersOf(PushClient::class.simpleName) },
-                json = get<Json>()
+                eventsDao = get(),
+                json = get<Json>(),
+                sdkLogger = get { parametersOf(PushClient::class.simpleName) }
             )
         }
         single<MutableList<PushCall>>(named(PersistentListTypes.PushCall)) {

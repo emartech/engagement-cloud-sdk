@@ -2,9 +2,6 @@ package com.emarsys.networking.clients.push
 
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
-import com.emarsys.core.exceptions.FailedRequestException
-import com.emarsys.core.exceptions.MissingApplicationCodeException
-import com.emarsys.core.exceptions.RetryLimitReachedException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.UrlRequest
@@ -13,6 +10,7 @@ import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
 import com.emarsys.networking.clients.EventBasedClientApi
+import com.emarsys.networking.clients.error.ClientExceptionHandler
 import com.emarsys.networking.clients.push.model.PushToken
 import io.ktor.http.HttpMethod
 import kotlinx.coroutines.CoroutineScope
@@ -23,6 +21,7 @@ import kotlinx.serialization.json.Json
 
 internal class PushClient(
     private val emarsysClient: NetworkClientApi,
+    private val clientExceptionHandler: ClientExceptionHandler,
     private val urlFactory: UrlFactoryApi,
     private val sdkEventManager: SdkEventManagerApi,
     private val applicationScope: CoroutineScope,
@@ -52,17 +51,11 @@ internal class PushClient(
                     sdkEventManager.emitEvent(SdkEvent.Internal.Sdk.Answer.Ready(originId = it.id))
                     it.ack(eventsDao, sdkLogger)
                 } catch (exception: Exception) {
-                    when (exception) {
-                        is FailedRequestException, is RetryLimitReachedException, is MissingApplicationCodeException -> it.ack(
-                            eventsDao,
-                            sdkLogger
-                        )
-
-                        else -> sdkLogger.error(
-                            "PushClient - consumePushEvents",
-                            exception
-                        )
-                    }
+                    clientExceptionHandler.handleException(
+                        exception,
+                        "PushClient - consumePushEvents",
+                        it
+                    )
                 }
             }
     }
