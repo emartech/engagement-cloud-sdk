@@ -15,6 +15,7 @@ object DeepLinkInjection {
         single<EventBasedClientApi>(named(EventBasedClientTypes.DeepLink)) {
             DeepLinkClient(
                 networkClient = get(named(NetworkClientTypes.Generic)),
+                clientExceptionHandler = get(),
                 sdkEventManager = get(),
                 urlFactory = get(),
                 userAgentProvider = get(),

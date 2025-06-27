@@ -2,9 +2,6 @@ package com.emarsys.networking.clients.deepLink
 
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
-import com.emarsys.core.exceptions.FailedRequestException
-import com.emarsys.core.exceptions.MissingApplicationCodeException
-import com.emarsys.core.exceptions.RetryLimitReachedException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.UserAgentProvider
 import com.emarsys.core.networking.UserAgentProviderApi
@@ -14,6 +11,7 @@ import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.event.SdkEvent
 import com.emarsys.networking.clients.EventBasedClientApi
+import com.emarsys.networking.clients.error.ClientExceptionHandler
 import io.ktor.http.HttpMethod
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -25,6 +23,7 @@ import kotlinx.serialization.json.put
 
 internal class DeepLinkClient(
     private val networkClient: NetworkClientApi,
+    private val clientExceptionHandler: ClientExceptionHandler,
     private val sdkEventManager: SdkEventManagerApi,
     private val urlFactory: UrlFactoryApi,
     private val userAgentProvider: UserAgentProviderApi,
@@ -61,17 +60,11 @@ internal class DeepLinkClient(
                         onNetworkError = { sdkEventManager.emitEvent(it) })
                     it.ack(eventsDao, sdkLogger)
                 } catch (exception: Exception) {
-                    when (exception) {
-                        is FailedRequestException, is RetryLimitReachedException, is MissingApplicationCodeException -> it.ack(
-                            eventsDao,
-                            sdkLogger
-                        )
-
-                        else -> sdkLogger.error(
-                            "DeepLinkClient - trackDeepLink(trackId: \"${it.trackingId}\")",
-                            exception
-                        )
-                    }
+                    clientExceptionHandler.handleException(
+                        exception,
+                        "DeepLinkClient - trackDeepLink(trackId: ${it.trackingId})",
+                        it
+                    )
                 }
             }
     }

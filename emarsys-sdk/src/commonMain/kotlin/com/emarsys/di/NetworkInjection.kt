@@ -64,6 +64,7 @@ object NetworkInjection {
         single<EventBasedClientApi>(named(EventBasedClientTypes.Device)) {
             DeviceClient(
                 emarsysClient = get(named(NetworkClientTypes.Emarsys)),
+                clientExceptionHandler = get(),
                 urlFactory = get(),
                 deviceInfoCollector = get(),
                 contactTokenHandler = get(),

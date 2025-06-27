@@ -2,9 +2,6 @@ package com.emarsys.networking.clients.deeplink
 
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
-import com.emarsys.core.exceptions.FailedRequestException
-import com.emarsys.core.exceptions.MissingApplicationCodeException
-import com.emarsys.core.exceptions.RetryLimitReachedException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.UserAgentProvider
 import com.emarsys.core.networking.UserAgentProviderApi
@@ -16,6 +13,7 @@ import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
 import com.emarsys.networking.clients.deepLink.DeepLinkClient
+import com.emarsys.networking.clients.error.ClientExceptionHandler
 import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
@@ -30,10 +28,6 @@ import dev.mokkery.resetCalls
 import dev.mokkery.verify
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
-import io.kotest.data.forAll
-import io.kotest.data.headers
-import io.kotest.data.row
-import io.kotest.data.table
 import io.kotest.matchers.shouldBe
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
@@ -74,6 +68,7 @@ class DeepLinkClientTests {
     private lateinit var mockLogger: Logger
     private lateinit var mockUserAgentProvider: UserAgentProviderApi
     private lateinit var mockEventsDao: EventsDaoApi
+    private lateinit var mockClientExceptionHandler: ClientExceptionHandler
     private lateinit var json: Json
     private lateinit var onlineEvents: MutableSharedFlow<OnlineSdkEvent>
     private lateinit var mockSdkEventManager: SdkEventManagerApi
@@ -88,6 +83,7 @@ class DeepLinkClientTests {
         mockLogger = mock(MockMode.autofill)
         mockUserAgentProvider = mock(MockMode.autofill)
         mockEventsDao = mock()
+        mockClientExceptionHandler = mock(MockMode.autofill)
         json = JsonUtil.json
         mockSdkEventManager = mock(MockMode.autofill)
         onlineEvents = MutableSharedFlow()
@@ -102,6 +98,7 @@ class DeepLinkClientTests {
     private fun createDeepLinkClient(applicationScope: CoroutineScope) =
         DeepLinkClient(
             mockNetworkClient,
+            mockClientExceptionHandler,
             mockSdkEventManager,
             mockUrlFactory,
             mockUserAgentProvider,
@@ -157,10 +154,11 @@ class DeepLinkClientTests {
     fun testConsumer_shouldReEmitEvent_throughSdkEventDistributor_inCaseOfNetworkError() = runTest {
         deepLinkClient = createDeepLinkClient(backgroundScope)
         deepLinkClient.register()
+        val testException = IOException("No Internet")
 
         everySuspend { mockNetworkClient.send(any(), any()) } calls { args ->
             (args.arg(1) as suspend () -> Unit).invoke()
-            throw IOException("No Internet")
+            throw testException
         }
         val trackDeepLink = SdkEvent.Internal.Sdk.TrackDeepLink(
             id = "trackDeepLink",
@@ -178,7 +176,13 @@ class DeepLinkClientTests {
         verify { mockUrlFactory.create(any()) }
         verifySuspend { mockNetworkClient.send(any(), any()) }
         verifySuspend { mockSdkEventManager.emitEvent(trackDeepLink) }
-        verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(trackDeepLink) }
+        verifySuspend {
+            mockClientExceptionHandler.handleException(
+                testException,
+                "DeepLinkClient - trackDeepLink(trackId: $TRACKING_ID)",
+                trackDeepLink
+            )
+        }
     }
 
     @Test
@@ -207,52 +211,31 @@ class DeepLinkClientTests {
     }
 
     @Test
-    fun testConsumer_should_ack_event_when_known_exception_happens() = forAll(
-        table(
-            headers("exception"),
-            listOf(
-                row(
-                    FailedRequestException(
-                        response = createTestResponse()
-                    )
-                ),
-                row(RetryLimitReachedException("Retry limit reached")),
-                row(
-                    MissingApplicationCodeException("Missing app code")
-                ),
-            )
+    fun testConsumer_should_call_clientExceptionHandler_when_exception_happens() = runTest {
+        createDeepLinkClient(backgroundScope).register()
+        val testException = Exception("Test exception")
+        every { mockUrlFactory.create(EmarsysUrlType.DEEP_LINK) } throws testException
+        val trackDeepLink = SdkEvent.Internal.Sdk.TrackDeepLink(
+            id = "trackDeepLink",
+            trackingId = TRACKING_ID
         )
-    ) { testException ->
-        runTest {
-            createDeepLinkClient(backgroundScope).register()
-            every { mockUrlFactory.create(EmarsysUrlType.DEEP_LINK) } throws testException
-            val trackDeepLink = SdkEvent.Internal.Sdk.TrackDeepLink(
-                id = "trackDeepLink",
-                trackingId = TRACKING_ID
+
+        val onlineSdkEvents = backgroundScope.async {
+            onlineEvents.take(1).toList()
+        }
+
+        onlineEvents.emit(trackDeepLink)
+
+        advanceUntilIdle()
+
+        onlineSdkEvents.await() shouldBe listOf(trackDeepLink)
+        verifySuspend(VerifyMode.exactly(0)) { mockNetworkClient.send(any(), any()) }
+        verifySuspend {
+            mockClientExceptionHandler.handleException(
+                testException,
+                "DeepLinkClient - trackDeepLink(trackId: $TRACKING_ID)",
+                trackDeepLink
             )
-
-            val onlineSdkEvents = backgroundScope.async {
-                onlineEvents.take(1).toList()
-            }
-
-            onlineEvents.emit(trackDeepLink)
-
-            advanceUntilIdle()
-
-            onlineSdkEvents.await() shouldBe listOf(trackDeepLink)
-            verifySuspend(VerifyMode.exactly(0)) { mockNetworkClient.send(any(), any()) }
-            verifySuspend(VerifyMode.exactly(0)) { mockLogger.error(any(), any<Throwable>()) }
-            verifySuspend { mockEventsDao.removeEvent(trackDeepLink) }
         }
     }
-
-    private fun createTestResponse(
-        body: String = "{}",
-        statusCode: HttpStatusCode = HttpStatusCode.OK
-    ) = Response(
-        UrlRequest(
-            TEST_BASE_URL,
-            HttpMethod.Post
-        ), statusCode, Headers.Empty, bodyAsText = body
-    )
 }
