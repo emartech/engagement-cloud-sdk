@@ -4,9 +4,6 @@ import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.channel.batched
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
-import com.emarsys.core.exceptions.FailedRequestException
-import com.emarsys.core.exceptions.MissingApplicationCodeException
-import com.emarsys.core.exceptions.RetryLimitReachedException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.UrlRequest
@@ -14,6 +11,7 @@ import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.event.SdkEvent
 import com.emarsys.networking.clients.EventBasedClientApi
+import com.emarsys.networking.clients.error.ClientExceptionHandler
 import io.ktor.http.HttpMethod
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -28,6 +26,7 @@ import kotlin.coroutines.coroutineContext
 
 internal class LoggingClient(
     private val genericNetworkClient: NetworkClientApi,
+    private val clientExceptionHandler: ClientExceptionHandler,
     private val urlFactory: UrlFactoryApi,
     private val sdkEventManager: SdkEventManagerApi,
     private val json: Json,
@@ -87,17 +86,11 @@ internal class LoggingClient(
                     sdkEvents.forEach { it.ack(eventsDao, sdkLogger) }
                 } catch (exception: Exception) {
                     coroutineContext.ensureActive()
-                    when (exception) {
-                        is FailedRequestException, is RetryLimitReachedException, is MissingApplicationCodeException -> {
-                            sdkEvents.forEach { it.ack(eventsDao, sdkLogger) }
-                        }
-
-                        else -> sdkLogger.error(
-                            "consumeLogsAndMetrics error",
-                            exception,
-                            isRemoteLog = false
-                        )
-                    }
+                    clientExceptionHandler.handleException(
+                        exception,
+                        "LoggingClient: ConsumeLogsAndMetrics error",
+                        *sdkEvents.toTypedArray()
+                    )
                 }
             }
     }

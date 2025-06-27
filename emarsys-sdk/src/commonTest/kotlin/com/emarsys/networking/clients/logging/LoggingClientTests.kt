@@ -4,9 +4,6 @@ import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.device.DeviceInfoForLogs
-import com.emarsys.core.exceptions.FailedRequestException
-import com.emarsys.core.exceptions.MissingApplicationCodeException
-import com.emarsys.core.exceptions.RetryLimitReachedException
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
@@ -15,6 +12,7 @@ import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.event.SdkEvent
+import com.emarsys.networking.clients.error.ClientExceptionHandler
 import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
@@ -28,10 +26,6 @@ import dev.mokkery.resetAnswers
 import dev.mokkery.resetCalls
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
-import io.kotest.data.forAll
-import io.kotest.data.headers
-import io.kotest.data.row
-import io.kotest.data.table
 import io.kotest.matchers.shouldBe
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
@@ -96,6 +90,7 @@ class LoggingClientTests {
     private lateinit var mockSdkEventManager: SdkEventManagerApi
     private lateinit var logEvents: MutableSharedFlow<SdkEvent.Internal.LogEvent>
     private lateinit var mockEventsDao: EventsDaoApi
+    private lateinit var mockClientExceptionHandler: ClientExceptionHandler
 
     @BeforeTest
     fun setup() = runTest {
@@ -107,11 +102,13 @@ class LoggingClientTests {
         logEvents = MutableSharedFlow()
         everySuspend { mockSdkEventManager.logEvents } returns logEvents
         mockEventsDao = mock(MockMode.autofill)
+        mockClientExceptionHandler = mock(MockMode.autofill)
     }
 
     private fun createLoggingClient(applicationScope: CoroutineScope): LoggingClient {
         return LoggingClient(
             mockEmarsysClient,
+            mockClientExceptionHandler,
             mockUrlFactory,
             mockSdkEventManager,
             json,
@@ -236,10 +233,12 @@ class LoggingClientTests {
     @Test
     fun testConsumer_should_reEmit_events_into_flow_when_there_is_a_network_error() = runTest {
         createLoggingClient(backgroundScope).register()
+
+        val testException = IOException("No Internet")
         every { mockUrlFactory.create(EmarsysUrlType.LOGGING) } returns TEST_BASE_URL
         everySuspend { mockEmarsysClient.send(any(), any()) } calls { args ->
             (args.arg(1) as suspend () -> Unit).invoke()
-            throw IOException("No Internet")
+            throw testException
         }
         everySuspend { mockDeviceInfoCollector.collectAsDeviceInfoForLogs() } returns deviceInfoForLogs
         val testLogAttributes = buildJsonObject {
@@ -262,81 +261,42 @@ class LoggingClientTests {
 
         onlineSdkEvents.await() shouldBe listOf(logEvent)
         verifySuspend { mockEmarsysClient.send(any(), any()) }
-        verifySuspend { mockSdkLogger.error(any(), any<Throwable>(), false) }
         verifySuspend { mockSdkEventManager.emitEvent(logEvent) }
-        verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(logEvent) }
+        verifySuspend {
+            mockClientExceptionHandler.handleException(
+                testException,
+                "LoggingClient: ConsumeLogsAndMetrics error",
+                logEvent
+            )
+        }
     }
 
     @Test
-    fun testConsumer_should_not_ack_event_and_log_locally_when_unknown_exception_happens() =
-        runTest {
-            createLoggingClient(backgroundScope).register()
+    fun testConsumer_should_callClientExceptionHandler_when_exception_happens() = runTest {
+        createLoggingClient(backgroundScope).register()
+        val testException = Exception("Test exception")
 
-            every { mockUrlFactory.create(EmarsysUrlType.LOGGING) } throws RuntimeException()
-            everySuspend { mockDeviceInfoCollector.collectAsDeviceInfoForLogs() } returns deviceInfoForLogs
-            val logEvent = SdkEvent.Internal.Sdk.Metric(
-                level = LogLevel.Metric,
-            )
+        every { mockUrlFactory.create(EmarsysUrlType.LOGGING) } throws testException
+        val logEvent = SdkEvent.Internal.Sdk.Metric(
+            level = LogLevel.Metric
+        )
 
-            val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
-                logEvents.take(1).toList()
-            }
-
-            logEvents.emit(logEvent)
-
-            advanceTimeBy(11000)
-
-            onlineSdkEvents.await() shouldBe listOf(logEvent)
-            verifySuspend(VerifyMode.exactly(0)) { mockEmarsysClient.send(any(), any()) }
-            verifySuspend { mockSdkLogger.error(any(), any<Throwable>(), false) }
-            verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(logEvent) }
+        val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
+            logEvents.take(1).toList()
         }
 
-    @Test
-    fun testConsumer_should_ack_event_when_known_exception_happens() = forAll(
-        table(
-            headers("exception"),
-            listOf(
-                row(
-                    FailedRequestException(
-                        createTestResponse(
-                            statusCode = HttpStatusCode.BadRequest
-                        )
-                    )
-                ),
-                row(RetryLimitReachedException("Retry limit reached")),
-                row(
-                    MissingApplicationCodeException("Missing app code")
-                ),
+        logEvents.emit(logEvent)
+
+        advanceTimeBy(11000)
+
+        onlineSdkEvents.await() shouldBe listOf(logEvent)
+        verifySuspend(VerifyMode.exactly(0)) { mockEmarsysClient.send(any(), any()) }
+        verifySuspend {
+            mockClientExceptionHandler.handleException(
+                testException,
+                "LoggingClient: ConsumeLogsAndMetrics error",
+                logEvent
             )
-        )
-    ) { testException ->
-        runTest {
-            createLoggingClient(backgroundScope).register()
-
-            every { mockUrlFactory.create(EmarsysUrlType.LOGGING) } throws testException
-            val logEvent = SdkEvent.Internal.Sdk.Metric(
-                level = LogLevel.Metric
-            )
-
-            val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
-                logEvents.take(1).toList()
-            }
-
-            logEvents.emit(logEvent)
-
-            advanceTimeBy(11000)
-
-            onlineSdkEvents.await() shouldBe listOf(logEvent)
-            verifySuspend(VerifyMode.exactly(0)) { mockEmarsysClient.send(any(), any()) }
-            verifySuspend(VerifyMode.exactly(0)) {
-                mockSdkLogger.error(
-                    any(),
-                    any<Throwable>(),
-                    false
-                )
-            }
-            verifySuspend { mockEventsDao.removeEvent(logEvent) }
         }
     }
 
