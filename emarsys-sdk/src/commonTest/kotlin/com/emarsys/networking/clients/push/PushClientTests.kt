@@ -12,8 +12,8 @@ import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
-import com.emarsys.networking.clients.event.model.OnlineSdkEvent
-import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.event.OnlineSdkEvent
+import com.emarsys.event.SdkEvent
 import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns

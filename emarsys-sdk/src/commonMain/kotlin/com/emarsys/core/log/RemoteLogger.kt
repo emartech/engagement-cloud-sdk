@@ -2,7 +2,7 @@ package com.emarsys.core.log
 
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.SdkEventDistributorApi
-import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.event.SdkEvent
 import kotlinx.serialization.json.JsonObject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject

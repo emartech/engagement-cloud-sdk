@@ -14,6 +14,8 @@ import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
+import com.emarsys.event.OnlineSdkEvent
+import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.inapp.InAppMessage
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
@@ -23,8 +25,6 @@ import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.mobileengage.inapp.WebViewHolder
 import com.emarsys.networking.clients.event.model.DeviceEventResponse
 import com.emarsys.networking.clients.event.model.EventResponseInApp
-import com.emarsys.networking.clients.event.model.OnlineSdkEvent
-import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
@@ -183,7 +183,7 @@ class EventClientTests {
         val expectedUrlRequest = UrlRequest(
             TEST_BASE_URL,
             HttpMethod.Post,
-            """{"dnd":$IN_APP_DND,"events":[{"fullClassName":"com.emarsys.networking.clients.event.model.SdkEvent.External.Custom","type":"custom","id":"$UUID","name":"${testEvent.name}","attributes":{"key":"value"},"timestamp":"$TIMESTAMP","nackCount":0}],"deviceEventState":{"key":"value"}}""",
+            """{"dnd":$IN_APP_DND,"events":[{"fullClassName":"com.emarsys.event.SdkEvent.External.Custom","type":"custom","id":"$UUID","name":"${testEvent.name}","attributes":{"key":"value"},"timestamp":"$TIMESTAMP","nackCount":0}],"deviceEventState":{"key":"value"}}""",
         )
         val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
             onlineEvents.take(1).toList()
@@ -447,7 +447,7 @@ class EventClientTests {
         val expectedUrlRequest = UrlRequest(
             TEST_BASE_URL,
             HttpMethod.Post,
-            """{"dnd":$IN_APP_DND,"events":[{"fullClassName":"com.emarsys.networking.clients.event.model.SdkEvent.External.Custom","type":"custom","id":"$UUID","name":"${testEvent.name}","attributes":{"key":"value"},"timestamp":"$TIMESTAMP","nackCount":0}]}""",
+            """{"dnd":$IN_APP_DND,"events":[{"fullClassName":"com.emarsys.event.SdkEvent.External.Custom","type":"custom","id":"$UUID","name":"${testEvent.name}","attributes":{"key":"value"},"timestamp":"$TIMESTAMP","nackCount":0}]}""",
         )
         return expectedUrlRequest
     }

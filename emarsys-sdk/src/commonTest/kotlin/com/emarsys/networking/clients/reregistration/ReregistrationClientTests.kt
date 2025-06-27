@@ -5,7 +5,7 @@ import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.state.StateMachineApi
-import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.event.SdkEvent
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws

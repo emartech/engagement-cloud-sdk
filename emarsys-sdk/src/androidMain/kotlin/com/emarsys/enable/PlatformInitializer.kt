@@ -2,7 +2,7 @@ package com.emarsys.enable
 
 import android.app.NotificationManager
 import com.emarsys.core.channel.SdkEventDistributorApi
-import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.event.SdkEvent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart

@@ -11,11 +11,11 @@ import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
+import com.emarsys.event.OnlineSdkEvent
+import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.session.SessionApi
 import com.emarsys.networking.EmarsysHeaders
 import com.emarsys.networking.clients.EventBasedClientApi
-import com.emarsys.networking.clients.event.model.OnlineSdkEvent
-import com.emarsys.networking.clients.event.model.SdkEvent
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineDispatcher

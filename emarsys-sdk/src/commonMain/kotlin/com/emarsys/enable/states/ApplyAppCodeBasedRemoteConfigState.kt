@@ -2,7 +2,7 @@ package com.emarsys.enable.states
 
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.state.State
-import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.event.SdkEvent
 
 internal class ApplyAppCodeBasedRemoteConfigState(private val sdkEventDistributor: SdkEventDistributorApi) :
     State {

@@ -3,7 +3,7 @@ package com.emarsys.core.log
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.di.SdkKoinIsolationContext.koin
-import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.event.SdkEvent
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every

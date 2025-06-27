@@ -19,6 +19,7 @@ import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
+import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.action.PushActionFactoryApi
 import com.emarsys.mobileengage.action.actions.Action
 import com.emarsys.mobileengage.action.actions.OpenExternalUrlAction
@@ -34,7 +35,6 @@ import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableOpenExternalUrlActionModel
 import com.emarsys.mobileengage.action.models.toPresentablePushToInAppActionModel
 import com.emarsys.mobileengage.inapp.PushToInAppPayload
-import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns

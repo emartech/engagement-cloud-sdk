@@ -1,6 +1,6 @@
 package com.emarsys.networking.clients.error
 
-import com.emarsys.networking.clients.event.model.OnlineSdkEvent
+import com.emarsys.event.OnlineSdkEvent
 
 interface ClientExceptionHandler {
 

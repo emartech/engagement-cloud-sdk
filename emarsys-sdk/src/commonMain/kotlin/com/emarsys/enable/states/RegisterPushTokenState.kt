@@ -4,7 +4,7 @@ import com.emarsys.api.push.PushConstants
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.StringStorageApi
-import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.event.SdkEvent
 
 internal class RegisterPushTokenState(
     private val storage: StringStorageApi,

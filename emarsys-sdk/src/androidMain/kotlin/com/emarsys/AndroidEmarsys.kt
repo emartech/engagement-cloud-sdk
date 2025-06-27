@@ -12,7 +12,7 @@ import com.emarsys.config.SdkConfig
 import com.emarsys.core.exceptions.SdkAlreadyEnabledException
 import com.emarsys.di.EventFlowTypes
 import com.emarsys.di.SdkKoinIsolationContext.koin
-import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.event.SdkEvent
 import com.emarsys.tracking.TrackingApi
 import kotlinx.coroutines.flow.Flow
 import org.koin.core.qualifier.named

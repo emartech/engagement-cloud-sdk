@@ -1,7 +1,7 @@
 package com.emarsys.core.db
 
 import com.emarsys.core.log.Logger
-import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.event.SdkEvent
 import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns

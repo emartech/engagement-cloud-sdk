@@ -4,7 +4,7 @@ import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.state.State
-import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.event.SdkEvent
 
 internal class LinkContactState(
     private val sdkContext: SdkContextApi,

@@ -2,7 +2,7 @@ package com.emarsys.core.db.events
 
 import com.emarsys.core.db.EmarsysIndexedDbObjectStoreApi
 import com.emarsys.core.log.Logger
-import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.event.SdkEvent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put

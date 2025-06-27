@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.emarsys.SdkConstants.SILENT_PUSH_RECEIVED_EVENT_NAME
 import com.emarsys.core.channel.SdkEventDistributorApi
+import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.action.PushActionFactory
 import com.emarsys.mobileengage.action.actions.Action
 import com.emarsys.mobileengage.action.models.BadgeCount
@@ -16,7 +17,6 @@ import com.emarsys.mobileengage.push.NotificationOperation.INIT
 import com.emarsys.mobileengage.push.model.AndroidPlatformData
 import com.emarsys.mobileengage.push.model.NotificationMethod
 import com.emarsys.mobileengage.push.model.SilentAndroidPushMessage
-import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.util.JsonUtil
 import dev.mokkery.verifySuspend
 import io.mockk.coEvery
@@ -24,7 +24,6 @@ import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.buildJsonObject
 import org.junit.Before
 import org.junit.Test
 

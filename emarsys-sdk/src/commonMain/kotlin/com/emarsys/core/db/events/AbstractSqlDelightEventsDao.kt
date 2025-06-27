@@ -1,6 +1,6 @@
 package com.emarsys.core.db.events
 
-import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.event.SdkEvent
 import com.emarsys.sqldelight.EmarsysDB
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow

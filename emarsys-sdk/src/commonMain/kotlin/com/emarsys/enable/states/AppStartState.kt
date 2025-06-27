@@ -5,7 +5,7 @@ import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.state.State
 
-import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.event.SdkEvent
 
 internal class AppStartState(
     private val sdkEventDistributor: SdkEventDistributorApi,

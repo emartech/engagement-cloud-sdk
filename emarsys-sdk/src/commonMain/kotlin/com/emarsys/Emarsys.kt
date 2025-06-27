@@ -18,8 +18,8 @@ import com.emarsys.di.SdkKoinIsolationContext
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.disable.DisableOrganizerApi
 import com.emarsys.enable.EnableOrganizerApi
+import com.emarsys.event.SdkEvent
 import com.emarsys.init.InitOrganizerApi
-import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.tracking.TrackingApi
 import kotlinx.coroutines.flow.Flow
 import org.koin.core.parameter.parametersOf

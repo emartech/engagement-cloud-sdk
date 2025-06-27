@@ -11,9 +11,9 @@ import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType.REGISTER_DEVICE_INFO
 import com.emarsys.core.url.UrlFactoryApi
+import com.emarsys.event.SdkEvent
 import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.contact.ContactTokenHandlerApi
-import com.emarsys.networking.clients.event.model.SdkEvent
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineScope

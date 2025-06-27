@@ -1,7 +1,7 @@
 package com.emarsys.core.channel
 
-import com.emarsys.networking.clients.event.model.OnlineSdkEvent
-import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.event.OnlineSdkEvent
+import com.emarsys.event.SdkEvent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 

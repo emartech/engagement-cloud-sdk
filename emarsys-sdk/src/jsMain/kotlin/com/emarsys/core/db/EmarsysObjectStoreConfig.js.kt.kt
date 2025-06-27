@@ -1,6 +1,6 @@
 package com.emarsys.core.db
 
-import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.event.SdkEvent
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.serializer
 

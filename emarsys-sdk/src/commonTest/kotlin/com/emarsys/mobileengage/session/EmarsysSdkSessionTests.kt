@@ -11,7 +11,7 @@ import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.session.SessionId
-import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.event.SdkEvent
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns

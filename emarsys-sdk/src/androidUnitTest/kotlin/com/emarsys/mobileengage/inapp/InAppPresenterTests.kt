@@ -7,7 +7,7 @@ import androidx.fragment.app.FragmentTransaction
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.InstantProvider
-import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.event.SdkEvent
 import com.emarsys.watchdog.activity.TransitionSafeCurrentActivityWatchdog
 import io.mockk.Called
 import io.mockk.coEvery

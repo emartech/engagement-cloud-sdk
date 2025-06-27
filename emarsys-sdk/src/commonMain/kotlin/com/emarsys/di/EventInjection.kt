@@ -11,9 +11,9 @@ import com.emarsys.api.event.EventTrackerInternal
 import com.emarsys.api.event.LoggingEventTracker
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.collections.PersistentList
+import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.session.EmarsysSdkSession
 import com.emarsys.mobileengage.session.SessionApi
-import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.tracking.Tracking
 import com.emarsys.tracking.TrackingApi
 import kotlinx.coroutines.flow.Flow

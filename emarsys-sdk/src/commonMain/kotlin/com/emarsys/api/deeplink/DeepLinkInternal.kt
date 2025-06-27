@@ -2,7 +2,7 @@ package com.emarsys.api.deeplink
 
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.SdkEventDistributorApi
-import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.event.SdkEvent
 import io.ktor.http.Url
 import kotlinx.coroutines.withContext
 

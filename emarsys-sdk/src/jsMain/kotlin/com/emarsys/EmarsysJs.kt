@@ -14,7 +14,7 @@ import com.emarsys.api.tracking.JSTrackingApi
 import com.emarsys.di.CoroutineScopeTypes
 import com.emarsys.di.EventFlowTypes
 import com.emarsys.di.SdkKoinIsolationContext.koin
-import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.event.SdkEvent
 import com.emarsys.util.JsonUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart

@@ -13,7 +13,7 @@ import com.emarsys.core.exceptions.SdkAlreadyDisabledException
 import com.emarsys.core.exceptions.SdkAlreadyEnabledException
 import com.emarsys.di.EventFlowTypes
 import com.emarsys.di.SdkKoinIsolationContext.koin
-import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.event.SdkEvent
 import io.ktor.utils.io.CancellationException
 import kotlinx.coroutines.flow.Flow
 import org.koin.core.qualifier.named

@@ -15,6 +15,8 @@ import com.emarsys.core.networking.model.body
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
+import com.emarsys.event.SdkEvent
+import com.emarsys.event.ack
 import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.inapp.InAppMessage
 import com.emarsys.mobileengage.inapp.InAppPresentationMode
@@ -25,8 +27,6 @@ import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.event.model.DeviceEventRequestBody
 import com.emarsys.networking.clients.event.model.DeviceEventResponse
 import com.emarsys.networking.clients.event.model.EventResponseInApp
-import com.emarsys.networking.clients.event.model.SdkEvent
-import com.emarsys.networking.clients.event.model.ack
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineScope

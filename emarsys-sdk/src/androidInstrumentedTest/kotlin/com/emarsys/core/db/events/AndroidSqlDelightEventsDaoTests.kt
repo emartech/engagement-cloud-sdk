@@ -2,8 +2,8 @@ package com.emarsys.core.db.events
 
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import com.emarsys.applicationContext
-import com.emarsys.networking.clients.event.model.OnlineSdkEvent
-import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.event.OnlineSdkEvent
+import com.emarsys.event.SdkEvent
 import com.emarsys.sqldelight.EmarsysDB
 import com.emarsys.util.JsonUtil
 import io.kotest.matchers.shouldBe

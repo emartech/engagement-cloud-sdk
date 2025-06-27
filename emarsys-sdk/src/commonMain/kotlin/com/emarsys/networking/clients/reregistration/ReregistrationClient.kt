@@ -5,8 +5,8 @@ import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.state.StateMachineApi
+import com.emarsys.event.SdkEvent
 import com.emarsys.networking.clients.EventBasedClientApi
-import com.emarsys.networking.clients.event.model.SdkEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.catch

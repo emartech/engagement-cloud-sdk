@@ -13,8 +13,8 @@ import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
-import com.emarsys.networking.clients.event.model.OnlineSdkEvent
-import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.event.OnlineSdkEvent
+import com.emarsys.event.SdkEvent
 import com.emarsys.remoteConfig.RemoteConfigResponse
 import com.emarsys.remoteConfig.RemoteConfigResponseHandlerApi
 import com.emarsys.util.JsonUtil

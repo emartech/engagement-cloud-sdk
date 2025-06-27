@@ -1,5 +1,6 @@
 package com.emarsys.networking.clients.event.model
 
+import com.emarsys.event.SdkEvent
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 

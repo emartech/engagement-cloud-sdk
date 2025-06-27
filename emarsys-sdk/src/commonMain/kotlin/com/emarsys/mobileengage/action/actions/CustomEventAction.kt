@@ -1,8 +1,8 @@
 package com.emarsys.mobileengage.action.actions
 
 import com.emarsys.core.channel.SdkEventDistributorApi
+import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.action.models.CustomEventActionModel
-import com.emarsys.networking.clients.event.model.SdkEvent
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 

@@ -2,10 +2,10 @@ package com.emarsys.mobileengage.push
 
 import com.emarsys.SdkConstants.SILENT_PUSH_RECEIVED_EVENT_NAME
 import com.emarsys.core.channel.SdkEventDistributorApi
+import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.action.PushActionFactoryApi
 import com.emarsys.mobileengage.push.model.AndroidPlatformData
 import com.emarsys.mobileengage.push.model.SilentAndroidPushMessage
-import com.emarsys.networking.clients.event.model.SdkEvent
 
 internal class SilentPushMessageHandler(
     private val pushActionFactory: PushActionFactoryApi,

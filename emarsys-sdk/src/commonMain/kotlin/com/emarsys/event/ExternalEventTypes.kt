@@ -1,4 +1,4 @@
-package com.emarsys.networking.clients.event.model
+package com.emarsys.event
 
 enum class ExternalEventTypes {
     APP_EVENT, BADGE_COUNT

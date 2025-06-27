@@ -2,7 +2,7 @@ package com.emarsys.mobileengage.inapp
 
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.Logger
-import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.event.SdkEvent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first

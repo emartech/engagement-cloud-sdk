@@ -4,8 +4,8 @@ import com.emarsys.api.SdkState
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.log.Logger
-import com.emarsys.networking.clients.event.model.OnlineSdkEvent
-import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.event.OnlineSdkEvent
+import com.emarsys.event.SdkEvent
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow

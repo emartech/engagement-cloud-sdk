@@ -3,9 +3,9 @@ package com.emarsys.networking.clients.event
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
-import com.emarsys.networking.clients.event.model.SdkEvent
-import com.emarsys.networking.clients.event.model.ack
-import com.emarsys.networking.clients.event.model.nack
+import com.emarsys.event.SdkEvent
+import com.emarsys.event.ack
+import com.emarsys.event.nack
 import dev.mokkery.MockMode
 import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend

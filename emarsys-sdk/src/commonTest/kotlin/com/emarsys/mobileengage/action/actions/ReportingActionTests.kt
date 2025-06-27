@@ -2,10 +2,10 @@ package com.emarsys.mobileengage.action.actions
 
 import com.emarsys.SdkConstants.BUTTON_CLICK_ORIGIN
 import com.emarsys.core.channel.SdkEventDistributorApi
+import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.action.models.BasicInAppButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
-import com.emarsys.networking.clients.event.model.SdkEvent
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend

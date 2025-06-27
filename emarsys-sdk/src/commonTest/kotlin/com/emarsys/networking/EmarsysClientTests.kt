@@ -12,11 +12,11 @@ import com.emarsys.core.networking.model.body
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
+import com.emarsys.event.SdkEvent
 import com.emarsys.model.TestDataClass
 import com.emarsys.networking.EmarsysHeaders.CLIENT_ID_HEADER
 import com.emarsys.networking.EmarsysHeaders.CLIENT_STATE_HEADER
 import com.emarsys.networking.EmarsysHeaders.CONTACT_TOKEN_HEADER
-import com.emarsys.networking.clients.event.model.SdkEvent
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every

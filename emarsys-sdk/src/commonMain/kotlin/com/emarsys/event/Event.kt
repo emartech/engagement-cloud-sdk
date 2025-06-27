@@ -1,4 +1,4 @@
-package com.emarsys.networking.clients.event.model
+package com.emarsys.event
 
 import com.emarsys.SdkConstants.APPLY_APPCODE_BASED_REMOTE_CONFIG_EVENT_NAME
 import com.emarsys.SdkConstants.APPLY_GLOBAL_REMOTE_CONFIG_EVENT_NAME

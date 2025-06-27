@@ -1,8 +1,8 @@
 package com.emarsys.mobileengage.action.actions
 
 import com.emarsys.core.channel.SdkEventDistributorApi
+import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.action.models.DismissActionModel
-import com.emarsys.networking.clients.event.model.SdkEvent
 
 internal class DismissAction(
     private val action: DismissActionModel,

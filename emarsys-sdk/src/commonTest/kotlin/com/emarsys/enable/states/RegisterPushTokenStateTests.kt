@@ -3,7 +3,7 @@ package com.emarsys.enable.states
 import com.emarsys.api.push.PushConstants
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.storage.StringStorageApi
-import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.event.SdkEvent
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every

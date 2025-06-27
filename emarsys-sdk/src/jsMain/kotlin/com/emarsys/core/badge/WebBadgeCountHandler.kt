@@ -2,8 +2,8 @@ package com.emarsys.core.badge
 
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.Logger
+import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.action.models.BadgeCount
-import com.emarsys.networking.clients.event.model.SdkEvent
 import com.emarsys.util.JsonUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

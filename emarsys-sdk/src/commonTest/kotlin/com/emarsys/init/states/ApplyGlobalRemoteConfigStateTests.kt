@@ -1,9 +1,8 @@
 package com.emarsys.init.states
 
 import com.emarsys.core.channel.SdkEventDistributorApi
-import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.SdkLogger
-import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.event.SdkEvent
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend

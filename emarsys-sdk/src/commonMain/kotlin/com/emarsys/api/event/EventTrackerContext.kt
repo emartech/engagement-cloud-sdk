@@ -1,6 +1,6 @@
 package com.emarsys.api.event
 
-import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.event.SdkEvent
 import kotlinx.serialization.Serializable
 
 internal class EventTrackerContext(

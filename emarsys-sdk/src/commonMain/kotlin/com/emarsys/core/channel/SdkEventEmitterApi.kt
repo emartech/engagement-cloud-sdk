@@ -1,6 +1,6 @@
 package com.emarsys.core.channel
 
-import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.event.SdkEvent
 
 interface SdkEventEmitterApi {
 

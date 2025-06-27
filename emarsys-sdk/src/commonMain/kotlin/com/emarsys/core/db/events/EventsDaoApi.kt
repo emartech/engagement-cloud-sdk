@@ -1,6 +1,6 @@
 package com.emarsys.core.db.events
 
-import com.emarsys.networking.clients.event.model.SdkEvent
+import com.emarsys.event.SdkEvent
 import kotlinx.coroutines.flow.Flow
 
 interface EventsDaoApi {
