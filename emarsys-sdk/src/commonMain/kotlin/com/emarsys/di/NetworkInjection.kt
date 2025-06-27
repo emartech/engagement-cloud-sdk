@@ -6,6 +6,8 @@ import com.emarsys.networking.EmarsysClient
 import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.config.ConfigClient
 import com.emarsys.networking.clients.device.DeviceClient
+import com.emarsys.networking.clients.error.ClientExceptionHandler
+import com.emarsys.networking.clients.error.DefaultClientExceptionHandler
 import com.emarsys.networking.clients.event.EventClient
 import com.emarsys.networking.clients.logging.LoggingClient
 import com.emarsys.networking.clients.remoteConfig.RemoteConfigClient
@@ -34,6 +36,13 @@ object NetworkInjection {
                 sdkLogger = get { parametersOf(EmarsysClient::class.simpleName) },
                 sdkEventDistributor = get()
             )
+        }
+        single<ClientExceptionHandler> {
+            DefaultClientExceptionHandler(
+                eventsDao = get(),
+                get {
+                    parametersOf(DefaultClientExceptionHandler::class.simpleName)
+                })
         }
         single<EventBasedClientApi>(named(EventBasedClientTypes.Event)) {
             EventClient(
@@ -80,6 +89,7 @@ object NetworkInjection {
         single<EventBasedClientApi>(named(EventBasedClientTypes.Config)) {
             ConfigClient(
                 emarsysNetworkClient = get(named(NetworkClientTypes.Emarsys)),
+                clientExceptionHandler = get(),
                 urlFactory = get(),
                 sdkEventManager = get(),
                 requestContext = get(),

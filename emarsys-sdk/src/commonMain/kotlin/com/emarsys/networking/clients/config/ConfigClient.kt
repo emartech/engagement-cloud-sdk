@@ -3,9 +3,6 @@ package com.emarsys.networking.clients.config
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
-import com.emarsys.core.exceptions.FailedRequestException
-import com.emarsys.core.exceptions.MissingApplicationCodeException
-import com.emarsys.core.exceptions.RetryLimitReachedException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.context.RequestContextApi
@@ -16,6 +13,7 @@ import com.emarsys.event.SdkEvent
 import com.emarsys.networking.RefreshTokenRequestBody
 import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.contact.ContactTokenHandlerApi
+import com.emarsys.networking.clients.error.ClientExceptionHandler
 import io.ktor.http.HttpMethod
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -25,6 +23,7 @@ import kotlinx.serialization.json.Json
 
 internal class ConfigClient(
     private val emarsysNetworkClient: NetworkClientApi,
+    private val clientExceptionHandler: ClientExceptionHandler,
     private val urlFactory: UrlFactoryApi,
     private val sdkEventManager: SdkEventManagerApi,
     private val requestContext: RequestContextApi,
@@ -66,7 +65,8 @@ internal class ConfigClient(
                     val response =
                         emarsysNetworkClient.send(
                             request,
-                            onNetworkError = { sdkEventManager.emitEvent(it) })
+                            onNetworkError = { sdkEventManager.emitEvent(it) }
+                        )
                     contactTokenHandler.handleContactTokens(response)
                     if (it is SdkEvent.Internal.Sdk.ChangeMerchantId) {
                         sdkContext.config =
@@ -77,17 +77,11 @@ internal class ConfigClient(
                     }
                     it.ack(eventsDao, sdkLogger)
                 } catch (exception: Exception) {
-                    when (exception) {
-                        is FailedRequestException, is RetryLimitReachedException, is MissingApplicationCodeException -> it.ack(
-                            eventsDao,
-                            sdkLogger
-                        )
-
-                        else -> sdkLogger.error(
-                            "ConfigClient - consumeConfigChanges",
-                            exception
-                        )
-                    }
+                    clientExceptionHandler.handleException(
+                        exception,
+                        "ConfigClient - consumeConfigChanges",
+                        it
+                    )
                 }
             }
     }

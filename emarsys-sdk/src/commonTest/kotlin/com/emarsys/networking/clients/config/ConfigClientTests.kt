@@ -17,6 +17,7 @@ import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
 import com.emarsys.networking.clients.contact.ContactTokenHandlerApi
+import com.emarsys.networking.clients.error.ClientExceptionHandler
 import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
@@ -72,6 +73,7 @@ class ConfigClientTests {
     private lateinit var mockSdkLogger: Logger
     private lateinit var mockConfig: SdkConfig
     private lateinit var mockRequestContext: RequestContextApi
+    private lateinit var mockClientExceptionHandler: ClientExceptionHandler
     private lateinit var json: Json
     private lateinit var onlineEvents: MutableSharedFlow<OnlineSdkEvent>
     private lateinit var mockSdkEventManager: SdkEventManagerApi
@@ -87,6 +89,7 @@ class ConfigClientTests {
         mockSdkLogger = mock(MockMode.autofill)
         mockConfig = mock()
         mockRequestContext = mock(MockMode.autofill)
+        mockClientExceptionHandler = mock(MockMode.autofill)
         every { mockRequestContext.refreshToken } returns "testRefreshToken"
         json = JsonUtil.json
         mockEventsDao = mock()
@@ -111,6 +114,7 @@ class ConfigClientTests {
     private fun createConfigClient(applicationScope: CoroutineScope) =
         ConfigClient(
             mockEmarsysClient,
+            mockClientExceptionHandler,
             mockUrlFactory,
             mockSdkEventManager,
             mockRequestContext,
@@ -221,44 +225,13 @@ class ConfigClientTests {
 
         onlineSdkEvents.await() shouldBe listOf(changeMerchantId)
         verifySuspend { mockEmarsysClient.send(any(), any()) }
-        verifySuspend { mockSdkLogger.error(any(), any<Throwable>()) }
         verifySuspend { mockSdkEventManager.emitEvent(changeMerchantId) }
         verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(changeMerchantId) }
 
     }
 
     @Test
-    fun testConsumer_should_not_ack_event_when_unknown_exception_happens() = runTest {
-        configClient = createConfigClient(backgroundScope)
-        configClient.register()
-
-        every {
-            mockUrlFactory.create(
-                EmarsysUrlType.REFRESH_TOKEN
-            )
-        } throws RuntimeException("exception")
-        val changeMerchantId = SdkEvent.Internal.Sdk.ChangeMerchantId(
-            id = "changeMerchantId",
-            merchantId = "newMerchantId"
-        )
-
-        val onlineSdkEvents = backgroundScope.async {
-            onlineEvents.take(1).toList()
-        }
-
-        onlineEvents.emit(changeMerchantId)
-
-        advanceUntilIdle()
-
-        onlineSdkEvents.await() shouldBe listOf(changeMerchantId)
-        verifySuspend(VerifyMode.exactly(0)) { mockEmarsysClient.send(any(), any()) }
-        verifySuspend { mockSdkLogger.error(any(), any<Throwable>()) }
-        verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(changeMerchantId) }
-
-    }
-
-    @Test
-    fun testConsumer_should_ack_event_when_known_exception_happens() = forAll(
+    fun testConsumer_should_call_clientExceptionHandler_when_exception_happens() = forAll(
         table(
             headers("exception"),
             listOf(
@@ -300,8 +273,13 @@ class ConfigClientTests {
 
             onlineSdkEvents.await() shouldBe listOf(changeMerchantId)
             verifySuspend(VerifyMode.exactly(0)) { mockEmarsysClient.send(any(), any()) }
-            verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
-            verifySuspend { mockEventsDao.removeEvent(changeMerchantId) }
+            verifySuspend {
+                mockClientExceptionHandler.handleException(
+                    testException,
+                    "ConfigClient - consumeConfigChanges",
+                    changeMerchantId
+                )
+            }
         }
     }
 
