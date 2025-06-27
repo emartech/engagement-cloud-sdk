@@ -13,6 +13,7 @@ dependencies {
     implementation(libs.androidx.runner)
     implementation(libs.kotest.assertions.core)
 
+    androidTestImplementation(libs.kotlinx.serialization.json)
     androidTestImplementation(libs.junit)
 }
 android {
