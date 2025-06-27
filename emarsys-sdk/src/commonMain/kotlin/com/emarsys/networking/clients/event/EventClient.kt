@@ -4,9 +4,6 @@ import com.emarsys.api.inapp.InAppConfigApi
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.channel.naturalBatching
 import com.emarsys.core.db.events.EventsDaoApi
-import com.emarsys.core.exceptions.FailedRequestException
-import com.emarsys.core.exceptions.MissingApplicationCodeException
-import com.emarsys.core.exceptions.RetryLimitReachedException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.context.RequestContextApi
@@ -24,6 +21,7 @@ import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppType
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.networking.clients.EventBasedClientApi
+import com.emarsys.networking.clients.error.ClientExceptionHandler
 import com.emarsys.networking.clients.event.model.DeviceEventRequestBody
 import com.emarsys.networking.clients.event.model.DeviceEventResponse
 import com.emarsys.networking.clients.event.model.EventResponseInApp
@@ -41,6 +39,7 @@ import kotlinx.serialization.json.buildJsonObject
 
 internal class EventClient(
     private val emarsysNetworkClient: NetworkClientApi,
+    private val clientExceptionHandler: ClientExceptionHandler,
     private val urlFactory: UrlFactoryApi,
     private val json: Json,
     private val eventActionFactory: EventActionFactoryApi,
@@ -98,16 +97,11 @@ internal class EventClient(
                     }
                     sdkEvents.ack(eventsDao, sdkLogger)
                 } catch (throwable: Throwable) {
-                    when (throwable) {
-                        is FailedRequestException, is RetryLimitReachedException, is MissingApplicationCodeException -> {
-                            sdkEvents.ack(eventsDao, sdkLogger)
-                        }
-
-                        else -> sdkLogger.error(
-                            "EventClient: Error during event consumption",
-                            throwable
-                        )
-                    }
+                    clientExceptionHandler.handleException(
+                        throwable,
+                        "EventClient: Error during event consumption",
+                        *sdkEvents.toTypedArray()
+                    )
                 }
             }.collect()
     }

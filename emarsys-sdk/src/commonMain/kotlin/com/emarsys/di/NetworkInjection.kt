@@ -47,6 +47,7 @@ object NetworkInjection {
         single<EventBasedClientApi>(named(EventBasedClientTypes.Event)) {
             EventClient(
                 emarsysNetworkClient = get(named(NetworkClientTypes.Emarsys)),
+                clientExceptionHandler = get(),
                 urlFactory = get(),
                 json = get(),
                 eventActionFactory = get(),

@@ -3,9 +3,6 @@ package com.emarsys.networking.clients.event
 import com.emarsys.api.inapp.InAppConfigApi
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
-import com.emarsys.core.exceptions.FailedRequestException
-import com.emarsys.core.exceptions.MissingApplicationCodeException
-import com.emarsys.core.exceptions.RetryLimitReachedException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.context.RequestContextApi
@@ -23,6 +20,7 @@ import com.emarsys.mobileengage.inapp.InAppType
 import com.emarsys.mobileengage.inapp.InAppViewApi
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.mobileengage.inapp.WebViewHolder
+import com.emarsys.networking.clients.error.ClientExceptionHandler
 import com.emarsys.networking.clients.event.model.DeviceEventResponse
 import com.emarsys.networking.clients.event.model.EventResponseInApp
 import com.emarsys.util.JsonUtil
@@ -36,10 +34,6 @@ import dev.mokkery.mock
 import dev.mokkery.verify
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
-import io.kotest.data.forAll
-import io.kotest.data.headers
-import io.kotest.data.row
-import io.kotest.data.table
 import io.kotest.matchers.shouldBe
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
@@ -91,6 +85,7 @@ class EventClientTests {
     }
 
     private lateinit var mockEmarsysClient: NetworkClientApi
+    private lateinit var mockClientExceptionHandler: ClientExceptionHandler
     private lateinit var mockUrlFactory: UrlFactoryApi
     private lateinit var mockOnEventActionFactory: EventActionFactoryApi
     private lateinit var mockSdkEventManager: SdkEventManagerApi
@@ -111,6 +106,7 @@ class EventClientTests {
     fun setup() {
         Dispatchers.setMain(StandardTestDispatcher())
         mockEmarsysClient = mock()
+        mockClientExceptionHandler = mock(MockMode.autofill)
         mockUrlFactory = mock()
         mockOnEventActionFactory = mock()
         mockInAppConfigApi = mock()
@@ -144,6 +140,7 @@ class EventClientTests {
 
     private fun createEventClient(applicationScope: CoroutineScope) = EventClient(
         mockEmarsysClient,
+        mockClientExceptionHandler,
         mockUrlFactory,
         json,
         mockOnEventActionFactory,
@@ -328,9 +325,10 @@ class EventClientTests {
     fun testConsumer_shouldReEmitEventsToEventFlow_whenOnRecoverCallbackIsCalled() = runTest {
         createEventClient(backgroundScope).register()
 
+        val testException = IOException("No Internet")
         everySuspend { mockEmarsysClient.send(any(), any()) }.calls { args ->
             (args.arg(1) as suspend () -> Unit).invoke()
-            throw IOException("No Internet")
+            throw testException
         }
 
         val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
@@ -344,7 +342,6 @@ class EventClientTests {
         advanceUntilIdle()
 
         onlineSdkEvents.await() shouldBe listOf(testEvent, testEvent1)
-        verifySuspend { mockSdkLogger.error(any(), any<Throwable>()) }
         verifySuspend { mockEmarsysClient.send(any(), any()) }
         verifySuspend(VerifyMode.exactly(0)) { mockInAppViewProvider.provide() }
         verifySuspend(VerifyMode.exactly(0)) { mockInAppView.load(any()) }
@@ -352,20 +349,20 @@ class EventClientTests {
 
         // wait for emissions
         delay(5000)
-        verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(testEvent) }
-        verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(testEvent1) }
+        verifySuspend { mockClientExceptionHandler.handleException(testException, "EventClient: Error during event consumption", *arrayOf(testEvent)) }
+        verifySuspend { mockClientExceptionHandler.handleException(testException, "EventClient: Error during event consumption", *arrayOf(testEvent1)) }
         verifySuspend { mockSdkEventManager.emitEvent(testEvent) }
         verifySuspend { mockSdkEventManager.emitEvent(testEvent1) }
     }
 
     @Test
-    fun testConsumer_shouldNotAckMessages_whenUnknownExceptionIsThrown() = runTest {
-        eventClient = createEventClient(backgroundScope)
-        eventClient.register()
+    fun testConsumer_shouldCallClientExceptionHandler_whenExceptionIsThrown() = runTest {
+        createEventClient(backgroundScope).register()
+        val testException = Exception("Test Exception")
 
         everySuspend { mockEmarsysClient.send(any(), any()) }.calls { args ->
             (args.arg(1) as suspend () -> Unit).invoke()
-            throw IOException("testException")
+            throw testException
         }
 
         val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
@@ -378,67 +375,25 @@ class EventClientTests {
 
         advanceUntilIdle()
 
+        delay(1000)
         onlineSdkEvents.await() shouldBe listOf(testEvent, testEvent1)
-        verifySuspend { mockSdkLogger.error(any(), any<Throwable>()) }
         verifySuspend { mockEmarsysClient.send(any(), any()) }
         verifySuspend(VerifyMode.exactly(0)) { mockInAppViewProvider.provide() }
         verifySuspend(VerifyMode.exactly(0)) { mockInAppView.load(any()) }
         verifySuspend(VerifyMode.exactly(0)) { mockOnEventActionFactory.create(any()) }
-        verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(testEvent) }
-        verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(testEvent1) }
-    }
-
-    @Test
-    fun testConsumer_shouldAckEvents_whenKnownExceptionIsThrown() {
-        forAll(
-            table(
-                headers("exception"),
-                listOf(
-                    row(
-                        FailedRequestException(
-                            response = createTestResponse()
-                        )
-                    ),
-                    row(RetryLimitReachedException("Retry limit reached")),
-                    row(
-                        MissingApplicationCodeException("Missing app code")
-                    ),
-                )
+        verifySuspend {
+            mockClientExceptionHandler.handleException(
+                testException,
+                "EventClient: Error during event consumption",
+                *arrayOf(testEvent)
             )
-        ) { testException ->
-            runTest {
-                createEventClient(backgroundScope).register()
-
-                everySuspend { mockEmarsysClient.send(any(), any()) }.calls { args ->
-                    (args.arg(1) as suspend () -> Unit).invoke()
-                    throw testException
-                }
-
-                val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
-                    onlineEvents.take(2).toList()
-                }
-                val testEvent1 = testEvent.copy(id = "testId1")
-
-                mockSdkEventManager.registerEvent(testEvent)
-                mockSdkEventManager.registerEvent(testEvent1)
-
-                advanceUntilIdle()
-
-                delay(1000)
-                onlineSdkEvents.await() shouldBe listOf(testEvent, testEvent1)
-                verifySuspend(VerifyMode.exactly(0)) {
-                    mockSdkLogger.error(
-                        any(),
-                        any<Throwable>()
-                    )
-                }
-                verifySuspend { mockEmarsysClient.send(any(), any()) }
-                verifySuspend(VerifyMode.exactly(0)) { mockInAppViewProvider.provide() }
-                verifySuspend(VerifyMode.exactly(0)) { mockInAppView.load(any()) }
-                verifySuspend(VerifyMode.exactly(0)) { mockOnEventActionFactory.create(any()) }
-                verifySuspend { mockEventsDao.removeEvent(testEvent) }
-                verifySuspend { mockEventsDao.removeEvent(testEvent1) }
-            }
+        }
+        verifySuspend {
+            mockClientExceptionHandler.handleException(
+                testException,
+                "EventClient: Error during event consumption",
+                *arrayOf(testEvent1)
+            )
         }
     }
 
