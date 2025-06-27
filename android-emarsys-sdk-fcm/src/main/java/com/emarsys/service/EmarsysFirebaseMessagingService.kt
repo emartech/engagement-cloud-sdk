@@ -15,7 +15,6 @@ class EmarsysFirebaseMessagingService : FirebaseMessagingService() {
         private const val PUSH_MESSAGE_PAYLOAD_INTENT_FILTER_ACTION =
             "com.emarsys.sdk.PUSH_MESSAGE_PAYLOAD"
         const val PUSH_MESSAGE_PAYLOAD_INTENT_KEY = "pushPayload"
-        private const val EMS_KEY = "ems"
         private const val EMS_VERSION_KEY = "ems.version"
 
         internal val messagingServices =
@@ -64,7 +63,7 @@ class EmarsysFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun isEmarsysMessage(remoteMessage: Map<String, String>): Boolean {
-        return remoteMessage.containsKey(EMS_VERSION_KEY) || remoteMessage.containsKey(EMS_KEY)
+        return remoteMessage.containsKey(EMS_VERSION_KEY)
     }
 
 }

@@ -16,7 +16,7 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.unmockkAll
 import io.mockk.verify
-import org.json.JSONObject
+import kotlinx.serialization.json.Json
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -136,11 +136,11 @@ class EmarsysFirebaseMessagingServiceTest {
 
     @Test
     fun onMessageReceived_shouldSendBroadcast_withAnIntentContaining_thePackageName() {
-        val testPayload = JSONObject("""{"ems":"payload"}""")
+        val testPayload = mapOf("ems.version" to "version1", "notification.title" to "title")
         val intentSlot: CapturingSlot<Intent> = slot()
         val mockMessagingService = mockk<FirebaseMessagingService>(relaxed = true)
         val mockMessage = mockk<RemoteMessage>(relaxed = true)
-        every { mockMessage.data } returns mapOf("ems" to "payload")
+        every { mockMessage.data } returns testPayload
 
         registerReceiver("com.emarsys.sdk.PUSH_MESSAGE_PAYLOAD")
 
@@ -159,7 +159,7 @@ class EmarsysFirebaseMessagingServiceTest {
         }
 
         with(intentSlot.captured) {
-            getStringExtra("pushPayload") shouldBe testPayload.toString()
+            getStringExtra("pushPayload") shouldBe Json.encodeToString(testPayload)
             action shouldBe "com.emarsys.sdk.PUSH_MESSAGE_PAYLOAD"
             `package` shouldNotBe null
         }
