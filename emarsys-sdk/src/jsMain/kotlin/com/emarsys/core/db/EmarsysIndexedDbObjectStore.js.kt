@@ -14,6 +14,8 @@ import kotlinx.serialization.json.put
 import web.events.EventHandler
 import web.idb.IDBTransactionMode
 import web.idb.IDBValidKey
+import web.idb.readonly
+import web.idb.readwrite
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine

@@ -7,7 +7,9 @@ import com.emarsys.mobileengage.action.models.BasicInAppButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.ReportingActionModel
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 internal data class ReportingAction(
     private val action: ReportingActionModel,
     private val sdkEventDistributor: SdkEventDistributorApi

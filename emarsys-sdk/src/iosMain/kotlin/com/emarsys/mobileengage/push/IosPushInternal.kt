@@ -46,7 +46,9 @@ import platform.UserNotifications.UNNotificationResponse
 import platform.UserNotifications.UNUserNotificationCenter
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 import platform.darwin.NSObject
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 internal class IosPushInternal(
     storage: StringStorageApi,
     private val pushContext: PushContextApi,
@@ -97,6 +99,7 @@ internal class IosPushInternal(
                 is RegisterPushToken -> sdkEventDistributor.registerEvent(
                     SdkEvent.Internal.Sdk.RegisterPushToken(pushToken = call.pushToken)
                 )
+
                 is ClearPushToken -> sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.ClearPushToken())
                 is HandleSilentMessageWithUserInfo -> handleSilentMessageWithUserInfo(call.userInfo)
             }

@@ -9,8 +9,10 @@ import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import kotlin.time.ExperimentalTime
 
 @SuppressLint("SetJavaScriptEnabled")
+@OptIn(ExperimentalTime::class)
 internal class InAppView @JvmOverloads constructor(
     context: Context,
     private val mainDispatcher: CoroutineDispatcher,

@@ -17,6 +17,7 @@ import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
+import js.promise.await
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
@@ -31,7 +32,7 @@ import web.broadcast.BroadcastChannel
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-
+@OptIn(ExperimentalCoroutinesApi::class)
 class EmarsysServiceWorkerTests {
 
     companion object {
@@ -44,7 +45,6 @@ class EmarsysServiceWorkerTests {
     private lateinit var onBadgeCountUpdateReceivedBroadcastChannel: BroadcastChannel
     private lateinit var emarsysServiceWorker: EmarsysServiceWorker
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(StandardTestDispatcher())

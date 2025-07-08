@@ -18,7 +18,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 internal class DeviceClient(
     private val emarsysClient: NetworkClientApi,
     private val clientExceptionHandler: ClientExceptionHandler,

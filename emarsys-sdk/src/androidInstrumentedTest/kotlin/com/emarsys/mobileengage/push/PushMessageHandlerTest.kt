@@ -26,8 +26,9 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import org.junit.Before
 import org.junit.Test
+import kotlin.time.ExperimentalTime
 
-
+@OptIn(ExperimentalTime::class)
 class PushMessageHandlerTest {
     private companion object {
         const val COLLAPSE_ID = "testCollapseId"

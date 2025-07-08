@@ -33,8 +33,9 @@ import kotlinx.serialization.json.put
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.AfterTest
+import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
 class InAppPresenterTests {
 
     private lateinit var mockCurrentActivityWatchdog: TransitionSafeCurrentActivityWatchdog

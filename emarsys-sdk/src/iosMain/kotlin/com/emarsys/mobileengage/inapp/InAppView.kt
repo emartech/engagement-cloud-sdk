@@ -5,7 +5,9 @@ import com.emarsys.core.providers.InstantProvider
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import platform.WebKit.WKWebView
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 internal class InAppView(
     private val mainDispatcher: CoroutineDispatcher,
     private val webViewProvider: SuspendFactory<String, WKWebView>,

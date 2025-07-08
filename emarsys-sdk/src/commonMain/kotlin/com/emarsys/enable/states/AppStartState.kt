@@ -6,7 +6,9 @@ import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.state.State
 
 import com.emarsys.event.SdkEvent
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 internal class AppStartState(
     private val sdkEventDistributor: SdkEventDistributorApi,
     private val timestampProvider: InstantProvider,

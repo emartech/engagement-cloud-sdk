@@ -1,5 +1,6 @@
 package com.emarsys.service
 
+import com.emarsys.service.hms.HmsRemoteMessageMapper
 import io.kotest.matchers.equality.shouldBeEqualUsingFields
 import io.kotest.matchers.shouldBe
 import org.json.JSONArray

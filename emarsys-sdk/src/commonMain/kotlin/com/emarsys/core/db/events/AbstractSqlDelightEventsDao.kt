@@ -5,7 +5,9 @@ import com.emarsys.sqldelight.EmarsysDB
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.serialization.json.Json
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 internal abstract class AbstractSqlDelightEventsDao(db: EmarsysDB, private val json: Json) : EventsDaoApi {
     private val queries = db.eventsQueries
 

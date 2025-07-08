@@ -6,7 +6,8 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Looper
 import androidx.test.platform.app.InstrumentationRegistry
-import com.emarsys.service.model.HuaweiMessagingServiceRegistrationOptions
+import com.emarsys.service.hms.EmarsysHuaweiMessagingService
+import com.emarsys.service.hms.model.HuaweiMessagingServiceRegistrationOptions
 import com.huawei.hms.push.HmsMessageService
 import com.huawei.hms.push.RemoteMessage
 import io.kotest.matchers.shouldBe

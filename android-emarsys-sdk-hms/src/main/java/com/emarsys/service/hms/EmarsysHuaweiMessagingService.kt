@@ -1,7 +1,7 @@
-package com.emarsys.service
+package com.emarsys.service.hms
 
 import android.content.Intent
-import com.emarsys.service.model.HuaweiMessagingServiceRegistrationOptions
+import com.emarsys.service.hms.model.HuaweiMessagingServiceRegistrationOptions
 import com.huawei.hms.push.HmsMessageService
 import com.huawei.hms.push.RemoteMessage
 

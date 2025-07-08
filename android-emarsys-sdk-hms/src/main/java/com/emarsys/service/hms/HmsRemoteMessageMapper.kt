@@ -1,7 +1,7 @@
-package com.emarsys.service
+package com.emarsys.service.hms
 
-import com.emarsys.service.model.NotificationOperation
-import com.emarsys.service.provider.UuidStringProvider
+import com.emarsys.service.hms.model.NotificationOperation
+import com.emarsys.service.hms.provider.UuidStringProvider
 import org.json.JSONArray
 import org.json.JSONObject
 

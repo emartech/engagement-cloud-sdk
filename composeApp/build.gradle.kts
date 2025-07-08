@@ -10,7 +10,7 @@ kotlin {
     jvmToolchain(17)
 
     js {
-        moduleName = "composeApp"
+        outputModuleName.set("composeApp")
         browser {
             commonWebpackConfig {
                 outputFileName = "composeApp.js"

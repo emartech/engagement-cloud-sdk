@@ -5,6 +5,7 @@ import ServiceWorkerOptions
 import com.emarsys.api.push.PushConstants
 import com.emarsys.core.storage.StringStorageApi
 import js.buffer.BufferSource
+import js.promise.await
 import js.typedarrays.Uint8Array
 import kotlinx.browser.window
 import web.navigator.navigator

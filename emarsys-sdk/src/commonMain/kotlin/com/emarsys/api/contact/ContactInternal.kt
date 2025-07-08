@@ -7,7 +7,9 @@ import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.collections.dequeue
 import com.emarsys.core.log.Logger
 import com.emarsys.event.SdkEvent
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 internal class ContactInternal(
     private val contactContext: ContactContextApi,
     private val sdkLogger: Logger,

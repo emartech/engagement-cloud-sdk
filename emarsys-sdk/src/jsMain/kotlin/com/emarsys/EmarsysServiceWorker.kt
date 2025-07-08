@@ -6,6 +6,7 @@ import com.emarsys.core.mapper.Mapper
 import com.emarsys.mobileengage.push.PushMessagePresenter
 import com.emarsys.mobileengage.push.model.JsPushMessage
 import js.promise.Promise
+import js.promise.invoke
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.promise
 import kotlinx.serialization.StringFormat

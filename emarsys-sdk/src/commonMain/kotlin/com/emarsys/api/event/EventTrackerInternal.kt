@@ -7,7 +7,9 @@ import com.emarsys.core.collections.dequeue
 import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 internal class EventTrackerInternal(
     private val sdkEventDistributor: SdkEventDistributorApi,
     private val eventTrackerContext: EventTrackerContextApi,

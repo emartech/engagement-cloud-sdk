@@ -9,7 +9,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import web.broadcast.BroadcastChannel
 import web.events.EventHandler
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 internal class WebBadgeCountHandler(
     private val onBadgeCountUpdateReceivedBroadcastChannel: BroadcastChannel,
     private val sdkEventDistributor: SdkEventDistributorApi,

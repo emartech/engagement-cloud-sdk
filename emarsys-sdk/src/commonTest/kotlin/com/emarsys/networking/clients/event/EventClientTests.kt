@@ -54,7 +54,6 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -64,8 +63,10 @@ import okio.IOException
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
 class EventClientTests {
     private companion object {
         val DEVICE_EVENT_STATE = JsonObject(mapOf("key" to JsonPrimitive("value")))
@@ -349,8 +350,20 @@ class EventClientTests {
 
         // wait for emissions
         delay(5000)
-        verifySuspend { mockClientExceptionHandler.handleException(testException, "EventClient: Error during event consumption", *arrayOf(testEvent)) }
-        verifySuspend { mockClientExceptionHandler.handleException(testException, "EventClient: Error during event consumption", *arrayOf(testEvent1)) }
+        verifySuspend {
+            mockClientExceptionHandler.handleException(
+                testException,
+                "EventClient: Error during event consumption",
+                *arrayOf(testEvent)
+            )
+        }
+        verifySuspend {
+            mockClientExceptionHandler.handleException(
+                testException,
+                "EventClient: Error during event consumption",
+                *arrayOf(testEvent1)
+            )
+        }
         verifySuspend { mockSdkEventManager.emitEvent(testEvent) }
         verifySuspend { mockSdkEventManager.emitEvent(testEvent1) }
     }

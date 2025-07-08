@@ -18,7 +18,9 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 internal class EmarsysSdkSession(
     private val timestampProvider: InstantProvider,
     private val uuidProvider: UuidProviderApi,

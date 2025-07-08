@@ -6,7 +6,9 @@ import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.action.PushActionFactoryApi
 import com.emarsys.mobileengage.push.model.AndroidPlatformData
 import com.emarsys.mobileengage.push.model.SilentAndroidPushMessage
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 internal class SilentPushMessageHandler(
     private val pushActionFactory: PushActionFactoryApi,
     private val sdkEventDistributor: SdkEventDistributorApi

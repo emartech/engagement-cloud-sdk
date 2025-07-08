@@ -25,14 +25,17 @@ import web.events.EventHandler
 import web.idb.IDBTransactionMode
 import web.idb.IDBValidKey
 import web.idb.indexedDB
+import web.idb.readonly
+import web.idb.readwrite
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
 class EmarsysIndexedDbObjectStoreTest {
 
     private lateinit var emarsysIndexedDb: EmarsysIndexedDb

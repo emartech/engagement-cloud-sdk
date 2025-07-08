@@ -11,13 +11,15 @@ import dev.mokkery.every
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
-import kotlinx.datetime.Clock
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 class EventTrackerGathererTests {
     private companion object {
         const val UUID = "testUUID"
@@ -47,7 +49,12 @@ class EventTrackerGathererTests {
 
         every { mockTimestampProvider.provide() } returns timestamp
         every { mockUuidProvider.provide() } returns UUID
-        val logger = SdkLogger("TestLoggerName", mock(MockMode.autofill), remoteLogger = null, sdkContext = mock())
+        val logger = SdkLogger(
+            "TestLoggerName",
+            mock(MockMode.autofill),
+            remoteLogger = null,
+            sdkContext = mock()
+        )
 
         eventTrackerContext = EventTrackerContext(mutableListOf())
 

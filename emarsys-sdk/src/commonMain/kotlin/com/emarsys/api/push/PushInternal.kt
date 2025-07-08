@@ -9,7 +9,9 @@ import com.emarsys.core.collections.dequeue
 import com.emarsys.core.log.Logger
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.event.SdkEvent
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 internal open class PushInternal(
     private val storage: StringStorageApi,
     private val pushContext: PushContextApi,

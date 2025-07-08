@@ -20,7 +20,9 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 class ReregistrationClientTests {
 
     private lateinit var sdkEventFlow: MutableSharedFlow<SdkEvent>

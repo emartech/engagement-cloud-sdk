@@ -1,5 +1,6 @@
 package com.emarsys.mobileengage.inapp
 
+import js.iterable.iterator
 import web.html.HTMLElement
 
 class InAppScriptExtractor: InAppScriptExtractorApi {

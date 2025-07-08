@@ -5,7 +5,9 @@ import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
 import web.dom.document
 import web.html.HTMLElement
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 internal class WebInAppView(
     private val inappScriptExtractor: InAppScriptExtractorApi,
     private val webInAppJsBridgeFactory: Factory<InAppJsBridgeData, WebInAppJsBridge>,

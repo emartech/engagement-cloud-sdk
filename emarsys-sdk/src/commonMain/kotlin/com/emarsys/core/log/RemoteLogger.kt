@@ -6,7 +6,9 @@ import com.emarsys.event.SdkEvent
 import kotlinx.serialization.json.JsonObject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 internal class RemoteLogger : RemoteLoggerApi, KoinComponent {
     private val sdkEventDistributor: SdkEventDistributorApi by inject()
     private val sdkContext: SdkContextApi by inject()

@@ -22,6 +22,8 @@ import web.events.EventType
 import web.events.addEventListener
 import web.push.PushEvent
 import web.serviceworker.NotificationEvent
+import kotlin.js.Promise.Companion.reject
+import kotlin.js.Promise.Companion.resolve
 
 
 fun main() {
@@ -75,7 +77,7 @@ fun main() {
                 jsPushMessage
             )
         )
-        event.waitUntil(Promise { resolve, reject ->
+        event.waitUntil(Promise<Unit> { resolve, reject ->
             serviceWorkerScope.promise {
                 notificationClickHandler.handleNotificationClick(jsNotificationClickedData)
                 event.notification.close()

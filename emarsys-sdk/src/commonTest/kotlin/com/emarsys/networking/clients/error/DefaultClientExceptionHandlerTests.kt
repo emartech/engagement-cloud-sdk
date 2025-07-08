@@ -24,8 +24,9 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
 class DefaultClientExceptionHandlerTests {
     private lateinit var mockEventsDao: EventsDaoApi
     private lateinit var mockSdkLogger: Logger

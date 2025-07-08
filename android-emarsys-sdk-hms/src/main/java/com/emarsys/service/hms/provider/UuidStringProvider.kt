@@ -1,4 +1,4 @@
-package com.emarsys.service.provider
+package com.emarsys.service.hms.provider
 
 import java.util.UUID
 

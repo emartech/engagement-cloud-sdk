@@ -16,7 +16,9 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 class EventTests {
 
     private lateinit var mockEventsDao: EventsDaoApi

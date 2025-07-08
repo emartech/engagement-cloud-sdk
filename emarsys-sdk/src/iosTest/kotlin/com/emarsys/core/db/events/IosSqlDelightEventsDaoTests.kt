@@ -11,14 +11,15 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import kotlinx.datetime.Clock
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
 class IosSqDelightEventsDaoTests {
     private companion object {
         const val DB_NAME = "test.db"
@@ -118,8 +119,10 @@ class IosSqDelightEventsDaoTests {
 
     @Test
     fun testRemoveAll_shouldRemoveAllEvents() = runTest {
-        val testEvent1 = SdkEvent.External.Custom("custom1", "testId", "test", ATTRIBUTES, TIMESTAMP)
-        val testEvent2 = SdkEvent.External.Custom("custom2", "testId", "test", ATTRIBUTES, TIMESTAMP)
+        val testEvent1 =
+            SdkEvent.External.Custom("custom1", "testId", "test", ATTRIBUTES, TIMESTAMP)
+        val testEvent2 =
+            SdkEvent.External.Custom("custom2", "testId", "test", ATTRIBUTES, TIMESTAMP)
         eventsDao.insertEvent(testEvent1)
         eventsDao.insertEvent(testEvent2)
 

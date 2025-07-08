@@ -24,7 +24,8 @@ kotlin {
         publishLibraryVariants("release")
     }
     js(IR) {
-        moduleName = "emarsys-sdk"
+        outputModuleName.set("emarsys-sdk")
+
         browser {
             commonWebpackConfig {
                 outputFileName = "emarsys-sdk.js"

@@ -18,7 +18,9 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 internal class PushClient(
     private val emarsysClient: NetworkClientApi,
     private val clientExceptionHandler: ClientExceptionHandler,

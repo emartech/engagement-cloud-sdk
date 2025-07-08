@@ -25,7 +25,10 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
+import kotlin.time.ExperimentalTime
 
+
+@OptIn(ExperimentalTime::class)
 internal class RemoteConfigClient(
     private val networkClient: NetworkClientApi,
     private val clientExceptionHandler: ClientExceptionHandler,

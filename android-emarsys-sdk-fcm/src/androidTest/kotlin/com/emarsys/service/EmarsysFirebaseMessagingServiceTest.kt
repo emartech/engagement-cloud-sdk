@@ -5,7 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import androidx.test.platform.app.InstrumentationRegistry
-import com.emarsys.service.model.FirebaseMessagingServiceRegistrationOptions
+import com.emarsys.service.fcm.EmarsysFirebaseMessagingService
+import com.emarsys.service.fcm.model.FirebaseMessagingServiceRegistrationOptions
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import io.kotest.matchers.shouldBe

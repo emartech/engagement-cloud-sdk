@@ -6,7 +6,9 @@ import com.emarsys.api.event.model.toSdkEvent
 import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 internal class EventTrackerGatherer(
     private val context: EventTrackerContextApi,
     private val timestampProvider: InstantProvider,

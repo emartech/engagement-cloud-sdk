@@ -4,6 +4,7 @@ import com.emarsys.self
 import web.serviceworker.ClientQueryOptions
 import web.serviceworker.ClientTypes
 import web.serviceworker.WindowClient
+import web.serviceworker.window
 
 class BrowserWindowHandler : BrowserWindowHandlerApi {
 

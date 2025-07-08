@@ -22,14 +22,15 @@ import kotlinx.coroutines.test.setMain
 import web.broadcast.BroadcastChannel
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
 class WebBadgeCountHandlerTest {
 
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
     private lateinit var onBadgeCountUpdateReceivedBroadcastChannel: BroadcastChannel
     private lateinit var webBadgeCountHandler: WebBadgeCountHandler
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @BeforeTest
     fun setup() = runTest {
         Dispatchers.setMain(StandardTestDispatcher())
@@ -76,7 +77,8 @@ class WebBadgeCountHandlerTest {
                     name = "badgeCount",
                     method = testBadgeCount.method.name,
                     badgeCount = testBadgeCount.value
-                ))
+                )
+            )
         }
     }
 

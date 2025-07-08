@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import web.dom.Document
 import web.dom.DocumentVisibilityState
+import web.dom.visible
 import web.events.Event
 import web.events.EventType
 import web.events.addEventListener

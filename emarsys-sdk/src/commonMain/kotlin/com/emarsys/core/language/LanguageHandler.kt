@@ -6,7 +6,9 @@ import com.emarsys.core.exceptions.PreconditionFailedException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.event.SdkEvent
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 internal class LanguageHandler(
     private val languageTagValidator: LanguageTagValidatorApi,
     private val stringStorage: StringStorageApi,

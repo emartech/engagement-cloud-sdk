@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalTime::class)
+
 package com.emarsys.mobileengage.session
 
 import com.emarsys.TestEmarsysConfig
@@ -31,11 +33,12 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlinx.datetime.Instant
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
 class EmarsysSdkSessionTests {
     private companion object {
         const val APPLICATION_CODE = "testApplicationCode"

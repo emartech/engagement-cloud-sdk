@@ -5,7 +5,9 @@ import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.state.State
 import com.emarsys.event.SdkEvent
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 internal class LinkContactState(
     private val sdkContext: SdkContextApi,
     private val sdkEventDistributor: SdkEventDistributorApi,

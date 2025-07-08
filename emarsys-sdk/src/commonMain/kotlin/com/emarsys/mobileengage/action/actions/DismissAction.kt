@@ -3,7 +3,9 @@ package com.emarsys.mobileengage.action.actions
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.action.models.DismissActionModel
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 internal class DismissAction(
     private val action: DismissActionModel,
     private val sdkEventDistributor: SdkEventDistributorApi

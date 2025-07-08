@@ -1,7 +1,7 @@
-package com.emarsys.service
+package com.emarsys.service.fcm
 
 import android.content.Intent
-import com.emarsys.service.model.FirebaseMessagingServiceRegistrationOptions
+import com.emarsys.service.fcm.model.FirebaseMessagingServiceRegistrationOptions
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kotlinx.serialization.json.Json

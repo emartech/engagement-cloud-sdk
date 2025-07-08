@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
+import kotlin.time.ExperimentalTime
 
 internal class InAppPresenter(
     private val currentActivityWatchdog: TransitionSafeCurrentActivityWatchdog,
@@ -58,6 +59,7 @@ internal class InAppPresenter(
         )
     }
 
+    @OptIn(ExperimentalTime::class)
     override suspend fun present(
         inAppView: InAppViewApi,
         webViewHolder: WebViewHolder,

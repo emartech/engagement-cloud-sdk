@@ -4,7 +4,9 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.UtcOffset
 import kotlinx.datetime.format
 import kotlinx.datetime.offsetAt
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 internal class TimezoneProvider(private val timestampProvider: InstantProvider) : TimezoneProviderApi {
     private val offSetFormat = UtcOffset.Format { offsetHours(); offsetMinutesOfHour() }
 

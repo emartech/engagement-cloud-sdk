@@ -1,4 +1,4 @@
-package com.emarsys.service.model
+package com.emarsys.service.hms.model
 
 data class HuaweiMessagingServiceRegistrationOptions(
     val includeEmarsysMessages: Boolean = false

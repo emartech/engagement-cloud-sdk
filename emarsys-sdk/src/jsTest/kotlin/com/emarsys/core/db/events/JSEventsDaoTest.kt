@@ -12,7 +12,9 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 class JSEventsDaoTest {
     private lateinit var jsEventsDao: JSEventsDao
     private lateinit var mockEmarsysIndexedDbObjectStore: EmarsysIndexedDbObjectStoreApi<SdkEvent>

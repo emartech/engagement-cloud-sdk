@@ -18,8 +18,10 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.time.ExperimentalTime
 
 
+@OptIn(ExperimentalTime::class)
 class ReportingActionTests {
     private companion object {
         const val ID = "testId"

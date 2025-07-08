@@ -16,8 +16,9 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Test
+import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
 class PlatformInitializerTest {
     private lateinit var sdkEventDistributor: SdkEventDistributorApi
     private lateinit var sdkEventFlow: MutableSharedFlow<SdkEvent>
