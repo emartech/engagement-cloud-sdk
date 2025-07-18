@@ -91,6 +91,7 @@ class EmarsysHuaweiMessagingServiceTest {
         with(intentSlot.captured) {
             getStringExtra("pushToken") shouldBe testPushToken
             action shouldBe "com.emarsys.sdk.PUSH_TOKEN"
+            `package` shouldNotBe null
         }
     }
 

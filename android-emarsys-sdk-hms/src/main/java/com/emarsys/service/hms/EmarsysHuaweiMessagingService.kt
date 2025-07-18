@@ -28,10 +28,7 @@ class EmarsysHuaweiMessagingService() : HmsMessageService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        val intent = Intent().apply {
-            action = PUSH_TOKEN_INTENT_FILTER_ACTION
-            putExtra(PUSH_TOKEN_INTENT_KEY, token)
-        }
+        val intent = createIntent(PUSH_TOKEN_INTENT_FILTER_ACTION, PUSH_TOKEN_INTENT_KEY, token)
         applicationContext.sendBroadcast(intent)
     }
 
@@ -44,15 +41,20 @@ class EmarsysHuaweiMessagingService() : HmsMessageService() {
             }
             .forEach { it.second.onMessageReceived(remoteMessage) }
 
-        val intent = Intent().apply {
-            action = PUSH_MESSAGE_PAYLOAD_INTENT_FILTER_ACTION
-            putExtra(
-                PUSH_MESSAGE_PAYLOAD_INTENT_KEY,
-                remoteMessage.data
-            )
-            setPackage(applicationContext.packageName)
-        }
+        val intent = createIntent(
+            PUSH_MESSAGE_PAYLOAD_INTENT_FILTER_ACTION,
+            PUSH_MESSAGE_PAYLOAD_INTENT_KEY,
+            remoteMessage.data
+        )
 
         applicationContext.sendBroadcast(intent)
+    }
+
+    private fun createIntent(action: String, extraKey: String, extraValue: String): Intent {
+        return Intent().apply {
+            this.action = action
+            putExtra(extraKey, extraValue)
+            setPackage(applicationContext.packageName)
+        }
     }
 }
