@@ -469,6 +469,7 @@ gradle-app.setting
 
 # End of https://www.toptal.com/developers/gitignore/api/gradle,kotlin,intellij,intellij+iml,intellij+all,node,xcode,cocoapods
 /composeApp/google-services.json
+/composeApp/src/androidMain/assets/agconnect-services.json
 /resources/ems-service-worker.js
 /resources/ems-service-worker.js.map
 /EmarsysSDK.xcframework/

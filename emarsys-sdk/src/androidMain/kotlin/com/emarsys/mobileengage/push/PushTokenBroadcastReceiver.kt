@@ -23,9 +23,9 @@ internal class PushTokenBroadcastReceiver : BroadcastReceiver(), SdkComponent {
 
     override fun onReceive(context: Context, intent: Intent) = goAsync(sdkDispatcher) {
         intent.getStringExtra(PushConstants.PUSH_TOKEN_KEY)?.let {
-                logger.debug("push token received: token: $it")
-                stringStorage.put(PushConstants.PUSH_TOKEN_STORAGE_KEY, it)
-                pushApi.registerPushToken(it)
-            }
+            logger.debug("push token received: token: $it")
+            stringStorage.put(PushConstants.PUSH_TOKEN_STORAGE_KEY, it)
+            pushApi.registerPushToken(it)
+        }
     }
 }

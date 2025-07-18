@@ -1,6 +1,7 @@
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
+    alias(libs.plugins.agconnect)
+    alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.googleServices)
     alias(libs.plugins.composeCompiler)
@@ -40,6 +41,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.appcompat)
             implementation(project(":android-emarsys-sdk-fcm"))
+            implementation(project(":android-emarsys-sdk-hms"))
 
         }
         commonMain.dependencies {

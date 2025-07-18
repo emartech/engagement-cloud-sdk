@@ -1,3 +1,13 @@
+buildscript{
+    repositories {
+        maven(url = "https://developer.huawei.com/repo/")
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle:8.1.1")
+        classpath("com.huawei.agconnect:agcp:1.9.3.301")
+    }
+}
+
 plugins {
     alias(libs.plugins.androidApplication) apply false
     alias(libs.plugins.androidLibrary) apply false
