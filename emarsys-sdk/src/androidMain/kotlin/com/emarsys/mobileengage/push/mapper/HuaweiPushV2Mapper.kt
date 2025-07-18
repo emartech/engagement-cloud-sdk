@@ -25,9 +25,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
 internal class HuaweiPushV2Mapper(
-    private val uuidProvider: UuidProviderApi,
-    private val logger: Logger,
-    private val json: Json
+    private val uuidProvider: UuidProviderApi, private val logger: Logger, private val json: Json
 ) : Mapper<JsonObject, AndroidPushMessage> {
 
     private companion object {
@@ -65,34 +63,28 @@ internal class HuaweiPushV2Mapper(
             val trackingInfo = emsObject[TRACKING_INFO]?.jsonPrimitive?.contentOrNull ?: "{}"
 
             AndroidPushMessage(
-                trackingInfo = trackingInfo,
-                platformData = AndroidPlatformData(
-                    channelId = notificationObject[CHANNEL_ID].getStringOrDefault(DEFAULT_CHANNEL_ID),
-                    NotificationMethod(
-                        collapseId = notificationObject[COLLAPSE_ID].getStringOrDefault(uuidProvider.provide()),
-                        operation = NotificationOperation.valueOf(
-                            notificationObject[OPERATION].getStringOrDefault("INIT")
-                        )
-                    ),
-                    style = notificationObject[STYLE]?.jsonPrimitive?.contentOrNull?.let {
-                        NotificationStyle.valueOf(it.uppercase())
-                    }
-                ),
-                badgeCount = notificationObject[BADGE_COUNT]?.jsonObject?.let { badgeCount ->
-                    BadgeCount(
-                        method = badgeCount.getValue(METHOD).jsonPrimitive.content.let {
-                            BadgeCountMethod.valueOf(it.uppercase())
-                        },
-                        value = badgeCount.getValue(VALUE).jsonPrimitive.int
+                trackingInfo = trackingInfo, platformData = AndroidPlatformData(
+                channelId = notificationObject[CHANNEL_ID].getStringOrDefault(DEFAULT_CHANNEL_ID),
+                NotificationMethod(
+                    collapseId = notificationObject[COLLAPSE_ID].getStringOrDefault(uuidProvider.provide()),
+                    operation = NotificationOperation.valueOf(
+                        notificationObject[OPERATION].getStringOrDefault("INIT").uppercase()
                     )
-                },
-                displayableData = DisplayableData(
-                    title = notificationObject.getValue(TITLE).jsonPrimitive.contentOrNull!!,
-                    body = notificationObject.getValue(BODY).jsonPrimitive.contentOrNull!!,
-                    iconUrlString = notificationObject[ICON]?.jsonPrimitive?.contentOrNull,
-                    imageUrlString = notificationObject[IMAGE_URL]?.jsonPrimitive?.contentOrNull
                 ),
-                actionableData = actionableData
+                style = notificationObject[STYLE]?.jsonPrimitive?.contentOrNull?.let {
+                    NotificationStyle.valueOf(it.uppercase())
+                }), badgeCount = notificationObject[BADGE_COUNT]?.jsonObject?.let { badgeCount ->
+                BadgeCount(
+                    method = badgeCount.getValue(METHOD).jsonPrimitive.content.let {
+                        BadgeCountMethod.valueOf(it.uppercase())
+                    }, value = badgeCount.getValue(VALUE).jsonPrimitive.int
+                )
+            }, displayableData = DisplayableData(
+                title = notificationObject.getValue(TITLE).jsonPrimitive.contentOrNull!!,
+                body = notificationObject.getValue(BODY).jsonPrimitive.contentOrNull!!,
+                iconUrlString = notificationObject[ICON]?.jsonPrimitive?.contentOrNull,
+                imageUrlString = notificationObject[IMAGE_URL]?.jsonPrimitive?.contentOrNull
+            ), actionableData = actionableData
             )
         } catch (exception: Exception) {
             println(exception)

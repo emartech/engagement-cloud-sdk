@@ -191,7 +191,7 @@ class HuaweiPushV2MapperTest {
                 put("style", "MESSAGE")
                 put("collapseId", COLLAPSE_ID)
                 put("channelId", CHANNEL_ID)
-                put("operation", "INIT")
+                put("operation", "init")
                 put("defaultAction", buildJsonObject {
                     put("type", "MECustomEvent")
                     put("reporting", REPORTING)
