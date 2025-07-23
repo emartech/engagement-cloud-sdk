@@ -156,7 +156,7 @@ android {
     }
     buildTypes {
         getByName("release") {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -172,7 +172,7 @@ buildConfig {
 
 afterEvaluate {
     tasks.withType<AndroidLintAnalysisTask>()
-        .configureEach {// https://github.com/gmazzo/gradle-buildconfig-plugin/issues/67
+        .configureEach { // https://github.com/gmazzo/gradle-buildconfig-plugin/issues/67
             mustRunAfter(tasks.withType<BuildConfigTask>())
         }
 }

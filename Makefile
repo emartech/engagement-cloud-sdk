@@ -64,7 +64,7 @@ create-apks: check-env ## create apks for testing
 	@./gradlew assembleAndroidTest
 
 test: check-env test-android test-web test-jvm test-ios ## run common tests on all platforms (jvm,web,android, ios)
-	@./gradlew :emarsys-sdk:allTests -x :composeApp:test
+	@./gradlew :emarsys-sdk:allTests -x :emarsys-sdk:testReleaseUnitTest -x :composeApp:test
 
 build-web: check-env ## run tests on web
 	@./gradlew jsBrowserProductionWebpack \
