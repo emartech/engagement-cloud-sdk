@@ -1,6 +1,8 @@
-# KMP Emarsys SDK
+[![REUSE status](https://api.reuse.software/badge/github.com/emartech/unified-emarsys-sdk)](https://api.reuse.software/info/github.com/emartech/unified-emarsys-sdk)
 
-The **KMP Emarsys SDK** is a Kotlin Multiplatform SDK designed to integrate with the Emarsys platform. It provides a unified interface for managing events, push notifications, and other functionalities across Android, iOS, and Web platforms.
+# Unified Emarsys SDK
+
+The **Unified Emarsys SDK** is a Kotlin Multiplatform SDK designed to integrate with the Emarsys platform. It provides a unified interface for managing events, push notifications, and other functionalities across Android, iOS, and Web platforms.
 
 ## Features
 
@@ -36,7 +38,7 @@ The SDK is distributed via Swift Package Manager (SPM). Add the following to you
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/emartech/kmp-emarsys-sdk.git", from: "4.0.0")
+    .package(url: "https://github.com/emartech/unified-emarsys-sdk.git", from: "4.0.0")
 ]
 ```
 
@@ -51,13 +53,13 @@ import EmarsysSDK
 The SDK is available on NPM. Install it using the following command:
 
 ```bash
-npm install @emarsys/kmp-emarsys-sdk
+npm install @emarsys/unified-emarsys-sdk
 ```
 
 Import and initialize the SDK in your JavaScript or TypeScript code:
 
 ```javascript
-import { EmarsysJs } from "@emarsys/kmp-emarsys-sdk";
+import { EmarsysJs } from "@emarsys/unified-emarsys-sdk";
 
 const emarsys = new EmarsysJs();
 await emarsys.enableTracking({
