@@ -1,7 +1,7 @@
 package com.emarsys.core.providers
 
+import kotlinx.datetime.Instant
 import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
 
 @OptIn(ExperimentalTime::class)
 internal interface InstantProvider: Provider<Instant> {

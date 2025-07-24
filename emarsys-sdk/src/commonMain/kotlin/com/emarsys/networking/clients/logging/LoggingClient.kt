@@ -23,6 +23,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.put
 import kotlin.coroutines.coroutineContext
+import kotlin.time.ExperimentalTime
 
 internal class LoggingClient(
     private val genericNetworkClient: NetworkClientApi,
@@ -44,6 +45,7 @@ internal class LoggingClient(
         }
     }
 
+    @OptIn(ExperimentalTime::class)
     private suspend fun startEventConsumer() {
         sdkEventManager.logEvents
             .batched(batchSize = batchSize, batchIntervalMillis = 10000L)

@@ -20,8 +20,8 @@ dokka = "2.0.0"
 junit = "4.13.2"
 kotlin = "2.2.0"
 kotlinxCoroutines = "1.10.2"
-kotlinxDatetime = "0.7.1"
-kotlinxSerializationJson = "1.9.0"
+kotlinxDatetime = "0.6.2"
+kotlinxSerializationJson = "1.8.0"
 ksp = "2.2.0-2.0.2"
 ktor = "3.2.1"
 koin = "4.1.0"
@@ -42,7 +42,6 @@ sqlDelight = "2.2.0-SNAPSHOT"
 mavenPublish = "0.33.0"
 
 [libraries]
-agcp = { module = "com.huawei.agconnect:agcp", version.ref = "agconnect_core" }
 sqlDelight-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqlDelight" }
 sqlDelight-native = { module = "app.cash.sqldelight:native-driver", version.ref = "sqlDelight" }
 sqlDelight-web = { module = "app.cash.sqldelight:web-worker-driver", version.ref = "sqlDelight" }

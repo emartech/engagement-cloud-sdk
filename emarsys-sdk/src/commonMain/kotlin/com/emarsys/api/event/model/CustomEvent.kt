@@ -1,10 +1,10 @@
 package com.emarsys.api.event.model
 
 import com.emarsys.event.SdkEvent
+import kotlinx.datetime.Instant
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
 
 data class CustomEvent(
     val name: String,
