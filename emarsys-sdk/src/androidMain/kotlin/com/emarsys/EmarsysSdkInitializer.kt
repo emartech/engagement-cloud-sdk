@@ -11,7 +11,7 @@ internal class EmarsysSdkInitializer : Initializer<Unit> {
     override fun create(context: Context) {
         setContext(context)
         return runBlocking {
-            Emarsys.initialize()
+            AndroidEmarsys.initialize()
         }
     }
 

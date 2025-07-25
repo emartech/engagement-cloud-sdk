@@ -18,16 +18,18 @@ import com.emarsys.event.SdkEvent
 import com.emarsys.util.JsonUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.await
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.promise
 import org.koin.core.qualifier.named
 import kotlin.js.Promise
 
-suspend fun main() {
-    EmarsysJs.init().await()
+fun main() {
+    EmarsysJs.init()
+    CoroutineScope(Dispatchers.Default).launch(start = CoroutineStart.UNDISPATCHED) {
+        Emarsys.runInitOrganizer()
+    }
 }
 
 typealias EmarsysSdkEventListener = (SdkApiEvent) -> Unit
@@ -50,26 +52,19 @@ object EmarsysJs {
     lateinit var inApp: JSInAppApi
     lateinit var predict: JSPredictApi
 
-    /**
-     * Initializes the SDK. This method must be called before using any other SDK functionality.
-     *
-     * @return A promise that resolves when the initialization is complete.
-     */
-    fun init(): Promise<Unit> {
-        return CoroutineScope(SupervisorJob()).promise {
-            Emarsys.initialize()
-            applicationScope = koin.get<CoroutineScope>(named(CoroutineScopeTypes.Application))
-            config = koin.get<JSConfigApi>()
-            contact = koin.get<JSContactApi>()
-            tracking = koin.get<JSTrackingApi>()
-            push = koin.get<JSPushApi>()
-            deepLink = koin.get<JSDeepLinkApi>()
-            geofence = koin.get<JSGeofenceApi>()
-            inbox = koin.get<JSInboxApi>()
-            inApp = koin.get<JSInAppApi>()
-            predict = koin.get<JSPredictApi>()
-            events = koin.get<Flow<SdkEvent.External.Api>>(named(EventFlowTypes.Public))
-        }
+    internal fun init() {
+        Emarsys.initDI()
+        applicationScope = koin.get<CoroutineScope>(named(CoroutineScopeTypes.Application))
+        config = koin.get<JSConfigApi>()
+        contact = koin.get<JSContactApi>()
+        tracking = koin.get<JSTrackingApi>()
+        push = koin.get<JSPushApi>()
+        deepLink = koin.get<JSDeepLinkApi>()
+        geofence = koin.get<JSGeofenceApi>()
+        inbox = koin.get<JSInboxApi>()
+        inApp = koin.get<JSInAppApi>()
+        predict = koin.get<JSPredictApi>()
+        events = koin.get<Flow<SdkEvent.External.Api>>(named(EventFlowTypes.Public))
     }
 
     /**

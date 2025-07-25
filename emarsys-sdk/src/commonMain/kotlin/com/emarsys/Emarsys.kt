@@ -31,9 +31,17 @@ import kotlin.native.HiddenFromObjC
 @OptIn(ExperimentalObjCRefinement::class)
 object Emarsys {
 
-    suspend fun initialize() {
+    internal fun initDI() {
         SdkKoinIsolationContext.init()
+    }
+
+    internal suspend fun runInitOrganizer() {
         koin.get<InitOrganizerApi>().init()
+    }
+
+    suspend fun initialize() {
+        initDI()
+        runInitOrganizer()
     }
 
     suspend fun enableTracking(config: SdkConfig): Result<Unit> {
