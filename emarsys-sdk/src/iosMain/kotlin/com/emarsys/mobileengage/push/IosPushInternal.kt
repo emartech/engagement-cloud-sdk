@@ -63,6 +63,7 @@ internal class IosPushInternal(
     private val timestampProvider: InstantProvider,
     private val uuidProvider: UuidProviderApi
 ) : PushInternal(storage, pushContext, sdkEventDistributor, sdkLogger), IosPushInstance {
+    //TODO: should handle list in a threadsafe way
     override var customerUserNotificationCenterDelegate: List<UNUserNotificationCenterDelegateProtocol> =
         listOf()
         set(value) {
