@@ -48,7 +48,6 @@ build-pipeline: check-env ## compile and build all modules for all platforms
 			 	-x :emarsys-sdk:jsPublicPackageJson \
 			 	-x :emarsys-sdk:jsTestPublicPackageJson \
 			 	-x :emarsys-sdk:jsPackageJson \
-			 	-x :packageJsonUmbrella \
 			 	-x :rootPackageJson \
 			 	-x :kotlinNodeJsSetup \
 			 	-x :kotlinNpmCachesSetup \
