@@ -13,6 +13,7 @@ plugins {
     alias(libs.plugins.skie)
     alias(libs.plugins.sqlDelight)
     alias(libs.plugins.mavenPublish)
+    alias(libs.plugins.kmmbridge)
 }
 
 group = "com.emarsys"
@@ -197,6 +198,29 @@ tasks.withType<app.cash.sqldelight.gradle.SqlDelightTask>().configureEach {
                         .replace("public class EventsQueries", "internal class EventsQueries")
                 )
             }
+    }
+}
+
+kmmbridge {
+    val spmBuildType = System.getenv("SPM_BUILD") ?: "dev"
+    when (spmBuildType) {
+        "dev" -> {
+            println("Building for local SPM development")
+            spm()
+        }
+
+        "release" -> {
+            println("Building for release")
+            spm(
+                spmDirectory = "./iosReleaseSpm",
+                useCustomPackageFile = true,
+                perModuleVariablesBlock = true
+            )
+        }
+
+        else -> {
+            println("Unknown SPM build type: $spmBuildType. Defaulting to local SPM development.")
+        }
     }
 }
 

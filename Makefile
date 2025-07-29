@@ -1,4 +1,4 @@
-.PHONY: build build-pipeline check-env clean create-apks help lint test test-web test-android test-android-firebase test-jvm link-ios-sdk link-ios-notification-service remove-temp-lipo temp-dirs lipo-merge-ios-sdk lipo-merge-ios-notification-service copy-lipo-ios-emarsys-sdk-output copy-lipo-notification-service-output ios-sdk-framework ios-notification-service-framework
+.PHONY: build build-pipeline check-env clean create-apks help lint test test-web test-android test-android-firebase test-jvm link-ios-sdk link-ios-notification-service remove-temp-lipo temp-dirs lipo-merge-ios-sdk lipo-merge-ios-notification-service copy-lipo-ios-emarsys-sdk-output copy-lipo-notification-service-output ios-sdk-framework ios-notification-service-framework prepare-spm
 .DEFAULT_GOAL := help
 SHELL := /bin/bash
 
@@ -151,3 +151,8 @@ ios-frameworks: ios-sdk-framework ios-notification-service-framework
 
 lint: check-env ## run Android Instrumented tests
 	@./gradlew :emarsys-sdk:lint -x :composeApp:lint
+
+prepare-spm: check-env ## prepare swift package manager package for iOS
+	@./gradlew spmDevBuild && \
+	cp -f "./iosReleaseSpm/Package.swift" "./Package.swift" && \
+	echo "Swift Package is prepared. To use it as a local dependency add the project in Xcode at the Package Dependencies section"
