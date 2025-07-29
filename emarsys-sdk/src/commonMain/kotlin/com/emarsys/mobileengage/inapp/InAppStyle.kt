@@ -1,15 +1,24 @@
 package com.emarsys.mobileengage.inapp
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
 sealed class InAppPresentationMode {
 
-    data object Overlay: InAppPresentationMode()
+    data object Overlay : InAppPresentationMode()
 
-    data class Sheet(val direction: SheetDirection): InAppPresentationMode()
+    data class Sheet(val direction: SheetDirection) : InAppPresentationMode()
 }
 
+@Serializable
 enum class InAppType {
+    @SerialName("overlay")
     OVERLAY,
+
+    @SerialName("inline")
     INLINE,
+
+    @SerialName("ribbon")
     RIBBON
 }
 

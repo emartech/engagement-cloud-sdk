@@ -23,6 +23,7 @@ internal class UrlFactory(
 ) : UrlFactoryApi {
     private companion object {
         const val V4_API = "v4"
+        const val V5_API = "v5"
     }
 
     override fun create(urlType: EmarsysUrlType): Url {
@@ -58,7 +59,7 @@ internal class UrlFactory(
             PUSH_TOKEN -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client/push-token")
             REGISTER_DEVICE_INFO -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client")
             EVENT -> {
-                Url("${sdkContext.defaultUrls.eventServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client/events")
+                Url("${sdkContext.defaultUrls.eventServiceBaseUrl}/$V5_API/apps/${getApplicationCode()}/client/events")
             }
 
             REMOTE_CONFIG_SIGNATURE -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/signature/${getApplicationCode()}")

@@ -1,7 +1,5 @@
 package com.emarsys.core.networking.context
 
-import kotlinx.serialization.json.JsonObject
-
 interface RequestContextApi {
 
     var contactToken: String?
@@ -12,7 +10,7 @@ interface RequestContextApi {
 
     var clientState: String?
 
-    var deviceEventState: JsonObject?
+    var deviceEventState: String?
 
     fun clearTokens()
 

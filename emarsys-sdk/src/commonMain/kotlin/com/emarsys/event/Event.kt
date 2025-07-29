@@ -15,6 +15,8 @@ import com.emarsys.SdkConstants.LINK_AUTHENTICATED_CONTACT_NAME
 import com.emarsys.SdkConstants.LINK_CONTACT_NAME
 import com.emarsys.SdkConstants.LOG_EVENT_NAME
 import com.emarsys.SdkConstants.METRIC_EVENT_NAME
+import com.emarsys.SdkConstants.ON_EVENT_ACTION_ORIGIN
+import com.emarsys.SdkConstants.ON_EVENT_ACTION_REPORTING_EVENT_NAME
 import com.emarsys.SdkConstants.PUSH_CLICKED_EVENT_NAME
 import com.emarsys.SdkConstants.REGISTER_DEVICE_INFO_EVENT_NAME
 import com.emarsys.SdkConstants.REGISTER_PUSH_TOKEN_EVENT_NAME
@@ -89,7 +91,7 @@ suspend fun List<OnlineSdkEvent>.nack(eventsDao: EventsDaoApi, sdkLogger: Logger
     }
 }
 
-@OptIn(ExperimentalSerializationApi::class,ExperimentalTime::class)
+@OptIn(ExperimentalSerializationApi::class, ExperimentalTime::class)
 @Serializable
 @JsonClassDiscriminator("fullClassName")
 sealed interface SdkEvent {
@@ -136,7 +138,10 @@ sealed interface SdkEvent {
     @Serializable
     sealed interface Internal : SdkEvent {
 
-        interface Reporting : Internal, OnlineSdkEvent
+        interface Reporting : Internal, OnlineSdkEvent {
+            val reporting: String?
+            val trackingInfo: String
+        }
 
         interface Custom : Internal, OnlineSdkEvent
 
@@ -338,14 +343,27 @@ sealed interface SdkEvent {
             @Serializable
             data class Clicked(
                 override val id: String = UUIDProvider().provide(),
-                val reporting: String? = null,
-                val trackingInfo: String,
+                override val reporting: String?,
+                override val trackingInfo: String,
                 val origin: String,
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0,
             ) : Push(PUSH_CLICKED_EVENT_NAME), Reporting
         }
+
+        @Serializable
+        data class OnEventActionExecuted(
+            override val type: String = "internal",
+            override val id: String = UUIDProvider().provide(),
+            override val reporting: String?,
+            override val trackingInfo: String,
+            override val attributes: JsonObject? = null,
+            override val timestamp: Instant = TimestampProvider().provide(),
+            override var nackCount: Int = 0,
+            override val name: String = ON_EVENT_ACTION_REPORTING_EVENT_NAME,
+            val origin: String = ON_EVENT_ACTION_ORIGIN,
+        ) : Internal, Reporting
 
         @Serializable
         sealed class InApp(override val name: String) : Internal {
@@ -356,14 +374,16 @@ sealed interface SdkEvent {
                 override val id: String = UUIDProvider().provide(),
                 override val attributes: JsonObject?,
                 override val timestamp: Instant = TimestampProvider().provide(),
+                override val reporting: String,
+                override val trackingInfo: String,
                 override var nackCount: Int = 0,
             ) : InApp(INAPP_VIEWED_EVENT_NAME), Reporting
 
             @Serializable
             data class ButtonClicked(
                 override val id: String = UUIDProvider().provide(),
-                val reporting: String,
-                val trackingInfo: String,
+                override val reporting: String,
+                override val trackingInfo: String,
                 val origin: String,
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),

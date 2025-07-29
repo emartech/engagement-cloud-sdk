@@ -16,6 +16,8 @@ object SdkConstants {
     const val UNLINK_CONTACT_NAME = "unlinkContact"
     const val TRACK_DEEPLINK_NAME = "trackDeepLink"
     const val INAPP_VIEWED_EVENT_NAME = "inapp:viewed"
+    const val ON_EVENT_ACTION_REPORTING_EVENT_NAME = "on_event:action"
+    const val ON_EVENT_ACTION_ORIGIN = "onEventAction"
     const val DISMISS_EVENT_NAME = "dismiss"
     const val REREGISTRATION_REQUIRED_EVENT_NAME = "reregistrationRequired"
     const val REGISTER_DEVICE_INFO_EVENT_NAME = "registerDeviceInfo"

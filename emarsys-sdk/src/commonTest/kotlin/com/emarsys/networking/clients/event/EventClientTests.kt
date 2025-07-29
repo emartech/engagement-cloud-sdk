@@ -14,6 +14,10 @@ import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.action.EventActionFactoryApi
+import com.emarsys.mobileengage.action.actions.Action
+import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
+import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.inapp.InAppMessage
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppType
@@ -21,15 +25,19 @@ import com.emarsys.mobileengage.inapp.InAppViewApi
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.mobileengage.inapp.WebViewHolder
 import com.emarsys.networking.clients.error.ClientExceptionHandler
+import com.emarsys.networking.clients.event.model.ContentCampaign
 import com.emarsys.networking.clients.event.model.DeviceEventResponse
-import com.emarsys.networking.clients.event.model.EventResponseInApp
+import com.emarsys.networking.clients.event.model.OnEventActionCampaign
 import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
+import dev.mokkery.answering.throws
 import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
+import dev.mokkery.matcher.capture.Capture
+import dev.mokkery.matcher.capture.capture
 import dev.mokkery.mock
 import dev.mokkery.verify
 import dev.mokkery.verify.VerifyMode
@@ -56,10 +64,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
 import okio.IOException
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -69,14 +75,19 @@ import kotlin.time.ExperimentalTime
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
 class EventClientTests {
     private companion object {
-        val DEVICE_EVENT_STATE = JsonObject(mapOf("key" to JsonPrimitive("value")))
+        const val DEVICE_EVENT_STATE = "testDeviceEventState"
         const val EVENT_NAME = "test event name"
         const val UUID = "testUuid"
         const val IN_APP_DND = false
         val TIMESTAMP = Clock.System.now()
-        const val CAMPAIGN_ID = "testCampaignId"
+        const val TRACKING_INFO = "testTrackingInfo"
+        const val TRACKING_INFO_1 = "testTrackingInfo1"
         val TEST_BASE_URL = Url("https://test-base-url/")
-        val testEventAttributes = buildJsonObject { put("key", JsonPrimitive("value")) }
+        val testEventAttributes = buildJsonObject {
+            put("key", JsonPrimitive("value"))
+            put("key1", JsonPrimitive(5))
+
+        }
         val testEvent = SdkEvent.External.Custom(
             id = UUID,
             name = EVENT_NAME,
@@ -126,15 +137,10 @@ class EventClientTests {
         every { mockUuidProvider.provide() } returns UUID
         every { mockSdkEventManager.onlineSdkEvents } returns onlineEvents
         everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
-        everySuspend { mockSdkEventManager.registerEvent(any()) } calls {
-            onlineEvents.emit(it.args[0] as OnlineSdkEvent)
-            mock(MockMode.autofill)
-        }
+        everySuspend { mockSdkEventManager.registerEvent(any()) } returns null
         every { mockInAppConfigApi.inAppDnd }.returns(IN_APP_DND)
         every { mockUrlFactory.create(EmarsysUrlType.EVENT) }.returns(TEST_BASE_URL)
-        everySuspend { mockSdkLogger.error(any(), any<Throwable>()) } calls {
-            (it.args[1] as Throwable).printStackTrace()
-        }
+        everySuspend { mockSdkLogger.error(any(), any<Throwable>(), true) } returns Unit
         everySuspend { mockInAppViewProvider.provide() } returns mockInAppView
         everySuspend { mockInAppView.load(any()) } returns mockWebViewHolder
     }
@@ -176,18 +182,18 @@ class EventClientTests {
 
         every { mockRequestContext.deviceEventState } returns DEVICE_EVENT_STATE
 
-        everySuspend { mockEmarsysClient.send(any(), any()) } returns createTestResponse("{}")
+        everySuspend { mockEmarsysClient.send(any(), any()) } returns createTestResponse()
         every { mockUrlFactory.create(EmarsysUrlType.EVENT) } returns TEST_BASE_URL
         val expectedUrlRequest = UrlRequest(
             TEST_BASE_URL,
             HttpMethod.Post,
-            """{"dnd":$IN_APP_DND,"events":[{"fullClassName":"com.emarsys.event.SdkEvent.External.Custom","type":"custom","id":"$UUID","name":"${testEvent.name}","attributes":{"key":"value"},"timestamp":"$TIMESTAMP","nackCount":0}],"deviceEventState":{"key":"value"}}""",
+            """{"dnd":$IN_APP_DND,"events":[{"type":"custom","name":"${testEvent.name}","timestamp":"$TIMESTAMP","attributes":{"key":"value","key1":"5"}}],"deviceEventState":"$DEVICE_EVENT_STATE"}""",
         )
         val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
             onlineEvents.take(1).toList()
         }
 
-        mockSdkEventManager.registerEvent(testEvent)
+        onlineEvents.emit(testEvent)
 
         advanceUntilIdle()
 
@@ -201,10 +207,7 @@ class EventClientTests {
         eventClient = createEventClient(backgroundScope)
         eventClient.register()
 
-        val expectedDeviceEventState = buildJsonObject {
-            put("key1", "value1")
-            put("key2", "value2")
-        }
+        val expectedDeviceEventState = "responseDeviceEventState"
 
         val deviceEventResponse = DeviceEventResponse(null, null, expectedDeviceEventState)
         val responseBody = json.encodeToString(deviceEventResponse)
@@ -220,7 +223,7 @@ class EventClientTests {
             onlineEvents.take(1).toList()
         }
 
-        mockSdkEventManager.registerEvent(testEvent)
+        onlineEvents.emit(testEvent)
 
         advanceUntilIdle()
 
@@ -237,15 +240,15 @@ class EventClientTests {
         eventClient.register()
 
         val html = "testHtml"
-        val testInapp = EventResponseInApp(CAMPAIGN_ID, html)
+        val testInapp = ContentCampaign(InAppType.OVERLAY, TRACKING_INFO, html)
         val expectedInAppMessage =
             InAppMessage(
                 dismissId = UUID,
                 InAppType.OVERLAY,
-                trackingInfo = CAMPAIGN_ID,
+                trackingInfo = TRACKING_INFO,
                 content = html
             )
-        val deviceEventResponse = DeviceEventResponse(testInapp, null, null)
+        val deviceEventResponse = DeviceEventResponse(listOf(testInapp), null, DEVICE_EVENT_STATE)
         val body = json.encodeToString(deviceEventResponse)
 
         everySuspend { mockEmarsysClient.send(any(), any()) }.returns(createTestResponse(body))
@@ -255,7 +258,7 @@ class EventClientTests {
             onlineEvents.take(1).toList()
         }
 
-        mockSdkEventManager.registerEvent(testEvent)
+        onlineEvents.emit(testEvent)
         advanceUntilIdle()
 
         onlineSdkEvents.await() shouldBe listOf(testEvent)
@@ -271,8 +274,8 @@ class EventClientTests {
         eventClient.register()
 
         val html = ""
-        val testInapp = EventResponseInApp(CAMPAIGN_ID, html)
-        val deviceEventResponse = DeviceEventResponse(testInapp, null, null)
+        val testInapp = ContentCampaign(InAppType.OVERLAY, TRACKING_INFO, html)
+        val deviceEventResponse = DeviceEventResponse(listOf(testInapp), null, DEVICE_EVENT_STATE)
         val body = json.encodeToString(deviceEventResponse)
 
         everySuspend { mockEmarsysClient.send(any(), any()) }.returns(createTestResponse(body))
@@ -281,7 +284,7 @@ class EventClientTests {
             onlineEvents.take(1).toList()
         }
 
-        mockSdkEventManager.registerEvent(testEvent)
+        onlineEvents.emit(testEvent)
 
         advanceUntilIdle()
 
@@ -309,7 +312,7 @@ class EventClientTests {
             onlineEvents.take(1).toList()
         }
 
-        mockSdkEventManager.registerEvent(testEvent)
+        onlineEvents.emit(testEvent)
 
         advanceUntilIdle()
 
@@ -337,8 +340,8 @@ class EventClientTests {
         }
         val testEvent1 = testEvent.copy(id = "testId1")
 
-        mockSdkEventManager.registerEvent(testEvent)
-        mockSdkEventManager.registerEvent(testEvent1)
+        onlineEvents.emit(testEvent)
+        onlineEvents.emit(testEvent1)
 
         advanceUntilIdle()
 
@@ -369,6 +372,198 @@ class EventClientTests {
     }
 
     @Test
+    fun testConsumer_shouldHandleOnEventActionCampaigns_executeActions_andReportThem_whenPresent() =
+        runTest {
+            val mockAction = mock<Action<Unit>>() {
+                everySuspend { invoke(any()) } returns Unit
+            }
+            everySuspend { mockOnEventActionFactory.create(any()) } returns mockAction
+            eventClient = createEventClient(backgroundScope)
+            eventClient.register()
+
+            val html = "testHtml"
+            val testInapp = ContentCampaign(InAppType.OVERLAY, TRACKING_INFO, html)
+            val expectedInAppMessage =
+                InAppMessage(
+                    dismissId = UUID,
+                    InAppType.OVERLAY,
+                    trackingInfo = TRACKING_INFO,
+                    content = html
+                )
+            val action1 = BasicOpenExternalUrlActionModel(
+                reporting = "reporting1",
+                url = "https://example.com"
+            )
+            val action2 = BasicAppEventActionModel(
+                reporting = "reporting2",
+                name = "appEvent",
+                payload = mapOf("key" to "value")
+            )
+            val onEventActionCampaign1 =
+                OnEventActionCampaign(
+                    trackingInfo = TRACKING_INFO,
+                    actions = listOf(action1, action2)
+                )
+
+            val action3 = BasicOpenExternalUrlActionModel(
+                reporting = "reporting3",
+                url = "https://example2.com",
+            )
+            val onEventActionCampaign2 = OnEventActionCampaign(
+                trackingInfo = TRACKING_INFO_1,
+                actions = listOf(
+                    action3
+                )
+            )
+
+            val deviceEventResponse = DeviceEventResponse(
+                listOf(testInapp),
+                listOf(onEventActionCampaign1, onEventActionCampaign2),
+                DEVICE_EVENT_STATE
+            )
+            val body = json.encodeToString(deviceEventResponse)
+
+            everySuspend { mockEmarsysClient.send(any(), any()) }.returns(createTestResponse(body))
+            everySuspend { mockInAppPresenter.present(any(), any(), any()) }.returns(Unit)
+            val onEventActionExecutedEventCaptureContainer = Capture.container<SdkEvent.Internal.OnEventActionExecuted>()
+            everySuspend {
+                mockSdkEventManager.registerEvent(capture(onEventActionExecutedEventCaptureContainer))
+            } returns null
+            val expectedUrlRequest = createTestRequest()
+            val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
+                onlineEvents.take(1).toList()
+            }
+
+            onlineEvents.emit(testEvent)
+            advanceUntilIdle()
+
+            onlineSdkEvents.await() shouldBe listOf(testEvent)
+            verifySuspend { mockEmarsysClient.send(expectedUrlRequest, any()) }
+            verifySuspend { mockInAppViewProvider.provide() }
+            verifySuspend { mockInAppView.load(expectedInAppMessage) }
+            verifySuspend {
+                mockOnEventActionFactory.create(action1)
+            }
+            verifySuspend {
+                mockOnEventActionFactory.create(action2)
+            }
+            verifySuspend {
+                mockOnEventActionFactory.create(action3)
+            }
+            verifySuspend(VerifyMode.exactly(3)) {
+                mockSdkEventManager.registerEvent(
+                    any()
+                )
+            }
+            onEventActionExecutedEventCaptureContainer.values.size shouldBe 3
+            onEventActionExecutedEventCaptureContainer.values[0].trackingInfo shouldBe onEventActionCampaign1.trackingInfo
+            onEventActionExecutedEventCaptureContainer.values[0].reporting shouldBe action1.reporting
+            onEventActionExecutedEventCaptureContainer.values[1].trackingInfo shouldBe onEventActionCampaign1.trackingInfo
+            onEventActionExecutedEventCaptureContainer.values[1].reporting shouldBe action2.reporting
+            onEventActionExecutedEventCaptureContainer.values[2].trackingInfo shouldBe onEventActionCampaign2.trackingInfo
+            onEventActionExecutedEventCaptureContainer.values[2].reporting shouldBe action3.reporting
+
+            verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
+        }
+
+    @Test
+    fun testConsumer_shouldExecuteAllActions_whenSomeActionsFail() =
+        runTest {
+            val mockAction = mock<Action<Unit>> {
+                everySuspend { invoke(any()) } returns Unit
+            }
+            val mockFailingAppEventAction = mock<Action<Unit>> {
+                everySuspend { invoke(any()) } throws Exception("This action fails.")
+            }
+            everySuspend { mockOnEventActionFactory.create(any()) } calls { args ->
+                if (args.arg<ActionModel>(0) is BasicOpenExternalUrlActionModel) {
+                    mockAction
+                } else {
+                    mockFailingAppEventAction
+                }
+            }
+            eventClient = createEventClient(backgroundScope)
+            eventClient.register()
+
+            val action1 = BasicOpenExternalUrlActionModel(
+                reporting = "reporting1",
+                url = "https://example.com",
+            )
+            val action2 = BasicAppEventActionModel(
+                reporting = "reporting2",
+                name = "appEvent",
+                payload = mapOf("key" to "value")
+            )
+            val action3 = BasicOpenExternalUrlActionModel(
+                reporting = "reporting3",
+                url = "https://example3.com"
+            )
+            val onEventActionCampaign1 =
+                OnEventActionCampaign(
+                    trackingInfo = TRACKING_INFO,
+                    actions = listOf(action1, action2, action3)
+                )
+
+            val action4 = BasicOpenExternalUrlActionModel(
+                reporting = "reporting4",
+                url = "https://example4.com",
+            )
+            val onEventActionCampaign2 = OnEventActionCampaign(
+                trackingInfo = TRACKING_INFO_1,
+                actions = listOf(action4)
+            )
+
+            val deviceEventResponse = DeviceEventResponse(
+                null,
+                listOf(onEventActionCampaign1, onEventActionCampaign2),
+                DEVICE_EVENT_STATE
+            )
+            val body = json.encodeToString(deviceEventResponse)
+
+            everySuspend { mockEmarsysClient.send(any(), any()) }.returns(createTestResponse(body))
+            val onEventActionExecutedEventCaptureContainer = Capture.container<SdkEvent.Internal.OnEventActionExecuted>()
+            everySuspend {
+                mockSdkEventManager.registerEvent(capture(onEventActionExecutedEventCaptureContainer))
+            } returns null
+            val expectedUrlRequest = createTestRequest()
+            val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
+                onlineEvents.take(1).toList()
+            }
+
+            onlineEvents.emit(testEvent)
+            advanceUntilIdle()
+
+            onlineSdkEvents.await() shouldBe listOf(testEvent)
+            verifySuspend { mockEmarsysClient.send(expectedUrlRequest, any()) }
+            verifySuspend {
+                mockOnEventActionFactory.create(action1)
+            }
+            verifySuspend {
+                mockOnEventActionFactory.create(action2)
+            }
+            verifySuspend {
+                mockOnEventActionFactory.create(action3)
+            }
+            verifySuspend {
+                mockOnEventActionFactory.create(action4)
+            }
+            verifySuspend(VerifyMode.exactly(3)) {
+                mockSdkEventManager.registerEvent(
+                    any()
+                )
+            }
+            onEventActionExecutedEventCaptureContainer.values.size shouldBe 3
+            onEventActionExecutedEventCaptureContainer.values[0].trackingInfo shouldBe onEventActionCampaign1.trackingInfo
+            onEventActionExecutedEventCaptureContainer.values[0].reporting shouldBe action1.reporting
+            onEventActionExecutedEventCaptureContainer.values[1].trackingInfo shouldBe onEventActionCampaign1.trackingInfo
+            onEventActionExecutedEventCaptureContainer.values[1].reporting shouldBe action3.reporting
+            onEventActionExecutedEventCaptureContainer.values[2].trackingInfo shouldBe onEventActionCampaign2.trackingInfo
+            onEventActionExecutedEventCaptureContainer.values[2].reporting shouldBe action4.reporting
+
+            verifySuspend(VerifyMode.exactly(1)) { mockSdkLogger.error(any(), any<Throwable>()) }
+        }
+
+    @Test
     fun testConsumer_shouldCallClientExceptionHandler_whenExceptionIsThrown() = runTest {
         createEventClient(backgroundScope).register()
         val testException = Exception("Test Exception")
@@ -383,8 +578,8 @@ class EventClientTests {
         }
         val testEvent1 = testEvent.copy(id = "testId1")
 
-        mockSdkEventManager.registerEvent(testEvent)
-        mockSdkEventManager.registerEvent(testEvent1)
+        onlineEvents.emit(testEvent)
+        onlineEvents.emit(testEvent1)
 
         advanceUntilIdle()
 
@@ -415,13 +610,13 @@ class EventClientTests {
         val expectedUrlRequest = UrlRequest(
             TEST_BASE_URL,
             HttpMethod.Post,
-            """{"dnd":$IN_APP_DND,"events":[{"fullClassName":"com.emarsys.event.SdkEvent.External.Custom","type":"custom","id":"$UUID","name":"${testEvent.name}","attributes":{"key":"value"},"timestamp":"$TIMESTAMP","nackCount":0}]}""",
+            """{"dnd":$IN_APP_DND,"events":[{"type":"custom","name":"${testEvent.name}","timestamp":"$TIMESTAMP","attributes":{"key":"value","key1":"5"}}]}""",
         )
         return expectedUrlRequest
     }
 
     private fun createTestResponse(
-        body: String = "{}",
+        body: String = """{ "deviceEventState": "$DEVICE_EVENT_STATE" }""",
         statusCode: HttpStatusCode = HttpStatusCode.OK
     ) = Response(
         UrlRequest(

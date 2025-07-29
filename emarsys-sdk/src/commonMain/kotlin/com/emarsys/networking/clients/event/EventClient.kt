@@ -15,6 +15,7 @@ import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.event.SdkEvent
 import com.emarsys.event.ack
 import com.emarsys.mobileengage.action.EventActionFactoryApi
+import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.inapp.InAppMessage
 import com.emarsys.mobileengage.inapp.InAppPresentationMode
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
@@ -22,13 +23,16 @@ import com.emarsys.mobileengage.inapp.InAppType
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.error.ClientExceptionHandler
+import com.emarsys.networking.clients.event.model.ContentCampaign
 import com.emarsys.networking.clients.event.model.DeviceEventRequestBody
 import com.emarsys.networking.clients.event.model.DeviceEventResponse
-import com.emarsys.networking.clients.event.model.EventResponseInApp
+import com.emarsys.networking.clients.event.model.OnEventActionCampaign
+import com.emarsys.networking.clients.event.model.toDeviceEvent
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.onEach
@@ -36,6 +40,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
+import kotlin.coroutines.coroutineContext
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
@@ -72,7 +77,7 @@ internal class EventClient(
                     val requestBody =
                         DeviceEventRequestBody(
                             inAppConfigApi.inAppDnd,
-                            sdkEvents,
+                            sdkEvents.map { it.toDeviceEvent() },
                             requestContext.deviceEventState
                         )
                     val body = json.encodeToString(requestBody)
@@ -92,8 +97,8 @@ internal class EventClient(
 
                     val result: DeviceEventResponse = response.body()
                     handleDeviceEventState(result)
-                    handleInApp(result.message)
-                    handleOnAppEventAction(result)
+                    handleInApp(result.contentCampaigns?.getOrNull(0))  // todo handle all campaigns returned
+                    result.actionCampaigns?.let { handleOnEventActionCampaigns(it) }
                     sdkEvents.forEach {
                         sdkEventManager.emitEvent(SdkEvent.Internal.Sdk.Answer.Ready(originId = it.id))
                     }
@@ -112,30 +117,35 @@ internal class EventClient(
         it.forEach { sdkEvent -> sdkEventManager.emitEvent(sdkEvent) }
     }
 
-    private suspend fun handleOnAppEventAction(deviceEventResponse: DeviceEventResponse) {
-        deviceEventResponse.onEventAction?.let {
-            sdkLogger.debug(deviceEventResponse.toString())
+    private suspend fun handleOnEventActionCampaigns(onEventActionCampaigns: List<OnEventActionCampaign>) {
+        onEventActionCampaigns.forEach { campaign ->
+            val actions =
+                campaign.actions.joinToString(separator = ", ") { it::class.simpleName.toString() }
+            sdkLogger.debug("EventClient - handleOnEventActionCampaigns with: $actions")
 
-            val actions = it.actions
-            val campaignId = it.campaignId
-
-            actions.forEach { action ->
-                eventActionFactory.create(action).invoke()
+            campaign.actions.forEach { action ->
+                try {
+                    eventActionFactory.create(action).invoke()
+                    reportOnEventActionCampaignAction(campaign.trackingInfo, action)
+                } catch (exception: Exception) {
+                    coroutineContext.ensureActive()
+                    sdkLogger.error("EventClient - onEventActionInvocationFailed", exception)
+                }
             }
-            reportOnEventAction(campaignId)
         }
     }
 
-    //TODO: check what needs to be reported here
-    private suspend fun reportOnEventAction(campaignId: String) {
-        sdkLogger.debug("EventClient - reportOnEventAction")
-
-        sdkEventManager.registerEvent(SdkEvent.Internal.InApp.Viewed(attributes = buildJsonObject {
-            put(
-                "campaignId",
-                JsonPrimitive(campaignId)
+    private suspend fun reportOnEventActionCampaignAction(
+        trackingInfo: String,
+        action: BasicActionModel
+    ) {
+        sdkLogger.debug("EventClient - reportOnEventActionCampaignAction")
+        sdkEventManager.registerEvent(
+            SdkEvent.Internal.OnEventActionExecuted(
+                trackingInfo = trackingInfo,
+                reporting = action.reporting,
             )
-        }))
+        )
     }
 
     private suspend fun handleDeviceEventState(deviceEventResponse: DeviceEventResponse) {
@@ -144,11 +154,11 @@ internal class EventClient(
         requestContext.deviceEventState = deviceEventResponse.deviceEventState
     }
 
-    private suspend fun handleInApp(message: EventResponseInApp?) {
-        if (message != null && message.html.isNotEmpty()) {
+    private suspend fun handleInApp(message: ContentCampaign?) {
+        if (message != null && message.content.isNotEmpty()) {
             sdkLogger.debug(
                 "EventClient - handleInApp",
-                buildJsonObject { put("campaignId", JsonPrimitive(message.campaignId)) })
+                buildJsonObject { put("campaignId", JsonPrimitive(message.trackingInfo)) })
 
             val view = inAppViewProvider.provide()
             //TODO: will be modified after event service v5 migration
@@ -157,8 +167,8 @@ internal class EventClient(
                     InAppMessage(
                         dismissId = uuidProvider.provide(),
                         type = InAppType.OVERLAY,
-                        trackingInfo = message.campaignId,
-                        content = message.html
+                        trackingInfo = message.trackingInfo,
+                        content = message.content
                     )
                 )
             inAppPresenter.present(view, webViewHolder, InAppPresentationMode.Overlay)

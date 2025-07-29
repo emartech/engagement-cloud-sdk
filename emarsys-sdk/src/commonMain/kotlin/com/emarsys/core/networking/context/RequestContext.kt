@@ -2,11 +2,10 @@ package com.emarsys.core.networking.context
 
 import com.emarsys.core.storage.Store
 import kotlinx.serialization.builtins.serializer
-import kotlinx.serialization.json.JsonObject
 
-internal class RequestContext(): RequestContextApi {
+internal class RequestContext() : RequestContextApi {
 
-   override var contactToken: String? by Store(
+    override var contactToken: String? by Store(
         key = "contactToken",
         serializer = String.serializer()
     )
@@ -23,9 +22,9 @@ internal class RequestContext(): RequestContextApi {
         serializer = String.serializer()
     )
 
-    override var deviceEventState: JsonObject? by Store(
+    override var deviceEventState: String? by Store(
         key = "deviceEventState",
-        serializer = JsonObject.serializer()
+        serializer = String.serializer()
     )
 
     override fun clearTokens() {

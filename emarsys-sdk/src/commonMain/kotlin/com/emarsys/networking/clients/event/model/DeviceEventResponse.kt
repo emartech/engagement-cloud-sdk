@@ -1,24 +1,25 @@
 package com.emarsys.networking.clients.event.model
 
 import com.emarsys.mobileengage.action.models.BasicActionModel
+import com.emarsys.mobileengage.inapp.InAppType
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonObject
 
 @Serializable
 data class DeviceEventResponse(
-    val message: EventResponseInApp? = null,
-    val onEventAction: OnEventAction? = null,
-    val deviceEventState: JsonObject? = null
+    val contentCampaigns: List<ContentCampaign>? = null,
+    val actionCampaigns: List<OnEventActionCampaign>? = null,
+    val deviceEventState: String
 )
 
 @Serializable
-data class OnEventAction(
-    val campaignId: String,
+data class OnEventActionCampaign(
+    val trackingInfo: String,
     val actions: List<BasicActionModel>
 )
 
 @Serializable
-data class EventResponseInApp(
-    val campaignId: String,
-    val html: String
+data class ContentCampaign(
+    val type: InAppType,
+    val trackingInfo: String,
+    val content: String
 )
