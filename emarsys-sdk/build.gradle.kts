@@ -1,6 +1,8 @@
 import co.touchlab.skie.configuration.DefaultArgumentInterop
 import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
 import com.github.gmazzo.buildconfig.BuildConfigTask
+import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
+import java.util.Base64
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -240,6 +242,17 @@ skie {
     }
 }
 mavenPublishing {
+    publishToMavenCentral()
+    signAllPublications()
+
+    configure(
+        AndroidSingleVariantLibrary(
+            variant = "release",
+            sourcesJar = true,
+            publishJavadocJar = true,
+        )
+    )
+
     coordinates(group.toString(), "emarsys-sdk", version.toString())
 
     pom {
@@ -265,6 +278,25 @@ mavenPublishing {
             url = "https://github.com/emartech/kmp-emarsys-sdk"
             connection = "scm:git:https://github.com/emartech/kmp-emarsys-sdk.git"
             developerConnection = "scm:git:https://github.com/emartech/kmp-emarsys-sdk.git"
+        }
+    }
+}
+
+tasks {
+    register("base64EnvToFile") {
+        val propertyName = project.property("propertyName") as String?
+            ?: throw IllegalArgumentException("Property 'propertyName' is not provided.")
+        val file = project.property("file") as String?
+            ?: throw IllegalArgumentException("Property 'file' is not provided.")
+
+        doLast {
+            val base64String = env.fetch(propertyName)
+            val decoder = Base64.getDecoder()
+            val decodedBytes = decoder.decode(base64String)
+
+            file(file).apply {
+                writeBytes(decodedBytes)
+            }
         }
     }
 }

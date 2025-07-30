@@ -156,3 +156,12 @@ prepare-spm: check-env ## prepare swift package manager package for iOS
 	@./gradlew spmDevBuild && \
 	cp -f "./iosReleaseSpm/Package.swift" "./Package.swift" && \
 	echo "Swift Package is prepared. To use it as a local dependency add the project in Xcode at the Package Dependencies section"
+
+prepare-release: check-env ## setup prerequisites for release
+	@./gradlew base64EnvToFile -PpropertyName=SONATYPE_SIGNING_SECRET_KEY_RING_FILE_BASE64 -Pfile=./secring.asc.gpg
+
+release: check-env prepare-release
+	@./gradlew assembleRelease && ./gradlew publishToMavenCentral
+
+release-locally: check-env prepare-release ## release to mavenLocal
+	@./gradlew assembleRelease && ./gradlew publishToMavenLocal

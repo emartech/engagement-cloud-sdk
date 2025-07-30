@@ -21,4 +21,5 @@ plugins {
     alias(libs.plugins.buildConfig) apply false
     alias(libs.plugins.googleServices) apply false
     alias(libs.plugins.agconnect) apply false
+    alias(libs.plugins.dotenv)
 }
