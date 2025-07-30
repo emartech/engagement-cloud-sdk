@@ -138,16 +138,16 @@ sealed interface SdkEvent {
     @Serializable
     sealed interface Internal : SdkEvent {
 
-        interface Reporting : Internal, OnlineSdkEvent {
+        sealed interface Reporting : Internal, OnlineSdkEvent {
             val reporting: String?
             val trackingInfo: String
         }
 
-        interface Custom : Internal, OnlineSdkEvent
+        sealed interface Custom : Internal, OnlineSdkEvent
 
-        interface LogEvent : Internal, OnlineSdkEvent
+        sealed interface LogEvent : Internal, OnlineSdkEvent
 
-        interface SetupFlowEvent : Internal, OnlineSdkEvent
+        sealed interface SetupFlowEvent : Internal, OnlineSdkEvent
 
         @Serializable
         sealed class Sdk(override val name: String) : Internal {
