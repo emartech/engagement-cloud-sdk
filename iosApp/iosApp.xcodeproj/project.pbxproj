@@ -11,15 +11,8 @@
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
 		2A918DE92C85E8FE00B1AF36 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A918DE82C85E8FE00B1AF36 /* NotificationService.swift */; };
-		2ABFACBB2E38B837006259C6 /* EmarsysSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 2ABFACBA2E38B837006259C6 /* EmarsysSDK */; };
-		2ABFACC32E38CAC3006259C6 /* EmarsysNotificationService in Frameworks */ = {isa = PBXBuildFile; productRef = 2ABFACC22E38CAC3006259C6 /* EmarsysNotificationService */; };
-		2ABFACC82E38CC51006259C6 /* EmarsysNotificationService in Frameworks */ = {isa = PBXBuildFile; productRef = 2ABFACC72E38CC51006259C6 /* EmarsysNotificationService */; };
-		2ABFACCA2E38CC51006259C6 /* EmarsysSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 2ABFACC92E38CC51006259C6 /* EmarsysSDK */; };
-		2ABFACCF2E38EB09006259C6 /* EmarsysNotificationService in Frameworks */ = {isa = PBXBuildFile; productRef = 2ABFACCE2E38EB09006259C6 /* EmarsysNotificationService */; };
-		2ABFACD12E38EB09006259C6 /* EmarsysSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 2ABFACD02E38EB09006259C6 /* EmarsysSDK */; };
-		2ABFACD42E390F91006259C6 /* EmarsysNotificationService in Frameworks */ = {isa = PBXBuildFile; productRef = 2ABFACD32E390F91006259C6 /* EmarsysNotificationService */; };
-		2ABFACD62E390F91006259C6 /* EmarsysSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 2ABFACD52E390F91006259C6 /* EmarsysSDK */; };
-		2AED9EEE2C7F6A7300A9AB2C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AED9EED2C7F6A7300A9AB2C /* AppDelegate.swift */; };
+		5DCECA582E3A64DC003AA0FA /* EmarsysNotificationService in Frameworks */ = {isa = PBXBuildFile; productRef = 5DCECA572E3A64DC003AA0FA /* EmarsysNotificationService */; };
+		5DCECA5A2E3A64DC003AA0FA /* EmarsysSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 5DCECA592E3A64DC003AA0FA /* EmarsysSDK */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
 /* End PBXBuildFile section */
 
@@ -54,7 +47,6 @@
 		2A918DE82C85E8FE00B1AF36 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		2A918DEA2C85E8FE00B1AF36 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2AED9EEC2C7F65CA00A9AB2C /* iosApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = iosApp.entitlements; sourceTree = "<group>"; };
-		2AED9EED2C7F6A7300A9AB2C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7555FF7B242A565900829871 /* Emarsys Sample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Emarsys Sample.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF82242A565900829871 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -66,10 +58,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2ABFACC82E38CC51006259C6 /* EmarsysNotificationService in Frameworks */,
-				2ABFACCF2E38EB09006259C6 /* EmarsysNotificationService in Frameworks */,
-				2ABFACD42E390F91006259C6 /* EmarsysNotificationService in Frameworks */,
-				2ABFACC32E38CAC3006259C6 /* EmarsysNotificationService in Frameworks */,
+				5DCECA582E3A64DC003AA0FA /* EmarsysNotificationService in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -77,10 +66,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2ABFACD12E38EB09006259C6 /* EmarsysSDK in Frameworks */,
-				2ABFACD62E390F91006259C6 /* EmarsysSDK in Frameworks */,
-				2ABFACCA2E38CC51006259C6 /* EmarsysSDK in Frameworks */,
-				2ABFACBB2E38B837006259C6 /* EmarsysSDK in Frameworks */,
+				5DCECA5A2E3A64DC003AA0FA /* EmarsysSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -132,7 +118,6 @@
 				7555FF8C242A565B00829871 /* Info.plist */,
 				2152FB032600AC8F00CF470E /* iOSApp.swift */,
 				058557D7273AAEEB004C7B11 /* Preview Content */,
-				2AED9EED2C7F6A7300A9AB2C /* AppDelegate.swift */,
 			);
 			path = iosApp;
 			sourceTree = "<group>";
@@ -186,6 +171,8 @@
 				2ABFACC92E38CC51006259C6 /* EmarsysSDK */,
 				2ABFACD02E38EB09006259C6 /* EmarsysSDK */,
 				2ABFACD52E390F91006259C6 /* EmarsysSDK */,
+				5DA1D2302E3A44980085D5A6 /* EmarsysSDK */,
+				5DCECA592E3A64DC003AA0FA /* EmarsysSDK */,
 			);
 			productName = iosApp;
 			productReference = 7555FF7B242A565900829871 /* Emarsys Sample.app */;
@@ -284,7 +271,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2AED9EEE2C7F6A7300A9AB2C /* AppDelegate.swift in Sources */,
 				2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
 			);
@@ -591,31 +577,27 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = EmarsysSDK;
 		};
-		2ABFACC22E38CAC3006259C6 /* EmarsysNotificationService */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = EmarsysNotificationService;
-		};
-		2ABFACC72E38CC51006259C6 /* EmarsysNotificationService */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = EmarsysNotificationService;
-		};
 		2ABFACC92E38CC51006259C6 /* EmarsysSDK */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = EmarsysSDK;
-		};
-		2ABFACCE2E38EB09006259C6 /* EmarsysNotificationService */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = EmarsysNotificationService;
 		};
 		2ABFACD02E38EB09006259C6 /* EmarsysSDK */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = EmarsysSDK;
 		};
-		2ABFACD32E390F91006259C6 /* EmarsysNotificationService */ = {
+		2ABFACD52E390F91006259C6 /* EmarsysSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EmarsysSDK;
+		};
+		5DA1D2302E3A44980085D5A6 /* EmarsysSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EmarsysSDK;
+		};
+		5DCECA572E3A64DC003AA0FA /* EmarsysNotificationService */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = EmarsysNotificationService;
 		};
-		2ABFACD52E390F91006259C6 /* EmarsysSDK */ = {
+		5DCECA592E3A64DC003AA0FA /* EmarsysSDK */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = EmarsysSDK;
 		};

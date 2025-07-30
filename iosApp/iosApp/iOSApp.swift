@@ -3,7 +3,7 @@ import EmarsysSDK
 
 @main
 struct iOSApp: App {
-    @UIApplicationDelegateAdaptor private var appDelegate: AppDelegate
+    @UIApplicationDelegateAdaptor private var appDelegate: EmarsysAppDelegate
     
 	var body: some Scene {
 		WindowGroup {
