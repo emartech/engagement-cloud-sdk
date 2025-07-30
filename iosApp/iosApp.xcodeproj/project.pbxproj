@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -104,13 +104,6 @@
 			path = NotificationService;
 			sourceTree = "<group>";
 		};
-		42799AB246E5F90AF97AA0EF /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		7555FF72242A565900829871 = {
 			isa = PBXGroup;
 			children = (
@@ -118,7 +111,6 @@
 				7555FF7D242A565900829871 /* iosApp */,
 				2A918DE72C85E8FE00B1AF36 /* NotificationService */,
 				7555FF7C242A565900829871 /* Products */,
-				42799AB246E5F90AF97AA0EF /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -218,7 +210,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 7555FF76242A565900829871 /* Build configuration list for PBXProject "iOSApp" */;
+			buildConfigurationList = 7555FF76242A565900829871 /* Build configuration list for PBXProject "iosApp" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -228,7 +220,6 @@
 			);
 			mainGroup = 7555FF72242A565900829871;
 			packageReferences = (
-				2ABFACD22E390F91006259C6 /* XCLocalSwiftPackageReference "../../kmp-emarsys-sdk" */,
 			);
 			productRefGroup = 7555FF7C242A565900829871 /* Products */;
 			projectDirPath = "";
@@ -575,7 +566,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		7555FF76242A565900829871 /* Build configuration list for PBXProject "iOSApp" */ = {
+		7555FF76242A565900829871 /* Build configuration list for PBXProject "iosApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7555FFA3242A565B00829871 /* Debug */,
@@ -594,13 +585,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCLocalSwiftPackageReference section */
-		2ABFACD22E390F91006259C6 /* XCLocalSwiftPackageReference "../../kmp-emarsys-sdk" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = "../../kmp-emarsys-sdk";
-		};
-/* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		2ABFACBA2E38B837006259C6 /* EmarsysSDK */ = {

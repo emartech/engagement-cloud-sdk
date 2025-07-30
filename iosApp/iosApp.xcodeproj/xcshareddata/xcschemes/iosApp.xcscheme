@@ -18,7 +18,7 @@
                BlueprintIdentifier = "7555FF7A242A565900829871"
                BuildableName = "Emarsys Sample.app"
                BlueprintName = "iosApp"
-               ReferencedContainer = "container:iOSApp.xcodeproj">
+               ReferencedContainer = "container:iosApp.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -47,7 +47,7 @@
             BlueprintIdentifier = "7555FF7A242A565900829871"
             BuildableName = "Emarsys Sample.app"
             BlueprintName = "iosApp"
-            ReferencedContainer = "container:iOSApp.xcodeproj">
+            ReferencedContainer = "container:iosApp.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -64,7 +64,7 @@
             BlueprintIdentifier = "7555FF7A242A565900829871"
             BuildableName = "Emarsys Sample.app"
             BlueprintName = "iosApp"
-            ReferencedContainer = "container:iOSApp.xcodeproj">
+            ReferencedContainer = "container:iosApp.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
