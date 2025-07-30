@@ -1,12 +1,10 @@
 package com.emarsys.mobileengage.pushtoinapp
 
 import com.emarsys.core.log.Logger
-import com.emarsys.mobileengage.action.models.PresentablePushToInAppActionModel
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandlerApi
 import com.emarsys.mobileengage.inapp.InAppMessage
 import com.emarsys.mobileengage.inapp.InAppType
-import com.emarsys.mobileengage.inapp.PushToInAppPayload
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -21,18 +19,9 @@ import kotlin.test.Test
 class PushToInAppHandlerTests {
     private companion object {
         const val URL = "https://sap.com"
-        const val CAMPAIGN_ID = "campaignId"
         const val CONTENT = "<html></html>"
         const val ID = "testId"
-        const val TITLE = "testTitle"
-        const val REPORTING = """{"reportingKey":"reportingValue"}"""
         const val TRACKING_INFO = """{"trackingKey":"trackingValue"}"""
-        val TEST_ACTION_MODEL = PresentablePushToInAppActionModel(
-            ID,
-            REPORTING,
-            TITLE,
-            PushToInAppPayload(CAMPAIGN_ID, URL)
-        )
         val INAPP_MESSAGE = InAppMessage(
             dismissId = ID,
             type = InAppType.OVERLAY,
@@ -59,7 +48,7 @@ class PushToInAppHandlerTests {
     fun handle_shouldCall_downLoad_andPresent_ifDownload_succeeds() = runTest {
         everySuspend { mockInAppDownLoader.download(URL) } returns INAPP_MESSAGE
 
-        pushToInAppHandler.handle(TEST_ACTION_MODEL)
+        pushToInAppHandler.handle(URL)
 
         verifySuspend {
             mockInAppDownLoader.download(URL)
@@ -73,7 +62,7 @@ class PushToInAppHandlerTests {
             val inAppMessageWithEmptyContent = INAPP_MESSAGE.copy(content = "")
             everySuspend { mockInAppDownLoader.download(URL) } returns inAppMessageWithEmptyContent
 
-            pushToInAppHandler.handle(TEST_ACTION_MODEL)
+            pushToInAppHandler.handle(URL)
 
             verifySuspend {
                 mockInAppDownLoader.download(URL)
@@ -88,7 +77,7 @@ class PushToInAppHandlerTests {
     fun handle_shouldNotCall_Present_ifDownload_returnsNull() = runTest {
         everySuspend { mockInAppDownLoader.download(URL) } returns null
 
-        pushToInAppHandler.handle(TEST_ACTION_MODEL)
+        pushToInAppHandler.handle(URL)
 
         verifySuspend {
             mockInAppDownLoader.download(URL)

@@ -33,7 +33,6 @@ import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.BasicPushToInAppActionModel
 import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableOpenExternalUrlActionModel
-import com.emarsys.mobileengage.action.models.toPresentablePushToInAppActionModel
 import com.emarsys.mobileengage.inapp.PushToInAppPayload
 import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
@@ -237,12 +236,11 @@ internal class IosPushInternalTests {
 
         val actionModel =
             BasicPushToInAppActionModel(
-                id = UUID,
                 reporting = REPORTING,
                 payload = PushToInAppPayload(campaignId, url)
             )
         val action = PushToInappAction(
-            actionModel.toPresentablePushToInAppActionModel(),
+            actionModel,
             mockPushToInAppHandler
         )
 

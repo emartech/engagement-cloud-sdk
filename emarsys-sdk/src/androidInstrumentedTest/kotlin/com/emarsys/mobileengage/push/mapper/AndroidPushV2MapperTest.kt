@@ -84,7 +84,6 @@ class AndroidPushV2MapperTest {
             })
             val expected = createExpectedAndroidPushMessage(
                 BasicPushToInAppActionModel(
-                    id = "testId",
                     reporting = REPORTING,
                     payload = PushToInAppPayload("testCampaignId", "testUrl")
                 )

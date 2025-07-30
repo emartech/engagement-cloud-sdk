@@ -284,12 +284,11 @@ mavenPublishing {
 
 tasks {
     register("base64EnvToFile") {
-        val propertyName = project.property("propertyName") as String?
-            ?: throw IllegalArgumentException("Property 'propertyName' is not provided.")
-        val file = project.property("file") as String?
-            ?: throw IllegalArgumentException("Property 'file' is not provided.")
-
         doLast {
+            val propertyName = project.property("propertyName") as String?
+                ?: throw IllegalArgumentException("Property 'propertyName' is not provided.")
+            val file = project.property("file") as String?
+                ?: throw IllegalArgumentException("Property 'file' is not provided.")
             val base64String = env.fetch(propertyName)
             val decoder = Base64.getDecoder()
             val decodedBytes = decoder.decode(base64String)

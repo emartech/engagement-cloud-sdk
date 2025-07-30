@@ -68,7 +68,7 @@ class PushActionFactoryTests {
     @Test
     fun create_shouldReturn_pushToInAppAction_fromBasicPushToInAppActionModel() = runTest {
         val testBasicActionModel =
-            BasicPushToInAppActionModel(ID, REPORTING, PushToInAppPayload(CAMPAIGN_ID, URL))
+            BasicPushToInAppActionModel(REPORTING, PushToInAppPayload(CAMPAIGN_ID, URL))
 
         val result = pushActionFactory.create(testBasicActionModel)
 
