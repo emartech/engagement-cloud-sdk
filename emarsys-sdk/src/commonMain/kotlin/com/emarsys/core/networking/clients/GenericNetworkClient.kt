@@ -82,7 +82,7 @@ internal class GenericNetworkClient(
                     exception,
                     isRemoteLog = !request.isLogRequest
                 )
-                throw exception
+                throw IOException(exception)
             } catch (throwable: Throwable) {
                 onNetworkError?.invoke()
                 sdkLogger.error(

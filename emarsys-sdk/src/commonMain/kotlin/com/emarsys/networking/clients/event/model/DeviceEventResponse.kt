@@ -1,6 +1,7 @@
 package com.emarsys.networking.clients.event.model
 
 import com.emarsys.mobileengage.action.models.BasicActionModel
+import com.emarsys.mobileengage.inapp.InAppMessage
 import com.emarsys.mobileengage.inapp.InAppType
 import kotlinx.serialization.Serializable
 
@@ -23,3 +24,7 @@ data class ContentCampaign(
     val trackingInfo: String,
     val content: String
 )
+
+fun ContentCampaign.asInAppMessage(): InAppMessage {
+    return InAppMessage(type = this.type, trackingInfo = this.trackingInfo, content = this.content)
+}

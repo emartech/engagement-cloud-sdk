@@ -40,8 +40,6 @@ import com.emarsys.core.util.Downloader
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.EventActionFactory
 import com.emarsys.mobileengage.action.EventActionFactoryApi
-import com.emarsys.mobileengage.inapp.InAppDownloader
-import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.util.JsonUtil
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import io.ktor.client.HttpClient
@@ -146,7 +144,6 @@ object CoreInjection {
                 logger = get<Logger> { parametersOf(Downloader::class.simpleName) },
             )
         }
-        singleOf(::InAppDownloader) { bind<InAppDownloaderApi>() }
         single<EventActionFactoryApi> {
             EventActionFactory(
                 sdkEventDistributor = get(),

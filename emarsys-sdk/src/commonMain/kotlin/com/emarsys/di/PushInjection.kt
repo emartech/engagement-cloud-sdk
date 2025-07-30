@@ -5,11 +5,13 @@ import com.emarsys.api.push.PushContext
 import com.emarsys.api.push.PushContextApi
 import com.emarsys.core.actions.ActionHandler
 import com.emarsys.core.actions.ActionHandlerApi
+import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.collections.PersistentList
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.mobileengage.action.PushActionFactory
 import com.emarsys.mobileengage.action.PushActionFactoryApi
+import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
 import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.push.PushClient
 import kotlinx.serialization.json.Json
@@ -23,6 +25,13 @@ object PushInjection {
     val pushModules = module {
         singleOf(::PushActionFactory) { bind<PushActionFactoryApi>() }
         singleOf(::ActionHandler) { bind<ActionHandlerApi>() }
+        single<PushToInAppHandlerApi> {
+            PushToInAppHandler(
+                downloader = get(),
+                inAppHandler = get(),
+                sdkLogger = get { parametersOf(PushToInAppHandler::class.simpleName) }
+            )
+        }
         single<EventBasedClientApi>(named(EventBasedClientTypes.Push)) {
             PushClient(
                 emarsysClient = get<NetworkClientApi>(named(NetworkClientTypes.Emarsys)),

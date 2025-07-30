@@ -12,6 +12,8 @@ import com.emarsys.api.inapp.InAppInternal
 import com.emarsys.api.inapp.InappConfig
 import com.emarsys.api.inapp.LoggingInApp
 import com.emarsys.core.collections.PersistentList
+import com.emarsys.mobileengage.inapp.InAppDownloader
+import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandler
 import com.emarsys.mobileengage.inapp.InAppHandlerApi
 import org.koin.core.module.dsl.bind
@@ -23,6 +25,12 @@ import org.koin.dsl.module
 object InAppInjection {
     val inAppModules = module {
         singleOf(::InAppHandler) { bind<InAppHandlerApi>() }
+        single<InAppDownloaderApi> {
+            InAppDownloader(
+                emarsysClient = get(named(NetworkClientTypes.Emarsys)),
+                sdkLogger = get { parametersOf(InAppDownloader::class.simpleName) }
+            )
+        }
         single<MutableList<InAppCall>>(named(PersistentListTypes.InAppCall)) {
             PersistentList(
                 id = PersistentListIds.INAPP_CONTEXT_PERSISTENT_ID,

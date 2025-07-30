@@ -195,7 +195,7 @@ class GenericNetworkClientTests {
         )
         val onNetworkError = mock<suspend () -> Unit>(MockMode.autofill)
 
-        shouldThrow<Exception> {
+        shouldThrow<IOException> {
             genericNetworkClient.send(request, onNetworkError)
         }
         verifySuspend(VerifyMode.exactly(0)) { onNetworkError() }

@@ -1,5 +1,6 @@
 package com.emarsys.mobileengage.pushtoinapp
 
+import com.emarsys.core.log.Logger
 import com.emarsys.mobileengage.action.models.PresentablePushToInAppActionModel
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandlerApi
@@ -44,18 +45,20 @@ class PushToInAppHandlerTests {
     private lateinit var pushToInAppHandler: PushToInAppHandler
     private lateinit var mockInAppDownLoader: InAppDownloaderApi
     private lateinit var mockInAppHandler: InAppHandlerApi
+    private lateinit var mockLogger: Logger
 
     @BeforeTest
     fun setup() {
         mockInAppHandler = mock(MockMode.autofill)
         everySuspend { mockInAppHandler.handle(INAPP_MESSAGE) } returns Unit
         mockInAppDownLoader = mock()
-        pushToInAppHandler = PushToInAppHandler(mockInAppDownLoader, mockInAppHandler)
+        mockLogger = mock(MockMode.autofill)
+        pushToInAppHandler = PushToInAppHandler(mockInAppDownLoader, mockInAppHandler, mockLogger)
     }
 
     @Test
     fun handle_shouldCall_downLoad_andPresent_ifDownload_succeeds() = runTest {
-        everySuspend { mockInAppDownLoader.download(URL) } returns CONTENT
+        everySuspend { mockInAppDownLoader.download(URL) } returns INAPP_MESSAGE
 
         pushToInAppHandler.handle(TEST_ACTION_MODEL)
 
@@ -68,7 +71,8 @@ class PushToInAppHandlerTests {
     @Test
     fun handle_shouldNotCall_downLoad_andPresent_ifDownload_succeeds_but_contentIsEmpty() =
         runTest {
-            everySuspend { mockInAppDownLoader.download(URL) } returns ""
+            val inAppMessageWithEmptyContent = INAPP_MESSAGE.copy(content = "")
+            everySuspend { mockInAppDownLoader.download(URL) } returns inAppMessageWithEmptyContent
 
             pushToInAppHandler.handle(TEST_ACTION_MODEL)
 
@@ -82,25 +86,10 @@ class PushToInAppHandlerTests {
         }
 
     @Test
-    fun handle_shouldNotCall_downLoad_andPresent_ifDownload_fails() = runTest {
+    fun handle_shouldNotCall_Present_ifDownload_returnsNull() = runTest {
         everySuspend { mockInAppDownLoader.download(URL) } returns null
 
         pushToInAppHandler.handle(TEST_ACTION_MODEL)
-
-        verifySuspend {
-            mockInAppDownLoader.download(URL)
-        }
-
-        verifySuspend(VerifyMode.exactly(0)) {
-            mockInAppHandler.handle(any())
-        }
-    }
-
-    @Test
-    fun handle_shouldNotCall_downLoad_andPresent_ifTrackingInfo_isNull() = runTest {
-        everySuspend { mockInAppDownLoader.download(URL) } returns CONTENT
-
-        pushToInAppHandler.handle(TEST_ACTION_MODEL.copy(trackingInfo = null))
 
         verifySuspend {
             mockInAppDownLoader.download(URL)

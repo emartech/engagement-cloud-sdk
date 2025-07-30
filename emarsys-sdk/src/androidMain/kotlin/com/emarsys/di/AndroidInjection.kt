@@ -22,7 +22,6 @@ import com.emarsys.api.push.PushInternal
 import com.emarsys.applicationContext
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
-import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.cache.AndroidFileCache
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.db.events.AndroidSqlDelightEventsDao
@@ -70,7 +69,6 @@ import com.emarsys.mobileengage.push.mapper.AndroidPushV2Mapper
 import com.emarsys.mobileengage.push.mapper.HuaweiPushV2Mapper
 import com.emarsys.mobileengage.push.mapper.SilentAndroidPushV2Mapper
 import com.emarsys.mobileengage.push.mapper.SilentHuaweiPushV2Mapper
-import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
 import com.emarsys.mobileengage.url.AndroidExternalUrlOpener
 import com.emarsys.sqldelight.EmarsysDB
 import com.emarsys.watchdog.activity.TransitionSafeCurrentActivityWatchdog
@@ -221,13 +219,6 @@ object AndroidInjection {
             AndroidExternalUrlOpener(
                 applicationContext = applicationContext,
                 sdkLogger = get { parametersOf(AndroidExternalUrlOpener::class.simpleName) }
-            )
-        }
-        single<PushToInAppHandlerApi> {
-            PushToInAppHandler(
-                downloader = get(),
-                inAppHandler = get(),
-                sdkLogger = get { parametersOf(PushToInAppHandler::class.simpleName) }
             )
         }
         single<ConnectionWatchDog> {

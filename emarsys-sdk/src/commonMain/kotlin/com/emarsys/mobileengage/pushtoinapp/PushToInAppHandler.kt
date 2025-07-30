@@ -5,8 +5,6 @@ import com.emarsys.core.log.Logger
 import com.emarsys.mobileengage.action.models.PresentablePushToInAppActionModel
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppHandlerApi
-import com.emarsys.mobileengage.inapp.InAppMessage
-import com.emarsys.mobileengage.inapp.InAppType
 
 class PushToInAppHandler(
     private val downloader: InAppDownloaderApi,
@@ -14,19 +12,10 @@ class PushToInAppHandler(
     private val sdkLogger: Logger
 ) : PushToInAppHandlerApi {
     override suspend fun handle(actionModel: PresentablePushToInAppActionModel) {
-        sdkLogger.debug("Handling push to in-app action")
-        val content = downloader.download(actionModel.payload.url)
-        if (!content.isNullOrEmpty()) {
-            actionModel.trackingInfo?.let {
-                inAppHandler.handle(
-                    InAppMessage(
-                        dismissId = actionModel.id,
-                        type = InAppType.OVERLAY,
-                        trackingInfo = it,
-                        content = content
-                    )
-                )
-            }
+        val inAppMessage = downloader.download(actionModel.payload.url)
+        if (!inAppMessage?.content.isNullOrEmpty()) {
+            sdkLogger.debug("Handling push-to-inApp action")
+            inAppHandler.handle(inAppMessage)
         }
     }
 }

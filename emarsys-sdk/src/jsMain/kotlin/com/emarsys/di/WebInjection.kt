@@ -29,7 +29,6 @@ import com.emarsys.api.tracking.JSTracking
 import com.emarsys.api.tracking.JSTrackingApi
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
-import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.badge.WebBadgeCountHandler
 import com.emarsys.core.badge.WebBadgeCountHandlerApi
 import com.emarsys.core.cache.FileCacheApi
@@ -74,7 +73,6 @@ import com.emarsys.mobileengage.push.PushNotificationClickHandler
 import com.emarsys.mobileengage.push.PushNotificationClickHandlerApi
 import com.emarsys.mobileengage.push.PushService
 import com.emarsys.mobileengage.push.PushServiceContext
-import com.emarsys.mobileengage.pushtoinapp.WebPushToInAppHandler
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.connection.WebConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
@@ -171,12 +169,6 @@ object WebInjection {
             WebExternalUrlOpener(
                 window = window,
                 sdkLogger = get { parametersOf(WebExternalUrlOpener::class.simpleName) })
-        }
-        single<PushToInAppHandlerApi> {
-            WebPushToInAppHandler(
-                downloader = get(),
-                inAppHandler = get()
-            )
         }
         single<ConnectionWatchDog> { WebConnectionWatchDog(window) }
         single<LifecycleWatchDog> {

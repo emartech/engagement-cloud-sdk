@@ -136,12 +136,6 @@ object IosInjection {
                 sdkLogger = get { parametersOf(IosExternalUrlOpener::class.simpleName) }
             )
         }
-        single<PushToInAppHandlerApi> {
-            PushToInAppHandler(
-                downloader = get(),
-                inAppHandler = get()
-            )
-        }
         single<ConnectionWatchDog> {
             IosConnectionWatchdog(
                 NWPathMonitorWrapper(

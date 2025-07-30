@@ -1,5 +1,5 @@
 package com.emarsys.mobileengage.inapp
 
 interface InAppDownloaderApi {
-    suspend fun download(url: String): String?
+    suspend fun download(url: String): InAppMessage?
 }
