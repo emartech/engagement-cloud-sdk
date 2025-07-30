@@ -11,11 +11,15 @@ import com.emarsys.api.tracking.IosTrackingApi
 import com.emarsys.config.SdkConfig
 import com.emarsys.core.exceptions.SdkAlreadyDisabledException
 import com.emarsys.core.exceptions.SdkAlreadyEnabledException
+import com.emarsys.di.CoroutineScopeTypes
 import com.emarsys.di.EventFlowTypes
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.event.SdkEvent
 import io.ktor.utils.io.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import org.koin.core.qualifier.named
 import kotlin.experimental.ExperimentalObjCName
 
@@ -49,9 +53,11 @@ object IosEmarsys {
     @Throws(CancellationException::class)
     suspend fun initialize() {
         Emarsys.initialize()
-        koin.get<Flow<SdkEvent.External.Api>>(named(EventFlowTypes.Public)).collect {
-            eventListeners.forEach { listener ->
-                listener.invoke(it)
+        koin.get<CoroutineScope>(named(CoroutineScopeTypes.Application)).launch(start = CoroutineStart.UNDISPATCHED) {
+            koin.get<Flow<SdkEvent.External.Api>>(named(EventFlowTypes.Public)).collect {
+                eventListeners.forEach { listener ->
+                    listener.invoke(it)
+                }
             }
         }
     }
