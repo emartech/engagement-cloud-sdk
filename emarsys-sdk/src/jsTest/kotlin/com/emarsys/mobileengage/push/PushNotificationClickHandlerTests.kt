@@ -184,14 +184,14 @@ class PushNotificationClickHandlerTests {
         }
 
     @Test
-    fun handleNotificationClick_shouldPushToInAppActionAndMandatoryAction_andAddTrackingInfoToActionModel() =
+    fun handleNotificationClick_shouldHandle_pushToInAppActionAndMandatoryAction() =
         runTest {
+            val testPushToInAppPayload = PushToInAppPayload("testCampaignId", "https://www.sap.com")
             val actionId = ""
             val actionModel =
                 BasicPushToInAppActionModel(
                     reporting = REPORTING,
-                    payload = PushToInAppPayload("testCampaignId", "https://www.sap.com"),
-                    trackingInfo = null
+                    payload = testPushToInAppPayload
                 )
             val notificationClickedData =
                 createTestJsNotificationClickedData(actionId, defaultTapActionModel = actionModel)
@@ -211,7 +211,7 @@ class PushNotificationClickHandlerTests {
 
             pushNotificationClickHandler.handleNotificationClick(event)
 
-            actionModelSlot.values.first().trackingInfo shouldBe TRACKING_INFO
+            actionModelSlot.values.first().payload shouldBe testPushToInAppPayload
             verifySuspend {
                 mockActionHandler.handleActions(
                     listOf(mockNotificationOpenedAction),

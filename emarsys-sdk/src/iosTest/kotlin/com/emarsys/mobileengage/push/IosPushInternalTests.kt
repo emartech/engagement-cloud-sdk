@@ -271,7 +271,7 @@ internal class IosPushInternalTests {
         advanceUntilIdle()
 
         verifySuspend {
-            mockActionFactory.create(actionModel.copy(trackingInfo = TRACKING_INFO))
+            mockActionFactory.create(actionModel)
             mockActionHandler.handleActions(any(), action)
         }
     }

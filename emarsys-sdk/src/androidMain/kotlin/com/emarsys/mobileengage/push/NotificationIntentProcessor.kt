@@ -14,7 +14,6 @@ import com.emarsys.mobileengage.action.models.BasicDismissActionModel
 import com.emarsys.mobileengage.action.models.BasicLaunchApplicationActionModel
 import com.emarsys.mobileengage.action.models.BasicPushButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.DismissActionModel
-import com.emarsys.mobileengage.action.models.InAppActionModel
 import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.push.model.AndroidPushMessage
@@ -52,18 +51,8 @@ internal class NotificationIntentProcessor(
         val defaultAction = intent.getStringExtra(INTENT_EXTRA_DEFAULT_TAP_ACTION_KEY)
 
         return try {
-            val actionModel = action?.let { json.decodeFromString<PresentableActionModel>(it) }
+            action?.let { json.decodeFromString<PresentableActionModel>(it) }
                 ?: defaultAction?.let { json.decodeFromString<BasicActionModel>(it) }
-            actionModel?.let {
-                val pushMessage =
-                    intent.getStringExtra(INTENT_EXTRA_PAYLOAD_KEY)?.let { pushString ->
-                        json.decodeFromString<AndroidPushMessage>(pushString)
-                    }
-                if(it is InAppActionModel) {
-                    it.trackingInfo = pushMessage?.trackingInfo
-                }
-            }
-            actionModel
         } catch (exception: Exception) {
             sdkLogger.error("Action parsing failed", exception, buildJsonObject {
                 put("action", action)

@@ -326,7 +326,7 @@ class NotificationIntentProcessorTests {
         }
 
     @Test
-    fun testProcessIntent_shouldHandleAction_withActionHandler_withMandatoryActions_andIncludeTrackingInfoInActionModel_whenActionIsPushToInApp() =
+    fun testProcessIntent_shouldHandleAction_withActionHandler_withMandatoryActions_whenActionIsPushToInApp() =
         runTest {
             val actionModelSlot = slot<BasicPushToInAppActionModel>()
             val actionJsonString =
@@ -358,7 +358,7 @@ class NotificationIntentProcessorTests {
 
             advanceUntilIdle()
 
-            actionModelSlot.captured.trackingInfo shouldBe TRACKING_INFO
+            actionModelSlot.captured.payload shouldBe PushToInAppPayload("testCampaignId", url = "https://www.sap.com")
             coVerify {
                 mockActionHandler.handleActions(
                     listOf(

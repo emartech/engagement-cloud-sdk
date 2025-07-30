@@ -31,8 +31,7 @@ class PushToInAppHandlerTests {
             ID,
             REPORTING,
             TITLE,
-            PushToInAppPayload(CAMPAIGN_ID, URL),
-            TRACKING_INFO
+            PushToInAppPayload(CAMPAIGN_ID, URL)
         )
         val INAPP_MESSAGE = InAppMessage(
             dismissId = ID,
