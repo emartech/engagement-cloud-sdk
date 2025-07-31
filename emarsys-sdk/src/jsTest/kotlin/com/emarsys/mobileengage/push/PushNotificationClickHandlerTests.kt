@@ -186,7 +186,7 @@ class PushNotificationClickHandlerTests {
     @Test
     fun handleNotificationClick_shouldHandle_pushToInAppActionAndMandatoryAction() =
         runTest {
-            val testPushToInAppPayload = PushToInAppPayload("testCampaignId", "https://www.sap.com")
+            val testPushToInAppPayload = PushToInAppPayload("https://www.sap.com")
             val actionId = ""
             val actionModel =
                 BasicPushToInAppActionModel(

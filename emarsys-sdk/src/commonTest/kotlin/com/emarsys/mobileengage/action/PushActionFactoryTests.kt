@@ -25,7 +25,6 @@ import kotlin.test.Test
 class PushActionFactoryTests {
     private companion object {
         const val URL = "url"
-        const val CAMPAIGN_ID = "campaignId"
         const val ID = "testId"
         const val TITLE = "testTitle"
         const val REPORTING = """{"reportingKey":"reportingValue"}"""
@@ -54,7 +53,7 @@ class PushActionFactoryTests {
             ID,
             REPORTING,
             TITLE,
-            PushToInAppPayload(CAMPAIGN_ID, URL)
+            PushToInAppPayload(URL)
         )
 
         val result = pushActionFactory.create(testActionModel)
@@ -68,7 +67,7 @@ class PushActionFactoryTests {
     @Test
     fun create_shouldReturn_pushToInAppAction_fromBasicPushToInAppActionModel() = runTest {
         val testBasicActionModel =
-            BasicPushToInAppActionModel(REPORTING, PushToInAppPayload(CAMPAIGN_ID, URL))
+            BasicPushToInAppActionModel(REPORTING, PushToInAppPayload(URL))
 
         val result = pushActionFactory.create(testBasicActionModel)
 

@@ -330,7 +330,7 @@ class NotificationIntentProcessorTests {
         runTest {
             val actionModelSlot = slot<BasicPushToInAppActionModel>()
             val actionJsonString =
-                """{"type": "InApp","reporting":"{\"someKey\":\"someValue\"}","payload":{"url":"https://www.sap.com","campaignId":"testCampaignId"}}"""
+                """{"type": "InApp","reporting":"{\"someKey\":\"someValue\"}","payload":{"url":"https://www.sap.com"}}"""
             val notificationOpenedActionModel =
                 NotificationOpenedActionModel(REPORTING, TRACKING_INFO)
             val basicDismissActionModel = BasicDismissActionModel(COLLAPSE_ID)
@@ -358,7 +358,7 @@ class NotificationIntentProcessorTests {
 
             advanceUntilIdle()
 
-            actionModelSlot.captured.payload shouldBe PushToInAppPayload("testCampaignId", url = "https://www.sap.com")
+            actionModelSlot.captured.payload shouldBe PushToInAppPayload(url = "https://www.sap.com")
             coVerify {
                 mockActionHandler.handleActions(
                     listOf(

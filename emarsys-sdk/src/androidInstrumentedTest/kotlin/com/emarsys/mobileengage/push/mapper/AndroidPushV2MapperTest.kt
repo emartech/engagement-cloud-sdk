@@ -78,14 +78,13 @@ class AndroidPushV2MapperTest {
                 put("id", "testId")
                 put("reporting", "{\"reportingKey\":\"reportingValue\"}")
                 put("payload", buildJsonObject {
-                    put("campaignId", "testCampaignId")
                     put("url", "testUrl")
                 })
             })
             val expected = createExpectedAndroidPushMessage(
                 BasicPushToInAppActionModel(
                     reporting = REPORTING,
-                    payload = PushToInAppPayload("testCampaignId", "testUrl")
+                    payload = PushToInAppPayload("testUrl")
                 )
             )
 

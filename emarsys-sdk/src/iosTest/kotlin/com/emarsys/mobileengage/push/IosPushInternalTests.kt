@@ -229,7 +229,6 @@ internal class IosPushInternalTests {
 
     @Test
     fun `didReceiveNotificationResponse should handle pushToInAppAction`() = runTest {
-        val campaignId = "campaignId"
         val url = "https://sap.com"
 
         val mockPushToInAppHandler: PushToInAppHandlerApi = mock()
@@ -237,7 +236,7 @@ internal class IosPushInternalTests {
         val actionModel =
             BasicPushToInAppActionModel(
                 reporting = REPORTING,
-                payload = PushToInAppPayload(campaignId, url)
+                payload = PushToInAppPayload(url)
             )
         val action = PushToInappAction(
             actionModel,
@@ -258,7 +257,6 @@ internal class IosPushInternalTests {
                 "id" to UUID,
                 "reporting" to REPORTING,
                 "payload" to mapOf(
-                    "campaignId" to campaignId,
                     "url" to url
                 )
             )
