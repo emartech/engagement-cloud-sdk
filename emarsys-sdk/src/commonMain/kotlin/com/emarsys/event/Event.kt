@@ -115,6 +115,16 @@ sealed interface SdkEvent {
 
         sealed interface Api : External {
 
+
+            /**
+             * Represents an event defined by the SAP Emarsys platform user.
+             *
+             * @property id A unique identifier for the event.
+             * @property name The name of the event.
+             * @property attributes Additional attributes associated with the event.
+             * @property timestamp The timestamp when the event occurred.
+             * @property type The type of the event, which is always "app_event".
+             */
             data class AppEvent(
                 override val id: String = UUIDProvider().provide(),
                 override val name: String,
@@ -123,6 +133,26 @@ sealed interface SdkEvent {
                 override val type: String = ExternalEventTypes.APP_EVENT.name.lowercase()
             ) : Api
 
+            /**
+             * Represents a badge count event tracked by the SDK.
+             *
+             * This event is used to be notified about changes to the badge count,
+             * typically for notifications or app icons.
+             *
+             * @property id A unique identifier for the event.
+             * @property name The name of the event.
+             * @property attributes Additional attributes associated with the event.
+             * @property timestamp The timestamp when the event occurred.
+             * @property type The type of the event, which is always "badge_count".
+             * @property badgeCount The badge count value that should be set or added
+             * to the current badge count.
+             * @property method The method used to update the badge count.
+             *
+             * Possible values:
+             * - SET
+             * - ADD
+             *
+             */
             data class BadgeCountEvent(
                 override val id: String = UUIDProvider().provide(),
                 override val name: String,

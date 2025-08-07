@@ -6,6 +6,12 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlin.time.ExperimentalTime
 
+/**
+ * Represents a custom event that can be tracked using the SDK.
+ *
+ * @property name The name of the custom event.
+ * @property attributes A map of string key-value pairs representing additional attributes for the event.
+ */
 data class CustomEvent(
     val name: String,
     val attributes: Map<String, String>? = null

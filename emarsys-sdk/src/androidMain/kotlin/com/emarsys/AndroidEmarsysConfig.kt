@@ -15,6 +15,13 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
 
+/**
+ * Configuration class for enabling the Emarsys SDK on Android.
+ *
+ * @property applicationCode The application code of your application.
+ * @property merchantId The merchant ID.
+ * @property launchActivityClass The class of the activity to be launched when a launch application action is performed.
+ */
 @Serializable(with = AndroidEmarsysConfigSerializer::class)
 data class AndroidEmarsysConfig(
     override val applicationCode: String? = null,

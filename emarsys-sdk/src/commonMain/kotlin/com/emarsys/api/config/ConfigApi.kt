@@ -2,21 +2,100 @@ package com.emarsys.api.config
 
 import com.emarsys.core.device.NotificationSettings
 
+/**
+ * Interface for managing SDK configuration settings.
+ *
+ * This API allows retrieving and modifying various configuration parameters.
+ */
 interface ConfigApi {
+
+    /**
+     * Retrieves the contact field ID configured.
+     *
+     * @return The contact field ID, or `null` if not configured.
+     */
     suspend fun getContactFieldId(): Int?
+
+    /**
+     * Retrieves the application code configured.
+     *
+     * @return The application code, or `null` if not configured.
+     */
     suspend fun getApplicationCode(): String?
+
+    /**
+     * Retrieves the merchant ID configured.
+     *
+     * @return The merchant ID, or `null` if not configured.
+     */
     suspend fun getMerchantId(): String?
+
+    /**
+     * Retrieves the client ID associated with the SDK.
+     *
+     * @return The client ID as a string.
+     */
     suspend fun getClientId(): String
+
+    /**
+     * Retrieves the language code currently set for the SDK.
+     *
+     * @return The language code as a string.
+     */
     suspend fun getLanguageCode(): String
+
+    /**
+     * Retrieves the version of the SDK.
+     *
+     * @return The SDK version as a string.
+     */
     suspend fun getSdkVersion(): String
 
+    /**
+     * Changes the application code.
+     *
+     * This operation validates the provided application code.
+     *
+     * Example usage:
+     * ```kotlin
+     * Emarsys.config.changeApplicationCode("ABCDE-12345")
+     * ```
+     *
+     * @param applicationCode The new application code to set.
+     * @return A [Result] indicating success or failure of the operation.
+     * In case of an invalid application code, the result contains an [InvalidApplicationCodeException][com.emarsys.core.exceptions.SdkException.InvalidApplicationCodeException]
+     */
     suspend fun changeApplicationCode(applicationCode: String): Result<Unit>
 
+    /**
+     * Changes the merchant ID used by the SDK.
+     *
+     * @param merchantId The new merchant ID to set.
+     * @return A [Result] indicating success or failure of the operation.
+     */
     suspend fun changeMerchantId(merchantId: String): Result<Unit>
 
+    /**
+     * Sets the language for the SDK.
+     *
+     * This operation updates the language settings for the SDK, enabling localized functionality.
+     *
+     * @param language The language code to set (e.g., "en", "de").
+     * @return A [Result] indicating success or failure of the operation.
+     */
     suspend fun setLanguage(language: String): Result<Unit>
 
+    /**
+     * Resets the language settings for the SDK to the default value.
+     *
+     * @return A [Result] indicating success or failure of the operation.
+     */
     suspend fun resetLanguage(): Result<Unit>
 
+    /**
+     * Retrieves the notification settings configured for the SDK.
+     *
+     * @return A [NotificationSettings] object containing the current notification settings.
+     */
     suspend fun getNotificationSettings(): NotificationSettings
 }
