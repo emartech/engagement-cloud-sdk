@@ -174,7 +174,7 @@ enum class CoroutineScopeTypes {
 }
 
 enum class PersistentListTypes {
-    PushCall, InAppCall, InboxCall, PredictCall, GeofenceTrackerCall, ConfigCall, ContactCall, EventTrackerCall
+    PushCall, InAppCall, InboxCall, PredictCall, ConfigCall, ContactCall, EventTrackerCall
 }
 
 enum class NetworkClientTypes {
@@ -198,7 +198,6 @@ object PersistentListIds {
     const val INAPP_CONTEXT_PERSISTENT_ID = "inAppContextPersistentId"
     const val INBOX_CONTEXT_PERSISTENT_ID = "inboxContextPersistentId"
     const val PREDICT_CONTEXT_PERSISTENT_ID = "predictContextPersistentId"
-    const val GEOFENCE_TRACKER_CONTEXT_PERSISTENT_ID = "geofenceTrackerContextPersistentId"
     const val CONFIG_CONTEXT_PERSISTENT_ID = "configContextPersistentId"
     const val CONTACT_CONTEXT_PERSISTENT_ID = "contactContextPersistentId"
     const val EVENT_TRACKER_CONTEXT_PERSISTENT_ID = "eventTrackerContextPersistentId"

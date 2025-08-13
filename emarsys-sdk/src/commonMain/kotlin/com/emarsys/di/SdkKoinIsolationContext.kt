@@ -28,7 +28,6 @@ object SdkKoinIsolationContext {
             PushInjection.pushModules,
             InAppInjection.inAppModules,
             InboxInjection.inboxModules,
-            GeofenceTrackerInjection.geofenceTrackerModules,
             DeepLinkInjection.deepLinkModules,
             PredictInjection.predictModules
         )

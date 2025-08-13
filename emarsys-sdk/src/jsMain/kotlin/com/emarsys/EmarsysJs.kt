@@ -5,7 +5,6 @@ import com.emarsys.api.deeplink.JSDeepLinkApi
 import com.emarsys.api.events.SdkApiEvent
 import com.emarsys.api.events.SdkEventSubscription
 import com.emarsys.api.events.SdkEventSubscriptionApi
-import com.emarsys.api.geofence.JSGeofenceApi
 import com.emarsys.api.inapp.JSInAppApi
 import com.emarsys.api.inbox.JSInboxApi
 import com.emarsys.api.predict.JSPredictApi
@@ -47,7 +46,6 @@ object EmarsysJs {
     lateinit var tracking: JSTrackingApi
     lateinit var push: JSPushApi
     lateinit var deepLink: JSDeepLinkApi
-    lateinit var geofence: JSGeofenceApi
     lateinit var inbox: JSInboxApi
     lateinit var inApp: JSInAppApi
     lateinit var predict: JSPredictApi
@@ -60,7 +58,6 @@ object EmarsysJs {
         tracking = koin.get<JSTrackingApi>()
         push = koin.get<JSPushApi>()
         deepLink = koin.get<JSDeepLinkApi>()
-        geofence = koin.get<JSGeofenceApi>()
         inbox = koin.get<JSInboxApi>()
         inApp = koin.get<JSInAppApi>()
         predict = koin.get<JSPredictApi>()

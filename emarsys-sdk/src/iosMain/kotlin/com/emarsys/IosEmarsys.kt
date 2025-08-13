@@ -3,7 +3,6 @@ package com.emarsys
 import com.emarsys.api.config.IosConfigApi
 import com.emarsys.api.contact.IosContactApi
 import com.emarsys.api.deeplink.IosDeepLinkApi
-import com.emarsys.api.geofence.IosGeofenceApi
 import com.emarsys.api.inapp.IosInAppApi
 import com.emarsys.api.predict.IosPredictApi
 import com.emarsys.api.push.IosPushApi
@@ -40,8 +39,6 @@ object IosEmarsys {
         get() = koin.get<IosInAppApi>()
     val config: IosConfigApi
         get() = koin.get<IosConfigApi>()
-    val geofence: IosGeofenceApi
-        get() = koin.get<IosGeofenceApi>()
     val predict: IosPredictApi
         get() = koin.get<IosPredictApi>()
     val deepLink: IosDeepLinkApi

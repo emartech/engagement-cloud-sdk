@@ -3,7 +3,6 @@ package com.emarsys
 import com.emarsys.api.config.ConfigApi
 import com.emarsys.api.contact.ContactApi
 import com.emarsys.api.deeplink.AndroidDeepLinkApi
-import com.emarsys.api.geofence.GeofenceTrackerApi
 import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.inbox.InboxApi
 import com.emarsys.api.predict.PredictApi
@@ -72,12 +71,6 @@ object AndroidEmarsys {
      */
     val config: ConfigApi
         get() = Emarsys.config
-
-    /**
-     * Provides access to the Geofence Tracker API, which allows managing geofence-related settings and functionality.
-     */
-    val geofence: GeofenceTrackerApi
-        get() = Emarsys.geofence
 
     /**
      * Provides access to the Predict API, which allows tracking user interactions and getting product recommendations.

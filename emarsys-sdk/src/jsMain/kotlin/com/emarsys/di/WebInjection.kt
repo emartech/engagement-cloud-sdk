@@ -7,8 +7,6 @@ import com.emarsys.api.contact.JSContact
 import com.emarsys.api.contact.JSContactApi
 import com.emarsys.api.deeplink.JSDeepLink
 import com.emarsys.api.deeplink.JSDeepLinkApi
-import com.emarsys.api.geofence.JSGeofence
-import com.emarsys.api.geofence.JSGeofenceApi
 import com.emarsys.api.inapp.JSInApp
 import com.emarsys.api.inapp.JSInAppApi
 import com.emarsys.api.inbox.JSInbox
@@ -268,14 +266,6 @@ object WebInjection {
         single<JSDeepLinkApi> {
             JSDeepLink(
                 deepLinkApi = get(),
-                applicationScope = get(
-                    named(CoroutineScopeTypes.Application)
-                )
-            )
-        }
-        single<JSGeofenceApi> {
-            JSGeofence(
-                geofenceTracker = get(),
                 applicationScope = get(
                     named(CoroutineScopeTypes.Application)
                 )

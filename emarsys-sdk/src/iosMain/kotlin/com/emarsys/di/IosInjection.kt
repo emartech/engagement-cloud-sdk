@@ -8,8 +8,6 @@ import com.emarsys.api.contact.IosContact
 import com.emarsys.api.contact.IosContactApi
 import com.emarsys.api.deeplink.IosDeepLink
 import com.emarsys.api.deeplink.IosDeepLinkApi
-import com.emarsys.api.geofence.IosGeofence
-import com.emarsys.api.geofence.IosGeofenceApi
 import com.emarsys.api.inapp.IosInApp
 import com.emarsys.api.inapp.IosInAppApi
 import com.emarsys.api.predict.IosPredict
@@ -97,7 +95,6 @@ object IosInjection {
         single<IosTrackingApi> { IosTracking() }
         single<IosInAppApi> { IosInApp() }
         single<IosConfigApi> { IosConfig() }
-        single<IosGeofenceApi> { IosGeofence() }
         single<IosPredictApi> { IosPredict() }
         single<IosDeepLinkApi> { IosDeepLink() }
         single<UNUserNotificationCenter> { UNUserNotificationCenter.currentNotificationCenter() }
