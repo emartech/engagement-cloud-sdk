@@ -11,8 +11,6 @@ import com.emarsys.api.inapp.JSInApp
 import com.emarsys.api.inapp.JSInAppApi
 import com.emarsys.api.inbox.JSInbox
 import com.emarsys.api.inbox.JSInboxApi
-import com.emarsys.api.predict.JSPredict
-import com.emarsys.api.predict.JSPredictApi
 import com.emarsys.api.push.JSPush
 import com.emarsys.api.push.JSPushApi
 import com.emarsys.api.push.LoggingPush
@@ -282,14 +280,6 @@ object WebInjection {
         single<JSInAppApi> {
             JSInApp(
                 inAppApi = get(),
-                applicationScope = get(
-                    named(CoroutineScopeTypes.Application)
-                )
-            )
-        }
-        single<JSPredictApi> {
-            JSPredict(
-                predictApi = get(),
                 applicationScope = get(
                     named(CoroutineScopeTypes.Application)
                 )

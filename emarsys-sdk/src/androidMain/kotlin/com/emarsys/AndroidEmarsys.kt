@@ -4,8 +4,6 @@ import com.emarsys.api.config.ConfigApi
 import com.emarsys.api.contact.ContactApi
 import com.emarsys.api.deeplink.AndroidDeepLinkApi
 import com.emarsys.api.inapp.InAppApi
-import com.emarsys.api.inbox.InboxApi
-import com.emarsys.api.predict.PredictApi
 import com.emarsys.api.push.PushApi
 import com.emarsys.core.exceptions.SdkAlreadyEnabledException
 import com.emarsys.di.EventFlowTypes
@@ -61,22 +59,10 @@ object AndroidEmarsys {
         get() = Emarsys.inApp
 
     /**
-     * Provides access to the Inbox API, which allows fetching inbox messages and message tagging functionality.
-     */
-    val inbox: InboxApi
-        get() = Emarsys.inbox
-
-    /**
      * Provides access to the Config API, which allows retrieving, setting and modifying SDK configuration settings.
      */
     val config: ConfigApi
         get() = Emarsys.config
-
-    /**
-     * Provides access to the Predict API, which allows tracking user interactions and getting product recommendations.
-     */
-    val predict: PredictApi
-        get() = Emarsys.predict
 
     /**
      * Initializes the SDK. This method must be called before using any other SDK functionality.

@@ -45,7 +45,6 @@ class InitOrganizerTests: KoinTest {
     }
 
     private lateinit var mockStateMachine: StateMachineApi
-    private lateinit var mockPredictStateMachine: StateMachineApi
     private lateinit var sdkContext: SdkContextApi
     private lateinit var initOrganizer: InitOrganizer
 
@@ -58,11 +57,10 @@ class InitOrganizerTests: KoinTest {
         koin.loadModules(listOf(testModule))
 
         mockStateMachine = mock()
-        mockPredictStateMachine = mock()
         sdkContext = SdkContext(
             StandardTestDispatcher(),
             mainDispatcher,
-            DefaultUrls("", "", "", "", "", "", ""),
+            DefaultUrls("", "", "", "", "", ""),
             LogLevel.Error,
             mutableSetOf(),
             logBreadcrumbsQueueSize = 10

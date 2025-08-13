@@ -9,7 +9,6 @@ class DefaultUrlTests {
     private val defaultUrls = DefaultUrls(
         "clientServiceBaseUrl - origin",
         "eventServiceBaseUrl - origin",
-        "predictBaseUrl - origin",
         "deepLinkBaseUrl - origin",
         "inboxBaseUrl - origin",
         "remoteConfigBaseUrl - origin",
@@ -21,7 +20,6 @@ class DefaultUrlTests {
         val expected = DefaultUrls(
             "clientServiceBaseUrl - new",
             "eventServiceBaseUrl - origin",
-            "predictBaseUrl - new",
             "deepLinkBaseUrl - origin",
             "inboxBaseUrl - new",
             "remoteConfigBaseUrl - origin",
@@ -29,7 +27,6 @@ class DefaultUrlTests {
         )
         val result = defaultUrls.copyWith(
             clientServiceBaseUrl = "clientServiceBaseUrl - new",
-            predictBaseUrl = "predictBaseUrl - new",
             inboxBaseUrl = "inboxBaseUrl - new",
             loggingUrl = "loggingUrl - new",
             remoteConfigBaseUrl = null

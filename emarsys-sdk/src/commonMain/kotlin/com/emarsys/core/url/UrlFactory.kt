@@ -32,27 +32,23 @@ internal class UrlFactory(
                 URLBuilder("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client/app").build()
             }
 
-            LINK_CONTACT -> createUrlBasedOnPredict(
+            LINK_CONTACT -> createUrl(
                 sdkContext.defaultUrls.clientServiceBaseUrl,
-                "contact-token",
                 "client/contact"
             ).build()
 
-            UNLINK_CONTACT -> createUrlBasedOnPredict(
+            UNLINK_CONTACT -> createUrl(
                 sdkContext.defaultUrls.clientServiceBaseUrl,
-                "contact",
                 "client/contact"
             ).build()
 
-            REFRESH_TOKEN -> createUrlBasedOnPredict(
+            REFRESH_TOKEN -> createUrl(
                 sdkContext.defaultUrls.clientServiceBaseUrl,
-                "contact-token",
                 "contact-token"
             ).build()
 
-            CHANGE_MERCHANT_ID -> createUrlBasedOnPredict(
+            CHANGE_MERCHANT_ID -> createUrl(
                 sdkContext.defaultUrls.clientServiceBaseUrl,
-                "contact-token",
                 "contact-token"
             ).build()
 
@@ -76,15 +72,10 @@ internal class UrlFactory(
             ?: throw MissingApplicationCodeException("Application code is missing!")
     }
 
-    private fun createUrlBasedOnPredict(
+    private fun createUrl(
         baseUrl: String,
-        predictPath: String,
         mePath: String
     ): URLBuilder {
-        return if (sdkContext.isConfigPredictOnly()) {
-            URLBuilder("$baseUrl/$V4_API/$predictPath")
-        } else {
-            URLBuilder("$baseUrl/$V4_API/apps/${getApplicationCode()}/$mePath")
-        }
+        return URLBuilder("$baseUrl/$V4_API/apps/${getApplicationCode()}/$mePath")
     }
 }

@@ -10,8 +10,6 @@ import com.emarsys.api.deeplink.IosDeepLink
 import com.emarsys.api.deeplink.IosDeepLinkApi
 import com.emarsys.api.inapp.IosInApp
 import com.emarsys.api.inapp.IosInAppApi
-import com.emarsys.api.predict.IosPredict
-import com.emarsys.api.predict.IosPredictApi
 import com.emarsys.api.push.IosPush
 import com.emarsys.api.push.IosPushApi
 import com.emarsys.api.push.PushApi
@@ -19,7 +17,6 @@ import com.emarsys.api.tracking.IosTracking
 import com.emarsys.api.tracking.IosTrackingApi
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
-import com.emarsys.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.emarsys.core.badge.IosBadgeCountHandler
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.cache.IosFileCache
@@ -71,7 +68,6 @@ import com.emarsys.mobileengage.push.IosPushInstance
 import com.emarsys.mobileengage.push.IosPushInternal
 import com.emarsys.mobileengage.push.IosPushWrapper
 import com.emarsys.mobileengage.push.IosPushWrapperApi
-import com.emarsys.mobileengage.pushtoinapp.PushToInAppHandler
 import com.emarsys.sqldelight.EmarsysDB
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
@@ -95,7 +91,6 @@ object IosInjection {
         single<IosTrackingApi> { IosTracking() }
         single<IosInAppApi> { IosInApp() }
         single<IosConfigApi> { IosConfig() }
-        single<IosPredictApi> { IosPredict() }
         single<IosDeepLinkApi> { IosDeepLink() }
         single<UNUserNotificationCenter> { UNUserNotificationCenter.currentNotificationCenter() }
         single<StringStorageApi> { StringStorage(userDefaults = get()) }

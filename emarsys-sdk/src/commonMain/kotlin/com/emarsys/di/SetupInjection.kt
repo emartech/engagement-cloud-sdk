@@ -96,15 +96,6 @@ object SetupInjection {
                 )
             )
         }
-        single<StateMachineApi>(named(StateMachineTypes.PredictEnable)) {
-            StateMachine(
-                states = listOf(
-                    get<State>(named(StateTypes.CollectDeviceInfo)),
-                    get<State>(named(StateTypes.PlatformInit)),
-                    get<State>(named(StateTypes.RestoreSavedSdkEvents)),
-                )
-            )
-        }
         single<StateMachineApi>(named(StateMachineTypes.MobileEngageReregistration)) {
             StateMachine(
                 states = listOf(
@@ -112,14 +103,6 @@ object SetupInjection {
                     get<State>(named(StateTypes.RegisterClient)),
                     get<State>(named(StateTypes.ApplyAppCodeBasedRemoteConfig)),
                     get<State>(named(StateTypes.RegisterPushToken)),
-                    get<State>(named(StateTypes.LinkContact))
-                )
-            )
-        }
-        single<StateMachineApi>(named(StateMachineTypes.PredictOnlyReregistration)) {
-            StateMachine(
-                states = listOf(
-                    get<State>(named(StateTypes.ClearRequestContextTokens)),
                     get<State>(named(StateTypes.LinkContact))
                 )
             )
@@ -132,18 +115,9 @@ object SetupInjection {
                 )
             )
         }
-        single<StateMachineApi>(named(StateMachineTypes.PredictDisable)) {
-            StateMachine(
-                states = listOf(
-                    get<State>(named(StateTypes.ClearEvents)),
-                    get<State>(named(StateTypes.ClearStoredConfig)),
-                )
-            )
-        }
         single<EnableOrganizerApi> {
             EnableOrganizer(
                 meStateMachine = get(named(StateMachineTypes.MobileEngageEnable)),
-                predictStateMachine = get(named(StateMachineTypes.PredictEnable)),
                 sdkContext = get(),
                 sdkConfigStore = get(),
                 emarsysSdkSession = get(),
@@ -153,7 +127,6 @@ object SetupInjection {
         single<DisableOrganizerApi> {
             DisableOrganizer(
                 mobileEngageDisableStateMachine = get(named(StateMachineTypes.MobileEngageEnable)),
-                predictDisableStateMachine = get(named(StateMachineTypes.PredictEnable)),
                 sdkContext = get(),
                 emarsysSdkSession = get(),
                 sdkLogger = get { parametersOf(EnableOrganizer::class.simpleName) },
@@ -165,7 +138,6 @@ object SetupInjection {
                 sdkEventManager = get(),
                 sdkContext = get(),
                 mobileEngageReregistrationStateMachine = get(named(StateMachineTypes.MobileEngageReregistration)),
-                predictOnlyReregistrationStateMachine = get(named(StateMachineTypes.PredictOnlyReregistration)),
                 applicationScope = get(named(CoroutineScopeTypes.Application)),
                 sdkLogger = get { parametersOf(ReregistrationClient::class.simpleName) })
         }
@@ -173,7 +145,7 @@ object SetupInjection {
 }
 
 enum class StateMachineTypes {
-    MobileEngageEnable, PredictEnable, MobileEngageDisable, PredictDisable, Init, MobileEngageReregistration, PredictOnlyReregistration
+    MobileEngageEnable, MobileEngageDisable, Init, MobileEngageReregistration
 }
 
 enum class StateTypes {

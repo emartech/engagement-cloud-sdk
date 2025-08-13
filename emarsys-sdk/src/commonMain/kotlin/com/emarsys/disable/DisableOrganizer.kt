@@ -8,7 +8,6 @@ import com.emarsys.mobileengage.session.SessionApi
 
 internal class DisableOrganizer(
     override val mobileEngageDisableStateMachine: StateMachineApi,
-    override val predictDisableStateMachine: StateMachineApi,
     override val sdkContext: SdkContextApi,
     private val emarsysSdkSession: SessionApi,
     private val sdkLogger: Logger
@@ -17,12 +16,7 @@ internal class DisableOrganizer(
     override suspend fun disable() {
         sdkContext.setSdkState(SdkState.inactive)
         sdkLogger.debug("SDK disabled")
-
-        if (sdkContext.isConfigPredictOnly()) {
-            predictDisableStateMachine.activate()
-        } else {
-            mobileEngageDisableStateMachine.activate()
-        }
+        mobileEngageDisableStateMachine.activate()
         emarsysSdkSession.endSession()
     }
 }

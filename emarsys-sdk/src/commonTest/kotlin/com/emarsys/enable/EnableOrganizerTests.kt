@@ -48,7 +48,6 @@ class EnableOrganizerTests: KoinTest {
     private lateinit var mainDispatcher: CoroutineDispatcher
 
     private lateinit var mockMeStateMachine: StateMachineApi
-    private lateinit var mockPredictStateMachine: StateMachineApi
     private lateinit var mockSdkConfigLoader: SdkConfigStoreApi<SdkConfig>
     private lateinit var mockSession: SessionApi
     private lateinit var sdkContext: SdkContextApi
@@ -65,21 +64,19 @@ class EnableOrganizerTests: KoinTest {
         mainDispatcher = StandardTestDispatcher()
         Dispatchers.setMain(mainDispatcher)
         mockMeStateMachine = mock(MockMode.autofill)
-        mockPredictStateMachine = mock(MockMode.autofill)
         mockSdkConfigLoader = mock(MockMode.autoUnit)
         mockSession = mock(MockMode.autoUnit)
         everySuspend { mockSdkConfigLoader.load() } returns null
         sdkContext = SdkContext(
             StandardTestDispatcher(),
             mainDispatcher,
-            DefaultUrls("", "", "", "", "", "", ""),
+            DefaultUrls("", "", "", "", "", ""),
             LogLevel.Error,
             mutableSetOf(),
             logBreadcrumbsQueueSize = 10
         )
         setupOrganizer = EnableOrganizer(
             mockMeStateMachine,
-            mockPredictStateMachine,
             sdkContext,
             mockSdkConfigLoader,
             mockSession,
@@ -121,9 +118,6 @@ class EnableOrganizerTests: KoinTest {
             verifySuspend(VerifyMode.exactly(0)) {
                 mockMeStateMachine.activate()
             }
-            verifySuspend(VerifyMode.exactly(0)) {
-                mockPredictStateMachine.activate()
-            }
         }
 
     @Test
@@ -137,24 +131,6 @@ class EnableOrganizerTests: KoinTest {
 
             verifySuspend { mockSdkConfigLoader.store(config) }
             verifySuspend {
-                mockMeStateMachine.activate()
-            }
-            sdkContext.config shouldBe config
-            sdkContext.currentSdkState.value shouldBe SdkState.active
-        }
-
-    @Test
-    fun setup_should_call_activate_onPredictStateMachine_and_set_config_and_state_on_context() =
-        runTest {
-            val config = TestEmarsysConfig(null, "testMerchantId")
-
-            setupOrganizer.enable(config)
-
-            verifySuspend { mockSdkConfigLoader.store(config) }
-            verifySuspend {
-                mockPredictStateMachine.activate()
-            }
-            verifySuspend(VerifyMode.exactly(0)) {
                 mockMeStateMachine.activate()
             }
             sdkContext.config shouldBe config

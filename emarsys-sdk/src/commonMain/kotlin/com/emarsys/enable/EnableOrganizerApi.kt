@@ -6,7 +6,7 @@ import com.emarsys.core.state.StateMachineApi
 
 internal interface EnableOrganizerApi {
     val meStateMachine: StateMachineApi
-    val predictStateMachine: StateMachineApi
+
     val sdkContext: SdkContextApi
 
     suspend fun enable(config: SdkConfig)

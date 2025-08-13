@@ -48,7 +48,6 @@ internal class RemoteConfigResponseHandler(
             sdkContext.defaultUrls = sdkContext.defaultUrls.copyWith(
                 clientServiceBaseUrl = it.clientService,
                 eventServiceBaseUrl = it.eventService,
-                predictBaseUrl = it.predictService,
                 deepLinkBaseUrl = it.deepLinkService,
                 inboxBaseUrl = it.inboxService
             )
@@ -63,7 +62,6 @@ internal class RemoteConfigResponseHandler(
 
     private fun applyFeatures(features: RemoteConfigFeatures?) {
         features?.mobileEngage?.let { switch(Features.MOBILE_ENGAGE, it) }
-        features?.predict?.let { switch(Features.PREDICT, it) }
     }
 
     private fun applyLuckyLogger(luckyLogger: LuckyLogger?) {

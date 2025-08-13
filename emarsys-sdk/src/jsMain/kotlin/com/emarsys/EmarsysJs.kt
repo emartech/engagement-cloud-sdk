@@ -6,8 +6,6 @@ import com.emarsys.api.events.SdkApiEvent
 import com.emarsys.api.events.SdkEventSubscription
 import com.emarsys.api.events.SdkEventSubscriptionApi
 import com.emarsys.api.inapp.JSInAppApi
-import com.emarsys.api.inbox.JSInboxApi
-import com.emarsys.api.predict.JSPredictApi
 import com.emarsys.api.push.JSPushApi
 import com.emarsys.api.tracking.JSTrackingApi
 import com.emarsys.di.CoroutineScopeTypes
@@ -46,9 +44,7 @@ object EmarsysJs {
     lateinit var tracking: JSTrackingApi
     lateinit var push: JSPushApi
     lateinit var deepLink: JSDeepLinkApi
-    lateinit var inbox: JSInboxApi
     lateinit var inApp: JSInAppApi
-    lateinit var predict: JSPredictApi
 
     internal fun init() {
         Emarsys.initDI()
@@ -58,9 +54,7 @@ object EmarsysJs {
         tracking = koin.get<JSTrackingApi>()
         push = koin.get<JSPushApi>()
         deepLink = koin.get<JSDeepLinkApi>()
-        inbox = koin.get<JSInboxApi>()
         inApp = koin.get<JSInAppApi>()
-        predict = koin.get<JSPredictApi>()
         events = koin.get<Flow<SdkEvent.External.Api>>(named(EventFlowTypes.Public))
     }
 

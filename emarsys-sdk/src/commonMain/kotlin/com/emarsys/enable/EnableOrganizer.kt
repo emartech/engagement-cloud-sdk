@@ -11,7 +11,6 @@ import com.emarsys.mobileengage.session.SessionApi
 
 internal class EnableOrganizer(
     override val meStateMachine: StateMachineApi,
-    override val predictStateMachine: StateMachineApi,
     override val sdkContext: SdkContextApi,
     private val sdkConfigStore: SdkConfigStoreApi<SdkConfig>,
     private val emarsysSdkSession: SessionApi,
@@ -30,11 +29,7 @@ internal class EnableOrganizer(
         sdkContext.setSdkState(SdkState.onHold)
         sdkConfigStore.store(config)
         sdkContext.config = config
-        if (sdkContext.isConfigPredictOnly()) {
-            predictStateMachine.activate()
-        } else {
-            meStateMachine.activate()
-        }
+        meStateMachine.activate()
         sdkContext.setSdkState(SdkState.active)
         emarsysSdkSession.startSession()
         sdkLogger.debug("SDK Setup Completed")

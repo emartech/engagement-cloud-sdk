@@ -19,7 +19,6 @@ internal class ReregistrationClient(
     private val sdkEventManager: SdkEventManagerApi,
     private val sdkContext: SdkContextApi,
     private val mobileEngageReregistrationStateMachine: StateMachineApi,
-    private val predictOnlyReregistrationStateMachine: StateMachineApi,
     private val applicationScope: CoroutineScope,
     private val sdkLogger: Logger
 ) : EventBasedClientApi {
@@ -36,11 +35,7 @@ internal class ReregistrationClient(
             .onEach {
                 sdkLogger.debug("Reregistration start")
                 sdkContext.setSdkState(SdkState.onHold)
-                if (sdkContext.isConfigPredictOnly()) {
-                    predictOnlyReregistrationStateMachine.activate()
-                } else {
-                    mobileEngageReregistrationStateMachine.activate()
-                }
+                mobileEngageReregistrationStateMachine.activate()
                 sdkContext.setSdkState(SdkState.active)
                 sdkLogger.debug("Reregistration finished")
             }.catch {

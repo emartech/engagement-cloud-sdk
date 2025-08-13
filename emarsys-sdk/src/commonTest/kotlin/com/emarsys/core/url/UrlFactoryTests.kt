@@ -77,19 +77,6 @@ class UrlFactoryTests {
     }
 
     @Test
-    fun testCreate_refreshTokenUrl_should_return_url_for_predict() {
-        val config = TestEmarsysConfig(null, "testMerchantId")
-        val clientServiceBaseUrl = "https://me-client.eservice.emarsys.net"
-        every { mockSdkContext.defaultUrls } returns mockDefaultUrls
-        every { mockDefaultUrls.clientServiceBaseUrl } returns clientServiceBaseUrl
-        every { mockSdkContext.config } returns config
-        every { mockSdkContext.isConfigPredictOnly() } returns true
-        val result = urlFactory.create(EmarsysUrlType.REFRESH_TOKEN)
-
-        result shouldBe Url("https://me-client.eservice.emarsys.net/v4/contact-token")
-    }
-
-    @Test
     fun testCreate_changeApplicationCode_should_return_url() {
         val config = TestEmarsysConfig("testAppCode", null)
         val clientServiceBaseUrl = "https://me-client.gservice.emarsys.net"
@@ -135,19 +122,6 @@ class UrlFactoryTests {
         val result = urlFactory.create(EmarsysUrlType.LINK_CONTACT)
 
         result shouldBe Url("https://me-client.gservice.emarsys.net/v4/apps/testAppCode/client/contact")
-    }
-
-    @Test
-    fun testCreate_linkContact_should_return_url_for_predict() {
-        val config = TestEmarsysConfig(null, "testMerchantId")
-        val clientServiceBaseUrl = "https://me-client.eservice.emarsys.net"
-        every { mockSdkContext.defaultUrls } returns mockDefaultUrls
-        every { mockDefaultUrls.clientServiceBaseUrl } returns clientServiceBaseUrl
-        every { mockSdkContext.config } returns config
-        every { mockSdkContext.isConfigPredictOnly() } returns true
-        val result = urlFactory.create(EmarsysUrlType.LINK_CONTACT)
-
-        result shouldBe Url("https://me-client.eservice.emarsys.net/v4/contact-token")
     }
 
     @Test

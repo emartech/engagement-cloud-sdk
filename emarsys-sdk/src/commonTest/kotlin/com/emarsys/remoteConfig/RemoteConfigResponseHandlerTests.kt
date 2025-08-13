@@ -52,7 +52,7 @@ class RemoteConfigResponseHandlerTests: KoinTest {
         sdkContext = SdkContext(
             StandardTestDispatcher(),
             StandardTestDispatcher(),
-            DefaultUrls("", "", "", "", "", "", ""),
+            DefaultUrls("", "", "", "", "", ""),
             LogLevel.Debug,
             mutableSetOf(),
             logBreadcrumbsQueueSize = 10
@@ -76,7 +76,6 @@ class RemoteConfigResponseHandlerTests: KoinTest {
     @Test
     fun testHandleAppCodeBasedConfigs() = runTest {
         val clientServiceUrl = "testClientServiceUrl"
-        val predictServiceUrl = "testPredictServiceUrl"
         val clientId = "testClientId"
         val configResponse = RemoteConfigResponse(
             ServiceUrls(
@@ -85,9 +84,6 @@ class RemoteConfigResponseHandlerTests: KoinTest {
             LuckyLogger(LogLevel.Error, 1.0),
             RemoteConfigFeatures(mobileEngage = true),
             overrides = mapOf(
-                clientId to RemoteConfig(
-                    ServiceUrls(predictService = predictServiceUrl)
-                ),
                 "differentClientId" to RemoteConfig(
                     ServiceUrls(clientService = "differentClientServiceUrl")
                 )
@@ -100,7 +96,6 @@ class RemoteConfigResponseHandlerTests: KoinTest {
         remoteConfigResponseHandler.handle(configResponse)
 
         sdkContext.defaultUrls.clientServiceBaseUrl shouldBe clientServiceUrl
-        sdkContext.defaultUrls.predictBaseUrl shouldBe predictServiceUrl
         sdkContext.remoteLogLevel shouldBe LogLevel.Error
         sdkContext.features shouldBe listOf(Features.MOBILE_ENGAGE)
     }
@@ -108,7 +103,6 @@ class RemoteConfigResponseHandlerTests: KoinTest {
     @Test
     fun testHandleGlobalConfig() = runTest {
         val clientServiceUrl = "testClientServiceUrl"
-        val predictServiceUrl = "testPredictServiceUrl"
         val clientId = "testClientId"
         val configResponse = RemoteConfigResponse(
             ServiceUrls(
@@ -117,9 +111,6 @@ class RemoteConfigResponseHandlerTests: KoinTest {
             LuckyLogger(LogLevel.Error, 1.0),
             RemoteConfigFeatures(mobileEngage = true),
             overrides = mapOf(
-                clientId to RemoteConfig(
-                    ServiceUrls(predictService = predictServiceUrl)
-                ),
                 "differentClientId" to RemoteConfig(
                     ServiceUrls(clientService = "differentClientServiceUrl")
                 )
@@ -132,7 +123,6 @@ class RemoteConfigResponseHandlerTests: KoinTest {
         remoteConfigResponseHandler.handle(configResponse)
 
         sdkContext.defaultUrls.clientServiceBaseUrl shouldBe clientServiceUrl
-        sdkContext.defaultUrls.predictBaseUrl shouldBe predictServiceUrl
         sdkContext.remoteLogLevel shouldBe LogLevel.Error
         sdkContext.features shouldBe listOf(Features.MOBILE_ENGAGE)
     }

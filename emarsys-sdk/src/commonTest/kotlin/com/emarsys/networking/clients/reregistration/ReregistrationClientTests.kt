@@ -29,7 +29,6 @@ class ReregistrationClientTests {
     private lateinit var mockSdkEventManager: SdkEventManagerApi
     private lateinit var mockSdkContext: SdkContextApi
     private lateinit var mockMobileEngageReregistrationStateMachine: StateMachineApi
-    private lateinit var mockPredictOnlyReregistrationStateMachine: StateMachineApi
     private lateinit var mockSdkLogger: Logger
 
     private lateinit var reregistrationClient: ReregistrationClient
@@ -41,7 +40,6 @@ class ReregistrationClientTests {
         mockSdkLogger = mock(MockMode.autofill)
         mockSdkContext = mock(MockMode.autofill)
         mockMobileEngageReregistrationStateMachine = mock(MockMode.autofill)
-        mockPredictOnlyReregistrationStateMachine = mock(MockMode.autofill)
 
         sdkEventFlow = MutableSharedFlow()
         every { mockSdkEventManager.sdkEventFlow } returns sdkEventFlow
@@ -70,30 +68,6 @@ class ReregistrationClientTests {
                 mockMobileEngageReregistrationStateMachine.activate()
                 mockSdkContext.setSdkState(SdkState.active)
             }
-            verifySuspend(VerifyMode.exactly(0)) {
-                mockPredictOnlyReregistrationStateMachine.activate()
-            }
-        }
-
-    @Test
-    fun testStartEventConsumer_shouldSetSdkState_toOnHold_activatePredictOnlyStateMachine_andSetSdkStateToOnActive_whenConfigIsPredictOnly() =
-        runTest {
-            reregistrationClient = createReregistrationClient(backgroundScope)
-            reregistrationClient.register()
-            every { mockSdkContext.isConfigPredictOnly() } returns true
-
-            val event = SdkEvent.Internal.Sdk.ReregistrationRequired()
-
-            sdkEventFlow.emit(event)
-
-            verifySuspend(VerifyMode.order) {
-                mockSdkContext.setSdkState(SdkState.onHold)
-                mockPredictOnlyReregistrationStateMachine.activate()
-                mockSdkContext.setSdkState(SdkState.active)
-            }
-            verifySuspend(VerifyMode.exactly(0)) {
-                mockMobileEngageReregistrationStateMachine.activate()
-            }
         }
 
     @Test
@@ -114,7 +88,6 @@ class ReregistrationClientTests {
             }
             verifySuspend(VerifyMode.exactly(0)) {
                 mockMobileEngageReregistrationStateMachine.activate()
-                mockPredictOnlyReregistrationStateMachine.activate()
                 mockSdkContext.setSdkState(SdkState.active)
             }
         }
@@ -124,7 +97,6 @@ class ReregistrationClientTests {
             sdkEventManager = mockSdkEventManager,
             sdkContext = mockSdkContext,
             mobileEngageReregistrationStateMachine = mockMobileEngageReregistrationStateMachine,
-            predictOnlyReregistrationStateMachine = mockPredictOnlyReregistrationStateMachine,
             applicationScope = applicationScope,
             sdkLogger = mockSdkLogger,
         )
