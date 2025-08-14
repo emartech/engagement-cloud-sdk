@@ -10,7 +10,6 @@ class DefaultUrlTests {
         "clientServiceBaseUrl - origin",
         "eventServiceBaseUrl - origin",
         "deepLinkBaseUrl - origin",
-        "inboxBaseUrl - origin",
         "remoteConfigBaseUrl - origin",
         "loggingUrl - origin"
     )
@@ -21,15 +20,12 @@ class DefaultUrlTests {
             "clientServiceBaseUrl - new",
             "eventServiceBaseUrl - origin",
             "deepLinkBaseUrl - origin",
-            "inboxBaseUrl - new",
             "remoteConfigBaseUrl - origin",
             "loggingUrl - new"
         )
         val result = defaultUrls.copyWith(
             clientServiceBaseUrl = "clientServiceBaseUrl - new",
-            inboxBaseUrl = "inboxBaseUrl - new",
-            loggingUrl = "loggingUrl - new",
-            remoteConfigBaseUrl = null
+            loggingUrl = "loggingUrl - new"
         )
 
         result shouldBe expected

@@ -48,8 +48,7 @@ internal class RemoteConfigResponseHandler(
             sdkContext.defaultUrls = sdkContext.defaultUrls.copyWith(
                 clientServiceBaseUrl = it.clientService,
                 eventServiceBaseUrl = it.eventService,
-                deepLinkBaseUrl = it.deepLinkService,
-                inboxBaseUrl = it.inboxService
+                deepLinkBaseUrl = it.deepLinkService
             )
         }
     }

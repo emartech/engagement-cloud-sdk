@@ -27,7 +27,6 @@ object SdkKoinIsolationContext {
             EventInjection.eventModules,
             PushInjection.pushModules,
             InAppInjection.inAppModules,
-            InboxInjection.inboxModules,
             DeepLinkInjection.deepLinkModules
         )
     }

@@ -73,7 +73,6 @@ class GenericApiTests: KoinTest {
                 "",
                 "",
                 "",
-                "",
                 ""
             ),
             LogLevel.Error,

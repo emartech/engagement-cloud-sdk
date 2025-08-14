@@ -9,8 +9,6 @@ import com.emarsys.api.deeplink.JSDeepLink
 import com.emarsys.api.deeplink.JSDeepLinkApi
 import com.emarsys.api.inapp.JSInApp
 import com.emarsys.api.inapp.JSInAppApi
-import com.emarsys.api.inbox.JSInbox
-import com.emarsys.api.inbox.JSInboxApi
 import com.emarsys.api.push.JSPush
 import com.emarsys.api.push.JSPushApi
 import com.emarsys.api.push.LoggingPush
@@ -264,14 +262,6 @@ object WebInjection {
         single<JSDeepLinkApi> {
             JSDeepLink(
                 deepLinkApi = get(),
-                applicationScope = get(
-                    named(CoroutineScopeTypes.Application)
-                )
-            )
-        }
-        single<JSInboxApi> {
-            JSInbox(
-                inboxApi = get(),
                 applicationScope = get(
                     named(CoroutineScopeTypes.Application)
                 )

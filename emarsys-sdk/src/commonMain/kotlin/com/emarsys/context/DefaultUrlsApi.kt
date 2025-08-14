@@ -5,7 +5,6 @@ interface DefaultUrlsApi {
     val clientServiceBaseUrl: String
     val eventServiceBaseUrl: String
     val deepLinkBaseUrl: String
-    val inboxBaseUrl: String
     val remoteConfigBaseUrl: String
     val loggingUrl: String
 }

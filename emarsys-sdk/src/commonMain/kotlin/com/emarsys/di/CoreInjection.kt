@@ -101,7 +101,6 @@ object CoreInjection {
                 "https://me-client.eservice.emarsys.net",
                 "https://mobile-events.eservice.emarsys.net",
                 "https://deep-link.eservice.emarsys.net",
-                "https://me-inbox.gservice.emarsys.net",
                 "https://mobile-sdk-config.gservice.emarsys.net",
                 "https://log-dealer.gservice.emarsys.net"
             )
@@ -173,7 +172,7 @@ enum class CoroutineScopeTypes {
 }
 
 enum class PersistentListTypes {
-    PushCall, InAppCall, InboxCall, ConfigCall, ContactCall, EventTrackerCall
+    PushCall, InAppCall, ConfigCall, ContactCall, EventTrackerCall
 }
 
 enum class NetworkClientTypes {
@@ -195,7 +194,6 @@ enum class SdkConfigStoreTypes {
 object PersistentListIds {
     const val PUSH_CONTEXT_PERSISTENT_ID = "pushContextPersistentId"
     const val INAPP_CONTEXT_PERSISTENT_ID = "inAppContextPersistentId"
-    const val INBOX_CONTEXT_PERSISTENT_ID = "inboxContextPersistentId"
     const val CONFIG_CONTEXT_PERSISTENT_ID = "configContextPersistentId"
     const val CONTACT_CONTEXT_PERSISTENT_ID = "contactContextPersistentId"
     const val EVENT_TRACKER_CONTEXT_PERSISTENT_ID = "eventTrackerContextPersistentId"

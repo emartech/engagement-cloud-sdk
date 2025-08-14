@@ -52,7 +52,7 @@ class RemoteConfigResponseHandlerTests: KoinTest {
         sdkContext = SdkContext(
             StandardTestDispatcher(),
             StandardTestDispatcher(),
-            DefaultUrls("", "", "", "", "", ""),
+            DefaultUrls("", "", "", "", ""),
             LogLevel.Debug,
             mutableSetOf(),
             logBreadcrumbsQueueSize = 10
