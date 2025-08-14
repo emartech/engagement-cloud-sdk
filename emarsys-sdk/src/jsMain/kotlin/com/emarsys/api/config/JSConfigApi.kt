@@ -8,12 +8,10 @@ import kotlin.js.Promise
 interface JSConfigApi {
     fun getContactFieldId(): Promise<Int?>
     fun getApplicationCode(): Promise<String?>
-    fun getMerchantId(): Promise<String?>
     fun getClientId(): Promise<String>
     fun getLanguageCode(): Promise<String>
     fun getSdkVersion(): Promise<String>
     fun changeApplicationCode(applicationCode: String): Promise<Unit>
-    fun changeMerchantId(merchantId: String): Promise<Unit>
     fun setLanguage(language: String): Promise<Unit>
     fun resetLanguage(): Promise<Unit>
     fun getPushSettings(): Promise<NotificationSettings>

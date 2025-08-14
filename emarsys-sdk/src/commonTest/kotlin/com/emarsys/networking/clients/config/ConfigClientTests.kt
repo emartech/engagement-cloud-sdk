@@ -129,10 +129,8 @@ class ConfigClientTests {
             TEST_BASE_URL
         )
         everySuspend { mockEmarsysClient.send(any(), any()) }.returns(createTestResponse("{}"))
-        every { mockConfig.copyWith("NewAppCode", null, null) } returns mockConfig
-        every { mockConfig.merchantId } returns null
+        every { mockConfig.copyWith("NewAppCode") } returns mockConfig
         every { mockConfig.applicationCode } returns "testApplicationCode"
-        every { mockConfig.sharedSecret } returns null
         val changeAppCode = SdkEvent.Internal.Sdk.ChangeAppCode(
             id = "changeApplicationCode",
             applicationCode = "NewAppCode"
@@ -148,48 +146,10 @@ class ConfigClientTests {
 
         onlineSdkEvents.await() shouldBe listOf(changeAppCode)
         verifySuspend { mockEmarsysClient.send(any(), any()) }
-        verify { mockConfig.copyWith(applicationCode = "NewAppCode", null, null) }
+        verify { mockConfig.copyWith(applicationCode = "NewAppCode") }
         verify { mockSdkContext.config = mockConfig }
         verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
         verifySuspend { mockEventsDao.removeEvent(changeAppCode) }
-    }
-
-    @Test
-    fun testConsumer_should_call_client_with_change_merchantId_request_and_ack_event() = runTest {
-        configClient = createConfigClient(backgroundScope)
-        configClient.register()
-
-        every { mockUrlFactory.create(EmarsysUrlType.REFRESH_TOKEN) }.returns(TEST_BASE_URL)
-        everySuspend { mockEmarsysClient.send(any(), any()) }.returns(createTestResponse("{}"))
-        every { mockConfig.copyWith(null, "newMerchantId", null) } returns mockConfig
-        every { mockConfig.merchantId } returns "testMerchantId"
-        every { mockConfig.applicationCode } returns null
-        every { mockConfig.sharedSecret } returns null
-        val changeMerchantId = SdkEvent.Internal.Sdk.ChangeMerchantId(
-            id = "changeMerchantId",
-            merchantId = "newMerchantId"
-        )
-
-        val onlineSdkEvents = backgroundScope.async {
-            onlineEvents.take(1).toList()
-        }
-
-        onlineEvents.emit(changeMerchantId)
-
-        advanceUntilIdle()
-
-        onlineSdkEvents.await() shouldBe listOf(changeMerchantId)
-        verifySuspend { mockEmarsysClient.send(any(), any()) }
-        verify {
-            mockConfig.copyWith(
-                merchantId = "newMerchantId",
-                applicationCode = null,
-                sharedSecret = null
-            )
-        }
-        verify { mockSdkContext.config = mockConfig }
-        verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
-        verifySuspend { mockEventsDao.removeEvent(changeMerchantId) }
     }
 
     @Test
@@ -197,30 +157,30 @@ class ConfigClientTests {
         configClient = createConfigClient(backgroundScope)
         configClient.register()
 
-        every { mockUrlFactory.create(EmarsysUrlType.REFRESH_TOKEN) } returns TEST_BASE_URL
+        every { mockUrlFactory.create(EmarsysUrlType.CHANGE_APPLICATION_CODE) } returns TEST_BASE_URL
         everySuspend { mockEmarsysClient.send(any(), any()) } calls { args ->
             (args.arg(1) as suspend () -> Unit).invoke()
             throw IOException("No Internet")
         }
 
-        val changeMerchantId = SdkEvent.Internal.Sdk.ChangeMerchantId(
-            id = "changeMerchantId",
-            merchantId = "newMerchantId"
+        val changeAppCode = SdkEvent.Internal.Sdk.ChangeAppCode(
+            id = "changeAppcode",
+            applicationCode = "newAppCode"
         )
-        everySuspend { mockSdkEventManager.emitEvent(changeMerchantId) } returns Unit
+        everySuspend { mockSdkEventManager.emitEvent(changeAppCode) } returns Unit
 
         val onlineSdkEvents = backgroundScope.async {
             onlineEvents.take(1).toList()
         }
 
-        onlineEvents.emit(changeMerchantId)
+        onlineEvents.emit(changeAppCode)
 
         advanceUntilIdle()
 
-        onlineSdkEvents.await() shouldBe listOf(changeMerchantId)
+        onlineSdkEvents.await() shouldBe listOf(changeAppCode)
         verifySuspend { mockEmarsysClient.send(any(), any()) }
-        verifySuspend { mockSdkEventManager.emitEvent(changeMerchantId) }
-        verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(changeMerchantId) }
+        verifySuspend { mockSdkEventManager.emitEvent(changeAppCode) }
+        verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(changeAppCode) }
 
     }
 
@@ -233,29 +193,29 @@ class ConfigClientTests {
 
         every {
             mockUrlFactory.create(
-                EmarsysUrlType.REFRESH_TOKEN
+                EmarsysUrlType.CHANGE_APPLICATION_CODE
             )
         } throws testException
-        val changeMerchantId = SdkEvent.Internal.Sdk.ChangeMerchantId(
-            id = "changeMerchantId",
-            merchantId = "newMerchantId"
+        val changeAppCode = SdkEvent.Internal.Sdk.ChangeAppCode(
+            id = "changeAppCode",
+            applicationCode = "newAppCode"
         )
 
         val onlineSdkEvents = backgroundScope.async {
             onlineEvents.take(1).toList()
         }
 
-        onlineEvents.emit(changeMerchantId)
+        onlineEvents.emit(changeAppCode)
 
         advanceUntilIdle()
 
-        onlineSdkEvents.await() shouldBe listOf(changeMerchantId)
+        onlineSdkEvents.await() shouldBe listOf(changeAppCode)
         verifySuspend(VerifyMode.exactly(0)) { mockEmarsysClient.send(any(), any()) }
         verifySuspend {
             mockClientExceptionHandler.handleException(
                 testException,
                 "ConfigClient - consumeConfigChanges",
-                changeMerchantId
+                changeAppCode
             )
         }
     }

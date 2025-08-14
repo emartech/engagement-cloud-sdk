@@ -30,8 +30,6 @@ internal class Config<Logging : ConfigInstance, Gatherer : ConfigInstance, Inter
 
     override suspend fun getApplicationCode(): String? = sdkContext.config?.applicationCode
 
-    override suspend fun getMerchantId(): String? = sdkContext.config?.merchantId
-
     override suspend fun getClientId(): String = deviceInfoCollector.getClientId()
 
     override suspend fun getLanguageCode(): String = getDeviceInfo().language
@@ -51,16 +49,6 @@ internal class Config<Logging : ConfigInstance, Gatherer : ConfigInstance, Inter
                 }
             }
         }
-
-    override suspend fun changeMerchantId(merchantId: String): Result<Unit> = runCatching {
-        withContext(sdkContext.sdkDispatcher) {
-            withLogContext(buildJsonObject {
-                put("merchantId", JsonPrimitive(merchantId))
-            }) {
-                activeInstance<ConfigInternalApi>().changeMerchantId(merchantId)
-            }
-        }
-    }
 
     override suspend fun setLanguage(language: String): Result<Unit> = runCatching {
         withContext(sdkContext.sdkDispatcher) {

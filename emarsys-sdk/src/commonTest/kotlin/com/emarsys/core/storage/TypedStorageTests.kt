@@ -17,9 +17,7 @@ import kotlin.test.Test
 class TypedStorageTests {
     private companion object {
         const val APP_CODE = "testApplicationCode"
-        const val MERCHANT_ID = "testMerchantId"
-        const val SHARED_SECRET = "testSharedSecret"
-        val CONFIG = TestEmarsysConfig(APP_CODE, MERCHANT_ID, SHARED_SECRET)
+        val CONFIG = TestEmarsysConfig(APP_CODE)
         val CONFIG_STRING = JsonUtil.json.encodeToString(CONFIG)
     }
 
@@ -40,7 +38,7 @@ class TypedStorageTests {
         val key = "testKey"
         every { mockStringStorage.put(any(), any()) } returns Unit
         every { mockStringStorage.get(key) } returns CONFIG_STRING
-        val expected = TestEmarsysConfig(APP_CODE, MERCHANT_ID, SHARED_SECRET)
+        val expected = TestEmarsysConfig(APP_CODE)
 
         typedStorage.put(key, TestEmarsysConfig.serializer(), expected)
 

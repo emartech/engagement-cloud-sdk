@@ -6,7 +6,6 @@ import kotlinx.serialization.Serializable
  * Configuration class for enabling the Emarsys SDK on the Web.
  *
  * @property applicationCode The application code of your application.
- * @property merchantId The merchant ID.
  * @property serviceWorkerOptions Options for configuring the service worker for receiving web push messages.
  */
 @OptIn(ExperimentalJsExport::class)
@@ -14,19 +13,13 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class JsEmarsysConfig(
     override val applicationCode: String? = null,
-    override val merchantId: String? = null,
-    override val sharedSecret: String? = null,
     val serviceWorkerOptions: ServiceWorkerOptions? = null
 ) : SdkConfig {
     override fun copyWith(
-        applicationCode: String?,
-        merchantId: String?,
-        sharedSecret: String?
+        applicationCode: String?
     ): SdkConfig {
         return copy(
-            applicationCode = applicationCode,
-            merchantId = merchantId,
-            sharedSecret = sharedSecret
+            applicationCode = applicationCode
         )
     }
 }

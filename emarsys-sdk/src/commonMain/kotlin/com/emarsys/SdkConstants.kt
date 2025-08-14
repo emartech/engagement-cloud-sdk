@@ -10,7 +10,6 @@ object SdkConstants {
     const val SESSION_END_EVENT_NAME = "session:end"
     const val APP_START_EVENT_NAME = "app:start"
     const val CHANGE_APP_CODE_NAME = "changeApplicationCode"
-    const val CHANGE_MERCHANT_ID_NAME = "changeMerchantId"
     const val LINK_CONTACT_NAME = "linkContact"
     const val LINK_AUTHENTICATED_CONTACT_NAME = "linAuthenticatedContact"
     const val UNLINK_CONTACT_NAME = "unlinkContact"

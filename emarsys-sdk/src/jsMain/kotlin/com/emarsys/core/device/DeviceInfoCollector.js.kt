@@ -61,7 +61,6 @@ internal actual class DeviceInfoCollector(
             sdkVersion = deviceInfo.sdkVersion,
             isDebugMode = false,
             applicationCode = sdkContext.config?.applicationCode,
-            merchantId = sdkContext.config?.merchantId,
             language = deviceInfo.language,
             timezone = deviceInfo.timezone,
             clientId = deviceInfo.clientId

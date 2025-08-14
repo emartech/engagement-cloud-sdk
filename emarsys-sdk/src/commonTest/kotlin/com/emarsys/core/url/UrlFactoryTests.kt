@@ -54,7 +54,7 @@ class UrlFactoryTests {
             every { mockDefaultUrls.clientServiceBaseUrl } returns testUrl
             every { mockDefaultUrls.eventServiceBaseUrl } returns testUrl
             every { mockDefaultUrls.remoteConfigBaseUrl } returns testUrl
-            val config = TestEmarsysConfig(null, null)
+            val config = TestEmarsysConfig()
             every { mockSdkContext.config } returns config
 
             shouldThrow<MissingApplicationCodeException> {
@@ -65,7 +65,7 @@ class UrlFactoryTests {
 
     @Test
     fun testCreate_refreshTokenUrl_should_return_url_with_appCode() {
-        val config = TestEmarsysConfig("testAppCode", null)
+        val config = TestEmarsysConfig("testAppCode")
         val clientServiceBaseUrl = "https://me-client.gservice.emarsys.net"
         every { mockSdkContext.defaultUrls } returns mockDefaultUrls
         every { mockDefaultUrls.clientServiceBaseUrl } returns clientServiceBaseUrl
@@ -78,7 +78,7 @@ class UrlFactoryTests {
 
     @Test
     fun testCreate_changeApplicationCode_should_return_url() {
-        val config = TestEmarsysConfig("testAppCode", null)
+        val config = TestEmarsysConfig("testAppCode")
         val clientServiceBaseUrl = "https://me-client.gservice.emarsys.net"
         every { mockSdkContext.defaultUrls } returns mockDefaultUrls
         every { mockDefaultUrls.clientServiceBaseUrl } returns clientServiceBaseUrl
@@ -90,7 +90,7 @@ class UrlFactoryTests {
 
     @Test
     fun testCreate_registerPushToken_should_return_url() {
-        val config = TestEmarsysConfig("testAppCode", null)
+        val config = TestEmarsysConfig("testAppCode")
         val clientServiceBaseUrl = "https://me-client.gservice.emarsys.net"
         every { mockSdkContext.defaultUrls } returns mockDefaultUrls
         every { mockDefaultUrls.clientServiceBaseUrl } returns clientServiceBaseUrl
@@ -102,7 +102,7 @@ class UrlFactoryTests {
 
     @Test
     fun testCreate_registerDeviceInfo_should_return_url() {
-        val config = TestEmarsysConfig("testAppCode", null)
+        val config = TestEmarsysConfig("testAppCode")
         val clientServiceBaseUrl = "https://me-client.gservice.emarsys.net"
         every { mockSdkContext.defaultUrls } returns mockDefaultUrls
         every { mockDefaultUrls.clientServiceBaseUrl } returns clientServiceBaseUrl
@@ -114,7 +114,7 @@ class UrlFactoryTests {
 
     @Test
     fun testCreate_linkContact_should_return_url_withAppCode() {
-        val config = TestEmarsysConfig("testAppCode", null)
+        val config = TestEmarsysConfig("testAppCode")
         val clientServiceBaseUrl = "https://me-client.gservice.emarsys.net"
         every { mockSdkContext.defaultUrls } returns mockDefaultUrls
         every { mockDefaultUrls.clientServiceBaseUrl } returns clientServiceBaseUrl
@@ -126,7 +126,7 @@ class UrlFactoryTests {
 
     @Test
     fun testCreate_remoteConfig_should_return_url_for_remoteConfig() {
-        val config = TestEmarsysConfig("testAppCode", null)
+        val config = TestEmarsysConfig("testAppCode")
         every { mockSdkContext.defaultUrls } returns mockDefaultUrls
         every { mockDefaultUrls.remoteConfigBaseUrl } returns "testRemoteConfigBaseUrl"
         every { mockSdkContext.config } returns config
@@ -138,7 +138,7 @@ class UrlFactoryTests {
 
     @Test
     fun testCreate_remoteConfig_should_return_url_for_remoteConfigSignature() {
-        val config = TestEmarsysConfig("testAppCode", null)
+        val config = TestEmarsysConfig("testAppCode")
         every { mockSdkContext.defaultUrls } returns mockDefaultUrls
         every { mockDefaultUrls.remoteConfigBaseUrl } returns "testRemoteConfigBaseUrl"
         every { mockSdkContext.config } returns config
@@ -150,7 +150,7 @@ class UrlFactoryTests {
 
     @Test
     fun testCreate_deepLink_should_return_url_for_trackDeepLink() {
-        val config = TestEmarsysConfig("testAppCode", null)
+        val config = TestEmarsysConfig("testAppCode")
         every { mockDefaultUrls.deepLinkBaseUrl } returns "testDeepLinkBaseUrl"
         every { mockSdkContext.defaultUrls } returns mockDefaultUrls
         every { mockSdkContext.config } returns config

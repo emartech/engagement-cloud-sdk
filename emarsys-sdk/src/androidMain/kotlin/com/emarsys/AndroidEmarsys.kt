@@ -80,7 +80,6 @@ object AndroidEmarsys {
      *         AndroidEmarsys.enableTracking(
      *             AndroidEmarsysConfig(
      *                 applicationCode = "ABCDE-12345",
-     *                 merchantId = "merchant_id_example",
      *                 launchActivityClass = MyActivity::class.java,
      *             )
      *         )

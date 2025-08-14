@@ -10,9 +10,6 @@ sealed interface ConfigCall {
     data class ChangeApplicationCode(val applicationCode: String) : ConfigCall
 
     @Serializable
-    data class ChangeMerchantId(val merchantId: String) : ConfigCall
-
-    @Serializable
     data class SetLanguage(val language: String) : ConfigCall
 
     @Serializable

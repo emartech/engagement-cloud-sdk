@@ -31,17 +31,6 @@ internal class ConfigInternal(
         )
     }
 
-    override suspend fun changeMerchantId(merchantId: String) {
-        sdkLogger.debug("ConfigInternal - changeMerchantId")
-        sdkEventDistributor.registerEvent(
-            SdkEvent.Internal.Sdk.ChangeMerchantId(
-                id = uuidProvider.provide(),
-                timestamp = timestampProvider.provide(),
-                merchantId = merchantId
-            )
-        )
-    }
-
     override suspend fun setLanguage(language: String) {
         languageHandler.handleLanguage(language)
     }

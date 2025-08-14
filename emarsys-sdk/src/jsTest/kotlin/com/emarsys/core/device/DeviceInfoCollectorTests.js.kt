@@ -83,7 +83,6 @@ class DeviceInfoCollectorTests {
         val mockConfig: SdkConfig = mock()
         every { mockSdkContext.config } returns mockConfig
         every { mockConfig.applicationCode } returns "testAppCode"
-        every { mockConfig.merchantId } returns "testMerchantId"
         deviceInfoCollector = DeviceInfoCollector(
             mockClientIdProvider,
             mockTimezoneProvider,
@@ -185,7 +184,6 @@ class DeviceInfoCollectorTests {
             sdkVersion = BuildConfig.VERSION_NAME,
             isDebugMode = false,
             applicationCode = "testAppCode",
-            merchantId = "testMerchantId",
             language = LANGUAGE,
             timezone = TIMEZONE,
             clientId = CLIENT_ID

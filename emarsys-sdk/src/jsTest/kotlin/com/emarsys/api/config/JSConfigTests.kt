@@ -57,13 +57,6 @@ class JSConfigTests {
     }
 
     @Test
-    fun getMerchantId_shouldCall_getMerchantId_onConfigApi() = runTest {
-        jSConfig.getMerchantId().await()
-
-        verifySuspend { mockConfigApi.getMerchantId() }
-    }
-
-    @Test
     fun getClientId_shouldCall_getClientId_onConfigApi() = runTest {
         jSConfig.getClientId().await()
 
@@ -115,29 +108,6 @@ class JSConfigTests {
         val jSConfig = JSConfig(mockConfigApi, TestScope())
 
         shouldThrow<CancellationException> {  jSConfig.changeApplicationCode(testAppCode).await() }
-    }
-
-    @Test
-    fun changeMerchantId_shouldCall_changeMerchantId_onConfigApi() = runTest {
-        val testMerchantId = "testMerchantId"
-        val mockConfigApi: ConfigApi = mock(MockMode.autofill)
-        everySuspend { mockConfigApi.changeMerchantId(testMerchantId) } returns Result.success(Unit)
-
-        jSConfig = JSConfig(mockConfigApi, TestScope())
-
-        jSConfig.changeMerchantId(testMerchantId).await()
-
-        verifySuspend { mockConfigApi.changeMerchantId(testMerchantId) }
-    }
-
-    @Test
-    fun changeMerchantId_shouldThrowException_ifChangeMerchantId_failed() = runTest {
-        val testMerchantId = "testMerchantId"
-        val mockConfigApi: ConfigApi = mock(MockMode.autofill)
-        everySuspend { mockConfigApi.changeMerchantId(testMerchantId) } returns testFailureResult
-        val jSConfig = JSConfig(mockConfigApi, TestScope())
-
-        shouldThrow<Exception> {  jSConfig.changeMerchantId(testMerchantId).await() }
     }
 
     @Test

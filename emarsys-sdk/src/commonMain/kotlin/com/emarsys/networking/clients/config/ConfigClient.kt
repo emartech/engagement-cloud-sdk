@@ -44,23 +44,12 @@ internal class ConfigClient(
 
     private suspend fun startEventConsumer() {
         sdkEventManager.onlineSdkEvents
-            .filter { it is SdkEvent.Internal.Sdk.ChangeAppCode || it is SdkEvent.Internal.Sdk.ChangeMerchantId }
+            .filter { it is SdkEvent.Internal.Sdk.ChangeAppCode }
             .collect {
                 try {
                     sdkLogger.debug("ConfigClient - consumeConfigChanges")
-                    val request = if (it is SdkEvent.Internal.Sdk.ChangeAppCode) {
-                        val url = urlFactory.create(EmarsysUrlType.CHANGE_APPLICATION_CODE)
-                        UrlRequest(url, HttpMethod.Post)
-                    } else {
-                        val url = urlFactory.create(EmarsysUrlType.REFRESH_TOKEN)
-
-                        UrlRequest(
-                            url, HttpMethod.Post,
-                            json.encodeToString(
-                                RefreshTokenRequestBody(requestContext.refreshToken!!)
-                            ),
-                        )
-                    }
+                    val url = urlFactory.create(EmarsysUrlType.CHANGE_APPLICATION_CODE)
+                    val request = UrlRequest(url, HttpMethod.Post)
 
                     val response =
                         emarsysNetworkClient.send(
@@ -68,10 +57,7 @@ internal class ConfigClient(
                             onNetworkError = { sdkEventManager.emitEvent(it) }
                         )
                     contactTokenHandler.handleContactTokens(response)
-                    if (it is SdkEvent.Internal.Sdk.ChangeMerchantId) {
-                        sdkContext.config =
-                            sdkContext.config?.copyWith(merchantId = it.merchantId)
-                    } else if (it is SdkEvent.Internal.Sdk.ChangeAppCode) {
+                    if (it is SdkEvent.Internal.Sdk.ChangeAppCode) {
                         sdkContext.config =
                             sdkContext.config?.copyWith(applicationCode = it.applicationCode)
                     }

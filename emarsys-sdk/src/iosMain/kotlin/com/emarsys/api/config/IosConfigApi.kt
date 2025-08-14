@@ -6,7 +6,6 @@ import kotlin.coroutines.cancellation.CancellationException
 interface IosConfigApi {
     suspend fun getContactFieldId(): Int?
     suspend fun getApplicationCode(): String?
-    suspend fun getMerchantId(): String?
     suspend fun getClientId(): String
     suspend fun getLanguageCode(): String
     suspend fun getSdkVersion(): String
@@ -14,9 +13,6 @@ interface IosConfigApi {
 
     @Throws(CancellationException::class)
     suspend fun changeApplicationCode(applicationCode: String)
-
-    @Throws(CancellationException::class)
-    suspend fun changeMerchantId(merchantId: String)
 
     @Throws(CancellationException::class)
     suspend fun setLanguage(language: String)

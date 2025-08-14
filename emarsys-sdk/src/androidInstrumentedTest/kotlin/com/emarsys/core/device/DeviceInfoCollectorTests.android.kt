@@ -67,7 +67,6 @@ class DeviceInfoCollectorTests {
 
         mockSdkContext = mockk(relaxed = true)
         every { mockSdkContext.config?.applicationCode } returns "testAppCode"
-        every { mockSdkContext.config?.merchantId } returns "testMerchantId"
 
         deviceInfoCollector = DeviceInfoCollector(
             mockTimezoneProvider,
@@ -214,7 +213,6 @@ class DeviceInfoCollectorTests {
             sdkVersion = BuildConfig.VERSION_NAME,
             isDebugMode = true,
             applicationCode = "testAppCode",
-            merchantId = "testMerchantId",
             language = LANGUAGE,
             timezone = TIMEZONE,
             clientId = CLIENT_ID

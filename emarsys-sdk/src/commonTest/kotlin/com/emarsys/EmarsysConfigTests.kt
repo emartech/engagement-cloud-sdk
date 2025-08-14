@@ -13,19 +13,17 @@ class EmarsysConfigTest {
 
     @Test
     fun testEmarsysConfig_isValid_shouldBe_true() = runTest {
-        val config = TestEmarsysConfig("ASD12-FGH34", "merchantId")
+        val config = TestEmarsysConfig("ASD12-FGH34")
 
         config.applicationCode shouldBe "ASD12-FGH34"
-        config.merchantId shouldBe "merchantId"
         config.isValid(mock(mode = MockMode.autofill)) shouldBe true
     }
 
     @Test
     fun testEmarsysConfig_isValid_shouldBe_false() = runTest {
-        val config = TestEmarsysConfig("null", "merchantId")
+        val config = TestEmarsysConfig("null")
 
         config.applicationCode shouldBe "null"
-        config.merchantId shouldBe "merchantId"
 
         shouldThrow<SdkException.InvalidApplicationCodeException> {
             config.isValid(mock(mode = MockMode.autofill))

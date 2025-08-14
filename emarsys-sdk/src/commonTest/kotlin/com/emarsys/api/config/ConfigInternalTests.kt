@@ -30,7 +30,6 @@ class ConfigInternalTests {
         const val UUID = "testUUID"
         val TIMESTAMP = Clock.System.now()
         const val APPCODE = "A1s2D-F3G4H"
-        const val MERCHANT_ID = "testMerchantId"
     }
 
     private lateinit var sdkEventDistributor: SdkEventDistributorApi
@@ -99,19 +98,6 @@ class ConfigInternalTests {
             }
         }
         verifySuspend(mode = VerifyMode.exactly(0)) { sdkEventDistributor.registerEvent(any()) }
-    }
-
-    @Test
-    fun testChangeMerchantId_shouldEmitChangeMerchantIdEvent_toSdkEventFlow() = runTest {
-        val expectedEvent = SdkEvent.Internal.Sdk.ChangeMerchantId(
-            id = UUID,
-            merchantId = MERCHANT_ID,
-            timestamp = TIMESTAMP
-        )
-
-        configInternal.changeMerchantId(MERCHANT_ID)
-
-        verifySuspend { sdkEventDistributor.registerEvent(expectedEvent) }
     }
 
     @Test

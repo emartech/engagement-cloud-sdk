@@ -23,16 +23,12 @@ import dev.mokkery.answering.throws
 import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
-import dev.mokkery.matcher.capture.Capture.Companion.slot
-import dev.mokkery.matcher.capture.capture
-import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import dev.mokkery.resetAnswers
 import dev.mokkery.resetCalls
 import dev.mokkery.verify
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
-import io.kotest.matchers.shouldBe
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -59,7 +55,6 @@ class ContactClientTests {
         const val OPEN_ID_TOKEN = "testOpenIdToken"
         const val CONTACT_FIELD_VALUE = "testContactFieldValue"
         const val CONTACT_FIELD_ID = 2575
-        const val MERCHANT_ID = "testMerchantId"
     }
 
     private lateinit var mockEmarsysClient: NetworkClientApi
@@ -101,7 +96,6 @@ class ContactClientTests {
         every { mockSdkContext.config } returns mockConfig
         everySuspend { mockContactTokenHandler.handleContactTokens(any()) } returns Unit
         everySuspend { mockEmarsysClient.send(any(), any()) } returns (createTestResponse("{}"))
-        every { mockConfig.merchantId } returns null
         every { mockSdkContext.contactFieldId = any() } returns Unit
         every { mockUrlFactory.create(EmarsysUrlType.LINK_CONTACT) } returns TEST_BASE_URL
         every { mockUrlFactory.create(EmarsysUrlType.UNLINK_CONTACT) } returns TEST_BASE_URL
@@ -158,14 +152,12 @@ class ContactClientTests {
     fun testConsumer_should_not_call_contactTokenHandler_when_client_responds_with_204() = runTest {
         contactClient.register()
 
-        val requestSlot = slot<UrlRequest>()
-        everySuspend { mockEmarsysClient.send(capture(requestSlot), any()) }.returns(
+        everySuspend { mockEmarsysClient.send(any(), any()) }.returns(
             createTestResponse(
                 "{}",
                 HttpStatusCode.NoContent
             )
         )
-        every { mockConfig.merchantId } returns MERCHANT_ID
         val linkContactEvent = SdkEvent.Internal.Sdk.LinkContact(
             "linkContact",
             contactFieldId = CONTACT_FIELD_ID,
@@ -182,20 +174,15 @@ class ContactClientTests {
         verifySuspend { mockSdkContext.contactFieldId = CONTACT_FIELD_ID }
         verifySuspend { mockEmarsysSdkSession.startSession() }
         verifySuspend { mockEventsDao.removeEvent(linkContactEvent) }
-
-        val request = requestSlot.get()
-        request.headers?.containsValue(MERCHANT_ID) shouldBe true
     }
 
     @Test
     fun testConsumer_should_call_client_with_linkAuthenticatedContact_request() = runTest {
         contactClient.register()
 
-        val requestSlot = slot<UrlRequest>()
-        everySuspend { mockEmarsysClient.send(capture(requestSlot), any()) }.returns(
+        everySuspend { mockEmarsysClient.send(any(), any()) }.returns(
             createTestResponse("{}")
         )
-        every { mockConfig.merchantId } returns MERCHANT_ID
         val linkAuthenticatedContactEvent = SdkEvent.Internal.Sdk.LinkAuthenticatedContact(
             "linkAuthenticatedContact",
             contactFieldId = CONTACT_FIELD_ID,
@@ -213,9 +200,6 @@ class ContactClientTests {
         verifySuspend { mockSdkContext.openIdToken = OPEN_ID_TOKEN }
         verifySuspend { mockEmarsysSdkSession.startSession() }
         verifySuspend { mockEventsDao.removeEvent(linkAuthenticatedContactEvent) }
-
-        val request = requestSlot.get()
-        request.headers?.containsValue(MERCHANT_ID) shouldBe true
     }
 
     @Test

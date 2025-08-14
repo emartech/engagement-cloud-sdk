@@ -4,7 +4,6 @@ import com.emarsys.SdkConstants.APPLY_APPCODE_BASED_REMOTE_CONFIG_EVENT_NAME
 import com.emarsys.SdkConstants.APPLY_GLOBAL_REMOTE_CONFIG_EVENT_NAME
 import com.emarsys.SdkConstants.APP_START_EVENT_NAME
 import com.emarsys.SdkConstants.CHANGE_APP_CODE_NAME
-import com.emarsys.SdkConstants.CHANGE_MERCHANT_ID_NAME
 import com.emarsys.SdkConstants.CLEAR_PUSH_TOKEN_EVENT_NAME
 import com.emarsys.SdkConstants.DEVICE_INFO_READY_EVENT_NAME
 import com.emarsys.SdkConstants.DEVICE_INFO_UPDATE_REQUIRED_EVENT_NAME
@@ -291,15 +290,6 @@ sealed interface SdkEvent {
                 override var nackCount: Int = 0,
                 val applicationCode: String
             ) : Sdk(CHANGE_APP_CODE_NAME), OnlineSdkEvent
-
-            @Serializable
-            data class ChangeMerchantId(
-                override val id: String = UUIDProvider().provide(),
-                override val attributes: JsonObject? = null,
-                override val timestamp: Instant = TimestampProvider().provide(),
-                override var nackCount: Int = 0,
-                val merchantId: String
-            ) : Sdk(CHANGE_MERCHANT_ID_NAME), OnlineSdkEvent
 
             @Serializable
             data class LinkContact(

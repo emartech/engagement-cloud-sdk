@@ -11,7 +11,6 @@ import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.session.SessionApi
-import com.emarsys.networking.EmarsysHeaders
 import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.error.ClientExceptionHandler
 import io.ktor.http.HttpMethod
@@ -103,9 +102,6 @@ internal class ContactClient(
 
     private fun createUrlRequest(event: SdkEvent): UrlRequest {
         val headers = mutableMapOf<String, Any?>()
-        if (sdkContext.config?.merchantId != null) {
-            headers[EmarsysHeaders.MERCHANT_ID_HEADER] = sdkContext.config!!.merchantId
-        }
         return when (event) {
             is SdkEvent.Internal.Sdk.LinkContact -> {
                 val requestBody = json.encodeToString(

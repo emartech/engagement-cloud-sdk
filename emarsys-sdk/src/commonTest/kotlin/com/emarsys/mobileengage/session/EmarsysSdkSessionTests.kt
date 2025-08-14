@@ -213,7 +213,7 @@ class EmarsysSdkSessionTests {
     fun testStartSession_shouldNotDoAnything_whenApplicationCodeIsNull() = runTest {
         sessionContext.sessionId = null
         sessionContext.sessionStart = null
-        every { mockSdkContext.config } returns TestEmarsysConfig(applicationCode = null)
+        every { mockSdkContext.config } returns TestEmarsysConfig()
 
         emarsysSdkSession.startSession()
 
@@ -300,7 +300,7 @@ class EmarsysSdkSessionTests {
 
     @Test
     fun testEndSession_shouldNotDoAnything_whenApplicationCodeIsNull() = runTest {
-        every { mockSdkContext.config } returns TestEmarsysConfig(applicationCode = null)
+        every { mockSdkContext.config } returns TestEmarsysConfig()
 
         emarsysSdkSession.endSession()
 

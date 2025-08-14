@@ -43,7 +43,6 @@ class ConfigTest: KoinTest {
     private companion object {
         const val CONTACT_FIELD_ID = 42
         const val APPLICATION_CODE = "testApplicationCode"
-        const val MERCHANT_ID = "testMerchantId"
         const val CLIENT_ID = "testClientId"
         const val LANGUAGE_CODE = "testLanguageCode"
         const val SDK_VERSION = "testSdkVersion"
@@ -106,7 +105,7 @@ class ConfigTest: KoinTest {
             logBreadcrumbsQueueSize = 10
         )
         sdkContext.contactFieldId = CONTACT_FIELD_ID
-        sdkContext.config = TestEmarsysConfig(APPLICATION_CODE, MERCHANT_ID)
+        sdkContext.config = TestEmarsysConfig(APPLICATION_CODE)
 
         everySuspend { mockDeviceInfoCollector.collect() } returns Json.encodeToString(DEVICE_INFO)
         everySuspend { mockDeviceInfoCollector.getNotificationSettings() } returns PUSH_SETTINGS
@@ -143,11 +142,6 @@ class ConfigTest: KoinTest {
     }
 
     @Test
-    fun testMerchantId_returnsCorrectValue() = runTest {
-        config.getMerchantId() shouldBe MERCHANT_ID
-    }
-
-    @Test
     fun testClientId_returnsCorrectValue() = runTest {
         config.getClientId() shouldBe CLIENT_ID
     }
@@ -180,18 +174,6 @@ class ConfigTest: KoinTest {
         }
     }
 
-    @Test
-    fun testChangeMerchantId_delegatesToCorrectInstance() = runTest {
-        val newMerchantId = "newMerchantId"
-        everySuspend { mockInternalConfig.changeMerchantId(newMerchantId) } returns Unit
-
-        sdkContext.setSdkState(SdkState.active)
-        config.changeMerchantId(newMerchantId)
-
-        verifySuspend {
-            mockInternalConfig.changeMerchantId(newMerchantId)
-        }
-    }
     @Test
     fun testResetLanguage_delegatesToCorrectInstance() = runTest {
         everySuspend { mockGathererConfig.resetLanguage() } returns Unit

@@ -24,13 +24,6 @@ interface ConfigApi {
     suspend fun getApplicationCode(): String?
 
     /**
-     * Retrieves the merchant ID configured.
-     *
-     * @return The merchant ID, or `null` if not configured.
-     */
-    suspend fun getMerchantId(): String?
-
-    /**
      * Retrieves the client ID associated with the SDK.
      *
      * @return The client ID as a string.
@@ -66,14 +59,6 @@ interface ConfigApi {
      * In case of an invalid application code, the result contains an [InvalidApplicationCodeException][com.emarsys.core.exceptions.SdkException.InvalidApplicationCodeException]
      */
     suspend fun changeApplicationCode(applicationCode: String): Result<Unit>
-
-    /**
-     * Changes the merchant ID used by the SDK.
-     *
-     * @param merchantId The new merchant ID to set.
-     * @return A [Result] indicating success or failure of the operation.
-     */
-    suspend fun changeMerchantId(merchantId: String): Result<Unit>
 
     /**
      * Sets the language for the SDK.

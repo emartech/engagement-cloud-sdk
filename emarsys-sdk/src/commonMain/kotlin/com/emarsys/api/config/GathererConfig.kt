@@ -11,11 +11,6 @@ internal class GathererConfig(
         configContext.calls.add(ConfigCall.ChangeApplicationCode(applicationCode))
     }
 
-    override suspend fun changeMerchantId(merchantId: String) {
-        sdkLogger.debug("GathererConfig - changeMerchantId")
-        configContext.calls.add(ConfigCall.ChangeMerchantId(merchantId))
-    }
-
     override suspend fun setLanguage(language: String) {
         sdkLogger.debug("GathererConfig - setLanguage")
         configContext.calls.add(ConfigCall.SetLanguage(language))

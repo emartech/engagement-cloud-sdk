@@ -31,7 +31,6 @@ data class DeviceInfoForLogs(
     val sdkVersion: String,
     val isDebugMode: Boolean,
     val applicationCode: String?,
-    val merchantId: String?,
     val language: String,
     val timezone: String,
     val clientId: String

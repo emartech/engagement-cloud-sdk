@@ -10,8 +10,6 @@ class AndroidEmarsysConfigTests {
     fun testSerialization() {
         val config = AndroidEmarsysConfig(
             applicationCode = "appCode",
-            merchantId = "merchantId",
-            sharedSecret = "testSharedSecret",
             launchActivityClass = TestClass::class.java
         )
 
@@ -20,8 +18,6 @@ class AndroidEmarsysConfigTests {
         val deserialized = JsonUtil.json.decodeFromString<AndroidEmarsysConfig>(serialized)
 
         deserialized.applicationCode shouldBe config.applicationCode
-        deserialized.merchantId shouldBe config.merchantId
-        deserialized.sharedSecret shouldBe config.sharedSecret
         deserialized.launchActivityClass shouldBe config.launchActivityClass
     }
 }

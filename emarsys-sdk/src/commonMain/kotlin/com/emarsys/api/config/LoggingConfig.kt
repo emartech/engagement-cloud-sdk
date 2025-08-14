@@ -15,15 +15,6 @@ internal class LoggingConfig(private val logger: Logger) : ConfigInstance {
         logger.debug(entry)
     }
 
-    override suspend fun changeMerchantId(merchantId: String) {
-        val entry = LogEntry.createMethodNotAllowed(
-            this, this::changeMerchantId.name, buildJsonObject {
-                put("merchantId", JsonPrimitive(merchantId))
-            }
-        )
-        logger.debug(entry)
-    }
-
     override suspend fun setLanguage(language: String) {
         val entry = LogEntry.createMethodNotAllowed(
             this, this::setLanguage.name, buildJsonObject {

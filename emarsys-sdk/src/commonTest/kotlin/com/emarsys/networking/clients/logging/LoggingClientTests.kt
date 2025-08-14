@@ -76,7 +76,6 @@ class LoggingClientTests {
             "4.0.0",
             true,
             null,
-            null,
             "hu_HU",
             "+0200",
             "testClientId"

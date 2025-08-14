@@ -19,25 +19,18 @@ import kotlinx.serialization.json.jsonPrimitive
  * Configuration class for enabling the Emarsys SDK on Android.
  *
  * @property applicationCode The application code of your application.
- * @property merchantId The merchant ID.
  * @property launchActivityClass The class of the activity to be launched when a launch application action is performed.
  */
 @Serializable(with = AndroidEmarsysConfigSerializer::class)
 data class AndroidEmarsysConfig(
     override val applicationCode: String? = null,
-    override val merchantId: String? = null,
-    override val sharedSecret: String? = null,
     val launchActivityClass: Class<*>? = null
 ) : SdkConfig {
     override fun copyWith(
-        applicationCode: String?,
-        merchantId: String?,
-        sharedSecret: String?
+        applicationCode: String?
     ): SdkConfig {
         return copy(
-            applicationCode = applicationCode,
-            merchantId = merchantId,
-            sharedSecret = sharedSecret
+            applicationCode = applicationCode
         )
     }
 }
@@ -50,8 +43,6 @@ object AndroidEmarsysConfigSerializer : KSerializer<AndroidEmarsysConfig> {
         val jsonObject = JsonUtil.json.decodeFromString<JsonObject>(decoder.decodeString())
         return AndroidEmarsysConfig(
             applicationCode = jsonObject["applicationCode"]?.jsonPrimitive?.contentOrNull,
-            merchantId = jsonObject["merchantId"]?.jsonPrimitive?.contentOrNull,
-            sharedSecret = jsonObject["sharedSecret"]?.jsonPrimitive?.contentOrNull,
             launchActivityClass = jsonObject["launchActivityClass"]?.jsonPrimitive?.contentOrNull?.let {
                 Class.forName(it)
             }
@@ -61,8 +52,6 @@ object AndroidEmarsysConfigSerializer : KSerializer<AndroidEmarsysConfig> {
     override fun serialize(encoder: Encoder, value: AndroidEmarsysConfig) {
         val jsonObject = buildJsonObject {
             put("applicationCode", JsonPrimitive(value.applicationCode))
-            put("merchantId", JsonPrimitive(value.merchantId))
-            put("sharedSecret", JsonPrimitive(value.sharedSecret))
             put("launchActivityClass", JsonPrimitive(value.launchActivityClass?.name))
         }
         val jsonString = JsonUtil.json.encodeToString(jsonObject)
