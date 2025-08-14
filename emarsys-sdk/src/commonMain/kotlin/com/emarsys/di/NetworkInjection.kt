@@ -95,11 +95,9 @@ object NetworkInjection {
                 clientExceptionHandler = get(),
                 urlFactory = get(),
                 sdkEventManager = get(),
-                requestContext = get(),
                 sdkContext = get(),
                 contactTokenHandler = get(),
                 eventsDao = get(),
-                json = get(),
                 sdkLogger = get { parametersOf(ConfigClient::class.simpleName) },
                 applicationScope = get(named(CoroutineScopeTypes.Application)),
             )

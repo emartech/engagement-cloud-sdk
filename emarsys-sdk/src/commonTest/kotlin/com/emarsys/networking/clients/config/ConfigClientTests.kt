@@ -66,9 +66,7 @@ class ConfigClientTests {
     private lateinit var mockSdkContext: SdkContextApi
     private lateinit var mockSdkLogger: Logger
     private lateinit var mockConfig: SdkConfig
-    private lateinit var mockRequestContext: RequestContextApi
     private lateinit var mockClientExceptionHandler: ClientExceptionHandler
-    private lateinit var json: Json
     private lateinit var onlineEvents: MutableSharedFlow<OnlineSdkEvent>
     private lateinit var mockSdkEventManager: SdkEventManagerApi
     private lateinit var configClient: ConfigClient
@@ -82,10 +80,7 @@ class ConfigClientTests {
         mockSdkContext = mock()
         mockSdkLogger = mock(MockMode.autofill)
         mockConfig = mock()
-        mockRequestContext = mock(MockMode.autofill)
         mockClientExceptionHandler = mock(MockMode.autofill)
-        every { mockRequestContext.refreshToken } returns "testRefreshToken"
-        json = JsonUtil.json
         mockEventsDao = mock()
         onlineEvents = spy(MutableSharedFlow())
         mockSdkEventManager = mock()
@@ -111,11 +106,9 @@ class ConfigClientTests {
             mockClientExceptionHandler,
             mockUrlFactory,
             mockSdkEventManager,
-            mockRequestContext,
             mockSdkContext,
             mockContactTokenHandler,
             mockEventsDao,
-            json,
             mockSdkLogger,
             applicationScope,
         )

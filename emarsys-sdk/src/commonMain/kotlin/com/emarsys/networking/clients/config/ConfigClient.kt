@@ -5,12 +5,10 @@ import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
-import com.emarsys.core.networking.context.RequestContextApi
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.event.SdkEvent
-import com.emarsys.networking.RefreshTokenRequestBody
 import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.contact.ContactTokenHandlerApi
 import com.emarsys.networking.clients.error.ClientExceptionHandler
@@ -19,18 +17,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 
 internal class ConfigClient(
     private val emarsysNetworkClient: NetworkClientApi,
     private val clientExceptionHandler: ClientExceptionHandler,
     private val urlFactory: UrlFactoryApi,
     private val sdkEventManager: SdkEventManagerApi,
-    private val requestContext: RequestContextApi,
     private val sdkContext: SdkContextApi,
     private val contactTokenHandler: ContactTokenHandlerApi,
     private val eventsDao: EventsDaoApi,
-    private val json: Json,
     private val sdkLogger: Logger,
     private val applicationScope: CoroutineScope
 ) : EventBasedClientApi {
