@@ -6,7 +6,7 @@ import com.emarsys.config.SdkConfig
 import com.emarsys.context.DefaultUrls
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
-import com.emarsys.core.exceptions.SdkAlreadyEnabledException
+import com.emarsys.core.exceptions.SdkException.SdkAlreadyEnabledException
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.state.StateMachineApi

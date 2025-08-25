@@ -4,7 +4,7 @@ import com.emarsys.api.SdkState
 import com.emarsys.context.DefaultUrls
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
-import com.emarsys.core.exceptions.PreconditionFailedException
+import com.emarsys.core.exceptions.SdkException.PreconditionFailedException
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
 import com.emarsys.core.storage.StringStorageApi

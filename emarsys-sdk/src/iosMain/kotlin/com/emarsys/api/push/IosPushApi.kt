@@ -1,6 +1,6 @@
 package com.emarsys.api.push
 
-import com.emarsys.core.exceptions.PreconditionFailedException
+import com.emarsys.core.exceptions.SdkException.PreconditionFailedException
 import io.ktor.utils.io.CancellationException
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 

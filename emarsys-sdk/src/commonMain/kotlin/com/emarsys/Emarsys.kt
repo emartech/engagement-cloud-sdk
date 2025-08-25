@@ -7,8 +7,8 @@ import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.push.PushApi
 import com.emarsys.config.SdkConfig
 import com.emarsys.config.isValid
-import com.emarsys.core.exceptions.SdkAlreadyDisabledException
-import com.emarsys.core.exceptions.SdkAlreadyEnabledException
+import com.emarsys.core.exceptions.SdkException.SdkAlreadyDisabledException
+import com.emarsys.core.exceptions.SdkException.SdkAlreadyEnabledException
 import com.emarsys.core.log.Logger
 import com.emarsys.di.EventFlowTypes
 import com.emarsys.di.SdkKoinIsolationContext

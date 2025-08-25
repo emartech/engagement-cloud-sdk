@@ -1,7 +1,7 @@
 package com.emarsys.core.url
 
 import com.emarsys.context.SdkContextApi
-import com.emarsys.core.exceptions.MissingApplicationCodeException
+import com.emarsys.core.exceptions.SdkException.MissingApplicationCodeException
 import com.emarsys.core.url.EmarsysUrlType.CHANGE_APPLICATION_CODE
 import com.emarsys.core.url.EmarsysUrlType.CHANGE_MERCHANT_ID
 import com.emarsys.core.url.EmarsysUrlType.DEEP_LINK

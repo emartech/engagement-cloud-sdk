@@ -1,9 +1,9 @@
 package com.emarsys.networking.clients.error
 
 import com.emarsys.core.db.events.EventsDaoApi
-import com.emarsys.core.exceptions.FailedRequestException
-import com.emarsys.core.exceptions.MissingApplicationCodeException
-import com.emarsys.core.exceptions.RetryLimitReachedException
+import com.emarsys.core.exceptions.SdkException.FailedRequestException
+import com.emarsys.core.exceptions.SdkException.MissingApplicationCodeException
+import com.emarsys.core.exceptions.SdkException.RetryLimitReachedException
 import com.emarsys.core.log.Logger
 import com.emarsys.event.OnlineSdkEvent
 

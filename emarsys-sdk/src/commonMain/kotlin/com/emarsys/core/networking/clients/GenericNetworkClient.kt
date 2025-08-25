@@ -1,7 +1,7 @@
 package com.emarsys.core.networking.clients
 
-import com.emarsys.core.exceptions.FailedRequestException
-import com.emarsys.core.exceptions.RetryLimitReachedException
+import com.emarsys.core.exceptions.SdkException.FailedRequestException
+import com.emarsys.core.exceptions.SdkException.RetryLimitReachedException
 import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.model.Response

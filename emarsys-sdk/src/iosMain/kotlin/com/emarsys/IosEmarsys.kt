@@ -7,8 +7,8 @@ import com.emarsys.api.inapp.IosInAppApi
 import com.emarsys.api.push.IosPushApi
 import com.emarsys.api.tracking.IosTrackingApi
 import com.emarsys.config.SdkConfig
-import com.emarsys.core.exceptions.SdkAlreadyDisabledException
-import com.emarsys.core.exceptions.SdkAlreadyEnabledException
+import com.emarsys.core.exceptions.SdkException.SdkAlreadyDisabledException
+import com.emarsys.core.exceptions.SdkException.SdkAlreadyEnabledException
 import com.emarsys.di.CoroutineScopeTypes
 import com.emarsys.di.EventFlowTypes
 import com.emarsys.di.SdkKoinIsolationContext.koin

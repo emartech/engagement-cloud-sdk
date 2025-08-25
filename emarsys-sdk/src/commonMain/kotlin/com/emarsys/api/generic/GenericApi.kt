@@ -5,7 +5,7 @@ import com.emarsys.api.Api
 import com.emarsys.api.AutoRegisterable
 import com.emarsys.api.SdkState
 import com.emarsys.context.SdkContextApi
-import com.emarsys.core.exceptions.PreconditionFailedException
+import com.emarsys.core.exceptions.SdkException.PreconditionFailedException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch

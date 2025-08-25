@@ -5,7 +5,7 @@ import com.emarsys.api.contact.ContactApi
 import com.emarsys.api.deeplink.AndroidDeepLinkApi
 import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.push.PushApi
-import com.emarsys.core.exceptions.SdkAlreadyEnabledException
+import com.emarsys.core.exceptions.SdkException.SdkAlreadyEnabledException
 import com.emarsys.di.EventFlowTypes
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.event.SdkEvent

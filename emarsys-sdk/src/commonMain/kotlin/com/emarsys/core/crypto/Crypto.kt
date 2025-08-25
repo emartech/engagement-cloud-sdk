@@ -1,13 +1,18 @@
 package com.emarsys.core.crypto
 
 import com.emarsys.KotlinPlatform
-import com.emarsys.core.exceptions.DecryptionFailedException
+import com.emarsys.core.exceptions.SdkException.DecryptionFailedException
 import com.emarsys.core.log.Logger
 import com.emarsys.currentPlatform
 import dev.whyoleg.cryptography.CryptographyProvider
-import dev.whyoleg.cryptography.algorithms.*
+import dev.whyoleg.cryptography.algorithms.AES
+import dev.whyoleg.cryptography.algorithms.EC
+import dev.whyoleg.cryptography.algorithms.ECDSA
+import dev.whyoleg.cryptography.algorithms.SHA256
+import dev.whyoleg.cryptography.algorithms.SHA512
 import dev.whyoleg.cryptography.operations.Hasher
-import io.ktor.util.*
+import io.ktor.util.decodeBase64Bytes
+import io.ktor.util.encodeBase64
 
 internal class Crypto(
     private val logger: Logger,

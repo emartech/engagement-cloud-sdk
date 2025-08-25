@@ -1,7 +1,6 @@
 package com.emarsys.core.crypto
 
-import com.emarsys.core.exceptions.DecryptionFailedException
-import com.emarsys.core.log.ConsoleLogger
+import com.emarsys.core.exceptions.SdkException.DecryptionFailedException
 import com.emarsys.core.log.SdkLogger
 import dev.mokkery.MockMode
 import dev.mokkery.mock

@@ -2,7 +2,7 @@ package com.emarsys.config
 
 
 import com.emarsys.TestEmarsysConfig
-import com.emarsys.core.exceptions.PreconditionFailedException
+import com.emarsys.core.exceptions.SdkException.PreconditionFailedException
 import com.emarsys.core.log.Logger
 import dev.mokkery.MockMode
 import dev.mokkery.mock

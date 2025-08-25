@@ -3,7 +3,7 @@ package com.emarsys.core.url
 import com.emarsys.TestEmarsysConfig
 import com.emarsys.context.DefaultUrlsApi
 import com.emarsys.context.SdkContextApi
-import com.emarsys.core.exceptions.MissingApplicationCodeException
+import com.emarsys.core.exceptions.SdkException.MissingApplicationCodeException
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every

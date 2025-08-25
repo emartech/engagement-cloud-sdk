@@ -3,7 +3,7 @@ package com.emarsys.mobileengage.push
 import com.emarsys.api.generic.GenericApi
 import com.emarsys.api.push.PushInternalApi
 import com.emarsys.context.SdkContextApi
-import com.emarsys.core.exceptions.PreconditionFailedException
+import com.emarsys.core.exceptions.SdkException.PreconditionFailedException
 import com.emarsys.core.log.Logger
 import com.emarsys.mobileengage.push.extension.toSilentPushUserInfo
 import com.emarsys.util.JsonUtil

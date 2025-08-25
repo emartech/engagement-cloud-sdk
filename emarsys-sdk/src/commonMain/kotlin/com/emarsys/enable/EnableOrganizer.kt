@@ -3,7 +3,7 @@ package com.emarsys.enable
 import com.emarsys.api.SdkState
 import com.emarsys.config.SdkConfig
 import com.emarsys.context.SdkContextApi
-import com.emarsys.core.exceptions.SdkAlreadyEnabledException
+import com.emarsys.core.exceptions.SdkException.SdkAlreadyEnabledException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.state.StateMachineApi
 import com.emarsys.enable.config.SdkConfigStoreApi

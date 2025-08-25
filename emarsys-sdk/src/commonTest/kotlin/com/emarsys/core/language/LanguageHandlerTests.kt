@@ -2,7 +2,7 @@ package com.emarsys.core.language
 
 import com.emarsys.SdkConstants.LANGUAGE_STORAGE_KEY
 import com.emarsys.core.channel.SdkEventDistributorApi
-import com.emarsys.core.exceptions.PreconditionFailedException
+import com.emarsys.core.exceptions.SdkException.PreconditionFailedException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.event.SdkEvent

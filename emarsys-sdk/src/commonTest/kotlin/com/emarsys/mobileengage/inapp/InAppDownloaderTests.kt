@@ -1,6 +1,6 @@
 package com.emarsys.mobileengage.inapp
 
-import com.emarsys.core.exceptions.FailedRequestException
+import com.emarsys.core.exceptions.SdkException.FailedRequestException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
