@@ -111,7 +111,7 @@ class PushClientTests {
             HttpMethod.Put,
             """{"pushToken":"testPushToken"}"""
         )
-        everySuspend { mockEmarsysClient.send(expectedUrlRequest, any()) } returns Response(
+        everySuspend { mockEmarsysClient.send(expectedUrlRequest) } returns Response(
             expectedUrlRequest,
             HttpStatusCode.OK,
             Headers.Empty,
@@ -131,7 +131,7 @@ class PushClientTests {
 
         onlineSdkEvents.await() shouldBe listOf(registerPushTokenEvent)
         verifySuspend {
-            mockEmarsysClient.send(expectedUrlRequest, any())
+            mockEmarsysClient.send(expectedUrlRequest)
         }
         verifySuspend { mockEventsDao.removeEvent(registerPushTokenEvent) }
     }
@@ -144,7 +144,7 @@ class PushClientTests {
             URL,
             HttpMethod.Delete
         )
-        everySuspend { mockEmarsysClient.send(expectedUrlRequest, any()) } returns Response(
+        everySuspend { mockEmarsysClient.send(expectedUrlRequest) } returns Response(
             expectedUrlRequest,
             HttpStatusCode.OK,
             Headers.Empty,
@@ -160,7 +160,7 @@ class PushClientTests {
 
         onlineSdkEvents.await() shouldBe listOf(clearPushTokenEvent)
         verifySuspend {
-            mockEmarsysClient.send(expectedUrlRequest, any())
+            mockEmarsysClient.send(expectedUrlRequest)
         }
         verifySuspend { mockEventsDao.removeEvent(clearPushTokenEvent) }
     }
@@ -171,7 +171,7 @@ class PushClientTests {
         createPushClient(backgroundScope).register()
         val testException = IOException("Network error")
 
-        everySuspend { mockEmarsysClient.send(any(), any()) } calls { args ->
+        everySuspend { mockEmarsysClient.send(any()) } calls { args ->
             (args.arg(1) as suspend () -> Unit).invoke()
             throw testException
         }
@@ -188,7 +188,7 @@ class PushClientTests {
 
         onlineSdkEvents.await() shouldBe listOf(clearPushTokenEvent)
         verifySuspend {
-            mockEmarsysClient.send(any(), any())
+            mockEmarsysClient.send(any())
             mockSdkEventManager.emitEvent(clearPushTokenEvent)
         }
         verifySuspend {
@@ -220,7 +220,7 @@ class PushClientTests {
         advanceUntilIdle()
 
         onlineSdkEvents.await() shouldBe listOf(clearPushTokenEvent)
-        verifySuspend(VerifyMode.exactly(0)) { mockEmarsysClient.send(any(), any()) }
+        verifySuspend(VerifyMode.exactly(0)) { mockEmarsysClient.send(any()) }
         verifySuspend {
             mockClientExceptionHandler.handleException(
                 testException,

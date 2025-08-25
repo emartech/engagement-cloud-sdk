@@ -48,8 +48,7 @@ internal class ConfigClient(
 
                     val response =
                         emarsysNetworkClient.send(
-                            request,
-                            onNetworkError = { sdkEventManager.emitEvent(it) }
+                            request
                         )
                     contactTokenHandler.handleContactTokens(response)
                     if (it is SdkEvent.Internal.Sdk.ChangeAppCode) {

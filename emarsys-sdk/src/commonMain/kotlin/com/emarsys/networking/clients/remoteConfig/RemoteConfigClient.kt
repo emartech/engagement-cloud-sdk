@@ -120,7 +120,7 @@ internal class RemoteConfigClient(
     }
 
     private suspend fun executeRequest(request: UrlRequest, event: OnlineSdkEvent): String? {
-        return networkClient.send(request, onNetworkError = { sdkEventManager.emitEvent(event) })
+        return networkClient.send(request)
             .let {
                 if (it.status.isSuccess()) {
                     it.bodyAsText

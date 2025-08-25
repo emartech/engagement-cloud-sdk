@@ -44,12 +44,11 @@ internal class EmarsysClient(
     }
 
     override suspend fun send(
-        request: UrlRequest,
-        onNetworkError: (suspend () -> Unit)?
-    ): Response {
+        request: UrlRequest
+    ): Result<Response> {
         return refreshContactToken {
             val emarsysRequest = addEmarsysHeaders(request)
-            val response = networkClient.send(emarsysRequest, onNetworkError)
+            val response = networkClient.send(emarsysRequest)
             handleEmarsysResponse(response)
             handleClientState(response)
             response

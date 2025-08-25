@@ -95,7 +95,7 @@ class ContactClientTests {
         sdkDispatcher = StandardTestDispatcher()
         every { mockSdkContext.config } returns mockConfig
         everySuspend { mockContactTokenHandler.handleContactTokens(any()) } returns Unit
-        everySuspend { mockEmarsysClient.send(any(), any()) } returns (createTestResponse("{}"))
+        everySuspend { mockEmarsysClient.send(any()) } returns (createTestResponse("{}"))
         every { mockSdkContext.contactFieldId = any() } returns Unit
         every { mockUrlFactory.create(EmarsysUrlType.LINK_CONTACT) } returns TEST_BASE_URL
         every { mockUrlFactory.create(EmarsysUrlType.UNLINK_CONTACT) } returns TEST_BASE_URL
@@ -139,7 +139,7 @@ class ContactClientTests {
         advanceUntilIdle()
 
         verify { mockUrlFactory.create(any()) }
-        verifySuspend { mockEmarsysClient.send(any(), any()) }
+        verifySuspend { mockEmarsysClient.send(any()) }
         verifySuspend { mockContactTokenHandler.handleContactTokens(any()) }
         verifySuspend { mockSdkContext.contactFieldId = CONTACT_FIELD_ID }
         verifySuspend { mockSdkContext.contactFieldValue = CONTACT_FIELD_VALUE }
@@ -152,7 +152,7 @@ class ContactClientTests {
     fun testConsumer_should_not_call_contactTokenHandler_when_client_responds_with_204() = runTest {
         contactClient.register()
 
-        everySuspend { mockEmarsysClient.send(any(), any()) }.returns(
+        everySuspend { mockEmarsysClient.send(any()) }.returns(
             createTestResponse(
                 "{}",
                 HttpStatusCode.NoContent
@@ -169,7 +169,7 @@ class ContactClientTests {
         advanceUntilIdle()
 
         verify { mockUrlFactory.create(any()) }
-        verifySuspend { mockEmarsysClient.send(any(), any()) }
+        verifySuspend { mockEmarsysClient.send(any()) }
         verifySuspend(VerifyMode.exactly(0)) { mockContactTokenHandler.handleContactTokens(any()) }
         verifySuspend { mockSdkContext.contactFieldId = CONTACT_FIELD_ID }
         verifySuspend { mockEmarsysSdkSession.startSession() }
@@ -180,7 +180,7 @@ class ContactClientTests {
     fun testConsumer_should_call_client_with_linkAuthenticatedContact_request() = runTest {
         contactClient.register()
 
-        everySuspend { mockEmarsysClient.send(any(), any()) }.returns(
+        everySuspend { mockEmarsysClient.send(any()) }.returns(
             createTestResponse("{}")
         )
         val linkAuthenticatedContactEvent = SdkEvent.Internal.Sdk.LinkAuthenticatedContact(
@@ -194,7 +194,7 @@ class ContactClientTests {
         advanceUntilIdle()
 
         verify { mockUrlFactory.create(any()) }
-        verifySuspend { mockEmarsysClient.send(any(), any()) }
+        verifySuspend { mockEmarsysClient.send(any()) }
         verifySuspend { mockContactTokenHandler.handleContactTokens(any()) }
         verifySuspend { mockSdkContext.contactFieldId = CONTACT_FIELD_ID }
         verifySuspend { mockSdkContext.openIdToken = OPEN_ID_TOKEN }
@@ -213,7 +213,7 @@ class ContactClientTests {
         advanceUntilIdle()
 
         verify { mockUrlFactory.create(any()) }
-        verifySuspend { mockEmarsysClient.send(any(), any()) }
+        verifySuspend { mockEmarsysClient.send(any()) }
         verifySuspend { mockContactTokenHandler.handleContactTokens(any()) }
         verifySuspend { mockSdkContext.contactFieldId = null }
         verifySuspend { mockSdkContext.contactFieldValue = null }
@@ -227,7 +227,7 @@ class ContactClientTests {
         contactClient.register()
 
         val unlinkContactEvent = SdkEvent.Internal.Sdk.UnlinkContact("unlinkContact")
-        everySuspend { mockEmarsysClient.send(any(), any()) } calls { args ->
+        everySuspend { mockEmarsysClient.send(any()) } calls { args ->
             (args.arg(1) as suspend () -> Unit).invoke()
             throw IOException("No Internet")
         }
@@ -237,7 +237,7 @@ class ContactClientTests {
         advanceUntilIdle()
 
         verify { mockUrlFactory.create(any()) }
-        verifySuspend { mockEmarsysClient.send(any(), any()) }
+        verifySuspend { mockEmarsysClient.send(any()) }
         verifySuspend(VerifyMode.exactly(0)) { mockContactTokenHandler.handleContactTokens(any()) }
         verifySuspend { mockSdkEventManager.emitEvent(unlinkContactEvent) }
     }
@@ -248,7 +248,7 @@ class ContactClientTests {
             contactClient.register()
             val testException = Exception("Test exception")
 
-            everySuspend { mockEmarsysClient.send(any(), any()) } throws testException
+            everySuspend { mockEmarsysClient.send(any()) } throws testException
             val unlinkContact = SdkEvent.Internal.Sdk.UnlinkContact("unlinkContact")
 
             onlineEvents.emit(unlinkContact)
@@ -256,7 +256,7 @@ class ContactClientTests {
             advanceUntilIdle()
 
             verify { mockUrlFactory.create(any()) }
-            verifySuspend { mockEmarsysClient.send(any(), any()) }
+            verifySuspend { mockEmarsysClient.send(any()) }
             verifySuspend {
                 mockClientExceptionHandler.handleException(
                     testException,

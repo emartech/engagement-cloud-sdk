@@ -1,6 +1,8 @@
 package com.emarsys.core.networking.clients
 
+import com.emarsys.core.exceptions.SdkException.CoroutineException
 import com.emarsys.core.exceptions.SdkException.FailedRequestException
+import com.emarsys.core.exceptions.SdkException.NetworkIOException
 import com.emarsys.core.exceptions.SdkException.RetryLimitReachedException
 import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.Logger
@@ -19,11 +21,11 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
-import kotlinx.coroutines.ensureActive
-import kotlinx.io.IOException
+import kotlinx.coroutines.isActive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlin.coroutines.coroutineContext
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
 
@@ -38,14 +40,13 @@ internal class GenericNetworkClient(
     }
 
     override suspend fun send(
-        request: UrlRequest,
-        onNetworkError: (suspend () -> Unit)?
-    ): Response {
+        request: UrlRequest
+    ): Result<Response> {
         var retries = 0
-        val httpResponse: HttpResponse
+        var result: Result<Response>
         val networkDuration = measureTime {
-            httpResponse = try {
-                client.request {
+            result = try {
+                val httpResponse = client.request {
                     val shouldAddDefaultHeader =
                         request.headers?.get(HttpHeaders.ContentType)?.toString().isNullOrEmpty()
                     if (shouldAddDefaultHeader) {
@@ -67,45 +68,81 @@ internal class GenericNetworkClient(
                     }
                     request.bodyString?.let { setBody(request.bodyString) }
                 }
-            } catch (exception: IOException) {
-                onNetworkError?.invoke()
-                sdkLogger.debug(
-                    "EventClient - consumeEvents: IOException during event consumption (iOS, Android)",
-                    exception,
-                    isRemoteLog = !request.isLogRequest
+                Result.success(
+                    Response(
+                        request,
+                        httpResponse.status,
+                        httpResponse.headers,
+                        httpResponse.bodyAsText()
+                    )
                 )
-                throw exception
-            } catch (exception: Exception) {
-                coroutineContext.ensureActive()
+            } catch (throwable: Throwable) {
                 sdkLogger.error(
                     "EventClient - consumeEvents: Exception during event consumption",
-                    exception,
-                    isRemoteLog = !request.isLogRequest
-                )
-                throw IOException(exception)
-            } catch (throwable: Throwable) {
-                onNetworkError?.invoke()
-                sdkLogger.error(
-                    "EventClient - consumeEvents: Throwable during event consumption (JavaScript)",
                     throwable,
                     isRemoteLog = !request.isLogRequest
                 )
-                throw IOException(throwable)
+                Result.failure(
+                    if (coroutineContext.isActive) {
+                        NetworkIOException(
+                            throwable.message ?: "IOException during network request"
+                        )
+                    } else {
+                        CoroutineException(
+                            throwable.message ?: "Coroutine cancelled during network request"
+                        )
+                    }
+                )
             }
-
         }
-        val response = Response(
-            request,
-            httpResponse.status,
-            httpResponse.headers,
-            httpResponse.bodyAsText()
+        val response = result.getOrNull()
+        response?.let {
+            networkDebugLog(request, it, networkDuration)
+            networkInfoLog(request, it, networkDuration, retries)
+            result = when {
+                !it.status.isSuccess() && it.status != HttpStatusCode.Unauthorized && retries == MAX_RETRY_COUNT -> {
+                    networkErrorLog("Request retry limit reached!", it, request, retries, networkDuration)
+                    Result.failure(RetryLimitReachedException("Request retry limit reached! Response: ${it.bodyAsText}"))
+                }
+                else -> {
+                    networkErrorLog("Request failed with status code: ${it.status.value}", it, request, retries, networkDuration)
+                    Result.failure(FailedRequestException(it))
+                }
+            }
+        }
+        return result
+    }
+
+    private suspend fun networkInfoLog(
+        request: UrlRequest,
+        response1: Response,
+        networkDuration: Duration,
+        retries: Int
+    ) {
+        sdkLogger.info(
+            "log_request",
+            buildJsonObject {
+                put("url", request.url.toString())
+                put("method", request.method.value)
+                put("statusCode", response1.status.value)
+                put("networkingDuration", networkDuration.inWholeMilliseconds)
+                put("retries", retries)
+            },
+            isRemoteLog = !request.isLogRequest
         )
+    }
+
+    private suspend fun networkDebugLog(
+        request: UrlRequest,
+        response1: Response,
+        networkDuration: Duration
+    ) {
         sdkLogger.debug(
             "log_request",
             buildJsonObject {
                 put("url", request.url.toString())
                 put("method", request.method.value)
-                put("statusCode", response.status.value)
+                put("statusCode", response1.status.value)
                 if (request.bodyString != null) {
                     put("payload", request.bodyString)
                 }
@@ -116,56 +153,24 @@ internal class GenericNetworkClient(
             },
             isRemoteLog = !request.isLogRequest
         )
-        sdkLogger.info(
-            "log_request",
-            buildJsonObject {
-                put("url", request.url.toString())
-                put("method", request.method.value)
-                put("statusCode", response.status.value)
-                put("networkingDuration", networkDuration.inWholeMilliseconds)
-                put("retries", retries)
-            },
+    }
+
+    private suspend fun networkErrorLog(topic: String, response: Response, request: UrlRequest, retries: Int, networkDuration: Duration) {
+        sdkLogger.error(
+            LogEntry(
+                topic,
+                buildJsonObject {
+                    put("status", response.status.value)
+                    put(
+                        "networkingDuration",
+                        networkDuration.inWholeMilliseconds
+                    )
+                    put("retries", retries)
+                    put("url", response.originalRequest.url.toString())
+                }
+            ),
             isRemoteLog = !request.isLogRequest
         )
-
-        if (!httpResponse.status.isSuccess() && httpResponse.status != HttpStatusCode.Unauthorized) {
-            if (retries == MAX_RETRY_COUNT) {
-                sdkLogger.error(
-                    LogEntry(
-                        "Request retry limit reached!",
-                        buildJsonObject {
-                            put("status", response.status.value)
-                            put(
-                                "networkingDuration",
-                                networkDuration.inWholeMilliseconds
-                            )
-                            put("retries", retries)
-                            put("url", response.originalRequest.url.toString())
-                        }
-                    ),
-                    isRemoteLog = !request.isLogRequest
-                )
-                throw RetryLimitReachedException("Request retry limit reached! Response: ${httpResponse.bodyAsText()}")
-            }
-            sdkLogger.error(
-                LogEntry(
-                    "Request failed with status code: ${httpResponse.status.value}",
-                    buildJsonObject {
-                        put("status", response.status.value)
-                        put(
-                            "networkingDuration",
-                            networkDuration.inWholeMilliseconds
-                        )
-                        put("retries", retries)
-                        put("url", response.originalRequest.url.toString())
-                    }
-                ),
-                isRemoteLog = !request.isLogRequest
-            )
-            throw FailedRequestException(response)
-        }
-
-        return response
     }
 
     private fun shouldRetry(response: HttpResponse): Boolean {

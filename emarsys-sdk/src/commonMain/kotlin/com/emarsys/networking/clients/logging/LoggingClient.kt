@@ -82,8 +82,7 @@ internal class LoggingClient(
                         isLogRequest = true
                     )
                     genericNetworkClient.send(
-                        request,
-                        onNetworkError = { sdkEvents.forEach { sdkEventManager.emitEvent(it) } }
+                        request
                     )
                     sdkEvents.forEach { it.ack(eventsDao, sdkLogger) }
                 } catch (exception: Exception) {

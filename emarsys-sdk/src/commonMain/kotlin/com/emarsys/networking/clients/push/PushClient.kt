@@ -47,8 +47,8 @@ internal class PushClient(
                     sdkLogger.debug("PushClient - consumePushEvents")
                     createRequest(it)?.let { request ->
                         emarsysClient.send(
-                            request,
-                            onNetworkError = { sdkEventManager.emitEvent(it) })
+                            request
+                        )
                     }
                     sdkEventManager.emitEvent(SdkEvent.Internal.Sdk.Answer.Ready(originId = it.id))
                     it.ack(eventsDao, sdkLogger)

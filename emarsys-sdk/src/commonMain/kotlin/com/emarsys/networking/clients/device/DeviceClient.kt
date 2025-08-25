@@ -47,8 +47,8 @@ internal class DeviceClient(
                     sdkLogger.debug("DeviceClient - consumeRegisterDeviceInfo")
                     val request = createRequest()
                     val response = emarsysClient.send(
-                        request,
-                        onNetworkError = { sdkEventManager.emitEvent(it) })
+                        request
+                    )
                     if (response.status == HttpStatusCode.OK) {
                         contactTokenHandler.handleContactTokens(response)
                     }

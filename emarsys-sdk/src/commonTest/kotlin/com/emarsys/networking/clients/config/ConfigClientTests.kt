@@ -6,7 +6,6 @@ import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
-import com.emarsys.core.networking.context.RequestContextApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType
@@ -15,7 +14,6 @@ import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
 import com.emarsys.networking.clients.contact.ContactTokenHandlerApi
 import com.emarsys.networking.clients.error.ClientExceptionHandler
-import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
@@ -47,7 +45,6 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.io.IOException
-import kotlinx.serialization.json.Json
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -121,7 +118,7 @@ class ConfigClientTests {
         every { mockUrlFactory.create(EmarsysUrlType.CHANGE_APPLICATION_CODE) }.returns(
             TEST_BASE_URL
         )
-        everySuspend { mockEmarsysClient.send(any(), any()) }.returns(createTestResponse("{}"))
+        everySuspend { mockEmarsysClient.send(any()) }.returns(createTestResponse("{}"))
         every { mockConfig.copyWith("NewAppCode") } returns mockConfig
         every { mockConfig.applicationCode } returns "testApplicationCode"
         val changeAppCode = SdkEvent.Internal.Sdk.ChangeAppCode(
@@ -138,7 +135,7 @@ class ConfigClientTests {
         advanceUntilIdle()
 
         onlineSdkEvents.await() shouldBe listOf(changeAppCode)
-        verifySuspend { mockEmarsysClient.send(any(), any()) }
+        verifySuspend { mockEmarsysClient.send(any()) }
         verify { mockConfig.copyWith(applicationCode = "NewAppCode") }
         verify { mockSdkContext.config = mockConfig }
         verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
@@ -151,7 +148,7 @@ class ConfigClientTests {
         configClient.register()
 
         every { mockUrlFactory.create(EmarsysUrlType.CHANGE_APPLICATION_CODE) } returns TEST_BASE_URL
-        everySuspend { mockEmarsysClient.send(any(), any()) } calls { args ->
+        everySuspend { mockEmarsysClient.send(any()) } calls { args ->
             (args.arg(1) as suspend () -> Unit).invoke()
             throw IOException("No Internet")
         }
@@ -171,7 +168,7 @@ class ConfigClientTests {
         advanceUntilIdle()
 
         onlineSdkEvents.await() shouldBe listOf(changeAppCode)
-        verifySuspend { mockEmarsysClient.send(any(), any()) }
+        verifySuspend { mockEmarsysClient.send(any()) }
         verifySuspend { mockSdkEventManager.emitEvent(changeAppCode) }
         verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(changeAppCode) }
 
@@ -203,7 +200,7 @@ class ConfigClientTests {
         advanceUntilIdle()
 
         onlineSdkEvents.await() shouldBe listOf(changeAppCode)
-        verifySuspend(VerifyMode.exactly(0)) { mockEmarsysClient.send(any(), any()) }
+        verifySuspend(VerifyMode.exactly(0)) { mockEmarsysClient.send(any()) }
         verifySuspend {
             mockClientExceptionHandler.handleException(
                 testException,

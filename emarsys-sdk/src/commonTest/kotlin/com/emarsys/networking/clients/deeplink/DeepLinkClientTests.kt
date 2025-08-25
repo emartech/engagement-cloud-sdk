@@ -132,7 +132,7 @@ class DeepLinkClientTests {
             Headers.Empty,
             bodyAsText = "{}"
         )
-        everySuspend { mockNetworkClient.send(expectedRequest, any()) } returns response
+        everySuspend { mockNetworkClient.send(expectedRequest) } returns response
         val trackDeepLink = SdkEvent.Internal.Sdk.TrackDeepLink(
             id = "trackDeepLink",
             trackingId = TRACKING_ID
@@ -147,7 +147,7 @@ class DeepLinkClientTests {
 
         onlineSdkEvents.await() shouldBe listOf(trackDeepLink)
         verify { mockUrlFactory.create(any()) }
-        verifySuspend { mockNetworkClient.send(expectedRequest, any()) }
+        verifySuspend { mockNetworkClient.send(expectedRequest) }
         verifySuspend { mockEventsDao.removeEvent(trackDeepLink) }
     }
 
@@ -157,7 +157,7 @@ class DeepLinkClientTests {
         deepLinkClient.register()
         val testException = IOException("No Internet")
 
-        everySuspend { mockNetworkClient.send(any(), any()) } calls { args ->
+        everySuspend { mockNetworkClient.send(any()) } calls { args ->
             (args.arg(1) as suspend () -> Unit).invoke()
             throw testException
         }
@@ -175,7 +175,7 @@ class DeepLinkClientTests {
 
         onlineSdkEvents.await() shouldBe listOf(trackDeepLink)
         verify { mockUrlFactory.create(any()) }
-        verifySuspend { mockNetworkClient.send(any(), any()) }
+        verifySuspend { mockNetworkClient.send(any()) }
         verifySuspend { mockSdkEventManager.emitEvent(trackDeepLink) }
         verifySuspend {
             mockClientExceptionHandler.handleException(
@@ -191,7 +191,7 @@ class DeepLinkClientTests {
         deepLinkClient = createDeepLinkClient(backgroundScope)
         deepLinkClient.register()
 
-        everySuspend { mockNetworkClient.send(any(), any()) } throws Exception("Request error")
+        everySuspend { mockNetworkClient.send(any()) } throws Exception("Request error")
         val trackDeepLink = SdkEvent.Internal.Sdk.TrackDeepLink(
             id = "trackDeepLink",
             trackingId = TRACKING_ID
@@ -206,7 +206,7 @@ class DeepLinkClientTests {
 
         onlineSdkEvents.await() shouldBe listOf(trackDeepLink)
         verify { mockUrlFactory.create(any()) }
-        verifySuspend { mockNetworkClient.send(any(), any()) }
+        verifySuspend { mockNetworkClient.send(any()) }
         verifySuspend(VerifyMode.exactly(0)) { mockSdkEventManager.emitEvent(trackDeepLink) }
         verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(trackDeepLink) }
     }
@@ -230,7 +230,7 @@ class DeepLinkClientTests {
         advanceUntilIdle()
 
         onlineSdkEvents.await() shouldBe listOf(trackDeepLink)
-        verifySuspend(VerifyMode.exactly(0)) { mockNetworkClient.send(any(), any()) }
+        verifySuspend(VerifyMode.exactly(0)) { mockNetworkClient.send(any()) }
         verifySuspend {
             mockClientExceptionHandler.handleException(
                 testException,

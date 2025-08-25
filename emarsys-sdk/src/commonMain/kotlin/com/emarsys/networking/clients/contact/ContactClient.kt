@@ -51,8 +51,8 @@ internal class ContactClient(
                     sdkLogger.debug("ContactClient - consumeContactChanges")
                     val request = createUrlRequest(it)
                     val response = emarsysClient.send(
-                        request,
-                        onNetworkError = { sdkEventManager.emitEvent(it) })
+                        request
+                    )
 
                     if (response.status != HttpStatusCode.NoContent) {
                         contactTokenHandler.handleContactTokens(response)

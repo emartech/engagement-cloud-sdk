@@ -56,8 +56,8 @@ internal class DeepLinkClient(
                         bodyString = json.encodeToString(requestBody)
                     )
                     networkClient.send(
-                        request,
-                        onNetworkError = { sdkEventManager.emitEvent(it) })
+                        request
+                    )
                     it.ack(eventsDao, sdkLogger)
                 } catch (exception: Exception) {
                     clientExceptionHandler.handleException(

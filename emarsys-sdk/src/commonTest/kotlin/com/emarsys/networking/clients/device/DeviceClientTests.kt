@@ -127,7 +127,7 @@ class DeviceClientTests {
             },
             """{"refreshToken":"$testRefreshToken", "contactToken":"$testContactToken"}"""
         )
-        everySuspend { mockEmarsysClient.send(any(), any()) } returns expectedResponse
+        everySuspend { mockEmarsysClient.send(any()) } returns expectedResponse
         everySuspend { mockContactTokenHandler.handleContactTokens(expectedResponse) } returns Unit
         val registerDeviceInfoEvent = SdkEvent.Internal.Sdk.RegisterDeviceInfo()
 
@@ -144,7 +144,7 @@ class DeviceClientTests {
         verifySuspend {
             mockDeviceInfoCollector.collect()
             mockUrlFactory.create(REGISTER_DEVICE_INFO)
-            mockEmarsysClient.send(request, any())
+            mockEmarsysClient.send(request)
             mockContactTokenHandler.handleContactTokens(expectedResponse)
             mockEventsDao.removeEvent(registerDeviceInfoEvent)
         }
@@ -171,7 +171,7 @@ class DeviceClientTests {
             ""
         )
         every { mockUrlFactory.create(REGISTER_DEVICE_INFO) } returns testUrl
-        everySuspend { mockEmarsysClient.send(any(), any()) } returns expectedResponse
+        everySuspend { mockEmarsysClient.send(any()) } returns expectedResponse
         val registerDeviceInfoEvent = SdkEvent.Internal.Sdk.RegisterDeviceInfo()
 
         val onlineSdkEvents = backgroundScope.async {
@@ -186,7 +186,7 @@ class DeviceClientTests {
         verifySuspend {
             mockDeviceInfoCollector.collect()
             mockUrlFactory.create(REGISTER_DEVICE_INFO)
-            mockEmarsysClient.send(request, any())
+            mockEmarsysClient.send(request)
             mockEventsDao.removeEvent(registerDeviceInfoEvent)
         }
         verifySuspend(VerifyMode.exactly(0)) {
@@ -201,7 +201,7 @@ class DeviceClientTests {
         createDeviceClient(backgroundScope).register()
         val testException = IOException("No Internet")
 
-        everySuspend { mockEmarsysClient.send(any(), any()) } calls { args ->
+        everySuspend { mockEmarsysClient.send(any()) } calls { args ->
             (args.arg(1) as suspend () -> Unit).invoke()
             throw testException
         }
@@ -220,7 +220,7 @@ class DeviceClientTests {
         verifySuspend {
             mockDeviceInfoCollector.collect()
             mockUrlFactory.create(REGISTER_DEVICE_INFO)
-            mockEmarsysClient.send(any(), any())
+            mockEmarsysClient.send(any())
             mockSdkEventManager.emitEvent(registerDeviceInfoEvent)
         }
         verifySuspend {
@@ -253,7 +253,7 @@ class DeviceClientTests {
         advanceUntilIdle()
 
         onlineSdkEvents.await() shouldBe listOf(registerDeviceInfoEvent)
-        verifySuspend(VerifyMode.exactly(0)) { mockEmarsysClient.send(any(), any()) }
+        verifySuspend(VerifyMode.exactly(0)) { mockEmarsysClient.send(any()) }
         verifySuspend {
             mockClientExceptionHandler.handleException(
                 testException,

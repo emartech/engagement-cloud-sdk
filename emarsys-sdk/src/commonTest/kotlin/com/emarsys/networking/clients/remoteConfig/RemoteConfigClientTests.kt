@@ -131,11 +131,10 @@ class RemoteConfigClientTests {
         every {
             mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG_SIGNATURE)
         } returns configSignatureUrl
-        everySuspend { mockNetworkClient.send(configRequest, any()) } returns configResponse
+        everySuspend { mockNetworkClient.send(configRequest) } returns configResponse
         everySuspend {
             mockNetworkClient.send(
-                configSignatureRequest,
-                any()
+                configSignatureRequest
             )
         } returns configSignatureResponse
         everySuspend { mockCrypto.verify(any(), any()) } returns true
@@ -149,8 +148,8 @@ class RemoteConfigClientTests {
         onlineEvents.emit(appCodeBasedRemoteConfigEvent)
 
         onlineSdkEvents.await() shouldBe listOf(appCodeBasedRemoteConfigEvent)
-        verifySuspend { mockNetworkClient.send(configRequest, any()) }
-        verifySuspend { mockNetworkClient.send(configSignatureRequest, any()) }
+        verifySuspend { mockNetworkClient.send(configRequest) }
+        verifySuspend { mockNetworkClient.send(configSignatureRequest) }
         verifySuspend { mockRemoteConfigResponseHandler.handle(RemoteConfigResponse(logLevel = LogLevel.Error)) }
         verifySuspend { mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG) }
         verifySuspend { mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG_SIGNATURE) }
@@ -174,11 +173,10 @@ class RemoteConfigClientTests {
         every {
             mockUrlFactory.create(EmarsysUrlType.GLOBAL_REMOTE_CONFIG_SIGNATURE)
         } returns configSignatureUrl
-        everySuspend { mockNetworkClient.send(configRequest, any()) } returns configResponse
+        everySuspend { mockNetworkClient.send(configRequest) } returns configResponse
         everySuspend {
             mockNetworkClient.send(
-                configSignatureRequest,
-                any()
+                configSignatureRequest
             )
         } returns configSignatureResponse
         everySuspend { mockCrypto.verify(any(), any()) } returns true
@@ -192,8 +190,8 @@ class RemoteConfigClientTests {
         onlineEvents.emit(globalRemoteConfig)
 
         onlineSdkEvents.await() shouldBe listOf(globalRemoteConfig)
-        verifySuspend { mockNetworkClient.send(configRequest, any()) }
-        verifySuspend { mockNetworkClient.send(configSignatureRequest, any()) }
+        verifySuspend { mockNetworkClient.send(configRequest) }
+        verifySuspend { mockNetworkClient.send(configSignatureRequest) }
         verifySuspend { mockRemoteConfigResponseHandler.handle(RemoteConfigResponse(logLevel = LogLevel.Error)) }
         verifySuspend { mockUrlFactory.create(EmarsysUrlType.GLOBAL_REMOTE_CONFIG) }
         verifySuspend { mockUrlFactory.create(EmarsysUrlType.GLOBAL_REMOTE_CONFIG_SIGNATURE) }
@@ -217,11 +215,10 @@ class RemoteConfigClientTests {
         every {
             mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG_SIGNATURE)
         } returns configSignatureUrl
-        everySuspend { mockNetworkClient.send(configRequest, any()) } returns configResponse
+        everySuspend { mockNetworkClient.send(configRequest) } returns configResponse
         everySuspend {
             mockNetworkClient.send(
-                configSignatureRequest,
-                any()
+                configSignatureRequest
             )
         } returns configSignatureResponse
         everySuspend { mockCrypto.verify(any(), any()) } returns false
@@ -259,11 +256,10 @@ class RemoteConfigClientTests {
                 EmarsysUrlType.REMOTE_CONFIG_SIGNATURE
             )
         } returns configSignatureUrl
-        everySuspend { mockNetworkClient.send(configRequest, any()) } returns configResponse
+        everySuspend { mockNetworkClient.send(configRequest) } returns configResponse
         everySuspend {
             mockNetworkClient.send(
-                configSignatureRequest,
-                any()
+                configSignatureRequest
             )
         } returns configSignatureResponse
 
@@ -299,11 +295,10 @@ class RemoteConfigClientTests {
                 EmarsysUrlType.REMOTE_CONFIG_SIGNATURE
             )
         } returns configSignatureUrl
-        everySuspend { mockNetworkClient.send(configRequest, any()) } returns configResponse
+        everySuspend { mockNetworkClient.send(configRequest) } returns configResponse
         everySuspend {
             mockNetworkClient.send(
-                configSignatureRequest,
-                any()
+                configSignatureRequest
             )
         } returns configSignatureResponse
 
@@ -332,14 +327,13 @@ class RemoteConfigClientTests {
             every {
                 mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG)
             } returns configUrl
-            everySuspend { mockNetworkClient.send(configRequest, any()) } returns configResponse
+            everySuspend { mockNetworkClient.send(configRequest) } returns configResponse
             every {
                 mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG_SIGNATURE)
             } returns configSignatureUrl
             everySuspend {
                 mockNetworkClient.send(
-                    configSignatureRequest,
-                    any()
+                    configSignatureRequest
                 )
             } throws testException
 
@@ -378,7 +372,7 @@ class RemoteConfigClientTests {
             mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG_SIGNATURE)
         } returns configSignatureUrl
 
-        everySuspend { mockNetworkClient.send(any(), any()) } calls { args ->
+        everySuspend { mockNetworkClient.send(any()) } calls { args ->
             (args.arg(1) as suspend () -> Unit).invoke()
             throw testException
         }
@@ -398,7 +392,7 @@ class RemoteConfigClientTests {
 
         onlineSdkEvents.await() shouldBe listOf(remoteConfigEvent)
         verifySuspend {
-            mockNetworkClient.send(any(), any())
+            mockNetworkClient.send(any())
             mockSdkEventManager.emitEvent(remoteConfigEvent)
         }
         verifySuspend {

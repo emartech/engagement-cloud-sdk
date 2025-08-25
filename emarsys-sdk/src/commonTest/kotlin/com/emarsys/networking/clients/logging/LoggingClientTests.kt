@@ -130,7 +130,7 @@ class LoggingClientTests {
         createLoggingClient(backgroundScope).register()
 
         every { mockUrlFactory.create(EmarsysUrlType.LOGGING) } returns TEST_BASE_URL
-        everySuspend { mockEmarsysClient.send(any(), any()) } returns createTestResponse("{}")
+        everySuspend { mockEmarsysClient.send(any()) } returns createTestResponse("{}")
         everySuspend { mockDeviceInfoCollector.collectAsDeviceInfoForLogs() } returns deviceInfoForLogs
         val testLogAttributes = buildJsonObject {
             put("message", JsonPrimitive("Test log message"))
@@ -175,7 +175,7 @@ class LoggingClientTests {
         advanceTimeBy(11000)
 
         onlineSdkEvents.await() shouldBe listOf(logEvent)
-        verifySuspend { mockEmarsysClient.send(expectedRequest, any()) }
+        verifySuspend { mockEmarsysClient.send(expectedRequest) }
         verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
         verifySuspend { mockEventsDao.removeEvent(logEvent) }
     }
@@ -184,7 +184,7 @@ class LoggingClientTests {
     fun testConsumer_should_call_client_with_metricEvent() = runTest {
         createLoggingClient(backgroundScope).register()
         every { mockUrlFactory.create(EmarsysUrlType.LOGGING) } returns TEST_BASE_URL
-        everySuspend { mockEmarsysClient.send(any(), any()) } returns createTestResponse("{}")
+        everySuspend { mockEmarsysClient.send(any()) } returns createTestResponse("{}")
         everySuspend { mockDeviceInfoCollector.collectAsDeviceInfoForLogs() } returns deviceInfoForLogs
         val testLogAttributes = buildJsonObject {
             put("message", JsonPrimitive("Test metric message"))
@@ -225,7 +225,7 @@ class LoggingClientTests {
         advanceTimeBy(11000)
 
         onlineSdkEvents.await() shouldBe listOf(logEvent)
-        verifySuspend { mockEmarsysClient.send(expectedRequest, any()) }
+        verifySuspend { mockEmarsysClient.send(expectedRequest) }
         verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
         verifySuspend { mockEventsDao.removeEvent(logEvent) }
     }
@@ -236,7 +236,7 @@ class LoggingClientTests {
 
         val testException = IOException("No Internet")
         every { mockUrlFactory.create(EmarsysUrlType.LOGGING) } returns TEST_BASE_URL
-        everySuspend { mockEmarsysClient.send(any(), any()) } calls { args ->
+        everySuspend { mockEmarsysClient.send(any()) } calls { args ->
             (args.arg(1) as suspend () -> Unit).invoke()
             throw testException
         }
@@ -260,7 +260,7 @@ class LoggingClientTests {
         advanceTimeBy(11000)
 
         onlineSdkEvents.await() shouldBe listOf(logEvent)
-        verifySuspend { mockEmarsysClient.send(any(), any()) }
+        verifySuspend { mockEmarsysClient.send(any()) }
         verifySuspend { mockSdkEventManager.emitEvent(logEvent) }
         verifySuspend {
             mockClientExceptionHandler.handleException(
@@ -290,7 +290,7 @@ class LoggingClientTests {
         advanceTimeBy(11000)
 
         onlineSdkEvents.await() shouldBe listOf(logEvent)
-        verifySuspend(VerifyMode.exactly(0)) { mockEmarsysClient.send(any(), any()) }
+        verifySuspend(VerifyMode.exactly(0)) { mockEmarsysClient.send(any()) }
         verifySuspend {
             mockClientExceptionHandler.handleException(
                 testException,
