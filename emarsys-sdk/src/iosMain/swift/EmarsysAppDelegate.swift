@@ -29,10 +29,7 @@ import UIKit
     }
 
     @objc public func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
-        Task {
-            try? await self.emarsys.deepLink.track(userActivity: userActivity)
-        }
-        return true
+        return self.emarsys.deepLink.track(userActivity: userActivity)
     }
 
     @objc public func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {

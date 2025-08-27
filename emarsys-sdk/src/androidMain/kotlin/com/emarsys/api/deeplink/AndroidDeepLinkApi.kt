@@ -21,5 +21,5 @@ interface AndroidDeepLinkApi {
      * @param activity The activity from which the deep link interaction originates.
      * @param intent The intent containing the deep link URI.
      */
-    suspend fun trackDeepLink(activity: Activity, intent: Intent)
+    fun trackDeepLink(activity: Activity, intent: Intent): Boolean
 }

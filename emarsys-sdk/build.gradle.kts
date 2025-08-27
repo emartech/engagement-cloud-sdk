@@ -235,6 +235,7 @@ skie {
     }
 
     build {
+        enableSwiftLibraryEvolution = true
         produceDistributableFramework()
     }
 

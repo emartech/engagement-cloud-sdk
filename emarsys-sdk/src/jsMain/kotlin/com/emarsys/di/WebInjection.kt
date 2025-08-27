@@ -261,10 +261,7 @@ object WebInjection {
         }
         single<JSDeepLinkApi> {
             JSDeepLink(
-                deepLinkApi = get(),
-                applicationScope = get(
-                    named(CoroutineScopeTypes.Application)
-                )
+                deepLinkApi = get()
             )
         }
         single<JSInAppApi> {
