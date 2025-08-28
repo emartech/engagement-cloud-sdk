@@ -38,9 +38,16 @@ interface ConfigApi {
     suspend fun getLanguageCode(): String
 
     /**
-     * Retrieves the version of the SDK.
+     * Retrieves the version number of the host Application.
      *
-     * @return The SDK version as a string.
+     * @return The host Application's version number as a string.
+     */
+    suspend fun getApplicationVersion(): String
+
+    /**
+     * Retrieves the version number of the SDK.
+     *
+     * @return The SDK version number as a string.
      */
     suspend fun getSdkVersion(): String
 
