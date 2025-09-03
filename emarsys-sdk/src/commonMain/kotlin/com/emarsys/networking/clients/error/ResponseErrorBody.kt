@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class ResponseErrorBody(val error: ResponseError)
 
 @Serializable
-data class ResponseError(val code: Int, val message: String, val target: String, val details: List<ErrorDetail>)
+data class ResponseError(val code: String, val message: String, val target: String, val details: List<ErrorDetail>)
 
 @Serializable
-data class ErrorDetail(val code: Int, val message: String)
+data class ErrorDetail(val code: String, val message: String)

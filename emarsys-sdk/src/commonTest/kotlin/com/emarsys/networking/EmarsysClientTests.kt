@@ -3,6 +3,7 @@
 package com.emarsys.networking
 
 import com.emarsys.core.channel.SdkEventDistributorApi
+import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.GenericNetworkClient
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.context.RequestContextApi
@@ -24,6 +25,7 @@ import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.verify
+import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import io.ktor.client.HttpClient
@@ -76,6 +78,8 @@ class EmarsysClientTests {
     private val now = Clock.System.now()
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
 
+    private lateinit var mockSdkLogger: Logger
+
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(StandardTestDispatcher())
@@ -84,6 +88,7 @@ class EmarsysClientTests {
         mockNetworkClient = mock()
         mockSdkEventDistributor = mock(MockMode.autofill)
         mockRequestContext = mock(MockMode.autofill)
+        mockSdkLogger = mock(MockMode.autofill)
 
         every { mockRequestContext.refreshToken } returns null
         every { mockRequestContext.contactToken } returns CONTACT_TOKEN
@@ -105,7 +110,7 @@ class EmarsysClientTests {
             mockTimestampProvider,
             mockUrlFactory,
             json,
-            mock(MockMode.autofill),
+            mockSdkLogger,
             mockSdkEventDistributor,
         )
     }
@@ -162,7 +167,7 @@ class EmarsysClientTests {
             }
             install(HttpRequestRetry)
         }
-        val networkClient = GenericNetworkClient(httpClient, sdkLogger = mock(MockMode.autofill))
+        val networkClient = GenericNetworkClient(httpClient, mockSdkLogger)
         val emarsysClient = EmarsysClient(
             networkClient,
             mockRequestContext,
@@ -223,7 +228,7 @@ class EmarsysClientTests {
             }
             install(HttpRequestRetry)
         }
-        val networkClient = GenericNetworkClient(httpClient, sdkLogger = mock(MockMode.autofill))
+        val networkClient = GenericNetworkClient(httpClient, mockSdkLogger)
         val emarsysClient = EmarsysClient(
             networkClient,
             mockRequestContext,
@@ -333,4 +338,49 @@ class EmarsysClientTests {
                 )
             }
         }
+
+    @Test
+    fun testSend_should_not_crash_and_log_when_errorCode_cant_be_parsed_toInt() = runTest {
+        val invalidErrorCode = "STRING_INSTEAD_OF_NUMBER"
+        everySuspend { mockNetworkClient.send(any()) } returns Response(
+            UrlRequest(
+                Url("https://testUrl.com"),
+                HttpMethod.Get,
+                null,
+            ),
+            HttpStatusCode(401, "test"),
+            headersOf("Content-Type", "application/json"),
+            buildJsonObject {
+                put("error", buildJsonObject {
+                    put("code", invalidErrorCode)
+                    put("message", "Anything")
+                    put("target", "Anything")
+                    putJsonArray("details") {
+                        add(buildJsonObject {
+                            put("code", "1201")
+                            put(
+                                "message",
+                                "TestMessage"
+                            )
+                        })
+                    }
+                })
+            }.toString()
+        )
+
+        emarsysClient.send(UrlRequest(Url("https://testUrl.com"), HttpMethod.Get, null))
+
+        verifySuspend {
+            mockSdkLogger.debug(
+                "Response error code can't be parsed to Int. Error code value: $invalidErrorCode",
+                true
+            )
+        }
+        verifySuspend(VerifyMode.exactly(0)) {
+            mockSdkEventDistributor.registerEvent(any())
+        }
+
+
+    }
+
 }
