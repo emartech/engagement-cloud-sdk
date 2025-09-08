@@ -15,7 +15,7 @@ data class DeviceEvent(
     val reporting: String? = null,
 )
 
-fun SdkEvent.toDeviceEvent(): DeviceEvent = DeviceEvent(
+fun SdkEvent.DeviceEvent.toDeviceEvent(): DeviceEvent = DeviceEvent(
     type = this.type,
     name = this.name,
     timestamp = this.timestamp,

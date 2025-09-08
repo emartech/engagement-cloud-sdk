@@ -107,9 +107,9 @@ class ReportingActionTests {
 
     private fun verifyArguments(
         eventSlot: SlotCapture<SdkEvent>,
-        expectedEvent: SdkEvent
+        expectedEvent: SdkEvent.Internal.Reporting
     ) {
-        eventSlot.get().name shouldBe expectedEvent.name
-        eventSlot.get().attributes shouldBe expectedEvent.attributes
+        eventSlot.get().type shouldBe expectedEvent.type
+        eventSlot.get() as SdkEvent.Internal.Reporting shouldBe expectedEvent
     }
 }

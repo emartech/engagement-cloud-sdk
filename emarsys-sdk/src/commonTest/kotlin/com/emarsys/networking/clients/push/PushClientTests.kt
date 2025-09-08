@@ -150,7 +150,7 @@ class PushClientTests {
             Headers.Empty,
             ""
         )
-        val clearPushTokenEvent = SdkEvent.Internal.Sdk.ClearPushToken(ID, null, TIMESTAMP)
+        val clearPushTokenEvent = SdkEvent.Internal.Sdk.ClearPushToken(ID, TIMESTAMP)
 
         val onlineSdkEvents = backgroundScope.async {
             onlineEvents.take(1).toList()
@@ -175,7 +175,7 @@ class PushClientTests {
             (args.arg(1) as suspend () -> Unit).invoke()
             throw testException
         }
-        val clearPushTokenEvent = SdkEvent.Internal.Sdk.ClearPushToken(ID, null, TIMESTAMP)
+        val clearPushTokenEvent = SdkEvent.Internal.Sdk.ClearPushToken(ID, TIMESTAMP)
         everySuspend { mockSdkEventManager.emitEvent(clearPushTokenEvent) } returns Unit
 
         val onlineSdkEvents = backgroundScope.async {
@@ -209,7 +209,7 @@ class PushClientTests {
             mockUrlFactory.create(EmarsysUrlType.PUSH_TOKEN)
         } throws testException
         val clearPushTokenEvent =
-            SdkEvent.Internal.Sdk.ClearPushToken(ID, null, TIMESTAMP)
+            SdkEvent.Internal.Sdk.ClearPushToken(ID, TIMESTAMP)
 
         val onlineSdkEvents = backgroundScope.async {
             onlineEvents.take(1).toList()

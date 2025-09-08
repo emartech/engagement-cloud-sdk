@@ -242,7 +242,7 @@ class DeviceClientTests {
         } throws testException
 
         val registerDeviceInfoEvent =
-            SdkEvent.Internal.Sdk.RegisterDeviceInfo("testId", null, TIMESTAMP)
+            SdkEvent.Internal.Sdk.RegisterDeviceInfo("testId", TIMESTAMP)
 
         val onlineSdkEvents = backgroundScope.async {
             onlineEvents.take(1).toList()

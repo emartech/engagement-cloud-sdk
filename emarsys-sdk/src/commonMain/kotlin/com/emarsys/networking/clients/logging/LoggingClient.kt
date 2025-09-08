@@ -68,8 +68,10 @@ internal class LoggingClient(
                                         "deviceInfo",
                                         json.encodeToJsonElement(deviceInfoCollector.collectAsDeviceInfoForLogs())
                                     )
-                                    sdkEvent.attributes?.forEach { attribute ->
-                                        put(attribute.key, attribute.value)
+                                    if (sdkEvent is SdkEvent.Internal.Sdk.Log) {
+                                        sdkEvent.attributes?.forEach { attribute ->
+                                            put(attribute.key, attribute.value)
+                                        }
                                     }
                                 }
                             }

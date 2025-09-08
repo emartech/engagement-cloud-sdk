@@ -69,7 +69,7 @@ internal class EventClient(
 
     private suspend fun startEventConsumer() {
         sdkEventManager.onlineSdkEvents
-            .filter { it is SdkEvent.Internal.Reporting || it is SdkEvent.Internal.Custom || it is SdkEvent.External.Custom }
+            .filter { it is SdkEvent.DeviceEvent }
             .naturalBatching().onEach { sdkEvents ->
                 try {
                     sdkLogger.debug("Consume Events, Batch size: ${sdkEvents.size}")
@@ -77,7 +77,7 @@ internal class EventClient(
                     val requestBody =
                         DeviceEventRequestBody(
                             inAppConfigApi.inAppDnd,
-                            sdkEvents.map { it.toDeviceEvent() },
+                            sdkEvents.map { (it as SdkEvent.DeviceEvent).toDeviceEvent() },
                             requestContext.deviceEventState
                         )
                     val body = json.encodeToString(requestBody)
