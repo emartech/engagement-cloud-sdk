@@ -63,7 +63,7 @@ class JSConfig(
         }
     }
 
-    override fun getPushSettings(): Promise<NotificationSettings> {
+    override fun getNotificationSettings(): Promise<NotificationSettings> {
         return applicationScope.promise {
             configApi.getNotificationSettings()
         }

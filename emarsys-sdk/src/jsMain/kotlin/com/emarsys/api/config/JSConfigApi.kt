@@ -15,5 +15,5 @@ interface JSConfigApi {
     fun changeApplicationCode(applicationCode: String): Promise<Unit>
     fun setLanguage(language: String): Promise<Unit>
     fun resetLanguage(): Promise<Unit>
-    fun getPushSettings(): Promise<NotificationSettings>
+    fun getNotificationSettings(): Promise<NotificationSettings>
 }
