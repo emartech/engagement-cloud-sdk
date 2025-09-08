@@ -30,6 +30,7 @@ import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.TimestampProvider
 import com.emarsys.core.providers.UUIDProvider
+import com.emarsys.mobileengage.embedded.message.MessageTagUpdate
 import kotlinx.datetime.Instant
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
@@ -167,6 +168,52 @@ sealed interface SdkEvent {
     @Serializable
     sealed interface Internal : SdkEvent {
 
+        sealed interface EmbeddedMessaging : Internal, OnlineSdkEvent {
+
+            @Serializable
+            data class FetchBadgeCount(
+                override val id: String = UUIDProvider().provide(),
+                override val type: String = "fetchBadgeCount",
+                override val name: String = "",
+                override val timestamp: Instant = TimestampProvider().provide(),
+                override val attributes: JsonObject? = null,
+                override var nackCount: Int
+            ) : EmbeddedMessaging
+
+            @Serializable
+            data class FetchMessages(
+                override val id: String = UUIDProvider().provide(),
+                override val type: String = "fetchMessages",
+                override val name: String = "",
+                override val timestamp: Instant = TimestampProvider().provide(),
+                override val attributes: JsonObject? = null,
+                override var nackCount: Int,
+                val offset: Int,
+                val categoryIds: List<String>
+            ) : EmbeddedMessaging
+
+            @Serializable
+            data class FetchMeta(
+                override val id: String = UUIDProvider().provide(),
+                override val type: String = "fetchMeta",
+                override val name: String = "",
+                override val timestamp: Instant = TimestampProvider().provide(),
+                override val attributes: JsonObject? = null,
+                override var nackCount: Int
+            ) : EmbeddedMessaging
+
+            @Serializable
+            data class UpdateTagsForMessages(
+                override val id: String = UUIDProvider().provide(),
+                override val type: String = "updateTagsForMessages",
+                override val name: String = "",
+                override val timestamp: Instant = TimestampProvider().provide(),
+                override val attributes: JsonObject? = null,
+                override var nackCount: Int,
+                val updateData: List<MessageTagUpdate>
+            ) : EmbeddedMessaging
+        }
+
         sealed interface Reporting : Internal, OnlineSdkEvent {
             val reporting: String?
             val trackingInfo: String
@@ -186,6 +233,13 @@ sealed interface SdkEvent {
                 open val originId: String = UUIDProvider().provide()
                 open val success: Boolean = true
                 open val throwable: Throwable? = null
+
+                data class Response<T>(
+                    val response: T,
+                    override val timestamp: Instant = TimestampProvider().provide(),
+                    override val id: String,
+                    override val attributes: JsonObject? = null,
+                ) : Answer("")
 
                 data class Ready(
                     override val id: String = UUIDProvider().provide(),
