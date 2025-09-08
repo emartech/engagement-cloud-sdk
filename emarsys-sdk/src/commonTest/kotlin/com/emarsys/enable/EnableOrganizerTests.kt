@@ -70,7 +70,7 @@ class EnableOrganizerTests: KoinTest {
         sdkContext = SdkContext(
             StandardTestDispatcher(),
             mainDispatcher,
-            DefaultUrls("", "", "", "", ""),
+            DefaultUrls("", "", "", "", "", ""),
             LogLevel.Error,
             mutableSetOf(),
             logBreadcrumbsQueueSize = 10

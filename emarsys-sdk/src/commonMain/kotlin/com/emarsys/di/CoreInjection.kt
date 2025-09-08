@@ -102,7 +102,8 @@ object CoreInjection {
                 "https://mobile-events.eservice.emarsys.net",
                 "https://deep-link.eservice.emarsys.net",
                 "https://mobile-sdk-config.gservice.emarsys.net",
-                "https://log-dealer.gservice.emarsys.net"
+                "https://log-dealer.gservice.emarsys.net",
+                "https://embedded-messaging.gservice.emarsys.net"
             )
         }
         single<SdkEventDistributor> {

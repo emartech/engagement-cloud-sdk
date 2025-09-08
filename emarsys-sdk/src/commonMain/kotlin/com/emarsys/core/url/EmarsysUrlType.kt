@@ -14,5 +14,6 @@ internal enum class EmarsysUrlType {
     GLOBAL_REMOTE_CONFIG_SIGNATURE,
     GLOBAL_REMOTE_CONFIG,
     DEEP_LINK,
-    LOGGING
+    LOGGING,
+    FETCH_EMBEDDED_MESSAGES
 }

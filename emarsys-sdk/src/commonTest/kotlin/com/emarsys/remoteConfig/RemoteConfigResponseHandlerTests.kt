@@ -30,7 +30,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-class RemoteConfigResponseHandlerTests: KoinTest {
+class RemoteConfigResponseHandlerTests : KoinTest {
 
     override fun getKoin(): Koin = koin
 
@@ -52,7 +52,7 @@ class RemoteConfigResponseHandlerTests: KoinTest {
         sdkContext = SdkContext(
             StandardTestDispatcher(),
             StandardTestDispatcher(),
-            DefaultUrls("", "", "", "", ""),
+            DefaultUrls("", "", "", "", "", ""),
             LogLevel.Debug,
             mutableSetOf(),
             logBreadcrumbsQueueSize = 10

@@ -159,4 +159,16 @@ class UrlFactoryTests {
 
         result shouldBe Url("testDeepLinkBaseUrl")
     }
+
+    @Test
+    fun testCreate_embeddedMessaging_should_return_url_for_fetchMessages() {
+        val config = TestEmarsysConfig("testAppCode")
+        every { mockDefaultUrls.embeddedMessagingBaseUrl } returns "testEmbeddedMessagingBaseUrl"
+        every { mockSdkContext.defaultUrls } returns mockDefaultUrls
+        every { mockSdkContext.config } returns config
+
+        val result = urlFactory.create(EmarsysUrlType.FETCH_EMBEDDED_MESSAGES)
+
+        result shouldBe Url("testEmbeddedMessagingBaseUrl/v1/testAppCode/messages")
+    }
 }

@@ -35,7 +35,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-class GenericApiTests: KoinTest {
+class GenericApiTests : KoinTest {
 
     override fun getKoin(): Koin = koin
 
@@ -68,13 +68,7 @@ class GenericApiTests: KoinTest {
         sdkContext = SdkContext(
             StandardTestDispatcher(),
             mainDispatcher,
-            DefaultUrls(
-                "",
-                "",
-                "",
-                "",
-                ""
-            ),
+            DefaultUrls("", "", "", "", "", ""),
             LogLevel.Error,
             mutableSetOf(),
             logBreadcrumbsQueueSize = 10

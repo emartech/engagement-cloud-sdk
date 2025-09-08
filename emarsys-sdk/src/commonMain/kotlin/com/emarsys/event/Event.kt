@@ -30,7 +30,7 @@ import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.TimestampProvider
 import com.emarsys.core.providers.UUIDProvider
-import com.emarsys.mobileengage.embedded.message.MessageTagUpdate
+import com.emarsys.mobileengage.embedded.messages.MessageTagUpdate
 import kotlinx.datetime.Instant
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable

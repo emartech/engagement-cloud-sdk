@@ -1,4 +1,4 @@
-package com.emarsys.mobileengage.embedded.message
+package com.emarsys.mobileengage.embedded.messages
 
 import kotlinx.serialization.Serializable
 
