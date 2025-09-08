@@ -144,8 +144,6 @@ sealed interface SdkEvent {
              * typically for notifications or app icons.
              *
              * @property id A unique identifier for the event.
-             * @property name The name of the event.
-             * @property attributes Additional attributes associated with the event.
              * @property timestamp The timestamp when the event occurred.
              * @property type The type of the event, which is always "badge_count".
              * @property badgeCount The badge count value that should be set or added

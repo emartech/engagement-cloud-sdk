@@ -33,7 +33,6 @@ internal class WebBadgeCountHandler(
                 JsonUtil.json.decodeFromString<BadgeCount>(badgeCountString)
             sdkEventDistributor.registerEvent(
                 SdkEvent.External.Api.BadgeCountEvent(
-                    name = "badgeCount",
                     badgeCount = badgeCount.value,
                     method = badgeCount.method.name,
                 )
