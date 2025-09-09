@@ -8,12 +8,14 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.buildUrl
 
 import io.ktor.http.takeFrom
+import kotlinx.serialization.json.Json
 
 internal class EmbeddedMessagesRequestFactory(
-    private val urlFactory: UrlFactoryApi
-) {
+    private val urlFactory: UrlFactoryApi,
+    private val json: Json
+): EmbeddedMessagingRequestFactoryApi {
 
-    fun create(embeddedMessagingEvent: SdkEvent.Internal.EmbeddedMessaging): UrlRequest {
+   override fun create(embeddedMessagingEvent: SdkEvent.Internal.EmbeddedMessaging): UrlRequest {
         return when (embeddedMessagingEvent) {
             is SdkEvent.Internal.EmbeddedMessaging.FetchMessages ->
                 createFetchMessagesRequest(embeddedMessagingEvent)
@@ -31,7 +33,12 @@ internal class EmbeddedMessagesRequestFactory(
                     method = HttpMethod.Get
                 )
 
-            else -> createFetchMessagesRequest(embeddedMessagingEvent as SdkEvent.Internal.EmbeddedMessaging.FetchMessages)
+            is SdkEvent.Internal.EmbeddedMessaging.UpdateTagsForMessages ->
+                UrlRequest(
+                    urlFactory.create(EmarsysUrlType.UPDATE_TAGS_FOR_MESSAGES),
+                    HttpMethod.Patch,
+                    bodyString = json.encodeToString(embeddedMessagingEvent.updateData)
+                )
         }
     }
 

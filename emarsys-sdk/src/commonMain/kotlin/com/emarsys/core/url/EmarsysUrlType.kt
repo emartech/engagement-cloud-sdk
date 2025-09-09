@@ -17,5 +17,6 @@ internal enum class EmarsysUrlType {
     LOGGING,
     FETCH_EMBEDDED_MESSAGES,
     FETCH_BADGE_COUNT,
-    FETCH_META
+    FETCH_META,
+    UPDATE_TAGS_FOR_MESSAGES
 }

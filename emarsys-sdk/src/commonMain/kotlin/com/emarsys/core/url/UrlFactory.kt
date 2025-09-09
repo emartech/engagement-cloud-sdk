@@ -57,6 +57,7 @@ internal class UrlFactory(
             FETCH_EMBEDDED_MESSAGES -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/$V1_API/${getApplicationCode()}/messages")
             FETCH_BADGE_COUNT -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/$V1_API/${getApplicationCode()}/badge-count")
             FETCH_META -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/$V1_API/${getApplicationCode()}/meta")
+            UPDATE_TAGS_FOR_MESSAGES -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/$V1_API/${getApplicationCode()}/tags")
         }
     }
 
