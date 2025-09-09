@@ -6,6 +6,7 @@ import com.emarsys.core.url.EmarsysUrlType.CHANGE_APPLICATION_CODE
 import com.emarsys.core.url.EmarsysUrlType.CHANGE_MERCHANT_ID
 import com.emarsys.core.url.EmarsysUrlType.DEEP_LINK
 import com.emarsys.core.url.EmarsysUrlType.EVENT
+import com.emarsys.core.url.EmarsysUrlType.FETCH_BADGE_COUNT
 import com.emarsys.core.url.EmarsysUrlType.FETCH_EMBEDDED_MESSAGES
 import com.emarsys.core.url.EmarsysUrlType.GLOBAL_REMOTE_CONFIG
 import com.emarsys.core.url.EmarsysUrlType.GLOBAL_REMOTE_CONFIG_SIGNATURE
@@ -69,6 +70,7 @@ internal class UrlFactory(
             DEEP_LINK -> Url(sdkContext.defaultUrls.deepLinkBaseUrl)
             LOGGING -> Url("${sdkContext.defaultUrls.loggingUrl}/v1/log")
             FETCH_EMBEDDED_MESSAGES -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/$V1_API/${getApplicationCode()}/messages")
+            FETCH_BADGE_COUNT -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/$V1_API/${getApplicationCode()}/badge-count")
         }
     }
 

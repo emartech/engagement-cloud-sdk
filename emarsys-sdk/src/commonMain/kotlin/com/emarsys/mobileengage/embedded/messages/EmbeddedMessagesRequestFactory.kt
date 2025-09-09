@@ -15,7 +15,15 @@ internal class EmbeddedMessagesRequestFactory(
 
     fun create(embeddedMessagingEvent: SdkEvent.Internal.EmbeddedMessaging): UrlRequest {
         return when (embeddedMessagingEvent) {
-            is SdkEvent.Internal.EmbeddedMessaging.FetchMessages -> createFetchMessagesRequest(embeddedMessagingEvent)
+            is SdkEvent.Internal.EmbeddedMessaging.FetchMessages ->
+                createFetchMessagesRequest(embeddedMessagingEvent)
+
+            is SdkEvent.Internal.EmbeddedMessaging.FetchBadgeCount ->
+                UrlRequest(
+                    url = urlFactory.create(EmarsysUrlType.FETCH_BADGE_COUNT),
+                    method = HttpMethod.Get
+                )
+
             else -> createFetchMessagesRequest(embeddedMessagingEvent as SdkEvent.Internal.EmbeddedMessaging.FetchMessages)
         }
     }
@@ -27,7 +35,10 @@ internal class EmbeddedMessagesRequestFactory(
                 parameters.append("skip", embeddedMessagingEvent.offset.toString())
             }
             if (embeddedMessagingEvent.categoryIds.isNotEmpty()) {
-                parameters.append("categoryIds", embeddedMessagingEvent.categoryIds.joinToString(","))
+                parameters.append(
+                    "categoryIds",
+                    embeddedMessagingEvent.categoryIds.joinToString(",")
+                )
             }
         }
         return UrlRequest(

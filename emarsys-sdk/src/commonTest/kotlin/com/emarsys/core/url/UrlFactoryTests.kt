@@ -171,4 +171,16 @@ class UrlFactoryTests {
 
         result shouldBe Url("testEmbeddedMessagingBaseUrl/v1/testAppCode/messages")
     }
+
+    @Test
+    fun testCreate_embeddedMessaging_should_return_url_for_badgeCount() {
+        val config = TestEmarsysConfig("testAppCode")
+        every { mockDefaultUrls.embeddedMessagingBaseUrl } returns "testEmbeddedMessagingBaseUrl"
+        every { mockSdkContext.defaultUrls } returns mockDefaultUrls
+        every { mockSdkContext.config } returns config
+
+        val result = urlFactory.create(EmarsysUrlType.FETCH_BADGE_COUNT)
+
+        result shouldBe Url("testEmbeddedMessagingBaseUrl/v1/testAppCode/badge-count")
+    }
 }

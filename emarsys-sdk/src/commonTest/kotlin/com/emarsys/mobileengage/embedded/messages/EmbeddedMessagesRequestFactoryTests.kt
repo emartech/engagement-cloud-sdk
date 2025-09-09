@@ -24,6 +24,7 @@ class EmbeddedMessagesRequestFactoryTests {
         mockUrlFactory = mock(MockMode.autofill)
 
         every { mockUrlFactory.create(EmarsysUrlType.FETCH_EMBEDDED_MESSAGES) } returns Url("https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages")
+        every { mockUrlFactory.create(EmarsysUrlType.FETCH_BADGE_COUNT) } returns Url("https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/badge-count")
 
         embeddedMessagesRequestFactory = EmbeddedMessagesRequestFactory(mockUrlFactory)
     }
@@ -43,7 +44,7 @@ class EmbeddedMessagesRequestFactoryTests {
     }
 
     @Test
-    fun create_fetchMessages_should_return_request_for_fetchMessages_endpoint_whenOffset_isSmallerThanZero() = runTest {
+    fun create_should_return_request_for_fetchMessages_endpoint_whenOffset_isSmallerThanZero() = runTest {
         val result = embeddedMessagesRequestFactory.create(
             SdkEvent.Internal.EmbeddedMessaging.FetchMessages(
                 nackCount = 0,
@@ -57,7 +58,7 @@ class EmbeddedMessagesRequestFactoryTests {
     }
 
     @Test
-    fun create_fetchMessages_should_return_request_for_fetchMessages_withOffsetAndCategoryIds() = runTest {
+    fun create_should_return_request_for_fetchMessages_withOffsetAndCategoryIds() = runTest {
         val result = embeddedMessagesRequestFactory.create(
             SdkEvent.Internal.EmbeddedMessaging.FetchMessages(
                 nackCount = 0,
@@ -68,6 +69,16 @@ class EmbeddedMessagesRequestFactoryTests {
 
         result.method shouldBe HttpMethod.Get
         result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?skip=40&categoryIds=category1%2Ccategory2"
+    }
+
+    @Test
+    fun create_should_return_request_for_fetchBadgeCount() = runTest {
+        val result = embeddedMessagesRequestFactory.create(
+            SdkEvent.Internal.EmbeddedMessaging.FetchBadgeCount(nackCount = 0)
+        )
+
+        result.method shouldBe HttpMethod.Get
+        result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/badge-count"
     }
 
 }
