@@ -1,18 +1,18 @@
-package com.emarsys.networking.clients.embeddedMessaging.model
+package com.emarsys.networking.clients.embedded.messaging.model
 
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class MetaResponse(
     val version: String,
-    val design: DesignMetaData
+    val design: DesignMetaData?
 )
 
 @Serializable
 data class DesignMetaData(
-    val fillColor: FillColors,
-    val text: TextMetaData,
-    val misc: Misc
+    val fillColor: FillColors?,
+    val text: TextMetaData?,
+    val misc: Misc?
 )
 
 @Serializable

@@ -1,4 +1,4 @@
-package com.emarsys.networking.clients.embeddedMessaging.model
+package com.emarsys.networking.clients.embedded.messaging.model
 
 import kotlinx.serialization.Serializable
 

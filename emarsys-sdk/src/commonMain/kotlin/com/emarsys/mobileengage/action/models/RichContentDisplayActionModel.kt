@@ -1,6 +1,6 @@
 package com.emarsys.mobileengage.action.models
 
-import com.emarsys.networking.clients.embeddedMessaging.model.EmbeddedMessageAnimation
+import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessageAnimation
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

@@ -1,4 +1,4 @@
-package com.emarsys.networking.clients.embeddedMessaging.model
+package com.emarsys.networking.clients.embedded.messaging.model
 
 import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
