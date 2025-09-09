@@ -25,6 +25,7 @@ class EmbeddedMessagesRequestFactoryTests {
 
         every { mockUrlFactory.create(EmarsysUrlType.FETCH_EMBEDDED_MESSAGES) } returns Url("https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages")
         every { mockUrlFactory.create(EmarsysUrlType.FETCH_BADGE_COUNT) } returns Url("https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/badge-count")
+        every { mockUrlFactory.create(EmarsysUrlType.FETCH_META) } returns Url("https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/meta")
 
         embeddedMessagesRequestFactory = EmbeddedMessagesRequestFactory(mockUrlFactory)
     }
@@ -79,6 +80,16 @@ class EmbeddedMessagesRequestFactoryTests {
 
         result.method shouldBe HttpMethod.Get
         result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/badge-count"
+    }
+
+    @Test
+    fun create_should_return_request_for_fetchMeta() = runTest {
+        val result = embeddedMessagesRequestFactory.create(
+            SdkEvent.Internal.EmbeddedMessaging.FetchMeta(nackCount = 0)
+        )
+
+        result.method shouldBe HttpMethod.Get
+        result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/meta"
     }
 
 }

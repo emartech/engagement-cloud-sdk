@@ -18,6 +18,13 @@ internal class EmbeddedMessagesRequestFactory(
             is SdkEvent.Internal.EmbeddedMessaging.FetchMessages ->
                 createFetchMessagesRequest(embeddedMessagingEvent)
 
+            is SdkEvent.Internal.EmbeddedMessaging.FetchMeta ->
+                UrlRequest(
+                    url = urlFactory.create(EmarsysUrlType.FETCH_META),
+                    method = HttpMethod.Get
+                )
+
+
             is SdkEvent.Internal.EmbeddedMessaging.FetchBadgeCount ->
                 UrlRequest(
                     url = urlFactory.create(EmarsysUrlType.FETCH_BADGE_COUNT),
