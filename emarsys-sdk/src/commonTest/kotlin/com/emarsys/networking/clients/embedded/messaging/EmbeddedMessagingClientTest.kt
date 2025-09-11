@@ -168,10 +168,11 @@ class EmbeddedMessagingClientTest {
             SdkEvent.Internal.EmbeddedMessaging.FetchMessages(nackCount = 0, offset = 0, categoryIds = emptyList())
         val event3 = SdkEvent.Internal.EmbeddedMessaging.FetchMeta(nackCount = 0)
         val event4 = SdkEvent.Internal.EmbeddedMessaging.UpdateTagsForMessages(nackCount = 0, updateData = emptyList())
+        val event5 = SdkEvent.Internal.EmbeddedMessaging.FetchNextPage(nackCount = 0, offset = 0, categoryIds = emptyList())
         val wrongEvent =
             SdkEvent.Internal.Sdk.LinkContact(contactFieldId = 0, contactFieldValue = "value", nackCount = 0)
         val onlineSdkEvents = backgroundScope.async {
-            onlineEvents.take(5).toList()
+            onlineEvents.take(6).toList()
         }
         val request = UrlRequest(
             url = Url("https://test.com"),
@@ -191,12 +192,13 @@ class EmbeddedMessagingClientTest {
         onlineEvents.emit(event2)
         onlineEvents.emit(event3)
         onlineEvents.emit(event4)
+        onlineEvents.emit(event5)
         onlineEvents.emit(wrongEvent)
 
         advanceUntilIdle()
 
-        onlineSdkEvents.await() shouldBe listOf(event1, event2, event3, event4, wrongEvent)
-        verifySuspend(VerifyMode.exactly(4)) { mockEmbeddedMessagesRequestFactory.create(any()) }
+        onlineSdkEvents.await() shouldBe listOf(event1, event2, event3, event4, event5, wrongEvent)
+        verifySuspend(VerifyMode.exactly(5)) { mockEmbeddedMessagesRequestFactory.create(any()) }
     }
 
     @Test

@@ -36,6 +36,7 @@ internal class EmbeddedMessagingClient(
                         || it is SdkEvent.Internal.EmbeddedMessaging.FetchMessages
                         || it is SdkEvent.Internal.EmbeddedMessaging.FetchMeta
                         || it is SdkEvent.Internal.EmbeddedMessaging.UpdateTagsForMessages
+                        || it is SdkEvent.Internal.EmbeddedMessaging.FetchNextPage
             }
             .collect {
                 try {

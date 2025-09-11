@@ -4,10 +4,7 @@ import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.event.SdkEvent
-import io.ktor.http.HttpMethod
-import io.ktor.http.buildUrl
-
-import io.ktor.http.takeFrom
+import io.ktor.http.*
 import kotlinx.serialization.json.Json
 
 internal class EmbeddedMessagesRequestFactory(
@@ -19,6 +16,18 @@ internal class EmbeddedMessagesRequestFactory(
         return when (embeddedMessagingEvent) {
             is SdkEvent.Internal.EmbeddedMessaging.FetchMessages ->
                 createFetchMessagesRequest(embeddedMessagingEvent)
+
+            is SdkEvent.Internal.EmbeddedMessaging.FetchNextPage ->
+                createFetchMessagesRequest(
+                    SdkEvent.Internal.EmbeddedMessaging.FetchMessages(
+                        id = embeddedMessagingEvent.id,
+                        type = embeddedMessagingEvent.type,
+                        timestamp = embeddedMessagingEvent.timestamp,
+                        nackCount = embeddedMessagingEvent.nackCount,
+                        offset = embeddedMessagingEvent.offset,
+                        categoryIds = embeddedMessagingEvent.categoryIds,
+                    )
+                )
 
             is SdkEvent.Internal.EmbeddedMessaging.FetchMeta ->
                 UrlRequest(
