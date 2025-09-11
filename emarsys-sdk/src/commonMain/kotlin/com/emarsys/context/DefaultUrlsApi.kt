@@ -7,4 +7,6 @@ interface DefaultUrlsApi {
     val deepLinkBaseUrl: String
     val remoteConfigBaseUrl: String
     val loggingUrl: String
+
+    val embeddedMessagingBaseUrl: String
 }

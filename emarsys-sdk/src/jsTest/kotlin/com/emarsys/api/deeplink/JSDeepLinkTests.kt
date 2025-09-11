@@ -1,21 +1,12 @@
 package com.emarsys.api.deeplink
 
 import dev.mokkery.answering.returns
-import dev.mokkery.everySuspend
+import dev.mokkery.every
 import dev.mokkery.mock
-import dev.mokkery.verifySuspend
-import io.kotest.assertions.throwables.shouldThrow
+import dev.mokkery.verify
+import io.kotest.matchers.shouldBe
 import io.ktor.http.Url
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.await
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
-import kotlin.test.AfterTest
-import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -24,33 +15,26 @@ class JSDeepLinkTests {
         val testUrl = Url("https://sap.com")
     }
 
-    @BeforeTest
-    fun setup() {
-        Dispatchers.setMain(StandardTestDispatcher())
-    }
+    @Test
+    fun trackDeepLink_shouldCall_trackDeepLink_onDeepLinkApi() {
+        val mockDeepLinkApi: DeepLinkApi = mock()
+        every { mockDeepLinkApi.trackDeepLink(testUrl) } returns Result.success(true)
+        val jsDeepLink = JSDeepLink(mockDeepLinkApi)
 
-    @AfterTest
-    fun teardown() {
-        Dispatchers.resetMain()
+        val result = jsDeepLink.trackDeepLink(testUrl)
+
+        verify { mockDeepLinkApi.trackDeepLink(testUrl) }
+        result shouldBe true
     }
 
     @Test
-    fun trackDeepLink_shouldCall_trackDeepLink_onDeepLinkApi() = runTest {
+    fun trackDeepLink_shouldReturnFalse_ifTrackingFails() {
         val mockDeepLinkApi: DeepLinkApi = mock()
-        everySuspend { mockDeepLinkApi.trackDeepLink(testUrl) } returns Result.success(Unit)
-        val jsDeepLink = JSDeepLink(mockDeepLinkApi, TestScope())
+        every { mockDeepLinkApi.trackDeepLink(testUrl) } returns Result.failure(Exception())
+        val jsDeepLink = JSDeepLink(mockDeepLinkApi)
 
-        jsDeepLink.trackDeepLink(testUrl).await()
+        val result = jsDeepLink.trackDeepLink(testUrl)
 
-        verifySuspend { mockDeepLinkApi.trackDeepLink(testUrl) }
-    }
-
-    @Test
-    fun trackDeepLink_shouldThrowException_ifTrackingFails() = runTest {
-        val mockDeepLinkApi: DeepLinkApi = mock()
-        everySuspend { mockDeepLinkApi.trackDeepLink(testUrl) } returns Result.failure(Exception())
-        val jsDeepLink = JSDeepLink(mockDeepLinkApi, TestScope())
-
-        shouldThrow<Exception> { jsDeepLink.trackDeepLink(testUrl).await() }
+        result shouldBe false
     }
 }

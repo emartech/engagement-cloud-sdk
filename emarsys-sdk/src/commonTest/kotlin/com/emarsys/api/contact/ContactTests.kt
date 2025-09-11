@@ -31,7 +31,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class ContactTests: KoinTest {
+class ContactTests : KoinTest {
 
     override fun getKoin(): Koin = koin
 
@@ -70,7 +70,7 @@ class ContactTests: KoinTest {
         sdkContext = SdkContext(
             StandardTestDispatcher(),
             mainDispatcher,
-            DefaultUrls("", "", "", "", ""),
+            DefaultUrls("", "", "", "", "", ""),
             LogLevel.Error,
             mutableSetOf(),
             logBreadcrumbsQueueSize = 10

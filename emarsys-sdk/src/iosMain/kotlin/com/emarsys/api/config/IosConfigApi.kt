@@ -8,6 +8,7 @@ interface IosConfigApi {
     suspend fun getApplicationCode(): String?
     suspend fun getClientId(): String
     suspend fun getLanguageCode(): String
+    suspend fun getApplicationVersion(): String
     suspend fun getSdkVersion(): String
     suspend fun getNotificationSettings(): IosNotificationSettings
 

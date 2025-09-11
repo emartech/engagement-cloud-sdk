@@ -38,7 +38,7 @@ class ReportingActionTests {
 
     @Test
     fun testInvoke_shouldSendEventWithProperPayload_whenActionModel_pushButtonClicked() = runTest {
-        val pushButtonClickedActionModel = BasicPushButtonClickedActionModel(ID, TRACKING_INFO)
+        val pushButtonClickedActionModel = BasicPushButtonClickedActionModel(reporting = REPORTING, TRACKING_INFO)
         val action = ReportingAction(pushButtonClickedActionModel, mockSdkEventDistributor)
         val expectedEvent = SdkEvent.Internal.Push.Clicked(
             ID,
@@ -107,9 +107,10 @@ class ReportingActionTests {
 
     private fun verifyArguments(
         eventSlot: SlotCapture<SdkEvent>,
-        expectedEvent: SdkEvent
+        expectedEvent: SdkEvent.Internal.Reporting
     ) {
-        eventSlot.get().name shouldBe expectedEvent.name
-        eventSlot.get().attributes shouldBe expectedEvent.attributes
+        eventSlot.get().type shouldBe expectedEvent.type
+        (eventSlot.get() as SdkEvent.Internal.Reporting).reporting shouldBe expectedEvent.reporting
+        (eventSlot.get() as SdkEvent.Internal.Reporting).trackingInfo shouldBe expectedEvent.trackingInfo
     }
 }

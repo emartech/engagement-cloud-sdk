@@ -6,5 +6,5 @@ internal interface SdkEventWaiterApi {
     val sdkEventDistributor: SdkEventDistributor
     val sdkEvent: SdkEvent
 
-    suspend fun await()
+    suspend fun <T>await() : SdkEvent.Internal.Sdk.Answer.Response<T>
 }

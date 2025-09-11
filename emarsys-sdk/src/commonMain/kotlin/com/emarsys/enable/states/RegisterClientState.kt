@@ -1,6 +1,7 @@
 package com.emarsys.enable.states
 
 import com.emarsys.core.channel.SdkEventDistributorApi
+import com.emarsys.core.networking.model.Response
 import com.emarsys.core.state.State
 import com.emarsys.event.SdkEvent
 import kotlin.time.ExperimentalTime
@@ -16,7 +17,7 @@ internal class RegisterClientState(
     }
 
     override suspend fun active() {
-        sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.RegisterDeviceInfo())?.await()
+        sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.RegisterDeviceInfo()).await<Response>()
     }
 
     override fun relax() {

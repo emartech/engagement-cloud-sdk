@@ -5,7 +5,8 @@ data class DefaultUrls(
     override val eventServiceBaseUrl: String,
     override val deepLinkBaseUrl: String,
     override val remoteConfigBaseUrl: String,
-    override val loggingUrl: String
+    override val loggingUrl: String,
+    override val embeddedMessagingBaseUrl: String
 ) : DefaultUrlsApi
 
 fun DefaultUrlsApi.copyWith(
@@ -13,11 +14,13 @@ fun DefaultUrlsApi.copyWith(
     eventServiceBaseUrl: String? = null,
     deepLinkBaseUrl: String? = null,
     remoteConfigBaseUrl: String? = null,
-    loggingUrl: String? = null
+    loggingUrl: String? = null,
+    embeddedMessagingBaseUrl: String? = null
 ) = DefaultUrls(
     clientServiceBaseUrl = clientServiceBaseUrl ?: this.clientServiceBaseUrl,
     eventServiceBaseUrl = eventServiceBaseUrl ?: this.eventServiceBaseUrl,
     deepLinkBaseUrl = deepLinkBaseUrl ?: this.deepLinkBaseUrl,
     remoteConfigBaseUrl = remoteConfigBaseUrl ?: this.remoteConfigBaseUrl,
-    loggingUrl = loggingUrl ?: this.loggingUrl
+    loggingUrl = loggingUrl ?: this.loggingUrl,
+    embeddedMessagingBaseUrl = embeddedMessagingBaseUrl ?: this.embeddedMessagingBaseUrl
 )

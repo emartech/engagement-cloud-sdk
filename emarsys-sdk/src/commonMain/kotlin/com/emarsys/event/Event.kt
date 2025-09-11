@@ -5,7 +5,6 @@ import com.emarsys.SdkConstants.APPLY_GLOBAL_REMOTE_CONFIG_EVENT_NAME
 import com.emarsys.SdkConstants.APP_START_EVENT_NAME
 import com.emarsys.SdkConstants.CHANGE_APP_CODE_NAME
 import com.emarsys.SdkConstants.CLEAR_PUSH_TOKEN_EVENT_NAME
-import com.emarsys.SdkConstants.DEVICE_INFO_READY_EVENT_NAME
 import com.emarsys.SdkConstants.DEVICE_INFO_UPDATE_REQUIRED_EVENT_NAME
 import com.emarsys.SdkConstants.DISMISS_EVENT_NAME
 import com.emarsys.SdkConstants.INAPP_VIEWED_EVENT_NAME
@@ -30,6 +29,7 @@ import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.TimestampProvider
 import com.emarsys.core.providers.UUIDProvider
+import com.emarsys.mobileengage.embedded.messages.MessageTagUpdate
 import kotlinx.datetime.Instant
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
@@ -96,9 +96,13 @@ suspend fun List<OnlineSdkEvent>.nack(eventsDao: EventsDaoApi, sdkLogger: Logger
 sealed interface SdkEvent {
     val id: String
     val type: String
-    val name: String
     val timestamp: Instant
-    val attributes: JsonObject?
+
+    @Serializable
+    sealed interface DeviceEvent : SdkEvent {
+        val name: String
+        val attributes: JsonObject?
+    }
 
     sealed interface External : SdkEvent {
 
@@ -110,7 +114,7 @@ sealed interface SdkEvent {
             override val attributes: JsonObject? = null,
             override val timestamp: Instant = TimestampProvider().provide(),
             override var nackCount: Int = 0
-        ) : External, OnlineSdkEvent
+        ) : External, OnlineSdkEvent, DeviceEvent
 
         sealed interface Api : External {
 
@@ -126,8 +130,8 @@ sealed interface SdkEvent {
              */
             data class AppEvent(
                 override val id: String = UUIDProvider().provide(),
-                override val name: String,
-                override val attributes: JsonObject? = null,
+                val name: String,
+                val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override val type: String = ExternalEventTypes.APP_EVENT.name.lowercase()
             ) : Api
@@ -139,8 +143,6 @@ sealed interface SdkEvent {
              * typically for notifications or app icons.
              *
              * @property id A unique identifier for the event.
-             * @property name The name of the event.
-             * @property attributes Additional attributes associated with the event.
              * @property timestamp The timestamp when the event occurred.
              * @property type The type of the event, which is always "badge_count".
              * @property badgeCount The badge count value that should be set or added
@@ -154,8 +156,6 @@ sealed interface SdkEvent {
              */
             data class BadgeCountEvent(
                 override val id: String = UUIDProvider().provide(),
-                override val name: String,
-                override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override val type: String = ExternalEventTypes.BADGE_COUNT.name.lowercase(),
                 val badgeCount: Int,
@@ -167,166 +167,219 @@ sealed interface SdkEvent {
     @Serializable
     sealed interface Internal : SdkEvent {
 
-        sealed interface Reporting : Internal, OnlineSdkEvent {
+        sealed interface EmbeddedMessaging : Internal, OnlineSdkEvent {
+
+            @Serializable
+            data class FetchBadgeCount(
+                override val id: String = UUIDProvider().provide(),
+                override val type: String = "fetchBadgeCount",
+                override val timestamp: Instant = TimestampProvider().provide(),
+                override var nackCount: Int
+            ) : EmbeddedMessaging
+
+            @Serializable
+            data class FetchMessages(
+                override val id: String = UUIDProvider().provide(),
+                override val type: String = "fetchMessages",
+                override val timestamp: Instant = TimestampProvider().provide(),
+                override var nackCount: Int,
+                val offset: Int,
+                val categoryIds: List<String>
+            ) : EmbeddedMessaging
+
+            @Serializable
+            data class FetchNextPage(
+                override val id: String = UUIDProvider().provide(),
+                override val type: String = "fetchNextPage",
+                override val timestamp: Instant = TimestampProvider().provide(),
+                override var nackCount: Int,
+                val offset: Int,
+                val categoryIds: List<String>
+            ) : EmbeddedMessaging
+
+            @Serializable
+            data class NextPage(
+                val id: String = UUIDProvider().provide()
+            )
+
+            @Serializable
+            data class FetchMeta(
+                override val id: String = UUIDProvider().provide(),
+                override val type: String = "fetchMeta",
+                override val timestamp: Instant = TimestampProvider().provide(),
+                override var nackCount: Int
+            ) : EmbeddedMessaging
+
+            @Serializable
+            data class UpdateTagsForMessages(
+                override val id: String = UUIDProvider().provide(),
+                override val type: String = "updateTagsForMessages",
+                override val timestamp: Instant = TimestampProvider().provide(),
+                override var nackCount: Int,
+                val updateData: List<MessageTagUpdate>
+            ) : EmbeddedMessaging
+        }
+
+        sealed interface Reporting : Internal, OnlineSdkEvent, DeviceEvent {
             val reporting: String?
             val trackingInfo: String
         }
 
-        sealed interface Custom : Internal, OnlineSdkEvent
+        sealed interface Custom : Internal, OnlineSdkEvent, DeviceEvent
 
         sealed interface LogEvent : Internal, OnlineSdkEvent
 
         sealed interface SetupFlowEvent : Internal, OnlineSdkEvent
 
         @Serializable
-        sealed class Sdk(override val name: String) : Internal {
+        sealed class Sdk : Internal {
             override val type: String = "internal"
 
-            sealed class Answer(val eventName: String) : Sdk(eventName) {
-                open val originId: String = UUIDProvider().provide()
-                open val success: Boolean = true
-                open val throwable: Throwable? = null
+            sealed class Answer() : Sdk() {
 
-                data class Ready(
-                    override val id: String = UUIDProvider().provide(),
+                override val id: String = UUIDProvider().provide()
+                abstract val originId: String
+                override val timestamp: Instant = TimestampProvider().provide()
+
+                data class Response<T>(
                     override val originId: String,
-                    override val attributes: JsonObject? = null,
-                    override val timestamp: Instant = TimestampProvider().provide(),
-                ) : Answer(DEVICE_INFO_READY_EVENT_NAME)
+                    val result: Result<T>
+                ) : Answer()
             }
 
             @Serializable
             data class DeviceInfoUpdateRequired(
                 override val id: String = UUIDProvider().provide(),
-                override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Sdk(DEVICE_INFO_UPDATE_REQUIRED_EVENT_NAME)
+                val name: String = DEVICE_INFO_UPDATE_REQUIRED_EVENT_NAME
+            ) : Sdk()
 
             @Serializable
             data class Log(
                 val level: LogLevel,
                 override val id: String = UUIDProvider().provide(),
-                override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-                override var nackCount: Int = 0
-            ) : Sdk(LOG_EVENT_NAME), LogEvent
+                override var nackCount: Int = 0,
+                val attributes: JsonObject? = null,
+                val name: String = LOG_EVENT_NAME
+            ) : Sdk(), LogEvent
 
             @Serializable
             data class Metric(
                 val level: LogLevel = LogLevel.Metric,
                 override val id: String = UUIDProvider().provide(),
-                override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-                override var nackCount: Int = 0
-            ) : Sdk(METRIC_EVENT_NAME), LogEvent
+                override var nackCount: Int = 0,
+                val name: String = METRIC_EVENT_NAME
+            ) : Sdk(), LogEvent
 
             @Serializable
             data class Dismiss(
                 override val id: String = UUIDProvider().provide(),
-                override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Sdk(DISMISS_EVENT_NAME)
+                val name: String = DISMISS_EVENT_NAME
+            ) : Sdk()
 
             @Serializable
             data class ReregistrationRequired(
                 override val id: String = UUIDProvider().provide(),
-                override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Sdk(REREGISTRATION_REQUIRED_EVENT_NAME)
+                val name: String = REREGISTRATION_REQUIRED_EVENT_NAME
+            ) : Sdk()
 
             @Serializable
             data class RegisterDeviceInfo(
                 override val id: String = UUIDProvider().provide(),
-                override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-                override var nackCount: Int = 0
-            ) : Sdk(REGISTER_DEVICE_INFO_EVENT_NAME), OnlineSdkEvent, SetupFlowEvent
+                override var nackCount: Int = 0,
+                val name: String = REGISTER_DEVICE_INFO_EVENT_NAME
+            ) : Sdk(), OnlineSdkEvent, SetupFlowEvent
 
             @Serializable
             data class RegisterPushToken(
                 override val id: String = UUIDProvider().provide(),
-                override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0,
                 val pushToken: String,
-            ) : Sdk(REGISTER_PUSH_TOKEN_EVENT_NAME), OnlineSdkEvent, SetupFlowEvent
+                val name: String = REGISTER_PUSH_TOKEN_EVENT_NAME
+            ) : Sdk(), OnlineSdkEvent, SetupFlowEvent
 
             @Serializable
             data class ClearPushToken(
                 override val id: String = UUIDProvider().provide(),
-                override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-                override var nackCount: Int = 0
-            ) : Sdk(CLEAR_PUSH_TOKEN_EVENT_NAME), OnlineSdkEvent
+                override var nackCount: Int = 0,
+                val name: String = CLEAR_PUSH_TOKEN_EVENT_NAME
+            ) : Sdk(), OnlineSdkEvent
 
             @Serializable
             data class RemoteConfigUpdateRequired(
                 override val id: String = UUIDProvider().provide(),
-                override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-            ) : Sdk(REMOTE_CONFIG_UPDATE_REQUIRED_EVENT_NAME)
+                val name: String = REMOTE_CONFIG_UPDATE_REQUIRED_EVENT_NAME
+            ) : Sdk()
 
             @Serializable
             data class ApplyAppCodeBasedRemoteConfig(
                 override val id: String = UUIDProvider().provide(),
-                override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-                override var nackCount: Int = 0
-            ) : Sdk(APPLY_APPCODE_BASED_REMOTE_CONFIG_EVENT_NAME), OnlineSdkEvent, SetupFlowEvent
+                override var nackCount: Int = 0,
+                val name: String = APPLY_APPCODE_BASED_REMOTE_CONFIG_EVENT_NAME
+            ) : Sdk(), OnlineSdkEvent, SetupFlowEvent
 
             @Serializable
             data class ApplyGlobalRemoteConfig(
                 override val id: String = UUIDProvider().provide(),
-                override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
-                override var nackCount: Int = 0
-            ) : Sdk(APPLY_GLOBAL_REMOTE_CONFIG_EVENT_NAME), OnlineSdkEvent, SetupFlowEvent
+                override var nackCount: Int = 0,
+                val name: String = APPLY_GLOBAL_REMOTE_CONFIG_EVENT_NAME
+            ) : Sdk(), OnlineSdkEvent, SetupFlowEvent
 
             @Serializable
             data class ChangeAppCode(
                 override val id: String = UUIDProvider().provide(),
-                override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0,
-                val applicationCode: String
-            ) : Sdk(CHANGE_APP_CODE_NAME), OnlineSdkEvent
+                val applicationCode: String,
+                val name: String = CHANGE_APP_CODE_NAME
+            ) : Sdk(), OnlineSdkEvent
 
             @Serializable
             data class LinkContact(
                 override val id: String = UUIDProvider().provide(),
                 override val timestamp: Instant = TimestampProvider().provide(),
-                override val attributes: JsonObject? = null,
                 override var nackCount: Int = 0,
                 val contactFieldId: Int? = null,
-                val contactFieldValue: String
-            ) : Sdk(LINK_CONTACT_NAME), OnlineSdkEvent
+                val contactFieldValue: String,
+                val name: String = LINK_CONTACT_NAME
+            ) : Sdk(), OnlineSdkEvent
 
             @Serializable
             data class LinkAuthenticatedContact(
                 override val id: String = UUIDProvider().provide(),
                 override val timestamp: Instant = TimestampProvider().provide(),
-                override val attributes: JsonObject? = null,
                 override var nackCount: Int = 0,
                 val contactFieldId: Int? = null,
-                val openIdToken: String
-            ) : Sdk(LINK_AUTHENTICATED_CONTACT_NAME), OnlineSdkEvent
+                val openIdToken: String,
+                val name: String = LINK_AUTHENTICATED_CONTACT_NAME
+            ) : Sdk(), OnlineSdkEvent
 
             @Serializable
             data class UnlinkContact(
                 override val id: String = UUIDProvider().provide(),
                 override val timestamp: Instant = TimestampProvider().provide(),
-                override val attributes: JsonObject? = null,
                 override var nackCount: Int = 0,
-            ) : Sdk(UNLINK_CONTACT_NAME), OnlineSdkEvent
+                val name: String = UNLINK_CONTACT_NAME
+            ) : Sdk(), OnlineSdkEvent
 
             @Serializable
             data class TrackDeepLink(
                 override val id: String = UUIDProvider().provide(),
                 override val timestamp: Instant = TimestampProvider().provide(),
-                override val attributes: JsonObject? = null,
                 override var nackCount: Int = 0,
-                val trackingId: String
-            ) : Sdk(TRACK_DEEPLINK_NAME), OnlineSdkEvent
+                val trackingId: String,
+                val name: String = TRACK_DEEPLINK_NAME
+            ) : Sdk(), OnlineSdkEvent
 
             @Serializable
             data class AppStart(
@@ -334,7 +387,8 @@ sealed interface SdkEvent {
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0,
-            ) : Sdk(APP_START_EVENT_NAME), Custom, SetupFlowEvent
+                override val name: String = APP_START_EVENT_NAME
+            ) : Sdk(), Custom, SetupFlowEvent
 
             @Serializable
             data class SessionStart(
@@ -342,7 +396,8 @@ sealed interface SdkEvent {
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0,
-            ) : Sdk(SESSION_START_EVENT_NAME), Custom
+                override val name: String = SESSION_START_EVENT_NAME
+            ) : Sdk(), Custom
 
             @Serializable
             data class SessionEnd(
@@ -350,13 +405,14 @@ sealed interface SdkEvent {
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0,
-                val duration: Long
-            ) : Sdk(SESSION_END_EVENT_NAME), Custom
+                val duration: Long,
+                override val name: String = SESSION_END_EVENT_NAME
+            ) : Sdk(), Custom
         }
 
         @Serializable
         sealed class Push(
-            override val name: String
+            val name: String
         ) : Internal {
             override val type: String = "internal"
 
@@ -386,7 +442,7 @@ sealed interface SdkEvent {
         ) : Internal, Reporting
 
         @Serializable
-        sealed class InApp(override val name: String) : Internal {
+        sealed class InApp(val name: String) : Internal {
             override val type: String = "internal"
 
             @Serializable
@@ -415,8 +471,6 @@ sealed interface SdkEvent {
         data class SilentPush(
             override val type: String = "internal",
             override val id: String = UUIDProvider().provide(),
-            override val name: String,
-            override val attributes: JsonObject?,
             override val timestamp: Instant,
         ) : Internal
 
@@ -424,8 +478,6 @@ sealed interface SdkEvent {
         data class OnEventAction(
             override val type: String = "internal",
             override val id: String = UUIDProvider().provide(),
-            override val name: String,
-            override val attributes: JsonObject?,
             override val timestamp: Instant,
         ) : Internal
 
@@ -433,8 +485,6 @@ sealed interface SdkEvent {
         data class BadgeCount(
             override val type: String = "internal",
             override val id: String = UUIDProvider().provide(),
-            override val name: String,
-            override val attributes: JsonObject?,
             override val timestamp: Instant,
         ) : Internal
     }

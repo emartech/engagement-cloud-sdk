@@ -74,7 +74,6 @@ class WebBadgeCountHandlerTest {
             mockSdkEventDistributor.registerEvent(
                 SdkEvent.External.Api.BadgeCountEvent(
                     id = any(),
-                    name = "badgeCount",
                     method = testBadgeCount.method.name,
                     badgeCount = testBadgeCount.value
                 )

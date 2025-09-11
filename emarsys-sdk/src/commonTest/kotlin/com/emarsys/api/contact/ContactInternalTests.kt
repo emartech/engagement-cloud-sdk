@@ -75,7 +75,6 @@ class ContactInternalTests {
 
         val emitted = eventSlot.get()
         (emitted is SdkEvent.Internal.Sdk.UnlinkContact) shouldBe true
-        emitted.attributes shouldBe null
     }
 
     @Test

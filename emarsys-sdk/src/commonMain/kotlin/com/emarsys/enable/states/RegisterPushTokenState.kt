@@ -2,6 +2,7 @@ package com.emarsys.enable.states
 
 import com.emarsys.api.push.PushConstants
 import com.emarsys.core.channel.SdkEventDistributorApi
+import com.emarsys.core.networking.model.Response
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.event.SdkEvent
@@ -25,7 +26,7 @@ internal class RegisterPushTokenState(
         if (pushToken != null && pushToken != lastSentPushToken) {
             sdkEventDistributor.registerEvent(
                 SdkEvent.Internal.Sdk.RegisterPushToken(pushToken = pushToken)
-            )?.await()
+            ).await<SdkEvent.Internal.Sdk.Answer.Response<Response>>()
             storage.put(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY, pushToken)
         }
     }

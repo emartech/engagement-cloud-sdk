@@ -34,6 +34,8 @@ internal class Config<Logging : ConfigInstance, Gatherer : ConfigInstance, Inter
 
     override suspend fun getLanguageCode(): String = getDeviceInfo().language
 
+    override suspend fun getApplicationVersion(): String = getDeviceInfo().applicationVersion
+
     override suspend fun getSdkVersion(): String = getDeviceInfo().sdkVersion
 
     override suspend fun changeApplicationCode(applicationCode: String): Result<Unit> =

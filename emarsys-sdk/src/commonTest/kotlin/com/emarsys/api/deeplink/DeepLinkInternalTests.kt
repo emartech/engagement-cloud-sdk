@@ -13,11 +13,14 @@ import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
+import dev.mokkery.matcher.any
 import dev.mokkery.matcher.capture.Capture.Companion.slot
 import dev.mokkery.matcher.capture.SlotCapture
 import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
+import dev.mokkery.verify.VerifyMode
+import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import io.ktor.http.Url
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +39,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DeepLinkInternalTests: KoinTest {
+class DeepLinkInternalTests : KoinTest {
 
     override fun getKoin(): Koin = koin
 
@@ -44,7 +47,7 @@ class DeepLinkInternalTests: KoinTest {
 
     private lateinit var sdkContext: SdkContextApi
     private lateinit var deepLinkInternal: DeepLinkInternal
-    private lateinit var sdkEventDistributor: SdkEventDistributorApi
+    private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
     private lateinit var eventSlot: SlotCapture<SdkEvent>
 
     @BeforeTest
@@ -60,16 +63,18 @@ class DeepLinkInternalTests: KoinTest {
         sdkContext = SdkContext(
             StandardTestDispatcher(),
             mainDispatcher,
-            DefaultUrls("", "", "", "", ""),
+            DefaultUrls("", "", "", "", "", ""),
             LogLevel.Error,
             mutableSetOf(),
             logBreadcrumbsQueueSize = 10
         )
 
         eventSlot = slot()
-        sdkEventDistributor = mock(MockMode.autofill)
-        everySuspend { sdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(MockMode.autofill)
-        deepLinkInternal = DeepLinkInternal(sdkContext, sdkEventDistributor)
+        mockSdkEventDistributor = mock(MockMode.autofill)
+        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(
+            MockMode.autofill
+        )
+        deepLinkInternal = DeepLinkInternal(sdkContext, mockSdkEventDistributor)
     }
 
     @AfterTest
@@ -79,15 +84,28 @@ class DeepLinkInternalTests: KoinTest {
     }
 
     @Test
-    fun testTrackDeepLink_should_emit_trackDeepLinkEvent_into_sdkEventFlow_if_url_contains_ems_dl_param() =
+    fun testTrackDeepLink_should_emit_trackDeepLinkEvent_into_sdkEventFlow_and_return_true_if_url_contains_ems_dl_param() =
         runTest {
             val url = Url("https://example.com?ems_dl=123")
 
-            deepLinkInternal.trackDeepLink(url)
+            val result = deepLinkInternal.trackDeepLink(url)
 
             val emittedEvent = eventSlot.get()
 
             (emittedEvent is SdkEvent.Internal.Sdk.TrackDeepLink) shouldBe true
             (emittedEvent as SdkEvent.Internal.Sdk.TrackDeepLink).trackingId shouldBe "123"
+            result.getOrNull() shouldBe true
         }
+
+    @Test
+    fun testTrackDeepLink_should_return_false_if_url_doesnt_contain_ems_dl_param() =
+        runTest {
+            val url = Url("https://example.com?any_param=any")
+
+            val result = deepLinkInternal.trackDeepLink(url)
+
+            result.getOrNull() shouldBe false
+            verifySuspend(VerifyMode.exactly(0)) { mockSdkEventDistributor.registerEvent(any()) }
+        }
+
 }

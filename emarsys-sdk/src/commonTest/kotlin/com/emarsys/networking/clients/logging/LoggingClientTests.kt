@@ -186,15 +186,9 @@ class LoggingClientTests {
         every { mockUrlFactory.create(EmarsysUrlType.LOGGING) } returns TEST_BASE_URL
         everySuspend { mockEmarsysClient.send(any()) } returns createTestResponse("{}")
         everySuspend { mockDeviceInfoCollector.collectAsDeviceInfoForLogs() } returns deviceInfoForLogs
-        val testLogAttributes = buildJsonObject {
-            put("message", JsonPrimitive("Test metric message"))
-            put("onScreenStart", JsonPrimitive("111"))
-            put("onScreenEnd", JsonPrimitive("222"))
-            put("onScreenDuration", JsonPrimitive("333"))
-        }
+
         val logEvent = SdkEvent.Internal.Sdk.Metric(
-            level = LogLevel.Metric,
-            attributes = testLogAttributes
+            level = LogLevel.Metric
         )
         val expectedRequest = UrlRequest(
             TEST_BASE_URL,
@@ -208,9 +202,6 @@ class LoggingClientTests {
                             "deviceInfo",
                             json.encodeToJsonElement(deviceInfoForLogs)
                         )
-                        testLogAttributes.forEach { attribute ->
-                            put(attribute.key, attribute.value)
-                        }
                     })))
                 }
 
@@ -241,15 +232,8 @@ class LoggingClientTests {
             throw testException
         }
         everySuspend { mockDeviceInfoCollector.collectAsDeviceInfoForLogs() } returns deviceInfoForLogs
-        val testLogAttributes = buildJsonObject {
-            put("message", JsonPrimitive("Test metric message"))
-            put("onScreenStart", JsonPrimitive("111"))
-            put("onScreenEnd", JsonPrimitive("222"))
-            put("onScreenDuration", JsonPrimitive("333"))
-        }
         val logEvent = SdkEvent.Internal.Sdk.Metric(
-            level = LogLevel.Metric,
-            attributes = testLogAttributes
+            level = LogLevel.Metric
         )
         everySuspend { mockSdkEventManager.emitEvent(logEvent) } returns Unit
         val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {

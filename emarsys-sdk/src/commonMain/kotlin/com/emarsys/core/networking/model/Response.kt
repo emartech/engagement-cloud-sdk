@@ -1,8 +1,7 @@
 package com.emarsys.core.networking.model
 
 import com.emarsys.util.JsonUtil
-import io.ktor.http.Headers
-import io.ktor.http.HttpStatusCode
+import io.ktor.http.*
 
 data class Response(
     val originalRequest: UrlRequest,

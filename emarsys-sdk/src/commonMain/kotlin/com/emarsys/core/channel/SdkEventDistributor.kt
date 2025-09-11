@@ -60,7 +60,7 @@ internal class SdkEventDistributor(
             connectionStatus.first { it }
         }
 
-    override suspend fun registerEvent(sdkEvent: SdkEvent): SdkEventWaiterApi? {
+    override suspend fun registerEvent(sdkEvent: SdkEvent): SdkEventWaiterApi {
         return try {
             if (sdkEvent is OnlineSdkEvent) {
                 eventsDao.insertEvent(sdkEvent)
@@ -75,7 +75,10 @@ internal class SdkEventDistributor(
                 buildJsonObject { put("event", sdkEvent.toString()) },
                 isRemoteLog = sdkEvent !is SdkEvent.Internal.LogEvent
             )
-            null
+            SdkEventWaiter(
+                this@SdkEventDistributor,
+                SdkEvent.Internal.Sdk.Answer.Response(sdkEvent.id, Result.failure<Exception>(exception))
+            )
         }
     }
 

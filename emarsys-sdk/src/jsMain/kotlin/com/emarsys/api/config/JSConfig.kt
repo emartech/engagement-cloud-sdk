@@ -33,6 +33,12 @@ class JSConfig(
         }
     }
 
+    override fun getApplicationVersion(): Promise<String> {
+        return applicationScope.promise {
+            configApi.getApplicationVersion()
+        }
+    }
+
     override fun getSdkVersion(): Promise<String> {
         return applicationScope.promise {
             configApi.getSdkVersion()
@@ -57,7 +63,7 @@ class JSConfig(
         }
     }
 
-    override fun getPushSettings(): Promise<NotificationSettings> {
+    override fun getNotificationSettings(): Promise<NotificationSettings> {
         return applicationScope.promise {
             configApi.getNotificationSettings()
         }

@@ -45,18 +45,29 @@ internal class PushClient(
             .collect {
                 try {
                     sdkLogger.debug("PushClient - consumePushEvents")
-                    createRequest(it)?.let { request ->
+                   val response =  createRequest(it)?.let { request ->
                         emarsysClient.send(
                             request
                         )
                     }
-                    sdkEventManager.emitEvent(SdkEvent.Internal.Sdk.Answer.Ready(originId = it.id))
+                    sdkEventManager.emitEvent(
+                        SdkEvent.Internal.Sdk.Answer.Response(
+                            originId = it.id,
+                            Result.success(response)
+                        )
+                    )
                     it.ack(eventsDao, sdkLogger)
                 } catch (exception: Exception) {
                     clientExceptionHandler.handleException(
                         exception,
                         "PushClient - consumePushEvents",
                         it
+                    )
+                    sdkEventManager.emitEvent(
+                        SdkEvent.Internal.Sdk.Answer.Response(
+                            originId = it.id,
+                            Result.failure<Exception>(exception)
+                        )
                     )
                 }
             }

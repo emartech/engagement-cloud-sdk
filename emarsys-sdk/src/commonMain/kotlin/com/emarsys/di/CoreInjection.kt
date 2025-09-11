@@ -40,6 +40,8 @@ import com.emarsys.core.util.Downloader
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.EventActionFactory
 import com.emarsys.mobileengage.action.EventActionFactoryApi
+import com.emarsys.mobileengage.embedded.messages.EmbeddedMessagesRequestFactory
+import com.emarsys.mobileengage.embedded.messages.EmbeddedMessagingRequestFactoryApi
 import com.emarsys.util.JsonUtil
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import io.ktor.client.HttpClient
@@ -102,7 +104,8 @@ object CoreInjection {
                 "https://mobile-events.eservice.emarsys.net",
                 "https://deep-link.eservice.emarsys.net",
                 "https://mobile-sdk-config.gservice.emarsys.net",
-                "https://log-dealer.gservice.emarsys.net"
+                "https://log-dealer.gservice.emarsys.net",
+                "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api"
             )
         }
         single<SdkEventDistributor> {
@@ -154,6 +157,7 @@ object CoreInjection {
         single<RequestContextApi> { RequestContext() }
         single<SessionContext> { SessionContext() }
         singleOf(::UrlFactory) { bind<UrlFactoryApi>() }
+        singleOf(::EmbeddedMessagesRequestFactory) { bind<EmbeddedMessagingRequestFactoryApi>() }
         single<CryptoApi> {
             Crypto(
                 logger = get<Logger> { parametersOf(Crypto::class.simpleName) },
@@ -180,7 +184,7 @@ enum class NetworkClientTypes {
 }
 
 enum class EventBasedClientTypes {
-    Device, Config, DeepLink, Contact, Event, Push, RemoteConfig, Logging, Reregistration
+    Device, Config, DeepLink, Contact, Event, Push, RemoteConfig, Logging, Reregistration, EmbeddedMessaging
 }
 
 enum class EventFlowTypes {

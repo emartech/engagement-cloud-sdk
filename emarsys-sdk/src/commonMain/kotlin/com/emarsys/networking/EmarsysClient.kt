@@ -19,9 +19,7 @@ import com.emarsys.networking.EmarsysHeaders.X_CLIENT_ID_HEADER
 import com.emarsys.networking.EmarsysHeaders.X_CLIENT_STATE_HEADER
 import com.emarsys.networking.EmarsysHeaders.X_CONTACT_TOKEN_HEADER
 import com.emarsys.networking.clients.error.ResponseErrorBody
-import io.ktor.http.HttpMethod
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.isSuccess
+import io.ktor.http.*
 import kotlinx.coroutines.delay
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
@@ -94,14 +92,19 @@ internal class EmarsysClient(
         if (response.status.value in HttpStatusCode.BadRequest.value..HttpStatusCode.GatewayTimeout.value) {
             val parsedBody = response.body<ResponseErrorBody>()
 
-            val event = when (parsedBody.error.code) {
-                in 1100..1199 -> SdkEvent.Internal.Sdk.ReregistrationRequired()
-                in 1200..1299 -> SdkEvent.Internal.Sdk.RemoteConfigUpdateRequired()
-                else -> null
+            val event = try {
+                when (parsedBody.error.code.toInt()) {
+                    in 1100..1199 -> SdkEvent.Internal.Sdk.ReregistrationRequired()
+                    in 1200..1299 -> SdkEvent.Internal.Sdk.RemoteConfigUpdateRequired()
+                    else -> null
+                }
+            } catch (ignored: NumberFormatException) {
+                sdkLogger.debug("Response error code can't be parsed to Int. Error code value: ${parsedBody.error.code}")
+                null
             }
 
             sdkLogger.debug(
-                "Received ${response.status.value} status code, mapped to ${event?.name ?: "unknown"} event",
+                "Received ${response.status.value} status code, mapped to ${event ?: "unknown"} event",
             )
             event?.let {
                 sdkEventDistributor.registerEvent(event)

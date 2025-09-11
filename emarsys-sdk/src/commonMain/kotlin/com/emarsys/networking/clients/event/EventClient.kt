@@ -69,7 +69,7 @@ internal class EventClient(
 
     private suspend fun startEventConsumer() {
         sdkEventManager.onlineSdkEvents
-            .filter { it is SdkEvent.Internal.Reporting || it is SdkEvent.Internal.Custom || it is SdkEvent.External.Custom }
+            .filter { it is SdkEvent.DeviceEvent }
             .naturalBatching().onEach { sdkEvents ->
                 try {
                     sdkLogger.debug("Consume Events, Batch size: ${sdkEvents.size}")
@@ -77,7 +77,7 @@ internal class EventClient(
                     val requestBody =
                         DeviceEventRequestBody(
                             inAppConfigApi.inAppDnd,
-                            sdkEvents.map { it.toDeviceEvent() },
+                            sdkEvents.map { (it as SdkEvent.DeviceEvent).toDeviceEvent() },
                             requestContext.deviceEventState
                         )
                     val body = json.encodeToString(requestBody)
@@ -100,7 +100,12 @@ internal class EventClient(
                     handleInApp(result.contentCampaigns?.getOrNull(0))  // todo handle all campaigns returned
                     result.actionCampaigns?.let { handleOnEventActionCampaigns(it) }
                     sdkEvents.forEach {
-                        sdkEventManager.emitEvent(SdkEvent.Internal.Sdk.Answer.Ready(originId = it.id))
+                        sdkEventManager.emitEvent(
+                            SdkEvent.Internal.Sdk.Answer.Response(
+                                originId = it.id,
+                                Result.success(response)
+                            )
+                        )
                     }
                     sdkEvents.ack(eventsDao, sdkLogger)
                 } catch (throwable: Throwable) {
@@ -109,6 +114,14 @@ internal class EventClient(
                         "EventClient: Error during event consumption",
                         *sdkEvents.toTypedArray()
                     )
+                    sdkEvents.forEach {
+                        sdkEventManager.emitEvent(
+                            SdkEvent.Internal.Sdk.Answer.Response(
+                                originId = it.id,
+                                Result.failure<Throwable>(throwable)
+                            )
+                        )
+                    }
                 }
             }.collect()
     }

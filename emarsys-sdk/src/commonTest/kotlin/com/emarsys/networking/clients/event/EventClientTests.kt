@@ -137,7 +137,7 @@ class EventClientTests {
         every { mockUuidProvider.provide() } returns UUID
         every { mockSdkEventManager.onlineSdkEvents } returns onlineEvents
         everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
-        everySuspend { mockSdkEventManager.registerEvent(any()) } returns null
+        everySuspend { mockSdkEventManager.registerEvent(any()) } returns mock()
         every { mockInAppConfigApi.inAppDnd }.returns(IN_APP_DND)
         every { mockUrlFactory.create(EmarsysUrlType.EVENT) }.returns(TEST_BASE_URL)
         everySuspend { mockSdkLogger.error(any(), any<Throwable>(), true) } returns Unit
@@ -428,7 +428,7 @@ class EventClientTests {
             val onEventActionExecutedEventCaptureContainer = Capture.container<SdkEvent.Internal.OnEventActionExecuted>()
             everySuspend {
                 mockSdkEventManager.registerEvent(capture(onEventActionExecutedEventCaptureContainer))
-            } returns null
+            } returns mock()
             val expectedUrlRequest = createTestRequest()
             val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
                 onlineEvents.take(1).toList()
@@ -524,7 +524,7 @@ class EventClientTests {
             val onEventActionExecutedEventCaptureContainer = Capture.container<SdkEvent.Internal.OnEventActionExecuted>()
             everySuspend {
                 mockSdkEventManager.registerEvent(capture(onEventActionExecutedEventCaptureContainer))
-            } returns null
+            } returns mock()
             val expectedUrlRequest = createTestRequest()
             val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
                 onlineEvents.take(1).toList()

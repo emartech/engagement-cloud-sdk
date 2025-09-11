@@ -13,6 +13,8 @@ class IosConfig : IosConfigApi {
 
     override suspend fun getLanguageCode(): String = koin.get<ConfigApi>().getLanguageCode()
 
+    override suspend fun getApplicationVersion(): String = koin.get<ConfigApi>().getApplicationVersion()
+
     override suspend fun getSdkVersion(): String = koin.get<ConfigApi>().getSdkVersion()
 
     override suspend fun getNotificationSettings(): IosNotificationSettings {

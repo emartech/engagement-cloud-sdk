@@ -5,9 +5,9 @@ import io.ktor.http.Url
 import platform.Foundation.NSUserActivity
 
 class IosDeepLink: IosDeepLinkApi {
-    override suspend fun track(userActivity: NSUserActivity) {
-        userActivity.webpageURL?.absoluteString()?.let {
-            koin.get<DeepLinkApi>().trackDeepLink(Url(it)).getOrThrow()
-        }
+    override fun track(userActivity: NSUserActivity): Boolean {
+        return userActivity.webpageURL?.absoluteString()?.let {
+            koin.get<DeepLinkApi>().trackDeepLink(Url(it)).getOrNull()
+        } ?: false
     }
 }

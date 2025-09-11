@@ -15,9 +15,7 @@ internal abstract class AbstractSqlDelightEventsDao(db: EmarsysDB, private val j
         queries.insertEvent(
             id = event.id,
             type = event.type,
-            name = event.name,
             timestamp = event.timestamp.toEpochMilliseconds(),
-            attributes = event.attributes.toString(),
             json = json.encodeToString(event)
         )
     }
@@ -26,9 +24,7 @@ internal abstract class AbstractSqlDelightEventsDao(db: EmarsysDB, private val j
         queries.upsertEvent(
             id = event.id,
             type = event.type,
-            name = event.name,
             timestamp = event.timestamp.toEpochMilliseconds(),
-            attributes = event.attributes.toString(),
             json = json.encodeToString(event)
         )
     }

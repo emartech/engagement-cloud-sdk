@@ -10,6 +10,7 @@ import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
+import com.emarsys.event.SdkEvent.Internal.Sdk.Answer.Response
 import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.error.ClientExceptionHandler
 import com.emarsys.remoteConfig.RemoteConfigResponse
@@ -59,13 +60,24 @@ internal class RemoteConfigClient(
                     remoteConfigResponse?.let {
                         remoteConfigResponseHandler.handle(remoteConfigResponse)
                     }
-                    sdkEventManager.emitEvent(SdkEvent.Internal.Sdk.Answer.Ready(originId = it.id))
+                    sdkEventManager.emitEvent(
+                        Response(
+                            originId = it.id,
+                            Result.success(remoteConfigResponse)
+                        )
+                    )
                     it.ack(eventsDao, sdkLogger)
                 } catch (exception: Exception) {
                     clientExceptionHandler.handleException(
                         exception,
                         "RemoteConfigClient: ConsumeRemoteConfigEvents error",
                         it
+                    )
+                    sdkEventManager.emitEvent(
+                        SdkEvent.Internal.Sdk.Answer.Response(
+                            originId = it.id,
+                            Result.failure<Exception>(exception)
+                        )
                     )
                 }
             }

@@ -309,6 +309,7 @@ object AndroidInjection {
         }
         single<AndroidDeepLinkApi> {
             AndroidDeepLink(
+                sdkDispatcher = get(named(DispatcherTypes.Sdk)),
                 deepLink = get<DeepLinkApi>(),
                 sdkLogger = get {
                     parametersOf(AndroidDeepLink::class.simpleName)

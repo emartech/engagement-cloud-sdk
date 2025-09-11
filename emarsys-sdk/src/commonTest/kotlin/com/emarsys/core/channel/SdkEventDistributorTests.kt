@@ -156,7 +156,6 @@ class SdkEventDistributorTests: KoinTest {
     fun registerAndStoreEvent_shouldNotPersistNotOnlineEvents_andEmitSdkEvent_toSdkEventFlow() =
         runTest {
             val testEvent = SdkEvent.External.Api.BadgeCountEvent(
-                name = "testEventName",
                 badgeCount = 1234,
                 method = "set"
             )
