@@ -1,6 +1,7 @@
 package com.emarsys.enable.states
 
 import com.emarsys.core.channel.SdkEventDistributorApi
+import com.emarsys.core.channel.SdkEventWaiterApi
 import com.emarsys.event.SdkEvent
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -25,11 +26,18 @@ class RegisterClientStateTests {
     private lateinit var eventSlot: SlotCapture<SdkEvent>
     private lateinit var registerClientState: RegisterClientState
 
+    private lateinit var mockWaiter: SdkEventWaiterApi
+
     @BeforeTest
     fun setup() = runTest {
+        mockWaiter = mock()
+        everySuspend { mockWaiter.await<Any>() } returns SdkEvent.Internal.Sdk.Answer.Response(
+            "0",
+            Result.success(Any())
+        )
         mockEventDistributor = mock()
         eventSlot = slot()
-        everySuspend { mockEventDistributor.registerEvent(capture(eventSlot)) } returns mock(MockMode.autofill)
+        everySuspend { mockEventDistributor.registerEvent(capture(eventSlot)) } returns mockWaiter
         registerClientState = RegisterClientState(mockEventDistributor)
     }
 

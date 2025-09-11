@@ -3,12 +3,14 @@ package com.emarsys.networking.clients.device
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
+import com.emarsys.core.exceptions.SdkException.NetworkIOException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType.REGISTER_DEVICE_INFO
 import com.emarsys.core.url.UrlFactoryApi
+import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
 import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.contact.ContactTokenHandlerApi
@@ -43,37 +45,47 @@ internal class DeviceClient(
     private suspend fun startEventConsumer() {
         sdkEventManager.onlineSdkEvents
             .filter { it is SdkEvent.Internal.Sdk.RegisterDeviceInfo }
-            .collect {
+            .collect { sdkEvent ->
+                sdkLogger.debug("DeviceClient - consumeRegisterDeviceInfo")
                 try {
-                    sdkLogger.debug("DeviceClient - consumeRegisterDeviceInfo")
                     val request = createRequest()
-                    val response = emarsysClient.send(
-                        request
-                    )
-                    if (response.status == HttpStatusCode.OK) {
-                        contactTokenHandler.handleContactTokens(response)
+                    val networkResponse = emarsysClient.send(request)
+                    networkResponse.onSuccess { response ->
+                        if (response.status == HttpStatusCode.OK) {
+                            contactTokenHandler.handleContactTokens(response)
+                        }
+                        sdkEventManager.emitEvent(
+                            SdkEvent.Internal.Sdk.Answer.Response(
+                                originId = sdkEvent.id,
+                                Result.success(response)
+                            )
+                        )
+                        sdkEvent.ack(eventsDao, sdkLogger)
                     }
-                    sdkEventManager.emitEvent(
-                        SdkEvent.Internal.Sdk.Answer.Response(
-                            originId = it.id,
-                            Result.success(response)
-                        )
-                    )
-                    it.ack(eventsDao, sdkLogger)
-                } catch (exception: Exception) {
-                    clientExceptionHandler.handleException(
-                        exception,
-                        "DeviceClient - consumeRegisterDeviceInfo",
-                        it
-                    )
-                    sdkEventManager.emitEvent(
-                        SdkEvent.Internal.Sdk.Answer.Response(
-                            originId = it.id,
-                            Result.failure<Exception>(exception)
-                        )
-                    )
+                    networkResponse.onFailure { exception ->
+                        handleException(exception, sdkEvent)
+                    }
+                } catch (e: Exception) {
+                    handleException(e, sdkEvent)
                 }
             }
+    }
+
+    private suspend fun handleException(exception: Throwable, sdkEvent: OnlineSdkEvent) {
+        if (exception is NetworkIOException) {
+            sdkEventManager.emitEvent(sdkEvent)
+        } else {
+            SdkEvent.Internal.Sdk.Answer.Response(
+                originId = sdkEvent.id,
+                Result.failure<Exception>(exception)
+            )
+
+        }
+        clientExceptionHandler.handleException(
+            exception,
+            "DeviceClient - consumeRegisterDeviceInfo",
+            sdkEvent
+        )
     }
 
     private suspend fun createRequest(): UrlRequest {

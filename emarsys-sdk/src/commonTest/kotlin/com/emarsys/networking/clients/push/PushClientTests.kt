@@ -111,11 +111,13 @@ class PushClientTests {
             HttpMethod.Put,
             """{"pushToken":"testPushToken"}"""
         )
-        everySuspend { mockEmarsysClient.send(expectedUrlRequest) } returns Response(
-            expectedUrlRequest,
-            HttpStatusCode.OK,
-            Headers.Empty,
-            ""
+        everySuspend { mockEmarsysClient.send(expectedUrlRequest) } returns Result.success(
+            Response(
+                expectedUrlRequest,
+                HttpStatusCode.OK,
+                Headers.Empty,
+                ""
+            )
         )
         val registerPushTokenEvent = SdkEvent.Internal.Sdk.RegisterPushToken(
             id = ID,
@@ -144,11 +146,13 @@ class PushClientTests {
             URL,
             HttpMethod.Delete
         )
-        everySuspend { mockEmarsysClient.send(expectedUrlRequest) } returns Response(
-            expectedUrlRequest,
-            HttpStatusCode.OK,
-            Headers.Empty,
-            ""
+        everySuspend { mockEmarsysClient.send(expectedUrlRequest) } returns Result.success(
+            Response(
+                expectedUrlRequest,
+                HttpStatusCode.OK,
+                Headers.Empty,
+                ""
+            )
         )
         val clearPushTokenEvent = SdkEvent.Internal.Sdk.ClearPushToken(ID, TIMESTAMP)
 
@@ -171,10 +175,7 @@ class PushClientTests {
         createPushClient(backgroundScope).register()
         val testException = IOException("Network error")
 
-        everySuspend { mockEmarsysClient.send(any()) } calls { args ->
-            (args.arg(1) as suspend () -> Unit).invoke()
-            throw testException
-        }
+        everySuspend { mockEmarsysClient.send(any()) } returns Result.failure(testException)
         val clearPushTokenEvent = SdkEvent.Internal.Sdk.ClearPushToken(ID, TIMESTAMP)
         everySuspend { mockSdkEventManager.emitEvent(clearPushTokenEvent) } returns Unit
 
@@ -190,6 +191,12 @@ class PushClientTests {
         verifySuspend {
             mockEmarsysClient.send(any())
             mockSdkEventManager.emitEvent(clearPushTokenEvent)
+            mockSdkEventManager.emitEvent(
+                SdkEvent.Internal.Sdk.Answer.Response(
+                    originId = clearPushTokenEvent.id,
+                    Result.failure<Exception>(testException)
+                )
+            )
         }
         verifySuspend {
             mockClientExceptionHandler.handleException(

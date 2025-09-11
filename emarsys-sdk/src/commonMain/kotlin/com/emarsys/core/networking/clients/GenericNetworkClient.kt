@@ -43,12 +43,13 @@ internal class GenericNetworkClient(
         request: UrlRequest
     ): Result<Response> {
         var retries = 0
-        var result: Result<Response>
-        val networkDuration = measureTime {
-            result = try {
-                val httpResponse = client.request {
+        return try {
+            var httpResponse: HttpResponse
+            val networkDuration: Duration = measureTime {
+                httpResponse = client.request {
                     val shouldAddDefaultHeader =
-                        request.headers?.get(HttpHeaders.ContentType)?.toString().isNullOrEmpty()
+                        request.headers?.get(HttpHeaders.ContentType)?.toString()
+                            .isNullOrEmpty()
                     if (shouldAddDefaultHeader) {
                         contentType(ContentType.Application.Json)
                     }
@@ -68,54 +69,63 @@ internal class GenericNetworkClient(
                     }
                     request.bodyString?.let { setBody(request.bodyString) }
                 }
-                Result.success(
-                    Response(
-                        request,
-                        httpResponse.status,
-                        httpResponse.headers,
-                        httpResponse.bodyAsText()
-                    )
-                )
-            } catch (throwable: Throwable) {
-                sdkLogger.error(
-                    "EventClient - consumeEvents: Exception during event consumption",
-                    throwable,
-                    isRemoteLog = !request.isLogRequest
-                )
-                Result.failure(
-                    if (coroutineContext.isActive) {
-                        NetworkIOException(
-                            throwable.message ?: "IOException during network request"
-                        )
-                    } else {
-                        CoroutineException(
-                            throwable.message ?: "Coroutine cancelled during network request"
-                        )
-                    }
-                )
             }
-        }
-        val response = result.getOrNull()
-        response?.let {
-            networkDebugLog(request, it, networkDuration)
-            networkInfoLog(request, it, networkDuration, retries)
-            result = when {
-                !it.status.isSuccess() && it.status != HttpStatusCode.Unauthorized && retries == MAX_RETRY_COUNT -> {
-                    networkErrorLog("Request retry limit reached!", it, request, retries, networkDuration)
-                    Result.failure(RetryLimitReachedException("Request retry limit reached! Response: ${it.bodyAsText}"))
+            networkDebugLog(request, httpResponse, networkDuration)
+            networkInfoLog(request, httpResponse, networkDuration, retries)
+            val response = Response(
+                request,
+                httpResponse.status,
+                httpResponse.headers,
+                httpResponse.bodyAsText()
+            )
+            when {
+                httpResponse.status.isSuccess() -> {
+                    Result.success(response)
+                }
+                !httpResponse.status.isSuccess() && httpResponse.status != HttpStatusCode.Unauthorized && retries == MAX_RETRY_COUNT -> {
+                    networkErrorLog(
+                        "Request retry limit reached!",
+                        httpResponse,
+                        request,
+                        retries,
+                        networkDuration
+                    )
+                    Result.failure(RetryLimitReachedException("Request retry limit reached! Response: ${httpResponse.bodyAsText()}"))
                 }
                 else -> {
-                    networkErrorLog("Request failed with status code: ${it.status.value}", it, request, retries, networkDuration)
-                    Result.failure(FailedRequestException(it))
+                    networkErrorLog(
+                        "Request failed with status code: ${httpResponse.status.value}",
+                        httpResponse,
+                        request,
+                        retries,
+                        networkDuration
+                    )
+                    Result.failure(FailedRequestException(response))
                 }
             }
+        } catch (throwable: Throwable) {
+            sdkLogger.error(
+                "EventClient - consumeEvents: Exception during event consumption",
+                throwable,
+                isRemoteLog = !request.isLogRequest
+            )
+            Result.failure(
+                if (coroutineContext.isActive) {
+                    NetworkIOException(
+                        throwable.message ?: "IOException during network request"
+                    )
+                } else {
+                    CoroutineException(
+                        throwable.message ?: "Coroutine cancelled during network request"
+                    )
+                }
+            )
         }
-        return result
     }
 
     private suspend fun networkInfoLog(
         request: UrlRequest,
-        response1: Response,
+        response: HttpResponse,
         networkDuration: Duration,
         retries: Int
     ) {
@@ -124,7 +134,7 @@ internal class GenericNetworkClient(
             buildJsonObject {
                 put("url", request.url.toString())
                 put("method", request.method.value)
-                put("statusCode", response1.status.value)
+                put("statusCode", response.status.value)
                 put("networkingDuration", networkDuration.inWholeMilliseconds)
                 put("retries", retries)
             },
@@ -134,7 +144,7 @@ internal class GenericNetworkClient(
 
     private suspend fun networkDebugLog(
         request: UrlRequest,
-        response1: Response,
+        response: HttpResponse,
         networkDuration: Duration
     ) {
         sdkLogger.debug(
@@ -142,7 +152,7 @@ internal class GenericNetworkClient(
             buildJsonObject {
                 put("url", request.url.toString())
                 put("method", request.method.value)
-                put("statusCode", response1.status.value)
+                put("statusCode", response.status.value)
                 if (request.bodyString != null) {
                     put("payload", request.bodyString)
                 }
@@ -155,7 +165,13 @@ internal class GenericNetworkClient(
         )
     }
 
-    private suspend fun networkErrorLog(topic: String, response: Response, request: UrlRequest, retries: Int, networkDuration: Duration) {
+    private suspend fun networkErrorLog(
+        topic: String,
+        response: HttpResponse,
+        request: UrlRequest,
+        retries: Int,
+        networkDuration: Duration
+    ) {
         sdkLogger.error(
             LogEntry(
                 topic,
@@ -166,7 +182,7 @@ internal class GenericNetworkClient(
                         networkDuration.inWholeMilliseconds
                     )
                     put("retries", retries)
-                    put("url", response.originalRequest.url.toString())
+                    put("url", request.url.toString())
                 }
             ),
             isRemoteLog = !request.isLogRequest

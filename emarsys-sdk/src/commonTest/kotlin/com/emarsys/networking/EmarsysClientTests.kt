@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalCoroutinesApi::class)
-
 package com.emarsys.networking
 
 import com.emarsys.core.channel.SdkEventDistributorApi
@@ -58,7 +56,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalTime::class)
+@OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
 class EmarsysClientTests {
     private companion object {
         const val ID = "testId"
@@ -204,7 +202,7 @@ class EmarsysClientTests {
             json.encodeToString(testData)
         )
 
-        val response: Response = emarsysClient.send(request)
+        val response: Response = emarsysClient.send(request).getOrNull()!!
 
         response shouldBe expectedResponse
         response.body<TestDataClass>() shouldBe testData
@@ -250,7 +248,7 @@ class EmarsysClientTests {
             )
         )
 
-        val response: Response = emarsysClient.send(request)
+        val response: Response = emarsysClient.send(request).getOrNull()!!
 
         response.originalRequest.headers?.get("test-header") shouldBe "testHeader"
         response.originalRequest.headers?.get(CLIENT_ID_HEADER) shouldBe CLIENT_ID
@@ -262,30 +260,32 @@ class EmarsysClientTests {
     fun testSend_should_emit_ReregistrationRequiredEvent_toSdkEventFlow_whenStatusCodeIs_inRange_400_504_andErrorCodeIsInRange_1100_1199() =
         runTest {
 
-            everySuspend { mockNetworkClient.send(any()) } returns Response(
-                UrlRequest(
-                    Url("https://testUrl.com"),
-                    HttpMethod.Get,
-                    null,
-                ),
-                HttpStatusCode(400, "test"),
-                headersOf("Content-Type", "application/json"),
-                buildJsonObject {
-                    put("error", buildJsonObject {
-                        put("code", "1112")
-                        put("message", "The contact-token could be not verified")
-                        put("target", "/v4/apps/EMS-1234/client")
-                        putJsonArray("details") {
-                            add(buildJsonObject {
-                                put("code", "1100")
-                                put(
-                                    "message",
-                                    "refresh token could not be decrypted, complete re-registration required"
-                                )
-                            })
-                        }
-                    })
-                }.toString()
+            everySuspend { mockNetworkClient.send(any()) } returns Result.success(
+                Response(
+                    UrlRequest(
+                        Url("https://testUrl.com"),
+                        HttpMethod.Get,
+                        null,
+                    ),
+                    HttpStatusCode(400, "test"),
+                    headersOf("Content-Type", "application/json"),
+                    buildJsonObject {
+                        put("error", buildJsonObject {
+                            put("code", "1112")
+                            put("message", "The contact-token could be not verified")
+                            put("target", "/v4/apps/EMS-1234/client")
+                            putJsonArray("details") {
+                                add(buildJsonObject {
+                                    put("code", "1100")
+                                    put(
+                                        "message",
+                                        "refresh token could not be decrypted, complete re-registration required"
+                                    )
+                                })
+                            }
+                        })
+                    }.toString()
+                )
             )
 
             emarsysClient.send(UrlRequest(Url("https://testUrl.com"), HttpMethod.Get, null))
@@ -302,30 +302,32 @@ class EmarsysClientTests {
     @Test
     fun testSend_should_emit_RemoteConfigUpdateRequiredEvent_toSdkEventFlow_whenStatusCodeIs_inRange_400_504_andErrorCodeIsInRange_1200_1299() =
         runTest {
-            everySuspend { mockNetworkClient.send(any()) } returns Response(
-                UrlRequest(
-                    Url("https://testUrl.com"),
-                    HttpMethod.Get,
-                    null,
-                ),
-                HttpStatusCode(401, "test"),
-                headersOf("Content-Type", "application/json"),
-                buildJsonObject {
-                    put("error", buildJsonObject {
-                        put("code", "1200")
-                        put("message", "The contact-token could be not verified")
-                        put("target", "/v4/apps/EMS-1234/client")
-                        putJsonArray("details") {
-                            add(buildJsonObject {
-                                put("code", "1201")
-                                put(
-                                    "message",
-                                    "refresh token could not be decrypted, complete re-registration required"
-                                )
-                            })
-                        }
-                    })
-                }.toString()
+            everySuspend { mockNetworkClient.send(any()) } returns Result.success(
+                Response(
+                    UrlRequest(
+                        Url("https://testUrl.com"),
+                        HttpMethod.Get,
+                        null,
+                    ),
+                    HttpStatusCode(401, "test"),
+                    headersOf("Content-Type", "application/json"),
+                    buildJsonObject {
+                        put("error", buildJsonObject {
+                            put("code", "1200")
+                            put("message", "The contact-token could be not verified")
+                            put("target", "/v4/apps/EMS-1234/client")
+                            putJsonArray("details") {
+                                add(buildJsonObject {
+                                    put("code", "1201")
+                                    put(
+                                        "message",
+                                        "refresh token could not be decrypted, complete re-registration required"
+                                    )
+                                })
+                            }
+                        })
+                    }.toString()
+                )
             )
 
             emarsysClient.send(UrlRequest(Url("https://testUrl.com"), HttpMethod.Get, null))
@@ -342,30 +344,32 @@ class EmarsysClientTests {
     @Test
     fun testSend_should_not_crash_and_log_when_errorCode_cant_be_parsed_toInt() = runTest {
         val invalidErrorCode = "STRING_INSTEAD_OF_NUMBER"
-        everySuspend { mockNetworkClient.send(any()) } returns Response(
-            UrlRequest(
-                Url("https://testUrl.com"),
-                HttpMethod.Get,
-                null,
-            ),
-            HttpStatusCode(401, "test"),
-            headersOf("Content-Type", "application/json"),
-            buildJsonObject {
-                put("error", buildJsonObject {
-                    put("code", invalidErrorCode)
-                    put("message", "Anything")
-                    put("target", "Anything")
-                    putJsonArray("details") {
-                        add(buildJsonObject {
-                            put("code", "1201")
-                            put(
-                                "message",
-                                "TestMessage"
-                            )
-                        })
-                    }
-                })
-            }.toString()
+        everySuspend { mockNetworkClient.send(any()) } returns Result.success(
+            Response(
+                UrlRequest(
+                    Url("https://testUrl.com"),
+                    HttpMethod.Get,
+                    null,
+                ),
+                HttpStatusCode(401, "test"),
+                headersOf("Content-Type", "application/json"),
+                buildJsonObject {
+                    put("error", buildJsonObject {
+                        put("code", invalidErrorCode)
+                        put("message", "Anything")
+                        put("target", "Anything")
+                        putJsonArray("details") {
+                            add(buildJsonObject {
+                                put("code", "1201")
+                                put(
+                                    "message",
+                                    "TestMessage"
+                                )
+                            })
+                        }
+                    })
+                }.toString()
+            )
         )
 
         emarsysClient.send(UrlRequest(Url("https://testUrl.com"), HttpMethod.Get, null))

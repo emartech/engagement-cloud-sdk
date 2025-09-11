@@ -130,7 +130,7 @@ class LoggingClientTests {
         createLoggingClient(backgroundScope).register()
 
         every { mockUrlFactory.create(EmarsysUrlType.LOGGING) } returns TEST_BASE_URL
-        everySuspend { mockEmarsysClient.send(any()) } returns createTestResponse("{}")
+        everySuspend { mockEmarsysClient.send(any()) } returns Result.success(createTestResponse("{}"))
         everySuspend { mockDeviceInfoCollector.collectAsDeviceInfoForLogs() } returns deviceInfoForLogs
         val testLogAttributes = buildJsonObject {
             put("message", JsonPrimitive("Test log message"))
@@ -184,7 +184,7 @@ class LoggingClientTests {
     fun testConsumer_should_call_client_with_metricEvent() = runTest {
         createLoggingClient(backgroundScope).register()
         every { mockUrlFactory.create(EmarsysUrlType.LOGGING) } returns TEST_BASE_URL
-        everySuspend { mockEmarsysClient.send(any()) } returns createTestResponse("{}")
+        everySuspend { mockEmarsysClient.send(any()) } returns Result.success(createTestResponse("{}"))
         everySuspend { mockDeviceInfoCollector.collectAsDeviceInfoForLogs() } returns deviceInfoForLogs
 
         val logEvent = SdkEvent.Internal.Sdk.Metric(
@@ -227,15 +227,12 @@ class LoggingClientTests {
 
         val testException = IOException("No Internet")
         every { mockUrlFactory.create(EmarsysUrlType.LOGGING) } returns TEST_BASE_URL
-        everySuspend { mockEmarsysClient.send(any()) } calls { args ->
-            (args.arg(1) as suspend () -> Unit).invoke()
-            throw testException
-        }
+        everySuspend { mockEmarsysClient.send(any()) } returns Result.failure(testException)
         everySuspend { mockDeviceInfoCollector.collectAsDeviceInfoForLogs() } returns deviceInfoForLogs
         val logEvent = SdkEvent.Internal.Sdk.Metric(
             level = LogLevel.Metric
         )
-        everySuspend { mockSdkEventManager.emitEvent(logEvent) } returns Unit
+        everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
         val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
             logEvents.take(1).toList()
         }

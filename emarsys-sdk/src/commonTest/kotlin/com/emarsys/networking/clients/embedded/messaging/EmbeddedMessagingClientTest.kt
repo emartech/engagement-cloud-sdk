@@ -2,6 +2,7 @@ package com.emarsys.networking.clients.embedded.messaging
 
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
+import com.emarsys.core.exceptions.SdkException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
@@ -123,7 +124,7 @@ class EmbeddedMessagingClientTest {
                 bodyAsText = "{}"
             )
 
-            everySuspend { mockEmarsysNetworkClient.send(request, any()) } returns expectedResponse
+            everySuspend { mockEmarsysNetworkClient.send(request) } returns Result.success(expectedResponse)
             everySuspend { mockEventsDao.removeEvent(event) } returns Unit
             everySuspend {
                 mockSdkEventManager.emitEvent(
@@ -148,7 +149,7 @@ class EmbeddedMessagingClientTest {
                     event
                 )
             }
-            verifySuspend { mockEmarsysNetworkClient.send(request, any()) }
+            verifySuspend { mockEmarsysNetworkClient.send(request) }
             verifySuspend { mockEventsDao.removeEvent(event) }
             verifySuspend {
                 mockSdkEventManager.emitEvent(
@@ -181,12 +182,12 @@ class EmbeddedMessagingClientTest {
 
         everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
         everySuspend { mockEmbeddedMessagesRequestFactory.create(any()) } returns request
-        everySuspend { mockEmarsysNetworkClient.send(any(), any()) } returns Response(
+        everySuspend { mockEmarsysNetworkClient.send(any()) } returns Result.success(Response(
             status = HttpStatusCode.OK,
             headers = Headers.Empty,
             originalRequest = request,
             bodyAsText = "{}"
-        )
+        ))
 
         onlineEvents.emit(event1)
         onlineEvents.emit(event2)
@@ -223,10 +224,7 @@ class EmbeddedMessagingClientTest {
             bodyAsText = "{}"
         )
 
-        everySuspend { mockEmarsysNetworkClient.send(request, any()) } calls { args ->
-            (args.arg(1) as (suspend () -> Unit)).invoke()
-            expectedResponse
-        }
+        everySuspend { mockEmarsysNetworkClient.send(request) } returns Result.failure(SdkException.NetworkIOException("Test Network error"))
 
         val onlineSdkEvents = backgroundScope.async {
             onlineEvents.take(1).toList()
@@ -239,7 +237,7 @@ class EmbeddedMessagingClientTest {
 
         onlineSdkEvents.await() shouldBe listOf(event)
         verifySuspend { mockEmbeddedMessagesRequestFactory.create(event) }
-        verifySuspend { mockEmarsysNetworkClient.send(request, any()) }
+        verifySuspend { mockEmarsysNetworkClient.send(request) }
         verifySuspend { mockSdkEventManager.emitEvent(event) }
     }
 
@@ -270,7 +268,7 @@ class EmbeddedMessagingClientTest {
         advanceUntilIdle()
 
         onlineSdkEvents.await() shouldBe listOf(event)
-        verifySuspend(VerifyMode.exactly(0)) { mockEmarsysNetworkClient.send(any(), any()) }
+        verifySuspend(VerifyMode.exactly(0)) { mockEmarsysNetworkClient.send(any()) }
         verifySuspend {
             mockClientExceptionHandler.handleException(
                 testException,

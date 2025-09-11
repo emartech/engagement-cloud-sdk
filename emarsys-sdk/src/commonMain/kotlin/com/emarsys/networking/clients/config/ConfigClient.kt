@@ -3,11 +3,14 @@ package com.emarsys.networking.clients.config
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
+import com.emarsys.core.exceptions.SdkException.NetworkIOException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
+import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
+import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
 import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.contact.ContactTokenHandlerApi
@@ -40,29 +43,44 @@ internal class ConfigClient(
     private suspend fun startEventConsumer() {
         sdkEventManager.onlineSdkEvents
             .filter { it is SdkEvent.Internal.Sdk.ChangeAppCode }
-            .collect {
+            .collect { sdkEvent ->
                 try {
                     sdkLogger.debug("ConfigClient - consumeConfigChanges")
+
                     val url = urlFactory.create(EmarsysUrlType.CHANGE_APPLICATION_CODE)
                     val request = UrlRequest(url, HttpMethod.Post)
-
-                    val response =
-                        emarsysNetworkClient.send(
-                            request
-                        )
-                    contactTokenHandler.handleContactTokens(response)
-                    if (it is SdkEvent.Internal.Sdk.ChangeAppCode) {
-                        sdkContext.config =
-                            sdkContext.config?.copyWith(applicationCode = it.applicationCode)
+                    val response = emarsysNetworkClient.send(request)
+                    response.onSuccess {
+                        contactTokenHandler.handleContactTokens(it)
+                        if (sdkEvent is SdkEvent.Internal.Sdk.ChangeAppCode) {
+                            sdkContext.config =
+                                sdkContext.config?.copyWith(applicationCode = sdkEvent.applicationCode)
+                        }
+                        sdkEvent.ack(eventsDao, sdkLogger)
                     }
-                    it.ack(eventsDao, sdkLogger)
-                } catch (exception: Exception) {
-                    clientExceptionHandler.handleException(
-                        exception,
-                        "ConfigClient - consumeConfigChanges",
-                        it
-                    )
+                    response.onFailure { throwable ->
+                        handleException(throwable, sdkEvent)
+                    }
+                } catch (e: Exception) {
+                    handleException(e, sdkEvent)
                 }
             }
+    }
+
+    private suspend fun handleException(exception: Throwable, sdkEvent: OnlineSdkEvent) {
+        if (exception is NetworkIOException) {
+            sdkEventManager.emitEvent(sdkEvent)
+        } else {
+            SdkEvent.Internal.Sdk.Answer.Response(
+                originId = sdkEvent.id,
+                Result.failure<Exception>(exception)
+            )
+
+        }
+        clientExceptionHandler.handleException(
+            exception,
+            "ConfigClient - consumeConfigChanges",
+            sdkEvent
+        )
     }
 }

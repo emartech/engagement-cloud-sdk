@@ -3,6 +3,7 @@ package com.emarsys.networking.clients.device
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
+import com.emarsys.core.exceptions.SdkException.NetworkIOException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
@@ -80,7 +81,7 @@ class DeviceClientTests {
         everySuspend { mockSdkLogger.error(any(), any<Throwable>()) } calls {
             (it.args[1] as Throwable).printStackTrace()
         }
-        onlineEvents = spy(MutableSharedFlow(replay = 5))
+        onlineEvents = MutableSharedFlow(replay = 5)
         mockSdkEventManager = mock(MockMode.autofill)
         every { mockSdkEventManager.onlineSdkEvents } returns onlineEvents
         mockEventsDao = mock(MockMode.autoUnit)
@@ -127,7 +128,7 @@ class DeviceClientTests {
             },
             """{"refreshToken":"$testRefreshToken", "contactToken":"$testContactToken"}"""
         )
-        everySuspend { mockEmarsysClient.send(any()) } returns expectedResponse
+        everySuspend { mockEmarsysClient.send(any()) } returns Result.success(expectedResponse)
         everySuspend { mockContactTokenHandler.handleContactTokens(expectedResponse) } returns Unit
         val registerDeviceInfoEvent = SdkEvent.Internal.Sdk.RegisterDeviceInfo()
 
@@ -171,7 +172,7 @@ class DeviceClientTests {
             ""
         )
         every { mockUrlFactory.create(REGISTER_DEVICE_INFO) } returns testUrl
-        everySuspend { mockEmarsysClient.send(any()) } returns expectedResponse
+        everySuspend { mockEmarsysClient.send(any()) } returns Result.success(expectedResponse)
         val registerDeviceInfoEvent = SdkEvent.Internal.Sdk.RegisterDeviceInfo()
 
         val onlineSdkEvents = backgroundScope.async {
@@ -199,12 +200,9 @@ class DeviceClientTests {
     @Test
     fun testConsumer_should_reEmit_events_on_network_error() = runTest {
         createDeviceClient(backgroundScope).register()
-        val testException = IOException("No Internet")
+        val testException = NetworkIOException("No Internet")
 
-        everySuspend { mockEmarsysClient.send(any()) } calls { args ->
-            (args.arg(1) as suspend () -> Unit).invoke()
-            throw testException
-        }
+        everySuspend { mockEmarsysClient.send(any()) } returns Result.failure(testException)
         val registerDeviceInfoEvent = SdkEvent.Internal.Sdk.RegisterDeviceInfo()
         everySuspend { mockSdkEventManager.emitEvent(registerDeviceInfoEvent) } returns Unit
 
@@ -221,16 +219,19 @@ class DeviceClientTests {
             mockDeviceInfoCollector.collect()
             mockUrlFactory.create(REGISTER_DEVICE_INFO)
             mockEmarsysClient.send(any())
-            mockSdkEventManager.emitEvent(registerDeviceInfoEvent)
         }
         verifySuspend {
             mockClientExceptionHandler.handleException(
                 testException,
-                "DeviceClient - consumeRegisterDeviceInfo",
+                any(),
                 registerDeviceInfoEvent
             )
         }
+        verifySuspend {
+            mockSdkEventManager.emitEvent(registerDeviceInfoEvent)
+        }
     }
+
 
     @Test
     fun testConsumer_should_callClientExceptionHadler_when_exception_happens() = runTest {

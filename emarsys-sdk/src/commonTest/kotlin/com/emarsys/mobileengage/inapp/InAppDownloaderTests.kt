@@ -32,12 +32,12 @@ class InAppDownloaderTests {
         val TEST_URL = Url(URL)
         val testRequest = UrlRequest(TEST_URL, HttpMethod.Post)
         val testContentCampaign = ContentCampaign(InAppType.OVERLAY, TRACKING_INFO, TEST_CONTENT)
-        val response: Response = Response(
+        val response: Result<Response> = Result.success(Response(
             testRequest,
             HttpStatusCode.OK,
             Headers.Empty,
             JsonUtil.json.encodeToString(testContentCampaign)
-        )
+        ))
     }
 
     private lateinit var inAppDownloader: InAppDownloader
@@ -65,8 +65,8 @@ class InAppDownloaderTests {
 
     @Test
     fun download_shouldReturn_null_ifDownloadReturnsFailedRequestException() = runTest {
-        val testException = FailedRequestException(response)
-        everySuspend { mockEmarsysNetworkClient.send(testRequest) } throws testException
+        val testException = FailedRequestException(response.getOrNull()!!)
+        everySuspend { mockEmarsysNetworkClient.send(testRequest) } returns Result.failure(testException)
 
         val result = inAppDownloader.download(URL)
 
@@ -80,7 +80,7 @@ class InAppDownloaderTests {
     @Test
     fun download_shouldReturn_null_ifDownloadReturnsIoException() = runTest {
         val testException = IOException("Download failed")
-        everySuspend { mockEmarsysNetworkClient.send(testRequest) } throws testException
+        everySuspend { mockEmarsysNetworkClient.send(testRequest) } returns Result.failure(testException)
 
         val result = inAppDownloader.download(URL)
 

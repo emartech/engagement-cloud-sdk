@@ -4,6 +4,8 @@ import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.networking.model.body
+import com.emarsys.mobileengage.inapp.InAppDownloaderApi
+import com.emarsys.mobileengage.inapp.InAppMessage
 import com.emarsys.networking.clients.event.model.ContentCampaign
 import com.emarsys.networking.clients.event.model.asInAppMessage
 import io.ktor.http.HttpMethod
@@ -19,14 +21,11 @@ internal class InAppDownloader(
     override suspend fun download(url: String): InAppMessage? {
         val request = UrlRequest(Url(url), HttpMethod.Post)
 
-        val contentCampaign: ContentCampaign? = try {
-            emarsysClient.send(request).body()
-        } catch (exception: Exception) {
+        val contentCampaign: ContentCampaign? = emarsysClient.send(request).getOrElse {
             coroutineContext.ensureActive()
-            sdkLogger.error("Content campaign download failed.", exception)
+            sdkLogger.error("Content campaign download failed.", it)
             null
-        }
-
+        }?.body()
         return contentCampaign?.asInAppMessage()
     }
 }

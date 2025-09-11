@@ -2,6 +2,7 @@ package com.emarsys.networking.clients.push
 
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
+import com.emarsys.core.exceptions.SdkException.NetworkIOException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.UrlRequest
@@ -42,38 +43,53 @@ internal class PushClient(
     private suspend fun startEventConsumer() {
         sdkEventManager.onlineSdkEvents
             .filter { it is SdkEvent.Internal.Sdk.RegisterPushToken || it is SdkEvent.Internal.Sdk.ClearPushToken }
-            .collect {
+            .collect { sdkEvent ->
                 try {
                     sdkLogger.debug("PushClient - consumePushEvents")
-                   val response =  createRequest(it)?.let { request ->
+                    val response = createRequest(sdkEvent).let { request ->
                         emarsysClient.send(
                             request
                         )
                     }
-                    sdkEventManager.emitEvent(
-                        SdkEvent.Internal.Sdk.Answer.Response(
-                            originId = it.id,
-                            Result.success(response)
+                    response.onSuccess {
+                        sdkEventManager.emitEvent(
+                            SdkEvent.Internal.Sdk.Answer.Response(
+                                originId = sdkEvent.id,
+                                Result.success(response)
+                            )
                         )
-                    )
-                    it.ack(eventsDao, sdkLogger)
+                        sdkEvent.ack(eventsDao, sdkLogger)
+                    }
+                    response.onFailure { exception ->
+                        handleException(exception, sdkEvent)
+                        sdkEventManager.emitEvent(sdkEvent)
+                    }
                 } catch (exception: Exception) {
-                    clientExceptionHandler.handleException(
-                        exception,
-                        "PushClient - consumePushEvents",
-                        it
-                    )
-                    sdkEventManager.emitEvent(
-                        SdkEvent.Internal.Sdk.Answer.Response(
-                            originId = it.id,
-                            Result.failure<Exception>(exception)
-                        )
-                    )
+                    handleException(exception, sdkEvent)
                 }
             }
     }
 
-    private fun createRequest(sdkEvent: OnlineSdkEvent): UrlRequest? {
+    private suspend fun handleException(exception: Throwable, sdkEvent: OnlineSdkEvent) {
+        if (exception is NetworkIOException) {
+            sdkEventManager.emitEvent(sdkEvent)
+        } else {
+            sdkEventManager.emitEvent(
+                SdkEvent.Internal.Sdk.Answer.Response(
+                    originId = sdkEvent.id,
+                    Result.failure<Exception>(exception)
+                )
+            )
+
+            clientExceptionHandler.handleException(
+                exception,
+                "PushClient - consumePushEvents",
+                sdkEvent
+            )
+        }
+    }
+
+    private fun createRequest(sdkEvent: OnlineSdkEvent): UrlRequest {
         val url = urlFactory.create(PUSH_TOKEN)
         return when (sdkEvent) {
             is SdkEvent.Internal.Sdk.RegisterPushToken -> {
@@ -83,7 +99,7 @@ internal class PushClient(
             }
 
             is SdkEvent.Internal.Sdk.ClearPushToken -> UrlRequest(url, HttpMethod.Delete)
-            else -> null
+            else -> throw IllegalArgumentException("Unsupported event type: $sdkEvent")
         }
     }
 }

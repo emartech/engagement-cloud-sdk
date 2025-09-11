@@ -1,6 +1,7 @@
 package com.emarsys.networking
 
 import com.emarsys.core.channel.SdkEventDistributorApi
+import com.emarsys.core.exceptions.SdkException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.context.RequestContextApi
@@ -47,34 +48,51 @@ internal class EmarsysClient(
         return refreshContactToken {
             val emarsysRequest = addEmarsysHeaders(request)
             val response = networkClient.send(emarsysRequest)
-            handleEmarsysResponse(response)
-            handleClientState(response)
+            response.getOrNull()?.let {
+                handleEmarsysResponse(it)
+                handleClientState(it)
+            }
             response
         }
     }
 
     private suspend fun refreshContactToken(
         retryCount: Long = 0,
-        callback: suspend () -> Response
-    ): Response {
-        val response = callback()
-        return if (response.status == HttpStatusCode.Unauthorized && requestContext.refreshToken != null && retryCount < MAX_RETRY_COUNT) {
+        callback: suspend () -> Result<Response>
+    ): Result<Response> {
+        val originalResponse = callback()
+
+        val exception = originalResponse.exceptionOrNull()
+        return if (exception != null &&
+            exception is SdkException.FailedRequestException &&
+            exception.response.status == HttpStatusCode.Unauthorized && requestContext.refreshToken != null && retryCount < MAX_RETRY_COUNT) {
             sdkLogger.debug(
                 "refreshing contact token",
                 buildJsonObject {
                     put("retryCount", JsonPrimitive(retryCount))
-                    put("status", JsonPrimitive(response.status.value))
+                    put("status", JsonPrimitive(exception.response.status.value))
                 }
             )
             delay((retryCount + 1).seconds)
             val request = createRefreshContactTokenRequest()
             val refreshResponse = networkClient.send(request)
-            val responseBody: RefreshTokenResponseBody = refreshResponse.body()
-            requestContext.contactToken = responseBody.contactToken
-            refreshContactToken(retryCount + 1, callback)
+            return refreshResponse.fold(
+                onSuccess = { response ->
+                    updateContactToken(response)
+                    refreshContactToken(retryCount + 1, callback)
+                },
+                onFailure = { _ ->
+                    originalResponse
+                }
+            )
         } else {
-            response
+            originalResponse
         }
+    }
+
+    private fun updateContactToken(refreshTokenResponse: Response) {
+        val responseBody: RefreshTokenResponseBody = refreshTokenResponse.body()
+        requestContext.contactToken = responseBody.contactToken
     }
 
     private fun createRefreshContactTokenRequest() = UrlRequest(

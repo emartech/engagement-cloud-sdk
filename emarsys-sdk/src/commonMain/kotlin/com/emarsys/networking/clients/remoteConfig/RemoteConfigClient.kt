@@ -68,19 +68,24 @@ internal class RemoteConfigClient(
                     )
                     it.ack(eventsDao, sdkLogger)
                 } catch (exception: Exception) {
-                    clientExceptionHandler.handleException(
-                        exception,
-                        "RemoteConfigClient: ConsumeRemoteConfigEvents error",
-                        it
-                    )
-                    sdkEventManager.emitEvent(
-                        SdkEvent.Internal.Sdk.Answer.Response(
-                            originId = it.id,
-                            Result.failure<Exception>(exception)
-                        )
-                    )
+                    handleException(exception, it)
                 }
             }
+    }
+
+    private suspend fun handleException(exception: Throwable, event: OnlineSdkEvent) {
+        clientExceptionHandler.handleException(
+            exception,
+            "RemoteConfigClient: ConsumeRemoteConfigEvents error",
+            event
+        )
+
+        sdkEventManager.emitEvent(
+            Response(
+                originId = event.id,
+                Result.failure<Exception>(exception)
+            )
+        )
     }
 
     private fun isRemoteConfigEvent(sdkEvent: SdkEvent): Boolean {
@@ -97,8 +102,23 @@ internal class RemoteConfigClient(
                 async(start = CoroutineStart.UNDISPATCHED) { fetchConfig(isGlobal, event) }
             val toBeSignatureBytes =
                 async(start = CoroutineStart.UNDISPATCHED) { fetchSignature(isGlobal, event) }
-            val config = toBeConfigBytes.await()
-            val signature = toBeSignatureBytes.await()
+            val configResponse = toBeConfigBytes.await()
+            val signatureResponse = toBeSignatureBytes.await()
+
+            val config = configResponse.getOrElse(onFailure = { exception ->
+                handleException(exception, event)
+                sdkEventManager.emitEvent(
+                    event
+                )
+                null
+            })?.bodyAsText
+            val signature = signatureResponse.getOrElse(onFailure = { exception ->
+                handleException(exception, event)
+                sdkEventManager.emitEvent(
+                    event
+                )
+                null
+            })?.bodyAsText
             if (config == null || signature == null) {
                 return@coroutineScope null
             }
@@ -111,7 +131,10 @@ internal class RemoteConfigClient(
         }
     }
 
-    private suspend fun fetchConfig(global: Boolean, event: OnlineSdkEvent): String? {
+    private suspend fun fetchConfig(
+        global: Boolean,
+        event: OnlineSdkEvent
+    ): Result<com.emarsys.core.networking.model.Response> {
         val request = UrlRequest(
             urlFactoryApi.create(
                 if (global) EmarsysUrlType.GLOBAL_REMOTE_CONFIG else EmarsysUrlType.REMOTE_CONFIG
@@ -121,7 +144,10 @@ internal class RemoteConfigClient(
         return executeRequest(request, event)
     }
 
-    private suspend fun fetchSignature(global: Boolean, event: OnlineSdkEvent): String? {
+    private suspend fun fetchSignature(
+        global: Boolean,
+        event: OnlineSdkEvent
+    ): Result<com.emarsys.core.networking.model.Response> {
         val request = UrlRequest(
             urlFactoryApi.create(
                 if (global) EmarsysUrlType.GLOBAL_REMOTE_CONFIG_SIGNATURE else EmarsysUrlType.REMOTE_CONFIG_SIGNATURE
@@ -131,13 +157,11 @@ internal class RemoteConfigClient(
         return executeRequest(request, event)
     }
 
-    private suspend fun executeRequest(request: UrlRequest, event: OnlineSdkEvent): String? {
+    private suspend fun executeRequest(
+        request: UrlRequest,
+        event: OnlineSdkEvent
+    ): Result<com.emarsys.core.networking.model.Response> {
         return networkClient.send(request)
-            .let {
-                if (it.status.isSuccess()) {
-                    it.bodyAsText
-                } else null
-            }
     }
 
 }

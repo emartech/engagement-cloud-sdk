@@ -2,6 +2,7 @@ package com.emarsys.networking.clients.deeplink
 
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
+import com.emarsys.core.exceptions.SdkException.NetworkIOException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.UserAgentProvider
 import com.emarsys.core.networking.UserAgentProviderApi
@@ -132,7 +133,7 @@ class DeepLinkClientTests {
             Headers.Empty,
             bodyAsText = "{}"
         )
-        everySuspend { mockNetworkClient.send(expectedRequest) } returns response
+        everySuspend { mockNetworkClient.send(expectedRequest) } returns Result.success(response)
         val trackDeepLink = SdkEvent.Internal.Sdk.TrackDeepLink(
             id = "trackDeepLink",
             trackingId = TRACKING_ID
@@ -155,12 +156,11 @@ class DeepLinkClientTests {
     fun testConsumer_shouldReEmitEvent_throughSdkEventDistributor_inCaseOfNetworkError() = runTest {
         deepLinkClient = createDeepLinkClient(backgroundScope)
         deepLinkClient.register()
-        val testException = IOException("No Internet")
+        val testException = NetworkIOException("No Internet")
 
-        everySuspend { mockNetworkClient.send(any()) } calls { args ->
-            (args.arg(1) as suspend () -> Unit).invoke()
-            throw testException
-        }
+        everySuspend { mockNetworkClient.send(any()) } returns Result.failure(testException)
+        everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
+
         val trackDeepLink = SdkEvent.Internal.Sdk.TrackDeepLink(
             id = "trackDeepLink",
             trackingId = TRACKING_ID
@@ -176,67 +176,71 @@ class DeepLinkClientTests {
         onlineSdkEvents.await() shouldBe listOf(trackDeepLink)
         verify { mockUrlFactory.create(any()) }
         verifySuspend { mockNetworkClient.send(any()) }
-        verifySuspend { mockSdkEventManager.emitEvent(trackDeepLink) }
         verifySuspend {
             mockClientExceptionHandler.handleException(
                 testException,
-                "DeepLinkClient - trackDeepLink(trackId: $TRACKING_ID)",
+                any(),
                 trackDeepLink
             )
         }
-    }
-
-    @Test
-    fun testConsumer_shouldNotAckEvent_inCaseOfUnknownException() = runTest {
-        deepLinkClient = createDeepLinkClient(backgroundScope)
-        deepLinkClient.register()
-
-        everySuspend { mockNetworkClient.send(any()) } throws Exception("Request error")
-        val trackDeepLink = SdkEvent.Internal.Sdk.TrackDeepLink(
-            id = "trackDeepLink",
-            trackingId = TRACKING_ID
-        )
-        val onlineSdkEvents = backgroundScope.async {
-            onlineEvents.take(1).toList()
-        }
-
-        onlineEvents.emit(trackDeepLink)
-
-        advanceUntilIdle()
-
-        onlineSdkEvents.await() shouldBe listOf(trackDeepLink)
-        verify { mockUrlFactory.create(any()) }
-        verifySuspend { mockNetworkClient.send(any()) }
-        verifySuspend(VerifyMode.exactly(0)) { mockSdkEventManager.emitEvent(trackDeepLink) }
-        verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(trackDeepLink) }
-    }
-
-    @Test
-    fun testConsumer_should_call_clientExceptionHandler_when_exception_happens() = runTest {
-        createDeepLinkClient(backgroundScope).register()
-        val testException = Exception("Test exception")
-        every { mockUrlFactory.create(EmarsysUrlType.DEEP_LINK) } throws testException
-        val trackDeepLink = SdkEvent.Internal.Sdk.TrackDeepLink(
-            id = "trackDeepLink",
-            trackingId = TRACKING_ID
-        )
-
-        val onlineSdkEvents = backgroundScope.async {
-            onlineEvents.take(1).toList()
-        }
-
-        onlineEvents.emit(trackDeepLink)
-
-        advanceUntilIdle()
-
-        onlineSdkEvents.await() shouldBe listOf(trackDeepLink)
-        verifySuspend(VerifyMode.exactly(0)) { mockNetworkClient.send(any()) }
         verifySuspend {
-            mockClientExceptionHandler.handleException(
-                testException,
-                "DeepLinkClient - trackDeepLink(trackId: $TRACKING_ID)",
+            mockSdkEventManager.emitEvent(
                 trackDeepLink
             )
+        }
+
+        @Test
+        fun testConsumer_shouldNotAckEvent_inCaseOfUnknownException() = runTest {
+            deepLinkClient = createDeepLinkClient(backgroundScope)
+            deepLinkClient.register()
+
+            everySuspend { mockNetworkClient.send(any()) } throws Exception("Request error")
+            val trackDeepLink = SdkEvent.Internal.Sdk.TrackDeepLink(
+                id = "trackDeepLink",
+                trackingId = TRACKING_ID
+            )
+            val onlineSdkEvents = backgroundScope.async {
+                onlineEvents.take(1).toList()
+            }
+
+            onlineEvents.emit(trackDeepLink)
+
+            advanceUntilIdle()
+
+            onlineSdkEvents.await() shouldBe listOf(trackDeepLink)
+            verify { mockUrlFactory.create(any()) }
+            verifySuspend { mockNetworkClient.send(any()) }
+            verifySuspend(VerifyMode.exactly(0)) { mockSdkEventManager.emitEvent(trackDeepLink) }
+            verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(trackDeepLink) }
+        }
+
+        @Test
+        fun testConsumer_should_call_clientExceptionHandler_when_exception_happens() = runTest {
+            createDeepLinkClient(backgroundScope).register()
+            val testException = Exception("Test exception")
+            every { mockUrlFactory.create(EmarsysUrlType.DEEP_LINK) } throws testException
+            val trackDeepLink = SdkEvent.Internal.Sdk.TrackDeepLink(
+                id = "trackDeepLink",
+                trackingId = TRACKING_ID
+            )
+
+            val onlineSdkEvents = backgroundScope.async {
+                onlineEvents.take(1).toList()
+            }
+
+            onlineEvents.emit(trackDeepLink)
+
+            advanceUntilIdle()
+
+            onlineSdkEvents.await() shouldBe listOf(trackDeepLink)
+            verifySuspend(VerifyMode.exactly(0)) { mockNetworkClient.send(any()) }
+            verifySuspend {
+                mockClientExceptionHandler.handleException(
+                    testException,
+                    "DeepLinkClient - trackDeepLink(trackId: $TRACKING_ID)",
+                    trackDeepLink
+                )
+            }
         }
     }
 }

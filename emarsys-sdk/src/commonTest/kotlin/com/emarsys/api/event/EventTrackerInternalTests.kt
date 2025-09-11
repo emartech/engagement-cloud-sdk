@@ -2,6 +2,7 @@ package com.emarsys.api.event
 
 import com.emarsys.api.event.model.CustomEvent
 import com.emarsys.core.channel.SdkEventDistributorApi
+import com.emarsys.core.channel.SdkEventWaiterApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.providers.InstantProvider
@@ -52,12 +53,18 @@ class EventTrackerInternalTests {
     private lateinit var eventTrackerInternal: EventTrackerInstance
     private lateinit var eventTrackerContext: EventTrackerContextApi
     private lateinit var logger: Logger
+    private lateinit var mockWaiter: SdkEventWaiterApi
 
     @BeforeTest
     fun setUp() {
         mockSdkEventDistributor = mock()
         mockTimestampProvider = mock()
         mockUuidProvider = mock()
+        mockWaiter = mock()
+        everySuspend { mockWaiter.await<Any>() } returns SdkEvent.Internal.Sdk.Answer.Response(
+            "0",
+            Result.success(Any())
+        )
         every { mockUuidProvider.provide() } returns UUID
         logger = SdkLogger("TestLoggerName", mock(MockMode.autofill), sdkContext = mock())
 
@@ -75,7 +82,7 @@ class EventTrackerInternalTests {
 
     @Test
     fun testTrackEvent_shouldMakeCall_onClient() = runTest {
-        everySuspend { mockSdkEventDistributor.registerEvent(event) } returns mock(MockMode.autofill)
+        everySuspend { mockSdkEventDistributor.registerEvent(event) } returns mockWaiter
         everySuspend { mockTimestampProvider.provide() } returns timestamp
 
         eventTrackerInternal.trackEvent(customEvent)
@@ -88,8 +95,8 @@ class EventTrackerInternalTests {
 
     @Test
     fun testActivate_should_send_calls_to_client() = runTest {
-        everySuspend { mockSdkEventDistributor.registerEvent(event) } returns mock(MockMode.autofill)
-        everySuspend { mockSdkEventDistributor.registerEvent(event2) } returns mock(MockMode.autofill)
+        everySuspend { mockSdkEventDistributor.registerEvent(event) } returns mockWaiter
+        everySuspend { mockSdkEventDistributor.registerEvent(event2) } returns mockWaiter
 
         eventTrackerInternal.activate()
 

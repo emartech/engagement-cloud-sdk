@@ -2,6 +2,7 @@ package com.emarsys.networking.clients.deepLink
 
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
+import com.emarsys.core.exceptions.SdkException.NetworkIOException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.UserAgentProvider
 import com.emarsys.core.networking.UserAgentProviderApi
@@ -43,9 +44,9 @@ internal class DeepLinkClient(
     private suspend fun startEventConsumer() {
         sdkEventManager.onlineSdkEvents
             .filterIsInstance<SdkEvent.Internal.Sdk.TrackDeepLink>()
-            .collect {
+            .collect { sdkEvent ->
                 try {
-                    val trackingId = it.trackingId
+                    val trackingId = sdkEvent.trackingId
                     val requestBody = buildJsonObject { put("ems_dl", trackingId) }
                     val headers =
                         mapOf(UserAgentProvider.USER_AGENT_HEADER_NAME to userAgentProvider.provide())
@@ -55,17 +56,39 @@ internal class DeepLinkClient(
                         headers = headers,
                         bodyString = json.encodeToString(requestBody)
                     )
-                    networkClient.send(
+
+                    val response = networkClient.send(
                         request
                     )
-                    it.ack(eventsDao, sdkLogger)
+                    response.onSuccess {
+                        sdkEvent.ack(eventsDao, sdkLogger)
+                    }
+                    response.onFailure { error ->
+                        handleException(error, sdkEvent)
+                    }
                 } catch (exception: Exception) {
-                    clientExceptionHandler.handleException(
-                        exception,
-                        "DeepLinkClient - trackDeepLink(trackId: ${it.trackingId})",
-                        it
-                    )
+                    handleException(exception, sdkEvent)
                 }
             }
+    }
+
+    private suspend fun handleException(
+        exception: Throwable,
+        sdkEvent: SdkEvent.Internal.Sdk.TrackDeepLink
+    ) {
+        if (exception is NetworkIOException) {
+            sdkEventManager.emitEvent(sdkEvent)
+        } else {
+            SdkEvent.Internal.Sdk.Answer.Response(
+                originId = sdkEvent.id,
+                Result.failure<Exception>(exception)
+            )
+
+        }
+        clientExceptionHandler.handleException(
+            exception,
+            "DeepLinkClient - trackDeepLink(trackId: ${sdkEvent.trackingId})",
+            sdkEvent
+        )
     }
 }

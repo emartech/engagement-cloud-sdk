@@ -83,18 +83,34 @@ internal class LoggingClient(
                         json.encodeToString(logRequestsJson),
                         isLogRequest = true
                     )
-                    genericNetworkClient.send(
+                    val response = genericNetworkClient.send(
                         request
                     )
-                    sdkEvents.forEach { it.ack(eventsDao, sdkLogger) }
+                    response.onSuccess {
+                        sdkEvents.forEach { it.ack(eventsDao, sdkLogger) }
+                    }
+
+                    response.onFailure { exception ->
+                        handleException(exception, sdkEvents)
+                        sdkEvents.forEach { sdkEvent ->
+                            sdkEventManager.emitEvent(sdkEvent)
+                        }
+                    }
                 } catch (exception: Exception) {
-                    coroutineContext.ensureActive()
-                    clientExceptionHandler.handleException(
-                        exception,
-                        "LoggingClient: ConsumeLogsAndMetrics error",
-                        *sdkEvents.toTypedArray()
-                    )
+                    handleException(exception, sdkEvents)
                 }
             }
+    }
+
+    private suspend fun handleException(
+        exception: Throwable,
+        sdkEvents: List<SdkEvent.Internal.LogEvent>
+    ) {
+        coroutineContext.ensureActive()
+        clientExceptionHandler.handleException(
+            exception,
+            "LoggingClient: ConsumeLogsAndMetrics error",
+            *sdkEvents.toTypedArray()
+        )
     }
 }

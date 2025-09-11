@@ -2,6 +2,7 @@ package com.emarsys.enable.states
 
 import com.emarsys.api.push.PushConstants
 import com.emarsys.core.channel.SdkEventDistributorApi
+import com.emarsys.core.channel.SdkEventWaiterApi
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.event.SdkEvent
 import dev.mokkery.MockMode
@@ -39,9 +40,16 @@ class RegisterPushTokenStateTests {
     private lateinit var registerPushTokenState: RegisterPushTokenState
     private lateinit var eventSlot: SlotCapture<SdkEvent>
 
+    private lateinit var mockWaiter: SdkEventWaiterApi
+
     @BeforeTest
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
+        mockWaiter = mock()
+        everySuspend { mockWaiter.await<Any>() } returns SdkEvent.Internal.Sdk.Answer.Response(
+            "0",
+            Result.success(Any())
+        )
         eventSlot = slot()
         mockSdkEventDistributor = mock()
         mockStringStorage = mock()
@@ -56,7 +64,7 @@ class RegisterPushTokenStateTests {
 
     @Test
     fun testActive_whenLastSentPushTokenIsMissing_pushTokenIsAvailable() = runTest {
-        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(MockMode.autofill)
+        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mockWaiter
         every { mockStringStorage.get(PushConstants.PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
         every { mockStringStorage.get(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns null
         every {
@@ -82,7 +90,7 @@ class RegisterPushTokenStateTests {
 
     @Test
     fun testActive_whenBothAvailable_butNotTheSame() = runTest {
-        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(MockMode.autofill)
+        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mockWaiter
         every { mockStringStorage.get(PushConstants.PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
         every { mockStringStorage.get(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns LAST_SENT_PUSH_TOKEN
         every { mockStringStorage.put(any(), any()) } returns Unit

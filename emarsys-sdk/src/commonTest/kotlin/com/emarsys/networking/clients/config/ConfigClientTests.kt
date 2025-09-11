@@ -4,6 +4,7 @@ import com.emarsys.config.SdkConfig
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
+import com.emarsys.core.exceptions.SdkException.NetworkIOException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
@@ -118,7 +119,7 @@ class ConfigClientTests {
         every { mockUrlFactory.create(EmarsysUrlType.CHANGE_APPLICATION_CODE) }.returns(
             TEST_BASE_URL
         )
-        everySuspend { mockEmarsysClient.send(any()) }.returns(createTestResponse("{}"))
+        everySuspend { mockEmarsysClient.send(any()) }.returns(Result.success(createTestResponse("{}")))
         every { mockConfig.copyWith("NewAppCode") } returns mockConfig
         every { mockConfig.applicationCode } returns "testApplicationCode"
         val changeAppCode = SdkEvent.Internal.Sdk.ChangeAppCode(
@@ -148,10 +149,8 @@ class ConfigClientTests {
         configClient.register()
 
         every { mockUrlFactory.create(EmarsysUrlType.CHANGE_APPLICATION_CODE) } returns TEST_BASE_URL
-        everySuspend { mockEmarsysClient.send(any()) } calls { args ->
-            (args.arg(1) as suspend () -> Unit).invoke()
-            throw IOException("No Internet")
-        }
+        val testException = NetworkIOException("No Network")
+        everySuspend { mockEmarsysClient.send(any()) } returns Result.failure(testException)
 
         val changeAppCode = SdkEvent.Internal.Sdk.ChangeAppCode(
             id = "changeAppcode",
@@ -169,7 +168,18 @@ class ConfigClientTests {
 
         onlineSdkEvents.await() shouldBe listOf(changeAppCode)
         verifySuspend { mockEmarsysClient.send(any()) }
-        verifySuspend { mockSdkEventManager.emitEvent(changeAppCode) }
+        verifySuspend {
+            mockSdkEventManager.emitEvent(
+                changeAppCode
+            )
+        }
+        verifySuspend {
+            mockClientExceptionHandler.handleException(
+                testException,
+                any(),
+                changeAppCode
+            )
+        }
         verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(changeAppCode) }
 
     }
@@ -190,6 +200,7 @@ class ConfigClientTests {
             id = "changeAppCode",
             applicationCode = "newAppCode"
         )
+        everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
 
         val onlineSdkEvents = backgroundScope.async {
             onlineEvents.take(1).toList()
@@ -204,7 +215,7 @@ class ConfigClientTests {
         verifySuspend {
             mockClientExceptionHandler.handleException(
                 testException,
-                "ConfigClient - consumeConfigChanges",
+                any(),
                 changeAppCode
             )
         }

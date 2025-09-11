@@ -4,6 +4,8 @@ import com.emarsys.api.inapp.InAppConfigApi
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.channel.naturalBatching
 import com.emarsys.core.db.events.EventsDaoApi
+import com.emarsys.core.exceptions.SdkException
+import com.emarsys.core.exceptions.SdkException.NetworkIOException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.context.RequestContextApi
@@ -12,6 +14,7 @@ import com.emarsys.core.networking.model.body
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
+import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
 import com.emarsys.event.ack
 import com.emarsys.mobileengage.action.EventActionFactoryApi
@@ -72,6 +75,7 @@ internal class EventClient(
             .filter { it is SdkEvent.DeviceEvent }
             .naturalBatching().onEach { sdkEvents ->
                 try {
+
                     sdkLogger.debug("Consume Events, Batch size: ${sdkEvents.size}")
                     val url = urlFactory.create(EmarsysUrlType.EVENT)
                     val requestBody =
@@ -81,49 +85,62 @@ internal class EventClient(
                             requestContext.deviceEventState
                         )
                     val body = json.encodeToString(requestBody)
-                    val response = emarsysNetworkClient.send(
+                    val networkResponse = emarsysNetworkClient.send(
                         UrlRequest(
                             url,
                             HttpMethod.Post,
                             body
-                        ),
-                        onNetworkError = { reEmitSdkEventsOnNetworkError(sdkEvents) }
+                        )
                     )
-
-                    if (response.status == HttpStatusCode.NoContent) {
+                    networkResponse.onSuccess { response ->
+                        if (response.status == HttpStatusCode.NoContent) {
+                            sdkEvents.ack(eventsDao, sdkLogger)
+                            return@onEach
+                        }
+                        val result: DeviceEventResponse = response.body()
+                        handleDeviceEventState(result)
+                        handleInApp(result.contentCampaigns?.getOrNull(0))  // todo handle all campaigns returned
+                        result.actionCampaigns?.let { handleOnEventActionCampaigns(it) }
+                        sdkEvents.forEach {
+                            sdkEventManager.emitEvent(
+                                SdkEvent.Internal.Sdk.Answer.Response(
+                                    originId = it.id,
+                                    Result.success(response)
+                                )
+                            )
+                        }
                         sdkEvents.ack(eventsDao, sdkLogger)
-                        return@onEach
                     }
-
-                    val result: DeviceEventResponse = response.body()
-                    handleDeviceEventState(result)
-                    handleInApp(result.contentCampaigns?.getOrNull(0))  // todo handle all campaigns returned
-                    result.actionCampaigns?.let { handleOnEventActionCampaigns(it) }
-                    sdkEvents.forEach {
-                        sdkEventManager.emitEvent(
-                            SdkEvent.Internal.Sdk.Answer.Response(
-                                originId = it.id,
-                                Result.success(response)
-                            )
-                        )
+                    networkResponse.onFailure { exception ->
+                        if (exception is NetworkIOException) {
+                            reEmitSdkEventsOnNetworkError(sdkEvents)
+                        } else {
+                            handleException(exception, sdkEvents)
+                        }
                     }
-                    sdkEvents.ack(eventsDao, sdkLogger)
-                } catch (throwable: Throwable) {
-                    clientExceptionHandler.handleException(
-                        throwable,
-                        "EventClient: Error during event consumption",
-                        *sdkEvents.toTypedArray()
-                    )
-                    sdkEvents.forEach {
-                        sdkEventManager.emitEvent(
-                            SdkEvent.Internal.Sdk.Answer.Response(
-                                originId = it.id,
-                                Result.failure<Throwable>(throwable)
-                            )
-                        )
-                    }
+                } catch (e: Exception) {
+                    handleException(e, sdkEvents)
                 }
             }.collect()
+    }
+
+    private suspend fun handleException(
+        exception: Throwable,
+        sdkEvents: List<OnlineSdkEvent>
+    ) {
+        clientExceptionHandler.handleException(
+            exception,
+            "EventClient: Error during event consumption",
+            *sdkEvents.toTypedArray()
+        )
+        sdkEvents.forEach {
+            sdkEventManager.emitEvent(
+                SdkEvent.Internal.Sdk.Answer.Response(
+                    originId = it.id,
+                    Result.failure<Throwable>(exception)
+                )
+            )
+        }
     }
 
     private suspend fun reEmitSdkEventsOnNetworkError(it: List<SdkEvent>) {

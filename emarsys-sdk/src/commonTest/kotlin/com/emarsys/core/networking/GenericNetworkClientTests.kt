@@ -1,5 +1,6 @@
 package com.emarsys.core.networking
 
+import com.emarsys.core.exceptions.SdkException
 import com.emarsys.core.exceptions.SdkException.FailedRequestException
 import com.emarsys.core.exceptions.SdkException.RetryLimitReachedException
 import com.emarsys.core.networking.clients.GenericNetworkClient
@@ -13,7 +14,10 @@ import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.beInstanceOf
+import io.kotest.matchers.types.shouldBeSameInstanceAs
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.config
 import io.ktor.client.engine.mock.MockEngine
@@ -66,7 +70,6 @@ class GenericNetworkClientTests {
 
         val response: Result<Response> = genericNetworkClient.send(request)
         response shouldBe expectedResponse
-//        response.body<TestDataClass>() shouldBe testData
     }
 
     @Test
@@ -90,7 +93,6 @@ class GenericNetworkClientTests {
 
         val response: Result<Response> = genericNetworkClient.send(request)
         response shouldBe expectedResponse
-//        response.body<TestDataClass>() shouldBe testData
     }
 
     @Test
@@ -111,7 +113,7 @@ class GenericNetworkClientTests {
         )
 
         val response: Result<Response> = genericNetworkClient.send(request)
-        response shouldBe expectedResponse
+        response shouldBe Result.success(expectedResponse)
     }
 
     @Test
@@ -126,13 +128,13 @@ class GenericNetworkClientTests {
             mapOf("Content-Type" to "application/json")
         )
 
-        shouldThrow<FailedRequestException> {
-            genericNetworkClient.send(request)
-        }
+        val response: Result<Response> = genericNetworkClient.send(request)
+
+        response.exceptionOrNull() should beInstanceOf(FailedRequestException::class)
     }
 
     @Test
-    fun testSend_shouldCallOnRecoverCallback_andRethrowException_whenThereIsNoInternetConnection_andIOExceptionIsThrown() =
+    fun testSend_returnWithFailureResultWithNetworkIOException_whenThereIsNoInternetConnection_andIOExceptionIsThrown() =
         runTest {
             val genericNetworkClient = GenericNetworkClient(
                 HttpClient(MockEngine {
@@ -148,16 +150,13 @@ class GenericNetworkClientTests {
                 null,
                 mapOf("Content-Type" to "application/json")
             )
-            val onNetworkError = mock<suspend () -> Unit>(MockMode.autofill)
+            val response: Result<Response> = genericNetworkClient.send(request)
 
-            shouldThrow<IOException> {
-                genericNetworkClient.send(request)
-            }
-            verifySuspend { onNetworkError() }
+            response.exceptionOrNull() should beInstanceOf(SdkException.NetworkIOException::class)
         }
 
     @Test
-    fun testSend_shouldCallOnRecoverCallback_andRethrowIOException_whenThereIsNoInternetConnection_andThrowableIsThrown() =
+    fun testSend_returnWithFailureResultWithNetworkIOException_whenThereIsNoInternetConnection_andThrowableIsThrown() =
         runTest {
             val genericNetworkClient = GenericNetworkClient(
                 HttpClient(MockEngine {
@@ -173,16 +172,14 @@ class GenericNetworkClientTests {
                 null,
                 mapOf("Content-Type" to "application/json")
             )
-            val onNetworkError = mock<suspend () -> Unit>(MockMode.autofill)
 
-            shouldThrow<IOException> {
-                genericNetworkClient.send(request)
-            }
-            verifySuspend { onNetworkError() }
+            val response: Result<Response> = genericNetworkClient.send(request)
+
+            response.exceptionOrNull() should beInstanceOf(SdkException.NetworkIOException::class)
         }
 
     @Test
-    fun testSend_rethrowException_whenThereIsNoInternetConnection_andExceptionIsThrown() = runTest {
+    fun testSend_returnWithFailureResult_whenThereIsNoInternetConnection_andExceptionIsThrown() = runTest {
         val genericNetworkClient = GenericNetworkClient(
             HttpClient(MockEngine {
                 throw Exception("No internet connection")
@@ -197,12 +194,9 @@ class GenericNetworkClientTests {
             null,
             mapOf("Content-Type" to "application/json")
         )
-        val onNetworkError = mock<suspend () -> Unit>(MockMode.autofill)
+        val response: Result<Response> = genericNetworkClient.send(request)
 
-        shouldThrow<IOException> {
-            genericNetworkClient.send(request)
-        }
-        verifySuspend(VerifyMode.exactly(0)) { onNetworkError() }
+        response.exceptionOrNull() should beInstanceOf(SdkException.NetworkIOException::class)
     }
 
     @Test
@@ -241,10 +235,11 @@ class GenericNetworkClientTests {
             mapOf("Content-Type" to "application/json")
         )
 
-        val exception = shouldThrow<RetryLimitReachedException> {
-            genericNetworkClient.send(request)
-        }
-        exception.message shouldBe """Request retry limit reached! Response: {"eventName":"test"}"""
+        val response: Result<Response> = genericNetworkClient.send(request)
+        val exception = response.exceptionOrNull()
+
+        exception should beInstanceOf(RetryLimitReachedException::class)
+        exception!!.message shouldBe """Request retry limit reached! Response: {"eventName":"test"}"""
     }
 
     @Test
@@ -293,8 +288,6 @@ class GenericNetworkClientTests {
         )
         val response: Result<Response> = genericNetworkClient.send(request)
         response shouldBe expectedResponse
-//        response.body<TestDataClass>() shouldBe testData
-
     }
 
     private fun createHttpClient(

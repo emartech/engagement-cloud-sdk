@@ -4,6 +4,7 @@ import com.emarsys.config.SdkConfig
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
+import com.emarsys.core.exceptions.SdkException.NetworkIOException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.context.RequestContextApi
@@ -95,7 +96,7 @@ class ContactClientTests {
         sdkDispatcher = StandardTestDispatcher()
         every { mockSdkContext.config } returns mockConfig
         everySuspend { mockContactTokenHandler.handleContactTokens(any()) } returns Unit
-        everySuspend { mockEmarsysClient.send(any()) } returns (createTestResponse("{}"))
+        everySuspend { mockEmarsysClient.send(any()) } returns (Result.success(createTestResponse("{}")))
         every { mockSdkContext.contactFieldId = any() } returns Unit
         every { mockUrlFactory.create(EmarsysUrlType.LINK_CONTACT) } returns TEST_BASE_URL
         every { mockUrlFactory.create(EmarsysUrlType.UNLINK_CONTACT) } returns TEST_BASE_URL
@@ -153,9 +154,11 @@ class ContactClientTests {
         contactClient.register()
 
         everySuspend { mockEmarsysClient.send(any()) }.returns(
-            createTestResponse(
-                "{}",
-                HttpStatusCode.NoContent
+            Result.success(
+                createTestResponse(
+                    "{}",
+                    HttpStatusCode.NoContent
+                )
             )
         )
         val linkContactEvent = SdkEvent.Internal.Sdk.LinkContact(
@@ -181,7 +184,7 @@ class ContactClientTests {
         contactClient.register()
 
         everySuspend { mockEmarsysClient.send(any()) }.returns(
-            createTestResponse("{}")
+            Result.success(createTestResponse("{}"))
         )
         val linkAuthenticatedContactEvent = SdkEvent.Internal.Sdk.LinkAuthenticatedContact(
             "linkAuthenticatedContact",
@@ -227,10 +230,10 @@ class ContactClientTests {
         contactClient.register()
 
         val unlinkContactEvent = SdkEvent.Internal.Sdk.UnlinkContact("unlinkContact")
-        everySuspend { mockEmarsysClient.send(any()) } calls { args ->
-            (args.arg(1) as suspend () -> Unit).invoke()
-            throw IOException("No Internet")
-        }
+        val testException = NetworkIOException("No Internet")
+        everySuspend { mockEmarsysClient.send(any()) } returns Result.failure(testException)
+        everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
+
 
         onlineEvents.emit(unlinkContactEvent)
 
@@ -239,7 +242,18 @@ class ContactClientTests {
         verify { mockUrlFactory.create(any()) }
         verifySuspend { mockEmarsysClient.send(any()) }
         verifySuspend(VerifyMode.exactly(0)) { mockContactTokenHandler.handleContactTokens(any()) }
-        verifySuspend { mockSdkEventManager.emitEvent(unlinkContactEvent) }
+        verifySuspend {
+            mockClientExceptionHandler.handleException(
+                testException,
+                any(),
+                unlinkContactEvent
+            )
+        }
+        verifySuspend {
+            mockSdkEventManager.emitEvent(
+                unlinkContactEvent
+            )
+        }
     }
 
     @Test
@@ -249,6 +263,8 @@ class ContactClientTests {
             val testException = Exception("Test exception")
 
             everySuspend { mockEmarsysClient.send(any()) } throws testException
+            everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
+
             val unlinkContact = SdkEvent.Internal.Sdk.UnlinkContact("unlinkContact")
 
             onlineEvents.emit(unlinkContact)
@@ -260,7 +276,7 @@ class ContactClientTests {
             verifySuspend {
                 mockClientExceptionHandler.handleException(
                     testException,
-                    "ContactClient - consumeContactChanges",
+                    any(),
                     unlinkContact
                 )
             }

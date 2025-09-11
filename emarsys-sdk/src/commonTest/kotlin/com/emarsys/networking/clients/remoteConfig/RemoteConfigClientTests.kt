@@ -3,6 +3,7 @@ package com.emarsys.networking.clients.remoteConfig
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.crypto.CryptoApi
 import com.emarsys.core.db.events.EventsDaoApi
+import com.emarsys.core.exceptions.SdkException
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
@@ -131,12 +132,12 @@ class RemoteConfigClientTests {
         every {
             mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG_SIGNATURE)
         } returns configSignatureUrl
-        everySuspend { mockNetworkClient.send(configRequest) } returns configResponse
+        everySuspend { mockNetworkClient.send(configRequest) } returns Result.success(configResponse)
         everySuspend {
             mockNetworkClient.send(
                 configSignatureRequest
             )
-        } returns configSignatureResponse
+        } returns Result.success(configSignatureResponse)
         everySuspend { mockCrypto.verify(any(), any()) } returns true
 
         val appCodeBasedRemoteConfigEvent = SdkEvent.Internal.Sdk.ApplyAppCodeBasedRemoteConfig()
@@ -173,12 +174,12 @@ class RemoteConfigClientTests {
         every {
             mockUrlFactory.create(EmarsysUrlType.GLOBAL_REMOTE_CONFIG_SIGNATURE)
         } returns configSignatureUrl
-        everySuspend { mockNetworkClient.send(configRequest) } returns configResponse
+        everySuspend { mockNetworkClient.send(configRequest) } returns Result.success(configResponse)
         everySuspend {
             mockNetworkClient.send(
                 configSignatureRequest
             )
-        } returns configSignatureResponse
+        } returns Result.success(configSignatureResponse)
         everySuspend { mockCrypto.verify(any(), any()) } returns true
 
         val globalRemoteConfig = SdkEvent.Internal.Sdk.ApplyGlobalRemoteConfig()
@@ -215,12 +216,12 @@ class RemoteConfigClientTests {
         every {
             mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG_SIGNATURE)
         } returns configSignatureUrl
-        everySuspend { mockNetworkClient.send(configRequest) } returns configResponse
+        everySuspend { mockNetworkClient.send(configRequest) } returns Result.success(configResponse)
         everySuspend {
             mockNetworkClient.send(
                 configSignatureRequest
             )
-        } returns configSignatureResponse
+        } returns Result.success(configSignatureResponse)
         everySuspend { mockCrypto.verify(any(), any()) } returns false
 
 
@@ -256,12 +257,16 @@ class RemoteConfigClientTests {
                 EmarsysUrlType.REMOTE_CONFIG_SIGNATURE
             )
         } returns configSignatureUrl
-        everySuspend { mockNetworkClient.send(configRequest) } returns configResponse
+        everySuspend { mockNetworkClient.send(configRequest) } returns Result.failure(
+            SdkException.FailedRequestException(
+                configResponse
+            )
+        )
         everySuspend {
             mockNetworkClient.send(
                 configSignatureRequest
             )
-        } returns configSignatureResponse
+        } returns Result.success(configSignatureResponse)
 
         val appCodeBasedRemoteConfigEvent = SdkEvent.Internal.Sdk.ApplyAppCodeBasedRemoteConfig()
 
@@ -295,12 +300,12 @@ class RemoteConfigClientTests {
                 EmarsysUrlType.REMOTE_CONFIG_SIGNATURE
             )
         } returns configSignatureUrl
-        everySuspend { mockNetworkClient.send(configRequest) } returns configResponse
+        everySuspend { mockNetworkClient.send(configRequest) } returns Result.success(configResponse)
         everySuspend {
             mockNetworkClient.send(
                 configSignatureRequest
             )
-        } returns configSignatureResponse
+        } returns Result.failure(SdkException.FailedRequestException(configSignatureResponse))
 
         val appCodeBasedRemoteConfigEvent = SdkEvent.Internal.Sdk.ApplyAppCodeBasedRemoteConfig()
 
@@ -327,7 +332,7 @@ class RemoteConfigClientTests {
             every {
                 mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG)
             } returns configUrl
-            everySuspend { mockNetworkClient.send(configRequest) } returns configResponse
+            everySuspend { mockNetworkClient.send(configRequest) } returns Result.success(configResponse)
             every {
                 mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG_SIGNATURE)
             } returns configSignatureUrl
@@ -372,15 +377,20 @@ class RemoteConfigClientTests {
             mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG_SIGNATURE)
         } returns configSignatureUrl
 
-        everySuspend { mockNetworkClient.send(any()) } calls { args ->
-            (args.arg(1) as suspend () -> Unit).invoke()
-            throw testException
-        }
+        everySuspend { mockNetworkClient.send(any()) } returns Result.failure(testException)
         val remoteConfigEvent = SdkEvent.Internal.Sdk.ApplyAppCodeBasedRemoteConfig(
             id = EVENT_ID,
             timestamp = timestamp
         )
         everySuspend { mockSdkEventManager.emitEvent(remoteConfigEvent) } returns Unit
+        everySuspend {
+            mockSdkEventManager.emitEvent(
+                SdkEvent.Internal.Sdk.Answer.Response(
+                    originId = remoteConfigEvent.id,
+                    Result.failure<Exception>(testException)
+                )
+            )
+        } returns Unit
 
         val onlineSdkEvents = backgroundScope.async {
             onlineEvents.take(1).toList()

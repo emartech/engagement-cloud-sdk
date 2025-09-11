@@ -1,6 +1,7 @@
 package com.emarsys.enable.states
 
 import com.emarsys.core.channel.SdkEventDistributorApi
+import com.emarsys.core.channel.SdkEventWaiterApi
 import com.emarsys.event.SdkEvent
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -20,8 +21,15 @@ class ApplyAppCodeBasedRemoteConfigStateTests {
     private lateinit var eventSlot: SlotCapture<SdkEvent>
     private lateinit var applyAppCodeBasedRemoteConfigState: ApplyAppCodeBasedRemoteConfigState
 
+    private lateinit var mockWaiter: SdkEventWaiterApi
+
     @BeforeTest
     fun setUp() {
+        mockWaiter = mock()
+        everySuspend { mockWaiter.await<Any>() } returns SdkEvent.Internal.Sdk.Answer.Response(
+            "0",
+            Result.success(Any())
+        )
         eventSlot = slot()
         mockSdkEventDistributor = mock()
         applyAppCodeBasedRemoteConfigState =
@@ -35,8 +43,7 @@ class ApplyAppCodeBasedRemoteConfigStateTests {
 
     @Test
     fun testActive() = runTest {
-        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(
-            MockMode.autofill)
+        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mockWaiter
 
         applyAppCodeBasedRemoteConfigState.active()
 

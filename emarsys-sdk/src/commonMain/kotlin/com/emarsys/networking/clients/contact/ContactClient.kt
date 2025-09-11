@@ -3,6 +3,7 @@ package com.emarsys.networking.clients.contact
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
+import com.emarsys.core.exceptions.SdkException.NetworkIOException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.UrlRequest
@@ -46,27 +47,43 @@ internal class ContactClient(
     private suspend fun startEventConsumer() {
         sdkEventManager.onlineSdkEvents
             .filter { isContactEvent(it) }
-            .collect {
+            .collect { sdkEvent ->
                 try {
                     sdkLogger.debug("ContactClient - consumeContactChanges")
-                    val request = createUrlRequest(it)
+                    val request = createUrlRequest(sdkEvent)
                     val response = emarsysClient.send(
                         request
                     )
-
-                    if (response.status != HttpStatusCode.NoContent) {
-                        contactTokenHandler.handleContactTokens(response)
+                    response.onSuccess {
+                        if (it.status != HttpStatusCode.NoContent) {
+                            contactTokenHandler.handleContactTokens(it)
+                        }
+                        handleSuccess(sdkEvent)
                     }
-
-                    handleSuccess(it)
-                } catch (exception: Exception) {
-                    clientExceptionHandler.handleException(
-                        exception,
-                        "ContactClient - consumeContactChanges",
-                        it
-                    )
+                    response.onFailure { throwable ->
+                        handleException(throwable, sdkEvent)
+                    }
+                } catch (throwable: Throwable) {
+                    handleException(throwable, sdkEvent)
                 }
             }
+    }
+
+    private suspend fun handleException(exception: Throwable, sdkEvent: OnlineSdkEvent) {
+        if (exception is NetworkIOException) {
+            sdkEventManager.emitEvent(sdkEvent)
+        } else {
+            SdkEvent.Internal.Sdk.Answer.Response(
+                originId = sdkEvent.id,
+                Result.failure<Exception>(exception)
+            )
+
+        }
+        clientExceptionHandler.handleException(
+            exception,
+            "ContactClient - consumeContactChanges",
+            sdkEvent
+        )
     }
 
     private suspend fun handleSuccess(event: OnlineSdkEvent) {
