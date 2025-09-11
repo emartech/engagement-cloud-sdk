@@ -100,7 +100,12 @@ internal class EventClient(
                     handleInApp(result.contentCampaigns?.getOrNull(0))  // todo handle all campaigns returned
                     result.actionCampaigns?.let { handleOnEventActionCampaigns(it) }
                     sdkEvents.forEach {
-                        sdkEventManager.emitEvent(SdkEvent.Internal.Sdk.Answer.Ready(originId = it.id))
+                        sdkEventManager.emitEvent(
+                            SdkEvent.Internal.Sdk.Answer.Response(
+                                originId = it.id,
+                                Result.success(response)
+                            )
+                        )
                     }
                     sdkEvents.ack(eventsDao, sdkLogger)
                 } catch (throwable: Throwable) {
@@ -109,6 +114,14 @@ internal class EventClient(
                         "EventClient: Error during event consumption",
                         *sdkEvents.toTypedArray()
                     )
+                    sdkEvents.forEach {
+                        sdkEventManager.emitEvent(
+                            SdkEvent.Internal.Sdk.Answer.Response(
+                                originId = it.id,
+                                Result.failure<Throwable>(throwable)
+                            )
+                        )
+                    }
                 }
             }.collect()
     }

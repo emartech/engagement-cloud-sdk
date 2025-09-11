@@ -1,6 +1,7 @@
 package com.emarsys.mobileengage.action.actions
 
 import com.emarsys.core.channel.SdkEventDistributorApi
+import com.emarsys.core.networking.model.Response
 import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.action.models.CustomEventActionModel
 import kotlinx.serialization.json.JsonPrimitive
@@ -24,6 +25,6 @@ internal class CustomEventAction(
                         )
                     }
                 })
-        )?.await()
+        ).await<SdkEvent.Internal.Sdk.Answer.Response<Response>>()
     }
 }

@@ -6,6 +6,7 @@ import com.emarsys.networking.EmarsysClient
 import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.config.ConfigClient
 import com.emarsys.networking.clients.device.DeviceClient
+import com.emarsys.networking.clients.embedded.messaging.EmbeddedMessagingClient
 import com.emarsys.networking.clients.error.ClientExceptionHandler
 import com.emarsys.networking.clients.error.DefaultClientExceptionHandler
 import com.emarsys.networking.clients.event.EventClient
@@ -61,6 +62,17 @@ object NetworkInjection {
                 applicationScope = get(named(CoroutineScopeTypes.Application)),
                 uuidProvider = get()
             )
+        }
+        single<EventBasedClientApi>(named(EventBasedClientTypes.EmbeddedMessaging)) {
+            EmbeddedMessagingClient(
+                emarsysNetworkClient = get(named(NetworkClientTypes.Emarsys)),
+                clientExceptionHandler = get(),
+                embeddedMessagingRequestFactory = get(),
+                sdkEventManager = get(),
+                eventsDao = get(),
+                sdkLogger = get { parametersOf(EventClient::class.simpleName) },
+                applicationScope = get(named(CoroutineScopeTypes.Application)),
+                )
         }
         single<EventBasedClientApi>(named(EventBasedClientTypes.Device)) {
             DeviceClient(

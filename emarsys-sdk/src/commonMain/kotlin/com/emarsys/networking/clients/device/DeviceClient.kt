@@ -5,6 +5,7 @@ import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
+import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType.REGISTER_DEVICE_INFO
 import com.emarsys.core.url.UrlFactoryApi
@@ -52,13 +53,24 @@ internal class DeviceClient(
                     if (response.status == HttpStatusCode.OK) {
                         contactTokenHandler.handleContactTokens(response)
                     }
-                    sdkEventManager.emitEvent(SdkEvent.Internal.Sdk.Answer.Ready(originId = it.id))
+                    sdkEventManager.emitEvent(
+                        SdkEvent.Internal.Sdk.Answer.Response(
+                            originId = it.id,
+                            Result.success(response)
+                        )
+                    )
                     it.ack(eventsDao, sdkLogger)
                 } catch (exception: Exception) {
                     clientExceptionHandler.handleException(
                         exception,
                         "DeviceClient - consumeRegisterDeviceInfo",
                         it
+                    )
+                    sdkEventManager.emitEvent(
+                        SdkEvent.Internal.Sdk.Answer.Response(
+                            originId = it.id,
+                            Result.failure<Exception>(exception)
+                        )
                     )
                 }
             }

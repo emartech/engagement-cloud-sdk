@@ -245,10 +245,6 @@ sealed interface SdkEvent {
                     override val originId: String,
                     val result: Result<T>
                 ) : Answer()
-
-                data class Ready(
-                    override val originId: String
-                ) : Answer()
             }
 
             @Serializable

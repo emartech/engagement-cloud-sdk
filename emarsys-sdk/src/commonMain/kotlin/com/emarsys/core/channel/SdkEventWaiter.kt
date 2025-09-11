@@ -8,7 +8,7 @@ internal class SdkEventWaiter(
     override val sdkEvent: SdkEvent
 ) : SdkEventWaiterApi {
 
-    override suspend fun await() {
-        sdkEventDistributor.sdkEventFlow.first { it is SdkEvent.Internal.Sdk.Answer && sdkEvent.id == it.originId }
+    override suspend fun <T> await(): SdkEvent.Internal.Sdk.Answer.Response<T> {
+        return sdkEventDistributor.sdkEventFlow.first { it is SdkEvent.Internal.Sdk.Answer && sdkEvent.id == it.originId } as SdkEvent.Internal.Sdk.Answer.Response<T>
     }
 }
