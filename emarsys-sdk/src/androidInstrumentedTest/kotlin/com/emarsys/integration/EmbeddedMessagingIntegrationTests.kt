@@ -6,20 +6,15 @@ import com.emarsys.context.SdkContextApi
 import com.emarsys.context.copyWith
 import com.emarsys.core.channel.SdkEventDistributor
 import com.emarsys.core.exceptions.SdkException
-import com.emarsys.core.networking.context.RequestContextApi
 import com.emarsys.core.networking.model.Response
-import com.emarsys.core.storage.StorageApi
 import com.emarsys.di.SdkKoinIsolationContext
 import com.emarsys.event.SdkEvent
-import com.emarsys.networking.clients.contact.ContactTokenHandler
-import io.kotest.assertions.print.print
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
-import kotlin.test.Ignore
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -43,7 +38,6 @@ class EmbeddedMessagingIntegrationTests {
 
     }
 
-    @Ignore
     @Test
     fun testEmbeddedMessagingFetchMessages() = runTest {
         val sdkEventDistributor = SdkKoinIsolationContext.koin.get<SdkEventDistributor>()
@@ -74,7 +68,6 @@ class EmbeddedMessagingIntegrationTests {
         response.result.isSuccess shouldBe true
     }
 
-    @Ignore
     @Test
     fun testEmbeddedMessagingFetchBadgeCount() = runTest {
         val sdkEventDistributor = SdkKoinIsolationContext.koin.get<SdkEventDistributor>()

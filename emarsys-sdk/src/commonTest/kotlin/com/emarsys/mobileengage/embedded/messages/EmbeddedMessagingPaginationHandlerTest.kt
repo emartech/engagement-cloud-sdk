@@ -44,7 +44,7 @@ class EmbeddedMessagingPaginationHandlerTest {
         mockSdkLogger = mock(MockMode.autofill)
         paginationState = spy(EmbeddedMessagingPaginationState())
         fetchNextPageCaptor = Capture.slot<SdkEvent.Internal.EmbeddedMessaging.FetchNextPage>()
-        everySuspend { mockSdkEventManager.registerEvent(sdkEvent = capture(fetchNextPageCaptor)) } returns null
+        everySuspend { mockSdkEventManager.registerEvent(sdkEvent = capture(fetchNextPageCaptor)) } returns mock(MockMode.autofill)
         sdkEventFlow = MutableSharedFlow<SdkEvent>(
             replay = 100,
             extraBufferCapacity = Channel.UNLIMITED
