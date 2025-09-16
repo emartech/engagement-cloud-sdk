@@ -70,12 +70,12 @@ class EmbeddedMessagesRequestFactoryTests {
             SdkEvent.Internal.EmbeddedMessaging.FetchMessages(
                 nackCount = 0,
                 offset = 40,
-                categoryIds = listOf("category1", "category2")
+                categoryIds = listOf(1, 2)
             )
         )
 
         result.method shouldBe HttpMethod.Get
-        result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?skip=40&categoryIds=category1%2Ccategory2"
+        result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?skip=40&categoryIds=1%2C2"
     }
 
     @Test

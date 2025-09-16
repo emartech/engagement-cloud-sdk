@@ -184,7 +184,7 @@ sealed interface SdkEvent {
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int,
                 val offset: Int,
-                val categoryIds: List<String>
+                val categoryIds: List<Int>
             ) : EmbeddedMessaging
 
             @Serializable
@@ -194,13 +194,15 @@ sealed interface SdkEvent {
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int,
                 val offset: Int,
-                val categoryIds: List<String>
+                val categoryIds: List<Int>
             ) : EmbeddedMessaging
 
             @Serializable
             data class NextPage(
-                val id: String = UUIDProvider().provide()
-            )
+                override val id: String = UUIDProvider().provide(),
+                override val type: String = "nextPage",
+                override val timestamp: Instant = TimestampProvider().provide()
+            ) : Internal
 
             @Serializable
             data class FetchMeta(
