@@ -1,10 +1,10 @@
 package com.emarsys.init.states
 
 import com.emarsys.core.Registerable
-import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.SdkLogger
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
+import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
@@ -35,11 +35,23 @@ class RegisterWatchdogsStateTests {
     }
 
     @Test
-    fun testActive_should_call_register_on_watchdogs() = runTest {
+    fun testActive_should_call_register_on_watchdogs_and_returnSuccessResult() = runTest {
         everySuspend { lifecycleWatchDog.register() } returns Unit
         everySuspend { connectionWatchDog.register() } returns Unit
 
-        registerWatchDogsState.active()
+        registerWatchDogsState.active() shouldBe Result.success(Unit)
+
+        verifySuspend { lifecycleWatchDog.register() }
+        verifySuspend { connectionWatchDog.register() }
+    }
+
+    @Test
+    fun testActive_should_return_failureResult_ifRegistrationFails() = runTest {
+        val testException = Exception("failure")
+        everySuspend { lifecycleWatchDog.register() }  throws testException
+        everySuspend { connectionWatchDog.register() } returns Unit
+
+        registerWatchDogsState.active() shouldBe Result.failure(testException)
 
         verifySuspend { lifecycleWatchDog.register() }
         verifySuspend { connectionWatchDog.register() }

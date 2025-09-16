@@ -20,7 +20,7 @@ internal class SdkConfigLoaderState(
     override fun prepare() {
     }
 
-    override suspend fun active() {
+    override suspend fun active(): Result<Unit> {
         sdkLogger.debug(
             "Load SdkConfig from storage and try to setup the SDK"
         )
@@ -29,6 +29,7 @@ internal class SdkConfigLoaderState(
                 setupOrganizer.enable(it)
             }
         }
+        return Result.success(Unit)
     }
 
     override fun relax() {

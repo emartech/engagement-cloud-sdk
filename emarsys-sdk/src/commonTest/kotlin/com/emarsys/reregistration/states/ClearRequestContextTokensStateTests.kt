@@ -6,6 +6,7 @@ import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.mock
 import dev.mokkery.verify
+import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -26,7 +27,7 @@ class ClearRequestContextTokensStateTests {
 
     @Test
     fun active_shouldClearContactToken_andRefreshToken() = runTest {
-        clearRequestContextTokensState.active()
+        clearRequestContextTokensState.active() shouldBe Result.success(Unit)
 
         verify { requestContext.clearTokens() }
     }

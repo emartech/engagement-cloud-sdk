@@ -12,8 +12,9 @@ internal class TestState(override val name: String) : State {
         functionCalls?.invoke(name, this::prepare.name)
     }
 
-    override suspend fun active() {
+    override suspend fun active(): Result<Unit> {
         functionCalls?.invoke(name, this::active.name)
+        return Result.success(Unit)
     }
 
     override fun relax() {

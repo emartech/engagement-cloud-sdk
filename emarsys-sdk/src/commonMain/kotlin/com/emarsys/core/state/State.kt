@@ -6,7 +6,7 @@ internal interface State {
 
     fun prepare()
 
-    suspend fun active()
+    suspend fun active(): Result<Unit>
 
     fun relax()
 

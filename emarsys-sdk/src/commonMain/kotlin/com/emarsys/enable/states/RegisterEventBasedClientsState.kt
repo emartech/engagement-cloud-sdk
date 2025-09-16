@@ -10,10 +10,11 @@ internal class RegisterEventBasedClientsState(private val clients: List<EventBas
 
     override fun prepare() {}
 
-    override suspend fun active() {
+    override suspend fun active(): Result<Unit> {
         clients.forEach {
             it.register()
         }
+        return Result.success(Unit)
     }
 
     override fun relax() {}

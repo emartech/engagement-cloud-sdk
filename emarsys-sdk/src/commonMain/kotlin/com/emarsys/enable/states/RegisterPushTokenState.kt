@@ -19,15 +19,20 @@ internal class RegisterPushTokenState(
     override fun prepare() {
     }
 
-    override suspend fun active() {
+    override suspend fun active(): Result<Unit> {
         val pushToken = storage.get(PushConstants.PUSH_TOKEN_STORAGE_KEY)
         val lastSentPushToken = storage.get(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY)
 
-        if (pushToken != null && pushToken != lastSentPushToken) {
+        return if (pushToken != null && pushToken != lastSentPushToken) {
             sdkEventDistributor.registerEvent(
                 SdkEvent.Internal.Sdk.RegisterPushToken(pushToken = pushToken)
-            ).await<SdkEvent.Internal.Sdk.Answer.Response<Response>>()
-            storage.put(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY, pushToken)
+            ).await<Response>()
+                .result
+                .mapCatching {
+                    storage.put(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY, pushToken)
+                }
+        } else {
+            Result.success(Unit)
         }
     }
 

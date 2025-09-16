@@ -3,6 +3,7 @@ package com.emarsys.init.states
 import com.emarsys.core.Registerable
 import com.emarsys.core.log.Logger
 import com.emarsys.core.state.State
+import com.emarsys.util.runCatchingWithoutCancellation
 
 internal class RegisterWatchdogsState(
     private val lifecycleWatchDog: Registerable,
@@ -15,11 +16,13 @@ internal class RegisterWatchdogsState(
     override fun prepare() {
     }
 
-    override suspend fun active() {
+    override suspend fun active(): Result<Unit> {
         sdkLogger.debug("Registering watchdogs")
 
-        connectionWatchDog.register()
-        lifecycleWatchDog.register()
+        return runCatchingWithoutCancellation {
+            connectionWatchDog.register()
+            lifecycleWatchDog.register()
+        }
     }
 
     override fun relax() {

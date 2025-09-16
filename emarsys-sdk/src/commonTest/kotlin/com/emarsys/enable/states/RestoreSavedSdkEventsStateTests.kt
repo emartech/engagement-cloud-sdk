@@ -10,6 +10,7 @@ import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
+import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
@@ -45,7 +46,7 @@ class RestoreSavedSdkEventsStateTests {
     fun testActive_shouldGetEventsFromDao_andEmitThem() = runTest {
         everySuspend { mockEventsDao.getEvents() } returns flowOf(testEvent1, testEvent2)
 
-        restoreSavedSdkEventsState.active()
+        restoreSavedSdkEventsState.active() shouldBe Result.success(Unit)
 
         verifySuspend(VerifyMode.order) {
             mockEventsDao.getEvents()
@@ -59,7 +60,7 @@ class RestoreSavedSdkEventsStateTests {
         everySuspend { mockEventsDao.getEvents() } returns flowOf(testEvent1, testEvent2)
         everySuspend { mockSdkEventEmitter.emitEvent(testEvent1) } throws Exception("Emit failed")
 
-        restoreSavedSdkEventsState.active()
+        restoreSavedSdkEventsState.active() shouldBe Result.success(Unit)
 
         verifySuspend(VerifyMode.order) {
             mockEventsDao.getEvents()

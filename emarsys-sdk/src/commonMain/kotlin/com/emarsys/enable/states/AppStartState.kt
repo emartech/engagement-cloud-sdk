@@ -1,11 +1,12 @@
 package com.emarsys.enable.states
 
 import com.emarsys.core.channel.SdkEventDistributorApi
+import com.emarsys.core.networking.model.Response
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.core.state.State
-
 import com.emarsys.event.SdkEvent
+import com.emarsys.response.mapToUnitOrFailure
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
@@ -20,14 +21,20 @@ internal class AppStartState(
     override fun prepare() {
     }
 
-    override suspend fun active() {
-        if (!alreadyCompleted) {
+    override suspend fun active(): Result<Unit> {
+        return if (!alreadyCompleted) {
             val appStartEvent = SdkEvent.Internal.Sdk.AppStart(
                 id = uuidProvider.provide(),
                 timestamp = timestampProvider.provide()
             )
-//            sdkEventDistributor.registerEvent(appStartEvent)?.await()
-            alreadyCompleted = true
+            sdkEventDistributor.registerEvent(appStartEvent)
+                .await<Response>()
+                .mapToUnitOrFailure()
+                .onSuccess {
+                    alreadyCompleted = true
+                }
+        } else {
+            Result.success(Unit)
         }
     }
 

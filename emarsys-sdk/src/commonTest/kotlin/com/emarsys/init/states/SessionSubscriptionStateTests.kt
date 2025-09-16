@@ -36,7 +36,7 @@ class SessionSubscriptionStateTests {
     fun testActive_should_call_subscribe_on_mobileEngageSession() = runTest {
         everySuspend { mockMobileEngageSession.subscribe(mockLifecycleWatchDog) } returns Unit
 
-        sessionSubscriptionState.active()
+        sessionSubscriptionState.active() shouldBe Result.success(Unit)
 
         verifySuspend { mockMobileEngageSession.subscribe(mockLifecycleWatchDog) }
     }

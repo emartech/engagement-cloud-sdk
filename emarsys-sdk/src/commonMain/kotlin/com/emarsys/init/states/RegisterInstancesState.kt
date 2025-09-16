@@ -17,11 +17,13 @@ internal class RegisterInstancesState(
     override fun prepare() {
     }
 
-    override suspend fun active() {
+    override suspend fun active(): Result<Unit> {
         sdkLogger.debug("Registering instances")
         eventTrackerApi.registerOnContext()
         contactApi.registerOnContext()
         pushApi.registerOnContext()
+
+        return Result.success(Unit)
     }
 
     override fun relax() {

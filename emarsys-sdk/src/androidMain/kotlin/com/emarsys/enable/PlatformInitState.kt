@@ -8,7 +8,8 @@ internal class PlatformInitState : State {
 
     override fun prepare() {}
 
-    override suspend fun active() {
+    override suspend fun active(): Result<Unit> {
+        return Result.success(Unit)
     }
 
     override fun relax() {

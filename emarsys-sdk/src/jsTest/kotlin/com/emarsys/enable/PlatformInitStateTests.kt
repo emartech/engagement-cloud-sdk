@@ -9,11 +9,13 @@ import com.emarsys.fake.FakeStringStorage
 import com.emarsys.mobileengage.push.PushServiceApi
 import com.emarsys.util.JsonUtil
 import dev.mokkery.answering.returns
+import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
+import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
@@ -63,12 +65,13 @@ class PlatformInitStateTests: KoinTest {
     }
 
     @Test
-    fun activate_shouldCallRegister_onJsBridge_ifSdkContext_hasConfig() = runTest {
+    fun activate_shouldCallRegister_onJsBridge_ifSdkContext_hasConfig_andReturnSuccess() = runTest {
         val testConfig = JsEmarsysConfig()
         testSdkContext.config = testConfig
 
-        platformInitState.active()
+        val result = platformInitState.active()
 
+        result shouldBe Result.success(Unit)
         verifySuspend {
             mockPushService.register(testConfig)
             mockPushService.subscribeForPushMessages(testConfig)
@@ -76,12 +79,27 @@ class PlatformInitStateTests: KoinTest {
     }
 
     @Test
-    fun activate_shouldNot_callRegister_onPushService_ifSdkContext_hasNoConfig() = runTest {
-        platformInitState.active()
+    fun activate_shouldNot_callRegister_onPushService_ifSdkContext_hasNoConfig_andReturnSuccess() = runTest {
+        val result = platformInitState.active()
 
+        result shouldBe Result.success(Unit)
         verifySuspend(VerifyMode.exactly(0)) {
             mockPushService.register(any())
             mockPushService.subscribeForPushMessages(any())
+        }
+    }
+
+    @Test
+    fun activate_should_callRegister_onPushService_ifSdkContext_hasConfig_andReturnFailure_ifErrorHappens() = runTest {
+        testSdkContext.config = JsEmarsysConfig()
+        val testException = Exception("failure")
+        everySuspend { mockPushService.register(any()) } throws testException
+
+        val result = platformInitState.active()
+
+        result shouldBe Result.failure(testException)
+        verifySuspend(VerifyMode.exactly(1)) {
+            mockPushService.register(any())
         }
     }
 }

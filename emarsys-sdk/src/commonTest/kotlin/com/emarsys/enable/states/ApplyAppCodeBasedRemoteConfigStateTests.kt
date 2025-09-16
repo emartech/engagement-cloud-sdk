@@ -3,7 +3,6 @@ package com.emarsys.enable.states
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.channel.SdkEventWaiterApi
 import com.emarsys.event.SdkEvent
-import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.capture.Capture.Companion.slot
@@ -42,11 +41,29 @@ class ApplyAppCodeBasedRemoteConfigStateTests {
     }
 
     @Test
-    fun testActive() = runTest {
+    fun testActive_shouldReturn_success() = runTest {
         everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mockWaiter
 
-        applyAppCodeBasedRemoteConfigState.active()
+        val result = applyAppCodeBasedRemoteConfigState.active()
 
         (eventSlot.get() is SdkEvent.Internal.Sdk.ApplyAppCodeBasedRemoteConfig) shouldBe true
+
+        result shouldBe Result.success(Unit)
+    }
+
+    @Test
+    fun testActive_shouldReturn_failure_whenEventResult_containsFailure() = runTest {
+        val testException = Exception("test exception")
+        everySuspend { mockWaiter.await<Any>() } returns SdkEvent.Internal.Sdk.Answer.Response(
+            "0",
+            Result.failure(testException)
+        )
+        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mockWaiter
+
+        val result = applyAppCodeBasedRemoteConfigState.active()
+
+        (eventSlot.get() is SdkEvent.Internal.Sdk.ApplyAppCodeBasedRemoteConfig) shouldBe true
+
+        result shouldBe Result.failure(testException)
     }
 }

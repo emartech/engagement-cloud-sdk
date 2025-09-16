@@ -6,8 +6,8 @@ import com.emarsys.core.state.StateMachine
 import com.emarsys.core.state.StateMachineApi
 import com.emarsys.disable.DisableOrganizer
 import com.emarsys.disable.DisableOrganizerApi
-import com.emarsys.disable.states.ClearEvents
-import com.emarsys.disable.states.ClearStoredConfig
+import com.emarsys.disable.states.ClearEventsState
+import com.emarsys.disable.states.ClearStoredConfigState
 import com.emarsys.enable.EnableOrganizer
 import com.emarsys.enable.EnableOrganizerApi
 import com.emarsys.enable.states.AppStartState
@@ -74,13 +74,13 @@ object SetupInjection {
             )
         }
         single<State>(named(StateTypes.ClearStoredConfig)) {
-            ClearStoredConfig(
+            ClearStoredConfigState(
                 sdkConfigStore = get(),
-                sdkLogger = get { parametersOf(ClearStoredConfig::class.simpleName) }
+                sdkLogger = get { parametersOf(ClearStoredConfigState::class.simpleName) }
             )
         }
         single<State>(named(StateTypes.ClearEvents)) {
-            ClearEvents(eventsDao = get())
+            ClearEventsState(eventsDao = get())
         }
 
         single<StateMachineApi>(named(StateMachineTypes.MobileEngageEnable)) {

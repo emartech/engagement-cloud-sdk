@@ -17,7 +17,7 @@ internal class RestoreSavedSdkEventsState(
 
     override fun prepare() {}
 
-    override suspend fun active() {
+    override suspend fun active(): Result<Unit> {
         sdkLogger.debug("Restoring saved SDK events")
         eventsDao.getEvents().collect {
             try {
@@ -32,6 +32,8 @@ internal class RestoreSavedSdkEventsState(
                 )
             }
         }
+
+        return Result.success(Unit)
     }
 
     override fun relax() {}

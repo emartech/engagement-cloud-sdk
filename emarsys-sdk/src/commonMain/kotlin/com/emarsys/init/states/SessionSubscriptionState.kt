@@ -16,10 +16,11 @@ internal class SessionSubscriptionState(
     override fun prepare() {
     }
 
-    override suspend fun active() {
+    override suspend fun active(): Result<Unit> {
         sdkLogger.debug("Subscribing to session")
 
         emarsysSdkSession.subscribe(lifecycleWatchDog)
+        return Result.success(Unit)
     }
 
     override fun relax() {

@@ -2,8 +2,9 @@ package com.emarsys.enable.states
 
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.channel.SdkEventWaiterApi
+import com.emarsys.core.networking.model.Response
+import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.event.SdkEvent
-import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
@@ -14,6 +15,10 @@ import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
+import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.Url
+import io.ktor.http.headersOf
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -33,7 +38,14 @@ class RegisterClientStateTests {
         mockWaiter = mock()
         everySuspend { mockWaiter.await<Any>() } returns SdkEvent.Internal.Sdk.Answer.Response(
             "0",
-            Result.success(Any())
+            Result.success(
+                Response(
+                    originalRequest = UrlRequest(Url("https://example.com"), HttpMethod.Post),
+                    status = HttpStatusCode.OK,
+                    headers = headersOf(),
+                    bodyAsText = "testBody"
+                )
+            )
         )
         mockEventDistributor = mock()
         eventSlot = slot()
@@ -43,10 +55,32 @@ class RegisterClientStateTests {
 
     @Test
     fun testActive_should_callDeviceClient() = runTest {
-        registerClientState.active()
+        val result = registerClientState.active()
 
         advanceUntilIdle()
 
+        result shouldBe Result.success(Unit)
+        verifySuspend {
+            mockEventDistributor.registerEvent(any())
+        }
+
+        (eventSlot.get() is SdkEvent.Internal.Sdk.RegisterDeviceInfo) shouldBe true
+    }
+
+    @Test
+    fun testActive_should_callDeviceClient_andReturnFailureResult_whenRequestFails() = runTest {
+        val testException = Exception("test exception")
+        everySuspend { mockWaiter.await<Any>() } returns SdkEvent.Internal.Sdk.Answer.Response(
+            "0",
+            Result.failure(testException)
+        )
+
+        val result = registerClientState.active()
+
+        advanceUntilIdle()
+
+        result.isSuccess shouldBe false
+        result.exceptionOrNull() shouldBe testException
         verifySuspend {
             mockEventDistributor.registerEvent(any())
         }

@@ -3,7 +3,6 @@ package com.emarsys.init.states
 import com.emarsys.api.contact.ContactApi
 import com.emarsys.api.event.EventTrackerApi
 import com.emarsys.api.push.PushApi
-import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.SdkLogger
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -45,7 +44,7 @@ class RegisterInstancesStateTests {
         everySuspend { mockContactApi.registerOnContext() } returns Unit
         everySuspend { mockPushApi.registerOnContext() } returns Unit
 
-        registerInstancesState.active()
+        registerInstancesState.active() shouldBe Result.success(Unit)
 
         verifySuspend { mockEventTrackerApi.registerOnContext() }
         verifySuspend { mockContactApi.registerOnContext() }

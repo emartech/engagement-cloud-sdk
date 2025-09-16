@@ -3,6 +3,7 @@ package com.emarsys.init.states
 import com.emarsys.core.log.Logger
 import com.emarsys.core.state.State
 import com.emarsys.enable.PlatformInitializerApi
+import com.emarsys.util.runCatchingWithoutCancellation
 
 internal class InitializerState(
     private val platformInitializer: PlatformInitializerApi,
@@ -13,9 +14,11 @@ internal class InitializerState(
     override fun prepare() {
     }
 
-    override suspend fun active() {
-        sdkLogger.debug("Initializing platforms")
-        platformInitializer.init()
+    override suspend fun active(): Result<Unit> {
+        return runCatchingWithoutCancellation {
+            sdkLogger.debug("Initializing platforms")
+            platformInitializer.init()
+        }
     }
 
     override fun relax() {

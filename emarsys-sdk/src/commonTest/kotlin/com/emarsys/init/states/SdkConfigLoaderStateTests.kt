@@ -11,6 +11,7 @@ import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
+import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -48,9 +49,10 @@ class SdkConfigLoaderStateTests {
             )
         everySuspend { mockSdkConfigLoader.load() } returns null
 
-        sdkConfigLoaderState.active()
+        val result = sdkConfigLoaderState.active()
         advanceUntilIdle()
 
+        result shouldBe Result.success(Unit)
         verifySuspend { mockSdkConfigLoader.load() }
         verifySuspend(VerifyMode.exactly(0)) {
             mockSetupOrganizer.enable(any())
@@ -68,9 +70,10 @@ class SdkConfigLoaderStateTests {
         val testConfig = TestEmarsysConfig()
         everySuspend { mockSdkConfigLoader.load() } returns testConfig
 
-        sdkConfigLoaderState.active()
+        val result = sdkConfigLoaderState.active()
         advanceUntilIdle()
 
+        result shouldBe Result.success(Unit)
         verifySuspend { mockSdkConfigLoader.load() }
         verifySuspend {
             mockSetupOrganizer.enable(testConfig)

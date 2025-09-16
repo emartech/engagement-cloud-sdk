@@ -54,7 +54,7 @@ class RegisterEventBasedClientsStateTests {
 
     @Test
     fun testActive_should_registerAllClients() = runTest {
-        registerEventBasedClientsState.active()
+        val result = registerEventBasedClientsState.active()
 
         clients.size shouldBe EventBasedClientTypes.entries.size
 
@@ -70,5 +70,7 @@ class RegisterEventBasedClientsStateTests {
             mockReregistrationClient.register()
             mockEmbeddedMessagingClient.register()
         }
+
+        result shouldBe Result.success(Unit)
     }
 }

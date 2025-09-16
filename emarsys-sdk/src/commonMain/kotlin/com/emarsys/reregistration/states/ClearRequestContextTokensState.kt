@@ -13,9 +13,11 @@ internal class ClearRequestContextTokensState(
 
     override fun prepare() {}
 
-    override suspend fun active() {
+    override suspend fun active(): Result<Unit> {
         sdkLogger.debug("Clearing request context tokens")
         requestContext.clearTokens()
+
+        return Result.success(Unit)
     }
 
     override fun relax() {}
