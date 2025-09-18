@@ -55,7 +55,7 @@ internal class PushClient(
                         sdkEventManager.emitEvent(
                             SdkEvent.Internal.Sdk.Answer.Response(
                                 originId = sdkEvent.id,
-                                Result.success(response)
+                                response
                             )
                         )
                         sdkEvent.ack(eventsDao, sdkLogger)

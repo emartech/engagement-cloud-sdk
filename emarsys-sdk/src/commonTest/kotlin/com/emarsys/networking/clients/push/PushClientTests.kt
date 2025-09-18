@@ -146,14 +146,15 @@ class PushClientTests {
             URL,
             HttpMethod.Delete
         )
-        everySuspend { mockEmarsysClient.send(expectedUrlRequest) } returns Result.success(
-            Response(
-                expectedUrlRequest,
-                HttpStatusCode.OK,
-                Headers.Empty,
-                ""
-            )
+        val response = Response(
+            expectedUrlRequest,
+            HttpStatusCode.OK,
+            Headers.Empty,
+            ""
         )
+        val result = Result.success(response)
+
+        everySuspend { mockEmarsysClient.send(expectedUrlRequest) } returns result
         val clearPushTokenEvent = SdkEvent.Internal.Sdk.ClearPushToken(ID, TIMESTAMP)
 
         val onlineSdkEvents = backgroundScope.async {
@@ -165,6 +166,14 @@ class PushClientTests {
         onlineSdkEvents.await() shouldBe listOf(clearPushTokenEvent)
         verifySuspend {
             mockEmarsysClient.send(expectedUrlRequest)
+        }
+        verifySuspend {
+            mockSdkEventManager.emitEvent(
+                SdkEvent.Internal.Sdk.Answer.Response(
+                    originId = ID,
+                    result
+                )
+            )
         }
         verifySuspend { mockEventsDao.removeEvent(clearPushTokenEvent) }
     }
