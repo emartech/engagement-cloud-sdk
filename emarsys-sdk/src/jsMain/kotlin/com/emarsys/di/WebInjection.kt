@@ -19,6 +19,8 @@ import com.emarsys.api.push.PushConstants.WEB_PUSH_ON_NOTIFICATION_CLICKED_CHANN
 import com.emarsys.api.push.PushGatherer
 import com.emarsys.api.push.PushInstance
 import com.emarsys.api.push.PushInternal
+import com.emarsys.api.setup.JsSetup
+import com.emarsys.api.setup.JsSetupApi
 import com.emarsys.api.tracking.JSTracking
 import com.emarsys.api.tracking.JSTrackingApi
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
@@ -227,36 +229,34 @@ object WebInjection {
                 sdkContext = get()
             )
         }
+        single<JsSetupApi> {
+            JsSetup(
+                get(),
+                get(named(CoroutineScopeTypes.Application))
+            )
+        }
         single<JSConfigApi> {
             JSConfig(
                 configApi = get(),
-                applicationScope = get(
-                    named(CoroutineScopeTypes.Application)
-                )
+                applicationScope = get(named(CoroutineScopeTypes.Application))
             )
         }
         single<JSContactApi> {
             JSContact(
                 contactApi = get(),
-                applicationScope = get(
-                    named(CoroutineScopeTypes.Application)
-                )
+                applicationScope = get(named(CoroutineScopeTypes.Application))
             )
         }
         single<JSTrackingApi> {
             JSTracking(
                 trackingApi = get(),
-                applicationScope = get(
-                    named(CoroutineScopeTypes.Application)
-                )
+                applicationScope = get(named(CoroutineScopeTypes.Application))
             )
         }
         single<JSPushApi> {
             JSPush(
                 pushApi = get(),
-                applicationScope = get(
-                    named(CoroutineScopeTypes.Application)
-                )
+                applicationScope = get(named(CoroutineScopeTypes.Application))
             )
         }
         single<JSDeepLinkApi> {
@@ -267,9 +267,7 @@ object WebInjection {
         single<JSInAppApi> {
             JSInApp(
                 inAppApi = get(),
-                applicationScope = get(
-                    named(CoroutineScopeTypes.Application)
-                )
+                applicationScope = get(named(CoroutineScopeTypes.Application))
             )
         }
     }

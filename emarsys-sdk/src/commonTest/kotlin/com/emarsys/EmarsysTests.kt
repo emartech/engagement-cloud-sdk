@@ -1,10 +1,11 @@
 package com.emarsys
 
-import com.emarsys.core.exceptions.SdkException
-import com.emarsys.core.log.Logger
+import com.emarsys.api.setup.SetupApi
 import com.emarsys.di.SdkKoinIsolationContext.koin
-import com.emarsys.fake.FakeLogger
-import io.kotest.assertions.throwables.shouldThrow
+import dev.mokkery.answering.returns
+import dev.mokkery.everySuspend
+import dev.mokkery.mock
+import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import org.koin.core.Koin
 import org.koin.core.module.Module
@@ -13,25 +14,68 @@ import org.koin.test.KoinTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class EmarsysTests: KoinTest {
+class EmarsysTests : KoinTest {
     override fun getKoin(): Koin = koin
 
+    private companion object {
+        val config = TestEmarsysConfig(applicationCode = "testConfig")
+        val testException = Exception("failure")
+    }
+
     private lateinit var testModule: Module
+    private lateinit var mockSetup: SetupApi
 
     @BeforeTest
     fun setUp() {
         testModule = module {
-            single<Logger> { FakeLogger() }
-
+            single<SetupApi> { mockSetup }
         }
         koin.loadModules(listOf(testModule))
     }
 
     @Test
-    fun testEnableTracking_shouldValidateConfig() = runTest {
-        val config = TestEmarsysConfig(applicationCode = "null")
-        shouldThrow<SdkException.InvalidApplicationCodeException> {
-            Emarsys.enableTracking(config)
+    fun testEnableTracking_shouldReturn_successFrom_setupApi_call() = runTest {
+        mockSetup = mock {
+            everySuspend { enableTracking(config) } returns Result.success(Unit)
         }
+
+        val result = Emarsys.enableTracking(config)
+
+        result.isSuccess shouldBe true
+        result.exceptionOrNull() shouldBe null
+    }
+
+    @Test
+    fun testEnableTracking_shouldReturn_failureFrom_setupApi_call() = runTest {
+        mockSetup = mock {
+            everySuspend { enableTracking(config) } returns Result.failure(testException)
+        }
+
+        val result = Emarsys.enableTracking(config)
+
+        result.exceptionOrNull() shouldBe testException
+    }
+
+    @Test
+    fun testDisableTracking_shouldReturn_successFrom_setupApi_call() = runTest {
+        mockSetup = mock {
+            everySuspend { disableTracking() } returns Result.success(Unit)
+        }
+
+        val result = Emarsys.disableTracking()
+
+        result.isSuccess shouldBe true
+        result.exceptionOrNull() shouldBe null
+    }
+
+    @Test
+    fun testDisableTracking_shouldReturn_failureFrom_setupApi_call() = runTest {
+        mockSetup = mock {
+            everySuspend { disableTracking() } returns Result.failure(testException)
+        }
+
+        val result = Emarsys.disableTracking()
+
+        result.exceptionOrNull() shouldBe testException
     }
 }

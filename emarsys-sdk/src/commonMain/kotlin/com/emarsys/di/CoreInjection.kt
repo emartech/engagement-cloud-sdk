@@ -1,5 +1,7 @@
 package com.emarsys.di
 
+import com.emarsys.api.setup.Setup
+import com.emarsys.api.setup.SetupApi
 import com.emarsys.context.DefaultUrls
 import com.emarsys.context.DefaultUrlsApi
 import com.emarsys.context.SdkContext
@@ -120,6 +122,13 @@ object CoreInjection {
             SdkEventEmitterApi::class,
             SdkEventManagerApi::class
         )
+        single<SetupApi> {
+            Setup(
+                get(),
+                get(),
+                get(),
+                get { parametersOf(Setup::class.simpleName) })
+        }
         single<SdkContextApi> {
             SdkContext(
                 sdkDispatcher = get(named(DispatcherTypes.Sdk)),

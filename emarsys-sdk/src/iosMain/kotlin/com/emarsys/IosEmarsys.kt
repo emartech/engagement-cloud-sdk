@@ -5,6 +5,7 @@ import com.emarsys.api.contact.IosContactApi
 import com.emarsys.api.deeplink.IosDeepLinkApi
 import com.emarsys.api.inapp.IosInAppApi
 import com.emarsys.api.push.IosPushApi
+import com.emarsys.api.setup.IosSetupApi
 import com.emarsys.api.tracking.IosTrackingApi
 import com.emarsys.config.SdkConfig
 import com.emarsys.core.exceptions.SdkException.SdkAlreadyDisabledException
@@ -28,6 +29,8 @@ typealias EmarsysEventListener = (SdkEvent) -> Unit
 object IosEmarsys {
     private var eventListeners: MutableList<EmarsysEventListener> = mutableListOf()
 
+    val setup: IosSetupApi
+        get() = koin.get<IosSetupApi>()
     val contact: IosContactApi
         get() = koin.get<IosContactApi>()
     val push: IosPushApi
@@ -47,13 +50,14 @@ object IosEmarsys {
     @Throws(CancellationException::class)
     suspend fun initialize() {
         Emarsys.initialize()
-        koin.get<CoroutineScope>(named(CoroutineScopeTypes.Application)).launch(start = CoroutineStart.UNDISPATCHED) {
-            koin.get<Flow<SdkEvent.External.Api>>(named(EventFlowTypes.Public)).collect {
-                eventListeners.forEach { listener ->
-                    listener.invoke(it)
+        koin.get<CoroutineScope>(named(CoroutineScopeTypes.Application))
+            .launch(start = CoroutineStart.UNDISPATCHED) {
+                koin.get<Flow<SdkEvent.External.Api>>(named(EventFlowTypes.Public)).collect {
+                    eventListeners.forEach { listener ->
+                        listener.invoke(it)
+                    }
                 }
             }
-        }
     }
 
     /**

@@ -126,7 +126,7 @@ object SetupInjection {
         }
         single<DisableOrganizerApi> {
             DisableOrganizer(
-                mobileEngageDisableStateMachine = get(named(StateMachineTypes.MobileEngageEnable)),
+                mobileEngageDisableStateMachine = get(named(StateMachineTypes.MobileEngageDisable)),
                 sdkContext = get(),
                 emarsysSdkSession = get(),
                 sdkLogger = get { parametersOf(EnableOrganizer::class.simpleName) },

@@ -13,6 +13,8 @@ import com.emarsys.api.inapp.IosInAppApi
 import com.emarsys.api.push.IosPush
 import com.emarsys.api.push.IosPushApi
 import com.emarsys.api.push.PushApi
+import com.emarsys.api.setup.IosSetup
+import com.emarsys.api.setup.IosSetupApi
 import com.emarsys.api.tracking.IosTracking
 import com.emarsys.api.tracking.IosTrackingApi
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
@@ -87,6 +89,7 @@ object IosInjection {
     val iosModules = module {
         single<NSUserDefaults> { NSUserDefaults(StorageConstants.SUITE_NAME) }
         single<IosContactApi> { IosContact() }
+        single<IosSetupApi> { IosSetup(get()) }
         single<IosPushApi> { IosPush() }
         single<IosTrackingApi> { IosTracking() }
         single<IosInAppApi> { IosInApp() }
