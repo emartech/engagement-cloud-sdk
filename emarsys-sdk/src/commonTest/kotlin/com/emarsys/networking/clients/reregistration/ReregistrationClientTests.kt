@@ -56,6 +56,7 @@ class ReregistrationClientTests {
     @Test
     fun testStartEventConsumer_shouldSetSdkState_toOnHold_activateMobileEngageStateMachine_andSetSdkStateToOnActive() =
         runTest {
+            everySuspend { mockMobileEngageReregistrationStateMachine.activate() } returns Result.success(Unit)
             reregistrationClient = createReregistrationClient(backgroundScope)
             reregistrationClient.register()
 
@@ -84,10 +85,32 @@ class ReregistrationClientTests {
 
             verifySuspend {
                 mockSdkContext.setSdkState(SdkState.onHold)
-                mockSdkLogger.error("Error during re-registration", testException)
+                mockSdkLogger.error("Error in re-registration flow collection", testException)
             }
             verifySuspend(VerifyMode.exactly(0)) {
                 mockMobileEngageReregistrationStateMachine.activate()
+                mockSdkContext.setSdkState(SdkState.active)
+            }
+        }
+
+    @Test
+    fun testStartEventConsumer_should_notSetStateToActive_andLog_whenStateMachine_returnsFailure() =
+        runTest {
+            reregistrationClient = createReregistrationClient(backgroundScope)
+            reregistrationClient.register()
+            val testException = Exception("Test exception")
+            everySuspend { mockMobileEngageReregistrationStateMachine.activate() } returns Result.failure(testException)
+
+            val event = SdkEvent.Internal.Sdk.ReregistrationRequired()
+
+            sdkEventFlow.emit(event)
+
+            verifySuspend {
+                mockSdkContext.setSdkState(SdkState.onHold)
+                mockMobileEngageReregistrationStateMachine.activate()
+                mockSdkLogger.error("Error during re-registration", testException)
+            }
+            verifySuspend(VerifyMode.exactly(0)) {
                 mockSdkContext.setSdkState(SdkState.active)
             }
         }

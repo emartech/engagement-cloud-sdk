@@ -36,10 +36,14 @@ internal class ReregistrationClient(
                 sdkLogger.debug("Reregistration start")
                 sdkContext.setSdkState(SdkState.onHold)
                 mobileEngageReregistrationStateMachine.activate()
-                sdkContext.setSdkState(SdkState.active)
-                sdkLogger.debug("Reregistration finished")
+                    .onSuccess {
+                        sdkContext.setSdkState(SdkState.active)
+                        sdkLogger.debug("Reregistration finished")
+                    }.onFailure {
+                        sdkLogger.error("Error during re-registration", it)
+                    }
             }.catch {
-                sdkLogger.error("Error during re-registration", it)
+                sdkLogger.error("Error in re-registration flow collection", it)
             }.collect()
     }
 

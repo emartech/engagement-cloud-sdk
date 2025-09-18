@@ -29,7 +29,7 @@ internal class EnableOrganizer(
         sdkContext.setSdkState(SdkState.onHold)
         sdkConfigStore.store(config)
         sdkContext.config = config
-        meStateMachine.activate()
+        meStateMachine.activate().getOrThrow()
         sdkContext.setSdkState(SdkState.active)
         emarsysSdkSession.startSession()
         sdkLogger.debug("SDK Setup Completed")

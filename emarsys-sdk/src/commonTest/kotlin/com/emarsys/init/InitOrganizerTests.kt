@@ -17,6 +17,7 @@ import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -32,7 +33,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-class InitOrganizerTests: KoinTest {
+class InitOrganizerTests : KoinTest {
 
     override fun getKoin(): Koin = koin
 
@@ -65,7 +66,11 @@ class InitOrganizerTests: KoinTest {
             mutableSetOf(),
             logBreadcrumbsQueueSize = 10
         )
-        initOrganizer = InitOrganizer(mockStateMachine, sdkContext, SdkLogger("TestLoggerName", mock(MockMode.autofill), sdkContext = mock()))
+        initOrganizer = InitOrganizer(
+            mockStateMachine,
+            sdkContext,
+            SdkLogger("TestLoggerName", mock(MockMode.autofill), sdkContext = mock())
+        )
     }
 
     @AfterTest
@@ -76,7 +81,7 @@ class InitOrganizerTests: KoinTest {
     @Test
     fun init_should_call_activate_onStateMachine_and_set_config_and_state_on_context() =
         runTest {
-            everySuspend { mockStateMachine.activate() } returns Unit
+            everySuspend { mockStateMachine.activate() } returns Result.success(Unit)
 
             initOrganizer.init()
 
@@ -91,6 +96,7 @@ class InitOrganizerTests: KoinTest {
         runTest {
             everySuspend { mockStateMachine.activate() } calls {
                 sdkContext.setSdkState(SdkState.active)
+                Result.success(Unit)
             }
 
             initOrganizer.init()
@@ -99,5 +105,20 @@ class InitOrganizerTests: KoinTest {
                 mockStateMachine.activate()
             }
             sdkContext.currentSdkState.value shouldBe SdkState.active
+        }
+
+    @Test
+    fun init_should_throwException_ifStateMachineActivation_throws() =
+        runTest {
+            val testException = Exception("failure")
+            everySuspend { mockStateMachine.activate() } returns Result.failure(testException)
+
+            val exception = shouldThrow<Exception> { initOrganizer.init() }
+
+            verifySuspend {
+                mockStateMachine.activate()
+            }
+            sdkContext.currentSdkState.value shouldBe SdkState.inactive
+            exception shouldBe testException
         }
 }

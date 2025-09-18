@@ -6,8 +6,12 @@ import com.emarsys.core.log.Logger
 import com.emarsys.core.state.StateMachineApi
 import com.emarsys.mobileengage.session.SessionApi
 import dev.mokkery.MockMode
+import dev.mokkery.answering.returns
+import dev.mokkery.everySuspend
 import dev.mokkery.mock
+import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
+import io.kotest.assertions.throwables.shouldThrow
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -22,7 +26,9 @@ class DisableOrganizerTests {
 
     @BeforeTest
     fun setup() {
-        mockMEStateMachine = mock(MockMode.autofill)
+        mockMEStateMachine = mock {
+            everySuspend { activate() } returns Result.success(Unit)
+        }
         mockSession = mock(MockMode.autofill)
         mockSdkContext = mock(MockMode.autofill)
         mockSdkLogger = mock(MockMode.autofill)
@@ -36,12 +42,22 @@ class DisableOrganizerTests {
     }
 
     @Test
-    fun testDisable_shouldActivate_MEOrganizer() = runTest {
-
+    fun testDisable_shouldActivate_MEDisableStateMachine_andEndSession() = runTest {
         disableOrganizer.disable()
 
         verifySuspend { mockSdkContext.setSdkState(SdkState.inactive) }
         verifySuspend { mockMEStateMachine.activate() }
         verifySuspend { mockSession.endSession() }
+    }
+
+    @Test
+    fun testDisable_shouldThrowException_whenStateMachineActivation_fails() = runTest {
+        everySuspend { mockMEStateMachine.activate() } returns Result.failure(RuntimeException("test exception"))
+
+        shouldThrow<RuntimeException> { disableOrganizer.disable() }
+
+        verifySuspend { mockSdkContext.setSdkState(SdkState.inactive) }
+        verifySuspend { mockMEStateMachine.activate() }
+        verifySuspend(VerifyMode.exactly(0)) { mockSession.endSession() }
     }
 }

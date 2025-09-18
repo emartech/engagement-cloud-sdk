@@ -27,7 +27,6 @@ kotlin {
         publishLibraryVariants("release")
     }
     js(IR) {
-        outputModuleName.set("emarsys-sdk")
         binaries.executable()
         generateTypeScriptDefinitions()
         browser {

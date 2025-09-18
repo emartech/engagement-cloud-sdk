@@ -11,12 +11,16 @@ internal class InitOrganizer(
     private val sdkLogger: Logger
 
 ) : InitOrganizerApi {
+
+    // TODO how to signal when auto-init fails
     override suspend fun init() {
         initStateMachine.activate()
+            .onFailure {
+                sdkLogger.debug("SDK initialized", it)
+            }.getOrThrow()
+
         if (sdkContext.currentSdkState.value == SdkState.inactive) {
             sdkContext.setSdkState(SdkState.initialized)
         }
-        sdkLogger.debug("SDK initialized")
     }
-
 }

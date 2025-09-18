@@ -51,7 +51,7 @@ class EnableOrganizerTests: KoinTest {
     private lateinit var mockSdkConfigLoader: SdkConfigStoreApi<SdkConfig>
     private lateinit var mockSession: SessionApi
     private lateinit var sdkContext: SdkContextApi
-    private lateinit var setupOrganizer: EnableOrganizerApi
+    private lateinit var enableOrganizer: EnableOrganizerApi
 
     @BeforeTest
     fun setUp() {
@@ -63,7 +63,9 @@ class EnableOrganizerTests: KoinTest {
 
         mainDispatcher = StandardTestDispatcher()
         Dispatchers.setMain(mainDispatcher)
-        mockMeStateMachine = mock(MockMode.autofill)
+        mockMeStateMachine = mock {
+            everySuspend { activate() } returns Result.success(Unit)
+        }
         mockSdkConfigLoader = mock(MockMode.autoUnit)
         mockSession = mock(MockMode.autoUnit)
         everySuspend { mockSdkConfigLoader.load() } returns null
@@ -75,7 +77,7 @@ class EnableOrganizerTests: KoinTest {
             mutableSetOf(),
             logBreadcrumbsQueueSize = 10
         )
-        setupOrganizer = EnableOrganizer(
+        enableOrganizer = EnableOrganizer(
             mockMeStateMachine,
             sdkContext,
             mockSdkConfigLoader,
@@ -90,11 +92,11 @@ class EnableOrganizerTests: KoinTest {
     }
 
     @Test
-    fun setup_should_call_activate_onMeStateMachine_and_store_config_and_set_config_and_state_on_context() =
+    fun enable_should_call_activate_onMeStateMachine_and_store_config_and_set_config_and_state_on_context() =
         runTest {
             val config = TestEmarsysConfig("testAppCode")
 
-            setupOrganizer.enable(config)
+            enableOrganizer.enable(config)
 
             verifySuspend { mockSdkConfigLoader.store(config) }
             verifySuspend {
@@ -106,13 +108,13 @@ class EnableOrganizerTests: KoinTest {
         }
 
     @Test
-    fun testSetupWithValidation_should_throw_whenAConfigWasAlreadyStored() =
+    fun testEnableWithValidation_should_throw_whenAConfigWasAlreadyStored() =
         runTest {
             val config = TestEmarsysConfig("testAppCode")
             everySuspend { mockSdkConfigLoader.load() } returns config
 
             val exception = shouldThrow<SdkAlreadyEnabledException> {
-                setupOrganizer.enableWithValidation(config)
+                enableOrganizer.enableWithValidation(config)
             }
             exception.message shouldBe "Emarsys SDK was already enabled!"
             verifySuspend(VerifyMode.exactly(0)) {
@@ -121,13 +123,13 @@ class EnableOrganizerTests: KoinTest {
         }
 
     @Test
-    fun testSetupWithValidation_should_call_setup_whenNoConfigWasStored() =
+    fun testEnableWithValidation_should_call_setup_whenNoConfigWasStored() =
         runTest {
             everySuspend { mockSdkConfigLoader.load() } returns null
 
             val config = TestEmarsysConfig("testAppCode")
 
-            setupOrganizer.enableWithValidation(config)
+            enableOrganizer.enableWithValidation(config)
 
             verifySuspend { mockSdkConfigLoader.store(config) }
             verifySuspend {
@@ -135,5 +137,25 @@ class EnableOrganizerTests: KoinTest {
             }
             sdkContext.config shouldBe config
             sdkContext.currentSdkState.value shouldBe SdkState.active
+        }
+
+    @Test
+    fun testEnableWithValidation_should_throwException_whenStateMachineActivation_returnsFailure() =
+        runTest {
+            val testException = Exception("failure")
+            everySuspend { mockSdkConfigLoader.load() } returns null
+            everySuspend { mockMeStateMachine.activate() } returns Result.failure(testException)
+
+            val config = TestEmarsysConfig("testAppCode")
+
+            shouldThrow<Exception> { enableOrganizer.enableWithValidation(config) }
+
+            verifySuspend { mockSdkConfigLoader.store(config) }
+            verifySuspend {
+                mockMeStateMachine.activate()
+            }
+            sdkContext.config shouldBe config
+            sdkContext.currentSdkState.value shouldBe SdkState.onHold
+            verifySuspend(VerifyMode.exactly(0)) { mockSession.startSession() }
         }
 }
