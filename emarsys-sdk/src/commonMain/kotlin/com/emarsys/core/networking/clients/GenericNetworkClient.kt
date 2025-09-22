@@ -90,7 +90,10 @@ internal class GenericNetworkClient(
                         retries,
                         networkDuration
                     )
-                    Result.failure(RetryLimitReachedException("Request retry limit reached! Response: ${httpResponse.bodyAsText()}"))
+                    Result.failure(RetryLimitReachedException(
+                        "Request retry limit reached!",
+                        response = response
+                    ))
                 }
                 else -> {
                     networkErrorLog(

@@ -6,18 +6,13 @@ import com.emarsys.core.exceptions.SdkException.RetryLimitReachedException
 import com.emarsys.core.networking.clients.GenericNetworkClient
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
-import com.emarsys.core.networking.model.body
 import com.emarsys.model.TestDataClass
 import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.mock
-import dev.mokkery.verify.VerifyMode
-import dev.mokkery.verifySuspend
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.beInstanceOf
-import io.kotest.matchers.types.shouldBeSameInstanceAs
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.config
 import io.ktor.client.engine.mock.MockEngine
@@ -236,10 +231,11 @@ class GenericNetworkClientTests {
         )
 
         val response: Result<Response> = genericNetworkClient.send(request)
-        val exception = response.exceptionOrNull()
+        val exception = response.exceptionOrNull() as RetryLimitReachedException
 
         exception should beInstanceOf(RetryLimitReachedException::class)
-        exception!!.message shouldBe """Request retry limit reached! Response: {"eventName":"test"}"""
+        exception.message shouldBe "Request retry limit reached!"
+        exception.response.status shouldBe HttpStatusCode.InternalServerError
     }
 
     @Test

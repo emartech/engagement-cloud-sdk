@@ -70,7 +70,7 @@ object NetworkInjection {
                 embeddedMessagingRequestFactory = get(),
                 sdkEventManager = get(),
                 eventsDao = get(),
-                sdkLogger = get { parametersOf(EventClient::class.simpleName) },
+                sdkLogger = get { parametersOf(EmbeddedMessagingClient::class.simpleName) },
                 applicationScope = get(named(CoroutineScopeTypes.Application)),
                 )
         }

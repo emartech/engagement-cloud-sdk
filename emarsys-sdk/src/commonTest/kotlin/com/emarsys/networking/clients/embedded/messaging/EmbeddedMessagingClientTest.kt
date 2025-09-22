@@ -12,7 +12,6 @@ import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.embedded.messages.EmbeddedMessagingRequestFactoryApi
 import com.emarsys.networking.clients.error.ClientExceptionHandler
 import dev.mokkery.*
-import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
 import dev.mokkery.matcher.any
@@ -216,13 +215,6 @@ class EmbeddedMessagingClientTest {
                 event
             )
         } returns request
-
-        val expectedResponse = Response(
-            status = HttpStatusCode.OK,
-            headers = Headers.Empty,
-            originalRequest = request,
-            bodyAsText = "{}"
-        )
 
         everySuspend { mockEmarsysNetworkClient.send(request) } returns Result.failure(SdkException.NetworkIOException("Test Network error"))
 

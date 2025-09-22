@@ -32,6 +32,16 @@ class DefaultClientExceptionHandlerTests {
     private lateinit var mockSdkLogger: Logger
     private lateinit var exceptionHandler: ClientExceptionHandler
 
+    private companion object {
+        val RESPONSE = Response(
+            UrlRequest(
+                Url("testUrl"),
+                HttpMethod.Post
+            ),
+            HttpStatusCode.Unauthorized, Headers.Empty, bodyAsText = "testBody"
+        )
+    }
+
     @BeforeTest
     fun setUp() {
         mockEventsDao = mock(MockMode.autofill)
@@ -45,20 +55,12 @@ class DefaultClientExceptionHandlerTests {
         table(
             headers("exception"),
             listOf(
-                row(
-                    FailedRequestException(
-                        response = Response(
-                            UrlRequest(
-                                Url("testUrl"),
-                                HttpMethod.Post
-                            ), HttpStatusCode.Unauthorized, Headers.Empty, bodyAsText = "testBody"
-                        )
-                    )
+                row(FailedRequestException(RESPONSE)),
+                row(RetryLimitReachedException(
+                    "Retry limit reached",
+                    RESPONSE)
                 ),
-                row(RetryLimitReachedException("Retry limit reached")),
-                row(
-                    MissingApplicationCodeException("Missing app code")
-                ),
+                row(MissingApplicationCodeException("Missing app code")),
             )
         )
     ) { testException ->
@@ -103,30 +105,31 @@ class DefaultClientExceptionHandlerTests {
     }
 
     @Test
-    fun testHandleException_shouldNackEvent_onUnknownException_whenCalledWithMultipleEvents() = runTest {
-        val trackDeepLinkEvent = SdkEvent.Internal.Sdk.TrackDeepLink(
-            id = "testId",
-            trackingId = "testTrackingId",
-            nackCount = 1
-        )
-        val trackDeepLinkEvent2 = SdkEvent.Internal.Sdk.TrackDeepLink(
-            id = "testId2",
-            trackingId = "testTrackingId2",
-            nackCount = 1
-        )
-        val expectedErrorMessage = "Test error message"
+    fun testHandleException_shouldNackEvent_onUnknownException_whenCalledWithMultipleEvents() =
+        runTest {
+            val trackDeepLinkEvent = SdkEvent.Internal.Sdk.TrackDeepLink(
+                id = "testId",
+                trackingId = "testTrackingId",
+                nackCount = 1
+            )
+            val trackDeepLinkEvent2 = SdkEvent.Internal.Sdk.TrackDeepLink(
+                id = "testId2",
+                trackingId = "testTrackingId2",
+                nackCount = 1
+            )
+            val expectedErrorMessage = "Test error message"
 
-        val testException = Exception("Unknown error")
+            val testException = Exception("Unknown error")
 
-        exceptionHandler.handleException(
-            throwable = testException,
-            errorMessage = expectedErrorMessage,
-            *arrayOf(trackDeepLinkEvent, trackDeepLinkEvent2)
-        )
-        advanceUntilIdle()
+            exceptionHandler.handleException(
+                throwable = testException,
+                errorMessage = expectedErrorMessage,
+                *arrayOf(trackDeepLinkEvent, trackDeepLinkEvent2)
+            )
+            advanceUntilIdle()
 
-        verifySuspend { mockEventsDao.upsertEvent(trackDeepLinkEvent) }
-        verifySuspend { mockEventsDao.upsertEvent(trackDeepLinkEvent2) }
-        verifySuspend { mockSdkLogger.error(expectedErrorMessage, testException) }
-    }
+            verifySuspend { mockEventsDao.upsertEvent(trackDeepLinkEvent) }
+            verifySuspend { mockEventsDao.upsertEvent(trackDeepLinkEvent2) }
+            verifySuspend { mockSdkLogger.error(expectedErrorMessage, testException) }
+        }
 }

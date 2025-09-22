@@ -1,5 +1,6 @@
 package com.emarsys.mobileengage.embedded.messages
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -12,5 +13,6 @@ data class MessageTagUpdate(
 
 @Serializable
 enum class TagOperation {
-    Add, Remove
+    @SerialName("add") Add,
+    @SerialName("remove") Remove
 }
