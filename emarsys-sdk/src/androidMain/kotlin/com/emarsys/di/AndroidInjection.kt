@@ -1,5 +1,7 @@
 package com.emarsys.di
 
+import AndroidConfig
+import AndroidConfigApi
 import android.app.NotificationManager
 import android.content.ClipboardManager
 import android.content.Context
@@ -31,6 +33,8 @@ import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.device.PlatformInfoCollector
 import com.emarsys.core.device.PlatformInfoCollectorApi
+import com.emarsys.core.device.notification.AndroidNotificationSettingsCollector
+import com.emarsys.core.device.notification.AndroidNotificationSettingsCollectorApi
 import com.emarsys.core.language.AndroidLanguageTagValidator
 import com.emarsys.core.language.LanguageTagValidatorApi
 import com.emarsys.core.launchapplication.LaunchApplicationHandler
@@ -115,6 +119,17 @@ object AndroidInjection {
             )
         }
         single<StringStorageApi> { StringStorage(sharedPreferences = get()) }
+        single<AndroidNotificationSettingsCollectorApi> {
+            AndroidNotificationSettingsCollector(
+                applicationContext
+            )
+        }
+        single<AndroidConfigApi> {
+            AndroidConfig(
+                configApi = get(),
+                androidNotificationSettingsCollector = get()
+            )
+        }
         single<DeviceInfoCollectorApi> {
             val isGoogleAvailable: Boolean = get(named(AvailableServices.Google))
             val isHuaweiAvailable: Boolean = get(named(AvailableServices.Huawei))
@@ -130,6 +145,7 @@ object AndroidInjection {
                 clientIdProvider = ClientIdProvider(uuidProvider = get(), storage = get()),
                 platformInfoCollector = get(),
                 wrapperInfoStorage = get(),
+                androidNotificationSettingsCollector = get(),
                 json = get(),
                 stringStorage = get(),
                 sdkContext = get()
@@ -172,7 +188,8 @@ object AndroidInjection {
                 metadataReader = get(),
                 notificationCompatStyler = get(),
                 platformInfoCollector = get(),
-                sdkLogger = get { parametersOf(PushMessagePresenter::class.simpleName) }
+                androidNotificationSettingsCollector = get(),
+                sdkLogger = get { parametersOf(PushMessagePresenter::class.simpleName) },
             )
         }
         single<AndroidPushV2Mapper> {

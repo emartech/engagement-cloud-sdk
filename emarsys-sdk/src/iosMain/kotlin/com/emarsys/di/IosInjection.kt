@@ -29,6 +29,8 @@ import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.device.UIDevice
 import com.emarsys.core.device.UIDeviceApi
+import com.emarsys.core.device.notification.IosNotificationSettingsCollector
+import com.emarsys.core.device.notification.IosNotificationSettingsCollectorApi
 import com.emarsys.core.language.IosLanguageTagValidator
 import com.emarsys.core.language.LanguageTagValidatorApi
 import com.emarsys.core.launchapplication.IosLaunchApplicationHandler
@@ -93,13 +95,23 @@ object IosInjection {
         single<IosPushApi> { IosPush() }
         single<IosTrackingApi> { IosTracking() }
         single<IosInAppApi> { IosInApp() }
-        single<IosConfigApi> { IosConfig() }
+        single<IosConfigApi> {
+            IosConfig(
+                configApi = get(),
+                iosNotificationSettingsCollector = get()
+            )
+        }
         single<IosDeepLinkApi> { IosDeepLink() }
         single<UNUserNotificationCenter> { UNUserNotificationCenter.currentNotificationCenter() }
         single<StringStorageApi> { StringStorage(userDefaults = get()) }
         single<SdkConfigStoreApi<IosEmarsysConfig>> { IosSdkConfigStore(typedStorage = get()) }
         single<PermissionHandlerApi> { IosPermissionHandler(notificationCenter = get()) }
         single<UIDeviceApi> { UIDevice(NSProcessInfo()) }
+        single<IosNotificationSettingsCollectorApi> {
+            IosNotificationSettingsCollector(
+                json = get()
+            )
+        }
         single<DeviceInfoCollectorApi> {
             DeviceInfoCollector(
                 clientIdProvider = ClientIdProvider(uuidProvider = get(), storage = get()),
@@ -108,6 +120,7 @@ object IosInjection {
                 timezoneProvider = get(),
                 deviceInformation = get(),
                 wrapperInfoStorage = get(),
+                iosNotificationSettingsCollector = get(),
                 json = get(),
                 stringStorage = get(),
                 sdkContext = get()

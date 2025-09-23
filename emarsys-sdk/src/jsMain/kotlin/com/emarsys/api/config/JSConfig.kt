@@ -1,12 +1,14 @@
 package com.emarsys.api.config
 
-import com.emarsys.core.device.NotificationSettings
+import com.emarsys.core.device.notification.WebNotificationSettings
+import com.emarsys.core.device.notification.WebNotificationSettingsCollectorApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.promise
 import kotlin.js.Promise
 
-class JSConfig(
+internal class JSConfig(
     private val configApi: ConfigApi,
+    private val webNotificationSettingsCollector: WebNotificationSettingsCollectorApi,
     private val applicationScope: CoroutineScope
 ) : JSConfigApi {
     override fun getContactFieldId(): Promise<Int?> {
@@ -63,9 +65,9 @@ class JSConfig(
         }
     }
 
-    override fun getNotificationSettings(): Promise<NotificationSettings> {
+    override fun getNotificationSettings(): Promise<WebNotificationSettings> {
         return applicationScope.promise {
-            configApi.getNotificationSettings()
+            webNotificationSettingsCollector.collect()
         }
     }
 }

@@ -1,6 +1,6 @@
 package com.emarsys
 
-import com.emarsys.api.config.ConfigApi
+import AndroidConfigApi
 import com.emarsys.api.contact.ContactApi
 import com.emarsys.api.deeplink.AndroidDeepLinkApi
 import com.emarsys.api.inapp.InAppApi
@@ -64,8 +64,8 @@ object AndroidEmarsys {
     /**
      * Provides access to the Config API, which allows retrieving, setting and modifying SDK configuration settings.
      */
-    val config: ConfigApi
-        get() = koin.get<ConfigApi>()
+    val config: AndroidConfigApi
+        get() = koin.get<AndroidConfigApi>()
 
     /**
      * Initializes the SDK. This method must be called before using any other SDK functionality.

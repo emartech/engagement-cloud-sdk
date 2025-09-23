@@ -5,6 +5,7 @@ import android.os.Build
 import com.emarsys.SdkConstants
 import com.emarsys.applicationContext
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.device.notification.AndroidNotificationSettingsCollectorApi
 import com.emarsys.core.providers.ApplicationVersionProviderApi
 import com.emarsys.core.providers.LanguageProviderApi
 import com.emarsys.core.providers.Provider
@@ -24,6 +25,7 @@ internal actual class DeviceInfoCollector(
     private val clientIdProvider: Provider<String>,
     private val platformInfoCollector: PlatformInfoCollectorApi,
     private val wrapperInfoStorage: TypedStorageApi,
+    private val androidNotificationSettingsCollector: AndroidNotificationSettingsCollectorApi,
     private val json: Json,
     private val stringStorage: StringStorageApi,
     private val sdkContext: SdkContextApi
@@ -84,6 +86,6 @@ internal actual class DeviceInfoCollector(
     }
 
     actual override suspend fun getNotificationSettings(): NotificationSettings {
-        return platformInfoCollector.notificationSettings()
+        return NotificationSettings(androidNotificationSettingsCollector.collect().areNotificationsEnabled)
     }
 }

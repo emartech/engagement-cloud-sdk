@@ -3,6 +3,9 @@ package com.emarsys.core.device
 import com.emarsys.SdkConstants
 import com.emarsys.config.SdkConfig
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.device.notification.PermissionState
+import com.emarsys.core.device.notification.WebNotificationSettings
+import com.emarsys.core.device.notification.WebNotificationSettingsCollectorApi
 import com.emarsys.core.providers.ApplicationVersionProviderApi
 import com.emarsys.core.providers.LanguageProviderApi
 import com.emarsys.core.providers.Provider
@@ -17,6 +20,8 @@ import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import io.kotest.data.forAll
+import io.kotest.data.row
 import io.kotest.matchers.shouldBe
 import kotlinx.browser.window
 import kotlinx.coroutines.test.runTest
@@ -53,6 +58,7 @@ class DeviceInfoCollectorTests {
     private lateinit var mockApplicationVersionProvider: ApplicationVersionProviderApi
     private lateinit var mockLanguageProvider: LanguageProviderApi
     private lateinit var mockWrapperInfoStorage: TypedStorageApi
+    private lateinit var mockWebNotificationSettingsCollector: WebNotificationSettingsCollectorApi
     private lateinit var deviceInfoCollector: DeviceInfoCollector
     private lateinit var mockStringStorage: StringStorageApi
     private lateinit var mockSdkContext: SdkContextApi
@@ -71,6 +77,7 @@ class DeviceInfoCollectorTests {
         mockLanguageProvider = mock()
         every { mockLanguageProvider.provide() } returns LANGUAGE
         mockWrapperInfoStorage = mock()
+        mockWebNotificationSettingsCollector = mock()
         mockStringStorage = mock()
         every { mockStringStorage.get(any()) } returns null
         everySuspend {
@@ -90,6 +97,7 @@ class DeviceInfoCollectorTests {
             mockApplicationVersionProvider,
             mockLanguageProvider,
             mockWrapperInfoStorage,
+            mockWebNotificationSettingsCollector,
             json,
             mockStringStorage,
             mockSdkContext
@@ -193,4 +201,26 @@ class DeviceInfoCollectorTests {
 
         result shouldBe expectedDeviceInfo
     }
+
+    @Test
+    fun getNotificationSettings_shouldReturn_areNotificationsEnabledTrue_whenPermissionStateIsGranted() =
+        runTest {
+            forAll(
+                row(PermissionState.Granted, true),
+                row(PermissionState.Denied, false),
+                row(PermissionState.Prompt, false),
+            ) { permissionState, expectedAreNotificationsEnabled ->
+                everySuspend {
+                    mockWebNotificationSettingsCollector.collect()
+                } returns WebNotificationSettings(
+                    permissionState = permissionState,
+                    isServiceWorkerRegistered = false,
+                    isSubscribed = false
+                )
+
+                val result = deviceInfoCollector.getNotificationSettings()
+
+                result shouldBe NotificationSettings(expectedAreNotificationsEnabled)
+            }
+        }
 }

@@ -3,7 +3,7 @@ package com.emarsys.core.device
 import com.emarsys.KotlinPlatform
 import com.emarsys.SdkConstants
 import com.emarsys.context.SdkContextApi
-import com.emarsys.core.device.IosNotificationConstant.Companion.fromLong
+import com.emarsys.core.device.notification.IosNotificationSettingsCollectorApi
 import com.emarsys.core.providers.ApplicationVersionProviderApi
 import com.emarsys.core.providers.LanguageProviderApi
 import com.emarsys.core.providers.Provider
@@ -12,11 +12,7 @@ import com.emarsys.core.storage.StorageConstants
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
 import com.emarsys.core.wrapper.WrapperInfo
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.serialization.json.Json
-import platform.UserNotifications.UNUserNotificationCenter
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 import kotlin.experimental.ExperimentalNativeApi
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
@@ -27,6 +23,7 @@ internal actual class DeviceInfoCollector(
     private val timezoneProvider: TimezoneProviderApi,
     private val deviceInformation: UIDeviceApi,
     private val wrapperInfoStorage: TypedStorageApi,
+    private val iosNotificationSettingsCollector: IosNotificationSettingsCollectorApi,
     private val json: Json,
     private val stringStorage: StringStorageApi,
     private val sdkContext: SdkContextApi,
@@ -81,31 +78,8 @@ internal actual class DeviceInfoCollector(
     }
 
     actual override suspend fun getNotificationSettings(): NotificationSettings {
-        return suspendCancellableCoroutine { continuation ->
-            UNUserNotificationCenter.currentNotificationCenter()
-                .getNotificationSettingsWithCompletionHandler { settings ->
-                    if (settings != null) {
-                        val iosNotificationSettings = IosNotificationSettings(
-                            fromLong<IosAuthorizationStatus>(settings.authorizationStatus),
-                            fromLong<IosNotificationSetting>(settings.soundSetting),
-                            fromLong<IosNotificationSetting>(settings.badgeSetting),
-                            fromLong<IosNotificationSetting>(settings.alertSetting),
-                            fromLong<IosNotificationSetting>(settings.notificationCenterSetting),
-                            fromLong<IosNotificationSetting>(settings.lockScreenSetting),
-                            fromLong<IosNotificationSetting>(settings.carPlaySetting),
-                            fromLong<IosAlertStyle>(settings.alertStyle),
-                            settings.showPreviewsSetting.name.toShowPreviewSetting(),
-                            fromLong<IosNotificationSetting>(settings.criticalAlertSetting),
-                            settings.providesAppNotificationSettings,
-                            fromLong<IosNotificationSetting>(settings.scheduledDeliverySetting),
-                            fromLong<IosNotificationSetting>(settings.timeSensitiveSetting)
-                        )
-                        println(json.encodeToString(iosNotificationSettings))
-                        continuation.resume(iosNotificationSettings)
-                    } else {
-                        continuation.resumeWithException(Exception("Failed to retrieve notification settings"))
-                    }
-                }
-        }
+        return NotificationSettings(
+            iosNotificationSettingsCollector.collect().authorizationStatus == IosAuthorizationStatus.Authorized
+        )
     }
 }

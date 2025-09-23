@@ -3,6 +3,8 @@ package com.emarsys.core.device
 import android.os.Build
 import com.emarsys.SdkConstants
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.device.notification.AndroidNotificationSettings
+import com.emarsys.core.device.notification.AndroidNotificationSettingsCollectorApi
 import com.emarsys.core.providers.ApplicationVersionProviderApi
 import com.emarsys.core.providers.LanguageProviderApi
 import com.emarsys.core.providers.Provider
@@ -40,6 +42,7 @@ class DeviceInfoCollectorTests {
     private lateinit var mockStorage: TypedStorageApi
     private lateinit var mockStringStorage: StringStorageApi
     private lateinit var deviceInfoCollector: DeviceInfoCollector
+    private lateinit var mockAndroidNotificationSettingsCollector: AndroidNotificationSettingsCollectorApi
     private lateinit var mockSdkContext: SdkContextApi
     private val json = JsonUtil.json
 
@@ -68,6 +71,8 @@ class DeviceInfoCollectorTests {
         mockSdkContext = mockk(relaxed = true)
         every { mockSdkContext.config?.applicationCode } returns "testAppCode"
 
+        mockAndroidNotificationSettingsCollector = mockk(relaxed = true)
+
         deviceInfoCollector = DeviceInfoCollector(
             mockTimezoneProvider,
             mockLanguageProvider,
@@ -76,6 +81,7 @@ class DeviceInfoCollectorTests {
             mockClientIdProvider,
             mockPlatformInfoCollector,
             mockStorage,
+            mockAndroidNotificationSettingsCollector,
             json,
             mockStringStorage,
             mockSdkContext
@@ -149,6 +155,7 @@ class DeviceInfoCollectorTests {
             mockClientIdProvider,
             mockPlatformInfoCollector,
             mockStorage,
+            mockAndroidNotificationSettingsCollector,
             json,
             mockStringStorage,
             mockSdkContext
@@ -162,16 +169,31 @@ class DeviceInfoCollectorTests {
     }
 
     @Test
-    fun getPushSettings_shouldCall_getNotificationSettings_onPlatformInfoCollector() = runTest {
+    fun getPushSettings_shouldCall_androidNotificationSettingsCollector_andReturn_enabledTrue() = runTest {
         val testSettings = AndroidNotificationSettings(
             true, -1000, listOf(ChannelSettings("testChannelId"))
         )
+        val expectedNotificationSettings = NotificationSettings(true)
 
-        every { mockPlatformInfoCollector.notificationSettings() } returns testSettings
+        every { mockAndroidNotificationSettingsCollector.collect() } returns testSettings
 
         val result = deviceInfoCollector.getNotificationSettings()
 
-        result shouldBe testSettings
+        result shouldBe expectedNotificationSettings
+    }
+
+    @Test
+    fun getPushSettings_shouldCall_androidNotificationSettingsCollector_andReturn_enabledFalse() = runTest {
+        val testSettings = AndroidNotificationSettings(
+            false, -1000, listOf(ChannelSettings("testChannelId"))
+        )
+        val expectedNotificationSettings = NotificationSettings(false)
+
+        every { mockAndroidNotificationSettingsCollector.collect() } returns testSettings
+
+        val result = deviceInfoCollector.getNotificationSettings()
+
+        result shouldBe expectedNotificationSettings
     }
 
     @Test

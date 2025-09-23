@@ -37,32 +37,9 @@ data class DeviceInfoForLogs(
 )
 
 @Serializable
-sealed interface NotificationSettings
-
-@Serializable
-data class AndroidNotificationSettings(
-    val areNotificationsEnabled: Boolean,
-    val importance: Int,
-    val channelSettings: List<ChannelSettings>
-): NotificationSettings
-
-@Serializable
-data class IosNotificationSettings(
-    val authorizationStatus: IosAuthorizationStatus,
-    val soundSetting: IosNotificationSetting,
-    val badgeSetting: IosNotificationSetting,
-    val alertSetting: IosNotificationSetting,
-    val notificationCenterSetting: IosNotificationSetting,
-    val lockScreenSetting: IosNotificationSetting,
-    val carPlaySetting: IosNotificationSetting,
-    val alertStyle: IosAlertStyle,
-    val showPreviewsSetting: IosShowPreviewSetting,
-    val criticalAlertSetting: IosNotificationSetting,
-    val providesAppNotificationSettings: Boolean = false,
-    // Last 2 property is only available from iOS 15.0
-    val scheduledDeliverySetting: IosNotificationSetting,
-    val timeSensitiveSetting: IosNotificationSetting
-): NotificationSettings
+data class NotificationSettings(
+    val areNotificationsEnabled: Boolean
+)
 
 @Serializable
 data class ChannelSettings(

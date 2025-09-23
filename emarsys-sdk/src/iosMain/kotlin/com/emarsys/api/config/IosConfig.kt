@@ -1,35 +1,38 @@
 package com.emarsys.api.config
 
-import com.emarsys.core.device.IosNotificationSettings
-import com.emarsys.di.SdkKoinIsolationContext.koin
+import com.emarsys.core.device.notification.IosNotificationSettings
+import com.emarsys.core.device.notification.IosNotificationSettingsCollectorApi
 
+internal class IosConfig(
+    private val configApi: ConfigApi,
+    private val iosNotificationSettingsCollector: IosNotificationSettingsCollectorApi
+) : IosConfigApi {
+    override suspend fun getContactFieldId(): Int? = configApi.getContactFieldId()
 
-class IosConfig : IosConfigApi {
-    override suspend fun getContactFieldId(): Int? = koin.get<ConfigApi>().getContactFieldId()
+    override suspend fun getApplicationCode(): String? = configApi.getApplicationCode()
 
-    override suspend fun getApplicationCode(): String? = koin.get<ConfigApi>().getApplicationCode()
+    override suspend fun getClientId(): String = configApi.getClientId()
 
-    override suspend fun getClientId(): String = koin.get<ConfigApi>().getClientId()
+    override suspend fun getLanguageCode(): String = configApi.getLanguageCode()
 
-    override suspend fun getLanguageCode(): String = koin.get<ConfigApi>().getLanguageCode()
+    override suspend fun getApplicationVersion(): String =
+        configApi.getApplicationVersion()
 
-    override suspend fun getApplicationVersion(): String = koin.get<ConfigApi>().getApplicationVersion()
-
-    override suspend fun getSdkVersion(): String = koin.get<ConfigApi>().getSdkVersion()
+    override suspend fun getSdkVersion(): String = configApi.getSdkVersion()
 
     override suspend fun getNotificationSettings(): IosNotificationSettings {
-        return koin.get<ConfigApi>().getNotificationSettings() as IosNotificationSettings
+        return iosNotificationSettingsCollector.collect()
     }
 
     override suspend fun changeApplicationCode(applicationCode: String) {
-        koin.get<ConfigApi>().changeApplicationCode(applicationCode).getOrThrow()
+        configApi.changeApplicationCode(applicationCode).getOrThrow()
     }
 
     override suspend fun setLanguage(language: String) {
-        koin.get<ConfigApi>().setLanguage(language).getOrThrow()
+        configApi.setLanguage(language).getOrThrow()
     }
 
     override suspend fun resetLanguage() {
-        koin.get<ConfigApi>().resetLanguage().getOrThrow()
+        configApi.resetLanguage().getOrThrow()
     }
 }

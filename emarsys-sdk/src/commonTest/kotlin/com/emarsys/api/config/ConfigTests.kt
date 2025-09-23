@@ -6,10 +6,9 @@ import com.emarsys.api.SdkState
 import com.emarsys.context.DefaultUrls
 import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
-import com.emarsys.core.device.AndroidNotificationSettings
-import com.emarsys.core.device.ChannelSettings
 import com.emarsys.core.device.DeviceInfo
 import com.emarsys.core.device.DeviceInfoCollectorApi
+import com.emarsys.core.device.NotificationSettings
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.di.SdkKoinIsolationContext.koin
@@ -47,7 +46,7 @@ class ConfigTest : KoinTest {
         const val LANGUAGE_CODE = "testLanguageCode"
         const val SDK_VERSION = "testSdkVersion"
         val PUSH_SETTINGS =
-            AndroidNotificationSettings(true, 1, listOf(ChannelSettings("testChannelId")))
+            NotificationSettings(true)
         val DEVICE_INFO = DeviceInfo(
             "testPlatform",
             SdkConstants.WEB_PLATFORM_CATEGORY,

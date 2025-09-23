@@ -1,11 +1,15 @@
 package com.emarsys.api.config
 
+import com.emarsys.core.device.notification.PermissionState
+import com.emarsys.core.device.notification.WebNotificationSettings
+import com.emarsys.core.device.notification.WebNotificationSettingsCollectorApi
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.await
@@ -27,6 +31,7 @@ class JSConfigTests {
 
 
     private lateinit var mockConfigApi: ConfigApi
+    private lateinit var mockWebNotificationSettingsCollector: WebNotificationSettingsCollectorApi
     private lateinit var jSConfig: JSConfigApi
 
 
@@ -34,7 +39,8 @@ class JSConfigTests {
     fun setup() {
         Dispatchers.setMain(StandardTestDispatcher())
         mockConfigApi = mock(MockMode.autofill)
-        jSConfig = JSConfig(mockConfigApi, TestScope())
+        mockWebNotificationSettingsCollector = mock(MockMode.autofill)
+        jSConfig = JSConfig(mockConfigApi, mockWebNotificationSettingsCollector, TestScope())
     }
 
     @AfterTest
@@ -78,19 +84,32 @@ class JSConfigTests {
     }
 
     @Test
-    fun getNotificationSettings_shouldCall_getNotificationSettings_onConfigApi() = runTest {
-        jSConfig.getNotificationSettings().await()
+    fun getNotificationSettings_shouldCall_collect_onWebNotificationSettingsCollectorApi() =
+        runTest {
+            val testWebNotificationSettings = WebNotificationSettings(
+                permissionState = PermissionState.Granted,
+                isServiceWorkerRegistered = false,
+                isSubscribed = false
+            )
+            everySuspend {
+                mockWebNotificationSettingsCollector.collect()
+            } returns testWebNotificationSettings
 
-        verifySuspend { mockConfigApi.getNotificationSettings() }
-    }
+            val webNotificationSettings = jSConfig.getNotificationSettings().await()
+
+            webNotificationSettings shouldBe testWebNotificationSettings
+            verifySuspend { mockWebNotificationSettingsCollector.collect() }
+        }
 
     @Test
     fun changeApplicationCode_shouldCall_changeApplicationCode_onConfigApi() = runTest {
         val testAppCode = "testAppCode"
         val mockConfigApi: ConfigApi = mock(MockMode.autofill)
-        everySuspend { mockConfigApi.changeApplicationCode(testAppCode) } returns Result.success(Unit)
+        everySuspend { mockConfigApi.changeApplicationCode(testAppCode) } returns Result.success(
+            Unit
+        )
 
-        jSConfig = JSConfig(mockConfigApi, TestScope())
+        jSConfig = JSConfig(mockConfigApi, mockWebNotificationSettingsCollector, TestScope())
 
         jSConfig.changeApplicationCode(testAppCode).await()
 
@@ -105,9 +124,9 @@ class JSConfigTests {
             CancellationException()
         )
 
-        val jSConfig = JSConfig(mockConfigApi, TestScope())
+        val jSConfig = JSConfig(mockConfigApi, mockWebNotificationSettingsCollector, TestScope())
 
-        shouldThrow<CancellationException> {  jSConfig.changeApplicationCode(testAppCode).await() }
+        shouldThrow<CancellationException> { jSConfig.changeApplicationCode(testAppCode).await() }
     }
 
     @Test
@@ -116,7 +135,7 @@ class JSConfigTests {
         val mockConfigApi: ConfigApi = mock(MockMode.autofill)
         everySuspend { mockConfigApi.setLanguage(testLanguage) } returns Result.success(Unit)
 
-        jSConfig = JSConfig(mockConfigApi, TestScope())
+        jSConfig = JSConfig(mockConfigApi, mockWebNotificationSettingsCollector, TestScope())
 
         jSConfig.setLanguage(testLanguage).await()
 
@@ -128,9 +147,9 @@ class JSConfigTests {
         val testLanguage = "testLanguage"
         val mockConfigApi: ConfigApi = mock(MockMode.autofill)
         everySuspend { mockConfigApi.setLanguage(testLanguage) } returns testFailureResult
-        val jSConfig = JSConfig(mockConfigApi, TestScope())
+        val jSConfig = JSConfig(mockConfigApi, mockWebNotificationSettingsCollector, TestScope())
 
-        shouldThrow<Exception> {  jSConfig.setLanguage(testLanguage).await() }
+        shouldThrow<Exception> { jSConfig.setLanguage(testLanguage).await() }
     }
 
     @Test
@@ -138,7 +157,7 @@ class JSConfigTests {
         val mockConfigApi: ConfigApi = mock(MockMode.autofill)
         everySuspend { mockConfigApi.resetLanguage() } returns Result.success(Unit)
 
-        jSConfig = JSConfig(mockConfigApi, TestScope())
+        jSConfig = JSConfig(mockConfigApi, mockWebNotificationSettingsCollector, TestScope())
 
         jSConfig.resetLanguage().await()
 
@@ -149,8 +168,8 @@ class JSConfigTests {
     fun resetLanguage_shouldThrowException_ifResetLanguage_failed() = runTest {
         val mockConfigApi: ConfigApi = mock(MockMode.autofill)
         everySuspend { mockConfigApi.resetLanguage() } returns testFailureResult
-        val jSConfig = JSConfig(mockConfigApi, TestScope())
+        val jSConfig = JSConfig(mockConfigApi, mockWebNotificationSettingsCollector, TestScope())
 
-        shouldThrow<Exception> {  jSConfig.resetLanguage().await() }
+        shouldThrow<Exception> { jSConfig.resetLanguage().await() }
     }
 }

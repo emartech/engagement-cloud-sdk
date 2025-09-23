@@ -11,8 +11,9 @@ import com.emarsys.api.push.PushConstants.INTENT_EXTRA_ACTION_KEY
 import com.emarsys.api.push.PushConstants.INTENT_EXTRA_DEFAULT_TAP_ACTION_KEY
 import com.emarsys.api.push.PushConstants.INTENT_EXTRA_PAYLOAD_KEY
 import com.emarsys.api.push.PushConstants.PUSH_NOTIFICATION_ICON_NAME
-import com.emarsys.core.device.AndroidNotificationSettings
 import com.emarsys.core.device.PlatformInfoCollectorApi
+import com.emarsys.core.device.notification.AndroidNotificationSettings
+import com.emarsys.core.device.notification.AndroidNotificationSettingsCollectorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.resource.MetadataReader
 import com.emarsys.mobileengage.action.models.DismissActionModel
@@ -28,6 +29,7 @@ internal class PushMessagePresenter(
     private val metadataReader: MetadataReader,
     private val notificationCompatStyler: NotificationCompatStyler,
     private val platformInfoCollector: PlatformInfoCollectorApi,
+    private val androidNotificationSettingsCollector: AndroidNotificationSettingsCollectorApi,
     private val sdkLogger: Logger
 ) : PushPresenter<AndroidPlatformData, AndroidPushMessage> {
     private companion object {
@@ -38,7 +40,7 @@ internal class PushMessagePresenter(
     override suspend fun present(pushMessage: AndroidPushMessage) {
         val message = handleChannelIdMismatch(
             pushMessage,
-            platformInfoCollector.notificationSettings(),
+            androidNotificationSettingsCollector.collect(),
             context
         )
 

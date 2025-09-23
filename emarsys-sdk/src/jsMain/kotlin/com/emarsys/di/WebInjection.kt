@@ -38,6 +38,8 @@ import com.emarsys.core.db.events.JSEventsDao
 import com.emarsys.core.device.DeviceInfoCollector
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.device.WebPlatformInfoCollector
+import com.emarsys.core.device.notification.WebNotificationSettingsCollector
+import com.emarsys.core.device.notification.WebNotificationSettingsCollectorApi
 import com.emarsys.core.language.LanguageTagValidatorApi
 import com.emarsys.core.language.WebLanguageTagValidator
 import com.emarsys.core.launchapplication.JsLaunchApplicationHandler
@@ -69,6 +71,7 @@ import com.emarsys.mobileengage.push.PushNotificationClickHandler
 import com.emarsys.mobileengage.push.PushNotificationClickHandlerApi
 import com.emarsys.mobileengage.push.PushService
 import com.emarsys.mobileengage.push.PushServiceContext
+import com.emarsys.mobileengage.push.PushServiceContextApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.connection.WebConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
@@ -121,13 +124,15 @@ object WebInjection {
                 applicationVersionProvider = get(),
                 languageProvider = get(),
                 wrapperInfoStorage = get(),
+                webNotificationSettingsCollector = get(),
                 json = get(),
                 stringStorage = get(),
                 sdkContext = get()
             )
         }
+        single<PushServiceContextApi> { PushServiceContext() }
         single<State>(named(StateTypes.PlatformInit)) {
-            val pushService = PushService(PushServiceContext(), storage = get<StringStorageApi>())
+            val pushService = PushService(get(), storage = get<StringStorageApi>())
             PlatformInitState(
                 pushService = pushService,
                 sdkContext = get()
@@ -235,9 +240,13 @@ object WebInjection {
                 get(named(CoroutineScopeTypes.Application))
             )
         }
+        single<WebNotificationSettingsCollectorApi> {
+            WebNotificationSettingsCollector(pushServiceContext = get())
+        }
         single<JSConfigApi> {
             JSConfig(
                 configApi = get(),
+                webNotificationSettingsCollector = get(),
                 applicationScope = get(named(CoroutineScopeTypes.Application))
             )
         }

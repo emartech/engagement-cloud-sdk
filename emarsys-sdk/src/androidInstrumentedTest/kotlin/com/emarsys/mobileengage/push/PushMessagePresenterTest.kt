@@ -5,9 +5,10 @@ import android.app.NotificationManager
 import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
-import com.emarsys.core.device.AndroidNotificationSettings
 import com.emarsys.core.device.ChannelSettings
 import com.emarsys.core.device.PlatformInfoCollector
+import com.emarsys.core.device.notification.AndroidNotificationSettings
+import com.emarsys.core.device.notification.AndroidNotificationSettingsCollectorApi
 import com.emarsys.core.resource.MetadataReader
 import com.emarsys.mobileengage.action.models.BadgeCount
 import com.emarsys.mobileengage.action.models.BadgeCountMethod
@@ -86,6 +87,7 @@ class PushMessagePresenterTest {
     private lateinit var mockPlatformInfoCollector: PlatformInfoCollector
     private lateinit var mockInAppDownloader: InAppDownloader
     private lateinit var notificationSlot: CapturingSlot<Notification>
+    private lateinit var mockAndroidNotificationSettingsCollector: AndroidNotificationSettingsCollectorApi
 
     @Before
     fun setup() = runTest {
@@ -94,6 +96,7 @@ class PushMessagePresenterTest {
         mockNotificationCompatStyler = mockk(relaxed = true)
         mockPlatformInfoCollector = mockk(relaxed = true)
         mockInAppDownloader = mockk(relaxed = true)
+        mockAndroidNotificationSettingsCollector = mockk(relaxed = true)
 
         json = JsonUtil.json
         mockMetadataReader = mockk(relaxed = true)
@@ -106,7 +109,8 @@ class PushMessagePresenterTest {
             mockMetadataReader,
             mockNotificationCompatStyler,
             mockPlatformInfoCollector,
-            sdkLogger = mockk(relaxed = true)
+            mockAndroidNotificationSettingsCollector,
+            sdkLogger = mockk(relaxed = true),
         )
 
         notificationSlot = slot<Notification>()
@@ -304,7 +308,7 @@ class PushMessagePresenterTest {
         val testSettings = AndroidNotificationSettings(true, 1, emptyList())
 
         every { mockPlatformInfoCollector.isDebugMode() } returns true
-        every { mockPlatformInfoCollector.notificationSettings() } returns testSettings
+        every { mockAndroidNotificationSettingsCollector.collect() } returns testSettings
 
         every {
             mockNotificationManager.notify(
@@ -326,7 +330,7 @@ class PushMessagePresenterTest {
         val testSettings = AndroidNotificationSettings(true, 1, channelSettings)
 
         every { mockPlatformInfoCollector.isDebugMode() } returns true
-        every { mockPlatformInfoCollector.notificationSettings() } returns testSettings
+        every { mockAndroidNotificationSettingsCollector.collect() } returns testSettings
 
         every {
             mockNotificationManager.notify(
@@ -347,7 +351,7 @@ class PushMessagePresenterTest {
         val testSettings = AndroidNotificationSettings(true, 1, emptyList())
 
         every { mockPlatformInfoCollector.isDebugMode() } returns false
-        every { mockPlatformInfoCollector.notificationSettings() } returns testSettings
+        every { mockAndroidNotificationSettingsCollector.collect() } returns testSettings
 
         every {
             mockNotificationManager.notify(

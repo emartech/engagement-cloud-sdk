@@ -4,6 +4,8 @@ import com.emarsys.KotlinPlatform
 import com.emarsys.SdkConstants
 import com.emarsys.config.SdkConfig
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.device.notification.IosNotificationSettings
+import com.emarsys.core.device.notification.IosNotificationSettingsCollectorApi
 import com.emarsys.core.providers.ApplicationVersionProviderApi
 import com.emarsys.core.providers.LanguageProviderApi
 import com.emarsys.core.providers.Provider
@@ -18,6 +20,8 @@ import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import io.kotest.data.forAll
+import io.kotest.data.row
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
@@ -44,6 +48,7 @@ class DeviceInfoCollectorTests {
     private lateinit var mockStringStorage: StringStorageApi
     private lateinit var mockSdkContext: SdkContextApi
     private lateinit var deviceInfoCollector: DeviceInfoCollector
+    private lateinit var mockIosNotificationSettingsCollector: IosNotificationSettingsCollectorApi
 
     @BeforeTest
     fun setUp() {
@@ -72,6 +77,7 @@ class DeviceInfoCollectorTests {
         val mockConfig: SdkConfig = mock()
         every { mockSdkContext.config } returns mockConfig
         every { mockConfig.applicationCode } returns "testAppCode"
+        mockIosNotificationSettingsCollector = mock()
         deviceInfoCollector = DeviceInfoCollector(
             mockClientIdProvider,
             mockApplicationVersionProvider,
@@ -79,6 +85,7 @@ class DeviceInfoCollectorTests {
             mockTimezoneProvider,
             mockDeviceInformation,
             mockWrapperStorage,
+            mockIosNotificationSettingsCollector,
             json,
             mockStringStorage,
             mockSdkContext
@@ -154,4 +161,42 @@ class DeviceInfoCollectorTests {
 
         result shouldBe expectedDeviceInfo
     }
+
+    @Test
+    fun getNotificationSettings_shouldReturn_enabledTrue_whenAuthorizationStatusIsAuthorized() =
+        runTest {
+            forAll(
+                row(IosAuthorizationStatus.Authorized, true),
+                row(IosAuthorizationStatus.NotDetermined, false),
+                row(IosAuthorizationStatus.Ephemeral, false),
+                row(IosAuthorizationStatus.Provisional, false),
+                row(IosAuthorizationStatus.Denied, false),
+            ) { authorizationStatus, expectedAreNotificationsEnabled ->
+                val testIosNotificationSettings =
+                    getTestIosNotificationSettings().copy(authorizationStatus = authorizationStatus)
+                everySuspend {
+                    mockIosNotificationSettingsCollector.collect()
+                } returns testIosNotificationSettings
+
+                val result = deviceInfoCollector.getNotificationSettings()
+
+                result shouldBe NotificationSettings(expectedAreNotificationsEnabled)
+            }
+        }
+
+    private fun getTestIosNotificationSettings() = IosNotificationSettings(
+        authorizationStatus = IosAuthorizationStatus.Authorized,
+        soundSetting = IosNotificationSetting.Enabled,
+        badgeSetting = IosNotificationSetting.Enabled,
+        alertSetting = IosNotificationSetting.Enabled,
+        notificationCenterSetting = IosNotificationSetting.Enabled,
+        lockScreenSetting = IosNotificationSetting.Enabled,
+        carPlaySetting = IosNotificationSetting.Disabled,
+        alertStyle = IosAlertStyle.Banner,
+        showPreviewsSetting = IosShowPreviewSetting.Always,
+        criticalAlertSetting = IosNotificationSetting.Disabled,
+        providesAppNotificationSettings = false,
+        scheduledDeliverySetting = IosNotificationSetting.Disabled,
+        timeSensitiveSetting = IosNotificationSetting.Disabled
+    )
 }

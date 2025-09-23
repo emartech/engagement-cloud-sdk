@@ -2,6 +2,8 @@ package com.emarsys.core.device
 
 import com.emarsys.SdkConstants
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.device.notification.PermissionState
+import com.emarsys.core.device.notification.WebNotificationSettingsCollectorApi
 import com.emarsys.core.providers.ApplicationVersionProviderApi
 import com.emarsys.core.providers.LanguageProviderApi
 import com.emarsys.core.providers.Provider
@@ -20,6 +22,7 @@ internal actual class DeviceInfoCollector(
     private val applicationVersionProvider: ApplicationVersionProviderApi,
     private val languageProvider: LanguageProviderApi,
     private val wrapperInfoStorage: TypedStorageApi,
+    private val webNotificationSettingsCollector: WebNotificationSettingsCollectorApi,
     private val json: Json,
     private val stringStorage: StringStorageApi,
     private val sdkContext: SdkContextApi
@@ -76,6 +79,8 @@ internal actual class DeviceInfoCollector(
     }
 
     actual override suspend fun getNotificationSettings(): NotificationSettings {
-        TODO("Not yet implemented")
+        return NotificationSettings(
+            webNotificationSettingsCollector.collect().permissionState == PermissionState.Granted
+        )
     }
 }
