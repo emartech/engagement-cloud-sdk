@@ -15,6 +15,7 @@ class SdkContext(
     override var remoteLogLevel: LogLevel,
     override val features: MutableSet<Features>,
     override var logBreadcrumbsQueueSize: Int,
+    override var embeddedMessagingFrequencyCapSeconds: Int = 5,
 ) : SdkContextApi {
 
     override var contactFieldId: Int? by Store(serializer =  Int.serializer(), key = "contactFieldId")

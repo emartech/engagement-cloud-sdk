@@ -23,6 +23,7 @@ import io.kotest.data.table
 import io.kotest.matchers.shouldBe
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -55,6 +56,7 @@ class EmbeddedMessagingIntegrationTests {
         sdkContext.config = AndroidEmarsysConfig(applicationCode = STAGING_APP_CODE)
         sdkContext.setSdkState(SdkState.active)
         sdkEventDistributor = SdkKoinIsolationContext.koin.get<SdkEventDistributor>()
+        sdkContext.embeddedMessagingFrequencyCapSeconds = 0
     }
 
     @Test
@@ -76,7 +78,7 @@ class EmbeddedMessagingIntegrationTests {
     }
 
     @Test
-    fun testFetchMessages_should_handle_requests() = runTest {
+    fun testFetchMessages_should_handle_requests() = runTest(UnconfinedTestDispatcher()) {
         forAll(
             provideExpectedStatusesForAppCodes()
         ) { applicationCode, expectedStatus ->

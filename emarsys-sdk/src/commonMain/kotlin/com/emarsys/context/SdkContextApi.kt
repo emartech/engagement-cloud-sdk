@@ -18,6 +18,7 @@ internal interface SdkContextApi {
     var remoteLogLevel: LogLevel
     val features: MutableSet<Features>
     var logBreadcrumbsQueueSize: Int
+    var embeddedMessagingFrequencyCapSeconds : Int
 
     suspend fun setSdkState(sdkState: SdkState)
 }
