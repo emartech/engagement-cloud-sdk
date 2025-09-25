@@ -7,6 +7,7 @@ import com.emarsys.core.state.StateMachineApi
 import com.emarsys.disable.DisableOrganizer
 import com.emarsys.disable.DisableOrganizerApi
 import com.emarsys.disable.states.ClearEventsState
+import com.emarsys.disable.states.ClearPushTokenOnDisableState
 import com.emarsys.disable.states.ClearStoredConfigState
 import com.emarsys.enable.EnableOrganizer
 import com.emarsys.enable.EnableOrganizerApi
@@ -66,6 +67,11 @@ object SetupInjection {
                 sdkLogger = get { parametersOf(ClearRequestContextTokensState::class.simpleName) }
             )
         }
+        single<State>(named(StateTypes.ClearPushTokenOnDisable)) {
+            ClearPushTokenOnDisableState(
+                sdkEventDistributor = get()
+            )
+        }
         single<State>(named(StateTypes.LinkContact)) {
             LinkContactState(
                 sdkContext = get(),
@@ -110,6 +116,7 @@ object SetupInjection {
         single<StateMachineApi>(named(StateMachineTypes.MobileEngageDisable)) {
             StateMachine(
                 states = listOf(
+                    get<State>(named(StateTypes.ClearPushTokenOnDisable)),
                     get<State>(named(StateTypes.ClearEvents)),
                     get<State>(named(StateTypes.ClearStoredConfig)),
                 )
@@ -157,6 +164,7 @@ enum class StateTypes {
     AppStart,
     RestoreSavedSdkEvents,
     ClearRequestContextTokens,
+    ClearPushTokenOnDisable,
     LinkContact,
     ClearStoredConfig,
     ClearEvents,
