@@ -14,7 +14,7 @@ import web.push.PushSubscriptionOptionsInit
 //TODO: add logger instead of console log
 //TODO: handle errors in registration and subscription
 class PushService(
-    private val pushServiceContext: PushServiceContext,
+    private val pushServiceContext: PushServiceContextApi,
     private val storage: StringStorageApi
 ) : PushServiceApi {
 
