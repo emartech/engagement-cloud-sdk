@@ -5,6 +5,7 @@ import com.emarsys.util.JsonUtil
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
@@ -21,7 +22,7 @@ class InAppJsBridgeFactoryTest {
         val inAppJsBridgeProvider = InAppJsBridgeFactory(
             mockActionFactory,
             JsonUtil.json,
-            StandardTestDispatcher()
+            TestScope(StandardTestDispatcher())
         )
 
         inAppJsBridgeProvider.create(

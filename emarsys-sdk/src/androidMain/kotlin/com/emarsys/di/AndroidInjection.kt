@@ -258,7 +258,7 @@ object AndroidInjection {
             val inAppJsBridgeFactory = InAppJsBridgeFactory(
                 actionFactory = get<EventActionFactoryApi>(),
                 json = get(),
-                sdkDispatcher = get(named(DispatcherTypes.Sdk))
+                applicationScope = get(named(CoroutineScopeTypes.Application))
             )
             InAppViewProvider(
                 applicationContext,
