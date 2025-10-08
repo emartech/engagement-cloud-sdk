@@ -28,8 +28,8 @@ object PushInjection {
         single<PushToInAppHandlerApi> {
             PushToInAppHandler(
                 downloader = get(),
-                inAppHandler = get(),
-                sdkLogger = get { parametersOf(PushToInAppHandler::class.simpleName) }
+                sdkLogger = get { parametersOf(PushToInAppHandler::class.simpleName) },
+                sdkEventManager = get()
             )
         }
         single<EventBasedClientApi>(named(EventBasedClientTypes.Push)) {

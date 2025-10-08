@@ -5,7 +5,7 @@ import com.emarsys.mobileengage.inapp.PushToInAppPayload
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-interface PushToInappActionModel {
+interface PushToInAppActionModel {
     val payload: PushToInAppPayload
 }
 
@@ -14,7 +14,7 @@ interface PushToInappActionModel {
 data class BasicPushToInAppActionModel(
     override val reporting: String,
     override val payload: PushToInAppPayload
-) : BasicActionModel(), PushToInappActionModel
+) : BasicActionModel(), PushToInAppActionModel
 
 @Serializable
 @SerialName("InApp")
@@ -23,4 +23,4 @@ data class PresentablePushToInAppActionModel(
     override val reporting: String,
     override val title: String,
     override val payload: PushToInAppPayload
-) : PresentableActionModel(), PushToInappActionModel
+) : PresentableActionModel(), PushToInAppActionModel
