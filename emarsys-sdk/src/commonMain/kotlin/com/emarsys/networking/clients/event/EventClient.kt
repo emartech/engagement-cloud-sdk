@@ -4,7 +4,6 @@ import com.emarsys.api.inapp.InAppConfigApi
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.channel.naturalBatching
 import com.emarsys.core.db.events.EventsDaoApi
-import com.emarsys.core.exceptions.SdkException
 import com.emarsys.core.exceptions.SdkException.NetworkIOException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
@@ -20,10 +19,7 @@ import com.emarsys.event.ack
 import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.inapp.InAppMessage
-import com.emarsys.mobileengage.inapp.InAppPresentationMode
-import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppType
-import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.error.ClientExceptionHandler
 import com.emarsys.networking.clients.event.model.ContentCampaign
@@ -55,8 +51,6 @@ internal class EventClient(
     private val eventActionFactory: EventActionFactoryApi,
     private val requestContext: RequestContextApi,
     private val inAppConfigApi: InAppConfigApi,
-    private val inAppPresenter: InAppPresenterApi,
-    private val inAppViewProvider: InAppViewProviderApi,
     private val sdkEventManager: SdkEventManagerApi,
     private val eventsDao: EventsDaoApi,
     private val sdkLogger: Logger,
@@ -189,18 +183,14 @@ internal class EventClient(
                 "EventClient - handleInApp",
                 buildJsonObject { put("campaignId", JsonPrimitive(message.trackingInfo)) })
 
-            val view = inAppViewProvider.provide()
-            //TODO: will be modified after event service v5 migration
-            val webViewHolder =
-                view.load(
-                    InAppMessage(
-                        dismissId = uuidProvider.provide(),
-                        type = InAppType.OVERLAY,
-                        trackingInfo = message.trackingInfo,
-                        content = message.content
-                    )
+            sdkEventManager.emitEvent(SdkEvent.Internal.InApp.Present(
+                inAppMessage = InAppMessage(
+                    dismissId = uuidProvider.provide(),
+                    type = InAppType.OVERLAY,
+                    trackingInfo = message.trackingInfo,
+                    content = message.content
                 )
-            inAppPresenter.present(view, webViewHolder, InAppPresentationMode.Overlay)
+            ))
         }
     }
 }

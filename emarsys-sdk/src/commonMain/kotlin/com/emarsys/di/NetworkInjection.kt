@@ -54,8 +54,6 @@ object NetworkInjection {
                 eventActionFactory = get(),
                 requestContext = get(),
                 inAppConfigApi = get(),
-                inAppPresenter = get(),
-                inAppViewProvider = get(),
                 sdkEventManager = get(),
                 eventsDao = get(),
                 sdkLogger = get { parametersOf(EventClient::class.simpleName) },

@@ -19,10 +19,7 @@ import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.inapp.InAppMessage
-import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppType
-import com.emarsys.mobileengage.inapp.InAppViewApi
-import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.mobileengage.inapp.WebViewHolder
 import com.emarsys.networking.clients.error.ClientExceptionHandler
 import com.emarsys.networking.clients.event.model.ContentCampaign
@@ -104,9 +101,6 @@ class EventClientTests {
     private lateinit var onlineEvents: MutableSharedFlow<OnlineSdkEvent>
     private lateinit var mockEventsDao: EventsDaoApi
     private lateinit var mockInAppConfigApi: InAppConfigApi
-    private lateinit var mockInAppPresenter: InAppPresenterApi
-    private lateinit var mockInAppViewProvider: InAppViewProviderApi
-    private lateinit var mockInAppView: InAppViewApi
     private lateinit var mockRequestContext: RequestContextApi
     private lateinit var json: Json
     private lateinit var eventClient: EventClient
@@ -122,9 +116,6 @@ class EventClientTests {
         mockUrlFactory = mock()
         mockOnEventActionFactory = mock()
         mockInAppConfigApi = mock()
-        mockInAppPresenter = mock()
-        mockInAppViewProvider = mock()
-        mockInAppView = mock()
         mockSdkLogger = mock(MockMode.autofill)
         json = JsonUtil.json
         mockWebViewHolder = mock()
@@ -141,8 +132,6 @@ class EventClientTests {
         every { mockInAppConfigApi.inAppDnd }.returns(IN_APP_DND)
         every { mockUrlFactory.create(EmarsysUrlType.EVENT) }.returns(TEST_BASE_URL)
         everySuspend { mockSdkLogger.error(any(), any<Throwable>(), true) } returns Unit
-        everySuspend { mockInAppViewProvider.provide() } returns mockInAppView
-        everySuspend { mockInAppView.load(any()) } returns mockWebViewHolder
     }
 
     private fun createEventClient(applicationScope: CoroutineScope) = EventClient(
@@ -153,8 +142,6 @@ class EventClientTests {
         mockOnEventActionFactory,
         mockRequestContext,
         mockInAppConfigApi,
-        mockInAppPresenter,
-        mockInAppViewProvider,
         mockSdkEventManager,
         mockEventsDao,
         mockSdkLogger,
@@ -237,9 +224,10 @@ class EventClientTests {
     }
 
     @Test
-    fun testConsumer_shouldHandleInApp_whenHtml_isPresent() = runTest {
+    fun testConsumer_shouldEmitPresentEvent_whenContent_isPresent() = runTest {
         eventClient = createEventClient(backgroundScope)
         eventClient.register()
+        val eventContainer = Capture.container<SdkEvent.Internal>()
 
         val html = "testHtml"
         val testInapp = ContentCampaign(InAppType.OVERLAY, TRACKING_INFO, html)
@@ -254,7 +242,7 @@ class EventClientTests {
         val body = json.encodeToString(deviceEventResponse)
 
         everySuspend { mockEmarsysClient.send(any()) }.returns(Result.success(createTestResponse(body)))
-        everySuspend { mockInAppPresenter.present(any(), any(), any()) }.returns(Unit)
+        everySuspend { mockSdkEventManager.emitEvent(capture(eventContainer)) } returns Unit
         val expectedUrlRequest = createTestRequest()
         val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
             onlineEvents.take(1).toList()
@@ -265,8 +253,12 @@ class EventClientTests {
 
         onlineSdkEvents.await() shouldBe listOf(testEvent)
         verifySuspend { mockEmarsysClient.send(expectedUrlRequest) }
-        verifySuspend { mockInAppViewProvider.provide() }
-        verifySuspend { mockInAppView.load(expectedInAppMessage) }
+
+        val presentEvent = eventContainer.values.find {
+            it is SdkEvent.Internal.InApp.Present
+        } as SdkEvent.Internal.InApp.Present
+        presentEvent.inAppMessage shouldBe expectedInAppMessage
+
         verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
     }
 
@@ -274,12 +266,14 @@ class EventClientTests {
     fun testConsumer_shouldNotHandleInApp_whenHtml_IsEmpty() = runTest {
         eventClient = createEventClient(backgroundScope)
         eventClient.register()
+        val eventContainer = Capture.container<SdkEvent.Internal>()
 
         val html = ""
         val testInapp = ContentCampaign(InAppType.OVERLAY, TRACKING_INFO, html)
         val deviceEventResponse = DeviceEventResponse(listOf(testInapp), null, DEVICE_EVENT_STATE)
         val body = json.encodeToString(deviceEventResponse)
 
+        everySuspend { mockSdkEventManager.emitEvent(capture(eventContainer)) } returns Unit
         everySuspend { mockEmarsysClient.send(any()) }.returns(Result.success(createTestResponse(body)))
         val expectedUrlRequest = createTestRequest()
         val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
@@ -292,10 +286,9 @@ class EventClientTests {
 
         onlineSdkEvents.await() shouldBe listOf(testEvent)
         verifySuspend { mockEmarsysClient.send(expectedUrlRequest) }
-        verifySuspend(VerifyMode.exactly(0)) { mockInAppViewProvider.provide() }
-        verifySuspend(VerifyMode.exactly(0)) { mockInAppView.load(any()) }
         verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
-
+        eventContainer.values.isNotEmpty() shouldBe true
+        eventContainer.values.find { it is SdkEvent.Internal.InApp.Present } shouldBe null
     }
 
     @Test
@@ -322,8 +315,6 @@ class EventClientTests {
 
         onlineSdkEvents.await() shouldBe listOf(testEvent)
         verifySuspend { mockEmarsysClient.send(expectedUrlRequest) }
-        verifySuspend(VerifyMode.exactly(0)) { mockInAppViewProvider.provide() }
-        verifySuspend(VerifyMode.exactly(0)) { mockInAppView.load(any()) }
         verifySuspend(VerifyMode.exactly(0)) { mockOnEventActionFactory.create(any()) }
         verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
         verifySuspend { mockEventsDao.removeEvent(testEvent) }
@@ -348,8 +339,6 @@ class EventClientTests {
 
         onlineSdkEvents.await() shouldBe listOf(testEvent, testEvent1)
         verifySuspend { mockEmarsysClient.send(any()) }
-        verifySuspend(VerifyMode.exactly(0)) { mockInAppViewProvider.provide() }
-        verifySuspend(VerifyMode.exactly(0)) { mockInAppView.load(any()) }
         verifySuspend(VerifyMode.exactly(0)) { mockOnEventActionFactory.create(any()) }
 
         // wait for emissions
@@ -392,15 +381,6 @@ class EventClientTests {
             eventClient = createEventClient(backgroundScope)
             eventClient.register()
 
-            val html = "testHtml"
-            val testInapp = ContentCampaign(InAppType.OVERLAY, TRACKING_INFO, html)
-            val expectedInAppMessage =
-                InAppMessage(
-                    dismissId = UUID,
-                    InAppType.OVERLAY,
-                    trackingInfo = TRACKING_INFO,
-                    content = html
-                )
             val action1 = BasicOpenExternalUrlActionModel(
                 reporting = "reporting1",
                 url = "https://example.com"
@@ -428,14 +408,13 @@ class EventClientTests {
             )
 
             val deviceEventResponse = DeviceEventResponse(
-                listOf(testInapp),
+                emptyList(),
                 listOf(onEventActionCampaign1, onEventActionCampaign2),
                 DEVICE_EVENT_STATE
             )
             val body = json.encodeToString(deviceEventResponse)
 
             everySuspend { mockEmarsysClient.send(any()) }.returns(Result.success(createTestResponse(body)))
-            everySuspend { mockInAppPresenter.present(any(), any(), any()) }.returns(Unit)
             val onEventActionExecutedEventCaptureContainer =
                 Capture.container<SdkEvent.Internal.OnEventActionExecuted>()
             everySuspend {
@@ -451,8 +430,6 @@ class EventClientTests {
 
             onlineSdkEvents.await() shouldBe listOf(testEvent)
             verifySuspend { mockEmarsysClient.send(expectedUrlRequest) }
-            verifySuspend { mockInAppViewProvider.provide() }
-            verifySuspend { mockInAppView.load(expectedInAppMessage) }
             verifySuspend {
                 mockOnEventActionFactory.create(action1)
             }
@@ -587,6 +564,8 @@ class EventClientTests {
             onlineEvents.take(2).toList()
         }
         val testEvent1 = testEvent.copy(id = "testId1")
+        val eventContainer = Capture.container<SdkEvent.Internal>()
+        everySuspend { mockSdkEventManager.emitEvent(capture(eventContainer)) } returns Unit
 
         onlineEvents.emit(testEvent)
         onlineEvents.emit(testEvent1)
@@ -595,8 +574,7 @@ class EventClientTests {
 
         delay(1000)
         onlineSdkEvents.await() shouldBe listOf(testEvent, testEvent1)
-        verifySuspend(VerifyMode.exactly(0)) { mockInAppViewProvider.provide() }
-        verifySuspend(VerifyMode.exactly(0)) { mockInAppView.load(any()) }
+        eventContainer.values.find { it is SdkEvent.Internal.InApp.Present } shouldBe null
         verifySuspend(VerifyMode.exactly(0)) { mockOnEventActionFactory.create(any()) }
         verifySuspend {
             mockClientExceptionHandler.handleException(
