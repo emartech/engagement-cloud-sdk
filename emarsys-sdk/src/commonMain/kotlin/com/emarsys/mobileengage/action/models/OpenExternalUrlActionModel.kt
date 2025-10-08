@@ -21,6 +21,6 @@ data class PresentableOpenExternalUrlActionModel(
 @Serializable
 @SerialName("OpenExternalUrl")
 data class BasicOpenExternalUrlActionModel(
-    override val reporting: String,
+    override val reporting: String = "",
     override val url: String
 ) : BasicActionModel(), OpenExternalUrlActionModel

@@ -10,6 +10,6 @@ interface CopyToClipboardActionModel {
 @Serializable
 @SerialName("copyToClipboard")
 data class BasicCopyToClipboardActionModel(
-    override val reporting: String,
+    override val reporting: String = "",
     override val text: String
-): BasicActionModel(), CopyToClipboardActionModel
+) : BasicActionModel(), CopyToClipboardActionModel

@@ -20,6 +20,6 @@ data class PresentableDismissActionModel(
 @Serializable
 @SerialName("Dismiss")
 data class BasicDismissActionModel(
-    override val reporting: String,
+    override val reporting: String = "",
     override var dismissId: String? = null
 ) : BasicActionModel(), DismissActionModel

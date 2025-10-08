@@ -17,12 +17,12 @@ data class PresentableCustomEventActionModel(
     override val title: String,
     override val name: String,
     override val payload: Map<String, String>? = null,
-):  PresentableActionModel(), CustomEventActionModel
+) : PresentableActionModel(), CustomEventActionModel
 
 @Serializable
 @SerialName("MECustomEvent")
 data class BasicCustomEventActionModel(
-    override val reporting: String,
+    override val reporting: String = "",
     override val name: String,
     override val payload: Map<String, String>? = null,
-): BasicActionModel(), CustomEventActionModel
+) : BasicActionModel(), CustomEventActionModel
