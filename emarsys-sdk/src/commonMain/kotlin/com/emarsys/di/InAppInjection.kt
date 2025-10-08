@@ -18,6 +18,7 @@ import com.emarsys.mobileengage.inapp.InAppHandler
 import com.emarsys.mobileengage.inapp.InAppHandlerApi
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
+import com.emarsys.mobileengage.inapp.InAppEventConsumer
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -37,6 +38,15 @@ object InAppInjection {
                 storage = get(),
                 elementSerializer = InAppCall.serializer(),
                 elements = listOf()
+            )
+        }
+        single<InAppEventConsumer>{
+            InAppEventConsumer(
+                applicationScope = get(named(CoroutineScopeTypes.Application)),
+                sdkEventManager = get(),
+                sdkLogger = get { parametersOf(InAppEventConsumer::class.simpleName) },
+                inAppPresenter = get(),
+                inAppViewProvider = get()
             )
         }
         single<InAppConfigApi> { InappConfig }

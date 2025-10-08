@@ -30,6 +30,7 @@ import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.TimestampProvider
 import com.emarsys.core.providers.UUIDProvider
 import com.emarsys.mobileengage.embedded.messages.MessageTagUpdate
+import com.emarsys.mobileengage.inapp.InAppMessage
 import kotlinx.datetime.Instant
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
@@ -467,6 +468,14 @@ sealed interface SdkEvent {
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0,
             ) : InApp(IN_APP_BUTTON_CLICKED_EVENT_NAME), Reporting
+
+            @Serializable
+            data class Present(
+                override val id: String = UUIDProvider().provide(),
+                override val timestamp: Instant = TimestampProvider().provide(),
+                override val type: String = "inAppPresent",
+                val inAppMessage: InAppMessage
+            ) : Internal
         }
 
         @Serializable

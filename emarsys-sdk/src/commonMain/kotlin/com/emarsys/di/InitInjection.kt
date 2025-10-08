@@ -4,15 +4,17 @@ import com.emarsys.core.Registerable
 import com.emarsys.core.state.State
 import com.emarsys.core.state.StateMachine
 import com.emarsys.core.state.StateMachineApi
+import com.emarsys.enable.states.RegisterEventBasedClientsState
 import com.emarsys.init.InitOrganizer
 import com.emarsys.init.InitOrganizerApi
 import com.emarsys.init.states.ApplyGlobalRemoteConfigState
 import com.emarsys.init.states.InitializerState
+import com.emarsys.init.states.RegisterEventConsumersState
 import com.emarsys.init.states.RegisterInstancesState
 import com.emarsys.init.states.RegisterWatchdogsState
 import com.emarsys.init.states.SdkConfigLoaderState
 import com.emarsys.init.states.SessionSubscriptionState
-import com.emarsys.enable.states.RegisterEventBasedClientsState
+import com.emarsys.mobileengage.inapp.InAppEventConsumer
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import org.koin.core.parameter.parametersOf
@@ -79,10 +81,18 @@ object InitInjection {
                 ),
             )
         }
+        single<State>(named(InitStateTypes.RegisterEventConsumers)){
+            RegisterEventConsumersState(
+                consumers = listOf(
+                    get<InAppEventConsumer>()
+                )
+            )
+        }
         single<StateMachineApi>(named(StateMachineTypes.Init)) {
             StateMachine(
                 states = listOf(
                     get(named(InitStateTypes.RegisterEventBasedClients)),
+                    get(named(InitStateTypes.RegisterEventConsumers)),
                     get(named(InitStateTypes.ApplyGlobalRemoteConfig)),
                     get(named(InitStateTypes.RegisterInstances)),
                     get(named(InitStateTypes.RegisterWatchdogs)),
@@ -103,5 +113,5 @@ object InitInjection {
 }
 
 enum class InitStateTypes {
-    ApplyGlobalRemoteConfig, RegisterInstances, RegisterWatchdogs, SessionSubscription, Initializer, SdkConfigLoader, RegisterEventBasedClients
+    ApplyGlobalRemoteConfig, RegisterInstances, RegisterWatchdogs, SessionSubscription, Initializer, SdkConfigLoader, RegisterEventBasedClients, RegisterEventConsumers
 }
