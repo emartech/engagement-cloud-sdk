@@ -1,5 +1,3 @@
 package com.emarsys.api.inapp
 
-internal data object InappConfig: InAppConfigApi {
-    override var inAppDnd: Boolean = false
-}
+internal data class InAppConfig(override var inAppDnd: Boolean = false): InAppConfigApi

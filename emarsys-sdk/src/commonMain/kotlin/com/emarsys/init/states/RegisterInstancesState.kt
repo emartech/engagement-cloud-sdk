@@ -2,6 +2,7 @@ package com.emarsys.init.states
 
 import com.emarsys.api.contact.ContactApi
 import com.emarsys.api.event.EventTrackerApi
+import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.push.PushApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.state.State
@@ -10,6 +11,7 @@ internal class RegisterInstancesState(
     private val eventTrackerApi: EventTrackerApi,
     private val contactApi: ContactApi,
     private val pushApi: PushApi,
+    private val inAppApi: InAppApi,
     private val sdkLogger: Logger
 ) : State {
     override val name: String = "registerInstanceState"
@@ -22,6 +24,7 @@ internal class RegisterInstancesState(
         eventTrackerApi.registerOnContext()
         contactApi.registerOnContext()
         pushApi.registerOnContext()
+        inAppApi.registerOnContext()
 
         return Result.success(Unit)
     }

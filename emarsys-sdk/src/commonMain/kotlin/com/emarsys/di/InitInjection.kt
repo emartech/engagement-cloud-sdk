@@ -34,7 +34,8 @@ object InitInjection {
                 eventTrackerApi = get(),
                 contactApi = get(),
                 pushApi = get(),
-                sdkLogger = get { parametersOf(RegisterInstancesState::class.simpleName) }
+                inAppApi = get(),
+                sdkLogger = get { parametersOf(RegisterInstancesState::class.simpleName) },
             )
         }
         single<State>(named(InitStateTypes.RegisterWatchdogs)) {

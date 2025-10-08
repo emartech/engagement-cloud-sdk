@@ -2,6 +2,7 @@ package com.emarsys.init.states
 
 import com.emarsys.api.contact.ContactApi
 import com.emarsys.api.event.EventTrackerApi
+import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.push.PushApi
 import com.emarsys.core.log.SdkLogger
 import dev.mokkery.MockMode
@@ -19,16 +20,19 @@ class RegisterInstancesStateTests {
     private lateinit var mockEventTrackerApi: EventTrackerApi
     private lateinit var mockContactApi: ContactApi
     private lateinit var mockPushApi: PushApi
+    private lateinit var mockInAppApi: InAppApi
 
     @BeforeTest
     fun setup() {
         mockEventTrackerApi = mock()
         mockContactApi = mock()
         mockPushApi = mock()
+        mockInAppApi = mock()
         registerInstancesState = RegisterInstancesState(
             mockEventTrackerApi,
             mockContactApi,
             mockPushApi,
+            mockInAppApi,
             SdkLogger("TestLoggerName", mock(MockMode.autofill), sdkContext = mock())
         )
     }
@@ -43,11 +47,13 @@ class RegisterInstancesStateTests {
         everySuspend { mockEventTrackerApi.registerOnContext() } returns Unit
         everySuspend { mockContactApi.registerOnContext() } returns Unit
         everySuspend { mockPushApi.registerOnContext() } returns Unit
+        everySuspend { mockInAppApi.registerOnContext() } returns Unit
 
         registerInstancesState.active() shouldBe Result.success(Unit)
 
         verifySuspend { mockEventTrackerApi.registerOnContext() }
         verifySuspend { mockContactApi.registerOnContext() }
         verifySuspend { mockPushApi.registerOnContext() }
+        verifySuspend { mockInAppApi.registerOnContext() }
     }
 }

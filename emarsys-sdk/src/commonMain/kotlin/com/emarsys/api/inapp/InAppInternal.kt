@@ -1,19 +1,27 @@
 package com.emarsys.api.inapp
 
 
-class InAppInternal : InAppInstance {
+internal class InAppInternal(
+    private val inAppConfig: InAppConfigApi,
+    private val inAppContext: InAppContextApi
+) : InAppInstance {
     override suspend fun pause() {
-        TODO("Not yet implemented")
+        inAppConfig.inAppDnd = true
     }
 
     override suspend fun resume() {
-        TODO("Not yet implemented")
+        inAppConfig.inAppDnd = false
     }
 
     override val isPaused: Boolean
-        get() = TODO("Not yet implemented")
+        get() = inAppConfig.inAppDnd
 
     override suspend fun activate() {
-        TODO("Not yet implemented")
+        if(inAppContext.calls.isNotEmpty()){
+            when(inAppContext.calls.last()) {
+                is InAppCall.Pause -> pause()
+                is InAppCall.Resume -> resume()
+            }
+        }
     }
 }

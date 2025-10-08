@@ -1,12 +1,14 @@
 package com.emarsys.api.inapp
 
+import com.emarsys.api.AutoRegisterable
+
 /**
  * Interface for managing in-app messaging functionality.
  *
  * This API allows pausing and resuming in-app messaging. Pausing can be useful when
  * in-app messages should not be displayed, such as during critical user interactions.
  */
-interface InAppApi {
+interface InAppApi : AutoRegisterable {
 
     /**
      * Indicates whether in-app messaging is currently paused.

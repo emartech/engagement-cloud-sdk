@@ -1,6 +1,7 @@
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
@@ -16,6 +17,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Preview
 fun App() {
     val eventName = mutableStateOf("")
+    val switchValue = mutableStateOf(false)
     MaterialTheme {
         Column {
             Text("Hello Team SDK!")
@@ -49,6 +51,22 @@ fun App() {
             }) {
                 Text("trackCustomEvent")
             }
+            Switch(
+                checked = switchValue.value,
+                onCheckedChange = {
+                    switchValue.value = it
+                    if(it) {
+                        CoroutineScope(Dispatchers.Default).launch {
+                            Emarsys.inApp.pause()
+                        }
+                    } else {
+                        CoroutineScope(Dispatchers.Default).launch {
+                            Emarsys.inApp.resume()
+                        }
+                    }
+                }
+            )
+            Text("InApp DND: ${switchValue.value}")
         }
     }
 }

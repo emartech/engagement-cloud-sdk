@@ -8,19 +8,21 @@ import kotlin.test.Test
 class GathererInAppTests {
     private lateinit var gathererInApp: GathererInApp
     private lateinit var inAppContext: InAppContextApi
+    private lateinit var inAppConfig: InAppConfig
 
     @BeforeTest
     fun setup() = runTest {
         inAppContext = InAppContext(mutableListOf())
+        inAppConfig = InAppConfig()
 
-        gathererInApp = GathererInApp(inAppContext, InappConfig)
+        gathererInApp = GathererInApp(inAppContext, inAppConfig)
     }
 
     @Test
     fun testIsPaused() = runTest {
         gathererInApp.isPaused shouldBe false
 
-        InappConfig.inAppDnd = true
+        inAppConfig.inAppDnd = true
 
         gathererInApp.isPaused shouldBe true
     }

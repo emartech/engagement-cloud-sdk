@@ -4,12 +4,12 @@ import com.emarsys.api.inapp.GathererInApp
 import com.emarsys.api.inapp.InApp
 import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.inapp.InAppCall
+import com.emarsys.api.inapp.InAppConfig
 import com.emarsys.api.inapp.InAppConfigApi
 import com.emarsys.api.inapp.InAppContext
 import com.emarsys.api.inapp.InAppContextApi
 import com.emarsys.api.inapp.InAppInstance
 import com.emarsys.api.inapp.InAppInternal
-import com.emarsys.api.inapp.InappConfig
 import com.emarsys.api.inapp.LoggingInApp
 import com.emarsys.core.collections.PersistentList
 import com.emarsys.mobileengage.inapp.InAppDownloader
@@ -44,7 +44,7 @@ object InAppInjection {
                 inAppViewProvider = get()
             )
         }
-        single<InAppConfigApi> { InappConfig }
+        single<InAppConfigApi> { InAppConfig() }
         single<InAppContextApi> {
             InAppContext(
                 calls = get(named(PersistentListTypes.InAppCall))
@@ -62,7 +62,12 @@ object InAppInjection {
                 inAppContext = get(),
             )
         }
-        single<InAppInstance>(named(InstanceType.Internal)) { InAppInternal() }
+        single<InAppInstance>(named(InstanceType.Internal)) {
+            InAppInternal(
+                inAppConfig = get(),
+                inAppContext = get()
+            )
+        }
         single<InAppApi> {
             InApp(
                 loggingApi = get(named(InstanceType.Logging)),
