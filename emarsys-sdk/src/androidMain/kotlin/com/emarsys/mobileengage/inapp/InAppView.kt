@@ -6,7 +6,6 @@ import android.util.AttributeSet
 import android.widget.LinearLayout
 import com.emarsys.core.factory.Factory
 import com.emarsys.core.providers.InstantProvider
-import com.emarsys.core.providers.UuidProviderApi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import kotlin.time.ExperimentalTime
@@ -19,7 +18,6 @@ internal class InAppView @JvmOverloads constructor(
     private val webViewProvider: WebViewProvider,
     private val jsBridgeFactory: Factory<InAppJsBridgeData, InAppJsBridge>,
     private val timestampProvider: InstantProvider,
-    private val uuidProvider: UuidProviderApi,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
 ) : LinearLayout(context, attrs, defStyleAttr), InAppViewApi {
@@ -51,7 +49,7 @@ internal class InAppView @JvmOverloads constructor(
 
             addView(webView)
             webView.addJavascriptInterface(
-                jsBridgeFactory.create(InAppJsBridgeData(uuidProvider.provide(), message.trackingInfo)),
+                jsBridgeFactory.create(InAppJsBridgeData(message.dismissId, message.trackingInfo)),
                 JS_BRIDGE_NAME
             )
 

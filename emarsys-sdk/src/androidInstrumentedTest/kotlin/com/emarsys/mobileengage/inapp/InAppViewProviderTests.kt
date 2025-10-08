@@ -4,7 +4,6 @@ import androidx.test.core.app.ActivityScenario
 import com.emarsys.FakeActivity
 import com.emarsys.core.factory.Factory
 import com.emarsys.core.providers.TimestampProvider
-import com.emarsys.core.providers.UUIDProvider
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -30,14 +29,13 @@ class InAppViewProviderTests {
                     mockInAppJsBridgeProvider,
                     Dispatchers.Main,
                     WebViewProvider(it.applicationContext, Dispatchers.Main),
-                    TimestampProvider(),
-                    UUIDProvider()
+                    TimestampProvider()
                 )
         }
     }
 
     @Test
-    fun provide_shouldReturn_webInappViewInstance() = runTest {
+    fun provide_shouldReturn_webInAppViewInstance() = runTest {
         val view = provider.provide()
 
         (view is InAppView) shouldBe true

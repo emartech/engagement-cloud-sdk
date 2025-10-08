@@ -21,13 +21,10 @@ class InAppViewTests {
     }
 
     private lateinit var mockJsBridgeFactory: Factory<InAppJsBridgeData, InAppJsBridge>
-    private lateinit var mockUUIDProvider: UUIDProvider
 
     @Before
     fun setUp() {
         mockJsBridgeFactory = mockk()
-        mockUUIDProvider = mockk()
-        every { mockUUIDProvider.provide() } returns UUID
     }
 
     @Test
@@ -40,12 +37,12 @@ class InAppViewTests {
             Dispatchers.Main,
             WebViewProvider(applicationContext, Dispatchers.Main),
             mockJsBridgeFactory,
-            TimestampProvider(),
-            mockUUIDProvider
+            TimestampProvider()
         )
 
         inAppView.load(
             InAppMessage(
+                dismissId = UUID,
                 type = InAppType.OVERLAY,
                 trackingInfo = TRACKING_INFO,
                 content = "testHtml"
