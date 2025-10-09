@@ -49,9 +49,7 @@ class EmbeddedMessagingIntegrationTests {
         sdkContext = SdkKoinIsolationContext.koin.get<SdkContextApi>()
         sdkContext.defaultUrls =
             sdkContext.defaultUrls.copyWith(
-                embeddedMessagingBaseUrl = "https://embedded-messaging-staging.gservice.emarsys.com/embedded-messaging/fake-api",
-                clientServiceBaseUrl = "https://me-client-staging.eservice.emarsys.com",
-                eventServiceBaseUrl = "https://mobile-events-staging.eservice.emarsys.com"
+                embeddedMessagingBaseUrl = "https://embedded-messaging-staging.gservice.emarsys.com/embedded-messaging/fake-api"
             )
         sdkContext.config = AndroidEmarsysConfig(applicationCode = STAGING_APP_CODE)
         sdkContext.setSdkState(SdkState.active)
