@@ -47,7 +47,7 @@ struct ContentView: View {
     
     func trackEvent(eventName: String) {
         Task {
-            try await Emarsys.shared.tracking.track(event: CustomEvent(name: eventName, attributes: nil))
+            try await Emarsys.shared.event.track(event: CustomEvent(name: eventName, attributes: nil))
         }
     }
 }

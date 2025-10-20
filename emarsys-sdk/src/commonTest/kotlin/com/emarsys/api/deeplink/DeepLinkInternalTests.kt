@@ -84,11 +84,11 @@ class DeepLinkInternalTests : KoinTest {
     }
 
     @Test
-    fun testTrackDeepLink_should_emit_trackDeepLinkEvent_into_sdkEventFlow_and_return_true_if_url_contains_ems_dl_param() =
+    fun testTrack_should_emit_trackEvent_into_sdkEventFlow_and_return_true_if_url_contains_ems_dl_param() =
         runTest {
             val url = Url("https://example.com?ems_dl=123")
 
-            val result = deepLinkInternal.trackDeepLink(url)
+            val result = deepLinkInternal.track(url)
 
             val emittedEvent = eventSlot.get()
 
@@ -98,11 +98,11 @@ class DeepLinkInternalTests : KoinTest {
         }
 
     @Test
-    fun testTrackDeepLink_should_return_false_if_url_doesnt_contain_ems_dl_param() =
+    fun testTrack_should_return_false_if_url_doesnt_contain_ems_dl_param() =
         runTest {
             val url = Url("https://example.com?any_param=any")
 
-            val result = deepLinkInternal.trackDeepLink(url)
+            val result = deepLinkInternal.track(url)
 
             result.getOrNull() shouldBe false
             verifySuspend(VerifyMode.exactly(0)) { mockSdkEventDistributor.registerEvent(any()) }

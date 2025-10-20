@@ -42,7 +42,7 @@ class JSTrackingTests {
     }
 
     @Test
-    fun trackCustomEvent_shouldCall_trackCustomEvent_onEventTrackerApi_withCorrectParam() =
+    fun testTrack_shouldCall_trackCustomEvent_onEventTrackerApi_withCorrectParam() =
         runTest {
             val testName = "testName"
             val payloadValue = "testValue"
@@ -50,18 +50,18 @@ class JSTrackingTests {
             val testPayload = js("{}")
             testPayload[payloadKey] = payloadValue
             val eventSlot: SlotCapture<CustomEvent> = slot()
-            everySuspend { mockEventTrackerApi.trackCustomEvent(capture(eventSlot)) } returns Result.success(
+            everySuspend { mockEventTrackerApi.track(capture(eventSlot)) } returns Result.success(
                 Unit
             )
 
-            jsTracking.trackCustomEvent(testName, testPayload).await()
+            jsTracking.track(testName, testPayload).await()
 
             eventSlot.get().name shouldBe testName
             eventSlot.get().attributes shouldBe mapOf(payloadKey to payloadValue)
         }
 
     @Test
-    fun trackCustomEvent_shouldCall_throwException_ifPayloadMappingFails() = runTest {
+    fun testTrack_shouldCall_throwException_ifPayloadMappingFails() = runTest {
         val testName = "testName"
         val payloadValue = js("""{"nested":"object"}""")
         val payloadKey = "testKey"
@@ -69,12 +69,12 @@ class JSTrackingTests {
         testPayload[payloadKey] = payloadValue
 
         shouldThrow<SerializationException> {
-            jsTracking.trackCustomEvent(testName, testPayload).await()
+            jsTracking.track(testName, testPayload).await()
         }
     }
 
     @Test
-    fun trackCustomEvent_shouldCall_throwException_ifEventTrackingFails() = runTest {
+    fun testTrack_shouldCall_throwException_ifEventTrackingFails() = runTest {
         val testName = "testName"
         val payloadKey = "testKey"
         val payloadValue = "testValue"
@@ -82,7 +82,7 @@ class JSTrackingTests {
         testPayload[payloadKey] = payloadValue
 
         everySuspend {
-            mockEventTrackerApi.trackCustomEvent(
+            mockEventTrackerApi.track(
                 CustomEvent(
                     testName,
                     mapOf(payloadKey to payloadValue)
@@ -93,7 +93,7 @@ class JSTrackingTests {
         )
 
         shouldThrow<Exception> {
-            jsTracking.trackCustomEvent(testName, testPayload).await()
+            jsTracking.track(testName, testPayload).await()
         }
     }
 }

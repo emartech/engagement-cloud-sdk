@@ -28,7 +28,7 @@ internal class Contact<Logging : ContactInstance, Gatherer : ContactInstance, In
      * @param contactFieldId The ID of the contact field.
      * @param contactFieldValue The value of the contact field.
      */
-    override suspend fun linkContact(contactFieldId: Int, contactFieldValue: String): Result<Unit> =
+    override suspend fun link(contactFieldId: Int, contactFieldValue: String): Result<Unit> =
         runCatching {
             withContext(sdkContext.sdkDispatcher) {
                 withLogContext(
@@ -40,7 +40,7 @@ internal class Contact<Logging : ContactInstance, Gatherer : ContactInstance, In
                             "contactFieldValue", JsonPrimitive(contactFieldValue)
                         )
                     }) {
-                    activeInstance<ContactInternalApi>().linkContact(
+                    activeInstance<ContactInternalApi>().link(
                         contactFieldId,
                         contactFieldValue
                     )
@@ -55,7 +55,7 @@ internal class Contact<Logging : ContactInstance, Gatherer : ContactInstance, In
      * @param contactFieldId The ID of the contact field.
      * @param openIdToken The OpenID token for authentication.
      */
-    override suspend fun linkAuthenticatedContact(
+    override suspend fun linkAuthenticated(
         contactFieldId: Int,
         openIdToken: String
     ): Result<Unit> =
@@ -70,7 +70,7 @@ internal class Contact<Logging : ContactInstance, Gatherer : ContactInstance, In
                             "openIdToken", JsonPrimitive(openIdToken)
                         )
                     }) {
-                    activeInstance<ContactInternalApi>().linkAuthenticatedContact(
+                    activeInstance<ContactInternalApi>().linkAuthenticated(
                         contactFieldId,
                         openIdToken
                     )
@@ -81,9 +81,9 @@ internal class Contact<Logging : ContactInstance, Gatherer : ContactInstance, In
     /**
      * Unlinks the currently linked contact from the SDK. And replaces it with an anonymous contact
      */
-    override suspend fun unlinkContact(): Result<Unit> = runCatching {
+    override suspend fun unlink(): Result<Unit> = runCatching {
         withContext(sdkContext.sdkDispatcher) {
-            activeInstance<ContactInternalApi>().unlinkContact()
+            activeInstance<ContactInternalApi>().unlink()
         }
     }
 }

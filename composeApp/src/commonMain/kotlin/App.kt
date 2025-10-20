@@ -32,7 +32,7 @@ fun App() {
             Button(onClick = {
                 CoroutineScope(Dispatchers.Default).launch {
                     enableTracking()
-                    Emarsys.contact.linkContact(100027299, "test@test.com")
+                    Emarsys.contact.link(100027299, "test@test.com")
                 }
             }) {
                 Text("enable SDK & link contact")
@@ -44,7 +44,7 @@ fun App() {
             Button(onClick = {
                 if (eventName.value.isNotBlank()) {
                     CoroutineScope(Dispatchers.Default).launch {
-                        Emarsys.tracking.trackCustomEvent(CustomEvent(eventName.value, null))
+                        Emarsys.event.track(CustomEvent(eventName.value, null))
 
                     }
                 }
@@ -55,7 +55,7 @@ fun App() {
                 checked = switchValue.value,
                 onCheckedChange = {
                     switchValue.value = it
-                    if(it) {
+                    if (it) {
                         CoroutineScope(Dispatchers.Default).launch {
                             Emarsys.inApp.pause()
                         }

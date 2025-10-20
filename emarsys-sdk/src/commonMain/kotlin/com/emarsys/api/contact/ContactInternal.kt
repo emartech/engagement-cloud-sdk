@@ -15,7 +15,7 @@ internal class ContactInternal(
     private val sdkLogger: Logger,
     private val sdkEventDistributor: SdkEventDistributorApi
 ) : ContactInstance {
-    override suspend fun linkContact(contactFieldId: Int, contactFieldValue: String) {
+    override suspend fun link(contactFieldId: Int, contactFieldValue: String) {
         sdkLogger.debug("ContactInternal - linkContact")
         sdkEventDistributor.registerEvent(
             SdkEvent.Internal.Sdk.LinkContact(
@@ -25,7 +25,7 @@ internal class ContactInternal(
         )
     }
 
-    override suspend fun linkAuthenticatedContact(contactFieldId: Int, openIdToken: String) {
+    override suspend fun linkAuthenticated(contactFieldId: Int, openIdToken: String) {
         sdkLogger.debug("ContactInternal - linkAuthenticatedContact")
         sdkEventDistributor.registerEvent(
             SdkEvent.Internal.Sdk.LinkAuthenticatedContact(
@@ -35,7 +35,7 @@ internal class ContactInternal(
         )
     }
 
-    override suspend fun unlinkContact() {
+    override suspend fun unlink() {
         sdkLogger.debug("ContactInternal - linkContact")
         sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.UnlinkContact())
     }

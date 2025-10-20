@@ -90,9 +90,9 @@ object Emarsys {
         get() = koin.get<PushApi>()
 
     /**
-     * Provides access to the Tracking API, which allows tracking custom events.
+     * Provides access to the Event Tracking API, which allows tracking custom events.
      */
-    val tracking: TrackingApi
+    val event: TrackingApi
         get() = koin.get<TrackingApi>()
 
     /**

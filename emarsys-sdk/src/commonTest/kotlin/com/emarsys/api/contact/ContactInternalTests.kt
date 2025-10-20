@@ -50,7 +50,7 @@ class ContactInternalTests {
 
     @Test
     fun testLinkContact_should_emit_linkContact_event_into_sdkFlow() = runTest {
-        contactInternal.linkContact(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE)
+        contactInternal.link(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE)
 
         val emitted = eventSlot.get()
         (emitted is SdkEvent.Internal.Sdk.LinkContact) shouldBe true
@@ -61,7 +61,7 @@ class ContactInternalTests {
     @Test
     fun testLinkAuthenticatedContact_should_emit_linkAuthenticatedContact_event_into_sdkFlow() =
         runTest {
-            contactInternal.linkAuthenticatedContact(CONTACT_FIELD_ID, OPEN_ID_TOKEN)
+            contactInternal.linkAuthenticated(CONTACT_FIELD_ID, OPEN_ID_TOKEN)
 
             val emitted = eventSlot.get()
             (emitted is SdkEvent.Internal.Sdk.LinkAuthenticatedContact) shouldBe true
@@ -71,7 +71,7 @@ class ContactInternalTests {
 
     @Test
     fun testUnlinkContact_should_emit_unlinkContact_event_into_sdkFlow() = runTest {
-        contactInternal.unlinkContact()
+        contactInternal.unlink()
 
         val emitted = eventSlot.get()
         (emitted is SdkEvent.Internal.Sdk.UnlinkContact) shouldBe true

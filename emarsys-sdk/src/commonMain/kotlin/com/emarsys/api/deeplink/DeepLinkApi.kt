@@ -4,6 +4,6 @@ import io.ktor.http.Url
 
 interface DeepLinkApi {
 
-    fun trackDeepLink(url: Url): Result<Boolean>
+    fun track(url: Url): Result<Boolean>
 
 }

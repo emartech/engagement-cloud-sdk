@@ -14,7 +14,7 @@ interface TrackingApi {
      *
      * Example usage:
      * ``` kotlin
-     *     Emarsys.tracking.trackCustomEvent(
+     *     Emarsys.event.track(
      *         CustomEvent(
      *             name = "event_name",
      *             attributes = mapOf(
@@ -27,5 +27,5 @@ interface TrackingApi {
      * @param event The custom event to track.
      * @return A [Result] indicating success or failure of the operation.
      */
-    suspend fun trackCustomEvent(event: CustomEvent): Result<Unit>
+    suspend fun track(event: CustomEvent): Result<Unit>
 }

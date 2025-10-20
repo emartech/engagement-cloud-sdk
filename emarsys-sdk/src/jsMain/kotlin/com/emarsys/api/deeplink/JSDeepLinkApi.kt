@@ -4,5 +4,5 @@ import io.ktor.http.Url
 
 @JsExport
 interface JSDeepLinkApi {
-    fun trackDeepLink(url: Url): Boolean
+    fun track(url: Url): Boolean
 }

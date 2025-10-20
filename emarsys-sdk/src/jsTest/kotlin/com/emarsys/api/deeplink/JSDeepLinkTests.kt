@@ -16,24 +16,24 @@ class JSDeepLinkTests {
     }
 
     @Test
-    fun trackDeepLink_shouldCall_trackDeepLink_onDeepLinkApi() {
+    fun testTrack_shouldCall_track_onDeepLinkApi() {
         val mockDeepLinkApi: DeepLinkApi = mock()
-        every { mockDeepLinkApi.trackDeepLink(testUrl) } returns Result.success(true)
+        every { mockDeepLinkApi.track(testUrl) } returns Result.success(true)
         val jsDeepLink = JSDeepLink(mockDeepLinkApi)
 
-        val result = jsDeepLink.trackDeepLink(testUrl)
+        val result = jsDeepLink.track(testUrl)
 
-        verify { mockDeepLinkApi.trackDeepLink(testUrl) }
+        verify { mockDeepLinkApi.track(testUrl) }
         result shouldBe true
     }
 
     @Test
-    fun trackDeepLink_shouldReturnFalse_ifTrackingFails() {
+    fun testTrack_shouldReturnFalse_ifTrackingFails() {
         val mockDeepLinkApi: DeepLinkApi = mock()
-        every { mockDeepLinkApi.trackDeepLink(testUrl) } returns Result.failure(Exception())
+        every { mockDeepLinkApi.track(testUrl) } returns Result.failure(Exception())
         val jsDeepLink = JSDeepLink(mockDeepLinkApi)
 
-        val result = jsDeepLink.trackDeepLink(testUrl)
+        val result = jsDeepLink.track(testUrl)
 
         result shouldBe false
     }

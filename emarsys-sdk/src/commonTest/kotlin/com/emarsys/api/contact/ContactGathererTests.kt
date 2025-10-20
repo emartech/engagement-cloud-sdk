@@ -39,12 +39,12 @@ class ContactGathererTests {
     @Test
     fun testGathering() = runTest {
 
-        contactGatherer.linkContact(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE)
-        contactGatherer.linkAuthenticatedContact(CONTACT_FIELD_ID, OPEN_ID_TOKEN)
-        contactGatherer.unlinkContact()
-        contactGatherer.linkContact(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE)
-        contactGatherer.unlinkContact()
-        contactGatherer.linkAuthenticatedContact(CONTACT_FIELD_ID, OPEN_ID_TOKEN)
+        contactGatherer.link(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE)
+        contactGatherer.linkAuthenticated(CONTACT_FIELD_ID, OPEN_ID_TOKEN)
+        contactGatherer.unlink()
+        contactGatherer.link(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE)
+        contactGatherer.unlink()
+        contactGatherer.linkAuthenticated(CONTACT_FIELD_ID, OPEN_ID_TOKEN)
 
         contactContext.calls shouldBe expected
     }

@@ -25,7 +25,7 @@ class AndroidDeepLink(
         val isLinkTracked =
             intentFromActivity?.getBooleanExtra(EMS_DEEP_LINK_TRACKED_KEY, false) ?: false
         if (!isLinkTracked && uri != null) {
-            result = deepLink.trackDeepLink(Url(uri.toString())).getOrNull() ?: false
+            result = deepLink.track(Url(uri.toString())).getOrNull() ?: false
             intentFromActivity?.putExtra(EMS_DEEP_LINK_TRACKED_KEY, true)
         } else {
             CoroutineScope(sdkDispatcher).launch(start = CoroutineStart.UNDISPATCHED) {

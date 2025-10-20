@@ -18,14 +18,14 @@ interface ContactApi : AutoRegisterable {
      *
      * Example usage:
      * ```kotlin
-     * Emarsys.contact.linkContact(3, "test@example.com")
+     * Emarsys.contact.link(3, "test@example.com")
      * ```
      *
      * @param contactFieldId The ID of the contact field.
      * @param contactFieldValue The value of the contact field to link.
      * @return A [Result] indicating success or failure of the operation.
      */
-    suspend fun linkContact(contactFieldId: Int, contactFieldValue: String): Result<Unit>
+    suspend fun link(contactFieldId: Int, contactFieldValue: String): Result<Unit>
 
     /**
      * Links a contact to the SDK using a specific contact field ID and OpenID token.
@@ -35,14 +35,14 @@ interface ContactApi : AutoRegisterable {
      *
      * Example usage:
      * ```kotlin
-     * Emarsys.contact.linkAuthenticatedContact(3, "open_id_token_example")
+     * Emarsys.contact.linkAuthenticated(3, "open_id_token_example")
      * ```
      *
      * @param contactFieldId The ID of the contact field to link (e.g., email, phone number).
      * @param openIdToken The OpenID token used for authentication.
      * @return A [Result] indicating success or failure of the operation.
      */
-    suspend fun linkAuthenticatedContact(contactFieldId: Int, openIdToken: String): Result<Unit>
+    suspend fun linkAuthenticated(contactFieldId: Int, openIdToken: String): Result<Unit>
 
     /**
      * Unlinks the currently linked contact from the SDK.
@@ -52,10 +52,10 @@ interface ContactApi : AutoRegisterable {
      *
      * Example usage:
      * ```kotlin
-     * Emarsys.contact.unlinkContact()
+     * Emarsys.contact.unlink()
      * ```
      *
      * @return A [Result] indicating success or failure of the operation.
      */
-    suspend fun unlinkContact(): Result<Unit>
+    suspend fun unlink(): Result<Unit>
 }

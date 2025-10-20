@@ -35,21 +35,21 @@ class LoggingContactTests {
 
     @Test
     fun testLinkContact() = runTest {
-        loggingContact.linkContact(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE)
+        loggingContact.link(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE)
 
         verifyLogging()
     }
 
     @Test
     fun testLinkAuthenticatedContact() = runTest {
-        loggingContact.linkAuthenticatedContact(CONTACT_FIELD_ID, OPEN_ID_TOKEN)
+        loggingContact.linkAuthenticated(CONTACT_FIELD_ID, OPEN_ID_TOKEN)
 
         verifyLogging()
     }
 
     @Test
     fun testUnlinkContact() = runTest {
-        loggingContact.linkAuthenticatedContact(CONTACT_FIELD_ID, OPEN_ID_TOKEN)
+        loggingContact.linkAuthenticated(CONTACT_FIELD_ID, OPEN_ID_TOKEN)
 
         verifyLogging()
     }

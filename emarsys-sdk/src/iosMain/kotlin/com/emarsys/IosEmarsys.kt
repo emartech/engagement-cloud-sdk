@@ -35,7 +35,7 @@ object IosEmarsys {
         get() = koin.get<IosContactApi>()
     val push: IosPushApi
         get() = koin.get<IosPushApi>()
-    val tracking: IosTrackingApi
+    val event: IosTrackingApi
         get() = koin.get<IosTrackingApi>()
     val inApp: IosInAppApi
         get() = koin.get<IosInAppApi>()

@@ -15,7 +15,7 @@ class JSContact(private val contactApi: ContactApi, private val applicationScope
      */
     override fun link(contactFieldId: Int, contactFieldValue: String): Promise<Unit> {
         return applicationScope.promise {
-            contactApi.linkContact(contactFieldId, contactFieldValue).getOrThrow()
+            contactApi.link(contactFieldId, contactFieldValue).getOrThrow()
         }
     }
 
@@ -28,7 +28,7 @@ class JSContact(private val contactApi: ContactApi, private val applicationScope
      */
     override fun linkAuthenticated(contactFieldId: Int, openIdToken: String): Promise<Unit> {
         return applicationScope.promise {
-            contactApi.linkAuthenticatedContact(contactFieldId, openIdToken).getOrThrow()
+            contactApi.linkAuthenticated(contactFieldId, openIdToken).getOrThrow()
         }
     }
 
@@ -39,7 +39,7 @@ class JSContact(private val contactApi: ContactApi, private val applicationScope
      */
     override fun unlink(): Promise<Unit> {
         return applicationScope.promise {
-            contactApi.unlinkContact().getOrThrow()
+            contactApi.unlink().getOrThrow()
         }
     }
 }

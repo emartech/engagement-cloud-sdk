@@ -6,6 +6,6 @@ import com.emarsys.tracking.TrackingApi
 
 class IosTracking: IosTrackingApi {
     override suspend fun track(event: CustomEvent) {
-        koin.get<TrackingApi>().trackCustomEvent(event)
+        koin.get<TrackingApi>().track(event)
     }
 }

@@ -39,7 +39,7 @@ object EmarsysJs {
     lateinit var setup: JsSetupApi
     lateinit var config: JSConfigApi
     lateinit var contact: JSContactApi
-    lateinit var tracking: JSTrackingApi
+    lateinit var event: JSTrackingApi
     lateinit var push: JSPushApi
     lateinit var deepLink: JSDeepLinkApi
     lateinit var inApp: JSInAppApi
@@ -53,7 +53,7 @@ object EmarsysJs {
         setup = koin.get<JsSetupApi>()
         config = koin.get<JSConfigApi>()
         contact = koin.get<JSContactApi>()
-        tracking = koin.get<JSTrackingApi>()
+        event = koin.get<JSTrackingApi>()
         push = koin.get<JSPushApi>()
         deepLink = koin.get<JSDeepLinkApi>()
         inApp = koin.get<JSInAppApi>()

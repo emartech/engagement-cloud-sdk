@@ -18,7 +18,7 @@ internal class DeepLinkInternal(
         const val TRACKING_ID_KEY = "ems_dl"
     }
 
-    override fun trackDeepLink(url: Url): Result<Boolean> = runCatching {
+    override fun track(url: Url): Result<Boolean> = runCatching {
         return@runCatching url.parameters[TRACKING_ID_KEY]?.let {
             CoroutineScope(sdkContext.sdkDispatcher).launch(start = CoroutineStart.UNDISPATCHED) {
                 sdkEventDistributor.registerEvent(

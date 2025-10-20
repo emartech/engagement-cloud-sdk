@@ -19,7 +19,7 @@ class JSTracking(
      * @param eventPayload Optional payload for the event.
      * @return A promise that resolves when the event is tracked.
      */
-    override fun trackCustomEvent(
+    override fun track(
         eventName: String,
         eventPayload: Any?
     ): Promise<Unit> {
@@ -27,7 +27,7 @@ class JSTracking(
             val attributes: Map<String, String>? = eventPayload?.let {
                 JsonUtil.json.decodeFromString(JSON.stringify(it))
             }
-            trackingApi.trackCustomEvent(CustomEvent(eventName, attributes)).getOrThrow()
+            trackingApi.track(CustomEvent(eventName, attributes)).getOrThrow()
         }
     }
 }

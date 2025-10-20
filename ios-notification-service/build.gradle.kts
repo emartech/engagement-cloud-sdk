@@ -17,7 +17,7 @@ kotlin {
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "EmarsysNotificationService"
-            isStatic = false
+            isStatic = true
         }
     }
 

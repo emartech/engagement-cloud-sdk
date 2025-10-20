@@ -10,7 +10,7 @@ class Tracking : TrackingApi {
      *
      * @param event custom event to be tracked.
      */
-    override suspend fun trackCustomEvent(event: CustomEvent): Result<Unit> {
+    override suspend fun track(event: CustomEvent): Result<Unit> {
         return koin.get<EventTrackerApi>().trackEvent(event)
     }
 }

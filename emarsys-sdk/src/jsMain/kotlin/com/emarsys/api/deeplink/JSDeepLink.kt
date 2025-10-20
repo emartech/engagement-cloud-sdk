@@ -5,8 +5,8 @@ import io.ktor.http.Url
 class JSDeepLink(
     private val deepLinkApi: DeepLinkApi
 ) : JSDeepLinkApi {
-    override fun trackDeepLink(url: Url): Boolean {
-        return deepLinkApi.trackDeepLink(url).getOrNull() ?: false
+    override fun track(url: Url): Boolean {
+        return deepLinkApi.track(url).getOrNull() ?: false
     }
 
 }
