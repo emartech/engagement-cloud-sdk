@@ -22,21 +22,20 @@ internal class AppStartState(
     }
 
     override suspend fun active(): Result<Unit> {
-        return Result.success(Unit)
-        //return if (!alreadyCompleted) {
-        //    val appStartEvent = SdkEvent.Internal.Sdk.AppStart(
-        //        id = uuidProvider.provide(),
-        //        timestamp = timestampProvider.provide()
-        //    )
-        //    sdkEventDistributor.registerEvent(appStartEvent)
-        //        .await<Response>()
-        //        .mapToUnitOrFailure()
-        //        .onSuccess {
-        //            alreadyCompleted = true
-        //        }
-        //} else {
-        //    Result.success(Unit)
-        //}
+        return if (!alreadyCompleted) {
+            val appStartEvent = SdkEvent.Internal.Sdk.AppStart(
+                id = uuidProvider.provide(),
+                timestamp = timestampProvider.provide()
+            )
+            sdkEventDistributor.registerEvent(appStartEvent)
+                .await<Response>()
+                .mapToUnitOrFailure()
+                .onSuccess {
+                    alreadyCompleted = true
+                }
+        } else {
+            Result.success(Unit)
+        }
     }
 
     override fun relax() {

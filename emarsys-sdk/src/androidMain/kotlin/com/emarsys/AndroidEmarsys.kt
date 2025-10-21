@@ -5,8 +5,7 @@ import com.emarsys.api.contact.ContactApi
 import com.emarsys.api.deeplink.AndroidDeepLinkApi
 import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.push.PushApi
-import com.emarsys.api.setup.SetupApi
-import com.emarsys.core.exceptions.SdkException.SdkAlreadyEnabledException
+import com.emarsys.api.setup.AndroidSetupApi
 import com.emarsys.di.EventFlowTypes
 import com.emarsys.di.SdkKoinIsolationContext
 import com.emarsys.di.SdkKoinIsolationContext.koin
@@ -68,38 +67,17 @@ object AndroidEmarsys {
         get() = koin.get<AndroidConfigApi>()
 
     /**
+     * Provides access to the Setup API, which allows enabling and disabling the tracking in the SDK.
+     */
+    val setup: AndroidSetupApi
+        get() = koin.get<AndroidSetupApi>()
+
+    /**
      * Initializes the SDK. This method must be called before using any other SDK functionality.
      * On Android it is being called automatically
      */
     suspend fun initialize() {
         SdkKoinIsolationContext.init()
         koin.get<InitOrganizerApi>().init()
-    }
-
-    /**
-     * Enables tracking with the provided [configuration][config].
-     *
-     * Example usage:
-     * ```kotlin
-     *         AndroidEmarsys.enableTracking(
-     *             AndroidEmarsysConfig(
-     *                 applicationCode = "ABCDE-12345",
-     *                 launchActivityClass = MyActivity::class.java,
-     *             )
-     *         )
-     * ```
-     *
-     * @param config The SDK configuration to use for enabling tracking.
-     * @throws SdkAlreadyEnabledException if tracking is already enabled.
-     */
-    suspend fun enableTracking(config: AndroidEmarsysConfig) {
-        koin.get<SetupApi>().enableTracking(config)
-    }
-
-    /**
-     * Disables tracking.
-     */
-    suspend fun disableTracking() {
-        koin.get<SetupApi>().disableTracking()
     }
 }

@@ -20,9 +20,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.promise
 import org.koin.core.qualifier.named
-import kotlin.js.Promise
 
 fun main() {
     EmarsysJs.init()
@@ -61,28 +59,6 @@ object EmarsysJs {
         inApp = koin.get<JSInAppApi>()
         sdkPublicEvents = koin.get<Flow<SdkEvent.External.Api>>(named(EventFlowTypes.Public))
         events = koin.get<EventEmitterApi>()
-    }
-
-    /**
-     * Enables tracking with the provided configuration.
-     *
-     * @param jsEmarsysConfig The SDK configuration to use for enabling tracking.
-     * @return A promise that resolves when tracking is enabled.
-     */
-    fun enableTracking(jsEmarsysConfig: JsEmarsysConfig): Promise<Unit> {
-        return applicationScope.promise {
-            setup.enableTracking(jsEmarsysConfig)
-        }
-    }
-
-    /**
-     * Disables tracking.
-     *
-     */
-    fun disableTracking(): Promise<Unit> {
-        return applicationScope.promise {
-            setup.disableTracking()
-        }
     }
 
     fun registerEventListener(eventListener: EmarsysSdkEventListener): SdkEventSubscriptionApi {

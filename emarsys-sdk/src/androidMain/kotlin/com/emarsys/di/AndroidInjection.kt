@@ -21,6 +21,8 @@ import com.emarsys.api.push.PushApi
 import com.emarsys.api.push.PushGatherer
 import com.emarsys.api.push.PushInstance
 import com.emarsys.api.push.PushInternal
+import com.emarsys.api.setup.AndroidSetup
+import com.emarsys.api.setup.AndroidSetupApi
 import com.emarsys.applicationContext
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.actions.launchapplication.LaunchApplicationHandlerApi
@@ -130,6 +132,7 @@ object AndroidInjection {
                 androidNotificationSettingsCollector = get()
             )
         }
+        single<AndroidSetupApi> { AndroidSetup(setup = get()) }
         single<DeviceInfoCollectorApi> {
             val isGoogleAvailable: Boolean = get(named(AvailableServices.Google))
             val isHuaweiAvailable: Boolean = get(named(AvailableServices.Huawei))

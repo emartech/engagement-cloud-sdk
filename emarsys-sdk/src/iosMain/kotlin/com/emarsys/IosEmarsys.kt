@@ -61,27 +61,9 @@ object IosEmarsys {
     }
 
     /**
-     * Enables tracking with the provided configuration.
-     *
-     * @param config The SDK configuration to use for enabling tracking.
-     */
-    @Throws(SdkAlreadyEnabledException::class, CancellationException::class)
-    suspend fun enableTracking(config: SdkConfig) {
-        Emarsys.enableTracking(config).getOrThrow()
-    }
-
-    /**
      * Registers an event listener to receive SDK events.
      */
     fun registerEventListener(listener: EmarsysEventListener) {
         eventListeners.add(listener)
-    }
-
-    /**
-     * Disables tracking.
-     */
-    @Throws(SdkAlreadyDisabledException::class, CancellationException::class)
-    suspend fun disableTracking() {
-        Emarsys.disableTracking().getOrThrow()
     }
 }
