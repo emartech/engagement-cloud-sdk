@@ -23,3 +23,9 @@ external interface SdkApiAppEvent : SdkApiEvent {
     val name: String
     val attributes: JSON
 }
+
+@JsExport
+object SdkApiEventTypes {
+    const val SDK_APP_EVENT = "app_event"
+    const val SDK_BADGE_COUNT_EVENT = "badge_count"
+}

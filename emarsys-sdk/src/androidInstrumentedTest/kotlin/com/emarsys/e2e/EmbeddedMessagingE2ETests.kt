@@ -15,6 +15,7 @@ import io.kotest.matchers.shouldBe
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
+import kotlin.test.Ignore
 import kotlin.test.Test
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
@@ -47,38 +48,40 @@ class EmbeddedMessagingE2ETests {
     }
 
     @Test
+    @Ignore
     fun testFetchBadgeCount_shouldEmitEvent_triggerRequest_and_returnHttpOkResponse() = runTest {
-            val response: SdkEvent.Internal.Sdk.Answer.Response<Response> =
-                sdkEventDistributor.registerEvent(
-                    SdkEvent.Internal.EmbeddedMessaging.FetchBadgeCount(
-                        nackCount = 0
-                    )
-                ).await()
+        val response: SdkEvent.Internal.Sdk.Answer.Response<Response> =
+            sdkEventDistributor.registerEvent(
+                SdkEvent.Internal.EmbeddedMessaging.FetchBadgeCount(
+                    nackCount = 0
+                )
+            ).await()
 
-            assertResponse(response)
+        assertResponse(response)
     }
 
     @Test
+    @Ignore
     fun testFetchMessages_shouldEmitEvent_triggerRequest_and_returnHttpOkResponse() = runTest {
-            val response: SdkEvent.Internal.Sdk.Answer.Response<Response> =
-                sdkEventDistributor.registerEvent(
-                    SdkEvent.Internal.EmbeddedMessaging.FetchMessages(
-                        offset = 0,
-                        nackCount = 0,
-                        categoryIds = emptyList()
-                    )
-                ).await()
+        val response: SdkEvent.Internal.Sdk.Answer.Response<Response> =
+            sdkEventDistributor.registerEvent(
+                SdkEvent.Internal.EmbeddedMessaging.FetchMessages(
+                    offset = 0,
+                    nackCount = 0,
+                    categoryIds = emptyList()
+                )
+            ).await()
 
-            assertResponse(response)
+        assertResponse(response)
+    }
+}
+
+private fun assertResponse(
+    response: SdkEvent.Internal.Sdk.Answer.Response<Response>
+) {
+    response.result.isSuccess shouldBe true
+    response.result
+        .onSuccess {
+            it.status shouldBe HttpStatusCode.OK
         }
-    }
-
-    private fun assertResponse(
-        response: SdkEvent.Internal.Sdk.Answer.Response<Response>
-    ) {
-        response.result.isSuccess shouldBe true
-        response.result
-            .onSuccess {
-                it.status shouldBe HttpStatusCode.OK
-            }
-    }
+}

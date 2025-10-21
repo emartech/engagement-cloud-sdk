@@ -117,6 +117,7 @@ sealed interface SdkEvent {
             override var nackCount: Int = 0
         ) : External, OnlineSdkEvent, DeviceEvent
 
+        @Serializable
         sealed interface Api : External {
 
 
@@ -129,6 +130,7 @@ sealed interface SdkEvent {
              * @property timestamp The timestamp when the event occurred.
              * @property type The type of the event, which is always "app_event".
              */
+            @Serializable
             data class AppEvent(
                 override val id: String = UUIDProvider().provide(),
                 val name: String,
@@ -155,6 +157,7 @@ sealed interface SdkEvent {
              * - ADD
              *
              */
+            @Serializable
             data class BadgeCountEvent(
                 override val id: String = UUIDProvider().provide(),
                 override val timestamp: Instant = TimestampProvider().provide(),

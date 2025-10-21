@@ -7,6 +7,8 @@ import com.emarsys.api.contact.JSContact
 import com.emarsys.api.contact.JSContactApi
 import com.emarsys.api.deeplink.JSDeepLink
 import com.emarsys.api.deeplink.JSDeepLinkApi
+import com.emarsys.api.events.EventEmitter
+import com.emarsys.api.events.EventEmitterApi
 import com.emarsys.api.inapp.JSInApp
 import com.emarsys.api.inapp.JSInAppApi
 import com.emarsys.api.push.JSPush
@@ -158,6 +160,17 @@ object WebInjection {
                 coroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob()),
                 sdkLogger = get { parametersOf(WebBadgeCountHandler::class.simpleName) }
 
+            )
+        }
+        single<EventEmitterApi> {
+            EventEmitter(
+                sdkPublicEventFLow = get(named(EventFlowTypes.Public)),
+                applicationScope = get(named(CoroutineScopeTypes.Application)),
+                listeners = mutableMapOf(),
+                onceListeners = mutableMapOf(),
+                uuidProvider = get(),
+                json = get(),
+                logger = get { parametersOf(EventEmitter::class.simpleName) }
             )
         }
         single<PlatformInitializerApi> {

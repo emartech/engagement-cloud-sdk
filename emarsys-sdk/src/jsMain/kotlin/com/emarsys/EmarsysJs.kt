@@ -1,6 +1,7 @@
 import com.emarsys.api.config.JSConfigApi
 import com.emarsys.api.contact.JSContactApi
 import com.emarsys.api.deeplink.JSDeepLinkApi
+import com.emarsys.api.events.EventEmitterApi
 import com.emarsys.api.events.SdkApiEvent
 import com.emarsys.api.events.SdkEventSubscription
 import com.emarsys.api.events.SdkEventSubscriptionApi
@@ -35,7 +36,8 @@ typealias EmarsysSdkEventListener = (SdkApiEvent) -> Unit
 object EmarsysJs {
     private lateinit var applicationScope: CoroutineScope
 
-    private lateinit var events: Flow<SdkEvent.External.Api>
+    private lateinit var sdkPublicEvents: Flow<SdkEvent.External.Api>
+    lateinit var events: EventEmitterApi
     lateinit var setup: JsSetupApi
     lateinit var config: JSConfigApi
     lateinit var contact: JSContactApi
@@ -57,7 +59,8 @@ object EmarsysJs {
         push = koin.get<JSPushApi>()
         deepLink = koin.get<JSDeepLinkApi>()
         inApp = koin.get<JSInAppApi>()
-        events = koin.get<Flow<SdkEvent.External.Api>>(named(EventFlowTypes.Public))
+        sdkPublicEvents = koin.get<Flow<SdkEvent.External.Api>>(named(EventFlowTypes.Public))
+        events = koin.get<EventEmitterApi>()
     }
 
     /**
@@ -84,7 +87,7 @@ object EmarsysJs {
 
     fun registerEventListener(eventListener: EmarsysSdkEventListener): SdkEventSubscriptionApi {
         val job = applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
-            events.collect {
+            sdkPublicEvents.collect {
                 eventListener(
                     JSON.parse<SdkApiEvent>(JsonUtil.json.encodeToString(it))
                 )

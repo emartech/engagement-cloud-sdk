@@ -25,32 +25,34 @@
 </body>
 
 <script>
+    let emarsys = window["emarsys-sdk"].Emarsys;
     document.getElementById("button-sdk-test").onclick = async () => {
-        const config = new window["emarsys-sdk"].JsEmarsysConfig(
-            "EMSA4-90136",
-            null
-        )
+     const config = new window["emarsys-sdk"].JsEmarsysConfig(
+         "EMSA4-90136",
+         null
+     )
 
-        await emarsys.setup.enableTracking(config);
-        await emarsys.contact.link(100027299, "test@test.com");
-    }
+     await emarsys.enableTracking(config);
+     await emarsys.contact.link(100027299, "test@test.com");
+     emarsys.eventEmitter.on("app_event", (event) => console.log(JSON.stringify(event)));
+ }
 
-    document.getElementById("button-integration-demo").onclick = async () => {
-        const config = new window["emarsys-sdk"].JsEmarsysConfig(
-            "EMS04-F3514",
-            null,
-            null,
-            new window["emarsys-sdk"].com.emarsys.ServiceWorkerOptions(
-                "BKlWDU3MxVpAEp7rjC5p9VYOhGBauYPO7K7b0117suJAoxaFzIwV4FT45eFI_hHBXgPlgKHyHDrbi1BpoKuiUww",
-                "/ems-service-worker.js"
-            )
-        )
-        await emarsys.setup.enableTracking(config);
-        await emarsys.contact.link(2575, "test2@test.com");
-    }
+ document.getElementById("button-integration-demo").onclick = async () => {
+     const config = new window["emarsys-sdk"].JsEmarsysConfig(
+         "EMS04-F3514",
+         null,
+         null,
+         new window["emarsys-sdk"].com.emarsys.ServiceWorkerOptions(
+             "BKlWDU3MxVpAEp7rjC5p9VYOhGBauYPO7K7b0117suJAoxaFzIwV4FT45eFI_hHBXgPlgKHyHDrbi1BpoKuiUww",
+             "/ems-service-worker.js"
+         )
+     )
+     await emarsys.setup.enableTracking(config);
+     await emarsys.contact.link(2575, "test2@test.com");
+ }
 
-    document.getElementById("button-custom-event").onclick = async () => {
-        await emarsys.tracking.trackCustomEvent(document.getElementById("customEventNameInput").value);
-    }
+ document.getElementById("button-custom-event").onclick = async () => {
+     await emarsys.tracking.trackCustomEvent(document.getElementById("customEventNameInput").value);
+ }
 </script>
 </html>
