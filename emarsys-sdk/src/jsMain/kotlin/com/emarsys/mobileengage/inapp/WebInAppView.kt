@@ -2,7 +2,6 @@ package com.emarsys.mobileengage.inapp
 
 import com.emarsys.core.factory.Factory
 import com.emarsys.core.providers.InstantProvider
-import com.emarsys.core.providers.UuidProviderApi
 import web.dom.document
 import web.html.HTMLElement
 import kotlin.time.ExperimentalTime
@@ -12,7 +11,6 @@ internal class WebInAppView(
     private val inappScriptExtractor: InAppScriptExtractorApi,
     private val webInAppJsBridgeFactory: Factory<InAppJsBridgeData, WebInAppJsBridge>,
     private val timestampProvider: InstantProvider,
-    private val uuidProvider: UuidProviderApi,
 ) : InAppViewApi {
 
     private lateinit var mInAppMessage: InAppMessage
@@ -34,7 +32,7 @@ internal class WebInAppView(
         mInAppMessage = message
         val jsBridge = webInAppJsBridgeFactory.create(
             InAppJsBridgeData(
-                dismissId = uuidProvider.provide(),
+                dismissId = message.dismissId,
                 trackingInfo = message.trackingInfo
             )
         )

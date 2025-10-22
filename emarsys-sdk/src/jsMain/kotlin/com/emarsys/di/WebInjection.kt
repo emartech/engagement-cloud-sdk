@@ -200,8 +200,7 @@ object WebInjection {
                     json = get(),
                     sdkDispatcher = get(named(DispatcherTypes.Sdk))
                 ),
-                timestampProvider = get(),
-                uuidProvider = get()
+                timestampProvider = get()
             )
         }
         single<InAppPresenterApi> {

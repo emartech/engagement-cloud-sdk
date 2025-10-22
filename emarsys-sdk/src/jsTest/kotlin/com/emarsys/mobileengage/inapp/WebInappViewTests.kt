@@ -2,8 +2,6 @@ package com.emarsys.mobileengage.inapp
 
 import com.emarsys.core.factory.Factory
 import com.emarsys.core.providers.TimestampProvider
-import com.emarsys.core.providers.UUIDProvider
-import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.util.JsonUtil
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -29,7 +27,6 @@ class WebInappViewTests {
     private lateinit var webInappView: WebInAppView
     private lateinit var inappScriptExtractor: InAppScriptExtractorApi
     private lateinit var mockWebInAppJsBridgeFactory: Factory<InAppJsBridgeData, WebInAppJsBridge>
-    private lateinit var mockUUIDProvider: UuidProviderApi
     private lateinit var sdkDispatcher: CoroutineDispatcher
 
     @BeforeTest
@@ -37,8 +34,6 @@ class WebInappViewTests {
         sdkDispatcher = StandardTestDispatcher()
         inappScriptExtractor = InAppScriptExtractor()
         mockWebInAppJsBridgeFactory = mock()
-        mockUUIDProvider = mock()
-        every { mockUUIDProvider.provide() } returns UUID
         every { mockWebInAppJsBridgeFactory.create(INAPP_JS_BRIDGE_DATA) } returns WebInAppJsBridge(
             mock(),
             INAPP_JS_BRIDGE_DATA,
@@ -48,8 +43,7 @@ class WebInappViewTests {
         webInappView = WebInAppView(
             inappScriptExtractor,
             mockWebInAppJsBridgeFactory,
-            TimestampProvider(),
-            mockUUIDProvider
+            TimestampProvider()
         )
     }
 
@@ -70,7 +64,12 @@ class WebInappViewTests {
             </html>"""
 
         val testMessage =
-            InAppMessage(type = InAppType.OVERLAY, trackingInfo = TRACKING_INFO, content = testHtml)
+            InAppMessage(
+                dismissId = UUID,
+                type = InAppType.OVERLAY,
+                trackingInfo = TRACKING_INFO,
+                content = testHtml
+            )
 
         val webViewHolder: WebWebViewHolder = webInappView.load(testMessage) as WebWebViewHolder
 
@@ -99,7 +98,12 @@ class WebInappViewTests {
             </html>"""
 
         val testMessage =
-            InAppMessage(type = InAppType.OVERLAY, trackingInfo = TRACKING_INFO, content = testHtml)
+            InAppMessage(
+                dismissId = UUID,
+                type = InAppType.OVERLAY,
+                trackingInfo = TRACKING_INFO,
+                content = testHtml
+            )
 
         val webViewHolder: WebWebViewHolder = webInappView.load(testMessage) as WebWebViewHolder
 

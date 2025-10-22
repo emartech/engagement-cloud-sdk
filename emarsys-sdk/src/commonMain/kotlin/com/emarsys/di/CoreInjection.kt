@@ -54,11 +54,13 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.serialization.StringFormat
 import kotlinx.serialization.json.Json
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
+import org.koin.dsl.bind
 import org.koin.dsl.binds
 import org.koin.dsl.module
 
@@ -97,7 +99,7 @@ object CoreInjection {
                 sdkLogger = get { parametersOf(TypedStorage::class.simpleName) }
             )
         }
-        single<Json> { JsonUtil.json }
+        single<Json> { JsonUtil.json }.bind<StringFormat>()
         single<StorageApi> { Storage(stringStorage = get(), json = get()) }
         singleOf(::UserAgentProvider) { bind<UserAgentProviderApi>() }
         single<DefaultUrlsApi> {

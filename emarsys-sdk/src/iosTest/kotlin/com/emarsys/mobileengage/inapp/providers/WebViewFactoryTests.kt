@@ -1,11 +1,9 @@
 package com.emarsys.mobileengage.inapp.providers
 
 import com.emarsys.core.factory.Factory
-import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.mobileengage.inapp.InAppJsBridge
 import com.emarsys.mobileengage.inapp.InAppJsBridgeData
 import com.emarsys.util.JsonUtil
-import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
@@ -23,25 +21,24 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class WebViewProviderTests {
+class WebViewFactoryTests {
     private companion object {
-        const val CAMPAIGN_ID = "campaignId"
+        const val TRACKING_INFO = """{"key":"value"}"""
+        const val DISMISS_ID = "dismissId"
     }
 
     private lateinit var mockIamJsBridgeProvider: Factory<InAppJsBridgeData, InAppJsBridge>
-    private lateinit var mockUUIDProvider: UuidProviderApi
 
     @BeforeTest
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
         mockIamJsBridgeProvider = mock()
-        mockUUIDProvider = mock(MockMode.autofill)
         everySuspend { mockIamJsBridgeProvider.create(any()) } returns
                 InAppJsBridge(
                     actionFactory = mock(),
                     inAppJsBridgeData = InAppJsBridgeData(
-                        dismissId = "dismissId",
-                        trackingInfo = "trackingInfo",
+                        dismissId = DISMISS_ID,
+                        trackingInfo = TRACKING_INFO,
                     ),
                     StandardTestDispatcher(),
                     StandardTestDispatcher(),
@@ -57,13 +54,12 @@ class WebViewProviderTests {
 
     @Test
     fun testProvideReturnsWebView() = runTest {
-        val provider = WebViewFactory(
+        val provider = IosWebViewFactory(
             StandardTestDispatcher(),
-            mockIamJsBridgeProvider,
-            mockUUIDProvider
+            mockIamJsBridgeProvider
         )
 
-        val webView = provider.create(CAMPAIGN_ID)
+        val webView = provider.create(DISMISS_ID, TRACKING_INFO)
 
         webView.backgroundColor shouldBe UIColor.clearColor
     }

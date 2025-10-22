@@ -64,7 +64,7 @@ import com.emarsys.mobileengage.inapp.IosInAppPresenter
 import com.emarsys.mobileengage.inapp.providers.InAppJsBridgeFactory
 import com.emarsys.mobileengage.inapp.providers.SceneProvider
 import com.emarsys.mobileengage.inapp.providers.ViewControllerProvider
-import com.emarsys.mobileengage.inapp.providers.WebViewFactory
+import com.emarsys.mobileengage.inapp.providers.IosWebViewFactory
 import com.emarsys.mobileengage.inapp.providers.WindowProvider
 import com.emarsys.mobileengage.push.IosGathererPush
 import com.emarsys.mobileengage.push.IosLoggingPush
@@ -161,14 +161,13 @@ object IosInjection {
                 sdkDispatcher = get(named(DispatcherTypes.Sdk)),
                 sdkLogger = get { parametersOf(InAppJsBridgeFactory::class.simpleName) }
             )
-            val webViewFactory = WebViewFactory(
+            val iosWebViewFactory = IosWebViewFactory(
                 mainDispatcher = get(named(DispatcherTypes.Main)),
-                inAppJsBridgeFactory = inAppJsBridgeFactory,
-                uuidProvider = get()
+                inAppJsBridgeFactory = inAppJsBridgeFactory
             )
             InAppViewProvider(
                 mainDispatcher = get(named(DispatcherTypes.Main)),
-                webViewProvider = webViewFactory,
+                webViewProvider = iosWebViewFactory,
                 timestampProvider = get(),
             )
         }

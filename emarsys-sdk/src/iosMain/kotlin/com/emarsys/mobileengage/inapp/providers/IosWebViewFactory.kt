@@ -1,8 +1,6 @@
 package com.emarsys.mobileengage.inapp.providers
 
 import com.emarsys.core.factory.Factory
-import com.emarsys.core.factory.SuspendFactory
-import com.emarsys.core.providers.UuidProviderApi
 import com.emarsys.mobileengage.inapp.InAppJsBridge
 import com.emarsys.mobileengage.inapp.InAppJsBridgeData
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -16,18 +14,17 @@ import platform.WebKit.WKProcessPool
 import platform.WebKit.WKWebView
 import platform.WebKit.WKWebViewConfiguration
 
-internal class WebViewFactory(
+internal class IosWebViewFactory(
     private val mainDispatcher: CoroutineDispatcher,
-    private val inAppJsBridgeFactory: Factory<InAppJsBridgeData, InAppJsBridge>,
-    private val uuidProvider: UuidProviderApi
-) : SuspendFactory<String, WKWebView> {
+    private val inAppJsBridgeFactory: Factory<InAppJsBridgeData, InAppJsBridge>
+) : IosWebViewFactoryApi {
 
     @OptIn(ExperimentalForeignApi::class)
-    override suspend fun create(trackingInfo: String): WKWebView {
+    override suspend fun create(dismissId: String, trackingInfo: String): WKWebView {
         return withContext(mainDispatcher) {
             val inAppJsBridge = inAppJsBridgeFactory.create(
                 InAppJsBridgeData(
-                    dismissId = uuidProvider.provide(),
+                    dismissId = dismissId,
                     trackingInfo = trackingInfo
                 )
             )

@@ -2,6 +2,7 @@ package com.emarsys.mobileengage.inapp
 
 import com.emarsys.core.factory.SuspendFactory
 import com.emarsys.core.providers.TimestampProvider
+import com.emarsys.mobileengage.inapp.providers.IosWebViewFactoryApi
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
@@ -17,13 +18,13 @@ import kotlin.test.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class InAppViewProviderTest {
 
-    private val mockWebViewFactory: SuspendFactory<String, WKWebView> = mock()
+    private val mockWebViewFactory: IosWebViewFactoryApi = mock()
     private val mainDispatcher = Dispatchers.Unconfined
 
     @Test
     fun `test provide returns non-null InAppView`() = runTest {
         val webView = WKWebView()
-        everySuspend { mockWebViewFactory.create(any()) } returns webView
+        everySuspend { mockWebViewFactory.create(any(), any()) } returns webView
 
         val inAppViewProvider =
             InAppViewProvider(mainDispatcher, mockWebViewFactory, TimestampProvider())

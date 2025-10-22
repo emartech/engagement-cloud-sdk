@@ -1,16 +1,15 @@
 package com.emarsys.mobileengage.inapp
 
-import com.emarsys.core.factory.SuspendFactory
 import com.emarsys.core.providers.InstantProvider
+import com.emarsys.mobileengage.inapp.providers.IosWebViewFactoryApi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import platform.WebKit.WKWebView
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 internal class InAppView(
     private val mainDispatcher: CoroutineDispatcher,
-    private val webViewProvider: SuspendFactory<String, WKWebView>,
+    private val webViewFactory: IosWebViewFactoryApi,
     private val timestampProvider: InstantProvider
     ) : InAppViewApi {
     private lateinit var mInAppMessage: InAppMessage
@@ -30,7 +29,7 @@ internal class InAppView(
 
         mInAppMessage = message
         return IosWebViewHolder(withContext(mainDispatcher) {
-            val webView = webViewProvider.create(message.trackingInfo)
+            val webView = webViewFactory.create(message.dismissId, message.trackingInfo)
             webView.loadHTMLString(message.content, null)
             webView
         }, inAppLoadingMetric())
