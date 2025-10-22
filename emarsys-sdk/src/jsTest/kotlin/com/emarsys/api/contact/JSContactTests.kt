@@ -20,7 +20,6 @@ import kotlin.test.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class JSContactTests {
     private companion object {
-        const val CONTACT_FIELD_ID = 2334
         const val CONTACT_FIELD_VALUE = "testContactFieldValue"
         const val OPEN_ID_TOKEN = "testOpenIdToken"
         val testException = Exception("testException")
@@ -47,53 +46,49 @@ class JSContactTests {
     fun link_shouldCall_link_onEmarsys() = runTest {
         everySuspend {
             mockContactApi.link(
-                CONTACT_FIELD_ID,
                 CONTACT_FIELD_VALUE
             )
         } returns testSuccessResult
 
-        jSContact.link(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE).await()
+        jSContact.link(CONTACT_FIELD_VALUE).await()
 
-        verifySuspend { mockContactApi.link(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE) }
+        verifySuspend { mockContactApi.link(CONTACT_FIELD_VALUE) }
     }
 
     @Test
     fun link_shouldThrowException_ifLink_failed() = runTest {
         everySuspend {
             mockContactApi.link(
-                CONTACT_FIELD_ID,
                 CONTACT_FIELD_VALUE
             )
         } returns testFailedResult
 
-        shouldThrow<Exception> { jSContact.link(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE).await() }
+        shouldThrow<Exception> { jSContact.link(CONTACT_FIELD_VALUE).await() }
     }
 
     @Test
     fun linkAuthenticated_shouldCall_linkAuthenticatedContact_onEmarsys() = runTest {
         everySuspend {
             mockContactApi.linkAuthenticated(
-                CONTACT_FIELD_ID,
                 OPEN_ID_TOKEN
             )
         } returns testSuccessResult
 
-        jSContact.linkAuthenticated(CONTACT_FIELD_ID, OPEN_ID_TOKEN).await()
+        jSContact.linkAuthenticated(OPEN_ID_TOKEN).await()
 
-        verifySuspend { mockContactApi.linkAuthenticated(CONTACT_FIELD_ID, OPEN_ID_TOKEN) }
+        verifySuspend { mockContactApi.linkAuthenticated(OPEN_ID_TOKEN) }
     }
 
     @Test
     fun linkAuthenticated_shouldThrowException_ifLinkAuthenticatedContact_failed() = runTest {
         everySuspend {
             mockContactApi.linkAuthenticated(
-                CONTACT_FIELD_ID,
                 OPEN_ID_TOKEN
             )
         } returns testFailedResult
 
         shouldThrow<Exception> {
-            jSContact.linkAuthenticated(CONTACT_FIELD_ID, OPEN_ID_TOKEN).await()
+            jSContact.linkAuthenticated(OPEN_ID_TOKEN).await()
         }
     }
 

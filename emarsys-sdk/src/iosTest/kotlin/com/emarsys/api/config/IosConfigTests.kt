@@ -52,12 +52,6 @@ class IosConfigTests {
         iosConfig = IosConfig(mockConfigApi, mockIosNotificationSettingsCollector)
     }
 
-    @Test
-    fun getContactFieldId_shouldCall_sameMethod_onConfigApi() = runTest {
-        iosConfig.getContactFieldId()
-
-        verifySuspend { mockConfigApi.getContactFieldId() }
-    }
 
     @Test
     fun getApplicationCode_shouldCall_sameMethod_onConfigApi() = runTest {

@@ -7,20 +7,18 @@ import kotlinx.serialization.json.buildJsonObject
 
 internal class LoggingContact(private val logger: Logger) : ContactInstance {
 
-    override suspend fun link(contactFieldId: Int, contactFieldValue: String) {
+    override suspend fun link(contactFieldValue: String) {
         val entry = LogEntry.createMethodNotAllowed(
             this, this::link.name, buildJsonObject {
-                put("contactFieldId", JsonPrimitive(contactFieldId))
                 put("contactFieldValue", JsonPrimitive(contactFieldValue))
             }
         )
         logger.debug(entry)
     }
 
-    override suspend fun linkAuthenticated(contactFieldId: Int, openIdToken: String) {
+    override suspend fun linkAuthenticated(openIdToken: String) {
         val entry = LogEntry.createMethodNotAllowed(
             this, this::linkAuthenticated.name, buildJsonObject {
-                put("contactFieldId", JsonPrimitive(contactFieldId))
                 put("openIdToken", JsonPrimitive(openIdToken))
             }
         )

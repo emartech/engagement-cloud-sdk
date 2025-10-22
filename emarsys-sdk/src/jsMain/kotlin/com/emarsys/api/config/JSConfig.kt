@@ -11,11 +11,6 @@ internal class JSConfig(
     private val webNotificationSettingsCollector: WebNotificationSettingsCollectorApi,
     private val applicationScope: CoroutineScope
 ) : JSConfigApi {
-    override fun getContactFieldId(): Promise<Int?> {
-        return applicationScope.promise {
-            configApi.getContactFieldId()
-        }
-    }
 
     override fun getApplicationCode(): Promise<String?> {
         return applicationScope.promise {

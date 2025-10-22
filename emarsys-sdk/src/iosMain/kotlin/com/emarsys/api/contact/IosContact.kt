@@ -2,13 +2,13 @@ package com.emarsys.api.contact
 
 import com.emarsys.di.SdkKoinIsolationContext.koin
 
-class IosContact: IosContactApi {
-    override suspend fun link(contactFieldId: Int, contactFieldValue: String) {
-        koin.get<ContactApi>().link(contactFieldId, contactFieldValue)
+class IosContact : IosContactApi {
+    override suspend fun link(contactFieldValue: String) {
+        koin.get<ContactApi>().link(contactFieldValue)
     }
 
-    override suspend fun linkAuthenticated(contactFieldId: Int, openIdToken: String) {
-        koin.get<ContactApi>().linkAuthenticated(contactFieldId, openIdToken)
+    override suspend fun linkAuthenticated(openIdToken: String) {
+        koin.get<ContactApi>().linkAuthenticated(openIdToken)
     }
 
     override suspend fun unlink() {

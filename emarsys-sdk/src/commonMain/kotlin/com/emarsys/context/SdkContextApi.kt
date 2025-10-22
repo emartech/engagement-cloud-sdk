@@ -10,7 +10,6 @@ internal interface SdkContextApi {
     val currentSdkState: StateFlow<SdkState>
     val sdkDispatcher: CoroutineDispatcher
     val mainDispatcher: CoroutineDispatcher
-    var contactFieldId: Int?
     var contactFieldValue: String?
     var openIdToken: String?
     var config: SdkConfig?

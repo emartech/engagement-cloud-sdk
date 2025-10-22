@@ -7,14 +7,14 @@ import com.emarsys.core.log.Logger
 
 internal class ContactGatherer(val context: ContactContextApi, private val sdkLogger: Logger) :
     ContactInstance {
-    override suspend fun link(contactFieldId: Int, contactFieldValue: String) {
+    override suspend fun link(contactFieldValue: String) {
         sdkLogger.debug("ContactGatherer - linkContact")
-        context.calls.add(LinkContact(contactFieldId, contactFieldValue))
+        context.calls.add(LinkContact(contactFieldValue))
     }
 
-    override suspend fun linkAuthenticated(contactFieldId: Int, openIdToken: String) {
+    override suspend fun linkAuthenticated(openIdToken: String) {
         sdkLogger.debug("ContactGatherer - linkAuthenticatedContact")
-        context.calls.add(LinkAuthenticatedContact(contactFieldId, openIdToken))
+        context.calls.add(LinkAuthenticatedContact(openIdToken))
     }
 
     override suspend fun unlink() {

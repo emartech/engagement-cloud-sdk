@@ -7,14 +7,14 @@ internal class ContactContext(override val calls: MutableList<ContactCall>) : Co
 @Serializable
 sealed interface ContactCall {
     @Serializable
-    data class LinkContact(val contactFieldId: Int, val contactFieldValue: String) : ContactCall
+    data class LinkContact(val contactFieldValue: String) : ContactCall
 
     @Serializable
-    data class LinkAuthenticatedContact(val contactFieldId: Int, val openIdToken: String) :
+    data class LinkAuthenticatedContact( val openIdToken: String) :
         ContactCall
 
     @Serializable
-    class UnlinkContact: ContactCall {
+    class UnlinkContact : ContactCall {
         override fun equals(other: Any?): Boolean {
             return other is UnlinkContact
         }

@@ -355,7 +355,6 @@ sealed interface SdkEvent {
                 override val id: String = UUIDProvider().provide(),
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0,
-                val contactFieldId: Int? = null,
                 val contactFieldValue: String,
                 val name: String = LINK_CONTACT_NAME
             ) : Sdk(), OnlineSdkEvent
@@ -365,7 +364,6 @@ sealed interface SdkEvent {
                 override val id: String = UUIDProvider().provide(),
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0,
-                val contactFieldId: Int? = null,
                 val openIdToken: String,
                 val name: String = LINK_AUTHENTICATED_CONTACT_NAME
             ) : Sdk(), OnlineSdkEvent

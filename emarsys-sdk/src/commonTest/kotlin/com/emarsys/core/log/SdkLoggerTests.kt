@@ -62,7 +62,6 @@ class SdkLoggerTests {
             "this is a testMessage",
             buildJsonObject {
                 put("testField", JsonPrimitive("testValue"))
-                put("contactFieldId", JsonPrimitive(1234))
                 put("contactFieldValue", JsonPrimitive("test@test.com"))
                 put("details", buildJsonObject {
                     put("param1", JsonPrimitive(3))

@@ -11,24 +11,23 @@ import com.emarsys.api.AutoRegisterable
 interface ContactApi : AutoRegisterable {
 
     /**
-     * Links a contact to the SDK using a specific contact field ID and its value.
+     * Links a contact to the SDK using a contact value as the identifier.
      *
      * This operation associates the provided contact information with the currently running
      * instance of the SDK, enabling personalized tracking and messaging.
      *
      * Example usage:
      * ```kotlin
-     * Emarsys.contact.link(3, "test@example.com")
+     * Emarsys.contact.link("1234567")
      * ```
      *
-     * @param contactFieldId The ID of the contact field.
      * @param contactFieldValue The value of the contact field to link.
      * @return A [Result] indicating success or failure of the operation.
      */
-    suspend fun link(contactFieldId: Int, contactFieldValue: String): Result<Unit>
+    suspend fun link(contactFieldValue: String): Result<Unit>
 
     /**
-     * Links a contact to the SDK using a specific contact field ID and OpenID token.
+     * Links a contact to the SDK using an OpenID token.
      *
      * This operation is used for linking contacts that are authenticated using OpenID Connect.
      * The OpenID token is provided by an external authentication provider.
@@ -38,11 +37,10 @@ interface ContactApi : AutoRegisterable {
      * Emarsys.contact.linkAuthenticated(3, "open_id_token_example")
      * ```
      *
-     * @param contactFieldId The ID of the contact field to link (e.g., email, phone number).
      * @param openIdToken The OpenID token used for authentication.
      * @return A [Result] indicating success or failure of the operation.
      */
-    suspend fun linkAuthenticated(contactFieldId: Int, openIdToken: String): Result<Unit>
+    suspend fun linkAuthenticated(openIdToken: String): Result<Unit>
 
     /**
      * Unlinks the currently linked contact from the SDK.

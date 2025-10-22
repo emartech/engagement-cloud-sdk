@@ -9,12 +9,11 @@ import kotlin.test.Test
 
 class ContactGathererTests {
     private companion object {
-        const val CONTACT_FIELD_ID = 42
         const val CONTACT_FIELD_VALUE = "testContactFieldValue"
         const val OPEN_ID_TOKEN = "testOpenIdToken"
-        val linkContact = ContactCall.LinkContact(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE)
+        val linkContact = ContactCall.LinkContact(CONTACT_FIELD_VALUE)
         val linkAuthenticatedContact =
-            ContactCall.LinkAuthenticatedContact(CONTACT_FIELD_ID, OPEN_ID_TOKEN)
+            ContactCall.LinkAuthenticatedContact(OPEN_ID_TOKEN)
         val unlinkContact = ContactCall.UnlinkContact()
 
         val expected = mutableListOf(
@@ -39,12 +38,12 @@ class ContactGathererTests {
     @Test
     fun testGathering() = runTest {
 
-        contactGatherer.link(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE)
-        contactGatherer.linkAuthenticated(CONTACT_FIELD_ID, OPEN_ID_TOKEN)
+        contactGatherer.link(CONTACT_FIELD_VALUE)
+        contactGatherer.linkAuthenticated(OPEN_ID_TOKEN)
         contactGatherer.unlink()
-        contactGatherer.link(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE)
+        contactGatherer.link(CONTACT_FIELD_VALUE)
         contactGatherer.unlink()
-        contactGatherer.linkAuthenticated(CONTACT_FIELD_ID, OPEN_ID_TOKEN)
+        contactGatherer.linkAuthenticated(OPEN_ID_TOKEN)
 
         contactContext.calls shouldBe expected
     }

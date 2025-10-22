@@ -6,9 +6,6 @@ internal class AndroidConfig(
     private val configApi: ConfigApi,
     private val androidNotificationSettingsCollector: AndroidNotificationSettingsCollectorApi
 ) : AndroidConfigApi {
-    override suspend fun getContactFieldId(): Int? {
-        return configApi.getContactFieldId()
-    }
 
     override suspend fun getApplicationCode(): String? {
         return configApi.getApplicationCode()

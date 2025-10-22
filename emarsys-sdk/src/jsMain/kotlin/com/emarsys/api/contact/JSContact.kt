@@ -4,31 +4,30 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.promise
 import kotlin.js.Promise
 
-class JSContact(private val contactApi: ContactApi, private val applicationScope: CoroutineScope) : JSContactApi {
+class JSContact(private val contactApi: ContactApi, private val applicationScope: CoroutineScope) :
+    JSContactApi {
 
     /**
-     * Links a contact to the SDK using the specified contact field ID and value.
+     * Links a contact to the SDK using the specified contact value.
      *
-     * @param contactFieldId The ID of the contact field.
      * @param contactFieldValue The value of the contact field.
      * @return A promise that resolves when the contact is linked.
      */
-    override fun link(contactFieldId: Int, contactFieldValue: String): Promise<Unit> {
+    override fun link(contactFieldValue: String): Promise<Unit> {
         return applicationScope.promise {
-            contactApi.link(contactFieldId, contactFieldValue).getOrThrow()
+            contactApi.link(contactFieldValue).getOrThrow()
         }
     }
 
     /**
-     * Links an authenticated contact to the SDK using the specified contact field ID and OpenID token.
+     * Links an authenticated contact to the SDK using the OpenID token.
      * Authenticated contacts are already verified through any OpenID provider like Google or Apple
      *
-     * @param contactFieldId The ID of the contact field.
      * @param openIdToken The OpenID token for authentication.
      */
-    override fun linkAuthenticated(contactFieldId: Int, openIdToken: String): Promise<Unit> {
+    override fun linkAuthenticated(openIdToken: String): Promise<Unit> {
         return applicationScope.promise {
-            contactApi.linkAuthenticated(contactFieldId, openIdToken).getOrThrow()
+            contactApi.linkAuthenticated(openIdToken).getOrThrow()
         }
     }
 

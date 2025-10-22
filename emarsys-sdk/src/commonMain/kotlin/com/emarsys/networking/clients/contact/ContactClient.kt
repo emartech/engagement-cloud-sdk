@@ -89,19 +89,16 @@ internal class ContactClient(
     private suspend fun handleSuccess(event: OnlineSdkEvent) {
         when (event) {
             is SdkEvent.Internal.Sdk.LinkContact -> {
-                sdkContext.contactFieldId = event.contactFieldId
                 sdkContext.contactFieldValue = event.contactFieldValue
                 emarsysSdkSession.startSession()
             }
 
             is SdkEvent.Internal.Sdk.LinkAuthenticatedContact -> {
-                sdkContext.contactFieldId = event.contactFieldId
                 sdkContext.openIdToken = event.openIdToken
                 emarsysSdkSession.startSession()
             }
 
             is SdkEvent.Internal.Sdk.UnlinkContact -> {
-                sdkContext.contactFieldId = null
                 sdkContext.contactFieldValue = null
                 sdkContext.openIdToken = null
                 emarsysSdkSession.endSession()
@@ -123,7 +120,6 @@ internal class ContactClient(
             is SdkEvent.Internal.Sdk.LinkContact -> {
                 val requestBody = json.encodeToString(
                     LinkContactRequestBody(
-                        event.contactFieldId,
                         event.contactFieldValue,
                         null
                     )
@@ -135,7 +131,6 @@ internal class ContactClient(
             is SdkEvent.Internal.Sdk.LinkAuthenticatedContact -> {
                 val requestBody = json.encodeToString(
                     LinkContactRequestBody(
-                        event.contactFieldId,
                         null,
                         event.openIdToken
                     )

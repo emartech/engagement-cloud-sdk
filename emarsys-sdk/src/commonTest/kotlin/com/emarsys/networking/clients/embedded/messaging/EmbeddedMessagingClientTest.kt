@@ -315,7 +315,6 @@ class EmbeddedMessagingClientTest {
         )
         val wrongEvent =
             SdkEvent.Internal.Sdk.LinkContact(
-                contactFieldId = 0,
                 contactFieldValue = "value",
                 nackCount = 0
             )

@@ -10,13 +10,6 @@ import com.emarsys.core.device.NotificationSettings
 interface ConfigApi {
 
     /**
-     * Retrieves the contact field ID configured.
-     *
-     * @return The contact field ID, or `null` if not configured.
-     */
-    suspend fun getContactFieldId(): Int?
-
-    /**
      * Retrieves the application code configured.
      *
      * @return The application code, or `null` if not configured.

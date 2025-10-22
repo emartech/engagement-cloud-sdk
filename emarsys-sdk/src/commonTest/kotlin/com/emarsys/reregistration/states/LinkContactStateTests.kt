@@ -30,7 +30,6 @@ import kotlin.test.Test
 class LinkContactStateTests {
 
     companion object {
-        private const val TEST_CONTACT_FIELD_ID = 4
         private const val TEST_CONTACT_FIELD_VALUE = "testContactFieldValue"
         private const val TEST_OPEN_ID_TOKEN = "testOpenIdToken"
         val testException = Exception("failed")
@@ -71,9 +70,8 @@ class LinkContactStateTests {
     }
 
     @Test
-    fun active_shouldRegisterLinkContactEvent_throughSdkEventDistributor_whenContactFieldIdAndValue_areAvailable() =
+    fun active_shouldRegisterLinkContactEvent_throughSdkEventDistributor_whenContactFieldValue_areAvailable() =
         runTest {
-            every { mockSdkContext.contactFieldId } returns TEST_CONTACT_FIELD_ID
             every { mockSdkContext.contactFieldValue } returns TEST_CONTACT_FIELD_VALUE
             everySuspend { mockSdkEventWaiter.await<Response>() } returns successResponse
 
@@ -82,14 +80,12 @@ class LinkContactStateTests {
             result shouldBe Result.success(Unit)
             val registeredEvent = eventSlot.get()
             (registeredEvent is SdkEvent.Internal.Sdk.LinkContact) shouldBe true
-            (registeredEvent as SdkEvent.Internal.Sdk.LinkContact).contactFieldId shouldBe TEST_CONTACT_FIELD_ID
-            registeredEvent.contactFieldValue shouldBe TEST_CONTACT_FIELD_VALUE
+            (registeredEvent as SdkEvent.Internal.Sdk.LinkContact).contactFieldValue shouldBe TEST_CONTACT_FIELD_VALUE
         }
 
     @Test
-    fun active_shouldRegisterLinkAuthenticatedContactEvent_throughSdkEventDistributor_whenContactFieldIdAndOpenIdToken_areAvailable() =
+    fun active_shouldRegisterLinkAuthenticatedContactEvent_throughSdkEventDistributor_whenOpenIdToken_areAvailable() =
         runTest {
-            every { mockSdkContext.contactFieldId } returns TEST_CONTACT_FIELD_ID
             every { mockSdkContext.contactFieldValue } returns null
             every { mockSdkContext.openIdToken } returns TEST_OPEN_ID_TOKEN
             everySuspend { mockSdkEventWaiter.await<Response>() } returns successResponse
@@ -99,14 +95,12 @@ class LinkContactStateTests {
             result shouldBe Result.success(Unit)
             val registeredEvent = eventSlot.get()
             (registeredEvent is SdkEvent.Internal.Sdk.LinkAuthenticatedContact) shouldBe true
-            (registeredEvent as SdkEvent.Internal.Sdk.LinkAuthenticatedContact).contactFieldId shouldBe TEST_CONTACT_FIELD_ID
-            registeredEvent.openIdToken shouldBe TEST_OPEN_ID_TOKEN
+            (registeredEvent as SdkEvent.Internal.Sdk.LinkAuthenticatedContact).openIdToken shouldBe TEST_OPEN_ID_TOKEN
         }
 
     @Test
     fun active_shouldNotEmitEvent_whenNeitherContactFieldValue_norOpenIdToken_areAvailable() =
         runTest {
-            every { mockSdkContext.contactFieldId } returns TEST_CONTACT_FIELD_ID
             every { mockSdkContext.contactFieldValue } returns null
             every { mockSdkContext.openIdToken } returns null
 
@@ -119,9 +113,8 @@ class LinkContactStateTests {
         }
 
     @Test
-    fun active_RegisterLinkAuthenticatedContactEvent_throughSdkEventDistributor_evenWhenContactFieldId_isNotAvailable() =
+    fun active_RegisterLinkAuthenticatedContactEvent_throughSdkEventDistributor_evenWhenContactFieldValue_isNotAvailable() =
         runTest {
-            every { mockSdkContext.contactFieldId } returns null
             every { mockSdkContext.contactFieldValue } returns TEST_CONTACT_FIELD_VALUE
             every { mockSdkContext.openIdToken } returns null
             everySuspend { mockSdkEventWaiter.await<Response>() } returns successResponse
@@ -131,14 +124,12 @@ class LinkContactStateTests {
             result shouldBe Result.success(Unit)
             val registeredEvent = eventSlot.get()
             (registeredEvent is SdkEvent.Internal.Sdk.LinkContact) shouldBe true
-            (registeredEvent as SdkEvent.Internal.Sdk.LinkContact).contactFieldId shouldBe null
-            registeredEvent.contactFieldValue shouldBe TEST_CONTACT_FIELD_VALUE
+            (registeredEvent as SdkEvent.Internal.Sdk.LinkContact).contactFieldValue shouldBe TEST_CONTACT_FIELD_VALUE
         }
 
     @Test
     fun active_shouldReturnFailure_whenLinkContactEvent_returnsError() =
         runTest {
-            every { mockSdkContext.contactFieldId } returns TEST_CONTACT_FIELD_ID
             every { mockSdkContext.contactFieldValue } returns TEST_CONTACT_FIELD_VALUE
             everySuspend { mockSdkEventWaiter.await<Response>() } returns failedResponse
 
@@ -147,14 +138,12 @@ class LinkContactStateTests {
             result shouldBe Result.failure(testException)
             val registeredEvent = eventSlot.get()
             (registeredEvent is SdkEvent.Internal.Sdk.LinkContact) shouldBe true
-            (registeredEvent as SdkEvent.Internal.Sdk.LinkContact).contactFieldId shouldBe TEST_CONTACT_FIELD_ID
-            registeredEvent.contactFieldValue shouldBe TEST_CONTACT_FIELD_VALUE
+            (registeredEvent as SdkEvent.Internal.Sdk.LinkContact).contactFieldValue shouldBe TEST_CONTACT_FIELD_VALUE
         }
 
     @Test
     fun active_shouldReturnFailure_whenLinkAuthenticatedContactEvent_returnsError() =
         runTest {
-            every { mockSdkContext.contactFieldId } returns TEST_CONTACT_FIELD_ID
             every { mockSdkContext.contactFieldValue } returns null
             every { mockSdkContext.openIdToken } returns TEST_OPEN_ID_TOKEN
             everySuspend { mockSdkEventWaiter.await<Response>() } returns failedResponse
@@ -164,8 +153,7 @@ class LinkContactStateTests {
             result shouldBe Result.failure(testException)
             val registeredEvent = eventSlot.get()
             (registeredEvent is SdkEvent.Internal.Sdk.LinkAuthenticatedContact) shouldBe true
-            (registeredEvent as SdkEvent.Internal.Sdk.LinkAuthenticatedContact).contactFieldId shouldBe TEST_CONTACT_FIELD_ID
-            registeredEvent.openIdToken shouldBe TEST_OPEN_ID_TOKEN
+            (registeredEvent as SdkEvent.Internal.Sdk.LinkAuthenticatedContact).openIdToken shouldBe TEST_OPEN_ID_TOKEN
         }
 
 }

@@ -2,8 +2,6 @@ import com.emarsys.core.device.notification.AndroidNotificationSettings
 
 interface AndroidConfigApi {
 
-    suspend fun getContactFieldId(): Int?
-
     suspend fun getApplicationCode(): String?
 
     suspend fun getClientId(): String

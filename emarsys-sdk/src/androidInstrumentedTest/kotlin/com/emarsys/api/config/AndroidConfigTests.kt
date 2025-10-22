@@ -34,13 +34,6 @@ class AndroidConfigTests {
     }
 
     @Test
-    fun getContactFieldId_shouldCall_sameMethod_onConfigApi() = runTest {
-        androidConfig.getContactFieldId()
-
-        verifySuspend { mockConfigApi.getContactFieldId() }
-    }
-
-    @Test
     fun getApplicationCode_shouldCall_sameMethod_onConfigApi() = runTest {
         androidConfig.getApplicationCode()
 

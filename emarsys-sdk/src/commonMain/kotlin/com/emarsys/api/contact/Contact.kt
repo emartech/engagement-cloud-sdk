@@ -25,23 +25,18 @@ internal class Contact<Logging : ContactInstance, Gatherer : ContactInstance, In
     /**
      * Links a contact to the SDK using the specified contact field ID and value.
      *
-     * @param contactFieldId The ID of the contact field.
      * @param contactFieldValue The value of the contact field.
      */
-    override suspend fun link(contactFieldId: Int, contactFieldValue: String): Result<Unit> =
+    override suspend fun link(contactFieldValue: String): Result<Unit> =
         runCatching {
             withContext(sdkContext.sdkDispatcher) {
                 withLogContext(
                     buildJsonObject {
                         put(
-                            "contactFieldId", JsonPrimitive(contactFieldId)
-                        )
-                        put(
                             "contactFieldValue", JsonPrimitive(contactFieldValue)
                         )
                     }) {
                     activeInstance<ContactInternalApi>().link(
-                        contactFieldId,
                         contactFieldValue
                     )
                 }
@@ -49,14 +44,12 @@ internal class Contact<Logging : ContactInstance, Gatherer : ContactInstance, In
         }
 
     /**
-     * Links an authenticated contact to the SDK using the specified contact field ID and OpenID token.
+     * Links an authenticated contact to the SDK using the OpenID token.
      * Authenticated contacts are already verified through any OpenID provider like Google or Apple
      *
-     * @param contactFieldId The ID of the contact field.
      * @param openIdToken The OpenID token for authentication.
      */
     override suspend fun linkAuthenticated(
-        contactFieldId: Int,
         openIdToken: String
     ): Result<Unit> =
         runCatching {
@@ -64,14 +57,10 @@ internal class Contact<Logging : ContactInstance, Gatherer : ContactInstance, In
                 withLogContext(
                     buildJsonObject {
                         put(
-                            "contactFieldId", JsonPrimitive(contactFieldId)
-                        )
-                        put(
                             "openIdToken", JsonPrimitive(openIdToken)
                         )
                     }) {
                     activeInstance<ContactInternalApi>().linkAuthenticated(
-                        contactFieldId,
                         openIdToken
                     )
                 }

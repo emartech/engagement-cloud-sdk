@@ -26,7 +26,6 @@ internal class Config<Logging : ConfigInstance, Gatherer : ConfigInstance, Inter
     internalApi,
     sdkContext
 ), ConfigApi {
-    override suspend fun getContactFieldId(): Int? = sdkContext.contactFieldId
 
     override suspend fun getApplicationCode(): String? = sdkContext.config?.applicationCode
 

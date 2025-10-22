@@ -7,7 +7,6 @@ internal class IosConfig(
     private val configApi: ConfigApi,
     private val iosNotificationSettingsCollector: IosNotificationSettingsCollectorApi
 ) : IosConfigApi {
-    override suspend fun getContactFieldId(): Int? = configApi.getContactFieldId()
 
     override suspend fun getApplicationCode(): String? = configApi.getApplicationCode()
 

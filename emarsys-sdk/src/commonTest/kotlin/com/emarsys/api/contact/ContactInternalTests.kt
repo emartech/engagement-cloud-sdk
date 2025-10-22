@@ -20,12 +20,11 @@ import kotlin.test.Test
 
 class ContactInternalTests {
     private companion object {
-        const val CONTACT_FIELD_ID = 2575
         const val CONTACT_FIELD_VALUE = "testContactFieldValue"
         const val OPEN_ID_TOKEN = "testOpenIdToken"
-        val linkContact = ContactCall.LinkContact(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE)
+        val linkContact = ContactCall.LinkContact(CONTACT_FIELD_VALUE)
         val linkAuthenticatedContact =
-            ContactCall.LinkAuthenticatedContact(CONTACT_FIELD_ID, OPEN_ID_TOKEN)
+            ContactCall.LinkAuthenticatedContact(OPEN_ID_TOKEN)
         val unlinkContact = ContactCall.UnlinkContact()
         val calls = mutableListOf(linkContact, linkAuthenticatedContact, unlinkContact)
     }
@@ -50,23 +49,21 @@ class ContactInternalTests {
 
     @Test
     fun testLinkContact_should_emit_linkContact_event_into_sdkFlow() = runTest {
-        contactInternal.link(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE)
+        contactInternal.link(CONTACT_FIELD_VALUE)
 
         val emitted = eventSlot.get()
         (emitted is SdkEvent.Internal.Sdk.LinkContact) shouldBe true
-        (emitted as SdkEvent.Internal.Sdk.LinkContact).contactFieldId shouldBe CONTACT_FIELD_ID
-        emitted.contactFieldValue shouldBe CONTACT_FIELD_VALUE
+        (emitted as SdkEvent.Internal.Sdk.LinkContact).contactFieldValue shouldBe CONTACT_FIELD_VALUE
     }
 
     @Test
     fun testLinkAuthenticatedContact_should_emit_linkAuthenticatedContact_event_into_sdkFlow() =
         runTest {
-            contactInternal.linkAuthenticated(CONTACT_FIELD_ID, OPEN_ID_TOKEN)
+            contactInternal.linkAuthenticated(OPEN_ID_TOKEN)
 
             val emitted = eventSlot.get()
             (emitted is SdkEvent.Internal.Sdk.LinkAuthenticatedContact) shouldBe true
-            (emitted as SdkEvent.Internal.Sdk.LinkAuthenticatedContact).contactFieldId shouldBe CONTACT_FIELD_ID
-            emitted.openIdToken shouldBe OPEN_ID_TOKEN
+            (emitted as SdkEvent.Internal.Sdk.LinkAuthenticatedContact).openIdToken shouldBe OPEN_ID_TOKEN
         }
 
     @Test

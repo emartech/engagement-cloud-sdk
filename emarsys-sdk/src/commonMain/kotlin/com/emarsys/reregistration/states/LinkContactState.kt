@@ -25,7 +25,6 @@ internal class LinkContactState(
             sdkLogger.debug("Register LinkContact event.")
             sdkEventDistributor.registerEvent(
                 SdkEvent.Internal.Sdk.LinkContact(
-                    contactFieldId = sdkContext.contactFieldId,
                     contactFieldValue = sdkContext.contactFieldValue!!
                 )
             ).await<Response>().mapToUnitOrFailure()
@@ -33,7 +32,6 @@ internal class LinkContactState(
             sdkLogger.debug("Register LinkAuthenticatedContact event.")
             sdkEventDistributor.registerEvent(
                 SdkEvent.Internal.Sdk.LinkAuthenticatedContact(
-                    contactFieldId = sdkContext.contactFieldId,
                     openIdToken = sdkContext.openIdToken!!
                 )
             ).await<Response>().mapToUnitOrFailure()

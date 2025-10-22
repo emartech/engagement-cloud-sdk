@@ -6,7 +6,6 @@ import kotlin.js.Promise
 @OptIn(ExperimentalJsExport::class)
 @JsExport
 interface JSConfigApi {
-    fun getContactFieldId(): Promise<Int?>
     fun getApplicationCode(): Promise<String?>
     fun getClientId(): Promise<String>
     fun getLanguageCode(): Promise<String>

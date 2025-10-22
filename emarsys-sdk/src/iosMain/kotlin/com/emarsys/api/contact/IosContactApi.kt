@@ -5,10 +5,10 @@ import io.ktor.utils.io.CancellationException
 interface IosContactApi {
 
     @Throws(CancellationException::class)
-    suspend fun link(contactFieldId: Int, contactFieldValue: String)
+    suspend fun link(contactFieldValue: String)
 
     @Throws(CancellationException::class)
-    suspend fun linkAuthenticated(contactFieldId: Int, openIdToken: String)
+    suspend fun linkAuthenticated(openIdToken: String)
 
     @Throws(CancellationException::class)
     suspend fun unlink()

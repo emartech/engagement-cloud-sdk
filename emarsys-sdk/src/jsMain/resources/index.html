@@ -33,7 +33,7 @@
      )
 
      await emarsys.setup.enableTracking(config);
-     await emarsys.contact.link(100027299, "test@test.com");
+     await emarsys.contact.link("test@test.com");
      emarsys.events.on("app_event", (event) => console.log(JSON.stringify(event)));
  }
 
@@ -48,7 +48,7 @@
          )
      )
      await emarsys.setup.enableTracking(config);
-     await emarsys.contact.link(2575, "test2@test.com");
+     await emarsys.contact.link("test2@test.com");
  }
 
  document.getElementById("button-custom-event").onclick = async () => {

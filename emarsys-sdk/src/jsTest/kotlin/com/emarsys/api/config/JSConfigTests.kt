@@ -49,13 +49,6 @@ class JSConfigTests {
     }
 
     @Test
-    fun getContactFieldId_shouldCall_getContactFieldId_onConfigApi() = runTest {
-        jSConfig.getContactFieldId().await()
-
-        verifySuspend { mockConfigApi.getContactFieldId() }
-    }
-
-    @Test
     fun getApplicationCode_shouldCall_getApplicationCode_onConfigApi() = runTest {
         jSConfig.getApplicationCode().await()
 

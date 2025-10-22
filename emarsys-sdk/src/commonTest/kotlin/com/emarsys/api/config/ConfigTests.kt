@@ -40,7 +40,6 @@ class ConfigTest : KoinTest {
     override fun getKoin(): Koin = koin
 
     private companion object {
-        const val CONTACT_FIELD_ID = 42
         const val APPLICATION_CODE = "testApplicationCode"
         const val CLIENT_ID = "testClientId"
         const val LANGUAGE_CODE = "testLanguageCode"
@@ -103,7 +102,6 @@ class ConfigTest : KoinTest {
             mutableSetOf(),
             logBreadcrumbsQueueSize = 10
         )
-        sdkContext.contactFieldId = CONTACT_FIELD_ID
         sdkContext.config = TestEmarsysConfig(APPLICATION_CODE)
 
         everySuspend { mockDeviceInfoCollector.collect() } returns Json.encodeToString(DEVICE_INFO)
@@ -128,11 +126,6 @@ class ConfigTest : KoinTest {
     fun tearDown() {
         Dispatchers.resetMain()
         koin.unloadModules(listOf(testModule))
-    }
-
-    @Test
-    fun testContactFieldId_returnsCorrectValue() = runTest {
-        config.getContactFieldId() shouldBe CONTACT_FIELD_ID
     }
 
     @Test

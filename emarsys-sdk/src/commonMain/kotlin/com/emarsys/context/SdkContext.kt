@@ -18,7 +18,6 @@ class SdkContext(
     override var embeddedMessagingFrequencyCapSeconds: Int = 5,
 ) : SdkContextApi {
 
-    override var contactFieldId: Int? by Store(serializer =  Int.serializer(), key = "contactFieldId")
     override var contactFieldValue: String? by Store(serializer =  String.serializer(), key = "contactFieldValue")
     override var openIdToken: String? by Store(serializer =  String.serializer(), key = "openIdToken")
 

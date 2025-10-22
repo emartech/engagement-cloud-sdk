@@ -4,7 +4,6 @@ import com.emarsys.core.device.notification.IosNotificationSettings
 import kotlin.coroutines.cancellation.CancellationException
 
 interface IosConfigApi {
-    suspend fun getContactFieldId(): Int?
     suspend fun getApplicationCode(): String?
     suspend fun getClientId(): String
     suspend fun getLanguageCode(): String

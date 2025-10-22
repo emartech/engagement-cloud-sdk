@@ -55,7 +55,6 @@ class ContactClientTests {
         val TEST_BASE_URL = Url("https://test-base-url/")
         const val OPEN_ID_TOKEN = "testOpenIdToken"
         const val CONTACT_FIELD_VALUE = "testContactFieldValue"
-        const val CONTACT_FIELD_ID = 2575
     }
 
     private lateinit var mockEmarsysClient: NetworkClientApi
@@ -97,7 +96,6 @@ class ContactClientTests {
         every { mockSdkContext.config } returns mockConfig
         everySuspend { mockContactTokenHandler.handleContactTokens(any()) } returns Unit
         everySuspend { mockEmarsysClient.send(any()) } returns (Result.success(createTestResponse("{}")))
-        every { mockSdkContext.contactFieldId = any() } returns Unit
         every { mockUrlFactory.create(EmarsysUrlType.LINK_CONTACT) } returns TEST_BASE_URL
         every { mockUrlFactory.create(EmarsysUrlType.UNLINK_CONTACT) } returns TEST_BASE_URL
         everySuspend { mockLogger.error(any(), any<Throwable>()) } calls {
@@ -131,7 +129,6 @@ class ContactClientTests {
 
         val linkContactEvent = SdkEvent.Internal.Sdk.LinkContact(
             "linkContact",
-            contactFieldId = CONTACT_FIELD_ID,
             contactFieldValue = CONTACT_FIELD_VALUE
         )
 
@@ -142,7 +139,6 @@ class ContactClientTests {
         verify { mockUrlFactory.create(any()) }
         verifySuspend { mockEmarsysClient.send(any()) }
         verifySuspend { mockContactTokenHandler.handleContactTokens(any()) }
-        verifySuspend { mockSdkContext.contactFieldId = CONTACT_FIELD_ID }
         verifySuspend { mockSdkContext.contactFieldValue = CONTACT_FIELD_VALUE }
         verifySuspend { mockEmarsysSdkSession.startSession() }
         verifySuspend { mockEventsDao.removeEvent(linkContactEvent) }
@@ -163,7 +159,6 @@ class ContactClientTests {
         )
         val linkContactEvent = SdkEvent.Internal.Sdk.LinkContact(
             "linkContact",
-            contactFieldId = CONTACT_FIELD_ID,
             contactFieldValue = CONTACT_FIELD_VALUE
         )
 
@@ -174,7 +169,6 @@ class ContactClientTests {
         verify { mockUrlFactory.create(any()) }
         verifySuspend { mockEmarsysClient.send(any()) }
         verifySuspend(VerifyMode.exactly(0)) { mockContactTokenHandler.handleContactTokens(any()) }
-        verifySuspend { mockSdkContext.contactFieldId = CONTACT_FIELD_ID }
         verifySuspend { mockEmarsysSdkSession.startSession() }
         verifySuspend { mockEventsDao.removeEvent(linkContactEvent) }
     }
@@ -188,7 +182,6 @@ class ContactClientTests {
         )
         val linkAuthenticatedContactEvent = SdkEvent.Internal.Sdk.LinkAuthenticatedContact(
             "linkAuthenticatedContact",
-            contactFieldId = CONTACT_FIELD_ID,
             openIdToken = OPEN_ID_TOKEN
         )
 
@@ -199,7 +192,6 @@ class ContactClientTests {
         verify { mockUrlFactory.create(any()) }
         verifySuspend { mockEmarsysClient.send(any()) }
         verifySuspend { mockContactTokenHandler.handleContactTokens(any()) }
-        verifySuspend { mockSdkContext.contactFieldId = CONTACT_FIELD_ID }
         verifySuspend { mockSdkContext.openIdToken = OPEN_ID_TOKEN }
         verifySuspend { mockEmarsysSdkSession.startSession() }
         verifySuspend { mockEventsDao.removeEvent(linkAuthenticatedContactEvent) }
@@ -218,7 +210,6 @@ class ContactClientTests {
         verify { mockUrlFactory.create(any()) }
         verifySuspend { mockEmarsysClient.send(any()) }
         verifySuspend { mockContactTokenHandler.handleContactTokens(any()) }
-        verifySuspend { mockSdkContext.contactFieldId = null }
         verifySuspend { mockSdkContext.contactFieldValue = null }
         verifySuspend { mockSdkContext.openIdToken = null }
         verifySuspend { mockEmarsysSdkSession.endSession() }
@@ -257,7 +248,7 @@ class ContactClientTests {
     }
 
     @Test
-    fun testConsumer_not_should_call_handleTokens_and_should_not_store_contactFieldId_and_should_clientExceptionHandler_on_exception() =
+    fun testConsumer_not_should_call_handleTokens_and_use_clientExceptionHandler_on_exception() =
         runTest {
             contactClient.register()
             val testException = Exception("Test exception")
@@ -283,7 +274,7 @@ class ContactClientTests {
             verifySuspend(VerifyMode.exactly(0)) {
                 mockContactTokenHandler.handleContactTokens(any())
             }
-            verifySuspend(VerifyMode.exactly(0)) { mockSdkContext.contactFieldId = null }
+      
         }
 
 

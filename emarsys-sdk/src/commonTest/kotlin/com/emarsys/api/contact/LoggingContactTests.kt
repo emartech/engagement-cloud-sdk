@@ -16,7 +16,6 @@ import kotlin.test.Test
 
 class LoggingContactTests {
     companion object {
-        const val CONTACT_FIELD_ID = 42
         const val CONTACT_FIELD_VALUE = "testContactFieldValue"
         const val OPEN_ID_TOKEN = "testOpenIdToken"
     }
@@ -35,21 +34,21 @@ class LoggingContactTests {
 
     @Test
     fun testLinkContact() = runTest {
-        loggingContact.link(CONTACT_FIELD_ID, CONTACT_FIELD_VALUE)
+        loggingContact.link( CONTACT_FIELD_VALUE)
 
         verifyLogging()
     }
 
     @Test
     fun testLinkAuthenticatedContact() = runTest {
-        loggingContact.linkAuthenticated(CONTACT_FIELD_ID, OPEN_ID_TOKEN)
+        loggingContact.linkAuthenticated( OPEN_ID_TOKEN)
 
         verifyLogging()
     }
 
     @Test
     fun testUnlinkContact() = runTest {
-        loggingContact.linkAuthenticated(CONTACT_FIELD_ID, OPEN_ID_TOKEN)
+        loggingContact.linkAuthenticated( OPEN_ID_TOKEN)
 
         verifyLogging()
     }
