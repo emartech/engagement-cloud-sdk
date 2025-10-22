@@ -99,7 +99,7 @@ object CoreInjection {
                 sdkLogger = get { parametersOf(TypedStorage::class.simpleName) }
             )
         }
-        single<Json> { JsonUtil.json }.bind<StringFormat>()
+        single<Json> { JsonUtil.json }
         single<StorageApi> { Storage(stringStorage = get(), json = get()) }
         singleOf(::UserAgentProvider) { bind<UserAgentProviderApi>() }
         single<DefaultUrlsApi> {

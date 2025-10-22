@@ -9,8 +9,7 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import kotlinx.serialization.StringFormat
-import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 internal class EventEmitter(
     private val sdkPublicEventFLow: Flow<SdkEvent.External.Api>,
@@ -18,7 +17,7 @@ internal class EventEmitter(
     private val listeners: MutableMap<String, MutableList<EmarsysSdkEventListener>>,
     private val onceListeners: MutableMap<String, EmarsysSdkEventListener>,
     private val uuidProvider: UuidProviderApi,
-    private val json: StringFormat,
+    private val json: Json,
     private val logger: Logger
 ) : EventEmitterApi {
 

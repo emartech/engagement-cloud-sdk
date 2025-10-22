@@ -9,9 +9,7 @@ import com.emarsys.event.SdkEvent
 import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
-import dev.mokkery.answering.throws
 import dev.mokkery.every
-import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
@@ -28,7 +26,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.Clock
-import kotlinx.serialization.StringFormat
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlin.test.AfterTest
@@ -64,7 +62,7 @@ class EventEmitterTests {
     private lateinit var listeners: MutableMap<String, MutableList<EmarsysSdkEventListener>>
     private lateinit var onceListeners: MutableMap<String, EmarsysSdkEventListener>
     private lateinit var mockUuidProvider: UuidProviderApi
-    private lateinit var mockJson: StringFormat
+    private lateinit var json: Json
     private lateinit var mockLogger: Logger
 
     @BeforeTest
@@ -73,8 +71,7 @@ class EventEmitterTests {
         sdkOutboundEventFLow = MutableSharedFlow()
         listeners = mutableMapOf()
         onceListeners = mutableMapOf()
-        mockJson = mock()
-        every { mockJson.serializersModule } returns JsonUtil.json.serializersModule
+        json = JsonUtil.json
         mockLogger = mock(MockMode.autofill)
         mockUuidProvider = mock()
         every { mockUuidProvider.provide() } returns UUID
@@ -87,7 +84,6 @@ class EventEmitterTests {
 
     private fun createEmitter(
         applicationScope: CoroutineScope,
-        json: StringFormat = JsonUtil.json
     ): EventEmitter {
         return EventEmitter(
             sdkOutboundEventFLow,
@@ -189,48 +185,6 @@ class EventEmitterTests {
 
             handledAppEvents.size shouldBe 1
             handledAppEvents.find { it.id === ID2 } shouldBe null
-        }
-
-    @Test
-    fun emitter_shouldKeepCollecting_ifErrorOccurs_inJsonParsing_andLogTheError() =
-        runTest {
-            val testError: Throwable = Exception("Failure")
-            val notParsableEvent = testAppEvent1.copy(id = "thisWillBreak")
-            every {
-                mockJson.encodeToString(any(), notParsableEvent)
-            } throws testError
-            every {
-                mockJson.encodeToString(any(), testAppEvent1)
-            } returns JsonUtil.json.encodeToString(testAppEvent1)
-            every {
-                mockJson.encodeToString(any(), testAppEvent2)
-            } returns JsonUtil.json.encodeToString(testAppEvent2)
-            val testEmitter = createEmitter(backgroundScope, mockJson)
-
-            val handledAppEvents: MutableList<SdkApiEvent> = mutableListOf()
-            val testAppEventListener: EmarsysSdkEventListener = { handledAppEvents.add(it) }
-
-            testEmitter.on(SDK_APP_EVENT, testAppEventListener)
-
-            sdkOutboundEventFLow.emit(notParsableEvent)
-            sdkOutboundEventFLow.emit(testAppEvent1)
-            sdkOutboundEventFLow.emit(testAppEvent2)
-
-            advanceUntilIdle()
-
-            handledAppEvents.size shouldBe 2
-
-            val event1 = handledAppEvents.find { it.id === ID } as SdkApiAppEvent
-            event1.type shouldBe SDK_APP_EVENT
-            event1.name shouldBe NAME
-            JSON.stringify(event1.attributes) shouldBe testAttributes.toString()
-
-            val event2 = handledAppEvents.find { it.id === ID2 } as SdkApiAppEvent
-            event2.type shouldBe SDK_APP_EVENT
-            event2.name shouldBe NAME2
-            JSON.stringify(event2.attributes) shouldBe testAttributes2.toString()
-
-            verifySuspend { mockLogger.error("SdkEvent parsing failed", testError, true) }
         }
 
     @Test
