@@ -8,4 +8,6 @@ import kotlin.js.Promise
 interface JsSetupApi {
     fun enableTracking(config: SdkConfig): Promise<Unit>
     fun disableTracking(): Promise<Unit>
+
+    fun isEnabled(): Promise<Boolean>
 }

@@ -38,36 +38,6 @@ object Emarsys {
     }
 
     /**
-     * Enables tracking with the provided [configuration][config].
-     *
-     * Example usage on Android:
-     * ```kotlin
-     *         Emarsys.enableTracking(
-     *             AndroidEmarsysConfig(
-     *                 applicationCode = "ABCDE-12345",
-     *                 launchActivityClass = MyActivity::class.java
-     *             )
-     *         )
-     * ```
-     *
-     * @param config The SDK configuration to use for enabling tracking.
-     * @returns a [Result] indicating the result of the operation,
-     * containing SdkAlreadyEnabledException if tracking is already enabled.
-     */
-    suspend fun enableTracking(config: SdkConfig): Result<Unit> {
-        return koin.get<SetupApi>().enableTracking(config)
-    }
-
-    /**
-     * Disables tracking.
-     * @returns a [Result] indicating the result of the operation,
-     * containing SdkAlreadyDisabledException if tracking is already disabled.
-     */
-    suspend fun disableTracking(): Result<Unit> {
-        return koin.get<SetupApi>().disableTracking()
-    }
-
-    /**
      * Publishes a flow of SDK events that can be observed externally.
      * The following event types are available:
      * - [AppEvent][SdkEvent.External.Api.AppEvent] - represents events defined by

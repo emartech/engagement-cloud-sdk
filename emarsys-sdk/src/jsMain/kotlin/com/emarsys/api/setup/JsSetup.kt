@@ -24,11 +24,22 @@ internal class JsSetup(
 
     /**
      * Disables tracking.
-     *
+     * @returns a [Promise] indicating the result of the operation,
+     * containing SdkAlreadyDisabledException if tracking is already disabled.
      */
     override fun disableTracking(): Promise<Unit> {
         return applicationScope.promise {
             setup.disableTracking()
+        }
+    }
+
+    /**
+     * Checks if tracking is enabled.
+     * @returns a [Promise] indicating if tracking is enabled,
+     */
+    override fun isEnabled(): Promise<Boolean> {
+        return applicationScope.promise {
+            setup.isEnabled()
         }
     }
 }

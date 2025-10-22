@@ -27,8 +27,17 @@ class AndroidSetup(private val setup: SetupApi) : AndroidSetupApi {
 
     /**
      * Disables tracking.
+     * @returns a [Result] indicating the result of the operation,
+     * containing SdkAlreadyDisabledException if tracking is already disabled.
      */
     override suspend fun disableTracking(): Result<Unit> {
         return setup.disableTracking()
+    }
+    /**
+     * Checks if tracking is enabled.
+     * @returns a [Boolean] indicating if tracking is enabled,
+     */
+    override suspend fun isEnabled(): Boolean {
+        return setup.isEnabled()
     }
 }

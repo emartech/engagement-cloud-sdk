@@ -12,4 +12,6 @@ interface IosSetupApi {
 
     @Throws(SdkAlreadyDisabledException::class, CancellationException::class)
     suspend fun disableTracking()
+
+    suspend fun isEnabled(): Boolean
 }

@@ -33,4 +33,11 @@ internal class Setup(
             }
         }
     }
+    /**
+     * Checks if tracking is enabled.
+     * @returns a [Boolean] indicating if tracking is enabled,
+     */
+    override suspend fun isEnabled(): Boolean {
+        return sdkContext.config?.applicationCode != null
+    }
 }

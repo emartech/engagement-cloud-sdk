@@ -7,4 +7,7 @@ interface SetupApi {
     suspend fun enableTracking(config: SdkConfig): Result<Unit>
 
     suspend fun disableTracking(): Result<Unit>
+
+    suspend fun isEnabled(): Boolean
+
 }

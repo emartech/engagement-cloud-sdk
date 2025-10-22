@@ -1,6 +1,7 @@
 package com.emarsys.api.setup
 
 import com.emarsys.TestEmarsysConfig
+import com.emarsys.config.SdkConfig
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.exceptions.SdkException
 import com.emarsys.core.log.Logger
@@ -95,5 +96,26 @@ class SetupTests {
 
         result.isFailure shouldBe true
         result.exceptionOrNull() shouldBe testException
+    }
+
+    @Test
+    fun testIsEnabled_shouldReturnTrue_ifAppCode_is_set() = runTest {
+        val mockConfig: SdkConfig = mock()
+        every { mockSdkContext.config } returns mockConfig
+        every { mockConfig.applicationCode } returns "ABCDE-12345"
+        val result = setup.isEnabled()
+
+        result shouldBe true
+    }
+
+    @Test
+    fun testIsEnabled_shouldReturnFalse_ifAppCode_is_null() = runTest {
+        val mockConfig: SdkConfig = mock()
+        every { mockSdkContext.config } returns mockConfig
+        every { mockConfig.applicationCode } returns null
+
+        val result = setup.isEnabled()
+
+        result shouldBe false
     }
 }
