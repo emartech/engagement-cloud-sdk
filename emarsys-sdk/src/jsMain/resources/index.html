@@ -32,9 +32,9 @@
          null
      )
 
-     await emarsys.enableTracking(config);
+     await emarsys.setup.enableTracking(config);
      await emarsys.contact.link(100027299, "test@test.com");
-     emarsys.eventEmitter.on("app_event", (event) => console.log(JSON.stringify(event)));
+     emarsys.events.on("app_event", (event) => console.log(JSON.stringify(event)));
  }
 
  document.getElementById("button-integration-demo").onclick = async () => {
@@ -52,7 +52,7 @@
  }
 
  document.getElementById("button-custom-event").onclick = async () => {
-     await emarsys.tracking.trackCustomEvent(document.getElementById("customEventNameInput").value);
+     await emarsys.event.track(document.getElementById("customEventNameInput").value);
  }
 </script>
 </html>
