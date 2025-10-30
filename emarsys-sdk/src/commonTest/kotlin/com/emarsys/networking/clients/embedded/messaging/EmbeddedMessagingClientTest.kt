@@ -1,6 +1,5 @@
 package com.emarsys.networking.clients.embedded.messaging
 
-import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.exceptions.SdkException
@@ -11,26 +10,18 @@ import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
+import com.emarsys.mobileengage.embedded.messages.EmbeddedMessagingContextApi
 import com.emarsys.mobileengage.embedded.messages.EmbeddedMessagingRequestFactoryApi
 import com.emarsys.networking.clients.error.ClientExceptionHandler
-import dev.mokkery.MockMode
+import dev.mokkery.*
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.sequentiallyReturns
 import dev.mokkery.answering.throws
-import dev.mokkery.every
-import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
-import dev.mokkery.mock
-import dev.mokkery.resetAnswers
-import dev.mokkery.resetCalls
 import dev.mokkery.verify.VerifyMode
-import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import io.ktor.http.Headers
-import io.ktor.http.HttpMethod
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.Url
+import io.ktor.http.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -58,7 +49,7 @@ class EmbeddedMessagingClientTest {
     private lateinit var mockEmbeddedMessagesRequestFactory: EmbeddedMessagingRequestFactoryApi
     private lateinit var mockEmarsysNetworkClient: NetworkClientApi
     private lateinit var mockTimestampProvider: InstantProvider
-    private lateinit var mockSdkContext: SdkContextApi
+    private lateinit var mockEmbeddedMessagingContext: EmbeddedMessagingContextApi
 
     private companion object {
         val NOW = Clock.System.now()
@@ -78,8 +69,8 @@ class EmbeddedMessagingClientTest {
         mockEmarsysNetworkClient = mock()
         mockTimestampProvider = mock()
         everySuspend { mockTimestampProvider.provide() } returns NOW
-        mockSdkContext = mock(MockMode.autofill)
-        every { mockSdkContext.embeddedMessagingFrequencyCapSeconds } returns 5
+        mockEmbeddedMessagingContext = mock(MockMode.autofill)
+        every { mockEmbeddedMessagingContext.embeddedMessagingFrequencyCapSeconds } returns 5
 
         onlineEvents = MutableSharedFlow()
 
@@ -105,7 +96,7 @@ class EmbeddedMessagingClientTest {
             eventsDao = mockEventsDao,
             clientExceptionHandler = mockClientExceptionHandler,
             timestampProvider = mockTimestampProvider,
-            sdkContext = mockSdkContext
+            embeddedMessagingContext = mockEmbeddedMessagingContext
         )
 
     @Test

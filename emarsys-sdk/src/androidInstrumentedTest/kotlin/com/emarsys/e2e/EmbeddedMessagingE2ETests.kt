@@ -11,8 +11,9 @@ import com.emarsys.core.networking.context.RequestContextApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.di.SdkKoinIsolationContext
 import com.emarsys.event.SdkEvent
+import com.emarsys.mobileengage.embedded.messages.EmbeddedMessagingContextApi
 import io.kotest.matchers.shouldBe
-import io.ktor.http.HttpStatusCode
+import io.ktor.http.*
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
@@ -28,6 +29,7 @@ class EmbeddedMessagingE2ETests {
 
     private lateinit var sdkContext: SdkContextApi
     private lateinit var sdkEventDistributor: SdkEventDistributorApi
+    private lateinit var embeddedMessagingContext: EmbeddedMessagingContextApi
 
     @BeforeTest
     fun setup() = runTest {
@@ -44,7 +46,8 @@ class EmbeddedMessagingE2ETests {
         sdkContext.config = AndroidEmarsysConfig(applicationCode = STAGING_APP_CODE)
         sdkContext.setSdkState(SdkState.active)
         sdkEventDistributor = SdkKoinIsolationContext.koin.get<SdkEventDistributor>()
-        sdkContext.embeddedMessagingFrequencyCapSeconds = 0
+        embeddedMessagingContext = SdkKoinIsolationContext.koin.get<EmbeddedMessagingContextApi>()
+        embeddedMessagingContext.embeddedMessagingFrequencyCapSeconds = 0
     }
 
     @Test

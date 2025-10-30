@@ -12,7 +12,7 @@ import com.emarsys.networking.clients.error.DefaultClientExceptionHandler
 import com.emarsys.networking.clients.event.EventClient
 import com.emarsys.networking.clients.logging.LoggingClient
 import com.emarsys.networking.clients.remoteConfig.RemoteConfigClient
-import io.ktor.client.HttpClient
+import io.ktor.client.*
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -71,7 +71,7 @@ object NetworkInjection {
                 sdkLogger = get { parametersOf(EmbeddedMessagingClient::class.simpleName) },
                 applicationScope = get(named(CoroutineScopeTypes.Application)),
                 timestampProvider = get(),
-                sdkContext = get()
+                embeddedMessagingContext = get()
                 )
         }
         single<EventBasedClientApi>(named(EventBasedClientTypes.Device)) {

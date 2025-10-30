@@ -13,15 +13,12 @@ import com.emarsys.core.networking.context.RequestContextApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.di.SdkKoinIsolationContext
 import com.emarsys.event.SdkEvent
+import com.emarsys.mobileengage.embedded.messages.EmbeddedMessagingContextApi
 import com.emarsys.mobileengage.embedded.messages.MessageTagUpdate
 import com.emarsys.mobileengage.embedded.messages.TagOperation
-import io.kotest.data.Table2
-import io.kotest.data.forAll
-import io.kotest.data.headers
-import io.kotest.data.row
-import io.kotest.data.table
+import io.kotest.data.*
 import io.kotest.matchers.shouldBe
-import io.ktor.http.HttpStatusCode
+import io.ktor.http.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -38,6 +35,7 @@ class EmbeddedMessagingIntegrationTests {
 
     private lateinit var sdkContext: SdkContextApi
     private lateinit var sdkEventDistributor: SdkEventDistributorApi
+    private lateinit var embeddedMessagingContext: EmbeddedMessagingContextApi
 
     @BeforeTest
     fun setup() = runTest {
@@ -54,7 +52,8 @@ class EmbeddedMessagingIntegrationTests {
         sdkContext.config = AndroidEmarsysConfig(applicationCode = STAGING_APP_CODE)
         sdkContext.setSdkState(SdkState.active)
         sdkEventDistributor = SdkKoinIsolationContext.koin.get<SdkEventDistributor>()
-        sdkContext.embeddedMessagingFrequencyCapSeconds = 0
+        embeddedMessagingContext = SdkKoinIsolationContext.koin.get<EmbeddedMessagingContextApi>()
+        embeddedMessagingContext.embeddedMessagingFrequencyCapSeconds = 0
     }
 
     @Test

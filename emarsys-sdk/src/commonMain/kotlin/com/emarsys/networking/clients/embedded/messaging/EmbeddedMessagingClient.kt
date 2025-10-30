@@ -1,6 +1,5 @@
 package com.emarsys.networking.clients.embedded.messaging
 
-import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.exceptions.SdkException.NetworkIOException
@@ -11,11 +10,11 @@ import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
+import com.emarsys.mobileengage.embedded.messages.EmbeddedMessagingContextApi
 import com.emarsys.mobileengage.embedded.messages.EmbeddedMessagingRequestFactoryApi
 import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.error.ClientExceptionHandler
-import io.ktor.http.Headers
-import io.ktor.http.HttpStatusCode
+import io.ktor.http.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.filter
@@ -33,7 +32,7 @@ internal class EmbeddedMessagingClient(
     private val eventsDao: EventsDaoApi,
     private val clientExceptionHandler: ClientExceptionHandler,
     private val timestampProvider: InstantProvider,
-    private val sdkContext: SdkContextApi
+    private val embeddedMessagingContext: EmbeddedMessagingContextApi
 ) : EventBasedClientApi {
 
     private var lastFetchMessagesEventResultReceived: Instant? = null
@@ -107,7 +106,7 @@ internal class EmbeddedMessagingClient(
 
     private fun isTooFrequentFetch(): Boolean {
         return lastFetchMessagesEventResultReceived?.let {
-            timestampProvider.provide().epochSeconds - it.epochSeconds < sdkContext.embeddedMessagingFrequencyCapSeconds
+            timestampProvider.provide().epochSeconds - it.epochSeconds < embeddedMessagingContext.embeddedMessagingFrequencyCapSeconds
         } ?: false
     }
 

@@ -3,7 +3,7 @@ package com.emarsys.networking.clients.embedded.messaging.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class MetaResponse(
+data class MetaData(
     val version: String,
     val design: DesignMetaData?
 )
