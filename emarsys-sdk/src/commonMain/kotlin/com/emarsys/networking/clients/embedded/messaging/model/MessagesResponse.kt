@@ -7,11 +7,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class MessagesResponse(
     val version: String,
-    val count: Int,
     val top: Int,
     val meta: Meta,
     val messages: List<EmbeddedMessage>,
-
 )
 
 @Serializable
@@ -40,4 +38,3 @@ data class EmbeddedMessage(
     val properties: Map<String, String>,
     val trackingInfo: String,
 )
-

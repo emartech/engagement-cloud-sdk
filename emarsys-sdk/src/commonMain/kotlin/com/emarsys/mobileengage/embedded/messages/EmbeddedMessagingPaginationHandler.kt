@@ -29,28 +29,44 @@ internal class EmbeddedMessagingPaginationHandler(
         sdkEventManager.sdkEventFlow
             .filter {
                 it is SdkEvent.Internal.EmbeddedMessaging.FetchMessages
-                        || (it is SdkEvent.Internal.Sdk.Answer.Response<*> && it.originId == paginationState.lastFetchMessagesId)
+                        || it is SdkEvent.Internal.Sdk.Answer.Response<*>
                         || it is SdkEvent.Internal.EmbeddedMessaging.NextPage
+                        || it is SdkEvent.Internal.EmbeddedMessaging.ResetPagination
             }
-            .collect {
-                if (it is SdkEvent.Internal.EmbeddedMessaging.FetchMessages) {
-                    paginationState.lastFetchMessagesId = it.id
-                    paginationState.offset = it.offset
-                    paginationState.categoryIds = it.categoryIds
-                } else if (it is SdkEvent.Internal.Sdk.Answer.Response<*>) {
-                    it.result.onSuccess { result ->
-                        val response: MessagesResponse = (result as Response).body()
-                        paginationState.top = response.top
-                        paginationState.count = response.count
+            .collect { event ->
+                when (event) {
+                    is SdkEvent.Internal.EmbeddedMessaging.FetchMessages -> {
+                        paginationState.lastFetchMessagesId = event.id
+                        paginationState.offset = event.offset
+                        paginationState.categoryIds = event.categoryIds
                     }
-                    it.result.onFailure { throwable -> } //TODO
-                } else if (it is SdkEvent.Internal.EmbeddedMessaging.NextPage) {
+                    is SdkEvent.Internal.Sdk.Answer.Response<*> -> {
+                        if (event.originId == paginationState.lastFetchMessagesId) {
+                            event.result.onSuccess { result ->
+                                val response: MessagesResponse = (result as Response).body()
+                                paginationState.top = response.top
+                                val received = response.messages.size
+                                paginationState.receivedCount += received
+                                if (received == 0 || (paginationState.top > 0 && received < paginationState.top)) {
+                                    paginationState.endReached = true
+                                    sdkLogger.debug("Can't fetch more messages, final page reached")
+                                }
+                            }
+                            event.result.onFailure { throwable ->
+                                sdkLogger.error("Failed to process embedded messages response", throwable)
+                            }
+                        } else {
+                            sdkLogger.debug("Ignoring response with mismatched originId=${event.originId}")
+                        }
+                    }
+                    is SdkEvent.Internal.EmbeddedMessaging.NextPage -> {
                         if (paginationState.canFetchNextPage()) {
                             paginationState.updateOffset()
+                            paginationState.lastFetchMessagesId = event.id
                             sdkEventManager.registerEvent(
                                 SdkEvent.Internal.EmbeddedMessaging.FetchNextPage(
-                                    id = it.id,
-                                    timestamp = it.timestamp,
+                                    id = event.id,
+                                    timestamp = event.timestamp,
                                     nackCount = 0,
                                     offset = paginationState.offset,
                                     categoryIds = paginationState.categoryIds
@@ -59,6 +75,14 @@ internal class EmbeddedMessagingPaginationHandler(
                         } else {
                             sdkLogger.debug("Can't fetch more messages, final page reached")
                         }
+                    }
+                    is SdkEvent.Internal.EmbeddedMessaging.ResetPagination -> {
+                        sdkLogger.debug("Resetting pagination state")
+                        paginationState.reset()
+                    }
+                    else -> {
+                        sdkLogger.debug("Ignoring unrelated event: ${event::class.simpleName}")
+                    }
                 }
             }
     }

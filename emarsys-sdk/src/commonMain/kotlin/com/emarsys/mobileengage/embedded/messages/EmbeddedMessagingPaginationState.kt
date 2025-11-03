@@ -5,17 +5,21 @@ internal open class EmbeddedMessagingPaginationState(
     open var top: Int = 0,
     open var offset: Int = 0,
     open var categoryIds: List<Int> = emptyList(),
-    open var count: Int = 0
+    open var receivedCount: Int = 0,
+    open var endReached: Boolean = false
 ) {
-    open fun canFetchNextPage(): Boolean {
-        return if(top>=0 && offset>=0 && count>=0){
-            (offset.plus(top)) < count
-        } else false
-    }
+    open fun canFetchNextPage(): Boolean = !endReached
 
     open fun updateOffset() {
-        if(offset>=0 && top>=0){
-            offset = offset.plus(top)
-        }
+        offset = receivedCount
+    }
+
+    open fun reset() {
+        lastFetchMessagesId = null
+        top = 0
+        offset = 0
+        categoryIds = emptyList()
+        receivedCount = 0
+        endReached = false
     }
 }

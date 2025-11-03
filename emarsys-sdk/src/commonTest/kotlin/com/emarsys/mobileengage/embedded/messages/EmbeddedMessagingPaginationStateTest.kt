@@ -6,62 +6,107 @@ import kotlin.test.Test
 class EmbeddedMessagingPaginationStateTest {
 
     @Test
-    fun testCanFetchNextPage_shouldReturnFalse_when_onLastPage(){
-        val actualState = EmbeddedMessagingPaginationState(
+    fun canFetchNextPage_shouldReturnFalse_when_endReached() {
+        val state = EmbeddedMessagingPaginationState(
             lastFetchMessagesId = "any",
             top = 30,
             offset = 0,
             categoryIds = listOf(1),
-            count = 30
+            receivedCount = 60,
+            endReached = true
         )
-
-        val result = actualState.canFetchNextPage()
-        result shouldBe false
+        state.canFetchNextPage() shouldBe false
     }
 
     @Test
-    fun testCanFetchNextPage_shouldReturnTrue_when_not_onLastPage(){
-        val actualState = EmbeddedMessagingPaginationState(
+    fun canFetchNextPage_shouldReturnTrue_when_not_endReached() {
+        val state = EmbeddedMessagingPaginationState(
             lastFetchMessagesId = "any",
             top = 30,
             offset = 0,
             categoryIds = listOf(1),
-            count = 31
+            receivedCount = 30,
+            endReached = false
         )
-
-        val result = actualState.canFetchNextPage()
-        result shouldBe true
+        state.canFetchNextPage() shouldBe true
     }
 
     @Test
-    fun testCanFetchNextPage_shouldReturnFalse_when_top_or_offset_or_count_is_less_than_0(){
-        val actualState = EmbeddedMessagingPaginationState(
+    fun updateOffset_shouldSetOffsetToReceivedCount() {
+        val state = EmbeddedMessagingPaginationState(
             lastFetchMessagesId = "any",
             top = 20,
-            offset = -1,
+            offset = 0,
             categoryIds = listOf(1),
-            count = 30
+            receivedCount = 55,
+            endReached = false
         )
-
-        val result = actualState.canFetchNextPage()
-
-        result shouldBe false
+        state.updateOffset()
+        state.offset shouldBe 55
     }
 
     @Test
-    fun updateOffset_should_not_do_anything_when_offset_or_top_is_less_than_0(){
-        val expectedOffset = 0
-
-        val actualState = EmbeddedMessagingPaginationState(
-            lastFetchMessagesId = "any",
-            top = -1,
-            offset = 0,
-            categoryIds = listOf(1),
-            count = 30
+    fun reset_shouldSetAllPropertiesToDefaultValues() {
+        val state = EmbeddedMessagingPaginationState(
+            lastFetchMessagesId = "test-id",
+            top = 50,
+            offset = 25,
+            categoryIds = listOf(1, 2, 3),
+            receivedCount = 75,
+            endReached = true
         )
 
-        actualState.updateOffset()
+        state.reset()
 
-        actualState.offset shouldBe expectedOffset
+        state.lastFetchMessagesId shouldBe null
+        state.top shouldBe 0
+        state.offset shouldBe 0
+        state.categoryIds shouldBe emptyList()
+        state.receivedCount shouldBe 0
+        state.endReached shouldBe false
+    }
+
+    @Test
+    fun reset_shouldMakeCanFetchNextPageReturnTrue() {
+        val state = EmbeddedMessagingPaginationState(endReached = true)
+
+        state.reset()
+
+        state.canFetchNextPage() shouldBe true
+    }
+
+    @Test
+    fun reset_shouldWorkWithDefaultConstructor() {
+        val state = EmbeddedMessagingPaginationState()
+        state.lastFetchMessagesId = "modified"
+        state.top = 100
+        state.offset = 50
+        state.categoryIds = listOf(5, 6)
+        state.receivedCount = 25
+        state.endReached = true
+
+        state.reset()
+
+        state.lastFetchMessagesId shouldBe null
+        state.top shouldBe 0
+        state.offset shouldBe 0
+        state.categoryIds shouldBe emptyList()
+        state.receivedCount shouldBe 0
+        state.endReached shouldBe false
+    }
+
+    @Test
+    fun reset_shouldAllowSubsequentOperations() {
+        val state = EmbeddedMessagingPaginationState(
+            receivedCount = 100,
+            endReached = true
+        )
+
+        state.reset()
+
+        state.receivedCount = 20
+        state.updateOffset()
+        state.offset shouldBe 20
+        state.canFetchNextPage() shouldBe true
     }
 }
