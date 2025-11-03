@@ -16,6 +16,8 @@ plugins {
     alias(libs.plugins.sqlDelight)
     alias(libs.plugins.mavenPublish)
     alias(libs.plugins.kmmbridge)
+    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.jetbrainsCompose)
 }
 
 group = "com.emarsys"
@@ -67,6 +69,10 @@ kotlin {
                 implementation(libs.ktor.serialization)
                 implementation(project.dependencies.platform(libs.cryptography))
                 implementation(libs.cryptography.core)
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material3)
+                implementation(compose.ui)
             }
         }
         val commonTest by getting {
@@ -91,6 +97,8 @@ kotlin {
                 implementation(libs.androidx.appcompat)
                 implementation(libs.sqlDelight.android)
                 implementation(libs.google.play.services.location)
+                implementation(libs.compose.ui.tooling.preview)
+                implementation(libs.compose.ui.tooling)
             }
         }
 
