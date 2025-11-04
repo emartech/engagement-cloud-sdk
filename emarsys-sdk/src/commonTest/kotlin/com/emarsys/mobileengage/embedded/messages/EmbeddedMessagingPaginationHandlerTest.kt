@@ -26,8 +26,6 @@ import io.ktor.http.Url
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -51,8 +49,6 @@ class EmbeddedMessagingPaginationHandlerTest {
     private lateinit var mockLogger: Logger
     private lateinit var state: EmbeddedMessagingPaginationState
     private lateinit var fetchNextPageSlot: SlotCapture<SdkEvent.Internal.EmbeddedMessaging.FetchNextPage>
-    private lateinit var testScope: CoroutineScope
-    private lateinit var handler: EmbeddedMessagingPaginationHandler
 
     private val testDispatcher = StandardTestDispatcher()
     private val json = JsonUtil.json
@@ -63,16 +59,12 @@ class EmbeddedMessagingPaginationHandlerTest {
         mockManager = mock(MockMode.autofill)
         mockLogger = mock(MockMode.autofill)
         state = EmbeddedMessagingPaginationState()
-        flow = MutableSharedFlow(replay = 0, extraBufferCapacity = Channel.UNLIMITED)
+        flow = MutableSharedFlow()
         fetchNextPageSlot = Capture.slot()
         every { mockManager.sdkEventFlow } returns flow
         everySuspend { mockLogger.debug(any<String>()) } returns Unit
         everySuspend { mockLogger.error(any<String>(), any<Throwable>()) } returns Unit
         everySuspend { mockManager.registerEvent(sdkEvent = capture(fetchNextPageSlot)) } returns mock()
-        testScope = CoroutineScope(testDispatcher)
-
-        handler = EmbeddedMessagingPaginationHandler(mockManager, testScope, mockLogger, state)
-        handler.register()
     }
 
     @AfterTest
@@ -80,11 +72,21 @@ class EmbeddedMessagingPaginationHandlerTest {
         Dispatchers.resetMain()
         resetCalls()
         resetAnswers()
-        testScope.cancel()
+    }
+
+    private fun createPaginationHandler(backgroundScope: CoroutineScope): EmbeddedMessagingPaginationHandler {
+        return EmbeddedMessagingPaginationHandler(
+            sdkEventManager = mockManager,
+            applicationScope = backgroundScope,
+            sdkLogger = mockLogger,
+            paginationState = state
+        )
     }
 
     @Test
     fun testFetchMessagesUpdatesState() = runTest {
+        createPaginationHandler(backgroundScope).register()
+
         val fetch = SdkEvent.Internal.EmbeddedMessaging.FetchMessages(
             nackCount = 0,
             offset = 5,
@@ -102,6 +104,8 @@ class EmbeddedMessagingPaginationHandlerTest {
 
     @Test
     fun testConsume_fetchMessages_shouldUpdateState() = runTest {
+        createPaginationHandler(backgroundScope).register()
+
         val fetch = SdkEvent.Internal.EmbeddedMessaging.FetchMessages(
             nackCount = 0,
             offset = 0,
@@ -122,6 +126,8 @@ class EmbeddedMessagingPaginationHandlerTest {
 
     @Test
     fun testConsume_fetchMessages_shouldUpdateWhenEndReached() = runTest {
+        createPaginationHandler(backgroundScope).register()
+
         val fetch = SdkEvent.Internal.EmbeddedMessaging.FetchMessages(
             nackCount = 0,
             offset = 0,
@@ -142,6 +148,8 @@ class EmbeddedMessagingPaginationHandlerTest {
 
     @Test
     fun testConsume_fetchMessages_should_markEndOnEmptyPage() = runTest {
+        createPaginationHandler(backgroundScope).register()
+
         val fetch = SdkEvent.Internal.EmbeddedMessaging.FetchMessages(
             nackCount = 0,
             offset = 0,
@@ -162,6 +170,8 @@ class EmbeddedMessagingPaginationHandlerTest {
 
     @Test
     fun testConsume_nextPage_shouldUpdateState() = runTest {
+        createPaginationHandler(backgroundScope).register()
+
         val next = SdkEvent.Internal.EmbeddedMessaging.NextPage()
         state.top = 2
         state.receivedCount = 2
@@ -175,6 +185,8 @@ class EmbeddedMessagingPaginationHandlerTest {
 
     @Test
     fun testConsume_nextPage_shouldNotRegister_whenEndReached() = runTest {
+        createPaginationHandler(backgroundScope).register()
+
         val next = SdkEvent.Internal.EmbeddedMessaging.NextPage()
         state.endReached = true
 
@@ -187,6 +199,8 @@ class EmbeddedMessagingPaginationHandlerTest {
 
     @Test
     fun testConsume_shouldIgnoreMismatchedResponse() = runTest {
+        createPaginationHandler(backgroundScope).register()
+
         val fetch = SdkEvent.Internal.EmbeddedMessaging.FetchMessages(
             nackCount = 0,
             offset = 0,
@@ -204,6 +218,8 @@ class EmbeddedMessagingPaginationHandlerTest {
 
     @Test
     fun testConsume_resetPaginationEvent_shouldResetsState() = runTest {
+        createPaginationHandler(backgroundScope).register()
+
         val resetEvent = SdkEvent.Internal.EmbeddedMessaging.ResetPagination()
         val fetch = SdkEvent.Internal.EmbeddedMessaging.FetchMessages(
             nackCount = 0,
