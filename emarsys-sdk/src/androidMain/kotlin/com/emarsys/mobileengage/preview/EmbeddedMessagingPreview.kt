@@ -6,6 +6,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.embedded.ui.MessageItemView
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
+import kotlinx.datetime.Clock
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
 
 
 @Preview(showBackground = true)
@@ -29,8 +32,8 @@ private fun providePreviewMessage() =
         emptyList(),
         listOf("promo", "new"),
         listOf(1, 2),
-        System.currentTimeMillis(),
-        System.currentTimeMillis() + 86400000,
+        Clock.System.now().minus(3.hours).toEpochMilliseconds(),
+        Clock.System.now().plus(4.days).toEpochMilliseconds(),
         mapOf("key1" to "value1", "key2" to "value2"),
         "tracking_info_example"
     )
