@@ -66,7 +66,10 @@ fun App() {
                     }
                 }
             )
+
             Text("InApp DND: ${switchValue.value}")
+
+            Emarsys.TestMessageItemView()
         }
     }
 }
