@@ -1,9 +1,9 @@
 package com.emarsys.di
 
-import com.emarsys.mobileengage.embedded.messages.EmbeddedMessagesRequestFactory
-import com.emarsys.mobileengage.embedded.messages.EmbeddedMessagingContext
-import com.emarsys.mobileengage.embedded.messages.EmbeddedMessagingContextApi
-import com.emarsys.mobileengage.embedded.messages.EmbeddedMessagingRequestFactoryApi
+import com.emarsys.mobileengage.embeddedmessaging.networking.EmbeddedMessagesRequestFactory
+import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContext
+import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
+import com.emarsys.mobileengage.embeddedmessaging.networking.EmbeddedMessagingRequestFactoryApi
 import org.koin.dsl.module
 
 object EmbeddedMessagingInjection {

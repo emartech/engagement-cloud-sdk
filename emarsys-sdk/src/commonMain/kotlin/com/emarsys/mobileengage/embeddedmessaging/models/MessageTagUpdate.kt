@@ -1,4 +1,4 @@
-package com.emarsys.mobileengage.embedded.messages
+package com.emarsys.mobileengage.embeddedmessaging.models
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

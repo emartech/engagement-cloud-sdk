@@ -6,7 +6,7 @@ import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.event.SdkEvent
-import com.emarsys.mobileengage.embedded.messages.EmbeddedMessagingContextApi
+import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import com.emarsys.networking.clients.embedded.messaging.model.MetaData
 import dev.mokkery.*
 import dev.mokkery.answering.returns

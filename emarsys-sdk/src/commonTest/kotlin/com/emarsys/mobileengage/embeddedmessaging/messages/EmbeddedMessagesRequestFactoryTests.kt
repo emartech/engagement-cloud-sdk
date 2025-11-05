@@ -1,9 +1,12 @@
-package com.emarsys.mobileengage.embedded.messages
+package com.emarsys.mobileengage.embeddedmessaging.messages
 
 
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.event.SdkEvent
+import com.emarsys.mobileengage.embeddedmessaging.networking.EmbeddedMessagesRequestFactory
+import com.emarsys.mobileengage.embeddedmessaging.models.MessageTagUpdate
+import com.emarsys.mobileengage.embeddedmessaging.models.TagOperation
 import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns

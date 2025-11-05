@@ -1,4 +1,4 @@
-package com.emarsys.mobileengage.embedded.messages
+package com.emarsys.mobileengage.embeddedmessaging.networking
 
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.event.SdkEvent

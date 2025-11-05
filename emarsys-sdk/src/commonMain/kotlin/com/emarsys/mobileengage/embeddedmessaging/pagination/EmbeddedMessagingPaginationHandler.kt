@@ -1,4 +1,4 @@
-package com.emarsys.mobileengage.embedded.messages
+package com.emarsys.mobileengage.embeddedmessaging.pagination
 
 import com.emarsys.core.Registerable
 import com.emarsys.core.channel.SdkEventManagerApi

@@ -11,7 +11,7 @@ import com.emarsys.core.networking.context.RequestContextApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.di.SdkKoinIsolationContext
 import com.emarsys.event.SdkEvent
-import com.emarsys.mobileengage.embedded.messages.EmbeddedMessagingContextApi
+import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import io.kotest.matchers.shouldBe
 import io.ktor.http.*
 import kotlinx.coroutines.test.runTest

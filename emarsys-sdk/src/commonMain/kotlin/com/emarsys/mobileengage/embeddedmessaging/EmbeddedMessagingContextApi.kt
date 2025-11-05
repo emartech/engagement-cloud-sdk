@@ -1,4 +1,4 @@
-package com.emarsys.mobileengage.embedded.messages
+package com.emarsys.mobileengage.embeddedmessaging
 
 import com.emarsys.networking.clients.embedded.messaging.model.MetaData
 

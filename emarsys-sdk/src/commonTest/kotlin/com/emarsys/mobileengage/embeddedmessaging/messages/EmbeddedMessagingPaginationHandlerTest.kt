@@ -1,10 +1,12 @@
-package com.emarsys.mobileengage.embedded.messages
+package com.emarsys.mobileengage.embeddedmessaging.messages
 
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.event.SdkEvent
+import com.emarsys.mobileengage.embeddedmessaging.pagination.EmbeddedMessagingPaginationHandler
+import com.emarsys.mobileengage.embeddedmessaging.pagination.EmbeddedMessagingPaginationState
 import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns

@@ -1,4 +1,4 @@
-package com.emarsys.mobileengage.embedded.ui
+package com.emarsys.mobileengage.embeddedmessaging.ui.item
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

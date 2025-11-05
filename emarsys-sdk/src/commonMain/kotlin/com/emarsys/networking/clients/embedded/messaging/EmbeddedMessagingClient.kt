@@ -10,8 +10,8 @@ import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
-import com.emarsys.mobileengage.embedded.messages.EmbeddedMessagingContextApi
-import com.emarsys.mobileengage.embedded.messages.EmbeddedMessagingRequestFactoryApi
+import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
+import com.emarsys.mobileengage.embeddedmessaging.networking.EmbeddedMessagingRequestFactoryApi
 import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.error.ClientExceptionHandler
 import io.ktor.http.*

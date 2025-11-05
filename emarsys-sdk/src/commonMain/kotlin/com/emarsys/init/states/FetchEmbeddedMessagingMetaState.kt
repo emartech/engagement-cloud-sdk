@@ -6,7 +6,7 @@ import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.body
 import com.emarsys.core.state.State
 import com.emarsys.event.SdkEvent
-import com.emarsys.mobileengage.embedded.messages.EmbeddedMessagingContextApi
+import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import com.emarsys.networking.clients.embedded.messaging.model.MetaData
 
 internal class FetchEmbeddedMessagingMetaState(

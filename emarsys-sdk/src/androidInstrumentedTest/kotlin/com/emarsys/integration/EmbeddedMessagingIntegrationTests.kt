@@ -13,9 +13,9 @@ import com.emarsys.core.networking.context.RequestContextApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.di.SdkKoinIsolationContext
 import com.emarsys.event.SdkEvent
-import com.emarsys.mobileengage.embedded.messages.EmbeddedMessagingContextApi
-import com.emarsys.mobileengage.embedded.messages.MessageTagUpdate
-import com.emarsys.mobileengage.embedded.messages.TagOperation
+import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
+import com.emarsys.mobileengage.embeddedmessaging.models.MessageTagUpdate
+import com.emarsys.mobileengage.embeddedmessaging.models.TagOperation
 import io.kotest.data.*
 import io.kotest.matchers.shouldBe
 import io.ktor.http.*

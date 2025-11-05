@@ -1,5 +1,6 @@
-package com.emarsys.mobileengage.embedded.messages
+package com.emarsys.mobileengage.embeddedmessaging.messages
 
+import com.emarsys.mobileengage.embeddedmessaging.pagination.EmbeddedMessagingPaginationState
 import io.kotest.matchers.shouldBe
 import kotlin.test.Test
 

@@ -29,8 +29,8 @@ import com.emarsys.core.util.Downloader
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.EventActionFactory
 import com.emarsys.mobileengage.action.EventActionFactoryApi
-import com.emarsys.mobileengage.embedded.messages.EmbeddedMessagesRequestFactory
-import com.emarsys.mobileengage.embedded.messages.EmbeddedMessagingRequestFactoryApi
+import com.emarsys.mobileengage.embeddedmessaging.networking.EmbeddedMessagesRequestFactory
+import com.emarsys.mobileengage.embeddedmessaging.networking.EmbeddedMessagingRequestFactoryApi
 import com.emarsys.util.JsonUtil
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import io.ktor.client.*
@@ -89,7 +89,7 @@ object CoreInjection {
         singleOf(::UserAgentProvider) { bind<UserAgentProviderApi>() }
         single<DefaultUrlsApi> {
             DefaultUrls(
-                "https://me-client.eservice.emarsys.net",
+                "https://me-client.gservice.emarsys.net",
                 "https://mobile-events.eservice.emarsys.net",
                 "https://deep-link.eservice.emarsys.net",
                 "https://mobile-sdk-config.gservice.emarsys.net",
