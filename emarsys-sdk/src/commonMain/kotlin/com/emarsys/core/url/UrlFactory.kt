@@ -34,12 +34,12 @@ internal class UrlFactory(
 
             REFRESH_TOKEN -> createUrl(
                 sdkContext.defaultUrls.clientServiceBaseUrl,
-                "contact-token"
+                "client/contact-token"
             ).build()
 
             CHANGE_MERCHANT_ID -> createUrl(
                 sdkContext.defaultUrls.clientServiceBaseUrl,
-                "contact-token"
+                "client/contact-token"
             ).build()
 
             PUSH_TOKEN -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client/push-token")

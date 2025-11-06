@@ -73,7 +73,19 @@ class UrlFactoryTests {
 
         val result = urlFactory.create(EmarsysUrlType.REFRESH_TOKEN)
 
-        result shouldBe Url("https://me-client.gservice.emarsys.net/v4/apps/testAppCode/contact-token")
+        result shouldBe Url("https://me-client.gservice.emarsys.net/v4/apps/testAppCode/client/contact-token")
+    }
+    @Test
+    fun testCreate_changeMerchantId_should_return_url_with_appCode() {
+        val config = TestEmarsysConfig("testAppCode")
+        val clientServiceBaseUrl = "https://me-client.gservice.emarsys.net"
+        every { mockSdkContext.defaultUrls } returns mockDefaultUrls
+        every { mockDefaultUrls.clientServiceBaseUrl } returns clientServiceBaseUrl
+        every { mockSdkContext.config } returns config
+
+        val result = urlFactory.create(EmarsysUrlType.CHANGE_MERCHANT_ID)
+
+        result shouldBe Url("https://me-client.gservice.emarsys.net/v4/apps/testAppCode/client/contact-token")
     }
 
     @Test
