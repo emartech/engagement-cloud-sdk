@@ -89,7 +89,7 @@ object CoreInjection {
         singleOf(::UserAgentProvider) { bind<UserAgentProviderApi>() }
         single<DefaultUrlsApi> {
             DefaultUrls(
-                "https://me-client.gservice.emarsys.net",
+                "https://me-client.eservice.emarsys.net",
                 "https://mobile-events.eservice.emarsys.net",
                 "https://deep-link.eservice.emarsys.net",
                 "https://mobile-sdk-config.gservice.emarsys.net",
