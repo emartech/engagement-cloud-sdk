@@ -35,6 +35,8 @@ struct ContentView: View {
                     Text("track event")
                 }
             }.padding(8)
+            
+            MessageItemView()
         }
     }
     

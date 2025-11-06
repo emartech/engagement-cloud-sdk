@@ -6,8 +6,6 @@ import com.emarsys.api.contact.ContactApi
 import com.emarsys.api.deeplink.DeepLinkApi
 import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.push.PushApi
-import com.emarsys.api.setup.SetupApi
-import com.emarsys.config.SdkConfig
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.di.EventFlowTypes
 import com.emarsys.di.SdkKoinIsolationContext

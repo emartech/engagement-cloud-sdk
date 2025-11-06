@@ -1,5 +1,6 @@
 package com.emarsys
 
+import androidx.compose.ui.window.ComposeUIViewController
 import com.emarsys.api.config.IosConfigApi
 import com.emarsys.api.contact.IosContactApi
 import com.emarsys.api.deeplink.IosDeepLinkApi
@@ -7,9 +8,6 @@ import com.emarsys.api.inapp.IosInAppApi
 import com.emarsys.api.push.IosPushApi
 import com.emarsys.api.setup.IosSetupApi
 import com.emarsys.api.tracking.IosTrackingApi
-import com.emarsys.config.SdkConfig
-import com.emarsys.core.exceptions.SdkException.SdkAlreadyDisabledException
-import com.emarsys.core.exceptions.SdkException.SdkAlreadyEnabledException
 import com.emarsys.di.CoroutineScopeTypes
 import com.emarsys.di.EventFlowTypes
 import com.emarsys.di.SdkKoinIsolationContext.koin
@@ -20,6 +18,7 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import org.koin.core.qualifier.named
+import platform.UIKit.UIViewController
 import kotlin.experimental.ExperimentalObjCName
 
 typealias EmarsysEventListener = (SdkEvent) -> Unit
@@ -65,5 +64,11 @@ object IosEmarsys {
      */
     fun registerEventListener(listener: EmarsysEventListener) {
         eventListeners.add(listener)
+    }
+
+    fun embeddedMessagingItem(): UIViewController {
+        return ComposeUIViewController {
+            Emarsys.TestMessageItemView()
+        }
     }
 }

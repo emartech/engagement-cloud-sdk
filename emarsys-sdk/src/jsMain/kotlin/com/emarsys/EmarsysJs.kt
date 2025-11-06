@@ -1,3 +1,7 @@
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.window.CanvasBasedWindow
+import com.emarsys.Emarsys
 import com.emarsys.api.config.JSConfigApi
 import com.emarsys.api.contact.JSContactApi
 import com.emarsys.api.deeplink.JSDeepLinkApi
@@ -70,5 +74,17 @@ object EmarsysJs {
             }
         }
         return SdkEventSubscription(job)
+    }
+
+    @Composable
+    fun testMessageItemView() {
+        Emarsys.TestMessageItemView()
+    }
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    fun testEmbeddedMessaging() {
+        CanvasBasedWindow(canvasElementId = "TestEmbeddedMessaging") {
+            testMessageItemView()
+        }
     }
 }
