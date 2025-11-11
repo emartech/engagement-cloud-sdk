@@ -1,4 +1,5 @@
-import com.emarsys.Emarsys
+package com.emarsys.sample
+
 import com.emarsys.IosEmarsys
 import com.emarsys.IosEmarsysConfig
 

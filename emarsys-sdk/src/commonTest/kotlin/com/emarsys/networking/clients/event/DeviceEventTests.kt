@@ -7,7 +7,9 @@ import io.kotest.matchers.shouldBe
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlin.test.Test
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 class DeviceEventTests {
 
     @Test

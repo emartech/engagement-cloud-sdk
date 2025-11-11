@@ -29,8 +29,9 @@ import kotlinx.coroutines.test.setMain
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
 class InAppEventConsumerTest {
     private lateinit var mockSdkEventManager: SdkEventManagerApi
     private lateinit var mockSdkLogger: Logger

@@ -2,16 +2,31 @@ package com.emarsys.mobileengage.embeddedmessaging.ui.item
 
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.decodeToImageBitmap
-import com.emarsys.core.util.DownloaderApi
-import com.emarsys.emarsys_sdk.generated.resources.Res
 
-class MessageItemViewModel(private val downloader: DownloaderApi) {
+class MessageItemViewModel(
+    private val model: MessageItemModelApi,
+) {
+    val id: String
+        get() = model.message.id
 
-    suspend fun fetchImage(url: String): ImageBitmap =
-        downloader.download(url)?.decodeToImageBitmap() ?: getFallbackImage()
+    val title: String
+        get() = model.message.title
+
+    val lead: String
+        get() = model.message.lead
+
+    val imageUrl: String?
+        get() = model.message.imageUrl
+    val receivedAt: Long
+        get() = model.message.receivedAt
+
+    //TODO: consider val imageBitmap?
+
+    suspend fun fetchImage(): ImageBitmap =
+        model.downloadImage()?.decodeToImageBitmap() ?: getFallbackImage()
 
 
     private suspend fun getFallbackImage(): ImageBitmap {
-        return Res.readBytes("files/placeholder.png").decodeToImageBitmap()
+        return model.getFallbackImageProvider().provide().decodeToImageBitmap()
     }
 }

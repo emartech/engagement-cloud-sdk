@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalTime::class)
+
 package com.emarsys.networking.clients.embedded.messaging
 
 import com.emarsys.core.channel.SdkEventManagerApi
@@ -34,10 +36,12 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.Clock
+
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class EmbeddedMessagingClientTest {
@@ -58,6 +62,7 @@ class EmbeddedMessagingClientTest {
         val MORE_OVER_THROTTLING_LIMIT = NOW.plus(7.seconds)
     }
 
+    @OptIn(ExperimentalTime::class)
     @BeforeTest
     fun setup() = runTest {
         Dispatchers.setMain(StandardTestDispatcher())

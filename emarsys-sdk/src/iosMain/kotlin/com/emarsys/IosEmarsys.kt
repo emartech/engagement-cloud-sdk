@@ -65,10 +65,4 @@ object IosEmarsys {
     fun registerEventListener(listener: EmarsysEventListener) {
         eventListeners.add(listener)
     }
-
-    fun embeddedMessagingItem(): UIViewController {
-        return ComposeUIViewController {
-            Emarsys.TestMessageItemView()
-        }
-    }
 }

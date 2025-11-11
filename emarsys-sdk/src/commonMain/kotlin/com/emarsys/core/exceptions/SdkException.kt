@@ -3,7 +3,7 @@ package com.emarsys.core.exceptions
 import com.emarsys.core.networking.model.Response
 
 sealed class SdkException(message: String) : RuntimeException(message) {
-    class InvalidApplicationCodeException(override val message: String): SdkException(message)
+    class InvalidApplicationCodeException(message: String): SdkException(message)
     class SdkAlreadyEnabledException(message: String): SdkException(message)
     class SdkAlreadyDisabledException(message: String): SdkException(message)
     class RetryLimitReachedException(message: String, val response: Response) : SdkException(message)

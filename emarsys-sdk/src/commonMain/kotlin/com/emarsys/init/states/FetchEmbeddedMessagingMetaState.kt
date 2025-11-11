@@ -8,6 +8,9 @@ import com.emarsys.core.state.State
 import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import com.emarsys.networking.clients.embedded.messaging.model.MetaData
+import kotlin.time.ExperimentalTime
+
+@OptIn(ExperimentalTime::class)
 
 internal class FetchEmbeddedMessagingMetaState(
     private val embeddedMessagingContext: EmbeddedMessagingContextApi,

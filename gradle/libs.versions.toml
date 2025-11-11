@@ -40,7 +40,7 @@ google-play-services-location = "21.3.0"
 kotlinWrappers = "2025.7.1"
 cryptography = "0.5.0"
 sqlDelight = "2.1.0"
-mavenPublish = "0.33.0"
+mavenPublish = "0.34.0"
 dotEnv = "4.0.0"
 
 [libraries]

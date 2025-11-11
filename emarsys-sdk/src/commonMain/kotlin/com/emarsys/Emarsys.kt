@@ -1,29 +1,20 @@
 package com.emarsys
 
-import androidx.compose.runtime.Composable
 import com.emarsys.api.config.ConfigApi
 import com.emarsys.api.contact.ContactApi
 import com.emarsys.api.deeplink.DeepLinkApi
 import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.push.PushApi
-import com.emarsys.core.util.DownloaderApi
 import com.emarsys.di.EventFlowTypes
 import com.emarsys.di.SdkKoinIsolationContext
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.event.SdkEvent
 import com.emarsys.init.InitOrganizerApi
-import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
-import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemView
-import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModel
-import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
 import com.emarsys.tracking.TrackingApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.datetime.Clock
 import org.koin.core.qualifier.named
 import kotlin.experimental.ExperimentalObjCRefinement
 import kotlin.native.HiddenFromObjC
-import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.hours
 
 @HiddenFromObjC
 @OptIn(ExperimentalObjCRefinement::class)
@@ -89,29 +80,4 @@ object Emarsys {
      */
     val deepLink: DeepLinkApi
         get() = koin.get<DeepLinkApi>()
-
-    @Composable
-    fun TestMessageItemView() {
-        val downloader = koin.get<DownloaderApi>()
-        val viewModel = MessageItemViewModel(downloader)
-        MessageItemView(
-            EmbeddedMessage(
-                "testId",
-                "Sample Title",
-                "This is a sample lead for the embedded message.",
-                "https://placebear.com/60/60",
-                BasicOpenExternalUrlActionModel(
-                    reporting = "Default Action", url = "https://example.com"
-                ),
-                emptyList(),
-                listOf("promo", "new"),
-                listOf(1, 2),
-                Clock.System.now().minus(3.hours).toEpochMilliseconds(),
-                Clock.System.now().plus(4.days).toEpochMilliseconds(),
-                mapOf("key1" to "value1", "key2" to "value2"),
-                "tracking_info_example"
-            ),
-            viewModel
-        )
-    }
 }

@@ -18,7 +18,9 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.time.ExperimentalTime
 
+@ExperimentalTime
 class EmbeddedMessagesRequestFactoryTests {
 
     private lateinit var embeddedMessagesRequestFactory: EmbeddedMessagesRequestFactory

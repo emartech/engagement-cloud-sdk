@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalTime::class)
+
 package com.emarsys.api.events
 
 import EmarsysSdkEventListener
@@ -32,6 +34,7 @@ import kotlinx.serialization.json.put
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class EventEmitterTests {

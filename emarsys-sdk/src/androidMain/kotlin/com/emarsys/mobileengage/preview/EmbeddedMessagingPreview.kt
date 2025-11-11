@@ -2,33 +2,69 @@ package com.emarsys.mobileengage.preview
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.emarsys_sdk.generated.resources.Res
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
+import com.emarsys.mobileengage.embeddedmessaging.provider.FallbackImageProvider
+import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemModel
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemView
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModel
+import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageModel
+import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageView
+import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageViewModel
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
 import com.emarsys.util.JsonUtil
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.datetime.Clock
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.ExperimentalTime
 
 @Preview(showBackground = true)
 @Composable
 fun MessageItemViewPreview() {
     MaterialTheme {
         MessageItemView(
-            providePreviewMessage(),
-            MessageItemViewModel(PreviewDownLoader())
+            MessageItemViewModel(
+                MessageItemModel(
+                    message = providePreviewMessage(),
+                    downloaderApi = PreviewDownLoader(),
+                    fallbackImageProvider = FallbackImageProvider()
+                )
+            )
         )
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun ListPageViewPreview() {
+    val coroutineScope = remember {
+        CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            coroutineScope.cancel()
+        }
+    }
+
+    MaterialTheme {
+        ListPageView(ListPageViewModel(ListPageModel(), PreviewDownLoader(), coroutineScope = coroutineScope))
+    }
+}
+
+@OptIn(ExperimentalTime::class)
 private fun providePreviewMessage() = EmbeddedMessage(
     "testId",
     "Sample Title",

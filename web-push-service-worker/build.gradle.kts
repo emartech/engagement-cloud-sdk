@@ -5,7 +5,7 @@ plugins {
 }
 
 kotlin {
-    js {
+    js(IR) {
         browser {
             commonWebpackConfig {
                 outputFileName = "ems-service-worker.js"

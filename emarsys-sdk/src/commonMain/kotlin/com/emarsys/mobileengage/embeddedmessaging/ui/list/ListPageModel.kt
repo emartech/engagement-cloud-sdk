@@ -1,0 +1,217 @@
+package com.emarsys.mobileengage.embeddedmessaging.ui.list
+
+import com.emarsys.mobileengage.action.models.PresentableActionModel
+import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
+
+class ListPageModel : ListPageModelApi {
+    override fun fetchMessages(): List<EmbeddedMessage> {
+        return listOf(
+            EmbeddedMessage(
+                id = "1",
+                title = "testTitle",
+                lead = "testLead",
+                imageUrl = "https://placebear.com/60/60",
+                defaultAction = null,
+                actions = emptyList<PresentableActionModel>(),
+                tags = emptyList(),
+                categoryIds = emptyList(),
+                receivedAt = 100000L,
+                expiresAt = 110000L,
+                properties = emptyMap(),
+                trackingInfo = "anything"
+            ),
+            EmbeddedMessage(
+                id = "2",
+                title = "testTitle2",
+                lead = "testLead2",
+                imageUrl = null,
+                defaultAction = null,
+                actions = emptyList<PresentableActionModel>(),
+                tags = emptyList(),
+                categoryIds = emptyList(),
+                receivedAt = 100000L,
+                expiresAt = 110000L,
+                properties = emptyMap(),
+                trackingInfo = "anything"
+            ),
+            EmbeddedMessage(
+                id = "3",
+                title = "testTitle3",
+                lead = "testLead3",
+                imageUrl = null,
+                defaultAction = null,
+                actions = emptyList<PresentableActionModel>(),
+                tags = emptyList(),
+                categoryIds = emptyList(),
+                receivedAt = 100000L,
+                expiresAt = 110000L,
+                properties = emptyMap(),
+                trackingInfo = "anything"
+            ), EmbeddedMessage(
+                id = "4",
+                title = "testTitle",
+                lead = "testLead",
+                imageUrl = "https://placebear.com/60/60",
+                defaultAction = null,
+                actions = emptyList<PresentableActionModel>(),
+                tags = emptyList(),
+                categoryIds = emptyList(),
+                receivedAt = 100000L,
+                expiresAt = 110000L,
+                properties = emptyMap(),
+                trackingInfo = "anything"
+            ),
+            EmbeddedMessage(
+                id = "5",
+                title = "testTitle2",
+                lead = "testLead2",
+                imageUrl = null,
+                defaultAction = null,
+                actions = emptyList<PresentableActionModel>(),
+                tags = emptyList(),
+                categoryIds = emptyList(),
+                receivedAt = 100000L,
+                expiresAt = 110000L,
+                properties = emptyMap(),
+                trackingInfo = "anything"
+            ),
+            EmbeddedMessage(
+                id = "6",
+                title = "testTitle3",
+                lead = "testLead3",
+                imageUrl = null,
+                defaultAction = null,
+                actions = emptyList<PresentableActionModel>(),
+                tags = emptyList(),
+                categoryIds = emptyList(),
+                receivedAt = 100000L,
+                expiresAt = 110000L,
+                properties = emptyMap(),
+                trackingInfo = "anything"
+            ), EmbeddedMessage(
+                id = "7",
+                title = "testTitle",
+                lead = "testLead",
+                imageUrl = "https://placebear.com/60/60",
+                defaultAction = null,
+                actions = emptyList<PresentableActionModel>(),
+                tags = emptyList(),
+                categoryIds = emptyList(),
+                receivedAt = 100000L,
+                expiresAt = 110000L,
+                properties = emptyMap(),
+                trackingInfo = "anything"
+            ),
+            EmbeddedMessage(
+                id = "8",
+                title = "testTitle2",
+                lead = "testLead2",
+                imageUrl = null,
+                defaultAction = null,
+                actions = emptyList<PresentableActionModel>(),
+                tags = emptyList(),
+                categoryIds = emptyList(),
+                receivedAt = 100000L,
+                expiresAt = 110000L,
+                properties = emptyMap(),
+                trackingInfo = "anything"
+            ),
+            EmbeddedMessage(
+                id = "9",
+                title = "testTitle3",
+                lead = "testLead3",
+                imageUrl = null,
+                defaultAction = null,
+                actions = emptyList<PresentableActionModel>(),
+                tags = emptyList(),
+                categoryIds = emptyList(),
+                receivedAt = 100000L,
+                expiresAt = 110000L,
+                properties = emptyMap(),
+                trackingInfo = "anything"
+            ), EmbeddedMessage(
+                id = "10",
+                title = "testTitle",
+                lead = "testLead",
+                imageUrl = "https://placebear.com/60/60",
+                defaultAction = null,
+                actions = emptyList<PresentableActionModel>(),
+                tags = emptyList(),
+                categoryIds = emptyList(),
+                receivedAt = 100000L,
+                expiresAt = 110000L,
+                properties = emptyMap(),
+                trackingInfo = "anything"
+            ),
+            EmbeddedMessage(
+                id = "11",
+                title = "testTitle2",
+                lead = "testLead2",
+                imageUrl = null,
+                defaultAction = null,
+                actions = emptyList<PresentableActionModel>(),
+                tags = emptyList(),
+                categoryIds = emptyList(),
+                receivedAt = 100000L,
+                expiresAt = 110000L,
+                properties = emptyMap(),
+                trackingInfo = "anything"
+            ),
+            EmbeddedMessage(
+                id = "12",
+                title = "testTitle3",
+                lead = "testLead3",
+                imageUrl = null,
+                defaultAction = null,
+                actions = emptyList<PresentableActionModel>(),
+                tags = emptyList(),
+                categoryIds = emptyList(),
+                receivedAt = 100000L,
+                expiresAt = 110000L,
+                properties = emptyMap(),
+                trackingInfo = "anything"
+            ), EmbeddedMessage(
+                id = "13",
+                title = "testTitle",
+                lead = "testLead",
+                imageUrl = "https://placebear.com/60/60",
+                defaultAction = null,
+                actions = emptyList<PresentableActionModel>(),
+                tags = emptyList(),
+                categoryIds = emptyList(),
+                receivedAt = 100000L,
+                expiresAt = 110000L,
+                properties = emptyMap(),
+                trackingInfo = "anything"
+            ),
+            EmbeddedMessage(
+                id = "14",
+                title = "testTitle2",
+                lead = "testLead2",
+                imageUrl = null,
+                defaultAction = null,
+                actions = emptyList<PresentableActionModel>(),
+                tags = emptyList(),
+                categoryIds = emptyList(),
+                receivedAt = 100000L,
+                expiresAt = 110000L,
+                properties = emptyMap(),
+                trackingInfo = "anything"
+            ),
+            EmbeddedMessage(
+                id = "15",
+                title = "testTitle3",
+                lead = "testLead3",
+                imageUrl = null,
+                defaultAction = null,
+                actions = emptyList<PresentableActionModel>(),
+                tags = emptyList(),
+                categoryIds = emptyList(),
+                receivedAt = 100000L,
+                expiresAt = 110000L,
+                properties = emptyMap(),
+                trackingInfo = "anything"
+            )
+        )
+    }
+}

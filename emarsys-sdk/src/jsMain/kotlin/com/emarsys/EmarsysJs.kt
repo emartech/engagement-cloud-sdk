@@ -75,16 +75,4 @@ object EmarsysJs {
         }
         return SdkEventSubscription(job)
     }
-
-    @Composable
-    fun testMessageItemView() {
-        Emarsys.TestMessageItemView()
-    }
-
-    @OptIn(ExperimentalComposeUiApi::class)
-    fun testEmbeddedMessaging() {
-        CanvasBasedWindow(canvasElementId = "TestEmbeddedMessaging") {
-            testMessageItemView()
-        }
-    }
 }

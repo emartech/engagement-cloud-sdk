@@ -14,12 +14,14 @@ import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import io.kotest.matchers.shouldBe
 import io.ktor.http.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
 import kotlin.test.Test
+import kotlin.time.ExperimentalTime
 
-@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
 class EmbeddedMessagingE2ETests {
     private companion object {
         const val STAGING_APP_CODE = "14C19-A121F"

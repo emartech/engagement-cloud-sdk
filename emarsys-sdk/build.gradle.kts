@@ -2,7 +2,7 @@ import co.touchlab.skie.configuration.DefaultArgumentInterop
 import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
 import com.github.gmazzo.buildconfig.BuildConfigTask
 import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
-import java.util.Base64
+import java.util.*
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -74,6 +74,7 @@ kotlin {
                 implementation(compose.material3)
                 implementation(compose.ui)
                 implementation(compose.components.resources)
+                implementation(compose.components.uiToolingPreview)
             }
         }
         val commonTest by getting {
@@ -88,6 +89,7 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 implementation(libs.koin.android)
+                implementation(libs.kotlinx.datetime)
                 implementation(libs.kotlinx.coroutines.android)
                 implementation(libs.ktor.client.android)
                 implementation(libs.androidx.core.ktx)

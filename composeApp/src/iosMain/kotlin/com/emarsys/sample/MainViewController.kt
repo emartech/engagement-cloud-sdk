@@ -1,3 +1,5 @@
+package com.emarsys.sample
+
 import androidx.compose.ui.window.ComposeUIViewController
 
 fun MainViewController() = ComposeUIViewController {

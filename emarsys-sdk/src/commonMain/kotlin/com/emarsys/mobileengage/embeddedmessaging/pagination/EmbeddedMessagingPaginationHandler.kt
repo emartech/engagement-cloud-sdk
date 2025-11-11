@@ -7,10 +7,13 @@ import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.body
 import com.emarsys.event.SdkEvent
 import com.emarsys.networking.clients.embedded.messaging.model.MessagesResponse
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
+
+@OptIn(ExperimentalTime::class)
 
 internal class EmbeddedMessagingPaginationHandler(
     private val sdkEventManager: SdkEventManagerApi,

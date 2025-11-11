@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalTime::class)
+
 package com.emarsys.mobileengage.embeddedmessaging.messages
 
 import com.emarsys.core.channel.SdkEventManagerApi
@@ -42,6 +44,7 @@ import kotlinx.serialization.json.putJsonObject
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class EmbeddedMessagingPaginationHandlerTest {

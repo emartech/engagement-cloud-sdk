@@ -1,7 +1,6 @@
 package com.emarsys.sample
 
 
-import App
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle

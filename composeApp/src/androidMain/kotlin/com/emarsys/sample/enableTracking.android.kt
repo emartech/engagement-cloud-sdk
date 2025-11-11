@@ -1,3 +1,5 @@
+package com.emarsys.sample
+
 import com.emarsys.AndroidEmarsys
 import com.emarsys.AndroidEmarsysConfig
 
