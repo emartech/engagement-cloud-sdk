@@ -1,6 +1,5 @@
 package com.emarsys
 
-import androidx.compose.ui.window.ComposeUIViewController
 import com.emarsys.api.config.IosConfigApi
 import com.emarsys.api.contact.IosContactApi
 import com.emarsys.api.deeplink.IosDeepLinkApi
@@ -12,6 +11,7 @@ import com.emarsys.di.CoroutineScopeTypes
 import com.emarsys.di.EventFlowTypes
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.event.SdkEvent
+import com.emarsys.mobileengage.embeddedmessaging.ui.list.embeddedMessagingListPage
 import io.ktor.utils.io.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -64,5 +64,9 @@ object IosEmarsys {
      */
     fun registerEventListener(listener: EmarsysEventListener) {
         eventListeners.add(listener)
+    }
+
+    fun embeddedMessage(): UIViewController {
+        return embeddedMessagingListPage()
     }
 }

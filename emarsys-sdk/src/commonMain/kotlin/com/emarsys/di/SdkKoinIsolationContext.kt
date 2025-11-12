@@ -15,6 +15,8 @@ import org.koin.dsl.koinApplication
 object SdkKoinIsolationContext {
     private var runningApp: KoinApplication? = null
 
+    fun isInitialized(): Boolean = runningApp != null
+
     private val koinApp = koinApplication {
         modules(
             InitInjection.initModules,

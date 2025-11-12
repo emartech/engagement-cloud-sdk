@@ -12,6 +12,7 @@ import com.emarsys.mobileengage.embeddedmessaging.provider.FallbackImageProvider
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
+import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
@@ -32,7 +33,7 @@ class MessageItemModelTests {
             id = "1",
             title = "testTitle",
             lead = "testLead",
-            imageUrl = null,
+            imageUrl = "example.com",
             defaultAction = null,
             actions = emptyList<PresentableActionModel>(),
             tags = emptyList(),
@@ -57,30 +58,45 @@ class MessageItemModelTests {
         mockSdkEventDistributor = mock(MockMode.autofill)
         mockSdkEventWaiter = mock(MockMode.autofill)
 
-        messageItemModel = MessageItemModel(
-            message = testMessage,
+        messageItemModel = createMessageItemModel()
+    }
+
+    private fun createMessageItemModel(message: EmbeddedMessage = testMessage): MessageItemModel =
+        MessageItemModel(
+            message = message,
             downloaderApi = mockDownloader,
             fallbackImageProvider = mockFallbackImageProvider,
             sdkEventDistributor = mockSdkEventDistributor
         )
-    }
+
 
     @Test
     fun downloadImage_shouldReturn_Null_when_ImageUrlIsMissing() = runTest {
-        
+        val result = createMessageItemModel(testMessage.copy(imageUrl = null)).downloadImage()
+
+        result shouldBe null
+        verifySuspend(VerifyMode.exactly(0)) { mockDownloader.download(any()) }
+    }
+
+    @Test
+    fun downloadImage_shouldNotCrash_when_ImageDownloadThrows_and_returnNull() = runTest {
+        everySuspend {
+            mockDownloader.download(any())
+        } throws Exception("Download failed")
+
         val result = messageItemModel.downloadImage()
 
         result shouldBe null
-        verifySuspend(VerifyMode.exactly(0)) { mockDownloader }
     }
 
     @Test
     fun downloadImage_shouldCall_downloaderApi() = runTest {
-        everySuspend { mockDownloader.download("example.com") }.returns(ByteArray(0))
+        val expectedUriString = "example.com"
+        everySuspend { mockDownloader.download(expectedUriString) } returns ByteArray(0)
 
         messageItemModel.downloadImage()
 
-        verifySuspend(VerifyMode.exactly(1)) { mockDownloader }
+        verifySuspend(VerifyMode.exactly(1)) { mockDownloader.download(expectedUriString) }
     }
 
     @Test
@@ -99,7 +115,11 @@ class MessageItemModelTests {
         everySuspend { mockSdkEventWaiter.await<Response>() } returns answerResponse
         everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mockSdkEventWaiter
 
-        val result = messageItemModel.updateTagsForMessage(tag = "seen", operation = TagOperation.Add, trackingInfo = "tracking-info-123")
+        val result = messageItemModel.updateTagsForMessage(
+            tag = "seen",
+            operation = TagOperation.Add,
+            trackingInfo = "tracking-info-123"
+        )
 
         result shouldBe true
     }
@@ -115,7 +135,11 @@ class MessageItemModelTests {
         everySuspend { mockSdkEventWaiter.await<Response>() } returns answerResponse
         everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mockSdkEventWaiter
 
-        val result = messageItemModel.updateTagsForMessage(tag = "seen", operation = TagOperation.Add, trackingInfo = "tracking-info-123")
+        val result = messageItemModel.updateTagsForMessage(
+            tag = "seen",
+            operation = TagOperation.Add,
+            trackingInfo = "tracking-info-123"
+        )
 
         result shouldBe false
     }
@@ -136,10 +160,12 @@ class MessageItemModelTests {
         everySuspend { mockSdkEventWaiter.await<Response>() } returns answerResponse
         everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mockSdkEventWaiter
 
-        messageItemModel.updateTagsForMessage(tag = "seen", operation = TagOperation.Add, trackingInfo = "tracking-info-123")
+        messageItemModel.updateTagsForMessage(
+            tag = "seen",
+            operation = TagOperation.Add,
+            trackingInfo = "tracking-info-123"
+        )
 
-        verifySuspend {
-            mockSdkEventDistributor.registerEvent(any())
-        }
+        verifySuspend { mockSdkEventDistributor.registerEvent(any()) }
     }
 }

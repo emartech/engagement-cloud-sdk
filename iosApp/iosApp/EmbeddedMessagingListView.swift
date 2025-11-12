@@ -8,11 +8,10 @@ import SwiftUI
 import EmarsysSDK
 
 
-struct MessageItemView: UIViewControllerRepresentable {
-    typealias UIViewControllerType = UIViewController
-    
+struct EmbeddedMessagingListView: UIViewControllerRepresentable {
+
     func makeUIViewController(context: Context) -> UIViewController {
-        Emarsys.shared.embeddedMessagingItem()
+        Emarsys.shared.embeddedMessage()
     }
     
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
