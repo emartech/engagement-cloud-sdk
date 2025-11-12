@@ -88,14 +88,14 @@ class InitOrganizerTests : KoinTest {
             verifySuspend {
                 mockStateMachine.activate()
             }
-            sdkContext.currentSdkState.value shouldBe SdkState.initialized
+            sdkContext.currentSdkState.value shouldBe SdkState.Initialized
         }
 
     @Test
     fun init_should_not_move_sdkState_backwards_whenInitStateMachine_alreadyActivatedTheSDK() =
         runTest {
             everySuspend { mockStateMachine.activate() } calls {
-                sdkContext.setSdkState(SdkState.active)
+                sdkContext.setSdkState(SdkState.Active)
                 Result.success(Unit)
             }
 
@@ -104,7 +104,7 @@ class InitOrganizerTests : KoinTest {
             verifySuspend {
                 mockStateMachine.activate()
             }
-            sdkContext.currentSdkState.value shouldBe SdkState.active
+            sdkContext.currentSdkState.value shouldBe SdkState.Active
         }
 
     @Test
@@ -118,7 +118,7 @@ class InitOrganizerTests : KoinTest {
             verifySuspend {
                 mockStateMachine.activate()
             }
-            sdkContext.currentSdkState.value shouldBe SdkState.inactive
+            sdkContext.currentSdkState.value shouldBe SdkState.Inactive
             exception shouldBe testException
         }
 }

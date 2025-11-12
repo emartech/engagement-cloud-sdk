@@ -65,9 +65,9 @@ class ReregistrationClientTests {
             sdkEventFlow.emit(event)
 
             verifySuspend(VerifyMode.order) {
-                mockSdkContext.setSdkState(SdkState.onHold)
+                mockSdkContext.setSdkState(SdkState.OnHold)
                 mockMobileEngageReregistrationStateMachine.activate()
-                mockSdkContext.setSdkState(SdkState.active)
+                mockSdkContext.setSdkState(SdkState.Active)
             }
         }
 
@@ -77,19 +77,19 @@ class ReregistrationClientTests {
             reregistrationClient = createReregistrationClient(backgroundScope)
             reregistrationClient.register()
             val testException = Exception("Test exception")
-            everySuspend { mockSdkContext.setSdkState(SdkState.onHold) } throws testException
+            everySuspend { mockSdkContext.setSdkState(SdkState.OnHold) } throws testException
 
             val event = SdkEvent.Internal.Sdk.ReregistrationRequired()
 
             sdkEventFlow.emit(event)
 
             verifySuspend {
-                mockSdkContext.setSdkState(SdkState.onHold)
+                mockSdkContext.setSdkState(SdkState.OnHold)
                 mockSdkLogger.error("Error in re-registration flow collection", testException)
             }
             verifySuspend(VerifyMode.exactly(0)) {
                 mockMobileEngageReregistrationStateMachine.activate()
-                mockSdkContext.setSdkState(SdkState.active)
+                mockSdkContext.setSdkState(SdkState.Active)
             }
         }
 
@@ -106,12 +106,12 @@ class ReregistrationClientTests {
             sdkEventFlow.emit(event)
 
             verifySuspend {
-                mockSdkContext.setSdkState(SdkState.onHold)
+                mockSdkContext.setSdkState(SdkState.OnHold)
                 mockMobileEngageReregistrationStateMachine.activate()
                 mockSdkLogger.error("Error during re-registration", testException)
             }
             verifySuspend(VerifyMode.exactly(0)) {
-                mockSdkContext.setSdkState(SdkState.active)
+                mockSdkContext.setSdkState(SdkState.Active)
             }
         }
 

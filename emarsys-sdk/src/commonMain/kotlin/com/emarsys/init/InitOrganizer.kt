@@ -19,8 +19,8 @@ internal class InitOrganizer(
                 sdkLogger.debug("SDK initialized", it)
             }.getOrThrow()
 
-        if (sdkContext.currentSdkState.value == SdkState.inactive) {
-            sdkContext.setSdkState(SdkState.initialized)
+        if (sdkContext.currentSdkState.value == SdkState.Inactive) {
+            sdkContext.setSdkState(SdkState.Initialized)
         }
     }
 }

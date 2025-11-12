@@ -102,7 +102,7 @@ class InappTests: KoinTest {
     fun testIsPaused_when_onHoldState() = runTest {
         every { mockGathererInApp.isPaused } returns true
 
-        sdkContext.setSdkState(SdkState.onHold)
+        sdkContext.setSdkState(SdkState.OnHold)
         advanceUntilIdle()
 
         inApp.isPaused shouldBe true
@@ -114,7 +114,7 @@ class InappTests: KoinTest {
     fun testIsPaused_when_activeState() = runTest {
         every { mockInAppInternal.isPaused } returns true
 
-        sdkContext.setSdkState(SdkState.active)
+        sdkContext.setSdkState(SdkState.Active)
         advanceUntilIdle()
         inApp.isPaused shouldBe true
 
@@ -134,7 +134,7 @@ class InappTests: KoinTest {
     fun testPause_when_onHoldState() = runTest {
         everySuspend { mockGathererInApp.pause() } returns Unit
 
-        sdkContext.setSdkState(SdkState.onHold)
+        sdkContext.setSdkState(SdkState.OnHold)
         advanceUntilIdle()
 
         inApp.pause()
@@ -145,7 +145,7 @@ class InappTests: KoinTest {
     @Test
     fun testPause_when_activeState() = runTest {
         everySuspend { mockInAppInternal.pause() } returns Unit
-        sdkContext.setSdkState(SdkState.active)
+        sdkContext.setSdkState(SdkState.Active)
         advanceUntilIdle()
 
         inApp.pause()
@@ -157,7 +157,7 @@ class InappTests: KoinTest {
     fun testPause_when_activeState_throws() = runTest {
         everySuspend { mockInAppInternal.pause() } throws testException
 
-        sdkContext.setSdkState(SdkState.active)
+        sdkContext.setSdkState(SdkState.Active)
         advanceUntilIdle()
 
         val result = inApp.pause()
@@ -178,7 +178,7 @@ class InappTests: KoinTest {
     fun testResume_when_onHoldState() = runTest {
         everySuspend { mockGathererInApp.resume() } returns Unit
 
-        sdkContext.setSdkState(SdkState.onHold)
+        sdkContext.setSdkState(SdkState.OnHold)
         advanceUntilIdle()
 
         inApp.resume()
@@ -189,7 +189,7 @@ class InappTests: KoinTest {
     @Test
     fun testResume_when_activeState() = runTest {
         everySuspend { mockInAppInternal.resume() } returns Unit
-        sdkContext.setSdkState(SdkState.active)
+        sdkContext.setSdkState(SdkState.Active)
         advanceUntilIdle()
 
         inApp.resume()
@@ -201,7 +201,7 @@ class InappTests: KoinTest {
     fun testResume_when_activeState_throws() = runTest {
         everySuspend { mockInAppInternal.resume() } throws testException
 
-        sdkContext.setSdkState(SdkState.active)
+        sdkContext.setSdkState(SdkState.Active)
         advanceUntilIdle()
 
         val result = inApp.resume()

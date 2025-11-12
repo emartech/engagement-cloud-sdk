@@ -101,7 +101,7 @@ class SdkEventDistributorTests: KoinTest {
             val testEvents = listOf(testEvent, testEvent2)
             val testConnectionState = MutableStateFlow(true)
             val sdkEventDistributor = createEventDistributor(testConnectionState, sdkContext)
-            sdkContext.setSdkState(SdkState.active)
+            sdkContext.setSdkState(SdkState.Active)
 
             val emittedEvents = backgroundScope.async {
                 sdkEventDistributor.onlineSdkEvents.take(2).toList()
@@ -122,7 +122,7 @@ class SdkEventDistributorTests: KoinTest {
             val testSetupFlowEvent = SdkEvent.Internal.Sdk.AppStart(id = "testId2")
             val testConnectionState = MutableStateFlow(true)
             val sdkEventDistributor = createEventDistributor(testConnectionState, sdkContext)
-            sdkContext.setSdkState(SdkState.onHold)
+            sdkContext.setSdkState(SdkState.OnHold)
 
             val emittedEvents = backgroundScope.async {
                 sdkEventDistributor.onlineSdkEvents.take(1).toList()
@@ -227,7 +227,7 @@ class SdkEventDistributorTests: KoinTest {
             val sdkEventDistributor =
                 createEventDistributor(connectionState = connectionState, sdkContext)
             val testEvent = SdkEvent.External.Custom(id = "testId", name = "testEventName")
-            sdkContext.setSdkState(SdkState.active)
+            sdkContext.setSdkState(SdkState.Active)
 
             val offlineCollected = backgroundScope.async {
                 try {
@@ -260,7 +260,7 @@ class SdkEventDistributorTests: KoinTest {
             val sdkEventDistributor =
                 createEventDistributor(connectionState = connectionState, sdkContext)
             val testEvent = SdkEvent.External.Custom(id = "testId", name = "testEventName")
-            sdkContext.setSdkState(SdkState.onHold)
+            sdkContext.setSdkState(SdkState.OnHold)
 
             val offlineCollected = backgroundScope.async {
                 try {
@@ -283,7 +283,7 @@ class SdkEventDistributorTests: KoinTest {
 
             delay(5000)
 
-            sdkContext.setSdkState(SdkState.active)
+            sdkContext.setSdkState(SdkState.Active)
 
             emittedOnlineEventsWhenOnline.await() shouldBe listOf(testEvent)
         }

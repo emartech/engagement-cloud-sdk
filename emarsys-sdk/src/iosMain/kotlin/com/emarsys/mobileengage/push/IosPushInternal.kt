@@ -196,7 +196,7 @@ internal class IosPushInternal(
                     )
                 }
             }
-            if (sdkContext.currentSdkState.value == SdkState.active) {
+            if (sdkContext.currentSdkState.value == SdkState.Active) {
                 withCompletionHandler(UNNotificationPresentationOptionBanner + UNNotificationPresentationOptionList + UNNotificationPresentationOptionAlert + UNNotificationPresentationOptionSound + UNNotificationPresentationOptionBadge)
             }
         }
@@ -215,7 +215,7 @@ internal class IosPushInternal(
                     )
                 }
             }
-            if (sdkContext.currentSdkState.value == SdkState.active) {
+            if (sdkContext.currentSdkState.value == SdkState.Active) {
                 this.didReceiveNotificationResponse(
                     didReceiveNotificationResponse.actionIdentifier,
                     didReceiveNotificationResponse.notification.request.content.userInfo as Map<String, Any>,

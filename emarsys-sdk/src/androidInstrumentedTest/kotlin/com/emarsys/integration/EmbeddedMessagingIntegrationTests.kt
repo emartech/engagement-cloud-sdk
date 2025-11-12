@@ -16,9 +16,13 @@ import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import com.emarsys.mobileengage.embeddedmessaging.models.MessageTagUpdate
 import com.emarsys.mobileengage.embeddedmessaging.models.TagOperation
-import io.kotest.data.*
+import io.kotest.data.Table2
+import io.kotest.data.forAll
+import io.kotest.data.headers
+import io.kotest.data.row
+import io.kotest.data.table
 import io.kotest.matchers.shouldBe
-import io.ktor.http.*
+import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -51,7 +55,7 @@ class EmbeddedMessagingIntegrationTests {
                 embeddedMessagingBaseUrl = "https://embedded-messaging-staging.gservice.emarsys.com/embedded-messaging/fake-api"
             )
         sdkContext.config = AndroidEmarsysConfig(applicationCode = STAGING_APP_CODE)
-        sdkContext.setSdkState(SdkState.active)
+        sdkContext.setSdkState(SdkState.Active)
         sdkEventDistributor = SdkKoinIsolationContext.koin.get<SdkEventDistributor>()
         embeddedMessagingContext = SdkKoinIsolationContext.koin.get<EmbeddedMessagingContextApi>()
         embeddedMessagingContext.embeddedMessagingFrequencyCapSeconds = 0

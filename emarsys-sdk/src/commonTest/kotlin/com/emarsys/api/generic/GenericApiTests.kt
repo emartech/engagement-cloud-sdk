@@ -1,9 +1,9 @@
 package com.emarsys.api.generic
 
-import com.emarsys.api.SdkState.active
-import com.emarsys.api.SdkState.inactive
-import com.emarsys.api.SdkState.initialized
-import com.emarsys.api.SdkState.onHold
+import com.emarsys.api.SdkState.Active
+import com.emarsys.api.SdkState.Inactive
+import com.emarsys.api.SdkState.Initialized
+import com.emarsys.api.SdkState.OnHold
 import com.emarsys.api.contact.ContactContext
 import com.emarsys.api.contact.ContactContextApi
 import com.emarsys.api.contact.ContactGatherer
@@ -84,7 +84,7 @@ class GenericApiTests : KoinTest {
 
     @Test
     fun testActive_whenSdkState_isInactive() = runTest {
-        sdkContext.setSdkState(inactive)
+        sdkContext.setSdkState(Inactive)
 
         advanceUntilIdle()
 
@@ -93,7 +93,7 @@ class GenericApiTests : KoinTest {
 
     @Test
     fun testActive_whenSdkState_isOnHold() = runTest {
-        sdkContext.setSdkState(onHold)
+        sdkContext.setSdkState(OnHold)
 
         advanceUntilIdle()
 
@@ -102,7 +102,7 @@ class GenericApiTests : KoinTest {
 
     @Test
     fun testActive_whenSdkState_isActive() = runTest {
-        sdkContext.setSdkState(active)
+        sdkContext.setSdkState(Active)
 
         advanceUntilIdle()
 
@@ -111,7 +111,7 @@ class GenericApiTests : KoinTest {
 
     @Test
     fun testActive_whenSdkState_isInitialized() = runTest {
-        sdkContext.setSdkState(initialized)
+        sdkContext.setSdkState(Initialized)
 
         advanceUntilIdle()
 

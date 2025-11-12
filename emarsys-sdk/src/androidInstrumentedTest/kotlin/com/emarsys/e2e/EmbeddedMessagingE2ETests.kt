@@ -13,7 +13,7 @@ import com.emarsys.di.SdkKoinIsolationContext
 import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import io.kotest.matchers.shouldBe
-import io.ktor.http.*
+import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
@@ -46,7 +46,7 @@ class EmbeddedMessagingE2ETests {
                 embeddedMessagingBaseUrl = "https://embedded-messaging-staging.gservice.emarsys.com/embedded-messaging/api"
             )
         sdkContext.config = AndroidEmarsysConfig(applicationCode = STAGING_APP_CODE)
-        sdkContext.setSdkState(SdkState.active)
+        sdkContext.setSdkState(SdkState.Active)
         sdkEventDistributor = SdkKoinIsolationContext.koin.get<SdkEventDistributor>()
         embeddedMessagingContext = SdkKoinIsolationContext.koin.get<EmbeddedMessagingContextApi>()
         embeddedMessagingContext.embeddedMessagingFrequencyCapSeconds = 0

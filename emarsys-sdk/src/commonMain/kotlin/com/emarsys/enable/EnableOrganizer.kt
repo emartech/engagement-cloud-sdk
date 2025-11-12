@@ -26,11 +26,11 @@ internal class EnableOrganizer(
     }
 
     override suspend fun enable(config: SdkConfig) {
-        sdkContext.setSdkState(SdkState.onHold)
+        sdkContext.setSdkState(SdkState.OnHold)
         sdkConfigStore.store(config)
         sdkContext.config = config
         meStateMachine.activate().getOrThrow()
-        sdkContext.setSdkState(SdkState.active)
+        sdkContext.setSdkState(SdkState.Active)
         emarsysSdkSession.startSession()
         sdkLogger.debug("SDK Setup Completed")
     }

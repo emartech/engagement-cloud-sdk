@@ -114,7 +114,7 @@ class PushTests: KoinTest {
             )
         } returns Unit
 
-        sdkContext.setSdkState(SdkState.onHold)
+        sdkContext.setSdkState(SdkState.OnHold)
         push.registerPushToken(PUSH_TOKEN)
 
         verifySuspend {
@@ -132,7 +132,7 @@ class PushTests: KoinTest {
             )
         } returns Unit
 
-        sdkContext.setSdkState(SdkState.active)
+        sdkContext.setSdkState(SdkState.Active)
         push.registerPushToken(PUSH_TOKEN)
 
         verifySuspend {
@@ -151,7 +151,7 @@ class PushTests: KoinTest {
             )
         } throws expectedException
 
-        sdkContext.setSdkState(SdkState.active)
+        sdkContext.setSdkState(SdkState.Active)
         val result = push.registerPushToken(PUSH_TOKEN)
 
         result.onFailure {
@@ -178,7 +178,7 @@ class PushTests: KoinTest {
             mockGathererPush.clearPushToken()
         } returns Unit
 
-        sdkContext.setSdkState(SdkState.onHold)
+        sdkContext.setSdkState(SdkState.OnHold)
         push.clearPushToken()
 
         verifySuspend {
@@ -192,7 +192,7 @@ class PushTests: KoinTest {
             mockPushInternal.clearPushToken()
         } returns Unit
 
-        sdkContext.setSdkState(SdkState.active)
+        sdkContext.setSdkState(SdkState.Active)
         push.clearPushToken()
 
         verifySuspend {
@@ -207,7 +207,7 @@ class PushTests: KoinTest {
             mockPushInternal.clearPushToken()
         } throws expectedException
 
-        sdkContext.setSdkState(SdkState.active)
+        sdkContext.setSdkState(SdkState.Active)
         val result = push.clearPushToken()
 
         result.onFailure {
@@ -234,7 +234,7 @@ class PushTests: KoinTest {
             mockGathererPush.getPushToken()
         } returns PUSH_TOKEN
 
-        sdkContext.setSdkState(SdkState.onHold)
+        sdkContext.setSdkState(SdkState.OnHold)
 
         val result = push.getPushToken()
 
@@ -249,7 +249,7 @@ class PushTests: KoinTest {
             mockPushInternal.getPushToken()
         } returns PUSH_TOKEN
 
-        sdkContext.setSdkState(SdkState.active)
+        sdkContext.setSdkState(SdkState.Active)
 
         val result = push.getPushToken()
 

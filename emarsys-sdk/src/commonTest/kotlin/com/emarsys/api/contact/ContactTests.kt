@@ -97,7 +97,7 @@ class ContactTests : KoinTest {
             )
         } returns Unit
 
-        sdkContext.setSdkState(SdkState.inactive)
+        sdkContext.setSdkState(SdkState.Inactive)
         contact.link(CONTACT_FIELD_VALUE)
 
         verifySuspend {
@@ -115,7 +115,7 @@ class ContactTests : KoinTest {
             )
         } returns Unit
 
-        sdkContext.setSdkState(SdkState.onHold)
+        sdkContext.setSdkState(SdkState.OnHold)
         contact.link(CONTACT_FIELD_VALUE)
 
         verifySuspend {
@@ -133,7 +133,7 @@ class ContactTests : KoinTest {
             )
         } returns Unit
 
-        sdkContext.setSdkState(SdkState.active)
+        sdkContext.setSdkState(SdkState.Active)
         contact.link(CONTACT_FIELD_VALUE)
 
         verifySuspend {
@@ -152,7 +152,7 @@ class ContactTests : KoinTest {
             )
         } throws testException
 
-        sdkContext.setSdkState(SdkState.active)
+        sdkContext.setSdkState(SdkState.Active)
         val result = contact.link(CONTACT_FIELD_VALUE)
 
         result.exceptionOrNull() shouldBe testException
@@ -166,7 +166,7 @@ class ContactTests : KoinTest {
             )
         } returns Unit
 
-        sdkContext.setSdkState(SdkState.inactive)
+        sdkContext.setSdkState(SdkState.Inactive)
         contact.linkAuthenticated(OPEN_ID_TOKEN)
 
         verifySuspend {
@@ -186,7 +186,7 @@ class ContactTests : KoinTest {
             )
         } returns Unit
 
-        sdkContext.setSdkState(SdkState.onHold)
+        sdkContext.setSdkState(SdkState.OnHold)
         contact.linkAuthenticated(OPEN_ID_TOKEN)
 
         verifySuspend {
@@ -205,7 +205,7 @@ class ContactTests : KoinTest {
             )
         } returns Unit
 
-        sdkContext.setSdkState(SdkState.active)
+        sdkContext.setSdkState(SdkState.Active)
         contact.linkAuthenticated(OPEN_ID_TOKEN)
 
         verifySuspend {
@@ -223,7 +223,7 @@ class ContactTests : KoinTest {
             )
         } throws testException
 
-        sdkContext.setSdkState(SdkState.active)
+        sdkContext.setSdkState(SdkState.Active)
         val result = contact.linkAuthenticated(OPEN_ID_TOKEN)
 
         result.exceptionOrNull() shouldBe testException
@@ -235,7 +235,7 @@ class ContactTests : KoinTest {
             mockLoggingContact.unlink()
         } returns Unit
 
-        sdkContext.setSdkState(SdkState.inactive)
+        sdkContext.setSdkState(SdkState.Inactive)
         contact.unlink()
 
         verifySuspend {
@@ -249,7 +249,7 @@ class ContactTests : KoinTest {
             mockGathererContact.unlink()
         } returns Unit
 
-        sdkContext.setSdkState(SdkState.onHold)
+        sdkContext.setSdkState(SdkState.OnHold)
         contact.unlink()
 
         verifySuspend {
@@ -263,7 +263,7 @@ class ContactTests : KoinTest {
             mockContactInternal.unlink()
         } returns Unit
 
-        sdkContext.setSdkState(SdkState.active)
+        sdkContext.setSdkState(SdkState.Active)
         contact.unlink()
 
         verifySuspend {
@@ -277,7 +277,7 @@ class ContactTests : KoinTest {
             mockContactInternal.unlink()
         } throws testException
 
-        sdkContext.setSdkState(SdkState.active)
+        sdkContext.setSdkState(SdkState.Active)
         val result = contact.unlink()
 
         result.exceptionOrNull() shouldBe testException

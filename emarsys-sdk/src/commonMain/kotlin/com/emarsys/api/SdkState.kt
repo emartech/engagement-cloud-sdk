@@ -1,8 +1,8 @@
 package com.emarsys.api
 
 enum class SdkState {
-    active,
-    onHold,
-    inactive,
-    initialized
+    Active,
+    OnHold,
+    Inactive,
+    Initialized
 }

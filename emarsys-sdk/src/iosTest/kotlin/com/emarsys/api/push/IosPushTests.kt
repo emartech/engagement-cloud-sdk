@@ -174,7 +174,7 @@ class IosPushTests: KoinTest {
             )
         } returns Unit
 
-        sdkContext.setSdkState(SdkState.onHold)
+        sdkContext.setSdkState(SdkState.OnHold)
         iosPushWrapper.registerPushToken(PUSH_TOKEN)
 
         verifySuspend { mockGathererPush.registerPushToken(PUSH_TOKEN) }
@@ -188,7 +188,7 @@ class IosPushTests: KoinTest {
             )
         } returns Unit
 
-        sdkContext.setSdkState(SdkState.active)
+        sdkContext.setSdkState(SdkState.Active)
         iosPushWrapper.registerPushToken(PUSH_TOKEN)
 
         verifySuspend {
@@ -207,7 +207,7 @@ class IosPushTests: KoinTest {
             )
         } throws expectedException
 
-        sdkContext.setSdkState(SdkState.active)
+        sdkContext.setSdkState(SdkState.Active)
         val result = iosPushWrapper.registerPushToken(PUSH_TOKEN)
 
         result.isFailure shouldBe true
@@ -233,7 +233,7 @@ class IosPushTests: KoinTest {
             mockGathererPush.clearPushToken()
         } returns Unit
 
-        sdkContext.setSdkState(SdkState.onHold)
+        sdkContext.setSdkState(SdkState.OnHold)
         iosPushWrapper.clearPushToken()
 
         verifySuspend {
@@ -247,7 +247,7 @@ class IosPushTests: KoinTest {
             mockPushInternal.clearPushToken()
         } returns Unit
 
-        sdkContext.setSdkState(SdkState.active)
+        sdkContext.setSdkState(SdkState.Active)
         iosPushWrapper.clearPushToken()
 
         verifySuspend {
@@ -262,7 +262,7 @@ class IosPushTests: KoinTest {
             mockPushInternal.clearPushToken()
         } throws expectedException
 
-        sdkContext.setSdkState(SdkState.active)
+        sdkContext.setSdkState(SdkState.Active)
         val result = iosPushWrapper.clearPushToken()
 
         result.isFailure shouldBe true
@@ -288,7 +288,7 @@ class IosPushTests: KoinTest {
             mockGathererPush.getPushToken()
         } returns PUSH_TOKEN
 
-        sdkContext.setSdkState(SdkState.onHold)
+        sdkContext.setSdkState(SdkState.OnHold)
 
         val result = iosPushWrapper.getPushToken()
 
@@ -303,7 +303,7 @@ class IosPushTests: KoinTest {
             mockPushInternal.getPushToken()
         } returns PUSH_TOKEN
 
-        sdkContext.setSdkState(SdkState.active)
+        sdkContext.setSdkState(SdkState.Active)
 
         val result = iosPushWrapper.getPushToken()
 
@@ -329,7 +329,7 @@ class IosPushTests: KoinTest {
             mockGathererPush.customerUserNotificationCenterDelegate
         } returns listOf(testUNUserNotificationCenterDelegateProtocol)
 
-        sdkContext.setSdkState(SdkState.onHold)
+        sdkContext.setSdkState(SdkState.OnHold)
 
         advanceUntilIdle()
 
@@ -344,7 +344,7 @@ class IosPushTests: KoinTest {
             mockPushInternal.customerUserNotificationCenterDelegate
         } returns listOf(testUNUserNotificationCenterDelegateProtocol)
 
-        sdkContext.setSdkState(SdkState.active)
+        sdkContext.setSdkState(SdkState.Active)
 
         advanceUntilIdle()
 
@@ -370,7 +370,7 @@ class IosPushTests: KoinTest {
             mockGathererPush.emarsysUserNotificationCenterDelegate
         } returns testUNUserNotificationCenterDelegateProtocol
 
-        sdkContext.setSdkState(SdkState.onHold)
+        sdkContext.setSdkState(SdkState.OnHold)
 
         advanceUntilIdle()
 
@@ -385,7 +385,7 @@ class IosPushTests: KoinTest {
             mockPushInternal.emarsysUserNotificationCenterDelegate
         } returns testUNUserNotificationCenterDelegateProtocol
 
-        sdkContext.setSdkState(SdkState.active)
+        sdkContext.setSdkState(SdkState.Active)
 
         advanceUntilIdle()
 
@@ -413,7 +413,7 @@ class IosPushTests: KoinTest {
             mockGathererPush.handleSilentMessageWithUserInfo(any())
         } returns Unit
 
-        sdkContext.setSdkState(SdkState.onHold)
+        sdkContext.setSdkState(SdkState.OnHold)
         iosPushWrapper.handleSilentMessageWithUserInfo(SILENT_USER_INFO_MAP)
 
         verifySuspend { mockGathererPush.handleSilentMessageWithUserInfo(SILENT_PUSH_USER_INFO) }
@@ -425,7 +425,7 @@ class IosPushTests: KoinTest {
             mockPushInternal.handleSilentMessageWithUserInfo(any())
         } returns Unit
 
-        sdkContext.setSdkState(SdkState.active)
+        sdkContext.setSdkState(SdkState.Active)
         iosPushWrapper.handleSilentMessageWithUserInfo(SILENT_USER_INFO_MAP)
 
         verifySuspend { mockPushInternal.handleSilentMessageWithUserInfo(SILENT_PUSH_USER_INFO) }
@@ -439,7 +439,7 @@ class IosPushTests: KoinTest {
                 mockPushInternal.handleSilentMessageWithUserInfo(any())
             } returns Unit
 
-            sdkContext.setSdkState(SdkState.active)
+            sdkContext.setSdkState(SdkState.Active)
             val result = iosPushWrapper.handleSilentMessageWithUserInfo(invalidUserInfoMap)
 
             result.isFailure shouldBe true

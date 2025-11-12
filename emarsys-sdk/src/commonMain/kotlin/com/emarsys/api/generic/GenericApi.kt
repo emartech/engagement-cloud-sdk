@@ -43,10 +43,10 @@ internal open class GenericApi<Logging : Activatable, Gatherer : Activatable, In
     private suspend fun setActiveInstance(state: SdkState) {
         activate(
             when (state) {
-                SdkState.active -> internalApi
-                SdkState.onHold -> gathererApi
-                SdkState.inactive -> loggingApi
-                SdkState.initialized -> loggingApi
+                SdkState.Active -> internalApi
+                SdkState.OnHold -> gathererApi
+                SdkState.Inactive -> loggingApi
+                SdkState.Initialized -> loggingApi
             }
         )
     }

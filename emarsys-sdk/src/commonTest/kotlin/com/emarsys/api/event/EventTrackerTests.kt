@@ -115,7 +115,7 @@ class EventTrackerTests: KoinTest {
         } returns Unit
 
 
-        sdkContext.setSdkState(SdkState.onHold)
+        sdkContext.setSdkState(SdkState.OnHold)
         eventTracker.trackEvent(event)
 
         verifySuspend {
@@ -129,7 +129,7 @@ class EventTrackerTests: KoinTest {
             mockEventTrackerInternal.trackEvent(event)
         } returns Unit
 
-        sdkContext.setSdkState(SdkState.active)
+        sdkContext.setSdkState(SdkState.Active)
         eventTracker.trackEvent(event)
 
         verifySuspend {
@@ -144,7 +144,7 @@ class EventTrackerTests: KoinTest {
             mockEventTrackerInternal.trackEvent(event)
         } throws expectException
 
-        sdkContext.setSdkState(SdkState.active)
+        sdkContext.setSdkState(SdkState.Active)
         val result = eventTracker.trackEvent(event)
 
         result.exceptionOrNull() shouldBe expectException

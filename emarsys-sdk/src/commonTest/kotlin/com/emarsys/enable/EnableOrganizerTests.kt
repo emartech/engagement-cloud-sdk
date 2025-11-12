@@ -103,7 +103,7 @@ class EnableOrganizerTests: KoinTest {
                 mockMeStateMachine.activate()
             }
             sdkContext.config shouldBe config
-            sdkContext.currentSdkState.value shouldBe SdkState.active
+            sdkContext.currentSdkState.value shouldBe SdkState.Active
             verifySuspend { mockSession.startSession() }
         }
 
@@ -136,7 +136,7 @@ class EnableOrganizerTests: KoinTest {
                 mockMeStateMachine.activate()
             }
             sdkContext.config shouldBe config
-            sdkContext.currentSdkState.value shouldBe SdkState.active
+            sdkContext.currentSdkState.value shouldBe SdkState.Active
         }
 
     @Test
@@ -155,7 +155,7 @@ class EnableOrganizerTests: KoinTest {
                 mockMeStateMachine.activate()
             }
             sdkContext.config shouldBe config
-            sdkContext.currentSdkState.value shouldBe SdkState.onHold
+            sdkContext.currentSdkState.value shouldBe SdkState.OnHold
             verifySuspend(VerifyMode.exactly(0)) { mockSession.startSession() }
         }
 }

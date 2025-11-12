@@ -158,7 +158,7 @@ class ConfigTest : KoinTest {
         val newAppCode = "newAppCode"
         everySuspend { mockGathererConfig.changeApplicationCode(newAppCode) } returns Unit
 
-        sdkContext.setSdkState(SdkState.onHold)
+        sdkContext.setSdkState(SdkState.OnHold)
         config.changeApplicationCode(newAppCode)
 
         verifySuspend {
@@ -170,7 +170,7 @@ class ConfigTest : KoinTest {
     fun testResetLanguage_delegatesToCorrectInstance() = runTest {
         everySuspend { mockGathererConfig.resetLanguage() } returns Unit
 
-        sdkContext.setSdkState(SdkState.onHold)
+        sdkContext.setSdkState(SdkState.OnHold)
         config.resetLanguage()
 
         verifySuspend {
