@@ -1,5 +1,6 @@
 package com.emarsys.api.config
 
+import com.emarsys.api.SdkState
 import com.emarsys.core.device.notification.PermissionState
 import com.emarsys.core.device.notification.WebNotificationSettings
 import com.emarsys.core.device.notification.WebNotificationSettingsCollectorApi
@@ -28,7 +29,6 @@ class JSConfigTests {
     private companion object {
         val testFailureResult = Result.failure<Unit>(Exception())
     }
-
 
     private lateinit var mockConfigApi: ConfigApi
     private lateinit var mockWebNotificationSettingsCollector: WebNotificationSettingsCollectorApi
@@ -75,6 +75,14 @@ class JSConfigTests {
 
         verifySuspend { mockConfigApi.getSdkVersion() }
     }
+
+    @Test
+    fun getCurrentSdkState_shouldCall_getCurrentSdkState_onConfigApi_andReturnCorrectStateString() =
+        runTest {
+            everySuspend { mockConfigApi.getCurrentSdkState() } returns SdkState.Active
+
+            jSConfig.getCurrentSdkState().await() shouldBe JSSdkState.ACTIVE
+        }
 
     @Test
     fun getNotificationSettings_shouldCall_collect_onWebNotificationSettingsCollectorApi() =

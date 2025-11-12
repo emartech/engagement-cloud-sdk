@@ -1,5 +1,6 @@
 package com.emarsys.api.config
 
+import com.emarsys.api.SdkState
 import com.emarsys.core.device.IosAlertStyle
 import com.emarsys.core.device.IosAuthorizationStatus
 import com.emarsys.core.device.IosNotificationSetting
@@ -86,6 +87,15 @@ class IosConfigTests {
         iosConfig.getSdkVersion()
 
         verifySuspend { mockConfigApi.getSdkVersion() }
+    }
+
+    @Test
+    fun getCurrentSdkState_shouldCall_sameMethod_onConfigApi() = runTest {
+        everySuspend { mockConfigApi.getCurrentSdkState() } returns SdkState.Active
+
+        iosConfig.getCurrentSdkState()
+
+        verifySuspend { mockConfigApi.getCurrentSdkState() }
     }
 
     @Test

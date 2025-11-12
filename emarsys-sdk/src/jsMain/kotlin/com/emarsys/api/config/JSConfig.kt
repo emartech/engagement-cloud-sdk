@@ -42,6 +42,12 @@ internal class JSConfig(
         }
     }
 
+    override fun getCurrentSdkState(): Promise<String> {
+        return applicationScope.promise {
+            configApi.getCurrentSdkState().toJsSdkState()
+        }
+    }
+
     override fun changeApplicationCode(applicationCode: String): Promise<Unit> {
         return applicationScope.promise {
             configApi.changeApplicationCode(applicationCode).getOrThrow()

@@ -1,5 +1,6 @@
 package com.emarsys.api.config
 
+import com.emarsys.api.SdkState
 import com.emarsys.core.device.notification.IosNotificationSettings
 import com.emarsys.core.device.notification.IosNotificationSettingsCollectorApi
 
@@ -18,6 +19,8 @@ internal class IosConfig(
         configApi.getApplicationVersion()
 
     override suspend fun getSdkVersion(): String = configApi.getSdkVersion()
+
+    override suspend fun getCurrentSdkState(): SdkState = configApi.getCurrentSdkState()
 
     override suspend fun getNotificationSettings(): IosNotificationSettings {
         return iosNotificationSettingsCollector.collect()

@@ -154,6 +154,16 @@ class ConfigTest : KoinTest {
     }
 
     @Test
+    fun testCurrentSdkState_returnsCorrectValue() = runTest {
+        sdkContext.setSdkState(SdkState.Inactive)
+
+        config.getCurrentSdkState() shouldBe SdkState.Inactive
+
+        sdkContext.setSdkState(SdkState.Active)
+        config.getCurrentSdkState() shouldBe SdkState.Active
+    }
+
+    @Test
     fun testChangeApplicationCode_delegatesToCorrectInstance() = runTest {
         val newAppCode = "newAppCode"
         everySuspend { mockGathererConfig.changeApplicationCode(newAppCode) } returns Unit

@@ -1,6 +1,7 @@
 package com.emarsys.api.config
 
 import Activatable
+import com.emarsys.api.SdkState
 import com.emarsys.api.generic.GenericApi
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.device.DeviceInfo
@@ -36,6 +37,8 @@ internal class Config<Logging : ConfigInstance, Gatherer : ConfigInstance, Inter
     override suspend fun getApplicationVersion(): String = getDeviceInfo().applicationVersion
 
     override suspend fun getSdkVersion(): String = getDeviceInfo().sdkVersion
+
+    override suspend fun getCurrentSdkState(): SdkState = sdkContext.currentSdkState.value
 
     override suspend fun changeApplicationCode(applicationCode: String): Result<Unit> =
         runCatching {

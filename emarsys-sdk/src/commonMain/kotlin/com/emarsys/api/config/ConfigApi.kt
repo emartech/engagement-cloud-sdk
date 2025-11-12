@@ -1,5 +1,6 @@
 package com.emarsys.api.config
 
+import com.emarsys.api.SdkState
 import com.emarsys.core.device.NotificationSettings
 
 /**
@@ -43,6 +44,14 @@ interface ConfigApi {
      * @return The SDK version number as a string.
      */
     suspend fun getSdkVersion(): String
+
+    /**
+     * Retrieves the current state of the SDK.
+     * Possible states include Active, OnHold, Inactive, and Initialized.
+     *
+     * @return The SDK state as an SdkState enum.
+     */
+    suspend fun getCurrentSdkState(): SdkState
 
     /**
      * Changes the application code.

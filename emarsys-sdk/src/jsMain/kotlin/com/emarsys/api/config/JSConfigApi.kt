@@ -11,6 +11,7 @@ interface JSConfigApi {
     fun getLanguageCode(): Promise<String>
     fun getApplicationVersion(): Promise<String>
     fun getSdkVersion(): Promise<String>
+    fun getCurrentSdkState(): Promise<String>
     fun changeApplicationCode(applicationCode: String): Promise<Unit>
     fun setLanguage(language: String): Promise<Unit>
     fun resetLanguage(): Promise<Unit>

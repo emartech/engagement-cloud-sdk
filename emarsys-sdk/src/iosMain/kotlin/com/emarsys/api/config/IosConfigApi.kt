@@ -1,5 +1,6 @@
 package com.emarsys.api.config
 
+import com.emarsys.api.SdkState
 import com.emarsys.core.device.notification.IosNotificationSettings
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -9,6 +10,7 @@ interface IosConfigApi {
     suspend fun getLanguageCode(): String
     suspend fun getApplicationVersion(): String
     suspend fun getSdkVersion(): String
+    suspend fun getCurrentSdkState(): SdkState
     suspend fun getNotificationSettings(): IosNotificationSettings
 
     @Throws(CancellationException::class)
