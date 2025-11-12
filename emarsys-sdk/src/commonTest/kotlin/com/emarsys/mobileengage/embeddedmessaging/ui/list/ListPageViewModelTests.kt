@@ -1,5 +1,6 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.list
 
+import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.embeddedmessaging.provider.FallbackImageProviderApi
@@ -8,6 +9,7 @@ import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
 import dev.mokkery.every
+import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CoroutineScope
@@ -28,6 +30,7 @@ class ListPageViewModelTests {
     private lateinit var mockModel: ListPageModelApi
     private lateinit var mockDownloaderApi: DownloaderApi
     private lateinit var mockFallbackImageProvider: FallbackImageProviderApi
+    private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
     private val testDispatcher = StandardTestDispatcher()
 
     @BeforeTest
@@ -36,6 +39,7 @@ class ListPageViewModelTests {
         mockModel = mock(MockMode.autofill)
         mockFallbackImageProvider = mock(MockMode.autofill)
         mockDownloaderApi = mock(MockMode.autofill)
+        mockSdkEventDistributor = mock(MockMode.autofill)
     }
 
     @AfterTest
@@ -45,7 +49,7 @@ class ListPageViewModelTests {
 
     @Test
     fun messages_shouldBeEmpty_when_ViewModelIsCreated() = runTest(testDispatcher) {
-        every { mockModel.fetchMessages() } returns emptyList()
+        everySuspend { mockModel.fetchMessages() } returns emptyList()
         val viewModel = createViewModel()
 
         val result = viewModel.messages.value
@@ -59,7 +63,7 @@ class ListPageViewModelTests {
             createTestMessage(id = "1", title = "Title1", lead = "Lead1"),
             createTestMessage(id = "2", title = "Title2", lead = "Lead2")
         )
-        every { mockModel.fetchMessages() } returns testMessages
+        everySuspend { mockModel.fetchMessages() } returns testMessages
         val viewModel = createViewModel()
 
         viewModel.refreshMessages()
@@ -77,7 +81,7 @@ class ListPageViewModelTests {
 
     @Test
     fun messages_shouldBeEmpty_when_fetchMessagesThrowsException() = runTest(testDispatcher) {
-        every { mockModel.fetchMessages() } throws RuntimeException("Network error")
+        everySuspend { mockModel.fetchMessages() } throws RuntimeException("Network error")
         val viewModel = createViewModel()
 
         viewModel.refreshMessages()
@@ -94,7 +98,7 @@ class ListPageViewModelTests {
             createTestMessage(id = "2", title = "Second"),
             createTestMessage(id = "3", title = "Third")
         )
-        every { mockModel.fetchMessages() } returns firstMessages
+        everySuspend { mockModel.fetchMessages() } returns firstMessages
         val viewModel = createViewModel()
 
         viewModel.refreshMessages()
@@ -103,7 +107,7 @@ class ListPageViewModelTests {
         firstResult.size shouldBe 1
         firstResult[0].id shouldBe "1"
 
-        every { mockModel.fetchMessages() } returns secondMessages
+        everySuspend { mockModel.fetchMessages() } returns secondMessages
         viewModel.refreshMessages()
         advanceUntilIdle()
         val secondResult = viewModel.messages.value
@@ -121,7 +125,7 @@ class ListPageViewModelTests {
             imageUrl = "https://example.com/image.jpg",
             receivedAt = 1234567890L
         )
-        every { mockModel.fetchMessages() } returns listOf(testMessage)
+        everySuspend { mockModel.fetchMessages() } returns listOf(testMessage)
         val viewModel = createViewModel()
 
         viewModel.refreshMessages()
@@ -141,6 +145,7 @@ class ListPageViewModelTests {
         mockModel,
         mockDownloaderApi,
         mockFallbackImageProvider,
+        mockSdkEventDistributor,
         CoroutineScope(SupervisorJob() + testDispatcher)
     )
 
