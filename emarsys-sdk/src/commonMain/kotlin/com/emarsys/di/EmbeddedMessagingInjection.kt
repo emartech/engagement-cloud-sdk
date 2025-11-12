@@ -1,9 +1,19 @@
 package com.emarsys.di
 
-import com.emarsys.mobileengage.embeddedmessaging.networking.EmbeddedMessagesRequestFactory
+import com.emarsys.core.util.DownloaderApi
+import com.emarsys.di.CoroutineScopeTypes
 import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContext
 import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
+import com.emarsys.mobileengage.embeddedmessaging.networking.EmbeddedMessagesRequestFactory
 import com.emarsys.mobileengage.embeddedmessaging.networking.EmbeddedMessagingRequestFactoryApi
+import com.emarsys.mobileengage.embeddedmessaging.provider.FallbackImageProvider
+import com.emarsys.mobileengage.embeddedmessaging.provider.FallbackImageProviderApi
+import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageModel
+import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageModelApi
+import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageViewModel
+import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageViewModelApi
+import kotlinx.coroutines.CoroutineScope
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 object EmbeddedMessagingInjection {
@@ -16,6 +26,20 @@ object EmbeddedMessagingInjection {
         }
         single<EmbeddedMessagingContextApi>{
             EmbeddedMessagingContext()
+        }
+        single<FallbackImageProviderApi> {
+            FallbackImageProvider()
+        }
+        single<ListPageModelApi> {
+            ListPageModel()
+        }
+        factory<ListPageViewModelApi> {
+            ListPageViewModel(
+                model = get<ListPageModelApi>(),
+                downloaderApi = get<DownloaderApi>(),
+                fallbackImageProvider = get<FallbackImageProviderApi>(),
+                coroutineScope = get<CoroutineScope>(named(CoroutineScopeTypes.Application))
+            )
         }
     }
 }

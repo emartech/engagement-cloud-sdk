@@ -9,15 +9,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.emarsys.core.util.DownloaderApi
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemView
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModel
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun ListPageView(
-    viewModel: ListPageViewModelApi
+    viewModel: ListPageViewModelApi = koin.get()
 ) {
     Column {
         MessageList(viewModel)
