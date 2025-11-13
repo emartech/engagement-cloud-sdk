@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface ListPageViewModelApi {
     val messages: StateFlow<List<MessageItemViewModel>>
+    val isRefreshing: StateFlow<Boolean>
 
     fun refreshMessages()
 }

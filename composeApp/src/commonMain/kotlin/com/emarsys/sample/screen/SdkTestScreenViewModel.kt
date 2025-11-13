@@ -40,6 +40,18 @@ class SdkTestScreenViewModel {
         }
     }
 
+    fun unLinkContact() {
+        viewModelScope.launch {
+            Emarsys.contact.unlink()
+        }
+    }
+
+    fun linkContact() {
+        viewModelScope.launch {
+            Emarsys.contact.link("test@test.com")
+        }
+    }
+
     fun trackCustomEvent() {
         val eventNameValue = _eventName.value
         if (eventNameValue.isNotBlank()) {

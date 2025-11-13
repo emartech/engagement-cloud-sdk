@@ -1,14 +1,19 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.list
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemView
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModel
@@ -22,9 +27,11 @@ fun ListPageView(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageList(viewModel: ListPageViewModelApi) {
     var messages by remember { mutableStateOf<List<MessageItemViewModel>>(emptyList()) }
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.refreshMessages()
@@ -34,9 +41,15 @@ fun MessageList(viewModel: ListPageViewModelApi) {
         }
     }
 
-    LazyColumn {
-        items(items = messages, key = { it.id }) { messageViewModel ->
-            MessageItemView(messageViewModel)
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = { viewModel.refreshMessages() },
+        modifier = Modifier.fillMaxSize()
+    ) {
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
+            items(items = messages, key = { it.id }) { messageViewModel ->
+                MessageItemView(messageViewModel)
+            }
         }
     }
 }

@@ -21,6 +21,14 @@ internal class ListPageViewModel(
     private val _messages = MutableStateFlow<List<MessageItemViewModel>>(emptyList())
     override val messages: StateFlow<List<MessageItemViewModel>> = _messages.asStateFlow()
 
+    private val _isRefreshing = MutableStateFlow(false)
+    override val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
+
+    override fun refreshMessages() {
+        _isRefreshing.value = true
+        loadMessages()
+    }
+
     private fun loadMessages() {
         coroutineScope.launch {
             //TODO: move error handling and fallback image providing inside model
@@ -31,11 +39,10 @@ internal class ListPageViewModel(
                 _messages.value = messageViewModels
             } catch (e: Exception) {
                 _messages.value = emptyList()
+            } finally {
+                _isRefreshing.value = false
             }
         }
     }
 
-    override fun refreshMessages() {
-        loadMessages()
-    }
 }

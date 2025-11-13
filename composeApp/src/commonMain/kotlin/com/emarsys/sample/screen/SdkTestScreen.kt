@@ -22,7 +22,7 @@ fun SdkTestScreen(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text("Hello Team SDK!")
-        
+
         Button(onClick = { viewModel.initializeSdk() }) {
             Text("Init SDK")
         }
@@ -30,16 +30,23 @@ fun SdkTestScreen(
         Button(onClick = { viewModel.enableSdkAndLinkContact() }) {
             Text("enable SDK & link contact")
         }
+        Button(onClick = { viewModel.linkContact() }) {
+            Text("link contact (test2@test.com)")
+        }
+
+        Button(onClick = { viewModel.unLinkContact() }) {
+            Text("unlink contact")
+        }
 
         TextField(
             value = eventName,
             onValueChange = { viewModel.updateEventName(it) }
         )
-        
+
         Button(onClick = { viewModel.trackCustomEvent() }) {
             Text("trackCustomEvent")
         }
-        
+
         Switch(
             checked = switchValue,
             onCheckedChange = { viewModel.toggleInAppDnd(it) }

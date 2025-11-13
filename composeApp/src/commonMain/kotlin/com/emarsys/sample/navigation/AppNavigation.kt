@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageView
 import com.emarsys.sample.safeAreaPadding
 import com.emarsys.sample.screen.SdkTestScreen
 
@@ -33,6 +34,7 @@ fun AppNavigation(
                     SdkTestScreen()
                 }
                 NavigationTab.EMBEDDED_MESSAGING -> {
+                    ListPageView()
                 }
             }
         }

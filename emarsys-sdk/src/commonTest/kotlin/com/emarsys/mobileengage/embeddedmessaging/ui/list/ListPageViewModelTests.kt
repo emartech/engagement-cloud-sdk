@@ -8,7 +8,6 @@ import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
-import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
@@ -139,6 +138,68 @@ class ListPageViewModelTests {
         messageViewModel.lead shouldBe "Test Lead"
         messageViewModel.imageUrl shouldBe "https://example.com/image.jpg"
         messageViewModel.receivedAt shouldBe 1234567890L
+    }
+
+    @Test
+    fun isRefreshing_shouldBeFalse_whenViewModelIsCreated() = runTest(testDispatcher) {
+        val viewModel = createViewModel()
+
+        val result = viewModel.isRefreshing.value
+
+        result shouldBe false
+    }
+
+    @Test
+    fun isRefreshing_shouldBeTrue_whenRefreshStarts() = runTest(testDispatcher) {
+        everySuspend { mockModel.fetchMessages() } returns emptyList()
+        val viewModel = createViewModel()
+
+        viewModel.refreshMessages()
+
+        val result = viewModel.isRefreshing.value
+        result shouldBe true
+    }
+
+    @Test
+    fun isRefreshing_shouldBeFalse_whenRefreshCompletes() = runTest(testDispatcher) {
+        everySuspend { mockModel.fetchMessages() } returns emptyList()
+        val viewModel = createViewModel()
+
+        viewModel.refreshMessages()
+
+        advanceUntilIdle()
+
+        val result = viewModel.isRefreshing.value
+        result shouldBe false
+    }
+
+    @Test
+    fun isRefreshing_shouldBeFalse_whenRefreshFails() = runTest(testDispatcher) {
+        everySuspend { mockModel.fetchMessages() } throws RuntimeException("Network error")
+        val viewModel = createViewModel()
+
+        viewModel.refreshMessages()
+
+        advanceUntilIdle()
+
+        val result = viewModel.isRefreshing.value
+        result shouldBe false
+    }
+
+    @Test
+    fun refreshMessages_shouldUpdateIsRefreshingState() = runTest(testDispatcher) {
+        val testMessages = listOf(createTestMessage(id = "1", title = "Title1"))
+        everySuspend { mockModel.fetchMessages() } returns testMessages
+        val viewModel = createViewModel()
+
+        viewModel.isRefreshing.value shouldBe false
+
+        viewModel.refreshMessages()
+        viewModel.isRefreshing.value shouldBe true
+
+        advanceUntilIdle()
+
+        viewModel.isRefreshing.value shouldBe false
     }
 
     private fun createViewModel(): ListPageViewModel = ListPageViewModel(
