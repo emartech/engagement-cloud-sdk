@@ -2,11 +2,15 @@ package com.emarsys.core.log
 
 import kotlinx.serialization.json.JsonObject
 
- interface Logger {
+interface Logger {
     suspend fun info(logEntry: LogEntry, isRemoteLog: Boolean = true)
     suspend fun info(message: String, isRemoteLog: Boolean = true)
     suspend fun info(message: String, throwable: Throwable, isRemoteLog: Boolean = true)
     suspend fun info(message: String, data: JsonObject, isRemoteLog: Boolean = true)
+
+    suspend fun trace(message: String, isRemoteLog: Boolean = true)
+
+    suspend fun trace(message: String, data: JsonObject, isRemoteLog: Boolean = true)
 
     suspend fun debug(logEntry: LogEntry, isRemoteLog: Boolean = true)
     suspend fun debug(message: String, isRemoteLog: Boolean = true)

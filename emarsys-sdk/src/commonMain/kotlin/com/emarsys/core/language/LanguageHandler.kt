@@ -23,7 +23,7 @@ internal class LanguageHandler(
                 sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.DeviceInfoUpdateRequired())
             } else {
                 val message = "Language $language is not supported!"
-                logger.debug(message)
+                logger.error(message)
                 throw PreconditionFailedException(message)
             }
         } else {

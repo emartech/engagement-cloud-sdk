@@ -60,17 +60,20 @@ class EmarsysIndexedDbObjectStore<T>(
                     continuation.resumeWithException(request.error!!)
                 }
             }
-            logger.debug("EmarsysIndexedDbObjectStore - put", buildJsonObject {
+            logger.trace("EmarsysIndexedDbObjectStore - put", buildJsonObject {
                 put("value", value.toString())
                 put("id", id)
-            }, isRemoteLog = value !is SdkEvent.Internal.LogEvent)
+            }, isRemoteLog = false)
             savedId
         }
     }
 
     override suspend fun getAll(): Flow<T> {
         return emarsysIndexedDb.execute { database ->
-            logger.debug("Fetching all data from store: ${emarsysObjectStoreConfig.name}")
+            logger.trace(
+                "Fetching all data from store: ${emarsysObjectStoreConfig.name}",
+                isRemoteLog = false
+            )
             suspendCoroutine { continuation ->
                 val transaction = database.transaction(
                     emarsysObjectStoreConfig.name,
@@ -107,9 +110,9 @@ class EmarsysIndexedDbObjectStore<T>(
 
     suspend fun get(id: String): T? {
         return emarsysIndexedDb.execute { database ->
-            logger.debug("EmarsysIndexedDbObjectStore - get", buildJsonObject {
+            logger.trace("EmarsysIndexedDbObjectStore - get", buildJsonObject {
                 put("id", id)
-            })
+            }, isRemoteLog = false)
             suspendCoroutine { continuation ->
                 val transaction = database.transaction(
                     emarsysObjectStoreConfig.name,
@@ -147,14 +150,13 @@ class EmarsysIndexedDbObjectStore<T>(
                 }
             }
         }
-
     }
 
     override suspend fun delete(id: String) {
         return emarsysIndexedDb.execute { database ->
-            logger.debug("EmarsysIndexedDbObjectStore - delete", buildJsonObject {
+            logger.trace("EmarsysIndexedDbObjectStore - delete", buildJsonObject {
                 put("id", id)
-            })
+            }, isRemoteLog = false)
             suspendCoroutine { continuation ->
                 val transaction = database.transaction(
                     emarsysObjectStoreConfig.name,

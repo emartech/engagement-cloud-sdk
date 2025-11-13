@@ -1,6 +1,8 @@
 package com.emarsys.core.log
 
 import kotlinx.serialization.json.JsonObject
+import kotlin.js.Console
+import kotlin.js.console
 
 actual class ConsoleLogger : ConsoleLoggerApi {
     actual override fun logToConsole(
@@ -12,7 +14,22 @@ actual class ConsoleLogger : ConsoleLoggerApi {
     ) {
         val logString = createLogString(loggerName, level, message, throwable, data)
         val color = getLogColor(level)
+        when (level) {
+            LogLevel.Debug -> console.debug(colorizeLog(logString, color))
+            LogLevel.Error -> console.error(colorizeLog(logString, color))
+            LogLevel.Info -> console.info(colorizeLog(logString, color))
+            LogLevel.Metric -> console.log(colorizeLog(logString, color))
+            LogLevel.Trace -> console.trace(colorizeLog(logString, color))
+        }
         println(colorizeLog(logString, color))
+    }
+
+    private fun Console.debug(message: String) {
+        console.asDynamic().debug(message)
+    }
+
+    private fun Console.trace(message: String) {
+        console.asDynamic().trace(message)
     }
 
     private fun createLogString(

@@ -36,6 +36,18 @@ internal class SdkLogger(
         log(LogLevel.Info, message, data = data, isRemoteLog = isRemoteLog)
     }
 
+    override suspend fun trace(message: String, isRemoteLog: Boolean) {
+        log(LogLevel.Trace, message, isRemoteLog = isRemoteLog)
+    }
+
+    override suspend fun trace(
+        message: String,
+        data: JsonObject,
+        isRemoteLog: Boolean
+    ) {
+        log(LogLevel.Trace, message, data = data, isRemoteLog = isRemoteLog)
+    }
+
     override suspend fun debug(logEntry: LogEntry, isRemoteLog: Boolean) {
         log(
             LogLevel.Debug,

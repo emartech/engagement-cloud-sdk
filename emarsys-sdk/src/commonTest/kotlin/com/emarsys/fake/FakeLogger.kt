@@ -4,7 +4,7 @@ import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.Logger
 import kotlinx.serialization.json.JsonObject
 
-class FakeLogger: Logger {
+class FakeLogger : Logger {
     override suspend fun info(
         logEntry: LogEntry,
         isRemoteLog: Boolean
@@ -22,6 +22,16 @@ class FakeLogger: Logger {
     }
 
     override suspend fun info(
+        message: String,
+        data: JsonObject,
+        isRemoteLog: Boolean
+    ) {
+    }
+
+    override suspend fun trace(message: String, isRemoteLog: Boolean) {
+    }
+
+    override suspend fun trace(
         message: String,
         data: JsonObject,
         isRemoteLog: Boolean
