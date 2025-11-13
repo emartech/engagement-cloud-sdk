@@ -8,10 +8,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.emarsys.sample.navigation.AppNavigation
 import com.emarsys.sample.navigation.NavigationTab
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-@Preview
 fun App() {
     var selectedTab by remember { mutableStateOf(NavigationTab.SDK_TEST) }
     
