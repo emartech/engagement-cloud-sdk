@@ -2,13 +2,10 @@ package com.emarsys.di
 
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.util.DownloaderApi
-import com.emarsys.di.CoroutineScopeTypes
 import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContext
 import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import com.emarsys.mobileengage.embeddedmessaging.networking.EmbeddedMessagesRequestFactory
 import com.emarsys.mobileengage.embeddedmessaging.networking.EmbeddedMessagingRequestFactoryApi
-import com.emarsys.mobileengage.embeddedmessaging.provider.FallbackImageProvider
-import com.emarsys.mobileengage.embeddedmessaging.provider.FallbackImageProviderApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageModel
 import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageModelApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageViewModel
@@ -28,9 +25,6 @@ object EmbeddedMessagingInjection {
         single<EmbeddedMessagingContextApi>{
             EmbeddedMessagingContext()
         }
-        single<FallbackImageProviderApi> {
-            FallbackImageProvider()
-        }
         single<ListPageModelApi> {
             ListPageModel(
                 sdkEventDistributor = get()
@@ -40,7 +34,6 @@ object EmbeddedMessagingInjection {
             ListPageViewModel(
                 model = get<ListPageModelApi>(),
                 downloaderApi = get<DownloaderApi>(),
-                fallbackImageProvider = get<FallbackImageProviderApi>(),
                 sdkEventDistributor = get<SdkEventDistributorApi>(),
                 coroutineScope = get<CoroutineScope>(named(CoroutineScopeTypes.Application))
             )

@@ -8,7 +8,6 @@ import com.emarsys.core.util.DownloaderApi
 import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.embeddedmessaging.models.TagOperation
-import com.emarsys.mobileengage.embeddedmessaging.provider.FallbackImageProviderApi
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -46,7 +45,6 @@ class MessageItemModelTests {
     }
 
     private lateinit var mockDownloader: DownloaderApi
-    private lateinit var mockFallbackImageProvider: FallbackImageProviderApi
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
     private lateinit var mockSdkEventWaiter: SdkEventWaiterApi
     private lateinit var messageItemModel: MessageItemModel
@@ -54,7 +52,6 @@ class MessageItemModelTests {
     @BeforeTest
     fun setup() {
         mockDownloader = mock()
-        mockFallbackImageProvider = mock()
         mockSdkEventDistributor = mock(MockMode.autofill)
         mockSdkEventWaiter = mock(MockMode.autofill)
 
@@ -65,7 +62,6 @@ class MessageItemModelTests {
         MessageItemModel(
             message = message,
             downloaderApi = mockDownloader,
-            fallbackImageProvider = mockFallbackImageProvider,
             sdkEventDistributor = mockSdkEventDistributor
         )
 

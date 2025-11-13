@@ -11,13 +11,10 @@ import com.emarsys.emarsys_sdk.generated.resources.Res
 import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
-import com.emarsys.mobileengage.embeddedmessaging.provider.FallbackImageProvider
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemModel
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemView
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModel
-import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageModel
 import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageView
-import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageViewModel
 import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageViewModelApi
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
 import com.emarsys.util.JsonUtil
@@ -34,7 +31,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.datetime.Clock
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -60,7 +56,6 @@ fun MessageItemViewPreview() {
                 MessageItemModel(
                     message = providePreviewMessage(),
                     downloaderApi = PreviewDownLoader(),
-                    fallbackImageProvider = FallbackImageProvider(),
                     sdkEventDistributor = previewSdkEventDistributor
                 )
             )
@@ -141,7 +136,6 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
                                 "tracking_info_example"
                             ),
                             downloaderApi = PreviewDownLoader(),
-                            fallbackImageProvider = FallbackImageProvider(),
                             sdkEventDistributor = previewSdkEventDistributor
                         )
                     )

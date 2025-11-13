@@ -6,13 +6,11 @@ import com.emarsys.core.util.DownloaderApi
 import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.embeddedmessaging.models.MessageTagUpdate
 import com.emarsys.mobileengage.embeddedmessaging.models.TagOperation
-import com.emarsys.mobileengage.embeddedmessaging.provider.FallbackImageProviderApi
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
 
 internal class MessageItemModel(
     override val message: EmbeddedMessage,
     private val downloaderApi: DownloaderApi,
-    private val fallbackImageProvider: FallbackImageProviderApi,
     private val sdkEventDistributor: SdkEventDistributorApi
 ) : MessageItemModelApi {
     override suspend fun downloadImage(): ByteArray? {
@@ -23,10 +21,6 @@ internal class MessageItemModel(
                null
            }
         }
-    }
-
-    override suspend fun getFallbackImageProvider(): FallbackImageProviderApi {
-        return fallbackImageProvider
     }
 
     override suspend fun updateTagsForMessage(tag: String, operation: TagOperation, trackingInfo: String): Boolean {

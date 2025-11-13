@@ -2,19 +2,17 @@ package com.emarsys.mobileengage.embeddedmessaging.ui.list
 
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.util.DownloaderApi
-import com.emarsys.mobileengage.embeddedmessaging.provider.FallbackImageProvider
-import com.emarsys.mobileengage.embeddedmessaging.provider.FallbackImageProviderApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemModel
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModel
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+
 internal class ListPageViewModel(
     private val model: ListPageModelApi,
     private val downloaderApi: DownloaderApi,
-    private val fallbackImageProvider: FallbackImageProviderApi = FallbackImageProvider(),
     private val sdkEventDistributor: SdkEventDistributorApi,
     private val coroutineScope: CoroutineScope,
 ) : ListPageViewModelApi {
@@ -34,7 +32,13 @@ internal class ListPageViewModel(
             //TODO: move error handling and fallback image providing inside model
             try {
                 val messageViewModels = model.fetchMessages().map { message ->
-                    MessageItemViewModel(MessageItemModel(message, downloaderApi, fallbackImageProvider, sdkEventDistributor))
+                    MessageItemViewModel(
+                        MessageItemModel(
+                            message,
+                            downloaderApi,
+                            sdkEventDistributor
+                        )
+                    )
                 }
                 _messages.value = messageViewModels
             } catch (e: Exception) {

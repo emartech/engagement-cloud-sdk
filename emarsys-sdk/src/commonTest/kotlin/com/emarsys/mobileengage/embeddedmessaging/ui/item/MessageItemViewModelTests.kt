@@ -1,84 +1,23 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.item
 
 import com.emarsys.mobileengage.action.models.PresentableActionModel
-import com.emarsys.mobileengage.embeddedmessaging.provider.FallbackImageProviderApi
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
-import dev.mokkery.answering.throws
 import dev.mokkery.every
-import dev.mokkery.everySuspend
 import dev.mokkery.mock
-import dev.mokkery.verifySuspend
-import dev.mokkery.verify.VerifyMode
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
-import kotlin.test.Ignore
 import kotlin.test.Test
 
 class MessageItemViewModelTests {
 
     private lateinit var mockMessageItemModel: MessageItemModelApi
-    private lateinit var mockFallbackImageProvider: FallbackImageProviderApi
-    private val fallbackImageBytes = ByteArray(100) { it.toByte() }
 
     @BeforeTest
     fun setup() = runTest {
         mockMessageItemModel = mock(MockMode.autofill)
-        mockFallbackImageProvider = mock(MockMode.autofill)
-        everySuspend { mockMessageItemModel.getFallbackImageProvider() } returns mockFallbackImageProvider
-        everySuspend { mockFallbackImageProvider.provide() } returns fallbackImageBytes
-    }
-
-    @Ignore
-    @Test
-    fun fetchImage_should_ReturnFallbackImage_when_downloadImageReturnsNull() = runTest {
-        everySuspend {
-            mockMessageItemModel.downloadImage()
-        } returns null
-        val viewModel = MessageItemViewModel(mockMessageItemModel)
-
-        val result = viewModel.fetchImage()
-
-        result shouldNotBe null
-        verifySuspend(VerifyMode.exactly(1)) { mockMessageItemModel.downloadImage() }
-        verifySuspend(VerifyMode.exactly(1)) { mockMessageItemModel.getFallbackImageProvider() }
-        verifySuspend(VerifyMode.exactly(1)) { mockFallbackImageProvider.provide() }
-    }
-
-    @Ignore
-    @Test
-    fun fetchImage_should_ReturnDownloadedImage_when_downloadImageSucceeds() = runTest {
-        val testImageBytes = ByteArray(100) { it.toByte() }
-        everySuspend {
-            mockMessageItemModel.downloadImage()
-        } returns testImageBytes
-        val viewModel = MessageItemViewModel(mockMessageItemModel)
-
-        val result = viewModel.fetchImage()
-
-        result shouldNotBe null
-        verifySuspend(VerifyMode.exactly(1)) { mockMessageItemModel.downloadImage() }
-        verifySuspend(VerifyMode.exactly(0)) { mockMessageItemModel.getFallbackImageProvider() }
-    }
-
-
-    @Ignore
-    @Test
-    fun fetchImage_should_ReturnFallbackImage_when_downloadImageThrowsException() = runTest {
-        everySuspend {
-            mockMessageItemModel.downloadImage()
-        } throws RuntimeException("Network error")
-        val viewModel = MessageItemViewModel(mockMessageItemModel)
-
-        val result = viewModel.fetchImage()
-
-        result shouldNotBe null
-        verifySuspend(VerifyMode.exactly(1)) { mockMessageItemModel.downloadImage() }
-        verifySuspend(VerifyMode.exactly(1)) { mockMessageItemModel.getFallbackImageProvider() }
-        verifySuspend(VerifyMode.exactly(1)) { mockFallbackImageProvider.provide() }
     }
 
     @Test

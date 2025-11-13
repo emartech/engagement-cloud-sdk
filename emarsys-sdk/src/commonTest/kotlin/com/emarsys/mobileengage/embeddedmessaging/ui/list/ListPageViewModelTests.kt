@@ -3,7 +3,6 @@ package com.emarsys.mobileengage.embeddedmessaging.ui.list
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.models.PresentableActionModel
-import com.emarsys.mobileengage.embeddedmessaging.provider.FallbackImageProviderApi
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -28,7 +27,6 @@ import kotlin.test.Test
 class ListPageViewModelTests {
     private lateinit var mockModel: ListPageModelApi
     private lateinit var mockDownloaderApi: DownloaderApi
-    private lateinit var mockFallbackImageProvider: FallbackImageProviderApi
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
     private val testDispatcher = StandardTestDispatcher()
 
@@ -36,7 +34,6 @@ class ListPageViewModelTests {
     fun setup() = runTest {
         Dispatchers.setMain(testDispatcher)
         mockModel = mock(MockMode.autofill)
-        mockFallbackImageProvider = mock(MockMode.autofill)
         mockDownloaderApi = mock(MockMode.autofill)
         mockSdkEventDistributor = mock(MockMode.autofill)
     }
@@ -205,7 +202,6 @@ class ListPageViewModelTests {
     private fun createViewModel(): ListPageViewModel = ListPageViewModel(
         mockModel,
         mockDownloaderApi,
-        mockFallbackImageProvider,
         mockSdkEventDistributor,
         CoroutineScope(SupervisorJob() + testDispatcher)
     )
