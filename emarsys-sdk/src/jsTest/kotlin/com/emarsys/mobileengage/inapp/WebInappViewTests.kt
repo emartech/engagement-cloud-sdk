@@ -77,8 +77,9 @@ class WebInappViewTests {
         val webView = webViewHolder.webView
         webView shouldNotBe null
         webView.querySelectorAll("script").length shouldBe 4
-        webView.innerHTML.contains("<script>$testScriptContent1</script>") shouldBe true
-        webView.innerHTML.contains("<script>$testScriptContent2</script>") shouldBe true
+        val innerHtmlString = webView.innerHTML.toString()
+        innerHtmlString.contains("<script>$testScriptContent1</script>") shouldBe true
+        innerHtmlString.contains("<script>$testScriptContent2</script>") shouldBe true
         webView.querySelector("div") shouldNotBe null
         webView.querySelector("button") shouldNotBe null
         webView.querySelector("h3") shouldNotBe null

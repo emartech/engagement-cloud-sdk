@@ -1,7 +1,7 @@
 package com.emarsys.api.event.model
 
 import com.emarsys.event.SdkEvent
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlin.time.ExperimentalTime

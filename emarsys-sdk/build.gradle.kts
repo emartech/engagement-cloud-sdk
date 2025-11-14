@@ -1,7 +1,10 @@
+@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
+
 import co.touchlab.skie.configuration.DefaultArgumentInterop
 import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
 import com.github.gmazzo.buildconfig.BuildConfigTask
 import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import java.util.*
 
 plugins {
@@ -24,6 +27,9 @@ group = "com.emarsys"
 version = "4.0.0"
 
 kotlin {
+    compilerOptions {
+        apiVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_2)
+    }
     jvmToolchain(17)
     androidTarget {
         publishLibraryVariants("release")
@@ -84,6 +90,8 @@ kotlin {
                 implementation(libs.ktor.client.mock)
                 implementation(libs.kotest.framework.engine)
                 implementation(libs.kotest.assertions.core)
+                implementation(libs.kotest.assertions.table)
+                implementation(libs.kotlinx.coroutines.test)
             }
         }
         val androidMain by getting {
@@ -120,6 +128,7 @@ kotlin {
                 implementation(libs.androidx.runner)
                 implementation(libs.androidx.test.junit)
                 implementation(libs.kotest.assertions.core)
+                implementation(libs.kotest.assertions.table)
                 implementation(libs.kotlinx.coroutines.test)
                 implementation(libs.okio.fakefilesystem)
             }
@@ -134,6 +143,8 @@ kotlin {
         iosTest {
             dependencies {
                 implementation(kotlin("test"))
+                implementation(libs.kotest.assertions.table)
+                implementation(libs.kotlinx.coroutines.test)
             }
         }
 
@@ -147,6 +158,8 @@ kotlin {
         val jsTest by getting {
             dependencies {
                 implementation(kotlin("test-js"))
+                implementation(libs.kotest.assertions.table)
+                implementation(libs.kotlinx.coroutines.test)
             }
         }
     }

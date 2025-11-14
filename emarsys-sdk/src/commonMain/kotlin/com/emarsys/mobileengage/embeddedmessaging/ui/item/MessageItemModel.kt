@@ -8,6 +8,7 @@ import com.emarsys.mobileengage.embeddedmessaging.models.MessageTagUpdate
 import com.emarsys.mobileengage.embeddedmessaging.models.TagOperation
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
+import kotlin.time.ExperimentalTime
 
 internal class MessageItemModel(
     override val message: EmbeddedMessage,
@@ -20,6 +21,7 @@ internal class MessageItemModel(
         }
     }
 
+    @OptIn(ExperimentalTime::class)
     override suspend fun updateTagsForMessage(
         tag: String,
         operation: TagOperation,

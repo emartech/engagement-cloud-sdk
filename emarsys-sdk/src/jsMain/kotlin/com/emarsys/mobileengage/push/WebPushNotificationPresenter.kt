@@ -8,7 +8,7 @@ class WebPushNotificationPresenter: WebPushNotificationPresenterApi {
     override suspend fun showNotification(
         webPushNotificationData: WebPushNotificationData
     ) {
-        self.registration.showNotification(
+        self.registration.asDynamic().showNotification(
             webPushNotificationData.title,
             webPushNotificationData.options.unsafeCast<web.notifications.NotificationOptions>()
         )

@@ -47,6 +47,7 @@ class LanguageHandlerTests {
     @Test
     fun testHandleLanguage_should_throw_exception_when_language_is_not_supported() = runTest {
         everySuspend { mockLanguageTagValidator.isValid("not-real-language-code") } returns false
+        everySuspend { mockLogger.error(any<String>()) } returns Unit
 
         shouldThrow<PreconditionFailedException> {
             languageHandler.handleLanguage("not-real-language-code")

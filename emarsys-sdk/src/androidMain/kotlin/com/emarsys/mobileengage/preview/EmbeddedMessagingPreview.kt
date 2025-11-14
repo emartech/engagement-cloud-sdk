@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalTime::class)
+
 package com.emarsys.mobileengage.preview
 
 import androidx.compose.material3.MaterialTheme
@@ -31,7 +33,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.ExperimentalTime

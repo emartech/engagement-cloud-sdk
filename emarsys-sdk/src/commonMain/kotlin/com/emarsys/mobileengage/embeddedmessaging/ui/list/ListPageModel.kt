@@ -7,10 +7,12 @@ import com.emarsys.event.SdkEvent
 import com.emarsys.networking.clients.embedded.messaging.model.BadgeCountResponse
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
 import com.emarsys.networking.clients.embedded.messaging.model.MessagesResponse
+import kotlin.time.ExperimentalTime
 
 internal class ListPageModel(
     private val sdkEventDistributor: SdkEventDistributorApi
 ) : ListPageModelApi {
+    @OptIn(ExperimentalTime::class)
     override suspend fun fetchMessages(): List<EmbeddedMessage> {
         return try {
             val fetchMessagesEvent = SdkEvent.Internal.EmbeddedMessaging.FetchMessages(
@@ -35,6 +37,7 @@ internal class ListPageModel(
         }
     }
 
+    @OptIn(ExperimentalTime::class)
     override suspend fun fetchBadgeCount(): Int {
         return try {
             val fetchBadgeCountEvent = SdkEvent.Internal.EmbeddedMessaging.FetchBadgeCount(
@@ -57,6 +60,7 @@ internal class ListPageModel(
         }
     }
 
+    @OptIn(ExperimentalTime::class)
     override suspend fun fetchNextPage(offset: Int, categoryIds: List<Int>): List<EmbeddedMessage> {
         return try {
             val fetchNextPageEvent = SdkEvent.Internal.EmbeddedMessaging.FetchNextPage(

@@ -24,6 +24,15 @@ kotlin {
             implementation(kotlin("test"))
             implementation(libs.kotest.framework.engine)
             implementation(libs.kotest.assertions.core)
+            implementation(libs.kotlinx.coroutines.test)
+            // Exclude Compose dependencies that come transitively from :emarsys-sdk
+            implementation(project(":emarsys-sdk")) {
+                exclude(group = "org.jetbrains.compose.runtime")
+                exclude(group = "org.jetbrains.compose.foundation")
+                exclude(group = "org.jetbrains.compose.material3")
+                exclude(group = "org.jetbrains.compose.ui")
+                exclude(group = "org.jetbrains.compose.components")
+            }
         }
         jsMain {
             dependencies {
@@ -33,6 +42,7 @@ kotlin {
         jsTest {
             dependencies {
                 implementation(kotlin("test-js"))
+                implementation(libs.kotlinx.coroutines.test)
             }
         }
     }
@@ -48,3 +58,14 @@ tasks.register<Copy>("copyServiceWorkerToEmarsysSDKResources") {
 }
 
 tasks.findByName("jsBrowserDistribution")?.finalizedBy("copyServiceWorkerToEmarsysSDKResources")
+
+// Exclude Compose dependencies from JS test classpath to avoid skiko.mjs errors
+configurations {
+    val jsTestRuntimeClasspath by getting {
+        exclude(group = "org.jetbrains.compose.runtime")
+        exclude(group = "org.jetbrains.compose.foundation")
+        exclude(group = "org.jetbrains.compose.material3")
+        exclude(group = "org.jetbrains.compose.ui")
+        exclude(group = "org.jetbrains.compose.components")
+    }
+}

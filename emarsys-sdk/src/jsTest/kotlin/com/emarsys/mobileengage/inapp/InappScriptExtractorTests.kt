@@ -2,6 +2,7 @@ package com.emarsys.mobileengage.inapp
 
 import io.kotest.matchers.shouldBe
 import web.dom.document
+import web.html.HtmlSource
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -30,7 +31,7 @@ class InappScriptExtractorTests {
             </html>"""
 
         val testElement = document.createElement("div")
-        testElement.innerHTML = testHtml
+        testElement.innerHTML = HtmlSource(testHtml)
 
         val result = inappScriptExtractor.extract(testElement)
 
@@ -49,7 +50,7 @@ class InappScriptExtractorTests {
             </html>"""
 
         val testElement = document.createElement("div")
-        testElement.innerHTML = testHtml
+        testElement.innerHTML = HtmlSource(testHtml)
 
         val result = inappScriptExtractor.extract(testElement)
 

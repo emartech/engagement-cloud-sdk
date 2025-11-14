@@ -4,6 +4,7 @@ import com.emarsys.core.factory.Factory
 import com.emarsys.core.providers.InstantProvider
 import web.dom.document
 import web.html.HTMLElement
+import web.html.HtmlSource
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
@@ -38,7 +39,7 @@ internal class WebInAppView(
         )
         jsBridge.register()
         val view = document.createElement("div")
-        view.innerHTML = message.content
+        view.innerHTML = HtmlSource(message.content)
 
         val scriptContents = inappScriptExtractor.extract(view)
         createScriptElements(scriptContents).forEach { scriptElement ->

@@ -21,7 +21,8 @@ class PushService(
     override suspend fun register(config: JsEmarsysConfig) {
         config.serviceWorkerOptions?.let {
             pushServiceContext.registration =
-                navigator.serviceWorker.register(it.serviceWorkerPath)
+                (navigator.serviceWorker.asDynamic()
+                    .register(it.serviceWorkerPath) as js.promise.Promise<web.serviceworker.ServiceWorkerRegistration>).await()
             navigator.serviceWorker.ready.await()
         }
     }
@@ -31,7 +32,7 @@ class PushService(
             config.serviceWorkerOptions?.let {
                 val options = createPushSubscriptionOptions(it)
                 val pushSubscription =
-                    pushServiceContext.registration?.pushManager?.subscribe(options)
+                    pushServiceContext.registration?.asDynamic().pushManager?.subscribe(options)
                 val pushToken =
                     pushSubscription?.let { subscription -> JSON.stringify(subscription) }
                 pushToken?.let { token ->

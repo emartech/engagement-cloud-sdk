@@ -1,9 +1,9 @@
 package com.emarsys.core.providers
 
 
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 internal class TimestampProvider: InstantProvider {
     @OptIn(ExperimentalTime::class)

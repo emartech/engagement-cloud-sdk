@@ -4,8 +4,9 @@ import com.emarsys.self
 import com.emarsys.window.BrowserWindowHandlerApi
 import web.broadcast.BroadcastChannel
 import web.serviceworker.WindowClient
+import web.serviceworker.focus
 
-class NotificationClickHandler(
+ class NotificationClickHandler(
     private val onNotificationClickedBroadcastChannel: BroadcastChannel,
     private val browserWindowHandler: BrowserWindowHandlerApi
 ) {

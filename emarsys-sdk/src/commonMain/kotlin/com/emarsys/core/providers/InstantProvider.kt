@@ -1,6 +1,6 @@
 package com.emarsys.core.providers
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
