@@ -7,6 +7,7 @@ import com.emarsys.core.networking.clients.GenericNetworkClient
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.model.TestDataClass
+import com.emarsys.testutil.MockHttpClientFactory
 import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.mock
@@ -174,25 +175,26 @@ class GenericNetworkClientTests {
         }
 
     @Test
-    fun testSend_returnWithFailureResult_whenThereIsNoInternetConnection_andExceptionIsThrown() = runTest {
-        val genericNetworkClient = GenericNetworkClient(
-            HttpClient(MockEngine {
-                throw Exception("No internet connection")
-            }),
-            sdkLogger = mock(MockMode.autofill)
-        )
-        val urlString =
-            URLBuilder("https://denna.gservice.emarsys.net/customResponseCode/500").build()
-        val request = UrlRequest(
-            urlString,
-            HttpMethod.Get,
-            null,
-            mapOf("Content-Type" to "application/json")
-        )
-        val response: Result<Response> = genericNetworkClient.send(request)
+    fun testSend_returnWithFailureResult_whenThereIsNoInternetConnection_andExceptionIsThrown() =
+        runTest {
+            val genericNetworkClient = GenericNetworkClient(
+                HttpClient(MockEngine {
+                    throw Exception("No internet connection")
+                }),
+                sdkLogger = mock(MockMode.autofill)
+            )
+            val urlString =
+                URLBuilder("https://denna.gservice.emarsys.net/customResponseCode/500").build()
+            val request = UrlRequest(
+                urlString,
+                HttpMethod.Get,
+                null,
+                mapOf("Content-Type" to "application/json")
+            )
+            val response: Result<Response> = genericNetworkClient.send(request)
 
-        response.exceptionOrNull() should beInstanceOf(SdkException.NetworkIOException::class)
-    }
+            response.exceptionOrNull() should beInstanceOf(SdkException.NetworkIOException::class)
+        }
 
     @Test
     fun testSend_should_send_request_that_fails_withRetries() = runTest {
@@ -291,20 +293,12 @@ class GenericNetworkClientTests {
         headers: Headers = Headers.Empty,
         body: String = json.encodeToString(testData),
     ) {
-        val mockHttpEngine = MockEngine {
-            it.headers[HttpHeaders.Accept] shouldBe "application/json"
-            respond(
-                ByteReadChannel(body),
-                status = responseStatus,
-                headers = headers
-            )
-        }
-        val httpClient = HttpClient(mockHttpEngine) {
-            install(ContentNegotiation) {
-                json()
-            }
-            install(HttpRequestRetry)
-        }
+        val httpClient = MockHttpClientFactory.create(
+            responseStatus,
+            headers,
+            body
+        )
+
         genericNetworkClient = GenericNetworkClient(httpClient, sdkLogger = mock(MockMode.autofill))
     }
 }

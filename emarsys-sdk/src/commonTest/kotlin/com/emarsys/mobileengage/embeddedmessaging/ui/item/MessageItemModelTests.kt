@@ -8,10 +8,10 @@ import com.emarsys.core.util.DownloaderApi
 import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.embeddedmessaging.models.TagOperation
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
-import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
@@ -51,7 +51,7 @@ class MessageItemModelTests {
 
     @BeforeTest
     fun setup() {
-        mockDownloader = mock()
+        mockDownloader = mock(MockMode.autofill)
         mockSdkEventDistributor = mock(MockMode.autofill)
         mockSdkEventWaiter = mock(MockMode.autofill)
 
@@ -75,24 +75,23 @@ class MessageItemModelTests {
     }
 
     @Test
-    fun downloadImage_shouldNotCrash_when_ImageDownloadThrows_and_returnNull() = runTest {
-        everySuspend {
-            mockDownloader.download(any())
-        } throws Exception("Download failed")
-
-        val result = messageItemModel.downloadImage()
-
-        result shouldBe null
-    }
-
-    @Test
     fun downloadImage_shouldCall_downloaderApi() = runTest {
         val expectedUriString = "example.com"
-        everySuspend { mockDownloader.download(expectedUriString) } returns ByteArray(0)
+        everySuspend {
+            mockDownloader.download(
+                expectedUriString,
+                EmbeddedMessagingConstants.PLACEHOLDER_IMAGE
+            )
+        } returns ByteArray(0)
 
         messageItemModel.downloadImage()
 
-        verifySuspend(VerifyMode.exactly(1)) { mockDownloader.download(expectedUriString) }
+        verifySuspend(VerifyMode.exactly(1)) {
+            mockDownloader.download(
+                expectedUriString,
+                EmbeddedMessagingConstants.PLACEHOLDER_IMAGE
+            )
+        }
     }
 
     @Test

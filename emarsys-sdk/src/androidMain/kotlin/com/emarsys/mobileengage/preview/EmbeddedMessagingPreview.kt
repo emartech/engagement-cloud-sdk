@@ -159,7 +159,7 @@ class PreviewDownLoader : DownloaderApi {
         install(HttpRequestRetry)
     }
 
-    override suspend fun download(urlString: String): ByteArray? {
+    override suspend fun download(urlString: String, fallback: ByteArray?): ByteArray? {
         return Res.readBytes("files/placeholder.png")
     }
 }

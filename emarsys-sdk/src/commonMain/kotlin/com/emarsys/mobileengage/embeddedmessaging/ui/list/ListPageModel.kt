@@ -20,7 +20,7 @@ internal class ListPageModel(
             )
             val messagesResponse = sdkEventDistributor.registerEvent(fetchMessagesEvent)
             val response = messagesResponse.await<Response>()
-            
+
             response.result.fold(
                 onSuccess = { networkResponse ->
                     val messagesResponse: MessagesResponse = networkResponse.body()
@@ -42,7 +42,7 @@ internal class ListPageModel(
             )
             val badgeCountResponse = sdkEventDistributor.registerEvent(fetchBadgeCountEvent)
             val response = badgeCountResponse.await<Response>()
-            
+
             response.result.fold(
                 onSuccess = { networkResponse ->
                     val badgeCountResponse: BadgeCountResponse = networkResponse.body()
@@ -66,7 +66,7 @@ internal class ListPageModel(
             )
             val nextPageResponse = sdkEventDistributor.registerEvent(fetchNextPageEvent)
             val response = nextPageResponse.await<Response>()
-            
+
             response.result.fold(
                 onSuccess = { networkResponse ->
                     val messagesResponse: MessagesResponse = networkResponse.body()

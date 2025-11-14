@@ -6,6 +6,7 @@ import com.emarsys.core.util.DownloaderApi
 import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.embeddedmessaging.models.MessageTagUpdate
 import com.emarsys.mobileengage.embeddedmessaging.models.TagOperation
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
 
 internal class MessageItemModel(
@@ -14,16 +15,16 @@ internal class MessageItemModel(
     private val sdkEventDistributor: SdkEventDistributorApi
 ) : MessageItemModelApi {
     override suspend fun downloadImage(): ByteArray? {
-       return message.imageUrl?.let {
-           try {
-               downloaderApi.download(message.imageUrl)
-           } catch (_: Exception) {
-               null
-           }
+        return message.imageUrl?.let {
+            downloaderApi.download(message.imageUrl, EmbeddedMessagingConstants.PLACEHOLDER_IMAGE)
         }
     }
 
-    override suspend fun updateTagsForMessage(tag: String, operation: TagOperation, trackingInfo: String): Boolean {
+    override suspend fun updateTagsForMessage(
+        tag: String,
+        operation: TagOperation,
+        trackingInfo: String
+    ): Boolean {
         return try {
             val updateData = listOf(
                 MessageTagUpdate(
@@ -39,7 +40,7 @@ internal class MessageItemModel(
             )
             val waiter = sdkEventDistributor.registerEvent(updateTagsEvent)
             val response = waiter.await<Response>()
-            
+
             response.result.fold(
                 onSuccess = { true },
                 onFailure = { false }

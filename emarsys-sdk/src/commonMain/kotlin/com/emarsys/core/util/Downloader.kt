@@ -2,7 +2,6 @@ package com.emarsys.core.util
 
 import com.emarsys.core.cache.FileCacheApi
 import com.emarsys.core.log.Logger
-import com.emarsys.emarsys_sdk.generated.resources.Res
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.readRawBytes
@@ -15,17 +14,14 @@ internal class Downloader(
     private val logger: Logger
 ) : DownloaderApi {
 
-    override suspend fun download(urlString: String): ByteArray? {
-        val url = Url(urlString)
-        val fileName = "${urlString.hashCode()}"
-
-        val cachedFile = fileCache.get(fileName)
+    override suspend fun download(urlString: String, fallback: ByteArray?): ByteArray? {
         return try {
-            cachedFile ?: downloadAndCache(url, fileName)
+            val url = Url(urlString)
+            val fileName = "${urlString.hashCode()}"
+            fileCache.get(fileName) ?: downloadAndCache(url, fileName) ?: fallback
         } catch (exception: Exception) {
             logger.error("Downloader", exception)
-//            return Res.readBytes("files/placeholder.png")
-            null
+            fallback
         }
     }
 

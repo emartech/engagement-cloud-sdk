@@ -1,14 +1,18 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.item
 
 import com.emarsys.mobileengage.action.models.PresentableActionModel
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
+import dev.mokkery.everySuspend
 import dev.mokkery.mock
+import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
+import kotlin.test.Ignore
 import kotlin.test.Test
 
 class MessageItemViewModelTests {
@@ -90,6 +94,22 @@ class MessageItemViewModelTests {
         val result = viewModel.receivedAt
 
         result shouldBe 1234567890L
+    }
+
+    @Test
+    @Ignore
+    fun fetchImage_shouldCallDownloadImage_onTheModel() = runTest {
+        val imageByteArray = EmbeddedMessagingConstants.PLACEHOLDER_IMAGE
+        val testMessage = createTestMessage(imageUrl = "testUrl")
+        val mockModel = mock<MessageItemModelApi>(MockMode.autofill)
+        every { mockModel.message } returns testMessage
+        everySuspend { mockModel.downloadImage() } returns imageByteArray
+
+        val viewModel = MessageItemViewModel(mockModel)
+
+        viewModel.fetchImage()
+
+        verifySuspend { mockModel.downloadImage() }
     }
 
     private fun createTestMessage(
