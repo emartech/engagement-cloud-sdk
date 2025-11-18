@@ -11,6 +11,7 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageModelApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageViewModel
 import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageViewModelApi
 import kotlinx.coroutines.CoroutineScope
+import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
@@ -27,7 +28,8 @@ object EmbeddedMessagingInjection {
         }
         single<ListPageModelApi> {
             ListPageModel(
-                sdkEventDistributor = get()
+                sdkEventDistributor = get(),
+                sdkLogger = get{ parametersOf(ListPageModel::class.simpleName) }
             )
         }
         factory<ListPageViewModelApi> {

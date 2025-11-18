@@ -2,11 +2,10 @@ package com.emarsys.mobileengage.embeddedmessaging.ui.list
 
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.util.DownloaderApi
-import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
+import com.emarsys.networking.clients.embedded.messaging.model.MessageCategory
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
-import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
@@ -14,106 +13,165 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.test.*
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ListPageViewModelTests {
+    private companion object {
+        val CATEGORIES = listOf(
+            MessageCategory(id = 1, value = "Category 1"),
+            MessageCategory(id = 2, value = "Category 2")
+        )
+    }
     private lateinit var mockModel: ListPageModelApi
     private lateinit var mockDownloaderApi: DownloaderApi
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
+    private lateinit var viewModel: ListPageViewModel
     private val testDispatcher = StandardTestDispatcher()
 
     @BeforeTest
-    fun setup() = runTest {
+    fun setup() {
         Dispatchers.setMain(testDispatcher)
         mockModel = mock(MockMode.autofill)
         mockDownloaderApi = mock(MockMode.autofill)
         mockSdkEventDistributor = mock(MockMode.autofill)
+
+        viewModel = ListPageViewModel(
+            mockModel,
+            mockDownloaderApi,
+            mockSdkEventDistributor,
+            CoroutineScope(SupervisorJob() + testDispatcher)
+        )
     }
 
     @AfterTest
-    fun tearDown() = runTest {
+    fun tearDown() {
         Dispatchers.resetMain()
     }
 
     @Test
-    fun messages_shouldBeEmpty_when_ViewModelIsCreated() = runTest(testDispatcher) {
-        everySuspend { mockModel.fetchMessages() } returns emptyList()
-        val viewModel = createViewModel()
+    fun testRefreshMessages_messagesAndCategories_shouldBeEmpty_when_ViewModelIsCreated() = runTest {
+        everySuspend { mockModel.fetchMessagesWithCategories() } returns Result.success(MessagesWithCategories())
 
-        val result = viewModel.messages.value
+        val messagesResult = viewModel.messages.value
+        val categoriesResult = viewModel.categories.value
 
-        result shouldBe emptyList()
+        messagesResult shouldBe emptyList()
+        categoriesResult shouldBe emptyList()
     }
 
     @Test
-    fun messages_shouldContainMessageViewModels_when_refreshMessagesIsCalled() = runTest(testDispatcher) {
+    fun testRefreshMessages_shouldSetMessagesAndCategories_when_refreshMessagesIsCalled() = runTest {
         val testMessages = listOf(
             createTestMessage(id = "1", title = "Title1", lead = "Lead1"),
             createTestMessage(id = "2", title = "Title2", lead = "Lead2")
         )
-        everySuspend { mockModel.fetchMessages() } returns testMessages
-        val viewModel = createViewModel()
+
+        everySuspend { mockModel.fetchMessagesWithCategories(filterUnreadOnly = false) } returns Result.success(
+            MessagesWithCategories(
+                CATEGORIES,
+                testMessages
+            )
+        )
 
         viewModel.refreshMessages()
+        viewModel.isRefreshing.value shouldBe true
+
         advanceUntilIdle()
 
-        val result = viewModel.messages.value
-        result.size shouldBe 2
-        result[0].id shouldBe "1"
-        result[0].title shouldBe "Title1"
-        result[0].lead shouldBe "Lead1"
-        result[1].id shouldBe "2"
-        result[1].title shouldBe "Title2"
-        result[1].lead shouldBe "Lead2"
+        val messageResults = viewModel.messages.value
+        messageResults.size shouldBe 2
+        messageResults[0].id shouldBe "1"
+        messageResults[0].title shouldBe "Title1"
+        messageResults[0].lead shouldBe "Lead1"
+        messageResults[1].id shouldBe "2"
+        messageResults[1].title shouldBe "Title2"
+        messageResults[1].lead shouldBe "Lead2"
+
+        val categoryResults = viewModel.categories.value
+        categoryResults.size shouldBe 2
+        categoryResults shouldBe CATEGORIES
+        viewModel.isRefreshing.value shouldBe false
     }
 
     @Test
-    fun messages_shouldBeEmpty_when_fetchMessagesThrowsException() = runTest(testDispatcher) {
-        everySuspend { mockModel.fetchMessages() } throws RuntimeException("Network error")
-        val viewModel = createViewModel()
+    fun testRefreshMessages_shouldNotUpdateMessagesAndCategories_when_fetchMessagesWithCategoriesReturnsFailureResult() = runTest {
+        val testMessages = listOf(
+            createTestMessage(id = "1", title = "Title1", lead = "Lead1"),
+            createTestMessage(id = "2", title = "Title2", lead = "Lead2")
+        )
+        everySuspend { mockModel.fetchMessagesWithCategories() } returns Result.success(
+            MessagesWithCategories(
+                CATEGORIES,
+                testMessages
+            )
+        )
 
         viewModel.refreshMessages()
+
         advanceUntilIdle()
 
-        val result = viewModel.messages.value
-        result shouldBe emptyList()
+        val messageResult = viewModel.messages.value
+        messageResult.size shouldBe 2
+        val categoriesResult = viewModel.categories.value
+        categoriesResult shouldBe CATEGORIES
+
+        everySuspend { mockModel.fetchMessagesWithCategories() } returns Result.failure(RuntimeException("Network error"))
+
+        viewModel.refreshMessages()
+
+        advanceUntilIdle()
+
+        val messageResultAfterFailure = viewModel.messages.value
+        messageResultAfterFailure.size shouldBe 2
+        val categoriesResultAfterFailure = viewModel.categories.value
+        categoriesResultAfterFailure shouldBe CATEGORIES
+        viewModel.isRefreshing.value shouldBe false
     }
 
     @Test
-    fun messages_shouldUpdate_when_refreshMessagesIsCalledMultipleTimes() = runTest(testDispatcher) {
+    fun testRefreshMessages_shouldUpdateMessagesAndCategories_when_refreshMessagesIsCalledMultipleTimes() = runTest {
         val firstMessages = listOf(createTestMessage(id = "1", title = "First"))
         val secondMessages = listOf(
             createTestMessage(id = "2", title = "Second"),
             createTestMessage(id = "3", title = "Third")
         )
-        everySuspend { mockModel.fetchMessages() } returns firstMessages
-        val viewModel = createViewModel()
+        val newCategories = listOf(MessageCategory(id = 3, value = "Category 3"))
+
+        everySuspend { mockModel.fetchMessagesWithCategories() } returns Result.success(
+            MessagesWithCategories(
+                CATEGORIES,
+                firstMessages
+            )
+        )
 
         viewModel.refreshMessages()
         advanceUntilIdle()
         val firstResult = viewModel.messages.value
         firstResult.size shouldBe 1
         firstResult[0].id shouldBe "1"
+        viewModel.categories.value shouldBe CATEGORIES
 
-        everySuspend { mockModel.fetchMessages() } returns secondMessages
+        everySuspend { mockModel.fetchMessagesWithCategories() } returns Result.success(
+            MessagesWithCategories(
+                newCategories,
+                secondMessages
+            )
+        )
         viewModel.refreshMessages()
         advanceUntilIdle()
         val secondResult = viewModel.messages.value
         secondResult.size shouldBe 2
         secondResult[0].id shouldBe "2"
         secondResult[1].id shouldBe "3"
+        viewModel.categories.value shouldBe newCategories
     }
 
     @Test
-    fun messages_shouldCreateMessageItemViewModels_withCorrectProperties() = runTest(testDispatcher) {
+    fun testRefreshMessages_shouldCreateMessageItemViewModels_withCorrectProperties() = runTest {
         val testMessage = createTestMessage(
             id = "testId",
             title = "Test Title",
@@ -121,8 +179,12 @@ class ListPageViewModelTests {
             imageUrl = "https://example.com/image.jpg",
             receivedAt = 1234567890L
         )
-        everySuspend { mockModel.fetchMessages() } returns listOf(testMessage)
-        val viewModel = createViewModel()
+        everySuspend { mockModel.fetchMessagesWithCategories() } returns Result.success(
+            MessagesWithCategories(
+                emptyList(),
+                listOf(testMessage)
+            )
+        )
 
         viewModel.refreshMessages()
         advanceUntilIdle()
@@ -138,18 +200,15 @@ class ListPageViewModelTests {
     }
 
     @Test
-    fun isRefreshing_shouldBeFalse_whenViewModelIsCreated() = runTest(testDispatcher) {
-        val viewModel = createViewModel()
-
+    fun isRefreshing_shouldBeFalse_whenViewModelIsCreated() = runTest {
         val result = viewModel.isRefreshing.value
 
         result shouldBe false
     }
 
     @Test
-    fun isRefreshing_shouldBeTrue_whenRefreshStarts() = runTest(testDispatcher) {
-        everySuspend { mockModel.fetchMessages() } returns emptyList()
-        val viewModel = createViewModel()
+    fun isRefreshing_shouldBeTrue_whenRefreshStarts() = runTest {
+        everySuspend { mockModel.fetchMessagesWithCategories() } returns Result.success(MessagesWithCategories())
 
         viewModel.refreshMessages()
 
@@ -158,9 +217,8 @@ class ListPageViewModelTests {
     }
 
     @Test
-    fun isRefreshing_shouldBeFalse_whenRefreshCompletes() = runTest(testDispatcher) {
-        everySuspend { mockModel.fetchMessages() } returns emptyList()
-        val viewModel = createViewModel()
+    fun isRefreshing_shouldBeFalse_whenRefreshCompletes() = runTest {
+        everySuspend { mockModel.fetchMessagesWithCategories() } returns Result.success(MessagesWithCategories())
 
         viewModel.refreshMessages()
 
@@ -171,9 +229,8 @@ class ListPageViewModelTests {
     }
 
     @Test
-    fun isRefreshing_shouldBeFalse_whenRefreshFails() = runTest(testDispatcher) {
-        everySuspend { mockModel.fetchMessages() } throws RuntimeException("Network error")
-        val viewModel = createViewModel()
+    fun isRefreshing_shouldBeFalse_whenRefreshFails() = runTest {
+        everySuspend { mockModel.fetchMessagesWithCategories() } returns Result.failure(RuntimeException("Network error"))
 
         viewModel.refreshMessages()
 
@@ -184,10 +241,14 @@ class ListPageViewModelTests {
     }
 
     @Test
-    fun refreshMessages_shouldUpdateIsRefreshingState() = runTest(testDispatcher) {
+    fun refreshMessages_shouldUpdateIsRefreshingState() = runTest {
         val testMessages = listOf(createTestMessage(id = "1", title = "Title1"))
-        everySuspend { mockModel.fetchMessages() } returns testMessages
-        val viewModel = createViewModel()
+        everySuspend { mockModel.fetchMessagesWithCategories() } returns Result.success(
+            MessagesWithCategories(
+                emptyList(),
+                testMessages
+            )
+        )
 
         viewModel.isRefreshing.value shouldBe false
 
@@ -198,13 +259,6 @@ class ListPageViewModelTests {
 
         viewModel.isRefreshing.value shouldBe false
     }
-
-    private fun createViewModel(): ListPageViewModel = ListPageViewModel(
-        mockModel,
-        mockDownloaderApi,
-        mockSdkEventDistributor,
-        CoroutineScope(SupervisorJob() + testDispatcher)
-    )
 
     private fun createTestMessage(
         id: String = "1",
@@ -219,7 +273,7 @@ class ListPageViewModelTests {
             lead = lead,
             imageUrl = imageUrl,
             defaultAction = null,
-            actions = emptyList<PresentableActionModel>(),
+            actions = emptyList(),
             tags = emptyList(),
             categoryIds = emptyList(),
             receivedAt = receivedAt,

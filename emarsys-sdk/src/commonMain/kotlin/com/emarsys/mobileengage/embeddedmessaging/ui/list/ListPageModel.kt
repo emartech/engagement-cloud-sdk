@@ -1,19 +1,21 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.list
 
 import com.emarsys.core.channel.SdkEventDistributorApi
+import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.body
 import com.emarsys.event.SdkEvent
 import com.emarsys.networking.clients.embedded.messaging.model.BadgeCountResponse
-import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
 import com.emarsys.networking.clients.embedded.messaging.model.MessagesResponse
 import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 internal class ListPageModel(
-    private val sdkEventDistributor: SdkEventDistributorApi
+    private val sdkEventDistributor: SdkEventDistributorApi,
+    private val sdkLogger: Logger
 ) : ListPageModelApi {
-    @OptIn(ExperimentalTime::class)
-    override suspend fun fetchMessages(filterUnreadOnly: Boolean): List<EmbeddedMessage> {
+
+    override suspend fun fetchMessagesWithCategories(filterUnreadOnly: Boolean): Result<MessagesWithCategories> {
         return try {
             val fetchMessagesEvent = SdkEvent.Internal.EmbeddedMessaging.FetchMessages(
                 nackCount = 0,
@@ -27,18 +29,24 @@ internal class ListPageModel(
             response.result.fold(
                 onSuccess = { networkResponse ->
                     val messagesResponse: MessagesResponse = networkResponse.body()
-                    messagesResponse.messages
+                    Result.success(
+                        MessagesWithCategories(
+                            messagesResponse.meta.categories,
+                            messagesResponse.messages
+                        )
+                    )
                 },
                 onFailure = {
-                    emptyList()
+                    sdkLogger.error("FetchMessagesWithCategories failure.", it)
+                    Result.failure(it)
                 }
             )
         } catch (e: Exception) {
-            emptyList()
+            sdkLogger.error("FetchMessagesWithCategories exception.", e)
+            Result.failure(e)
         }
     }
 
-    @OptIn(ExperimentalTime::class)
     override suspend fun fetchBadgeCount(): Int {
         return try {
             val fetchBadgeCountEvent = SdkEvent.Internal.EmbeddedMessaging.FetchBadgeCount(
@@ -53,16 +61,20 @@ internal class ListPageModel(
                     badgeCountResponse.count
                 },
                 onFailure = {
+                    sdkLogger.error("FetchBadgeCount failure.", it)
                     0
                 }
             )
         } catch (e: Exception) {
+            sdkLogger.error("FetchBadgeCount exception.", e)
             0
         }
     }
 
-    @OptIn(ExperimentalTime::class)
-    override suspend fun fetchNextPage(offset: Int, categoryIds: List<Int>): List<EmbeddedMessage> {
+    override suspend fun fetchNextPage(
+        offset: Int,
+        categoryIds: List<Int>
+    ): Result<MessagesWithCategories> {
         return try {
             val fetchNextPageEvent = SdkEvent.Internal.EmbeddedMessaging.FetchNextPage(
                 nackCount = 0,
@@ -75,14 +87,21 @@ internal class ListPageModel(
             response.result.fold(
                 onSuccess = { networkResponse ->
                     val messagesResponse: MessagesResponse = networkResponse.body()
-                    messagesResponse.messages
+                    Result.success(
+                        MessagesWithCategories(
+                            messagesResponse.meta.categories,
+                            messagesResponse.messages
+                        )
+                    )
                 },
                 onFailure = {
-                    emptyList()
+                    sdkLogger.error("FetchNextPage failure.", it)
+                    Result.failure(it)
                 }
             )
         } catch (e: Exception) {
-            emptyList()
+            sdkLogger.error("FetchNextPage exception.", e)
+            Result.failure(e)
         }
     }
 }
