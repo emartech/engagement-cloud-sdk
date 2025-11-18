@@ -13,12 +13,13 @@ internal class ListPageModel(
     private val sdkEventDistributor: SdkEventDistributorApi
 ) : ListPageModelApi {
     @OptIn(ExperimentalTime::class)
-    override suspend fun fetchMessages(): List<EmbeddedMessage> {
+    override suspend fun fetchMessages(filterUnreadOnly: Boolean): List<EmbeddedMessage> {
         return try {
             val fetchMessagesEvent = SdkEvent.Internal.EmbeddedMessaging.FetchMessages(
                 nackCount = 0,
                 offset = 0,
-                categoryIds = emptyList()
+                categoryIds = emptyList(),
+                filterUnreadMessages = filterUnreadOnly
             )
             val messagesResponse = sdkEventDistributor.registerEvent(fetchMessagesEvent)
             val response = messagesResponse.await<Response>()

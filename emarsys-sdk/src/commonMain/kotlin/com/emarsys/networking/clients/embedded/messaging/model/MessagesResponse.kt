@@ -34,7 +34,7 @@ data class EmbeddedMessage(
     val tags: List<String>,
     val categoryIds: List<Int>,
     val receivedAt: Long,
-    val expiresAt: Long,
+    val expiresAt: Long?,
     val properties: Map<String, String>,
     val trackingInfo: String,
 )

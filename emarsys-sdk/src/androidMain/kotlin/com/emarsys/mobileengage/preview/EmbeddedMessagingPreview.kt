@@ -147,7 +147,14 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
         override val isRefreshing: StateFlow<Boolean>
             get() = MutableStateFlow(false).asStateFlow()
 
+        override val filterUnreadOnly: StateFlow<Boolean>
+            get() = MutableStateFlow(false).asStateFlow()
+
         override fun refreshMessages() {
+            Unit
+        }
+
+        override fun setFilterUnreadOnly(unreadOnly: Boolean) {
             Unit
         }
     }

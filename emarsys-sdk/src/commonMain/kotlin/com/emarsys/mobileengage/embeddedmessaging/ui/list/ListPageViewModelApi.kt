@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.StateFlow
 interface ListPageViewModelApi {
     val messages: StateFlow<List<MessageItemViewModel>>
     val isRefreshing: StateFlow<Boolean>
+    val filterUnreadOnly: StateFlow<Boolean>
 
     fun refreshMessages()
+    fun setFilterUnreadOnly(unreadOnly: Boolean)
 }
