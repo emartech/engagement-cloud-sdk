@@ -89,7 +89,7 @@ jobs:
 
   test:
     needs: build
-    runs-on: macos-13
+    runs-on: macos-latest
     strategy:
       matrix:
         include:
