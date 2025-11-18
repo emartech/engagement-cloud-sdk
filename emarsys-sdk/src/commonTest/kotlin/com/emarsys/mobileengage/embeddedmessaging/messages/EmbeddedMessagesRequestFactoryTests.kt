@@ -80,7 +80,22 @@ class EmbeddedMessagesRequestFactoryTests {
         )
 
         result.method shouldBe HttpMethod.Get
-        result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?skip=40&categoryIds=1%2C2"
+        result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?skip=40&filterCategoryIds=1%2C2"
+    }
+
+    @Test
+    fun create_should_return_request_for_fetchMessages_withFilterUnreadTrue() = runTest {
+        val result = embeddedMessagesRequestFactory.create(
+            SdkEvent.Internal.EmbeddedMessaging.FetchMessages(
+                nackCount = 0,
+                offset = 40,
+                categoryIds = listOf(1, 2),
+                filterUnreadMessages = true
+            )
+        )
+
+        result.method shouldBe HttpMethod.Get
+        result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?skip=40&filterCategoryIds=1%2C2&filterUnread=true"
     }
 
     @Test

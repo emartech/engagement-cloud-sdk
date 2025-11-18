@@ -188,7 +188,8 @@ sealed interface SdkEvent {
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int,
                 val offset: Int,
-                val categoryIds: List<Int>
+                val filterUnreadMessages: Boolean = false,
+                val categoryIds: List<Int> = emptyList()
             ) : EmbeddedMessaging
 
             @Serializable

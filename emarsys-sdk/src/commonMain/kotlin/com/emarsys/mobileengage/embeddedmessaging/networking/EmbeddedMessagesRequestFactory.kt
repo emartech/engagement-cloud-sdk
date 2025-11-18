@@ -13,9 +13,9 @@ import kotlinx.serialization.json.Json
 internal class EmbeddedMessagesRequestFactory(
     private val urlFactory: UrlFactoryApi,
     private val json: Json
-): EmbeddedMessagingRequestFactoryApi {
+) : EmbeddedMessagingRequestFactoryApi {
 
-   override fun create(embeddedMessagingEvent: SdkEvent.Internal.EmbeddedMessaging): UrlRequest {
+    override fun create(embeddedMessagingEvent: SdkEvent.Internal.EmbeddedMessaging): UrlRequest {
         return when (embeddedMessagingEvent) {
             is SdkEvent.Internal.EmbeddedMessaging.FetchMessages ->
                 createFetchMessagesRequest(embeddedMessagingEvent)
@@ -62,8 +62,14 @@ internal class EmbeddedMessagesRequestFactory(
             }
             if (embeddedMessagingEvent.categoryIds.isNotEmpty()) {
                 parameters.append(
-                    "categoryIds",
+                    "filterCategoryIds",
                     embeddedMessagingEvent.categoryIds.joinToString(",")
+                )
+            }
+            if (embeddedMessagingEvent.filterUnreadMessages) {
+                parameters.append(
+                    "filterUnread",
+                    "true"
                 )
             }
         }
