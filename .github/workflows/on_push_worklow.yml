@@ -48,53 +48,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 0
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: 17
           distribution: 'temurin'
-          cache: 'gradle'
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          cache-read-only: false
-          gradle-home-cache-includes: |
-            caches
-            notifications
-            jdks
-
-      - name: Cache Gradle build cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', '**/gradle/libs.versions.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      - name: Cache Kotlin/Native build artifacts
-        if: matrix.platform == 'ios'
-        uses: actions/cache@v4
-        with:
-          path: |
-            emarsys-sdk/build/bin
-            ios-notification-service/build/bin
-            .gradle
-          key: ${{ runner.os }}-kotlin-native-${{ matrix.platform }}-${{ hashFiles('**/*.kt', '**/*.kts', '**/build.gradle.kts', '**/gradle.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-kotlin-native-${{ matrix.platform }}-
 
       - name: Build
         run: make build-${{ matrix.platform }}
-        env:
-          GRADLE_OPTS: -Dorg.gradle.caching=true -Dorg.gradle.configuration-cache=true
 
   lint:
     needs: build
@@ -102,40 +71,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 0
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: 17
           distribution: 'temurin'
-          cache: 'gradle'
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          cache-read-only: false
-          gradle-home-cache-includes: |
-            caches
-            notifications
-            jdks
-
-      - name: Cache Gradle build cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', '**/gradle/libs.versions.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
 
       - name: Run lint
         run: make lint
-        env:
-          GRADLE_OPTS: -Dorg.gradle.caching=true -Dorg.gradle.configuration-cache=true
 
   test:
     needs: build
@@ -150,48 +100,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 0
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: 17
           distribution: 'temurin'
-          cache: 'gradle'
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          cache-read-only: false
-          gradle-home-cache-includes: |
-            caches
-            notifications
-            jdks
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-
-      - name: Cache Gradle build cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', '**/gradle/libs.versions.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      - name: Cache Kotlin/Native build artifacts
-        if: matrix.platform == 'ios'
-        uses: actions/cache@v4
-        with:
-          path: |
-            emarsys-sdk/build/bin
-            ios-notification-service/build/bin
-            .gradle
-          key: ${{ runner.os }}-kotlin-native-${{ matrix.platform }}-${{ hashFiles('**/*.kt', '**/*.kts', '**/build.gradle.kts', '**/gradle.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-kotlin-native-${{ matrix.platform }}-
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
@@ -201,16 +122,14 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 30
-          arch: x86_64
+          arch: arm64-v8a
           disable-animations: true
-          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -no-snapshot-load -no-snapshot-save -wipe-data -accel on
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
           script: make test-android
 
       - name: Test iOS
         if: matrix.platform == 'ios'
         run: make test-ios
-        env:
-          GRADLE_OPTS: -Dorg.gradle.caching=true -Dorg.gradle.configuration-cache=true
 
       - name: Setup Node.js
         if: matrix.platform == 'web'
