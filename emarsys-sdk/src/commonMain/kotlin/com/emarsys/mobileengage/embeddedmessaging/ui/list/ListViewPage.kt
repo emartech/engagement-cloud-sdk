@@ -4,7 +4,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -25,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.emarsys.di.SdkKoinIsolationContext.koin
+import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategorySelectorButton
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemView
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModel
 
@@ -52,17 +56,19 @@ fun MessageList(viewModel: ListPageViewModelApi) {
         }
     }
 
+    FilterRow(
+        filterUnreadOnly = filterUnreadOnly,
+        onFilterChange = { viewModel.setFilterUnreadOnly(it) }
+    )
+
+    HorizontalDivider()
+
     PullToRefreshBox(
         isRefreshing = isRefreshing,
         onRefresh = { viewModel.refreshMessages() },
         modifier = Modifier.fillMaxSize()
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            FilterRow(
-                filterUnreadOnly = filterUnreadOnly,
-                onFilterChange = { viewModel.setFilterUnreadOnly(it) }
-            )
-            
             if (messages.isEmpty()) {
                 EmptyState()
             } else {
@@ -84,18 +90,30 @@ fun FilterRow(
 ) {
     Row(
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         FilterChip(
+            modifier = Modifier.height(56.dp),
             selected = !filterUnreadOnly,
             onClick = { onFilterChange(false) },
             label = { Text("All") }
         )
         FilterChip(
+            modifier = Modifier.height(56.dp),
             selected = filterUnreadOnly,
             onClick = { onFilterChange(true) },
             label = { Text("Unread") }
         )
+
+        Spacer(modifier = Modifier.padding(8.dp).weight(1f))
+
+        Column {
+            CategorySelectorButton(
+                isCategorySelectionActive = false,
+                onClick = { },
+            )
+        }
     }
 }
 

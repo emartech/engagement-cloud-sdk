@@ -5,7 +5,7 @@ import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
 import com.github.gmazzo.buildconfig.BuildConfigTask
 import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import java.util.*
+import java.util.Base64
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -81,6 +81,7 @@ kotlin {
                 implementation(compose.ui)
                 implementation(compose.components.resources)
                 implementation(compose.components.uiToolingPreview)
+                implementation(compose.materialIconsExtended)
             }
         }
         val commonTest by getting {

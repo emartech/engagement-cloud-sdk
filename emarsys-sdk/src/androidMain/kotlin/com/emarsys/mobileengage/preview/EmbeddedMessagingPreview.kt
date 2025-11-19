@@ -13,6 +13,7 @@ import com.emarsys.emarsys_sdk.generated.resources.Res
 import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
+import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategorySelectorButton
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemModel
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemView
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModel
@@ -21,15 +22,19 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageViewModelApi
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
 import com.emarsys.networking.clients.embedded.messaging.model.MessageCategory
 import com.emarsys.util.JsonUtil
-import io.ktor.client.*
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.serialization.kotlinx.json.*
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.HttpRequestRetry
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -91,6 +96,14 @@ fun ListPageViewPreview() {
             providePreviewMessageViewModel(previewSdkEventDistributor)
         )
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CategorySelectorButtonPreview() {
+    CategorySelectorButton(isCategorySelectionActive = false, onClick = {
+        println("I'm clicked!")
+    })
 }
 
 private fun providePreviewMessage() = EmbeddedMessage(
