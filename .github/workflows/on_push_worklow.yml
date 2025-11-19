@@ -121,8 +121,10 @@ jobs:
         if: matrix.platform == 'android'
         uses: reactivecircus/android-emulator-runner@v2
         with:
+          api-level: 30
           arch: arm64-v8a
-          api-level: 36
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
           script: make test-android
 
       - name: Test iOS
