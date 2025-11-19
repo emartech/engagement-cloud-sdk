@@ -31,7 +31,6 @@ import com.emarsys.core.providers.TimestampProvider
 import com.emarsys.core.providers.UUIDProvider
 import com.emarsys.mobileengage.embeddedmessaging.models.MessageTagUpdate
 import com.emarsys.mobileengage.inapp.InAppMessage
-import kotlin.time.Instant
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
@@ -39,6 +38,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 sealed interface OnlineSdkEvent : SdkEvent {
     var nackCount: Int
@@ -199,7 +199,8 @@ sealed interface SdkEvent {
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int,
                 val offset: Int,
-                val categoryIds: List<Int>
+                val categoryIds: List<Int>,
+                val filterUnreadMessages: Boolean = false
             ) : EmbeddedMessaging
 
             @Serializable

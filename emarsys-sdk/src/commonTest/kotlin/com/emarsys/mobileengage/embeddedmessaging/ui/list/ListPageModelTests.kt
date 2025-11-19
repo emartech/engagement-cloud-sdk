@@ -17,7 +17,6 @@ import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.matcher.capture.Capture.Companion.slot
-import dev.mokkery.matcher.capture.SlotCapture
 import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
@@ -150,9 +149,7 @@ class ListPageModelTests {
     }
 
     @Test
-    fun fetchNextPage_shouldSendFetchNextPageEvent_andReturnResult_onSuccess() = runTest {
-        val eventSlot: SlotCapture<SdkEvent> = slot()
-        val testOffset = 2
+    fun fetchNextPage_shouldSendNextPageEvent_andReturnResult_onSuccess() = runTest {
         val response = createTestMessageResponse()
         val networkResponse = Response(
             originalRequest = UrlRequest(Url("https://example.com"), HttpMethod.Get),
@@ -166,14 +163,9 @@ class ListPageModelTests {
         )
 
         everySuspend { mockSdkEventWaiter.await<Response>() } returns answerResponse
-        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mockSdkEventWaiter
+        everySuspend { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.NextPage>()) } returns mockSdkEventWaiter
 
-        val result = model.fetchNextPage(offset = testOffset, categoryIds = emptyList()).getOrThrow()
-
-        val emittedEvent = eventSlot.get() as SdkEvent.Internal.EmbeddedMessaging.FetchNextPage
-
-        emittedEvent.offset shouldBe testOffset
-        emittedEvent.categoryIds shouldBe emptyList()
+        val result = model.fetchNextPage().getOrThrow()
 
         result.messages.size shouldBe 2
         result.messages shouldBe response.messages
@@ -193,7 +185,7 @@ class ListPageModelTests {
         everySuspend { mockSdkEventWaiter.await<Response>() } returns answerResponse
         everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mockSdkEventWaiter
 
-        val result = model.fetchNextPage(offset = 2, categoryIds = emptyList())
+        val result = model.fetchNextPage()
 
         result.isFailure shouldBe true
         result.exceptionOrNull() shouldBe testException
@@ -206,7 +198,7 @@ class ListPageModelTests {
 
         everySuspend { mockSdkEventDistributor.registerEvent(any()) } throws testException
 
-        val result = model.fetchNextPage(offset = 2, categoryIds = emptyList())
+        val result = model.fetchNextPage()
 
         result.isFailure shouldBe true
         result.exceptionOrNull() shouldBe testException

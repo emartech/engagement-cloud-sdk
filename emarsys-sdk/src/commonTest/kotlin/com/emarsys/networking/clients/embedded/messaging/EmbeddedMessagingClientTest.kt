@@ -35,11 +35,10 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlin.time.Clock
-
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.time.Clock
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
@@ -307,7 +306,8 @@ class EmbeddedMessagingClientTest {
         val event5 = SdkEvent.Internal.EmbeddedMessaging.FetchNextPage(
             nackCount = 0,
             offset = 0,
-            categoryIds = emptyList()
+            categoryIds = emptyList(),
+            filterUnreadMessages = false
         )
         val wrongEvent =
             SdkEvent.Internal.Sdk.LinkContact(

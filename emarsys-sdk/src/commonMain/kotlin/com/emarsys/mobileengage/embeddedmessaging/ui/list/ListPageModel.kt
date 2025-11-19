@@ -71,17 +71,9 @@ internal class ListPageModel(
         }
     }
 
-    override suspend fun fetchNextPage(
-        offset: Int,
-        categoryIds: List<Int>
-    ): Result<MessagesWithCategories> {
+    override suspend fun fetchNextPage(): Result<MessagesWithCategories> {
         return try {
-            val fetchNextPageEvent = SdkEvent.Internal.EmbeddedMessaging.FetchNextPage(
-                nackCount = 0,
-                offset = offset,
-                categoryIds = categoryIds
-            )
-            val nextPageResponse = sdkEventDistributor.registerEvent(fetchNextPageEvent)
+            val nextPageResponse = sdkEventDistributor.registerEvent(SdkEvent.Internal.EmbeddedMessaging.NextPage())
             val response = nextPageResponse.await<Response>()
 
             response.result.fold(

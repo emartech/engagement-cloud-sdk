@@ -4,9 +4,9 @@ package com.emarsys.mobileengage.embeddedmessaging.messages
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.event.SdkEvent
-import com.emarsys.mobileengage.embeddedmessaging.networking.EmbeddedMessagesRequestFactory
 import com.emarsys.mobileengage.embeddedmessaging.models.MessageTagUpdate
 import com.emarsys.mobileengage.embeddedmessaging.models.TagOperation
+import com.emarsys.mobileengage.embeddedmessaging.networking.EmbeddedMessagesRequestFactory
 import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -140,6 +140,70 @@ class EmbeddedMessagesRequestFactoryTests {
         result.method shouldBe HttpMethod.Patch
         result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/tags"
         result.bodyString shouldBe JsonUtil.json.encodeToString(updateData)
+    }
+
+    @Test
+    fun create_should_return_request_for_fetchNextPage() = runTest {
+        val offset = 20
+        val result = embeddedMessagesRequestFactory.create(
+            SdkEvent.Internal.EmbeddedMessaging.FetchNextPage(
+                nackCount = 0,
+                offset = offset,
+                categoryIds = emptyList()
+            )
+        )
+
+        result.method shouldBe HttpMethod.Get
+        result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?skip=$offset"
+    }
+
+    @Test
+    fun create_should_return_request_for_fetchNextPage_withNotEmptyCategoryIds() = runTest {
+        val offset = 20
+        val result = embeddedMessagesRequestFactory.create(
+            SdkEvent.Internal.EmbeddedMessaging.FetchNextPage(
+                nackCount = 0,
+                offset = offset,
+                categoryIds = listOf(1, 2)
+            )
+        )
+
+        result.method shouldBe HttpMethod.Get
+        result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?skip=$offset&filterCategoryIds=1%2C2"
+    }
+
+    @Test
+    fun create_should_return_request_for_fetchNextPage_withFilterUnreadTrue() = runTest {
+        val offset = 20
+        val filterUnreadMessages = true
+        val result = embeddedMessagesRequestFactory.create(
+            SdkEvent.Internal.EmbeddedMessaging.FetchNextPage(
+                nackCount = 0,
+                offset = offset,
+                categoryIds = emptyList(),
+                filterUnreadMessages = filterUnreadMessages
+            )
+        )
+
+        result.method shouldBe HttpMethod.Get
+        result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?skip=$offset&filterUnread=$filterUnreadMessages"
+    }
+
+    @Test
+    fun create_should_return_request_for_fetchNextPage_withFilterUnreadTrue_and_NotEmptyCategoryIds() = runTest {
+        val offset = 20
+        val filterUnreadMessages = true
+        val result = embeddedMessagesRequestFactory.create(
+            SdkEvent.Internal.EmbeddedMessaging.FetchNextPage(
+                nackCount = 0,
+                offset = offset,
+                categoryIds = listOf(1, 2),
+                filterUnreadMessages = filterUnreadMessages
+            )
+        )
+
+        result.method shouldBe HttpMethod.Get
+        result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?skip=$offset&filterCategoryIds=1%2C2&filterUnread=$filterUnreadMessages"
     }
 
 }

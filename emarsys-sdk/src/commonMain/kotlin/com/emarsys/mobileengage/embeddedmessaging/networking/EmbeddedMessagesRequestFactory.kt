@@ -5,8 +5,8 @@ import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.event.SdkEvent
 import io.ktor.http.*
-import kotlin.time.ExperimentalTime
 import kotlinx.serialization.json.Json
+import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 
@@ -29,6 +29,7 @@ internal class EmbeddedMessagesRequestFactory(
                         nackCount = embeddedMessagingEvent.nackCount,
                         offset = embeddedMessagingEvent.offset,
                         categoryIds = embeddedMessagingEvent.categoryIds,
+                        filterUnreadMessages = embeddedMessagingEvent.filterUnreadMessages
                     )
                 )
 

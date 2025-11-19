@@ -6,7 +6,8 @@ internal class EmbeddedMessagingPaginationState(
     var offset: Int = 0,
     var categoryIds: List<Int> = emptyList(),
     var receivedCount: Int = 0,
-    var endReached: Boolean = false
+    var endReached: Boolean = false,
+    var filterUnreadMessages: Boolean = false
 ) {
     fun canFetchNextPage(): Boolean = !endReached
 
@@ -21,5 +22,6 @@ internal class EmbeddedMessagingPaginationState(
         categoryIds = emptyList()
         receivedCount = 0
         endReached = false
+        filterUnreadMessages = false
     }
 }
