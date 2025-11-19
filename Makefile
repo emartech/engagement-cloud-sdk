@@ -80,8 +80,7 @@ test-android: check-env ## run Android tests for all modules
 	@./gradlew connectedAndroidTest -x :composeApp:connectedAndroidTest
 
 build-ios: check-env ## build iOS
-	@./gradlew linkReleaseFrameworkIosArm64 \
-	        -x :composeApp:linkReleaseFrameworkIosArm64
+	@./gradlew compileKotlinIosArm64
 
 build-ios-all-archtypes: check-env ## build iOS
 	@./gradlew linkReleaseFrameworkIosArm64 linkReleaseFrameworkIosX64 linkReleaseFrameworkIosSimulatorArm64 \
