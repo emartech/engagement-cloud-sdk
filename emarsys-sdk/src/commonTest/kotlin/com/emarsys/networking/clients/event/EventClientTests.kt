@@ -26,40 +26,22 @@ import com.emarsys.networking.clients.event.model.ContentCampaign
 import com.emarsys.networking.clients.event.model.DeviceEventResponse
 import com.emarsys.networking.clients.event.model.OnEventActionCampaign
 import com.emarsys.util.JsonUtil
-import dev.mokkery.MockMode
+import dev.mokkery.*
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
-import dev.mokkery.every
-import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.matcher.capture.Capture
 import dev.mokkery.matcher.capture.capture
-import dev.mokkery.mock
-import dev.mokkery.verify
 import dev.mokkery.verify.VerifyMode
-import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
-import io.ktor.http.Headers
-import io.ktor.http.HttpMethod
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.Url
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
+import io.ktor.http.*
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
-import kotlin.time.Clock
+import kotlinx.coroutines.test.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
@@ -67,6 +49,7 @@ import okio.IOException
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
@@ -292,18 +275,22 @@ class EventClientTests {
     }
 
     @Test
-    fun testConsumer_shouldNotDoAnything_whenResponseStatusCodeIs204() = runTest {
+    fun testConsumer_shouldAckEvents_andEmitAnswerResponses_whenResponseStatusCodeIs204() = runTest {
+        val testResult = Result.success(
+            createTestResponse(
+                statusCode = HttpStatusCode.NoContent,
+                body = ""
+            )
+        )
+        val expectedAnswerResponse =
+            SdkEvent.Internal.Sdk.Answer.Response(
+                testEvent.id,
+                testResult
+            )
         eventClient = createEventClient(backgroundScope)
         eventClient.register()
 
-        everySuspend { mockEmarsysClient.send(any()) }.returns(
-            Result.success(
-                createTestResponse(
-                    statusCode = HttpStatusCode.NoContent,
-                    body = ""
-                )
-            )
-        )
+        everySuspend { mockEmarsysClient.send(any()) }.returns(testResult)
         val expectedUrlRequest = createTestRequest()
         val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
             onlineEvents.take(1).toList()
@@ -318,6 +305,7 @@ class EventClientTests {
         verifySuspend(VerifyMode.exactly(0)) { mockOnEventActionFactory.create(any()) }
         verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
         verifySuspend { mockEventsDao.removeEvent(testEvent) }
+        verifySuspend { mockSdkEventManager.emitEvent(expectedAnswerResponse) }
     }
 
     @Test
@@ -365,10 +353,14 @@ class EventClientTests {
                 )
             )
         }
-        verifySuspend { mockSdkEventManager.emitEvent( SdkEvent.Internal.Sdk.Answer.Response(
-            originId = testEvent1.id,
-            Result.failure<Throwable>(testException)
-        )) }
+        verifySuspend {
+            mockSdkEventManager.emitEvent(
+                SdkEvent.Internal.Sdk.Answer.Response(
+                    originId = testEvent1.id,
+                    Result.failure<Throwable>(testException)
+                )
+            )
+        }
     }
 
     @Test

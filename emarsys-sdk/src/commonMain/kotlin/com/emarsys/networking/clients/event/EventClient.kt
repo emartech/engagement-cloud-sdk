@@ -8,6 +8,7 @@ import com.emarsys.core.exceptions.SdkException.NetworkIOException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.context.RequestContextApi
+import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.networking.model.body
 import com.emarsys.core.providers.UuidProviderApi
@@ -22,24 +23,15 @@ import com.emarsys.mobileengage.inapp.InAppMessage
 import com.emarsys.mobileengage.inapp.InAppType
 import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.error.ClientExceptionHandler
-import com.emarsys.networking.clients.event.model.ContentCampaign
-import com.emarsys.networking.clients.event.model.DeviceEventRequestBody
-import com.emarsys.networking.clients.event.model.DeviceEventResponse
-import com.emarsys.networking.clients.event.model.OnEventActionCampaign
-import com.emarsys.networking.clients.event.model.toDeviceEvent
-import io.ktor.http.HttpMethod
-import io.ktor.http.HttpStatusCode
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.ensureActive
+import com.emarsys.networking.clients.event.model.*
+import io.ktor.http.*
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
-import kotlin.coroutines.coroutineContext
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
@@ -88,20 +80,14 @@ internal class EventClient(
                     networkResponse.onSuccess { response ->
                         if (response.status == HttpStatusCode.NoContent) {
                             sdkEvents.ack(eventsDao, sdkLogger)
+                            emitResponseEventOnSuccess(sdkEvents, response)
                             return@onEach
                         }
                         val result: DeviceEventResponse = response.body()
                         handleDeviceEventState(result)
                         handleInApp(result.contentCampaigns?.getOrNull(0))  // todo handle all campaigns returned
                         result.actionCampaigns?.let { handleOnEventActionCampaigns(it) }
-                        sdkEvents.forEach {
-                            sdkEventManager.emitEvent(
-                                SdkEvent.Internal.Sdk.Answer.Response(
-                                    originId = it.id,
-                                    Result.success(response)
-                                )
-                            )
-                        }
+                        emitResponseEventOnSuccess(sdkEvents, response)
                         sdkEvents.ack(eventsDao, sdkLogger)
                     }
                     networkResponse.onFailure { exception ->
@@ -140,6 +126,17 @@ internal class EventClient(
         it.forEach { sdkEvent -> sdkEventManager.emitEvent(sdkEvent) }
     }
 
+    private suspend fun emitResponseEventOnSuccess(sdkEvents: List<SdkEvent>, response: Response) {
+        sdkEvents.forEach { event ->
+            sdkEventManager.emitEvent(
+                SdkEvent.Internal.Sdk.Answer.Response(
+                    originId = event.id,
+                    Result.success(response)
+                )
+            )
+        }
+    }
+
     private suspend fun handleOnEventActionCampaigns(onEventActionCampaigns: List<OnEventActionCampaign>) {
         onEventActionCampaigns.forEach { campaign ->
             val actions =
@@ -151,7 +148,7 @@ internal class EventClient(
                     eventActionFactory.create(action).invoke()
                     reportOnEventActionCampaignAction(campaign.trackingInfo, action)
                 } catch (exception: Exception) {
-                    coroutineContext.ensureActive()
+                    currentCoroutineContext().ensureActive()
                     sdkLogger.error("EventClient - onEventActionInvocationFailed", exception)
                 }
             }
@@ -183,14 +180,16 @@ internal class EventClient(
                 "EventClient - handleInApp",
                 buildJsonObject { put("campaignId", JsonPrimitive(message.trackingInfo)) })
 
-            sdkEventManager.emitEvent(SdkEvent.Internal.InApp.Present(
-                inAppMessage = InAppMessage(
-                    dismissId = uuidProvider.provide(),
-                    type = InAppType.OVERLAY,
-                    trackingInfo = message.trackingInfo,
-                    content = message.content
+            sdkEventManager.emitEvent(
+                SdkEvent.Internal.InApp.Present(
+                    inAppMessage = InAppMessage(
+                        dismissId = uuidProvider.provide(),
+                        type = InAppType.OVERLAY,
+                        trackingInfo = message.trackingInfo,
+                        content = message.content
+                    )
                 )
-            ))
+            )
         }
     }
 }
