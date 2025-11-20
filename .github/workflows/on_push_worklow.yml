@@ -115,13 +115,7 @@ jobs:
           target: google_apis
           emulator-boot-timeout: 900
           disable-animations: true
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           script: |
-            echo "Waiting for emulator to be fully ready..."
-            adb wait-for-device
-            echo "Waiting for boot to complete..."
-            adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done'
-            echo "Emulator is ready, running tests..."
             make test-android
 
       - name: Test iOS
