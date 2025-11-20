@@ -17,12 +17,14 @@ internal class CustomEventAction(
         sdkEventDistributor.registerEvent(
             SdkEvent.External.Custom(
                 name = action.name,
-                attributes = buildJsonObject {
-                    action.payload?.forEach { (key, value) ->
-                        put(
-                            key,
-                            JsonPrimitive(value)
-                        )
+                attributes = action.payload?.let {
+                    buildJsonObject {
+                        it.forEach { (key, value) ->
+                            put(
+                                key,
+                                JsonPrimitive(value)
+                            )
+                        }
                     }
                 })
         ).await<SdkEvent.Internal.Sdk.Answer.Response<Response>>()

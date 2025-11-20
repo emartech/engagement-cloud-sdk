@@ -14,17 +14,17 @@ internal class AppEventAction(
 ) : Action<SdkEvent> {
     //TODO we should add the source!!
     override suspend fun invoke(value: SdkEvent?) {
-        value?.let {
-            sdkEventDistributor.registerEvent(
-                SdkEvent.External.Api.AppEvent(
-                    name = action.name,
-                    attributes = buildJsonObject {
-                        action.payload?.forEach { (key, value) ->
+        sdkEventDistributor.registerEvent(
+            SdkEvent.External.Api.AppEvent(
+                name = action.name,
+                attributes = action.payload?.let {
+                    buildJsonObject {
+                        it.forEach { (key, value) ->
                             put(key, value)
                         }
-                    },
-                )
+                    }
+                }
             )
-        }
+        )
     }
 }

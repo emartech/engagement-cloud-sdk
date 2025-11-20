@@ -38,7 +38,7 @@ object Emarsys {
     /**
      * Publishes a flow of SDK events that can be observed externally.
      * The following event types are available:
-     * - [AppEvent][SdkEvent.External.Api.AppEvent] - represents events defined by
+     * - [SdkEvent.External.Api.AppEvent] - represents events defined by
      * the SAP Emarsys platform user.
      * - [BadgeCountEvent][SdkEvent.External.Api.BadgeCountEvent] - represents changes in the badge count.
      */

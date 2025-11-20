@@ -1,10 +1,10 @@
 package com.emarsys.api.event.model
 
 import com.emarsys.event.SdkEvent
-import kotlin.time.Instant
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * Represents a custom event that can be tracked using the SDK.
@@ -19,14 +19,16 @@ data class CustomEvent(
 
 @OptIn(ExperimentalTime::class)
 fun CustomEvent.toSdkEvent(uuid: String, timestamp: Instant): SdkEvent = SdkEvent.External.Custom(
-    id  = uuid,
+    id = uuid,
     name = name,
-    attributes = buildJsonObject {
-        attributes?.forEach { (key, value) ->
-            put(
-                key,
-                JsonPrimitive(value)
-            )
+    attributes = attributes?.let { attributes ->
+        buildJsonObject {
+            attributes.forEach { (key, value) ->
+                put(
+                    key,
+                    JsonPrimitive(value)
+                )
+            }
         }
     },
     timestamp = timestamp
