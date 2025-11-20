@@ -35,8 +35,7 @@ kotlin {
         publishLibraryVariants("release")
     }
     js(IR) {
-        binaries.executable()
-        generateTypeScriptDefinitions()
+        useCommonJs()
         browser {
             commonWebpackConfig {
                 outputFileName = "emarsys-sdk.js"
@@ -46,8 +45,9 @@ kotlin {
                     useChromeHeadless()
                 }
             }
-            binaries.executable()
         }
+        binaries.executable()
+        generateTypeScriptDefinitions()
     }
 
     listOf(
