@@ -35,7 +35,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class, ExperimentalWasmJsInterop::class)
 class EmarsysIndexedDbObjectStoreTest {
 
     private lateinit var emarsysIndexedDb: EmarsysIndexedDb

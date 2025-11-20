@@ -20,6 +20,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
+@OptIn(ExperimentalWasmJsInterop::class)
 class EmarsysIndexedDbObjectStore<T>(
     private val emarsysIndexedDb: EmarsysIndexedDb,
     private val emarsysObjectStoreConfig: EmarsysObjectStoreConfig<T>,
@@ -60,20 +61,12 @@ class EmarsysIndexedDbObjectStore<T>(
                     continuation.resumeWithException(request.error!!)
                 }
             }
-            logger.trace("EmarsysIndexedDbObjectStore - put", buildJsonObject {
-                put("value", value.toString())
-                put("id", id)
-            }, isRemoteLog = false)
             savedId
         }
     }
 
     override suspend fun getAll(): Flow<T> {
         return emarsysIndexedDb.execute { database ->
-            logger.trace(
-                "Fetching all data from store: ${emarsysObjectStoreConfig.name}",
-                isRemoteLog = false
-            )
             suspendCoroutine { continuation ->
                 val transaction = database.transaction(
                     emarsysObjectStoreConfig.name,
@@ -90,7 +83,7 @@ class EmarsysIndexedDbObjectStore<T>(
                                     emarsysObjectStoreConfig.serializer,
                                     JSON.stringify(it)
                                 )
-                            } catch (exception: Exception) {
+                            } catch (_: Exception) {
                                 null
                             }
                         }
@@ -110,9 +103,6 @@ class EmarsysIndexedDbObjectStore<T>(
 
     suspend fun get(id: String): T? {
         return emarsysIndexedDb.execute { database ->
-            logger.trace("EmarsysIndexedDbObjectStore - get", buildJsonObject {
-                put("id", id)
-            }, isRemoteLog = false)
             suspendCoroutine { continuation ->
                 val transaction = database.transaction(
                     emarsysObjectStoreConfig.name,
@@ -154,9 +144,6 @@ class EmarsysIndexedDbObjectStore<T>(
 
     override suspend fun delete(id: String) {
         return emarsysIndexedDb.execute { database ->
-            logger.trace("EmarsysIndexedDbObjectStore - delete", buildJsonObject {
-                put("id", id)
-            }, isRemoteLog = false)
             suspendCoroutine { continuation ->
                 val transaction = database.transaction(
                     emarsysObjectStoreConfig.name,
