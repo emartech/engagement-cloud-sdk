@@ -13,6 +13,7 @@ import com.emarsys.emarsys_sdk.generated.resources.Res
 import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
+import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategoriesDialogView
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategorySelectorButton
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemModel
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemView
@@ -104,6 +105,23 @@ fun CategorySelectorButtonPreview() {
     CategorySelectorButton(isCategorySelectionActive = false, onClick = {
         println("I'm clicked!")
     })
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CategoriesDialogViewPreview() {
+    val messageCategories = listOf(
+        MessageCategory(1, "Serums"),
+        MessageCategory(2, "Creams"),
+        MessageCategory(3, "Boosters"),
+        MessageCategory(4, "Promotions"),
+        MessageCategory(5, "Beauty tips"),
+    )
+    CategoriesDialogView(
+        messageCategories,
+        onDismiss = {
+            println("I'm dismissed!")
+        })
 }
 
 private fun providePreviewMessage() = EmbeddedMessage(
