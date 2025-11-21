@@ -9,6 +9,7 @@ import com.emarsys.api.inapp.JSInAppApi
 import com.emarsys.api.push.JSPushApi
 import com.emarsys.api.setup.JsSetupApi
 import com.emarsys.api.tracking.JSTrackingApi
+import com.emarsys.core.log.Logger
 import com.emarsys.di.CoroutineScopeTypes
 import com.emarsys.di.EventFlowTypes
 import com.emarsys.di.SdkKoinIsolationContext
@@ -20,6 +21,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 
 fun main() {
@@ -47,8 +49,13 @@ object EmarsysJs {
     internal fun init() {
         SdkKoinIsolationContext.init()
         applicationScope = koin.get<CoroutineScope>(named(CoroutineScopeTypes.Application))
+        val logger = koin.get<Logger>(parameters = { parametersOf(EmarsysJs::class.simpleName) })
         applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
-            koin.get<InitOrganizerApi>().init()
+            try {
+                koin.get<InitOrganizerApi>().init()
+            } catch (error: Throwable) {
+                logger.error(error.stackTraceToString())
+            }
         }
         setup = koin.get<JsSetupApi>()
         config = koin.get<JSConfigApi>()

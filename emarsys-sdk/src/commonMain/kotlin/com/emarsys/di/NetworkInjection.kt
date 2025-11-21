@@ -83,7 +83,7 @@ object NetworkInjection {
                 applicationScope = get(named(CoroutineScopeTypes.Application)),
                 timestampProvider = get(),
                 embeddedMessagingContext = get()
-                )
+            )
         }
         single<EventBasedClientApi>(named(EventBasedClientTypes.Device)) {
             DeviceClient(
