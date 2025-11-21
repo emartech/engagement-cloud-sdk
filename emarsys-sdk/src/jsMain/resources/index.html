@@ -1,7 +1,7 @@
 <html lang="en">
 <head>
     <title>Emarsys SDK demo</title>
-    <script src="skiko.js"></script>
+    <script type="module" src="skiko.mjs"></script>
     <script src="emarsys-sdk.js"></script>
 </head>
 <body>
@@ -43,7 +43,7 @@
          null
      )
 
-     await emarsys.setup.com.emarsys.sample.enableTracking(config);
+     await emarsys.setup.enableTracking(config);
      await emarsys.contact.link("test@test.com");
      emarsys.events.on("app_event", (event) => console.log(JSON.stringify(event)));
  }
@@ -58,7 +58,7 @@
              "/ems-service-worker.js"
          )
      )
-     await emarsys.setup.com.emarsys.sample.enableTracking(config);
+     await emarsys.setup.enableTracking(config);
      await emarsys.contact.link("test2@test.com");
  }
 

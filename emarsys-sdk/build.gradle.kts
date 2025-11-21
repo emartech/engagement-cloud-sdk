@@ -35,8 +35,8 @@ kotlin {
         publishLibraryVariants("release")
     }
     js(IR) {
-        useCommonJs()
         browser {
+            useCommonJs()
             commonWebpackConfig {
                 outputFileName = "emarsys-sdk.js"
             }
