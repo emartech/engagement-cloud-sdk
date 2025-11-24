@@ -45,6 +45,8 @@ import com.emarsys.core.providers.AndroidApplicationVersionProvider
 import com.emarsys.core.providers.ApplicationVersionProviderApi
 import com.emarsys.core.providers.ClientIdProvider
 import com.emarsys.core.providers.LanguageProviderApi
+import com.emarsys.core.providers.pagelocation.PageLocationProvider
+import com.emarsys.core.providers.pagelocation.PageLocationProviderApi
 import com.emarsys.core.resource.MetadataReader
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.StorageConstants
@@ -133,6 +135,7 @@ object AndroidInjection {
             )
         }
         single<AndroidSetupApi> { AndroidSetup(setup = get()) }
+        single<PageLocationProviderApi> { PageLocationProvider() }
         single<DeviceInfoCollectorApi> {
             val isGoogleAvailable: Boolean = get(named(AvailableServices.Google))
             val isHuaweiAvailable: Boolean = get(named(AvailableServices.Huawei))

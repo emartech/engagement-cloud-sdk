@@ -103,6 +103,7 @@ object WebInjection {
         }
         single<LanguageProviderApi> { WebLanguageProvider() }
         single<ApplicationVersionProviderApi> { WebApplicationVersionProvider() }
+        single<PageLocationProviderApi> { PageLocationProvider() }
         single<EventsDaoApi> {
             val emarsysIndexedDb = EmarsysIndexedDb(
                 indexedDBFactory = indexedDB,

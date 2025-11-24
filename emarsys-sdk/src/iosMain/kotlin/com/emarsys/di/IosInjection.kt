@@ -114,6 +114,7 @@ object IosInjection {
                 json = get()
             )
         }
+        single<PageLocationProviderApi> { PageLocationProvider() }
         single<DeviceInfoCollectorApi> {
             DeviceInfoCollector(
                 clientIdProvider = ClientIdProvider(uuidProvider = get(), storage = get()),

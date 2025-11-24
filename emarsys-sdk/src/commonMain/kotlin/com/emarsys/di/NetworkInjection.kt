@@ -69,7 +69,9 @@ object NetworkInjection {
                 eventsDao = get(),
                 sdkLogger = get { parametersOf(EventClient::class.simpleName) },
                 applicationScope = get(named(CoroutineScopeTypes.Application)),
-                uuidProvider = get()
+                uuidProvider = get(),
+                deviceInfoCollector = get(),
+                pageLocationProvider = get()
             )
         }
         single<EventBasedClientApi>(named(EventBasedClientTypes.EmbeddedMessaging)) {
