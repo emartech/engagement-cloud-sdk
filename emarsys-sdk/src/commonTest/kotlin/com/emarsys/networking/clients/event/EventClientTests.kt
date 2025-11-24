@@ -3,12 +3,14 @@ package com.emarsys.networking.clients.event
 import com.emarsys.api.inapp.InAppConfigApi
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
+import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.context.RequestContextApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.providers.UuidProviderApi
+import com.emarsys.core.providers.pagelocation.PageLocationProviderApi
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.event.OnlineSdkEvent
@@ -26,22 +28,39 @@ import com.emarsys.networking.clients.event.model.ContentCampaign
 import com.emarsys.networking.clients.event.model.DeviceEventResponse
 import com.emarsys.networking.clients.event.model.OnEventActionCampaign
 import com.emarsys.util.JsonUtil
-import dev.mokkery.*
+import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
+import dev.mokkery.every
+import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.matcher.capture.Capture
 import dev.mokkery.matcher.capture.capture
+import dev.mokkery.mock
+import dev.mokkery.verify
 import dev.mokkery.verify.VerifyMode
+import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
-import io.ktor.http.*
-import kotlinx.coroutines.*
+import io.ktor.http.Headers
+import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.Url
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.test.*
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
@@ -58,6 +77,8 @@ class EventClientTests {
         const val DEVICE_EVENT_STATE = "testDeviceEventState"
         const val EVENT_NAME = "test event name"
         const val UUID = "testUuid"
+        const val PAGE_LOCATION = "www.example.com"
+        const val PLATFORM_CATEGORY = "mobile"
         const val IN_APP_DND = false
         val TIMESTAMP = Clock.System.now()
         const val TRACKING_INFO = "testTrackingInfo"
@@ -90,6 +111,8 @@ class EventClientTests {
     private lateinit var mockSdkLogger: Logger
     private lateinit var mockWebViewHolder: WebViewHolder
     private lateinit var mockUuidProvider: UuidProviderApi
+    private lateinit var mockDeviceInfoCollector: DeviceInfoCollectorApi
+    private lateinit var mockPageLocationProvider: PageLocationProviderApi
 
     @BeforeTest
     fun setup() {
@@ -107,6 +130,10 @@ class EventClientTests {
         mockEventsDao = mock(MockMode.autofill)
         onlineEvents = MutableSharedFlow()
         mockSdkEventManager = mock()
+        mockDeviceInfoCollector = mock()
+        every { mockDeviceInfoCollector.getPlatformCategory() } returns PLATFORM_CATEGORY
+        mockPageLocationProvider = mock()
+        every { mockPageLocationProvider.provide() } returns PAGE_LOCATION
         mockUuidProvider = mock()
         every { mockUuidProvider.provide() } returns UUID
         every { mockSdkEventManager.onlineSdkEvents } returns onlineEvents
@@ -129,7 +156,9 @@ class EventClientTests {
         mockEventsDao,
         mockSdkLogger,
         applicationScope,
-        mockUuidProvider
+        mockUuidProvider,
+        mockDeviceInfoCollector,
+        mockPageLocationProvider
     )
 
     @AfterTest

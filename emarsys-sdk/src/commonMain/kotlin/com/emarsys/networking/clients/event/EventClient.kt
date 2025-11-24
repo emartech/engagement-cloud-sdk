@@ -4,6 +4,7 @@ import com.emarsys.api.inapp.InAppConfigApi
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.channel.naturalBatching
 import com.emarsys.core.db.events.EventsDaoApi
+import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.exceptions.SdkException.NetworkIOException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
@@ -12,6 +13,7 @@ import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.networking.model.body
 import com.emarsys.core.providers.UuidProviderApi
+import com.emarsys.core.providers.pagelocation.PageLocationProviderApi
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.event.OnlineSdkEvent
@@ -23,12 +25,21 @@ import com.emarsys.mobileengage.inapp.InAppMessage
 import com.emarsys.mobileengage.inapp.InAppType
 import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.error.ClientExceptionHandler
-import com.emarsys.networking.clients.event.model.*
-import io.ktor.http.*
-import kotlinx.coroutines.*
+import com.emarsys.networking.clients.event.model.ContentCampaign
+import com.emarsys.networking.clients.event.model.DeviceEventRequestBody
+import com.emarsys.networking.clients.event.model.DeviceEventResponse
+import com.emarsys.networking.clients.event.model.OnEventActionCampaign
+import com.emarsys.networking.clients.event.model.toDeviceEvent
+import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
@@ -47,7 +58,9 @@ internal class EventClient(
     private val eventsDao: EventsDaoApi,
     private val sdkLogger: Logger,
     private val applicationScope: CoroutineScope,
-    private val uuidProvider: UuidProviderApi
+    private val uuidProvider: UuidProviderApi,
+    private val deviceInfoCollector: DeviceInfoCollectorApi,
+    private val pageLocationProvider: PageLocationProviderApi
 ) : EventBasedClientApi {
 
     override suspend fun register() {
@@ -66,7 +79,12 @@ internal class EventClient(
                     val requestBody =
                         DeviceEventRequestBody(
                             inAppConfigApi.inAppDnd,
-                            sdkEvents.map { (it as SdkEvent.DeviceEvent).toDeviceEvent() },
+                            sdkEvents.map {
+                                (it as SdkEvent.DeviceEvent).toDeviceEvent(
+                                    platformCategory = deviceInfoCollector.getPlatformCategory(),
+                                    pageLocation = pageLocationProvider.provide()
+                                )
+                            },
                             requestContext.deviceEventState
                         )
                     val body = json.encodeToString(requestBody)
