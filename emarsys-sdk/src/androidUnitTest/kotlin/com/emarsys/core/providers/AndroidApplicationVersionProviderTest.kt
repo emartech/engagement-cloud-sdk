@@ -1,4 +1,4 @@
-package com.emarsys.core.provider
+package com.emarsys.core.providers
 
 import android.content.Context
 import android.content.pm.ApplicationInfo

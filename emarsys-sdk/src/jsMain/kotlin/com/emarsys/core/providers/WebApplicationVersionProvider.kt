@@ -1,6 +1,4 @@
-package com.emarsys.core.provider
-
-import com.emarsys.core.providers.ApplicationVersionProviderApi
+package com.emarsys.core.providers
 
 internal class WebApplicationVersionProvider: ApplicationVersionProviderApi {
     private companion object {

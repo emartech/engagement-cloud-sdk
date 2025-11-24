@@ -1,7 +1,6 @@
-package com.emarsys.core.provider
+package com.emarsys.core.providers
 
 import com.emarsys.core.device.UNKNOWN_VERSION_NAME
-import com.emarsys.core.providers.ApplicationVersionProviderApi
 import platform.Foundation.NSBundle
 
 internal class IosApplicationVersionProvider: ApplicationVersionProviderApi {

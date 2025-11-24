@@ -47,11 +47,11 @@ import com.emarsys.core.language.WebLanguageTagValidator
 import com.emarsys.core.launchapplication.JsLaunchApplicationHandler
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.permission.WebPermissionHandler
-import com.emarsys.core.provider.WebApplicationVersionProvider
-import com.emarsys.core.provider.WebLanguageProvider
 import com.emarsys.core.providers.ApplicationVersionProviderApi
 import com.emarsys.core.providers.ClientIdProvider
 import com.emarsys.core.providers.LanguageProviderApi
+import com.emarsys.core.providers.WebApplicationVersionProvider
+import com.emarsys.core.providers.WebLanguageProvider
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.StringStorageApi

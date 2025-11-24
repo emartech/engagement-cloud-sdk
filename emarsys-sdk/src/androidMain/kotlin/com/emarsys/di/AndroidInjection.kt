@@ -41,7 +41,7 @@ import com.emarsys.core.language.AndroidLanguageTagValidator
 import com.emarsys.core.language.LanguageTagValidatorApi
 import com.emarsys.core.launchapplication.LaunchApplicationHandler
 import com.emarsys.core.permission.PermissionHandlerApi
-import com.emarsys.core.provider.AndroidApplicationVersionProvider
+import com.emarsys.core.providers.AndroidApplicationVersionProvider
 import com.emarsys.core.providers.ApplicationVersionProviderApi
 import com.emarsys.core.providers.ClientIdProvider
 import com.emarsys.core.providers.LanguageProviderApi

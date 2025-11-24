@@ -1,6 +1,5 @@
-package com.emarsys.core.provider
+package com.emarsys.core.providers
 
-import com.emarsys.core.providers.LanguageProviderApi
 import kotlinx.browser.window
 
 internal class WebLanguageProvider: LanguageProviderApi {

@@ -36,11 +36,13 @@ import com.emarsys.core.language.LanguageTagValidatorApi
 import com.emarsys.core.launchapplication.IosLaunchApplicationHandler
 import com.emarsys.core.permission.IosPermissionHandler
 import com.emarsys.core.permission.PermissionHandlerApi
-import com.emarsys.core.provider.IosApplicationVersionProvider
-import com.emarsys.core.provider.IosLanguageProvider
 import com.emarsys.core.providers.ApplicationVersionProviderApi
 import com.emarsys.core.providers.ClientIdProvider
+import com.emarsys.core.providers.IosApplicationVersionProvider
+import com.emarsys.core.providers.IosLanguageProvider
 import com.emarsys.core.providers.LanguageProviderApi
+import com.emarsys.core.providers.pagelocation.PageLocationProvider
+import com.emarsys.core.providers.pagelocation.PageLocationProviderApi
 import com.emarsys.core.setup.PlatformInitState
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.StorageConstants
@@ -62,9 +64,9 @@ import com.emarsys.mobileengage.inapp.InAppViewProvider
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.mobileengage.inapp.IosInAppPresenter
 import com.emarsys.mobileengage.inapp.providers.InAppJsBridgeFactory
+import com.emarsys.mobileengage.inapp.providers.IosWebViewFactory
 import com.emarsys.mobileengage.inapp.providers.SceneProvider
 import com.emarsys.mobileengage.inapp.providers.ViewControllerProvider
-import com.emarsys.mobileengage.inapp.providers.IosWebViewFactory
 import com.emarsys.mobileengage.inapp.providers.WindowProvider
 import com.emarsys.mobileengage.push.IosGathererPush
 import com.emarsys.mobileengage.push.IosLoggingPush

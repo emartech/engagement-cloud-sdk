@@ -1,6 +1,5 @@
-package com.emarsys.core.provider
+package com.emarsys.core.providers
 
-import com.emarsys.core.providers.LanguageProviderApi
 import platform.Foundation.NSLocale
 import platform.Foundation.preferredLanguages
 
