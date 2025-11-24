@@ -121,7 +121,8 @@ fun CategoriesDialogViewPreview() {
         messageCategories,
         onDismiss = {
             println("I'm dismissed!")
-        })
+        }
+    )
 }
 
 private fun providePreviewMessage() = EmbeddedMessage(

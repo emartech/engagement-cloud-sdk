@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
@@ -30,8 +32,6 @@ import com.emarsys.networking.clients.embedded.messaging.model.MessageCategory
 
 @Composable
 fun CategoriesDialogView(categories: List<MessageCategory>, onDismiss: () -> Unit) {
-    val selectAllSelected = mutableStateOf(false)
-    val resetSelected = mutableStateOf(false)
     val selectedCategories = mutableStateOf(setOf<Int>())
 
     Dialog(
@@ -44,37 +44,43 @@ fun CategoriesDialogView(categories: List<MessageCategory>, onDismiss: () -> Uni
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp)
         ) {
             Column(
-                modifier = Modifier.padding(8.dp),
+                modifier = Modifier.padding(top = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Categories", style = MaterialTheme.typography.titleLarge)
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    IconButton(onClick = { onDismiss() }) {
-                        Icon(Icons.Outlined.Close, contentDescription = "Close categories dialog")
-                    }
-                }
-
-                Text("Select Categories to Display", style = MaterialTheme.typography.titleSmall)
+                DialogHeader(onDismiss)
 
                 CategoryFilterChipsList(categories, selectedCategories)
 
-                HorizontalDivider()
+                HorizontalDivider(modifier = Modifier.padding(start = 8.dp, end = 8.dp))
 
-                SelectionManagement(
-                    selectAllSelected,
-                    selectedCategories,
-                    categories,
-                    resetSelected
-                )
+                DialogActionButtons(selectedCategories, onDismiss)
             }
         }
     }
+}
+
+@Composable
+private fun DialogHeader(onDismiss: () -> Unit) {
+    Row(
+        modifier = Modifier.padding(start = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text("Categories", style = MaterialTheme.typography.titleLarge)
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        IconButton(onClick = { onDismiss() }) {
+            Icon(Icons.Outlined.Close, contentDescription = "Close categories dialog")
+        }
+    }
+
+    Text(
+        "Select Category Filters",
+        style = MaterialTheme.typography.titleSmall,
+        modifier = Modifier.padding(start = 8.dp)
+    )
 }
 
 @Composable
@@ -87,7 +93,7 @@ private fun CategoryFilterChipsList(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 8.dp)
+            .padding(8.dp)
     ) {
         categories.forEach { (id, value) ->
             FilterChip(
@@ -120,59 +126,33 @@ private fun CategoryFilterChipsList(
 }
 
 @Composable
-private fun SelectionManagement(
-    selectAllSelected: MutableState<Boolean>,
+private fun DialogActionButtons(
     selectedCategories: MutableState<Set<Int>>,
-    categories: List<MessageCategory>,
-    resetSelected: MutableState<Boolean>
+    onDismiss: () -> Unit
 ) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        FilterChip(
-            selected = selectAllSelected.value,
+    Row(
+        modifier = Modifier.padding(8.dp)
+    ) {
+        Button(
+            shape = MaterialTheme.shapes.small,
+            colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.secondary),
             onClick = {
-                selectAllSelected.value = !selectAllSelected.value
-                selectedCategories.value = if (selectAllSelected.value) {
-                    categories.map { it.id }.toSet()
-                } else {
-                    setOf()
-                }
+                selectedCategories.value = emptySet()
             },
-            label = {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (selectAllSelected.value) {
-                        Icon(
-                            Icons.Outlined.Check,
-                            contentDescription = "Select All selected"
-                        )
-                    }
-                    Text("Select All")
+        ) {
+            Text("Reset")
+        }
 
-                }
-            }
-        )
-        FilterChip(
-            selected = resetSelected.value,
+        Spacer(modifier = Modifier.weight(1f))
+
+        Button(
+            shape = MaterialTheme.shapes.small,
+            colors = ButtonDefaults.buttonColors(),
             onClick = {
-                resetSelected.value = !resetSelected.value
-                selectedCategories.value = setOf()
+                onDismiss()
             },
-            label = {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (resetSelected.value) {
-                        Icon(
-                            Icons.Outlined.Check,
-                            contentDescription = "Reset selected"
-                        )
-                    }
-                    Text("Reset")
-                }
-            }
-        )
+        ) {
+            Text("Apply")
+        }
     }
 }
