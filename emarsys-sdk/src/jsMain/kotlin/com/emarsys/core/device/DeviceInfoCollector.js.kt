@@ -83,4 +83,8 @@ internal actual class DeviceInfoCollector(
             webNotificationSettingsCollector.collect().permissionState == PermissionState.Granted
         )
     }
+
+    actual override fun getPlatformCategory(): String {
+        return SdkConstants.WEB_PLATFORM_CATEGORY
+    }
 }

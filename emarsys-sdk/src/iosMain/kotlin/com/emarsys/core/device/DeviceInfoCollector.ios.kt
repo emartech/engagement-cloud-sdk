@@ -82,4 +82,8 @@ internal actual class DeviceInfoCollector(
             iosNotificationSettingsCollector.collect().authorizationStatus == IosAuthorizationStatus.Authorized
         )
     }
+
+    actual override fun getPlatformCategory(): String {
+        return SdkConstants.MOBILE_PLATFORM_CATEGORY
+    }
 }

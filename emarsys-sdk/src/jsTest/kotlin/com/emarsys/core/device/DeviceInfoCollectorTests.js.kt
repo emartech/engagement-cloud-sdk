@@ -223,4 +223,10 @@ class DeviceInfoCollectorTests {
                 result shouldBe NotificationSettings(expectedAreNotificationsEnabled)
             }
         }
+
+    @Test
+    fun getPlatformCategory_shouldReturn_webPlatformCategory() = {
+        deviceInfoCollector.getPlatformCategory() shouldBe SdkConstants.WEB_PLATFORM_CATEGORY
+    }
+
 }

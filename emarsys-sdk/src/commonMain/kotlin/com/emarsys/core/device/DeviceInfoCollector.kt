@@ -11,4 +11,6 @@ internal expect class DeviceInfoCollector: DeviceInfoCollectorApi {
     override suspend fun getClientId(): String
 
     override suspend fun getNotificationSettings(): NotificationSettings
+
+    override fun getPlatformCategory(): String
 }

@@ -184,6 +184,11 @@ class DeviceInfoCollectorTests {
             }
         }
 
+    @Test
+    fun getPlatformCategory_shouldReturn_mobilePlatformCategory() {
+        deviceInfoCollector.getPlatformCategory() shouldBe SdkConstants.MOBILE_PLATFORM_CATEGORY
+    }
+
     private fun getTestIosNotificationSettings() = IosNotificationSettings(
         authorizationStatus = IosAuthorizationStatus.Authorized,
         soundSetting = IosNotificationSetting.Enabled,

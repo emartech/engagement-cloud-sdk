@@ -244,4 +244,9 @@ class DeviceInfoCollectorTests {
 
         result shouldBe expectedDeviceInfo
     }
+
+    @Test
+    fun getPlatformCategory_shouldReturn_mobilePlatformCategory() {
+        deviceInfoCollector.getPlatformCategory() shouldBe SdkConstants.MOBILE_PLATFORM_CATEGORY
+    }
 }

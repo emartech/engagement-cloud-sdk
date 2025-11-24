@@ -88,4 +88,8 @@ internal actual class DeviceInfoCollector(
     actual override suspend fun getNotificationSettings(): NotificationSettings {
         return NotificationSettings(androidNotificationSettingsCollector.collect().areNotificationsEnabled)
     }
+
+    actual override fun getPlatformCategory(): String {
+        return SdkConstants.MOBILE_PLATFORM_CATEGORY
+    }
 }

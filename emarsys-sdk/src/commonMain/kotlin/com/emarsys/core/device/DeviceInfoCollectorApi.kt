@@ -10,4 +10,6 @@ interface DeviceInfoCollectorApi {
     suspend fun getClientId(): String
 
     suspend fun getNotificationSettings(): NotificationSettings
+
+    fun getPlatformCategory(): String
 }
