@@ -52,6 +52,8 @@ import com.emarsys.core.providers.ClientIdProvider
 import com.emarsys.core.providers.LanguageProviderApi
 import com.emarsys.core.providers.WebApplicationVersionProvider
 import com.emarsys.core.providers.WebLanguageProvider
+import com.emarsys.core.providers.pagelocation.PageLocationProvider
+import com.emarsys.core.providers.pagelocation.PageLocationProviderApi
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.StringStorageApi

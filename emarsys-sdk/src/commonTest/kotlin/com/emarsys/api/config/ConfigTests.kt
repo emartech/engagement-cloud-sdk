@@ -105,6 +105,7 @@ class ConfigTest : KoinTest {
         sdkContext.config = TestEmarsysConfig(APPLICATION_CODE)
 
         everySuspend { mockDeviceInfoCollector.collect() } returns Json.encodeToString(DEVICE_INFO)
+        everySuspend { mockDeviceInfoCollector.collectAsDeviceInfo() } returns DEVICE_INFO
         everySuspend { mockDeviceInfoCollector.getNotificationSettings() } returns PUSH_SETTINGS
         everySuspend { mockDeviceInfoCollector.getClientId() } returns CLIENT_ID
 

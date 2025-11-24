@@ -8,7 +8,6 @@ import com.emarsys.core.device.DeviceInfo
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.device.NotificationSettings
 import com.emarsys.core.log.withLogContext
-import com.emarsys.util.JsonUtil
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
@@ -77,6 +76,6 @@ internal class Config<Logging : ConfigInstance, Gatherer : ConfigInstance, Inter
     }
 
     private suspend fun getDeviceInfo(): DeviceInfo {
-        return JsonUtil.json.decodeFromString<DeviceInfo>(deviceInfoCollector.collect())
+        return deviceInfoCollector.collectAsDeviceInfo()
     }
 }
