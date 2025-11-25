@@ -1,7 +1,6 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.item
 
 import com.emarsys.mobileengage.action.models.PresentableActionModel
-import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -99,7 +98,7 @@ class MessageItemViewModelTests {
     @Test
     @Ignore
     fun fetchImage_shouldCallDownloadImage_onTheModel() = runTest {
-        val imageByteArray = EmbeddedMessagingConstants.PLACEHOLDER_IMAGE
+        val imageByteArray = byteArrayOf()
         val testMessage = createTestMessage(imageUrl = "testUrl")
         val mockModel = mock<MessageItemModelApi>(MockMode.autofill)
         every { mockModel.message } returns testMessage

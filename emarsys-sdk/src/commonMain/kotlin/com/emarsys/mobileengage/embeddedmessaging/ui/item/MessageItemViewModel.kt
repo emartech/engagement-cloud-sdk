@@ -24,6 +24,6 @@ class MessageItemViewModel(
     val receivedAt: Long
         get() = model.message.receivedAt
 
-    suspend fun fetchImage(): ImageBitmap? =
-        model.downloadImage()?.decodeToImageBitmap()
+    suspend fun fetchImage(): ImageBitmap =
+        model.downloadImage().decodeToImageBitmap()
 }

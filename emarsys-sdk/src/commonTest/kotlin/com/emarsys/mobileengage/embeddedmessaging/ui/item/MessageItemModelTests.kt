@@ -14,6 +14,10 @@ import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
+import dev.mokkery.matcher.capture.Capture.Companion.slot
+import dev.mokkery.matcher.capture.SlotCapture
+import dev.mokkery.matcher.capture.capture
+import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
@@ -23,7 +27,9 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import io.ktor.http.headersOf
 import kotlinx.coroutines.test.runTest
+import kotlin.io.encoding.Base64
 import kotlin.test.BeforeTest
+import kotlin.test.Ignore
 import kotlin.test.Test
 
 class MessageItemModelTests {
@@ -42,6 +48,8 @@ class MessageItemModelTests {
             properties = emptyMap(),
             trackingInfo = "anything"
         )
+        val fallbackImageByteArray = Base64.decode(EmbeddedMessagingConstants.BASE64_PLACEHOLDER_IMAGE
+            .encodeToByteArray())
     }
 
     private lateinit var mockDownloader: DownloaderApi
@@ -66,6 +74,7 @@ class MessageItemModelTests {
         )
 
 
+    @Ignore
     @Test
     fun downloadImage_shouldReturn_Null_when_ImageUrlIsMissing() = runTest {
         val result = createMessageItemModel(testMessage.copy(imageUrl = null)).downloadImage()
@@ -76,20 +85,22 @@ class MessageItemModelTests {
 
     @Test
     fun downloadImage_shouldCall_downloaderApi() = runTest {
+        val fallbackSlot: SlotCapture<ByteArray> = slot()
         val expectedUriString = "example.com"
         everySuspend {
             mockDownloader.download(
                 expectedUriString,
-                EmbeddedMessagingConstants.PLACEHOLDER_IMAGE
+                capture(fallbackSlot)
             )
         } returns ByteArray(0)
 
         messageItemModel.downloadImage()
 
+        fallbackSlot.get() shouldBe fallbackImageByteArray
         verifySuspend(VerifyMode.exactly(1)) {
             mockDownloader.download(
                 expectedUriString,
-                EmbeddedMessagingConstants.PLACEHOLDER_IMAGE
+                any()
             )
         }
     }

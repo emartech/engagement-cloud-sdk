@@ -8,6 +8,7 @@ import com.emarsys.mobileengage.embeddedmessaging.models.MessageTagUpdate
 import com.emarsys.mobileengage.embeddedmessaging.models.TagOperation
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
+import kotlin.io.encoding.Base64
 import kotlin.time.ExperimentalTime
 
 internal class MessageItemModel(
@@ -15,10 +16,10 @@ internal class MessageItemModel(
     private val downloaderApi: DownloaderApi,
     private val sdkEventDistributor: SdkEventDistributorApi
 ) : MessageItemModelApi {
-    override suspend fun downloadImage(): ByteArray? {
+    override suspend fun downloadImage(): ByteArray {
         return message.imageUrl?.let {
-            downloaderApi.download(message.imageUrl, EmbeddedMessagingConstants.PLACEHOLDER_IMAGE)
-        }
+            downloaderApi.download(message.imageUrl, getDecodedFallbackImage())
+        } ?: getDecodedFallbackImage()
     }
 
     @OptIn(ExperimentalTime::class)
@@ -52,4 +53,8 @@ internal class MessageItemModel(
         }
     }
 
+    private fun getDecodedFallbackImage(): ByteArray {
+        val byteArray = EmbeddedMessagingConstants.BASE64_PLACEHOLDER_IMAGE.encodeToByteArray()
+        return Base64.decode(byteArray)
+    }
 }
