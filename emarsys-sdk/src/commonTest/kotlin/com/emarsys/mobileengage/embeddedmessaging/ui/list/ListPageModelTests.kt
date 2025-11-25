@@ -23,7 +23,10 @@ import dev.mokkery.mock
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import io.ktor.http.*
+import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.Url
+import io.ktor.http.headersOf
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -61,7 +64,7 @@ class ListPageModelTests {
             everySuspend { mockSdkEventWaiter.await<Response>() } returns answerResponse
             everySuspend { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMessages>()) } returns mockSdkEventWaiter
 
-            val result = model.fetchMessagesWithCategories().getOrThrow()
+            val result = model.fetchMessagesWithCategories(false, emptyList()).getOrThrow()
 
             result.messages shouldBe messagesResponse.messages
             result.categories shouldBe messagesResponse.meta.categories
@@ -78,7 +81,7 @@ class ListPageModelTests {
         everySuspend { mockSdkEventWaiter.await<Response>() } returns answerResponse
         everySuspend { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMessages>()) } returns mockSdkEventWaiter
 
-        val result = model.fetchMessagesWithCategories()
+        val result = model.fetchMessagesWithCategories(false, emptyList())
 
         result.isFailure shouldBe true
         result.exceptionOrNull() shouldBe testException
@@ -91,11 +94,16 @@ class ListPageModelTests {
 
         everySuspend { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMessages>()) } throws testException
 
-        val result = model.fetchMessagesWithCategories()
+        val result = model.fetchMessagesWithCategories(false, emptyList())
 
         result.isFailure shouldBe true
         result.exceptionOrNull() shouldBe testException
-        verifySuspend { mockSdkLogger.error("FetchMessagesWithCategories exception.", testException) }
+        verifySuspend {
+            mockSdkLogger.error(
+                "FetchMessagesWithCategories exception.",
+                testException
+            )
+        }
     }
 
     @Test
@@ -226,7 +234,7 @@ class ListPageModelTests {
                 mockSdkEventDistributor.registerEvent(capture(capturedEvent))
             } returns mockSdkEventWaiter
 
-            model.fetchMessagesWithCategories(filterUnreadOnly = false)
+            model.fetchMessagesWithCategories(false, emptyList())
 
             capturedEvent.get() shouldNotBe null
             capturedEvent.get().filterUnreadMessages shouldBe false
@@ -235,6 +243,7 @@ class ListPageModelTests {
     @Test
     fun fetchMessagesWithCategories_shouldSendFetchMessagesEvent_withFilterUnreadMessagesTrue_whenFilterUnreadOnlyIsTrue() =
         runTest {
+            val expectedCategoryIds = listOf(1, 2, 3)
             val networkResponse = Response(
                 originalRequest = UrlRequest(Url("https://example.com"), HttpMethod.Get),
                 status = HttpStatusCode.OK,
@@ -253,10 +262,13 @@ class ListPageModelTests {
                 mockSdkEventDistributor.registerEvent(capture(capturedEvent))
             } returns mockSdkEventWaiter
 
-            model.fetchMessagesWithCategories(filterUnreadOnly = true)
+            model.fetchMessagesWithCategories(filterUnreadOnly = true, expectedCategoryIds)
 
-            capturedEvent.get() shouldNotBe null
-            capturedEvent.get().filterUnreadMessages shouldBe true
+            with(capturedEvent.get()) {
+                this shouldNotBe null
+                filterUnreadMessages shouldBe true
+                categoryIds shouldBe expectedCategoryIds
+            }
         }
 
     private fun createTestMessageResponse(): MessagesResponse {

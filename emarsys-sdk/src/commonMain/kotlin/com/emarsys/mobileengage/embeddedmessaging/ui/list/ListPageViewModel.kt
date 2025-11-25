@@ -32,17 +32,18 @@ internal class ListPageViewModel(
     override val filterUnreadOnly: StateFlow<Boolean> = _filterUnreadOnly.asStateFlow()
     private val _selectedCategoryIds = MutableStateFlow<Set<Int>>(emptySet())
     override val selectedCategoryIds: StateFlow<Set<Int>> = _selectedCategoryIds.asStateFlow()
-    override val messagesByCategories: StateFlow<List<MessageItemViewModel>> = combine(_messages, _selectedCategoryIds) { messages, selectedCategoryIds ->
-        if (selectedCategoryIds.isEmpty()) {
-            messages
-        } else {
-            messages.filter { messageViewModel ->
-                messageViewModel.categoryIds.any { category ->
-                    selectedCategoryIds.contains(category)
+    override val messagesByCategories: StateFlow<List<MessageItemViewModel>> =
+        combine(_messages, _selectedCategoryIds) { messages, selectedCategoryIds ->
+            if (selectedCategoryIds.isEmpty()) {
+                messages
+            } else {
+                messages.filter { messageViewModel ->
+                    messageViewModel.categoryIds.any { category ->
+                        selectedCategoryIds.contains(category)
+                    }
                 }
             }
-        }
-    }.stateIn(coroutineScope, SharingStarted.Eagerly, emptyList())
+        }.stateIn(coroutineScope, SharingStarted.Eagerly, emptyList())
 
     override fun refreshMessages() {
         _isRefreshing.value = true
@@ -60,7 +61,10 @@ internal class ListPageViewModel(
 
     private fun loadMessages() {
         coroutineScope.launch {
-            val fetchResult = model.fetchMessagesWithCategories(filterUnreadOnly = _filterUnreadOnly.value)
+            val fetchResult = model.fetchMessagesWithCategories(
+                filterUnreadOnly = _filterUnreadOnly.value,
+                categoryIds = _selectedCategoryIds.value.toList()
+            )
 
             fetchResult
                 .onSuccess {

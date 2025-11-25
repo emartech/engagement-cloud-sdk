@@ -15,12 +15,15 @@ internal class ListPageModel(
     private val sdkLogger: Logger
 ) : ListPageModelApi {
 
-    override suspend fun fetchMessagesWithCategories(filterUnreadOnly: Boolean): Result<MessagesWithCategories> {
+    override suspend fun fetchMessagesWithCategories(
+        filterUnreadOnly: Boolean,
+        categoryIds: List<Int>
+    ): Result<MessagesWithCategories> {
         return try {
             val fetchMessagesEvent = SdkEvent.Internal.EmbeddedMessaging.FetchMessages(
                 nackCount = 0,
                 offset = 0,
-                categoryIds = emptyList(),
+                categoryIds = categoryIds,
                 filterUnreadMessages = filterUnreadOnly
             )
             val messagesResponse = sdkEventDistributor.registerEvent(fetchMessagesEvent)
