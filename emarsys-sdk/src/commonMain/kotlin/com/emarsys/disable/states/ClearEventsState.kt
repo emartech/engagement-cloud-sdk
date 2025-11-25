@@ -12,6 +12,7 @@ class ClearEventsState(private val eventsDao: EventsDaoApi) : State {
 
     override suspend fun active(): Result<Unit> {
         return runCatchingWithoutCancellation {
+            //TODO: should we keep log events?
             eventsDao.removeAll()
         }
     }

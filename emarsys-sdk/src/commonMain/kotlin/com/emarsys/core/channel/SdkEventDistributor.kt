@@ -66,7 +66,7 @@ internal class SdkEventDistributor(
                 eventsDao.insertEvent(sdkEvent)
             }
             _sdkEventFlow.emit(sdkEvent)
-            SdkEventWaiter(this@SdkEventDistributor, sdkEvent)
+            SdkEventWaiter(this@SdkEventDistributor, sdkEvent, connectionStatus)
         } catch (exception: Exception) {
             coroutineContext.ensureActive()
             sdkLogger.error(
@@ -77,7 +77,11 @@ internal class SdkEventDistributor(
             )
             SdkEventWaiter(
                 this@SdkEventDistributor,
-                SdkEvent.Internal.Sdk.Answer.Response(sdkEvent.id, Result.failure<Exception>(exception))
+                SdkEvent.Internal.Sdk.Answer.Response(
+                    sdkEvent.id,
+                    Result.failure<Exception>(exception)
+                ),
+                connectionStatus
             )
         }
     }
