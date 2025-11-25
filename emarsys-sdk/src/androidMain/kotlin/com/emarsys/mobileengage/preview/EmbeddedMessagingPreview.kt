@@ -119,6 +119,10 @@ fun CategoriesDialogViewPreview() {
     )
     CategoriesDialogView(
         messageCategories,
+        selectedCategories = setOf(1, 3),
+        onApplyClicked = {
+            print("I'm applied with categories: $it")
+        },
         onDismiss = {
             println("I'm dismissed!")
         }
@@ -188,12 +192,20 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
 
         override val filterUnreadOnly: StateFlow<Boolean>
             get() = MutableStateFlow(false).asStateFlow()
+        override val selectedCategoryIds: StateFlow<Set<Int>>
+            get() = MutableStateFlow(setOf())
+        override val messagesByCategories: StateFlow<List<MessageItemViewModel>>
+            get() = messages
 
         override fun refreshMessages() {
             Unit
         }
 
         override fun setFilterUnreadOnly(unreadOnly: Boolean) {
+            Unit
+        }
+
+        override fun setSelectedCategoryIds(categoryIds: Set<Int>) {
             Unit
         }
     }

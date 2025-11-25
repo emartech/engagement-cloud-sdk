@@ -7,8 +7,11 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModel
 import com.emarsys.networking.clients.embedded.messaging.model.MessageCategory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 internal class ListPageViewModel(
@@ -27,6 +30,19 @@ internal class ListPageViewModel(
 
     private val _filterUnreadOnly = MutableStateFlow(false)
     override val filterUnreadOnly: StateFlow<Boolean> = _filterUnreadOnly.asStateFlow()
+    private val _selectedCategoryIds = MutableStateFlow<Set<Int>>(emptySet())
+    override val selectedCategoryIds: StateFlow<Set<Int>> = _selectedCategoryIds.asStateFlow()
+    override val messagesByCategories: StateFlow<List<MessageItemViewModel>> = combine(_messages, _selectedCategoryIds) { messages, selectedCategoryIds ->
+        if (selectedCategoryIds.isEmpty()) {
+            messages
+        } else {
+            messages.filter { messageViewModel ->
+                messageViewModel.categoryIds.any { category ->
+                    selectedCategoryIds.contains(category)
+                }
+            }
+        }
+    }.stateIn(coroutineScope, SharingStarted.Eagerly, emptyList())
 
     override fun refreshMessages() {
         _isRefreshing.value = true
@@ -36,6 +52,10 @@ internal class ListPageViewModel(
     override fun setFilterUnreadOnly(unreadOnly: Boolean) {
         _filterUnreadOnly.value = unreadOnly
         refreshMessages()
+    }
+
+    override fun setSelectedCategoryIds(categoryIds: Set<Int>) {
+        _selectedCategoryIds.value = categoryIds
     }
 
     private fun loadMessages() {
@@ -62,5 +82,4 @@ internal class ListPageViewModel(
                 }
         }
     }
-
 }

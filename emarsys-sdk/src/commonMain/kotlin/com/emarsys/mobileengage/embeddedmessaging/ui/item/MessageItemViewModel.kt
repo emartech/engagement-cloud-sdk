@@ -17,6 +17,10 @@ class MessageItemViewModel(
 
     val imageUrl: String?
         get() = model.message.imageUrl
+
+    val categoryIds: List<Int>
+        get() = model.message.categoryIds
+
     val receivedAt: Long
         get() = model.message.receivedAt
 

@@ -31,8 +31,13 @@ import com.emarsys.networking.clients.embedded.messaging.model.MessageCategory
 
 
 @Composable
-fun CategoriesDialogView(categories: List<MessageCategory>, onDismiss: () -> Unit) {
-    val selectedCategories = mutableStateOf(setOf<Int>())
+fun CategoriesDialogView(
+    categories: List<MessageCategory>,
+    selectedCategories: Set<Int>,
+    onApplyClicked: (Set<Int>) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val selectedCategories = mutableStateOf(selectedCategories)
 
     Dialog(
         properties = DialogProperties(
@@ -55,7 +60,7 @@ fun CategoriesDialogView(categories: List<MessageCategory>, onDismiss: () -> Uni
 
                 HorizontalDivider(modifier = Modifier.padding(start = 8.dp, end = 8.dp))
 
-                DialogActionButtons(selectedCategories, onDismiss)
+                DialogActionButtons(selectedCategories, onApplyClicked = onApplyClicked)
             }
         }
     }
@@ -128,7 +133,7 @@ private fun CategoryFilterChipsList(
 @Composable
 private fun DialogActionButtons(
     selectedCategories: MutableState<Set<Int>>,
-    onDismiss: () -> Unit
+    onApplyClicked: (Set<Int>) -> Unit
 ) {
     Row(
         modifier = Modifier.padding(8.dp)
@@ -149,7 +154,7 @@ private fun DialogActionButtons(
             shape = MaterialTheme.shapes.small,
             colors = ButtonDefaults.buttonColors(),
             onClick = {
-                onDismiss()
+                onApplyClicked(selectedCategories.value)
             },
         ) {
             Text("Apply")

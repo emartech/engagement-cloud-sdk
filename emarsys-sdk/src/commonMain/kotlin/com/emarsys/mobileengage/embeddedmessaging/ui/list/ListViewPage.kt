@@ -28,9 +28,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.emarsys.di.SdkKoinIsolationContext.koin
+import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategoriesDialogView
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategorySelectorButton
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemView
-import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModel
 
 @Composable
 fun ListPageView(
@@ -44,24 +44,40 @@ fun ListPageView(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageList(viewModel: ListPageViewModelApi) {
-    var messages by remember { mutableStateOf<List<MessageItemViewModel>>(emptyList()) }
+    val messages by viewModel.messagesByCategories.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     val filterUnreadOnly by viewModel.filterUnreadOnly.collectAsState()
+    val selectedCategoryIds by viewModel.selectedCategoryIds.collectAsState()
+    var showCategorySelector by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.refreshMessages()
-
-        viewModel.messages.collect { newMessages ->
-            messages = newMessages
-        }
     }
 
     FilterRow(
+        selectedCategoryIds = selectedCategoryIds,
         filterUnreadOnly = filterUnreadOnly,
-        onFilterChange = { viewModel.setFilterUnreadOnly(it) }
+        onFilterChange = { viewModel.setFilterUnreadOnly(it) },
+        onCategorySelectorClicked = {
+            showCategorySelector = true
+        }
     )
 
     HorizontalDivider()
+
+    if (showCategorySelector) {
+        CategoriesDialogView(
+            categories = viewModel.categories.value,
+            selectedCategories = viewModel.selectedCategoryIds.value,
+            onApplyClicked = {
+                viewModel.setSelectedCategoryIds(it)
+                showCategorySelector = false
+            },
+            onDismiss = {
+                showCategorySelector = false
+            }
+        )
+    }
 
     PullToRefreshBox(
         isRefreshing = isRefreshing,
@@ -85,8 +101,10 @@ fun MessageList(viewModel: ListPageViewModelApi) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilterRow(
+    selectedCategoryIds: Set<Int>,
     filterUnreadOnly: Boolean,
-    onFilterChange: (Boolean) -> Unit
+    onFilterChange: (Boolean) -> Unit,
+    onCategorySelectorClicked: () -> Unit
 ) {
     Row(
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -110,8 +128,10 @@ fun FilterRow(
 
         Column {
             CategorySelectorButton(
-                isCategorySelectionActive = false,
-                onClick = { },
+                isCategorySelectionActive = selectedCategoryIds.isNotEmpty(),
+                onClick = {
+                    onCategorySelectorClicked()
+                },
             )
         }
     }

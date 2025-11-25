@@ -1,7 +1,12 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.item
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,7 +48,7 @@ fun MessageItemView(viewModel: MessageItemViewModel) {
                 bitmap = it,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.size(64.dp)
+                modifier = Modifier.size(54.dp)
             )
         } ?: LoadingSpinner()
 
@@ -65,7 +70,7 @@ fun MessageItemView(viewModel: MessageItemViewModel) {
 @Composable
 fun LoadingSpinner() {
     CircularProgressIndicator(
-        modifier = Modifier.width(64.dp)
+        modifier = Modifier.width(54.dp)
     )
 }
 
