@@ -44,7 +44,7 @@ fun ListPageView(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageList(viewModel: ListPageViewModelApi) {
-    val messages by viewModel.messagesByCategories.collectAsState()
+    val messages by viewModel.messages.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     val filterUnreadOnly by viewModel.filterUnreadOnly.collectAsState()
     val selectedCategoryIds by viewModel.selectedCategoryIds.collectAsState()
@@ -71,6 +71,7 @@ fun MessageList(viewModel: ListPageViewModelApi) {
             selectedCategories = viewModel.selectedCategoryIds.value,
             onApplyClicked = {
                 viewModel.setSelectedCategoryIds(it)
+                viewModel.refreshMessages()
                 showCategorySelector = false
             },
             onDismiss = {

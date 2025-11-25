@@ -10,7 +10,6 @@ interface ListPageViewModelApi {
     val isRefreshing: StateFlow<Boolean>
     val filterUnreadOnly: StateFlow<Boolean>
     val selectedCategoryIds: StateFlow<Set<Int>>
-    val messagesByCategories: StateFlow<List<MessageItemViewModel>>
 
     fun refreshMessages()
     fun setFilterUnreadOnly(unreadOnly: Boolean)

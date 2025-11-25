@@ -194,8 +194,6 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
             get() = MutableStateFlow(false).asStateFlow()
         override val selectedCategoryIds: StateFlow<Set<Int>>
             get() = MutableStateFlow(setOf())
-        override val messagesByCategories: StateFlow<List<MessageItemViewModel>>
-            get() = messages
 
         override fun refreshMessages() {
             Unit
