@@ -1,6 +1,7 @@
 package com.emarsys.di
 
 import com.emarsys.core.Registerable
+import com.emarsys.core.channel.SdkEventEmitterApi
 import com.emarsys.core.state.State
 import com.emarsys.core.state.StateMachine
 import com.emarsys.core.state.StateMachineApi
@@ -12,6 +13,7 @@ import com.emarsys.init.states.InitializerState
 import com.emarsys.init.states.RegisterEventConsumersState
 import com.emarsys.init.states.RegisterInstancesState
 import com.emarsys.init.states.RegisterWatchdogsState
+import com.emarsys.init.states.RestoreOperationalEventsState
 import com.emarsys.init.states.SdkConfigLoaderState
 import com.emarsys.init.states.SessionSubscriptionState
 import com.emarsys.mobileengage.inapp.InAppEventConsumer
@@ -58,6 +60,12 @@ object InitInjection {
                 sdkLogger = get { parametersOf(InitializerState::class.simpleName) }
             )
         }
+        single<State>(named(InitStateTypes.RestoreOperationalEvents)) {
+            RestoreOperationalEventsState(
+                eventEmitter = get<SdkEventEmitterApi>(),
+                eventsDao = get()
+            )
+        }
         single<State>(named(InitStateTypes.SdkConfigLoader)) {
             SdkConfigLoaderState(
                 sdkConfigStore = get(),
@@ -82,7 +90,7 @@ object InitInjection {
                 ),
             )
         }
-        single<State>(named(InitStateTypes.RegisterEventConsumers)){
+        single<State>(named(InitStateTypes.RegisterEventConsumers)) {
             RegisterEventConsumersState(
                 consumers = listOf(
                     get<InAppEventConsumer>()
@@ -99,6 +107,7 @@ object InitInjection {
                     get(named(InitStateTypes.RegisterWatchdogs)),
                     get(named(InitStateTypes.SessionSubscription)),
                     get(named(InitStateTypes.Initializer)),
+                    get(named(InitStateTypes.RestoreOperationalEvents)),
                     get(named(InitStateTypes.SdkConfigLoader))
                 )
             )
@@ -114,5 +123,5 @@ object InitInjection {
 }
 
 enum class InitStateTypes {
-    ApplyGlobalRemoteConfig, RegisterInstances, RegisterWatchdogs, SessionSubscription, Initializer, SdkConfigLoader, RegisterEventBasedClients, RegisterEventConsumers
+    ApplyGlobalRemoteConfig, RegisterInstances, RegisterWatchdogs, SessionSubscription, Initializer, SdkConfigLoader, RegisterEventBasedClients, RegisterEventConsumers, RestoreOperationalEvents
 }
