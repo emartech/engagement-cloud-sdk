@@ -7,6 +7,7 @@ internal enum class EmarsysUrlType {
     REFRESH_TOKEN,
     CHANGE_MERCHANT_ID,
     PUSH_TOKEN,
+    CLEAR_PUSH_TOKEN,
     EVENT,
     REGISTER_DEVICE_INFO,
     REMOTE_CONFIG_SIGNATURE,

@@ -71,6 +71,7 @@ class PushClientTests {
         mockEmarsysClient = mock()
         mockDefaultUrls = mock()
         mockUrlFactory = mock()
+        every { mockUrlFactory.create(EmarsysUrlType.CLEAR_PUSH_TOKEN, any()) } returns URL
         every { mockUrlFactory.create(EmarsysUrlType.PUSH_TOKEN) } returns URL
         onlineEvents = spy(MutableSharedFlow(replay = 5))
         mockSdkEventManager = mock()
@@ -183,7 +184,6 @@ class PushClientTests {
         verifySuspend { mockEventsDao.removeEvent(clearPushTokenEvent) }
     }
 
-
     @Test
     fun testConsumer_should_reEmit_events_on_network_error() = runTest {
         createPushClient(backgroundScope).register()
@@ -230,15 +230,15 @@ class PushClientTests {
         createPushClient(backgroundScope).register()
 
         val testException = Exception("Test exception")
-        every {
-            mockUrlFactory.create(EmarsysUrlType.PUSH_TOKEN)
-        } throws testException
         val clearPushTokenEvent =
             SdkEvent.Internal.Sdk.ClearPushToken(
                 ID,
                 TIMESTAMP,
                 applicationCode = TEST_APPLICATION_CODE
             )
+        every {
+            mockUrlFactory.create(EmarsysUrlType.CLEAR_PUSH_TOKEN, clearPushTokenEvent)
+        } throws testException
 
         val onlineSdkEvents = backgroundScope.async {
             onlineEvents.take(1).toList()

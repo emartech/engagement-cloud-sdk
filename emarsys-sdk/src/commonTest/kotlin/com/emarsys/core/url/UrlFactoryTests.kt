@@ -4,6 +4,7 @@ import com.emarsys.TestEmarsysConfig
 import com.emarsys.context.DefaultUrlsApi
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.exceptions.SdkException.MissingApplicationCodeException
+import com.emarsys.event.SdkEvent
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -17,16 +18,27 @@ import io.kotest.matchers.shouldBe
 import io.ktor.http.Url
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 class UrlFactoryTests {
+    private companion object {
+        const val APPLICATION_CODE = "testAppCode"
+        const val CLIENT_SERVICE_BASE_URL = "https://me-client.gservice.emarsys.net"
+        val config = TestEmarsysConfig(APPLICATION_CODE)
+    }
+
     private lateinit var mockSdkContext: SdkContextApi
     private lateinit var mockDefaultUrls: DefaultUrlsApi
     private lateinit var urlFactory: UrlFactoryApi
 
     @BeforeTest
     fun setUp() {
-        mockSdkContext = mock(MockMode.autofill)
         mockDefaultUrls = mock(MockMode.autofill)
+        mockSdkContext = mock(MockMode.autofill)
+        every { mockSdkContext.defaultUrls } returns mockDefaultUrls
+        every { mockDefaultUrls.clientServiceBaseUrl } returns CLIENT_SERVICE_BASE_URL
+        every { mockSdkContext.config } returns config
         urlFactory = UrlFactory(mockSdkContext)
     }
 
@@ -65,107 +77,93 @@ class UrlFactoryTests {
 
     @Test
     fun testCreate_refreshTokenUrl_should_return_url_with_appCode() {
-        val config = TestEmarsysConfig("testAppCode")
-        val clientServiceBaseUrl = "https://me-client.gservice.emarsys.net"
-        every { mockSdkContext.defaultUrls } returns mockDefaultUrls
-        every { mockDefaultUrls.clientServiceBaseUrl } returns clientServiceBaseUrl
-        every { mockSdkContext.config } returns config
-
         val result = urlFactory.create(EmarsysUrlType.REFRESH_TOKEN)
 
-        result shouldBe Url("https://me-client.gservice.emarsys.net/v4/apps/testAppCode/client/contact-token")
+        result shouldBe Url("https://me-client.gservice.emarsys.net/v4/apps/$APPLICATION_CODE/client/contact-token")
     }
+
     @Test
     fun testCreate_changeMerchantId_should_return_url_with_appCode() {
-        val config = TestEmarsysConfig("testAppCode")
-        val clientServiceBaseUrl = "https://me-client.gservice.emarsys.net"
-        every { mockSdkContext.defaultUrls } returns mockDefaultUrls
-        every { mockDefaultUrls.clientServiceBaseUrl } returns clientServiceBaseUrl
-        every { mockSdkContext.config } returns config
 
         val result = urlFactory.create(EmarsysUrlType.CHANGE_MERCHANT_ID)
 
-        result shouldBe Url("https://me-client.gservice.emarsys.net/v4/apps/testAppCode/client/contact-token")
+        result shouldBe Url("https://me-client.gservice.emarsys.net/v4/apps/$APPLICATION_CODE/client/contact-token")
     }
 
     @Test
     fun testCreate_changeApplicationCode_should_return_url() {
-        val config = TestEmarsysConfig("testAppCode")
-        val clientServiceBaseUrl = "https://me-client.gservice.emarsys.net"
-        every { mockSdkContext.defaultUrls } returns mockDefaultUrls
-        every { mockDefaultUrls.clientServiceBaseUrl } returns clientServiceBaseUrl
-        every { mockSdkContext.config } returns config
+
         val result = urlFactory.create(EmarsysUrlType.CHANGE_APPLICATION_CODE)
 
-        result shouldBe Url("https://me-client.gservice.emarsys.net/v4/apps/testAppCode/client/app")
+        result shouldBe Url("https://me-client.gservice.emarsys.net/v4/apps/$APPLICATION_CODE/client/app")
     }
 
     @Test
     fun testCreate_registerPushToken_should_return_url() {
-        val config = TestEmarsysConfig("testAppCode")
-        val clientServiceBaseUrl = "https://me-client.gservice.emarsys.net"
-        every { mockSdkContext.defaultUrls } returns mockDefaultUrls
-        every { mockDefaultUrls.clientServiceBaseUrl } returns clientServiceBaseUrl
-        every { mockSdkContext.config } returns config
+
         val result = urlFactory.create(EmarsysUrlType.PUSH_TOKEN)
 
-        result shouldBe Url("https://me-client.gservice.emarsys.net/v4/apps/testAppCode/client/push-token")
+        result shouldBe Url("https://me-client.gservice.emarsys.net/v4/apps/$APPLICATION_CODE/client/push-token")
+    }
+
+    @Test
+    fun testCreate_clearPushToken_should_return_url() {
+        val testEvent = SdkEvent.Internal.Sdk.ClearPushToken(applicationCode = APPLICATION_CODE)
+
+        val result = urlFactory.create(EmarsysUrlType.CLEAR_PUSH_TOKEN, testEvent)
+
+        result shouldBe Url("https://me-client.gservice.emarsys.net/v4/apps/$APPLICATION_CODE/client/push-token")
+    }
+
+    @Test
+    fun testCreate_clearPushToken_should_throwException_ifEventIsNull() {
+
+        shouldThrow<MissingApplicationCodeException> { urlFactory.create(EmarsysUrlType.CLEAR_PUSH_TOKEN) }
+    }
+
+    @Test
+    fun testCreate_clearPushToken_should_throwException_ifAppCodeIsNull() {
+        val testEvent = SdkEvent.Internal.Sdk.ClearPushToken(applicationCode = null)
+
+        shouldThrow<MissingApplicationCodeException> { urlFactory.create(EmarsysUrlType.CLEAR_PUSH_TOKEN, testEvent) }
     }
 
     @Test
     fun testCreate_registerDeviceInfo_should_return_url() {
-        val config = TestEmarsysConfig("testAppCode")
-        val clientServiceBaseUrl = "https://me-client.gservice.emarsys.net"
-        every { mockSdkContext.defaultUrls } returns mockDefaultUrls
-        every { mockDefaultUrls.clientServiceBaseUrl } returns clientServiceBaseUrl
-        every { mockSdkContext.config } returns config
+
         val result = urlFactory.create(EmarsysUrlType.REGISTER_DEVICE_INFO)
 
-        result shouldBe Url("https://me-client.gservice.emarsys.net/v4/apps/testAppCode/client")
+        result shouldBe Url("https://me-client.gservice.emarsys.net/v4/apps/$APPLICATION_CODE/client")
     }
 
     @Test
     fun testCreate_linkContact_should_return_url_withAppCode() {
-        val config = TestEmarsysConfig("testAppCode")
-        val clientServiceBaseUrl = "https://me-client.gservice.emarsys.net"
-        every { mockSdkContext.defaultUrls } returns mockDefaultUrls
-        every { mockDefaultUrls.clientServiceBaseUrl } returns clientServiceBaseUrl
-        every { mockSdkContext.config } returns config
         val result = urlFactory.create(EmarsysUrlType.LINK_CONTACT)
 
-        result shouldBe Url("https://me-client.gservice.emarsys.net/v4/apps/testAppCode/client/contact")
+        result shouldBe Url("https://me-client.gservice.emarsys.net/v4/apps/$APPLICATION_CODE/client/contact")
     }
 
     @Test
     fun testCreate_remoteConfig_should_return_url_for_remoteConfig() {
-        val config = TestEmarsysConfig("testAppCode")
-        every { mockSdkContext.defaultUrls } returns mockDefaultUrls
         every { mockDefaultUrls.remoteConfigBaseUrl } returns "testRemoteConfigBaseUrl"
-        every { mockSdkContext.config } returns config
 
         val result = urlFactory.create(EmarsysUrlType.REMOTE_CONFIG)
 
-        result shouldBe Url("testRemoteConfigBaseUrl/testAppCode")
+        result shouldBe Url("testRemoteConfigBaseUrl/$APPLICATION_CODE")
     }
 
     @Test
     fun testCreate_remoteConfig_should_return_url_for_remoteConfigSignature() {
-        val config = TestEmarsysConfig("testAppCode")
-        every { mockSdkContext.defaultUrls } returns mockDefaultUrls
         every { mockDefaultUrls.remoteConfigBaseUrl } returns "testRemoteConfigBaseUrl"
-        every { mockSdkContext.config } returns config
 
         val result = urlFactory.create(EmarsysUrlType.REMOTE_CONFIG_SIGNATURE)
 
-        result shouldBe Url("testRemoteConfigBaseUrl/signature/testAppCode")
+        result shouldBe Url("testRemoteConfigBaseUrl/signature/$APPLICATION_CODE")
     }
 
     @Test
     fun testCreate_deepLink_should_return_url_for_trackDeepLink() {
-        val config = TestEmarsysConfig("testAppCode")
         every { mockDefaultUrls.deepLinkBaseUrl } returns "testDeepLinkBaseUrl"
-        every { mockSdkContext.defaultUrls } returns mockDefaultUrls
-        every { mockSdkContext.config } returns config
 
         val result = urlFactory.create(EmarsysUrlType.DEEP_LINK)
 
@@ -174,49 +172,37 @@ class UrlFactoryTests {
 
     @Test
     fun testCreate_embeddedMessaging_should_return_url_for_fetchMessages() {
-        val config = TestEmarsysConfig("testAppCode")
         every { mockDefaultUrls.embeddedMessagingBaseUrl } returns "testEmbeddedMessagingBaseUrl"
-        every { mockSdkContext.defaultUrls } returns mockDefaultUrls
-        every { mockSdkContext.config } returns config
 
         val result = urlFactory.create(EmarsysUrlType.FETCH_EMBEDDED_MESSAGES)
 
-        result shouldBe Url("testEmbeddedMessagingBaseUrl/v1/testAppCode/messages")
+        result shouldBe Url("testEmbeddedMessagingBaseUrl/v1/$APPLICATION_CODE/messages")
     }
 
     @Test
     fun testCreate_embeddedMessaging_should_return_url_for_badgeCount() {
-        val config = TestEmarsysConfig("testAppCode")
         every { mockDefaultUrls.embeddedMessagingBaseUrl } returns "testEmbeddedMessagingBaseUrl"
-        every { mockSdkContext.defaultUrls } returns mockDefaultUrls
-        every { mockSdkContext.config } returns config
 
         val result = urlFactory.create(EmarsysUrlType.FETCH_BADGE_COUNT)
 
-        result shouldBe Url("testEmbeddedMessagingBaseUrl/v1/testAppCode/badge-count")
+        result shouldBe Url("testEmbeddedMessagingBaseUrl/v1/$APPLICATION_CODE/badge-count")
     }
 
     @Test
     fun testCreate_embeddedMessaging_should_return_url_for_fetchMeta() {
-        val config = TestEmarsysConfig("testAppCode")
         every { mockDefaultUrls.embeddedMessagingBaseUrl } returns "testEmbeddedMessagingBaseUrl"
-        every { mockSdkContext.defaultUrls } returns mockDefaultUrls
-        every { mockSdkContext.config } returns config
 
         val result = urlFactory.create(EmarsysUrlType.FETCH_META)
 
-        result shouldBe Url("testEmbeddedMessagingBaseUrl/v1/testAppCode/meta")
+        result shouldBe Url("testEmbeddedMessagingBaseUrl/v1/$APPLICATION_CODE/meta")
     }
 
     @Test
     fun testCreate_embeddedMessaging_should_return_url_for_updateTagsForMessages() {
-        val config = TestEmarsysConfig("testAppCode")
         every { mockDefaultUrls.embeddedMessagingBaseUrl } returns "testEmbeddedMessagingBaseUrl"
-        every { mockSdkContext.defaultUrls } returns mockDefaultUrls
-        every { mockSdkContext.config } returns config
 
         val result = urlFactory.create(EmarsysUrlType.UPDATE_TAGS_FOR_MESSAGES)
 
-        result shouldBe Url("testEmbeddedMessagingBaseUrl/v1/testAppCode/tags")
+        result shouldBe Url("testEmbeddedMessagingBaseUrl/v1/$APPLICATION_CODE/tags")
     }
 }

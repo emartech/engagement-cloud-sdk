@@ -6,6 +6,7 @@ import com.emarsys.core.exceptions.SdkException.NetworkIOException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.UrlRequest
+import com.emarsys.core.url.EmarsysUrlType.CLEAR_PUSH_TOKEN
 import com.emarsys.core.url.EmarsysUrlType.PUSH_TOKEN
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.event.OnlineSdkEvent
@@ -90,15 +91,19 @@ internal class PushClient(
     }
 
     private fun createRequest(sdkEvent: OnlineSdkEvent): UrlRequest {
-        val url = urlFactory.create(PUSH_TOKEN)
         return when (sdkEvent) {
             is SdkEvent.Internal.Sdk.RegisterPushToken -> {
+                val url = urlFactory.create(PUSH_TOKEN)
                 val pushToken = sdkEvent.pushToken
                 val body = json.encodeToString(PushToken(pushToken))
                 UrlRequest(url, HttpMethod.Put, body)
             }
 
-            is SdkEvent.Internal.Sdk.ClearPushToken -> UrlRequest(url, HttpMethod.Delete)
+            is SdkEvent.Internal.Sdk.ClearPushToken -> {
+                val url = urlFactory.create(CLEAR_PUSH_TOKEN, sdkEvent)
+                UrlRequest(url, HttpMethod.Delete)
+            }
+
             else -> throw IllegalArgumentException("Unsupported event type: $sdkEvent")
         }
     }

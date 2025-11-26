@@ -246,6 +246,10 @@ sealed interface SdkEvent {
 
         sealed interface SetupFlowEvent : Internal, OnlineSdkEvent
 
+        sealed interface OperationalEvent: Internal, OnlineSdkEvent {
+            val applicationCode: String?
+        }
+
         @Serializable
         sealed class Sdk : Internal {
             override val type: String = "internal"
@@ -325,8 +329,8 @@ sealed interface SdkEvent {
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0,
                 val name: String = CLEAR_PUSH_TOKEN_EVENT_NAME,
-                val applicationCode: String?
-            ) : Sdk(), OnlineSdkEvent
+                override val applicationCode: String?
+            ) : Sdk(), OnlineSdkEvent, OperationalEvent
 
             @Serializable
             data class RemoteConfigUpdateRequired(
