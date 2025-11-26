@@ -1,7 +1,9 @@
 package com.emarsys.api.push
 
+import com.emarsys.TestEmarsysConfig
 import com.emarsys.api.push.PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY
 import com.emarsys.api.push.PushConstants.PUSH_TOKEN_STORAGE_KEY
+import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.storage.StringStorageApi
@@ -9,6 +11,7 @@ import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
+import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.matcher.capture.Capture
@@ -32,8 +35,9 @@ import kotlin.test.Test
 class PushInternalTests {
     private companion object {
         const val PUSH_TOKEN = "testPushToken"
+        const val APPLICATION_CODE = "testAppCode"
         val registerPushToken = PushCall.RegisterPushToken(PUSH_TOKEN)
-        val clearPushToken = PushCall.ClearPushToken()
+        val clearPushToken = PushCall.ClearPushToken(APPLICATION_CODE)
         val expectedCalls = mutableListOf(
             registerPushToken,
             clearPushToken
@@ -44,12 +48,15 @@ class PushInternalTests {
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
     private lateinit var eventSlot: SlotCapture<SdkEvent>
     private lateinit var mockLogger: Logger
+    private lateinit var mockSdkContext: SdkContextApi
     private lateinit var pushContext: PushContextApi
     private lateinit var pushInternal: PushInternal
 
     @BeforeTest
     fun setup() {
         mockStringStorage = mock()
+        mockSdkContext = mock()
+        every { mockSdkContext.config } returns TestEmarsysConfig(APPLICATION_CODE)
         eventSlot = slot()
         mockSdkEventDistributor = mock(MockMode.autofill)
         mockLogger = mock(MockMode.autofill)
@@ -58,6 +65,7 @@ class PushInternalTests {
             mockStringStorage,
             pushContext,
             mockSdkEventDistributor,
+            mockSdkContext,
             mockLogger
         )
     }
@@ -141,21 +149,28 @@ class PushInternalTests {
     }
 
     @Test
-    fun testClearPushToken() = runTest {
-        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(
-            MockMode.autofill
-        )
-        everySuspend { mockStringStorage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, null) } returns Unit
+    fun testClearPushToken_shouldRegisterEventOnSdkDistributor_andClear_lastSentPushToken_fromStorage() =
+        runTest {
+            everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(
+                MockMode.autofill
+            )
+            everySuspend {
+                mockStringStorage.put(
+                    LAST_SENT_PUSH_TOKEN_STORAGE_KEY,
+                    null
+                )
+            } returns Unit
 
-        pushInternal.clearPushToken()
+            pushInternal.clearPushToken()
 
-        verifySuspend { mockStringStorage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, null) }
-        val emitted = eventSlot.get()
-        (emitted is SdkEvent.Internal.Sdk.ClearPushToken) shouldBe true
-    }
+            verifySuspend { mockStringStorage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, null) }
+            val emitted = eventSlot.get()
+            (emitted is SdkEvent.Internal.Sdk.ClearPushToken) shouldBe true
+            (emitted as SdkEvent.Internal.Sdk.ClearPushToken).applicationCode shouldBe APPLICATION_CODE
+        }
 
     @Test
-    fun testPushToken() = runTest {
+    fun testRegisterPushToken_shouldRegisterTheToken_ifNoStoredTokens_areFound() = runTest {
         everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mock(MockMode.autofill)
         everySuspend { mockStringStorage.get(PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
         everySuspend { mockStringStorage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns null
@@ -168,6 +183,7 @@ class PushInternalTests {
         } returns Unit
 
         pushInternal.registerPushToken(PUSH_TOKEN)
+        verifySuspend { mockSdkEventDistributor.registerEvent(any()) }
         pushInternal.getPushToken() shouldBe PUSH_TOKEN
     }
 
@@ -186,6 +202,9 @@ class PushInternalTests {
         emittedValues.first { it is SdkEvent.Internal.Sdk.RegisterPushToken }.apply {
             (this as SdkEvent.Internal.Sdk.RegisterPushToken).pushToken shouldBe PUSH_TOKEN
         }
-        emittedValues.firstOrNull { it is SdkEvent.Internal.Sdk.ClearPushToken } shouldNotBe null
+        emittedValues.firstOrNull { it is SdkEvent.Internal.Sdk.ClearPushToken }.apply {
+            this shouldNotBe null
+            (this as SdkEvent.Internal.Sdk.ClearPushToken).applicationCode shouldBe APPLICATION_CODE
+        }
     }
 }

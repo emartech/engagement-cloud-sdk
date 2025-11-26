@@ -324,7 +324,8 @@ sealed interface SdkEvent {
                 override val id: String = UUIDProvider().provide(),
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0,
-                val name: String = CLEAR_PUSH_TOKEN_EVENT_NAME
+                val name: String = CLEAR_PUSH_TOKEN_EVENT_NAME,
+                val applicationCode: String?
             ) : Sdk(), OnlineSdkEvent
 
             @Serializable

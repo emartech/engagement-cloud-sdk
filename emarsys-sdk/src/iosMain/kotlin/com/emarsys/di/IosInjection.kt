@@ -217,9 +217,10 @@ object IosInjection {
         }
         single<IosPushInstance>(named(InstanceType.Gatherer)) {
             IosGathererPush(
+                context = get(),
                 storage = get(),
                 iosPushInternal = get(named(InstanceType.Internal)),
-                context = get()
+                sdkContext = get()
             )
         }
         single<IosPushInstance>(named(InstanceType.Logging)) {

@@ -1,5 +1,6 @@
 package com.emarsys.disable.states
 
+import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.state.State
@@ -9,7 +10,8 @@ import kotlin.time.ExperimentalTime
 @OptIn(ExperimentalTime::class)
 
 internal class ClearPushTokenOnDisableState(
-    private val sdkEventDistributor: SdkEventDistributorApi
+    private val sdkEventDistributor: SdkEventDistributorApi,
+    private val sdkContext: SdkContextApi
 ) : State {
     override val name: String = "clearPushTokenOnDisableState"
 
@@ -18,7 +20,7 @@ internal class ClearPushTokenOnDisableState(
 
     override suspend fun active(): Result<Unit> {
         return sdkEventDistributor.registerEvent(
-            SdkEvent.Internal.Sdk.ClearPushToken()
+            SdkEvent.Internal.Sdk.ClearPushToken(applicationCode = sdkContext.config?.applicationCode)
         ).await<Response>()
             .result
             .mapCatching {}

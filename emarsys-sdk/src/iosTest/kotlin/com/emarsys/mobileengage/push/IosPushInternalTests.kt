@@ -1,6 +1,7 @@
 package com.emarsys.mobileengage.push
 
 import com.emarsys.SdkConstants.SILENT_PUSH_RECEIVED_EVENT_NAME
+import com.emarsys.TestEmarsysConfig
 import com.emarsys.api.push.Ems
 import com.emarsys.api.push.PushCall.ClearPushToken
 import com.emarsys.api.push.PushCall.HandleSilentMessageWithUserInfo
@@ -38,6 +39,7 @@ import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.sequentially
+import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.matcher.capture.Capture
@@ -54,25 +56,26 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlin.time.Instant
 import kotlinx.serialization.json.Json
 import platform.UserNotifications.UNNotificationDefaultActionIdentifier
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
 internal class IosPushInternalTests {
     private companion object {
         const val UUID = "testUUID"
+        const val TEST_APPLICATION_CODE = "testAppCode"
         const val PUSH_TOKEN = "testPushToken"
         const val VERSION = "APNS_V2"
         const val TRACKING_INFO = """{"trackingInfo":"testTrackingInfo"}"""
         const val REPORTING = """{"id":"testId"}"""
         const val REPORTING2 = """{"id":"testId2"}"""
         val REGISTER_PUSH_TOKEN = RegisterPushToken(PUSH_TOKEN)
-        val CLEAR_PUSH_TOKEN = ClearPushToken()
+        val CLEAR_PUSH_TOKEN = ClearPushToken(TEST_APPLICATION_CODE)
         val HANDLE_SILENT_MESSAGE_WITH_USER_INFO = HandleSilentMessageWithUserInfo(
             SilentPushUserInfo(
                 ems = Ems(
@@ -116,6 +119,7 @@ internal class IosPushInternalTests {
 
         mockStorage = mock()
         mockSdkContext = mock()
+        every { mockSdkContext.config } returns TestEmarsysConfig(TEST_APPLICATION_CODE)
         mockActionFactory = mock()
         mockActionHandler = mock()
         mockBadgeCountHandler = mock()

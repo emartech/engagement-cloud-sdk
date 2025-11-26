@@ -14,13 +14,5 @@ sealed interface PushCall {
     data class HandleSilentMessageWithUserInfo(val userInfo: SilentPushUserInfo) : PushCall
 
     @Serializable
-    class ClearPushToken : PushCall {
-        override fun equals(other: Any?): Boolean {
-            return other is ClearPushToken
-        }
-
-        override fun hashCode(): Int {
-            return this::class.hashCode()
-        }
-    }
+    data class ClearPushToken(val applicationCode: String?) : PushCall
 }

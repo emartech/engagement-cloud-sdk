@@ -38,12 +38,12 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import kotlin.time.Clock
 import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 
@@ -51,6 +51,7 @@ import kotlin.time.ExperimentalTime
 class PushClientTests {
     private companion object {
         const val TEST_PUSH_TOKEN = "testPushToken"
+        const val TEST_APPLICATION_CODE = "testAppCode"
         const val ID = "testId"
         val URL = Url("https://www.testUrl.com/testAppCode/client")
         val TIMESTAMP = Clock.System.now()
@@ -155,7 +156,11 @@ class PushClientTests {
         val result = Result.success(response)
 
         everySuspend { mockEmarsysClient.send(expectedUrlRequest) } returns result
-        val clearPushTokenEvent = SdkEvent.Internal.Sdk.ClearPushToken(ID, TIMESTAMP)
+        val clearPushTokenEvent = SdkEvent.Internal.Sdk.ClearPushToken(
+            ID,
+            TIMESTAMP,
+            applicationCode = TEST_APPLICATION_CODE
+        )
 
         val onlineSdkEvents = backgroundScope.async {
             onlineEvents.take(1).toList()
@@ -185,7 +190,11 @@ class PushClientTests {
         val testException = IOException("Network error")
 
         everySuspend { mockEmarsysClient.send(any()) } returns Result.failure(testException)
-        val clearPushTokenEvent = SdkEvent.Internal.Sdk.ClearPushToken(ID, TIMESTAMP)
+        val clearPushTokenEvent = SdkEvent.Internal.Sdk.ClearPushToken(
+            ID,
+            TIMESTAMP,
+            applicationCode = TEST_APPLICATION_CODE
+        )
         everySuspend { mockSdkEventManager.emitEvent(clearPushTokenEvent) } returns Unit
 
         val onlineSdkEvents = backgroundScope.async {
@@ -225,7 +234,11 @@ class PushClientTests {
             mockUrlFactory.create(EmarsysUrlType.PUSH_TOKEN)
         } throws testException
         val clearPushTokenEvent =
-            SdkEvent.Internal.Sdk.ClearPushToken(ID, TIMESTAMP)
+            SdkEvent.Internal.Sdk.ClearPushToken(
+                ID,
+                TIMESTAMP,
+                applicationCode = TEST_APPLICATION_CODE
+            )
 
         val onlineSdkEvents = backgroundScope.async {
             onlineEvents.take(1).toList()

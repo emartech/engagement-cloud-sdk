@@ -11,7 +11,12 @@ import com.emarsys.disable.states.ClearPushTokenOnDisableState
 import com.emarsys.disable.states.ClearStoredConfigState
 import com.emarsys.enable.EnableOrganizer
 import com.emarsys.enable.EnableOrganizerApi
-import com.emarsys.enable.states.*
+import com.emarsys.enable.states.AppStartState
+import com.emarsys.enable.states.ApplyAppCodeBasedRemoteConfigState
+import com.emarsys.enable.states.CollectDeviceInfoState
+import com.emarsys.enable.states.RegisterClientState
+import com.emarsys.enable.states.RegisterPushTokenState
+import com.emarsys.enable.states.RestoreSavedSdkEventsState
 import com.emarsys.init.states.FetchEmbeddedMessagingMetaState
 import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.reregistration.ReregistrationClient
@@ -65,7 +70,8 @@ object SetupInjection {
         }
         single<State>(named(StateTypes.ClearPushTokenOnDisable)) {
             ClearPushTokenOnDisableState(
-                sdkEventDistributor = get()
+                sdkEventDistributor = get(),
+                sdkContext = get()
             )
         }
         single<State>(named(StateTypes.LinkContact)) {

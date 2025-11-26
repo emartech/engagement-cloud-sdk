@@ -4,14 +4,16 @@ import com.emarsys.api.push.PushCall
 import com.emarsys.api.push.PushContextApi
 import com.emarsys.api.push.PushGatherer
 import com.emarsys.api.push.SilentPushUserInfo
+import com.emarsys.context.SdkContextApi
 import com.emarsys.core.storage.StringStorageApi
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 
 internal class IosGathererPush(
     private val context: PushContextApi,
     storage: StringStorageApi,
-    private val iosPushInternal: IosPushInstance
-) : PushGatherer(context, storage), IosPushInstance {
+    private val iosPushInternal: IosPushInstance,
+    sdkContext: SdkContextApi
+) : PushGatherer(context, storage, sdkContext), IosPushInstance {
     override var customerUserNotificationCenterDelegate: List<UNUserNotificationCenterDelegateProtocol>
         get() = iosPushInternal.customerUserNotificationCenterDelegate
         set(value) {

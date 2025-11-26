@@ -4,6 +4,7 @@ import com.emarsys.api.push.PushCall.ClearPushToken
 import com.emarsys.api.push.PushCall.RegisterPushToken
 import com.emarsys.api.push.PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY
 import com.emarsys.api.push.PushConstants.PUSH_TOKEN_STORAGE_KEY
+import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.collections.dequeue
 import com.emarsys.core.log.Logger
@@ -16,6 +17,7 @@ internal open class PushInternal(
     private val storage: StringStorageApi,
     private val pushContext: PushContextApi,
     private val sdkEventDistributor: SdkEventDistributorApi,
+    private val sdkContext: SdkContextApi,
     private val sdkLogger: Logger
 ) : PushInstance {
 
@@ -33,7 +35,7 @@ internal open class PushInternal(
     }
 
     override suspend fun clearPushToken() {
-        sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.ClearPushToken())
+        sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.ClearPushToken(applicationCode = sdkContext.config?.applicationCode))
         storage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, null)
     }
 
@@ -50,7 +52,7 @@ internal open class PushInternal(
                     )
                 )
 
-                is ClearPushToken -> sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.ClearPushToken())
+                is ClearPushToken -> sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.ClearPushToken(applicationCode = call.applicationCode))
                 is PushCall.HandleSilentMessageWithUserInfo -> {
                     sdkLogger.debug(
                         "Common PushInternal: shouldn't handle silent message with user info: $call"

@@ -230,7 +230,8 @@ object WebInjection {
         single<PushInstance>(named(InstanceType.Gatherer)) {
             PushGatherer(
                 context = get(),
-                storage = get()
+                storage = get(),
+                sdkContext = get()
             )
         }
         single<PushInstance>(named(InstanceType.Internal)) {
@@ -238,6 +239,7 @@ object WebInjection {
                 storage = get(),
                 pushContext = get(),
                 sdkEventDistributor = get(),
+                sdkContext = get(),
                 sdkLogger = get { parametersOf(PushInternal::class.simpleName) }
             )
         }

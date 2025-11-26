@@ -1,11 +1,13 @@
 package com.emarsys.mobileengage.push
 
+import com.emarsys.TestEmarsysConfig
 import com.emarsys.api.push.Ems
 import com.emarsys.api.push.PushCall
 import com.emarsys.api.push.PushContext
 import com.emarsys.api.push.PushContextApi
 import com.emarsys.api.push.SilentNotification
 import com.emarsys.api.push.SilentPushUserInfo
+import com.emarsys.context.SdkContextApi
 import com.emarsys.core.storage.StringStorageApi
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -20,7 +22,12 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class IosGathererPushTests {
+    private companion object {
+        const val TEST_APPLICATION_CODE = "testAppCode"
+    }
+
     private lateinit var mockStorage: StringStorageApi
+    private lateinit var mockSdkContext: SdkContextApi
     private lateinit var mockIosPushInternal: IosPushInstance
     private lateinit var iosGathererPush: IosGathererPush
     private lateinit var pushContext: PushContextApi
@@ -30,15 +37,20 @@ class IosGathererPushTests {
     fun setup() {
         mockStorage = mock()
         mockIosPushInternal = mock()
+        mockSdkContext = mock()
+        every { mockSdkContext.config } returns TestEmarsysConfig(TEST_APPLICATION_CODE)
         testNotificationCenterDelegateProtocol =
             object : NSObject(), UNUserNotificationCenterDelegateProtocol {}
         pushContext = PushContext(mutableListOf())
-        iosGathererPush = IosGathererPush(pushContext, mockStorage, mockIosPushInternal)
+        iosGathererPush =
+            IosGathererPush(pushContext, mockStorage, mockIosPushInternal, mockSdkContext)
     }
 
     @Test
     fun testCustomerUserNotificationCenterDelegate_getter_shouldInvokeOnInternalInstance() {
-        every { mockIosPushInternal.customerUserNotificationCenterDelegate } returns listOf(testNotificationCenterDelegateProtocol)
+        every { mockIosPushInternal.customerUserNotificationCenterDelegate } returns listOf(
+            testNotificationCenterDelegateProtocol
+        )
         val result = iosGathererPush.customerUserNotificationCenterDelegate
 
         verify { mockIosPushInternal.customerUserNotificationCenterDelegate }

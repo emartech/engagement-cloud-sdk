@@ -61,7 +61,8 @@ internal class IosPushInternal(
     private val sdkEventDistributor: SdkEventDistributorApi,
     private val timestampProvider: InstantProvider,
     private val uuidProvider: UuidProviderApi
-) : PushInternal(storage, pushContext, sdkEventDistributor, sdkLogger), IosPushInstance {
+) : PushInternal(storage, pushContext, sdkEventDistributor, sdkContext, sdkLogger),
+    IosPushInstance {
     //TODO: should handle list in a threadsafe way
     override var customerUserNotificationCenterDelegate: List<UNUserNotificationCenterDelegateProtocol> =
         listOf()
@@ -100,7 +101,12 @@ internal class IosPushInternal(
                     SdkEvent.Internal.Sdk.RegisterPushToken(pushToken = call.pushToken)
                 )
 
-                is ClearPushToken -> sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.ClearPushToken())
+                is ClearPushToken -> sdkEventDistributor.registerEvent(
+                    SdkEvent.Internal.Sdk.ClearPushToken(
+                        applicationCode = call.applicationCode
+                    )
+                )
+
                 is HandleSilentMessageWithUserInfo -> handleSilentMessageWithUserInfo(call.userInfo)
             }
         }
