@@ -40,6 +40,12 @@ class SdkTestScreenViewModel {
         }
     }
 
+    fun disableSdk() {
+        viewModelScope.launch {
+            Emarsys.setup.disableTracking()
+        }
+    }
+
     fun unLinkContact() {
         viewModelScope.launch {
             Emarsys.contact.unlink()

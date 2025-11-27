@@ -1,7 +1,13 @@
 package com.emarsys.sample.screen
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Button
+import androidx.compose.material.Switch
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -53,5 +59,9 @@ fun SdkTestScreen(
         )
 
         Text("InApp DND: $switchValue")
+
+        Button(onClick = { viewModel.disableSdk() }) {
+            Text("Disable tracking")
+        }
     }
 }
