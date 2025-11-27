@@ -2,8 +2,11 @@ package com.emarsys.mobileengage.embeddedmessaging.ui.theme
 
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.sp
 import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 
 class ThemeMapper(private val embeddedMessagingContext: EmbeddedMessagingContextApi) {
@@ -81,17 +84,49 @@ class ThemeMapper(private val embeddedMessagingContext: EmbeddedMessagingContext
                 tertiaryFixed = MaterialTheme.colorScheme.tertiaryFixed,
                 tertiaryFixedDim = MaterialTheme.colorScheme.tertiaryFixedDim,
                 onTertiaryFixed = MaterialTheme.colorScheme.onTertiaryFixed,
-                onTertiaryFixedVariant = MaterialTheme.colorScheme.onTertiaryFixedVariant,
+                onTertiaryFixedVariant = MaterialTheme.colorScheme.onTertiaryFixedVariant
             )
         } ?: MaterialTheme.colorScheme
     }
 
-    fun String.toColor(fallback: Color): Color {
-        val colorString = this.removePrefix("#")
-        return when (colorString.length) {
-            6 -> Color(("FF$colorString").toLong(16))
-            8 -> Color(colorString.toLong(16))
-            else -> fallback
+    @Composable
+    fun mapTypography(): Typography {
+        val textMetaData = embeddedMessagingContext.metaData?.design?.text
+        return textMetaData?.let {
+            Typography(
+                displayLarge = textMetaData.displayLargeFontSize.toTextStyle(),
+                displayMedium = textMetaData.displayMediumFontSize.toTextStyle(),
+                displaySmall = textMetaData.displaySmallFontSize.toTextStyle(),
+                headlineLarge = textMetaData.headlineLargeFontSize.toTextStyle(),
+                headlineMedium = textMetaData.headlineMediumFontSize.toTextStyle(),
+                headlineSmall = textMetaData.headlineSmallFontSize.toTextStyle(),
+                titleLarge = textMetaData.titleLargeFontSize.toTextStyle(),
+                titleMedium = textMetaData.titleMediumFontSize.toTextStyle(),
+                titleSmall = textMetaData.titleSmallFontSize.toTextStyle(),
+                bodyLarge = textMetaData.bodyLargeFontSize.toTextStyle(),
+                bodyMedium = textMetaData.bodyMediumFontSize.toTextStyle(),
+                bodySmall = textMetaData.bodySmallFontSize.toTextStyle(),
+                labelLarge = textMetaData.labelLargeFontSize.toTextStyle(),
+                labelMedium = textMetaData.labelMediumFontSize.toTextStyle(),
+                labelSmall = textMetaData.labelSmallFontSize.toTextStyle()
+            )
+        } ?: MaterialTheme.typography
+    }
+
+    private fun String.toColor(fallback: Color): Color {
+        return try {
+            val colorString = this.removePrefix("#")
+            when (colorString.length) {
+                6 -> Color(("FF$colorString").toLong(16))
+                8 -> Color(colorString.toLong(16))
+                else -> fallback
+            }
+        } catch (_: Exception) {
+            fallback
         }
+    }
+
+    private fun Double.toTextStyle(): TextStyle {
+        return TextStyle(fontSize = this.sp)
     }
 }
