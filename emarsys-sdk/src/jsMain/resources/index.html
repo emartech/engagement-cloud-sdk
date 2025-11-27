@@ -23,6 +23,9 @@
     <input id="customEventNameInput" name="customEventName" type="text">
 </label>
 <button type="button" id="button-custom-event">Track!</button>
+<div style="margin-top:32px;">
+    <button type="button" id="button-disable-sdk">Disable tracking in SDK</button>
+</div>
 
 <div>
     <div>
@@ -64,6 +67,10 @@
 
  document.getElementById("button-custom-event").onclick = async () => {
      await emarsys.event.track(document.getElementById("customEventNameInput").value);
+ }
+
+ document.getElementById("button-disable-sdk").onclick = async () => {
+     await emarsys.setup.disableTracking();
  }
 
  document.getElementById("button-render-message").onclick = () => {

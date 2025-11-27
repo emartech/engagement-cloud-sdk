@@ -5,6 +5,7 @@ import com.emarsys.api.contact.ContactApi
 import com.emarsys.api.deeplink.DeepLinkApi
 import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.push.PushApi
+import com.emarsys.api.setup.SetupApi
 import com.emarsys.di.EventFlowTypes
 import com.emarsys.di.SdkKoinIsolationContext
 import com.emarsys.di.SdkKoinIsolationContext.koin
@@ -34,6 +35,12 @@ object Emarsys {
             runInitOrganizer()
         }
     }
+
+    /**
+     * Provides access to the Setup API, which allows enabling and disabling the tracking in the SDK.
+     */
+    val setup: SetupApi
+        get() = koin.get<SetupApi>()
 
     /**
      * Publishes a flow of SDK events that can be observed externally.
