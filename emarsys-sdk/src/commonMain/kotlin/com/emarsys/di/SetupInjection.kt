@@ -107,7 +107,7 @@ object SetupInjection {
                     get<State>(named(StateTypes.RegisterPushToken)),
                     get<State>(named(StateTypes.RestoreSavedSdkEvents)),
                     get<State>(named(StateTypes.AppStart)),
-//                    get<State>(named(StateTypes.FetchEmbeddedMessagingMetaState))
+                    get<State>(named(StateTypes.FetchEmbeddedMessagingMetaState))
                 )
             )
         }

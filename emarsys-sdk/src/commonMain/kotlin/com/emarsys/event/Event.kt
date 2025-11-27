@@ -223,7 +223,7 @@ sealed interface SdkEvent {
                 override val type: String = "fetchMeta",
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0
-            ) : EmbeddedMessaging
+            ) : EmbeddedMessaging, SetupFlowEvent
 
             @Serializable
             data class UpdateTagsForMessages(

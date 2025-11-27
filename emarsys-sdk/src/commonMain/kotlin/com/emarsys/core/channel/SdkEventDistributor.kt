@@ -7,6 +7,7 @@ import com.emarsys.core.log.Logger
 import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -19,7 +20,6 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
-import kotlin.coroutines.coroutineContext
 
 internal class SdkEventDistributor(
     private val connectionStatus: StateFlow<Boolean>,
@@ -68,7 +68,7 @@ internal class SdkEventDistributor(
             _sdkEventFlow.emit(sdkEvent)
             SdkEventWaiter(this@SdkEventDistributor, sdkEvent, connectionStatus)
         } catch (exception: Exception) {
-            coroutineContext.ensureActive()
+            currentCoroutineContext().ensureActive()
             sdkLogger.error(
                 "SdkEventDistributor - Failed to register event",
                 exception,
@@ -90,7 +90,7 @@ internal class SdkEventDistributor(
         try {
             _sdkEventFlow.emit(sdkEvent)
         } catch (exception: Exception) {
-            coroutineContext.ensureActive()
+            currentCoroutineContext().ensureActive()
             sdkLogger.error(
                 "SdkEventDistributor - Failed to emit event",
                 exception,
