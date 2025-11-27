@@ -17,8 +17,8 @@ internal class MessageItemModel(
     private val sdkEventDistributor: SdkEventDistributorApi
 ) : MessageItemModelApi {
     override suspend fun downloadImage(): ByteArray {
-        return message.imageUrl?.let {
-            downloaderApi.download(message.imageUrl, getDecodedFallbackImage())
+        return message.listThumbnailImage?.let {
+            downloaderApi.download(it.src, getDecodedFallbackImage())
         } ?: getDecodedFallbackImage()
     }
 

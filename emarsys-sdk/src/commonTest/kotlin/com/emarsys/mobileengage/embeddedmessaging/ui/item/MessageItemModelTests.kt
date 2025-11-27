@@ -10,6 +10,7 @@ import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.embeddedmessaging.models.TagOperation
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
+import com.emarsys.networking.clients.embedded.messaging.model.ListThumbnailImage
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -38,7 +39,7 @@ class MessageItemModelTests {
             id = "1",
             title = "testTitle",
             lead = "testLead",
-            imageUrl = "example.com",
+            listThumbnailImage = ListThumbnailImage("example.com", null),
             defaultAction = null,
             actions = emptyList<PresentableActionModel>(),
             tags = emptyList(),
@@ -77,7 +78,7 @@ class MessageItemModelTests {
     @Ignore
     @Test
     fun downloadImage_shouldReturn_Null_when_ImageUrlIsMissing() = runTest {
-        val result = createMessageItemModel(testMessage.copy(imageUrl = null)).downloadImage()
+        val result = createMessageItemModel(testMessage.copy(listThumbnailImage = null)).downloadImage()
 
         result shouldBe null
         verifySuspend(VerifyMode.exactly(0)) { mockDownloader.download(any()) }

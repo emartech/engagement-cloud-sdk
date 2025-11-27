@@ -16,7 +16,7 @@ class MessageItemViewModel(
         get() = model.message.lead
 
     val imageUrl: String?
-        get() = model.message.imageUrl
+        get() = model.message.listThumbnailImage?.src
 
     val categoryIds: List<Int>
         get() = model.message.categoryIds

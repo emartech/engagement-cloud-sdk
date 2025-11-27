@@ -3,6 +3,7 @@ package com.emarsys.mobileengage.embeddedmessaging.ui.list
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
+import com.emarsys.networking.clients.embedded.messaging.model.ListThumbnailImage
 import com.emarsys.networking.clients.embedded.messaging.model.MessageCategory
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -359,7 +360,9 @@ class ListPageViewModelTests {
             id = id,
             title = title,
             lead = lead,
-            imageUrl = imageUrl,
+            listThumbnailImage = imageUrl?.let {
+                ListThumbnailImage(imageUrl, null)
+            },
             defaultAction = null,
             actions = emptyList(),
             tags = emptyList(),

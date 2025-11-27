@@ -31,9 +31,10 @@ fun MessageItemView(viewModel: MessageItemViewModel) {
     var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
 
     LaunchedEffect(viewModel.imageUrl) {
-        imageBitmap = null
         imageBitmap = try {
-            viewModel.fetchImage()
+            viewModel.fetchImage().takeIf {
+                it.width > 0 && it.height > 0
+            }
         } catch (_: Exception) {
             null
         }

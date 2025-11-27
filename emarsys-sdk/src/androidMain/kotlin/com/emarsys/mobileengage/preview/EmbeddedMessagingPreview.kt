@@ -21,6 +21,7 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModel
 import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageView
 import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageViewModelApi
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
+import com.emarsys.networking.clients.embedded.messaging.model.ListThumbnailImage
 import com.emarsys.networking.clients.embedded.messaging.model.MessageCategory
 import com.emarsys.util.JsonUtil
 import io.ktor.client.HttpClient
@@ -133,7 +134,7 @@ private fun providePreviewMessage() = EmbeddedMessage(
     "testId",
     "Sample Title",
     "This is a sample lead for the embedded message.",
-    "https://placebear.com/60/60",
+    ListThumbnailImage("https://placebear.com/60/60", null),
     BasicOpenExternalUrlActionModel(
         reporting = "Default Action", url = "https://example.com"
     ),
@@ -158,7 +159,7 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
                                 "testId",
                                 "Sample Title",
                                 "This is a sample lead for the embedded message.",
-                                "https://placebear.com/60/60",
+                                ListThumbnailImage("https://placebear.com/60/60", null),
                                 BasicOpenExternalUrlActionModel(
                                     reporting = "Default Action", url = "https://example.com"
                                 ),

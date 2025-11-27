@@ -2,6 +2,7 @@ package com.emarsys.mobileengage.embeddedmessaging.ui.item
 
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
+import com.emarsys.networking.clients.embedded.messaging.model.ListThumbnailImage
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -122,7 +123,9 @@ class MessageItemViewModelTests {
             id = id,
             title = title,
             lead = lead,
-            imageUrl = imageUrl,
+            listThumbnailImage = imageUrl?.let {
+                ListThumbnailImage(imageUrl, null)
+            },
             defaultAction = null,
             actions = emptyList<PresentableActionModel>(),
             tags = emptyList(),

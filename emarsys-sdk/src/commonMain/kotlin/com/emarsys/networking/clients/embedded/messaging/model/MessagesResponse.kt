@@ -28,7 +28,7 @@ data class EmbeddedMessage(
     val id: String,
     val title: String,
     val lead: String,
-    val imageUrl: String?,
+    val listThumbnailImage: ListThumbnailImage?,
     val defaultAction: BasicActionModel?,
     val actions : List<PresentableActionModel>,
     val tags: List<String>,
@@ -37,4 +37,10 @@ data class EmbeddedMessage(
     val expiresAt: Long?,
     val properties: Map<String, String>,
     val trackingInfo: String,
+)
+
+@Serializable
+data class ListThumbnailImage(
+    val src: String,
+    val alt: String?
 )
