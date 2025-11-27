@@ -31,13 +31,16 @@ import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategoriesDialogView
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategorySelectorButton
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemView
+import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 
 @Composable
 fun ListPageView(
     viewModel: ListPageViewModelApi = koin.get()
 ) {
-    Column {
-        MessageList(viewModel)
+    EmbeddedMessagingTheme {
+        Column {
+            MessageList(viewModel)
+        }
     }
 }
 
@@ -54,44 +57,46 @@ fun MessageList(viewModel: ListPageViewModelApi) {
         viewModel.refreshMessages()
     }
 
-    FilterRow(
-        selectedCategoryIds = selectedCategoryIds,
-        filterUnreadOnly = filterUnreadOnly,
-        onFilterChange = { viewModel.setFilterUnreadOnly(it) },
-        onCategorySelectorClicked = {
-            showCategorySelector = true
-        }
-    )
-
-    HorizontalDivider()
-
-    if (showCategorySelector) {
-        CategoriesDialogView(
-            categories = viewModel.categories.value,
-            selectedCategories = viewModel.selectedCategoryIds.value,
-            onApplyClicked = {
-                viewModel.setSelectedCategoryIds(it)
-                viewModel.refreshMessages()
-                showCategorySelector = false
-            },
-            onDismiss = {
-                showCategorySelector = false
+    EmbeddedMessagingTheme {
+        FilterRow(
+            selectedCategoryIds = selectedCategoryIds,
+            filterUnreadOnly = filterUnreadOnly,
+            onFilterChange = { viewModel.setFilterUnreadOnly(it) },
+            onCategorySelectorClicked = {
+                showCategorySelector = true
             }
         )
-    }
 
-    PullToRefreshBox(
-        isRefreshing = isRefreshing,
-        onRefresh = { viewModel.refreshMessages() },
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            if (messages.isEmpty()) {
-                EmptyState()
-            } else {
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    items(items = messages, key = { it.id }) { messageViewModel ->
-                        MessageItemView(messageViewModel)
+        HorizontalDivider()
+
+        if (showCategorySelector) {
+            CategoriesDialogView(
+                categories = viewModel.categories.value,
+                selectedCategories = viewModel.selectedCategoryIds.value,
+                onApplyClicked = {
+                    viewModel.setSelectedCategoryIds(it)
+                    viewModel.refreshMessages()
+                    showCategorySelector = false
+                },
+                onDismiss = {
+                    showCategorySelector = false
+                }
+            )
+        }
+
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = { viewModel.refreshMessages() },
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                if (messages.isEmpty()) {
+                    EmptyState()
+                } else {
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                        items(items = messages, key = { it.id }) { messageViewModel ->
+                            MessageItemView(messageViewModel)
+                        }
                     }
                 }
             }
@@ -107,50 +112,54 @@ fun FilterRow(
     onFilterChange: (Boolean) -> Unit,
     onCategorySelectorClicked: () -> Unit
 ) {
-    Row(
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        FilterChip(
-            modifier = Modifier.height(56.dp),
-            selected = !filterUnreadOnly,
-            onClick = { onFilterChange(false) },
-            label = { Text("All") }
-        )
-        FilterChip(
-            modifier = Modifier.height(56.dp),
-            selected = filterUnreadOnly,
-            onClick = { onFilterChange(true) },
-            label = { Text("Unread") }
-        )
-
-        Spacer(modifier = Modifier.padding(8.dp).weight(1f))
-
-        Column {
-            CategorySelectorButton(
-                isCategorySelectionActive = selectedCategoryIds.isNotEmpty(),
-                onClick = {
-                    onCategorySelectorClicked()
-                },
+    EmbeddedMessagingTheme {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            FilterChip(
+                modifier = Modifier.height(56.dp),
+                selected = !filterUnreadOnly,
+                onClick = { onFilterChange(false) },
+                label = { Text("All") }
             )
+            FilterChip(
+                modifier = Modifier.height(56.dp),
+                selected = filterUnreadOnly,
+                onClick = { onFilterChange(true) },
+                label = { Text("Unread") }
+            )
+
+            Spacer(modifier = Modifier.padding(8.dp).weight(1f))
+
+            Column {
+                CategorySelectorButton(
+                    isCategorySelectionActive = selectedCategoryIds.isNotEmpty(),
+                    onClick = {
+                        onCategorySelectorClicked()
+                    },
+                )
+            }
         }
     }
 }
 
 @Composable
 fun EmptyState() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
+    EmbeddedMessagingTheme {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
+            contentAlignment = Alignment.Center
         ) {
-            Text("No messages")
-            Text("You have no messages in the selected view.")
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text("No messages")
+                Text("You have no messages in the selected view.")
+            }
         }
     }
 }

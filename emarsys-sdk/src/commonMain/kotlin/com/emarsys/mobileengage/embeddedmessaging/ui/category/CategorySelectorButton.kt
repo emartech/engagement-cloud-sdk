@@ -8,6 +8,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 
 
 @Composable
@@ -15,16 +16,18 @@ fun CategorySelectorButton(
     isCategorySelectionActive: Boolean,
     onClick: () -> Unit
 ) {
-    ExtendedFloatingActionButton(
-        onClick = onClick,
-        icon = {
-            Icon(
-                if (isCategorySelectionActive) Icons.Filled.FilterAlt else Icons.Outlined.FilterAlt,
-                "Category filter button"
-            )
-        },
-        text = { Text("Categories") },
-        containerColor = if (isCategorySelectionActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
-        contentColor = if (isCategorySelectionActive) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondary
-    )
+    EmbeddedMessagingTheme {
+        ExtendedFloatingActionButton(
+            onClick = onClick,
+            icon = {
+                Icon(
+                    if (isCategorySelectionActive) Icons.Filled.FilterAlt else Icons.Outlined.FilterAlt,
+                    "Category filter button"
+                )
+            },
+            text = { Text("Categories") },
+            containerColor = if (isCategorySelectionActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
+            contentColor = if (isCategorySelectionActive) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondary
+        )
+    }
 }

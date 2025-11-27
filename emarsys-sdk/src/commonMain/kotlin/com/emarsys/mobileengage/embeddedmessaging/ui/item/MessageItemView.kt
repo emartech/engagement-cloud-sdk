@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -40,39 +41,43 @@ fun MessageItemView(viewModel: MessageItemViewModelApi) {
         }
     }
 
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(8.dp)
-    ) {
-        imageBitmap?.let {
-            Image(
-                bitmap = it,
-                contentDescription = viewModel.imageAltText,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.size(54.dp)
-            )
-        } ?: LoadingSpinner()
-
-        Spacer(modifier = Modifier.padding(8.dp))
-
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(8.dp)
+    EmbeddedMessagingTheme {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(8.dp)
         ) {
-            Text(text = viewModel.title)
-            Text(text = viewModel.lead, maxLines = 1, overflow = TextOverflow.Ellipsis)
-        }
+            imageBitmap?.let {
+                Image(
+                    bitmap = it,
+                    contentDescription = viewModel.imageAltText,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.size(54.dp)
+                )
+            } ?: LoadingSpinner()
 
-        Text(formatTimestamp(viewModel.receivedAt))
+            Spacer(modifier = Modifier.padding(8.dp))
+
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(8.dp)
+            ) {
+                Text(text = viewModel.title)
+                Text(text = viewModel.lead, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
+
+            Text(formatTimestamp(viewModel.receivedAt))
+        }
     }
 }
 
 @Composable
 fun LoadingSpinner() {
-    CircularProgressIndicator(
-        modifier = Modifier.width(54.dp)
-    )
+    EmbeddedMessagingTheme {
+        CircularProgressIndicator(
+            modifier = Modifier.width(54.dp)
+        )
+    }
 }
 
 @OptIn(ExperimentalTime::class)

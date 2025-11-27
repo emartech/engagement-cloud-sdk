@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 import com.emarsys.networking.clients.embedded.messaging.model.MessageCategory
 
 
@@ -39,28 +40,30 @@ fun CategoriesDialogView(
 ) {
     val selectedCategories = mutableStateOf(selectedCategories)
 
-    Dialog(
-        properties = DialogProperties(
-            dismissOnBackPress = true,
-            dismissOnClickOutside = true
-        ),
-        onDismissRequest = { onDismiss() }
-    ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
+    EmbeddedMessagingTheme {
+        Dialog(
+            properties = DialogProperties(
+                dismissOnBackPress = true,
+                dismissOnClickOutside = true
+            ),
+            onDismissRequest = { onDismiss() }
         ) {
-            Column(
-                modifier = Modifier.padding(top = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
             ) {
-                DialogHeader(onDismiss)
+                Column(
+                    modifier = Modifier.padding(top = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
+                ) {
+                    DialogHeader(onDismiss)
 
-                CategoryFilterChipsList(categories, selectedCategories)
+                    CategoryFilterChipsList(categories, selectedCategories)
 
-                HorizontalDivider(modifier = Modifier.padding(start = 8.dp, end = 8.dp))
+                    HorizontalDivider(modifier = Modifier.padding(start = 8.dp, end = 8.dp))
 
-                DialogActionButtons(selectedCategories, onApplyClicked = onApplyClicked)
+                    DialogActionButtons(selectedCategories, onApplyClicked = onApplyClicked)
+                }
             }
         }
     }
@@ -68,24 +71,26 @@ fun CategoriesDialogView(
 
 @Composable
 private fun DialogHeader(onDismiss: () -> Unit) {
-    Row(
-        modifier = Modifier.padding(start = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text("Categories", style = MaterialTheme.typography.titleLarge)
+    EmbeddedMessagingTheme {
+        Row(
+            modifier = Modifier.padding(start = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("Categories", style = MaterialTheme.typography.titleLarge)
 
-        Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(1f))
 
-        IconButton(onClick = { onDismiss() }) {
-            Icon(Icons.Outlined.Close, contentDescription = "Close categories dialog")
+            IconButton(onClick = { onDismiss() }) {
+                Icon(Icons.Outlined.Close, contentDescription = "Close categories dialog")
+            }
         }
-    }
 
-    Text(
-        "Select Category Filters",
-        style = MaterialTheme.typography.titleSmall,
-        modifier = Modifier.padding(start = 8.dp)
-    )
+        Text(
+            "Select Category Filters",
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier.padding(start = 8.dp)
+        )
+    }
 }
 
 @Composable
@@ -93,39 +98,41 @@ private fun CategoryFilterChipsList(
     categories: List<MessageCategory>,
     selectedCategories: MutableState<Set<Int>>
 ) {
-    FlowRow(
-        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-    ) {
-        categories.forEach { (id, value) ->
-            FilterChip(
-                selected = selectedCategories.value.contains(id),
-                onClick = {
-                    selectedCategories.value =
-                        if (selectedCategories.value.contains(id)) {
-                            selectedCategories.value - id
-                        } else {
-                            selectedCategories.value + id
+    EmbeddedMessagingTheme {
+        FlowRow(
+            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+        ) {
+            categories.forEach { (id, value) ->
+                FilterChip(
+                    selected = selectedCategories.value.contains(id),
+                    onClick = {
+                        selectedCategories.value =
+                            if (selectedCategories.value.contains(id)) {
+                                selectedCategories.value - id
+                            } else {
+                                selectedCategories.value + id
+                            }
+                    },
+                    label = {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            if (selectedCategories.value.contains(id)) {
+                                Icon(
+                                    Icons.Outlined.Check,
+                                    contentDescription = "Category $value selected"
+                                )
+                            }
+                            Text(value)
                         }
-                },
-                label = {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (selectedCategories.value.contains(id)) {
-                            Icon(
-                                Icons.Outlined.Check,
-                                contentDescription = "Category $value selected"
-                            )
-                        }
-                        Text(value)
                     }
-                }
-            )
+                )
+            }
         }
     }
 }
@@ -135,29 +142,31 @@ private fun DialogActionButtons(
     selectedCategories: MutableState<Set<Int>>,
     onApplyClicked: (Set<Int>) -> Unit
 ) {
-    Row(
-        modifier = Modifier.padding(8.dp)
-    ) {
-        Button(
-            shape = MaterialTheme.shapes.small,
-            colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.secondary),
-            onClick = {
-                selectedCategories.value = emptySet()
-            },
+    EmbeddedMessagingTheme {
+        Row(
+            modifier = Modifier.padding(8.dp)
         ) {
-            Text("Reset")
-        }
+            Button(
+                shape = MaterialTheme.shapes.small,
+                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.secondary),
+                onClick = {
+                    selectedCategories.value = emptySet()
+                },
+            ) {
+                Text("Reset")
+            }
 
-        Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(1f))
 
-        Button(
-            shape = MaterialTheme.shapes.small,
-            colors = ButtonDefaults.buttonColors(),
-            onClick = {
-                onApplyClicked(selectedCategories.value)
-            },
-        ) {
-            Text("Apply")
+            Button(
+                shape = MaterialTheme.shapes.small,
+                colors = ButtonDefaults.buttonColors(),
+                onClick = {
+                    onApplyClicked(selectedCategories.value)
+                },
+            ) {
+                Text("Apply")
+            }
         }
     }
 }
