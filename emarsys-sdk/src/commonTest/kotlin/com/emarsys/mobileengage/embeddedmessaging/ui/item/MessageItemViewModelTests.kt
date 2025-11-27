@@ -73,6 +73,19 @@ class MessageItemViewModelTests {
     }
 
     @Test
+    fun imageUrl_shouldReturn_MessageImageAltText() {
+        val expectedAltText = "Example Image"
+        val testMessage = createTestMessage(imageUrl = "https://example.com/image.jpg", imageAltText = expectedAltText)
+        val mockModel = mock<MessageItemModelApi>(MockMode.autofill)
+        every { mockModel.message } returns testMessage
+        val viewModel = MessageItemViewModel(mockModel)
+
+        val result = viewModel.imageAltText
+
+        result shouldBe expectedAltText
+    }
+
+    @Test
     fun imageUrl_shouldReturn_Null_when_MessageImageUrlIsNull() {
         val testMessage = createTestMessage(imageUrl = null)
         val mockModel = mock<MessageItemModelApi>(MockMode.autofill)
@@ -117,6 +130,7 @@ class MessageItemViewModelTests {
         title: String = "testTitle",
         lead: String = "testLead",
         imageUrl: String? = null,
+        imageAltText: String? = null,
         receivedAt: Long = 100000L
     ): EmbeddedMessage {
         return EmbeddedMessage(
@@ -124,7 +138,7 @@ class MessageItemViewModelTests {
             title = title,
             lead = lead,
             listThumbnailImage = imageUrl?.let {
-                ListThumbnailImage(imageUrl, null)
+                ListThumbnailImage(imageUrl, imageAltText)
             },
             defaultAction = null,
             actions = emptyList<PresentableActionModel>(),

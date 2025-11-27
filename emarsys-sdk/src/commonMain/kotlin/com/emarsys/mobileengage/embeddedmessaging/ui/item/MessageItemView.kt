@@ -27,7 +27,7 @@ import kotlin.time.Instant
 
 
 @Composable
-fun MessageItemView(viewModel: MessageItemViewModel) {
+fun MessageItemView(viewModel: MessageItemViewModelApi) {
     var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
 
     LaunchedEffect(viewModel.imageUrl) {
@@ -47,7 +47,7 @@ fun MessageItemView(viewModel: MessageItemViewModel) {
         imageBitmap?.let {
             Image(
                 bitmap = it,
-                contentDescription = null,
+                contentDescription = viewModel.imageAltText,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.size(54.dp)
             )

@@ -4,6 +4,7 @@ import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemModel
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModel
+import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
 import com.emarsys.networking.clients.embedded.messaging.model.MessageCategory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,8 +18,8 @@ internal class ListPageViewModel(
     private val sdkEventDistributor: SdkEventDistributorApi,
     private val coroutineScope: CoroutineScope,
 ) : ListPageViewModelApi {
-    private val _messages = MutableStateFlow<List<MessageItemViewModel>>(emptyList())
-    override val messages: StateFlow<List<MessageItemViewModel>> = _messages.asStateFlow()
+    private val _messages = MutableStateFlow<List<MessageItemViewModelApi>>(emptyList())
+    override val messages: StateFlow<List<MessageItemViewModelApi>> = _messages.asStateFlow()
     private val _categories = MutableStateFlow<List<MessageCategory>>(emptyList())
     override val categories: StateFlow<List<MessageCategory>> = _categories.asStateFlow()
 

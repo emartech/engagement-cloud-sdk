@@ -5,25 +5,28 @@ import androidx.compose.ui.graphics.decodeToImageBitmap
 
 class MessageItemViewModel(
     private val model: MessageItemModelApi,
-) {
-    val id: String
+): MessageItemViewModelApi {
+    override val id: String
         get() = model.message.id
 
-    val title: String
+    override val title: String
         get() = model.message.title
 
-    val lead: String
+    override val lead: String
         get() = model.message.lead
 
-    val imageUrl: String?
+    override val imageUrl: String?
         get() = model.message.listThumbnailImage?.src
 
-    val categoryIds: List<Int>
+    override val imageAltText: String?
+        get() = model.message.listThumbnailImage?.alt
+
+    override val categoryIds: List<Int>
         get() = model.message.categoryIds
 
-    val receivedAt: Long
+    override val receivedAt: Long
         get() = model.message.receivedAt
 
-    suspend fun fetchImage(): ImageBitmap =
+    override suspend fun fetchImage(): ImageBitmap =
         model.downloadImage().decodeToImageBitmap()
 }
