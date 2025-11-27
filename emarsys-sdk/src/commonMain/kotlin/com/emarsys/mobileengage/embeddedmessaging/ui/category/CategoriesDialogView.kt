@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -38,7 +39,7 @@ fun CategoriesDialogView(
     onApplyClicked: (Set<Int>) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val selectedCategories = mutableStateOf(selectedCategories)
+    val selectedCategories = rememberSaveable { mutableStateOf(selectedCategories) }
 
     EmbeddedMessagingTheme {
         Dialog(

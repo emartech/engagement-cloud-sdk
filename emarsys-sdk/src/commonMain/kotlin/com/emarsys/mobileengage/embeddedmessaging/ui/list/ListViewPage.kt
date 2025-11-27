@@ -22,7 +22,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,7 +51,7 @@ fun MessageList(viewModel: ListPageViewModelApi) {
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     val filterUnreadOnly by viewModel.filterUnreadOnly.collectAsState()
     val selectedCategoryIds by viewModel.selectedCategoryIds.collectAsState()
-    var showCategorySelector by remember { mutableStateOf(false) }
+    var showCategorySelector by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.refreshMessages()
