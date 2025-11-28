@@ -2,7 +2,6 @@
 
 package com.emarsys.mobileengage.preview
 
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
@@ -45,28 +44,26 @@ import kotlin.time.ExperimentalTime
 @Preview(showBackground = true)
 @Composable
 fun MessageItemViewPreview() {
-    MaterialTheme {
-        val previewSdkEventDistributor = object : SdkEventDistributorApi {
-            override val sdkEventFlow =
-                MutableSharedFlow<SdkEvent>()
-            override val onlineSdkEvents =
-                emptyFlow<OnlineSdkEvent>()
-            override val logEvents =
-                emptyFlow<SdkEvent.Internal.LogEvent>()
+    val previewSdkEventDistributor = object : SdkEventDistributorApi {
+        override val sdkEventFlow =
+            MutableSharedFlow<SdkEvent>()
+        override val onlineSdkEvents =
+            emptyFlow<OnlineSdkEvent>()
+        override val logEvents =
+            emptyFlow<SdkEvent.Internal.LogEvent>()
 
-            override suspend fun registerEvent(sdkEvent: SdkEvent) =
-                throw NotImplementedError("Preview only")
-        }
-        MessageItemView(
-            MessageItemViewModel(
-                MessageItemModel(
-                    message = providePreviewMessage(),
-                    downloaderApi = PreviewDownLoader(),
-                    sdkEventDistributor = previewSdkEventDistributor
-                )
+        override suspend fun registerEvent(sdkEvent: SdkEvent) =
+            throw NotImplementedError("Preview only")
+    }
+    MessageItemView(
+        MessageItemViewModel(
+            MessageItemModel(
+                message = providePreviewMessage(),
+                downloaderApi = PreviewDownLoader(),
+                sdkEventDistributor = previewSdkEventDistributor
             )
         )
-    }
+    )
 }
 
 @Preview(showBackground = true)
@@ -82,22 +79,20 @@ fun ListPageViewPreview() {
         }
     }
 
-    MaterialTheme {
-        val previewSdkEventDistributor = object : SdkEventDistributorApi {
-            override val sdkEventFlow =
-                MutableSharedFlow<SdkEvent>()
-            override val onlineSdkEvents =
-                emptyFlow<OnlineSdkEvent>()
-            override val logEvents =
-                emptyFlow<SdkEvent.Internal.LogEvent>()
+    val previewSdkEventDistributor = object : SdkEventDistributorApi {
+        override val sdkEventFlow =
+            MutableSharedFlow<SdkEvent>()
+        override val onlineSdkEvents =
+            emptyFlow<OnlineSdkEvent>()
+        override val logEvents =
+            emptyFlow<SdkEvent.Internal.LogEvent>()
 
-            override suspend fun registerEvent(sdkEvent: SdkEvent) =
-                throw NotImplementedError("Preview only")
-        }
-        ListPageView(
-            providePreviewMessageViewModel(previewSdkEventDistributor)
-        )
+        override suspend fun registerEvent(sdkEvent: SdkEvent) =
+            throw NotImplementedError("Preview only")
     }
+    ListPageView(
+        providePreviewMessageViewModel(previewSdkEventDistributor)
+    )
 }
 
 @Preview(showBackground = true)
