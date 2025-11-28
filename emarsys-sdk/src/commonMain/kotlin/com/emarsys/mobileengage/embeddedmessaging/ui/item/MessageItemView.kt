@@ -6,8 +6,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -21,6 +21,8 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.DEFAULT_PADDING
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.MESSAGE_ITEM_IMAGE_SIZE
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -47,7 +49,7 @@ fun MessageItemView(viewModel: MessageItemViewModelApi) {
     EmbeddedMessagingTheme {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier.padding(DEFAULT_PADDING)
         ) {
             if (hasThumbnailImage) {
                 imageBitmap?.let {
@@ -55,22 +57,33 @@ fun MessageItemView(viewModel: MessageItemViewModelApi) {
                         bitmap = it,
                         contentDescription = viewModel.imageAltText,
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.size(54.dp)
+                        modifier = Modifier.size(MESSAGE_ITEM_IMAGE_SIZE)
                     )
                 } ?: LoadingSpinner()
-                Spacer(modifier = Modifier.padding(8.dp))
+
+                Spacer(modifier = Modifier.padding(DEFAULT_PADDING))
             }
 
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(if (hasThumbnailImage) 8.dp else 0.dp)
+                    .padding(if (hasThumbnailImage) DEFAULT_PADDING else 0.dp)
             ) {
-                Text(text = viewModel.title)
-                Text(text = viewModel.lead, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(
+                    text = viewModel.title,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Text(
+                    text = viewModel.lead,
+                    style = MaterialTheme.typography.bodyLarge,
+                    maxLines = 1, overflow = TextOverflow.Ellipsis
+                )
             }
 
-            Text(formatTimestamp(viewModel.receivedAt))
+            Text(
+                formatTimestamp(viewModel.receivedAt),
+                style = MaterialTheme.typography.bodyLarge
+            )
         }
     }
 }
@@ -79,7 +92,7 @@ fun MessageItemView(viewModel: MessageItemViewModelApi) {
 fun LoadingSpinner() {
     EmbeddedMessagingTheme {
         CircularProgressIndicator(
-            modifier = Modifier.width(54.dp)
+            modifier = Modifier.size(MESSAGE_ITEM_IMAGE_SIZE)
         )
     }
 }

@@ -27,7 +27,8 @@ fun CategorySelectorButton(
             },
             text = { Text("Categories") },
             containerColor = if (isCategorySelectionActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
-            contentColor = if (isCategorySelectionActive) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondary
+            contentColor = if (isCategorySelectionActive) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondary,
+            shape = MaterialTheme.shapes.small
         )
     }
 }

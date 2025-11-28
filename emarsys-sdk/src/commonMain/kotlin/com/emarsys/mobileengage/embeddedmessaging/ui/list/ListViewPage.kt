@@ -15,6 +15,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -28,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.emarsys.di.SdkKoinIsolationContext.koin
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.DEFAULT_PADDING
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategoriesDialogView
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategorySelectorButton
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemView
@@ -114,7 +116,7 @@ fun FilterRow(
 ) {
     EmbeddedMessagingTheme {
         Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            modifier = Modifier.padding(horizontal = DEFAULT_PADDING, vertical = DEFAULT_PADDING),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -131,7 +133,7 @@ fun FilterRow(
                 label = { Text("Unread") }
             )
 
-            Spacer(modifier = Modifier.padding(8.dp).weight(1f))
+            Spacer(modifier = Modifier.padding(DEFAULT_PADDING).weight(1f))
 
             Column {
                 CategorySelectorButton(
@@ -157,8 +159,14 @@ fun EmptyState() {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("No messages")
-                Text("You have no messages in the selected view.")
+                Text(
+                    text = "No messages",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Text(
+                    text = "You have no messages in the selected view.",
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
         }
     }

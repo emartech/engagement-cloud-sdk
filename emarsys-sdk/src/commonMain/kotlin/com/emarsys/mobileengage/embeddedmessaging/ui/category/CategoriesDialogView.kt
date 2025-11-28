@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.DEFAULT_PADDING
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 import com.emarsys.networking.clients.embedded.messaging.model.MessageCategory
 
@@ -51,17 +52,23 @@ fun CategoriesDialogView(
         ) {
             Card(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                shape = MaterialTheme.shapes.medium
             ) {
                 Column(
-                    modifier = Modifier.padding(top = 8.dp),
+                    modifier = Modifier.padding(top = DEFAULT_PADDING),
                     verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
                 ) {
                     DialogHeader(onDismiss)
 
                     CategoryFilterChipsList(categories, selectedCategories)
 
-                    HorizontalDivider(modifier = Modifier.padding(start = 8.dp, end = 8.dp))
+                    HorizontalDivider(
+                        modifier = Modifier.padding(
+                            start = DEFAULT_PADDING,
+                            end = DEFAULT_PADDING
+                        )
+                    )
 
                     DialogActionButtons(selectedCategories, onApplyClicked = onApplyClicked)
                 }
@@ -74,7 +81,7 @@ fun CategoriesDialogView(
 private fun DialogHeader(onDismiss: () -> Unit) {
     EmbeddedMessagingTheme {
         Row(
-            modifier = Modifier.padding(start = 8.dp),
+            modifier = Modifier.padding(start = DEFAULT_PADDING),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text("Categories", style = MaterialTheme.typography.titleLarge)
@@ -89,7 +96,7 @@ private fun DialogHeader(onDismiss: () -> Unit) {
         Text(
             "Select Category Filters",
             style = MaterialTheme.typography.titleSmall,
-            modifier = Modifier.padding(start = 8.dp)
+            modifier = Modifier.padding(start = DEFAULT_PADDING)
         )
     }
 }
@@ -145,7 +152,7 @@ private fun DialogActionButtons(
 ) {
     EmbeddedMessagingTheme {
         Row(
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier.padding(DEFAULT_PADDING)
         ) {
             Button(
                 shape = MaterialTheme.shapes.small,
@@ -161,7 +168,10 @@ private fun DialogActionButtons(
 
             Button(
                 shape = MaterialTheme.shapes.small,
-                colors = ButtonDefaults.buttonColors(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),
                 onClick = {
                     onApplyClicked(selectedCategories.value)
                 },
