@@ -93,6 +93,10 @@ class ThemeMapper(private val embeddedMessagingContext: EmbeddedMessagingContext
         } ?: MaterialTheme.typography
     }
 
+    fun mapMisc() : EmbeddedMessagingDesignValues {
+        return EmbeddedMessagingDesignValues()
+    }
+
     private fun String.toColor(fallback: Color): Color {
         return try {
             val colorString = this.removePrefix("#")

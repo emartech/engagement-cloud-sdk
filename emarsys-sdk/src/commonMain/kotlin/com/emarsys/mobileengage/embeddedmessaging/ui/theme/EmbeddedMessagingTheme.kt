@@ -2,6 +2,7 @@ package com.emarsys.mobileengage.embeddedmessaging.ui.theme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 
@@ -11,11 +12,20 @@ fun EmbeddedMessagingTheme(content: @Composable () -> Unit) {
 
     embeddedMessagingContext?.let {
         val themeMapper = ThemeMapper(it)
+        val designValues = themeMapper.mapMisc()
 
-        MaterialTheme(
-            colorScheme = themeMapper.mapColorScheme(),
-            typography = themeMapper.mapTypography(),
-            content = content
-        )
-    } ?: MaterialTheme { content() }
+        CompositionLocalProvider(
+            LocalDesignValues provides designValues
+        ) {
+            MaterialTheme(
+                colorScheme = themeMapper.mapColorScheme(),
+                typography = themeMapper.mapTypography(),
+                content = content
+            )
+        }
+    } ?: CompositionLocalProvider(
+        LocalDesignValues provides EmbeddedMessagingDesignValues()
+    ) {
+        MaterialTheme { content() }
+    }
 }
