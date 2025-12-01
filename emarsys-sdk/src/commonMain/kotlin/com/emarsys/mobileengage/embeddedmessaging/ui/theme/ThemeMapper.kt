@@ -52,26 +52,6 @@ class ThemeMapper(private val embeddedMessagingContext: EmbeddedMessagingContext
                 inversePrimary = colors.inversePrimary.toColor(MaterialTheme.colorScheme.inversePrimary),
                 scrim = colors.scrim.toColor(MaterialTheme.colorScheme.scrim),
 
-//                selectedState = MaterialTheme.colorScheme,
-//                disabledState = MaterialTheme.colorScheme,
-//                hoverState = MaterialTheme.colorScheme,
-//                pressedState = MaterialTheme.colorScheme,
-//                focusState = MaterialTheme.colorScheme,
-
-//                warning = MaterialTheme.colorScheme,
-//                onWarning = MaterialTheme.colorScheme.onWarning,
-//                warningContainer = MaterialTheme.colorScheme.warningContainer,
-//                onWarningContainer = MaterialTheme.colorScheme.onWarningContainer,
-//                success = MaterialTheme.colorScheme.success,
-//                onSuccess = MaterialTheme.colorScheme.onSuccess,
-//                successContainer = MaterialTheme.colorScheme.successContainer,
-//                onSuccessContainer = MaterialTheme.colorScheme.onSuccessContainer,
-//                info = MaterialTheme.colorScheme.info,
-//                onInfo = MaterialTheme.colorScheme.onInfo,
-//                infoContainer = MaterialTheme.colorScheme.infoContainer,
-//                onInfoContainer = MaterialTheme.colorScheme.onInfoContainer,
-
-                // Additional colors not in the default ColorScheme
                 surfaceTint = MaterialTheme.colorScheme.surfaceTint,
                 primaryFixed = MaterialTheme.colorScheme.primaryFixed,
                 primaryFixedDim = MaterialTheme.colorScheme.primaryFixedDim,

@@ -66,6 +66,21 @@ data class FillColors(
     val inversePrimary: String,
     val scrim: String,
 
+    val surfaceTint: String? = null,
+    val primaryFixed: String? = null,
+    val primaryFixedDim: String? = null,
+    val onPrimaryFixed: String? = null,
+    val onPrimaryFixedVariant: String? = null,
+    val secondaryFixed: String? = null,
+    val secondaryFixedDim: String? = null,
+    val onSecondaryFixed: String? = null,
+    val onSecondaryFixedVariant: String? = null,
+    val tertiaryFixed: String? = null,
+    val tertiaryFixedDim: String? = null,
+    val onTertiaryFixed: String? = null,
+    val onTertiaryFixedVariant: String? = null,
+
+    // TODO: Remove these after backend team changes the response
     val selectedState: String,
     val disabledState: String,
     val hoverState: String,
@@ -103,6 +118,43 @@ data class TextMetaData(
     val labelLargeFontSize: Double,
     val labelMediumFontSize: Double,
     val labelSmallFontSize: Double,
+)
+
+@Serializable
+data class ShapesData(
+    val extraSmall: ShapeCornerRadius,
+    val small: ShapeCornerRadius,
+    val medium: ShapeCornerRadius,
+    val large: ShapeCornerRadius,
+    val extraLarge: ShapeCornerRadius
+)
+
+@Serializable
+data class MiscV2(
+    val messageItemMargin: Double,
+    val messageItemElevation: Double,
+
+    val listContentPadding: Double,
+    val listItemSpacing: Double,
+
+    val compactOverlayWidth: Double,
+    val compactOverlayMaxHeight: Double,
+    val compactOverlayCornerRadius: Double,
+    val compactOverlayElevation: Double,
+
+    val emptyStateImageUrl: String? = null,
+    val messageItemImageHeight: Double,
+    val messageItemClipShape: String, // e.g., "Rectangle", "Circle", "Rounded", "Custom"
+    val messageItemImageCornerRadius: Double,
+    val messageItemCustomShape: ShapeCornerRadius? = null
+)
+
+@Serializable
+data class ShapeCornerRadius(
+    val topStart: Double,
+    val topEnd: Double,
+    val bottomStart: Double,
+    val bottomEnd: Double
 )
 
 @Serializable
