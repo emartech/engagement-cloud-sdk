@@ -30,10 +30,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.DEFAULT_PADDING
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.DEFAULT_SPACING
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategoriesDialogView
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategorySelectorButton
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemView
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
+import com.emarsys.mobileengage.embeddedmessaging.ui.theme.LocalDesignValues
 
 @Composable
 fun ListPageView(
@@ -95,7 +97,10 @@ fun MessageList(viewModel: ListPageViewModelApi) {
                 if (messages.isEmpty()) {
                     EmptyState()
                 } else {
-                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(LocalDesignValues.current.listItemSpacing)
+                    ) {
                         items(items = messages, key = { it.id }) { messageViewModel ->
                             MessageItemView(messageViewModel)
                         }
@@ -118,7 +123,7 @@ fun FilterRow(
         Row(
             modifier = Modifier.padding(horizontal = DEFAULT_PADDING, vertical = DEFAULT_PADDING),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(DEFAULT_SPACING)
         ) {
             FilterChip(
                 modifier = Modifier.height(56.dp),

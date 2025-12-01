@@ -20,9 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.DEFAULT_PADDING
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.MESSAGE_ITEM_IMAGE_SIZE
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.ZERO_PADDING
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -67,7 +67,7 @@ fun MessageItemView(viewModel: MessageItemViewModelApi) {
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(if (hasThumbnailImage) DEFAULT_PADDING else 0.dp)
+                    .padding(if (hasThumbnailImage) DEFAULT_PADDING else ZERO_PADDING)
             ) {
                 Text(
                     text = viewModel.title,
@@ -76,7 +76,8 @@ fun MessageItemView(viewModel: MessageItemViewModelApi) {
                 Text(
                     text = viewModel.lead,
                     style = MaterialTheme.typography.bodyLarge,
-                    maxLines = 1, overflow = TextOverflow.Ellipsis
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
 

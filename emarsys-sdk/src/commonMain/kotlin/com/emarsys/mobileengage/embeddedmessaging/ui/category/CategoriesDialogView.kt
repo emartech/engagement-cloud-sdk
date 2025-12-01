@@ -25,11 +25,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.DEFAULT_PADDING
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.DEFAULT_SPACING
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.ZERO_ELEVATION
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
+import com.emarsys.mobileengage.embeddedmessaging.ui.theme.LocalDesignValues
 import com.emarsys.networking.clients.embedded.messaging.model.MessageCategory
 
 
@@ -57,7 +59,10 @@ fun CategoriesDialogView(
             ) {
                 Column(
                     modifier = Modifier.padding(top = DEFAULT_PADDING),
-                    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
+                    verticalArrangement = Arrangement.spacedBy(
+                        DEFAULT_SPACING,
+                        Alignment.CenterVertically
+                    )
                 ) {
                     DialogHeader(onDismiss)
 
@@ -80,24 +85,22 @@ fun CategoriesDialogView(
 @Composable
 private fun DialogHeader(onDismiss: () -> Unit) {
     EmbeddedMessagingTheme {
-        Row(
-            modifier = Modifier.padding(start = DEFAULT_PADDING),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text("Categories", style = MaterialTheme.typography.titleLarge)
+        Column(modifier = Modifier.padding(start = DEFAULT_PADDING)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Categories", style = MaterialTheme.typography.titleLarge)
 
-            Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.weight(1f))
 
-            IconButton(onClick = { onDismiss() }) {
-                Icon(Icons.Outlined.Close, contentDescription = "Close categories dialog")
+                IconButton(onClick = { onDismiss() }) {
+                    Icon(
+                        imageVector = Icons.Outlined.Close,
+                        contentDescription = "Close categories dialog"
+                    )
+                }
             }
-        }
 
-        Text(
-            "Select Category Filters",
-            style = MaterialTheme.typography.titleSmall,
-            modifier = Modifier.padding(start = DEFAULT_PADDING)
-        )
+            Text("Select Category Filters", style = MaterialTheme.typography.titleSmall)
+        }
     }
 }
 
@@ -108,11 +111,11 @@ private fun CategoryFilterChipsList(
 ) {
     EmbeddedMessagingTheme {
         FlowRow(
-            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(DEFAULT_SPACING, Alignment.CenterVertically),
+            horizontalArrangement = Arrangement.spacedBy(DEFAULT_SPACING),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp)
+                .padding(DEFAULT_PADDING)
         ) {
             categories.forEach { (id, value) ->
                 FilterChip(
@@ -127,7 +130,7 @@ private fun CategoryFilterChipsList(
                     },
                     label = {
                         Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(DEFAULT_SPACING),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             if (selectedCategories.value.contains(id)) {
@@ -155,6 +158,7 @@ private fun DialogActionButtons(
             modifier = Modifier.padding(DEFAULT_PADDING)
         ) {
             Button(
+                elevation = ButtonDefaults.buttonElevation(ZERO_ELEVATION),
                 shape = MaterialTheme.shapes.small,
                 colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.secondary),
                 onClick = {
@@ -167,6 +171,7 @@ private fun DialogActionButtons(
             Spacer(modifier = Modifier.weight(1f))
 
             Button(
+                elevation = ButtonDefaults.buttonElevation(LocalDesignValues.current.buttonElevation),
                 shape = MaterialTheme.shapes.small,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,

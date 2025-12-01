@@ -169,6 +169,28 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
                             downloaderApi = PreviewDownLoader(),
                             sdkEventDistributor = previewSdkEventDistributor
                         )
+                    ),
+                    MessageItemViewModel(
+                        MessageItemModel(
+                            EmbeddedMessage(
+                                "testId2",
+                                "Sample Title 2",
+                                "This is a sample lead for the embedded message.",
+                                ListThumbnailImage("https://placebear.com/60/60", null),
+                                BasicOpenExternalUrlActionModel(
+                                    reporting = "Default Action", url = "https://example.com"
+                                ),
+                                emptyList(),
+                                listOf("promo", "new"),
+                                listOf(1, 2),
+                                Clock.System.now().minus(3.hours).toEpochMilliseconds(),
+                                Clock.System.now().plus(4.days).toEpochMilliseconds(),
+                                mapOf("key1" to "value1", "key2" to "value2"),
+                                "tracking_info_example"
+                            ),
+                            downloaderApi = PreviewDownLoader(),
+                            sdkEventDistributor = previewSdkEventDistributor
+                        )
                     )
                 )
             ).asStateFlow()
