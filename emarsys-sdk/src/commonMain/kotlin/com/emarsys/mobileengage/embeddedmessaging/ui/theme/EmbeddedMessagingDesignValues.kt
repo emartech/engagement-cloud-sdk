@@ -9,7 +9,7 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.
 import com.emarsys.networking.clients.embedded.messaging.model.ShapeCornerRadius
 
 @Immutable
-data class EmbeddedMessagingDesignValues(
+internal data class EmbeddedMessagingDesignValues(
     val messageItemMargin: Dp = DEFAULT_PADDING,
     val messageItemElevation: Dp = DEFAULT_ELEVATION,
 
@@ -30,7 +30,7 @@ data class EmbeddedMessagingDesignValues(
     val messageItemCustomShape: ShapeCornerRadius? = null
 )
 
-val LocalDesignValues = compositionLocalOf {
+internal val LocalDesignValues = compositionLocalOf {
     EmbeddedMessagingDesignValues()
 }
 

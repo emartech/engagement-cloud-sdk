@@ -30,7 +30,7 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Translations.PINNED_MESSAGES_TITLE
 
 @Immutable
-data class StringResources(
+internal data class StringResources(
     val allMessagesFilterButtonLabel: String = FILTER_ALL_BUTTON_LABEL,
     val allMessagesFilterButtonAltText: String = FILTER_ALL_BUTTON_ALT_TEXT,
     val unreadMessagesFilterButtonLabel: String = FILTER_UNREAD_BUTTON_LABEL,
@@ -59,6 +59,6 @@ data class StringResources(
     val deleteMessageDialogConfirmButtonAltText: String = DELETE_MESSAGE_DIALOG_CONFIRM_BUTTON_ALT_TEXT
 )
 
-val LocalStringResources = compositionLocalOf {
+internal val LocalStringResources = compositionLocalOf {
     StringResources()
 }

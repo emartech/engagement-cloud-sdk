@@ -9,7 +9,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
 import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 
-class ThemeMapper(private val embeddedMessagingContext: EmbeddedMessagingContextApi) {
+internal class ThemeMapper(private val embeddedMessagingContext: EmbeddedMessagingContextApi) {
 
     @Composable
     fun mapColorScheme(): ColorScheme {

@@ -26,14 +26,14 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class MetaData(
+internal data class MetaData(
     val version: String,
     val labels: Labels,
     val design: DesignMetaData?
 )
 
 @Serializable
-data class Labels(
+internal data class Labels(
     // TODO: Remove these after backend team changes the response
     val allMessagesHeader: String,
     val unreadMessagesHeader: String,
@@ -70,14 +70,14 @@ data class Labels(
 )
 
 @Serializable
-data class DesignMetaData(
+internal data class DesignMetaData(
     val fillColor: FillColors?,
     val text: TextMetaData?,
     val misc: Misc?
 )
 
 @Serializable
-data class FillColors(
+internal data class FillColors(
     val primary: String,
     val onPrimary: String,
     val primaryContainer: String,
@@ -150,7 +150,7 @@ data class FillColors(
 )
 
 @Serializable
-data class TextMetaData(
+internal data class TextMetaData(
     val displayLargeFontSize: Double,
     val displayMediumFontSize: Double,
     val displaySmallFontSize: Double,
@@ -169,7 +169,7 @@ data class TextMetaData(
 )
 
 @Serializable
-data class ShapesData(
+internal data class ShapesData(
     val extraSmall: ShapeCornerRadius,
     val small: ShapeCornerRadius,
     val medium: ShapeCornerRadius,
@@ -178,7 +178,7 @@ data class ShapesData(
 )
 
 @Serializable
-data class MiscV2(
+internal data class MiscV2(
     val messageItemMargin: Double,
     val messageItemElevation: Double,
 
@@ -198,7 +198,7 @@ data class MiscV2(
 )
 
 @Serializable
-data class ShapeCornerRadius(
+internal data class ShapeCornerRadius(
     val topStart: Double,
     val topEnd: Double,
     val bottomStart: Double,
@@ -206,7 +206,7 @@ data class ShapeCornerRadius(
 )
 
 @Serializable
-data class Misc(
+internal data class Misc(
     val dialogCornerRadius: Double,
     val categoryButtonCornerRadius: Double,
     val messageItemCornerRadius: Double,

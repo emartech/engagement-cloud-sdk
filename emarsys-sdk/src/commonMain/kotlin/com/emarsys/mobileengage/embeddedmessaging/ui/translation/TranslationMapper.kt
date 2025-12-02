@@ -2,7 +2,7 @@ package com.emarsys.mobileengage.embeddedmessaging.ui.translation
 
 import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 
-class TranslationMapper: TranslationMapperApi {
+internal class TranslationMapper: TranslationMapperApi {
 
     override fun map(embeddedMessagingContext: EmbeddedMessagingContextApi): StringResources {
         val translations = embeddedMessagingContext.metaData?.labels
