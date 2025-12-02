@@ -5,6 +5,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
+import com.emarsys.mobileengage.embeddedmessaging.ui.translation.LocalStringResources
+import com.emarsys.mobileengage.embeddedmessaging.ui.translation.StringResources
+import com.emarsys.mobileengage.embeddedmessaging.ui.translation.TranslationMapper
 
 @Composable
 fun EmbeddedMessagingTheme(content: @Composable () -> Unit) {
@@ -13,9 +16,12 @@ fun EmbeddedMessagingTheme(content: @Composable () -> Unit) {
     embeddedMessagingContext?.let {
         val themeMapper = ThemeMapper(it)
         val designValues = themeMapper.mapMisc()
+        val translationMapper = TranslationMapper()
+        val stringValues = translationMapper.map(it)
 
         CompositionLocalProvider(
-            LocalDesignValues provides designValues
+            LocalDesignValues provides designValues,
+            LocalStringResources provides stringValues
         ) {
             MaterialTheme(
                 colorScheme = themeMapper.mapColorScheme(),
@@ -24,7 +30,8 @@ fun EmbeddedMessagingTheme(content: @Composable () -> Unit) {
             )
         }
     } ?: CompositionLocalProvider(
-        LocalDesignValues provides EmbeddedMessagingDesignValues()
+        LocalDesignValues provides EmbeddedMessagingDesignValues(),
+        LocalStringResources provides StringResources()
     ) {
         MaterialTheme { content() }
     }

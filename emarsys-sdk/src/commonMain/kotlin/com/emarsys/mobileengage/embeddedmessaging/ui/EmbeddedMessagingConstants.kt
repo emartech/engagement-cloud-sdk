@@ -15,4 +15,33 @@ object EmbeddedMessagingConstants {
 
     val DEFAULT_SPACING = 8.dp
     val ZERO_SPACING = 0.dp
+
+    object Translations{
+        const val FILTER_ALL_BUTTON_LABEL = "All"
+        const val FILTER_ALL_BUTTON_ALT_TEXT = "All messages filter button"
+        const val FILTER_UNREAD_BUTTON_LABEL = "Unread"
+        const val FILTER_UNREAD_BUTTON_ALT_TEXT = "Unread messages filter button"
+        const val CATEGORIES_FILTER_BUTTON_LABEL = "Categories"
+        const val CATEGORIES_FILTER_BUTTON_ICON_ALT_TEXT = "Category filter button"
+        const val CATEGORIES_FILTER_DIALOG_TITLE = "Categories"
+        const val CATEGORIES_FILTER_DIALOG_SUBTITLE = "Select Category Filters"
+        const val CATEGORY_FILTER_CHIP_ICON_ALT_TEXT = "selected"
+        const val CATEGORIES_FILTER_DIALOG_RESET_BUTTON_LABEL = "Reset"
+        const val CATEGORIES_FILTER_DIALOG_RESET_BUTTON_ALT_TEXT = "Reset Selected Categories Button"
+        const val CATEGORIES_FILTER_DIALOG_APPLY_BUTTON_LABEL = "Apply"
+        const val CATEGORIES_FILTER_DIALOG_CLOSE_BUTTON_ALT_TEXT = "Close categories dialog"
+        const val PINNED_MESSAGES_TITLE = "Pinned Messages"
+        const val DETAILED_MESSAGE_CLOSE_BUTTON_LABEL = "Close"
+        const val DETAILED_MESSAGE_CLOSE_BUTTON_ALT_TEXT = "Detailed message close button"
+        const val DETAILED_MESSAGE_DELETE_BUTTON_LABEL = "Delete Message"
+        const val DETAILED_MESSAGE_DELETE_BUTTON_ALT_TEXT = "Delete message button"
+        const val EMPTY_STATE_TITLE = "No Messages"
+        const val EMPTY_STATE_DESCRIPTION = "You have no messages in the selected view."
+        const val DELETE_MESSAGE_DIALOG_TITLE = "Delete Message?"
+        const val DELETE_MESSAGE_DIALOG_DESCRIPTION = "By deleting this, it will be no longer available"
+        const val DELETE_MESSAGE_DIALOG_CANCEL_BUTTON_LABEL = "Cancel"
+        const val DELETE_MESSAGE_DIALOG_CANCEL_BUTTON_ALT_TEXT = "Delete message cancel button"
+        const val DELETE_MESSAGE_DIALOG_CONFIRM_BUTTON_LABEL = "Delete"
+        const val DELETE_MESSAGE_DIALOG_CONFIRM_BUTTON_ALT_TEXT = "Confirm delete message button"
+    }
 }

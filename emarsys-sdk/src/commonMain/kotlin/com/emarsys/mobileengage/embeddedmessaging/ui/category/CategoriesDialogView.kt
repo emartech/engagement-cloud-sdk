@@ -32,6 +32,7 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.ZERO_ELEVATION
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.LocalDesignValues
+import com.emarsys.mobileengage.embeddedmessaging.ui.translation.LocalStringResources
 import com.emarsys.networking.clients.embedded.messaging.model.MessageCategory
 
 
@@ -87,19 +88,25 @@ private fun DialogHeader(onDismiss: () -> Unit) {
     EmbeddedMessagingTheme {
         Column(modifier = Modifier.padding(start = DEFAULT_PADDING)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Categories", style = MaterialTheme.typography.titleLarge)
+                Text(
+                    text = LocalStringResources.current.categoriesFilterDialogTitle,
+                    style = MaterialTheme.typography.titleLarge
+                )
 
                 Spacer(modifier = Modifier.weight(1f))
 
                 IconButton(onClick = { onDismiss() }) {
                     Icon(
                         imageVector = Icons.Outlined.Close,
-                        contentDescription = "Close categories dialog"
+                        contentDescription = LocalStringResources.current.categoriesFilterDialogCloseButtonAltText
                     )
                 }
             }
 
-            Text("Select Category Filters", style = MaterialTheme.typography.titleSmall)
+            Text(
+                text = LocalStringResources.current.categoriesFilterDialogSubtitle,
+                style = MaterialTheme.typography.titleSmall
+            )
         }
     }
 }
@@ -136,7 +143,7 @@ private fun CategoryFilterChipsList(
                             if (selectedCategories.value.contains(id)) {
                                 Icon(
                                     Icons.Outlined.Check,
-                                    contentDescription = "Category $value selected"
+                                    contentDescription = "$value ${LocalStringResources.current.categoryFilterChipIconAltText}"
                                 )
                             }
                             Text(value)
@@ -165,7 +172,7 @@ private fun DialogActionButtons(
                     selectedCategories.value = emptySet()
                 },
             ) {
-                Text("Reset")
+                Text(LocalStringResources.current.categoriesFilterDialogResetButtonLabel)
             }
 
             Spacer(modifier = Modifier.weight(1f))
@@ -181,7 +188,7 @@ private fun DialogActionButtons(
                     onApplyClicked(selectedCategories.value)
                 },
             ) {
-                Text("Apply")
+                Text(LocalStringResources.current.categoriesFilterDialogApplyButtonLabel)
             }
         }
     }

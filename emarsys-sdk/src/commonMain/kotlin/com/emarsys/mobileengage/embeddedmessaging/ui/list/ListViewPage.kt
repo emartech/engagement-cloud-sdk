@@ -36,6 +36,7 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategorySelectorBu
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemView
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.LocalDesignValues
+import com.emarsys.mobileengage.embeddedmessaging.ui.translation.LocalStringResources
 
 @Composable
 fun ListPageView(
@@ -129,13 +130,13 @@ fun FilterRow(
                 modifier = Modifier.height(56.dp),
                 selected = !filterUnreadOnly,
                 onClick = { onFilterChange(false) },
-                label = { Text("All") }
+                label = { Text(LocalStringResources.current.allMessagesFilterButtonLabel) }
             )
             FilterChip(
                 modifier = Modifier.height(56.dp),
                 selected = filterUnreadOnly,
                 onClick = { onFilterChange(true) },
-                label = { Text("Unread") }
+                label = { Text(LocalStringResources.current.unreadMessagesFilterButtonLabel) }
             )
 
             Spacer(modifier = Modifier.padding(DEFAULT_PADDING).weight(1f))
@@ -165,11 +166,11 @@ fun EmptyState() {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "No messages",
+                    text = LocalStringResources.current.emptyStateTitle,
                     style = MaterialTheme.typography.bodyLarge
                 )
                 Text(
-                    text = "You have no messages in the selected view.",
+                    text = LocalStringResources.current.emptyStateDescription,
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
