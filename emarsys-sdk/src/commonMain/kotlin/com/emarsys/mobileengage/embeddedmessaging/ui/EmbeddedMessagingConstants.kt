@@ -13,6 +13,8 @@ internal object EmbeddedMessagingConstants {
     val DEFAULT_PADDING = 8.dp
     val ZERO_PADDING = 0.dp
 
+    val DIALOG_CONTAINER_PADDING = 16.dp
+
     val DEFAULT_SPACING = 8.dp
     val ZERO_SPACING = 0.dp
 

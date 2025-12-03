@@ -1,5 +1,6 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.category
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -13,11 +14,14 @@ import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SelectableChipColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -25,10 +29,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.DEFAULT_PADDING
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.DEFAULT_SPACING
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.DIALOG_CONTAINER_PADDING
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.ZERO_ELEVATION
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.LocalDesignValues
@@ -54,12 +61,14 @@ fun CategoriesDialogView(
             onDismissRequest = { onDismiss() }
         ) {
             Card(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
+                modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.medium
             ) {
                 Column(
-                    modifier = Modifier.padding(top = DEFAULT_PADDING),
+                    modifier = Modifier.padding(DIALOG_CONTAINER_PADDING),
                     verticalArrangement = Arrangement.spacedBy(
                         DEFAULT_SPACING,
                         Alignment.CenterVertically
@@ -70,6 +79,7 @@ fun CategoriesDialogView(
                     CategoryFilterChipsList(categories, selectedCategories)
 
                     HorizontalDivider(
+                        color = MaterialTheme.colorScheme.outline,
                         modifier = Modifier.padding(
                             start = DEFAULT_PADDING,
                             end = DEFAULT_PADDING
@@ -126,6 +136,8 @@ private fun CategoryFilterChipsList(
         ) {
             categories.forEach { (id, value) ->
                 FilterChip(
+                    border = filterChipBorderSettings(selectedCategories, id),
+                    colors = filterChipColors(),
                     selected = selectedCategories.value.contains(id),
                     onClick = {
                         selectedCategories.value =
@@ -193,3 +205,33 @@ private fun DialogActionButtons(
         }
     }
 }
+
+@Composable
+private fun filterChipColors(): SelectableChipColors = SelectableChipColors(
+    containerColor = Color.Unspecified,
+    labelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+    leadingIconColor = Color.Unspecified,
+    trailingIconColor = Color.Unspecified,
+    disabledLabelColor = Color.Unspecified,
+    disabledContainerColor = Color.Unspecified,
+    disabledLeadingIconColor = Color.Unspecified,
+    disabledTrailingIconColor = Color.Unspecified,
+    selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+    disabledSelectedContainerColor = Color.Unspecified,
+    selectedLabelColor = MaterialTheme.colorScheme.onSecondaryContainer,
+    selectedLeadingIconColor = Color.Unspecified,
+    selectedTrailingIconColor = Color.Unspecified
+)
+
+@Composable
+private fun filterChipBorderSettings(
+    selectedCategories: MutableState<Set<Int>>,
+    id: Int
+): BorderStroke = FilterChipDefaults.filterChipBorder(
+    enabled = true,
+    borderColor = MaterialTheme.colorScheme.outline,
+    selectedBorderColor = Color.Transparent,
+    selectedBorderWidth = 0.dp,
+    borderWidth = 1.dp,
+    selected = selectedCategories.value.contains(id)
+)
