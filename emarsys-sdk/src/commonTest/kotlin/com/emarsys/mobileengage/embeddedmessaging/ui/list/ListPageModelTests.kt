@@ -6,6 +6,7 @@ import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.event.SdkEvent
+import com.emarsys.mobileengage.embeddedmessaging.exceptions.TooFrequentFetchMessagesRequestsException
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
 import com.emarsys.networking.clients.embedded.messaging.model.MessageCategory
 import com.emarsys.networking.clients.embedded.messaging.model.MessagesResponse
@@ -23,10 +24,8 @@ import dev.mokkery.mock
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import io.ktor.http.HttpMethod
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.Url
-import io.ktor.http.headersOf
+import io.kotest.matchers.types.shouldBeInstanceOf
+import io.ktor.http.*
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -69,6 +68,29 @@ class ListPageModelTests {
             result.messages shouldBe messagesResponse.messages
             result.categories shouldBe messagesResponse.meta.categories
         }
+
+    @Test
+    fun fetchMessagesWithCategories_shouldReturnFailureResult_whenFetchMessagesResultIsHttp204() = runTest {
+        val networkResponse = Response(
+            originalRequest = UrlRequest(Url("https://example.com"), HttpMethod.Get),
+            status = HttpStatusCode.NoContent,
+            headers = headersOf(),
+            bodyAsText = ""
+        )
+        val answerResponse = SdkEvent.Internal.Sdk.Answer.Response(
+            originId = "test-id",
+            result = Result.success(networkResponse)
+        )
+
+        everySuspend { mockSdkEventWaiter.await<Response>() } returns answerResponse
+        everySuspend { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMessages>()) } returns mockSdkEventWaiter
+
+        val result = model.fetchMessagesWithCategories(false, emptyList())
+
+        result.isFailure shouldBe true
+        result.exceptionOrNull().shouldBeInstanceOf<TooFrequentFetchMessagesRequestsException>()
+        result.exceptionOrNull()?.message shouldBe "Too frequent FetchMessages request."
+    }
 
     @Test
     fun fetchMessagesWithCategories_shouldReturnFailureResult_whenResponseFails() = runTest {
