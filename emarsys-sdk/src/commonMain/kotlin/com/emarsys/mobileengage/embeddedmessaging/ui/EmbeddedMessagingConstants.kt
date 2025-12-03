@@ -7,6 +7,8 @@ internal object EmbeddedMessagingConstants {
 
     val MESSAGE_ITEM_IMAGE_SIZE = 54.dp
 
+    val FLOATING_ACTION_BUTTON_SIZE = 40.dp
+
     val DEFAULT_ELEVATION = 8.dp
     val ZERO_ELEVATION = 0.dp
 

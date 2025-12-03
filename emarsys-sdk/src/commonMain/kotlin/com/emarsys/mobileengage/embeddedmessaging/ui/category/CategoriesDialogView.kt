@@ -179,7 +179,7 @@ private fun DialogActionButtons(
             Button(
                 elevation = ButtonDefaults.buttonElevation(ZERO_ELEVATION),
                 shape = MaterialTheme.shapes.small,
-                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.secondary),
+                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.primary),
                 onClick = {
                     selectedCategories.value = emptySet()
                 },

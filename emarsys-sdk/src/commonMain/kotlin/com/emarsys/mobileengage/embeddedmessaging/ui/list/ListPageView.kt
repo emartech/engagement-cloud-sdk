@@ -1,5 +1,6 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.list
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,10 +28,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.DEFAULT_PADDING
-import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.DEFAULT_SPACING
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.FLOATING_ACTION_BUTTON_SIZE
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.ZERO_SPACING
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategoriesDialogView
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategorySelectorButton
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemView
@@ -43,7 +44,7 @@ fun ListPageView(
     viewModel: ListPageViewModelApi = koin.get()
 ) {
     EmbeddedMessagingTheme {
-        Column {
+        Column(modifier = Modifier.background(MaterialTheme.colorScheme.surface)) {
             MessageList(viewModel)
         }
     }
@@ -72,7 +73,7 @@ fun MessageList(viewModel: ListPageViewModelApi) {
             }
         )
 
-        HorizontalDivider()
+        HorizontalDivider(color = MaterialTheme.colorScheme.outline)
 
         if (showCategorySelector) {
             CategoriesDialogView(
@@ -122,18 +123,18 @@ fun FilterRow(
 ) {
     EmbeddedMessagingTheme {
         Row(
-            modifier = Modifier.padding(horizontal = DEFAULT_PADDING, vertical = DEFAULT_PADDING),
+            modifier = Modifier.padding(DEFAULT_PADDING),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(DEFAULT_SPACING)
+            horizontalArrangement = Arrangement.spacedBy(ZERO_SPACING)
         ) {
             FilterChip(
-                modifier = Modifier.height(56.dp),
+                modifier = Modifier.height(FLOATING_ACTION_BUTTON_SIZE),
                 selected = !filterUnreadOnly,
                 onClick = { onFilterChange(false) },
                 label = { Text(LocalStringResources.current.allMessagesFilterButtonLabel) }
             )
             FilterChip(
-                modifier = Modifier.height(56.dp),
+                modifier = Modifier.height(FLOATING_ACTION_BUTTON_SIZE),
                 selected = filterUnreadOnly,
                 onClick = { onFilterChange(true) },
                 label = { Text(LocalStringResources.current.unreadMessagesFilterButtonLabel) }
