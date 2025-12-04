@@ -16,11 +16,13 @@ import com.emarsys.di.SdkKoinIsolationContext
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.event.SdkEvent
 import com.emarsys.init.InitOrganizerApi
+import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageView
 import com.emarsys.util.JsonUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.web.renderComposable
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 
@@ -78,4 +80,14 @@ object EmarsysJs {
         }
         return SdkEventSubscription(job)
     }
+
+    fun testEmbeddedMessaging(rootElementId: String) {
+        val element = kotlinx.browser.document.getElementById(rootElementId)
+            ?: error("No element with id='$rootElementId' found")
+        renderComposable(root = element) {
+            ListPageView()
+        }
+    }
+
+
 }

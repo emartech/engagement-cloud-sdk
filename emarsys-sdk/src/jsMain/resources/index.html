@@ -1,9 +1,9 @@
 <html lang="en">
 <head>
     <title>Emarsys SDK demo</title>
-    <script src="emarsys-sdk.js" onload="javascript:window.alert('Base import loaded')" async></script>
+    <script src="emarsys-sdk-html.js" onload="javascript:window.alert('Base import loaded')"></script>
 <!--    <script src="sdk-loader.js"></script>-->
-    <script type="module" src="skiko.mjs"></script>
+<!--    <script type="module" src="skiko.mjs"></script>-->
 </head>
 <body>
 <div style="display: flex; gap:1rem; flex-wrap:no-wrap">
@@ -34,13 +34,13 @@
         <button type="button" id="button-render-message">Render Test Message Item View</button>
     </div>
 
-    <canvas id="TestEmbeddedMessaging"></canvas>
+    <div id="TestEmbeddedMessaging"></div>
 </div>
 
 </body>
 
 <script>
-    let emarsys = window.Emarsys;
+    let emarsys = window["emarsys-sdk"].Emarsys.getInstance();
     document.getElementById("button-sdk-test").onclick = async () => {
      const config = new window["emarsys-sdk"].JsEmarsysConfig(
          "EMSA4-90136",
@@ -75,7 +75,7 @@
  }
 
  document.getElementById("button-render-message").onclick = () => {
-     emarsys.testEmbeddedMessaging();
+     emarsys.testEmbeddedMessaging("TestEmbeddedMessaging");
  }
 </script>
 </html>

@@ -36,7 +36,7 @@ kotlin {
     }
 
     // Dynamic JS variant selection: -Pjs.variant=html or -Pjs.variant=canvas (default: canvas)
-    val jsVariant = project.findProperty("js.variant")?.toString() ?: "canvas"
+    val jsVariant = project.findProperty("js.variant")?.toString() ?: "html"
     println("Building JS variant: $jsVariant")
 
     js(IR) {

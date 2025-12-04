@@ -1,5 +1,6 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.category
 
+import LocalDesignValues
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -38,7 +39,7 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstant
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.DIALOG_CONTAINER_PADDING
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.ZERO_ELEVATION
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
-import com.emarsys.mobileengage.embeddedmessaging.ui.theme.LocalDesignValues
+
 import com.emarsys.mobileengage.embeddedmessaging.ui.translation.LocalStringResources
 import com.emarsys.networking.clients.embedded.messaging.model.MessageCategory
 
