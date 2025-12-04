@@ -11,6 +11,7 @@ import com.emarsys.core.util.DownloaderApi
 import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategoriesDialogView
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategorySelectorButton
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemModel
@@ -23,6 +24,7 @@ import com.emarsys.networking.clients.embedded.messaging.model.ListThumbnailImag
 import com.emarsys.networking.clients.embedded.messaging.model.MessageCategory
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpRequestRetry
+import io.ktor.util.decodeBase64Bytes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -230,7 +232,6 @@ class PreviewDownLoader : DownloaderApi {
     }
 
     override suspend fun download(urlString: String, fallback: ByteArray?): ByteArray? {
-//        return Res.readBytes("files/placeholder.png")
-        return ByteArray(0)
+        return EmbeddedMessagingConstants.BASE64_PLACEHOLDER_IMAGE.decodeBase64Bytes()
     }
 }
