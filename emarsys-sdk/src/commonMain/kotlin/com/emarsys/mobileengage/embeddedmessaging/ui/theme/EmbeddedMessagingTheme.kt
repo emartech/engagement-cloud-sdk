@@ -26,6 +26,7 @@ fun EmbeddedMessagingTheme(content: @Composable () -> Unit) {
             MaterialTheme(
                 colorScheme = themeMapper.mapColorScheme(),
                 typography = themeMapper.mapTypography(),
+                shapes = themeMapper.mapShapes(),
                 content = content
             )
         }

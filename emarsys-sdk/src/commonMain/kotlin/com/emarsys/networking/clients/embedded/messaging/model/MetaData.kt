@@ -73,7 +73,8 @@ internal data class Labels(
 internal data class DesignMetaData(
     val fillColor: FillColors?,
     val text: TextMetaData?,
-    val misc: Misc?
+    val shapes: ShapesData? = null,
+    val misc: Misc?,
 )
 
 @Serializable

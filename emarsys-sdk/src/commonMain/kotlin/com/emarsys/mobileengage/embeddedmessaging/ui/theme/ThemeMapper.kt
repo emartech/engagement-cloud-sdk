@@ -1,11 +1,14 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.theme
 
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 
@@ -144,6 +147,45 @@ internal class ThemeMapper(private val embeddedMessagingContext: EmbeddedMessagi
                 labelSmall = textMetaData.labelSmallFontSize.toTextStyle()
             )
         } ?: MaterialTheme.typography
+    }
+
+    @Composable
+    fun mapShapes(): Shapes {
+        val shapeMetaData = embeddedMessagingContext.metaData?.design?.shapes
+        return shapeMetaData?.let {
+            MaterialTheme.shapes.copy(
+                extraSmall = RoundedCornerShape(
+                    topStart = it.extraSmall.topStart.dp,
+                    topEnd = it.extraSmall.topEnd.dp,
+                    bottomStart = it.extraSmall.bottomStart.dp,
+                    bottomEnd = it.extraSmall.bottomEnd.dp,
+                ),
+                small = RoundedCornerShape(
+                    topStart = it.small.topStart.dp,
+                    topEnd = it.small.topEnd.dp,
+                    bottomStart = it.small.bottomStart.dp,
+                    bottomEnd = it.small.bottomEnd.dp,
+                ),
+                medium = RoundedCornerShape(
+                    topStart = it.medium.topStart.dp,
+                    topEnd = it.medium.topEnd.dp,
+                    bottomStart = it.medium.bottomStart.dp,
+                    bottomEnd = it.medium.bottomEnd.dp,
+                ),
+                large = RoundedCornerShape(
+                    topStart = it.large.topStart.dp,
+                    topEnd = it.large.topEnd.dp,
+                    bottomStart = it.large.bottomStart.dp,
+                    bottomEnd = it.large.bottomEnd.dp,
+                ),
+                extraLarge = RoundedCornerShape(
+                    topStart = it.extraLarge.topStart.dp,
+                    topEnd = it.extraLarge.topEnd.dp,
+                    bottomStart = it.extraLarge.bottomStart.dp,
+                    bottomEnd = it.extraLarge.bottomEnd.dp,
+                )
+            )
+        } ?: MaterialTheme.shapes
     }
 
     fun mapMisc() : EmbeddedMessagingDesignValues {
