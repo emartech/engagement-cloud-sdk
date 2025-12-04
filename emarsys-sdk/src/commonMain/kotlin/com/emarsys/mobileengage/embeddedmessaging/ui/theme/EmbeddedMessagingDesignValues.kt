@@ -5,6 +5,8 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.unit.Dp
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.DEFAULT_ELEVATION
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.DEFAULT_PADDING
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.ZERO_CORNER_RADIUS
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.ZERO_ELEVATION
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.ZERO_SPACING
 import com.emarsys.networking.clients.embedded.messaging.model.ShapeCornerRadius
 
@@ -24,8 +26,10 @@ internal data class EmbeddedMessagingDesignValues(
     val compactOverlayElevation: Dp = DEFAULT_ELEVATION,
 
     val emptyStateImageUrl: String? = null,
-    val messageItemImageHeight: Dp = DEFAULT_PADDING,
-    val messageItemClipShape: String = "Rectangle", // e.g., "Rectangle", "Circle", "Rounded", "Custom"
+    val messageItemCardCornerRadius: Dp = ZERO_CORNER_RADIUS,
+    val messageItemCardElevation: Dp= ZERO_ELEVATION,
+    val messageItemImageHeight: Dp = DEFAULT_PADDING, // e.g., "Rectangle", "Circle", "Rounded", "Custom"
+    val messageItemClipShape: String = "Rectangle",
     val messageItemImageCornerRadius: Dp = DEFAULT_PADDING,
     val messageItemCustomShape: ShapeCornerRadius? = null
 )

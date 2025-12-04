@@ -191,8 +191,10 @@ internal data class MiscV2(
     val compactOverlayElevation: Double,
 
     val emptyStateImageUrl: String? = null,
+    val messageItemCardCornerRadius: Double? = 0.0,
+    val messageItemCardElevation: Double? = 0.0,
     val messageItemImageHeight: Double,
-    val messageItemClipShape: String, // e.g., "Rectangle", "Circle", "Rounded", "Custom"
+    val messageItemImageClipShape: String, // e.g., "Rectangle", "Circle", "Rounded", "Custom"
     val messageItemImageCornerRadius: Double,
     val messageItemCustomShape: ShapeCornerRadius? = null
 )

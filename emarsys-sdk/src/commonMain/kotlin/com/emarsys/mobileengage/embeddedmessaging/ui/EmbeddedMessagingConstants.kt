@@ -20,6 +20,8 @@ internal object EmbeddedMessagingConstants {
     val DEFAULT_SPACING = 8.dp
     val ZERO_SPACING = 0.dp
 
+    val ZERO_CORNER_RADIUS = 0.dp
+
     internal object Translations{
         const val FILTER_ALL_BUTTON_LABEL = "All"
         const val FILTER_ALL_BUTTON_ALT_TEXT = "All messages filter button"

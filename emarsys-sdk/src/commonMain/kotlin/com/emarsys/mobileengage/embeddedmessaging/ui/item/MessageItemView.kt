@@ -6,6 +6,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,6 +27,7 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.MESSAGE_ITEM_IMAGE_SIZE
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.ZERO_PADDING
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
+import com.emarsys.mobileengage.embeddedmessaging.ui.theme.LocalDesignValues
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -47,44 +51,50 @@ fun MessageItemView(viewModel: MessageItemViewModelApi) {
     }
 
     EmbeddedMessagingTheme {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(DEFAULT_PADDING)
+        Card(
+            shape = RoundedCornerShape(LocalDesignValues.current.messageItemCardCornerRadius),
+            elevation = CardDefaults.cardElevation(LocalDesignValues.current.messageItemCardElevation),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
-            if (hasThumbnailImage) {
-                imageBitmap?.let {
-                    Image(
-                        bitmap = it,
-                        contentDescription = viewModel.imageAltText,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.size(MESSAGE_ITEM_IMAGE_SIZE)
-                    )
-                } ?: LoadingSpinner()
-
-                Spacer(modifier = Modifier.padding(DEFAULT_PADDING))
-            }
-
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(if (hasThumbnailImage) DEFAULT_PADDING else ZERO_PADDING)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(DEFAULT_PADDING)
             ) {
+                if (hasThumbnailImage) {
+                    imageBitmap?.let {
+                        Image(
+                            bitmap = it,
+                            contentDescription = viewModel.imageAltText,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.size(MESSAGE_ITEM_IMAGE_SIZE)
+                        )
+                    } ?: LoadingSpinner()
+
+                    Spacer(modifier = Modifier.padding(DEFAULT_PADDING))
+                }
+
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(if (hasThumbnailImage) DEFAULT_PADDING else ZERO_PADDING)
+                ) {
+                    Text(
+                        text = viewModel.title,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    Text(
+                        text = viewModel.lead,
+                        style = MaterialTheme.typography.bodyLarge,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+
                 Text(
-                    text = viewModel.title,
+                    formatTimestamp(viewModel.receivedAt),
                     style = MaterialTheme.typography.bodyLarge
                 )
-                Text(
-                    text = viewModel.lead,
-                    style = MaterialTheme.typography.bodyLarge,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
             }
-
-            Text(
-                formatTimestamp(viewModel.receivedAt),
-                style = MaterialTheme.typography.bodyLarge
-            )
         }
     }
 }
