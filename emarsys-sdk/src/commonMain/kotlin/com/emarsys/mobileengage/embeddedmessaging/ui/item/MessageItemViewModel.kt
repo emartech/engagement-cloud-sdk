@@ -1,8 +1,5 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.item
 
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.decodeToImageBitmap
-
 class MessageItemViewModel(
     private val model: MessageItemModelApi,
 ): MessageItemViewModelApi {
@@ -27,6 +24,6 @@ class MessageItemViewModel(
     override val receivedAt: Long
         get() = model.message.receivedAt
 
-    override suspend fun fetchImage(): ImageBitmap =
-        model.downloadImage().decodeToImageBitmap()
+    override suspend fun fetchImage(): ByteArray =
+        model.downloadImage()
 }

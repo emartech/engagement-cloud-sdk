@@ -8,7 +8,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.util.DownloaderApi
-import com.emarsys.emarsys_sdk.generated.resources.Res
 import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
@@ -22,11 +21,8 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageViewModelApi
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
 import com.emarsys.networking.clients.embedded.messaging.model.ListThumbnailImage
 import com.emarsys.networking.clients.embedded.messaging.model.MessageCategory
-import com.emarsys.util.JsonUtil
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpRequestRetry
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -229,13 +225,12 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
 
 class PreviewDownLoader : DownloaderApi {
     private val client = HttpClient {
-        install(ContentNegotiation) {
-            json(JsonUtil.json)
-        }
+
         install(HttpRequestRetry)
     }
 
     override suspend fun download(urlString: String, fallback: ByteArray?): ByteArray? {
-        return Res.readBytes("files/placeholder.png")
+//        return Res.readBytes("files/placeholder.png")
+        return ByteArray(0)
     }
 }

@@ -3,12 +3,12 @@ package com.emarsys.mobileengage.embeddedmessaging.ui.theme
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.unit.Dp
-import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Dimensions.DEFAULT_ELEVATION
-import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Dimensions.DEFAULT_PADDING
-import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Dimensions.ZERO_ELEVATION
-import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Dimensions.ZERO_SPACING
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.DEFAULT_ELEVATION
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.DEFAULT_PADDING
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.ZERO_ELEVATION
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.ZERO_SPACING
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Image.DEFAULT_IMAGE_CLIP_SHAPE
-import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Shapes.ZERO_CORNER_RADIUS
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Shapes.ZERO_CORNER_RADIUS
 import com.emarsys.networking.clients.embedded.messaging.model.ShapeCornerRadius
 
 @Immutable
@@ -38,5 +38,3 @@ internal data class EmbeddedMessagingDesignValues(
 internal val LocalDesignValues = compositionLocalOf {
     EmbeddedMessagingDesignValues()
 }
-
-

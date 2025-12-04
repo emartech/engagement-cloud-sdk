@@ -23,13 +23,13 @@ object EmbeddedMessagingInjection {
                 get()
             )
         }
-        single<EmbeddedMessagingContextApi>{
+        single<EmbeddedMessagingContextApi> {
             EmbeddedMessagingContext()
         }
         single<ListPageModelApi> {
             ListPageModel(
                 sdkEventDistributor = get(),
-                sdkLogger = get{ parametersOf(ListPageModel::class.simpleName) }
+                sdkLogger = get { parametersOf(ListPageModel::class.simpleName) }
             )
         }
         factory<ListPageViewModelApi> {

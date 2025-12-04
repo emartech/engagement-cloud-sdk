@@ -10,7 +10,7 @@ plugins {
 kotlin {
     jvmToolchain(17)
 
-    js {
+    js(IR) {
         outputModuleName.set("composeApp")
         browser {
             commonWebpackConfig {

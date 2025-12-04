@@ -34,11 +34,21 @@ kotlin {
     androidTarget {
         publishLibraryVariants("release")
     }
+
+    // Dynamic JS variant selection: -Pjs.variant=html or -Pjs.variant=canvas (default: canvas)
+    val jsVariant = project.findProperty("js.variant")?.toString() ?: "canvas"
+    println("Building JS variant: $jsVariant")
+
     js(IR) {
         browser {
-            useCommonJs()
             commonWebpackConfig {
-                outputFileName = "emarsys-sdk.js"
+                outputFileName = "emarsys-sdk-$jsVariant.js"
+                cssSupport {
+                    enabled.set(false)
+                }
+            }
+            webpackTask {
+                mode = org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig.Mode.PRODUCTION
             }
             testTask {
                 useKarma {
@@ -47,8 +57,20 @@ kotlin {
             }
         }
         binaries.executable()
+
+        compilerOptions {
+            moduleKind.set(org.jetbrains.kotlin.gradle.dsl.JsModuleKind.MODULE_ES)
+            sourceMap.set(false)
+            freeCompilerArgs.addAll(listOf(
+                "-Xir-dce",
+                "-Xir-minimized-member-names=true",
+                "-Xir-per-module-output-name=false",
+                "-Xpartial-linkage=enable"))
+        }
         generateTypeScriptDefinitions()
     }
+
+    applyDefaultHierarchyTemplate()
 
     listOf(
         iosX64(),
@@ -70,18 +92,9 @@ kotlin {
                 implementation(libs.okio)
                 implementation(libs.kotlinx.serialization.json)
                 implementation(libs.ktor.client.core)
-                implementation(libs.ktor.client.content.negotiation)
-                implementation(libs.ktor.serialization.kotlinx.json)
-                implementation(libs.ktor.serialization)
                 implementation(project.dependencies.platform(libs.cryptography))
                 implementation(libs.cryptography.core)
                 implementation(compose.runtime)
-                implementation(compose.foundation)
-                implementation(compose.material3)
-                implementation(compose.ui)
-                implementation(compose.components.resources)
-                implementation(compose.components.uiToolingPreview)
-                implementation(compose.materialIconsExtended)
             }
         }
         val commonTest by getting {
@@ -95,7 +108,19 @@ kotlin {
                 implementation(libs.kotlinx.coroutines.test)
             }
         }
+        val commonComposeMain by creating {
+            dependsOn(commonMain)
+            dependencies {
+                implementation(compose.foundation)
+                implementation(compose.material3)
+                implementation(compose.ui)
+                implementation(compose.components.resources)
+                implementation(compose.components.uiToolingPreview)
+                implementation(compose.materialIconsExtended)
+            }
+        }
         val androidMain by getting {
+            dependsOn(commonComposeMain)
             dependencies {
                 implementation(libs.koin.android)
                 implementation(libs.kotlinx.datetime)
@@ -134,14 +159,15 @@ kotlin {
                 implementation(libs.okio.fakefilesystem)
             }
         }
-        iosMain {
+        val iosMain by getting {
+            dependsOn(commonComposeMain)
             dependencies {
                 implementation(libs.ktor.client.apple)
                 implementation(libs.cryptography.provider.apple)
                 implementation(libs.sqlDelight.native)
             }
         }
-        iosTest {
+        val iosTest by getting {
             dependencies {
                 implementation(kotlin("test"))
                 implementation(libs.kotest.assertions.table)
@@ -156,6 +182,7 @@ kotlin {
                 implementation(libs.cryptography.provider.webcrypto)
             }
         }
+
         val jsTest by getting {
             dependencies {
                 implementation(kotlin("test-js"))
@@ -163,6 +190,20 @@ kotlin {
                 implementation(libs.kotlinx.coroutines.test)
             }
         }
+
+        val jsHtml by creating {
+            dependsOn(commonMain)
+            dependencies {
+                implementation(compose.html.core)
+            }
+        }
+
+        when(jsVariant) {
+            "html" -> jsMain.dependsOn(jsHtml)
+            "canvas" -> jsMain.dependsOn(commonComposeMain)
+            else -> error("Invalid js.variant: $jsVariant. Use 'html' or 'canvas'")
+        }
+
     }
 }
 

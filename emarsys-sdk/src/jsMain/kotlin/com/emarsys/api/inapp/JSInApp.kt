@@ -4,7 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.promise
 import kotlin.js.Promise
 
-class JSInApp(private val inAppApi: InAppApi, private val applicationScope: CoroutineScope) :
+internal class JSInApp(private val inAppApi: InAppApi, private val applicationScope: CoroutineScope) :
     JSInAppApi {
     override val isPaused: Boolean = inAppApi.isPaused
 

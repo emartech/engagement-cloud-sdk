@@ -4,7 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.promise
 import kotlin.js.Promise
 
-class JSPush(private val pushApi: PushApi, private val applicationScope: CoroutineScope) :
+internal class JSPush(private val pushApi: PushApi, private val applicationScope: CoroutineScope) :
     JSPushApi {
     override fun registerPushToken(pushToken: String): Promise<Unit> {
         return applicationScope.promise {

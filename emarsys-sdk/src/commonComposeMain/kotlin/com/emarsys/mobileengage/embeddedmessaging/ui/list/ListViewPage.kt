@@ -1,5 +1,6 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.list
 
+import LocalDesignValues
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,14 +30,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.emarsys.di.SdkKoinIsolationContext.koin
-import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.DEFAULT_PADDING
-import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.FLOATING_ACTION_BUTTON_SIZE
-import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.ZERO_SPACING
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DEFAULT_PADDING
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.FLOATING_ACTION_BUTTON_SIZE
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.ZERO_SPACING
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategoriesDialogView
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategorySelectorButton
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemView
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
-import com.emarsys.mobileengage.embeddedmessaging.ui.theme.LocalDesignValues
 import com.emarsys.mobileengage.embeddedmessaging.ui.translation.LocalStringResources
 
 @Composable
@@ -77,8 +77,8 @@ fun MessageList(viewModel: ListPageViewModelApi) {
 
         if (showCategorySelector) {
             CategoriesDialogView(
-                categories = viewModel.categories.value,
-                selectedCategories = viewModel.selectedCategoryIds.value,
+                categories = viewModel.categories.collectAsState().value,
+                selectedCategories = viewModel.selectedCategoryIds.collectAsState().value,
                 onApplyClicked = {
                     viewModel.setSelectedCategoryIds(it)
                     viewModel.refreshMessages()

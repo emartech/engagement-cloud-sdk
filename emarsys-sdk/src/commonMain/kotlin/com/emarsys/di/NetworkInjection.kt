@@ -14,8 +14,6 @@ import com.emarsys.networking.clients.logging.LoggingClient
 import com.emarsys.networking.clients.remoteConfig.RemoteConfigClient
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpRequestRetry
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import kotlinx.serialization.json.Json
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -24,9 +22,6 @@ object NetworkInjection {
     val networkModules = module {
         single<HttpClient> {
             HttpClient {
-                install(ContentNegotiation) {
-                    get<Json>()
-                }
                 install(HttpRequestRetry)
             }
         }

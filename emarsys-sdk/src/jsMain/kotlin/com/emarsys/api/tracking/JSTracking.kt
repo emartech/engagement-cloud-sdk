@@ -7,7 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.promise
 import kotlin.js.Promise
 
-class JSTracking(
+internal class JSTracking(
     private val trackingApi: TrackingApi,
     private val applicationScope: CoroutineScope
 ) : JSTrackingApi {

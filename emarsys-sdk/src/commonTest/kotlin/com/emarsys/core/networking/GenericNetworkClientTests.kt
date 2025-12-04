@@ -19,14 +19,14 @@ import io.ktor.client.engine.config
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.plugins.HttpRequestRetry
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.URLBuilder
 import io.ktor.http.headersOf
-import io.ktor.serialization.kotlinx.json.json
+
 import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.test.runTest
 import kotlinx.io.IOException
@@ -217,9 +217,6 @@ class GenericNetworkClientTests {
             }
         }
         val httpClient = HttpClient(mockHttpEngine) {
-            install(ContentNegotiation) {
-                json()
-            }
             install(HttpRequestRetry)
         }
         genericNetworkClient = GenericNetworkClient(httpClient, sdkLogger = mock(MockMode.autofill))
@@ -261,9 +258,6 @@ class GenericNetworkClientTests {
             }
         }
         val httpClient = HttpClient(mockHttpEngine) {
-            install(ContentNegotiation) {
-                json()
-            }
             install(HttpRequestRetry)
         }
         genericNetworkClient = GenericNetworkClient(httpClient, sdkLogger = mock(MockMode.autofill))

@@ -31,7 +31,6 @@ import io.ktor.client.engine.config
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.plugins.HttpRequestRetry
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.URLBuilder
@@ -45,7 +44,6 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlin.time.Clock
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
@@ -54,6 +52,7 @@ import kotlinx.serialization.json.putJsonArray
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
@@ -160,9 +159,6 @@ class EmarsysClientTests {
             }
         }
         val httpClient = HttpClient(mockHttpEngine) {
-            install(ContentNegotiation) {
-                json
-            }
             install(HttpRequestRetry)
         }
         val networkClient = GenericNetworkClient(httpClient, mockSdkLogger)
@@ -221,9 +217,6 @@ class EmarsysClientTests {
             }
         }
         val httpClient = HttpClient(mockHttpEngine) {
-            install(ContentNegotiation) {
-                json
-            }
             install(HttpRequestRetry)
         }
         val networkClient = GenericNetworkClient(httpClient, mockSdkLogger)

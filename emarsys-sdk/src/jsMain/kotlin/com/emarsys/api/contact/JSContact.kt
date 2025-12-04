@@ -4,7 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.promise
 import kotlin.js.Promise
 
-class JSContact(private val contactApi: ContactApi, private val applicationScope: CoroutineScope) :
+internal class JSContact(private val contactApi: ContactApi, private val applicationScope: CoroutineScope) :
     JSContactApi {
 
     /**
