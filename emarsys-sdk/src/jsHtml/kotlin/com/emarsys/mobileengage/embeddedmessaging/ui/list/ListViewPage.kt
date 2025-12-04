@@ -49,6 +49,7 @@ import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Hr
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
+import org.jetbrains.compose.web.renderComposable
 
 @Composable
 fun ListPageView(
@@ -291,5 +292,15 @@ fun EmptyState() {
                 }
             }
         }
+    }
+}
+
+@OptIn(ExperimentalJsExport::class)
+@JsExport
+fun testEmbeddedMessaging(rootElementId: String) {
+    val element = kotlinx.browser.document.getElementById(rootElementId)
+        ?: error("No element with id='$rootElementId' found")
+    renderComposable(root = element) {
+        ListPageView()
     }
 }
