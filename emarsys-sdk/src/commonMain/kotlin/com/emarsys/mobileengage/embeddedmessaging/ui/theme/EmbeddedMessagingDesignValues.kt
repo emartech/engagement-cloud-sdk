@@ -3,11 +3,12 @@ package com.emarsys.mobileengage.embeddedmessaging.ui.theme
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.unit.Dp
-import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.DEFAULT_ELEVATION
-import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.DEFAULT_PADDING
-import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.ZERO_CORNER_RADIUS
-import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.ZERO_ELEVATION
-import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.ZERO_SPACING
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Dimensions.DEFAULT_ELEVATION
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Dimensions.DEFAULT_PADDING
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Dimensions.ZERO_ELEVATION
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Dimensions.ZERO_SPACING
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Image.DEFAULT_IMAGE_CLIP_SHAPE
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Shapes.ZERO_CORNER_RADIUS
 import com.emarsys.networking.clients.embedded.messaging.model.ShapeCornerRadius
 
 @Immutable
@@ -29,7 +30,7 @@ internal data class EmbeddedMessagingDesignValues(
     val messageItemCardCornerRadius: Dp = ZERO_CORNER_RADIUS,
     val messageItemCardElevation: Dp= ZERO_ELEVATION,
     val messageItemImageHeight: Dp = DEFAULT_PADDING, // e.g., "Rectangle", "Circle", "Rounded", "Custom"
-    val messageItemClipShape: String = "Rectangle",
+    val messageItemClipShape: String = DEFAULT_IMAGE_CLIP_SHAPE,
     val messageItemImageCornerRadius: Dp = DEFAULT_PADDING,
     val messageItemCustomShape: ShapeCornerRadius? = null
 )

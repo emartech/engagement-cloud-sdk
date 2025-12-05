@@ -6,7 +6,7 @@ import com.emarsys.core.util.DownloaderApi
 import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.embeddedmessaging.models.MessageTagUpdate
 import com.emarsys.mobileengage.embeddedmessaging.models.TagOperation
-import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Image.BASE64_PLACEHOLDER_IMAGE
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
 import kotlin.io.encoding.Base64
 import kotlin.time.ExperimentalTime
@@ -54,7 +54,7 @@ internal class MessageItemModel(
     }
 
     private fun getDecodedFallbackImage(): ByteArray {
-        val byteArray = EmbeddedMessagingConstants.BASE64_PLACEHOLDER_IMAGE.encodeToByteArray()
+        val byteArray = BASE64_PLACEHOLDER_IMAGE.encodeToByteArray()
         return Base64.decode(byteArray)
     }
 }

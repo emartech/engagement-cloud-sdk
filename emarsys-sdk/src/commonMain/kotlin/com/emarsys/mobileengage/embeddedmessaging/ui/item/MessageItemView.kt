@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -20,12 +21,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
-import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.DEFAULT_PADDING
-import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.MESSAGE_ITEM_IMAGE_SIZE
-import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.ZERO_PADDING
+import androidx.compose.ui.unit.dp
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Dimensions.DEFAULT_PADDING
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Dimensions.MESSAGE_ITEM_IMAGE_SIZE
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Dimensions.ZERO_PADDING
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Shapes.ZERO_CORNER_RADIUS
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.LocalDesignValues
 import kotlin.time.Clock
@@ -66,7 +70,9 @@ fun MessageItemView(viewModel: MessageItemViewModelApi) {
                             bitmap = it,
                             contentDescription = viewModel.imageAltText,
                             contentScale = ContentScale.Crop,
-                            modifier = Modifier.size(MESSAGE_ITEM_IMAGE_SIZE)
+                            modifier = Modifier
+                                .size(MESSAGE_ITEM_IMAGE_SIZE)
+                                .clip(imageClipShape())
                         )
                     } ?: LoadingSpinner()
 
@@ -96,6 +102,29 @@ fun MessageItemView(viewModel: MessageItemViewModelApi) {
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun imageClipShape(): RoundedCornerShape {
+    val fallbackShape = RoundedCornerShape(ZERO_CORNER_RADIUS)
+    return when (LocalDesignValues.current.messageItemClipShape) {
+        "Rectangle" -> fallbackShape
+        "Circle" -> CircleShape
+        "Rounded" -> RoundedCornerShape(LocalDesignValues.current.messageItemImageCornerRadius)
+        "Custom" -> {
+            val customShape = LocalDesignValues.current.messageItemCustomShape
+            customShape?.let {
+                RoundedCornerShape(
+                    topStart = customShape.topStart.dp,
+                    topEnd = customShape.topEnd.dp,
+                    bottomStart = customShape.bottomStart.dp,
+                    bottomEnd = customShape.bottomEnd.dp
+                )
+            } ?: fallbackShape
+        }
+
+        else -> fallbackShape
     }
 }
 

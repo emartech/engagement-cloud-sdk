@@ -49,7 +49,7 @@ class MessageItemModelTests {
             properties = emptyMap(),
             trackingInfo = "anything"
         )
-        val fallbackImageByteArray = Base64.decode(EmbeddedMessagingConstants.BASE64_PLACEHOLDER_IMAGE
+        val fallbackImageByteArray = Base64.decode(EmbeddedMessagingConstants.Image.BASE64_PLACEHOLDER_IMAGE
             .encodeToByteArray())
     }
 
