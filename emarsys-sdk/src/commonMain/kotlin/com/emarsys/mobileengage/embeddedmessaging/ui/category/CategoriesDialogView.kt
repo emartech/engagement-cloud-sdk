@@ -108,7 +108,7 @@ private fun DialogHeader(onDismiss: () -> Unit) {
                 IconButton(onClick = { onDismiss() }) {
                     Icon(
                         imageVector = Icons.Outlined.Close,
-                        contentDescription = LocalStringResources.current.categoriesFilterDialogCloseButtonAltText
+                        contentDescription = LocalStringResources.current.closeIconButtonAltText
                     )
                 }
             }
