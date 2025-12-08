@@ -232,6 +232,6 @@ class PreviewDownLoader : DownloaderApi {
     }
 
     override suspend fun download(urlString: String, fallback: ByteArray?): ByteArray? {
-        return EmbeddedMessagingConstants.BASE64_PLACEHOLDER_IMAGE.decodeBase64Bytes()
+        return EmbeddedMessagingConstants.Image.BASE64_PLACEHOLDER_IMAGE.decodeBase64Bytes()
     }
 }

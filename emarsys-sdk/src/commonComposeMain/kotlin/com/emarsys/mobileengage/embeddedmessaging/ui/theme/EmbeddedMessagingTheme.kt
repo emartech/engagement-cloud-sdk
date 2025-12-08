@@ -1,7 +1,5 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.theme
 
-import EmbeddedMessagingDesignValues
-import LocalDesignValues
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
