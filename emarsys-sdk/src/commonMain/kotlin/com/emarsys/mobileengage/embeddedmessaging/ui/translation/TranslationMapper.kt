@@ -14,7 +14,7 @@ internal class TranslationMapper: TranslationMapperApi {
                 categoriesFilterIconAltText = it.categoriesFilterIconAltText,
                 categoriesFilterDialogTitle = it.categoriesFilterDialogTitle,
                 categoriesFilterDialogSubtitle = it.categoriesFilterDialogSubtitle,
-                categoryFilterChipIconAltText = it.categoryFilterChipIconAltText,
+                selectedCategoryFilterChipIconAltText = it.selectedCategoryFilterChipIconAltText,
                 categoriesFilterDialogResetButtonLabel = it.categoriesFilterDialogResetButtonLabel,
                 categoriesFilterDialogApplyButtonLabel = it.categoriesFilterDialogApplyButtonLabel,
                 pinnedMessagesTitle = it.pinnedMessagesTitle,

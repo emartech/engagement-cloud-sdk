@@ -9,6 +9,9 @@ internal object EmbeddedMessagingConstants {
     }
 
     internal object Translations {
+        const val PINNED_MESSAGES_TITLE = "Pinned Messages"
+        const val EMPTY_STATE_TITLE = "No Messages"
+        const val EMPTY_STATE_DESCRIPTION = "You have no messages in the selected view."
         const val FILTER_ALL_BUTTON_LABEL = "All"
         const val FILTER_UNREAD_BUTTON_LABEL = "Unread"
         const val CATEGORIES_FILTER_BUTTON_LABEL = "Categories"
@@ -18,16 +21,13 @@ internal object EmbeddedMessagingConstants {
         const val CATEGORY_FILTER_CHIP_ICON_ALT_TEXT = "selected"
         const val CATEGORIES_FILTER_DIALOG_RESET_BUTTON_LABEL = "Reset"
         const val CATEGORIES_FILTER_DIALOG_APPLY_BUTTON_LABEL = "Apply"
-        const val PINNED_MESSAGES_TITLE = "Pinned Messages"
         const val DETAILED_MESSAGE_CLOSE_BUTTON_LABEL = "Close"
         const val DETAILED_MESSAGE_DELETE_BUTTON_LABEL = "Delete Message"
-        const val EMPTY_STATE_TITLE = "No Messages"
-        const val EMPTY_STATE_DESCRIPTION = "You have no messages in the selected view."
         const val DELETE_MESSAGE_DIALOG_TITLE = "Delete Message?"
         const val DELETE_MESSAGE_DIALOG_DESCRIPTION = "By deleting this, it will be no longer available"
         const val DELETE_MESSAGE_DIALOG_CANCEL_BUTTON_LABEL = "Cancel"
         const val DELETE_MESSAGE_DIALOG_CONFIRM_BUTTON_LABEL = "Delete"
-        const val CLOSE_ICON_BUTTON_ALT_TEXT = "Close icon button"
         const val DELETE_ICON_BUTTON_ALT_TEXT = "Delete icon button"
+        const val CLOSE_ICON_BUTTON_ALT_TEXT = "Close icon button"
     }
 }

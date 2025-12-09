@@ -156,7 +156,7 @@ private fun CategoryFilterChipsList(
                             if (selectedCategories.value.contains(id)) {
                                 Icon(
                                     Icons.Outlined.Check,
-                                    contentDescription = "$value ${LocalStringResources.current.categoryFilterChipIconAltText}"
+                                    contentDescription = "$value ${LocalStringResources.current.selectedCategoryFilterChipIconAltText}"
                                 )
                             }
                             Text(value)
