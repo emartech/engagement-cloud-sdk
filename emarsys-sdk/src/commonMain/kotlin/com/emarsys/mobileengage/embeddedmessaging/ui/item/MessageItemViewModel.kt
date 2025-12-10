@@ -27,6 +27,9 @@ class MessageItemViewModel(
     override val isUnread: Boolean
         get() = model.isUnread()
 
+    override val isPinned: Boolean
+        get() = model.isPinned()
+
     override suspend fun fetchImage(): ByteArray =
         model.downloadImage()
 }

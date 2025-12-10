@@ -119,6 +119,15 @@ class MessageItemViewModelTests {
     }
 
     @Test
+    fun isPinned_shouldReturn_MessageIsPinned() {
+        val mockModel = mock<MessageItemModelApi>(MockMode.autofill)
+        every { mockModel.isPinned() } returns true
+        val viewModel = MessageItemViewModel(mockModel)
+
+        viewModel.isPinned shouldBe true
+    }
+
+    @Test
     @Ignore
     fun fetchImage_shouldCallDownloadImage_onTheModel() = runTest {
         val imageByteArray = byteArrayOf()

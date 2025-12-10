@@ -196,4 +196,25 @@ class MessageItemModelTests {
 
         model.isUnread() shouldBe true
     }
+
+    @Test
+    fun isPinned_shouldReturnFalse_whenTagsNotContainingPinned() = runTest {
+        val model = createMessageItemModel(testMessage.copy(tags = listOf("notPinned")))
+
+        model.isPinned() shouldBe false
+    }
+
+    @Test
+    fun isPinned_shouldReturnTrue_whenTagsContainsPinned() = runTest {
+        val model = createMessageItemModel(testMessage.copy(tags = listOf("pinned")))
+
+        model.isPinned() shouldBe true
+    }
+
+    @Test
+    fun isPinned_shouldReturnTrue_whenTagsContainsPinned_caseInsensitively() = runTest {
+        val model = createMessageItemModel(testMessage.copy(tags = listOf("PinNed")))
+
+        model.isPinned() shouldBe true
+    }
 }
