@@ -7,4 +7,5 @@ interface MessageItemModelApi {
     val message: EmbeddedMessage
     suspend fun downloadImage(): ByteArray
     suspend fun updateTagsForMessage(tag: String, operation: TagOperation, trackingInfo: String): Boolean
+    fun isUnread(): Boolean
 }

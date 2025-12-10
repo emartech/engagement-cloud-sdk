@@ -45,7 +45,7 @@ struct SdkTestView: View {
     func enableTracking() {
         Task {
             try? await Emarsys.shared.setup.enableTracking(config: EmarsysConfig(applicationCode: "EMS11-C3FD3"))
-            try? await Emarsys.shared.contact.link(contactFieldValue: "test2@test.com")
+            try? await Emarsys.shared.contact.link(contactFieldValue: "test@test.com")
         }
     }
     

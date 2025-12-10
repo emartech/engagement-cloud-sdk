@@ -1,7 +1,7 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.item
 
 class MessageItemViewModel(
-    private val model: MessageItemModelApi,
+    private val model: MessageItemModelApi
 ): MessageItemViewModelApi {
     override val id: String
         get() = model.message.id
@@ -23,6 +23,9 @@ class MessageItemViewModel(
 
     override val receivedAt: Long
         get() = model.message.receivedAt
+
+    override val isUnread: Boolean
+        get() = model.isUnread()
 
     override suspend fun fetchImage(): ByteArray =
         model.downloadImage()

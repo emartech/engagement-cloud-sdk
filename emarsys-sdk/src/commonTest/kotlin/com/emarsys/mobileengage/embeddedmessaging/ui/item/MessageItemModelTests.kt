@@ -175,4 +175,25 @@ class MessageItemModelTests {
 
         verifySuspend { mockSdkEventDistributor.registerEvent(any()) }
     }
+
+    @Test
+    fun isUnread_shouldReturnFalse_whenTagsNotContainingUnread() = runTest {
+        val model = createMessageItemModel(testMessage.copy(tags = listOf("seen")))
+
+        model.isUnread() shouldBe false
+    }
+
+    @Test
+    fun isUnread_shouldReturnTrue_whenTagsContainsUnread() = runTest {
+        val model = createMessageItemModel(testMessage.copy(tags = listOf("unread")))
+
+        model.isUnread() shouldBe true
+    }
+
+    @Test
+    fun isUnread_shouldReturnTrue_whenTagsContainsUnread_caseInsensitively() = runTest {
+        val model = createMessageItemModel(testMessage.copy(tags = listOf("UnrEad")))
+
+        model.isUnread() shouldBe true
+    }
 }

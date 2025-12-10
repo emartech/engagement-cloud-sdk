@@ -110,6 +110,15 @@ class MessageItemViewModelTests {
     }
 
     @Test
+    fun isUnread_shouldReturn_MessageIsUnread() {
+        val mockModel = mock<MessageItemModelApi>(MockMode.autofill)
+        every { mockModel.isUnread() } returns true
+        val viewModel = MessageItemViewModel(mockModel)
+
+        viewModel.isUnread shouldBe true
+    }
+
+    @Test
     @Ignore
     fun fetchImage_shouldCallDownloadImage_onTheModel() = runTest {
         val imageByteArray = byteArrayOf()

@@ -16,6 +16,9 @@ internal class MessageItemModel(
     private val downloaderApi: DownloaderApi,
     private val sdkEventDistributor: SdkEventDistributorApi
 ) : MessageItemModelApi {
+    private companion object {
+        const val UNREAD_TAG = "unread"
+    }
     override suspend fun downloadImage(): ByteArray {
         return message.listThumbnailImage?.let {
             downloaderApi.download(it.src, getDecodedFallbackImage())
@@ -51,6 +54,10 @@ internal class MessageItemModel(
         } catch (e: Exception) {
             false
         }
+    }
+
+    override fun isUnread(): Boolean {
+        return message.tags.map { it.lowercase() }.contains(UNREAD_TAG)
     }
 
     private fun getDecodedFallbackImage(): ByteArray {

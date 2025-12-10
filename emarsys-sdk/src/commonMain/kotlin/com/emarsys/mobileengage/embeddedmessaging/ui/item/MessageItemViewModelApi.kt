@@ -8,6 +8,7 @@ interface MessageItemViewModelApi {
     val imageAltText: String?
     val categoryIds: List<Int>
     val receivedAt: Long
+    val isUnread: Boolean
 
     suspend fun fetchImage(): ByteArray
 }
