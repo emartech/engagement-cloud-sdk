@@ -4,7 +4,9 @@ import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.event.SdkEvent
-import io.ktor.http.*
+import io.ktor.http.HttpMethod
+import io.ktor.http.buildUrl
+import io.ktor.http.takeFrom
 import kotlinx.serialization.json.Json
 import kotlin.time.ExperimentalTime
 
@@ -59,7 +61,7 @@ internal class EmbeddedMessagesRequestFactory(
         val url = buildUrl {
             takeFrom(urlFactory.create(EmarsysUrlType.FETCH_EMBEDDED_MESSAGES))
             if (embeddedMessagingEvent.offset > 0) {
-                parameters.append("skip", embeddedMessagingEvent.offset.toString())
+                parameters.append("\$skip", embeddedMessagingEvent.offset.toString())
             }
             if (embeddedMessagingEvent.categoryIds.isNotEmpty()) {
                 parameters.append(
