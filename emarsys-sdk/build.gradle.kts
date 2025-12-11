@@ -117,6 +117,11 @@ kotlin {
                 implementation(compose.components.resources)
                 implementation(compose.components.uiToolingPreview)
                 implementation(compose.materialIconsExtended)
+                implementation(compose.material3AdaptiveNavigationSuite)
+
+                implementation(libs.compose.adaptive)
+                implementation(libs.compose.adaptive.navigation)
+                implementation(libs.compose.ui.backhandler)
             }
         }
         val androidMain by getting {

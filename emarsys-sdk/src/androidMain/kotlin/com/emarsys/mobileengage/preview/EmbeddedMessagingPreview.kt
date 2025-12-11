@@ -60,7 +60,10 @@ fun MessageItemViewPreview() {
                 downloaderApi = PreviewDownLoader(),
                 sdkEventDistributor = previewSdkEventDistributor
             )
-        )
+        ),
+        onClick = {
+            println("Message item clicked!")
+        }
     )
 }
 

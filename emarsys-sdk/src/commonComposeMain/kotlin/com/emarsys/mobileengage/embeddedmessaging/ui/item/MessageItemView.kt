@@ -1,6 +1,7 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.item
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -40,7 +41,7 @@ import kotlin.time.Instant
 
 
 @Composable
-fun MessageItemView(viewModel: MessageItemViewModelApi) {
+fun MessageItemView(viewModel: MessageItemViewModelApi, onClick: () -> Unit) {
     var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
     val hasThumbnailImage = viewModel.imageUrl != null
 
@@ -60,7 +61,8 @@ fun MessageItemView(viewModel: MessageItemViewModelApi) {
         Card(
             shape = RoundedCornerShape(LocalDesignValues.current.messageItemCardCornerRadius),
             elevation = CardDefaults.cardElevation(LocalDesignValues.current.messageItemCardElevation),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            modifier = Modifier.clickable(onClick = { onClick() })
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
