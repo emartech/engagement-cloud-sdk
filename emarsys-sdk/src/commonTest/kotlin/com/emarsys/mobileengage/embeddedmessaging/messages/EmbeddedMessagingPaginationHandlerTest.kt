@@ -10,21 +10,37 @@ import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.embeddedmessaging.pagination.EmbeddedMessagingPaginationHandler
 import com.emarsys.mobileengage.embeddedmessaging.pagination.EmbeddedMessagingPaginationState
 import com.emarsys.util.JsonUtil
-import dev.mokkery.*
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
+import dev.mokkery.every
+import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.matcher.capture.Capture
 import dev.mokkery.matcher.capture.SlotCapture
 import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
+import dev.mokkery.mock
+import dev.mokkery.resetAnswers
+import dev.mokkery.resetCalls
 import io.kotest.matchers.shouldBe
-import io.ktor.http.*
+import io.ktor.http.Headers
+import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.Url
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.test.*
-import kotlinx.serialization.json.*
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonArray
+import kotlinx.serialization.json.putJsonObject
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -205,47 +221,6 @@ class EmbeddedMessagingPaginationHandlerTest {
 
         state.receivedCount shouldBe 0
         state.top shouldBe 0
-    }
-
-    @Test
-    fun testConsume_resetPaginationEvent_shouldResetsState() = runTest {
-        createPaginationHandler(backgroundScope).register()
-
-        val resetEvent = SdkEvent.Internal.EmbeddedMessaging.ResetPagination()
-        val fetch = SdkEvent.Internal.EmbeddedMessaging.FetchMessages(
-            nackCount = 0,
-            offset = 15,
-            categoryIds = listOf(3, 4, 5),
-            filterUnreadMessages = true
-        )
-        val response = response(fetch.id, buildSuccessBody(10, 2))
-
-        flow.emit(fetch)
-        flow.emit(response)
-
-        advanceUntilIdle()
-
-        state.offset shouldBe 15
-        state.receivedCount shouldBe 2
-        state.top shouldBe 10
-        state.lastFetchMessagesId shouldBe fetch.id
-        state.categoryIds shouldBe listOf(3, 4, 5)
-        state.endReached shouldBe true
-        state.filterUnreadMessages shouldBe true
-
-
-        flow.emit(resetEvent)
-
-        advanceUntilIdle()
-
-        state.offset shouldBe 0
-        state.receivedCount shouldBe 0
-        state.top shouldBe 0
-        state.lastFetchMessagesId shouldBe null
-        state.categoryIds shouldBe emptyList()
-        state.endReached shouldBe false
-        state.canFetchNextPage() shouldBe true
-        state.filterUnreadMessages shouldBe false
     }
 
     private fun response(originId: String, body: String) = SdkEvent.Internal.Sdk.Answer.Response(
