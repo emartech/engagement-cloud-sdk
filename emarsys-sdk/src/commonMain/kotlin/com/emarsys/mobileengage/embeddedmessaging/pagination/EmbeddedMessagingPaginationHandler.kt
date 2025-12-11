@@ -20,7 +20,7 @@ internal class EmbeddedMessagingPaginationHandler(
     private val applicationScope: CoroutineScope,
     private val sdkLogger: Logger,
     private val paginationState: EmbeddedMessagingPaginationState
-) : Registerable {
+) : EmbeddedMessagingPaginationHandlerApi {
     override suspend fun register() {
         applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
             sdkLogger.debug("register EmbeddedMessagingPagination")
@@ -28,13 +28,14 @@ internal class EmbeddedMessagingPaginationHandler(
         }
     }
 
+    override fun isEndReached() = paginationState.endReached
+
     private suspend fun consumeEvents() {
         sdkEventManager.sdkEventFlow
             .filter {
                 it is SdkEvent.Internal.EmbeddedMessaging.FetchMessages
                         || it is SdkEvent.Internal.Sdk.Answer.Response<*>
                         || it is SdkEvent.Internal.EmbeddedMessaging.NextPage
-                        || it is SdkEvent.Internal.EmbeddedMessaging.ResetPagination
             }
             .collect { event ->
                 when (event) {
@@ -44,6 +45,7 @@ internal class EmbeddedMessagingPaginationHandler(
                         paginationState.categoryIds = event.categoryIds
                         paginationState.filterUnreadMessages = event.filterUnreadMessages
                     }
+
                     is SdkEvent.Internal.Sdk.Answer.Response<*> -> {
                         if (event.originId == paginationState.lastFetchMessagesId) {
                             event.result.onSuccess { result ->
@@ -57,12 +59,16 @@ internal class EmbeddedMessagingPaginationHandler(
                                 }
                             }
                             event.result.onFailure { throwable ->
-                                sdkLogger.error("Failed to process embedded messages response", throwable)
+                                sdkLogger.error(
+                                    "Failed to process embedded messages response",
+                                    throwable
+                                )
                             }
                         } else {
                             sdkLogger.debug("Ignoring response with mismatched originId=${event.originId}")
                         }
                     }
+
                     is SdkEvent.Internal.EmbeddedMessaging.NextPage -> {
                         if (paginationState.canFetchNextPage()) {
                             paginationState.updateOffset()
@@ -81,10 +87,7 @@ internal class EmbeddedMessagingPaginationHandler(
                             sdkLogger.debug("Can't fetch more messages, final page reached")
                         }
                     }
-                    is SdkEvent.Internal.EmbeddedMessaging.ResetPagination -> {
-                        sdkLogger.debug("Resetting pagination state")
-                        paginationState.reset()
-                    }
+
                     else -> {
                         sdkLogger.debug("Ignoring unrelated event: ${event::class.simpleName}")
                     }

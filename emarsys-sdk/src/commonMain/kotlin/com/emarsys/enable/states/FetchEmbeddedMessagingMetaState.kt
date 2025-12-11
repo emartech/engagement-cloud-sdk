@@ -1,4 +1,4 @@
-package com.emarsys.init.states
+package com.emarsys.enable.states
 
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.Logger

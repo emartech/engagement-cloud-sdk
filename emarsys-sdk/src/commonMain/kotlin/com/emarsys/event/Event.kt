@@ -211,13 +211,6 @@ sealed interface SdkEvent {
             ) : Internal
 
             @Serializable
-            data class ResetPagination(
-                override val id: String = UUIDProvider().provide(),
-                override val type: String = "resetPagination",
-                override val timestamp: Instant = TimestampProvider().provide()
-            ) : Internal
-
-            @Serializable
             data class FetchMeta(
                 override val id: String = UUIDProvider().provide(),
                 override val type: String = "fetchMeta",

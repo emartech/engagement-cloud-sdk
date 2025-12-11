@@ -14,10 +14,11 @@ import com.emarsys.enable.EnableOrganizerApi
 import com.emarsys.enable.states.AppStartState
 import com.emarsys.enable.states.ApplyAppCodeBasedRemoteConfigState
 import com.emarsys.enable.states.CollectDeviceInfoState
+import com.emarsys.enable.states.EmbeddedMessagingPaginationHandlerSetupState
+import com.emarsys.enable.states.FetchEmbeddedMessagingMetaState
 import com.emarsys.enable.states.RegisterClientState
 import com.emarsys.enable.states.RegisterPushTokenState
 import com.emarsys.enable.states.RestoreSavedSdkEventsState
-import com.emarsys.init.states.FetchEmbeddedMessagingMetaState
 import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.reregistration.ReregistrationClient
 import com.emarsys.reregistration.states.ClearRequestContextTokensState
@@ -97,6 +98,12 @@ object SetupInjection {
                 sdkLogger = get { parametersOf(FetchEmbeddedMessagingMetaState::class.simpleName) }
             )
         }
+        single<State>(named(StateTypes.EmbeddedMessagingPaginationHandlerSetupState)) {
+            EmbeddedMessagingPaginationHandlerSetupState(
+                embeddedMessagingPaginationHandler = get(),
+                sdkLogger = get { parametersOf(EmbeddedMessagingPaginationHandlerSetupState::class.simpleName) }
+            )
+        }
         single<StateMachineApi>(named(StateMachineTypes.MobileEngageEnable)) {
             StateMachine(
                 states = listOf(
@@ -107,7 +114,8 @@ object SetupInjection {
                     get<State>(named(StateTypes.RegisterPushToken)),
                     get<State>(named(StateTypes.RestoreSavedSdkEvents)),
                     get<State>(named(StateTypes.AppStart)),
-                    get<State>(named(StateTypes.FetchEmbeddedMessagingMetaState))
+                    get<State>(named(StateTypes.FetchEmbeddedMessagingMetaState)),
+                    get<State>(named(StateTypes.EmbeddedMessagingPaginationHandlerSetupState))
                 )
             )
         }
@@ -177,5 +185,6 @@ enum class StateTypes {
     LinkContact,
     ClearStoredConfig,
     ClearEvents,
-    FetchEmbeddedMessagingMetaState
+    FetchEmbeddedMessagingMetaState,
+    EmbeddedMessagingPaginationHandlerSetupState
 }
