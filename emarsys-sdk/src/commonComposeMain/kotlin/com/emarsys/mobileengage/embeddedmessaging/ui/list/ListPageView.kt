@@ -166,7 +166,7 @@ fun MessageList(viewModel: ListPageViewModelApi) {
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("Select a message to view details")
+                    Text(LocalStringResources.current.detailedMessageEmptyStateText)
                 }
             }
         )

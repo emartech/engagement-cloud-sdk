@@ -21,6 +21,7 @@ internal object EmbeddedMessagingConstants {
         const val CATEGORY_FILTER_CHIP_ICON_ALT_TEXT = "selected"
         const val CATEGORIES_FILTER_DIALOG_RESET_BUTTON_LABEL = "Reset"
         const val CATEGORIES_FILTER_DIALOG_APPLY_BUTTON_LABEL = "Apply"
+        const val DETAILED_MESSAGE_EMPTY_STATE_TEXT = "Select a message to view details"
         const val DETAILED_MESSAGE_CLOSE_BUTTON_LABEL = "Close"
         const val DETAILED_MESSAGE_DELETE_BUTTON_LABEL = "Delete Message"
         const val DELETE_MESSAGE_DIALOG_TITLE = "Delete Message?"

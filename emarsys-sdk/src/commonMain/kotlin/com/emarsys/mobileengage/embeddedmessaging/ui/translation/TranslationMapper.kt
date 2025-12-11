@@ -18,6 +18,7 @@ internal class TranslationMapper: TranslationMapperApi {
                 categoriesFilterDialogResetButtonLabel = it.categoriesFilterDialogResetButtonLabel,
                 categoriesFilterDialogApplyButtonLabel = it.categoriesFilterDialogApplyButtonLabel,
                 pinnedMessagesTitle = it.pinnedMessagesTitle,
+                detailedMessageEmptyStateText = it.detailedMessageEmptyStateText,
                 detailedMessageCloseButtonLabel = it.detailedMessageCloseButtonLabel,
                 detailedMessageDeleteButtonLabel = it.detailedMessageDeleteButtonLabel,
                 emptyStateTitle = it.emptyStateTitle,
