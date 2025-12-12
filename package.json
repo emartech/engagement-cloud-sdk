@@ -1,0 +1,9 @@
+{
+  "type": "commonjs",
+  "scripts": {
+    "test": "node --test emarsys-sdk/emarsys-sdk-loader/*.spec.js"
+  },
+  "devDependencies": {
+    "jsdom": "^27.2.0"
+  }
+}
