@@ -6,20 +6,15 @@ import com.emarsys.core.exceptions.SdkException.NetworkIOException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
-import com.emarsys.core.networking.model.UrlRequest
-import com.emarsys.core.providers.InstantProvider
 import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
-import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import com.emarsys.mobileengage.embeddedmessaging.networking.EmbeddedMessagingRequestFactoryApi
 import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.error.ClientExceptionHandler
-import io.ktor.http.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
-import kotlin.time.Instant
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
@@ -30,12 +25,8 @@ internal class EmbeddedMessagingClient(
     private val embeddedMessagingRequestFactory: EmbeddedMessagingRequestFactoryApi,
     private val emarsysNetworkClient: NetworkClientApi,
     private val eventsDao: EventsDaoApi,
-    private val clientExceptionHandler: ClientExceptionHandler,
-    private val timestampProvider: InstantProvider,
-    private val embeddedMessagingContext: EmbeddedMessagingContextApi
+    private val clientExceptionHandler: ClientExceptionHandler
 ) : EventBasedClientApi {
-
-    private var lastFetchMessagesEventResultReceived: Instant? = null
 
     override suspend fun register() {
         applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
@@ -61,18 +52,12 @@ internal class EmbeddedMessagingClient(
                         embeddedMessagingRequestFactory.create(it as SdkEvent.Internal.EmbeddedMessaging)
                     when (it) {
                         is SdkEvent.Internal.EmbeddedMessaging.FetchMessages -> {
-                            if (isTooFrequentFetch()) {
-                                handleThrottling(it, request)
-                            } else {
-                                emarsysNetworkClient.send(request)
-                                    .onSuccess { response ->
-                                        handleSuccess(it, response)
-                                        lastFetchMessagesEventResultReceived =
-                                            timestampProvider.provide()
-                                    }.onFailure { exception ->
-                                        handleException(exception, it)
-                                    }
-                            }
+                            emarsysNetworkClient.send(request)
+                                .onSuccess { response ->
+                                    handleSuccess(it, response)
+                                }.onFailure { exception ->
+                                    handleException(exception, it)
+                                }
                         }
 
                         else -> {
@@ -88,26 +73,6 @@ internal class EmbeddedMessagingClient(
                     handleException(e, it)
                 }
             }
-    }
-
-    private suspend fun handleThrottling(
-        event: OnlineSdkEvent,
-        request: UrlRequest
-    ) {
-        handleSuccess(
-            event, Response(
-                originalRequest = request,
-                status = HttpStatusCode.NoContent,
-                headers = Headers.Empty,
-                bodyAsText = ""
-            )
-        )
-    }
-
-    private fun isTooFrequentFetch(): Boolean {
-        return lastFetchMessagesEventResultReceived?.let {
-            timestampProvider.provide().epochSeconds - it.epochSeconds < embeddedMessagingContext.embeddedMessagingFrequencyCapSeconds
-        } ?: false
     }
 
     private suspend fun handleSuccess(

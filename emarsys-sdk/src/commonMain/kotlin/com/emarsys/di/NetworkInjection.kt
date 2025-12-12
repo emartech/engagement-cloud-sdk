@@ -78,8 +78,6 @@ object NetworkInjection {
                 eventsDao = get(),
                 sdkLogger = get { parametersOf(EmbeddedMessagingClient::class.simpleName) },
                 applicationScope = get(named(CoroutineScopeTypes.Application)),
-                timestampProvider = get(),
-                embeddedMessagingContext = get()
             )
         }
         single<EventBasedClientApi>(named(EventBasedClientTypes.Device)) {
