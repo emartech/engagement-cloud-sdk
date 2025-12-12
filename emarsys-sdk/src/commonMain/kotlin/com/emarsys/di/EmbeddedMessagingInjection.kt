@@ -40,6 +40,7 @@ object EmbeddedMessagingInjection {
         single<ListPageModelApi> {
             ListPageModel(
                 sdkEventDistributor = get(),
+                embeddedMessagingPaginationHandler = get(),
                 sdkLogger = get { parametersOf(ListPageModel::class.simpleName) }
             )
         }
