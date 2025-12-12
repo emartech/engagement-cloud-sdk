@@ -11,5 +11,8 @@ interface MessageItemViewModelApi {
     val isUnread: Boolean
     val isPinned: Boolean
 
+    fun hasDefaultAction(): Boolean
     suspend fun fetchImage(): ByteArray
+    suspend fun handleDefaultAction()
+    suspend fun tagMessageRead()
 }

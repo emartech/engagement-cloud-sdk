@@ -6,6 +6,10 @@ import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.event.SdkEvent
+import com.emarsys.mobileengage.action.ActionFactoryApi
+import com.emarsys.mobileengage.action.actions.Action
+import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.embeddedmessaging.models.TagOperation
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants
@@ -35,7 +39,7 @@ import kotlin.test.Test
 
 class MessageItemModelTests {
     private companion object {
-        val testMessage = EmbeddedMessage(
+        val TEST_MESSAGE = EmbeddedMessage(
             id = "1",
             title = "testTitle",
             lead = "testLead",
@@ -49,13 +53,15 @@ class MessageItemModelTests {
             properties = emptyMap(),
             trackingInfo = "anything"
         )
-        val fallbackImageByteArray = Base64.decode(EmbeddedMessagingConstants.Image.BASE64_PLACEHOLDER_IMAGE
+        val FALLBACK_IMAGE_BYTEARRAY = Base64.decode(EmbeddedMessagingConstants.Image.BASE64_PLACEHOLDER_IMAGE
             .encodeToByteArray())
+        val TEST_ACTION = BasicOpenExternalUrlActionModel(url = "https://example.com")
     }
 
     private lateinit var mockDownloader: DownloaderApi
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
     private lateinit var mockSdkEventWaiter: SdkEventWaiterApi
+    private lateinit var mockActionFactory: ActionFactoryApi<ActionModel>
     private lateinit var messageItemModel: MessageItemModel
 
     @BeforeTest
@@ -63,22 +69,24 @@ class MessageItemModelTests {
         mockDownloader = mock(MockMode.autofill)
         mockSdkEventDistributor = mock(MockMode.autofill)
         mockSdkEventWaiter = mock(MockMode.autofill)
+        mockActionFactory = mock(MockMode.autofill)
 
         messageItemModel = createMessageItemModel()
     }
 
-    private fun createMessageItemModel(message: EmbeddedMessage = testMessage): MessageItemModel =
+    private fun createMessageItemModel(message: EmbeddedMessage = TEST_MESSAGE): MessageItemModel =
         MessageItemModel(
             message = message,
             downloaderApi = mockDownloader,
-            sdkEventDistributor = mockSdkEventDistributor
+            sdkEventDistributor = mockSdkEventDistributor,
+            actionFactory = mockActionFactory
         )
 
 
     @Ignore
     @Test
     fun downloadImage_shouldReturn_Null_when_ImageUrlIsMissing() = runTest {
-        val result = createMessageItemModel(testMessage.copy(listThumbnailImage = null)).downloadImage()
+        val result = createMessageItemModel(TEST_MESSAGE.copy(listThumbnailImage = null)).downloadImage()
 
         result shouldBe null
         verifySuspend(VerifyMode.exactly(0)) { mockDownloader.download(any()) }
@@ -97,7 +105,7 @@ class MessageItemModelTests {
 
         messageItemModel.downloadImage()
 
-        fallbackSlot.get() shouldBe fallbackImageByteArray
+        fallbackSlot.get() shouldBe FALLBACK_IMAGE_BYTEARRAY
         verifySuspend(VerifyMode.exactly(1)) {
             mockDownloader.download(
                 expectedUriString,
@@ -124,8 +132,7 @@ class MessageItemModelTests {
 
         val result = messageItemModel.updateTagsForMessage(
             tag = "seen",
-            operation = TagOperation.Add,
-            trackingInfo = "tracking-info-123"
+            operation = TagOperation.Add
         )
 
         result shouldBe true
@@ -144,8 +151,7 @@ class MessageItemModelTests {
 
         val result = messageItemModel.updateTagsForMessage(
             tag = "seen",
-            operation = TagOperation.Add,
-            trackingInfo = "tracking-info-123"
+            operation = TagOperation.Add
         )
 
         result shouldBe false
@@ -169,8 +175,7 @@ class MessageItemModelTests {
 
         messageItemModel.updateTagsForMessage(
             tag = "seen",
-            operation = TagOperation.Add,
-            trackingInfo = "tracking-info-123"
+            operation = TagOperation.Add
         )
 
         verifySuspend { mockSdkEventDistributor.registerEvent(any()) }
@@ -178,43 +183,62 @@ class MessageItemModelTests {
 
     @Test
     fun isUnread_shouldReturnFalse_whenTagsNotContainingUnread() = runTest {
-        val model = createMessageItemModel(testMessage.copy(tags = listOf("seen")))
+        val model = createMessageItemModel(TEST_MESSAGE.copy(tags = listOf("seen")))
 
         model.isUnread() shouldBe false
     }
 
     @Test
     fun isUnread_shouldReturnTrue_whenTagsContainsUnread() = runTest {
-        val model = createMessageItemModel(testMessage.copy(tags = listOf("unread")))
+        val model = createMessageItemModel(TEST_MESSAGE.copy(tags = listOf("unread")))
 
         model.isUnread() shouldBe true
     }
 
     @Test
     fun isUnread_shouldReturnTrue_whenTagsContainsUnread_caseInsensitively() = runTest {
-        val model = createMessageItemModel(testMessage.copy(tags = listOf("UnrEad")))
+        val model = createMessageItemModel(TEST_MESSAGE.copy(tags = listOf("UnrEad")))
 
         model.isUnread() shouldBe true
     }
 
     @Test
     fun isPinned_shouldReturnFalse_whenTagsNotContainingPinned() = runTest {
-        val model = createMessageItemModel(testMessage.copy(tags = listOf("notPinned")))
+        val model = createMessageItemModel(TEST_MESSAGE.copy(tags = listOf("notPinned")))
 
         model.isPinned() shouldBe false
     }
 
     @Test
     fun isPinned_shouldReturnTrue_whenTagsContainsPinned() = runTest {
-        val model = createMessageItemModel(testMessage.copy(tags = listOf("pinned")))
+        val model = createMessageItemModel(TEST_MESSAGE.copy(tags = listOf("pinned")))
 
         model.isPinned() shouldBe true
     }
 
     @Test
     fun isPinned_shouldReturnTrue_whenTagsContainsPinned_caseInsensitively() = runTest {
-        val model = createMessageItemModel(testMessage.copy(tags = listOf("PinNed")))
+        val model = createMessageItemModel(TEST_MESSAGE.copy(tags = listOf("PinNed")))
 
         model.isPinned() shouldBe true
+    }
+
+    @Test
+    fun hasDefaultAction_shouldReturnTrue_whenMessageHasADefaultAction() = runTest {
+        val model = createMessageItemModel(TEST_MESSAGE.copy(defaultAction = TEST_ACTION))
+
+        model.hasDefaultAction() shouldBe true
+    }
+
+    @Test
+    fun handleDefaultAction_shouldCreateActionWithFactory_andInvoke() = runTest {
+        val mockAction = mock<Action<Unit>>(MockMode.autofill)
+        everySuspend { mockActionFactory.create(TEST_ACTION) } returns mockAction
+        val model = createMessageItemModel(TEST_MESSAGE.copy(defaultAction = TEST_ACTION))
+
+        model.handleDefaultAction()
+
+        verifySuspend { mockActionFactory.create(TEST_ACTION) }
+        verifySuspend { mockAction() }
     }
 }

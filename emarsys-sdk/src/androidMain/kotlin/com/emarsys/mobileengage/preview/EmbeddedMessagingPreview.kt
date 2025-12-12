@@ -7,9 +7,14 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
 import com.emarsys.core.channel.SdkEventDistributorApi
+import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
+import com.emarsys.mobileengage.action.ActionFactoryApi
+import com.emarsys.mobileengage.action.actions.Action
+import com.emarsys.mobileengage.action.actions.OpenExternalUrlAction
+import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategoriesDialogView
@@ -58,7 +63,8 @@ fun MessageItemViewPreview() {
             MessageItemModel(
                 message = providePreviewMessage(),
                 downloaderApi = PreviewDownLoader(),
-                sdkEventDistributor = previewSdkEventDistributor
+                sdkEventDistributor = previewSdkEventDistributor,
+                actionFactory = PreviewActionFactory()
             )
         ),
         onClick = {
@@ -168,7 +174,8 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
                                 "tracking_info_example"
                             ),
                             downloaderApi = PreviewDownLoader(),
-                            sdkEventDistributor = previewSdkEventDistributor
+                            sdkEventDistributor = previewSdkEventDistributor,
+                            actionFactory = PreviewActionFactory()
                         )
                     ),
                     MessageItemViewModel(
@@ -190,7 +197,8 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
                                 "tracking_info_example"
                             ),
                             downloaderApi = PreviewDownLoader(),
-                            sdkEventDistributor = previewSdkEventDistributor
+                            sdkEventDistributor = previewSdkEventDistributor,
+                            actionFactory = PreviewActionFactory()
                         )
                     )
                 )
@@ -228,7 +236,20 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
     }
 
 
-class PreviewDownLoader : DownloaderApi {
+internal class PreviewActionFactory() : ActionFactoryApi<ActionModel> {
+    override suspend fun create(action: ActionModel): Action<*> {
+        return OpenExternalUrlAction(
+            action = BasicOpenExternalUrlActionModel(url = "https://www.example.com"),
+            externalUrlOpener = object : ExternalUrlOpenerApi {
+                override suspend fun open(url: String) {
+                    println("Opening URL: $url")
+                }
+            })
+    }
+}
+
+
+internal class PreviewDownLoader : DownloaderApi {
     private val client = HttpClient {
 
         install(HttpRequestRetry)

@@ -2,6 +2,8 @@ package com.emarsys.mobileengage.embeddedmessaging.ui.list
 
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.util.DownloaderApi
+import com.emarsys.mobileengage.action.ActionFactoryApi
+import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemModel
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModel
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
@@ -16,6 +18,7 @@ internal class ListPageViewModel(
     private val model: ListPageModelApi,
     private val downloaderApi: DownloaderApi,
     private val sdkEventDistributor: SdkEventDistributorApi,
+    private val actionFactory: ActionFactoryApi<ActionModel>,
     private val coroutineScope: CoroutineScope,
 ) : ListPageViewModelApi {
     private val _messages = MutableStateFlow<List<MessageItemViewModelApi>>(emptyList())
@@ -59,7 +62,8 @@ internal class ListPageViewModel(
                             MessageItemModel(
                                 message,
                                 downloaderApi,
-                                sdkEventDistributor
+                                sdkEventDistributor,
+                                actionFactory
                             )
                         )
                     }

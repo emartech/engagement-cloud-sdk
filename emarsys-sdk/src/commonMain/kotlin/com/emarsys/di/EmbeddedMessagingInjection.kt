@@ -2,6 +2,7 @@ package com.emarsys.di
 
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.util.DownloaderApi
+import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContext
 import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import com.emarsys.mobileengage.embeddedmessaging.networking.EmbeddedMessagesRequestFactory
@@ -49,6 +50,7 @@ object EmbeddedMessagingInjection {
                 model = get<ListPageModelApi>(),
                 downloaderApi = get<DownloaderApi>(),
                 sdkEventDistributor = get<SdkEventDistributorApi>(),
+                actionFactory = get<EventActionFactoryApi>(),
                 coroutineScope = get<CoroutineScope>(named(CoroutineScopeTypes.Application))
             )
         }

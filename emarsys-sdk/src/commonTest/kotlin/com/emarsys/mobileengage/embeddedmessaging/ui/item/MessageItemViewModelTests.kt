@@ -1,6 +1,7 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.item
 
 import com.emarsys.mobileengage.action.models.PresentableActionModel
+import com.emarsys.mobileengage.embeddedmessaging.models.TagOperation
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
 import com.emarsys.networking.clients.embedded.messaging.model.ListThumbnailImage
 import dev.mokkery.MockMode
@@ -75,7 +76,10 @@ class MessageItemViewModelTests {
     @Test
     fun imageUrl_shouldReturn_MessageImageAltText() {
         val expectedAltText = "Example Image"
-        val testMessage = createTestMessage(imageUrl = "https://example.com/image.jpg", imageAltText = expectedAltText)
+        val testMessage = createTestMessage(
+            imageUrl = "https://example.com/image.jpg",
+            imageAltText = expectedAltText
+        )
         val mockModel = mock<MessageItemModelApi>(MockMode.autofill)
         every { mockModel.message } returns testMessage
         val viewModel = MessageItemViewModel(mockModel)
@@ -125,6 +129,38 @@ class MessageItemViewModelTests {
         val viewModel = MessageItemViewModel(mockModel)
 
         viewModel.isPinned shouldBe true
+    }
+
+    @Test
+    fun hasDefaultAction_shouldReturn_MessageHasDefaultAction() {
+        val mockModel = mock<MessageItemModelApi>(MockMode.autofill)
+        every { mockModel.hasDefaultAction() } returns true
+        val viewModel = MessageItemViewModel(mockModel)
+
+        viewModel.hasDefaultAction() shouldBe true
+    }
+
+    @Test
+    fun handleDefaultAction_shouldCall_MessageHandleDefaultAction() = runTest {
+        val mockModel = mock<MessageItemModelApi>(MockMode.autofill)
+        everySuspend { mockModel.handleDefaultAction() } returns Unit
+
+        val viewModel = MessageItemViewModel(mockModel)
+
+        viewModel.handleDefaultAction()
+
+        verifySuspend { mockModel.handleDefaultAction() }
+    }
+
+    @Test
+    fun tagMessageRead_shouldCall_MessageUpdateTagsForMessage() = runTest {
+        val mockModel = mock<MessageItemModelApi>(MockMode.autofill)
+
+        val viewModel = MessageItemViewModel(mockModel)
+
+        viewModel.tagMessageRead()
+
+        verifySuspend { mockModel.updateTagsForMessage("read", TagOperation.Add) }
     }
 
     @Test

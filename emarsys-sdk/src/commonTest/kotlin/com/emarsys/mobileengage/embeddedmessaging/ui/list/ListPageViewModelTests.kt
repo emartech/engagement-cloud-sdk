@@ -2,6 +2,8 @@ package com.emarsys.mobileengage.embeddedmessaging.ui.list
 
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.util.DownloaderApi
+import com.emarsys.mobileengage.action.ActionFactoryApi
+import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
 import com.emarsys.networking.clients.embedded.messaging.model.ListThumbnailImage
 import com.emarsys.networking.clients.embedded.messaging.model.MessageCategory
@@ -36,6 +38,7 @@ class ListPageViewModelTests {
     private lateinit var mockModel: ListPageModelApi
     private lateinit var mockDownloaderApi: DownloaderApi
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
+    private lateinit var mockActionFactory: ActionFactoryApi<ActionModel>
     private lateinit var viewModel: ListPageViewModel
     private val testDispatcher = StandardTestDispatcher()
 
@@ -45,11 +48,13 @@ class ListPageViewModelTests {
         mockModel = mock(MockMode.autofill)
         mockDownloaderApi = mock(MockMode.autofill)
         mockSdkEventDistributor = mock(MockMode.autofill)
+        mockActionFactory = mock(MockMode.autofill)
 
         viewModel = ListPageViewModel(
             mockModel,
             mockDownloaderApi,
             mockSdkEventDistributor,
+            mockActionFactory,
             CoroutineScope(SupervisorJob() + testDispatcher)
         )
     }

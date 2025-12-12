@@ -1,8 +1,14 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.item
 
+import com.emarsys.mobileengage.embeddedmessaging.models.TagOperation
+
 class MessageItemViewModel(
     private val model: MessageItemModelApi
-): MessageItemViewModelApi {
+) : MessageItemViewModelApi {
+    private companion object {
+        const val TAG_READ = "read"
+    }
+
     override val id: String
         get() = model.message.id
 
@@ -30,6 +36,16 @@ class MessageItemViewModel(
     override val isPinned: Boolean
         get() = model.isPinned()
 
+    override fun hasDefaultAction() = model.hasDefaultAction()
+
     override suspend fun fetchImage(): ByteArray =
         model.downloadImage()
+
+    override suspend fun handleDefaultAction() {
+        model.handleDefaultAction()
+    }
+
+    override suspend fun tagMessageRead() {
+        model.updateTagsForMessage(TAG_READ, TagOperation.Add)
+    }
 }
