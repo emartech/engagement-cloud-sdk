@@ -1,6 +1,5 @@
-package com.emarsys.mobileengage.embeddedmessaging.messages
+package com.emarsys.mobileengage.embeddedmessaging.pagination
 
-import com.emarsys.mobileengage.embeddedmessaging.pagination.EmbeddedMessagingPaginationState
 import io.kotest.matchers.shouldBe
 import kotlin.test.Test
 
@@ -44,6 +43,26 @@ class EmbeddedMessagingPaginationStateTest {
         )
         state.updateOffset()
         state.offset shouldBe 55
+    }
+
+    @Test
+    fun refresh_shouldResetRelevantProperties() {
+        val state = EmbeddedMessagingPaginationState(
+            lastFetchMessagesId = "test-id",
+            top = 10,
+            offset = 0,
+            categoryIds = listOf(),
+            receivedCount = 10,
+            endReached = true,
+            filterUnreadMessages = false
+        )
+
+        state.refresh()
+
+        state.lastFetchMessagesId shouldBe null
+        state.offset shouldBe 0
+        state.receivedCount shouldBe 0
+        state.endReached shouldBe false
     }
 
     @Test

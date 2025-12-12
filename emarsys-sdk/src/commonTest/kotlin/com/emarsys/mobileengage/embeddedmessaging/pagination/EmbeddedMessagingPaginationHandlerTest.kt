@@ -1,14 +1,12 @@
 @file:OptIn(ExperimentalTime::class)
 
-package com.emarsys.mobileengage.embeddedmessaging.messages
+package com.emarsys.mobileengage.embeddedmessaging.pagination
 
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.event.SdkEvent
-import com.emarsys.mobileengage.embeddedmessaging.pagination.EmbeddedMessagingPaginationHandler
-import com.emarsys.mobileengage.embeddedmessaging.pagination.EmbeddedMessagingPaginationState
 import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -22,6 +20,7 @@ import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import dev.mokkery.resetAnswers
 import dev.mokkery.resetCalls
+import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
@@ -89,24 +88,32 @@ class EmbeddedMessagingPaginationHandlerTest {
     }
 
     @Test
-    fun testFetchMessagesUpdatesState() = runTest {
+    fun testConsume_FetchMessages_shouldResetAndUpdateState() = runTest {
         createPaginationHandler(backgroundScope).register()
 
-        val fetch = SdkEvent.Internal.EmbeddedMessaging.FetchMessages(
+        state.offset = 10
+        state.receivedCount = 15
+        state.endReached = true
+        state.lastFetchMessagesId = "old-id"
+        state.categoryIds = listOf(1, 2)
+        state.filterUnreadMessages = false
+
+        val fetchMessagesEvent = SdkEvent.Internal.EmbeddedMessaging.FetchMessages(
             nackCount = 0,
-            offset = 5,
-            categoryIds = listOf(7, 8),
-            filterUnreadMessages = true,
+            offset = 0,
+            categoryIds = emptyList()
         )
 
-        flow.emit(fetch)
+        flow.emit(fetchMessagesEvent)
 
         advanceUntilIdle()
 
-        state.offset shouldBe 5
-        state.categoryIds shouldBe listOf(7, 8)
-        state.lastFetchMessagesId shouldBe fetch.id
-        state.filterUnreadMessages shouldBe true
+        state.offset shouldBe 0
+        state.receivedCount shouldBe 0
+        state.endReached shouldBe false
+        state.lastFetchMessagesId shouldBe fetchMessagesEvent.id
+        state.categoryIds shouldBe emptyList()
+        state.filterUnreadMessages shouldBe false
     }
 
     @Test
@@ -202,6 +209,30 @@ class EmbeddedMessagingPaginationHandlerTest {
         advanceUntilIdle()
 
         (fetchNextPageSlot.value is SlotCapture.Value.Absent) shouldBe true
+    }
+
+    @Test
+    fun testConsume_shouldCatchException_whenResponseParsingFails() = runTest {
+        createPaginationHandler(backgroundScope).register()
+
+        val fetch = SdkEvent.Internal.EmbeddedMessaging.FetchMessages(
+            nackCount = 0,
+            offset = 0,
+            categoryIds = emptyList()
+        )
+        val response = response(fetch.id, "invalid-json")
+
+        flow.emit(fetch)
+        flow.emit(response)
+
+        advanceUntilIdle()
+
+        verifySuspend {
+            mockLogger.error(
+                "Error processing pagination event: $response",
+                any<Exception>()
+            )
+        }
     }
 
     @Test

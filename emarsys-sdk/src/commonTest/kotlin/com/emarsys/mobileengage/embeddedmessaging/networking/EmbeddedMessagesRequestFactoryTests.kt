@@ -1,12 +1,10 @@
-package com.emarsys.mobileengage.embeddedmessaging.messages
-
+package com.emarsys.mobileengage.embeddedmessaging.networking
 
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.embeddedmessaging.models.MessageTagUpdate
 import com.emarsys.mobileengage.embeddedmessaging.models.TagOperation
-import com.emarsys.mobileengage.embeddedmessaging.networking.EmbeddedMessagesRequestFactory
 import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -186,25 +184,26 @@ class EmbeddedMessagesRequestFactoryTests {
             )
         )
 
-        result.method shouldBe HttpMethod.Get
+        result.method shouldBe HttpMethod.Companion.Get
         result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?%24skip=$offset&filterUnread=$filterUnreadMessages"
     }
 
     @Test
-    fun create_should_return_request_for_fetchNextPage_withFilterUnreadTrue_and_NotEmptyCategoryIds() = runTest {
-        val offset = 20
-        val filterUnreadMessages = true
-        val result = embeddedMessagesRequestFactory.create(
-            SdkEvent.Internal.EmbeddedMessaging.FetchNextPage(
-                nackCount = 0,
-                offset = offset,
-                categoryIds = listOf(1, 2),
-                filterUnreadMessages = filterUnreadMessages
+    fun create_should_return_request_for_fetchNextPage_withFilterUnreadTrue_and_NotEmptyCategoryIds() =
+        runTest {
+            val offset = 20
+            val filterUnreadMessages = true
+            val result = embeddedMessagesRequestFactory.create(
+                SdkEvent.Internal.EmbeddedMessaging.FetchNextPage(
+                    nackCount = 0,
+                    offset = offset,
+                    categoryIds = listOf(1, 2),
+                    filterUnreadMessages = filterUnreadMessages
+                )
             )
-        )
 
-        result.method shouldBe HttpMethod.Get
-        result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?%24skip=$offset&filterCategoryIds=1%2C2&filterUnread=$filterUnreadMessages"
-    }
+            result.method shouldBe HttpMethod.Companion.Get
+            result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?%24skip=$offset&filterCategoryIds=1%2C2&filterUnread=$filterUnreadMessages"
+        }
 
 }

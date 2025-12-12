@@ -1,6 +1,6 @@
 package com.emarsys.mobileengage.embeddedmessaging.pagination
 
-internal class EmbeddedMessagingPaginationState(
+internal data class EmbeddedMessagingPaginationState(
     var lastFetchMessagesId: String? = null,
     var top: Int = 0,
     var offset: Int = 0,
@@ -13,6 +13,13 @@ internal class EmbeddedMessagingPaginationState(
 
     fun updateOffset() {
         offset = receivedCount
+    }
+
+    fun refresh() {
+        lastFetchMessagesId = null
+        offset = 0
+        receivedCount = 0
+        endReached = false
     }
 
     fun reset() {
