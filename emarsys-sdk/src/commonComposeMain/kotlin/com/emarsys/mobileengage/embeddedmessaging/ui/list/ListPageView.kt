@@ -85,7 +85,7 @@ fun MessageList(viewModel: ListPageViewModelApi) {
     BackHandler(enabled = selectedMessageId != null) {
         selectedMessageId = null
         scope.launch {
-            navigator.navigateBack()
+            navigator.navigateTo(ListDetailPaneScaffoldRole.List)
         }
     }
 
@@ -158,7 +158,7 @@ fun MessageList(viewModel: ListPageViewModelApi) {
                         onBack = {
                             selectedMessageId = null
                             scope.launch {
-                                navigator.navigateBack()
+                                navigator.navigateTo(ListDetailPaneScaffoldRole.List)
                             }
                         }
                     )
