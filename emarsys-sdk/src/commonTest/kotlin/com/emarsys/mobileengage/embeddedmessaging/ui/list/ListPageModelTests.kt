@@ -7,6 +7,7 @@ import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.embeddedmessaging.exceptions.TooFrequentFetchMessagesRequestsException
+import com.emarsys.mobileengage.embeddedmessaging.pagination.EmbeddedMessagingPaginationHandlerApi
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
 import com.emarsys.networking.clients.embedded.messaging.model.MessageCategory
 import com.emarsys.networking.clients.embedded.messaging.model.MessagesResponse
@@ -15,23 +16,29 @@ import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
+import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.matcher.capture.Capture.Companion.slot
 import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
+import dev.mokkery.verify
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import io.ktor.http.*
+import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.Url
+import io.ktor.http.headersOf
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class ListPageModelTests {
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
+    private lateinit var mockEmbeddedMessagingPaginationHandler: EmbeddedMessagingPaginationHandlerApi
     private lateinit var mockSdkEventWaiter: SdkEventWaiterApi
     private lateinit var mockSdkLogger: Logger
     private lateinit var model: ListPageModel
@@ -40,9 +47,14 @@ class ListPageModelTests {
     @BeforeTest
     fun setup() {
         mockSdkEventDistributor = mock(MockMode.autofill)
+        mockEmbeddedMessagingPaginationHandler = mock(MockMode.autofill)
         mockSdkEventWaiter = mock(MockMode.autofill)
         mockSdkLogger = mock(MockMode.autofill)
-        model = ListPageModel(mockSdkEventDistributor, mockSdkLogger)
+        model = ListPageModel(
+            mockSdkEventDistributor,
+            mockEmbeddedMessagingPaginationHandler,
+            mockSdkLogger
+        )
     }
 
     @Test
@@ -62,35 +74,39 @@ class ListPageModelTests {
             )
             everySuspend { mockSdkEventWaiter.await<Response>() } returns answerResponse
             everySuspend { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMessages>()) } returns mockSdkEventWaiter
+            every { mockEmbeddedMessagingPaginationHandler.isEndReached() } returns false
 
             val result = model.fetchMessagesWithCategories(false, emptyList()).getOrThrow()
 
             result.messages shouldBe messagesResponse.messages
             result.categories shouldBe messagesResponse.meta.categories
+            verify{ mockEmbeddedMessagingPaginationHandler.isEndReached() }
+            result.isEndReached shouldBe false
         }
 
     @Test
-    fun fetchMessagesWithCategories_shouldReturnFailureResult_whenFetchMessagesResultIsHttp204() = runTest {
-        val networkResponse = Response(
-            originalRequest = UrlRequest(Url("https://example.com"), HttpMethod.Get),
-            status = HttpStatusCode.NoContent,
-            headers = headersOf(),
-            bodyAsText = ""
-        )
-        val answerResponse = SdkEvent.Internal.Sdk.Answer.Response(
-            originId = "test-id",
-            result = Result.success(networkResponse)
-        )
+    fun fetchMessagesWithCategories_shouldReturnFailureResult_whenFetchMessagesResultIsHttp204() =
+        runTest {
+            val networkResponse = Response(
+                originalRequest = UrlRequest(Url("https://example.com"), HttpMethod.Get),
+                status = HttpStatusCode.NoContent,
+                headers = headersOf(),
+                bodyAsText = ""
+            )
+            val answerResponse = SdkEvent.Internal.Sdk.Answer.Response(
+                originId = "test-id",
+                result = Result.success(networkResponse)
+            )
 
-        everySuspend { mockSdkEventWaiter.await<Response>() } returns answerResponse
-        everySuspend { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMessages>()) } returns mockSdkEventWaiter
+            everySuspend { mockSdkEventWaiter.await<Response>() } returns answerResponse
+            everySuspend { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMessages>()) } returns mockSdkEventWaiter
 
-        val result = model.fetchMessagesWithCategories(false, emptyList())
+            val result = model.fetchMessagesWithCategories(false, emptyList())
 
-        result.isFailure shouldBe true
-        result.exceptionOrNull().shouldBeInstanceOf<TooFrequentFetchMessagesRequestsException>()
-        result.exceptionOrNull()?.message shouldBe "Too frequent FetchMessages request."
-    }
+            result.isFailure shouldBe true
+            result.exceptionOrNull().shouldBeInstanceOf<TooFrequentFetchMessagesRequestsException>()
+            result.exceptionOrNull()?.message shouldBe "Too frequent FetchMessages request."
+        }
 
     @Test
     fun fetchMessagesWithCategories_shouldReturnFailureResult_whenResponseFails() = runTest {
@@ -194,6 +210,7 @@ class ListPageModelTests {
 
         everySuspend { mockSdkEventWaiter.await<Response>() } returns answerResponse
         everySuspend { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.NextPage>()) } returns mockSdkEventWaiter
+        every { mockEmbeddedMessagingPaginationHandler.isEndReached() } returns false
 
         val result = model.fetchNextPage().getOrThrow()
 
@@ -202,6 +219,8 @@ class ListPageModelTests {
 
         result.categories.size shouldBe 2
         result.categories shouldBe response.meta.categories
+        verify{ mockEmbeddedMessagingPaginationHandler.isEndReached() }
+        result.isEndReached shouldBe false
     }
 
     @Test

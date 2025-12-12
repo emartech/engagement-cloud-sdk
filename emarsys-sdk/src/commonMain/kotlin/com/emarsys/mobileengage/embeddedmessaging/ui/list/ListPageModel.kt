@@ -6,14 +6,16 @@ import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.body
 import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.embeddedmessaging.exceptions.TooFrequentFetchMessagesRequestsException
+import com.emarsys.mobileengage.embeddedmessaging.pagination.EmbeddedMessagingPaginationHandlerApi
 import com.emarsys.networking.clients.embedded.messaging.model.BadgeCountResponse
 import com.emarsys.networking.clients.embedded.messaging.model.MessagesResponse
-import io.ktor.http.*
+import io.ktor.http.HttpStatusCode
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 internal class ListPageModel(
     private val sdkEventDistributor: SdkEventDistributorApi,
+    private val embeddedMessagingPaginationHandler: EmbeddedMessagingPaginationHandlerApi,
     private val sdkLogger: Logger
 ) : ListPageModelApi {
 
@@ -40,7 +42,8 @@ internal class ListPageModel(
                         Result.success(
                             MessagesWithCategories(
                                 messagesResponse.meta.categories,
-                                messagesResponse.messages
+                                messagesResponse.messages,
+                                isEndReached = embeddedMessagingPaginationHandler.isEndReached()
                             )
                         )
                     }
@@ -82,7 +85,8 @@ internal class ListPageModel(
 
     override suspend fun fetchNextPage(): Result<MessagesWithCategories> {
         return try {
-            val nextPageResponse = sdkEventDistributor.registerEvent(SdkEvent.Internal.EmbeddedMessaging.NextPage())
+            val nextPageResponse =
+                sdkEventDistributor.registerEvent(SdkEvent.Internal.EmbeddedMessaging.NextPage())
             val response = nextPageResponse.await<Response>()
 
             response.result.fold(
@@ -91,7 +95,8 @@ internal class ListPageModel(
                     Result.success(
                         MessagesWithCategories(
                             messagesResponse.meta.categories,
-                            messagesResponse.messages
+                            messagesResponse.messages,
+                            isEndReached = embeddedMessagingPaginationHandler.isEndReached()
                         )
                     )
                 },
