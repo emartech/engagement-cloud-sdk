@@ -1,9 +1,5 @@
 package com.emarsys.config
 
-import kotlin.js.ExperimentalJsExport
-
-
-@OptIn(ExperimentalJsExport::class)
 interface SdkConfig {
     val applicationCode: String?
 

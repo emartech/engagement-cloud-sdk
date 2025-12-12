@@ -1,7 +1,7 @@
 package com.emarsys.mobileengage.push
 
 import JsEmarsysConfig
-import ServiceWorkerOptions
+import com.emarsys.ServiceWorkerOptions
 import com.emarsys.api.push.PushConstants
 import com.emarsys.core.storage.StringStorageApi
 import js.buffer.BufferSource
