@@ -1,6 +1,7 @@
 package com.emarsys.enable.states
 
 import com.emarsys.mobileengage.embeddedmessaging.pagination.EmbeddedMessagingPaginationHandlerApi
+import dev.mokkery.MockMode
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
@@ -17,11 +18,11 @@ class EmbeddedMessagingPaginationHandlerSetupStateTests {
 
     @BeforeTest
     fun setup() = runTest {
-        mockEmbeddedMessagingPaginationHandler = mock()
+        mockEmbeddedMessagingPaginationHandler = mock(MockMode.autoUnit)
         embeddedMessagingPaginationHandlerSetupState =
             EmbeddedMessagingPaginationHandlerSetupState(
                 mockEmbeddedMessagingPaginationHandler,
-                sdkLogger = mock()
+                sdkLogger = mock(MockMode.autoUnit)
             )
     }
 

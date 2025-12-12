@@ -111,13 +111,12 @@ kotlin {
         val commonComposeMain by creating {
             dependsOn(commonMain)
             dependencies {
-                implementation(compose.foundation)
-                implementation(compose.material3)
-                implementation(compose.ui)
-                implementation(compose.components.resources)
-                implementation(compose.components.uiToolingPreview)
-                implementation(compose.materialIconsExtended)
-                implementation(compose.material3AdaptiveNavigationSuite)
+                implementation(libs.compose.foundation)
+                implementation(libs.compose.material)
+                implementation(libs.compose.ui)
+                implementation(libs.compose.resources)
+                implementation(libs.compose.plugin.ui.tooling.preview)
+                implementation(libs.compose.material.icons)
 
                 implementation(libs.compose.adaptive)
                 implementation(libs.compose.adaptive.navigation)
@@ -199,7 +198,7 @@ kotlin {
         val jsHtml by creating {
             dependsOn(commonMain)
             dependencies {
-                implementation(compose.html.core)
+                implementation(libs.compose.html.core)
             }
         }
 

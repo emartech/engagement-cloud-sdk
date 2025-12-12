@@ -81,7 +81,7 @@ class EmbeddedMessagesRequestFactoryTests {
         )
 
         result.method shouldBe HttpMethod.Get
-        result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?\$skip=40&filterCategoryIds=1%2C2"
+        result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?%24skip=40&filterCategoryIds=1%2C2"
     }
 
     @Test
@@ -96,7 +96,7 @@ class EmbeddedMessagesRequestFactoryTests {
         )
 
         result.method shouldBe HttpMethod.Get
-        result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?\$skip=40&filterCategoryIds=1%2C2&filterUnread=true"
+        result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?%24skip=40&filterCategoryIds=1%2C2&filterUnread=true"
     }
 
     @Test
@@ -155,7 +155,7 @@ class EmbeddedMessagesRequestFactoryTests {
         )
 
         result.method shouldBe HttpMethod.Get
-        result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?\$skip=$offset"
+        result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?%24skip=$offset"
     }
 
     @Test
@@ -170,7 +170,7 @@ class EmbeddedMessagesRequestFactoryTests {
         )
 
         result.method shouldBe HttpMethod.Get
-        result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?\$skip=$offset&filterCategoryIds=1%2C2"
+        result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?%24skip=$offset&filterCategoryIds=1%2C2"
     }
 
     @Test
@@ -187,7 +187,7 @@ class EmbeddedMessagesRequestFactoryTests {
         )
 
         result.method shouldBe HttpMethod.Get
-        result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?\$skip=$offset&filterUnread=$filterUnreadMessages"
+        result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?%24skip=$offset&filterUnread=$filterUnreadMessages"
     }
 
     @Test
@@ -204,7 +204,7 @@ class EmbeddedMessagesRequestFactoryTests {
         )
 
         result.method shouldBe HttpMethod.Get
-        result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?\$skip=$offset&filterCategoryIds=1%2C2&filterUnread=$filterUnreadMessages"
+        result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?%24skip=$offset&filterCategoryIds=1%2C2&filterUnread=$filterUnreadMessages"
     }
 
 }

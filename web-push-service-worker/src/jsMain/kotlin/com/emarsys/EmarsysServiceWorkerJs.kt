@@ -26,6 +26,7 @@ import kotlin.js.Promise.Companion.reject
 import kotlin.js.Promise.Companion.resolve
 
 
+@OptIn(ExperimentalWasmJsInterop::class)
 fun main() {
     val serviceWorkerScope = CoroutineScope(SupervisorJob())
 
