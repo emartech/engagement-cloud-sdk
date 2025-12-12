@@ -36,7 +36,7 @@ kotlin {
     }
 
     // Dynamic JS variant selection: -Pjs.variant=html or -Pjs.variant=canvas (default: canvas)
-    val jsVariant = project.findProperty("js.variant")?.toString() ?: "canvas"
+    val jsVariant = project.findProperty("js.variant")?.toString() ?: "html"
     println("Building JS variant: $jsVariant")
 
     js(IR) {
@@ -274,6 +274,18 @@ tasks.withType<app.cash.sqldelight.gradle.SqlDelightTask>().configureEach {
     }
 }
 
+tasks.register<Exec>("sdkLoaderTest") {
+    group = "verification"
+    description = "Run Node.js tests using the built-in node:test runner"
+
+    workingDir = projectDir
+
+    commandLine(
+        "npm",
+        "test",
+    )
+}
+
 kmmbridge {
     val spmBuildType = System.getenv("SPM_BUILD") ?: "dev"
     when (spmBuildType) {
@@ -352,6 +364,18 @@ mavenPublishing {
             developerConnection = "scm:git:https://github.com/emartech/kmp-emarsys-sdk.git"
         }
     }
+}
+
+val copyLoader by tasks.registering(Copy::class) {
+    val loaderJs = project.layout.projectDirectory.file("emarsys-sdk-loader/emarsys-sdk-loader.js")
+    val target = layout.buildDirectory.dir("dist/js/productionExecutable")
+
+    from(loaderJs)
+    into(target)
+}
+
+tasks.named("jsBrowserDistribution") {
+    finalizedBy(copyLoader)
 }
 
 tasks {
