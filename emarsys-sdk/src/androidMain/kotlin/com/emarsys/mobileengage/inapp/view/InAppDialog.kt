@@ -1,5 +1,4 @@
-package com.emarsys.mobileengage.inapp
-
+package com.emarsys.mobileengage.inapp.view
 
 import android.app.Dialog
 import android.os.Bundle
@@ -11,12 +10,16 @@ import android.widget.FrameLayout
 import androidx.fragment.app.DialogFragment
 import com.emarsys.R
 
-class InAppDialog(
-    private val inAppView: View
-) : DialogFragment() {
+class InAppDialog : DialogFragment() {
 
     companion object {
         const val TAG = "MOBILE_ENGAGE_IN_APP_DIALOG_TAG"
+    }
+
+    private var inAppView: View? = null
+
+    fun setInAppView(view: View) {
+        inAppView = view
     }
 
     override fun onCreateView(
@@ -27,7 +30,7 @@ class InAppDialog(
         val view =
             inflater.inflate(R.layout.mobile_engage_in_app_message, container, false)
         val inAppContainer: FrameLayout = view.findViewById(R.id.mobileEngageInAppMessageContainer)
-        inAppContainer.addView(inAppView)
+        inAppView?.let { inAppContainer.addView(it) }
         return inAppContainer
     }
 

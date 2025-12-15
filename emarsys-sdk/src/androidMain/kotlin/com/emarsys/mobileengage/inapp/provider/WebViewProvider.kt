@@ -1,4 +1,4 @@
-package com.emarsys.mobileengage.inapp
+package com.emarsys.mobileengage.inapp.provider
 
 import android.content.Context
 import android.graphics.Color

@@ -8,6 +8,9 @@ import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.event.SdkEvent
+import com.emarsys.mobileengage.inapp.provider.InAppDialogProviderApi
+import com.emarsys.mobileengage.inapp.view.InAppDialog
+import com.emarsys.mobileengage.inapp.view.InAppView
 import com.emarsys.watchdog.activity.TransitionSafeCurrentActivityWatchdog
 import io.mockk.Called
 import io.mockk.coEvery
@@ -39,6 +42,8 @@ import kotlin.time.ExperimentalTime
 class InAppPresenterTests {
 
     private lateinit var mockCurrentActivityWatchdog: TransitionSafeCurrentActivityWatchdog
+    private lateinit var mockInAppDialog: InAppDialog
+    private lateinit var mockInAppDialogProvider: InAppDialogProviderApi
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
     private lateinit var sdkEventFlow: MutableSharedFlow<SdkEvent>
     private lateinit var mockLogger: Logger
@@ -51,18 +56,22 @@ class InAppPresenterTests {
         mainDispatcher = StandardTestDispatcher()
         Dispatchers.setMain(mainDispatcher)
         mockCurrentActivityWatchdog = mockk<TransitionSafeCurrentActivityWatchdog>()
+        mockInAppDialog = mockk(relaxed = true)
+        mockInAppDialogProvider = mockk(relaxed = true)
+        every { mockInAppDialogProvider.provide() } returns mockInAppDialog
         mockSdkEventDistributor = mockk(relaxed = true)
         sdkEventFlow = MutableSharedFlow()
         mockLogger = mockk(relaxed = true)
         mockTimestampProvider = mockk(relaxed = true)
         every { mockSdkEventDistributor.sdkEventFlow } returns sdkEventFlow
         inAppPresenter = InAppPresenter(
+            mockInAppDialogProvider,
             mockCurrentActivityWatchdog,
             mainDispatcher,
             mockSdkEventDistributor,
+            timestampProvider = mockTimestampProvider,
             logger = mockLogger,
             applicationScope = mockk(),
-            timestampProvider = mockTimestampProvider,
         )
     }
 
@@ -93,17 +102,19 @@ class InAppPresenterTests {
                     }
 
             val inAppPresenter = InAppPresenter(
+                mockInAppDialogProvider,
                 mockCurrentActivityWatchdog,
                 mainDispatcher,
                 mockSdkEventDistributor,
+                timestampProvider = mockTimestampProvider,
                 logger = mockLogger,
                 applicationScope = backgroundScope,
-                timestampProvider = mockTimestampProvider,
             )
 
             inAppPresenter.present(mockView, mockWebViewHolder, InAppPresentationMode.Overlay)
             advanceUntilIdle()
 
+            verify { mockInAppDialog.setInAppView(mockView) }
             verify { mockFragmentManager.beginTransaction() }
             verify { mockFragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN) }
             verify {
@@ -159,12 +170,13 @@ class InAppPresenterTests {
         )
         every { mockView.inAppMessage } returns inAppMessage
         val inAppPresenter = InAppPresenter(
+            mockInAppDialogProvider,
             mockCurrentActivityWatchdog,
             mainDispatcher,
             mockSdkEventDistributor,
+            timestampProvider = mockTimestampProvider,
             logger = mockLogger,
             applicationScope = TestScope(SupervisorJob()),
-            timestampProvider = mockTimestampProvider,
         )
 
         inAppPresenter.present(mockView, mockWebViewHolder, InAppPresentationMode.Overlay)

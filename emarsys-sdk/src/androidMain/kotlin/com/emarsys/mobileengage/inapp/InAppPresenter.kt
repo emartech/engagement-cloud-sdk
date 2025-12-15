@@ -8,6 +8,9 @@ import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.event.SdkEvent
+import com.emarsys.mobileengage.inapp.provider.InAppDialogProviderApi
+import com.emarsys.mobileengage.inapp.view.InAppDialog
+import com.emarsys.mobileengage.inapp.view.InAppView
 import com.emarsys.watchdog.activity.TransitionSafeCurrentActivityWatchdog
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -20,6 +23,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlin.time.ExperimentalTime
 
 internal class InAppPresenter(
+    private val inAppDialogProvider: InAppDialogProviderApi,
     private val currentActivityWatchdog: TransitionSafeCurrentActivityWatchdog,
     private val mainDispatcher: CoroutineDispatcher,
     private val sdkEventDistributor: SdkEventDistributorApi,
@@ -66,7 +70,9 @@ internal class InAppPresenter(
         mode: InAppPresentationMode,
         animation: InAppPresentationAnimation?
     ) {
-        val inAppDialog = InAppDialog(inAppView as InAppView)
+        val inAppDialog = inAppDialogProvider.provide().apply {
+            setInAppView(inAppView as InAppView)
+        }
         val currentActivity = currentActivityWatchdog.waitForActivity()
         val onScreenTimeStart = timestampProvider.provide().toEpochMilliseconds()
         currentActivity.fragmentManager()?.let {

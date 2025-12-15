@@ -64,9 +64,11 @@ import com.emarsys.mobileengage.clipboard.AndroidClipboardHandler
 import com.emarsys.mobileengage.inapp.InAppJsBridgeFactory
 import com.emarsys.mobileengage.inapp.InAppPresenter
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
-import com.emarsys.mobileengage.inapp.InAppViewProvider
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
-import com.emarsys.mobileengage.inapp.WebViewProvider
+import com.emarsys.mobileengage.inapp.provider.InAppDialogProvider
+import com.emarsys.mobileengage.inapp.provider.InAppDialogProviderApi
+import com.emarsys.mobileengage.inapp.provider.InAppViewProvider
+import com.emarsys.mobileengage.inapp.provider.WebViewProvider
 import com.emarsys.mobileengage.permission.AndroidPermissionHandler
 import com.emarsys.mobileengage.push.AndroidPushMessageFactory
 import com.emarsys.mobileengage.push.NotificationCompatStyler
@@ -274,8 +276,10 @@ object AndroidInjection {
                 timestampProvider = get()
             )
         }
+        single<InAppDialogProviderApi> { InAppDialogProvider() }
         single<InAppPresenterApi> {
             InAppPresenter(
+                inAppDialogProvider = get(),
                 currentActivityWatchdog = get(),
                 mainDispatcher = get(named(DispatcherTypes.Main)),
                 sdkEventDistributor = get(),

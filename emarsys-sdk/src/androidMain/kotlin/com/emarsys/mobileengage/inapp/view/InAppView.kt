@@ -1,4 +1,4 @@
-package com.emarsys.mobileengage.inapp
+package com.emarsys.mobileengage.inapp.view
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -6,6 +6,14 @@ import android.util.AttributeSet
 import android.widget.LinearLayout
 import com.emarsys.core.factory.Factory
 import com.emarsys.core.providers.InstantProvider
+import com.emarsys.mobileengage.inapp.AndroidWebViewHolder
+import com.emarsys.mobileengage.inapp.InAppJsBridge
+import com.emarsys.mobileengage.inapp.InAppJsBridgeData
+import com.emarsys.mobileengage.inapp.InAppLoadingMetric
+import com.emarsys.mobileengage.inapp.InAppMessage
+import com.emarsys.mobileengage.inapp.InAppViewApi
+import com.emarsys.mobileengage.inapp.WebViewHolder
+import com.emarsys.mobileengage.inapp.provider.WebViewProvider
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import kotlin.time.ExperimentalTime

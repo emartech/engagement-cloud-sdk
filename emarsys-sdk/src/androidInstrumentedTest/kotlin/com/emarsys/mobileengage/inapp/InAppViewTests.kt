@@ -5,6 +5,8 @@ import androidx.core.view.children
 import com.emarsys.applicationContext
 import com.emarsys.core.factory.Factory
 import com.emarsys.core.providers.TimestampProvider
+import com.emarsys.mobileengage.inapp.provider.WebViewProvider
+import com.emarsys.mobileengage.inapp.view.InAppView
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk

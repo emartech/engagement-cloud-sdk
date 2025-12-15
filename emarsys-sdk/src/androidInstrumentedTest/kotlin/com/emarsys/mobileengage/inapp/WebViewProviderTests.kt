@@ -2,6 +2,7 @@ package com.emarsys.mobileengage.inapp
 
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import com.emarsys.applicationContext
+import com.emarsys.mobileengage.inapp.provider.WebViewProvider
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
