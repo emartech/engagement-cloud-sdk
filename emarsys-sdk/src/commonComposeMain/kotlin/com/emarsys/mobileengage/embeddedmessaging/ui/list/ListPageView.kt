@@ -140,6 +140,7 @@ fun MessageList(viewModel: ListPageViewModelApi) {
                                             selectedMessageId = messageViewModel.id
                                             scope.launch {
                                                 messageViewModel.tagMessageRead()
+                                                messageViewModel.handleDefaultAction()
                                                 if (messageViewModel.hasDefaultAction()) {
                                                     navigator.navigateTo(
                                                         pane = ListDetailPaneScaffoldRole.Detail
