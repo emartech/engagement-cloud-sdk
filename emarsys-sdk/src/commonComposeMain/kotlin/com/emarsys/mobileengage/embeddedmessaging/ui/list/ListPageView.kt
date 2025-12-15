@@ -75,6 +75,8 @@ fun MessageList(viewModel: ListPageViewModelApi) {
     val canShowDetailPane = mutableStateOf(windowSizeClass.isWidthAtLeastBreakpoint(400))
 
     var selectedMessageId by rememberSaveable { mutableStateOf<String?>(null) }
+    val selectedMessageViewModel = messages.firstOrNull { it.id == selectedMessageId }
+
     val navigator = rememberListDetailPaneScaffoldNavigator<String>()
     val scope = rememberCoroutineScope()
 
@@ -155,17 +157,16 @@ fun MessageList(viewModel: ListPageViewModelApi) {
                 }
             },
             detailPane = {
-                selectedMessageId?.let { messageId ->
+                selectedMessageViewModel?.let {
                     MessageDetailView(
-                        messageId = messageId,
-                        canShowDetailPane.value,
-                        onBack = {
-                            selectedMessageId = null
-                            scope.launch {
-                                navigator.navigateTo(ListDetailPaneScaffoldRole.List)
-                            }
+                        it,
+                        canShowDetailPane.value
+                    ) {
+                        selectedMessageId = null
+                        scope.launch {
+                            navigator.navigateTo(ListDetailPaneScaffoldRole.List)
                         }
-                    )
+                    }
                 } ?: Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
