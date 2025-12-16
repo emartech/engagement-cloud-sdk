@@ -41,7 +41,11 @@ import kotlin.time.Instant
 
 
 @Composable
-fun MessageItemView(viewModel: MessageItemViewModelApi, onClick: () -> Unit) {
+fun MessageItemView(
+    viewModel: MessageItemViewModelApi,
+    isSelected: Boolean = false,
+    onClick: () -> Unit
+) {
     var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
     val hasThumbnailImage = viewModel.imageUrl != null
 
@@ -61,7 +65,10 @@ fun MessageItemView(viewModel: MessageItemViewModelApi, onClick: () -> Unit) {
         Card(
             shape = RoundedCornerShape(LocalDesignValues.current.messageItemCardCornerRadius),
             elevation = CardDefaults.cardElevation(LocalDesignValues.current.messageItemCardElevation),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            colors = if (isSelected) CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+            else CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface
+            ),
             modifier = Modifier.clickable(onClick = { onClick() })
         ) {
             Row(

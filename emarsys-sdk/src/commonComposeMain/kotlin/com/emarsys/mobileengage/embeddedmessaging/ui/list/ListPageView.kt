@@ -138,6 +138,7 @@ fun MessageList(viewModel: ListPageViewModelApi) {
                                 items(items = messages, key = { it.id }) { messageViewModel ->
                                     MessageItemView(
                                         viewModel = messageViewModel,
+                                        isSelected = messageViewModel == selectedMessageViewModel,
                                         onClick = {
                                             selectedMessageId = messageViewModel.id
                                             scope.launch {
