@@ -14,6 +14,8 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageModel
 import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageModelApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageViewModel
 import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageViewModelApi
+import com.emarsys.mobileengage.embeddedmessaging.ui.list.PagerFactory
+import com.emarsys.mobileengage.embeddedmessaging.ui.list.PagerFactoryApi
 import kotlinx.coroutines.CoroutineScope
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
@@ -45,13 +47,22 @@ object EmbeddedMessagingInjection {
                 sdkLogger = get { parametersOf(ListPageModel::class.simpleName) }
             )
         }
-        factory<ListPageViewModelApi> {
-            ListPageViewModel(
+        single<PagerFactoryApi> {
+            PagerFactory(
                 model = get<ListPageModelApi>(),
                 downloaderApi = get<DownloaderApi>(),
                 sdkEventDistributor = get<SdkEventDistributorApi>(),
                 actionFactory = get<EventActionFactoryApi>(),
-                coroutineScope = get<CoroutineScope>(named(CoroutineScopeTypes.Application))
+                logger = get { parametersOf(PagerFactory::class.simpleName) }
+            )
+        }
+
+        factory<ListPageViewModelApi> {
+            ListPageViewModel(
+                embeddedMessagingContext = get(),
+                timestampProvider = get(),
+                coroutineScope = get<CoroutineScope>(named(CoroutineScopeTypes.Application)),
+                pagerFactory = get()
             )
         }
     }

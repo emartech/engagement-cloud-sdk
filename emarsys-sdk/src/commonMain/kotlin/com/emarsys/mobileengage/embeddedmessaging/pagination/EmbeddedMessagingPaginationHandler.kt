@@ -49,7 +49,7 @@ internal class EmbeddedMessagingPaginationHandler(
                             paginationState.filterUnreadMessages = event.filterUnreadMessages
                         }
 
-                        is SdkEvent.Internal.Sdk.Answer.Response<*> -> {
+                        is SdkEvent.Internal.Sdk.Answer.Response<*> -> { // TODO: handle concurrency with model
                             if (event.originId == paginationState.lastFetchMessagesId) {
                                 event.result.fold(
                                     onSuccess = { result ->

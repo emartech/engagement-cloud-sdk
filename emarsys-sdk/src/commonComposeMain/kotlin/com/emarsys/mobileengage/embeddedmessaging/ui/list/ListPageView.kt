@@ -9,12 +9,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
@@ -27,7 +27,6 @@ import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,9 +37,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.DEFAULT_PADDING
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.FLOATING_ACTION_BUTTON_SIZE
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.MESSAGE_ITEM_IMAGE_SIZE
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.ZERO_SPACING
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategoriesDialogView
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategorySelectorButton
@@ -65,8 +68,7 @@ fun ListPageView(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageList(viewModel: ListPageViewModelApi) {
-    val messages by viewModel.messages.collectAsState()
-    val isRefreshing by viewModel.isRefreshing.collectAsState()
+    val lazyPagingMessageItems = viewModel.messagePagingDataFlow.collectAsLazyPagingItems()
     val filterUnreadOnly by viewModel.filterUnreadOnly.collectAsState()
     val selectedCategoryIds by viewModel.selectedCategoryIds.collectAsState()
     var showCategorySelector by rememberSaveable { mutableStateOf(false) }
@@ -75,14 +77,11 @@ fun MessageList(viewModel: ListPageViewModelApi) {
     val canShowDetailPane = mutableStateOf(windowSizeClass.isWidthAtLeastBreakpoint(400))
 
     var selectedMessageId by rememberSaveable { mutableStateOf<String?>(null) }
-    val selectedMessageViewModel = messages.firstOrNull { it.id == selectedMessageId }
+    val selectedMessageViewModel =
+        lazyPagingMessageItems.itemSnapshotList.items.firstOrNull { it.id == selectedMessageId }
 
     val navigator = rememberListDetailPaneScaffoldNavigator<String>()
     val scope = rememberCoroutineScope()
-
-    LaunchedEffect(Unit) {
-        viewModel.refreshMessages()
-    }
 
     BackHandler(enabled = selectedMessageId != null) {
         selectedMessageId = null
@@ -109,7 +108,6 @@ fun MessageList(viewModel: ListPageViewModelApi) {
                 selectedCategories = viewModel.selectedCategoryIds.value,
                 onApplyClicked = {
                     viewModel.setSelectedCategoryIds(it)
-                    viewModel.refreshMessages()
                     showCategorySelector = false
                 },
                 onDismiss = {
@@ -123,34 +121,78 @@ fun MessageList(viewModel: ListPageViewModelApi) {
             value = navigator.scaffoldValue,
             listPane = {
                 PullToRefreshBox(
-                    isRefreshing = isRefreshing,
-                    onRefresh = { viewModel.refreshMessages() },
+                    isRefreshing = lazyPagingMessageItems.loadState.source.refresh is LoadState.Loading,  // TODO: fix duplicate loading indicator
+                    onRefresh = { viewModel.refreshMessages { lazyPagingMessageItems.refresh() } },
                     modifier = Modifier.fillMaxSize()
                 ) {
                     Column(modifier = Modifier.fillMaxSize()) {
-                        if (messages.isEmpty()) {
-                            EmptyState()
-                        } else {
-                            LazyColumn(
-                                modifier = Modifier.fillMaxSize(),
-                                verticalArrangement = Arrangement.spacedBy(LocalDesignValues.current.listItemSpacing)
-                            ) {
-                                items(items = messages, key = { it.id }) { messageViewModel ->
-                                    MessageItemView(
-                                        viewModel = messageViewModel,
-                                        isSelected = messageViewModel == selectedMessageViewModel,
-                                        onClick = {
-                                            selectedMessageId = messageViewModel.id
-                                            scope.launch {
-                                                messageViewModel.tagMessageRead()
-                                                messageViewModel.handleDefaultAction()
-                                                if (messageViewModel.hasDefaultAction()) {
-                                                    navigator.navigateTo(
-                                                        pane = ListDetailPaneScaffoldRole.Detail
-                                                    )
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.spacedBy(LocalDesignValues.current.listItemSpacing)
+                        )
+                        {
+                            if (lazyPagingMessageItems.loadState.source.refresh == LoadState.Loading) {
+                                item {
+                                    MessagesLoadingSpinner()
+                                }
+                            } else if (lazyPagingMessageItems.itemCount == 0 && lazyPagingMessageItems.loadState.isIdle && !lazyPagingMessageItems.loadState.hasError) {
+                                item {
+                                    if (filterUnreadOnly || selectedCategoryIds.isNotEmpty()) {
+                                        EmptyState() // TODO: Empty state with filter applied message
+                                    } else {
+                                        EmptyState()
+                                    }
+                                }
+                            } else if (lazyPagingMessageItems.loadState.source.refresh is LoadState.Error) {
+                                // TODO: decide how to display refresh error
+                                if (lazyPagingMessageItems.loadState.source.refresh is LoadState.Error) {
+                                    item {
+                                        Text(
+                                            (lazyPagingMessageItems.loadState.refresh as LoadState.Error).error.message
+                                                ?: "fallback error"
+                                        )
+                                    }
+                                } else {
+                                    item {
+                                        Text("generic error")
+                                    }
+                                }
+                            } else {
+                                items(
+                                    count = lazyPagingMessageItems.itemCount,
+                                    key = lazyPagingMessageItems.itemKey { it.id }
+                                ) { index ->
+                                    lazyPagingMessageItems[index]?.let { messageViewModel ->
+                                        MessageItemView(
+                                            viewModel = messageViewModel,
+                                            isSelected = messageViewModel == selectedMessageViewModel,
+                                            onClick = {
+                                                selectedMessageId = messageViewModel.id
+                                                scope.launch {
+                                                    messageViewModel.tagMessageRead()
+                                                    messageViewModel.handleDefaultAction()
+                                                    if (messageViewModel.hasDefaultAction()) {
+                                                        navigator.navigateTo(
+                                                            pane = ListDetailPaneScaffoldRole.Detail
+                                                        )
+                                                    }
                                                 }
-                                            }
-                                        })
+                                            })
+                                    }
+                                }
+                                if (lazyPagingMessageItems.loadState.source.append == LoadState.Loading) {
+                                    item {
+                                        MessagesLoadingSpinner()
+                                    }
+                                } else if (lazyPagingMessageItems.loadState.source.append is LoadState.Error) {
+                                    // TODO: decide how to display nextpage error
+                                    val errorState =
+                                        lazyPagingMessageItems.loadState.source.append as LoadState.Error
+                                    item {
+                                        Text(
+                                            "fetch next page error: ${errorState.error.message}"
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -176,6 +218,20 @@ fun MessageList(viewModel: ListPageViewModelApi) {
                 }
             }
         )
+    }
+}
+
+@Composable
+fun MessagesLoadingSpinner() {
+    EmbeddedMessagingTheme {
+        Box(
+            modifier = Modifier.fillMaxWidth().padding(DEFAULT_PADDING),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(MESSAGE_ITEM_IMAGE_SIZE)
+            )
+        }
     }
 }
 
@@ -224,9 +280,7 @@ fun FilterRow(
 fun EmptyState() {
     EmbeddedMessagingTheme {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
+            modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             Column(

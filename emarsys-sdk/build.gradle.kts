@@ -95,6 +95,8 @@ kotlin {
                 implementation(project.dependencies.platform(libs.cryptography))
                 implementation(libs.cryptography.core)
                 implementation(compose.runtime)
+                implementation(libs.androidx.paging.common)
+                implementation(libs.androidx.paging.compose)
             }
         }
         val commonTest by getting {
@@ -140,6 +142,7 @@ kotlin {
                 implementation(libs.google.play.services.location)
                 implementation(libs.compose.ui.tooling.preview)
                 implementation(libs.compose.ui.tooling)
+                implementation(libs.androidx.paging.runtime)
             }
         }
 
@@ -202,7 +205,7 @@ kotlin {
             }
         }
 
-        when(jsVariant) {
+        when (jsVariant) {
             "html" -> jsMain.dependsOn(jsHtml)
             "canvas" -> jsMain.dependsOn(commonComposeMain)
             else -> error("Invalid js.variant: $jsVariant. Use 'html' or 'canvas'")

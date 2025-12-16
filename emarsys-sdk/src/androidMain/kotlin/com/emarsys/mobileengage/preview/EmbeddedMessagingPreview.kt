@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.paging.PagingData
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.util.DownloaderApi
@@ -22,6 +23,7 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategorySelectorBu
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemModel
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemView
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModel
+import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageView
 import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageViewModelApi
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
@@ -34,11 +36,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -152,57 +156,59 @@ private fun providePreviewMessage() = EmbeddedMessage(
 @OptIn(ExperimentalTime::class)
 private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventDistributorApi) =
     object : ListPageViewModelApi {
-        override val messages: StateFlow<List<MessageItemViewModel>>
-            get() = MutableStateFlow(
-                listOf(
-                    MessageItemViewModel(
-                        MessageItemModel(
-                            EmbeddedMessage(
-                                "testId",
-                                "Sample Title",
-                                "This is a sample lead for the embedded message.",
-                                ListThumbnailImage("https://placebear.com/60/60", null),
-                                BasicOpenExternalUrlActionModel(
-                                    reporting = "Default Action", url = "https://example.com"
+        override val messagePagingDataFlow: Flow<PagingData<MessageItemViewModelApi>>
+            get() = flowOf(
+                PagingData.from(
+                    listOf(
+                        MessageItemViewModel(
+                            MessageItemModel(
+                                EmbeddedMessage(
+                                    "testId",
+                                    "Sample Title",
+                                    "This is a sample lead for the embedded message.",
+                                    ListThumbnailImage("https://placebear.com/60/60", null),
+                                    BasicOpenExternalUrlActionModel(
+                                        reporting = "Default Action", url = "https://example.com"
+                                    ),
+                                    emptyList(),
+                                    listOf("promo", "new"),
+                                    listOf(1, 2),
+                                    Clock.System.now().minus(3.hours).toEpochMilliseconds(),
+                                    Clock.System.now().plus(4.days).toEpochMilliseconds(),
+                                    mapOf("key1" to "value1", "key2" to "value2"),
+                                    "tracking_info_example"
                                 ),
-                                emptyList(),
-                                listOf("promo", "new"),
-                                listOf(1, 2),
-                                Clock.System.now().minus(3.hours).toEpochMilliseconds(),
-                                Clock.System.now().plus(4.days).toEpochMilliseconds(),
-                                mapOf("key1" to "value1", "key2" to "value2"),
-                                "tracking_info_example"
-                            ),
-                            downloaderApi = PreviewDownLoader(),
+                                downloaderApi = PreviewDownLoader(),
                             sdkEventDistributor = previewSdkEventDistributor,
                             actionFactory = PreviewActionFactory()
-                        )
-                    ),
-                    MessageItemViewModel(
-                        MessageItemModel(
-                            EmbeddedMessage(
-                                "testId2",
-                                "Sample Title 2",
-                                "This is a sample lead for the embedded message.",
-                                ListThumbnailImage("https://placebear.com/60/60", null),
-                                BasicOpenExternalUrlActionModel(
-                                    reporting = "Default Action", url = "https://example.com"
+                            )
+                        ),
+                        MessageItemViewModel(
+                            MessageItemModel(
+                                EmbeddedMessage(
+                                    "testId2",
+                                    "Sample Title 2",
+                                    "This is a sample lead for the embedded message.",
+                                    ListThumbnailImage("https://placebear.com/60/60", null),
+                                    BasicOpenExternalUrlActionModel(
+                                        reporting = "Default Action", url = "https://example.com"
+                                    ),
+                                    emptyList(),
+                                    listOf("promo", "new"),
+                                    listOf(1, 2),
+                                    Clock.System.now().minus(3.hours).toEpochMilliseconds(),
+                                    Clock.System.now().plus(4.days).toEpochMilliseconds(),
+                                    mapOf("key1" to "value1", "key2" to "value2"),
+                                    "tracking_info_example"
                                 ),
-                                emptyList(),
-                                listOf("promo", "new"),
-                                listOf(1, 2),
-                                Clock.System.now().minus(3.hours).toEpochMilliseconds(),
-                                Clock.System.now().plus(4.days).toEpochMilliseconds(),
-                                mapOf("key1" to "value1", "key2" to "value2"),
-                                "tracking_info_example"
-                            ),
-                            downloaderApi = PreviewDownLoader(),
+                                downloaderApi = PreviewDownLoader(),
                             sdkEventDistributor = previewSdkEventDistributor,
                             actionFactory = PreviewActionFactory()
+                            )
                         )
                     )
                 )
-            ).asStateFlow()
+            )
 
         override val categories: StateFlow<List<MessageCategory>>
             get() =
@@ -213,24 +219,20 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
                     )
                 ).asStateFlow()
 
-
-        override val isRefreshing: StateFlow<Boolean>
-            get() = MutableStateFlow(false).asStateFlow()
-
         override val filterUnreadOnly: StateFlow<Boolean>
             get() = MutableStateFlow(false).asStateFlow()
         override val selectedCategoryIds: StateFlow<Set<Int>>
             get() = MutableStateFlow(setOf())
-
-        override fun refreshMessages() {
-            Unit
-        }
 
         override fun setFilterUnreadOnly(unreadOnly: Boolean) {
             Unit
         }
 
         override fun setSelectedCategoryIds(categoryIds: Set<Int>) {
+            Unit
+        }
+
+        override fun refreshMessages(canCallRefresh: () -> Unit) {
             Unit
         }
     }

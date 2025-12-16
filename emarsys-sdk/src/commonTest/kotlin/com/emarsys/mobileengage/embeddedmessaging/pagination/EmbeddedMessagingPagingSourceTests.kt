@@ -1,0 +1,179 @@
+package com.emarsys.mobileengage.embeddedmessaging.pagination
+
+import androidx.paging.PagingSource
+import com.emarsys.core.channel.SdkEventDistributorApi
+import com.emarsys.core.log.Logger
+import com.emarsys.core.util.DownloaderApi
+import com.emarsys.mobileengage.action.ActionFactoryApi
+import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
+import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageModelApi
+import com.emarsys.mobileengage.embeddedmessaging.ui.list.MessagesWithCategories
+import com.emarsys.networking.clients.embedded.messaging.model.MessageCategory
+import dev.mokkery.answering.returns
+import dev.mokkery.answering.throws
+import dev.mokkery.everySuspend
+import dev.mokkery.matcher.any
+import dev.mokkery.mock
+import dev.mokkery.verifySuspend
+import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.test.runTest
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+
+class EmbeddedMessagingPagingSourceTests {
+
+    private lateinit var mockListPageModel: ListPageModelApi
+    private lateinit var mockDownloader: DownloaderApi
+    private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
+
+    private lateinit var mockActionFactory: ActionFactoryApi<ActionModel>
+    private lateinit var mockLogger: Logger
+
+    @BeforeTest
+    fun setup() {
+        mockListPageModel = mock()
+        mockDownloader = mock()
+        mockSdkEventDistributor = mock()
+        mockActionFactory = mock()
+        mockLogger = mock()
+
+        everySuspend { mockLogger.trace(any()) } returns Unit
+        everySuspend { mockLogger.error(any(), any<Throwable>()) } returns Unit
+
+    }
+
+    private fun createEmbeddedMessagingPagingSource(
+        filterUnreadOnly: Boolean = false,
+        selectedCategoryIds: List<Int> = emptyList(),
+        setCategories: (List<MessageCategory>) -> Unit = { }
+    ) = EmbeddedMessagingPagingSource(
+        listPageModel = mockListPageModel,
+        filterUnreadOnly = filterUnreadOnly,
+        selectedCategoryIds = selectedCategoryIds,
+        setCategories = setCategories,
+        downloader = mockDownloader,
+        sdkEventDistributor = mockSdkEventDistributor,
+        actionFactory = mockActionFactory,
+        logger = mockLogger
+    )
+
+    @Test
+    fun testLoad_should_call_fetchMessagesWithCategories_when_invokedFirstTime() = runTest {
+        val embeddedMessagingPagingSource = createEmbeddedMessagingPagingSource()
+        everySuspend {
+            mockListPageModel.fetchMessagesWithCategories(
+                false, emptyList()
+            )
+        } returns Result.success(
+            MessagesWithCategories(
+                messages = emptyList(), categories = emptyList(), isEndReached = false
+            )
+        )
+        val result: PagingSource.LoadResult<Int, MessageItemViewModelApi> =
+            embeddedMessagingPagingSource.load(
+                PagingSource.LoadParams.Refresh(
+                    key = null, loadSize = 20, placeholdersEnabled = false
+                )
+            )
+
+        verifySuspend {
+            mockListPageModel.fetchMessagesWithCategories(
+                filterUnreadOnly = false, categoryIds = emptyList()
+            )
+        }
+        (result is PagingSource.LoadResult.Error) shouldBe false
+    }
+
+    @Test
+    fun testLoad_should_call_fetchMessagesWithCategories_when_invokedFirstTime_and_HandleErrors_WhenResultFailed() =
+        runTest {
+            val embeddedMessagingPagingSource = createEmbeddedMessagingPagingSource()
+            everySuspend {
+                mockListPageModel.fetchMessagesWithCategories(
+                    false, emptyList()
+                )
+            } returns Result.failure(
+                Exception("Test Exception")
+            )
+            val result: PagingSource.LoadResult<Int, MessageItemViewModelApi> =
+                embeddedMessagingPagingSource.load(
+                    PagingSource.LoadParams.Refresh(
+                        key = null, loadSize = 20, placeholdersEnabled = false
+                    )
+                )
+
+            verifySuspend {
+                mockListPageModel.fetchMessagesWithCategories(
+                    filterUnreadOnly = false, categoryIds = emptyList()
+                )
+            }
+            (result is PagingSource.LoadResult.Error) shouldBe true
+        }
+
+    @Test
+    fun testLoad_should_catch_Exception_onFailure() = runTest {
+        val embeddedMessagingPagingSource = createEmbeddedMessagingPagingSource()
+        everySuspend {
+            mockListPageModel.fetchMessagesWithCategories(
+                false, emptyList()
+            )
+        } throws Exception("Test Exception")
+
+        val result: PagingSource.LoadResult<Int, MessageItemViewModelApi> =
+            embeddedMessagingPagingSource.load(
+                PagingSource.LoadParams.Refresh(
+                    key = null, loadSize = 20, placeholdersEnabled = false
+                )
+            )
+
+        (result is PagingSource.LoadResult.Error) shouldBe true
+    }
+
+
+    @Test
+    fun testLoad_should_call_fetchNextPage_when_notOnFirstPage_andHandleError_whenResultFailed() =
+        runTest {
+            val embeddedMessagingPagingSource = createEmbeddedMessagingPagingSource()
+            everySuspend {
+                mockListPageModel.fetchNextPage()
+            } returns Result.failure(
+                Exception("Test Exception")
+            )
+            val result: PagingSource.LoadResult<Int, MessageItemViewModelApi> =
+                embeddedMessagingPagingSource.load(
+                    PagingSource.LoadParams.Refresh(
+                        key = 1, loadSize = 20, placeholdersEnabled = false
+                    )
+                )
+
+            verifySuspend {
+                mockListPageModel.fetchNextPage()
+            }
+            (result is PagingSource.LoadResult.Error) shouldBe true
+        }
+
+    @Test
+    fun testLoad_should_call_fetchNextPage_when_notOnFirstPage() = runTest {
+        val embeddedMessagingPagingSource = createEmbeddedMessagingPagingSource()
+        everySuspend {
+            mockListPageModel.fetchNextPage()
+        } returns Result.success(
+            MessagesWithCategories(
+                messages = emptyList(), categories = emptyList(), isEndReached = false
+            )
+        )
+        val result: PagingSource.LoadResult<Int, MessageItemViewModelApi> =
+            embeddedMessagingPagingSource.load(
+                PagingSource.LoadParams.Refresh(
+                    key = 1, loadSize = 20, placeholdersEnabled = false
+                )
+            )
+
+        verifySuspend {
+            mockListPageModel.fetchNextPage()
+        }
+        (result is PagingSource.LoadResult.Error) shouldBe false
+    }
+
+}

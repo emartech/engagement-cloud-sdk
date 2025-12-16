@@ -1,79 +1,67 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.list
 
-import com.emarsys.core.channel.SdkEventDistributorApi
-import com.emarsys.core.util.DownloaderApi
-import com.emarsys.mobileengage.action.ActionFactoryApi
-import com.emarsys.mobileengage.action.models.ActionModel
-import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemModel
-import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModel
-import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
+import androidx.paging.cachedIn
+import com.emarsys.core.providers.InstantProvider
+import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import com.emarsys.networking.clients.embedded.messaging.model.MessageCategory
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
+@OptIn(ExperimentalTime::class)
 internal class ListPageViewModel(
-    private val model: ListPageModelApi,
-    private val downloaderApi: DownloaderApi,
-    private val sdkEventDistributor: SdkEventDistributorApi,
-    private val actionFactory: ActionFactoryApi<ActionModel>,
+    private val embeddedMessagingContext: EmbeddedMessagingContextApi,
+    private val timestampProvider: InstantProvider,
     private val coroutineScope: CoroutineScope,
+    private val pagerFactory: PagerFactoryApi,
 ) : ListPageViewModelApi {
-    private val _messages = MutableStateFlow<List<MessageItemViewModelApi>>(emptyList())
-    override val messages: StateFlow<List<MessageItemViewModelApi>> = _messages.asStateFlow()
     private val _categories = MutableStateFlow<List<MessageCategory>>(emptyList())
     override val categories: StateFlow<List<MessageCategory>> = _categories.asStateFlow()
-
-    private val _isRefreshing = MutableStateFlow(false)
-    override val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
     private val _filterUnreadOnly = MutableStateFlow(false)
     override val filterUnreadOnly: StateFlow<Boolean> = _filterUnreadOnly.asStateFlow()
     private val _selectedCategoryIds = MutableStateFlow<Set<Int>>(emptySet())
     override val selectedCategoryIds: StateFlow<Set<Int>> = _selectedCategoryIds.asStateFlow()
 
-    override fun refreshMessages() {
-        _isRefreshing.value = true
-        loadMessages()
-    }
+    private var lastRefreshTimestamp: Instant? = null
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override val messagePagingDataFlow =
+        combine(_filterUnreadOnly, _selectedCategoryIds) { filterUnreadOnly, selectedCategoryIds ->
+            filterUnreadOnly to selectedCategoryIds
+        }.flatMapLatest { (filterUnreadOnly, selectedCategoryIds) ->
+            lastRefreshTimestamp = null
+            pagerFactory.create(
+                filterUnreadOnly = filterUnreadOnly,
+                selectedCategoryIds = selectedCategoryIds.toList(),
+                categories = _categories
+            )
+        }.cachedIn(coroutineScope) // TODO: add lifecycle aware scope
 
     override fun setFilterUnreadOnly(unreadOnly: Boolean) {
         _filterUnreadOnly.value = unreadOnly
-        refreshMessages()
     }
 
     override fun setSelectedCategoryIds(categoryIds: Set<Int>) {
         _selectedCategoryIds.value = categoryIds
     }
 
-    private fun loadMessages() {
-        coroutineScope.launch {
-            val fetchResult = model.fetchMessagesWithCategories(
-                filterUnreadOnly = _filterUnreadOnly.value,
-                categoryIds = _selectedCategoryIds.value.toList()
-            )
-
-            fetchResult
-                .onSuccess {
-                    val messageViewModels = it.messages.map { message ->
-                        MessageItemViewModel(
-                            MessageItemModel(
-                                message,
-                                downloaderApi,
-                                sdkEventDistributor,
-                                actionFactory
-                            )
-                        )
-                    }
-                    _messages.value = messageViewModels
-                    _categories.value = it.categories
-                    _isRefreshing.value = false
-                }
-                .onFailure {
-                    _isRefreshing.value = false
-                }
+    override fun refreshMessages(canCallRefresh: () -> Unit) {
+        if (!isTooFrequentFetch()) {
+            canCallRefresh.invoke()
+            lastRefreshTimestamp = timestampProvider.provide()
         }
+    }
+
+    private fun isTooFrequentFetch(): Boolean {
+        return lastRefreshTimestamp?.let {
+            (timestampProvider.provide() - lastRefreshTimestamp!!).inWholeSeconds < embeddedMessagingContext.embeddedMessagingFrequencyCapSeconds
+        } ?: false
     }
 }
