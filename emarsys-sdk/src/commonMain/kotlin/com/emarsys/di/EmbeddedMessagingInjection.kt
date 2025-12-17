@@ -57,7 +57,7 @@ object EmbeddedMessagingInjection {
             )
         }
 
-        factory<ListPageViewModelApi> {
+        single<ListPageViewModelApi> {
             ListPageViewModel(
                 embeddedMessagingContext = get(),
                 timestampProvider = get(),

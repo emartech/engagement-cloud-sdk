@@ -179,8 +179,8 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
                                     "tracking_info_example"
                                 ),
                                 downloaderApi = PreviewDownLoader(),
-                            sdkEventDistributor = previewSdkEventDistributor,
-                            actionFactory = PreviewActionFactory()
+                                sdkEventDistributor = previewSdkEventDistributor,
+                                actionFactory = PreviewActionFactory()
                             )
                         ),
                         MessageItemViewModel(
@@ -202,8 +202,8 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
                                     "tracking_info_example"
                                 ),
                                 downloaderApi = PreviewDownLoader(),
-                            sdkEventDistributor = previewSdkEventDistributor,
-                            actionFactory = PreviewActionFactory()
+                                sdkEventDistributor = previewSdkEventDistributor,
+                                actionFactory = PreviewActionFactory()
                             )
                         )
                     )
@@ -221,8 +221,21 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
 
         override val filterUnreadOnly: StateFlow<Boolean>
             get() = MutableStateFlow(false).asStateFlow()
+
         override val selectedCategoryIds: StateFlow<Set<Int>>
-            get() = MutableStateFlow(setOf())
+            get() = MutableStateFlow<Set<Int>>(setOf()).asStateFlow()
+
+        override val hasFiltersApplied: StateFlow<Boolean>
+            get() = MutableStateFlow(false).asStateFlow()
+
+        override val selectedMessageId: StateFlow<String?>
+            get() = MutableStateFlow(null).asStateFlow()
+
+        override val selectedMessage: StateFlow<MessageItemViewModelApi?>
+            get() = MutableStateFlow(null).asStateFlow()
+
+        override val showCategorySelector: StateFlow<Boolean>
+            get() = MutableStateFlow(false).asStateFlow()
 
         override fun setFilterUnreadOnly(unreadOnly: Boolean) {
             Unit
@@ -232,7 +245,30 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
             Unit
         }
 
-        override fun refreshMessages(canCallRefresh: () -> Unit) {
+        override suspend fun selectMessage(
+            messageViewModel: MessageItemViewModelApi,
+            navigationCallback: suspend () -> Unit
+        ) {
+            Unit
+        }
+
+        override fun clearSelection() {
+            Unit
+        }
+
+        override fun openCategorySelector() {
+            Unit
+        }
+
+        override fun closeCategorySelector() {
+            Unit
+        }
+
+        override fun applyCategorySelection(categoryIds: Set<Int>) {
+            Unit
+        }
+
+        override fun refreshMessages(shouldCallRefresh: () -> Unit) {
             Unit
         }
     }

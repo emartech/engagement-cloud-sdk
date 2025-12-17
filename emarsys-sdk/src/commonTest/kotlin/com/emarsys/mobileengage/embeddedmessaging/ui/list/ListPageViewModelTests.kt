@@ -65,10 +65,6 @@ class ListPageViewModelTests {
         mockEmbeddedMessagingContext = mock(MockMode.autofill)
 
         viewModel = ListPageViewModel(
-            model = mockModel,
-            downloaderApi = mockDownloaderApi,
-            sdkEventDistributor = mockSdkEventDistributor,
-            actionFactory = mockActionFactory,
             embeddedMessagingContext = mockEmbeddedMessagingContext,
             timestampProvider = mockTimestampProvider,
             coroutineScope = CoroutineScope(SupervisorJob() + testDispatcher),
@@ -169,6 +165,175 @@ class ListPageViewModelTests {
 
         viewModel.refreshMessages(canCallRefresh)
         count shouldBe 2
+    }
+
+    @Test
+    fun testSelectMessage_shouldUpdateSelectedMessageIdAndCache_withoutNavigationWhenNoDefaultAction() = runTest {
+        val mockMessageViewModel = mock<com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi>(MockMode.autofill)
+        every { mockMessageViewModel.id } returns "message-123"
+        every { mockMessageViewModel.hasDefaultAction() } returns false
+
+        viewModel.selectedMessageId.value shouldBe null
+        viewModel.selectedMessage.value shouldBe null
+
+        var navigationCalled = false
+        viewModel.selectMessage(mockMessageViewModel) {
+            navigationCalled = true
+        }
+
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        viewModel.selectedMessageId.value shouldBe "message-123"
+        viewModel.selectedMessage.value shouldBe mockMessageViewModel
+        navigationCalled shouldBe false
+    }
+
+    @Test
+    fun testSelectMessage_shouldCallNavigationCallback_whenMessageHasDefaultAction() = runTest {
+        val mockMessageViewModel = mock<com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi>(MockMode.autofill)
+        every { mockMessageViewModel.id } returns "message-456"
+        every { mockMessageViewModel.hasDefaultAction() } returns true
+
+        var navigationCalled = false
+        viewModel.selectMessage(mockMessageViewModel) {
+            navigationCalled = true
+        }
+
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        viewModel.selectedMessageId.value shouldBe "message-456"
+        viewModel.selectedMessage.value shouldBe mockMessageViewModel
+        navigationCalled shouldBe true
+    }
+
+    @Test
+    fun testClearSelection_shouldSetSelectedMessageIdAndCacheToNull() = runTest {
+        val mockMessageViewModel = mock<com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi>(MockMode.autofill)
+        every { mockMessageViewModel.id } returns "message-789"
+        every { mockMessageViewModel.hasDefaultAction() } returns false
+
+        viewModel.selectMessage(mockMessageViewModel) {}
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        viewModel.selectedMessageId.value shouldBe "message-789"
+        viewModel.selectedMessage.value shouldNotBe null
+
+        viewModel.clearSelection()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        viewModel.selectedMessageId.value shouldBe null
+        viewModel.selectedMessage.value shouldBe null
+    }
+
+    @Test
+    fun testOpenCategorySelector_shouldSetShowCategorySelectorToTrue() = runTest {
+        viewModel.showCategorySelector.value shouldBe false
+
+        viewModel.openCategorySelector()
+
+        viewModel.showCategorySelector.value shouldBe true
+    }
+
+    @Test
+    fun testCloseCategorySelector_shouldSetShowCategorySelectorToFalse() = runTest {
+        viewModel.openCategorySelector()
+        viewModel.showCategorySelector.value shouldBe true
+
+        viewModel.closeCategorySelector()
+
+        viewModel.showCategorySelector.value shouldBe false
+    }
+
+    @Test
+    fun testApplyCategorySelection_shouldSetCategoryIdsAndCloseDialog() = runTest {
+        val selectedCategoryIds = setOf(1, 2, 3)
+
+        every { mockPagerFactory.create(any(), any(), any()) } returns flowOf(
+            PagingData.from(
+                data = emptyList(),
+                placeholdersBefore = 0,
+                placeholdersAfter = 0
+            )
+        )
+
+        viewModel.openCategorySelector()
+        viewModel.showCategorySelector.value shouldBe true
+        viewModel.selectedCategoryIds.value shouldBe emptySet()
+
+        viewModel.applyCategorySelection(selectedCategoryIds)
+
+        viewModel.selectedCategoryIds.value shouldBe selectedCategoryIds
+        viewModel.showCategorySelector.value shouldBe false
+    }
+
+    @Test
+    fun testHasFiltersApplied_shouldReturnTrue_whenFilterUnreadOnlyIsTrue() = runTest {
+        every { mockPagerFactory.create(any(), any(), any()) } returns flowOf(
+            PagingData.from(
+                data = emptyList(),
+                placeholdersBefore = 0,
+                placeholdersAfter = 0
+            )
+        )
+
+        viewModel.hasFiltersApplied.value shouldBe false
+
+        viewModel.setFilterUnreadOnly(true)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        viewModel.hasFiltersApplied.value shouldBe true
+    }
+
+    @Test
+    fun testHasFiltersApplied_shouldReturnTrue_whenSelectedCategoryIdsIsNotEmpty() = runTest {
+        val selectedCategoryIds = setOf(1, 2)
+
+        every { mockPagerFactory.create(any(), any(), any()) } returns flowOf(
+            PagingData.from(
+                data = emptyList(),
+                placeholdersBefore = 0,
+                placeholdersAfter = 0
+            )
+        )
+
+        viewModel.hasFiltersApplied.value shouldBe false
+
+        viewModel.setSelectedCategoryIds(selectedCategoryIds)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        viewModel.hasFiltersApplied.value shouldBe true
+    }
+
+    @Test
+    fun testHasFiltersApplied_shouldReturnTrue_whenBothFiltersAreApplied() = runTest {
+        val selectedCategoryIds = setOf(3, 4)
+
+        every { mockPagerFactory.create(any(), any(), any()) } returns flowOf(
+            PagingData.from(
+                data = emptyList(),
+                placeholdersBefore = 0,
+                placeholdersAfter = 0
+            )
+        )
+
+        viewModel.hasFiltersApplied.value shouldBe false
+
+        viewModel.setFilterUnreadOnly(true)
+        viewModel.setSelectedCategoryIds(selectedCategoryIds)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        viewModel.hasFiltersApplied.value shouldBe true
+    }
+
+    @Test
+    fun testHasFiltersApplied_shouldReturnFalse_whenNoFiltersAreApplied() = runTest {
+        viewModel.hasFiltersApplied.value shouldBe false
+
+        viewModel.setFilterUnreadOnly(false)
+        viewModel.setSelectedCategoryIds(emptySet())
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        viewModel.hasFiltersApplied.value shouldBe false
     }
 }
 

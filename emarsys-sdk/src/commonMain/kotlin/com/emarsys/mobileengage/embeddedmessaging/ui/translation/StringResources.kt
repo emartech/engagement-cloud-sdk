@@ -20,6 +20,10 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Translations.DETAILED_MESSAGE_EMPTY_STATE_TEXT
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Translations.EMPTY_STATE_DESCRIPTION
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Translations.EMPTY_STATE_TITLE
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Translations.ERROR_STATE_NO_INTERNET_STATE_DESCRIPTION
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Translations.ERROR_STATE_NO_INTERNET_STATE_REFRESH_ICON_ALT_TEXT
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Translations.ERROR_STATE_NO_INTERNET_STATE_RETRY_BUTTON_LABEL
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Translations.ERROR_STATE_NO_INTERNET_STATE_TITLE
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Translations.FILTER_ALL_BUTTON_LABEL
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Translations.FILTER_UNREAD_BUTTON_LABEL
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Translations.PINNED_MESSAGES_TITLE
@@ -46,7 +50,11 @@ internal data class StringResources(
     val deleteMessageDialogCancelButtonLabel: String = DELETE_MESSAGE_DIALOG_CANCEL_BUTTON_LABEL,
     val deleteMessageDialogConfirmButtonLabel: String = DELETE_MESSAGE_DIALOG_CONFIRM_BUTTON_LABEL,
     val deleteIconButtonAltText: String = DELETE_ICON_BUTTON_ALT_TEXT,
-    val closeIconButtonAltText: String = CLOSE_ICON_BUTTON_ALT_TEXT
+    val closeIconButtonAltText: String = CLOSE_ICON_BUTTON_ALT_TEXT,
+    val noInternetStateTitle: String = ERROR_STATE_NO_INTERNET_STATE_TITLE,
+    val noInternetStateDescription: String = ERROR_STATE_NO_INTERNET_STATE_DESCRIPTION,
+    val noInternetStateRetryButtonLabel: String = ERROR_STATE_NO_INTERNET_STATE_RETRY_BUTTON_LABEL,
+    val noInternetStateRefreshIconAltText: String = ERROR_STATE_NO_INTERNET_STATE_REFRESH_ICON_ALT_TEXT,
 )
 
 internal val LocalStringResources = compositionLocalOf {

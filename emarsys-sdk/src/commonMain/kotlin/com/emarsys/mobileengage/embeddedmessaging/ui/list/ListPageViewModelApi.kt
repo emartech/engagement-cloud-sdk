@@ -9,11 +9,25 @@ import kotlinx.coroutines.flow.StateFlow
 interface ListPageViewModelApi {
     val messagePagingDataFlow: Flow<PagingData<MessageItemViewModelApi>>
     val categories: StateFlow<List<MessageCategory>>
+
     val filterUnreadOnly: StateFlow<Boolean>
     val selectedCategoryIds: StateFlow<Set<Int>>
+    val hasFiltersApplied: StateFlow<Boolean>
+
+    val selectedMessageId: StateFlow<String?>
+    val selectedMessage: StateFlow<MessageItemViewModelApi?>
+
+    val showCategorySelector: StateFlow<Boolean>
 
     fun setFilterUnreadOnly(unreadOnly: Boolean)
     fun setSelectedCategoryIds(categoryIds: Set<Int>)
 
-    fun refreshMessages(canCallRefresh : () -> Unit)
+    suspend fun selectMessage(messageViewModel: MessageItemViewModelApi, onShouldNavigate: suspend () -> Unit)
+    fun clearSelection()
+
+    fun openCategorySelector()
+    fun closeCategorySelector()
+    fun applyCategorySelection(categoryIds: Set<Int>)
+
+    fun refreshMessages(shouldCallRefresh: () -> Unit)
 }
