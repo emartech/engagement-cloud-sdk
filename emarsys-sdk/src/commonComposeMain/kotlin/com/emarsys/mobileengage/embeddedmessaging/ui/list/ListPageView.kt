@@ -22,6 +22,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
@@ -30,6 +35,7 @@ import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,7 +47,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.DEFAULT_PADDING
@@ -82,6 +87,32 @@ private fun MessageList(viewModel: ListPageViewModelApi) {
     val selectedMessageViewModel by viewModel.selectedMessage.collectAsState()
     val hasFiltersApplied by viewModel.hasFiltersApplied.collectAsState()
     val categories by viewModel.categories.collectAsState()
+    val hasConnection by viewModel.hasConnection.collectAsState()
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val hasMessages = lazyPagingMessageItems.itemCount > 0
+
+    val snackbarNoConnectionMessage = LocalStringResources.current.errorStateNoConnectionDescription
+    val snackbarNoConnectionButtonLabel = LocalStringResources.current.errorStateNoConnectionRetryButtonLabel
+    val snackbarConnectionRestoredMessage = LocalStringResources.current.snackbarConnectionRestored
+
+    LaunchedEffect(hasConnection, hasMessages) {
+        if (!hasConnection && hasMessages) {
+            val result = snackbarHostState.showSnackbar(
+                message = snackbarNoConnectionMessage,
+                actionLabel = snackbarNoConnectionButtonLabel,
+                duration = SnackbarDuration.Long
+            )
+            if (result == SnackbarResult.ActionPerformed) {
+                viewModel.refreshMessages { lazyPagingMessageItems.refresh() }
+            }
+        } else if (hasConnection && hasMessages && snackbarHostState.currentSnackbarData != null) {
+            snackbarHostState.showSnackbar(
+                message = snackbarConnectionRestoredMessage,
+                duration = SnackbarDuration.Short
+            )
+        }
+    }
 
     val navigator = rememberListDetailPaneScaffoldNavigator<String>()
     val scope = rememberCoroutineScope()
@@ -96,74 +127,84 @@ private fun MessageList(viewModel: ListPageViewModelApi) {
     }
 
     EmbeddedMessagingTheme {
-        FilterRow(
-            selectedCategoryIds = selectedCategoryIds,
-            filterUnreadOnly = filterUnreadOnly,
-            onFilterChange = { viewModel.setFilterUnreadOnly(it) },
-            onCategorySelectorClicked = { showCategorySelector = true }
-        )
-
-        HorizontalDivider(color = MaterialTheme.colorScheme.outline)
-
-        if (showCategorySelector) {
-            CategoriesDialogView(
-                categories = categories,
-                selectedCategories = selectedCategoryIds,
-                onApplyClicked = { newSelection ->
-                    viewModel.setSelectedCategoryIds(newSelection)
-                    showCategorySelector = false
-                },
-                onDismiss = {
-                    showCategorySelector = false
-                }
-            )
-        }
-
-        ListDetailPaneScaffold(
-            directive = navigator.scaffoldDirective,
-            value = navigator.scaffoldValue,
-            listPane = {
-                MessageListPane(
-                    lazyPagingMessageItems = lazyPagingMessageItems,
-                    selectedMessage = selectedMessageViewModel,
-                    hasFiltersApplied = hasFiltersApplied,
-                    onRefresh = { viewModel.refreshMessages { lazyPagingMessageItems.refresh() } },
-                    onMessageClick = { messageViewModel ->
-                        scope.launch {
-                            viewModel.selectMessage(messageViewModel) {
-                                navigator.navigateTo(ListDetailPaneScaffoldRole.Detail)
-                            }
-                        }
-                    },
-                    lazyListState = listState
+        Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) }) {
+            Column {
+                FilterRow(
+                    selectedCategoryIds = selectedCategoryIds,
+                    filterUnreadOnly = filterUnreadOnly,
+                    onFilterChange = { viewModel.setFilterUnreadOnly(it) },
+                    onCategorySelectorClicked = { showCategorySelector = true }
                 )
-            },
-            detailPane = {
-                AnimatedContent(
-                    targetState = selectedMessageViewModel,
-                    transitionSpec = {
-                        fadeIn() + slideInVertically() togetherWith fadeOut() + slideOutVertically()
-                    }
-                ) {
-                    selectedMessageViewModel?.let { messageViewModel ->
-                        MessageDetailView(
-                            messageViewModel,
-                            canShowDetailPane
+
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline)
+
+                if (showCategorySelector) {
+                    CategoriesDialogView(
+                        categories = categories,
+                        selectedCategories = selectedCategoryIds,
+                        onApplyClicked = { newSelection ->
+                            viewModel.setSelectedCategoryIds(newSelection)
+                            showCategorySelector = false
+                        },
+                        onDismiss = {
+                            showCategorySelector = false
+                        }
+                    )
+                }
+
+                ListDetailPaneScaffold(
+                    directive = navigator.scaffoldDirective,
+                    value = navigator.scaffoldValue,
+                    listPane = {
+                        MessageItemsListPane(
+                            lazyListState = listState,
+                            lazyPagingMessageItems = lazyPagingMessageItems,
+                            selectedMessage = selectedMessageViewModel,
+                            hasFiltersApplied = hasFiltersApplied,
+                            hasConnection = hasConnection,
+                            onRefresh = { viewModel.refreshMessages { lazyPagingMessageItems.refresh() } },
+                            onMessageClick = { messageViewModel ->
+                                scope.launch {
+                                    viewModel.selectMessage(messageViewModel) {
+                                        navigator.navigateTo(ListDetailPaneScaffoldRole.Detail)
+                                    }
+                                }
+                            },
+                            onClearFilters = {
+                                viewModel.setFilterUnreadOnly(false)
+                                viewModel.setSelectedCategoryIds(emptySet())
+                            },
+                            snackbarHostState = snackbarHostState
+                        )
+                    },
+                    detailPane = {
+                        AnimatedContent(
+                            targetState = selectedMessageViewModel,
+                            transitionSpec = {
+                                fadeIn() + slideInVertically() togetherWith fadeOut() + slideOutVertically()
+                            }
                         ) {
-                            viewModel.clearSelection()
-                            scope.launch {
-                                navigator.navigateTo(ListDetailPaneScaffoldRole.List)
+                            selectedMessageViewModel?.let { messageViewModel ->
+                                MessageDetailView(
+                                    messageViewModel,
+                                    canShowDetailPane
+                                ) {
+                                    viewModel.clearSelection()
+                                    scope.launch {
+                                        navigator.navigateTo(ListDetailPaneScaffoldRole.List)
+                                    }
+                                }
+                            } ?: Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(LocalStringResources.current.detailedMessageEmptyStateText)
                             }
                         }
-                    } ?: Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(LocalStringResources.current.detailedMessageEmptyStateText)
                     }
-                }
+                )
             }
-        )
+        }
     }
 }
 

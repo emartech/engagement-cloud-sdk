@@ -5,6 +5,7 @@ import com.emarsys.core.providers.InstantProvider
 import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
 import com.emarsys.networking.clients.embedded.messaging.model.MessageCategory
+import com.emarsys.watchdog.connection.ConnectionWatchDog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +25,7 @@ internal class ListPageViewModel(
     private val timestampProvider: InstantProvider,
     private val coroutineScope: CoroutineScope,
     private val pagerFactory: PagerFactoryApi,
+    private val connectionWatchDog: ConnectionWatchDog
 ) : ListPageViewModelApi {
     private val _categories = MutableStateFlow<List<MessageCategory>>(emptyList())
     override val categories: StateFlow<List<MessageCategory>> = _categories.asStateFlow()
@@ -32,7 +34,7 @@ internal class ListPageViewModel(
     override val filterUnreadOnly: StateFlow<Boolean> = _filterUnreadOnly.asStateFlow()
     private val _selectedCategoryIds = MutableStateFlow<Set<Int>>(emptySet())
     override val selectedCategoryIds: StateFlow<Set<Int>> = _selectedCategoryIds.asStateFlow()
-
+    override val hasConnection: StateFlow<Boolean> = connectionWatchDog.isOnline
     override val hasFiltersApplied: StateFlow<Boolean> =
         combine(_filterUnreadOnly, _selectedCategoryIds) { unreadOnly, categoryIds ->
             unreadOnly || categoryIds.isNotEmpty()

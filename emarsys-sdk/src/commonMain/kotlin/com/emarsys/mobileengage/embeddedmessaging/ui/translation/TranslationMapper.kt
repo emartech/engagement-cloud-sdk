@@ -2,7 +2,7 @@ package com.emarsys.mobileengage.embeddedmessaging.ui.translation
 
 import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 
-internal class TranslationMapper: TranslationMapperApi {
+internal class TranslationMapper : TranslationMapperApi {
 
     override fun map(embeddedMessagingContext: EmbeddedMessagingContextApi): StringResources {
         val translations = embeddedMessagingContext.metaData?.labels
@@ -23,12 +23,23 @@ internal class TranslationMapper: TranslationMapperApi {
                 detailedMessageDeleteButtonLabel = it.detailedMessageDeleteButtonLabel,
                 emptyStateTitle = it.emptyStateTitle,
                 emptyStateDescription = it.emptyStateDescription,
+                emptyStateFilteredTitle = it.emptyStateFilteredTitle,
+                emptyStateFilteredDescription = it.emptyStateFilteredDescription,
+                emptyStateFilteredClearFiltersButtonLabel = it.emptyStateFilteredClearFiltersButtonLabel,
+                emptyStateFilteredClearFiltersIconAltText = it.emptyStateFilteredClearFiltersIconAltText,
+                snackbarConnectionRestored = it.snackbarConnectionRestored,
                 deleteMessageDialogTitle = it.deleteMessageDialogTitle,
                 deleteMessageDialogDescription = it.deleteMessageDialogDescription,
                 deleteMessageDialogCancelButtonLabel = it.deleteMessageDialogCancelButtonLabel,
                 deleteMessageDialogConfirmButtonLabel = it.deleteMessageDialogConfirmButtonLabel,
                 deleteIconButtonAltText = it.deleteIconButtonAltText,
-                closeIconButtonAltText = it.closeIconButtonAltText
+                closeIconButtonAltText = it.closeIconButtonAltText,
+                errorStateNoConnectionTitle = it.errorStateNoConnectionTitle,
+                errorStateNoConnectionDescription = it.errorStateNoConnectionDescription,
+                errorStateNoConnectionRetryButtonLabel = it.errorStateNoConnectionRetryButtonLabel,
+                errorStateNoConnectionRefreshIconAltText = it.errorStateNoConnectionRefreshIconAltText,
+                refreshErrorMessageText = it.refreshErrorMessageText,
+                failedToLoadMoreMessagesText = it.failedToLoadMoreMessagesText
             )
         } ?: StringResources()
     }

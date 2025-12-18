@@ -30,5 +30,16 @@ internal object EmbeddedMessagingConstants {
         const val DELETE_MESSAGE_DIALOG_CONFIRM_BUTTON_LABEL = "Delete"
         const val DELETE_ICON_BUTTON_ALT_TEXT = "Delete icon button"
         const val CLOSE_ICON_BUTTON_ALT_TEXT = "Close icon button"
+        const val ERROR_STATE_NO_CONNECTION_TITLE = "You're Offline"
+        const val ERROR_STATE_NO_CONNECTION_DESCRIPTION = "Messages could not be loaded. Check your connection and try again."
+        const val SNACKBAR_CONNECTION_RESTORED = "Connection restored."
+        const val ERROR_STATE_NO_CONNECTION_RETRY_BUTTON_LABEL = "Retry"
+        const val ERROR_STATE_NO_CONNECTION_REFRESH_ICON_ALT_TEXT = "Refresh icon"
+        const val EMPTY_STATE_FILTERED_TITLE = "No Messages Found"
+        const val EMPTY_STATE_FILTERED_DESCRIPTION = "No messages match your current filters. Try adjusting your filters or clear them to see all messages."
+        const val EMPTY_STATE_FILTERED_CLEAR_FILTERS_BUTTON_LABEL = "Clear Filters"
+        const val EMPTY_STATE_FILTERED_CLEAR_FILTERS_ICON_ALT_TEXT = "Clear filters icon"
+        const val REFRESH_ERROR_MESSAGE_TEXT = "Failed to refresh messages. Please try again. Check your connection and try again."
+        const val FAILED_TO_LOAD_MORE_MESSAGES_TEXT = "Failed to load more messages."
     }
 }

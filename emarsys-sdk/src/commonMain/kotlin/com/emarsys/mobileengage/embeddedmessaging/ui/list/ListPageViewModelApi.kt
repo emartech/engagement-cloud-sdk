@@ -13,6 +13,7 @@ interface ListPageViewModelApi {
     val filterUnreadOnly: StateFlow<Boolean>
     val selectedCategoryIds: StateFlow<Set<Int>>
     val hasFiltersApplied: StateFlow<Boolean>
+    val hasConnection: StateFlow<Boolean>
 
     val selectedMessageId: StateFlow<String?>
     val selectedMessage: StateFlow<MessageItemViewModelApi?>

@@ -8,6 +8,7 @@ import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import com.emarsys.networking.clients.embedded.messaging.model.MessageCategory
+import com.emarsys.watchdog.connection.ConnectionWatchDog
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.sequentiallyReturns
@@ -51,6 +52,7 @@ class ListPageViewModelTests {
     private lateinit var mockEmbeddedMessagingContext: EmbeddedMessagingContextApi
     private lateinit var mockPagerFactory: PagerFactoryApi
     private lateinit var mockTimestampProvider: InstantProvider
+    private lateinit var mockConnectionWatchDog: ConnectionWatchDog
     private val testDispatcher = StandardTestDispatcher()
 
     @BeforeTest
@@ -62,13 +64,15 @@ class ListPageViewModelTests {
         mockActionFactory = mock(MockMode.autofill)
         mockPagerFactory = mock(MockMode.autofill)
         mockTimestampProvider = mock(MockMode.autofill)
+        mockConnectionWatchDog = mock(MockMode.autofill)
         mockEmbeddedMessagingContext = mock(MockMode.autofill)
 
         viewModel = ListPageViewModel(
             embeddedMessagingContext = mockEmbeddedMessagingContext,
             timestampProvider = mockTimestampProvider,
             coroutineScope = CoroutineScope(SupervisorJob() + testDispatcher),
-            pagerFactory = mockPagerFactory
+            pagerFactory = mockPagerFactory,
+            connectionWatchDog = mockConnectionWatchDog
         )
     }
 

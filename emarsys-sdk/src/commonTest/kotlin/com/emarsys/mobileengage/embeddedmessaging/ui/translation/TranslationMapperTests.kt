@@ -46,7 +46,18 @@ class TranslationMapperTests {
             deleteMessageDialogCancelButtonLabel = "test deleteMessageDialogCancelButtonLabel",
             deleteMessageDialogConfirmButtonLabel = "test deleteMessageDialogConfirmButtonLabel",
             deleteIconButtonAltText = "test deleteIconButtonAltText",
-            closeIconButtonAltText = "test closeIconButtonAltText"
+            closeIconButtonAltText = "test closeIconButtonAltText",
+            errorStateNoConnectionTitle = "test errorStateNoInternetConnectionTitle",
+            errorStateNoConnectionDescription = "test errorStateNoInternetConnectionDescription",
+            errorStateNoConnectionRetryButtonLabel = "test errorStateNoInternetConnectionRetryButtonLabel",
+            errorStateNoConnectionRefreshIconAltText = "test errorStateNoInternetConnectionRefreshIconAltText",
+            snackbarConnectionRestored = "test snackbarConnectionRestored",
+            emptyStateFilteredTitle = "test emptyStateFilteredTitle",
+            emptyStateFilteredDescription = "test emptyStateFilteredDescription",
+            emptyStateFilteredClearFiltersButtonLabel = "test emptyStateFilteredClearFiltersButtonLabel",
+            emptyStateFilteredClearFiltersIconAltText = "test emptyStateFilteredClearFiltersIconAltText",
+            refreshErrorMessageText = "testRefreshErrorMessageText",
+            failedToLoadMoreMessagesText = "testFailedToLoadMoreMessagesText"
         )
 
         val resultStringResources = translationMapper.map(testEmbeddedMessagingContext)
@@ -91,6 +102,17 @@ class TranslationMapperTests {
         deleteMessageDialogCancelButtonLabel = "test deleteMessageDialogCancelButtonLabel",
         deleteMessageDialogConfirmButtonLabel = "test deleteMessageDialogConfirmButtonLabel",
         deleteIconButtonAltText = "test deleteIconButtonAltText",
-        closeIconButtonAltText = "test closeIconButtonAltText"
+        closeIconButtonAltText = "test closeIconButtonAltText",
+        errorStateNoConnectionTitle = "test errorStateNoInternetConnectionTitle",
+        errorStateNoConnectionDescription = "test errorStateNoInternetConnectionDescription",
+        snackbarConnectionRestored = "test snackbarConnectionRestored",
+        errorStateNoConnectionRetryButtonLabel = "test errorStateNoInternetConnectionRetryButtonLabel",
+        errorStateNoConnectionRefreshIconAltText = "test errorStateNoInternetConnectionRefreshIconAltText",
+        emptyStateFilteredTitle = "test emptyStateFilteredTitle",
+        emptyStateFilteredDescription = "test emptyStateFilteredDescription",
+        emptyStateFilteredClearFiltersButtonLabel = "test emptyStateFilteredClearFiltersButtonLabel",
+        emptyStateFilteredClearFiltersIconAltText = "test emptyStateFilteredClearFiltersIconAltText",
+        refreshErrorMessageText = "testRefreshErrorMessageText",
+        failedToLoadMoreMessagesText = "testFailedToLoadMoreMessagesText"
     )
 }

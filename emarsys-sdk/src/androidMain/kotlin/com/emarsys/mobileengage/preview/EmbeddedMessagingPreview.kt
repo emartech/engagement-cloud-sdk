@@ -227,6 +227,8 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
 
         override val hasFiltersApplied: StateFlow<Boolean>
             get() = MutableStateFlow(false).asStateFlow()
+        override val hasConnection: StateFlow<Boolean>
+            get() = MutableStateFlow(false).asStateFlow()
 
         override val selectedMessageId: StateFlow<String?>
             get() = MutableStateFlow(null).asStateFlow()

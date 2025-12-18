@@ -27,6 +27,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.time.ExperimentalTime
 
@@ -61,6 +62,7 @@ class EmbeddedMessagingIntegrationTests {
         embeddedMessagingContext.embeddedMessagingFrequencyCapSeconds = 0
     }
 
+    @Ignore("Fake API is discontinued, will update tests for the real API")
     @Test
     fun testFetchBadgeCount_should_handle_requests() = runTest {
         forAll(
@@ -79,6 +81,7 @@ class EmbeddedMessagingIntegrationTests {
         }
     }
 
+    @Ignore("Fake API is discontinued, will update tests for the real API")
     @Test
     fun testFetchMessages_should_handle_requests() = runTest(UnconfinedTestDispatcher()) {
         forAll(
@@ -99,6 +102,7 @@ class EmbeddedMessagingIntegrationTests {
         }
     }
 
+    @Ignore("Fake API is discontinued, will update tests for the real API")
     @Test
     fun testFetchMeta_should_handle_requests() = runTest {
         forAll(
@@ -117,6 +121,7 @@ class EmbeddedMessagingIntegrationTests {
         }
     }
 
+    @Ignore("Fake API is discontinued, will update tests for the real API")
     @Test
     fun testUpdateTags_should_handle_requests() = runTest {
         forAll(
