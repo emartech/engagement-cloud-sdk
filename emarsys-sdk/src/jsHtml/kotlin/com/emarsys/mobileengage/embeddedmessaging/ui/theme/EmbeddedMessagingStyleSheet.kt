@@ -1,11 +1,26 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.theme
 
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.BUTTON_FONT_WEIGHT
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DEFAULT_BORDER_RADIUS
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DEFAULT_BORDER_WIDTH
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DEFAULT_CURSOR
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DEFAULT_DIVIDER_WIDTH
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DEFAULT_MARGIN
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DEFAULT_PADDING
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DEFAULT_SPACING
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DIALOG_CARD_WIDTH
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DIALOG_CONTAINER_PADDING
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.FLOATING_ACTION_BUTTON_SIZE
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.ICON_DEFAULT_SIZE
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.LIST_PANE_WIDTH
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MAX_HEIGHT
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MAX_WIDTH
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MESSAGE_ITEM_IMAGE_SIZE
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.TITLE_FONT_WEIGHT
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.ZERO_BORDER_WIDTH
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.ZERO_MARGIN
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.ZERO_PADDING
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.ZERO_POSITION_VALUE
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.ZERO_SPACING
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.AlignSelf
@@ -13,7 +28,6 @@ import org.jetbrains.compose.web.css.Color
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.FlexDirection
 import org.jetbrains.compose.web.css.JustifyContent
-import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.Position
 import org.jetbrains.compose.web.css.StyleSheet
 import org.jetbrains.compose.web.css.alignItems
@@ -39,19 +53,16 @@ import org.jetbrains.compose.web.css.marginRight
 import org.jetbrains.compose.web.css.marginTop
 import org.jetbrains.compose.web.css.maxWidth
 import org.jetbrains.compose.web.css.padding
-import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.position
-import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.right
 import org.jetbrains.compose.web.css.textAlign
 import org.jetbrains.compose.web.css.top
-import org.jetbrains.compose.web.css.vh
 import org.jetbrains.compose.web.css.width
 
 object EmbeddedMessagingStyleSheet : StyleSheet() {
     val listPageContainer by style {
-        backgroundColor(CssVars.colorSurface.value())
-        height(100.vh)
+        backgroundColor(CssColorVars.colorSurface.value())
+        height(MAX_HEIGHT)
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Column)
     }
@@ -59,13 +70,16 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
     val splitViewContainer by style {
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Row)
-        height(100.percent)
-        width(100.percent)
+        height(MAX_HEIGHT)
+        width(MAX_WIDTH)
     }
 
     val listPane by style {
-        width(400.px)
-        property("border-right", "1px solid ${CssVars.colorOutline.variableName()}")
+        width(LIST_PANE_WIDTH)
+        property(
+            "border-right",
+            "${DEFAULT_BORDER_WIDTH} solid ${CssColorVars.colorOutline.value()}"
+        )
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Column)
     }
@@ -85,31 +99,32 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
 
     val filterButton by style {
         height(FLOATING_ACTION_BUTTON_SIZE)
-        padding(8.px, 12.px)
-        borderRadius(16.px)
-        cursor("pointer")
-        fontSize(14.px)
-        fontWeight(400)
-        marginRight(8.px)
+        padding(DEFAULT_PADDING)
+        border(ZERO_BORDER_WIDTH)
+        borderRadius(DEFAULT_BORDER_RADIUS)
+        cursor(DEFAULT_CURSOR)
+        fontSize(CssFontVars.fontSizeBodyMedium)
+        fontWeight(BUTTON_FONT_WEIGHT)
+        marginRight(DEFAULT_MARGIN)
     }
 
     val filterButtonUnselected by style {
         backgroundColor(Color.transparent)
-        color(CssVars.colorOnSurfaceVariant.value())
-        border(1.px, LineStyle.Solid, CssVars.colorOutline.value())
+        color(CssColorVars.colorOnSurfaceVariant.value())
+        border(ZERO_BORDER_WIDTH)
     }
 
     val filterButtonSelected by style {
-        backgroundColor(CssVars.colorSecondaryContainer.value())
-        color(CssVars.colorOnSecondaryContainer.value())
-        border(0.px)
+        backgroundColor(CssColorVars.colorSecondaryContainer.value())
+        color(CssColorVars.colorOnSecondaryContainer.value())
+        border(ZERO_BORDER_WIDTH)
     }
 
     val divider by style {
-        border(1.px)
-        height(1.px)
-        backgroundColor(CssVars.colorOutline.value())
-        margin(0.px)
+        border(DEFAULT_BORDER_WIDTH, color = CssColorVars.colorOutline.value())
+        height(DEFAULT_DIVIDER_WIDTH)
+        backgroundColor(CssColorVars.colorOutline.value())
+        margin(ZERO_MARGIN)
     }
 
     val messageListContainer by style {
@@ -120,28 +135,28 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
     }
 
     val refreshIndicator by style {
-        padding(8.px)
+        padding(DEFAULT_PADDING)
         textAlign("center")
-        color(CssVars.colorOnSurface.value())
-        fontSize(14.px)
+        color(CssColorVars.colorOnSurface.value())
+        fontSize(CssFontVars.fontSizeLabelLarge)
     }
 
     val refreshButton by style {
-        width(100.percent)
-        padding(8.px)
-        border(0.px)
-        backgroundColor(CssVars.colorSurfaceVariant.value())
-        color(CssVars.colorOnSurfaceVariant.value())
-        cursor("pointer")
-        fontSize(14.px)
+        width(MAX_WIDTH)
+        padding(DEFAULT_PADDING)
+        border(ZERO_BORDER_WIDTH)
+        backgroundColor(CssColorVars.colorSurfaceVariant.value())
+        color(CssColorVars.colorOnSurfaceVariant.value())
+        cursor(DEFAULT_CURSOR)
+        fontSize(CssFontVars.fontSizeLabelLarge)
         display(DisplayStyle.Flex)
         justifyContent(JustifyContent.Center)
         alignItems(AlignItems.Center)
     }
 
     val refreshIcon by style {
-        width(24.px)
-        height(24.px)
+        width(ICON_DEFAULT_SIZE)
+        height(ICON_DEFAULT_SIZE)
     }
 
     val scrollableList by style {
@@ -165,21 +180,21 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
     }
 
     val emptyStateText by style {
-        fontSize(16.px)
-        color(CssVars.colorOnSurface.value())
+        fontSize(CssFontVars.fontSizeBodyLarge)
+        color(CssColorVars.colorOnSurface.value())
         display(DisplayStyle.Block)
     }
 
     val emptyStateTitle by style {
-        marginBottom(8.px)
+        marginBottom(DEFAULT_MARGIN)
     }
 
     val dialogOverlay by style {
         position(Position.Fixed)
-        top(0.px)
-        left(0.px)
-        right(0.px)
-        bottom(0.px)
+        top(ZERO_POSITION_VALUE)
+        left(ZERO_POSITION_VALUE)
+        right(ZERO_POSITION_VALUE)
+        bottom(ZERO_POSITION_VALUE)
         backgroundColor(Color("rgba(0, 0, 0, 0.5)"))
         display(DisplayStyle.Flex)
         alignItems(AlignItems.Center)
@@ -188,11 +203,11 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
     }
 
     val dialogCard by style {
-        backgroundColor(CssVars.colorSurface.value())
-        borderRadius(8.px)
+        backgroundColor(CssColorVars.colorSurface.value())
+        borderRadius(DEFAULT_BORDER_RADIUS)
         property("box-shadow", "0 4px 16px rgba(0,0,0,0.2)")
-        maxWidth(500.px)
-        width(90.percent)
+        maxWidth(DIALOG_CARD_WIDTH)
+        width(MAX_WIDTH)
     }
 
     val dialogContent by style {
@@ -203,7 +218,7 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
     }
 
     val dialogHeaderContainer by style {
-        padding(0.px, 0.px, 0.px, DEFAULT_PADDING)
+        padding(ZERO_PADDING, ZERO_PADDING, ZERO_PADDING, DEFAULT_PADDING)
     }
 
     val dialogHeaderRow by style {
@@ -212,37 +227,37 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
     }
 
     val dialogTitle by style {
-        fontSize(22.px)
-        fontWeight(500)
-        color(CssVars.colorOnSurface.value())
+        fontSize(CssFontVars.fontSizeTitleLarge)
+        fontWeight(TITLE_FONT_WEIGHT)
+        color(CssColorVars.colorOnSurface.value())
         flex(1)
     }
 
     val dialogCloseButton by style {
-        border(0.px)
         backgroundColor(Color.transparent)
-        cursor("pointer")
-        width(24.px)
-        height(24.px)
-        padding(0.px) // Reset padding for icon-only button
+        border(ZERO_BORDER_WIDTH)
+        cursor(DEFAULT_CURSOR)
+        width(ICON_DEFAULT_SIZE)
+        height(ICON_DEFAULT_SIZE)
+        padding(ZERO_PADDING)
         display(DisplayStyle.Flex)
         alignItems(AlignItems.Center)
         justifyContent(JustifyContent.Center)
-        color(CssVars.colorOnSurface.value())
+        color(CssColorVars.colorOnSurface.value())
     }
 
     val dialogSubtitle by style {
-        fontSize(14.px)
-        color(CssVars.colorOnSurface.value())
+        fontSize(CssFontVars.fontSizeBodyMedium)
+        color(CssColorVars.colorOnSurface.value())
         display(DisplayStyle.Block)
-        marginTop(4.px)
+        marginTop(DEFAULT_MARGIN)
     }
 
     val dialogDivider by style {
-        border(0.px)
-        height(1.px)
-        backgroundColor(CssVars.colorOutline.value())
-        margin(0.px, DEFAULT_PADDING)
+        border(DEFAULT_BORDER_WIDTH, color = CssColorVars.colorOutline.value())
+        height(DEFAULT_DIVIDER_WIDTH)
+        backgroundColor(CssColorVars.colorOutline.value())
+        margin(ZERO_MARGIN, DEFAULT_MARGIN)
     }
 
     val categoryChipsContainer by style {
@@ -256,56 +271,57 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         display(DisplayStyle.Flex)
         alignItems(AlignItems.Center)
         gap(DEFAULT_SPACING)
-        padding(8.px, 12.px)
-        borderRadius(16.px)
-        cursor("pointer")
-        fontSize(14.px)
-        fontWeight(400)
+        padding(DEFAULT_PADDING)
+        border(ZERO_BORDER_WIDTH)
+        borderRadius(DEFAULT_BORDER_RADIUS)
+        cursor(DEFAULT_CURSOR)
+        fontSize(CssFontVars.fontSizeLabelLarge)
+        fontWeight(BUTTON_FONT_WEIGHT)
     }
 
     val categoryChipSelected by style {
-        backgroundColor(CssVars.colorSecondaryContainer.value())
-        color(CssVars.colorOnSecondaryContainer.value())
-        border(0.px)
+        backgroundColor(CssColorVars.colorSecondaryContainer.value())
+        color(CssColorVars.colorOnSecondaryContainer.value())
+        border(ZERO_BORDER_WIDTH)
     }
 
     val categoryChipUnselected by style {
         backgroundColor(Color.transparent)
-        color(CssVars.colorOnPrimaryContainer.value())
-        property("border", "1px solid ${CssVars.colorOutline.variableName()}")
+        color(CssColorVars.colorOnPrimaryContainer.value())
+        border(ZERO_BORDER_WIDTH)
     }
 
     val categoryChipCheckmark by style {
-        width(18.px)
-        height(18.px)
+        width(ICON_DEFAULT_SIZE)
+        height(ICON_DEFAULT_SIZE)
     }
 
     val dialogActionsContainer by style {
         display(DisplayStyle.Flex)
         padding(DEFAULT_PADDING)
-        gap(8.px)
+        gap(DEFAULT_SPACING)
     }
 
     val dialogResetButton by style {
-        padding(10.px, 16.px)
-        borderRadius(4.px)
-        border(0.px)
+        padding(DEFAULT_PADDING)
+        border(ZERO_BORDER_WIDTH)
+        borderRadius(DEFAULT_BORDER_RADIUS)
         backgroundColor(Color.transparent)
-        color(CssVars.colorPrimary.value())
-        cursor("pointer")
-        fontSize(14.px)
-        fontWeight(500)
+        color(CssColorVars.colorPrimary.value())
+        cursor(DEFAULT_CURSOR)
+        fontSize(CssFontVars.fontSizeLabelLarge)
+        fontWeight(BUTTON_FONT_WEIGHT)
     }
 
     val dialogApplyButton by style {
-        padding(10.px, 16.px)
-        borderRadius(4.px)
-        border(0.px)
-        backgroundColor(CssVars.colorPrimary.value())
-        color(CssVars.colorOnPrimary.value())
-        cursor("pointer")
-        fontSize(14.px)
-        fontWeight(500)
+        padding(DEFAULT_BORDER_RADIUS)
+        border(ZERO_BORDER_WIDTH)
+        borderRadius(DEFAULT_BORDER_RADIUS)
+        backgroundColor(CssColorVars.colorPrimary.value())
+        color(CssColorVars.colorOnPrimary.value())
+        cursor(DEFAULT_CURSOR)
+        fontSize(CssFontVars.fontSizeLabelLarge)
+        fontWeight(BUTTON_FONT_WEIGHT)
         property("box-shadow", "0 2px 4px rgba(0,0,0,0.1)")
     }
 
@@ -317,30 +333,32 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         height(FLOATING_ACTION_BUTTON_SIZE)
         display(DisplayStyle.Flex)
         alignItems(AlignItems.Center)
-        gap(8.px)
-        padding(8.px, 16.px)
-        borderRadius(4.px)
-        border(0.px)
-        cursor("pointer")
-        fontSize(14.px)
-        fontWeight(500)
+        gap(DEFAULT_SPACING)
+        padding(DEFAULT_PADDING)
+        border(ZERO_BORDER_WIDTH)
+        borderRadius(DEFAULT_BORDER_RADIUS)
+        cursor(DEFAULT_CURSOR)
+        fontSize(CssFontVars.fontSizeLabelLarge)
+        fontWeight(BUTTON_FONT_WEIGHT)
         property("box-shadow", "0 2px 4px rgba(0,0,0,0.1)")
     }
 
     val categorySelectorButtonActive by style {
-        backgroundColor(CssVars.colorPrimary.value())
-        color(CssVars.colorOnPrimary.value())
+        backgroundColor(CssColorVars.colorPrimary.value())
+        color(CssColorVars.colorOnPrimary.value())
+        border(ZERO_BORDER_WIDTH)
     }
 
     val categorySelectorButtonInactive by style {
-        backgroundColor(CssVars.colorSurfaceVariant.value())
-        color(CssVars.colorOnSurfaceVariant.value())
+        backgroundColor(CssColorVars.colorSurfaceVariant.value())
+        color(CssColorVars.colorOnSurfaceVariant.value())
+        border(ZERO_BORDER_WIDTH)
     }
 
     val categorySelectorIcon by style {
-        width(18.px)
-        height(18.px)
-        property("fill", "currentColor") // Ensure SVG takes text color
+        width(ICON_DEFAULT_SIZE)
+        height(ICON_DEFAULT_SIZE)
+        property("fill", "currentColor")
     }
 
     val messageItem by style {
@@ -371,14 +389,14 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
     }
 
     val messageItemTitle by style {
-        fontSize(16.px)
-        color(CssVars.colorOnSurface.value())
+        fontSize(CssFontVars.fontSizeBodyLarge)
+        color(CssColorVars.colorOnSurface.value())
         display(DisplayStyle.Block)
     }
 
     val messageItemLead by style {
-        fontSize(16.px)
-        color(CssVars.colorOnSurface.value())
+        fontSize(CssFontVars.fontSizeBodyLarge)
+        color(CssColorVars.colorOnSurface.value())
         property("overflow", "hidden")
         property("text-overflow", "ellipsis")
         property("white-space", "nowrap")
@@ -386,8 +404,8 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
     }
 
     val messageItemTimestamp by style {
-        fontSize(16.px)
-        color(CssVars.colorOnSurface.value())
+        fontSize(CssFontVars.fontSizeBodyLarge)
+        color(CssColorVars.colorOnSurface.value())
     }
 
     val loadingSpinner by style {
@@ -396,7 +414,7 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         display(DisplayStyle.Flex)
         alignItems(AlignItems.Center)
         justifyContent(JustifyContent.Center)
-        color(CssVars.colorOnSurface.value())
+        color(CssColorVars.colorOnSurface.value())
     }
 
     val detailViewContainer by style {
@@ -406,12 +424,12 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
     }
 
     val detailBackButton by style {
-        padding(8.px, 16.px)
-        borderRadius(4.px)
-        border(0.px)
-        backgroundColor(CssVars.colorSurfaceVariant.value())
-        color(CssVars.colorOnSurface.value())
-        cursor("pointer")
+        padding(DEFAULT_PADDING)
+        borderRadius(DEFAULT_BORDER_RADIUS)
+        border(ZERO_BORDER_WIDTH)
+        backgroundColor(CssColorVars.colorSurfaceVariant.value())
+        color(CssColorVars.colorOnSurface.value())
+        cursor(DEFAULT_CURSOR)
         alignSelf(AlignSelf.FlexStart)
         marginBottom(DEFAULT_PADDING)
     }
@@ -423,8 +441,8 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
     }
 
     val detailImage by style {
-        maxWidth(100.percent)
-        borderRadius(8.px)
+        maxWidth(MAX_WIDTH)
+        borderRadius(DEFAULT_BORDER_RADIUS)
         property("object-fit", "contain")
     }
 }

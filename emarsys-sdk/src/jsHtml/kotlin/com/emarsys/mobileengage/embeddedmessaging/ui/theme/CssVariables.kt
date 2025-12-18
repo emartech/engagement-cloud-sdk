@@ -1,91 +1,111 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.theme
 
 import org.jetbrains.compose.web.css.CSSColorValue
+import org.jetbrains.compose.web.css.CSSNumeric
 import org.jetbrains.compose.web.css.Color
 import org.jetbrains.compose.web.css.StyleScope
+import org.jetbrains.compose.web.css.px
 
-data class CssVar(val name: String) {
+data class CssColorVar(val name: String) {
     fun value(): CSSColorValue = Color("var($name)")
-    
-    fun variableName(): String = "var($name)"
 }
 
-fun StyleScope.setVar(variable: CssVar, value: String) {
+fun StyleScope.setVar(variable: CssColorVar, value: String) {
     property(variable.name, value)
 }
 
-object CssVars {
-    val colorPrimary = CssVar("--emarsys-color-primary")
-    val colorOnPrimary = CssVar("--emarsys-color-on-primary")
-    val colorPrimaryContainer = CssVar("--emarsys-color-primary-container")
-    val colorOnPrimaryContainer = CssVar("--emarsys-color-on-primary-container")
-    
-    val colorSecondary = CssVar("--emarsys-color-secondary")
-    val colorOnSecondary = CssVar("--emarsys-color-on-secondary")
-    val colorSecondaryContainer = CssVar("--emarsys-color-secondary-container")
-    val colorOnSecondaryContainer = CssVar("--emarsys-color-on-secondary-container")
-    
-    val colorTertiary = CssVar("--emarsys-color-tertiary")
-    val colorOnTertiary = CssVar("--emarsys-color-on-tertiary")
-    val colorTertiaryContainer = CssVar("--emarsys-color-tertiary-container")
-    val colorOnTertiaryContainer = CssVar("--emarsys-color-on-tertiary-container")
-    
-    val colorError = CssVar("--emarsys-color-error")
-    val colorOnError = CssVar("--emarsys-color-on-error")
-    val colorErrorContainer = CssVar("--emarsys-color-error-container")
-    val colorOnErrorContainer = CssVar("--emarsys-color-on-error-container")
-    
-    val colorBackground = CssVar("--emarsys-color-background")
-    val colorOnBackground = CssVar("--emarsys-color-on-background")
-    val colorSurface = CssVar("--emarsys-color-surface")
-    val colorOnSurface = CssVar("--emarsys-color-on-surface")
-    val colorSurfaceVariant = CssVar("--emarsys-color-surface-variant")
-    val colorOnSurfaceVariant = CssVar("--emarsys-color-on-surface-variant")
-    
-    val colorSurfaceContainer = CssVar("--emarsys-color-surface-container")
-    val colorSurfaceContainerHigh = CssVar("--emarsys-color-surface-container-high")
-    val colorSurfaceContainerHighest = CssVar("--emarsys-color-surface-container-highest")
-    val colorSurfaceContainerLow = CssVar("--emarsys-color-surface-container-low")
-    val colorSurfaceContainerLowest = CssVar("--emarsys-color-surface-container-lowest")
-    val colorSurfaceDim = CssVar("--emarsys-color-surface-dim")
-    val colorSurfaceBright = CssVar("--emarsys-color-surface-bright")
-    val colorSurfaceTint = CssVar("--emarsys-color-surface-tint")
-    
-    val colorOutline = CssVar("--emarsys-color-outline")
-    val colorOutlineVariant = CssVar("--emarsys-color-outline-variant")
-    
-    val colorInverseSurface = CssVar("--emarsys-color-inverse-surface")
-    val colorInverseOnSurface = CssVar("--emarsys-color-inverse-on-surface")
-    val colorInversePrimary = CssVar("--emarsys-color-inverse-primary")
-    
-    val colorScrim = CssVar("--emarsys-color-scrim")
+internal object CssColorVars {
+    val colorPrimary = CssColorVar("--emarsys-color-primary")
+    val colorOnPrimary = CssColorVar("--emarsys-color-on-primary")
+    val colorPrimaryContainer = CssColorVar("--emarsys-color-primary-container")
+    val colorOnPrimaryContainer = CssColorVar("--emarsys-color-on-primary-container")
 
-    val colorPrimaryFixed = CssVar("--emarsys-color-colorPrimaryFixed")
-    val colorPrimaryFixedDim = CssVar("--emarsys-color-colorPrimaryFixedDim")
-    val colorOnPrimaryFixed = CssVar("--emarsys-color-colorOnPrimaryFixed")
-    val colorOnPrimaryFixedVariant = CssVar("--emarsys-color-colorOnPrimaryFixedVariant")
-    val colorSecondaryFixed = CssVar("--emarsys-color-colorSecondaryFixed")
-    val colorSecondaryFixedDim = CssVar("--emarsys-color-colorSecondaryFixedDim")
-    val colorOnSecondaryFixed = CssVar("--emarsys-color-colorOnSecondaryFixed")
-    val colorOnSecondaryFixedVariant = CssVar("--emarsys-color-colorOnSecondaryFixedVariant")
-    val colorTertiaryFixed = CssVar("--emarsys-color-colorTertiaryFixed")
-    val colorTertiaryFixedDim = CssVar("--emarsys-color-colorTertiaryFixedDim")
-    val colorOnTertiaryFixed = CssVar("--emarsys-color-colorOnTertiaryFixed")
-    val colorOnTertiaryFixedVariant = CssVar("--emarsys-color-colorOnTertiaryFixedVariant")
-    
-    val fontSizeDisplayLarge = CssVar("--emarsys-font-size-display-large")
-    val fontSizeDisplayMedium = CssVar("--emarsys-font-size-display-medium")
-    val fontSizeDisplaySmall = CssVar("--emarsys-font-size-display-small")
-    val fontSizeHeadlineLarge = CssVar("--emarsys-font-size-headline-large")
-    val fontSizeHeadlineMedium = CssVar("--emarsys-font-size-headline-medium")
-    val fontSizeHeadlineSmall = CssVar("--emarsys-font-size-headline-small")
-    val fontSizeTitleLarge = CssVar("--emarsys-font-size-title-large")
-    val fontSizeTitleMedium = CssVar("--emarsys-font-size-title-medium")
-    val fontSizeTitleSmall = CssVar("--emarsys-font-size-title-small")
-    val fontSizeBodyLarge = CssVar("--emarsys-font-size-body-large")
-    val fontSizeBodyMedium = CssVar("--emarsys-font-size-body-medium")
-    val fontSizeBodySmall = CssVar("--emarsys-font-size-body-small")
-    val fontSizeLabelLarge = CssVar("--emarsys-font-size-label-large")
-    val fontSizeLabelMedium = CssVar("--emarsys-font-size-label-medium")
-    val fontSizeLabelSmall = CssVar("--emarsys-font-size-label-small")
+    val colorSecondary = CssColorVar("--emarsys-color-secondary")
+    val colorOnSecondary = CssColorVar("--emarsys-color-on-secondary")
+    val colorSecondaryContainer = CssColorVar("--emarsys-color-secondary-container")
+    val colorOnSecondaryContainer = CssColorVar("--emarsys-color-on-secondary-container")
+
+    val colorTertiary = CssColorVar("--emarsys-color-tertiary")
+    val colorOnTertiary = CssColorVar("--emarsys-color-on-tertiary")
+    val colorTertiaryContainer = CssColorVar("--emarsys-color-tertiary-container")
+    val colorOnTertiaryContainer = CssColorVar("--emarsys-color-on-tertiary-container")
+
+    val colorError = CssColorVar("--emarsys-color-error")
+    val colorOnError = CssColorVar("--emarsys-color-on-error")
+    val colorErrorContainer = CssColorVar("--emarsys-color-error-container")
+    val colorOnErrorContainer = CssColorVar("--emarsys-color-on-error-container")
+
+    val colorBackground = CssColorVar("--emarsys-color-background")
+    val colorOnBackground = CssColorVar("--emarsys-color-on-background")
+    val colorSurface = CssColorVar("--emarsys-color-surface")
+    val colorOnSurface = CssColorVar("--emarsys-color-on-surface")
+    val colorSurfaceVariant = CssColorVar("--emarsys-color-surface-variant")
+    val colorOnSurfaceVariant = CssColorVar("--emarsys-color-on-surface-variant")
+
+    val colorSurfaceContainer = CssColorVar("--emarsys-color-surface-container")
+    val colorSurfaceContainerHigh = CssColorVar("--emarsys-color-surface-container-high")
+    val colorSurfaceContainerHighest = CssColorVar("--emarsys-color-surface-container-highest")
+    val colorSurfaceContainerLow = CssColorVar("--emarsys-color-surface-container-low")
+    val colorSurfaceContainerLowest = CssColorVar("--emarsys-color-surface-container-lowest")
+    val colorSurfaceDim = CssColorVar("--emarsys-color-surface-dim")
+    val colorSurfaceBright = CssColorVar("--emarsys-color-surface-bright")
+    val colorSurfaceTint = CssColorVar("--emarsys-color-surface-tint")
+
+    val colorOutline = CssColorVar("--emarsys-color-outline")
+    val colorOutlineVariant = CssColorVar("--emarsys-color-outline-variant")
+
+    val colorInverseSurface = CssColorVar("--emarsys-color-inverse-surface")
+    val colorInverseOnSurface = CssColorVar("--emarsys-color-inverse-on-surface")
+    val colorInversePrimary = CssColorVar("--emarsys-color-inverse-primary")
+
+    val colorScrim = CssColorVar("--emarsys-color-scrim")
+
+    val colorPrimaryFixed = CssColorVar("--emarsys-color-colorPrimaryFixed")
+    val colorPrimaryFixedDim = CssColorVar("--emarsys-color-colorPrimaryFixedDim")
+    val colorOnPrimaryFixed = CssColorVar("--emarsys-color-colorOnPrimaryFixed")
+    val colorOnPrimaryFixedVariant = CssColorVar("--emarsys-color-colorOnPrimaryFixedVariant")
+    val colorSecondaryFixed = CssColorVar("--emarsys-color-colorSecondaryFixed")
+    val colorSecondaryFixedDim = CssColorVar("--emarsys-color-colorSecondaryFixedDim")
+    val colorOnSecondaryFixed = CssColorVar("--emarsys-color-colorOnSecondaryFixed")
+    val colorOnSecondaryFixedVariant = CssColorVar("--emarsys-color-colorOnSecondaryFixedVariant")
+    val colorTertiaryFixed = CssColorVar("--emarsys-color-colorTertiaryFixed")
+    val colorTertiaryFixedDim = CssColorVar("--emarsys-color-colorTertiaryFixedDim")
+    val colorOnTertiaryFixed = CssColorVar("--emarsys-color-colorOnTertiaryFixed")
+    val colorOnTertiaryFixedVariant = CssColorVar("--emarsys-color-colorOnTertiaryFixedVariant")
+}
+
+internal object CssFontVars {
+    var fontSizeDisplayLarge: CSSNumeric = DefaultFontVars.fontSizeDisplayLarge
+    var fontSizeDisplayMedium: CSSNumeric = DefaultFontVars.fontSizeDisplayMedium
+    var fontSizeDisplaySmall: CSSNumeric = DefaultFontVars.fontSizeDisplaySmall
+    var fontSizeHeadlineLarge: CSSNumeric = DefaultFontVars.fontSizeHeadlineLarge
+    var fontSizeHeadlineMedium: CSSNumeric = DefaultFontVars.fontSizeHeadlineMedium
+    var fontSizeHeadlineSmall: CSSNumeric = DefaultFontVars.fontSizeHeadlineSmall
+    var fontSizeTitleLarge: CSSNumeric = DefaultFontVars.fontSizeTitleLarge
+    var fontSizeTitleMedium: CSSNumeric = DefaultFontVars.fontSizeTitleMedium
+    var fontSizeTitleSmall: CSSNumeric = DefaultFontVars.fontSizeTitleSmall
+    var fontSizeBodyLarge: CSSNumeric = DefaultFontVars.fontSizeBodyLarge
+    var fontSizeBodyMedium: CSSNumeric = DefaultFontVars.fontSizeBodyMedium
+    var fontSizeBodySmall: CSSNumeric = DefaultFontVars.fontSizeBodySmall
+    var fontSizeLabelLarge: CSSNumeric = DefaultFontVars.fontSizeLabelLarge
+    var fontSizeLabelMedium: CSSNumeric = DefaultFontVars.fontSizeLabelMedium
+    var fontSizeLabelSmall: CSSNumeric = DefaultFontVars.fontSizeLabelSmall
+}
+
+internal object DefaultFontVars {
+    val fontSizeDisplayLarge: CSSNumeric = 56.px
+    val fontSizeDisplayMedium: CSSNumeric = 44.px
+    val fontSizeDisplaySmall: CSSNumeric = 36.px
+    val fontSizeHeadlineLarge: CSSNumeric = 32.px
+    val fontSizeHeadlineMedium: CSSNumeric = 28.px
+    val fontSizeHeadlineSmall: CSSNumeric = 24.px
+    val fontSizeTitleLarge: CSSNumeric = 20.px
+    val fontSizeTitleMedium: CSSNumeric = 16.px
+    val fontSizeTitleSmall: CSSNumeric = 14.px
+    val fontSizeBodyLarge: CSSNumeric = 16.px
+    val fontSizeBodyMedium: CSSNumeric = 14.px
+    val fontSizeBodySmall: CSSNumeric = 12.px
+    val fontSizeLabelLarge: CSSNumeric = 14.px
+    val fontSizeLabelMedium: CSSNumeric = 12.px
+    val fontSizeLabelSmall: CSSNumeric = 10.px
 }

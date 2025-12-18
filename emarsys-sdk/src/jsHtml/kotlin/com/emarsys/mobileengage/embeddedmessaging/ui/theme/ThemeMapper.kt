@@ -2,6 +2,8 @@ package com.emarsys.mobileengage.embeddedmessaging.ui.theme
 
 import androidx.compose.runtime.Composable
 import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
+import com.emarsys.networking.clients.embedded.messaging.model.TextMetaData
+import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Style
 
 internal class ThemeMapper(private val embeddedMessagingContext: EmbeddedMessagingContextApi) {
@@ -9,6 +11,7 @@ internal class ThemeMapper(private val embeddedMessagingContext: EmbeddedMessagi
     @Composable
     fun generateThemeCSS() {
         val design = embeddedMessagingContext.metaData?.design
+        mapFontSizes(design?.text)
 
 //        if (design != null) {
 //            val colors = design.fillColor
@@ -89,7 +92,7 @@ internal class ThemeMapper(private val embeddedMessagingContext: EmbeddedMessagi
 //                }
 //            }
 //        } else {
-            generateDefaultThemeCSS()
+        generateDefaultThemeCSS()
 //        }
     }
 
@@ -102,71 +105,89 @@ internal class ThemeMapper(private val embeddedMessagingContext: EmbeddedMessagi
         fun generateDefaultThemeCSS() {
             Style {
                 ":root" style {
-                    setVar(CssVars.colorPrimary, "#526525")
-                    setVar(CssVars.colorOnPrimary, "#ffffff")
-                    setVar(CssVars.colorPrimaryContainer, "#9cbd4c")
-                    setVar(CssVars.colorOnPrimaryContainer, "#000000")
-                    setVar(CssVars.colorSecondary, "#365e2c")
-                    setVar(CssVars.colorOnSecondary, "#ffffff")
-                    setVar(CssVars.colorSecondaryContainer, "#DFE6C5")
-                    setVar(CssVars.colorOnSecondaryContainer, "#000000")
-                    setVar(CssVars.colorTertiary, "#6f6334")
-                    setVar(CssVars.colorOnTertiary, "#ffffff")
-                    setVar(CssVars.colorTertiaryContainer, "#b19f58")
-                    setVar(CssVars.colorOnTertiaryContainer, "#000000")
-                    setVar(CssVars.colorError, "#BA1A1A")
-                    setVar(CssVars.colorOnError, "#FFFFFF")
-                    setVar(CssVars.colorErrorContainer, "#FFDAD6")
-                    setVar(CssVars.colorOnErrorContainer, "#410002")
-                    setVar(CssVars.colorBackground, "#FDFCF6")
-                    setVar(CssVars.colorOnBackground, "#1B1C18")
-                    setVar(CssVars.colorSurface, "#FAFAEE")
-                    setVar(CssVars.colorOnSurface, "#1B1C18")
-                    setVar(CssVars.colorSurfaceVariant, "#EFEFE2")
-                    setVar(CssVars.colorOnSurfaceVariant, "#45483C")
-                    setVar(CssVars.colorSurfaceContainer, "#F0EFE8")
-                    setVar(CssVars.colorSurfaceContainerHigh, "#EAE9E2")
-                    setVar(CssVars.colorSurfaceContainerHighest, "#E4E3DD")
-                    setVar(CssVars.colorSurfaceContainerLow, "#F6F5EE")
-                    setVar(CssVars.colorSurfaceContainerLowest, "#FFFFFF")
-                    setVar(CssVars.colorSurfaceDim, "#DDD9D1")
-                    setVar(CssVars.colorSurfaceBright, "#FDFCF6")
-                    setVar(CssVars.colorOutline, "#ffffff")
-                    setVar(CssVars.colorOutlineVariant, "#30312C")
-                    setVar(CssVars.colorInverseSurface, "#F2F1E9")
-                    setVar(CssVars.colorInverseOnSurface, "#f9fbf4")
-                    setVar(CssVars.colorInversePrimary, "#000000")
-                    setVar(CssVars.colorScrim, "#526525")
-                    setVar(CssVars.colorSurfaceTint, "#526525")
-                    setVar(CssVars.colorPrimaryFixed, "#ffffff")
-                    setVar(CssVars.colorPrimaryFixedDim, "#e4edcf")
-                    setVar(CssVars.colorOnPrimaryFixed, "#000000")
-                    setVar(CssVars.colorOnPrimaryFixedVariant, "#151a0a")
-                    setVar(CssVars.colorSecondaryFixed, "#ffffff")
-                    setVar(CssVars.colorSecondaryFixedDim, "#d7ead2")
-                    setVar(CssVars.colorOnSecondaryFixed, "#000000")
-                    setVar(CssVars.colorOnSecondaryFixedVariant, "#0e190b")
-                    setVar(CssVars.colorTertiaryFixed, "#ffffff")
-                    setVar(CssVars.colorTertiaryFixedDim, "#eae5d2")
-                    setVar(CssVars.colorOnTertiaryFixed, "#000000")
-                    setVar(CssVars.colorOnTertiaryFixedVariant, "#19160b")
-                    setVar(CssVars.fontSizeDisplayLarge, "56px")
-                    setVar(CssVars.fontSizeDisplayMedium, "44px")
-                    setVar(CssVars.fontSizeDisplaySmall, "36px")
-                    setVar(CssVars.fontSizeHeadlineLarge, "32px")
-                    setVar(CssVars.fontSizeHeadlineMedium, "28px")
-                    setVar(CssVars.fontSizeHeadlineSmall, "24px")
-                    setVar(CssVars.fontSizeTitleLarge, "20px")
-                    setVar(CssVars.fontSizeTitleMedium, "16px")
-                    setVar(CssVars.fontSizeTitleSmall, "14px")
-                    setVar(CssVars.fontSizeBodyLarge, "16px")
-                    setVar(CssVars.fontSizeBodyMedium, "14px")
-                    setVar(CssVars.fontSizeBodySmall, "12px")
-                    setVar(CssVars.fontSizeLabelLarge, "14px")
-                    setVar(CssVars.fontSizeLabelMedium, "12px")
-                    setVar(CssVars.fontSizeLabelSmall, "10px")
+                    setVar(CssColorVars.colorPrimary, "#526525")
+                    setVar(CssColorVars.colorOnPrimary, "#ffffff")
+                    setVar(CssColorVars.colorPrimaryContainer, "#9cbd4c")
+                    setVar(CssColorVars.colorOnPrimaryContainer, "#000000")
+                    setVar(CssColorVars.colorSecondary, "#365e2c")
+                    setVar(CssColorVars.colorOnSecondary, "#ffffff")
+                    setVar(CssColorVars.colorSecondaryContainer, "#DFE6C5")
+                    setVar(CssColorVars.colorOnSecondaryContainer, "#000000")
+                    setVar(CssColorVars.colorTertiary, "#6f6334")
+                    setVar(CssColorVars.colorOnTertiary, "#ffffff")
+                    setVar(CssColorVars.colorTertiaryContainer, "#b19f58")
+                    setVar(CssColorVars.colorOnTertiaryContainer, "#000000")
+                    setVar(CssColorVars.colorError, "#BA1A1A")
+                    setVar(CssColorVars.colorOnError, "#FFFFFF")
+                    setVar(CssColorVars.colorErrorContainer, "#FFDAD6")
+                    setVar(CssColorVars.colorOnErrorContainer, "#410002")
+                    setVar(CssColorVars.colorBackground, "#FDFCF6")
+                    setVar(CssColorVars.colorOnBackground, "#1B1C18")
+                    setVar(CssColorVars.colorSurface, "#FAFAEE")
+                    setVar(CssColorVars.colorOnSurface, "#1B1C18")
+                    setVar(CssColorVars.colorSurfaceVariant, "#EFEFE2")
+                    setVar(CssColorVars.colorOnSurfaceVariant, "#45483C")
+                    setVar(CssColorVars.colorSurfaceContainer, "#F0EFE8")
+                    setVar(CssColorVars.colorSurfaceContainerHigh, "#EAE9E2")
+                    setVar(CssColorVars.colorSurfaceContainerHighest, "#E4E3DD")
+                    setVar(CssColorVars.colorSurfaceContainerLow, "#F6F5EE")
+                    setVar(CssColorVars.colorSurfaceContainerLowest, "#FFFFFF")
+                    setVar(CssColorVars.colorSurfaceDim, "#DDD9D1")
+                    setVar(CssColorVars.colorSurfaceBright, "#FDFCF6")
+                    setVar(CssColorVars.colorOutline, "#ffffff")
+                    setVar(CssColorVars.colorOutlineVariant, "#30312C")
+                    setVar(CssColorVars.colorInverseSurface, "#F2F1E9")
+                    setVar(CssColorVars.colorInverseOnSurface, "#f9fbf4")
+                    setVar(CssColorVars.colorInversePrimary, "#000000")
+                    setVar(CssColorVars.colorScrim, "#526525")
+                    setVar(CssColorVars.colorSurfaceTint, "#526525")
+                    setVar(CssColorVars.colorPrimaryFixed, "#ffffff")
+                    setVar(CssColorVars.colorPrimaryFixedDim, "#e4edcf")
+                    setVar(CssColorVars.colorOnPrimaryFixed, "#000000")
+                    setVar(CssColorVars.colorOnPrimaryFixedVariant, "#151a0a")
+                    setVar(CssColorVars.colorSecondaryFixed, "#ffffff")
+                    setVar(CssColorVars.colorSecondaryFixedDim, "#d7ead2")
+                    setVar(CssColorVars.colorOnSecondaryFixed, "#000000")
+                    setVar(CssColorVars.colorOnSecondaryFixedVariant, "#0e190b")
+                    setVar(CssColorVars.colorTertiaryFixed, "#ffffff")
+                    setVar(CssColorVars.colorTertiaryFixedDim, "#eae5d2")
+                    setVar(CssColorVars.colorOnTertiaryFixed, "#000000")
+                    setVar(CssColorVars.colorOnTertiaryFixedVariant, "#19160b")
                 }
             }
         }
+    }
+
+    private fun mapFontSizes(typography: TextMetaData?) {
+        CssFontVars.fontSizeDisplayLarge =
+            typography?.displayLargeFontSize?.toInt()?.px ?: DefaultFontVars.fontSizeDisplayLarge
+        CssFontVars.fontSizeDisplayMedium =
+            typography?.displayMediumFontSize?.toInt()?.px ?: DefaultFontVars.fontSizeDisplayMedium
+        CssFontVars.fontSizeDisplaySmall =
+            typography?.displaySmallFontSize?.toInt()?.px ?: DefaultFontVars.fontSizeDisplaySmall
+        CssFontVars.fontSizeHeadlineLarge =
+            typography?.headlineLargeFontSize?.toInt()?.px ?: DefaultFontVars.fontSizeHeadlineLarge
+        CssFontVars.fontSizeHeadlineMedium = typography?.headlineMediumFontSize?.toInt()?.px
+            ?: DefaultFontVars.fontSizeHeadlineMedium
+        CssFontVars.fontSizeHeadlineSmall =
+            typography?.headlineSmallFontSize?.toInt()?.px ?: DefaultFontVars.fontSizeHeadlineSmall
+        CssFontVars.fontSizeTitleLarge =
+            typography?.titleLargeFontSize?.toInt()?.px ?: DefaultFontVars.fontSizeTitleLarge
+        CssFontVars.fontSizeTitleMedium =
+            typography?.titleMediumFontSize?.toInt()?.px ?: DefaultFontVars.fontSizeTitleMedium
+        CssFontVars.fontSizeTitleSmall =
+            typography?.titleSmallFontSize?.toInt()?.px ?: DefaultFontVars.fontSizeTitleSmall
+        CssFontVars.fontSizeBodyLarge =
+            typography?.bodyLargeFontSize?.toInt()?.px ?: DefaultFontVars.fontSizeBodyLarge
+        CssFontVars.fontSizeBodyMedium =
+            typography?.bodyMediumFontSize?.toInt()?.px ?: DefaultFontVars.fontSizeBodyMedium
+        CssFontVars.fontSizeBodySmall =
+            typography?.bodySmallFontSize?.toInt()?.px ?: DefaultFontVars.fontSizeBodySmall
+        CssFontVars.fontSizeLabelLarge =
+            typography?.labelLargeFontSize?.toInt()?.px ?: DefaultFontVars.fontSizeLabelLarge
+        CssFontVars.fontSizeLabelMedium =
+            typography?.labelMediumFontSize?.toInt()?.px ?: DefaultFontVars.fontSizeLabelMedium
+        CssFontVars.fontSizeLabelSmall =
+            typography?.labelSmallFontSize?.toInt()?.px ?: DefaultFontVars.fontSizeLabelSmall
     }
 }

@@ -3,14 +3,12 @@ package com.emarsys.mobileengage.embeddedmessaging.ui.category
 import androidx.compose.runtime.Composable
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingStyleSheet
 import com.emarsys.mobileengage.embeddedmessaging.ui.translation.LocalStringResources
-import org.jetbrains.compose.web.css.paddingLeft
-import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 
 private const val FILTER_ALT_ICON_PATH =
-    "M4.25 5.61C6.27 8.2 10 13 10 13v6c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-6s3.72-4.8 5.74-7.39A1 1 0 0 0 18.95 4H5.04c-.83 0-1.3.95-.79 1.61z"
+    "M4.11084 5.54242C4.28224 5.20935 4.62542 5 5 5H19C19.3746 5 19.7178 5.20935 19.8892 5.54242C20.0606 5.87549 20.0315 6.27642 19.8137 6.58124L15 13.3205V17C15 17.3788 14.786 17.725 14.4472 17.8944L10.4472 19.8944C10.1372 20.0494 9.76909 20.0329 9.47427 19.8507C9.17946 19.6684 9 19.3466 9 19V13.3205L4.18627 6.58124C3.96855 6.27642 3.93943 5.87549 4.11084 5.54242ZM6.94319 7L10.8137 12.4188C10.9349 12.5884 11 12.7916 11 13V17.382L13 16.382V13C13 12.7916 13.0651 12.5884 13.1863 12.4188L17.0568 7H6.94319Z"
 
 @Composable
 fun CategorySelectorButton(
@@ -25,14 +23,12 @@ fun CategorySelectorButton(
             else EmbeddedMessagingStyleSheet.categorySelectorButtonInactive
         )
     }) {
+        Span {
+            Text(LocalStringResources.current.categoriesFilterButtonLabel)
+        }
         SvgIcon(
             path = FILTER_ALT_ICON_PATH,
             className = EmbeddedMessagingStyleSheet.categorySelectorIcon
         )
-        Span({
-            style { paddingLeft(8.px) }
-        }) {
-            Text(LocalStringResources.current.categoriesFilterButtonLabel)
-        }
     }
 }
