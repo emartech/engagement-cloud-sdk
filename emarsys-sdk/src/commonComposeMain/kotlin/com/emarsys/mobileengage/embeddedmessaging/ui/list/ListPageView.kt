@@ -120,7 +120,7 @@ private fun MessageList(viewModel: ListPageViewModelApi) {
     val canShowDetailPane = windowSizeClass.isWidthAtLeastBreakpoint(400)
 
     BackHandler(enabled = selectedMessageViewModel != null) {
-        viewModel.clearSelection()
+        viewModel.clearMessageSelection()
         scope.launch {
             navigator.navigateTo(ListDetailPaneScaffoldRole.List)
         }
@@ -189,7 +189,7 @@ private fun MessageList(viewModel: ListPageViewModelApi) {
                                     messageViewModel,
                                     canShowDetailPane
                                 ) {
-                                    viewModel.clearSelection()
+                                    viewModel.clearMessageSelection()
                                     scope.launch {
                                         navigator.navigateTo(ListDetailPaneScaffoldRole.List)
                                     }
@@ -257,7 +257,7 @@ private fun rememberListPageViewModel(): ListPageViewModelApi {
 
     DisposableEffect(Unit) {
         onDispose {
-            viewModel.clearSelection()
+            viewModel.clearMessageSelection()
             viewModel.setFilterUnreadOnly(false)
             viewModel.setSelectedCategoryIds(emptySet())
         }

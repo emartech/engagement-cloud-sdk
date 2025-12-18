@@ -1,5 +1,6 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.list
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,25 +24,38 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxState
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemKey
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.DEFAULT_PADDING
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.FLOATING_ACTION_BUTTON_SIZE
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.MESSAGE_ITEM_IMAGE_SIZE
+import com.emarsys.mobileengage.embeddedmessaging.ui.item.DeleteMessageItemConfirmationDialog
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemView
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.list.placeholders.PlaceholderMessageList
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.LocalDesignValues
 import com.emarsys.mobileengage.embeddedmessaging.ui.translation.LocalStringResources
+import kotlinx.coroutines.launch
 
 private fun LazyPagingItems<MessageItemViewModelApi>.isIdleButEmpty(): Boolean =
     this.itemCount == 0 && this.loadState.isIdle && !this.loadState.hasError
@@ -75,6 +90,11 @@ fun MessageItemsListPane(
     val refreshErrorMessage = LocalStringResources.current.refreshErrorMessageText
     val failedToLoadMoreMessagesErrorMessage =
         LocalStringResources.current.failedToLoadMoreMessagesText
+
+    var messageToDelete by rememberSaveable { mutableStateOf<String?>(null) }
+    var dismissStateToReset by remember { mutableStateOf<SwipeToDismissBoxState?>(null) }
+
+    val scope = rememberCoroutineScope()
 
     EmbeddedMessagingTheme {
         LaunchedEffect(refreshError) {
@@ -137,11 +157,27 @@ fun MessageItemsListPane(
                                 key = lazyPagingMessageItems.itemKey { it.id }
                             ) { index ->
                                 lazyPagingMessageItems[index]?.let { messageViewModel ->
-                                    MessageItemView(
-                                        viewModel = messageViewModel,
-                                        isSelected = messageViewModel == selectedMessage,
-                                        onClick = { onMessageClick(messageViewModel) }
+                                    val dismissState = rememberSwipeToDismissBoxState(
+                                        initialValue = SwipeToDismissBoxValue.Settled,
+                                        positionalThreshold = { totalDistance -> totalDistance * 0.3f },
                                     )
+                                    SwipeToDismissBox(
+                                        state = dismissState,
+                                        enableDismissFromStartToEnd = false,
+                                        backgroundContent = {
+                                            DeleteMessageOnSwipeBox()
+                                        },
+                                        onDismiss = {
+                                            messageToDelete = messageViewModel.id
+                                            dismissStateToReset = dismissState
+                                        }
+                                    ) {
+                                        MessageItemView(
+                                            viewModel = messageViewModel,
+                                            isSelected = messageViewModel == selectedMessage,
+                                            onClick = { onMessageClick(messageViewModel) }
+                                        )
+                                    }
                                 }
                             }
 
@@ -155,8 +191,46 @@ fun MessageItemsListPane(
                 }
             }
         }
-    }
 
+        messageToDelete?.let {
+            DeleteMessageItemConfirmationDialog(
+                onDismiss = {
+                    messageToDelete = null
+                    scope.launch {
+                        dismissStateToReset?.snapTo(SwipeToDismissBoxValue.Settled)
+                        dismissStateToReset = null
+                    }
+                },
+                onConfirm = {
+                    messageToDelete = null
+                    dismissStateToReset = null
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun DeleteMessageOnSwipeBox() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(end = DEFAULT_PADDING),
+        contentAlignment = Alignment.CenterEnd
+    ) {
+        Box(
+            modifier = Modifier
+                .size(73.dp)
+                .background(MaterialTheme.colorScheme.error),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Delete,
+                contentDescription = LocalStringResources.current.deleteIconButtonAltText,
+                tint = MaterialTheme.colorScheme.onError
+            )
+        }
+    }
 }
 
 @Composable

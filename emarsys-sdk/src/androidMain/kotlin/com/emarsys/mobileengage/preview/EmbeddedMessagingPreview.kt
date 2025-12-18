@@ -254,7 +254,7 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
             Unit
         }
 
-        override fun clearSelection() {
+        override fun clearMessageSelection() {
             Unit
         }
 

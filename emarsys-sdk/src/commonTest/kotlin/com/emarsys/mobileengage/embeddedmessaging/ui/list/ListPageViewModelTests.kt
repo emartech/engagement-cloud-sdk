@@ -222,7 +222,7 @@ class ListPageViewModelTests {
         viewModel.selectedMessageId.value shouldBe "message-789"
         viewModel.selectedMessage.value shouldNotBe null
 
-        viewModel.clearSelection()
+        viewModel.clearMessageSelection()
         testDispatcher.scheduler.advanceUntilIdle()
 
         viewModel.selectedMessageId.value shouldBe null

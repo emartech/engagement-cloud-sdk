@@ -24,7 +24,7 @@ interface ListPageViewModelApi {
     fun setSelectedCategoryIds(categoryIds: Set<Int>)
 
     suspend fun selectMessage(messageViewModel: MessageItemViewModelApi, onShouldNavigate: suspend () -> Unit)
-    fun clearSelection()
+    fun clearMessageSelection()
 
     fun openCategorySelector()
     fun closeCategorySelector()

@@ -91,7 +91,7 @@ internal class ListPageViewModel(
         }
     }
 
-    override fun clearSelection() {
+    override fun clearMessageSelection() {
         _selectedMessageId.value = null
         cachedSelectedMessage = null
     }
