@@ -202,6 +202,7 @@ kotlin {
             dependsOn(commonMain)
             dependencies {
                 implementation(libs.compose.html.core)
+                implementation(libs.compose.html.svg)
             }
         }
 

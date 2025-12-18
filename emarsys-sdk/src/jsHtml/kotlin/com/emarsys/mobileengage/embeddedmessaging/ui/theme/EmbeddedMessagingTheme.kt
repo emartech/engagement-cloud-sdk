@@ -7,10 +7,13 @@ import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.translation.LocalStringResources
 import com.emarsys.mobileengage.embeddedmessaging.ui.translation.StringResources
 import com.emarsys.mobileengage.embeddedmessaging.ui.translation.TranslationMapper
-import org.jetbrains.compose.web.dom.Style
+import org.jetbrains.compose.web.css.Style
 
 @Composable
 fun EmbeddedMessagingTheme(content: @Composable () -> Unit) {
+    ThemeMapper.generateDefaultThemeCSS()
+    Style(EmbeddedMessagingStyleSheet)
+
     val embeddedMessagingContext: EmbeddedMessagingContextApi? = koin.getOrNull()
 
     embeddedMessagingContext?.let {
@@ -19,11 +22,6 @@ fun EmbeddedMessagingTheme(content: @Composable () -> Unit) {
         val translationMapper = TranslationMapper()
         val stringValues = translationMapper.map(it)
 
-        // Apply global CSS theme variables
-        Style {
-            themeMapper.generateThemeCSS()
-        }
-
         CompositionLocalProvider(
             LocalDesignValues provides designValues,
             LocalStringResources provides stringValues
@@ -31,11 +29,6 @@ fun EmbeddedMessagingTheme(content: @Composable () -> Unit) {
             content()
         }
     } ?: run {
-        // Default theme without context
-        Style {
-            ThemeMapper.generateDefaultThemeCSS()
-        }
-
         CompositionLocalProvider(
             LocalDesignValues provides EmbeddedMessagingDesignValues(),
             LocalStringResources provides StringResources()

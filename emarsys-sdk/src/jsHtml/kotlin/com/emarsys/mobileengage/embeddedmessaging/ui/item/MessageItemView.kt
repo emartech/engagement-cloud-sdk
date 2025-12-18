@@ -6,25 +6,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DEFAULT_PADDING
-import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MESSAGE_ITEM_IMAGE_SIZE
-import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.ZERO_PADDING
-import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
+import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingStyleSheet
 import kotlinx.browser.window
-import org.jetbrains.compose.web.css.AlignItems
-import org.jetbrains.compose.web.css.DisplayStyle
-import org.jetbrains.compose.web.css.FlexDirection
-import org.jetbrains.compose.web.css.JustifyContent
-import org.jetbrains.compose.web.css.alignItems
-import org.jetbrains.compose.web.css.display
-import org.jetbrains.compose.web.css.flex
-import org.jetbrains.compose.web.css.flexDirection
-import org.jetbrains.compose.web.css.fontSize
-import org.jetbrains.compose.web.css.height
-import org.jetbrains.compose.web.css.justifyContent
-import org.jetbrains.compose.web.css.padding
-import org.jetbrains.compose.web.css.px
-import org.jetbrains.compose.web.css.width
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Img
 import org.jetbrains.compose.web.dom.Span
@@ -34,7 +17,10 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
 @Composable
-fun MessageItemView(viewModel: MessageItemViewModelApi) {
+fun MessageItemView(
+    viewModel: MessageItemViewModelApi,
+    onClick: () -> Unit
+) {
     var imageDataUrl by remember { mutableStateOf<String?>(null) }
     val hasThumbnailImage = viewModel.imageUrl != null
 
@@ -51,68 +37,44 @@ fun MessageItemView(viewModel: MessageItemViewModelApi) {
         }
     }
 
-    EmbeddedMessagingTheme {
-        Div({
-            style {
-                display(DisplayStyle.Flex)
-                flexDirection(FlexDirection.Row)
-                alignItems(AlignItems.Center)
-                padding(DEFAULT_PADDING)
-            }
-        }) {
-            if (hasThumbnailImage) {
-                if (imageDataUrl != null) {
-                    Img(src = imageDataUrl!!, alt = viewModel.imageAltText ?: "") {
-                        style {
-                            width(MESSAGE_ITEM_IMAGE_SIZE)
-                            height(MESSAGE_ITEM_IMAGE_SIZE)
-                            property("object-fit", "cover")
-                        }
-                    }
-                } else {
-                    LoadingSpinner()
+    Div({
+        classes(EmbeddedMessagingStyleSheet.messageItem)
+        onClick { onClick() }
+    }) {
+        if (hasThumbnailImage) {
+            imageDataUrl?.let { url ->
+                Img(src = url, alt = viewModel.imageAltText ?: "") {
+                    classes(EmbeddedMessagingStyleSheet.messageItemImage)
                 }
-
-                Div({ style { padding(DEFAULT_PADDING) } })
-            }
+            } ?: LoadingSpinner()
 
             Div({
-                style {
-                    flex(1)
-                    padding(if (hasThumbnailImage) DEFAULT_PADDING else ZERO_PADDING)
-                }
-            }) {
-                Span({
-                    style {
-                        fontSize(16.px)
-                        property("color", "var(--color-on-surface)")
-                        display(DisplayStyle.Block)
-                    }
-                }) {
-                    Text(viewModel.title)
-                }
-                Span({
-                    style {
-                        fontSize(16.px)
-                        property("color", "var(--color-on-surface)")
-                        property("overflow", "hidden")
-                        property("text-overflow", "ellipsis")
-                        property("white-space", "nowrap")
-                        display(DisplayStyle.Block)
-                    }
-                }) {
-                    Text(viewModel.lead)
-                }
-            }
+                classes(EmbeddedMessagingStyleSheet.messageItemImageSpacer)
+            })
+        }
 
+        Div({
+            classes(
+                if (hasThumbnailImage) EmbeddedMessagingStyleSheet.messageItemContent
+                else EmbeddedMessagingStyleSheet.messageItemContentNoPadding
+            )
+        }) {
             Span({
-                style {
-                    fontSize(16.px)
-                    property("color", "var(--color-on-surface)")
-                }
+                classes(EmbeddedMessagingStyleSheet.messageItemTitle)
             }) {
-                Text(formatTimestamp(viewModel.receivedAt))
+                Text(viewModel.title)
             }
+            Span({
+                classes(EmbeddedMessagingStyleSheet.messageItemLead)
+            }) {
+                Text(viewModel.lead)
+            }
+        }
+
+        Span({
+            classes(EmbeddedMessagingStyleSheet.messageItemTimestamp)
+        }) {
+            Text(formatTimestamp(viewModel.receivedAt))
         }
     }
 }
@@ -120,14 +82,7 @@ fun MessageItemView(viewModel: MessageItemViewModelApi) {
 @Composable
 fun LoadingSpinner() {
     Div({
-        style {
-            width(MESSAGE_ITEM_IMAGE_SIZE)
-            height(MESSAGE_ITEM_IMAGE_SIZE)
-            display(DisplayStyle.Flex)
-            alignItems(AlignItems.Center)
-            justifyContent(JustifyContent.Center)
-            property("color", "var(--color-on-surface)")
-        }
+        classes(EmbeddedMessagingStyleSheet.loadingSpinner)
     }) {
         Text("...")
     }
@@ -150,7 +105,6 @@ private fun formatTimestamp(timestamp: Long): String {
 }
 
 private fun byteArrayToDataUrl(bytes: ByteArray): String {
-    // Convert ByteArray to base64 data URL
     val base64 = window.btoa(
         bytes.joinToString("") { (it.toInt() and 0xFF).toChar().toString() }
     )

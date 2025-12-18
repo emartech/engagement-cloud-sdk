@@ -50,6 +50,7 @@ uiBackhandler = "1.9.3"
 
 [libraries]
 compose-html-core = { module = "org.jetbrains.compose.html:html-core", version.ref = "compose-plugin" }
+compose-html-svg = { module = "org.jetbrains.compose.html:html-svg", version.ref = "compose-plugin" }
 sqlDelight-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqlDelight" }
 sqlDelight-native = { module = "app.cash.sqldelight:native-driver", version.ref = "sqlDelight" }
 sqlDelight-web = { module = "app.cash.sqldelight:web-worker-driver", version.ref = "sqlDelight" }
