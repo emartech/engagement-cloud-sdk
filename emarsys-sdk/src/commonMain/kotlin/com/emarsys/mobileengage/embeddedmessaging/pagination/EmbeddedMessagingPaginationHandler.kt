@@ -53,7 +53,11 @@ internal class EmbeddedMessagingPaginationHandler(
                             if (event.originId == paginationState.lastFetchMessagesId) {
                                 event.result.fold(
                                     onSuccess = { result ->
-                                        val response: MessagesResponse = (result as Response).body()
+                                        if (result !is Response) {
+                                            sdkLogger.debug("Response produced by this handler should be ignored.")
+                                            return@fold
+                                        }
+                                        val response: MessagesResponse = result.body()
                                         paginationState.top = response.top
                                         val received = response.messages.size
                                         paginationState.receivedCount += received
@@ -72,12 +76,6 @@ internal class EmbeddedMessagingPaginationHandler(
                                         sdkLogger.error(
                                             "Failed to process embedded messages response",
                                             throwable
-                                        )
-                                        sdkEventManager.emitEvent(
-                                            SdkEvent.Internal.Sdk.Answer.Response<MessagesResponse>(
-                                                originId = event.originId,
-                                                result = Result.failure(throwable)
-                                            )
                                         )
                                     }
                                 )
