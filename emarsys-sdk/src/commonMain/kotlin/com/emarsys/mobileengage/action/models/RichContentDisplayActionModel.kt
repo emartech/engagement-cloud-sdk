@@ -5,9 +5,9 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-@SerialName("RichContentDisplayAction")
+@SerialName("RichContentDisplay")
 data class BasicRichContentDisplayActionModel(
-    override val reporting: String,
+    override val reporting: String = "{}",
     val url: String,
     val animation: EmbeddedMessageAnimation
 ) : BasicActionModel()
