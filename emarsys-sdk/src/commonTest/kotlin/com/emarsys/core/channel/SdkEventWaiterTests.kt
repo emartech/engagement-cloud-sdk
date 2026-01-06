@@ -10,6 +10,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -53,8 +54,8 @@ class SdkEventWaiterTests {
             val testWaiter = SdkEventWaiter(mockSdkEventDistributor, sdkEvent, mockConnectionStatus)
 
             backgroundScope.launch(start = CoroutineStart.UNDISPATCHED) {
-                val result = testWaiter.await<Result<Unit>>()
-                result.result shouldBe testEventResult
+                val actualResult = testWaiter.await<Result<Unit>>()
+                actualResult shouldBe testAnswer
             }
 
             sharedFlow.emit(testAnswer)
@@ -86,6 +87,58 @@ class SdkEventWaiterTests {
 
             sharedFlow.emit(testAnswer2)
 
+            sharedFlow.emit(testAnswer)
+        }
+
+    @Test
+    fun await_shouldReturn_answerResponse_whenAMatchingEvent_withTheSpecifiedClass_IsEmitted_andConnectionStatus_isTrue() =
+        runTest {
+            sdkEvent = SdkEvent.Internal.Sdk.AppStart(id = ORIGIN_ID_1)
+
+            val testAnswer = SdkEvent.Internal.Sdk.Answer.Response(
+                ORIGIN_ID_1,
+                Result.success("test string")
+            )
+
+            everySuspend { mockConnectionStatus.value } returns true
+            everySuspend { mockSdkEventDistributor.sdkEventFlow } returns sharedFlow
+
+            val testWaiter = SdkEventWaiter(mockSdkEventDistributor, sdkEvent, mockConnectionStatus)
+
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+                val actualResult = testWaiter.await(String::class)
+                actualResult shouldBe testAnswer
+            }
+
+            sharedFlow.emit(testAnswer)
+        }
+
+    @Test
+    fun await_shouldReturn_answerResponse_whenAMatchingEvent_withTheSpecifiedClass_andIgnoreDifferentClass_IsEmitted_andConnectionStatus_isTrue() =
+        runTest {
+            sdkEvent = SdkEvent.Internal.Sdk.AppStart(id = ORIGIN_ID_1)
+
+            val testAnswerWithDifferentResultClass = SdkEvent.Internal.Sdk.Answer.Response(
+                ORIGIN_ID_1,
+                Result.success(12345)
+            )
+
+            val testAnswer = SdkEvent.Internal.Sdk.Answer.Response(
+                ORIGIN_ID_1,
+                Result.success("test string")
+            )
+
+            everySuspend { mockConnectionStatus.value } returns true
+            everySuspend { mockSdkEventDistributor.sdkEventFlow } returns sharedFlow
+
+            val testWaiter = SdkEventWaiter(mockSdkEventDistributor, sdkEvent, mockConnectionStatus)
+
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+                val actualResult = testWaiter.await(String::class)
+                actualResult shouldBe testAnswer
+            }
+
+            sharedFlow.emit(testAnswerWithDifferentResultClass)
             sharedFlow.emit(testAnswer)
         }
 

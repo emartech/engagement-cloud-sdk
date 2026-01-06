@@ -1,6 +1,8 @@
 package com.emarsys.mobileengage.embeddedmessaging.pagination
 
+import androidx.paging.PagingConfig
 import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.Logger
 import com.emarsys.core.util.DownloaderApi
@@ -174,6 +176,20 @@ class EmbeddedMessagingPagingSourceTests {
             mockListPageModel.fetchNextPage()
         }
         (result is PagingSource.LoadResult.Error) shouldBe false
+    }
+
+    @Test
+    fun testGetRefreshKey_should_return_0() = runTest {
+        val embeddedMessagingPagingSource = createEmbeddedMessagingPagingSource()
+
+        val result = embeddedMessagingPagingSource.getRefreshKey(PagingState(
+            pages = emptyList(),
+            anchorPosition = null,
+            config = PagingConfig(pageSize = 20),
+            leadingPlaceholderCount = 0
+        ))
+
+        result shouldBe 0
     }
 
 }

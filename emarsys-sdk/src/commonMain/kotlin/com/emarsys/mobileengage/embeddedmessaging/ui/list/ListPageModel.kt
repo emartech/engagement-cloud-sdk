@@ -5,11 +5,9 @@ import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.body
 import com.emarsys.event.SdkEvent
-import com.emarsys.mobileengage.embeddedmessaging.exceptions.TooFrequentFetchMessagesRequestsException
 import com.emarsys.mobileengage.embeddedmessaging.pagination.EmbeddedMessagingPaginationHandlerApi
 import com.emarsys.networking.clients.embedded.messaging.model.BadgeCountResponse
 import com.emarsys.networking.clients.embedded.messaging.model.MessagesResponse
-import io.ktor.http.HttpStatusCode
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
@@ -30,23 +28,18 @@ internal class ListPageModel(
                 categoryIds = categoryIds,
                 filterUnreadMessages = filterUnreadOnly
             )
-            val messagesResponse = sdkEventDistributor.registerEvent(fetchMessagesEvent)
-            val response = messagesResponse.await<Response>()
+            val fetchMessagesResponse =
+                sdkEventDistributor.registerEvent(fetchMessagesEvent).await(MessagesResponse::class)
 
-            response.result.fold(
-                onSuccess = { networkResponse ->
-                    if (networkResponse.status == HttpStatusCode.NoContent) {
-                        Result.failure(TooFrequentFetchMessagesRequestsException("Too frequent FetchMessages request."))
-                    } else {
-                        val messagesResponse: MessagesResponse = networkResponse.body()
-                        Result.success(
-                            MessagesWithCategories(
-                                messagesResponse.meta.categories,
-                                messagesResponse.messages,
-                                isEndReached = embeddedMessagingPaginationHandler.isEndReached()
-                            )
+            fetchMessagesResponse.result.fold(
+                onSuccess = { messagesResponse ->
+                    Result.success(
+                        MessagesWithCategories(
+                            messagesResponse.meta.categories,
+                            messagesResponse.messages,
+                            isEndReached = embeddedMessagingPaginationHandler.isEndReached()
                         )
-                    }
+                    )
                 },
                 onFailure = {
                     sdkLogger.error("FetchMessagesWithCategories failure.", it)
@@ -87,11 +80,10 @@ internal class ListPageModel(
         return try {
             val nextPageResponse =
                 sdkEventDistributor.registerEvent(SdkEvent.Internal.EmbeddedMessaging.NextPage())
-            val response = nextPageResponse.await<Response>()
+                    .await(MessagesResponse::class)
 
-            response.result.fold(
-                onSuccess = { networkResponse ->
-                    val messagesResponse: MessagesResponse = networkResponse.body()
+            nextPageResponse.result.fold(
+                onSuccess = { messagesResponse ->
                     Result.success(
                         MessagesWithCategories(
                             messagesResponse.meta.categories,

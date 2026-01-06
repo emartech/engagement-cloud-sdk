@@ -49,7 +49,7 @@ internal class EmbeddedMessagingPaginationHandler(
                             paginationState.filterUnreadMessages = event.filterUnreadMessages
                         }
 
-                        is SdkEvent.Internal.Sdk.Answer.Response<*> -> { // TODO: handle concurrency with model
+                        is SdkEvent.Internal.Sdk.Answer.Response<*> -> {
                             if (event.originId == paginationState.lastFetchMessagesId) {
                                 event.result.fold(
                                     onSuccess = { result ->
@@ -61,11 +61,23 @@ internal class EmbeddedMessagingPaginationHandler(
                                             paginationState.endReached = true
                                             sdkLogger.debug("Can't fetch more messages, final page reached")
                                         }
+                                        sdkEventManager.emitEvent(
+                                            SdkEvent.Internal.Sdk.Answer.Response(
+                                                originId = event.originId,
+                                                result = Result.success(response)
+                                            )
+                                        )
                                     },
                                     onFailure = { throwable ->
                                         sdkLogger.error(
                                             "Failed to process embedded messages response",
                                             throwable
+                                        )
+                                        sdkEventManager.emitEvent(
+                                            SdkEvent.Internal.Sdk.Answer.Response<MessagesResponse>(
+                                                originId = event.originId,
+                                                result = Result.failure(throwable)
+                                            )
                                         )
                                     }
                                 )

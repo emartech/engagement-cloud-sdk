@@ -7,6 +7,7 @@ import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.event.SdkEvent
+import com.emarsys.networking.clients.embedded.messaging.model.MessagesResponse
 import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -117,7 +118,7 @@ class EmbeddedMessagingPaginationHandlerTest {
     }
 
     @Test
-    fun testConsume_fetchMessages_shouldUpdateState() = runTest {
+    fun testConsume_fetchMessages_shouldUpdateState_and_emit_result() = runTest {
         createPaginationHandler(backgroundScope).register()
 
         val fetch = SdkEvent.Internal.EmbeddedMessaging.FetchMessages(
@@ -128,6 +129,8 @@ class EmbeddedMessagingPaginationHandlerTest {
         val body = buildSuccessBody(top = 3, count = 3)
         val resp = response(fetch.id, body)
 
+        val expectedResponse: MessagesResponse = JsonUtil.json.decodeFromString(body)
+
         flow.emit(fetch)
         flow.emit(resp)
 
@@ -136,6 +139,14 @@ class EmbeddedMessagingPaginationHandlerTest {
         state.top shouldBe 3
         state.receivedCount shouldBe 3
         state.endReached shouldBe false
+        verifySuspend {
+            mockManager.emitEvent(
+                SdkEvent.Internal.Sdk.Answer.Response(
+                    originId = fetch.id,
+                    result = Result.success(expectedResponse)
+                )
+            )
+        }
     }
 
     @Test

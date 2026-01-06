@@ -66,9 +66,6 @@ internal class EmbeddedMessagingPagingSource(
     }
 
     override fun getRefreshKey(state: PagingState<Int, MessageItemViewModelApi>): Int? {
-        return state.anchorPosition?.let {
-            state.closestPageToPosition(it)?.prevKey?.plus(1)
-                ?: state.closestPageToPosition(it)?.nextKey?.minus(1) ?: 0
-        }
+        return 0
     }
 }

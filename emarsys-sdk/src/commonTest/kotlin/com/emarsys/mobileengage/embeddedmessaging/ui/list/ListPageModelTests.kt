@@ -6,13 +6,11 @@ import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.event.SdkEvent
-import com.emarsys.mobileengage.embeddedmessaging.exceptions.TooFrequentFetchMessagesRequestsException
 import com.emarsys.mobileengage.embeddedmessaging.pagination.EmbeddedMessagingPaginationHandlerApi
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
 import com.emarsys.networking.clients.embedded.messaging.model.MessageCategory
 import com.emarsys.networking.clients.embedded.messaging.model.MessagesResponse
 import com.emarsys.networking.clients.embedded.messaging.model.Meta
-import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
@@ -27,7 +25,6 @@ import dev.mokkery.verify
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import io.kotest.matchers.types.shouldBeInstanceOf
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
@@ -42,7 +39,6 @@ class ListPageModelTests {
     private lateinit var mockSdkEventWaiter: SdkEventWaiterApi
     private lateinit var mockSdkLogger: Logger
     private lateinit var model: ListPageModel
-    private val json = JsonUtil.json
 
     @BeforeTest
     fun setup() {
@@ -61,18 +57,11 @@ class ListPageModelTests {
     fun fetchMessagesWithCategories_shouldSendFetchMessagesEvent_andReturnsMessagesWithCategoriesResult_onSuccess() =
         runTest {
             val messagesResponse = createTestMessageResponse()
-
-            val networkResponse = Response(
-                originalRequest = UrlRequest(Url("https://example.com"), HttpMethod.Get),
-                status = HttpStatusCode.OK,
-                headers = headersOf(),
-                bodyAsText = json.encodeToString(messagesResponse)
-            )
             val answerResponse = SdkEvent.Internal.Sdk.Answer.Response(
                 originId = "test-id",
-                result = Result.success(networkResponse)
+                result = Result.success(messagesResponse)
             )
-            everySuspend { mockSdkEventWaiter.await<Response>() } returns answerResponse
+            everySuspend { mockSdkEventWaiter.await(MessagesResponse::class) } returns answerResponse
             everySuspend { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMessages>()) } returns mockSdkEventWaiter
             every { mockEmbeddedMessagingPaginationHandler.isEndReached() } returns false
 
@@ -80,43 +69,19 @@ class ListPageModelTests {
 
             result.messages shouldBe messagesResponse.messages
             result.categories shouldBe messagesResponse.meta.categories
-            verify{ mockEmbeddedMessagingPaginationHandler.isEndReached() }
+            verify { mockEmbeddedMessagingPaginationHandler.isEndReached() }
             result.isEndReached shouldBe false
-        }
-
-    @Test
-    fun fetchMessagesWithCategories_shouldReturnFailureResult_whenFetchMessagesResultIsHttp204() =
-        runTest {
-            val networkResponse = Response(
-                originalRequest = UrlRequest(Url("https://example.com"), HttpMethod.Get),
-                status = HttpStatusCode.NoContent,
-                headers = headersOf(),
-                bodyAsText = ""
-            )
-            val answerResponse = SdkEvent.Internal.Sdk.Answer.Response(
-                originId = "test-id",
-                result = Result.success(networkResponse)
-            )
-
-            everySuspend { mockSdkEventWaiter.await<Response>() } returns answerResponse
-            everySuspend { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMessages>()) } returns mockSdkEventWaiter
-
-            val result = model.fetchMessagesWithCategories(false, emptyList())
-
-            result.isFailure shouldBe true
-            result.exceptionOrNull().shouldBeInstanceOf<TooFrequentFetchMessagesRequestsException>()
-            result.exceptionOrNull()?.message shouldBe "Too frequent FetchMessages request."
         }
 
     @Test
     fun fetchMessagesWithCategories_shouldReturnFailureResult_whenResponseFails() = runTest {
         val testException = Exception("Network error")
-        val answerResponse = SdkEvent.Internal.Sdk.Answer.Response<Response>(
+        val answerResponse = SdkEvent.Internal.Sdk.Answer.Response<MessagesResponse>(
             originId = "test-id",
             result = Result.failure(testException)
         )
 
-        everySuspend { mockSdkEventWaiter.await<Response>() } returns answerResponse
+        everySuspend { mockSdkEventWaiter.await(MessagesResponse::class) } returns answerResponse
         everySuspend { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMessages>()) } returns mockSdkEventWaiter
 
         val result = model.fetchMessagesWithCategories(false, emptyList())
@@ -196,42 +161,36 @@ class ListPageModelTests {
 
     @Test
     fun fetchNextPage_shouldSendNextPageEvent_andReturnResult_onSuccess() = runTest {
-        val response = createTestMessageResponse()
-        val networkResponse = Response(
-            originalRequest = UrlRequest(Url("https://example.com"), HttpMethod.Get),
-            status = HttpStatusCode.OK,
-            headers = headersOf(),
-            bodyAsText = json.encodeToString(response)
-        )
+        val messagesResponse = createTestMessageResponse()
         val answerResponse = SdkEvent.Internal.Sdk.Answer.Response(
             originId = "test-id",
-            result = Result.success(networkResponse)
+            result = Result.success(messagesResponse)
         )
 
-        everySuspend { mockSdkEventWaiter.await<Response>() } returns answerResponse
+        everySuspend { mockSdkEventWaiter.await(MessagesResponse::class) } returns answerResponse
         everySuspend { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.NextPage>()) } returns mockSdkEventWaiter
         every { mockEmbeddedMessagingPaginationHandler.isEndReached() } returns false
 
         val result = model.fetchNextPage().getOrThrow()
 
         result.messages.size shouldBe 2
-        result.messages shouldBe response.messages
+        result.messages shouldBe messagesResponse.messages
 
         result.categories.size shouldBe 2
-        result.categories shouldBe response.meta.categories
-        verify{ mockEmbeddedMessagingPaginationHandler.isEndReached() }
+        result.categories shouldBe messagesResponse.meta.categories
+        verify { mockEmbeddedMessagingPaginationHandler.isEndReached() }
         result.isEndReached shouldBe false
     }
 
     @Test
     fun fetchNextPage_shouldReturnFailureResult_onFailure() = runTest {
         val testException = Exception("Network error")
-        val answerResponse = SdkEvent.Internal.Sdk.Answer.Response<Response>(
+        val answerResponse = SdkEvent.Internal.Sdk.Answer.Response<MessagesResponse>(
             originId = "test-id",
             result = Result.failure(testException)
         )
 
-        everySuspend { mockSdkEventWaiter.await<Response>() } returns answerResponse
+        everySuspend { mockSdkEventWaiter.await(MessagesResponse::class) } returns answerResponse
         everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mockSdkEventWaiter
 
         val result = model.fetchNextPage()
@@ -257,18 +216,18 @@ class ListPageModelTests {
     @Test
     fun fetchMessagesWithCategories_shouldSendFetchMessagesEvent_withFilterUnreadMessagesFalse_whenFilterUnreadOnlyIsFalse() =
         runTest {
-            val networkResponse = Response(
-                originalRequest = UrlRequest(Url("https://example.com"), HttpMethod.Get),
-                status = HttpStatusCode.OK,
-                headers = headersOf(),
-                bodyAsText = """{"version":"1.0","top":10,"meta":{"categories":[]},"messages":[]}"""
+            val messagesResponse = MessagesResponse(
+                "1.0",
+                10,
+                Meta(emptyList()),
+                emptyList(),
             )
             val answerResponse = SdkEvent.Internal.Sdk.Answer.Response(
                 originId = "test-id",
-                result = Result.success(networkResponse)
+                result = Result.success(messagesResponse)
             )
 
-            everySuspend { mockSdkEventWaiter.await<Response>() } returns answerResponse
+            everySuspend { mockSdkEventWaiter.await(MessagesResponse::class) } returns answerResponse
 
             val capturedEvent = slot<SdkEvent.Internal.EmbeddedMessaging.FetchMessages>()
             everySuspend {
@@ -285,18 +244,24 @@ class ListPageModelTests {
     fun fetchMessagesWithCategories_shouldSendFetchMessagesEvent_withFilterUnreadMessagesTrue_whenFilterUnreadOnlyIsTrue() =
         runTest {
             val expectedCategoryIds = listOf(1, 2, 3)
-            val networkResponse = Response(
-                originalRequest = UrlRequest(Url("https://example.com"), HttpMethod.Get),
-                status = HttpStatusCode.OK,
-                headers = headersOf(),
-                bodyAsText = """{"version":"1.0","top":10,"meta":{"categories":[]},"messages":[]}"""
+            val messagesResponse = MessagesResponse(
+                "1.0",
+                10,
+                Meta(
+                    listOf(
+                        MessageCategory(1, "cat1"),
+                        MessageCategory(2, "cat2"),
+                        MessageCategory(3, "cat3")
+                    )
+                ),
+                emptyList(),
             )
             val answerResponse = SdkEvent.Internal.Sdk.Answer.Response(
                 originId = "test-id",
-                result = Result.success(networkResponse)
+                result = Result.success(messagesResponse)
             )
 
-            everySuspend { mockSdkEventWaiter.await<Response>() } returns answerResponse
+            everySuspend { mockSdkEventWaiter.await(MessagesResponse::class) } returns answerResponse
 
             val capturedEvent = slot<SdkEvent.Internal.EmbeddedMessaging.FetchMessages>()
             everySuspend {
