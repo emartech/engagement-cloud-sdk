@@ -159,11 +159,13 @@ fun MessageItemsListPane(
                                 lazyPagingMessageItems[index]?.let { messageViewModel ->
                                     val dismissState = rememberSwipeToDismissBoxState(
                                         initialValue = SwipeToDismissBoxValue.Settled,
-                                        positionalThreshold = { totalDistance -> totalDistance * 0.3f },
+                                        positionalThreshold = { totalDistance -> totalDistance * 0.3f }
                                     )
+
                                     SwipeToDismissBox(
                                         state = dismissState,
                                         enableDismissFromStartToEnd = false,
+                                        enableDismissFromEndToStart = selectedMessage == null,
                                         backgroundContent = {
                                             DeleteMessageOnSwipeBox()
                                         },
@@ -174,7 +176,7 @@ fun MessageItemsListPane(
                                     ) {
                                         MessageItemView(
                                             viewModel = messageViewModel,
-                                            isSelected = messageViewModel == selectedMessage,
+                                            isSelected = messageViewModel.id == selectedMessage?.id,
                                             onClick = { onMessageClick(messageViewModel) }
                                         )
                                     }

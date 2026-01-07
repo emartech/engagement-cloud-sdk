@@ -32,6 +32,7 @@ import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
+import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -115,12 +116,18 @@ private fun MessageList(viewModel: ListPageViewModelApi) {
     }
 
     val navigator = rememberListDetailPaneScaffoldNavigator<String>()
+
+    LaunchedEffect(navigator.scaffoldValue[ListDetailPaneScaffoldRole.Detail]) {
+        if (navigator.scaffoldValue[ListDetailPaneScaffoldRole.Detail] == PaneAdaptedValue.Hidden) {
+            viewModel.clearMessageSelection()
+        }
+    }
+
     val scope = rememberCoroutineScope()
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val canShowDetailPane = windowSizeClass.isWidthAtLeastBreakpoint(400)
 
     BackHandler(enabled = selectedMessageViewModel != null) {
-        viewModel.clearMessageSelection()
         scope.launch {
             navigator.navigateTo(ListDetailPaneScaffoldRole.List)
         }
@@ -189,7 +196,6 @@ private fun MessageList(viewModel: ListPageViewModelApi) {
                                     messageViewModel,
                                     canShowDetailPane
                                 ) {
-                                    viewModel.clearMessageSelection()
                                     scope.launch {
                                         navigator.navigateTo(ListDetailPaneScaffoldRole.List)
                                     }
