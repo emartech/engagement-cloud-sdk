@@ -13,8 +13,10 @@ import com.emarsys.mobileengage.action.actions.DismissAction
 import com.emarsys.mobileengage.action.actions.OpenExternalUrlAction
 import com.emarsys.mobileengage.action.actions.ReportingAction
 import com.emarsys.mobileengage.action.actions.RequestPushPermissionAction
+import com.emarsys.mobileengage.action.actions.RichContentDisplayAction
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.AppEventActionModel
+import com.emarsys.mobileengage.action.models.BasicRichContentDisplayActionModel
 import com.emarsys.mobileengage.action.models.CopyToClipboardActionModel
 import com.emarsys.mobileengage.action.models.CustomEventActionModel
 import com.emarsys.mobileengage.action.models.DismissActionModel
@@ -38,6 +40,7 @@ internal class EventActionFactory(
             is OpenExternalUrlActionModel -> OpenExternalUrlAction(action, externalUrlOpener)
             is ReportingActionModel -> ReportingAction(action, sdkEventDistributor)
             is CopyToClipboardActionModel -> CopyToClipboardAction(action, clipboardHandler)
+            is BasicRichContentDisplayActionModel -> RichContentDisplayAction(action)
             else -> {
                 val exception = IllegalArgumentException("Unknown action type: $action")
                 sdkLogger.error("EventActionFactory", exception)

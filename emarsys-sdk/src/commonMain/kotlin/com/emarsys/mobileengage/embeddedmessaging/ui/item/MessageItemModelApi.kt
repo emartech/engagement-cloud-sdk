@@ -9,6 +9,6 @@ interface MessageItemModelApi {
     suspend fun updateTagsForMessage(tag: String, operation: TagOperation): Boolean
     fun isUnread(): Boolean
     fun isPinned(): Boolean
-    fun hasDefaultAction(): Boolean
+    fun shouldNavigate(): Boolean
     suspend fun handleDefaultAction()
 }

@@ -6,6 +6,7 @@ import com.emarsys.core.util.DownloaderApi
 import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.action.models.BasicRichContentDisplayActionModel
 import com.emarsys.mobileengage.embeddedmessaging.models.MessageTagUpdate
 import com.emarsys.mobileengage.embeddedmessaging.models.TagOperation
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Image.BASE64_PLACEHOLDER_IMAGE
@@ -68,8 +69,8 @@ internal class MessageItemModel(
         return message.tags.map { it.lowercase() }.contains(PINNED_TAG)
     }
 
-    override fun hasDefaultAction(): Boolean {
-        return message.defaultAction != null
+    override fun shouldNavigate(): Boolean {
+        return message.defaultAction is BasicRichContentDisplayActionModel
     }
 
     override suspend fun handleDefaultAction() {

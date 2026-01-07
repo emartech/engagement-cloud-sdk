@@ -78,7 +78,7 @@ internal class ListPageViewModel(
 
     override suspend fun selectMessage(
         messageViewModel: MessageItemViewModelApi,
-        onShouldNavigate: suspend () -> Unit
+        onNavigate: suspend () -> Unit
     ) {
         cachedSelectedMessage = messageViewModel
         _selectedMessageId.value = messageViewModel.id
@@ -86,8 +86,8 @@ internal class ListPageViewModel(
         messageViewModel.tagMessageRead()
         messageViewModel.handleDefaultAction()
 
-        if (messageViewModel.hasDefaultAction()) {
-            onShouldNavigate.invoke()
+        if (messageViewModel.shouldNavigate()) {
+            onNavigate.invoke()
         }
     }
 

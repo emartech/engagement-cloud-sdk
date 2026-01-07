@@ -10,10 +10,12 @@ import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.actions.Action
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
+import com.emarsys.mobileengage.action.models.BasicRichContentDisplayActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.embeddedmessaging.models.TagOperation
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
+import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessageAnimation
 import com.emarsys.networking.clients.embedded.messaging.model.ListThumbnailImage
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -53,9 +55,14 @@ class MessageItemModelTests {
             properties = emptyMap(),
             trackingInfo = "anything"
         )
-        val FALLBACK_IMAGE_BYTEARRAY = Base64.decode(EmbeddedMessagingConstants.Image.BASE64_PLACEHOLDER_IMAGE
-            .encodeToByteArray())
-        val TEST_ACTION = BasicOpenExternalUrlActionModel(url = "https://example.com")
+        val FALLBACK_IMAGE_BYTEARRAY = Base64.decode(
+            EmbeddedMessagingConstants.Image.BASE64_PLACEHOLDER_IMAGE
+                .encodeToByteArray()
+        )
+        val TEST_ACTION = BasicRichContentDisplayActionModel(
+            url = "https://example.com",
+            animation = EmbeddedMessageAnimation.FADING_FROM_BOTTOM
+        )
     }
 
     private lateinit var mockDownloader: DownloaderApi
@@ -86,7 +93,8 @@ class MessageItemModelTests {
     @Ignore
     @Test
     fun downloadImage_shouldReturn_Null_when_ImageUrlIsMissing() = runTest {
-        val result = createMessageItemModel(TEST_MESSAGE.copy(listThumbnailImage = null)).downloadImage()
+        val result =
+            createMessageItemModel(TEST_MESSAGE.copy(listThumbnailImage = null)).downloadImage()
 
         result shouldBe null
         verifySuspend(VerifyMode.exactly(0)) { mockDownloader.download(any()) }
@@ -224,11 +232,24 @@ class MessageItemModelTests {
     }
 
     @Test
-    fun hasDefaultAction_shouldReturnTrue_whenMessageHasADefaultAction() = runTest {
-        val model = createMessageItemModel(TEST_MESSAGE.copy(defaultAction = TEST_ACTION))
+    fun shouldNavigate_shouldReturnTrue_whenMessageContainsRichContentDisplayActionAsDefaultAction() =
+        runTest {
+            val model = createMessageItemModel(TEST_MESSAGE.copy(defaultAction = TEST_ACTION))
 
-        model.hasDefaultAction() shouldBe true
-    }
+            model.shouldNavigate() shouldBe true
+        }
+
+    @Test
+    fun shouldNavigate_shouldReturnFalse_whenDefaultActionIsNotRichContentDisplayAction() =
+        runTest {
+            val model = createMessageItemModel(
+                TEST_MESSAGE.copy(
+                    defaultAction = BasicOpenExternalUrlActionModel(url = "https://example.com")
+                )
+            )
+
+            model.shouldNavigate() shouldBe false
+        }
 
     @Test
     fun handleDefaultAction_shouldCreateActionWithFactory_andInvoke() = runTest {

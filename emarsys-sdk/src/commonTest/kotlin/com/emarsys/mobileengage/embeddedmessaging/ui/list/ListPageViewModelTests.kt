@@ -172,10 +172,10 @@ class ListPageViewModelTests {
     }
 
     @Test
-    fun testSelectMessage_shouldUpdateSelectedMessageIdAndCache_withoutNavigationWhenNoDefaultAction() = runTest {
+    fun testSelectMessage_shouldUpdateSelectedMessageIdAndCache_withoutNavigation() = runTest {
         val mockMessageViewModel = mock<com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi>(MockMode.autofill)
         every { mockMessageViewModel.id } returns "message-123"
-        every { mockMessageViewModel.hasDefaultAction() } returns false
+        every { mockMessageViewModel.shouldNavigate() } returns false
 
         viewModel.selectedMessageId.value shouldBe null
         viewModel.selectedMessage.value shouldBe null
@@ -193,10 +193,10 @@ class ListPageViewModelTests {
     }
 
     @Test
-    fun testSelectMessage_shouldCallNavigationCallback_whenMessageHasDefaultAction() = runTest {
+    fun testSelectMessage_shouldCallNavigationCallback_whenMessageShouldNavigateToDetailView() = runTest {
         val mockMessageViewModel = mock<com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi>(MockMode.autofill)
         every { mockMessageViewModel.id } returns "message-456"
-        every { mockMessageViewModel.hasDefaultAction() } returns true
+        every { mockMessageViewModel.shouldNavigate() } returns true
 
         var navigationCalled = false
         viewModel.selectMessage(mockMessageViewModel) {
@@ -214,7 +214,7 @@ class ListPageViewModelTests {
     fun testClearSelection_shouldSetSelectedMessageIdAndCacheToNull() = runTest {
         val mockMessageViewModel = mock<com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi>(MockMode.autofill)
         every { mockMessageViewModel.id } returns "message-789"
-        every { mockMessageViewModel.hasDefaultAction() } returns false
+        every { mockMessageViewModel.shouldNavigate() } returns false
 
         viewModel.selectMessage(mockMessageViewModel) {}
         testDispatcher.scheduler.advanceUntilIdle()

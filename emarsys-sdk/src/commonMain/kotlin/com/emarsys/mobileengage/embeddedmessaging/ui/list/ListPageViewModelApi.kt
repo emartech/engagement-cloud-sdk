@@ -23,7 +23,7 @@ interface ListPageViewModelApi {
     fun setFilterUnreadOnly(unreadOnly: Boolean)
     fun setSelectedCategoryIds(categoryIds: Set<Int>)
 
-    suspend fun selectMessage(messageViewModel: MessageItemViewModelApi, onShouldNavigate: suspend () -> Unit)
+    suspend fun selectMessage(messageViewModel: MessageItemViewModelApi, onNavigate: suspend () -> Unit)
     fun clearMessageSelection()
 
     fun openCategorySelector()

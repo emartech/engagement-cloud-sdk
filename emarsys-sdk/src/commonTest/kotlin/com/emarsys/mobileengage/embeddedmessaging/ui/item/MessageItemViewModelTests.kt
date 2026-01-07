@@ -132,12 +132,12 @@ class MessageItemViewModelTests {
     }
 
     @Test
-    fun hasDefaultAction_shouldReturn_MessageHasDefaultAction() {
+    fun hasDefaultAction_shouldReturn_MessageShouldNavigateToDetailView() {
         val mockModel = mock<MessageItemModelApi>(MockMode.autofill)
-        every { mockModel.hasDefaultAction() } returns true
+        every { mockModel.shouldNavigate() } returns true
         val viewModel = MessageItemViewModel(mockModel)
 
-        viewModel.hasDefaultAction() shouldBe true
+        viewModel.shouldNavigate() shouldBe true
     }
 
     @Test

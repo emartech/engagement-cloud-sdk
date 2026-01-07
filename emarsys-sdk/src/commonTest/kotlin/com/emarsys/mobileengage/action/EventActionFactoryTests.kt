@@ -3,7 +3,6 @@ package com.emarsys.mobileengage.action
 import com.emarsys.core.actions.badge.BadgeCountHandlerApi
 import com.emarsys.core.actions.clipboard.ClipboardHandlerApi
 import com.emarsys.core.channel.SdkEventDistributorApi
-import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.permission.PermissionHandlerApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
@@ -12,11 +11,14 @@ import com.emarsys.mobileengage.action.actions.CustomEventAction
 import com.emarsys.mobileengage.action.actions.DismissAction
 import com.emarsys.mobileengage.action.actions.OpenExternalUrlAction
 import com.emarsys.mobileengage.action.actions.RequestPushPermissionAction
+import com.emarsys.mobileengage.action.actions.RichContentDisplayAction
 import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
 import com.emarsys.mobileengage.action.models.BasicCustomEventActionModel
 import com.emarsys.mobileengage.action.models.BasicDismissActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
+import com.emarsys.mobileengage.action.models.BasicRichContentDisplayActionModel
 import com.emarsys.mobileengage.action.models.RequestPushPermissionActionModel
+import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessageAnimation
 import dev.mokkery.MockMode
 import dev.mokkery.mock
 import io.kotest.matchers.shouldNotBe
@@ -105,4 +107,17 @@ class EventActionFactoryTests {
         result.shouldBeTypeOf<OpenExternalUrlAction>()
     }
 
+    @Test
+    fun testCreate_withBasicRichContentDisplayModel() = runTest {
+        val action = BasicRichContentDisplayActionModel(
+            REPORTING,
+            "url",
+            animation = EmbeddedMessageAnimation.FADING_FROM_BOTTOM
+        )
+
+        val result = actionFactory.create(action)
+
+        result shouldNotBe null
+        result.shouldBeTypeOf<RichContentDisplayAction>()
+    }
 }
