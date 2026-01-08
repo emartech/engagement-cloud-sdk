@@ -28,6 +28,7 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Translations.ERROR_STATE_NO_CONNECTION_REFRESH_ICON_ALT_TEXT
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Translations.ERROR_STATE_NO_CONNECTION_RETRY_BUTTON_LABEL
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Translations.ERROR_STATE_NO_CONNECTION_TITLE
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Translations.FAILED_TO_DELETE_MESSAGE_TEXT
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Translations.FAILED_TO_LOAD_MORE_MESSAGES_TEXT
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Translations.FILTER_ALL_BUTTON_LABEL
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Translations.FILTER_UNREAD_BUTTON_LABEL
@@ -68,7 +69,8 @@ internal data class StringResources(
     val errorStateNoConnectionRetryButtonLabel: String = ERROR_STATE_NO_CONNECTION_RETRY_BUTTON_LABEL,
     val errorStateNoConnectionRefreshIconAltText: String = ERROR_STATE_NO_CONNECTION_REFRESH_ICON_ALT_TEXT,
     val refreshErrorMessageText: String = REFRESH_ERROR_MESSAGE_TEXT,
-    val failedToLoadMoreMessagesText: String = FAILED_TO_LOAD_MORE_MESSAGES_TEXT
+    val failedToLoadMoreMessagesText: String = FAILED_TO_LOAD_MORE_MESSAGES_TEXT,
+    val failedToDeleteMessageText: String = FAILED_TO_DELETE_MESSAGE_TEXT
 )
 
 internal val LocalStringResources = compositionLocalOf {

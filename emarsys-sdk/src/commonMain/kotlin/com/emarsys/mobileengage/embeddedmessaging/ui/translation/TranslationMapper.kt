@@ -39,7 +39,8 @@ internal class TranslationMapper : TranslationMapperApi {
                 errorStateNoConnectionRetryButtonLabel = it.errorStateNoConnectionRetryButtonLabel,
                 errorStateNoConnectionRefreshIconAltText = it.errorStateNoConnectionRefreshIconAltText,
                 refreshErrorMessageText = it.refreshErrorMessageText,
-                failedToLoadMoreMessagesText = it.failedToLoadMoreMessagesText
+                failedToLoadMoreMessagesText = it.failedToLoadMoreMessagesText,
+                failedToDeleteMessageText = it.failedToDeleteMessageText
             )
         } ?: StringResources()
     }

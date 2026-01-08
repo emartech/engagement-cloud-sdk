@@ -57,7 +57,8 @@ class TranslationMapperTests {
             emptyStateFilteredClearFiltersButtonLabel = "test emptyStateFilteredClearFiltersButtonLabel",
             emptyStateFilteredClearFiltersIconAltText = "test emptyStateFilteredClearFiltersIconAltText",
             refreshErrorMessageText = "testRefreshErrorMessageText",
-            failedToLoadMoreMessagesText = "testFailedToLoadMoreMessagesText"
+            failedToLoadMoreMessagesText = "testFailedToLoadMoreMessagesText",
+            failedToDeleteMessageText = "testFailedToDeleteMessageText"
         )
 
         val resultStringResources = translationMapper.map(testEmbeddedMessagingContext)
@@ -113,6 +114,7 @@ class TranslationMapperTests {
         emptyStateFilteredClearFiltersButtonLabel = "test emptyStateFilteredClearFiltersButtonLabel",
         emptyStateFilteredClearFiltersIconAltText = "test emptyStateFilteredClearFiltersIconAltText",
         refreshErrorMessageText = "testRefreshErrorMessageText",
-        failedToLoadMoreMessagesText = "testFailedToLoadMoreMessagesText"
+        failedToLoadMoreMessagesText = "testFailedToLoadMoreMessagesText",
+        failedToDeleteMessageText = "testFailedToDeleteMessageText"
     )
 }

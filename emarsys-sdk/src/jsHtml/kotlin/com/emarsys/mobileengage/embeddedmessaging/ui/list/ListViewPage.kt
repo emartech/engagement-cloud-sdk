@@ -13,6 +13,7 @@ import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategoriesDialogView
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategorySelectorButton
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.SvgIcon
+import com.emarsys.mobileengage.embeddedmessaging.ui.detail.MessageDetailView
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemView
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingStyleSheet
@@ -45,7 +46,7 @@ fun ListPageView(
 
 @Composable
 fun MessageList(viewModel: ListPageViewModelApi) {
-    val lazyPagingMessageItems = viewModel.messagePagingDataFlow.collectAsLazyPagingItems()
+    val lazyPagingMessageItems = viewModel.messagePagingDataFlowFiltered.collectAsLazyPagingItems()
     val filterUnreadOnly by viewModel.filterUnreadOnly.collectAsState()
     val selectedCategoryIds by viewModel.selectedCategoryIds.collectAsState()
     var showCategorySelector by remember { mutableStateOf(false) }
@@ -55,7 +56,8 @@ fun MessageList(viewModel: ListPageViewModelApi) {
     }
 
     var selectedMessageId by remember { mutableStateOf<String?>(null) }
-    val selectedMessage = lazyPagingMessageItems.itemSnapshotList.find { it?.id == selectedMessageId }
+    val selectedMessage =
+        lazyPagingMessageItems.itemSnapshotList.find { it?.id == selectedMessageId }
 
     LaunchedEffect(Unit) {
         val mediaQuery = window.matchMedia("(orientation: landscape)")
@@ -82,14 +84,14 @@ fun MessageList(viewModel: ListPageViewModelApi) {
 
                 MessageListContent(
                     lazyPagingMessageItems = lazyPagingMessageItems,
-                    onRefresh = { viewModel.refreshMessages { lazyPagingMessageItems.refresh() } },
+                    onRefresh = { viewModel.refreshMessagesWithThrottling { lazyPagingMessageItems.refresh() } },
                     onItemClick = { selectedMessageId = it }
                 )
             }
 
             Div({ classes(EmbeddedMessagingStyleSheet.detailPane) }) {
                 if (selectedMessage != null) {
-                    com.emarsys.mobileengage.embeddedmessaging.ui.detail.MessageDetailView(
+                    MessageDetailView(
                         viewModel = selectedMessage,
                         isSplitView = true,
                         onBack = {}
@@ -102,7 +104,7 @@ fun MessageList(viewModel: ListPageViewModelApi) {
     } else {
         if (selectedMessageId != null) {
             if (selectedMessage != null) {
-                com.emarsys.mobileengage.embeddedmessaging.ui.detail.MessageDetailView(
+                MessageDetailView(
                     viewModel = selectedMessage,
                     isSplitView = false,
                     onBack = { selectedMessageId = null }
@@ -121,7 +123,7 @@ fun MessageList(viewModel: ListPageViewModelApi) {
 
             MessageListContent(
                 lazyPagingMessageItems = lazyPagingMessageItems,
-                onRefresh = { viewModel.refreshMessages { lazyPagingMessageItems.refresh() } },
+                onRefresh = { viewModel.refreshMessagesWithThrottling { lazyPagingMessageItems.refresh() } },
                 onItemClick = { selectedMessageId = it }
             )
         }
@@ -133,7 +135,7 @@ fun MessageList(viewModel: ListPageViewModelApi) {
             selectedCategories = viewModel.selectedCategoryIds.collectAsState().value,
             onApplyClicked = {
                 viewModel.setSelectedCategoryIds(it)
-                viewModel.refreshMessages { lazyPagingMessageItems.refresh() }
+                viewModel.refreshMessagesWithThrottling { lazyPagingMessageItems.refresh() }
                 showCategorySelector = false
             },
             onDismiss = { showCategorySelector = false }
@@ -166,7 +168,8 @@ fun MessageListContent(
             }) {
                 SvgIcon(
                     path = REFRESH_ICON_PATH,
-                    className = EmbeddedMessagingStyleSheet.refreshIcon)
+                    className = EmbeddedMessagingStyleSheet.refreshIcon
+                )
             }
         }
 

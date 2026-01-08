@@ -8,6 +8,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.paging.PagingData
 import com.emarsys.core.channel.SdkEventDistributorApi
+import com.emarsys.core.log.LogEntry
+import com.emarsys.core.log.Logger
 import com.emarsys.core.url.ExternalUrlOpenerApi
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.event.OnlineSdkEvent
@@ -43,6 +45,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.serialization.json.JsonObject
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -68,7 +71,8 @@ fun MessageItemViewPreview() {
                 message = providePreviewMessage(),
                 downloaderApi = PreviewDownLoader(),
                 sdkEventDistributor = previewSdkEventDistributor,
-                actionFactory = PreviewActionFactory()
+                actionFactory = PreviewActionFactory(),
+                logger = PreviewLogger()
             )
         ),
         onClick = {
@@ -156,7 +160,7 @@ private fun providePreviewMessage() = EmbeddedMessage(
 @OptIn(ExperimentalTime::class)
 private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventDistributorApi) =
     object : ListPageViewModelApi {
-        override val messagePagingDataFlow: Flow<PagingData<MessageItemViewModelApi>>
+        override val messagePagingDataFlowFiltered: Flow<PagingData<MessageItemViewModelApi>>
             get() = flowOf(
                 PagingData.from(
                     listOf(
@@ -180,7 +184,8 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
                                 ),
                                 downloaderApi = PreviewDownLoader(),
                                 sdkEventDistributor = previewSdkEventDistributor,
-                                actionFactory = PreviewActionFactory()
+                                actionFactory = PreviewActionFactory(),
+                                logger = PreviewLogger()
                             )
                         ),
                         MessageItemViewModel(
@@ -203,7 +208,8 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
                                 ),
                                 downloaderApi = PreviewDownLoader(),
                                 sdkEventDistributor = previewSdkEventDistributor,
-                                actionFactory = PreviewActionFactory()
+                                actionFactory = PreviewActionFactory(),
+                                logger = PreviewLogger()
                             )
                         )
                     )
@@ -254,6 +260,10 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
             Unit
         }
 
+        override suspend fun deleteMessage(messageViewModel: MessageItemViewModelApi): Result<Unit> {
+            return Result.success(Unit)
+        }
+
         override fun clearMessageSelection() {
             Unit
         }
@@ -270,7 +280,7 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
             Unit
         }
 
-        override fun refreshMessages(shouldCallRefresh: () -> Unit) {
+        override fun refreshMessagesWithThrottling(shouldCallRefresh: () -> Unit) {
             Unit
         }
     }
@@ -298,4 +308,116 @@ internal class PreviewDownLoader : DownloaderApi {
     override suspend fun download(urlString: String, fallback: ByteArray?): ByteArray? {
         return EmbeddedMessagingConstants.Image.BASE64_PLACEHOLDER_IMAGE.decodeBase64Bytes()
     }
+}
+
+internal class PreviewLogger : Logger {
+    override suspend fun info(
+        logEntry: LogEntry,
+        isRemoteLog: Boolean
+    ) {
+        Unit
+    }
+
+    override suspend fun info(message: String, isRemoteLog: Boolean) {
+        Unit
+    }
+
+    override suspend fun info(
+        message: String,
+        throwable: Throwable,
+        isRemoteLog: Boolean
+    ) {
+        Unit
+    }
+
+    override suspend fun info(
+        message: String,
+        data: JsonObject,
+        isRemoteLog: Boolean
+    ) {
+        Unit
+    }
+
+    override suspend fun trace(message: String, isRemoteLog: Boolean) {
+        Unit
+    }
+
+    override suspend fun trace(
+        message: String,
+        data: JsonObject,
+        isRemoteLog: Boolean
+    ) {
+        Unit
+    }
+
+    override suspend fun debug(
+        logEntry: LogEntry,
+        isRemoteLog: Boolean
+    ) {
+        Unit
+    }
+
+    override suspend fun debug(message: String, isRemoteLog: Boolean) {
+        Unit
+    }
+
+    override suspend fun debug(
+        message: String,
+        data: JsonObject,
+        isRemoteLog: Boolean
+    ) {
+        Unit
+    }
+
+    override suspend fun debug(
+        message: String,
+        throwable: Throwable,
+        isRemoteLog: Boolean
+    ) {
+        Unit
+    }
+
+    override suspend fun error(
+        logEntry: LogEntry,
+        isRemoteLog: Boolean
+    ) {
+        Unit
+    }
+
+    override suspend fun error(message: String, isRemoteLog: Boolean) {
+        Unit
+    }
+
+    override suspend fun error(
+        message: String,
+        data: JsonObject,
+        isRemoteLog: Boolean
+    ) {
+        Unit
+    }
+
+    override suspend fun error(
+        message: String,
+        throwable: Throwable,
+        isRemoteLog: Boolean
+    ) {
+        Unit
+    }
+
+    override suspend fun error(
+        message: String,
+        throwable: Throwable,
+        data: JsonObject,
+        isRemoteLog: Boolean
+    ) {
+        Unit
+    }
+
+    override suspend fun metric(
+        message: String,
+        data: JsonObject
+    ) {
+        Unit
+    }
+
 }

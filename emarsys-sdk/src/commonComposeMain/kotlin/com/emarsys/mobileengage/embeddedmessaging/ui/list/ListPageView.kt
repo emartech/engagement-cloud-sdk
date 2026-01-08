@@ -74,7 +74,7 @@ fun ListPageView(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MessageList(viewModel: ListPageViewModelApi) {
-    val lazyPagingMessageItems = viewModel.messagePagingDataFlow.collectAsLazyPagingItems()
+    val lazyPagingMessageItems = viewModel.messagePagingDataFlowFiltered.collectAsLazyPagingItems()
 
     var showCategorySelector by rememberSaveable { mutableStateOf(false) }
 
@@ -94,7 +94,8 @@ private fun MessageList(viewModel: ListPageViewModelApi) {
     val hasMessages = lazyPagingMessageItems.itemCount > 0
 
     val snackbarNoConnectionMessage = LocalStringResources.current.errorStateNoConnectionDescription
-    val snackbarNoConnectionButtonLabel = LocalStringResources.current.errorStateNoConnectionRetryButtonLabel
+    val snackbarNoConnectionButtonLabel =
+        LocalStringResources.current.errorStateNoConnectionRetryButtonLabel
     val snackbarConnectionRestoredMessage = LocalStringResources.current.snackbarConnectionRestored
 
     val navigator = rememberListDetailPaneScaffoldNavigator<String>()
@@ -110,7 +111,7 @@ private fun MessageList(viewModel: ListPageViewModelApi) {
                 duration = SnackbarDuration.Long
             )
             if (result == SnackbarResult.ActionPerformed) {
-                viewModel.refreshMessages { lazyPagingMessageItems.refresh() }
+                viewModel.refreshMessagesWithThrottling { lazyPagingMessageItems.refresh() }
             }
         } else if (hasConnection && hasMessages && snackbarHostState.currentSnackbarData != null) {
             snackbarHostState.showSnackbar(
@@ -176,13 +177,19 @@ private fun MessageList(viewModel: ListPageViewModelApi) {
                             selectedMessage = selectedMessageViewModel,
                             hasFiltersApplied = hasFiltersApplied,
                             hasConnection = hasConnection,
-                            onRefresh = { viewModel.refreshMessages { lazyPagingMessageItems.refresh() } },
+                            onRefresh = { viewModel.refreshMessagesWithThrottling { lazyPagingMessageItems.refresh() } },
                             onMessageClick = { messageViewModel ->
                                 scope.launch {
                                     viewModel.selectMessage(messageViewModel) {
                                         navigator.navigateTo(ListDetailPaneScaffoldRole.Detail)
                                     }
                                 }
+                            },
+                            onMessageDelete = { messageId ->
+                                lazyPagingMessageItems.itemSnapshotList.find { it?.id == messageId }
+                                    ?.let { messageViewModel ->
+                                        viewModel.deleteMessage(messageViewModel)
+                                    } ?: Result.success(Unit)
                             },
                             onClearFilters = {
                                 viewModel.setFilterUnreadOnly(false)

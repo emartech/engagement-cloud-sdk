@@ -82,6 +82,7 @@ fun MessageItemsListPane(
     hasFiltersApplied: Boolean,
     onRefresh: () -> Unit,
     onMessageClick: (MessageItemViewModelApi) -> Unit,
+    onMessageDelete: suspend (String) -> Result<Unit>,
     onClearFilters: () -> Unit,
     snackbarHostState: SnackbarHostState,
     lazyListState: LazyListState = rememberLazyListState(),
@@ -94,8 +95,9 @@ fun MessageItemsListPane(
     val refreshErrorMessage = LocalStringResources.current.refreshErrorMessageText
     val failedToLoadMoreMessagesErrorMessage =
         LocalStringResources.current.failedToLoadMoreMessagesText
+    val failedToDeleteMessageErrorMessage = LocalStringResources.current.failedToDeleteMessageText
 
-    var messageToDelete by rememberSaveable { mutableStateOf<String?>(null) }
+    var messageIdToDelete by rememberSaveable { mutableStateOf<String?>(null) }
     var dismissStateToReset by remember { mutableStateOf<SwipeToDismissBoxState?>(null) }
 
     val scope = rememberCoroutineScope()
@@ -194,7 +196,7 @@ fun MessageItemsListPane(
                                             DeleteMessageOnSwipeBox()
                                         },
                                         onDismiss = {
-                                            messageToDelete = messageViewModel.id
+                                            messageIdToDelete = messageViewModel.id
                                             dismissStateToReset = dismissState
                                         }
                                     ) {
@@ -218,18 +220,32 @@ fun MessageItemsListPane(
             }
         }
 
-        messageToDelete?.let {
+        messageIdToDelete?.let {
             DeleteMessageItemConfirmationDialog(
                 onDismiss = {
-                    messageToDelete = null
+                    messageIdToDelete = null
                     scope.launch {
                         dismissStateToReset?.snapTo(SwipeToDismissBoxValue.Settled)
                         dismissStateToReset = null
                     }
                 },
                 onConfirm = {
-                    messageToDelete = null
-                    dismissStateToReset = null
+                    scope.launch {
+                        messageIdToDelete?.let {
+                            onMessageDelete(it)
+                                .onFailure {
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar(
+                                            message = failedToDeleteMessageErrorMessage,
+                                            duration = SnackbarDuration.Short
+                                        )
+                                    }
+                                }
+                        }
+                        dismissStateToReset?.snapTo(SwipeToDismissBoxValue.Settled)
+                        dismissStateToReset = null
+                        messageIdToDelete = null
+                    }
                 }
             )
         }
