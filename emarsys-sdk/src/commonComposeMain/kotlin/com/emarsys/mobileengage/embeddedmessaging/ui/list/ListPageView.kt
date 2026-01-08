@@ -97,6 +97,11 @@ private fun MessageList(viewModel: ListPageViewModelApi) {
     val snackbarNoConnectionButtonLabel = LocalStringResources.current.errorStateNoConnectionRetryButtonLabel
     val snackbarConnectionRestoredMessage = LocalStringResources.current.snackbarConnectionRestored
 
+    val navigator = rememberListDetailPaneScaffoldNavigator<String>()
+    val scope = rememberCoroutineScope()
+    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+    val canShowDetailPane = windowSizeClass.isWidthAtLeastBreakpoint(400)
+
     LaunchedEffect(hasConnection, hasMessages) {
         if (!hasConnection && hasMessages) {
             val result = snackbarHostState.showSnackbar(
@@ -115,17 +120,19 @@ private fun MessageList(viewModel: ListPageViewModelApi) {
         }
     }
 
-    val navigator = rememberListDetailPaneScaffoldNavigator<String>()
+    LaunchedEffect(selectedMessageViewModel, canShowDetailPane) {
+        if (selectedMessageViewModel != null && canShowDetailPane) {
+            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail)
+        } else if (selectedMessageViewModel == null) {
+            navigator.navigateTo(ListDetailPaneScaffoldRole.List)
+        }
+    }
 
     LaunchedEffect(navigator.scaffoldValue[ListDetailPaneScaffoldRole.Detail]) {
         if (navigator.scaffoldValue[ListDetailPaneScaffoldRole.Detail] == PaneAdaptedValue.Hidden) {
             viewModel.clearMessageSelection()
         }
     }
-
-    val scope = rememberCoroutineScope()
-    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
-    val canShowDetailPane = windowSizeClass.isWidthAtLeastBreakpoint(400)
 
     BackHandler(enabled = selectedMessageViewModel != null) {
         scope.launch {
@@ -181,7 +188,9 @@ private fun MessageList(viewModel: ListPageViewModelApi) {
                                 viewModel.setFilterUnreadOnly(false)
                                 viewModel.setSelectedCategoryIds(emptySet())
                             },
-                            snackbarHostState = snackbarHostState
+                            snackbarHostState = snackbarHostState,
+                            canShowDetailPane = canShowDetailPane,
+                            scaffoldValue = navigator.scaffoldValue
                         )
                     },
                     detailPane = {

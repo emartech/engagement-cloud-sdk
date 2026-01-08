@@ -28,6 +28,8 @@ import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxState
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldValue
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
@@ -72,7 +74,7 @@ private fun LazyPagingItems<MessageItemViewModelApi>.isLoadingMore(): Boolean =
 private fun LazyPagingItems<MessageItemViewModelApi>.shouldShowErrorStateNoConnection(hasConnection: Boolean): Boolean =
     !hasConnection && this.itemCount == 0
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun MessageItemsListPane(
     lazyPagingMessageItems: LazyPagingItems<MessageItemViewModelApi>,
@@ -83,7 +85,9 @@ fun MessageItemsListPane(
     onClearFilters: () -> Unit,
     snackbarHostState: SnackbarHostState,
     lazyListState: LazyListState = rememberLazyListState(),
-    hasConnection: Boolean
+    hasConnection: Boolean,
+    canShowDetailPane: Boolean,
+    scaffoldValue: ThreePaneScaffoldValue
 ) {
     val refreshError = lazyPagingMessageItems.loadState.refresh as? LoadState.Error
     val appendError = lazyPagingMessageItems.loadState.append as? LoadState.Error
@@ -157,15 +161,35 @@ fun MessageItemsListPane(
                                 key = lazyPagingMessageItems.itemKey { it.id }
                             ) { index ->
                                 lazyPagingMessageItems[index]?.let { messageViewModel ->
+                                    val isSwipeEnabled = if (canShowDetailPane) {
+                                        messageViewModel.id != selectedMessage?.id
+                                    } else {
+                                        selectedMessage == null
+                                    }
+
                                     val dismissState = rememberSwipeToDismissBoxState(
                                         initialValue = SwipeToDismissBoxValue.Settled,
-                                        positionalThreshold = { totalDistance -> totalDistance * 0.3f }
+                                        positionalThreshold = { totalDistance -> totalDistance * 0.3f },
+                                        confirmValueChange = { newValue ->
+                                            if (newValue == SwipeToDismissBoxValue.EndToStart) {
+                                                isSwipeEnabled
+                                            } else {
+                                                true
+                                            }
+                                        }
                                     )
+
+                                    // Reset state when layout changes (e.g. rotation) to prevent phantom swipes
+                                    LaunchedEffect(scaffoldValue) {
+                                        if (dismissState.currentValue != SwipeToDismissBoxValue.Settled) {
+                                            dismissState.snapTo(SwipeToDismissBoxValue.Settled)
+                                        }
+                                    }
 
                                     SwipeToDismissBox(
                                         state = dismissState,
                                         enableDismissFromStartToEnd = false,
-                                        enableDismissFromEndToStart = selectedMessage == null,
+                                        enableDismissFromEndToStart = isSwipeEnabled,
                                         backgroundContent = {
                                             DeleteMessageOnSwipeBox()
                                         },
