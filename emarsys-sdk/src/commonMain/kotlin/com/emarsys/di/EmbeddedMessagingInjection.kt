@@ -18,6 +18,7 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.list.PagerFactory
 import com.emarsys.mobileengage.embeddedmessaging.ui.list.PagerFactoryApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -64,7 +65,9 @@ object EmbeddedMessagingInjection {
                 timestampProvider = get(),
                 coroutineScope = get<CoroutineScope>(named(CoroutineScopeTypes.Application)),
                 pagerFactory = get(),
-                connectionWatchDog = get<ConnectionWatchDog>()
+                connectionWatchDog = get<ConnectionWatchDog>(),
+                deletedMessageIds = MutableStateFlow(emptySet()),
+                readMessageIds = MutableStateFlow(emptySet())
             )
         }
     }

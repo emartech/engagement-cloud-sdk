@@ -7,24 +7,31 @@ import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
-import com.emarsys.networking.clients.embedded.messaging.model.MessageCategory
+import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.sequentiallyReturns
 import dev.mokkery.every
+import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.verify
+import dev.mokkery.verify.VerifyMode
+import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -37,11 +44,8 @@ import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ListPageViewModelTests {
-    private companion object {
-        val CATEGORIES = listOf(
-            MessageCategory(id = 1, value = "Category 1"),
-            MessageCategory(id = 2, value = "Category 2")
-        )
+    companion object {
+        const val TEST_MESSAGE_ID = "test-message-id"
     }
 
     private lateinit var mockModel: ListPageModelApi
@@ -54,6 +58,8 @@ class ListPageViewModelTests {
     private lateinit var mockTimestampProvider: InstantProvider
     private lateinit var mockConnectionWatchDog: ConnectionWatchDog
     private val testDispatcher = StandardTestDispatcher()
+    private lateinit var deletedMessageIds: MutableStateFlow<Set<String>>
+    private lateinit var readMessageIds: MutableStateFlow<Set<String>>
 
     @BeforeTest
     fun setup() {
@@ -66,13 +72,17 @@ class ListPageViewModelTests {
         mockTimestampProvider = mock(MockMode.autofill)
         mockConnectionWatchDog = mock(MockMode.autofill)
         mockEmbeddedMessagingContext = mock(MockMode.autofill)
+        deletedMessageIds = MutableStateFlow(emptySet())
+        readMessageIds = MutableStateFlow(emptySet())
 
         viewModel = ListPageViewModel(
             embeddedMessagingContext = mockEmbeddedMessagingContext,
             timestampProvider = mockTimestampProvider,
             coroutineScope = CoroutineScope(SupervisorJob() + testDispatcher),
             pagerFactory = mockPagerFactory,
-            connectionWatchDog = mockConnectionWatchDog
+            connectionWatchDog = mockConnectionWatchDog,
+            deletedMessageIds = deletedMessageIds,
+            readMessageIds = readMessageIds
         )
     }
 
@@ -97,7 +107,7 @@ class ListPageViewModelTests {
 
         viewModel.setFilterUnreadOnly(true)
 
-        val firstMessage = viewModel.messagePagingDataFlow.first()
+        val firstMessage = viewModel.messagePagingDataFlowFiltered.first()
 
         viewModel.filterUnreadOnly.value shouldBe true
         firstMessage shouldNotBe null
@@ -128,7 +138,7 @@ class ListPageViewModelTests {
 
         viewModel.setSelectedCategoryIds(selectedCategoryIds)
 
-        val firstMessage = viewModel.messagePagingDataFlow.first()
+        val firstMessage = viewModel.messagePagingDataFlowFiltered.first()
 
         viewModel.selectedCategoryIds.value shouldBe selectedCategoryIds
 
@@ -144,38 +154,40 @@ class ListPageViewModelTests {
 
     @OptIn(ExperimentalTime::class)
     @Test
-    fun testRefreshMessages_shouldApplyThrottling_whenRequestIsTooFrequent() = runTest {
-        var count = 0
-        val canCallRefresh: () -> Unit = { count++ }
+    fun testRefreshMessages_WithThrottling_shouldApplyThrottling_whenRequestIsTooFrequent() =
+        runTest {
+            var count = 0
+            val canCallRefresh: () -> Unit = { count++ }
 
-        val firstRequest = Clock.System.now()
-        val secondRequestThatShouldBeThrottled = firstRequest.plus(2.seconds)
-        val thirdRequest = firstRequest.plus(12.seconds)
-        val fourthRequest = firstRequest.plus(25.seconds)
+            val firstRequest = Clock.System.now()
+            val secondRequestThatShouldBeThrottled = firstRequest.plus(2.seconds)
+            val thirdRequest = firstRequest.plus(12.seconds)
+            val fourthRequest = firstRequest.plus(25.seconds)
 
-        every { mockTimestampProvider.provide() } sequentiallyReturns listOf(
-            firstRequest,
-            secondRequestThatShouldBeThrottled,
-            thirdRequest,
-            fourthRequest
-        )
-        every { mockEmbeddedMessagingContext.embeddedMessagingFrequencyCapSeconds } returns 10
+            every { mockTimestampProvider.provide() } sequentiallyReturns listOf(
+                firstRequest,
+                secondRequestThatShouldBeThrottled,
+                thirdRequest,
+                fourthRequest
+            )
+            every { mockEmbeddedMessagingContext.embeddedMessagingFrequencyCapSeconds } returns 10
 
-        viewModel.refreshMessages(canCallRefresh)
-        count shouldBe 1
+            viewModel.refreshMessagesWithThrottling(canCallRefresh)
+            count shouldBe 1
 
-        viewModel.refreshMessages(canCallRefresh)
-        count shouldBe 1
+            viewModel.refreshMessagesWithThrottling(canCallRefresh)
+            count shouldBe 1
 
-        viewModel.refreshMessages(canCallRefresh)
-        count shouldBe 2
-    }
+            viewModel.refreshMessagesWithThrottling(canCallRefresh)
+            count shouldBe 2
+        }
 
     @Test
     fun testSelectMessage_shouldUpdateSelectedMessageIdAndCache_withoutNavigation() = runTest {
-        val mockMessageViewModel = mock<com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi>(MockMode.autofill)
-        every { mockMessageViewModel.id } returns "message-123"
+        val mockMessageViewModel = mock<MessageItemViewModelApi>(MockMode.autofill)
+        every { mockMessageViewModel.id } returns TEST_MESSAGE_ID
         every { mockMessageViewModel.shouldNavigate() } returns false
+        everySuspend { mockMessageViewModel.tagMessageRead() } returns Result.success(Unit)
 
         viewModel.selectedMessageId.value shouldBe null
         viewModel.selectedMessage.value shouldBe null
@@ -187,39 +199,79 @@ class ListPageViewModelTests {
 
         testDispatcher.scheduler.advanceUntilIdle()
 
-        viewModel.selectedMessageId.value shouldBe "message-123"
+        viewModel.selectedMessageId.value shouldBe TEST_MESSAGE_ID
         viewModel.selectedMessage.value shouldBe mockMessageViewModel
         navigationCalled shouldBe false
+        readMessageIds.value shouldBe setOf(TEST_MESSAGE_ID)
     }
 
     @Test
-    fun testSelectMessage_shouldCallNavigationCallback_whenMessageShouldNavigateToDetailView() = runTest {
-        val mockMessageViewModel = mock<com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi>(MockMode.autofill)
-        every { mockMessageViewModel.id } returns "message-456"
-        every { mockMessageViewModel.shouldNavigate() } returns true
+    fun testSelectMessage_shouldCallNavigationCallback_whenMessageShouldNavigateToDetailView() =
+        runTest {
+            val mockMessageViewModel = mock<MessageItemViewModelApi>(MockMode.autofill)
+            every { mockMessageViewModel.id } returns TEST_MESSAGE_ID
+            every { mockMessageViewModel.shouldNavigate() } returns true
+            everySuspend { mockMessageViewModel.tagMessageRead() } returns Result.success(Unit)
 
-        var navigationCalled = false
-        viewModel.selectMessage(mockMessageViewModel) {
-            navigationCalled = true
+
+            var navigationCalled = false
+            viewModel.selectMessage(mockMessageViewModel) {
+                navigationCalled = true
+            }
+
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            viewModel.selectedMessageId.value shouldBe TEST_MESSAGE_ID
+            viewModel.selectedMessage.value shouldBe mockMessageViewModel
+            navigationCalled shouldBe true
+            readMessageIds.value shouldBe setOf(TEST_MESSAGE_ID)
         }
 
-        testDispatcher.scheduler.advanceUntilIdle()
+    @Test
+    fun testDeleteMessage_shouldCallMessageViewModel_deleteMessage_andUpdateDeletedMessageIdsFilter() =
+        runTest {
+            val mockMessageViewModel = mock<MessageItemViewModelApi>(MockMode.autofill)
+            every { mockMessageViewModel.id } returns TEST_MESSAGE_ID
+            everySuspend { mockMessageViewModel.deleteMessage() } returns Result.success(Unit)
 
-        viewModel.selectedMessageId.value shouldBe "message-456"
-        viewModel.selectedMessage.value shouldBe mockMessageViewModel
-        navigationCalled shouldBe true
-    }
+            every { mockPagerFactory.create(any(), any(), any()) } returns flowOf(
+                PagingData.from(
+                    data = listOf(mockMessageViewModel),
+                    placeholdersBefore = 0,
+                    placeholdersAfter = 0
+                )
+            )
+
+            val pagingDataList = mutableListOf<PagingData<MessageItemViewModelApi>>()
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+                viewModel.messagePagingDataFlowFiltered.collect {
+                    pagingDataList.add(it)
+                }
+            }
+
+            viewModel.deleteMessage(mockMessageViewModel)
+            advanceUntilIdle()
+
+            pagingDataList.size shouldBe  1
+            verify(VerifyMode.exactly(1)) {
+                mockPagerFactory.create(any(), any(), any())
+            }
+            verifySuspend {
+                mockMessageViewModel.deleteMessage()
+            }
+            deletedMessageIds.value shouldBe setOf(TEST_MESSAGE_ID)
+        }
 
     @Test
     fun testClearSelection_shouldSetSelectedMessageIdAndCacheToNull() = runTest {
-        val mockMessageViewModel = mock<com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi>(MockMode.autofill)
-        every { mockMessageViewModel.id } returns "message-789"
+        val mockMessageViewModel = mock<MessageItemViewModelApi>(MockMode.autofill)
+        every { mockMessageViewModel.id } returns TEST_MESSAGE_ID
         every { mockMessageViewModel.shouldNavigate() } returns false
 
         viewModel.selectMessage(mockMessageViewModel) {}
         testDispatcher.scheduler.advanceUntilIdle()
 
-        viewModel.selectedMessageId.value shouldBe "message-789"
+        viewModel.selectedMessageId.value shouldBe TEST_MESSAGE_ID
         viewModel.selectedMessage.value shouldNotBe null
 
         viewModel.clearMessageSelection()

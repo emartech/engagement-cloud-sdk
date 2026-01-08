@@ -48,7 +48,8 @@ internal class EmbeddedMessagingPagingSource(
                                     message,
                                     downloader,
                                     sdkEventDistributor,
-                                    actionFactory
+                                    actionFactory,
+                                    logger
                                 )
                             )
                         },

@@ -1,6 +1,7 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.list
 
 import androidx.paging.cachedIn
+import androidx.paging.filter
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
@@ -25,7 +26,9 @@ internal class ListPageViewModel(
     private val timestampProvider: InstantProvider,
     private val coroutineScope: CoroutineScope,
     private val pagerFactory: PagerFactoryApi,
-    private val connectionWatchDog: ConnectionWatchDog
+    private val connectionWatchDog: ConnectionWatchDog,
+    private val deletedMessageIds: MutableStateFlow<Set<String>>,
+    private val readMessageIds: MutableStateFlow<Set<String>>
 ) : ListPageViewModelApi {
     private val _categories = MutableStateFlow<List<MessageCategory>>(emptyList())
     override val categories: StateFlow<List<MessageCategory>> = _categories.asStateFlow()
@@ -54,7 +57,7 @@ internal class ListPageViewModel(
     private var lastRefreshTimestamp: Instant? = null
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override val messagePagingDataFlow =
+    private val _messagePagingDataFlowFromApi =
         combine(_filterUnreadOnly, _selectedCategoryIds) { filterUnreadOnly, selectedCategoryIds ->
             filterUnreadOnly to selectedCategoryIds
         }
@@ -67,6 +70,15 @@ internal class ListPageViewModel(
                     categories = _categories
                 )
             }.cachedIn(coroutineScope)
+
+    override val messagePagingDataFlowFiltered =
+        combine(
+            _messagePagingDataFlowFromApi,
+            deletedMessageIds,
+            readMessageIds
+        ) { pagingData, deletedIds, readIds ->
+            pagingData.filter { !deletedIds.contains(it.id) }
+        }
 
     override fun setFilterUnreadOnly(unreadOnly: Boolean) {
         _filterUnreadOnly.value = unreadOnly
@@ -84,11 +96,23 @@ internal class ListPageViewModel(
         _selectedMessageId.value = messageViewModel.id
 
         messageViewModel.tagMessageRead()
-        messageViewModel.handleDefaultAction()
+            .onSuccess {
+                readMessageIds.value = readMessageIds.value + messageViewModel.id
+            }
 
         if (messageViewModel.shouldNavigate()) {
             onNavigate.invoke()
         }
+        messageViewModel.handleDefaultAction()
+    }
+
+    override suspend fun deleteMessage(
+        messageViewModel: MessageItemViewModelApi
+    ): Result<Unit> {
+        return messageViewModel.deleteMessage()
+            .onSuccess {
+                deletedMessageIds.value = deletedMessageIds.value + messageViewModel.id
+            }
     }
 
     override fun clearMessageSelection() {
@@ -109,7 +133,7 @@ internal class ListPageViewModel(
         closeCategorySelector()
     }
 
-    override fun refreshMessages(shouldCallRefresh: () -> Unit) {
+    override fun refreshMessagesWithThrottling(shouldCallRefresh: () -> Unit) {
         if (!isTooFrequentFetch()) {
             shouldCallRefresh.invoke()
             lastRefreshTimestamp = timestampProvider.provide()

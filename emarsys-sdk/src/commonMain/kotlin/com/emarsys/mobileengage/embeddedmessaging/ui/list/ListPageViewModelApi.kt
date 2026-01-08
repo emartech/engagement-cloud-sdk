@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 interface ListPageViewModelApi {
-    val messagePagingDataFlow: Flow<PagingData<MessageItemViewModelApi>>
+    val messagePagingDataFlowFiltered: Flow<PagingData<MessageItemViewModelApi>>
     val categories: StateFlow<List<MessageCategory>>
 
     val filterUnreadOnly: StateFlow<Boolean>
@@ -24,11 +24,13 @@ interface ListPageViewModelApi {
     fun setSelectedCategoryIds(categoryIds: Set<Int>)
 
     suspend fun selectMessage(messageViewModel: MessageItemViewModelApi, onNavigate: suspend () -> Unit)
+    suspend fun deleteMessage(messageViewModel: MessageItemViewModelApi): Result<Unit>
+
     fun clearMessageSelection()
 
     fun openCategorySelector()
     fun closeCategorySelector()
     fun applyCategorySelection(categoryIds: Set<Int>)
 
-    fun refreshMessages(shouldCallRefresh: () -> Unit)
+    fun refreshMessagesWithThrottling(shouldCallRefresh: () -> Unit)
 }
