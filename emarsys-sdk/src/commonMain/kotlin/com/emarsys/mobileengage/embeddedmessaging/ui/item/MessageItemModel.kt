@@ -1,6 +1,7 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.item
 
 import com.emarsys.core.channel.SdkEventDistributorApi
+import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.event.SdkEvent
@@ -18,24 +19,37 @@ internal class MessageItemModel(
     override val message: EmbeddedMessage,
     private val downloaderApi: DownloaderApi,
     private val sdkEventDistributor: SdkEventDistributorApi,
-    private val actionFactory: ActionFactoryApi<ActionModel>
+    private val actionFactory: ActionFactoryApi<ActionModel>,
+    private val logger: Logger
 ) : MessageItemModelApi {
 
     private companion object {
+        const val READ_TAG = "read"
         const val UNREAD_TAG = "unread"
         const val PINNED_TAG = "pinned"
+        const val DELETED_TAG = "deleted"
     }
+
     override suspend fun downloadImage(): ByteArray {
         return message.listThumbnailImage?.let {
             downloaderApi.download(it.src, getDecodedFallbackImage())
         } ?: getDecodedFallbackImage()
     }
 
+    override suspend fun tagMessageRead(): Result<Unit> {
+        return updateTagsForMessage(READ_TAG, TagOperation.Add)
+    }
+
+    override suspend fun deleteMessage(): Result<Unit> {
+        return updateTagsForMessage(DELETED_TAG, TagOperation.Add)
+    }
+
     @OptIn(ExperimentalTime::class)
-    override suspend fun updateTagsForMessage(
+    private suspend fun updateTagsForMessage(
         tag: String,
         operation: TagOperation
-    ): Boolean {
+    ): Result<Unit> {
+        logger.debug("Updating tag '$tag' with operation '$operation' for message id '${message.id}'")
         return try {
             val updateData = listOf(
                 MessageTagUpdate(
@@ -52,12 +66,18 @@ internal class MessageItemModel(
             val waiter = sdkEventDistributor.registerEvent(updateTagsEvent)
             val response = waiter.await<Response>()
 
-            response.result.fold(
-                onSuccess = { true },
-                onFailure = { false }
-            )
+            response.result
+                .onFailure {
+                    logger.debug(
+                        "tag update failure: $tag $operation for message id '${message.id}'",
+                        it
+                    )
+                }
+                .map {
+                    logger.debug("tag update success: $tag $operation for message id '${message.id}'")
+                }
         } catch (e: Exception) {
-            false
+            Result.failure(e)
         }
     }
 

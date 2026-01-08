@@ -2,6 +2,7 @@ package com.emarsys.mobileengage.embeddedmessaging.ui.item
 
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.channel.SdkEventWaiterApi
+import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.util.DownloaderApi
@@ -12,6 +13,7 @@ import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.action.models.BasicRichContentDisplayActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
+import com.emarsys.mobileengage.embeddedmessaging.models.MessageTagUpdate
 import com.emarsys.mobileengage.embeddedmessaging.models.TagOperation
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
@@ -28,6 +30,10 @@ import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
+import io.kotest.data.forAll
+import io.kotest.data.headers
+import io.kotest.data.row
+import io.kotest.data.table
 import io.kotest.matchers.shouldBe
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -38,6 +44,7 @@ import kotlin.io.encoding.Base64
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
 import kotlin.test.Test
+import kotlin.time.ExperimentalTime
 
 class MessageItemModelTests {
     private companion object {
@@ -69,7 +76,10 @@ class MessageItemModelTests {
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
     private lateinit var mockSdkEventWaiter: SdkEventWaiterApi
     private lateinit var mockActionFactory: ActionFactoryApi<ActionModel>
+    private lateinit var mockLogger: Logger
     private lateinit var messageItemModel: MessageItemModel
+
+    private val eventSlot = slot<SdkEvent.Internal.EmbeddedMessaging.UpdateTagsForMessages>()
 
     @BeforeTest
     fun setup() {
@@ -77,6 +87,7 @@ class MessageItemModelTests {
         mockSdkEventDistributor = mock(MockMode.autofill)
         mockSdkEventWaiter = mock(MockMode.autofill)
         mockActionFactory = mock(MockMode.autofill)
+        mockLogger = mock(MockMode.autofill)
 
         messageItemModel = createMessageItemModel()
     }
@@ -86,7 +97,8 @@ class MessageItemModelTests {
             message = message,
             downloaderApi = mockDownloader,
             sdkEventDistributor = mockSdkEventDistributor,
-            actionFactory = mockActionFactory
+            actionFactory = mockActionFactory,
+            logger = mockLogger
         )
 
 
@@ -122,71 +134,73 @@ class MessageItemModelTests {
         }
     }
 
+    @OptIn(ExperimentalTime::class)
     @Test
-    fun updateTagsForMessage_shouldSendUpdateTagsForMessagesEvent_andReturnSuccess() = runTest {
-        val networkResponse = Response(
-            originalRequest = UrlRequest(Url("https://example.com"), HttpMethod.Patch),
-            status = HttpStatusCode.OK,
-            headers = headersOf(),
-            bodyAsText = ""
-        )
-        val answerResponse = SdkEvent.Internal.Sdk.Answer.Response(
-            originId = "test-id",
-            result = Result.success(networkResponse)
-        )
+    fun messageTagging_shouldSendUpdateTagsForMessagesEvent_andReturnSuccess() = runTest {
+        forAll(
+            table(
+                headers("expectedTag", "testMethod"),
+                listOf(
+                    row("deleted", messageItemModel::deleteMessage),
+                    row("read", messageItemModel::tagMessageRead),
+                )
+            )
+        ) { expectedTag, testMethod ->
+            val networkResponse = Response(
+                originalRequest = UrlRequest(Url("https://example.com"), HttpMethod.Patch),
+                status = HttpStatusCode.OK,
+                headers = headersOf(),
+                bodyAsText = ""
+            )
+            val answerResponse = SdkEvent.Internal.Sdk.Answer.Response(
+                originId = "test-id",
+                result = Result.success(networkResponse)
+            )
 
-        everySuspend { mockSdkEventWaiter.await<Response>() } returns answerResponse
-        everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mockSdkEventWaiter
+            everySuspend { mockSdkEventWaiter.await<Response>() } returns answerResponse
+            everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mockSdkEventWaiter
 
-        val result = messageItemModel.updateTagsForMessage(
-            tag = "seen",
-            operation = TagOperation.Add
-        )
+            val result = testMethod()
 
-        result shouldBe true
+            result.isSuccess shouldBe true
+            eventSlot.get().run {
+                nackCount shouldBe 0
+                updateData shouldBe listOf(
+                    MessageTagUpdate(
+                        messageId = messageItemModel.message.id,
+                        operation = TagOperation.Add,
+                        tag = expectedTag,
+                        trackingInfo = messageItemModel.message.trackingInfo
+                    )
+                )
+            }
+        }
     }
 
     @Test
-    fun updateTagsForMessage_shouldReturnFailure_whenResponseFails() = runTest {
-        val testException = Exception("Network error")
-        val answerResponse = SdkEvent.Internal.Sdk.Answer.Response<Response>(
-            originId = "test-id",
-            result = Result.failure(testException)
-        )
+    fun messageTagging_shouldReturnFailure_whenResponseFails() = runTest {
+        forAll(
+            table(
+                headers("testMethod"),
+                listOf(
+                    row(messageItemModel::deleteMessage),
+                    row(messageItemModel::tagMessageRead),
+                )
+            )
+        ) { testMethod ->
+            val testException = Exception("Network error")
+            val answerResponse = SdkEvent.Internal.Sdk.Answer.Response<Response>(
+                originId = "test-id",
+                result = Result.failure(testException)
+            )
 
-        everySuspend { mockSdkEventWaiter.await<Response>() } returns answerResponse
-        everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mockSdkEventWaiter
+            everySuspend { mockSdkEventWaiter.await<Response>() } returns answerResponse
+            everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mockSdkEventWaiter
 
-        val result = messageItemModel.updateTagsForMessage(
-            tag = "seen",
-            operation = TagOperation.Add
-        )
+            val result = testMethod()
 
-        result shouldBe false
-    }
-
-    @Test
-    fun updateTagsForMessage_shouldCreateCorrectMessageTagUpdate() = runTest {
-        val networkResponse = Response(
-            originalRequest = UrlRequest(Url("https://example.com"), HttpMethod.Patch),
-            status = HttpStatusCode.OK,
-            headers = headersOf(),
-            bodyAsText = ""
-        )
-        val answerResponse = SdkEvent.Internal.Sdk.Answer.Response(
-            originId = "test-id",
-            result = Result.success(networkResponse)
-        )
-
-        everySuspend { mockSdkEventWaiter.await<Response>() } returns answerResponse
-        everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mockSdkEventWaiter
-
-        messageItemModel.updateTagsForMessage(
-            tag = "seen",
-            operation = TagOperation.Add
-        )
-
-        verifySuspend { mockSdkEventDistributor.registerEvent(any()) }
+            result.isSuccess shouldBe false
+        }
     }
 
     @Test
