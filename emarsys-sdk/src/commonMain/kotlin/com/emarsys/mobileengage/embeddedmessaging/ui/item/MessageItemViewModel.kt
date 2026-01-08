@@ -1,13 +1,8 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.item
 
-import com.emarsys.mobileengage.embeddedmessaging.models.TagOperation
-
 class MessageItemViewModel(
     private val model: MessageItemModelApi
 ) : MessageItemViewModelApi {
-    private companion object {
-        const val TAG_READ = "read"
-    }
 
     override val id: String
         get() = model.message.id
@@ -45,7 +40,11 @@ class MessageItemViewModel(
         model.handleDefaultAction()
     }
 
-    override suspend fun tagMessageRead() {
-        model.updateTagsForMessage(TAG_READ, TagOperation.Add)
+    override suspend fun tagMessageRead(): Result<Unit> {
+        return model.tagMessageRead()
+    }
+
+    override suspend fun deleteMessage(): Result<Unit> {
+        return model.deleteMessage()
     }
 }

@@ -1,10 +1,8 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.item
 
 import com.emarsys.mobileengage.action.models.PresentableActionModel
-import com.emarsys.mobileengage.embeddedmessaging.models.TagOperation
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
 import com.emarsys.networking.clients.embedded.messaging.model.ListThumbnailImage
-import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
@@ -13,24 +11,24 @@ import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
-import kotlin.test.Ignore
 import kotlin.test.Test
 
 class MessageItemViewModelTests {
 
     private lateinit var mockMessageItemModel: MessageItemModelApi
 
+    private lateinit var viewModel: MessageItemViewModel
+
     @BeforeTest
     fun setup() = runTest {
-        mockMessageItemModel = mock(MockMode.autofill)
+        mockMessageItemModel = mock()
+        viewModel = MessageItemViewModel(mockMessageItemModel)
     }
 
     @Test
-    fun id_shouldReturn_MessageId() {
+    fun id_shouldReturn_ModelId() {
         val testMessage = createTestMessage(id = "testId")
-        val mockModel = mock<MessageItemModelApi>(MockMode.autofill)
-        every { mockModel.message } returns testMessage
-        val viewModel = MessageItemViewModel(mockModel)
+        every { mockMessageItemModel.message } returns testMessage
 
         val result = viewModel.id
 
@@ -38,11 +36,9 @@ class MessageItemViewModelTests {
     }
 
     @Test
-    fun title_shouldReturn_MessageTitle() {
+    fun title_shouldReturn_ModelTitle() {
         val testMessage = createTestMessage(title = "Test Title")
-        val mockModel = mock<MessageItemModelApi>(MockMode.autofill)
-        every { mockModel.message } returns testMessage
-        val viewModel = MessageItemViewModel(mockModel)
+        every { mockMessageItemModel.message } returns testMessage
 
         val result = viewModel.title
 
@@ -50,11 +46,9 @@ class MessageItemViewModelTests {
     }
 
     @Test
-    fun lead_shouldReturn_MessageLead() {
+    fun lead_shouldReturn_ModelLead() {
         val testMessage = createTestMessage(lead = "Test Lead")
-        val mockModel = mock<MessageItemModelApi>(MockMode.autofill)
-        every { mockModel.message } returns testMessage
-        val viewModel = MessageItemViewModel(mockModel)
+        every { mockMessageItemModel.message } returns testMessage
 
         val result = viewModel.lead
 
@@ -62,11 +56,9 @@ class MessageItemViewModelTests {
     }
 
     @Test
-    fun imageUrl_shouldReturn_MessageImageUrl() {
+    fun imageUrl_shouldReturn_ModelImageUrl() {
         val testMessage = createTestMessage(imageUrl = "https://example.com/image.jpg")
-        val mockModel = mock<MessageItemModelApi>(MockMode.autofill)
-        every { mockModel.message } returns testMessage
-        val viewModel = MessageItemViewModel(mockModel)
+        every { mockMessageItemModel.message } returns testMessage
 
         val result = viewModel.imageUrl
 
@@ -74,15 +66,13 @@ class MessageItemViewModelTests {
     }
 
     @Test
-    fun imageUrl_shouldReturn_MessageImageAltText() {
+    fun imageUrl_shouldReturn_ModelImageAltText() {
         val expectedAltText = "Example Image"
         val testMessage = createTestMessage(
             imageUrl = "https://example.com/image.jpg",
             imageAltText = expectedAltText
         )
-        val mockModel = mock<MessageItemModelApi>(MockMode.autofill)
-        every { mockModel.message } returns testMessage
-        val viewModel = MessageItemViewModel(mockModel)
+        every { mockMessageItemModel.message } returns testMessage
 
         val result = viewModel.imageAltText
 
@@ -90,11 +80,9 @@ class MessageItemViewModelTests {
     }
 
     @Test
-    fun imageUrl_shouldReturn_Null_when_MessageImageUrlIsNull() {
+    fun imageUrl_shouldReturn_Null_when_ModelImageUrlIsNull() {
         val testMessage = createTestMessage(imageUrl = null)
-        val mockModel = mock<MessageItemModelApi>(MockMode.autofill)
-        every { mockModel.message } returns testMessage
-        val viewModel = MessageItemViewModel(mockModel)
+        every { mockMessageItemModel.message } returns testMessage
 
         val result = viewModel.imageUrl
 
@@ -102,11 +90,9 @@ class MessageItemViewModelTests {
     }
 
     @Test
-    fun receivedAt_shouldReturn_MessageReceivedAt() {
+    fun receivedAt_shouldReturn_ModelReceivedAt() {
         val testMessage = createTestMessage(receivedAt = 1234567890L)
-        val mockModel = mock<MessageItemModelApi>(MockMode.autofill)
-        every { mockModel.message } returns testMessage
-        val viewModel = MessageItemViewModel(mockModel)
+        every { mockMessageItemModel.message } returns testMessage
 
         val result = viewModel.receivedAt
 
@@ -114,69 +100,65 @@ class MessageItemViewModelTests {
     }
 
     @Test
-    fun isUnread_shouldReturn_MessageIsUnread() {
-        val mockModel = mock<MessageItemModelApi>(MockMode.autofill)
-        every { mockModel.isUnread() } returns true
-        val viewModel = MessageItemViewModel(mockModel)
+    fun isUnread_shouldReturn_ModelIsUnread() {
+        every { mockMessageItemModel.isUnread() } returns true
 
         viewModel.isUnread shouldBe true
     }
 
     @Test
-    fun isPinned_shouldReturn_MessageIsPinned() {
-        val mockModel = mock<MessageItemModelApi>(MockMode.autofill)
-        every { mockModel.isPinned() } returns true
-        val viewModel = MessageItemViewModel(mockModel)
+    fun isPinned_shouldReturn_ModelIsPinned() {
+        every { mockMessageItemModel.isPinned() } returns true
 
         viewModel.isPinned shouldBe true
     }
 
     @Test
-    fun hasDefaultAction_shouldReturn_MessageShouldNavigateToDetailView() {
-        val mockModel = mock<MessageItemModelApi>(MockMode.autofill)
-        every { mockModel.shouldNavigate() } returns true
-        val viewModel = MessageItemViewModel(mockModel)
+    fun hasDefaultAction_shouldReturn_ModelShouldNavigateToDetailView() {
+        every { mockMessageItemModel.shouldNavigate() } returns true
 
         viewModel.shouldNavigate() shouldBe true
     }
 
     @Test
-    fun handleDefaultAction_shouldCall_MessageHandleDefaultAction() = runTest {
-        val mockModel = mock<MessageItemModelApi>(MockMode.autofill)
-        everySuspend { mockModel.handleDefaultAction() } returns Unit
-
-        val viewModel = MessageItemViewModel(mockModel)
+    fun handleDefaultAction_shouldCall_ModelHandleDefaultAction() = runTest {
+        everySuspend { mockMessageItemModel.handleDefaultAction() } returns Unit
 
         viewModel.handleDefaultAction()
 
-        verifySuspend { mockModel.handleDefaultAction() }
+        verifySuspend { mockMessageItemModel.handleDefaultAction() }
     }
 
     @Test
-    fun tagMessageRead_shouldCall_MessageUpdateTagsForMessage() = runTest {
-        val mockModel = mock<MessageItemModelApi>(MockMode.autofill)
+    fun tagMessageRead_shouldCall_ModelTagMessageRead() = runTest {
+        everySuspend { mockMessageItemModel.tagMessageRead() } returns Result.success(Unit)
 
-        val viewModel = MessageItemViewModel(mockModel)
+        val result = viewModel.tagMessageRead()
 
-        viewModel.tagMessageRead()
-
-        verifySuspend { mockModel.updateTagsForMessage("read", TagOperation.Add) }
+        result.isSuccess shouldBe true
+        verifySuspend { mockMessageItemModel.tagMessageRead() }
     }
 
     @Test
-    @Ignore
+    fun deleteMessage_shouldCall_ModelDeleteMessage() = runTest {
+        everySuspend { mockMessageItemModel.deleteMessage() } returns Result.success(Unit)
+
+        val result = viewModel.deleteMessage()
+
+        result.isSuccess shouldBe true
+        verifySuspend { mockMessageItemModel.deleteMessage() }
+    }
+
+    @Test
     fun fetchImage_shouldCallDownloadImage_onTheModel() = runTest {
         val imageByteArray = byteArrayOf()
         val testMessage = createTestMessage(imageUrl = "testUrl")
-        val mockModel = mock<MessageItemModelApi>(MockMode.autofill)
-        every { mockModel.message } returns testMessage
-        everySuspend { mockModel.downloadImage() } returns imageByteArray
-
-        val viewModel = MessageItemViewModel(mockModel)
+        every { mockMessageItemModel.message } returns testMessage
+        everySuspend { mockMessageItemModel.downloadImage() } returns imageByteArray
 
         viewModel.fetchImage()
 
-        verifySuspend { mockModel.downloadImage() }
+        verifySuspend { mockMessageItemModel.downloadImage() }
     }
 
     private fun createTestMessage(

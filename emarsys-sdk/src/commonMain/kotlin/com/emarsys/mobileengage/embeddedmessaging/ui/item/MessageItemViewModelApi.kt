@@ -14,5 +14,6 @@ interface MessageItemViewModelApi {
     fun shouldNavigate(): Boolean
     suspend fun fetchImage(): ByteArray
     suspend fun handleDefaultAction()
-    suspend fun tagMessageRead()
+    suspend fun tagMessageRead(): Result<Unit>
+    suspend fun deleteMessage(): Result<Unit>
 }
