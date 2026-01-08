@@ -20,7 +20,7 @@ class MessageItemViewModelTests {
     private lateinit var viewModel: MessageItemViewModel
 
     @BeforeTest
-    fun setup() = runTest {
+    fun setup() {
         mockMessageItemModel = mock()
         viewModel = MessageItemViewModel(mockMessageItemModel)
     }
