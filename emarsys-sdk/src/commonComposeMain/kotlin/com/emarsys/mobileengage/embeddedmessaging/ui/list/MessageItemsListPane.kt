@@ -180,6 +180,9 @@ fun MessageItemsListPane(
                                 key = lazyPagingMessageItems.itemKey { it.id }
                             ) { index ->
                                 lazyPagingMessageItems[index]?.let { messageViewModel ->
+                                    if (messageViewModel.isExcludedLocally) {
+                                        return@let
+                                    }
                                     val isSwipeEnabled = fullyVisibleItems.contains(index) &&
                                             if (canShowDetailPane) {
                                                 messageViewModel.id != selectedMessage?.id

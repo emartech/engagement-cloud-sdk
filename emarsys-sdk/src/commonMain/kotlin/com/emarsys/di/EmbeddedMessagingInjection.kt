@@ -66,8 +66,8 @@ object EmbeddedMessagingInjection {
                 coroutineScope = get<CoroutineScope>(named(CoroutineScopeTypes.Application)),
                 pagerFactory = get(),
                 connectionWatchDog = get<ConnectionWatchDog>(),
-                deletedMessageIds = MutableStateFlow(emptySet()),
-                readMessageIds = MutableStateFlow(emptySet())
+                locallyDeletedMessageIds = MutableStateFlow(emptySet()),
+                locallyReadMessageIds = MutableStateFlow(emptySet())
             )
         }
     }

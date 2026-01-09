@@ -1,7 +1,7 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.list
 
 import androidx.paging.cachedIn
-import androidx.paging.filter
+import androidx.paging.map
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
@@ -27,8 +27,8 @@ internal class ListPageViewModel(
     private val coroutineScope: CoroutineScope,
     private val pagerFactory: PagerFactoryApi,
     private val connectionWatchDog: ConnectionWatchDog,
-    private val deletedMessageIds: MutableStateFlow<Set<String>>,
-    private val readMessageIds: MutableStateFlow<Set<String>>
+    private val locallyDeletedMessageIds: MutableStateFlow<Set<String>>,
+    private val locallyReadMessageIds: MutableStateFlow<Set<String>>
 ) : ListPageViewModelApi {
     private val _categories = MutableStateFlow<List<MessageCategory>>(emptyList())
     override val categories: StateFlow<List<MessageCategory>> = _categories.asStateFlow()
@@ -69,16 +69,28 @@ internal class ListPageViewModel(
                     selectedCategoryIds = selectedCategoryIds.toList(),
                     categories = _categories
                 )
-            }.cachedIn(coroutineScope)
+            }
+            .cachedIn(coroutineScope)
+            .map { pagingData ->
+                pagingData.map {
+                    if (!it.isExcludedLocally && filterUnreadOnly.value && locallyReadMessageIds.value.contains(it.id)) {
+                        it.copyAsExcludedLocally()
+                    } else it
+                }
+            }
 
     override val messagePagingDataFlowFiltered =
         combine(
             _messagePagingDataFlowFromApi,
-            deletedMessageIds,
-            readMessageIds
-        ) { pagingData, deletedIds, readIds ->
-            pagingData.filter { !deletedIds.contains(it.id) }
+            locallyDeletedMessageIds,
+        ) { pagingData, deletedIds ->
+            pagingData.map {
+                if (!it.isExcludedLocally && deletedIds.contains(it.id)) {
+                    it.copyAsExcludedLocally()
+                } else it
+            }
         }
+
 
     override fun setFilterUnreadOnly(unreadOnly: Boolean) {
         _filterUnreadOnly.value = unreadOnly
@@ -97,7 +109,7 @@ internal class ListPageViewModel(
 
         messageViewModel.tagMessageRead()
             .onSuccess {
-                readMessageIds.value = readMessageIds.value + messageViewModel.id
+                locallyReadMessageIds.value = locallyReadMessageIds.value + messageViewModel.id
             }
 
         if (messageViewModel.shouldNavigate()) {
@@ -111,7 +123,8 @@ internal class ListPageViewModel(
     ): Result<Unit> {
         return messageViewModel.deleteMessage()
             .onSuccess {
-                deletedMessageIds.value = deletedMessageIds.value + messageViewModel.id
+                locallyDeletedMessageIds.value =
+                    locallyDeletedMessageIds.value + messageViewModel.id
             }
     }
 

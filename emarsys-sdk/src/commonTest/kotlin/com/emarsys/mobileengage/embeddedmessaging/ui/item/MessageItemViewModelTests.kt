@@ -8,6 +8,7 @@ import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
+import io.kotest.matchers.equals.shouldNotBeEqual
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
@@ -111,6 +112,26 @@ class MessageItemViewModelTests {
         every { mockMessageItemModel.isPinned() } returns true
 
         viewModel.isPinned shouldBe true
+    }
+
+    @Test
+    fun copyAsExcludedLocally_shouldCreateNewInstance_withUpdatedIsExcludedLocally() = runTest {
+        val result = viewModel.copyAsExcludedLocally()
+
+        result shouldNotBeEqual viewModel
+        result.isExcludedLocally shouldBe true
+    }
+
+    @Test
+    fun copyAsExcludedLocally_shouldCreateNewInstance_andLeaveExcludedLocallyAsTrue() = runTest {
+        val copiedViewModel = viewModel.copyAsExcludedLocally()
+
+        val result = copiedViewModel.copyAsExcludedLocally()
+
+        result shouldNotBeEqual viewModel
+        result shouldNotBeEqual copiedViewModel
+        copiedViewModel.isExcludedLocally shouldBe true
+        result.isExcludedLocally shouldBe true
     }
 
     @Test

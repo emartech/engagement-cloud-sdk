@@ -1,7 +1,8 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.item
 
 class MessageItemViewModel(
-    private val model: MessageItemModelApi
+    private val model: MessageItemModelApi,
+    override val isExcludedLocally: Boolean = false
 ) : MessageItemViewModelApi {
 
     override val id: String
@@ -47,4 +48,7 @@ class MessageItemViewModel(
     override suspend fun deleteMessage(): Result<Unit> {
         return model.deleteMessage()
     }
+
+    override fun copyAsExcludedLocally(): MessageItemViewModelApi =
+        MessageItemViewModel(model, isExcludedLocally = true)
 }

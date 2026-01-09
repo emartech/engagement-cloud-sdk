@@ -81,8 +81,8 @@ class ListPageViewModelTests {
             coroutineScope = CoroutineScope(SupervisorJob() + testDispatcher),
             pagerFactory = mockPagerFactory,
             connectionWatchDog = mockConnectionWatchDog,
-            deletedMessageIds = deletedMessageIds,
-            readMessageIds = readMessageIds
+            locallyDeletedMessageIds = deletedMessageIds,
+            locallyReadMessageIds = readMessageIds
         )
     }
 
