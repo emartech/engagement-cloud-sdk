@@ -13,7 +13,6 @@ config.optimization.minimizer = [
                 drop_debugger: true,
                 conditionals: true,
                 evaluate: true,
-                drop_console: true, // Drop console.* calls
                 sequences: true,
                 booleans: true,
                 passes: 3, // Run compression multiple times
