@@ -15,18 +15,18 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
@@ -48,10 +48,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.DEFAULT_PADDING
-import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.FLOATING_ACTION_BUTTON_SIZE
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.ZERO_SPACING
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategoriesDialogView
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategorySelectorButton
@@ -244,17 +244,11 @@ private fun FilterRow(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(ZERO_SPACING)
         ) {
-            FilterChip(
-                modifier = Modifier.height(FLOATING_ACTION_BUTTON_SIZE),
-                selected = !filterUnreadOnly,
-                onClick = { onFilterChange(false) },
-                label = { Text(LocalStringResources.current.allMessagesFilterButtonLabel) }
-            )
-            FilterChip(
-                modifier = Modifier.height(FLOATING_ACTION_BUTTON_SIZE),
-                selected = filterUnreadOnly,
-                onClick = { onFilterChange(true) },
-                label = { Text(LocalStringResources.current.unreadMessagesFilterButtonLabel) }
+
+            FilterByReadStateTab(
+                filterUnreadOnly = filterUnreadOnly,
+                onFilterChange = onFilterChange,
+                modifier = Modifier.weight(1.5f)
             )
 
             Spacer(modifier = Modifier.padding(DEFAULT_PADDING).weight(1f))
@@ -268,6 +262,47 @@ private fun FilterRow(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun FilterByReadStateTab(
+    filterUnreadOnly: Boolean,
+    onFilterChange: (Boolean) -> Unit,
+    modifier: Modifier
+) {
+    PrimaryTabRow(
+        selectedTabIndex = if (filterUnreadOnly) 1 else 0,
+        modifier = modifier,
+        containerColor = MaterialTheme.colorScheme.surface,
+        divider = {}
+    ) {
+        Tab(
+            selected = !filterUnreadOnly,
+            onClick = { onFilterChange(false) },
+            text = {
+                Text(
+                    text = LocalStringResources.current.allMessagesFilterButtonLabel,
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    softWrap = true
+                )
+            }
+        )
+        Tab(
+            selected = filterUnreadOnly,
+            onClick = { onFilterChange(true) },
+            text = {
+                Text(
+                    text = LocalStringResources.current.unreadMessagesFilterButtonLabel,
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    softWrap = true
+                )
+            },
+        )
     }
 }
 
