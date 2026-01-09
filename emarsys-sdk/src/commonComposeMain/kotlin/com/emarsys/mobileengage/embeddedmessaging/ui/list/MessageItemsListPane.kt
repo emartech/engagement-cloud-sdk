@@ -36,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -186,34 +187,33 @@ fun MessageItemsListPane(
                                                 selectedMessage == null
                                             }
 
-                                    val dismissState = rememberSwipeToDismissBoxState(
-                                        initialValue = SwipeToDismissBoxValue.Settled,
-                                        positionalThreshold = { totalDistance -> totalDistance * 0.3f },
-                                    )
-
-                                    LaunchedEffect(scaffoldValue) {
-                                        if (dismissState.currentValue != SwipeToDismissBoxValue.Settled) {
-                                            dismissState.snapTo(SwipeToDismissBoxValue.Settled)
-                                        }
-                                    }
-
-                                    SwipeToDismissBox(
-                                        state = dismissState,
-                                        enableDismissFromStartToEnd = false,
-                                        enableDismissFromEndToStart = isSwipeEnabled,
-                                        backgroundContent = {
-                                            DeleteMessageOnSwipeBox()
-                                        },
-                                        onDismiss = {
-                                            messageIdToDelete = messageViewModel.id
-                                            dismissStateToReset = dismissState
-                                        }
-                                    ) {
-                                        MessageItemView(
-                                            viewModel = messageViewModel,
-                                            isSelected = messageViewModel.id == selectedMessage?.id,
-                                            onClick = { onMessageClick(messageViewModel) }
+                                    key(messageViewModel.id, scaffoldValue, isSwipeEnabled) {
+                                        val dismissState = rememberSwipeToDismissBoxState(
+                                            initialValue = SwipeToDismissBoxValue.Settled,
+                                            positionalThreshold = { totalDistance -> totalDistance * 0.3f }
                                         )
+
+                                        LaunchedEffect(dismissState.currentValue) {
+                                            if (dismissState.currentValue != SwipeToDismissBoxValue.Settled) {
+                                                messageIdToDelete = messageViewModel.id
+                                                dismissStateToReset = dismissState
+                                            }
+                                        }
+
+                                        SwipeToDismissBox(
+                                            state = dismissState,
+                                            enableDismissFromStartToEnd = false,
+                                            enableDismissFromEndToStart = isSwipeEnabled,
+                                            backgroundContent = {
+                                                DeleteMessageOnSwipeBox()
+                                            }
+                                        ) {
+                                            MessageItemView(
+                                                viewModel = messageViewModel,
+                                                isSelected = messageViewModel.id == selectedMessage?.id,
+                                                onClick = { onMessageClick(messageViewModel) }
+                                            )
+                                        }
                                     }
                                 }
                             }
