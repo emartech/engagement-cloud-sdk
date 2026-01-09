@@ -204,24 +204,24 @@ class MessageItemModelTests {
     }
 
     @Test
-    fun isUnread_shouldReturnFalse_whenTagsNotContainingUnread() = runTest {
-        val model = createMessageItemModel(TEST_MESSAGE.copy(tags = listOf("seen")))
+    fun isUnread_shouldReturnFalse_whenTagsContainingRead() = runTest {
+        val model = createMessageItemModel(TEST_MESSAGE.copy(tags = listOf("read")))
 
         model.isUnread() shouldBe false
     }
 
     @Test
-    fun isUnread_shouldReturnTrue_whenTagsContainsUnread() = runTest {
+    fun isUnread_shouldReturnTrue_whenTagsDontContainRead() = runTest {
         val model = createMessageItemModel(TEST_MESSAGE.copy(tags = listOf("unread")))
 
         model.isUnread() shouldBe true
     }
 
     @Test
-    fun isUnread_shouldReturnTrue_whenTagsContainsUnread_caseInsensitively() = runTest {
-        val model = createMessageItemModel(TEST_MESSAGE.copy(tags = listOf("UnrEad")))
+    fun isUnread_shouldReturnFalse_whenTagsContainsRead_caseInsensitively() = runTest {
+        val model = createMessageItemModel(TEST_MESSAGE.copy(tags = listOf("Read")))
 
-        model.isUnread() shouldBe true
+        model.isUnread() shouldBe false
     }
 
     @Test

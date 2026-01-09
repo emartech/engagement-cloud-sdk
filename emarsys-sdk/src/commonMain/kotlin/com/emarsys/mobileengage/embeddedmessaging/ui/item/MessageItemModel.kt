@@ -25,7 +25,6 @@ internal class MessageItemModel(
 
     private companion object {
         const val READ_TAG = "read"
-        const val UNREAD_TAG = "unread"
         const val PINNED_TAG = "pinned"
         const val DELETED_TAG = "deleted"
     }
@@ -82,7 +81,7 @@ internal class MessageItemModel(
     }
 
     override fun isUnread(): Boolean {
-        return message.tags.map { it.lowercase() }.contains(UNREAD_TAG)
+        return message.tags.map { it.lowercase() }.contains(READ_TAG).not()
     }
 
     override fun isPinned(): Boolean {
