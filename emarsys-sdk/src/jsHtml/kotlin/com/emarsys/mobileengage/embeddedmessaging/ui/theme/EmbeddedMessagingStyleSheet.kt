@@ -22,6 +22,7 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstant
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.ZERO_PADDING
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.ZERO_POSITION_VALUE
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.ZERO_SPACING
+import org.jetbrains.compose.web.css.AlignContent
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.AlignSelf
 import org.jetbrains.compose.web.css.Color
@@ -30,6 +31,7 @@ import org.jetbrains.compose.web.css.FlexDirection
 import org.jetbrains.compose.web.css.JustifyContent
 import org.jetbrains.compose.web.css.Position
 import org.jetbrains.compose.web.css.StyleSheet
+import org.jetbrains.compose.web.css.alignContent
 import org.jetbrains.compose.web.css.alignItems
 import org.jetbrains.compose.web.css.alignSelf
 import org.jetbrains.compose.web.css.backgroundColor
@@ -361,11 +363,23 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         property("fill", "currentColor")
     }
 
+    val deleteMessageIcon by style {
+        width(ICON_DEFAULT_SIZE)
+        height(ICON_DEFAULT_SIZE)
+        property("fill", "currentColor")
+        padding(DEFAULT_PADDING)
+        display(DisplayStyle.Block)
+    }
+
     val messageItem by style {
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Row)
         alignItems(AlignItems.Center)
         padding(DEFAULT_PADDING)
+
+        self + hover style {
+            backgroundColor(CssColorVars.colorSurfaceDim.value())
+        }
     }
 
     val messageItemImage by style {
@@ -379,7 +393,16 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
     }
 
     val messageItemContent by style {
+        flex(5)
+        padding(DEFAULT_PADDING)
+    }
+
+    val messageItemMisc by style {
         flex(1)
+        display(DisplayStyle.Flex)
+        flexDirection(FlexDirection.Column)
+        alignItems(AlignItems.Center)
+        alignContent(AlignContent.SpaceBetween)
         padding(DEFAULT_PADDING)
     }
 
@@ -389,23 +412,26 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
     }
 
     val messageItemTitle by style {
+        display(DisplayStyle.Block)
+        marginBottom(DEFAULT_MARGIN)
         fontSize(CssFontVars.fontSizeBodyLarge)
         color(CssColorVars.colorOnSurface.value())
-        display(DisplayStyle.Block)
     }
 
     val messageItemLead by style {
-        fontSize(CssFontVars.fontSizeBodyLarge)
+        display(DisplayStyle.Block)
+        marginBottom(DEFAULT_MARGIN)
+        fontSize(CssFontVars.fontSizeBodyMedium)
         color(CssColorVars.colorOnSurface.value())
         property("overflow", "hidden")
         property("text-overflow", "ellipsis")
         property("white-space", "nowrap")
-        display(DisplayStyle.Block)
     }
 
     val messageItemTimestamp by style {
-        fontSize(CssFontVars.fontSizeBodyLarge)
+        fontSize(CssFontVars.fontSizeBodyMedium)
         color(CssColorVars.colorOnSurface.value())
+        display(DisplayStyle.Block)
     }
 
     val loadingSpinner by style {

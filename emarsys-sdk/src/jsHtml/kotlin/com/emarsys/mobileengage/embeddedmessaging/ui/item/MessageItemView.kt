@@ -6,15 +6,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.emarsys.mobileengage.embeddedmessaging.ui.category.SvgIcon
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingStyleSheet
+import com.emarsys.mobileengage.embeddedmessaging.util.asFormattedTimestamp
 import kotlinx.browser.window
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Img
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
+
+private const val DELETE_ICON_PATH =
+    "M7 21q-0.83 0-1.41-0.59t-0.59-1.41V6H4V4h5V3h6v1h5v2h-1v13q0 0.82-0.59 1.41t-1.41 0.59H7Zm10-15H7v13h10V6ZM9 17h2V8H9v9Zm4 0h2V8h-2v9ZM7 6v13-13Z"
 
 @Composable
 fun MessageItemView(
@@ -69,12 +71,23 @@ fun MessageItemView(
             }) {
                 Text(viewModel.lead)
             }
+            Span({
+                classes(EmbeddedMessagingStyleSheet.messageItemTimestamp)
+            }) {
+                Text(viewModel.receivedAt.asFormattedTimestamp())
+            }
         }
 
-        Span({
-            classes(EmbeddedMessagingStyleSheet.messageItemTimestamp)
+        Div({
+            classes(
+                if (hasThumbnailImage) EmbeddedMessagingStyleSheet.messageItemMisc
+                else EmbeddedMessagingStyleSheet.messageItemContentNoPadding
+            )
         }) {
-            Text(formatTimestamp(viewModel.receivedAt))
+            SvgIcon(
+                path = DELETE_ICON_PATH,
+                className = EmbeddedMessagingStyleSheet.deleteMessageIcon
+            )
         }
     }
 }
@@ -85,22 +98,6 @@ fun LoadingSpinner() {
         classes(EmbeddedMessagingStyleSheet.loadingSpinner)
     }) {
         Text("...")
-    }
-}
-
-@OptIn(ExperimentalTime::class)
-private fun formatTimestamp(timestamp: Long): String {
-    val now = Clock.System.now()
-    val receivedAt = Instant.fromEpochMilliseconds(timestamp)
-    val duration = now - receivedAt
-
-    val hours = duration.inWholeHours
-    val days = duration.inWholeDays
-
-    return if (days >= 1) {
-        "${days}d"
-    } else {
-        "${hours}h"
     }
 }
 

@@ -35,11 +35,7 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstant
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Shapes.ZERO_CORNER_RADIUS
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.LocalDesignValues
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
+import com.emarsys.mobileengage.embeddedmessaging.util.asFormattedTimestamp
 
 
 @Composable
@@ -111,7 +107,7 @@ fun MessageItemView(
                     )
 
                     Text(
-                        text = formatTimestamp(viewModel.receivedAt),
+                        text = viewModel.receivedAt.asFormattedTimestamp(),
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 }
@@ -151,33 +147,3 @@ fun LoadingSpinner() {
         )
     }
 }
-
-@OptIn(ExperimentalTime::class)
-private fun formatTimestamp(timestamp: Long): String {
-    val now = Clock.System.now()
-    val receivedAt = Instant.fromEpochMilliseconds(timestamp)
-
-    val nowDateTime = now.toLocalDateTime(TimeZone.currentSystemDefault())
-    val receivedDateTime = receivedAt.toLocalDateTime(TimeZone.currentSystemDefault())
-
-    return when {
-        nowDateTime.date == receivedDateTime.date -> {
-            "${
-                receivedDateTime.hour.toString().padStart(2, '0')
-            }:${receivedDateTime.minute.toString().padStart(2, '0')}"
-        }
-
-        nowDateTime.year == receivedDateTime.year -> {
-            "${
-                receivedDateTime.month.name.take(3)
-            } ${receivedDateTime.day}".toCapitalized()
-        }
-
-        else -> {
-            "${receivedDateTime.month.name.take(3)} ${receivedDateTime.day}, ${receivedDateTime.year}".toCapitalized()
-        }
-    }
-}
-
-private fun String.toCapitalized() =
-    this.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }

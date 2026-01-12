@@ -1,12 +1,14 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.list
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.emarsys.di.SdkKoinIsolationContext.koin
@@ -27,6 +29,10 @@ import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 import org.jetbrains.compose.web.renderComposable
 import org.w3c.dom.events.Event
+import web.cssom.atrule.height
+import web.cssom.px
+import web.dom.document
+import web.intersection.IntersectionObserver
 
 private const val REFRESH_ICON_PATH =
     "M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"
@@ -67,7 +73,7 @@ fun MessageList(viewModel: ListPageViewModelApi) {
 
     LaunchedEffect(isLandscape, lazyPagingMessageItems.itemSnapshotList) {
         if (isLandscape && selectedMessageId == null && lazyPagingMessageItems.itemCount > 0) {
-            selectedMessageId = lazyPagingMessageItems[0]?.id
+            selectedMessageId = lazyPagingMessageItems.itemSnapshotList[0]?.id
         }
     }
 
@@ -149,8 +155,7 @@ fun MessageListContent(
     onRefresh: () -> Unit,
     onItemClick: (String) -> Unit
 ) {
-
-    val isRefreshing = lazyPagingMessageItems.loadState.refresh is androidx.paging.LoadState.Loading
+    val isRefreshing = lazyPagingMessageItems.loadState.source.refresh is LoadState.Loading
 
     Div({
         classes(EmbeddedMessagingStyleSheet.messageListContainer)
@@ -179,8 +184,7 @@ fun MessageListContent(
             Div({
                 classes(EmbeddedMessagingStyleSheet.scrollableList)
             }) {
-                for (i in 0 until lazyPagingMessageItems.itemCount) {
-                    val messageViewModel = lazyPagingMessageItems[i]
+                lazyPagingMessageItems.itemSnapshotList.map { messageViewModel ->
                     if (messageViewModel != null) {
                         MessageItemView(
                             viewModel = messageViewModel,
@@ -188,6 +192,23 @@ fun MessageListContent(
                         )
                     }
                 }
+                if (lazyPagingMessageItems.itemCount > 0) {
+                    Div({
+                        attr("shouldLoadNextPage", "true")
+                        style { height(1.px) }
+                    }
+                    ) {
+                        DisposableEffect(Unit) {
+                            val observer = observePrefetch {
+                                if (lazyPagingMessageItems.itemCount > 0) {
+                                    lazyPagingMessageItems[lazyPagingMessageItems.itemCount - 1]
+                                }
+                            }
+                            onDispose { observer.disconnect() }
+                        }
+                    }
+                }
+
                 // TODO: Handle append loading state (Spinner at bottom)
                 if (lazyPagingMessageItems.loadState.append is androidx.paging.LoadState.Loading) {
                     Div({ classes(EmbeddedMessagingStyleSheet.refreshIndicator) }) {
@@ -281,4 +302,21 @@ fun testEmbeddedMessaging(rootElementId: String) {
     renderComposable(root = element) {
         ListPageView()
     }
+}
+
+fun observePrefetch(onTrigger: () -> Unit): IntersectionObserver {
+    val observer = IntersectionObserver(
+        callback = { entries, _ ->
+            if (entries.any { it.isIntersecting }) {
+                onTrigger()
+            }
+        }
+    )
+
+    val target: web.dom.Element? = document.querySelector("[shouldLoadNextPage]")
+    if (target != null) {
+        observer.observe(target)
+    }
+
+    return observer
 }
