@@ -16,17 +16,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
@@ -48,14 +47,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.DEFAULT_PADDING
-import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.ZERO_SPACING
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategoriesDialogView
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategorySelectorButton
 import com.emarsys.mobileengage.embeddedmessaging.ui.detail.MessageDetailView
+import com.emarsys.mobileengage.embeddedmessaging.ui.tab.FilterByReadStateTabs
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 import com.emarsys.mobileengage.embeddedmessaging.ui.translation.LocalStringResources
 import kotlinx.coroutines.launch
@@ -242,67 +240,26 @@ private fun FilterRow(
         Row(
             modifier = Modifier.padding(DEFAULT_PADDING),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(ZERO_SPACING)
+            horizontalArrangement = Arrangement.spacedBy(DEFAULT_PADDING)
         ) {
-
-            FilterByReadStateTab(
-                filterUnreadOnly = filterUnreadOnly,
-                onFilterChange = onFilterChange,
-                modifier = Modifier.weight(1.5f)
+            FilterByReadStateTabs(
+                selectedTabIndex = if (filterUnreadOnly) 1 else 0,
+                allMessagesText = LocalStringResources.current.allMessagesFilterButtonLabel,
+                unreadMessagesText = LocalStringResources.current.unreadMessagesFilterButtonLabel,
+                onAllMessagesClick = { onFilterChange(false) },
+                onUnreadClick = { onFilterChange(true) },
+                modifier = Modifier.wrapContentWidth()
             )
 
-            Spacer(modifier = Modifier.padding(DEFAULT_PADDING).weight(1f))
+            Spacer(modifier = Modifier.weight(0.5f))
 
-            Column {
-                CategorySelectorButton(
-                    isCategorySelectionActive = selectedCategoryIds.isNotEmpty(),
-                    onClick = {
-                        onCategorySelectorClicked()
-                    },
-                )
-            }
+            CategorySelectorButton(
+                isCategorySelectionActive = selectedCategoryIds.isNotEmpty(),
+                onClick = {
+                    onCategorySelectorClicked()
+                },
+            )
         }
-    }
-}
-
-@Composable
-private fun FilterByReadStateTab(
-    filterUnreadOnly: Boolean,
-    onFilterChange: (Boolean) -> Unit,
-    modifier: Modifier
-) {
-    PrimaryTabRow(
-        selectedTabIndex = if (filterUnreadOnly) 1 else 0,
-        modifier = modifier,
-        containerColor = MaterialTheme.colorScheme.surface,
-        divider = {}
-    ) {
-        Tab(
-            selected = !filterUnreadOnly,
-            onClick = { onFilterChange(false) },
-            text = {
-                Text(
-                    text = LocalStringResources.current.allMessagesFilterButtonLabel,
-                    style = MaterialTheme.typography.bodyMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    softWrap = true
-                )
-            }
-        )
-        Tab(
-            selected = filterUnreadOnly,
-            onClick = { onFilterChange(true) },
-            text = {
-                Text(
-                    text = LocalStringResources.current.unreadMessagesFilterButtonLabel,
-                    style = MaterialTheme.typography.bodyMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    softWrap = true
-                )
-            },
-        )
     }
 }
 
