@@ -368,7 +368,7 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         height(ICON_DEFAULT_SIZE)
         property("fill", "currentColor")
         padding(DEFAULT_PADDING)
-        display(DisplayStyle.Block)
+        display(DisplayStyle.None)
     }
 
     val messageItem by style {
@@ -379,6 +379,13 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
 
         self + hover style {
             backgroundColor(CssColorVars.colorSurfaceDim.value())
+
+            child(
+                className("EmbeddedMessagingStyleSheet-messageItemMisc"),
+                className("EmbeddedMessagingStyleSheet-deleteMessageIcon")
+            ) style {
+                display(DisplayStyle.Block)
+            }
         }
     }
 
