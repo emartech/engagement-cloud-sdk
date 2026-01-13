@@ -1,23 +1,24 @@
 package com.emarsys.core.url
 
-internal enum class EmarsysUrlType {
-    CHANGE_APPLICATION_CODE,
-    LINK_CONTACT,
-    UNLINK_CONTACT,
-    REFRESH_TOKEN,
-    CHANGE_MERCHANT_ID,
-    PUSH_TOKEN,
-    CLEAR_PUSH_TOKEN,
-    EVENT,
-    REGISTER_DEVICE_INFO,
-    REMOTE_CONFIG_SIGNATURE,
-    REMOTE_CONFIG,
-    GLOBAL_REMOTE_CONFIG_SIGNATURE,
-    GLOBAL_REMOTE_CONFIG,
-    DEEP_LINK,
-    LOGGING,
-    FETCH_EMBEDDED_MESSAGES,
-    FETCH_BADGE_COUNT,
-    FETCH_META,
-    UPDATE_TAGS_FOR_MESSAGES
+internal sealed interface EmarsysUrlType {
+    data object ChangeApplicationCode : EmarsysUrlType
+    data object LinkContact : EmarsysUrlType
+    data object UnlinkContact : EmarsysUrlType
+    data object RefreshToken : EmarsysUrlType
+    data object ChangeMerchantId : EmarsysUrlType
+    data object PushToken : EmarsysUrlType
+    data object ClearPushToken : EmarsysUrlType
+    data object Event : EmarsysUrlType
+    data object RegisterDeviceInfo : EmarsysUrlType
+    data object RemoteConfigSignature : EmarsysUrlType
+    data object RemoteConfig : EmarsysUrlType
+    data object GlobalRemoteConfigSignature : EmarsysUrlType
+    data object GlobalRemoteConfig : EmarsysUrlType
+    data object DeepLink : EmarsysUrlType
+    data object Logging : EmarsysUrlType
+    data object FetchEmbeddedMessages : EmarsysUrlType
+    data object FetchBadgeCount : EmarsysUrlType
+    data object FetchMeta : EmarsysUrlType
+    data object UpdateTagsForMessages : EmarsysUrlType
+    data object FetchInlineInAppMessages : EmarsysUrlType
 }

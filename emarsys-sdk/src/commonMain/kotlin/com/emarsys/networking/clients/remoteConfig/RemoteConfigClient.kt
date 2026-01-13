@@ -16,7 +16,6 @@ import com.emarsys.networking.clients.error.ClientExceptionHandler
 import com.emarsys.remoteConfig.RemoteConfigResponse
 import com.emarsys.remoteConfig.RemoteConfigResponseHandlerApi
 import io.ktor.http.HttpMethod
-import io.ktor.http.isSuccess
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.async
@@ -137,7 +136,7 @@ internal class RemoteConfigClient(
     ): Result<com.emarsys.core.networking.model.Response> {
         val request = UrlRequest(
             urlFactoryApi.create(
-                if (global) EmarsysUrlType.GLOBAL_REMOTE_CONFIG else EmarsysUrlType.REMOTE_CONFIG
+                if (global) EmarsysUrlType.GlobalRemoteConfig else EmarsysUrlType.RemoteConfig
             ),
             HttpMethod.Get
         )
@@ -150,7 +149,7 @@ internal class RemoteConfigClient(
     ): Result<com.emarsys.core.networking.model.Response> {
         val request = UrlRequest(
             urlFactoryApi.create(
-                if (global) EmarsysUrlType.GLOBAL_REMOTE_CONFIG_SIGNATURE else EmarsysUrlType.REMOTE_CONFIG_SIGNATURE
+                if (global) EmarsysUrlType.GlobalRemoteConfigSignature else EmarsysUrlType.RemoteConfigSignature
             ),
             HttpMethod.Get
         )

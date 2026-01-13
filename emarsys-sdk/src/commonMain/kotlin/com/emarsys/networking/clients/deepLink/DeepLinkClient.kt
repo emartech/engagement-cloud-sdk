@@ -51,7 +51,7 @@ internal class DeepLinkClient(
                     val headers =
                         mapOf(UserAgentProvider.USER_AGENT_HEADER_NAME to userAgentProvider.provide())
                     val request = UrlRequest(
-                        urlFactory.create(EmarsysUrlType.DEEP_LINK),
+                        urlFactory.create(EmarsysUrlType.DeepLink),
                         method = HttpMethod.Post,
                         headers = headers,
                         bodyString = json.encodeToString(requestBody)

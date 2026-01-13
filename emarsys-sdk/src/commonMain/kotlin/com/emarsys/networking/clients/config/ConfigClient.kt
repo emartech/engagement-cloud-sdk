@@ -6,7 +6,6 @@ import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.exceptions.SdkException.NetworkIOException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
-import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
@@ -47,7 +46,7 @@ internal class ConfigClient(
                 try {
                     sdkLogger.debug("ConfigClient - consumeConfigChanges")
 
-                    val url = urlFactory.create(EmarsysUrlType.CHANGE_APPLICATION_CODE)
+                    val url = urlFactory.create(EmarsysUrlType.ChangeApplicationCode)
                     val request = UrlRequest(url, HttpMethod.Post)
                     val response = emarsysNetworkClient.send(request)
                     response.onSuccess {

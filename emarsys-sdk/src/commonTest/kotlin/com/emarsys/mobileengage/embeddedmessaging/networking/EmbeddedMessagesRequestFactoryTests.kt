@@ -31,10 +31,10 @@ class EmbeddedMessagesRequestFactoryTests {
         json = JsonUtil.json
         mockUrlFactory = mock(MockMode.autofill)
 
-        every { mockUrlFactory.create(EmarsysUrlType.FETCH_EMBEDDED_MESSAGES) } returns Url("https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages")
-        every { mockUrlFactory.create(EmarsysUrlType.FETCH_BADGE_COUNT) } returns Url("https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/badge-count")
-        every { mockUrlFactory.create(EmarsysUrlType.FETCH_META) } returns Url("https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/meta")
-        every { mockUrlFactory.create(EmarsysUrlType.UPDATE_TAGS_FOR_MESSAGES) } returns Url("https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/tags")
+        every { mockUrlFactory.create(EmarsysUrlType.FetchEmbeddedMessages) } returns Url("https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages")
+        every { mockUrlFactory.create(EmarsysUrlType.FetchBadgeCount) } returns Url("https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/badge-count")
+        every { mockUrlFactory.create(EmarsysUrlType.FetchMeta) } returns Url("https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/meta")
+        every { mockUrlFactory.create(EmarsysUrlType.UpdateTagsForMessages) } returns Url("https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/tags")
 
         embeddedMessagesRequestFactory = EmbeddedMessagesRequestFactory(mockUrlFactory, json)
     }

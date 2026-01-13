@@ -45,7 +45,6 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlinx.io.IOException
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -116,7 +115,7 @@ class ConfigClientTests {
         configClient = createConfigClient(backgroundScope)
         configClient.register()
 
-        every { mockUrlFactory.create(EmarsysUrlType.CHANGE_APPLICATION_CODE) }.returns(
+        every { mockUrlFactory.create(EmarsysUrlType.ChangeApplicationCode) }.returns(
             TEST_BASE_URL
         )
         everySuspend { mockEmarsysClient.send(any()) }.returns(Result.success(createTestResponse("{}")))
@@ -148,7 +147,7 @@ class ConfigClientTests {
         configClient = createConfigClient(backgroundScope)
         configClient.register()
 
-        every { mockUrlFactory.create(EmarsysUrlType.CHANGE_APPLICATION_CODE) } returns TEST_BASE_URL
+        every { mockUrlFactory.create(EmarsysUrlType.ChangeApplicationCode) } returns TEST_BASE_URL
         val testException = NetworkIOException("No Network")
         everySuspend { mockEmarsysClient.send(any()) } returns Result.failure(testException)
 
@@ -193,7 +192,7 @@ class ConfigClientTests {
 
         every {
             mockUrlFactory.create(
-                EmarsysUrlType.CHANGE_APPLICATION_CODE
+                EmarsysUrlType.ChangeApplicationCode
             )
         } throws testException
         val changeAppCode = SdkEvent.Internal.Sdk.ChangeAppCode(

@@ -75,7 +75,7 @@ internal class EventClient(
             .naturalBatching().onEach { sdkEvents ->
                 try {
                     sdkLogger.debug("Consume Events, Batch size: ${sdkEvents.size}")
-                    val url = urlFactory.create(EmarsysUrlType.EVENT)
+                    val url = urlFactory.create(EmarsysUrlType.Event)
                     val requestBody =
                         DeviceEventRequestBody(
                             inAppConfigApi.inAppDnd,

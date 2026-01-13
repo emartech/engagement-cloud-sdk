@@ -8,7 +8,7 @@ import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
-import com.emarsys.core.url.EmarsysUrlType.REGISTER_DEVICE_INFO
+import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
@@ -24,7 +24,6 @@ import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.resetAnswers
 import dev.mokkery.resetCalls
-import dev.mokkery.spy
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
@@ -43,11 +42,10 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlin.time.Clock
-import kotlinx.io.IOException
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
@@ -73,7 +71,7 @@ class DeviceClientTests {
         Dispatchers.setMain(StandardTestDispatcher())
         mockEmarsysClient = mock()
         mockUrlFactory = mock()
-        every { mockUrlFactory.create(REGISTER_DEVICE_INFO) } returns URL
+        every { mockUrlFactory.create(EmarsysUrlType.RegisterDeviceInfo) } returns URL
         mockDeviceInfoCollector = mock()
         everySuspend { mockDeviceInfoCollector.collect() } returns DEVICE_INFO_STRING
         mockContactTokenHandler = mock()
@@ -144,7 +142,7 @@ class DeviceClientTests {
         onlineSdkEvents.await() shouldBe listOf(registerDeviceInfoEvent)
         verifySuspend {
             mockDeviceInfoCollector.collect()
-            mockUrlFactory.create(REGISTER_DEVICE_INFO)
+            mockUrlFactory.create(EmarsysUrlType.RegisterDeviceInfo)
             mockEmarsysClient.send(request)
             mockContactTokenHandler.handleContactTokens(expectedResponse)
             mockEventsDao.removeEvent(registerDeviceInfoEvent)
@@ -171,7 +169,7 @@ class DeviceClientTests {
             },
             ""
         )
-        every { mockUrlFactory.create(REGISTER_DEVICE_INFO) } returns testUrl
+        every { mockUrlFactory.create(EmarsysUrlType.RegisterDeviceInfo) } returns testUrl
         everySuspend { mockEmarsysClient.send(any()) } returns Result.success(expectedResponse)
         val registerDeviceInfoEvent = SdkEvent.Internal.Sdk.RegisterDeviceInfo()
 
@@ -186,7 +184,7 @@ class DeviceClientTests {
         onlineSdkEvents.await() shouldBe listOf(registerDeviceInfoEvent)
         verifySuspend {
             mockDeviceInfoCollector.collect()
-            mockUrlFactory.create(REGISTER_DEVICE_INFO)
+            mockUrlFactory.create(EmarsysUrlType.RegisterDeviceInfo)
             mockEmarsysClient.send(request)
             mockEventsDao.removeEvent(registerDeviceInfoEvent)
         }
@@ -217,7 +215,7 @@ class DeviceClientTests {
         onlineSdkEvents.await() shouldBe listOf(registerDeviceInfoEvent)
         verifySuspend {
             mockDeviceInfoCollector.collect()
-            mockUrlFactory.create(REGISTER_DEVICE_INFO)
+            mockUrlFactory.create(EmarsysUrlType.RegisterDeviceInfo)
             mockEmarsysClient.send(any())
         }
         verifySuspend {
@@ -239,7 +237,7 @@ class DeviceClientTests {
         val testException = Exception("Test Exception")
 
         every {
-            mockUrlFactory.create(REGISTER_DEVICE_INFO)
+            mockUrlFactory.create(EmarsysUrlType.RegisterDeviceInfo)
         } throws testException
 
         val registerDeviceInfoEvent =

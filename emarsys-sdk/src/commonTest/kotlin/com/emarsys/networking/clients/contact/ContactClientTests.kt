@@ -42,7 +42,6 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -96,8 +95,8 @@ class ContactClientTests {
         every { mockSdkContext.config } returns mockConfig
         everySuspend { mockContactTokenHandler.handleContactTokens(any()) } returns Unit
         everySuspend { mockEmarsysClient.send(any()) } returns (Result.success(createTestResponse("{}")))
-        every { mockUrlFactory.create(EmarsysUrlType.LINK_CONTACT) } returns TEST_BASE_URL
-        every { mockUrlFactory.create(EmarsysUrlType.UNLINK_CONTACT) } returns TEST_BASE_URL
+        every { mockUrlFactory.create(EmarsysUrlType.LinkContact) } returns TEST_BASE_URL
+        every { mockUrlFactory.create(EmarsysUrlType.UnlinkContact) } returns TEST_BASE_URL
         everySuspend { mockLogger.error(any(), any<Throwable>()) } calls {
             (it.args[1] as Throwable).printStackTrace()
         }

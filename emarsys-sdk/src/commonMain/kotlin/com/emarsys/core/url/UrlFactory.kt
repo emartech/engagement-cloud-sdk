@@ -2,25 +2,6 @@ package com.emarsys.core.url
 
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.exceptions.SdkException.MissingApplicationCodeException
-import com.emarsys.core.url.EmarsysUrlType.CHANGE_APPLICATION_CODE
-import com.emarsys.core.url.EmarsysUrlType.CHANGE_MERCHANT_ID
-import com.emarsys.core.url.EmarsysUrlType.CLEAR_PUSH_TOKEN
-import com.emarsys.core.url.EmarsysUrlType.DEEP_LINK
-import com.emarsys.core.url.EmarsysUrlType.EVENT
-import com.emarsys.core.url.EmarsysUrlType.FETCH_BADGE_COUNT
-import com.emarsys.core.url.EmarsysUrlType.FETCH_EMBEDDED_MESSAGES
-import com.emarsys.core.url.EmarsysUrlType.FETCH_META
-import com.emarsys.core.url.EmarsysUrlType.GLOBAL_REMOTE_CONFIG
-import com.emarsys.core.url.EmarsysUrlType.GLOBAL_REMOTE_CONFIG_SIGNATURE
-import com.emarsys.core.url.EmarsysUrlType.LINK_CONTACT
-import com.emarsys.core.url.EmarsysUrlType.LOGGING
-import com.emarsys.core.url.EmarsysUrlType.PUSH_TOKEN
-import com.emarsys.core.url.EmarsysUrlType.REFRESH_TOKEN
-import com.emarsys.core.url.EmarsysUrlType.REGISTER_DEVICE_INFO
-import com.emarsys.core.url.EmarsysUrlType.REMOTE_CONFIG
-import com.emarsys.core.url.EmarsysUrlType.REMOTE_CONFIG_SIGNATURE
-import com.emarsys.core.url.EmarsysUrlType.UNLINK_CONTACT
-import com.emarsys.core.url.EmarsysUrlType.UPDATE_TAGS_FOR_MESSAGES
 import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
 import io.ktor.http.URLBuilder
@@ -38,49 +19,52 @@ internal class UrlFactory(
 
     override fun create(urlType: EmarsysUrlType, sdkEvent: OnlineSdkEvent?): Url {
         return when (urlType) {
-            CHANGE_APPLICATION_CODE -> {
+            EmarsysUrlType.ChangeApplicationCode -> {
                 URLBuilder("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client/app").build()
             }
 
-            LINK_CONTACT -> createUrl(
+            EmarsysUrlType.LinkContact -> createUrl(
                 sdkContext.defaultUrls.clientServiceBaseUrl,
                 "client/contact"
             ).build()
 
-            UNLINK_CONTACT -> createUrl(
+            EmarsysUrlType.UnlinkContact -> createUrl(
                 sdkContext.defaultUrls.clientServiceBaseUrl,
                 "client/contact"
             ).build()
 
-            REFRESH_TOKEN -> createUrl(
+            EmarsysUrlType.RefreshToken -> createUrl(
                 sdkContext.defaultUrls.clientServiceBaseUrl,
                 "client/contact-token"
             ).build()
 
-            CHANGE_MERCHANT_ID -> createUrl(
+            EmarsysUrlType.ChangeMerchantId -> createUrl(
                 sdkContext.defaultUrls.clientServiceBaseUrl,
                 "client/contact-token"
             ).build()
 
-            PUSH_TOKEN -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client/push-token")
-            CLEAR_PUSH_TOKEN ->
+            EmarsysUrlType.PushToken -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client/push-token")
+            EmarsysUrlType.ClearPushToken ->
                 Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCodeFromEvent(sdkEvent)}/client/push-token")
 
-            REGISTER_DEVICE_INFO -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client")
-            EVENT -> {
+            EmarsysUrlType.RegisterDeviceInfo -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client")
+            EmarsysUrlType.Event -> {
                 Url("${sdkContext.defaultUrls.eventServiceBaseUrl}/$V5_API/apps/${getApplicationCode()}/client/events")
             }
 
-            REMOTE_CONFIG_SIGNATURE -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/signature/${getApplicationCode()}")
-            REMOTE_CONFIG -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/${getApplicationCode()}")
-            GLOBAL_REMOTE_CONFIG_SIGNATURE -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/signature/GLOBAL")
-            GLOBAL_REMOTE_CONFIG -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/GLOBAL")
-            DEEP_LINK -> Url(sdkContext.defaultUrls.deepLinkBaseUrl)
-            LOGGING -> Url("${sdkContext.defaultUrls.loggingUrl}/v1/log")
-            FETCH_EMBEDDED_MESSAGES -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/$V1_API/${getApplicationCode()}/messages")
-            FETCH_BADGE_COUNT -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/$V1_API/${getApplicationCode()}/badge-count")
-            FETCH_META -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/$V1_API/${getApplicationCode()}/meta")
-            UPDATE_TAGS_FOR_MESSAGES -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/$V1_API/${getApplicationCode()}/tags")
+            EmarsysUrlType.RemoteConfigSignature -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/signature/${getApplicationCode()}")
+            EmarsysUrlType.RemoteConfig -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/${getApplicationCode()}")
+            EmarsysUrlType.GlobalRemoteConfigSignature -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/signature/GLOBAL")
+            EmarsysUrlType.GlobalRemoteConfig -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/GLOBAL")
+            EmarsysUrlType.DeepLink -> Url(sdkContext.defaultUrls.deepLinkBaseUrl)
+            EmarsysUrlType.Logging -> Url("${sdkContext.defaultUrls.loggingUrl}/v1/log")
+            EmarsysUrlType.FetchEmbeddedMessages -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/$V1_API/${getApplicationCode()}/messages")
+            EmarsysUrlType.FetchBadgeCount -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/$V1_API/${getApplicationCode()}/badge-count")
+            EmarsysUrlType.FetchMeta -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/$V1_API/${getApplicationCode()}/meta")
+            EmarsysUrlType.UpdateTagsForMessages -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/$V1_API/${getApplicationCode()}/tags")
+            is EmarsysUrlType.FetchInlineInAppMessages -> {
+                Url("${sdkContext.defaultUrls.eventServiceBaseUrl}/$V5_API/apps/${getApplicationCode()}/inline-messages")
+            }
         }
     }
 

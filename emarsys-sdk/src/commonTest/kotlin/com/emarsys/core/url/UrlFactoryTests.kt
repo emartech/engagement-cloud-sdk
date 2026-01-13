@@ -48,16 +48,16 @@ class UrlFactoryTests {
             table(
                 headers("urls"),
                 listOf(
-                    row(EmarsysUrlType.REFRESH_TOKEN),
-                    row(EmarsysUrlType.CHANGE_APPLICATION_CODE),
-                    row(EmarsysUrlType.LINK_CONTACT),
-                    row(EmarsysUrlType.UNLINK_CONTACT),
-                    row(EmarsysUrlType.REFRESH_TOKEN),
-                    row(EmarsysUrlType.PUSH_TOKEN),
-                    row(EmarsysUrlType.REGISTER_DEVICE_INFO),
-                    row(EmarsysUrlType.EVENT),
-                    row(EmarsysUrlType.REMOTE_CONFIG_SIGNATURE),
-                    row(EmarsysUrlType.REMOTE_CONFIG),
+                    row(EmarsysUrlType.RefreshToken),
+                    row(EmarsysUrlType.ChangeApplicationCode),
+                    row(EmarsysUrlType.LinkContact),
+                    row(EmarsysUrlType.UnlinkContact),
+                    row(EmarsysUrlType.RefreshToken),
+                    row(EmarsysUrlType.PushToken),
+                    row(EmarsysUrlType.RegisterDeviceInfo),
+                    row(EmarsysUrlType.Event),
+                    row(EmarsysUrlType.RemoteConfigSignature),
+                    row(EmarsysUrlType.RemoteConfig),
                 )
             )
         ) {
@@ -77,7 +77,7 @@ class UrlFactoryTests {
 
     @Test
     fun testCreate_refreshTokenUrl_should_return_url_with_appCode() {
-        val result = urlFactory.create(EmarsysUrlType.REFRESH_TOKEN)
+        val result = urlFactory.create(EmarsysUrlType.RefreshToken)
 
         result shouldBe Url("https://me-client.gservice.emarsys.net/v4/apps/$APPLICATION_CODE/client/contact-token")
     }
@@ -85,7 +85,7 @@ class UrlFactoryTests {
     @Test
     fun testCreate_changeMerchantId_should_return_url_with_appCode() {
 
-        val result = urlFactory.create(EmarsysUrlType.CHANGE_MERCHANT_ID)
+        val result = urlFactory.create(EmarsysUrlType.ChangeMerchantId)
 
         result shouldBe Url("https://me-client.gservice.emarsys.net/v4/apps/$APPLICATION_CODE/client/contact-token")
     }
@@ -93,7 +93,7 @@ class UrlFactoryTests {
     @Test
     fun testCreate_changeApplicationCode_should_return_url() {
 
-        val result = urlFactory.create(EmarsysUrlType.CHANGE_APPLICATION_CODE)
+        val result = urlFactory.create(EmarsysUrlType.ChangeApplicationCode)
 
         result shouldBe Url("https://me-client.gservice.emarsys.net/v4/apps/$APPLICATION_CODE/client/app")
     }
@@ -101,7 +101,7 @@ class UrlFactoryTests {
     @Test
     fun testCreate_registerPushToken_should_return_url() {
 
-        val result = urlFactory.create(EmarsysUrlType.PUSH_TOKEN)
+        val result = urlFactory.create(EmarsysUrlType.PushToken)
 
         result shouldBe Url("https://me-client.gservice.emarsys.net/v4/apps/$APPLICATION_CODE/client/push-token")
     }
@@ -110,7 +110,7 @@ class UrlFactoryTests {
     fun testCreate_clearPushToken_should_return_url() {
         val testEvent = SdkEvent.Internal.Sdk.ClearPushToken(applicationCode = APPLICATION_CODE)
 
-        val result = urlFactory.create(EmarsysUrlType.CLEAR_PUSH_TOKEN, testEvent)
+        val result = urlFactory.create(EmarsysUrlType.ClearPushToken, testEvent)
 
         result shouldBe Url("https://me-client.gservice.emarsys.net/v4/apps/$APPLICATION_CODE/client/push-token")
     }
@@ -118,27 +118,27 @@ class UrlFactoryTests {
     @Test
     fun testCreate_clearPushToken_should_throwException_ifEventIsNull() {
 
-        shouldThrow<MissingApplicationCodeException> { urlFactory.create(EmarsysUrlType.CLEAR_PUSH_TOKEN) }
+        shouldThrow<MissingApplicationCodeException> { urlFactory.create(EmarsysUrlType.ClearPushToken) }
     }
 
     @Test
     fun testCreate_clearPushToken_should_throwException_ifAppCodeIsNull() {
         val testEvent = SdkEvent.Internal.Sdk.ClearPushToken(applicationCode = null)
 
-        shouldThrow<MissingApplicationCodeException> { urlFactory.create(EmarsysUrlType.CLEAR_PUSH_TOKEN, testEvent) }
+        shouldThrow<MissingApplicationCodeException> { urlFactory.create(EmarsysUrlType.ClearPushToken, testEvent) }
     }
 
     @Test
     fun testCreate_registerDeviceInfo_should_return_url() {
 
-        val result = urlFactory.create(EmarsysUrlType.REGISTER_DEVICE_INFO)
+        val result = urlFactory.create(EmarsysUrlType.RegisterDeviceInfo)
 
         result shouldBe Url("https://me-client.gservice.emarsys.net/v4/apps/$APPLICATION_CODE/client")
     }
 
     @Test
     fun testCreate_linkContact_should_return_url_withAppCode() {
-        val result = urlFactory.create(EmarsysUrlType.LINK_CONTACT)
+        val result = urlFactory.create(EmarsysUrlType.LinkContact)
 
         result shouldBe Url("https://me-client.gservice.emarsys.net/v4/apps/$APPLICATION_CODE/client/contact")
     }
@@ -147,7 +147,7 @@ class UrlFactoryTests {
     fun testCreate_remoteConfig_should_return_url_for_remoteConfig() {
         every { mockDefaultUrls.remoteConfigBaseUrl } returns "testRemoteConfigBaseUrl"
 
-        val result = urlFactory.create(EmarsysUrlType.REMOTE_CONFIG)
+        val result = urlFactory.create(EmarsysUrlType.RemoteConfig)
 
         result shouldBe Url("testRemoteConfigBaseUrl/$APPLICATION_CODE")
     }
@@ -156,7 +156,7 @@ class UrlFactoryTests {
     fun testCreate_remoteConfig_should_return_url_for_remoteConfigSignature() {
         every { mockDefaultUrls.remoteConfigBaseUrl } returns "testRemoteConfigBaseUrl"
 
-        val result = urlFactory.create(EmarsysUrlType.REMOTE_CONFIG_SIGNATURE)
+        val result = urlFactory.create(EmarsysUrlType.RemoteConfigSignature)
 
         result shouldBe Url("testRemoteConfigBaseUrl/signature/$APPLICATION_CODE")
     }
@@ -165,7 +165,7 @@ class UrlFactoryTests {
     fun testCreate_deepLink_should_return_url_for_trackDeepLink() {
         every { mockDefaultUrls.deepLinkBaseUrl } returns "testDeepLinkBaseUrl"
 
-        val result = urlFactory.create(EmarsysUrlType.DEEP_LINK)
+        val result = urlFactory.create(EmarsysUrlType.DeepLink)
 
         result shouldBe Url("testDeepLinkBaseUrl")
     }
@@ -174,7 +174,7 @@ class UrlFactoryTests {
     fun testCreate_embeddedMessaging_should_return_url_for_fetchMessages() {
         every { mockDefaultUrls.embeddedMessagingBaseUrl } returns "testEmbeddedMessagingBaseUrl"
 
-        val result = urlFactory.create(EmarsysUrlType.FETCH_EMBEDDED_MESSAGES)
+        val result = urlFactory.create(EmarsysUrlType.FetchEmbeddedMessages)
 
         result shouldBe Url("testEmbeddedMessagingBaseUrl/v1/$APPLICATION_CODE/messages")
     }
@@ -183,7 +183,7 @@ class UrlFactoryTests {
     fun testCreate_embeddedMessaging_should_return_url_for_badgeCount() {
         every { mockDefaultUrls.embeddedMessagingBaseUrl } returns "testEmbeddedMessagingBaseUrl"
 
-        val result = urlFactory.create(EmarsysUrlType.FETCH_BADGE_COUNT)
+        val result = urlFactory.create(EmarsysUrlType.FetchBadgeCount)
 
         result shouldBe Url("testEmbeddedMessagingBaseUrl/v1/$APPLICATION_CODE/badge-count")
     }
@@ -192,7 +192,7 @@ class UrlFactoryTests {
     fun testCreate_embeddedMessaging_should_return_url_for_fetchMeta() {
         every { mockDefaultUrls.embeddedMessagingBaseUrl } returns "testEmbeddedMessagingBaseUrl"
 
-        val result = urlFactory.create(EmarsysUrlType.FETCH_META)
+        val result = urlFactory.create(EmarsysUrlType.FetchMeta)
 
         result shouldBe Url("testEmbeddedMessagingBaseUrl/v1/$APPLICATION_CODE/meta")
     }
@@ -201,8 +201,16 @@ class UrlFactoryTests {
     fun testCreate_embeddedMessaging_should_return_url_for_updateTagsForMessages() {
         every { mockDefaultUrls.embeddedMessagingBaseUrl } returns "testEmbeddedMessagingBaseUrl"
 
-        val result = urlFactory.create(EmarsysUrlType.UPDATE_TAGS_FOR_MESSAGES)
+        val result = urlFactory.create(EmarsysUrlType.UpdateTagsForMessages)
 
         result shouldBe Url("testEmbeddedMessagingBaseUrl/v1/$APPLICATION_CODE/tags")
+    }
+
+    @Test
+    fun testCreate_inlineInAppMessages_should_return_url() {
+        every { mockDefaultUrls.eventServiceBaseUrl } returns "testEventServiceBaseUrl"
+
+        val result = urlFactory.create(EmarsysUrlType.FetchInlineInAppMessages)
+        result shouldBe Url("testEventServiceBaseUrl/v5/apps/$APPLICATION_CODE/inline-messages")
     }
 }

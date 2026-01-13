@@ -18,7 +18,6 @@ import com.emarsys.remoteConfig.RemoteConfigResponse
 import com.emarsys.remoteConfig.RemoteConfigResponseHandlerApi
 import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
-import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
 import dev.mokkery.every
@@ -47,11 +46,11 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlin.time.Clock
 import kotlinx.io.IOException
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
@@ -128,9 +127,9 @@ class RemoteConfigClientTests {
             Headers.Empty,
             CONFIG_SIGNATURE_RESULT
         )
-        every { mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG) } returns configUrl
+        every { mockUrlFactory.create(EmarsysUrlType.RemoteConfig) } returns configUrl
         every {
-            mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG_SIGNATURE)
+            mockUrlFactory.create(EmarsysUrlType.RemoteConfigSignature)
         } returns configSignatureUrl
         everySuspend { mockNetworkClient.send(configRequest) } returns Result.success(configResponse)
         everySuspend {
@@ -152,8 +151,8 @@ class RemoteConfigClientTests {
         verifySuspend { mockNetworkClient.send(configRequest) }
         verifySuspend { mockNetworkClient.send(configSignatureRequest) }
         verifySuspend { mockRemoteConfigResponseHandler.handle(RemoteConfigResponse(logLevel = LogLevel.Error)) }
-        verifySuspend { mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG) }
-        verifySuspend { mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG_SIGNATURE) }
+        verifySuspend { mockUrlFactory.create(EmarsysUrlType.RemoteConfig) }
+        verifySuspend { mockUrlFactory.create(EmarsysUrlType.RemoteConfigSignature) }
         verifySuspend { mockEventsDao.removeEvent(appCodeBasedRemoteConfigEvent) }
     }
 
@@ -170,9 +169,9 @@ class RemoteConfigClientTests {
             CONFIG_SIGNATURE_RESULT
         )
 
-        every { mockUrlFactory.create(EmarsysUrlType.GLOBAL_REMOTE_CONFIG) } returns configUrl
+        every { mockUrlFactory.create(EmarsysUrlType.GlobalRemoteConfig) } returns configUrl
         every {
-            mockUrlFactory.create(EmarsysUrlType.GLOBAL_REMOTE_CONFIG_SIGNATURE)
+            mockUrlFactory.create(EmarsysUrlType.GlobalRemoteConfigSignature)
         } returns configSignatureUrl
         everySuspend { mockNetworkClient.send(configRequest) } returns Result.success(configResponse)
         everySuspend {
@@ -194,8 +193,8 @@ class RemoteConfigClientTests {
         verifySuspend { mockNetworkClient.send(configRequest) }
         verifySuspend { mockNetworkClient.send(configSignatureRequest) }
         verifySuspend { mockRemoteConfigResponseHandler.handle(RemoteConfigResponse(logLevel = LogLevel.Error)) }
-        verifySuspend { mockUrlFactory.create(EmarsysUrlType.GLOBAL_REMOTE_CONFIG) }
-        verifySuspend { mockUrlFactory.create(EmarsysUrlType.GLOBAL_REMOTE_CONFIG_SIGNATURE) }
+        verifySuspend { mockUrlFactory.create(EmarsysUrlType.GlobalRemoteConfig) }
+        verifySuspend { mockUrlFactory.create(EmarsysUrlType.GlobalRemoteConfigSignature) }
         verifySuspend { mockEventsDao.removeEvent(globalRemoteConfig) }
     }
 
@@ -212,9 +211,9 @@ class RemoteConfigClientTests {
             CONFIG_SIGNATURE_RESULT
         )
 
-        every { mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG) } returns configUrl
+        every { mockUrlFactory.create(EmarsysUrlType.RemoteConfig) } returns configUrl
         every {
-            mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG_SIGNATURE)
+            mockUrlFactory.create(EmarsysUrlType.RemoteConfigSignature)
         } returns configSignatureUrl
         everySuspend { mockNetworkClient.send(configRequest) } returns Result.success(configResponse)
         everySuspend {
@@ -251,10 +250,10 @@ class RemoteConfigClientTests {
             CONFIG_SIGNATURE_RESULT
         )
 
-        every { mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG) } returns configUrl
+        every { mockUrlFactory.create(EmarsysUrlType.RemoteConfig) } returns configUrl
         every {
             mockUrlFactory.create(
-                EmarsysUrlType.REMOTE_CONFIG_SIGNATURE
+                EmarsysUrlType.RemoteConfigSignature
             )
         } returns configSignatureUrl
         everySuspend { mockNetworkClient.send(configRequest) } returns Result.failure(
@@ -294,10 +293,10 @@ class RemoteConfigClientTests {
             CONFIG_SIGNATURE_RESULT
         )
 
-        every { mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG) } returns configUrl
+        every { mockUrlFactory.create(EmarsysUrlType.RemoteConfig) } returns configUrl
         every {
             mockUrlFactory.create(
-                EmarsysUrlType.REMOTE_CONFIG_SIGNATURE
+                EmarsysUrlType.RemoteConfigSignature
             )
         } returns configSignatureUrl
         everySuspend { mockNetworkClient.send(configRequest) } returns Result.success(configResponse)
@@ -330,11 +329,11 @@ class RemoteConfigClientTests {
                 Response(configRequest, HttpStatusCode.OK, Headers.Empty, CONFIG_RESULT)
 
             every {
-                mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG)
+                mockUrlFactory.create(EmarsysUrlType.RemoteConfig)
             } returns configUrl
             everySuspend { mockNetworkClient.send(configRequest) } returns Result.success(configResponse)
             every {
-                mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG_SIGNATURE)
+                mockUrlFactory.create(EmarsysUrlType.RemoteConfigSignature)
             } returns configSignatureUrl
             everySuspend {
                 mockNetworkClient.send(
@@ -371,10 +370,10 @@ class RemoteConfigClientTests {
         createClient(backgroundScope).register()
         val testException = IOException("No Internet")
         every {
-            mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG)
+            mockUrlFactory.create(EmarsysUrlType.RemoteConfig)
         } returns configUrl
         every {
-            mockUrlFactory.create(EmarsysUrlType.REMOTE_CONFIG_SIGNATURE)
+            mockUrlFactory.create(EmarsysUrlType.RemoteConfigSignature)
         } returns configSignatureUrl
 
         everySuspend { mockNetworkClient.send(any()) } returns Result.failure(testException)

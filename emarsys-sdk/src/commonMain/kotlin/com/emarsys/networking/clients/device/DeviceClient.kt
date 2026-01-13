@@ -6,9 +6,8 @@ import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.exceptions.SdkException.NetworkIOException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
-import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
-import com.emarsys.core.url.EmarsysUrlType.REGISTER_DEVICE_INFO
+import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
@@ -90,7 +89,7 @@ internal class DeviceClient(
 
     private suspend fun createRequest(): UrlRequest {
         val deviceInfoString = deviceInfoCollector.collect()
-        val url = urlFactory.create(REGISTER_DEVICE_INFO)
+        val url = urlFactory.create(EmarsysUrlType.RegisterDeviceInfo)
         return UrlRequest(
             url,
             HttpMethod.Post,

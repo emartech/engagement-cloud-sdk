@@ -124,7 +124,7 @@ internal class ContactClient(
                         null
                     )
                 )
-                val url = urlFactory.create(EmarsysUrlType.LINK_CONTACT)
+                val url = urlFactory.create(EmarsysUrlType.LinkContact)
                 UrlRequest(url, HttpMethod.Post, requestBody, headers)
             }
 
@@ -135,12 +135,12 @@ internal class ContactClient(
                         event.openIdToken
                     )
                 )
-                val url = urlFactory.create(EmarsysUrlType.LINK_CONTACT)
+                val url = urlFactory.create(EmarsysUrlType.LinkContact)
                 UrlRequest(url, HttpMethod.Post, requestBody, headers)
             }
 
             else -> {
-                val url = urlFactory.create(EmarsysUrlType.UNLINK_CONTACT)
+                val url = urlFactory.create(EmarsysUrlType.UnlinkContact)
                 UrlRequest(url, HttpMethod.Delete, null, headers)
             }
         }

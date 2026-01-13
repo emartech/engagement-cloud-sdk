@@ -47,7 +47,6 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -91,7 +90,7 @@ class DeepLinkClientTests {
         onlineEvents = MutableSharedFlow()
         everySuspend { mockSdkEventManager.onlineSdkEvents } returns onlineEvents
         everySuspend { mockUserAgentProvider.provide() } returns TEST_USER_AGENT
-        every { mockUrlFactory.create(EmarsysUrlType.DEEP_LINK) } returns TEST_BASE_URL
+        every { mockUrlFactory.create(EmarsysUrlType.DeepLink) } returns TEST_BASE_URL
         everySuspend { mockLogger.error(any(), any<Throwable>()) } calls {
             (it.args[1] as Throwable).printStackTrace()
         }
@@ -218,7 +217,7 @@ class DeepLinkClientTests {
         fun testConsumer_should_call_clientExceptionHandler_when_exception_happens() = runTest {
             createDeepLinkClient(backgroundScope).register()
             val testException = Exception("Test exception")
-            every { mockUrlFactory.create(EmarsysUrlType.DEEP_LINK) } throws testException
+            every { mockUrlFactory.create(EmarsysUrlType.DeepLink) } throws testException
             val trackDeepLink = SdkEvent.Internal.Sdk.TrackDeepLink(
                 id = "trackDeepLink",
                 trackingId = TRACKING_ID

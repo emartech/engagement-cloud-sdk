@@ -52,7 +52,7 @@ internal class LoggingClient(
             .collect { sdkEvents ->
                 try {
                     sdkLogger.debug("consumeLogsAndMetrics", isRemoteLog = false)
-                    val url = urlFactory.create(EmarsysUrlType.LOGGING)
+                    val url = urlFactory.create(EmarsysUrlType.Logging)
                     val logRequestsJson =
                         buildJsonObject {
                             val logRequestJsonArray = sdkEvents.map { sdkEvent ->

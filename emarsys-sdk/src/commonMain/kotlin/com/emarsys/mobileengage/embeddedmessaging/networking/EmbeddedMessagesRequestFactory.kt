@@ -37,20 +37,20 @@ internal class EmbeddedMessagesRequestFactory(
 
             is SdkEvent.Internal.EmbeddedMessaging.FetchMeta ->
                 UrlRequest(
-                    url = urlFactory.create(EmarsysUrlType.FETCH_META),
+                    url = urlFactory.create(EmarsysUrlType.FetchMeta),
                     method = HttpMethod.Get
                 )
 
 
             is SdkEvent.Internal.EmbeddedMessaging.FetchBadgeCount ->
                 UrlRequest(
-                    url = urlFactory.create(EmarsysUrlType.FETCH_BADGE_COUNT),
+                    url = urlFactory.create(EmarsysUrlType.FetchBadgeCount),
                     method = HttpMethod.Get
                 )
 
             is SdkEvent.Internal.EmbeddedMessaging.UpdateTagsForMessages ->
                 UrlRequest(
-                    urlFactory.create(EmarsysUrlType.UPDATE_TAGS_FOR_MESSAGES),
+                    urlFactory.create(EmarsysUrlType.UpdateTagsForMessages),
                     HttpMethod.Patch,
                     bodyString = json.encodeToString(embeddedMessagingEvent.updateData)
                 )
@@ -59,7 +59,7 @@ internal class EmbeddedMessagesRequestFactory(
 
     private fun createFetchMessagesRequest(embeddedMessagingEvent: SdkEvent.Internal.EmbeddedMessaging.FetchMessages): UrlRequest {
         val url = buildUrl {
-            takeFrom(urlFactory.create(EmarsysUrlType.FETCH_EMBEDDED_MESSAGES))
+            takeFrom(urlFactory.create(EmarsysUrlType.FetchEmbeddedMessages))
             if (embeddedMessagingEvent.offset > 0) {
                 parameters.append("\$skip", embeddedMessagingEvent.offset.toString())
             }

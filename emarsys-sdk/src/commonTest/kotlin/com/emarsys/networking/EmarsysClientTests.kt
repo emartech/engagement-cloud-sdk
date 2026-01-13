@@ -96,7 +96,7 @@ class EmarsysClientTests {
 
         every { mockTimestampProvider.provide() } returns now
         every {
-            mockUrlFactory.create(EmarsysUrlType.REFRESH_TOKEN)
+            mockUrlFactory.create(EmarsysUrlType.RefreshToken)
         } returns Url("https://testUrl.com")
 
         everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mock(MockMode.autofill)
