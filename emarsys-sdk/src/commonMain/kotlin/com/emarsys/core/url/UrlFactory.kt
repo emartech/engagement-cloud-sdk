@@ -11,12 +11,12 @@ internal class UrlFactory(
     private val sdkContext: SdkContextApi
 ) : UrlFactoryApi {
     private companion object {
-        const val V4_API = "v4"
-
         const val V1_API = "v1"
+        const val V4_API = "v4"
         const val V5_API = "v5"
     }
 
+    //TODO: remove sdkEvent, add to the URLType if needed
     override fun create(urlType: EmarsysUrlType, sdkEvent: OnlineSdkEvent?): Url {
         return when (urlType) {
             EmarsysUrlType.ChangeApplicationCode -> {

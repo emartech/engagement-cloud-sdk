@@ -61,10 +61,12 @@ import com.emarsys.enable.config.AndroidSdkConfigStore
 import com.emarsys.enable.config.SdkConfigStoreApi
 import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.clipboard.AndroidClipboardHandler
+import com.emarsys.mobileengage.inapp.AndroidInlineInAppViewRenderer
 import com.emarsys.mobileengage.inapp.InAppJsBridgeFactory
 import com.emarsys.mobileengage.inapp.InAppPresenter
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
+import com.emarsys.mobileengage.inapp.InlineInAppViewRendererApi
 import com.emarsys.mobileengage.inapp.provider.InAppDialogProvider
 import com.emarsys.mobileengage.inapp.provider.InAppDialogProviderApi
 import com.emarsys.mobileengage.inapp.provider.InAppViewProvider
@@ -288,6 +290,7 @@ object AndroidInjection {
                 applicationScope = get(named(CoroutineScopeTypes.Application))
             )
         }
+        single<InlineInAppViewRendererApi> { AndroidInlineInAppViewRenderer() }
         single<ClipboardHandlerApi> {
             val clipboardManager =
                 applicationContext.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager

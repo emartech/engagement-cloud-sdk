@@ -68,9 +68,11 @@ import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppScriptExtractor
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
+import com.emarsys.mobileengage.inapp.InlineInAppViewRendererApi
 import com.emarsys.mobileengage.inapp.WebInAppJsBridgeFactory
 import com.emarsys.mobileengage.inapp.WebInAppPresenter
 import com.emarsys.mobileengage.inapp.WebInAppViewProvider
+import com.emarsys.mobileengage.inapp.WebInlineInAppViewRenderer
 import com.emarsys.mobileengage.push.PushNotificationClickHandler
 import com.emarsys.mobileengage.push.PushNotificationClickHandlerApi
 import com.emarsys.mobileengage.push.PushService
@@ -215,6 +217,7 @@ object WebInjection {
         }
         single<ClipboardHandlerApi> { WebClipboardHandler(window.navigator.clipboard) }
         single<LaunchApplicationHandlerApi> { JsLaunchApplicationHandler() }
+        single<InlineInAppViewRendererApi> { WebInlineInAppViewRenderer() }
         single<LanguageTagValidatorApi> { WebLanguageTagValidator() }
         single<SdkConfigStoreApi<JsEmarsysConfig>>(named(SdkConfigStoreTypes.Web)) {
             JsEmarsysConfigStore(

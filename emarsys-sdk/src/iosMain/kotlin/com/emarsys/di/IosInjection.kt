@@ -62,7 +62,9 @@ import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppViewProvider
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
+import com.emarsys.mobileengage.inapp.InlineInAppViewRendererApi
 import com.emarsys.mobileengage.inapp.IosInAppPresenter
+import com.emarsys.mobileengage.inapp.IosInlineInAppViewRenderer
 import com.emarsys.mobileengage.inapp.providers.InAppJsBridgeFactory
 import com.emarsys.mobileengage.inapp.providers.IosWebViewFactory
 import com.emarsys.mobileengage.inapp.providers.SceneProvider
@@ -190,6 +192,7 @@ object IosInjection {
         }
         single<ClipboardHandlerApi> { IosClipboardHandler(UIPasteboard.generalPasteboard) }
         single<LaunchApplicationHandlerApi> { IosLaunchApplicationHandler() }
+        single<InlineInAppViewRendererApi> { IosInlineInAppViewRenderer() }
         single<LanguageTagValidatorApi> { IosLanguageTagValidator() }
         single<SdkConfigStoreApi<IosEmarsysConfig>> { IosSdkConfigStore(typedStorage = get()) }
         single<IosPushInstance>(named(InstanceType.Internal)) {

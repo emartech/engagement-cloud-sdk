@@ -19,6 +19,9 @@ class SdkTestScreenViewModel {
     private val _switchValue = MutableStateFlow(false)
     val switchValue: StateFlow<Boolean> = _switchValue.asStateFlow()
 
+    private val _showInlineInAppView = MutableStateFlow(false)
+    val showInlineInAppView: StateFlow<Boolean> = _showInlineInAppView.asStateFlow()
+
     fun updateEventName(newValue: String) {
         _eventName.value = newValue
     }
@@ -76,5 +79,9 @@ class SdkTestScreenViewModel {
                 Emarsys.inApp.resume()
             }
         }
+    }
+
+    fun showInlineInAppViewByUrl() {
+        _showInlineInAppView.value = true
     }
 }

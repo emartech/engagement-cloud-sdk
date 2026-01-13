@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
@@ -13,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.emarsys.mobileengage.inapp.InlineInAppView
 
 @Composable
 fun SdkTestScreen(
@@ -20,10 +23,12 @@ fun SdkTestScreen(
 ) {
     val eventName by viewModel.eventName.collectAsState()
     val switchValue by viewModel.switchValue.collectAsState()
+    val showInlineInAppView by viewModel.showInlineInAppView.collectAsState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -62,6 +67,14 @@ fun SdkTestScreen(
 
         Button(onClick = { viewModel.disableSdk() }) {
             Text("Disable tracking")
+        }
+
+        Button(onClick = { viewModel.showInlineInAppViewByUrl() }) {
+            Text("Show InlineInApp (URL)")
+        }
+
+        if (showInlineInAppView) {
+            InlineInAppView(viewId = "ia")
         }
     }
 }

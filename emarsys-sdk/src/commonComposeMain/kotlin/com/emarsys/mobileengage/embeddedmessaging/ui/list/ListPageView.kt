@@ -265,6 +265,7 @@ private fun FilterRow(
 
 @Composable
 private fun rememberListPageViewModel(): ListPageViewModelApi {
+    //TODO: safer koin access in case of uninitialized sdk/koin
     val viewModel = remember {
         koin.get<ListPageViewModelApi>()
     }

@@ -15,6 +15,8 @@ import com.emarsys.core.collections.PersistentList
 import com.emarsys.mobileengage.inapp.InAppDownloader
 import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppEventConsumer
+import com.emarsys.mobileengage.inapp.InlineInAppMessageFetcher
+import com.emarsys.mobileengage.inapp.InlineInAppMessageFetcherApi
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -25,6 +27,13 @@ object InAppInjection {
             InAppDownloader(
                 emarsysClient = get(named(NetworkClientTypes.Emarsys)),
                 sdkLogger = get { parametersOf(InAppDownloader::class.simpleName) }
+            )
+        }
+        single<InlineInAppMessageFetcherApi> {
+            InlineInAppMessageFetcher(
+                networkClient = get(named(NetworkClientTypes.Emarsys)),
+                urlFactory = get(),
+                json = get()
             )
         }
         single<MutableList<InAppCall>>(named(PersistentListTypes.InAppCall)) {
