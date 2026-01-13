@@ -119,7 +119,7 @@ fun MessageItemView(
 @Composable
 private fun imageClipShape(): RoundedCornerShape {
     val fallbackShape = RoundedCornerShape(ZERO_CORNER_RADIUS)
-    return when (LocalDesignValues.current.messageItemClipShape) {
+    return when (LocalDesignValues.current.messageItemImageClipShape) {
         "Rectangle" -> fallbackShape
         "Circle" -> CircleShape
         "Rounded" -> RoundedCornerShape(LocalDesignValues.current.messageItemImageCornerRadius)

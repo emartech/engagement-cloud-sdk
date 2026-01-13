@@ -41,13 +41,6 @@ internal data class MetaData(
 
 @Serializable
 internal data class Labels(
-    // TODO: Remove these after backend team changes the response
-    val allMessagesHeader: String,
-    val unreadMessagesHeader: String,
-    val filterCategories: String,
-    val detailedMessageCloseButton: String,
-    val deleteDetailedMessageButton: String,
-
     val pinnedMessagesTitle: String,
     val emptyStateTitle: String,
     val emptyStateDescription: String,
@@ -142,26 +135,6 @@ internal data class FillColors(
     val tertiaryFixedDim: String? = null,
     val onTertiaryFixed: String? = null,
     val onTertiaryFixedVariant: String? = null,
-
-    // TODO: Remove these after backend team changes the response
-    val selectedState: String,
-    val disabledState: String,
-    val hoverState: String,
-    val pressedState: String,
-    val focusState: String,
-
-    val warning: String,
-    val onWarning: String,
-    val warningContainer: String,
-    val onWarningContainer: String,
-    val success: String,
-    val onSuccess: String,
-    val successContainer: String,
-    val onSuccessContainer: String,
-    val info: String,
-    val onInfo: String,
-    val infoContainer: String,
-    val onInfoContainer: String
 )
 
 @Serializable
@@ -193,9 +166,12 @@ internal data class ShapesData(
 )
 
 @Serializable
-internal data class MiscV2(
+internal data class Misc(
     val messageItemMargin: Double,
     val messageItemElevation: Double,
+
+    //TODO: remove default after backend support is added
+    val buttonElevation: Double = 0.0,
 
     val listContentPadding: Double,
     val listItemSpacing: Double,
@@ -220,106 +196,4 @@ internal data class ShapeCornerRadius(
     val topEnd: Double,
     val bottomStart: Double,
     val bottomEnd: Double
-)
-
-@Serializable
-internal data class Misc(
-    val dialogCornerRadius: Double,
-    val categoryButtonCornerRadius: Double,
-    val messageItemCornerRadius: Double,
-    val filterButtonCornerRadius: Double,
-    val actionButtonCornerRadius: Double,
-    val chipCornerRadius: Double,
-    val detailViewCornerRadius: Double,
-    val headerCornerRadius: Double,
-    val footerCornerRadius: Double,
-    val modalCornerRadius: Double,
-    val snackbarCornerRadius: Double,
-    val tooltipCornerRadius: Double,
-    val badgeCornerRadius: Double,
-    val avatarCornerRadius: Double,
-    val imageCornerRadius: Double,
-
-    val messageItemPadding: Double,
-    val messageItemMargin: Double,
-    val messageItemSpacing: Double,
-    val dialogPadding: Double,
-    val dialogMargin: Double,
-    val dialogSpacing: Double,
-    val categoryButtonPadding: Double,
-    val categoryButtonMargin: Double,
-    val categoryButtonSpacing: Double,
-    val filterButtonPadding: Double,
-    val filterButtonMargin: Double,
-    val actionButtonPadding: Double,
-    val actionButtonMargin: Double,
-    val headerPadding: Double,
-    val headerMargin: Double,
-    val headerSpacing: Double,
-    val footerPadding: Double,
-    val footerMargin: Double,
-    val footerSpacing: Double,
-    val listPadding: Double,
-    val listMargin: Double,
-    val listSpacing: Double,
-    val detailViewPadding: Double,
-    val detailViewMargin: Double,
-    val detailViewSpacing: Double,
-
-    val dividerWidth: Double,
-    val dividerColor: String,
-    val categoryButtonStrokeColor: String,
-    val categoryButtonStrokeSize: Double,
-    val messageItemStrokeColor: String,
-    val messageItemStrokeSize: Double,
-    val filterButtonStrokeColor: String,
-    val filterButtonStrokeSize: Double,
-    val actionButtonStrokeColor: String,
-    val actionButtonStrokeSize: Double,
-
-    val messageItemElevation: Double,
-    val dialogElevation: Double,
-    val categoryButtonElevation: Double,
-    val filterButtonElevation: Double,
-    val actionButtonElevation: Double,
-    val headerElevation: Double,
-    val footerElevation: Double,
-    val modalElevation: Double,
-    val snackbarElevation: Double,
-    val tooltipElevation: Double,
-
-    val messageItemIconSize: Double,
-    val categoryButtonIconSize: Double,
-    val filterButtonIconSize: Double,
-    val actionButtonIconSize: Double,
-    val headerIconSize: Double,
-    val footerIconSize: Double,
-    val dialogIconSize: Double,
-    val snackbarIconSize: Double,
-    val tooltipIconSize: Double,
-    val listContentPadding: Double,
-    val listItemSpacing: Double,
-    val listItemMargin: Double,
-    val tabButtonPadding: Double,
-    val tabButtonSpacing: Double,
-    val filterButtonSpacing: Double,
-    val actionButtonSpacing: Double,
-    val compactOverlayWidth: Double,
-    val compactOverlayMaxHeight: Double,
-    val compactOverlayPadding: Double,
-    val compactOverlaySpacing: Double,
-    val compactOverlayCornerRadius: Double,
-    val compactOverlayElevation: Double,
-    val emptyStatePadding: Double,
-    val emptyStateSpacing: Double,
-    val emptyStateIconPadding: Double,
-    val detailViewImageHeight: Double,
-    val detailViewImageCornerRadius: Double,
-    val detailViewTagPadding: Double,
-    val detailViewTagSpacing: Double,
-    val detailViewActionSpacing: Double,
-    val swipeDeleteBackgroundCornerRadius: Double,
-    val swipeDeleteButtonSize: Double,
-    val swipeDeleteButtonCornerRadius: Double,
-    val swipeDeleteIconSize: Double
 )

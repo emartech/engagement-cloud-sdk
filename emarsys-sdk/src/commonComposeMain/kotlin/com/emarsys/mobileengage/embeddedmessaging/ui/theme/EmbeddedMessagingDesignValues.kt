@@ -30,7 +30,7 @@ internal data class EmbeddedMessagingDesignValues(
     val messageItemCardCornerRadius: Dp = ZERO_CORNER_RADIUS,
     val messageItemCardElevation: Dp= ZERO_ELEVATION,
     val messageItemImageHeight: Dp = DEFAULT_PADDING, // e.g., "Rectangle", "Circle", "Rounded", "Custom"
-    val messageItemClipShape: String = DEFAULT_IMAGE_CLIP_SHAPE,
+    val messageItemImageClipShape: String = DEFAULT_IMAGE_CLIP_SHAPE,
     val messageItemImageCornerRadius: Dp = DEFAULT_PADDING,
     val messageItemCustomShape: ShapeCornerRadius? = null
 )
