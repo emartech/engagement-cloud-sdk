@@ -9,6 +9,7 @@ import com.emarsys.enable.states.FetchEmbeddedMessagingMetaState
 import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import com.emarsys.networking.clients.embedded.messaging.model.MetaData
+import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -23,7 +24,6 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import io.ktor.http.headersOf
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.json.Json
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -133,104 +133,24 @@ class FetchEmbeddedMessagingMetaStateTests {
       "labelSmallFontSize" : 11
     },
     "misc" : {
-      "dialogCornerRadius" : 16,
-      "categoryButtonCornerRadius" : 8,
-      "messageItemCornerRadius" : 0,
-      "filterButtonCornerRadius" : 20,
-      "actionButtonCornerRadius" : 8,
-      "chipCornerRadius" : 8,
-      "detailViewCornerRadius" : 8,
-      "headerCornerRadius" : 0,
-      "footerCornerRadius" : 0,
-      "modalCornerRadius" : 16,
-      "snackbarCornerRadius" : 8,
-      "tooltipCornerRadius" : 4,
-      "badgeCornerRadius" : 12,
-      "avatarCornerRadius" : 20,
-      "imageCornerRadius" : 8,
-      "messageItemPadding" : 16,
-      "messageItemMargin" : 0,
-      "messageItemSpacing" : 8,
-      "dialogPadding" : 24,
-      "dialogMargin" : 16,
-      "dialogSpacing" : 16,
-      "categoryButtonPadding" : 12,
-      "categoryButtonMargin" : 4,
-      "categoryButtonSpacing" : 8,
-      "filterButtonPadding" : 16,
-      "filterButtonMargin" : 8,
-      "actionButtonPadding" : 16,
-      "actionButtonMargin" : 8,
-      "headerPadding" : 16,
-      "headerMargin" : 0,
-      "headerSpacing" : 8,
-      "footerPadding" : 16,
-      "footerMargin" : 0,
-      "footerSpacing" : 8,
-      "listPadding" : 0,
-      "listMargin" : 0,
-      "listSpacing" : 4,
-      "detailViewPadding" : 16,
-      "detailViewMargin" : 0,
-      "detailViewSpacing" : 16,
-      "dividerWidth" : 1,
-      "dividerColor" : "#FFF57C00",
-      "categoryButtonStrokeColor" : "#FFC8E6C9",
-      "categoryButtonStrokeSize" : 0.5,
-      "messageItemStrokeColor" : "#FFE0E0E0",
-      "messageItemStrokeSize" : 1,
-      "filterButtonStrokeColor" : "#FFC8E6C9",
-      "filterButtonStrokeSize" : 1,
-      "actionButtonStrokeColor" : "#FFC8E6C9",
-      "actionButtonStrokeSize" : 1,
-      "messageItemElevation" : 2,
-      "dialogElevation" : 8,
-      "categoryButtonElevation" : 0,
-      "filterButtonElevation" : 0,
-      "actionButtonElevation" : 0,
-      "headerElevation" : 4,
-      "footerElevation" : 4,
-      "modalElevation" : 16,
-      "snackbarElevation" : 6,
-      "tooltipElevation" : 4,
-      "messageItemIconSize" : 20,
-      "categoryButtonIconSize" : 16,
-      "filterButtonIconSize" : 20,
-      "actionButtonIconSize" : 16,
-      "headerIconSize" : 24,
-      "footerIconSize" : 20,
-      "dialogIconSize" : 20,
-      "snackbarIconSize" : 24,
-      "tooltipIconSize" : 16,
-      "listContentPadding" : 0,
-      "listItemSpacing" : 0,
-      "listItemMargin" : 0,
-      "tabButtonPadding" : 16,
-      "tabButtonSpacing" : 8,
-      "filterButtonSpacing" : 8,
-      "actionButtonSpacing" : 8,
-      "compactOverlayWidth" : 400,
-      "compactOverlayMaxHeight" : 600,
-      "compactOverlayPadding" : 8,
-      "compactOverlaySpacing" : 4,
-      "compactOverlayCornerRadius" : 12,
-      "compactOverlayElevation" : 8,
-      "emptyStatePadding" : 32,
-      "emptyStateSpacing" : 8,
-      "emptyStateIconPadding" : 16,
-      "detailViewImageHeight" : 200,
-      "detailViewImageCornerRadius" : 8,
-      "detailViewTagPadding" : 8,
-      "detailViewTagSpacing" : 8,
-      "detailViewActionSpacing" : 8,
-      "swipeDeleteBackgroundCornerRadius" : 12,
-      "swipeDeleteButtonSize" : 40,
-      "swipeDeleteButtonCornerRadius" : 20,
-      "swipeDeleteIconSize" : 16
+        "messageItemMargin": 8,
+        "messageItemElevation": 8,
+        "buttonElevation": 8,
+        "listContentPadding": 8,
+        "listItemSpacing": 8,
+        "compactOverlayWidth": 8,
+        "compactOverlayMaxHeight": 8,
+        "compactOverlayCornerRadius": 8,
+        "compactOverlayElevation": 8,
+        "messageItemCardCornerRadius": 8,
+        "messageItemCardElevation": 8,
+        "messageItemImageHeight": 8,
+        "messageItemImageClipShape": "rectangle",
+        "messageItemImageCornerRadius": 8
     }
   }
 }"""
-        val expectedMetaData = Json.decodeFromString<MetaData>(metaDataResponse)
+        val expectedMetaData = JsonUtil.json.decodeFromString<MetaData>(metaDataResponse)
         val response = SdkEvent.Internal.Sdk.Answer.Response(
             "0",
             Result.success(

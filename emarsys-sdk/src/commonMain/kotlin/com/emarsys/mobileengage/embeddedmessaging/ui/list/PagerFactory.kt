@@ -24,6 +24,7 @@ internal class PagerFactory(
     override fun create(
         filterUnreadOnly: Boolean,
         selectedCategoryIds: List<Int>,
+        deletedMessageIds: Set<String>,
         categories: MutableStateFlow<List<MessageCategory>>
     ): Flow<PagingData<MessageItemViewModelApi>> {
         return Pager(
@@ -40,10 +41,11 @@ internal class PagerFactory(
                     listPageModel = model,
                     filterUnreadOnly = filterUnreadOnly,
                     selectedCategoryIds = selectedCategoryIds.toList(),
+                    deletedMessageIds = deletedMessageIds,
                     setCategories = { categories.value = it },
                     downloader = downloaderApi,
-                    sdkEventDistributor = sdkEventDistributor,
                     actionFactory = actionFactory,
+                    sdkEventDistributor = sdkEventDistributor,
                     logger = logger
                 )
             }

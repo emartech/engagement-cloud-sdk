@@ -7,6 +7,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
@@ -15,6 +16,7 @@ import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategoriesDialogView
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategorySelectorButton
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.SvgIcon
+import com.emarsys.mobileengage.embeddedmessaging.ui.delete.DeleteMessageDialogView
 import com.emarsys.mobileengage.embeddedmessaging.ui.detail.MessageDetailView
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemView
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
@@ -22,6 +24,7 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingStyl
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 import com.emarsys.mobileengage.embeddedmessaging.ui.translation.LocalStringResources
 import kotlinx.browser.window
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Hr
@@ -52,10 +55,15 @@ fun ListPageView(
 
 @Composable
 fun MessageList(viewModel: ListPageViewModelApi) {
-    val lazyPagingMessageItems = viewModel.messagePagingDataFlowFiltered.collectAsLazyPagingItems()
+    val lazyPagingMessageItems =
+        viewModel.messagePagingDataFlowFiltered.collectAsLazyPagingItems()
     val filterUnreadOnly by viewModel.filterUnreadOnly.collectAsState()
     val selectedCategoryIds by viewModel.selectedCategoryIds.collectAsState()
+    var messageToDeleteId by remember { mutableStateOf<String?>(null) }
     var showCategorySelector by remember { mutableStateOf(false) }
+    var showDeleteMessageDialog by remember { mutableStateOf(false) }
+
+    val scope = rememberCoroutineScope()
 
     var isLandscape by remember {
         mutableStateOf(window.matchMedia("(orientation: landscape)").matches)
@@ -71,12 +79,6 @@ fun MessageList(viewModel: ListPageViewModelApi) {
         mediaQuery.addEventListener("change", listener)
     }
 
-    LaunchedEffect(isLandscape, lazyPagingMessageItems.itemSnapshotList) {
-        if (isLandscape && selectedMessageId == null && lazyPagingMessageItems.itemCount > 0) {
-            selectedMessageId = lazyPagingMessageItems.itemSnapshotList[0]?.id
-        }
-    }
-
     if (isLandscape) {
         Div({ classes(EmbeddedMessagingStyleSheet.splitViewContainer) }) {
             Div({ classes(EmbeddedMessagingStyleSheet.listPane) }) {
@@ -90,8 +92,12 @@ fun MessageList(viewModel: ListPageViewModelApi) {
 
                 MessageListContent(
                     lazyPagingMessageItems = lazyPagingMessageItems,
-                    onRefresh = { viewModel.refreshMessagesWithThrottling { lazyPagingMessageItems.refresh() } },
-                    onItemClick = { selectedMessageId = it }
+                    onRefresh = { viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() } },
+                    onItemClick = { selectedMessageId = it },
+                    onDeleteIconClicked = {
+                        messageToDeleteId = it
+                        showDeleteMessageDialog = true
+                    }
                 )
             }
 
@@ -130,7 +136,12 @@ fun MessageList(viewModel: ListPageViewModelApi) {
             MessageListContent(
                 lazyPagingMessageItems = lazyPagingMessageItems,
                 onRefresh = { viewModel.refreshMessagesWithThrottling { lazyPagingMessageItems.refresh() } },
-                onItemClick = { selectedMessageId = it }
+//                onRefresh = { viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() } },
+                onItemClick = { selectedMessageId = it },
+                onDeleteIconClicked = {
+                    messageToDeleteId = it
+                    showDeleteMessageDialog = true
+                }
             )
         }
     }
@@ -142,9 +153,30 @@ fun MessageList(viewModel: ListPageViewModelApi) {
             onApplyClicked = {
                 viewModel.setSelectedCategoryIds(it)
                 viewModel.refreshMessagesWithThrottling { lazyPagingMessageItems.refresh() }
+//                viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() }
                 showCategorySelector = false
             },
             onDismiss = { showCategorySelector = false }
+        )
+    }
+
+    if (showDeleteMessageDialog) {
+        DeleteMessageDialogView(
+            onApplyClicked = {
+                showDeleteMessageDialog = false
+                lazyPagingMessageItems.itemSnapshotList.find { it?.id == messageToDeleteId }
+                    ?.let { messageViewModel ->
+                        scope.launch {
+                            viewModel.deleteMessage(messageViewModel)
+                        }
+                    } ?: Result.success(Unit)
+                messageToDeleteId = null
+//                viewModel.triggerRefreshFromJs()
+            },
+            onDismiss = {
+                showDeleteMessageDialog = false
+                messageToDeleteId = null
+            }
         )
     }
 }
@@ -153,7 +185,8 @@ fun MessageList(viewModel: ListPageViewModelApi) {
 fun MessageListContent(
     lazyPagingMessageItems: LazyPagingItems<MessageItemViewModelApi>,
     onRefresh: () -> Unit,
-    onItemClick: (String) -> Unit
+    onItemClick: (String) -> Unit,
+    onDeleteIconClicked: (String) -> Unit
 ) {
     val isRefreshing = lazyPagingMessageItems.loadState.source.refresh is LoadState.Loading
 
@@ -185,10 +218,11 @@ fun MessageListContent(
                 classes(EmbeddedMessagingStyleSheet.scrollableList)
             }) {
                 lazyPagingMessageItems.itemSnapshotList.map { messageViewModel ->
-                    if (messageViewModel != null) {
+                    messageViewModel?.let {
                         MessageItemView(
                             viewModel = messageViewModel,
-                            onClick = { onItemClick(messageViewModel.id) }
+                            onClick = { onItemClick(messageViewModel.id) },
+                            onDeleteClicked = { onDeleteIconClicked(messageViewModel.id) }
                         )
                     }
                 }

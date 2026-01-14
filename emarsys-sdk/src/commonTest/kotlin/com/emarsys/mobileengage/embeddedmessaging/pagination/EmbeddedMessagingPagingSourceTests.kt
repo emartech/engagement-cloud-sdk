@@ -11,6 +11,8 @@ import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageModelApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.list.MessagesWithCategories
+import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
+import com.emarsys.networking.clients.embedded.messaging.model.ListThumbnailImage
 import com.emarsys.networking.clients.embedded.messaging.model.MessageCategory
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
@@ -48,16 +50,18 @@ class EmbeddedMessagingPagingSourceTests {
     private fun createEmbeddedMessagingPagingSource(
         filterUnreadOnly: Boolean = false,
         selectedCategoryIds: List<Int> = emptyList(),
+        deletedMessageIds: Set<String> = emptySet(),
         setCategories: (List<MessageCategory>) -> Unit = { }
     ) = EmbeddedMessagingPagingSource(
         listPageModel = mockListPageModel,
         filterUnreadOnly = filterUnreadOnly,
         selectedCategoryIds = selectedCategoryIds,
+        deletedMessageIds = deletedMessageIds,
         setCategories = setCategories,
         downloader = mockDownloader,
-        sdkEventDistributor = mockSdkEventDistributor,
         actionFactory = mockActionFactory,
-        logger = mockLogger
+        sdkEventDistributor = mockSdkEventDistributor,
+        logger = mockLogger,
     )
 
     @Test
@@ -85,6 +89,112 @@ class EmbeddedMessagingPagingSourceTests {
             )
         }
         (result is PagingSource.LoadResult.Error) shouldBe false
+    }
+
+    @Test
+    fun testLoad_should_exclude_deleted_messages_from_the_returned_flow() = runTest {
+        val testMessage1 = EmbeddedMessage(
+            id = "1",
+            title = "testTitle",
+            lead = "testLead",
+            listThumbnailImage = ListThumbnailImage("example.com", null),
+            defaultAction = null,
+            actions = emptyList(),
+            tags = listOf("deleted"),
+            categoryIds = emptyList(),
+            receivedAt = 100000L,
+            expiresAt = 110000L,
+            properties = emptyMap(),
+            trackingInfo = "anything"
+        )
+        val testMessage2 = EmbeddedMessage(
+            id = "2",
+            title = "testTitle",
+            lead = "testLead",
+            listThumbnailImage = ListThumbnailImage("example.com", null),
+            defaultAction = null,
+            actions = emptyList(),
+            tags = listOf("not-deleted"),
+            categoryIds = emptyList(),
+            receivedAt = 100000L,
+            expiresAt = 110000L,
+            properties = emptyMap(),
+            trackingInfo = "anything"
+        )
+        val testEmbeddedMessagesResponse = listOf(testMessage1, testMessage2)
+        val embeddedMessagingPagingSource = createEmbeddedMessagingPagingSource()
+        everySuspend {
+            mockListPageModel.fetchMessagesWithCategories(
+                false, emptyList()
+            )
+        } returns Result.success(
+            MessagesWithCategories(
+                messages = testEmbeddedMessagesResponse, categories = emptyList(), isEndReached = false
+            )
+        )
+        val result: PagingSource.LoadResult<Int, MessageItemViewModelApi> =
+            embeddedMessagingPagingSource.load(
+                PagingSource.LoadParams.Refresh(
+                    key = null, loadSize = 20, placeholdersEnabled = false
+                )
+            )
+
+        (result is PagingSource.LoadResult.Error) shouldBe false
+        (result as PagingSource.LoadResult.Page).data.size shouldBe 1
+        result.data[0].id shouldBe "2"
+    }
+
+    @Test
+    fun testLoad_should_exclude_locally_deleted_messages_from_the_returned_flow() = runTest {
+        val testMessage1 = EmbeddedMessage(
+            id = "1",
+            title = "testTitle",
+            lead = "testLead",
+            listThumbnailImage = ListThumbnailImage("example.com", null),
+            defaultAction = null,
+            actions = emptyList(),
+            tags = listOf(),
+            categoryIds = emptyList(),
+            receivedAt = 100000L,
+            expiresAt = 110000L,
+            properties = emptyMap(),
+            trackingInfo = "anything"
+        )
+        val testMessage2 = EmbeddedMessage(
+            id = "2",
+            title = "testTitle",
+            lead = "testLead",
+            listThumbnailImage = ListThumbnailImage("example.com", null),
+            defaultAction = null,
+            actions = emptyList(),
+            tags = listOf(),
+            categoryIds = emptyList(),
+            receivedAt = 100000L,
+            expiresAt = 110000L,
+            properties = emptyMap(),
+            trackingInfo = "anything"
+        )
+        val testEmbeddedMessagesResponse = listOf(testMessage1, testMessage2)
+        val embeddedMessagingPagingSource = createEmbeddedMessagingPagingSource(deletedMessageIds = setOf("2"))
+        everySuspend {
+            mockListPageModel.fetchMessagesWithCategories(
+                false, emptyList()
+            )
+        } returns Result.success(
+            MessagesWithCategories(
+                messages = testEmbeddedMessagesResponse, categories = emptyList(), isEndReached = false
+            )
+        )
+        val result: PagingSource.LoadResult<Int, MessageItemViewModelApi> =
+            embeddedMessagingPagingSource.load(
+                PagingSource.LoadParams.Refresh(
+                    key = null, loadSize = 20, placeholdersEnabled = false
+                )
+            )
+
+        (result is PagingSource.LoadResult.Error) shouldBe false
+        (result as PagingSource.LoadResult.Page).data.size shouldBe 1
+        result.data[0].id shouldBe "1"
     }
 
     @Test
@@ -131,7 +241,6 @@ class EmbeddedMessagingPagingSourceTests {
 
         (result is PagingSource.LoadResult.Error) shouldBe true
     }
-
 
     @Test
     fun testLoad_should_call_fetchNextPage_when_notOnFirstPage_andHandleError_whenResultFailed() =

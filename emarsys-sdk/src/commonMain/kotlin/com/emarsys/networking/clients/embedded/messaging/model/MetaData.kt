@@ -169,18 +169,13 @@ internal data class ShapesData(
 internal data class Misc(
     val messageItemMargin: Double,
     val messageItemElevation: Double,
-
-    //TODO: remove default after backend support is added
     val buttonElevation: Double = 0.0,
-
     val listContentPadding: Double,
     val listItemSpacing: Double,
-
     val compactOverlayWidth: Double,
     val compactOverlayMaxHeight: Double,
     val compactOverlayCornerRadius: Double,
     val compactOverlayElevation: Double,
-
     val emptyStateImageUrl: String? = null,
     val messageItemCardCornerRadius: Double? = 0.0,
     val messageItemCardElevation: Double? = 0.0,

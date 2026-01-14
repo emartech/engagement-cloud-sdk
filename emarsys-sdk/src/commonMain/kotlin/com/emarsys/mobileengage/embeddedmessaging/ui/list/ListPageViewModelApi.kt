@@ -33,4 +33,6 @@ interface ListPageViewModelApi {
     fun applyCategorySelection(categoryIds: Set<Int>)
 
     fun refreshMessagesWithThrottling(shouldCallRefresh: () -> Unit)
+
+    val triggerRefreshFromJs: () -> Unit
 }

@@ -75,7 +75,7 @@ skie {
         disableUpload.set(true)
     }
 }
-val deviceName = project.findProperty("iosDevice") as? String ?: "iPhone 16 Pro"
+val deviceName = project.findProperty("iosDevice") as? String ?: "iPhone 17 Pro"
 
 
 tasks.register<Exec>("bootIOSSimulator") {

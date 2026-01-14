@@ -21,7 +21,8 @@ private const val DELETE_ICON_PATH =
 @Composable
 fun MessageItemView(
     viewModel: MessageItemViewModelApi,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onDeleteClicked: () -> Unit
 ) {
     var imageDataUrl by remember { mutableStateOf<String?>(null) }
     val hasThumbnailImage = viewModel.imageUrl != null
@@ -83,6 +84,7 @@ fun MessageItemView(
                 if (hasThumbnailImage) EmbeddedMessagingStyleSheet.messageItemMisc
                 else EmbeddedMessagingStyleSheet.messageItemContentNoPadding
             )
+            onClick { onDeleteClicked() }
         }) {
             SvgIcon(
                 path = DELETE_ICON_PATH,

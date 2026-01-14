@@ -304,6 +304,15 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         gap(DEFAULT_SPACING)
     }
 
+    val deleteDialogActionsContainer by style {
+        display(DisplayStyle.Flex)
+        flexDirection(FlexDirection.Row)
+        alignItems(AlignItems.Center)
+        justifyContent(JustifyContent.End)
+        padding(DEFAULT_PADDING)
+        gap(DEFAULT_SPACING)
+    }
+
     val dialogResetButton by style {
         padding(DEFAULT_PADDING)
         border(ZERO_BORDER_WIDTH)

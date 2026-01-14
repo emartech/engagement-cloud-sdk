@@ -283,6 +283,8 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
         override fun refreshMessagesWithThrottling(shouldCallRefresh: () -> Unit) {
             Unit
         }
+
+        override val triggerRefreshFromJs: () -> Unit = { Unit }
     }
 
 

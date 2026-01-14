@@ -78,11 +78,6 @@ class TranslationMapperTests {
     }
 
     private fun createTestLabels(): Labels = Labels(
-        allMessagesHeader = "test allMessagesHeader",
-        unreadMessagesHeader = "test unreadMessagesHeader",
-        filterCategories = "test filterCategories",
-        detailedMessageCloseButton = "test detailedMessageCloseButton",
-        deleteDetailedMessageButton = "test deleteDetailedMessageButton",
         pinnedMessagesTitle = "test pinnedMessagesTitle",
         emptyStateTitle = "test emptyStateTitle",
         emptyStateDescription = "test emptyStateDescription",
