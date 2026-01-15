@@ -93,7 +93,11 @@ fun MessageList(viewModel: ListPageViewModelApi) {
                 MessageListContent(
                     lazyPagingMessageItems = lazyPagingMessageItems,
                     onRefresh = { viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() } },
-                    onItemClick = { selectedMessageId = it },
+                    onItemClick = {
+                        scope.launch {
+                            viewModel.selectMessage(it) {}
+                        }
+                    },
                     onDeleteIconClicked = {
                         messageToDeleteId = it
                         showDeleteMessageDialog = true
@@ -135,9 +139,12 @@ fun MessageList(viewModel: ListPageViewModelApi) {
 
             MessageListContent(
                 lazyPagingMessageItems = lazyPagingMessageItems,
-                onRefresh = { viewModel.refreshMessagesWithThrottling { lazyPagingMessageItems.refresh() } },
-//                onRefresh = { viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() } },
-                onItemClick = { selectedMessageId = it },
+                onRefresh = { viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() } },
+                onItemClick = {
+                    scope.launch {
+                        viewModel.selectMessage(it) {}
+                    }
+                },
                 onDeleteIconClicked = {
                     messageToDeleteId = it
                     showDeleteMessageDialog = true
@@ -152,8 +159,6 @@ fun MessageList(viewModel: ListPageViewModelApi) {
             selectedCategories = viewModel.selectedCategoryIds.collectAsState().value,
             onApplyClicked = {
                 viewModel.setSelectedCategoryIds(it)
-                viewModel.refreshMessagesWithThrottling { lazyPagingMessageItems.refresh() }
-//                viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() }
                 showCategorySelector = false
             },
             onDismiss = { showCategorySelector = false }
@@ -171,7 +176,6 @@ fun MessageList(viewModel: ListPageViewModelApi) {
                         }
                     } ?: Result.success(Unit)
                 messageToDeleteId = null
-//                viewModel.triggerRefreshFromJs()
             },
             onDismiss = {
                 showDeleteMessageDialog = false
@@ -185,7 +189,7 @@ fun MessageList(viewModel: ListPageViewModelApi) {
 fun MessageListContent(
     lazyPagingMessageItems: LazyPagingItems<MessageItemViewModelApi>,
     onRefresh: () -> Unit,
-    onItemClick: (String) -> Unit,
+    onItemClick: (MessageItemViewModelApi) -> Unit,
     onDeleteIconClicked: (String) -> Unit
 ) {
     val isRefreshing = lazyPagingMessageItems.loadState.source.refresh is LoadState.Loading
@@ -219,11 +223,13 @@ fun MessageListContent(
             }) {
                 lazyPagingMessageItems.itemSnapshotList.map { messageViewModel ->
                     messageViewModel?.let {
-                        MessageItemView(
-                            viewModel = messageViewModel,
-                            onClick = { onItemClick(messageViewModel.id) },
-                            onDeleteClicked = { onDeleteIconClicked(messageViewModel.id) }
-                        )
+                        if (!it.isExcludedLocally) {
+                            MessageItemView(
+                                viewModel = messageViewModel,
+                                onClick = { onItemClick(messageViewModel) },
+                                onDeleteClicked = { onDeleteIconClicked(messageViewModel.id) }
+                            )
+                        }
                     }
                 }
                 if (lazyPagingMessageItems.itemCount > 0) {
@@ -239,6 +245,13 @@ fun MessageListContent(
                                 }
                             }
                             onDispose { observer.disconnect() }
+                        }
+                        val target: web.dom.Element? =
+                            document.querySelector("[shouldLoadNextPage]")
+                        if (target != null && isInViewPort(target)) {
+                            if (lazyPagingMessageItems.itemCount > 0) {
+                                lazyPagingMessageItems[lazyPagingMessageItems.itemCount - 1]
+                            }
                         }
                     }
                 }
@@ -338,7 +351,14 @@ fun testEmbeddedMessaging(rootElementId: String) {
     }
 }
 
+private fun isInViewPort(element: web.dom.Element): Boolean {
+    val reticule = element.getBoundingClientRect()
+    val isInPort = reticule.top < window.innerHeight && reticule.bottom > 0
+    return isInPort
+}
+
 fun observePrefetch(onTrigger: () -> Unit): IntersectionObserver {
+    val target: web.dom.Element? = document.querySelector("[shouldLoadNextPage]")
     val observer = IntersectionObserver(
         callback = { entries, _ ->
             if (entries.any { it.isIntersecting }) {
@@ -347,7 +367,6 @@ fun observePrefetch(onTrigger: () -> Unit): IntersectionObserver {
         }
     )
 
-    val target: web.dom.Element? = document.querySelector("[shouldLoadNextPage]")
     if (target != null) {
         observer.observe(target)
     }

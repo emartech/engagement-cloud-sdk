@@ -1,6 +1,7 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.list
 
 import androidx.paging.cachedIn
+import androidx.paging.map
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
@@ -58,13 +59,13 @@ internal class ListPageViewModel(
     private val triggerFromJS = MutableStateFlow(false)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override val messagePagingDataFlowFiltered =
+    private val _messagePagingDataFlowFromApi =
         combine(
             _filterUnreadOnly,
             _selectedCategoryIds,
-            locallyDeletedMessageIds,
-        ) { filterUnreadOnly, selectedCategoryIds, deletedIds ->
-            Triple(filterUnreadOnly, selectedCategoryIds, deletedIds)
+            triggerFromJS
+        ) { filterUnreadOnly, selectedCategoryIds, _ ->
+            Pair(filterUnreadOnly, selectedCategoryIds)
         }
             .flatMapLatest { pair ->
                 val (filterUnreadOnly, selectedCategoryIds) = pair
@@ -72,10 +73,31 @@ internal class ListPageViewModel(
                 pagerFactory.create(
                     filterUnreadOnly = filterUnreadOnly,
                     selectedCategoryIds = selectedCategoryIds.toList(),
-                    locallyDeletedMessageIds.value,
-                    categories = _categories,
+                    categories = _categories
                 )
+            }
+            .map { pagingData ->
+                pagingData.map {
+                    if ((!it.isExcludedLocally && filterUnreadOnly.value && locallyReadMessageIds.value.contains(
+                            it.id
+                        )) || it.isDeleted
+                    ) {
+                        it.copyAsExcludedLocally()
+                    } else it
+                }
             }.cachedIn(coroutineScope)
+
+    override val messagePagingDataFlowFiltered =
+        combine(
+            _messagePagingDataFlowFromApi,
+            locallyDeletedMessageIds,
+        ) { pagingData, deletedIds ->
+            pagingData.map {
+                if (!it.isExcludedLocally && deletedIds.contains(it.id)) {
+                    it.copyAsExcludedLocally()
+                } else it
+            }
+        }
 
     override val triggerRefreshFromJs = { triggerFromJS.value = !triggerFromJS.value }
 
@@ -94,10 +116,14 @@ internal class ListPageViewModel(
         cachedSelectedMessage = messageViewModel
         _selectedMessageId.value = messageViewModel.id
 
-        messageViewModel.tagMessageRead()
-            .onSuccess {
-                locallyReadMessageIds.value += messageViewModel.id
-            }
+        if(!locallyReadMessageIds.value.contains(messageViewModel.id) && messageViewModel.isUnread) {
+            messageViewModel.tagMessageRead()
+                .onSuccess {
+                    val newReadIdSet = mutableSetOf(messageViewModel.id)
+                    newReadIdSet.addAll(locallyReadMessageIds.value)
+                    locallyReadMessageIds.value = newReadIdSet
+                }
+        }
 
         if (messageViewModel.shouldNavigate()) {
             onNavigate.invoke()
@@ -110,7 +136,9 @@ internal class ListPageViewModel(
     ): Result<Unit> {
         return messageViewModel.deleteMessage()
             .onSuccess {
-                locallyDeletedMessageIds.value += messageViewModel.id
+                val newDeletedIdSet = mutableSetOf(messageViewModel.id)
+                newDeletedIdSet.addAll(locallyDeletedMessageIds.value)
+                locallyDeletedMessageIds.value = newDeletedIdSet
             }
     }
 

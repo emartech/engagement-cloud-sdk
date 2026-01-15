@@ -84,6 +84,10 @@ internal class MessageItemModel(
         return message.tags.map { it.lowercase() }.contains(READ_TAG).not()
     }
 
+    override fun isDeleted(): Boolean {
+        return message.tags.map { it.lowercase() }.contains(DELETED_TAG)
+    }
+
     override fun isPinned(): Boolean {
         return message.tags.map { it.lowercase() }.contains(PINNED_TAG)
     }

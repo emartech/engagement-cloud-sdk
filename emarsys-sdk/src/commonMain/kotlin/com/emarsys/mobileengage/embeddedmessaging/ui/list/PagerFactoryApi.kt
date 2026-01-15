@@ -10,7 +10,6 @@ internal interface PagerFactoryApi {
     fun create(
         filterUnreadOnly: Boolean,
         selectedCategoryIds: List<Int>,
-        deletedMessageIds: Set<String>,
         categories: MutableStateFlow<List<MessageCategory>>
     ): Flow<PagingData<MessageItemViewModelApi>>
 }

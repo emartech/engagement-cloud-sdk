@@ -32,6 +32,9 @@ class MessageItemViewModel(
     override val isPinned: Boolean
         get() = model.isPinned()
 
+    override val isDeleted: Boolean
+        get() = model.isDeleted()
+
     override fun shouldNavigate() = model.shouldNavigate()
 
     override suspend fun fetchImage(): ByteArray =

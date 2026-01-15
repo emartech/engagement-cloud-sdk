@@ -11,23 +11,18 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemModel
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModel
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageModelApi
-import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
 import com.emarsys.networking.clients.embedded.messaging.model.MessageCategory
 
 internal class EmbeddedMessagingPagingSource(
     private val listPageModel: ListPageModelApi,
     private val filterUnreadOnly: Boolean,
     private val selectedCategoryIds: List<Int>,
-    private val deletedMessageIds: Set<String>,
     private val setCategories: (List<MessageCategory>) -> Unit,
     private val downloader: DownloaderApi,
     private val actionFactory: ActionFactoryApi<ActionModel>,
     private val sdkEventDistributor: SdkEventDistributorApi,
     private val logger: Logger
 ) : PagingSource<Int, MessageItemViewModelApi>() {
-    private companion object {
-        const val DELETED_TAG = "deleted"
-    }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MessageItemViewModelApi> {
         return try {
@@ -47,20 +42,17 @@ internal class EmbeddedMessagingPagingSource(
                     val nextKey =
                         if (it.isEndReached) null else pageNumber + 1
                     LoadResult.Page(
-                        it.messages.filter { embeddedMessage ->
-                            shouldIncludeMessage(embeddedMessage)
-                        }
-                            .map { message ->
-                                MessageItemViewModel(
-                                    MessageItemModel(
-                                        message,
-                                        downloader,
-                                        sdkEventDistributor,
-                                        actionFactory,
-                                        logger
-                                    )
+                        it.messages.map { message ->
+                            MessageItemViewModel(
+                                MessageItemModel(
+                                    message,
+                                    downloader,
+                                    sdkEventDistributor,
+                                    actionFactory,
+                                    logger
                                 )
-                            },
+                            )
+                        },
                         prevKey,
                         nextKey
                     )
@@ -72,11 +64,6 @@ internal class EmbeddedMessagingPagingSource(
             logger.error("Error loading page", e)
             LoadResult.Error(e)
         }
-    }
-
-    private fun shouldIncludeMessage(embeddedMessage: EmbeddedMessage): Boolean {
-        return !embeddedMessage.tags.map { value -> value.lowercase() }
-            .contains(DELETED_TAG) && !deletedMessageIds.contains(embeddedMessage.id)
     }
 
     override fun getRefreshKey(state: PagingState<Int, MessageItemViewModelApi>): Int {

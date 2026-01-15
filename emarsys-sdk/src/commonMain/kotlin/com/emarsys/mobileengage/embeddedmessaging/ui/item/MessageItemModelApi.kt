@@ -9,6 +9,7 @@ interface MessageItemModelApi {
     suspend fun deleteMessage(): Result<Unit>
     fun isUnread(): Boolean
     fun isPinned(): Boolean
+    fun isDeleted(): Boolean
     fun shouldNavigate(): Boolean
     suspend fun handleDefaultAction()
 }

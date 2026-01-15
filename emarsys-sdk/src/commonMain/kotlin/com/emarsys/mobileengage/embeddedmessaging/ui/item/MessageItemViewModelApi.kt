@@ -10,6 +10,7 @@ interface MessageItemViewModelApi {
     val receivedAt: Long
     val isUnread: Boolean
     val isPinned: Boolean
+    val isDeleted: Boolean
     val isExcludedLocally: Boolean
 
     fun shouldNavigate(): Boolean

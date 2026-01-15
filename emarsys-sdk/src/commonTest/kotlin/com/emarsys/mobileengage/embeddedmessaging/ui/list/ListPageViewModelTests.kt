@@ -97,7 +97,7 @@ class ListPageViewModelTests {
         viewModel.selectedCategoryIds.value shouldBe emptySet()
         viewModel.categories.value shouldBe emptyList()
 
-        every { mockPagerFactory.create(any(), any(), any(), any()) } returns flowOf(
+        every { mockPagerFactory.create(any(), any(), any()) } returns flowOf(
             PagingData.from(
                 data = emptyList(),
                 placeholdersBefore = 0,
@@ -115,8 +115,7 @@ class ListPageViewModelTests {
             mockPagerFactory.create(
                 filterUnreadOnly = true,
                 selectedCategoryIds = viewModel.selectedCategoryIds.value.toList(),
-                deletedMessageIds = emptySet(),
-                categories = any(),
+                categories = any()
             )
         }
     }
@@ -129,7 +128,7 @@ class ListPageViewModelTests {
 
         val selectedCategoryIds = setOf(1, 2, 3)
 
-        every { mockPagerFactory.create(any(), any(), any(), any()) } returns flowOf(
+        every { mockPagerFactory.create(any(), any(), any()) } returns flowOf(
             PagingData.from(
                 data = emptyList(),
                 placeholdersBefore = 0,
@@ -148,8 +147,7 @@ class ListPageViewModelTests {
             mockPagerFactory.create(
                 filterUnreadOnly = false,
                 selectedCategoryIds = selectedCategoryIds.toList(),
-                deletedMessageIds = emptySet(),
-                categories = any(),
+                categories = any()
             )
         }
     }
@@ -188,6 +186,7 @@ class ListPageViewModelTests {
     fun testSelectMessage_shouldUpdateSelectedMessageIdAndCache_withoutNavigation() = runTest {
         val mockMessageViewModel = mock<MessageItemViewModelApi>(MockMode.autofill)
         every { mockMessageViewModel.id } returns TEST_MESSAGE_ID
+        every { mockMessageViewModel.isUnread } returns true
         every { mockMessageViewModel.shouldNavigate() } returns false
         everySuspend { mockMessageViewModel.tagMessageRead() } returns Result.success(Unit)
 
@@ -212,6 +211,7 @@ class ListPageViewModelTests {
         runTest {
             val mockMessageViewModel = mock<MessageItemViewModelApi>(MockMode.autofill)
             every { mockMessageViewModel.id } returns TEST_MESSAGE_ID
+            every { mockMessageViewModel.isUnread } returns true
             every { mockMessageViewModel.shouldNavigate() } returns true
             everySuspend { mockMessageViewModel.tagMessageRead() } returns Result.success(Unit)
 
@@ -230,13 +230,61 @@ class ListPageViewModelTests {
         }
 
     @Test
+    fun testSelectMessage_shouldCall_tagMessageRead_ifTheMessage_isUnread_andNotInLocallyRead() =
+        runTest {
+            val mockMessageViewModel = mock<MessageItemViewModelApi>(MockMode.autofill)
+            every { mockMessageViewModel.id } returns TEST_MESSAGE_ID
+            every { mockMessageViewModel.isUnread } returns true
+            everySuspend { mockMessageViewModel.tagMessageRead() } returns Result.success(Unit)
+
+            viewModel.selectMessage(mockMessageViewModel) {}
+
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            verifySuspend { mockMessageViewModel.tagMessageRead() }
+        }
+
+    @Test
+    fun testSelectMessage_shouldNotCall_tagMessageRead_ifTheMessage_read() =
+        runTest {
+            val mockMessageViewModel = mock<MessageItemViewModelApi>(MockMode.autofill)
+            every { mockMessageViewModel.id } returns TEST_MESSAGE_ID
+            every { mockMessageViewModel.isUnread } returns false
+            everySuspend { mockMessageViewModel.tagMessageRead() } returns Result.success(Unit)
+
+            viewModel.selectMessage(mockMessageViewModel) {}
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            verifySuspend(VerifyMode.exactly(0)) { mockMessageViewModel.tagMessageRead() }
+        }
+
+    @Test
+    fun testSelectMessage_shouldNotCall_tagMessageRead_ifTheMessage_isUnread_butIncludedInLocallyRead() =
+        runTest {
+            val mockMessageViewModel = mock<MessageItemViewModelApi>(MockMode.autofill)
+            every { mockMessageViewModel.id } returns TEST_MESSAGE_ID
+            every { mockMessageViewModel.isUnread } returns true
+            everySuspend { mockMessageViewModel.tagMessageRead() } returns Result.success(Unit)
+
+            viewModel.selectMessage(mockMessageViewModel) {}
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            readMessageIds.value shouldBe setOf(TEST_MESSAGE_ID)
+
+            viewModel.selectMessage(mockMessageViewModel) {}
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            verifySuspend(VerifyMode.exactly(1)) { mockMessageViewModel.tagMessageRead() }
+        }
+
+    @Test
     fun testDeleteMessage_shouldCallMessageViewModel_deleteMessage_andUpdateDeletedMessageIdsFilter() =
         runTest {
             val mockMessageViewModel = mock<MessageItemViewModelApi>(MockMode.autofill)
             every { mockMessageViewModel.id } returns TEST_MESSAGE_ID
             everySuspend { mockMessageViewModel.deleteMessage() } returns Result.success(Unit)
 
-            every { mockPagerFactory.create(any(), any(), any(), any()) } returns flowOf(
+            every { mockPagerFactory.create(any(), any(), any()) } returns flowOf(
                 PagingData.from(
                     data = listOf(mockMessageViewModel),
                     placeholdersBefore = 0,
@@ -256,7 +304,7 @@ class ListPageViewModelTests {
 
             pagingDataList.size shouldBe 1
             verify(VerifyMode.exactly(1)) {
-                mockPagerFactory.create(any(), any(), any(), any())
+                mockPagerFactory.create(any(), any(), any())
             }
             verifySuspend {
                 mockMessageViewModel.deleteMessage()
@@ -306,7 +354,7 @@ class ListPageViewModelTests {
     fun testApplyCategorySelection_shouldSetCategoryIdsAndCloseDialog() = runTest {
         val selectedCategoryIds = setOf(1, 2, 3)
 
-        every { mockPagerFactory.create(any(), any(), any(), any()) } returns flowOf(
+        every { mockPagerFactory.create(any(), any(), any()) } returns flowOf(
             PagingData.from(
                 data = emptyList(),
                 placeholdersBefore = 0,
@@ -326,7 +374,7 @@ class ListPageViewModelTests {
 
     @Test
     fun testHasFiltersApplied_shouldReturnTrue_whenFilterUnreadOnlyIsTrue() = runTest {
-        every { mockPagerFactory.create(any(), any(), any(), any()) } returns flowOf(
+        every { mockPagerFactory.create(any(), any(), any()) } returns flowOf(
             PagingData.from(
                 data = emptyList(),
                 placeholdersBefore = 0,
@@ -346,7 +394,7 @@ class ListPageViewModelTests {
     fun testHasFiltersApplied_shouldReturnTrue_whenSelectedCategoryIdsIsNotEmpty() = runTest {
         val selectedCategoryIds = setOf(1, 2)
 
-        every { mockPagerFactory.create(any(), any(), any(), any()) } returns flowOf(
+        every { mockPagerFactory.create(any(), any(), any()) } returns flowOf(
             PagingData.from(
                 data = emptyList(),
                 placeholdersBefore = 0,
@@ -366,7 +414,7 @@ class ListPageViewModelTests {
     fun testHasFiltersApplied_shouldReturnTrue_whenBothFiltersAreApplied() = runTest {
         val selectedCategoryIds = setOf(3, 4)
 
-        every { mockPagerFactory.create(any(), any(), any(), any()) } returns flowOf(
+        every { mockPagerFactory.create(any(), any(), any()) } returns flowOf(
             PagingData.from(
                 data = emptyList(),
                 placeholdersBefore = 0,
