@@ -369,18 +369,6 @@ mavenPublishing {
     }
 }
 
-val copyLoader by tasks.registering(Copy::class) {
-    val loaderJs = project.layout.projectDirectory.file("emarsys-sdk-loader/emarsys-sdk-loader.js")
-    val target = layout.buildDirectory.dir("dist/js/productionExecutable")
-
-    from(loaderJs)
-    into(target)
-}
-
-tasks.named("jsBrowserDistribution") {
-    finalizedBy(copyLoader)
-}
-
 tasks {
     register("base64EnvToFile") {
         doLast {

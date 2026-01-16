@@ -147,7 +147,7 @@ async function createTestEnvironment() {
     const mockTrackCustomEvent = mock.fn()
     const baseURL = pathToFileURL(path.resolve('./')).href;
     const resourceLoader = new SpyResourceLoader()
-    const loaderPath = path.join(__dirname, 'emarsys-sdk-loader.js')
+    const loaderPath = path.resolve('./emarsys-sdk/src/jsHtml/resources/emarsys-sdk-loader.js');
     const dom = new JSDOM(`<!DOCTYPE html><html lang="en"><head><script src="${loaderPath}"></script>
 </head></html>`, {
         url: baseURL,
