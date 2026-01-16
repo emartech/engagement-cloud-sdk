@@ -163,6 +163,8 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
 
     val scrollableList by style {
         flex(1)
+        display(DisplayStyle.Flex)
+        flexDirection(FlexDirection.Column)
         property("overflow-y", "auto")
     }
 
@@ -411,6 +413,7 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
     val messageItemContent by style {
         flex(5)
         padding(DEFAULT_PADDING)
+        property("overflow", "hidden")
     }
 
     val messageItemMisc by style {
@@ -423,7 +426,7 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
     }
 
     val messageItemContentNoPadding by style {
-        flex(1)
+        flex(5)
         padding(ZERO_PADDING)
     }
 
