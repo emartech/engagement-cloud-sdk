@@ -274,7 +274,7 @@ class EmarsysIndexedDbObjectStoreTest {
         )
 
         val event = SdkEvent.External.Custom(
-                        "id",
+            "id",
             "name",
             buildJsonObject { put("key", JsonPrimitive("value")) })
 
@@ -343,7 +343,7 @@ class EmarsysIndexedDbObjectStoreTest {
         )
 
         val event = SdkEvent.External.Custom(
-                        "id",
+            "id",
             "name",
             buildJsonObject { put("key", JsonPrimitive("value")) })
 

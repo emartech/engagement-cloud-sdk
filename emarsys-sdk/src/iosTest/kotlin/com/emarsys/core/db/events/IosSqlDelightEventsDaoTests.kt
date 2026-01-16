@@ -11,12 +11,12 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import kotlin.time.Clock
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
@@ -47,7 +47,6 @@ class IosSqDelightEventsDaoTests {
     @Test
     fun testInsertEvent() = runTest {
         val event = SdkEvent.External.Custom(
-            type = "custom",
             id = "testId",
             name = "test",
             attributes = ATTRIBUTES,
@@ -66,7 +65,6 @@ class IosSqDelightEventsDaoTests {
     @Test
     fun testUpsertEvent() = runTest {
         val event = SdkEvent.External.Custom(
-            type = "custom",
             id = "testId",
             name = "test",
             attributes = ATTRIBUTES,
@@ -98,7 +96,6 @@ class IosSqDelightEventsDaoTests {
     fun testRemoveEvent_shouldDoNothing_whenNothingWasInserted() = runTest {
         eventsDao.removeEvent(
             SdkEvent.External.Custom(
-                "custom",
                 "testId",
                 "test",
                 ATTRIBUTES,
@@ -109,7 +106,7 @@ class IosSqDelightEventsDaoTests {
 
     @Test
     fun testRemoveEvent_shouldRemoveEvent_ById() = runTest {
-        val testEvent = SdkEvent.External.Custom("custom", "testId", "test", ATTRIBUTES, TIMESTAMP)
+        val testEvent = SdkEvent.External.Custom("testId", "test", ATTRIBUTES, TIMESTAMP)
         eventsDao.insertEvent(testEvent)
 
         eventsDao.removeEvent(testEvent)
@@ -120,9 +117,9 @@ class IosSqDelightEventsDaoTests {
     @Test
     fun testRemoveAll_shouldRemoveAllEvents() = runTest {
         val testEvent1 =
-            SdkEvent.External.Custom("custom1", "testId", "test", ATTRIBUTES, TIMESTAMP)
+            SdkEvent.External.Custom("testId", "test", ATTRIBUTES, TIMESTAMP)
         val testEvent2 =
-            SdkEvent.External.Custom("custom2", "testId", "test", ATTRIBUTES, TIMESTAMP)
+            SdkEvent.External.Custom("testId", "test", ATTRIBUTES, TIMESTAMP)
         eventsDao.insertEvent(testEvent1)
         eventsDao.insertEvent(testEvent2)
 
