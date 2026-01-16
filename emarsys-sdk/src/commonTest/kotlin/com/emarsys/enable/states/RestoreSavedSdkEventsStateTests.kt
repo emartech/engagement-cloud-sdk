@@ -26,8 +26,8 @@ class RestoreSavedSdkEventsStateTests {
     private lateinit var restoreSavedSdkEventsState: RestoreSavedSdkEventsState
 
     companion object {
-        val testEvent1 = SdkEvent.External.Custom("custom", "testId1", "testName1")
-        val testEvent2 = SdkEvent.External.Custom("custom", "testId2", "testName2")
+        val testEvent1 = SdkEvent.External.Custom( "testId1", "testName1")
+        val testEvent2 = SdkEvent.External.Custom( "testId2", "testName2")
 
     }
 

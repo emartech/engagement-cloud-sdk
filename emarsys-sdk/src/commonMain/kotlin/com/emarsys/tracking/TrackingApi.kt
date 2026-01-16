@@ -1,6 +1,6 @@
 package com.emarsys.tracking
 
-import com.emarsys.api.event.model.CustomEvent
+import com.emarsys.api.event.model.TrackedEvent
 
 /**
  * Interface for performing event tracking operations.
@@ -8,9 +8,9 @@ import com.emarsys.api.event.model.CustomEvent
 interface TrackingApi {
 
     /**
-     * Tracks a custom event.
+     * Tracks an event.
      *
-     * This operation registers a custom event with the Emarsys platform.
+     * This operation registers an event with the Emarsys platform.
      *
      * Example usage:
      * ``` kotlin
@@ -24,8 +24,8 @@ interface TrackingApi {
      *     )
      * ```
      *
-     * @param event The custom event to track.
+     * @param trackedEvent The custom event or navigate event to track.
      * @return A [Result] indicating success or failure of the operation.
      */
-    suspend fun track(event: CustomEvent): Result<Unit>
+    suspend fun track(trackedEvent: TrackedEvent): Result<Unit>
 }

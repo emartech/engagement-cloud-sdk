@@ -1,16 +1,15 @@
 package com.emarsys.api.tracking
 
 import com.emarsys.api.event.model.CustomEvent
+import com.emarsys.api.event.model.NavigateEvent
+import com.emarsys.api.tracking.model.JsCustomEvent
 import com.emarsys.tracking.TrackingApi
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
-import dev.mokkery.matcher.capture.Capture.Companion.slot
-import dev.mokkery.matcher.capture.SlotCapture
-import dev.mokkery.matcher.capture.capture
-import dev.mokkery.matcher.capture.get
+import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.verifySuspend
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.await
@@ -19,7 +18,6 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlinx.serialization.SerializationException
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -42,50 +40,60 @@ class JSTrackingTests {
     }
 
     @Test
-    fun testTrack_shouldCall_trackCustomEvent_onEventTrackerApi_withCorrectParam() =
+    fun testTrackEvent_shouldCall_trackCustomEvent_onEventTrackerApi_withCorrectParam() =
         runTest {
             val testName = "testName"
-            val payloadValue = "testValue"
-            val payloadKey = "testKey"
-            val testPayload = js("{}")
-            testPayload[payloadKey] = payloadValue
-            val eventSlot: SlotCapture<CustomEvent> = slot()
-            everySuspend { mockEventTrackerApi.track(capture(eventSlot)) } returns Result.success(
+            val testAttributesMap = mapOf("testKey" to "testValue")
+            everySuspend { mockEventTrackerApi.track(any()) } returns Result.success(
                 Unit
             )
+            val jsCustomEvent: JsCustomEvent =
+                js("{ name: testName, attributes: { 'testKey': 'testValue' } }").unsafeCast<com.emarsys.api.tracking.model.JsCustomEvent>()
 
-            jsTracking.track(testName, testPayload).await()
+            jsTracking.trackEvent(jsCustomEvent).await()
 
-            eventSlot.get().name shouldBe testName
-            eventSlot.get().attributes shouldBe mapOf(payloadKey to payloadValue)
+            verifySuspend { mockEventTrackerApi.track(CustomEvent(testName, testAttributesMap)) }
         }
 
     @Test
-    fun testTrack_shouldCall_throwException_ifPayloadMappingFails() = runTest {
-        val testName = "testName"
-        val payloadValue = js("""{"nested":"object"}""")
-        val payloadKey = "testKey"
-        val testPayload = js("{}")
-        testPayload[payloadKey] = payloadValue
+    fun testTrackNavigation_shouldCall_trackCustomEvent_onEventTrackerApi_withCorrectParam() =
+        runTest {
+            val testLocation = "testLocation"
+            everySuspend { mockEventTrackerApi.track(any()) } returns Result.success(
+                Unit
+            )
 
-        shouldThrow<SerializationException> {
-            jsTracking.track(testName, testPayload).await()
+            jsTracking.trackNavigation(testLocation).await()
+
+            verifySuspend { mockEventTrackerApi.track(NavigateEvent(testLocation)) }
+        }
+
+    @Test
+    fun testTrackEvent_shouldThrowException_ifPayloadMappingFails() = runTest {
+        everySuspend { mockEventTrackerApi.track(any()) } returns Result.success(
+            Unit
+        )
+        val testName = "testName"
+        val customEvent: JsCustomEvent =
+            js("{ name: testName, attributes: { 'testKey': {} }}").unsafeCast<JsCustomEvent>()
+
+        shouldThrow<IllegalArgumentException> {
+            jsTracking.trackEvent(customEvent).await()
         }
     }
 
     @Test
-    fun testTrack_shouldCall_throwException_ifEventTrackingFails() = runTest {
+    fun testTrackEvent_shouldThrowException_ifEventTrackingFails() = runTest {
         val testName = "testName"
-        val payloadKey = "testKey"
-        val payloadValue = "testValue"
-        val testPayload = js("{}")
-        testPayload[payloadKey] = payloadValue
+        val testAttributesMap = mapOf("testKey" to "testValue")
+        val customEvent: JsCustomEvent =
+            js("{ name: testName, attributes: { 'testKey': 'testValue' } }").unsafeCast<JsCustomEvent>()
 
         everySuspend {
             mockEventTrackerApi.track(
                 CustomEvent(
                     testName,
-                    mapOf(payloadKey to payloadValue)
+                    testAttributesMap
                 )
             )
         } returns Result.failure(
@@ -93,7 +101,7 @@ class JSTrackingTests {
         )
 
         shouldThrow<Exception> {
-            jsTracking.track(testName, testPayload).await()
+            jsTracking.trackEvent(customEvent).await()
         }
     }
 }

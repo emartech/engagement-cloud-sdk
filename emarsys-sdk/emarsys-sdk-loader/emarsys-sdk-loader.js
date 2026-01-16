@@ -20,7 +20,7 @@
             'resetLanguage',
             'getNotificationSettings']),
         contact: createApiSegment('contact', ['link', 'linkAuthenticated', 'unlink']),
-        event: createApiSegment('event', ['track']),
+        event: createApiSegment('event', ['trackNavigation', 'trackEvent']),
         push: createApiSegment('push', ['registerPushToken', 'clearPushToken', 'getPushToken']),
         deepLink: createApiSegment('deepLink', ['track']),
         inApp: createApiSegment('inApp', ['pause', 'resume', 'isPaused']),

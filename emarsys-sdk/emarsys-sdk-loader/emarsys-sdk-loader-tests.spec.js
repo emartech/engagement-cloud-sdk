@@ -84,14 +84,14 @@ describe('emarsys-sdk-loader', function () {
             } = await createTestEnvironment();
             const spyGathererDisableTracking = testContext.mock.method(window.Emarsys.setup, "disableTracking")
             const spyGathererRegisterPushToken = testContext.mock.method(window.Emarsys.push, "registerPushToken")
-            const spyGathererTrackCustomEvent = testContext.mock.method(window.Emarsys.event, "track")
+            const spyGathererTrackCustomEvent = testContext.mock.method(window.Emarsys.event, "trackEvent")
 
             await window.Emarsys.setup.disableTracking();
             await window.Emarsys.push.registerPushToken(testPushToken);
 
             triggerSDKLoadedEvent(window)
 
-            await window.Emarsys.event.track(testEvent);
+            await window.Emarsys.event.trackEvent(testEvent);
 
             assert.equal(spyGathererDisableTracking.mock.callCount(), 1)
             assert.equal(mockDisableTracking.mock.callCount(), 1)
@@ -167,7 +167,7 @@ async function createTestEnvironment() {
     const emarsysHtml = {
         setup: {disableTracking: mockDisableTracking},
         push: {registerPushToken: mockRegisterPushToken},
-        event: {track: mockTrackCustomEvent},
+        event: {trackEvent: mockTrackCustomEvent},
         getInstance: () => emarsysHtml
     }
 

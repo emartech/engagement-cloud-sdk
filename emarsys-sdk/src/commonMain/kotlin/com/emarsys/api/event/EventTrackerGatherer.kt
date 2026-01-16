@@ -1,8 +1,7 @@
 package com.emarsys.api.event
 
 import com.emarsys.api.event.EventTrackerCall.TrackEvent
-import com.emarsys.api.event.model.CustomEvent
-import com.emarsys.api.event.model.toSdkEvent
+import com.emarsys.api.event.model.TrackedEvent
 import com.emarsys.core.log.Logger
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.core.providers.UuidProviderApi
@@ -15,10 +14,10 @@ internal class EventTrackerGatherer(
     private val uuidProvider: UuidProviderApi,
     private val sdkLogger: Logger
 ) : EventTrackerInstance {
-    override suspend fun trackEvent(event: CustomEvent) {
+    override suspend fun trackEvent(trackedEvent: TrackedEvent) {
         context.calls.add(
             TrackEvent(
-                event.toSdkEvent(
+                trackedEvent.toSdkEvent(
                     uuidProvider.provide(),
                     timestampProvider.provide(),
                 )

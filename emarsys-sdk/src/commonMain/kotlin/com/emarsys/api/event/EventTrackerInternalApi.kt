@@ -1,8 +1,8 @@
 package com.emarsys.api.event
 
-import com.emarsys.api.event.model.CustomEvent
+import com.emarsys.api.event.model.TrackedEvent
 
 interface EventTrackerInternalApi {
 
-    suspend fun trackEvent(event: CustomEvent)
+    suspend fun trackEvent(trackedEvent: TrackedEvent)
 }

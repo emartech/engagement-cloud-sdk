@@ -3,7 +3,6 @@ package com.emarsys.networking.clients.event
 import com.emarsys.SdkConstants
 import com.emarsys.event.SdkEvent
 import com.emarsys.networking.clients.event.model.DeviceEvent
-import com.emarsys.networking.clients.event.model.toDeviceEvent
 import io.kotest.matchers.shouldBe
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put

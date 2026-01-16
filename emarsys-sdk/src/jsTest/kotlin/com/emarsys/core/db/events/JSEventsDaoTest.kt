@@ -27,7 +27,7 @@ class JSEventsDaoTest {
 
     @Test
     fun insertEvent_shouldCallPut_onObjectStore_withCorrectParams() = runTest {
-        val testEvent = SdkEvent.External.Custom("custom", "testId", "testName")
+        val testEvent = SdkEvent.External.Custom("testId", "testName")
 
         jsEventsDao.insertEvent(testEvent)
 
@@ -36,7 +36,7 @@ class JSEventsDaoTest {
 
     @Test
     fun upsertEvent_shouldCallPut_onObjectStore_withCorrectParams() = runTest {
-        val testEvent = SdkEvent.External.Custom("custom", "testId", "testName")
+        val testEvent = SdkEvent.External.Custom("testId", "testName")
 
         jsEventsDao.insertEvent(testEvent)
 
@@ -45,8 +45,8 @@ class JSEventsDaoTest {
 
     @Test
     fun getEvents_shouldReturn_flowOfStoredEvents() = runTest {
-        val testEvent = SdkEvent.External.Custom("custom", "testId", "testName")
-        val testEvent2 = SdkEvent.External.Custom("custom", "testId2", "testName2")
+        val testEvent = SdkEvent.External.Custom("testId", "testName")
+        val testEvent2 = SdkEvent.External.Custom("testId2", "testName2")
         val expectedEvents = flowOf(testEvent, testEvent2)
 
         everySuspend { mockEmarsysIndexedDbObjectStore.getAll() } returns expectedEvents

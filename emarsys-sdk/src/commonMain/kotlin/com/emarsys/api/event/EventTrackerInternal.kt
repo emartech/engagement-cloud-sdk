@@ -1,7 +1,6 @@
 package com.emarsys.api.event
 
-import com.emarsys.api.event.model.CustomEvent
-import com.emarsys.api.event.model.toSdkEvent
+import com.emarsys.api.event.model.TrackedEvent
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.collections.dequeue
 import com.emarsys.core.log.Logger
@@ -20,9 +19,9 @@ internal class EventTrackerInternal(
     private val sdkLogger: Logger
 ) : EventTrackerInstance {
 
-    override suspend fun trackEvent(event: CustomEvent) {
+    override suspend fun trackEvent(trackedEvent: TrackedEvent) {
         sdkEventDistributor.registerEvent(
-            event.toSdkEvent(
+            trackedEvent.toSdkEvent(
                 uuidProvider.provide(),
                 timestampProvider.provide()
             )

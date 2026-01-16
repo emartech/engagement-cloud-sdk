@@ -1,7 +1,7 @@
 package com.emarsys.api.event
 
 import Activatable
-import com.emarsys.api.event.model.CustomEvent
+import com.emarsys.api.event.model.TrackedEvent
 import com.emarsys.api.generic.GenericApi
 import com.emarsys.context.SdkContextApi
 import kotlinx.coroutines.withContext
@@ -16,9 +16,9 @@ internal class EventTracker<Logging : EventTrackerInstance, Gatherer : EventTrac
 ) : GenericApi<Logging, Gatherer, Internal>(
     loggingApi, gathererApi, internalApi, sdkContext
 ), EventTrackerApi {
-    override suspend fun trackEvent(event: CustomEvent): Result<Unit> = runCatching {
+    override suspend fun trackEvent(trackedEvent: TrackedEvent): Result<Unit> = runCatching {
         withContext(sdkContext.sdkDispatcher) {
-            activeInstance<EventTrackerInternalApi>().trackEvent(event)
+            activeInstance<EventTrackerInternalApi>().trackEvent(trackedEvent)
         }
     }
 }

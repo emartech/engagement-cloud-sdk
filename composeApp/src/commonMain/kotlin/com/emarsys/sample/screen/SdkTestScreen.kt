@@ -58,6 +58,10 @@ fun SdkTestScreen(
             Text("trackCustomEvent")
         }
 
+        Button(onClick = { viewModel.trackNavigateEvent() }) {
+            Text("trackNavigateEvent - only on web")
+        }
+
         Switch(
             checked = switchValue,
             onCheckedChange = { viewModel.toggleInAppDnd(it) }

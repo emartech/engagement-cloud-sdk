@@ -1,5 +1,6 @@
 package com.emarsys.event
 
+import com.emarsys.SdkConstants
 import com.emarsys.SdkConstants.APPLY_APPCODE_BASED_REMOTE_CONFIG_EVENT_NAME
 import com.emarsys.SdkConstants.APPLY_GLOBAL_REMOTE_CONFIG_EVENT_NAME
 import com.emarsys.SdkConstants.APP_START_EVENT_NAME
@@ -31,11 +32,13 @@ import com.emarsys.core.providers.TimestampProvider
 import com.emarsys.core.providers.UUIDProvider
 import com.emarsys.mobileengage.embeddedmessaging.models.MessageTagUpdate
 import com.emarsys.mobileengage.inapp.InAppMessage
+import com.emarsys.networking.clients.event.model.DeviceEvent
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -102,20 +105,74 @@ sealed interface SdkEvent {
     @Serializable
     sealed interface DeviceEvent : SdkEvent {
         val name: String
+
+        fun createAttributesMap(): Map<String, String>?
+
+        fun createDeviceEventFromAttributesMap(attributes: Map<String, String>?): com.emarsys.networking.clients.event.model.DeviceEvent =
+            DeviceEvent(
+                type = this.type,
+                name = this.name,
+                timestamp = this.timestamp,
+                attributes = attributes,
+                trackingInfo = null,
+                reporting = null
+            )
+
+        fun toDeviceEvent(
+            platformCategory: String = SdkConstants.MOBILE_PLATFORM_CATEGORY,
+            pageLocation: String
+        ): com.emarsys.networking.clients.event.model.DeviceEvent {
+            val pageLocation = if (platformCategory == SdkConstants.WEB_PLATFORM_CATEGORY) {
+                SdkConstants.PAGE_LOCATION_ATTRIBUTE_KEY to pageLocation
+            } else null
+            val attributesMap = createAttributesMap()
+            val extendedAttributesMap: Map<String, String>? =
+                if (attributesMap == null && pageLocation == null) null
+                else buildMap {
+                    attributesMap?.let { putAll(it) }
+                    pageLocation?.let { put(it.first, it.second) }
+                }
+            return createDeviceEventFromAttributesMap(extendedAttributesMap)
+        }
+    }
+
+    sealed interface DeviceEventWithCustomAttributes : DeviceEvent {
         val attributes: JsonObject?
+
+        override fun createAttributesMap(): Map<String, String>? = buildMap {
+            attributes?.forEach { (key, value) ->
+                put(key, value.jsonPrimitive.content)
+            }
+        }
     }
 
     sealed interface External : SdkEvent {
 
         @Serializable
         data class Custom(
-            override val type: String = "custom",
             override val id: String = UUIDProvider().provide(),
             override val name: String,
             override val attributes: JsonObject? = null,
             override val timestamp: Instant = TimestampProvider().provide(),
             override var nackCount: Int = 0
-        ) : External, OnlineSdkEvent, DeviceEvent
+        ) : External, OnlineSdkEvent, DeviceEventWithCustomAttributes {
+            override val type: String = "custom"
+        }
+
+        @Serializable
+        data class NavigateEvent(
+            override val id: String = UUIDProvider().provide(),
+            override val timestamp: Instant,
+            val location: String,
+            override var nackCount: Int = 0
+        ) : External, OnlineSdkEvent, DeviceEvent {
+            override val type: String = "internal"
+            override val name: String = "navigate"
+
+            override fun createAttributesMap(): Map<String, String> = buildMap {
+                put("location", location)
+            }
+        }
 
         @Serializable
         sealed interface Api : External {
@@ -228,18 +285,29 @@ sealed interface SdkEvent {
             ) : EmbeddedMessaging
         }
 
-        sealed interface Reporting : Internal, OnlineSdkEvent, DeviceEvent {
+        sealed interface Reporting : Internal, OnlineSdkEvent, DeviceEventWithCustomAttributes {
             val reporting: String?
             val trackingInfo: String
+
+            override fun createDeviceEventFromAttributesMap(attributes: Map<String, String>?): com.emarsys.networking.clients.event.model.DeviceEvent {
+                return DeviceEvent(
+                    type = this.type,
+                    name = this.name,
+                    timestamp = this.timestamp,
+                    attributes = attributes,
+                    trackingInfo = this.trackingInfo,
+                    reporting = this.reporting
+                )
+            }
         }
 
-        sealed interface Custom : Internal, OnlineSdkEvent, DeviceEvent
+        sealed interface Custom : Internal, OnlineSdkEvent, DeviceEventWithCustomAttributes
 
         sealed interface LogEvent : Internal, OnlineSdkEvent
 
         sealed interface SetupFlowEvent : Internal, OnlineSdkEvent
 
-        sealed interface OperationalEvent: Internal, OnlineSdkEvent {
+        sealed interface OperationalEvent : Internal, OnlineSdkEvent {
             val applicationCode: String?
         }
 

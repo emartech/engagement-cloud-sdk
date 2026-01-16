@@ -29,7 +29,6 @@ import com.emarsys.networking.clients.event.model.ContentCampaign
 import com.emarsys.networking.clients.event.model.DeviceEventRequestBody
 import com.emarsys.networking.clients.event.model.DeviceEventResponse
 import com.emarsys.networking.clients.event.model.OnEventActionCampaign
-import com.emarsys.networking.clients.event.model.toDeviceEvent
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineScope

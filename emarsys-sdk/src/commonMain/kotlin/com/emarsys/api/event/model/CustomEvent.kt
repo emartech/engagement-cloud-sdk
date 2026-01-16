@@ -15,21 +15,26 @@ import kotlin.time.Instant
 data class CustomEvent(
     val name: String,
     val attributes: Map<String, String>? = null
-)
-
-@OptIn(ExperimentalTime::class)
-fun CustomEvent.toSdkEvent(uuid: String, timestamp: Instant): SdkEvent = SdkEvent.External.Custom(
-    id = uuid,
-    name = name,
-    attributes = attributes?.let { attributes ->
-        buildJsonObject {
-            attributes.forEach { (key, value) ->
-                put(
-                    key,
-                    JsonPrimitive(value)
-                )
-            }
-        }
-    },
-    timestamp = timestamp
-)
+) : TrackedEvent {
+    @OptIn(ExperimentalTime::class)
+    override fun toSdkEvent(
+        uuid: String,
+        timestamp: Instant
+    ): SdkEvent {
+        return SdkEvent.External.Custom(
+            id = uuid,
+            name = name,
+            attributes = attributes?.let { attributes ->
+                buildJsonObject {
+                    attributes.forEach { (key, value) ->
+                        put(
+                            key,
+                            JsonPrimitive(value)
+                        )
+                    }
+                }
+            },
+            timestamp = timestamp
+        )
+    }
+}

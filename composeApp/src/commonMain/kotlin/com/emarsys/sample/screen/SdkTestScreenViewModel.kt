@@ -2,6 +2,7 @@ package com.emarsys.sample.screen
 
 import com.emarsys.Emarsys
 import com.emarsys.api.event.model.CustomEvent
+import com.emarsys.api.event.model.NavigateEvent
 import com.emarsys.sample.enableTracking
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -67,6 +68,16 @@ class SdkTestScreenViewModel {
             viewModelScope.launch {
                 Emarsys.event.track(CustomEvent(eventNameValue, null))
             }
+        }
+    }
+
+    fun trackNavigateEvent(){
+        viewModelScope.launch {
+            Emarsys.event.track(
+                NavigateEvent(
+                    location = "https://www.emarsys.com"
+                )
+            )
         }
     }
 

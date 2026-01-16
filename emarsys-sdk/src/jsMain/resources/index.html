@@ -23,6 +23,7 @@
     <input id="customEventNameInput" name="customEventName" type="text">
 </label>
 <button type="button" id="button-custom-event">Track!</button>
+<button type="button" id="button-navigate-event">Track navigate event</button>
 <div style="margin-top:32px;">
     <button type="button" id="button-disable-sdk">Disable tracking in SDK</button>
 </div>
@@ -68,7 +69,12 @@
  }
 
  document.getElementById("button-custom-event").onclick = async () => {
-     await emarsys.event.track(document.getElementById("customEventNameInput").value);
+     const name = document.getElementById("customEventNameInput").value;
+     await emarsys.event.trackEvent({ name: name, attributes: {"key1": "value1"}});
+ }
+
+ document.getElementById("button-navigate-event").onclick = async () => {
+     await emarsys.event.trackNavigation("https://www.emarsys.com");
  }
 
  document.getElementById("button-disable-sdk").onclick = async () => {
