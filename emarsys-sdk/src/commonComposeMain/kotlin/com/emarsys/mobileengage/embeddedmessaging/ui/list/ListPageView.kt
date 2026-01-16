@@ -59,19 +59,28 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.translation.LocalStringReso
 import kotlinx.coroutines.launch
 
 @Composable
-fun ListPageView(
+fun ListPageView(showFilters: Boolean = true) {
+    EmbeddedMessagingTheme {
+        InternalListPageView(showFilters)
+    }
+}
+
+
+@Composable
+internal fun InternalListPageView(
+    showFilters: Boolean = true,
     viewModel: ListPageViewModelApi = rememberListPageViewModel()
 ) {
     EmbeddedMessagingTheme {
         Column(modifier = Modifier.background(MaterialTheme.colorScheme.surface)) {
-            MessageList(viewModel)
+            MessageList(showFilters, viewModel)
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun MessageList(viewModel: ListPageViewModelApi) {
+private fun MessageList(showFilters: Boolean, viewModel: ListPageViewModelApi) {
     val lazyPagingMessageItems = viewModel.messagePagingDataFlowFiltered.collectAsLazyPagingItems()
 
     var showCategorySelector by rememberSaveable { mutableStateOf(false) }
@@ -142,14 +151,16 @@ private fun MessageList(viewModel: ListPageViewModelApi) {
     EmbeddedMessagingTheme {
         Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) }) {
             Column {
-                FilterRow(
-                    selectedCategoryIds = selectedCategoryIds,
-                    filterUnreadOnly = filterUnreadOnly,
-                    onFilterChange = { viewModel.setFilterUnreadOnly(it) },
-                    onCategorySelectorClicked = { showCategorySelector = true }
-                )
+                if (showFilters) {
+                    FilterRow(
+                        selectedCategoryIds = selectedCategoryIds,
+                        filterUnreadOnly = filterUnreadOnly,
+                        onFilterChange = { viewModel.setFilterUnreadOnly(it) },
+                        onCategorySelectorClicked = { showCategorySelector = true }
+                    )
 
-                HorizontalDivider(color = MaterialTheme.colorScheme.outline)
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline)
+                }
 
                 if (showCategorySelector) {
                     CategoriesDialogView(

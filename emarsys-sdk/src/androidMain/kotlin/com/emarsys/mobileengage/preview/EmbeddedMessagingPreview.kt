@@ -26,7 +26,7 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemModel
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemView
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModel
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
-import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageView
+import com.emarsys.mobileengage.embeddedmessaging.ui.list.InternalListPageView
 import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageViewModelApi
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
 import com.emarsys.networking.clients.embedded.messaging.model.ListThumbnailImage
@@ -105,8 +105,9 @@ fun ListPageViewPreview() {
         override suspend fun registerEvent(sdkEvent: SdkEvent) =
             throw NotImplementedError("Preview only")
     }
-    ListPageView(
-        providePreviewMessageViewModel(previewSdkEventDistributor)
+    InternalListPageView(
+        showFilters = true,
+        viewModel = providePreviewMessageViewModel(previewSdkEventDistributor)
     )
 }
 

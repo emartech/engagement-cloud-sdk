@@ -34,7 +34,7 @@ fun AppNavigation(
                     SdkTestScreen()
                 }
                 NavigationTab.EMBEDDED_MESSAGING -> {
-                    ListPageView()
+                    ListPageView(showFilters = true)
                 }
             }
         }
