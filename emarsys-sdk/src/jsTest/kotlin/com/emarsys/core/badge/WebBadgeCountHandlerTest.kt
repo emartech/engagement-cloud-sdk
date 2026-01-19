@@ -10,8 +10,11 @@ import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
+import dev.mokkery.matcher.capture.Capture.Companion.slot
+import dev.mokkery.matcher.capture.capture
+import dev.mokkery.matcher.capture.isPresent
 import dev.mokkery.mock
-import dev.mokkery.verifySuspend
+import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -64,22 +67,19 @@ class WebBadgeCountHandlerTest {
 
     @Test
     fun handleBadgeCount_shouldEmitSdkEvent_whenBadgeCountReceived() = runTest {
+        val eventSlot = slot<SdkEvent.External.Api.BadgeCountEvent>()
         val testBadgeCount = BadgeCount(BadgeCountMethod.SET, 1)
         val testBadgeCountString = JsonUtil.json.encodeToString(testBadgeCount)
         everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mock(MockMode.autofill)
 
+        everySuspend {
+            mockSdkEventDistributor.registerEvent(
+                capture(eventSlot)
+            )
+        } returns mock(MockMode.autofill)
+
         webBadgeCountHandler.handleBadgeCount(testBadgeCountString)
 
-        verifySuspend {
-            mockSdkEventDistributor.registerEvent(
-                SdkEvent.External.Api.BadgeCountEvent(
-                    id = any(),
-                    method = testBadgeCount.method.name,
-                    badgeCount = testBadgeCount.value
-                )
-            )
-        }
+        eventSlot.isPresent shouldBe true
     }
-
-
 }

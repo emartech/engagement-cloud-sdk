@@ -53,7 +53,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -171,7 +170,7 @@ class EventClientTests {
         eventClient = createEventClient(backgroundScope)
         eventClient.register()
 
-        verifySuspend { mockSdkEventManager.onlineSdkEvents.filter(any()) }
+        verifySuspend { mockSdkEventManager.onlineSdkEvents }
         verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
     }
 

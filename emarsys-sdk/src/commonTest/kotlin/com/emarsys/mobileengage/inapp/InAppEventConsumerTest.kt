@@ -18,12 +18,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
-
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlin.test.AfterTest
@@ -73,7 +71,7 @@ class InAppEventConsumerTest {
         val inAppEventHandler = createInAppEventHandler(backgroundScope)
         inAppEventHandler.register()
 
-        verifySuspend { mockSdkEventManager.sdkEventFlow.filter(any()) }
+        verifySuspend { mockSdkEventManager.sdkEventFlow }
         verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
     }
 

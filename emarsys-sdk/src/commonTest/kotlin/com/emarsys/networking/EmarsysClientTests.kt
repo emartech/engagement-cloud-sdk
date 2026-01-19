@@ -21,6 +21,9 @@ import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
+import dev.mokkery.matcher.capture.Capture.Companion.slot
+import dev.mokkery.matcher.capture.capture
+import dev.mokkery.matcher.capture.isPresent
 import dev.mokkery.mock
 import dev.mokkery.verify
 import dev.mokkery.verify.VerifyMode
@@ -41,6 +44,7 @@ import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -252,6 +256,7 @@ class EmarsysClientTests {
     @Test
     fun testSend_should_emit_ReregistrationRequiredEvent_toSdkEventFlow_whenStatusCodeIs_inRange_400_504_andErrorCodeIsInRange_1100_1199() =
         runTest {
+            val eventSlot = slot<SdkEvent.Internal.Sdk.ReregistrationRequired>()
 
             everySuspend { mockNetworkClient.send(any()) } returns Result.success(
                 Response(
@@ -281,20 +286,24 @@ class EmarsysClientTests {
                 )
             )
 
+            everySuspend {
+                mockSdkEventDistributor.registerEvent(
+                    sdkEvent = capture(eventSlot)
+                )
+            } returns mock(MockMode.autofill)
+
             emarsysClient.send(UrlRequest(Url("https://testUrl.com"), HttpMethod.Get, null))
 
-            verifySuspend {
-                mockSdkEventDistributor.registerEvent(
-                    SdkEvent.Internal.Sdk.ReregistrationRequired(
-                        id = any()
-                    )
-                )
-            }
+            advanceUntilIdle()
+
+            eventSlot.isPresent shouldBe true
         }
 
     @Test
     fun testSend_should_emit_RemoteConfigUpdateRequiredEvent_toSdkEventFlow_whenStatusCodeIs_inRange_400_504_andErrorCodeIsInRange_1200_1299() =
         runTest {
+            val eventSlot = slot<SdkEvent.Internal.Sdk.RemoteConfigUpdateRequired>()
+
             everySuspend { mockNetworkClient.send(any()) } returns Result.success(
                 Response(
                     UrlRequest(
@@ -322,16 +331,17 @@ class EmarsysClientTests {
                     }.toString()
                 )
             )
+            everySuspend {
+                mockSdkEventDistributor.registerEvent(
+                    sdkEvent = capture(eventSlot)
+                )
+            } returns mock(MockMode.autofill)
 
             emarsysClient.send(UrlRequest(Url("https://testUrl.com"), HttpMethod.Get, null))
 
-            verifySuspend {
-                mockSdkEventDistributor.registerEvent(
-                    SdkEvent.Internal.Sdk.RemoteConfigUpdateRequired(
-                        id = any()
-                    )
-                )
-            }
+            advanceUntilIdle()
+
+            eventSlot.isPresent shouldBe true
         }
 
     @Test

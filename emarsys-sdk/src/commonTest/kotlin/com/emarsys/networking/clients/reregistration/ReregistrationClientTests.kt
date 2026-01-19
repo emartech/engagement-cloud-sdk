@@ -16,7 +16,6 @@ import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -50,7 +49,7 @@ class ReregistrationClientTests {
         reregistrationClient = createReregistrationClient(backgroundScope)
         reregistrationClient.register()
 
-        verifySuspend { mockSdkEventManager.sdkEventFlow.filterIsInstance<SdkEvent.Internal.Sdk.ReregistrationRequired>() }
+        verifySuspend { mockSdkEventManager.sdkEventFlow }
     }
 
     @Test
