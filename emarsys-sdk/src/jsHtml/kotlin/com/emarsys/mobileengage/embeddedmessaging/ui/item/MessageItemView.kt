@@ -22,7 +22,8 @@ private const val DELETE_ICON_PATH =
 fun MessageItemView(
     viewModel: MessageItemViewModelApi,
     onClick: () -> Unit,
-    onDeleteClicked: () -> Unit
+    onDeleteClicked: () -> Unit,
+    withDeleteIcon: Boolean = true
 ) {
     var imageDataUrl by remember { mutableStateOf<String?>(null) }
     val hasThumbnailImage = viewModel.imageUrl != null
@@ -41,6 +42,7 @@ fun MessageItemView(
     }
 
     Div({
+        id("mi-${viewModel.id}")
         classes(EmbeddedMessagingStyleSheet.messageItem)
         onClick { onClick() }
     }) {
@@ -79,17 +81,16 @@ fun MessageItemView(
             }
         }
 
-        Div({
-            classes(
-                if (hasThumbnailImage) EmbeddedMessagingStyleSheet.messageItemMisc
-                else EmbeddedMessagingStyleSheet.messageItemContentNoPadding
-            )
-            onClick { onDeleteClicked() }
-        }) {
-            SvgIcon(
-                path = DELETE_ICON_PATH,
-                className = EmbeddedMessagingStyleSheet.deleteMessageIcon
-            )
+        if (withDeleteIcon) {
+            Div({
+                classes(EmbeddedMessagingStyleSheet.messageItemMisc)
+                onClick { onDeleteClicked() }
+            }) {
+                SvgIcon(
+                    path = DELETE_ICON_PATH,
+                    className = EmbeddedMessagingStyleSheet.deleteMessageIcon
+                )
+            }
         }
     }
 }

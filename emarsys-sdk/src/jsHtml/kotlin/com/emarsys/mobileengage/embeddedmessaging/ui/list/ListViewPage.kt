@@ -1,7 +1,6 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.list
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -18,7 +17,6 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategorySelectorBu
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.SvgIcon
 import com.emarsys.mobileengage.embeddedmessaging.ui.delete.DeleteMessageDialogView
 import com.emarsys.mobileengage.embeddedmessaging.ui.detail.MessageDetailView
-import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemView
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingStyleSheet
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
@@ -32,8 +30,6 @@ import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 import org.jetbrains.compose.web.renderComposable
 import org.w3c.dom.events.Event
-import web.cssom.atrule.height
-import web.cssom.px
 import web.dom.document
 import web.intersection.IntersectionObserver
 
@@ -59,8 +55,9 @@ fun MessageList(viewModel: ListPageViewModelApi) {
         viewModel.messagePagingDataFlowFiltered.collectAsLazyPagingItems()
     val filterUnreadOnly by viewModel.filterUnreadOnly.collectAsState()
     val selectedCategoryIds by viewModel.selectedCategoryIds.collectAsState()
-    var messageToDeleteId by remember { mutableStateOf<String?>(null) }
-    var showCategorySelector by remember { mutableStateOf(false) }
+    val selectedMessage by viewModel.selectedMessage.collectAsState()
+    val showCategorySelector by viewModel.showCategorySelector.collectAsState()
+    var messageToDelete by remember { mutableStateOf<MessageItemViewModelApi?>(null) }
     var showDeleteMessageDialog by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
@@ -69,14 +66,14 @@ fun MessageList(viewModel: ListPageViewModelApi) {
         mutableStateOf(window.matchMedia("(orientation: landscape)").matches)
     }
 
-    var selectedMessageId by remember { mutableStateOf<String?>(null) }
-    val selectedMessage =
-        lazyPagingMessageItems.itemSnapshotList.find { it?.id == selectedMessageId }
-
     LaunchedEffect(Unit) {
         val mediaQuery = window.matchMedia("(orientation: landscape)")
         val listener: (Event) -> Unit = { _ -> isLandscape = mediaQuery.matches }
         mediaQuery.addEventListener("change", listener)
+    }
+
+    LaunchedEffect(selectedMessage) {
+        window.document.querySelector("#mi-${selectedMessage?.id}")?.scrollIntoView()
     }
 
     if (isLandscape) {
@@ -86,7 +83,7 @@ fun MessageList(viewModel: ListPageViewModelApi) {
                     selectedCategoryIds = selectedCategoryIds,
                     filterUnreadOnly = filterUnreadOnly,
                     onFilterChange = { viewModel.setFilterUnreadOnly(it) },
-                    onCategorySelectorClicked = { showCategorySelector = true }
+                    onCategorySelectorClicked = { viewModel.openCategorySelector() }
                 )
                 Hr({ classes(EmbeddedMessagingStyleSheet.divider) })
 
@@ -95,45 +92,39 @@ fun MessageList(viewModel: ListPageViewModelApi) {
                     onRefresh = { viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() } },
                     onItemClick = {
                         scope.launch {
-                            viewModel.selectMessage(it) {}
+                            viewModel.selectMessage(it, onNavigate = {})
                         }
                     },
                     onDeleteIconClicked = {
-                        messageToDeleteId = it
+                        messageToDelete = it
                         showDeleteMessageDialog = true
                     }
                 )
             }
 
             Div({ classes(EmbeddedMessagingStyleSheet.detailPane) }) {
-                if (selectedMessage != null) {
+                selectedMessage?.let {
                     MessageDetailView(
-                        viewModel = selectedMessage,
+                        viewModel = it,
                         isSplitView = true,
                         onBack = {}
                     )
-                } else {
-                    EmptyDetailState()
-                }
+                } ?: EmptyDetailState()
             }
         }
     } else {
-        if (selectedMessageId != null) {
-            if (selectedMessage != null) {
-                MessageDetailView(
-                    viewModel = selectedMessage,
-                    isSplitView = false,
-                    onBack = { selectedMessageId = null }
-                )
-            } else {
-                selectedMessageId = null
-            }
+        if (selectedMessage != null) {
+            MessageDetailView(
+                viewModel = viewModel.selectedMessage.value!!,
+                isSplitView = false,
+                onBack = { viewModel.clearMessageSelection() }
+            )
         } else {
             FilterRow(
                 selectedCategoryIds = selectedCategoryIds,
                 filterUnreadOnly = filterUnreadOnly,
                 onFilterChange = { viewModel.setFilterUnreadOnly(it) },
-                onCategorySelectorClicked = { showCategorySelector = true }
+                onCategorySelectorClicked = { viewModel.openCategorySelector() }
             )
             Hr({ classes(EmbeddedMessagingStyleSheet.divider) })
 
@@ -142,11 +133,11 @@ fun MessageList(viewModel: ListPageViewModelApi) {
                 onRefresh = { viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() } },
                 onItemClick = {
                     scope.launch {
-                        viewModel.selectMessage(it) {}
+                        viewModel.selectMessage(it, onNavigate = {})
                     }
                 },
                 onDeleteIconClicked = {
-                    messageToDeleteId = it
+                    messageToDelete = it
                     showDeleteMessageDialog = true
                 }
             )
@@ -159,9 +150,9 @@ fun MessageList(viewModel: ListPageViewModelApi) {
             selectedCategories = viewModel.selectedCategoryIds.collectAsState().value,
             onApplyClicked = {
                 viewModel.setSelectedCategoryIds(it)
-                showCategorySelector = false
+                viewModel.closeCategorySelector()
             },
-            onDismiss = { showCategorySelector = false }
+            onDismiss = { viewModel.closeCategorySelector() }
         )
     }
 
@@ -169,17 +160,17 @@ fun MessageList(viewModel: ListPageViewModelApi) {
         DeleteMessageDialogView(
             onApplyClicked = {
                 showDeleteMessageDialog = false
-                lazyPagingMessageItems.itemSnapshotList.find { it?.id == messageToDeleteId }
+                lazyPagingMessageItems.itemSnapshotList.find { it?.id == messageToDelete?.id }
                     ?.let { messageViewModel ->
                         scope.launch {
                             viewModel.deleteMessage(messageViewModel)
                         }
                     } ?: Result.success(Unit)
-                messageToDeleteId = null
+                messageToDelete = null
             },
             onDismiss = {
                 showDeleteMessageDialog = false
-                messageToDeleteId = null
+                messageToDelete = null
             }
         )
     }
@@ -190,7 +181,8 @@ fun MessageListContent(
     lazyPagingMessageItems: LazyPagingItems<MessageItemViewModelApi>,
     onRefresh: () -> Unit,
     onItemClick: (MessageItemViewModelApi) -> Unit,
-    onDeleteIconClicked: (String) -> Unit
+    withDeleteIcon: Boolean = true,
+    onDeleteIconClicked: (MessageItemViewModelApi) -> Unit = {}
 ) {
     val isRefreshing = lazyPagingMessageItems.loadState.source.refresh is LoadState.Loading
 
@@ -218,51 +210,13 @@ fun MessageListContent(
         if (lazyPagingMessageItems.itemCount == 0 && !isRefreshing) {
             EmptyState()
         } else {
-            Div({
-                classes(EmbeddedMessagingStyleSheet.scrollableList)
-            }) {
-                lazyPagingMessageItems.itemSnapshotList.map { messageViewModel ->
-                    messageViewModel?.let {
-                        if (!it.isExcludedLocally) {
-                            MessageItemView(
-                                viewModel = messageViewModel,
-                                onClick = { onItemClick(messageViewModel) },
-                                onDeleteClicked = { onDeleteIconClicked(messageViewModel.id) }
-                            )
-                        }
-                    }
-                }
-                if (lazyPagingMessageItems.itemCount > 0) {
-                    Div({
-                        attr("shouldLoadNextPage", "true")
-                        style { height(1.px) }
-                    }
-                    ) {
-                        DisposableEffect(Unit) {
-                            val observer = observePrefetch {
-                                if (lazyPagingMessageItems.itemCount > 0) {
-                                    lazyPagingMessageItems[lazyPagingMessageItems.itemCount - 1]
-                                }
-                            }
-                            onDispose { observer.disconnect() }
-                        }
-                        val target: web.dom.Element? =
-                            document.querySelector("[shouldLoadNextPage]")
-                        if (target != null && isInViewPort(target)) {
-                            if (lazyPagingMessageItems.itemCount > 0) {
-                                lazyPagingMessageItems[lazyPagingMessageItems.itemCount - 1]
-                            }
-                        }
-                    }
-                }
-
-                // TODO: Handle append loading state (Spinner at bottom)
-                if (lazyPagingMessageItems.loadState.append is androidx.paging.LoadState.Loading) {
-                    Div({ classes(EmbeddedMessagingStyleSheet.refreshIndicator) }) {
-                        Text("Loading more...")
-                    }
-                }
-            }
+            ListView(
+                lazyPagingMessageItems,
+                onItemClick = {
+                    onItemClick(it)
+                },
+                withDeleteIcon = withDeleteIcon
+            ) { onDeleteIconClicked(it) }
         }
     }
 }
@@ -351,10 +305,14 @@ fun testEmbeddedMessaging(rootElementId: String) {
     }
 }
 
-private fun isInViewPort(element: web.dom.Element): Boolean {
-    val reticule = element.getBoundingClientRect()
-    val isInPort = reticule.top < window.innerHeight && reticule.bottom > 0
-    return isInPort
+@OptIn(ExperimentalJsExport::class)
+@JsExport
+fun testCompactView(rootElementId: String) {
+    val element = kotlinx.browser.document.getElementById(rootElementId)
+        ?: error("No element with id='$rootElementId' found")
+    renderComposable(root = element) {
+        CompactListView() {}
+    }
 }
 
 fun observePrefetch(onTrigger: () -> Unit): IntersectionObserver {

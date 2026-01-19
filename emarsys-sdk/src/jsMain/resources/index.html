@@ -34,7 +34,15 @@
         <button type="button" id="button-render-message">Render Test Message Item View</button>
     </div>
 
-    <div id="TestEmbeddedMessaging"></div>
+    <div id="TestEmbeddedMessaging" style="height:40vh"></div>
+</div>
+<div>
+    <div>
+        <h3>Test Message Item View</h3>
+        <button type="button" id="button-render-compact-view">Render Compact View</button>
+    </div>
+
+    <div id="TestCompactView" style="height:40vh; width:40vw"></div>
 </div>
 
 </body>
@@ -83,6 +91,10 @@
 
  document.getElementById("button-render-message").onclick = () => {
      window["emarsys-sdk"].testEmbeddedMessaging("TestEmbeddedMessaging");
+ }
+
+ document.getElementById("button-render-compact-view").onclick = () => {
+     window["emarsys-sdk"].testCompactView("TestCompactView");
  }
 </script>
 </html>

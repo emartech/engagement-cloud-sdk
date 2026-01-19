@@ -80,7 +80,7 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         width(LIST_PANE_WIDTH)
         property(
             "border-right",
-            "${DEFAULT_BORDER_WIDTH} solid ${CssColorVars.colorOutline.value()}"
+            "$DEFAULT_BORDER_WIDTH solid ${CssColorVars.colorOutline.value()}"
         )
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Column)
@@ -90,6 +90,13 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         flex(1)
         padding(DEFAULT_PADDING)
         property("overflow-y", "auto")
+    }
+
+    val compactListView by style {
+        backgroundColor(CssColorVars.colorSurface.value())
+        height(MAX_HEIGHT)
+        display(DisplayStyle.Flex)
+        flexDirection(FlexDirection.Column)
     }
 
     val filterRowContainer by style {
@@ -133,7 +140,7 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         flex(1)
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Column)
-        property("overflow", "hidden")
+        property("overflow", "scroll")
     }
 
     val refreshIndicator by style {
@@ -379,7 +386,10 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         height(ICON_DEFAULT_SIZE)
         property("fill", "currentColor")
         padding(DEFAULT_PADDING)
-        display(DisplayStyle.None)
+        property("opacity", 0)
+        property("pointer-events", "none")
+        property("transform", "scale(0.8)")
+        property("transition", "opacity 0.2s ease-out, transform 0.2s ease-out")
     }
 
     val messageItem by style {
@@ -395,7 +405,9 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
                 className("EmbeddedMessagingStyleSheet-messageItemMisc"),
                 className("EmbeddedMessagingStyleSheet-deleteMessageIcon")
             ) style {
-                display(DisplayStyle.Block)
+                property("opacity", 1)
+                property("pointer-events", "auto")
+                property("transform", "scale(1)")
             }
         }
     }

@@ -237,9 +237,6 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
         override val hasConnection: StateFlow<Boolean>
             get() = MutableStateFlow(false).asStateFlow()
 
-        override val selectedMessageId: StateFlow<String?>
-            get() = MutableStateFlow(null).asStateFlow()
-
         override val selectedMessage: StateFlow<MessageItemViewModelApi?>
             get() = MutableStateFlow(null).asStateFlow()
 

@@ -43,13 +43,8 @@ internal class ListPageViewModel(
             unreadOnly || categoryIds.isNotEmpty()
         }.stateIn(coroutineScope, SharingStarted.Eagerly, false)
 
-    private val _selectedMessageId = MutableStateFlow<String?>(null)
-    override val selectedMessageId: StateFlow<String?> = _selectedMessageId.asStateFlow()
-
-    private var cachedSelectedMessage: MessageItemViewModelApi? = null
-    override val selectedMessage: StateFlow<MessageItemViewModelApi?> =
-        _selectedMessageId.map { cachedSelectedMessage }
-            .stateIn(coroutineScope, SharingStarted.Eagerly, null)
+    private val _selectedMessage: MutableStateFlow<MessageItemViewModelApi?> = MutableStateFlow(null)
+    override val selectedMessage: StateFlow<MessageItemViewModelApi?> = _selectedMessage.asStateFlow()
 
     private val _showCategorySelector = MutableStateFlow(false)
     override val showCategorySelector: StateFlow<Boolean> = _showCategorySelector.asStateFlow()
@@ -113,8 +108,7 @@ internal class ListPageViewModel(
         messageViewModel: MessageItemViewModelApi,
         onNavigate: suspend () -> Unit
     ) {
-        cachedSelectedMessage = messageViewModel
-        _selectedMessageId.value = messageViewModel.id
+        _selectedMessage.value = messageViewModel
 
         if(!locallyReadMessageIds.value.contains(messageViewModel.id) && messageViewModel.isUnread) {
             messageViewModel.tagMessageRead()
@@ -146,8 +140,7 @@ internal class ListPageViewModel(
     }
 
     override fun clearMessageSelection() {
-        _selectedMessageId.value = null
-        cachedSelectedMessage = null
+        _selectedMessage.value = null
     }
 
     override fun openCategorySelector() {

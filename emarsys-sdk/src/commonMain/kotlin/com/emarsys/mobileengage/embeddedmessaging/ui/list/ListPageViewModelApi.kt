@@ -15,7 +15,6 @@ interface ListPageViewModelApi {
     val hasFiltersApplied: StateFlow<Boolean>
     val hasConnection: StateFlow<Boolean>
 
-    val selectedMessageId: StateFlow<String?>
     val selectedMessage: StateFlow<MessageItemViewModelApi?>
 
     val showCategorySelector: StateFlow<Boolean>
