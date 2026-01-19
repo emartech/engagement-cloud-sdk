@@ -89,17 +89,17 @@ fun MessageList(viewModel: ListPageViewModelApi) {
 
                 MessageListContent(
                     lazyPagingMessageItems = lazyPagingMessageItems,
+                    viewModel,
                     onRefresh = { viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() } },
                     onItemClick = {
                         scope.launch {
                             viewModel.selectMessage(it, onNavigate = {})
                         }
-                    },
-                    onDeleteIconClicked = {
-                        messageToDelete = it
-                        showDeleteMessageDialog = true
                     }
-                )
+                ) {
+                    messageToDelete = it
+                    showDeleteMessageDialog = true
+                }
             }
 
             Div({ classes(EmbeddedMessagingStyleSheet.detailPane) }) {
@@ -130,6 +130,7 @@ fun MessageList(viewModel: ListPageViewModelApi) {
 
             MessageListContent(
                 lazyPagingMessageItems = lazyPagingMessageItems,
+                viewModel,
                 onRefresh = { viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() } },
                 onItemClick = {
                     scope.launch {
@@ -179,6 +180,7 @@ fun MessageList(viewModel: ListPageViewModelApi) {
 @Composable
 fun MessageListContent(
     lazyPagingMessageItems: LazyPagingItems<MessageItemViewModelApi>,
+    listViewModel: ListPageViewModelApi,
     onRefresh: () -> Unit,
     onItemClick: (MessageItemViewModelApi) -> Unit,
     withDeleteIcon: Boolean = true,
@@ -212,6 +214,7 @@ fun MessageListContent(
         } else {
             ListView(
                 lazyPagingMessageItems,
+                listViewModel,
                 onItemClick = {
                     onItemClick(it)
                 },

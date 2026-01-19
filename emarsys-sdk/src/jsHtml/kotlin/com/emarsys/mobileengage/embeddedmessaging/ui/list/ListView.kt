@@ -2,6 +2,7 @@ package com.emarsys.mobileengage.embeddedmessaging.ui.list
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
 import androidx.paging.compose.LazyPagingItems
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemView
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
@@ -16,10 +17,13 @@ import web.dom.document
 @Composable
 fun ListView(
     lazyPagingMessageItems: LazyPagingItems<MessageItemViewModelApi>,
+    listViewModel: ListPageViewModelApi,
     onItemClick: (MessageItemViewModelApi) -> Unit,
     withDeleteIcon: Boolean = true,
     onDeleteIconClicked: (MessageItemViewModelApi) -> Unit = {}
 ) {
+    val selectedMessage = listViewModel.selectedMessage.collectAsState()
+
     Div({
         classes(EmbeddedMessagingStyleSheet.scrollableList)
     }) {
@@ -28,6 +32,7 @@ fun ListView(
                 if (!it.isExcludedLocally) {
                     MessageItemView(
                         viewModel = messageViewModel,
+                        selectedMessage.value?.id,
                         onClick = {
                             onItemClick(messageViewModel)
                         },

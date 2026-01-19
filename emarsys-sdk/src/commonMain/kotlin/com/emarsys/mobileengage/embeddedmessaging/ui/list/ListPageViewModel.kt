@@ -133,7 +133,7 @@ internal class ListPageViewModel(
                 val newDeletedIdSet = mutableSetOf(messageViewModel.id)
                 newDeletedIdSet.addAll(locallyDeletedMessageIds.value)
                 locallyDeletedMessageIds.value = newDeletedIdSet
-                if(selectedMessageId.value == messageViewModel.id) {
+                if(selectedMessage.value?.id == messageViewModel.id) {
                     clearMessageSelection()
                 }
             }

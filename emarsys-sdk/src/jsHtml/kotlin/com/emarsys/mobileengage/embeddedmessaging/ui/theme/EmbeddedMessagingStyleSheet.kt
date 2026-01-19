@@ -397,6 +397,7 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         flexDirection(FlexDirection.Row)
         alignItems(AlignItems.Center)
         padding(DEFAULT_PADDING)
+        cursor(DEFAULT_CURSOR)
 
         self + hover style {
             backgroundColor(CssColorVars.colorSurfaceDim.value())
@@ -410,6 +411,10 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
                 property("transform", "scale(1)")
             }
         }
+    }
+
+    val messageItemSelected by style {
+        backgroundColor(CssColorVars.colorSurfaceDim.value())
     }
 
     val messageItemImage by style {

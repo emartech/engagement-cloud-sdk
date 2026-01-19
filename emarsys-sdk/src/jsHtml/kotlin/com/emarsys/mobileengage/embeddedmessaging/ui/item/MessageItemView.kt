@@ -21,12 +21,19 @@ private const val DELETE_ICON_PATH =
 @Composable
 fun MessageItemView(
     viewModel: MessageItemViewModelApi,
+    selectedMessageId: String?,
     onClick: () -> Unit,
     onDeleteClicked: () -> Unit,
     withDeleteIcon: Boolean = true
 ) {
     var imageDataUrl by remember { mutableStateOf<String?>(null) }
     val hasThumbnailImage = viewModel.imageUrl != null
+
+    val classes = mutableListOf(EmbeddedMessagingStyleSheet.messageItem).apply {
+        if (selectedMessageId === viewModel.id) {
+            this.add(EmbeddedMessagingStyleSheet.messageItemSelected)
+        }
+    }
 
     LaunchedEffect(viewModel.imageUrl) {
         imageDataUrl = viewModel.imageUrl?.let {
@@ -43,7 +50,7 @@ fun MessageItemView(
 
     Div({
         id("mi-${viewModel.id}")
-        classes(EmbeddedMessagingStyleSheet.messageItem)
+        classes(classes)
         onClick { onClick() }
     }) {
         if (hasThumbnailImage) {

@@ -23,6 +23,7 @@ fun CompactListView(
             }) {
                 ListView(
                     lazyPagingMessageItems = viewModel.messagePagingDataFlowFiltered.collectAsLazyPagingItems(),
+                    viewModel,
                     onItemClick = {
                         scope.launch {
                             viewModel.selectMessage(it) {
