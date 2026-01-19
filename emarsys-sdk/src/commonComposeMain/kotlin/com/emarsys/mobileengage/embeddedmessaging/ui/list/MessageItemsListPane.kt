@@ -183,12 +183,8 @@ fun MessageItemsListPane(
                                     if (messageViewModel.isExcludedLocally) {
                                         return@let
                                     }
-                                    val isSwipeEnabled = fullyVisibleItems.contains(index) &&
-                                            if (canShowDetailPane) {
-                                                messageViewModel.id != selectedMessage?.id
-                                            } else {
-                                                selectedMessage == null
-                                            }
+
+                                    val isSwipeEnabled = fullyVisibleItems.contains(index)
 
                                     key(messageViewModel.id, scaffoldValue, isSwipeEnabled) {
                                         val dismissState = rememberSwipeToDismissBoxState(

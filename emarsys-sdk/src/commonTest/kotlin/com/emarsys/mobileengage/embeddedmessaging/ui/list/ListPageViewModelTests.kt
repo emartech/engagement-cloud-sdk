@@ -313,6 +313,26 @@ class ListPageViewModelTests {
         }
 
     @Test
+    fun testDeleteMessage_shouldClearMessageSelection_whenDeleteSucceeded_andSelectedMessageWasDeleted() =
+        runTest {
+            val mockMessageViewModel = mock<MessageItemViewModelApi>(MockMode.autofill)
+            every { mockMessageViewModel.id } returns TEST_MESSAGE_ID
+            everySuspend { mockMessageViewModel.deleteMessage() } returns Result.success(Unit)
+
+            viewModel.selectMessage(mockMessageViewModel) {}
+            viewModel.selectedMessageId.value shouldBe TEST_MESSAGE_ID
+            viewModel.deleteMessage(mockMessageViewModel)
+            advanceUntilIdle()
+
+
+            verifySuspend {
+                mockMessageViewModel.deleteMessage()
+            }
+            deletedMessageIds.value shouldBe setOf(TEST_MESSAGE_ID)
+            viewModel.selectedMessageId.value shouldBe null
+        }
+
+    @Test
     fun testClearSelection_shouldSetSelectedMessageIdAndCacheToNull() = runTest {
         val mockMessageViewModel = mock<MessageItemViewModelApi>(MockMode.autofill)
         every { mockMessageViewModel.id } returns TEST_MESSAGE_ID
