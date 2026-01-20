@@ -41,6 +41,8 @@ import dev.mokkery.mock
 import dev.mokkery.verify
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
+import io.kotest.data.forAll
+import io.kotest.data.row
 import io.kotest.matchers.shouldBe
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
@@ -202,36 +204,39 @@ class EventClientTests {
 
     @Test
     fun testConsumer_shouldHandleDeviceEventState() = runTest {
-        eventClient = createEventClient(backgroundScope)
-        eventClient.register()
+        forAll(
+            row("responseDeviceEventState"),
+            row(null),
+        ) { expectedDeviceEventState ->
+            eventClient = createEventClient(backgroundScope)
+            eventClient.register()
 
-        val expectedDeviceEventState = "responseDeviceEventState"
+            val deviceEventResponse = DeviceEventResponse(null, null, expectedDeviceEventState)
+            val responseBody = json.encodeToString(deviceEventResponse)
 
-        val deviceEventResponse = DeviceEventResponse(null, null, expectedDeviceEventState)
-        val responseBody = json.encodeToString(deviceEventResponse)
-
-        everySuspend { mockEmarsysClient.send(any()) }.returns(
-            Result.success(
-                createTestResponse(
-                    responseBody
+            everySuspend { mockEmarsysClient.send(any()) }.returns(
+                Result.success(
+                    createTestResponse(
+                        responseBody
+                    )
                 )
             )
-        )
-        every { mockUrlFactory.create(EmarsysUrlType.Event) }.returns(TEST_BASE_URL)
-        val expectedUrlRequest = createTestRequest()
-        val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
-            onlineEvents.take(1).toList()
+            every { mockUrlFactory.create(EmarsysUrlType.Event) }.returns(TEST_BASE_URL)
+            val expectedUrlRequest = createTestRequest()
+            val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
+                onlineEvents.take(1).toList()
+            }
+
+            onlineEvents.emit(testEvent)
+
+            advanceUntilIdle()
+
+            onlineSdkEvents.await() shouldBe listOf(testEvent)
+            verifySuspend { mockEmarsysClient.send(expectedUrlRequest) }
+            verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
+
+            verify { mockRequestContext.deviceEventState = expectedDeviceEventState }
         }
-
-        onlineEvents.emit(testEvent)
-
-        advanceUntilIdle()
-
-        onlineSdkEvents.await() shouldBe listOf(testEvent)
-        verifySuspend { mockEmarsysClient.send(expectedUrlRequest) }
-        verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
-
-        verify { mockRequestContext.deviceEventState = expectedDeviceEventState }
     }
 
     @Test
@@ -252,7 +257,13 @@ class EventClientTests {
         val deviceEventResponse = DeviceEventResponse(listOf(testInapp), null, DEVICE_EVENT_STATE)
         val body = json.encodeToString(deviceEventResponse)
 
-        everySuspend { mockEmarsysClient.send(any()) }.returns(Result.success(createTestResponse(body)))
+        everySuspend { mockEmarsysClient.send(any()) }.returns(
+            Result.success(
+                createTestResponse(
+                    body
+                )
+            )
+        )
         everySuspend { mockSdkEventManager.emitEvent(capture(eventContainer)) } returns Unit
         val expectedUrlRequest = createTestRequest()
         val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
@@ -285,7 +296,13 @@ class EventClientTests {
         val body = json.encodeToString(deviceEventResponse)
 
         everySuspend { mockSdkEventManager.emitEvent(capture(eventContainer)) } returns Unit
-        everySuspend { mockEmarsysClient.send(any()) }.returns(Result.success(createTestResponse(body)))
+        everySuspend { mockEmarsysClient.send(any()) }.returns(
+            Result.success(
+                createTestResponse(
+                    body
+                )
+            )
+        )
         val expectedUrlRequest = createTestRequest()
         val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
             onlineEvents.take(1).toList()
@@ -303,38 +320,39 @@ class EventClientTests {
     }
 
     @Test
-    fun testConsumer_shouldAckEvents_andEmitAnswerResponses_whenResponseStatusCodeIs204() = runTest {
-        val testResult = Result.success(
-            createTestResponse(
-                statusCode = HttpStatusCode.NoContent,
-                body = ""
+    fun testConsumer_shouldAckEvents_andEmitAnswerResponses_whenResponseStatusCodeIs204() =
+        runTest {
+            val testResult = Result.success(
+                createTestResponse(
+                    statusCode = HttpStatusCode.NoContent,
+                    body = ""
+                )
             )
-        )
-        val expectedAnswerResponse =
-            SdkEvent.Internal.Sdk.Answer.Response(
-                testEvent.id,
-                testResult
-            )
-        eventClient = createEventClient(backgroundScope)
-        eventClient.register()
+            val expectedAnswerResponse =
+                SdkEvent.Internal.Sdk.Answer.Response(
+                    testEvent.id,
+                    testResult
+                )
+            eventClient = createEventClient(backgroundScope)
+            eventClient.register()
 
-        everySuspend { mockEmarsysClient.send(any()) }.returns(testResult)
-        val expectedUrlRequest = createTestRequest()
-        val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
-            onlineEvents.take(1).toList()
+            everySuspend { mockEmarsysClient.send(any()) }.returns(testResult)
+            val expectedUrlRequest = createTestRequest()
+            val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
+                onlineEvents.take(1).toList()
+            }
+
+            onlineEvents.emit(testEvent)
+
+            advanceUntilIdle()
+
+            onlineSdkEvents.await() shouldBe listOf(testEvent)
+            verifySuspend { mockEmarsysClient.send(expectedUrlRequest) }
+            verifySuspend(VerifyMode.exactly(0)) { mockOnEventActionFactory.create(any()) }
+            verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
+            verifySuspend { mockEventsDao.removeEvent(testEvent) }
+            verifySuspend { mockSdkEventManager.emitEvent(expectedAnswerResponse) }
         }
-
-        onlineEvents.emit(testEvent)
-
-        advanceUntilIdle()
-
-        onlineSdkEvents.await() shouldBe listOf(testEvent)
-        verifySuspend { mockEmarsysClient.send(expectedUrlRequest) }
-        verifySuspend(VerifyMode.exactly(0)) { mockOnEventActionFactory.create(any()) }
-        verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
-        verifySuspend { mockEventsDao.removeEvent(testEvent) }
-        verifySuspend { mockSdkEventManager.emitEvent(expectedAnswerResponse) }
-    }
 
     @Test
     fun testConsumer_shouldReEmitEventsToEventFlow_whenOnRecoverCallbackIsCalled() = runTest {
@@ -434,7 +452,13 @@ class EventClientTests {
             )
             val body = json.encodeToString(deviceEventResponse)
 
-            everySuspend { mockEmarsysClient.send(any()) }.returns(Result.success(createTestResponse(body)))
+            everySuspend { mockEmarsysClient.send(any()) }.returns(
+                Result.success(
+                    createTestResponse(
+                        body
+                    )
+                )
+            )
             val onEventActionExecutedEventCaptureContainer =
                 Capture.container<SdkEvent.Internal.OnEventActionExecuted>()
             everySuspend {
@@ -529,7 +553,13 @@ class EventClientTests {
             )
             val body = json.encodeToString(deviceEventResponse)
 
-            everySuspend { mockEmarsysClient.send(any()) }.returns(Result.success(createTestResponse(body)))
+            everySuspend { mockEmarsysClient.send(any()) }.returns(
+                Result.success(
+                    createTestResponse(
+                        body
+                    )
+                )
+            )
             val onEventActionExecutedEventCaptureContainer =
                 Capture.container<SdkEvent.Internal.OnEventActionExecuted>()
             everySuspend {

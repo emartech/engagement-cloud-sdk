@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 data class DeviceEventResponse(
     val contentCampaigns: List<ContentCampaign>? = null,
     val actionCampaigns: List<OnEventActionCampaign>? = null,
-    val deviceEventState: String
+    val deviceEventState: String? = null
 )
 
 @Serializable
