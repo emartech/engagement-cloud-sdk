@@ -29,6 +29,7 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
@@ -179,34 +180,34 @@ private fun MessageList(showFilters: Boolean, viewModel: ListPageViewModelApi) {
                     directive = navigator.scaffoldDirective,
                     value = navigator.scaffoldValue,
                     listPane = {
-                        MessageItemsListPane(
-                            lazyListState = listState,
-                            lazyPagingMessageItems = lazyPagingMessageItems,
-                            selectedMessage = selectedMessageViewModel,
-                            hasFiltersApplied = hasFiltersApplied,
-                            hasConnection = hasConnection,
-                            onRefresh = { viewModel.refreshMessagesWithThrottling { lazyPagingMessageItems.refresh() } },
-                            onMessageClick = { messageViewModel ->
-                                scope.launch {
-                                    viewModel.selectMessage(messageViewModel) {
-                                        navigator.navigateTo(ListDetailPaneScaffoldRole.Detail)
+                        AnimatedPane {
+                            MessageItemsListPane(
+                                lazyListState = listState,
+                                lazyPagingMessageItems = lazyPagingMessageItems,
+                                selectedMessage = selectedMessageViewModel,
+                                hasFiltersApplied = hasFiltersApplied,
+                                hasConnection = hasConnection,
+                                onRefresh = { viewModel.refreshMessagesWithThrottling { lazyPagingMessageItems.refresh() } },
+                                onMessageClick = { messageViewModel ->
+                                    scope.launch {
+                                        viewModel.selectMessage(messageViewModel) {
+                                            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail)
+                                        }
                                     }
-                                }
-                            },
-                            onMessageDelete = { messageId ->
-                                lazyPagingMessageItems.itemSnapshotList.find { it?.id == messageId }
-                                    ?.let { messageViewModel ->
-                                        viewModel.deleteMessage(messageViewModel)
-                                    } ?: Result.success(Unit)
-                            },
-                            onClearFilters = {
-                                viewModel.setFilterUnreadOnly(false)
-                                viewModel.setSelectedCategoryIds(emptySet())
-                            },
-                            snackbarHostState = snackbarHostState,
-                            canShowDetailPane = canShowDetailPane,
-                            scaffoldValue = navigator.scaffoldValue
-                        )
+                                },
+                                onMessageDelete = { messageId ->
+                                    lazyPagingMessageItems.itemSnapshotList.find { it?.id == messageId }
+                                        ?.let { messageViewModel ->
+                                            viewModel.deleteMessage(messageViewModel)
+                                        } ?: Result.success(Unit)
+                                },
+                                onClearFilters = {
+                                    viewModel.setFilterUnreadOnly(false)
+                                    viewModel.setSelectedCategoryIds(emptySet())
+                                },
+                                snackbarHostState = snackbarHostState,
+                            )
+                        }
                     },
                     detailPane = {
                         AnimatedContent(

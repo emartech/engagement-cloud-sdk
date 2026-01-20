@@ -29,17 +29,14 @@ import androidx.compose.material3.SwipeToDismissBoxState
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldValue
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -89,8 +86,6 @@ fun MessageItemsListPane(
     snackbarHostState: SnackbarHostState,
     lazyListState: LazyListState = rememberLazyListState(),
     hasConnection: Boolean,
-    canShowDetailPane: Boolean,
-    scaffoldValue: ThreePaneScaffoldValue
 ) {
     val refreshError = lazyPagingMessageItems.loadState.refresh as? LoadState.Error
     val appendError = lazyPagingMessageItems.loadState.append as? LoadState.Error
@@ -103,21 +98,6 @@ fun MessageItemsListPane(
     var dismissStateToReset by remember { mutableStateOf<SwipeToDismissBoxState?>(null) }
 
     val scope = rememberCoroutineScope()
-
-    val fullyVisibleItems by remember {
-        derivedStateOf {
-            val viewportStart = lazyListState.layoutInfo.viewportStartOffset
-            val viewportEnd = lazyListState.layoutInfo.viewportEndOffset
-
-            lazyListState.layoutInfo.visibleItemsInfo
-                .filter { item ->
-                    item.offset >= viewportStart &&
-                            (item.offset + item.size) <= viewportEnd
-                }
-                .map { it.index }
-                .toSet()
-        }
-    }
 
     EmbeddedMessagingTheme {
         LaunchedEffect(refreshError) {
@@ -184,35 +164,45 @@ fun MessageItemsListPane(
                                         return@let
                                     }
 
-                                    val isSwipeEnabled = fullyVisibleItems.contains(index)
-
-                                    key(messageViewModel.id, scaffoldValue, isSwipeEnabled) {
-                                        val dismissState = rememberSwipeToDismissBoxState(
-                                            initialValue = SwipeToDismissBoxValue.Settled,
-                                            positionalThreshold = { totalDistance -> totalDistance * 0.3f }
+                                    val swipeToDismissPositionalThreshold =
+                                        { totalDistance: Float -> totalDistance * 0.3f }
+                                    val dismissState = rememberSaveable(
+                                        saver = Saver(
+                                            save = { it.currentValue },
+                                            restore = {
+                                                SwipeToDismissBoxState(
+                                                    if (messageIdToDelete != null) it else SwipeToDismissBoxValue.Settled,
+                                                    positionalThreshold = swipeToDismissPositionalThreshold
+                                                )
+                                            },
                                         )
+                                    ) {
+                                        SwipeToDismissBoxState(
+                                            SwipeToDismissBoxValue.Settled,
+                                            positionalThreshold = swipeToDismissPositionalThreshold
+                                        )
+                                    }
 
-                                        LaunchedEffect(dismissState.currentValue) {
-                                            if (dismissState.currentValue != SwipeToDismissBoxValue.Settled) {
-                                                messageIdToDelete = messageViewModel.id
-                                                dismissStateToReset = dismissState
-                                            }
+                                    LaunchedEffect(dismissState.currentValue) {
+                                        if (dismissState.currentValue != SwipeToDismissBoxValue.Settled) {
+                                            messageIdToDelete = messageViewModel.id
+                                            dismissStateToReset = dismissState
                                         }
+                                    }
 
-                                        SwipeToDismissBox(
-                                            state = dismissState,
-                                            enableDismissFromStartToEnd = false,
-                                            enableDismissFromEndToStart = isSwipeEnabled,
-                                            backgroundContent = {
-                                                DeleteMessageOnSwipeBox()
-                                            }
-                                        ) {
-                                            MessageItemView(
-                                                viewModel = messageViewModel,
-                                                isSelected = messageViewModel.id == selectedMessage?.id,
-                                                onClick = { onMessageClick(messageViewModel) }
-                                            )
+                                    SwipeToDismissBox(
+                                        state = dismissState,
+                                        enableDismissFromStartToEnd = false,
+                                        enableDismissFromEndToStart = true,
+                                        backgroundContent = {
+                                            DeleteMessageOnSwipeBox()
                                         }
+                                    ) {
+                                        MessageItemView(
+                                            viewModel = messageViewModel,
+                                            isSelected = messageViewModel.id == selectedMessage?.id,
+                                            onClick = { onMessageClick(messageViewModel) }
+                                        )
                                     }
                                 }
                             }
