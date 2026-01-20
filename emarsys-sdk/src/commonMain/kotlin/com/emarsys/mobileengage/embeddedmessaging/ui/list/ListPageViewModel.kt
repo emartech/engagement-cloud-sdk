@@ -24,9 +24,9 @@ import kotlin.time.Instant
 internal class ListPageViewModel(
     private val embeddedMessagingContext: EmbeddedMessagingContextApi,
     private val timestampProvider: InstantProvider,
-    private val coroutineScope: CoroutineScope,
+    coroutineScope: CoroutineScope,
     private val pagerFactory: PagerFactoryApi,
-    private val connectionWatchDog: ConnectionWatchDog,
+    connectionWatchDog: ConnectionWatchDog,
     private val locallyDeletedMessageIds: MutableStateFlow<Set<String>>,
     private val locallyReadMessageIds: MutableStateFlow<Set<String>>
 ) : ListPageViewModelApi {
@@ -133,7 +133,7 @@ internal class ListPageViewModel(
                 val newDeletedIdSet = mutableSetOf(messageViewModel.id)
                 newDeletedIdSet.addAll(locallyDeletedMessageIds.value)
                 locallyDeletedMessageIds.value = newDeletedIdSet
-                if(selectedMessage.value?.id == messageViewModel.id) {
+                if (_selectedMessage.value?.id == messageViewModel.id) {
                     clearMessageSelection()
                 }
             }

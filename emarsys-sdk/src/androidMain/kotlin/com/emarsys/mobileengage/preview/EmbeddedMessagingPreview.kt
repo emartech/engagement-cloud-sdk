@@ -131,7 +131,7 @@ fun CategoriesDialogViewPreview() {
     )
     CategoriesDialogView(
         messageCategories,
-        selectedCategories = setOf(1, 3),
+        selectedCategoriesOnDialogOpen = setOf(1, 3),
         onApplyClicked = {
             print("I'm applied with categories: $it")
         },

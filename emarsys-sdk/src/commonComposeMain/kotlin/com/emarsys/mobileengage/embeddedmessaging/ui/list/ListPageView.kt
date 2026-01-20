@@ -34,7 +34,6 @@ import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -69,7 +68,7 @@ fun ListPageView(showFilters: Boolean = true) {
 @Composable
 internal fun InternalListPageView(
     showFilters: Boolean = true,
-    viewModel: ListPageViewModelApi = rememberListPageViewModel()
+    viewModel: ListPageViewModelApi = koin.get<ListPageViewModelApi>()
 ) {
     EmbeddedMessagingTheme {
         Column(modifier = Modifier.background(MaterialTheme.colorScheme.surface)) {
@@ -165,7 +164,7 @@ private fun MessageList(showFilters: Boolean, viewModel: ListPageViewModelApi) {
                 if (showCategorySelector) {
                     CategoriesDialogView(
                         categories = categories,
-                        selectedCategories = selectedCategoryIds,
+                        selectedCategoriesOnDialogOpen = selectedCategoryIds,
                         onApplyClicked = { newSelection ->
                             viewModel.setSelectedCategoryIds(newSelection)
                             showCategorySelector = false
@@ -272,22 +271,4 @@ private fun FilterRow(
             )
         }
     }
-}
-
-@Composable
-private fun rememberListPageViewModel(): ListPageViewModelApi {
-    //TODO: safer koin access in case of uninitialized sdk/koin
-    val viewModel = remember {
-        koin.get<ListPageViewModelApi>()
-    }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            viewModel.clearMessageSelection()
-            viewModel.setFilterUnreadOnly(false)
-            viewModel.setSelectedCategoryIds(emptySet())
-        }
-    }
-
-    return viewModel
 }

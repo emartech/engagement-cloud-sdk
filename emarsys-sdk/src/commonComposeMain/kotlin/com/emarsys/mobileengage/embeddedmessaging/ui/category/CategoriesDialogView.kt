@@ -47,11 +47,11 @@ import com.emarsys.networking.clients.embedded.messaging.model.MessageCategory
 @Composable
 fun CategoriesDialogView(
     categories: List<MessageCategory>,
-    selectedCategories: Set<Int>,
+    selectedCategoriesOnDialogOpen: Set<Int>,
     onApplyClicked: (Set<Int>) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val selectedCategories = rememberSaveable { mutableStateOf(selectedCategories) }
+    val selectedCategories = rememberSaveable { mutableStateOf(selectedCategoriesOnDialogOpen) }
 
     EmbeddedMessagingTheme {
         Dialog(
@@ -87,7 +87,10 @@ fun CategoriesDialogView(
                         )
                     )
 
-                    DialogActionButtons(selectedCategories, onApplyClicked = onApplyClicked)
+                    DialogActionButtons(
+                        selectedCategories,
+                        onApplyClicked = onApplyClicked
+                    )
                 }
             }
         }
