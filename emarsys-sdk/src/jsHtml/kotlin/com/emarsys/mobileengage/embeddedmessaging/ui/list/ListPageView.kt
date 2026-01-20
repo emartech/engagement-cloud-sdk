@@ -29,6 +29,7 @@ import org.jetbrains.compose.web.dom.Hr
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 import org.jetbrains.compose.web.renderComposable
+import org.w3c.dom.Element
 import org.w3c.dom.events.Event
 import web.dom.document
 import web.intersection.IntersectionObserver

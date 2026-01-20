@@ -31,30 +31,26 @@ build: check-env ## build project with yarn actualization
 
 build-pipeline: check-env ## compile and build all modules for all platforms
 	@./gradlew :emarsys-sdk:build \
-				:emarsys-sdk:javaPreCompileRelease \
-		 		-x :emarsys-sdk:compileTestDevelopmentExecutableKotlinJs \
-				-x :emarsys-sdk:test \
-		  		-x :emarsys-sdk:lint \
-			    -x :emarsys-sdk:testDebugUnitTest \
-			    -x :emarsys-sdk:testReleaseUnitTest \
-			 	-x :emarsys-sdk:jsBrowserTest \
-			 	-x :emarsys-sdk:compileKotlinJs \
-			 	-x :composeApp:build \
-			 	-x :composeApp:jsPackageJson \
-			 	-x :composeApp:jsTestPackageJson \
-			 	-x :composeApp:jsPublicPackageJson \
-			 	-x :composeApp:jsTestPublicPackageJson \
-			 	-x :emarsys-sdk:jsTestPackageJson \
-			 	-x :emarsys-sdk:jsPublicPackageJson \
-			 	-x :emarsys-sdk:jsTestPublicPackageJson \
-			 	-x :emarsys-sdk:jsPackageJson \
-			 	-x :rootPackageJson \
-			 	-x :kotlinNodeJsSetup \
-			 	-x :kotlinNpmCachesSetup \
-			 	-x :kotlinStoreYarnLock \
-			 	-x :kotlinRestoreYarnLock \
-			 	-x :kotlinYarnSetup \
-			 	-x :kotlinNpmInstall \
+			 	:emarsys-sdk:javaPreCompileRelease \
+			   	-x :emarsys-sdk:compileTestDevelopmentExecutableKotlinJs \
+			   	-x :emarsys-sdk:test \
+			   	-x :emarsys-sdk:lint \
+			   	-x :composeApp:build \
+			   	-x :composeApp:jsPackageJson \
+			   	-x :composeApp:jsTestPackageJson \
+			   	-x :composeApp:jsPublicPackageJson \
+			   	-x :composeApp:jsTestPublicPackageJson \
+			   	-x :emarsys-sdk:jsTestPackageJson \
+			   	-x :emarsys-sdk:jsPublicPackageJson \
+			   	-x :emarsys-sdk:jsTestPublicPackageJson \
+			   	-x :emarsys-sdk:jsPackageJson \
+			   	-x :rootPackageJson \
+			   	-x :kotlinNodeJsSetup \
+			   	-x :kotlinNpmCachesSetup \
+			   	-x :kotlinStoreYarnLock \
+			   	-x :kotlinRestoreYarnLock \
+			   	-x :kotlinYarnSetup \
+			   	-x :kotlinNpmInstall
 
 clean: check-env ## clean all build artifacts
 	@./gradlew clean
@@ -63,7 +59,7 @@ create-apks: check-env ## create apks for testing
 	@./gradlew assembleAndroidTest
 
 test: check-env test-android test-web test-sdk-loader test-jvm test-ios ## run common tests on all platforms (jvm,web,android, ios)
-	@./gradlew :emarsys-sdk:allTests -x :emarsys-sdk:testReleaseUnitTest -x :composeApp:test
+	@./gradlew :emarsys-sdk:allTests -x :composeApp:test
 
 build-web: check-env ## run tests on web
 	@./gradlew jsBrowserProductionWebpack \

@@ -1,14 +1,14 @@
 plugins {
     alias(libs.plugins.androidLibrary)
-    alias(libs.plugins.kotlin)
     alias(libs.plugins.googleServices)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.builtInKotlin)
 }
 
 dependencies {
     api(libs.fcm)
 
-    implementation(kotlin("test"))
+    testImplementation(libs.kotlin.test)
     implementation(libs.mockk.android)
     implementation(libs.androidx.runner)
     implementation(libs.kotest.assertions.core)
@@ -17,6 +17,7 @@ dependencies {
     androidTestImplementation(libs.junit)
 }
 android {
+    enableKotlin = true
     namespace = "com.emarsys.fcm"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 

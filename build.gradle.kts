@@ -3,7 +3,7 @@ buildscript{
         maven(url = "https://developer.huawei.com/repo/")
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:8.11.0")
+        classpath("com.android.tools.build:gradle:9.0.0")
         classpath("com.huawei.agconnect:agcp:1.9.3.301")
     }
 }
@@ -14,6 +14,7 @@ plugins {
     alias(libs.plugins.jetbrainsCompose) apply false
     alias(libs.plugins.composeCompiler) apply false
     alias(libs.plugins.kotlinMultiplatform) apply false
+    alias(libs.plugins.kotlinMultiplatformLibrary) apply false
     alias(libs.plugins.kotlin) apply false
     alias(libs.plugins.kotlinSerialization) apply false
     alias(libs.plugins.dokka) apply false

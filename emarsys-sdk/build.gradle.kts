@@ -4,12 +4,14 @@ import co.touchlab.skie.configuration.DefaultArgumentInterop
 import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
 import com.github.gmazzo.buildconfig.BuildConfigTask
 import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.SourcesJar
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import java.util.Base64
 
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.dokka)
     alias(libs.plugins.ksp)
@@ -28,7 +30,7 @@ version = "4.0.0"
 
 kotlin {
     compilerOptions {
-        apiVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_2)
+        apiVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_3)
     }
     jvmToolchain(17)
     androidTarget {
@@ -48,7 +50,8 @@ kotlin {
                 }
             }
             webpackTask {
-                mode = org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig.Mode.PRODUCTION
+                mode =
+                    org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig.Mode.PRODUCTION
             }
             testTask {
                 useKarma {
@@ -61,11 +64,14 @@ kotlin {
         compilerOptions {
             moduleKind.set(org.jetbrains.kotlin.gradle.dsl.JsModuleKind.MODULE_ES)
             sourceMap.set(false)
-            freeCompilerArgs.addAll(listOf(
-                "-Xir-dce",
-                "-Xir-minimized-member-names=true",
-                "-Xir-per-module-output-name=false",
-                "-Xpartial-linkage=enable"))
+            freeCompilerArgs.addAll(
+                listOf(
+                    "-Xir-dce",
+                    "-Xir-minimized-member-names=true",
+                    "-Xir-per-module-output-name=false",
+                    "-Xpartial-linkage=enable"
+                )
+            )
         }
         generateTypeScriptDefinitions()
     }
@@ -101,7 +107,7 @@ kotlin {
         }
         val commonTest by getting {
             dependencies {
-                implementation(kotlin("test"))
+                implementation(libs.kotlin.test)
                 implementation(libs.koin.test)
                 implementation(libs.ktor.client.mock)
                 implementation(libs.kotest.framework.engine)
@@ -148,13 +154,13 @@ kotlin {
 
         val androidUnitTest by getting {
             dependencies {
-                implementation(kotlin("test"))
+                implementation(libs.kotlin.test)
                 implementation(libs.mockk.android)
             }
         }
         val androidInstrumentedTest by getting {
             dependencies {
-                implementation(kotlin("test"))
+                implementation(libs.kotlin.test)
                 implementation(libs.koin.test)
 //                implementation(libs.koin.android.startup)
                 implementation(libs.mockk.android)
@@ -176,7 +182,7 @@ kotlin {
         }
         val iosTest by getting {
             dependencies {
-                implementation(kotlin("test"))
+                implementation(libs.kotlin.test)
                 implementation(libs.kotest.assertions.table)
                 implementation(libs.kotlinx.coroutines.test)
             }
@@ -192,7 +198,7 @@ kotlin {
 
         val jsTest by getting {
             dependencies {
-                implementation(kotlin("test-js"))
+                implementation(libs.kotlin.test)
                 implementation(libs.kotest.assertions.table)
                 implementation(libs.kotlinx.coroutines.test)
             }
@@ -203,6 +209,7 @@ kotlin {
             dependencies {
                 implementation(libs.compose.html.core)
                 implementation(libs.compose.html.svg)
+                implementation(libs.kotlin.wrapper.browser)
             }
         }
 
@@ -334,9 +341,9 @@ mavenPublishing {
 
     configure(
         AndroidSingleVariantLibrary(
+            javadocJar = JavadocJar.Javadoc(),
+            sourcesJar = SourcesJar.Sources(),
             variant = "release",
-            sourcesJar = true,
-            publishJavadocJar = true,
         )
     )
 
