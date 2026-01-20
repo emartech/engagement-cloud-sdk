@@ -2,7 +2,6 @@ package com.emarsys.networking.clients.embedded.messaging.model
 
 import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -30,7 +29,6 @@ data class EmbeddedMessage(
     val title: String,
     val lead: String,
     val listThumbnailImage: ListThumbnailImage?,
-    @SerialName("defaultTapAction")
     val defaultAction: BasicActionModel?,
     val actions : List<PresentableActionModel>,
     val tags: List<String>,
