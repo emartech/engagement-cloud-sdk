@@ -69,7 +69,7 @@ fun ListPageView(showFilters: Boolean = true) {
 @Composable
 internal fun InternalListPageView(
     showFilters: Boolean = true,
-    viewModel: ListPageViewModelApi = koin.get<ListPageViewModelApi>()
+    viewModel: ListPageViewModelApi = koin.get<ListPageViewModelApi>()  // todo safer koin access in case of uninitialized sdk/koin
 ) {
     EmbeddedMessagingTheme {
         Column(modifier = Modifier.background(MaterialTheme.colorScheme.surface)) {
