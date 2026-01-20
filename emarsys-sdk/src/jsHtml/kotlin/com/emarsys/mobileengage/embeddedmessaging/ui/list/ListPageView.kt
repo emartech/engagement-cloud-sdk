@@ -318,6 +318,22 @@ fun testCompactView(rootElementId: String) {
     }
 }
 
+@OptIn(ExperimentalJsExport::class)
+@JsExport
+fun listViewTag(rootElement: Element) {
+    renderComposable(root = rootElement) {
+        ListPageView()
+    }
+}
+
+@OptIn(ExperimentalJsExport::class)
+@JsExport
+fun compactViewTag(rootElement: Element) {
+    renderComposable(root = rootElement) {
+        CompactListView() {}
+    }
+}
+
 fun observePrefetch(onTrigger: () -> Unit): IntersectionObserver {
     val target: web.dom.Element? = document.querySelector("[shouldLoadNextPage]")
     val observer = IntersectionObserver(

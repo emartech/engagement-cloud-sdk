@@ -35,6 +35,7 @@
     scriptTag.onload = async function () {
         sdkCore = global["emarsys-sdk"].Emarsys.getInstance();
         global.emarsysSdkLoaded = true
+        registerEmbeddedMessagingListViews()
         await replayCalls()
     }
     scriptTag.onerror = function (error) {
@@ -42,6 +43,40 @@
     };
 
     document.head.appendChild(scriptTag);
+
+    class EmbeddedMessagingCompactListView extends HTMLElement {
+
+        connectedCallback() {
+            const mount = document.createElement("div")
+            this.appendChild(mount)
+
+            window["emarsys-sdk"].compactViewTag(
+                mount,
+            )
+        }
+
+        disconnectedCallback() {
+        }
+    }
+
+    class EmbeddedMessagingListView extends HTMLElement {
+
+        connectedCallback() {
+            const mount = document.createElement("div")
+            this.appendChild(mount)
+
+            window["emarsys-sdk"].listViewTag(mount,
+            )
+        }
+
+        disconnectedCallback() {
+        }
+    }
+
+    function registerEmbeddedMessagingListViews() {
+        global.customElements.define("em-compact-list-view", EmbeddedMessagingCompactListView)
+        global.customElements.define("em-list-view", EmbeddedMessagingListView)
+    }
 
     function createApiMethods(apiSegment, methodName) {
         return async function () {
