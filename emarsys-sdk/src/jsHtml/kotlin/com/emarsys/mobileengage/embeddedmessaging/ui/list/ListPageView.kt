@@ -39,19 +39,20 @@ private const val REFRESH_ICON_PATH =
 
 @Composable
 fun ListPageView(
+    customMessageItemElementName: String? = null,
     viewModel: ListPageViewModelApi = koin.get()
 ) {
     EmbeddedMessagingTheme {
         Div({
             classes(EmbeddedMessagingStyleSheet.listPageContainer)
         }) {
-            MessageList(viewModel)
+            MessageList(customMessageItemElementName, viewModel)
         }
     }
 }
 
 @Composable
-fun MessageList(viewModel: ListPageViewModelApi) {
+fun MessageList(customMessageItemElementName: String?, viewModel: ListPageViewModelApi) {
     val lazyPagingMessageItems =
         viewModel.messagePagingDataFlowFiltered.collectAsLazyPagingItems()
     val filterUnreadOnly by viewModel.filterUnreadOnly.collectAsState()
@@ -74,7 +75,9 @@ fun MessageList(viewModel: ListPageViewModelApi) {
     }
 
     LaunchedEffect(selectedMessage) {
-        window.document.querySelector("#mi-${selectedMessage?.id}")?.scrollIntoView()
+        window.document.querySelector("#mi-${selectedMessage?.id}")?.scrollIntoView(
+            js("{ behavior: 'smooth', block: 'center' }")
+        )
     }
 
     if (isLandscape) {
@@ -91,6 +94,7 @@ fun MessageList(viewModel: ListPageViewModelApi) {
                 MessageListContent(
                     lazyPagingMessageItems = lazyPagingMessageItems,
                     viewModel,
+                    customMessageItemElementName,
                     onRefresh = { viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() } },
                     onItemClick = {
                         scope.launch {
@@ -132,6 +136,7 @@ fun MessageList(viewModel: ListPageViewModelApi) {
             MessageListContent(
                 lazyPagingMessageItems = lazyPagingMessageItems,
                 viewModel,
+                customMessageItemElementName,
                 onRefresh = { viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() } },
                 onItemClick = {
                     scope.launch {
@@ -182,6 +187,7 @@ fun MessageList(viewModel: ListPageViewModelApi) {
 fun MessageListContent(
     lazyPagingMessageItems: LazyPagingItems<MessageItemViewModelApi>,
     listViewModel: ListPageViewModelApi,
+    customMessageItemElementName: String?,
     onRefresh: () -> Unit,
     onItemClick: (MessageItemViewModelApi) -> Unit,
     withDeleteIcon: Boolean = true,
@@ -216,6 +222,7 @@ fun MessageListContent(
             ListView(
                 lazyPagingMessageItems,
                 listViewModel,
+                customMessageItemElementName,
                 onItemClick = {
                     onItemClick(it)
                 },
@@ -321,17 +328,17 @@ fun testCompactView(rootElementId: String) {
 
 @OptIn(ExperimentalJsExport::class)
 @JsExport
-fun listViewTag(rootElement: Element) {
+fun listViewTag(rootElement: Element, customMessageItemElementName: String?) {
     renderComposable(root = rootElement) {
-        ListPageView()
+        ListPageView(customMessageItemElementName)
     }
 }
 
 @OptIn(ExperimentalJsExport::class)
 @JsExport
-fun compactViewTag(rootElement: Element) {
+fun compactViewTag(rootElement: Element, customMessageItemElementName: String?) {
     renderComposable(root = rootElement) {
-        CompactListView() {}
+        CompactListView(customMessageItemElementName) {}
     }
 }
 
