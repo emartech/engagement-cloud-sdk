@@ -1,19 +1,18 @@
 package com.emarsys.api.config
 
 import com.emarsys.core.device.notification.WebNotificationSettings
-import kotlin.js.Promise
 
 @OptIn(ExperimentalJsExport::class)
 @JsExport
 interface JSConfigApi {
-    fun getApplicationCode(): Promise<String?>
-    fun getClientId(): Promise<String>
-    fun getLanguageCode(): Promise<String>
-    fun getApplicationVersion(): Promise<String>
-    fun getSdkVersion(): Promise<String>
-    fun getCurrentSdkState(): Promise<String>
-    fun changeApplicationCode(applicationCode: String): Promise<Unit>
-    fun setLanguage(language: String): Promise<Unit>
-    fun resetLanguage(): Promise<Unit>
-    fun getNotificationSettings(): Promise<WebNotificationSettings>
+    suspend fun getApplicationCode(): String?
+    suspend fun getClientId(): String
+    suspend fun getLanguageCode(): String
+    suspend fun getApplicationVersion(): String
+    suspend fun getSdkVersion(): String
+    suspend fun getCurrentSdkState(): String
+    suspend fun changeApplicationCode(applicationCode: String)
+    suspend fun setLanguage(language: String)
+    suspend fun resetLanguage()
+    suspend fun getNotificationSettings(): WebNotificationSettings
 }

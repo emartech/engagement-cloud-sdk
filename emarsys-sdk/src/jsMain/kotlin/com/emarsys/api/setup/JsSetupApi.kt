@@ -1,13 +1,12 @@
 package com.emarsys.api.setup
 
 import com.emarsys.JsApiConfig
-import kotlin.js.Promise
 
 @OptIn(ExperimentalJsExport::class)
 @JsExport
 interface JsSetupApi {
-    fun enableTracking(config: JsApiConfig): Promise<Unit>
-    fun disableTracking(): Promise<Unit>
+    suspend fun enableTracking(config: JsApiConfig)
+    suspend fun disableTracking()
 
-    fun isEnabled(): Promise<Boolean>
+    suspend fun isEnabled(): Boolean
 }

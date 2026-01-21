@@ -7,9 +7,7 @@ import dev.mokkery.verifySuspend
 import io.kotest.assertions.throwables.shouldThrow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.await
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -34,7 +32,7 @@ class JSContactTests {
     fun setup() {
         Dispatchers.setMain(StandardTestDispatcher())
         mockContactApi = mock()
-        jSContact = JSContact(mockContactApi, TestScope())
+        jSContact = JSContact(mockContactApi)
     }
 
     @AfterTest
@@ -50,7 +48,7 @@ class JSContactTests {
             )
         } returns testSuccessResult
 
-        jSContact.link(CONTACT_FIELD_VALUE).await()
+        jSContact.link(CONTACT_FIELD_VALUE)
 
         verifySuspend { mockContactApi.link(CONTACT_FIELD_VALUE) }
     }
@@ -63,7 +61,7 @@ class JSContactTests {
             )
         } returns testFailedResult
 
-        shouldThrow<Exception> { jSContact.link(CONTACT_FIELD_VALUE).await() }
+        shouldThrow<Exception> { jSContact.link(CONTACT_FIELD_VALUE) }
     }
 
     @Test
@@ -74,7 +72,7 @@ class JSContactTests {
             )
         } returns testSuccessResult
 
-        jSContact.linkAuthenticated(OPEN_ID_TOKEN).await()
+        jSContact.linkAuthenticated(OPEN_ID_TOKEN)
 
         verifySuspend { mockContactApi.linkAuthenticated(OPEN_ID_TOKEN) }
     }
@@ -88,7 +86,7 @@ class JSContactTests {
         } returns testFailedResult
 
         shouldThrow<Exception> {
-            jSContact.linkAuthenticated(OPEN_ID_TOKEN).await()
+            jSContact.linkAuthenticated(OPEN_ID_TOKEN)
         }
     }
 
@@ -96,7 +94,7 @@ class JSContactTests {
     fun unlink_shouldCall_unlink_onEmarsys() = runTest {
         everySuspend { mockContactApi.unlink() } returns testSuccessResult
 
-        jSContact.unlink().await()
+        jSContact.unlink()
 
         verifySuspend { mockContactApi.unlink() }
     }
@@ -105,6 +103,6 @@ class JSContactTests {
     fun unlink_shouldThrowException_ifUnlink_failed() = runTest {
         everySuspend { mockContactApi.unlink() } returns testFailedResult
 
-        shouldThrow<Exception> { jSContact.unlink().await() }
+        shouldThrow<Exception> { jSContact.unlink() }
     }
 }

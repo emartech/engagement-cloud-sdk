@@ -1,13 +1,12 @@
 package com.emarsys.api.tracking
 
 import com.emarsys.api.tracking.model.JsCustomEvent
-import kotlin.js.Promise
 
 @OptIn(ExperimentalJsExport::class)
 @JsExport
 interface JSTrackingApi {
 
-    fun trackEvent(event: JsCustomEvent): Promise<Unit>
+    suspend fun trackEvent(event: JsCustomEvent)
 
-    fun trackNavigation(location: String): Promise<Unit>
+    suspend fun trackNavigation(location: String)
 }

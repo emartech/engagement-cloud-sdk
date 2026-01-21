@@ -1,10 +1,7 @@
 package com.emarsys.api.contact
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.promise
-import kotlin.js.Promise
 
-internal class JSContact(private val contactApi: ContactApi, private val applicationScope: CoroutineScope) :
+internal class JSContact(private val contactApi: ContactApi) :
     JSContactApi {
 
     /**
@@ -13,10 +10,8 @@ internal class JSContact(private val contactApi: ContactApi, private val applica
      * @param contactFieldValue The value of the contact field.
      * @return A promise that resolves when the contact is linked.
      */
-    override fun link(contactFieldValue: String): Promise<Unit> {
-        return applicationScope.promise {
-            contactApi.link(contactFieldValue).getOrThrow()
-        }
+    override suspend fun link(contactFieldValue: String) {
+        contactApi.link(contactFieldValue).getOrThrow()
     }
 
     /**
@@ -25,10 +20,8 @@ internal class JSContact(private val contactApi: ContactApi, private val applica
      *
      * @param openIdToken The OpenID token for authentication.
      */
-    override fun linkAuthenticated(openIdToken: String): Promise<Unit> {
-        return applicationScope.promise {
-            contactApi.linkAuthenticated(openIdToken).getOrThrow()
-        }
+    override suspend fun linkAuthenticated(openIdToken: String) {
+        contactApi.linkAuthenticated(openIdToken).getOrThrow()
     }
 
     /**
@@ -36,9 +29,7 @@ internal class JSContact(private val contactApi: ContactApi, private val applica
      *
      * @return A promise that resolves when the contact is unlinked.
      */
-    override fun unlink(): Promise<Unit> {
-        return applicationScope.promise {
-            contactApi.unlink().getOrThrow()
-        }
+    override suspend fun unlink() {
+        contactApi.unlink().getOrThrow()
     }
 }
