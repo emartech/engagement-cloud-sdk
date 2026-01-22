@@ -200,7 +200,7 @@ class MessageItemViewModelTests {
             defaultAction = null,
             actions = emptyList<PresentableActionModel>(),
             tags = emptyList(),
-            categoryIds = emptyList(),
+            categories = emptyList(),
             receivedAt = receivedAt,
             expiresAt = 110000L,
             properties = emptyMap(),

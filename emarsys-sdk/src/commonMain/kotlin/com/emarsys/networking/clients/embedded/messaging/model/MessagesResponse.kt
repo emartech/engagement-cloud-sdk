@@ -2,9 +2,10 @@ package com.emarsys.networking.clients.embedded.messaging.model
 
 import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
+import com.emarsys.networking.clients.embedded.messaging.serializer.MessagesResponseSerializer
 import kotlinx.serialization.Serializable
 
-@Serializable
+@Serializable(with = MessagesResponseSerializer::class)
 data class MessagesResponse(
     val version: String,
     val top: Int,
@@ -30,9 +31,9 @@ data class EmbeddedMessage(
     val lead: String,
     val listThumbnailImage: ListThumbnailImage?,
     val defaultAction: BasicActionModel?,
-    val actions : List<PresentableActionModel>,
+    val actions: List<PresentableActionModel>,
     val tags: List<String>,
-    val categoryIds: List<Int>,
+    val categories: List<Category>,
     val receivedAt: Long,
     val expiresAt: Long?,
     val properties: Map<String, String>,
@@ -43,4 +44,10 @@ data class EmbeddedMessage(
 data class ListThumbnailImage(
     val src: String,
     val alt: String?
+)
+
+@Serializable
+data class Category(
+    val id: Int,
+    val text: String
 )

@@ -53,15 +53,19 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstant
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategoriesDialogView
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategorySelectorButton
 import com.emarsys.mobileengage.embeddedmessaging.ui.detail.MessageDetailView
+import com.emarsys.mobileengage.embeddedmessaging.ui.item.CustomMessageItemViewModelApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.tab.FilterByReadStateTabs
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 import com.emarsys.mobileengage.embeddedmessaging.ui.translation.LocalStringResources
 import kotlinx.coroutines.launch
 
 @Composable
-fun ListPageView(showFilters: Boolean = true) {
+fun ListPageView(
+    showFilters: Boolean = true,
+    customMessageItem: ((message: CustomMessageItemViewModelApi, isSelected: Boolean) -> Composable)?
+) {
     EmbeddedMessagingTheme {
-        InternalListPageView(showFilters)
+        InternalListPageView(showFilters, customMessageItem = customMessageItem)
     }
 }
 
@@ -69,18 +73,23 @@ fun ListPageView(showFilters: Boolean = true) {
 @Composable
 internal fun InternalListPageView(
     showFilters: Boolean = true,
-    viewModel: ListPageViewModelApi = koin.get<ListPageViewModelApi>()  // todo safer koin access in case of uninitialized sdk/koin
+    viewModel: ListPageViewModelApi = koin.get<ListPageViewModelApi>(),
+    customMessageItem: ((viewModel: CustomMessageItemViewModelApi, isSelected: Boolean) -> Composable)? = null
 ) {
     EmbeddedMessagingTheme {
         Column(modifier = Modifier.background(MaterialTheme.colorScheme.surface)) {
-            MessageList(showFilters, viewModel)
+            MessageList(showFilters, customMessageItem, viewModel)
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun MessageList(showFilters: Boolean, viewModel: ListPageViewModelApi) {
+private fun MessageList(
+    showFilters: Boolean,
+    customMessageItem: ((viewModel: CustomMessageItemViewModelApi, isSelected: Boolean) -> Composable)?,
+    viewModel: ListPageViewModelApi
+) {
     val lazyPagingMessageItems = viewModel.messagePagingDataFlowFiltered.collectAsLazyPagingItems()
 
     var showCategorySelector by rememberSaveable { mutableStateOf(false) }
@@ -216,6 +225,7 @@ private fun MessageList(showFilters: Boolean, viewModel: ListPageViewModelApi) {
                                     viewModel.setSelectedCategoryIds(emptySet())
                                 },
                                 snackbarHostState = snackbarHostState,
+                                customMessageItem = customMessageItem
                             )
                         }
                     },

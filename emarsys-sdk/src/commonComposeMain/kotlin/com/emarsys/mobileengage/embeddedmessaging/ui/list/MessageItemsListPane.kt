@@ -1,6 +1,7 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.list
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -49,7 +50,9 @@ import androidx.paging.compose.itemKey
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.DEFAULT_PADDING
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.FLOATING_ACTION_BUTTON_SIZE
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.MESSAGE_ITEM_IMAGE_SIZE
+import com.emarsys.mobileengage.embeddedmessaging.ui.item.CustomMessageItemViewModelApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.DeleteMessageItemConfirmationDialog
+import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemModelApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemView
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.list.placeholders.PlaceholderMessageList
@@ -86,6 +89,7 @@ fun MessageItemsListPane(
     snackbarHostState: SnackbarHostState,
     lazyListState: LazyListState = rememberLazyListState(),
     hasConnection: Boolean,
+    customMessageItem: ((viewModel: CustomMessageItemViewModelApi, isSelected: Boolean) -> Composable)?
 ) {
     val refreshError = lazyPagingMessageItems.loadState.refresh as? LoadState.Error
     val appendError = lazyPagingMessageItems.loadState.append as? LoadState.Error
@@ -198,11 +202,26 @@ fun MessageItemsListPane(
                                             DeleteMessageOnSwipeBox()
                                         }
                                     ) {
-                                        MessageItemView(
-                                            viewModel = messageViewModel,
-                                            isSelected = messageViewModel.id == selectedMessage?.id,
-                                            onClick = { onMessageClick(messageViewModel) }
-                                        )
+                                        if (customMessageItem == null) {
+                                            MessageItemView(
+                                                viewModel = messageViewModel,
+                                                isSelected = messageViewModel.id == selectedMessage?.id,
+                                                onClick = { onMessageClick(messageViewModel) }
+                                            )
+                                        } else {
+                                            Box(
+                                                modifier = Modifier.clickable(onClick = {
+                                                    onMessageClick(
+                                                        messageViewModel
+                                                    )
+                                                })
+                                            ) {
+                                                customMessageItem.invoke(
+                                                    messageViewModel,
+                                                    messageViewModel.id == selectedMessage?.id
+                                                )
+                                            }
+                                        }
                                     }
                                 }
                             }

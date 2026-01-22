@@ -28,6 +28,7 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModel
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.list.InternalListPageView
 import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageViewModelApi
+import com.emarsys.networking.clients.embedded.messaging.model.Category
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
 import com.emarsys.networking.clients.embedded.messaging.model.ListThumbnailImage
 import com.emarsys.networking.clients.embedded.messaging.model.MessageCategory
@@ -151,7 +152,7 @@ private fun providePreviewMessage() = EmbeddedMessage(
     ),
     emptyList(),
     listOf("promo", "new"),
-    listOf(1, 2),
+    listOf(Category(1, "1"), Category(2, "2")),
     Clock.System.now().minus(3.hours).toEpochMilliseconds(),
     Clock.System.now().plus(4.days).toEpochMilliseconds(),
     mapOf("key1" to "value1", "key2" to "value2"),
@@ -177,7 +178,7 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
                                     ),
                                     emptyList(),
                                     listOf("promo", "new"),
-                                    listOf(1, 2),
+                                    listOf(Category(1, "1"), Category(2, "2")),
                                     Clock.System.now().minus(3.hours).toEpochMilliseconds(),
                                     Clock.System.now().plus(4.days).toEpochMilliseconds(),
                                     mapOf("key1" to "value1", "key2" to "value2"),
@@ -201,7 +202,7 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
                                     ),
                                     emptyList(),
                                     listOf("promo", "new"),
-                                    listOf(1, 2),
+                                    listOf(Category(1, "1"), Category(2, "2")),
                                     Clock.System.now().minus(3.hours).toEpochMilliseconds(),
                                     Clock.System.now().plus(4.days).toEpochMilliseconds(),
                                     mapOf("key1" to "value1", "key2" to "value2"),

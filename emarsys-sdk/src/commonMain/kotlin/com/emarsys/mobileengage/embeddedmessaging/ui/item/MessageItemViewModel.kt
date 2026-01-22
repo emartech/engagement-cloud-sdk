@@ -1,6 +1,7 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.item
 
 import com.emarsys.mobileengage.action.models.BasicRichContentDisplayActionModel
+import com.emarsys.networking.clients.embedded.messaging.model.Category
 import io.ktor.http.Url
 
 class MessageItemViewModel(
@@ -23,8 +24,8 @@ class MessageItemViewModel(
     override val imageAltText: String?
         get() = model.message.listThumbnailImage?.alt
 
-    override val categoryIds: List<Int>
-        get() = model.message.categoryIds
+    override val categories: List<Category>
+        get() = model.message.categories
 
     override val receivedAt: Long
         get() = model.message.receivedAt
