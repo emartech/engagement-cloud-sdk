@@ -1,5 +1,8 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.item
 
+import com.emarsys.mobileengage.action.models.BasicRichContentDisplayActionModel
+import io.ktor.http.Url
+
 class MessageItemViewModel(
     private val model: MessageItemModelApi,
     override val isExcludedLocally: Boolean = false
@@ -35,6 +38,11 @@ class MessageItemViewModel(
     override val isDeleted: Boolean
         get() = model.isDeleted()
 
+    override val richContentUrl: Url?
+        get() {
+            return getDefaultActionUrl()
+        }
+
     override fun shouldNavigate() = model.shouldNavigate()
 
     override suspend fun fetchImage(): ByteArray =
@@ -54,4 +62,14 @@ class MessageItemViewModel(
 
     override fun copyAsExcludedLocally(): MessageItemViewModelApi =
         MessageItemViewModel(model, isExcludedLocally = true)
+
+    private fun getDefaultActionUrl(): Url? {
+        val defaultAction = model.message.defaultAction
+        return if (defaultAction is BasicRichContentDisplayActionModel) {
+            Url(defaultAction.url)
+            //TODO: SDK-576
+        } else {
+            null
+        }
+    }
 }

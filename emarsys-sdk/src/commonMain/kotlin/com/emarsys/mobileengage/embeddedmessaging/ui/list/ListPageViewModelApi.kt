@@ -19,6 +19,10 @@ interface ListPageViewModelApi {
 
     val showCategorySelector: StateFlow<Boolean>
 
+    val triggerRefreshFromJs: () -> Unit
+
+    val shouldHideFilterRowForDetailedView: StateFlow<Boolean>
+
     fun setFilterUnreadOnly(unreadOnly: Boolean)
     fun setSelectedCategoryIds(categoryIds: Set<Int>)
 
@@ -33,5 +37,5 @@ interface ListPageViewModelApi {
 
     fun refreshMessagesWithThrottling(shouldCallRefresh: () -> Unit)
 
-    val triggerRefreshFromJs: () -> Unit
+    fun hideFilterRowForDetailedView(shouldHideFilterRow: Boolean)
 }

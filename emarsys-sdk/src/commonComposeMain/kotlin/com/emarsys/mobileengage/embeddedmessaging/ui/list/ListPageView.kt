@@ -109,6 +109,8 @@ private fun MessageList(showFilters: Boolean, viewModel: ListPageViewModelApi) {
     val scope = rememberCoroutineScope()
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val canShowDetailPane = windowSizeClass.isWidthAtLeastBreakpoint(400)
+    val shouldHideFilterRowForDetailedView =
+        viewModel.shouldHideFilterRowForDetailedView.collectAsState()
 
     LaunchedEffect(hasConnection, hasMessages) {
         if (!hasConnection && hasMessages) {
@@ -136,6 +138,14 @@ private fun MessageList(showFilters: Boolean, viewModel: ListPageViewModelApi) {
         }
     }
 
+    LaunchedEffect(
+        navigator.scaffoldValue[ListDetailPaneScaffoldRole.List]
+    ) {
+        if (showFilters) {
+            viewModel.hideFilterRowForDetailedView(navigator.scaffoldValue[ListDetailPaneScaffoldRole.List] == PaneAdaptedValue.Hidden)
+        }
+    }
+
     LaunchedEffect(navigator.scaffoldValue[ListDetailPaneScaffoldRole.Detail]) {
         if (navigator.scaffoldValue[ListDetailPaneScaffoldRole.Detail] == PaneAdaptedValue.Hidden) {
             viewModel.clearMessageSelection()
@@ -151,7 +161,7 @@ private fun MessageList(showFilters: Boolean, viewModel: ListPageViewModelApi) {
     EmbeddedMessagingTheme {
         Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) }) {
             Column {
-                if (showFilters) {
+                if (showFilters && !(shouldHideFilterRowForDetailedView.value)) {
                     FilterRow(
                         selectedCategoryIds = selectedCategoryIds,
                         filterUnreadOnly = filterUnreadOnly,
@@ -219,7 +229,6 @@ private fun MessageList(showFilters: Boolean, viewModel: ListPageViewModelApi) {
                             selectedMessageViewModel?.let { messageViewModel ->
                                 MessageDetailView(
                                     messageViewModel,
-                                    canShowDetailPane
                                 ) {
                                     scope.launch {
                                         navigator.navigateTo(ListDetailPaneScaffoldRole.List)

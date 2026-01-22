@@ -96,9 +96,9 @@ internal class MessageItemModel(
         return message.defaultAction is BasicRichContentDisplayActionModel
     }
 
-    override suspend fun handleDefaultAction() {
-        message.defaultAction?.let {
-            actionFactory.create(it).invoke()
+    override suspend fun handleDefaultAction(){
+        message.defaultAction?.let { defaultAction ->
+            actionFactory.create(defaultAction).invoke()
         }
     }
 

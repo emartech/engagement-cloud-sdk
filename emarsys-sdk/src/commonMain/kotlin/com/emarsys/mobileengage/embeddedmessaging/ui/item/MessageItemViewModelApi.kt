@@ -1,5 +1,7 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui.item
 
+import io.ktor.http.Url
+
 interface MessageItemViewModelApi {
     val id: String
     val title: String
@@ -12,6 +14,7 @@ interface MessageItemViewModelApi {
     val isPinned: Boolean
     val isDeleted: Boolean
     val isExcludedLocally: Boolean
+    val richContentUrl: Url?
 
     fun shouldNavigate(): Boolean
     suspend fun fetchImage(): ByteArray

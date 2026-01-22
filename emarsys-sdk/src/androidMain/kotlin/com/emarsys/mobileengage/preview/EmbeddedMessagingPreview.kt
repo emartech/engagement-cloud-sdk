@@ -243,6 +243,11 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
         override val showCategorySelector: StateFlow<Boolean>
             get() = MutableStateFlow(false).asStateFlow()
 
+        override val triggerRefreshFromJs: () -> Unit = { Unit }
+
+        override val shouldHideFilterRowForDetailedView: StateFlow<Boolean>
+            get() = MutableStateFlow(false).asStateFlow()
+
         override fun setFilterUnreadOnly(unreadOnly: Boolean) {
             Unit
         }
@@ -282,7 +287,9 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
             Unit
         }
 
-        override val triggerRefreshFromJs: () -> Unit = { Unit }
+        override fun hideFilterRowForDetailedView(shouldHideFilterRow: Boolean) {
+            Unit
+        }
     }
 
 
