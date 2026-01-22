@@ -27,82 +27,165 @@
 <div style="margin-top:32px;">
     <button type="button" id="button-disable-sdk">Disable tracking in SDK</button>
 </div>
-
-<!--<div>-->
-<!--    <div>-->
-<!--        <h3>Test Message Item View</h3>-->
-<!--        <button type="button" id="button-render-message">Render Test Message Item View</button>-->
-<!--    </div>-->
-
-<!--    <div id="TestEmbeddedMessaging" style="height:40vh"></div>-->
-<!--</div>-->
-<!--<div>-->
-<!--    <div>-->
-<!--        <h3>Test Message Item View</h3>-->
-<!--        <button type="button" id="button-render-compact-view">Render Compact View</button>-->
-<!--    </div>-->
-
-<!--    <div id="TestCompactView" style="height:40vh; width:40vw"></div>-->
-<!--</div>-->
-<p>Detail view</p>
-<div style="height:400px">
-    <em-list-view custom-message-item-element-name="custom-message-item"></em-list-view>
+<hr/>
+<div class="embedded-messaging-demo">
+    <p>Embedded Messaging Demo</p>
+    <div class="embedded-messaging-demo-container">
+        <div class="compact-view-display">
+            <button type="button" id="button-render-compact-view">Open Compact View</button>
+            <div id="example-compact-view-tab" class="hidden" style="height:400px; width:300px">
+                <ec-embedded-messaging-compact-list></ec-embedded-messaging-compact-list>
+            </div>
+        </div>
+        <div class="detail-view-display">
+            <p>Detail view</p>
+            <ec-embedded-messaging-list></ec-embedded-messaging-list>
+        </div>
+    </div>
 </div>
-<p>Compact view</p>
-<div style="height:400px; width:300px">
-    <em-compact-list-view custom-message-item-element-name="custom-message-item"></em-compact-list-view>
-</div>
-
 </body>
 
 <script>
     let emarsys = window.Emarsys;
     document.getElementById("button-sdk-test").onclick = async () => {
-<!--     const config = new window["emarsys-sdk"].EmarsysConfig(-->
-<!--         "EMSA4-90136",-->
-<!--         null-->
-<!--     )-->
+        <!--     const config = new window["emarsys-sdk"].EmarsysConfig(-->
+        <!--         "EMSA4-90136",-->
+        <!--         null-->
+        <!--     )-->
 
-     const config = {applicationCode: "EMS11-C3FD3"};
+        const config = {applicationCode: "EMS11-C3FD3"};
 
-     await emarsys.setup.enableTracking(config);
-     await emarsys.contact.link("test@test.com");
-     emarsys.events.on("app_event", (event) => console.log(JSON.stringify(event)));
- }
+        await emarsys.setup.enableTracking(config);
+        await emarsys.contact.link("test@test.com");
+        emarsys.events.on("app_event", (event) => console.log(JSON.stringify(event)));
+    }
 
- document.getElementById("button-integration-demo").onclick = async () => {
-     const config = new window["emarsys-sdk"].JsEmarsysConfig(
-         "EMS04-F3514",
-         null,
-         null,
-         new window["emarsys-sdk"].ServiceWorkerOptions(
-             "BKlWDU3MxVpAEp7rjC5p9VYOhGBauYPO7K7b0117suJAoxaFzIwV4FT45eFI_hHBXgPlgKHyHDrbi1BpoKuiUww",
-             "/ems-service-worker.js"
-         )
-     )
-     await emarsys.setup.enableTracking(config);
-     await emarsys.contact.link("test2@test.com");
- }
+    document.getElementById("button-integration-demo").onclick = async () => {
+        const config = new window["emarsys-sdk"].JsEmarsysConfig(
+            "EMS04-F3514",
+            null,
+            null,
+            new window["emarsys-sdk"].ServiceWorkerOptions(
+                "BKlWDU3MxVpAEp7rjC5p9VYOhGBauYPO7K7b0117suJAoxaFzIwV4FT45eFI_hHBXgPlgKHyHDrbi1BpoKuiUww",
+                "/ems-service-worker.js"
+            )
+        )
+        await emarsys.setup.enableTracking(config);
+        await emarsys.contact.link("test2@test.com");
+    }
 
- document.getElementById("button-custom-event").onclick = async () => {
-     const name = document.getElementById("customEventNameInput").value;
-     await emarsys.event.trackEvent({ name: name, attributes: {"key1": "value1"}});
- }
+    document.getElementById("button-custom-event").onclick = async () => {
+        const name = document.getElementById("customEventNameInput").value;
+        await emarsys.event.trackEvent({name: name, attributes: {"key1": "value1"}});
+    }
 
- document.getElementById("button-navigate-event").onclick = async () => {
-     await emarsys.event.trackNavigation("https://www.emarsys.com");
- }
+    document.getElementById("button-navigate-event").onclick = async () => {
+        await emarsys.event.trackNavigation("https://www.emarsys.com");
+    }
 
- document.getElementById("button-disable-sdk").onclick = async () => {
-     await emarsys.setup.disableTracking();
- }
+    document.getElementById("button-disable-sdk").onclick = async () => {
+        await emarsys.setup.disableTracking();
+    }
 
- document.getElementById("button-render-message").onclick = () => {
-     window["emarsys-sdk"].testEmbeddedMessaging("TestEmbeddedMessaging");
- }
+    document.getElementById("button-render-compact-view").onclick = () => {
+        document.querySelector('#example-compact-view-tab').classList.toggle("hidden");
+    }
 
- document.getElementById("button-render-compact-view").onclick = () => {
-     window["emarsys-sdk"].testCompactView("TestCompactView");
- }
+    emarsys.ready.then(() => {
+        document.querySelector('ec-embedded-messaging-compact-list')
+            .addEventListener('navigate', (e) => {
+                console.log("Navigating to somewhere.");
+            });
+    });
+
+    class MyCustomMessageItem extends HTMLElement {
+        static get observedAttributes() {
+            return ["image", "title", "lead"]
+        }
+
+        constructor() {
+            super();
+            this.attachShadow({mode: "open"});
+        }
+
+        connectedCallback() {
+            this.render();
+        }
+
+        attributeChangedCallback(name, oldValue, newValue) {
+            if (oldValue !== newValue) {
+                this.render();
+            }
+        }
+
+        render() {
+            const image = this.getAttribute("image") ?? "";
+            const title = this.getAttribute("title") ?? "";
+            const lead = this.getAttribute("lead") ?? "";
+
+            this.shadowRoot.innerHTML = `
+    <style>
+      .card {
+        margin: 0;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 12px;
+      }
+      img {
+        max-width: 100%;
+        border-radius: 4px;
+      }
+      h3 {
+        margin: 8px 0 4px;
+      }
+      p {
+        margin: 0;
+        color: #555;
+      }
+    </style>
+
+    <div class="card">
+      ${image ? `<img src="${image}" alt="">` : ""}
+      <h3>${title}</h3>
+      <p>${lead}</p>
+    </div>
+  `;
+        }
+    }
+
+    global.customElements.define("custom-message-item", MyCustomMessageItem)
 </script>
+<style>
+    body {
+        padding: 8px;
+    }
+
+    .hidden {
+        visibility: hidden;
+    }
+
+    .embedded-messaging-demo {
+        display: flex;
+        flex-direction: column;
+
+        > p {
+            display: flex;
+        }
+    }
+
+    .embedded-messaging-demo-container {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .compact-view-display {
+        flex: 1;
+        margin-bottom: 32px;
+    }
+
+    .detail-view-display {
+        flex: 5;
+        height: 40vh;
+    }
+</style>
 </html>

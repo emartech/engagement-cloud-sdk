@@ -16,6 +16,7 @@ import com.emarsys.di.SdkKoinIsolationContext
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.event.SdkEvent
 import com.emarsys.init.InitOrganizerApi
+import com.emarsys.mobileengage.embeddedmessaging.ui.initializeCustomElements
 import com.emarsys.util.JsonUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -66,6 +67,8 @@ object EmarsysJs {
         inApp = koin.get<JSInAppApi>()
         sdkPublicEvents = koin.get<Flow<SdkEvent.External.Api>>(named(EventFlowTypes.Public))
         events = koin.get<EventEmitterApi>()
+        
+        initializeCustomElements()
     }
 
     fun registerEventListener(eventListener: EmarsysSdkEventListener): SdkEventSubscriptionApi {

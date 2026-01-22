@@ -155,7 +155,6 @@ async function createTestEnvironment() {
         resources: resourceLoader,
     });
 
-
     await new Promise((resolve) => {
         if (dom.window.document.readyState === 'complete') {
             resolve();
@@ -165,6 +164,7 @@ async function createTestEnvironment() {
     });
 
     const emarsysHtml = {
+        ready: Promise.resolve(),
         setup: {disableTracking: mockDisableTracking},
         push: {registerPushToken: mockRegisterPushToken},
         event: {trackEvent: mockTrackCustomEvent},

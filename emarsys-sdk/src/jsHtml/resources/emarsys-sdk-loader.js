@@ -1,12 +1,15 @@
 (function (global) {
     let sdkCore = null
     let calls = []
+    let resolveLoaded
+    const sdkReady = new Promise(resolve => resolveLoaded = resolve)
 
     const currentSource = document.currentScript.src
     const baseUrl = currentSource.substring(0, currentSource.lastIndexOf('/'));
     const sdkUrl = `${baseUrl}/emarsys-sdk-html.js`
 
     global.Emarsys = {
+        ready: sdkReady,
         setup: createApiSegment('setup', ['enableTracking', 'disableTracking', 'isEnabled']),
         config: createApiSegment('config', [
             'getApplicationCode',
@@ -35,7 +38,7 @@
     scriptTag.onload = async function () {
         sdkCore = global["emarsys-sdk"].Emarsys.getInstance();
         global.emarsysSdkLoaded = true
-        registerEmbeddedMessagingListViews()
+        resolveLoaded()
         await replayCalls()
     }
     scriptTag.onerror = function (error) {
@@ -43,100 +46,6 @@
     };
 
     document.head.appendChild(scriptTag);
-
-    class EmbeddedMessagingCompactListView extends HTMLElement {
-        static get observedAttributes() {
-            return ["custom-message-item-element-name"]
-        }
-
-        connectedCallback() {
-            const mount = document.createElement("div")
-            this.appendChild(mount)
-
-            window["emarsys-sdk"].compactViewTag(mount, this.attributes.getNamedItem("custom-message-item-element-name").value)
-        }
-
-        disconnectedCallback() {
-        }
-    }
-
-    class EmbeddedMessagingListView extends HTMLElement {
-        static get observedAttributes() {
-            ["custom-message-item-element-name"]
-        }
-
-        connectedCallback() {
-            const mount = document.createElement("div")
-            this.appendChild(mount)
-
-            window["emarsys-sdk"].listViewTag(mount, this.attributes.getNamedItem("custom-message-item-element-name").value)
-        }
-
-        disconnectedCallback() {
-        }
-    }
-
-    function registerEmbeddedMessagingListViews() {
-        global.customElements.define("em-compact-list-view", EmbeddedMessagingCompactListView)
-        global.customElements.define("em-list-view", EmbeddedMessagingListView)
-    }
-
-    class MyCustomMessageItem extends HTMLElement {
-        static get observedAttributes() {
-           return ["image", "title", "lead"]
-        }
-
-        constructor() {
-            super();
-            this.attachShadow({mode: "open"});
-        }
-
-        connectedCallback() {
-            this.render();
-        }
-
-        attributeChangedCallback(name, oldValue, newValue) {
-            if (oldValue !== newValue) {
-                this.render();
-            }
-        }
-
-        render() {
-            const image = this.getAttribute("image") ?? "";
-            const title = this.getAttribute("title") ?? "";
-            const lead = this.getAttribute("lead") ?? "";
-
-            this.shadowRoot.innerHTML = `
-     <style>
-       .card {
-         margin: 0;
-         border: 1px solid #ddd;
-         border-radius: 8px;
-         padding: 12px;
-       }
-       img {
-         max-width: 100%;
-         border-radius: 4px;
-       }
-       h3 {
-         margin: 8px 0 4px;
-       }
-       p {
-         margin: 0;
-         color: #555;
-       }
-     </style>
-
-     <div class="card">
-       ${image ? `<img src="${image}" alt="">` : ""}
-       <h3>${title}</h3>
-       <p>${lead}</p>
-     </div>
-   `;
-        }
-    }
-
-    global.customElements.define("custom-message-item", MyCustomMessageItem)
 
     function createApiMethods(apiSegment, methodName) {
         return async function () {
