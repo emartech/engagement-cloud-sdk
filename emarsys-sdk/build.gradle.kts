@@ -31,6 +31,7 @@ version = "4.0.0"
 kotlin {
     compilerOptions {
         apiVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_3)
+        freeCompilerArgs.add("-Xenable-suspend-function-exporting")
     }
     jvmToolchain(17)
     androidTarget {

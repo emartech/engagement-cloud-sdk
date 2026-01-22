@@ -12,10 +12,11 @@ import com.emarsys.mobileengage.push.model.JsPushMessage
 import com.emarsys.notification.NotificationClickHandler
 import com.emarsys.util.JsonUtil
 import com.emarsys.window.BrowserWindowHandler
+import js.coroutines.promise
 import js.promise.Promise
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.promise
+import kotlinx.coroutines.launch
 import web.broadcast.BroadcastChannel
 import web.events.EventHandler
 import web.events.EventType
@@ -46,7 +47,6 @@ fun main() {
         pushMessageWebV2Mapper,
         onBadgeCountUpdateReceivedBroadcastChannel,
         JsonUtil.json,
-        CoroutineScope(SupervisorJob()),
         consoleLogger
     )
 
@@ -58,11 +58,11 @@ fun main() {
 
     self.addEventListener(EventType("push"), { event: PushEvent ->
         event.data?.let {
-            val showNotificationPromise =
+            val showNotificationPromise = CoroutineScope(SupervisorJob()).promise {
                 emarsysServiceWorker.onPush(JSON.stringify(it.json()))
+            }
             event.waitUntil(showNotificationPromise)
         }
-
     })
 
     self.addEventListener(EventType("install"), {
@@ -79,13 +79,14 @@ fun main() {
             )
         )
         event.waitUntil(Promise<Unit> { resolve, reject ->
-            serviceWorkerScope.promise {
-                notificationClickHandler.handleNotificationClick(jsNotificationClickedData)
-                event.notification.close()
-            }.then {
-                resolve(Unit)
-            }.catch {
-                reject(it)
+            serviceWorkerScope.launch {
+                try {
+                    notificationClickHandler.handleNotificationClick(jsNotificationClickedData)
+                    event.notification.close()
+                    resolve(Unit)
+                } catch (e: Exception) {
+                    reject(e)
+                }
             }
         })
     })

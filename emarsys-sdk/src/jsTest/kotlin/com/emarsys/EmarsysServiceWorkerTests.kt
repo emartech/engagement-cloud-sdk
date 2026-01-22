@@ -17,13 +17,10 @@ import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
-import js.promise.await
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestResult
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.serialization.StringFormat
@@ -60,7 +57,6 @@ class EmarsysServiceWorkerTests {
             mockPushMessageWebV1Mapper,
             onBadgeCountUpdateReceivedBroadcastChannel,
             mockJson,
-            TestScope(SupervisorJob()),
             ConsoleLogger()
         )
     }
@@ -70,9 +66,10 @@ class EmarsysServiceWorkerTests {
         val invalidPushMessage = "invalidPushMessage"
         everySuspend { mockPushMessageWebV1Mapper.map(invalidPushMessage) } returns null
 
-        val result = emarsysServiceWorker.onPush(invalidPushMessage).await()
+        val result = emarsysServiceWorker.onPush(invalidPushMessage)
 
         result shouldBe null
+
         verifySuspend(VerifyMode.exactly(0)) {
             mockPushMessagePresenter.present(any())
         }
@@ -84,7 +81,7 @@ class EmarsysServiceWorkerTests {
         everySuspend { mockPushMessageWebV1Mapper.map(TEST_PUSH_MESSAGE_STRING) } returns testJsPushMessage
         everySuspend { mockPushMessagePresenter.present(any()) } returns Unit
 
-        emarsysServiceWorker.onPush(TEST_PUSH_MESSAGE_STRING).await()
+        emarsysServiceWorker.onPush(TEST_PUSH_MESSAGE_STRING)
 
         verifySuspend(VerifyMode.exactly(1)) {
             mockPushMessagePresenter.present(testJsPushMessage)
@@ -106,7 +103,7 @@ class EmarsysServiceWorkerTests {
                 )
             } returns "testBadgeCountString"
 
-            emarsysServiceWorker.onPush(TEST_PUSH_MESSAGE_STRING).await()
+            emarsysServiceWorker.onPush(TEST_PUSH_MESSAGE_STRING)
 
             verifySuspend(VerifyMode.exactly(1)) {
                 mockJson.encodeToString(testBadgeCount)

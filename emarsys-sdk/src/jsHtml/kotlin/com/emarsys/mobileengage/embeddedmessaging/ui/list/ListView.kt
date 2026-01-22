@@ -8,7 +8,12 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemView
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingStyleSheet
 import kotlinx.browser.window
+import org.jetbrains.compose.web.css.Color
+import org.jetbrains.compose.web.css.DisplayStyle
+import org.jetbrains.compose.web.css.backgroundColor
+import org.jetbrains.compose.web.css.display
 import org.jetbrains.compose.web.dom.Div
+import org.jetbrains.compose.web.dom.P
 import org.jetbrains.compose.web.dom.Text
 import web.cssom.atrule.height
 import web.cssom.px
@@ -18,6 +23,7 @@ import web.dom.document
 fun ListView(
     lazyPagingMessageItems: LazyPagingItems<MessageItemViewModelApi>,
     listViewModel: ListPageViewModelApi,
+    customMessageItemElementName: String? = null,
     onItemClick: (MessageItemViewModelApi) -> Unit,
     withDeleteIcon: Boolean = true,
     onDeleteIconClicked: (MessageItemViewModelApi) -> Unit = {}
@@ -33,6 +39,7 @@ fun ListView(
                     MessageItemView(
                         viewModel = messageViewModel,
                         selectedMessage.value?.id,
+                        customMessageItemElementName,
                         onClick = {
                             onItemClick(messageViewModel)
                         },
@@ -45,9 +52,14 @@ fun ListView(
         if (lazyPagingMessageItems.itemCount > 0) {
             Div({
                 attr("shouldLoadNextPage", "true")
-                style { height(1.px) }
+                style {
+                    height(1.px)
+                    backgroundColor(Color.transparent)
+                    display(DisplayStyle.Block)
+                }
             }
             ) {
+                P {}
                 DisposableEffect(Unit) {
                     val observer = observePrefetch {
                         if (lazyPagingMessageItems.itemCount > 0) {

@@ -9,9 +9,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.await
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -34,7 +32,7 @@ class JSPushTests {
     fun setup() {
         Dispatchers.setMain(StandardTestDispatcher())
         mockPushApi = mock(MockMode.autoUnit)
-        jsPush = JSPush(mockPushApi, TestScope())
+        jsPush = JSPush(mockPushApi)
     }
 
     @AfterTest
@@ -47,7 +45,7 @@ class JSPushTests {
         val testPushToken = "testPushToken"
         everySuspend { mockPushApi.registerPushToken(testPushToken) } returns testSuccessResult
 
-        jsPush.registerPushToken(testPushToken).await()
+        jsPush.registerPushToken(testPushToken)
 
         verifySuspend { mockPushApi.registerPushToken(testPushToken) }
     }
@@ -57,14 +55,14 @@ class JSPushTests {
         val testPushToken = "testPushToken"
         everySuspend { mockPushApi.registerPushToken(testPushToken) } returns testFailedResult
 
-        shouldThrow<Exception> { jsPush.registerPushToken(testPushToken).await() }
+        shouldThrow<Exception> { jsPush.registerPushToken(testPushToken) }
     }
 
     @Test
     fun clearPushToken_shouldCall_clearPushTokenOnPushApi() = runTest {
         everySuspend { mockPushApi.clearPushToken() } returns testSuccessResult
 
-        jsPush.clearPushToken().await()
+        jsPush.clearPushToken()
 
         verifySuspend { mockPushApi.clearPushToken() }
     }
@@ -73,7 +71,7 @@ class JSPushTests {
     fun clearPushToken_shouldThrowException_ifClearPushToken_fails() = runTest {
         everySuspend { mockPushApi.clearPushToken() } returns testFailedResult
 
-        shouldThrow<Exception> { jsPush.clearPushToken().await() }
+        shouldThrow<Exception> { jsPush.clearPushToken() }
     }
 
     @Test
@@ -82,7 +80,7 @@ class JSPushTests {
         val testSuccessResultWithString = Result.success<String>(token)
         everySuspend { mockPushApi.getPushToken() } returns testSuccessResultWithString
 
-        val result = jsPush.getPushToken().await()
+        val result = jsPush.getPushToken()
 
         result shouldBe token
     }
@@ -92,6 +90,6 @@ class JSPushTests {
         val testFailedResult = Result.failure<String>(testException)
         everySuspend { mockPushApi.getPushToken() } returns testFailedResult
 
-        shouldThrow<Exception> { jsPush.clearPushToken().await() }
+        shouldThrow<Exception> { jsPush.clearPushToken() }
     }
 }

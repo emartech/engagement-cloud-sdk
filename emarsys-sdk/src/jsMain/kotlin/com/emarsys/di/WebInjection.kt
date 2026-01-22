@@ -256,9 +256,7 @@ object WebInjection {
         }
         single<JsSetupApi> {
             JsSetup(
-                get(),
-                get(named(CoroutineScopeTypes.Application))
-            )
+                get())
         }
         single<WebNotificationSettingsCollectorApi> {
             WebNotificationSettingsCollector(pushServiceContext = get())
@@ -266,27 +264,19 @@ object WebInjection {
         single<JSConfigApi> {
             JSConfig(
                 configApi = get(),
-                webNotificationSettingsCollector = get(),
-                applicationScope = get(named(CoroutineScopeTypes.Application))
-            )
+                webNotificationSettingsCollector = get())
         }
         single<JSContactApi> {
             JSContact(
-                contactApi = get(),
-                applicationScope = get(named(CoroutineScopeTypes.Application))
-            )
+                contactApi = get())
         }
         single<JSTrackingApi> {
             JSTracking(
-                trackingApi = get(),
-                applicationScope = get(named(CoroutineScopeTypes.Application))
-            )
+                trackingApi = get())
         }
         single<JSPushApi> {
             JSPush(
-                pushApi = get(),
-                applicationScope = get(named(CoroutineScopeTypes.Application))
-            )
+                pushApi = get())
         }
         single<JSDeepLinkApi> {
             JSDeepLink(
@@ -295,9 +285,7 @@ object WebInjection {
         }
         single<JSInAppApi> {
             JSInApp(
-                inAppApi = get(),
-                applicationScope = get(named(CoroutineScopeTypes.Application))
-            )
+                inAppApi = get())
         }
     }
 

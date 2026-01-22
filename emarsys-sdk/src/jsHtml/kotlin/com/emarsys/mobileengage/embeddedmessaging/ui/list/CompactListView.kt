@@ -11,6 +11,7 @@ import org.jetbrains.compose.web.dom.Div
 
 @Composable
 fun CompactListView(
+    customMessageItemElementName: String? = null,
     navigateToDetailedView: () -> Unit
 ) {
     val viewModel: ListPageViewModelApi = koin.get()
@@ -24,6 +25,7 @@ fun CompactListView(
                 ListView(
                     lazyPagingMessageItems = viewModel.messagePagingDataFlowFiltered.collectAsLazyPagingItems(),
                     viewModel,
+                    customMessageItemElementName,
                     onItemClick = {
                         scope.launch {
                             viewModel.selectMessage(it) {

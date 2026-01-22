@@ -10,10 +10,16 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.category.SvgIcon
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingStyleSheet
 import com.emarsys.mobileengage.embeddedmessaging.util.asFormattedTimestamp
 import kotlinx.browser.window
+import org.jetbrains.compose.web.css.DisplayStyle
+import org.jetbrains.compose.web.css.display
+import org.jetbrains.compose.web.css.percent
+import org.jetbrains.compose.web.css.width
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Img
 import org.jetbrains.compose.web.dom.Span
+import org.jetbrains.compose.web.dom.TagElement
 import org.jetbrains.compose.web.dom.Text
+import org.w3c.dom.HTMLElement
 
 private const val DELETE_ICON_PATH =
     "M7 21q-0.83 0-1.41-0.59t-0.59-1.41V6H4V4h5V3h6v1h5v2h-1v13q0 0.82-0.59 1.41t-1.41 0.59H7Zm10-15H7v13h10V6ZM9 17h2V8H9v9Zm4 0h2V8h-2v9ZM7 6v13-13Z"
@@ -22,12 +28,20 @@ private const val DELETE_ICON_PATH =
 fun MessageItemView(
     viewModel: MessageItemViewModelApi,
     selectedMessageId: String?,
+    customMessageItemName: String?,
     onClick: () -> Unit,
     onDeleteClicked: () -> Unit,
     withDeleteIcon: Boolean = true
 ) {
     var imageDataUrl by remember { mutableStateOf<String?>(null) }
-    val hasThumbnailImage = viewModel.imageUrl != null
+    val hasCustomElementDefined =
+        customMessageItemName?.let {
+            val isCustomElementFound = window.customElements.get(it) != null
+            if (!isCustomElementFound) {
+                console.error("CustomMessageItem element with the name $customMessageItemName not found!")
+            }
+            isCustomElementFound
+        } ?: false
 
     val classes = mutableListOf(EmbeddedMessagingStyleSheet.messageItem).apply {
         if (selectedMessageId === viewModel.id) {
@@ -53,39 +67,18 @@ fun MessageItemView(
         classes(classes)
         onClick { onClick() }
     }) {
-        if (hasThumbnailImage) {
-            imageDataUrl?.let { url ->
-                Img(src = url, alt = viewModel.imageAltText ?: "") {
-                    classes(EmbeddedMessagingStyleSheet.messageItemImage)
+        if (hasCustomElementDefined) {
+            TagElement<HTMLElement>(customMessageItemName, applyAttrs = {
+                style {
+                    display(DisplayStyle.Block)
+                    width(100.percent)
                 }
-            } ?: LoadingSpinner()
-
-            Div({
-                classes(EmbeddedMessagingStyleSheet.messageItemImageSpacer)
-            })
-        }
-
-        Div({
-            classes(
-                if (hasThumbnailImage) EmbeddedMessagingStyleSheet.messageItemContent
-                else EmbeddedMessagingStyleSheet.messageItemContentNoPadding
-            )
-        }) {
-            Span({
-                classes(EmbeddedMessagingStyleSheet.messageItemTitle)
-            }) {
-                Text(viewModel.title)
-            }
-            Span({
-                classes(EmbeddedMessagingStyleSheet.messageItemLead)
-            }) {
-                Text(viewModel.lead)
-            }
-            Span({
-                classes(EmbeddedMessagingStyleSheet.messageItemTimestamp)
-            }) {
-                Text(viewModel.receivedAt.asFormattedTimestamp())
-            }
+                attr("title", viewModel.title)
+                attr("lead", viewModel.lead)
+                viewModel.imageUrl?.let { attr("image", it) }
+            }) {}
+        } else {
+            MessageItemCore(viewModel, imageDataUrl)
         }
 
         if (withDeleteIcon) {
@@ -98,6 +91,45 @@ fun MessageItemView(
                     className = EmbeddedMessagingStyleSheet.deleteMessageIcon
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun MessageItemCore(viewModel: MessageItemViewModelApi, imageDataUrl: String?) {
+    val hasThumbnailImage = viewModel.imageUrl != null
+    if (hasThumbnailImage) {
+        imageDataUrl?.let { url ->
+            Img(src = url, alt = viewModel.imageAltText ?: "") {
+                classes(EmbeddedMessagingStyleSheet.messageItemImage)
+            }
+        } ?: LoadingSpinner()
+
+        Div({
+            classes(EmbeddedMessagingStyleSheet.messageItemImageSpacer)
+        })
+    }
+
+    Div({
+        classes(
+            if (hasThumbnailImage) EmbeddedMessagingStyleSheet.messageItemContent
+            else EmbeddedMessagingStyleSheet.messageItemContentNoPadding
+        )
+    }) {
+        Span({
+            classes(EmbeddedMessagingStyleSheet.messageItemTitle)
+        }) {
+            Text(viewModel.title)
+        }
+        Span({
+            classes(EmbeddedMessagingStyleSheet.messageItemLead)
+        }) {
+            Text(viewModel.lead)
+        }
+        Span({
+            classes(EmbeddedMessagingStyleSheet.messageItemTimestamp)
+        }) {
+            Text(viewModel.receivedAt.asFormattedTimestamp())
         }
     }
 }

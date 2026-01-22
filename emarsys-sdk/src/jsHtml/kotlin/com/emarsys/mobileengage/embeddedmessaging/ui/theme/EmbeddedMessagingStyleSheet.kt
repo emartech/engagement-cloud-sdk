@@ -172,7 +172,6 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         flex(1)
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Column)
-        property("overflow-y", "auto")
     }
 
     val emptyStateContainer by style {
@@ -180,7 +179,6 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         display(DisplayStyle.Flex)
         alignItems(AlignItems.Center)
         justifyContent(JustifyContent.Center)
-        property("overflow-y", "auto")
     }
 
     val emptyStateContent by style {

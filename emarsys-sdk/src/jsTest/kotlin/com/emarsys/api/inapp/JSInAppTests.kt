@@ -9,9 +9,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.await
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -30,7 +28,7 @@ class JSInAppTests {
         Dispatchers.setMain(StandardTestDispatcher())
         mockInApp = mock()
         every { mockInApp.isPaused } returns false
-        jsInApp = JSInApp(mockInApp, TestScope())
+        jsInApp = JSInApp(mockInApp)
     }
 
     @AfterTest
@@ -47,7 +45,7 @@ class JSInAppTests {
     fun pause_shouldCall_pause_onInAppApi() = runTest {
         everySuspend { mockInApp.pause() } returns Result.success(Unit)
 
-        jsInApp.pause().await()
+        jsInApp.pause()
 
         verifySuspend { mockInApp.pause() }
     }
@@ -56,14 +54,14 @@ class JSInAppTests {
     fun pause_shouldThrowException_ifPauseFails_onApi() = runTest {
         everySuspend { mockInApp.pause() } returns Result.failure(Exception())
 
-        shouldThrow<Exception> { jsInApp.pause().await() }
+        shouldThrow<Exception> { jsInApp.pause() }
     }
 
     @Test
     fun resume_shouldCall_resume_onInAppApi() = runTest {
         everySuspend { mockInApp.resume() } returns Result.success(Unit)
 
-        jsInApp.resume().await()
+        jsInApp.resume()
 
         verifySuspend { mockInApp.resume() }
     }
@@ -72,6 +70,6 @@ class JSInAppTests {
     fun resume_shouldThrowException_ifResumeFails_onApi() = runTest {
         everySuspend { mockInApp.resume() } returns Result.failure(Exception())
 
-        shouldThrow<Exception> { jsInApp.resume().await() }
+        shouldThrow<Exception> { jsInApp.resume() }
     }
 }

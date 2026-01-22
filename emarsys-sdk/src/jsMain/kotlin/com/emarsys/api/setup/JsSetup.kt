@@ -2,50 +2,36 @@ package com.emarsys.api.setup
 
 import JsEmarsysConfig
 import com.emarsys.JsApiConfig
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.promise
-import kotlin.js.Promise
 
 internal class JsSetup(
-    private val setup: SetupApi,
-    private val applicationScope: CoroutineScope
+    private val setup: SetupApi
 ) : JsSetupApi {
 
     /**
      * Enables tracking with the provided configuration.
      *
      * @param jSApiConfig The SDK configuration to use for enabling tracking.
-     * @return A promise that resolves when tracking is enabled.
      */
-    override fun enableTracking(config: JsApiConfig): Promise<Unit> {
-        return applicationScope.promise {
-            setup.enableTracking(
-                JsEmarsysConfig(
-                    applicationCode = config.applicationCode,
-                    config.serviceWorkerOptions
-                )
+    override suspend fun enableTracking(config: JsApiConfig) {
+        setup.enableTracking(
+            JsEmarsysConfig(
+                applicationCode = config.applicationCode,
+                config.serviceWorkerOptions
             )
-        }
+        )
     }
 
     /**
      * Disables tracking.
-     * @returns a [Promise] indicating the result of the operation,
-     * containing SdkAlreadyDisabledException if tracking is already disabled.
      */
-    override fun disableTracking(): Promise<Unit> {
-        return applicationScope.promise {
-            setup.disableTracking()
-        }
+    override suspend fun disableTracking() {
+        setup.disableTracking()
     }
 
     /**
      * Checks if tracking is enabled.
-     * @returns a [Promise] indicating if tracking is enabled,
      */
-    override fun isEnabled(): Promise<Boolean> {
-        return applicationScope.promise {
-            setup.isEnabled()
-        }
+    override suspend fun isEnabled(): Boolean {
+        return setup.isEnabled()
     }
 }

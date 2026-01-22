@@ -12,9 +12,7 @@ import dev.mokkery.verifySuspend
 import io.kotest.assertions.throwables.shouldThrow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.await
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -31,7 +29,7 @@ class JSTrackingTests {
     fun setup() {
         Dispatchers.setMain(StandardTestDispatcher())
         mockEventTrackerApi = mock()
-        jsTracking = JSTracking(mockEventTrackerApi, TestScope())
+        jsTracking = JSTracking(mockEventTrackerApi)
     }
 
     @AfterTest
@@ -50,7 +48,7 @@ class JSTrackingTests {
             val jsCustomEvent: JsCustomEvent =
                 js("{ name: testName, attributes: { 'testKey': 'testValue' } }").unsafeCast<com.emarsys.api.tracking.model.JsCustomEvent>()
 
-            jsTracking.trackEvent(jsCustomEvent).await()
+            jsTracking.trackEvent(jsCustomEvent)
 
             verifySuspend { mockEventTrackerApi.track(CustomEvent(testName, testAttributesMap)) }
         }
@@ -63,7 +61,7 @@ class JSTrackingTests {
                 Unit
             )
 
-            jsTracking.trackNavigation(testLocation).await()
+            jsTracking.trackNavigation(testLocation)
 
             verifySuspend { mockEventTrackerApi.track(NavigateEvent(testLocation)) }
         }
@@ -78,7 +76,7 @@ class JSTrackingTests {
             js("{ name: testName, attributes: { 'testKey': {} }}").unsafeCast<JsCustomEvent>()
 
         shouldThrow<IllegalArgumentException> {
-            jsTracking.trackEvent(customEvent).await()
+            jsTracking.trackEvent(customEvent)
         }
     }
 
@@ -101,7 +99,7 @@ class JSTrackingTests {
         )
 
         shouldThrow<Exception> {
-            jsTracking.trackEvent(customEvent).await()
+            jsTracking.trackEvent(customEvent)
         }
     }
 }
