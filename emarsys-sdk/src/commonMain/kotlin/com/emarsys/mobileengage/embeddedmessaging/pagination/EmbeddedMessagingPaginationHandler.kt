@@ -46,7 +46,7 @@ internal class EmbeddedMessagingPaginationHandler(
                             paginationState.lastFetchMessagesId = event.id
                             paginationState.offset = event.offset
                             paginationState.categoryIds = event.categoryIds
-                            paginationState.filterUnreadMessages = event.filterUnreadMessages
+                            paginationState.filterUnopenedMessages = event.filterUnopenedMessages
                         }
 
                         is SdkEvent.Internal.Sdk.Answer.Response<*> -> {
@@ -93,7 +93,7 @@ internal class EmbeddedMessagingPaginationHandler(
                                         nackCount = 0,
                                         offset = paginationState.offset,
                                         categoryIds = paginationState.categoryIds,
-                                        filterUnreadMessages = paginationState.filterUnreadMessages
+                                        filterUnopenedMessages = paginationState.filterUnopenedMessages
                                     )
                                 )
                             } else {

@@ -214,7 +214,7 @@ class ListPageModelTests {
     }
 
     @Test
-    fun fetchMessagesWithCategories_shouldSendFetchMessagesEvent_withFilterUnreadMessagesFalse_whenFilterUnreadOnlyIsFalse() =
+    fun fetchMessagesWithCategories_shouldSendFetchMessagesEvent_withFilterUnopenedMessagesFalse_whenFilterUnopenedOnlyIsFalse() =
         runTest {
             val messagesResponse = MessagesResponse(
                 "1.0",
@@ -237,11 +237,11 @@ class ListPageModelTests {
             model.fetchMessagesWithCategories(false, emptyList())
 
             capturedEvent.get() shouldNotBe null
-            capturedEvent.get().filterUnreadMessages shouldBe false
+            capturedEvent.get().filterUnopenedMessages shouldBe false
         }
 
     @Test
-    fun fetchMessagesWithCategories_shouldSendFetchMessagesEvent_withFilterUnreadMessagesTrue_whenFilterUnreadOnlyIsTrue() =
+    fun fetchMessagesWithCategories_shouldSendFetchMessagesEvent_withFilterUnopenedMessagesTrue_whenFilterUnopenedOnlyIsTrue() =
         runTest {
             val expectedCategoryIds = listOf(1, 2, 3)
             val messagesResponse = MessagesResponse(
@@ -268,11 +268,11 @@ class ListPageModelTests {
                 mockSdkEventDistributor.registerEvent(capture(capturedEvent))
             } returns mockSdkEventWaiter
 
-            model.fetchMessagesWithCategories(filterUnreadOnly = true, expectedCategoryIds)
+            model.fetchMessagesWithCategories(filterUnopenedOnly = true, expectedCategoryIds)
 
             with(capturedEvent.get()) {
                 this shouldNotBe null
-                filterUnreadMessages shouldBe true
+                filterUnopenedMessages shouldBe true
                 categoryIds shouldBe expectedCategoryIds
             }
         }

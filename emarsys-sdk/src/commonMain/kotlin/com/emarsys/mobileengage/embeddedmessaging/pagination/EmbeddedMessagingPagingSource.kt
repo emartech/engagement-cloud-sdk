@@ -15,7 +15,7 @@ import com.emarsys.networking.clients.embedded.messaging.model.MessageCategory
 
 internal class EmbeddedMessagingPagingSource(
     private val listPageModel: ListPageModelApi,
-    private val filterUnreadOnly: Boolean,
+    private val filterUnopenedOnly: Boolean,
     private val selectedCategoryIds: List<Int>,
     private val setCategories: (List<MessageCategory>) -> Unit,
     private val downloader: DownloaderApi,
@@ -30,7 +30,7 @@ internal class EmbeddedMessagingPagingSource(
             logger.trace("pageNumber: $pageNumber")
             if (pageNumber == 0) {
                 listPageModel.fetchMessagesWithCategories(
-                    filterUnreadOnly = filterUnreadOnly,
+                    filterUnopenedOnly = filterUnopenedOnly,
                     categoryIds = selectedCategoryIds,
                 )
             } else {

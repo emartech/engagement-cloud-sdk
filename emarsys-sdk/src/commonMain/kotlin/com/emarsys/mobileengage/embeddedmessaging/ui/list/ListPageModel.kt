@@ -18,7 +18,7 @@ internal class ListPageModel(
 ) : ListPageModelApi {
 
     override suspend fun fetchMessagesWithCategories(
-        filterUnreadOnly: Boolean,
+        filterUnopenedOnly: Boolean,
         categoryIds: List<Int>
     ): Result<MessagesWithCategories> {
         return try {
@@ -26,7 +26,7 @@ internal class ListPageModel(
                 nackCount = 0,
                 offset = 0,
                 categoryIds = categoryIds,
-                filterUnreadMessages = filterUnreadOnly
+                filterUnopenedMessages = filterUnopenedOnly
             )
             val fetchMessagesResponse =
                 sdkEventDistributor.registerEvent(fetchMessagesEvent).await(MessagesResponse::class)

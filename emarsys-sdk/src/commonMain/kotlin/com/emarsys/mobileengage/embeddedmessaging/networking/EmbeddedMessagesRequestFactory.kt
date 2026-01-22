@@ -31,7 +31,7 @@ internal class EmbeddedMessagesRequestFactory(
                         nackCount = embeddedMessagingEvent.nackCount,
                         offset = embeddedMessagingEvent.offset,
                         categoryIds = embeddedMessagingEvent.categoryIds,
-                        filterUnreadMessages = embeddedMessagingEvent.filterUnreadMessages
+                        filterUnopenedMessages = embeddedMessagingEvent.filterUnopenedMessages
                     )
                 )
 
@@ -69,9 +69,9 @@ internal class EmbeddedMessagesRequestFactory(
                     embeddedMessagingEvent.categoryIds.joinToString(",")
                 )
             }
-            if (embeddedMessagingEvent.filterUnreadMessages) {
+            if (embeddedMessagingEvent.filterUnopenedMessages) {
                 parameters.append(
-                    "filterUnread",
+                    "filterUnopened",
                     "true"
                 )
             }

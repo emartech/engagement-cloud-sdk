@@ -97,7 +97,7 @@ class EmbeddedMessagingPaginationHandlerTest {
         state.endReached = true
         state.lastFetchMessagesId = "old-id"
         state.categoryIds = listOf(1, 2)
-        state.filterUnreadMessages = false
+        state.filterUnopenedMessages = false
 
         val fetchMessagesEvent = SdkEvent.Internal.EmbeddedMessaging.FetchMessages(
             nackCount = 0,
@@ -114,7 +114,7 @@ class EmbeddedMessagingPaginationHandlerTest {
         state.endReached shouldBe false
         state.lastFetchMessagesId shouldBe fetchMessagesEvent.id
         state.categoryIds shouldBe emptyList()
-        state.filterUnreadMessages shouldBe false
+        state.filterUnopenedMessages shouldBe false
     }
 
     @Test

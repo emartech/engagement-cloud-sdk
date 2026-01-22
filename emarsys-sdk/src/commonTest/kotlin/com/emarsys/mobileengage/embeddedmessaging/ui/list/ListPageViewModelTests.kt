@@ -96,8 +96,8 @@ class ListPageViewModelTests {
     }
 
     @Test
-    fun testSetFilterUnreadOnly_shouldCallPagerFactory_withFilterUnreadOnlyTrue() = runTest {
-        viewModel.filterUnreadOnly.value shouldBe false
+    fun testSetFilterUnopenedOnly_shouldCallPagerFactory_withFilterUnopenedOnlyTrue() = runTest {
+        viewModel.filterUnopenedOnly.value shouldBe false
         viewModel.selectedCategoryIds.value shouldBe emptySet()
         viewModel.categories.value shouldBe emptyList()
 
@@ -109,15 +109,15 @@ class ListPageViewModelTests {
             )
         )
 
-        viewModel.setFilterUnreadOnly(true)
+        viewModel.setFilterUnopenedOnly(true)
 
         val firstMessage = viewModel.messagePagingDataFlowFiltered.first()
 
-        viewModel.filterUnreadOnly.value shouldBe true
+        viewModel.filterUnopenedOnly.value shouldBe true
         firstMessage shouldNotBe null
         verify {
             mockPagerFactory.create(
-                filterUnreadOnly = true,
+                filterUnopenedOnly = true,
                 selectedCategoryIds = viewModel.selectedCategoryIds.value.toList(),
                 categories = any()
             )
@@ -126,7 +126,7 @@ class ListPageViewModelTests {
 
     @Test
     fun testSetSelectCategoryIds_shouldCallPagerFactory_withCorrectSelectedCategoryIds() = runTest {
-        viewModel.filterUnreadOnly.value shouldBe false
+        viewModel.filterUnopenedOnly.value shouldBe false
         viewModel.selectedCategoryIds.value shouldBe emptySet()
         viewModel.categories.value shouldBe emptyList()
 
@@ -149,7 +149,7 @@ class ListPageViewModelTests {
         firstMessage shouldNotBe null
         verify {
             mockPagerFactory.create(
-                filterUnreadOnly = false,
+                filterUnopenedOnly = false,
                 selectedCategoryIds = selectedCategoryIds.toList(),
                 categories = any()
             )
@@ -396,7 +396,7 @@ class ListPageViewModelTests {
     }
 
     @Test
-    fun testHasFiltersApplied_shouldReturnTrue_whenFilterUnreadOnlyIsTrue() = runTest {
+    fun testHasFiltersApplied_shouldReturnTrue_whenFilterUnopenedOnlyIsTrue() = runTest {
         every { mockPagerFactory.create(any(), any(), any()) } returns flowOf(
             PagingData.from(
                 data = emptyList(),
@@ -407,7 +407,7 @@ class ListPageViewModelTests {
 
         viewModel.hasFiltersApplied.value shouldBe false
 
-        viewModel.setFilterUnreadOnly(true)
+        viewModel.setFilterUnopenedOnly(true)
         testDispatcher.scheduler.advanceUntilIdle()
 
         viewModel.hasFiltersApplied.value shouldBe true
@@ -447,7 +447,7 @@ class ListPageViewModelTests {
 
         viewModel.hasFiltersApplied.value shouldBe false
 
-        viewModel.setFilterUnreadOnly(true)
+        viewModel.setFilterUnopenedOnly(true)
         viewModel.setSelectedCategoryIds(selectedCategoryIds)
         testDispatcher.scheduler.advanceUntilIdle()
 
@@ -458,7 +458,7 @@ class ListPageViewModelTests {
     fun testHasFiltersApplied_shouldReturnFalse_whenNoFiltersAreApplied() = runTest {
         viewModel.hasFiltersApplied.value shouldBe false
 
-        viewModel.setFilterUnreadOnly(false)
+        viewModel.setFilterUnopenedOnly(false)
         viewModel.setSelectedCategoryIds(emptySet())
         testDispatcher.scheduler.advanceUntilIdle()
 

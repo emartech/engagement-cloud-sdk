@@ -33,13 +33,13 @@ internal class ListPageViewModel(
     private val _categories = MutableStateFlow<List<MessageCategory>>(emptyList())
     override val categories: StateFlow<List<MessageCategory>> = _categories.asStateFlow()
 
-    private val _filterUnreadOnly = MutableStateFlow(false)
-    override val filterUnreadOnly: StateFlow<Boolean> = _filterUnreadOnly.asStateFlow()
+    private val _filterUnopenedOnly = MutableStateFlow(false)
+    override val filterUnopenedOnly: StateFlow<Boolean> = _filterUnopenedOnly.asStateFlow()
     private val _selectedCategoryIds = MutableStateFlow<Set<Int>>(emptySet())
     override val selectedCategoryIds: StateFlow<Set<Int>> = _selectedCategoryIds.asStateFlow()
     override val hasConnection: StateFlow<Boolean> = connectionWatchDog.isOnline
     override val hasFiltersApplied: StateFlow<Boolean> =
-        combine(_filterUnreadOnly, _selectedCategoryIds) { unreadOnly, categoryIds ->
+        combine(_filterUnopenedOnly, _selectedCategoryIds) { unreadOnly, categoryIds ->
             unreadOnly || categoryIds.isNotEmpty()
         }.stateIn(coroutineScope, SharingStarted.Eagerly, false)
 
@@ -63,24 +63,24 @@ internal class ListPageViewModel(
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _messagePagingDataFlowFromApi =
         combine(
-            _filterUnreadOnly,
+            _filterUnopenedOnly,
             _selectedCategoryIds,
             triggerFromJS
-        ) { filterUnreadOnly, selectedCategoryIds, _ ->
-            Pair(filterUnreadOnly, selectedCategoryIds)
+        ) { filterUnopenedOnly, selectedCategoryIds, _ ->
+            Pair(filterUnopenedOnly, selectedCategoryIds)
         }
             .flatMapLatest { pair ->
-                val (filterUnreadOnly, selectedCategoryIds) = pair
+                val (filterUnopenedOnly, selectedCategoryIds) = pair
                 lastRefreshTimestamp = null
                 pagerFactory.create(
-                    filterUnreadOnly = filterUnreadOnly,
+                    filterUnopenedOnly = filterUnopenedOnly,
                     selectedCategoryIds = selectedCategoryIds.toList(),
                     categories = _categories
                 )
             }
             .map { pagingData ->
                 pagingData.map {
-                    if ((!it.isExcludedLocally && filterUnreadOnly.value && locallyOpenedMessageIds.value.contains(
+                    if ((!it.isExcludedLocally && filterUnopenedOnly.value && locallyOpenedMessageIds.value.contains(
                             it.id
                         )) || it.isDeleted
                     ) {
@@ -103,8 +103,8 @@ internal class ListPageViewModel(
 
     override val triggerRefreshFromJs = { triggerFromJS.value = !triggerFromJS.value }
 
-    override fun setFilterUnreadOnly(unreadOnly: Boolean) {
-        _filterUnreadOnly.value = unreadOnly
+    override fun setFilterUnopenedOnly(unreadOnly: Boolean) {
+        _filterUnopenedOnly.value = unreadOnly
     }
 
     override fun setSelectedCategoryIds(categoryIds: Set<Int>) {

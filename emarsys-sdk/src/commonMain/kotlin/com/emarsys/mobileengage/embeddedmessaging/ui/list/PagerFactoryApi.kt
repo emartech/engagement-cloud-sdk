@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 internal interface PagerFactoryApi {
     fun create(
-        filterUnreadOnly: Boolean,
+        filterUnopenedOnly: Boolean,
         selectedCategoryIds: List<Int>,
         categories: MutableStateFlow<List<MessageCategory>>
     ): Flow<PagingData<MessageItemViewModelApi>>

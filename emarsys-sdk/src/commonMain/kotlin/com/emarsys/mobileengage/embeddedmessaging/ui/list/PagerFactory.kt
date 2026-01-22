@@ -22,7 +22,7 @@ internal class PagerFactory(
     private val logger: Logger
 ) : PagerFactoryApi {
     override fun create(
-        filterUnreadOnly: Boolean,
+        filterUnopenedOnly: Boolean,
         selectedCategoryIds: List<Int>,
         categories: MutableStateFlow<List<MessageCategory>>
     ): Flow<PagingData<MessageItemViewModelApi>> {
@@ -38,7 +38,7 @@ internal class PagerFactory(
             pagingSourceFactory = {
                 EmbeddedMessagingPagingSource(
                     listPageModel = model,
-                    filterUnreadOnly = filterUnreadOnly,
+                    filterUnopenedOnly = filterUnopenedOnly,
                     selectedCategoryIds = selectedCategoryIds.toList(),
                     setCategories = { categories.value = it },
                     downloader = downloaderApi,

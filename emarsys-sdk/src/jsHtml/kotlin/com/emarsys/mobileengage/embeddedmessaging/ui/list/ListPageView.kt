@@ -55,7 +55,7 @@ fun ListPageView(
 fun MessageList(customMessageItemElementName: String?, viewModel: ListPageViewModelApi) {
     val lazyPagingMessageItems =
         viewModel.messagePagingDataFlowFiltered.collectAsLazyPagingItems()
-    val filterUnreadOnly by viewModel.filterUnreadOnly.collectAsState()
+    val filterUnopenedOnly by viewModel.filterUnopenedOnly.collectAsState()
     val selectedCategoryIds by viewModel.selectedCategoryIds.collectAsState()
     val selectedMessage by viewModel.selectedMessage.collectAsState()
     val showCategorySelector by viewModel.showCategorySelector.collectAsState()
@@ -85,8 +85,8 @@ fun MessageList(customMessageItemElementName: String?, viewModel: ListPageViewMo
             Div({ classes(EmbeddedMessagingStyleSheet.listPane) }) {
                 FilterRow(
                     selectedCategoryIds = selectedCategoryIds,
-                    filterUnreadOnly = filterUnreadOnly,
-                    onFilterChange = { viewModel.setFilterUnreadOnly(it) },
+                    filterUnopenedOnly = filterUnopenedOnly,
+                    onFilterChange = { viewModel.setFilterUnopenedOnly(it) },
                     onCategorySelectorClicked = { viewModel.openCategorySelector() }
                 )
                 Hr({ classes(EmbeddedMessagingStyleSheet.divider) })
@@ -127,8 +127,8 @@ fun MessageList(customMessageItemElementName: String?, viewModel: ListPageViewMo
         } else {
             FilterRow(
                 selectedCategoryIds = selectedCategoryIds,
-                filterUnreadOnly = filterUnreadOnly,
-                onFilterChange = { viewModel.setFilterUnreadOnly(it) },
+                filterUnopenedOnly = filterUnopenedOnly,
+                onFilterChange = { viewModel.setFilterUnopenedOnly(it) },
                 onCategorySelectorClicked = { viewModel.openCategorySelector() }
             )
             Hr({ classes(EmbeddedMessagingStyleSheet.divider) })
@@ -244,7 +244,7 @@ fun EmptyDetailState() {
 @Composable
 fun FilterRow(
     selectedCategoryIds: Set<Int>,
-    filterUnreadOnly: Boolean,
+    filterUnopenedOnly: Boolean,
     onFilterChange: (Boolean) -> Unit,
     onCategorySelectorClicked: () -> Unit
 ) {
@@ -255,7 +255,7 @@ fun FilterRow(
             onClick { onFilterChange(false) }
             classes(
                 EmbeddedMessagingStyleSheet.filterButton,
-                if (!filterUnreadOnly) EmbeddedMessagingStyleSheet.filterButtonSelected else EmbeddedMessagingStyleSheet.filterButtonUnselected
+                if (!filterUnopenedOnly) EmbeddedMessagingStyleSheet.filterButtonSelected else EmbeddedMessagingStyleSheet.filterButtonUnselected
             )
         }) {
             Text(LocalStringResources.current.allMessagesFilterButtonLabel)
@@ -264,7 +264,7 @@ fun FilterRow(
             onClick { onFilterChange(true) }
             classes(
                 EmbeddedMessagingStyleSheet.filterButton,
-                if (filterUnreadOnly) EmbeddedMessagingStyleSheet.filterButtonSelected else EmbeddedMessagingStyleSheet.filterButtonUnselected
+                if (filterUnopenedOnly) EmbeddedMessagingStyleSheet.filterButtonSelected else EmbeddedMessagingStyleSheet.filterButtonUnselected
             )
         }) {
             Text(LocalStringResources.current.unreadMessagesFilterButtonLabel)

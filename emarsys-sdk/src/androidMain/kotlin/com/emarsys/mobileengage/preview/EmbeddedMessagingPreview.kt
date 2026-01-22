@@ -227,7 +227,7 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
                     )
                 ).asStateFlow()
 
-        override val filterUnreadOnly: StateFlow<Boolean>
+        override val filterUnopenedOnly: StateFlow<Boolean>
             get() = MutableStateFlow(false).asStateFlow()
 
         override val selectedCategoryIds: StateFlow<Set<Int>>
@@ -249,7 +249,7 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
         override val shouldHideFilterRowForDetailedView: StateFlow<Boolean>
             get() = MutableStateFlow(false).asStateFlow()
 
-        override fun setFilterUnreadOnly(unreadOnly: Boolean) {
+        override fun setFilterUnopenedOnly(unreadOnly: Boolean) {
             Unit
         }
 

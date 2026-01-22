@@ -46,13 +46,13 @@ class EmbeddedMessagingPagingSourceTests {
     }
 
     private fun createEmbeddedMessagingPagingSource(
-        filterUnreadOnly: Boolean = false,
+        filterUnopenedOnly: Boolean = false,
         selectedCategoryIds: List<Int> = emptyList(),
         deletedMessageIds: Set<String> = emptySet(),
         setCategories: (List<MessageCategory>) -> Unit = { }
     ) = EmbeddedMessagingPagingSource(
         listPageModel = mockListPageModel,
-        filterUnreadOnly = filterUnreadOnly,
+        filterUnopenedOnly = filterUnopenedOnly,
         selectedCategoryIds = selectedCategoryIds,
         setCategories = setCategories,
         downloader = mockDownloader,
@@ -82,7 +82,7 @@ class EmbeddedMessagingPagingSourceTests {
 
         verifySuspend {
             mockListPageModel.fetchMessagesWithCategories(
-                filterUnreadOnly = false, categoryIds = emptyList()
+                filterUnopenedOnly = false, categoryIds = emptyList()
             )
         }
         (result is PagingSource.LoadResult.Error) shouldBe false
@@ -108,7 +108,7 @@ class EmbeddedMessagingPagingSourceTests {
 
             verifySuspend {
                 mockListPageModel.fetchMessagesWithCategories(
-                    filterUnreadOnly = false, categoryIds = emptyList()
+                    filterUnopenedOnly = false, categoryIds = emptyList()
                 )
             }
             (result is PagingSource.LoadResult.Error) shouldBe true

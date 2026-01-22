@@ -10,7 +10,7 @@ interface ListPageViewModelApi {
     val messagePagingDataFlowFiltered: Flow<PagingData<MessageItemViewModelApi>>
     val categories: StateFlow<List<MessageCategory>>
 
-    val filterUnreadOnly: StateFlow<Boolean>
+    val filterUnopenedOnly: StateFlow<Boolean>
     val selectedCategoryIds: StateFlow<Set<Int>>
     val hasFiltersApplied: StateFlow<Boolean>
     val hasConnection: StateFlow<Boolean>
@@ -23,7 +23,7 @@ interface ListPageViewModelApi {
 
     val shouldHideFilterRowForDetailedView: StateFlow<Boolean>
 
-    fun setFilterUnreadOnly(unreadOnly: Boolean)
+    fun setFilterUnopenedOnly(unreadOnly: Boolean)
     fun setSelectedCategoryIds(categoryIds: Set<Int>)
 
     suspend fun selectMessage(messageViewModel: MessageItemViewModelApi, onNavigate: suspend () -> Unit)

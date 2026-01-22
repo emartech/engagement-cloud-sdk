@@ -94,7 +94,7 @@ private fun MessageList(
 
     var showCategorySelector by rememberSaveable { mutableStateOf(false) }
 
-    val filterUnreadOnly by viewModel.filterUnreadOnly.collectAsState()
+    val filterUnOpenedOnly by viewModel.filterUnopenedOnly.collectAsState()
     val selectedCategoryIds by viewModel.selectedCategoryIds.collectAsState()
 
     val listState = rememberSaveable(saver = LazyListState.Saver) {
@@ -173,8 +173,8 @@ private fun MessageList(
                 if (showFilters && !(shouldHideFilterRowForDetailedView.value)) {
                     FilterRow(
                         selectedCategoryIds = selectedCategoryIds,
-                        filterUnreadOnly = filterUnreadOnly,
-                        onFilterChange = { viewModel.setFilterUnreadOnly(it) },
+                        filterUnopenedOnly = filterUnOpenedOnly,
+                        onFilterChange = { viewModel.setFilterUnopenedOnly(it) },
                         onCategorySelectorClicked = { showCategorySelector = true }
                     )
 
@@ -221,7 +221,7 @@ private fun MessageList(
                                         } ?: Result.success(Unit)
                                 },
                                 onClearFilters = {
-                                    viewModel.setFilterUnreadOnly(false)
+                                    viewModel.setFilterUnopenedOnly(false)
                                     viewModel.setSelectedCategoryIds(emptySet())
                                 },
                                 snackbarHostState = snackbarHostState,
@@ -262,7 +262,7 @@ private fun MessageList(
 @Composable
 private fun FilterRow(
     selectedCategoryIds: Set<Int>,
-    filterUnreadOnly: Boolean,
+    filterUnopenedOnly: Boolean,
     onFilterChange: (Boolean) -> Unit,
     onCategorySelectorClicked: () -> Unit
 ) {
@@ -273,7 +273,7 @@ private fun FilterRow(
             horizontalArrangement = Arrangement.spacedBy(DEFAULT_PADDING)
         ) {
             FilterByReadStateTabs(
-                selectedTabIndex = if (filterUnreadOnly) 1 else 0,
+                selectedTabIndex = if (filterUnopenedOnly) 1 else 0,
                 allMessagesText = LocalStringResources.current.allMessagesFilterButtonLabel,
                 unreadMessagesText = LocalStringResources.current.unreadMessagesFilterButtonLabel,
                 onAllMessagesClick = { onFilterChange(false) },

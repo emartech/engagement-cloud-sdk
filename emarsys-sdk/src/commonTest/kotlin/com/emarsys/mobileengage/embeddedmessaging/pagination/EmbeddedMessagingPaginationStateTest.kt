@@ -54,7 +54,7 @@ class EmbeddedMessagingPaginationStateTest {
             categoryIds = listOf(),
             receivedCount = 10,
             endReached = true,
-            filterUnreadMessages = false
+            filterUnopenedMessages = false
         )
 
         state.refresh()
@@ -74,7 +74,7 @@ class EmbeddedMessagingPaginationStateTest {
             categoryIds = listOf(1, 2, 3),
             receivedCount = 75,
             endReached = true,
-            filterUnreadMessages = true
+            filterUnopenedMessages = true
         )
 
         state.reset()
@@ -85,7 +85,7 @@ class EmbeddedMessagingPaginationStateTest {
         state.categoryIds shouldBe emptyList()
         state.receivedCount shouldBe 0
         state.endReached shouldBe false
-        state.filterUnreadMessages shouldBe false
+        state.filterUnopenedMessages shouldBe false
     }
 
     @Test
@@ -106,7 +106,7 @@ class EmbeddedMessagingPaginationStateTest {
         state.categoryIds = listOf(5, 6)
         state.receivedCount = 25
         state.endReached = true
-        state.filterUnreadMessages = false
+        state.filterUnopenedMessages = false
 
         state.reset()
 
@@ -116,7 +116,7 @@ class EmbeddedMessagingPaginationStateTest {
         state.categoryIds shouldBe emptyList()
         state.receivedCount shouldBe 0
         state.endReached shouldBe false
-        state.filterUnreadMessages = false
+        state.filterUnopenedMessages = false
     }
 
     @Test

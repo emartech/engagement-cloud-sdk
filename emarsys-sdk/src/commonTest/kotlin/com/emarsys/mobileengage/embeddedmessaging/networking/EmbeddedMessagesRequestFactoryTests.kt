@@ -83,18 +83,18 @@ class EmbeddedMessagesRequestFactoryTests {
     }
 
     @Test
-    fun create_should_return_request_for_fetchMessages_withFilterUnreadTrue() = runTest {
+    fun create_should_return_request_for_fetchMessages_withFilterUnopenedTrue() = runTest {
         val result = embeddedMessagesRequestFactory.create(
             SdkEvent.Internal.EmbeddedMessaging.FetchMessages(
                 nackCount = 0,
                 offset = 40,
                 categoryIds = listOf(1, 2),
-                filterUnreadMessages = true
+                filterUnopenedMessages = true
             )
         )
 
         result.method shouldBe HttpMethod.Get
-        result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?%24skip=40&filterCategoryIds=1%2C2&filterUnread=true"
+        result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?%24skip=40&filterCategoryIds=1%2C2&filterUnopened=true"
     }
 
     @Test
@@ -172,38 +172,38 @@ class EmbeddedMessagesRequestFactoryTests {
     }
 
     @Test
-    fun create_should_return_request_for_fetchNextPage_withFilterUnreadTrue() = runTest {
+    fun create_should_return_request_for_fetchNextPage_withFilterUnopenedTrue() = runTest {
         val offset = 20
-        val filterUnreadMessages = true
+        val filterUnopenedMessages = true
         val result = embeddedMessagesRequestFactory.create(
             SdkEvent.Internal.EmbeddedMessaging.FetchNextPage(
                 nackCount = 0,
                 offset = offset,
                 categoryIds = emptyList(),
-                filterUnreadMessages = filterUnreadMessages
+                filterUnopenedMessages = filterUnopenedMessages
             )
         )
 
         result.method shouldBe HttpMethod.Companion.Get
-        result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?%24skip=$offset&filterUnread=$filterUnreadMessages"
+        result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?%24skip=$offset&filterUnopened=$filterUnopenedMessages"
     }
 
     @Test
-    fun create_should_return_request_for_fetchNextPage_withFilterUnreadTrue_and_NotEmptyCategoryIds() =
+    fun create_should_return_request_for_fetchNextPage_withFilterUnopenedTrue_and_NotEmptyCategoryIds() =
         runTest {
             val offset = 20
-            val filterUnreadMessages = true
+            val filterUnopenedMessages = true
             val result = embeddedMessagesRequestFactory.create(
                 SdkEvent.Internal.EmbeddedMessaging.FetchNextPage(
                     nackCount = 0,
                     offset = offset,
                     categoryIds = listOf(1, 2),
-                    filterUnreadMessages = filterUnreadMessages
+                    filterUnopenedMessages = filterUnopenedMessages
                 )
             )
 
             result.method shouldBe HttpMethod.Companion.Get
-            result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?%24skip=$offset&filterCategoryIds=1%2C2&filterUnread=$filterUnreadMessages"
+            result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?%24skip=$offset&filterCategoryIds=1%2C2&filterUnopened=$filterUnopenedMessages"
         }
 
 }

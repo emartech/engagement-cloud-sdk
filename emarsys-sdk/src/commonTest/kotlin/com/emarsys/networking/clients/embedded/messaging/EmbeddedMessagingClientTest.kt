@@ -175,7 +175,7 @@ class EmbeddedMessagingClientTest {
             nackCount = 0,
             offset = 0,
             categoryIds = emptyList(),
-            filterUnreadMessages = false
+            filterUnopenedMessages = false
         )
         val wrongEvent =
             SdkEvent.Internal.Sdk.LinkContact(
