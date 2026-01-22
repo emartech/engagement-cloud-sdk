@@ -11,7 +11,7 @@ interface MessageItemViewModelApi : CustomMessageItemViewModelApi {
     fun shouldNavigate(): Boolean
     suspend fun fetchImage(): ByteArray
     suspend fun handleDefaultAction()
-    suspend fun tagMessageRead(): Result<Unit>
+    suspend fun tagMessageOpened(): Result<Unit>
     suspend fun deleteMessage(): Result<Unit>
     fun copyAsExcludedLocally(): MessageItemViewModelApi
 }
@@ -22,7 +22,7 @@ interface CustomMessageItemViewModelApi {
     val imageUrl: String?
     val imageAltText: String?
     val receivedAt: Long
-    val isUnread: Boolean
+    val isNotOpened: Boolean
     val isPinned: Boolean
     val categories: List<Category>
 }

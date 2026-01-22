@@ -30,8 +30,8 @@ class MessageItemViewModel(
     override val receivedAt: Long
         get() = model.message.receivedAt
 
-    override val isUnread: Boolean
-        get() = model.isUnread()
+    override val isNotOpened: Boolean
+        get() = model.isNotOpened()
 
     override val isPinned: Boolean
         get() = model.isPinned()
@@ -53,8 +53,8 @@ class MessageItemViewModel(
         model.handleDefaultAction()
     }
 
-    override suspend fun tagMessageRead(): Result<Unit> {
-        return model.tagMessageRead()
+    override suspend fun tagMessageOpened(): Result<Unit> {
+        return model.tagMessageOpened()
     }
 
     override suspend fun deleteMessage(): Result<Unit> {

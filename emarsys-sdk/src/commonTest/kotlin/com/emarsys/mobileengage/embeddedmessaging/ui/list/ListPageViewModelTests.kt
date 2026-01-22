@@ -86,7 +86,7 @@ class ListPageViewModelTests {
             pagerFactory = mockPagerFactory,
             connectionWatchDog = mockConnectionWatchDog,
             locallyDeletedMessageIds = deletedMessageIds,
-            locallyReadMessageIds = readMessageIds
+            locallyOpenedMessageIds = readMessageIds
         )
     }
 
@@ -187,35 +187,39 @@ class ListPageViewModelTests {
         }
 
     @Test
-    fun testSelectMessage_shouldUpdateSelectedMessageAndCache_withoutNavigation() = runTest {
-        val mockMessageViewModel = mock<MessageItemViewModelApi>(MockMode.autofill)
-        every { mockMessageViewModel.id } returns TEST_MESSAGE_ID
-        every { mockMessageViewModel.isUnread } returns true
-        every { mockMessageViewModel.shouldNavigate() } returns false
-        everySuspend { mockMessageViewModel.tagMessageRead() } returns Result.success(Unit)
-
-        viewModel.selectedMessage.value shouldBe null
-
-        var navigationCalled = false
-        viewModel.selectMessage(mockMessageViewModel) {
-            navigationCalled = true
-        }
-
-        testDispatcher.scheduler.advanceUntilIdle()
-
-        viewModel.selectedMessage.value shouldBe mockMessageViewModel
-        navigationCalled shouldBe false
-        readMessageIds.value shouldBe setOf(TEST_MESSAGE_ID)
-    }
-
-    @Test
-    fun testSelectMessage_shouldCallNavigationCallback_whenMessageShouldNavigateToDetailView() =
+    fun testSelectMessage_shouldUpdateSelectedMessageAndCache_withoutNavigation_andHandleDefaultAction() =
         runTest {
             val mockMessageViewModel = mock<MessageItemViewModelApi>(MockMode.autofill)
             every { mockMessageViewModel.id } returns TEST_MESSAGE_ID
-            every { mockMessageViewModel.isUnread } returns true
+            every { mockMessageViewModel.isNotOpened } returns true
+            every { mockMessageViewModel.shouldNavigate() } returns false
+            everySuspend { mockMessageViewModel.tagMessageOpened() } returns Result.success(Unit)
+
+            viewModel.selectedMessage.value shouldBe null
+
+            var navigationCalled = false
+            viewModel.selectMessage(mockMessageViewModel) {
+                navigationCalled = true
+            }
+
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            viewModel.selectedMessage.value shouldBe mockMessageViewModel
+            navigationCalled shouldBe false
+            readMessageIds.value shouldBe setOf(TEST_MESSAGE_ID)
+            verifySuspend {
+                mockMessageViewModel.handleDefaultAction()
+            }
+        }
+
+    @Test
+    fun testSelectMessage_shouldCallNavigationCallback_whenMessageShouldNavigateToDetailView_andNotHandleDefaultAction() =
+        runTest {
+            val mockMessageViewModel = mock<MessageItemViewModelApi>(MockMode.autofill)
+            every { mockMessageViewModel.id } returns TEST_MESSAGE_ID
+            every { mockMessageViewModel.isNotOpened } returns true
             every { mockMessageViewModel.shouldNavigate() } returns true
-            everySuspend { mockMessageViewModel.tagMessageRead() } returns Result.success(Unit)
+            everySuspend { mockMessageViewModel.tagMessageOpened() } returns Result.success(Unit)
 
             var navigationCalled = false
             viewModel.selectMessage(mockMessageViewModel) {
@@ -227,21 +231,24 @@ class ListPageViewModelTests {
             viewModel.selectedMessage.value shouldBe mockMessageViewModel
             navigationCalled shouldBe true
             readMessageIds.value shouldBe setOf(TEST_MESSAGE_ID)
+            verifySuspend(VerifyMode.exactly(0)) {
+                mockMessageViewModel.handleDefaultAction()
+            }
         }
 
     @Test
-    fun testSelectMessage_shouldCall_tagMessageRead_ifTheMessage_isUnread_andNotInLocallyRead() =
+    fun testSelectMessage_shouldCall_tagMessageRead_ifTheMessage_isNotOpened_andNotInLocallyOpened() =
         runTest {
             val mockMessageViewModel = mock<MessageItemViewModelApi>(MockMode.autofill)
             every { mockMessageViewModel.id } returns TEST_MESSAGE_ID
-            every { mockMessageViewModel.isUnread } returns true
-            everySuspend { mockMessageViewModel.tagMessageRead() } returns Result.success(Unit)
+            every { mockMessageViewModel.isNotOpened } returns true
+            everySuspend { mockMessageViewModel.tagMessageOpened() } returns Result.success(Unit)
 
             viewModel.selectMessage(mockMessageViewModel) {}
 
             testDispatcher.scheduler.advanceUntilIdle()
 
-            verifySuspend { mockMessageViewModel.tagMessageRead() }
+            verifySuspend { mockMessageViewModel.tagMessageOpened() }
         }
 
     @Test
@@ -249,22 +256,22 @@ class ListPageViewModelTests {
         runTest {
             val mockMessageViewModel = mock<MessageItemViewModelApi>(MockMode.autofill)
             every { mockMessageViewModel.id } returns TEST_MESSAGE_ID
-            every { mockMessageViewModel.isUnread } returns false
-            everySuspend { mockMessageViewModel.tagMessageRead() } returns Result.success(Unit)
+            every { mockMessageViewModel.isNotOpened } returns false
+            everySuspend { mockMessageViewModel.tagMessageOpened() } returns Result.success(Unit)
 
             viewModel.selectMessage(mockMessageViewModel) {}
             testDispatcher.scheduler.advanceUntilIdle()
 
-            verifySuspend(VerifyMode.exactly(0)) { mockMessageViewModel.tagMessageRead() }
+            verifySuspend(VerifyMode.exactly(0)) { mockMessageViewModel.tagMessageOpened() }
         }
 
     @Test
-    fun testSelectMessage_shouldNotCall_tagMessageRead_ifTheMessage_isUnread_butIncludedInLocallyRead() =
+    fun testSelectMessage_shouldNotCall_tagMessageRead_ifTheMessage_isNotOpened_butIncludedInLocallyOpened() =
         runTest {
             val mockMessageViewModel = mock<MessageItemViewModelApi>(MockMode.autofill)
             every { mockMessageViewModel.id } returns TEST_MESSAGE_ID
-            every { mockMessageViewModel.isUnread } returns true
-            everySuspend { mockMessageViewModel.tagMessageRead() } returns Result.success(Unit)
+            every { mockMessageViewModel.isNotOpened } returns true
+            everySuspend { mockMessageViewModel.tagMessageOpened() } returns Result.success(Unit)
 
             viewModel.selectMessage(mockMessageViewModel) {}
             testDispatcher.scheduler.advanceUntilIdle()
@@ -274,7 +281,7 @@ class ListPageViewModelTests {
             viewModel.selectMessage(mockMessageViewModel) {}
             testDispatcher.scheduler.advanceUntilIdle()
 
-            verifySuspend(VerifyMode.exactly(1)) { mockMessageViewModel.tagMessageRead() }
+            verifySuspend(VerifyMode.exactly(1)) { mockMessageViewModel.tagMessageOpened() }
         }
 
     @Test
@@ -459,22 +466,23 @@ class ListPageViewModelTests {
     }
 
     @Test
-    fun testHideFilterRowForDetailedView_shouldUpdate_ShouldHideFilterRowForDetailedViewState_ToTheProperValue() = runTest {
-        forAll(
-            table(
-                headers( "expectedBoolean"),
-                listOf(
-                    row(true),
-                    row(false)
+    fun testHideFilterRowForDetailedView_shouldUpdate_ShouldHideFilterRowForDetailedViewState_ToTheProperValue() =
+        runTest {
+            forAll(
+                table(
+                    headers("expectedBoolean"),
+                    listOf(
+                        row(true),
+                        row(false)
+                    )
                 )
-            )
-        ) { expectedBoolean ->
-            viewModel.shouldHideFilterRowForDetailedView.value shouldBe !expectedBoolean
+            ) { expectedBoolean ->
+                viewModel.shouldHideFilterRowForDetailedView.value shouldBe !expectedBoolean
 
-            viewModel.hideFilterRowForDetailedView(expectedBoolean)
+                viewModel.hideFilterRowForDetailedView(expectedBoolean)
 
-            viewModel.shouldHideFilterRowForDetailedView.value shouldBe expectedBoolean
+                viewModel.shouldHideFilterRowForDetailedView.value shouldBe expectedBoolean
+            }
         }
-    }
 }
 

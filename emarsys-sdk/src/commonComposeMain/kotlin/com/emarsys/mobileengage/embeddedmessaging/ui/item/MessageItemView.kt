@@ -96,12 +96,12 @@ fun MessageItemView(
                     Text(
                         text = viewModel.title,
                         style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = if (viewModel.isUnread) FontWeight.Bold else FontWeight.Normal
+                        fontWeight = if (viewModel.isNotOpened) FontWeight.Bold else FontWeight.Normal
                     )
                     Text(
                         text = viewModel.lead,
                         style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = if (viewModel.isUnread) FontWeight.Bold else FontWeight.Normal,
+                        fontWeight = if (viewModel.isNotOpened) FontWeight.Bold else FontWeight.Normal,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )

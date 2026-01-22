@@ -28,7 +28,7 @@ internal class ListPageViewModel(
     private val pagerFactory: PagerFactoryApi,
     connectionWatchDog: ConnectionWatchDog,
     private val locallyDeletedMessageIds: MutableStateFlow<Set<String>>,
-    private val locallyReadMessageIds: MutableStateFlow<Set<String>>
+    private val locallyOpenedMessageIds: MutableStateFlow<Set<String>>
 ) : ListPageViewModelApi {
     private val _categories = MutableStateFlow<List<MessageCategory>>(emptyList())
     override val categories: StateFlow<List<MessageCategory>> = _categories.asStateFlow()
@@ -43,8 +43,10 @@ internal class ListPageViewModel(
             unreadOnly || categoryIds.isNotEmpty()
         }.stateIn(coroutineScope, SharingStarted.Eagerly, false)
 
-    private val _selectedMessage: MutableStateFlow<MessageItemViewModelApi?> = MutableStateFlow(null)
-    override val selectedMessage: StateFlow<MessageItemViewModelApi?> = _selectedMessage.asStateFlow()
+    private val _selectedMessage: MutableStateFlow<MessageItemViewModelApi?> =
+        MutableStateFlow(null)
+    override val selectedMessage: StateFlow<MessageItemViewModelApi?> =
+        _selectedMessage.asStateFlow()
 
     private val _showCategorySelector = MutableStateFlow(false)
     override val showCategorySelector: StateFlow<Boolean> = _showCategorySelector.asStateFlow()
@@ -55,7 +57,8 @@ internal class ListPageViewModel(
 
     private val _shouldHideFilterRowForDetailedView = MutableStateFlow(false)
 
-    override val shouldHideFilterRowForDetailedView: StateFlow<Boolean> = _shouldHideFilterRowForDetailedView.asStateFlow()
+    override val shouldHideFilterRowForDetailedView: StateFlow<Boolean> =
+        _shouldHideFilterRowForDetailedView.asStateFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _messagePagingDataFlowFromApi =
@@ -77,7 +80,7 @@ internal class ListPageViewModel(
             }
             .map { pagingData ->
                 pagingData.map {
-                    if ((!it.isExcludedLocally && filterUnreadOnly.value && locallyReadMessageIds.value.contains(
+                    if ((!it.isExcludedLocally && filterUnreadOnly.value && locallyOpenedMessageIds.value.contains(
                             it.id
                         )) || it.isDeleted
                     ) {
@@ -118,19 +121,20 @@ internal class ListPageViewModel(
     ) {
         _selectedMessage.value = messageViewModel
 
-        if(!locallyReadMessageIds.value.contains(messageViewModel.id) && messageViewModel.isUnread) {
-            messageViewModel.tagMessageRead()
+        if (!locallyOpenedMessageIds.value.contains(messageViewModel.id) && messageViewModel.isNotOpened) {
+            messageViewModel.tagMessageOpened()
                 .onSuccess {
-                    val newReadIdSet = mutableSetOf(messageViewModel.id)
-                    newReadIdSet.addAll(locallyReadMessageIds.value)
-                    locallyReadMessageIds.value = newReadIdSet
+                    val newOpenedIdSet = mutableSetOf(messageViewModel.id)
+                    newOpenedIdSet.addAll(locallyOpenedMessageIds.value)
+                    locallyOpenedMessageIds.value = newOpenedIdSet
                 }
         }
 
         if (messageViewModel.shouldNavigate()) {
             onNavigate.invoke()
+        } else {
+            messageViewModel.handleDefaultAction()
         }
-        messageViewModel.handleDefaultAction()
     }
 
     override suspend fun deleteMessage(

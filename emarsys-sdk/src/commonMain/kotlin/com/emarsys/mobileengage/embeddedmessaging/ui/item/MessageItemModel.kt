@@ -25,6 +25,7 @@ internal class MessageItemModel(
 
     private companion object {
         const val READ_TAG = "read"
+        const val OPENED_TAG = "opened"
         const val PINNED_TAG = "pinned"
         const val DELETED_TAG = "deleted"
     }
@@ -35,8 +36,8 @@ internal class MessageItemModel(
         } ?: getDecodedFallbackImage()
     }
 
-    override suspend fun tagMessageRead(): Result<Unit> {
-        return updateTagsForMessage(READ_TAG, TagOperation.Add)
+    override suspend fun tagMessageOpened(): Result<Unit> {
+        return updateTagsForMessage(OPENED_TAG, TagOperation.Add)
     }
 
     override suspend fun deleteMessage(): Result<Unit> {
@@ -80,8 +81,8 @@ internal class MessageItemModel(
         }
     }
 
-    override fun isUnread(): Boolean {
-        return message.tags.map { it.lowercase() }.contains(READ_TAG).not()
+    override fun isNotOpened(): Boolean {
+        return message.tags.map { it.lowercase() }.contains(OPENED_TAG).not()
     }
 
     override fun isDeleted(): Boolean {

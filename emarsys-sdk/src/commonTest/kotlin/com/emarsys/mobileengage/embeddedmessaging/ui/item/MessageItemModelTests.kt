@@ -143,7 +143,7 @@ class MessageItemModelTests {
                 headers("expectedTag", "testMethod"),
                 listOf(
                     row("deleted", messageItemModel::deleteMessage),
-                    row("read", messageItemModel::tagMessageRead),
+                    row("opened", messageItemModel::tagMessageOpened),
                 )
             )
         ) { expectedTag, testMethod ->
@@ -185,7 +185,7 @@ class MessageItemModelTests {
                 headers("testMethod"),
                 listOf(
                     row(messageItemModel::deleteMessage),
-                    row(messageItemModel::tagMessageRead),
+                    row(messageItemModel::tagMessageOpened),
                 )
             )
         ) { testMethod ->
@@ -205,24 +205,24 @@ class MessageItemModelTests {
     }
 
     @Test
-    fun isUnread_shouldReturnFalse_whenTagsContainingRead() = runTest {
-        val model = createMessageItemModel(TEST_MESSAGE.copy(tags = listOf("read")))
+    fun isNotOpened_shouldReturnFalse_whenTagsContainingOpened() = runTest {
+        val model = createMessageItemModel(TEST_MESSAGE.copy(tags = listOf("opened")))
 
-        model.isUnread() shouldBe false
+        model.isNotOpened() shouldBe false
     }
 
     @Test
-    fun isUnread_shouldReturnTrue_whenTagsDontContainRead() = runTest {
-        val model = createMessageItemModel(TEST_MESSAGE.copy(tags = listOf("unread")))
+    fun isNotOpened_shouldReturnTrue_whenTagsDontContainOpened() = runTest {
+        val model = createMessageItemModel(TEST_MESSAGE.copy(tags = listOf("custom")))
 
-        model.isUnread() shouldBe true
+        model.isNotOpened() shouldBe true
     }
 
     @Test
-    fun isUnread_shouldReturnFalse_whenTagsContainsRead_caseInsensitively() = runTest {
-        val model = createMessageItemModel(TEST_MESSAGE.copy(tags = listOf("Read")))
+    fun isNotOpened_shouldReturnFalse_whenTagsContainsOpened_caseInsensitively() = runTest {
+        val model = createMessageItemModel(TEST_MESSAGE.copy(tags = listOf("Opened")))
 
-        model.isUnread() shouldBe false
+        model.isNotOpened() shouldBe false
     }
 
     @Test

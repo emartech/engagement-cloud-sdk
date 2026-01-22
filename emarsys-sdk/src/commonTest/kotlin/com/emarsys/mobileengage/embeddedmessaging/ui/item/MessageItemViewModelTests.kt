@@ -101,10 +101,10 @@ class MessageItemViewModelTests {
     }
 
     @Test
-    fun isUnread_shouldReturn_ModelIsUnread() {
-        every { mockMessageItemModel.isUnread() } returns true
+    fun isNotOpened_shouldReturn_ModelIsNotOpened() {
+        every { mockMessageItemModel.isNotOpened() } returns true
 
-        viewModel.isUnread shouldBe true
+        viewModel.isNotOpened shouldBe true
     }
 
     @Test
@@ -151,13 +151,13 @@ class MessageItemViewModelTests {
     }
 
     @Test
-    fun tagMessageRead_shouldCall_ModelTagMessageRead() = runTest {
-        everySuspend { mockMessageItemModel.tagMessageRead() } returns Result.success(Unit)
+    fun tagMessageRead_shouldCall_ModelTagMessageOpened() = runTest {
+        everySuspend { mockMessageItemModel.tagMessageOpened() } returns Result.success(Unit)
 
-        val result = viewModel.tagMessageRead()
+        val result = viewModel.tagMessageOpened()
 
         result.isSuccess shouldBe true
-        verifySuspend { mockMessageItemModel.tagMessageRead() }
+        verifySuspend { mockMessageItemModel.tagMessageOpened() }
     }
 
     @Test

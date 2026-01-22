@@ -67,7 +67,7 @@ object EmbeddedMessagingInjection {
                 pagerFactory = get(),
                 connectionWatchDog = get<ConnectionWatchDog>(),
                 locallyDeletedMessageIds = MutableStateFlow(emptySet()),
-                locallyReadMessageIds = MutableStateFlow(emptySet())
+                locallyOpenedMessageIds = MutableStateFlow(emptySet())
             )
         }
     }
