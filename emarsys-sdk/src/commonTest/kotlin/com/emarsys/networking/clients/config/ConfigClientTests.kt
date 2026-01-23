@@ -1,5 +1,6 @@
 package com.emarsys.networking.clients.config
 
+import com.emarsys.api.SdkState
 import com.emarsys.config.SdkConfig
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.SdkEventManagerApi
@@ -13,6 +14,7 @@ import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
+import com.emarsys.mobileengage.config.FollowUpChangeAppCodeOrganizerApi
 import com.emarsys.networking.clients.contact.ContactTokenHandlerApi
 import com.emarsys.networking.clients.error.ClientExceptionHandler
 import dev.mokkery.MockMode
@@ -26,7 +28,6 @@ import dev.mokkery.mock
 import dev.mokkery.resetAnswers
 import dev.mokkery.resetCalls
 import dev.mokkery.spy
-import dev.mokkery.verify
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
@@ -66,6 +67,7 @@ class ConfigClientTests {
     private lateinit var mockClientExceptionHandler: ClientExceptionHandler
     private lateinit var onlineEvents: MutableSharedFlow<OnlineSdkEvent>
     private lateinit var mockSdkEventManager: SdkEventManagerApi
+    private lateinit var mockFollowUpChangeAppCodeOrganizer: FollowUpChangeAppCodeOrganizerApi
     private lateinit var configClient: ConfigClient
 
     @BeforeTest
@@ -73,14 +75,15 @@ class ConfigClientTests {
         Dispatchers.setMain(StandardTestDispatcher())
         mockEmarsysClient = mock()
         mockUrlFactory = mock()
-        mockContactTokenHandler = mock()
-        mockSdkContext = mock()
+        mockContactTokenHandler = mock(MockMode.autofill)
+        mockSdkContext = mock(MockMode.autofill)
         mockSdkLogger = mock(MockMode.autofill)
         mockConfig = mock()
         mockClientExceptionHandler = mock(MockMode.autofill)
         mockEventsDao = mock()
         onlineEvents = spy(MutableSharedFlow())
         mockSdkEventManager = mock()
+        mockFollowUpChangeAppCodeOrganizer = mock(MockMode.autofill)
         every { mockSdkEventManager.onlineSdkEvents } returns onlineEvents
 
         everySuspend { mockContactTokenHandler.handleContactTokens(any()) } returns Unit
@@ -105,6 +108,7 @@ class ConfigClientTests {
             mockSdkEventManager,
             mockSdkContext,
             mockContactTokenHandler,
+            mockFollowUpChangeAppCodeOrganizer,
             mockEventsDao,
             mockSdkLogger,
             applicationScope,
@@ -135,11 +139,18 @@ class ConfigClientTests {
         advanceUntilIdle()
 
         onlineSdkEvents.await() shouldBe listOf(changeAppCode)
-        verifySuspend { mockEmarsysClient.send(any()) }
-        verify { mockConfig.copyWith(applicationCode = "NewAppCode") }
-        verify { mockSdkContext.config = mockConfig }
+
+        verifySuspend(VerifyMode.order) {
+            mockEmarsysClient.send(any())
+            mockSdkContext.setSdkState(SdkState.OnHold)
+            mockContactTokenHandler.handleContactTokens(any())
+            mockConfig.copyWith(applicationCode = "NewAppCode")
+            mockSdkContext.config = mockConfig
+            mockFollowUpChangeAppCodeOrganizer.organize()
+            mockSdkContext.setSdkState(SdkState.Active)
+            mockEventsDao.removeEvent(changeAppCode)
+        }
         verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
-        verifySuspend { mockEventsDao.removeEvent(changeAppCode) }
     }
 
     @Test

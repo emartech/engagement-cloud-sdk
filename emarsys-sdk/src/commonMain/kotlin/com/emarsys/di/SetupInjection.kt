@@ -19,6 +19,8 @@ import com.emarsys.enable.states.FetchEmbeddedMessagingMetaState
 import com.emarsys.enable.states.RegisterClientState
 import com.emarsys.enable.states.RegisterPushTokenState
 import com.emarsys.enable.states.RestoreSavedSdkEventsState
+import com.emarsys.mobileengage.config.FollowUpChangeAppCodeOrganizer
+import com.emarsys.mobileengage.config.FollowUpChangeAppCodeOrganizerApi
 import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.reregistration.ReregistrationClient
 import com.emarsys.reregistration.states.ClearRequestContextTokensState
@@ -130,6 +132,14 @@ object SetupInjection {
                 )
             )
         }
+        single<StateMachineApi>(named(StateMachineTypes.FollowUpChangeAppCodeStateMachine)) {
+            StateMachine(
+                states = listOf(
+                    get<State>(named(StateTypes.ApplyAppCodeBasedRemoteConfig)),
+                    get<State>(named(StateTypes.FetchEmbeddedMessagingMetaState))
+                )
+            )
+        }
         single<StateMachineApi>(named(StateMachineTypes.MobileEngageDisable)) {
             StateMachine(
                 states = listOf(
@@ -153,10 +163,16 @@ object SetupInjection {
                 mobileEngageDisableStateMachine = get(named(StateMachineTypes.MobileEngageDisable)),
                 sdkContext = get(),
                 emarsysSdkSession = get(),
-                sdkLogger = get { parametersOf(EnableOrganizer::class.simpleName) },
+                sdkLogger = get { parametersOf(DisableOrganizer::class.simpleName) },
             )
         }
-
+        single<FollowUpChangeAppCodeOrganizerApi> {
+            FollowUpChangeAppCodeOrganizer(
+                followUpChangeAppCodeStateMachine = get(named(StateMachineTypes.FollowUpChangeAppCodeStateMachine)),
+                sdkContext = get(),
+                logger = get { parametersOf(FollowUpChangeAppCodeOrganizer::class.simpleName) }
+            )
+        }
         single<EventBasedClientApi>(named(EventBasedClientTypes.Reregistration)) {
             ReregistrationClient(
                 sdkEventManager = get(),
@@ -169,7 +185,7 @@ object SetupInjection {
 }
 
 enum class StateMachineTypes {
-    MobileEngageEnable, MobileEngageDisable, Init, MobileEngageReregistration
+    MobileEngageEnable, MobileEngageDisable, Init, MobileEngageReregistration, FollowUpChangeAppCodeStateMachine
 }
 
 enum class StateTypes {

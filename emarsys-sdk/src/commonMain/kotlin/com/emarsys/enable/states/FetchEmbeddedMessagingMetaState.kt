@@ -35,6 +35,7 @@ internal class FetchEmbeddedMessagingMetaState(
                     Result.success(Unit)
                 },
                 onFailure = {
+                    embeddedMessagingContext.metaData = null
                     sdkLogger.error("Error happened while fetching Embedded Messaging Meta data", it)
                     Result.failure(it)
                 }

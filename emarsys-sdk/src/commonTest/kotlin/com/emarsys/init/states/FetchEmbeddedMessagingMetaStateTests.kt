@@ -190,6 +190,7 @@ class FetchEmbeddedMessagingMetaStateTests {
         val result = state.active()
 
         result shouldBe Result.failure(exception)
+        verifySuspend { mockEmbeddedMessagingContext.metaData = null }
         verifySuspend { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMeta>()) }
         verifySuspend(VerifyMode.exactly(0)) { mockEmbeddedMessagingContext.metaData = any() }
     }

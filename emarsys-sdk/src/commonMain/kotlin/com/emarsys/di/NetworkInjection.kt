@@ -115,6 +115,7 @@ object NetworkInjection {
                 sdkEventManager = get(),
                 sdkContext = get(),
                 contactTokenHandler = get(),
+                followUpChangeAppCodeOrganizer = get(),
                 eventsDao = get(),
                 sdkLogger = get { parametersOf(ConfigClient::class.simpleName) },
                 applicationScope = get(named(CoroutineScopeTypes.Application)),
