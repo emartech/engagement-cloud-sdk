@@ -29,6 +29,12 @@ internal class InAppEventConsumer(
             .filter { it is SdkEvent.Internal.InApp.Present }
             .collect {
                 val presentEvent = it as SdkEvent.Internal.InApp.Present
+                val messageType = presentEvent.inAppMessage.type
+                
+                if (messageType == InAppType.INLINE || messageType.name == "INLINE") {
+                    return@collect
+                }
+                
                 val view = inAppViewProvider.provide()
                 val webViewHolder = view.load(presentEvent.inAppMessage)
                 inAppPresenter.present(view, webViewHolder, Overlay)

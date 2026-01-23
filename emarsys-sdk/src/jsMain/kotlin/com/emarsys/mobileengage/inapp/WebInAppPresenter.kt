@@ -55,9 +55,14 @@ internal class WebInAppPresenter(
         mode: InAppPresentationMode,
         animation: InAppPresentationAnimation?
     ) {
+        val inAppMessage = view.inAppMessage
+        if (inAppMessage.type == InAppType.INLINE || inAppMessage.type.name == "INLINE") {
+            return
+        }
+
         val inappView = (webViewHolder as WebWebViewHolder).webView
         val styledInappView = inappView.let {
-            if (mode == InAppPresentationMode.Overlay) {
+            if (mode is InAppPresentationMode.Overlay) {
                 applyOverlayStyle(inappView)
             } else {
                 applyRibbonStyle(inappView)
@@ -74,7 +79,6 @@ internal class WebInAppPresenter(
     private fun applyOverlayStyle(viewContainer: HTMLElement): HTMLElement {
         return viewContainer.apply {
             this.style.position = "fixed"
-            this.style.display = "true"
             this.style.width = "100%"
             this.style.height = "100%"
             this.style.top = "0"
@@ -90,7 +94,6 @@ internal class WebInAppPresenter(
     private fun applyRibbonStyle(viewContainer: HTMLElement): HTMLElement {
         return viewContainer.apply {
             this.style.position = "fixed"
-            this.style.display = "true"
             this.style.width = "100%"
             this.style.height = "20%"
             this.style.top = "0"

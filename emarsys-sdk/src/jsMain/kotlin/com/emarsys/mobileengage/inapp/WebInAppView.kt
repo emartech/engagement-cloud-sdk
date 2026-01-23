@@ -4,7 +4,6 @@ import com.emarsys.core.factory.Factory
 import com.emarsys.core.providers.InstantProvider
 import web.dom.document
 import web.html.HTMLElement
-import web.html.HtmlSource
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
@@ -39,7 +38,8 @@ internal class WebInAppView(
         )
         jsBridge.register()
         val view = document.createElement("div")
-        view.innerHTML = HtmlSource(message.content)
+        val shadowRoot = view.asDynamic().attachShadow(js("({mode: 'open'})"))
+        shadowRoot.innerHTML = message.content
 
         val scriptContents = inappScriptExtractor.extract(view)
         createScriptElements(scriptContents).forEach { scriptElement ->

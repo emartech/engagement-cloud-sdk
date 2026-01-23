@@ -8,7 +8,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingStyleSheet
+import com.emarsys.mobileengage.inapp.InlineInAppView
+import io.ktor.http.Url
 import kotlinx.browser.window
+import org.jetbrains.compose.web.css.height
+import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.H2
@@ -55,6 +59,13 @@ fun MessageDetailView(
             H2 {
                 Text(viewModel.title)
             }
+            Div({
+                style {
+                    height(500.px)
+                }
+            }) {
+                InlineInAppView(Url("https://www.example.com"))
+            }
             imageDataUrl?.let { url ->
                 Img(src = url, alt = viewModel.imageAltText ?: "") {
                     classes(EmbeddedMessagingStyleSheet.detailImage)
@@ -62,6 +73,13 @@ fun MessageDetailView(
             }
             P {
                 Text(viewModel.lead)
+                Div({
+                    style {
+                        height(500.px)
+                    }
+                }) {
+                    InlineInAppView(Url("https://www.example.com"))
+                }
             }
         }
     }

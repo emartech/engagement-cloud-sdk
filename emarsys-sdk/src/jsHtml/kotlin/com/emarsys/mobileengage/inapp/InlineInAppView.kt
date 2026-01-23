@@ -29,10 +29,10 @@ actual fun InlineInAppView(message: InAppMessage) {
     LaunchedEffect(message) {
         val inAppViewProvider: InAppViewProviderApi = koin.get()
         val sdkEventDistributor: SdkEventDistributorApi = koin.get()
-        
+
         val inAppView = inAppViewProvider.provide()
         val holder = inAppView.load(message)
-        
+
         val webElement = holder.asDynamic().webView as? HTMLElement
         webViewElement.value = webElement
         
@@ -40,34 +40,38 @@ actual fun InlineInAppView(message: InAppMessage) {
             sdkEventDistributor.sdkEventFlow.first { sdkEvent ->
                 sdkEvent is SdkEvent.Internal.Sdk.Dismiss && sdkEvent.id == message.dismissId
             }
-            
             webViewElement.value = null
         }
     }
     
-    Div(attrs = {
-        style {
-            width(100.percent)
-            height(100.percent)
-        }
-        ref { element ->
-            webViewElement.value?.let { webView ->
-                element.appendChild(webView.unsafeCast<Node>())
+    webViewElement.value?.let { webView ->
+        Div(attrs = {
+            style {
+                width(100.percent)
+                height(100.percent)
             }
-            onDispose { }
-        }
-    })
+            ref { element ->
+                element.appendChild(webView.unsafeCast<Node>())
+                onDispose { }
+            }
+        })
+    }
 }
 
 @Composable
 internal fun InlineInAppView(url: Url) {
+    val emarsysClient: NetworkClientApi = koin.get(named(NetworkClientTypes.Emarsys))
     val message = remember { mutableStateOf<InAppMessage?>(null) }
 
     LaunchedEffect(url) {
-        val emarsysClient: NetworkClientApi = koin.get(named(NetworkClientTypes.Emarsys))
         val response = emarsysClient.send(UrlRequest(url, HttpMethod.Get))
+
         response.getOrNull()?.let {
-            message.value = InAppMessage(type = InAppType.INLINE, trackingInfo = "inlineInAppTrackingInfo", content = it.bodyAsText)
+            message.value = InAppMessage(
+                type = InAppType.INLINE,
+                trackingInfo = "inlineInAppTrackingInfo",
+                content = it.bodyAsText
+            )
         }
     }
 
