@@ -398,8 +398,6 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         cursor(DEFAULT_CURSOR)
 
         self + hover style {
-            backgroundColor(CssColorVars.colorSurfaceDim.value())
-
             child(
                 className("EmbeddedMessagingStyleSheet-messageItemMisc"),
                 className("EmbeddedMessagingStyleSheet-deleteMessageIcon")
@@ -408,6 +406,12 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
                 property("pointer-events", "auto")
                 property("transform", "scale(1)")
             }
+        }
+    }
+
+    val messageItemHover by style {
+        self + hover style {
+            backgroundColor(CssColorVars.colorSurfaceDim.value())
         }
     }
 
@@ -450,6 +454,10 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         marginBottom(DEFAULT_MARGIN)
         fontSize(CssFontVars.fontSizeBodyLarge)
         color(CssColorVars.colorOnSurface.value())
+    }
+
+    val unopened by style {
+        fontWeight("bold")
     }
 
     val messageItemLead by style {

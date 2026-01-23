@@ -3,6 +3,11 @@
     <title>Emarsys SDK demo</title>
     <!--    <script src="emarsys-sdk-html.js"></script>-->
     <script src="emarsys-sdk-loader.js"></script>
+    <style>
+        .selected {
+            background-color:red;
+        }
+    </style>
 </head>
 <body>
 <div style="display: flex; gap:1rem; flex-wrap:no-wrap">
@@ -39,7 +44,7 @@
         </div>
         <div class="detail-view-display">
             <p>Detail view</p>
-            <ec-embedded-messaging-list></ec-embedded-messaging-list>
+            <ec-embedded-messaging-list custom-message-item-element-name="custom-message-item"></ec-embedded-messaging-list>
         </div>
     </div>
 </div>
@@ -97,10 +102,10 @@
                 console.log("Navigating to somewhere.");
             });
     });
-
+    
     class MyCustomMessageItem extends HTMLElement {
         static get observedAttributes() {
-            return ["image", "title", "lead"]
+            return ["image", "title", "lead","image-alt-text", "is-not-opened", "is-selected", "is-pinned", "categories"]
         }
 
         constructor() {
@@ -113,15 +118,34 @@
         }
 
         attributeChangedCallback(name, oldValue, newValue) {
+            if (name === "is-selected") {
+                this.updateSelected()
+            }
             if (oldValue !== newValue) {
                 this.render();
             }
         }
 
+        updateSelected() {
+            const isSelected =
+                this.hasAttribute("is-selected") &&
+                this.getAttribute("is-selected") !== "false";
+
+            this.classList.toggle("selected", isSelected);
+        }
+
         render() {
-            const image = this.getAttribute("image") ?? "";
             const title = this.getAttribute("title") ?? "";
             const lead = this.getAttribute("lead") ?? "";
+            const image = this.getAttribute("image") ?? "";
+            const imageAltText = this.getAttribute("image-alt-text") ?? "";
+            const receivedAt = this.getAttribute("received-at") ?? "";
+            const isSelected = this.getAttribute("is-selected") ?? false;
+            const isNotOpened = this.getAttribute("is-not-opened") ?? false;
+            const isPinned = this.getAttribute("is-pinned") ?? false;
+            const isDeleted = this.getAttribute("is-deleted") ?? false;
+            const categoriesAttr = this.getAttribute("categories") ?? "[]";
+            const categories = JSON.parse(categoriesAttr);
 
             this.shadowRoot.innerHTML = `
     <style>
@@ -142,18 +166,46 @@
         margin: 0;
         color: #555;
       }
+      ul {
+        list-style-type: none;
+      }
+      .categories-container {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+        gap: 4px;
+      }
+      .category-chip {
+       align-content: space-evenly;
+       border-radius: 16px;
+       padding: 12px;
+       background-color: #9cc7f1;
+       border: 1px solid #007f6a;
+      }
     </style>
 
     <div class="card">
       ${image ? `<img src="${image}" alt="">` : ""}
       <h3>${title}</h3>
       <p>${lead}</p>
+      <ul>
+        <li>ImageAltText: ${imageAltText}</li>
+        <li>ReceivedAt: ${receivedAt}</li>
+        <li>IsSelected: ${isSelected}</li>
+        <li>IsNotOpened: ${isNotOpened}</li>
+        <li>IsPinned: ${isPinned}</li>
+        <li>IsDeleted: ${isDeleted}</li>
+        <li>Categories: ${categoriesAttr}</li>
+      </ul>
+     <div class="categories-container">
+        ${categories.map((category) => `<div class="category-chip">${category.text}</div>`).join('')}
+      </div>
     </div>
   `;
         }
     }
 
-    global.customElements.define("custom-message-item", MyCustomMessageItem)
+    window.customElements.define("custom-message-item", MyCustomMessageItem)
 </script>
 <style>
     body {
@@ -185,7 +237,7 @@
 
     .detail-view-display {
         flex: 5;
-        height: 40vh;
+        height: 600px;
     }
 </style>
 </html>

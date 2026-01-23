@@ -6,13 +6,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.SvgIcon
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingStyleSheet
 import com.emarsys.mobileengage.embeddedmessaging.util.asFormattedTimestamp
+import com.emarsys.util.JsonUtil
 import kotlinx.browser.window
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.display
-import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.width
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Img
@@ -44,8 +45,12 @@ fun MessageItemView(
         } ?: false
 
     val classes = mutableListOf(EmbeddedMessagingStyleSheet.messageItem).apply {
-        if (selectedMessageId === viewModel.id) {
-            this.add(EmbeddedMessagingStyleSheet.messageItemSelected)
+        if (!hasCustomElementDefined) {
+            this.add(EmbeddedMessagingStyleSheet.messageItemHover)
+
+            if (selectedMessageId === viewModel.id) {
+                this.add(EmbeddedMessagingStyleSheet.messageItemSelected)
+            }
         }
     }
 
@@ -71,11 +76,18 @@ fun MessageItemView(
             TagElement<HTMLElement>(customMessageItemName, applyAttrs = {
                 style {
                     display(DisplayStyle.Block)
-                    width(100.percent)
+                    width(EmbeddedMessagingUiConstants.MAX_WIDTH)
                 }
                 attr("title", viewModel.title)
                 attr("lead", viewModel.lead)
                 viewModel.imageUrl?.let { attr("image", it) }
+                viewModel.imageAltText?.let { attr("image-alt-text", it) }
+                attr("is-selected", (selectedMessageId === viewModel.id).toString())
+                attr("received-at", viewModel.receivedAt.asFormattedTimestamp())
+                attr("is-not-opened", viewModel.isNotOpened.toString())
+                attr("is-pinned", viewModel.isPinned.toString())
+                attr("is-deleted", viewModel.isDeleted.toString())
+                attr("categories", JsonUtil.json.encodeToString(viewModel.categories))
             }) {}
         } else {
             MessageItemCore(viewModel, imageDataUrl)
@@ -97,6 +109,16 @@ fun MessageItemView(
 
 @Composable
 private fun MessageItemCore(viewModel: MessageItemViewModelApi, imageDataUrl: String?) {
+    val titleClasses = mutableListOf(EmbeddedMessagingStyleSheet.messageItemTitle).apply {
+        if (viewModel.isNotOpened) {
+            this.add(EmbeddedMessagingStyleSheet.unopened)
+        }
+    }
+    val leadClasses = mutableListOf(EmbeddedMessagingStyleSheet.messageItemLead).apply {
+        if (viewModel.isNotOpened) {
+            this.add(EmbeddedMessagingStyleSheet.unopened)
+        }
+    }
     val hasThumbnailImage = viewModel.imageUrl != null
     if (hasThumbnailImage) {
         imageDataUrl?.let { url ->
@@ -117,12 +139,12 @@ private fun MessageItemCore(viewModel: MessageItemViewModelApi, imageDataUrl: St
         )
     }) {
         Span({
-            classes(EmbeddedMessagingStyleSheet.messageItemTitle)
+            classes(titleClasses)
         }) {
             Text(viewModel.title)
         }
         Span({
-            classes(EmbeddedMessagingStyleSheet.messageItemLead)
+            classes(leadClasses)
         }) {
             Text(viewModel.lead)
         }
