@@ -62,7 +62,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ListPageView(
     showFilters: Boolean = true,
-    customMessageItem: ((message: CustomMessageItemViewModelApi, isSelected: Boolean) -> Composable)?
+    customMessageItem: ((message: CustomMessageItemViewModelApi, isSelected: Boolean) -> Composable)? = null
 ) {
     EmbeddedMessagingTheme {
         InternalListPageView(showFilters, customMessageItem = customMessageItem)
