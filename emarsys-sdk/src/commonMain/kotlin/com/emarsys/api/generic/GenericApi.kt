@@ -45,7 +45,7 @@ internal open class GenericApi<Logging : Activatable, Gatherer : Activatable, In
             when (state) {
                 SdkState.Active -> internalApi
                 SdkState.OnHold -> gathererApi
-                SdkState.Inactive -> loggingApi
+                SdkState.UnInitialized -> loggingApi
                 SdkState.Initialized -> loggingApi
             }
         )

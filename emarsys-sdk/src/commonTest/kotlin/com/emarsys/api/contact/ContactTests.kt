@@ -90,14 +90,14 @@ class ContactTests : KoinTest {
     }
 
     @Test
-    fun testlink_inactiveState() = runTest {
+    fun testLink_unInitializedState() = runTest {
         everySuspend {
             mockLoggingContact.link(
                 CONTACT_FIELD_VALUE
             )
         } returns Unit
 
-        sdkContext.setSdkState(SdkState.Inactive)
+        sdkContext.setSdkState(SdkState.UnInitialized)
         contact.link(CONTACT_FIELD_VALUE)
 
         verifySuspend {
@@ -108,7 +108,7 @@ class ContactTests : KoinTest {
     }
 
     @Test
-    fun testlink_onHoldState() = runTest {
+    fun testLink_onHoldState() = runTest {
         everySuspend {
             mockGathererContact.link(
                 CONTACT_FIELD_VALUE
@@ -126,7 +126,7 @@ class ContactTests : KoinTest {
     }
 
     @Test
-    fun testlink_activeState() = runTest {
+    fun testLink_activeState() = runTest {
         everySuspend {
             mockContactInternal.link(
                 CONTACT_FIELD_VALUE
@@ -145,7 +145,7 @@ class ContactTests : KoinTest {
     }
 
     @Test
-    fun testlink_activeState_throws() = runTest {
+    fun testLink_activeState_throws() = runTest {
         everySuspend {
             mockContactInternal.link(
                 CONTACT_FIELD_VALUE
@@ -159,14 +159,14 @@ class ContactTests : KoinTest {
     }
 
     @Test
-    fun testlinkAuthenticated_inactiveState() = runTest {
+    fun testLinkAuthenticated_unInitializedState() = runTest {
         everySuspend {
             mockLoggingContact.linkAuthenticated(
                 OPEN_ID_TOKEN
             )
         } returns Unit
 
-        sdkContext.setSdkState(SdkState.Inactive)
+        sdkContext.setSdkState(SdkState.UnInitialized)
         contact.linkAuthenticated(OPEN_ID_TOKEN)
 
         verifySuspend {
@@ -178,7 +178,7 @@ class ContactTests : KoinTest {
     }
 
     @Test
-    fun testlinkAuthenticated_onHoldState() = runTest {
+    fun testLinkAuthenticated_onHoldState() = runTest {
         everySuspend {
             mockGathererContact.linkAuthenticated(
 
@@ -198,7 +198,7 @@ class ContactTests : KoinTest {
     }
 
     @Test
-    fun testlinkAuthenticated_activeState() = runTest {
+    fun testLinkAuthenticated_activeState() = runTest {
         everySuspend {
             mockContactInternal.linkAuthenticated(
                 OPEN_ID_TOKEN
@@ -216,7 +216,7 @@ class ContactTests : KoinTest {
     }
 
     @Test
-    fun testlinkAuthenticated_activeState_throws() = runTest {
+    fun testLinkAuthenticated_activeState_throws() = runTest {
         everySuspend {
             mockContactInternal.linkAuthenticated(
                 OPEN_ID_TOKEN
@@ -230,12 +230,12 @@ class ContactTests : KoinTest {
     }
 
     @Test
-    fun testUnlink_inactiveState() = runTest {
+    fun testUnlink_UnInitializedState() = runTest {
         everySuspend {
             mockLoggingContact.unlink()
         } returns Unit
 
-        sdkContext.setSdkState(SdkState.Inactive)
+        sdkContext.setSdkState(SdkState.UnInitialized)
         contact.unlink()
 
         verifySuspend {

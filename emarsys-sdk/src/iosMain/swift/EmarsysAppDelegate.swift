@@ -7,8 +7,6 @@ import UIKit
 
     @objc public func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         Task {
-            try? await self.emarsys.initialize()
-
             let center = UNUserNotificationCenter.current()
             center.delegate = self.emarsys.push.emarsysUserNotificationCenterDelegate
 

@@ -12,15 +12,15 @@ internal class InitOrganizer(
 
 ) : InitOrganizerApi {
 
-    // TODO how to signal when auto-init fails
     override suspend fun init() {
-        initStateMachine.activate()
-            .onFailure {
-                sdkLogger.debug("SDK initialized", it)
-            }.getOrThrow()
-
-        if (sdkContext.currentSdkState.value == SdkState.Inactive) {
-            sdkContext.setSdkState(SdkState.Initialized)
+        if (sdkContext.currentSdkState.value == SdkState.UnInitialized) {
+            initStateMachine.activate()
+                .onSuccess {
+                    sdkContext.setSdkState(SdkState.Initialized)
+                }
+                .onFailure {
+                    sdkLogger.debug("SDK initialization failed.", it)
+                }.getOrThrow()
         }
     }
 }

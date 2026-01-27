@@ -22,7 +22,7 @@ class SdkContext(
 
     override var config: SdkConfig? = null
 
-    override val currentSdkState = MutableStateFlow(SdkState.Inactive)
+    override val currentSdkState = MutableStateFlow(SdkState.UnInitialized)
 
     override suspend fun setSdkState(sdkState: SdkState) {
         currentSdkState.value = sdkState

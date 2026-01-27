@@ -1,6 +1,9 @@
 package com.emarsys.di
 
+import com.emarsys.api.SdkState
+import com.emarsys.context.SdkContextApi
 import com.emarsys.core.log.Logger
+import com.emarsys.init.InitOrganizerApi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -40,11 +43,18 @@ object SdkKoinIsolationContext {
         if (runningApp == null) {
             koinApp.koin.loadModules(loadPlatformModules())
             runningApp = startKoin(koinApp)
-        }
-        val sdkDispatcher = koin.get<CoroutineDispatcher>(named(DispatcherTypes.Sdk))
-        CoroutineScope(sdkDispatcher).launch {
-            koin.get<Logger> { parametersOf(SdkKoinIsolationContext::class.simpleName) }
-                .debug("SDK DI initialized")
+            val sdkDispatcher = koin.get<CoroutineDispatcher>(named(DispatcherTypes.Sdk))
+            val sdkContext = koin.get<SdkContextApi>()
+            val initOrganizer = koin.get<InitOrganizerApi>()
+            val logger =
+                koin.get<Logger> { parametersOf(SdkKoinIsolationContext::class.simpleName) }
+            CoroutineScope(sdkDispatcher).launch {
+                logger.debug("SDK DI initialized")
+                if (sdkContext.currentSdkState.value == SdkState.UnInitialized) {
+                    initOrganizer.init()
+                    logger.debug("SDK initialized with InitOrganizer")
+                }
+            }
         }
 
         return koin

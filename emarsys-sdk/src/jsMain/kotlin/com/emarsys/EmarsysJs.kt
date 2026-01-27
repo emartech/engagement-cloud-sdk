@@ -35,21 +35,21 @@ typealias EmarsysSdkEventListener = (SdkApiEvent) -> Unit
 @JsExport
 @JsName("Emarsys")
 object EmarsysJs {
-    private lateinit var applicationScope: CoroutineScope
-
-    private lateinit var sdkPublicEvents: Flow<SdkEvent.External.Api>
-    lateinit var events: EventEmitterApi
-    lateinit var setup: JsSetupApi
-    lateinit var config: JSConfigApi
-    lateinit var contact: JSContactApi
-    lateinit var event: JSTrackingApi
-    lateinit var push: JSPushApi
-    lateinit var deepLink: JSDeepLinkApi
-    lateinit var inApp: JSInAppApi
+    init {
+        SdkKoinIsolationContext.init()
+    }
+    private val applicationScope: CoroutineScope = koin.get<CoroutineScope>(named(CoroutineScopeTypes.Application))
+    private val sdkPublicEvents = koin.get<Flow<SdkEvent.External.Api>>(named(EventFlowTypes.Public))
+    val events = koin.get<EventEmitterApi>()
+    val setup = koin.get<JsSetupApi>()
+    val config = koin.get<JSConfigApi>()
+    val contact = koin.get<JSContactApi>()
+    val event = koin.get<JSTrackingApi>()
+    val push = koin.get<JSPushApi>()
+    val deepLink = koin.get<JSDeepLinkApi>()
+    val inApp = koin.get<JSInAppApi>()
 
     internal fun init() {
-        SdkKoinIsolationContext.init()
-        applicationScope = koin.get<CoroutineScope>(named(CoroutineScopeTypes.Application))
         val logger = koin.get<Logger>(parameters = { parametersOf(EmarsysJs::class.simpleName) })
         applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
             try {
@@ -58,15 +58,6 @@ object EmarsysJs {
                 logger.error(error.stackTraceToString())
             }
         }
-        setup = koin.get<JsSetupApi>()
-        config = koin.get<JSConfigApi>()
-        contact = koin.get<JSContactApi>()
-        event = koin.get<JSTrackingApi>()
-        push = koin.get<JSPushApi>()
-        deepLink = koin.get<JSDeepLinkApi>()
-        inApp = koin.get<JSInAppApi>()
-        sdkPublicEvents = koin.get<Flow<SdkEvent.External.Api>>(named(EventFlowTypes.Public))
-        events = koin.get<EventEmitterApi>()
         
         initializeCustomElements()
     }

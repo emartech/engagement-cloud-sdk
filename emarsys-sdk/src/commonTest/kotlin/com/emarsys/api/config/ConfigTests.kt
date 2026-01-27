@@ -156,9 +156,9 @@ class ConfigTest : KoinTest {
 
     @Test
     fun testCurrentSdkState_returnsCorrectValue() = runTest {
-        sdkContext.setSdkState(SdkState.Inactive)
+        sdkContext.setSdkState(SdkState.UnInitialized)
 
-        config.getCurrentSdkState() shouldBe SdkState.Inactive
+        config.getCurrentSdkState() shouldBe SdkState.UnInitialized
 
         sdkContext.setSdkState(SdkState.Active)
         config.getCurrentSdkState() shouldBe SdkState.Active

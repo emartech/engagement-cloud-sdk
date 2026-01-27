@@ -9,6 +9,7 @@ import com.emarsys.api.setup.IosSetupApi
 import com.emarsys.api.tracking.IosTrackingApi
 import com.emarsys.di.CoroutineScopeTypes
 import com.emarsys.di.EventFlowTypes
+import com.emarsys.di.SdkKoinIsolationContext
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.embeddedmessaging.ui.list.embeddedMessagingListPage
@@ -26,6 +27,9 @@ typealias EmarsysEventListener = (SdkEvent) -> Unit
 @OptIn(ExperimentalObjCName::class)
 @ObjCName("Emarsys")
 object IosEmarsys {
+    init {
+        SdkKoinIsolationContext.init()
+    }
     private var eventListeners: MutableList<EmarsysEventListener> = mutableListOf()
 
     val setup: IosSetupApi

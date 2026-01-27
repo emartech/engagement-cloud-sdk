@@ -8,13 +8,13 @@ import com.emarsys.api.SdkState
 object JSSdkState {
     const val ACTIVE = "active"
     const val ON_HOLD = "on_hold"
-    const val INACTIVE = "inactive"
+    const val UN_INITIALIZED = "un_initialized"
     const val INITIALIZED = "initialized"
 }
 
 fun SdkState.toJsSdkState(): String = when (this) {
     SdkState.Active -> JSSdkState.ACTIVE
     SdkState.OnHold -> JSSdkState.ON_HOLD
-    SdkState.Inactive -> JSSdkState.INACTIVE
+    SdkState.UnInitialized -> JSSdkState.UN_INITIALIZED
     SdkState.Initialized -> JSSdkState.INITIALIZED
 }

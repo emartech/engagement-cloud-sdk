@@ -14,7 +14,7 @@ internal class DisableOrganizer(
 ) : DisableOrganizerApi {
 
     override suspend fun disable() {
-        sdkContext.setSdkState(SdkState.Inactive)
+        sdkContext.setSdkState(SdkState.UnInitialized)
         sdkLogger.debug("SDK disabled")
         mobileEngageDisableStateMachine.activate().getOrThrow()
         emarsysSdkSession.endSession()

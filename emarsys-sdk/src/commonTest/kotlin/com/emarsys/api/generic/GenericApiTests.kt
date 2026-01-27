@@ -1,9 +1,9 @@
 package com.emarsys.api.generic
 
 import com.emarsys.api.SdkState.Active
-import com.emarsys.api.SdkState.Inactive
 import com.emarsys.api.SdkState.Initialized
 import com.emarsys.api.SdkState.OnHold
+import com.emarsys.api.SdkState.UnInitialized
 import com.emarsys.api.contact.ContactContext
 import com.emarsys.api.contact.ContactContextApi
 import com.emarsys.api.contact.ContactGatherer
@@ -83,8 +83,8 @@ class GenericApiTests : KoinTest {
     }
 
     @Test
-    fun testActive_whenSdkState_isInactive() = runTest {
-        sdkContext.setSdkState(Inactive)
+    fun testActive_whenSdkState_isUnInitialized() = runTest {
+        sdkContext.setSdkState(UnInitialized)
 
         advanceUntilIdle()
 

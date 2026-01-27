@@ -45,7 +45,7 @@ class DisableOrganizerTests {
     fun testDisable_shouldActivate_MEDisableStateMachine_andEndSession() = runTest {
         disableOrganizer.disable()
 
-        verifySuspend { mockSdkContext.setSdkState(SdkState.Inactive) }
+        verifySuspend { mockSdkContext.setSdkState(SdkState.UnInitialized) }
         verifySuspend { mockMEStateMachine.activate() }
         verifySuspend { mockSession.endSession() }
     }
@@ -56,7 +56,7 @@ class DisableOrganizerTests {
 
         shouldThrow<RuntimeException> { disableOrganizer.disable() }
 
-        verifySuspend { mockSdkContext.setSdkState(SdkState.Inactive) }
+        verifySuspend { mockSdkContext.setSdkState(SdkState.UnInitialized) }
         verifySuspend { mockMEStateMachine.activate() }
         verifySuspend(VerifyMode.exactly(0)) { mockSession.endSession() }
     }

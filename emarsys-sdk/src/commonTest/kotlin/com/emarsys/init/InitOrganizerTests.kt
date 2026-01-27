@@ -1,81 +1,49 @@
 package com.emarsys.init
 
 import com.emarsys.api.SdkState
-import com.emarsys.context.DefaultUrls
-import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
-import com.emarsys.core.log.LogLevel
-import com.emarsys.core.log.SdkLogger
+import com.emarsys.core.log.Logger
 import com.emarsys.core.state.StateMachineApi
-import com.emarsys.core.storage.StringStorageApi
-import com.emarsys.di.SdkKoinIsolationContext.koin
-import com.emarsys.fake.FakeStringStorage
-import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
-import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
+import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlinx.serialization.json.Json
-import org.koin.core.Koin
-import org.koin.core.module.Module
-import org.koin.dsl.module
-import org.koin.test.KoinTest
-import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-class InitOrganizerTests : KoinTest {
-
-    override fun getKoin(): Koin = koin
-
-    private lateinit var testModule: Module
-
-    private val mainDispatcher = StandardTestDispatcher()
-
-    init {
-        Dispatchers.setMain(mainDispatcher)
-    }
-
+class InitOrganizerTests {
+    private lateinit var testDispatcher: TestDispatcher
     private lateinit var mockStateMachine: StateMachineApi
-    private lateinit var sdkContext: SdkContextApi
+    private lateinit var mockLogger: Logger
+    private lateinit var mockSdkContext: SdkContextApi
     private lateinit var initOrganizer: InitOrganizer
 
     @BeforeTest
     fun setUp() {
-        testModule = module {
-            single<StringStorageApi> { FakeStringStorage() }
-            single<Json> { JsonUtil.json }
-        }
-        koin.loadModules(listOf(testModule))
+        testDispatcher = StandardTestDispatcher()
+        Dispatchers.setMain(testDispatcher)
 
-        mockStateMachine = mock()
-        sdkContext = SdkContext(
-            StandardTestDispatcher(),
-            mainDispatcher,
-            DefaultUrls("", "", "", "", "", ""),
-            LogLevel.Error,
-            mutableSetOf(),
-            logBreadcrumbsQueueSize = 10
-        )
+        mockStateMachine = mock(MockMode.autofill)
+        mockSdkContext = mock(MockMode.autofill)
+        everySuspend { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.UnInitialized)
+
+        mockLogger = mock(MockMode.autofill)
         initOrganizer = InitOrganizer(
             mockStateMachine,
-            sdkContext,
-            SdkLogger("TestLoggerName", mock(MockMode.autofill), sdkContext = mock())
+            mockSdkContext,
+            mockLogger
         )
-    }
-
-    @AfterTest
-    fun tearDown() {
-        koin.unloadModules(listOf(testModule))
     }
 
     @Test
@@ -88,23 +56,37 @@ class InitOrganizerTests : KoinTest {
             verifySuspend {
                 mockStateMachine.activate()
             }
-            sdkContext.currentSdkState.value shouldBe SdkState.Initialized
+            verifySuspend { mockSdkContext.setSdkState(SdkState.Initialized) }
+        }
+
+    @Test
+    fun init_should_only_call_activate_onStateMachine_when_the_sdkState_is_unInitialized() =
+        runTest {
+            everySuspend { mockStateMachine.activate() } returns Result.success(Unit)
+
+            initOrganizer.init()
+
+            verifySuspend { mockSdkContext.setSdkState(SdkState.Initialized) }
+
+            everySuspend { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Initialized)
+
+            initOrganizer.init()
+
+            verifySuspend(VerifyMode.exactly(1)) { mockStateMachine.activate() }
         }
 
     @Test
     fun init_should_not_move_sdkState_backwards_whenInitStateMachine_alreadyActivatedTheSDK() =
         runTest {
-            everySuspend { mockStateMachine.activate() } calls {
-                sdkContext.setSdkState(SdkState.Active)
-                Result.success(Unit)
-            }
+            everySuspend { mockStateMachine.activate() } returns Result.success(Unit)
+            everySuspend { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
 
             initOrganizer.init()
 
-            verifySuspend {
-                mockStateMachine.activate()
-            }
-            sdkContext.currentSdkState.value shouldBe SdkState.Active
+            verifySuspend(VerifyMode.exactly(0)) { mockStateMachine.activate() }
+            verifySuspend(VerifyMode.exactly(0)) { mockSdkContext.setSdkState(SdkState.UnInitialized) }
+            verifySuspend(VerifyMode.exactly(0)) { mockSdkContext.setSdkState(SdkState.OnHold) }
+            verifySuspend(VerifyMode.exactly(0)) { mockSdkContext.setSdkState(SdkState.Initialized) }
         }
 
     @Test
@@ -115,10 +97,9 @@ class InitOrganizerTests : KoinTest {
 
             val exception = shouldThrow<Exception> { initOrganizer.init() }
 
-            verifySuspend {
-                mockStateMachine.activate()
-            }
-            sdkContext.currentSdkState.value shouldBe SdkState.Inactive
+            verifySuspend { mockStateMachine.activate() }
+            verifySuspend(VerifyMode.exactly(0)) { mockSdkContext.setSdkState(SdkState.Active) }
             exception shouldBe testException
+            verifySuspend { mockLogger.debug("SDK initialization failed.", testException) }
         }
 }
