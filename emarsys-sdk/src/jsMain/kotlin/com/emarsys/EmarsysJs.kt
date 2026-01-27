@@ -50,6 +50,8 @@ object EmarsysJs {
     val inApp = koin.get<JSInAppApi>()
 
     internal fun init() {
+        SdkKoinIsolationContext.init()
+
         val logger = koin.get<Logger>(parameters = { parametersOf(EmarsysJs::class.simpleName) })
         applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
             try {
