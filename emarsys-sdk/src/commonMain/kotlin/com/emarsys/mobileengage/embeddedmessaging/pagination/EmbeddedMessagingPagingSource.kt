@@ -7,6 +7,7 @@ import com.emarsys.core.log.Logger
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
+import com.emarsys.mobileengage.embeddedmessaging.exceptions.LastPageReachedException
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemModel
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModel
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
@@ -58,7 +59,16 @@ internal class EmbeddedMessagingPagingSource(
                     )
                 },
                 onFailure = {
-                    LoadResult.Error(it)
+                    if (it is LastPageReachedException) {
+                        logger.debug("Last page reached")
+                        LoadResult.Page(
+                            emptyList(),
+                            prevKey = if (pageNumber > 0) pageNumber - 1 else null,
+                            nextKey = null
+                        )
+                    } else {
+                        LoadResult.Error(it)
+                    }
                 })
         } catch (e: Exception) {
             logger.error("Error loading page", e)

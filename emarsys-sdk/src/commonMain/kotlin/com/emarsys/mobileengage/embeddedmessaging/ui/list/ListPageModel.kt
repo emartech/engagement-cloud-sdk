@@ -5,7 +5,8 @@ import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.body
 import com.emarsys.event.SdkEvent
-import com.emarsys.mobileengage.embeddedmessaging.pagination.EmbeddedMessagingPaginationHandlerApi
+import com.emarsys.mobileengage.embeddedmessaging.exceptions.LastPageReachedException
+import com.emarsys.mobileengage.embeddedmessaging.pagination.EmbeddedMessagingPaginationState
 import com.emarsys.networking.clients.embedded.messaging.model.BadgeCountResponse
 import com.emarsys.networking.clients.embedded.messaging.model.MessagesResponse
 import kotlin.time.ExperimentalTime
@@ -13,8 +14,8 @@ import kotlin.time.ExperimentalTime
 @OptIn(ExperimentalTime::class)
 internal class ListPageModel(
     private val sdkEventDistributor: SdkEventDistributorApi,
-    private val embeddedMessagingPaginationHandler: EmbeddedMessagingPaginationHandlerApi,
-    private val sdkLogger: Logger
+    private val sdkLogger: Logger,
+    private var paginationState: EmbeddedMessagingPaginationState
 ) : ListPageModelApi {
 
     override suspend fun fetchMessagesWithCategories(
@@ -28,16 +29,26 @@ internal class ListPageModel(
                 categoryIds = categoryIds,
                 filterUnopenedMessages = filterUnopenedOnly
             )
+
+            paginationState = EmbeddedMessagingPaginationState(
+                totalReceivedCount = 0,
+                isEndReached = false,
+                categoryIds = categoryIds,
+                filterUnopenedMessages = filterUnopenedOnly
+            )
+
             val fetchMessagesResponse =
-                sdkEventDistributor.registerEvent(fetchMessagesEvent).await(MessagesResponse::class)
+                sdkEventDistributor.registerEvent(fetchMessagesEvent).await<Response>()
 
             fetchMessagesResponse.result.fold(
-                onSuccess = { messagesResponse ->
+                onSuccess = { messagesSuccessResponse ->
+                    val messagesResponse: MessagesResponse = messagesSuccessResponse.body()
+                    updatePaginationState(messagesResponse)
                     Result.success(
                         MessagesWithCategories(
                             messagesResponse.meta.categories,
                             messagesResponse.messages,
-                            isEndReached = embeddedMessagingPaginationHandler.isEndReached()
+                            isEndReached = paginationState.isEndReached
                         )
                     )
                 },
@@ -57,8 +68,7 @@ internal class ListPageModel(
             val fetchBadgeCountEvent = SdkEvent.Internal.EmbeddedMessaging.FetchBadgeCount(
                 nackCount = 0
             )
-            val badgeCountResponse = sdkEventDistributor.registerEvent(fetchBadgeCountEvent)
-            val response = badgeCountResponse.await<Response>()
+            val response = sdkEventDistributor.registerEvent(fetchBadgeCountEvent).await<Response>()
 
             response.result.fold(
                 onSuccess = { networkResponse ->
@@ -78,28 +88,49 @@ internal class ListPageModel(
 
     override suspend fun fetchNextPage(): Result<MessagesWithCategories> {
         return try {
-            val nextPageResponse =
-                sdkEventDistributor.registerEvent(SdkEvent.Internal.EmbeddedMessaging.NextPage())
-                    .await(MessagesResponse::class)
-
-            nextPageResponse.result.fold(
-                onSuccess = { messagesResponse ->
-                    Result.success(
-                        MessagesWithCategories(
-                            messagesResponse.meta.categories,
-                            messagesResponse.messages,
-                            isEndReached = embeddedMessagingPaginationHandler.isEndReached()
-                        )
+            if (!paginationState.isEndReached) {
+                val nextPageResponse = sdkEventDistributor.registerEvent(
+                    SdkEvent.Internal.EmbeddedMessaging.FetchNextPage(
+                        nackCount = 0,
+                        offset = paginationState.totalReceivedCount,
+                        categoryIds = paginationState.categoryIds,
+                        filterUnopenedMessages = paginationState.filterUnopenedMessages
                     )
-                },
-                onFailure = {
-                    sdkLogger.error("FetchNextPage failure.", it)
-                    Result.failure(it)
-                }
-            )
+                ).await<Response>()
+                nextPageResponse.result.fold(
+                    onSuccess = { messagesResponse ->
+                        val messagesResponse: MessagesResponse = messagesResponse.body()
+                        updatePaginationState(messagesResponse)
+                        Result.success(
+                            MessagesWithCategories(
+                                messagesResponse.meta.categories,
+                                messagesResponse.messages,
+                                isEndReached = paginationState.isEndReached
+                            )
+                        )
+                    },
+                    onFailure = {
+                        sdkLogger.error("FetchNextPage failure.", it)
+                        Result.failure(it)
+                    }
+                )
+            } else {
+                sdkLogger.debug("Can't fetch more messages, final page reached")
+                Result.failure(LastPageReachedException("Can't fetch more pages because last page reached"))
+            }
         } catch (e: Exception) {
             sdkLogger.error("FetchNextPage exception.", e)
             Result.failure(e)
         }
+    }
+
+    private fun updatePaginationState(messagesResponse: MessagesResponse) {
+        val fetchedMessagesCount = messagesResponse.messages.size
+        val messagesPerPage = messagesResponse.top
+
+        paginationState = paginationState.copy(
+            totalReceivedCount = paginationState.totalReceivedCount + fetchedMessagesCount,
+            isEndReached = fetchedMessagesCount == 0 || fetchedMessagesCount < messagesPerPage
+        )
     }
 }

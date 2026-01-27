@@ -7,8 +7,6 @@ import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContext
 import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import com.emarsys.mobileengage.embeddedmessaging.networking.EmbeddedMessagesRequestFactory
 import com.emarsys.mobileengage.embeddedmessaging.networking.EmbeddedMessagingRequestFactoryApi
-import com.emarsys.mobileengage.embeddedmessaging.pagination.EmbeddedMessagingPaginationHandler
-import com.emarsys.mobileengage.embeddedmessaging.pagination.EmbeddedMessagingPaginationHandlerApi
 import com.emarsys.mobileengage.embeddedmessaging.pagination.EmbeddedMessagingPaginationState
 import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageModel
 import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageModelApi
@@ -34,19 +32,11 @@ object EmbeddedMessagingInjection {
         single<EmbeddedMessagingContextApi> {
             EmbeddedMessagingContext()
         }
-        single<EmbeddedMessagingPaginationHandlerApi> {
-            EmbeddedMessagingPaginationHandler(
-                sdkEventManager = get(),
-                applicationScope = get<CoroutineScope>(named(CoroutineScopeTypes.Application)),
-                sdkLogger = get { parametersOf(EmbeddedMessagingPaginationHandler::class.simpleName) },
-                paginationState = EmbeddedMessagingPaginationState()
-            )
-        }
         single<ListPageModelApi> {
             ListPageModel(
                 sdkEventDistributor = get(),
-                embeddedMessagingPaginationHandler = get(),
-                sdkLogger = get { parametersOf(ListPageModel::class.simpleName) }
+                sdkLogger = get { parametersOf(ListPageModel::class.simpleName) },
+                paginationState = EmbeddedMessagingPaginationState()
             )
         }
         single<PagerFactoryApi> {

@@ -261,13 +261,6 @@ sealed interface SdkEvent {
             ) : EmbeddedMessaging
 
             @Serializable
-            data class NextPage(
-                override val id: String = UUIDProvider().provide(),
-                override val type: String = "nextPage",
-                override val timestamp: Instant = TimestampProvider().provide()
-            ) : Internal
-
-            @Serializable
             data class FetchMeta(
                 override val id: String = UUIDProvider().provide(),
                 override val type: String = "fetchMeta",
