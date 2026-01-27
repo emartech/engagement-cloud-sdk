@@ -14,8 +14,8 @@
 		2A42F0C82EC4D6F00097D526 /* EmbeddedMessagingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A42F0C72EC4D6F00097D526 /* EmbeddedMessagingView.swift */; };
 		2A42F0CA2EC4D7D50097D526 /* EmbeddedMessagingListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A42F0C92EC4D7D50097D526 /* EmbeddedMessagingListView.swift */; };
 		2A918DE92C85E8FE00B1AF36 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A918DE82C85E8FE00B1AF36 /* NotificationService.swift */; };
-		2AA3D3842F1A4374007BA4B0 /* EmarsysNotificationService in Frameworks */ = {isa = PBXBuildFile; productRef = 2AA3D3832F1A4374007BA4B0 /* EmarsysNotificationService */; };
-		2AA3D3862F1A4374007BA4B0 /* EmarsysSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 2AA3D3852F1A4374007BA4B0 /* EmarsysSDK */; };
+		2AFF7A122F28B6FB00C4BAB1 /* EmarsysNotificationService in Frameworks */ = {isa = PBXBuildFile; productRef = 2AFF7A112F28B6FB00C4BAB1 /* EmarsysNotificationService */; };
+		2AFF7A142F28B6FB00C4BAB1 /* EmarsysSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 2AFF7A132F28B6FB00C4BAB1 /* EmarsysSDK */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
 /* End PBXBuildFile section */
 
@@ -64,7 +64,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2AA3D3842F1A4374007BA4B0 /* EmarsysNotificationService in Frameworks */,
+				2AFF7A122F28B6FB00C4BAB1 /* EmarsysNotificationService in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -72,7 +72,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2AA3D3862F1A4374007BA4B0 /* EmarsysSDK in Frameworks */,
+				2AFF7A142F28B6FB00C4BAB1 /* EmarsysSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -191,6 +191,9 @@
 				2A7ADD732EF03F530029635B /* EmarsysSDK */,
 				5DD9DCF62F0FE4920091E96D /* EmarsysSDK */,
 				2AA3D3852F1A4374007BA4B0 /* EmarsysSDK */,
+				2A64A0702F238579002351E5 /* EmarsysSDK */,
+				2A963E902F27C35200B958E3 /* EmarsysSDK */,
+				2AFF7A132F28B6FB00C4BAB1 /* EmarsysSDK */,
 			);
 			productName = iosApp;
 			productReference = 7555FF7B242A565900829871 /* Emarsys Sample.app */;
@@ -225,7 +228,7 @@
 			);
 			mainGroup = 7555FF72242A565900829871;
 			packageReferences = (
-				2AA3D3822F1A4374007BA4B0 /* XCLocalSwiftPackageReference "../../unified-emarsys-sdk" */,
+				2AFF7A102F28B6FB00C4BAB1 /* XCLocalSwiftPackageReference "../../unified-emarsys-sdk" */,
 			);
 			productRefGroup = 7555FF7C242A565900829871 /* Products */;
 			projectDirPath = "";
@@ -574,7 +577,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		2AA3D3822F1A4374007BA4B0 /* XCLocalSwiftPackageReference "../../unified-emarsys-sdk" */ = {
+		2AFF7A102F28B6FB00C4BAB1 /* XCLocalSwiftPackageReference "../../unified-emarsys-sdk" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = "../../unified-emarsys-sdk";
 		};
@@ -605,13 +608,17 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = EmarsysSDK;
 		};
+		2A64A0702F238579002351E5 /* EmarsysSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EmarsysSDK;
+		};
 		2A7ADD732EF03F530029635B /* EmarsysSDK */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = EmarsysSDK;
 		};
-		2AA3D3832F1A4374007BA4B0 /* EmarsysNotificationService */ = {
+		2A963E902F27C35200B958E3 /* EmarsysSDK */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = EmarsysNotificationService;
+			productName = EmarsysSDK;
 		};
 		2AA3D3852F1A4374007BA4B0 /* EmarsysSDK */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -630,6 +637,14 @@
 			productName = EmarsysSDK;
 		};
 		2ABFACD52E390F91006259C6 /* EmarsysSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EmarsysSDK;
+		};
+		2AFF7A112F28B6FB00C4BAB1 /* EmarsysNotificationService */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EmarsysNotificationService;
+		};
+		2AFF7A132F28B6FB00C4BAB1 /* EmarsysSDK */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = EmarsysSDK;
 		};
