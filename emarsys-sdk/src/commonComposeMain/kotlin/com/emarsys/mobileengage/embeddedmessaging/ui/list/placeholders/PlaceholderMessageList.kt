@@ -108,18 +108,18 @@ private fun PlaceholderMessageItem() {
                             .size(height = 14.dp, width = 150.dp)
                             .shimmerEffect()
                     )
-                }
 
-                Box(
-                    modifier = Modifier
-                        .padding(start = DEFAULT_PADDING)
-                        .background(
-                            placeholderColor,
-                            shape = RoundedCornerShape(4.dp)
-                        )
-                        .size(height = 14.dp, width = 30.dp)
-                        .shimmerEffect()
-                )
+                    Box(
+                        modifier = Modifier
+                            .padding(vertical = SMALL_PADDING)
+                            .background(
+                                placeholderColor,
+                                shape = RoundedCornerShape(4.dp)
+                            )
+                            .size(height = 14.dp, width = 30.dp)
+                            .shimmerEffect()
+                    )
+                }
             }
         }
     }

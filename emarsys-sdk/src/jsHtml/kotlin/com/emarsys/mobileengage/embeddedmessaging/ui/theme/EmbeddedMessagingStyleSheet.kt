@@ -16,6 +16,7 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstant
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MAX_HEIGHT
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MAX_WIDTH
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MESSAGE_ITEM_IMAGE_SIZE
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.TEXT_PLACEHOLDER_HEIGHT
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.TITLE_FONT_WEIGHT
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.ZERO_BORDER_WIDTH
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.ZERO_MARGIN
@@ -25,6 +26,7 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstant
 import org.jetbrains.compose.web.css.AlignContent
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.AlignSelf
+import org.jetbrains.compose.web.css.AnimationTimingFunction
 import org.jetbrains.compose.web.css.Color
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.FlexDirection
@@ -34,19 +36,25 @@ import org.jetbrains.compose.web.css.StyleSheet
 import org.jetbrains.compose.web.css.alignContent
 import org.jetbrains.compose.web.css.alignItems
 import org.jetbrains.compose.web.css.alignSelf
+import org.jetbrains.compose.web.css.animation
+import org.jetbrains.compose.web.css.background
 import org.jetbrains.compose.web.css.backgroundColor
+import org.jetbrains.compose.web.css.backgroundPosition
+import org.jetbrains.compose.web.css.backgroundSize
 import org.jetbrains.compose.web.css.border
 import org.jetbrains.compose.web.css.borderRadius
 import org.jetbrains.compose.web.css.bottom
 import org.jetbrains.compose.web.css.color
 import org.jetbrains.compose.web.css.cursor
 import org.jetbrains.compose.web.css.display
+import org.jetbrains.compose.web.css.duration
 import org.jetbrains.compose.web.css.flex
 import org.jetbrains.compose.web.css.flexDirection
 import org.jetbrains.compose.web.css.fontSize
 import org.jetbrains.compose.web.css.fontWeight
 import org.jetbrains.compose.web.css.gap
 import org.jetbrains.compose.web.css.height
+import org.jetbrains.compose.web.css.iterationCount
 import org.jetbrains.compose.web.css.justifyContent
 import org.jetbrains.compose.web.css.left
 import org.jetbrains.compose.web.css.margin
@@ -54,10 +62,13 @@ import org.jetbrains.compose.web.css.marginBottom
 import org.jetbrains.compose.web.css.marginRight
 import org.jetbrains.compose.web.css.marginTop
 import org.jetbrains.compose.web.css.maxWidth
+import org.jetbrains.compose.web.css.ms
 import org.jetbrains.compose.web.css.padding
+import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.position
 import org.jetbrains.compose.web.css.right
 import org.jetbrains.compose.web.css.textAlign
+import org.jetbrains.compose.web.css.timingFunction
 import org.jetbrains.compose.web.css.top
 import org.jetbrains.compose.web.css.width
 
@@ -476,6 +487,10 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         display(DisplayStyle.Block)
     }
 
+    val messageItemTextPlaceholder by style {
+        height(TEXT_PLACEHOLDER_HEIGHT)
+    }
+
     val loadingSpinner by style {
         width(MESSAGE_ITEM_IMAGE_SIZE)
         height(MESSAGE_ITEM_IMAGE_SIZE)
@@ -512,5 +527,33 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         maxWidth(MAX_WIDTH)
         borderRadius(DEFAULT_BORDER_RADIUS)
         property("object-fit", "contain")
+    }
+
+    private val shimmer by keyframes {
+        0.percent {
+            backgroundPosition("100% 100%")
+        }
+        70.percent {
+            backgroundPosition("0% 0%")
+        }
+        100.percent {
+            backgroundPosition("0% 0%")
+        }
+    }
+
+    val shimmerEffect by style {
+        animation(shimmer) {
+            duration(1200.ms)
+            timingFunction(AnimationTimingFunction.EaseInOut)
+            iterationCount(null)  // infinite
+        }
+        background(
+            """linear-gradient(
+                -45deg, #0000001A 25%, 
+                ${CssColorVars.colorSurfaceTint.value()} 50%,
+                #0000001A 75%)"""
+                .trimIndent()
+        )
+        backgroundSize("400% 400%")
     }
 }

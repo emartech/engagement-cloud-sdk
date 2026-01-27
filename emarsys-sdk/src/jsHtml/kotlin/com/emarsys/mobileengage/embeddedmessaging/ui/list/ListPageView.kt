@@ -18,6 +18,7 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.category.SvgIcon
 import com.emarsys.mobileengage.embeddedmessaging.ui.delete.DeleteMessageDialogView
 import com.emarsys.mobileengage.embeddedmessaging.ui.detail.MessageDetailView
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
+import com.emarsys.mobileengage.embeddedmessaging.ui.list.placeholders.PlaceholderMessageList
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingStyleSheet
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 import com.emarsys.mobileengage.embeddedmessaging.ui.translation.LocalStringResources
@@ -199,11 +200,7 @@ fun MessageListContent(
         classes(EmbeddedMessagingStyleSheet.messageListContainer)
     }) {
         if (isRefreshing) {
-            Div({
-                classes(EmbeddedMessagingStyleSheet.refreshIndicator)
-            }) {
-                Text("Refreshing...")
-            }
+            PlaceholderMessageList()
         } else {
             Button({
                 onClick { onRefresh() }
@@ -214,20 +211,20 @@ fun MessageListContent(
                     className = EmbeddedMessagingStyleSheet.refreshIcon
                 )
             }
-        }
 
-        if (lazyPagingMessageItems.itemCount == 0 && !isRefreshing) {
-            EmptyState()
-        } else {
-            ListView(
-                lazyPagingMessageItems,
-                listViewModel,
-                customMessageItemElementName,
-                onItemClick = {
-                    onItemClick(it)
-                },
-                withDeleteIcon = withDeleteIcon
-            ) { onDeleteIconClicked(it) }
+            if (lazyPagingMessageItems.itemCount == 0) {
+                EmptyState()
+            } else {
+                ListView(
+                    lazyPagingMessageItems,
+                    listViewModel,
+                    customMessageItemElementName,
+                    onItemClick = {
+                        onItemClick(it)
+                    },
+                    withDeleteIcon = withDeleteIcon
+                ) { onDeleteIconClicked(it) }
+            }
         }
     }
 }

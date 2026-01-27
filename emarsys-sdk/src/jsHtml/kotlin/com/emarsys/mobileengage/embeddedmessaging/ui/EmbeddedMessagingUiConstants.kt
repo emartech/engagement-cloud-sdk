@@ -41,4 +41,6 @@ object EmbeddedMessagingUiConstants {
     const val DEFAULT_CURSOR = "pointer"
 
     val ZERO_POSITION_VALUE = 0.px
+
+    val TEXT_PLACEHOLDER_HEIGHT = 12.px
 }
