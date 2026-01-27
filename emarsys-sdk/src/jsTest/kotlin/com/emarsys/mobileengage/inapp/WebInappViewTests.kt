@@ -3,6 +3,7 @@ package com.emarsys.mobileengage.inapp
 import com.emarsys.core.factory.Factory
 import com.emarsys.core.providers.TimestampProvider
 import com.emarsys.util.JsonUtil
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.mock
@@ -33,9 +34,9 @@ class WebInappViewTests {
     fun setup() {
         sdkDispatcher = StandardTestDispatcher()
         inappScriptExtractor = InAppScriptExtractor()
-        mockWebInAppJsBridgeFactory = mock()
+        mockWebInAppJsBridgeFactory = mock(MockMode.autofill)
         every { mockWebInAppJsBridgeFactory.create(INAPP_JS_BRIDGE_DATA) } returns WebInAppJsBridge(
-            mock(),
+            mock(MockMode.autofill),
             INAPP_JS_BRIDGE_DATA,
             sdkDispatcher,
             JsonUtil.json
@@ -48,7 +49,7 @@ class WebInappViewTests {
     }
 
     @Test
-    fun load_shouldSetTheHtmlContent_andAddScripts() = runTest {
+    fun load_shouldSetTheHtmlContent_andAddScriptsToShadowRoot() = runTest {
         val testScriptContent1 = "script1"
         val testScriptContent2 = "script2"
         val testHtml = """<html><head>
@@ -74,15 +75,15 @@ class WebInappViewTests {
         val webViewHolder: WebWebViewHolder = webInappView.load(testMessage) as WebWebViewHolder
 
         webInappView.inAppMessage shouldBe testMessage
-        val webView = webViewHolder.webView
-        webView shouldNotBe null
-        webView.querySelectorAll("script").length shouldBe 4
-        val innerHtmlString = webView.innerHTML.toString()
+        val shadowRoot = webViewHolder.webView.shadowRoot
+        shadowRoot shouldNotBe null
+        shadowRoot?.querySelectorAll("script")?.length shouldBe 4
+        val innerHtmlString = shadowRoot?.innerHTML.toString()
         innerHtmlString.contains("<script>$testScriptContent1</script>") shouldBe true
         innerHtmlString.contains("<script>$testScriptContent2</script>") shouldBe true
-        webView.querySelector("div") shouldNotBe null
-        webView.querySelector("button") shouldNotBe null
-        webView.querySelector("h3") shouldNotBe null
+        shadowRoot?.querySelector("div") shouldNotBe null
+        shadowRoot?.querySelector("button") shouldNotBe null
+        shadowRoot?.querySelector("h3") shouldNotBe null
     }
 
     @Test
@@ -111,12 +112,12 @@ class WebInappViewTests {
         webInappView.inAppMessage shouldBe testMessage
         webViewHolder.webView shouldNotBe null
 
-        webViewHolder.webView.let {
+        webViewHolder.webView.shadowRoot?.let {
             it.querySelectorAll("script").length shouldBe 0
             it.querySelector("div") shouldNotBe null
             it.querySelector("button") shouldNotBe null
             it.querySelector("h3") shouldNotBe null
-        }
+        } ?: throw AssertionError("Shadow root is null")
     }
 }
 

@@ -41,9 +41,9 @@ internal class WebInAppView(
         val shadowRoot = view.asDynamic().attachShadow(js("({mode: 'open'})"))
         shadowRoot.innerHTML = message.content
 
-        val scriptContents = inappScriptExtractor.extract(view)
+        val scriptContents = inappScriptExtractor.extract(shadowRoot)
         createScriptElements(scriptContents).forEach { scriptElement ->
-            view.appendChild(scriptElement)
+            shadowRoot.appendChild(scriptElement)
         }
 
         return WebWebViewHolder(view, inAppLoadingMetric())
