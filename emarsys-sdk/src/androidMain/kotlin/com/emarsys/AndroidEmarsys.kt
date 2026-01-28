@@ -3,6 +3,7 @@ package com.emarsys
 import AndroidConfigApi
 import com.emarsys.api.contact.ContactApi
 import com.emarsys.api.deeplink.AndroidDeepLinkApi
+import com.emarsys.api.embeddedmessaging.EmbeddedMessagingApi
 import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.push.PushApi
 import com.emarsys.api.setup.AndroidSetupApi
@@ -71,6 +72,12 @@ object AndroidEmarsys {
      */
     val setup: AndroidSetupApi
         get() = koin.get<AndroidSetupApi>()
+
+    /**
+     * Provides access to the Embedded Messaging API, which allows access to EmbeddedMessaging state.
+     */
+    val embeddedMessaging: EmbeddedMessagingApi
+        get() = koin.get<EmbeddedMessagingApi>()
 
     /**
      * Initializes the SDK. This method must be called before using any other SDK functionality.

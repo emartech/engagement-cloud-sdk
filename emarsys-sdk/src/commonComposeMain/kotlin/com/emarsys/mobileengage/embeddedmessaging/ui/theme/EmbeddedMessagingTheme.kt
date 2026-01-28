@@ -10,7 +10,7 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.translation.StringResources
 import com.emarsys.mobileengage.embeddedmessaging.ui.translation.TranslationMapper
 
 @Composable
-fun EmbeddedMessagingTheme(content: @Composable () -> Unit) {
+internal fun EmbeddedMessagingTheme(content: @Composable () -> Unit) {
     val embeddedMessagingContext: EmbeddedMessagingContextApi? = koin.getOrNull()
 
     embeddedMessagingContext?.let {

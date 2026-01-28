@@ -4,6 +4,7 @@ import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.networking.clients.embedded.messaging.serializer.MessagesResponseSerializer
 import kotlinx.serialization.Serializable
+import kotlin.js.JsExport
 
 @Serializable(with = MessagesResponseSerializer::class)
 data class MessagesResponse(
@@ -18,6 +19,7 @@ data class Meta(
     val categories: List<MessageCategory>,
 )
 
+@JsExport
 @Serializable
 data class MessageCategory(
     val id: Int,

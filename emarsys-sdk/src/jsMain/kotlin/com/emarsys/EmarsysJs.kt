@@ -1,6 +1,7 @@
 import com.emarsys.api.config.JSConfigApi
 import com.emarsys.api.contact.JSContactApi
 import com.emarsys.api.deeplink.JSDeepLinkApi
+import com.emarsys.api.embeddedmessaging.JsEmbeddedMessagingApi
 import com.emarsys.api.events.EventEmitterApi
 import com.emarsys.api.events.SdkApiEvent
 import com.emarsys.api.events.SdkEventSubscription
@@ -48,6 +49,7 @@ object EmarsysJs {
     val push = koin.get<JSPushApi>()
     val deepLink = koin.get<JSDeepLinkApi>()
     val inApp = koin.get<JSInAppApi>()
+    val embeddedMessaging = koin.get<JsEmbeddedMessagingApi>()
 
     internal fun init() {
         SdkKoinIsolationContext.init()

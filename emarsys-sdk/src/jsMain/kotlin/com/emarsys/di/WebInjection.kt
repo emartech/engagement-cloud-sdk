@@ -7,6 +7,8 @@ import com.emarsys.api.contact.JSContact
 import com.emarsys.api.contact.JSContactApi
 import com.emarsys.api.deeplink.JSDeepLink
 import com.emarsys.api.deeplink.JSDeepLinkApi
+import com.emarsys.api.embeddedmessaging.JsEmbeddedMessaging
+import com.emarsys.api.embeddedmessaging.JsEmbeddedMessagingApi
 import com.emarsys.api.events.EventEmitter
 import com.emarsys.api.events.EventEmitterApi
 import com.emarsys.api.inapp.JSInApp
@@ -254,39 +256,22 @@ object WebInjection {
                 sdkContext = get()
             )
         }
-        single<JsSetupApi> {
-            JsSetup(
-                get())
-        }
+        single<JsSetupApi> { JsSetup(get()) }
         single<WebNotificationSettingsCollectorApi> {
             WebNotificationSettingsCollector(pushServiceContext = get())
         }
         single<JSConfigApi> {
             JSConfig(
                 configApi = get(),
-                webNotificationSettingsCollector = get())
-        }
-        single<JSContactApi> {
-            JSContact(
-                contactApi = get())
-        }
-        single<JSTrackingApi> {
-            JSTracking(
-                trackingApi = get())
-        }
-        single<JSPushApi> {
-            JSPush(
-                pushApi = get())
-        }
-        single<JSDeepLinkApi> {
-            JSDeepLink(
-                deepLinkApi = get()
+                webNotificationSettingsCollector = get()
             )
         }
-        single<JSInAppApi> {
-            JSInApp(
-                inAppApi = get())
-        }
+        single<JSContactApi> { JSContact(contactApi = get()) }
+        single<JSTrackingApi> { JSTracking(trackingApi = get()) }
+        single<JSPushApi> { JSPush(pushApi = get()) }
+        single<JSDeepLinkApi> { JSDeepLink(deepLinkApi = get()) }
+        single<JSInAppApi> { JSInApp(inAppApi = get()) }
+        single<JsEmbeddedMessagingApi> { JsEmbeddedMessaging(embeddedMessagingApi = get()) }
     }
 
     private fun getNavigatorData(): String {

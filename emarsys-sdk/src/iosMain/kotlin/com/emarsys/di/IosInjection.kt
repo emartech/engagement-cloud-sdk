@@ -8,6 +8,8 @@ import com.emarsys.api.contact.IosContact
 import com.emarsys.api.contact.IosContactApi
 import com.emarsys.api.deeplink.IosDeepLink
 import com.emarsys.api.deeplink.IosDeepLinkApi
+import com.emarsys.api.embeddedmessaging.IosEmbeddedMessaging
+import com.emarsys.api.embeddedmessaging.IosEmbeddedMessagingApi
 import com.emarsys.api.inapp.IosInApp
 import com.emarsys.api.inapp.IosInAppApi
 import com.emarsys.api.push.IosPush
@@ -245,6 +247,7 @@ object IosInjection {
             IosPushWrapperApi::class,
             PushApi::class
         )
+        single<IosEmbeddedMessagingApi> { IosEmbeddedMessaging(embeddedMessaging = get()) }
     }
 }
 

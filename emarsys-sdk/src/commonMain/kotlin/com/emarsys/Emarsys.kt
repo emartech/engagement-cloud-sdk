@@ -3,6 +3,7 @@ package com.emarsys
 import com.emarsys.api.config.ConfigApi
 import com.emarsys.api.contact.ContactApi
 import com.emarsys.api.deeplink.DeepLinkApi
+import com.emarsys.api.embeddedmessaging.EmbeddedMessagingApi
 import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.push.PushApi
 import com.emarsys.api.setup.SetupApi
@@ -87,4 +88,10 @@ object Emarsys {
      */
     val deepLink: DeepLinkApi
         get() = koin.get<DeepLinkApi>()
+
+    /**
+     * Provides access to the Embedded Messaging API, which allows access to EmbeddedMessaging state.
+     */
+    val embeddedMessaging: EmbeddedMessagingApi
+        get() = koin.get<EmbeddedMessagingApi>()
 }

@@ -3,6 +3,7 @@ package com.emarsys
 import com.emarsys.api.config.IosConfigApi
 import com.emarsys.api.contact.IosContactApi
 import com.emarsys.api.deeplink.IosDeepLinkApi
+import com.emarsys.api.embeddedmessaging.IosEmbeddedMessagingApi
 import com.emarsys.api.inapp.IosInAppApi
 import com.emarsys.api.push.IosPushApi
 import com.emarsys.api.setup.IosSetupApi
@@ -46,6 +47,8 @@ object IosEmarsys {
         get() = koin.get<IosConfigApi>()
     val deepLink: IosDeepLinkApi
         get() = koin.get<IosDeepLinkApi>()
+    val embeddedMessaging: IosEmbeddedMessagingApi
+        get() = koin.get<IosEmbeddedMessagingApi>()
 
     /**
      * Initializes the SDK. This method must be called before using any other SDK functionality.
