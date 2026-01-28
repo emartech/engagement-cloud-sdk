@@ -35,8 +35,10 @@ object InitInjection {
             RegisterInstancesState(
                 eventTrackerApi = get(),
                 contactApi = get(),
+                configApi = get(),
                 pushApi = get(),
                 inAppApi = get(),
+                embeddedMessagingApi = get(),
                 sdkLogger = get { parametersOf(RegisterInstancesState::class.simpleName) },
             )
         }

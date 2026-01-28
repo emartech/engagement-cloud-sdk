@@ -1,13 +1,13 @@
 package com.emarsys.init.states
 
+import com.emarsys.api.config.ConfigApi
 import com.emarsys.api.contact.ContactApi
+import com.emarsys.api.embeddedmessaging.EmbeddedMessagingApi
 import com.emarsys.api.event.EventTrackerApi
 import com.emarsys.api.inapp.InAppApi
 import com.emarsys.api.push.PushApi
 import com.emarsys.core.log.SdkLogger
 import dev.mokkery.MockMode
-import dev.mokkery.answering.returns
-import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
@@ -21,18 +21,24 @@ class RegisterInstancesStateTests {
     private lateinit var mockContactApi: ContactApi
     private lateinit var mockPushApi: PushApi
     private lateinit var mockInAppApi: InAppApi
+    private lateinit var mockEmbeddedMessagingApi: EmbeddedMessagingApi
+    private lateinit var mockConfigApi: ConfigApi
 
     @BeforeTest
     fun setup() {
-        mockEventTrackerApi = mock()
-        mockContactApi = mock()
-        mockPushApi = mock()
-        mockInAppApi = mock()
+        mockEventTrackerApi = mock(MockMode.autofill)
+        mockContactApi = mock(MockMode.autofill)
+        mockPushApi = mock(MockMode.autofill)
+        mockConfigApi = mock(MockMode.autofill)
+        mockEmbeddedMessagingApi = mock(MockMode.autofill)
+        mockInAppApi = mock(MockMode.autofill)
         registerInstancesState = RegisterInstancesState(
             mockEventTrackerApi,
             mockContactApi,
+            mockConfigApi,
             mockPushApi,
             mockInAppApi,
+            mockEmbeddedMessagingApi,
             SdkLogger("TestLoggerName", mock(MockMode.autofill), sdkContext = mock())
         )
     }
@@ -44,10 +50,6 @@ class RegisterInstancesStateTests {
 
     @Test
     fun testActive_should_call_registerOnContext_on_instances() = runTest {
-        everySuspend { mockEventTrackerApi.registerOnContext() } returns Unit
-        everySuspend { mockContactApi.registerOnContext() } returns Unit
-        everySuspend { mockPushApi.registerOnContext() } returns Unit
-        everySuspend { mockInAppApi.registerOnContext() } returns Unit
 
         registerInstancesState.active() shouldBe Result.success(Unit)
 
@@ -55,5 +57,7 @@ class RegisterInstancesStateTests {
         verifySuspend { mockContactApi.registerOnContext() }
         verifySuspend { mockPushApi.registerOnContext() }
         verifySuspend { mockInAppApi.registerOnContext() }
+        verifySuspend { mockConfigApi.registerOnContext() }
+        verifySuspend { mockEmbeddedMessagingApi.registerOnContext() }
     }
 }

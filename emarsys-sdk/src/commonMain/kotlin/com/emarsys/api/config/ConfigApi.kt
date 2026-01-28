@@ -1,5 +1,6 @@
 package com.emarsys.api.config
 
+import com.emarsys.api.AutoRegisterable
 import com.emarsys.api.SdkState
 import com.emarsys.core.device.NotificationSettings
 
@@ -8,7 +9,7 @@ import com.emarsys.core.device.NotificationSettings
  *
  * This API allows retrieving and modifying various configuration parameters.
  */
-interface ConfigApi {
+interface ConfigApi: AutoRegisterable {
 
     /**
      * Retrieves the application code configured.
