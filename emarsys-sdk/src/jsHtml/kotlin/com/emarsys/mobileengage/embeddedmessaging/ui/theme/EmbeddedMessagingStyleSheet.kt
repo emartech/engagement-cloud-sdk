@@ -26,7 +26,6 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstant
 import org.jetbrains.compose.web.ExperimentalComposeWebApi
 import org.jetbrains.compose.web.css.AlignContent
 import org.jetbrains.compose.web.css.AlignItems
-import org.jetbrains.compose.web.css.AlignSelf
 import org.jetbrains.compose.web.css.AnimationTimingFunction
 import org.jetbrains.compose.web.css.AnimationTimingFunction.Companion.cubicBezier
 import org.jetbrains.compose.web.css.Color
@@ -37,7 +36,6 @@ import org.jetbrains.compose.web.css.Position
 import org.jetbrains.compose.web.css.StyleSheet
 import org.jetbrains.compose.web.css.alignContent
 import org.jetbrains.compose.web.css.alignItems
-import org.jetbrains.compose.web.css.alignSelf
 import org.jetbrains.compose.web.css.animation
 import org.jetbrains.compose.web.css.background
 import org.jetbrains.compose.web.css.backgroundColor
@@ -193,7 +191,7 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         alignItems(AlignItems.Center)
     }
 
-    val refreshIcon by style {
+    val defaultSvgIconSize by style {
         width(ICON_DEFAULT_SIZE)
         height(ICON_DEFAULT_SIZE)
     }
@@ -276,8 +274,6 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         backgroundColor(Color.transparent)
         border(ZERO_BORDER_WIDTH)
         cursor(DEFAULT_CURSOR)
-        width(ICON_DEFAULT_SIZE)
-        height(ICON_DEFAULT_SIZE)
         padding(ZERO_PADDING)
         display(DisplayStyle.Flex)
         alignItems(AlignItems.Center)
@@ -328,11 +324,6 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         backgroundColor(Color.transparent)
         color(CssColorVars.colorOnPrimaryContainer.value())
         border(ZERO_BORDER_WIDTH)
-    }
-
-    val categoryChipCheckmark by style {
-        width(ICON_DEFAULT_SIZE)
-        height(ICON_DEFAULT_SIZE)
     }
 
     val dialogActionsContainer by style {
@@ -403,16 +394,7 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         border(ZERO_BORDER_WIDTH)
     }
 
-    val categorySelectorIcon by style {
-        width(ICON_DEFAULT_SIZE)
-        height(ICON_DEFAULT_SIZE)
-        property("fill", "currentColor")
-    }
-
     val deleteMessageIcon by style {
-        width(ICON_DEFAULT_SIZE)
-        height(ICON_DEFAULT_SIZE)
-        property("fill", "currentColor")
         padding(DEFAULT_PADDING)
         property("opacity", 0)
         property("pointer-events", "none")
@@ -523,17 +505,6 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Column)
         gap(DEFAULT_SPACING)
-    }
-
-    val detailBackButton by style {
-        padding(DEFAULT_PADDING)
-        borderRadius(DEFAULT_BORDER_RADIUS)
-        border(ZERO_BORDER_WIDTH)
-        backgroundColor(CssColorVars.colorSurfaceVariant.value())
-        color(CssColorVars.colorOnSurface.value())
-        cursor(DEFAULT_CURSOR)
-        alignSelf(AlignSelf.FlexStart)
-        marginBottom(DEFAULT_PADDING)
     }
 
     val detailContent by style {

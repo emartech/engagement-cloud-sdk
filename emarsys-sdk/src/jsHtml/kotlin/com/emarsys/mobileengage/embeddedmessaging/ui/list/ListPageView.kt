@@ -123,21 +123,13 @@ fun MessageList(
 
             Div({ classes(EmbeddedMessagingStyleSheet.detailPane) }) {
                 selectedMessage?.let {
-                    MessageDetailView(
-                        viewModel = it,
-                        isSplitView = true,
-                        onBack = {}
-                    )
+                    MessageDetailView(viewModel = it)
                 } ?: EmptyDetailState()
             }
         }
     } else {
         if (selectedMessage != null) {
-            MessageDetailView(
-                viewModel = viewModel.selectedMessage.value!!,
-                isSplitView = false,
-                onBack = { viewModel.clearMessageSelection() }
-            )
+            MessageDetailView(viewModel = viewModel.selectedMessage.value!!)
         } else {
             FilterRow(
                 selectedCategoryIds = selectedCategoryIds,
@@ -219,10 +211,7 @@ fun MessageListContent(
                 onClick { onRefresh() }
                 classes(EmbeddedMessagingStyleSheet.refreshButton)
             }) {
-                SvgIcon(
-                    path = REFRESH_ICON_PATH,
-                    className = EmbeddedMessagingStyleSheet.refreshIcon
-                )
+                SvgIcon(path = REFRESH_ICON_PATH)
             }
 
             if (lazyPagingMessageItems.itemCount == 0) {

@@ -13,7 +13,6 @@ import io.ktor.http.Url
 import kotlinx.browser.window
 import org.jetbrains.compose.web.css.height
 import org.jetbrains.compose.web.css.px
-import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.H2
 import org.jetbrains.compose.web.dom.Img
@@ -22,9 +21,7 @@ import org.jetbrains.compose.web.dom.Text
 
 @Composable
 fun MessageDetailView(
-    viewModel: MessageItemViewModelApi,
-    isSplitView: Boolean,
-    onBack: () -> Unit
+    viewModel: MessageItemViewModelApi
 ) {
     var imageDataUrl by remember { mutableStateOf<String?>(null) }
 
@@ -44,15 +41,6 @@ fun MessageDetailView(
     Div({
         classes(EmbeddedMessagingStyleSheet.detailViewContainer)
     }) {
-        if (!isSplitView) {
-            Button({
-                onClick { onBack() }
-                classes(EmbeddedMessagingStyleSheet.detailBackButton)
-            }) {
-                Text("← Back")
-            }
-        }
-
         Div({
             classes(EmbeddedMessagingStyleSheet.detailContent)
         }) {

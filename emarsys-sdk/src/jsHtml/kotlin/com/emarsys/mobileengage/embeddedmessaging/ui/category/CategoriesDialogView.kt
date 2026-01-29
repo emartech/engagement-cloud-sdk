@@ -73,7 +73,7 @@ private fun DialogHeader(onDismiss: () -> Unit) {
                 onClick { onDismiss() }
                 classes(EmbeddedMessagingStyleSheet.dialogCloseButton)
             }) {
-                SvgIcon(path = CLOSE_ICON_PATH, className = null)
+                SvgIcon(path = CLOSE_ICON_PATH)
             }
         }
 
@@ -112,10 +112,7 @@ private fun CategoryFilterChipsList(
                 )
             }) {
                 if (isSelected) {
-                    SvgIcon(
-                        path = CHECK_ICON_PATH,
-                        className = EmbeddedMessagingStyleSheet.categoryChipCheckmark
-                    )
+                    SvgIcon(path = CHECK_ICON_PATH)
                 }
                 Text(value)
             }
@@ -157,16 +154,11 @@ private fun DialogActionButtons(
 
 @OptIn(ExperimentalComposeWebSvgApi::class)
 @Composable
-internal fun SvgIcon(path: String, className: String?) {
+internal fun SvgIcon(path: String, className: String? = null) {
     Svg(viewBox = "0 0 24 24", attrs = {
+        classes(EmbeddedMessagingStyleSheet.defaultSvgIconSize)
         className?.let { classes(it) }
         attr("fill", "currentColor")
-        if (className == null) {
-            style {
-                property("width", "100%")
-                property("height", "100%")
-            }
-        }
     }) {
         Path(d = path)
     }

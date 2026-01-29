@@ -26,9 +26,6 @@ fun CategorySelectorButton(
         Span {
             Text(LocalStringResources.current.categoriesFilterButtonLabel)
         }
-        SvgIcon(
-            path = FILTER_ALT_ICON_PATH,
-            className = EmbeddedMessagingStyleSheet.categorySelectorIcon
-        )
+        SvgIcon(path = FILTER_ALT_ICON_PATH)
     }
 }
