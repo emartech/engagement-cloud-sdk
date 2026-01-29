@@ -23,7 +23,7 @@ interface ListPageViewModelApi {
 
     val shouldHideFilterRowForDetailedView: StateFlow<Boolean>
 
-    fun setFilterUnopenedOnly(unreadOnly: Boolean)
+    fun setFilterUnopenedOnly(unopenedOnly: Boolean)
     fun setSelectedCategoryIds(categoryIds: Set<Int>)
 
     suspend fun selectMessage(messageViewModel: MessageItemViewModelApi, onNavigate: suspend () -> Unit)

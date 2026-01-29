@@ -24,6 +24,11 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingThem
 import com.emarsys.mobileengage.embeddedmessaging.ui.translation.LocalStringResources
 import kotlinx.browser.window
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.web.css.Position
+import org.jetbrains.compose.web.css.left
+import org.jetbrains.compose.web.css.position
+import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.css.width
 import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Hr
@@ -31,6 +36,7 @@ import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 import org.jetbrains.compose.web.renderComposable
 import org.w3c.dom.Element
+import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.events.Event
 import web.dom.document
 import web.intersection.IntersectionObserver
@@ -245,36 +251,68 @@ fun FilterRow(
     onFilterChange: (Boolean) -> Unit,
     onCategorySelectorClicked: () -> Unit
 ) {
+    var allFilterButtonRef by remember { mutableStateOf<HTMLButtonElement?>(null) }
+    var unreadFilterButtonRef by remember { mutableStateOf<HTMLButtonElement?>(null) }
+
+    val selectedFilterButton = if (filterUnopenedOnly) unreadFilterButtonRef else allFilterButtonRef
+
     Div({
         classes(EmbeddedMessagingStyleSheet.filterRowContainer)
     }) {
-        Button({
-            onClick { onFilterChange(false) }
-            classes(
-                EmbeddedMessagingStyleSheet.filterButton,
-                if (!filterUnopenedOnly) EmbeddedMessagingStyleSheet.filterButtonSelected else EmbeddedMessagingStyleSheet.filterButtonUnselected
-            )
-        }) {
-            Text(LocalStringResources.current.allMessagesFilterButtonLabel)
-        }
-        Button({
-            onClick { onFilterChange(true) }
-            classes(
-                EmbeddedMessagingStyleSheet.filterButton,
-                if (filterUnopenedOnly) EmbeddedMessagingStyleSheet.filterButtonSelected else EmbeddedMessagingStyleSheet.filterButtonUnselected
-            )
-        }) {
-            Text(LocalStringResources.current.unreadMessagesFilterButtonLabel)
+        Div(
+            { style { position(Position.Relative) } }
+        ) {
+            Button({
+                ref { buttonElement ->
+                    allFilterButtonRef = buttonElement
+                    onDispose { }
+                }
+                onClick { onFilterChange(false) }
+                classes(
+                    EmbeddedMessagingStyleSheet.filterButton,
+                    if (!filterUnopenedOnly) EmbeddedMessagingStyleSheet.filterButtonSelected else EmbeddedMessagingStyleSheet.filterButtonUnselected
+                )
+            }) {
+                Text(LocalStringResources.current.allMessagesFilterButtonLabel)
+            }
+            Button({
+                ref {
+                    unreadFilterButtonRef = it
+                    onDispose { }
+                }
+                onClick { onFilterChange(true) }
+                classes(
+                    EmbeddedMessagingStyleSheet.filterButton,
+                    if (filterUnopenedOnly) EmbeddedMessagingStyleSheet.filterButtonSelected else EmbeddedMessagingStyleSheet.filterButtonUnselected
+                )
+            }) {
+                Text(LocalStringResources.current.unreadMessagesFilterButtonLabel)
+            }
+            Div({
+                classes(EmbeddedMessagingStyleSheet.filterButtonSelectedIndicator)
+                style {
+                    left(
+                        selectedFilterButton?.offsetLeft?.px ?: 0.px
+                    )
+                    width(
+                        selectedFilterButton?.offsetWidth?.px ?: 0.px
+                    )
+                }
+            })
         }
 
-        Div({ style { property("flex", "1") } })
-
-        CategorySelectorButton(
-            isCategorySelectionActive = selectedCategoryIds.isNotEmpty(),
-            onClick = {
-                onCategorySelectorClicked()
-            },
-        )
+        Div({
+            style {
+                property("margin-left", "auto")
+            }
+        }) {
+            CategorySelectorButton(
+                isCategorySelectionActive = selectedCategoryIds.isNotEmpty(),
+                onClick = {
+                    onCategorySelectorClicked()
+                },
+            )
+        }
     }
 }
 

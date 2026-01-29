@@ -23,10 +23,12 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstant
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.ZERO_PADDING
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.ZERO_POSITION_VALUE
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.ZERO_SPACING
+import org.jetbrains.compose.web.ExperimentalComposeWebApi
 import org.jetbrains.compose.web.css.AlignContent
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.AlignSelf
 import org.jetbrains.compose.web.css.AnimationTimingFunction
+import org.jetbrains.compose.web.css.AnimationTimingFunction.Companion.cubicBezier
 import org.jetbrains.compose.web.css.Color
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.FlexDirection
@@ -66,10 +68,13 @@ import org.jetbrains.compose.web.css.ms
 import org.jetbrains.compose.web.css.padding
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.position
+import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.right
+import org.jetbrains.compose.web.css.s
 import org.jetbrains.compose.web.css.textAlign
 import org.jetbrains.compose.web.css.timingFunction
 import org.jetbrains.compose.web.css.top
+import org.jetbrains.compose.web.css.transitions
 import org.jetbrains.compose.web.css.width
 
 object EmbeddedMessagingStyleSheet : StyleSheet() {
@@ -135,9 +140,23 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
     }
 
     val filterButtonSelected by style {
-        backgroundColor(CssColorVars.colorSecondaryContainer.value())
-        color(CssColorVars.colorOnSecondaryContainer.value())
+        backgroundColor(Color.transparent)
+        color(CssColorVars.colorPrimary.value())
         border(ZERO_BORDER_WIDTH)
+    }
+
+    @OptIn(ExperimentalComposeWebApi::class)
+    val filterButtonSelectedIndicator by style {
+        position(Position.Absolute)
+        bottom(0.px)
+        height(2.px)
+        backgroundColor(CssColorVars.colorSurfaceTint.value())
+        transitions {
+            all {
+                duration = 0.3.s
+                timingFunction = cubicBezier(0.4, 0.0, 0.2, 1.0)
+            }
+        }
     }
 
     val divider by style {

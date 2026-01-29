@@ -103,8 +103,8 @@ internal class ListPageViewModel(
 
     override val triggerRefreshFromJs = { triggerFromJS.value = !triggerFromJS.value }
 
-    override fun setFilterUnopenedOnly(unreadOnly: Boolean) {
-        _filterUnopenedOnly.value = unreadOnly
+    override fun setFilterUnopenedOnly(unopenedOnly: Boolean) {
+        _filterUnopenedOnly.value = unopenedOnly
     }
 
     override fun setSelectedCategoryIds(categoryIds: Set<Int>) {
