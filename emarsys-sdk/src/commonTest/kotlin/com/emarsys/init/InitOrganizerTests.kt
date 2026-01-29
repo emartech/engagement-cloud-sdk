@@ -6,6 +6,7 @@ import com.emarsys.core.log.Logger
 import com.emarsys.core.state.StateMachineApi
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
+import dev.mokkery.answering.sequentiallyReturns
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode
@@ -79,11 +80,14 @@ class InitOrganizerTests {
     fun init_should_not_move_sdkState_backwards_whenInitStateMachine_alreadyActivatedTheSDK() =
         runTest {
             everySuspend { mockStateMachine.activate() } returns Result.success(Unit)
-            everySuspend { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
+            everySuspend { mockSdkContext.currentSdkState } sequentiallyReturns listOf(
+                MutableStateFlow(SdkState.UnInitialized),
+                MutableStateFlow(SdkState.OnHold)
+            )
 
             initOrganizer.init()
 
-            verifySuspend(VerifyMode.exactly(0)) { mockStateMachine.activate() }
+            verifySuspend(VerifyMode.exactly(1)) { mockStateMachine.activate() }
             verifySuspend(VerifyMode.exactly(0)) { mockSdkContext.setSdkState(SdkState.UnInitialized) }
             verifySuspend(VerifyMode.exactly(0)) { mockSdkContext.setSdkState(SdkState.OnHold) }
             verifySuspend(VerifyMode.exactly(0)) { mockSdkContext.setSdkState(SdkState.Initialized) }

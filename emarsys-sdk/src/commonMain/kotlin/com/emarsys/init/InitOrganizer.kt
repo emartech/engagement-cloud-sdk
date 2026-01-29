@@ -16,7 +16,9 @@ internal class InitOrganizer(
         if (sdkContext.currentSdkState.value == SdkState.UnInitialized) {
             initStateMachine.activate()
                 .onSuccess {
-                    sdkContext.setSdkState(SdkState.Initialized)
+                    if (sdkContext.currentSdkState.value == SdkState.UnInitialized) {
+                        sdkContext.setSdkState(SdkState.Initialized)
+                    }
                 }
                 .onFailure {
                     sdkLogger.debug("SDK initialization failed.", it)
