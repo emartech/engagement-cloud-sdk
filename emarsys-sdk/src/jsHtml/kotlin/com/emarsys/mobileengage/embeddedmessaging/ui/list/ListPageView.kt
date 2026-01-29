@@ -47,19 +47,24 @@ private const val REFRESH_ICON_PATH =
 @Composable
 fun ListPageView(
     customMessageItemElementName: String? = null,
+    showFilters: Boolean = true,
     viewModel: ListPageViewModelApi = koin.get()
 ) {
     EmbeddedMessagingTheme {
         Div({
             classes(EmbeddedMessagingStyleSheet.listPageContainer)
         }) {
-            MessageList(customMessageItemElementName, viewModel)
+            MessageList(customMessageItemElementName, showFilters, viewModel)
         }
     }
 }
 
 @Composable
-fun MessageList(customMessageItemElementName: String?, viewModel: ListPageViewModelApi) {
+fun MessageList(
+    customMessageItemElementName: String?,
+    showFilters: Boolean = true,
+    viewModel: ListPageViewModelApi
+) {
     val lazyPagingMessageItems =
         viewModel.messagePagingDataFlowFiltered.collectAsLazyPagingItems()
     val filterUnopenedOnly by viewModel.filterUnopenedOnly.collectAsState()
@@ -90,13 +95,15 @@ fun MessageList(customMessageItemElementName: String?, viewModel: ListPageViewMo
     if (isLandscape) {
         Div({ classes(EmbeddedMessagingStyleSheet.splitViewContainer) }) {
             Div({ classes(EmbeddedMessagingStyleSheet.listPane) }) {
-                FilterRow(
-                    selectedCategoryIds = selectedCategoryIds,
-                    filterUnopenedOnly = filterUnopenedOnly,
-                    onFilterChange = { viewModel.setFilterUnopenedOnly(it) },
-                    onCategorySelectorClicked = { viewModel.openCategorySelector() }
-                )
-                Hr({ classes(EmbeddedMessagingStyleSheet.divider) })
+                if (showFilters) {
+                    FilterRow(
+                        selectedCategoryIds = selectedCategoryIds,
+                        filterUnopenedOnly = filterUnopenedOnly,
+                        onFilterChange = { viewModel.setFilterUnopenedOnly(it) },
+                        onCategorySelectorClicked = { viewModel.openCategorySelector() }
+                    )
+                    Hr({ classes(EmbeddedMessagingStyleSheet.divider) })
+                }
 
                 MessageListContent(
                     lazyPagingMessageItems = lazyPagingMessageItems,

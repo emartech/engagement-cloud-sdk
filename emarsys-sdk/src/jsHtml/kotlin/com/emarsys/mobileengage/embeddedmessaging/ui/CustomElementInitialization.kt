@@ -7,7 +7,7 @@ actual fun initializeCustomElements() {
         "ec-embedded-messaging-list",
         createBridge(
             factory = { EmarsysMessagingListElement() },
-            observedAttributes = arrayOf("custom-message-item-element-name")
+            observedAttributes = arrayOf("custom-message-item-element-name", "hide-filters")
         )
     )
     window.customElements.define(

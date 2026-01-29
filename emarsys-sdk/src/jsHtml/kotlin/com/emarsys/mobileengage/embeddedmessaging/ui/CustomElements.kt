@@ -71,7 +71,8 @@ abstract class ComposeCustomElement(
 class EmarsysMessagingListElement : ComposeCustomElement({ _ ->
     { attributes ->
         val customMessageItemName = attributes["custom-message-item-element-name"]
-        ListPageView(customMessageItemName)
+        val showFilters = attributes["hide-filters"] == null
+        ListPageView(customMessageItemName, showFilters = showFilters)
     }
 })
 
