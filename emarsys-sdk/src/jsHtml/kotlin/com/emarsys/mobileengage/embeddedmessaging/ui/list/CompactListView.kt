@@ -12,7 +12,7 @@ import org.jetbrains.compose.web.dom.Div
 @Composable
 fun CompactListView(
     customMessageItemElementName: String? = null,
-    navigateToDetailedView: () -> Unit
+    navigateToDetailedView: () -> Unit = {}
 ) {
     val viewModel: ListPageViewModelApi = koin.get()
     val scope = rememberCoroutineScope()

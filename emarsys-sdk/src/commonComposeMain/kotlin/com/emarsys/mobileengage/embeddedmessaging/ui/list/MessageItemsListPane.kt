@@ -52,7 +52,6 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstant
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.MESSAGE_ITEM_IMAGE_SIZE
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.CustomMessageItemViewModelApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.DeleteMessageItemConfirmationDialog
-import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemModelApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemView
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.list.placeholders.PlaceholderMessageList
@@ -61,16 +60,16 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.theme.LocalDesignValues
 import com.emarsys.mobileengage.embeddedmessaging.ui.translation.LocalStringResources
 import kotlinx.coroutines.launch
 
-private fun LazyPagingItems<MessageItemViewModelApi>.isIdleButEmpty(): Boolean =
+internal fun LazyPagingItems<MessageItemViewModelApi>.isIdleButEmpty(): Boolean =
     this.itemCount == 0 && this.loadState.isIdle && !this.loadState.hasError
 
-private fun LazyPagingItems<MessageItemViewModelApi>.isInitiallyLoading(): Boolean =
+internal fun LazyPagingItems<MessageItemViewModelApi>.isInitiallyLoading(): Boolean =
     this.loadState.source.refresh is LoadState.Loading
 
-private fun LazyPagingItems<MessageItemViewModelApi>.hasRefreshError(): Boolean =
+internal fun LazyPagingItems<MessageItemViewModelApi>.hasRefreshError(): Boolean =
     this.loadState.source.refresh is LoadState.Error
 
-private fun LazyPagingItems<MessageItemViewModelApi>.isLoadingMore(): Boolean =
+internal fun LazyPagingItems<MessageItemViewModelApi>.isLoadingMore(): Boolean =
     this.loadState.source.append == LoadState.Loading
 
 private fun LazyPagingItems<MessageItemViewModelApi>.shouldShowErrorStateNoConnection(hasConnection: Boolean): Boolean =
@@ -293,7 +292,7 @@ private fun DeleteMessageOnSwipeBox() {
 }
 
 @Composable
-private fun MessagesLoadingSpinner() {
+internal fun MessagesLoadingSpinner() {
     EmbeddedMessagingTheme {
         Box(
             modifier = Modifier.fillMaxWidth().padding(DEFAULT_PADDING),
@@ -307,7 +306,7 @@ private fun MessagesLoadingSpinner() {
 }
 
 @Composable
-private fun EmptyState() {
+internal fun EmptyState() {
     EmbeddedMessagingTheme {
         Box(
             modifier = Modifier.fillMaxSize(),
