@@ -34,10 +34,9 @@ class LoggingEmbeddedMessagingTests {
     fun setup() {
         Dispatchers.setMain(StandardTestDispatcher())
         mockSdkContext = mock()
-        every { mockSdkContext.sdkDispatcher } returns StandardTestDispatcher()
         mockLogger = mock()
+        every { mockSdkContext.sdkDispatcher } returns StandardTestDispatcher()
         everySuspend { mockLogger.debug(capture(slot)) } returns Unit
-
         loggingInstance = LoggingEmbeddedMessaging(mockSdkContext, mockLogger)
     }
 
@@ -47,8 +46,58 @@ class LoggingEmbeddedMessagingTests {
     }
 
     @Test
-    fun categories_shouldReturn_categories_fromViewmodel() = runTest {
+    fun categories_shouldReturn_emptyList_andLog_logMethodNotAllowed() = runTest {
         loggingInstance.categories shouldBe emptyList()
+
+        advanceUntilIdle()
+
+        val capturedLogEntry = slot.get()
+        capturedLogEntry.topic shouldBe "log_method_not_allowed"
+    }
+
+    @Test
+    fun isUnreadFilterActive_shouldReturn_false_andLog_logMethodNotAllowed() = runTest {
+        loggingInstance.isUnreadFilterActive shouldBe false
+
+        advanceUntilIdle()
+
+        val capturedLogEntry = slot.get()
+        capturedLogEntry.topic shouldBe "log_method_not_allowed"
+    }
+
+    @Test
+    fun activeCategoryIdFilters_shouldReturn_emptySet_andLog_logMethodNotAllowed() = runTest {
+        loggingInstance.activeCategoryIdFilters shouldBe emptySet()
+
+        advanceUntilIdle()
+
+        val capturedLogEntry = slot.get()
+        capturedLogEntry.topic shouldBe "log_method_not_allowed"
+    }
+
+    @Test
+    fun filterUnreadOnly_shouldLog_logMethodNotAllowed() = runTest {
+        loggingInstance.filterUnreadOnly(true)
+
+        advanceUntilIdle()
+
+        val capturedLogEntry = slot.get()
+        capturedLogEntry.topic shouldBe "log_method_not_allowed"
+    }
+
+    @Test
+    fun filterByCategoryIds_shouldLog_logMethodNotAllowed() = runTest {
+        loggingInstance.filterByCategoryIds(setOf(1, 2))
+
+        advanceUntilIdle()
+
+        val capturedLogEntry = slot.get()
+        capturedLogEntry.topic shouldBe "log_method_not_allowed"
+    }
+
+    @Test
+    fun activate_shouldLog_debugInfo() = runTest {
+        loggingInstance.activate()
 
         advanceUntilIdle()
 

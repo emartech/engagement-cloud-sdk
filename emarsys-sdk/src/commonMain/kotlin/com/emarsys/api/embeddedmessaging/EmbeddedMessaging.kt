@@ -21,4 +21,17 @@ internal class EmbeddedMessaging<Logging : EmbeddedMessagingInstance, Gatherer :
 
     override val categories: List<MessageCategory>
         get() = activeInstance<EmbeddedMessagingInternalApi>().categories
+    override val isUnreadFilterActive: Boolean
+        get() = activeInstance<EmbeddedMessagingInternalApi>().isUnreadFilterActive
+    override val activeCategoryIdFilters: List<Int>
+        get() = activeInstance<EmbeddedMessagingInternalApi>().activeCategoryIdFilters.toList()
+
+    override fun filterUnreadOnly(filterUnreadOnly: Boolean) {
+        activeInstance<EmbeddedMessagingInternalApi>().filterUnreadOnly(filterUnreadOnly)
+    }
+
+    override fun filterByCategoryIds(categoryIds: List<Int>) {
+        activeInstance<EmbeddedMessagingInternalApi>().filterByCategoryIds(categoryIds.toSet())
+    }
+
 }
