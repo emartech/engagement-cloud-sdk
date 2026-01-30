@@ -56,6 +56,8 @@ import com.emarsys.core.providers.WebApplicationVersionProvider
 import com.emarsys.core.providers.WebLanguageProvider
 import com.emarsys.core.providers.pagelocation.PageLocationProvider
 import com.emarsys.core.providers.pagelocation.PageLocationProviderApi
+import com.emarsys.core.providers.platform.PlatformCategoryProvider
+import com.emarsys.core.providers.platform.PlatformCategoryProviderApi
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.StringStorageApi
@@ -124,6 +126,7 @@ object WebInjection {
                 logger = get { parametersOf(JSEventsDao::class.simpleName) }
             )
         }
+        single<PlatformCategoryProviderApi> { PlatformCategoryProvider() }
         single<PermissionHandlerApi> { WebPermissionHandler() }
         single<DeviceInfoCollectorApi> {
             DeviceInfoCollector(
@@ -136,7 +139,8 @@ object WebInjection {
                 webNotificationSettingsCollector = get(),
                 json = get(),
                 stringStorage = get(),
-                sdkContext = get()
+                sdkContext = get(),
+                platformCategoryProvider = get()
             )
         }
         single<PushServiceContextApi> { PushServiceContext() }

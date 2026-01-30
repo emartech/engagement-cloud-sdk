@@ -8,6 +8,7 @@ import com.emarsys.core.providers.ApplicationVersionProviderApi
 import com.emarsys.core.providers.LanguageProviderApi
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.providers.TimezoneProviderApi
+import com.emarsys.core.providers.platform.PlatformCategoryProviderApi
 import com.emarsys.core.storage.StorageConstants
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
@@ -25,7 +26,8 @@ internal actual class DeviceInfoCollector(
     private val webNotificationSettingsCollector: WebNotificationSettingsCollectorApi,
     private val json: Json,
     private val stringStorage: StringStorageApi,
-    private val sdkContext: SdkContextApi
+    private val sdkContext: SdkContextApi,
+    private val platformCategoryProvider: PlatformCategoryProviderApi
 ) : DeviceInfoCollectorApi {
 
     actual override suspend fun collect(): String {
@@ -37,7 +39,7 @@ internal actual class DeviceInfoCollector(
 
         return DeviceInfo(
             platform = headerData.browserName,
-            platformCategory = SdkConstants.WEB_PLATFORM_CATEGORY,
+            platformCategory = platformCategoryProvider.provide(),
             platformWrapper = getWrapperInfo()?.platformWrapper,
             platformWrapperVersion = getWrapperInfo()?.wrapperVersion,
             applicationVersion = applicationVersionProvider.provide(),
@@ -85,6 +87,6 @@ internal actual class DeviceInfoCollector(
     }
 
     actual override fun getPlatformCategory(): String {
-        return SdkConstants.WEB_PLATFORM_CATEGORY
+        return platformCategoryProvider.provide()
     }
 }

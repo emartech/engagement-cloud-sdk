@@ -10,6 +10,7 @@ import com.emarsys.core.providers.ApplicationVersionProviderApi
 import com.emarsys.core.providers.LanguageProviderApi
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.providers.TimezoneProviderApi
+import com.emarsys.core.providers.platform.PlatformCategoryProviderApi
 import com.emarsys.core.storage.StorageConstants
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
@@ -29,13 +30,14 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class DeviceInfoCollectorTests {
-    private companion object {
+    private companion object Companion {
         const val LANGUAGE = "en-US"
         const val APP_VERSION = "2.0"
         const val CLIENT_ID = "test uuid"
         const val DEVICE_MODEL = "iPhone16"
         const val OS_VERSION = "testOsVersion"
         const val TIMEZONE = "+0300"
+        const val PLATFORM_CATEGORY = "testCategory"
     }
 
     private lateinit var mockClientIdProvider: Provider<String>
@@ -47,6 +49,7 @@ class DeviceInfoCollectorTests {
     private lateinit var json: Json
     private lateinit var mockStringStorage: StringStorageApi
     private lateinit var mockSdkContext: SdkContextApi
+    private lateinit var mockPlatformCategoryProvider: PlatformCategoryProviderApi
     private lateinit var deviceInfoCollector: DeviceInfoCollector
     private lateinit var mockIosNotificationSettingsCollector: IosNotificationSettingsCollectorApi
 
@@ -77,6 +80,8 @@ class DeviceInfoCollectorTests {
         val mockConfig: SdkConfig = mock()
         every { mockSdkContext.config } returns mockConfig
         every { mockConfig.applicationCode } returns "testAppCode"
+        mockPlatformCategoryProvider = mock()
+        every { mockPlatformCategoryProvider.provide() } returns PLATFORM_CATEGORY
         mockIosNotificationSettingsCollector = mock()
         deviceInfoCollector = DeviceInfoCollector(
             mockClientIdProvider,
@@ -88,7 +93,8 @@ class DeviceInfoCollectorTests {
             mockIosNotificationSettingsCollector,
             json,
             mockStringStorage,
-            mockSdkContext
+            mockSdkContext,
+            mockPlatformCategoryProvider
         )
     }
 
@@ -96,7 +102,7 @@ class DeviceInfoCollectorTests {
     fun collect_shouldCollectDeviceInfo() = runTest {
         val deviceInfo = DeviceInfo(
             KotlinPlatform.IOS.name.lowercase(),
-            SdkConstants.MOBILE_PLATFORM_CATEGORY,
+            PLATFORM_CATEGORY,
             null,
             null,
             APP_VERSION,
@@ -123,7 +129,7 @@ class DeviceInfoCollectorTests {
 
         val deviceInfo = DeviceInfo(
             KotlinPlatform.IOS.name.lowercase(),
-            SdkConstants.MOBILE_PLATFORM_CATEGORY,
+            PLATFORM_CATEGORY,
             null,
             null,
             APP_VERSION,
@@ -143,7 +149,7 @@ class DeviceInfoCollectorTests {
     fun collectAsDeviceInfoForLogs_shouldReturnDeviceInfo() = runTest {
         val expectedDeviceInfo = DeviceInfoForLogs(
             platform = "ios",
-            platformCategory = "mobile",
+            platformCategory = PLATFORM_CATEGORY,
             platformWrapper = null,
             platformWrapperVersion = null,
             applicationVersion = APP_VERSION,
@@ -186,7 +192,7 @@ class DeviceInfoCollectorTests {
 
     @Test
     fun getPlatformCategory_shouldReturn_mobilePlatformCategory() {
-        deviceInfoCollector.getPlatformCategory() shouldBe SdkConstants.MOBILE_PLATFORM_CATEGORY
+        deviceInfoCollector.getPlatformCategory() shouldBe PLATFORM_CATEGORY
     }
 
     private fun getTestIosNotificationSettings() = IosNotificationSettings(

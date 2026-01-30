@@ -9,6 +9,7 @@ import com.emarsys.core.providers.ApplicationVersionProviderApi
 import com.emarsys.core.providers.LanguageProviderApi
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.providers.TimezoneProviderApi
+import com.emarsys.core.providers.platform.PlatformCategoryProviderApi
 import com.emarsys.core.storage.StorageConstants
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
@@ -32,6 +33,7 @@ class DeviceInfoCollectorTests {
         const val TIMEZONE = "+0300"
         const val WRAPPER_PLATFORM = "flutter"
         const val WRAPPER_VERSION = "1.0.0"
+        const val PLATFORM_CATEGORY = "testCategory"
     }
 
     private lateinit var mockLanguageProvider: LanguageProviderApi
@@ -44,6 +46,7 @@ class DeviceInfoCollectorTests {
     private lateinit var deviceInfoCollector: DeviceInfoCollector
     private lateinit var mockAndroidNotificationSettingsCollector: AndroidNotificationSettingsCollectorApi
     private lateinit var mockSdkContext: SdkContextApi
+    private lateinit var mockPlatformCategoryProvider: PlatformCategoryProviderApi
     private val json = JsonUtil.json
 
     @Before
@@ -61,6 +64,9 @@ class DeviceInfoCollectorTests {
         coEvery { mockClientIdProvider.provide() } returns CLIENT_ID
 
         mockPlatformInfoCollector = mockk(relaxed = true)
+
+        mockPlatformCategoryProvider = mockk(relaxed = true)
+        every { mockPlatformCategoryProvider.provide() } returns PLATFORM_CATEGORY
 
         mockStorage = mockk(relaxed = true)
         coEvery { mockStorage.get(any<String>(), WrapperInfo.serializer()) } returns null
@@ -84,7 +90,8 @@ class DeviceInfoCollectorTests {
             mockAndroidNotificationSettingsCollector,
             json,
             mockStringStorage,
-            mockSdkContext
+            mockSdkContext,
+            mockPlatformCategoryProvider
         )
     }
 
@@ -97,7 +104,7 @@ class DeviceInfoCollectorTests {
     fun collect_shouldReturn_deviceInfo_whenNative() = runTest {
         val expectedDeviceInfo = DeviceInfo(
             platform = "android",
-            platformCategory = "mobile",
+            platformCategory = PLATFORM_CATEGORY,
             platformWrapper = null,
             platformWrapperVersion = null,
             applicationVersion = APP_VERSION,
@@ -127,7 +134,7 @@ class DeviceInfoCollectorTests {
 
         val expectedDeviceInfo = DeviceInfo(
             platform = "android",
-            platformCategory = "mobile",
+            platformCategory = PLATFORM_CATEGORY,
             platformWrapper = WRAPPER_PLATFORM,
             platformWrapperVersion = WRAPPER_VERSION,
             applicationVersion = APP_VERSION,
@@ -158,7 +165,8 @@ class DeviceInfoCollectorTests {
             mockAndroidNotificationSettingsCollector,
             json,
             mockStringStorage,
-            mockSdkContext
+            mockSdkContext,
+            mockPlatformCategoryProvider
         )
 
         val result = deviceInfoCollector.collect()
@@ -169,32 +177,34 @@ class DeviceInfoCollectorTests {
     }
 
     @Test
-    fun getPushSettings_shouldCall_androidNotificationSettingsCollector_andReturn_enabledTrue() = runTest {
-        val testSettings = AndroidNotificationSettings(
-            true, -1000, listOf(ChannelSettings("testChannelId"))
-        )
-        val expectedNotificationSettings = NotificationSettings(true)
+    fun getPushSettings_shouldCall_androidNotificationSettingsCollector_andReturn_enabledTrue() =
+        runTest {
+            val testSettings = AndroidNotificationSettings(
+                true, -1000, listOf(ChannelSettings("testChannelId"))
+            )
+            val expectedNotificationSettings = NotificationSettings(true)
 
-        every { mockAndroidNotificationSettingsCollector.collect() } returns testSettings
+            every { mockAndroidNotificationSettingsCollector.collect() } returns testSettings
 
-        val result = deviceInfoCollector.getNotificationSettings()
+            val result = deviceInfoCollector.getNotificationSettings()
 
-        result shouldBe expectedNotificationSettings
-    }
+            result shouldBe expectedNotificationSettings
+        }
 
     @Test
-    fun getPushSettings_shouldCall_androidNotificationSettingsCollector_andReturn_enabledFalse() = runTest {
-        val testSettings = AndroidNotificationSettings(
-            false, -1000, listOf(ChannelSettings("testChannelId"))
-        )
-        val expectedNotificationSettings = NotificationSettings(false)
+    fun getPushSettings_shouldCall_androidNotificationSettingsCollector_andReturn_enabledFalse() =
+        runTest {
+            val testSettings = AndroidNotificationSettings(
+                false, -1000, listOf(ChannelSettings("testChannelId"))
+            )
+            val expectedNotificationSettings = NotificationSettings(false)
 
-        every { mockAndroidNotificationSettingsCollector.collect() } returns testSettings
+            every { mockAndroidNotificationSettingsCollector.collect() } returns testSettings
 
-        val result = deviceInfoCollector.getNotificationSettings()
+            val result = deviceInfoCollector.getNotificationSettings()
 
-        result shouldBe expectedNotificationSettings
-    }
+            result shouldBe expectedNotificationSettings
+        }
 
     @Test
     fun collect_shouldReturn_overWritten_language() = runTest {
@@ -205,7 +215,7 @@ class DeviceInfoCollectorTests {
 
         val expectedDeviceInfo = DeviceInfo(
             platform = "android",
-            platformCategory = "mobile",
+            platformCategory = PLATFORM_CATEGORY,
             platformWrapper = null,
             platformWrapperVersion = null,
             applicationVersion = APP_VERSION,
@@ -226,7 +236,7 @@ class DeviceInfoCollectorTests {
     fun collectAsDeviceInfoForLogs_shouldReturn_deviceInfo_whenNative() = runTest {
         val expectedDeviceInfo = DeviceInfoForLogs(
             platform = "android",
-            platformCategory = "mobile",
+            platformCategory = PLATFORM_CATEGORY,
             platformWrapper = null,
             platformWrapperVersion = null,
             applicationVersion = APP_VERSION,
@@ -247,6 +257,6 @@ class DeviceInfoCollectorTests {
 
     @Test
     fun getPlatformCategory_shouldReturn_mobilePlatformCategory() {
-        deviceInfoCollector.getPlatformCategory() shouldBe SdkConstants.MOBILE_PLATFORM_CATEGORY
+        deviceInfoCollector.getPlatformCategory() shouldBe PLATFORM_CATEGORY
     }
 }

@@ -45,6 +45,8 @@ import com.emarsys.core.providers.IosLanguageProvider
 import com.emarsys.core.providers.LanguageProviderApi
 import com.emarsys.core.providers.pagelocation.PageLocationProvider
 import com.emarsys.core.providers.pagelocation.PageLocationProviderApi
+import com.emarsys.core.providers.platform.PlatformCategoryProvider
+import com.emarsys.core.providers.platform.PlatformCategoryProviderApi
 import com.emarsys.core.setup.PlatformInitState
 import com.emarsys.core.state.State
 import com.emarsys.core.storage.StorageConstants
@@ -119,6 +121,7 @@ object IosInjection {
             )
         }
         single<PageLocationProviderApi> { PageLocationProvider() }
+        single<PlatformCategoryProviderApi> { PlatformCategoryProvider() }
         single<DeviceInfoCollectorApi> {
             DeviceInfoCollector(
                 clientIdProvider = ClientIdProvider(uuidProvider = get(), storage = get()),
@@ -130,7 +133,8 @@ object IosInjection {
                 iosNotificationSettingsCollector = get(),
                 json = get(),
                 stringStorage = get(),
-                sdkContext = get()
+                sdkContext = get(),
+                platformCategoryProvider = get()
             )
         }
         single<State>(named(StateTypes.PlatformInit)) { PlatformInitState() }

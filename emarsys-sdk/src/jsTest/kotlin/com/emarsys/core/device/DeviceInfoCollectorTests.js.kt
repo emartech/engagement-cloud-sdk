@@ -10,6 +10,7 @@ import com.emarsys.core.providers.ApplicationVersionProviderApi
 import com.emarsys.core.providers.LanguageProviderApi
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.providers.TimezoneProviderApi
+import com.emarsys.core.providers.platform.PlatformCategoryProviderApi
 import com.emarsys.core.storage.StorageConstants
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
@@ -40,6 +41,7 @@ class DeviceInfoCollectorTests {
         const val CLIENT_ID = "stored client id"
         const val WRAPPER_PLATFORM = "flutter"
         const val WRAPPER_VERSION = "1.0.0"
+        const val PLATFORM_CATEGORY = "testCategory"
 
         val navigator = window.navigator
         val testWebPlatformInfo = WebPlatformInfo(
@@ -62,6 +64,7 @@ class DeviceInfoCollectorTests {
     private lateinit var deviceInfoCollector: DeviceInfoCollector
     private lateinit var mockStringStorage: StringStorageApi
     private lateinit var mockSdkContext: SdkContextApi
+    private lateinit var mockPlatformCategoryProvider: PlatformCategoryProviderApi
     private val json: Json = JsonUtil.json
 
     @BeforeTest
@@ -90,6 +93,8 @@ class DeviceInfoCollectorTests {
         val mockConfig: SdkConfig = mock()
         every { mockSdkContext.config } returns mockConfig
         every { mockConfig.applicationCode } returns "testAppCode"
+        mockPlatformCategoryProvider = mock()
+        every { mockPlatformCategoryProvider.provide() } returns PLATFORM_CATEGORY
         deviceInfoCollector = DeviceInfoCollector(
             mockClientIdProvider,
             mockTimezoneProvider,
@@ -100,7 +105,8 @@ class DeviceInfoCollectorTests {
             mockWebNotificationSettingsCollector,
             json,
             mockStringStorage,
-            mockSdkContext
+            mockSdkContext,
+            mockPlatformCategoryProvider
         )
     }
 
@@ -108,7 +114,7 @@ class DeviceInfoCollectorTests {
     fun collect_shouldReturn_deviceInfo() = runTest {
         val expectedDeviceInfo = DeviceInfo(
             platform = BROWSER_NAME,
-            platformCategory = SdkConstants.WEB_PLATFORM_CATEGORY,
+            platformCategory = PLATFORM_CATEGORY,
             platformWrapper = null,
             platformWrapperVersion = null,
             applicationVersion = APPLICATION_VERSION,
@@ -139,7 +145,7 @@ class DeviceInfoCollectorTests {
 
         val expectedDeviceInfo = DeviceInfo(
             platform = BROWSER_NAME,
-            platformCategory = SdkConstants.WEB_PLATFORM_CATEGORY,
+            platformCategory = PLATFORM_CATEGORY,
             platformWrapper = WRAPPER_PLATFORM,
             platformWrapperVersion = WRAPPER_VERSION,
             applicationVersion = APPLICATION_VERSION,
@@ -162,7 +168,7 @@ class DeviceInfoCollectorTests {
 
         val expectedDeviceInfo = DeviceInfo(
             platform = BROWSER_NAME,
-            platformCategory = SdkConstants.WEB_PLATFORM_CATEGORY,
+            platformCategory = PLATFORM_CATEGORY,
             platformWrapper = null,
             platformWrapperVersion = null,
             applicationVersion = APPLICATION_VERSION,
@@ -183,7 +189,7 @@ class DeviceInfoCollectorTests {
     fun collectAsDeviceInfoForLogs_shouldReturn_deviceInfo() = runTest {
         val expectedDeviceInfo = DeviceInfoForLogs(
             platform = BROWSER_NAME,
-            platformCategory = SdkConstants.WEB_PLATFORM_CATEGORY,
+            platformCategory = PLATFORM_CATEGORY,
             platformWrapper = null,
             platformWrapperVersion = null,
             applicationVersion = APPLICATION_VERSION,
@@ -226,7 +232,7 @@ class DeviceInfoCollectorTests {
 
     @Test
     fun getPlatformCategory_shouldReturn_webPlatformCategory() = {
-        deviceInfoCollector.getPlatformCategory() shouldBe SdkConstants.WEB_PLATFORM_CATEGORY
+        deviceInfoCollector.getPlatformCategory() shouldBe PLATFORM_CATEGORY
     }
 
 }

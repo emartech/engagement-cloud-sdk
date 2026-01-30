@@ -8,6 +8,7 @@ import com.emarsys.core.providers.ApplicationVersionProviderApi
 import com.emarsys.core.providers.LanguageProviderApi
 import com.emarsys.core.providers.Provider
 import com.emarsys.core.providers.TimezoneProviderApi
+import com.emarsys.core.providers.platform.PlatformCategoryProviderApi
 import com.emarsys.core.storage.StorageConstants
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.storage.TypedStorageApi
@@ -27,6 +28,7 @@ internal actual class DeviceInfoCollector(
     private val json: Json,
     private val stringStorage: StringStorageApi,
     private val sdkContext: SdkContextApi,
+    private val platformCategoryProvider: PlatformCategoryProviderApi,
 ) : DeviceInfoCollectorApi {
     actual override suspend fun collect(): String {
         return json.encodeToString(collectAsDeviceInfo())
@@ -35,7 +37,7 @@ internal actual class DeviceInfoCollector(
     actual override suspend fun collectAsDeviceInfo(): DeviceInfo {
         return DeviceInfo(
             KotlinPlatform.IOS.name.lowercase(),
-            platformCategory = SdkConstants.MOBILE_PLATFORM_CATEGORY,
+            platformCategory = platformCategoryProvider.provide(),
             platformWrapper = getWrapperInfo()?.platformWrapper,
             platformWrapperVersion = getWrapperInfo()?.wrapperVersion,
             applicationVersion = applicationVersionProvider.provide(),
@@ -84,6 +86,6 @@ internal actual class DeviceInfoCollector(
     }
 
     actual override fun getPlatformCategory(): String {
-        return SdkConstants.MOBILE_PLATFORM_CATEGORY
+        return platformCategoryProvider.provide()
     }
 }
