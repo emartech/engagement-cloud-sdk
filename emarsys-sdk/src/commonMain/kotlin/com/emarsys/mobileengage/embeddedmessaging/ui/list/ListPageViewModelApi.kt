@@ -23,6 +23,8 @@ interface ListPageViewModelApi {
 
     val shouldHideFilterRowForDetailedView: StateFlow<Boolean>
 
+    val platformCategory: String
+
     fun setFilterUnopenedOnly(unopenedOnly: Boolean)
     fun setSelectedCategoryIds(categoryIds: Set<Int>)
 

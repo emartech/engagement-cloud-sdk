@@ -3,6 +3,7 @@ package com.emarsys.mobileengage.embeddedmessaging.ui.list
 import androidx.paging.cachedIn
 import androidx.paging.map
 import com.emarsys.core.providers.InstantProvider
+import com.emarsys.core.providers.platform.PlatformCategoryProviderApi
 import com.emarsys.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
 import com.emarsys.networking.clients.embedded.messaging.model.MessageCategory
@@ -28,7 +29,8 @@ internal class ListPageViewModel(
     private val pagerFactory: PagerFactoryApi,
     connectionWatchDog: ConnectionWatchDog,
     private val locallyDeletedMessageIds: MutableStateFlow<Set<String>>,
-    private val locallyOpenedMessageIds: MutableStateFlow<Set<String>>
+    private val locallyOpenedMessageIds: MutableStateFlow<Set<String>>,
+    platformCategoryProvider: PlatformCategoryProviderApi
 ) : ListPageViewModelApi {
     private val _categories = MutableStateFlow<List<MessageCategory>>(emptyList())
     override val categories: StateFlow<List<MessageCategory>> = _categories.asStateFlow()
@@ -59,6 +61,8 @@ internal class ListPageViewModel(
 
     override val shouldHideFilterRowForDetailedView: StateFlow<Boolean> =
         _shouldHideFilterRowForDetailedView.asStateFlow()
+
+    override val platformCategory: String = platformCategoryProvider.provide()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _messagePagingDataFlowFromApi =

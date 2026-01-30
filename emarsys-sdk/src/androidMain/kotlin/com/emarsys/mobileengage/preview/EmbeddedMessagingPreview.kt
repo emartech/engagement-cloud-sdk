@@ -7,6 +7,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.paging.PagingData
+import com.emarsys.SdkConstants
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.log.LogEntry
 import com.emarsys.core.log.Logger
@@ -248,6 +249,9 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
 
         override val shouldHideFilterRowForDetailedView: StateFlow<Boolean>
             get() = MutableStateFlow(false).asStateFlow()
+
+        override val platformCategory: String
+            get() = SdkConstants.MOBILE_PLATFORM_CATEGORY
 
         override fun setFilterUnopenedOnly(unopenedOnly: Boolean) {
             Unit

@@ -3,6 +3,7 @@ package com.emarsys.mobileengage.embeddedmessaging.ui.list
 import androidx.paging.PagingData
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.providers.InstantProvider
+import com.emarsys.core.providers.platform.PlatformCategoryProviderApi
 import com.emarsys.core.util.DownloaderApi
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
@@ -50,6 +51,7 @@ import kotlin.time.ExperimentalTime
 class ListPageViewModelTests {
     companion object {
         const val TEST_MESSAGE_ID = "test-message-id"
+        const val PLATFORM_CATEGORY = "testCategory"
     }
 
     private lateinit var mockModel: ListPageModelApi
@@ -64,6 +66,7 @@ class ListPageViewModelTests {
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var deletedMessageIds: MutableStateFlow<Set<String>>
     private lateinit var readMessageIds: MutableStateFlow<Set<String>>
+    private lateinit var mockPlatformCategoryProvider: PlatformCategoryProviderApi
 
     @BeforeTest
     fun setup() {
@@ -76,6 +79,8 @@ class ListPageViewModelTests {
         mockTimestampProvider = mock(MockMode.autofill)
         mockConnectionWatchDog = mock(MockMode.autofill)
         mockEmbeddedMessagingContext = mock(MockMode.autofill)
+        mockPlatformCategoryProvider = mock(MockMode.autofill)
+        every { mockPlatformCategoryProvider.provide() } returns PLATFORM_CATEGORY
         deletedMessageIds = MutableStateFlow(emptySet())
         readMessageIds = MutableStateFlow(emptySet())
 
@@ -86,7 +91,8 @@ class ListPageViewModelTests {
             pagerFactory = mockPagerFactory,
             connectionWatchDog = mockConnectionWatchDog,
             locallyDeletedMessageIds = deletedMessageIds,
-            locallyOpenedMessageIds = readMessageIds
+            locallyOpenedMessageIds = readMessageIds,
+            mockPlatformCategoryProvider
         )
     }
 
@@ -484,5 +490,10 @@ class ListPageViewModelTests {
                 viewModel.shouldHideFilterRowForDetailedView.value shouldBe expectedBoolean
             }
         }
+
+    @Test
+    fun platformCategory_shouldReturn_platformCategory_fromProvider() {
+        viewModel.platformCategory shouldBe PLATFORM_CATEGORY
+    }
 }
 
