@@ -12,16 +12,20 @@ import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
+import dev.mokkery.matcher.capture.Capture
+import dev.mokkery.matcher.capture.capture
+import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.data.forAll
 import io.kotest.data.row
+import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
-import kotlin.time.Clock
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
@@ -30,14 +34,16 @@ class ConfigInternalTests {
         const val UUID = "testUUID"
         val TIMESTAMP = Clock.System.now()
         const val APPCODE = "A1s2D-F3G4H"
+        const val HUNGARIAN_LANGUAGE = "hu-HU"
     }
 
-    private lateinit var sdkEventDistributor: SdkEventDistributorApi
+    private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
     private lateinit var mockUuidProvider: UuidProviderApi
     private lateinit var mockTimestampProvider: InstantProvider
     private lateinit var mockLogger: Logger
     private lateinit var mockLanguageHandler: LanguageHandlerApi
     private lateinit var configInternal: ConfigInternal
+    private lateinit var mockConfigContext: ConfigContextApi
 
     @BeforeTest
     fun setUp() = runTest {
@@ -47,16 +53,18 @@ class ConfigInternalTests {
         every { mockUuidProvider.provide() } returns UUID
         mockTimestampProvider = mock()
         every { mockTimestampProvider.provide() } returns TIMESTAMP
-        mockLanguageHandler = mock()
-        sdkEventDistributor = mock(MockMode.autofill)
-        everySuspend { sdkEventDistributor.registerEvent(any()) } returns mock(MockMode.autofill)
+        mockLanguageHandler = mock(MockMode.autofill)
+        mockSdkEventDistributor = mock(MockMode.autofill)
+        everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mock(MockMode.autofill)
+        mockConfigContext = mock()
         configInternal =
             ConfigInternal(
-                sdkEventDistributor,
+                mockSdkEventDistributor,
+                mockConfigContext,
                 mockUuidProvider,
                 mockTimestampProvider,
                 mockLogger,
-                mockLanguageHandler
+                mockLanguageHandler,
             )
     }
 
@@ -70,7 +78,7 @@ class ConfigInternalTests {
 
         configInternal.changeApplicationCode(APPCODE)
 
-        verifySuspend { sdkEventDistributor.registerEvent(expectedEvent) }
+        verifySuspend { mockSdkEventDistributor.registerEvent(expectedEvent) }
     }
 
     @Test
@@ -80,7 +88,7 @@ class ConfigInternalTests {
             configInternal.changeApplicationCode(" ")
         }
 
-        verifySuspend(mode = VerifyMode.exactly(0)) { sdkEventDistributor.registerEvent(any()) }
+        verifySuspend(mode = VerifyMode.exactly(0)) { mockSdkEventDistributor.registerEvent(any()) }
     }
 
     @Test
@@ -97,31 +105,52 @@ class ConfigInternalTests {
                 configInternal.changeApplicationCode(appCode)
             }
         }
-        verifySuspend(mode = VerifyMode.exactly(0)) { sdkEventDistributor.registerEvent(any()) }
+        verifySuspend(mode = VerifyMode.exactly(0)) { mockSdkEventDistributor.registerEvent(any()) }
     }
 
     @Test
     fun testSetLanguage_shouldCallHandleLanguage_onLanguageHandler() = runTest {
-        val language = "hu-HU"
-
-        everySuspend { mockLanguageHandler.handleLanguage(language) } returns Unit
-
-        configInternal.setLanguage(language)
+        configInternal.setLanguage(HUNGARIAN_LANGUAGE)
 
         verifySuspend {
-            mockLanguageHandler.handleLanguage(language)
+            mockLanguageHandler.handleLanguage(HUNGARIAN_LANGUAGE)
         }
     }
 
     @Test
     fun testResetLanguage_shouldCallHandleLanguage_withNull_inLanguageHandler() = runTest {
-        everySuspend { mockLanguageHandler.handleLanguage(null) } returns Unit
-
         configInternal.resetLanguage()
 
         verifySuspend {
             mockLanguageHandler.handleLanguage(null)
         }
+    }
+
+    @Test
+    fun testActivate_shouldReplayStoredCallsFromConfigContext_inTheRightOrder() = runTest {
+        val slot = Capture.slot<SdkEvent>()
+        val testCalls = mutableListOf(
+            ConfigCall.ChangeApplicationCode(APPCODE),
+            ConfigCall.SetLanguage(HUNGARIAN_LANGUAGE),
+            ConfigCall.ResetLanguage
+        )
+        everySuspend { mockConfigContext.calls } returns testCalls
+        everySuspend { mockSdkEventDistributor.registerEvent(capture(slot)) } returns mock()
+
+        configInternal.activate()
+
+        val testEvent = slot.get()
+        verifySuspend(VerifyMode.order) {
+            mockSdkEventDistributor.registerEvent(testEvent)
+            testEvent shouldBe SdkEvent.Internal.Sdk.ChangeAppCode(
+                id = UUID,
+                applicationCode = APPCODE.uppercase(),
+                timestamp = TIMESTAMP
+            )
+            mockLanguageHandler.handleLanguage(HUNGARIAN_LANGUAGE)
+            mockLanguageHandler.handleLanguage(null)
+        }
+        testCalls.size shouldBe 0
     }
 
 }

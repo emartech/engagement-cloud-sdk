@@ -43,10 +43,11 @@ object ConfigInjection {
         single<ConfigInstance>(named(InstanceType.Internal)) {
             ConfigInternal(
                 sdkEventDistributor = get(),
+                configContext = get(),
                 uuidProvider = get(),
                 timestampProvider = get(),
                 sdkLogger = get { parametersOf(ConfigInternal::class.simpleName) },
-                languageHandler = get()
+                languageHandler = get(),
             )
         }
         single<LanguageHandlerApi> {
