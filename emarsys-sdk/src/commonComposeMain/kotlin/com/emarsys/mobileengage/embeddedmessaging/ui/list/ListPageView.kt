@@ -237,9 +237,16 @@ private fun MessageList(
                             }
                         ) {
                             selectedMessageViewModel?.let { messageViewModel ->
-                                MessageDetailView(
-                                    messageViewModel,
-                                ) {
+                                if (messageViewModel.shouldNavigate()) {
+                                    MessageDetailView(
+                                        messageViewModel = messageViewModel,
+                                        onBack = {
+                                            scope.launch {
+                                                navigator.navigateTo(ListDetailPaneScaffoldRole.List)
+                                            }
+                                        }
+                                    )
+                                } else {
                                     scope.launch {
                                         navigator.navigateTo(ListDetailPaneScaffoldRole.List)
                                     }
