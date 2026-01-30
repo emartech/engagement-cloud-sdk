@@ -48,6 +48,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.emarsys.SdkConstants
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.DEFAULT_PADDING
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategoriesDialogView
@@ -206,6 +207,7 @@ private fun MessageList(
                                 selectedMessage = selectedMessageViewModel,
                                 hasFiltersApplied = hasFiltersApplied,
                                 hasConnection = hasConnection,
+                                withSwipeGestures = viewModel.platformCategory != SdkConstants.WEB_PLATFORM_CATEGORY,
                                 onRefresh = { viewModel.refreshMessagesWithThrottling { lazyPagingMessageItems.refresh() } },
                                 onMessageClick = { messageViewModel ->
                                     scope.launch {

@@ -81,6 +81,7 @@ fun MessageItemsListPane(
     lazyPagingMessageItems: LazyPagingItems<MessageItemViewModelApi>,
     selectedMessage: MessageItemViewModelApi?,
     hasFiltersApplied: Boolean,
+    withSwipeGestures: Boolean,
     onRefresh: () -> Unit,
     onMessageClick: (MessageItemViewModelApi) -> Unit,
     onMessageDelete: suspend (String) -> Result<Unit>,
@@ -123,10 +124,10 @@ fun MessageItemsListPane(
             }
         }
 
-        PullToRefreshBox(
+        RefreshableMessageItemsList(
+            withPullToRefresh = withSwipeGestures,
             isRefreshing = lazyPagingMessageItems.isInitiallyLoading(),
-            onRefresh = onRefresh,
-            modifier = Modifier.fillMaxSize()
+            onRefresh = onRefresh
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 if (lazyPagingMessageItems.shouldShowErrorStateNoConnection(hasConnection)) {
@@ -167,60 +168,55 @@ fun MessageItemsListPane(
                                         return@let
                                     }
 
-                                    val swipeToDismissPositionalThreshold =
-                                        { totalDistance: Float -> totalDistance * 0.3f }
-                                    val dismissState = rememberSaveable(
-                                        saver = Saver(
-                                            save = { it.currentValue },
-                                            restore = {
-                                                SwipeToDismissBoxState(
-                                                    if (messageIdToDelete != null) it else SwipeToDismissBoxValue.Settled,
-                                                    positionalThreshold = swipeToDismissPositionalThreshold
-                                                )
-                                            },
-                                        )
-                                    ) {
-                                        SwipeToDismissBoxState(
-                                            SwipeToDismissBoxValue.Settled,
-                                            positionalThreshold = swipeToDismissPositionalThreshold
-                                        )
-                                    }
-
-                                    LaunchedEffect(dismissState.currentValue) {
-                                        if (dismissState.currentValue != SwipeToDismissBoxValue.Settled) {
-                                            messageIdToDelete = messageViewModel.id
-                                            dismissStateToReset = dismissState
-                                        }
-                                    }
-
-                                    SwipeToDismissBox(
-                                        state = dismissState,
-                                        enableDismissFromStartToEnd = false,
-                                        enableDismissFromEndToStart = true,
-                                        backgroundContent = {
-                                            DeleteMessageOnSwipeBox()
-                                        }
-                                    ) {
-                                        if (customMessageItem == null) {
-                                            MessageItemView(
-                                                viewModel = messageViewModel,
-                                                isSelected = messageViewModel.id == selectedMessage?.id,
-                                                onClick = { onMessageClick(messageViewModel) }
-                                            )
-                                        } else {
-                                            Box(
-                                                modifier = Modifier.clickable(onClick = {
-                                                    onMessageClick(
-                                                        messageViewModel
+                                    if (withSwipeGestures) {
+                                        val swipeToDismissPositionalThreshold =
+                                            { totalDistance: Float -> totalDistance * 0.3f }
+                                        val dismissState = rememberSaveable(
+                                            saver = Saver(
+                                                save = { it.currentValue },
+                                                restore = {
+                                                    SwipeToDismissBoxState(
+                                                        if (messageIdToDelete != null) it else SwipeToDismissBoxValue.Settled,
+                                                        positionalThreshold = swipeToDismissPositionalThreshold
                                                     )
-                                                })
-                                            ) {
-                                                customMessageItem.invoke(
-                                                    messageViewModel,
-                                                    messageViewModel.id == selectedMessage?.id
-                                                )
+                                                },
+                                            )
+                                        ) {
+                                            SwipeToDismissBoxState(
+                                                SwipeToDismissBoxValue.Settled,
+                                                positionalThreshold = swipeToDismissPositionalThreshold
+                                            )
+                                        }
+
+                                        LaunchedEffect(dismissState.currentValue) {
+                                            if (dismissState.currentValue != SwipeToDismissBoxValue.Settled) {
+                                                messageIdToDelete = messageViewModel.id
+                                                dismissStateToReset = dismissState
                                             }
                                         }
+
+                                        SwipeToDismissBox(
+                                            state = dismissState,
+                                            enableDismissFromStartToEnd = false,
+                                            enableDismissFromEndToStart = true,
+                                            backgroundContent = {
+                                                DeleteMessageOnSwipeBox()
+                                            }
+                                        ) {
+                                            MessageItemViewContainer(
+                                                messageViewModel,
+                                                selectedMessage,
+                                                onMessageClick,
+                                                customMessageItem
+                                            )
+                                        }
+                                    } else {
+                                        MessageItemViewContainer(
+                                            messageViewModel,
+                                            selectedMessage,
+                                            onMessageClick,
+                                            customMessageItem
+                                        )
                                     }
                                 }
                             }
@@ -263,6 +259,55 @@ fun MessageItemsListPane(
                         messageIdToDelete = null
                     }
                 }
+            )
+        }
+    }
+}
+
+@Composable
+private fun RefreshableMessageItemsList(
+    withPullToRefresh: Boolean,
+    isRefreshing: Boolean,
+    onRefresh: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    if (withPullToRefresh) {
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = onRefresh,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            content()
+        }
+    } else {
+        content()
+    }
+}
+
+@Composable
+fun MessageItemViewContainer(
+    messageViewModel: MessageItemViewModelApi,
+    selectedMessage: MessageItemViewModelApi?,
+    onMessageClick: (MessageItemViewModelApi) -> Unit,
+    customMessageItem: ((viewModel: CustomMessageItemViewModelApi, isSelected: Boolean) -> Composable)?
+) {
+    if (customMessageItem == null) {
+        MessageItemView(
+            viewModel = messageViewModel,
+            isSelected = messageViewModel.id == selectedMessage?.id,
+            onClick = { onMessageClick(messageViewModel) }
+        )
+    } else {
+        Box(
+            modifier = Modifier.clickable(onClick = {
+                onMessageClick(
+                    messageViewModel
+                )
+            })
+        ) {
+            customMessageItem.invoke(
+                messageViewModel,
+                messageViewModel.id == selectedMessage?.id
             )
         }
     }
