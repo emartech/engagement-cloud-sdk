@@ -1,8 +1,6 @@
 package com.emarsys.core.log
 
 import com.emarsys.context.SdkContextApi
-import com.emarsys.core.channel.SdkEventDistributorApi
-import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.event.SdkEvent
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -16,45 +14,25 @@ import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
-import org.koin.core.Koin
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
-import org.koin.core.module.Module
-import org.koin.dsl.module
-import org.koin.test.KoinTest
-import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class RemoteLoggerTests : KoinTest {
+@OptIn(ExperimentalCoroutinesApi::class)
+class RemoteLoggerTests {
 
-    override fun getKoin(): Koin = koin
-
-    private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
+    private lateinit var mockLogEventRegistry: LogEventRegistryApi
     private lateinit var remoteLogger: RemoteLoggerApi
-    private lateinit var testModule: Module
     private lateinit var mockSdkContext: SdkContextApi
 
     @BeforeTest
     fun setup() {
-        mockSdkEventDistributor = mock(MockMode.autofill)
-        mockSdkContext = mock()
-        testModule = module {
-            single<SdkEventDistributorApi> { mockSdkEventDistributor }
-            single<SdkContextApi> { mockSdkContext }
-        }
-        startKoin {
-            modules(testModule)
-        }
-        remoteLogger = RemoteLogger()
-    }
-
-    @AfterTest
-    fun tearDown() {
-        stopKoin()
+        mockLogEventRegistry = mock(MockMode.autofill)
+        mockSdkContext = mock(MockMode.autofill)
+        remoteLogger = RemoteLogger(mockLogEventRegistry, mockSdkContext)
     }
 
     @Test
@@ -62,13 +40,12 @@ class RemoteLoggerTests : KoinTest {
         val logLevel = LogLevel.Info
         every { mockSdkContext.remoteLogLevel } returns LogLevel.Debug
         val logMessage = JsonObject(mapOf("message" to JsonPrimitive("This is a test log")))
-        val eventCapture = slot<SdkEvent.Internal.Sdk.Log>()
-        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventCapture)) } returns mock(MockMode.autofill)
+        everySuspend { mockLogEventRegistry.registerLogEvent(any()) }  returns Unit
 
         remoteLogger.logToRemote(logLevel, logMessage)
 
         verifySuspend(VerifyMode.exactly(0)) {
-            mockSdkEventDistributor.registerEvent(any())
+            mockLogEventRegistry.registerLogEvent(any())
         }
     }
 
@@ -79,12 +56,12 @@ class RemoteLoggerTests : KoinTest {
 
         val logMessage = JsonObject(mapOf("message" to JsonPrimitive("This is a test log")))
         val eventCapture = slot<SdkEvent.Internal.Sdk.Log>()
-        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventCapture)) } returns mock(MockMode.autofill)
+        everySuspend { mockLogEventRegistry.registerLogEvent(capture(eventCapture)) }  returns Unit
 
         remoteLogger.logToRemote(logLevel, logMessage)
 
         verifySuspend {
-            mockSdkEventDistributor.registerEvent(any())
+            mockLogEventRegistry.registerLogEvent(any())
         }
         val capturedEvent: SdkEvent.Internal.Sdk.Log = eventCapture.get()
         capturedEvent.level shouldBe logLevel
@@ -99,12 +76,12 @@ class RemoteLoggerTests : KoinTest {
 
         val logMessage = JsonObject(mapOf("message" to JsonPrimitive("This is a test log")))
         val eventCapture = slot<SdkEvent.Internal.Sdk.Log>()
-        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventCapture)) } returns mock(MockMode.autofill)
+        everySuspend { mockLogEventRegistry.registerLogEvent(capture(eventCapture)) } returns Unit
 
         remoteLogger.logToRemote(logLevel, logMessage)
 
         verifySuspend {
-            mockSdkEventDistributor.registerEvent(any())
+            mockLogEventRegistry.registerLogEvent(any())
         }
         val capturedEvent: SdkEvent.Internal.Sdk.Log = eventCapture.get()
         capturedEvent.level shouldBe logLevel

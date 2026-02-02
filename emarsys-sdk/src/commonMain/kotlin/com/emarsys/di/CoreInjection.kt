@@ -14,6 +14,8 @@ import com.emarsys.core.crypto.Crypto
 import com.emarsys.core.crypto.CryptoApi
 import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.ConsoleLoggerApi
+import com.emarsys.core.log.LogEventRegistry
+import com.emarsys.core.log.LogEventRegistryApi
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
 import com.emarsys.core.log.RemoteLogger
@@ -72,8 +74,14 @@ object CoreInjection {
         single<ConsoleLoggerApi> {
             ConsoleLogger()
         }
+        single<LogEventRegistryApi> {
+            LogEventRegistry()
+        }
         single<RemoteLoggerApi> {
-            RemoteLogger()
+            RemoteLogger(
+                logEventRegistry = get(),
+                sdkContext = get()
+            )
         }
         factory<Logger> { (loggerName: String) ->
             SdkLogger(
@@ -109,10 +117,12 @@ object CoreInjection {
         }
         single<SdkEventDistributor> {
             SdkEventDistributor(
-                get<ConnectionWatchDog>().isOnline,
+                connectionStatus = get<ConnectionWatchDog>().isOnline,
                 sdkContext = get(),
                 eventsDao = get(),
-                sdkLogger = get { parametersOf(SdkEventDistributor::class.simpleName) },
+                logEventRegistry = get(),
+                applicationScope = get(named(CoroutineScopeTypes.Application)),
+                sdkLogger = get { parametersOf(SdkEventDistributor::class.simpleName) }
             )
         } binds arrayOf(
             SdkEventDistributorApi::class,

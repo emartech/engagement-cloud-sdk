@@ -2,10 +2,14 @@ package com.emarsys.core.channel
 
 import com.emarsys.api.SdkState
 import com.emarsys.context.SdkContextApi
+import com.emarsys.core.Registerable
 import com.emarsys.core.db.events.EventsDaoApi
+import com.emarsys.core.log.LogEventRegistryApi
 import com.emarsys.core.log.Logger
 import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
@@ -18,6 +22,7 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
@@ -25,8 +30,10 @@ internal class SdkEventDistributor(
     private val connectionStatus: StateFlow<Boolean>,
     private val sdkContext: SdkContextApi,
     private val eventsDao: EventsDaoApi,
+    private val logEventRegistry: LogEventRegistryApi,
+    private val applicationScope: CoroutineScope,
     private val sdkLogger: Logger
-) : SdkEventManagerApi {
+) : SdkEventManagerApi, Registerable {
 
     private val _sdkEventFlow = MutableSharedFlow<SdkEvent>(
         replay = 100,
@@ -59,6 +66,16 @@ internal class SdkEventDistributor(
         .onEach {
             connectionStatus.first { it }
         }
+
+    override suspend fun register() {
+        applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
+            sdkLogger.debug("Register")
+            logEventRegistry.logEvents
+                .collect {
+                    registerEvent(it)
+                }
+        }
+    }
 
     override suspend fun registerEvent(sdkEvent: SdkEvent): SdkEventWaiterApi {
         return try {

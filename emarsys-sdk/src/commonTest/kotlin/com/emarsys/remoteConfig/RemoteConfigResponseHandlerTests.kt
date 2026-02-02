@@ -1,80 +1,59 @@
 package com.emarsys.remoteConfig
 
 import com.emarsys.context.DefaultUrls
+import com.emarsys.context.DefaultUrlsApi
 import com.emarsys.context.Features
-import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.SdkLogger
 import com.emarsys.core.providers.DoubleProvider
-import com.emarsys.core.storage.StringStorageApi
-import com.emarsys.di.SdkKoinIsolationContext.koin
-import com.emarsys.fake.FakeStringStorage
-import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
+import dev.mokkery.matcher.capture.Capture.Companion.slot
+import dev.mokkery.matcher.capture.capture
+import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
+import dev.mokkery.verify
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.json.Json
-import org.koin.core.Koin
-import org.koin.core.module.Module
-import org.koin.dsl.module
-import org.koin.test.KoinTest
-import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-class RemoteConfigResponseHandlerTests : KoinTest {
-
-    override fun getKoin(): Koin = koin
-
-    private lateinit var testModule: Module
-
-    private lateinit var sdkContext: SdkContextApi
+class RemoteConfigResponseHandlerTests {
+    private lateinit var mockSdkContext: SdkContextApi
+    private lateinit var defaultUrls: DefaultUrlsApi
     private lateinit var mockDeviceInfoCollector: DeviceInfoCollectorApi
     private lateinit var mockRandomProvider: DoubleProvider
     private lateinit var remoteConfigResponseHandler: RemoteConfigResponseHandler
 
     @BeforeTest
     fun setUp() {
-        testModule = module {
-            single<StringStorageApi> { FakeStringStorage() }
-            single<Json> { JsonUtil.json }
-        }
-        koin.loadModules(listOf(testModule))
+        mockSdkContext = mock(MockMode.autofill)
+        defaultUrls = DefaultUrls("", "", "", "", "", "")
+        every { mockSdkContext.defaultUrls } returns defaultUrls
 
-        sdkContext = SdkContext(
-            StandardTestDispatcher(),
-            StandardTestDispatcher(),
-            DefaultUrls("", "", "", "", "", ""),
-            LogLevel.Debug,
-            mutableSetOf(),
-            logBreadcrumbsQueueSize = 10
-        )
-        mockDeviceInfoCollector = mock()
-        mockRandomProvider = mock()
+        everySuspend { mockSdkContext.sdkDispatcher } returns StandardTestDispatcher()
+        every { mockSdkContext.features } returns mutableSetOf()
+
+        mockDeviceInfoCollector = mock(MockMode.autofill)
+        mockRandomProvider = mock(MockMode.autofill)
 
         remoteConfigResponseHandler = RemoteConfigResponseHandler(
             mockDeviceInfoCollector,
-            sdkContext,
+            mockSdkContext,
             mockRandomProvider,
-            SdkLogger("TestLoggerName", mock(MockMode.autofill), sdkContext = sdkContext)
+            SdkLogger("TestLoggerName", mock(MockMode.autofill), sdkContext = mockSdkContext)
         )
-    }
-
-    @AfterTest
-    fun tearDown() {
-        koin.unloadModules(listOf(testModule))
     }
 
     @Test
     fun testHandleAppCodeBasedConfigs() = runTest {
+        val defaultUrlSlot = slot<DefaultUrlsApi>()
         val clientServiceUrl = "testClientServiceUrl"
         val clientId = "testClientId"
         val configResponse = RemoteConfigResponse(
@@ -92,16 +71,19 @@ class RemoteConfigResponseHandlerTests : KoinTest {
 
         everySuspend { mockDeviceInfoCollector.getClientId() } returns clientId
         every { mockRandomProvider.provide() } returns 0.1
+        every { mockSdkContext.defaultUrls = capture(defaultUrlSlot) } returns Unit
+
 
         remoteConfigResponseHandler.handle(configResponse)
 
-        sdkContext.defaultUrls.clientServiceBaseUrl shouldBe clientServiceUrl
-        sdkContext.remoteLogLevel shouldBe LogLevel.Error
-        sdkContext.features shouldBe listOf(Features.MOBILE_ENGAGE)
+        defaultUrlSlot.get().clientServiceBaseUrl shouldBe clientServiceUrl
+        verify { mockSdkContext.remoteLogLevel = LogLevel.Error }
+        mockSdkContext.features shouldBe listOf(Features.MOBILE_ENGAGE)
     }
 
     @Test
     fun testHandleGlobalConfig() = runTest {
+        val defaultUrlSlot = slot<DefaultUrlsApi>()
         val clientServiceUrl = "testClientServiceUrl"
         val clientId = "testClientId"
         val configResponse = RemoteConfigResponse(
@@ -116,15 +98,15 @@ class RemoteConfigResponseHandlerTests : KoinTest {
                 )
             )
         )
-
+        every { mockSdkContext.defaultUrls = capture(defaultUrlSlot) } returns Unit
         everySuspend { mockDeviceInfoCollector.getClientId() } returns clientId
         every { mockRandomProvider.provide() } returns 0.1
 
         remoteConfigResponseHandler.handle(configResponse)
 
-        sdkContext.defaultUrls.clientServiceBaseUrl shouldBe clientServiceUrl
-        sdkContext.remoteLogLevel shouldBe LogLevel.Error
-        sdkContext.features shouldBe listOf(Features.MOBILE_ENGAGE)
+        defaultUrlSlot.get().clientServiceBaseUrl shouldBe clientServiceUrl
+        verify { mockSdkContext.remoteLogLevel = LogLevel.Error }
+        mockSdkContext.features shouldBe listOf(Features.MOBILE_ENGAGE)
     }
 
 }

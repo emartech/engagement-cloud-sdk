@@ -1,17 +1,11 @@
 package com.emarsys.api.deeplink
 
-import com.emarsys.context.DefaultUrls
-import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.channel.SdkEventDistributorApi
-import com.emarsys.core.log.LogLevel
-import com.emarsys.core.storage.StringStorageApi
-import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.event.SdkEvent
-import com.emarsys.fake.FakeStringStorage
-import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
+import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.matcher.capture.Capture.Companion.slot
@@ -23,64 +17,33 @@ import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import io.ktor.http.Url
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
-import kotlinx.serialization.json.Json
-import org.koin.core.Koin
-import org.koin.core.module.Module
-import org.koin.dsl.module
-import org.koin.test.KoinTest
-import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DeepLinkInternalTests : KoinTest {
-
-    override fun getKoin(): Koin = koin
-
-    private lateinit var testModule: Module
-
-    private lateinit var sdkContext: SdkContextApi
-    private lateinit var deepLinkInternal: DeepLinkInternal
+class DeepLinkInternalTests {
+    private lateinit var mockSdkContext: SdkContextApi
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
     private lateinit var eventSlot: SlotCapture<SdkEvent>
+    private lateinit var testDispatcher: TestDispatcher
+    private lateinit var deepLinkInternal: DeepLinkInternal
 
     @BeforeTest
     fun setUp() {
-        testModule = module {
-            single<StringStorageApi> { FakeStringStorage() }
-            single<Json> { JsonUtil.json }
-        }
-        koin.loadModules(listOf(testModule))
-
-        val mainDispatcher = StandardTestDispatcher()
-        Dispatchers.setMain(mainDispatcher)
-        sdkContext = SdkContext(
-            StandardTestDispatcher(),
-            mainDispatcher,
-            DefaultUrls("", "", "", "", "", ""),
-            LogLevel.Error,
-            mutableSetOf(),
-            logBreadcrumbsQueueSize = 10
-        )
+        testDispatcher = StandardTestDispatcher()
+        mockSdkContext = mock(MockMode.autofill)
+        every { mockSdkContext.sdkDispatcher } returns testDispatcher
 
         eventSlot = slot()
         mockSdkEventDistributor = mock(MockMode.autofill)
         everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(
             MockMode.autofill
         )
-        deepLinkInternal = DeepLinkInternal(sdkContext, mockSdkEventDistributor)
-    }
-
-    @AfterTest
-    fun teardown() {
-        Dispatchers.resetMain()
-        koin.unloadModules(listOf(testModule))
+        deepLinkInternal = DeepLinkInternal(mockSdkContext, mockSdkEventDistributor)
     }
 
     @Test

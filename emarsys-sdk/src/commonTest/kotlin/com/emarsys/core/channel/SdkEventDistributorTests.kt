@@ -1,19 +1,16 @@
 package com.emarsys.core.channel
 
 import com.emarsys.api.SdkState
-import com.emarsys.context.SdkContext
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.db.events.EventsDaoApi
+import com.emarsys.core.log.LogEventRegistryApi
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.log.Logger
-import com.emarsys.core.storage.StringStorageApi
-import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.event.SdkEvent
-import com.emarsys.fake.FakeStringStorage
-import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
+import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
@@ -22,12 +19,14 @@ import dev.mokkery.verifySuspend
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
@@ -39,11 +38,8 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlinx.serialization.json.Json
-import org.koin.core.Koin
-import org.koin.core.module.Module
-import org.koin.dsl.module
-import org.koin.test.KoinTest
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -51,45 +47,65 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
-class SdkEventDistributorTests: KoinTest {
-
-    override fun getKoin(): Koin = koin
-
-    private lateinit var testModule: Module
-
-    private lateinit var sdkContext: SdkContextApi
+class SdkEventDistributorTests {
+    private lateinit var mockSdkContext: SdkContextApi
     private lateinit var sdkDispatcher: CoroutineDispatcher
     private lateinit var mockEventsDao: EventsDaoApi
+    private lateinit var mockLogEventRegistryApi: LogEventRegistryApi
+    private lateinit var applicationScope: CoroutineScope
     private lateinit var mockSdkLogger: Logger
 
     @BeforeTest
     fun setup() {
-        testModule = module {
-            single<StringStorageApi> { FakeStringStorage() }
-            single<Json> { JsonUtil.json }
-        }
-        koin.loadModules(listOf(testModule))
-
         val mainDispatcher = StandardTestDispatcher()
+        applicationScope = CoroutineScope(mainDispatcher)
         Dispatchers.setMain(mainDispatcher)
         sdkDispatcher = StandardTestDispatcher()
-        sdkContext =
-            SdkContext(
-                sdkDispatcher,
-                mainDispatcher,
-                defaultUrls = mock(MockMode.autofill),
-                LogLevel.Debug,
-                mutableSetOf(),
-                logBreadcrumbsQueueSize = 10
-            )
+        mockSdkContext = mock(MockMode.autofill)
         mockEventsDao = mock(MockMode.autofill)
+        mockLogEventRegistryApi = mock(MockMode.autofill)
         mockSdkLogger = mock(MockMode.autofill)
     }
 
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
-        koin.unloadModules(listOf(testModule))
+    }
+
+    @Test
+    fun register_shouldCollectLogEvents_andRegisterThem() = runTest {
+        val logEvent = SdkEvent.Internal.Sdk.Log(
+            level = LogLevel.Info,
+            attributes = buildJsonObject {
+                put("message", "Test log message")
+            }
+        )
+        val logEventsFlow = MutableSharedFlow<SdkEvent.Internal.LogEvent>()
+        every { mockLogEventRegistryApi.logEvents } returns logEventsFlow
+
+        val sdkEventDistributor = createEventDistributor(
+            MutableStateFlow(true),
+            mockSdkContext
+        )
+
+        val emittedEvents = backgroundScope.async {
+            sdkEventDistributor.sdkEventFlow.take(1).toList()
+        }
+
+        val emittedLogEvents = backgroundScope.async {
+            sdkEventDistributor.logEvents.take(1).toList()
+        }
+
+        sdkEventDistributor.register()
+        advanceUntilIdle()
+
+        logEventsFlow.emit(logEvent)
+        advanceUntilIdle()
+
+        emittedEvents.await() shouldBe listOf(logEvent)
+        verifySuspend { mockEventsDao.insertEvent(logEvent) }
+
+        emittedLogEvents.await() shouldBe listOf(logEvent)
     }
 
     @Test
@@ -100,8 +116,8 @@ class SdkEventDistributorTests: KoinTest {
             val testEvent2 = SdkEvent.Internal.Sdk.AppStart(id = "testId2")
             val testEvents = listOf(testEvent, testEvent2)
             val testConnectionState = MutableStateFlow(true)
-            val sdkEventDistributor = createEventDistributor(testConnectionState, sdkContext)
-            sdkContext.setSdkState(SdkState.Active)
+            val sdkEventDistributor = createEventDistributor(testConnectionState, mockSdkContext)
+            every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
 
             val emittedEvents = backgroundScope.async {
                 sdkEventDistributor.onlineSdkEvents.take(2).toList()
@@ -121,8 +137,8 @@ class SdkEventDistributorTests: KoinTest {
             val testEvent = SdkEvent.External.Custom(id = "testId", name = "testEventName")
             val testSetupFlowEvent = SdkEvent.Internal.Sdk.AppStart(id = "testId2")
             val testConnectionState = MutableStateFlow(true)
-            val sdkEventDistributor = createEventDistributor(testConnectionState, sdkContext)
-            sdkContext.setSdkState(SdkState.OnHold)
+            val sdkEventDistributor = createEventDistributor(testConnectionState, mockSdkContext)
+            every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.OnHold)
 
             val emittedEvents = backgroundScope.async {
                 sdkEventDistributor.onlineSdkEvents.take(1).toList()
@@ -138,7 +154,8 @@ class SdkEventDistributorTests: KoinTest {
     fun registerAndStoreEvent_shouldPersistOnlineEventsToDb_andEmitSdkEvent_toSdkEventFlow() =
         runTest {
             val testEvent = SdkEvent.External.Custom(id = "testId", name = "testEventName")
-            val sdkEventDistributor = createEventDistributor(MutableStateFlow(false), sdkContext)
+            val sdkEventDistributor =
+                createEventDistributor(MutableStateFlow(false), mockSdkContext)
 
             val emittedEvents = backgroundScope.async {
                 sdkEventDistributor.sdkEventFlow.take(1).toList()
@@ -159,7 +176,8 @@ class SdkEventDistributorTests: KoinTest {
                 badgeCount = 1234,
                 method = "set"
             )
-            val sdkEventDistributor = createEventDistributor(MutableStateFlow(false), sdkContext)
+            val sdkEventDistributor =
+                createEventDistributor(MutableStateFlow(false), mockSdkContext)
 
             val emittedEvents = backgroundScope.async {
                 sdkEventDistributor.sdkEventFlow.take(1).toList()
@@ -179,7 +197,8 @@ class SdkEventDistributorTests: KoinTest {
             val testEvent = SdkEvent.External.Custom(id = "testId", name = "testEventName")
             val testException = RuntimeException("DB error")
             everySuspend { mockEventsDao.insertEvent(testEvent) } throws testException
-            val sdkEventDistributor = createEventDistributor(MutableStateFlow(false), sdkContext)
+            val sdkEventDistributor =
+                createEventDistributor(MutableStateFlow(false), mockSdkContext)
 
             sdkEventDistributor.registerEvent(testEvent)
 
@@ -195,7 +214,8 @@ class SdkEventDistributorTests: KoinTest {
             val testEvent = SdkEvent.External.Custom(id = "testId", name = "testEventName")
             val testException = RuntimeException("DB error")
             everySuspend { mockEventsDao.insertEvent(testEvent) } throws testException
-            val sdkEventDistributor = createEventDistributor(MutableStateFlow(false), sdkContext)
+            val sdkEventDistributor =
+                createEventDistributor(MutableStateFlow(false), mockSdkContext)
 
             sdkEventDistributor.registerEvent(testEvent)
 
@@ -207,7 +227,7 @@ class SdkEventDistributorTests: KoinTest {
     @Test
     fun emitEvent_shouldEmitSdkEvent_toSdkEventFlow() = runTest {
         val testEvent = SdkEvent.External.Custom(id = "testId", name = "testEventName")
-        val sdkEventDistributor = createEventDistributor(MutableStateFlow(false), sdkContext)
+        val sdkEventDistributor = createEventDistributor(MutableStateFlow(false), mockSdkContext)
 
         val emittedEvents = backgroundScope.async {
             sdkEventDistributor.sdkEventFlow.take(1).toList()
@@ -225,9 +245,9 @@ class SdkEventDistributorTests: KoinTest {
             everySuspend { mockEventsDao.getEvents() } returns flowOf()
             val connectionState = MutableStateFlow(false)
             val sdkEventDistributor =
-                createEventDistributor(connectionState = connectionState, sdkContext)
+                createEventDistributor(connectionState = connectionState, mockSdkContext)
             val testEvent = SdkEvent.External.Custom(id = "testId", name = "testEventName")
-            sdkContext.setSdkState(SdkState.Active)
+            every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
 
             val offlineCollected = backgroundScope.async {
                 try {
@@ -255,12 +275,13 @@ class SdkEventDistributorTests: KoinTest {
     @Test
     fun distributor_shouldPauseOnlineEvents_whenSdkStateIsOnHold_andConnection_isOffline() =
         runTest {
+            val sdkStateFlow = MutableStateFlow(SdkState.OnHold)
             everySuspend { mockEventsDao.getEvents() } returns flowOf()
             val connectionState = MutableStateFlow(false)
             val sdkEventDistributor =
-                createEventDistributor(connectionState = connectionState, sdkContext)
+                createEventDistributor(connectionState = connectionState, mockSdkContext)
             val testEvent = SdkEvent.External.Custom(id = "testId", name = "testEventName")
-            sdkContext.setSdkState(SdkState.OnHold)
+            every { mockSdkContext.currentSdkState } returns sdkStateFlow
 
             val offlineCollected = backgroundScope.async {
                 try {
@@ -283,7 +304,7 @@ class SdkEventDistributorTests: KoinTest {
 
             delay(5000)
 
-            sdkContext.setSdkState(SdkState.Active)
+            sdkStateFlow.value = SdkState.Active
 
             emittedOnlineEventsWhenOnline.await() shouldBe listOf(testEvent)
         }
@@ -296,7 +317,9 @@ class SdkEventDistributorTests: KoinTest {
             connectionState,
             sdkContext,
             mockEventsDao,
-            mockSdkLogger
+            mockLogEventRegistryApi,
+            applicationScope,
+            mockSdkLogger,
         )
     }
 }
