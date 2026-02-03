@@ -96,7 +96,7 @@ fun MessageItemView(
                     Text(
                         text = viewModel.title,
                         style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = if (viewModel.isNotOpened) FontWeight.Bold else FontWeight.Normal
+                        fontWeight = if (viewModel.isNotOpened) FontWeight.ExtraBold else FontWeight.Normal
                     )
                     Text(
                         text = viewModel.lead,
