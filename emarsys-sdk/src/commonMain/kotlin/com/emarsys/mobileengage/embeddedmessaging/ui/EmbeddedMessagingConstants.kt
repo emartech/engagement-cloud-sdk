@@ -17,7 +17,7 @@ internal object EmbeddedMessagingConstants {
         const val CATEGORIES_FILTER_BUTTON_LABEL = "Categories"
         const val CATEGORIES_FILTER_BUTTON_ICON_ALT_TEXT = "Category filter button"
         const val CATEGORIES_FILTER_DIALOG_TITLE = "Categories"
-        const val CATEGORIES_FILTER_DIALOG_SUBTITLE = "Select Category Filters"
+        const val CATEGORIES_FILTER_DIALOG_SUBTITLE = "Select Categories to display"
         const val CATEGORY_FILTER_CHIP_ICON_ALT_TEXT = "selected"
         const val CATEGORIES_FILTER_DIALOG_RESET_BUTTON_LABEL = "Reset"
         const val CATEGORIES_FILTER_DIALOG_APPLY_BUTTON_LABEL = "Apply"

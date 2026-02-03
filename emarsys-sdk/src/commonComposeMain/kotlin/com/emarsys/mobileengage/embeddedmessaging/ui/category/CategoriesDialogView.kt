@@ -105,7 +105,8 @@ private fun DialogHeader(onDismiss: () -> Unit) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = LocalStringResources.current.categoriesFilterDialogTitle,
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.W400
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
@@ -121,8 +122,8 @@ private fun DialogHeader(onDismiss: () -> Unit) {
             Text(
                 modifier = Modifier.padding(top = LARGE_PADDING),
                 text = LocalStringResources.current.categoriesFilterDialogSubtitle,
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.W500
             )
         }
     }
