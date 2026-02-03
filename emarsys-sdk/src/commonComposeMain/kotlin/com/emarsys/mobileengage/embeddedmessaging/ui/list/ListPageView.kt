@@ -227,7 +227,8 @@ private fun MessageList(
                                     viewModel.setSelectedCategoryIds(emptySet())
                                 },
                                 snackbarHostState = snackbarHostState,
-                                customMessageItem = customMessageItem
+                                customMessageItem = customMessageItem,
+                                listPageViewModel = viewModel
                             )
                         }
                     },

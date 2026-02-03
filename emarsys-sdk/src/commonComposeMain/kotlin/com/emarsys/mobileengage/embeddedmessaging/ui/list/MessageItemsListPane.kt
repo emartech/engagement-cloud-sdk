@@ -51,6 +51,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
@@ -99,7 +100,8 @@ fun MessageItemsListPane(
     snackbarHostState: SnackbarHostState,
     lazyListState: LazyListState = rememberLazyListState(),
     hasConnection: Boolean,
-    customMessageItem: ((viewModel: CustomMessageItemViewModelApi, isSelected: Boolean) -> Composable)?
+    customMessageItem: ((viewModel: CustomMessageItemViewModelApi, isSelected: Boolean) -> Composable)?,
+    listPageViewModel: ListPageViewModelApi
 ) {
     val refreshError = lazyPagingMessageItems.loadState.refresh as? LoadState.Error
     val appendError = lazyPagingMessageItems.loadState.append as? LoadState.Error
@@ -140,6 +142,9 @@ fun MessageItemsListPane(
             onRefresh = onRefresh
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
+                if (!withSwipeGestures) {
+                    RefreshButtonOnWeb(listPageViewModel)
+                }
                 if (lazyPagingMessageItems.shouldShowErrorStateNoConnection(hasConnection)) {
                     ErrorStateNoConnection(onRefresh = onRefresh)
                 } else {
@@ -491,6 +496,29 @@ private fun FilteredEmptyState(onClearFilters: () -> Unit) {
                     shape = MaterialTheme.shapes.small
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun RefreshButtonOnWeb(listPageViewModel: ListPageViewModelApi) {
+    Row(
+        Modifier.fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surfaceVariant).padding(ZERO_PADDING),
+    ) {
+        IconButton(
+            modifier = Modifier.fillMaxWidth().padding(ZERO_PADDING),
+            shape = RectangleShape,
+            onClick = {
+                listPageViewModel.refreshMessagesWithThrottling {
+                    listPageViewModel.triggerRefreshFromJs()
+                }
+            }
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Refresh,
+                contentDescription = LocalStringResources.current.deleteIconButtonAltText
+            )
         }
     }
 }

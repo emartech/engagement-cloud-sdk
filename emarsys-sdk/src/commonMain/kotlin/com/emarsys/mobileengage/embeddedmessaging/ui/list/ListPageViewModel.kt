@@ -75,7 +75,6 @@ internal class ListPageViewModel(
         }
             .flatMapLatest { pair ->
                 val (filterUnopenedOnly, selectedCategoryIds) = pair
-                lastRefreshTimestamp = null
                 pagerFactory.create(
                     filterUnopenedOnly = filterUnopenedOnly,
                     selectedCategoryIds = selectedCategoryIds.toList(),
