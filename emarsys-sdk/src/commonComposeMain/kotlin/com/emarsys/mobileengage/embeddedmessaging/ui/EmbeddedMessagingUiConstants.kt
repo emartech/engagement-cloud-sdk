@@ -12,9 +12,10 @@ object EmbeddedMessagingUiConstants {
         val DEFAULT_ELEVATION = 8.dp
         val ZERO_ELEVATION = 0.dp
 
-        val DEFAULT_PADDING = 8.dp
-        val SMALL_PADDING = 4.dp
         val ZERO_PADDING = 0.dp
+        val SMALL_PADDING = 4.dp
+        val DEFAULT_PADDING = 8.dp
+        val LARGE_PADDING = 16.dp
 
         val DIALOG_CONTAINER_PADDING = 16.dp
 

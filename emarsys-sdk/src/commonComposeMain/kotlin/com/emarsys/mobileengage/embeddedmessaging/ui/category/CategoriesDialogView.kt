@@ -30,16 +30,17 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.DEFAULT_PADDING
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.DEFAULT_SPACING
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.DIALOG_CONTAINER_PADDING
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.LARGE_PADDING
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.ZERO_ELEVATION
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.LocalDesignValues
-
 import com.emarsys.mobileengage.embeddedmessaging.ui.translation.LocalStringResources
 import com.emarsys.networking.clients.embedded.messaging.model.MessageCategory
 
@@ -118,8 +119,10 @@ private fun DialogHeader(onDismiss: () -> Unit) {
             }
 
             Text(
+                modifier = Modifier.padding(top = LARGE_PADDING),
                 text = LocalStringResources.current.categoriesFilterDialogSubtitle,
-                style = MaterialTheme.typography.titleSmall
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold
             )
         }
     }
