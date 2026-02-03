@@ -1,12 +1,12 @@
 package com.emarsys.core.log
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.coroutineContext
 
 class LogContext(val contextMap: JsonObject) :
     AbstractCoroutineContextElement(Key) {
@@ -19,13 +19,13 @@ suspend fun <T> withLogContext(
 ): T {
     val extendedContext = buildJsonObject {
         contextMap.forEach { contextMapEntry -> put(contextMapEntry.key, contextMapEntry.value) }
-        coroutineContext[LogContext.Key]?.contextMap?.let { coroutineContextEntries ->
+        currentCoroutineContext()[LogContext.Key]?.contextMap?.let { coroutineContextEntries ->
             coroutineContextEntries.entries.forEach {
                 put(it.key, it.value)
             }
         }
     }
-    return withContext(coroutineContext + extendedContext.toContext()) {
+    return withContext(currentCoroutineContext() + extendedContext.toContext()) {
         block()
     }
 }

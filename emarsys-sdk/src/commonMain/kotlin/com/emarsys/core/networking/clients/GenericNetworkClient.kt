@@ -21,10 +21,10 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
-import kotlin.coroutines.coroutineContext
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
@@ -82,6 +82,7 @@ internal class GenericNetworkClient(
                 httpResponse.status.isSuccess() -> {
                     Result.success(response)
                 }
+
                 !httpResponse.status.isSuccess() && httpResponse.status != HttpStatusCode.Unauthorized && retries == MAX_RETRY_COUNT -> {
                     networkErrorLog(
                         "Request retry limit reached!",
@@ -90,11 +91,14 @@ internal class GenericNetworkClient(
                         retries,
                         networkDuration
                     )
-                    Result.failure(RetryLimitReachedException(
-                        "Request retry limit reached!",
-                        response = response
-                    ))
+                    Result.failure(
+                        RetryLimitReachedException(
+                            "Request retry limit reached!",
+                            response = response
+                        )
+                    )
                 }
+
                 else -> {
                     networkErrorLog(
                         "Request failed with status code: ${httpResponse.status.value}",
@@ -113,7 +117,7 @@ internal class GenericNetworkClient(
                 isRemoteLog = !request.isLogRequest
             )
             Result.failure(
-                if (coroutineContext.isActive) {
+                if (currentCoroutineContext().isActive) {
                     NetworkIOException(
                         throwable.message ?: "IOException during network request"
                     )

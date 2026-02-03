@@ -15,6 +15,7 @@ import com.emarsys.networking.clients.error.ClientExceptionHandler
 import io.ktor.http.HttpMethod
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
@@ -22,7 +23,6 @@ import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.put
-import kotlin.coroutines.coroutineContext
 import kotlin.time.ExperimentalTime
 
 internal class LoggingClient(
@@ -106,7 +106,7 @@ internal class LoggingClient(
         exception: Throwable,
         sdkEvents: List<SdkEvent.Internal.LogEvent>
     ) {
-        coroutineContext.ensureActive()
+        currentCoroutineContext().ensureActive()
         clientExceptionHandler.handleException(
             exception,
             "LoggingClient: ConsumeLogsAndMetrics error",
