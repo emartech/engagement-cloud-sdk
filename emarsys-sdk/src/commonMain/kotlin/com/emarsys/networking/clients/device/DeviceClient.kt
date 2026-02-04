@@ -3,6 +3,7 @@ package com.emarsys.networking.clients.device
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
 import com.emarsys.core.device.DeviceInfoCollectorApi
+import com.emarsys.core.device.DeviceInfoUpdaterApi
 import com.emarsys.core.exceptions.SdkException.NetworkIOException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
@@ -28,6 +29,7 @@ internal class DeviceClient(
     private val clientExceptionHandler: ClientExceptionHandler,
     private val urlFactory: UrlFactoryApi,
     private val deviceInfoCollector: DeviceInfoCollectorApi,
+    private val deviceInfoUpdater: DeviceInfoUpdaterApi,
     private val contactTokenHandler: ContactTokenHandlerApi,
     private val sdkEventManager: SdkEventManagerApi,
     private val eventsDao: EventsDaoApi,
@@ -47,22 +49,29 @@ internal class DeviceClient(
             .collect { sdkEvent ->
                 sdkLogger.debug("DeviceClient - consumeRegisterDeviceInfo")
                 try {
-                    val request = createRequest()
-                    val networkResponse = emarsysClient.send(request)
-                    networkResponse.onSuccess { response ->
-                        if (response.status == HttpStatusCode.OK) {
-                            contactTokenHandler.handleContactTokens(response)
-                        }
-                        sdkEventManager.emitEvent(
-                            SdkEvent.Internal.Sdk.Answer.Response(
-                                originId = sdkEvent.id,
-                                Result.success(response)
+                    val deviceInfo = deviceInfoCollector.collect()
+                    if (deviceInfoUpdater.hasDeviceInfoChanged(deviceInfo)) {
+                        val request = createRequest(deviceInfo)
+                        val networkResponse = emarsysClient.send(request)
+                        networkResponse.onSuccess { response ->
+                            if (response.status == HttpStatusCode.OK) {
+                                contactTokenHandler.handleContactTokens(response)
+                            }
+                            sdkEventManager.emitEvent(
+                                SdkEvent.Internal.Sdk.Answer.Response(
+                                    originId = sdkEvent.id,
+                                    Result.success(response)
+                                )
                             )
-                        )
+                            deviceInfoUpdater.updateDeviceInfoHash(deviceInfo)
+                            sdkEvent.ack(eventsDao, sdkLogger)
+                        }
+                        networkResponse.onFailure { exception ->
+                            handleException(exception, sdkEvent)
+                        }
+                    } else {
+                        sdkLogger.debug("DeviceInfo has not changed.")
                         sdkEvent.ack(eventsDao, sdkLogger)
-                    }
-                    networkResponse.onFailure { exception ->
-                        handleException(exception, sdkEvent)
                     }
                 } catch (e: Exception) {
                     handleException(e, sdkEvent)
@@ -87,8 +96,7 @@ internal class DeviceClient(
         )
     }
 
-    private suspend fun createRequest(): UrlRequest {
-        val deviceInfoString = deviceInfoCollector.collect()
+    private fun createRequest(deviceInfoString: String): UrlRequest {
         val url = urlFactory.create(EmarsysUrlType.RegisterDeviceInfo)
         return UrlRequest(
             url,

@@ -86,6 +86,7 @@ object NetworkInjection {
                 clientExceptionHandler = get(),
                 urlFactory = get(),
                 deviceInfoCollector = get(),
+                deviceInfoUpdater = get(),
                 contactTokenHandler = get(),
                 sdkEventManager = get(),
                 eventsDao = get(),

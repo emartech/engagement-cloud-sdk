@@ -6,7 +6,6 @@ import com.emarsys.SdkConstants.APPLY_GLOBAL_REMOTE_CONFIG_EVENT_NAME
 import com.emarsys.SdkConstants.APP_START_EVENT_NAME
 import com.emarsys.SdkConstants.CHANGE_APP_CODE_NAME
 import com.emarsys.SdkConstants.CLEAR_PUSH_TOKEN_EVENT_NAME
-import com.emarsys.SdkConstants.DEVICE_INFO_UPDATE_REQUIRED_EVENT_NAME
 import com.emarsys.SdkConstants.DISMISS_EVENT_NAME
 import com.emarsys.SdkConstants.INAPP_VIEWED_EVENT_NAME
 import com.emarsys.SdkConstants.IN_APP_BUTTON_CLICKED_EVENT_NAME
@@ -319,13 +318,6 @@ sealed interface SdkEvent {
                     val result: Result<T>
                 ) : Answer()
             }
-
-            @Serializable
-            data class DeviceInfoUpdateRequired(
-                override val id: String = UUIDProvider().provide(),
-                override val timestamp: Instant = TimestampProvider().provide(),
-                val name: String = DEVICE_INFO_UPDATE_REQUIRED_EVENT_NAME
-            ) : Sdk()
 
             @Serializable
             data class Log(

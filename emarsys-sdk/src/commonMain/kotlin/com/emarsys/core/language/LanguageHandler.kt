@@ -20,7 +20,7 @@ internal class LanguageHandler(
         if (language != null) {
             if (languageTagValidator.isValid(language)) {
                 stringStorage.put(LANGUAGE_STORAGE_KEY, language)
-                sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.DeviceInfoUpdateRequired())
+                sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.RegisterDeviceInfo())
             } else {
                 val message = "Language $language is not supported!"
                 logger.error(message)
@@ -28,7 +28,7 @@ internal class LanguageHandler(
             }
         } else {
             stringStorage.put(LANGUAGE_STORAGE_KEY, null)
-            sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.DeviceInfoUpdateRequired())
+            sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.RegisterDeviceInfo())
         }
     }
 }

@@ -12,6 +12,8 @@ import com.emarsys.core.channel.SdkEventEmitterApi
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.crypto.Crypto
 import com.emarsys.core.crypto.CryptoApi
+import com.emarsys.core.device.DeviceInfoUpdater
+import com.emarsys.core.device.DeviceInfoUpdaterApi
 import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.ConsoleLoggerApi
 import com.emarsys.core.log.LogEventRegistry
@@ -104,6 +106,7 @@ object CoreInjection {
         }
         single<Json> { JsonUtil.json }
         single<StorageApi> { Storage(stringStorage = get(), json = get()) }
+        single<DeviceInfoUpdaterApi> { DeviceInfoUpdater(stringStorage = get()) }
         singleOf(::UserAgentProvider) { bind<UserAgentProviderApi>() }
         single<DefaultUrlsApi> {
             DefaultUrls(

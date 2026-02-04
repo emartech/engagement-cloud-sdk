@@ -55,7 +55,7 @@ class LanguageHandlerTests {
     }
 
     @Test
-    fun testHandleLanguage_should_clearStorage_and_emit_deviceInfoUpdateRequired_event_when_language_is_null() =
+    fun testHandleLanguage_should_clearStorage_and_emit_registerDeviceInfo_event_when_language_is_null() =
         runTest {
             everySuspend { mockStringStorage.put(any(), any()) } returns Unit
             everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mock(MockMode.autofill)
@@ -64,12 +64,12 @@ class LanguageHandlerTests {
 
             verifySuspend {
                 mockStringStorage.put(LANGUAGE_STORAGE_KEY, null)
-                mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.Sdk.DeviceInfoUpdateRequired>())
+                mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.Sdk.RegisterDeviceInfo>())
             }
         }
 
     @Test
-    fun testHandleLanguage_should_store_language_and_emit_deviceInfoUpdateRequired_event_when_language_is_valid() =
+    fun testHandleLanguage_should_store_language_and_emit_registerDeviceInfo_event_when_language_is_valid() =
         runTest {
             everySuspend { mockStringStorage.put(any(), any()) } returns Unit
             everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mock(MockMode.autofill)
@@ -79,7 +79,7 @@ class LanguageHandlerTests {
 
             verifySuspend {
                 mockStringStorage.put(LANGUAGE_STORAGE_KEY, "zh-Hant-HK")
-                mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.Sdk.DeviceInfoUpdateRequired>())
+                mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.Sdk.RegisterDeviceInfo>())
             }
         }
 

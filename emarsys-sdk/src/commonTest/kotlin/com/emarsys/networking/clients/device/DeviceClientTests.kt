@@ -2,7 +2,10 @@ package com.emarsys.networking.clients.device
 
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.db.events.EventsDaoApi
+import com.emarsys.core.device.DeviceConstants.DEVICE_INFO_STORAGE_KEY
 import com.emarsys.core.device.DeviceInfoCollectorApi
+import com.emarsys.core.device.DeviceInfoUpdater
+import com.emarsys.core.device.DeviceInfoUpdaterApi
 import com.emarsys.core.exceptions.SdkException.NetworkIOException
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
@@ -12,6 +15,7 @@ import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
 import com.emarsys.event.OnlineSdkEvent
 import com.emarsys.event.SdkEvent
+import com.emarsys.fake.FakeStringStorage
 import com.emarsys.networking.clients.contact.ContactTokenHandlerApi
 import com.emarsys.networking.clients.error.ClientExceptionHandler
 import dev.mokkery.MockMode
@@ -51,7 +55,8 @@ import kotlin.time.ExperimentalTime
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
 class DeviceClientTests {
     private companion object {
-        const val DEVICE_INFO_STRING = "testDeviceInfo"
+        const val STORED_DEVICE_INFO_STRING = "testDeviceInfo"
+        const val NEW_DEVICE_INFO = "newDeviceInfo"
         val URL = Url("https://www.testUrl.com/testAppCode/client")
         val TIMESTAMP = Clock.System.now()
     }
@@ -64,6 +69,8 @@ class DeviceClientTests {
     private lateinit var mockEventsDao: EventsDaoApi
     private lateinit var mockClientExceptionHandler: ClientExceptionHandler
     private lateinit var mockSdkLogger: Logger
+    private lateinit var deviceInfoUpdater: DeviceInfoUpdaterApi
+    private lateinit var fakeStringStorage: FakeStringStorage
     private lateinit var onlineEvents: MutableSharedFlow<OnlineSdkEvent>
 
     @BeforeTest
@@ -73,16 +80,21 @@ class DeviceClientTests {
         mockUrlFactory = mock()
         every { mockUrlFactory.create(EmarsysUrlType.RegisterDeviceInfo) } returns URL
         mockDeviceInfoCollector = mock()
-        everySuspend { mockDeviceInfoCollector.collect() } returns DEVICE_INFO_STRING
+        everySuspend { mockDeviceInfoCollector.collect() } returns NEW_DEVICE_INFO
         mockContactTokenHandler = mock()
         mockSdkLogger = mock(MockMode.autofill)
         everySuspend { mockSdkLogger.error(any(), any<Throwable>()) } calls {
             (it.args[1] as Throwable).printStackTrace()
         }
+        fakeStringStorage = FakeStringStorage()
+        fakeStringStorage.put(DEVICE_INFO_STORAGE_KEY, STORED_DEVICE_INFO_STRING.hashCode().toString())
+
+        deviceInfoUpdater = DeviceInfoUpdater(fakeStringStorage)
+
         onlineEvents = MutableSharedFlow(replay = 5)
         mockSdkEventManager = mock(MockMode.autofill)
         every { mockSdkEventManager.onlineSdkEvents } returns onlineEvents
-        mockEventsDao = mock(MockMode.autoUnit)
+        mockEventsDao = mock(MockMode.autofill)
         mockClientExceptionHandler = mock(MockMode.autoUnit)
     }
 
@@ -98,11 +110,12 @@ class DeviceClientTests {
             mockClientExceptionHandler,
             mockUrlFactory,
             mockDeviceInfoCollector,
+            deviceInfoUpdater,
             mockContactTokenHandler,
             mockSdkEventManager,
             mockEventsDao,
             applicationScope,
-            mockSdkLogger,
+            mockSdkLogger
         )
     }
 
@@ -115,7 +128,7 @@ class DeviceClientTests {
         val request = UrlRequest(
             URL,
             HttpMethod.Post,
-            DEVICE_INFO_STRING
+            NEW_DEVICE_INFO
         )
         val expectedResponse = Response(
             request,
@@ -133,7 +146,6 @@ class DeviceClientTests {
         val onlineSdkEvents = backgroundScope.async {
             onlineEvents.take(1).toList()
         }
-
 
         onlineEvents.emit(registerDeviceInfoEvent)
 
@@ -154,11 +166,10 @@ class DeviceClientTests {
         createDeviceClient(backgroundScope).register()
 
         val testUrl = Url("https://www.testUrl.com/testAppCode/client")
-        val testDeviceInfoString = "testDeviceInfo"
         val request = UrlRequest(
             testUrl,
             HttpMethod.Post,
-            testDeviceInfoString
+            NEW_DEVICE_INFO
         )
         val expectedResponse = Response(
             request,
@@ -230,9 +241,8 @@ class DeviceClientTests {
         }
     }
 
-
     @Test
-    fun testConsumer_should_callClientExceptionHadler_when_exception_happens() = runTest {
+    fun testConsumer_should_callClientExceptionHandler_when_exception_happens() = runTest {
         createDeviceClient(backgroundScope).register()
         val testException = Exception("Test Exception")
 
@@ -260,5 +270,29 @@ class DeviceClientTests {
                 registerDeviceInfoEvent
             )
         }
+    }
+
+    @Test
+    fun testConsumer_should_collectDeviceInfo_andAckTheEvent_ifDeviceInfoHasNotChanged() = runTest {
+        everySuspend { mockDeviceInfoCollector.collect() } returns STORED_DEVICE_INFO_STRING
+
+        createDeviceClient(backgroundScope).register()
+
+        val registerDeviceInfoEvent = SdkEvent.Internal.Sdk.RegisterDeviceInfo("testId", TIMESTAMP)
+
+        val onlineSdkEvents = backgroundScope.async {
+            onlineEvents.take(1).toList()
+        }
+
+        onlineEvents.emit(registerDeviceInfoEvent)
+
+        advanceUntilIdle()
+
+        onlineSdkEvents.await() shouldBe listOf(registerDeviceInfoEvent)
+
+        verifySuspend(VerifyMode.exactly(1)) { mockDeviceInfoCollector.collect() }
+        verifySuspend(VerifyMode.exactly(0)) { mockEmarsysClient.send(any()) }
+        verifySuspend(VerifyMode.exactly(1)) { mockEventsDao.removeEvent(registerDeviceInfoEvent) }
+        verifySuspend { mockSdkLogger.debug("DeviceInfo has not changed.") }
     }
 }
