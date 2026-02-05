@@ -109,6 +109,7 @@ object InitInjection {
         single<StateMachineApi>(named(StateMachineTypes.Init)) {
             StateMachine(
                 states = listOf(
+                    get(named(InitStateTypes.LegacySDKMigration)),
                     get(named(InitStateTypes.RegisterSdkEventDistributorState)),
                     get(named(InitStateTypes.RegisterEventBasedClients)),
                     get(named(InitStateTypes.RegisterEventConsumers)),
@@ -133,5 +134,5 @@ object InitInjection {
 }
 
 enum class InitStateTypes {
-    ApplyGlobalRemoteConfig, RegisterInstances, RegisterWatchdogs, SessionSubscription, Initializer, SdkConfigLoader, RegisterEventBasedClients, RegisterEventConsumers, RegisterSdkEventDistributorState, RestoreOperationalEvents
+    LegacySDKMigration, ApplyGlobalRemoteConfig, RegisterInstances, RegisterWatchdogs, SessionSubscription, Initializer, SdkConfigLoader, RegisterEventBasedClients, RegisterEventConsumers, RegisterSdkEventDistributorState, RestoreOperationalEvents
 }

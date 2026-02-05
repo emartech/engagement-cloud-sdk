@@ -56,6 +56,11 @@ import com.emarsys.core.storage.StorageConstants.DB_NAME
 import com.emarsys.core.storage.StringStorage
 import com.emarsys.core.storage.StringStorageApi
 import com.emarsys.core.url.ExternalUrlOpenerApi
+import com.emarsys.db_migration.LegacyDBOpenHelper
+import com.emarsys.db_migration.LegacySharedPreferencesWrapper
+import com.emarsys.db_migration.LegacySharedPreferencesWrapper.Companion.EMARSYS_SECURE_SHARED_PREFERENCES_V3_NAME
+import com.emarsys.db_migration.SharedPreferenceCrypto
+import com.emarsys.db_migration.states.LegacySDKMigrationState
 import com.emarsys.enable.PlatformInitState
 import com.emarsys.enable.PlatformInitializer
 import com.emarsys.enable.PlatformInitializerApi
@@ -163,6 +168,28 @@ object AndroidInjection {
                 stringStorage = get(),
                 sdkContext = get(),
                 platformCategoryProvider = get()
+            )
+        }
+        single<State>(named(InitStateTypes.LegacySDKMigration)) {
+            val sharedPreferences: SharedPreferences =
+                applicationContext.getSharedPreferences(
+                    EMARSYS_SECURE_SHARED_PREFERENCES_V3_NAME,
+                    Context.MODE_PRIVATE
+                )
+            val legacySharedPreferencesWrapper = LegacySharedPreferencesWrapper(
+                sharedPreferences,
+                SharedPreferenceCrypto(
+                    sdkLogger = get { parametersOf(SharedPreferenceCrypto::class.simpleName) }
+                )
+            )
+            val legacyMigrationDBOpenHelper = LegacyDBOpenHelper(applicationContext)
+            LegacySDKMigrationState(
+                legacySharedPreferencesWrapper = legacySharedPreferencesWrapper,
+                legacyDBOpenHelper = legacyMigrationDBOpenHelper,
+                requestContext = get(),
+                stringStorage = get(),
+                ioDispatcher = Dispatchers.IO,
+                sdkLogger = get { parametersOf(LegacySDKMigrationState::class.simpleName) }
             )
         }
         single<State>(named(StateTypes.PlatformInit)) { PlatformInitState() }
