@@ -87,7 +87,10 @@ class DeviceClientTests {
             (it.args[1] as Throwable).printStackTrace()
         }
         fakeStringStorage = FakeStringStorage()
-        fakeStringStorage.put(DEVICE_INFO_STORAGE_KEY, STORED_DEVICE_INFO_STRING.hashCode().toString())
+        fakeStringStorage.put(
+            DEVICE_INFO_STORAGE_KEY,
+            STORED_DEVICE_INFO_STRING.hashCode().toString()
+        )
 
         deviceInfoUpdater = DeviceInfoUpdater(fakeStringStorage)
 
@@ -158,6 +161,12 @@ class DeviceClientTests {
             mockEmarsysClient.send(request)
             mockContactTokenHandler.handleContactTokens(expectedResponse)
             mockEventsDao.removeEvent(registerDeviceInfoEvent)
+            mockSdkEventManager.emitEvent(
+                SdkEvent.Internal.Sdk.Answer.Response(
+                    originId = registerDeviceInfoEvent.id,
+                    Result.success(Unit)
+                )
+            )
         }
     }
 
@@ -294,5 +303,13 @@ class DeviceClientTests {
         verifySuspend(VerifyMode.exactly(0)) { mockEmarsysClient.send(any()) }
         verifySuspend(VerifyMode.exactly(1)) { mockEventsDao.removeEvent(registerDeviceInfoEvent) }
         verifySuspend { mockSdkLogger.debug("DeviceInfo has not changed.") }
+        verifySuspend {
+            mockSdkEventManager.emitEvent(
+                SdkEvent.Internal.Sdk.Answer.Response(
+                    originId = registerDeviceInfoEvent.id,
+                    Result.success(Unit)
+                )
+            )
+        }
     }
 }

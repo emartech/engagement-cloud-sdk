@@ -60,7 +60,7 @@ internal class DeviceClient(
                             sdkEventManager.emitEvent(
                                 SdkEvent.Internal.Sdk.Answer.Response(
                                     originId = sdkEvent.id,
-                                    Result.success(response)
+                                    Result.success(Unit)
                                 )
                             )
                             deviceInfoUpdater.updateDeviceInfoHash(deviceInfo)
@@ -72,6 +72,12 @@ internal class DeviceClient(
                     } else {
                         sdkLogger.debug("DeviceInfo has not changed.")
                         sdkEvent.ack(eventsDao, sdkLogger)
+                        sdkEventManager.emitEvent(
+                            SdkEvent.Internal.Sdk.Answer.Response(
+                                originId = sdkEvent.id,
+                                Result.success(Unit)
+                            )
+                        )
                     }
                 } catch (e: Exception) {
                     handleException(e, sdkEvent)

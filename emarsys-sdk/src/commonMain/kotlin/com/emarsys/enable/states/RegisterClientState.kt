@@ -1,7 +1,6 @@
 package com.emarsys.enable.states
 
 import com.emarsys.core.channel.SdkEventDistributorApi
-import com.emarsys.core.networking.model.Response
 import com.emarsys.core.state.State
 import com.emarsys.event.SdkEvent
 import com.emarsys.response.mapToUnitOrFailure
@@ -19,7 +18,7 @@ internal class RegisterClientState(
 
     override suspend fun active(): Result<Unit> {
         return sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.RegisterDeviceInfo())
-            .await<Response>()
+            .await<Unit>()
             .mapToUnitOrFailure()
     }
 

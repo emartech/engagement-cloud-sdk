@@ -2,8 +2,6 @@ package com.emarsys.enable.states
 
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.core.channel.SdkEventWaiterApi
-import com.emarsys.core.networking.model.Response
-import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.event.SdkEvent
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -15,10 +13,6 @@ import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
-import io.ktor.http.HttpMethod
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.Url
-import io.ktor.http.headersOf
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -38,14 +32,7 @@ class RegisterClientStateTests {
         mockWaiter = mock()
         everySuspend { mockWaiter.await<Any>() } returns SdkEvent.Internal.Sdk.Answer.Response(
             "0",
-            Result.success(
-                Response(
-                    originalRequest = UrlRequest(Url("https://example.com"), HttpMethod.Post),
-                    status = HttpStatusCode.OK,
-                    headers = headersOf(),
-                    bodyAsText = "testBody"
-                )
-            )
+            Result.success(Unit)
         )
         mockEventDistributor = mock()
         eventSlot = slot()
