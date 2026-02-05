@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import com.emarsys.core.log.Logger
+import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.url.AndroidExternalUrlOpener
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
@@ -33,10 +34,13 @@ class AndroidExternalUrlOpenerTests {
 
     @Test
     fun testOpen_shouldOpenValidUrl() = runTest {
+        val testActionModel = BasicOpenExternalUrlActionModel(
+            url = "https://www.sap.com"
+        )
         val intentCaptor = slot<Intent>()
         every { mockContext.startActivity(capture(intentCaptor)) } returns Unit
 
-        androidExternalUrlOpener.open("https://www.emarsys.com")
+        androidExternalUrlOpener.open(testActionModel)
 
         verify { mockContext.startActivity(any<Intent>()) }
         val capturedIntent = intentCaptor.captured
@@ -46,7 +50,11 @@ class AndroidExternalUrlOpenerTests {
 
     @Test
     fun testOpen_shouldNotOpenInvalidUrl() = runTest {
-        androidExternalUrlOpener.open("invalid")
+        val testActionModel = BasicOpenExternalUrlActionModel(
+            url = "invalid"
+        )
+
+        androidExternalUrlOpener.open(testActionModel)
 
         verify(exactly = 0) { mockContext.startActivity(any<Intent>()) }
     }
@@ -54,11 +62,14 @@ class AndroidExternalUrlOpenerTests {
 
     @Test
     fun testOpen_shouldNotOpenValidUrlWhenActivityIsNotFound() = runTest {
-        val url = "https://www.emarsys.com"
+        val url = "https://www.sap.com"
+        val testActionModel = BasicOpenExternalUrlActionModel(
+            url = url
+        )
         val exception = ActivityNotFoundException()
         every { mockContext.startActivity(any()) } throws exception
 
-        androidExternalUrlOpener.open(url)
+        androidExternalUrlOpener.open(testActionModel)
 
         verifySuspend {
             mockLogger.error(

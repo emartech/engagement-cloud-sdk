@@ -13,22 +13,22 @@ class OpenExternalUrlActionTests {
 
     @Test
     fun invoke_shouldCallExternalUrlOpener() = runTest {
-        val url = "https://www.emarsys.com"
+        val actionModel = PresentableOpenExternalUrlActionModel(
+            id = "123",
+            reporting = """{"reportingKey":"reportingValue"}""",
+            title = "Emarsys",
+            url = "https://www.emarsys.com"
+        )
         val mockExternalUrlOpener = mock<ExternalUrlOpenerApi> {
-            everySuspend { open(url) } returns Unit
+            everySuspend { open(actionModel) } returns Unit
         }
 
         val openExternalUrlAction = OpenExternalUrlAction(
-            PresentableOpenExternalUrlActionModel(
-                id = "123",
-                reporting = """{"reportingKey":"reportingValue"}""",
-                title = "Emarsys",
-                url
-            ),
+            actionModel,
             mockExternalUrlOpener
         )
         openExternalUrlAction()
 
-        verifySuspend { mockExternalUrlOpener.open(url) }
+        verifySuspend { mockExternalUrlOpener.open(actionModel) }
     }
 }

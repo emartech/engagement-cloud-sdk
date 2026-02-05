@@ -15,12 +15,12 @@ internal class PushActionFactory(
     private val eventActionFactory: EventActionFactoryApi,
     private val launchApplicationHandler: LaunchApplicationHandlerApi
 ) : PushActionFactoryApi {
-    override suspend fun create(action: ActionModel): Action<*> {
-        return when (action) {
+    override suspend fun create(actionModel: ActionModel): Action<*> {
+        return when (actionModel) {
             is BasicPushToInAppActionModel,
-            is PresentablePushToInAppActionModel -> PushToInappAction(action, pushToInAppHandler)
+            is PresentablePushToInAppActionModel -> PushToInappAction(actionModel, pushToInAppHandler)
             is BasicLaunchApplicationActionModel -> LaunchApplicationAction(launchApplicationHandler)
-            else -> eventActionFactory.create(action)
+            else -> eventActionFactory.create(actionModel)
         }
     }
 }

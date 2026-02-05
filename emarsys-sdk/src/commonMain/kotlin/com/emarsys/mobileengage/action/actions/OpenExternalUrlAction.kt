@@ -9,6 +9,6 @@ class OpenExternalUrlAction(
 ): Action<Unit> {
 
     override suspend fun invoke(value: Unit?) {
-        externalUrlOpener.open(action.url)
+        externalUrlOpener.open(action)
     }
 }

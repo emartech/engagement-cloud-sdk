@@ -20,6 +20,7 @@ import com.emarsys.mobileengage.action.actions.Action
 import com.emarsys.mobileengage.action.actions.OpenExternalUrlAction
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
+import com.emarsys.mobileengage.action.models.OpenExternalUrlActionModel
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategoriesDialogView
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategorySelectorButton
@@ -299,12 +300,12 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
 
 
 internal class PreviewActionFactory() : ActionFactoryApi<ActionModel> {
-    override suspend fun create(action: ActionModel): Action<*> {
+    override suspend fun create(actionModel: ActionModel): Action<*> {
         return OpenExternalUrlAction(
             action = BasicOpenExternalUrlActionModel(url = "https://www.example.com"),
             externalUrlOpener = object : ExternalUrlOpenerApi {
-                override suspend fun open(url: String) {
-                    println("Opening URL: $url")
+                override suspend fun open(actionModel: OpenExternalUrlActionModel) {
+                    println("Opening URL: ${actionModel.url}")
                 }
             })
     }

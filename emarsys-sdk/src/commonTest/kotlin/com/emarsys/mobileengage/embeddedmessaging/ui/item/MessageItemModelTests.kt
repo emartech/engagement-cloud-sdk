@@ -16,7 +16,6 @@ import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.embeddedmessaging.models.MessageTagUpdate
 import com.emarsys.mobileengage.embeddedmessaging.models.TagOperation
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants
-import com.emarsys.networking.clients.embedded.messaging.model.Category
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessage
 import com.emarsys.networking.clients.embedded.messaging.model.EmbeddedMessageAnimation
 import com.emarsys.networking.clients.embedded.messaging.model.ListThumbnailImage

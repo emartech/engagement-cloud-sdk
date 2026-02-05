@@ -75,7 +75,7 @@ class WebInAppJsBridgeTests {
     fun buttonClicked_shouldTrigger_actionFactory() = runTest {
         val testActionModel = BasicInAppButtonClickedActionModel(REPORTING, TRACKING_INFO)
         everySuspend {
-            mockActionFactory.create(action = testActionModel)
+            mockActionFactory.create(actionModel = testActionModel)
         } returns TEST_ACTION
 
         inappJsBridge.register()
@@ -96,7 +96,7 @@ class WebInAppJsBridgeTests {
         val testJsonString =
             createTestJson(name = "customEventName", payload = buildJsonObject { put("key", "value") })
         everySuspend {
-            mockActionFactory.create(action = testActionModel)
+            mockActionFactory.create(actionModel = testActionModel)
         } returns TEST_ACTION
 
         inappJsBridge.register()
@@ -116,7 +116,7 @@ class WebInAppJsBridgeTests {
             BasicAppEventActionModel(REPORTING, "appEventName", mapOf("key" to "value"))
         val testJsonString = createTestJson(name = "appEventName", payload = buildJsonObject { put("key", "value") })
         everySuspend {
-            mockActionFactory.create(action = testActionModel)
+            mockActionFactory.create(actionModel = testActionModel)
         } returns TEST_ACTION
 
         inappJsBridge.register()
@@ -134,7 +134,7 @@ class WebInAppJsBridgeTests {
     fun requestPushPermission_shouldTrigger_actionFactory() = runTest {
         val testActionModel = RequestPushPermissionActionModel
         everySuspend {
-            mockActionFactory.create(action = testActionModel)
+            mockActionFactory.create(actionModel = testActionModel)
         } returns TEST_ACTION
 
         inappJsBridge.register()
@@ -153,7 +153,7 @@ class WebInAppJsBridgeTests {
         val testActionModel = BasicOpenExternalUrlActionModel(REPORTING, "https://sap.com")
         val testJsonString = createTestJson(url = "https://sap.com")
         everySuspend {
-            mockActionFactory.create(action = testActionModel)
+            mockActionFactory.create(actionModel = testActionModel)
         } returns TEST_ACTION
 
         inappJsBridge.register()
@@ -171,7 +171,7 @@ class WebInAppJsBridgeTests {
     fun dismiss_shouldTrigger_actionFactory() = runTest {
         val testActionModel = BasicDismissActionModel(REPORTING, DISMISS)
         everySuspend {
-            mockActionFactory.create(action = testActionModel)
+            mockActionFactory.create(actionModel = testActionModel)
         } returns TEST_ACTION
 
         inappJsBridge.register()
@@ -190,7 +190,7 @@ class WebInAppJsBridgeTests {
         val testActionModel = BasicCopyToClipboardActionModel(REPORTING, "testValue")
         val testJsonString = createTestJson(text = "testValue")
         everySuspend {
-            mockActionFactory.create(action = testActionModel)
+            mockActionFactory.create(actionModel = testActionModel)
         } returns TEST_ACTION
 
         inappJsBridge.register()

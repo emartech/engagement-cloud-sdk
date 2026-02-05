@@ -1,6 +1,7 @@
 package com.emarsys.core.url
 
 import com.emarsys.core.log.Logger
+import com.emarsys.mobileengage.action.models.OpenExternalUrlActionModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -17,8 +18,8 @@ class IosExternalUrlOpener(
     private val sdkLogger: Logger
 ) : ExternalUrlOpenerApi {
 
-    override suspend fun open(url: String) {
-        val nsUrl = NSURL(string = url)
+    override suspend fun open(actionModel: OpenExternalUrlActionModel) {
+        val nsUrl = NSURL(string = actionModel.url)
         if (uiApplication.canOpenURL(nsUrl)) {
             withContext(mainDispatcher) {
                 uiApplication.openURL(nsUrl, emptyMap<Any?, Any?>()) { success ->
@@ -29,7 +30,7 @@ class IosExternalUrlOpener(
                                 buildJsonObject {
                                     put(
                                         "message",
-                                        JsonPrimitive("Failed to open url: $url")
+                                        JsonPrimitive("Failed to open url: ${actionModel.url}")
                                     )
                                 }
 

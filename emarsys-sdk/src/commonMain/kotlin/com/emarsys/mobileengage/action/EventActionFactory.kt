@@ -31,18 +31,18 @@ internal class EventActionFactory(
     private val clipboardHandler: ClipboardHandlerApi,
     private val sdkLogger: Logger
 ) : EventActionFactoryApi {
-    override suspend fun create(action: ActionModel): Action<*> {
-        return when (action) {
-            is AppEventActionModel -> AppEventAction(action, sdkEventDistributor)
-            is CustomEventActionModel -> CustomEventAction(action, sdkEventDistributor)
+    override suspend fun create(actionModel: ActionModel): Action<*> {
+        return when (actionModel) {
+            is AppEventActionModel -> AppEventAction(actionModel, sdkEventDistributor)
+            is CustomEventActionModel -> CustomEventAction(actionModel, sdkEventDistributor)
             is RequestPushPermissionActionModel -> RequestPushPermissionAction(permissionHandler)
-            is DismissActionModel -> DismissAction(action, sdkEventDistributor)
-            is OpenExternalUrlActionModel -> OpenExternalUrlAction(action, externalUrlOpener)
-            is ReportingActionModel -> ReportingAction(action, sdkEventDistributor)
-            is CopyToClipboardActionModel -> CopyToClipboardAction(action, clipboardHandler)
-            is BasicRichContentDisplayActionModel -> RichContentDisplayAction(action)
+            is DismissActionModel -> DismissAction(actionModel, sdkEventDistributor)
+            is OpenExternalUrlActionModel -> OpenExternalUrlAction(actionModel, externalUrlOpener)
+            is ReportingActionModel -> ReportingAction(actionModel, sdkEventDistributor)
+            is CopyToClipboardActionModel -> CopyToClipboardAction(actionModel, clipboardHandler)
+            is BasicRichContentDisplayActionModel -> RichContentDisplayAction(actionModel)
             else -> {
-                val exception = IllegalArgumentException("Unknown action type: $action")
+                val exception = IllegalArgumentException("Unknown action type: $actionModel")
                 sdkLogger.error("EventActionFactory", exception)
                 throw exception
 
