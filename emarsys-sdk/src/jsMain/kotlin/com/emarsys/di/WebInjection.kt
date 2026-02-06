@@ -71,6 +71,7 @@ import com.emarsys.enable.config.SdkConfigStoreApi
 import com.emarsys.init.states.LegacySDKMigrationState
 import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
+import com.emarsys.mobileengage.inapp.InAppScriptExtractor
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.mobileengage.inapp.InlineInAppViewRendererApi
 import com.emarsys.mobileengage.inapp.WebInAppJsBridgeFactory
@@ -213,7 +214,8 @@ object WebInjection {
         single<FileCacheApi> { WebFileCache() }
         single<InAppViewProviderApi> {
             WebInAppViewProvider(
-                WebInAppJsBridgeFactory(
+                inappScriptExtractor =  InAppScriptExtractor(),
+                webInAppJsBridgeFactory = WebInAppJsBridgeFactory(
                     actionFactory = get<EventActionFactoryApi>(),
                     json = get(),
                     sdkDispatcher = get(named(DispatcherTypes.Sdk))
