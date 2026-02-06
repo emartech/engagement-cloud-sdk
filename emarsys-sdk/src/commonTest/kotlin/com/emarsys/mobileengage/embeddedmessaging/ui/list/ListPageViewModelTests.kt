@@ -20,10 +20,6 @@ import dev.mokkery.mock
 import dev.mokkery.verify
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
-import io.kotest.data.forAll
-import io.kotest.data.headers
-import io.kotest.data.row
-import io.kotest.data.table
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.CoroutineScope
@@ -470,26 +466,6 @@ class ListPageViewModelTests {
 
         viewModel.hasFiltersApplied.value shouldBe false
     }
-
-    @Test
-    fun testHideFilterRowForDetailedView_shouldUpdate_ShouldHideFilterRowForDetailedViewState_ToTheProperValue() =
-        runTest {
-            forAll(
-                table(
-                    headers("expectedBoolean"),
-                    listOf(
-                        row(true),
-                        row(false)
-                    )
-                )
-            ) { expectedBoolean ->
-                viewModel.shouldHideFilterRowForDetailedView.value shouldBe !expectedBoolean
-
-                viewModel.hideFilterRowForDetailedView(expectedBoolean)
-
-                viewModel.shouldHideFilterRowForDetailedView.value shouldBe expectedBoolean
-            }
-        }
 
     @Test
     fun platformCategory_shouldReturn_platformCategory_fromProvider() {

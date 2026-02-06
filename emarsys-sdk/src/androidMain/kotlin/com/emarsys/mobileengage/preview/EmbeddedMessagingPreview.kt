@@ -248,9 +248,6 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
 
         override val triggerRefreshFromJs: () -> Unit = { Unit }
 
-        override val shouldHideFilterRowForDetailedView: StateFlow<Boolean>
-            get() = MutableStateFlow(false).asStateFlow()
-
         override val platformCategory: String
             get() = SdkConstants.MOBILE_PLATFORM_CATEGORY
 
@@ -290,10 +287,6 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
         }
 
         override fun refreshMessagesWithThrottling(shouldCallRefresh: () -> Unit) {
-            Unit
-        }
-
-        override fun hideFilterRowForDetailedView(shouldHideFilterRow: Boolean) {
             Unit
         }
     }

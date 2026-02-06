@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -26,6 +27,7 @@ import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -61,11 +63,13 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstant
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.FLOATING_ACTION_BUTTON_SIZE
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.MESSAGE_ITEM_IMAGE_SIZE
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.ZERO_PADDING
+import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategorySelectorButton
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.CustomMessageItemViewModelApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.DeleteMessageItemConfirmationDialog
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemView
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.list.placeholders.PlaceholderMessageList
+import com.emarsys.mobileengage.embeddedmessaging.ui.tab.FilterByReadStateTabs
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.LocalDesignValues
 import com.emarsys.mobileengage.embeddedmessaging.ui.translation.LocalStringResources
@@ -101,7 +105,12 @@ fun MessageItemsListPane(
     lazyListState: LazyListState = rememberLazyListState(),
     hasConnection: Boolean,
     customMessageItem: ((viewModel: CustomMessageItemViewModelApi, isSelected: Boolean) -> Composable)?,
-    listPageViewModel: ListPageViewModelApi
+    listPageViewModel: ListPageViewModelApi,
+    showFilters: Boolean,
+    selectedCategoryIds: Set<Int>,
+    filterUnOpenedOnly: Boolean,
+    onFilterChange: (Boolean) -> Unit,
+    showCategorySelector: () -> Unit,
 ) {
     val refreshError = lazyPagingMessageItems.loadState.refresh as? LoadState.Error
     val appendError = lazyPagingMessageItems.loadState.append as? LoadState.Error
@@ -136,115 +145,128 @@ fun MessageItemsListPane(
             }
         }
 
-        RefreshableMessageItemsList(
-            withPullToRefresh = withSwipeGestures,
-            isRefreshing = lazyPagingMessageItems.isInitiallyLoading(),
-            onRefresh = onRefresh
-        ) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                if (!withSwipeGestures) {
-                    RefreshButtonOnWeb(listPageViewModel)
-                }
-                if (lazyPagingMessageItems.shouldShowErrorStateNoConnection(hasConnection)) {
-                    ErrorStateNoConnection(onRefresh = onRefresh)
-                } else {
-                    LazyColumn(
-                        state = lazyListState,
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(LocalDesignValues.current.listItemSpacing)
-                    ) {
-                        if (lazyPagingMessageItems.isInitiallyLoading()) {
-                            item {
-                                PlaceholderMessageList()
-                            }
-                        } else if (lazyPagingMessageItems.isIdleButEmpty()) {
-                            item {
-                                if (hasFiltersApplied) {
-                                    FilteredEmptyState(onClearFilters = onClearFilters)
-                                } else {
-                                    EmptyState()
-                                }
-                            }
-                        } else if (lazyPagingMessageItems.hasRefreshError() && lazyPagingMessageItems.itemCount == 0) {
-                            item {
-                                if (hasFiltersApplied) {
-                                    FilteredEmptyState(onClearFilters = onClearFilters)
-                                } else {
-                                    EmptyState()
-                                }
-                            }
-                        } else {
-                            items(
-                                count = lazyPagingMessageItems.itemCount,
-                                key = lazyPagingMessageItems.itemKey { it.id }
-                            ) { index ->
-                                lazyPagingMessageItems[index]?.let { messageViewModel ->
-                                    if (messageViewModel.isExcludedLocally) {
-                                        return@let
-                                    }
+        Column {
+            if (showFilters) {
+                FilterRow(
+                    selectedCategoryIds = selectedCategoryIds,
+                    filterUnopenedOnly = filterUnOpenedOnly,
+                    onFilterChange = onFilterChange,
+                    onCategorySelectorClicked = showCategorySelector
+                )
 
-                                    if (withSwipeGestures) {
-                                        val swipeToDismissPositionalThreshold =
-                                            { totalDistance: Float -> totalDistance * 0.3f }
-                                        val dismissState = rememberSaveable(
-                                            saver = Saver(
-                                                save = { it.currentValue },
-                                                restore = {
-                                                    SwipeToDismissBoxState(
-                                                        if (messageIdToDelete != null) it else SwipeToDismissBoxValue.Settled,
-                                                        positionalThreshold = swipeToDismissPositionalThreshold
-                                                    )
-                                                },
-                                            )
-                                        ) {
-                                            SwipeToDismissBoxState(
-                                                SwipeToDismissBoxValue.Settled,
-                                                positionalThreshold = swipeToDismissPositionalThreshold
-                                            )
-                                        }
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline)
+            }
 
-                                        LaunchedEffect(dismissState.currentValue) {
-                                            if (dismissState.currentValue != SwipeToDismissBoxValue.Settled) {
-                                                messageIdToDelete = messageViewModel.id
-                                                dismissStateToReset = dismissState
-                                            }
-                                        }
-
-                                        SwipeToDismissBox(
-                                            state = dismissState,
-                                            enableDismissFromStartToEnd = false,
-                                            enableDismissFromEndToStart = true,
-                                            backgroundContent = {
-                                                DeleteMessageOnSwipeBox()
-                                            }
-                                        ) {
-                                            MessageItemViewContainer(
-                                                messageViewModel,
-                                                selectedMessage,
-                                                onMessageClick,
-                                                customMessageItem
-                                            )
-                                        }
-                                    } else {
-                                        BoxWithDeleteIcon(
-                                            onDelete = {
-                                                messageIdToDelete = messageViewModel.id
-                                            }
-                                        ) {
-                                            MessageItemViewContainer(
-                                                messageViewModel,
-                                                selectedMessage,
-                                                onMessageClick,
-                                                customMessageItem
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-
-                            if (lazyPagingMessageItems.isLoadingMore()) {
+            RefreshableMessageItemsList(
+                withPullToRefresh = withSwipeGestures,
+                isRefreshing = lazyPagingMessageItems.isInitiallyLoading(),
+                onRefresh = onRefresh
+            ) {
+                Column(modifier = Modifier.fillMaxSize()) {
+                    if (!withSwipeGestures) {
+                        RefreshButtonOnWeb(listPageViewModel)
+                    }
+                    if (lazyPagingMessageItems.shouldShowErrorStateNoConnection(hasConnection)) {
+                        ErrorStateNoConnection(onRefresh = onRefresh)
+                    } else {
+                        LazyColumn(
+                            state = lazyListState,
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.spacedBy(LocalDesignValues.current.listItemSpacing)
+                        ) {
+                            if (lazyPagingMessageItems.isInitiallyLoading()) {
                                 item {
-                                    MessagesLoadingSpinner()
+                                    PlaceholderMessageList()
+                                }
+                            } else if (lazyPagingMessageItems.isIdleButEmpty()) {
+                                item {
+                                    if (hasFiltersApplied) {
+                                        FilteredEmptyState(onClearFilters = onClearFilters)
+                                    } else {
+                                        EmptyState()
+                                    }
+                                }
+                            } else if (lazyPagingMessageItems.hasRefreshError() && lazyPagingMessageItems.itemCount == 0) {
+                                item {
+                                    if (hasFiltersApplied) {
+                                        FilteredEmptyState(onClearFilters = onClearFilters)
+                                    } else {
+                                        EmptyState()
+                                    }
+                                }
+                            } else {
+                                items(
+                                    count = lazyPagingMessageItems.itemCount,
+                                    key = lazyPagingMessageItems.itemKey { it.id }
+                                ) { index ->
+                                    lazyPagingMessageItems[index]?.let { messageViewModel ->
+                                        if (messageViewModel.isExcludedLocally) {
+                                            return@let
+                                        }
+
+                                        if (withSwipeGestures) {
+                                            val swipeToDismissPositionalThreshold =
+                                                { totalDistance: Float -> totalDistance * 0.3f }
+                                            val dismissState = rememberSaveable(
+                                                saver = Saver(
+                                                    save = { it.currentValue },
+                                                    restore = {
+                                                        SwipeToDismissBoxState(
+                                                            if (messageIdToDelete != null) it else SwipeToDismissBoxValue.Settled,
+                                                            positionalThreshold = swipeToDismissPositionalThreshold
+                                                        )
+                                                    },
+                                                )
+                                            ) {
+                                                SwipeToDismissBoxState(
+                                                    SwipeToDismissBoxValue.Settled,
+                                                    positionalThreshold = swipeToDismissPositionalThreshold
+                                                )
+                                            }
+
+                                            LaunchedEffect(dismissState.currentValue) {
+                                                if (dismissState.currentValue != SwipeToDismissBoxValue.Settled) {
+                                                    messageIdToDelete = messageViewModel.id
+                                                    dismissStateToReset = dismissState
+                                                }
+                                            }
+
+                                            SwipeToDismissBox(
+                                                state = dismissState,
+                                                enableDismissFromStartToEnd = false,
+                                                enableDismissFromEndToStart = true,
+                                                backgroundContent = {
+                                                    DeleteMessageOnSwipeBox()
+                                                }
+                                            ) {
+                                                MessageItemViewContainer(
+                                                    messageViewModel,
+                                                    selectedMessage,
+                                                    onMessageClick,
+                                                    customMessageItem
+                                                )
+                                            }
+                                        } else {
+                                            BoxWithDeleteIcon(
+                                                onDelete = {
+                                                    messageIdToDelete = messageViewModel.id
+                                                }
+                                            ) {
+                                                MessageItemViewContainer(
+                                                    messageViewModel,
+                                                    selectedMessage,
+                                                    onMessageClick,
+                                                    customMessageItem
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (lazyPagingMessageItems.isLoadingMore()) {
+                                    item {
+                                        MessagesLoadingSpinner()
+                                    }
                                 }
                             }
                         }
@@ -562,6 +584,41 @@ private fun ErrorStateNoConnection(onRefresh: () -> Unit) {
                     shape = MaterialTheme.shapes.small
                 )
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun FilterRow(
+    selectedCategoryIds: Set<Int>,
+    filterUnopenedOnly: Boolean,
+    onFilterChange: (Boolean) -> Unit,
+    onCategorySelectorClicked: () -> Unit
+) {
+    EmbeddedMessagingTheme {
+        Row(
+            modifier = Modifier.padding(DEFAULT_PADDING),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(DEFAULT_PADDING)
+        ) {
+            FilterByReadStateTabs(
+                selectedTabIndex = if (filterUnopenedOnly) 1 else 0,
+                allMessagesText = LocalStringResources.current.allMessagesFilterButtonLabel,
+                unreadMessagesText = LocalStringResources.current.unreadMessagesFilterButtonLabel,
+                onAllMessagesClick = { onFilterChange(false) },
+                onUnreadClick = { onFilterChange(true) },
+                modifier = Modifier.wrapContentWidth()
+            )
+
+            Spacer(modifier = Modifier.weight(0.5f))
+
+            CategorySelectorButton(
+                isCategorySelectionActive = selectedCategoryIds.isNotEmpty(),
+                onClick = {
+                    onCategorySelectorClicked()
+                },
+            )
         }
     }
 }

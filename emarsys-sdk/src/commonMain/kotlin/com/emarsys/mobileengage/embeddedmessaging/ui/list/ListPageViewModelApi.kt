@@ -21,8 +21,6 @@ interface ListPageViewModelApi {
 
     val triggerRefreshFromJs: () -> Unit
 
-    val shouldHideFilterRowForDetailedView: StateFlow<Boolean>
-
     val platformCategory: String
 
     fun setFilterUnopenedOnly(unopenedOnly: Boolean)
@@ -38,6 +36,4 @@ interface ListPageViewModelApi {
     fun applyCategorySelection(categoryIds: Set<Int>)
 
     fun refreshMessagesWithThrottling(shouldCallRefresh: () -> Unit)
-
-    fun hideFilterRowForDetailedView(shouldHideFilterRow: Boolean)
 }

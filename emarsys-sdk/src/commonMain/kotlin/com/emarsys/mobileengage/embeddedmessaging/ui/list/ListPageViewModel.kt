@@ -57,11 +57,6 @@ internal class ListPageViewModel(
 
     private val triggerFromJS = MutableStateFlow(false)
 
-    private val _shouldHideFilterRowForDetailedView = MutableStateFlow(false)
-
-    override val shouldHideFilterRowForDetailedView: StateFlow<Boolean> =
-        _shouldHideFilterRowForDetailedView.asStateFlow()
-
     override val platformCategory: String = platformCategoryProvider.provide()
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -112,10 +107,6 @@ internal class ListPageViewModel(
 
     override fun setSelectedCategoryIds(categoryIds: Set<Int>) {
         _selectedCategoryIds.value = categoryIds
-    }
-
-    override fun hideFilterRowForDetailedView(shouldHideFilterRow: Boolean) {
-        _shouldHideFilterRowForDetailedView.value = shouldHideFilterRow
     }
 
     override suspend fun selectMessage(

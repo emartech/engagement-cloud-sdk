@@ -9,17 +9,11 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -50,12 +44,9 @@ import androidx.compose.ui.backhandler.BackHandler
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.emarsys.SdkConstants
 import com.emarsys.di.SdkKoinIsolationContext.koin
-import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.DEFAULT_PADDING
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategoriesDialogView
-import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategorySelectorButton
 import com.emarsys.mobileengage.embeddedmessaging.ui.detail.MessageDetailView
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.CustomMessageItemViewModelApi
-import com.emarsys.mobileengage.embeddedmessaging.ui.tab.FilterByReadStateTabs
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 import com.emarsys.mobileengage.embeddedmessaging.ui.translation.LocalStringResources
 import kotlinx.coroutines.launch
@@ -119,8 +110,6 @@ private fun MessageList(
     val scope = rememberCoroutineScope()
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val canShowDetailPane = windowSizeClass.isWidthAtLeastBreakpoint(400)
-    val shouldHideFilterRowForDetailedView =
-        viewModel.shouldHideFilterRowForDetailedView.collectAsState()
 
     LaunchedEffect(hasConnection, hasMessages) {
         if (!hasConnection && hasMessages) {
@@ -148,14 +137,6 @@ private fun MessageList(
         }
     }
 
-    LaunchedEffect(
-        navigator.scaffoldValue[ListDetailPaneScaffoldRole.List]
-    ) {
-        if (showFilters) {
-            viewModel.hideFilterRowForDetailedView(navigator.scaffoldValue[ListDetailPaneScaffoldRole.List] == PaneAdaptedValue.Hidden)
-        }
-    }
-
     LaunchedEffect(navigator.scaffoldValue[ListDetailPaneScaffoldRole.Detail]) {
         if (navigator.scaffoldValue[ListDetailPaneScaffoldRole.Detail] == PaneAdaptedValue.Hidden) {
             viewModel.clearMessageSelection()
@@ -171,17 +152,6 @@ private fun MessageList(
     EmbeddedMessagingTheme {
         Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) }) {
             Column {
-                if (showFilters && !(shouldHideFilterRowForDetailedView.value)) {
-                    FilterRow(
-                        selectedCategoryIds = selectedCategoryIds,
-                        filterUnopenedOnly = filterUnOpenedOnly,
-                        onFilterChange = { viewModel.setFilterUnopenedOnly(it) },
-                        onCategorySelectorClicked = { showCategorySelector = true }
-                    )
-
-                    HorizontalDivider(color = MaterialTheme.colorScheme.outline)
-                }
-
                 if (showCategorySelector) {
                     CategoriesDialogView(
                         categories = categories,
@@ -228,7 +198,14 @@ private fun MessageList(
                                 },
                                 snackbarHostState = snackbarHostState,
                                 customMessageItem = customMessageItem,
-                                listPageViewModel = viewModel
+                                listPageViewModel = viewModel,
+                                showFilters = showFilters,
+                                selectedCategoryIds = selectedCategoryIds,
+                                filterUnOpenedOnly = filterUnOpenedOnly,
+                                onFilterChange = {
+                                    viewModel.setFilterUnopenedOnly(it)
+                                },
+                                showCategorySelector = { showCategorySelector = true }
                             )
                         }
                     },
@@ -264,41 +241,6 @@ private fun MessageList(
                     }
                 )
             }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun FilterRow(
-    selectedCategoryIds: Set<Int>,
-    filterUnopenedOnly: Boolean,
-    onFilterChange: (Boolean) -> Unit,
-    onCategorySelectorClicked: () -> Unit
-) {
-    EmbeddedMessagingTheme {
-        Row(
-            modifier = Modifier.padding(DEFAULT_PADDING),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(DEFAULT_PADDING)
-        ) {
-            FilterByReadStateTabs(
-                selectedTabIndex = if (filterUnopenedOnly) 1 else 0,
-                allMessagesText = LocalStringResources.current.allMessagesFilterButtonLabel,
-                unreadMessagesText = LocalStringResources.current.unreadMessagesFilterButtonLabel,
-                onAllMessagesClick = { onFilterChange(false) },
-                onUnreadClick = { onFilterChange(true) },
-                modifier = Modifier.wrapContentWidth()
-            )
-
-            Spacer(modifier = Modifier.weight(0.5f))
-
-            CategorySelectorButton(
-                isCategorySelectionActive = selectedCategoryIds.isNotEmpty(),
-                onClick = {
-                    onCategorySelectorClicked()
-                },
-            )
         }
     }
 }
