@@ -38,5 +38,5 @@ object SdkConstants {
     const val LANGUAGE_STORAGE_KEY = "customerOverwroteLanguageCodeKey"
     const val DEVICE_INFO_UPDATE_REQUIRED_EVENT_NAME = "deviceInfoUpdateRequired"
     const val PAGE_LOCATION_ATTRIBUTE_KEY = "url"
-    const val LEGACY_DB_MIGRATION_DONE_KEY = "legacy_db_migration_done"
+    const val LEGACY_SDK_MIGRATION_DONE_KEY = "legacy_sdk_migration_done"
 }

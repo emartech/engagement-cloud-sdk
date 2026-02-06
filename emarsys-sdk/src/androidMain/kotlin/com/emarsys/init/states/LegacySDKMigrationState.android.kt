@@ -1,8 +1,7 @@
-package com.emarsys.db_migration.states
+package com.emarsys.init.states
 
 import android.database.sqlite.SQLiteOpenHelper
 import com.emarsys.SdkConstants
-import com.emarsys.SdkConstants.CLIENT_ID_STORAGE_KEY
 import com.emarsys.api.push.PushConstants
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.context.RequestContextApi
@@ -12,7 +11,9 @@ import com.emarsys.db_migration.LegacySharedPreferencesWrapper
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlin.use
 
+@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 internal actual class LegacySDKMigrationState(
     private val legacySharedPreferencesWrapper: LegacySharedPreferencesWrapper,
     private val legacyDBOpenHelper: SQLiteOpenHelper,
@@ -27,7 +28,7 @@ internal actual class LegacySDKMigrationState(
 
     actual override suspend fun active(): Result<Unit> {
         return try {
-            if (stringStorage.get(SdkConstants.LEGACY_DB_MIGRATION_DONE_KEY) != null) {
+            if (stringStorage.get(SdkConstants.LEGACY_SDK_MIGRATION_DONE_KEY) != null) {
                 return Result.success(Unit)
             }
 
@@ -47,7 +48,7 @@ internal actual class LegacySDKMigrationState(
                 ).use {
                     if (it.moveToFirst()) {
                         it.getString(0)?.let { legacyClientId ->
-                            stringStorage.put(CLIENT_ID_STORAGE_KEY, legacyClientId)
+                            stringStorage.put(SdkConstants.CLIENT_ID_STORAGE_KEY, legacyClientId)
                             sdkLogger.debug("Migrated legacy client id.")
                         }
                     }
@@ -76,7 +77,7 @@ internal actual class LegacySDKMigrationState(
                 requestContext.deviceEventState = it
             }
 
-            stringStorage.put(SdkConstants.LEGACY_DB_MIGRATION_DONE_KEY, "true")
+            stringStorage.put(SdkConstants.LEGACY_SDK_MIGRATION_DONE_KEY, "true")
             sdkLogger.debug("Migration from legacy SDK completed")
             Result.success(Unit)
         } catch (exception: Exception) {
@@ -99,7 +100,3 @@ internal actual class LegacySDKMigrationState(
 
     }
 }
-
-
-
-

@@ -1,4 +1,4 @@
-package com.emarsys.db_migration.states
+package com.emarsys.init.states
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -7,7 +7,6 @@ import android.security.keystore.KeyProperties
 import android.util.Base64
 import androidx.core.database.sqlite.transaction
 import com.emarsys.SdkConstants
-import com.emarsys.SdkConstants.CLIENT_ID_STORAGE_KEY
 import com.emarsys.api.push.PushConstants
 import com.emarsys.applicationContext
 import com.emarsys.core.log.Logger
@@ -18,7 +17,6 @@ import com.emarsys.core.storage.StringStorage
 import com.emarsys.db_migration.LegacyDBOpenHelper
 import com.emarsys.db_migration.LegacySharedPreferencesWrapper
 import com.emarsys.db_migration.SharedPreferenceCrypto
-import com.emarsys.db_migration.SharedPreferenceCrypto.Companion.KEYSTORE_ALIAS
 import io.mockk.clearAllMocks
 import io.mockk.clearMocks
 import io.mockk.coEvery
@@ -71,7 +69,7 @@ class LegacySDKMigrationStateTest {
             Context.MODE_PRIVATE
         )
         stringStorageSpy = spyk(StringStorage(sharedPreferences))
-        stringStorageSpy.put(SdkConstants.LEGACY_DB_MIGRATION_DONE_KEY, null)
+        stringStorageSpy.put(SdkConstants.LEGACY_SDK_MIGRATION_DONE_KEY, null)
         legacyDBOpenHelper = LegacyDBOpenHelper(applicationContext)
         requestContextSpy = spyk(RequestContext())
         legacySDKMigrationState = LegacySDKMigrationState(
@@ -86,7 +84,7 @@ class LegacySDKMigrationStateTest {
             sdkLogger = mockSdkLogger
         )
 
-        stringStorageSpy.put(SdkConstants.LEGACY_DB_MIGRATION_DONE_KEY, null)
+        stringStorageSpy.put(SdkConstants.LEGACY_SDK_MIGRATION_DONE_KEY, null)
         legacySharedPreferences.edit().clear().apply()
         stringStorageSpy.put("mobile_engage_contact_token", null)
         stringStorageSpy.put("mobile_engage_refresh_token", null)
@@ -130,13 +128,13 @@ class LegacySDKMigrationStateTest {
         legacySDKMigrationState.active()
 
         coVerify {
-            stringStorageSpy.put(CLIENT_ID_STORAGE_KEY, TEST_CLIENT_ID)
+            stringStorageSpy.put(SdkConstants.CLIENT_ID_STORAGE_KEY, TEST_CLIENT_ID)
             requestContextSpy.contactToken = TEST_CONTACT_TOKEN
             requestContextSpy.refreshToken = TEST_REFRESH_TOKEN
             requestContextSpy.clientState = TEST_CLIENT_STATE
             stringStorageSpy.put(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY, TEST_PUSH_TOKEN)
             requestContextSpy.deviceEventState = TEST_DEVICE_EVENT_STATE
-            stringStorageSpy.put(SdkConstants.LEGACY_DB_MIGRATION_DONE_KEY, "true")
+            stringStorageSpy.put(SdkConstants.LEGACY_SDK_MIGRATION_DONE_KEY, "true")
         }
     }
 
@@ -166,10 +164,10 @@ class LegacySDKMigrationStateTest {
             legacySDKMigrationState.active()
 
             coVerify {
-                stringStorageSpy.get(SdkConstants.LEGACY_DB_MIGRATION_DONE_KEY)
-                stringStorageSpy.put(CLIENT_ID_STORAGE_KEY, TEST_CLIENT_ID)
+                stringStorageSpy.get(SdkConstants.LEGACY_SDK_MIGRATION_DONE_KEY)
+                stringStorageSpy.put(SdkConstants.CLIENT_ID_STORAGE_KEY, TEST_CLIENT_ID)
                 requestContextSpy.contactToken = TEST_CONTACT_TOKEN
-                stringStorageSpy.put(SdkConstants.LEGACY_DB_MIGRATION_DONE_KEY, "true")
+                stringStorageSpy.put(SdkConstants.LEGACY_SDK_MIGRATION_DONE_KEY, "true")
             }
             confirmVerified(requestContextSpy)
             confirmVerified(stringStorageSpy)
@@ -177,12 +175,12 @@ class LegacySDKMigrationStateTest {
 
     @Test
     fun active_shouldReturn_whenDataHasAlreadyBeenMigrated() = runTest {
-        stringStorageSpy.put(SdkConstants.LEGACY_DB_MIGRATION_DONE_KEY, "true")
+        stringStorageSpy.put(SdkConstants.LEGACY_SDK_MIGRATION_DONE_KEY, "true")
         clearMocks(stringStorageSpy)
 
         legacySDKMigrationState.active()
 
-        coVerify { stringStorageSpy.get(SdkConstants.LEGACY_DB_MIGRATION_DONE_KEY) }
+        coVerify { stringStorageSpy.get(SdkConstants.LEGACY_SDK_MIGRATION_DONE_KEY) }
         confirmVerified(stringStorageSpy)
     }
 
@@ -194,7 +192,7 @@ class LegacySDKMigrationStateTest {
 
         legacySDKMigrationState.active()
 
-        coVerify { mockSdkLogger.debug("Starting migration from legacy Android SDK")  }
+        coVerify { mockSdkLogger.debug("Starting migration from legacy Android SDK") }
     }
 
 
@@ -202,11 +200,11 @@ class LegacySDKMigrationStateTest {
         val keyStore = KeyStore.getInstance("AndroidKeyStore")
         keyStore.load(null)
 
-        if (!keyStore.containsAlias(KEYSTORE_ALIAS)) {
+        if (!keyStore.containsAlias(SharedPreferenceCrypto.Companion.KEYSTORE_ALIAS)) {
             return createSecretKey()
         }
 
-        return keyStore.getKey(KEYSTORE_ALIAS, null) as SecretKey
+        return keyStore.getKey(SharedPreferenceCrypto.Companion.KEYSTORE_ALIAS, null) as SecretKey
     }
 
     private fun tryEncrypt(value: String): String {
@@ -223,7 +221,7 @@ class LegacySDKMigrationStateTest {
         val keyGenerator =
             KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES)
         val keyGenParameterSpec = KeyGenParameterSpec.Builder(
-            KEYSTORE_ALIAS,
+            SharedPreferenceCrypto.Companion.KEYSTORE_ALIAS,
             KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
         )
             .setBlockModes(KeyProperties.BLOCK_MODE_GCM)

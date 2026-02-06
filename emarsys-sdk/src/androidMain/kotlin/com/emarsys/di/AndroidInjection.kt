@@ -60,12 +60,12 @@ import com.emarsys.db_migration.LegacyDBOpenHelper
 import com.emarsys.db_migration.LegacySharedPreferencesWrapper
 import com.emarsys.db_migration.LegacySharedPreferencesWrapper.Companion.EMARSYS_SECURE_SHARED_PREFERENCES_V3_NAME
 import com.emarsys.db_migration.SharedPreferenceCrypto
-import com.emarsys.db_migration.states.LegacySDKMigrationState
 import com.emarsys.enable.PlatformInitState
 import com.emarsys.enable.PlatformInitializer
 import com.emarsys.enable.PlatformInitializerApi
 import com.emarsys.enable.config.AndroidSdkConfigStore
 import com.emarsys.enable.config.SdkConfigStoreApi
+import com.emarsys.init.states.LegacySDKMigrationState
 import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.clipboard.AndroidClipboardHandler
 import com.emarsys.mobileengage.inapp.AndroidInlineInAppViewRenderer

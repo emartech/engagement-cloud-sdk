@@ -49,6 +49,7 @@ import com.emarsys.core.providers.platform.PlatformCategoryProvider
 import com.emarsys.core.providers.platform.PlatformCategoryProviderApi
 import com.emarsys.core.setup.PlatformInitState
 import com.emarsys.core.state.State
+import com.emarsys.core.storage.KeychainStorage
 import com.emarsys.core.storage.StorageConstants
 import com.emarsys.core.storage.StorageConstants.DB_NAME
 import com.emarsys.core.storage.StringStorage
@@ -62,6 +63,7 @@ import com.emarsys.enable.PlatformInitializer
 import com.emarsys.enable.PlatformInitializerApi
 import com.emarsys.enable.config.IosSdkConfigStore
 import com.emarsys.enable.config.SdkConfigStoreApi
+import com.emarsys.init.states.LegacySDKMigrationState
 import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
 import com.emarsys.mobileengage.inapp.InAppViewProvider
@@ -135,6 +137,15 @@ object IosInjection {
                 stringStorage = get(),
                 sdkContext = get(),
                 platformCategoryProvider = get()
+            )
+        }
+        single<State>(named(InitStateTypes.LegacySDKMigration)) {
+            LegacySDKMigrationState(
+                requestContext = get(),
+                sdkContext = get(),
+                stringStorage = get(),
+                keychainStorage = KeychainStorage(),
+                sdkLogger = get { parametersOf(LegacySDKMigrationState::class.simpleName) }
             )
         }
         single<State>(named(StateTypes.PlatformInit)) { PlatformInitState() }

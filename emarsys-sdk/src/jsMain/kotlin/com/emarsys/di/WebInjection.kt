@@ -68,9 +68,9 @@ import com.emarsys.enable.PlatformInitializer
 import com.emarsys.enable.PlatformInitializerApi
 import com.emarsys.enable.config.JsEmarsysConfigStore
 import com.emarsys.enable.config.SdkConfigStoreApi
+import com.emarsys.init.states.LegacySDKMigrationState
 import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
-import com.emarsys.mobileengage.inapp.InAppScriptExtractor
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.mobileengage.inapp.InlineInAppViewRendererApi
 import com.emarsys.mobileengage.inapp.WebInAppJsBridgeFactory
@@ -143,6 +143,14 @@ object WebInjection {
                 platformCategoryProvider = get()
             )
         }
+        single<State>(named(InitStateTypes.LegacySDKMigration)) {
+            LegacySDKMigrationState(
+                requestContext = get(),
+                sdkContext = get(),
+                stringStorage = get(),
+                sdkLogger = get { parametersOf(LegacySDKMigrationState::class.simpleName) }
+            )
+        }
         single<PushServiceContextApi> { PushServiceContext() }
         single<State>(named(StateTypes.PlatformInit)) {
             val pushService = PushService(get(), storage = get<StringStorageApi>())
@@ -205,7 +213,6 @@ object WebInjection {
         single<FileCacheApi> { WebFileCache() }
         single<InAppViewProviderApi> {
             WebInAppViewProvider(
-                InAppScriptExtractor(),
                 WebInAppJsBridgeFactory(
                     actionFactory = get<EventActionFactoryApi>(),
                     json = get(),
