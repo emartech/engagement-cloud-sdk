@@ -80,6 +80,8 @@ import com.emarsys.mobileengage.inapp.WebInAppViewProvider
 import com.emarsys.mobileengage.inapp.WebInlineInAppViewRenderer
 import com.emarsys.mobileengage.inapp.iframe.ContentReplacer
 import com.emarsys.mobileengage.inapp.iframe.ContentReplacerApi
+import com.emarsys.mobileengage.inapp.iframe.IframeFactory
+import com.emarsys.mobileengage.inapp.iframe.IframeFactoryApi
 import com.emarsys.mobileengage.push.PushNotificationClickHandler
 import com.emarsys.mobileengage.push.PushNotificationClickHandlerApi
 import com.emarsys.mobileengage.push.PushService
@@ -232,6 +234,7 @@ object WebInjection {
                 logger = get { parametersOf(WebInAppPresenter::class.simpleName) }
             )
         }
+        single<IframeFactoryApi> { IframeFactory() }
         single<ContentReplacerApi> {
             ContentReplacer(
                 sdkContext = get(),
