@@ -68,6 +68,7 @@ import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.right
 import org.jetbrains.compose.web.css.s
 import org.jetbrains.compose.web.css.textAlign
+import org.jetbrains.compose.web.css.times
 import org.jetbrains.compose.web.css.timingFunction
 import org.jetbrains.compose.web.css.top
 import org.jetbrains.compose.web.css.transitions
@@ -260,6 +261,7 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
     val dialogHeaderRow by style {
         display(DisplayStyle.Flex)
         alignItems(AlignItems.Center)
+        marginBottom(DEFAULT_MARGIN * 3)
     }
 
     val dialogTitle by style {
@@ -317,6 +319,7 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         backgroundColor(CssColorVars.colorSecondaryContainer.value())
         color(CssColorVars.colorOnSecondaryContainer.value())
         border(ZERO_BORDER_WIDTH)
+        fontWeight("bold")
     }
 
     val categoryChipUnselected by style {

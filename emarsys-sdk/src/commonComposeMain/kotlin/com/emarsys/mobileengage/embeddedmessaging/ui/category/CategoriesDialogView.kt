@@ -188,7 +188,7 @@ private fun DialogActionButtons(
             modifier = Modifier.padding(DEFAULT_PADDING)
         ) {
             Button(
-                elevation = ButtonDefaults.buttonElevation(ZERO_ELEVATION),
+                elevation = ButtonDefaults.buttonElevation(ZERO_ELEVATION, hoveredElevation = 0.dp),
                 shape = MaterialTheme.shapes.small,
                 colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.primary),
                 onClick = {
