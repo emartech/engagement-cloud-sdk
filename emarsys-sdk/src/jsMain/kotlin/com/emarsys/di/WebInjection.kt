@@ -78,6 +78,8 @@ import com.emarsys.mobileengage.inapp.WebInAppJsBridgeFactory
 import com.emarsys.mobileengage.inapp.WebInAppPresenter
 import com.emarsys.mobileengage.inapp.WebInAppViewProvider
 import com.emarsys.mobileengage.inapp.WebInlineInAppViewRenderer
+import com.emarsys.mobileengage.inapp.iframe.ContentReplacer
+import com.emarsys.mobileengage.inapp.iframe.ContentReplacerApi
 import com.emarsys.mobileengage.push.PushNotificationClickHandler
 import com.emarsys.mobileengage.push.PushNotificationClickHandlerApi
 import com.emarsys.mobileengage.push.PushService
@@ -228,6 +230,12 @@ object WebInjection {
                 sdkEventDistributor = get(),
                 sdkDispatcher = get(named(DispatcherTypes.Sdk)),
                 logger = get { parametersOf(WebInAppPresenter::class.simpleName) }
+            )
+        }
+        single<ContentReplacerApi> {
+            ContentReplacer(
+                sdkContext = get(),
+                sdkVersionProvider = get()
             )
         }
         single<ClipboardHandlerApi> { WebClipboardHandler(window.navigator.clipboard) }
