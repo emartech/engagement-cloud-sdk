@@ -222,6 +222,7 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
 
     val emptyStateTitle by style {
         marginBottom(DEFAULT_MARGIN)
+        fontWeight("bold")
     }
 
     val dialogOverlay by style {
