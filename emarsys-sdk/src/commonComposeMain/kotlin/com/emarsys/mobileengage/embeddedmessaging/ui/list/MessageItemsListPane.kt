@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -75,8 +76,12 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.theme.LocalDesignValues
 import com.emarsys.mobileengage.embeddedmessaging.ui.translation.LocalStringResources
 import kotlinx.coroutines.launch
 
-internal fun LazyPagingItems<MessageItemViewModelApi>.isIdleButEmpty(): Boolean =
-    this.itemCount == 0 && this.loadState.isIdle && !this.loadState.hasError
+internal fun LazyPagingItems<MessageItemViewModelApi>.isIdleButEmpty(): Boolean {
+    val itemCountWithoutLocallyExcluded =
+        this.itemSnapshotList.count { it?.isExcludedLocally == false }
+    return itemCountWithoutLocallyExcluded == 0 && this.loadState.isIdle && !this.loadState.hasError
+}
+
 
 internal fun LazyPagingItems<MessageItemViewModelApi>.isInitiallyLoading(): Boolean =
     this.loadState.source.refresh is LoadState.Loading
@@ -181,17 +186,17 @@ fun MessageItemsListPane(
                             } else if (lazyPagingMessageItems.isIdleButEmpty()) {
                                 item {
                                     if (hasFiltersApplied) {
-                                        FilteredEmptyState(onClearFilters = onClearFilters)
+                                        FilteredMessageItemsListEmptyState(onClearFilters = onClearFilters)
                                     } else {
-                                        EmptyState()
+                                        MessageItemsListEmptyState()
                                     }
                                 }
                             } else if (lazyPagingMessageItems.hasRefreshError() && lazyPagingMessageItems.itemCount == 0) {
                                 item {
                                     if (hasFiltersApplied) {
-                                        FilteredEmptyState(onClearFilters = onClearFilters)
+                                        FilteredMessageItemsListEmptyState(onClearFilters = onClearFilters)
                                     } else {
-                                        EmptyState()
+                                        MessageItemsListEmptyState()
                                     }
                                 }
                             } else {
@@ -274,38 +279,41 @@ fun MessageItemsListPane(
                 }
             }
         }
+    }
 
-        messageIdToDelete?.let {
-            DeleteMessageItemConfirmationDialog(
-                onDismiss = {
-                    messageIdToDelete = null
-                    scope.launch {
-                        dismissStateToReset?.snapTo(SwipeToDismissBoxValue.Settled)
-                        dismissStateToReset = null
-                    }
-                },
-                onConfirm = {
-                    scope.launch {
-                        messageIdToDelete?.let {
-                            onMessageDelete(it)
-                                .onFailure {
-                                    scope.launch {
-                                        snackbarHostState.showSnackbar(
-                                            message = failedToDeleteMessageErrorMessage,
-                                            duration = SnackbarDuration.Short
-                                        )
-                                    }
-                                }
-                        }
-                        dismissStateToReset?.snapTo(SwipeToDismissBoxValue.Settled)
-                        dismissStateToReset = null
-                        messageIdToDelete = null
-                    }
+
+
+    messageIdToDelete?.let {
+        DeleteMessageItemConfirmationDialog(
+            onDismiss = {
+                messageIdToDelete = null
+                scope.launch {
+                    dismissStateToReset?.snapTo(SwipeToDismissBoxValue.Settled)
+                    dismissStateToReset = null
                 }
-            )
-        }
+            },
+            onConfirm = {
+                scope.launch {
+                    messageIdToDelete?.let {
+                        onMessageDelete(it)
+                            .onFailure {
+                                scope.launch {
+                                    snackbarHostState.showSnackbar(
+                                        message = failedToDeleteMessageErrorMessage,
+                                        duration = SnackbarDuration.Short
+                                    )
+                                }
+                            }
+                    }
+                    dismissStateToReset?.snapTo(SwipeToDismissBoxValue.Settled)
+                    dismissStateToReset = null
+                    messageIdToDelete = null
+                }
+            }
+        )
     }
 }
+
 
 @Composable
 private fun RefreshableMessageItemsList(
@@ -457,6 +465,15 @@ internal fun MessagesLoadingSpinner() {
 }
 
 @Composable
+internal fun LazyItemScope.MessageItemsListEmptyState() {
+    Box(
+        modifier = Modifier.fillParentMaxSize()
+    ) {
+        EmptyState()
+    }
+}
+
+@Composable
 internal fun EmptyState() {
     EmbeddedMessagingTheme {
         Box(
@@ -468,7 +485,7 @@ internal fun EmptyState() {
             ) {
                 Text(
                     text = LocalStringResources.current.emptyStateTitle,
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.titleLarge
                 )
                 Text(
                     text = LocalStringResources.current.emptyStateDescription,
@@ -480,10 +497,10 @@ internal fun EmptyState() {
 }
 
 @Composable
-private fun FilteredEmptyState(onClearFilters: () -> Unit) {
+private fun LazyItemScope.FilteredMessageItemsListEmptyState(onClearFilters: () -> Unit) {
     EmbeddedMessagingTheme {
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillParentMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             Column(

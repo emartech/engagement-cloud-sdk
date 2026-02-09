@@ -51,7 +51,7 @@ fun CompactListView(
                         }
                     } else if (lazyPagingMessageItems.shouldShowEmptyState()) {
                         item {
-                            EmptyState()
+                            MessageItemsListEmptyState()
                         }
                     } else {
                         items(
