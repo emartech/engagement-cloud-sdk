@@ -35,6 +35,8 @@ import com.emarsys.core.providers.TimezoneProvider
 import com.emarsys.core.providers.TimezoneProviderApi
 import com.emarsys.core.providers.UUIDProvider
 import com.emarsys.core.providers.UuidProviderApi
+import com.emarsys.core.providers.sdkversion.SdkVersionProvider
+import com.emarsys.core.providers.sdkversion.SdkVersionProviderApi
 import com.emarsys.core.session.SessionContext
 import com.emarsys.core.storage.Storage
 import com.emarsys.core.storage.StorageApi
@@ -97,6 +99,7 @@ object CoreInjection {
         singleOf(::UUIDProvider) { bind<UuidProviderApi>() }
         singleOf(::TimezoneProvider) { bind<TimezoneProviderApi>() }
         singleOf(::RandomProvider) { bind<DoubleProvider>() }
+        single<SdkVersionProviderApi> { SdkVersionProvider() }
         single<TypedStorageApi> {
             TypedStorage(
                 stringStorage = get(),
