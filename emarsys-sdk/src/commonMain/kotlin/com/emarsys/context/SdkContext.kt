@@ -8,7 +8,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.serialization.builtins.serializer
 
-class SdkContext(
+internal class SdkContext(
     override val sdkDispatcher: CoroutineDispatcher,
     override val mainDispatcher: CoroutineDispatcher,
     override var defaultUrls: DefaultUrlsApi,

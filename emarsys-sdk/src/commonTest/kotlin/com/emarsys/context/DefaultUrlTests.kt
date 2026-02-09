@@ -12,7 +12,8 @@ class DefaultUrlTests {
         "deepLinkBaseUrl - origin",
         "remoteConfigBaseUrl - origin",
         "loggingUrl - origin",
-        "embeddedMessagingBaseUrl - origin"
+        "embeddedMessagingBaseUrl - origin",
+        "ecJsBridgeUrl - origin"
     )
 
     @Test
@@ -23,7 +24,8 @@ class DefaultUrlTests {
             "deepLinkBaseUrl - origin",
             "remoteConfigBaseUrl - origin",
             "loggingUrl - new",
-            "embeddedMessagingBaseUrl - origin"
+            "embeddedMessagingBaseUrl - origin",
+            "ecJsBridgeUrl - origin"
         )
         val result = defaultUrls.copyWith(
             clientServiceBaseUrl = "clientServiceBaseUrl - new",

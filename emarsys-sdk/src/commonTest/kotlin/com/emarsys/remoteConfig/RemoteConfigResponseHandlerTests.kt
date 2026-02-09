@@ -34,7 +34,7 @@ class RemoteConfigResponseHandlerTests {
     @BeforeTest
     fun setUp() {
         mockSdkContext = mock(MockMode.autofill)
-        defaultUrls = DefaultUrls("", "", "", "", "", "")
+        defaultUrls = DefaultUrls("", "", "", "", "", "", "")
         every { mockSdkContext.defaultUrls } returns defaultUrls
 
         everySuspend { mockSdkContext.sdkDispatcher } returns StandardTestDispatcher()
