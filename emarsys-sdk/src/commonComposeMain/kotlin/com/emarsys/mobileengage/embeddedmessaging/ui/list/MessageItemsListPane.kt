@@ -372,7 +372,7 @@ fun BoxWithDeleteIcon(
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
                     .clip(CircleShape)
-                    .padding(ZERO_PADDING)
+                    .padding(DEFAULT_PADDING)
                     .background(
                         shape = CircleShape,
                         brush = Brush.radialGradient(
