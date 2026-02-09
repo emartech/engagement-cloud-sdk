@@ -146,6 +146,9 @@ private fun CategoryFilterChipsList(
                 FilterChip(
                     border = filterChipBorderSettings(selectedCategories, id),
                     colors = filterChipColors(),
+                    elevation = FilterChipDefaults.filterChipElevation(
+                        hoveredElevation = 0.dp,
+                    ),
                     selected = selectedCategories.value.contains(id),
                     onClick = {
                         selectedCategories.value =
