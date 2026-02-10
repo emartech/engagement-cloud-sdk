@@ -1,17 +1,30 @@
 package com.emarsys.mobileengage.inapp
 
-import com.emarsys.core.factory.Factory
 import com.emarsys.core.providers.InstantProvider
-import web.dom.document
+import com.emarsys.mobileengage.inapp.iframe.ContentReplacerApi
+import com.emarsys.mobileengage.inapp.iframe.IframeFactoryApi
+import com.emarsys.mobileengage.inapp.iframe.MessageChannelProviderApi
+import web.blob.Blob
+import web.blob.BlobPropertyBag
+import web.events.EventType
+import web.events.addEventListener
 import web.html.HTMLElement
+import web.html.HTMLIFrameElement
+import web.messaging.MessageChannel
+import web.url.URL
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 internal class WebInAppView(
-    private val inappScriptExtractor: InAppScriptExtractorApi,
-    private val webInAppJsBridgeFactory: Factory<InAppJsBridgeData, WebInAppJsBridge>,
     private val timestampProvider: InstantProvider,
+    private val contentReplacer: ContentReplacerApi,
+    private val iframeFactory: IframeFactoryApi,
+    private val messageChannelProvider: MessageChannelProviderApi
 ) : InAppViewApi {
+    private companion object {
+        const val TARGET_ORIGIN = "*"
+        const val INIT_MESSAGE_CHANNEL = "INIT_MESSAGE_CHANNEL"
+    }
 
     private lateinit var mInAppMessage: InAppMessage
     private var loadingStarted: Long? = null
@@ -30,31 +43,42 @@ internal class WebInAppView(
         loadingStarted = timestampProvider.provide().toEpochMilliseconds()
 
         mInAppMessage = message
-        val jsBridge = webInAppJsBridgeFactory.create(
-            InAppJsBridgeData(
-                dismissId = message.dismissId,
-                trackingInfo = message.trackingInfo
-            )
-        )
-        jsBridge.register()
-        val view = document.createElement("div")
-        val shadowRoot = view.asDynamic().attachShadow(js("({mode: 'open'})"))
-        shadowRoot.innerHTML = message.content
 
-        val scriptContents = inappScriptExtractor.extract(shadowRoot)
-        createScriptElements(scriptContents).forEach { scriptElement ->
-            shadowRoot.appendChild(scriptElement)
-        }
+        val replacedContent = contentReplacer.replace(message.content)
+        val iframeContainer = iframeFactory.create()
+        val blobUrl = createBlobUrl(replacedContent)
+        val messageChannel = messageChannelProvider.provide(message)
 
-        return WebWebViewHolder(view, inAppLoadingMetric())
+        iframeContainer.src = blobUrl
+        registerOnLoadListener(iframeContainer, messageChannel, blobUrl)
+
+        return WebWebViewHolder(iframeContainer as HTMLElement, inAppLoadingMetric())
     }
 
-    private fun createScriptElements(scriptTexts: List<String>): List<HTMLElement> {
-        return scriptTexts.map { scriptContent ->
-            val element = document.createElement("script")
-            element.setAttribute("type", "text/javascript")
-            element.textContent = scriptContent
-            element
-        }
+    private fun registerOnLoadListener(
+        iframeContainer: HTMLIFrameElement,
+        messageChannel: MessageChannel,
+        blobUrl: String
+    ) {
+        iframeContainer.addEventListener(EventType("load"), {
+            iframeContainer.contentWindow?.postMessage(
+                INIT_MESSAGE_CHANNEL,
+                TARGET_ORIGIN,
+                arrayOf(messageChannel.port2)
+            )
+
+            URL.revokeObjectURL(blobUrl)
+        })
+    }
+
+    private fun createBlobUrl(content: String): String {
+        val contentBlob =
+            Blob(
+                arrayOf(content),
+                js("{}").unsafeCast<BlobPropertyBag>().apply {
+                    type = "text/html"
+                })
+
+        return URL.createObjectURL(contentBlob)
     }
 }

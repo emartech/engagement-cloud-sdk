@@ -1,8 +1,10 @@
 package com.emarsys.mobileengage.inapp
 
-import com.emarsys.core.factory.Factory
 import com.emarsys.core.providers.TimestampProvider
-import com.emarsys.core.providers.UuidProviderApi
+import com.emarsys.mobileengage.action.EventActionFactoryApi
+import com.emarsys.mobileengage.inapp.iframe.ContentReplacerApi
+import com.emarsys.mobileengage.inapp.iframe.IframeFactoryApi
+import com.emarsys.mobileengage.inapp.iframe.MessageChannelProviderApi
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
@@ -10,18 +12,23 @@ import kotlin.test.Test
 
 class WebInAppViewProviderTests {
     private lateinit var webInappViewProvider: WebInAppViewProvider
-    private lateinit var inappScriptExtractor: InAppScriptExtractor
-    private lateinit var mockWebInAppJsBridgeFactory: Factory<InAppJsBridgeData, WebInAppJsBridge>
+    private lateinit var mockContentReplacer: ContentReplacerApi
+    private lateinit var mockIframeFactory: IframeFactoryApi
+    private lateinit var mockEventActionFactory: EventActionFactoryApi
+    private lateinit var mockMessageChannelProvider: MessageChannelProviderApi
 
     @Test
     fun provide_shouldReturn_webInappViewInstance() = runTest {
-        inappScriptExtractor = InAppScriptExtractor()
-        mockWebInAppJsBridgeFactory = mock()
+        mockContentReplacer = mock()
+        mockIframeFactory = mock()
+        mockMessageChannelProvider = mock()
+        mockEventActionFactory = mock()
         webInappViewProvider =
             WebInAppViewProvider(
-                inappScriptExtractor,
-                mockWebInAppJsBridgeFactory,
-                TimestampProvider()
+                TimestampProvider(),
+                mockContentReplacer,
+                mockIframeFactory,
+                mockMessageChannelProvider
             )
 
         val view = webInappViewProvider.provide()

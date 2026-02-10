@@ -1,18 +1,22 @@
 package com.emarsys.mobileengage.inapp
 
-import com.emarsys.core.factory.Factory
 import com.emarsys.core.providers.InstantProvider
+import com.emarsys.mobileengage.inapp.iframe.ContentReplacerApi
+import com.emarsys.mobileengage.inapp.iframe.IframeFactoryApi
+import com.emarsys.mobileengage.inapp.iframe.MessageChannelProviderApi
 
 internal class WebInAppViewProvider(
-    private val inappScriptExtractor: InAppScriptExtractorApi,
-    private val webInAppJsBridgeFactory: Factory<InAppJsBridgeData, WebInAppJsBridge>,
     private val timestampProvider: InstantProvider,
+    private val contentReplacer: ContentReplacerApi,
+    private val iframeFactory: IframeFactoryApi,
+    private val messageChannelProvider: MessageChannelProviderApi,
 ) : InAppViewProviderApi {
     override suspend fun provide(): InAppViewApi {
         return WebInAppView(
-            inappScriptExtractor,
-            webInAppJsBridgeFactory,
-            timestampProvider
+            timestampProvider,
+            contentReplacer,
+            iframeFactory,
+            messageChannelProvider
         )
     }
 }

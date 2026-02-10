@@ -10,7 +10,7 @@ interface PushButtonClickedActionModel : ReportingActionModel {
 }
 
 interface InAppButtonClickedActionModel : ReportingActionModel {
-    val trackingInfo: String
+    var trackingInfo: String
 }
 
 @Serializable
@@ -24,7 +24,7 @@ data class BasicPushButtonClickedActionModel(
 @SerialName("inAppButtonClicked")
 data class BasicInAppButtonClickedActionModel(
     override val reporting: String,
-    override val trackingInfo: String,
+    override var trackingInfo: String = "",
 ) : BasicActionModel(), InAppButtonClickedActionModel
 
 @Serializable

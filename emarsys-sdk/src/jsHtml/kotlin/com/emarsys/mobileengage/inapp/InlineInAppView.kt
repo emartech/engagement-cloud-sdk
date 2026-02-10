@@ -25,7 +25,7 @@ import web.html.HTMLElement
 @Composable
 actual fun InlineInAppView(message: InAppMessage) {
     val webViewElement = remember { mutableStateOf<HTMLElement?>(null) }
-    
+
     LaunchedEffect(message) {
         val inAppViewProvider: InAppViewProviderApi = koin.get()
         val sdkEventDistributor: SdkEventDistributorApi = koin.get()
@@ -35,7 +35,7 @@ actual fun InlineInAppView(message: InAppMessage) {
 
         val webElement = holder.asDynamic().webView as? HTMLElement
         webViewElement.value = webElement
-        
+
         launch {
             sdkEventDistributor.sdkEventFlow.first { sdkEvent ->
                 sdkEvent is SdkEvent.Internal.Sdk.Dismiss && sdkEvent.id == message.dismissId
@@ -43,9 +43,10 @@ actual fun InlineInAppView(message: InAppMessage) {
             webViewElement.value = null
         }
     }
-    
+
     webViewElement.value?.let { webView ->
         Div(attrs = {
+            id(message.dismissId)
             style {
                 width(100.percent)
                 height(100.percent)

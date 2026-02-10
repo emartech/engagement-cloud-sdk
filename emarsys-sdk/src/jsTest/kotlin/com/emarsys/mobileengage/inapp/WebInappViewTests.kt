@@ -1,123 +1,102 @@
 package com.emarsys.mobileengage.inapp
 
-import com.emarsys.core.factory.Factory
-import com.emarsys.core.providers.TimestampProvider
-import com.emarsys.util.JsonUtil
+import com.emarsys.core.providers.InstantProvider
+import com.emarsys.mobileengage.inapp.iframe.ContentReplacerApi
+import com.emarsys.mobileengage.inapp.iframe.IframeFactory
+import com.emarsys.mobileengage.inapp.iframe.IframeFactoryApi
+import com.emarsys.mobileengage.inapp.iframe.MessageChannelProviderApi
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
+import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
+import web.dom.ElementId
+import web.dom.document
+import web.html.HTMLIFrameElement
+import web.http.fetch
+import web.http.text
+import web.messaging.MessageChannel
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.time.Clock
 
 class WebInappViewTests {
     private companion object {
         const val UUID = "testUUID"
         const val TRACKING_INFO = """{"trackingInfo": "testTrackingInfo"}"""
-        val INAPP_JS_BRIDGE_DATA = InAppJsBridgeData(
-            dismissId = UUID,
-            trackingInfo = TRACKING_INFO
-        )
     }
 
     private lateinit var webInappView: WebInAppView
-    private lateinit var inappScriptExtractor: InAppScriptExtractorApi
-    private lateinit var mockWebInAppJsBridgeFactory: Factory<InAppJsBridgeData, WebInAppJsBridge>
     private lateinit var sdkDispatcher: CoroutineDispatcher
+    private lateinit var mockTimestampProvider: InstantProvider
+    private lateinit var mockContentReplacer: ContentReplacerApi
+    private lateinit var iframeFactory: IframeFactoryApi
+    private lateinit var mockMessageChannelProvider: MessageChannelProviderApi
 
     @BeforeTest
     fun setup() {
+        mockTimestampProvider = mock(MockMode.autofill)
+        every { mockTimestampProvider.provide() } returns Clock.System.now()
+        mockContentReplacer = mock(MockMode.autofill)
+        iframeFactory = IframeFactory()
+        mockMessageChannelProvider = mock(MockMode.autofill)
+        every { mockMessageChannelProvider.provide(any()) } returns MessageChannel()
         sdkDispatcher = StandardTestDispatcher()
-        inappScriptExtractor = InAppScriptExtractor()
-        mockWebInAppJsBridgeFactory = mock(MockMode.autofill)
-        every { mockWebInAppJsBridgeFactory.create(INAPP_JS_BRIDGE_DATA) } returns WebInAppJsBridge(
-            mock(MockMode.autofill),
-            INAPP_JS_BRIDGE_DATA,
-            sdkDispatcher,
-            JsonUtil.json
-        )
         webInappView = WebInAppView(
-            inappScriptExtractor,
-            mockWebInAppJsBridgeFactory,
-            TimestampProvider()
+            mockTimestampProvider,
+            mockContentReplacer,
+            iframeFactory,
+            mockMessageChannelProvider
         )
     }
 
     @Test
-    fun load_shouldSetTheHtmlContent_andAddScriptsToShadowRoot() = runTest {
-        val testScriptContent1 = "script1"
-        val testScriptContent2 = "script2"
-        val testHtml = """<html><head>
-                <script>$testScriptContent1</script>
-                <script>$testScriptContent2</script>
-            </head>
+    fun load_shouldReturnAnIframeElement_withABlobUrl_asSource() = runTest {
+        val testButtonId = "button2"
+        val testHtml = """<!doctype html><html><head><title>Test</title></head>
             <body class="en">
             <div style="width: 100%">
                     <h3>Inapp JS Bridge tests</h3>
-                    <button type="button" id="button2" me-button-clicked="buttonId">Button clicked!</button>
+                    <button type="button" id="$testButtonId" me-button-clicked="buttonId">Button clicked!</button>
                 </div>
             </body>
             </html>"""
 
-        val testMessage =
-            InAppMessage(
-                dismissId = UUID,
-                type = InAppType.OVERLAY,
-                trackingInfo = TRACKING_INFO,
-                content = testHtml
-            )
+        every { mockContentReplacer.replace(testHtml) } returns testHtml
+
+        val testMessage = InAppMessage(
+            dismissId = UUID,
+            type = InAppType.OVERLAY,
+            trackingInfo = TRACKING_INFO,
+            content = testHtml
+        )
 
         val webViewHolder: WebWebViewHolder = webInappView.load(testMessage) as WebWebViewHolder
 
-        webInappView.inAppMessage shouldBe testMessage
-        val shadowRoot = webViewHolder.webView.shadowRoot
-        shadowRoot shouldNotBe null
-        shadowRoot?.querySelectorAll("script")?.length shouldBe 4
-        val innerHtmlString = shadowRoot?.innerHTML.toString()
-        innerHtmlString.contains("<script>$testScriptContent1</script>") shouldBe true
-        innerHtmlString.contains("<script>$testScriptContent2</script>") shouldBe true
-        shadowRoot?.querySelector("div") shouldNotBe null
-        shadowRoot?.querySelector("button") shouldNotBe null
-        shadowRoot?.querySelector("h3") shouldNotBe null
-    }
-
-    @Test
-    fun load_shouldSetTheHtmlContent_withOutScripts() = runTest {
-        val testHtml = """<html><head>
-                <title>Test title</title>
-            </head>
-            <body class="en">
-            <div style="width: 100%">
-                    <h3>Inapp JS Bridge tests</h3>
-                    <button type="button" id="button2" me-button-clicked="buttonId">Button clicked!</button>
-                </div>
-            </body>
-            </html>"""
-
-        val testMessage =
-            InAppMessage(
-                dismissId = UUID,
-                type = InAppType.OVERLAY,
-                trackingInfo = TRACKING_INFO,
-                content = testHtml
-            )
-
-        val webViewHolder: WebWebViewHolder = webInappView.load(testMessage) as WebWebViewHolder
+        val container = document.createElement("div").apply {
+            this.id = ElementId("testId")
+        }
+        container.appendChild(webViewHolder.webView)
+        document.body.appendChild(container)
 
         webInappView.inAppMessage shouldBe testMessage
-        webViewHolder.webView shouldNotBe null
+        verifySuspend {
+            mockTimestampProvider.provide()
+            mockContentReplacer.replace(testHtml)
+            mockMessageChannelProvider.provide(testMessage)
+        }
 
-        webViewHolder.webView.shadowRoot?.let {
-            it.querySelectorAll("script").length shouldBe 0
-            it.querySelector("div") shouldNotBe null
-            it.querySelector("button") shouldNotBe null
-            it.querySelector("h3") shouldNotBe null
-        } ?: throw AssertionError("Shadow root is null")
+        document.body.contains(webViewHolder.webView) shouldBe true
+        val iframe = document.querySelector("iframe[sandbox='allow-scripts']") as HTMLIFrameElement
+
+        val content = fetch(iframe.src).text()
+
+        content shouldBe testHtml
     }
 }
 

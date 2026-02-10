@@ -1,5 +1,6 @@
 package com.emarsys.di
 
+import com.emarsys.IframeBridgeV2
 import com.emarsys.api.setup.Setup
 import com.emarsys.api.setup.SetupApi
 import com.emarsys.context.DefaultUrls
@@ -119,7 +120,7 @@ object CoreInjection {
                 "https://mobile-sdk-config.gservice.emarsys.net",
                 "https://log-dealer.gservice.emarsys.net",
                 "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/api",
-                "https://sap.com"
+                IframeBridgeV2.IFRAME_BRIDGE_V2
             )
         }
         single<SdkEventDistributor> {

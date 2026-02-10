@@ -69,12 +69,9 @@ import com.emarsys.enable.PlatformInitializerApi
 import com.emarsys.enable.config.JsEmarsysConfigStore
 import com.emarsys.enable.config.SdkConfigStoreApi
 import com.emarsys.init.states.LegacySDKMigrationState
-import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.inapp.InAppPresenterApi
-import com.emarsys.mobileengage.inapp.InAppScriptExtractor
 import com.emarsys.mobileengage.inapp.InAppViewProviderApi
 import com.emarsys.mobileengage.inapp.InlineInAppViewRendererApi
-import com.emarsys.mobileengage.inapp.WebInAppJsBridgeFactory
 import com.emarsys.mobileengage.inapp.WebInAppPresenter
 import com.emarsys.mobileengage.inapp.WebInAppViewProvider
 import com.emarsys.mobileengage.inapp.WebInlineInAppViewRenderer
@@ -227,13 +224,10 @@ object WebInjection {
         }
         single<InAppViewProviderApi> {
             WebInAppViewProvider(
-                inappScriptExtractor =  InAppScriptExtractor(),
-                webInAppJsBridgeFactory = WebInAppJsBridgeFactory(
-                    actionFactory = get<EventActionFactoryApi>(),
-                    json = get(),
-                    sdkDispatcher = get(named(DispatcherTypes.Sdk))
-                ),
-                timestampProvider = get()
+                timestampProvider = get(),
+                contentReplacer = get(),
+                iframeFactory = get(),
+                messageChannelProvider = get()
             )
         }
         single<InAppPresenterApi> {
