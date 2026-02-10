@@ -12,6 +12,7 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstant
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DIALOG_CONTAINER_PADDING
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.FLOATING_ACTION_BUTTON_SIZE
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.ICON_DEFAULT_SIZE
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.LARGE_MARGIN
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.LIST_PANE_WIDTH
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MAX_HEIGHT
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MAX_WIDTH
@@ -221,6 +222,10 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         display(DisplayStyle.Block)
     }
 
+    val emptyStateButtonTextContainer by style {
+        margin(LARGE_MARGIN)
+    }
+
     val emptyStateTitle by style {
         marginBottom(DEFAULT_MARGIN)
         fontWeight("bold")
@@ -394,6 +399,29 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         backgroundColor(CssColorVars.colorSurfaceVariant.value())
         color(CssColorVars.colorOnSurfaceVariant.value())
         border(ZERO_BORDER_WIDTH)
+    }
+
+    val categorySelectorButtonContent by style {
+        alignItems("center")
+        display(DisplayStyle.LegacyInlineFlex)
+        padding(DEFAULT_PADDING)
+    }
+
+    val emptyStateClearFiltersButton by style {
+        height(FLOATING_ACTION_BUTTON_SIZE)
+        display(DisplayStyle.Flex)
+        alignItems(AlignItems.Center)
+        gap(DEFAULT_SPACING)
+        padding(DEFAULT_PADDING)
+        border(ZERO_BORDER_WIDTH)
+        borderRadius(DEFAULT_BORDER_RADIUS)
+        cursor(DEFAULT_CURSOR)
+        fontSize(CssFontVars.fontSizeLabelLarge)
+        fontWeight(BUTTON_FONT_WEIGHT)
+        backgroundColor(CssColorVars.colorPrimary.value())
+        color(CssColorVars.colorOnPrimary.value())
+        marginTop(DEFAULT_MARGIN)
+        property("box-shadow", "0 2px 4px rgba(0,0,0,0.1)")
     }
 
     val deleteMessageIcon by style {

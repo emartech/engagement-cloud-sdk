@@ -73,6 +73,7 @@ fun MessageList(
     val showCategorySelector by viewModel.showCategorySelector.collectAsState()
     var messageToDelete by remember { mutableStateOf<MessageItemViewModelApi?>(null) }
     var showDeleteMessageDialog by remember { mutableStateOf(false) }
+    val hasFiltersApplied by viewModel.hasFiltersApplied.collectAsState()
 
     val scope = rememberCoroutineScope()
 
@@ -114,11 +115,17 @@ fun MessageList(
                         scope.launch {
                             viewModel.selectMessage(it, onNavigate = {})
                         }
+                    },
+                    onClearFilters = {
+                        viewModel.setSelectedCategoryIds(emptySet())
+                        viewModel.setFilterUnopenedOnly(false)
+                    },
+                    hasFiltersApplied = hasFiltersApplied,
+                    onDeleteIconClicked = {
+                        messageToDelete = it
+                        showDeleteMessageDialog = true
                     }
-                ) {
-                    messageToDelete = it
-                    showDeleteMessageDialog = true
-                }
+                )
             }
 
             Div({ classes(EmbeddedMessagingStyleSheet.detailPane) }) {
@@ -149,6 +156,11 @@ fun MessageList(
                         viewModel.selectMessage(it, onNavigate = {})
                     }
                 },
+                onClearFilters = {
+                    viewModel.setSelectedCategoryIds(emptySet())
+                    viewModel.setFilterUnopenedOnly(false)
+                },
+                hasFiltersApplied = hasFiltersApplied,
                 onDeleteIconClicked = {
                     messageToDelete = it
                     showDeleteMessageDialog = true
@@ -197,7 +209,9 @@ fun MessageListContent(
     onRefresh: () -> Unit,
     onItemClick: (MessageItemViewModelApi) -> Unit,
     withDeleteIcon: Boolean = true,
-    onDeleteIconClicked: (MessageItemViewModelApi) -> Unit = {}
+    onClearFilters: () -> Unit,
+    hasFiltersApplied: Boolean,
+    onDeleteIconClicked: (MessageItemViewModelApi) -> Unit = {},
 ) {
     val isRefreshing = lazyPagingMessageItems.loadState.source.refresh is LoadState.Loading
 
@@ -214,8 +228,14 @@ fun MessageListContent(
                 SvgIcon(path = REFRESH_ICON_PATH)
             }
 
-            if (lazyPagingMessageItems.itemCount == 0) {
-                EmptyState()
+            if (lazyPagingMessageItems.isIdleButEmpty()) {
+                if (hasFiltersApplied) {
+                    FilteredMessageItemsListEmptyState {
+                        onClearFilters()
+                    }
+                } else {
+                    EmptyState()
+                }
             } else {
                 ListView(
                     lazyPagingMessageItems,
@@ -332,6 +352,45 @@ fun EmptyState() {
                 classes(EmbeddedMessagingStyleSheet.emptyStateText)
             }) {
                 Text(LocalStringResources.current.emptyStateDescription)
+            }
+        }
+    }
+}
+
+@Composable
+fun FilteredMessageItemsListEmptyState(
+    onFilterReset: () -> Unit
+) {
+    Div({
+        classes(EmbeddedMessagingStyleSheet.emptyStateContainer)
+    }) {
+        Div({
+            classes(EmbeddedMessagingStyleSheet.emptyStateContent)
+        }) {
+            Span({
+                classes(
+                    EmbeddedMessagingStyleSheet.emptyStateText,
+                    EmbeddedMessagingStyleSheet.emptyStateTitle
+                )
+            }) {
+                Text(LocalStringResources.current.emptyStateFilteredTitle)
+            }
+            Span({
+                classes(EmbeddedMessagingStyleSheet.emptyStateText)
+            }) {
+                Text(LocalStringResources.current.emptyStateFilteredDescription)
+            }
+            Button({
+                onClick { onFilterReset() }
+                classes(
+                    EmbeddedMessagingStyleSheet.emptyStateClearFiltersButton
+                )
+            }) {
+                Span({
+                    classes(EmbeddedMessagingStyleSheet.emptyStateButtonTextContainer)
+                }) {
+                    Text(LocalStringResources.current.emptyStateFilteredClearFiltersButtonLabel)
+                }
             }
         }
     }

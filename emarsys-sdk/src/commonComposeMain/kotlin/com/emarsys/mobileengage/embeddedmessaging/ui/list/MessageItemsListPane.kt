@@ -76,22 +76,6 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.theme.LocalDesignValues
 import com.emarsys.mobileengage.embeddedmessaging.ui.translation.LocalStringResources
 import kotlinx.coroutines.launch
 
-internal fun LazyPagingItems<MessageItemViewModelApi>.isIdleButEmpty(): Boolean {
-    val itemCountWithoutLocallyExcluded =
-        this.itemSnapshotList.count { it?.isExcludedLocally == false }
-    return itemCountWithoutLocallyExcluded == 0 && this.loadState.isIdle && !this.loadState.hasError
-}
-
-
-internal fun LazyPagingItems<MessageItemViewModelApi>.isInitiallyLoading(): Boolean =
-    this.loadState.source.refresh is LoadState.Loading
-
-internal fun LazyPagingItems<MessageItemViewModelApi>.hasRefreshError(): Boolean =
-    this.loadState.source.refresh is LoadState.Error
-
-internal fun LazyPagingItems<MessageItemViewModelApi>.isLoadingMore(): Boolean =
-    this.loadState.source.append == LoadState.Loading
-
 private fun LazyPagingItems<MessageItemViewModelApi>.shouldShowErrorStateNoConnection(hasConnection: Boolean): Boolean =
     !hasConnection && this.itemCount == 0
 

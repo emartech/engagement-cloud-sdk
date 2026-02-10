@@ -23,9 +23,15 @@ fun CategorySelectorButton(
             else EmbeddedMessagingStyleSheet.categorySelectorButtonInactive
         )
     }) {
-        Span {
-            Text(LocalStringResources.current.categoriesFilterButtonLabel)
+        Span({
+            classes(
+                EmbeddedMessagingStyleSheet.categorySelectorButtonContent
+            )
+        }) {
+            SvgIcon(path = FILTER_ALT_ICON_PATH)
+            Span {
+                Text(LocalStringResources.current.categoriesFilterButtonLabel)
+            }
         }
-        SvgIcon(path = FILTER_ALT_ICON_PATH)
     }
 }
