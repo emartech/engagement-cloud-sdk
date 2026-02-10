@@ -1,5 +1,6 @@
 package com.emarsys.mobileengage.inapp.iframe
 
+import com.emarsys.core.log.Logger
 import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.action.models.BasicInAppButtonClickedActionModel
@@ -15,6 +16,7 @@ import web.messaging.MessageChannel
 internal class MessageChannelProvider(
     private val eventActionFactory: EventActionFactoryApi,
     private val applicationScope: CoroutineScope,
+    private val logger: Logger,
     private val json: Json
 ) : MessageChannelProviderApi {
     private companion object {
@@ -35,12 +37,18 @@ internal class MessageChannelProvider(
                 return@EventHandler
             }
 
-            val actionModel =
-                json.decodeFromString<BasicActionModel>(JSON.stringify(messageEvent.data))
-                    .amend(message)
+            try {
+                val actionModel =
+                    json.decodeFromString<BasicActionModel>(JSON.stringify(messageEvent.data))
+                        .amend(message)
 
-            applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
-                eventActionFactory.create(actionModel).invoke()
+                applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
+                    eventActionFactory.create(actionModel).invoke()
+                }
+            } catch (exception: Throwable) {
+                applicationScope.launch {
+                    logger.error("Failed to parse actionModel from messageEvent data.", exception)
+                }
             }
         }
         return messageChannel
@@ -49,9 +57,7 @@ internal class MessageChannelProvider(
     private fun BasicActionModel.amend(message: InAppMessage): BasicActionModel {
         if (this is DismissActionModel) {
             this.dismissId = message.dismissId
-        }
-
-        if (this is BasicInAppButtonClickedActionModel) {
+        } else if (this is BasicInAppButtonClickedActionModel) {
             this.trackingInfo = message.trackingInfo
         }
 

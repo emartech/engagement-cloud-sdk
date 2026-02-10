@@ -219,6 +219,7 @@ object WebInjection {
             MessageChannelProvider(
                 eventActionFactory = get(),
                 applicationScope = get(named(CoroutineScopeTypes.Application)),
+                logger = get { parametersOf(MessageChannelProvider::class.simpleName) },
                 json = get()
             )
         }

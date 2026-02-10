@@ -1,5 +1,6 @@
 package com.emarsys.mobileengage.inapp.iframe
 
+import com.emarsys.core.log.Logger
 import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.action.actions.Action
 import com.emarsys.mobileengage.action.models.BasicDismissActionModel
@@ -12,7 +13,9 @@ import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
+import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
@@ -44,6 +47,7 @@ class MessageChannelProviderTests {
     }
 
     private lateinit var mockEventActionFactory: EventActionFactoryApi
+    private lateinit var mockLogger: Logger
     private lateinit var json: Json
     private lateinit var messageChannelProvider: MessageChannelProviderApi
 
@@ -52,12 +56,14 @@ class MessageChannelProviderTests {
         val dispatcher = StandardTestDispatcher()
         Dispatchers.setMain(dispatcher)
         mockEventActionFactory = mock(MockMode.autofill)
+        mockLogger = mock(MockMode.autofill)
         json = JsonUtil.json
 
         messageChannelProvider =
             MessageChannelProvider(
                 mockEventActionFactory,
                 TestScope(dispatcher),
+                mockLogger,
                 json
             )
     }
@@ -101,6 +107,31 @@ class MessageChannelProviderTests {
             mockAction.invoke()
         }
     }
+
+    @Test
+    fun provide_shouldReturnMessageChannel_andShouldNotCrash_whenMessageDataCantBeParsed() =
+        runTest {
+            val loggerInvoked = CompletableDeferred<Unit>()
+
+            everySuspend { mockLogger.error(any<String>(), any<Throwable>()) } calls {
+                loggerInvoked.complete(Unit)
+            }
+
+            val channel = messageChannelProvider.provide(testInAppMessage)
+
+            val messageWithType = buildJsonObject {
+                put("unknownKey", "unknownValue")
+            }
+
+            channel.port2.postMessage(JSON.parse(json.encodeToString(messageWithType)))
+
+            advanceUntilIdle()
+
+            loggerInvoked.await()
+            verifySuspend(VerifyMode.exactly(0)) {
+                mockEventActionFactory.create(any())
+            }
+        }
 
     @Test
     fun provide_shouldAmend_theActionModel_inCaseOfDismiss() = runTest {
