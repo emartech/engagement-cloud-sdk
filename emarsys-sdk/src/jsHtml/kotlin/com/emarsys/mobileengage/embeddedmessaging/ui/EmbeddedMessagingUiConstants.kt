@@ -17,6 +17,7 @@ object EmbeddedMessagingUiConstants {
 
     val DEFAULT_MARGIN = 8.px
     val ZERO_MARGIN = 0.px
+    val LARGE_MARGIN = 16.px
 
     val DIALOG_CONTAINER_PADDING = 16.px
 
@@ -31,7 +32,7 @@ object EmbeddedMessagingUiConstants {
 
     val ZERO_BORDER_WIDTH = 0.px
     val DEFAULT_BORDER_WIDTH = 1.px
-    val DEFAULT_BORDER_RADIUS = 16.px
+    val DEFAULT_BORDER_RADIUS = 13.px
 
     const val BUTTON_FONT_WEIGHT = 400
     const val TITLE_FONT_WEIGHT = 600
