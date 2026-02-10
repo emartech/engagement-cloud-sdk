@@ -82,6 +82,8 @@ import com.emarsys.mobileengage.inapp.iframe.ContentReplacer
 import com.emarsys.mobileengage.inapp.iframe.ContentReplacerApi
 import com.emarsys.mobileengage.inapp.iframe.IframeFactory
 import com.emarsys.mobileengage.inapp.iframe.IframeFactoryApi
+import com.emarsys.mobileengage.inapp.iframe.MessageChannelProvider
+import com.emarsys.mobileengage.inapp.iframe.MessageChannelProviderApi
 import com.emarsys.mobileengage.push.PushNotificationClickHandler
 import com.emarsys.mobileengage.push.PushNotificationClickHandlerApi
 import com.emarsys.mobileengage.push.PushService
@@ -216,6 +218,13 @@ object WebInjection {
             )
         }
         single<FileCacheApi> { WebFileCache() }
+        single<MessageChannelProviderApi> {
+            MessageChannelProvider(
+                eventActionFactory = get(),
+                applicationScope = get(named(CoroutineScopeTypes.Application)),
+                json = get()
+            )
+        }
         single<InAppViewProviderApi> {
             WebInAppViewProvider(
                 inappScriptExtractor =  InAppScriptExtractor(),
