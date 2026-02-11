@@ -59,5 +59,10 @@ tasks.findByName("jsBrowserDistribution")?.finalizedBy("copyServiceWorkerToEmars
 // Exclude Compose dependencies from JS test classpath to avoid skiko.mjs errors
 configurations {
     val jsTestRuntimeClasspath by getting
-
+    jsTestRuntimeClasspath.exclude(group = "org.jetbrains.compose.ui")
+    jsTestRuntimeClasspath.exclude(group = "org.jetbrains.compose.foundation")
+    jsTestRuntimeClasspath.exclude(group = "org.jetbrains.compose.material")
+    jsTestRuntimeClasspath.exclude(group = "org.jetbrains.compose.runtime")
+    jsTestRuntimeClasspath.exclude(group = "org.jetbrains.compose.components")
+    jsTestRuntimeClasspath.exclude(group = "org.jetbrains.skiko")
 }

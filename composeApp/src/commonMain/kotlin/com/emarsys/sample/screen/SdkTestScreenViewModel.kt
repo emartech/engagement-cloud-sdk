@@ -20,8 +20,8 @@ class SdkTestScreenViewModel {
     private val _switchValue = MutableStateFlow(false)
     val switchValue: StateFlow<Boolean> = _switchValue.asStateFlow()
 
-    private val _showInlineInAppView = MutableStateFlow(false)
-    val showInlineInAppView: StateFlow<Boolean> = _showInlineInAppView.asStateFlow()
+    private val _inlineInAppViewCount = MutableStateFlow(0)
+    val inlineInAppViewCount: StateFlow<Int> = _inlineInAppViewCount.asStateFlow()
 
     fun updateEventName(newValue: String) {
         _eventName.value = newValue
@@ -92,7 +92,7 @@ class SdkTestScreenViewModel {
         }
     }
 
-    fun showInlineInAppViewByUrl() {
-        _showInlineInAppView.value = true
+    fun addInlineInAppView() {
+        _inlineInAppViewCount.value++
     }
 }

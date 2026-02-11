@@ -1,5 +1,6 @@
 package com.emarsys.mobileengage.inapp
 
+import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
@@ -26,16 +27,23 @@ class InlineInAppMessageFetcherTests {
 
     private lateinit var mockNetworkClient: NetworkClientApi
     private lateinit var mockUrlFactory: UrlFactoryApi
+    private lateinit var mockLogger: Logger
     private lateinit var fetcher: InlineInAppMessageFetcher
 
     private val testViewId = "testViewId"
-    private val testUrl = Url("https://example.com/inline-messages")
+    private val testUrl = Url("https://sap.com/inline-messages")
 
     @BeforeTest
     fun setup() {
         mockNetworkClient = mock(MockMode.autoUnit)
         mockUrlFactory = mock(MockMode.autoUnit)
-        fetcher = InlineInAppMessageFetcher(mockNetworkClient, mockUrlFactory, Json { ignoreUnknownKeys = true })
+        mockLogger = mock(MockMode.autofill)
+        fetcher = InlineInAppMessageFetcher(
+            mockNetworkClient,
+            mockUrlFactory,
+            Json { ignoreUnknownKeys = true },
+            mockLogger
+        )
 
         every { mockUrlFactory.create(any()) } returns testUrl
     }
@@ -165,11 +173,16 @@ class InlineInAppMessageFetcherTests {
 
     @Test
     fun fetch_shouldReturnNull_whenNetworkRequestFails() = runTest {
-        everySuspend { mockNetworkClient.send(any()) } returns Result.failure(Exception("Network error"))
+        val testException = Exception("Network error")
+        everySuspend { mockNetworkClient.send(any()) } returns Result.failure(testException)
 
         val result = fetcher.fetch(testViewId)
 
         result shouldBe null
+
+        verifySuspend {
+            mockLogger.error(any(), testException)
+        }
     }
 
     @Test
@@ -184,6 +197,69 @@ class InlineInAppMessageFetcherTests {
         everySuspend { mockNetworkClient.send(any()) } returns Result.success(response)
 
         val result = fetcher.fetch(testViewId)
+
+        result shouldBe null
+
+        verifySuspend {
+            mockLogger.error(any(), any<Throwable>())
+        }
+    }
+
+    @Test
+    fun fetchByUrl_shouldReturnMessage_whenResponseIsSuccessful() = runTest {
+        val contentUrl = Url("https://sap.com/inline-content")
+        val htmlContent = "<div>Inline Content</div>"
+
+        val response = Response(
+            originalRequest = UrlRequest(contentUrl, HttpMethod.Get),
+            status = HttpStatusCode.OK,
+            headers = Headers.Empty,
+            bodyAsText = htmlContent
+        )
+
+        everySuspend { mockNetworkClient.send(any()) } returns Result.success(response)
+
+        val result = fetcher.fetch(contentUrl)
+
+        result!!.type shouldBe InAppType.INLINE
+        result.trackingInfo shouldBe "inlineInAppTrackingInfo"
+        result.content shouldBe htmlContent
+
+        verifySuspend {
+            mockNetworkClient.send(any())
+        }
+    }
+
+    @Test
+    fun fetchByUrl_shouldReturnNull_whenNetworkRequestFails() = runTest {
+        val contentUrl = Url("https://sap.com/inline-content")
+        val testException = Exception("Network error")
+
+        everySuspend { mockNetworkClient.send(any()) } returns Result.failure(testException)
+
+        val result = fetcher.fetch(contentUrl)
+
+        result shouldBe null
+
+        verifySuspend {
+            mockLogger.error(any(), testException)
+        }
+    }
+
+    @Test
+    fun fetchByUrl_shouldReturnNull_whenResponseBodyIsEmpty() = runTest {
+        val contentUrl = Url("https://sap.com/inline-content")
+
+        val response = Response(
+            originalRequest = UrlRequest(contentUrl, HttpMethod.Get),
+            status = HttpStatusCode.OK,
+            headers = Headers.Empty,
+            bodyAsText = ""
+        )
+
+        everySuspend { mockNetworkClient.send(any()) } returns Result.success(response)
+
+        val result = fetcher.fetch(contentUrl)
 
         result shouldBe null
     }

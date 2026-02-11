@@ -23,7 +23,7 @@ fun SdkTestScreen(
 ) {
     val eventName by viewModel.eventName.collectAsState()
     val switchValue by viewModel.switchValue.collectAsState()
-    val showInlineInAppView by viewModel.showInlineInAppView.collectAsState()
+    val inlineInAppViewCount by viewModel.inlineInAppViewCount.collectAsState()
 
     Column(
         modifier = Modifier
@@ -73,11 +73,11 @@ fun SdkTestScreen(
             Text("Disable tracking")
         }
 
-        Button(onClick = { viewModel.showInlineInAppViewByUrl() }) {
-            Text("Show InlineInApp (URL)")
+        Button(onClick = { viewModel.addInlineInAppView() }) {
+            Text("Add InlineInApp")
         }
 
-        if (showInlineInAppView) {
+        repeat(inlineInAppViewCount) { index ->
             InlineInAppView(viewId = "ia")
         }
     }

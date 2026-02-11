@@ -33,7 +33,8 @@ object InAppInjection {
             InlineInAppMessageFetcher(
                 networkClient = get(named(NetworkClientTypes.Emarsys)),
                 urlFactory = get(),
-                json = get()
+                json = get(),
+                sdkLogger = get { parametersOf(InlineInAppMessageFetcher::class.simpleName) }
             )
         }
         single<MutableList<InAppCall>>(named(PersistentListTypes.InAppCall)) {
