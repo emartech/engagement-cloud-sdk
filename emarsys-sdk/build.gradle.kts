@@ -57,6 +57,7 @@ kotlin {
             testTask {
                 useKarma {
                     useChromeHeadless()
+                    environment("TZ", "Europe/Budapest")
                 }
             }
         }

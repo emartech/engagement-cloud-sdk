@@ -1,5 +1,8 @@
 package com.emarsys.mobileengage.embeddedmessaging.util
 
+import com.emarsys.core.datetime.asLocaleFormattedFullDate
+import com.emarsys.core.datetime.asLocaleFormattedHoursAndMinutes
+import com.emarsys.core.datetime.asLocaleFormattedMonthsAndDays
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
@@ -15,23 +18,8 @@ internal fun Long.asFormattedTimestamp(): String {
     val receivedDateTime = receivedAt.toLocalDateTime(TimeZone.currentSystemDefault())
 
     return when {
-        nowDateTime.date == receivedDateTime.date -> {
-            "${
-                receivedDateTime.hour.toString().padStart(2, '0')
-            }:${receivedDateTime.minute.toString().padStart(2, '0')}"
-        }
-
-        nowDateTime.year == receivedDateTime.year -> {
-            "${
-                receivedDateTime.month.name.take(3)
-            } ${receivedDateTime.day}".toCapitalized()
-        }
-
-        else -> {
-            "${receivedDateTime.month.name.take(3)} ${receivedDateTime.day}, ${receivedDateTime.year}".toCapitalized()
-        }
+        nowDateTime.date == receivedDateTime.date -> this.asLocaleFormattedHoursAndMinutes()
+        nowDateTime.year == receivedDateTime.year -> this.asLocaleFormattedMonthsAndDays()
+        else -> this.asLocaleFormattedFullDate()
     }
 }
-
-private fun String.toCapitalized() =
-    this.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
