@@ -77,6 +77,8 @@ import com.emarsys.mobileengage.inapp.WebInAppViewProvider
 import com.emarsys.mobileengage.inapp.WebInlineInAppViewRenderer
 import com.emarsys.mobileengage.inapp.iframe.ContentReplacer
 import com.emarsys.mobileengage.inapp.iframe.ContentReplacerApi
+import com.emarsys.mobileengage.inapp.iframe.IframeContainerResizer
+import com.emarsys.mobileengage.inapp.iframe.IframeContainerResizerApi
 import com.emarsys.mobileengage.inapp.iframe.IframeFactory
 import com.emarsys.mobileengage.inapp.iframe.IframeFactoryApi
 import com.emarsys.mobileengage.inapp.iframe.MessageChannelProvider
@@ -215,10 +217,12 @@ object WebInjection {
             )
         }
         single<FileCacheApi> { WebFileCache() }
+        single<IframeContainerResizerApi> { IframeContainerResizer() }
         single<MessageChannelProviderApi> {
             MessageChannelProvider(
                 eventActionFactory = get(),
                 applicationScope = get(named(CoroutineScopeTypes.Application)),
+                iframeContainerResizer = get(),
                 logger = get { parametersOf(MessageChannelProvider::class.simpleName) },
                 json = get()
             )

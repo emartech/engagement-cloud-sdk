@@ -8,10 +8,12 @@ import com.emarsys.mobileengage.action.models.BasicInAppButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.action.models.HtmlTarget
 import com.emarsys.mobileengage.inapp.InAppMessage
+import com.emarsys.mobileengage.inapp.toIframeId
 import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
+import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
@@ -47,6 +49,7 @@ class MessageChannelProviderTests {
     }
 
     private lateinit var mockEventActionFactory: EventActionFactoryApi
+    private lateinit var mockIframeContainerResizer: IframeContainerResizerApi
     private lateinit var mockLogger: Logger
     private lateinit var json: Json
     private lateinit var messageChannelProvider: MessageChannelProviderApi
@@ -56,6 +59,7 @@ class MessageChannelProviderTests {
         val dispatcher = StandardTestDispatcher()
         Dispatchers.setMain(dispatcher)
         mockEventActionFactory = mock(MockMode.autofill)
+        mockIframeContainerResizer = mock(MockMode.autofill)
         mockLogger = mock(MockMode.autofill)
         json = JsonUtil.json
 
@@ -63,6 +67,7 @@ class MessageChannelProviderTests {
             MessageChannelProvider(
                 mockEventActionFactory,
                 TestScope(dispatcher),
+                mockIframeContainerResizer,
                 mockLogger,
                 json
             )
@@ -192,6 +197,34 @@ class MessageChannelProviderTests {
         verifySuspend {
             mockEventActionFactory.create(amendedActionModel)
             mockAction.invoke()
+        }
+    }
+
+    @Test
+    fun provide_shouldRegisterMessageHandler_thatHandles_resizeMessagesProperly() = runTest {
+        val testHeight = 321
+
+        val resizeCompleted = CompletableDeferred<Unit>()
+        every { mockIframeContainerResizer.resize(DISMISS_ID.toIframeId(), testHeight) } calls {
+            resizeCompleted.complete(Unit)
+        }
+
+        val channel = messageChannelProvider.provide(testInAppMessage)
+
+        val messageWithType = buildJsonObject {
+            put("height", testHeight)
+            put("type", "resize")
+        }
+
+        channel.port2.postMessage(JSON.parse(json.encodeToString(messageWithType)))
+
+        advanceUntilIdle()
+
+        resizeCompleted.await()
+
+        verifySuspend { mockIframeContainerResizer.resize(DISMISS_ID.toIframeId(), testHeight) }
+        verifySuspend(VerifyMode.exactly(0)) {
+            mockEventActionFactory.create(any())
         }
     }
 }

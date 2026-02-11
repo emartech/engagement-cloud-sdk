@@ -6,9 +6,11 @@ import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.action.models.BasicInAppButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.DismissActionModel
 import com.emarsys.mobileengage.inapp.InAppMessage
+import com.emarsys.mobileengage.inapp.toIframeId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import web.events.EventHandler
 import web.messaging.MessageChannel
@@ -16,6 +18,7 @@ import web.messaging.MessageChannel
 internal class MessageChannelProvider(
     private val eventActionFactory: EventActionFactoryApi,
     private val applicationScope: CoroutineScope,
+    private val iframeContainerResizer: IframeContainerResizerApi,
     private val logger: Logger,
     private val json: Json
 ) : MessageChannelProviderApi {
@@ -38,6 +41,9 @@ internal class MessageChannelProvider(
             }
 
             try {
+                if (handleResizeEvent(JSON.stringify(messageEvent.data), message.dismissId)) {
+                    return@EventHandler
+                }
                 val actionModel =
                     json.decodeFromString<BasicActionModel>(JSON.stringify(messageEvent.data))
                         .amend(message)
@@ -63,4 +69,17 @@ internal class MessageChannelProvider(
 
         return this
     }
+
+    private fun handleResizeEvent(messageData: String, dismissId: String): Boolean {
+        return try {
+            val resizeMessage = json.decodeFromString<IframeResizeMessage>(messageData)
+            iframeContainerResizer.resize(dismissId.toIframeId(), resizeMessage.height)
+            true
+        } catch (_: Throwable) {
+            false
+        }
+    }
 }
+
+@Serializable
+data class IframeResizeMessage(val type: String, val height: Int)

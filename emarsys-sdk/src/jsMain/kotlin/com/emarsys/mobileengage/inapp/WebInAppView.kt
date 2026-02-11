@@ -6,6 +6,7 @@ import com.emarsys.mobileengage.inapp.iframe.IframeFactoryApi
 import com.emarsys.mobileengage.inapp.iframe.MessageChannelProviderApi
 import web.blob.Blob
 import web.blob.BlobPropertyBag
+import web.dom.ElementId
 import web.events.EventType
 import web.events.addEventListener
 import web.html.HTMLElement
@@ -50,6 +51,7 @@ internal class WebInAppView(
         val messageChannel = messageChannelProvider.provide(message)
 
         iframeContainer.src = blobUrl
+        iframeContainer.id = ElementId(message.dismissId.toIframeId())
         registerOnLoadListener(iframeContainer, messageChannel, blobUrl)
 
         return WebWebViewHolder(iframeContainer as HTMLElement, inAppLoadingMetric())
