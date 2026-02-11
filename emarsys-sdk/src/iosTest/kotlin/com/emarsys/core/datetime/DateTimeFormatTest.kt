@@ -2,6 +2,7 @@ package com.emarsys.core.datetime
 
 import io.kotest.matchers.shouldBe
 import platform.CoreFoundation.CFTimeZoneResetSystem
+import platform.Foundation.NSUserDefaults
 import platform.posix.setenv
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -17,26 +18,27 @@ class DateTimeFormatTest {
     fun setup() {
         setenv("TZ", "Europe/Budapest", 1)
         CFTimeZoneResetSystem()
+        NSUserDefaults.standardUserDefaults.setObject("en_US", forKey = "AppleLocale")
     }
 
     @Test
     fun asLocaleFormattedHoursAndMinutes_should_format_hours_and_minutes_according_to_locale() {
         val formattedTime = TEST_TIMESTAMP.asLocaleFormattedHoursAndMinutes()
 
-        formattedTime shouldBe "2:01"
+        formattedTime shouldBe "2:01 AM"
     }
 
     @Test
     fun asLocaleFormattedMonthsAndDays_should_format_hours_and_minutes_according_to_locale() {
         val formattedTime = TEST_TIMESTAMP.asLocaleFormattedMonthsAndDays()
 
-        formattedTime shouldBe "Mar 1."
+        formattedTime shouldBe "Mar 1"
     }
 
     @Test
     fun asLocaleFormattedFullDate_should_format_hours_and_minutes_according_to_locale() {
         val formattedTime = TEST_TIMESTAMP.asLocaleFormattedFullDate()
 
-        formattedTime shouldBe "2026. 03. 01."
+        formattedTime shouldBe "03/01/2026"
     }
 }
