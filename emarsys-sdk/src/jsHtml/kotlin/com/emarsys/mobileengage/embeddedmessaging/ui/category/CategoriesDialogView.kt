@@ -132,7 +132,10 @@ private fun DialogActionButtons(
             onClick {
                 selectedCategories.value = emptySet()
             }
-            classes(EmbeddedMessagingStyleSheet.dialogResetButton)
+            classes(
+                EmbeddedMessagingStyleSheet.dialogButton,
+                EmbeddedMessagingStyleSheet.categoriesDialogResetButton
+            )
         }) {
             Text(LocalStringResources.current.categoriesFilterDialogResetButtonLabel)
         }
@@ -145,7 +148,10 @@ private fun DialogActionButtons(
             onClick {
                 onApplyClicked(selectedCategories.value)
             }
-            classes(EmbeddedMessagingStyleSheet.dialogApplyButton)
+            classes(
+                EmbeddedMessagingStyleSheet.dialogButton,
+                EmbeddedMessagingStyleSheet.categoriesDialogApplyButton
+            )
         }) {
             Text(LocalStringResources.current.categoriesFilterDialogApplyButtonLabel)
         }

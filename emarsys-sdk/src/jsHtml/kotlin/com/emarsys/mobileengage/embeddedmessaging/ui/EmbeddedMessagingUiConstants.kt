@@ -9,20 +9,23 @@ object EmbeddedMessagingUiConstants {
 
     val FLOATING_ACTION_BUTTON_SIZE = 40.px
 
-    val DEFAULT_ELEVATION = 8.px
     val ZERO_ELEVATION = 0.px
+    val DEFAULT_ELEVATION = 8.px
 
-    val DEFAULT_PADDING = 8.px
     val ZERO_PADDING = 0.px
+    val DEFAULT_PADDING = 8.px
+    val MEDIUM_PADDING = 12.px
+    val MEDIUM_LARGE_PADDING = 16.px
+    val LARGE_PADDING = 24.px
 
     val DEFAULT_MARGIN = 8.px
     val ZERO_MARGIN = 0.px
-    val LARGE_MARGIN = 16.px
+    val MEDIUM_MARGIN = 16.px
+    val LARGE_MARGIN = 24.px
 
-    val DIALOG_CONTAINER_PADDING = 16.px
-
-    val DEFAULT_SPACING = 8.px
     val ZERO_SPACING = 0.px
+    val DEFAULT_SPACING = 8.px
+    val MEDIUM_SPACING = 16.px
 
     val MAX_HEIGHT = 100.percent
     val MAX_WIDTH = 100.percent
@@ -32,7 +35,10 @@ object EmbeddedMessagingUiConstants {
 
     val ZERO_BORDER_WIDTH = 0.px
     val DEFAULT_BORDER_WIDTH = 1.px
-    val DEFAULT_BORDER_RADIUS = 13.px
+
+    val SMALL_BORDER_RADIUS = 8.px
+    val DEFAULT_BORDER_RADIUS = 15.px
+    val LARGE_BORDER_RADIUS = 24.px
 
     const val BUTTON_FONT_WEIGHT = 400
     const val TITLE_FONT_WEIGHT = 600

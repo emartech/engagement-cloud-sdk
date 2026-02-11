@@ -9,14 +9,20 @@ import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstant
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DEFAULT_PADDING
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DEFAULT_SPACING
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DIALOG_CARD_WIDTH
-import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DIALOG_CONTAINER_PADDING
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.FLOATING_ACTION_BUTTON_SIZE
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.ICON_DEFAULT_SIZE
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.LARGE_BORDER_RADIUS
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.LARGE_MARGIN
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.LARGE_PADDING
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.LIST_PANE_WIDTH
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MAX_HEIGHT
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MAX_WIDTH
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MEDIUM_LARGE_PADDING
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MEDIUM_MARGIN
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MEDIUM_PADDING
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MEDIUM_SPACING
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MESSAGE_ITEM_IMAGE_SIZE
+import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.SMALL_BORDER_RADIUS
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.TEXT_PLACEHOLDER_HEIGHT
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.TITLE_FONT_WEIGHT
 import com.emarsys.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.ZERO_BORDER_WIDTH
@@ -32,6 +38,7 @@ import org.jetbrains.compose.web.css.Color
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.FlexDirection
 import org.jetbrains.compose.web.css.JustifyContent
+import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.Position
 import org.jetbrains.compose.web.css.StyleSheet
 import org.jetbrains.compose.web.css.alignItems
@@ -63,6 +70,8 @@ import org.jetbrains.compose.web.css.marginTop
 import org.jetbrains.compose.web.css.maxWidth
 import org.jetbrains.compose.web.css.ms
 import org.jetbrains.compose.web.css.padding
+import org.jetbrains.compose.web.css.paddingBottom
+import org.jetbrains.compose.web.css.paddingTop
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.position
 import org.jetbrains.compose.web.css.px
@@ -124,7 +133,7 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         height(FLOATING_ACTION_BUTTON_SIZE)
         padding(DEFAULT_PADDING)
         border(ZERO_BORDER_WIDTH)
-        borderRadius(DEFAULT_BORDER_RADIUS)
+        borderRadius(SMALL_BORDER_RADIUS)
         cursor(DEFAULT_CURSOR)
         fontSize(CssFontVars.fontSizeBodyMedium)
         fontWeight(BUTTON_FONT_WEIGHT)
@@ -158,9 +167,9 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
     }
 
     val divider by style {
-        border(DEFAULT_BORDER_WIDTH, color = CssColorVars.colorOutline.value())
+        border(DEFAULT_BORDER_WIDTH, color = CssColorVars.colorOutlineVariant.value())
         height(DEFAULT_DIVIDER_WIDTH)
-        backgroundColor(CssColorVars.colorOutline.value())
+        backgroundColor(CssColorVars.colorOutlineVariant.value())
         margin(ZERO_MARGIN)
     }
 
@@ -223,7 +232,7 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
     }
 
     val emptyStateButtonTextContainer by style {
-        margin(LARGE_MARGIN)
+        margin(MEDIUM_MARGIN)
     }
 
     val emptyStateTitle by style {
@@ -246,30 +255,33 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
 
     val dialogCard by style {
         backgroundColor(CssColorVars.colorSurface.value())
-        borderRadius(DEFAULT_BORDER_RADIUS)
+        borderRadius(LARGE_BORDER_RADIUS)
         property("box-shadow", "0 4px 16px rgba(0,0,0,0.2)")
         maxWidth(DIALOG_CARD_WIDTH)
         width(MAX_WIDTH)
     }
 
     val dialogContent by style {
-        padding(DIALOG_CONTAINER_PADDING)
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Column)
         gap(DEFAULT_SPACING)
     }
 
     val dialogHeaderContainer by style {
-        padding(ZERO_PADDING, ZERO_PADDING, ZERO_PADDING, DEFAULT_PADDING)
+
     }
 
     val dialogHeaderRow by style {
+        marginRight(LARGE_MARGIN)
+        marginTop(DEFAULT_MARGIN)
         display(DisplayStyle.Flex)
         alignItems(AlignItems.Center)
         marginBottom(DEFAULT_MARGIN * 3)
     }
 
     val dialogTitle by style {
+        padding(LARGE_PADDING)
+        paddingBottom(MEDIUM_LARGE_PADDING)
         fontSize(CssFontVars.fontSizeTitleLarge)
         fontWeight(TITLE_FONT_WEIGHT)
         color(CssColorVars.colorOnSurface.value())
@@ -288,36 +300,38 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
     }
 
     val dialogSubtitle by style {
-        fontSize(CssFontVars.fontSizeBodyMedium)
+        padding(LARGE_PADDING)
+        paddingTop(ZERO_PADDING)
+        fontSize(CssFontVars.fontSizeBodyLarge)
         color(CssColorVars.colorOnSurface.value())
         display(DisplayStyle.Block)
-        marginTop(DEFAULT_MARGIN)
     }
 
     val dialogDivider by style {
-        border(DEFAULT_BORDER_WIDTH, color = CssColorVars.colorOutline.value())
+        border(DEFAULT_BORDER_WIDTH, color = CssColorVars.colorOutlineVariant.value())
         height(DEFAULT_DIVIDER_WIDTH)
-        backgroundColor(CssColorVars.colorOutline.value())
-        margin(ZERO_MARGIN, DEFAULT_MARGIN)
+        backgroundColor(CssColorVars.colorOutlineVariant.value())
+        margin(DEFAULT_MARGIN, LARGE_MARGIN)
     }
 
     val categoryChipsContainer by style {
+        margin(LARGE_MARGIN)
+        marginTop(ZERO_MARGIN)
+        marginBottom(DEFAULT_MARGIN)
         display(DisplayStyle.Flex)
         property("flex-wrap", "wrap")
-        gap(DEFAULT_SPACING)
-        padding(DEFAULT_PADDING)
+        gap(MEDIUM_SPACING)
     }
 
     val categoryChip by style {
         display(DisplayStyle.Flex)
         alignItems(AlignItems.Center)
         gap(DEFAULT_SPACING)
-        padding(DEFAULT_PADDING)
-        border(ZERO_BORDER_WIDTH)
-        borderRadius(DEFAULT_BORDER_RADIUS)
+        padding(MEDIUM_PADDING)
         cursor(DEFAULT_CURSOR)
         fontSize(CssFontVars.fontSizeLabelLarge)
         fontWeight(BUTTON_FONT_WEIGHT)
+        borderRadius(SMALL_BORDER_RADIUS)
     }
 
     val categoryChipSelected by style {
@@ -330,12 +344,14 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
     val categoryChipUnselected by style {
         backgroundColor(Color.transparent)
         color(CssColorVars.colorOnPrimaryContainer.value())
-        border(ZERO_BORDER_WIDTH)
+        border(DEFAULT_BORDER_WIDTH, LineStyle.Solid, CssColorVars.colorOutline.value())
     }
 
     val dialogActionsContainer by style {
         display(DisplayStyle.Flex)
-        padding(DEFAULT_PADDING)
+        padding(ZERO_PADDING)
+        margin(LARGE_MARGIN)
+        marginTop(DEFAULT_MARGIN)
         gap(DEFAULT_SPACING)
     }
 
@@ -344,31 +360,46 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         flexDirection(FlexDirection.Row)
         alignItems(AlignItems.Center)
         justifyContent(JustifyContent.End)
-        padding(DEFAULT_PADDING)
+        padding(MEDIUM_LARGE_PADDING)
         gap(DEFAULT_SPACING)
     }
 
-    val dialogResetButton by style {
-        padding(DEFAULT_PADDING)
-        border(ZERO_BORDER_WIDTH)
-        borderRadius(DEFAULT_BORDER_RADIUS)
-        backgroundColor(Color.transparent)
-        color(CssColorVars.colorPrimary.value())
+    val dialogButton by style {
+        padding(LARGE_PADDING)
+        paddingTop(MEDIUM_PADDING)
+        paddingBottom(MEDIUM_PADDING)
         cursor(DEFAULT_CURSOR)
         fontSize(CssFontVars.fontSizeLabelLarge)
         fontWeight(BUTTON_FONT_WEIGHT)
     }
-
-    val dialogApplyButton by style {
-        padding(DEFAULT_BORDER_RADIUS)
+    val deleteDialogApplyButton by style {
         border(ZERO_BORDER_WIDTH)
-        borderRadius(DEFAULT_BORDER_RADIUS)
+        borderRadius(LARGE_BORDER_RADIUS)
         backgroundColor(CssColorVars.colorPrimary.value())
         color(CssColorVars.colorOnPrimary.value())
-        cursor(DEFAULT_CURSOR)
-        fontSize(CssFontVars.fontSizeLabelLarge)
-        fontWeight(BUTTON_FONT_WEIGHT)
         property("box-shadow", "0 2px 4px rgba(0,0,0,0.1)")
+    }
+
+    val deleteDialogCancelButton by style {
+        border(ZERO_BORDER_WIDTH)
+        borderRadius(LARGE_BORDER_RADIUS)
+        backgroundColor(Color.transparent)
+        color(CssColorVars.colorPrimary.value())
+    }
+
+    val categoriesDialogApplyButton by style {
+        border(ZERO_BORDER_WIDTH)
+        borderRadius(SMALL_BORDER_RADIUS)
+        backgroundColor(CssColorVars.colorPrimary.value())
+        color(CssColorVars.colorOnPrimary.value())
+        property("box-shadow", "0 2px 4px rgba(0,0,0,0.1)")
+    }
+
+    val categoriesDialogResetButton by style {
+        border(DEFAULT_BORDER_WIDTH, LineStyle.Solid, CssColorVars.colorOutline.value())
+        borderRadius(SMALL_BORDER_RADIUS)
+        backgroundColor(Color.transparent)
+        color(CssColorVars.colorOnPrimaryContainer.value())
     }
 
     val spacer by style {
@@ -414,7 +445,7 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         gap(DEFAULT_SPACING)
         padding(DEFAULT_PADDING)
         border(ZERO_BORDER_WIDTH)
-        borderRadius(DEFAULT_BORDER_RADIUS)
+        borderRadius(SMALL_BORDER_RADIUS)
         cursor(DEFAULT_CURSOR)
         fontSize(CssFontVars.fontSizeLabelLarge)
         fontWeight(BUTTON_FONT_WEIGHT)

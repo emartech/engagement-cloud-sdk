@@ -41,7 +41,10 @@ fun DeleteMessageDialogView(
                         onClick {
                             onDismiss()
                         }
-                        classes(EmbeddedMessagingStyleSheet.dialogResetButton)
+                        classes(
+                            EmbeddedMessagingStyleSheet.dialogButton,
+                            EmbeddedMessagingStyleSheet.deleteDialogCancelButton
+                        )
                     }) {
                         Text(LocalStringResources.current.deleteMessageDialogCancelButtonLabel)
                     }
@@ -50,7 +53,10 @@ fun DeleteMessageDialogView(
                         onClick {
                             onApplyClicked()
                         }
-                        classes(EmbeddedMessagingStyleSheet.dialogApplyButton)
+                        classes(
+                            EmbeddedMessagingStyleSheet.dialogButton,
+                            EmbeddedMessagingStyleSheet.deleteDialogApplyButton
+                        )
                     }) {
                         Text(LocalStringResources.current.deleteMessageDialogConfirmButtonLabel)
                     }
