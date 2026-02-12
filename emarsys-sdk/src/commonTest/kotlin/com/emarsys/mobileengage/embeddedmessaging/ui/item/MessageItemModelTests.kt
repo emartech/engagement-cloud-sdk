@@ -225,6 +225,27 @@ class MessageItemModelTests {
     }
 
     @Test
+    fun isRead_shouldReturnTrue_whenTagsContainingRead() = runTest {
+        val model = createMessageItemModel(TEST_MESSAGE.copy(tags = listOf("read")))
+
+        model.isRead() shouldBe true
+    }
+
+    @Test
+    fun isRead_shouldReturnFalse_whenTagsDontContainRead() = runTest {
+        val model = createMessageItemModel(TEST_MESSAGE.copy(tags = listOf("custom")))
+
+        model.isRead() shouldBe false
+    }
+
+    @Test
+    fun isRead_shouldReturnTrue_whenTagsContainRead_caseInsensitively() = runTest {
+        val model = createMessageItemModel(TEST_MESSAGE.copy(tags = listOf("Read")))
+
+        model.isRead() shouldBe true
+    }
+
+    @Test
     fun isPinned_shouldReturnFalse_whenTagsNotContainingPinned() = runTest {
         val model = createMessageItemModel(TEST_MESSAGE.copy(tags = listOf("notPinned")))
 

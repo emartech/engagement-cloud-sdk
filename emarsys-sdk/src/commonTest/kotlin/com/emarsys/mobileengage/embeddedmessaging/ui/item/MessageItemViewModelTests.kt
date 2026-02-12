@@ -108,6 +108,13 @@ class MessageItemViewModelTests {
     }
 
     @Test
+    fun isRead_shouldReturn_ModelIsRead() {
+        every { mockMessageItemModel.isRead() } returns true
+
+        viewModel.isRead shouldBe true
+    }
+
+    @Test
     fun isPinned_shouldReturn_ModelIsPinned() {
         every { mockMessageItemModel.isPinned() } returns true
 
@@ -168,6 +175,16 @@ class MessageItemViewModelTests {
 
         result.isSuccess shouldBe true
         verifySuspend { mockMessageItemModel.deleteMessage() }
+    }
+
+    @Test
+    fun deleteMessage_shouldCall_ModelTagMessageRead() = runTest {
+        everySuspend { mockMessageItemModel.tagMessageRead() } returns Result.success(Unit)
+
+        val result = viewModel.tagMessageRead()
+
+        result.isSuccess shouldBe true
+        verifySuspend { mockMessageItemModel.tagMessageRead() }
     }
 
     @Test

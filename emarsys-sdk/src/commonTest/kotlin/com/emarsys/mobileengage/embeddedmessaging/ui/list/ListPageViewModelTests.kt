@@ -340,6 +340,33 @@ class ListPageViewModelTests {
         }
 
     @Test
+    fun testTagMessageRead_shouldTagMessageRead_whenNotAlreadyRead() =
+        runTest {
+            val mockMessageViewModel = mock<MessageItemViewModelApi>(MockMode.autofill)
+            every { mockMessageViewModel.isRead } returns false
+            everySuspend { mockMessageViewModel.tagMessageRead() } returns Result.success(Unit)
+
+            viewModel.tagMessageRead(mockMessageViewModel) shouldBe Result.success(Unit)
+
+            verifySuspend {
+                mockMessageViewModel.tagMessageRead()
+            }
+        }
+
+    @Test
+    fun testTagMessageRead_shouldReturnSuccess_whenAlreadyRead() =
+        runTest {
+            val mockMessageViewModel = mock<MessageItemViewModelApi>(MockMode.autofill)
+            every { mockMessageViewModel.isRead } returns true
+
+            viewModel.tagMessageRead(mockMessageViewModel) shouldBe Result.success(Unit)
+
+            verifySuspend(VerifyMode.exactly(0)) {
+                mockMessageViewModel.tagMessageRead()
+            }
+        }
+
+    @Test
     fun testClearSelection_shouldSetSelectedMessageAndCacheToNull() = runTest {
         val mockMessageViewModel = mock<MessageItemViewModelApi>(MockMode.autofill)
         every { mockMessageViewModel.id } returns TEST_MESSAGE_ID

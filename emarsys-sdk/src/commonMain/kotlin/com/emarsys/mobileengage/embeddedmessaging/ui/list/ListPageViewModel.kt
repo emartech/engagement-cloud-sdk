@@ -149,9 +149,11 @@ internal class ListPageViewModel(
     }
 
     override suspend fun tagMessageRead(messageViewModel: MessageItemViewModelApi): Result<Unit> {
-        return if (!messageViewModel.isRead)
+        return if (!messageViewModel.isRead) {
             messageViewModel.tagMessageRead()
-        else Result.success(Unit)
+        } else {
+            Result.success(Unit)
+        }
     }
 
     override fun clearMessageSelection() {
