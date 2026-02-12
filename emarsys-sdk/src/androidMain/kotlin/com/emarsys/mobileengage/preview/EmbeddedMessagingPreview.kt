@@ -270,6 +270,10 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
             return Result.success(Unit)
         }
 
+        override suspend fun tagMessageRead(messageViewModel: MessageItemViewModelApi): Result<Unit> {
+            return Result.success(Unit)
+        }
+
         override fun clearMessageSelection() {
             Unit
         }

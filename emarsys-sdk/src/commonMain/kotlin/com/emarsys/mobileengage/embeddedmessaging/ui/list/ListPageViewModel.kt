@@ -124,10 +124,13 @@ internal class ListPageViewModel(
                 }
         }
 
-        if (messageViewModel.shouldNavigate()) {
+        if (messageViewModel.hasRichContent()) {
             onNavigate.invoke()
         } else {
-            messageViewModel.handleDefaultAction()
+            messageViewModel.tagMessageRead().onFailure {
+
+            }
+            messageViewModel.handleDefaultAction()  // todo error handling
         }
     }
 
@@ -143,6 +146,12 @@ internal class ListPageViewModel(
                     clearMessageSelection()
                 }
             }
+    }
+
+    override suspend fun tagMessageRead(messageViewModel: MessageItemViewModelApi): Result<Unit> {
+        return if (!messageViewModel.isRead)
+            messageViewModel.tagMessageRead()
+        else Result.success(Unit)
     }
 
     override fun clearMessageSelection() {

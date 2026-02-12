@@ -28,6 +28,7 @@ interface ListPageViewModelApi {
 
     suspend fun selectMessage(messageViewModel: MessageItemViewModelApi, onNavigate: suspend () -> Unit)
     suspend fun deleteMessage(messageViewModel: MessageItemViewModelApi): Result<Unit>
+    suspend fun tagMessageRead(messageViewModel: MessageItemViewModelApi): Result<Unit>
 
     fun clearMessageSelection()
 

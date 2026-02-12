@@ -39,12 +39,15 @@ class MessageItemViewModel(
     override val isDeleted: Boolean
         get() = model.isDeleted()
 
+    override val isRead: Boolean
+        get() = model.isRead()
+
     override val richContentUrl: Url?
         get() {
             return getDefaultActionUrl()
         }
 
-    override fun shouldNavigate() = model.shouldNavigate()
+    override fun hasRichContent() = model.hasRichContent()
 
     override suspend fun fetchImage(): ByteArray =
         model.downloadImage()
@@ -59,6 +62,10 @@ class MessageItemViewModel(
 
     override suspend fun deleteMessage(): Result<Unit> {
         return model.deleteMessage()
+    }
+
+    override suspend fun tagMessageRead(): Result<Unit> {
+        return model.tagMessageRead()
     }
 
     override fun copyAsExcludedLocally(): MessageItemViewModelApi =

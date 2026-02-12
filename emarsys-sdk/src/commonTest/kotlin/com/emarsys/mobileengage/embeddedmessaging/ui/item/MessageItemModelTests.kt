@@ -250,7 +250,7 @@ class MessageItemModelTests {
         runTest {
             val model = createMessageItemModel(TEST_MESSAGE.copy(defaultAction = TEST_ACTION))
 
-            model.shouldNavigate() shouldBe true
+            model.hasRichContent() shouldBe true
         }
 
     @Test
@@ -262,7 +262,7 @@ class MessageItemModelTests {
                 )
             )
 
-            model.shouldNavigate() shouldBe false
+            model.hasRichContent() shouldBe false
         }
 
     @Test

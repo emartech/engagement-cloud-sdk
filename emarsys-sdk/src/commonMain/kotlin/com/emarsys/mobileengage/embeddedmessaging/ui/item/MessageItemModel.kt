@@ -40,6 +40,10 @@ internal class MessageItemModel(
         return updateTagsForMessage(OPENED_TAG, TagOperation.Add)
     }
 
+    override suspend fun tagMessageRead(): Result<Unit> {
+        return updateTagsForMessage(READ_TAG, TagOperation.Add)
+    }
+
     override suspend fun deleteMessage(): Result<Unit> {
         return updateTagsForMessage(DELETED_TAG, TagOperation.Add)
     }
@@ -85,6 +89,10 @@ internal class MessageItemModel(
         return message.tags.map { it.lowercase() }.contains(OPENED_TAG).not()
     }
 
+    override fun isRead(): Boolean {
+        return message.tags.map { it.lowercase() }.contains(READ_TAG)
+    }
+
     override fun isDeleted(): Boolean {
         return message.tags.map { it.lowercase() }.contains(DELETED_TAG)
     }
@@ -93,11 +101,11 @@ internal class MessageItemModel(
         return message.tags.map { it.lowercase() }.contains(PINNED_TAG)
     }
 
-    override fun shouldNavigate(): Boolean {
+    override fun hasRichContent(): Boolean {
         return message.defaultAction is BasicRichContentDisplayActionModel
     }
 
-    override suspend fun handleDefaultAction(){
+    override suspend fun handleDefaultAction() {
         message.defaultAction?.let { defaultAction ->
             actionFactory.create(defaultAction).invoke()
         }

@@ -8,10 +8,12 @@ interface MessageItemViewModelApi : CustomMessageItemViewModelApi {
     val isExcludedLocally: Boolean
     val richContentUrl: Url?
     val isDeleted: Boolean
-    fun shouldNavigate(): Boolean
+    val isRead: Boolean
+    fun hasRichContent(): Boolean
     suspend fun fetchImage(): ByteArray
     suspend fun handleDefaultAction()
     suspend fun tagMessageOpened(): Result<Unit>
+    suspend fun tagMessageRead(): Result<Unit>
     suspend fun deleteMessage(): Result<Unit>
     fun copyAsExcludedLocally(): MessageItemViewModelApi
 }

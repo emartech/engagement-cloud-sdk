@@ -135,10 +135,10 @@ class MessageItemViewModelTests {
     }
 
     @Test
-    fun hasDefaultAction_shouldReturn_ModelShouldNavigateToDetailView() {
-        every { mockMessageItemModel.shouldNavigate() } returns true
+    fun hasRichContent_shouldReturn_ModelHasRichContentToDetailView() {
+        every { mockMessageItemModel.hasRichContent() } returns true
 
-        viewModel.shouldNavigate() shouldBe true
+        viewModel.hasRichContent() shouldBe true
     }
 
     @Test

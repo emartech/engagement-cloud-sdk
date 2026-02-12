@@ -194,7 +194,7 @@ class ListPageViewModelTests {
             val mockMessageViewModel = mock<MessageItemViewModelApi>(MockMode.autofill)
             every { mockMessageViewModel.id } returns TEST_MESSAGE_ID
             every { mockMessageViewModel.isNotOpened } returns true
-            every { mockMessageViewModel.shouldNavigate() } returns false
+            every { mockMessageViewModel.hasRichContent() } returns false
             everySuspend { mockMessageViewModel.tagMessageOpened() } returns Result.success(Unit)
 
             viewModel.selectedMessage.value shouldBe null
@@ -220,7 +220,7 @@ class ListPageViewModelTests {
             val mockMessageViewModel = mock<MessageItemViewModelApi>(MockMode.autofill)
             every { mockMessageViewModel.id } returns TEST_MESSAGE_ID
             every { mockMessageViewModel.isNotOpened } returns true
-            every { mockMessageViewModel.shouldNavigate() } returns true
+            every { mockMessageViewModel.hasRichContent() } returns true
             everySuspend { mockMessageViewModel.tagMessageOpened() } returns Result.success(Unit)
 
             var navigationCalled = false
@@ -343,7 +343,7 @@ class ListPageViewModelTests {
     fun testClearSelection_shouldSetSelectedMessageAndCacheToNull() = runTest {
         val mockMessageViewModel = mock<MessageItemViewModelApi>(MockMode.autofill)
         every { mockMessageViewModel.id } returns TEST_MESSAGE_ID
-        every { mockMessageViewModel.shouldNavigate() } returns false
+        every { mockMessageViewModel.hasRichContent() } returns false
 
         viewModel.selectMessage(mockMessageViewModel) {}
         testDispatcher.scheduler.advanceUntilIdle()
