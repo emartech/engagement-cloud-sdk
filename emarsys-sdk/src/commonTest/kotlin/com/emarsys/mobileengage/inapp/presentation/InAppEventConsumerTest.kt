@@ -1,11 +1,9 @@
-package com.emarsys.mobileengage.inapp
+package com.emarsys.mobileengage.inapp.presentation
 
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.log.Logger
 import com.emarsys.event.SdkEvent
-import com.emarsys.mobileengage.inapp.presentation.InAppEventConsumer
-import com.emarsys.mobileengage.inapp.presentation.InAppPresentationMode.Overlay
-import com.emarsys.mobileengage.inapp.presentation.InAppPresenterApi
+import com.emarsys.mobileengage.inapp.InAppMessage
 import com.emarsys.mobileengage.inapp.view.InAppViewApi
 import com.emarsys.mobileengage.inapp.view.InAppViewProviderApi
 import com.emarsys.mobileengage.inapp.webview.WebViewHolder
@@ -47,7 +45,7 @@ class InAppEventConsumerTest {
         Dispatchers.setMain(StandardTestDispatcher())
         sdkEventFlow = MutableSharedFlow<SdkEvent>(
             replay = 100,
-            extraBufferCapacity = Channel.UNLIMITED
+            extraBufferCapacity = Channel.Factory.UNLIMITED
         )
         mockSdkEventManager = mock(MockMode.autofill)
         everySuspend { mockSdkEventManager.sdkEventFlow } returns sdkEventFlow
@@ -77,7 +75,12 @@ class InAppEventConsumerTest {
         inAppEventHandler.register()
 
         verifySuspend { mockSdkEventManager.sdkEventFlow }
-        verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
+        verifySuspend(VerifyMode.Companion.exactly(0)) {
+            mockSdkLogger.error(
+                any(),
+                any<Throwable>()
+            )
+        }
     }
 
     @Test
@@ -107,7 +110,13 @@ class InAppEventConsumerTest {
         sdkEvents.await() shouldBe listOf(event)
         verifySuspend { mockInAppViewProvider.provide() }
         verifySuspend { mockInAppView.load(inAppMessage) }
-        verifySuspend { mockInAppPresenter.present(mockInAppView, mockWebViewHolder,Overlay) }
+        verifySuspend {
+            mockInAppPresenter.present(
+                mockInAppView,
+                mockWebViewHolder,
+                InAppPresentationMode.Overlay
+            )
+        }
     }
 
 }

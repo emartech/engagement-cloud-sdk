@@ -1,4 +1,4 @@
-package com.emarsys.mobileengage.inapp
+package com.emarsys.mobileengage.inapp.networking.download
 
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
@@ -6,7 +6,6 @@ import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
-import com.emarsys.mobileengage.inapp.networking.download.InlineInAppMessageFetcher
 import com.emarsys.mobileengage.inapp.presentation.InAppType
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -66,9 +65,9 @@ class InlineInAppMessageFetcherTests {
         """.trimIndent()
 
         val response = Response(
-            originalRequest = UrlRequest(testUrl, HttpMethod.Post),
-            status = HttpStatusCode.OK,
-            headers = Headers.Empty,
+            originalRequest = UrlRequest(testUrl, HttpMethod.Companion.Post),
+            status = HttpStatusCode.Companion.OK,
+            headers = Headers.Companion.Empty,
             bodyAsText = responseJson
         )
 
@@ -102,9 +101,9 @@ class InlineInAppMessageFetcherTests {
         """.trimIndent()
 
         val response = Response(
-            originalRequest = UrlRequest(testUrl, HttpMethod.Post),
-            status = HttpStatusCode.OK,
-            headers = Headers.Empty,
+            originalRequest = UrlRequest(testUrl, HttpMethod.Companion.Post),
+            status = HttpStatusCode.Companion.OK,
+            headers = Headers.Companion.Empty,
             bodyAsText = responseJson
         )
 
@@ -131,9 +130,9 @@ class InlineInAppMessageFetcherTests {
         """.trimIndent()
 
         val response = Response(
-            originalRequest = UrlRequest(testUrl, HttpMethod.Post),
-            status = HttpStatusCode.OK,
-            headers = Headers.Empty,
+            originalRequest = UrlRequest(testUrl, HttpMethod.Companion.Post),
+            status = HttpStatusCode.Companion.OK,
+            headers = Headers.Companion.Empty,
             bodyAsText = responseJson
         )
 
@@ -160,9 +159,9 @@ class InlineInAppMessageFetcherTests {
         """.trimIndent()
 
         val response = Response(
-            originalRequest = UrlRequest(testUrl, HttpMethod.Post),
-            status = HttpStatusCode.OK,
-            headers = Headers.Empty,
+            originalRequest = UrlRequest(testUrl, HttpMethod.Companion.Post),
+            status = HttpStatusCode.Companion.OK,
+            headers = Headers.Companion.Empty,
             bodyAsText = responseJson
         )
 
@@ -190,9 +189,9 @@ class InlineInAppMessageFetcherTests {
     @Test
     fun fetch_shouldReturnNull_whenResponseDecodingFails() = runTest {
         val response = Response(
-            originalRequest = UrlRequest(testUrl, HttpMethod.Post),
-            status = HttpStatusCode.OK,
-            headers = Headers.Empty,
+            originalRequest = UrlRequest(testUrl, HttpMethod.Companion.Post),
+            status = HttpStatusCode.Companion.OK,
+            headers = Headers.Companion.Empty,
             bodyAsText = "invalid json"
         )
 
@@ -213,9 +212,9 @@ class InlineInAppMessageFetcherTests {
         val htmlContent = "<div>Inline Content</div>"
 
         val response = Response(
-            originalRequest = UrlRequest(contentUrl, HttpMethod.Get),
-            status = HttpStatusCode.OK,
-            headers = Headers.Empty,
+            originalRequest = UrlRequest(contentUrl, HttpMethod.Companion.Get),
+            status = HttpStatusCode.Companion.OK,
+            headers = Headers.Companion.Empty,
             bodyAsText = htmlContent
         )
 
@@ -253,9 +252,9 @@ class InlineInAppMessageFetcherTests {
         val contentUrl = Url("https://sap.com/inline-content")
 
         val response = Response(
-            originalRequest = UrlRequest(contentUrl, HttpMethod.Get),
-            status = HttpStatusCode.OK,
-            headers = Headers.Empty,
+            originalRequest = UrlRequest(contentUrl, HttpMethod.Companion.Get),
+            status = HttpStatusCode.Companion.OK,
+            headers = Headers.Companion.Empty,
             bodyAsText = ""
         )
 
