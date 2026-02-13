@@ -7,7 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
-import com.emarsys.mobileengage.inapp.InlineInAppView
+import com.emarsys.mobileengage.inapp.view.InlineInAppView
 
 @Composable
 fun MessageDetailView(

@@ -4,6 +4,8 @@ import com.emarsys.core.providers.InstantProvider
 import com.emarsys.mobileengage.inapp.iframe.ContentReplacerApi
 import com.emarsys.mobileengage.inapp.iframe.IframeFactoryApi
 import com.emarsys.mobileengage.inapp.iframe.MessageChannelProviderApi
+import com.emarsys.mobileengage.inapp.view.InAppViewApi
+import com.emarsys.mobileengage.inapp.view.InAppViewProviderApi
 
 internal class WebInAppViewProvider(
     private val timestampProvider: InstantProvider,

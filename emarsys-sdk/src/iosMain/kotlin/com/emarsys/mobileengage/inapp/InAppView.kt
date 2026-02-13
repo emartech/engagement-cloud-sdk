@@ -2,6 +2,9 @@ package com.emarsys.mobileengage.inapp
 
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.mobileengage.inapp.providers.IosWebViewFactoryApi
+import com.emarsys.mobileengage.inapp.reporting.InAppLoadingMetric
+import com.emarsys.mobileengage.inapp.view.InAppViewApi
+import com.emarsys.mobileengage.inapp.webview.WebViewHolder
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import kotlin.time.ExperimentalTime

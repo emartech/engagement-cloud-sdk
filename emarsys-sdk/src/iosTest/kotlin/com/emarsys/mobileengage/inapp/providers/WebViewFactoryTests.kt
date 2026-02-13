@@ -2,7 +2,7 @@ package com.emarsys.mobileengage.inapp.providers
 
 import com.emarsys.core.factory.Factory
 import com.emarsys.mobileengage.inapp.InAppJsBridge
-import com.emarsys.mobileengage.inapp.InAppJsBridgeData
+import com.emarsys.mobileengage.inapp.jsbridge.InAppJsBridgeData
 import com.emarsys.util.JsonUtil
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend

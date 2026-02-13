@@ -18,7 +18,7 @@ import com.emarsys.mobileengage.action.models.PresentableAppEventActionModel
 import com.emarsys.mobileengage.action.models.PresentableCustomEventActionModel
 import com.emarsys.mobileengage.action.models.PresentableDismissActionModel
 import com.emarsys.mobileengage.action.models.PresentableOpenExternalUrlActionModel
-import com.emarsys.mobileengage.inapp.InAppDownloader
+import com.emarsys.mobileengage.inapp.networking.download.InAppDownloader
 import com.emarsys.mobileengage.push.model.AndroidPlatformData
 import com.emarsys.mobileengage.push.model.AndroidPushMessage
 import com.emarsys.mobileengage.push.model.NotificationMethod

@@ -71,13 +71,13 @@ import com.emarsys.mobileengage.clipboard.AndroidClipboardHandler
 import com.emarsys.mobileengage.inapp.AndroidInlineInAppViewRenderer
 import com.emarsys.mobileengage.inapp.InAppJsBridgeFactory
 import com.emarsys.mobileengage.inapp.InAppPresenter
-import com.emarsys.mobileengage.inapp.InAppPresenterApi
-import com.emarsys.mobileengage.inapp.InAppViewProviderApi
-import com.emarsys.mobileengage.inapp.InlineInAppViewRendererApi
+import com.emarsys.mobileengage.inapp.presentation.InAppPresenterApi
+import com.emarsys.mobileengage.inapp.presentation.InlineInAppViewRendererApi
 import com.emarsys.mobileengage.inapp.provider.InAppDialogProvider
 import com.emarsys.mobileengage.inapp.provider.InAppDialogProviderApi
 import com.emarsys.mobileengage.inapp.provider.InAppViewProvider
 import com.emarsys.mobileengage.inapp.provider.WebViewProvider
+import com.emarsys.mobileengage.inapp.view.InAppViewProviderApi
 import com.emarsys.mobileengage.permission.AndroidPermissionHandler
 import com.emarsys.mobileengage.push.AndroidPushMessageFactory
 import com.emarsys.mobileengage.push.NotificationCompatStyler

@@ -1,4 +1,4 @@
-package com.emarsys.mobileengage.inapp
+package com.emarsys.mobileengage.inapp.view
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -11,6 +11,10 @@ import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.di.SdkKoinIsolationContext
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.event.SdkEvent
+import com.emarsys.mobileengage.inapp.InAppMessage
+import com.emarsys.mobileengage.inapp.networking.download.InlineInAppMessageFetcherApi
+import com.emarsys.mobileengage.inapp.presentation.InlineInAppViewRendererApi
+import com.emarsys.mobileengage.inapp.webview.WebViewHolder
 import io.ktor.http.Url
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch

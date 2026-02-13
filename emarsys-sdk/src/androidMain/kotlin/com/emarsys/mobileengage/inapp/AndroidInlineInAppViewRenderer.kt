@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
+import com.emarsys.mobileengage.inapp.presentation.InlineInAppViewRendererApi
+import com.emarsys.mobileengage.inapp.webview.WebViewHolder
 
 internal class AndroidInlineInAppViewRenderer: InlineInAppViewRendererApi {
     

@@ -4,10 +4,10 @@ import android.content.Context
 import com.emarsys.core.factory.Factory
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.mobileengage.inapp.InAppJsBridge
-import com.emarsys.mobileengage.inapp.InAppJsBridgeData
-import com.emarsys.mobileengage.inapp.InAppViewApi
-import com.emarsys.mobileengage.inapp.InAppViewProviderApi
+import com.emarsys.mobileengage.inapp.jsbridge.InAppJsBridgeData
 import com.emarsys.mobileengage.inapp.view.InAppView
+import com.emarsys.mobileengage.inapp.view.InAppViewApi
+import com.emarsys.mobileengage.inapp.view.InAppViewProviderApi
 import kotlinx.coroutines.CoroutineDispatcher
 
 internal class InAppViewProvider(

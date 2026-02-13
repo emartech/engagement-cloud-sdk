@@ -12,7 +12,7 @@ import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.action.models.BasicAppEventActionModel
 import com.emarsys.mobileengage.action.models.BasicCustomEventActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
-import com.emarsys.mobileengage.inapp.InAppDownloader
+import com.emarsys.mobileengage.inapp.networking.download.InAppDownloader
 import com.emarsys.mobileengage.push.NotificationOperation.INIT
 import com.emarsys.mobileengage.push.model.AndroidPlatformData
 import com.emarsys.mobileengage.push.model.NotificationMethod

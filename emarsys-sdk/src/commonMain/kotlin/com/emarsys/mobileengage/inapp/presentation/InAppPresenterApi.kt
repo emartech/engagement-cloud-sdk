@@ -1,4 +1,8 @@
-package com.emarsys.mobileengage.inapp
+package com.emarsys.mobileengage.inapp.presentation
+
+import com.emarsys.mobileengage.inapp.reporting.InAppLoadingMetric
+import com.emarsys.mobileengage.inapp.view.InAppViewApi
+import com.emarsys.mobileengage.inapp.webview.WebViewHolder
 
 interface InAppPresenterApi {
     suspend fun trackMetric(

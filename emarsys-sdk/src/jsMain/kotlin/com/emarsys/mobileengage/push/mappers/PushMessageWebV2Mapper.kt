@@ -4,7 +4,7 @@ import com.emarsys.core.log.ConsoleLogger
 import com.emarsys.core.log.LogLevel
 import com.emarsys.core.mapper.Mapper
 import com.emarsys.mobileengage.action.models.PresentableActionModel
-import com.emarsys.mobileengage.inapp.PushToInAppPayload
+import com.emarsys.mobileengage.inapp.networking.models.PushToInAppPayload
 import com.emarsys.mobileengage.push.ActionableData
 import com.emarsys.mobileengage.push.DisplayableData
 import com.emarsys.mobileengage.push.model.JsPlatformData

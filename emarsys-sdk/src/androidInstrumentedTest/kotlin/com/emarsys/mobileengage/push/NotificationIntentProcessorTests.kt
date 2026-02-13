@@ -23,7 +23,7 @@ import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.action.models.PresentableAppEventActionModel
 import com.emarsys.mobileengage.action.models.PresentableDismissActionModel
-import com.emarsys.mobileengage.inapp.PushToInAppPayload
+import com.emarsys.mobileengage.inapp.networking.models.PushToInAppPayload
 import com.emarsys.util.JsonUtil
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery

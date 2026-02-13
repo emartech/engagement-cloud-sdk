@@ -3,6 +3,8 @@ package com.emarsys.mobileengage.inapp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
+import com.emarsys.mobileengage.inapp.presentation.InlineInAppViewRendererApi
+import com.emarsys.mobileengage.inapp.webview.WebViewHolder
 import kotlinx.browser.document
 import org.w3c.dom.HTMLElement
 

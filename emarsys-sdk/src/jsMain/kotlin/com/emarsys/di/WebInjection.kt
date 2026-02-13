@@ -69,9 +69,6 @@ import com.emarsys.enable.PlatformInitializerApi
 import com.emarsys.enable.config.JsEmarsysConfigStore
 import com.emarsys.enable.config.SdkConfigStoreApi
 import com.emarsys.init.states.LegacySDKMigrationState
-import com.emarsys.mobileengage.inapp.InAppPresenterApi
-import com.emarsys.mobileengage.inapp.InAppViewProviderApi
-import com.emarsys.mobileengage.inapp.InlineInAppViewRendererApi
 import com.emarsys.mobileengage.inapp.WebInAppPresenter
 import com.emarsys.mobileengage.inapp.WebInAppViewProvider
 import com.emarsys.mobileengage.inapp.WebInlineInAppViewRenderer
@@ -83,6 +80,9 @@ import com.emarsys.mobileengage.inapp.iframe.IframeFactory
 import com.emarsys.mobileengage.inapp.iframe.IframeFactoryApi
 import com.emarsys.mobileengage.inapp.iframe.MessageChannelProvider
 import com.emarsys.mobileengage.inapp.iframe.MessageChannelProviderApi
+import com.emarsys.mobileengage.inapp.presentation.InAppPresenterApi
+import com.emarsys.mobileengage.inapp.presentation.InlineInAppViewRendererApi
+import com.emarsys.mobileengage.inapp.view.InAppViewProviderApi
 import com.emarsys.mobileengage.push.PushNotificationClickHandler
 import com.emarsys.mobileengage.push.PushNotificationClickHandlerApi
 import com.emarsys.mobileengage.push.PushService

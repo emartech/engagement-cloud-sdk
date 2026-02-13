@@ -18,7 +18,7 @@ import com.emarsys.init.states.RegisterWatchdogsState
 import com.emarsys.init.states.RestoreOperationalEventsState
 import com.emarsys.init.states.SdkConfigLoaderState
 import com.emarsys.init.states.SessionSubscriptionState
-import com.emarsys.mobileengage.inapp.InAppEventConsumer
+import com.emarsys.mobileengage.inapp.presentation.InAppEventConsumer
 import com.emarsys.watchdog.connection.ConnectionWatchDog
 import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
 import org.koin.core.parameter.parametersOf

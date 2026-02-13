@@ -1,6 +1,7 @@
 package com.emarsys.mobileengage.inapp
 
 import com.emarsys.mobileengage.action.EventActionFactoryApi
+import com.emarsys.mobileengage.inapp.jsbridge.InAppJsBridgeData
 import com.emarsys.util.JsonUtil
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk

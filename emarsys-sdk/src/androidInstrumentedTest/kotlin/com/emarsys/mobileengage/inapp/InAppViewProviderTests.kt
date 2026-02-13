@@ -4,6 +4,7 @@ import androidx.test.core.app.ActivityScenario
 import com.emarsys.FakeActivity
 import com.emarsys.core.factory.Factory
 import com.emarsys.core.providers.TimestampProvider
+import com.emarsys.mobileengage.inapp.jsbridge.InAppJsBridgeData
 import com.emarsys.mobileengage.inapp.provider.InAppViewProvider
 import com.emarsys.mobileengage.inapp.provider.WebViewProvider
 import com.emarsys.mobileengage.inapp.view.InAppView

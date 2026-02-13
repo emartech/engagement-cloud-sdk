@@ -1,6 +1,7 @@
-package com.emarsys.mobileengage.inapp
+package com.emarsys.mobileengage.inapp.view
 
 import androidx.compose.runtime.Composable
+import com.emarsys.mobileengage.inapp.InAppMessage
 
 @Composable
 expect fun InlineInAppView(message: InAppMessage)

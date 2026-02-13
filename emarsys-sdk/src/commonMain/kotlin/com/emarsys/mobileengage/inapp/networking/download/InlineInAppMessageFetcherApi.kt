@@ -1,5 +1,6 @@
-package com.emarsys.mobileengage.inapp
+package com.emarsys.mobileengage.inapp.networking.download
 
+import com.emarsys.mobileengage.inapp.InAppMessage
 import io.ktor.http.Url
 
 interface InlineInAppMessageFetcherApi {

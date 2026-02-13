@@ -1,7 +1,7 @@
 package com.emarsys.mobileengage.action.models
 
 import com.emarsys.core.providers.UUIDProvider
-import com.emarsys.mobileengage.inapp.PushToInAppPayload
+import com.emarsys.mobileengage.inapp.networking.models.PushToInAppPayload
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

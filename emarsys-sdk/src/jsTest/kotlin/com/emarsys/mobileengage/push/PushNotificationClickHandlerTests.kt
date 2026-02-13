@@ -11,7 +11,7 @@ import com.emarsys.mobileengage.action.models.BasicPushToInAppActionModel
 import com.emarsys.mobileengage.action.models.NotificationOpenedActionModel
 import com.emarsys.mobileengage.action.models.PresentableActionModel
 import com.emarsys.mobileengage.action.models.PresentableOpenExternalUrlActionModel
-import com.emarsys.mobileengage.inapp.PushToInAppPayload
+import com.emarsys.mobileengage.inapp.networking.models.PushToInAppPayload
 import com.emarsys.mobileengage.push.model.JsNotificationClickedData
 import com.emarsys.mobileengage.push.model.JsPlatformData
 import com.emarsys.mobileengage.push.model.JsPushMessage

@@ -2,6 +2,7 @@ package com.emarsys.mobileengage.inapp
 
 import com.emarsys.core.factory.Factory
 import com.emarsys.mobileengage.action.EventActionFactoryApi
+import com.emarsys.mobileengage.inapp.jsbridge.InAppJsBridgeData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.Json
 

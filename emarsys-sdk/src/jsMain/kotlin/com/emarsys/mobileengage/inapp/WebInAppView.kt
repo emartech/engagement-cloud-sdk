@@ -4,6 +4,9 @@ import com.emarsys.core.providers.InstantProvider
 import com.emarsys.mobileengage.inapp.iframe.ContentReplacerApi
 import com.emarsys.mobileengage.inapp.iframe.IframeFactoryApi
 import com.emarsys.mobileengage.inapp.iframe.MessageChannelProviderApi
+import com.emarsys.mobileengage.inapp.reporting.InAppLoadingMetric
+import com.emarsys.mobileengage.inapp.view.InAppViewApi
+import com.emarsys.mobileengage.inapp.webview.WebViewHolder
 import web.blob.Blob
 import web.blob.BlobPropertyBag
 import web.dom.ElementId

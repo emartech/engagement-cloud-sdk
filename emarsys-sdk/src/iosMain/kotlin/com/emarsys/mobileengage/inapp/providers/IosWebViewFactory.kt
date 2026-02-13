@@ -2,7 +2,7 @@ package com.emarsys.mobileengage.inapp.providers
 
 import com.emarsys.core.factory.Factory
 import com.emarsys.mobileengage.inapp.InAppJsBridge
-import com.emarsys.mobileengage.inapp.InAppJsBridgeData
+import com.emarsys.mobileengage.inapp.jsbridge.InAppJsBridgeData
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.readValue
 import kotlinx.coroutines.CoroutineDispatcher

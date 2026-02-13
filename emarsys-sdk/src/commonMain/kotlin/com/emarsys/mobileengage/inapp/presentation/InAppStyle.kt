@@ -1,4 +1,4 @@
-package com.emarsys.mobileengage.inapp
+package com.emarsys.mobileengage.inapp.presentation
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

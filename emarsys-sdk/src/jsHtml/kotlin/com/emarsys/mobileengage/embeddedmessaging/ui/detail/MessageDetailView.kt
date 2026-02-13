@@ -11,7 +11,7 @@ import androidx.compose.runtime.setValue
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingStyleSheet
 import com.emarsys.mobileengage.embeddedmessaging.ui.toReadTagId
-import com.emarsys.mobileengage.inapp.InlineInAppView
+import com.emarsys.mobileengage.inapp.view.InlineInAppView
 import io.ktor.http.Url
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineScope

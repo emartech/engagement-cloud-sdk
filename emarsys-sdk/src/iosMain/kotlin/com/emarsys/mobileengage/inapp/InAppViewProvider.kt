@@ -2,6 +2,8 @@ package com.emarsys.mobileengage.inapp
 
 import com.emarsys.core.providers.InstantProvider
 import com.emarsys.mobileengage.inapp.providers.IosWebViewFactoryApi
+import com.emarsys.mobileengage.inapp.view.InAppViewApi
+import com.emarsys.mobileengage.inapp.view.InAppViewProviderApi
 import kotlinx.coroutines.CoroutineDispatcher
 
 internal class InAppViewProvider(

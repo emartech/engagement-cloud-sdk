@@ -2,7 +2,7 @@ package com.emarsys.networking.clients.event.model
 
 import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.inapp.InAppMessage
-import com.emarsys.mobileengage.inapp.InAppType
+import com.emarsys.mobileengage.inapp.presentation.InAppType
 import kotlinx.serialization.Serializable
 
 @Serializable

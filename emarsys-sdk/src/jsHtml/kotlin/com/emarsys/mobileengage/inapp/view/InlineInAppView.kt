@@ -1,4 +1,4 @@
-package com.emarsys.mobileengage.inapp
+package com.emarsys.mobileengage.inapp.view
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -10,6 +10,9 @@ import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.di.NetworkClientTypes
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.event.SdkEvent
+import com.emarsys.mobileengage.inapp.InAppMessage
+import com.emarsys.mobileengage.inapp.networking.download.InlineInAppMessageFetcherApi
+import com.emarsys.mobileengage.inapp.presentation.InAppType
 import io.ktor.http.HttpMethod
 import io.ktor.http.Url
 import kotlinx.coroutines.flow.first

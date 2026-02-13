@@ -5,7 +5,7 @@ import com.emarsys.core.log.Logger
 import com.emarsys.mobileengage.action.ActionFactoryApi
 import com.emarsys.mobileengage.action.models.ActionModel
 import com.emarsys.mobileengage.inapp.InAppJsBridge
-import com.emarsys.mobileengage.inapp.InAppJsBridgeData
+import com.emarsys.mobileengage.inapp.jsbridge.InAppJsBridgeData
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.serialization.json.Json
 

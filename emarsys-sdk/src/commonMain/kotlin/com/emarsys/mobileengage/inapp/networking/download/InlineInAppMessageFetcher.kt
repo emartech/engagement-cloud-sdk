@@ -1,10 +1,14 @@
-package com.emarsys.mobileengage.inapp
+package com.emarsys.mobileengage.inapp.networking.download
 
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
+import com.emarsys.mobileengage.inapp.InAppMessage
+import com.emarsys.mobileengage.inapp.networking.models.InlineMessageRequest
+import com.emarsys.mobileengage.inapp.networking.models.InlineMessageResponse
+import com.emarsys.mobileengage.inapp.presentation.InAppType
 import io.ktor.http.HttpMethod
 import io.ktor.http.Url
 import kotlinx.serialization.json.Json

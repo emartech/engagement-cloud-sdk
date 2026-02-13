@@ -3,7 +3,12 @@ package com.emarsys.mobileengage.inapp
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.log.Logger
 import com.emarsys.event.SdkEvent
-import com.emarsys.mobileengage.inapp.InAppPresentationMode.Overlay
+import com.emarsys.mobileengage.inapp.presentation.InAppEventConsumer
+import com.emarsys.mobileengage.inapp.presentation.InAppPresentationMode.Overlay
+import com.emarsys.mobileengage.inapp.presentation.InAppPresenterApi
+import com.emarsys.mobileengage.inapp.view.InAppViewApi
+import com.emarsys.mobileengage.inapp.view.InAppViewProviderApi
+import com.emarsys.mobileengage.inapp.webview.WebViewHolder
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend

@@ -1,6 +1,7 @@
 package com.emarsys.mobileengage.inapp
 
 import com.emarsys.core.providers.UUIDProvider
+import com.emarsys.mobileengage.inapp.presentation.InAppType
 import kotlinx.serialization.Serializable
 
 @Serializable

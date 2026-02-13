@@ -12,11 +12,11 @@ import com.emarsys.api.inapp.InAppInstance
 import com.emarsys.api.inapp.InAppInternal
 import com.emarsys.api.inapp.LoggingInApp
 import com.emarsys.core.collections.PersistentList
-import com.emarsys.mobileengage.inapp.InAppDownloader
-import com.emarsys.mobileengage.inapp.InAppDownloaderApi
-import com.emarsys.mobileengage.inapp.InAppEventConsumer
-import com.emarsys.mobileengage.inapp.InlineInAppMessageFetcher
-import com.emarsys.mobileengage.inapp.InlineInAppMessageFetcherApi
+import com.emarsys.mobileengage.inapp.networking.download.InAppDownloader
+import com.emarsys.mobileengage.inapp.networking.download.InAppDownloaderApi
+import com.emarsys.mobileengage.inapp.networking.download.InlineInAppMessageFetcher
+import com.emarsys.mobileengage.inapp.networking.download.InlineInAppMessageFetcherApi
+import com.emarsys.mobileengage.inapp.presentation.InAppEventConsumer
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module

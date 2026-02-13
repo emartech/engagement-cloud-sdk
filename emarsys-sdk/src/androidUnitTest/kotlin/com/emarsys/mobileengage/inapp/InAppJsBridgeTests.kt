@@ -8,6 +8,7 @@ import com.emarsys.mobileengage.action.models.BasicDismissActionModel
 import com.emarsys.mobileengage.action.models.BasicInAppButtonClickedActionModel
 import com.emarsys.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.emarsys.mobileengage.action.models.RequestPushPermissionActionModel
+import com.emarsys.mobileengage.inapp.jsbridge.InAppJsBridgeData
 import com.emarsys.util.JsonUtil
 import io.mockk.coVerify
 import io.mockk.mockk

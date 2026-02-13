@@ -6,6 +6,8 @@ import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.url.EmarsysUrlType
 import com.emarsys.core.url.UrlFactoryApi
+import com.emarsys.mobileengage.inapp.networking.download.InlineInAppMessageFetcher
+import com.emarsys.mobileengage.inapp.presentation.InAppType
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every

@@ -1,10 +1,10 @@
-package com.emarsys.mobileengage.inapp
+package com.emarsys.mobileengage.inapp.presentation
 
 import com.emarsys.core.Registerable
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.log.Logger
 import com.emarsys.event.SdkEvent
-import com.emarsys.mobileengage.inapp.InAppPresentationMode.Overlay
+import com.emarsys.mobileengage.inapp.view.InAppViewProviderApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.filter
@@ -30,14 +30,14 @@ internal class InAppEventConsumer(
             .collect {
                 val presentEvent = it as SdkEvent.Internal.InApp.Present
                 val messageType = presentEvent.inAppMessage.type
-                
+
                 if (messageType == InAppType.INLINE || messageType.name == "INLINE") {
                     return@collect
                 }
-                
+
                 val view = inAppViewProvider.provide()
                 val webViewHolder = view.load(presentEvent.inAppMessage)
-                inAppPresenter.present(view, webViewHolder, Overlay)
+                inAppPresenter.present(view, webViewHolder, InAppPresentationMode.Overlay)
             }
     }
 }

@@ -3,9 +3,9 @@ package com.emarsys.mobileengage.pushtoinapp
 import com.emarsys.core.channel.SdkEventManagerApi
 import com.emarsys.core.log.Logger
 import com.emarsys.event.SdkEvent
-import com.emarsys.mobileengage.inapp.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.InAppMessage
-import com.emarsys.mobileengage.inapp.InAppType
+import com.emarsys.mobileengage.inapp.networking.download.InAppDownloaderApi
+import com.emarsys.mobileengage.inapp.presentation.InAppType
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend

@@ -1,9 +1,10 @@
-package com.emarsys.mobileengage.inapp
+package com.emarsys.mobileengage.inapp.networking.download
 
 import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.UrlRequest
 import com.emarsys.core.networking.model.body
+import com.emarsys.mobileengage.inapp.InAppMessage
 import com.emarsys.networking.clients.event.model.ContentCampaign
 import com.emarsys.networking.clients.event.model.asInAppMessage
 import io.ktor.http.HttpMethod

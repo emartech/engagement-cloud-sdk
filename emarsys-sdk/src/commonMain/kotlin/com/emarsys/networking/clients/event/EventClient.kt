@@ -22,7 +22,7 @@ import com.emarsys.event.ack
 import com.emarsys.mobileengage.action.EventActionFactoryApi
 import com.emarsys.mobileengage.action.models.BasicActionModel
 import com.emarsys.mobileengage.inapp.InAppMessage
-import com.emarsys.mobileengage.inapp.InAppType
+import com.emarsys.mobileengage.inapp.presentation.InAppType
 import com.emarsys.networking.clients.EventBasedClientApi
 import com.emarsys.networking.clients.error.ClientExceptionHandler
 import com.emarsys.networking.clients.event.model.ContentCampaign

@@ -5,11 +5,12 @@ import com.emarsys.core.log.Logger
 import com.emarsys.core.networking.clients.NetworkClientApi
 import com.emarsys.core.networking.model.Response
 import com.emarsys.core.networking.model.UrlRequest
+import com.emarsys.mobileengage.inapp.networking.download.InAppDownloader
+import com.emarsys.mobileengage.inapp.presentation.InAppType
 import com.emarsys.networking.clients.event.model.ContentCampaign
 import com.emarsys.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
-import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
