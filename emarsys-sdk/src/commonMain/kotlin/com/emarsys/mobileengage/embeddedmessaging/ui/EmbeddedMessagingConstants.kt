@@ -1,6 +1,9 @@
 package com.emarsys.mobileengage.embeddedmessaging.ui
 
 internal object EmbeddedMessagingConstants {
+    internal object Prefixes {
+        const val READ_TAG_ID_PREFIX = "read-"
+    }
 
     internal object Image {
         const val BASE64_PLACEHOLDER_IMAGE =
@@ -47,4 +50,8 @@ internal object EmbeddedMessagingConstants {
         const val FAILED_TO_LOAD_MORE_MESSAGES_TEXT = "Failed to load more messages."
         const val FAILED_TO_DELETE_MESSAGE_TEXT = "Failed to delete message."
     }
+}
+
+internal fun String.toReadTagId(): String {
+    return "${EmbeddedMessagingConstants.Prefixes.READ_TAG_ID_PREFIX}$this"
 }
