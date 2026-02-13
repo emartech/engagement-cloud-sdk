@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import com.emarsys.mobileengage.embeddedmessaging.ui.list.CompactListView
 import com.emarsys.mobileengage.embeddedmessaging.ui.list.ListPageView
+import com.emarsys.mobileengage.inapp.view.InlineInAppView
 import org.jetbrains.compose.web.renderComposable
 import web.events.CustomEvent
 import web.events.CustomEventInit
@@ -68,7 +69,7 @@ abstract class ComposeCustomElement(
 
 @OptIn(ExperimentalJsExport::class)
 @JsExport
-class EmarsysMessagingListElement : ComposeCustomElement({ _ ->
+class ECMessagingListElement : ComposeCustomElement({ _ ->
     { attributes ->
         val customMessageItemName = attributes["custom-message-item-element-name"]
         val showFilters = attributes["hide-filters"] == null
@@ -78,11 +79,21 @@ class EmarsysMessagingListElement : ComposeCustomElement({ _ ->
 
 @OptIn(ExperimentalJsExport::class)
 @JsExport
-class EmarsysMessagingCompactListElement : ComposeCustomElement({ self ->
+class ECMessagingCompactListElement : ComposeCustomElement({ self ->
     { attributes ->
         val customMessageItemName = attributes["custom-message-item-element-name"]
         CompactListView(customMessageItemName, navigateToDetailedView = {
             self.dispatchCustomEvent("navigate")
         })
+    }
+})
+
+@OptIn(ExperimentalJsExport::class)
+@JsExport
+class ECInlineInAppView : ComposeCustomElement({ self ->
+    { attributes ->
+        attributes["view-id"]?.let {
+            InlineInAppView(it)
+        } ?: console.error("ViewId is missing!")
     }
 })

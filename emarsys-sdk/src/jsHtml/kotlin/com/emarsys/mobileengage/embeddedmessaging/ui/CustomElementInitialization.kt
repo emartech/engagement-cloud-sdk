@@ -6,15 +6,22 @@ actual fun initializeCustomElements() {
     window.customElements.define(
         "ec-embedded-messaging-list",
         createBridge(
-            factory = { EmarsysMessagingListElement() },
+            factory = { ECMessagingListElement() },
             observedAttributes = arrayOf("custom-message-item-element-name", "hide-filters")
         )
     )
     window.customElements.define(
         "ec-embedded-messaging-compact-list",
         createBridge(
-            factory = { EmarsysMessagingCompactListElement() },
+            factory = { ECMessagingCompactListElement() },
             observedAttributes = arrayOf("custom-message-item-element-name")
+        )
+    )
+    window.customElements.define(
+        "ec-inline-inapp-view",
+        createBridge(
+            factory = { ECInlineInAppView() },
+            observedAttributes = arrayOf("view-id")
         )
     )
 }
