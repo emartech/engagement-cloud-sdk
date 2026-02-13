@@ -10,20 +10,17 @@ import com.emarsys.api.inapp.JSInAppApi
 import com.emarsys.api.push.JSPushApi
 import com.emarsys.api.setup.JsSetupApi
 import com.emarsys.api.tracking.JSTrackingApi
-import com.emarsys.core.log.Logger
 import com.emarsys.di.CoroutineScopeTypes
 import com.emarsys.di.EventFlowTypes
 import com.emarsys.di.SdkKoinIsolationContext
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.event.SdkEvent
-import com.emarsys.init.InitOrganizerApi
 import com.emarsys.mobileengage.embeddedmessaging.ui.initializeCustomElements
 import com.emarsys.util.JsonUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 
 fun main() {
@@ -39,8 +36,11 @@ object EmarsysJs {
     init {
         SdkKoinIsolationContext.init()
     }
-    private val applicationScope: CoroutineScope = koin.get<CoroutineScope>(named(CoroutineScopeTypes.Application))
-    private val sdkPublicEvents = koin.get<Flow<SdkEvent.External.Api>>(named(EventFlowTypes.Public))
+
+    private val applicationScope: CoroutineScope =
+        koin.get<CoroutineScope>(named(CoroutineScopeTypes.Application))
+    private val sdkPublicEvents =
+        koin.get<Flow<SdkEvent.External.Api>>(named(EventFlowTypes.Public))
     val events = koin.get<EventEmitterApi>()
     val setup = koin.get<JsSetupApi>()
     val config = koin.get<JSConfigApi>()
@@ -52,17 +52,6 @@ object EmarsysJs {
     val embeddedMessaging = koin.get<JsEmbeddedMessagingApi>()
 
     internal fun init() {
-        SdkKoinIsolationContext.init()
-
-        val logger = koin.get<Logger>(parameters = { parametersOf(EmarsysJs::class.simpleName) })
-        applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
-            try {
-                koin.get<InitOrganizerApi>().init()
-            } catch (error: Throwable) {
-                logger.error(error.stackTraceToString())
-            }
-        }
-        
         initializeCustomElements()
     }
 
