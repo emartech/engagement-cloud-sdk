@@ -13,9 +13,10 @@ import com.emarsys.mobileengage.inapp.InlineInAppView
 fun MessageDetailView(
     messageViewModel: MessageItemViewModelApi,
     onBack: () -> Unit,
+    modifier: Modifier
 ) {
     EmbeddedMessagingTheme {
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = modifier.fillMaxSize()) {
             val url = remember {
                 messageViewModel.richContentUrl
             }

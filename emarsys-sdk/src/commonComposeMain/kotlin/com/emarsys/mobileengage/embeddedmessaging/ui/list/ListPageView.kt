@@ -47,6 +47,7 @@ import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.mobileengage.embeddedmessaging.ui.category.CategoriesDialogView
 import com.emarsys.mobileengage.embeddedmessaging.ui.detail.MessageDetailView
 import com.emarsys.mobileengage.embeddedmessaging.ui.item.CustomMessageItemViewModelApi
+import com.emarsys.mobileengage.embeddedmessaging.ui.item.onScreenTime
 import com.emarsys.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 import com.emarsys.mobileengage.embeddedmessaging.ui.translation.LocalStringResources
 import kotlinx.coroutines.launch
@@ -217,12 +218,20 @@ private fun MessageList(
                             }
                         ) {
                             selectedMessageViewModel?.let { messageViewModel ->
-                                if (messageViewModel.shouldNavigate()) {
+                                if (messageViewModel.hasRichContent()) {
                                     MessageDetailView(
                                         messageViewModel = messageViewModel,
                                         onBack = {
                                             scope.launch {
                                                 navigator.navigateTo(ListDetailPaneScaffoldRole.List)
+                                            }
+                                        },
+                                        modifier = Modifier.onScreenTime(
+                                            3000L,
+                                            0.5f
+                                        ) {
+                                            scope.launch {
+                                                viewModel.tagMessageRead(messageViewModel)
                                             }
                                         }
                                     )
