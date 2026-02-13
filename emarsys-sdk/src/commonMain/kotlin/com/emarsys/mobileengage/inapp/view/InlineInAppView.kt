@@ -4,4 +4,4 @@ import androidx.compose.runtime.Composable
 import com.emarsys.mobileengage.inapp.InAppMessage
 
 @Composable
-expect fun InlineInAppView(message: InAppMessage)
+internal expect fun InlineInAppView(message: InAppMessage)

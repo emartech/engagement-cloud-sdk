@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
 @Composable
-actual fun InlineInAppView(message: InAppMessage) {
+internal actual fun InlineInAppView(message: InAppMessage) {
     val sdkContext: SdkContextApi? = koin.getOrNull()
     if (!SdkKoinIsolationContext.isInitialized() || sdkContext?.config?.applicationCode == null) {
         return

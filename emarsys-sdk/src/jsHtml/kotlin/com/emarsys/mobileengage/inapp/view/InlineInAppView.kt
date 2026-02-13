@@ -26,7 +26,7 @@ import org.w3c.dom.Node
 import web.html.HTMLElement
 
 @Composable
-actual fun InlineInAppView(message: InAppMessage) {
+internal actual fun InlineInAppView(message: InAppMessage) {
     val webViewElement = remember { mutableStateOf<HTMLElement?>(null) }
 
     LaunchedEffect(message) {
