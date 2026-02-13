@@ -12,6 +12,8 @@ import com.emarsys.api.inapp.InAppInstance
 import com.emarsys.api.inapp.InAppInternal
 import com.emarsys.api.inapp.LoggingInApp
 import com.emarsys.core.collections.PersistentList
+import com.emarsys.mobileengage.inapp.jsbridge.ContentReplacer
+import com.emarsys.mobileengage.inapp.jsbridge.ContentReplacerApi
 import com.emarsys.mobileengage.inapp.networking.download.InAppDownloader
 import com.emarsys.mobileengage.inapp.networking.download.InAppDownloaderApi
 import com.emarsys.mobileengage.inapp.networking.download.InlineInAppMessageFetcher
@@ -23,6 +25,12 @@ import org.koin.dsl.module
 
 object InAppInjection {
     val inAppModules = module {
+        single<ContentReplacerApi> {
+            ContentReplacer(
+                sdkContext = get(),
+                sdkVersionProvider = get()
+            )
+        }
         single<InAppDownloaderApi> {
             InAppDownloader(
                 emarsysClient = get(named(NetworkClientTypes.Emarsys)),

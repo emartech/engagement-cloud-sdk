@@ -9,6 +9,7 @@ import com.emarsys.core.providers.InstantProvider
 import com.emarsys.mobileengage.inapp.AndroidWebViewHolder
 import com.emarsys.mobileengage.inapp.InAppJsBridge
 import com.emarsys.mobileengage.inapp.InAppMessage
+import com.emarsys.mobileengage.inapp.jsbridge.ContentReplacerApi
 import com.emarsys.mobileengage.inapp.jsbridge.InAppJsBridgeData
 import com.emarsys.mobileengage.inapp.provider.WebViewProvider
 import com.emarsys.mobileengage.inapp.reporting.InAppLoadingMetric
@@ -27,6 +28,7 @@ internal class InAppView @JvmOverloads constructor(
     private val timestampProvider: InstantProvider,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
+    private val contentReplacer: ContentReplacerApi
 ) : LinearLayout(context, attrs, defStyleAttr), InAppViewApi {
 
     companion object {
@@ -49,10 +51,11 @@ internal class InAppView @JvmOverloads constructor(
     override suspend fun load(message: InAppMessage): WebViewHolder {
         loadingStarted = timestampProvider.provide().toEpochMilliseconds()
         mInAppMessage = message
+        val replacedContent = contentReplacer.replace(message.content)
 
         return withContext(mainDispatcher) {
             val webView = webViewProvider.provide()
-            webView.loadDataWithBaseURL(null, message.content, "text/html", "UTF-8", null)
+            webView.loadDataWithBaseURL(null, replacedContent, "text/html", "UTF-8", null)
 
             addView(webView)
             webView.addJavascriptInterface(

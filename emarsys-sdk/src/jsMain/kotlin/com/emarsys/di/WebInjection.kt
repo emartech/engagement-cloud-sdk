@@ -72,8 +72,6 @@ import com.emarsys.init.states.LegacySDKMigrationState
 import com.emarsys.mobileengage.inapp.WebInAppPresenter
 import com.emarsys.mobileengage.inapp.WebInAppViewProvider
 import com.emarsys.mobileengage.inapp.WebInlineInAppViewRenderer
-import com.emarsys.mobileengage.inapp.iframe.ContentReplacer
-import com.emarsys.mobileengage.inapp.iframe.ContentReplacerApi
 import com.emarsys.mobileengage.inapp.iframe.IframeContainerResizer
 import com.emarsys.mobileengage.inapp.iframe.IframeContainerResizerApi
 import com.emarsys.mobileengage.inapp.iframe.IframeFactory
@@ -243,12 +241,6 @@ object WebInjection {
             )
         }
         single<IframeFactoryApi> { IframeFactory() }
-        single<ContentReplacerApi> {
-            ContentReplacer(
-                sdkContext = get(),
-                sdkVersionProvider = get()
-            )
-        }
         single<ClipboardHandlerApi> { WebClipboardHandler(window.navigator.clipboard) }
         single<LaunchApplicationHandlerApi> { JsLaunchApplicationHandler() }
         single<InlineInAppViewRendererApi> { WebInlineInAppViewRenderer() }

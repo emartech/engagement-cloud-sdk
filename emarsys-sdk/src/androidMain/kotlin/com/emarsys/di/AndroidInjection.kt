@@ -306,7 +306,8 @@ object AndroidInjection {
                 inAppJsBridgeFactory,
                 mainDispatcher = get(named(DispatcherTypes.Main)),
                 WebViewProvider(applicationContext, get(named(DispatcherTypes.Main))),
-                timestampProvider = get()
+                timestampProvider = get(),
+                contentReplacer = get(),
             )
         }
         single<InAppDialogProviderApi> { InAppDialogProvider() }

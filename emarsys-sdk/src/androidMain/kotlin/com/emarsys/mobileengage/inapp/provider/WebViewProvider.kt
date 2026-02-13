@@ -8,7 +8,7 @@ import android.widget.LinearLayout.LayoutParams.MATCH_PARENT
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
-class WebViewProvider(
+internal class WebViewProvider(
     private val context: Context,
     private val mainDispatcher: CoroutineDispatcher
 ) {

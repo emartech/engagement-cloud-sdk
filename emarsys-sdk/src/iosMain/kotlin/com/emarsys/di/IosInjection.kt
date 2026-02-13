@@ -191,6 +191,7 @@ object IosInjection {
                 mainDispatcher = get(named(DispatcherTypes.Main)),
                 webViewProvider = iosWebViewFactory,
                 timestampProvider = get(),
+                contentReplacer = get()
             )
         }
         single<InAppPresenterApi> {

@@ -1,4 +1,4 @@
-package com.emarsys.mobileengage.inapp.iframe
+package com.emarsys.mobileengage.inapp.jsbridge
 
 import com.emarsys.context.DefaultUrlsApi
 import com.emarsys.context.SdkContextApi
@@ -22,7 +22,7 @@ class ContentReplacerTests {
 <head>
   <meta sdkVersion="$SDK_VERSION_PLACEHOLDER">
   $JS_BRIDGE_PLACEHOLDER</head></html>"""
-        const val TEST_JS_HOST_URL = "https://example.com"
+        const val TEST_JS_BRIDGE_HOST_URL = "https://example.com"
     }
 
     private lateinit var contentReplacer: ContentReplacerApi
@@ -33,7 +33,7 @@ class ContentReplacerTests {
     @BeforeTest
     fun setup() {
         mockDefaultUrls = mock(MockMode.autofill)
-        every { mockDefaultUrls.ecJsBridgeUrl } returns TEST_JS_HOST_URL
+        every { mockDefaultUrls.ecJsBridgeUrl } returns TEST_JS_BRIDGE_HOST_URL
         mockSdkContext = mock(MockMode.autofill)
         every { mockSdkContext.defaultUrls } returns mockDefaultUrls
         mockSdkVersionProvider = mock(MockMode.autofill)
@@ -47,7 +47,7 @@ class ContentReplacerTests {
 
         val result = contentReplacer.replace(TEST_INAPP_CONTENT)
 
-        result.contains(TEST_JS_HOST_URL) shouldBe true
+        result.contains(TEST_JS_BRIDGE_HOST_URL) shouldBe true
         result.contains(JS_BRIDGE_PLACEHOLDER) shouldBe false
     }
 

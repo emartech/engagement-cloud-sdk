@@ -1,4 +1,4 @@
-package com.emarsys.mobileengage.inapp.iframe
+package com.emarsys.mobileengage.inapp.jsbridge
 
 import com.emarsys.context.SdkContextApi
 import com.emarsys.core.providers.sdkversion.SdkVersionProviderApi

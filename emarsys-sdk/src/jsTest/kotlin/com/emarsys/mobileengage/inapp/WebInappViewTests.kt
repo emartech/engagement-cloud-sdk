@@ -1,10 +1,10 @@
 package com.emarsys.mobileengage.inapp
 
 import com.emarsys.core.providers.InstantProvider
-import com.emarsys.mobileengage.inapp.iframe.ContentReplacerApi
 import com.emarsys.mobileengage.inapp.iframe.IframeFactory
 import com.emarsys.mobileengage.inapp.iframe.IframeFactoryApi
 import com.emarsys.mobileengage.inapp.iframe.MessageChannelProviderApi
+import com.emarsys.mobileengage.inapp.jsbridge.ContentReplacerApi
 import com.emarsys.mobileengage.inapp.presentation.InAppType
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns

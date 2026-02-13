@@ -1,8 +1,8 @@
-package com.emarsys.mobileengage.inapp
+package com.emarsys.mobileengage.inapp.providers
 
-import com.emarsys.core.factory.SuspendFactory
 import com.emarsys.core.providers.TimestampProvider
-import com.emarsys.mobileengage.inapp.providers.IosWebViewFactoryApi
+import com.emarsys.mobileengage.inapp.InAppViewProvider
+import com.emarsys.mobileengage.inapp.jsbridge.ContentReplacerApi
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
@@ -19,6 +19,7 @@ import kotlin.test.Test
 class InAppViewProviderTest {
 
     private val mockWebViewFactory: IosWebViewFactoryApi = mock()
+    private val mockContentReplacer: ContentReplacerApi = mock()
     private val mainDispatcher = Dispatchers.Unconfined
 
     @Test
@@ -27,7 +28,12 @@ class InAppViewProviderTest {
         everySuspend { mockWebViewFactory.create(any(), any()) } returns webView
 
         val inAppViewProvider =
-            InAppViewProvider(mainDispatcher, mockWebViewFactory, TimestampProvider())
+            InAppViewProvider(
+                mainDispatcher,
+                mockWebViewFactory,
+                TimestampProvider(),
+                mockContentReplacer
+            )
         val result = inAppViewProvider.provide()
 
         result shouldNotBe null

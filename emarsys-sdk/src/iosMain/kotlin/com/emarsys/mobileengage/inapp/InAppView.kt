@@ -1,6 +1,7 @@
 package com.emarsys.mobileengage.inapp
 
 import com.emarsys.core.providers.InstantProvider
+import com.emarsys.mobileengage.inapp.jsbridge.ContentReplacerApi
 import com.emarsys.mobileengage.inapp.providers.IosWebViewFactoryApi
 import com.emarsys.mobileengage.inapp.reporting.InAppLoadingMetric
 import com.emarsys.mobileengage.inapp.view.InAppViewApi
@@ -13,8 +14,9 @@ import kotlin.time.ExperimentalTime
 internal class InAppView(
     private val mainDispatcher: CoroutineDispatcher,
     private val webViewFactory: IosWebViewFactoryApi,
-    private val timestampProvider: InstantProvider
-    ) : InAppViewApi {
+    private val timestampProvider: InstantProvider,
+    private val contentReplacer: ContentReplacerApi
+) : InAppViewApi {
     private lateinit var mInAppMessage: InAppMessage
     private var loadingStarted: Long? = null
     override val inAppMessage: InAppMessage
@@ -31,10 +33,12 @@ internal class InAppView(
         loadingStarted = timestampProvider.provide().toEpochMilliseconds()
 
         mInAppMessage = message
-        return IosWebViewHolder(withContext(mainDispatcher) {
-            val webView = webViewFactory.create(message.dismissId, message.trackingInfo)
-            webView.loadHTMLString(message.content, null)
-            webView
-        }, inAppLoadingMetric())
+        val replacedContent = contentReplacer.replace(message.content)
+        val webView = withContext(mainDispatcher) {
+            webViewFactory.create(message.dismissId, message.trackingInfo).apply {
+                loadHTMLString(replacedContent, null)
+            }
+        }
+        return IosWebViewHolder(webView, inAppLoadingMetric())
     }
 }

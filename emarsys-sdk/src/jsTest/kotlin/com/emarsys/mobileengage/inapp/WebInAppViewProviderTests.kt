@@ -2,9 +2,9 @@ package com.emarsys.mobileengage.inapp
 
 import com.emarsys.core.providers.TimestampProvider
 import com.emarsys.mobileengage.action.EventActionFactoryApi
-import com.emarsys.mobileengage.inapp.iframe.ContentReplacerApi
 import com.emarsys.mobileengage.inapp.iframe.IframeFactoryApi
 import com.emarsys.mobileengage.inapp.iframe.MessageChannelProviderApi
+import com.emarsys.mobileengage.inapp.jsbridge.ContentReplacerApi
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest

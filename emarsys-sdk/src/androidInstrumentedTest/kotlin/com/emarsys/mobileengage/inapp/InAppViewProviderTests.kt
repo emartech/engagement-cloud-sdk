@@ -4,6 +4,7 @@ import androidx.test.core.app.ActivityScenario
 import com.emarsys.FakeActivity
 import com.emarsys.core.factory.Factory
 import com.emarsys.core.providers.TimestampProvider
+import com.emarsys.mobileengage.inapp.jsbridge.ContentReplacerApi
 import com.emarsys.mobileengage.inapp.jsbridge.InAppJsBridgeData
 import com.emarsys.mobileengage.inapp.provider.InAppViewProvider
 import com.emarsys.mobileengage.inapp.provider.WebViewProvider
@@ -19,11 +20,13 @@ import kotlin.test.Test
 class InAppViewProviderTests {
     private lateinit var activityScenario: ActivityScenario<FakeActivity>
     private lateinit var provider: InAppViewProvider
+    private lateinit var mockContentReplacer: ContentReplacerApi
 
     @Before
     fun setup() {
         val mockInAppJsBridgeProvider: Factory<InAppJsBridgeData, InAppJsBridge> =
             mockk(relaxed = true)
+        mockContentReplacer = mockk()
         activityScenario =
             ActivityScenario.launch(FakeActivity::class.java)
         activityScenario.onActivity {
@@ -33,7 +36,8 @@ class InAppViewProviderTests {
                     mockInAppJsBridgeProvider,
                     Dispatchers.Main,
                     WebViewProvider(it.applicationContext, Dispatchers.Main),
-                    TimestampProvider()
+                    TimestampProvider(),
+                    contentReplacer = mockContentReplacer
                 )
         }
     }
