@@ -73,7 +73,7 @@ fun MessageDetailView(
                     height(500.px)
                 }
             }) {
-                InlineInAppView(Url("https://www.example.com"))
+                InlineInAppView(Url("https://www.example.com"), viewModel.trackingInfo)
             }
             imageDataUrl?.let { url ->
                 Img(src = url, alt = viewModel.imageAltText ?: "") {
@@ -87,7 +87,7 @@ fun MessageDetailView(
                         height(500.px)
                     }
                 }) {
-                    InlineInAppView(Url("https://www.example.com"))
+                    InlineInAppView(Url("https://www.example.com"), viewModel.trackingInfo)
                 }
             }
         }

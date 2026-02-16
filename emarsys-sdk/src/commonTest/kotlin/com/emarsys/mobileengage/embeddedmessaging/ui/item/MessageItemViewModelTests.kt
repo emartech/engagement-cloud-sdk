@@ -15,6 +15,9 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class MessageItemViewModelTests {
+    private companion object {
+        const val TRACKING_INFO = """{"trackingKey":"trackingValue"}"""
+    }
 
     private lateinit var mockMessageItemModel: MessageItemModelApi
 
@@ -98,6 +101,14 @@ class MessageItemViewModelTests {
         val result = viewModel.receivedAt
 
         result shouldBe 1234567890L
+    }
+
+    @Test
+    fun trackingInfo_shouldReturn_ModelTrackingInfo() {
+        val testMessage = createTestMessage(TRACKING_INFO)
+        every { mockMessageItemModel.message } returns testMessage
+
+        viewModel.trackingInfo shouldBe TRACKING_INFO
     }
 
     @Test
@@ -205,7 +216,8 @@ class MessageItemViewModelTests {
         lead: String = "testLead",
         imageUrl: String? = null,
         imageAltText: String? = null,
-        receivedAt: Long = 100000L
+        receivedAt: Long = 100000L,
+        trackingInfo: String = TRACKING_INFO
     ): EmbeddedMessage {
         return EmbeddedMessage(
             id = id,
@@ -221,7 +233,7 @@ class MessageItemViewModelTests {
             receivedAt = receivedAt,
             expiresAt = 110000L,
             properties = emptyMap(),
-            trackingInfo = "anything"
+            trackingInfo = trackingInfo
         )
     }
 }

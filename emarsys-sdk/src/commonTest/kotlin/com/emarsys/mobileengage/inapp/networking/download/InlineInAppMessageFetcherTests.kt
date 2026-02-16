@@ -32,6 +32,7 @@ class InlineInAppMessageFetcherTests {
     private lateinit var fetcher: InlineInAppMessageFetcher
 
     private val testViewId = "testViewId"
+    private val testTrackingInfo = "testTrackingInfo"
     private val testUrl = Url("https://sap.com/inline-messages")
 
     @BeforeTest
@@ -220,10 +221,10 @@ class InlineInAppMessageFetcherTests {
 
         everySuspend { mockNetworkClient.send(any()) } returns Result.success(response)
 
-        val result = fetcher.fetch(contentUrl)
+        val result = fetcher.fetch(contentUrl, testTrackingInfo)
 
         result!!.type shouldBe InAppType.INLINE
-        result.trackingInfo shouldBe "inlineInAppTrackingInfo"
+        result.trackingInfo shouldBe testTrackingInfo
         result.content shouldBe htmlContent
 
         verifySuspend {
@@ -238,7 +239,7 @@ class InlineInAppMessageFetcherTests {
 
         everySuspend { mockNetworkClient.send(any()) } returns Result.failure(testException)
 
-        val result = fetcher.fetch(contentUrl)
+        val result = fetcher.fetch(contentUrl, testTrackingInfo)
 
         result shouldBe null
 
@@ -260,7 +261,7 @@ class InlineInAppMessageFetcherTests {
 
         everySuspend { mockNetworkClient.send(any()) } returns Result.success(response)
 
-        val result = fetcher.fetch(contentUrl)
+        val result = fetcher.fetch(contentUrl, testTrackingInfo)
 
         result shouldBe null
     }

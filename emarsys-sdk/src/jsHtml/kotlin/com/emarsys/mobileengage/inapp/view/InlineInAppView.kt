@@ -5,15 +5,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.emarsys.core.channel.SdkEventDistributorApi
-import com.emarsys.core.networking.clients.NetworkClientApi
-import com.emarsys.core.networking.model.UrlRequest
-import com.emarsys.di.NetworkClientTypes
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.event.SdkEvent
 import com.emarsys.mobileengage.inapp.InAppMessage
 import com.emarsys.mobileengage.inapp.networking.download.InlineInAppMessageFetcherApi
-import com.emarsys.mobileengage.inapp.presentation.InAppType
-import io.ktor.http.HttpMethod
 import io.ktor.http.Url
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -21,7 +16,6 @@ import org.jetbrains.compose.web.css.height
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.width
 import org.jetbrains.compose.web.dom.Div
-import org.koin.core.qualifier.named
 import org.w3c.dom.Node
 import web.html.HTMLElement
 
@@ -63,20 +57,13 @@ internal actual fun InlineInAppView(message: InAppMessage) {
 }
 
 @Composable
-internal fun InlineInAppView(url: Url) {
-    val emarsysClient: NetworkClientApi = koin.get(named(NetworkClientTypes.Emarsys))
+internal fun InlineInAppView(url: Url, trackingInfo: String) {
+    val fetcher: InlineInAppMessageFetcherApi = koin.get()
     val message = remember { mutableStateOf<InAppMessage?>(null) }
 
     LaunchedEffect(url) {
-        val response = emarsysClient.send(UrlRequest(url, HttpMethod.Get))
 
-        response.getOrNull()?.let {
-            message.value = InAppMessage(
-                type = InAppType.INLINE,
-                trackingInfo = "inlineInAppTrackingInfo",
-                content = it.bodyAsText
-            )
-        }
+        message.value = fetcher.fetch(url, trackingInfo)
     }
 
     message.value?.let {
@@ -87,7 +74,6 @@ internal fun InlineInAppView(url: Url) {
 @Composable
 fun InlineInAppView(viewId: String) {
     val message = remember { mutableStateOf<InAppMessage?>(null) }
-
 
     LaunchedEffect(viewId) {
         val fetcher: InlineInAppMessageFetcherApi = koin.get()

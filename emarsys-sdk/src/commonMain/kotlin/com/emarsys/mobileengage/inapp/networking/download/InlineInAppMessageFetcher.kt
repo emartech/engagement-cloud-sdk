@@ -55,7 +55,7 @@ internal class InlineInAppMessageFetcher(
         }
     }
 
-    override suspend fun fetch(url: Url): InAppMessage? {
+    override suspend fun fetch(url: Url, trackingInfo: String): InAppMessage? {
         val request = UrlRequest(url, HttpMethod.Get)
         return try {
             networkClient.send(request).getOrElse {
@@ -69,7 +69,7 @@ internal class InlineInAppMessageFetcher(
                     sdkLogger.debug("Successfully fetched inline message from url: $url")
                     InAppMessage(
                         type = InAppType.INLINE,
-                        trackingInfo = "inlineInAppTrackingInfo",
+                        trackingInfo = trackingInfo,
                         content = content
                     )
                 }

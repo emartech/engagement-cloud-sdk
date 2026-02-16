@@ -54,7 +54,7 @@ internal actual fun InlineInAppView(message: InAppMessage) {
 }
 
 @Composable
-internal fun InlineInAppView(url: Url) {
+internal fun InlineInAppView(url: Url, trackingInfo: String) {
     val sdkContext: SdkContextApi? = koin.getOrNull()
     if (!SdkKoinIsolationContext.isInitialized() || sdkContext?.config?.applicationCode == null) {
         return
@@ -64,7 +64,7 @@ internal fun InlineInAppView(url: Url) {
     val message = rememberSaveable(url, stateSaver = InAppMessageSaver) { mutableStateOf(null) }
 
     LaunchedEffect(url) {
-        message.value = fetcher.fetch(url)
+        message.value = fetcher.fetch(url, trackingInfo)
     }
 
     message.value?.let {

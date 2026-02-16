@@ -9,6 +9,7 @@ interface MessageItemViewModelApi : CustomMessageItemViewModelApi {
     val richContentUrl: Url?
     val isDeleted: Boolean
     val isRead: Boolean
+    val trackingInfo: String
     fun hasRichContent(): Boolean
     suspend fun fetchImage(): ByteArray
     suspend fun handleDefaultAction()

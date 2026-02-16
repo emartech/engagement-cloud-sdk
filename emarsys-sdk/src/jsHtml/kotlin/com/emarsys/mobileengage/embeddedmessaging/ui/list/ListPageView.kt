@@ -129,13 +129,15 @@ fun MessageList(
             }
 
             Div({ classes(EmbeddedMessagingStyleSheet.detailPane) }) {
-                selectedMessage?.let {
-                    MessageDetailView(viewModel = it)
-                } ?: EmptyDetailState()
+                if (selectedMessage?.hasRichContent() ?: false) {
+                    MessageDetailView(viewModel = selectedMessage!!)
+                } else {
+                    EmptyDetailState()
+                }
             }
         }
     } else {
-        if (selectedMessage != null) {
+        if (selectedMessage?.hasRichContent() ?: false) {
             MessageDetailView(viewModel = viewModel.selectedMessage.value!!)
         } else {
             FilterRow(

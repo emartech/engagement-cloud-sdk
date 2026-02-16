@@ -7,5 +7,6 @@ class RichContentDisplayAction(
 ): Action<Unit> {
 
     override suspend fun invoke(value: Unit?) {
+        //TODO report detail view opening
     }
 }

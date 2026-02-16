@@ -30,6 +30,9 @@ class MessageItemViewModel(
     override val receivedAt: Long
         get() = model.message.receivedAt
 
+    override val trackingInfo: String
+        get() = model.message.trackingInfo
+
     override val isNotOpened: Boolean
         get() = model.isNotOpened()
 
