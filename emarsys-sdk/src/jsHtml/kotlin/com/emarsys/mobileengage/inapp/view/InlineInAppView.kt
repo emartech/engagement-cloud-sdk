@@ -7,6 +7,7 @@ import androidx.compose.runtime.remember
 import com.emarsys.core.channel.SdkEventDistributorApi
 import com.emarsys.di.SdkKoinIsolationContext.koin
 import com.emarsys.event.SdkEvent
+import com.emarsys.mobileengage.embeddedmessaging.ui.toDismissId
 import com.emarsys.mobileengage.inapp.InAppMessage
 import com.emarsys.mobileengage.inapp.networking.download.InlineInAppMessageFetcherApi
 import io.ktor.http.Url
@@ -17,10 +18,12 @@ import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.width
 import org.jetbrains.compose.web.dom.Div
 import org.w3c.dom.Node
+import web.dom.ElementId
+import web.dom.document
 import web.html.HTMLElement
 
 @Composable
-internal actual fun InlineInAppView(message: InAppMessage) {
+internal actual fun InlineInAppView(message: InAppMessage, onDismiss: () -> Unit) {
     val webViewElement = remember { mutableStateOf<HTMLElement?>(null) }
 
     LaunchedEffect(message) {
@@ -38,12 +41,13 @@ internal actual fun InlineInAppView(message: InAppMessage) {
                 sdkEvent is SdkEvent.Internal.Sdk.Dismiss && sdkEvent.id == message.dismissId
             }
             webViewElement.value = null
+            onDismiss()
         }
     }
 
     webViewElement.value?.let { webView ->
         Div(attrs = {
-            id(message.dismissId)
+            id(message.dismissId.toDismissId())
             style {
                 width(100.percent)
                 height(100.percent)
@@ -67,7 +71,12 @@ internal fun InlineInAppView(url: Url, trackingInfo: String) {
     }
 
     message.value?.let {
-        InlineInAppView(it)
+        InlineInAppView(
+            message = it,
+            onDismiss = {
+                removeInlineInApp(it)
+            }
+        )
     }
 }
 
@@ -81,7 +90,11 @@ fun InlineInAppView(viewId: String) {
     }
 
     message.value?.let {
-        InlineInAppView(it)
+        InlineInAppView(it) {}
     }
+}
+
+private fun removeInlineInApp(message: InAppMessage) {
+    document.getElementById(ElementId(message.dismissId.toDismissId()))?.remove()
 }
 

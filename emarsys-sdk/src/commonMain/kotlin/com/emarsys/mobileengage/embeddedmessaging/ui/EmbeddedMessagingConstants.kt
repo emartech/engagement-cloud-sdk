@@ -3,6 +3,7 @@ package com.emarsys.mobileengage.embeddedmessaging.ui
 internal object EmbeddedMessagingConstants {
     internal object Prefixes {
         const val READ_TAG_ID_PREFIX = "read-"
+        const val DISMISS_ID_PREFIX = "ec-dismiss-"
     }
 
     internal object Image {
@@ -54,4 +55,8 @@ internal object EmbeddedMessagingConstants {
 
 internal fun String.toReadTagId(): String {
     return "${EmbeddedMessagingConstants.Prefixes.READ_TAG_ID_PREFIX}$this"
+}
+
+internal fun String.toDismissId(): String {
+    return "${EmbeddedMessagingConstants.Prefixes.DISMISS_ID_PREFIX}$this"
 }

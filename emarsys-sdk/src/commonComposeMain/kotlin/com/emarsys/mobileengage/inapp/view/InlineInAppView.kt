@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
 @Composable
-internal actual fun InlineInAppView(message: InAppMessage) {
+internal actual fun InlineInAppView(message: InAppMessage, onDismiss: () -> Unit) {
     val sdkContext: SdkContextApi? = koin.getOrNull()
     if (!SdkKoinIsolationContext.isInitialized() || sdkContext?.config?.applicationCode == null) {
         return
@@ -43,6 +43,7 @@ internal actual fun InlineInAppView(message: InAppMessage) {
                 sdkEvent is SdkEvent.Internal.Sdk.Dismiss && sdkEvent.id == message.dismissId
             }
             isVisible.value = false
+            onDismiss()
         }
     }
 
@@ -54,13 +55,13 @@ internal actual fun InlineInAppView(message: InAppMessage) {
 }
 
 @Composable
-internal fun InlineInAppView(url: Url, trackingInfo: String) {
+internal fun InlineInAppView(url: Url, trackingInfo: String, onDismiss: () -> Unit) {
     val sdkContext: SdkContextApi? = koin.getOrNull()
     if (!SdkKoinIsolationContext.isInitialized() || sdkContext?.config?.applicationCode == null) {
         return
     }
     val fetcher: InlineInAppMessageFetcherApi = koin.get()
-    
+
     val message = rememberSaveable(url, stateSaver = InAppMessageSaver) { mutableStateOf(null) }
 
     LaunchedEffect(url) {
@@ -68,7 +69,7 @@ internal fun InlineInAppView(url: Url, trackingInfo: String) {
     }
 
     message.value?.let {
-        InlineInAppView(it)
+        InlineInAppView(it, onDismiss)
     }
 }
 
@@ -80,7 +81,7 @@ fun InlineInAppView(viewId: String) {
     }
 
     val fetcher: InlineInAppMessageFetcherApi = koin.get()
-    
+
     val message = rememberSaveable(viewId, stateSaver = InAppMessageSaver) { mutableStateOf(null) }
 
     LaunchedEffect(viewId) {
@@ -88,7 +89,7 @@ fun InlineInAppView(viewId: String) {
     }
 
     message.value?.let {
-        InlineInAppView(it)
+        InlineInAppView(it) {}
     }
 }
 

@@ -22,7 +22,7 @@ fun MessageDetailView(
             }
 
             if (url != null) {
-                InlineInAppView(url = url, messageViewModel.trackingInfo)
+                InlineInAppView(url = url, messageViewModel.trackingInfo, onBack)
             } else {
                 //TODO: error handling
             }
