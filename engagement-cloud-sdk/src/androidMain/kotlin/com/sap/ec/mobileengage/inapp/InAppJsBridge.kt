@@ -1,0 +1,93 @@
+package com.sap.ec.mobileengage.inapp
+
+import android.webkit.JavascriptInterface
+import com.sap.ec.mobileengage.action.EventActionFactoryApi
+import com.sap.ec.mobileengage.action.models.BasicAppEventActionModel
+import com.sap.ec.mobileengage.action.models.BasicCopyToClipboardActionModel
+import com.sap.ec.mobileengage.action.models.BasicCustomEventActionModel
+import com.sap.ec.mobileengage.action.models.BasicDismissActionModel
+import com.sap.ec.mobileengage.action.models.BasicInAppButtonClickedActionModel
+import com.sap.ec.mobileengage.action.models.BasicOpenExternalUrlActionModel
+import com.sap.ec.mobileengage.action.models.RequestPushPermissionActionModel
+import com.sap.ec.mobileengage.inapp.jsbridge.InAppJsBridgeData
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonPrimitive
+
+internal class InAppJsBridge(
+    private val inAppJsBridgeData: InAppJsBridgeData,
+    private val actionFactory: EventActionFactoryApi,
+    private val applicationScope: CoroutineScope,
+    private val json: Json
+) {
+
+
+    @JavascriptInterface
+    fun triggerMEEvent(jsonString: String) {
+        applicationScope.launch {
+            val actionModel = json.decodeFromString<BasicCustomEventActionModel>(jsonString)
+            actionFactory.create(actionModel)()
+        }
+    }
+
+    @JavascriptInterface
+    fun buttonClicked(jsonString: String) {
+        applicationScope.launch {
+            val buttonClickJson = json.decodeFromString<JsonObject>(jsonString)
+            val reporting = buttonClickJson["reporting"]?.jsonPrimitive?.contentOrNull
+            reporting?.let {
+                val actionModel =
+                    BasicInAppButtonClickedActionModel(it, inAppJsBridgeData.trackingInfo)
+                actionFactory.create(actionModel)()
+            }
+        }
+    }
+
+    @JavascriptInterface
+    fun triggerAppEvent(jsonString: String) {
+        applicationScope.launch {
+            val actionModel = json.decodeFromString<BasicAppEventActionModel>(jsonString)
+            actionFactory.create(actionModel)()
+        }
+    }
+
+    @JavascriptInterface
+    fun requestPushPermission(jsonString: String) {
+        applicationScope.launch {
+            val actionModel =
+                json.decodeFromString<RequestPushPermissionActionModel>(jsonString)
+            actionFactory.create(actionModel)()
+        }
+    }
+
+    @JavascriptInterface
+    fun openExternalLink(jsonString: String) {
+        applicationScope.launch {
+            val actionModel =
+                json.decodeFromString<BasicOpenExternalUrlActionModel>(jsonString)
+            actionFactory.create(actionModel)()
+        }
+    }
+
+    @JavascriptInterface
+    fun close(jsonString: String) {
+        applicationScope.launch {
+            val actionModel = json.decodeFromString<BasicDismissActionModel>(jsonString)
+            actionModel.dismissId = inAppJsBridgeData.dismissId
+            actionFactory.create(actionModel)()
+        }
+    }
+
+    @JavascriptInterface
+    fun copyToClipboard(jsonString: String) {
+        applicationScope.launch {
+            val actionModel =
+                json.decodeFromString<BasicCopyToClipboardActionModel>(jsonString)
+            actionFactory.create(actionModel)()
+        }
+    }
+}
+

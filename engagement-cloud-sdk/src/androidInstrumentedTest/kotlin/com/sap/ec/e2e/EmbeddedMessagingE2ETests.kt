@@ -1,0 +1,92 @@
+package com.sap.ec.e2e
+
+import com.sap.ec.AndroidEngagementCloud
+import com.sap.ec.api.SdkState
+import com.sap.ec.api.config.AndroidEngagementCloudSDKConfig
+import com.sap.ec.context.SdkContextApi
+import com.sap.ec.context.copyWith
+import com.sap.ec.core.channel.SdkEventDistributor
+import com.sap.ec.core.channel.SdkEventDistributorApi
+import com.sap.ec.core.networking.context.RequestContextApi
+import com.sap.ec.core.networking.model.Response
+import com.sap.ec.di.SdkKoinIsolationContext
+import com.sap.ec.event.SdkEvent
+import com.sap.ec.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
+import io.kotest.matchers.shouldBe
+import io.ktor.http.HttpStatusCode
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
+import kotlin.test.BeforeTest
+import kotlin.test.Ignore
+import kotlin.test.Test
+import kotlin.time.ExperimentalTime
+
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
+class EmbeddedMessagingE2ETests {
+    private companion object {
+        const val STAGING_APP_CODE = "14C19-A121F"
+        const val STAGING_UNIVERSAL_TOKEN_EXPIRES_ON_2025_10_30 =
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjdXN0b21lcklkIjoyMTg1MjQ1MzAsImNvbnRhY3RJZCI6MjE4NTI0NTMwLCJwbGF0Zm9ybSI6ImlvcyIsImxhbmd1YWdlIjoiZW4iLCJpYXQiOjE3NjE4MjU2MDB9.be1-49C46hYIOLNjAMSPIgNu8iVtH0DRC8zCzSgiVUA"
+    }
+
+    private lateinit var sdkContext: SdkContextApi
+    private lateinit var sdkEventDistributor: SdkEventDistributorApi
+    private lateinit var embeddedMessagingContext: EmbeddedMessagingContextApi
+
+    @BeforeTest
+    fun setup() = runTest {
+        AndroidEngagementCloud.initialize()
+        val requestContext = SdkKoinIsolationContext.koin.get<RequestContextApi>()
+        requestContext.clientId = STAGING_UNIVERSAL_TOKEN_EXPIRES_ON_2025_10_30
+        requestContext.contactToken = STAGING_UNIVERSAL_TOKEN_EXPIRES_ON_2025_10_30
+        requestContext.clientState = STAGING_UNIVERSAL_TOKEN_EXPIRES_ON_2025_10_30
+        sdkContext = SdkKoinIsolationContext.koin.get<SdkContextApi>()
+        sdkContext.defaultUrls =
+            sdkContext.defaultUrls.copyWith(
+                embeddedMessagingBaseUrl = "https://embedded-messaging-staging.gservice.emarsys.com/embedded-messaging/api"
+            )
+        sdkContext.config = AndroidEngagementCloudSDKConfig(applicationCode = STAGING_APP_CODE)
+        sdkContext.setSdkState(SdkState.Active)
+        sdkEventDistributor = SdkKoinIsolationContext.koin.get<SdkEventDistributor>()
+        embeddedMessagingContext = SdkKoinIsolationContext.koin.get<EmbeddedMessagingContextApi>()
+        embeddedMessagingContext.embeddedMessagingFrequencyCapSeconds = 0
+    }
+
+    @Test
+    @Ignore
+    fun testFetchBadgeCount_shouldEmitEvent_triggerRequest_and_returnHttpOkResponse() = runTest {
+        val response: SdkEvent.Internal.Sdk.Answer.Response<Response> =
+            sdkEventDistributor.registerEvent(
+                SdkEvent.Internal.EmbeddedMessaging.FetchBadgeCount(
+                    nackCount = 0
+                )
+            ).await()
+
+        assertResponse(response)
+    }
+
+    @Test
+    @Ignore
+    fun testFetchMessages_shouldEmitEvent_triggerRequest_and_returnHttpOkResponse() = runTest {
+        val response: SdkEvent.Internal.Sdk.Answer.Response<Response> =
+            sdkEventDistributor.registerEvent(
+                SdkEvent.Internal.EmbeddedMessaging.FetchMessages(
+                    offset = 0,
+                    nackCount = 0,
+                    categoryIds = emptyList()
+                )
+            ).await()
+
+        assertResponse(response)
+    }
+}
+
+private fun assertResponse(
+    response: SdkEvent.Internal.Sdk.Answer.Response<Response>
+) {
+    response.result.isSuccess shouldBe true
+    response.result
+        .onSuccess {
+            it.status shouldBe HttpStatusCode.OK
+        }
+}

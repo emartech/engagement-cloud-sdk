@@ -1,10 +1,5 @@
-//
-//
-// Copyright © 2025 Emarsys-Technologies Kft. All rights reserved.
-//
-
 import SwiftUI
-import EmarsysSDK
+import SAPEngagementCloudSDK
 
 struct EmbeddedMessagingView: View {
     var body: some View {

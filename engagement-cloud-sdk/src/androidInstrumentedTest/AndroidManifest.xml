@@ -1,0 +1,19 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    android:versionCode="1"
+    android:versionName="0.0.0">
+
+    <application android:name=".TestApplication">
+        <activity
+            android:name="com.sap.ec.FakeActivity"
+            android:exported="true"
+            android:theme="@style/Base.Theme.AppCompat.Light" />
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false">
+            <meta-data
+                android:name="com.sap.ec.EngagementCloudSdkInitializer"
+                android:value="androidx.startup" />
+        </provider>
+    </application>
+</manifest>

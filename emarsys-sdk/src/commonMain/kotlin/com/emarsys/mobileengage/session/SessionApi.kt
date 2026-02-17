@@ -1,9 +1,0 @@
-package com.emarsys.mobileengage.session
-
-import com.emarsys.watchdog.lifecycle.LifecycleWatchDog
-
-interface SessionApi {
-    suspend fun subscribe(lifecycleWatchDog: LifecycleWatchDog)
-    suspend fun startSession()
-    suspend fun endSession()
-}

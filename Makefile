@@ -1,4 +1,4 @@
-.PHONY: build build-pipeline check-env clean create-apks help lint test test-web test-android test-android-firebase test-jvm link-ios-sdk link-ios-notification-service remove-temp-lipo temp-dirs lipo-merge-ios-sdk lipo-merge-ios-notification-service copy-lipo-ios-emarsys-sdk-output copy-lipo-notification-service-output ios-sdk-framework ios-notification-service-framework prepare-spm
+.PHONY: build build-pipeline check-env clean create-apks help lint test test-web test-android test-android-firebase test-jvm prepare-spm
 .DEFAULT_GOAL := help
 SHELL := /bin/bash
 
@@ -30,20 +30,20 @@ build: check-env ## build project with yarn actualization
 
 
 build-pipeline: check-env ## compile and build all modules for all platforms
-	@./gradlew :emarsys-sdk:build \
-			 	:emarsys-sdk:javaPreCompileRelease \
-			   	-x :emarsys-sdk:compileTestDevelopmentExecutableKotlinJs \
-			   	-x :emarsys-sdk:test \
-			   	-x :emarsys-sdk:lint \
+	@./gradlew :engagement-cloud-sdk:build \
+			 	:engagement-cloud-sdk:javaPreCompileRelease \
+			   	-x :engagement-cloud-sdk:compileTestDevelopmentExecutableKotlinJs \
+			   	-x :engagement-cloud-sdk:test \
+			   	-x :engagement-cloud-sdk:lint \
 			   	-x :composeApp:build \
 			   	-x :composeApp:jsPackageJson \
 			   	-x :composeApp:jsTestPackageJson \
 			   	-x :composeApp:jsPublicPackageJson \
 			   	-x :composeApp:jsTestPublicPackageJson \
-			   	-x :emarsys-sdk:jsTestPackageJson \
-			   	-x :emarsys-sdk:jsPublicPackageJson \
-			   	-x :emarsys-sdk:jsTestPublicPackageJson \
-			   	-x :emarsys-sdk:jsPackageJson \
+			   	-x :engagement-cloud-sdk:jsTestPackageJson \
+			   	-x :engagement-cloud-sdk:jsPublicPackageJson \
+			   	-x :engagement-cloud-sdk:jsTestPublicPackageJson \
+			   	-x :engagement-cloud-sdk:jsPackageJson \
 			   	-x :rootPackageJson \
 			   	-x :kotlinNodeJsSetup \
 			   	-x :kotlinNpmCachesSetup \
@@ -59,7 +59,7 @@ create-apks: check-env ## create apks for testing
 	@./gradlew assembleAndroidTest
 
 test: check-env test-android test-web test-sdk-loader test-jvm test-ios ## run common tests on all platforms (jvm,web,android, ios)
-	@./gradlew :emarsys-sdk:allTests -x :composeApp:test
+	@./gradlew :engagement-cloud-sdk:allTests -x :composeApp:test
 
 build-web: check-env ## run tests on web
 	@./gradlew jsBrowserProductionWebpack \
@@ -101,54 +101,8 @@ test-android-firebase: check-env ## run Android Instrumented tests on Firebase T
        --device model=b4q,version=33,locale=en,orientation=portrait \
        --client-details matrixLabel="Unified SDK"
 
-link-ios-sdk: ## links iOS frameworks for supported arch types
-	@./gradlew :emarsys-sdk:linkReleaseFrameworkIosX64 :emarsys-sdk:linkReleaseFrameworkIosArm64 :emarsys-sdk:linkReleaseFrameworkIosSimulatorArm64
-
-link-ios-notification-service: ## links iOS frameworks for supported arch types
-	@./gradlew :ios-notification-service:linkReleaseFrameworkIosX64 :ios-notification-service:linkReleaseFrameworkIosArm64 :ios-notification-service:linkReleaseFrameworkIosSimulatorArm64
-
-remove-temp-lipo: ## clean up lipo output directory
-	@rm -rf lipo
-
-temp-dirs: ## create temporary directories
-	@mkdir -p lipo buildedFrameworks
-
-lipo-merge-ios-sdk: ## merges conflicting emarsys-sdk archs for simulator
-	@lipo -create \
-        emarsys-sdk/build/bin/iosX64/releaseFramework/EmarsysSDK.framework/EmarsysSDK \
-        emarsys-sdk/build/bin/iosSimulatorArm64/releaseFramework/EmarsysSDK.framework/EmarsysSDK \
-        -output lipo/EmarsysSDK
-
-lipo-merge-ios-notification-service: ## merges conflicting notification-service archs for simulator
-	@lipo -create \
-        ios-notification-service/build/bin/iosX64/releaseFramework/EmarsysNotificationService.framework/EmarsysNotificationService \
-        ios-notification-service/build/bin/iosSimulatorArm64/releaseFramework/EmarsysNotificationService.framework/EmarsysNotificationService \
-        -output lipo/EmarsysNotificationService
-
-copy-lipo-ios-emarsys-sdk-output: ## copies the lipo output file for the sdk and replaces the existing one at the destination
-	@\cp ./lipo/EmarsysSDK emarsys-sdk/build/bin/iosSimulatorArm64/releaseFramework/EmarsysSDK.framework/EmarsysSDK
-
-copy-lipo-notification-service-output: ## copies the lipo output file for the notification-service and replaces the existing one at the destination
-	@\cp ./lipo/EmarsysNotificationService  ios-notification-service/build/bin/iosSimulatorArm64/releaseFramework/EmarsysNotificationService.framework/EmarsysNotificationService
-
-ios-sdk-framework: link-ios-sdk remove-temp-lipo temp-dirs lipo-merge-ios-sdk copy-lipo-ios-emarsys-sdk-output
-	@rm -rf buildedFrameworks/EmarsysSDK.xcframework && \
-	xcodebuild -create-xcframework \
-         -framework emarsys-sdk/build/bin/iosArm64/releaseFramework/EmarsysSDK.framework \
-          -framework emarsys-sdk/build/bin/iosSimulatorArm64/releaseFramework/EmarsysSDK.framework \
-          -output buildedFrameworks/EmarsysSDK.xcframework
-
-ios-notification-service-framework: link-ios-notification-service remove-temp-lipo temp-dirs lipo-merge-ios-notification-service copy-lipo-notification-service-output
-	@rm -rf buildedFrameworks/EmarsysNotificationService.xcframework && \
-	xcodebuild -create-xcframework \
-         -framework ios-notification-service/build/bin/iosArm64/releaseFramework/EmarsysNotificationService.framework \
-          -framework ios-notification-service/build/bin/iosSimulatorArm64/releaseFramework/EmarsysNotificationService.framework \
-          -output buildedFrameworks/EmarsysNotificationService.xcframework
-
-ios-frameworks: ios-sdk-framework ios-notification-service-framework
-
 lint: check-env ## run Android Instrumented tests
-	@./gradlew :emarsys-sdk:lint -x :composeApp:lint
+	@./gradlew :engagement-cloud-sdk:lint -x :composeApp:lint
 
 prepare-spm: check-env ## prepare swift package manager package for iOS
 	@./gradlew spmDevBuild && \

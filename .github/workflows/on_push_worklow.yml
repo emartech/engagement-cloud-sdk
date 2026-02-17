@@ -1,4 +1,4 @@
-name: Unified Emarsys SDK CI
+name: Engagement Cloud SDK CI
 
 on:
   pull_request:

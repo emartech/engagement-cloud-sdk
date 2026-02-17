@@ -28,12 +28,12 @@ dependencyResolutionManagement {
         maven(url = "https://oss.sonatype.org/content/repositories/snapshots")
     }
 }
-rootProject.name = "EmarsysSDK"
+rootProject.name = "EngagementCloudSDK"
 include(
     ":composeApp",
-    ":emarsys-sdk",
-    ":android-emarsys-sdk-hms",
-    ":android-emarsys-sdk-fcm",
+    ":engagement-cloud-sdk",
+    ":android-ec-sdk-hms",
+    ":android-ec-sdk-fcm",
     ":ios-notification-service",
     ":web-push-service-worker"
 )

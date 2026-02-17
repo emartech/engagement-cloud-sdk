@@ -9,7 +9,7 @@ kotlin {
         browser {
             useCommonJs()
             commonWebpackConfig {
-                outputFileName = "ems-service-worker.js"
+                outputFileName = "ec-service-worker.js"
             }
         }
         binaries.executable()
@@ -17,7 +17,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(project(":emarsys-sdk"))
+            implementation(project(":engagement-cloud-sdk"))
 
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.coroutines.core)
@@ -27,8 +27,8 @@ kotlin {
             implementation(libs.kotest.framework.engine)
             implementation(libs.kotest.assertions.core)
             implementation(libs.kotlinx.coroutines.test)
-            // Exclude Compose dependencies that come transitively from :emarsys-sdk
-            implementation(project(":emarsys-sdk"))
+            // Exclude Compose dependencies that come transitively from :engagement-cloud-sdk
+            implementation(project(":engagement-cloud-sdk"))
 
         }
         jsMain {
@@ -45,16 +45,16 @@ kotlin {
     }
 }
 
-tasks.register<Copy>("copyServiceWorkerToEmarsysSDKResources") {
-    println("copying service worker to emarsys-sdk resources")
+tasks.register<Copy>("copyServiceWorkerToEngagementCloudSDKResources") {
+    println("copying service worker to engagement-cloud-sdk resources")
     from(
-        layout.buildDirectory.file("dist/js/productionExecutable/ems-service-worker.js"),
-        layout.buildDirectory.file("dist/js/productionExecutable/ems-service-worker.js.map")
+        layout.buildDirectory.file("dist/js/productionExecutable/ec-service-worker.js"),
+        layout.buildDirectory.file("dist/js/productionExecutable/ec-service-worker.js.map")
     )
-    into(project(":emarsys-sdk").layout.projectDirectory.dir("src/jsMain/resources"))
+    into(project(":engagement-cloud-sdk").layout.projectDirectory.dir("src/jsMain/resources"))
 }
 
-tasks.findByName("jsBrowserDistribution")?.finalizedBy("copyServiceWorkerToEmarsysSDKResources")
+tasks.findByName("jsBrowserDistribution")?.finalizedBy("copyServiceWorkerToEngagementCloudSDKResources")
 
 // Exclude Compose dependencies from JS test classpath to avoid skiko.mjs errors
 configurations {

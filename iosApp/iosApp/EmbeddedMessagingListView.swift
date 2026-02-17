@@ -1,17 +1,12 @@
-//
-//
-// Copyright © 2025 Emarsys-Technologies Kft. All rights reserved.
-//
-
 import Foundation
 import SwiftUI
-import EmarsysSDK
+import SAPEngagementCloudSDK
 
 
 struct EmbeddedMessagingListView: UIViewControllerRepresentable {
 
     func makeUIViewController(context: Context) -> UIViewController {
-        Emarsys.shared.embeddedMessage()
+        EngagementCloud.shared.embeddedMessage()
     }
     
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {

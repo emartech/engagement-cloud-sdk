@@ -1,4 +1,4 @@
-name: Publish EmarsysSdk web to GitHub Packages
+name: Publish Engagement Cloud SDK web to GitHub Packages
 
 on:
   workflow_dispatch:
@@ -38,8 +38,8 @@ jobs:
         run: |
           ARTIFACT_DIR="dist/js-artifacts"
           mkdir -p "$ARTIFACT_DIR" && \
-          cp ./emarsys-sdk/build/kotlin-webpack/js/productionExecutable/*.js* "$ARTIFACT_DIR"/ && \
-          cp ./build/js/packages/emarsys-sdk/kotlin/*.d.ts* "$ARTIFACT_DIR"/
+          cp ./engagement-cloud-sdk/build/kotlin-webpack/js/productionExecutable/*.js* "$ARTIFACT_DIR"/ && \
+          cp ./build/js/packages/engagement-cloud-sdk/kotlin/*.d.ts* "$ARTIFACT_DIR"/
           echo "artifact_path=$ARTIFACT_DIR" >> "$GITHUB_OUTPUT"
         shell: bash
 

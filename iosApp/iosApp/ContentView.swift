@@ -1,5 +1,5 @@
 import SwiftUI
-import EmarsysSDK
+import SAPEngagementCloudSDK
 
 
 struct ContentView: View {

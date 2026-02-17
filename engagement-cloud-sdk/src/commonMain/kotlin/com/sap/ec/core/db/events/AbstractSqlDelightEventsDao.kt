@@ -1,0 +1,48 @@
+package com.sap.ec.core.db.events
+
+import com.sap.ec.event.SdkEvent
+import com.sap.ec.sqldelight.SapEngagementCloudDB
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.serialization.json.Json
+import kotlin.time.ExperimentalTime
+
+@OptIn(ExperimentalTime::class)
+internal abstract class AbstractSqlDelightEventsDao(db: SapEngagementCloudDB, private val json: Json) : EventsDaoApi {
+    private val queries = db.eventsQueries
+
+    override suspend fun insertEvent(event: SdkEvent) {
+        queries.insertEvent(
+            id = event.id,
+            type = event.type,
+            timestamp = event.timestamp.toEpochMilliseconds(),
+            json = json.encodeToString(event)
+        )
+    }
+
+    override suspend fun upsertEvent(event: SdkEvent) {
+        queries.upsertEvent(
+            id = event.id,
+            type = event.type,
+            timestamp = event.timestamp.toEpochMilliseconds(),
+            json = json.encodeToString(event)
+        )
+    }
+
+    override suspend fun getEvents(): Flow<SdkEvent> {
+        return queries.selectAll()
+            .executeAsList()
+            .map {
+                json.decodeFromString<SdkEvent>(it)
+            }
+            .asFlow()
+    }
+
+    override suspend fun removeEvent(event: SdkEvent) {
+        queries.deleteById(event.id)
+    }
+
+    override suspend fun removeAll() {
+        queries.deleteAll()
+    }
+}

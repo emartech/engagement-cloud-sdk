@@ -1,13 +1,9 @@
-//
-//
-// Copyright © 2025 Emarsys-Technologies Kft. All rights reserved.
-//
-
 import SwiftUI
-import EmarsysSDK
+import SAPEngagementCloudSDK
 
 struct SdkTestView: View {
     @State private var eventName = ""
+    private let engagementCloud = EngagementCloud.shared
 
     var body: some View {
         VStack {
@@ -20,7 +16,7 @@ struct SdkTestView: View {
                 enableTracking()
                 let userActivity = NSUserActivity(activityType: NSUserActivityTypeBrowsingWeb)
                 userActivity.webpageURL = URL(string: "http://www.google.com/something?fancy_url=1&ems_dl=1_2_3_4_5")
-                let deeplinkHandled = Emarsys.shared.deepLink.track(userActivity: userActivity)
+                let deeplinkHandled = engagementCloud.deepLink.track(userActivity: userActivity)
                 print("Deeplink handled: \(deeplinkHandled)")
             } label: {
                 Text("testDeeplinkWithDemoData")
@@ -44,14 +40,15 @@ struct SdkTestView: View {
     
     func enableTracking() {
         Task {
-            try? await Emarsys.shared.setup.enableTracking(config: EmarsysConfig(applicationCode: "EMS11-C3FD3"))
-            try? await Emarsys.shared.contact.link(contactFieldValue: "test@test.com")
+        
+            try? await engagementCloud.setup.enableTracking(config: EngagementCloudConfig(applicationCode: "EMS11-C3FD3"))
+            try? await engagementCloud.contact.link(contactFieldValue: "test@test.com")
         }
     }
     
     func trackEvent(eventName: String) {
         Task {
-            try await Emarsys.shared.event.track(event: CustomEvent(name: eventName, attributes: nil))
+            try await engagementCloud.event.track(event: CustomEvent(name: eventName, attributes: nil))
         }
     }
 }

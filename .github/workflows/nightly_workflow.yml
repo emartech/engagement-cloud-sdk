@@ -1,4 +1,4 @@
-name: Unified Emarsys SDK Nightly CI
+name: Unified Engagement Cloud SDK Nightly CI
 
 on:
   workflow_dispatch:

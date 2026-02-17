@@ -30,18 +30,18 @@
         </activity>
 
         <meta-data
-            android:name="com.emarsys.sample.small_notification_icon"
+            android:name="com.sap.ec.sample.small_notification_icon"
             android:resource="@drawable/mobile_engage_logo_icon" />
 
         <service
-            android:name="com.emarsys.service.fcm.EmarsysFirebaseMessagingService"
+            android:name="com.sap.ec.service.fcm.SAPEngagementCloudFirebaseMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
         <service
-            android:name="com.emarsys.service.hms.EmarsysHuaweiMessagingService"
+            android:name="com.sap.ec.service.SAPEngagementCloudHuaweiMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.huawei.push.action.MESSAGING_EVENT" />

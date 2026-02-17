@@ -40,8 +40,8 @@ kotlin {
             implementation(libs.compose.ui.tooling.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.appcompat)
-            implementation(project(":android-emarsys-sdk-fcm"))
-            implementation(project(":android-emarsys-sdk-hms"))
+            implementation(project(":android-ec-sdk-fcm"))
+            implementation(project(":android-ec-sdk-hms"))
 
         }
         commonMain.dependencies {
@@ -51,17 +51,17 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
-            implementation(project(":emarsys-sdk"))
+            implementation(project(":engagement-cloud-sdk"))
         }
 
         iosMain.dependencies {
-            implementation(project(":emarsys-sdk"))
+            implementation(project(":engagement-cloud-sdk"))
         }
     }
 }
 
 android {
-    namespace = "com.emarsys.sample"
+    namespace = "com.sap.ec.sample"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
@@ -69,7 +69,7 @@ android {
     sourceSets["main"].resources.srcDirs("src/commonMain/resources")
 
     defaultConfig {
-        applicationId = "com.emarsys.sample"
+        applicationId = "com.sap.ec.sample"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1

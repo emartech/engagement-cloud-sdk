@@ -1,0 +1,99 @@
+package com.sap.ec.mobileengage.inapp.networking.download
+
+import com.sap.ec.core.exceptions.SdkException
+import com.sap.ec.core.log.Logger
+import com.sap.ec.core.networking.clients.NetworkClientApi
+import com.sap.ec.core.networking.model.Response
+import com.sap.ec.core.networking.model.UrlRequest
+import com.sap.ec.mobileengage.inapp.presentation.InAppType
+import com.sap.ec.networking.clients.event.model.ContentCampaign
+import com.sap.ec.util.JsonUtil
+import dev.mokkery.MockMode
+import dev.mokkery.answering.returns
+import dev.mokkery.everySuspend
+import dev.mokkery.matcher.any
+import dev.mokkery.mock
+import dev.mokkery.verifySuspend
+import io.kotest.matchers.shouldBe
+import io.ktor.http.Headers
+import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.Url
+import kotlinx.coroutines.test.runTest
+import kotlinx.io.IOException
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+
+class InAppDownloaderTests {
+    private companion object {
+        const val TEST_CONTENT = "test content"
+        const val TRACKING_INFO = "testTrackingInfo"
+        const val URL = "https://test.com"
+        val TEST_URL = Url(URL)
+        val testRequest = UrlRequest(TEST_URL, HttpMethod.Companion.Post)
+        val testContentCampaign = ContentCampaign(InAppType.OVERLAY, TRACKING_INFO, TEST_CONTENT)
+        val response: Result<Response> = Result.success(
+            Response(
+                testRequest,
+                HttpStatusCode.Companion.OK,
+                Headers.Companion.Empty,
+                JsonUtil.json.encodeToString(testContentCampaign)
+            )
+        )
+    }
+
+    private lateinit var inAppDownloader: InAppDownloader
+    private lateinit var mockEmarsysNetworkClient: NetworkClientApi
+    private lateinit var mockLogger: Logger
+
+    @BeforeTest
+    fun setup() {
+
+        mockEmarsysNetworkClient = mock()
+        mockLogger = mock(MockMode.autofill)
+        inAppDownloader = InAppDownloader(mockEmarsysNetworkClient, mockLogger)
+    }
+
+    @Test
+    fun download_shouldReturn_theResponse_asInAppMessage() = runTest {
+        everySuspend { mockEmarsysNetworkClient.send(testRequest) } returns response
+
+        val result = inAppDownloader.download(URL)
+
+        result?.type shouldBe InAppType.OVERLAY
+        result?.trackingInfo shouldBe TRACKING_INFO
+        result?.content shouldBe TEST_CONTENT
+    }
+
+    @Test
+    fun download_shouldReturn_null_ifDownloadReturnsFailedRequestException() = runTest {
+        val testException = SdkException.FailedRequestException(response.getOrNull()!!)
+        everySuspend { mockEmarsysNetworkClient.send(testRequest) } returns Result.failure(
+            testException
+        )
+
+        val result = inAppDownloader.download(URL)
+
+        result shouldBe null
+
+        verifySuspend {
+            mockLogger.error(any(), testException)
+        }
+    }
+
+    @Test
+    fun download_shouldReturn_null_ifDownloadReturnsIoException() = runTest {
+        val testException = IOException("Download failed")
+        everySuspend { mockEmarsysNetworkClient.send(testRequest) } returns Result.failure(
+            testException
+        )
+
+        val result = inAppDownloader.download(URL)
+
+        result shouldBe null
+
+        verifySuspend {
+            mockLogger.error(any(), testException)
+        }
+    }
+}

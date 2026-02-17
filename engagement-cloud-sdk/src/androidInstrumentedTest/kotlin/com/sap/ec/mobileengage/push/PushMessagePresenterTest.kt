@@ -1,0 +1,397 @@
+package com.sap.ec.mobileengage.push
+
+import android.app.Notification
+import android.app.NotificationManager
+import android.content.Context
+import androidx.core.app.NotificationCompat
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import com.sap.ec.core.device.ChannelSettings
+import com.sap.ec.core.device.PlatformInfoCollector
+import com.sap.ec.core.device.notification.AndroidNotificationSettings
+import com.sap.ec.core.device.notification.AndroidNotificationSettingsCollectorApi
+import com.sap.ec.core.resource.MetadataReader
+import com.sap.ec.mobileengage.action.models.BadgeCount
+import com.sap.ec.mobileengage.action.models.BadgeCountMethod
+import com.sap.ec.mobileengage.action.models.BasicAppEventActionModel
+import com.sap.ec.mobileengage.action.models.PresentableActionModel
+import com.sap.ec.mobileengage.action.models.PresentableAppEventActionModel
+import com.sap.ec.mobileengage.action.models.PresentableCustomEventActionModel
+import com.sap.ec.mobileengage.action.models.PresentableDismissActionModel
+import com.sap.ec.mobileengage.action.models.PresentableOpenExternalUrlActionModel
+import com.sap.ec.mobileengage.inapp.networking.download.InAppDownloader
+import com.sap.ec.mobileengage.push.model.AndroidPlatformData
+import com.sap.ec.mobileengage.push.model.AndroidPushMessage
+import com.sap.ec.mobileengage.push.model.NotificationMethod
+import com.sap.ec.util.JsonUtil
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
+import io.mockk.CapturingSlot
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.slot
+import io.mockk.spyk
+import io.mockk.verify
+import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.Json
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
+
+class PushMessagePresenterTest {
+    private companion object {
+        const val COLLAPSE_ID = "testCollapseId"
+        const val TRACKING_INFO = """{"trackingInfoKey":"trackingInfoValue"}"""
+        const val REPORTING = """{"reportingKey":"reportingValue"}"""
+        const val ICON_ID = 10
+        const val CHANNEL_ID = "testChannelId"
+        const val DEBUG_CHANNEL_ID = "ems_debug"
+        const val TITLE = "testTitle"
+        const val BODY = "testBody"
+        val testCustomEventAction =
+            PresentableCustomEventActionModel(
+                "customEventId",
+                REPORTING,
+                "customEvent",
+                "customAction",
+                mapOf("key" to "value")
+            )
+        val testAppEventAction =
+            PresentableAppEventActionModel(
+                "appEventId",
+                REPORTING,
+                "appEvent",
+                "appAction",
+                mapOf("key2" to "value2")
+            )
+        val testOpenExternalUrlAction =
+            PresentableOpenExternalUrlActionModel(
+                "externalUrlId",
+                REPORTING,
+                "openExternalUrl",
+                "https://example.com"
+            )
+
+        val testPresentableActions: List<PresentableActionModel> =
+            listOf(testCustomEventAction, testAppEventAction, testOpenExternalUrlAction)
+
+        val testDefaultTapAction = BasicAppEventActionModel(REPORTING, "testName", null)
+    }
+
+    private lateinit var pushMessagePresenter: PushMessagePresenter
+    private lateinit var mockContext: Context
+    private lateinit var mockNotificationManager: NotificationManager
+    private lateinit var json: Json
+    private lateinit var mockMetadataReader: MetadataReader
+    private lateinit var mockNotificationCompatStyler: NotificationCompatStyler
+    private lateinit var mockPlatformInfoCollector: PlatformInfoCollector
+    private lateinit var mockInAppDownloader: InAppDownloader
+    private lateinit var notificationSlot: CapturingSlot<Notification>
+    private lateinit var mockAndroidNotificationSettingsCollector: AndroidNotificationSettingsCollectorApi
+
+    @Before
+    fun setup() = runTest {
+        mockContext = getInstrumentation().targetContext.applicationContext
+        mockNotificationManager = mockk(relaxed = true)
+        mockNotificationCompatStyler = mockk(relaxed = true)
+        mockPlatformInfoCollector = mockk(relaxed = true)
+        mockInAppDownloader = mockk(relaxed = true)
+        mockAndroidNotificationSettingsCollector = mockk(relaxed = true)
+
+        json = JsonUtil.json
+        mockMetadataReader = mockk(relaxed = true)
+        every { mockMetadataReader.getInt(any()) } returns ICON_ID
+
+        pushMessagePresenter = PushMessagePresenter(
+            mockContext,
+            json,
+            mockNotificationManager,
+            mockMetadataReader,
+            mockNotificationCompatStyler,
+            mockPlatformInfoCollector,
+            mockAndroidNotificationSettingsCollector,
+            sdkLogger = mockk(relaxed = true),
+        )
+
+        notificationSlot = slot<Notification>()
+
+    }
+
+    @After
+    fun tearDown() = runTest {
+        notificationSlot.clear()
+    }
+
+    @Test
+    fun present_shouldShowNotification_withCorrectData_withActions() = runTest {
+        val testMessage = createTestMessage(testPresentableActions)
+
+        every {
+            mockNotificationManager.notify(
+                COLLAPSE_ID,
+                COLLAPSE_ID.hashCode(),
+                capture(notificationSlot)
+            )
+        } returns Unit
+
+        pushMessagePresenter.present(testMessage)
+
+        assertNotificationFields(notificationSlot.captured)
+        notificationSlot.captured.actions.size shouldBe 3
+        notificationSlot.captured.actions[0].title shouldBe testCustomEventAction.title
+        notificationSlot.captured.actions[1].title shouldBe testAppEventAction.title
+        notificationSlot.captured.actions[2].title shouldBe testOpenExternalUrlAction.title
+
+        coVerify {
+            mockNotificationCompatStyler.style(
+                any<NotificationCompat.Builder>(),
+                testMessage
+            )
+        }
+        verify {
+            mockNotificationManager.notify(
+                COLLAPSE_ID,
+                COLLAPSE_ID.hashCode(),
+                notificationSlot.captured
+            )
+        }
+    }
+
+    @Test
+    fun present_shouldShowNotification_withCorrectData_withoutActions() = runTest {
+        val testMessage = createTestMessage(actions = null, defaultTapAction = null)
+
+        every {
+            mockNotificationManager.notify(
+                COLLAPSE_ID,
+                COLLAPSE_ID.hashCode(),
+                capture(notificationSlot)
+            )
+        } returns Unit
+
+        pushMessagePresenter.present(testMessage)
+
+        assertNotificationFields(notificationSlot.captured)
+        notificationSlot.captured.actions shouldBe null
+
+        verify {
+            mockNotificationManager.notify(
+                COLLAPSE_ID,
+                COLLAPSE_ID.hashCode(),
+                notificationSlot.captured
+            )
+        }
+    }
+
+    @Test
+    fun present_shouldShowNotification_withCorrectData_withDefaultActionOnly() = runTest {
+        val testMessage = createTestMessage(null, testDefaultTapAction)
+
+        every {
+            mockNotificationManager.notify(
+                COLLAPSE_ID,
+                COLLAPSE_ID.hashCode(),
+                capture(notificationSlot)
+            )
+        } returns Unit
+
+        pushMessagePresenter.present(testMessage)
+
+        assertNotificationFields(notificationSlot.captured)
+        notificationSlot.captured.actions shouldBe null
+
+        verify {
+            mockNotificationManager.notify(
+                COLLAPSE_ID,
+                COLLAPSE_ID.hashCode(),
+                notificationSlot.captured
+            )
+        }
+    }
+
+    @Test
+    fun present_shouldShowNotification_withCorrectData_withActionsAndDefaultAction() = runTest {
+        val testMessage = createTestMessage(testPresentableActions, testDefaultTapAction)
+
+        every {
+            mockNotificationManager.notify(
+                COLLAPSE_ID,
+                COLLAPSE_ID.hashCode(),
+                capture(notificationSlot)
+            )
+        } returns Unit
+
+        pushMessagePresenter.present(testMessage)
+
+        assertNotificationFields(notificationSlot.captured)
+        notificationSlot.captured.actions.size shouldBe 3
+
+        verify {
+            mockNotificationManager.notify(
+                COLLAPSE_ID,
+                COLLAPSE_ID.hashCode(),
+                notificationSlot.captured
+            )
+        }
+    }
+
+    @Test
+    fun present_shouldShowNotification_withCorrectData_withBadgeCount() = runTest {
+        val testValue = 8
+        val testMessage = createTestMessage(
+            testPresentableActions,
+            testDefaultTapAction,
+            BadgeCount(BadgeCountMethod.SET, testValue)
+        )
+
+        every {
+            mockNotificationManager.notify(
+                COLLAPSE_ID,
+                COLLAPSE_ID.hashCode(),
+                capture(notificationSlot)
+            )
+        } returns Unit
+
+        pushMessagePresenter.present(testMessage)
+
+        assertNotificationFields(notificationSlot.captured)
+        notificationSlot.captured.actions.size shouldBe 3
+
+        verify {
+            mockNotificationManager.notify(
+                COLLAPSE_ID,
+                COLLAPSE_ID.hashCode(),
+                notificationSlot.captured
+            )
+        }
+
+        notificationSlot.captured.number shouldBe testValue
+    }
+
+    @Test
+    fun present_shouldShowNotification_withCorrectData_withDismissActionModel_filledWithId() =
+        runTest {
+            val dismissActionModelSpy =
+                spyk(PresentableDismissActionModel("dismissId", REPORTING, "Dismiss", null))
+            val testMessage = createTestMessage(
+                listOf(dismissActionModelSpy),
+                testDefaultTapAction,
+            )
+
+            every {
+                mockNotificationManager.notify(
+                    COLLAPSE_ID,
+                    COLLAPSE_ID.hashCode(),
+                    capture(notificationSlot)
+                )
+            } returns Unit
+
+            pushMessagePresenter.present(testMessage)
+
+            assertNotificationFields(notificationSlot.captured)
+            notificationSlot.captured.actions.size shouldBe 1
+            notificationSlot.captured.actions[0].title shouldBe "Dismiss"
+
+            verify { dismissActionModelSpy.dismissId = COLLAPSE_ID }
+            verify {
+                mockNotificationManager.notify(
+                    COLLAPSE_ID,
+                    COLLAPSE_ID.hashCode(),
+                    notificationSlot.captured
+                )
+            }
+        }
+
+    @Test
+    fun present_shouldCreateDebugChannel_if_debugMode_and_channelId_isInvalid() = runTest {
+        val message = createTestMessage()
+        val testSettings = AndroidNotificationSettings(true, 1, emptyList())
+
+        every { mockPlatformInfoCollector.isDebugMode() } returns true
+        every { mockAndroidNotificationSettingsCollector.collect() } returns testSettings
+
+        every {
+            mockNotificationManager.notify(
+                COLLAPSE_ID,
+                COLLAPSE_ID.hashCode(),
+                capture(notificationSlot)
+            )
+        } returns Unit
+
+        pushMessagePresenter.present(message)
+
+        notificationSlot.captured.channelId shouldBe DEBUG_CHANNEL_ID
+    }
+
+    @Test
+    fun present_should_not_CreateDebugChannel_if_debugMode_and_channelId_is_valid() = runTest {
+        val message = createTestMessage()
+        val channelSettings = listOf(ChannelSettings(CHANNEL_ID))
+        val testSettings = AndroidNotificationSettings(true, 1, channelSettings)
+
+        every { mockPlatformInfoCollector.isDebugMode() } returns true
+        every { mockAndroidNotificationSettingsCollector.collect() } returns testSettings
+
+        every {
+            mockNotificationManager.notify(
+                COLLAPSE_ID,
+                COLLAPSE_ID.hashCode(),
+                capture(notificationSlot)
+            )
+        } returns Unit
+
+        pushMessagePresenter.present(message)
+
+        notificationSlot.captured.channelId shouldBe CHANNEL_ID
+    }
+
+    @Test
+    fun present_should_not_CreateDebugChannel_if_not_debugMode() = runTest {
+        val message = createTestMessage()
+        val testSettings = AndroidNotificationSettings(true, 1, emptyList())
+
+        every { mockPlatformInfoCollector.isDebugMode() } returns false
+        every { mockAndroidNotificationSettingsCollector.collect() } returns testSettings
+
+        every {
+            mockNotificationManager.notify(
+                COLLAPSE_ID,
+                COLLAPSE_ID.hashCode(),
+                capture(notificationSlot)
+            )
+        } returns Unit
+
+        pushMessagePresenter.present(message)
+
+        notificationSlot.captured.channelId shouldBe CHANNEL_ID
+    }
+
+    private fun createTestMessage(
+        actions: List<PresentableActionModel>? = null,
+        defaultTapAction: BasicAppEventActionModel? = null,
+        badgeCount: BadgeCount? = null,
+        iconUrlString: String? = null,
+        imageUrlString: String? = null
+    ): AndroidPushMessage {
+        val testMethod = NotificationMethod(COLLAPSE_ID, NotificationOperation.INIT)
+        return AndroidPushMessage(
+            TRACKING_INFO,
+            AndroidPlatformData(CHANNEL_ID, testMethod),
+            badgeCount,
+            DisplayableData(TITLE, BODY, iconUrlString, imageUrlString),
+            ActionableData(
+                actions = actions,
+                defaultTapAction = defaultTapAction
+            )
+        )
+    }
+
+    private fun assertNotificationFields(notification: Notification) {
+        notification.channelId shouldBe CHANNEL_ID
+        notification.smallIcon.resId shouldBe ICON_ID
+        notification.contentIntent shouldNotBe null
+        notification.extras.getString("android.title") shouldBe TITLE
+        notification.extras.getString("android.text") shouldBe BODY
+        notification.priority shouldBe NotificationCompat.PRIORITY_DEFAULT
+    }
+}

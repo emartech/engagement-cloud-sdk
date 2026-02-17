@@ -1,0 +1,71 @@
+package com.sap.ec.mobileengage.action.actions
+
+import com.sap.ec.core.channel.SdkEventDistributorApi
+import com.sap.ec.core.channel.SdkEventWaiterApi
+import com.sap.ec.event.SdkEvent
+import com.sap.ec.mobileengage.action.models.BasicCustomEventActionModel
+import dev.mokkery.MockMode
+import dev.mokkery.answering.returns
+import dev.mokkery.everySuspend
+import dev.mokkery.matcher.capture.Capture
+import dev.mokkery.matcher.capture.SlotCapture
+import dev.mokkery.matcher.capture.capture
+import dev.mokkery.matcher.capture.get
+import dev.mokkery.mock
+import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+
+@OptIn(ExperimentalCoroutinesApi::class)
+class CustomEventActionTests {
+    private companion object {
+        const val TEST_NAME = "testName"
+    }
+
+    private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
+    private lateinit var mockSdkEventWaiter: SdkEventWaiterApi
+    private lateinit var eventSlot: SlotCapture<SdkEvent.External.Custom>
+
+    @BeforeTest
+    fun setup() {
+        eventSlot = Capture.slot()
+        mockSdkEventWaiter = mock(MockMode.autoUnit)
+        everySuspend { mockSdkEventWaiter.await<Any>() } returns SdkEvent.Internal.Sdk.Answer.Response(
+            "0",
+            Result.success(Any())
+        )
+        mockSdkEventDistributor = mock(MockMode.autofill)
+        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mockSdkEventWaiter
+    }
+
+    @Test
+    fun invoke_shouldNotAddAttributes_toInvokedAction_ifActionModelPayload_isNull() = runTest {
+        val testActionModel = BasicCustomEventActionModel(name = TEST_NAME)
+
+        CustomEventAction(testActionModel, mockSdkEventDistributor).invoke()
+
+        advanceUntilIdle()
+
+        eventSlot.get().attributes shouldBe null
+    }
+
+    @Test
+    fun invoke_shouldAddAttributes_toInvokedAction_ifActionModelPayload_isNotNull() = runTest {
+        val testAttributes = mapOf("key" to "value", "testKey" to "testValue")
+        val testActionModel = BasicCustomEventActionModel(name = TEST_NAME, payload = testAttributes)
+
+        CustomEventAction(testActionModel, mockSdkEventDistributor).invoke()
+
+        advanceUntilIdle()
+
+        eventSlot.get().attributes shouldBe buildJsonObject {
+            put("key", "value")
+            put("testKey", "testValue")
+        }
+    }
+}

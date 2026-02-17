@@ -1,0 +1,127 @@
+package com.sap.ec.mobileengage.push
+
+import android.content.Context
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import com.sap.ec.SdkConstants.SILENT_PUSH_RECEIVED_EVENT_NAME
+import com.sap.ec.core.channel.SdkEventDistributorApi
+import com.sap.ec.event.SdkEvent
+import com.sap.ec.mobileengage.action.PushActionFactory
+import com.sap.ec.mobileengage.action.actions.Action
+import com.sap.ec.mobileengage.action.models.BadgeCount
+import com.sap.ec.mobileengage.action.models.BasicActionModel
+import com.sap.ec.mobileengage.action.models.BasicAppEventActionModel
+import com.sap.ec.mobileengage.action.models.BasicCustomEventActionModel
+import com.sap.ec.mobileengage.action.models.BasicOpenExternalUrlActionModel
+import com.sap.ec.mobileengage.inapp.networking.download.InAppDownloader
+import com.sap.ec.mobileengage.push.NotificationOperation.INIT
+import com.sap.ec.mobileengage.push.model.AndroidPlatformData
+import com.sap.ec.mobileengage.push.model.NotificationMethod
+import com.sap.ec.mobileengage.push.model.SilentAndroidPushMessage
+import com.sap.ec.util.JsonUtil
+import dev.mokkery.verifySuspend
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
+import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.Json
+import org.junit.Before
+import org.junit.Test
+import kotlin.time.ExperimentalTime
+
+@OptIn(ExperimentalTime::class)
+class PushMessageHandlerTest {
+    private companion object {
+        const val COLLAPSE_ID = "testCollapseId"
+        const val CHANNEL_ID = "testChannelId"
+        const val TRACKING_INFO = """{"trackingInfoKey":"trackingInfoValue"}"""
+        const val REPORTING = """{"key":"value"}"""
+
+        val testOpenExternalUrlBasicAction =
+            BasicOpenExternalUrlActionModel(
+                REPORTING,
+                "https://example.com"
+            )
+        val testCustomEventBasicAction =
+            BasicCustomEventActionModel(
+                REPORTING,
+                "customAction",
+                mapOf("key" to "value")
+            )
+        val testAppEventBasicAction =
+            BasicAppEventActionModel(
+                REPORTING,
+                "appAction",
+                mapOf("key2" to "value2")
+            )
+
+        val testBasicActions = listOf(
+            testOpenExternalUrlBasicAction,
+            testCustomEventBasicAction,
+            testAppEventBasicAction
+        )
+    }
+
+    private lateinit var silentPushMessageHandler: SilentPushMessageHandler
+    private lateinit var mockContext: Context
+    private lateinit var json: Json
+    private lateinit var mockInAppDownloader: InAppDownloader
+    private lateinit var mockPushActionFactory: PushActionFactory
+    private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
+
+
+    @Before
+    fun setup() = runTest {
+        mockContext = getInstrumentation().targetContext.applicationContext
+        mockInAppDownloader = mockk(relaxed = true)
+        mockPushActionFactory = mockk(relaxed = true)
+        mockSdkEventDistributor = mockk(relaxed = true)
+
+        json = JsonUtil.json
+
+        silentPushMessageHandler = SilentPushMessageHandler(
+            mockPushActionFactory,
+            mockSdkEventDistributor
+        )
+    }
+
+    @Test
+    fun handle_should_invoke_actions_when_silentPush() = runTest {
+        val message = createTestSilentMessage(actions = testBasicActions)
+        val mockAction: Action<*> = mockk(relaxed = true)
+        coEvery { mockPushActionFactory.create(testCustomEventBasicAction) } returns mockAction
+        coEvery { mockPushActionFactory.create(testAppEventBasicAction) } returns mockAction
+        coEvery { mockPushActionFactory.create(testOpenExternalUrlBasicAction) } returns mockAction
+
+        silentPushMessageHandler.handle(message)
+
+        coVerify(exactly = 3) { mockAction.invoke() }
+    }
+
+    @Test
+    fun handle_should_emit_event_with_campaignId() = runTest {
+        val message = createTestSilentMessage()
+
+        silentPushMessageHandler.handle(message)
+
+        verifySuspend {
+            mockSdkEventDistributor.registerEvent(
+                SdkEvent.External.Api.AppEvent(name = SILENT_PUSH_RECEIVED_EVENT_NAME)
+            )
+        }
+    }
+
+    private fun createTestSilentMessage(
+        actions: List<BasicActionModel>? = null,
+        badgeCount: BadgeCount? = null,
+    ): SilentAndroidPushMessage {
+        val tesMethod = NotificationMethod(COLLAPSE_ID, INIT)
+        return SilentAndroidPushMessage(
+            TRACKING_INFO,
+            AndroidPlatformData(CHANNEL_ID, tesMethod),
+            badgeCount,
+            ActionableData(
+                actions = actions
+            )
+        )
+    }
+}
