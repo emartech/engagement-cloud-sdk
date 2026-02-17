@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.view.Window
 import android.widget.FrameLayout
 import androidx.fragment.app.DialogFragment
-import com.sap.ec.R
+import com.sap.R
 
 class InAppDialog : DialogFragment() {
 

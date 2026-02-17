@@ -40,8 +40,8 @@ kotlin {
             implementation(libs.compose.ui.tooling.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.appcompat)
-            implementation(project(":android-ec-sdk-fcm"))
-            implementation(project(":android-ec-sdk-hms"))
+            implementation(project(":engagement-cloud-sdk-android-fcm"))
+            implementation(project(":engagement-cloud-sdk-android-hms"))
 
         }
         commonMain.dependencies {

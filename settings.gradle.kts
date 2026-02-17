@@ -32,8 +32,8 @@ rootProject.name = "EngagementCloudSDK"
 include(
     ":composeApp",
     ":engagement-cloud-sdk",
-    ":android-ec-sdk-hms",
-    ":android-ec-sdk-fcm",
+    ":engagement-cloud-sdk-android-hms",
+    ":engagement-cloud-sdk-android-fcm",
     ":ios-notification-service",
     ":web-push-service-worker"
 )

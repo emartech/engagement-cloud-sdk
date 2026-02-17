@@ -225,7 +225,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.sap.ec"
+    namespace = "com.sap"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
