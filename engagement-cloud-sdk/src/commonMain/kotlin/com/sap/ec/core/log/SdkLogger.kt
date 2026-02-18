@@ -1,12 +1,12 @@
 package com.sap.ec.core.log
 
 import com.sap.ec.context.SdkContextApi
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
-import kotlin.coroutines.coroutineContext
 
 internal class SdkLogger(
     private val loggerName: String,
@@ -119,7 +119,7 @@ internal class SdkLogger(
         data: JsonObject = JsonObject(mapOf()),
         isRemoteLog: Boolean = true
     ) {
-        val contextMap = coroutineContext[LogContext.Key]?.contextMap
+        val contextMap = currentCoroutineContext()[LogContext.Key]?.contextMap
         val extendedData = mergeContext(data, contextMap)
 
         if (remoteLogger != null && isRemoteLog) {

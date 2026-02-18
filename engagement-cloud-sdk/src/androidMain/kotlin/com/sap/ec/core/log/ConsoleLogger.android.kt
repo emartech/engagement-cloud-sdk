@@ -27,7 +27,7 @@ internal actual class ConsoleLogger : ConsoleLoggerApi {
             LogLevel.Trace -> Log.v(loggerName, logString, throwable)
             LogLevel.Debug -> Log.d(loggerName, logString, throwable)
             LogLevel.Error -> Log.e(loggerName, logString, throwable)
-            LogLevel.Metric -> Log.wtf(loggerName, logString)
+            LogLevel.Metric -> Log.v(loggerName, logString)
         }
     }
 
