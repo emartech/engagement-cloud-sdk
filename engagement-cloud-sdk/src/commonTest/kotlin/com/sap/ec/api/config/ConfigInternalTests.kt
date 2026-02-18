@@ -34,6 +34,7 @@ class ConfigInternalTests {
         const val UUID = "testUUID"
         val TIMESTAMP = Clock.System.now()
         const val APPCODE = "A1s2D-F3G4H"
+        const val MULTI_REGION_APPCODE = "INS-S01-APP-ABC12"
         const val HUNGARIAN_LANGUAGE = "hu-HU"
     }
 
@@ -82,6 +83,19 @@ class ConfigInternalTests {
     }
 
     @Test
+    fun testChangeApplicationCode_shouldEmitChangeApplicationCodeEvent_toSdkEventFlow_whenMultiRegionAppCode_isUsed() = runTest {
+        val expectedEvent = SdkEvent.Internal.Sdk.ChangeAppCode(
+            id = UUID,
+            applicationCode = MULTI_REGION_APPCODE.uppercase(),
+            timestamp = TIMESTAMP
+        )
+
+        configInternal.changeApplicationCode(MULTI_REGION_APPCODE)
+
+        verifySuspend { mockSdkEventDistributor.registerEvent(expectedEvent) }
+    }
+
+    @Test
     fun testChangeApplicationCode_shouldReturn_whenAppCode_isEmpty() = runTest {
         everySuspend { mockLogger.error(message = any()) } returns Unit
         shouldThrow<SdkException.InvalidApplicationCodeException> {
@@ -98,7 +112,14 @@ class ConfigInternalTests {
             row("EMS"),
             row("-EMS11-C3FD3"),
             row("EMS11--C3FD3"),
-            row("EMS11-C3FD3-")
+            row("EMS11-C3FD3-"),
+            row("EMS11-C3FD3-C3FD3"),
+            row("INS-S01-APP-1234"),
+            row("INS-S01-12345"),
+            row("INS-APP-12345"),
+            row("${MULTI_REGION_APPCODE}123"),
+            row("EXTRA_START-${MULTI_REGION_APPCODE}"),
+            row("${MULTI_REGION_APPCODE}-EXTRA_END"),
         ) { appCode ->
             everySuspend { mockLogger.error(any(), any<Throwable>(), true) } returns Unit
             shouldThrow<SdkException.InvalidApplicationCodeException> {
