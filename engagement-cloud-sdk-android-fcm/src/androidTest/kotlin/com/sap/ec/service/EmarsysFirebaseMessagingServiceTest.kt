@@ -68,9 +68,9 @@ class EmarsysFirebaseMessagingServiceTest {
         val result = SAPEngagementCloudFirebaseMessagingService.messagingServices
 
         result.size shouldBe 2
-        result[0].first.includeEmarsysMessages shouldBe false
+        result[0].first.includeEngagementCloudMessages shouldBe false
         result[0].second shouldBe testMessagingService1
-        result[1].first.includeEmarsysMessages shouldBe true
+        result[1].first.includeEngagementCloudMessages shouldBe true
         result[1].second shouldBe testMessagingService2
     }
 

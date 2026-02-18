@@ -40,7 +40,7 @@ class SAPEngagementCloudFirebaseMessagingService : FirebaseMessagingService() {
         println("message received: ${remoteMessage.messageId}")
         messagingServices
             .filter {
-                it.first.includeEmarsysMessages || !isEmarsysMessage(remoteMessage.data)
+                it.first.includeEngagementCloudMessages || !isEmarsysMessage(remoteMessage.data)
             }
             .forEach { it.second.onMessageReceived(remoteMessage) }
         if (isEmarsysMessage(remoteMessage.data)) {
