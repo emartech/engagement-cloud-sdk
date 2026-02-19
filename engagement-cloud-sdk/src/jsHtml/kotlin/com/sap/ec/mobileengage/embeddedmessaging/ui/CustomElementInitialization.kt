@@ -5,28 +5,28 @@ import kotlinx.browser.window
 actual fun initializeCustomElements() {
     window.customElements.define(
         "ec-embedded-messaging-list",
-        com.sap.ec.mobileengage.embeddedmessaging.ui.createBridge(
-            factory = { com.sap.ec.mobileengage.embeddedmessaging.ui.ECMessagingListElement() },
+        createBridge(
+            factory = { ECMessagingListElement() },
             observedAttributes = arrayOf("custom-message-item-element-name", "hide-filters")
         )
     )
     window.customElements.define(
         "ec-embedded-messaging-compact-list",
-        com.sap.ec.mobileengage.embeddedmessaging.ui.createBridge(
-            factory = { com.sap.ec.mobileengage.embeddedmessaging.ui.ECMessagingCompactListElement() },
+        createBridge(
+            factory = { ECMessagingCompactListElement() },
             observedAttributes = arrayOf("custom-message-item-element-name")
         )
     )
     window.customElements.define(
         "ec-inline-inapp-view",
-        com.sap.ec.mobileengage.embeddedmessaging.ui.createBridge(
-            factory = { com.sap.ec.mobileengage.embeddedmessaging.ui.ECInlineInAppView() },
+        createBridge(
+            factory = { ECInlineInAppView() },
             observedAttributes = arrayOf("view-id")
         )
     )
 }
 
-private fun createBridge(factory: () -> com.sap.ec.mobileengage.embeddedmessaging.ui.ComposeCustomElement, observedAttributes: Array<String>): dynamic {
+private fun createBridge(factory: () -> ComposeCustomElement, observedAttributes: Array<String>): dynamic {
     return js("""
         (function() {
             function Bridge() {

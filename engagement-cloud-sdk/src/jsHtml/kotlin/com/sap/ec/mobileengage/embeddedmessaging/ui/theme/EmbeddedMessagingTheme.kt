@@ -11,7 +11,6 @@ import org.jetbrains.compose.web.css.Style
 
 @Composable
 fun EmbeddedMessagingTheme(content: @Composable () -> Unit) {
-    ThemeMapper.Companion.generateDefaultThemeCSS()
     Style(EmbeddedMessagingStyleSheet)
 
     val embeddedMessagingContext: EmbeddedMessagingContextApi? = koin.getOrNull()
@@ -22,6 +21,7 @@ fun EmbeddedMessagingTheme(content: @Composable () -> Unit) {
         val designValues = themeMapper.mapMisc()
         val translationMapper = TranslationMapper()
         val stringValues = translationMapper.map(it)
+        themeMapper.generateThemeCSS()
 
         CompositionLocalProvider(
             LocalDesignValues provides designValues,

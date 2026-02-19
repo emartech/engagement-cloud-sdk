@@ -10,7 +10,7 @@ data class CssColorVar(val name: String) {
     fun value(): CSSColorValue = Color("var($name)")
 }
 
-fun StyleScope.setVar(variable: com.sap.ec.mobileengage.embeddedmessaging.ui.theme.CssColorVar, value: String) {
+fun StyleScope.setVar(variable: CssColorVar, value: String) {
     property(variable.name, value)
 }
 
