@@ -37,7 +37,6 @@ object NetworkInjection {
                     named(NetworkClientTypes.Generic)
                 ),
                 requestContext = get(),
-                timestampProvider = get(),
                 urlFactory = get(),
                 json = get(),
                 sdkLogger = get { parametersOf(ECClient::class.simpleName) },

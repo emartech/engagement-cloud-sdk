@@ -8,17 +8,12 @@ import com.sap.ec.core.networking.context.RequestContextApi
 import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.networking.model.UrlRequest
 import com.sap.ec.core.networking.model.body
-import com.sap.ec.core.providers.InstantProvider
 import com.sap.ec.core.url.ECUrlType
 import com.sap.ec.core.url.UrlFactoryApi
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.networking.ECHeaders.CLIENT_ID_HEADER
 import com.sap.ec.networking.ECHeaders.CLIENT_STATE_HEADER
 import com.sap.ec.networking.ECHeaders.CONTACT_TOKEN_HEADER
-import com.sap.ec.networking.ECHeaders.REQUEST_ORDER_HEADER
-import com.sap.ec.networking.ECHeaders.X_CLIENT_ID_HEADER
-import com.sap.ec.networking.ECHeaders.X_CLIENT_STATE_HEADER
-import com.sap.ec.networking.ECHeaders.X_CONTACT_TOKEN_HEADER
 import com.sap.ec.networking.clients.error.ResponseErrorBody
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -34,7 +29,6 @@ import kotlin.time.ExperimentalTime
 internal class ECClient(
     private val networkClient: NetworkClientApi,
     private val requestContext: RequestContextApi,
-    private val timestampProvider: InstantProvider,
     private val urlFactory: UrlFactoryApi,
     private val json: Json,
     private val sdkLogger: Logger,
@@ -104,7 +98,6 @@ internal class ECClient(
         mapOf(
             CLIENT_ID_HEADER to requestContext.clientId,
             CLIENT_STATE_HEADER to requestContext.clientState,
-            REQUEST_ORDER_HEADER to timestampProvider.provide().toEpochMilliseconds()
         )
     )
 
@@ -143,12 +136,8 @@ internal class ECClient(
     private fun addEcHeaders(request: UrlRequest): UrlRequest {
         val ecHeaders = mutableMapOf(
             CLIENT_ID_HEADER to requestContext.clientId,
-            X_CLIENT_ID_HEADER to requestContext.clientId,
             CLIENT_STATE_HEADER to requestContext.clientState,
-            X_CLIENT_STATE_HEADER to requestContext.clientState,
             CONTACT_TOKEN_HEADER to requestContext.contactToken,
-            X_CONTACT_TOKEN_HEADER to requestContext.contactToken,
-            REQUEST_ORDER_HEADER to timestampProvider.provide().toEpochMilliseconds()
         ).filterValues { it != null }
 
         val headers = request.headers?.let {

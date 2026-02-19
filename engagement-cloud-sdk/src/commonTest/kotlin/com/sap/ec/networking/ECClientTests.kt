@@ -8,7 +8,6 @@ import com.sap.ec.core.networking.context.RequestContextApi
 import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.networking.model.UrlRequest
 import com.sap.ec.core.networking.model.body
-import com.sap.ec.core.providers.InstantProvider
 import com.sap.ec.core.url.ECUrlType
 import com.sap.ec.core.url.UrlFactoryApi
 import com.sap.ec.event.SdkEvent
@@ -16,6 +15,7 @@ import com.sap.ec.model.TestDataClass
 import com.sap.ec.networking.ECHeaders.CLIENT_ID_HEADER
 import com.sap.ec.networking.ECHeaders.CLIENT_STATE_HEADER
 import com.sap.ec.networking.ECHeaders.CONTACT_TOKEN_HEADER
+import com.sap.ec.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -70,7 +70,6 @@ class ECClientTests {
         val testData = TestDataClass(ID, NAME)
     }
 
-    private lateinit var mockTimestampProvider: InstantProvider
     private lateinit var mockUrlFactory: UrlFactoryApi
     private lateinit var mockNetworkClient: NetworkClientApi
     private lateinit var json: Json
@@ -84,7 +83,6 @@ class ECClientTests {
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(StandardTestDispatcher())
-        mockTimestampProvider = mock()
         mockUrlFactory = mock()
         mockNetworkClient = mock()
         mockSdkEventDistributor = mock(MockMode.autofill)
@@ -96,9 +94,8 @@ class ECClientTests {
         every { mockRequestContext.clientState } returns CLIENT_STATE
         every { mockRequestContext.clientId } returns CLIENT_ID
 
-        json = Json
+        json = JsonUtil.json
 
-        every { mockTimestampProvider.provide() } returns now
         every {
             mockUrlFactory.create(ECUrlType.RefreshToken)
         } returns Url("https://testUrl.com")
@@ -108,7 +105,6 @@ class ECClientTests {
         eCClient = ECClient(
             mockNetworkClient,
             mockRequestContext,
-            mockTimestampProvider,
             mockUrlFactory,
             json,
             mockSdkLogger,
@@ -157,7 +153,7 @@ class ECClientTests {
                     status = HttpStatusCode.OK,
                     headers = headers {
                         append("Content-Type", "application/json")
-                        append("ems-client-state", "testClientState")
+                        append("ec-client-state", "testClientState")
                     }
                 )
             }
@@ -169,7 +165,6 @@ class ECClientTests {
         val eCClient = ECClient(
             networkClient,
             mockRequestContext,
-            mockTimestampProvider,
             mockUrlFactory,
             json,
             mock(MockMode.autofill),
@@ -186,9 +181,7 @@ class ECClientTests {
         )
         val expectedRequest = request.copy(
             headers = mapOf(
-                "ems-contact" to "testContactToken",
-                "X-Contact-Token" to "testContactToken",
-                "X-Request-Order" to now.toEpochMilliseconds()
+                "ec-contact" to "testContactToken",
             )
         )
 
@@ -197,7 +190,7 @@ class ECClientTests {
             HttpStatusCode.OK,
             headers {
                 append("Content-Type", "application/json")
-                append("ems-client-state", "testClientState")
+                append("ec-client-state", "testClientState")
             },
             json.encodeToString(testData)
         )
@@ -227,7 +220,6 @@ class ECClientTests {
         val eCClient = ECClient(
             networkClient,
             mockRequestContext,
-            mockTimestampProvider,
             mockUrlFactory,
             json,
             mock(MockMode.autofill),

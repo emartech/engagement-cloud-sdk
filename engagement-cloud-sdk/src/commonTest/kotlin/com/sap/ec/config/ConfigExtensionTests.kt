@@ -22,7 +22,7 @@ class ConfigExtensionTests {
 
     @Test
     fun isValid_shouldReturn_true() = runTest {
-        val testConfig = TestEngagementCloudSDKConfig("test-application-code")
+        val testConfig = TestEngagementCloudSDKConfig("INS-S01-APP-ABC12")
 
         testConfig.isValid(mockLogger) shouldBe true
     }

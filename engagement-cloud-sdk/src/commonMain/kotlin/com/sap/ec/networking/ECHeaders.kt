@@ -1,12 +1,7 @@
 package com.sap.ec.networking
 
 internal object ECHeaders {
-    const val CLIENT_ID_HEADER = "ems-client-id"
-    const val X_CLIENT_ID_HEADER = "X-Client-Id"
-    const val CLIENT_STATE_HEADER = "ems-client-state"
-    const val X_CLIENT_STATE_HEADER = "X-Client-State"
-    const val CONTACT_TOKEN_HEADER = "ems-contact"
-    const val X_CONTACT_TOKEN_HEADER = "X-Contact-Token"
-    const val REQUEST_ORDER_HEADER = "X-Request-Order"
-    const val MERCHANT_ID_HEADER = "ems-merchant-id"
+    const val CLIENT_ID_HEADER = "ec-client-id"
+    const val CLIENT_STATE_HEADER = "ec-client-state"
+    const val CONTACT_TOKEN_HEADER = "ec-contact"
 }
