@@ -12,7 +12,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -41,9 +44,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
+import androidx.compose.ui.unit.dp
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.window.core.layout.WindowSizeClass
 import com.sap.ec.SdkConstants
 import com.sap.ec.di.SdkKoinIsolationContext.koin
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.DEFAULT_PADDING
 import com.sap.ec.mobileengage.embeddedmessaging.ui.category.CategoriesDialogView
 import com.sap.ec.mobileengage.embeddedmessaging.ui.detail.MessageDetailView
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.CustomMessageItemViewModelApi
@@ -117,7 +123,10 @@ private fun MessageList(
     val navigator = rememberListDetailPaneScaffoldNavigator<String>()
     val scope = rememberCoroutineScope()
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
-    val canShowDetailPane = windowSizeClass.isWidthAtLeastBreakpoint(400)
+    val canShowDetailPane =
+        windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
+    val isTabletScale =
+        windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND)
 
     LaunchedEffect(hasConnection, hasMessages) {
         if (!hasConnection && hasMessages) {
@@ -175,88 +184,118 @@ private fun MessageList(
                 }
 
                 ListDetailPaneScaffold(
+                    modifier = Modifier.background(MaterialTheme.colorScheme.background),
                     directive = navigator.scaffoldDirective,
                     value = navigator.scaffoldValue,
                     listPane = {
-                        AnimatedPane {
-                            MessageItemsListPane(
-                                lazyListState = listState,
-                                lazyPagingMessageItems = lazyPagingMessageItems,
-                                selectedMessage = selectedMessageViewModel,
-                                hasFiltersApplied = hasFiltersApplied,
-                                hasConnection = hasConnection,
-                                withSwipeGestures = viewModel.platformCategory != SdkConstants.WEB_PLATFORM_CATEGORY,
-                                onRefresh = { viewModel.refreshMessagesWithThrottling { lazyPagingMessageItems.refresh() } },
-                                onMessageClick = { messageViewModel ->
-                                    scope.launch {
-                                        viewModel.selectMessage(messageViewModel) {
-                                            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail)
+                        AdaptiveCardContainer(isTabletScale = isTabletScale) {
+                            AnimatedPane {
+                                MessageItemsListPane(
+                                    lazyListState = listState,
+                                    lazyPagingMessageItems = lazyPagingMessageItems,
+                                    selectedMessage = selectedMessageViewModel,
+                                    hasFiltersApplied = hasFiltersApplied,
+                                    hasConnection = hasConnection,
+                                    withSwipeGestures = viewModel.platformCategory != SdkConstants.WEB_PLATFORM_CATEGORY,
+                                    onRefresh = { viewModel.refreshMessagesWithThrottling { lazyPagingMessageItems.refresh() } },
+                                    onMessageClick = { messageViewModel ->
+                                        scope.launch {
+                                            viewModel.selectMessage(messageViewModel) {
+                                                navigator.navigateTo(ListDetailPaneScaffoldRole.Detail)
+                                            }
                                         }
-                                    }
-                                },
-                                onMessageDelete = { messageId ->
-                                    lazyPagingMessageItems.itemSnapshotList.find { it?.id == messageId }
-                                        ?.let { messageViewModel ->
-                                            viewModel.deleteMessage(messageViewModel)
-                                        } ?: Result.success(Unit)
-                                },
-                                onClearFilters = {
-                                    viewModel.setFilterUnopenedOnly(false)
-                                    viewModel.setSelectedCategoryIds(emptySet())
-                                },
-                                snackbarHostState = snackbarHostState,
-                                customMessageItem = customMessageItem,
-                                listPageViewModel = viewModel,
-                                showFilters = showFilters,
-                                selectedCategoryIds = selectedCategoryIds,
-                                filterUnOpenedOnly = filterUnOpenedOnly,
-                                onFilterChange = {
-                                    viewModel.setFilterUnopenedOnly(it)
-                                },
-                                showCategorySelector = { showCategorySelector = true }
-                            )
+                                    },
+                                    onMessageDelete = { messageId ->
+                                        lazyPagingMessageItems.itemSnapshotList.find { it?.id == messageId }
+                                            ?.let { messageViewModel ->
+                                                viewModel.deleteMessage(messageViewModel)
+                                            } ?: Result.success(Unit)
+                                    },
+                                    onClearFilters = {
+                                        viewModel.setFilterUnopenedOnly(false)
+                                        viewModel.setSelectedCategoryIds(emptySet())
+                                    },
+                                    snackbarHostState = snackbarHostState,
+                                    customMessageItem = customMessageItem,
+                                    listPageViewModel = viewModel,
+                                    showFilters = showFilters,
+                                    selectedCategoryIds = selectedCategoryIds,
+                                    filterUnOpenedOnly = filterUnOpenedOnly,
+                                    onFilterChange = {
+                                        viewModel.setFilterUnopenedOnly(it)
+                                    },
+                                    showCategorySelector = { showCategorySelector = true }
+                                )
+
+                            }
                         }
                     },
                     detailPane = {
-                        AnimatedContent(
-                            targetState = selectedMessageViewModel,
-                            transitionSpec = {
-                                fadeIn() + slideInVertically() togetherWith fadeOut() + slideOutVertically()
-                            }
-                        ) {
-                            selectedMessageViewModel?.let { messageViewModel ->
-                                if (messageViewModel.hasRichContent()) {
-                                    MessageDetailView(
-                                        messageViewModel = messageViewModel,
-                                        onBack = {
-                                            scope.launch {
-                                                navigator.navigateTo(ListDetailPaneScaffoldRole.List)
-                                            }
-                                        },
-                                        modifier = Modifier.onScreenTime(
-                                            3000L,
-                                            0.5f
-                                        ) {
-                                            scope.launch {
-                                                viewModel.tagMessageRead(messageViewModel)
-                                            }
-                                        }
-                                    )
-                                } else {
-                                    scope.launch {
-                                        navigator.navigateTo(ListDetailPaneScaffoldRole.List)
-                                    }
+                        AdaptiveCardContainer(isTabletScale) {
+                            AnimatedContent(
+                                targetState = selectedMessageViewModel,
+                                transitionSpec = {
+                                    fadeIn() + slideInVertically() togetherWith fadeOut() + slideOutVertically()
                                 }
-                            } ?: Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
                             ) {
-                                Text(LocalStringResources.current.detailedMessageEmptyStateText)
+                                selectedMessageViewModel?.let { messageViewModel ->
+                                    if (messageViewModel.hasRichContent()) {
+                                        MessageDetailView(
+                                            messageViewModel = messageViewModel,
+                                            onBack = {
+                                                scope.launch {
+                                                    navigator.navigateTo(
+                                                        ListDetailPaneScaffoldRole.List
+                                                    )
+                                                }
+                                            },
+                                            modifier = Modifier.onScreenTime(
+                                                3000L,
+                                                0.5f
+                                            ) {
+                                                scope.launch {
+                                                    viewModel.tagMessageRead(messageViewModel)
+                                                }
+                                            }
+                                        )
+                                    } else {
+                                        scope.launch {
+                                            navigator.navigateTo(ListDetailPaneScaffoldRole.List)
+                                        }
+                                    }
+                                } ?: Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(LocalStringResources.current.detailedMessageEmptyStateText)
+                                }
                             }
                         }
                     }
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun AdaptiveCardContainer(isTabletScale: Boolean, content: @Composable () -> Unit) {
+    MaterialTheme {
+        if (isTabletScale) {
+            Card(
+                shape = MaterialTheme.shapes.medium,
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.onSurface
+                ),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(DEFAULT_PADDING),
+            ) {
+                content()
+            }
+        } else {
+            content()
         }
     }
 }
