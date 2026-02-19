@@ -46,7 +46,7 @@ class SdkTestScreenViewModel {
 
     fun disableSdk() {
         viewModelScope.launch {
-            EngagementCloud.setup.disableTracking()
+            EngagementCloud.setup.disable()
         }
     }
 

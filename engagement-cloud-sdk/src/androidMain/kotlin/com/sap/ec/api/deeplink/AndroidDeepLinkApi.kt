@@ -8,7 +8,7 @@ import android.content.Intent
  *
  * Engagement Cloud SDK automatically handles deep link tracking in most cases, with only one exception:
  * manual tracking is needed when your Activity has onNewIntent overridden. In that case, you
- * can track the deep link using the [trackDeepLink] method of this interface.
+ * can track the deep link using the [track] method of this interface.
  */
 interface AndroidDeepLinkApi {
 
@@ -21,5 +21,5 @@ interface AndroidDeepLinkApi {
      * @param activity The activity from which the deep link interaction originates.
      * @param intent The intent containing the deep link URI.
      */
-    fun trackDeepLink(activity: Activity, intent: Intent): Boolean
+    fun track(activity: Activity, intent: Intent): Boolean
 }

@@ -4,9 +4,9 @@ import com.sap.ec.api.config.AndroidEngagementCloudSDKConfig
 
 interface AndroidSetupApi {
 
-    suspend fun enableTracking(config: AndroidEngagementCloudSDKConfig): Result<Unit>
+    suspend fun enable(config: AndroidEngagementCloudSDKConfig): Result<Unit>
 
-    suspend fun disableTracking(): Result<Unit>
+    suspend fun disable(): Result<Unit>
 
     suspend fun isEnabled(): Boolean
 }

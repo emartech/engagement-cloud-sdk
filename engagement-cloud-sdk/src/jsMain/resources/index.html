@@ -60,7 +60,7 @@
 
         const config = {applicationCode: "EMS11-C3FD3"};
 
-        await engagementCloud.setup.enableTracking(config);
+        await engagementCloud.setup.enable(config);
         await engagementCloud.contact.link("test@test.com");
         engagementCloud.events.on("app_event", (event) => console.log(JSON.stringify(event)));
     }
@@ -75,7 +75,7 @@
                 "/ec-service-worker.js"
             )
         )
-        await engagementCloud.setup.enableTracking(config);
+        await engagementCloud.setup.enable(config);
         await engagementCloud.contact.link("test2@test.com");
     }
 
@@ -89,7 +89,7 @@
     }
 
     document.getElementById("button-disable-sdk").onclick = async () => {
-        await engagementCloud.setup.disableTracking();
+        await engagementCloud.setup.disable();
     }
 
     document.getElementById("button-render-compact-view").onclick = () => {

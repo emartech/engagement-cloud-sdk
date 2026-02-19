@@ -15,7 +15,7 @@ internal class Setup(
     private val sdkContext: SdkContextApi,
     private val logger: Logger
 ) : SetupApi {
-    override suspend fun enableTracking(config: SdkConfig): Result<Unit> {
+    override suspend fun enable(config: SdkConfig): Result<Unit> {
         return withContext(sdkContext.sdkDispatcher) {
             //todo check exception handling
             runCatchingWithoutCancellation {
@@ -25,7 +25,7 @@ internal class Setup(
         }
     }
 
-    override suspend fun disableTracking(): Result<Unit> {
+    override suspend fun disable(): Result<Unit> {
         return withContext(sdkContext.sdkDispatcher) {
             //todo check usage of SdkAlreadyDisabledException
             runCatchingWithoutCancellation {

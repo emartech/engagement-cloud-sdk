@@ -8,12 +8,13 @@ internal class JsSetup(
 ) : JsSetupApi {
 
     /**
-     * Enables tracking with the provided configuration.
+     * Enables the SDK with the provided configuration.
+     * The SDK will start tracking only after this method has been called.
      *
      * @param config is the SDK configuration to use for enabling tracking.
      */
-    override suspend fun enableTracking(config: JsApiConfig) {
-        setup.enableTracking(
+    override suspend fun enable(config: JsApiConfig) {
+        setup.enable(
             JsEngagementCloudSDKConfig(
                 applicationCode = config.applicationCode,
                 config.serviceWorkerOptions
@@ -22,14 +23,14 @@ internal class JsSetup(
     }
 
     /**
-     * Disables tracking.
+     * Disables the SDK and it will no longer send or track any events.
      */
-    override suspend fun disableTracking() {
-        setup.disableTracking()
+    override suspend fun disable() {
+        setup.disable()
     }
 
     /**
-     * Checks if tracking is enabled.
+     * Checks if the SDK is enabled.
      */
     override suspend fun isEnabled(): Boolean {
         return setup.isEnabled()

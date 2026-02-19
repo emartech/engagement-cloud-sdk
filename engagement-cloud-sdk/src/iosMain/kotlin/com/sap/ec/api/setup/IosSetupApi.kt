@@ -8,10 +8,10 @@ import io.ktor.utils.io.CancellationException
 interface IosSetupApi {
 
     @Throws(SdkAlreadyEnabledException::class, CancellationException::class)
-    suspend fun enableTracking(config: IosEngagementCloudSDKConfig)
+    suspend fun enable(config: IosEngagementCloudSDKConfig)
 
     @Throws(SdkAlreadyDisabledException::class, CancellationException::class)
-    suspend fun disableTracking()
+    suspend fun disable()
 
     suspend fun isEnabled(): Boolean
 }

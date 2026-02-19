@@ -22,16 +22,16 @@ class IosSetupTests {
     fun enableTracking_shouldDelegate_toTheSameMethod_onSetupApi() = runTest {
         val iosConfig = IosEngagementCloudSDKConfig("ABC-123")
 
-        iosSetup.enableTracking(iosConfig)
+        iosSetup.enable(iosConfig)
 
-        verifySuspend { mockSetup.enableTracking(iosConfig) }
+        verifySuspend { mockSetup.enable(iosConfig) }
     }
 
     @Test
     fun disableTracking_shouldDelegate_toTheSameMethod_onSetupApi() = runTest {
 
-        iosSetup.disableTracking()
+        iosSetup.disable()
 
-        verifySuspend { mockSetup.disableTracking() }
+        verifySuspend { mockSetup.disable() }
     }
 }

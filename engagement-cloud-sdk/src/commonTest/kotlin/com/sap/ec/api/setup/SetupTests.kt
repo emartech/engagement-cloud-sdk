@@ -53,16 +53,16 @@ class SetupTests {
     fun enableTracking_shouldReturnSuccess_ifEnableOrganizer_succeeds() = runTest {
         val testConfig = TestEngagementCloudSDKConfig("ABCDE-12345")
 
-        val result = setup.enableTracking(testConfig)
+        val result = setup.enable(testConfig)
 
         result.isSuccess shouldBe true
     }
 
     @Test
-    fun enableTracking_shouldValidate_theConfig_andReturnFailure_ifValidationFails() = runTest {
+    fun enable_shouldValidate_theConfig_andReturnFailure_ifValidationFails() = runTest {
         val testConfig = TestEngagementCloudSDKConfig("null")
 
-        val result = setup.enableTracking(testConfig)
+        val result = setup.enable(testConfig)
 
         result.isFailure shouldBe true
         (result.exceptionOrNull() is SdkException.InvalidApplicationCodeException) shouldBe true
@@ -74,7 +74,7 @@ class SetupTests {
         val testConfig = TestEngagementCloudSDKConfig("ABCDE-12345")
         everySuspend { mockEnableOrganizer.enableWithValidation(testConfig) } throws testException
 
-        val result = setup.enableTracking(testConfig)
+        val result = setup.enable(testConfig)
 
         result.isFailure shouldBe true
         result.exceptionOrNull() shouldBe testException
@@ -82,7 +82,7 @@ class SetupTests {
 
     @Test
     fun disableTracking_shouldReturnSuccess_ifDisableOrganizer_succeeds() = runTest {
-        val result = setup.disableTracking()
+        val result = setup.disable()
 
         result.isSuccess shouldBe true
     }
@@ -92,7 +92,7 @@ class SetupTests {
         val testException = Exception("failed")
         everySuspend { mockDisableOrganizer.disable() } throws testException
 
-        val result = setup.disableTracking()
+        val result = setup.disable()
 
         result.isFailure shouldBe true
         result.exceptionOrNull() shouldBe testException

@@ -4,9 +4,9 @@ import com.sap.ec.config.SdkConfig
 
 interface SetupApi {
 
-    suspend fun enableTracking(config: SdkConfig): Result<Unit>
+    suspend fun enable(config: SdkConfig): Result<Unit>
 
-    suspend fun disableTracking(): Result<Unit>
+    suspend fun disable(): Result<Unit>
 
     suspend fun isEnabled(): Boolean
 

@@ -15,7 +15,7 @@ class AndroidDeepLink(
     private val deepLink: DeepLinkApi,
     private val sdkLogger: Logger
 ): AndroidDeepLinkApi {
-    override fun trackDeepLink(
+    override fun track(
         activity: Activity,
         intent: Intent
     ): Boolean {
