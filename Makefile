@@ -20,6 +20,17 @@ check-env:
 		echo "Please set them in your .env file or as system environment variables. Check https://secret.emarsys.net/cred/detail/18243/"; \
 		exit 1; \
 	fi
+help:
+	@echo "Available targets:"
+	@echo "  build-android    - Build Android artifacts"
+	@echo "  build-ios        - Build iOS artifacts"
+	@echo "  build-js-html    - Build JS artifacts"
+	@echo "  lint             - Run lint"
+	@echo "  test             - Run all tests"
+	@echo "  publish-maven    - Publish to GitHub Packages (Maven)"
+	@echo "  publish-npm      - Publish to GitHub Packages (NPM)"
+	@echo "  publish-ios-spm  - Publish iOS SPM"
+
 clean-dist:
 	@rm -rf dist
 
@@ -45,14 +56,14 @@ build-js-html: check-env
 build-web: build-js-html
 
 test-web: check-env
-	@./gradlew :engagement-cloud-sdk:jsBrowserProductionLibraryTest \
+	@./gradlew :engagement-cloud-sdk:jsBrowserTest \
 		-Pjs.variant=html \
-		-x :composeApp:jsBrowserProductionLibraryTest
+		-x :composeApp:jsBrowserTest
 
 test-sdk-loader: check-env
-	@./gradlew :engagement-cloud-sdk:jsBrowserProductionLibraryTest \
+	@./gradlew :engagement-cloud-sdk:jsBrowserTest \
 		-Pjs.variant=html \
-		-x :composeApp:jsBrowserProductionLibraryTest \
+		-x :composeApp:jsBrowserTest \
 		--tests com.sap.ec.mobileengage.WebSdkLoaderTest
 
 test-jvm: check-env
@@ -60,7 +71,7 @@ test-jvm: check-env
 
 build-android: check-env
 	@./gradlew \
-		:engagement-cloud-sdk:assembleAndroidRelease \
+		:engagement-cloud-sdk:assembleAndroidMain \
 		:engagement-cloud-sdk-android-fcm:assembleRelease \
 		:engagement-cloud-sdk-android-hms:assembleRelease
 
@@ -69,6 +80,11 @@ test-android: check-env
 		:engagement-cloud-sdk:testAndroidReleaseUnitTest \
 		:engagement-cloud-sdk-android-fcm:testReleaseUnitTest \
 		:engagement-cloud-sdk-android-hms:testReleaseUnitTest
+
+build-ios-all-archtypes: check-env
+	@./gradlew \
+		:engagement-cloud-sdk:assembleEngagementCloudSDKReleaseXCFramework \
+		:ios-notification-service:assembleEngagementCloudNotificationServiceReleaseXCFramework
 
 build-ios: check-env
 	@./gradlew :engagement-cloud-sdk:iosArm64Binaries

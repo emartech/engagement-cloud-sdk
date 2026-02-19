@@ -16,7 +16,7 @@ kotlin {
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "SAPEngagementCloudNotificationService"
+            baseName = "EngagementCloudNotificationService"
             isStatic = true
         }
     }

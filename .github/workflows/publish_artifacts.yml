@@ -115,8 +115,8 @@ jobs:
           retention-days: 1
           if-no-files-found: error
           path: |
-            engagement-cloud-sdk/build/XCFrameworks/release/
-            ios-notification-service/build/XCFrameworks/release/
+            engagement-cloud-sdk/build/XCFrameworks/release/*.xcframework
+            ios-notification-service/build/XCFrameworks/release/*.xcframework
 
 
   build-js:

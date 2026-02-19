@@ -1,13 +1,13 @@
 // swift-tools-version:5.3
 import PackageDescription
 
-// BEGIN KMMBRIDGE VARIABLES BLOCK FOR 'SAPEngagementCloudSDK' (do not edit)
-let SdkPackageName = "SAPEngagementCloudSDK"
-// END KMMBRIDGE BLOCK FOR 'SAPEngagementCloudSDK'
+// BEGIN KMMBRIDGE VARIABLES BLOCK FOR 'EngagementCloudSDK' (do not edit)
+let SdkPackageName = "EngagementCloudSDK"
+// END KMMBRIDGE BLOCK FOR 'EngagementCloudSDK'
 
-// BEGIN KMMBRIDGE VARIABLES BLOCK FOR 'SAPEngagementCloudNotificationService' (do not edit)
-let NotificationServicePackageName = "SAPEngagementCloudNotificationService"
-// END KMMBRIDGE BLOCK FOR 'SAPEngagementCloudNotificationService'
+// BEGIN KMMBRIDGE VARIABLES BLOCK FOR 'EngagementCloudNotificationService' (do not edit)
+let NotificationServicePackageName = "EngagementCloudNotificationService"
+// END KMMBRIDGE BLOCK FOR 'EngagementCloudNotificationService'
 
 
 let package = Package(

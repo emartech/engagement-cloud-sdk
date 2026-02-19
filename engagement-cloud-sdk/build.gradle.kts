@@ -99,7 +99,7 @@ kotlin {
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "SAPEngagementCloudSDK"
+            baseName = "EngagementCloudSDK"
             isStatic = false
         }
     }
@@ -352,10 +352,10 @@ mavenPublishing {
     coordinates(group.toString(), "engagement-cloud-sdk", version.toString())
 
     pom {
-        name = "SAP Engagement Cloud SDK"
-        description = "SAP Engagement Cloud SDK"
+        name = "Engagement Cloud SDK"
+        description = "Engagement Cloud SDK"
         inceptionYear = "2025"
-        url = "https://github.com/emartech/sap-engagement-cloud-sdk/"
+        url = "https://github.com/emartech/engagement-cloud-sdk/"
         licenses {
             license {
                 name = "Apache License 2.0"
@@ -366,7 +366,7 @@ mavenPublishing {
         developers {
             developer {
                 id = "sap"
-                name = "SAP"
+                name = "Emarsys"
                 url = "https://sap.com"
             }
         }
