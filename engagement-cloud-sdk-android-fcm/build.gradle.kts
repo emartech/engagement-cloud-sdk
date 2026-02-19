@@ -62,7 +62,7 @@ if (findProperty("ENABLE_PUBLISHING") == "true") {
         repositories {
             maven {
                 name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/${System.getenv("GITHUB_REPO") ?: "emartech/kmp-emarsys-sdk"}")
+                url = uri("https://maven.pkg.github.com/${System.getenv("GITHUB_REPO") ?: "emartech/engagement-cloud-sdk"}")
                 credentials {
                     username = System.getenv("GITHUB_ACTOR")
                     password = System.getenv("GITHUB_TOKEN")

@@ -301,7 +301,7 @@ kmmbridge {
         "release" -> {
             println("Building for release")
             spm(
-                spmDirectory = "./iosReleaseSpm",
+                spmDirectory = "${rootDir}/iosReleaseSpm",
                 useCustomPackageFile = true,
                 perModuleVariablesBlock = true
             )
@@ -335,7 +335,7 @@ if (project.findProperty("ENABLE_PUBLISHING") == "true") {
         repositories {
             maven {
                 name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/emartech/sap-engagement-cloud-sdk")
+                url = uri("https://maven.pkg.github.com/${System.getenv("GITHUB_REPO") ?: "emartech/engagement-cloud-sdk"}")
                 credentials {
                     username = System.getenv("GITHUB_ACTOR")
                     password = System.getenv("GITHUB_TOKEN")

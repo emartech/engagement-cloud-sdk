@@ -52,7 +52,7 @@ kmmbridge {
         "release" -> {
             println("Building for release")
             spm(
-                spmDirectory = "./iosReleaseSpm",
+                spmDirectory = "${rootDir}/iosReleaseSpm",
                 useCustomPackageFile = true,
                 perModuleVariablesBlock = true
             )

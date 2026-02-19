@@ -6,7 +6,7 @@
 
     const currentSource = document.currentScript.src
     const baseUrl = currentSource.substring(0, currentSource.lastIndexOf('/'));
-    const sdkUrl = `${baseUrl}/sap-engagement-cloud-sdk-html.js`
+    const sdkUrl = `${baseUrl}/engagement-cloud-sdk-html.js`
 
     global.SAPEngagementCloud = {
         ready: sdkReady,
