@@ -5,6 +5,7 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.sap.ec.service.fcm.model.FirebaseMessagingServiceRegistrationOptions
 import kotlinx.serialization.json.Json
+import org.jetbrains.annotations.ApiStatus
 
 
 class SAPEngagementCloudFirebaseMessagingService : FirebaseMessagingService() {
@@ -20,11 +21,23 @@ class SAPEngagementCloudFirebaseMessagingService : FirebaseMessagingService() {
         internal val messagingServices =
             mutableListOf<Pair<FirebaseMessagingServiceRegistrationOptions, FirebaseMessagingService>>()
 
+        @ApiStatus.Experimental
         fun registerMessagingService(
             messagingService: FirebaseMessagingService,
-            registrationOptions: FirebaseMessagingServiceRegistrationOptions = FirebaseMessagingServiceRegistrationOptions()
+            registrationOptions: FirebaseMessagingServiceRegistrationOptions
         ) {
             messagingServices.add(Pair(registrationOptions, messagingService))
+        }
+
+        fun registerMessagingService(
+            messagingService: FirebaseMessagingService
+        ) {
+            messagingServices.add(
+                Pair(
+                    FirebaseMessagingServiceRegistrationOptions(),
+                    messagingService
+                )
+            )
         }
     }
 
