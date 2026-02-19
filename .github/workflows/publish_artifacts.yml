@@ -215,7 +215,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run Android unit tests
-        run: ./gradlew :engagement-cloud-sdk:allTests -x :composeApp:test
+        run: make test-android
 
 
   test-ios:
