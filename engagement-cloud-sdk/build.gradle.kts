@@ -140,6 +140,7 @@ kotlin {
                 implementation(libs.compose.resources)
                 implementation(libs.compose.plugin.ui.tooling.preview)
                 implementation(libs.compose.material.icons)
+                implementation(libs.androidx.lifecycle.runtime)
 
                 implementation(libs.compose.adaptive)
                 implementation(libs.compose.adaptive.navigation)
