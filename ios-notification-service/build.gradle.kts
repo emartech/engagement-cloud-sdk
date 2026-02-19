@@ -6,8 +6,13 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.mokkery)
     alias(libs.plugins.skie)
-    alias(libs.plugins.kmmbridge)
+    alias(libs.plugins.kmmbridge) apply false
     `maven-publish`
+}
+
+val isMac = System.getProperty("os.name").contains("Mac", ignoreCase = true)
+if (isMac) {
+    apply(plugin = "co.touchlab.kmmbridge")
 }
 
 kotlin {
@@ -44,27 +49,29 @@ kotlin {
     }
 }
 
-kmmbridge {
-    frameworkName.set("EngagementCloudNotificationService")
-    val spmBuildType = System.getenv("SPM_BUILD") ?: "dev"
-    when (spmBuildType) {
-        "dev" -> {
-            println("Building for local SPM development")
-            spm()
-        }
+if (isMac) {
+    kmmbridge {
+        frameworkName.set("EngagementCloudNotificationService")
+        val spmBuildType = System.getenv("SPM_BUILD") ?: "dev"
+        when (spmBuildType) {
+            "dev" -> {
+                println("Building for local SPM development")
+                spm()
+            }
 
-        "release" -> {
-            println("Building for release")
-            mavenPublishArtifacts()
-            spm(
-                spmDirectory = "${rootDir}/iosReleaseSpm",
-                useCustomPackageFile = true,
-                perModuleVariablesBlock = true
-            )
-        }
+            "release" -> {
+                println("Building for release")
+                mavenPublishArtifacts()
+                spm(
+                    spmDirectory = "${rootDir}/iosReleaseSpm",
+                    useCustomPackageFile = true,
+                    perModuleVariablesBlock = true
+                )
+            }
 
-        else -> {
-            println("Unknown SPM build type: $spmBuildType. Defaulting to local SPM development.")
+            else -> {
+                println("Unknown SPM build type: $spmBuildType. Defaulting to local SPM development.")
+            }
         }
     }
 }

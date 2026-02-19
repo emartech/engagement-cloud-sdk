@@ -221,7 +221,7 @@ jobs:
   test-ios:
     name: Test / iOS
     needs: build-ios
-    runs-on: macos-latest
+    runs-on: macos-latest-xlarge
     steps:
       - uses: actions/checkout@v4
         with:

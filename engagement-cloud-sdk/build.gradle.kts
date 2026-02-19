@@ -3,6 +3,8 @@
 import co.touchlab.skie.configuration.DefaultArgumentInterop
 import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
 import com.github.gmazzo.buildconfig.BuildConfigTask
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.KotlinMultiplatform
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import java.util.Base64
 
@@ -17,9 +19,14 @@ plugins {
     alias(libs.plugins.skie)
     alias(libs.plugins.sqlDelight)
     alias(libs.plugins.mavenPublish)
-    alias(libs.plugins.kmmbridge)
+    alias(libs.plugins.kmmbridge) apply false
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.jetbrainsCompose)
+}
+
+val isMac = System.getProperty("os.name").contains("Mac", ignoreCase = true)
+if (isMac) {
+    apply(plugin = "co.touchlab.kmmbridge")
 }
 
 group = "com.sap"
@@ -293,27 +300,29 @@ tasks.register<Exec>("sdkLoaderTest") {
     )
 }
 
-kmmbridge {
-    frameworkName.set("EngagementCloudSDK")
-    val spmBuildType = System.getenv("SPM_BUILD") ?: "dev"
-    when (spmBuildType) {
-        "dev" -> {
-            println("Building for local SPM development")
-            spm()
-        }
+if (isMac) {
+    kmmbridge {
+        frameworkName.set("EngagementCloudSDK")
+        val spmBuildType = System.getenv("SPM_BUILD") ?: "dev"
+        when (spmBuildType) {
+            "dev" -> {
+                println("Building for local SPM development")
+                spm()
+            }
 
-        "release" -> {
-            println("Building for release")
-            mavenPublishArtifacts()
-            spm(
-                spmDirectory = "${rootDir}/iosReleaseSpm",
-                useCustomPackageFile = true,
-                perModuleVariablesBlock = true
-            )
-        }
+            "release" -> {
+                println("Building for release")
+                mavenPublishArtifacts()
+                spm(
+                    spmDirectory = "${rootDir}/iosReleaseSpm",
+                    useCustomPackageFile = true,
+                    perModuleVariablesBlock = true
+                )
+            }
 
-        else -> {
-            println("Unknown SPM build type: $spmBuildType. Defaulting to local SPM development.")
+            else -> {
+                println("Unknown SPM build type: $spmBuildType. Defaulting to local SPM development.")
+            }
         }
     }
 }
@@ -352,6 +361,7 @@ if (project.findProperty("ENABLE_PUBLISHING") == "true") {
 
 
 mavenPublishing {
+    configure(KotlinMultiplatform(javadocJar = JavadocJar.None()))
     publishToMavenCentral()
     if (project.hasProperty("signing.keyId") || System.getenv("GPG_PRIVATE_KEY") != null) {
         signAllPublications()
