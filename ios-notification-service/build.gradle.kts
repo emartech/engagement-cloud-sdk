@@ -1,3 +1,4 @@
+import co.touchlab.kmmbridge.KmmBridgeExtension
 import co.touchlab.skie.configuration.DefaultArgumentInterop
 import org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeSimulatorTest
 
@@ -50,7 +51,7 @@ kotlin {
 }
 
 if (isMac) {
-    kmmbridge {
+    extensions.configure<KmmBridgeExtension>("kmmbridge") {
         frameworkName.set("EngagementCloudNotificationService")
         val spmBuildType = System.getenv("SPM_BUILD") ?: "dev"
         when (spmBuildType) {

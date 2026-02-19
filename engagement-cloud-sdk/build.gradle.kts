@@ -1,5 +1,6 @@
 @file:OptIn(ExperimentalKotlinGradlePluginApi::class)
 
+import co.touchlab.kmmbridge.KmmBridgeExtension
 import co.touchlab.skie.configuration.DefaultArgumentInterop
 import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
 import com.github.gmazzo.buildconfig.BuildConfigTask
@@ -301,7 +302,7 @@ tasks.register<Exec>("sdkLoaderTest") {
 }
 
 if (isMac) {
-    kmmbridge {
+    extensions.configure<KmmBridgeExtension>("kmmbridge") {
         frameworkName.set("EngagementCloudSDK")
         val spmBuildType = System.getenv("SPM_BUILD") ?: "dev"
         when (spmBuildType) {
