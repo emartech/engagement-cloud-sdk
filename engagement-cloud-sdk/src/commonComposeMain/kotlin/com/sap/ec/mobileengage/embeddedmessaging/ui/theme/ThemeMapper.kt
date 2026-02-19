@@ -57,20 +57,19 @@ internal class ThemeMapper(private val embeddedMessagingContext: EmbeddedMessagi
                 inverseOnSurface = colors.inverseOnSurface.toColor(MaterialTheme.colorScheme.inverseOnSurface),
                 inversePrimary = colors.inversePrimary.toColor(MaterialTheme.colorScheme.inversePrimary),
                 scrim = colors.scrim.toColor(MaterialTheme.colorScheme.scrim),
-
-                surfaceTint = MaterialTheme.colorScheme.surfaceTint,
-                primaryFixed = MaterialTheme.colorScheme.primaryFixed,
-                primaryFixedDim = MaterialTheme.colorScheme.primaryFixedDim,
-                onPrimaryFixed = MaterialTheme.colorScheme.onPrimaryFixed,
-                onPrimaryFixedVariant = MaterialTheme.colorScheme.onPrimaryFixedVariant,
-                secondaryFixed = MaterialTheme.colorScheme.secondaryFixed,
-                secondaryFixedDim = MaterialTheme.colorScheme.secondaryFixedDim,
-                onSecondaryFixed = MaterialTheme.colorScheme.onSecondaryFixed,
-                onSecondaryFixedVariant = MaterialTheme.colorScheme.onSecondaryFixedVariant,
-                tertiaryFixed = MaterialTheme.colorScheme.tertiaryFixed,
-                tertiaryFixedDim = MaterialTheme.colorScheme.tertiaryFixedDim,
-                onTertiaryFixed = MaterialTheme.colorScheme.onTertiaryFixed,
-                onTertiaryFixedVariant = MaterialTheme.colorScheme.onTertiaryFixedVariant
+                surfaceTint = colors.surfaceTint.toColor(MaterialTheme.colorScheme.surfaceTint),
+                primaryFixed = colors.primaryFixed.toColor(MaterialTheme.colorScheme.primaryFixed),
+                primaryFixedDim = colors.primaryFixedDim.toColor(MaterialTheme.colorScheme.primaryFixedDim),
+                onPrimaryFixed = colors.onPrimaryFixed.toColor(MaterialTheme.colorScheme.onPrimaryFixed),
+                onPrimaryFixedVariant = colors.onPrimaryFixedVariant.toColor(MaterialTheme.colorScheme.onPrimaryFixedVariant),
+                secondaryFixed = colors.secondaryFixed.toColor(MaterialTheme.colorScheme.secondaryFixed),
+                secondaryFixedDim = colors.secondaryFixedDim.toColor(MaterialTheme.colorScheme.secondaryFixedDim),
+                onSecondaryFixed = colors.onSecondaryFixed.toColor(MaterialTheme.colorScheme.onSecondaryFixed),
+                onSecondaryFixedVariant = colors.onSecondaryFixedVariant.toColor(MaterialTheme.colorScheme.onSecondaryFixedVariant),
+                tertiaryFixed = colors.tertiaryFixed.toColor(MaterialTheme.colorScheme.tertiaryFixed),
+                tertiaryFixedDim = colors.tertiaryFixedDim.toColor(MaterialTheme.colorScheme.tertiaryFixedDim),
+                onTertiaryFixed = colors.onTertiaryFixed.toColor(MaterialTheme.colorScheme.onTertiaryFixed),
+                onTertiaryFixedVariant = colors.onTertiaryFixedVariant.toColor(MaterialTheme.colorScheme.onTertiaryFixedVariant)
             )
         } ?: MaterialTheme.colorScheme
     }
