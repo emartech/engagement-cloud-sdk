@@ -41,7 +41,7 @@ fun CategorySelectorButton(
             ),
             text = { Text(LocalStringResources.current.categoriesFilterButtonLabel) },
             containerColor = if (isCategorySelectionActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = if (isCategorySelectionActive) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+            contentColor = if (isCategorySelectionActive) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
             shape = MaterialTheme.shapes.small
         )
     }

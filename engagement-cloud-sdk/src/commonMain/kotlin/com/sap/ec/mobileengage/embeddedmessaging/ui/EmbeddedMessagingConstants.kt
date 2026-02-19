@@ -73,7 +73,7 @@ internal object EmbeddedMessagingConstants {
         const val ON_BACKGROUND = "#1B1C18"
         const val SURFACE = "#E9E9DD"
         const val ON_SURFACE = "#1B1C18"
-        const val SURFACE_VARIANT = "#ffffff"
+        const val SURFACE_VARIANT = "#EFEFE2"
         const val ON_SURFACE_VARIANT = "#9dae75"
         const val SURFACE_CONTAINER = "#F0EFE8"
         const val SURFACE_CONTAINER_HIGH = "#EAE9E2"

@@ -22,9 +22,11 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -504,20 +506,19 @@ private fun LazyItemScope.FilteredMessageItemsListEmptyState(onClearFilters: () 
                     style = MaterialTheme.typography.bodyLarge
                 )
                 Spacer(modifier = Modifier.height(LocalDesignValues.current.listContentPadding))
-                ExtendedFloatingActionButton(
+                Button(
                     onClick = onClearFilters,
                     modifier = Modifier.height(FLOATING_ACTION_BUTTON_SIZE),
-                    icon = {
-                        Icon(
-                            Icons.Outlined.Clear,
-                            contentDescription = LocalStringResources.current.emptyStateFilteredClearFiltersIconAltText,
-                        )
-                    },
-                    text = { Text(LocalStringResources.current.emptyStateFilteredClearFiltersButtonLabel) },
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    shape = MaterialTheme.shapes.small
-                )
+                    colors = ButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                        disabledContainerColor = ButtonDefaults.buttonColors().disabledContainerColor,
+                        disabledContentColor = ButtonDefaults.buttonColors().disabledContentColor
+                    ),
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    Text(LocalStringResources.current.emptyStateFilteredClearFiltersButtonLabel)
+                }
             }
         }
     }

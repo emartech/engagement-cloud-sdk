@@ -142,7 +142,7 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
 
     val filterButtonUnselected by style {
         backgroundColor(Color.transparent)
-        color(CssColorVars.colorOnSurfaceVariant.value())
+        color(CssColorVars.colorOnSurface.value())
         border(ZERO_BORDER_WIDTH)
     }
 
@@ -428,7 +428,7 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
 
     val categorySelectorButtonInactive by style {
         backgroundColor(CssColorVars.colorSurfaceVariant.value())
-        color(CssColorVars.colorOnSurfaceVariant.value())
+        color(CssColorVars.colorOnSurface.value())
         border(ZERO_BORDER_WIDTH)
     }
 
