@@ -2,7 +2,7 @@
     android:versionCode="1"
     android:versionName="0.0.0">
 
-    <application android:name=".TestApplication">
+    <application android:name="com.sap.ec.TestApplication">
         <activity
             android:name="com.sap.ec.FakeActivity"
             android:exported="true"

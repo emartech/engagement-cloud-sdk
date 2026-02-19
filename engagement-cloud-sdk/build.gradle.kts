@@ -3,15 +3,12 @@
 import co.touchlab.skie.configuration.DefaultArgumentInterop
 import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
 import com.github.gmazzo.buildconfig.BuildConfigTask
-import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
-import com.vanniktech.maven.publish.JavadocJar
-import com.vanniktech.maven.publish.SourcesJar
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import java.util.Base64
 
 plugins {
-    alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.kotlinMultiplatformLibrary)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.dokka)
     alias(libs.plugins.ksp)
@@ -34,9 +31,26 @@ kotlin {
         freeCompilerArgs.add("-Xenable-suspend-function-exporting")
     }
     jvmToolchain(17)
-    androidTarget {
-        publishLibraryVariants("release")
+
+    androidLibrary {
+        namespace = "com.sap"
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
+
+        androidResources {
+            enable = true
+        }
+
+        withHostTest {
+            isIncludeAndroidResources = true
+        }
+
+        withDeviceTest {
+            instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+            execution = "HOST"
+        }
     }
+
 
     // Dynamic JS variant selection: -Pjs.variant=html or -Pjs.variant=canvas (default: canvas)
     val jsVariant = project.findProperty("js.variant")?.toString() ?: "html"
@@ -154,13 +168,13 @@ kotlin {
             }
         }
 
-        val androidUnitTest by getting {
+        val androidHostTest by getting {
             dependencies {
                 implementation(libs.kotlin.test)
                 implementation(libs.mockk.android)
             }
         }
-        val androidInstrumentedTest by getting {
+        val androidDeviceTest by getting {
             dependencies {
                 implementation(libs.kotlin.test)
                 implementation(libs.koin.test)
@@ -224,32 +238,32 @@ kotlin {
     }
 }
 
-android {
-    namespace = "com.sap"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
-
-    defaultConfig {
-        minSdk = libs.versions.android.minSdk.get().toInt()
-//        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunner = "com.sap.ec.SdkTestInstrumentationRunner"
-    }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-            excludes += "/META-INF/LICENSE.md"
-            excludes += "/META-INF/LICENSE-notice.md"
-        }
-    }
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
-    }
-}
+//android {
+//    namespace = "com.sap"
+//    compileSdk = libs.versions.android.compileSdk.get().toInt()
+//
+//    defaultConfig {
+//        minSdk = libs.versions.android.minSdk.get().toInt()
+////        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+//        testInstrumentationRunner = "com.sap.ec.SdkTestInstrumentationRunner"
+//    }
+//    packaging {
+//        resources {
+//            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+//            excludes += "/META-INF/LICENSE.md"
+//            excludes += "/META-INF/LICENSE-notice.md"
+//        }
+//    }
+//    buildTypes {
+//        getByName("release") {
+//            isMinifyEnabled = true
+//            proguardFiles(
+//                getDefaultProguardFile("proguard-android-optimize.txt"),
+//                "proguard-rules.pro"
+//            )
+//        }
+//    }
+//}
 
 buildConfig {
     packageName("com.sap.ec.core.device")
@@ -279,7 +293,10 @@ tasks.withType<app.cash.sqldelight.gradle.SqlDelightTask>().configureEach {
                 file.writeText(
                     file.readText()
                         .replace("public data class Events", "internal data class Events")
-                        .replace("public interface SapEngagementCloudDB", "internal interface SapEngagementCloudDB")
+                        .replace(
+                            "public interface SapEngagementCloudDB",
+                            "internal interface SapEngagementCloudDB"
+                        )
                         .replace("public class EventsQueries", "internal class EventsQueries")
                 )
             }
@@ -337,46 +354,47 @@ skie {
         disableUpload.set(true)
     }
 }
-mavenPublishing {
-    publishToMavenCentral()
-    signAllPublications()
 
-    configure(
-        AndroidSingleVariantLibrary(
-            javadocJar = JavadocJar.Javadoc(),
-            sourcesJar = SourcesJar.Sources(),
-            variant = "release",
-        )
-    )
-
-    coordinates(group.toString(), "sap-engagement-cloud-sdk", version.toString())
-
-    pom {
-        name = "SAP Engagement Cloud SDK"
-        description = "SAP Engagement Cloud SDK"
-        inceptionYear = "2025"
-        url = "https://github.com/emartech/sap-engagement-cloud-sdk/"
-        licenses {
-            license {
-                name = "Mozilla Public License 2.0"
-                url = "https://github.com/emartech/sap-engagement-cloud-sdk/blob/main/LICENSE"
-                distribution = "https://github.com/emartech/sap-engagement-cloud-sdk/blob/main/LICENSE"
-            }
-        }
-        developers {
-            developer {
-                id = "sap"
-                name = "SAP"
-                url = "https://sap.com"
-            }
-        }
-        scm {
-            url = "https://github.com/emartech/sap-engagement-cloud-sdk"
-            connection = "scm:git:https://github.com/emartech/sap-engagement-cloud-sdk.git"
-            developerConnection = "scm:git:https://github.com/emartech/sap-engagement-cloud-sdk.git"
-        }
-    }
-}
+//mavenPublishing {
+//    publishToMavenCentral()
+//    signAllPublications()
+//
+////    configure(
+////        AndroidSingleVariantLibrary(
+////            javadocJar = JavadocJar.Javadoc(),
+////            sourcesJar = SourcesJar.Sources(),
+////            variant = "release",
+////        )
+////    )
+//
+//    coordinates(group.toString(), "sap-engagement-cloud-sdk", version.toString())
+//
+//    pom {
+//        name = "SAP Engagement Cloud SDK"
+//        description = "SAP Engagement Cloud SDK"
+//        inceptionYear = "2025"
+//        url = "https://github.com/emartech/sap-engagement-cloud-sdk/"
+//        licenses {
+//            license {
+//                name = "Mozilla Public License 2.0"
+//                url = "https://github.com/emartech/sap-engagement-cloud-sdk/blob/main/LICENSE"
+//                distribution = "https://github.com/emartech/sap-engagement-cloud-sdk/blob/main/LICENSE"
+//            }
+//        }
+//        developers {
+//            developer {
+//                id = "sap"
+//                name = "SAP"
+//                url = "https://sap.com"
+//            }
+//        }
+//        scm {
+//            url = "https://github.com/emartech/sap-engagement-cloud-sdk"
+//            connection = "scm:git:https://github.com/emartech/sap-engagement-cloud-sdk.git"
+//            developerConnection = "scm:git:https://github.com/emartech/sap-engagement-cloud-sdk.git"
+//        }
+//    }
+//}
 
 tasks {
     register("base64EnvToFile") {
