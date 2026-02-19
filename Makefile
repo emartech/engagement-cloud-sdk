@@ -112,8 +112,6 @@ prepare-spm: check-env
 publish-maven: check-env
 	@./gradlew \
 		-PENABLE_PUBLISHING=true \
-		-x dokkaGeneratePublicationHtml \
-		-x androidDokkaJavadocJar \
 		:engagement-cloud-sdk:publishAllPublicationsToGitHubPackagesRepository \
 		:engagement-cloud-sdk-android-fcm:publishMavenPublicationToGitHubPackagesRepository \
 		:engagement-cloud-sdk-android-hms:publishMavenPublicationToGitHubPackagesRepository
@@ -128,8 +126,6 @@ publish-ios-spm: check-env
 		-PGITHUB_PUBLISH_TOKEN=$(GITHUB_TOKEN) \
 		-PGITHUB_REPO=$(GITHUB_REPO) \
 		-PENABLE_PUBLISHING=true \
-		-x dokkaGeneratePublicationHtml \
-		-x androidDokkaJavadocJar \
 		--no-daemon
 
 prepare-release: check-env

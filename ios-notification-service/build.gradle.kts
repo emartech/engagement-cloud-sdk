@@ -29,6 +29,8 @@ kotlin {
                 isStatic = true
             }
         }
+    } else {
+        jvm()
     }
 
     sourceSets {
