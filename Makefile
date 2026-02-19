@@ -101,7 +101,6 @@ test-android-firebase: check-env
 
 lint: check-env
 	@./gradlew \
-		:engagement-cloud-sdk:lintRelease \
 		:engagement-cloud-sdk-android-fcm:lintRelease \
 		:engagement-cloud-sdk-android-hms:lintRelease
 

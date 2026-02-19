@@ -84,7 +84,7 @@ jobs:
 
   build-ios:
     name: Build / iOS
-    runs-on: macos-latest
+    runs-on: macos-latest-xlarge
     env:
       SPM_BUILD: release
     steps:
@@ -97,6 +97,14 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
+
+      - name: Cache Konan directory
+        uses: actions/cache@v4
+        with:
+          path: ~/.konan
+          key: ${{ runner.os }}-konan-${{ hashFiles('**/*.gradle.kts', '**/libs.versions.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-konan-
 
       - uses: gradle/actions/setup-gradle@v4
 
