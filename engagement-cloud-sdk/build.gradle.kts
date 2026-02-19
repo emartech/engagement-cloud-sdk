@@ -289,6 +289,8 @@ tasks.register<Exec>("sdkLoaderTest") {
 }
 
 kmmbridge {
+    frameworkName.set("EngagementCloudSDK")
+    mavenPublishArtifacts()
     val spmBuildType = System.getenv("SPM_BUILD") ?: "dev"
     when (spmBuildType) {
         "dev" -> {
@@ -372,9 +374,9 @@ mavenPublishing {
             }
         }
         scm {
-            url = "https://github.com/emartech/sap-engagement-cloud-sdk"
-            connection = "scm:git:https://github.com/emartech/sap-engagement-cloud-sdk.git"
-            developerConnection = "scm:git:https://github.com/emartech/sap-engagement-cloud-sdk.git"
+            url = "https://github.com/emartech/engagement-cloud-sdk"
+            connection = "scm:git:https://github.com/emartech/engagement-cloud-sdk.git"
+            developerConnection = "scm:git:https://github.com/emartech/engagement-cloud-sdk.git"
         }
     }
 }

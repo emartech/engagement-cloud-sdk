@@ -113,8 +113,8 @@ publish-maven: check-env
 	@./gradlew \
 		-PENABLE_PUBLISHING=true \
 		:engagement-cloud-sdk:publishAllPublicationsToGitHubPackagesRepository \
-		:engagement-cloud-sdk-android-fcm:publishReleasePublicationToGitHubPackagesRepository \
-		:engagement-cloud-sdk-android-hms:publishReleasePublicationToGitHubPackagesRepository
+		:engagement-cloud-sdk-android-fcm:publishMavenPublicationToGitHubPackagesRepository \
+		:engagement-cloud-sdk-android-hms:publishMavenPublicationToGitHubPackagesRepository
 
 publish-npm: check-env
 	@cd dist/npm && npm publish --registry https://npm.pkg.github.com

@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.mokkery)
     alias(libs.plugins.skie)
     alias(libs.plugins.kmmbridge)
+    `maven-publish`
 }
 
 kotlin {
@@ -39,6 +40,8 @@ kotlin {
 }
 
 kmmbridge {
+    frameworkName.set("EngagementCloudNotificationService")
+    mavenPublishArtifacts()
     val spmBuildType = System.getenv("SPM_BUILD") ?: "dev"
     when (spmBuildType) {
         "dev" -> {
@@ -75,6 +78,21 @@ skie {
         disableUpload.set(true)
     }
 }
+if (project.findProperty("ENABLE_PUBLISHING") == "true") {
+    publishing {
+        repositories {
+            maven {
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/${System.getenv("GITHUB_REPO") ?: "emartech/engagement-cloud-sdk"}")
+                credentials {
+                    username = System.getenv("GITHUB_ACTOR")
+                    password = System.getenv("GITHUB_TOKEN")
+                }
+            }
+        }
+    }
+}
+
 val deviceName = project.findProperty("iosDevice") as? String ?: "iPhone 17 Pro"
 
 
