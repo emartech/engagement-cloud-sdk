@@ -341,7 +341,7 @@ jobs:
   publish-ios-spm:
     name: Publish / iOS SPM (GitHub Release)
     needs: test-ios
-    runs-on: macos-latest
+    runs-on: macos-latest-xlarge
     env:
       SPM_BUILD: release
     steps:
@@ -379,6 +379,7 @@ jobs:
         env:
           VERSION_OVERRIDE: ${{ env.VERSION }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_REPO: ${{ github.repository }}
           GITHUB_ARTIFACT_RELEASE_ID: ${{ steps.spm_release.outputs.id }}
 

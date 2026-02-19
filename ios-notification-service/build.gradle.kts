@@ -11,29 +11,34 @@ plugins {
 }
 
 kotlin {
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach { iosTarget ->
-        iosTarget.binaries.framework {
-            baseName = "EngagementCloudNotificationService"
-            isStatic = true
+    val isMac = System.getProperty("os.name").contains("Mac", ignoreCase = true)
+    if (isMac) {
+        listOf(
+            iosX64(),
+            iosArm64(),
+            iosSimulatorArm64()
+        ).forEach { iosTarget ->
+            iosTarget.binaries.framework {
+                baseName = "EngagementCloudNotificationService"
+                isStatic = true
+            }
         }
     }
 
     sourceSets {
-        iosMain {
-            dependencies {
-                implementation(libs.kotlinx.coroutines.core)
-                implementation(libs.kotlinx.serialization.json)
+        if (isMac) {
+            iosMain {
+                dependencies {
+                    implementation(libs.kotlinx.coroutines.core)
+                    implementation(libs.kotlinx.serialization.json)
+                }
             }
-        }
-        iosTest {
-            dependencies {
-                implementation(libs.kotlin.test)
-                implementation(libs.kotest.assertions.core)
-                implementation(libs.kotlinx.coroutines.test)
+            iosTest {
+                dependencies {
+                    implementation(libs.kotlin.test)
+                    implementation(libs.kotest.assertions.core)
+                    implementation(libs.kotlinx.coroutines.test)
+                }
             }
         }
     }
@@ -41,7 +46,6 @@ kotlin {
 
 kmmbridge {
     frameworkName.set("EngagementCloudNotificationService")
-    mavenPublishArtifacts()
     val spmBuildType = System.getenv("SPM_BUILD") ?: "dev"
     when (spmBuildType) {
         "dev" -> {
@@ -51,6 +55,7 @@ kmmbridge {
 
         "release" -> {
             println("Building for release")
+            mavenPublishArtifacts()
             spm(
                 spmDirectory = "${rootDir}/iosReleaseSpm",
                 useCustomPackageFile = true,
