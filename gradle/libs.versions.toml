@@ -78,6 +78,7 @@ compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", v
 compose-material-icons = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "compose-material-icons" }
 compose-material = { module = "org.jetbrains.compose.material3:material3", version.ref = "compose-material3" }
 compose-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose-plugin" }
+compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose-plugin" }
 fcm = { group = "com.google.firebase", name = "firebase-messaging", version.ref = "fcm" }
 hms = { group = "com.huawei.hms", name = "push", version.ref = "hms_push" }
 agconnect-core = { group = "com.huawei.agconnect", name = "agconnect-core", version.ref = "agconnect_core" }

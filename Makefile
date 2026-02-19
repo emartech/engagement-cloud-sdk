@@ -1,4 +1,4 @@
-.PHONY: build build-pipeline check-env clean create-apks help lint test test-web test-android test-android-firebase test-jvm prepare-spm
+.PHONY: build build-pipeline build-android build-ios build-ios-all-archtypes build-js-html build-web check-env clean create-apks help lint prepare-release prepare-spm publish-android publish-ios-spm publish-npm release release-locally test test-android test-android-firebase test-ios test-sdk-loader test-web
 .DEFAULT_GOAL := help
 SHELL := /bin/bash
 
@@ -20,100 +20,104 @@ check-env:
 		echo "Please set them in your .env file or as system environment variables. Check https://secret.emarsys.net/cred/detail/18243/"; \
 		exit 1; \
 	fi
-help: ## Show this help
-	@echo "Targets:"
-	@fgrep -h "##" $(MAKEFILE_LIST) | grep ":" | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/\(.*\):.*##[ \t]*/    \1 ## /' | sort | column -t -s '##'
-	@echo
+clean-dist:
+	@rm -rf dist
 
-build: check-env ## build project with yarn actualization
-	@./gradlew kotlinUpgradeYarnLock build
+build: check-env
+	@./gradlew :composeApp:yarnActualization && ./gradlew assemble
 
+build-pipeline: check-env
+	@./gradlew assemble
 
-build-pipeline: check-env ## compile and build all modules for all platforms
-	@./gradlew :engagement-cloud-sdk:build \
-			 	:engagement-cloud-sdk:javaPreCompileRelease \
-			   	-x :engagement-cloud-sdk:compileTestDevelopmentExecutableKotlinJs \
-			   	-x :engagement-cloud-sdk:test \
-			   	-x :engagement-cloud-sdk:lint \
-			   	-x :composeApp:build \
-			   	-x :composeApp:jsPackageJson \
-			   	-x :composeApp:jsTestPackageJson \
-			   	-x :composeApp:jsPublicPackageJson \
-			   	-x :composeApp:jsTestPublicPackageJson \
-			   	-x :engagement-cloud-sdk:jsTestPackageJson \
-			   	-x :engagement-cloud-sdk:jsPublicPackageJson \
-			   	-x :engagement-cloud-sdk:jsTestPublicPackageJson \
-			   	-x :engagement-cloud-sdk:jsPackageJson \
-			   	-x :rootPackageJson \
-			   	-x :kotlinNodeJsSetup \
-			   	-x :kotlinNpmCachesSetup \
-			   	-x :kotlinStoreYarnLock \
-			   	-x :kotlinRestoreYarnLock \
-			   	-x :kotlinYarnSetup \
-			   	-x :kotlinNpmInstall
-
-clean: check-env ## clean all build artifacts
+clean: check-env
 	@./gradlew clean
 
-create-apks: check-env ## create apks for testing
-	@./gradlew assembleAndroidTest
+create-apks: check-env
+	@./gradlew :composeApp:assembleRelease
 
-test: check-env test-android test-web test-sdk-loader test-jvm test-ios ## run common tests on all platforms (jvm,web,android, ios)
-	@./gradlew :engagement-cloud-sdk:allTests -x :composeApp:test
+test: check-env test-android test-web test-sdk-loader test-jvm test-ios
 
-build-web: check-env ## run tests on web
-	@./gradlew jsBrowserProductionWebpack \
- 			-x :composeApp:jsBrowserProductionWebpack
+build-js-html: check-env
+	@./gradlew :engagement-cloud-sdk:jsBrowserProductionWebpack \
+		-Pjs.variant=html \
+		-x :composeApp:jsBrowserProductionWebpack
 
-test-web: check-env ## run tests on web
-	@./gradlew jsBrowserTest \
- 			-x :composeApp:jsBrowserTest
+build-web: build-js-html
 
-test-sdk-loader: check-env ## run sdk loader test
-	@./gradlew sdkLoaderTest
+test-web: check-env
+	@./gradlew :engagement-cloud-sdk:jsBrowserProductionLibraryTest \
+		-Pjs.variant=html \
+		-x :composeApp:jsBrowserProductionLibraryTest
 
-build-android: check-env ##
-	@./gradlew assembleRelease -x :composeApp:assembleRelease
+test-sdk-loader: check-env
+	@./gradlew :engagement-cloud-sdk:jsBrowserProductionLibraryTest \
+		-Pjs.variant=html \
+		-x :composeApp:jsBrowserProductionLibraryTest \
+		--tests com.sap.ec.mobileengage.WebSdkLoaderTest
 
-test-android: check-env ## run Android tests for all modules
-	@./gradlew connectedAndroidTest -x :composeApp:connectedAndroidTest
+test-jvm: check-env
+	@./gradlew :engagement-cloud-sdk:jvmTest
 
-build-ios: check-env ## build iOS
-	@./gradlew compileKotlinIosArm64
+build-android: check-env
+	@./gradlew \
+		:engagement-cloud-sdk:assembleAndroidRelease \
+		:engagement-cloud-sdk-android-fcm:assembleRelease \
+		:engagement-cloud-sdk-android-hms:assembleRelease
 
-build-ios-all-archtypes: check-env ## build iOS
-	@./gradlew linkReleaseFrameworkIosArm64 linkReleaseFrameworkIosX64 linkReleaseFrameworkIosSimulatorArm64 \
-	        -x :composeApp:linkReleaseFrameworkIosArm64 \
-	        -x :composeApp:linkReleaseFrameworkIosX64 \
-	        -x :composeApp:linkReleaseFrameworkIosSimulatorArm64
+test-android: check-env
+	@./gradlew \
+		:engagement-cloud-sdk:testAndroidReleaseUnitTest \
+		:engagement-cloud-sdk-android-fcm:testReleaseUnitTest \
+		:engagement-cloud-sdk-android-hms:testReleaseUnitTest
 
-test-ios: check-env ## run iOS tests
-	@./gradlew iosSimulatorArm64Test -x :composeApp:iosSimulatorArm64Test
+build-ios: check-env
+	@./gradlew :engagement-cloud-sdk:iosArm64Binaries
 
-test-android-firebase: check-env ## run Android Instrumented tests on Firebase Test Lab
+test-ios: check-env
+	@./gradlew :engagement-cloud-sdk:iosX64Test
+
+test-android-firebase: check-env
 	@gcloud firebase test android run \
-       --type instrumentation \
-       --app ./composeApp/build/outputs/apk/androidTest/debug/composeApp-debug-androidTest.apk \
-       --test ./emarsys-sdk/build/outputs/apk/androidTest/debug/emarsys-sdk-debug-androidTest.apk \
-       --device model=f2q,version=30,locale=en,orientation=portrait  \
-       --device model=a51,version=31,locale=en,orientation=portrait \
-       --device model=bluejay,version=32,locale=en,orientation=portrait \
-       --device model=b4q,version=33,locale=en,orientation=portrait \
-       --client-details matrixLabel="Unified SDK"
+		--type instrumentation \
+		--app engagement-cloud-sdk/build/outputs/apk/debug/engagement-cloud-sdk-debug.apk \
+		--test engagement-cloud-sdk/build/outputs/apk/androidTest/debug/engagement-cloud-sdk-debug-androidTest.apk \
+		--device model=Pixel3,version=30,locale=en,orientation=portrait
 
-lint: check-env ## run Android Instrumented tests
-	@./gradlew :engagement-cloud-sdk:lint -x :composeApp:lint
+lint: check-env
+	@./gradlew \
+		:engagement-cloud-sdk:lintRelease \
+		:engagement-cloud-sdk-android-fcm:lintRelease \
+		:engagement-cloud-sdk-android-hms:lintRelease
 
-prepare-spm: check-env ## prepare swift package manager package for iOS
+prepare-spm: check-env
 	@./gradlew spmDevBuild && \
 	cp -f "./iosReleaseSpm/Package.swift" "./Package.swift" && \
 	echo "Swift Package is prepared. To use it as a local dependency add the project in Xcode at the Package Dependencies section"
 
-prepare-release: check-env ## setup prerequisites for release
+publish-maven: check-env
+	@./gradlew \
+		-PENABLE_PUBLISHING=true \
+		:engagement-cloud-sdk:publishAllPublicationsToGitHubPackagesRepository \
+		:engagement-cloud-sdk-android-fcm:publishReleasePublicationToGitHubPackagesRepository \
+		:engagement-cloud-sdk-android-hms:publishReleasePublicationToGitHubPackagesRepository
+
+publish-npm: check-env
+	@cd dist/npm && npm publish --registry https://npm.pkg.github.com
+
+publish-ios-spm: check-env
+	@./gradlew kmmBridgePublish \
+		-PNATIVE_BUILD_TYPE='RELEASE' \
+		-PGITHUB_ARTIFACT_RELEASE_ID=$(GITHUB_ARTIFACT_RELEASE_ID) \
+		-PGITHUB_PUBLISH_TOKEN=$(GITHUB_TOKEN) \
+		-PGITHUB_REPO=$(GITHUB_REPO) \
+		-PENABLE_PUBLISHING=true \
+		--no-daemon
+
+prepare-release: check-env
 	@./gradlew base64EnvToFile -PpropertyName=SONATYPE_SIGNING_SECRET_KEY_RING_FILE_BASE64 -Pfile=./secring.asc.gpg
 
 release: check-env prepare-release
 	@./gradlew assembleRelease && ./gradlew publishToMavenCentral
 
-release-locally: check-env prepare-release ## release to mavenLocal
+release-locally: check-env prepare-release
 	@./gradlew assembleRelease && ./gradlew publishToMavenLocal

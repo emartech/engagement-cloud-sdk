@@ -23,7 +23,7 @@ plugins {
 }
 
 group = "com.sap"
-version = "4.0.0"
+version = System.getenv("VERSION_OVERRIDE") ?: "4.0.0"
 
 kotlin {
     compilerOptions {
@@ -46,20 +46,19 @@ kotlin {
         }
 
         withDeviceTest {
-            instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+            instrumentationRunner = "com.sap.ec.SdkTestInstrumentationRunner"
             execution = "HOST"
         }
     }
 
 
-    // Dynamic JS variant selection: -Pjs.variant=html or -Pjs.variant=canvas (default: canvas)
     val jsVariant = project.findProperty("js.variant")?.toString() ?: "html"
     println("Building JS variant: $jsVariant")
 
     js(IR) {
         browser {
             commonWebpackConfig {
-                outputFileName = "sap-engagement-cloud-sdk-$jsVariant.js"
+                outputFileName = "engagement-cloud-sdk-$jsVariant.js"
                 cssSupport {
                     enabled.set(false)
                 }
@@ -116,7 +115,7 @@ kotlin {
                 implementation(libs.ktor.client.core)
                 implementation(project.dependencies.platform(libs.cryptography))
                 implementation(libs.cryptography.core)
-                implementation(compose.runtime)
+                implementation(libs.compose.runtime)
                 implementation(libs.androidx.paging.common)
                 implementation(libs.androidx.paging.compose)
             }
@@ -178,7 +177,6 @@ kotlin {
             dependencies {
                 implementation(libs.kotlin.test)
                 implementation(libs.koin.test)
-//                implementation(libs.koin.android.startup)
                 implementation(libs.mockk.android)
                 implementation(libs.androidx.runner)
                 implementation(libs.androidx.test.junit)
@@ -238,32 +236,6 @@ kotlin {
     }
 }
 
-//android {
-//    namespace = "com.sap"
-//    compileSdk = libs.versions.android.compileSdk.get().toInt()
-//
-//    defaultConfig {
-//        minSdk = libs.versions.android.minSdk.get().toInt()
-////        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-//        testInstrumentationRunner = "com.sap.ec.SdkTestInstrumentationRunner"
-//    }
-//    packaging {
-//        resources {
-//            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-//            excludes += "/META-INF/LICENSE.md"
-//            excludes += "/META-INF/LICENSE-notice.md"
-//        }
-//    }
-//    buildTypes {
-//        getByName("release") {
-//            isMinifyEnabled = true
-//            proguardFiles(
-//                getDefaultProguardFile("proguard-android-optimize.txt"),
-//                "proguard-rules.pro"
-//            )
-//        }
-//    }
-//}
 
 buildConfig {
     packageName("com.sap.ec.core.device")
@@ -272,7 +244,7 @@ buildConfig {
 
 afterEvaluate {
     tasks.withType<AndroidLintAnalysisTask>()
-        .configureEach { // https://github.com/gmazzo/gradle-buildconfig-plugin/issues/67
+        .configureEach {
             mustRunAfter(tasks.withType<BuildConfigTask>())
         }
 }
@@ -286,7 +258,7 @@ sqldelight {
 }
 
 tasks.withType<app.cash.sqldelight.gradle.SqlDelightTask>().configureEach {
-    doLast("workaround https://github.com/sqldelight/sqldelight/issues/1333") {
+    doLast {
         outputDirectory.get().asFile.walk()
             .filter { it.isFile && it.extension == "kt" }
             .forEach { file ->
@@ -355,46 +327,56 @@ skie {
     }
 }
 
-//mavenPublishing {
-//    publishToMavenCentral()
-//    signAllPublications()
-//
-////    configure(
-////        AndroidSingleVariantLibrary(
-////            javadocJar = JavadocJar.Javadoc(),
-////            sourcesJar = SourcesJar.Sources(),
-////            variant = "release",
-////        )
-////    )
-//
-//    coordinates(group.toString(), "sap-engagement-cloud-sdk", version.toString())
-//
-//    pom {
-//        name = "SAP Engagement Cloud SDK"
-//        description = "SAP Engagement Cloud SDK"
-//        inceptionYear = "2025"
-//        url = "https://github.com/emartech/sap-engagement-cloud-sdk/"
-//        licenses {
-//            license {
-//                name = "Mozilla Public License 2.0"
-//                url = "https://github.com/emartech/sap-engagement-cloud-sdk/blob/main/LICENSE"
-//                distribution = "https://github.com/emartech/sap-engagement-cloud-sdk/blob/main/LICENSE"
-//            }
-//        }
-//        developers {
-//            developer {
-//                id = "sap"
-//                name = "SAP"
-//                url = "https://sap.com"
-//            }
-//        }
-//        scm {
-//            url = "https://github.com/emartech/sap-engagement-cloud-sdk"
-//            connection = "scm:git:https://github.com/emartech/sap-engagement-cloud-sdk.git"
-//            developerConnection = "scm:git:https://github.com/emartech/sap-engagement-cloud-sdk.git"
-//        }
-//    }
-//}
+if (project.findProperty("ENABLE_PUBLISHING") == "true") {
+    publishing {
+        repositories {
+            maven {
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/emartech/sap-engagement-cloud-sdk")
+                credentials {
+                    username = System.getenv("GITHUB_ACTOR")
+                    password = System.getenv("GITHUB_TOKEN")
+                }
+            }
+        }
+    }
+}
+
+
+mavenPublishing {
+    publishToMavenCentral()
+    if (project.hasProperty("signing.keyId") || System.getenv("GPG_PRIVATE_KEY") != null) {
+        signAllPublications()
+    }
+
+    coordinates(group.toString(), "engagement-cloud-sdk", version.toString())
+
+    pom {
+        name = "SAP Engagement Cloud SDK"
+        description = "SAP Engagement Cloud SDK"
+        inceptionYear = "2025"
+        url = "https://github.com/emartech/sap-engagement-cloud-sdk/"
+        licenses {
+            license {
+                name = "Apache License 2.0"
+                url = "https://github.com/emartech/engagement-cloud-sdk/blob/main/LICENSE"
+                distribution = "https://github.com/emartech/engagement-cloud-sdk/blob/main/LICENSE"
+            }
+        }
+        developers {
+            developer {
+                id = "sap"
+                name = "SAP"
+                url = "https://sap.com"
+            }
+        }
+        scm {
+            url = "https://github.com/emartech/sap-engagement-cloud-sdk"
+            connection = "scm:git:https://github.com/emartech/sap-engagement-cloud-sdk.git"
+            developerConnection = "scm:git:https://github.com/emartech/sap-engagement-cloud-sdk.git"
+        }
+    }
+}
 
 tasks {
     register("base64EnvToFile") {
