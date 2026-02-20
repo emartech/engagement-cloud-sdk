@@ -1,5 +1,5 @@
 import SwiftUI
-import SAPEngagementCloudSDK
+import EngagementCloudSDK
 
 struct SdkTestView: View {
     @State private var eventName = ""
@@ -41,7 +41,7 @@ struct SdkTestView: View {
     func enableTracking() {
         Task {
         
-            try? await engagementCloud.setup.enableTracking(config: EngagementCloudConfig(applicationCode: "EMS11-C3FD3"))
+            try? await engagementCloud.setup.enable(config: IosEngagementCloudSDKConfig(applicationCode: "EMSE3-B4341"))
             try? await engagementCloud.contact.link(contactFieldValue: "test@test.com")
         }
     }

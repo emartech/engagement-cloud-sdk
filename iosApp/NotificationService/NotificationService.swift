@@ -1,5 +1,5 @@
 import UserNotifications
-import SAPEngagementCloudNotificationService
+import EngagementCloudNotificationService
 
 
 class NotificationService: UNNotificationServiceExtension {

@@ -1,5 +1,5 @@
 import SwiftUI
-import SAPEngagementCloudSDK
+import EngagementCloudSDK
 
 @main
 struct iOSApp: App {

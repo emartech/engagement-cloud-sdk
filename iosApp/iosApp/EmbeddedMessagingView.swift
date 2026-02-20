@@ -1,5 +1,5 @@
 import SwiftUI
-import SAPEngagementCloudSDK
+import EngagementCloudSDK
 
 struct EmbeddedMessagingView: View {
     var body: some View {

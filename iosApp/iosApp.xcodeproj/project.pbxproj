@@ -13,9 +13,9 @@
 		2A42F0C62EC4D5CE0097D526 /* SdkTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A42F0C52EC4D5CE0097D526 /* SdkTestView.swift */; };
 		2A42F0C82EC4D6F00097D526 /* EmbeddedMessagingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A42F0C72EC4D6F00097D526 /* EmbeddedMessagingView.swift */; };
 		2A42F0CA2EC4D7D50097D526 /* EmbeddedMessagingListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A42F0C92EC4D7D50097D526 /* EmbeddedMessagingListView.swift */; };
-		2A8E82F72F44A23200D31B6C /* SAPEngagementCloudNotificationService in Frameworks */ = {isa = PBXBuildFile; productRef = 2A8E82F62F44A23200D31B6C /* SAPEngagementCloudNotificationService */; };
-		2A8E82F92F44A23200D31B6C /* SAPEngagementCloudSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 2A8E82F82F44A23200D31B6C /* SAPEngagementCloudSDK */; };
 		2A918DE92C85E8FE00B1AF36 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A918DE82C85E8FE00B1AF36 /* NotificationService.swift */; };
+		57E0CD772F489AC60018D847 /* EngagementCloudNotificationService in Frameworks */ = {isa = PBXBuildFile; productRef = 57E0CD762F489AC60018D847 /* EngagementCloudNotificationService */; };
+		57E0CD792F489AC60018D847 /* EngagementCloudSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 57E0CD782F489AC60018D847 /* EngagementCloudSDK */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
 /* End PBXBuildFile section */
 
@@ -64,7 +64,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2A8E82F72F44A23200D31B6C /* SAPEngagementCloudNotificationService in Frameworks */,
+				57E0CD772F489AC60018D847 /* EngagementCloudNotificationService in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -72,7 +72,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2A8E82F92F44A23200D31B6C /* SAPEngagementCloudSDK in Frameworks */,
+				57E0CD792F489AC60018D847 /* EngagementCloudSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -197,6 +197,7 @@
 				2A38E7692F30AE8500B5910C /* EmarsysSDK */,
 				2A633A642F3229D800B0C145 /* EmarsysSDK */,
 				2A8E82F82F44A23200D31B6C /* SAPEngagementCloudSDK */,
+				57E0CD782F489AC60018D847 /* EngagementCloudSDK */,
 			);
 			productName = iosApp;
 			productReference = 7555FF7B242A565900829871 /* Engagement Cloud Sample.app */;
@@ -231,7 +232,7 @@
 			);
 			mainGroup = 7555FF72242A565900829871;
 			packageReferences = (
-				2A8E82F52F44A23200D31B6C /* XCLocalSwiftPackageReference "../../unified-emarsys-sdk" */,
+				57E0CD752F489AC60018D847 /* XCLocalSwiftPackageReference "../../engagement-cloud-sdk" */,
 			);
 			productRefGroup = 7555FF7C242A565900829871 /* Products */;
 			projectDirPath = "";
@@ -580,9 +581,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		2A8E82F52F44A23200D31B6C /* XCLocalSwiftPackageReference "../../unified-emarsys-sdk" */ = {
+		57E0CD752F489AC60018D847 /* XCLocalSwiftPackageReference "../../engagement-cloud-sdk" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = "../../unified-emarsys-sdk";
+			relativePath = "../../engagement-cloud-sdk";
 		};
 /* End XCLocalSwiftPackageReference section */
 
@@ -627,10 +628,6 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = EmarsysSDK;
 		};
-		2A8E82F62F44A23200D31B6C /* SAPEngagementCloudNotificationService */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = SAPEngagementCloudNotificationService;
-		};
 		2A8E82F82F44A23200D31B6C /* SAPEngagementCloudSDK */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SAPEngagementCloudSDK;
@@ -662,6 +659,14 @@
 		2AFF7A132F28B6FB00C4BAB1 /* EmarsysSDK */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = EmarsysSDK;
+		};
+		57E0CD762F489AC60018D847 /* EngagementCloudNotificationService */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EngagementCloudNotificationService;
+		};
+		57E0CD782F489AC60018D847 /* EngagementCloudSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EngagementCloudSDK;
 		};
 		5DCECA592E3A64DC003AA0FA /* EmarsysSDK */ = {
 			isa = XCSwiftPackageProductDependency;

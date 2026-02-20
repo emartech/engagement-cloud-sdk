@@ -99,9 +99,11 @@ lint: check-env
 		:engagement-cloud-sdk-android-hms:lintRelease
 
 prepare-spm: check-env
-	@./gradlew spmDevBuild && \
-	cp -f "./iosReleaseSpm/Package.swift" "./Package.swift" && \
-	echo "Swift Package is prepared. To use it as a local dependency add the project in Xcode at the Package Dependencies section"
+	@./gradlew \
+		-PENABLE_PUBLISHING=true \
+		spmDevBuild && \
+		cp -f "./iosReleaseSpm/Package.swift" "./Package.swift" && \
+		echo "Swift Package is prepared. To use it as a local dependency add the project in Xcode at the Package Dependencies section"
 
 publish-maven: check-env
 	@./gradlew \

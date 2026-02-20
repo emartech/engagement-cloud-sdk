@@ -1,6 +1,6 @@
 import Foundation
 import SwiftUI
-import SAPEngagementCloudSDK
+import EngagementCloudSDK
 
 
 struct EmbeddedMessagingListView: UIViewControllerRepresentable {
