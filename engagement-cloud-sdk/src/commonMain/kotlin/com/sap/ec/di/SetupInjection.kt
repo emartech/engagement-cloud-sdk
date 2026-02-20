@@ -96,6 +96,7 @@ object SetupInjection {
             FetchEmbeddedMessagingMetaState(
                 embeddedMessagingContext = get(),
                 sdkEventDistributor = get(),
+                sdkContext = get(),
                 sdkLogger = get { parametersOf(FetchEmbeddedMessagingMetaState::class.simpleName) }
             )
         }

@@ -1,5 +1,7 @@
 package com.sap.ec.enable.states
 
+import com.sap.ec.context.Features
+import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.model.Response
@@ -14,6 +16,7 @@ import kotlin.time.ExperimentalTime
 
 internal class FetchEmbeddedMessagingMetaState(
     private val embeddedMessagingContext: EmbeddedMessagingContextApi,
+    private val sdkContext: SdkContextApi,
     private val sdkEventDistributor: SdkEventDistributorApi,
     private val sdkLogger: Logger
 ) : State {
@@ -24,22 +27,30 @@ internal class FetchEmbeddedMessagingMetaState(
 
     override suspend fun active(): Result<Unit> {
         sdkLogger.debug("Fetching Embedded Messaging Meta State started")
-        return sdkEventDistributor.registerEvent(
-            SdkEvent.Internal.EmbeddedMessaging.FetchMeta()
-        ).await<Response>()
-            .result
-            .fold(
-                onSuccess = {
-                    embeddedMessagingContext.metaData = it.body<MetaData>()
-                    sdkLogger.debug("Meta data fetched and stored in EmbeddedMessagingContext")
-                    Result.success(Unit)
-                },
-                onFailure = {
-                    embeddedMessagingContext.metaData = null
-                    sdkLogger.error("Error happened while fetching Embedded Messaging Meta data", it)
-                    Result.failure(it)
-                }
-            )
+        return if (sdkContext.features.contains(Features.EMBEDDED_MESSAGING)) {
+            sdkEventDistributor.registerEvent(
+                SdkEvent.Internal.EmbeddedMessaging.FetchMeta()
+            ).await<Response>()
+                .result
+                .fold(
+                    onSuccess = {
+                        embeddedMessagingContext.metaData = it.body<MetaData>()
+                        sdkLogger.debug("Meta data fetched and stored in EmbeddedMessagingContext")
+                        Result.success(Unit)
+                    },
+                    onFailure = {
+                        embeddedMessagingContext.metaData = null
+                        sdkLogger.error(
+                            "Error happened while fetching Embedded Messaging Meta data",
+                            it
+                        )
+                        Result.failure(it)
+                    }
+                )
+        } else {
+            sdkLogger.debug("Feature Embedded Messaging is disabled, skipping Fetch Meta data job")
+            Result.success(Unit)
+        }
     }
 
     override fun relax() {

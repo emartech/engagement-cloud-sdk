@@ -1,5 +1,7 @@
 package com.sap.ec.init.states
 
+import com.sap.ec.context.Features
+import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.channel.SdkEventWaiterApi
 import com.sap.ec.core.log.Logger
@@ -12,6 +14,7 @@ import com.sap.ec.networking.clients.embedded.messaging.model.MetaData
 import com.sap.ec.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
+import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
@@ -29,6 +32,7 @@ import kotlin.test.Test
 
 class FetchEmbeddedMessagingMetaStateTests {
     private lateinit var mockEmbeddedMessagingContext: EmbeddedMessagingContextApi
+    private lateinit var mockSdkContext: SdkContextApi
     private lateinit var mockSdkLogger: Logger
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
     private lateinit var mockSdkEventWaiter: SdkEventWaiterApi
@@ -39,16 +43,20 @@ class FetchEmbeddedMessagingMetaStateTests {
         mockSdkLogger = mock(MockMode.autofill)
         mockSdkEventDistributor = mock(MockMode.autofill)
         mockSdkEventWaiter = mock(MockMode.autofill)
+        mockSdkContext = mock(MockMode.autofill)
     }
 
     @Test
-    fun testActive_should_EmitFetchMetaEvent_and_storeMetaDataInEmbeddedMessagingContext_when_MetaResponseResult_IsSuccess() = runTest {
-        val state = FetchEmbeddedMessagingMetaState(
-            embeddedMessagingContext = mockEmbeddedMessagingContext,
-            sdkEventDistributor = mockSdkEventDistributor,
-            sdkLogger = mockSdkLogger
-        )
-        val metaDataResponse = """{
+    fun testActive_should_EmitFetchMetaEvent_and_storeMetaDataInEmbeddedMessagingContext_when_MetaResponseResult_IsSuccess() =
+        runTest {
+            val state = FetchEmbeddedMessagingMetaState(
+                embeddedMessagingContext = mockEmbeddedMessagingContext,
+                sdkContext = mockSdkContext,
+                sdkEventDistributor = mockSdkEventDistributor,
+                sdkLogger = mockSdkLogger
+            )
+            every { mockSdkContext.features } returns mutableSetOf(Features.EMBEDDED_MESSAGING)
+            val metaDataResponse = """{
   "version" : "v1",
   "labels" : {
     "allMessagesHeader" : "All Messages",
@@ -146,48 +154,74 @@ class FetchEmbeddedMessagingMetaStateTests {
     }
   }
 }"""
-        val expectedMetaData = JsonUtil.json.decodeFromString<MetaData>(metaDataResponse)
-        val response = SdkEvent.Internal.Sdk.Answer.Response(
-            "0",
-            Result.success(
-                Response(
-                    originalRequest = UrlRequest(Url("https://noonecares.com/api/v1/testAppCode/meta"), HttpMethod.Get),
-                    status = HttpStatusCode.OK,
-                    headers = headersOf(),
-                    bodyAsText = metaDataResponse
+            val expectedMetaData = JsonUtil.json.decodeFromString<MetaData>(metaDataResponse)
+            val response = SdkEvent.Internal.Sdk.Answer.Response(
+                "0",
+                Result.success(
+                    Response(
+                        originalRequest = UrlRequest(
+                            Url("https://noonecares.com/api/v1/testAppCode/meta"),
+                            HttpMethod.Get
+                        ),
+                        status = HttpStatusCode.OK,
+                        headers = headersOf(),
+                        bodyAsText = metaDataResponse
+                    )
                 )
             )
-        )
-        everySuspend { mockSdkEventWaiter.await<Response>() } returns response
-        everySuspend { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMeta>()) } returns mockSdkEventWaiter
+            everySuspend { mockSdkEventWaiter.await<Response>() } returns response
+            everySuspend { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMeta>()) } returns mockSdkEventWaiter
 
-        val result = state.active()
+            val result = state.active()
 
-        result shouldBe Result.success(Unit)
-        verifySuspend { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMeta>()) }
-        verify { mockEmbeddedMessagingContext.metaData = expectedMetaData }
-    }
+            result shouldBe Result.success(Unit)
+            verifySuspend { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMeta>()) }
+            verify { mockEmbeddedMessagingContext.metaData = expectedMetaData }
+        }
 
     @Test
-    fun testActive_should_EmitFetchMetaEvent_and_notStoreAnything_when_MetaResponseResult_IsFailure() = runTest {
-        val state = FetchEmbeddedMessagingMetaState(
-            embeddedMessagingContext = mockEmbeddedMessagingContext,
-            sdkEventDistributor = mockSdkEventDistributor,
-            sdkLogger = mockSdkLogger
-        )
-        val exception = Exception("any exception happened")
-        val response = SdkEvent.Internal.Sdk.Answer.Response(
-            "0",
-            Result.failure<Response>(exception)
-        )
-        everySuspend { mockSdkEventWaiter.await<Response>() } returns response
-        everySuspend { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMeta>()) } returns mockSdkEventWaiter
+    fun testActive_should_EmitFetchMetaEvent_and_notStoreAnything_when_MetaResponseResult_IsFailure() =
+        runTest {
+            every { mockSdkContext.features } returns mutableSetOf(Features.EMBEDDED_MESSAGING)
 
-        val result = state.active()
+            val state = FetchEmbeddedMessagingMetaState(
+                embeddedMessagingContext = mockEmbeddedMessagingContext,
+                sdkEventDistributor = mockSdkEventDistributor,
+                sdkContext = mockSdkContext,
+                sdkLogger = mockSdkLogger
+            )
+            val exception = Exception("any exception happened")
+            val response = SdkEvent.Internal.Sdk.Answer.Response(
+                "0",
+                Result.failure<Response>(exception)
+            )
+            everySuspend { mockSdkEventWaiter.await<Response>() } returns response
+            everySuspend { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMeta>()) } returns mockSdkEventWaiter
 
-        result shouldBe Result.failure(exception)
-        verifySuspend { mockEmbeddedMessagingContext.metaData = null }
-        verifySuspend { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMeta>()) }
-        verifySuspend(VerifyMode.exactly(0)) { mockEmbeddedMessagingContext.metaData = any() }
-    }
+            val result = state.active()
+
+            result shouldBe Result.failure(exception)
+            verifySuspend { mockEmbeddedMessagingContext.metaData = null }
+            verifySuspend { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMeta>()) }
+            verifySuspend(VerifyMode.exactly(0)) { mockEmbeddedMessagingContext.metaData = any() }
+        }
+
+    @Test
+    fun testActive_should_notCall_EmitFetchMetaEvent_when_EmbeddedMessagingContext_IsDisabled() =
+        runTest {
+            every { mockSdkContext.features } returns mutableSetOf()
+
+            val state = FetchEmbeddedMessagingMetaState(
+                embeddedMessagingContext = mockEmbeddedMessagingContext,
+                sdkEventDistributor = mockSdkEventDistributor,
+                sdkContext = mockSdkContext,
+                sdkLogger = mockSdkLogger
+            )
+
+            val result = state.active()
+
+            result shouldBe Result.success(Unit)
+            verifySuspend(VerifyMode.exactly(0)) { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMeta>()) }
+            verifySuspend(VerifyMode.exactly(0)) { mockEmbeddedMessagingContext.metaData = any() }
+        }
 }

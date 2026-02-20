@@ -61,7 +61,7 @@ class RemoteConfigResponseHandlerTests {
                 clientService = clientServiceUrl
             ), LogLevel.Debug,
             LuckyLogger(LogLevel.Error, 1.0),
-            RemoteConfigFeatures(mobileEngage = true),
+            RemoteConfigFeatures(mobileEngage = true, embeddedMessaging = true),
             overrides = mapOf(
                 "differentClientId" to RemoteConfig(
                     ServiceUrls(clientService = "differentClientServiceUrl")
@@ -78,7 +78,7 @@ class RemoteConfigResponseHandlerTests {
 
         defaultUrlSlot.get().clientServiceBaseUrl shouldBe clientServiceUrl
         verify { mockSdkContext.remoteLogLevel = LogLevel.Error }
-        mockSdkContext.features shouldBe listOf(Features.MOBILE_ENGAGE)
+        mockSdkContext.features shouldBe listOf(Features.MOBILE_ENGAGE, Features.EMBEDDED_MESSAGING)
     }
 
     @Test

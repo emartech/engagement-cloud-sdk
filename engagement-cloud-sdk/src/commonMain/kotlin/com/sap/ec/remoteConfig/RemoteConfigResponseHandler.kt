@@ -61,6 +61,7 @@ internal class RemoteConfigResponseHandler(
 
     private fun applyFeatures(features: RemoteConfigFeatures?) {
         features?.mobileEngage?.let { switch(Features.MOBILE_ENGAGE, it) }
+        features?.embeddedMessaging?.let { switch(Features.EMBEDDED_MESSAGING, it) }
     }
 
     private fun applyLuckyLogger(luckyLogger: LuckyLogger?) {

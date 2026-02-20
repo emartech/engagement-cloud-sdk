@@ -4,5 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RemoteConfigFeatures(
-    val mobileEngage: Boolean? = null
+    val mobileEngage: Boolean? = null,
+    val embeddedMessaging: Boolean? = null
 )
