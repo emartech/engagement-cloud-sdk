@@ -65,21 +65,10 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build Android release AARs
-        run: make build-android
+      - name: Run Android Pipeline (Build, Lint, Test, [Publish])
+        run: make pipeline-android
         env:
-          VERSION_OVERRIDE: ${{ env.VERSION }}
-
-      - name: Run lint
-        run: make lint
-
-      - name: Run Android unit tests
-        run: make test-android
-
-      - name: Publish to GitHub Packages Maven
-        if: env.DRY_RUN != 'true'
-        run: make publish-maven
-        env:
+          PUBLISH: ${{ env.DRY_RUN != 'true' }}
           VERSION_OVERRIDE: ${{ env.VERSION }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
@@ -115,25 +104,8 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@emartech'
-
       - name: Install npm dependencies
         run: npm install
-
-      - name: Build JS html variant
-        run: make build-js-html
-
-      - name: Assemble NPM package
-        run: |
-          mkdir -p dist/npm
-          cp engagement-cloud-sdk/build/kotlin-webpack/js/productionExecutable/engagement-cloud-sdk-html.js dist/npm/
-          cp build/js/packages/engagement-cloud-sdk/kotlin/engagement-cloud-sdk-html.d.ts dist/npm/ 2>/dev/null || true
-          sed "s/\"version\": \"0.0.0\"/\"version\": \"${{ env.VERSION }}\"/" \
-            engagement-cloud-sdk/npm-package.json > dist/npm/package.json
 
       - name: Install Chrome for tests
         run: |
@@ -142,11 +114,16 @@ jobs:
           sudo apt-get update -q
           sudo apt-get install -y google-chrome-stable
 
-      - name: Run web tests
-        run: make test-web
+      - name: Run JS Pipeline (Build, Test)
+        run: make pipeline-js
 
-      - name: Run SDK loader tests
-        run: make test-sdk-loader
+      - name: Assemble NPM package
+        run: |
+          mkdir -p dist/npm
+          cp engagement-cloud-sdk/build/kotlin-webpack/js/productionExecutable/engagement-cloud-sdk-html.js dist/npm/
+          cp build/js/packages/engagement-cloud-sdk/kotlin/engagement-cloud-sdk-html.d.ts dist/npm/ 2>/dev/null || true
+          sed "s/\"version\": \"0.0.0\"/\"version\": \"${{ env.VERSION }}\"/" \
+            engagement-cloud-sdk/npm-package.json > dist/npm/package.json
 
       - name: Publish to GitHub Packages NPM
         if: env.DRY_RUN != 'true'
@@ -192,14 +169,6 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build iOS frameworks (all architectures)
-        run: make build-ios-all-archtypes
-        env:
-          VERSION_OVERRIDE: ${{ env.VERSION }}
-
-      - name: Run iOS tests
-        run: make test-ios
-
       - name: Create GitHub Release for SPM artifact
         if: env.DRY_RUN != 'true'
         id: spm_release
@@ -211,19 +180,10 @@ jobs:
           prerelease: true
           generate_release_notes: false
 
-      - name: Publish iOS Maven targets to GitHub Packages
-        if: env.DRY_RUN != 'true'
-        run: make publish-maven-ios
+      - name: Run iOS Pipeline (Build, Test, [Publish Maven], [Publish SPM])
+        run: make pipeline-ios
         env:
-          VERSION_OVERRIDE: ${{ env.VERSION }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_ACTOR: ${{ github.actor }}
-          GITHUB_REPO: ${{ github.repository }}
-
-      - name: Publish iOS SPM via kmmBridgePublish
-        if: env.DRY_RUN != 'true'
-        run: make publish-ios-spm
-        env:
+          PUBLISH: ${{ env.DRY_RUN != 'true' }}
           VERSION_OVERRIDE: ${{ env.VERSION }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}

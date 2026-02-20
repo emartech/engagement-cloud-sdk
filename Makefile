@@ -1,4 +1,4 @@
-.PHONY: build build-pipeline build-android build-ios build-ios-all-archtypes build-js-html build-web check-env clean create-apks help lint prepare-release prepare-spm publish-android publish-ios-spm publish-npm release release-locally test test-android test-android-firebase test-ios test-sdk-loader test-web
+.PHONY: build build-pipeline build-android build-ios build-ios-all-archtypes build-js-html build-web check-env clean create-apks help lint pipeline-android pipeline-js pipeline-ios prepare-release prepare-spm publish-android publish-ios-spm publish-npm release release-locally test test-android test-android-firebase test-ios test-sdk-loader test-web
 .DEFAULT_GOAL := help
 SHELL := /bin/bash
 
@@ -122,7 +122,10 @@ publish-maven-ios: check-env
 		:engagement-cloud-sdk:publishIosArm64PublicationToGitHubPackagesRepository \
 		:engagement-cloud-sdk:publishIosX64PublicationToGitHubPackagesRepository \
 		:engagement-cloud-sdk:publishIosSimulatorArm64PublicationToGitHubPackagesRepository \
-		:ios-notification-service:publishAllPublicationsToGitHubPackagesRepository
+		:ios-notification-service:publishIosArm64PublicationToGitHubPackagesRepository \
+		:ios-notification-service:publishIosX64PublicationToGitHubPackagesRepository \
+		:ios-notification-service:publishIosSimulatorArm64PublicationToGitHubPackagesRepository \
+		:ios-notification-service:publishKotlinMultiplatformPublicationToGitHubPackagesRepository
 
 publish-npm: check-env
 	@cd dist/npm && npm publish --registry https://npm.pkg.github.com
@@ -144,3 +147,50 @@ release: check-env prepare-release
 
 release-locally: check-env prepare-release
 	@./gradlew assembleRelease publishToMavenLocal -PPROMOTE_TO_MAVEN_CENTRAL=true
+
+pipeline-android: check-env
+	@./gradlew \
+		:engagement-cloud-sdk:assembleAndroidMain \
+		:engagement-cloud-sdk-android-fcm:assembleRelease \
+		:engagement-cloud-sdk-android-hms:assembleRelease \
+		:engagement-cloud-sdk-android-fcm:lintRelease \
+		:engagement-cloud-sdk-android-hms:lintRelease \
+		:engagement-cloud-sdk:testAndroidHostTest \
+		:engagement-cloud-sdk-android-fcm:testDebugUnitTest \
+		:engagement-cloud-sdk-android-hms:testDebugUnitTest \
+		$(if $(filter true,$(PUBLISH)), \
+			:engagement-cloud-sdk:publishAllPublicationsToGitHubPackagesRepository \
+			:engagement-cloud-sdk-android-fcm:publishMavenPublicationToGitHubPackagesRepository \
+			:engagement-cloud-sdk-android-hms:publishMavenPublicationToGitHubPackagesRepository) \
+		-PENABLE_PUBLISHING=$(PUBLISH) \
+		--no-daemon
+
+pipeline-js: check-env
+	@./gradlew \
+		:engagement-cloud-sdk:jsBrowserProductionWebpack \
+		:engagement-cloud-sdk:jsBrowserTest \
+		-Pjs.variant=html \
+		-x :composeApp:jsBrowserProductionWebpack \
+		-x :composeApp:jsBrowserTest \
+		--no-daemon
+
+pipeline-ios: check-env
+	@./gradlew \
+		:engagement-cloud-sdk:assembleEngagementCloudSDKReleaseXCFramework \
+		:ios-notification-service:assembleEngagementCloudNotificationServiceReleaseXCFramework \
+		:engagement-cloud-sdk:iosX64Test \
+		$(if $(filter true,$(PUBLISH)), \
+			:engagement-cloud-sdk:publishIosArm64PublicationToGitHubPackagesRepository \
+			:engagement-cloud-sdk:publishIosX64PublicationToGitHubPackagesRepository \
+			:engagement-cloud-sdk:publishIosSimulatorArm64PublicationToGitHubPackagesRepository \
+			:ios-notification-service:publishIosArm64PublicationToGitHubPackagesRepository \
+			:ios-notification-service:publishIosX64PublicationToGitHubPackagesRepository \
+			:ios-notification-service:publishIosSimulatorArm64PublicationToGitHubPackagesRepository \
+			:ios-notification-service:publishKotlinMultiplatformPublicationToGitHubPackagesRepository \
+			kmmBridgePublish) \
+		-PENABLE_PUBLISHING=$(PUBLISH) \
+		-PNATIVE_BUILD_TYPE='RELEASE' \
+		-PGITHUB_ARTIFACT_RELEASE_ID=$(GITHUB_ARTIFACT_RELEASE_ID) \
+		-PGITHUB_PUBLISH_TOKEN=$(GITHUB_TOKEN) \
+		-PGITHUB_REPO=$(GITHUB_REPO) \
+		--no-daemon
