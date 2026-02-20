@@ -116,6 +116,14 @@ publish-maven: check-env
 		:engagement-cloud-sdk-android-fcm:publishMavenPublicationToGitHubPackagesRepository \
 		:engagement-cloud-sdk-android-hms:publishMavenPublicationToGitHubPackagesRepository
 
+publish-maven-ios: check-env
+	@./gradlew \
+		-PENABLE_PUBLISHING=true \
+		:engagement-cloud-sdk:publishIosArm64PublicationToGitHubPackagesRepository \
+		:engagement-cloud-sdk:publishIosX64PublicationToGitHubPackagesRepository \
+		:engagement-cloud-sdk:publishIosSimulatorArm64PublicationToGitHubPackagesRepository \
+		:ios-notification-service:publishAllPublicationsToGitHubPackagesRepository
+
 publish-npm: check-env
 	@cd dist/npm && npm publish --registry https://npm.pkg.github.com
 

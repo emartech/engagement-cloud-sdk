@@ -47,11 +47,11 @@ permissions:
 
 
 jobs:
-  build-android:
-    name: Build / Android
+  android-pipeline:
+    name: Android Pipeline (Build, Test, Publish)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -70,6 +70,21 @@ jobs:
         env:
           VERSION_OVERRIDE: ${{ env.VERSION }}
 
+      - name: Run lint
+        run: make lint
+
+      - name: Run Android unit tests
+        run: make test-android
+
+      - name: Publish to GitHub Packages Maven
+        if: env.DRY_RUN != 'true'
+        run: make publish-maven
+        env:
+          VERSION_OVERRIDE: ${{ env.VERSION }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_REPO: ${{ github.repository }}
+
       - name: Upload Android artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -82,13 +97,79 @@ jobs:
             engagement-cloud-sdk-android-hms/build/outputs/aar/*-release.aar
 
 
-  build-ios:
-    name: Build / iOS
+  js-pipeline:
+    name: JS Pipeline (Build, Test, Publish)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@emartech'
+
+      - name: Install npm dependencies
+        run: npm install
+
+      - name: Build JS html variant
+        run: make build-js-html
+
+      - name: Assemble NPM package
+        run: |
+          mkdir -p dist/npm
+          cp engagement-cloud-sdk/build/kotlin-webpack/js/productionExecutable/engagement-cloud-sdk-html.js dist/npm/
+          cp build/js/packages/engagement-cloud-sdk/kotlin/engagement-cloud-sdk-html.d.ts dist/npm/ 2>/dev/null || true
+          sed "s/\"version\": \"0.0.0\"/\"version\": \"${{ env.VERSION }}\"/" \
+            engagement-cloud-sdk/npm-package.json > dist/npm/package.json
+
+      - name: Install Chrome for tests
+        run: |
+          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+          sudo apt-get update -q
+          sudo apt-get install -y google-chrome-stable
+
+      - name: Run web tests
+        run: make test-web
+
+      - name: Run SDK loader tests
+        run: make test-sdk-loader
+
+      - name: Publish to GitHub Packages NPM
+        if: env.DRY_RUN != 'true'
+        run: npm publish dist/npm/
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload JS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: js-artifacts
+          retention-days: 1
+          if-no-files-found: error
+          path: dist/npm/
+
+
+  ios-pipeline:
+    name: iOS Pipeline (Build, Test, Publish)
     runs-on: macos-latest-xlarge
     env:
       SPM_BUILD: release
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           fetch-tags: true
@@ -116,251 +197,8 @@ jobs:
         env:
           VERSION_OVERRIDE: ${{ env.VERSION }}
 
-      - name: Upload iOS XCFramework artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-artifacts
-          retention-days: 1
-          if-no-files-found: error
-          path: |
-            engagement-cloud-sdk/build/XCFrameworks/release/*.xcframework
-            ios-notification-service/build/XCFrameworks/release/*.xcframework
-
-
-  build-js:
-    name: Build / JS (html)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - uses: actions/setup-java@v4
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: ${{ env.JAVA_DISTRIBUTION }}
-
-      - uses: gradle/actions/setup-gradle@v4
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Install npm dependencies
-        run: npm install
-
-      - name: Build JS html variant
-        run: make build-js-html
-
-      - name: Assemble NPM package
-        run: |
-          mkdir -p dist/npm
-          cp engagement-cloud-sdk/build/kotlin-webpack/js/productionExecutable/engagement-cloud-sdk-html.js dist/npm/
-          cp build/js/packages/engagement-cloud-sdk/kotlin/engagement-cloud-sdk-html.d.ts dist/npm/ 2>/dev/null || true
-          sed "s/\"version\": \"0.0.0\"/\"version\": \"${{ env.VERSION }}\"/" \
-            engagement-cloud-sdk/npm-package.json > dist/npm/package.json
-
-      - name: Upload JS artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: js-artifacts
-          retention-days: 1
-          if-no-files-found: error
-          path: dist/npm/
-
-
-  lint:
-    name: Lint
-    needs: build-android
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - uses: actions/setup-java@v4
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: ${{ env.JAVA_DISTRIBUTION }}
-
-      - uses: gradle/actions/setup-gradle@v4
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Run lint
-        run: make lint
-
-
-  test-android:
-    name: Test / Android (unit)
-    needs: build-android
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - uses: actions/setup-java@v4
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: ${{ env.JAVA_DISTRIBUTION }}
-
-      - uses: gradle/actions/setup-gradle@v4
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Run Android unit tests
-        run: make test-android
-
-
-  test-ios:
-    name: Test / iOS
-    needs: build-ios
-    runs-on: macos-latest-xlarge
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - uses: actions/setup-java@v4
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: ${{ env.JAVA_DISTRIBUTION }}
-
-      - uses: gradle/actions/setup-gradle@v4
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
       - name: Run iOS tests
         run: make test-ios
-
-
-  test-web:
-    name: Test / Web
-    needs: build-js
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - uses: actions/setup-java@v4
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: ${{ env.JAVA_DISTRIBUTION }}
-
-      - uses: gradle/actions/setup-gradle@v4
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Install npm dependencies
-        run: npm install
-
-      - name: Install Chrome
-        run: |
-          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-          sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
-          sudo apt-get update -q
-          sudo apt-get install -y google-chrome-stable
-
-      - name: Run web tests
-        run: make test-web
-
-      - name: Run SDK loader tests
-        run: make test-sdk-loader
-
-
-  publish-maven:
-    name: Publish / Maven (GitHub Packages)
-    needs: [lint, test-android]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - uses: actions/setup-java@v4
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: ${{ env.JAVA_DISTRIBUTION }}
-
-      - uses: gradle/actions/setup-gradle@v4
-        with:
-          cache-read-only: false
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Publish to GitHub Packages Maven
-        if: env.DRY_RUN != 'true'
-        run: make publish-maven
-        env:
-          VERSION_OVERRIDE: ${{ env.VERSION }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_ACTOR: ${{ github.actor }}
-          GITHUB_REPO: ${{ github.repository }}
-
-
-  publish-npm:
-    name: Publish / NPM (GitHub Packages)
-    needs: test-web
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@emartech'
-
-      - name: Download JS artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: js-artifacts
-          path: dist/npm/
-
-      - name: Publish to GitHub Packages NPM
-        if: env.DRY_RUN != 'true'
-        run: npm publish dist/npm/
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-
-  publish-ios-spm:
-    name: Publish / iOS SPM (GitHub Release)
-    needs: test-ios
-    runs-on: macos-latest-xlarge
-    env:
-      SPM_BUILD: release
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-          fetch-tags: true
-
-      - uses: actions/setup-java@v4
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: ${{ env.JAVA_DISTRIBUTION }}
-
-      - uses: gradle/actions/setup-gradle@v4
-        with:
-          cache-read-only: false
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
 
       - name: Create GitHub Release for SPM artifact
         if: env.DRY_RUN != 'true'
@@ -373,6 +211,15 @@ jobs:
           prerelease: true
           generate_release_notes: false
 
+      - name: Publish iOS Maven targets to GitHub Packages
+        if: env.DRY_RUN != 'true'
+        run: make publish-maven-ios
+        env:
+          VERSION_OVERRIDE: ${{ env.VERSION }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_REPO: ${{ github.repository }}
+
       - name: Publish iOS SPM via kmmBridgePublish
         if: env.DRY_RUN != 'true'
         run: make publish-ios-spm
@@ -383,11 +230,21 @@ jobs:
           GITHUB_REPO: ${{ github.repository }}
           GITHUB_ARTIFACT_RELEASE_ID: ${{ steps.spm_release.outputs.id }}
 
+      - name: Upload iOS XCFramework artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-artifacts
+          retention-days: 1
+          if-no-files-found: error
+          path: |
+            engagement-cloud-sdk/build/XCFrameworks/release/*.xcframework
+            ios-notification-service/build/XCFrameworks/release/*.xcframework
+
 
   report-slack:
     name: Report / Slack
     if: always()
-    needs: [lint, test-android, test-ios, test-web, publish-maven, publish-npm, publish-ios-spm]
+    needs: [android-pipeline, js-pipeline, ios-pipeline]
     runs-on: ubuntu-latest
     steps:
       - name: Compute Slack prefix
