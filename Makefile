@@ -155,9 +155,12 @@ pipeline-android: check-env
 		:engagement-cloud-sdk-android-fcm:testDebugUnitTest \
 		:engagement-cloud-sdk-android-hms:testDebugUnitTest \
 		$(if $(filter true,$(PUBLISH)), \
-			:engagement-cloud-sdk:publishAllPublicationsToGitHubPackagesRepository \
+			:engagement-cloud-sdk:publishKotlinMultiplatformPublicationToGitHubPackagesRepository \
+			:engagement-cloud-sdk:publishAndroidReleasePublicationToGitHubPackagesRepository \
+			:engagement-cloud-sdk:publishJsPublicationToGitHubPackagesRepository \
 			:engagement-cloud-sdk-android-fcm:publishMavenPublicationToGitHubPackagesRepository \
-			:engagement-cloud-sdk-android-hms:publishMavenPublicationToGitHubPackagesRepository) \
+			:engagement-cloud-sdk-android-hms:publishMavenPublicationToGitHubPackagesRepository \
+			:ios-notification-service:publishKotlinMultiplatformPublicationToGitHubPackagesRepository) \
 		-PENABLE_PUBLISHING=$(PUBLISH) \
 		--no-daemon
 
@@ -182,7 +185,6 @@ pipeline-ios: check-env
 			:ios-notification-service:publishIosArm64PublicationToGitHubPackagesRepository \
 			:ios-notification-service:publishIosX64PublicationToGitHubPackagesRepository \
 			:ios-notification-service:publishIosSimulatorArm64PublicationToGitHubPackagesRepository \
-			:ios-notification-service:publishKotlinMultiplatformPublicationToGitHubPackagesRepository \
 			kmmBridgePublish) \
 		-PENABLE_PUBLISHING=$(PUBLISH) \
 		-PNATIVE_BUILD_TYPE='$(if $(filter true,$(PUBLISH)),RELEASE,DEBUG)' \

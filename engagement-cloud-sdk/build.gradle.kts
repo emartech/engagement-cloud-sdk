@@ -100,13 +100,12 @@ kotlin {
 
     applyDefaultHierarchyTemplate()
 
-    val isMac = System.getProperty("os.name").contains("Mac", ignoreCase = true)
-    if (isMac) {
-        listOf(
-            iosX64(),
-            iosArm64(),
-            iosSimulatorArm64()
-        ).forEach { iosTarget ->
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { iosTarget ->
+        if (isMac) {
             iosTarget.binaries.framework {
                 baseName = "EngagementCloudSDK"
                 isStatic = false

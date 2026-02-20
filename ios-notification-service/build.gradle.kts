@@ -20,38 +20,44 @@ if (isMac) {
 }
 
 kotlin {
-    val isMac = System.getProperty("os.name").contains("Mac", ignoreCase = true)
-    if (isMac) {
-        listOf(
-            iosX64(),
-            iosArm64(),
-            iosSimulatorArm64()
-        ).forEach { iosTarget ->
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { iosTarget ->
+        if (isMac) {
             iosTarget.binaries.framework {
                 baseName = "EngagementCloudNotificationService"
                 isStatic = true
             }
         }
-    } else {
+    }
+
+    if (!isMac) {
         jvm()
     }
 
     sourceSets {
-        if (isMac) {
-            iosMain {
-                dependencies {
-                    implementation(libs.kotlinx.coroutines.core)
-                    implementation(libs.kotlinx.serialization.json)
-                }
-            }
-            iosTest {
-                dependencies {
-                    implementation(libs.kotlin.test)
-                    implementation(libs.kotest.assertions.core)
-                    implementation(libs.kotlinx.coroutines.test)
-                }
+        val commonMain by getting {
+            dependencies {
+                implementation(libs.kotlinx.coroutines.core)
+                implementation(libs.kotlinx.serialization.json)
             }
         }
+        val commonTest by getting {
+            dependencies {
+                implementation(libs.kotlin.test)
+                implementation(libs.kotest.assertions.core)
+                implementation(libs.kotlinx.coroutines.test)
+            }
+        }
+    }
+}
+
+publishing {
+    publications.withType<MavenPublication>().configureEach {
+        val artifactId = artifactId.replace("ios-notification-service", "engagement-cloud-sdk-ios-notification-service")
+        this.artifactId = artifactId
     }
 }
 
