@@ -90,7 +90,9 @@ skie {
     }
 
     build {
-        produceDistributableFramework()
+        if (project.findProperty("ENABLE_PUBLISHING") == "true") {
+            produceDistributableFramework()
+        }
     }
     analytics {
         disableUpload.set(true)

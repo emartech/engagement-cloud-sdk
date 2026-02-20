@@ -127,7 +127,10 @@ jobs:
 
       - name: Publish to GitHub Packages NPM
         if: env.DRY_RUN != 'true'
-        run: npm publish dist/npm/
+        working-directory: dist/npm
+        run: |
+          cp ../../.npmrc .
+          npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

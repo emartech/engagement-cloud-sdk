@@ -336,8 +336,10 @@ skie {
     }
 
     build {
-        enableSwiftLibraryEvolution = true
-        produceDistributableFramework()
+        if (project.findProperty("ENABLE_PUBLISHING") == "true") {
+            enableSwiftLibraryEvolution = true
+            produceDistributableFramework()
+        }
     }
 
     analytics {
