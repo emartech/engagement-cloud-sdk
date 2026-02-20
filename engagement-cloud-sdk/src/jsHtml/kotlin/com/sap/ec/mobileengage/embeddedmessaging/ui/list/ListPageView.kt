@@ -85,10 +85,18 @@ fun MessageList(
         mutableStateOf(window.matchMedia("(orientation: landscape)").matches)
     }
 
+    var isTabletScale by remember {
+        mutableStateOf(window.matchMedia("(min-width: 1240px)").matches)
+    }
+
     LaunchedEffect(Unit) {
-        val mediaQuery = window.matchMedia("(orientation: landscape)")
-        val listener: (Event) -> Unit = { _ -> isLandscape = mediaQuery.matches }
-        mediaQuery.addEventListener("change", listener)
+        val landscapeMediaQuery = window.matchMedia("(orientation: landscape)")
+        val landscapeListener: (Event) -> Unit = { _ -> isLandscape = landscapeMediaQuery.matches }
+        landscapeMediaQuery.addEventListener("change", landscapeListener)
+
+        val tabletMediaQuery = window.matchMedia("(min-width: 1240px)")
+        val tabletListener: (Event) -> Unit = { _ -> isTabletScale = tabletMediaQuery.matches }
+        tabletMediaQuery.addEventListener("change", tabletListener)
     }
 
     LaunchedEffect(selectedMessage) {
@@ -99,83 +107,93 @@ fun MessageList(
 
     if (isLandscape) {
         Div({ classes(EmbeddedMessagingStyleSheet.splitViewContainer) }) {
-            Div({ classes(EmbeddedMessagingStyleSheet.listPane) }) {
-                if (showFilters) {
-                    FilterRow(
-                        selectedCategoryIds = selectedCategoryIds,
-                        filterUnopenedOnly = filterUnopenedOnly,
-                        onFilterChange = { viewModel.setFilterUnopenedOnly(it) },
-                        onCategorySelectorClicked = { viewModel.openCategorySelector() }
-                    )
-                    Hr({ classes(EmbeddedMessagingStyleSheet.divider) })
-                }
-
-                MessageListContent(
-                    lazyPagingMessageItems = lazyPagingMessageItems,
-                    viewModel,
-                    customMessageItemElementName,
-                    onRefresh = { viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() } },
-                    onItemClick = {
-                        scope.launch {
-                            viewModel.selectMessage(it, onNavigate = {})
-                        }
-                    },
-                    onClearFilters = {
-                        viewModel.setSelectedCategoryIds(emptySet())
-                        viewModel.setFilterUnopenedOnly(false)
-                    },
-                    hasFiltersApplied = hasFiltersApplied,
-                    onDeleteIconClicked = {
-                        messageToDelete = it
-                        showDeleteMessageDialog = true
+            AdaptiveCardContainer(isTabletScale = isTabletScale) {
+                Div({ classes(EmbeddedMessagingStyleSheet.listPane) }) {
+                    if (showFilters) {
+                        FilterRow(
+                            selectedCategoryIds = selectedCategoryIds,
+                            filterUnopenedOnly = filterUnopenedOnly,
+                            onFilterChange = { viewModel.setFilterUnopenedOnly(it) },
+                            onCategorySelectorClicked = { viewModel.openCategorySelector() }
+                        )
+                        Hr({ classes(EmbeddedMessagingStyleSheet.divider) })
                     }
-                )
+
+                    MessageListContent(
+                        lazyPagingMessageItems = lazyPagingMessageItems,
+                        viewModel,
+                        customMessageItemElementName,
+                        onRefresh = { viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() } },
+                        onItemClick = {
+                            scope.launch {
+                                viewModel.selectMessage(it, onNavigate = {})
+                            }
+                        },
+                        onClearFilters = {
+                            viewModel.setSelectedCategoryIds(emptySet())
+                            viewModel.setFilterUnopenedOnly(false)
+                        },
+                        hasFiltersApplied = hasFiltersApplied,
+                        onDeleteIconClicked = {
+                            messageToDelete = it
+                            showDeleteMessageDialog = true
+                        }
+                    )
+                }
             }
 
-            Div({ classes(EmbeddedMessagingStyleSheet.detailPane) }) {
-                if (selectedMessage?.hasRichContent() ?: false) {
-                    MessageDetailView(
-                        viewModel = selectedMessage!!
-                    )
-                } else {
-                    EmptyDetailState()
+            AdaptiveCardContainer(isTabletScale = isTabletScale, flex = true) {
+                Div({ classes(EmbeddedMessagingStyleSheet.detailPane) }) {
+                    if (selectedMessage?.hasRichContent() ?: false) {
+                        MessageDetailView(
+                            viewModel = selectedMessage!!
+                        )
+                    } else {
+                        EmptyDetailState()
+                    }
                 }
             }
         }
     } else {
-        if (selectedMessage?.hasRichContent() ?: false) {
-            MessageDetailView(
-                viewModel = viewModel.selectedMessage.value!!
-            )
-        } else {
-            FilterRow(
-                selectedCategoryIds = selectedCategoryIds,
-                filterUnopenedOnly = filterUnopenedOnly,
-                onFilterChange = { viewModel.setFilterUnopenedOnly(it) },
-                onCategorySelectorClicked = { viewModel.openCategorySelector() }
-            )
-            Hr({ classes(EmbeddedMessagingStyleSheet.divider) })
-
-            MessageListContent(
-                lazyPagingMessageItems = lazyPagingMessageItems,
-                viewModel,
-                customMessageItemElementName,
-                onRefresh = { viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() } },
-                onItemClick = {
-                    scope.launch {
-                        viewModel.selectMessage(it, onNavigate = {})
+        AdaptiveCardContainer(isTabletScale = isTabletScale) {
+            if (selectedMessage?.hasRichContent() ?: false) {
+                MessageDetailView(
+                    viewModel = viewModel.selectedMessage.value!!
+                )
+            } else {
+                Div({ classes(EmbeddedMessagingStyleSheet.compactListView) }) {
+                    if (showFilters) {
+                        FilterRow(
+                            selectedCategoryIds = selectedCategoryIds,
+                            filterUnopenedOnly = filterUnopenedOnly,
+                            onFilterChange = { viewModel.setFilterUnopenedOnly(it) },
+                            onCategorySelectorClicked = { viewModel.openCategorySelector() }
+                        )
+                        Hr({ classes(EmbeddedMessagingStyleSheet.divider) })
                     }
-                },
-                onClearFilters = {
-                    viewModel.setSelectedCategoryIds(emptySet())
-                    viewModel.setFilterUnopenedOnly(false)
-                },
-                hasFiltersApplied = hasFiltersApplied,
-                onDeleteIconClicked = {
-                    messageToDelete = it
-                    showDeleteMessageDialog = true
+
+                    MessageListContent(
+                        lazyPagingMessageItems = lazyPagingMessageItems,
+                        viewModel,
+                        customMessageItemElementName,
+                        onRefresh = { viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() } },
+                        onItemClick = {
+                            scope.launch {
+                                viewModel.selectMessage(it, onNavigate = {})
+                            }
+                        },
+                        onClearFilters = {
+                            viewModel.setSelectedCategoryIds(emptySet())
+                            viewModel.setFilterUnopenedOnly(false)
+                        },
+                        hasFiltersApplied = hasFiltersApplied,
+                        onDeleteIconClicked = {
+                            messageToDelete = it
+                            showDeleteMessageDialog = true
+                        }
+                    )
                 }
-            )
+            }
         }
     }
 
@@ -464,3 +482,22 @@ fun observePrefetch(onTrigger: () -> Unit): IntersectionObserver {
 
     return observer
 }
+
+@Composable
+fun AdaptiveCardContainer(isTabletScale: Boolean, flex: Boolean = false, content: @Composable () -> Unit) {
+    if (isTabletScale) {
+        Div({
+            classes(
+                if (flex) EmbeddedMessagingStyleSheet.islandContainerFlex
+                else EmbeddedMessagingStyleSheet.islandContainer
+            )
+        }) {
+            Div({ classes(EmbeddedMessagingStyleSheet.islandCard) }) {
+                content()
+            }
+        }
+    } else {
+        content()
+    }
+}
+

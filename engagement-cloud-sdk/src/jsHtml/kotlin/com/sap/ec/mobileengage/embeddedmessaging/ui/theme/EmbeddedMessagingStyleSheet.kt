@@ -92,11 +92,40 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         flexDirection(FlexDirection.Column)
     }
 
+    val islandContainer by style {
+        padding(DEFAULT_PADDING)
+        height(MAX_HEIGHT)
+        backgroundColor(CssColorVars.colorBackground.value())
+        display(DisplayStyle.Flex)
+        flexDirection(FlexDirection.Column)
+    }
+
+    val islandContainerFlex by style {
+        padding(DEFAULT_PADDING)
+        height(MAX_HEIGHT)
+        backgroundColor(CssColorVars.colorBackground.value())
+        display(DisplayStyle.Flex)
+        flexDirection(FlexDirection.Column)
+        flex(1)
+    }
+
+    val islandCard by style {
+        backgroundColor(CssColorVars.colorSurface.value())
+        borderRadius(DEFAULT_BORDER_RADIUS)
+        property("box-shadow", "0 2px 8px rgba(0, 0, 0, 0.1)")
+        property("overflow", "hidden")
+        height(MAX_HEIGHT)
+        display(DisplayStyle.Flex)
+        flexDirection(FlexDirection.Column)
+        flex(1)
+    }
+
     val splitViewContainer by style {
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Row)
         height(MAX_HEIGHT)
         width(MAX_WIDTH)
+        gap(ZERO_SPACING)
     }
 
     val listPane by style {
