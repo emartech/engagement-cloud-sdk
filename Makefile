@@ -46,7 +46,7 @@ clean: check-env
 create-apks: check-env
 	@./gradlew :composeApp:assembleRelease
 
-test: check-env test-android test-web test-sdk-loader test-jvm test-ios
+test: check-env test-android test-web test-sdk-loader test-ios
 
 build-js-html: check-env
 	@./gradlew :engagement-cloud-sdk:jsBrowserProductionWebpack \
@@ -66,9 +66,6 @@ test-sdk-loader: check-env
 		-x :composeApp:jsBrowserTest \
 		--tests com.sap.ec.mobileengage.WebSdkLoaderTest
 
-test-jvm: check-env
-	@./gradlew :engagement-cloud-sdk:jvmTest
-
 build-android: check-env
 	@./gradlew \
 		:engagement-cloud-sdk:assembleAndroidMain \
@@ -76,10 +73,7 @@ build-android: check-env
 		:engagement-cloud-sdk-android-hms:assembleRelease
 
 test-android: check-env
-	@./gradlew \
-		:engagement-cloud-sdk:testAndroidHostTest \
-		:engagement-cloud-sdk-android-fcm:testDebugUnitTest \
-		:engagement-cloud-sdk-android-hms:testDebugUnitTest
+	@./gradlew :engagement-cloud-sdk:allTests -x :composeApp:test
 
 build-ios-all-archtypes: check-env
 	@./gradlew \
