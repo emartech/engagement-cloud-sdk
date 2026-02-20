@@ -3,7 +3,7 @@ import EngagementCloudNotificationService
 
 
 class NotificationService: UNNotificationServiceExtension {
-    let engagementCloudNotificationService = EngagementCloudNotificationService()
+    let engagementCloudNotificationService = EngagementCloudNotificationService_()
 
     var contentHandler: ((UNNotificationContent) -> Void)?
     var bestAttemptContent: UNMutableNotificationContent?
