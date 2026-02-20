@@ -2,7 +2,7 @@
 
 # SAP Engagement Cloud SDK
 
-The **SAP Engagement Cloud SDK** is a Kotlin Multiplatform SDK designed to integrate with the SAP Engagement Cloud platform. It provides a unified interface for managing events, push notifications, in-app messages, and other functionalities across Android, iOS, and Web platforms.
+The **SAP Engagement Cloud SDK** is a Kotlin Multiplatform SDK designed to integrate with SAP Engagement Cloud. It provides a unified interface for managing events, push notifications, in-app messages, and other functionalities across Android, iOS, and Web platforms.
 
 ## Documentation
 
