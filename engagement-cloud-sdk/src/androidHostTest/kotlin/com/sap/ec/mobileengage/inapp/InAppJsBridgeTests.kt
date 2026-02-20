@@ -1,5 +1,6 @@
 package com.sap.ec.mobileengage.inapp
 
+import com.sap.ec.core.log.Logger
 import com.sap.ec.mobileengage.action.EventActionFactoryApi
 import com.sap.ec.mobileengage.action.models.BasicAppEventActionModel
 import com.sap.ec.mobileengage.action.models.BasicCopyToClipboardActionModel
@@ -33,6 +34,7 @@ import kotlin.test.AfterTest
 class InAppJsBridgeTests {
     private companion object {
         const val DISMISS_ID = "dismissId"
+        const val BUTTON_ID = "buttonId"
         const val TRACKING_INFO = """{"key":"value"}"""
         val reporting = buildJsonObject {
             put("reportingKey", "reportingValue")
@@ -44,6 +46,7 @@ class InAppJsBridgeTests {
     private lateinit var mockActionFactory: EventActionFactoryApi
     private lateinit var applicationScope: CoroutineScope
     private lateinit var json: Json
+    private lateinit var mockLogger: Logger
     private lateinit var inAppJsBridge: InAppJsBridge
 
     @Before
@@ -51,9 +54,11 @@ class InAppJsBridgeTests {
         Dispatchers.setMain(StandardTestDispatcher())
         inAppJsBridgeData = InAppJsBridgeData(DISMISS_ID, TRACKING_INFO)
         mockActionFactory = mockk(relaxed = true)
+        mockLogger = mockk(relaxed = true)
         applicationScope = TestScope(StandardTestDispatcher())
         json = JsonUtil.json
-        inAppJsBridge = InAppJsBridge(inAppJsBridgeData, mockActionFactory, applicationScope, json)
+        inAppJsBridge =
+            InAppJsBridge(inAppJsBridgeData, mockActionFactory, applicationScope, json, mockLogger)
     }
 
     @AfterTest
@@ -62,7 +67,7 @@ class InAppJsBridgeTests {
     }
 
     @Test
-    fun triggerMEEvent_shouldCall_actionFactory_withBasicCustomEventActionModel() = runTest {
+    fun handleInAppAction_shouldCall_actionFactory_withBasicCustomEventActionModel() = runTest {
         val eventName = "testCustomEvent"
         val testEventString = buildJsonObject {
             put("type", "MECustomEvent")
@@ -73,7 +78,7 @@ class InAppJsBridgeTests {
 
         val expectedActionModel = BasicCustomEventActionModel(reporting, eventName, payloadMap)
 
-        inAppJsBridge.triggerMEEvent(testEventString)
+        inAppJsBridge.handleInAppAction(testEventString)
 
         advanceUntilIdle()
 
@@ -83,14 +88,17 @@ class InAppJsBridgeTests {
     }
 
     @Test
-    fun buttonClicked_shouldCall_actionFactory_withBasicButtonClickedActionModel() = runTest {
+    fun handleInAppAction_shouldCall_actionFactory_withBasicButtonClickedActionModel() = runTest {
         val testEventString = buildJsonObject {
+            put("type", "inAppButtonClicked")
+            put("buttonId", BUTTON_ID)
             put("reporting", reporting)
         }.toString()
 
-        val expectedActionModel = BasicInAppButtonClickedActionModel(reporting, TRACKING_INFO)
+        val expectedActionModel =
+            BasicInAppButtonClickedActionModel(reporting, TRACKING_INFO)
 
-        inAppJsBridge.buttonClicked(testEventString)
+        inAppJsBridge.handleInAppAction(testEventString)
 
         advanceUntilIdle()
 
@@ -100,7 +108,7 @@ class InAppJsBridgeTests {
     }
 
     @Test
-    fun triggerAppEvent_shouldCall_actionFactory_withBasicAppEventActionModel() = runTest {
+    fun handleInAppAction_shouldCall_actionFactory_withBasicAppEventActionModel() = runTest {
         val eventName = "testAppEvent"
         val testEventString = buildJsonObject {
             put("type", "MEAppEvent")
@@ -111,7 +119,7 @@ class InAppJsBridgeTests {
 
         val expectedActionModel = BasicAppEventActionModel(reporting, eventName, payloadMap)
 
-        inAppJsBridge.triggerAppEvent(testEventString)
+        inAppJsBridge.handleInAppAction(testEventString)
 
         advanceUntilIdle()
 
@@ -121,24 +129,25 @@ class InAppJsBridgeTests {
     }
 
     @Test
-    fun requestPushPermission_shouldCall_actionFactory_withRequestPushPermissionActionModel() = runTest {
-        val testEventString = buildJsonObject {
-            put("type", "RequestPushPermission")
-        }.toString()
+    fun handleInAppAction_shouldCall_actionFactory_withRequestPushPermissionActionModel() =
+        runTest {
+            val testEventString = buildJsonObject {
+                put("type", "RequestPushPermission")
+            }.toString()
 
-        val expectedActionModel = RequestPushPermissionActionModel
+            val expectedActionModel = RequestPushPermissionActionModel()
 
-        inAppJsBridge.requestPushPermission(testEventString)
+            inAppJsBridge.handleInAppAction(testEventString)
 
-        advanceUntilIdle()
+            advanceUntilIdle()
 
-        coVerify {
-            mockActionFactory.create(expectedActionModel)
+            coVerify {
+                mockActionFactory.create(expectedActionModel)
+            }
         }
-    }
 
     @Test
-    fun openExternalLink_shouldCall_actionFactory_withBasicOpenExternalUrlActionModel() = runTest {
+    fun handleInAppAction_shouldCall_actionFactory_withBasicOpenExternalUrlActionModel() = runTest {
         val url = "https://test.com"
         val testEventString = buildJsonObject {
             put("type", "OpenExternalUrl")
@@ -148,7 +157,7 @@ class InAppJsBridgeTests {
 
         val expectedActionModel = BasicOpenExternalUrlActionModel(reporting, url)
 
-        inAppJsBridge.openExternalLink(testEventString)
+        inAppJsBridge.handleInAppAction(testEventString)
 
         advanceUntilIdle()
 
@@ -158,7 +167,7 @@ class InAppJsBridgeTests {
     }
 
     @Test
-    fun close_shouldCall_actionFactory_withBasicDismissActionModel() = runTest {
+    fun handleInAppAction_shouldCall_actionFactory_withBasicDismissActionModel() = runTest {
         val testEventString = buildJsonObject {
             put("type", "Dismiss")
             put("reporting", reporting)
@@ -166,7 +175,7 @@ class InAppJsBridgeTests {
 
         val expectedActionModel = BasicDismissActionModel(reporting, DISMISS_ID)
 
-        inAppJsBridge.close(testEventString)
+        inAppJsBridge.handleInAppAction(testEventString)
 
         advanceUntilIdle()
 
@@ -176,7 +185,7 @@ class InAppJsBridgeTests {
     }
 
     @Test
-    fun copyToClipboard_shouldCall_actionFactory_withBasicCopyToClipboardActionModel() = runTest {
+    fun handleInAppAction_shouldCall_actionFactory_withBasicCopyToClipboardActionModel() = runTest {
         val text = "copy me to clipboard"
         val testEventString = buildJsonObject {
             put("type", "copyToClipboard")
@@ -186,12 +195,33 @@ class InAppJsBridgeTests {
 
         val expectedActionModel = BasicCopyToClipboardActionModel(reporting, text)
 
-        inAppJsBridge.copyToClipboard(testEventString)
+        inAppJsBridge.handleInAppAction(testEventString)
 
         advanceUntilIdle()
 
         coVerify {
             mockActionFactory.create(expectedActionModel)
+        }
+    }
+
+    @Test
+    fun handleInAppAction_shouldCreateErrorLog_ifActionModelCannotBeParsed() = runTest {
+        val text = "copy me to clipboard"
+        val testEventString = buildJsonObject {
+            put("reporting", reporting)
+            put("text", text)
+        }.toString()
+
+        inAppJsBridge.handleInAppAction(testEventString)
+
+        advanceUntilIdle()
+
+        coVerify(exactly = 0) { mockActionFactory.create(any()) }
+        coVerify {
+            mockLogger.error(
+                "Failed to parse actionModel from inapp action data.",
+                any<Throwable>()
+            )
         }
     }
 }

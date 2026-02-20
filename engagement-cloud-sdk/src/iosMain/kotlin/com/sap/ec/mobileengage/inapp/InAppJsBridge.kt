@@ -3,13 +3,8 @@ package com.sap.ec.mobileengage.inapp
 import com.sap.ec.core.log.Logger
 import com.sap.ec.mobileengage.action.ActionFactoryApi
 import com.sap.ec.mobileengage.action.models.ActionModel
-import com.sap.ec.mobileengage.action.models.BasicAppEventActionModel
-import com.sap.ec.mobileengage.action.models.BasicCopyToClipboardActionModel
-import com.sap.ec.mobileengage.action.models.BasicCustomEventActionModel
-import com.sap.ec.mobileengage.action.models.BasicDismissActionModel
-import com.sap.ec.mobileengage.action.models.BasicInAppButtonClickedActionModel
-import com.sap.ec.mobileengage.action.models.BasicOpenExternalUrlActionModel
-import com.sap.ec.mobileengage.action.models.RequestPushPermissionActionModel
+import com.sap.ec.mobileengage.action.models.BasicActionModel
+import com.sap.ec.mobileengage.action.models.amendForJsBridge
 import com.sap.ec.mobileengage.inapp.jsbridge.InAppJsBridgeData
 import com.sap.ec.util.JsonUtil
 import kotlinx.coroutines.CoroutineDispatcher
@@ -33,89 +28,29 @@ class InAppJsBridge(
     private val json: Json
 ) : NSObject(), WKScriptMessageHandlerProtocol {
 
-    private val jsCommandNames = listOf(
-        "triggerMEEvent",
-        "buttonClicked",
-        "triggerAppEvent",
-        "requestPushPermission",
-        "openExternalLink",
-        "close",
-        "copyToClipboard"
-    )
+    val scriptMessageHandler = "handleInAppAction"
 
     private fun handleActions(didReceiveScriptMessage: WKScriptMessage) {
         val sdkScope = CoroutineScope(sdkDispatcher)
         val mainScope = CoroutineScope(mainDispatcher)
         sdkScope.launch {
-            val body: String = withContext(mainScope.coroutineContext) {
-                (didReceiveScriptMessage.body as NSDictionary).toJsonString()
-            }
-            val name = withContext(mainScope.coroutineContext) {
-                didReceiveScriptMessage.name
-            }
-            logger.debug("Received action: name(${name}), body(${body})")
-            when (name) {
-                "triggerMEEvent" -> {
-                    val actionModel =
-                        json.decodeFromString<BasicCustomEventActionModel>(body)
-                    actionFactory.create(actionModel)()
+            try {
+                val body: String = withContext(mainScope.coroutineContext) {
+                    (didReceiveScriptMessage.body as NSDictionary).toJsonString()
                 }
-
-                "buttonClicked" -> {
-                    val actionModel =
-                        json.decodeFromString<BasicInAppButtonClickedActionModel>(body)
-                    actionFactory.create(actionModel)()
-                }
-
-                "triggerAppEvent" -> {
-                    val actionModel =
-                        json.decodeFromString<BasicAppEventActionModel>(body)
-                    actionFactory.create(actionModel)()
-                }
-
-                "requestPushPermission" -> {
-                    val actionModel =
-                        json.decodeFromString<RequestPushPermissionActionModel>(
-                            body
-                        )
-                    actionFactory.create(actionModel)()
-                }
-
-                "openExternalLink" -> {
-                    val actionModel =
-                        json.decodeFromString<BasicOpenExternalUrlActionModel>(
-                            body
-                        )
-                    actionFactory.create(actionModel)()
-                }
-
-                "close" -> {
-                    val actionModel =
-                        json.decodeFromString<BasicDismissActionModel>(body)
-                    actionModel.dismissId = inAppJsBridgeData.dismissId
-                    actionFactory.create(actionModel)()
-                }
-
-                "copyToClipboard" -> {
-                    val actionModel =
-                        json.decodeFromString<BasicCopyToClipboardActionModel>(
-                            body
-                        )
-                    actionFactory.create(actionModel)()
-                }
-
-                else -> {
-                    logger.info("Unknown action: ${didReceiveScriptMessage.name}")
-                }
+                logger.debug("Received action: body(${body})")
+                val actionModel = json.decodeFromString<BasicActionModel>(body)
+                    .amendForJsBridge(inAppJsBridgeData)
+                actionFactory.create(actionModel).invoke()
+            } catch (error: Throwable) {
+                logger.error("Failed to parse actionModel from inapp action data.", error)
             }
         }
     }
 
     fun registerContentController(): WKUserContentController {
         val userContentController = WKUserContentController()
-        jsCommandNames.forEach { jsCommandName ->
-            userContentController.addScriptMessageHandler(this, jsCommandName)
-        }
+        userContentController.addScriptMessageHandler(this, scriptMessageHandler)
         return userContentController
     }
 

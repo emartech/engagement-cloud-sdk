@@ -23,7 +23,8 @@ class InAppJsBridgeFactoryTest {
         val inAppJsBridgeProvider = InAppJsBridgeFactory(
             mockActionFactory,
             JsonUtil.json,
-            TestScope(StandardTestDispatcher())
+            TestScope(StandardTestDispatcher()),
+            mockk(relaxed = true)
         )
 
         inAppJsBridgeProvider.create(

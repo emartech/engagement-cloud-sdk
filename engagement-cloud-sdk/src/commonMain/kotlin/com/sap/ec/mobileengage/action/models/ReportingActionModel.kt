@@ -16,14 +16,14 @@ interface InAppButtonClickedActionModel : ReportingActionModel {
 @Serializable
 @SerialName("pushButtonClicked")
 data class BasicPushButtonClickedActionModel(
-    override val reporting: String,
+    override val reporting: String = "",
     override val trackingInfo: String
 ) : BasicActionModel(), PushButtonClickedActionModel
 
 @Serializable
 @SerialName("inAppButtonClicked")
 data class BasicInAppButtonClickedActionModel(
-    override val reporting: String,
+    override val reporting: String = "",
     override var trackingInfo: String = "",
 ) : BasicActionModel(), InAppButtonClickedActionModel
 

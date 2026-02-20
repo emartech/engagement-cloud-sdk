@@ -79,7 +79,7 @@ class EventActionFactoryTests {
 
     @Test
     fun testCreate_withAskForPushPermissionActionModel() = runTest {
-        val action = RequestPushPermissionActionModel
+        val action = RequestPushPermissionActionModel()
 
         val result = actionFactory.create(action)
 

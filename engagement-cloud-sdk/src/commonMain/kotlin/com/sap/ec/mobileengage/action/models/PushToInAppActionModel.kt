@@ -12,7 +12,7 @@ interface PushToInAppActionModel {
 @Serializable
 @SerialName("InApp")
 data class BasicPushToInAppActionModel(
-    override val reporting: String,
+    override val reporting: String = "",
     override val payload: PushToInAppPayload
 ) : BasicActionModel(), PushToInAppActionModel
 
