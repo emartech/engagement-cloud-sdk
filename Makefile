@@ -158,9 +158,15 @@ pipeline-android: check-env
 			:engagement-cloud-sdk:publishKotlinMultiplatformPublicationToGitHubPackagesRepository \
 			:engagement-cloud-sdk:publishAndroidPublicationToGitHubPackagesRepository \
 			:engagement-cloud-sdk:publishJsPublicationToGitHubPackagesRepository \
+			:engagement-cloud-sdk:publishIosArm64PublicationToGitHubPackagesRepository \
+			:engagement-cloud-sdk:publishIosX64PublicationToGitHubPackagesRepository \
+			:engagement-cloud-sdk:publishIosSimulatorArm64PublicationToGitHubPackagesRepository \
 			:engagement-cloud-sdk-android-fcm:publishMavenPublicationToGitHubPackagesRepository \
 			:engagement-cloud-sdk-android-hms:publishMavenPublicationToGitHubPackagesRepository \
-			:ios-notification-service:publishKotlinMultiplatformPublicationToGitHubPackagesRepository) \
+			:ios-notification-service:publishKotlinMultiplatformPublicationToGitHubPackagesRepository \
+			:ios-notification-service:publishIosArm64PublicationToGitHubPackagesRepository \
+			:ios-notification-service:publishIosX64PublicationToGitHubPackagesRepository \
+			:ios-notification-service:publishIosSimulatorArm64PublicationToGitHubPackagesRepository) \
 		-PENABLE_PUBLISHING=$(PUBLISH) \
 		--no-daemon
 
@@ -179,12 +185,6 @@ pipeline-ios: check-env
 		$(if $(filter true,$(PUBLISH)), \
 			:engagement-cloud-sdk:assembleEngagementCloudSDKReleaseXCFramework \
 			:ios-notification-service:assembleEngagementCloudNotificationServiceReleaseXCFramework \
-			:engagement-cloud-sdk:publishIosArm64PublicationToGitHubPackagesRepository \
-			:engagement-cloud-sdk:publishIosX64PublicationToGitHubPackagesRepository \
-			:engagement-cloud-sdk:publishIosSimulatorArm64PublicationToGitHubPackagesRepository \
-			:ios-notification-service:publishIosArm64PublicationToGitHubPackagesRepository \
-			:ios-notification-service:publishIosX64PublicationToGitHubPackagesRepository \
-			:ios-notification-service:publishIosSimulatorArm64PublicationToGitHubPackagesRepository \
 			kmmBridgePublish) \
 		-PENABLE_PUBLISHING=$(PUBLISH) \
 		-PNATIVE_BUILD_TYPE='$(if $(filter true,$(PUBLISH)),RELEASE,DEBUG)' \
