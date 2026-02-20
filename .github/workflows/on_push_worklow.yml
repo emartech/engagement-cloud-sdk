@@ -212,7 +212,7 @@ jobs:
 
       - name: Trigger automerge
         if: ${{ !contains(needs.*.result, 'cancelled') && !contains(needs.*.result, 'failure') && github.event.pull_request != null && github.actor == 'dependabot[bot]' && github.event.pull_request.merged == false}}
-        uses: peter-evans/repository-dispatch@v3
+        uses: peter-evans/repository-dispatch@v4
         with:
           token: ${{ secrets.AUTO_MERGE_TOKEN }}
           event-type: checks-complete
