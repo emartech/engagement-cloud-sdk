@@ -156,7 +156,7 @@ pipeline-android: check-env
 		:engagement-cloud-sdk-android-hms:testDebugUnitTest \
 		$(if $(filter true,$(PUBLISH)), \
 			:engagement-cloud-sdk:publishKotlinMultiplatformPublicationToGitHubPackagesRepository \
-			:engagement-cloud-sdk:publishAndroidReleasePublicationToGitHubPackagesRepository \
+			:engagement-cloud-sdk:publishAndroidPublicationToGitHubPackagesRepository \
 			:engagement-cloud-sdk:publishJsPublicationToGitHubPackagesRepository \
 			:engagement-cloud-sdk-android-fcm:publishMavenPublicationToGitHubPackagesRepository \
 			:engagement-cloud-sdk-android-hms:publishMavenPublicationToGitHubPackagesRepository \
