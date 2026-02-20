@@ -176,10 +176,10 @@ pipeline-js: check-env
 
 pipeline-ios: check-env
 	@./gradlew \
-		:engagement-cloud-sdk:assembleEngagementCloudSDKReleaseXCFramework \
-		:ios-notification-service:assembleEngagementCloudNotificationServiceReleaseXCFramework \
 		:engagement-cloud-sdk:iosX64Test \
 		$(if $(filter true,$(PUBLISH)), \
+			:engagement-cloud-sdk:assembleEngagementCloudSDKReleaseXCFramework \
+			:ios-notification-service:assembleEngagementCloudNotificationServiceReleaseXCFramework \
 			:engagement-cloud-sdk:publishIosArm64PublicationToGitHubPackagesRepository \
 			:engagement-cloud-sdk:publishIosX64PublicationToGitHubPackagesRepository \
 			:engagement-cloud-sdk:publishIosSimulatorArm64PublicationToGitHubPackagesRepository \
@@ -189,7 +189,7 @@ pipeline-ios: check-env
 			:ios-notification-service:publishKotlinMultiplatformPublicationToGitHubPackagesRepository \
 			kmmBridgePublish) \
 		-PENABLE_PUBLISHING=$(PUBLISH) \
-		-PNATIVE_BUILD_TYPE='RELEASE' \
+		-PNATIVE_BUILD_TYPE='$(if $(filter true,$(PUBLISH)),RELEASE,DEBUG)' \
 		-PGITHUB_ARTIFACT_RELEASE_ID=$(GITHUB_ARTIFACT_RELEASE_ID) \
 		-PGITHUB_PUBLISH_TOKEN=$(GITHUB_TOKEN) \
 		-PGITHUB_REPO=$(GITHUB_REPO) \

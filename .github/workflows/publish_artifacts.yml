@@ -104,6 +104,12 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@emartech'
+
       - name: Install npm dependencies
         run: npm install
 
@@ -127,10 +133,7 @@ jobs:
 
       - name: Publish to GitHub Packages NPM
         if: env.DRY_RUN != 'true'
-        working-directory: dist/npm
-        run: |
-          cp ../../.npmrc .
-          npm publish
+        run: npm publish dist/npm/
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
