@@ -363,7 +363,9 @@ if (project.findProperty("ENABLE_PUBLISHING") == "true") {
 
 mavenPublishing {
     configure(KotlinMultiplatform(javadocJar = JavadocJar.None()))
-    publishToMavenCentral()
+    if (project.findProperty("PROMOTE_TO_MAVEN_CENTRAL") == "true") {
+        publishToMavenCentral()
+    }
     if (project.hasProperty("signing.keyId") || System.getenv("GPG_PRIVATE_KEY") != null) {
         signAllPublications()
     }

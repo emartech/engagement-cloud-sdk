@@ -140,7 +140,7 @@ prepare-release: check-env
 	@./gradlew base64EnvToFile -PpropertyName=SONATYPE_SIGNING_SECRET_KEY_RING_FILE_BASE64 -Pfile=./secring.asc.gpg
 
 release: check-env prepare-release
-	@./gradlew assembleRelease && ./gradlew publishToMavenCentral
+	@./gradlew assembleRelease publishToMavenCentral -PPROMOTE_TO_MAVEN_CENTRAL=true
 
 release-locally: check-env prepare-release
-	@./gradlew assembleRelease && ./gradlew publishToMavenLocal
+	@./gradlew assembleRelease publishToMavenLocal -PPROMOTE_TO_MAVEN_CENTRAL=true
