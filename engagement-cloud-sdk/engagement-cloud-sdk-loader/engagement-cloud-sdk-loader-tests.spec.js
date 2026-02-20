@@ -165,7 +165,7 @@ async function createTestEnvironment() {
 
     const engagementCloudHtml = {
         ready: Promise.resolve(),
-        setup: {disableTracking: mockDisableTracking},
+        setup: {disable: mockDisable},
         push: {registerPushToken: mockRegisterPushToken},
         event: {trackEvent: mockTrackCustomEvent},
         getInstance: () => engagementCloudHtml
@@ -178,7 +178,7 @@ async function createTestEnvironment() {
     return {
         loader: resourceLoader,
         window: dom.window,
-        mockDisableTracking: mockDisableTracking,
+        mockDisable: mockDisable,
         mockRegisterPushToken: mockRegisterPushToken,
         mockTrackCustomEvent: mockTrackCustomEvent
     };

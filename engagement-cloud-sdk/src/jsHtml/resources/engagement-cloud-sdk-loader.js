@@ -10,7 +10,7 @@
 
     global.SAPEngagementCloud = {
         ready: sdkReady,
-        setup: createApiSegment('setup', ['enableTracking', 'disableTracking', 'isEnabled']),
+        setup: createApiSegment('setup', ['enable', 'disable', 'isEnabled']),
         config: createApiSegment('config', [
             'getApplicationCode',
             'getClientId',
