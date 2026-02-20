@@ -162,11 +162,7 @@ pipeline-android: check-env
 			:engagement-cloud-sdk:publishIosX64PublicationToGitHubPackagesRepository \
 			:engagement-cloud-sdk:publishIosSimulatorArm64PublicationToGitHubPackagesRepository \
 			:engagement-cloud-sdk-android-fcm:publishMavenPublicationToGitHubPackagesRepository \
-			:engagement-cloud-sdk-android-hms:publishMavenPublicationToGitHubPackagesRepository \
-			:ios-notification-service:publishKotlinMultiplatformPublicationToGitHubPackagesRepository \
-			:ios-notification-service:publishIosArm64PublicationToGitHubPackagesRepository \
-			:ios-notification-service:publishIosX64PublicationToGitHubPackagesRepository \
-			:ios-notification-service:publishIosSimulatorArm64PublicationToGitHubPackagesRepository) \
+			:engagement-cloud-sdk-android-hms:publishMavenPublicationToGitHubPackagesRepository) \
 		-PENABLE_PUBLISHING=$(PUBLISH) \
 		--no-daemon
 
