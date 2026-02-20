@@ -44,6 +44,7 @@ env:
 permissions:
   contents: write
   packages: write
+  actions: read
 
 
 jobs:
@@ -230,6 +231,7 @@ jobs:
           channel: mobile-team-ci
           text: '${{ steps.prefix.outputs.value }}Publish pipeline failed! :man-gesturing-no: :blobcatfearful:'
           fields: repo,workflow,job,took
+          github_token: ${{ secrets.GITHUB_TOKEN }}
         env:
           SLACK_WEBHOOK_URL: ${{ env.SLACK_WEBHOOK }}
 
@@ -241,5 +243,6 @@ jobs:
           channel: mobile-team-ci
           text: '${{ steps.prefix.outputs.value }}Publish pipeline succeeded! v${{ env.VERSION }} :man-gesturing-ok: :bananadance:'
           fields: repo,workflow,job,took
+          github_token: ${{ secrets.GITHUB_TOKEN }}
         env:
           SLACK_WEBHOOK_URL: ${{ env.SLACK_WEBHOOK }}
