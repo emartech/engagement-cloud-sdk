@@ -39,6 +39,8 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
+import kotlin.experimental.ExperimentalObjCName
+import kotlin.native.ObjCName
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
@@ -186,7 +188,9 @@ sealed interface SdkEvent {
              * @property timestamp The timestamp when the event occurred.
              * @property type The type of the event, which is always "app_event".
              */
+            @OptIn(ExperimentalObjCName::class)
             @Serializable
+            @ObjCName("AppEvent")
             data class AppEvent(
                 override val id: String = UUIDProvider().provide(),
                 val name: String,
