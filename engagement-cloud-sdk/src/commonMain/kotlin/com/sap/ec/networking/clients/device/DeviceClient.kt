@@ -63,7 +63,7 @@ internal class DeviceClient(
                                     Result.success(Unit)
                                 )
                             )
-                            deviceInfoUpdater.updateDeviceInfoHash(deviceInfo)
+                            deviceInfoUpdater.storeDeviceInfo(deviceInfo)
                             sdkEvent.ack(eventsDao, sdkLogger)
                         }
                         networkResponse.onFailure { exception ->

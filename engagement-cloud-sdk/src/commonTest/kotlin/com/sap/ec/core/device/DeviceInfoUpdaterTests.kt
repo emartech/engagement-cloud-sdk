@@ -15,7 +15,6 @@ import kotlin.test.Test
 class DeviceInfoUpdaterTests {
     private companion object {
         const val TEST_DEVICE_INFO = "testDeviceInfo"
-        val testDeviceInfoHash = TEST_DEVICE_INFO.hashCode().toString()
     }
 
     private lateinit var mockStringStorage: StringStorageApi
@@ -28,35 +27,32 @@ class DeviceInfoUpdaterTests {
     }
 
     @Test
-    fun updateDeviceInfoHash_shouldStore_theHash_ofTheProvidedInput() {
+    fun storeDeviceInfo_shouldStoreTheInputString() {
+        deviceInfoUpdater.storeDeviceInfo(TEST_DEVICE_INFO)
 
-        deviceInfoUpdater.updateDeviceInfoHash(TEST_DEVICE_INFO)
-
-        verify { mockStringStorage.put(DEVICE_INFO_STORAGE_KEY, testDeviceInfoHash) }
+        verify { mockStringStorage.put(DEVICE_INFO_STORAGE_KEY, TEST_DEVICE_INFO) }
     }
 
     @Test
-    fun hasDeviceInfoChanged_shouldReturnTrue_ifActualDeviceInfoHash_isDifferent_fromTheStored() =
+    fun hasDeviceInfoChanged_shouldReturnTrue_ifActualDeviceInfo_isDifferent_fromTheStored() =
         runTest {
-            val storedHash = "storedHash"
-            everySuspend { mockStringStorage.get(DEVICE_INFO_STORAGE_KEY) } returns storedHash
+            val storedDeviceInfo = "storedDeviceInfo"
+            everySuspend { mockStringStorage.get(DEVICE_INFO_STORAGE_KEY) } returns storedDeviceInfo
 
             val hasChanged = deviceInfoUpdater.hasDeviceInfoChanged(TEST_DEVICE_INFO)
 
             verify { mockStringStorage.get(DEVICE_INFO_STORAGE_KEY) }
-
             hasChanged shouldBe true
         }
 
     @Test
-    fun hasDeviceInfoChanged_shouldReturnFalse_ifActualDeviceInfoHash_isTheSame_asTheStored() =
+    fun hasDeviceInfoChanged_shouldReturnFalse_ifActualDeviceInfo_isTheSame_asTheStored() =
         runTest {
-            everySuspend { mockStringStorage.get(DEVICE_INFO_STORAGE_KEY) } returns testDeviceInfoHash
+            everySuspend { mockStringStorage.get(DEVICE_INFO_STORAGE_KEY) } returns TEST_DEVICE_INFO
 
             val hasChanged = deviceInfoUpdater.hasDeviceInfoChanged(TEST_DEVICE_INFO)
 
             verify { mockStringStorage.get(DEVICE_INFO_STORAGE_KEY) }
-
             hasChanged shouldBe false
         }
 }

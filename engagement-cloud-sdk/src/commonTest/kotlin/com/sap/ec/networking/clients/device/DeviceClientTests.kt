@@ -89,7 +89,7 @@ class DeviceClientTests {
         fakeStringStorage = FakeStringStorage()
         fakeStringStorage.put(
             DEVICE_INFO_STORAGE_KEY,
-            STORED_DEVICE_INFO_STRING.hashCode().toString()
+            STORED_DEVICE_INFO_STRING
         )
 
         deviceInfoUpdater = DeviceInfoUpdater(fakeStringStorage)
@@ -123,7 +123,7 @@ class DeviceClientTests {
     }
 
     @Test
-    fun testConsumer_should_send_deviceInfo_to_client_service() = runTest {
+    fun testConsumer_should_send_deviceInfo_to_client_service_when_DeviceInfo_changed() = runTest {
         createDeviceClient(backgroundScope).register()
 
         val testRefreshToken = "testRefreshToken"

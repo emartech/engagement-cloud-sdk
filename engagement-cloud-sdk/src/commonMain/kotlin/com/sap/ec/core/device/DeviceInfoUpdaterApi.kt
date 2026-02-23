@@ -1,6 +1,6 @@
 package com.sap.ec.core.device
 
 interface DeviceInfoUpdaterApi {
-    fun updateDeviceInfoHash(deviceInfo: String)
+    fun storeDeviceInfo(deviceInfo: String)
     suspend fun hasDeviceInfoChanged(actualDeviceInfo: String): Boolean
 }

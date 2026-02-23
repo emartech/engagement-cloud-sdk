@@ -7,13 +7,12 @@ class DeviceInfoUpdater(
     private val stringStorage: StringStorageApi
 ) : DeviceInfoUpdaterApi {
 
-    override fun updateDeviceInfoHash(deviceInfo: String) {
-        stringStorage.put(DEVICE_INFO_STORAGE_KEY, deviceInfo.hashCode().toString())
+    override fun storeDeviceInfo(deviceInfo: String) {
+        stringStorage.put(DEVICE_INFO_STORAGE_KEY, deviceInfo)
     }
 
     override suspend fun hasDeviceInfoChanged(actualDeviceInfo: String): Boolean {
-        val storedHash = stringStorage.get(DEVICE_INFO_STORAGE_KEY)
-        val actualHash = actualDeviceInfo.hashCode().toString()
-        return storedHash != actualHash
+        val storedDeviceInfo = stringStorage.get(DEVICE_INFO_STORAGE_KEY)
+        return storedDeviceInfo != actualDeviceInfo
     }
 }
