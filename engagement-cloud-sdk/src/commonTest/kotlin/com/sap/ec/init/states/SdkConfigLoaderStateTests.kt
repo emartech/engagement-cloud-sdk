@@ -67,7 +67,7 @@ class SdkConfigLoaderStateTests {
                     StandardTestDispatcher()
                 ), sdkLogger = mock(MockMode.autofill)
             )
-        val testConfig = TestEngagementCloudSDKConfig()
+        val testConfig = TestEngagementCloudSDKConfig(applicationCode = "test-app-code")
         everySuspend { mockSdkConfigLoader.load() } returns testConfig
 
         val result = sdkConfigLoaderState.active()

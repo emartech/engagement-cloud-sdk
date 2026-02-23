@@ -66,7 +66,7 @@ class UrlFactoryTests {
             every { mockDefaultUrls.clientServiceBaseUrl } returns testUrl
             every { mockDefaultUrls.eventServiceBaseUrl } returns testUrl
             every { mockDefaultUrls.remoteConfigBaseUrl } returns testUrl
-            val config = TestEngagementCloudSDKConfig()
+            val config = TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
             every { mockSdkContext.config } returns config
 
             shouldThrow<MissingApplicationCodeException> {

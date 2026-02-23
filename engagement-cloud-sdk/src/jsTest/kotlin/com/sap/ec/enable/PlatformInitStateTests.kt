@@ -27,7 +27,7 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class PlatformInitStateTests: KoinTest {
+class PlatformInitStateTests : KoinTest {
 
     override fun getKoin(): Koin = koin
 
@@ -66,7 +66,7 @@ class PlatformInitStateTests: KoinTest {
 
     @Test
     fun activate_shouldCallRegister_onJsBridge_ifSdkContext_hasConfig_andReturnSuccess() = runTest {
-        val testConfig = JsEngagementCloudSDKConfig()
+        val testConfig = JsEngagementCloudSDKConfig(applicationCode = "test-app-code")
         testSdkContext.config = testConfig
 
         val result = platformInitState.active()
@@ -79,27 +79,29 @@ class PlatformInitStateTests: KoinTest {
     }
 
     @Test
-    fun activate_shouldNot_callRegister_onPushService_ifSdkContext_hasNoConfig_andReturnSuccess() = runTest {
-        val result = platformInitState.active()
+    fun activate_shouldNot_callRegister_onPushService_ifSdkContext_hasNoConfig_andReturnSuccess() =
+        runTest {
+            val result = platformInitState.active()
 
-        result shouldBe Result.success(Unit)
-        verifySuspend(VerifyMode.exactly(0)) {
-            mockPushService.register(any())
-            mockPushService.subscribeForPushMessages(any())
+            result shouldBe Result.success(Unit)
+            verifySuspend(VerifyMode.exactly(0)) {
+                mockPushService.register(any())
+                mockPushService.subscribeForPushMessages(any())
+            }
         }
-    }
 
     @Test
-    fun activate_should_callRegister_onPushService_ifSdkContext_hasConfig_andReturnFailure_ifErrorHappens() = runTest {
-        testSdkContext.config = JsEngagementCloudSDKConfig()
-        val testException = Exception("failure")
-        everySuspend { mockPushService.register(any()) } throws testException
+    fun activate_should_callRegister_onPushService_ifSdkContext_hasConfig_andReturnFailure_ifErrorHappens() =
+        runTest {
+            testSdkContext.config = JsEngagementCloudSDKConfig(applicationCode = "test-app-code")
+            val testException = Exception("failure")
+            everySuspend { mockPushService.register(any()) } throws testException
 
-        val result = platformInitState.active()
+            val result = platformInitState.active()
 
-        result shouldBe Result.failure(testException)
-        verifySuspend(VerifyMode.exactly(1)) {
-            mockPushService.register(any())
+            result shouldBe Result.failure(testException)
+            verifySuspend(VerifyMode.exactly(1)) {
+                mockPushService.register(any())
+            }
         }
-    }
 }

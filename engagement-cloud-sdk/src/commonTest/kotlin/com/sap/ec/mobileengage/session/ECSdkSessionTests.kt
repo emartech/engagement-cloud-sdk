@@ -210,10 +210,10 @@ class ECSdkSessionTests {
     }
 
     @Test
-    fun testStartSession_shouldNotDoAnything_whenApplicationCodeIsNull() = runTest {
+    fun testStartSession_shouldNotDoAnything_whenConfigIsNull() = runTest {
         sessionContext.sessionId = null
         sessionContext.sessionStart = null
-        every { mockSdkContext.config } returns TestEngagementCloudSDKConfig()
+        every { mockSdkContext.config } returns null
 
         ECSdkSession.startSession()
 
@@ -300,7 +300,7 @@ class ECSdkSessionTests {
 
     @Test
     fun testEndSession_shouldNotDoAnything_whenApplicationCodeIsNull() = runTest {
-        every { mockSdkContext.config } returns TestEngagementCloudSDKConfig()
+        every { mockSdkContext.config } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
 
         ECSdkSession.endSession()
 
