@@ -5,7 +5,10 @@ import com.sap.ec.api.push.PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY
 import com.sap.ec.api.push.PushConstants.PUSH_TOKEN_STORAGE_KEY
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
+import com.sap.ec.core.channel.SdkEventWaiterApi
 import com.sap.ec.core.log.Logger
+import com.sap.ec.core.networking.model.Response
+import com.sap.ec.core.networking.model.UrlRequest
 import com.sap.ec.core.storage.StringStorageApi
 import com.sap.ec.event.OnlineSdkEvent
 import com.sap.ec.event.SdkEvent
@@ -13,7 +16,6 @@ import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
-import dev.mokkery.matcher.any
 import dev.mokkery.matcher.capture.Capture
 import dev.mokkery.matcher.capture.Capture.Companion.slot
 import dev.mokkery.matcher.capture.SlotCapture
@@ -27,6 +29,10 @@ import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.ktor.http.Headers
+import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.Url
 import kotlinx.coroutines.test.runTest
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -98,11 +104,67 @@ class PushInternalTests {
     }
 
     @Test
-    fun testRegisterPushToken_shouldRegisterPushToken_whenPushTokenWasNotStoredPreviously() =
+    fun testRegisterPushToken_shouldRegisterPushToken_whenStoredPushTokenIsDifferent_andStorePushToken_onNetworkSuccess() =
         runTest {
-            everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(
-                MockMode.autofill
-            )
+            val successResponse: SdkEvent.Internal.Sdk.Answer.Response<Response> =
+                SdkEvent.Internal.Sdk.Answer.Response(
+                    "any",
+                    Result.success(
+                        value = Response(
+                            originalRequest = UrlRequest(
+                                url = Url("sap.com"),
+                                method = HttpMethod.Get
+                            ),
+                            status = HttpStatusCode.OK,
+                            headers = Headers.Empty,
+                            bodyAsText = ""
+                        )
+                    )
+                )
+            val mockSdkEventWaiter: SdkEventWaiterApi = mock()
+            everySuspend { mockSdkEventWaiter.await<Response>() } returns successResponse
+            everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mockSdkEventWaiter
+            everySuspend { mockStringStorage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns "Different Push Token"
+            everySuspend { mockStringStorage.put(PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
+            everySuspend {
+                mockStringStorage.put(
+                    LAST_SENT_PUSH_TOKEN_STORAGE_KEY,
+                    PUSH_TOKEN
+                )
+            } returns Unit
+
+            pushInternal.registerPushToken(PUSH_TOKEN)
+
+            verifySuspend(VerifyMode.order) {
+                mockStringStorage.put(PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN)
+                mockStringStorage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN)
+            }
+            val emitted = eventSlot.get()
+            (emitted is SdkEvent.Internal.Sdk.RegisterPushToken) shouldBe true
+            (emitted as SdkEvent.Internal.Sdk.RegisterPushToken).pushToken shouldBe PUSH_TOKEN
+        }
+
+    @Test
+    fun testRegisterPushToken_shouldRegisterPushToken_whenPushTokenWasNotStoredPreviously_andStorePushToken_onNetworkSuccess() =
+        runTest {
+            val successResponse: SdkEvent.Internal.Sdk.Answer.Response<Response> =
+                SdkEvent.Internal.Sdk.Answer.Response(
+                    "any",
+                    Result.success(
+                        value = Response(
+                            originalRequest = UrlRequest(
+                                url = Url("sap.com"),
+                                method = HttpMethod.Get
+                            ),
+                            status = HttpStatusCode.OK,
+                            headers = Headers.Empty,
+                            bodyAsText = ""
+                        )
+                    )
+                )
+            val mockSdkEventWaiter: SdkEventWaiterApi = mock()
+            everySuspend { mockSdkEventWaiter.await<Response>() } returns successResponse
+            everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mockSdkEventWaiter
             everySuspend { mockStringStorage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns null
             everySuspend { mockStringStorage.put(PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
             everySuspend {
@@ -124,28 +186,52 @@ class PushInternalTests {
         }
 
     @Test
-    fun testRegisterPushToken_shouldRegisterPushToken_whenStoredPushTokenIsDifferent() = runTest {
-        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(
-            MockMode.autofill
-        )
-        everySuspend { mockStringStorage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns "<differentTestPushToken>"
+    fun testRegisterPushToken_shouldRegisterPushToken_whenStoredPushTokenIsDifferent_andShouldNotStorePushToken_onNetworkFailure() =
+        runTest {
+            val failureResponse: SdkEvent.Internal.Sdk.Answer.Response<Response> =
+                SdkEvent.Internal.Sdk.Answer.Response(
+                    "any",
+                    Result.failure(
+                        exception = RuntimeException("Any push token registration error")
+                    )
+                )
+            val mockSdkEventWaiter: SdkEventWaiterApi = mock()
+            everySuspend { mockSdkEventWaiter.await<Response>() } returns failureResponse
+            everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mockSdkEventWaiter
+            everySuspend { mockStringStorage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns null
+            everySuspend { mockStringStorage.put(PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
+
+            pushInternal.registerPushToken(PUSH_TOKEN)
+
+            verifySuspend { mockStringStorage.put(PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) }
+            verifySuspend(VerifyMode.exactly(0)) {
+                mockStringStorage.put(
+                    LAST_SENT_PUSH_TOKEN_STORAGE_KEY,
+                    PUSH_TOKEN
+                )
+            }
+            val emitted = eventSlot.get()
+            (emitted is SdkEvent.Internal.Sdk.RegisterPushToken) shouldBe true
+            (emitted as SdkEvent.Internal.Sdk.RegisterPushToken).pushToken shouldBe PUSH_TOKEN
+        }
+
+    @Test
+    fun testRegisterPushToken_shouldNotRegisterPushToken_whenStoredPushTokenIsTheSame() = runTest {
+        everySuspend { mockStringStorage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
         everySuspend { mockStringStorage.put(PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
-        everySuspend {
+
+        pushInternal.registerPushToken(PUSH_TOKEN)
+
+        verifySuspend {
+            mockStringStorage.put(PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN)
+            mockStringStorage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY)
+        }
+        verifySuspend(VerifyMode.exactly(0)) {
             mockStringStorage.put(
                 LAST_SENT_PUSH_TOKEN_STORAGE_KEY,
                 PUSH_TOKEN
             )
-        } returns Unit
-
-        pushInternal.registerPushToken(PUSH_TOKEN)
-
-        verifySuspend(VerifyMode.order) {
-            mockStringStorage.put(PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN)
-            mockStringStorage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN)
         }
-        val emitted = eventSlot.get()
-        (emitted is SdkEvent.Internal.Sdk.RegisterPushToken) shouldBe true
-        (emitted as SdkEvent.Internal.Sdk.RegisterPushToken).pushToken shouldBe PUSH_TOKEN
     }
 
     @Test
@@ -168,24 +254,6 @@ class PushInternalTests {
             (emitted is SdkEvent.Internal.Sdk.ClearPushToken) shouldBe true
             (emitted as SdkEvent.Internal.Sdk.ClearPushToken).applicationCode shouldBe APPLICATION_CODE
         }
-
-    @Test
-    fun testRegisterPushToken_shouldRegisterTheToken_ifNoStoredTokens_areFound() = runTest {
-        everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mock(MockMode.autofill)
-        everySuspend { mockStringStorage.get(PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
-        everySuspend { mockStringStorage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns null
-        everySuspend { mockStringStorage.put(PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
-        everySuspend {
-            mockStringStorage.put(
-                LAST_SENT_PUSH_TOKEN_STORAGE_KEY,
-                PUSH_TOKEN
-            )
-        } returns Unit
-
-        pushInternal.registerPushToken(PUSH_TOKEN)
-        verifySuspend { mockSdkEventDistributor.registerEvent(any()) }
-        pushInternal.getPushToken() shouldBe PUSH_TOKEN
-    }
 
     @Test
     fun testActivate_should_sendCalls_toPushClient() = runTest {

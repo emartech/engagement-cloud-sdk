@@ -8,6 +8,7 @@ import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.collections.dequeue
 import com.sap.ec.core.log.Logger
+import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.storage.StringStorageApi
 import com.sap.ec.event.SdkEvent
 import kotlin.time.ExperimentalTime
@@ -29,8 +30,18 @@ internal open class PushInternal(
                 SdkEvent.Internal.Sdk.RegisterPushToken(
                     pushToken = pushToken
                 )
-            )
-            storage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, pushToken)
+            ).await<Response>()
+                .result
+                .fold(
+                    onSuccess = {
+                        storage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, pushToken)
+                    },
+                    onFailure = {
+                        sdkLogger.error("Register push token failed", it)
+                    }
+                )
+        } else {
+            sdkLogger.debug("Push token hasn't changed")
         }
     }
 
@@ -52,7 +63,12 @@ internal open class PushInternal(
                     )
                 )
 
-                is ClearPushToken -> sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.ClearPushToken(applicationCode = call.applicationCode))
+                is ClearPushToken -> sdkEventDistributor.registerEvent(
+                    SdkEvent.Internal.Sdk.ClearPushToken(
+                        applicationCode = call.applicationCode
+                    )
+                )
+
                 is PushCall.HandleSilentMessageWithUserInfo -> {
                     sdkLogger.debug(
                         "Common PushInternal: shouldn't handle silent message with user info: $call"
