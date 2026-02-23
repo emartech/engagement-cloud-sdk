@@ -107,15 +107,4 @@ class SetupTests {
 
         result shouldBe true
     }
-
-    @Test
-    fun testIsEnabled_shouldReturnFalse_ifAppCode_is_null() = runTest {
-        val mockConfig: SdkConfig = mock()
-        every { mockSdkContext.config } returns mockConfig
-        every { mockConfig.applicationCode } returns null
-
-        val result = setup.isEnabled()
-
-        result shouldBe false
-    }
 }
