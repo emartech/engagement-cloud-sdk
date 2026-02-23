@@ -312,11 +312,7 @@ if (isMac) {
             "release" -> {
                 println("Building for release")
                 mavenPublishArtifacts()
-                spm(
-                    spmDirectory = "${rootDir}/iosReleaseSpm",
-                    useCustomPackageFile = true,
-                    perModuleVariablesBlock = true
-                )
+                spm()
             }
 
             else -> {
