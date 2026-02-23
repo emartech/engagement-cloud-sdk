@@ -1,18 +1,13 @@
 // swift-tools-version:5.3
 import PackageDescription
 
-// BEGIN KMMBRIDGE VARIABLES BLOCK FOR 'EngagementCloudSDK' (do not edit)
-let remoteEngagementCloudSDKUrl = ""
-let remoteEngagementCloudSDKChecksum = ""
 let engagementCloudSDKPackageName = "EngagementCloudSDK"
-// END KMMBRIDGE BLOCK FOR 'EngagementCloudSDK'
+let engagementCloudSDKUrl = "__SDK_URL__"
+let engagementCloudSDKChecksum = "__SDK_CHECKSUM__"
 
-// BEGIN KMMBRIDGE VARIABLES BLOCK FOR 'EngagementCloudNotificationService' (do not edit)
-let remoteEngagementCloudNotificationServiceUrl = ""
-let remoteEngagementCloudNotificationServiceChecksum = ""
 let engagementCloudNotificationServicePackageName = "EngagementCloudNotificationService"
-// END KMMBRIDGE BLOCK FOR 'EngagementCloudNotificationService'
-
+let engagementCloudNotificationServiceUrl = "__NS_URL__"
+let engagementCloudNotificationServiceChecksum = "__NS_CHECKSUM__"
 
 let package = Package(
     name: engagementCloudSDKPackageName,
@@ -32,13 +27,13 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: engagementCloudSDKPackageName,
-            url: remoteEngagementCloudSDKUrl,
-            checksum: remoteEngagementCloudSDKChecksum
+            url: engagementCloudSDKUrl,
+            checksum: engagementCloudSDKChecksum
         ),
         .binaryTarget(
             name: engagementCloudNotificationServicePackageName,
-            url: remoteEngagementCloudNotificationServiceUrl,
-            checksum: remoteEngagementCloudNotificationServiceChecksum
+            url: engagementCloudNotificationServiceUrl,
+            checksum: engagementCloudNotificationServiceChecksum
         ),
     ]
 )

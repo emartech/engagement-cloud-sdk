@@ -197,25 +197,43 @@ jobs:
           GITHUB_REPO: ${{ github.repository }}
           GITHUB_ARTIFACT_RELEASE_ID: ${{ steps.spm_release.outputs.id }}
 
-      - name: Copy and commit updated Package.swift for SPM
+      - name: Upload XCFrameworks to GitHub Release
+        if: env.DRY_RUN != 'true'
+        working-directory: ${{ github.workspace }}
+        run: |
+          # Zip XCFrameworks
+          zip -rj EngagementCloudSDK.xcframework.zip engagement-cloud-sdk/build/XCFrameworks/release/EngagementCloudSDK.xcframework
+          zip -rj EngagementCloudNotificationService.xcframework.zip ios-notification-service/build/XCFrameworks/release/EngagementCloudNotificationService.xcframework
+          
+          # Calculate checksums
+          echo "SDK_CHECKSUM=$(shasum -a 256 EngagementCloudSDK.xcframework.zip | cut -d ' ' -f 1)" >> $GITHUB_ENV
+          echo "NS_CHECKSUM=$(shasum -a 256 EngagementCloudNotificationService.xcframework.zip | cut -d ' ' -f 1)" >> $GITHUB_ENV
+          
+          # Upload to GitHub Release
+          gh release upload spm-${{ env.VERSION }} \
+            EngagementCloudSDK.xcframework.zip \
+            EngagementCloudNotificationService.xcframework.zip \
+            --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate and commit Package.swift for SPM
         if: env.DRY_RUN != 'true'
         run: |
-          # Copy the KMMBridge-updated Package.swift to root
-          cp iosReleaseSpm/Package.swift Package.swift
+          # Generate Package.swift from template
+          sed -e "s|__SDK_URL__|https://github.com/${{ github.repository }}/releases/download/spm-${{ env.VERSION }}/EngagementCloudSDK.xcframework.zip|" \
+              -e "s|__SDK_CHECKSUM__|${{ env.SDK_CHECKSUM }}|" \
+              -e "s|__NS_URL__|https://github.com/${{ github.repository }}/releases/download/spm-${{ env.VERSION }}/EngagementCloudNotificationService.xcframework.zip|" \
+              -e "s|__NS_CHECKSUM__|${{ env.NS_CHECKSUM }}|" \
+              iosReleaseSpm/Package.swift > Package.swift
           
-          # Configure git
+          # Commit to SPM release tag
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # Create an orphan commit for SPM release (doesn't affect main branch)
           git add Package.swift
-          git commit -m "SPM release ${{ env.VERSION }}" --allow-empty
-          
-          # Update the SPM release tag to point to this commit
+          git commit -m "SPM release ${{ env.VERSION }}"
           git tag -f spm-${{ env.VERSION }}
           git push origin spm-${{ env.VERSION }} --force
-          
-          # Reset back to original state (don't modify main)
           git reset --hard HEAD~1
 
       - name: Upload iOS XCFramework artifacts
@@ -245,7 +263,7 @@ jobs:
           fi
 
       - name: Notify Slack (failure)
-        if: ${{ !cancelled() && contains(needs.*.result, 'failure') }}
+        if: ${{ !cancelled() && (contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')) }}
         uses: 8398a7/action-slack@v3
         with:
           status: failure
@@ -257,7 +275,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ env.SLACK_WEBHOOK }}
 
       - name: Notify Slack (success)
-        if: ${{ !cancelled() && !contains(needs.*.result, 'failure') }}
+        if: ${{ !cancelled() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') }}
         uses: 8398a7/action-slack@v3
         with:
           status: success
