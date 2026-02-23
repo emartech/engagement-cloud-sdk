@@ -23,6 +23,14 @@ struct ContentView: View {
                         Image(systemName: "message")
                     }
                 }
+            CustomEmbeddedMessagingView()
+                .tabItem {
+                    Label {
+                        Text("CustomEMList")
+                    } icon: {
+                        Image(systemName: "message.circle")
+                    }
+                }
         }
     }
 }

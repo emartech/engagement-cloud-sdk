@@ -28,7 +28,7 @@ private fun LazyPagingItems<MessageItemViewModelApi>.shouldShowEmptyState(): Boo
 @Composable
 fun CompactListView(
     onNavigate: () -> Unit = {},
-    customMessageItem: ((viewModel: CustomMessageItemViewModelApi, isSelected: Boolean) -> Composable)? = null
+    customMessageItem: (@Composable (viewModel: CustomMessageItemViewModelApi, isSelected: Boolean) -> Unit)? = null
 ) {
     val viewModel = koin.getOrNull<ListPageViewModelApi>()
 

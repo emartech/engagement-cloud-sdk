@@ -95,7 +95,7 @@ fun MessageItemsListPane(
     snackbarHostState: SnackbarHostState,
     lazyListState: LazyListState = rememberLazyListState(),
     hasConnection: Boolean,
-    customMessageItem: ((viewModel: CustomMessageItemViewModelApi, isSelected: Boolean) -> Composable)?,
+    customMessageItem: (@Composable (viewModel: CustomMessageItemViewModelApi, isSelected: Boolean) -> Unit)?,
     listPageViewModel: ListPageViewModelApi,
     showFilters: Boolean,
     selectedCategoryIds: Set<Int>,
@@ -389,7 +389,7 @@ private fun MessageItemViewContainer(
     messageViewModel: MessageItemViewModelApi,
     selectedMessage: MessageItemViewModelApi?,
     onMessageClick: (MessageItemViewModelApi) -> Unit,
-    customMessageItem: ((viewModel: CustomMessageItemViewModelApi, isSelected: Boolean) -> Composable)?
+    customMessageItem: (@Composable (viewModel: CustomMessageItemViewModelApi, isSelected: Boolean) -> Unit)?
 ) {
     if (customMessageItem == null) {
         MessageItemView(

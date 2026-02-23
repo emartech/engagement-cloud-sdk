@@ -13,14 +13,12 @@ import com.sap.ec.di.EventFlowTypes
 import com.sap.ec.di.SdkKoinIsolationContext
 import com.sap.ec.di.SdkKoinIsolationContext.koin
 import com.sap.ec.event.SdkEvent
-import com.sap.ec.mobileengage.embeddedmessaging.ui.list.embeddedMessagingListPage
 import io.ktor.utils.io.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import org.koin.core.qualifier.named
-import platform.UIKit.UIViewController
 import kotlin.experimental.ExperimentalObjCName
 
 typealias EngagementCloudEventListener = (SdkEvent) -> Unit
@@ -71,9 +69,5 @@ object IosEngagementCloud {
      */
     fun registerEventListener(listener: EngagementCloudEventListener) {
         eventListeners.add(listener)
-    }
-
-    fun embeddedMessage(): UIViewController {
-        return embeddedMessagingListPage()
     }
 }

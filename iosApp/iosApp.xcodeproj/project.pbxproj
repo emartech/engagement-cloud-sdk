@@ -10,12 +10,14 @@
 		058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557BA273AAA24004C7B11 /* Assets.xcassets */; };
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
+		2A36443B2F4C5D2B003203E4 /* EngagementCloudNotificationService in Frameworks */ = {isa = PBXBuildFile; productRef = 2A36443A2F4C5D2B003203E4 /* EngagementCloudNotificationService */; };
+		2A36443D2F4C5D2B003203E4 /* EngagementCloudSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 2A36443C2F4C5D2B003203E4 /* EngagementCloudSDK */; };
+		2A3644412F4C611E003203E4 /* EMListWithCustomMessageItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A3644402F4C611E003203E4 /* EMListWithCustomMessageItemView.swift */; };
+		2A3644432F4C6226003203E4 /* CustomEmbeddedMessagingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A3644422F4C6226003203E4 /* CustomEmbeddedMessagingView.swift */; };
 		2A42F0C62EC4D5CE0097D526 /* SdkTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A42F0C52EC4D5CE0097D526 /* SdkTestView.swift */; };
 		2A42F0C82EC4D6F00097D526 /* EmbeddedMessagingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A42F0C72EC4D6F00097D526 /* EmbeddedMessagingView.swift */; };
-		2A42F0CA2EC4D7D50097D526 /* EmbeddedMessagingListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A42F0C92EC4D7D50097D526 /* EmbeddedMessagingListView.swift */; };
+		2A42F0CA2EC4D7D50097D526 /* EMListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A42F0C92EC4D7D50097D526 /* EMListView.swift */; };
 		2A918DE92C85E8FE00B1AF36 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A918DE82C85E8FE00B1AF36 /* NotificationService.swift */; };
-		57E0CD772F489AC60018D847 /* EngagementCloudNotificationService in Frameworks */ = {isa = PBXBuildFile; productRef = 57E0CD762F489AC60018D847 /* EngagementCloudNotificationService */; };
-		57E0CD792F489AC60018D847 /* EngagementCloudSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 57E0CD782F489AC60018D847 /* EngagementCloudSDK */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
 /* End PBXBuildFile section */
 
@@ -46,9 +48,11 @@
 		058557BA273AAA24004C7B11 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		2152FB032600AC8F00CF470E /* iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSApp.swift; sourceTree = "<group>"; };
+		2A3644402F4C611E003203E4 /* EMListWithCustomMessageItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EMListWithCustomMessageItemView.swift; sourceTree = "<group>"; };
+		2A3644422F4C6226003203E4 /* CustomEmbeddedMessagingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomEmbeddedMessagingView.swift; sourceTree = "<group>"; };
 		2A42F0C52EC4D5CE0097D526 /* SdkTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SdkTestView.swift; sourceTree = "<group>"; };
 		2A42F0C72EC4D6F00097D526 /* EmbeddedMessagingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedMessagingView.swift; sourceTree = "<group>"; };
-		2A42F0C92EC4D7D50097D526 /* EmbeddedMessagingListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedMessagingListView.swift; sourceTree = "<group>"; };
+		2A42F0C92EC4D7D50097D526 /* EMListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EMListView.swift; sourceTree = "<group>"; };
 		2A918DE62C85E8FE00B1AF36 /* NotificationService.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NotificationService.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		2A918DE82C85E8FE00B1AF36 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		2A918DEA2C85E8FE00B1AF36 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -64,7 +68,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				57E0CD772F489AC60018D847 /* EngagementCloudNotificationService in Frameworks */,
+				2A36443B2F4C5D2B003203E4 /* EngagementCloudNotificationService in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -72,7 +76,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				57E0CD792F489AC60018D847 /* EngagementCloudSDK in Frameworks */,
+				2A36443D2F4C5D2B003203E4 /* EngagementCloudSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -85,6 +89,25 @@
 				058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		2A36443E2F4C6087003203E4 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				2A36443F2F4C6095003203E4 /* EmbeddedMessaging */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		2A36443F2F4C6095003203E4 /* EmbeddedMessaging */ = {
+			isa = PBXGroup;
+			children = (
+				2A42F0C72EC4D6F00097D526 /* EmbeddedMessagingView.swift */,
+				2A42F0C92EC4D7D50097D526 /* EMListView.swift */,
+				2A3644402F4C611E003203E4 /* EMListWithCustomMessageItemView.swift */,
+				2A3644422F4C6226003203E4 /* CustomEmbeddedMessagingView.swift */,
+			);
+			path = EmbeddedMessaging;
 			sourceTree = "<group>";
 		};
 		2A918DE72C85E8FE00B1AF36 /* NotificationService */ = {
@@ -118,6 +141,7 @@
 		7555FF7D242A565900829871 /* iosApp */ = {
 			isa = PBXGroup;
 			children = (
+				2A36443E2F4C6087003203E4 /* Views */,
 				2AED9EEC2C7F65CA00A9AB2C /* iosApp.entitlements */,
 				058557BA273AAA24004C7B11 /* Assets.xcassets */,
 				7555FF82242A565900829871 /* ContentView.swift */,
@@ -125,8 +149,6 @@
 				2152FB032600AC8F00CF470E /* iOSApp.swift */,
 				058557D7273AAEEB004C7B11 /* Preview Content */,
 				2A42F0C52EC4D5CE0097D526 /* SdkTestView.swift */,
-				2A42F0C72EC4D6F00097D526 /* EmbeddedMessagingView.swift */,
-				2A42F0C92EC4D7D50097D526 /* EmbeddedMessagingListView.swift */,
 			);
 			path = iosApp;
 			sourceTree = "<group>";
@@ -198,6 +220,8 @@
 				2A633A642F3229D800B0C145 /* EmarsysSDK */,
 				2A8E82F82F44A23200D31B6C /* SAPEngagementCloudSDK */,
 				57E0CD782F489AC60018D847 /* EngagementCloudSDK */,
+				2A3644212F48BA8E003203E4 /* EngagementCloudSDK */,
+				2A36443C2F4C5D2B003203E4 /* EngagementCloudSDK */,
 			);
 			productName = iosApp;
 			productReference = 7555FF7B242A565900829871 /* Engagement Cloud Sample.app */;
@@ -232,7 +256,7 @@
 			);
 			mainGroup = 7555FF72242A565900829871;
 			packageReferences = (
-				57E0CD752F489AC60018D847 /* XCLocalSwiftPackageReference "../../engagement-cloud-sdk" */,
+				2A3644392F4C5D2B003203E4 /* XCLocalSwiftPackageReference "../../engagement-cloud-sdk" */,
 			);
 			productRefGroup = 7555FF7C242A565900829871 /* Products */;
 			projectDirPath = "";
@@ -299,9 +323,11 @@
 			files = (
 				2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */,
 				2A42F0C62EC4D5CE0097D526 /* SdkTestView.swift in Sources */,
+				2A3644432F4C6226003203E4 /* CustomEmbeddedMessagingView.swift in Sources */,
+				2A3644412F4C611E003203E4 /* EMListWithCustomMessageItemView.swift in Sources */,
 				2A42F0C82EC4D6F00097D526 /* EmbeddedMessagingView.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
-				2A42F0CA2EC4D7D50097D526 /* EmbeddedMessagingListView.swift in Sources */,
+				2A42F0CA2EC4D7D50097D526 /* EMListView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -581,7 +607,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		57E0CD752F489AC60018D847 /* XCLocalSwiftPackageReference "../../engagement-cloud-sdk" */ = {
+		2A3644392F4C5D2B003203E4 /* XCLocalSwiftPackageReference "../../engagement-cloud-sdk" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = "../../engagement-cloud-sdk";
 		};
@@ -591,6 +617,18 @@
 		2A0DADBF2EE9696400244A18 /* EmarsysSDK */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = EmarsysSDK;
+		};
+		2A3644212F48BA8E003203E4 /* EngagementCloudSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EngagementCloudSDK;
+		};
+		2A36443A2F4C5D2B003203E4 /* EngagementCloudNotificationService */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EngagementCloudNotificationService;
+		};
+		2A36443C2F4C5D2B003203E4 /* EngagementCloudSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EngagementCloudSDK;
 		};
 		2A38E7692F30AE8500B5910C /* EmarsysSDK */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -659,10 +697,6 @@
 		2AFF7A132F28B6FB00C4BAB1 /* EmarsysSDK */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = EmarsysSDK;
-		};
-		57E0CD762F489AC60018D847 /* EngagementCloudNotificationService */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = EngagementCloudNotificationService;
 		};
 		57E0CD782F489AC60018D847 /* EngagementCloudSDK */ = {
 			isa = XCSwiftPackageProductDependency;

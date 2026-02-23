@@ -44,7 +44,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
-import androidx.compose.ui.unit.dp
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.window.core.layout.WindowSizeClass
 import com.sap.ec.SdkConstants
@@ -61,7 +60,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ListPageView(
     showFilters: Boolean = true,
-    customMessageItem: ((message: CustomMessageItemViewModelApi, isSelected: Boolean) -> Composable)? = null
+    customMessageItem: (@Composable (message: CustomMessageItemViewModelApi, isSelected: Boolean) -> Unit)? = null
 ) {
     EmbeddedMessagingTheme {
         InternalListPageView(
@@ -76,7 +75,7 @@ fun ListPageView(
 internal fun InternalListPageView(
     showFilters: Boolean = true,
     viewModel: ListPageViewModelApi = koin.get<ListPageViewModelApi>(),
-    customMessageItem: ((viewModel: CustomMessageItemViewModelApi, isSelected: Boolean) -> Composable)? = null
+    customMessageItem: (@Composable (viewModel: CustomMessageItemViewModelApi, isSelected: Boolean) -> Unit)? = null
 ) {
     EmbeddedMessagingTheme {
         Column(modifier = Modifier.background(MaterialTheme.colorScheme.surface)) {
@@ -93,7 +92,7 @@ internal fun InternalListPageView(
 @Composable
 private fun MessageList(
     showFilters: Boolean,
-    customMessageItem: ((viewModel: CustomMessageItemViewModelApi, isSelected: Boolean) -> Composable)?,
+    customMessageItem: (@Composable (viewModel: CustomMessageItemViewModelApi, isSelected: Boolean) -> Unit)?,
     viewModel: ListPageViewModelApi
 ) {
     val lazyPagingMessageItems = viewModel.messagePagingDataFlowFiltered.collectAsLazyPagingItems()

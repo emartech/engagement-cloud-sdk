@@ -23,5 +23,11 @@ fun BottomNavigationBar(
             icon = { Text("Embedded") },
             label = { Text("Messages") }
         )
+        BottomNavigationItem(
+            selected = selectedTab == NavigationTab.EM_CUSTOM_ITEM,
+            onClick = { onTabSelected(NavigationTab.EM_CUSTOM_ITEM) },
+            icon = { Text("CustomView") },
+            label = { Text("EM") }
+        )
     }
 }

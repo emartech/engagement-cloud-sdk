@@ -42,7 +42,7 @@ fun SdkTestScreen(
             Text("enable SDK & link contact")
         }
         Button(onClick = { viewModel.linkContact() }) {
-            Text("link contact (test2@test.com)")
+            Text("link contact (test@test.com)")
         }
 
         Button(onClick = { viewModel.unLinkContact() }) {

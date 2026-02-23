@@ -2,5 +2,6 @@ package com.sap.ec.sample.navigation
 
 enum class NavigationTab {
     SDK_TEST,
-    EMBEDDED_MESSAGING
+    EMBEDDED_MESSAGING,
+    EM_CUSTOM_ITEM
 }
