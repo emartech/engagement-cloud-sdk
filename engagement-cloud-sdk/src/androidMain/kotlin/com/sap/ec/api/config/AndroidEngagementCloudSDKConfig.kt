@@ -23,11 +23,11 @@ import kotlinx.serialization.json.jsonPrimitive
  */
 @Serializable(with = AndroidECConfigSerializer::class)
 data class AndroidEngagementCloudSDKConfig(
-    override val applicationCode: String? = null,
+    override val applicationCode: String,
     val launchActivityClass: Class<*>? = null
 ) : SdkConfig {
     override fun copyWith(
-        applicationCode: String?
+        applicationCode: String
     ): SdkConfig {
         return copy(
             applicationCode = applicationCode
@@ -42,7 +42,7 @@ object AndroidECConfigSerializer : KSerializer<AndroidEngagementCloudSDKConfig> 
     override fun deserialize(decoder: Decoder): AndroidEngagementCloudSDKConfig {
         val jsonObject = JsonUtil.json.decodeFromString<JsonObject>(decoder.decodeString())
         return AndroidEngagementCloudSDKConfig(
-            applicationCode = jsonObject["applicationCode"]?.jsonPrimitive?.contentOrNull,
+            applicationCode = jsonObject["applicationCode"]?.jsonPrimitive?.content!!,
             launchActivityClass = jsonObject["launchActivityClass"]?.jsonPrimitive?.contentOrNull?.let {
                 Class.forName(it)
             }

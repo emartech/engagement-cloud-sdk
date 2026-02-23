@@ -12,7 +12,7 @@ import kotlinx.serialization.Serializable
 @JsExport
 @JsName("EngagementCloudConfig")
 data class JsApiConfig(
-    val applicationCode: String? = null,
+    val applicationCode: String,
     val serviceWorkerOptions: ServiceWorkerOptions? = null
 )
 

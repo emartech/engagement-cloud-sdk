@@ -4,11 +4,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class JsEngagementCloudSDKConfig(
-    override val applicationCode: String? = null,
-    val serviceWorkerOptions: ServiceWorkerOptions? = null
+    override val applicationCode: String,
+    val serviceWorkerOptions: ServiceWorkerOptions? = null,
 ) : SdkConfig {
     override fun copyWith(
-        applicationCode: String?
+        applicationCode: String
     ): SdkConfig {
         return copy(
             applicationCode = applicationCode
