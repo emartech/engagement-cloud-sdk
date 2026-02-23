@@ -22,6 +22,8 @@ import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MEDIUM_PADDING
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MEDIUM_SPACING
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MESSAGE_ITEM_IMAGE_SIZE
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.ONE_THIRD_WIDTH
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.SWIPE_DELETE_BACKGROUND_CORRECTION
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.SMALL_BORDER_RADIUS
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.TEXT_PLACEHOLDER_HEIGHT
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.TITLE_FONT_WEIGHT
@@ -184,7 +186,7 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
     @OptIn(ExperimentalComposeWebApi::class)
     val filterButtonSelectedIndicator by style {
         position(Position.Absolute)
-        bottom(0.px)
+        bottom(ZERO_POSITION_VALUE)
         height(2.px)
         backgroundColor(CssColorVars.colorSurfaceTint.value())
         transitions {
@@ -513,6 +515,39 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
                 property("transform", "scale(1)")
             }
         }
+    }
+
+    val swipeContainer by style {
+        position(Position.Relative)
+        property("overflow", "hidden")
+        property("touch-action", "pan-y")
+        property("user-select", "none")
+        property("-webkit-user-select","none")
+        width(MAX_WIDTH)
+    }
+
+    val swipeDeleteBackground by style {
+        position(Position.Absolute)
+        top(SWIPE_DELETE_BACKGROUND_CORRECTION)
+        right(SWIPE_DELETE_BACKGROUND_CORRECTION)
+        bottom(SWIPE_DELETE_BACKGROUND_CORRECTION)
+        display(DisplayStyle.Flex)
+        alignItems(AlignItems.Center)
+        justifyContent(JustifyContent.End)
+        backgroundColor(CssColorVars.colorError.value())
+        padding(DEFAULT_PADDING)
+        width(ONE_THIRD_WIDTH)
+    }
+
+    val swipeDeleteIcon by style {
+        property("fill", CssColorVars.colorOnError.value())
+    }
+
+    val swipeContent by style {
+        position(Position.Relative)
+        width(MAX_WIDTH)
+        backgroundColor(CssColorVars.colorSurface.value())
+        property("z-index", "1")
     }
 
     val messageItemHover by style {

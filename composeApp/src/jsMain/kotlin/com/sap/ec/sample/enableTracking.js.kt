@@ -4,5 +4,5 @@ import JSEngagementCloud
 import com.sap.ec.JsApiConfig
 
 actual suspend fun enableTracking() {
-    JSEngagementCloud.setup.enable(JsApiConfig("EMS11-C3FD3"))
+    JSEngagementCloud.setup.enable(JsApiConfig("EMSE3-B4341"))
 }

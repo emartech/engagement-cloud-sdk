@@ -3,6 +3,7 @@ package com.sap.ec.mobileengage.embeddedmessaging.ui.list
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.paging.compose.LazyPagingItems
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemView
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
@@ -19,6 +20,10 @@ import web.cssom.atrule.height
 import web.cssom.px
 import web.dom.document
 
+private fun isTouchDevice(): Boolean {
+    return js("'ontouchstart' in window || navigator.maxTouchPoints > 0") as Boolean
+}
+
 @Composable
 fun ListView(
     lazyPagingMessageItems: LazyPagingItems<MessageItemViewModelApi>,
@@ -29,6 +34,7 @@ fun ListView(
     onDeleteIconClicked: (MessageItemViewModelApi) -> Unit = {}
 ) {
     val selectedMessage = listViewModel.selectedMessage.collectAsState()
+    val isTouchEnabled = remember { isTouchDevice() }
 
     Div({
         classes(EmbeddedMessagingStyleSheet.scrollableList)
@@ -44,7 +50,8 @@ fun ListView(
                             onItemClick(messageViewModel)
                         },
                         onDeleteClicked = { onDeleteIconClicked(messageViewModel) },
-                        withDeleteIcon = withDeleteIcon
+                        withDeleteIcon = withDeleteIcon && !isTouchEnabled,
+                        withSwipeGesture = isTouchEnabled
                     )
                 }
             }
