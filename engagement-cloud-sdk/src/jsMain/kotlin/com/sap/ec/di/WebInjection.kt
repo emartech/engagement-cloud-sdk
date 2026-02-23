@@ -295,7 +295,7 @@ object WebInjection {
         single<JSPushApi> { JSPush(pushApi = get()) }
         single<JSDeepLinkApi> { JSDeepLink(deepLinkApi = get()) }
         single<JSInAppApi> { JSInApp(inAppApi = get()) }
-        single<JsEmbeddedMessagingApi> { JsEmbeddedMessaging(embeddedMessagingApi = get()) }
+        single<JsEmbeddedMessagingApi> { JsEmbeddedMessaging(embeddedMessaging = get()) }
     }
 
     private fun getNavigatorData(): String {

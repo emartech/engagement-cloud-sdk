@@ -16,6 +16,20 @@ class IosEmbeddedMessaging(private val embeddedMessaging: EmbeddedMessagingApi) 
     override val categories: List<MessageCategory>
         get() = embeddedMessaging.categories
 
+    override val isUnreadFilterActive: Boolean
+        get() = embeddedMessaging.isUnreadFilterActive
+
+    override val activeCategoryFilters: List<MessageCategory>
+        get() = embeddedMessaging.activeCategoryFilters
+
+    override fun filterUnreadOnly(filterUnreadOnly: Boolean) {
+        embeddedMessaging.filterUnreadOnly(filterUnreadOnly)
+    }
+
+    override fun filterByCategories(categories: List<MessageCategory>) {
+        embeddedMessaging.filterByCategories(categories)
+    }
+
     override fun listPageView(
         showFilters: Boolean,
         customMessageItem: ((viewModel: CustomMessageItemViewModelApi, isSelected: Boolean) -> UIViewController)?

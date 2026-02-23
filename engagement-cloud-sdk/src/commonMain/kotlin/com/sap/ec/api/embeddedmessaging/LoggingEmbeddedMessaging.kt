@@ -31,7 +31,7 @@ internal class LoggingEmbeddedMessaging(
             }
             return false
         }
-    override val activeCategoryIdFilters: Set<Int>
+    override val activeCategoryFilters: Set<MessageCategory>
         get() {
             val entry = LogEntry.createMethodNotAllowed<LoggingEmbeddedMessaging>(
                 this, this::categories.name
@@ -51,7 +51,7 @@ internal class LoggingEmbeddedMessaging(
         }
     }
 
-    override fun filterByCategoryIds(categoryIds: Set<Int>) {
+    override fun filterByCategories(categories: Set<MessageCategory>) {
         val entry = LogEntry.createMethodNotAllowed<LoggingEmbeddedMessaging>(
             this, this::categories.name
         )

@@ -7,8 +7,8 @@ interface EmbeddedMessagingApi: AutoRegisterable {
 
     val categories: List<MessageCategory>
     val isUnreadFilterActive: Boolean
-    val activeCategoryIdFilters: List<Int>
+    val activeCategoryFilters: List<MessageCategory>
     fun filterUnreadOnly(filterUnreadOnly: Boolean)
-    fun filterByCategoryIds(categoryIds: List<Int>)
+    fun filterByCategories(categories: List<MessageCategory>)
 
 }

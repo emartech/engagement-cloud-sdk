@@ -6,8 +6,8 @@ interface EmbeddedMessagingInternalApi {
 
     val categories: List<MessageCategory>
     val isUnreadFilterActive: Boolean
-    val activeCategoryIdFilters: Set<Int>
+    val activeCategoryFilters: Set<MessageCategory>
     fun filterUnreadOnly(filterUnreadOnly: Boolean)
-    fun filterByCategoryIds(categoryIds: Set<Int>)
+    fun filterByCategories(categories: Set<MessageCategory>)
 
 }

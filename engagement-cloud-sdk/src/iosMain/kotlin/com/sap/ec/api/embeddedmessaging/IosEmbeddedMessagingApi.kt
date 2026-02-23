@@ -6,6 +6,10 @@ import platform.UIKit.UIViewController
 
 interface IosEmbeddedMessagingApi {
     val categories: List<MessageCategory>
+    val isUnreadFilterActive: Boolean
+    val activeCategoryFilters: List<MessageCategory>
+    fun filterUnreadOnly(filterUnreadOnly: Boolean)
+    fun filterByCategories(categories: List<MessageCategory>)
 
     fun listPageView(
         showFilters: Boolean,

@@ -95,25 +95,25 @@ class EmbeddedMessagingTests {
     }
 
     @Test
-    fun activeCategoryIdFilters_shouldGetValue_fromActiveInstance_initializedSDK() = runTest {
+    fun activeCategoryFilters_shouldGetValue_fromActiveInstance_initializedSDK() = runTest {
         every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Initialized)
-        every { mockLoggingInstance.activeCategoryIdFilters } returns emptySet()
+        every { mockLoggingInstance.activeCategoryFilters } returns emptySet()
 
         embeddedMessaging.registerOnContext()
 
-        embeddedMessaging.activeCategoryIdFilters shouldBe emptyList()
-        verify { mockLoggingInstance.activeCategoryIdFilters }
+        embeddedMessaging.activeCategoryFilters shouldBe emptyList()
+        verify { mockLoggingInstance.activeCategoryFilters }
     }
 
     @Test
-    fun activeCategoryIdFilters_shouldGetValue_fromActiveInstance_activeSDK() = runTest {
+    fun activeCategoryFilters_shouldGetValue_fromActiveInstance_activeSDK() = runTest {
         every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
-        every { mockInternalInstance.activeCategoryIdFilters } returns emptySet()
+        every { mockInternalInstance.activeCategoryFilters } returns emptySet()
 
         embeddedMessaging.registerOnContext()
 
-        embeddedMessaging.activeCategoryIdFilters shouldBe emptyList()
-        verify { mockInternalInstance.activeCategoryIdFilters }
+        embeddedMessaging.activeCategoryFilters shouldBe emptyList()
+        verify { mockInternalInstance.activeCategoryFilters }
     }
 
     @Test
@@ -137,22 +137,24 @@ class EmbeddedMessagingTests {
     }
 
     @Test
-    fun filterByCategoryIds_shouldCallMethod_onActiveInstance_initializedSDK() = runTest {
+    fun filterByCategories_shouldCallMethod_onActiveInstance_initializedSDK() = runTest {
         every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Initialized)
         embeddedMessaging.registerOnContext()
 
-        embeddedMessaging.filterByCategoryIds(listOf(1, 2))
+        val categories = listOf(MessageCategory(1, "Category 1"), MessageCategory(2, "Category 2"))
+        embeddedMessaging.filterByCategories(categories)
 
-        verify { mockLoggingInstance.filterByCategoryIds(setOf(1, 2)) }
+        verify { mockLoggingInstance.filterByCategories(setOf(MessageCategory(1, "Category 1"), MessageCategory(2, "Category 2"))) }
     }
 
     @Test
-    fun filterByCategoryIds_shouldCallMethod_onActiveInstance_activeSDK() = runTest {
+    fun filterByCategories_shouldCallMethod_onActiveInstance_activeSDK() = runTest {
         every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
         embeddedMessaging.registerOnContext()
 
-        embeddedMessaging.filterByCategoryIds(listOf(1, 2))
+        val categories = listOf(MessageCategory(1, "Category 1"), MessageCategory(2, "Category 2"))
+        embeddedMessaging.filterByCategories(categories)
 
-        verify { mockInternalInstance.filterByCategoryIds(setOf(1, 2)) }
+        verify { mockInternalInstance.filterByCategories(setOf(MessageCategory(1, "Category 1"), MessageCategory(2, "Category 2"))) }
     }
 }

@@ -66,8 +66,8 @@ class LoggingEmbeddedMessagingTests {
     }
 
     @Test
-    fun activeCategoryIdFilters_shouldReturn_emptySet_andLog_logMethodNotAllowed() = runTest {
-        loggingInstance.activeCategoryIdFilters shouldBe emptySet()
+    fun activeCategoryFilters_shouldReturn_emptySet_andLog_logMethodNotAllowed() = runTest {
+        loggingInstance.activeCategoryFilters shouldBe emptySet()
 
         advanceUntilIdle()
 
@@ -86,8 +86,8 @@ class LoggingEmbeddedMessagingTests {
     }
 
     @Test
-    fun filterByCategoryIds_shouldLog_logMethodNotAllowed() = runTest {
-        loggingInstance.filterByCategoryIds(setOf(1, 2))
+    fun filterByCategories_shouldLog_logMethodNotAllowed() = runTest {
+        loggingInstance.filterByCategories(emptySet())
 
         advanceUntilIdle()
 

@@ -12,14 +12,19 @@ internal class EmbeddedMessagingInternal(
         get() = listPageViewModel.categories.value
     override val isUnreadFilterActive: Boolean
         get() = listPageViewModel.filterUnopenedOnly.value
-    override val activeCategoryIdFilters: Set<Int>
-        get() = listPageViewModel.selectedCategoryIds.value
+    override val activeCategoryFilters: Set<MessageCategory>
+        get() {
+            val selectedIds = listPageViewModel.selectedCategoryIds.value
+            val allCategories = listPageViewModel.categories.value
+            return allCategories.filter { it.id in selectedIds }.toSet()
+        }
 
     override fun filterUnreadOnly(filterUnreadOnly: Boolean) {
         listPageViewModel.setFilterUnopenedOnly(filterUnreadOnly)
     }
 
-    override fun filterByCategoryIds(categoryIds: Set<Int>) {
+    override fun filterByCategories(categories: Set<MessageCategory>) {
+        val categoryIds = categories.map { it.id }.toSet()
         listPageViewModel.setSelectedCategoryIds(categoryIds)
     }
 

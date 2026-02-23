@@ -20,14 +20,6 @@ data class Meta(
     val categories: List<MessageCategory>,
 )
 
-@OptIn(ExperimentalJsExport::class)
-@JsExport
-@Serializable
-data class MessageCategory(
-    val id: Int,
-    val value: String
-)
-
 @Serializable
 data class EmbeddedMessage(
     val id: String,
