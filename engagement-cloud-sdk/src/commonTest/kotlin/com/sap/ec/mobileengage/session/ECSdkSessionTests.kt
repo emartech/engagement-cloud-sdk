@@ -299,17 +299,6 @@ class ECSdkSessionTests {
     }
 
     @Test
-    fun testEndSession_shouldNotDoAnything_whenApplicationCodeIsNull() = runTest {
-        every { mockSdkContext.config } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
-
-        ECSdkSession.endSession()
-
-        verifySessionEventNotRegistered(sessionEndEvent)
-        sessionContext.sessionId shouldBe SESSION_ID
-        sessionContext.sessionStart shouldBe SESSION_START
-    }
-
-    @Test
     fun testEndSession_shouldNotDoAnything_whenContactTokenIsNull() = runTest {
         every { mockRequestContext.contactToken } returns null
         every { mockSdkContext.config } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)

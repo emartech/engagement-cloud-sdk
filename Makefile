@@ -73,7 +73,12 @@ build-android: check-env
 		:engagement-cloud-sdk-android-hms:assembleRelease
 
 test-android: check-env
-	@./gradlew :engagement-cloud-sdk:allTests -x :composeApp:test
+	@./gradlew \
+		:engagement-cloud-sdk:testAndroidHostTest \
+		:engagement-cloud-sdk:connectedAndroidDeviceTest \
+		:engagement-cloud-sdk-android-fcm:testDebugUnitTest \
+		:engagement-cloud-sdk-android-hms:testDebugUnitTest \
+		-x :composeApp:test
 
 build-ios-all-archtypes: check-env
 	@./gradlew \

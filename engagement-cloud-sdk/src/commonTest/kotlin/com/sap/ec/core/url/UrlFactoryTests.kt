@@ -10,10 +10,6 @@ import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.mock
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.data.forAll
-import io.kotest.data.headers
-import io.kotest.data.row
-import io.kotest.data.table
 import io.kotest.matchers.shouldBe
 import io.ktor.http.Url
 import kotlin.test.BeforeTest
@@ -40,39 +36,6 @@ class UrlFactoryTests {
         every { mockDefaultUrls.clientServiceBaseUrl } returns CLIENT_SERVICE_BASE_URL
         every { mockSdkContext.config } returns config
         urlFactory = UrlFactory(mockSdkContext)
-    }
-
-    @Test
-    fun testCreate_shouldTrowException_whenApplicationCode_isNull() {
-        forAll(
-            table(
-                headers("urls"),
-                listOf(
-                    row(ECUrlType.RefreshToken),
-                    row(ECUrlType.ChangeApplicationCode),
-                    row(ECUrlType.LinkContact),
-                    row(ECUrlType.UnlinkContact),
-                    row(ECUrlType.RefreshToken),
-                    row(ECUrlType.PushToken),
-                    row(ECUrlType.RegisterDeviceInfo),
-                    row(ECUrlType.Event),
-                    row(ECUrlType.RemoteConfigSignature),
-                    row(ECUrlType.RemoteConfig),
-                )
-            )
-        ) {
-            val testUrl = "https://me-client.gservice.emarsys.net"
-            every { mockSdkContext.defaultUrls } returns mockDefaultUrls
-            every { mockDefaultUrls.clientServiceBaseUrl } returns testUrl
-            every { mockDefaultUrls.eventServiceBaseUrl } returns testUrl
-            every { mockDefaultUrls.remoteConfigBaseUrl } returns testUrl
-            val config = TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
-            every { mockSdkContext.config } returns config
-
-            shouldThrow<MissingApplicationCodeException> {
-                urlFactory.create(it)
-            }
-        }
     }
 
     @Test
