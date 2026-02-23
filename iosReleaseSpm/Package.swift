@@ -2,43 +2,43 @@
 import PackageDescription
 
 // BEGIN KMMBRIDGE VARIABLES BLOCK FOR 'EngagementCloudSDK' (do not edit)
-let EngagementCloudSDKPackageName = "EngagementCloudSDK"
-let EngagementCloudSDKUrl = ""
-let EngagementCloudSDKChecksum = ""
+let remoteEngagementCloudSDKUrl = ""
+let remoteEngagementCloudSDKChecksum = ""
+let engagementCloudSDKPackageName = "EngagementCloudSDK"
 // END KMMBRIDGE BLOCK FOR 'EngagementCloudSDK'
 
 // BEGIN KMMBRIDGE VARIABLES BLOCK FOR 'EngagementCloudNotificationService' (do not edit)
-let EngagementCloudNotificationServicePackageName = "EngagementCloudNotificationService"
-let EngagementCloudNotificationServiceUrl = ""
-let EngagementCloudNotificationServiceChecksum = ""
+let remoteEngagementCloudNotificationServiceUrl = ""
+let remoteEngagementCloudNotificationServiceChecksum = ""
+let engagementCloudNotificationServicePackageName = "EngagementCloudNotificationService"
 // END KMMBRIDGE BLOCK FOR 'EngagementCloudNotificationService'
 
 
 let package = Package(
-    name: EngagementCloudSDKPackageName,
+    name: engagementCloudSDKPackageName,
     platforms: [
         .iOS(.v13)
     ],
     products: [
         .library(
-            name: EngagementCloudSDKPackageName,
-            targets: [EngagementCloudSDKPackageName]
+            name: engagementCloudSDKPackageName,
+            targets: [engagementCloudSDKPackageName]
         ),
         .library(
-            name: EngagementCloudNotificationServicePackageName,
-            targets: [EngagementCloudNotificationServicePackageName]
+            name: engagementCloudNotificationServicePackageName,
+            targets: [engagementCloudNotificationServicePackageName]
         ),
     ],
     targets: [
         .binaryTarget(
-            name: EngagementCloudSDKPackageName,
-            url: EngagementCloudSDKUrl,
-            checksum: EngagementCloudSDKChecksum
+            name: engagementCloudSDKPackageName,
+            url: remoteEngagementCloudSDKUrl,
+            checksum: remoteEngagementCloudSDKChecksum
         ),
         .binaryTarget(
-            name: EngagementCloudNotificationServicePackageName,
-            url: EngagementCloudNotificationServiceUrl,
-            checksum: EngagementCloudNotificationServiceChecksum
+            name: engagementCloudNotificationServicePackageName,
+            url: remoteEngagementCloudNotificationServiceUrl,
+            checksum: remoteEngagementCloudNotificationServiceChecksum
         ),
     ]
 )
