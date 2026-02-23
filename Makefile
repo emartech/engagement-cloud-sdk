@@ -194,4 +194,5 @@ pipeline-ios: check-env
 			:engagement-cloud-sdk:assembleEngagementCloudSDKReleaseXCFramework \
 			:ios-notification-service:assembleEngagementCloudNotificationServiceReleaseXCFramework) \
 		-PNATIVE_BUILD_TYPE='$(if $(filter true,$(PUBLISH)),RELEASE,DEBUG)' \
+		$(if $(filter true,$(PUBLISH)),-PENABLE_PUBLISHING=true) \
 		--no-daemon
