@@ -26,24 +26,22 @@ class AndroidSetupTests {
     fun enableTracking_shouldDelegate_toSetupApi_andReturnItsResult() = runTest {
         val testConfig = AndroidEngagementCloudSDKConfig("ABC-123")
         val testResult = Result.success(Unit)
-        everySuspend { mockSetup.enableTracking(testConfig) } returns testResult
+        everySuspend { mockSetup.enable(testConfig) } returns testResult
 
-        val result = androidSetup.enableTracking(testConfig)
+        val result = androidSetup.enable(testConfig)
 
-        everySuspend { mockSetup.enableTracking(testConfig) }
-
+        everySuspend { mockSetup.enable(testConfig) }
         result shouldBe testResult
     }
 
     @Test
     fun disableTracking_shouldDelegate_toSetupApi_andReturnItsResult() = runTest {
         val testResult = Result.failure<Unit>(Exception("failure"))
-        everySuspend { mockSetup.disableTracking() } returns testResult
+        everySuspend { mockSetup.disable() } returns testResult
 
-        val result = androidSetup.disableTracking()
+        val result = androidSetup.disable()
 
-        everySuspend { mockSetup.disableTracking() }
-
+        everySuspend { mockSetup.disable() }
         result shouldBe testResult
     }
 }
