@@ -197,6 +197,27 @@ jobs:
           GITHUB_REPO: ${{ github.repository }}
           GITHUB_ARTIFACT_RELEASE_ID: ${{ steps.spm_release.outputs.id }}
 
+      - name: Copy and commit updated Package.swift for SPM
+        if: env.DRY_RUN != 'true'
+        run: |
+          # Copy the KMMBridge-updated Package.swift to root
+          cp iosReleaseSpm/Package.swift Package.swift
+          
+          # Configure git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Create an orphan commit for SPM release (doesn't affect main branch)
+          git add Package.swift
+          git commit -m "SPM release ${{ env.VERSION }}" --allow-empty
+          
+          # Update the SPM release tag to point to this commit
+          git tag -f spm-${{ env.VERSION }}
+          git push origin spm-${{ env.VERSION }} --force
+          
+          # Reset back to original state (don't modify main)
+          git reset --hard HEAD~1
+
       - name: Upload iOS XCFramework artifacts
         uses: actions/upload-artifact@v4
         with:
