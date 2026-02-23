@@ -7,7 +7,10 @@ import platform.UIKit.UIViewController
 interface IosEmbeddedMessagingApi {
     val categories: List<MessageCategory>
 
-    fun listPageView(showFilters: Boolean): UIViewController
+    fun listPageView(
+        showFilters: Boolean,
+        customMessageItem: ((viewModel: CustomMessageItemViewModelApi, isSelected: Boolean) -> UIViewController)? = null
+    ): UIViewController
 
     fun compactListView(
         onNavigate: () -> Unit,

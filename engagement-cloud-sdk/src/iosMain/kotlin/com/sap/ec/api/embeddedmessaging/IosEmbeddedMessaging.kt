@@ -16,9 +16,18 @@ class IosEmbeddedMessaging(private val embeddedMessaging: EmbeddedMessagingApi) 
     override val categories: List<MessageCategory>
         get() = embeddedMessaging.categories
 
-    override fun listPageView(showFilters: Boolean): UIViewController {
+    override fun listPageView(
+        showFilters: Boolean,
+        customMessageItem: ((viewModel: CustomMessageItemViewModelApi, isSelected: Boolean) -> UIViewController)?
+    ): UIViewController {
         return ComposeUIViewController {
-            ListPageView(showFilters)
+            ListPageView(
+                showFilters,
+                customMessageItem = customMessageItem?.let { customItem ->
+                    @Composable { viewModel: CustomMessageItemViewModelApi, isSelected: Boolean ->
+                        mapUIViewControllerToCompose(customItem(viewModel, isSelected))
+                    }
+                })
         }
     }
 

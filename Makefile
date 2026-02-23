@@ -1,4 +1,4 @@
-.PHONY: build build-pipeline build-android build-ios build-ios-all-archtypes build-js-html build-web check-env clean create-apks help lint pipeline-android pipeline-js pipeline-ios prepare-release prepare-spm publish-android publish-ios-spm publish-npm release release-locally test test-android test-android-firebase test-ios test-sdk-loader test-web
+.PHONY: build build-pipeline build-android build-ios build-ios-all-archtypes build-js-html build-web check-env clean create-apks help lint pipeline-android pipeline-js pipeline-ios prepare-release prepare-spm prepare-local-spm publish-android publish-ios-spm publish-npm release release-locally test test-android test-android-firebase test-ios test-sdk-loader test-web
 .DEFAULT_GOAL := help
 SHELL := /bin/bash
 
@@ -109,6 +109,13 @@ prepare-spm: check-env
 		spmDevBuild && \
 		cp -f "./iosReleaseSpm/Package.swift" "./Package.swift" && \
 		echo "Swift Package is prepared. To use it as a local dependency add the project in Xcode at the Package Dependencies section"
+
+prepare-local-spm: check-env
+	@./gradlew \
+		-PENABLE_PUBLISHING=true \
+		spmDevBuild && \
+		cp -f "./spmLocalRelease/Package.swift" "./Package.swift" && \
+		echo "Local Swift Package is prepared."
 
 publish-maven: check-env
 	@./gradlew \
