@@ -227,14 +227,17 @@ jobs:
               -e "s|__NS_CHECKSUM__|${{ env.NS_CHECKSUM }}|" \
               iosReleaseSpm/Package.swift > Package.swift
           
-          # Commit to SPM release tag
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Update main branch with latest Package.swift
           git add Package.swift
-          git commit -m "SPM release ${{ env.VERSION }}"
+          git commit -m "Update Package.swift for SPM release ${{ env.VERSION }}"
+          git push origin HEAD:main
+          
+          # Also tag this commit for SPM version resolution
           git tag -f ${{ env.VERSION }}
           git push origin ${{ env.VERSION }} --force
-          git reset --hard HEAD~1
 
       - name: Upload iOS XCFramework artifacts
         uses: actions/upload-artifact@v6
