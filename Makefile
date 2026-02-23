@@ -192,11 +192,6 @@ pipeline-ios: check-env
 		:engagement-cloud-sdk:iosX64Test \
 		$(if $(filter true,$(PUBLISH)), \
 			:engagement-cloud-sdk:assembleEngagementCloudSDKReleaseXCFramework \
-			:ios-notification-service:assembleEngagementCloudNotificationServiceReleaseXCFramework \
-			kmmBridgePublish) \
-		-PENABLE_PUBLISHING=$(PUBLISH) \
+			:ios-notification-service:assembleEngagementCloudNotificationServiceReleaseXCFramework) \
 		-PNATIVE_BUILD_TYPE='$(if $(filter true,$(PUBLISH)),RELEASE,DEBUG)' \
-		-PGITHUB_ARTIFACT_RELEASE_ID=$(GITHUB_ARTIFACT_RELEASE_ID) \
-		-PGITHUB_PUBLISH_TOKEN=$(GITHUB_TOKEN) \
-		-PGITHUB_REPO=$(GITHUB_REPO) \
 		--no-daemon

@@ -187,23 +187,23 @@ jobs:
           prerelease: true
           generate_release_notes: false
 
-      - name: Run iOS Pipeline (Build, Test, [Publish Maven], [Publish SPM])
+      - name: Build and Test iOS
         run: make pipeline-ios
         env:
           PUBLISH: ${{ env.DRY_RUN != 'true' }}
           VERSION_OVERRIDE: ${{ env.VERSION }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_ACTOR: ${{ github.actor }}
-          GITHUB_REPO: ${{ github.repository }}
-          GITHUB_ARTIFACT_RELEASE_ID: ${{ steps.spm_release.outputs.id }}
 
       - name: Upload XCFrameworks to GitHub Release
         if: env.DRY_RUN != 'true'
-        working-directory: ${{ github.workspace }}
         run: |
-          # Zip XCFrameworks
-          zip -rj EngagementCloudSDK.xcframework.zip engagement-cloud-sdk/build/XCFrameworks/release/EngagementCloudSDK.xcframework
-          zip -rj EngagementCloudNotificationService.xcframework.zip ios-notification-service/build/XCFrameworks/release/EngagementCloudNotificationService.xcframework
+          # Zip XCFrameworks (preserving directory structure)
+          cd engagement-cloud-sdk/build/XCFrameworks/release
+          zip -r $GITHUB_WORKSPACE/EngagementCloudSDK.xcframework.zip EngagementCloudSDK.xcframework
+          cd $GITHUB_WORKSPACE
+          
+          cd ios-notification-service/build/XCFrameworks/release
+          zip -r $GITHUB_WORKSPACE/EngagementCloudNotificationService.xcframework.zip EngagementCloudNotificationService.xcframework
+          cd $GITHUB_WORKSPACE
           
           # Calculate checksums
           echo "SDK_CHECKSUM=$(shasum -a 256 EngagementCloudSDK.xcframework.zip | cut -d ' ' -f 1)" >> $GITHUB_ENV

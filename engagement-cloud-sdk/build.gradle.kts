@@ -311,8 +311,7 @@ if (isMac) {
 
             "release" -> {
                 println("Building for release")
-                mavenPublishArtifacts()
-                spm()
+                // XCFramework build only - CI workflow handles GitHub Release upload and Package.swift generation
             }
 
             else -> {
