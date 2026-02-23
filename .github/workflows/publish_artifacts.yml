@@ -182,7 +182,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag_name: spm-${{ env.VERSION }}
+          tag_name: ${{ env.VERSION }}
           name: SPM Release ${{ env.VERSION }}
           prerelease: true
           generate_release_notes: false
@@ -210,7 +210,7 @@ jobs:
           echo "NS_CHECKSUM=$(shasum -a 256 EngagementCloudNotificationService.xcframework.zip | cut -d ' ' -f 1)" >> $GITHUB_ENV
           
           # Upload to GitHub Release
-          gh release upload spm-${{ env.VERSION }} \
+          gh release upload ${{ env.VERSION }} \
             EngagementCloudSDK.xcframework.zip \
             EngagementCloudNotificationService.xcframework.zip \
             --clobber
@@ -221,9 +221,9 @@ jobs:
         if: env.DRY_RUN != 'true'
         run: |
           # Generate Package.swift from template
-          sed -e "s|__SDK_URL__|https://github.com/${{ github.repository }}/releases/download/spm-${{ env.VERSION }}/EngagementCloudSDK.xcframework.zip|" \
+          sed -e "s|__SDK_URL__|https://github.com/${{ github.repository }}/releases/download/${{ env.VERSION }}/EngagementCloudSDK.xcframework.zip|" \
               -e "s|__SDK_CHECKSUM__|${{ env.SDK_CHECKSUM }}|" \
-              -e "s|__NS_URL__|https://github.com/${{ github.repository }}/releases/download/spm-${{ env.VERSION }}/EngagementCloudNotificationService.xcframework.zip|" \
+              -e "s|__NS_URL__|https://github.com/${{ github.repository }}/releases/download/${{ env.VERSION }}/EngagementCloudNotificationService.xcframework.zip|" \
               -e "s|__NS_CHECKSUM__|${{ env.NS_CHECKSUM }}|" \
               iosReleaseSpm/Package.swift > Package.swift
           
@@ -232,8 +232,8 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add Package.swift
           git commit -m "SPM release ${{ env.VERSION }}"
-          git tag -f spm-${{ env.VERSION }}
-          git push origin spm-${{ env.VERSION }} --force
+          git tag -f ${{ env.VERSION }}
+          git push origin ${{ env.VERSION }} --force
           git reset --hard HEAD~1
 
       - name: Upload iOS XCFramework artifacts
