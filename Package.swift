@@ -1,38 +1,39 @@
 // swift-tools-version:5.3
 import PackageDescription
 
-// BEGIN KMMBRIDGE VARIABLES BLOCK FOR 'EngagementCloudSDK' (do not edit)
-let SdkPackageName = "EngagementCloudSDK"
-// END KMMBRIDGE BLOCK FOR 'EngagementCloudSDK'
+let engagementCloudSDKPackageName = "EngagementCloudSDK"
+let engagementCloudSDKUrl = "https://github.com/emartech/engagement-cloud-sdk/releases/download/0.0.73/EngagementCloudSDK.xcframework.zip"
+let engagementCloudSDKChecksum = "550ce73294d24ed28aa7556216507401a7349f3fa6e31b683339840736d0e7f8"
 
-// BEGIN KMMBRIDGE VARIABLES BLOCK FOR 'EngagementCloudNotificationService' (do not edit)
-let NotificationServicePackageName = "EngagementCloudNotificationService"
-// END KMMBRIDGE BLOCK FOR 'EngagementCloudNotificationService'
-
+let engagementCloudNotificationServicePackageName = "EngagementCloudNotificationService"
+let engagementCloudNotificationServiceUrl = "https://github.com/emartech/engagement-cloud-sdk/releases/download/0.0.73/EngagementCloudNotificationService.xcframework.zip"
+let engagementCloudNotificationServiceChecksum = "30fa37e11f20af01fc113973f69f9f7d9e9d5d59ac71331f3e0517506fe49ec5"
 
 let package = Package(
-    name: SdkPackageName,
+    name: engagementCloudSDKPackageName,
     platforms: [
         .iOS(.v13)
     ],
     products: [
         .library(
-            name: SdkPackageName,
-            targets: [SdkPackageName]
+            name: engagementCloudSDKPackageName,
+            targets: [engagementCloudSDKPackageName]
         ),
         .library(
-            name: NotificationServicePackageName,
-            targets: [NotificationServicePackageName]
+            name: engagementCloudNotificationServicePackageName,
+            targets: [engagementCloudNotificationServicePackageName]
         ),
     ],
     targets: [
         .binaryTarget(
-            name: SdkPackageName,
-            path: "./engagement-cloud-sdk/build/XCFrameworks/debug/\(SdkPackageName).xcframework"
+            name: engagementCloudSDKPackageName,
+            url: engagementCloudSDKUrl,
+            checksum: engagementCloudSDKChecksum
         ),
         .binaryTarget(
-            name: NotificationServicePackageName,
-            path: "./ios-notification-service/build/XCFrameworks/debug/\(NotificationServicePackageName).xcframework"
+            name: engagementCloudNotificationServicePackageName,
+            url: engagementCloudNotificationServiceUrl,
+            checksum: engagementCloudNotificationServiceChecksum
         ),
     ]
 )
