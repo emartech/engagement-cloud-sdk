@@ -1,9 +1,13 @@
 package com.sap.ec.api.setup
 
 import com.sap.ec.TestEngagementCloudSDKConfig
+import com.sap.ec.config.LinkContactData
 import com.sap.ec.config.SdkConfig
+import com.sap.ec.context.DefaultUrls
+import com.sap.ec.context.SdkContext
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.exceptions.SdkException
+import com.sap.ec.core.log.LogLevel
 import com.sap.ec.core.log.Logger
 import com.sap.ec.disable.DisableOrganizerApi
 import com.sap.ec.enable.EnableOrganizerApi
@@ -29,19 +33,29 @@ class SetupTests {
 
     private lateinit var mockEnableOrganizer: EnableOrganizerApi
     private lateinit var mockDisableOrganizer: DisableOrganizerApi
-    private lateinit var mockSdkContext: SdkContextApi
+    private lateinit var testSdkContext: SdkContextApi
     private lateinit var mockLogger: Logger
+    private lateinit var mockOnContactLinkingFailedCallback: suspend () -> LinkContactData?
     private lateinit var setup: SetupApi
 
     @BeforeTest
     fun setup() {
-        Dispatchers.setMain(StandardTestDispatcher())
+        val mainDispatcher = StandardTestDispatcher()
+        Dispatchers.setMain(mainDispatcher)
         mockEnableOrganizer = mock(MockMode.autofill)
         mockDisableOrganizer = mock(MockMode.autofill)
-        mockSdkContext = mock()
-        every { mockSdkContext.sdkDispatcher } returns StandardTestDispatcher()
+        testSdkContext = SdkContext(
+            sdkDispatcher = StandardTestDispatcher(),
+            mainDispatcher = mainDispatcher,
+            defaultUrls = DefaultUrls("", "", "", "", "", "", ""),
+            remoteLogLevel = LogLevel.Error,
+            features = mutableSetOf(),
+            logBreadcrumbsQueueSize = 10,
+            onContactLinkingFailed = null
+        )
+        mockOnContactLinkingFailedCallback = mock()
         mockLogger = mock(MockMode.autofill)
-        setup = Setup(mockEnableOrganizer, mockDisableOrganizer, mockSdkContext, mockLogger)
+        setup = Setup(mockEnableOrganizer, mockDisableOrganizer, testSdkContext, mockLogger)
     }
 
     @AfterTest
@@ -53,16 +67,17 @@ class SetupTests {
     fun enableTracking_shouldReturnSuccess_ifEnableOrganizer_succeeds() = runTest {
         val testConfig = TestEngagementCloudSDKConfig("ABCDE-12345")
 
-        val result = setup.enable(testConfig)
+        val result = setup.enable(testConfig, mockOnContactLinkingFailedCallback)
 
         result.isSuccess shouldBe true
+        testSdkContext.onContactLinkingFailed shouldBe mockOnContactLinkingFailedCallback
     }
 
     @Test
     fun enable_shouldValidate_theConfig_andReturnFailure_ifValidationFails() = runTest {
         val testConfig = TestEngagementCloudSDKConfig("null")
 
-        val result = setup.enable(testConfig)
+        val result = setup.enable(testConfig, mockOnContactLinkingFailedCallback)
 
         result.isFailure shouldBe true
         (result.exceptionOrNull() is SdkException.InvalidApplicationCodeException) shouldBe true
@@ -74,7 +89,7 @@ class SetupTests {
         val testConfig = TestEngagementCloudSDKConfig("ABCDE-12345")
         everySuspend { mockEnableOrganizer.enableWithValidation(testConfig) } throws testException
 
-        val result = setup.enable(testConfig)
+        val result = setup.enable(testConfig, mockOnContactLinkingFailedCallback)
 
         result.isFailure shouldBe true
         result.exceptionOrNull() shouldBe testException
@@ -101,7 +116,7 @@ class SetupTests {
     @Test
     fun testIsEnabled_shouldReturnTrue_ifAppCode_is_set() = runTest {
         val mockConfig: SdkConfig = mock()
-        every { mockSdkContext.config } returns mockConfig
+        testSdkContext.config = mockConfig
         every { mockConfig.applicationCode } returns "ABCDE-12345"
         val result = setup.isEnabled()
 

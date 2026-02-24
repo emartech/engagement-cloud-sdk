@@ -3,7 +3,9 @@ package com.sap.ec.reregistration.states
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.log.Logger
+import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.state.State
+import com.sap.ec.response.mapToUnitOrFailure
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
@@ -18,7 +20,20 @@ internal class LinkContactState(
 
     override suspend fun active(): Result<Unit> {
         sdkLogger.debug("Linking contact")
-        return Result.success(Unit)
+        if (sdkContext.onContactLinkingFailed == null) {
+            sdkLogger.debug("No onContactLinkingFailed callback provided, skipping contact linking.")
+            return Result.success(Unit)
+        }
+
+        return sdkContext.onContactLinkingFailed?.invoke()?.let { linkContactData ->
+            sdkLogger.debug("Register LinkContact event.")
+            sdkEventDistributor.registerEvent(
+                linkContactData.toLinkContactEvent()
+            ).await<Response>().mapToUnitOrFailure()
+        } ?: run {
+            sdkLogger.debug("No contact linking data provided, skipping contact linking.")
+            Result.success(Unit)
+        }
     }
 
 

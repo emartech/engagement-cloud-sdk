@@ -26,7 +26,6 @@ import io.ktor.http.Url
 import io.ktor.http.headersOf
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
-import kotlin.test.Ignore
 import kotlin.test.Test
 
 class LinkContactStateTests {
@@ -72,7 +71,6 @@ class LinkContactStateTests {
     }
 
     @Test
-    @Ignore
     fun active_shouldNotRegisterAnyEvent_whenOnContactLinkingFailedCallback_isNull() =
         runTest {
             every {
@@ -88,7 +86,6 @@ class LinkContactStateTests {
         }
 
     @Test
-    @Ignore
     fun active_shouldRegisterLinkContactEvent_throughSdkEventDistributor_whenOnContactLinking_returnsContactFieldValue() =
         runTest {
             every {
@@ -109,7 +106,6 @@ class LinkContactStateTests {
         }
 
     @Test
-    @Ignore
     fun active_shouldRegisterLinkAuthenticatedContactEvent_throughSdkEventDistributor_whenOnContactLinking_returnsOpenIdToken() =
         runTest {
             every {
@@ -130,7 +126,6 @@ class LinkContactStateTests {
         }
 
     @Test
-    @Ignore
     fun active_shouldReturnFailure_whenRegisteringEvent_returnsError() =
         runTest {
             every {

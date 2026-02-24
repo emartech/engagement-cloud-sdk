@@ -34,7 +34,7 @@ internal class ReregistrationClient(
             .filterIsInstance<SdkEvent.Internal.Sdk.ReregistrationRequired>()
             .onEach {
                 sdkLogger.debug("Reregistration start")
-                sdkContext.setSdkState(SdkState.OnHold)
+                sdkContext.setSdkState(SdkState.OnHold)  // TODO use operational events
                 mobileEngageReregistrationStateMachine.activate()
                     .onSuccess {
                         sdkContext.setSdkState(SdkState.Active)

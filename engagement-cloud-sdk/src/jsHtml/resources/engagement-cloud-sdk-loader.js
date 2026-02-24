@@ -10,7 +10,7 @@
 
   global.EngagementCloud = {
     ready: sdkReady,
-    setup: createApiSegment("setup", ["enable", "disable", "isEnabled"]),
+    setup: createApiSegment("setup", ["enable", "disable", "isEnabled", "setOnContactLinkingFailedCallback"]),
     config: createApiSegment("config", [
       "getApplicationCode",
       "getClientId",

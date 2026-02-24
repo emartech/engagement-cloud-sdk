@@ -2,6 +2,7 @@ package com.sap.ec.api.setup
 
 
 import com.sap.ec.api.config.AndroidEngagementCloudSDKConfig
+import com.sap.ec.config.LinkContactData
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -14,11 +15,13 @@ import kotlin.test.Test
 class AndroidSetupTests {
 
     private lateinit var mockSetup: SetupApi
+    private lateinit var mockOnContactLinkingFailedCallback: suspend () -> LinkContactData?
     private lateinit var androidSetup: AndroidSetupApi
 
     @BeforeTest
     fun setup() {
         mockSetup = mock(MockMode.autofill)
+        mockOnContactLinkingFailedCallback = mock()
         androidSetup = AndroidSetup(mockSetup)
     }
 
@@ -26,11 +29,11 @@ class AndroidSetupTests {
     fun enableTracking_shouldDelegate_toSetupApi_andReturnItsResult() = runTest {
         val testConfig = AndroidEngagementCloudSDKConfig("ABC-123")
         val testResult = Result.success(Unit)
-        everySuspend { mockSetup.enable(testConfig) } returns testResult
+        everySuspend { mockSetup.enable(testConfig, mockOnContactLinkingFailedCallback) } returns testResult
 
-        val result = androidSetup.enable(testConfig)
+        val result = androidSetup.enable(testConfig, mockOnContactLinkingFailedCallback)
 
-        everySuspend { mockSetup.enable(testConfig) }
+        everySuspend { mockSetup.enable(testConfig, mockOnContactLinkingFailedCallback) }
         result shouldBe testResult
     }
 
