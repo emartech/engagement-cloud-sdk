@@ -13,8 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.CustomMessageItemViewModelApi
-import com.sap.ec.mobileengage.embeddedmessaging.ui.list.CompactListView
-import com.sap.ec.mobileengage.embeddedmessaging.ui.list.ListPageView
+import com.sap.ec.mobileengage.embeddedmessaging.ui.list.EmbeddedMessagingCompactView
+import com.sap.ec.mobileengage.embeddedmessaging.ui.list.EmbeddedMessagingView
 import com.sap.ec.sample.safeAreaPadding
 import com.sap.ec.sample.screen.SdkTestScreen
 
@@ -43,11 +43,11 @@ fun AppNavigation(
                 }
 
                 NavigationTab.EMBEDDED_MESSAGING -> {
-                    ListPageView(showFilters = true)
+                    EmbeddedMessagingView(showFilters = true)
                 }
 
                 NavigationTab.EM_CUSTOM_ITEM -> {
-                    CompactListView(
+                    EmbeddedMessagingCompactView(
                         onNavigate = {
                             println("Navigate to message details")
                         },

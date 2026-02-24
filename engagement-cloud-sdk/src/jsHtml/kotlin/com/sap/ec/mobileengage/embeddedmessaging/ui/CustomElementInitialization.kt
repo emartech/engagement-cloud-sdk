@@ -4,14 +4,14 @@ import kotlinx.browser.window
 
 actual fun initializeCustomElements() {
     window.customElements.define(
-        "ec-embedded-messaging-list",
+        "ec-embedded-messaging",
         createBridge(
             factory = { ECMessagingListElement() },
             observedAttributes = arrayOf("custom-message-item-element-name", "hide-filters")
         )
     )
     window.customElements.define(
-        "ec-embedded-messaging-compact-list",
+        "ec-embedded-messaging-compact",
         createBridge(
             factory = { ECMessagingCompactListElement() },
             observedAttributes = arrayOf("custom-message-item-element-name")

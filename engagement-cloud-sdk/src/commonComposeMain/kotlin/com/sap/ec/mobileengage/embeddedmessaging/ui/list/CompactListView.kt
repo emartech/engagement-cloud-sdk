@@ -26,7 +26,7 @@ private fun LazyPagingItems<MessageItemViewModelApi>.shouldShowEmptyState(): Boo
     this.isIdleButEmpty() || (this.hasRefreshError() && this.itemCount == 0)
 
 @Composable
-fun CompactListView(
+fun EmbeddedMessagingCompactView(
     onNavigate: () -> Unit = {},
     customMessageItem: (@Composable (viewModel: CustomMessageItemViewModelApi, isSelected: Boolean) -> Unit)? = null
 ) {

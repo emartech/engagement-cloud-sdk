@@ -1,5 +1,6 @@
 package com.sap.ec
 
+import androidx.compose.ui.window.ComposeUIViewController
 import com.sap.ec.api.config.IosConfigApi
 import com.sap.ec.api.contact.IosContactApi
 import com.sap.ec.api.deeplink.IosDeepLinkApi
@@ -13,12 +14,14 @@ import com.sap.ec.di.EventFlowTypes
 import com.sap.ec.di.SdkKoinIsolationContext
 import com.sap.ec.di.SdkKoinIsolationContext.koin
 import com.sap.ec.event.SdkEvent
+import com.sap.ec.mobileengage.inapp.view.InlineInAppView
 import io.ktor.utils.io.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import org.koin.core.qualifier.named
+import platform.UIKit.UIViewController
 import kotlin.experimental.ExperimentalObjCName
 
 typealias EngagementCloudEventListener = (SdkEvent) -> Unit
@@ -29,6 +32,7 @@ object IosEngagementCloud {
     init {
         SdkKoinIsolationContext.init()
     }
+
     private var eventListeners: MutableList<EngagementCloudEventListener> = mutableListOf()
 
     val setup: IosSetupApi

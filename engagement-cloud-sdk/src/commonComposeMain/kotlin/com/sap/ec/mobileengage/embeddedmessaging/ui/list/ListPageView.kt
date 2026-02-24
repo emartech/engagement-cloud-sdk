@@ -58,7 +58,7 @@ import com.sap.ec.mobileengage.embeddedmessaging.ui.translation.LocalStringResou
 import kotlinx.coroutines.launch
 
 @Composable
-fun ListPageView(
+fun EmbeddedMessagingView(
     showFilters: Boolean = true,
     customMessageItem: (@Composable (message: CustomMessageItemViewModelApi, isSelected: Boolean) -> Unit)? = null
 ) {

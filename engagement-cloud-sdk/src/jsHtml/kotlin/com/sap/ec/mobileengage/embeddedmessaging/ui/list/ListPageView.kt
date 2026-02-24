@@ -426,46 +426,6 @@ fun FilteredMessageItemsListEmptyState(
     }
 }
 
-@OptIn(ExperimentalJsExport::class)
-@JsExport
-fun testEmbeddedMessaging(rootElementId: String) {
-    val element = kotlinx.browser.document.getElementById(rootElementId)
-        ?: error("No element with id='$rootElementId' found")
-    renderComposable(root = element) {
-        ListPageView()
-    }
-}
-
-@OptIn(ExperimentalJsExport::class)
-@JsExport
-fun testCompactView(rootElementId: String) {
-    val element = kotlinx.browser.document.getElementById(rootElementId)
-        ?: error("No element with id='$rootElementId' found")
-    renderComposable(root = element) {
-        CompactListView() {}
-    }
-}
-
-@OptIn(ExperimentalJsExport::class)
-@JsExport
-fun listViewTag(rootElement: Element, customMessageItemElementName: String?) {
-    renderComposable(root = rootElement) {
-        ListPageView(
-            customMessageItemElementName
-        )
-    }
-}
-
-@OptIn(ExperimentalJsExport::class)
-@JsExport
-fun compactViewTag(rootElement: Element, customMessageItemElementName: String?) {
-    renderComposable(root = rootElement) {
-        CompactListView(
-            customMessageItemElementName
-        ) {}
-    }
-}
-
 fun observePrefetch(onTrigger: () -> Unit): IntersectionObserver {
     val target: web.dom.Element? = document.querySelector("[shouldLoadNextPage]")
     val observer = IntersectionObserver(

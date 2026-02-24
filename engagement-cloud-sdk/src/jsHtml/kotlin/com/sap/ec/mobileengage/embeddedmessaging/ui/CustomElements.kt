@@ -67,8 +67,6 @@ abstract class ComposeCustomElement(
     }
 }
 
-@OptIn(ExperimentalJsExport::class)
-@JsExport
 class ECMessagingListElement : ComposeCustomElement({ _ ->
     { attributes ->
         val customMessageItemName = attributes["custom-message-item-element-name"]
@@ -80,8 +78,6 @@ class ECMessagingListElement : ComposeCustomElement({ _ ->
     }
 })
 
-@OptIn(ExperimentalJsExport::class)
-@JsExport
 class ECMessagingCompactListElement : ComposeCustomElement({ self ->
     { attributes ->
         val customMessageItemName = attributes["custom-message-item-element-name"]
@@ -93,8 +89,6 @@ class ECMessagingCompactListElement : ComposeCustomElement({ self ->
     }
 })
 
-@OptIn(ExperimentalJsExport::class)
-@JsExport
 class ECInlineInAppView : ComposeCustomElement({ self ->
     { attributes ->
         attributes["view-id"]?.let {

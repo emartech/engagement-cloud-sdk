@@ -6,8 +6,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.UIKitView
 import androidx.compose.ui.window.ComposeUIViewController
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.CustomMessageItemViewModelApi
-import com.sap.ec.mobileengage.embeddedmessaging.ui.list.CompactListView
-import com.sap.ec.mobileengage.embeddedmessaging.ui.list.ListPageView
+import com.sap.ec.mobileengage.embeddedmessaging.ui.list.EmbeddedMessagingCompactView
+import com.sap.ec.mobileengage.embeddedmessaging.ui.list.EmbeddedMessagingView
 import com.sap.ec.networking.clients.embedded.messaging.model.MessageCategory
 import platform.UIKit.UIViewController
 
@@ -35,7 +35,7 @@ class IosEmbeddedMessaging(private val embeddedMessaging: EmbeddedMessagingApi) 
         customMessageItem: ((viewModel: CustomMessageItemViewModelApi, isSelected: Boolean) -> UIViewController)?
     ): UIViewController {
         return ComposeUIViewController {
-            ListPageView(
+            EmbeddedMessagingView(
                 showFilters,
                 customMessageItem = customMessageItem?.let { customItem ->
                     @Composable { viewModel: CustomMessageItemViewModelApi, isSelected: Boolean ->
@@ -50,7 +50,7 @@ class IosEmbeddedMessaging(private val embeddedMessaging: EmbeddedMessagingApi) 
         customMessageItem: ((viewModel: CustomMessageItemViewModelApi, isSelected: Boolean) -> UIViewController)?
     ): UIViewController {
         return ComposeUIViewController {
-            CompactListView(
+            EmbeddedMessagingCompactView(
                 onNavigate = onNavigate,
                 customMessageItem = customMessageItem?.let { customItem ->
                     @Composable { viewModel: CustomMessageItemViewModelApi, isSelected: Boolean ->
