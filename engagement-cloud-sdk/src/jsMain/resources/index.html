@@ -60,7 +60,8 @@
 
         const config = {applicationCode: "EMSE3-B4341"};
 
-        await engagementCloud.setup.enable(config);
+        await engagementCloud.setup.enable(config, async () => { return {contactFieldValue: "test@test.com"} });
+        await engagementCloud.setup.setOnContactLinkingFailedCallback(async () => { return {contactFieldValue: "test@test.com"} });
         await engagementCloud.contact.link("test@test.com");
         engagementCloud.events.on("app_event", (event) => console.log(JSON.stringify(event)));
     }
@@ -75,7 +76,8 @@
                 "/ec-service-worker.js"
             )
         )
-        await engagementCloud.setup.enable(config);
+        await engagementCloud.setup.enable(config, async () => { return {contactFieldValue: "test2@test.com"} });
+        await engagementCloud.setup.setOnContactLinkingFailedCallback(async () => { return {contactFieldValue: "test2@test.com"} });
         await engagementCloud.contact.link("test2@test.com");
     }
 
@@ -97,7 +99,7 @@
     }
 
     engagementCloud.ready.then(() => {
-        document.querySelector('ec-embedded-messaging-compact-list')
+        document.querySelector('ec-embedded-messaging-compact')
             .addEventListener('navigate', (e) => {
                 console.log("Navigating to somewhere.");
             });
