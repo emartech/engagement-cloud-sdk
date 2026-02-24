@@ -1,6 +1,7 @@
 package com.sap.ec.enable
 
 import JsEngagementCloudSDKConfig
+import com.sap.ec.context.DefaultUrls
 import com.sap.ec.context.SdkContext
 import com.sap.ec.core.log.LogLevel
 import com.sap.ec.core.storage.StringStorageApi
@@ -46,12 +47,13 @@ class PlatformInitStateTests : KoinTest {
         koin.loadModules(listOf(testModule))
 
         testSdkContext = SdkContext(
-            StandardTestDispatcher(),
-            StandardTestDispatcher(),
-            mock(),
-            LogLevel.Info,
-            mutableSetOf(),
-            logBreadcrumbsQueueSize = 10
+            sdkDispatcher = StandardTestDispatcher(),
+            mainDispatcher = StandardTestDispatcher(),
+            defaultUrls = DefaultUrls("", "", "", "", "", "", ""),
+            remoteLogLevel = LogLevel.Error,
+            features = mutableSetOf(),
+            logBreadcrumbsQueueSize = 10,
+            onContactLinkingFailed = null
         )
         mockPushService = mock()
         everySuspend { mockPushService.register(any()) } returns Unit
