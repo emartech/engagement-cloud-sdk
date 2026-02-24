@@ -36,11 +36,30 @@ class RemoteLoggerTests {
     }
 
     @Test
-    fun testLogToRemote_whenRemoteLogLevelIsLowerThanLogLevel() = runTest {
-        val logLevel = LogLevel.Info
-        every { mockSdkContext.remoteLogLevel } returns LogLevel.Debug
+    fun testLogToRemote_shouldRegisterLogEvent_whenRemoteLogLevelIsLowerThanLogLevel() = runTest {
+        val logLevel = LogLevel.Error
+        every { mockSdkContext.remoteLogLevel } returns LogLevel.Info
+
         val logMessage = JsonObject(mapOf("message" to JsonPrimitive("This is a test log")))
-        everySuspend { mockLogEventRegistry.registerLogEvent(any()) }  returns Unit
+        val eventCapture = slot<SdkEvent.Internal.Sdk.Log>()
+        everySuspend { mockLogEventRegistry.registerLogEvent(capture(eventCapture)) } returns Unit
+
+        remoteLogger.logToRemote(logLevel, logMessage)
+
+        val capturedEvent: SdkEvent.Internal.Sdk.Log = eventCapture.get()
+        verifySuspend {
+            mockLogEventRegistry.registerLogEvent(capturedEvent)
+        }
+        capturedEvent.level shouldBe logLevel
+        capturedEvent.name shouldBe "log"
+        capturedEvent.attributes shouldBe logMessage
+    }
+
+    @Test
+    fun testLogToRemote_shouldNotRegisterLogEvent_whenRemoteLogLevelIsHigher() = runTest {
+        val logLevel = LogLevel.Info
+        every { mockSdkContext.remoteLogLevel } returns LogLevel.Error
+        val logMessage = JsonObject(mapOf("message" to JsonPrimitive("This is a test log")))
 
         remoteLogger.logToRemote(logLevel, logMessage)
 
@@ -50,27 +69,7 @@ class RemoteLoggerTests {
     }
 
     @Test
-    fun testLogToRemote_whenRemoteLogLevelIsHigher() = runTest {
-        val logLevel = LogLevel.Info
-        every { mockSdkContext.remoteLogLevel } returns LogLevel.Error
-
-        val logMessage = JsonObject(mapOf("message" to JsonPrimitive("This is a test log")))
-        val eventCapture = slot<SdkEvent.Internal.Sdk.Log>()
-        everySuspend { mockLogEventRegistry.registerLogEvent(capture(eventCapture)) }  returns Unit
-
-        remoteLogger.logToRemote(logLevel, logMessage)
-
-        verifySuspend {
-            mockLogEventRegistry.registerLogEvent(any())
-        }
-        val capturedEvent: SdkEvent.Internal.Sdk.Log = eventCapture.get()
-        capturedEvent.level shouldBe logLevel
-        capturedEvent.name shouldBe "log"
-        capturedEvent.attributes shouldBe logMessage
-    }
-
-    @Test
-    fun testLogToRemote_whenRemoteLogLevelEqualsLogLevel() = runTest {
+    fun testLogToRemote_shouldRegisterLogEvent_whenRemoteLogLevelEqualsLogLevel() = runTest {
         val logLevel = LogLevel.Info
         every { mockSdkContext.remoteLogLevel } returns LogLevel.Info
 

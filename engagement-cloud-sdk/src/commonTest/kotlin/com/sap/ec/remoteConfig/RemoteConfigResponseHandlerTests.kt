@@ -68,7 +68,6 @@ class RemoteConfigResponseHandlerTests {
                 )
             )
         )
-
         everySuspend { mockDeviceInfoCollector.getClientId() } returns clientId
         every { mockRandomProvider.provide() } returns 0.1
         every { mockSdkContext.defaultUrls = capture(defaultUrlSlot) } returns Unit
