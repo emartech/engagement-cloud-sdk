@@ -11,7 +11,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalWasmJsInterop::class)
 class JsEmbeddedMessagingTests {
     private companion object {
         val CATEGORIES = listOf(
@@ -33,21 +33,21 @@ class JsEmbeddedMessagingTests {
     fun `categories should return same value as embeddedMessaging categories`() {
         every { mockEmbeddedMessaging.categories } returns CATEGORIES
 
-        embeddedMessaging.categories shouldBe CATEGORIES
+        embeddedMessaging.getCategories() shouldBe CATEGORIES
     }
 
     @Test
     fun `isUnreadFilterActive should return same value as embeddedMessaging`() {
         every { mockEmbeddedMessaging.isUnreadFilterActive } returns true
 
-        embeddedMessaging.isUnreadFilterActive shouldBe true
+        embeddedMessaging.isUnreadFilterActive() shouldBe true
     }
 
     @Test
-    fun `activeCategoryFilters should return same value as embeddedMessaging`() {
+    fun `getActiveCategoryFilters should return same value as embeddedMessaging`() {
         every { mockEmbeddedMessaging.activeCategoryFilters } returns CATEGORIES
 
-        embeddedMessaging.activeCategoryFilters shouldBe CATEGORIES
+        embeddedMessaging.getActiveCategoryFilters() shouldBe CATEGORIES.toJsArray()
     }
 
     @Test
@@ -59,7 +59,7 @@ class JsEmbeddedMessagingTests {
 
     @Test
     fun `filterByCategories should delegate call to embeddedMessaging`() {
-        embeddedMessaging.filterByCategories(CATEGORIES)
+        embeddedMessaging.filterByCategories(CATEGORIES.toJsArray())
 
         verify { mockEmbeddedMessaging.filterByCategories(CATEGORIES) }
     }
