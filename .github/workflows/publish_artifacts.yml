@@ -45,6 +45,8 @@ permissions:
   contents: write
   packages: write
   actions: read
+  pages: write
+  id-token: write
 
 
 jobs:
@@ -138,13 +140,73 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Assemble Pure JS Artifacts for CDN
+        run: |
+          mkdir -p dist/cdn/${{ env.VERSION }}
+          
+          # Copy main SDK bundle
+          cp engagement-cloud-sdk/build/kotlin-webpack/js/productionExecutable/engagement-cloud-sdk-html.js \
+            dist/cdn/${{ env.VERSION }}/engagement-cloud-sdk.js
+          
+          # Copy TypeScript definitions
+          cp build/js/packages/engagement-cloud-sdk/kotlin/engagement-cloud-sdk-html.d.ts \
+            dist/cdn/${{ env.VERSION }}/engagement-cloud-sdk.d.ts 2>/dev/null || true
+          
+          # Copy loader script
+          cp engagement-cloud-sdk/src/jsHtml/resources/engagement-cloud-sdk-loader.js \
+            dist/cdn/${{ env.VERSION }}/engagement-cloud-sdk-loader.js
+          
+          # Copy service worker
+          cp web-push-service-worker/build/kotlin-webpack/js/productionExecutable/ec-service-worker.js \
+            dist/cdn/${{ env.VERSION }}/ec-service-worker.js
+          
+          # Create latest symlink content (copy same files to latest/)
+          mkdir -p dist/cdn/latest
+          cp dist/cdn/${{ env.VERSION }}/* dist/cdn/latest/
+          
+          # Create zip for GitHub Release
+          cd dist/cdn/${{ env.VERSION }}
+          zip -r ../engagement-cloud-sdk-web-${{ env.VERSION }}.zip .
+          cd -
+          
+          echo "CDN artifacts assembled:"
+          ls -la dist/cdn/${{ env.VERSION }}/
+          ls -la dist/cdn/
+
+      - name: Deploy to GitHub Pages
+        if: env.DRY_RUN != 'true'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist/cdn
+          keep_files: true
+          destination_dir: .
+
+      - name: Upload JS Web Bundle to GitHub Release
+        if: env.DRY_RUN != 'true'
+        run: |
+          # Create release if it doesn't exist (iOS pipeline may have created it)
+          gh release create ${{ env.VERSION }} \
+            --title "Release ${{ env.VERSION }}" \
+            --prerelease \
+            --generate-release-notes || true
+          
+          # Upload web bundle zip
+          gh release upload ${{ env.VERSION }} \
+            dist/cdn/engagement-cloud-sdk-web-${{ env.VERSION }}.zip \
+            --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Upload JS artifacts
         uses: actions/upload-artifact@v6
         with:
           name: js-artifacts
           retention-days: 1
           if-no-files-found: error
-          path: dist/npm/
+          path: |
+            dist/npm/
+            dist/cdn/${{ env.VERSION }}/
 
 
   ios-pipeline:

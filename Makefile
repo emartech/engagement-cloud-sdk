@@ -181,6 +181,7 @@ pipeline-android: check-env
 pipeline-js: check-env
 	@./gradlew \
 		:engagement-cloud-sdk:jsBrowserProductionWebpack \
+		:web-push-service-worker:jsBrowserProductionWebpack \
 		:engagement-cloud-sdk:jsBrowserTest \
 		-Pjs.variant=html \
 		-x :composeApp:jsBrowserProductionWebpack \
