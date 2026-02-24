@@ -1,38 +1,39 @@
 // swift-tools-version:5.3
 import PackageDescription
 
-// BEGIN KMMBRIDGE VARIABLES BLOCK FOR 'EngagementCloudSDK' (do not edit)
-let SdkPackageName = "EngagementCloudSDK"
-// END KMMBRIDGE BLOCK FOR 'EngagementCloudSDK'
+let engagementCloudSDKPackageName = "EngagementCloudSDK"
+let engagementCloudSDKUrl = "__SDK_URL__"
+let engagementCloudSDKChecksum = "__SDK_CHECKSUM__"
 
-// BEGIN KMMBRIDGE VARIABLES BLOCK FOR 'EngagementCloudNotificationService' (do not edit)
-let NotificationServicePackageName = "EngagementCloudNotificationService"
-// END KMMBRIDGE BLOCK FOR 'EngagementCloudNotificationService'
-
+let engagementCloudNotificationServicePackageName = "EngagementCloudNotificationService"
+let engagementCloudNotificationServiceUrl = "__NS_URL__"
+let engagementCloudNotificationServiceChecksum = "__NS_CHECKSUM__"
 
 let package = Package(
-    name: SdkPackageName,
+    name: engagementCloudSDKPackageName,
     platforms: [
         .iOS(.v13)
     ],
     products: [
         .library(
-            name: SdkPackageName,
-            targets: [SdkPackageName]
+            name: engagementCloudSDKPackageName,
+            targets: [engagementCloudSDKPackageName]
         ),
         .library(
-            name: NotificationServicePackageName,
-            targets: [NotificationServicePackageName]
+            name: engagementCloudNotificationServicePackageName,
+            targets: [engagementCloudNotificationServicePackageName]
         ),
     ],
     targets: [
         .binaryTarget(
-            name: SdkPackageName,
-            path: "./engagement-cloud-sdk/build/XCFrameworks/debug/\(SdkPackageName).xcframework"
+            name: engagementCloudSDKPackageName,
+            url: engagementCloudSDKUrl,
+            checksum: engagementCloudSDKChecksum
         ),
         .binaryTarget(
-            name: NotificationServicePackageName,
-            path: "./ios-notification-service/build/XCFrameworks/debug/\(NotificationServicePackageName).xcframework"
+            name: engagementCloudNotificationServicePackageName,
+            url: engagementCloudNotificationServiceUrl,
+            checksum: engagementCloudNotificationServiceChecksum
         ),
     ]
 )

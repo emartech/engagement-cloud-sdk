@@ -114,7 +114,7 @@ prepare-local-spm: check-env
 	@./gradlew \
 		-PENABLE_PUBLISHING=true \
 		spmDevBuild && \
-		cp -f "./spmLocalRelease/Package.swift" "./Package.swift" && \
+		cp -f "./iosReleaseSpm/Package.swift" "./Package.swift" && \
 		echo "Local Swift Package is prepared."
 
 publish-maven: check-env

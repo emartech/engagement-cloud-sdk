@@ -28,11 +28,11 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: SdkPackageName,
-            path: "./engagement-cloud-sdk/build/XCFrameworks/debug/\(SdkPackageName).xcframework"
+            path: "../engagement-cloud-sdk/build/XCFrameworks/debug/\(SdkPackageName).xcframework"
         ),
         .binaryTarget(
             name: NotificationServicePackageName,
-            path: "./ios-notification-service/build/XCFrameworks/debug/\(NotificationServicePackageName).xcframework"
+            path: "../ios-notification-service/build/XCFrameworks/debug/\(NotificationServicePackageName).xcframework"
         ),
     ]
 )
