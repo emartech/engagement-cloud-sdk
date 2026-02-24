@@ -8,7 +8,7 @@
     const baseUrl = currentSource.substring(0, currentSource.lastIndexOf('/'));
     const sdkUrl = `${baseUrl}/engagement-cloud-sdk-html.js`
 
-    global.SAPEngagementCloud = {
+    global.EngagementCloud = {
         ready: sdkReady,
         setup: createApiSegment('setup', ['enable', 'disable', 'isEnabled']),
         config: createApiSegment('config', [

@@ -8,7 +8,7 @@ describe('engagement-cloud-sdk-loader', function () {
     it('should register Engagement Cloud API on window', async () => {
         const {window} = await createTestEnvironment();
 
-        assert.notEqual(window.SAPEngagementCloud, undefined);
+        assert.notEqual(window.EngagementCloud, undefined);
 
         window.close()
     })
@@ -36,25 +36,25 @@ describe('engagement-cloud-sdk-loader', function () {
             window.close()
         }
     )
-    it('should create all api segments on the SAPEngagementCloud object', async () => {
+    it('should create all api segments on the EngagementCloud object', async () => {
             const apiSegments = ['setup', 'config', 'contact', 'event', 'push', 'deepLink', 'inApp', 'events']
             const {window} = await createTestEnvironment();
 
             apiSegments.forEach((segment) => {
-                assert.equal(window.SAPEngagementCloud[segment] !== undefined, true);
+                assert.equal(window.EngagementCloud[segment] !== undefined, true);
             })
 
             window.close()
         }
     )
-    it('should gather calls before SDK is loaded and replay them to SAPEngagementCloud after loading is done', async () => {
-            const {window, mockDisableTracking} = await createTestEnvironment();
+    it('should gather calls before SDK is loaded and replay them to EngagementCloud after loading is done', async () => {
+            const {window, mockDisable} = await createTestEnvironment();
 
-            await window.SAPEngagementCloud.setup.disableTracking()
+            await window.EngagementCloud.setup.disable()
 
             triggerSDKLoadedEvent(window)
 
-            assert.equal(mockDisableTracking.mock.callCount(), 1)
+            assert.equal(mockDisable.mock.callCount(), 1)
 
             window.close()
         }
@@ -63,7 +63,7 @@ describe('engagement-cloud-sdk-loader', function () {
             const testPushToken = "testPushToken";
             const {window, mockRegisterPushToken} = await createTestEnvironment();
 
-            await window.SAPEngagementCloud.push.registerPushToken(testPushToken);
+            await window.EngagementCloud.push.registerPushToken(testPushToken);
 
             triggerSDKLoadedEvent(window)
 
@@ -79,22 +79,22 @@ describe('engagement-cloud-sdk-loader', function () {
             const {
                 window,
                 mockRegisterPushToken,
-                mockDisableTracking,
+                mockDisable,
                 mockTrackCustomEvent
             } = await createTestEnvironment();
-            const spyGathererDisableTracking = testContext.mock.method(window.SAPEngagementCloud.setup, "disableTracking")
-            const spyGathererRegisterPushToken = testContext.mock.method(window.SAPEngagementCloud.push, "registerPushToken")
-            const spyGathererTrackCustomEvent = testContext.mock.method(window.SAPEngagementCloud.event, "trackEvent")
+            const spyGathererDisable = testContext.mock.method(window.EngagementCloud.setup, "disable")
+            const spyGathererRegisterPushToken = testContext.mock.method(window.EngagementCloud.push, "registerPushToken")
+            const spyGathererTrackCustomEvent = testContext.mock.method(window.EngagementCloud.event, "trackEvent")
 
-            await window.SAPEngagementCloud.setup.disableTracking();
-            await window.SAPEngagementCloud.push.registerPushToken(testPushToken);
+            await window.EngagementCloud.setup.disable();
+            await window.EngagementCloud.push.registerPushToken(testPushToken);
 
             triggerSDKLoadedEvent(window)
 
-            await window.SAPEngagementCloud.event.trackEvent(testEvent);
+            await window.EngagementCloud.event.trackEvent(testEvent);
 
-            assert.equal(spyGathererDisableTracking.mock.callCount(), 1)
-            assert.equal(mockDisableTracking.mock.callCount(), 1)
+            assert.equal(spyGathererDisable.mock.callCount(), 1)
+            assert.equal(mockDisable.mock.callCount(), 1)
 
             assert.equal(spyGathererRegisterPushToken.mock.callCount(), 1)
             assert.equal(mockRegisterPushToken.mock.callCount(), 1)
@@ -106,14 +106,14 @@ describe('engagement-cloud-sdk-loader', function () {
             window.close()
         }
     )
-    it('should delegate call to SAPEngagementCloud after the sdk is loaded', async () => {
-            const {window, mockDisableTracking} = await createTestEnvironment();
+    it('should delegate call to EngagementCloud after the sdk is loaded', async () => {
+            const {window, mockDisable} = await createTestEnvironment();
 
             triggerSDKLoadedEvent(window)
 
-            await window.SAPEngagementCloud.setup.disableTracking()
+            await window.EngagementCloud.setup.disable()
 
-            assert.equal(mockDisableTracking.mock.callCount(), 1)
+            assert.equal(mockDisable.mock.callCount(), 1)
 
             window.close()
         }
@@ -142,7 +142,7 @@ function triggerSDKLoadedEvent(window) {
 }
 
 async function createTestEnvironment() {
-    const mockDisableTracking = mock.fn()
+    const mockDisable = mock.fn()
     const mockRegisterPushToken = mock.fn()
     const mockTrackCustomEvent = mock.fn()
     const baseURL = pathToFileURL(path.resolve('./')).href;
@@ -172,7 +172,7 @@ async function createTestEnvironment() {
     }
 
     dom.window["engagement-cloud-sdk"] = {
-        SAPEngagementCloud: engagementCloudHtml,
+        EngagementCloud: engagementCloudHtml,
     };
 
     return {
