@@ -1,11 +1,11 @@
 package com.sap.ec.networking.clients.contact
 
-import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventManagerApi
 import com.sap.ec.core.db.events.EventsDaoApi
 import com.sap.ec.core.exceptions.SdkException.NetworkIOException
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.clients.NetworkClientApi
+import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.networking.model.UrlRequest
 import com.sap.ec.core.url.ECUrlType
 import com.sap.ec.core.url.UrlFactoryApi
@@ -28,7 +28,6 @@ internal class ContactClient(
     private val clientExceptionHandler: ClientExceptionHandler,
     private val sdkEventManager: SdkEventManagerApi,
     private val urlFactory: UrlFactoryApi,
-    private val sdkContext: SdkContextApi,
     private val contactTokenHandler: ContactTokenHandlerApi,
     private val ecSdkSession: SessionApi,
     private val eventsDao: EventsDaoApi,
@@ -58,7 +57,7 @@ internal class ContactClient(
                         if (it.status != HttpStatusCode.NoContent) {
                             contactTokenHandler.handleContactTokens(it)
                         }
-                        handleSuccess(sdkEvent)
+                        handleSuccess(sdkEvent, it)
                     }
                     response.onFailure { throwable ->
                         handleException(throwable, sdkEvent)
@@ -86,21 +85,17 @@ internal class ContactClient(
         )
     }
 
-    private suspend fun handleSuccess(event: OnlineSdkEvent) {
+    private suspend fun handleSuccess(event: OnlineSdkEvent, response: Response) {
         when (event) {
             is SdkEvent.Internal.Sdk.LinkContact -> {
-                sdkContext.contactFieldValue = event.contactFieldValue
                 ecSdkSession.startSession()
             }
 
             is SdkEvent.Internal.Sdk.LinkAuthenticatedContact -> {
-                sdkContext.openIdToken = event.openIdToken
                 ecSdkSession.startSession()
             }
 
             is SdkEvent.Internal.Sdk.UnlinkContact -> {
-                sdkContext.contactFieldValue = null
-                sdkContext.openIdToken = null
                 ecSdkSession.endSession()
             }
 
@@ -108,6 +103,12 @@ internal class ContactClient(
         }
 
         event.ack(eventsDao, sdkLogger)
+        sdkEventManager.emitEvent(
+            SdkEvent.Internal.Sdk.Answer.Response(
+                originId = event.id,
+                Result.success(response)
+            )
+        )
     }
 
     private fun isContactEvent(event: OnlineSdkEvent): Boolean {

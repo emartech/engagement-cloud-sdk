@@ -32,7 +32,6 @@ object ContactInjection {
                 clientExceptionHandler = get(),
                 sdkEventManager = get(),
                 urlFactory = get(),
-                sdkContext = get(),
                 contactTokenHandler = get(),
                 ecSdkSession = get(),
                 eventsDao = get(),

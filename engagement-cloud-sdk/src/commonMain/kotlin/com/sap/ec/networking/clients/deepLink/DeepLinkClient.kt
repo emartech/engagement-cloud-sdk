@@ -62,6 +62,12 @@ internal class DeepLinkClient(
                     )
                     response.onSuccess {
                         sdkEvent.ack(eventsDao, sdkLogger)
+                        sdkEventManager.emitEvent(
+                            SdkEvent.Internal.Sdk.Answer.Response(
+                                originId = sdkEvent.id,
+                                Result.success(it)
+                            )
+                        )
                     }
                     response.onFailure { error ->
                         handleException(error, sdkEvent)

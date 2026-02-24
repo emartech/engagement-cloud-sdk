@@ -122,7 +122,8 @@ class ConfigClientTests {
         every { mockUrlFactory.create(ECUrlType.ChangeApplicationCode) }.returns(
             TEST_BASE_URL
         )
-        everySuspend { mockEcClient.send(any()) }.returns(Result.success(createTestResponse("{}")))
+        val testResponse = createTestResponse("{}")
+        everySuspend { mockEcClient.send(any()) }.returns(Result.success(testResponse))
         every { mockConfig.copyWith("NewAppCode") } returns mockConfig
         every { mockConfig.applicationCode } returns "testApplicationCode"
         val changeAppCode = SdkEvent.Internal.Sdk.ChangeAppCode(
@@ -149,6 +150,12 @@ class ConfigClientTests {
             mockFollowUpChangeAppCodeOrganizer.organize()
             mockSdkContext.setSdkState(SdkState.Active)
             mockEventsDao.removeEvent(changeAppCode)
+            mockSdkEventManager.emitEvent(
+                SdkEvent.Internal.Sdk.Answer.Response(
+                    originId = changeAppCode.id,
+                    Result.success(testResponse)
+                )
+            )
         }
         verifySuspend(VerifyMode.exactly(0)) { mockSdkLogger.error(any(), any<Throwable>()) }
     }

@@ -72,6 +72,8 @@ class ContactClientTests {
     private lateinit var sdkDispatcher: CoroutineDispatcher
     private lateinit var contactClient: ContactClient
 
+    private lateinit var testResponse: Response
+
     @BeforeTest
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
@@ -94,7 +96,8 @@ class ContactClientTests {
         sdkDispatcher = StandardTestDispatcher()
         every { mockSdkContext.config } returns mockConfig
         everySuspend { mockContactTokenHandler.handleContactTokens(any()) } returns Unit
-        everySuspend { mockEcClient.send(any()) } returns (Result.success(createTestResponse("{}")))
+        testResponse = createTestResponse("{}")
+        everySuspend { mockEcClient.send(any()) } returns (Result.success(testResponse))
         every { mockUrlFactory.create(ECUrlType.LinkContact) } returns TEST_BASE_URL
         every { mockUrlFactory.create(ECUrlType.UnlinkContact) } returns TEST_BASE_URL
         everySuspend { mockLogger.error(any(), any<Throwable>()) } calls {
@@ -106,7 +109,6 @@ class ContactClientTests {
             mockClientExceptionHandler,
             mockSdkEventManager,
             mockUrlFactory,
-            mockSdkContext,
             mockContactTokenHandler,
             mockEcSdkSession,
             mockEventsDao,
@@ -138,9 +140,16 @@ class ContactClientTests {
         verify { mockUrlFactory.create(any()) }
         verifySuspend { mockEcClient.send(any()) }
         verifySuspend { mockContactTokenHandler.handleContactTokens(any()) }
-        verifySuspend { mockSdkContext.contactFieldValue = CONTACT_FIELD_VALUE }
         verifySuspend { mockEcSdkSession.startSession() }
         verifySuspend { mockEventsDao.removeEvent(linkContactEvent) }
+        verifySuspend {
+            mockSdkEventManager.emitEvent(
+                SdkEvent.Internal.Sdk.Answer.Response(
+                    originId = linkContactEvent.id,
+                    Result.success(testResponse)
+                )
+            )
+        }
 
     }
 
@@ -148,12 +157,13 @@ class ContactClientTests {
     fun testConsumer_should_not_call_contactTokenHandler_when_client_responds_with_204() = runTest {
         contactClient.register()
 
+        val test204Response = createTestResponse(
+            "{}",
+            HttpStatusCode.NoContent
+        )
         everySuspend { mockEcClient.send(any()) }.returns(
             Result.success(
-                createTestResponse(
-                    "{}",
-                    HttpStatusCode.NoContent
-                )
+                test204Response
             )
         )
         val linkContactEvent = SdkEvent.Internal.Sdk.LinkContact(
@@ -170,15 +180,20 @@ class ContactClientTests {
         verifySuspend(VerifyMode.exactly(0)) { mockContactTokenHandler.handleContactTokens(any()) }
         verifySuspend { mockEcSdkSession.startSession() }
         verifySuspend { mockEventsDao.removeEvent(linkContactEvent) }
+        verifySuspend {
+            mockSdkEventManager.emitEvent(
+                SdkEvent.Internal.Sdk.Answer.Response(
+                    originId = linkContactEvent.id,
+                    Result.success(test204Response)
+                )
+            )
+        }
     }
 
     @Test
     fun testConsumer_should_call_client_with_linkAuthenticatedContact_request() = runTest {
         contactClient.register()
 
-        everySuspend { mockEcClient.send(any()) }.returns(
-            Result.success(createTestResponse("{}"))
-        )
         val linkAuthenticatedContactEvent = SdkEvent.Internal.Sdk.LinkAuthenticatedContact(
             "linkAuthenticatedContact",
             openIdToken = OPEN_ID_TOKEN
@@ -191,9 +206,16 @@ class ContactClientTests {
         verify { mockUrlFactory.create(any()) }
         verifySuspend { mockEcClient.send(any()) }
         verifySuspend { mockContactTokenHandler.handleContactTokens(any()) }
-        verifySuspend { mockSdkContext.openIdToken = OPEN_ID_TOKEN }
         verifySuspend { mockEcSdkSession.startSession() }
         verifySuspend { mockEventsDao.removeEvent(linkAuthenticatedContactEvent) }
+        verifySuspend {
+            mockSdkEventManager.emitEvent(
+                SdkEvent.Internal.Sdk.Answer.Response(
+                    originId = linkAuthenticatedContactEvent.id,
+                    Result.success(testResponse)
+                )
+            )
+        }
     }
 
     @Test
@@ -209,10 +231,16 @@ class ContactClientTests {
         verify { mockUrlFactory.create(any()) }
         verifySuspend { mockEcClient.send(any()) }
         verifySuspend { mockContactTokenHandler.handleContactTokens(any()) }
-        verifySuspend { mockSdkContext.contactFieldValue = null }
-        verifySuspend { mockSdkContext.openIdToken = null }
         verifySuspend { mockEcSdkSession.endSession() }
         verifySuspend { mockEventsDao.removeEvent(unlinkContactEvent) }
+        verifySuspend {
+            mockSdkEventManager.emitEvent(
+                SdkEvent.Internal.Sdk.Answer.Response(
+                    originId = unlinkContactEvent.id,
+                    Result.success(testResponse)
+                )
+            )
+        }
     }
 
     @Test
@@ -244,6 +272,14 @@ class ContactClientTests {
                 unlinkContactEvent
             )
         }
+        verifySuspend(VerifyMode.exactly(0)) {
+            mockSdkEventManager.emitEvent(
+                SdkEvent.Internal.Sdk.Answer.Response(
+                    originId = unlinkContactEvent.id,
+                    Result.success(Unit)
+                )
+            )
+        }
     }
 
     @Test
@@ -255,9 +291,9 @@ class ContactClientTests {
             everySuspend { mockEcClient.send(any()) } throws testException
             everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
 
-            val unlinkContact = SdkEvent.Internal.Sdk.UnlinkContact("unlinkContact")
+            val unlinkContactEvent = SdkEvent.Internal.Sdk.UnlinkContact("unlinkContact")
 
-            onlineEvents.emit(unlinkContact)
+            onlineEvents.emit(unlinkContactEvent)
 
             advanceUntilIdle()
 
@@ -267,13 +303,19 @@ class ContactClientTests {
                 mockClientExceptionHandler.handleException(
                     testException,
                     any(),
-                    unlinkContact
+                    unlinkContactEvent
                 )
             }
             verifySuspend(VerifyMode.exactly(0)) {
                 mockContactTokenHandler.handleContactTokens(any())
+                mockSdkEventManager.emitEvent(
+                    SdkEvent.Internal.Sdk.Answer.Response(
+                        originId = unlinkContactEvent.id,
+                        Result.success(Unit)
+                    )
+                )
             }
-      
+
         }
 
 

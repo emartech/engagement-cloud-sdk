@@ -64,6 +64,12 @@ internal class ConfigClient(
 
                         sdkContext.setSdkState(SdkState.Active)
                         sdkEvent.ack(eventsDao, sdkLogger)
+                        sdkEventManager.emitEvent(
+                            SdkEvent.Internal.Sdk.Answer.Response(
+                                originId = sdkEvent.id,
+                                Result.success(it)
+                            )
+                        )
                     }
                     response.onFailure { throwable ->
                         handleException(throwable, sdkEvent)
