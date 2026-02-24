@@ -3,6 +3,9 @@ package com.sap.ec.remoteConfig
 import com.sap.ec.context.DefaultUrls
 import com.sap.ec.context.DefaultUrlsApi
 import com.sap.ec.context.Features
+import com.sap.ec.context.Features.EmbeddedMessaging
+import com.sap.ec.context.Features.JsBridgeSignatureCheck
+import com.sap.ec.context.Features.MobileEngage
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.device.DeviceInfoCollectorApi
 import com.sap.ec.core.log.LogLevel
@@ -55,13 +58,25 @@ class RemoteConfigResponseHandlerTests {
     fun testHandleAppCodeBasedConfigs() = runTest {
         val defaultUrlSlot = slot<DefaultUrlsApi>()
         val clientServiceUrl = "testClientServiceUrl"
+        val eventServiceUrl = "testEventServiceUrl"
+        val deeplinkServiceUrl = "testDeepLinkServiceUrl"
+        val jsBridgeUrl = "testJsBridgeUrl"
+        val embeddedMessagingServiceUrl = "testEmbeddedMessagingServiceUrl"
         val clientId = "testClientId"
         val configResponse = RemoteConfigResponse(
             ServiceUrls(
-                clientService = clientServiceUrl
+                clientService = clientServiceUrl,
+                eventService = eventServiceUrl,
+                deepLinkService = deeplinkServiceUrl,
+                embeddedMessagingService = embeddedMessagingServiceUrl,
+                jsBridgeUrl = jsBridgeUrl
             ), LogLevel.Debug,
             LuckyLogger(LogLevel.Error, 1.0),
-            RemoteConfigFeatures(mobileEngage = true, embeddedMessaging = true),
+            RemoteConfigFeatures(
+                mobileEngage = true,
+                embeddedMessaging = true,
+                jsBridgeSignatureCheck = true
+            ),
             overrides = mapOf(
                 "differentClientId" to RemoteConfig(
                     ServiceUrls(clientService = "differentClientServiceUrl")
@@ -76,8 +91,16 @@ class RemoteConfigResponseHandlerTests {
         remoteConfigResponseHandler.handle(configResponse)
 
         defaultUrlSlot.get().clientServiceBaseUrl shouldBe clientServiceUrl
+        defaultUrlSlot.get().eventServiceBaseUrl shouldBe eventServiceUrl
+        defaultUrlSlot.get().deepLinkBaseUrl shouldBe deeplinkServiceUrl
+        defaultUrlSlot.get().embeddedMessagingBaseUrl shouldBe embeddedMessagingServiceUrl
+        defaultUrlSlot.get().jsBridgeUrl shouldBe jsBridgeUrl
         verify { mockSdkContext.remoteLogLevel = LogLevel.Error }
-        mockSdkContext.features shouldBe listOf(Features.MOBILE_ENGAGE, Features.EMBEDDED_MESSAGING)
+        mockSdkContext.features shouldBe listOf(
+            MobileEngage,
+            EmbeddedMessaging,
+            JsBridgeSignatureCheck
+        )
     }
 
     @Test
@@ -105,7 +128,7 @@ class RemoteConfigResponseHandlerTests {
 
         defaultUrlSlot.get().clientServiceBaseUrl shouldBe clientServiceUrl
         verify { mockSdkContext.remoteLogLevel = LogLevel.Error }
-        mockSdkContext.features shouldBe listOf(Features.MOBILE_ENGAGE)
+        mockSdkContext.features shouldBe listOf(MobileEngage)
     }
 
 }

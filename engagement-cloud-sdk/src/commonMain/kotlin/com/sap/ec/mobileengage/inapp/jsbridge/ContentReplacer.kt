@@ -14,7 +14,7 @@ internal class ContentReplacer(
 
     override fun replace(content: String): String {
         return content
-            .replace(JS_BRIDGE_PLACEHOLDER, sdkContext.defaultUrls.ecJsBridgeUrl)
+            .replace(JS_BRIDGE_PLACEHOLDER, sdkContext.defaultUrls.jsBridgeUrl)
             .replace(SDK_VERSION_PLACEHOLDER, sdkVersionProvider.provide())
     }
 }

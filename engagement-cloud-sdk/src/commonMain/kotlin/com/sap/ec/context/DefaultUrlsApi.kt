@@ -7,5 +7,5 @@ interface DefaultUrlsApi {
     val remoteConfigBaseUrl: String
     val loggingUrl: String
     val embeddedMessagingBaseUrl: String
-    val ecJsBridgeUrl: String
+    val jsBridgeUrl: String
 }

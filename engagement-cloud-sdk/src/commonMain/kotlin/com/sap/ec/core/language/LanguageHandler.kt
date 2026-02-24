@@ -2,6 +2,7 @@ package com.sap.ec.core.language
 
 import com.sap.ec.SdkConstants.LANGUAGE_STORAGE_KEY
 import com.sap.ec.context.Features
+import com.sap.ec.context.Features.*
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.exceptions.SdkException.PreconditionFailedException
@@ -44,7 +45,7 @@ internal class LanguageHandler(
     private suspend fun handleNetworkResult(result: Result<Unit>) {
         result.fold(
             onSuccess = {
-                if (sdkContext.features.contains(Features.EMBEDDED_MESSAGING)) {
+                if (sdkContext.features.contains(EmbeddedMessaging)) {
                     sdkEventDistributor.registerEvent(
                         SdkEvent.Internal.EmbeddedMessaging.FetchMeta()
                     ).await<Unit>()

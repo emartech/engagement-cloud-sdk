@@ -2,6 +2,7 @@ package com.sap.ec.core.language
 
 import com.sap.ec.SdkConstants.LANGUAGE_STORAGE_KEY
 import com.sap.ec.context.Features
+import com.sap.ec.context.Features.EmbeddedMessaging
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.channel.SdkEventWaiterApi
@@ -77,7 +78,7 @@ class LanguageHandlerTests {
             val fetchMetaSlot = slot<SdkEvent.Internal.EmbeddedMessaging.FetchMeta>()
             everySuspend { mockSdkEventDistributor.registerEvent(capture(fetchMetaSlot)) } returns mockEventWaiter
             everySuspend { mockStringStorage.put(any(), any()) } returns Unit
-            everySuspend { mockSdkContext.features } returns mutableSetOf(Features.EMBEDDED_MESSAGING)
+            everySuspend { mockSdkContext.features } returns mutableSetOf(EmbeddedMessaging)
 
             languageHandler.handleLanguage(null)
 
@@ -99,7 +100,7 @@ class LanguageHandlerTests {
             everySuspend { mockEventWaiter.await<Exception>() } returns failureDeviceEventResponse
             everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mockEventWaiter
             everySuspend { mockStringStorage.put(any(), any()) } returns Unit
-            everySuspend { mockSdkContext.features } returns mutableSetOf(Features.EMBEDDED_MESSAGING)
+            everySuspend { mockSdkContext.features } returns mutableSetOf(EmbeddedMessaging)
             everySuspend { mockLogger.error(any(), any<Throwable>()) } returns Unit
 
             languageHandler.handleLanguage(null)
@@ -123,7 +124,7 @@ class LanguageHandlerTests {
             val fetchMetaSlot = slot<SdkEvent.Internal.EmbeddedMessaging.FetchMeta>()
             everySuspend { mockSdkEventDistributor.registerEvent(capture(fetchMetaSlot)) } returns mockEventWaiter
             everySuspend { mockStringStorage.put(any(), any()) } returns Unit
-            everySuspend { mockSdkContext.features } returns mutableSetOf(Features.EMBEDDED_MESSAGING)
+            everySuspend { mockSdkContext.features } returns mutableSetOf(EmbeddedMessaging)
             everySuspend { mockLanguageTagValidator.isValid("zh-Hans-CN") } returns true
 
             languageHandler.handleLanguage("zh-Hans-CN")
@@ -146,7 +147,7 @@ class LanguageHandlerTests {
             everySuspend { mockEventWaiter.await<Exception>() } returns failureDeviceEventResponse
             everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mockEventWaiter
             everySuspend { mockStringStorage.put(any(), any()) } returns Unit
-            everySuspend { mockSdkContext.features } returns mutableSetOf(Features.EMBEDDED_MESSAGING)
+            everySuspend { mockSdkContext.features } returns mutableSetOf(EmbeddedMessaging)
             everySuspend { mockLanguageTagValidator.isValid("zh-Hans-CN") } returns true
             everySuspend { mockLogger.error(any(), any<Throwable>()) } returns Unit
 

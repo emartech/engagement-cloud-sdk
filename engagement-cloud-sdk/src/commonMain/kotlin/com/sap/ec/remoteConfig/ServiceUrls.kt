@@ -6,5 +6,7 @@ import kotlinx.serialization.Serializable
 data class ServiceUrls(
     val eventService: String? = null,
     val clientService: String? = null,
-    val deepLinkService: String? = null
+    val deepLinkService: String? = null,
+    val embeddedMessagingService: String? = null,
+    val jsBridgeUrl: String? = null
 )

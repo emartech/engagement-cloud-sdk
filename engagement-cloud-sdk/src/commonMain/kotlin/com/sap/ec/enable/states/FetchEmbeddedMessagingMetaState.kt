@@ -24,7 +24,7 @@ internal class FetchEmbeddedMessagingMetaState(
 
     override suspend fun active(): Result<Unit> {
         sdkLogger.debug("Fetching Embedded Messaging Meta State started")
-        return if (sdkContext.features.contains(Features.EMBEDDED_MESSAGING)) {
+        return if (sdkContext.features.contains(Features.EmbeddedMessaging)) {
             sdkEventDistributor.registerEvent(
                 SdkEvent.Internal.EmbeddedMessaging.FetchMeta()
             ).await<Response>()

@@ -33,7 +33,7 @@ class ContentReplacerTests {
     @BeforeTest
     fun setup() {
         mockDefaultUrls = mock(MockMode.autofill)
-        every { mockDefaultUrls.ecJsBridgeUrl } returns TEST_JS_BRIDGE_HOST_URL
+        every { mockDefaultUrls.jsBridgeUrl } returns TEST_JS_BRIDGE_HOST_URL
         mockSdkContext = mock(MockMode.autofill)
         every { mockSdkContext.defaultUrls } returns mockDefaultUrls
         mockSdkVersionProvider = mock(MockMode.autofill)

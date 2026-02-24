@@ -1,6 +1,7 @@
 package com.sap.ec.remoteConfig
 
 import com.sap.ec.context.Features
+import com.sap.ec.context.Features.*
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.context.copyWith
 import com.sap.ec.core.device.DeviceInfoCollectorApi
@@ -48,7 +49,9 @@ internal class RemoteConfigResponseHandler(
             sdkContext.defaultUrls = sdkContext.defaultUrls.copyWith(
                 clientServiceBaseUrl = it.clientService,
                 eventServiceBaseUrl = it.eventService,
-                deepLinkBaseUrl = it.deepLinkService
+                deepLinkBaseUrl = it.deepLinkService,
+                embeddedMessagingBaseUrl = it.embeddedMessagingService,
+                jsBridgeUrl = it.jsBridgeUrl,
             )
         }
     }
@@ -60,8 +63,9 @@ internal class RemoteConfigResponseHandler(
     }
 
     private fun applyFeatures(features: RemoteConfigFeatures?) {
-        features?.mobileEngage?.let { switch(Features.MOBILE_ENGAGE, it) }
-        features?.embeddedMessaging?.let { switch(Features.EMBEDDED_MESSAGING, it) }
+        features?.mobileEngage?.let { switch(MobileEngage, it) }
+        features?.embeddedMessaging?.let { switch(EmbeddedMessaging, it) }
+        features?.jsBridgeSignatureCheck?.let { switch(JsBridgeSignatureCheck, it) }
     }
 
     private fun applyLuckyLogger(luckyLogger: LuckyLogger?) {

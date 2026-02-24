@@ -50,7 +50,7 @@ class FetchEmbeddedMessagingMetaStateTests {
     @Test
     fun testActive_shouldEmitFetchMetaEvent_andReturnSuccessUnit_whenMetaResponseResultIsSuccess() =
         runTest {
-            every { mockSdkContext.features } returns mutableSetOf(Features.EMBEDDED_MESSAGING)
+            every { mockSdkContext.features } returns mutableSetOf(Features.EmbeddedMessaging)
             val metaDataResponse = """{
   "version" : "v1",
   "labels" : {
@@ -175,7 +175,7 @@ class FetchEmbeddedMessagingMetaStateTests {
     @Test
     fun testActive_shouldEmitFetchMetaEvent_andReturnFailure_whenMetaResponseResultIsFailure() =
         runTest {
-            every { mockSdkContext.features } returns mutableSetOf(Features.EMBEDDED_MESSAGING)
+            every { mockSdkContext.features } returns mutableSetOf(Features.EmbeddedMessaging)
             val exception = Exception("any exception happened")
             val response = SdkEvent.Internal.Sdk.Answer.Response(
                 "0",
