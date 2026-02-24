@@ -127,13 +127,13 @@ class IosPushTests: KoinTest {
             TestUserNotificationCenterDelegate()
 
         sdkContext = SdkContext(
-            sdkDispatcher,
-            StandardTestDispatcher(),
-            null,
-            DefaultUrls("", "", "", "", "", "", ""),
-            LogLevel.Error,
-            mutableSetOf(),
-            logBreadcrumbsQueueSize = 10
+            sdkDispatcher = StandardTestDispatcher(),
+            mainDispatcher = StandardTestDispatcher(),
+            defaultUrls = DefaultUrls("", "", "", "", "", "", ""),
+            remoteLogLevel = LogLevel.Error,
+            features = mutableSetOf(),
+            logBreadcrumbsQueueSize = 10,
+            onContactLinkingFailed = null
         )
 
         everySuspend { mockLoggingPush.activate() } returns Unit
