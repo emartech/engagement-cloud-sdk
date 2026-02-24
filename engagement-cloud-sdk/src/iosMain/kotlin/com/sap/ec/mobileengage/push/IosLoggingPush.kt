@@ -1,6 +1,8 @@
 package com.sap.ec.mobileengage.push
 
 import com.sap.ec.api.push.LoggingPush
+import com.sap.ec.api.push.NotificationCenterDelegateRegistration
+import com.sap.ec.api.push.NotificationCenterDelegateRegistrationOptions
 import com.sap.ec.api.push.SilentPushUserInfo
 import com.sap.ec.core.log.LogEntry
 import com.sap.ec.core.log.Logger
@@ -17,23 +19,36 @@ internal class IosLoggingPush(
     storage: StringStorageApi,
     private val sdkDispatcher: CoroutineDispatcher
 ) : LoggingPush(storage, logger), IosPushInstance {
-    override var customerUserNotificationCenterDelegate: List<UNUserNotificationCenterDelegateProtocol>
+
+    override val registeredNotificationCenterDelegates: List<NotificationCenterDelegateRegistration>
         get() {
-            val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)
+            val entry = LogEntry.createMethodNotAllowed(this, this::registeredNotificationCenterDelegates.name)
             CoroutineScope(sdkDispatcher).launch {
                 logger.debug(entry)
             }
-            return listOf()
+            return emptyList()
         }
-        set(_) {
-            val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)
-            CoroutineScope(sdkDispatcher).launch {
-                logger.debug(entry)
-            }
+
+    override fun registerNotificationCenterDelegate(
+        delegate: UNUserNotificationCenterDelegateProtocol,
+        options: NotificationCenterDelegateRegistrationOptions
+    ) {
+        val entry = LogEntry.createMethodNotAllowed(this, this::registerNotificationCenterDelegate.name)
+        CoroutineScope(sdkDispatcher).launch {
+            logger.debug(entry)
         }
+    }
+
+    override fun unregisterNotificationCenterDelegate(delegate: UNUserNotificationCenterDelegateProtocol) {
+        val entry = LogEntry.createMethodNotAllowed(this, this::unregisterNotificationCenterDelegate.name)
+        CoroutineScope(sdkDispatcher).launch {
+            logger.debug(entry)
+        }
+    }
+
     override val userNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol
         get() {
-            val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)
+            val entry = LogEntry.createMethodNotAllowed(this, this::userNotificationCenterDelegate.name)
             CoroutineScope(sdkDispatcher).launch {
                 logger.debug(entry)
             }
@@ -41,7 +56,7 @@ internal class IosLoggingPush(
         }
 
     override suspend fun handleSilentMessageWithUserInfo(userInfo: SilentPushUserInfo) {
-        val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)
+        val entry = LogEntry.createMethodNotAllowed(this, this::handleSilentMessageWithUserInfo.name)
         logger.debug(entry)
     }
 }

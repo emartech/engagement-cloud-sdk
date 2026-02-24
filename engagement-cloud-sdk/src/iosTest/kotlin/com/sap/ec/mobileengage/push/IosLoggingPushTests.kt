@@ -20,6 +20,8 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
+import platform.darwin.NSObject
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -52,17 +54,6 @@ class IosLoggingPushTests {
     }
 
     @Test
-    fun testCustomerUserNotificationCenterDelegate() = runTest {
-        val result = iosLoggingPush.customerUserNotificationCenterDelegate
-
-        advanceUntilIdle()
-
-        verifyLogging()
-
-        result shouldBe emptyList()
-    }
-
-    @Test
     fun testUserNotificationCenterDelegate() = runTest {
         iosLoggingPush.userNotificationCenterDelegate
 
@@ -90,6 +81,38 @@ class IosLoggingPushTests {
     @Test
     fun testActive() = runTest {
         iosLoggingPush.activate()
+
+        verifyLogging()
+    }
+
+    @Test
+    fun testRegisteredNotificationDelegates_shouldReturnEmptyAndLog() = runTest {
+        val result = iosLoggingPush.registeredNotificationCenterDelegates
+
+        advanceUntilIdle()
+
+        verifyLogging()
+        result shouldBe emptyList()
+    }
+
+    @Test
+    fun testRegisterNotificationDelegate_shouldLog() = runTest {
+        val testDelegate = object : NSObject(), UNUserNotificationCenterDelegateProtocol {}
+
+        iosLoggingPush.registerNotificationCenterDelegate(testDelegate)
+
+        advanceUntilIdle()
+
+        verifyLogging()
+    }
+
+    @Test
+    fun testUnregisterNotificationCenterDelegate_shouldLog() = runTest {
+        val testDelegate = object : NSObject(), UNUserNotificationCenterDelegateProtocol {}
+
+        iosLoggingPush.unregisterNotificationCenterDelegate(testDelegate)
+
+        advanceUntilIdle()
 
         verifyLogging()
     }

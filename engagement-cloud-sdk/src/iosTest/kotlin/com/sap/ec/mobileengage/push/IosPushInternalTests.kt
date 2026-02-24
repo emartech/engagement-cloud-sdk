@@ -3,6 +3,8 @@ package com.sap.ec.mobileengage.push
 import com.sap.ec.SdkConstants.SILENT_PUSH_RECEIVED_EVENT_NAME
 import com.sap.ec.TestEngagementCloudSDKConfig
 import com.sap.ec.api.push.Ems
+import com.sap.ec.api.push.NotificationCenterDelegateRegistration
+import com.sap.ec.api.push.NotificationCenterDelegateRegistrationOptions
 import com.sap.ec.api.push.PushCall.ClearPushToken
 import com.sap.ec.api.push.PushCall.HandleSilentMessageWithUserInfo
 import com.sap.ec.api.push.PushCall.RegisterPushToken
@@ -58,6 +60,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.serialization.json.Json
 import platform.UserNotifications.UNNotificationDefaultActionIdentifier
+import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
+import platform.darwin.NSObject
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -113,6 +117,9 @@ internal class IosPushInternalTests {
     private lateinit var mockTimestampProvider: InstantProvider
     private lateinit var mockUuidProvider: UuidProviderApi
 
+    private lateinit var testDelegate1: UNUserNotificationCenterDelegateProtocol
+    private lateinit var testDelegate2: UNUserNotificationCenterDelegateProtocol
+
     @BeforeTest
     fun setup() = runTest {
         Dispatchers.setMain(StandardTestDispatcher())
@@ -148,6 +155,9 @@ internal class IosPushInternalTests {
             mockTimestampProvider,
             mockUuidProvider
         )
+
+        testDelegate1 = object : NSObject(), UNUserNotificationCenterDelegateProtocol {}
+        testDelegate2 = object : NSObject(), UNUserNotificationCenterDelegateProtocol {}
     }
 
     @AfterTest
@@ -548,5 +558,178 @@ internal class IosPushInternalTests {
                 badgeCount?.let { put("badgeCount", it) }
             })
         }
+    }
+
+    // MARK: - Notification Delegate Registration Tests
+
+    @Test
+    fun `registerNotificationCenterDelegate should add delegate to list`() {
+        iosPushInternal.registerNotificationCenterDelegate(testDelegate1)
+
+        iosPushInternal.registeredNotificationCenterDelegates.size shouldBe 1
+        iosPushInternal.registeredNotificationCenterDelegates[0].delegate shouldBe testDelegate1
+    }
+
+    @Test
+    fun `registerNotificationCenterDelegate should use default options when not provided`() {
+        iosPushInternal.registerNotificationCenterDelegate(testDelegate1)
+
+        val registration = iosPushInternal.registeredNotificationCenterDelegates[0]
+        registration.options.includeEngagementCloudMessages shouldBe false
+    }
+
+    @Test
+    fun `registerNotificationCenterDelegate should use provided options`() {
+        val options = NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = true)
+
+        iosPushInternal.registerNotificationCenterDelegate(testDelegate1, options)
+
+        val registration = iosPushInternal.registeredNotificationCenterDelegates[0]
+        registration.options.includeEngagementCloudMessages shouldBe true
+    }
+
+    @Test
+    fun `registerNotificationCenterDelegate should register multiple delegates`() {
+        iosPushInternal.registerNotificationCenterDelegate(testDelegate1)
+        iosPushInternal.registerNotificationCenterDelegate(testDelegate2)
+
+        iosPushInternal.registeredNotificationCenterDelegates.size shouldBe 2
+    }
+
+    @Test
+    fun `registerNotificationCenterDelegate should replace existing registration for same delegate`() {
+        val options1 = NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = false)
+        val options2 = NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = true)
+
+        iosPushInternal.registerNotificationCenterDelegate(testDelegate1, options1)
+        iosPushInternal.registerNotificationCenterDelegate(testDelegate1, options2)
+
+        iosPushInternal.registeredNotificationCenterDelegates.size shouldBe 1
+        iosPushInternal.registeredNotificationCenterDelegates[0].options.includeEngagementCloudMessages shouldBe true
+    }
+
+    @Test
+    fun `unregisterNotificationCenterDelegate should remove delegate from list`() {
+        iosPushInternal.registerNotificationCenterDelegate(testDelegate1)
+        iosPushInternal.registerNotificationCenterDelegate(testDelegate2)
+
+        iosPushInternal.unregisterNotificationCenterDelegate(testDelegate1)
+
+        iosPushInternal.registeredNotificationCenterDelegates.size shouldBe 1
+        iosPushInternal.registeredNotificationCenterDelegates[0].delegate shouldBe testDelegate2
+    }
+
+    @Test
+    fun `unregisterNotificationCenterDelegate should do nothing if delegate not registered`() {
+        iosPushInternal.registerNotificationCenterDelegate(testDelegate1)
+
+        iosPushInternal.unregisterNotificationCenterDelegate(testDelegate2)
+
+        iosPushInternal.registeredNotificationCenterDelegates.size shouldBe 1
+    }
+
+    @Test
+    fun `registeredNotificationCenterDelegates should return immutable copy`() {
+        iosPushInternal.registerNotificationCenterDelegate(testDelegate1)
+
+        val list1 = iosPushInternal.registeredNotificationCenterDelegates
+        iosPushInternal.registerNotificationCenterDelegate(testDelegate2)
+        val list2 = iosPushInternal.registeredNotificationCenterDelegates
+
+        list1.size shouldBe 1
+        list2.size shouldBe 2
+    }
+
+    // MARK: - Notification Filtering Tests
+
+    @Test
+    fun `isEngagementCloudNotification should return true when userInfo contains ems key`() {
+        val userInfo = mapOf<Any?, Any?>("ems" to mapOf("version" to "1.0"))
+
+        val result = IosPushInternal.isEngagementCloudNotification(userInfo)
+
+        result shouldBe true
+    }
+
+    @Test
+    fun `isEngagementCloudNotification should return false when userInfo does not contain ems key`() {
+        val userInfo = mapOf<Any?, Any?>("someOtherKey" to "value")
+
+        val result = IosPushInternal.isEngagementCloudNotification(userInfo)
+
+        result shouldBe false
+    }
+
+    @Test
+    fun `isEngagementCloudNotification should return false for empty userInfo`() {
+        val userInfo = emptyMap<Any?, Any?>()
+
+        val result = IosPushInternal.isEngagementCloudNotification(userInfo)
+
+        result shouldBe false
+    }
+
+    @Test
+    fun `filterDelegates should return all delegates for non-EC notification`() {
+        val registrations = listOf(
+            NotificationCenterDelegateRegistration(testDelegate1, NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = false)),
+            NotificationCenterDelegateRegistration(testDelegate2, NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = true))
+        )
+        val nonEcUserInfo = mapOf<Any?, Any?>("someKey" to "value")
+
+        val result = IosPushInternal.filterDelegates(registrations, nonEcUserInfo)
+
+        result.size shouldBe 2
+        result shouldBe listOf(testDelegate1, testDelegate2)
+    }
+
+    @Test
+    fun `filterDelegates should only return delegates with includeEngagementCloudMessages true for EC notification`() {
+        val registrations = listOf(
+            NotificationCenterDelegateRegistration(testDelegate1, NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = false)),
+            NotificationCenterDelegateRegistration(testDelegate2, NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = true))
+        )
+        val ecUserInfo = mapOf<Any?, Any?>("ems" to mapOf("version" to "1.0"))
+
+        val result = IosPushInternal.filterDelegates(registrations, ecUserInfo)
+
+        result.size shouldBe 1
+        result[0] shouldBe testDelegate2
+    }
+
+    @Test
+    fun `filterDelegates should return empty list when no delegates match for EC notification`() {
+        val registrations = listOf(
+            NotificationCenterDelegateRegistration(testDelegate1, NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = false)),
+            NotificationCenterDelegateRegistration(testDelegate2, NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = false))
+        )
+        val ecUserInfo = mapOf<Any?, Any?>("ems" to mapOf("version" to "1.0"))
+
+        val result = IosPushInternal.filterDelegates(registrations, ecUserInfo)
+
+        result.size shouldBe 0
+    }
+
+    @Test
+    fun `filterDelegates should return all delegates when all have includeEngagementCloudMessages true for EC notification`() {
+        val registrations = listOf(
+            NotificationCenterDelegateRegistration(testDelegate1, NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = true)),
+            NotificationCenterDelegateRegistration(testDelegate2, NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = true))
+        )
+        val ecUserInfo = mapOf<Any?, Any?>("ems" to mapOf("version" to "1.0"))
+
+        val result = IosPushInternal.filterDelegates(registrations, ecUserInfo)
+
+        result.size shouldBe 2
+    }
+
+    @Test
+    fun `filterDelegates should return empty list for empty registrations`() {
+        val emptyRegistrations = emptyList<NotificationCenterDelegateRegistration>()
+        val ecUserInfo = mapOf<Any?, Any?>("ems" to mapOf("version" to "1.0"))
+
+        val result = IosPushInternal.filterDelegates(emptyRegistrations, ecUserInfo)
+
+        result.size shouldBe 0
     }
 }

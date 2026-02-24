@@ -129,6 +129,7 @@ class IosPushTests: KoinTest {
         sdkContext = SdkContext(
             sdkDispatcher,
             StandardTestDispatcher(),
+            null,
             DefaultUrls("", "", "", "", "", "", ""),
             LogLevel.Error,
             mutableSetOf(),
@@ -311,47 +312,6 @@ class IosPushTests: KoinTest {
         result.onSuccess {
             it shouldBe IosPushTests.Companion.PUSH_TOKEN
         }
-    }
-
-    @Test
-    fun testCustomerUserNotificationCenterDelegate_inactiveState() = runTest {
-        every {
-            mockLoggingPush.customerUserNotificationCenterDelegate
-        } returns emptyList()
-
-        val result = iosPushWrapper.customerUserNotificationCenterDelegate
-
-        result shouldBe emptyList()
-    }
-
-    @Test
-    fun testCustomerUserNotificationCenterDelegate_onHoldState() = runTest {
-        every {
-            mockGathererPush.customerUserNotificationCenterDelegate
-        } returns listOf(testUNUserNotificationCenterDelegateProtocol)
-
-        sdkContext.setSdkState(SdkState.OnHold)
-
-        advanceUntilIdle()
-
-        val result = iosPushWrapper.customerUserNotificationCenterDelegate
-
-        result shouldBe listOf(testUNUserNotificationCenterDelegateProtocol)
-    }
-
-    @Test
-    fun testCustomerUserNotificationCenterDelegate_onActiveState() = runTest {
-        every {
-            mockPushInternal.customerUserNotificationCenterDelegate
-        } returns listOf(testUNUserNotificationCenterDelegateProtocol)
-
-        sdkContext.setSdkState(SdkState.Active)
-
-        advanceUntilIdle()
-
-        val result = iosPushWrapper.customerUserNotificationCenterDelegate
-
-        result shouldBe listOf(testUNUserNotificationCenterDelegateProtocol)
     }
 
     @Test

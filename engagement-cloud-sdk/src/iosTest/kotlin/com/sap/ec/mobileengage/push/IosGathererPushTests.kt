@@ -2,6 +2,8 @@ package com.sap.ec.mobileengage.push
 
 import com.sap.ec.TestEngagementCloudSDKConfig
 import com.sap.ec.api.push.Ems
+import com.sap.ec.api.push.NotificationCenterDelegateRegistration
+import com.sap.ec.api.push.NotificationCenterDelegateRegistrationOptions
 import com.sap.ec.api.push.PushCall
 import com.sap.ec.api.push.PushContext
 import com.sap.ec.api.push.PushContextApi
@@ -47,30 +49,6 @@ class IosGathererPushTests {
     }
 
     @Test
-    fun testCustomerUserNotificationCenterDelegate_getter_shouldInvokeOnInternalInstance() {
-        every { mockIosPushInternal.customerUserNotificationCenterDelegate } returns listOf(
-            testNotificationCenterDelegateProtocol
-        )
-        val result = iosGathererPush.customerUserNotificationCenterDelegate
-
-        verify { mockIosPushInternal.customerUserNotificationCenterDelegate }
-        result shouldBe listOf(testNotificationCenterDelegateProtocol)
-    }
-
-    @Test
-    fun testCustomerUserNotificationCenterDelegate_setter_shouldInvokeOnInternalInstance() {
-        every { mockIosPushInternal.customerUserNotificationCenterDelegate } returns listOf()
-        every { mockIosPushInternal.customerUserNotificationCenterDelegate = any() } returns Unit
-        iosGathererPush.customerUserNotificationCenterDelegate =
-            listOf(testNotificationCenterDelegateProtocol)
-
-        verify {
-            mockIosPushInternal.customerUserNotificationCenterDelegate =
-                listOf(testNotificationCenterDelegateProtocol)
-        }
-    }
-
-    @Test
     fun testEmarsysUserNotificationCenterDelegate_shouldInvokeOnInternalInstance() {
         every { mockIosPushInternal.userNotificationCenterDelegate } returns testNotificationCenterDelegateProtocol
         val result = iosGathererPush.userNotificationCenterDelegate
@@ -95,5 +73,37 @@ class IosGathererPushTests {
 
         pushContext.calls.contains(PushCall.HandleSilentMessageWithUserInfo(userInfo)) shouldBe true
         pushContext.calls.size shouldBe 1
+    }
+
+    @Test
+    fun testRegisteredNotificationDelegates_shouldDelegateToInternal() {
+        val expectedRegistrations = listOf(
+            NotificationCenterDelegateRegistration(testNotificationCenterDelegateProtocol)
+        )
+        every { mockIosPushInternal.registeredNotificationCenterDelegates } returns expectedRegistrations
+
+        val result = iosGathererPush.registeredNotificationCenterDelegates
+
+        verify { mockIosPushInternal.registeredNotificationCenterDelegates }
+        result shouldBe expectedRegistrations
+    }
+
+    @Test
+    fun testRegisterNotificationDelegate_shouldDelegateToInternal() {
+        val options = NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = true)
+        every { mockIosPushInternal.registerNotificationCenterDelegate(any(), any()) } returns Unit
+
+        iosGathererPush.registerNotificationCenterDelegate(testNotificationCenterDelegateProtocol, options)
+
+        verify { mockIosPushInternal.registerNotificationCenterDelegate(testNotificationCenterDelegateProtocol, options) }
+    }
+
+    @Test
+    fun testUnregisterNotificationCenterDelegate_shouldDelegateToInternal() {
+        every { mockIosPushInternal.unregisterNotificationCenterDelegate(any()) } returns Unit
+
+        iosGathererPush.unregisterNotificationCenterDelegate(testNotificationCenterDelegateProtocol)
+
+        verify { mockIosPushInternal.unregisterNotificationCenterDelegate(testNotificationCenterDelegateProtocol) }
     }
 }

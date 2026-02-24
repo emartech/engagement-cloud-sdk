@@ -2,6 +2,8 @@ package com.sap.ec.mobileengage.push
 
 import com.sap.ec.SdkConstants.SILENT_PUSH_RECEIVED_EVENT_NAME
 import com.sap.ec.api.SdkState
+import com.sap.ec.api.push.NotificationCenterDelegateRegistration
+import com.sap.ec.api.push.NotificationCenterDelegateRegistrationOptions
 import com.sap.ec.api.push.PushCall.ClearPushToken
 import com.sap.ec.api.push.PushCall.HandleSilentMessageWithUserInfo
 import com.sap.ec.api.push.PushCall.RegisterPushToken
@@ -63,20 +65,36 @@ internal class IosPushInternal(
     private val uuidProvider: UuidProviderApi
 ) : PushInternal(storage, pushContext, sdkEventDistributor, sdkContext, sdkLogger),
     IosPushInstance {
-    //TODO: should handle list in a threadsafe way
-    override var customerUserNotificationCenterDelegate: List<UNUserNotificationCenterDelegateProtocol> =
-        listOf()
-        set(value) {
-            (userNotificationCenterDelegate as InternalNotificationCenterDelegateProxy).customerDelegates =
-                value
-            field = value
-        }
+
+    private val _registeredDelegates = mutableListOf<NotificationCenterDelegateRegistration>()
+
+    override val registeredNotificationCenterDelegates: List<NotificationCenterDelegateRegistration>
+        get() = _registeredDelegates.toList()
+
+    override fun registerNotificationCenterDelegate(
+        delegate: UNUserNotificationCenterDelegateProtocol,
+        options: NotificationCenterDelegateRegistrationOptions
+    ) {
+        _registeredDelegates.removeAll { it.delegate === delegate }
+        _registeredDelegates.add(NotificationCenterDelegateRegistration(delegate, options))
+        updateProxyDelegates()
+    }
+
+    override fun unregisterNotificationCenterDelegate(delegate: UNUserNotificationCenterDelegateProtocol) {
+        _registeredDelegates.removeAll { it.delegate === delegate }
+        updateProxyDelegates()
+    }
+
+    private fun updateProxyDelegates() {
+        (userNotificationCenterDelegate as InternalNotificationCenterDelegateProxy).registeredDelegates =
+            _registeredDelegates.toList()
+    }
 
     override val userNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol =
         InternalNotificationCenterDelegateProxy(
             didReceiveNotificationResponse = this::didReceiveNotificationResponse,
-            sdkContext,
-            customerUserNotificationCenterDelegate
+            sdkContext = sdkContext,
+            registeredDelegates = _registeredDelegates.toList()
         )
 
     override suspend fun handleSilentMessageWithUserInfo(userInfo: SilentPushUserInfo) {
@@ -182,19 +200,44 @@ internal class IosPushInternal(
         }
     }
 
+    internal companion object {
+        private const val EMS_KEY = "ems"
+
+        internal fun isEngagementCloudNotification(userInfo: Map<Any?, *>): Boolean {
+            return userInfo.containsKey(EMS_KEY)
+        }
+
+        internal fun filterDelegates(
+            registeredDelegates: List<NotificationCenterDelegateRegistration>,
+            userInfo: Map<Any?, *>
+        ): List<UNUserNotificationCenterDelegateProtocol> {
+            val isEcNotification = isEngagementCloudNotification(userInfo)
+            return registeredDelegates
+                .filter { !isEcNotification || it.options.includeEngagementCloudMessages }
+                .map { it.delegate }
+        }
+    }
+
     private class InternalNotificationCenterDelegateProxy(
         private val didReceiveNotificationResponse: (actionIdentifier: String, userInfo: Map<String, Any>, handler: () -> Unit) -> Unit,
         private val sdkContext: SdkContextApi,
-        var customerDelegates: List<UNUserNotificationCenterDelegateProtocol> = emptyList()
+        var registeredDelegates: List<NotificationCenterDelegateRegistration> = emptyList()
     ) : UNUserNotificationCenterDelegateProtocol, NSObject() {
+
+        private fun getDelegatesToNotify(userInfo: Map<Any?, *>): List<UNUserNotificationCenterDelegateProtocol> {
+            return filterDelegates(registeredDelegates, userInfo)
+        }
 
         override fun userNotificationCenter(
             center: UNUserNotificationCenter,
             willPresentNotification: UNNotification,
             withCompletionHandler: (UNNotificationPresentationOptions) -> Unit
         ) {
+            val userInfo = willPresentNotification.request.content.userInfo
+            val delegatesToNotify = getDelegatesToNotify(userInfo)
+
             CoroutineScope(Dispatchers.Main).launch {
-                customerDelegates.forEach {
+                delegatesToNotify.forEach {
                     it.userNotificationCenter(
                         center,
                         willPresentNotification,
@@ -212,8 +255,11 @@ internal class IosPushInternal(
             didReceiveNotificationResponse: UNNotificationResponse,
             withCompletionHandler: () -> Unit
         ) {
+            val userInfo = didReceiveNotificationResponse.notification.request.content.userInfo
+            val delegatesToNotify = getDelegatesToNotify(userInfo)
+
             CoroutineScope(Dispatchers.Main).launch {
-                customerDelegates.forEach {
+                delegatesToNotify.forEach {
                     it.userNotificationCenter(
                         center,
                         didReceiveNotificationResponse,
@@ -235,8 +281,8 @@ internal class IosPushInternal(
             openSettingsForNotification: UNNotification?
         ) {
             CoroutineScope(Dispatchers.Main).launch {
-                customerDelegates.forEach {
-                    it.userNotificationCenter(center, openSettingsForNotification)
+                registeredDelegates.forEach {
+                    it.delegate.userNotificationCenter(center, openSettingsForNotification)
                 }
             }
         }

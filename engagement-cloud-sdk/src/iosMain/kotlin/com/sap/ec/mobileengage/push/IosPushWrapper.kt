@@ -1,6 +1,8 @@
 package com.sap.ec.mobileengage.push
 
 import com.sap.ec.api.generic.GenericApi
+import com.sap.ec.api.push.NotificationCenterDelegateRegistration
+import com.sap.ec.api.push.NotificationCenterDelegateRegistrationOptions
 import com.sap.ec.api.push.PushInternalApi
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.exceptions.SdkException.PreconditionFailedException
@@ -34,12 +36,19 @@ internal class IosPushWrapper<Logging : IosPushInstance, Gatherer : IosPushInsta
         return kotlin.runCatching { activeInstance<PushInternalApi>().getPushToken() }
     }
 
-    override var customerUserNotificationCenterDelegate: List<UNUserNotificationCenterDelegateProtocol>
-        get() = activeInstance<IosPushInstance>().customerUserNotificationCenterDelegate
-        set(value) {
-            activeInstance<IosPushInstance>().customerUserNotificationCenterDelegate =
-                value
-        }
+    override val registeredNotificationCenterDelegates: List<NotificationCenterDelegateRegistration>
+        get() = activeInstance<IosPushInstance>().registeredNotificationCenterDelegates
+
+    override fun registerNotificationCenterDelegate(
+        delegate: UNUserNotificationCenterDelegateProtocol,
+        options: NotificationCenterDelegateRegistrationOptions
+    ) {
+        activeInstance<IosPushInstance>().registerNotificationCenterDelegate(delegate, options)
+    }
+
+    override fun unregisterNotificationCenterDelegate(delegate: UNUserNotificationCenterDelegateProtocol) {
+        activeInstance<IosPushInstance>().unregisterNotificationCenterDelegate(delegate)
+    }
 
     override val userNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol
         get() = activeInstance<IosPushInstance>().userNotificationCenterDelegate

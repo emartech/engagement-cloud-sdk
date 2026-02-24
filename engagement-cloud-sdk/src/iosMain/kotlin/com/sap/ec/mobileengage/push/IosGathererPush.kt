@@ -1,5 +1,7 @@
 package com.sap.ec.mobileengage.push
 
+import com.sap.ec.api.push.NotificationCenterDelegateRegistration
+import com.sap.ec.api.push.NotificationCenterDelegateRegistrationOptions
 import com.sap.ec.api.push.PushCall
 import com.sap.ec.api.push.PushContextApi
 import com.sap.ec.api.push.PushGatherer
@@ -14,11 +16,21 @@ internal class IosGathererPush(
     private val iosPushInternal: IosPushInstance,
     sdkContext: SdkContextApi
 ) : PushGatherer(context, storage, sdkContext), IosPushInstance {
-    override var customerUserNotificationCenterDelegate: List<UNUserNotificationCenterDelegateProtocol>
-        get() = iosPushInternal.customerUserNotificationCenterDelegate
-        set(value) {
-            iosPushInternal.customerUserNotificationCenterDelegate = value
-        }
+
+    override val registeredNotificationCenterDelegates: List<NotificationCenterDelegateRegistration>
+        get() = iosPushInternal.registeredNotificationCenterDelegates
+
+    override fun registerNotificationCenterDelegate(
+        delegate: UNUserNotificationCenterDelegateProtocol,
+        options: NotificationCenterDelegateRegistrationOptions
+    ) {
+        iosPushInternal.registerNotificationCenterDelegate(delegate, options)
+    }
+
+    override fun unregisterNotificationCenterDelegate(delegate: UNUserNotificationCenterDelegateProtocol) {
+        iosPushInternal.unregisterNotificationCenterDelegate(delegate)
+    }
+
     override val userNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol
         get() = iosPushInternal.userNotificationCenterDelegate
 

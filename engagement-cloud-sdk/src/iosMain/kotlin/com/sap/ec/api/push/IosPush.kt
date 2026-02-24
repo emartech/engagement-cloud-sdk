@@ -5,13 +5,20 @@ import com.sap.ec.mobileengage.push.IosPushWrapperApi
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 
 class IosPush : IosPushApi {
-    override var customerUserNotificationCenterDelegate: List<UNUserNotificationCenterDelegateProtocol>
-        get() {
-            return koin.get<IosPushWrapperApi>().customerUserNotificationCenterDelegate
-        }
-        set(value) {
-            koin.get<IosPushWrapperApi>().customerUserNotificationCenterDelegate = value
-        }
+
+    override val registeredNotificationCenterDelegates: List<NotificationCenterDelegateRegistration>
+        get() = koin.get<IosPushWrapperApi>().registeredNotificationCenterDelegates
+
+    override fun registerNotificationCenterDelegate(
+        delegate: UNUserNotificationCenterDelegateProtocol,
+        options: NotificationCenterDelegateRegistrationOptions
+    ) {
+        koin.get<IosPushWrapperApi>().registerNotificationCenterDelegate(delegate, options)
+    }
+
+    override fun unregisterNotificationCenterDelegate(delegate: UNUserNotificationCenterDelegateProtocol) {
+        koin.get<IosPushWrapperApi>().unregisterNotificationCenterDelegate(delegate)
+    }
 
     override val userNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol
         get() = koin.get<IosPushWrapperApi>().userNotificationCenterDelegate
