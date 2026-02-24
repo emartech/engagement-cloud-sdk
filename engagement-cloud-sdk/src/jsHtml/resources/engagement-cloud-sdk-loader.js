@@ -6,7 +6,8 @@
 
   const currentSource = document.currentScript.src;
   const baseUrl = currentSource.substring(0, currentSource.lastIndexOf("/"));
-  const sdkUrl = `${baseUrl}/engagement-cloud-sdk-html.js`;
+  const sdkUrl = "https://emartech.github.io/engagement-cloud-sdk/latest/engagement-cloud-sdk.js";
+//  const sdkUrl = `${baseUrl}/engagement-cloud-sdk-html.js`;
 
   global.EngagementCloud = {
     ready: sdkReady,
