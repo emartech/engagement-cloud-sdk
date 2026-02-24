@@ -138,6 +138,7 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         )
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Column)
+        property("overflow", "scroll")
     }
 
     val detailPane by style {
@@ -240,6 +241,7 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         flex(1)
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Column)
+        property("overflow", "scroll")
     }
 
     val emptyStateContainer by style {
