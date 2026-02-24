@@ -5,7 +5,7 @@ import EngagementCloudSDK
 struct EMListWithCustomMessageItemView: UIViewControllerRepresentable {
     
     func makeUIViewController(context: Context) -> UIViewController {
-        EngagementCloud.shared.embeddedMessaging.compactListView {
+        EngagementCloud.shared.embeddedMessaging.CompactView {
             print("HELLO: onNavigate")
         } customMessageItem: { viewModel, isSelected in
             let vc = UIViewController()
@@ -23,6 +23,12 @@ struct EMListWithCustomMessageItemView: UIViewControllerRepresentable {
 
             return vc
         }
+//        
+//        EngagementCloud.shared.embeddedMessaging.compactListView {
+//            //onNavigate logic
+//        } customMessageItem: { viewModel, isSelected in
+//            //customMessageItem viewController implementation
+//        }
     }
     
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {

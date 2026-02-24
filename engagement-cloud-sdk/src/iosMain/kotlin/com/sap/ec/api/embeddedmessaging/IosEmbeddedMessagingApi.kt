@@ -11,12 +11,12 @@ interface IosEmbeddedMessagingApi {
     fun filterUnreadOnly(filterUnreadOnly: Boolean)
     fun filterByCategories(categories: List<MessageCategory>)
 
-    fun listPageView(
+    fun View(
         showFilters: Boolean,
         customMessageItem: ((viewModel: CustomMessageItemViewModelApi, isSelected: Boolean) -> UIViewController)? = null
     ): UIViewController
 
-    fun compactListView(
+    fun CompactView(
         onNavigate: () -> Unit,
         customMessageItem: ((viewModel: CustomMessageItemViewModelApi, isSelected: Boolean) -> UIViewController)? = null
     ): UIViewController
