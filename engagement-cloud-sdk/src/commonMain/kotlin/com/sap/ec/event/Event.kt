@@ -414,6 +414,8 @@ sealed interface SdkEvent {
                 val name: String = CHANGE_APP_CODE_NAME
             ) : Sdk(), OnlineSdkEvent
 
+            sealed interface LinkContactEvent : Internal, OnlineSdkEvent
+
             @Serializable
             data class LinkContact(
                 override val id: String = UUIDProvider().provide(),
@@ -421,7 +423,9 @@ sealed interface SdkEvent {
                 override var nackCount: Int = 0,
                 val contactFieldValue: String,
                 val name: String = LINK_CONTACT_NAME
-            ) : Sdk(), OnlineSdkEvent
+            ) : Sdk(), OnlineSdkEvent, LinkContactEvent {
+
+            }
 
             @Serializable
             data class LinkAuthenticatedContact(
@@ -430,7 +434,7 @@ sealed interface SdkEvent {
                 override var nackCount: Int = 0,
                 val openIdToken: String,
                 val name: String = LINK_AUTHENTICATED_CONTACT_NAME
-            ) : Sdk(), OnlineSdkEvent
+            ) : Sdk(), OnlineSdkEvent, LinkContactEvent
 
             @Serializable
             data class UnlinkContact(
