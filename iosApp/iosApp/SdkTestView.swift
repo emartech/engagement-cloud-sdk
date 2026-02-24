@@ -4,6 +4,7 @@ import EngagementCloudSDK
 struct SdkTestView: View {
     @State private var eventName = ""
     private let engagementCloud = EngagementCloud.shared
+    @State private var showInlineInApp = false
 
     var body: some View {
         VStack {
@@ -35,6 +36,17 @@ struct SdkTestView: View {
                     Text("track event")
                 }
             }.padding(8)
+            
+            Button {
+                self.showInlineInApp.toggle()
+            } label: {
+                Text("Show InlineInApp")
+            }
+
+            
+            if (self.showInlineInApp) {
+                InlineInAppViewWrapper(viewId: "ia")
+            }
         }
     }
     

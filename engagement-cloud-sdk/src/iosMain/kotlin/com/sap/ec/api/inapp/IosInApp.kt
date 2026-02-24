@@ -1,6 +1,9 @@
 package com.sap.ec.api.inapp
 
+import androidx.compose.ui.window.ComposeUIViewController
 import com.sap.ec.di.SdkKoinIsolationContext.koin
+import com.sap.ec.mobileengage.inapp.view.InlineInAppView as ComposeInlineInAppView
+import platform.UIKit.UIViewController
 
 class IosInApp: IosInAppApi {
     override val isPaused: Boolean
@@ -14,5 +17,11 @@ class IosInApp: IosInAppApi {
 
     override suspend fun resume() {
         koin.get<InAppApi>().resume()
+    }
+
+    override fun InlineInAppView(viewId: String): UIViewController {
+        return ComposeUIViewController {
+            ComposeInlineInAppView(viewId)
+        }
     }
 }

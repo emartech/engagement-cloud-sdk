@@ -19,6 +19,9 @@
 		2A866EEF2F4C9B5900BB51B0 /* EngagementCloudSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 2A866EEE2F4C9B5900BB51B0 /* EngagementCloudSDK */; };
 		2A866EF22F4DCB6300BB51B0 /* EngagementCloudNotificationService in Frameworks */ = {isa = PBXBuildFile; productRef = 2A866EF12F4DCB6300BB51B0 /* EngagementCloudNotificationService */; };
 		2A866EF42F4DCB6300BB51B0 /* EngagementCloudSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 2A866EF32F4DCB6300BB51B0 /* EngagementCloudSDK */; };
+		2A866EF72F4DDF1B00BB51B0 /* InlineInAppViewWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A866EF62F4DDF1B00BB51B0 /* InlineInAppViewWrapper.swift */; };
+		2A866EFA2F4DFC8B00BB51B0 /* EngagementCloudNotificationService in Frameworks */ = {isa = PBXBuildFile; productRef = 2A866EF92F4DFC8B00BB51B0 /* EngagementCloudNotificationService */; };
+		2A866EFC2F4DFC8B00BB51B0 /* EngagementCloudSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 2A866EFB2F4DFC8B00BB51B0 /* EngagementCloudSDK */; };
 		2A918DE92C85E8FE00B1AF36 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A918DE82C85E8FE00B1AF36 /* NotificationService.swift */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
 /* End PBXBuildFile section */
@@ -55,6 +58,7 @@
 		2A42F0C52EC4D5CE0097D526 /* SdkTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SdkTestView.swift; sourceTree = "<group>"; };
 		2A42F0C72EC4D6F00097D526 /* EmbeddedMessagingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedMessagingView.swift; sourceTree = "<group>"; };
 		2A42F0C92EC4D7D50097D526 /* EMListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EMListView.swift; sourceTree = "<group>"; };
+		2A866EF62F4DDF1B00BB51B0 /* InlineInAppViewWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InlineInAppViewWrapper.swift; sourceTree = "<group>"; };
 		2A918DE62C85E8FE00B1AF36 /* NotificationService.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NotificationService.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		2A918DE82C85E8FE00B1AF36 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		2A918DEA2C85E8FE00B1AF36 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -71,6 +75,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2A866EF22F4DCB6300BB51B0 /* EngagementCloudNotificationService in Frameworks */,
+				2A866EFA2F4DFC8B00BB51B0 /* EngagementCloudNotificationService in Frameworks */,
 				2A866EED2F4C9B5900BB51B0 /* EngagementCloudNotificationService in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -80,6 +85,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2A866EF42F4DCB6300BB51B0 /* EngagementCloudSDK in Frameworks */,
+				2A866EFC2F4DFC8B00BB51B0 /* EngagementCloudSDK in Frameworks */,
 				2A866EEF2F4C9B5900BB51B0 /* EngagementCloudSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -98,6 +104,7 @@
 		2A36443E2F4C6087003203E4 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				2A866EF52F4DDF0100BB51B0 /* InApp */,
 				2A36443F2F4C6095003203E4 /* EmbeddedMessaging */,
 			);
 			path = Views;
@@ -112,6 +119,14 @@
 				2A3644422F4C6226003203E4 /* CustomEmbeddedMessagingView.swift */,
 			);
 			path = EmbeddedMessaging;
+			sourceTree = "<group>";
+		};
+		2A866EF52F4DDF0100BB51B0 /* InApp */ = {
+			isa = PBXGroup;
+			children = (
+				2A866EF62F4DDF1B00BB51B0 /* InlineInAppViewWrapper.swift */,
+			);
+			path = InApp;
 			sourceTree = "<group>";
 		};
 		2A918DE72C85E8FE00B1AF36 /* NotificationService */ = {
@@ -204,6 +219,7 @@
 			packageProductDependencies = (
 				2A866EEE2F4C9B5900BB51B0 /* EngagementCloudSDK */,
 				2A866EF32F4DCB6300BB51B0 /* EngagementCloudSDK */,
+				2A866EFB2F4DFC8B00BB51B0 /* EngagementCloudSDK */,
 			);
 			productName = iosApp;
 			productReference = 7555FF7B242A565900829871 /* Engagement Cloud Sample.app */;
@@ -238,7 +254,7 @@
 			);
 			mainGroup = 7555FF72242A565900829871;
 			packageReferences = (
-				2A866EF02F4DCB6300BB51B0 /* XCLocalSwiftPackageReference "../../engagement-cloud-sdk" */,
+				2A866EF82F4DFC8B00BB51B0 /* XCLocalSwiftPackageReference "../spmLocalRelease" */,
 			);
 			productRefGroup = 7555FF7C242A565900829871 /* Products */;
 			projectDirPath = "";
@@ -305,6 +321,7 @@
 			files = (
 				2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */,
 				2A42F0C62EC4D5CE0097D526 /* SdkTestView.swift in Sources */,
+				2A866EF72F4DDF1B00BB51B0 /* InlineInAppViewWrapper.swift in Sources */,
 				2A3644432F4C6226003203E4 /* CustomEmbeddedMessagingView.swift in Sources */,
 				2A3644412F4C611E003203E4 /* EMListWithCustomMessageItemView.swift in Sources */,
 				2A42F0C82EC4D6F00097D526 /* EmbeddedMessagingView.swift in Sources */,
@@ -589,9 +606,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		2A866EF02F4DCB6300BB51B0 /* XCLocalSwiftPackageReference "../../engagement-cloud-sdk" */ = {
+		2A866EF82F4DFC8B00BB51B0 /* XCLocalSwiftPackageReference "../spmLocalRelease" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = "../../engagement-cloud-sdk";
+			relativePath = ../spmLocalRelease;
 		};
 /* End XCLocalSwiftPackageReference section */
 
@@ -609,6 +626,14 @@
 			productName = EngagementCloudNotificationService;
 		};
 		2A866EF32F4DCB6300BB51B0 /* EngagementCloudSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EngagementCloudSDK;
+		};
+		2A866EF92F4DFC8B00BB51B0 /* EngagementCloudNotificationService */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EngagementCloudNotificationService;
+		};
+		2A866EFB2F4DFC8B00BB51B0 /* EngagementCloudSDK */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = EngagementCloudSDK;
 		};
