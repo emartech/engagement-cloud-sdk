@@ -66,12 +66,13 @@ class PushTests: KoinTest {
         mockPushInternal = mock()
 
         sdkContext = SdkContext(
-            StandardTestDispatcher(),
-            mainDispatcher,
-            DefaultUrls("", "", "", "", "", "", ""),
-            LogLevel.Error,
-            mutableSetOf(),
-            logBreadcrumbsQueueSize = 10
+            sdkDispatcher = StandardTestDispatcher(),
+            mainDispatcher = mainDispatcher,
+            defaultUrls = DefaultUrls("", "", "", "", "", "", ""),
+            remoteLogLevel = LogLevel.Error,
+            features = mutableSetOf(),
+            logBreadcrumbsQueueSize = 10,
+            onContactLinkingFailed = null
         )
 
         everySuspend { mockLoggingPush.activate() } returns Unit

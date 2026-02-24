@@ -32,7 +32,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class EventTrackerTests: KoinTest {
+class EventTrackerTests : KoinTest {
 
     override fun getKoin(): Koin = koin
 
@@ -67,12 +67,13 @@ class EventTrackerTests: KoinTest {
         mockEventTrackerInternal = mock()
 
         sdkContext = SdkContext(
-            StandardTestDispatcher(),
-            mainDispatcher,
-            DefaultUrls("", "", "", "", "", "", ""),
-            LogLevel.Error,
-            mutableSetOf(),
-            logBreadcrumbsQueueSize = 10
+            sdkDispatcher = StandardTestDispatcher(),
+            mainDispatcher = mainDispatcher,
+            defaultUrls = DefaultUrls("", "", "", "", "", "", ""),
+            remoteLogLevel = LogLevel.Error,
+            features = mutableSetOf(),
+            logBreadcrumbsQueueSize = 10,
+            onContactLinkingFailed = null
         )
 
         everySuspend { mockLoggingEventTracker.activate() } returns Unit

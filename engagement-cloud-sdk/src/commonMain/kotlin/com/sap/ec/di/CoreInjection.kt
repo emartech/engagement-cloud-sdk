@@ -148,6 +148,7 @@ object CoreInjection {
             SdkContext(
                 sdkDispatcher = get(named(DispatcherTypes.Sdk)),
                 mainDispatcher = get(named(DispatcherTypes.Main)),
+                onContactLinkingFailed = null,
                 defaultUrls = get(),
                 remoteLogLevel = LogLevel.Error,
                 features = mutableSetOf(),

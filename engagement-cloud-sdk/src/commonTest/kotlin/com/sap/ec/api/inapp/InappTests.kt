@@ -1,4 +1,3 @@
-
 package com.sap.ec.api.inapp
 
 import com.sap.ec.api.SdkState
@@ -34,7 +33,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class InappTests: KoinTest {
+class InappTests : KoinTest {
 
     override fun getKoin(): Koin = koin
 
@@ -69,12 +68,13 @@ class InappTests: KoinTest {
         mockInAppInternal = mock()
 
         sdkContext = SdkContext(
-            StandardTestDispatcher(),
-            mainDispatcher,
-            DefaultUrls("", "", "", "", "", "", ""),
-            LogLevel.Error,
-            mutableSetOf(),
-            logBreadcrumbsQueueSize = 10
+            sdkDispatcher = StandardTestDispatcher(),
+            mainDispatcher = mainDispatcher,
+            defaultUrls = DefaultUrls("", "", "", "", "", "", ""),
+            remoteLogLevel = LogLevel.Error,
+            features = mutableSetOf(),
+            logBreadcrumbsQueueSize = 10,
+            onContactLinkingFailed = null
         )
 
         everySuspend { mockLoggingInApp.activate() } returns Unit

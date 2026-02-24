@@ -67,12 +67,13 @@ class ContactTests : KoinTest {
         mockGathererContact = mock()
         mockContactInternal = mock()
         sdkContext = SdkContext(
-            StandardTestDispatcher(),
-            mainDispatcher,
-            DefaultUrls("", "", "", "", "", "", ""),
-            LogLevel.Error,
-            mutableSetOf(),
-            logBreadcrumbsQueueSize = 10
+            sdkDispatcher = StandardTestDispatcher(),
+            mainDispatcher = mainDispatcher,
+            defaultUrls = DefaultUrls("", "", "", "", "", "", ""),
+            remoteLogLevel = LogLevel.Error,
+            features = mutableSetOf(),
+            logBreadcrumbsQueueSize = 10,
+            onContactLinkingFailed = null
         )
 
         everySuspend { mockLoggingContact.activate() } returns Unit

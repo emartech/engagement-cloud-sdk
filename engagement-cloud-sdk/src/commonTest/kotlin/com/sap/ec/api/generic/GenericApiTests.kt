@@ -66,12 +66,13 @@ class GenericApiTests : KoinTest {
         contactInternal =
             ContactInternal(contactContext, mockSdkLogger, sdkEventDistributor = mock())
         sdkContext = SdkContext(
-            StandardTestDispatcher(),
-            mainDispatcher,
-            DefaultUrls("", "", "", "", "", "", ""),
-            LogLevel.Error,
-            mutableSetOf(),
-            logBreadcrumbsQueueSize = 10
+            sdkDispatcher = StandardTestDispatcher(),
+            mainDispatcher = mainDispatcher,
+            defaultUrls = DefaultUrls("", "", "", "", "", "", ""),
+            remoteLogLevel = LogLevel.Error,
+            features = mutableSetOf(),
+            logBreadcrumbsQueueSize = 10,
+            onContactLinkingFailed = null
         )
         genericApi = GenericApi(loggingContact, contactGatherer, contactInternal, sdkContext)
         genericApi.registerOnContext()

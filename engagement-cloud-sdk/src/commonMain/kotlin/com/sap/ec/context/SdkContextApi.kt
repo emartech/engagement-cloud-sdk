@@ -1,6 +1,7 @@
 package com.sap.ec.context
 
 import com.sap.ec.api.SdkState
+import com.sap.ec.config.LinkContactData
 import com.sap.ec.config.SdkConfig
 import com.sap.ec.core.log.LogLevel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -13,6 +14,7 @@ internal interface SdkContextApi {
     var contactFieldValue: String?
     var openIdToken: String?
     var config: SdkConfig?
+    var onContactLinkingFailed: (suspend () -> LinkContactData?)?
     var defaultUrls: DefaultUrlsApi
     var remoteLogLevel: LogLevel
     val features: MutableSet<Features>
