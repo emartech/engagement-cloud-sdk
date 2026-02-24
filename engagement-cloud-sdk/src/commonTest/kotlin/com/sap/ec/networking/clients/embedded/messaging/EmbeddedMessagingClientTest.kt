@@ -7,13 +7,17 @@ import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.clients.NetworkClientApi
 import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.networking.model.UrlRequest
+import com.sap.ec.core.networking.model.body
 import com.sap.ec.event.OnlineSdkEvent
 import com.sap.ec.event.SdkEvent
+import com.sap.ec.mobileengage.embeddedmessaging.EmbeddedMessagingContext
 import com.sap.ec.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import com.sap.ec.mobileengage.embeddedmessaging.networking.EmbeddedMessagingRequestFactoryApi
+import com.sap.ec.networking.clients.embedded.messaging.model.MetaData
 import com.sap.ec.networking.clients.error.ClientExceptionHandler
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
+import dev.mokkery.answering.sequentiallyReturns
 import dev.mokkery.answering.throws
 import dev.mokkery.every
 import dev.mokkery.everySuspend
@@ -53,8 +57,8 @@ class EmbeddedMessagingClientTest {
     private lateinit var mockClientExceptionHandler: ClientExceptionHandler
     private lateinit var onlineEvents: MutableSharedFlow<OnlineSdkEvent>
     private lateinit var mockEmbeddedMessagesRequestFactory: EmbeddedMessagingRequestFactoryApi
-    private lateinit var mockEmarsysNetworkClient: NetworkClientApi
-    private lateinit var mockEmbeddedMessagingContext: EmbeddedMessagingContextApi
+    private lateinit var mockECNetworkClient: NetworkClientApi
+    private lateinit var embeddedMessagingContext: EmbeddedMessagingContextApi
 
     @BeforeTest
     fun setup() = runTest {
@@ -64,9 +68,8 @@ class EmbeddedMessagingClientTest {
         mockEventsDao = mock()
         mockEmbeddedMessagesRequestFactory = mock()
         mockClientExceptionHandler = mock()
-        mockEmarsysNetworkClient = mock()
-        mockEmbeddedMessagingContext = mock(MockMode.autofill)
-        every { mockEmbeddedMessagingContext.embeddedMessagingFrequencyCapSeconds } returns 5
+        mockECNetworkClient = mock()
+        embeddedMessagingContext = EmbeddedMessagingContext()
 
         onlineEvents = MutableSharedFlow()
 
@@ -88,13 +91,14 @@ class EmbeddedMessagingClientTest {
             sdkEventManager = mockSdkEventManager,
             applicationScope = applicationScope,
             embeddedMessagingRequestFactory = mockEmbeddedMessagesRequestFactory,
-            ecNetworkClient = mockEmarsysNetworkClient,
+            ecNetworkClient = mockECNetworkClient,
             eventsDao = mockEventsDao,
-            clientExceptionHandler = mockClientExceptionHandler
+            clientExceptionHandler = mockClientExceptionHandler,
+            embeddedMessagingContext = embeddedMessagingContext
         )
 
     @Test
-    fun testConsumer_should_get_FetchBadgeCountEvent_from_flow_and_send_http_request_and_ack_event_and_emit_response() =
+    fun testConsumer_shouldGetFetchBadgeCountEventFromFlow_andSendHttpRequest_andAckEvent_andEmitResponse() =
         runTest {
             createEmbeddedMessagingClient(backgroundScope).register()
             val event = SdkEvent.Internal.EmbeddedMessaging.FetchBadgeCount(nackCount = 0)
@@ -117,7 +121,7 @@ class EmbeddedMessagingClientTest {
                 bodyAsText = "{}"
             )
 
-            everySuspend { mockEmarsysNetworkClient.send(request) } returns Result.success(
+            everySuspend { mockECNetworkClient.send(request) } returns Result.success(
                 expectedResponse
             )
             everySuspend { mockEventsDao.removeEvent(event) } returns Unit
@@ -144,7 +148,7 @@ class EmbeddedMessagingClientTest {
                     event
                 )
             }
-            verifySuspend { mockEmarsysNetworkClient.send(request) }
+            verifySuspend { mockECNetworkClient.send(request) }
             verifySuspend { mockEventsDao.removeEvent(event) }
             verifySuspend {
                 mockSdkEventManager.emitEvent(
@@ -157,7 +161,7 @@ class EmbeddedMessagingClientTest {
         }
 
     @Test
-    fun testConsumer_should_consume_only_EmbeddedMessaging_events() = runTest {
+    fun testConsumer_shouldConsumeOnlyEmbeddedMessagingEvents() = runTest {
         createEmbeddedMessagingClient(backgroundScope).register()
         val event1 = SdkEvent.Internal.EmbeddedMessaging.FetchBadgeCount(nackCount = 0)
         val event2 =
@@ -189,16 +193,28 @@ class EmbeddedMessagingClientTest {
             url = Url("https://test.com"),
             method = HttpMethod.Get
         )
+        val anyResponse = Response(
+            status = HttpStatusCode.OK,
+            headers = Headers.Empty,
+            originalRequest = request,
+            bodyAsText = "{}"
+        )
+
+        val metaDataResponse = Response(
+            status = HttpStatusCode.OK,
+            headers = Headers.Empty,
+            originalRequest = request,
+            bodyAsText = createMetaDataResponseString()
+        )
 
         everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
         everySuspend { mockEmbeddedMessagesRequestFactory.create(any()) } returns request
-        everySuspend { mockEmarsysNetworkClient.send(any()) } returns Result.success(
-            Response(
-                status = HttpStatusCode.OK,
-                headers = Headers.Empty,
-                originalRequest = request,
-                bodyAsText = "{}"
-            )
+        everySuspend { mockECNetworkClient.send(any()) } sequentiallyReturns listOf(
+            Result.success(anyResponse),
+            Result.success(anyResponse),
+            Result.success(metaDataResponse),
+            Result.success(anyResponse),
+            Result.success(anyResponse)
         )
 
         onlineEvents.emit(event1)
@@ -215,7 +231,7 @@ class EmbeddedMessagingClientTest {
     }
 
     @Test
-    fun testConsumer_should_reEmit_events_into_flow_when_there_is_a_network_error() = runTest {
+    fun testConsumer_shouldReEmitEventsIntoFlow_whenThereIsANetworkError() = runTest {
         createEmbeddedMessagingClient(backgroundScope).register()
         val event = SdkEvent.Internal.EmbeddedMessaging.FetchBadgeCount(nackCount = 0)
         val request = UrlRequest(
@@ -229,7 +245,7 @@ class EmbeddedMessagingClientTest {
             )
         } returns request
 
-        everySuspend { mockEmarsysNetworkClient.send(request) } returns Result.failure(
+        everySuspend { mockECNetworkClient.send(request) } returns Result.failure(
             SdkException.NetworkIOException(
                 "Test Network error"
             )
@@ -246,12 +262,12 @@ class EmbeddedMessagingClientTest {
 
         onlineSdkEvents.await() shouldBe listOf(event)
         verifySuspend { mockEmbeddedMessagesRequestFactory.create(event) }
-        verifySuspend { mockEmarsysNetworkClient.send(request) }
+        verifySuspend { mockECNetworkClient.send(request) }
         verifySuspend { mockSdkEventManager.emitEvent(event) }
     }
 
     @Test
-    fun testConsumer_should_call_clientExceptionHandler_when_exception_happens() = runTest {
+    fun testConsumer_shouldCallClientExceptionHandler_whenExceptionHappens() = runTest {
         createEmbeddedMessagingClient(backgroundScope).register()
         val testException = Exception("Test Exception")
         val event = SdkEvent.Internal.EmbeddedMessaging.FetchBadgeCount(nackCount = 0)
@@ -277,7 +293,7 @@ class EmbeddedMessagingClientTest {
         advanceUntilIdle()
 
         onlineSdkEvents.await() shouldBe listOf(event)
-        verifySuspend(VerifyMode.exactly(0)) { mockEmarsysNetworkClient.send(any()) }
+        verifySuspend(VerifyMode.exactly(0)) { mockECNetworkClient.send(any()) }
         verifySuspend {
             mockClientExceptionHandler.handleException(
                 testException,
@@ -293,5 +309,171 @@ class EmbeddedMessagingClientTest {
                 )
             )
         }
+    }
+
+    @Test
+    fun testConsumer_shouldGetFetchMetaEventFromFlow_andSendHttpRequest_andStoreMetaData_andAckEvent_andEmitResponse() =
+        runTest {
+            createEmbeddedMessagingClient(backgroundScope).register()
+            val event = SdkEvent.Internal.EmbeddedMessaging.FetchMeta(nackCount = 0)
+
+            val request = UrlRequest(
+                url = Url("https://test.com"),
+                method = HttpMethod.Get
+            )
+
+            every {
+                mockEmbeddedMessagesRequestFactory.create(
+                    event
+                )
+            } returns request
+
+            val expectedResponse = Response(
+                status = HttpStatusCode.OK,
+                headers = Headers.Empty,
+                originalRequest = request,
+                bodyAsText = createMetaDataResponseString()
+            )
+
+            everySuspend { mockECNetworkClient.send(request) } returns Result.success(
+                expectedResponse
+            )
+            everySuspend { mockEventsDao.removeEvent(event) } returns Unit
+            everySuspend {
+                mockSdkEventManager.emitEvent(
+                    SdkEvent.Internal.Sdk.Answer.Response(
+                        event.id,
+                        Result.success(expectedResponse)
+                    )
+                )
+            } returns Unit
+
+            val onlineSdkEvents = backgroundScope.async {
+                onlineEvents.take(1).toList()
+            }
+
+            onlineEvents.emit(event)
+
+            advanceUntilIdle()
+
+            onlineSdkEvents.await() shouldNotBe null
+            verifySuspend {
+                mockEmbeddedMessagesRequestFactory.create(
+                    event
+                )
+            }
+            verifySuspend { mockECNetworkClient.send(request) }
+            verifySuspend { mockEventsDao.removeEvent(event) }
+            verifySuspend {
+                mockSdkEventManager.emitEvent(
+                    SdkEvent.Internal.Sdk.Answer.Response(
+                        event.id,
+                        Result.success(expectedResponse)
+                    )
+                )
+            }
+            embeddedMessagingContext.metaData shouldBe expectedResponse.body<MetaData>()
+        }
+
+    private fun createMetaDataResponseString(): String {
+        val metaDataResponseString = """{
+  "version" : "v1",
+  "labels" : {
+    "allMessagesHeader" : "All Messages",
+    "unreadMessagesHeader" : "Unread Messages",
+    "filterCategories" : "Filter Categories",
+    "pinnedMessagesTitle" : "Pinned Messages",
+    "detailedMessageCloseButton" : "Close",
+    "deleteDetailedMessageButton" : "Delete",
+    "emptyStateTitle" : "No Messages",
+    "emptyStateDescription" : "You have no messages at the moment."
+  },
+  "design" : {
+    "fillColor" : {
+      "primary" : "#FF526525",
+      "onPrimary" : "#FFFFFFFF",
+      "primaryContainer" : "#FFE8F5E8",
+      "onPrimaryContainer" : "#FF1B5E20",
+      "secondary" : "#FF2E7D32",
+      "onSecondary" : "#FFFFFFFF",
+      "secondaryContainer" : "#FFDFE6C5",
+      "onSecondaryContainer" : "#FF181E09",
+      "tertiary" : "#FF388E3C",
+      "onTertiary" : "#FFFFFFFF",
+      "tertiaryContainer" : "#FFA5D6A7",
+      "onTertiaryContainer" : "#FF1B5E20",
+      "error" : "#FFD32F2F",
+      "onError" : "#FFFFFFFF",
+      "errorContainer" : "#FFFFEBEE",
+      "onErrorContainer" : "#FFD32F2F",
+      "background" : "#FFF4F4E8",
+      "onBackground" : "#FF1B5E20",
+      "surface" : "#FFEFEFE2",
+      "onSurface" : "#FF45483C",
+      "surfaceVariant" : "#FFF6F5E9",
+      "onSurfaceVariant" : "#FF2E7D32",
+      "surfaceContainer" : "#FFF5F5F5",
+      "surfaceContainerHigh" : "#FFE9E9DD",
+      "surfaceContainerHighest" : "#FFE8F5E8",
+      "surfaceContainerLow" : "#FFF4F4E8",
+      "surfaceContainerLowest" : "#FFFFFFFF",
+      "surfaceDim" : "#FFE0E0E0",
+      "surfaceBright" : "#FFFFFFFF",
+      "outline" : "#FF76786B",
+      "outlineVariant" : "#FFA5D6A7",
+      "inverseSurface" : "#FF2E7D32",
+      "inverseOnSurface" : "#FFFFFFFF",
+      "inversePrimary" : "#FF4CAF50",
+      "scrim" : "#80000000",
+      "surfaceTint": "#526525",
+      "primaryFixed": "#ffffff",
+      "primaryFixedDim": "#e4edcf",
+      "onPrimaryFixed": "#000000",
+      "onPrimaryFixedVariant": "#151a0a",
+      "secondaryFixed": "#ffffff",
+      "secondaryFixedDim": "#d7ead2",
+      "onSecondaryFixed": "#000000",
+      "onSecondaryFixedVariant": "#0e190b",
+      "tertiaryFixed": "#ffffff",
+      "tertiaryFixedDim": "#eae5d2",
+      "onTertiaryFixed": "#000000",
+      "onTertiaryFixedVariant": "#19160b"
+    },
+    "text" : {
+      "displayLargeFontSize" : 57,
+      "displayMediumFontSize" : 45,
+      "displaySmallFontSize" : 36,
+      "headlineLargeFontSize" : 32,
+      "headlineMediumFontSize" : 28,
+      "headlineSmallFontSize" : 24,
+      "titleLargeFontSize" : 22,
+      "titleMediumFontSize" : 16,
+      "titleSmallFontSize" : 14,
+      "bodyLargeFontSize" : 16,
+      "bodyMediumFontSize" : 14,
+      "bodySmallFontSize" : 12,
+      "labelLargeFontSize" : 14,
+      "labelMediumFontSize" : 12,
+      "labelSmallFontSize" : 11
+    },
+    "misc" : {
+        "messageItemMargin": 8,
+        "messageItemElevation": 8,
+        "buttonElevation": 8,
+        "listContentPadding": 8,
+        "listItemSpacing": 8,
+        "compactOverlayWidth": 8,
+        "compactOverlayMaxHeight": 8,
+        "compactOverlayCornerRadius": 8,
+        "compactOverlayElevation": 8,
+        "messageItemCardCornerRadius": 8,
+        "messageItemCardElevation": 8,
+        "messageItemImageHeight": 8,
+        "messageItemImageClipShape": "rectangle",
+        "messageItemImageCornerRadius": 8
+    }
+  }
+}"""
+        return metaDataResponseString
     }
 }

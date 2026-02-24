@@ -6,10 +6,13 @@ import com.sap.ec.core.exceptions.SdkException.NetworkIOException
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.clients.NetworkClientApi
 import com.sap.ec.core.networking.model.Response
+import com.sap.ec.core.networking.model.body
 import com.sap.ec.event.OnlineSdkEvent
 import com.sap.ec.event.SdkEvent
+import com.sap.ec.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import com.sap.ec.mobileengage.embeddedmessaging.networking.EmbeddedMessagingRequestFactoryApi
 import com.sap.ec.networking.clients.EventBasedClientApi
+import com.sap.ec.networking.clients.embedded.messaging.model.MetaData
 import com.sap.ec.networking.clients.error.ClientExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -25,7 +28,8 @@ internal class EmbeddedMessagingClient(
     private val embeddedMessagingRequestFactory: EmbeddedMessagingRequestFactoryApi,
     private val ecNetworkClient: NetworkClientApi,
     private val eventsDao: EventsDaoApi,
-    private val clientExceptionHandler: ClientExceptionHandler
+    private val clientExceptionHandler: ClientExceptionHandler,
+    private val embeddedMessagingContext: EmbeddedMessagingContextApi
 ) : EventBasedClientApi {
 
     override suspend fun register() {
@@ -51,12 +55,21 @@ internal class EmbeddedMessagingClient(
                     val request =
                         embeddedMessagingRequestFactory.create(it as SdkEvent.Internal.EmbeddedMessaging)
                     when (it) {
-                        is SdkEvent.Internal.EmbeddedMessaging.FetchMessages -> {
+                        is SdkEvent.Internal.EmbeddedMessaging.FetchMeta -> {
                             ecNetworkClient.send(request)
                                 .onSuccess { response ->
+                                    embeddedMessagingContext.metaData = response.body<MetaData>()
+                                    sdkLogger.debug("Meta data fetched and stored in EmbeddedMessagingContext")
                                     handleSuccess(it, response)
                                 }.onFailure { exception ->
-                                    handleException(exception, it)
+                                    handleException(
+                                        exception,
+                                        it
+                                    )
+                                    sdkLogger.error(
+                                        "Error happened while fetching Embedded Messaging Meta data",
+                                        exception
+                                    )
                                 }
                         }
 

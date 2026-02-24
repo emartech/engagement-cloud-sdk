@@ -70,13 +70,14 @@ object NetworkInjection {
         }
         single<EventBasedClientApi>(named(EventBasedClientTypes.EmbeddedMessaging)) {
             EmbeddedMessagingClient(
-                ecNetworkClient = get(named(NetworkClientTypes.EC)),
-                clientExceptionHandler = get(),
-                embeddedMessagingRequestFactory = get(),
-                sdkEventManager = get(),
-                eventsDao = get(),
                 sdkLogger = get { parametersOf(EmbeddedMessagingClient::class.simpleName) },
+                sdkEventManager = get(),
                 applicationScope = get(named(CoroutineScopeTypes.Application)),
+                embeddedMessagingRequestFactory = get(),
+                ecNetworkClient = get(named(NetworkClientTypes.EC)),
+                eventsDao = get(),
+                clientExceptionHandler = get(),
+                embeddedMessagingContext = get()
             )
         }
         single<EventBasedClientApi>(named(EventBasedClientTypes.Device)) {

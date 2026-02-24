@@ -5,17 +5,14 @@ import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.model.Response
-import com.sap.ec.core.networking.model.body
 import com.sap.ec.core.state.State
 import com.sap.ec.event.SdkEvent
-import com.sap.ec.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
-import com.sap.ec.networking.clients.embedded.messaging.model.MetaData
+import com.sap.ec.response.mapToUnitOrFailure
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 
 internal class FetchEmbeddedMessagingMetaState(
-    private val embeddedMessagingContext: EmbeddedMessagingContextApi,
     private val sdkContext: SdkContextApi,
     private val sdkEventDistributor: SdkEventDistributorApi,
     private val sdkLogger: Logger
@@ -31,22 +28,7 @@ internal class FetchEmbeddedMessagingMetaState(
             sdkEventDistributor.registerEvent(
                 SdkEvent.Internal.EmbeddedMessaging.FetchMeta()
             ).await<Response>()
-                .result
-                .fold(
-                    onSuccess = {
-                        embeddedMessagingContext.metaData = it.body<MetaData>()
-                        sdkLogger.debug("Meta data fetched and stored in EmbeddedMessagingContext")
-                        Result.success(Unit)
-                    },
-                    onFailure = {
-                        embeddedMessagingContext.metaData = null
-                        sdkLogger.error(
-                            "Error happened while fetching Embedded Messaging Meta data",
-                            it
-                        )
-                        Result.failure(it)
-                    }
-                )
+                .mapToUnitOrFailure()
         } else {
             sdkLogger.debug("Feature Embedded Messaging is disabled, skipping Fetch Meta data job")
             Result.success(Unit)
