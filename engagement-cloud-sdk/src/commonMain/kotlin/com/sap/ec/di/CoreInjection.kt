@@ -5,6 +5,7 @@ import com.sap.ec.api.setup.Setup
 import com.sap.ec.api.setup.SetupApi
 import com.sap.ec.context.DefaultUrls
 import com.sap.ec.context.DefaultUrlsApi
+import com.sap.ec.context.Features
 import com.sap.ec.context.SdkContext
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributor
@@ -151,7 +152,7 @@ object CoreInjection {
                 onContactLinkingFailed = null,
                 defaultUrls = get(),
                 remoteLogLevel = LogLevel.Error,
-                features = mutableSetOf(),
+                features = mutableSetOf(Features.JsBridgeSignatureCheck),
                 logBreadcrumbsQueueSize = 10
             )
         }

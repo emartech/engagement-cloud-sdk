@@ -20,6 +20,7 @@ import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import dev.mokkery.verify
+import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -41,7 +42,7 @@ class RemoteConfigResponseHandlerTests {
         every { mockSdkContext.defaultUrls } returns defaultUrls
 
         everySuspend { mockSdkContext.sdkDispatcher } returns StandardTestDispatcher()
-        every { mockSdkContext.features } returns mutableSetOf()
+        every { mockSdkContext.features } returns mutableSetOf(JsBridgeSignatureCheck)
 
         mockDeviceInfoCollector = mock(MockMode.autofill)
         mockRandomProvider = mock(MockMode.autofill)
@@ -96,12 +97,40 @@ class RemoteConfigResponseHandlerTests {
         defaultUrlSlot.get().embeddedMessagingBaseUrl shouldBe embeddedMessagingServiceUrl
         defaultUrlSlot.get().jsBridgeUrl shouldBe jsBridgeUrl
         verify { mockSdkContext.remoteLogLevel = LogLevel.Error }
-        mockSdkContext.features shouldBe listOf(
+        mockSdkContext.features.size shouldBe 3
+        mockSdkContext.features shouldContainAll listOf(
             MobileEngage,
             EmbeddedMessaging,
             JsBridgeSignatureCheck
         )
     }
+
+    @Test
+    fun testHandleAppCodeBasedConfigs_shouldFallbackToJsBridgeSignatureCheck_evenIfJsBridgeIsNotDefined() =
+        runTest {
+            val defaultUrlSlot = slot<DefaultUrlsApi>()
+
+            val configResponse = RemoteConfigResponse(
+                ServiceUrls(
+
+                ),
+                LogLevel.Debug,
+                LuckyLogger(LogLevel.Error, 1.0),
+                RemoteConfigFeatures(
+
+                ),
+            )
+            every { mockRandomProvider.provide() } returns 0.1
+            every { mockSdkContext.defaultUrls = capture(defaultUrlSlot) } returns Unit
+
+
+            remoteConfigResponseHandler.handle(configResponse)
+
+            verify { mockSdkContext.remoteLogLevel = LogLevel.Error }
+            mockSdkContext.features shouldBe listOf(
+                JsBridgeSignatureCheck
+            )
+        }
 
     @Test
     fun testHandleGlobalConfig() = runTest {
@@ -113,7 +142,7 @@ class RemoteConfigResponseHandlerTests {
                 clientService = clientServiceUrl
             ), LogLevel.Debug,
             LuckyLogger(LogLevel.Error, 1.0),
-            RemoteConfigFeatures(mobileEngage = true),
+            RemoteConfigFeatures(mobileEngage = true, jsBridgeSignatureCheck = false),
             overrides = mapOf(
                 "differentClientId" to RemoteConfig(
                     ServiceUrls(clientService = "differentClientServiceUrl")
