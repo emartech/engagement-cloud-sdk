@@ -27,7 +27,7 @@ kotlin {
     ).forEach { iosTarget ->
         if (isMac) {
             iosTarget.binaries.framework {
-                baseName = "EngagementCloudNotificationService"
+                baseName = "EngagementCloudSDKNotificationService"
                 isStatic = true
             }
         }
@@ -63,7 +63,7 @@ publishing {
 
 if (isMac) {
     extensions.configure<KmmBridgeExtension>("kmmbridge") {
-        frameworkName.set("EngagementCloudNotificationService")
+        frameworkName.set("EngagementCloudSDKNotificationService")
         val spmBuildType = System.getenv("SPM_BUILD") ?: "dev"
         when (spmBuildType) {
             "dev" -> {

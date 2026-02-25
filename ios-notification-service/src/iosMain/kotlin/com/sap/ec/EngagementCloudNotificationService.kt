@@ -39,12 +39,15 @@ import platform.UserNotifications.UNNotificationCategory
 import platform.UserNotifications.UNNotificationCategoryOptionNone
 import platform.UserNotifications.UNNotificationContent
 import platform.UserNotifications.UNNotificationRequest
+import kotlin.experimental.ExperimentalObjCName
 
 enum class PayloadVersion {
     V1,
     V2
 }
 
+@OptIn(ExperimentalObjCName::class)
+@ObjCName("EngagementCloudNotificationService")
 @BetaInteropApi
 class EngagementCloudNotificationService(
     private val notificationCenter: NotificationCenterApi = NotificationCenter()

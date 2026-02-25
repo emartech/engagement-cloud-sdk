@@ -5,7 +5,7 @@ let engagementCloudSDKPackageName = "EngagementCloudSDK"
 let engagementCloudSDKUrl = "__SDK_URL__"
 let engagementCloudSDKChecksum = "__SDK_CHECKSUM__"
 
-let engagementCloudNotificationServicePackageName = "EngagementCloudNotificationService"
+let engagementCloudNotificationServicePackageName = "EngagementCloudSDKNotificationService"
 let engagementCloudNotificationServiceUrl = "__NS_URL__"
 let engagementCloudNotificationServiceChecksum = "__NS_CHECKSUM__"
 

@@ -264,17 +264,17 @@ jobs:
           cd $GITHUB_WORKSPACE
           
           cd ios-notification-service/build/XCFrameworks/release
-          zip -r $GITHUB_WORKSPACE/EngagementCloudNotificationService.xcframework.zip EngagementCloudNotificationService.xcframework
+          zip -r $GITHUB_WORKSPACE/EngagementCloudSDKNotificationService.xcframework.zip EngagementCloudSDKNotificationService.xcframework
           cd $GITHUB_WORKSPACE
           
           # Calculate checksums
           echo "SDK_CHECKSUM=$(shasum -a 256 EngagementCloudSDK.xcframework.zip | cut -d ' ' -f 1)" >> $GITHUB_ENV
-          echo "NS_CHECKSUM=$(shasum -a 256 EngagementCloudNotificationService.xcframework.zip | cut -d ' ' -f 1)" >> $GITHUB_ENV
+          echo "NS_CHECKSUM=$(shasum -a 256 EngagementCloudSDKNotificationService.xcframework.zip | cut -d ' ' -f 1)" >> $GITHUB_ENV
           
           # Upload to GitHub Release
           gh release upload ${{ env.VERSION }} \
             EngagementCloudSDK.xcframework.zip \
-            EngagementCloudNotificationService.xcframework.zip \
+            EngagementCloudSDKNotificationService.xcframework.zip \
             --clobber
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -285,7 +285,7 @@ jobs:
           # Generate Package.swift from template
           sed -e "s|__SDK_URL__|https://github.com/${{ github.repository }}/releases/download/${{ env.VERSION }}/EngagementCloudSDK.xcframework.zip|" \
               -e "s|__SDK_CHECKSUM__|${{ env.SDK_CHECKSUM }}|" \
-              -e "s|__NS_URL__|https://github.com/${{ github.repository }}/releases/download/${{ env.VERSION }}/EngagementCloudNotificationService.xcframework.zip|" \
+              -e "s|__NS_URL__|https://github.com/${{ github.repository }}/releases/download/${{ env.VERSION }}/EngagementCloudSDKNotificationService.xcframework.zip|" \
               -e "s|__NS_CHECKSUM__|${{ env.NS_CHECKSUM }}|" \
               iosReleaseSpm/Package.swift > Package.swift
           

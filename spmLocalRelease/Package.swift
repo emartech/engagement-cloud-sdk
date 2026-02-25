@@ -6,7 +6,7 @@ let SdkPackageName = "EngagementCloudSDK"
 // END KMMBRIDGE BLOCK FOR 'EngagementCloudSDK'
 
 // BEGIN KMMBRIDGE VARIABLES BLOCK FOR 'EngagementCloudNotificationService' (do not edit)
-let NotificationServicePackageName = "EngagementCloudNotificationService"
+let NotificationServicePackageName = "EngagementCloudSDKNotificationService"
 // END KMMBRIDGE BLOCK FOR 'EngagementCloudNotificationService'
 
 
