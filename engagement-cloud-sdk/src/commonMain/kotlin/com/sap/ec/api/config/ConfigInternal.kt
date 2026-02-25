@@ -2,6 +2,7 @@ package com.sap.ec.api.config
 
 import com.sap.ec.config.ApplicationCode
 import com.sap.ec.config.validate
+import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.collections.dequeue
 import com.sap.ec.core.language.LanguageHandlerApi
@@ -18,19 +19,24 @@ internal class ConfigInternal(
     private val uuidProvider: UuidProviderApi,
     private val timestampProvider: InstantProvider,
     private val sdkLogger: Logger,
-    private val languageHandler: LanguageHandlerApi
+    private val languageHandler: LanguageHandlerApi,
+    private val sdkContext: SdkContextApi
 ) : ConfigInstance {
 
     override suspend fun changeApplicationCode(applicationCode: String) {
         val appCode = ApplicationCode(applicationCode.uppercase())
         appCode.validate(sdkLogger)
-        sdkEventDistributor.registerEvent(
-            SdkEvent.Internal.Sdk.ChangeAppCode(
-                id = uuidProvider.provide(),
-                timestamp = timestampProvider.provide(),
-                applicationCode = appCode.value
+        if (appCode.value == sdkContext.config?.applicationCode) {
+            sdkLogger.info("The new appcode is the same as the currently used.")
+        } else {
+            sdkEventDistributor.registerEvent(
+                SdkEvent.Internal.Sdk.ChangeAppCode(
+                    id = uuidProvider.provide(),
+                    timestamp = timestampProvider.provide(),
+                    applicationCode = appCode.value
+                )
             )
-        )
+        }
     }
 
     override suspend fun setLanguage(language: String) {

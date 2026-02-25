@@ -1,5 +1,7 @@
 package com.sap.ec.api.config
 
+import com.sap.ec.TestEngagementCloudSDKConfig
+import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.exceptions.SdkException
 import com.sap.ec.core.language.LanguageHandlerApi
@@ -33,7 +35,8 @@ class ConfigInternalTests {
     private companion object {
         const val UUID = "testUUID"
         val TIMESTAMP = Clock.System.now()
-        const val APPCODE = "A1s2D-F3G4H"
+        const val OLD_APPCODE = "B2B3C-D6T2C"
+        const val NEW_APPCODE = "A1s2D-F3G4H"
         const val MULTI_REGION_APPCODE = "INS-S01-APP-ABC12"
         const val HUNGARIAN_LANGUAGE = "hu-HU"
     }
@@ -45,6 +48,7 @@ class ConfigInternalTests {
     private lateinit var mockLanguageHandler: LanguageHandlerApi
     private lateinit var configInternal: ConfigInternal
     private lateinit var mockConfigContext: ConfigContextApi
+    private lateinit var mockSdkContext: SdkContextApi
 
     @BeforeTest
     fun setUp() = runTest {
@@ -58,6 +62,7 @@ class ConfigInternalTests {
         mockSdkEventDistributor = mock(MockMode.autofill)
         everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mock(MockMode.autofill)
         mockConfigContext = mock()
+        mockSdkContext = mock()
         configInternal =
             ConfigInternal(
                 mockSdkEventDistributor,
@@ -66,6 +71,7 @@ class ConfigInternalTests {
                 mockTimestampProvider,
                 mockLogger,
                 mockLanguageHandler,
+                mockSdkContext
             )
     }
 
@@ -73,34 +79,47 @@ class ConfigInternalTests {
     fun testChangeApplicationCode_shouldEmitChangeApplicationCodeEvent_toSdkEventFlow() = runTest {
         val expectedEvent = SdkEvent.Internal.Sdk.ChangeAppCode(
             id = UUID,
-            applicationCode = APPCODE.uppercase(),
+            applicationCode = NEW_APPCODE.uppercase(),
             timestamp = TIMESTAMP
         )
+        everySuspend { mockSdkContext.config } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
 
-        configInternal.changeApplicationCode(APPCODE)
+        configInternal.changeApplicationCode(NEW_APPCODE)
 
         verifySuspend { mockSdkEventDistributor.registerEvent(expectedEvent) }
     }
 
     @Test
-    fun testChangeApplicationCode_shouldEmitChangeApplicationCodeEvent_toSdkEventFlow_whenMultiRegionAppCode_isUsed() = runTest {
-        val expectedEvent = SdkEvent.Internal.Sdk.ChangeAppCode(
-            id = UUID,
-            applicationCode = MULTI_REGION_APPCODE.uppercase(),
-            timestamp = TIMESTAMP
-        )
+    fun testChangeApplicationCode_shouldEmitChangeApplicationCodeEvent_toSdkEventFlow_whenMultiRegionAppCode_isUsed() =
+        runTest {
+            val expectedEvent = SdkEvent.Internal.Sdk.ChangeAppCode(
+                id = UUID,
+                applicationCode = MULTI_REGION_APPCODE.uppercase(),
+                timestamp = TIMESTAMP
+            )
+            everySuspend { mockSdkContext.config } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
 
-        configInternal.changeApplicationCode(MULTI_REGION_APPCODE)
+            configInternal.changeApplicationCode(MULTI_REGION_APPCODE)
 
-        verifySuspend { mockSdkEventDistributor.registerEvent(expectedEvent) }
-    }
+            verifySuspend { mockSdkEventDistributor.registerEvent(expectedEvent) }
+        }
 
     @Test
-    fun testChangeApplicationCode_shouldReturn_whenAppCode_isEmpty() = runTest {
+    fun testChangeApplicationCode_shouldNotRegisterChangeAppCodeEvent_whenAppCode_isEmpty() = runTest {
         everySuspend { mockLogger.error(message = any()) } returns Unit
         shouldThrow<SdkException.InvalidApplicationCodeException> {
             configInternal.changeApplicationCode(" ")
         }
+
+        verifySuspend(mode = VerifyMode.exactly(0)) { mockSdkEventDistributor.registerEvent(any()) }
+    }
+
+    @Test
+    fun testChangeApplicationCode_shouldNotRegisterChangeAppCodeEvent_whenAppCode_hasNotChanged() = runTest {
+        everySuspend { mockSdkContext.config } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
+        everySuspend { mockLogger.info(any<String>()) } returns Unit
+
+        configInternal.changeApplicationCode(OLD_APPCODE)
 
         verifySuspend(mode = VerifyMode.exactly(0)) { mockSdkEventDistributor.registerEvent(any()) }
     }
@@ -151,12 +170,13 @@ class ConfigInternalTests {
     fun testActivate_shouldReplayStoredCallsFromConfigContext_inTheRightOrder() = runTest {
         val slot = Capture.slot<SdkEvent>()
         val testCalls = mutableListOf(
-            ConfigCall.ChangeApplicationCode(APPCODE),
+            ConfigCall.ChangeApplicationCode(NEW_APPCODE),
             ConfigCall.SetLanguage(HUNGARIAN_LANGUAGE),
             ConfigCall.ResetLanguage
         )
         everySuspend { mockConfigContext.calls } returns testCalls
         everySuspend { mockSdkEventDistributor.registerEvent(capture(slot)) } returns mock()
+        everySuspend { mockSdkContext.config } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
 
         configInternal.activate()
 
@@ -165,7 +185,7 @@ class ConfigInternalTests {
             mockSdkEventDistributor.registerEvent(testEvent)
             testEvent shouldBe SdkEvent.Internal.Sdk.ChangeAppCode(
                 id = UUID,
-                applicationCode = APPCODE.uppercase(),
+                applicationCode = NEW_APPCODE.uppercase(),
                 timestamp = TIMESTAMP
             )
             mockLanguageHandler.handleLanguage(HUNGARIAN_LANGUAGE)

@@ -48,6 +48,7 @@ object ConfigInjection {
                 timestampProvider = get(),
                 sdkLogger = get { parametersOf(ConfigInternal::class.simpleName) },
                 languageHandler = get(),
+                sdkContext = get()
             )
         }
         single<LanguageHandlerApi> {
