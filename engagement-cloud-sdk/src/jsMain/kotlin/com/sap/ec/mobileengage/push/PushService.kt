@@ -1,7 +1,7 @@
 package com.sap.ec.mobileengage.push
 
 import JsEngagementCloudSDKConfig
-import com.sap.ec.ServiceWorkerOptions
+import com.sap.ec.api.config.ServiceWorkerOptions
 import com.sap.ec.api.push.PushConstants
 import com.sap.ec.core.storage.StringStorageApi
 import js.buffer.BufferSource

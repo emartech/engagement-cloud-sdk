@@ -1,7 +1,7 @@
 package com.sap.ec.api.setup
 
 import JsEngagementCloudSDKConfig
-import com.sap.ec.JsApiConfig
+import com.sap.ec.api.config.JsApiConfig
 import kotlinx.coroutines.await
 import kotlin.js.Promise
 

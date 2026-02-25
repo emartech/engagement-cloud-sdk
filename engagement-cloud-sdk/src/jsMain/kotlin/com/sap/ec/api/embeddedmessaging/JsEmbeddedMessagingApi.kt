@@ -1,13 +1,11 @@
 package com.sap.ec.api.embeddedmessaging
 
-import com.sap.ec.networking.clients.embedded.messaging.model.MessageCategory
-
 @OptIn(ExperimentalJsExport::class)
 @JsExport
 interface JsEmbeddedMessagingApi {
-    fun getCategories(): Array<MessageCategory>
+    fun getCategories(): Array<JsMessageCategory>
     fun isUnreadFilterActive(): Boolean
-    fun getActiveCategoryFilters(): Array<MessageCategory>
+    fun getActiveCategoryFilters(): Array<JsMessageCategory>
     fun filterUnreadOnly(filterUnreadOnly: Boolean)
-    fun filterByCategories(categories: Array<MessageCategory>)
+    fun filterByCategories(categories: Array<JsMessageCategory>)
 }

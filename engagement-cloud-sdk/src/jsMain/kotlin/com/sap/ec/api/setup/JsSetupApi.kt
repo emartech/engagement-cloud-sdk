@@ -1,6 +1,6 @@
 package com.sap.ec.api.setup
 
-import com.sap.ec.JsApiConfig
+import com.sap.ec.api.config.JsApiConfig
 import kotlin.js.Promise
 
 @OptIn(ExperimentalJsExport::class)

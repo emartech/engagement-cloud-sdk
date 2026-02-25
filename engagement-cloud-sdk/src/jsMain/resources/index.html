@@ -53,11 +53,6 @@
 <script>
     let engagementCloud = window.EngagementCloud;
     document.getElementById("button-sdk-test").onclick = async () => {
-        <!--     const config = new window["engagement-cloud-sdk"].EngagementCloudConfig(-->
-        <!--         "EMSA4-90136",-->
-        <!--         null-->
-        <!--     )-->
-
         const config = {applicationCode: "EMSE3-B4341"};
 
         await engagementCloud.setup.enable(config, async () => { return {contactFieldValue: "test@test.com"} });

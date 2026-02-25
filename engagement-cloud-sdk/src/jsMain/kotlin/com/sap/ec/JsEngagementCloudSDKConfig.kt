@@ -1,4 +1,4 @@
-import com.sap.ec.ServiceWorkerOptions
+import com.sap.ec.api.config.ServiceWorkerOptions
 import com.sap.ec.config.SdkConfig
 import kotlinx.serialization.Serializable
 

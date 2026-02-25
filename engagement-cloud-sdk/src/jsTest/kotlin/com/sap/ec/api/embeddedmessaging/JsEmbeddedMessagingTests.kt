@@ -18,48 +18,51 @@ class JsEmbeddedMessagingTests {
             MessageCategory(1, "Category 1"),
             MessageCategory(2, "Category 2")
         )
+        val jsMessageCategories = CATEGORIES.map {
+            JSApiMessageCategory(it.id, it.value)
+        }
     }
 
     private lateinit var mockEmbeddedMessaging: EmbeddedMessagingApi
-    private lateinit var embeddedMessaging: JsEmbeddedMessagingApi
+    private lateinit var jsEmbeddedMessaging: JsEmbeddedMessagingApi
 
     @BeforeTest
     fun setup() {
         mockEmbeddedMessaging = mock(MockMode.autofill)
-        embeddedMessaging = JsEmbeddedMessaging(mockEmbeddedMessaging)
+        jsEmbeddedMessaging = JsEmbeddedMessaging(mockEmbeddedMessaging)
     }
 
     @Test
     fun `categories should return same value as embeddedMessaging categories`() {
         every { mockEmbeddedMessaging.categories } returns CATEGORIES
 
-        embeddedMessaging.getCategories() shouldBe CATEGORIES
+        jsEmbeddedMessaging.getCategories() shouldBe jsMessageCategories.toJsArray()
     }
 
     @Test
     fun `isUnreadFilterActive should return same value as embeddedMessaging`() {
         every { mockEmbeddedMessaging.isUnreadFilterActive } returns true
 
-        embeddedMessaging.isUnreadFilterActive() shouldBe true
+        jsEmbeddedMessaging.isUnreadFilterActive() shouldBe true
     }
 
     @Test
     fun `getActiveCategoryFilters should return same value as embeddedMessaging`() {
         every { mockEmbeddedMessaging.activeCategoryFilters } returns CATEGORIES
 
-        embeddedMessaging.getActiveCategoryFilters() shouldBe CATEGORIES.toJsArray()
+        jsEmbeddedMessaging.getActiveCategoryFilters() shouldBe jsMessageCategories.toJsArray()
     }
 
     @Test
     fun `filterUnreadOnly should delegate call to embeddedMessaging`() {
-        embeddedMessaging.filterUnreadOnly(true)
+        jsEmbeddedMessaging.filterUnreadOnly(true)
 
         verify { mockEmbeddedMessaging.filterUnreadOnly(true) }
     }
 
     @Test
     fun `filterByCategories should delegate call to embeddedMessaging`() {
-        embeddedMessaging.filterByCategories(CATEGORIES.toJsArray())
+        jsEmbeddedMessaging.filterByCategories(jsMessageCategories.toJsArray())
 
         verify { mockEmbeddedMessaging.filterByCategories(CATEGORIES) }
     }
