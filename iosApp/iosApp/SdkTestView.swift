@@ -54,7 +54,7 @@ struct SdkTestView: View {
         Task {
             try? await engagementCloud.setup.enable(
                 config: IosEngagementCloudSDKConfig(applicationCode: "EMSE3-B4341"),
-                onContactLinkingFailedCallback: { onSuccess, onError in
+                onContactLinkingFailed: { onSuccess, onError in
                     Task {
                         // login
                         onSuccess(LinkContactDataContactFieldValueData(contactFieldValue: "test@test.com"))
