@@ -224,4 +224,138 @@ class InAppJsBridgeTests {
             )
         }
     }
+
+    @Test
+    fun triggerMEEvent_shouldCall_actionFactory_withBasicCustomEventActionModel() = runTest {
+        val eventName = "testCustomEvent"
+        val testEventString = buildJsonObject {
+            put("type", "MECustomEvent")
+            put("reporting", reporting)
+            put("name", eventName)
+            put("payload", json.encodeToJsonElement(payloadMap))
+        }.toString()
+
+        val expectedActionModel = BasicCustomEventActionModel(reporting, eventName, payloadMap)
+
+        inAppJsBridge.triggerMEEvent(testEventString)
+
+        advanceUntilIdle()
+
+        coVerify {
+            mockActionFactory.create(expectedActionModel)
+        }
+    }
+
+    @Test
+    fun buttonClicked_shouldCall_actionFactory_withBasicButtonClickedActionModel() = runTest {
+        val testEventString = buildJsonObject {
+            put("reporting", reporting)
+        }.toString()
+
+        val expectedActionModel = BasicInAppButtonClickedActionModel(reporting, TRACKING_INFO)
+
+        inAppJsBridge.buttonClicked(testEventString)
+
+        advanceUntilIdle()
+
+        coVerify {
+            mockActionFactory.create(expectedActionModel)
+        }
+    }
+
+    @Test
+    fun triggerAppEvent_shouldCall_actionFactory_withBasicAppEventActionModel() = runTest {
+        val eventName = "testAppEvent"
+        val testEventString = buildJsonObject {
+            put("type", "MEAppEvent")
+            put("reporting", reporting)
+            put("name", eventName)
+            put("payload", json.encodeToJsonElement(payloadMap))
+        }.toString()
+
+        val expectedActionModel = BasicAppEventActionModel(reporting, eventName, payloadMap)
+
+        inAppJsBridge.triggerAppEvent(testEventString)
+
+        advanceUntilIdle()
+
+        coVerify {
+            mockActionFactory.create(expectedActionModel)
+        }
+    }
+
+    @Test
+    fun requestPushPermission_shouldCall_actionFactory_withRequestPushPermissionActionModel() = runTest {
+        val testEventString = buildJsonObject {
+            put("type", "RequestPushPermission")
+        }.toString()
+
+        val expectedActionModel = RequestPushPermissionActionModel()
+
+        inAppJsBridge.requestPushPermission(testEventString)
+
+        advanceUntilIdle()
+
+        coVerify {
+            mockActionFactory.create(expectedActionModel)
+        }
+    }
+
+    @Test
+    fun openExternalLink_shouldCall_actionFactory_withBasicOpenExternalUrlActionModel() = runTest {
+        val url = "https://test.com"
+        val testEventString = buildJsonObject {
+            put("type", "OpenExternalUrl")
+            put("reporting", reporting)
+            put("url", url)
+        }.toString()
+
+        val expectedActionModel = BasicOpenExternalUrlActionModel(reporting, url)
+
+        inAppJsBridge.openExternalLink(testEventString)
+
+        advanceUntilIdle()
+
+        coVerify {
+            mockActionFactory.create(expectedActionModel)
+        }
+    }
+
+    @Test
+    fun close_shouldCall_actionFactory_withBasicDismissActionModel() = runTest {
+        val testEventString = buildJsonObject {
+            put("type", "Dismiss")
+            put("reporting", reporting)
+        }.toString()
+
+        val expectedActionModel = BasicDismissActionModel(reporting, DISMISS_ID)
+
+        inAppJsBridge.close(testEventString)
+
+        advanceUntilIdle()
+
+        coVerify {
+            mockActionFactory.create(expectedActionModel)
+        }
+    }
+
+    @Test
+    fun copyToClipboard_shouldCall_actionFactory_withBasicCopyToClipboardActionModel() = runTest {
+        val text = "copy me to clipboard"
+        val testEventString = buildJsonObject {
+            put("type", "copyToClipboard")
+            put("reporting", reporting)
+            put("text", text)
+        }.toString()
+
+        val expectedActionModel = BasicCopyToClipboardActionModel(reporting, text)
+
+        inAppJsBridge.copyToClipboard(testEventString)
+
+        advanceUntilIdle()
+
+        coVerify {
+            mockActionFactory.create(expectedActionModel)
+        }
+    }
 }
