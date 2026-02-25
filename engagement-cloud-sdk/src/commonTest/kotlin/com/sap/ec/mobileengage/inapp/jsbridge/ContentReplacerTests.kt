@@ -6,6 +6,7 @@ import com.sap.ec.core.providers.sdkversion.SdkVersionProviderApi
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
+import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
@@ -29,6 +30,7 @@ class ContentReplacerTests {
     private lateinit var mockDefaultUrls: DefaultUrlsApi
     private lateinit var mockSdkVersionProvider: SdkVersionProviderApi
     private lateinit var mockSdkContext: SdkContextApi
+    private lateinit var mockJsBridgeVerifier: JsBridgeVerifierApi
 
     @BeforeTest
     fun setup() {
@@ -38,16 +40,40 @@ class ContentReplacerTests {
         every { mockSdkContext.defaultUrls } returns mockDefaultUrls
         mockSdkVersionProvider = mock(MockMode.autofill)
         every { mockSdkVersionProvider.provide() } returns TEST_SDK_VERSION
+        mockJsBridgeVerifier = mock(MockMode.autofill)
+        everySuspend { mockJsBridgeVerifier.shouldInjectJsBridge() } returns Result.success(true)
 
-        contentReplacer = ContentReplacer(mockSdkContext, mockSdkVersionProvider)
+        contentReplacer = ContentReplacer(mockSdkContext, mockSdkVersionProvider, mockJsBridgeVerifier)
     }
 
     @Test
-    fun replace_shouldAdd_theEcJsBridgeURL_toTheContent_byReplacing_thePlaceholder() = runTest {
+    fun replace_shouldAdd_scriptSrcTag_toTheContent_whenInjectionAllowed() = runTest {
+        everySuspend { mockJsBridgeVerifier.shouldInjectJsBridge() } returns Result.success(true)
 
         val result = contentReplacer.replace(TEST_INAPP_CONTENT)
 
-        result.contains(TEST_JS_BRIDGE_HOST_URL) shouldBe true
+        result.contains("<script src=\"$TEST_JS_BRIDGE_HOST_URL\"></script>") shouldBe true
+        result.contains(JS_BRIDGE_PLACEHOLDER) shouldBe false
+    }
+
+    @Test
+    fun replace_shouldRemovePlaceholder_whenInjectionDenied() = runTest {
+        everySuspend { mockJsBridgeVerifier.shouldInjectJsBridge() } returns Result.success(false)
+
+        val result = contentReplacer.replace(TEST_INAPP_CONTENT)
+
+        result.contains(TEST_JS_BRIDGE_HOST_URL) shouldBe false
+        result.contains(JS_BRIDGE_PLACEHOLDER) shouldBe false
+    }
+
+    @Test
+    fun replace_shouldRemovePlaceholder_whenVerifierReturnsFailure() = runTest {
+        everySuspend { mockJsBridgeVerifier.shouldInjectJsBridge() } returns
+            Result.failure(Exception("error"))
+
+        val result = contentReplacer.replace(TEST_INAPP_CONTENT)
+
+        result.contains(TEST_JS_BRIDGE_HOST_URL) shouldBe false
         result.contains(JS_BRIDGE_PLACEHOLDER) shouldBe false
     }
 

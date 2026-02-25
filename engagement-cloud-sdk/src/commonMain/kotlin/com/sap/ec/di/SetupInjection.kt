@@ -15,6 +15,7 @@ import com.sap.ec.enable.states.AppStartState
 import com.sap.ec.enable.states.ApplyAppCodeBasedRemoteConfigState
 import com.sap.ec.enable.states.CollectDeviceInfoState
 import com.sap.ec.enable.states.FetchEmbeddedMessagingMetaState
+import com.sap.ec.enable.states.FetchJsBridgeState
 import com.sap.ec.enable.states.RegisterClientState
 import com.sap.ec.enable.states.RegisterPushTokenState
 import com.sap.ec.enable.states.RestoreSavedSdkEventsState
@@ -99,11 +100,18 @@ object SetupInjection {
                 sdkLogger = get { parametersOf(FetchEmbeddedMessagingMetaState::class.simpleName) }
             )
         }
+        single<State>(named(StateTypes.FetchJsBridge)) {
+            FetchJsBridgeState(
+                jsBridgeClient = get(),
+                sdkLogger = get { parametersOf(FetchJsBridgeState::class.simpleName) }
+            )
+        }
         single<StateMachineApi>(named(StateMachineTypes.MobileEngageEnable)) {
             StateMachine(
                 states = listOf(
                     get<State>(named(StateTypes.CollectDeviceInfo)),
                     get<State>(named(StateTypes.ApplyAppCodeBasedRemoteConfig)),
+                    get<State>(named(StateTypes.FetchJsBridge)),
                     get<State>(named(StateTypes.RegisterClient)),
                     get<State>(named(StateTypes.PlatformInit)),
                     get<State>(named(StateTypes.RegisterPushToken)),
@@ -194,4 +202,5 @@ enum class StateTypes {
     ClearStoredConfig,
     ClearEvents,
     FetchEmbeddedMessagingMetaState,
+    FetchJsBridge,
 }

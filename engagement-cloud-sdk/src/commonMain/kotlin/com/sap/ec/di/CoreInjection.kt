@@ -1,6 +1,5 @@
 package com.sap.ec.di
 
-import com.sap.ec.IframeBridgeV2
 import com.sap.ec.api.setup.Setup
 import com.sap.ec.api.setup.SetupApi
 import com.sap.ec.context.DefaultUrls
@@ -52,6 +51,8 @@ import com.sap.ec.mobileengage.action.EventActionFactory
 import com.sap.ec.mobileengage.action.EventActionFactoryApi
 import com.sap.ec.mobileengage.embeddedmessaging.networking.EmbeddedMessagesRequestFactory
 import com.sap.ec.mobileengage.embeddedmessaging.networking.EmbeddedMessagingRequestFactoryApi
+import com.sap.ec.networking.clients.jsbridge.JsBridgeClient
+import com.sap.ec.networking.clients.jsbridge.JsBridgeClientApi
 import com.sap.ec.util.JsonUtil
 import com.sap.ec.watchdog.connection.ConnectionWatchDog
 import io.ktor.client.HttpClient
@@ -121,7 +122,8 @@ object CoreInjection {
                 "https://mobile-sdk-config.gservice.emarsys.net",
                 "https://log-dealer.gservice.emarsys.net",
                 "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/api",
-                IframeBridgeV2.IFRAME_BRIDGE_V2
+                "https://mobile-sdk-config.gservice.emarsys.net/jsbridge/latest.min.js",
+                "https://mobile-sdk-config.gservice.emarsys.net/jsbridge/latest.min.sign"
             )
         }
         single<SdkEventDistributor> {
@@ -180,6 +182,15 @@ object CoreInjection {
             Crypto(
                 logger = get<Logger> { parametersOf(Crypto::class.simpleName) },
                 PUBLIC_KEY
+            )
+        }
+        single<JsBridgeClientApi> {
+            JsBridgeClient(
+                networkClient = get(named(NetworkClientTypes.Generic)),
+                crypto = get(),
+                sdkContext = get(),
+                stringStorage = get(),
+                sdkLogger = get { parametersOf(JsBridgeClient::class.simpleName) }
             )
         }
     }

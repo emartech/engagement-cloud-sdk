@@ -8,5 +8,6 @@ data class ServiceUrls(
     val clientService: String? = null,
     val deepLinkService: String? = null,
     val embeddedMessagingService: String? = null,
-    val jsBridgeUrl: String? = null
+    val jsBridgeUrl: String? = null,
+    val jsBridgeSignatureUrl: String? = null
 )

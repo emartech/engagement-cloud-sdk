@@ -52,6 +52,7 @@ internal class RemoteConfigResponseHandler(
                 deepLinkBaseUrl = it.deepLinkService,
                 embeddedMessagingBaseUrl = it.embeddedMessagingService,
                 jsBridgeUrl = it.jsBridgeUrl,
+                jsBridgeSignatureUrl = it.jsBridgeSignatureUrl,
             )
         }
     }

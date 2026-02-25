@@ -7,4 +7,5 @@ object StorageConstants {
 
     const val WRAPPER_INFO_KEY = "wrapper_info"
     const val SDK_CONFIG_KEY = "sdk_config"
+    const val JS_BRIDGE_MD5_KEY = "js_bridge_md5"
 }

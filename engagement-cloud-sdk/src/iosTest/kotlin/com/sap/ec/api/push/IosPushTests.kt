@@ -129,7 +129,7 @@ class IosPushTests: KoinTest {
         sdkContext = SdkContext(
             sdkDispatcher = StandardTestDispatcher(),
             mainDispatcher = StandardTestDispatcher(),
-            defaultUrls = DefaultUrls("", "", "", "", "", "", ""),
+            defaultUrls = DefaultUrls("", "", "", "", "", "", "", ""),
             remoteLogLevel = LogLevel.Error,
             features = mutableSetOf(),
             logBreadcrumbsQueueSize = 10,

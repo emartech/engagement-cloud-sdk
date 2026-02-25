@@ -14,6 +14,8 @@ import com.sap.ec.api.inapp.LoggingInApp
 import com.sap.ec.core.collections.PersistentList
 import com.sap.ec.mobileengage.inapp.jsbridge.ContentReplacer
 import com.sap.ec.mobileengage.inapp.jsbridge.ContentReplacerApi
+import com.sap.ec.mobileengage.inapp.jsbridge.JsBridgeVerifier
+import com.sap.ec.mobileengage.inapp.jsbridge.JsBridgeVerifierApi
 import com.sap.ec.mobileengage.inapp.networking.download.InAppDownloader
 import com.sap.ec.mobileengage.inapp.networking.download.InAppDownloaderApi
 import com.sap.ec.mobileengage.inapp.networking.download.InlineInAppMessageFetcher
@@ -25,10 +27,18 @@ import org.koin.dsl.module
 
 object InAppInjection {
     val inAppModules = module {
+        single<JsBridgeVerifierApi> {
+            JsBridgeVerifier(
+                stringStorage = get(),
+                jsBridgeClient = get(),
+                sdkLogger = get { parametersOf(JsBridgeVerifier::class.simpleName) }
+            )
+        }
         single<ContentReplacerApi> {
             ContentReplacer(
                 sdkContext = get(),
-                sdkVersionProvider = get()
+                sdkVersionProvider = get(),
+                jsBridgeVerifier = get()
             )
         }
         single<InAppDownloaderApi> {

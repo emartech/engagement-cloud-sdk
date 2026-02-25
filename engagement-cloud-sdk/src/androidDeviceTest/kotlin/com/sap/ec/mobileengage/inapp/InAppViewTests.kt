@@ -14,6 +14,7 @@ import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.coVerify
 import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -65,7 +66,7 @@ class InAppViewTests {
         every { mockWebView.parent } returns null
 
         every { mockJsBridgeFactory.create(inAppJsBridgeData) } returns mockk(relaxed = true)
-        every { mockContentReplacer.replace(content) } returns replacedContent
+        coEvery { mockContentReplacer.replace(content) } returns replacedContent
         val inAppView = InAppView(
             applicationContext,
             testDispatcher,
@@ -86,7 +87,7 @@ class InAppViewTests {
 
         advanceUntilIdle()
 
-        verify { mockContentReplacer.replace(content) }
+        coVerify { mockContentReplacer.replace(content) }
         (inAppView.children.first() is WebView) shouldBe true
         verify {
             mockWebView.loadDataWithBaseURL(

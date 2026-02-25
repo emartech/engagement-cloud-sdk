@@ -9,6 +9,7 @@ import com.sap.ec.mobileengage.inapp.presentation.InAppType
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
+import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
@@ -68,7 +69,7 @@ class WebInappViewTests {
             </body>
             </html>"""
 
-        every { mockContentReplacer.replace(testHtml) } returns testHtml
+        everySuspend { mockContentReplacer.replace(testHtml) } returns testHtml
 
         val testMessage = InAppMessage(
             dismissId = UUID,

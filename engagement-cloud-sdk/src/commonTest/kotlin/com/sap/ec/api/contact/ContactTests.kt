@@ -69,7 +69,7 @@ class ContactTests : KoinTest {
         sdkContext = SdkContext(
             sdkDispatcher = StandardTestDispatcher(),
             mainDispatcher = mainDispatcher,
-            defaultUrls = DefaultUrls("", "", "", "", "", "", ""),
+            defaultUrls = DefaultUrls("", "", "", "", "", "", "", ""),
             remoteLogLevel = LogLevel.Error,
             features = mutableSetOf(),
             logBreadcrumbsQueueSize = 10,

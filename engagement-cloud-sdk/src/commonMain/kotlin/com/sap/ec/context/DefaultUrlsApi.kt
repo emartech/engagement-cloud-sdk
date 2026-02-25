@@ -8,4 +8,5 @@ interface DefaultUrlsApi {
     val loggingUrl: String
     val embeddedMessagingBaseUrl: String
     val jsBridgeUrl: String
+    val jsBridgeSignatureUrl: String
 }

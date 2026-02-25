@@ -2,5 +2,5 @@ package com.sap.ec.mobileengage.inapp.jsbridge
 
 interface ContentReplacerApi {
 
-    fun replace(content: String): String
+    suspend fun replace(content: String): String
 }
