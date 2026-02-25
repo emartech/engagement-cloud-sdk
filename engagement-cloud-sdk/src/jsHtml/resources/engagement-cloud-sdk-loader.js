@@ -36,7 +36,6 @@
       "getPushToken",
     ]),
     deepLink: createApiSegment("deepLink", ["track"]),
-    inApp: createApiSegment("inApp", ["pause", "resume", "isPaused"]),
     events: createApiSegment("events", [
       "once",
       "on",

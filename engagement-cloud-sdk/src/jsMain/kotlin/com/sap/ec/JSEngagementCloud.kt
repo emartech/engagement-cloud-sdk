@@ -6,7 +6,6 @@ import com.sap.ec.api.events.EventEmitterApi
 import com.sap.ec.api.events.SdkApiEvent
 import com.sap.ec.api.events.SdkEventSubscription
 import com.sap.ec.api.events.SdkEventSubscriptionApi
-import com.sap.ec.api.inapp.JSInAppApi
 import com.sap.ec.api.push.JSPushApi
 import com.sap.ec.api.setup.JsSetupApi
 import com.sap.ec.api.tracking.JSTrackingApi
@@ -48,7 +47,6 @@ object JSEngagementCloud {
     val event = koin.get<JSTrackingApi>()
     val push = koin.get<JSPushApi>()
     val deepLink = koin.get<JSDeepLinkApi>()
-    val inApp = koin.get<JSInAppApi>()
     val embeddedMessaging = koin.get<JsEmbeddedMessagingApi>()
 
     internal fun init() {

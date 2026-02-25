@@ -37,7 +37,7 @@ describe('engagement-cloud-sdk-loader', function () {
         }
     )
     it('should create all api segments on the EngagementCloud object', async () => {
-            const apiSegments = ['setup', 'config', 'contact', 'event', 'push', 'deepLink', 'inApp', 'events', 'embeddedMessaging']
+            const apiSegments = ['setup', 'config', 'contact', 'event', 'push', 'deepLink', 'events', 'embeddedMessaging']
             const {window} = await createTestEnvironment();
 
             apiSegments.forEach((segment) => {
