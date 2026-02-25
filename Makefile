@@ -175,6 +175,7 @@ pipeline-android: check-env
 			:engagement-cloud-sdk:publishIosSimulatorArm64PublicationToGitHubPackagesRepository \
 			:engagement-cloud-sdk-android-fcm:publishMavenPublicationToGitHubPackagesRepository \
 			:engagement-cloud-sdk-android-hms:publishMavenPublicationToGitHubPackagesRepository) \
+		-Pjs.variant=canvas \
 		-PENABLE_PUBLISHING=$(PUBLISH) \
 		--no-daemon
 
