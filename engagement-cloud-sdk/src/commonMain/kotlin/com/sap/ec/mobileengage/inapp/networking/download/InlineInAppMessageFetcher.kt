@@ -2,6 +2,7 @@ package com.sap.ec.mobileengage.inapp.networking.download
 
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.clients.NetworkClientApi
+import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.networking.model.UrlRequest
 import com.sap.ec.core.url.ECUrlType
 import com.sap.ec.core.url.UrlFactoryApi
@@ -21,14 +22,34 @@ internal class InlineInAppMessageFetcher(
 ) : InlineInAppMessageFetcherApi {
 
     override suspend fun fetch(viewId: String): InAppMessage? {
-        val url = urlFactory.create(ECUrlType.FetchInlineInAppMessages)
-        val requestBody = json.encodeToString(InlineMessageRequest(viewIds = listOf(viewId)))
-        val request = UrlRequest(url, HttpMethod.Post, requestBody)
         return try {
-            networkClient.send(request).getOrElse {
+            val url = urlFactory.create(ECUrlType.FetchInlineInAppMessages)
+            val requestBody = json.encodeToString(InlineMessageRequest(viewIds = listOf(viewId)))
+            val request = UrlRequest(url, HttpMethod.Post, requestBody)
+
+            val response = networkClient.send(request).getOrElse {
                 sdkLogger.error("Failed to fetch inline messages for viewId: $viewId", it)
-                return null
-            }.bodyAsText.let { body ->
+                null
+            }
+
+            response?.let {
+                createInAppFromResponse(response, viewId)
+            }
+        } catch (e: Exception) {
+            sdkLogger.error(
+                "Exception occurred while fetching or decoding inline message for viewId: $viewId",
+                e
+            )
+            null
+        }
+    }
+
+    private suspend fun createInAppFromResponse(response: Response, viewId: String): InAppMessage? {
+        return if (response.status.value == 204) {
+            sdkLogger.debug("Received 204 No Content response for viewId: $viewId")
+            null
+        } else {
+            response.bodyAsText.let { body ->
                 val responseModel = json.decodeFromString<InlineMessageResponse>(body)
                 responseModel.inlineMessages?.find {
                     it.viewId.equals(viewId, ignoreCase = true)
@@ -46,12 +67,6 @@ internal class InlineInAppMessageFetcher(
                     }
                 }
             }
-        } catch (e: Exception) {
-            sdkLogger.error(
-                "Exception occurred while fetching or decoding inline message for viewId: $viewId",
-                e
-            )
-            return null
         }
     }
 

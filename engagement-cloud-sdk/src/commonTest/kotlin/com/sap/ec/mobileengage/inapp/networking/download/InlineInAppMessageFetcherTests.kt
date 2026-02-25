@@ -7,6 +7,7 @@ import com.sap.ec.core.networking.model.UrlRequest
 import com.sap.ec.core.url.ECUrlType
 import com.sap.ec.core.url.UrlFactoryApi
 import com.sap.ec.mobileengage.inapp.presentation.InAppType
+import com.sap.ec.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -43,7 +44,7 @@ class InlineInAppMessageFetcherTests {
         fetcher = InlineInAppMessageFetcher(
             mockNetworkClient,
             mockUrlFactory,
-            Json { ignoreUnknownKeys = true },
+            JsonUtil.json,
             mockLogger
         )
 
@@ -170,6 +171,27 @@ class InlineInAppMessageFetcherTests {
 
         val result = fetcher.fetch(testViewId)
 
+        result shouldBe null
+    }
+
+    @Test
+    fun fetch_shouldReturnNull_whenResponseIsEmpty() = runTest {
+        val responseJson = "".trimIndent()
+
+        val response = Response(
+            originalRequest = UrlRequest(testUrl, HttpMethod.Companion.Post),
+            status = HttpStatusCode.NoContent,
+            headers = Headers.Empty,
+            bodyAsText = responseJson
+        )
+
+        everySuspend { mockNetworkClient.send(any()) } returns Result.success(response)
+
+        val result = fetcher.fetch(testViewId)
+
+        verifySuspend {
+            mockLogger.debug("Received 204 No Content response for viewId: $testViewId")
+        }
         result shouldBe null
     }
 
