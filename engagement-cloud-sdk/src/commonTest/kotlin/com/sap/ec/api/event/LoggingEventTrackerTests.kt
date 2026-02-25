@@ -3,12 +3,14 @@ package com.sap.ec.api.event
 import com.sap.ec.api.event.model.CustomEvent
 import com.sap.ec.core.log.LogEntry
 import com.sap.ec.core.log.Logger
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.capture.Capture
 import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
+import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
@@ -25,7 +27,7 @@ class LoggingEventTrackerTests {
 
     @BeforeTest
     fun setup() = runTest {
-        mockLogger = mock()
+        mockLogger = mock(MockMode.autofill)
         everySuspend { mockLogger.debug(capture(slot)) } returns Unit
 
         loggingInstance = LoggingEventTracker(mockLogger)
@@ -39,10 +41,10 @@ class LoggingEventTrackerTests {
     }
 
     @Test
-    fun testActive() = runTest {
+    fun activate_shouldLog_debugInfo() = runTest {
         loggingInstance.activate()
 
-        verifyLogging()
+        verifySuspend { mockLogger.debug("LoggingEventTracker activated") }
     }
 
     private fun verifyLogging() {

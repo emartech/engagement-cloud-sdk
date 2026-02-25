@@ -33,6 +33,6 @@ internal class LoggingInApp(private val sdkContext: SdkContextApi, private val l
     }
 
     override suspend fun activate() {
-        logger.debug("${this::class.qualifiedName} activated")
+        logger.debug("${this::class.simpleName} activated")
     }
 }

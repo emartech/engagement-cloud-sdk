@@ -32,6 +32,6 @@ internal class LoggingConfig(private val logger: Logger) : ConfigInstance {
     }
 
     override suspend fun activate() {
-        logger.debug("${this::class.qualifiedName} activated")
+        logger.debug("${this::class.simpleName} activated")
     }
 }

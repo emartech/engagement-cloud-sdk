@@ -3,6 +3,7 @@ package com.sap.ec.api.embeddedmessaging
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.log.LogEntry
 import com.sap.ec.core.log.Logger
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
@@ -10,6 +11,7 @@ import dev.mokkery.matcher.capture.Capture
 import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
+import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -34,7 +36,7 @@ class LoggingEmbeddedMessagingTests {
     fun setup() {
         Dispatchers.setMain(StandardTestDispatcher())
         mockSdkContext = mock()
-        mockLogger = mock()
+        mockLogger = mock(MockMode.autofill)
         every { mockSdkContext.sdkDispatcher } returns StandardTestDispatcher()
         everySuspend { mockLogger.debug(capture(slot)) } returns Unit
         loggingInstance = LoggingEmbeddedMessaging(mockSdkContext, mockLogger)
@@ -101,7 +103,6 @@ class LoggingEmbeddedMessagingTests {
 
         advanceUntilIdle()
 
-        val capturedLogEntry = slot.get()
-        capturedLogEntry.topic shouldBe "log_method_not_allowed"
+        verifySuspend { mockLogger.debug("LoggingEmbeddedMessaging activated") }
     }
 }

@@ -17,6 +17,6 @@ internal class LoggingEventTracker(private val logger: Logger) : EventTrackerIns
     }
 
     override suspend fun activate() {
-        logger.debug("${this::class.qualifiedName} activated")
+        logger.debug("${this::class.simpleName} activated")
     }
 }

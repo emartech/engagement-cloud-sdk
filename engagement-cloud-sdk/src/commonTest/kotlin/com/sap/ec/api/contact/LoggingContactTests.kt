@@ -9,6 +9,7 @@ import dev.mokkery.matcher.capture.Capture
 import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
+import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
@@ -57,7 +58,7 @@ class LoggingContactTests {
     fun testActive() = runTest {
         loggingContact.activate()
 
-        verifyLogging()
+        verifySuspend { mockSdkLogger.debug("LoggingContact activated") }
     }
 
     private fun verifyLogging() {
