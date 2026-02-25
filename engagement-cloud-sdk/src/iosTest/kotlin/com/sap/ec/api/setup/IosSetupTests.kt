@@ -3,6 +3,7 @@ package com.sap.ec.api.setup
 import com.sap.ec.IosEngagementCloudSDKConfig
 import com.sap.ec.config.LinkContactData
 import dev.mokkery.MockMode
+import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
 import kotlinx.coroutines.test.runTest
@@ -22,12 +23,11 @@ class IosSetupTests {
     @Test
     fun enableTracking_shouldDelegate_toTheSameMethod_onSetupApi() = runTest {
         val iosConfig = IosEngagementCloudSDKConfig("ABC-123")
-        val linkContactData = LinkContactData.ContactFieldValueData("testValue")
-        val onContactLinkingFailed: suspend () -> LinkContactData? = { linkContactData }
+        val onContactLinkingFailed: OnContactLinkingFailed = { onSuccess, onError -> }
 
         iosSetup.enable(iosConfig, onContactLinkingFailed = onContactLinkingFailed)
 
-        verifySuspend { mockSetup.enable(iosConfig, onContactLinkingFailed) }
+        verifySuspend { mockSetup.enable(iosConfig, any()) }
     }
 
     @Test

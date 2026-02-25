@@ -145,5 +145,19 @@ class LinkContactStateTests {
             (registeredEvent as SdkEvent.Internal.Sdk.LinkContact).contactFieldValue shouldBe TEST_CONTACT_FIELD_VALUE
         }
 
+    @Test
+    fun active_shouldReturnFailure_whenOnContactLinkingFailedCallback_ThrowsException() =
+        runTest {
+            every {
+                mockSdkContext.onContactLinkingFailed
+            } returns { throw testException }
+
+            val result = linkContactState.active()
+
+            result shouldBe Result.failure(testException)
+            verifySuspend(VerifyMode.exactly(0)) {
+                mockSdkEventDistributor.registerEvent(any())
+            }
+        }
 
 }

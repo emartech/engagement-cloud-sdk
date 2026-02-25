@@ -25,7 +25,14 @@ internal class LinkContactState(
             return Result.success(Unit)
         }
 
-        return sdkContext.onContactLinkingFailed?.invoke()?.let { linkContactData ->
+        val linkContactData = try {
+            sdkContext.onContactLinkingFailed?.invoke()
+        } catch (e: Exception) {
+            sdkLogger.debug("Error invoking onContactLinkingFailed callback: ${e.message}", e)
+            return Result.failure(e)
+        }
+
+        return linkContactData?.let { linkContactData ->
             sdkLogger.debug("Register LinkContact event.")
             sdkEventDistributor.registerEvent(
                 linkContactData.toLinkContactEvent()

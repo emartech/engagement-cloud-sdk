@@ -5,6 +5,9 @@ import com.sap.ec.config.LinkContactData
 import com.sap.ec.core.exceptions.SdkException.SdkAlreadyDisabledException
 import com.sap.ec.core.exceptions.SdkException.SdkAlreadyEnabledException
 import io.ktor.utils.io.CancellationException
+import platform.Foundation.NSError
+
+typealias OnContactLinkingFailed = (onSuccess: (LinkContactData?) -> Unit, onError: (NSError?) -> Unit) -> Unit
 
 interface IosSetupApi {
 
@@ -29,7 +32,7 @@ interface IosSetupApi {
     @Throws(SdkAlreadyEnabledException::class, CancellationException::class)
     suspend fun enable(
         config: IosEngagementCloudSDKConfig,
-        onContactLinkingFailed: suspend () -> LinkContactData?
+        onContactLinkingFailed: OnContactLinkingFailed
     )
 
     /**
@@ -50,5 +53,5 @@ interface IosSetupApi {
      * Sets the setOnContactLinkingFailedCallback used to acquire contact data for contact linking.
      * @param onContactLinkingFailed The callback to be invoked when contact linking fails, allowing the app to provide contact data that the SDK can use to link.
      */
-    fun setOnContactLinkingFailedCallback(onContactLinkingFailed: suspend () -> LinkContactData?)
+    fun setOnContactLinkingFailedCallback(onContactLinkingFailed: OnContactLinkingFailed)
 }
