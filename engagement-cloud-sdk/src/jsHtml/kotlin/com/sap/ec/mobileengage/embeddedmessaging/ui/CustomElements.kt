@@ -88,11 +88,3 @@ class ECMessagingCompactListElement : ComposeCustomElement({ self ->
             })
     }
 })
-
-class ECInlineInAppView : ComposeCustomElement({ self ->
-    { attributes ->
-        attributes["view-id"]?.let {
-            InlineInAppView(it)
-        } ?: console.error("ViewId is missing!")
-    }
-})

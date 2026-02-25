@@ -81,7 +81,7 @@ internal fun InlineInAppView(url: Url, trackingInfo: String) {
 }
 
 @Composable
-fun InlineInAppView(viewId: String) {
+internal fun InlineInAppView(viewId: String) {
     val message = remember { mutableStateOf<InAppMessage?>(null) }
 
     LaunchedEffect(viewId) {

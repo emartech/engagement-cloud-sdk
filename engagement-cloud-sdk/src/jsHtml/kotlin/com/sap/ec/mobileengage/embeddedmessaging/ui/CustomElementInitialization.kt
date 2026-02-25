@@ -17,13 +17,6 @@ actual fun initializeCustomElements() {
             observedAttributes = arrayOf("custom-message-item-element-name")
         )
     )
-    window.customElements.define(
-        "ec-inline-inapp-view",
-        createBridge(
-            factory = { ECInlineInAppView() },
-            observedAttributes = arrayOf("view-id")
-        )
-    )
 }
 
 private fun createBridge(factory: () -> ComposeCustomElement, observedAttributes: Array<String>): dynamic {
