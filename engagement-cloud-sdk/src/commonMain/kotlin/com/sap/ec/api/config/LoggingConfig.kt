@@ -32,7 +32,6 @@ internal class LoggingConfig(private val logger: Logger) : ConfigInstance {
     }
 
     override suspend fun activate() {
-        val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)
-        logger.debug(entry)
+        logger.debug("${this::class.qualifiedName} activated")
     }
 }

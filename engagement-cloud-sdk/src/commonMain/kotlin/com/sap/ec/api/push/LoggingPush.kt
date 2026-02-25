@@ -28,13 +28,12 @@ internal open class LoggingPush(
     }
 
     override suspend fun getPushToken(): String? {
-        val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)
+        val entry = LogEntry.createMethodNotAllowed(this, this::getPushToken.name)
         logger.debug(entry)
         return null
     }
 
     override suspend fun activate() {
-        val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)
-        logger.debug(entry)
+        logger.debug("${this::class.qualifiedName} activated")
     }
 }

@@ -24,7 +24,7 @@ internal class LoggingEmbeddedMessaging(
     override val isUnreadFilterActive: Boolean
         get() {
             val entry = LogEntry.createMethodNotAllowed<LoggingEmbeddedMessaging>(
-                this, this::categories.name
+                this, this::isUnreadFilterActive.name
             )
             CoroutineScope(sdkContext.sdkDispatcher).launch {
                 logger.debug(entry)
@@ -34,7 +34,7 @@ internal class LoggingEmbeddedMessaging(
     override val activeCategoryFilters: Set<MessageCategory>
         get() {
             val entry = LogEntry.createMethodNotAllowed<LoggingEmbeddedMessaging>(
-                this, this::categories.name
+                this, this::activeCategoryFilters.name
             )
             CoroutineScope(sdkContext.sdkDispatcher).launch {
                 logger.debug(entry)
@@ -44,7 +44,7 @@ internal class LoggingEmbeddedMessaging(
 
     override fun filterUnreadOnly(filterUnreadOnly: Boolean) {
         val entry = LogEntry.createMethodNotAllowed<LoggingEmbeddedMessaging>(
-            this, this::categories.name
+            this, this::filterUnreadOnly.name
         )
         CoroutineScope(sdkContext.sdkDispatcher).launch {
             logger.debug(entry)
@@ -53,7 +53,7 @@ internal class LoggingEmbeddedMessaging(
 
     override fun filterByCategories(categories: Set<MessageCategory>) {
         val entry = LogEntry.createMethodNotAllowed<LoggingEmbeddedMessaging>(
-            this, this::categories.name
+            this, this::filterByCategories.name
         )
         CoroutineScope(sdkContext.sdkDispatcher).launch {
             logger.debug(entry)
@@ -61,11 +61,6 @@ internal class LoggingEmbeddedMessaging(
     }
 
     override suspend fun activate() {
-        val entry = LogEntry.createMethodNotAllowed<LoggingEmbeddedMessaging>(
-            this, this::categories.name
-        )
-        CoroutineScope(sdkContext.sdkDispatcher).launch {
-            logger.debug(entry)
-        }
+        logger.debug("${this::class.qualifiedName} activated")
     }
 }

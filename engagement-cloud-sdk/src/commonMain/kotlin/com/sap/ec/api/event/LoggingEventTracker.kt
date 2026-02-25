@@ -17,7 +17,6 @@ internal class LoggingEventTracker(private val logger: Logger) : EventTrackerIns
     }
 
     override suspend fun activate() {
-        val entry = LogEntry.createMethodNotAllowed(this, this::activate.name)
-        logger.debug(entry)
+        logger.debug("${this::class.qualifiedName} activated")
     }
 }

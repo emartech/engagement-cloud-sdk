@@ -33,9 +33,6 @@ internal class LoggingInApp(private val sdkContext: SdkContextApi, private val l
     }
 
     override suspend fun activate() {
-        val entry = LogEntry.createMethodNotAllowed(
-            this, this::activate.name
-        )
-        logger.debug(entry)
+        logger.debug("${this::class.qualifiedName} activated")
     }
 }
