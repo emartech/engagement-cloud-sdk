@@ -20,6 +20,7 @@ internal class JsBridgeVerifier(
         val cachedMd5 = stringStorage.get(StorageConstants.JS_BRIDGE_MD5_KEY)
 
         if (cachedMd5 != null && cachedMd5 == serverMd5) {
+            sdkLogger.debug("JsBridge MD5 matched, skipping download")
             return Result.success(true)
         }
 

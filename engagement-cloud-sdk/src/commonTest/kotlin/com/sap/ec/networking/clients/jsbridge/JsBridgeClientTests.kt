@@ -71,12 +71,13 @@ class JsBridgeClientTests {
     private fun createResponse(
         body: String,
         url: String = JS_BRIDGE_URL,
-        googHashHeader: String? = null
+        googHashHeader: String? = null,
+        googHashHeaders: List<String>? = null
     ): Response {
-        val headers = if (googHashHeader != null) {
-            headersOf("x-goog-hash" to listOf(googHashHeader))
-        } else {
-            headersOf()
+        val headers = when {
+            googHashHeaders != null -> headersOf("x-goog-hash" to googHashHeaders)
+            googHashHeader != null -> headersOf("x-goog-hash" to listOf(googHashHeader))
+            else -> headersOf()
         }
         return Response(
             originalRequest = UrlRequest(
@@ -172,6 +173,21 @@ class JsBridgeClientTests {
         verify { mockStringStorage.put(StorageConstants.JS_BRIDGE_MD5_KEY, SERVER_MD5) }
     }
 
+    @Test
+    fun testValidateJSBridge_shouldParseMd5_whenGoogHashReturnedAsSeparateHeaders() = runTest {
+        everySuspend { mockNetworkClient.send(any()) } sequentially {
+            returns(Result.success(createResponse(JS_CONTENT, googHashHeaders = listOf("crc32c=abc", "md5=$SERVER_MD5"))))
+            returns(Result.success(createResponse(SIGNATURE)))
+        }
+        everySuspend { mockCrypto.verify(JS_CONTENT, SIGNATURE) } returns true
+        every { mockStringStorage.put(any(), any<String>()) } returns Unit
+
+        val result = jsBridgeClient.validateJSBridge()
+
+        result.isSuccess shouldBe true
+        verify { mockStringStorage.put(StorageConstants.JS_BRIDGE_MD5_KEY, SERVER_MD5) }
+    }
+
     // --- Feature OFF tests ---
 
     @Test
@@ -234,6 +250,21 @@ class JsBridgeClientTests {
             originalRequest = UrlRequest(url = Url(JS_BRIDGE_URL), method = HttpMethod.Head),
             status = HttpStatusCode.OK,
             headers = headersOf("x-goog-hash" to listOf("crc32c=abc, md5=$SERVER_MD5")),
+            bodyAsText = ""
+        )
+        everySuspend { mockNetworkClient.send(any()) } returns Result.success(headResponse)
+
+        val result = jsBridgeClient.fetchServerMd5()
+
+        result shouldBe Result.success(SERVER_MD5)
+    }
+
+    @Test
+    fun fetchServerMd5_shouldReturnMd5_whenGoogHashReturnedAsSeparateHeaders() = runTest {
+        val headResponse = Response(
+            originalRequest = UrlRequest(url = Url(JS_BRIDGE_URL), method = HttpMethod.Head),
+            status = HttpStatusCode.OK,
+            headers = headersOf("x-goog-hash" to listOf("crc32c=abc", "md5=$SERVER_MD5")),
             bodyAsText = ""
         )
         everySuspend { mockNetworkClient.send(any()) } returns Result.success(headResponse)
