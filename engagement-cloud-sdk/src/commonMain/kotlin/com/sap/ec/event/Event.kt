@@ -303,6 +303,9 @@ sealed interface SdkEvent {
 
         sealed interface SetupFlowEvent : Internal, OnlineSdkEvent
 
+        /**
+         * Use this interface for events that should be processed even then the SDK is not in at least OnHold state.
+         */
         sealed interface OperationalEvent : Internal, OnlineSdkEvent {
             val applicationCode: String?
         }
@@ -414,7 +417,7 @@ sealed interface SdkEvent {
                 val name: String = CHANGE_APP_CODE_NAME
             ) : Sdk(), OnlineSdkEvent
 
-            sealed interface LinkContactEvent : Internal, OnlineSdkEvent
+            sealed interface LinkContactEvent : Internal, OnlineSdkEvent, SetupFlowEvent
 
             @Serializable
             data class LinkContact(
@@ -423,9 +426,7 @@ sealed interface SdkEvent {
                 override var nackCount: Int = 0,
                 val contactFieldValue: String,
                 val name: String = LINK_CONTACT_NAME
-            ) : Sdk(), OnlineSdkEvent, LinkContactEvent {
-
-            }
+            ) : Sdk(), OnlineSdkEvent, LinkContactEvent
 
             @Serializable
             data class LinkAuthenticatedContact(

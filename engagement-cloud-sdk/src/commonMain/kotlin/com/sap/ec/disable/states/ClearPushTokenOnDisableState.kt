@@ -5,6 +5,7 @@ import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.state.State
 import com.sap.ec.event.SdkEvent
+import com.sap.ec.response.mapToUnitOrFailure
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
@@ -22,8 +23,7 @@ internal class ClearPushTokenOnDisableState(
         return sdkEventDistributor.registerEvent(
             SdkEvent.Internal.Sdk.ClearPushToken(applicationCode = sdkContext.config?.applicationCode)
         ).await<Response>()
-            .result
-            .mapCatching {}
+            .mapToUnitOrFailure()
     }
 
     override fun relax() {

@@ -48,18 +48,32 @@ internal class SdkEventDistributor(
             .filter { it !is SdkEvent.Internal.LogEvent }
             .onEach { connectionStatus.first { it } }
 
+    /**
+     * Events that have the [SdkEvent.Internal.OperationalEvent] interface are processed even when the SDK is below OnHold state.
+     */
+    private val operationalOnlineEvents =
+        _onlineSdkEvents
+            .filterIsInstance<SdkEvent.Internal.OperationalEvent>()
+
+    /**
+     * Events that have the [SdkEvent.Internal.SetupFlowEvent] interface are processed when the SDK is in OnHold or Active state.
+     * This is needed as some events related to the setup flow (e.g. [SdkEvent.Internal.Sdk.RegisterDeviceInfo]) need to be processed even when the SDK is in OnHold state.
+     */
     private val setupFlowOnlineEvents =
         _onlineSdkEvents
             .filterIsInstance<SdkEvent.Internal.SetupFlowEvent>()
             .onEach { sdkContext.currentSdkState.first { it == SdkState.Active || it == SdkState.OnHold } }
 
-    private val nonSetupFlowOnlineEvents =
+    /**
+     * All other events are processed only when the SDK is in Active state.
+     */
+    private val activeStateOnlineEvents =
         _onlineSdkEvents
-            .filter { it !is SdkEvent.Internal.SetupFlowEvent }
+            .filter { it !is SdkEvent.Internal.SetupFlowEvent && it !is SdkEvent.Internal.OperationalEvent }
             .onEach { sdkContext.currentSdkState.first { it == SdkState.Active } }
 
     override val onlineSdkEvents: Flow<OnlineSdkEvent> =
-        merge(setupFlowOnlineEvents, nonSetupFlowOnlineEvents)
+        merge(operationalOnlineEvents, setupFlowOnlineEvents, activeStateOnlineEvents)
 
     override val logEvents = _sdkEventFlow
         .filterIsInstance<SdkEvent.Internal.LogEvent>()
