@@ -24,8 +24,8 @@ private const val CHECK_ICON_PATH =
 @Composable
 fun CategoriesDialogView(
     categories: List<MessageCategory>,
-    selectedCategories: Set<Int>,
-    onApplyClicked: (Set<Int>) -> Unit,
+    selectedCategories: Set<String>,
+    onApplyClicked: (Set<String>) -> Unit,
     onDismiss: () -> Unit
 ) {
     val selectedCategories = remember { mutableStateOf(selectedCategories) }
@@ -98,7 +98,7 @@ private fun DialogHeader(onDismiss: () -> Unit) {
 @Composable
 private fun CategoryFilterChipsList(
     categories: List<MessageCategory>,
-    selectedCategories: MutableState<Set<Int>>
+    selectedCategories: MutableState<Set<String>>
 ) {
     Div({
         classes(EmbeddedMessagingStyleSheet.categoryChipsContainer)
@@ -134,8 +134,8 @@ private fun CategoryFilterChipsList(
 
 @Composable
 private fun DialogActionButtons(
-    selectedCategories: MutableState<Set<Int>>,
-    onApplyClicked: (Set<Int>) -> Unit
+    selectedCategories: MutableState<Set<String>>,
+    onApplyClicked: (Set<String>) -> Unit
 ) {
     Div({
         classes(EmbeddedMessagingStyleSheet.dialogActionsContainer)

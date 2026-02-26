@@ -62,7 +62,7 @@ class EmbeddedMessagingTests {
 
     @Test
     fun categories_shouldGetCategories_fromActiveInstance_activeSDK() = runTest {
-        val testCategories = listOf(MessageCategory(1, "1"))
+        val testCategories = listOf(MessageCategory("1", "1"))
         every { mockInternalInstance.categories } returns testCategories
         every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
 
@@ -141,10 +141,10 @@ class EmbeddedMessagingTests {
         every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Initialized)
         embeddedMessaging.registerOnContext()
 
-        val categories = listOf(MessageCategory(1, "Category 1"), MessageCategory(2, "Category 2"))
+        val categories = listOf(MessageCategory("1", "Category 1"), MessageCategory("2", "Category 2"))
         embeddedMessaging.filterByCategories(categories)
 
-        verify { mockLoggingInstance.filterByCategories(setOf(MessageCategory(1, "Category 1"), MessageCategory(2, "Category 2"))) }
+        verify { mockLoggingInstance.filterByCategories(setOf(MessageCategory("1", "Category 1"), MessageCategory("2", "Category 2"))) }
     }
 
     @Test
@@ -152,9 +152,9 @@ class EmbeddedMessagingTests {
         every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
         embeddedMessaging.registerOnContext()
 
-        val categories = listOf(MessageCategory(1, "Category 1"), MessageCategory(2, "Category 2"))
+        val categories = listOf(MessageCategory("1", "Category 1"), MessageCategory("2", "Category 2"))
         embeddedMessaging.filterByCategories(categories)
 
-        verify { mockInternalInstance.filterByCategories(setOf(MessageCategory(1, "Category 1"), MessageCategory(2, "Category 2"))) }
+        verify { mockInternalInstance.filterByCategories(setOf(MessageCategory("1", "Category 1"), MessageCategory("2", "Category 2"))) }
     }
 }

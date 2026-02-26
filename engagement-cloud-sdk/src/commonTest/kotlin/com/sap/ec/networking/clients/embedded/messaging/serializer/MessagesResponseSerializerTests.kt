@@ -53,8 +53,8 @@ class MessagesResponseSerializerTests {
             top = 1,
             meta = Meta(
                 categories = listOf(
-                    MessageCategory(1, "Category 1"),
-                    MessageCategory(2, "Category 2")
+                    MessageCategory("1", "Category 1"),
+                    MessageCategory("2", "Category 2")
                 )
             ),
             messages = listOf(
@@ -66,7 +66,7 @@ class MessagesResponseSerializerTests {
                     defaultAction = null,
                     actions = emptyList(),
                     tags = listOf("tag1", "tag2"),
-                    categories = listOf(Category(1, "Category 1")),
+                    categories = listOf(Category("1", "Category 1")),
                     receivedAt = 1678886400000L,
                     expiresAt = null,
                     properties = emptyMap(),
@@ -87,8 +87,8 @@ class MessagesResponseSerializerTests {
             top = 1,
             meta = Meta(
                 categories = listOf(
-                    MessageCategory(1, "Category 1"),
-                    MessageCategory(2, "Category 2")
+                    MessageCategory("1", "Category 1"),
+                    MessageCategory("2", "Category 2")
                 )
             ),
             messages = listOf(
@@ -100,7 +100,7 @@ class MessagesResponseSerializerTests {
                     defaultAction = null,
                     actions = emptyList(),
                     tags = listOf("tag1", "tag2"),
-                    categories = listOf(Category(1, "Category 1")),
+                    categories = listOf(Category("1", "Category 1")),
                     receivedAt = 1678886400000L,
                     expiresAt = null,
                     properties = emptyMap(),

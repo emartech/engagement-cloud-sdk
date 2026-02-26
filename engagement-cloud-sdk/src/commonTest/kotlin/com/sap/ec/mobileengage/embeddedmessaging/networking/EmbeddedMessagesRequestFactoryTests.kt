@@ -74,7 +74,7 @@ class EmbeddedMessagesRequestFactoryTests {
             SdkEvent.Internal.EmbeddedMessaging.FetchMessages(
                 nackCount = 0,
                 offset = 40,
-                categoryIds = listOf(1, 2)
+                categoryIds = listOf("1", "2")
             )
         )
 
@@ -88,7 +88,7 @@ class EmbeddedMessagesRequestFactoryTests {
             SdkEvent.Internal.EmbeddedMessaging.FetchMessages(
                 nackCount = 0,
                 offset = 40,
-                categoryIds = listOf(1, 2),
+                categoryIds = listOf("1", "2"),
                 filterUnopenedMessages = true
             )
         )
@@ -163,7 +163,7 @@ class EmbeddedMessagesRequestFactoryTests {
             SdkEvent.Internal.EmbeddedMessaging.FetchNextPage(
                 nackCount = 0,
                 offset = offset,
-                categoryIds = listOf(1, 2)
+                categoryIds = listOf("1", "2")
             )
         )
 
@@ -197,7 +197,7 @@ class EmbeddedMessagesRequestFactoryTests {
                 SdkEvent.Internal.EmbeddedMessaging.FetchNextPage(
                     nackCount = 0,
                     offset = offset,
-                    categoryIds = listOf(1, 2),
+                    categoryIds = listOf("1", "2"),
                     filterUnopenedMessages = filterUnopenedMessages
                 )
             )

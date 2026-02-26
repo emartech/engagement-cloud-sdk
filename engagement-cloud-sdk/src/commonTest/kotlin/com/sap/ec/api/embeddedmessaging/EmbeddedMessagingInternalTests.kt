@@ -28,7 +28,7 @@ class EmbeddedMessagingInternalTests {
 
     @Test
     fun categories_shouldReturn_categories_fromViewmodel() {
-        val testCategories = listOf(MessageCategory(1, "1"), MessageCategory(2, "2"))
+        val testCategories = listOf(MessageCategory("1", "1"), MessageCategory("2", "2"))
         every { mockViewModel.categories } returns MutableStateFlow(testCategories)
 
         val embeddedMessagingInternal = EmbeddedMessagingInternal(mockViewModel, mockLogger)
@@ -47,13 +47,13 @@ class EmbeddedMessagingInternalTests {
 
     @Test
     fun activeCategoryFilters_shouldReturn_selectedCategories_fromViewmodel() {
-        val testCategories = listOf(MessageCategory(1, "Category 1"), MessageCategory(2, "Category 2"))
-        every { mockViewModel.selectedCategoryIds } returns MutableStateFlow(setOf(1))
+        val testCategories = listOf(MessageCategory("1", "Category 1"), MessageCategory("2", "Category 2"))
+        every { mockViewModel.selectedCategoryIds } returns MutableStateFlow(setOf("1"))
         every { mockViewModel.categories } returns MutableStateFlow(testCategories)
 
         val embeddedMessagingInternal = EmbeddedMessagingInternal(mockViewModel, mockLogger)
 
-        embeddedMessagingInternal.activeCategoryFilters shouldBe setOf(MessageCategory(1, "Category 1"))
+        embeddedMessagingInternal.activeCategoryFilters shouldBe setOf(MessageCategory("1", "Category 1"))
     }
 
     @Test
@@ -68,13 +68,13 @@ class EmbeddedMessagingInternalTests {
 
     @Test
     fun filterByCategories_shouldCallMethod_setSelectedCategoryIds_withCorrectArgument_onViewmodel() {
-        val categories = setOf(MessageCategory(1, "Category 1"), MessageCategory(2, "Category 2"))
-        every { mockViewModel.setSelectedCategoryIds(setOf(1,2)) } returns Unit
+        val categories = setOf(MessageCategory("1", "Category 1"), MessageCategory("2", "Category 2"))
+        every { mockViewModel.setSelectedCategoryIds(setOf("1","2")) } returns Unit
 
         val embeddedMessagingInternal = EmbeddedMessagingInternal(mockViewModel, mockLogger)
         embeddedMessagingInternal.filterByCategories(categories)
 
-        verify { mockViewModel.setSelectedCategoryIds(setOf(1,2)) }
+        verify { mockViewModel.setSelectedCategoryIds(setOf("1","2")) }
     }
 
     @Test

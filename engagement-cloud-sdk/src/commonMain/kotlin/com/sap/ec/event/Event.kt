@@ -249,7 +249,7 @@ sealed interface SdkEvent {
                 override var nackCount: Int,
                 val offset: Int,
                 val filterUnopenedMessages: Boolean = false,
-                val categoryIds: List<Int> = emptyList()
+                val categoryIds: List<String> = emptyList()
             ) : EmbeddedMessaging
 
             @Serializable
@@ -259,7 +259,7 @@ sealed interface SdkEvent {
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int,
                 val offset: Int,
-                val categoryIds: List<Int>,
+                val categoryIds: List<String>,
                 val filterUnopenedMessages: Boolean = false
             ) : EmbeddedMessaging
 

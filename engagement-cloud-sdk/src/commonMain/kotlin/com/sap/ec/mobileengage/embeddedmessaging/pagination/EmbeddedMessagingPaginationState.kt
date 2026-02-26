@@ -1,7 +1,7 @@
 package com.sap.ec.mobileengage.embeddedmessaging.pagination
 
 data class EmbeddedMessagingPaginationState(
-    val categoryIds: List<Int> = emptyList(),
+    val categoryIds: List<String> = emptyList(),
     val totalReceivedCount: Int = 0,
     val filterUnopenedMessages: Boolean = false,
     val isEndReached: Boolean = false

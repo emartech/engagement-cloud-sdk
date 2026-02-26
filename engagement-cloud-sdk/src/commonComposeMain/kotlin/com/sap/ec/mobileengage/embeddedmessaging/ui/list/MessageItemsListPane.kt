@@ -98,7 +98,7 @@ fun MessageItemsListPane(
     customMessageItem: (@Composable (viewModel: CustomMessageItemViewModelApi, isSelected: Boolean) -> Unit)?,
     listPageViewModel: ListPageViewModelApi,
     showFilters: Boolean,
-    selectedCategoryIds: Set<Int>,
+    selectedCategoryIds: Set<String>,
     filterUnOpenedOnly: Boolean,
     onFilterChange: (Boolean) -> Unit,
     showCategorySelector: () -> Unit,
@@ -593,7 +593,7 @@ private fun ErrorStateNoConnection(onRefresh: () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FilterRow(
-    selectedCategoryIds: Set<Int>,
+    selectedCategoryIds: Set<String>,
     filterUnopenedOnly: Boolean,
     onFilterChange: (Boolean) -> Unit,
     onCategorySelectorClicked: () -> Unit

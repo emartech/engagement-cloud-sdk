@@ -17,7 +17,7 @@ import com.sap.ec.networking.clients.embedded.messaging.model.MessageCategory
 internal class EmbeddedMessagingPagingSource(
     private val listPageModel: ListPageModelApi,
     private val filterUnopenedOnly: Boolean,
-    private val selectedCategoryIds: List<Int>,
+    private val selectedCategoryIds: List<String>,
     private val setCategories: (List<MessageCategory>) -> Unit,
     private val downloader: DownloaderApi,
     private val actionFactory: ActionFactoryApi<ActionModel>,

@@ -4,8 +4,6 @@ import com.sap.ec.mobileengage.action.models.BasicActionModel
 import com.sap.ec.mobileengage.action.models.PresentableActionModel
 import com.sap.ec.networking.clients.embedded.messaging.serializer.MessagesResponseSerializer
 import kotlinx.serialization.Serializable
-import kotlin.js.ExperimentalJsExport
-import kotlin.js.JsExport
 
 @Serializable(with = MessagesResponseSerializer::class)
 data class MessagesResponse(
@@ -44,6 +42,6 @@ data class ListThumbnailImage(
 
 @Serializable
 data class Category(
-    val id: Int,
+    val id: String,
     val text: String
 )

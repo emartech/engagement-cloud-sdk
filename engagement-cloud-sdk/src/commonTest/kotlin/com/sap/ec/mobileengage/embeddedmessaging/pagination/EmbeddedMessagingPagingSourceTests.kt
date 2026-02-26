@@ -48,7 +48,7 @@ class EmbeddedMessagingPagingSourceTests {
 
     private fun createEmbeddedMessagingPagingSource(
         filterUnopenedOnly: Boolean = false,
-        selectedCategoryIds: List<Int> = emptyList(),
+        selectedCategoryIds: List<String> = emptyList(),
         setCategories: (List<MessageCategory>) -> Unit = { }
     ) = EmbeddedMessagingPagingSource(
         listPageModel = mockListPageModel,

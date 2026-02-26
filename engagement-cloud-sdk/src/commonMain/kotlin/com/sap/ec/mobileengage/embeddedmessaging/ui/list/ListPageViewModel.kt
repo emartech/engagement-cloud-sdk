@@ -37,8 +37,8 @@ internal class ListPageViewModel(
 
     private val _filterUnopenedOnly = MutableStateFlow(false)
     override val filterUnopenedOnly: StateFlow<Boolean> = _filterUnopenedOnly.asStateFlow()
-    private val _selectedCategoryIds = MutableStateFlow<Set<Int>>(emptySet())
-    override val selectedCategoryIds: StateFlow<Set<Int>> = _selectedCategoryIds.asStateFlow()
+    private val _selectedCategoryIds = MutableStateFlow<Set<String>>(emptySet())
+    override val selectedCategoryIds: StateFlow<Set<String>> = _selectedCategoryIds.asStateFlow()
     override val hasConnection: StateFlow<Boolean> = connectionWatchDog.isOnline
     override val hasFiltersApplied: StateFlow<Boolean> =
         combine(_filterUnopenedOnly, _selectedCategoryIds) { unreadOnly, categoryIds ->
@@ -105,7 +105,7 @@ internal class ListPageViewModel(
         _filterUnopenedOnly.value = unopenedOnly
     }
 
-    override fun setSelectedCategoryIds(categoryIds: Set<Int>) {
+    override fun setSelectedCategoryIds(categoryIds: Set<String>) {
         _selectedCategoryIds.value = categoryIds
     }
 
@@ -168,7 +168,7 @@ internal class ListPageViewModel(
         _showCategorySelector.value = false
     }
 
-    override fun applyCategorySelection(categoryIds: Set<Int>) {
+    override fun applyCategorySelection(categoryIds: Set<String>) {
         setSelectedCategoryIds(categoryIds)
         closeCategorySelector()
     }

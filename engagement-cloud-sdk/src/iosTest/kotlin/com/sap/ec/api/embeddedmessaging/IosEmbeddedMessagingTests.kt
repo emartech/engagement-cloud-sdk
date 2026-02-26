@@ -15,8 +15,8 @@ import kotlin.test.Test
 class IosEmbeddedMessagingTests {
     private companion object {
         val CATEGORIES = listOf(
-            MessageCategory(1, "Category 1"),
-            MessageCategory(2, "Category 2")
+            MessageCategory("1", "Category 1"),
+            MessageCategory("2", "Category 2")
         )
     }
 

@@ -15,8 +15,8 @@ import kotlin.test.Test
 class JsEmbeddedMessagingTests {
     private companion object {
         val CATEGORIES = listOf(
-            MessageCategory(1, "Category 1"),
-            MessageCategory(2, "Category 2")
+            MessageCategory("1", "Category 1"),
+            MessageCategory("2", "Category 2")
         )
         val jsMessageCategories = CATEGORIES.map {
             JSApiMessageCategory(it.id, it.value)

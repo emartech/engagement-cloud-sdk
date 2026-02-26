@@ -11,7 +11,7 @@ interface ListPageViewModelApi {
     val categories: StateFlow<List<MessageCategory>>
 
     val filterUnopenedOnly: StateFlow<Boolean>
-    val selectedCategoryIds: StateFlow<Set<Int>>
+    val selectedCategoryIds: StateFlow<Set<String>>
     val hasFiltersApplied: StateFlow<Boolean>
     val hasConnection: StateFlow<Boolean>
 
@@ -24,7 +24,7 @@ interface ListPageViewModelApi {
     val platformCategory: String
 
     fun setFilterUnopenedOnly(unopenedOnly: Boolean)
-    fun setSelectedCategoryIds(categoryIds: Set<Int>)
+    fun setSelectedCategoryIds(categoryIds: Set<String>)
 
     suspend fun selectMessage(messageViewModel: MessageItemViewModelApi, onNavigate: suspend () -> Unit)
     suspend fun deleteMessage(messageViewModel: MessageItemViewModelApi): Result<Unit>
@@ -34,7 +34,7 @@ interface ListPageViewModelApi {
 
     fun openCategorySelector()
     fun closeCategorySelector()
-    fun applyCategorySelection(categoryIds: Set<Int>)
+    fun applyCategorySelection(categoryIds: Set<String>)
 
     fun refreshMessagesWithThrottling(shouldCallRefresh: () -> Unit)
 }

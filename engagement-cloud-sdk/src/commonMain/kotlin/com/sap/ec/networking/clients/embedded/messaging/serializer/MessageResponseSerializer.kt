@@ -23,7 +23,7 @@ object MessagesResponseSerializer : KSerializer<MessagesResponse> {
         val defaultAction: BasicActionModel?,
         val actions: List<PresentableActionModel>,
         val tags: List<String>,
-        val categoryIds: List<Int>,
+        val categoryIds: List<String>,
         val receivedAt: Long,
         val expiresAt: Long?,
         val properties: Map<String, String>,

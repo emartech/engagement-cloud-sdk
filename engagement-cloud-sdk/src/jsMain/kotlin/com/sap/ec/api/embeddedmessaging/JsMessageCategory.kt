@@ -7,13 +7,13 @@ import kotlinx.serialization.Serializable
 @JsExport
 @JsName("MessageCategory")
 interface JsMessageCategory {
-    val id: Int
+    val id: String
     val value: String
 }
 
 @Serializable
 data class JSApiMessageCategory(
-    override val id: Int,
+    override val id: String,
     override val value: String
 ) : JsMessageCategory
 

@@ -23,7 +23,7 @@ internal class PagerFactory(
 ) : PagerFactoryApi {
     override fun create(
         filterUnopenedOnly: Boolean,
-        selectedCategoryIds: List<Int>,
+        selectedCategoryIds: List<String>,
         categories: MutableStateFlow<List<MessageCategory>>
     ): Flow<PagingData<MessageItemViewModelApi>> {
         return Pager(

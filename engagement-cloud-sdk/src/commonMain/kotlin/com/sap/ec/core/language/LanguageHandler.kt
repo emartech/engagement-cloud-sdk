@@ -1,7 +1,6 @@
 package com.sap.ec.core.language
 
 import com.sap.ec.SdkConstants.LANGUAGE_STORAGE_KEY
-import com.sap.ec.context.Features
 import com.sap.ec.context.Features.*
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi

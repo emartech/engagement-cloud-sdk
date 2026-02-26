@@ -20,7 +20,7 @@ internal class ListPageModel(
 
     override suspend fun fetchMessagesWithCategories(
         filterUnopenedOnly: Boolean,
-        categoryIds: List<Int>
+        categoryIds: List<String>
     ): Result<MessagesWithCategories> {
         return try {
             val fetchMessagesEvent = SdkEvent.Internal.EmbeddedMessaging.FetchMessages(

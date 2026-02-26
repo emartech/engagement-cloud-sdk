@@ -132,7 +132,7 @@ class ListPageViewModelTests {
         viewModel.selectedCategoryIds.value shouldBe emptySet()
         viewModel.categories.value shouldBe emptyList()
 
-        val selectedCategoryIds = setOf(1, 2, 3)
+        val selectedCategoryIds = setOf("1", "2", "3")
 
         every { mockPagerFactory.create(any(), any(), any()) } returns flowOf(
             PagingData.from(
@@ -404,7 +404,7 @@ class ListPageViewModelTests {
 
     @Test
     fun testApplyCategorySelection_shouldSetCategoryIdsAndCloseDialog() = runTest {
-        val selectedCategoryIds = setOf(1, 2, 3)
+        val selectedCategoryIds = setOf("1", "2", "3")
 
         every { mockPagerFactory.create(any(), any(), any()) } returns flowOf(
             PagingData.from(
@@ -444,7 +444,7 @@ class ListPageViewModelTests {
 
     @Test
     fun testHasFiltersApplied_shouldReturnTrue_whenSelectedCategoryIdsIsNotEmpty() = runTest {
-        val selectedCategoryIds = setOf(1, 2)
+        val selectedCategoryIds = setOf("1", "2")
 
         every { mockPagerFactory.create(any(), any(), any()) } returns flowOf(
             PagingData.from(
@@ -464,7 +464,7 @@ class ListPageViewModelTests {
 
     @Test
     fun testHasFiltersApplied_shouldReturnTrue_whenBothFiltersAreApplied() = runTest {
-        val selectedCategoryIds = setOf(3, 4)
+        val selectedCategoryIds = setOf("3", "4")
 
         every { mockPagerFactory.create(any(), any(), any()) } returns flowOf(
             PagingData.from(

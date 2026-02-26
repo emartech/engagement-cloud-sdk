@@ -128,15 +128,15 @@ fun CategorySelectorButtonPreview() {
 @Composable
 fun CategoriesDialogViewPreview() {
     val messageCategories = listOf(
-        MessageCategory(1, "Serums"),
-        MessageCategory(2, "Creams"),
-        MessageCategory(3, "Boosters"),
-        MessageCategory(4, "Promotions"),
-        MessageCategory(5, "Beauty tips"),
+        MessageCategory("1", "Serums"),
+        MessageCategory("2", "Creams"),
+        MessageCategory("3", "Boosters"),
+        MessageCategory("4", "Promotions"),
+        MessageCategory("5", "Beauty tips"),
     )
     CategoriesDialogView(
         messageCategories,
-        selectedCategoriesOnDialogOpen = setOf(1, 3),
+        selectedCategoriesOnDialogOpen = setOf("1", "3"),
         onApplyClicked = {
             print("I'm applied with categories: $it")
         },
@@ -156,7 +156,7 @@ private fun providePreviewMessage() = EmbeddedMessage(
     ),
     emptyList(),
     listOf("promo", "new"),
-    listOf(Category(1, "1"), Category(2, "2")),
+    listOf(Category("1", "1"), Category("2", "2")),
     Clock.System.now().minus(3.hours).toEpochMilliseconds(),
     Clock.System.now().plus(4.days).toEpochMilliseconds(),
     mapOf("key1" to "value1", "key2" to "value2"),
@@ -182,7 +182,7 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
                                     ),
                                     emptyList(),
                                     listOf("promo", "new"),
-                                    listOf(Category(1, "1"), Category(2, "2")),
+                                    listOf(Category("1", "1"), Category("2", "2")),
                                     Clock.System.now().minus(3.hours).toEpochMilliseconds(),
                                     Clock.System.now().plus(4.days).toEpochMilliseconds(),
                                     mapOf("key1" to "value1", "key2" to "value2"),
@@ -206,7 +206,7 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
                                     ),
                                     emptyList(),
                                     listOf("promo", "new"),
-                                    listOf(Category(1, "1"), Category(2, "2")),
+                                    listOf(Category("1", "1"), Category("2", "2")),
                                     Clock.System.now().minus(3.hours).toEpochMilliseconds(),
                                     Clock.System.now().plus(4.days).toEpochMilliseconds(),
                                     mapOf("key1" to "value1", "key2" to "value2"),
@@ -226,16 +226,16 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
             get() =
                 MutableStateFlow(
                     listOf(
-                        MessageCategory(1, "Category 1"),
-                        MessageCategory(2, "Category 2")
+                        MessageCategory("1", "Category 1"),
+                        MessageCategory("2", "Category 2")
                     )
                 ).asStateFlow()
 
         override val filterUnopenedOnly: StateFlow<Boolean>
             get() = MutableStateFlow(false).asStateFlow()
 
-        override val selectedCategoryIds: StateFlow<Set<Int>>
-            get() = MutableStateFlow<Set<Int>>(setOf()).asStateFlow()
+        override val selectedCategoryIds: StateFlow<Set<String>>
+            get() = MutableStateFlow<Set<String>>(setOf()).asStateFlow()
 
         override val hasFiltersApplied: StateFlow<Boolean>
             get() = MutableStateFlow(false).asStateFlow()
@@ -257,7 +257,7 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
             Unit
         }
 
-        override fun setSelectedCategoryIds(categoryIds: Set<Int>) {
+        override fun setSelectedCategoryIds(categoryIds: Set<String>) {
             Unit
         }
 
@@ -288,7 +288,7 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
             Unit
         }
 
-        override fun applyCategorySelection(categoryIds: Set<Int>) {
+        override fun applyCategorySelection(categoryIds: Set<String>) {
             Unit
         }
 

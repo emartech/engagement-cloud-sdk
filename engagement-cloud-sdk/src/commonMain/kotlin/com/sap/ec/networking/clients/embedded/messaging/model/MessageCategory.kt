@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class MessageCategory(
-    val id: Int,
+    val id: String,
     val value: String
 )

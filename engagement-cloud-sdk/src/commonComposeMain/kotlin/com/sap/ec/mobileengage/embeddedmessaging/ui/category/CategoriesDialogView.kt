@@ -48,8 +48,8 @@ import com.sap.ec.networking.clients.embedded.messaging.model.MessageCategory
 @Composable
 fun CategoriesDialogView(
     categories: List<MessageCategory>,
-    selectedCategoriesOnDialogOpen: Set<Int>,
-    onApplyClicked: (Set<Int>) -> Unit,
+    selectedCategoriesOnDialogOpen: Set<String>,
+    onApplyClicked: (Set<String>) -> Unit,
     onDismiss: () -> Unit
 ) {
     val selectedCategories = rememberSaveable { mutableStateOf(selectedCategoriesOnDialogOpen) }
@@ -137,7 +137,7 @@ private fun DialogHeader(onDismiss: () -> Unit) {
 @Composable
 private fun CategoryFilterChipsList(
     categories: List<MessageCategory>,
-    selectedCategories: MutableState<Set<Int>>
+    selectedCategories: MutableState<Set<String>>
 ) {
     EmbeddedMessagingTheme {
         FlowRow(
@@ -188,8 +188,8 @@ private fun CategoryFilterChipsList(
 
 @Composable
 private fun DialogActionButtons(
-    selectedCategories: MutableState<Set<Int>>,
-    onApplyClicked: (Set<Int>) -> Unit
+    selectedCategories: MutableState<Set<String>>,
+    onApplyClicked: (Set<String>) -> Unit
 ) {
     EmbeddedMessagingTheme {
         Row(
@@ -244,8 +244,8 @@ private fun filterChipColors(): SelectableChipColors = SelectableChipColors(
 
 @Composable
 private fun filterChipBorderSettings(
-    selectedCategories: MutableState<Set<Int>>,
-    id: Int
+    selectedCategories: MutableState<Set<String>>,
+    id: String
 ): BorderStroke = FilterChipDefaults.filterChipBorder(
     enabled = true,
     borderColor = MaterialTheme.colorScheme.outline,

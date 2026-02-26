@@ -292,7 +292,7 @@ fun EmptyDetailState() {
 
 @Composable
 fun FilterRow(
-    selectedCategoryIds: Set<Int>,
+    selectedCategoryIds: Set<String>,
     filterUnopenedOnly: Boolean,
     onFilterChange: (Boolean) -> Unit,
     onCategorySelectorClicked: () -> Unit

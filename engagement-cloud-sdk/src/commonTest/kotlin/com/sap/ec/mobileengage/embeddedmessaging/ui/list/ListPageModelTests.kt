@@ -110,7 +110,7 @@ class ListPageModelTests {
     @Test
     fun fetchMessagesWithCategories_shouldSendFetchMessagesEvent_withFilterUnopenedMessagesFalse_whenFilterUnopenedOnlyIsFalse() =
         runTest {
-            val testCategoryIds = listOf(1)
+            val testCategoryIds = listOf("1")
             val messagesResponse = createTestMessagesResponse(10, 10, 2)
             val networkResponse = Response(
                 originalRequest = UrlRequest(
@@ -143,7 +143,7 @@ class ListPageModelTests {
     @Test
     fun fetchMessagesWithCategories_shouldSendFetchMessagesEvent_withFilterUnopenedMessagesTrue_whenFilterUnopenedOnlyIsTrue() =
         runTest {
-            val testCategoryIds = listOf(1, 2, 3)
+            val testCategoryIds = listOf("1", "2", "3")
             val messagesResponse = createTestMessagesResponse(10, 10, 2)
             val networkResponse = Response(
                 originalRequest = UrlRequest(
@@ -387,7 +387,7 @@ class ListPageModelTests {
         }
         val categories = mutableListOf<MessageCategory>()
         for (num in 1..categoriesReturned) {
-            categories.add(MessageCategory(num, "testCategory$num"))
+            categories.add(MessageCategory(num.toString(), "testCategory$num"))
         }
         val messagesResponse = MessagesResponse(
             "1.0",
