@@ -9,6 +9,6 @@ interface IosInAppApi {
     fun InlineInAppView(
         viewId: String,
         onLoaded: (() -> Unit)? = null,
-        onDismiss: (() -> Unit)? = null
+        onClose: (() -> Unit)? = null
     ): UIViewController
 }

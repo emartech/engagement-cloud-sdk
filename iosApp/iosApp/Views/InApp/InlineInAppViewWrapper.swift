@@ -6,11 +6,11 @@ import EngagementCloudSDK
 
 struct InlineInAppViewWrapper: UIViewControllerRepresentable {
     let viewId: String
-    let onLoaded: (() -> Void)? = nil
-    let onDismiss: (() -> Void)? = nil
+    let onLoaded: (() -> Void)?
+    let onClose: (() -> Void)?
     
     func makeUIViewController(context: Context) -> UIViewController {
-        EngagementCloud.shared.inApp.InlineInAppView(viewId: viewId, onLoaded: onLoaded, onDismiss: onDismiss)
+        EngagementCloud.shared.inApp.InlineInAppView(viewId: viewId, onLoaded: onLoaded, onClose: onClose)
     }
     
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {

@@ -1,5 +1,5 @@
-import SwiftUI
 import EngagementCloudSDK
+import SwiftUI
 
 struct SdkTestView: View {
     @State private var eventName = ""
@@ -22,7 +22,7 @@ struct SdkTestView: View {
             } label: {
                 Text("testDeeplinkWithDemoData")
             }
-            
+
             HStack {
                 TextField(
                     "Event name",
@@ -36,24 +36,27 @@ struct SdkTestView: View {
                     Text("track event")
                 }
             }.padding(8)
-            
+
             Button {
                 self.showInlineInApp.toggle()
             } label: {
                 Text("Show InlineInApp")
             }
 
-            
-            if (self.showInlineInApp) {
-                InlineInAppViewWrapper(viewId: "ia", onLoaded: {
-                    print("loaded")
-                }, onDismiss: {
-                    print("dismiss")
-                })
+
+            if self.showInlineInApp {
+                InlineInAppViewWrapper(
+                    viewId: "ia",
+                    onLoaded: {
+                        print("loaded")
+                    },
+                    onClose: {
+                        print("closed")
+                    })
             }
         }
     }
-    
+
     func enableTracking() {
         Task {
             try? await engagementCloud.setup.enable(
@@ -68,7 +71,7 @@ struct SdkTestView: View {
             try? await engagementCloud.contact.link(contactFieldValue: "test@test.com")
         }
     }
-    
+
     func trackEvent(eventName: String) {
         Task {
             try await engagementCloud.event.track(event: CustomEvent(name: eventName, attributes: nil))

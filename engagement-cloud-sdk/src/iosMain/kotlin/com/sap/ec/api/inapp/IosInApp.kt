@@ -22,10 +22,10 @@ class IosInApp: IosInAppApi {
     override fun InlineInAppView(
         viewId: String,
         onLoaded: (() -> Unit)?,
-        onDismiss: (() -> Unit)?
+        onClose: (() -> Unit)?
     ): UIViewController {
         return ComposeUIViewController {
-            ComposeInlineInAppView(viewId, onLoaded, onDismiss)
+            ComposeInlineInAppView(viewId, onLoaded, onClose)
         }
     }
 }

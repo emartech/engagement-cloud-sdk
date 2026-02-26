@@ -25,7 +25,7 @@ import web.html.HTMLElement
 @Composable
 internal actual fun InlineInAppView(
     message: InAppMessage,
-    onDismiss: () -> Unit,
+    onClose: () -> Unit,
     onLoaded: (() -> Unit)?
 ) {
     val webViewElement = remember { mutableStateOf<HTMLElement?>(null) }
@@ -47,7 +47,7 @@ internal actual fun InlineInAppView(
                 sdkEvent is SdkEvent.Internal.Sdk.Dismiss && sdkEvent.id == message.dismissId
             }
             webViewElement.value = null
-            onDismiss()
+            onClose()
         }
     }
 
@@ -83,7 +83,7 @@ internal fun InlineInAppView(
     message.value?.let {
         InlineInAppView(
             message = it,
-            onDismiss = {
+            onClose = {
                 removeInlineInApp(it)
             },
             onLoaded = onLoaded
@@ -95,7 +95,7 @@ internal fun InlineInAppView(
 internal fun InlineInAppView(
     viewId: String,
     onLoaded: (() -> Unit)? = null,
-    onDismiss: (() -> Unit)? = null
+    onClose: (() -> Unit)? = null
 ) {
     val message = remember { mutableStateOf<InAppMessage?>(null) }
 
@@ -107,7 +107,7 @@ internal fun InlineInAppView(
     message.value?.let {
         InlineInAppView(
             message = it,
-            onDismiss = { onDismiss?.invoke() },
+            onClose = { onClose?.invoke() },
             onLoaded = onLoaded
         )
     }

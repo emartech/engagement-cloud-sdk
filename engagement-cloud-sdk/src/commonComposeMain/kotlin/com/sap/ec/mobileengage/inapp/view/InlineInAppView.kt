@@ -23,7 +23,7 @@ import kotlinx.serialization.json.Json
 @Composable
 internal actual fun InlineInAppView(
     message: InAppMessage,
-    onDismiss: () -> Unit,
+    onClose: () -> Unit,
     onLoaded: (() -> Unit)?
 ) {
     val sdkContext: SdkContextApi? = koin.getOrNull()
@@ -49,7 +49,7 @@ internal actual fun InlineInAppView(
                 sdkEvent is SdkEvent.Internal.Sdk.Dismiss && sdkEvent.id == message.dismissId
             }
             isVisible.value = false
-            onDismiss()
+            onClose()
         }
     }
 
@@ -64,7 +64,7 @@ internal actual fun InlineInAppView(
 internal fun InlineInAppView(
     url: Url,
     trackingInfo: String,
-    onDismiss: () -> Unit,
+    onClose: () -> Unit,
     onLoaded: (() -> Unit)? = null
 ) {
     val sdkContext: SdkContextApi? = koin.getOrNull()
@@ -80,7 +80,7 @@ internal fun InlineInAppView(
     }
 
     message.value?.let {
-        InlineInAppView(it, onDismiss, onLoaded)
+        InlineInAppView(it, onClose, onLoaded)
     }
 }
 
@@ -88,7 +88,7 @@ internal fun InlineInAppView(
 fun InlineInAppView(
     viewId: String,
     onLoaded: (() -> Unit)? = null,
-    onDismiss: (() -> Unit)? = null
+    onClose: (() -> Unit)? = null
 ) {
     val sdkContext: SdkContextApi? = koin.getOrNull()
     if (!SdkKoinIsolationContext.isInitialized() || sdkContext?.config?.applicationCode == null) {
@@ -106,7 +106,7 @@ fun InlineInAppView(
     message.value?.let {
         InlineInAppView(
             message = it,
-            onDismiss = { onDismiss?.invoke() },
+            onClose = { onClose?.invoke() },
             onLoaded = onLoaded
         )
     }
