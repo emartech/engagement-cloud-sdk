@@ -13,14 +13,17 @@ import com.sap.ec.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.sap.ec.mobileengage.action.models.RequestPushPermissionActionModel
 import com.sap.ec.mobileengage.action.models.amendForJsBridge
 import com.sap.ec.mobileengage.inapp.jsbridge.InAppJsBridgeData
-import com.sap.ec.util.JsonUtil
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
-import platform.Foundation.NSDictionary
-import platform.Foundation.allKeys
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonArray
+import platform.Foundation.NSArray
 import platform.WebKit.WKScriptMessage
 import platform.WebKit.WKScriptMessageHandlerProtocol
 import platform.WebKit.WKUserContentController
@@ -52,7 +55,7 @@ class InAppJsBridge(
         sdkScope.launch {
             try {
                 val body: String = withContext(mainScope.coroutineContext) {
-                    (didReceiveScriptMessage.body as NSDictionary).toJsonString()
+                    didReceiveScriptMessage.body.toJsonString()
                 }
                 val name = withContext(mainScope.coroutineContext) {
                     didReceiveScriptMessage.name
@@ -138,24 +141,30 @@ class InAppJsBridge(
     ) {
         handleActions(didReceiveScriptMessage)
     }
+    private fun Any.toJsonString(): String {
+        val jsonElement = this.toJsonElement()
+        return json.encodeToString(JsonElement.serializer(), jsonElement)
+    }
 
-    private fun NSDictionary.toMap(): Map<String, String?> {
-        val map = mutableMapOf<String, String?>()
-        val keys = this.allKeys
-        for (key in keys) {
-            val keyString = key as? String ?: continue
-            val value = this.objectForKey(keyString)
-            map[keyString] = value.toString()
+    @Suppress("UNCHECKED_CAST")
+    private fun Any?.toJsonElement(): JsonElement {
+        return when (this) {
+            null -> JsonNull
+            is Map<*, *> -> {
+                buildJsonObject {
+                    this@toJsonElement.forEach { (key, value) ->
+                        val keyString = key.toString()
+                        put(keyString, value.toJsonElement())
+                    }
+                }
+            }
+            is List<*> -> {
+                JsonArray(this.map { it.toJsonElement() })
+            }
+            is String -> JsonPrimitive(this)
+            is Number -> JsonPrimitive(this)
+            is Boolean -> JsonPrimitive(this)
+            else -> JsonPrimitive(this.toString())
         }
-        return map
-    }
-
-    private fun NSDictionary.toJsonString(): String {
-        val map = this.toMap()
-        return convertMapToJsonString(map)
-    }
-
-    private fun convertMapToJsonString(map: Map<String, String?>): String {
-        return JsonUtil.json.encodeToString(map)
     }
 }
