@@ -1,6 +1,6 @@
 package com.sap.ec.api.setup
 
-import com.sap.ec.api.config.JsApiConfig
+import com.sap.ec.api.config.EngagementCloudConfig
 import kotlin.js.Promise
 
 @OptIn(ExperimentalJsExport::class)
@@ -15,7 +15,7 @@ interface JsSetupApi {
      * @param onContactLinkingFailed The callback to be invoked when contact linking fails, allowing the app to provide contact data that the SDK can use to link.
      */
     suspend fun enable(
-        config: JsApiConfig,
+        config: EngagementCloudConfig,
         onContactLinkingFailed: () -> Promise<JsLinkContactData?>
     )
 
