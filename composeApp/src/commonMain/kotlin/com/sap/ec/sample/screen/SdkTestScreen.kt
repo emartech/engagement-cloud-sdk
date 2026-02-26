@@ -82,7 +82,9 @@ fun SdkTestScreen(
         }
 
         repeat(inlineInAppViewCount) { index ->
-            InlineInAppView(viewId = "ia")
+            InlineInAppView(viewId = "ia", onLoaded = {
+                println("Loaded")
+            }, onDismiss = { println("Dismissed") })
         }
     }
 }

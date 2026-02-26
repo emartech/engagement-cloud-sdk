@@ -45,7 +45,11 @@ struct SdkTestView: View {
 
             
             if (self.showInlineInApp) {
-                InlineInAppViewWrapper(viewId: "ia")
+                InlineInAppViewWrapper(viewId: "ia", onLoaded: {
+                    print("loaded")
+                }, onDismiss: {
+                    print("dismiss")
+                })
             }
         }
     }

@@ -19,9 +19,13 @@ class IosInApp: IosInAppApi {
         koin.get<InAppApi>().resume()
     }
 
-    override fun InlineInAppView(viewId: String): UIViewController {
+    override fun InlineInAppView(
+        viewId: String,
+        onLoaded: (() -> Unit)?,
+        onDismiss: (() -> Unit)?
+    ): UIViewController {
         return ComposeUIViewController {
-            ComposeInlineInAppView(viewId)
+            ComposeInlineInAppView(viewId, onLoaded, onDismiss)
         }
     }
 }

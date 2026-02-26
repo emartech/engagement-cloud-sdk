@@ -21,7 +21,11 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
 @Composable
-internal actual fun InlineInAppView(message: InAppMessage, onDismiss: () -> Unit) {
+internal actual fun InlineInAppView(
+    message: InAppMessage,
+    onDismiss: () -> Unit,
+    onLoaded: (() -> Unit)?
+) {
     val sdkContext: SdkContextApi? = koin.getOrNull()
     if (!SdkKoinIsolationContext.isInitialized() || sdkContext?.config?.applicationCode == null) {
         return
@@ -37,6 +41,8 @@ internal actual fun InlineInAppView(message: InAppMessage, onDismiss: () -> Unit
         val inAppView = inAppViewProvider.provide()
         val holder = inAppView.load(message)
         webViewHolder.value = holder
+
+        onLoaded?.invoke()
 
         launch {
             sdkEventDistributor.sdkEventFlow.first { sdkEvent ->
@@ -55,7 +61,12 @@ internal actual fun InlineInAppView(message: InAppMessage, onDismiss: () -> Unit
 }
 
 @Composable
-internal fun InlineInAppView(url: Url, trackingInfo: String, onDismiss: () -> Unit) {
+internal fun InlineInAppView(
+    url: Url,
+    trackingInfo: String,
+    onDismiss: () -> Unit,
+    onLoaded: (() -> Unit)? = null
+) {
     val sdkContext: SdkContextApi? = koin.getOrNull()
     if (!SdkKoinIsolationContext.isInitialized() || sdkContext?.config?.applicationCode == null) {
         return
@@ -69,12 +80,16 @@ internal fun InlineInAppView(url: Url, trackingInfo: String, onDismiss: () -> Un
     }
 
     message.value?.let {
-        InlineInAppView(it, onDismiss)
+        InlineInAppView(it, onDismiss, onLoaded)
     }
 }
 
 @Composable
-fun InlineInAppView(viewId: String) {
+fun InlineInAppView(
+    viewId: String,
+    onLoaded: (() -> Unit)? = null,
+    onDismiss: (() -> Unit)? = null
+) {
     val sdkContext: SdkContextApi? = koin.getOrNull()
     if (!SdkKoinIsolationContext.isInitialized() || sdkContext?.config?.applicationCode == null) {
         return
@@ -89,7 +104,11 @@ fun InlineInAppView(viewId: String) {
     }
 
     message.value?.let {
-        InlineInAppView(it) {}
+        InlineInAppView(
+            message = it,
+            onDismiss = { onDismiss?.invoke() },
+            onLoaded = onLoaded
+        )
     }
 }
 

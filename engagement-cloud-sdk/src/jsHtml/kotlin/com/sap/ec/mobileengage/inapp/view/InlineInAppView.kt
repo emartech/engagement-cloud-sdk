@@ -23,7 +23,11 @@ import web.dom.document
 import web.html.HTMLElement
 
 @Composable
-internal actual fun InlineInAppView(message: InAppMessage, onDismiss: () -> Unit) {
+internal actual fun InlineInAppView(
+    message: InAppMessage,
+    onDismiss: () -> Unit,
+    onLoaded: (() -> Unit)?
+) {
     val webViewElement = remember { mutableStateOf<HTMLElement?>(null) }
 
     LaunchedEffect(message) {
@@ -35,6 +39,8 @@ internal actual fun InlineInAppView(message: InAppMessage, onDismiss: () -> Unit
 
         val webElement = holder.asDynamic().webView as? HTMLElement
         webViewElement.value = webElement
+
+        onLoaded?.invoke()
 
         launch {
             sdkEventDistributor.sdkEventFlow.first { sdkEvent ->
@@ -61,7 +67,11 @@ internal actual fun InlineInAppView(message: InAppMessage, onDismiss: () -> Unit
 }
 
 @Composable
-internal fun InlineInAppView(url: Url, trackingInfo: String) {
+internal fun InlineInAppView(
+    url: Url,
+    trackingInfo: String,
+    onLoaded: (() -> Unit)? = null
+) {
     val fetcher: InlineInAppMessageFetcherApi = koin.get()
     val message = remember { mutableStateOf<InAppMessage?>(null) }
 
@@ -75,13 +85,18 @@ internal fun InlineInAppView(url: Url, trackingInfo: String) {
             message = it,
             onDismiss = {
                 removeInlineInApp(it)
-            }
+            },
+            onLoaded = onLoaded
         )
     }
 }
 
 @Composable
-internal fun InlineInAppView(viewId: String) {
+internal fun InlineInAppView(
+    viewId: String,
+    onLoaded: (() -> Unit)? = null,
+    onDismiss: (() -> Unit)? = null
+) {
     val message = remember { mutableStateOf<InAppMessage?>(null) }
 
     LaunchedEffect(viewId) {
@@ -90,7 +105,11 @@ internal fun InlineInAppView(viewId: String) {
     }
 
     message.value?.let {
-        InlineInAppView(it) {}
+        InlineInAppView(
+            message = it,
+            onDismiss = { onDismiss?.invoke() },
+            onLoaded = onLoaded
+        )
     }
 }
 
