@@ -4,6 +4,7 @@ import com.sap.ec.EngagementCloud
 import com.sap.ec.api.event.model.CustomEvent
 import com.sap.ec.api.event.model.NavigateEvent
 import com.sap.ec.sample.enableTracking
+import com.sap.ec.sample.registerPushToken
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -56,6 +57,12 @@ class SdkTestScreenViewModel {
         }
     }
 
+    fun trackPushToken() {
+        viewModelScope.launch {
+            registerPushToken()
+        }
+    }
+
     fun linkContact() {
         viewModelScope.launch {
             EngagementCloud.contact.link("test@test.com")
@@ -71,7 +78,7 @@ class SdkTestScreenViewModel {
         }
     }
 
-    fun trackNavigateEvent(){
+    fun trackNavigateEvent() {
         viewModelScope.launch {
             EngagementCloud.event.track(
                 NavigateEvent(

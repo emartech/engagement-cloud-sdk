@@ -49,6 +49,10 @@ fun SdkTestScreen(
             Text("unlink contact")
         }
 
+        Button(onClick = { viewModel.trackPushToken() }) {
+            Text("track Push Token")
+        }
+
         TextField(
             value = eventName,
             onValueChange = { viewModel.updateEventName(it) }
