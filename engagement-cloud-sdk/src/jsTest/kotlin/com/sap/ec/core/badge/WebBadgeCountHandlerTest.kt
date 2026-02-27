@@ -3,20 +3,21 @@ package com.sap.ec.core.badge
 import com.sap.ec.api.push.PushConstants.WEB_PUSH_ON_BADGE_COUNT_UPDATE_RECEIVED
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.api.event.model.BadgeCountEvent
-import com.sap.ec.api.event.model.EngagementCloudEvent
 import com.sap.ec.mobileengage.action.models.BadgeCount
 import com.sap.ec.mobileengage.action.models.BadgeCountMethod
 import com.sap.ec.util.JsonUtil
-import dev.mokkery.MockMode
+import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.matcher.capture.Capture.Companion.slot
 import dev.mokkery.matcher.capture.capture
+import dev.mokkery.matcher.capture.get
 import dev.mokkery.matcher.capture.isPresent
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -71,16 +72,18 @@ class WebBadgeCountHandlerTest {
         val eventSlot = slot<BadgeCountEvent>()
         val testBadgeCount = BadgeCount(BadgeCountMethod.SET, 1)
         val testBadgeCountString = JsonUtil.json.encodeToString(testBadgeCount)
-        everySuspend { mockSdkEventDistributor.registerPublicEvent(any<EngagementCloudEvent>()) } returns mock(MockMode.autofill)
-
-        everySuspend {
-            mockSdkEventDistributor.registerPublicEvent(
-                capture(eventSlot)
-            )
-        } returns mock(MockMode.autofill)
+        val completableDeferred = CompletableDeferred<Unit>()
+        everySuspend { mockSdkEventDistributor.registerPublicEvent(capture(eventSlot)) } calls {
+            completableDeferred.complete(Unit)
+        }
 
         webBadgeCountHandler.handleBadgeCount(testBadgeCountString)
 
+        completableDeferred.await()
+        with(eventSlot.get()) {
+            method shouldBe BadgeCountMethod.SET.name
+            badgeCount shouldBe 1
+        }
         eventSlot.isPresent shouldBe true
     }
 }

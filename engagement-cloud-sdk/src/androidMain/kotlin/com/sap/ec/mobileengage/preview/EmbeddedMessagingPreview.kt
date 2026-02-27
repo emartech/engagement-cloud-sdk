@@ -9,7 +9,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.paging.PagingData
 import com.sap.ec.SdkConstants
 import com.sap.ec.core.channel.SdkEventDistributorApi
-import com.sap.ec.core.channel.SdkEventWaiterApi
 import com.sap.ec.core.log.LogEntry
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.url.ExternalUrlOpenerApi
@@ -46,6 +45,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -62,6 +62,8 @@ fun MessageItemViewPreview() {
     val previewSdkEventDistributor = object : SdkEventDistributorApi {
         override val sdkEventFlow =
             MutableSharedFlow<SdkEvent>()
+        override val sdkPublicEventFlow: SharedFlow<EngagementCloudEvent> =
+            MutableSharedFlow()
         override val onlineSdkEvents =
             emptyFlow<OnlineSdkEvent>()
         override val logEvents =
@@ -70,7 +72,7 @@ fun MessageItemViewPreview() {
         override suspend fun registerEvent(sdkEvent: SdkEvent) =
             throw NotImplementedError("Preview only")
 
-        override suspend fun registerPublicEvent(sdkEvent: EngagementCloudEvent): SdkEventWaiterApi {
+        override suspend fun registerPublicEvent(sdkEvent: EngagementCloudEvent) {
             throw NotImplementedError("Preview only")
         }
     }
@@ -106,6 +108,8 @@ fun ListPageViewPreview() {
     val previewSdkEventDistributor = object : SdkEventDistributorApi {
         override val sdkEventFlow =
             MutableSharedFlow<SdkEvent>()
+        override val sdkPublicEventFlow: SharedFlow<EngagementCloudEvent> =
+            MutableSharedFlow()
         override val onlineSdkEvents =
             emptyFlow<OnlineSdkEvent>()
         override val logEvents =
@@ -114,7 +118,7 @@ fun ListPageViewPreview() {
         override suspend fun registerEvent(sdkEvent: SdkEvent) =
             throw NotImplementedError("Preview only")
 
-        override suspend fun registerPublicEvent(sdkEvent: EngagementCloudEvent): SdkEventWaiterApi {
+        override suspend fun registerPublicEvent(sdkEvent: EngagementCloudEvent) {
             throw NotImplementedError("Preview only")
         }
     }

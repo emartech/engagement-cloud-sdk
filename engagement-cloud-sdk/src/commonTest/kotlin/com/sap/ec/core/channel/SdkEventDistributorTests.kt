@@ -1,6 +1,7 @@
 package com.sap.ec.core.channel
 
 import com.sap.ec.api.SdkState
+import com.sap.ec.api.event.model.BadgeCountEvent
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.db.events.EventsDaoApi
 import com.sap.ec.core.log.LogEventRegistryApi
@@ -284,6 +285,25 @@ class SdkEventDistributorTests {
             sdkStateFlow.value = SdkState.Active
 
             emittedOnlineEventsWhenOnline.await() shouldBe listOf(testEvent)
+        }
+
+    @Test
+    fun registerPublicEvent_shouldEmitEvent_toSdkPublicEventFlow() =
+        runTest {
+            val testPublicEvent = BadgeCountEvent(
+                badgeCount = 1234,
+                method = "set"
+            )
+            val sdkEventDistributor =
+                createEventDistributor(MutableStateFlow(false), mockSdkContext)
+
+            val emittedEvents = backgroundScope.async {
+                sdkEventDistributor.sdkPublicEventFlow.take(1).toList()
+            }
+
+            sdkEventDistributor.registerPublicEvent(testPublicEvent)
+
+            emittedEvents.await() shouldBe listOf(testPublicEvent)
         }
 
     private fun createEventDistributor(

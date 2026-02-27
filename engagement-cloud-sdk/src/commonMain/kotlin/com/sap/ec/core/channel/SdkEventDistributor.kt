@@ -41,6 +41,13 @@ internal class SdkEventDistributor(
         extraBufferCapacity = Channel.UNLIMITED
     )
 
+    private val _sdkPublicEventFlow = MutableSharedFlow<EngagementCloudEvent>(
+        replay = 100,
+        extraBufferCapacity = Channel.UNLIMITED
+    )
+
+    override val sdkPublicEventFlow = _sdkPublicEventFlow.asSharedFlow()
+
     override val sdkEventFlow = _sdkEventFlow.asSharedFlow()
 
     private val _onlineSdkEvents: Flow<OnlineSdkEvent> =
@@ -118,8 +125,9 @@ internal class SdkEventDistributor(
         }
     }
 
-    override suspend fun registerPublicEvent(sdkEvent: EngagementCloudEvent): SdkEventWaiterApi {
-        TODO("Not yet implemented")
+    override suspend fun registerPublicEvent(sdkEvent: EngagementCloudEvent) {
+        sdkLogger.trace("Register public event: ${sdkEvent.type}", buildJsonObject { put("event", sdkEvent.toString()) })
+        _sdkPublicEventFlow.emit(sdkEvent)
     }
 
     override suspend fun emitEvent(sdkEvent: SdkEvent) {

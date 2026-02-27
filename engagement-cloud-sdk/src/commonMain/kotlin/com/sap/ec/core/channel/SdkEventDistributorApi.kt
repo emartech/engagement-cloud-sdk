@@ -8,10 +8,11 @@ import kotlinx.coroutines.flow.SharedFlow
 
 internal interface SdkEventDistributorApi {
     val sdkEventFlow: SharedFlow<SdkEvent>
+    val sdkPublicEventFlow: SharedFlow<EngagementCloudEvent>
     val onlineSdkEvents: Flow<OnlineSdkEvent>
     val logEvents: Flow<SdkEvent.Internal.LogEvent>
 
     suspend fun registerEvent(sdkEvent: SdkEvent): SdkEventWaiterApi
-    suspend fun registerPublicEvent(sdkEvent: EngagementCloudEvent): SdkEventWaiterApi
+    suspend fun registerPublicEvent(sdkEvent: EngagementCloudEvent)
 
 }

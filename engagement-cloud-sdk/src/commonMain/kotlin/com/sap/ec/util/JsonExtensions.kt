@@ -16,7 +16,7 @@ import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.long
 import kotlinx.serialization.json.longOrNull
 
-fun JsonObject.toMap(): Map<String, Any> {
+internal fun JsonObject.toMap(): Map<String, Any> {
     return runCatching {
         this.mapNotNull { (key, value) ->
             val convertedValue = value.toAny()
@@ -29,7 +29,7 @@ fun JsonObject.toMap(): Map<String, Any> {
     }.getOrElse { emptyMap() }
 }
 
-fun Map<String, Any?>.toJsonObject(): JsonObject {
+internal fun Map<String, Any?>.toJsonObject(): JsonObject {
     return runCatching {
         buildJsonObject {
             this@toJsonObject.forEach { (key, value) ->
@@ -39,7 +39,7 @@ fun Map<String, Any?>.toJsonObject(): JsonObject {
     }.getOrElse { buildJsonObject {} }
 }
 
-fun JsonElement.toAny(): Any? {
+internal fun JsonElement.toAny(): Any? {
     return runCatching {
         when (this) {
             is JsonNull -> null
@@ -59,7 +59,7 @@ fun JsonElement.toAny(): Any? {
     }.getOrNull()
 }
 
-fun Any?.toJsonElement(): JsonElement {
+internal fun Any?.toJsonElement(): JsonElement {
     return runCatching {
         when (this) {
             null -> JsonNull

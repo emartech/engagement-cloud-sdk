@@ -21,7 +21,7 @@ external interface SdkApiAppEvent : SdkApiEvent {
     override val type: String
     override val id: String
     val name: String
-    val attributes: JSON
+    val payload: JSON
 }
 
 @JsExport

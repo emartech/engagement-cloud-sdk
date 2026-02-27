@@ -18,7 +18,7 @@ internal class AppEventAction(
         sdkEventDistributor.registerPublicEvent(
             AppEvent(
                 name = action.name,
-                attributes = action.payload?.let {
+                payload = action.payload?.let {
                     buildJsonObject {
                         it.forEach { (key, value) ->
                             put(key, value)

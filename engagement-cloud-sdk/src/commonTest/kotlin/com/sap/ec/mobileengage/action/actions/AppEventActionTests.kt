@@ -1,12 +1,10 @@
 package com.sap.ec.mobileengage.action.actions
 
 import com.sap.ec.core.channel.SdkEventDistributorApi
-import com.sap.ec.core.channel.SdkEventWaiterApi
 import com.sap.ec.api.event.model.AppEvent
-import com.sap.ec.event.SdkEvent
 import com.sap.ec.mobileengage.action.models.BasicAppEventActionModel
 import dev.mokkery.MockMode
-import dev.mokkery.answering.returns
+import dev.mokkery.answering.calls
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.capture.Capture
 import dev.mokkery.matcher.capture.SlotCapture
@@ -14,6 +12,7 @@ import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -30,19 +29,17 @@ class AppEventActionTests {
     }
 
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
-    private lateinit var mockSdkEventWaiter: SdkEventWaiterApi
     private lateinit var eventSlot: SlotCapture<AppEvent>
+    private lateinit var completableDeferred: CompletableDeferred<Unit>
 
     @BeforeTest
     fun setup() {
         eventSlot = Capture.slot()
-        mockSdkEventWaiter = mock(MockMode.autoUnit)
-        everySuspend { mockSdkEventWaiter.await<Any>() } returns SdkEvent.Internal.Sdk.Answer.Response(
-            "0",
-            Result.success(Any())
-        )
         mockSdkEventDistributor = mock(MockMode.autofill)
-        everySuspend { mockSdkEventDistributor.registerPublicEvent(capture(eventSlot)) } returns mockSdkEventWaiter
+        completableDeferred = CompletableDeferred()
+        everySuspend { mockSdkEventDistributor.registerPublicEvent(capture(eventSlot)) } calls {
+            completableDeferred.complete(Unit)
+        }
     }
 
     @Test
@@ -53,19 +50,21 @@ class AppEventActionTests {
 
         advanceUntilIdle()
 
-        eventSlot.get().attributes shouldBe null
+        completableDeferred.await()
+        eventSlot.get().payload shouldBe null
     }
 
     @Test
     fun invoke_shouldAddAttributes_toInvokedAction_ifActionModelPayload_isNotNull() = runTest {
-        val testAttributes = mapOf("key" to "value", "testKey" to "testValue")
-        val testActionModel = BasicAppEventActionModel(name = TEST_NAME, payload = testAttributes)
+        val testPayload = mapOf("key" to "value", "testKey" to "testValue")
+        val testActionModel = BasicAppEventActionModel(name = TEST_NAME, payload = testPayload)
 
         AppEventAction(testActionModel, mockSdkEventDistributor).invoke()
 
         advanceUntilIdle()
 
-        eventSlot.get().attributes shouldBe buildJsonObject {
+        completableDeferred.await()
+        eventSlot.get().payload shouldBe buildJsonObject {
             put("key", "value")
             put("testKey", "testValue")
         }

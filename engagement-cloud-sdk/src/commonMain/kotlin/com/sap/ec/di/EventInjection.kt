@@ -11,12 +11,12 @@ import com.sap.ec.api.event.EventTrackerInternal
 import com.sap.ec.api.event.LoggingEventTracker
 import com.sap.ec.core.collections.PersistentList
 import com.sap.ec.api.event.model.EngagementCloudEvent
+import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.mobileengage.session.ECSdkSession
 import com.sap.ec.mobileengage.session.SessionApi
 import com.sap.ec.tracking.Tracking
 import com.sap.ec.tracking.TrackingApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -78,8 +78,7 @@ object EventInjection {
                 sdkLogger = get { parametersOf(ECSdkSession::class.simpleName) })
         }
         single<Flow<EngagementCloudEvent>>(named(EventFlowTypes.Public)) {
-            TODO("add real implementation after eventDistributor is extended")
-            emptyFlow()
+            get<SdkEventDistributorApi>().sdkPublicEventFlow
         }
         single<TrackingApi> { Tracking() }
     }

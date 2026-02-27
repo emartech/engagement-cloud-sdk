@@ -51,13 +51,12 @@ class EventEmitterTests {
         val testAttributes = buildJsonObject { put("key", "value") }
         val testAttributes2 = buildJsonObject { put("key2", "value2") }
         val testAppEvent1 =
-            AppEvent(ID, NAME, testAttributes, testTimestamp)
+            AppEvent(ID, NAME, testAttributes)
         val testAppEvent2 =
-            AppEvent(ID2, NAME2, testAttributes2, testTimestamp)
+            AppEvent(ID2, NAME2, testAttributes2)
         val testBadgeCountEvent =
             BadgeCountEvent(
                 ID3,
-                testTimestamp,
                 badgeCount = 10,
                 method = "add"
             )
@@ -119,7 +118,7 @@ class EventEmitterTests {
             val result = handledEvent as SdkApiAppEvent
             result.id shouldBe ID
             result.name shouldBe NAME
-            stringify(result.attributes) shouldBe testAttributes.toString()
+            stringify(result.payload) shouldBe testAttributes.toString()
             handledEvent?.type shouldBe SDK_APP_EVENT
 
             verifySuspend { mockLogger.debug("Registering listener for event type: $SDK_APP_EVENT") }
@@ -153,12 +152,12 @@ class EventEmitterTests {
                 val event1 = eventList.find { it.id === ID } as SdkApiAppEvent
                 event1.type shouldBe SDK_APP_EVENT
                 event1.name shouldBe NAME
-                JSON.stringify(event1.attributes) shouldBe testAttributes.toString()
+                JSON.stringify(event1.payload) shouldBe testAttributes.toString()
 
                 val event2 = eventList.find { it.id === ID2 } as SdkApiAppEvent
                 event2.type shouldBe SDK_APP_EVENT
                 event2.name shouldBe NAME2
-                JSON.stringify(event2.attributes) shouldBe testAttributes2.toString()
+                JSON.stringify(event2.payload) shouldBe testAttributes2.toString()
             }
         }
 
@@ -180,7 +179,7 @@ class EventEmitterTests {
             val event1 = handledAppEvents.find { it.id === ID } as SdkApiAppEvent
             event1.type shouldBe SDK_APP_EVENT
             event1.name shouldBe NAME
-            JSON.stringify(event1.attributes) shouldBe testAttributes.toString()
+            JSON.stringify(event1.payload) shouldBe testAttributes.toString()
 
             handledAppEvents.find { it.id === ID2 } shouldBe null
 
@@ -221,12 +220,12 @@ class EventEmitterTests {
             val event1 = handledAppEvents.find { it.id === ID } as SdkApiAppEvent
             event1.type shouldBe SDK_APP_EVENT
             event1.name shouldBe NAME
-            JSON.stringify(event1.attributes) shouldBe testAttributes.toString()
+            JSON.stringify(event1.payload) shouldBe testAttributes.toString()
 
             val event2 = handledAppEvents.find { it.id === ID2 } as SdkApiAppEvent
             event2.type shouldBe SDK_APP_EVENT
             event2.name shouldBe NAME2
-            JSON.stringify(event2.attributes) shouldBe testAttributes2.toString()
+            JSON.stringify(event2.payload) shouldBe testAttributes2.toString()
 
             val badgeEvent = handledBadgeCountEvents[0] as SdkApiBadgeCountEvent
             badgeEvent.id shouldBe testBadgeCountEvent.id
@@ -247,9 +246,9 @@ class EventEmitterTests {
         runTest {
             val emitter = createEmitter(backgroundScope)
             val testAppEvent1 =
-                AppEvent(ID, NAME, testAttributes, testTimestamp)
+                AppEvent(ID, NAME, testAttributes)
             val testAppEvent2 =
-                AppEvent(ID2, NAME2, testAttributes2, testTimestamp)
+                AppEvent(ID2, NAME2, testAttributes2)
             val handledAppEvents: MutableList<SdkApiEvent> = mutableListOf()
             val testAppEventListener: EngagementCloudSdkEventListener = { handledAppEvents.add(it) }
 
@@ -265,7 +264,7 @@ class EventEmitterTests {
             val event1 = handledAppEvents.find { it.id === ID } as SdkApiAppEvent
             event1.type shouldBe SDK_APP_EVENT
             event1.name shouldBe NAME
-            JSON.stringify(event1.attributes) shouldBe testAttributes.toString()
+            JSON.stringify(event1.payload) shouldBe testAttributes.toString()
 
             handledAppEvents.find { it.id === ID2 } shouldBe null
 

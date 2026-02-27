@@ -107,8 +107,7 @@ internal class IosPushInternal(
         sdkEventDistributor.registerPublicEvent(
             AppEvent(
                 id = uuidProvider.provide(),
-                name = SILENT_PUSH_RECEIVED_EVENT_NAME,
-                timestamp = timestampProvider.provide()
+                name = SILENT_PUSH_RECEIVED_EVENT_NAME
             )
         )
     }

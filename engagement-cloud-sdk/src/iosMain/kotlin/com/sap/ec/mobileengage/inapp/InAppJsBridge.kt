@@ -13,17 +13,13 @@ import com.sap.ec.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.sap.ec.mobileengage.action.models.RequestPushPermissionActionModel
 import com.sap.ec.mobileengage.action.models.amendForJsBridge
 import com.sap.ec.mobileengage.inapp.jsbridge.InAppJsBridgeData
+import com.sap.ec.util.toJsonElement
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonArray
-import platform.Foundation.NSArray
 import platform.WebKit.WKScriptMessage
 import platform.WebKit.WKScriptMessageHandlerProtocol
 import platform.WebKit.WKUserContentController
@@ -54,65 +50,59 @@ class InAppJsBridge(
         val mainScope = CoroutineScope(mainDispatcher)
         sdkScope.launch {
             try {
-                val body: String = withContext(mainScope.coroutineContext) {
-                    didReceiveScriptMessage.body.toJsonString()
+                val bodyElement: JsonElement = withContext(mainScope.coroutineContext) {
+                    didReceiveScriptMessage.body.toJsonElement()
                 }
                 val name = withContext(mainScope.coroutineContext) {
                     didReceiveScriptMessage.name
                 }
-                logger.debug("Received action: body(${body})")
+                logger.debug("Received action: body(${json.encodeToString(JsonElement.serializer(), bodyElement)})")
                 when (name) {
                     "triggerMEEvent" -> {
                         val actionModel =
-                            json.decodeFromString<BasicCustomEventActionModel>(body)
+                            json.decodeFromJsonElement(BasicCustomEventActionModel.serializer(), bodyElement)
                         actionFactory.create(actionModel)()
                     }
 
                     "buttonClicked" -> {
                         val actionModel =
-                            json.decodeFromString<BasicInAppButtonClickedActionModel>(body)
+                            json.decodeFromJsonElement(BasicInAppButtonClickedActionModel.serializer(), bodyElement)
                         actionFactory.create(actionModel)()
                     }
 
                     "triggerAppEvent" -> {
                         val actionModel =
-                            json.decodeFromString<BasicAppEventActionModel>(body)
+                            json.decodeFromJsonElement(BasicAppEventActionModel.serializer(), bodyElement)
                         actionFactory.create(actionModel)()
                     }
 
                     "requestPushPermission" -> {
                         val actionModel =
-                            json.decodeFromString<RequestPushPermissionActionModel>(
-                                body
-                            )
+                            json.decodeFromJsonElement(RequestPushPermissionActionModel.serializer(), bodyElement)
                         actionFactory.create(actionModel)()
                     }
 
                     "openExternalLink" -> {
                         val actionModel =
-                            json.decodeFromString<BasicOpenExternalUrlActionModel>(
-                                body
-                            )
+                            json.decodeFromJsonElement(BasicOpenExternalUrlActionModel.serializer(), bodyElement)
                         actionFactory.create(actionModel)()
                     }
 
                     "close" -> {
                         val actionModel =
-                            json.decodeFromString<BasicDismissActionModel>(body)
+                            json.decodeFromJsonElement(BasicDismissActionModel.serializer(), bodyElement)
                         actionModel.dismissId = inAppJsBridgeData.dismissId
                         actionFactory.create(actionModel)()
                     }
 
                     "copyToClipboard" -> {
                         val actionModel =
-                            json.decodeFromString<BasicCopyToClipboardActionModel>(
-                                body
-                            )
+                            json.decodeFromJsonElement(BasicCopyToClipboardActionModel.serializer(), bodyElement)
                         actionFactory.create(actionModel)()
                     }
 
                     "handleInAppAction" -> {
-                        val actionModel = json.decodeFromString<BasicActionModel>(body)
+                        val actionModel = json.decodeFromJsonElement(BasicActionModel.serializer(), bodyElement)
                             .amendForJsBridge(inAppJsBridgeData)
                         actionFactory.create(actionModel).invoke()
                     }
@@ -140,31 +130,5 @@ class InAppJsBridge(
         didReceiveScriptMessage: WKScriptMessage
     ) {
         handleActions(didReceiveScriptMessage)
-    }
-    private fun Any.toJsonString(): String {
-        val jsonElement = this.toJsonElement()
-        return json.encodeToString(JsonElement.serializer(), jsonElement)
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    private fun Any?.toJsonElement(): JsonElement {
-        return when (this) {
-            null -> JsonNull
-            is Map<*, *> -> {
-                buildJsonObject {
-                    this@toJsonElement.forEach { (key, value) ->
-                        val keyString = key.toString()
-                        put(keyString, value.toJsonElement())
-                    }
-                }
-            }
-            is List<*> -> {
-                JsonArray(this.map { it.toJsonElement() })
-            }
-            is String -> JsonPrimitive(this)
-            is Number -> JsonPrimitive(this)
-            is Boolean -> JsonPrimitive(this)
-            else -> JsonPrimitive(this.toString())
-        }
     }
 }

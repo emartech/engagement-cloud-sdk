@@ -471,7 +471,7 @@ internal class IosPushInternalTests {
 
         val mockOpenExternalUrlAction: Action<*> = mock(MockMode.autoUnit)
         val mockAppEventAction: Action<*> = mock(MockMode.autoUnit)
-        everySuspend { mockSdkEventDistributor.registerPublicEvent(any()) } returns mock(MockMode.autofill)
+        everySuspend { mockSdkEventDistributor.registerPublicEvent(any()) }
 
         everySuspend { mockActionFactory.create(openExternalUrlActionModel) } returns mockOpenExternalUrlAction
         everySuspend { mockActionFactory.create(appEventActionModel) } returns mockAppEventAction
@@ -506,7 +506,7 @@ internal class IosPushInternalTests {
             ),
         )
         everySuspend { mockActionFactory.create(openExternalUrlActionModel) } returns mockOpenExternalUrlAction
-        everySuspend { mockSdkEventDistributor.registerPublicEvent(any()) } returns mock(MockMode.autofill)
+        everySuspend { mockSdkEventDistributor.registerPublicEvent(any()) }
 
         iosPushInternal.handleSilentMessageWithUserInfo(userInfo)
 
@@ -515,8 +515,7 @@ internal class IosPushInternalTests {
             mockSdkEventDistributor.registerPublicEvent(
                 AppEvent(
                     id = UUID,
-                    name = SILENT_PUSH_RECEIVED_EVENT_NAME,
-                    timestamp = Instant.DISTANT_PAST
+                    name = SILENT_PUSH_RECEIVED_EVENT_NAME
                 )
             )
         }
