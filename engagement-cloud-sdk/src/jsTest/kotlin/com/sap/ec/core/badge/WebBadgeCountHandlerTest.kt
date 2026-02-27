@@ -2,7 +2,8 @@ package com.sap.ec.core.badge
 
 import com.sap.ec.api.push.PushConstants.WEB_PUSH_ON_BADGE_COUNT_UPDATE_RECEIVED
 import com.sap.ec.core.channel.SdkEventDistributorApi
-import com.sap.ec.event.SdkEvent
+import com.sap.ec.api.event.model.BadgeCountEvent
+import com.sap.ec.api.event.model.EngagementCloudEvent
 import com.sap.ec.mobileengage.action.models.BadgeCount
 import com.sap.ec.mobileengage.action.models.BadgeCountMethod
 import com.sap.ec.util.JsonUtil
@@ -67,13 +68,13 @@ class WebBadgeCountHandlerTest {
 
     @Test
     fun handleBadgeCount_shouldEmitSdkEvent_whenBadgeCountReceived() = runTest {
-        val eventSlot = slot<SdkEvent.External.Api.BadgeCountEvent>()
+        val eventSlot = slot<BadgeCountEvent>()
         val testBadgeCount = BadgeCount(BadgeCountMethod.SET, 1)
         val testBadgeCountString = JsonUtil.json.encodeToString(testBadgeCount)
-        everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mock(MockMode.autofill)
+        everySuspend { mockSdkEventDistributor.registerPublicEvent(any<EngagementCloudEvent>()) } returns mock(MockMode.autofill)
 
         everySuspend {
-            mockSdkEventDistributor.registerEvent(
+            mockSdkEventDistributor.registerPublicEvent(
                 capture(eventSlot)
             )
         } returns mock(MockMode.autofill)

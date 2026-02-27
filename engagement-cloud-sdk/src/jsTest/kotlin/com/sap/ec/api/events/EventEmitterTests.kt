@@ -7,7 +7,9 @@ import com.sap.ec.api.events.SdkApiEventTypes.SDK_APP_EVENT
 import com.sap.ec.api.events.SdkApiEventTypes.SDK_BADGE_COUNT_EVENT
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.providers.UuidProviderApi
-import com.sap.ec.event.SdkEvent
+import com.sap.ec.api.event.model.AppEvent
+import com.sap.ec.api.event.model.BadgeCountEvent
+import com.sap.ec.api.event.model.EngagementCloudEvent
 import com.sap.ec.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -36,7 +38,7 @@ import kotlin.test.Test
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalWasmJsInterop::class)
 class EventEmitterTests {
     private companion object {
         const val ID = "testId"
@@ -49,11 +51,11 @@ class EventEmitterTests {
         val testAttributes = buildJsonObject { put("key", "value") }
         val testAttributes2 = buildJsonObject { put("key2", "value2") }
         val testAppEvent1 =
-            SdkEvent.External.Api.AppEvent(ID, NAME, testAttributes, testTimestamp)
+            AppEvent(ID, NAME, testAttributes, testTimestamp)
         val testAppEvent2 =
-            SdkEvent.External.Api.AppEvent(ID2, NAME2, testAttributes2, testTimestamp)
+            AppEvent(ID2, NAME2, testAttributes2, testTimestamp)
         val testBadgeCountEvent =
-            SdkEvent.External.Api.BadgeCountEvent(
+            BadgeCountEvent(
                 ID3,
                 testTimestamp,
                 badgeCount = 10,
@@ -61,7 +63,7 @@ class EventEmitterTests {
             )
     }
 
-    private lateinit var sdkOutboundEventFLow: MutableSharedFlow<SdkEvent.External.Api>
+    private lateinit var sdkOutboundEventFLow: MutableSharedFlow<EngagementCloudEvent>
     private lateinit var listeners: MutableMap<String, MutableList<EngagementCloudSdkEventListener>>
     private lateinit var onceListeners: MutableMap<String, EngagementCloudSdkEventListener>
     private lateinit var mockUuidProvider: UuidProviderApi
@@ -245,9 +247,9 @@ class EventEmitterTests {
         runTest {
             val emitter = createEmitter(backgroundScope)
             val testAppEvent1 =
-                SdkEvent.External.Api.AppEvent(ID, NAME, testAttributes, testTimestamp)
+                AppEvent(ID, NAME, testAttributes, testTimestamp)
             val testAppEvent2 =
-                SdkEvent.External.Api.AppEvent(ID2, NAME2, testAttributes2, testTimestamp)
+                AppEvent(ID2, NAME2, testAttributes2, testTimestamp)
             val handledAppEvents: MutableList<SdkApiEvent> = mutableListOf()
             val testAppEventListener: EngagementCloudSdkEventListener = { handledAppEvents.add(it) }
 

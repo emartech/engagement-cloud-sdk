@@ -3,7 +3,7 @@ package com.sap.ec.api.events
 import EngagementCloudSdkEventListener
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.providers.UuidProviderApi
-import com.sap.ec.event.SdkEvent
+import com.sap.ec.api.event.model.EngagementCloudEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
 internal class EventEmitter(
-    private val sdkPublicEventFLow: Flow<SdkEvent.External.Api>,
+    private val sdkPublicEventFLow: Flow<EngagementCloudEvent>,
     private val applicationScope: CoroutineScope,
     private val listeners: MutableMap<String, MutableList<EngagementCloudSdkEventListener>>,
     private val onceListeners: MutableMap<String, EngagementCloudSdkEventListener>,
@@ -99,7 +99,7 @@ internal class EventEmitter(
         }
     }
 
-    private suspend fun parseSdkPublicEvent(event: SdkEvent.External.Api): SdkApiEvent? {
+    private suspend fun parseSdkPublicEvent(event: EngagementCloudEvent): SdkApiEvent? {
         return try {
             JSON.parse<SdkApiEvent>(json.encodeToString(event))
         } catch (error: Throwable) {

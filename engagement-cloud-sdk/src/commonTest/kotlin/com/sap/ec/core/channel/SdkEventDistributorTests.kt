@@ -14,7 +14,6 @@ import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
-import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
@@ -165,28 +164,6 @@ class SdkEventDistributorTests {
 
             emittedEvents.await() shouldBe listOf(testEvent)
             verifySuspend {
-                mockEventsDao.insertEvent(testEvent)
-            }
-        }
-
-    @Test
-    fun registerAndStoreEvent_shouldNotPersistNotOnlineEvents_andEmitSdkEvent_toSdkEventFlow() =
-        runTest {
-            val testEvent = SdkEvent.External.Api.BadgeCountEvent(
-                badgeCount = 1234,
-                method = "set"
-            )
-            val sdkEventDistributor =
-                createEventDistributor(MutableStateFlow(false), mockSdkContext)
-
-            val emittedEvents = backgroundScope.async {
-                sdkEventDistributor.sdkEventFlow.take(1).toList()
-            }
-
-            sdkEventDistributor.registerEvent(testEvent)
-
-            emittedEvents.await() shouldBe listOf(testEvent)
-            verifySuspend(VerifyMode.exactly(0)) {
                 mockEventsDao.insertEvent(testEvent)
             }
         }

@@ -1,6 +1,7 @@
 package com.sap.ec.mobileengage.action.actions
 
 import com.sap.ec.core.channel.SdkEventDistributorApi
+import com.sap.ec.api.event.model.AppEvent
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.mobileengage.action.models.AppEventActionModel
 import kotlinx.serialization.json.buildJsonObject
@@ -14,8 +15,8 @@ internal class AppEventAction(
 ) : Action<SdkEvent> {
     //TODO we should add the source!!
     override suspend fun invoke(value: SdkEvent?) {
-        sdkEventDistributor.registerEvent(
-            SdkEvent.External.Api.AppEvent(
+        sdkEventDistributor.registerPublicEvent(
+            AppEvent(
                 name = action.name,
                 attributes = action.payload?.let {
                     buildJsonObject {

@@ -1,6 +1,5 @@
 package com.sap.ec
 
-import androidx.compose.ui.window.ComposeUIViewController
 import com.sap.ec.api.config.IosConfigApi
 import com.sap.ec.api.contact.IosContactApi
 import com.sap.ec.api.deeplink.IosDeepLinkApi
@@ -13,18 +12,16 @@ import com.sap.ec.di.CoroutineScopeTypes
 import com.sap.ec.di.EventFlowTypes
 import com.sap.ec.di.SdkKoinIsolationContext
 import com.sap.ec.di.SdkKoinIsolationContext.koin
-import com.sap.ec.event.SdkEvent
-import com.sap.ec.mobileengage.inapp.view.InlineInAppView
+import com.sap.ec.api.event.model.EngagementCloudEvent
 import io.ktor.utils.io.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import org.koin.core.qualifier.named
-import platform.UIKit.UIViewController
 import kotlin.experimental.ExperimentalObjCName
 
-typealias EngagementCloudEventListener = (SdkEvent) -> Unit
+typealias EngagementCloudEventListener = (EngagementCloudEvent) -> Unit
 
 @OptIn(ExperimentalObjCName::class)
 @ObjCName("EngagementCloud")
@@ -60,7 +57,7 @@ object IosEngagementCloud {
         EngagementCloud.initialize()
         koin.get<CoroutineScope>(named(CoroutineScopeTypes.Application))
             .launch(start = CoroutineStart.UNDISPATCHED) {
-                koin.get<Flow<SdkEvent.External.Api>>(named(EventFlowTypes.Public)).collect {
+                koin.get<Flow<EngagementCloudEvent>>(named(EventFlowTypes.Public)).collect {
                     eventListeners.forEach { listener ->
                         listener.invoke(it)
                     }

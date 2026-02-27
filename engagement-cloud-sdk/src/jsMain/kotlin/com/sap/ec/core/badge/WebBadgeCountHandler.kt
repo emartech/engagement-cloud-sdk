@@ -2,7 +2,7 @@ package com.sap.ec.core.badge
 
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.log.Logger
-import com.sap.ec.event.SdkEvent
+import com.sap.ec.api.event.model.BadgeCountEvent
 import com.sap.ec.mobileengage.action.models.BadgeCount
 import com.sap.ec.util.JsonUtil
 import kotlinx.coroutines.CoroutineScope
@@ -31,8 +31,8 @@ internal class WebBadgeCountHandler(
         try {
             val badgeCount =
                 JsonUtil.json.decodeFromString<BadgeCount>(badgeCountString)
-            sdkEventDistributor.registerEvent(
-                SdkEvent.External.Api.BadgeCountEvent(
+            sdkEventDistributor.registerPublicEvent(
+                BadgeCountEvent(
                     badgeCount = badgeCount.value,
                     method = badgeCount.method.name,
                 )

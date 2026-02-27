@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.sap.ec.SdkConstants.SILENT_PUSH_RECEIVED_EVENT_NAME
 import com.sap.ec.core.channel.SdkEventDistributorApi
-import com.sap.ec.event.SdkEvent
+import com.sap.ec.api.event.model.AppEvent
 import com.sap.ec.mobileengage.action.PushActionFactory
 import com.sap.ec.mobileengage.action.actions.Action
 import com.sap.ec.mobileengage.action.models.BadgeCount
@@ -104,8 +104,8 @@ class PushMessageHandlerTest {
         silentPushMessageHandler.handle(message)
 
         verifySuspend {
-            mockSdkEventDistributor.registerEvent(
-                SdkEvent.External.Api.AppEvent(name = SILENT_PUSH_RECEIVED_EVENT_NAME)
+            mockSdkEventDistributor.registerPublicEvent(
+                AppEvent(name = SILENT_PUSH_RECEIVED_EVENT_NAME)
             )
         }
     }

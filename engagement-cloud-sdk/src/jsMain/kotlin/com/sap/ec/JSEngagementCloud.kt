@@ -13,7 +13,7 @@ import com.sap.ec.di.CoroutineScopeTypes
 import com.sap.ec.di.EventFlowTypes
 import com.sap.ec.di.SdkKoinIsolationContext
 import com.sap.ec.di.SdkKoinIsolationContext.koin
-import com.sap.ec.event.SdkEvent
+import com.sap.ec.api.event.model.EngagementCloudEvent
 import com.sap.ec.mobileengage.embeddedmessaging.ui.initializeCustomElements
 import com.sap.ec.util.JsonUtil
 import kotlinx.coroutines.CoroutineScope
@@ -39,7 +39,7 @@ object JSEngagementCloud {
     private val applicationScope: CoroutineScope =
         koin.get<CoroutineScope>(named(CoroutineScopeTypes.Application))
     private val sdkPublicEvents =
-        koin.get<Flow<SdkEvent.External.Api>>(named(EventFlowTypes.Public))
+        koin.get<Flow<EngagementCloudEvent>>(named(EventFlowTypes.Public))
     val events = koin.get<EventEmitterApi>()
     val setup = koin.get<JsSetupApi>()
     val config = koin.get<JSConfigApi>()

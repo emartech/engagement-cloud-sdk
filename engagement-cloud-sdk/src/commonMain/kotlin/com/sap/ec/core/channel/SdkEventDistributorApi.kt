@@ -1,6 +1,7 @@
 package com.sap.ec.core.channel
 
 import com.sap.ec.event.OnlineSdkEvent
+import com.sap.ec.api.event.model.EngagementCloudEvent
 import com.sap.ec.event.SdkEvent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
@@ -11,5 +12,6 @@ internal interface SdkEventDistributorApi {
     val logEvents: Flow<SdkEvent.Internal.LogEvent>
 
     suspend fun registerEvent(sdkEvent: SdkEvent): SdkEventWaiterApi
+    suspend fun registerPublicEvent(sdkEvent: EngagementCloudEvent): SdkEventWaiterApi
 
 }

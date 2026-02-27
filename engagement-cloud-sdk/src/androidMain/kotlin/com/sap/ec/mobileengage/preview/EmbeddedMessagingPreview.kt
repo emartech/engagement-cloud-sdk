@@ -9,11 +9,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.paging.PagingData
 import com.sap.ec.SdkConstants
 import com.sap.ec.core.channel.SdkEventDistributorApi
+import com.sap.ec.core.channel.SdkEventWaiterApi
 import com.sap.ec.core.log.LogEntry
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.url.ExternalUrlOpenerApi
 import com.sap.ec.core.util.DownloaderApi
 import com.sap.ec.event.OnlineSdkEvent
+import com.sap.ec.api.event.model.EngagementCloudEvent
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.mobileengage.action.ActionFactoryApi
 import com.sap.ec.mobileengage.action.actions.Action
@@ -67,6 +69,10 @@ fun MessageItemViewPreview() {
 
         override suspend fun registerEvent(sdkEvent: SdkEvent) =
             throw NotImplementedError("Preview only")
+
+        override suspend fun registerPublicEvent(sdkEvent: EngagementCloudEvent): SdkEventWaiterApi {
+            throw NotImplementedError("Preview only")
+        }
     }
     MessageItemView(
         MessageItemViewModel(
@@ -107,6 +113,10 @@ fun ListPageViewPreview() {
 
         override suspend fun registerEvent(sdkEvent: SdkEvent) =
             throw NotImplementedError("Preview only")
+
+        override suspend fun registerPublicEvent(sdkEvent: EngagementCloudEvent): SdkEventWaiterApi {
+            throw NotImplementedError("Preview only")
+        }
     }
     InternalListPageView(
         showFilters = true,
@@ -263,7 +273,7 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
 
         override suspend fun selectMessage(
             messageViewModel: MessageItemViewModelApi,
-            navigationCallback: suspend () -> Unit
+            onNavigate: suspend () -> Unit
         ) {
             Unit
         }

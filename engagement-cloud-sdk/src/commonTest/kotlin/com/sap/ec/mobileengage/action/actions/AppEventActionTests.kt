@@ -2,6 +2,7 @@ package com.sap.ec.mobileengage.action.actions
 
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.channel.SdkEventWaiterApi
+import com.sap.ec.api.event.model.AppEvent
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.mobileengage.action.models.BasicAppEventActionModel
 import dev.mokkery.MockMode
@@ -30,7 +31,7 @@ class AppEventActionTests {
 
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
     private lateinit var mockSdkEventWaiter: SdkEventWaiterApi
-    private lateinit var eventSlot: SlotCapture<SdkEvent.External.Api.AppEvent>
+    private lateinit var eventSlot: SlotCapture<AppEvent>
 
     @BeforeTest
     fun setup() {
@@ -41,7 +42,7 @@ class AppEventActionTests {
             Result.success(Any())
         )
         mockSdkEventDistributor = mock(MockMode.autofill)
-        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mockSdkEventWaiter
+        everySuspend { mockSdkEventDistributor.registerPublicEvent(capture(eventSlot)) } returns mockSdkEventWaiter
     }
 
     @Test

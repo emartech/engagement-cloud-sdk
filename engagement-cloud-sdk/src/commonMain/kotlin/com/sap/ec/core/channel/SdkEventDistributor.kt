@@ -7,6 +7,7 @@ import com.sap.ec.core.db.events.EventsDaoApi
 import com.sap.ec.core.log.LogEventRegistryApi
 import com.sap.ec.core.log.Logger
 import com.sap.ec.event.OnlineSdkEvent
+import com.sap.ec.api.event.model.EngagementCloudEvent
 import com.sap.ec.event.SdkEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -115,6 +116,10 @@ internal class SdkEventDistributor(
                 connectionStatus
             )
         }
+    }
+
+    override suspend fun registerPublicEvent(sdkEvent: EngagementCloudEvent): SdkEventWaiterApi {
+        TODO("Not yet implemented")
     }
 
     override suspend fun emitEvent(sdkEvent: SdkEvent) {

@@ -10,7 +10,7 @@ import com.sap.ec.api.setup.SetupApi
 import com.sap.ec.di.EventFlowTypes
 import com.sap.ec.di.SdkKoinIsolationContext
 import com.sap.ec.di.SdkKoinIsolationContext.koin
-import com.sap.ec.event.SdkEvent
+import com.sap.ec.api.event.model.EngagementCloudEvent
 import com.sap.ec.init.InitOrganizerApi
 import com.sap.ec.tracking.TrackingApi
 import kotlinx.coroutines.flow.Flow
@@ -46,12 +46,12 @@ object EngagementCloud {
     /**
      * Publishes a flow of SDK events that can be observed externally.
      * The following event types are available:
-     * - [SdkEvent.External.Api.AppEvent] - represents events defined by
+     * - [com.sap.ec.api.event.model.AppEvent] - represents events defined by
      * the SAP Engagement Cloud platform user.
-     * - [BadgeCountEvent][SdkEvent.External.Api.BadgeCountEvent] - represents changes in the badge count.
+     * - [BadgeCountEvent][com.sap.ec.api.event.model.BadgeCountEvent] - represents changes in the badge count.
      */
-    val events: Flow<SdkEvent>
-        get() = koin.get<Flow<SdkEvent.External.Api>>(named(EventFlowTypes.Public))
+    val events: Flow<EngagementCloudEvent>
+        get() = koin.get<Flow<EngagementCloudEvent>>(named(EventFlowTypes.Public))
 
     /**
      * Provides access to the Contact API, which allows managing the contact using the SDK.

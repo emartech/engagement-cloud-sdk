@@ -20,6 +20,7 @@ import com.sap.ec.core.log.Logger
 import com.sap.ec.core.providers.InstantProvider
 import com.sap.ec.core.providers.UuidProviderApi
 import com.sap.ec.core.storage.StringStorageApi
+import com.sap.ec.api.event.model.AppEvent
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.mobileengage.action.PushActionFactoryApi
 import com.sap.ec.mobileengage.action.actions.Action
@@ -103,8 +104,8 @@ internal class IosPushInternal(
         }
 
         //TODO: revisit what we want to send in attributes after API discovery
-        sdkEventDistributor.registerEvent(
-            SdkEvent.External.Api.AppEvent(
+        sdkEventDistributor.registerPublicEvent(
+            AppEvent(
                 id = uuidProvider.provide(),
                 name = SILENT_PUSH_RECEIVED_EVENT_NAME,
                 timestamp = timestampProvider.provide()

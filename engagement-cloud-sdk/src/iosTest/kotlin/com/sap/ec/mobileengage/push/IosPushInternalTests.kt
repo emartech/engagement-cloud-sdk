@@ -22,6 +22,7 @@ import com.sap.ec.core.providers.InstantProvider
 import com.sap.ec.core.providers.UuidProviderApi
 import com.sap.ec.core.storage.StringStorageApi
 import com.sap.ec.core.url.ExternalUrlOpenerApi
+import com.sap.ec.api.event.model.AppEvent
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.mobileengage.action.PushActionFactoryApi
 import com.sap.ec.mobileengage.action.actions.Action
@@ -470,7 +471,7 @@ internal class IosPushInternalTests {
 
         val mockOpenExternalUrlAction: Action<*> = mock(MockMode.autoUnit)
         val mockAppEventAction: Action<*> = mock(MockMode.autoUnit)
-        everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mock(MockMode.autofill)
+        everySuspend { mockSdkEventDistributor.registerPublicEvent(any()) } returns mock(MockMode.autofill)
 
         everySuspend { mockActionFactory.create(openExternalUrlActionModel) } returns mockOpenExternalUrlAction
         everySuspend { mockActionFactory.create(appEventActionModel) } returns mockAppEventAction
@@ -505,14 +506,14 @@ internal class IosPushInternalTests {
             ),
         )
         everySuspend { mockActionFactory.create(openExternalUrlActionModel) } returns mockOpenExternalUrlAction
-        everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mock(MockMode.autofill)
+        everySuspend { mockSdkEventDistributor.registerPublicEvent(any()) } returns mock(MockMode.autofill)
 
         iosPushInternal.handleSilentMessageWithUserInfo(userInfo)
 
         verifySuspend { mockOpenExternalUrlAction.invoke() }
         verifySuspend {
-            mockSdkEventDistributor.registerEvent(
-                SdkEvent.External.Api.AppEvent(
+            mockSdkEventDistributor.registerPublicEvent(
+                AppEvent(
                     id = UUID,
                     name = SILENT_PUSH_RECEIVED_EVENT_NAME,
                     timestamp = Instant.DISTANT_PAST
@@ -537,7 +538,6 @@ internal class IosPushInternalTests {
             (this as SdkEvent.Internal.Sdk.RegisterPushToken).pushToken shouldBe PUSH_TOKEN
         }
         emittedValues.firstOrNull { it is SdkEvent.Internal.Sdk.ClearPushToken } shouldNotBe null
-        emittedValues.firstOrNull { it is SdkEvent.External.Api.AppEvent } shouldNotBe null
     }
 
     private fun createUserInfoMap(
