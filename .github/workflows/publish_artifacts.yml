@@ -78,7 +78,7 @@ jobs:
           GITHUB_REPO: ${{ github.repository }}
 
       - name: Upload Android artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: android-artifacts
           retention-days: 1
@@ -199,7 +199,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload JS artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: js-artifacts
           retention-days: 1
@@ -302,7 +302,7 @@ jobs:
           git push origin ${{ env.VERSION }} --force
 
       - name: Upload iOS XCFramework artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ios-artifacts
           retention-days: 1
