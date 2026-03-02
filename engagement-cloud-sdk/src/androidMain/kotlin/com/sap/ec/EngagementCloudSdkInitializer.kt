@@ -1,6 +1,7 @@
 package com.sap.ec
 
 import android.content.Context
+import android.util.Log
 import androidx.startup.Initializer
 import kotlinx.coroutines.runBlocking
 
@@ -11,7 +12,13 @@ internal class EngagementCloudSdkInitializer : Initializer<Unit> {
     override fun create(context: Context) {
         setContext(context)
         return runBlocking {
-            AndroidEngagementCloud.initialize()
+            AndroidEngagementCloud.initialize().onFailure {
+                Log.e(
+                    "EngagementCloudSdkInitializer",
+                    "Failed to initialize Engagement Cloud SDK: ${it.message}",
+                    it
+                )
+            }
         }
     }
 

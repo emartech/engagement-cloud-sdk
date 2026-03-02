@@ -173,7 +173,7 @@ class FetchEmbeddedMessagingMetaStateTests {
         }
 
     @Test
-    fun testActive_shouldEmitFetchMetaEvent_andReturnFailure_whenMetaResponseResultIsFailure() =
+    fun testActive_shouldEmitFetchMetaEvent_andReturnSuccess_evenWhenMetaResponseResultIsFailure() =
         runTest {
             every { mockSdkContext.features } returns mutableSetOf(Features.EmbeddedMessaging)
             val exception = Exception("any exception happened")
@@ -186,7 +186,7 @@ class FetchEmbeddedMessagingMetaStateTests {
 
             val result = state.active()
 
-            result shouldBe Result.failure(exception)
+            result shouldBe Result.success(Unit)
             verifySuspend { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMeta>()) }
         }
 

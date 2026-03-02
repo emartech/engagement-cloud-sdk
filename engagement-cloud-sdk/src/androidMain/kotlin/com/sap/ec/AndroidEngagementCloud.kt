@@ -12,6 +12,8 @@ import com.sap.ec.di.SdkKoinIsolationContext
 import com.sap.ec.di.SdkKoinIsolationContext.koin
 import com.sap.ec.api.event.model.EngagementCloudEvent
 import com.sap.ec.tracking.TrackingApi
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import org.koin.core.qualifier.named
 
@@ -82,7 +84,13 @@ object AndroidEngagementCloud {
      * Initializes the SDK. This method must be called before using any other SDK functionality.
      * On Android it is being called automatically
      */
-    suspend fun initialize() {
-        SdkKoinIsolationContext.init()
+    suspend fun initialize(): Result<Unit> {
+        return try {
+            SdkKoinIsolationContext.init()
+            Result.success(Unit)
+        } catch (exception: Exception) {
+            currentCoroutineContext().ensureActive()
+            return Result.failure(exception)
+        }
     }
 }
