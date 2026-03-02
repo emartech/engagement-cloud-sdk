@@ -47,7 +47,7 @@ internal object EmbeddedMessagingConstants {
         const val EMPTY_STATE_FILTERED_CLEAR_FILTERS_BUTTON_LABEL = "Clear Filters"
         const val EMPTY_STATE_FILTERED_CLEAR_FILTERS_ICON_ALT_TEXT = "Clear filters icon"
         const val REFRESH_ERROR_MESSAGE_TEXT =
-            "Failed to refresh messages. Please try again. Check your connection and try again."
+            "Failed to load messages. Please try again. Check your connection and try again."
         const val FAILED_TO_LOAD_MORE_MESSAGES_TEXT = "Failed to load more messages."
         const val FAILED_TO_DELETE_MESSAGE_TEXT = "Failed to delete message."
     }

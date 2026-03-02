@@ -103,21 +103,21 @@ internal class EmbeddedMessagingClient(
 
     private suspend fun handleException(
         exception: Throwable,
-        messaging: OnlineSdkEvent
+        sdkEvent: OnlineSdkEvent
     ) {
         if (exception is NetworkIOException) {
-            sdkEventManager.emitEvent(messaging)
+            sdkEventManager.emitEvent(sdkEvent)
         } else {
             sdkEventManager.emitEvent(
                 SdkEvent.Internal.Sdk.Answer.Response(
-                    messaging.id,
-                    Result.failure<Exception>(exception)
+                    sdkEvent.id,
+                    Result.failure<Response>(exception)
                 )
             )
             clientExceptionHandler.handleException(
                 exception,
                 "exception while consuming EmbeddedMessaging events",
-                messaging
+                sdkEvent
             )
         }
     }

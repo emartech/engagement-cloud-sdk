@@ -103,7 +103,7 @@ fun MessageItemsListPane(
     onFilterChange: (Boolean) -> Unit,
     showCategorySelector: () -> Unit,
 ) {
-    val refreshError = lazyPagingMessageItems.loadState.refresh as? LoadState.Error
+    val refreshOrInitialLoadError = lazyPagingMessageItems.loadState.refresh as? LoadState.Error
     val appendError = lazyPagingMessageItems.loadState.append as? LoadState.Error
     val refreshErrorMessage = LocalStringResources.current.refreshErrorMessageText
     val failedToLoadMoreMessagesErrorMessage =
@@ -116,14 +116,12 @@ fun MessageItemsListPane(
     val scope = rememberCoroutineScope()
 
     EmbeddedMessagingTheme {
-        LaunchedEffect(refreshError) {
-            refreshError?.let {
-                if (lazyPagingMessageItems.itemCount > 0) {
-                    snackbarHostState.showSnackbar(
-                        message = refreshErrorMessage,
-                        duration = SnackbarDuration.Short
-                    )
-                }
+        LaunchedEffect(refreshOrInitialLoadError) {
+            refreshOrInitialLoadError?.let {
+                snackbarHostState.showSnackbar(
+                    message = refreshErrorMessage,
+                    duration = SnackbarDuration.Short
+                )
             }
         }
 
