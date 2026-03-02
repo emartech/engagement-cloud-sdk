@@ -78,7 +78,7 @@ internal class NotificationIntentProcessor(
                         actionFactory.create(BasicLaunchApplicationActionModel)
                     add(launchApplicationAction)
                     pushMessage?.platformData?.notificationMethod?.collapseId?.let {
-                        val dismissAction = actionFactory.create(BasicDismissActionModel(it))
+                        val dismissAction = actionFactory.create(BasicDismissActionModel(it, it))
                         add(dismissAction)
                     }
                 }

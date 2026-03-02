@@ -41,7 +41,7 @@ class SdkTestScreenViewModel {
     fun enableSdkAndLinkContact() {
         viewModelScope.launch {
             enableTracking()
-            EngagementCloud.contact.link("test@test.com")
+            EngagementCloud.contact.link("test1@test.com")
         }
     }
 
@@ -65,7 +65,7 @@ class SdkTestScreenViewModel {
 
     fun linkContact() {
         viewModelScope.launch {
-            EngagementCloud.contact.link("test@test.com")
+            EngagementCloud.contact.link("test1@test.com")
         }
     }
 

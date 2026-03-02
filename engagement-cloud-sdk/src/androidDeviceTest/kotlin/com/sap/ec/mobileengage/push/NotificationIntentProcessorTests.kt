@@ -124,7 +124,7 @@ class NotificationIntentProcessorTests {
             val mockBasicDismissAction = mockk<DismissAction>(relaxed = true)
             val mockReportingAction = mockk<DismissAction>(relaxed = true)
             coEvery { mockActionFactory.create(BasicLaunchApplicationActionModel) } returns mockLaunchApplicationAction
-            coEvery { mockActionFactory.create(BasicDismissActionModel(COLLAPSE_ID)) } returns mockBasicDismissAction
+            coEvery { mockActionFactory.create(BasicDismissActionModel(COLLAPSE_ID, COLLAPSE_ID)) } returns mockBasicDismissAction
             coEvery {
                 mockActionFactory.create(
                     NotificationOpenedActionModel(
@@ -157,7 +157,7 @@ class NotificationIntentProcessorTests {
             payload = PAYLOAD
         )
         val buttonClickedActionModel = BasicPushButtonClickedActionModel(REPORTING, TRACKING_INFO)
-        val basicDismissActionModel = BasicDismissActionModel(COLLAPSE_ID)
+        val basicDismissActionModel = BasicDismissActionModel(COLLAPSE_ID, COLLAPSE_ID)
         val reportingAction = ReportingAction(buttonClickedActionModel, mockSdkEventDistributor)
         val mockLaunchApplicationAction: LaunchApplicationAction = mockk(relaxed = true)
         val dismissAction = DismissAction(basicDismissActionModel, mockSdkEventDistributor)
@@ -288,7 +288,7 @@ class NotificationIntentProcessorTests {
                 """{"type": "MEAppEvent","reporting":"{\"someKey\":\"someValue\"}","name":"$NAME","payload":{"testKey":"testValue"}}"""
             val notificationOpenedActionModel =
                 NotificationOpenedActionModel(REPORTING, TRACKING_INFO)
-            val basicDismissActionModel = BasicDismissActionModel(COLLAPSE_ID)
+            val basicDismissActionModel = BasicDismissActionModel(COLLAPSE_ID, COLLAPSE_ID)
             val reportingAction =
                 ReportingAction(notificationOpenedActionModel, mockSdkEventDistributor)
             val basicDismissAction = DismissAction(basicDismissActionModel, mockSdkEventDistributor)
@@ -333,7 +333,7 @@ class NotificationIntentProcessorTests {
                 """{"type": "InApp","reporting":"{\"someKey\":\"someValue\"}","payload":{"url":"https://www.sap.com"}}"""
             val notificationOpenedActionModel =
                 NotificationOpenedActionModel(REPORTING, TRACKING_INFO)
-            val basicDismissActionModel = BasicDismissActionModel(COLLAPSE_ID)
+            val basicDismissActionModel = BasicDismissActionModel(COLLAPSE_ID, COLLAPSE_ID)
             val reportingAction =
                 ReportingAction(notificationOpenedActionModel, mockSdkEventDistributor)
             val basicDismissAction = DismissAction(basicDismissActionModel, mockSdkEventDistributor)
