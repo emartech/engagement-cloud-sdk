@@ -34,7 +34,7 @@ data class AppEvent(
     val name: String,
     val payload: Map<String, Any>? = null,
     override val type: EventType = EventType.APP_EVENT
-) : EngagementCloudEvent
+) : EngagementCloudEvent()
 
 internal object AppEventSerializer : KSerializer<AppEvent> {
     override val descriptor: SerialDescriptor =

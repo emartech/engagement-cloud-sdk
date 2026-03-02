@@ -12,10 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import com.sap.ec.EngagementCloud
-import com.sap.ec.api.event.model.AppEvent
-import com.sap.ec.api.event.model.BadgeCountEvent
-import com.sap.ec.api.event.model.EventType
 import com.sap.ec.core.device.AndroidVersionUtils.isTiramisuOrAbove
 import kotlinx.coroutines.launch
 
@@ -28,21 +24,6 @@ class MainActivity : AppCompatActivity() {
         }
         lifecycleScope.launch {
             askNotificationPermission()
-
-            EngagementCloud.events.collect {
-                when (it.type) {
-                    EventType.APP_EVENT -> {
-                        with(it as AppEvent) {
-                            Log.i("Engagement Cloud SDK", "Received App Event: $name with payload: $payload")
-                        }
-                    }
-                    EventType.BADGE_COUNT -> {
-                        with(it as BadgeCountEvent) {
-                            Log.i("Engagement Cloud SDK", "Received Badge Count Event: $badgeCount for method: $method")
-                        }
-                    }
-                }
-            }
         }
     }
 

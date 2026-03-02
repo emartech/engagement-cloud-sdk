@@ -30,4 +30,4 @@ data class BadgeCountEvent(
     val badgeCount: Int,
     val method: String,
     override val type: EventType = EventType.BADGE_COUNT
-) : EngagementCloudEvent
+) : EngagementCloudEvent()
