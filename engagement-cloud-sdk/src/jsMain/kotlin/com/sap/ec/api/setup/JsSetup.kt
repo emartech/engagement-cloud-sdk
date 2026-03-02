@@ -22,11 +22,11 @@ internal class JsSetup(
             ),
             onContactLinkingFailed = {
                 onContactLinkingFailed().await()?.toLinkContactData()
-            })
+            }).getOrThrow()
     }
 
     override suspend fun disable() {
-        setup.disable().onFailure { println(it.message) }
+        setup.disable().getOrThrow()
     }
 
     override suspend fun isEnabled(): Boolean {

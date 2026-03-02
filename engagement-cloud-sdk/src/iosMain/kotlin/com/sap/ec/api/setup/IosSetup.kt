@@ -14,11 +14,12 @@ class IosSetup(private val setup: SetupApi) : IosSetupApi {
     ) {
         val suspendOnContactLinkingFailed =
             convertOnContactLinkingFailedCallbackToSuspendFunction(onContactLinkingFailed)
-        setup.enable(config, suspendOnContactLinkingFailed)
+        setup.enable(config, suspendOnContactLinkingFailed).getOrThrow()
     }
 
+
     override suspend fun disable() {
-        setup.disable()
+        setup.disable().getOrThrow()
     }
 
     override suspend fun isEnabled(): Boolean {
