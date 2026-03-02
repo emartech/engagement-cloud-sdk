@@ -60,10 +60,11 @@ object IosEngagementCloud {
 
     /**
      * Initializes the SDK. This method must be called before using any other SDK functionality.
+     * Throws an exception in case of an initialization failure.
      */
     @Throws(CancellationException::class)
     suspend fun initialize() {
-        EngagementCloud.initialize()
+        EngagementCloud.initialize().getOrThrow()
         koin.get<CoroutineScope>(named(CoroutineScopeTypes.Application))
             .launch(start = CoroutineStart.UNDISPATCHED) {
                 koin.get<Flow<EngagementCloudEvent>>(named(EventFlowTypes.Public)).collect {
