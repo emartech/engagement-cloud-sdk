@@ -1,7 +1,6 @@
 package com.sap.ec.api.event.model
 
 import com.sap.ec.core.providers.UUIDProvider
-import com.sap.ec.event.ExternalEventTypes
 import kotlinx.serialization.Serializable
 import kotlin.experimental.ExperimentalObjCName
 import kotlin.native.ObjCName
@@ -30,5 +29,5 @@ data class BadgeCountEvent(
     val id: String = UUIDProvider().provide(),
     val badgeCount: Int,
     val method: String,
-    override val type: String = ExternalEventTypes.BADGE_COUNT.name.lowercase()
+    override val type: EventType = EventType.BADGE_COUNT
 ) : EngagementCloudEvent

@@ -51,7 +51,7 @@ struct SdkTestView: View {
                         print("loaded")
                     },
                     onClose: {
-                        print("closed")
+                        self.showInlineInApp.toggle()
                     })
             }
         }
@@ -69,6 +69,17 @@ struct SdkTestView: View {
                 }
             )
             try? await engagementCloud.contact.link(contactFieldValue: "test@test.com")
+
+            engagementCloud.registerEventListener { event in
+                switch(event.type) {
+                case .appEvent: {
+                    let appEvent = event as! AppEvent
+                    print("appEvent received: \(appEvent.name) with payload: \(appEvent.payload ?? [:])")
+                }()
+                case .badgeCount:
+                    print("badgeCount")
+                }
+            }
         }
     }
 

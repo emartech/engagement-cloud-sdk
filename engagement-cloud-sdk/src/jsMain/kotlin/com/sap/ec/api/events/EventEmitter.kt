@@ -1,9 +1,9 @@
 package com.sap.ec.api.events
 
 import EngagementCloudSdkEventListener
+import com.sap.ec.api.event.model.EngagementCloudEvent
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.providers.UuidProviderApi
-import com.sap.ec.api.event.model.EngagementCloudEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
@@ -31,7 +31,7 @@ internal class EventEmitter(
             collectionJob = applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
                 sdkPublicEventFLow.collect { event ->
                     val parsedApiEvent = parseSdkPublicEvent(event)
-                    val eventType = event.type
+                    val eventType = event.type.value.lowercase()
 
                     parsedApiEvent?.let { parsedEvent ->
                         listeners[eventType]?.forEach { listener ->

@@ -9,6 +9,7 @@ import com.sap.ec.api.deeplink.JSDeepLink
 import com.sap.ec.api.deeplink.JSDeepLinkApi
 import com.sap.ec.api.embeddedmessaging.JsEmbeddedMessaging
 import com.sap.ec.api.embeddedmessaging.JsEmbeddedMessagingApi
+import com.sap.ec.api.event.model.EngagementCloudEvent
 import com.sap.ec.api.events.EventEmitter
 import com.sap.ec.api.events.EventEmitterApi
 import com.sap.ec.api.inapp.JSInApp
@@ -94,6 +95,7 @@ import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.json.Json
 import org.koin.core.module.Module
 import org.koin.core.parameter.parametersOf
@@ -187,7 +189,7 @@ object WebInjection {
         }
         single<EventEmitterApi> {
             EventEmitter(
-                sdkPublicEventFLow = get(named(EventFlowTypes.Public)),
+                sdkPublicEventFLow = get<Flow<EngagementCloudEvent>>(named(EventFlowTypes.Public)),
                 applicationScope = get(named(CoroutineScopeTypes.Application)),
                 listeners = mutableMapOf(),
                 onceListeners = mutableMapOf(),

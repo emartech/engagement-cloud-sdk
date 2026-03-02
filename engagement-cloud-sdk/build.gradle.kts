@@ -2,6 +2,7 @@
 
 import co.touchlab.kmmbridge.KmmBridgeExtension
 import co.touchlab.skie.configuration.DefaultArgumentInterop
+import co.touchlab.skie.configuration.EnumInterop
 import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
 import com.github.gmazzo.buildconfig.BuildConfigTask
 import com.vanniktech.maven.publish.JavadocJar
@@ -325,6 +326,7 @@ skie {
     features {
         group {
             DefaultArgumentInterop.Enabled(true)
+            EnumInterop.Enabled(true)
         }
     }
 

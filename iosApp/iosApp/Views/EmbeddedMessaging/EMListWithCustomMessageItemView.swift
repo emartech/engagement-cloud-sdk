@@ -23,12 +23,6 @@ struct EMListWithCustomMessageItemView: UIViewControllerRepresentable {
 
             return vc
         }
-//        
-//        EngagementCloud.shared.embeddedMessaging.compactListView {
-//            //onNavigate logic
-//        } customMessageItem: { viewModel, isSelected in
-//            //customMessageItem viewController implementation
-//        }
     }
     
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {

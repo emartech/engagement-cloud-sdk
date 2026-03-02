@@ -1,5 +1,6 @@
 import co.touchlab.kmmbridge.KmmBridgeExtension
 import co.touchlab.skie.configuration.DefaultArgumentInterop
+import co.touchlab.skie.configuration.EnumInterop
 import org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeSimulatorTest
 
 plugins {
@@ -87,6 +88,7 @@ skie {
     features {
         group {
             DefaultArgumentInterop.Enabled(true)
+            EnumInterop.Enabled(true)
         }
     }
 

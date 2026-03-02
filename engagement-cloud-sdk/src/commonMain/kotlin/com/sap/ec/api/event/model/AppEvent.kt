@@ -1,7 +1,6 @@
 package com.sap.ec.api.event.model
 
 import com.sap.ec.core.providers.UUIDProvider
-import com.sap.ec.event.ExternalEventTypes
 import com.sap.ec.util.toJsonObject
 import com.sap.ec.util.toMap
 import kotlinx.serialization.KSerializer
@@ -34,7 +33,7 @@ data class AppEvent(
     val id: String = UUIDProvider().provide(),
     val name: String,
     val payload: Map<String, Any>? = null,
-    override val type: String = ExternalEventTypes.APP_EVENT.name.lowercase()
+    override val type: EventType = EventType.APP_EVENT
 ) : EngagementCloudEvent
 
 internal object AppEventSerializer : KSerializer<AppEvent> {
@@ -52,7 +51,7 @@ internal object AppEventSerializer : KSerializer<AppEvent> {
             id = jsonObject["id"]?.jsonPrimitive?.content!!,
             name = jsonObject["name"]?.jsonPrimitive?.content!!,
             payload = jsonObject["payload"]?.jsonObject?.toMap(),
-            type = jsonObject["type"]?.jsonPrimitive?.content!!
+            type = EventType.fromValue(jsonObject["type"]?.jsonPrimitive?.content!!)
         )
     }
 
@@ -63,7 +62,7 @@ internal object AppEventSerializer : KSerializer<AppEvent> {
             value.payload?.let { attributes ->
                 put("payload", attributes.toJsonObject())
             }
-            put("type", JsonPrimitive(value.type))
+            put("type", JsonPrimitive(value.type.value))
         }
         encoder.encodeSerializableValue(JsonObject.Companion.serializer(), jsonObject)
     }

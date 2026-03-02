@@ -4,6 +4,7 @@ import com.sap.ec.api.config.IosConfigApi
 import com.sap.ec.api.contact.IosContactApi
 import com.sap.ec.api.deeplink.IosDeepLinkApi
 import com.sap.ec.api.embeddedmessaging.IosEmbeddedMessagingApi
+import com.sap.ec.api.event.model.EngagementCloudEvent
 import com.sap.ec.api.inapp.IosInAppApi
 import com.sap.ec.api.push.IosPushApi
 import com.sap.ec.api.setup.IosSetupApi
@@ -12,7 +13,6 @@ import com.sap.ec.di.CoroutineScopeTypes
 import com.sap.ec.di.EventFlowTypes
 import com.sap.ec.di.SdkKoinIsolationContext
 import com.sap.ec.di.SdkKoinIsolationContext.koin
-import com.sap.ec.api.event.model.EngagementCloudEvent
 import io.ktor.utils.io.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -28,6 +28,15 @@ typealias EngagementCloudEventListener = (EngagementCloudEvent) -> Unit
 object IosEngagementCloud {
     init {
         SdkKoinIsolationContext.init()
+        koin.get<CoroutineScope>(named(CoroutineScopeTypes.Application))
+            .launch(start = CoroutineStart.UNDISPATCHED) {
+                koin.get<Flow<EngagementCloudEvent>>(named(EventFlowTypes.Public)).collect {
+                    eventListeners.forEach { listener ->
+                        listener.invoke(it)
+                    }
+                }
+            }
+
     }
 
     private var eventListeners: MutableList<EngagementCloudEventListener> = mutableListOf()
