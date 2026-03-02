@@ -9,5 +9,5 @@ import kotlin.js.ExperimentalJsExport
 @Serializable
 @JsonClassDiscriminator("fullClassName")
 sealed class EngagementCloudEvent {
-    abstract val type: EventType
+    internal abstract val type: EventType
 }
