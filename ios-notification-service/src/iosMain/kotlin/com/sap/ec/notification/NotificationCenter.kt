@@ -1,4 +1,4 @@
-package com.sap.ec.iosNotificationService.notification
+package com.sap.ec.notification
 
 import kotlinx.coroutines.suspendCancellableCoroutine
 import platform.UserNotifications.UNNotificationCategory

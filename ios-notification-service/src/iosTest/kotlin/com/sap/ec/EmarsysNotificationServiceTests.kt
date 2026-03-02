@@ -2,8 +2,8 @@
 
 package com.sap.ec
 
-import com.sap.ec.iosNotificationService.notification.FakeNotificationCenter
-import com.sap.ec.iosNotificationService.notification.NotificationCenterApi
+import com.sap.ec.notification.FakeNotificationCenter
+import com.sap.ec.notification.NotificationCenterApi
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import kotlinx.cinterop.BetaInteropApi

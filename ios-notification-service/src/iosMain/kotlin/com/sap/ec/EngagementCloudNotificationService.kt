@@ -4,8 +4,8 @@ import com.sap.ec.iosNotificationService.file.FileSmith
 import com.sap.ec.iosNotificationService.models.ActionModel
 import com.sap.ec.iosNotificationService.models.DismissActionModel
 import com.sap.ec.iosNotificationService.networking.Downloader
-import com.sap.ec.iosNotificationService.notification.NotificationCenter
-import com.sap.ec.iosNotificationService.notification.NotificationCenterApi
+import com.sap.ec.notification.NotificationCenter
+import com.sap.ec.notification.NotificationCenterApi
 import com.sap.ec.iosNotificationService.provider.SessionProvider
 import com.sap.ec.iosNotificationService.provider.UUIDProvider
 import kotlinx.cinterop.BetaInteropApi

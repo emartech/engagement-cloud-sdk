@@ -1,4 +1,4 @@
-package com.sap.ec.iosNotificationService.notification
+package com.sap.ec.notification
 
 import platform.UserNotifications.UNNotificationCategory
 
