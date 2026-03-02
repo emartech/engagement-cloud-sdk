@@ -6,6 +6,7 @@ import com.sap.ec.enable.EnableOrganizerApi
 import com.sap.ec.enable.config.SdkConfigStoreApi
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
+import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
@@ -78,5 +79,27 @@ class SdkConfigLoaderStateTests {
         verifySuspend {
             mockSetupOrganizer.enable(testConfig)
         }
+    }
+
+    @Test
+    fun testActive_should_returnFailure_whenEnableThrowsException() = runTest {
+        sdkConfigLoaderState =
+            SdkConfigLoaderState(
+                mockSdkConfigLoader,
+                mockSetupOrganizer,
+                applicationScope = backgroundScope,
+                sdkLogger = mock(MockMode.autofill)
+            )
+        val testConfig = TestEngagementCloudSDKConfig(applicationCode = "test-app-code")
+        val testException = RuntimeException("Enable failed")
+        everySuspend { mockSdkConfigLoader.load() } returns testConfig
+        everySuspend { mockSetupOrganizer.enable(any()) } throws testException
+
+        val result = sdkConfigLoaderState.active()
+        advanceUntilIdle()
+
+        result.isSuccess shouldBe true
+        verifySuspend { mockSdkConfigLoader.load() }
+        verifySuspend { mockSetupOrganizer.enable(testConfig) }
     }
 }

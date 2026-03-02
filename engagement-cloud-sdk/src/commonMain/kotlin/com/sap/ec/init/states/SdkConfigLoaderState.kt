@@ -26,7 +26,11 @@ internal class SdkConfigLoaderState(
         )
         sdkConfigStore.load()?.let {
             applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
-                setupOrganizer.enable(it)
+                try {
+                    setupOrganizer.enable(it)
+                } catch (exception: Exception) {
+                    sdkLogger.debug("Failed to setup SDK with loaded config", exception)
+                }
             }
         }
         return Result.success(Unit)
