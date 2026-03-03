@@ -3,19 +3,22 @@ package com.sap.ec.mobileengage.push
 import JsEngagementCloudSDKConfig
 import com.sap.ec.api.config.ServiceWorkerOptions
 import com.sap.ec.api.push.PushConstants
+import com.sap.ec.core.log.Logger
 import com.sap.ec.core.storage.StringStorageApi
 import js.buffer.BufferSource
 import js.promise.await
-import js.typedarrays.Uint8Array
+import js.typedarrays.toUint8Array
 import kotlinx.browser.window
 import web.navigator.navigator
 import web.push.PushSubscriptionOptionsInit
+import web.push.subscribe
 
 //TODO: add logger instead of console log
 //TODO: handle errors in registration and subscription
 class PushService(
     private val pushServiceContext: PushServiceContextApi,
-    private val storage: StringStorageApi
+    private val storage: StringStorageApi,
+    private val sdkLogger: Logger
 ) : PushServiceApi {
 
     override suspend fun register(config: JsEngagementCloudSDKConfig) {
@@ -32,7 +35,7 @@ class PushService(
             config.serviceWorkerOptions?.let {
                 val options = createPushSubscriptionOptions(it)
                 val pushSubscription =
-                    pushServiceContext.registration?.asDynamic().pushManager?.subscribe(options)
+                    pushServiceContext.registration?.pushManager?.subscribe(options)
                 val pushToken =
                     pushSubscription?.let { subscription -> JSON.stringify(subscription) }
                 pushToken?.let { token ->
@@ -41,7 +44,7 @@ class PushService(
                 }
             }
         } catch (e: Throwable) {
-            console.log("push subscription failed: $e")
+            sdkLogger.error("Push subscription failed", e)
         }
     }
 
@@ -54,15 +57,18 @@ class PushService(
     }
 
     private fun urlBase64ToUint8Array(base64String: String): BufferSource {
-        val padding = "=".repeat((4 - base64String.length % 4) % 4);
+        val padding = "=".repeat((4 - base64String.length % 4) % 4)
         val base64 = (base64String + padding)
             .replace('-', '+')
-            .replace('_', '/');
+            .replace('_', '/')
 
-        val rawData = window.atob(base64);
-        val outputArray = Uint8Array.fromBase64(rawData).unsafeCast<BufferSource>();
+        val rawData = window.atob(base64)
+        val outputArray = ByteArray(rawData.length)
 
-        return outputArray;
+        for (i in rawData.indices) {
+            outputArray[i] = rawData[i].code.toByte()
+        }
+        return outputArray.toUint8Array()
     }
 
 }

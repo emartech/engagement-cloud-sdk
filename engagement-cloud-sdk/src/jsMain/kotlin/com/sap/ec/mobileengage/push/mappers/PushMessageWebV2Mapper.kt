@@ -12,6 +12,7 @@ import com.sap.ec.mobileengage.push.model.JsPushMessage
 import com.sap.ec.mobileengage.push.model.v1.RemoteWebPushMessageV2
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 
 class PushMessageWebV2Mapper(
     private val json: Json,
@@ -51,7 +52,11 @@ class PushMessageWebV2Mapper(
                 LogLevel.Error,
                 "Error mapping push message",
                 exception,
-                JsonObject(emptyMap())
+                JsonObject(
+                    mapOf(
+                        "payload" to JsonPrimitive(from)
+                    )
+                )
             )
             null
         }

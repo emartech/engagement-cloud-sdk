@@ -159,10 +159,14 @@ object WebInjection {
         }
         single<PushServiceContextApi> { PushServiceContext() }
         single<State>(named(StateTypes.PlatformInit)) {
-            val pushService = PushService(get(), storage = get<StringStorageApi>())
+            val pushService = PushService(
+                get(),
+                storage = get<StringStorageApi>(),
+                sdkLogger = get { parametersOf(PushService::class.simpleName) }
+            )
             PlatformInitState(
                 pushService = pushService,
-                sdkContext = get()
+                sdkContext = get(),
             )
         }
         single<PushNotificationClickHandlerApi> {
