@@ -99,9 +99,9 @@ internal class EventEmitter(
         }
     }
 
-    private suspend fun parseSdkPublicEvent(event: EngagementCloudEvent): SdkApiEvent? {
+    private suspend fun parseSdkPublicEvent(event: EngagementCloudEvent): JsApiEvent? {
         return try {
-            JSON.parse<SdkApiEvent>(json.encodeToString(EngagementCloudEvent.serializer(), event))
+            JSON.parse<JsApiEvent>(json.encodeToString(EngagementCloudEvent.serializer(), event))
         } catch (error: Throwable) {
             logger.error("SdkEvent parsing failed", error)
             null
@@ -109,7 +109,7 @@ internal class EventEmitter(
     }
 
     private suspend fun invokeListener(
-        event: SdkApiEvent,
+        event: JsApiEvent,
         listener: EngagementCloudSdkEventListener
     ) {
         try {

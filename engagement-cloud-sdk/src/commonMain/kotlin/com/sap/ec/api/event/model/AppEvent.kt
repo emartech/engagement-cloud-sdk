@@ -30,7 +30,7 @@ import kotlin.native.ObjCName
 @Serializable(with = AppEventSerializer::class)
 @ObjCName("AppEvent")
 data class AppEvent(
-    val id: String = UUIDProvider().provide(),
+    override val id: String = UUIDProvider().provide(),
     val name: String,
     val payload: Map<String, Any>? = null,
     override val type: EventType = EventType.APP_EVENT

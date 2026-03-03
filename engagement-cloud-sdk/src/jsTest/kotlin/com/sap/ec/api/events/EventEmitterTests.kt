@@ -3,13 +3,13 @@
 package com.sap.ec.api.events
 
 import EngagementCloudSdkEventListener
-import com.sap.ec.api.events.SdkApiEventTypes.SDK_APP_EVENT
-import com.sap.ec.api.events.SdkApiEventTypes.SDK_BADGE_COUNT_EVENT
-import com.sap.ec.core.log.Logger
-import com.sap.ec.core.providers.UuidProviderApi
 import com.sap.ec.api.event.model.AppEvent
 import com.sap.ec.api.event.model.BadgeCountEvent
 import com.sap.ec.api.event.model.EngagementCloudEvent
+import com.sap.ec.api.events.JsApiEventTypes.APP_EVENT
+import com.sap.ec.api.events.JsApiEventTypes.BADGE_COUNT
+import com.sap.ec.core.log.Logger
+import com.sap.ec.core.providers.UuidProviderApi
 import com.sap.ec.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -104,10 +104,10 @@ class EventEmitterTests {
     fun on_shouldRegisterTheListener_sendDebugLog_startCollection_andCallTheListener_whenAnEventIsEmitted() =
         runTest {
             val emitter = createEmitter(backgroundScope)
-            var handledEvent: SdkApiEvent? = null
+            var handledEvent: JsApiEvent? = null
             val testListener: EngagementCloudSdkEventListener = { handledEvent = it }
 
-            emitter.on(SDK_APP_EVENT, testListener)
+            emitter.on(APP_EVENT, testListener)
 
             sdkOutboundEventFLow.emit(testAppEvent1)
 
@@ -115,29 +115,29 @@ class EventEmitterTests {
 
             handledEvent shouldNotBe null
 
-            val result = handledEvent as SdkApiAppEvent
+            val result = handledEvent as JsAppEvent
             result.id shouldBe ID
             result.name shouldBe NAME
             stringify(result.payload) shouldBe testAttributes.toString()
-            handledEvent?.type shouldBe SDK_APP_EVENT
+            handledEvent?.type shouldBe APP_EVENT
 
-            verifySuspend { mockLogger.debug("Registering listener for event type: $SDK_APP_EVENT") }
+            verifySuspend { mockLogger.debug("Registering listener for event type: $APP_EVENT") }
         }
 
     @Test
     fun emitter_shouldInvokeEveryListener_forTheEmittedEventType_andNotInvokeOtherListenerTypes() =
         runTest {
             val emitter = createEmitter(backgroundScope)
-            val handledAppEvents1: MutableList<SdkApiEvent> = mutableListOf()
-            val handledAppEvents2: MutableList<SdkApiEvent> = mutableListOf()
-            var handledBadgeCountEvent: SdkApiEvent? = null
+            val handledAppEvents1: MutableList<JsApiEvent> = mutableListOf()
+            val handledAppEvents2: MutableList<JsApiEvent> = mutableListOf()
+            var handledBadgeCountEvent: JsApiEvent? = null
             val testAppEventListener1: EngagementCloudSdkEventListener = { handledAppEvents1.add(it) }
             val testBadgeCountListener: EngagementCloudSdkEventListener = { handledBadgeCountEvent = it }
             val testAppEventListener2: EngagementCloudSdkEventListener = { handledAppEvents2.add(it) }
 
-            emitter.on(SDK_APP_EVENT, testAppEventListener1)
-            emitter.on(SDK_BADGE_COUNT_EVENT, testBadgeCountListener)
-            emitter.on(SDK_APP_EVENT, testAppEventListener2)
+            emitter.on(APP_EVENT, testAppEventListener1)
+            emitter.on(BADGE_COUNT, testBadgeCountListener)
+            emitter.on(APP_EVENT, testAppEventListener2)
 
             sdkOutboundEventFLow.emit(testAppEvent1)
             sdkOutboundEventFLow.emit(testAppEvent2)
@@ -149,13 +149,13 @@ class EventEmitterTests {
             handledBadgeCountEvent shouldBe null
 
             listOf(handledAppEvents1, handledAppEvents2).forEach { eventList ->
-                val event1 = eventList.find { it.id === ID } as SdkApiAppEvent
-                event1.type shouldBe SDK_APP_EVENT
+                val event1 = eventList.find { it.id === ID } as JsAppEvent
+                event1.type shouldBe APP_EVENT
                 event1.name shouldBe NAME
                 JSON.stringify(event1.payload) shouldBe testAttributes.toString()
 
-                val event2 = eventList.find { it.id === ID2 } as SdkApiAppEvent
-                event2.type shouldBe SDK_APP_EVENT
+                val event2 = eventList.find { it.id === ID2 } as JsAppEvent
+                event2.type shouldBe APP_EVENT
                 event2.name shouldBe NAME2
                 JSON.stringify(event2.payload) shouldBe testAttributes2.toString()
             }
@@ -165,10 +165,10 @@ class EventEmitterTests {
     fun emitter_shouldStopCollection_ifNoEventListenersAreLeft_afterCalling_onceListener() =
         runTest {
             val emitter = createEmitter(backgroundScope)
-            val handledAppEvents: MutableList<SdkApiEvent> = mutableListOf()
+            val handledAppEvents: MutableList<JsApiEvent> = mutableListOf()
             val testAppEventListener: EngagementCloudSdkEventListener = { handledAppEvents.add(it) }
 
-            emitter.once(SDK_APP_EVENT, testAppEventListener)
+            emitter.once(APP_EVENT, testAppEventListener)
 
             sdkOutboundEventFLow.emit(testAppEvent1)
 
@@ -176,8 +176,8 @@ class EventEmitterTests {
 
             handledAppEvents.size shouldBe 1
 
-            val event1 = handledAppEvents.find { it.id === ID } as SdkApiAppEvent
-            event1.type shouldBe SDK_APP_EVENT
+            val event1 = handledAppEvents.find { it.id === ID } as JsAppEvent
+            event1.type shouldBe APP_EVENT
             event1.name shouldBe NAME
             JSON.stringify(event1.payload) shouldBe testAttributes.toString()
 
@@ -197,16 +197,16 @@ class EventEmitterTests {
             val emitter = createEmitter(backgroundScope)
             val testError: Throwable = Exception("Failure")
 
-            val handledAppEvents: MutableList<SdkApiEvent> = mutableListOf()
-            val handledBadgeCountEvents: MutableList<SdkApiEvent> = mutableListOf()
+            val handledAppEvents: MutableList<JsApiEvent> = mutableListOf()
+            val handledBadgeCountEvents: MutableList<JsApiEvent> = mutableListOf()
             val testAppEventListener: EngagementCloudSdkEventListener = { handledAppEvents.add(it) }
             val testBadgeCountEventListener: EngagementCloudSdkEventListener =
                 { handledBadgeCountEvents.add(it) }
             val throwingListener: EngagementCloudSdkEventListener = { throw testError }
 
-            emitter.on(SDK_APP_EVENT, testAppEventListener)
-            emitter.on(SDK_APP_EVENT, throwingListener)
-            emitter.on(SDK_BADGE_COUNT_EVENT, testBadgeCountEventListener)
+            emitter.on(APP_EVENT, testAppEventListener)
+            emitter.on(APP_EVENT, throwingListener)
+            emitter.on(BADGE_COUNT, testBadgeCountEventListener)
 
             sdkOutboundEventFLow.emit(testAppEvent1)
             sdkOutboundEventFLow.emit(testAppEvent2)
@@ -217,24 +217,24 @@ class EventEmitterTests {
             handledAppEvents.size shouldBe 2
             handledBadgeCountEvents.size shouldBe 1
 
-            val event1 = handledAppEvents.find { it.id === ID } as SdkApiAppEvent
-            event1.type shouldBe SDK_APP_EVENT
+            val event1 = handledAppEvents.find { it.id === ID } as JsAppEvent
+            event1.type shouldBe APP_EVENT
             event1.name shouldBe NAME
             JSON.stringify(event1.payload) shouldBe testAttributes.toString()
 
-            val event2 = handledAppEvents.find { it.id === ID2 } as SdkApiAppEvent
-            event2.type shouldBe SDK_APP_EVENT
+            val event2 = handledAppEvents.find { it.id === ID2 } as JsAppEvent
+            event2.type shouldBe APP_EVENT
             event2.name shouldBe NAME2
             JSON.stringify(event2.payload) shouldBe testAttributes2.toString()
 
-            val badgeEvent = handledBadgeCountEvents[0] as SdkApiBadgeCountEvent
+            val badgeEvent = handledBadgeCountEvents[0] as JsBadgeCountEvent
             badgeEvent.id shouldBe testBadgeCountEvent.id
             badgeEvent.badgeCount shouldBe testBadgeCountEvent.badgeCount
             badgeEvent.method shouldBe testBadgeCountEvent.method
 
             verifySuspend(VerifyMode.exactly(2)) {
                 mockLogger.error(
-                    "Listener invocation failed for event type: $SDK_APP_EVENT",
+                    "Listener invocation failed for event type: $APP_EVENT",
                     testError,
                     false
                 )
@@ -249,10 +249,10 @@ class EventEmitterTests {
                 AppEvent(ID, NAME, testAttributes)
             val testAppEvent2 =
                 AppEvent(ID2, NAME2, testAttributes2)
-            val handledAppEvents: MutableList<SdkApiEvent> = mutableListOf()
+            val handledAppEvents: MutableList<JsApiEvent> = mutableListOf()
             val testAppEventListener: EngagementCloudSdkEventListener = { handledAppEvents.add(it) }
 
-            emitter.once(SDK_APP_EVENT, testAppEventListener)
+            emitter.once(APP_EVENT, testAppEventListener)
 
             sdkOutboundEventFLow.emit(testAppEvent1)
             sdkOutboundEventFLow.emit(testAppEvent2)
@@ -261,29 +261,29 @@ class EventEmitterTests {
 
             handledAppEvents.size shouldBe 1
 
-            val event1 = handledAppEvents.find { it.id === ID } as SdkApiAppEvent
-            event1.type shouldBe SDK_APP_EVENT
+            val event1 = handledAppEvents.find { it.id === ID } as JsAppEvent
+            event1.type shouldBe APP_EVENT
             event1.name shouldBe NAME
             JSON.stringify(event1.payload) shouldBe testAttributes.toString()
 
             handledAppEvents.find { it.id === ID2 } shouldBe null
 
-            verifySuspend { mockLogger.debug("Registering once listener for event type: $SDK_APP_EVENT") }
+            verifySuspend { mockLogger.debug("Registering once listener for event type: $APP_EVENT") }
         }
 
     @Test
     fun off_shouldRemoveTheListener_fromTheRegisteredListeners_andSendDebugLog() =
         runTest {
             val emitter = createEmitter(backgroundScope)
-            val handledAppEvents: MutableList<SdkApiEvent> = mutableListOf()
-            val handledAppEvents2: MutableList<SdkApiEvent> = mutableListOf()
+            val handledAppEvents: MutableList<JsApiEvent> = mutableListOf()
+            val handledAppEvents2: MutableList<JsApiEvent> = mutableListOf()
             val testAppEventListener: EngagementCloudSdkEventListener = { handledAppEvents.add(it) }
             val testAppEventListener2: EngagementCloudSdkEventListener = { handledAppEvents2.add(it) }
 
-            emitter.on(SDK_APP_EVENT, testAppEventListener)
-            emitter.on(SDK_APP_EVENT, testAppEventListener2)
+            emitter.on(APP_EVENT, testAppEventListener)
+            emitter.on(APP_EVENT, testAppEventListener2)
 
-            emitter.off(SDK_APP_EVENT, testAppEventListener)
+            emitter.off(APP_EVENT, testAppEventListener)
 
             sdkOutboundEventFLow.emit(testAppEvent1)
 
@@ -292,23 +292,23 @@ class EventEmitterTests {
             handledAppEvents.size shouldBe 0
             handledAppEvents2.size shouldBe 1
 
-            verifySuspend { mockLogger.debug("Removing listener for event type: $SDK_APP_EVENT") }
+            verifySuspend { mockLogger.debug("Removing listener for event type: $APP_EVENT") }
         }
 
     @Test
     fun off_shouldStopCollecting_ifTheLastListenerIsRemoved() =
         runTest {
-            val handledAppEvents: MutableList<SdkApiEvent> = mutableListOf()
+            val handledAppEvents: MutableList<JsApiEvent> = mutableListOf()
             val testAppEventListener: EngagementCloudSdkEventListener = { handledAppEvents.add(it) }
             val emitter = createEmitter(backgroundScope)
 
-            emitter.on(SDK_APP_EVENT, testAppEventListener)
+            emitter.on(APP_EVENT, testAppEventListener)
             sdkOutboundEventFLow.emit(testAppEvent1)
 
             advanceUntilIdle()
             handledAppEvents.size shouldBe 1
 
-            emitter.off(SDK_APP_EVENT, testAppEventListener)
+            emitter.off(APP_EVENT, testAppEventListener)
 
             sdkOutboundEventFLow.emit(testAppEvent1)
 
@@ -320,15 +320,15 @@ class EventEmitterTests {
     @Test
     fun removeAllListeners_shouldClearAllRegisteredListeners_sendDebugLog_andStopCollecting_() =
         runTest {
-            val handledAppEvents: MutableList<SdkApiEvent> = mutableListOf()
-            val handledBadgeCountEvents: MutableList<SdkApiEvent> = mutableListOf()
+            val handledAppEvents: MutableList<JsApiEvent> = mutableListOf()
+            val handledBadgeCountEvents: MutableList<JsApiEvent> = mutableListOf()
             val testAppEventListener: EngagementCloudSdkEventListener = { handledAppEvents.add(it) }
             val testBadgeCountEventListener: EngagementCloudSdkEventListener =
                 { handledBadgeCountEvents.add(it) }
             val emitter = createEmitter(backgroundScope)
 
-            emitter.on(SDK_APP_EVENT, testAppEventListener)
-            emitter.on(SDK_BADGE_COUNT_EVENT, testBadgeCountEventListener)
+            emitter.on(APP_EVENT, testAppEventListener)
+            emitter.on(BADGE_COUNT, testBadgeCountEventListener)
 
             sdkOutboundEventFLow.emit(testAppEvent1)
             sdkOutboundEventFLow.emit(testBadgeCountEvent)

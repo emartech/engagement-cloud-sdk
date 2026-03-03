@@ -2,8 +2,9 @@ import com.sap.ec.api.config.JSConfigApi
 import com.sap.ec.api.contact.JSContactApi
 import com.sap.ec.api.deeplink.JSDeepLinkApi
 import com.sap.ec.api.embeddedmessaging.JsEmbeddedMessagingApi
+import com.sap.ec.api.event.model.EngagementCloudEvent
 import com.sap.ec.api.events.EventEmitterApi
-import com.sap.ec.api.events.SdkApiEvent
+import com.sap.ec.api.events.JsApiEvent
 import com.sap.ec.api.events.SdkEventSubscription
 import com.sap.ec.api.events.SdkEventSubscriptionApi
 import com.sap.ec.api.push.JSPushApi
@@ -13,7 +14,6 @@ import com.sap.ec.di.CoroutineScopeTypes
 import com.sap.ec.di.EventFlowTypes
 import com.sap.ec.di.SdkKoinIsolationContext
 import com.sap.ec.di.SdkKoinIsolationContext.koin
-import com.sap.ec.api.event.model.EngagementCloudEvent
 import com.sap.ec.mobileengage.embeddedmessaging.ui.initializeCustomElements
 import com.sap.ec.util.JsonUtil
 import kotlinx.coroutines.CoroutineScope
@@ -26,7 +26,7 @@ fun main() {
     JSEngagementCloud.init()
 }
 
-typealias EngagementCloudSdkEventListener = (SdkApiEvent) -> Unit
+typealias EngagementCloudSdkEventListener = (JsApiEvent) -> Unit
 
 @OptIn(ExperimentalJsExport::class)
 @JsExport
@@ -57,7 +57,7 @@ object JSEngagementCloud {
         val job = applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
             sdkPublicEvents.collect {
                 eventListener(
-                    JSON.parse<SdkApiEvent>(JsonUtil.json.encodeToString(it))
+                    JSON.parse<JsApiEvent>(JsonUtil.json.encodeToString(it))
                 )
             }
         }

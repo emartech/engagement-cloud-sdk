@@ -3,13 +3,15 @@
 package com.sap.ec.api.events
 
 @JsExport
-sealed external interface SdkApiEvent {
+@JsName("EngagementCloudEvent")
+sealed external interface JsApiEvent {
     val type: String
     val id: String
 }
 
 @JsExport
-external interface SdkApiBadgeCountEvent : SdkApiEvent {
+@JsName("BadgeCount")
+external interface JsBadgeCountEvent : JsApiEvent {
     override val type: String
     override val id: String
     val badgeCount: Int
@@ -17,7 +19,8 @@ external interface SdkApiBadgeCountEvent : SdkApiEvent {
 }
 
 @JsExport
-external interface SdkApiAppEvent : SdkApiEvent {
+@JsName("AppEvent")
+external interface JsAppEvent : JsApiEvent {
     override val type: String
     override val id: String
     val name: String
@@ -25,7 +28,8 @@ external interface SdkApiAppEvent : SdkApiEvent {
 }
 
 @JsExport
-object SdkApiEventTypes {
-    const val SDK_APP_EVENT = "app_event"
-    const val SDK_BADGE_COUNT_EVENT = "badge_count"
+@JsName("EngagementCloudEventTypes")
+object JsApiEventTypes {
+    const val APP_EVENT = "app_event"
+    const val BADGE_COUNT = "badge_count"
 }

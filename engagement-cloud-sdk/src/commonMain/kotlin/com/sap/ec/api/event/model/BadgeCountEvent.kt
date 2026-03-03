@@ -24,9 +24,9 @@ import kotlin.native.ObjCName
  */
 @OptIn(ExperimentalObjCName::class)
 @Serializable
-@ObjCName("BadgeCount")
+@ObjCName("BadgeCountEvent")
 data class BadgeCountEvent(
-    val id: String = UUIDProvider().provide(),
+    override val id: String = UUIDProvider().provide(),
     val badgeCount: Int,
     val method: String,
     override val type: EventType = EventType.BADGE_COUNT
