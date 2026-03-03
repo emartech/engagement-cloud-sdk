@@ -36,10 +36,19 @@ object IosEngagementCloud {
                     }
                 }
             }
-
     }
 
     private var eventListeners: MutableList<EngagementCloudEventListener> = mutableListOf()
+
+    /**
+     * AsyncStream of SDK events that can be observed externally.
+     * The following event types are available:
+     * - [com.sap.ec.api.event.model.AppEvent] - represents events defined by
+     * the SAP Engagement Cloud platform user.
+     * - [BadgeCountEvent][com.sap.ec.api.event.model.BadgeCountEvent] - represents changes in the badge count.
+     */
+    val events: Flow<EngagementCloudEvent>
+        get() = koin.get<Flow<EngagementCloudEvent>>(named(EventFlowTypes.Public))
 
     val setup: IosSetupApi
         get() = koin.get<IosSetupApi>()

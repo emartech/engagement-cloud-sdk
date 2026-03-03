@@ -69,16 +69,24 @@ struct SdkTestView: View {
                 }
             )
             try? await engagementCloud.contact.link(contactFieldValue: "test@test.com")
+            
             engagementCloud.registerEventListener { event in
                 switch onEnum(of: event) {
                     case .appEvent(let appEvent): print("appEvent name \(appEvent.name)")
                     case .badgeCountEvent(let badgeCountEvent): print("badgeCountEvent method \(badgeCountEvent.method) count: \(badgeCountEvent.badgeCount)")
                 }
-                
+
                 switch(event) {
                     case let appEvent as AppEvent: print("appEvent received: \(appEvent.name) with payload: \(appEvent.payload ?? [:])")
                     case let badgeCountEvent as BadgeCountEvent: print("badgeCount: \(badgeCountEvent.badgeCount)")
                     default: print("unknown event type")
+                }
+            }
+
+            for await event in engagementCloud.events {
+                switch onEnum(of: event) {
+                    case .appEvent(let appEvent): print("AsyncStream appEvent received: \(appEvent.name) with payload: \(appEvent.payload ?? [:])")
+                    case .badgeCountEvent(let badgeCountEvent): print("AsyncStream badgeCount: \(badgeCountEvent.badgeCount)")
                 }
             }
         }
