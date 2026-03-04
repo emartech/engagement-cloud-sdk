@@ -3,42 +3,35 @@ package com.sap.ec.api.config
 import com.sap.ec.SdkConstants
 import com.sap.ec.TestEngagementCloudSDKConfig
 import com.sap.ec.api.SdkState
-import com.sap.ec.context.DefaultUrls
-import com.sap.ec.context.SdkContext
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.device.DeviceInfo
 import com.sap.ec.core.device.DeviceInfoCollectorApi
 import com.sap.ec.core.device.NotificationSettings
-import com.sap.ec.core.log.LogLevel
-import com.sap.ec.core.storage.StringStorageApi
-import com.sap.ec.di.SdkKoinIsolationContext.koin
-import com.sap.ec.fake.FakeStringStorage
-import com.sap.ec.util.JsonUtil
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
+import dev.mokkery.answering.sequentially
+import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
+import dev.mokkery.verify
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.serialization.json.Json
-import org.koin.core.Koin
-import org.koin.core.module.Module
-import org.koin.dsl.module
-import org.koin.test.KoinTest
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class ConfigTest : KoinTest {
-
-    override fun getKoin(): Koin = koin
-
+class ConfigTest {
     private companion object {
         const val APPLICATION_CODE = "testApplicationCode"
         const val CLIENT_ID = "testClientId"
@@ -59,9 +52,8 @@ class ConfigTest : KoinTest {
             "testTimeZone",
             "testClientId"
         )
+        val TEST_CONFIG = TestEngagementCloudSDKConfig(APPLICATION_CODE)
     }
-
-    private lateinit var testModule: Module
 
     private lateinit var mockDeviceInfoCollector: DeviceInfoCollectorApi
 
@@ -71,39 +63,23 @@ class ConfigTest : KoinTest {
 
     private lateinit var mockInternalConfig: ConfigInstance
 
-    private lateinit var sdkContext: SdkContextApi
+    private lateinit var mockSdkContext: SdkContextApi
 
     private lateinit var config: Config<ConfigInstance, ConfigInstance, ConfigInstance>
 
     private val mainDispatcher = StandardTestDispatcher()
 
-    init {
-        Dispatchers.setMain(mainDispatcher)
-    }
-
     @BeforeTest
-    fun setup() = runTest {
-        testModule = module {
-            single<StringStorageApi> { FakeStringStorage() }
-            single<Json> { JsonUtil.json }
-        }
-        koin.loadModules(listOf(testModule))
+    fun setup() {
+        Dispatchers.setMain(mainDispatcher)
+        mockDeviceInfoCollector = mock(MockMode.autofill)
+        mockLoggingConfig = mock(MockMode.autofill)
+        mockGathererConfig = mock(MockMode.autofill)
+        mockInternalConfig = mock(MockMode.autofill)
+        mockSdkContext = mock(MockMode.autofill)
 
-        mockDeviceInfoCollector = mock()
-        mockLoggingConfig = mock()
-        mockGathererConfig = mock()
-        mockInternalConfig = mock()
-
-        sdkContext = SdkContext(
-            sdkDispatcher = StandardTestDispatcher(),
-            mainDispatcher = mainDispatcher,
-            defaultUrls = DefaultUrls("", "", "", "", "", "", "", ""),
-            remoteLogLevel = LogLevel.Error,
-            features = mutableSetOf(),
-            logBreadcrumbsQueueSize = 10,
-            onContactLinkingFailed = null
-        )
-        sdkContext.config = TestEngagementCloudSDKConfig(APPLICATION_CODE)
+        every { mockSdkContext.config } returns TEST_CONFIG
+        every { mockSdkContext.sdkDispatcher } returns StandardTestDispatcher()
 
         everySuspend { mockDeviceInfoCollector.collect() } returns Json.encodeToString(DEVICE_INFO)
         everySuspend { mockDeviceInfoCollector.collectAsDeviceInfo() } returns DEVICE_INFO
@@ -118,21 +94,79 @@ class ConfigTest : KoinTest {
             mockLoggingConfig,
             mockGathererConfig,
             mockInternalConfig,
-            sdkContext,
+            mockSdkContext,
             mockDeviceInfoCollector
         )
-        config.registerOnContext()
     }
 
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
-        koin.unloadModules(listOf(testModule))
     }
 
     @Test
-    fun testApplicationCode_returnsCorrectValue() = runTest {
+    fun testApplicationCode_whenActiveState_returnsApplicationCode() = runTest {
+        every { mockSdkContext.config } returns TEST_CONFIG
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
+
+        config.registerOnContext()
+
         config.getApplicationCode() shouldBe APPLICATION_CODE
+    }
+
+    @Test
+    fun testApplicationCode_whenOnHoldState_awaitsAndReturnsApplicationCodeWhenSdkBecomesActive() =
+        runTest {
+            every { mockSdkContext.currentSdkState } sequentially {
+                returns(MutableStateFlow(SdkState.OnHold))
+                returns(MutableStateFlow(SdkState.Active))
+            }
+
+            config.registerOnContext()
+
+            val result = async { config.getApplicationCode() }
+
+            advanceUntilIdle()
+
+            result.await() shouldBe APPLICATION_CODE
+        }
+
+    @Test
+    fun testApplicationCode_whenOnHoldState_awaitsAndReturnsApplicationCodeWhenSdkBecomesInitialized() =
+        runTest {
+            every { mockSdkContext.currentSdkState } sequentially {
+                returns(MutableStateFlow(SdkState.OnHold))
+                returns(MutableStateFlow(SdkState.Initialized))
+            }
+            every { mockSdkContext.config } returns null
+
+            config.registerOnContext()
+
+            val result = async {
+                config.getApplicationCode()
+            }
+
+            advanceUntilIdle()
+
+            result.await() shouldBe null
+        }
+
+    @Test
+    fun testApplicationCode_whenUnInitializedState_returnsNull() = runTest {
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.UnInitialized)
+
+        config.registerOnContext()
+
+        config.getApplicationCode() shouldBe null
+    }
+
+    @Test
+    fun testApplicationCode_whenInitializedState_returnsNull() = runTest {
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Initialized)
+
+        config.registerOnContext()
+
+        config.getApplicationCode() shouldBe null
     }
 
     @Test
@@ -157,36 +191,38 @@ class ConfigTest : KoinTest {
 
     @Test
     fun testCurrentSdkState_returnsCorrectValue() = runTest {
-        sdkContext.setSdkState(SdkState.UnInitialized)
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.UnInitialized)
 
         config.getCurrentSdkState() shouldBe SdkState.UnInitialized
-
-        sdkContext.setSdkState(SdkState.Active)
-        config.getCurrentSdkState() shouldBe SdkState.Active
+        verify { mockSdkContext.currentSdkState }
     }
 
     @Test
     fun testChangeApplicationCode_delegatesToCorrectInstance() = runTest {
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.OnHold)
+
+        config.registerOnContext()
         val newAppCode = "newAppCode"
         everySuspend { mockGathererConfig.changeApplicationCode(newAppCode) } returns Unit
 
-        sdkContext.setSdkState(SdkState.OnHold)
         config.changeApplicationCode(newAppCode)
 
-        verifySuspend {
-            mockGathererConfig.changeApplicationCode(newAppCode)
-        }
+        advanceUntilIdle()
+
+        verifySuspend { mockGathererConfig.changeApplicationCode(newAppCode) }
     }
 
     @Test
     fun testResetLanguage_delegatesToCorrectInstance() = runTest {
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.OnHold)
         everySuspend { mockGathererConfig.resetLanguage() } returns Unit
 
-        sdkContext.setSdkState(SdkState.OnHold)
+        config.registerOnContext()
+
         config.resetLanguage()
 
-        verifySuspend {
-            mockGathererConfig.resetLanguage()
-        }
+        advanceUntilIdle()
+
+        verifySuspend { mockGathererConfig.resetLanguage() }
     }
 }

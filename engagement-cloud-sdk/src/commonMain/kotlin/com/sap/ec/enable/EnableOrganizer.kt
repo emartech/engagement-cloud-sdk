@@ -29,9 +29,15 @@ internal class EnableOrganizer(
         sdkContext.setSdkState(SdkState.OnHold)
         sdkConfigStore.store(config)
         sdkContext.config = config
-        meStateMachine.activate().getOrThrow()
+        meStateMachine.activate()
+            .onFailure {
+                sdkContext.config = null
+                sdkConfigStore.clear()
+                sdkContext.setSdkState(SdkState.Initialized)
+                sdkLogger.debug("Enabling SDK failed during MeStateMachine activation. Failed with exception: ${it.message}")
+            }.getOrThrow()
         sdkContext.setSdkState(SdkState.Active)
         ecSdkSession.startSession()
-        sdkLogger.debug("SDK Setup Completed")
+        sdkLogger.debug("Enabling SDK Completed")
     }
 }

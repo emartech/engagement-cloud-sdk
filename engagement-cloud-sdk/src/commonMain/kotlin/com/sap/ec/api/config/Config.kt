@@ -8,6 +8,7 @@ import com.sap.ec.core.device.DeviceInfo
 import com.sap.ec.core.device.DeviceInfoCollectorApi
 import com.sap.ec.core.device.NotificationSettings
 import com.sap.ec.core.log.withLogContext
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
@@ -27,7 +28,16 @@ internal class Config<Logging : ConfigInstance, Gatherer : ConfigInstance, Inter
     sdkContext
 ), ConfigApi {
 
-    override suspend fun getApplicationCode(): String? = sdkContext.config?.applicationCode
+    override suspend fun getApplicationCode(): String? {
+        return when (sdkContext.currentSdkState.value) {
+            SdkState.OnHold -> {
+                sdkContext.currentSdkState.first { it == SdkState.Active || it == SdkState.Initialized }
+                sdkContext.config?.applicationCode
+            }
+            SdkState.UnInitialized, SdkState.Initialized -> null
+            SdkState.Active -> sdkContext.config?.applicationCode
+        }
+    }
 
     override suspend fun getClientId(): String = deviceInfoCollector.getClientId()
 

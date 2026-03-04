@@ -115,12 +115,18 @@ class EnableOrganizerTests {
 
             shouldThrow<Exception> { enableOrganizer.enableWithValidation(config) }
 
-            verifySuspend { mockSdkConfigStore.store(config) }
-            verifySuspend {
-                mockMeStateMachine.activate()
+            verifySuspend(VerifyMode.order) {
+                 mockSdkConfigStore.load()
+                 mockSdkContext.setSdkState(SdkState.OnHold)
+                 mockSdkConfigStore.store(config)
+                 mockSdkContext.config = config
+                 mockMeStateMachine.activate()
+                 mockSdkContext.config = null
+                 mockSdkConfigStore.clear()
+                 mockSdkContext.setSdkState(SdkState.Initialized)
             }
-            verify { mockSdkContext.config = config }
-            verifySuspend { mockSdkContext.setSdkState(SdkState.OnHold) }
+
+            verifySuspend(VerifyMode.exactly(0)) { mockSdkContext.setSdkState(SdkState.Active) }
             verifySuspend(VerifyMode.exactly(0)) { mockSession.startSession() }
         }
 }
