@@ -148,7 +148,7 @@ class PushMessagePresenterTests {
             js("{}").unsafeCast<NotificationOptions>().apply {
                 body = testPushMessage.displayableData?.body
                 icon = testPushMessage.displayableData?.iconUrlString
-                badge = testPushMessage.displayableData?.imageUrlString
+                image = testPushMessage.displayableData?.imageUrlString
                 tag = testPushMessage.trackingInfo
                 actions = notificationActions
                 data = JsonUtil.json.encodeToString<JsPushMessage>(testPushMessage)
