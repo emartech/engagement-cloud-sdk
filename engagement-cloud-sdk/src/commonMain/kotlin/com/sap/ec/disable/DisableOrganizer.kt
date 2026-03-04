@@ -14,7 +14,7 @@ internal class DisableOrganizer(
 ) : DisableOrganizerApi {
 
     override suspend fun disable() {
-        sdkContext.setSdkState(SdkState.UnInitialized)
+        sdkContext.setSdkState(SdkState.Initialized)
         sdkLogger.debug("SDK disabled")
         mobileEngageDisableStateMachine.activate().getOrThrow()
         ecSdkSession.endSession()
