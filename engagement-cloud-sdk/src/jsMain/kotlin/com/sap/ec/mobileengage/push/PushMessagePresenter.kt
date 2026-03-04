@@ -17,7 +17,7 @@ open class PushMessagePresenter(private val webPushNotificationPresenter: WebPus
             val notificationOptions = js("{}").unsafeCast<NotificationOptions>().apply {
                 body = it.body
                 icon = it.iconUrlString
-                badge = it.imageUrlString
+                image = it.imageUrlString
                 tag = pushMessage.trackingInfo
             }
 
