@@ -17,8 +17,8 @@ data class RemoteWebPushNotificationV2(
     val silent: Boolean,
     val title: String,
     val body: String,
-    val icon: String,
-    val imageUrl: String,
+    val icon: String? = null,
+    val imageUrl: String? = null,
     val defaultAction: BasicActionModel? = null,
     val actions: List<PresentableActionModel>? = null,
     val badgeCount: BadgeCount? = null
