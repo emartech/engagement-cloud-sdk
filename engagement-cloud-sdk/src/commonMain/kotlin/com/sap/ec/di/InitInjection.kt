@@ -120,7 +120,9 @@ object InitInjection {
                     get(named(InitStateTypes.Initializer)),
                     get(named(InitStateTypes.RestoreOperationalEvents)),
                     get(named(InitStateTypes.SdkConfigLoader))
-                )
+                ),
+                name = StateMachineTypes.Init.name,
+                logger = get { parametersOf(StateMachineTypes.Init.name) }
             )
         }
         single<InitOrganizerApi> {

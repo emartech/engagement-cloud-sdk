@@ -1,5 +1,7 @@
 package com.sap.ec.core.state
 
+import dev.mokkery.MockMode
+import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
@@ -22,6 +24,7 @@ internal class TestState(override val name: String) : State {
     }
 
 }
+
 internal class StateMachineTests {
 
     companion object {
@@ -34,7 +37,12 @@ internal class StateMachineTests {
 
     @BeforeTest
     fun setup() = runTest {
-        stateMachine = StateMachine(listOf(state1, state2, state3))
+        stateMachine =
+            StateMachine(
+                listOf(state1, state2, state3),
+                "testMachine",
+                mock(MockMode.autofill)
+            )
     }
 
     @Test

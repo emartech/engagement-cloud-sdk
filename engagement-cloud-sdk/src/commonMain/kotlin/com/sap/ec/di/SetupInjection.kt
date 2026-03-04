@@ -118,7 +118,9 @@ object SetupInjection {
                     get<State>(named(StateTypes.RestoreSavedSdkEvents)),
                     get<State>(named(StateTypes.AppStart)),
                     get<State>(named(StateTypes.FetchEmbeddedMessagingMetaState)),
-                )
+                ),
+                name = StateMachineTypes.MobileEngageEnable.name,
+                logger = get { parametersOf(StateMachineTypes.MobileEngageEnable.name) }
             )
         }
         single<StateMachineApi>(named(StateMachineTypes.MobileEngageReregistration)) {
@@ -129,7 +131,9 @@ object SetupInjection {
                     get<State>(named(StateTypes.ApplyAppCodeBasedRemoteConfig)),
                     get<State>(named(StateTypes.RegisterPushToken)),
                     get<State>(named(StateTypes.LinkContact))
-                )
+                ),
+                name = StateMachineTypes.MobileEngageReregistration.name,
+                logger = get { parametersOf(StateMachineTypes.MobileEngageReregistration.name) }
             )
         }
         single<StateMachineApi>(named(StateMachineTypes.FollowUpChangeAppCodeStateMachine)) {
@@ -137,7 +141,9 @@ object SetupInjection {
                 states = listOf(
                     get<State>(named(StateTypes.ApplyAppCodeBasedRemoteConfig)),
                     get<State>(named(StateTypes.FetchEmbeddedMessagingMetaState))
-                )
+                ),
+                name = StateMachineTypes.FollowUpChangeAppCodeStateMachine.name,
+                logger = get { parametersOf(StateMachineTypes.FollowUpChangeAppCodeStateMachine.name) }
             )
         }
         single<StateMachineApi>(named(StateMachineTypes.MobileEngageDisable)) {
@@ -146,7 +152,9 @@ object SetupInjection {
                     get<State>(named(StateTypes.ClearPushTokenOnDisable)),
                     get<State>(named(StateTypes.ClearEvents)),
                     get<State>(named(StateTypes.ClearStoredConfig)),
-                )
+                ),
+                name = StateMachineTypes.MobileEngageDisable.name,
+                logger = get { parametersOf(StateMachineTypes.MobileEngageDisable.name) }
             )
         }
         single<EnableOrganizerApi> {
