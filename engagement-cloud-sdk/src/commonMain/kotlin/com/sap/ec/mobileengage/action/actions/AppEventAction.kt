@@ -1,11 +1,9 @@
 package com.sap.ec.mobileengage.action.actions
 
-import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.api.event.model.AppEvent
+import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.mobileengage.action.models.AppEventActionModel
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
@@ -18,13 +16,7 @@ internal class AppEventAction(
         sdkEventDistributor.registerPublicEvent(
             AppEvent(
                 name = action.name,
-                payload = action.payload?.let {
-                    buildJsonObject {
-                        it.forEach { (key, value) ->
-                            put(key, value)
-                        }
-                    }
-                }
+                payload = action.payload
             )
         )
     }

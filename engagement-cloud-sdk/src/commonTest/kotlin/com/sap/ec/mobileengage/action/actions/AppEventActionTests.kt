@@ -1,7 +1,7 @@
 package com.sap.ec.mobileengage.action.actions
 
-import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.api.event.model.AppEvent
+import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.mobileengage.action.models.BasicAppEventActionModel
 import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
@@ -16,8 +16,6 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.time.ExperimentalTime
@@ -64,9 +62,6 @@ class AppEventActionTests {
         advanceUntilIdle()
 
         completableDeferred.await()
-        eventSlot.get().payload shouldBe buildJsonObject {
-            put("key", "value")
-            put("testKey", "testValue")
-        }
+        eventSlot.get().payload shouldBe testPayload
     }
 }
