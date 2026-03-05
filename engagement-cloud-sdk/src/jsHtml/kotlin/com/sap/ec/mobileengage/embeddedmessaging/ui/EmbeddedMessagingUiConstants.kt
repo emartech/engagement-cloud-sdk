@@ -14,7 +14,6 @@ object EmbeddedMessagingUiConstants {
     val DEFAULT_ELEVATION = 8.px
     val ISLAND_SPACING = 24.px
     val MESSAGE_ITEM_RIGHT_PADDING = 18.px
-    val LIST_VIEW_MAX_WIDTH = 600.px
 
     val ZERO_PADDING = 0.px
     val SMALL_PADDING = 4.px
@@ -38,7 +37,8 @@ object EmbeddedMessagingUiConstants {
     val ONE_THIRD_WIDTH = 33.percent
 
     val DIALOG_CARD_WIDTH = 500.px
-    val LIST_PANE_WIDTH = 400.px
+    val LIST_PANE_MIN_WIDTH = 400.px
+    val LIST_VIEW_MAX_WIDTH = 600.px
 
     val ZERO_BORDER_WIDTH = 0.px
     val DEFAULT_BORDER_WIDTH = 1.px

@@ -16,7 +16,8 @@ import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.LARGE_BORDER_RADIUS
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.LARGE_MARGIN
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.LARGE_PADDING
-import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.LIST_PANE_WIDTH
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.LIST_PANE_MIN_WIDTH
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.LIST_VIEW_MAX_WIDTH
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MAX_HEIGHT
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MAX_WIDTH
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MEDIUM_LARGE_MARGIN
@@ -65,7 +66,6 @@ import org.jetbrains.compose.web.css.color
 import org.jetbrains.compose.web.css.cursor
 import org.jetbrains.compose.web.css.display
 import org.jetbrains.compose.web.css.duration
-import org.jetbrains.compose.web.css.em
 import org.jetbrains.compose.web.css.flex
 import org.jetbrains.compose.web.css.flexDirection
 import org.jetbrains.compose.web.css.fontSize
@@ -82,6 +82,7 @@ import org.jetbrains.compose.web.css.marginLeft
 import org.jetbrains.compose.web.css.marginRight
 import org.jetbrains.compose.web.css.marginTop
 import org.jetbrains.compose.web.css.maxWidth
+import org.jetbrains.compose.web.css.minWidth
 import org.jetbrains.compose.web.css.ms
 import org.jetbrains.compose.web.css.padding
 import org.jetbrains.compose.web.css.paddingBottom
@@ -113,6 +114,9 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         backgroundColor(CssColorVars.colorBackground.value())
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Column)
+        maxWidth(LIST_VIEW_MAX_WIDTH)
+        minWidth(LIST_PANE_MIN_WIDTH)
+        flex(1)
     }
 
     val islandSpacer by style {
@@ -155,7 +159,8 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
     }
 
     val listPane by style {
-        width(LIST_PANE_WIDTH)
+        maxWidth(LIST_VIEW_MAX_WIDTH)
+        minWidth(LIST_PANE_MIN_WIDTH)
         property(
             "border-right",
             "$DEFAULT_BORDER_WIDTH solid ${CssColorVars.colorSurfaceVariant.value()}"
