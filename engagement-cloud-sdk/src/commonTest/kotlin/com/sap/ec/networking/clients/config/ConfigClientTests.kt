@@ -12,11 +12,13 @@ import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.networking.model.UrlRequest
 import com.sap.ec.core.url.ECUrlType
 import com.sap.ec.core.url.UrlFactoryApi
+import com.sap.ec.enable.config.SdkConfigStoreApi
 import com.sap.ec.event.OnlineSdkEvent
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.mobileengage.config.FollowUpChangeAppCodeOrganizerApi
 import com.sap.ec.networking.clients.contact.ContactTokenHandlerApi
 import com.sap.ec.networking.clients.error.ClientExceptionHandler
+import com.sap.ec.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
@@ -46,6 +48,8 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -68,6 +72,7 @@ class ConfigClientTests {
     private lateinit var onlineEvents: MutableSharedFlow<OnlineSdkEvent>
     private lateinit var mockSdkEventManager: SdkEventManagerApi
     private lateinit var mockFollowUpChangeAppCodeOrganizer: FollowUpChangeAppCodeOrganizerApi
+    private lateinit var mockSdkConfigStore: SdkConfigStoreApi<SdkConfig>
     private lateinit var configClient: ConfigClient
 
     @BeforeTest
@@ -84,11 +89,13 @@ class ConfigClientTests {
         onlineEvents = spy(MutableSharedFlow())
         mockSdkEventManager = mock()
         mockFollowUpChangeAppCodeOrganizer = mock(MockMode.autofill)
+        mockSdkConfigStore = mock(MockMode.autofill)
         every { mockSdkEventManager.onlineSdkEvents } returns onlineEvents
 
         everySuspend { mockContactTokenHandler.handleContactTokens(any()) } returns Unit
         everySuspend { mockSdkContext.config } returns mockConfig
         everySuspend { mockSdkContext.config = any() } returns Unit
+        everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
         everySuspend { mockSdkLogger.error(any(), any<Throwable>()) } calls {
             (it.args[1] as Throwable).printStackTrace()
         }
@@ -110,8 +117,10 @@ class ConfigClientTests {
             mockContactTokenHandler,
             mockFollowUpChangeAppCodeOrganizer,
             mockEventsDao,
+            mockSdkConfigStore,
             mockSdkLogger,
             applicationScope,
+            JsonUtil.json,
         )
 
     @Test
@@ -131,6 +140,14 @@ class ConfigClientTests {
             applicationCode = "NewAppCode"
         )
 
+        val expectedRequest = UrlRequest(
+            TEST_BASE_URL,
+            HttpMethod.Post,
+            JsonUtil.json.encodeToString(buildJsonObject {
+                put("to", "NewAppCode")
+            })
+        )
+
         val onlineSdkEvents = backgroundScope.async {
             onlineEvents.take(1).toList()
         }
@@ -142,11 +159,12 @@ class ConfigClientTests {
         onlineSdkEvents.await() shouldBe listOf(changeAppCode)
 
         verifySuspend(VerifyMode.order) {
-            mockEcClient.send(any())
+            mockEcClient.send(expectedRequest)
             mockSdkContext.setSdkState(SdkState.OnHold)
             mockContactTokenHandler.handleContactTokens(any())
             mockConfig.copyWith(applicationCode = "NewAppCode")
             mockSdkContext.config = mockConfig
+            mockSdkConfigStore.store(mockConfig)
             mockFollowUpChangeAppCodeOrganizer.organize()
             mockSdkContext.setSdkState(SdkState.Active)
             mockEventsDao.removeEvent(changeAppCode)
@@ -235,6 +253,116 @@ class ConfigClientTests {
                 any(),
                 changeAppCode
             )
+        }
+    }
+
+    @Test
+    fun testConsumer_should_persist_config_to_store_after_successful_change() = runTest {
+        configClient = createConfigClient(backgroundScope)
+        configClient.register()
+
+        every { mockUrlFactory.create(ECUrlType.ChangeApplicationCode) }.returns(TEST_BASE_URL)
+        val testResponse = createTestResponse("{}")
+        everySuspend { mockEcClient.send(any()) }.returns(Result.success(testResponse))
+        every { mockConfig.copyWith("PersistTestAppCode") } returns mockConfig
+        every { mockConfig.applicationCode } returns "testApplicationCode"
+
+        val changeAppCode = SdkEvent.Internal.Sdk.ChangeAppCode(
+            id = "persistTestId",
+            applicationCode = "PersistTestAppCode"
+        )
+
+        val onlineSdkEvents = backgroundScope.async {
+            onlineEvents.take(1).toList()
+        }
+
+        onlineEvents.emit(changeAppCode)
+        advanceUntilIdle()
+
+        onlineSdkEvents.await() shouldBe listOf(changeAppCode)
+
+        verifySuspend {
+            mockSdkContext.config = mockConfig
+            mockSdkConfigStore.store(mockConfig)
+        }
+    }
+
+    @Test
+    fun testConsumer_should_not_persist_config_when_network_request_fails() = runTest {
+        configClient = createConfigClient(backgroundScope)
+        configClient.register()
+
+        every { mockUrlFactory.create(ECUrlType.ChangeApplicationCode) } returns TEST_BASE_URL
+        val testException = NetworkIOException("No Network")
+        everySuspend { mockEcClient.send(any()) } returns Result.failure(testException)
+        everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
+
+        val changeAppCode = SdkEvent.Internal.Sdk.ChangeAppCode(
+            id = "failedPersistTestId",
+            applicationCode = "FailedAppCode"
+        )
+
+        val onlineSdkEvents = backgroundScope.async {
+            onlineEvents.take(1).toList()
+        }
+
+        onlineEvents.emit(changeAppCode)
+        advanceUntilIdle()
+
+        onlineSdkEvents.await() shouldBe listOf(changeAppCode)
+
+        verifySuspend(VerifyMode.exactly(0)) {
+            mockSdkConfigStore.store(any())
+        }
+        verifySuspend(VerifyMode.exactly(0)) {
+            mockSdkContext.config = any()
+        }
+        verifySuspend(VerifyMode.exactly(0)) {
+            mockConfig.copyWith(any<String>())
+        }
+    }
+
+    @Test
+    fun testConsumer_should_emit_failure_response_when_backend_error_occurs() = runTest {
+        configClient = createConfigClient(backgroundScope)
+        configClient.register()
+
+        every { mockUrlFactory.create(ECUrlType.ChangeApplicationCode) } returns TEST_BASE_URL
+        val testException = Exception("Backend error")
+        everySuspend { mockEcClient.send(any()) } returns Result.failure(testException)
+        everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
+
+        val changeAppCode = SdkEvent.Internal.Sdk.ChangeAppCode(
+            id = "backendErrorTestId",
+            applicationCode = "ErrorAppCode"
+        )
+
+        val onlineSdkEvents = backgroundScope.async {
+            onlineEvents.take(1).toList()
+        }
+
+        onlineEvents.emit(changeAppCode)
+        advanceUntilIdle()
+
+        onlineSdkEvents.await() shouldBe listOf(changeAppCode)
+
+        verifySuspend {
+            mockSdkEventManager.emitEvent(
+                SdkEvent.Internal.Sdk.Answer.Response(
+                    originId = changeAppCode.id,
+                    Result.failure<Exception>(testException)
+                )
+            )
+        }
+        verifySuspend {
+            mockClientExceptionHandler.handleException(
+                testException,
+                "ConfigClient - consumeConfigChanges",
+                changeAppCode
+            )
+        }
+        verifySuspend(VerifyMode.exactly(0)) {
+            mockEventsDao.removeEvent(changeAppCode)
         }
     }
 

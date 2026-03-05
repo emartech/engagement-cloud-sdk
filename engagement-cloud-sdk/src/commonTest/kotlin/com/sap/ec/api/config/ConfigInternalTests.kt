@@ -3,6 +3,7 @@ package com.sap.ec.api.config
 import com.sap.ec.TestEngagementCloudSDKConfig
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
+import com.sap.ec.core.channel.SdkEventWaiterApi
 import com.sap.ec.core.exceptions.SdkException
 import com.sap.ec.core.language.LanguageHandlerApi
 import com.sap.ec.core.log.Logger
@@ -82,6 +83,13 @@ class ConfigInternalTests {
             applicationCode = NEW_APPCODE.uppercase(),
             timestamp = TIMESTAMP
         )
+        val mockWaiter = mock<SdkEventWaiterApi>()
+        val successResponse = SdkEvent.Internal.Sdk.Answer.Response<Any>(
+            originId = UUID,
+            Result.success(Unit)
+        )
+        everySuspend { mockWaiter.await<Any>() } returns successResponse
+        everySuspend { mockSdkEventDistributor.registerEvent(expectedEvent) } returns mockWaiter
         everySuspend { mockSdkContext.config } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
 
         configInternal.changeApplicationCode(NEW_APPCODE)
@@ -97,6 +105,13 @@ class ConfigInternalTests {
                 applicationCode = MULTI_REGION_APPCODE.uppercase(),
                 timestamp = TIMESTAMP
             )
+            val mockWaiter = mock<SdkEventWaiterApi>()
+            val successResponse = SdkEvent.Internal.Sdk.Answer.Response<Any>(
+                originId = UUID,
+                Result.success(Unit)
+            )
+            everySuspend { mockWaiter.await<Any>() } returns successResponse
+            everySuspend { mockSdkEventDistributor.registerEvent(expectedEvent) } returns mockWaiter
             everySuspend { mockSdkContext.config } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
 
             configInternal.changeApplicationCode(MULTI_REGION_APPCODE)
@@ -174,8 +189,14 @@ class ConfigInternalTests {
             ConfigCall.SetLanguage(HUNGARIAN_LANGUAGE),
             ConfigCall.ResetLanguage
         )
+        val mockWaiter = mock<SdkEventWaiterApi>()
+        val successResponse = SdkEvent.Internal.Sdk.Answer.Response<Any>(
+            originId = UUID,
+            Result.success(Unit)
+        )
+        everySuspend { mockWaiter.await<Any>() } returns successResponse
         everySuspend { mockConfigContext.calls } returns testCalls
-        everySuspend { mockSdkEventDistributor.registerEvent(capture(slot)) } returns mock()
+        everySuspend { mockSdkEventDistributor.registerEvent(capture(slot)) } returns mockWaiter
         everySuspend { mockSdkContext.config } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
 
         configInternal.activate()
@@ -192,6 +213,42 @@ class ConfigInternalTests {
             mockLanguageHandler.handleLanguage(null)
         }
         testCalls.size shouldBe 0
+    }
+
+    @Test
+    fun testChangeApplicationCode_shouldWaitForResponse_andThrowOnFailure() = runTest {
+        val testException = Exception("Backend error")
+        val mockWaiter = mock<SdkEventWaiterApi>()
+        val failureResponse = SdkEvent.Internal.Sdk.Answer.Response<Any>(
+            originId = UUID,
+            Result.failure(testException)
+        )
+        everySuspend { mockWaiter.await<Any>() } returns failureResponse
+        everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mockWaiter
+        everySuspend { mockSdkContext.config } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
+
+        val exception = shouldThrow<Exception> {
+            configInternal.changeApplicationCode(NEW_APPCODE)
+        }
+
+        exception shouldBe testException
+        verifySuspend { mockSdkEventDistributor.registerEvent(any()) }
+    }
+
+    @Test
+    fun testChangeApplicationCode_shouldWaitForResponse_andSucceedOnSuccess() = runTest {
+        val mockWaiter = mock<SdkEventWaiterApi>()
+        val successResponse = SdkEvent.Internal.Sdk.Answer.Response<Any>(
+            originId = UUID,
+            Result.success(Unit)
+        )
+        everySuspend { mockWaiter.await<Any>() } returns successResponse
+        everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mockWaiter
+        everySuspend { mockSdkContext.config } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
+
+        configInternal.changeApplicationCode(NEW_APPCODE)
+
+        verifySuspend { mockSdkEventDistributor.registerEvent(any()) }
     }
 
 }

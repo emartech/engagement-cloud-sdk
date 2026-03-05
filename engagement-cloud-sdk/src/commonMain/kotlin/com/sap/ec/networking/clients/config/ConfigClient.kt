@@ -1,6 +1,7 @@
 package com.sap.ec.networking.clients.config
 
 import com.sap.ec.api.SdkState
+import com.sap.ec.config.SdkConfig
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventManagerApi
 import com.sap.ec.core.db.events.EventsDaoApi
@@ -10,6 +11,7 @@ import com.sap.ec.core.networking.clients.NetworkClientApi
 import com.sap.ec.core.networking.model.UrlRequest
 import com.sap.ec.core.url.ECUrlType
 import com.sap.ec.core.url.UrlFactoryApi
+import com.sap.ec.enable.config.SdkConfigStoreApi
 import com.sap.ec.event.OnlineSdkEvent
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.mobileengage.config.FollowUpChangeAppCodeOrganizerApi
@@ -21,6 +23,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 internal class ConfigClient(
     private val ecNetworkClient: NetworkClientApi,
@@ -31,8 +36,10 @@ internal class ConfigClient(
     private val contactTokenHandler: ContactTokenHandlerApi,
     private val followUpChangeAppCodeOrganizer: FollowUpChangeAppCodeOrganizerApi,
     private val eventsDao: EventsDaoApi,
+    private val sdkConfigStore: SdkConfigStoreApi<SdkConfig>,
     private val sdkLogger: Logger,
-    private val applicationScope: CoroutineScope
+    private val applicationScope: CoroutineScope,
+    private val json: Json
 ) : EventBasedClientApi {
 
     override suspend fun register() {
@@ -47,18 +54,22 @@ internal class ConfigClient(
             .filter { it is SdkEvent.Internal.Sdk.ChangeAppCode }
             .collect { sdkEvent ->
                 try {
+                    sdkEvent as SdkEvent.Internal.Sdk.ChangeAppCode
                     sdkLogger.debug("ConfigClient - consumeConfigChanges")
 
                     val url = urlFactory.create(ECUrlType.ChangeApplicationCode)
-                    val request = UrlRequest(url, HttpMethod.Post)
+                    val request = UrlRequest(url, HttpMethod.Post, json.encodeToString(buildJsonObject {
+                        put("to", sdkEvent.applicationCode)
+                    }))
+
                     val response = ecNetworkClient.send(request)
                     response.onSuccess {
                         sdkContext.setSdkState(SdkState.OnHold)
                         contactTokenHandler.handleContactTokens(it)
-                        if (sdkEvent is SdkEvent.Internal.Sdk.ChangeAppCode) {
-                            sdkContext.config =
-                                sdkContext.config?.copyWith(applicationCode = sdkEvent.applicationCode)
-                        }
+
+                        val updatedConfig = sdkContext.config?.copyWith(applicationCode = sdkEvent.applicationCode)
+                        sdkContext.config = updatedConfig
+                        updatedConfig?.let { config -> sdkConfigStore.store(config) }
 
                         followUpChangeAppCodeOrganizer.organize()
 
@@ -84,11 +95,12 @@ internal class ConfigClient(
         if (exception is NetworkIOException) {
             sdkEventManager.emitEvent(sdkEvent)
         } else {
-            SdkEvent.Internal.Sdk.Answer.Response(
-                originId = sdkEvent.id,
-                Result.failure<Exception>(exception)
+            sdkEventManager.emitEvent(
+                SdkEvent.Internal.Sdk.Answer.Response(
+                    originId = sdkEvent.id,
+                    Result.failure<Exception>(exception)
+                )
             )
-
         }
         clientExceptionHandler.handleException(
             exception,

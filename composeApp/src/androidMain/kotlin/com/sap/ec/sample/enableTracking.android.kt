@@ -10,6 +10,7 @@ import com.sap.ec.config.LinkContactData
 actual suspend fun enableTracking() {
     AndroidEngagementCloud.setup.enable(
         AndroidEngagementCloudSDKConfig("EMSE3-B4341"),
+//        AndroidEngagementCloudSDKConfig("EMS7F-6F32D"), for appCode change test, staging AppCode
         onContactLinkingFailed = {
             LinkContactData.ContactFieldValueData("test1@test.com")
         }

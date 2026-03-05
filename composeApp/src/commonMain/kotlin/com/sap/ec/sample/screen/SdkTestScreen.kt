@@ -81,6 +81,10 @@ fun SdkTestScreen(
             Text("Add InlineInApp")
         }
 
+        Button(onClick = { viewModel.changeAppCode() }) {
+            Text("Change Appcode")
+        }
+
         repeat(inlineInAppViewCount) { index ->
             InlineInAppView(
                 viewId = "ia",

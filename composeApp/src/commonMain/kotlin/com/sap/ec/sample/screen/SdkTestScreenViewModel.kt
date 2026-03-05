@@ -99,6 +99,13 @@ class SdkTestScreenViewModel {
         }
     }
 
+    fun changeAppCode() {
+        viewModelScope.launch {
+            EngagementCloud.config.changeApplicationCode("INS-S01-APP-ASA5A") //staging AppCode
+            print("AppCode: ${EngagementCloud.config.getApplicationCode()}")
+        }
+    }
+
     fun addInlineInAppView() {
         _inlineInAppViewCount.value++
     }

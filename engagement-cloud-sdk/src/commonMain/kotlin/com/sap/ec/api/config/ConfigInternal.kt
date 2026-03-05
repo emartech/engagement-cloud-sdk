@@ -29,13 +29,14 @@ internal class ConfigInternal(
         if (appCode.value == sdkContext.config?.applicationCode) {
             sdkLogger.info("The new appcode is the same as the currently used.")
         } else {
-            sdkEventDistributor.registerEvent(
+            val response = sdkEventDistributor.registerEvent(
                 SdkEvent.Internal.Sdk.ChangeAppCode(
                     id = uuidProvider.provide(),
                     timestamp = timestampProvider.provide(),
                     applicationCode = appCode.value
                 )
-            )
+            ).await<SdkEvent.Internal.Sdk.Answer.Response<Any>>()
+            response.result.getOrThrow()
         }
     }
 
