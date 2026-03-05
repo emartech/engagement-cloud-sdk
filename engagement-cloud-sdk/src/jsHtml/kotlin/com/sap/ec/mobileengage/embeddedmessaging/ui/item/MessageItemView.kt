@@ -2,7 +2,6 @@ package com.sap.ec.mobileengage.embeddedmessaging.ui.item
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,7 +39,6 @@ fun MessageItemView(
     withDeleteIcon: Boolean = true,
     withSwipeGesture: Boolean = false
 ) {
-    var imageDataUrl by remember { mutableStateOf<String?>(null) }
     val hasCustomElementDefined =
         customMessageItemName?.let {
             val isCustomElementFound = window.customElements.get(it) != null
@@ -60,28 +58,12 @@ fun MessageItemView(
         }
     }
 
-    LaunchedEffect(viewModel.imageUrl) {
-        imageDataUrl = viewModel.imageUrl?.let {
-            try {
-                val imageBytes = viewModel.fetchImage()
-                if (imageBytes.isNotEmpty()) {
-                    byteArrayToDataUrl(
-                        imageBytes
-                    )
-                } else null
-            } catch (_: Exception) {
-                null
-            }
-        }
-    }
-
     if (withSwipeGesture) {
         SwipeableMessageItem(
             viewModel = viewModel,
             selectedMessageId = selectedMessageId,
             customMessageItemName = customMessageItemName,
             hasCustomElementDefined = hasCustomElementDefined,
-            imageDataUrl = imageDataUrl,
             classes = classes,
             onClick = onClick,
             onDeleteClicked = onDeleteClicked
@@ -110,10 +92,7 @@ fun MessageItemView(
                     attr("categories", JsonUtil.json.encodeToString(viewModel.categories))
                 }) {}
             } else {
-                ECMessageItem(
-                    viewModel,
-                    imageDataUrl
-                )
+                ECMessageItem(viewModel)
             }
 
             if (withDeleteIcon) {
@@ -137,7 +116,6 @@ private fun SwipeableMessageItem(
     selectedMessageId: String?,
     customMessageItemName: String?,
     hasCustomElementDefined: Boolean,
-    imageDataUrl: String?,
     classes: List<String>,
     onClick: () -> Unit,
     onDeleteClicked: () -> Unit
@@ -188,10 +166,7 @@ private fun SwipeableMessageItem(
                     attr("categories", JsonUtil.json.encodeToString(viewModel.categories))
                 }) {}
             } else {
-                ECMessageItem(
-                    viewModel,
-                    imageDataUrl
-                )
+                ECMessageItem(viewModel)
             }
         }
 
@@ -308,7 +283,7 @@ private fun SwipeableMessageItem(
 }
 
 @Composable
-private fun ECMessageItem(viewModel: MessageItemViewModelApi, imageDataUrl: String?) {
+private fun ECMessageItem(viewModel: MessageItemViewModelApi) {
     val titleClasses = mutableListOf(EmbeddedMessagingStyleSheet.messageItemTitle).apply {
         if (viewModel.isNotOpened) {
             this.add(EmbeddedMessagingStyleSheet.unopenedTitle)
@@ -321,7 +296,7 @@ private fun ECMessageItem(viewModel: MessageItemViewModelApi, imageDataUrl: Stri
     }
     val hasThumbnailImage = viewModel.imageUrl != null
     if (hasThumbnailImage) {
-        imageDataUrl?.let { url ->
+        viewModel.imageUrl?.let { url ->
             Img(src = url, alt = viewModel.imageAltText ?: "") {
                 classes(EmbeddedMessagingStyleSheet.messageItemImage)
             }
@@ -359,11 +334,4 @@ fun LoadingSpinner() {
     }) {
         Text("...")
     }
-}
-
-private fun byteArrayToDataUrl(bytes: ByteArray): String {
-    val base64 = window.btoa(
-        bytes.joinToString("") { (it.toInt() and 0xFF).toChar().toString() }
-    )
-    return "data:image/jpeg;base64,$base64"
 }
