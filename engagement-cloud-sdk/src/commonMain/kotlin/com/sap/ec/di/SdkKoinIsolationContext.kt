@@ -8,7 +8,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
-import org.koin.core.Koin
 import org.koin.core.KoinApplication
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
@@ -40,25 +39,38 @@ object SdkKoinIsolationContext {
 
     val koin = koinApp.koin
 
-    fun init(): Koin {
+    fun init() {
         if (runningApp == null) {
-            koinApp.koin.loadModules(loadPlatformModules())
-            runningApp = startKoin(koinApp)
+            initKoin()
             val sdkDispatcher = koin.get<CoroutineDispatcher>(named(DispatcherTypes.Sdk))
-            val sdkContext = koin.get<SdkContextApi>()
-            val initOrganizer = koin.get<InitOrganizerApi>()
-            val logger =
-                koin.get<Logger> { parametersOf(SdkKoinIsolationContext::class.simpleName) }
             CoroutineScope(sdkDispatcher).launch(start = CoroutineStart.UNDISPATCHED) {
-                logger.debug("SDK DI initialized")
-                if (sdkContext.currentSdkState.value == SdkState.UnInitialized) {
-                    initOrganizer.init()
-                    logger.debug("SDK initialized with InitOrganizer")
-                }
+                launchInitOrganizer()
             }
         }
+    }
 
-        return koin
+    suspend fun initLaunch() {
+        if (runningApp == null) {
+            initKoin()
+            launchInitOrganizer()
+        }
+    }
+
+    private suspend fun launchInitOrganizer() {
+        val sdkContext = koin.get<SdkContextApi>()
+        val initOrganizer = koin.get<InitOrganizerApi>()
+        val logger =
+            koin.get<Logger> { parametersOf(SdkKoinIsolationContext::class.simpleName) }
+        if (sdkContext.currentSdkState.value == SdkState.UnInitialized) {
+            initOrganizer.init()
+            logger.debug("SDK initialized with InitOrganizer")
+        }
+    }
+
+    private fun initKoin() {
+        koinApp.koin.loadModules(loadPlatformModules())
+        runningApp = startKoin(koinApp)
+
     }
 }
 

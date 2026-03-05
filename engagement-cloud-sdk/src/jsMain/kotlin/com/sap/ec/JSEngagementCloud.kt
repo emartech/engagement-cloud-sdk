@@ -21,9 +21,15 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import org.koin.core.qualifier.named
+import web.window.window
 
+@OptIn(ExperimentalWasmJsInterop::class)
 fun main() {
-    JSEngagementCloud.init()
+    val loaderUsed = (window["engagementCloudSdkLoaderUsed"] as? Boolean) ?: false
+    if (!loaderUsed) {
+        SdkKoinIsolationContext.init()
+        JSEngagementCloud.init()
+    }
 }
 
 typealias EngagementCloudSdkEventListener = (JsApiEvent) -> Unit
@@ -32,22 +38,21 @@ typealias EngagementCloudSdkEventListener = (JsApiEvent) -> Unit
 @JsExport
 @JsName("EngagementCloud")
 object JSEngagementCloud {
-    init {
-        SdkKoinIsolationContext.init()
-    }
+    private val applicationScope by lazy { koin.get<CoroutineScope>(named(CoroutineScopeTypes.Application)) }
+    private val sdkPublicEvents by lazy { koin.get<Flow<EngagementCloudEvent>>(named(EventFlowTypes.Public)) }
+    val events: EventEmitterApi by lazy { koin.get<EventEmitterApi>() }
+    val setup: JsSetupApi by lazy { koin.get<JsSetupApi>() }
+    val config: JSConfigApi by lazy { koin.get<JSConfigApi>() }
+    val contact: JSContactApi by lazy { koin.get<JSContactApi>() }
+    val event: JSTrackingApi by lazy { koin.get<JSTrackingApi>() }
+    val push: JSPushApi by lazy { koin.get<JSPushApi>() }
+    val deepLink: JSDeepLinkApi by lazy { koin.get<JSDeepLinkApi>() }
+    val embeddedMessaging: JsEmbeddedMessagingApi by lazy { koin.get<JsEmbeddedMessagingApi>() }
 
-    private val applicationScope: CoroutineScope =
-        koin.get<CoroutineScope>(named(CoroutineScopeTypes.Application))
-    private val sdkPublicEvents =
-        koin.get<Flow<EngagementCloudEvent>>(named(EventFlowTypes.Public))
-    val events = koin.get<EventEmitterApi>()
-    val setup = koin.get<JsSetupApi>()
-    val config = koin.get<JSConfigApi>()
-    val contact = koin.get<JSContactApi>()
-    val event = koin.get<JSTrackingApi>()
-    val push = koin.get<JSPushApi>()
-    val deepLink = koin.get<JSDeepLinkApi>()
-    val embeddedMessaging = koin.get<JsEmbeddedMessagingApi>()
+    suspend fun initializeSdk() {
+        SdkKoinIsolationContext.initLaunch()
+        init()
+    }
 
     internal fun init() {
         initializeCustomElements()

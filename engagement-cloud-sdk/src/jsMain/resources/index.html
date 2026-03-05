@@ -93,7 +93,7 @@
         document.querySelector('#example-compact-view-tab').classList.toggle("hidden");
     }
 
-    engagementCloud.ready.then(() => {
+    engagementCloud.loaded.then(() => {
         document.querySelector('ec-embedded-messaging-compact')
             .addEventListener('navigate', (e) => {
                 console.log("Navigating to somewhere.");

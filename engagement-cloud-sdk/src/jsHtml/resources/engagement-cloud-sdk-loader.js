@@ -1,17 +1,24 @@
 (function (global) {
+  global.engagementCloudSdkLoaderUsed = true;
+  let engagementCloudSdkLoaded = false;
   let sdkCore = null;
   let calls = [];
   let resolveLoaded;
-  const sdkReady = new Promise((resolve) => (resolveLoaded = resolve));
+  const sdkLoaded = new Promise((resolve) => (resolveLoaded = resolve));
 
   const currentSource = document.currentScript.src;
   const baseUrl = currentSource.substring(0, currentSource.lastIndexOf("/"));
-  const sdkUrl = "https://emartech.github.io/engagement-cloud-sdk/latest/engagement-cloud-sdk.js";
-//  const sdkUrl = `${baseUrl}/engagement-cloud-sdk-html.js`;
+  //  const sdkUrl = "https://emartech.github.io/engagement-cloud-sdk/latest/engagement-cloud-sdk.js";
+  const sdkUrl = `${baseUrl}/engagement-cloud-sdk-html.js`;
 
   global.EngagementCloud = {
-    ready: sdkReady,
-    setup: createApiSegment("setup", ["enable", "disable", "isEnabled", "setOnContactLinkingFailedCallback"]),
+    loaded: sdkLoaded,
+    setup: createApiSegment("setup", [
+      "enable",
+      "disable",
+      "isEnabled",
+      "setOnContactLinkingFailedCallback",
+    ]),
     config: createApiSegment("config", [
       "getApplicationCode",
       "getClientId",
@@ -58,9 +65,16 @@
   scriptTag.async = true;
   scriptTag.onload = async function () {
     sdkCore = global["engagement-cloud-sdk"].EngagementCloud.getInstance();
-    global.engagementCloudSdkLoaded = true;
     resolveLoaded();
-    await replayCalls();
+    sdkCore
+      .initializeSdk()
+      .then(async () => {
+        engagementCloudSdkLoaded = true;
+        await replayCalls();
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
   scriptTag.onerror = function (error) {
     console.error("SDK loading failed. Error: ", error);
@@ -71,7 +85,7 @@
   function createApiMethods(apiSegment, methodName) {
     return async function () {
       let args = Array.prototype.slice.call(arguments);
-      if (global.engagementCloudSdkLoaded && sdkCore && calls.length === 0) {
+      if (engagementCloudSdkLoaded && sdkCore && calls.length === 0) {
         const { target, apiMethod } = getTargetAndMethod(
           apiSegment,
           methodName,
