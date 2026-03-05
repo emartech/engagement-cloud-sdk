@@ -20,6 +20,9 @@ internal class SdkContext(
 
     override val currentSdkState = MutableStateFlow(SdkState.UnInitialized)
 
+    override suspend fun isEnabledState(): Boolean =
+        currentSdkState.value == SdkState.OnHold || currentSdkState.value == SdkState.Active
+
     override suspend fun setSdkState(sdkState: SdkState) {
         currentSdkState.value = sdkState
     }

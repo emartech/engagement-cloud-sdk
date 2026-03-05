@@ -18,7 +18,7 @@ internal class EnableOrganizer(
 ) : EnableOrganizerApi {
 
     override suspend fun enableWithValidation(config: SdkConfig) {
-        if (sdkConfigStore.load() != null) {
+        if (sdkContext.isEnabledState()) {
             sdkLogger.debug("SDK already enabled")
             throw SdkAlreadyEnabledException("SAP Engagement Cloud SDK was already enabled!")
         }

@@ -76,6 +76,7 @@ class EnableOrganizerTests {
         runTest {
             val config = TestEngagementCloudSDKConfig("testAppCode")
             everySuspend { mockSdkConfigStore.load() } returns config
+            everySuspend { mockSdkContext.isEnabledState() } returns true
 
             val exception = shouldThrow<SdkAlreadyEnabledException> {
                 enableOrganizer.enableWithValidation(config)
@@ -110,13 +111,13 @@ class EnableOrganizerTests {
             val testException = Exception("failure")
             everySuspend { mockSdkConfigStore.load() } returns null
             everySuspend { mockMeStateMachine.activate() } returns Result.failure(testException)
+            everySuspend { mockSdkContext.isEnabledState() } returns false
 
             val config = TestEngagementCloudSDKConfig("testAppCode")
 
             shouldThrow<Exception> { enableOrganizer.enableWithValidation(config) }
 
             verifySuspend(VerifyMode.order) {
-                 mockSdkConfigStore.load()
                  mockSdkContext.setSdkState(SdkState.OnHold)
                  mockSdkConfigStore.store(config)
                  mockSdkContext.config = config

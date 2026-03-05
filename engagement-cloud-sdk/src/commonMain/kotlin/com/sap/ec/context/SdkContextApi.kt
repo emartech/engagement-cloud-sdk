@@ -18,5 +18,7 @@ internal interface SdkContextApi {
     val features: MutableSet<Features>
     var logBreadcrumbsQueueSize: Int
 
+    suspend fun isEnabledState(): Boolean
+
     suspend fun setSdkState(sdkState: SdkState)
 }
