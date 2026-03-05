@@ -4,10 +4,10 @@ import com.sap.ec.iosNotificationService.file.FileSmith
 import com.sap.ec.iosNotificationService.models.ActionModel
 import com.sap.ec.iosNotificationService.models.DismissActionModel
 import com.sap.ec.iosNotificationService.networking.Downloader
-import com.sap.ec.notification.NotificationCenter
-import com.sap.ec.notification.NotificationCenterApi
 import com.sap.ec.iosNotificationService.provider.SessionProvider
 import com.sap.ec.iosNotificationService.provider.UUIDProvider
+import com.sap.ec.notification.NotificationCenter
+import com.sap.ec.notification.NotificationCenterApi
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.Dispatchers
@@ -103,6 +103,7 @@ class EngagementCloudNotificationService(
         contentHandler(bestAttemptContent)
     }
 
+    @OptIn(ExperimentalForeignApi::class)
     private suspend fun createActions() {
         actionModels()?.let { actionModels ->
             val notificationActions = actionModels.map {
@@ -120,8 +121,47 @@ class EngagementCloudNotificationService(
 
             notificationCenter.addCategory(category)
 
+            updateActionsInUserInfo(actionModels)
+
             mutex.withLock {
                 bestAttemptContent.setCategoryIdentifier(category.identifier)
+            }
+        }
+    }
+
+    private fun updateActionsInUserInfo(actionModels: List<ActionModel>) {
+        val currentUserInfo = bestAttemptContent.userInfo.toMutableMap()
+        val notificationValue = currentUserInfo["notification"]
+
+        if (notificationValue is Map<*, *>) {
+            val notificationDict = notificationValue.toMutableMap()
+            val actionsValue = notificationDict["actions"]
+
+            if (actionsValue is List<*>) {
+                val actionModelsMap = actionModels.associateBy { "${it.type}|${it.title}" }
+
+                val updatedActions = actionsValue.map { actionValue ->
+                    if (actionValue is Map<*, *>) {
+                        val type = actionValue["type"] as? String
+                        val title = actionValue["title"] as? String
+
+                        if (type != null && title != null) {
+                            val key = "$type|$title"
+                            val matchingModel = actionModelsMap[key]
+
+                            if (matchingModel != null) {
+                                val mutableAction = actionValue.toMutableMap()
+                                mutableAction["id"] = matchingModel.id
+                                return@map mutableAction
+                            }
+                        }
+                    }
+                    actionValue
+                }
+
+                notificationDict["actions"] = updatedActions
+                currentUserInfo["notification"] = notificationDict
+                bestAttemptContent.setUserInfo(currentUserInfo as Map<Any?, *>)
             }
         }
     }

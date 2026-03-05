@@ -2,6 +2,8 @@ package com.sap.ec.mobileengage.push
 
 import com.sap.ec.SdkConstants.SILENT_PUSH_RECEIVED_EVENT_NAME
 import com.sap.ec.TestEngagementCloudSDKConfig
+import com.sap.ec.api.SdkState
+import com.sap.ec.api.event.model.AppEvent
 import com.sap.ec.api.push.Ems
 import com.sap.ec.api.push.NotificationCenterDelegateRegistration
 import com.sap.ec.api.push.NotificationCenterDelegateRegistrationOptions
@@ -22,7 +24,6 @@ import com.sap.ec.core.providers.InstantProvider
 import com.sap.ec.core.providers.UuidProviderApi
 import com.sap.ec.core.storage.StringStorageApi
 import com.sap.ec.core.url.ExternalUrlOpenerApi
-import com.sap.ec.api.event.model.AppEvent
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.mobileengage.action.PushActionFactoryApi
 import com.sap.ec.mobileengage.action.actions.Action
@@ -54,6 +55,7 @@ import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -120,6 +122,7 @@ internal class IosPushInternalTests {
 
     private lateinit var testDelegate1: UNUserNotificationCenterDelegateProtocol
     private lateinit var testDelegate2: UNUserNotificationCenterDelegateProtocol
+    private lateinit var sdkStateFlow: MutableStateFlow<SdkState>
 
     @BeforeTest
     fun setup() = runTest {
@@ -127,7 +130,9 @@ internal class IosPushInternalTests {
 
         mockStorage = mock()
         mockSdkContext = mock()
+        sdkStateFlow = MutableStateFlow(SdkState.Active)
         every { mockSdkContext.config } returns TestEngagementCloudSDKConfig(TEST_APPLICATION_CODE)
+        every { mockSdkContext.currentSdkState } returns sdkStateFlow
         mockActionFactory = mock()
         mockActionHandler = mock()
         mockBadgeCountHandler = mock()
@@ -730,5 +735,299 @@ internal class IosPushInternalTests {
         val result = IosPushInternal.filterDelegates(emptyRegistrations, ecUserInfo)
 
         result.size shouldBe 0
+    }
+
+    @Test
+    fun `didReceiveNotificationResponse should always call completion handler even when parsing fails`() =
+        runTest {
+            var completionHandlerCalled = false
+            val invalidUserInfo = mapOf<String, Any>("invalid" to "data")
+
+            iosPushInternal.didReceiveNotificationResponse(
+                UNNotificationDefaultActionIdentifier,
+                invalidUserInfo
+            ) {
+                completionHandlerCalled = true
+            }
+
+            advanceUntilIdle()
+
+            completionHandlerCalled shouldBe true
+        }
+
+    @Test
+    fun `didReceiveNotificationResponse should always call completion handler on success`() =
+        runTest {
+            var completionHandlerCalled = false
+            val actionModel = BasicOpenExternalUrlActionModel(REPORTING, url = "https://www.sap.com")
+            val notificationOpenedActionModel = NotificationOpenedActionModel(REPORTING, TRACKING_INFO)
+            val mockAction: Action<Unit> = mock(MockMode.autoUnit)
+            val mockReportingAction: Action<Unit> = mock(MockMode.autoUnit)
+
+            everySuspend { mockActionFactory.create(actionModel) } returns mockAction
+            everySuspend { mockActionFactory.create(notificationOpenedActionModel) } returns mockReportingAction
+
+            val userInfo = createUserInfoMap(
+                defaultAction = mapOf(
+                    "type" to "OpenExternalUrl",
+                    "reporting" to REPORTING,
+                    "url" to "https://www.sap.com"
+                ),
+                actions = null
+            )
+
+            iosPushInternal.didReceiveNotificationResponse(
+                UNNotificationDefaultActionIdentifier,
+                userInfo
+            ) {
+                completionHandlerCalled = true
+            }
+
+            advanceUntilIdle()
+
+            completionHandlerCalled shouldBe true
+        }
+
+    @Test
+    fun `userNotificationCenterDelegate should process notification immediately when SDK is Active`() =
+        runTest {
+            sdkStateFlow.value = SdkState.Active
+            var handlerProcessed = false
+            val actionModel = BasicOpenExternalUrlActionModel(REPORTING, url = "https://www.sap.com")
+            val notificationOpenedActionModel = NotificationOpenedActionModel(REPORTING, TRACKING_INFO)
+            val mockAction: Action<Unit> = mock(MockMode.autoUnit)
+            val mockReportingAction: Action<Unit> = mock(MockMode.autoUnit)
+
+            everySuspend { mockActionFactory.create(actionModel) } returns mockAction
+            everySuspend { mockActionFactory.create(notificationOpenedActionModel) } returns mockReportingAction
+
+            val userInfo = createUserInfoMap(
+                defaultAction = mapOf(
+                    "type" to "OpenExternalUrl",
+                    "reporting" to REPORTING,
+                    "url" to "https://www.sap.com"
+                ),
+                actions = null
+            )
+
+            iosPushInternal.didReceiveNotificationResponse(
+                UNNotificationDefaultActionIdentifier,
+                userInfo
+            ) {
+                handlerProcessed = true
+            }
+
+            advanceUntilIdle()
+
+            handlerProcessed shouldBe true
+            verifySuspend {
+                mockActionFactory.create(actionModel)
+                mockActionHandler.handleActions(listOf(mockReportingAction), mockAction)
+            }
+        }
+
+    @Test
+    fun `proxy delegate should queue notification when SDK is not Active and process when Active`() =
+        runTest {
+            sdkStateFlow.value = SdkState.Initialized
+
+            val nonActiveIosPushInternal = IosPushInternal(
+                mockStorage,
+                pushContext,
+                mockSdkContext,
+                mockActionFactory,
+                mockActionHandler,
+                mockBadgeCountHandler,
+                json,
+                sdkDispatcher,
+                mockSdkLogger,
+                mockSdkEventDistributor,
+                mockTimestampProvider,
+                mockUuidProvider
+            )
+
+            var completionHandlerCalled = false
+            val actionModel = BasicOpenExternalUrlActionModel(REPORTING, url = "https://www.sap.com")
+            val notificationOpenedActionModel = NotificationOpenedActionModel(REPORTING, TRACKING_INFO)
+            val mockAction: Action<Unit> = mock(MockMode.autoUnit)
+            val mockReportingAction: Action<Unit> = mock(MockMode.autoUnit)
+
+            everySuspend { mockActionFactory.create(actionModel) } returns mockAction
+            everySuspend { mockActionFactory.create(notificationOpenedActionModel) } returns mockReportingAction
+
+            val userInfo = createUserInfoMap(
+                defaultAction = mapOf(
+                    "type" to "OpenExternalUrl",
+                    "reporting" to REPORTING,
+                    "url" to "https://www.sap.com"
+                ),
+                actions = null
+            )
+
+            nonActiveIosPushInternal.didReceiveNotificationResponse(
+                UNNotificationDefaultActionIdentifier,
+                userInfo
+            ) {
+                completionHandlerCalled = true
+            }
+
+            advanceUntilIdle()
+
+            completionHandlerCalled shouldBe true
+        }
+
+    @Test
+    fun `didReceiveNotificationResponse should handle empty userInfo gracefully`() =
+        runTest {
+            var completionHandlerCalled = false
+            val emptyUserInfo = emptyMap<String, Any>()
+
+            iosPushInternal.didReceiveNotificationResponse(
+                UNNotificationDefaultActionIdentifier,
+                emptyUserInfo
+            ) {
+                completionHandlerCalled = true
+            }
+
+            advanceUntilIdle()
+
+            completionHandlerCalled shouldBe true
+        }
+
+    @Test
+    fun `multiple concurrent didReceiveNotificationResponse calls should all complete`() =
+        runTest {
+            var completionHandler1Called = false
+            var completionHandler2Called = false
+            var completionHandler3Called = false
+
+            val invalidUserInfo = mapOf<String, Any>("invalid" to "data")
+
+            iosPushInternal.didReceiveNotificationResponse(
+                UNNotificationDefaultActionIdentifier,
+                invalidUserInfo
+            ) {
+                completionHandler1Called = true
+            }
+
+            iosPushInternal.didReceiveNotificationResponse(
+                UNNotificationDefaultActionIdentifier,
+                invalidUserInfo
+            ) {
+                completionHandler2Called = true
+            }
+
+            iosPushInternal.didReceiveNotificationResponse(
+                UNNotificationDefaultActionIdentifier,
+                invalidUserInfo
+            ) {
+                completionHandler3Called = true
+            }
+
+            advanceUntilIdle()
+
+            completionHandler1Called shouldBe true
+            completionHandler2Called shouldBe true
+            completionHandler3Called shouldBe true
+        }
+
+    @Test
+    fun `didReceiveNotificationResponse should correctly match action by id`() = runTest {
+        val actionId1 = "bd3d06fa-9dae-452c-9a0b-90500c3e8942"
+        val actionId2 = "b92eafa5-9204-42d6-b9d0-9abf67688ccc"
+        val actionId3 = "3e4e2461-90bd-4220-bd6f-321e3cbedefe"
+
+        val mockUrlOpener: ExternalUrlOpenerApi = mock(MockMode.autoUnit)
+        val actionModel1 = PresentableOpenExternalUrlActionModel(
+            id = actionId1,
+            reporting = """{"id":"sap.com"}""",
+            title = "sap.com",
+            url = "https://www.sap.com"
+        )
+
+        val action1 = OpenExternalUrlAction(actionModel1, mockUrlOpener)
+        everySuspend { mockActionFactory.create(actionModel1) } returns action1
+
+        val actions = listOf(
+            mapOf(
+                "type" to "OpenExternalUrl",
+                "id" to actionId1,
+                "title" to "sap.com",
+                "reporting" to """{"id":"sap.com"}""",
+                "url" to "https://www.sap.com"
+            ),
+            mapOf(
+                "type" to "MECustomEvent",
+                "id" to actionId2,
+                "title" to "mysy2",
+                "reporting" to """{"id":"mysy2"}""",
+                "name" to "mysy2"
+            ),
+            mapOf(
+                "type" to "Dismiss",
+                "id" to actionId3,
+                "title" to "dismiss",
+                "reporting" to """{"id":"dismiss"}"""
+            )
+        )
+
+        val userInfo = createUserInfoMap(
+            defaultAction = mapOf(
+                "type" to "MEAppEvent",
+                "reporting" to """{"id":"MEAppEvent"}""",
+                "name" to "testApppEventName",
+                "payload" to mapOf("testeAppEventPayloadKey" to "testAppEventPayloadValue")
+            ),
+            actions = actions
+        )
+
+        val buttonClickedActionModel = BasicPushButtonClickedActionModel(
+            actionModel1.reporting,
+            TRACKING_INFO
+        )
+        val reportingAction = ReportingAction(buttonClickedActionModel, mock(MockMode.autoUnit))
+        everySuspend { mockActionFactory.create(buttonClickedActionModel) } returns reportingAction
+
+        iosPushInternal.didReceiveNotificationResponse(actionId1, userInfo) {}
+
+        advanceUntilIdle()
+
+        verifySuspend {
+            mockActionFactory.create(actionModel1)
+            mockActionHandler.handleActions(listOf(reportingAction), action1)
+        }
+    }
+
+    @Test
+    fun `didReceiveNotificationResponse should not find action with wrong id`() = runTest {
+        val correctActionId = "bd3d06fa-9dae-452c-9a0b-90500c3e8942"
+        val wrongActionId = "wrong-id-that-does-not-exist"
+
+        val actions = listOf(
+            mapOf(
+                "type" to "OpenExternalUrl",
+                "id" to correctActionId,
+                "title" to "sap.com",
+                "reporting" to """{"id":"sap.com"}""",
+                "url" to "https://www.sap.com"
+            )
+        )
+
+        val userInfo = createUserInfoMap(
+            defaultAction = null,
+            actions = actions
+        )
+
+        val notificationOpenedActionModel = NotificationOpenedActionModel(null, TRACKING_INFO)
+        val reportingAction = ReportingAction(notificationOpenedActionModel, mock(MockMode.autoUnit))
+        everySuspend { mockActionFactory.create(notificationOpenedActionModel) } returns reportingAction
+
+        iosPushInternal.didReceiveNotificationResponse(wrongActionId, userInfo) {}
+
+        advanceUntilIdle()
+
+        verifySuspend {
+            mockActionHandler.handleActions(listOf(reportingAction), null)
+        }
     }
 }

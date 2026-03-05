@@ -64,11 +64,11 @@ struct SdkTestView: View {
                 onContactLinkingFailed: { onSuccess, onError in
                     Task {
                         // login
-                        onSuccess(LinkContactDataContactFieldValueData(contactFieldValue: "test@test.com"))
+                        onSuccess(LinkContactDataContactFieldValueData(contactFieldValue: "test1@test.com"))
                     }
                 }
             )
-            try? await engagementCloud.contact.link(contactFieldValue: "test@test.com")
+            try? await engagementCloud.contact.link(contactFieldValue: "test1@test.com")
             
             engagementCloud.registerEventListener { event in
                 switch onEnum(of: event) {

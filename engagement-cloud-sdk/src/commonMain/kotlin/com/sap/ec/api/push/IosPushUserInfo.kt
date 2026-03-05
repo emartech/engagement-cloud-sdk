@@ -3,7 +3,33 @@ package com.sap.ec.api.push
 import com.sap.ec.mobileengage.action.models.BadgeCount
 import com.sap.ec.mobileengage.action.models.BasicActionModel
 import com.sap.ec.mobileengage.action.models.PresentableActionModel
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+
+object FlexibleBooleanSerializer : KSerializer<Boolean> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("FlexibleBoolean", PrimitiveKind.BOOLEAN)
+
+    override fun deserialize(decoder: Decoder): Boolean {
+        return try {
+            decoder.decodeBoolean()
+        } catch (e: Exception) {
+            try {
+                decoder.decodeInt() != 0
+            } catch (e2: Exception) {
+                false
+            }
+        }
+    }
+
+    override fun serialize(encoder: Encoder, value: Boolean) {
+        encoder.encodeBoolean(value)
+    }
+}
 
 @Serializable
 data class PushUserInfo(
@@ -19,6 +45,7 @@ data class SilentPushUserInfo(
 
 @Serializable
 data class Notification(
+    @Serializable(with = FlexibleBooleanSerializer::class)
     val silent: Boolean = false,
     val defaultAction: BasicActionModel? = null,
     val actions: List<PresentableActionModel>? = null,
@@ -27,6 +54,7 @@ data class Notification(
 
 @Serializable
 data class SilentNotification(
+    @Serializable(with = FlexibleBooleanSerializer::class)
     val silent: Boolean = false,
     val defaultAction: BasicActionModel? = null,
     val actions: List<BasicActionModel>? = null,

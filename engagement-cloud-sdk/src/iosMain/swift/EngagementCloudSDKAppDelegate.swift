@@ -11,13 +11,12 @@ import UIKit
             center.delegate = self.ec.push.userNotificationCenterDelegate
 
             UIApplication.shared.registerForRemoteNotifications()
-            let notificationCenter = UNUserNotificationCenter.current()
             var authorizationOptions: UNAuthorizationOptions = [.alert, .sound, .badge]
             if #available(iOS 12.0, *) {
                 authorizationOptions.insert(.provisional)
             }
             do {
-                let _ = try await notificationCenter.requestAuthorization(options: authorizationOptions)
+                let _ = try await center.requestAuthorization(options: authorizationOptions)
             } catch {
                 print("Error requesting notification authorization: \(error.localizedDescription)")
             }

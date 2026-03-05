@@ -2,6 +2,7 @@ package com.sap.ec.mobileengage.push
 
 import com.sap.ec.SdkConstants.SILENT_PUSH_RECEIVED_EVENT_NAME
 import com.sap.ec.api.SdkState
+import com.sap.ec.api.event.model.AppEvent
 import com.sap.ec.api.push.NotificationCenterDelegateRegistration
 import com.sap.ec.api.push.NotificationCenterDelegateRegistrationOptions
 import com.sap.ec.api.push.PushCall.ClearPushToken
@@ -20,7 +21,6 @@ import com.sap.ec.core.log.Logger
 import com.sap.ec.core.providers.InstantProvider
 import com.sap.ec.core.providers.UuidProviderApi
 import com.sap.ec.core.storage.StringStorageApi
-import com.sap.ec.api.event.model.AppEvent
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.mobileengage.action.PushActionFactoryApi
 import com.sap.ec.mobileengage.action.actions.Action
@@ -33,6 +33,7 @@ import com.sap.ec.mobileengage.push.extension.toPushUserInfo
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
@@ -54,7 +55,7 @@ import kotlin.time.ExperimentalTime
 internal class IosPushInternal(
     storage: StringStorageApi,
     private val pushContext: PushContextApi,
-    sdkContext: SdkContextApi,
+    private val sdkContext: SdkContextApi,
     private val actionFactory: PushActionFactoryApi,
     private val actionHandler: ActionHandlerApi,
     private val badgeCountHandler: BadgeCountHandlerApi,
@@ -68,6 +69,14 @@ internal class IosPushInternal(
     IosPushInstance {
 
     private val _registeredDelegates = mutableListOf<NotificationCenterDelegateRegistration>()
+    private val pendingNotificationResponses = mutableListOf<PendingNotificationResponse>()
+    private var isObservingSdkState = false
+
+    private data class PendingNotificationResponse(
+        val actionIdentifier: String,
+        val userInfo: Map<String, Any>,
+        val completionHandler: () -> Unit
+    )
 
     override val registeredNotificationCenterDelegates: List<NotificationCenterDelegateRegistration>
         get() = _registeredDelegates.toList()
@@ -94,6 +103,7 @@ internal class IosPushInternal(
     override val userNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol =
         InternalNotificationCenterDelegateProxy(
             didReceiveNotificationResponse = this::didReceiveNotificationResponse,
+            queuePendingNotificationResponse = this::queuePendingNotificationResponse,
             sdkContext = sdkContext,
             registeredDelegates = _registeredDelegates.toList()
         )
@@ -138,17 +148,55 @@ internal class IosPushInternal(
         CoroutineScope(sdkDispatcher).launch {
             try {
                 val pushUserInfo = userInfo.toPushUserInfo(json)
-                pushUserInfo?.let {
+                if (pushUserInfo != null) {
                     handleActions(actionIdentifier, pushUserInfo)
                     pushUserInfo.notification.badgeCount?.let { badgeCountHandler.handle(it) }
-
-                    withContext(Dispatchers.Main) {
-                        withCompletionHandler()
-                    }
+                } else {
+                    sdkLogger.debug("Could not parse push notification user info")
                 }
             } catch (exception: Exception) {
                 sdkLogger.error("DidReceiveNotificationResponse", exception)
+            } finally {
+                withContext(Dispatchers.Main) {
+                    withCompletionHandler()
+                }
             }
+        }
+    }
+
+    private fun queuePendingNotificationResponse(
+        actionIdentifier: String,
+        userInfo: Map<String, Any>,
+        completionHandler: () -> Unit
+    ) {
+        CoroutineScope(sdkDispatcher).launch {
+            pendingNotificationResponses.add(
+                PendingNotificationResponse(actionIdentifier, userInfo, completionHandler)
+            )
+            startObservingSdkStateIfNeeded()
+        }
+    }
+
+    private fun startObservingSdkStateIfNeeded() {
+        if (isObservingSdkState) return
+        isObservingSdkState = true
+        CoroutineScope(sdkDispatcher).launch {
+            sdkContext.currentSdkState
+                .first {  it == SdkState.Active }
+            processPendingNotificationResponses()
+            isObservingSdkState = false
+        }
+    }
+
+    private fun processPendingNotificationResponses() {
+        val responsesToProcess = pendingNotificationResponses.toList()
+        pendingNotificationResponses.clear()
+        responsesToProcess.forEach { pending ->
+            didReceiveNotificationResponse(
+                pending.actionIdentifier,
+                pending.userInfo,
+                pending.completionHandler
+            )
         }
     }
 
@@ -170,7 +218,6 @@ internal class IosPushInternal(
         }
 
         val mandatoryActions = createMandatoryActions(pushUserInfo, actionModel)
-
         actionHandler.handleActions(mandatoryActions, triggeredAction)
     }
 
@@ -220,6 +267,7 @@ internal class IosPushInternal(
 
     private class InternalNotificationCenterDelegateProxy(
         private val didReceiveNotificationResponse: (actionIdentifier: String, userInfo: Map<String, Any>, handler: () -> Unit) -> Unit,
+        private val queuePendingNotificationResponse: (actionIdentifier: String, userInfo: Map<String, Any>, handler: () -> Unit) -> Unit,
         private val sdkContext: SdkContextApi,
         var registeredDelegates: List<NotificationCenterDelegateRegistration> = emptyList()
     ) : UNUserNotificationCenterDelegateProtocol, NSObject() {
@@ -269,6 +317,12 @@ internal class IosPushInternal(
             }
             if (sdkContext.currentSdkState.value == SdkState.Active) {
                 this.didReceiveNotificationResponse(
+                    didReceiveNotificationResponse.actionIdentifier,
+                    didReceiveNotificationResponse.notification.request.content.userInfo as Map<String, Any>,
+                    withCompletionHandler
+                )
+            } else {
+                this.queuePendingNotificationResponse(
                     didReceiveNotificationResponse.actionIdentifier,
                     didReceiveNotificationResponse.notification.request.content.userInfo as Map<String, Any>,
                     withCompletionHandler

@@ -11,48 +11,40 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
-import platform.darwin.NSObject
-
 
 internal class IosLoggingPush(
     private val logger: Logger,
+    private val dispatcher: CoroutineDispatcher,
     storage: StringStorageApi,
-    private val sdkDispatcher: CoroutineDispatcher
+    private val iosPushInternal: IosPushInstance
 ) : LoggingPush(storage, logger), IosPushInstance {
 
     override val registeredNotificationCenterDelegates: List<NotificationCenterDelegateRegistration>
-        get() {
-            val entry = LogEntry.createMethodNotAllowed(this, this::registeredNotificationCenterDelegates.name)
-            CoroutineScope(sdkDispatcher).launch {
-                logger.debug(entry)
-            }
-            return emptyList()
-        }
+        get() = iosPushInternal.registeredNotificationCenterDelegates
 
     override fun registerNotificationCenterDelegate(
         delegate: UNUserNotificationCenterDelegateProtocol,
         options: NotificationCenterDelegateRegistrationOptions
     ) {
-        val entry = LogEntry.createMethodNotAllowed(this, this::registerNotificationCenterDelegate.name)
-        CoroutineScope(sdkDispatcher).launch {
-            logger.debug(entry)
+        CoroutineScope(dispatcher).launch {
+            logger.trace("registerNotificationCenterDelegate was called")
         }
+        iosPushInternal.registerNotificationCenterDelegate(delegate, options)
     }
 
     override fun unregisterNotificationCenterDelegate(delegate: UNUserNotificationCenterDelegateProtocol) {
-        val entry = LogEntry.createMethodNotAllowed(this, this::unregisterNotificationCenterDelegate.name)
-        CoroutineScope(sdkDispatcher).launch {
-            logger.debug(entry)
+        CoroutineScope(dispatcher).launch {
+            logger.trace("unregisterNotificationCenterDelegate was called")
         }
+        iosPushInternal.unregisterNotificationCenterDelegate(delegate)
     }
 
     override val userNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol
         get() {
-            val entry = LogEntry.createMethodNotAllowed(this, this::userNotificationCenterDelegate.name)
-            CoroutineScope(sdkDispatcher).launch {
-                logger.debug(entry)
+            CoroutineScope(dispatcher).launch {
+                logger.trace("userNotificationCenterDelegate was called")
             }
-            return object : NSObject(), UNUserNotificationCenterDelegateProtocol {}
+            return iosPushInternal.userNotificationCenterDelegate
         }
 
     override suspend fun handleSilentMessageWithUserInfo(userInfo: SilentPushUserInfo) {

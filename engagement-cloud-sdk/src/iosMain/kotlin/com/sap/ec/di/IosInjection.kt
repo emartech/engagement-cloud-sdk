@@ -19,6 +19,7 @@ import com.sap.ec.api.setup.IosSetup
 import com.sap.ec.api.setup.IosSetupApi
 import com.sap.ec.api.tracking.IosTracking
 import com.sap.ec.api.tracking.IosTrackingApi
+import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.actions.clipboard.ClipboardHandlerApi
 import com.sap.ec.core.actions.launchapplication.LaunchApplicationHandlerApi
 import com.sap.ec.core.badge.IosBadgeCountHandler
@@ -247,8 +248,9 @@ object IosInjection {
         single<IosPushInstance>(named(InstanceType.Logging)) {
             IosLoggingPush(
                 storage = get(),
-                sdkDispatcher = get(named(DispatcherTypes.Sdk)),
-                logger = get { parametersOf(IosLoggingPush::class.simpleName) }
+                logger = get { parametersOf(IosLoggingPush::class.simpleName) },
+                dispatcher = get<SdkContextApi>().sdkDispatcher,
+                iosPushInternal = get(named(InstanceType.Internal))
             )
         }
         single<PushApi> {
