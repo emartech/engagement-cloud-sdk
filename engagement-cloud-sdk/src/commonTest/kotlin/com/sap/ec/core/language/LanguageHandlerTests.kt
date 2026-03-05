@@ -1,10 +1,9 @@
 package com.sap.ec.core.language
 
 import com.sap.ec.SdkConstants.LANGUAGE_STORAGE_KEY
-import com.sap.ec.context.Features
 import com.sap.ec.context.Features.EmbeddedMessaging
 import com.sap.ec.context.SdkContextApi
-import com.sap.ec.core.channel.SdkEventDistributorApi
+import com.sap.ec.core.channel.SdkEventManagerApi
 import com.sap.ec.core.channel.SdkEventWaiterApi
 import com.sap.ec.core.exceptions.SdkException.PreconditionFailedException
 import com.sap.ec.core.log.Logger
@@ -28,7 +27,7 @@ class LanguageHandlerTests {
 
     private lateinit var mockLanguageTagValidator: LanguageTagValidatorApi
     private lateinit var mockStringStorage: StringStorageApi
-    private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
+    private lateinit var mockSdkEventManager: SdkEventManagerApi
     private lateinit var mockLogger: Logger
     private lateinit var mockSdkContext: SdkContextApi
     private lateinit var mockEventWaiter: SdkEventWaiterApi
@@ -39,7 +38,7 @@ class LanguageHandlerTests {
     fun setUp() = runTest {
         mockLanguageTagValidator = mock()
         mockStringStorage = mock()
-        mockSdkEventDistributor = mock()
+        mockSdkEventManager = mock()
         mockLogger = mock()
         everySuspend {
             mockLogger.debug(any<String>())
@@ -50,7 +49,7 @@ class LanguageHandlerTests {
         languageHandler = LanguageHandler(
             mockLanguageTagValidator,
             mockStringStorage,
-            mockSdkEventDistributor,
+            mockSdkEventManager,
             mockLogger,
             mockSdkContext
         )
@@ -74,9 +73,10 @@ class LanguageHandlerTests {
                 Result.success(Unit)
             )
             everySuspend { mockEventWaiter.await<Unit>() } returns successDeviceEventResponse
-            everySuspend { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.Sdk.RegisterDeviceInfo>()) } returns mockEventWaiter
+            everySuspend { mockSdkEventManager.registerEvent(any<SdkEvent.Internal.Sdk.ChangeLanguage>()) } returns mockEventWaiter
             val fetchMetaSlot = slot<SdkEvent.Internal.EmbeddedMessaging.FetchMeta>()
-            everySuspend { mockSdkEventDistributor.registerEvent(capture(fetchMetaSlot)) } returns mockEventWaiter
+            everySuspend { mockSdkEventManager.registerEvent(capture(fetchMetaSlot)) } returns mockEventWaiter
+            everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
             everySuspend { mockStringStorage.put(any(), any()) } returns Unit
             everySuspend { mockSdkContext.features } returns mutableSetOf(EmbeddedMessaging)
 
@@ -84,8 +84,9 @@ class LanguageHandlerTests {
 
             verifySuspend {
                 mockStringStorage.put(LANGUAGE_STORAGE_KEY, null)
-                mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.Sdk.RegisterDeviceInfo>())
-                mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMeta>())
+                mockSdkEventManager.registerEvent(any<SdkEvent.Internal.Sdk.ChangeLanguage>())
+                mockSdkEventManager.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMeta>())
+                mockSdkEventManager.emitEvent(any<SdkEvent.Internal.EmbeddedMessaging.TriggerRefresh>())
             }
             fetchMetaSlot.values.first().type shouldBe "fetchMeta"
         }
@@ -98,7 +99,7 @@ class LanguageHandlerTests {
                 Result.failure(RuntimeException("any"))
             )
             everySuspend { mockEventWaiter.await<Exception>() } returns failureDeviceEventResponse
-            everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mockEventWaiter
+            everySuspend { mockSdkEventManager.registerEvent(any()) } returns mockEventWaiter
             everySuspend { mockStringStorage.put(any(), any()) } returns Unit
             everySuspend { mockSdkContext.features } returns mutableSetOf(EmbeddedMessaging)
             everySuspend { mockLogger.error(any(), any<Throwable>()) } returns Unit
@@ -107,9 +108,10 @@ class LanguageHandlerTests {
 
             verifySuspend {
                 mockStringStorage.put(LANGUAGE_STORAGE_KEY, null)
-                mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.Sdk.RegisterDeviceInfo>())
+                mockSdkEventManager.registerEvent(any<SdkEvent.Internal.Sdk.ChangeLanguage>())
             }
-            verifySuspend(VerifyMode.exactly(0)) { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMeta>()) }
+            verifySuspend(VerifyMode.exactly(0)) { mockSdkEventManager.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMeta>()) }
+            verifySuspend(VerifyMode.exactly(0)) { mockSdkEventManager.emitEvent(any<SdkEvent.Internal.EmbeddedMessaging.TriggerRefresh>()) }
         }
 
     @Test
@@ -120,9 +122,10 @@ class LanguageHandlerTests {
                 Result.success(Unit)
             )
             everySuspend { mockEventWaiter.await<Unit>() } returns successDeviceEventResponse
-            everySuspend { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.Sdk.RegisterDeviceInfo>()) } returns mockEventWaiter
+            everySuspend { mockSdkEventManager.registerEvent(any<SdkEvent.Internal.Sdk.ChangeLanguage>()) } returns mockEventWaiter
             val fetchMetaSlot = slot<SdkEvent.Internal.EmbeddedMessaging.FetchMeta>()
-            everySuspend { mockSdkEventDistributor.registerEvent(capture(fetchMetaSlot)) } returns mockEventWaiter
+            everySuspend { mockSdkEventManager.registerEvent(capture(fetchMetaSlot)) } returns mockEventWaiter
+            everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
             everySuspend { mockStringStorage.put(any(), any()) } returns Unit
             everySuspend { mockSdkContext.features } returns mutableSetOf(EmbeddedMessaging)
             everySuspend { mockLanguageTagValidator.isValid("zh-Hans-CN") } returns true
@@ -131,8 +134,9 @@ class LanguageHandlerTests {
 
             verifySuspend {
                 mockStringStorage.put(LANGUAGE_STORAGE_KEY, "zh-Hans-CN")
-                mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.Sdk.RegisterDeviceInfo>())
-                mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMeta>())
+                mockSdkEventManager.registerEvent(any<SdkEvent.Internal.Sdk.ChangeLanguage>())
+                mockSdkEventManager.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMeta>())
+                mockSdkEventManager.emitEvent(any<SdkEvent.Internal.EmbeddedMessaging.TriggerRefresh>())
             }
             fetchMetaSlot.values.first().type shouldBe "fetchMeta"
         }
@@ -145,7 +149,7 @@ class LanguageHandlerTests {
                 Result.failure(RuntimeException("any"))
             )
             everySuspend { mockEventWaiter.await<Exception>() } returns failureDeviceEventResponse
-            everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mockEventWaiter
+            everySuspend { mockSdkEventManager.registerEvent(any()) } returns mockEventWaiter
             everySuspend { mockStringStorage.put(any(), any()) } returns Unit
             everySuspend { mockSdkContext.features } returns mutableSetOf(EmbeddedMessaging)
             everySuspend { mockLanguageTagValidator.isValid("zh-Hans-CN") } returns true
@@ -155,9 +159,10 @@ class LanguageHandlerTests {
 
             verifySuspend {
                 mockStringStorage.put(LANGUAGE_STORAGE_KEY, "zh-Hans-CN")
-                mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.Sdk.RegisterDeviceInfo>())
+                mockSdkEventManager.registerEvent(any<SdkEvent.Internal.Sdk.ChangeLanguage>())
             }
-            verifySuspend(VerifyMode.exactly(0)) { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMeta>()) }
+            verifySuspend(VerifyMode.exactly(0)) { mockSdkEventManager.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMeta>()) }
+            verifySuspend(VerifyMode.exactly(0)) { mockSdkEventManager.emitEvent(any<SdkEvent.Internal.EmbeddedMessaging.TriggerRefresh>()) }
         }
 
     @Test
@@ -168,7 +173,7 @@ class LanguageHandlerTests {
                 Result.success(Unit)
             )
             everySuspend { mockEventWaiter.await<Unit>() } returns successDeviceEventResponse
-            everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mockEventWaiter
+            everySuspend { mockSdkEventManager.registerEvent(any()) } returns mockEventWaiter
             everySuspend { mockStringStorage.put(any(), any()) } returns Unit
             everySuspend { mockSdkContext.features } returns mutableSetOf()
             everySuspend { mockLanguageTagValidator.isValid("zh-Hans-CN") } returns true
@@ -178,9 +183,10 @@ class LanguageHandlerTests {
 
             verifySuspend {
                 mockStringStorage.put(LANGUAGE_STORAGE_KEY, "zh-Hans-CN")
-                mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.Sdk.RegisterDeviceInfo>())
+                mockSdkEventManager.registerEvent(any<SdkEvent.Internal.Sdk.ChangeLanguage>())
             }
-            verifySuspend(VerifyMode.exactly(0)) { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMeta>()) }
+            verifySuspend(VerifyMode.exactly(0)) { mockSdkEventManager.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMeta>()) }
+            verifySuspend(VerifyMode.exactly(0)) { mockSdkEventManager.emitEvent(any<SdkEvent.Internal.EmbeddedMessaging.TriggerRefresh>()) }
         }
 
     @Test
@@ -191,7 +197,7 @@ class LanguageHandlerTests {
                 Result.success(Unit)
             )
             everySuspend { mockEventWaiter.await<Unit>() } returns successDeviceEventResponse
-            everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mockEventWaiter
+            everySuspend { mockSdkEventManager.registerEvent(any()) } returns mockEventWaiter
             everySuspend { mockStringStorage.put(any(), any()) } returns Unit
             everySuspend { mockSdkContext.features } returns mutableSetOf()
             everySuspend { mockLogger.debug(any<String>()) } returns Unit
@@ -200,8 +206,9 @@ class LanguageHandlerTests {
 
             verifySuspend {
                 mockStringStorage.put(LANGUAGE_STORAGE_KEY, null)
-                mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.Sdk.RegisterDeviceInfo>())
+                mockSdkEventManager.registerEvent(any<SdkEvent.Internal.Sdk.ChangeLanguage>())
             }
-            verifySuspend(VerifyMode.exactly(0)) { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMeta>()) }
+            verifySuspend(VerifyMode.exactly(0)) { mockSdkEventManager.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMeta>()) }
+            verifySuspend(VerifyMode.exactly(0)) { mockSdkEventManager.emitEvent(any<SdkEvent.Internal.EmbeddedMessaging.TriggerRefresh>()) }
         }
 }

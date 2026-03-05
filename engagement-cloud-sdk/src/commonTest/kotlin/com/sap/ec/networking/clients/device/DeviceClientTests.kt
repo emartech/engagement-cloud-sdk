@@ -275,7 +275,7 @@ class DeviceClientTests {
         verifySuspend {
             mockClientExceptionHandler.handleException(
                 testException,
-                "DeviceClient - consumeRegisterDeviceInfo",
+                "DeviceClient - consume RegisterDeviceInfo",
                 registerDeviceInfoEvent
             )
         }
@@ -312,4 +312,51 @@ class DeviceClientTests {
             )
         }
     }
+
+    @Test
+    fun testConsumer_should_send_deviceInfo_to_client_service_when_ChangeLanguage_event_received() = runTest {
+        createDeviceClient(backgroundScope).register()
+
+        val request = UrlRequest(
+            URL,
+            HttpMethod.Post,
+            NEW_DEVICE_INFO
+        )
+        val expectedResponse = Response(
+            request,
+            HttpStatusCode.OK,
+            headers {
+                append("Content-Type", "application/json")
+                append("X-Client-State", "testClientState")
+            },
+            """{"refreshToken":"testRefreshToken", "contactToken":"testContactToken"}"""
+        )
+        everySuspend { mockEcClient.send(any()) } returns Result.success(expectedResponse)
+        everySuspend { mockContactTokenHandler.handleContactTokens(expectedResponse) } returns Unit
+        val changeLanguageEvent = SdkEvent.Internal.Sdk.ChangeLanguage()
+
+        val onlineSdkEvents = backgroundScope.async {
+            onlineEvents.take(1).toList()
+        }
+
+        onlineEvents.emit(changeLanguageEvent)
+
+        advanceUntilIdle()
+
+        onlineSdkEvents.await() shouldBe listOf(changeLanguageEvent)
+        verifySuspend {
+            mockDeviceInfoCollector.collect()
+            mockUrlFactory.create(ECUrlType.RegisterDeviceInfo)
+            mockEcClient.send(request)
+            mockContactTokenHandler.handleContactTokens(expectedResponse)
+            mockEventsDao.removeEvent(changeLanguageEvent)
+            mockSdkEventManager.emitEvent(
+                SdkEvent.Internal.Sdk.Answer.Response(
+                    originId = changeLanguageEvent.id,
+                    Result.success(Unit)
+                )
+            )
+        }
+    }
+
 }

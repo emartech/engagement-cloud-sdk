@@ -150,6 +150,9 @@ class ContactClientTests {
                 )
             )
         }
+        verifySuspend {
+            mockSdkEventManager.emitEvent(any<SdkEvent.Internal.EmbeddedMessaging.TriggerRefresh>())
+        }
 
     }
 
@@ -188,6 +191,9 @@ class ContactClientTests {
                 )
             )
         }
+        verifySuspend {
+            mockSdkEventManager.emitEvent(any<SdkEvent.Internal.EmbeddedMessaging.TriggerRefresh>())
+        }
     }
 
     @Test
@@ -216,6 +222,9 @@ class ContactClientTests {
                 )
             )
         }
+        verifySuspend {
+            mockSdkEventManager.emitEvent(any<SdkEvent.Internal.EmbeddedMessaging.TriggerRefresh>())
+        }
     }
 
     @Test
@@ -240,6 +249,9 @@ class ContactClientTests {
                     Result.success(testResponse)
                 )
             )
+        }
+        verifySuspend {
+            mockSdkEventManager.emitEvent(any<SdkEvent.Internal.EmbeddedMessaging.TriggerRefresh>())
         }
     }
 
@@ -280,6 +292,9 @@ class ContactClientTests {
                 )
             )
         }
+        verifySuspend(VerifyMode.exactly(0)) {
+            mockSdkEventManager.emitEvent(any<SdkEvent.Internal.EmbeddedMessaging.TriggerRefresh>())
+        }
     }
 
     @Test
@@ -314,6 +329,9 @@ class ContactClientTests {
                         Result.success(Unit)
                     )
                 )
+            }
+            verifySuspend(VerifyMode.exactly(0)) {
+                mockSdkEventManager.emitEvent(any<SdkEvent.Internal.EmbeddedMessaging.TriggerRefresh>())
             }
 
         }

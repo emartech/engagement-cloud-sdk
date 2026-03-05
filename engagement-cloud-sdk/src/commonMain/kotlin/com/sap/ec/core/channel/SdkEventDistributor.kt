@@ -99,6 +99,15 @@ internal class SdkEventDistributor(
         }
     }
 
+    /**
+     * Registers an [SdkEvent] by persisting [OnlineSdkEvent] instances to the database and
+     * emitting the event to the SDK event flow. Returns an [SdkEventWaiterApi] that can be
+     * used to await a response event matching the original event's id.
+     *
+     * Events implementing [OnlineSdkEvent] are stored in the database so they survive app
+     * restarts and can be retried. Non-[OnlineSdkEvent] events are emitted to the flow
+     * without persistence.
+     */
     override suspend fun registerEvent(sdkEvent: SdkEvent): SdkEventWaiterApi {
         return try {
             if (sdkEvent is OnlineSdkEvent) {
@@ -130,6 +139,12 @@ internal class SdkEventDistributor(
         _sdkPublicEventFlow.emit(sdkEvent)
     }
 
+    /**
+     * Emits an [SdkEvent] directly to the SDK event flow without persisting it to the database.
+     *
+     * Use this method for local signaling events that do not need to survive app restarts
+     * or be retried on failure.
+     */
     override suspend fun emitEvent(sdkEvent: SdkEvent) {
         try {
             _sdkEventFlow.emit(sdkEvent)

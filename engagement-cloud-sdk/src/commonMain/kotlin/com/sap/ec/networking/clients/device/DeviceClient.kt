@@ -45,9 +45,9 @@ internal class DeviceClient(
 
     private suspend fun startEventConsumer() {
         sdkEventManager.onlineSdkEvents
-            .filter { it is SdkEvent.Internal.Sdk.RegisterDeviceInfo }
+            .filter { it is SdkEvent.Internal.Sdk.RegisterDeviceInfo || it is SdkEvent.Internal.Sdk.ChangeLanguage }
             .collect { sdkEvent ->
-                sdkLogger.debug("DeviceClient - consumeRegisterDeviceInfo")
+                sdkLogger.debug("DeviceClient - consume ${sdkEvent::class.simpleName}")
                 try {
                     val deviceInfo = deviceInfoCollector.collect()
                     if (deviceInfoUpdater.hasDeviceInfoChanged(deviceInfo)) {
@@ -97,7 +97,7 @@ internal class DeviceClient(
         }
         clientExceptionHandler.handleException(
             exception,
-            "DeviceClient - consumeRegisterDeviceInfo",
+            "DeviceClient - consume ${sdkEvent::class.simpleName}",
             sdkEvent
         )
     }

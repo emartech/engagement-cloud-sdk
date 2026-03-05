@@ -20,6 +20,7 @@ object SdkConstants {
     const val DISMISS_EVENT_NAME = "dismiss"
     const val REREGISTRATION_REQUIRED_EVENT_NAME = "reregistrationRequired"
     const val REGISTER_DEVICE_INFO_EVENT_NAME = "registerDeviceInfo"
+    const val CHANGE_LANGUAGE_EVENT_NAME = "changeLanguage"
     const val DEVICE_INFO_READY_EVENT_NAME = "DeviceInfoReady"
     const val REGISTER_PUSH_TOKEN_EVENT_NAME = "registerPushToken"
     const val CLEAR_PUSH_TOKEN_EVENT_NAME = "clearPushToken"

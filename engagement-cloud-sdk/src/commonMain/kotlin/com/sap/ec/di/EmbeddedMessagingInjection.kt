@@ -62,7 +62,8 @@ object EmbeddedMessagingInjection {
                 connectionWatchDog = get<ConnectionWatchDog>(),
                 locallyDeletedMessageIds = MutableStateFlow(emptySet()),
                 locallyOpenedMessageIds = MutableStateFlow(emptySet()),
-                platformCategoryProvider = get()
+                platformCategoryProvider = get(),
+                sdkEventDistributor = get()
             )
         }
         single<EmbeddedMessagingInstance>(named(InstanceType.Logging)) {

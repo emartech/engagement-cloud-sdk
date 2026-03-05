@@ -109,6 +109,7 @@ internal class ContactClient(
                 Result.success(response)
             )
         )
+        sdkEventManager.emitEvent(SdkEvent.Internal.EmbeddedMessaging.TriggerRefresh())
     }
 
     private fun isContactEvent(event: OnlineSdkEvent): Boolean {

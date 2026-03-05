@@ -55,7 +55,7 @@ object ConfigInjection {
             LanguageHandler(
                 stringStorage = get(),
                 languageTagValidator = get(),
-                sdkEventDistributor = get(),
+                sdkEventManager = get(),
                 logger = get { parametersOf(LanguageHandler::class.simpleName) },
                 sdkContext = get()
             )

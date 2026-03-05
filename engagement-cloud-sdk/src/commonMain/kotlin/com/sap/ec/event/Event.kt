@@ -5,6 +5,7 @@ import com.sap.ec.SdkConstants.APPLY_APPCODE_BASED_REMOTE_CONFIG_EVENT_NAME
 import com.sap.ec.SdkConstants.APPLY_GLOBAL_REMOTE_CONFIG_EVENT_NAME
 import com.sap.ec.SdkConstants.APP_START_EVENT_NAME
 import com.sap.ec.SdkConstants.CHANGE_APP_CODE_NAME
+import com.sap.ec.SdkConstants.CHANGE_LANGUAGE_EVENT_NAME
 import com.sap.ec.SdkConstants.CLEAR_PUSH_TOKEN_EVENT_NAME
 import com.sap.ec.SdkConstants.DISMISS_EVENT_NAME
 import com.sap.ec.SdkConstants.INAPP_VIEWED_EVENT_NAME
@@ -209,6 +210,14 @@ sealed interface SdkEvent {
                 val filterUnopenedMessages: Boolean = false
             ) : EmbeddedMessaging
 
+
+            @Serializable
+            data class TriggerRefresh(
+                override val type: String = "triggerRefresh",
+                override val id: String = UUIDProvider().provide(),
+                override val timestamp: Instant = TimestampProvider().provide()
+            ) : Internal
+
             @Serializable
             data class FetchMeta(
                 override val id: String = UUIDProvider().provide(),
@@ -312,6 +321,14 @@ sealed interface SdkEvent {
                 override var nackCount: Int = 0,
                 val name: String = REGISTER_DEVICE_INFO_EVENT_NAME
             ) : Sdk(), OnlineSdkEvent, SetupFlowEvent
+
+            @Serializable
+            data class ChangeLanguage(
+                override val id: String = UUIDProvider().provide(),
+                override val timestamp: Instant = TimestampProvider().provide(),
+                override var nackCount: Int = 0,
+                val name: String = CHANGE_LANGUAGE_EVENT_NAME
+            ) : Sdk(), OnlineSdkEvent
 
             @Serializable
             data class RegisterPushToken(
@@ -514,5 +531,6 @@ sealed interface SdkEvent {
             override val id: String = UUIDProvider().provide(),
             override val timestamp: Instant,
         ) : Internal
+
     }
 }

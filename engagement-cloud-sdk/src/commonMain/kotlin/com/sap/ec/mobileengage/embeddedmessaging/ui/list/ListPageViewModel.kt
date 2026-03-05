@@ -2,21 +2,26 @@ package com.sap.ec.mobileengage.embeddedmessaging.ui.list
 
 import androidx.paging.cachedIn
 import androidx.paging.map
+import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.providers.InstantProvider
 import com.sap.ec.core.providers.platform.PlatformCategoryProviderApi
+import com.sap.ec.event.SdkEvent
 import com.sap.ec.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
 import com.sap.ec.networking.clients.embedded.messaging.model.MessageCategory
 import com.sap.ec.watchdog.connection.ConnectionWatchDog
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.stateIn
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -30,7 +35,8 @@ internal class ListPageViewModel(
     connectionWatchDog: ConnectionWatchDog,
     private val locallyDeletedMessageIds: MutableStateFlow<Set<String>>,
     private val locallyOpenedMessageIds: MutableStateFlow<Set<String>>,
-    platformCategoryProvider: PlatformCategoryProviderApi
+    platformCategoryProvider: PlatformCategoryProviderApi,
+    sdkEventDistributor: SdkEventDistributorApi
 ) : ListPageViewModelApi {
     private val _categories = MutableStateFlow<List<MessageCategory>>(emptyList())
     override val categories: StateFlow<List<MessageCategory>> = _categories.asStateFlow()
@@ -56,16 +62,26 @@ internal class ListPageViewModel(
     private var lastRefreshTimestamp: Instant? = null
 
     private val triggerFromJS = MutableStateFlow(false)
+    private val refreshTrigger = MutableStateFlow(false)
 
     override val platformCategory: String = platformCategoryProvider.provide()
+
+    init {
+        coroutineScope.launch(start= CoroutineStart.UNDISPATCHED) {
+            sdkEventDistributor.sdkEventFlow
+                .filter { it is SdkEvent.Internal.EmbeddedMessaging.TriggerRefresh }
+                .collect { refreshTrigger.value = !refreshTrigger.value }
+        }
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _messagePagingDataFlowFromApi =
         combine(
             _filterUnopenedOnly,
             _selectedCategoryIds,
-            triggerFromJS
-        ) { filterUnopenedOnly, selectedCategoryIds, _ ->
+            triggerFromJS,
+            refreshTrigger
+        ) { filterUnopenedOnly, selectedCategoryIds, _, _ ->
             Pair(filterUnopenedOnly, selectedCategoryIds)
         }
             .flatMapLatest { pair ->
