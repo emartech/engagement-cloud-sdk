@@ -3,6 +3,12 @@
     <title>Engagement Cloud SDK demo</title>
     <!--    <script src="engagement-cloud-sdk-html.js"></script>-->
     <script src="engagement-cloud-sdk-loader.js"></script>
+    <script>
+        // test for a call that happens immediately after the loader's script tag
+        EngagementCloud.event.track({type: "CUSTOM", name: "TEST AFTER LOADER", attributes: {"key1": "value1"}})
+            .then(() => console.log("Tracking Event successful"))
+            .catch(e => console.error(e))
+    </script>
     <style>
         .selected {
             background-color:red;
@@ -47,7 +53,8 @@
         </div>
         <div class="detail-view-display">
             <p>Detail view</p>
-            <ec-embedded-messaging custom-message-item-element-name="custom-message-item"></ec-embedded-messaging>
+            <ec-embedded-messaging
+                    custom-message-item-element-name="custom-message-item"></ec-embedded-messaging>
         </div>
     </div>
 </div>
@@ -81,11 +88,11 @@
 
     document.getElementById("button-custom-event").onclick = async () => {
         const name = document.getElementById("customEventNameInput").value;
-        await engagementCloud.event.trackEvent({name: name, attributes: {"key1": "value1"}});
+        await engagementCloud.event.track({type: "CUSTOM", name: name, attributes: {"key1": "value1"}});
     }
 
     document.getElementById("button-navigate-event").onclick = async () => {
-        await engagementCloud.event.trackNavigation("https://www.emarsys.com");
+        await engagementCloud.event.track({ type: "NAVIGATE", location: "https://www.emarsys.com" });
     }
 
     document.getElementById("button-disable-sdk").onclick = async () => {

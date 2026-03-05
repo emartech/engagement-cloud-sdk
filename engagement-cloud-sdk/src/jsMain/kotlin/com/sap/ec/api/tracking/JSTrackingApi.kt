@@ -1,12 +1,11 @@
 package com.sap.ec.api.tracking
 
-import com.sap.ec.api.tracking.model.JsCustomEvent
+import com.sap.ec.api.tracking.model.JsTrackedEvent
 
 @OptIn(ExperimentalJsExport::class)
 @JsExport
 interface JSTrackingApi {
 
-    suspend fun trackEvent(event: JsCustomEvent)
+    suspend fun track(event: JsTrackedEvent)
 
-    suspend fun trackNavigation(location: String)
 }

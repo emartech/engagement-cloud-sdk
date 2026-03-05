@@ -1,5 +1,6 @@
 package com.sap.ec.api.tracking.model
 
+
 /**
  * Represents a custom event that can be tracked using the SDK.
  *
@@ -8,7 +9,11 @@ package com.sap.ec.api.tracking.model
  */
 @OptIn(ExperimentalJsExport::class)
 @JsExport
-interface JsCustomEvent {
+@JsName("CustomEvent")
+interface JsCustomEvent : JsTrackedEvent {
+    override val type: String
+        get() = JsEventType.CUSTOM.name
+
     val name: String
 
     val attributes: dynamic

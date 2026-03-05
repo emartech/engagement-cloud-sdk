@@ -36,7 +36,7 @@
       "linkAuthenticated",
       "unlink",
     ]),
-    event: createApiSegment("event", ["trackNavigation", "trackEvent"]),
+    event: createApiSegment("event", ["track"]),
     push: createApiSegment("push", [
       "registerPushToken",
       "clearPushToken",

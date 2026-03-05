@@ -98,7 +98,7 @@ describe("engagement-cloud-sdk-loader", function () {
 
     triggerSDKLoadedEvent(window);
 
-    await window.EngagementCloud.event.trackEvent(testEvent);
+            await window.EngagementCloud.event.track(testEvent);
 
     assert.equal(spyGathererDisable.mock.callCount(), 1);
     assert.equal(mockDisable.mock.callCount(), 1);
@@ -180,10 +180,10 @@ async function createTestEnvironment() {
     ready: Promise.resolve(),
     setup: { disable: mockDisable },
     push: { registerPushToken: mockRegisterPushToken },
-    event: { trackEvent: mockTrackCustomEvent },
-    getInstance: () => engagementCloudHtml,
-    initializeSdk: mockInitializeSdk,
-  };
+        event: {track: mockTrackCustomEvent},
+        getInstance: () => engagementCloudHtml,
+        initializeSdk: mockInitializeSdk,
+    }
 
   dom.window["engagement-cloud-sdk"] = {
     EngagementCloud: engagementCloudHtml,

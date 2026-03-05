@@ -297,7 +297,12 @@ object WebInjection {
             )
         }
         single<JSContactApi> { JSContact(contactApi = get()) }
-        single<JSTrackingApi> { JSTracking(trackingApi = get()) }
+        single<JSTrackingApi> {
+            JSTracking(
+                trackingApi = get(),
+                sdkLogger = get { parametersOf(JSTracking::class.simpleName) }
+            )
+        }
         single<JSPushApi> { JSPush(pushApi = get()) }
         single<JSDeepLinkApi> { JSDeepLink(deepLinkApi = get()) }
         single<JSInAppApi> { JSInApp(inAppApi = get()) }
