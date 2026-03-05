@@ -13,13 +13,13 @@ internal class IosSdkConfigStore(
 
     override suspend fun store(config: SdkConfig) {
         typedStorage.put(
-            StorageConstants.SDK_CONFIG_KEY,
+            StorageConstants.SDK_CONFIG_STORAGE_KEY,
             IosEngagementCloudSDKConfig.serializer(),
             config as IosEngagementCloudSDKConfig
         )
     }
 
     override suspend fun clear() {
-        typedStorage.remove(StorageConstants.SDK_CONFIG_KEY)
+        typedStorage.remove(StorageConstants.SDK_CONFIG_STORAGE_KEY)
     }
 }

@@ -6,13 +6,14 @@ import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
 import androidx.core.database.sqlite.transaction
-import com.sap.ec.SdkConstants
+import com.sap.ec.SdkConstants.LEGACY_SDK_MIGRATION_DONE_KEY
 import com.sap.ec.api.push.PushConstants
 import com.sap.ec.applicationContext
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.context.RequestContext
 import com.sap.ec.core.networking.context.RequestContextApi
 import com.sap.ec.core.storage.StorageConstants
+import com.sap.ec.core.storage.StorageConstants.CLIENT_ID_STORAGE_KEY
 import com.sap.ec.core.storage.StringStorage
 import com.sap.ec.db_migration.LegacyDBOpenHelper
 import com.sap.ec.db_migration.LegacySharedPreferencesWrapper
@@ -69,7 +70,7 @@ class LegacySDKMigrationStateTest {
             Context.MODE_PRIVATE
         )
         stringStorageSpy = spyk(StringStorage(sharedPreferences))
-        stringStorageSpy.put(SdkConstants.LEGACY_SDK_MIGRATION_DONE_KEY, null)
+        stringStorageSpy.put(LEGACY_SDK_MIGRATION_DONE_KEY, null)
         legacyDBOpenHelper = LegacyDBOpenHelper(applicationContext)
         requestContextSpy = spyk(RequestContext())
         legacySDKMigrationState = LegacySDKMigrationState(
@@ -84,7 +85,7 @@ class LegacySDKMigrationStateTest {
             sdkLogger = mockSdkLogger
         )
 
-        stringStorageSpy.put(SdkConstants.LEGACY_SDK_MIGRATION_DONE_KEY, null)
+        stringStorageSpy.put(LEGACY_SDK_MIGRATION_DONE_KEY, null)
         legacySharedPreferences.edit().clear().apply()
         stringStorageSpy.put("mobile_engage_contact_token", null)
         stringStorageSpy.put("mobile_engage_refresh_token", null)
@@ -128,13 +129,13 @@ class LegacySDKMigrationStateTest {
         legacySDKMigrationState.active()
 
         coVerify {
-            stringStorageSpy.put(SdkConstants.CLIENT_ID_STORAGE_KEY, TEST_CLIENT_ID)
+            stringStorageSpy.put(CLIENT_ID_STORAGE_KEY, TEST_CLIENT_ID)
             requestContextSpy.contactToken = TEST_CONTACT_TOKEN
             requestContextSpy.refreshToken = TEST_REFRESH_TOKEN
             requestContextSpy.clientState = TEST_CLIENT_STATE
             stringStorageSpy.put(PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY, TEST_PUSH_TOKEN)
             requestContextSpy.deviceEventState = TEST_DEVICE_EVENT_STATE
-            stringStorageSpy.put(SdkConstants.LEGACY_SDK_MIGRATION_DONE_KEY, "true")
+            stringStorageSpy.put(LEGACY_SDK_MIGRATION_DONE_KEY, "true")
         }
     }
 
@@ -164,10 +165,10 @@ class LegacySDKMigrationStateTest {
             legacySDKMigrationState.active()
 
             coVerify {
-                stringStorageSpy.get(SdkConstants.LEGACY_SDK_MIGRATION_DONE_KEY)
-                stringStorageSpy.put(SdkConstants.CLIENT_ID_STORAGE_KEY, TEST_CLIENT_ID)
+                stringStorageSpy.get(LEGACY_SDK_MIGRATION_DONE_KEY)
+                stringStorageSpy.put(CLIENT_ID_STORAGE_KEY, TEST_CLIENT_ID)
                 requestContextSpy.contactToken = TEST_CONTACT_TOKEN
-                stringStorageSpy.put(SdkConstants.LEGACY_SDK_MIGRATION_DONE_KEY, "true")
+                stringStorageSpy.put(LEGACY_SDK_MIGRATION_DONE_KEY, "true")
             }
             confirmVerified(requestContextSpy)
             confirmVerified(stringStorageSpy)
@@ -175,12 +176,12 @@ class LegacySDKMigrationStateTest {
 
     @Test
     fun active_shouldReturn_whenDataHasAlreadyBeenMigrated() = runTest {
-        stringStorageSpy.put(SdkConstants.LEGACY_SDK_MIGRATION_DONE_KEY, "true")
+        stringStorageSpy.put(LEGACY_SDK_MIGRATION_DONE_KEY, "true")
         clearMocks(stringStorageSpy)
 
         legacySDKMigrationState.active()
 
-        coVerify { stringStorageSpy.get(SdkConstants.LEGACY_SDK_MIGRATION_DONE_KEY) }
+        coVerify { stringStorageSpy.get(LEGACY_SDK_MIGRATION_DONE_KEY) }
         confirmVerified(stringStorageSpy)
     }
 

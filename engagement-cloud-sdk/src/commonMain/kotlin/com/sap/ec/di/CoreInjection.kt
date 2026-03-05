@@ -225,10 +225,9 @@ enum class SdkConfigStoreTypes {
 }
 
 object PersistentListIds {
-    const val PUSH_CONTEXT_PERSISTENT_ID = "pushContextPersistentId"
-    const val INAPP_CONTEXT_PERSISTENT_ID = "inAppContextPersistentId"
-    const val CONFIG_CONTEXT_PERSISTENT_ID = "configContextPersistentId"
-    const val CONTACT_CONTEXT_PERSISTENT_ID = "contactContextPersistentId"
-    const val EVENT_TRACKER_CONTEXT_PERSISTENT_ID = "eventTrackerContextPersistentId"
-
+    const val PUSH_CONTEXT_PERSISTENT_ID = "SAPEngagementCloudSdkPushContextCalls"
+    const val INAPP_CONTEXT_PERSISTENT_ID = "SAPEngagementCloudSdkInAppContextCalls"
+    const val CONFIG_CONTEXT_PERSISTENT_ID = "SAPEngagementCloudSdkConfigContextCalls"
+    const val CONTACT_CONTEXT_PERSISTENT_ID = "SAPEngagementCloudSdkContactContextCalls"
+    const val EVENT_TRACKER_CONTEXT_PERSISTENT_ID = "SAPEngagementCloudSdkEventTrackerContextCalls"
 }

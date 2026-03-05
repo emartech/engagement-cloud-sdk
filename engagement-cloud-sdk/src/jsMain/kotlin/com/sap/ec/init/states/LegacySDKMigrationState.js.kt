@@ -6,6 +6,7 @@ import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.context.RequestContextApi
 import com.sap.ec.core.state.State
+import com.sap.ec.core.storage.StorageConstants.CLIENT_ID_STORAGE_KEY
 import com.sap.ec.core.storage.StringStorageApi
 import com.sap.ec.util.runCatchingWithoutCancellation
 import kotlinx.serialization.json.Json
@@ -102,7 +103,7 @@ internal actual class LegacySDKMigrationState(
                     ?.content
             }.onSuccess { clientId ->
                 clientId?.let {
-                    stringStorage.put(SdkConstants.CLIENT_ID_STORAGE_KEY, it)
+                    stringStorage.put(CLIENT_ID_STORAGE_KEY, it)
                     sdkLogger.debug("Migrated legacy clientId.")
                 }
             }.onFailure { e ->

@@ -13,13 +13,13 @@ internal class JsECConfigStore(
 
     override suspend fun store(config: SdkConfig) {
         typedStorage.put(
-            StorageConstants.SDK_CONFIG_KEY,
+            StorageConstants.SDK_CONFIG_STORAGE_KEY,
             JsEngagementCloudSDKConfig.serializer(),
             config as JsEngagementCloudSDKConfig
         )
     }
 
     override suspend fun clear() {
-        typedStorage.remove(StorageConstants.SDK_CONFIG_KEY)
+        typedStorage.remove(StorageConstants.SDK_CONFIG_STORAGE_KEY)
     }
 }

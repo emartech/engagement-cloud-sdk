@@ -6,6 +6,7 @@ import com.sap.ec.api.push.PushConstants
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.context.RequestContextApi
 import com.sap.ec.core.state.State
+import com.sap.ec.core.storage.StorageConstants.CLIENT_ID_STORAGE_KEY
 import com.sap.ec.core.storage.StringStorageApi
 import com.sap.ec.db_migration.LegacySharedPreferencesWrapper
 import kotlinx.coroutines.CoroutineDispatcher
@@ -48,7 +49,7 @@ internal actual class LegacySDKMigrationState(
                 ).use {
                     if (it.moveToFirst()) {
                         it.getString(0)?.let { legacyClientId ->
-                            stringStorage.put(SdkConstants.CLIENT_ID_STORAGE_KEY, legacyClientId)
+                            stringStorage.put(CLIENT_ID_STORAGE_KEY, legacyClientId)
                             sdkLogger.debug("Migrated legacy client id.")
                         }
                     }

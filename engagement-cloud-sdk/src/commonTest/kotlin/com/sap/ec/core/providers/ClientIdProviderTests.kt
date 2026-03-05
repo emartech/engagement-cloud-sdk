@@ -1,6 +1,6 @@
 package com.sap.ec.core.providers
 
-import com.sap.ec.SdkConstants
+import com.sap.ec.core.storage.StorageConstants.CLIENT_ID_STORAGE_KEY
 import com.sap.ec.core.storage.StringStorageApi
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -32,18 +32,18 @@ class ClientIdProviderTests {
 
     @Test
     fun testProvide_shouldProvideClientId_from_storage() = runTest {
-        everySuspend { mockStringStorage.get(SdkConstants.CLIENT_ID_STORAGE_KEY) } returns CLIENT_ID
+        everySuspend { mockStringStorage.get(CLIENT_ID_STORAGE_KEY) } returns CLIENT_ID
 
         provider.provide() shouldBe CLIENT_ID
     }
 
     @Test
     fun testProvide_shouldGenerate_andStoreNewId_when_no_clientId_in_storage() = runTest {
-        everySuspend { mockStringStorage.get(SdkConstants.CLIENT_ID_STORAGE_KEY) } returns null
-        everySuspend { mockStringStorage.put(SdkConstants.CLIENT_ID_STORAGE_KEY, UUID) } returns Unit
+        everySuspend { mockStringStorage.get(CLIENT_ID_STORAGE_KEY) } returns null
+        everySuspend { mockStringStorage.put(CLIENT_ID_STORAGE_KEY, UUID) } returns Unit
         everySuspend { mockUUIDProvider.provide() } returns UUID
 
         provider.provide() shouldBe UUID
-        verifySuspend { mockStringStorage.put(SdkConstants.CLIENT_ID_STORAGE_KEY, UUID) }
+        verifySuspend { mockStringStorage.put(CLIENT_ID_STORAGE_KEY, UUID) }
     }
 }

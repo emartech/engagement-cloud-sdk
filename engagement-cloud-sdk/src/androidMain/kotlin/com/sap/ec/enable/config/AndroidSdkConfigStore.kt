@@ -13,13 +13,13 @@ internal class AndroidSdkConfigStore(
 
     override suspend fun store(config: SdkConfig) {
         typedStorage.put(
-            StorageConstants.SDK_CONFIG_KEY,
+            StorageConstants.SDK_CONFIG_STORAGE_KEY,
             AndroidEngagementCloudSDKConfig.serializer(),
             config as AndroidEngagementCloudSDKConfig
         )
     }
 
     override suspend fun clear() {
-        typedStorage.remove(StorageConstants.SDK_CONFIG_KEY)
+        typedStorage.remove(StorageConstants.SDK_CONFIG_STORAGE_KEY)
     }
 }

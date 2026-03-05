@@ -1,6 +1,6 @@
 package com.sap.ec.core.device
 
-import com.sap.ec.core.device.DeviceConstants.DEVICE_INFO_STORAGE_KEY
+import com.sap.ec.core.storage.StorageConstants.DEVICE_INFO_STORAGE_KEY
 import com.sap.ec.core.storage.StringStorageApi
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns

@@ -2,7 +2,6 @@ package com.sap.ec.networking.clients.device
 
 import com.sap.ec.core.channel.SdkEventManagerApi
 import com.sap.ec.core.db.events.EventsDaoApi
-import com.sap.ec.core.device.DeviceConstants.DEVICE_INFO_STORAGE_KEY
 import com.sap.ec.core.device.DeviceInfoCollectorApi
 import com.sap.ec.core.device.DeviceInfoUpdater
 import com.sap.ec.core.device.DeviceInfoUpdaterApi
@@ -11,6 +10,7 @@ import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.clients.NetworkClientApi
 import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.networking.model.UrlRequest
+import com.sap.ec.core.storage.StorageConstants.DEVICE_INFO_STORAGE_KEY
 import com.sap.ec.core.url.ECUrlType
 import com.sap.ec.core.url.UrlFactoryApi
 import com.sap.ec.event.OnlineSdkEvent

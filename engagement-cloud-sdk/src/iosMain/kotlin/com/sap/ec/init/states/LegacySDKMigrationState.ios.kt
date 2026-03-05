@@ -7,6 +7,7 @@ import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.context.RequestContextApi
 import com.sap.ec.core.state.State
 import com.sap.ec.core.storage.KeychainStorageApi
+import com.sap.ec.core.storage.StorageConstants.CLIENT_ID_STORAGE_KEY
 import com.sap.ec.core.storage.StringStorageApi
 import com.sap.ec.util.runCatchingWithoutCancellation
 import kotlinx.cinterop.BetaInteropApi
@@ -70,7 +71,7 @@ internal actual class LegacySDKMigrationState(
     private suspend fun migrateClientId() {
         runCatchingWithoutCancellation {
             find(KEY_HARDWARE_ID)?.let {
-                stringStorage.put(SdkConstants.CLIENT_ID_STORAGE_KEY, it)
+                stringStorage.put(CLIENT_ID_STORAGE_KEY, it)
                 sdkLogger.debug("Migrated legacy clientId")
             }
         }

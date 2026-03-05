@@ -1,6 +1,6 @@
 package com.sap.ec.core.providers
 
-import com.sap.ec.SdkConstants.CLIENT_ID_STORAGE_KEY
+import com.sap.ec.core.storage.StorageConstants.CLIENT_ID_STORAGE_KEY
 import com.sap.ec.core.storage.StringStorageApi
 
 internal class ClientIdProvider(

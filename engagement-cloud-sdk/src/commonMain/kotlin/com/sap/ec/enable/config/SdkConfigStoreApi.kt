@@ -10,7 +10,7 @@ internal interface SdkConfigStoreApi<out LoadedType : SdkConfig> {
     val deserializer: KSerializer<out LoadedType>
 
     suspend fun load(): LoadedType? {
-        return typedStorage.get(StorageConstants.SDK_CONFIG_KEY, deserializer)
+        return typedStorage.get(StorageConstants.SDK_CONFIG_STORAGE_KEY, deserializer)
     }
 
     suspend fun store(config: SdkConfig)

@@ -5,6 +5,7 @@ import com.sap.ec.api.push.PushConstants
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.context.RequestContextApi
+import com.sap.ec.core.storage.StorageConstants.CLIENT_ID_STORAGE_KEY
 import com.sap.ec.fake.FakeStringStorage
 import dev.mokkery.MockMode
 import dev.mokkery.matcher.any
@@ -103,7 +104,7 @@ class LegacySDKMigrationStateTests {
     fun active_shouldNotSetClientId_whenNoLegacyDatabaseExists() = runTest {
         migrationState.active()
 
-        fakeStringStorage.get(SdkConstants.CLIENT_ID_STORAGE_KEY) shouldBe null
+        fakeStringStorage.get(CLIENT_ID_STORAGE_KEY) shouldBe null
         verify(VerifyMode.exactly(0)) { mockRequestContext.contactToken = any() }
     }
 
@@ -150,7 +151,7 @@ class LegacySDKMigrationStateTests {
 
         migrationState.active()
 
-        fakeStringStorage.get(SdkConstants.CLIENT_ID_STORAGE_KEY) shouldBe TEST_CLIENT_ID
+        fakeStringStorage.get(CLIENT_ID_STORAGE_KEY) shouldBe TEST_CLIENT_ID
     }
 
     @Test
@@ -202,7 +203,7 @@ class LegacySDKMigrationStateTests {
 
         migrationState.active()
 
-        fakeStringStorage.get(SdkConstants.CLIENT_ID_STORAGE_KEY) shouldBe TEST_CLIENT_ID
+        fakeStringStorage.get(CLIENT_ID_STORAGE_KEY) shouldBe TEST_CLIENT_ID
         verify { mockRequestContext.contactToken = TEST_CONTACT_TOKEN }
         verify { mockRequestContext.refreshToken = TEST_REFRESH_TOKEN }
         verify { mockRequestContext.clientState = TEST_CLIENT_STATE }
@@ -216,7 +217,7 @@ class LegacySDKMigrationStateTests {
 
         migrationState.active()
 
-        fakeStringStorage.get(SdkConstants.CLIENT_ID_STORAGE_KEY) shouldBe null
+        fakeStringStorage.get(CLIENT_ID_STORAGE_KEY) shouldBe null
     }
 
     @Test
@@ -225,7 +226,7 @@ class LegacySDKMigrationStateTests {
 
         migrationState.active()
 
-        fakeStringStorage.get(SdkConstants.CLIENT_ID_STORAGE_KEY) shouldBe null
+        fakeStringStorage.get(CLIENT_ID_STORAGE_KEY) shouldBe null
     }
 
     @Test
@@ -237,7 +238,7 @@ class LegacySDKMigrationStateTests {
 
         migrationState.active()
 
-        fakeStringStorage.get(SdkConstants.CLIENT_ID_STORAGE_KEY) shouldBe null
+        fakeStringStorage.get(CLIENT_ID_STORAGE_KEY) shouldBe null
     }
 
     private suspend fun setupLegacyDatabase(vararg entries: Pair<String, String>) {

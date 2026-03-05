@@ -3,7 +3,6 @@ package com.sap.ec
 object SdkConstants {
     const val PUSH_CLICKED_EVENT_NAME = "push:click"
     const val BUTTON_CLICK_ORIGIN = "button"
-    const val CLIENT_ID_STORAGE_KEY = "clientId"
     const val IN_APP_BUTTON_CLICKED_EVENT_NAME = "click"
     const val SILENT_PUSH_RECEIVED_EVENT_NAME = "push:silentPushReceived"
     const val SESSION_START_EVENT_NAME = "session:start"
@@ -39,5 +38,5 @@ object SdkConstants {
     const val LANGUAGE_STORAGE_KEY = "customerOverwroteLanguageCodeKey"
     const val DEVICE_INFO_UPDATE_REQUIRED_EVENT_NAME = "deviceInfoUpdateRequired"
     const val PAGE_LOCATION_ATTRIBUTE_KEY = "url"
-    const val LEGACY_SDK_MIGRATION_DONE_KEY = "legacy_sdk_migration_done"
+    const val LEGACY_SDK_MIGRATION_DONE_KEY = "SAPEngagementCloudSdkLegacySdkMigrationDone"
 }
