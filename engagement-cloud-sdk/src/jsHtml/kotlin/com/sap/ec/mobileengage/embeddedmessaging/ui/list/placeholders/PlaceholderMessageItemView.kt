@@ -32,10 +32,6 @@ fun PlaceholderMessageItemView() {
         })
 
         Div({
-            classes(EmbeddedMessagingStyleSheet.messageItemImageSpacer)
-        })
-
-        Div({
             classes(EmbeddedMessagingStyleSheet.messageItemContent)
             style {
                 display(DisplayStyle.Flex)

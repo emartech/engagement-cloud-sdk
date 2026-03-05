@@ -123,7 +123,8 @@ private fun CategoryFilterChipsList(
             }) {
                 if (isSelected) {
                     SvgIcon(
-                        path = CHECK_ICON_PATH
+                        path = CHECK_ICON_PATH,
+                        className = "EmbeddedMessagingStyleSheet-svgCheckmarkIconSize"
                     )
                 }
                 Text(value)
@@ -174,7 +175,7 @@ private fun DialogActionButtons(
 @Composable
 internal fun SvgIcon(path: String, className: String? = null) {
     Svg(viewBox = "0 0 24 24", attrs = {
-        classes(EmbeddedMessagingStyleSheet.defaultSvgIconSize)
+        classes(EmbeddedMessagingStyleSheet.svgDefaultIconSize)
         className?.let { classes(it) }
         attr("fill", "currentColor")
     }) {

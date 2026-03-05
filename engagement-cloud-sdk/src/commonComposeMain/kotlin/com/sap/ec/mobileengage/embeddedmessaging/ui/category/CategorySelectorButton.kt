@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.BUTTON_LABEL_FONT_WEIGHT
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.FLOATING_ACTION_BUTTON_SIZE
 import com.sap.ec.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 import com.sap.ec.mobileengage.embeddedmessaging.ui.translation.LocalStringResources
@@ -39,7 +40,13 @@ fun CategorySelectorButton(
                 hoveredElevation = 0.dp,
                 focusedElevation = 0.dp
             ),
-            text = { Text(LocalStringResources.current.categoriesFilterButtonLabel) },
+            text = {
+                Text(
+                    LocalStringResources.current.categoriesFilterButtonLabel,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = BUTTON_LABEL_FONT_WEIGHT
+                )
+            },
             containerColor = if (isCategorySelectionActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
             contentColor = if (isCategorySelectionActive) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
             shape = MaterialTheme.shapes.small

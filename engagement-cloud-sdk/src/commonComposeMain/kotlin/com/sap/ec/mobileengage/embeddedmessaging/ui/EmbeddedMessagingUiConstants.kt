@@ -3,13 +3,16 @@ package com.sap.ec.mobileengage.embeddedmessaging.ui
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.sap.ec.mobileengage.embeddedmessaging.ui.theme.toColor
 
 object EmbeddedMessagingUiConstants {
 
     internal object Dimensions {
-        val MESSAGE_ITEM_IMAGE_SIZE = 54.dp
+        val MESSAGE_ITEM_IMAGE_SIZE = 78.dp
+        val MESSAGE_ITEM_HORIZONTAL_PADDING = 12.dp
+        val MESSAGE_ITEM_VERTICAL_PADDING = 4.dp
 
         val FLOATING_ACTION_BUTTON_SIZE = 40.dp
 
@@ -19,12 +22,23 @@ object EmbeddedMessagingUiConstants {
         val ZERO_PADDING = 0.dp
         val SMALL_PADDING = 4.dp
         val DEFAULT_PADDING = 8.dp
-        val LARGE_PADDING = 16.dp
+        val MEDIUM_PADDING = 16.dp
+        val LARGE_PADDING = 24.dp
 
         val DIALOG_CONTAINER_PADDING = 16.dp
 
         val DEFAULT_SPACING = 8.dp
         val ZERO_SPACING = 0.dp
+
+        val BUTTON_LABEL_FONT_WEIGHT = FontWeight.W500
+        val LARGE_FONT_WEIGHT = FontWeight.W400
+        val MEDIUM_FONT_WEIGHT = FontWeight.W500
+        val BODY_SMALL_WEIGHT = FontWeight.W400
+        val TIMESTAMP_FONT_WEIGHT = FontWeight.W400
+        val UNREAD_MESSAGE_LEAD_FONT_WEIGHT = FontWeight.W700
+        val READ_MESSAGE_LEAD_FONT_WEIGHT = FontWeight.W400
+        val UNREAD_MESSAGE_TITLE_FONT_WEIGHT = FontWeight.W800
+        val READ_MESSAGE_TITLE_FONT_WEIGHT = FontWeight.W500
     }
 
     internal object Shapes {

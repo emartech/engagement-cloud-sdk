@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -26,11 +25,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.decodeToImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.DEFAULT_PADDING
+import androidx.compose.ui.unit.sp
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.MESSAGE_ITEM_HORIZONTAL_PADDING
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.MESSAGE_ITEM_IMAGE_SIZE
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.MESSAGE_ITEM_VERTICAL_PADDING
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.READ_MESSAGE_LEAD_FONT_WEIGHT
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.READ_MESSAGE_TITLE_FONT_WEIGHT
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.TIMESTAMP_FONT_WEIGHT
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.UNREAD_MESSAGE_LEAD_FONT_WEIGHT
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.UNREAD_MESSAGE_TITLE_FONT_WEIGHT
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.ZERO_PADDING
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Shapes.ZERO_CORNER_RADIUS
 import com.sap.ec.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
@@ -71,7 +76,10 @@ fun MessageItemView(
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(DEFAULT_PADDING)
+                modifier = Modifier.padding(
+                    MESSAGE_ITEM_HORIZONTAL_PADDING,
+                    MESSAGE_ITEM_VERTICAL_PADDING
+                )
             ) {
                 if (hasThumbnailImage) {
                     imageBitmap?.let {
@@ -85,31 +93,39 @@ fun MessageItemView(
                         )
                     }
                         ?: LoadingSpinner()
-
-                    Spacer(modifier = Modifier.padding(DEFAULT_PADDING))
                 }
 
                 Column(
                     modifier = Modifier
                         .weight(1f)
-                        .padding(if (hasThumbnailImage) DEFAULT_PADDING else ZERO_PADDING)
+                        .padding(
+                            if (hasThumbnailImage) MESSAGE_ITEM_HORIZONTAL_PADDING else ZERO_PADDING,
+                            MESSAGE_ITEM_VERTICAL_PADDING
+                        )
                 ) {
                     Text(
                         text = viewModel.title,
                         style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = if (viewModel.isNotOpened) FontWeight.ExtraBold else FontWeight.Normal
+                        fontWeight = if (viewModel.isNotOpened) UNREAD_MESSAGE_TITLE_FONT_WEIGHT else READ_MESSAGE_TITLE_FONT_WEIGHT,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        letterSpacing = 0.16.sp,
                     )
                     Text(
                         text = viewModel.lead,
                         style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = if (viewModel.isNotOpened) FontWeight.Bold else FontWeight.Normal,
+                        fontWeight = if (viewModel.isNotOpened) UNREAD_MESSAGE_LEAD_FONT_WEIGHT else READ_MESSAGE_LEAD_FONT_WEIGHT,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        letterSpacing = 0.27.sp,
                     )
 
                     Text(
                         text = viewModel.receivedAt.asFormattedTimestamp(),
                         style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontWeight = TIMESTAMP_FONT_WEIGHT,
+                        letterSpacing = 0.27.sp,
                     )
                 }
             }

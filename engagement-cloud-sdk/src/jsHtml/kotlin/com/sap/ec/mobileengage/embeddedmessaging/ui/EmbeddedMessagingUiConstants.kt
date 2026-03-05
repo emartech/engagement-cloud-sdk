@@ -4,15 +4,20 @@ import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
 
 object EmbeddedMessagingUiConstants {
-    val MESSAGE_ITEM_IMAGE_SIZE = 54.px
-    val ICON_DEFAULT_SIZE = 24.px
+    val MESSAGE_ITEM_IMAGE_SIZE = 78.px
+    val CHECKMARK_ICON_DEFAULT_SIZE = 19.px
+    val DEFAULT_ICON_SIZE = 24.px
 
     val FLOATING_ACTION_BUTTON_SIZE = 40.px
 
     val ZERO_ELEVATION = 0.px
     val DEFAULT_ELEVATION = 8.px
+    val ISLAND_SPACING = 24.px
+    val MESSAGE_ITEM_RIGHT_PADDING = 18.px
+    val LIST_VIEW_MAX_WIDTH = 600.px
 
     val ZERO_PADDING = 0.px
+    val SMALL_PADDING = 4.px
     val DEFAULT_PADDING = 8.px
     val MEDIUM_PADDING = 12.px
     val MEDIUM_LARGE_PADDING = 16.px
@@ -20,7 +25,8 @@ object EmbeddedMessagingUiConstants {
 
     val DEFAULT_MARGIN = 8.px
     val ZERO_MARGIN = 0.px
-    val MEDIUM_MARGIN = 16.px
+    val MEDIUM_MARGIN = 12.px
+    val MEDIUM_LARGE_MARGIN = 16.px
     val LARGE_MARGIN = 24.px
 
     val ZERO_SPACING = 0.px
@@ -41,8 +47,12 @@ object EmbeddedMessagingUiConstants {
     val DEFAULT_BORDER_RADIUS = 15.px
     val LARGE_BORDER_RADIUS = 24.px
 
-    const val BUTTON_FONT_WEIGHT = 400
-    const val TITLE_FONT_WEIGHT = 600
+    const val BUTTON_FONT_WEIGHT = 500
+    const val TITLE_FONT_WEIGHT = 400
+    const val MESSAGE_ITEM_TITLE_FONT_WEIGHT = 500
+    const val MESSAGE_ITEM_UNOPENED_FONT_WEIGHT = 800
+    const val MESSAGE_ITEM_LEAD_FONT_WEIGHT = 400
+    const val MESSAGE_ITEM_UNOPENED_LEAD_FONT_WEIGHT = 700
 
     val DEFAULT_DIVIDER_WIDTH = 1.px
 

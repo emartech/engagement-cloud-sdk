@@ -30,14 +30,16 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.DEFAULT_PADDING
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.DEFAULT_SPACING
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.DIALOG_CONTAINER_PADDING
-import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.LARGE_PADDING
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.LARGE_FONT_WEIGHT
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.MEDIUM_FONT_WEIGHT
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.MEDIUM_PADDING
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.ZERO_ELEVATION
 import com.sap.ec.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 import com.sap.ec.mobileengage.embeddedmessaging.ui.theme.LocalDesignValues
@@ -111,7 +113,7 @@ private fun DialogHeader(onDismiss: () -> Unit) {
                 Text(
                     text = LocalStringResources.current.categoriesFilterDialogTitle,
                     style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.W400
+                    fontWeight = LARGE_FONT_WEIGHT
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
@@ -125,10 +127,11 @@ private fun DialogHeader(onDismiss: () -> Unit) {
             }
 
             Text(
-                modifier = Modifier.padding(top = LARGE_PADDING),
+                modifier = Modifier.padding(top = MEDIUM_PADDING),
                 text = LocalStringResources.current.categoriesFilterDialogSubtitle,
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.W500
+                fontWeight = MEDIUM_FONT_WEIGHT,
+                letterSpacing = 0.16.sp
             )
         }
     }
@@ -177,7 +180,12 @@ private fun CategoryFilterChipsList(
                                     contentDescription = "$value ${LocalStringResources.current.selectedCategoryFilterChipIconAltText}"
                                 )
                             }
-                            Text(value)
+                            Text(
+                                text = value,
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = MEDIUM_FONT_WEIGHT,
+                                letterSpacing = 0.11.sp
+                            )
                         }
                     }
                 )

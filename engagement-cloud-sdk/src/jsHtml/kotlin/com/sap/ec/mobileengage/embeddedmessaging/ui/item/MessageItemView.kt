@@ -311,12 +311,12 @@ private fun SwipeableMessageItem(
 private fun ECMessageItem(viewModel: MessageItemViewModelApi, imageDataUrl: String?) {
     val titleClasses = mutableListOf(EmbeddedMessagingStyleSheet.messageItemTitle).apply {
         if (viewModel.isNotOpened) {
-            this.add(EmbeddedMessagingStyleSheet.unopened)
+            this.add(EmbeddedMessagingStyleSheet.unopenedTitle)
         }
     }
     val leadClasses = mutableListOf(EmbeddedMessagingStyleSheet.messageItemLead).apply {
         if (viewModel.isNotOpened) {
-            this.add(EmbeddedMessagingStyleSheet.unopened)
+            this.add(EmbeddedMessagingStyleSheet.unopenedLead)
         }
     }
     val hasThumbnailImage = viewModel.imageUrl != null
@@ -326,10 +326,6 @@ private fun ECMessageItem(viewModel: MessageItemViewModelApi, imageDataUrl: Stri
                 classes(EmbeddedMessagingStyleSheet.messageItemImage)
             }
         } ?: LoadingSpinner()
-
-        Div({
-            classes(EmbeddedMessagingStyleSheet.messageItemImageSpacer)
-        })
     }
 
     Div({

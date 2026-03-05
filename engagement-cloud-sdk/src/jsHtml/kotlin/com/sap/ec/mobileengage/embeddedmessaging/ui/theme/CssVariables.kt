@@ -147,13 +147,13 @@ internal object DefaultFontVars {
     val fontSizeHeadlineLarge: CSSNumeric = 32.px
     val fontSizeHeadlineMedium: CSSNumeric = 28.px
     val fontSizeHeadlineSmall: CSSNumeric = 24.px
-    val fontSizeTitleLarge: CSSNumeric = 20.px
-    val fontSizeTitleMedium: CSSNumeric = 16.px
+    val fontSizeTitleLarge: CSSNumeric = 24.px
+    val fontSizeTitleMedium: CSSNumeric = 17.px
     val fontSizeTitleSmall: CSSNumeric = 14.px
-    val fontSizeBodyLarge: CSSNumeric = 16.px
-    val fontSizeBodyMedium: CSSNumeric = 14.px
-    val fontSizeBodySmall: CSSNumeric = 12.px
-    val fontSizeLabelLarge: CSSNumeric = 14.px
-    val fontSizeLabelMedium: CSSNumeric = 12.px
+    val fontSizeBodyLarge: CSSNumeric = 17.px
+    val fontSizeBodyMedium: CSSNumeric = 15.px
+    val fontSizeBodySmall: CSSNumeric = 13.px
+    val fontSizeLabelLarge: CSSNumeric = 17.px
+    val fontSizeLabelMedium: CSSNumeric = 15.px
     val fontSizeLabelSmall: CSSNumeric = 10.px
 }

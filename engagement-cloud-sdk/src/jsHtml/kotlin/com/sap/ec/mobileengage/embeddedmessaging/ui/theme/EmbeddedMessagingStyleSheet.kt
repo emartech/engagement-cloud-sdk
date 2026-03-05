@@ -1,30 +1,39 @@
 package com.sap.ec.mobileengage.embeddedmessaging.ui.theme
 
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.BUTTON_FONT_WEIGHT
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.CHECKMARK_ICON_DEFAULT_SIZE
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DEFAULT_BORDER_RADIUS
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DEFAULT_BORDER_WIDTH
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DEFAULT_CURSOR
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DEFAULT_DIVIDER_WIDTH
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DEFAULT_ICON_SIZE
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DEFAULT_MARGIN
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DEFAULT_PADDING
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DEFAULT_SPACING
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DIALOG_CARD_WIDTH
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.FLOATING_ACTION_BUTTON_SIZE
-import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.ICON_DEFAULT_SIZE
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.ISLAND_SPACING
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.LARGE_BORDER_RADIUS
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.LARGE_MARGIN
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.LARGE_PADDING
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.LIST_PANE_WIDTH
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MAX_HEIGHT
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MAX_WIDTH
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MEDIUM_LARGE_MARGIN
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MEDIUM_LARGE_PADDING
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MEDIUM_MARGIN
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MEDIUM_PADDING
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MEDIUM_SPACING
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MESSAGE_ITEM_IMAGE_SIZE
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MESSAGE_ITEM_LEAD_FONT_WEIGHT
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MESSAGE_ITEM_RIGHT_PADDING
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MESSAGE_ITEM_TITLE_FONT_WEIGHT
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MESSAGE_ITEM_UNOPENED_FONT_WEIGHT
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MESSAGE_ITEM_UNOPENED_LEAD_FONT_WEIGHT
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.ONE_THIRD_WIDTH
-import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.SWIPE_DELETE_BACKGROUND_CORRECTION
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.SMALL_BORDER_RADIUS
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.SMALL_PADDING
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.SWIPE_DELETE_BACKGROUND_CORRECTION
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.TEXT_PLACEHOLDER_HEIGHT
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.TITLE_FONT_WEIGHT
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.ZERO_BORDER_WIDTH
@@ -56,6 +65,7 @@ import org.jetbrains.compose.web.css.color
 import org.jetbrains.compose.web.css.cursor
 import org.jetbrains.compose.web.css.display
 import org.jetbrains.compose.web.css.duration
+import org.jetbrains.compose.web.css.em
 import org.jetbrains.compose.web.css.flex
 import org.jetbrains.compose.web.css.flexDirection
 import org.jetbrains.compose.web.css.fontSize
@@ -65,14 +75,17 @@ import org.jetbrains.compose.web.css.height
 import org.jetbrains.compose.web.css.iterationCount
 import org.jetbrains.compose.web.css.justifyContent
 import org.jetbrains.compose.web.css.left
+import org.jetbrains.compose.web.css.lineHeight
 import org.jetbrains.compose.web.css.margin
 import org.jetbrains.compose.web.css.marginBottom
+import org.jetbrains.compose.web.css.marginLeft
 import org.jetbrains.compose.web.css.marginRight
 import org.jetbrains.compose.web.css.marginTop
 import org.jetbrains.compose.web.css.maxWidth
 import org.jetbrains.compose.web.css.ms
 import org.jetbrains.compose.web.css.padding
 import org.jetbrains.compose.web.css.paddingBottom
+import org.jetbrains.compose.web.css.paddingRight
 import org.jetbrains.compose.web.css.paddingTop
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.position
@@ -84,6 +97,7 @@ import org.jetbrains.compose.web.css.times
 import org.jetbrains.compose.web.css.timingFunction
 import org.jetbrains.compose.web.css.top
 import org.jetbrains.compose.web.css.transitions
+import org.jetbrains.compose.web.css.whiteSpace
 import org.jetbrains.compose.web.css.width
 
 object EmbeddedMessagingStyleSheet : StyleSheet() {
@@ -95,15 +109,17 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
     }
 
     val islandContainer by style {
-        padding(DEFAULT_PADDING)
         height(MAX_HEIGHT)
         backgroundColor(CssColorVars.colorBackground.value())
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Column)
     }
 
+    val islandSpacer by style {
+        width(ISLAND_SPACING)
+    }
+
     val islandContainerFlex by style {
-        padding(DEFAULT_PADDING)
         height(MAX_HEIGHT)
         backgroundColor(CssColorVars.colorBackground.value())
         display(DisplayStyle.Flex)
@@ -126,19 +142,31 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Row)
         height(MAX_HEIGHT)
-        width(MAX_WIDTH)
         gap(ZERO_SPACING)
+    }
+
+    val splitViewContainerWithIslands by style {
+        display(DisplayStyle.Flex)
+        flexDirection(FlexDirection.Row)
+        height(MAX_HEIGHT)
+        gap(ZERO_SPACING)
+        backgroundColor(CssColorVars.colorBackground.value())
+        padding(MEDIUM_LARGE_PADDING, LARGE_PADDING)
     }
 
     val listPane by style {
         width(LIST_PANE_WIDTH)
         property(
             "border-right",
-            "$DEFAULT_BORDER_WIDTH solid ${CssColorVars.colorOutline.value()}"
+            "$DEFAULT_BORDER_WIDTH solid ${CssColorVars.colorSurfaceVariant.value()}"
         )
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Column)
-        property("overflow", "scroll")
+        property("overflow", "auto")
+    }
+
+    val listViewContainer by style {
+        height(MAX_HEIGHT)
     }
 
     val detailPane by style {
@@ -209,7 +237,7 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         flex(1)
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Column)
-        property("overflow", "scroll")
+        property("overflow", "auto")
     }
 
     val refreshIndicator by style {
@@ -232,9 +260,14 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         alignItems(AlignItems.Center)
     }
 
-    val defaultSvgIconSize by style {
-        width(ICON_DEFAULT_SIZE)
-        height(ICON_DEFAULT_SIZE)
+    val svgDefaultIconSize by style {
+        width(DEFAULT_ICON_SIZE)
+        height(DEFAULT_ICON_SIZE)
+    }
+
+    val svgCheckmarkIconSize by style {
+        width(CHECKMARK_ICON_DEFAULT_SIZE)
+        height(CHECKMARK_ICON_DEFAULT_SIZE)
     }
 
     val scrollableList by style {
@@ -265,7 +298,7 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
     }
 
     val emptyStateButtonTextContainer by style {
-        margin(MEDIUM_MARGIN)
+        margin(MEDIUM_LARGE_MARGIN)
     }
 
     val emptyStateTitle by style {
@@ -335,9 +368,10 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
     val dialogSubtitle by style {
         padding(LARGE_PADDING)
         paddingTop(ZERO_PADDING)
-        fontSize(CssFontVars.fontSizeBodyLarge)
-        color(CssColorVars.colorOnSurface.value())
+        fontSize(CssFontVars.fontSizeBodyMedium)
+        color(CssColorVars.colorOnSurfaceVariant.value())
         display(DisplayStyle.Block)
+        fontWeight(TITLE_FONT_WEIGHT)
     }
 
     val dialogDivider by style {
@@ -362,7 +396,7 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         gap(DEFAULT_SPACING)
         padding(MEDIUM_PADDING)
         cursor(DEFAULT_CURSOR)
-        fontSize(CssFontVars.fontSizeLabelLarge)
+        fontSize(CssFontVars.fontSizeLabelMedium)
         fontWeight(BUTTON_FONT_WEIGHT)
         borderRadius(SMALL_BORDER_RADIUS)
     }
@@ -371,12 +405,11 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         backgroundColor(CssColorVars.colorSecondaryContainer.value())
         color(CssColorVars.colorOnSecondaryContainer.value())
         border(ZERO_BORDER_WIDTH)
-        fontWeight("bold")
     }
 
     val categoryChipUnselected by style {
         backgroundColor(Color.transparent)
-        color(CssColorVars.colorOnPrimaryContainer.value())
+        color(CssColorVars.colorOnSurfaceVariant.value())
         border(DEFAULT_BORDER_WIDTH, LineStyle.Solid, CssColorVars.colorOutline.value())
     }
 
@@ -402,7 +435,7 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         paddingTop(MEDIUM_PADDING)
         paddingBottom(MEDIUM_PADDING)
         cursor(DEFAULT_CURSOR)
-        fontSize(CssFontVars.fontSizeLabelLarge)
+        fontSize(CssFontVars.fontSizeLabelMedium)
         fontWeight(BUTTON_FONT_WEIGHT)
     }
     val deleteDialogApplyButton by style {
@@ -432,7 +465,8 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         border(DEFAULT_BORDER_WIDTH, LineStyle.Solid, CssColorVars.colorOutline.value())
         borderRadius(SMALL_BORDER_RADIUS)
         backgroundColor(Color.transparent)
-        color(CssColorVars.colorOnPrimaryContainer.value())
+        color(CssColorVars.colorOnSurfaceVariant.value())
+        fontSize(CssFontVars.fontSizeLabelMedium)
     }
 
     val spacer by style {
@@ -448,7 +482,7 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         border(ZERO_BORDER_WIDTH)
         borderRadius(DEFAULT_BORDER_RADIUS)
         cursor(DEFAULT_CURSOR)
-        fontSize(CssFontVars.fontSizeLabelLarge)
+        fontSize(CssFontVars.fontSizeLabelMedium)
         fontWeight(BUTTON_FONT_WEIGHT)
         property("box-shadow", "0 2px 4px rgba(0,0,0,0.1)")
     }
@@ -461,7 +495,7 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
 
     val categorySelectorButtonInactive by style {
         backgroundColor(CssColorVars.colorSurfaceVariant.value())
-        color(CssColorVars.colorOnSurface.value())
+        color(CssColorVars.colorOnSurfaceVariant.value())
         border(ZERO_BORDER_WIDTH)
     }
 
@@ -489,6 +523,7 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
     }
 
     val deleteMessageIcon by style {
+        color(CssColorVars.colorOnSurface.value())
         padding(DEFAULT_PADDING)
         borderRadius(DEFAULT_BORDER_RADIUS)
         marginRight(DEFAULT_MARGIN)
@@ -504,7 +539,10 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Row)
         alignItems(AlignItems.Center)
-        padding(DEFAULT_PADDING)
+        padding(ZERO_PADDING)
+        paddingRight(MESSAGE_ITEM_RIGHT_PADDING)
+        marginTop(SMALL_PADDING)
+        marginBottom(SMALL_PADDING)
         cursor(DEFAULT_CURSOR)
 
         self + hover style {
@@ -524,7 +562,7 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         property("overflow", "hidden")
         property("touch-action", "pan-y")
         property("user-select", "none")
-        property("-webkit-user-select","none")
+        property("-webkit-user-select", "none")
         width(MAX_WIDTH)
     }
 
@@ -566,16 +604,15 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
         width(MESSAGE_ITEM_IMAGE_SIZE)
         height(MESSAGE_ITEM_IMAGE_SIZE)
         property("object-fit", "cover")
-    }
-
-    val messageItemImageSpacer by style {
-        padding(DEFAULT_PADDING)
+        marginLeft(MEDIUM_MARGIN)
+        marginRight(MEDIUM_MARGIN)
     }
 
     val messageItemContent by style {
         flex(1)
-        padding(DEFAULT_PADDING)
         property("overflow", "hidden")
+        paddingTop(SMALL_PADDING)
+        paddingBottom(SMALL_PADDING)
     }
 
     val messageItemMisc by style {
@@ -597,29 +634,40 @@ object EmbeddedMessagingStyleSheet : StyleSheet() {
 
     val messageItemTitle by style {
         display(DisplayStyle.Block)
-        marginBottom(DEFAULT_MARGIN)
         fontSize(CssFontVars.fontSizeBodyLarge)
         color(CssColorVars.colorOnSurface.value())
+        fontWeight(MESSAGE_ITEM_TITLE_FONT_WEIGHT)
+        lineHeight("150%")
+        property("text-overflow", "ellipsis")
+        property("overflow", "hidden")
+        whiteSpace("nowrap")
     }
 
-    val unopened by style {
-        fontWeight("bold")
+    val unopenedTitle by style {
+        fontWeight(MESSAGE_ITEM_UNOPENED_FONT_WEIGHT)
     }
 
     val messageItemLead by style {
         display(DisplayStyle.Block)
-        marginBottom(DEFAULT_MARGIN)
         fontSize(CssFontVars.fontSizeBodyMedium)
-        color(CssColorVars.colorOnSurface.value())
+        color(CssColorVars.colorOnSurfaceVariant.value())
+        fontWeight(MESSAGE_ITEM_LEAD_FONT_WEIGHT)
+        lineHeight("142.857%")
         property("overflow", "hidden")
         property("text-overflow", "ellipsis")
         property("white-space", "nowrap")
     }
 
+    val unopenedLead by style {
+        fontWeight(MESSAGE_ITEM_UNOPENED_LEAD_FONT_WEIGHT)
+    }
+
     val messageItemTimestamp by style {
-        fontSize(CssFontVars.fontSizeBodyMedium)
-        color(CssColorVars.colorOnSurface.value())
         display(DisplayStyle.Block)
+        fontSize(CssFontVars.fontSizeBodyMedium)
+        color(CssColorVars.colorOnSurfaceVariant.value())
+        fontWeight(TITLE_FONT_WEIGHT)
+        lineHeight("142.857%")
     }
 
     val messageItemTextPlaceholder by style {

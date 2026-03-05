@@ -48,7 +48,9 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.window.core.layout.WindowSizeClass
 import com.sap.ec.SdkConstants
 import com.sap.ec.di.SdkKoinIsolationContext.koin
-import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.DEFAULT_PADDING
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.LARGE_PADDING
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.MEDIUM_PADDING
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.ZERO_PADDING
 import com.sap.ec.mobileengage.embeddedmessaging.ui.category.CategoriesDialogView
 import com.sap.ec.mobileengage.embeddedmessaging.ui.detail.MessageDetailView
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.CustomMessageItemViewModelApi
@@ -183,7 +185,12 @@ private fun MessageList(
                 }
 
                 ListDetailPaneScaffold(
-                    modifier = Modifier.background(MaterialTheme.colorScheme.background),
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.background)
+                        .padding(
+                            if (isTabletScale) LARGE_PADDING else ZERO_PADDING,
+                            if (isTabletScale) MEDIUM_PADDING else ZERO_PADDING,
+                        ),
                     directive = navigator.scaffoldDirective,
                     value = navigator.scaffoldValue,
                     listPane = {
@@ -289,7 +296,6 @@ fun AdaptiveCardContainer(isTabletScale: Boolean, content: @Composable () -> Uni
                 ),
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(DEFAULT_PADDING),
             ) {
                 content()
             }

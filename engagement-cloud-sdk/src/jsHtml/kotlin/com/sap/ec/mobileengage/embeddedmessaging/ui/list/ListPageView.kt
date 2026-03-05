@@ -34,8 +34,6 @@ import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Hr
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
-import org.jetbrains.compose.web.renderComposable
-import org.w3c.dom.Element
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.events.Event
 import web.dom.document
@@ -106,8 +104,16 @@ fun MessageList(
     }
 
     if (isLandscape) {
-        Div({ classes(EmbeddedMessagingStyleSheet.splitViewContainer) }) {
-            AdaptiveCardContainer(isTabletScale = isTabletScale) {
+        Div({
+            classes(
+                if (isLandscape && isTabletScale) {
+                    EmbeddedMessagingStyleSheet.splitViewContainerWithIslands
+                } else {
+                    EmbeddedMessagingStyleSheet.splitViewContainer
+                }
+            )
+        }) {
+            AdaptiveCardContainer(isTabletScale = isTabletScale, isLandscape = isLandscape) {
                 Div({ classes(EmbeddedMessagingStyleSheet.listPane) }) {
                     if (showFilters) {
                         FilterRow(
@@ -142,7 +148,13 @@ fun MessageList(
                 }
             }
 
-            AdaptiveCardContainer(isTabletScale = isTabletScale, flex = true) {
+            if (isLandscape && isTabletScale) {
+                Div({
+                    classes(EmbeddedMessagingStyleSheet.islandSpacer)
+                })
+            }
+
+            AdaptiveCardContainer(isTabletScale = isTabletScale, flex = true, isLandscape = isLandscape) {
                 Div({ classes(EmbeddedMessagingStyleSheet.detailPane) }) {
                     if (selectedMessage?.hasRichContent() ?: false) {
                         MessageDetailView(
@@ -155,43 +167,45 @@ fun MessageList(
             }
         }
     } else {
-        AdaptiveCardContainer(isTabletScale = isTabletScale) {
-            if (selectedMessage?.hasRichContent() ?: false) {
-                MessageDetailView(
-                    viewModel = viewModel.selectedMessage.value!!
-                )
-            } else {
-                Div({ classes(EmbeddedMessagingStyleSheet.compactListView) }) {
-                    if (showFilters) {
-                        FilterRow(
-                            selectedCategoryIds = selectedCategoryIds,
-                            filterUnopenedOnly = filterUnopenedOnly,
-                            onFilterChange = { viewModel.setFilterUnopenedOnly(it) },
-                            onCategorySelectorClicked = { viewModel.openCategorySelector() }
-                        )
-                        Hr({ classes(EmbeddedMessagingStyleSheet.divider) })
-                    }
-
-                    MessageListContent(
-                        lazyPagingMessageItems = lazyPagingMessageItems,
-                        viewModel,
-                        customMessageItemElementName,
-                        onRefresh = { viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() } },
-                        onItemClick = {
-                            scope.launch {
-                                viewModel.selectMessage(it, onNavigate = {})
-                            }
-                        },
-                        onClearFilters = {
-                            viewModel.setSelectedCategoryIds(emptySet())
-                            viewModel.setFilterUnopenedOnly(false)
-                        },
-                        hasFiltersApplied = hasFiltersApplied,
-                        onDeleteIconClicked = {
-                            messageToDelete = it
-                            showDeleteMessageDialog = true
-                        }
+        Div({ classes(EmbeddedMessagingStyleSheet.listViewContainer) }) {
+            AdaptiveCardContainer(isTabletScale = isTabletScale, isLandscape = isLandscape) {
+                if (selectedMessage?.hasRichContent() ?: false) {
+                    MessageDetailView(
+                        viewModel = viewModel.selectedMessage.value!!
                     )
+                } else {
+                    Div({ classes(EmbeddedMessagingStyleSheet.compactListView) }) {
+                        if (showFilters) {
+                            FilterRow(
+                                selectedCategoryIds = selectedCategoryIds,
+                                filterUnopenedOnly = filterUnopenedOnly,
+                                onFilterChange = { viewModel.setFilterUnopenedOnly(it) },
+                                onCategorySelectorClicked = { viewModel.openCategorySelector() }
+                            )
+                            Hr({ classes(EmbeddedMessagingStyleSheet.divider) })
+                        }
+
+                        MessageListContent(
+                            lazyPagingMessageItems = lazyPagingMessageItems,
+                            viewModel,
+                            customMessageItemElementName,
+                            onRefresh = { viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() } },
+                            onItemClick = {
+                                scope.launch {
+                                    viewModel.selectMessage(it, onNavigate = {})
+                                }
+                            },
+                            onClearFilters = {
+                                viewModel.setSelectedCategoryIds(emptySet())
+                                viewModel.setFilterUnopenedOnly(false)
+                            },
+                            hasFiltersApplied = hasFiltersApplied,
+                            onDeleteIconClicked = {
+                                messageToDelete = it
+                                showDeleteMessageDialog = true
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -444,8 +458,13 @@ fun observePrefetch(onTrigger: () -> Unit): IntersectionObserver {
 }
 
 @Composable
-fun AdaptiveCardContainer(isTabletScale: Boolean, flex: Boolean = false, content: @Composable () -> Unit) {
-    if (isTabletScale) {
+fun AdaptiveCardContainer(
+    isTabletScale: Boolean,
+    flex: Boolean = false,
+    isLandscape: Boolean,
+    content: @Composable () -> Unit
+) {
+    if (isLandscape && isTabletScale) {
         Div({
             classes(
                 if (flex) EmbeddedMessagingStyleSheet.islandContainerFlex

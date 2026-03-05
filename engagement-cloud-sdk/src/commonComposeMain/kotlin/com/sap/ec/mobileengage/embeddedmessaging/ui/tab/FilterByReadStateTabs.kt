@@ -24,6 +24,8 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.BUTTON_LABEL_FONT_WEIGHT
 import com.sap.ec.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 
 
@@ -65,7 +67,9 @@ internal fun FilterByReadStateTabs(
                         style = MaterialTheme.typography.bodyMedium,
                         color = if (selectedTabIndex == 0) primaryColor else onSurfaceColor,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        fontWeight = BUTTON_LABEL_FONT_WEIGHT,
+                        letterSpacing = 0.11.sp,
                     )
                 }
 
@@ -80,7 +84,9 @@ internal fun FilterByReadStateTabs(
                         style = MaterialTheme.typography.bodyMedium,
                         color = if (selectedTabIndex == 1) primaryColor else onSurfaceColor,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        fontWeight = BUTTON_LABEL_FONT_WEIGHT,
+                        letterSpacing = 0.11.sp
                     )
                 }
             }

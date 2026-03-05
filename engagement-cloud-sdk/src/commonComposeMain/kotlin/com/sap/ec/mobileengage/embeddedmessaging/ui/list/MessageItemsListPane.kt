@@ -59,12 +59,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemKey
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.BODY_SMALL_WEIGHT
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.BUTTON_LABEL_FONT_WEIGHT
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.DEFAULT_PADDING
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.FLOATING_ACTION_BUTTON_SIZE
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.MESSAGE_ITEM_IMAGE_SIZE
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.LARGE_FONT_WEIGHT
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.ZERO_PADDING
 import com.sap.ec.mobileengage.embeddedmessaging.ui.category.CategorySelectorButton
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.CustomMessageItemViewModelApi
@@ -374,7 +378,8 @@ fun BoxWithDeleteIcon(
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.Delete,
-                        contentDescription = LocalStringResources.current.deleteIconButtonAltText
+                        contentDescription = LocalStringResources.current.deleteIconButtonAltText,
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
@@ -469,11 +474,16 @@ internal fun EmptyState() {
             ) {
                 Text(
                     text = LocalStringResources.current.emptyStateTitle,
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = LARGE_FONT_WEIGHT,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = LocalStringResources.current.emptyStateDescription,
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = BODY_SMALL_WEIGHT,
+                    letterSpacing = 0.43.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -495,13 +505,18 @@ private fun LazyItemScope.FilteredMessageItemsListEmptyState(onClearFilters: () 
             ) {
                 Text(
                     text = LocalStringResources.current.emptyStateFilteredTitle,
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = LARGE_FONT_WEIGHT,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(LocalDesignValues.current.listContentPadding))
                 Text(
                     text = LocalStringResources.current.emptyStateFilteredDescription,
                     textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = BODY_SMALL_WEIGHT,
+                    letterSpacing = 0.43.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(modifier = Modifier.height(LocalDesignValues.current.listContentPadding))
                 Button(
@@ -515,7 +530,11 @@ private fun LazyItemScope.FilteredMessageItemsListEmptyState(onClearFilters: () 
                     ),
                     shape = MaterialTheme.shapes.medium
                 ) {
-                    Text(LocalStringResources.current.emptyStateFilteredClearFiltersButtonLabel)
+                    Text(
+                        text = LocalStringResources.current.emptyStateFilteredClearFiltersButtonLabel,
+                        fontWeight = BUTTON_LABEL_FONT_WEIGHT,
+                        letterSpacing = 0.11.sp,
+                    )
                 }
             }
         }
@@ -560,13 +579,18 @@ private fun ErrorStateNoConnection(onRefresh: () -> Unit) {
             ) {
                 Text(
                     text = LocalStringResources.current.errorStateNoConnectionTitle,
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = LARGE_FONT_WEIGHT,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(LocalDesignValues.current.listContentPadding))
                 Text(
                     text = LocalStringResources.current.errorStateNoConnectionDescription,
                     textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = BODY_SMALL_WEIGHT,
+                    letterSpacing = 0.43.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(modifier = Modifier.height(LocalDesignValues.current.listContentPadding))
                 ExtendedFloatingActionButton(
@@ -578,7 +602,13 @@ private fun ErrorStateNoConnection(onRefresh: () -> Unit) {
                             contentDescription = LocalStringResources.current.errorStateNoConnectionRefreshIconAltText,
                         )
                     },
-                    text = { Text(LocalStringResources.current.errorStateNoConnectionRetryButtonLabel) },
+                    text = {
+                        Text(
+                            text = LocalStringResources.current.errorStateNoConnectionRetryButtonLabel,
+                            fontWeight = BUTTON_LABEL_FONT_WEIGHT,
+                            letterSpacing = 0.11.sp,
+                        )
+                    },
                     containerColor = MaterialTheme.colorScheme.surfaceVariant,
                     contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     shape = MaterialTheme.shapes.small
