@@ -101,21 +101,16 @@ internal class RemoteConfigClient(
                 async(start = CoroutineStart.UNDISPATCHED) { fetchConfig(isGlobal, event) }
             val toBeSignatureBytes =
                 async(start = CoroutineStart.UNDISPATCHED) { fetchSignature(isGlobal, event) }
+
             val configResponse = toBeConfigBytes.await()
             val signatureResponse = toBeSignatureBytes.await()
 
             val config = configResponse.getOrElse(onFailure = { exception ->
                 handleException(exception, event)
-                sdkEventManager.emitEvent(
-                    event
-                )
                 null
             })?.bodyAsText
             val signature = signatureResponse.getOrElse(onFailure = { exception ->
                 handleException(exception, event)
-                sdkEventManager.emitEvent(
-                    event
-                )
                 null
             })?.bodyAsText
             if (config == null || signature == null) {

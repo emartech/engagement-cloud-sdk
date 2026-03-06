@@ -381,7 +381,6 @@ class RemoteConfigClientTests {
             id = EVENT_ID,
             timestamp = timestamp
         )
-        everySuspend { mockSdkEventManager.emitEvent(remoteConfigEvent) } returns Unit
         everySuspend {
             mockSdkEventManager.emitEvent(
                 SdkEvent.Internal.Sdk.Answer.Response(
@@ -402,7 +401,7 @@ class RemoteConfigClientTests {
         onlineSdkEvents.await() shouldBe listOf(remoteConfigEvent)
         verifySuspend {
             mockNetworkClient.send(any())
-            mockSdkEventManager.emitEvent(remoteConfigEvent)
+            remoteConfigEvent.nack(mockEventsDao, mockSdkLogger)
         }
         verifySuspend {
             mockClientExceptionHandler.handleException(
