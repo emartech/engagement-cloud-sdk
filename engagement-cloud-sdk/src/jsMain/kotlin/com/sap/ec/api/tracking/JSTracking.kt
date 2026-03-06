@@ -46,7 +46,6 @@ internal class JSTracking(
                 JsEventType.CUSTOM -> {
                     validateJsEvent<JsCustomEventValidationData>(event)
                     val jsCustomEvent = event.unsafeCast<JsCustomEvent>()
-                    require(jsCustomEvent.attributes != null)
                     val attributesMap =
                         parseAttributesMap(jsCustomEvent.attributes)
                     CustomEvent(

@@ -75,6 +75,22 @@ class JSTrackingTests {
         }
 
     @Test
+    fun testTrack_shouldCall_track_onEventTrackerApi_withCustomEvent_withoutAttributes() =
+        runTest {
+            val testName = "testName"
+            everySuspend { mockEventTrackerApi.track(any()) } returns Result.success(
+                Unit
+            )
+
+            val jsCustomEvent: JsCustomEvent =
+                js("{ type: 'custom', name: testName }").unsafeCast<JsCustomEvent>()
+
+            jsTracking.track(jsCustomEvent)
+
+            verifySuspend { mockEventTrackerApi.track(CustomEvent(testName)) }
+        }
+
+    @Test
     fun testTrack_shouldCall_track_onEventTrackerApi_withNavigateEvent() =
         runTest {
             everySuspend { mockEventTrackerApi.track(any()) } returns Result.success(
