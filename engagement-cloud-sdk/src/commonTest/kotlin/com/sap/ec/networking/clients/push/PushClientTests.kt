@@ -208,7 +208,7 @@ class PushClientTests {
         onlineSdkEvents.await() shouldBe listOf(clearPushTokenEvent)
         verifySuspend {
             mockEmarsysClient.send(any())
-            mockSdkEventManager.emitEvent(clearPushTokenEvent)
+            clearPushTokenEvent.nack(mockEventsDao, mockSdkLogger)
             mockSdkEventManager.emitEvent(
                 SdkEvent.Internal.Sdk.Answer.Response(
                     originId = clearPushTokenEvent.id,

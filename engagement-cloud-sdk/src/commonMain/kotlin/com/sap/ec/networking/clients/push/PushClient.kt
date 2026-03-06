@@ -62,7 +62,6 @@ internal class PushClient(
                     }
                     response.onFailure { exception ->
                         handleException(exception, sdkEvent)
-                        sdkEventManager.emitEvent(sdkEvent)
                     }
                 } catch (exception: Exception) {
                     handleException(exception, sdkEvent)
