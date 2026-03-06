@@ -88,7 +88,7 @@ fun CategoriesDialogView(
                     )
 
                     HorizontalDivider(
-                        color = MaterialTheme.colorScheme.outline,
+                        color = MaterialTheme.colorScheme.outlineVariant,
                         modifier = Modifier.padding(
                             start = DEFAULT_PADDING,
                             end = DEFAULT_PADDING

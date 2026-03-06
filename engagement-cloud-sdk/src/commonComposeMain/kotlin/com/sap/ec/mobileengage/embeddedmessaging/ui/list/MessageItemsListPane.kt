@@ -138,7 +138,7 @@ fun MessageItemsListPane(
             }
         }
 
-        Column {
+        Column(modifier = Modifier.background(color = MaterialTheme.colorScheme.surface)) {
             if (showFilters) {
                 FilterRow(
                     selectedCategoryIds = selectedCategoryIds,
@@ -147,7 +147,7 @@ fun MessageItemsListPane(
                     onCategorySelectorClicked = showCategorySelector
                 )
 
-                HorizontalDivider(color = MaterialTheme.colorScheme.outline)
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
             }
 
             RefreshableMessageItemsList(
@@ -628,7 +628,7 @@ private fun FilterRow(
 ) {
     EmbeddedMessagingTheme {
         Row(
-            modifier = Modifier.padding(DEFAULT_PADDING),
+            modifier = Modifier.padding(DEFAULT_PADDING).background(color = MaterialTheme.colorScheme.surface),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(DEFAULT_PADDING)
         ) {
