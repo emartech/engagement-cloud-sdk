@@ -58,6 +58,23 @@ class JSTrackingTests {
         }
 
     @Test
+    fun testTrack_shouldCall_track_onEventTrackerApi_withCustomEvent_withLowercase_eventType() =
+        runTest {
+            val testName = "testName"
+            val testAttributesMap = mapOf("testKey" to "testValue")
+            everySuspend { mockEventTrackerApi.track(any()) } returns Result.success(
+                Unit
+            )
+
+            val jsCustomEvent: JsCustomEvent =
+                js("{ type: 'custom', name: testName, attributes: { 'testKey': 'testValue' } }").unsafeCast<JsCustomEvent>()
+
+            jsTracking.track(jsCustomEvent)
+
+            verifySuspend { mockEventTrackerApi.track(CustomEvent(testName, testAttributesMap)) }
+        }
+
+    @Test
     fun testTrack_shouldCall_track_onEventTrackerApi_withNavigateEvent() =
         runTest {
             everySuspend { mockEventTrackerApi.track(any()) } returns Result.success(
@@ -99,7 +116,7 @@ class JSTrackingTests {
             val exception =
                 shouldThrow<IllegalArgumentException> { jsTracking.track(jsNavigateEvent) }
 
-            exception.message shouldBe "Invalid event type: TEST"
+            exception.message shouldBe "Invalid event type: TEST. Valid types are: custom, navigate"
         }
 
     @Test
@@ -130,7 +147,7 @@ class JSTrackingTests {
         val exception = shouldThrow<IllegalArgumentException> {
             jsTracking.track(customEvent)
         }
-        exception.message shouldBe "Invalid event type: unknown"
+        exception.message shouldBe "Invalid event type: unknown. Valid types are: custom, navigate"
     }
 
     @Test

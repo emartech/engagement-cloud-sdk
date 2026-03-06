@@ -22,6 +22,10 @@ internal class JSTracking(
 
     private val possibleEventTypes = JsEventType.entries.map { it.toString() }
 
+    private val validEventTypesString = possibleEventTypes.joinToString(
+        ", "
+    ) { it.lowercase() }
+
     /**
      * Tracks an event.
      * Custom events can be used to trigger In-App campaigns or any automation configured at Engagement Cloud.
@@ -31,12 +35,14 @@ internal class JSTracking(
      */
     @OptIn(ExperimentalSerializationApi::class)
     override suspend fun track(event: JsTrackedEvent) {
-        println(possibleEventTypes)
-        if (!possibleEventTypes.contains(event.type)) {
-            throw IllegalArgumentException("Invalid event type: ${event.type}")
+        val eventType = event.type.uppercase()
+        if (!possibleEventTypes.contains(eventType)) {
+            throw IllegalArgumentException(
+                "Invalid event type: ${event.type}. Valid types are: $validEventTypesString"
+            )
         }
         val event = try {
-            when (JsEventType.valueOf(event.type)) {
+            when (JsEventType.valueOf(eventType)) {
                 JsEventType.CUSTOM -> {
                     validateJsEvent<JsCustomEventValidationData>(event)
                     val jsCustomEvent = event.unsafeCast<JsCustomEvent>()
