@@ -1,8 +1,11 @@
 package com.sap.ec.mobileengage.embeddedmessaging
 
 import com.sap.ec.networking.clients.embedded.messaging.model.MetaData
+import kotlinx.coroutines.flow.StateFlow
 
 internal interface EmbeddedMessagingContextApi {
-    var metaData: MetaData?
+    val metaData: StateFlow<MetaData?>
     var embeddedMessagingFrequencyCapSeconds: Int
+
+    fun setMetaData(data: MetaData?)
 }

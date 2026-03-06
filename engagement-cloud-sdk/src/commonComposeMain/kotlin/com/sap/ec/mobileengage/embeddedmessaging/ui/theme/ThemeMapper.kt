@@ -10,17 +10,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.sap.ec.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.DEFAULT_ELEVATION
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.ZERO_ELEVATION
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Shapes.ZERO_CORNER_RADIUS
+import com.sap.ec.networking.clients.embedded.messaging.model.MetaData
 
-internal class ThemeMapper(private val embeddedMessagingContext: EmbeddedMessagingContextApi) {
+internal class ThemeMapper(private val metaData: MetaData?) {
 
     @Composable
     fun mapColorScheme(): ColorScheme {
-        val colors = embeddedMessagingContext.metaData?.design?.fillColor
+        val colors = metaData?.design?.fillColor
         return colors?.let {
             ColorScheme(
                 primary = colors.primary.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().primary),
@@ -77,7 +77,7 @@ internal class ThemeMapper(private val embeddedMessagingContext: EmbeddedMessagi
 
     @Composable
     fun mapTypography(): Typography {
-        val textMetaData = embeddedMessagingContext.metaData?.design?.text
+        val textMetaData = metaData?.design?.text
         return textMetaData?.let {
             Typography(
                 displayLarge = textMetaData.displayLargeFontSize.toTextStyle(),
@@ -101,7 +101,7 @@ internal class ThemeMapper(private val embeddedMessagingContext: EmbeddedMessagi
 
     @Composable
     fun mapShapes(): Shapes {
-        val shapeMetaData = embeddedMessagingContext.metaData?.design?.shapes
+        val shapeMetaData = metaData?.design?.shapes
         return shapeMetaData?.let {
             MaterialTheme.shapes.copy(
                 extraSmall = RoundedCornerShape(
@@ -139,7 +139,7 @@ internal class ThemeMapper(private val embeddedMessagingContext: EmbeddedMessagi
     }
 
     fun mapMisc(): EmbeddedMessagingDesignValues {
-        val miscMetaData = embeddedMessagingContext.metaData?.design?.misc
+        val miscMetaData = metaData?.design?.misc
         return miscMetaData?.let {
             EmbeddedMessagingDesignValues(
                 messageItemMargin = it.messageItemMargin.dp,

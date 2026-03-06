@@ -58,7 +58,8 @@ internal class EmbeddedMessagingClient(
                         is SdkEvent.Internal.EmbeddedMessaging.FetchMeta -> {
                             ecNetworkClient.send(request)
                                 .onSuccess { response ->
-                                    embeddedMessagingContext.metaData = response.body<MetaData>()
+                                    val metaData = response.body<MetaData>()
+                                    embeddedMessagingContext.setMetaData(metaData)
                                     sdkLogger.debug("Meta data fetched and stored in EmbeddedMessagingContext")
                                     handleSuccess(it, response)
                                 }.onFailure { exception ->

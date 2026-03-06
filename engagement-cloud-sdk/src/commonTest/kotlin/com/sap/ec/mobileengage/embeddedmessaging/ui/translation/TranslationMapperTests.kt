@@ -1,6 +1,5 @@
 package com.sap.ec.mobileengage.embeddedmessaging.ui.translation
 
-import com.sap.ec.mobileengage.embeddedmessaging.EmbeddedMessagingContext
 import com.sap.ec.networking.clients.embedded.messaging.model.Labels
 import com.sap.ec.networking.clients.embedded.messaging.model.MetaData
 import io.kotest.matchers.shouldBe
@@ -17,12 +16,10 @@ class TranslationMapperTests {
 
     @Test
     fun mapTranslations_should_mapTranslationsFromEmbeddedMessagingContext_when_embeddedMessagingContextIsAvailable() {
-        val testEmbeddedMessagingContext = EmbeddedMessagingContext(
-            metaData = MetaData(
-                "testVersion",
-                createTestLabels(),
-                design = null
-            )
+        val testMetaData = MetaData(
+            "testVersion",
+            createTestLabels(),
+            design = null
         )
 
         val expectedStringResources = StringResources(
@@ -61,18 +58,16 @@ class TranslationMapperTests {
             failedToDeleteMessageText = "testFailedToDeleteMessageText"
         )
 
-        val resultStringResources = translationMapper.map(testEmbeddedMessagingContext)
+        val resultStringResources = translationMapper.map(testMetaData)
 
         resultStringResources shouldBe expectedStringResources
     }
 
     @Test
     fun mapTranslations_should_fallbackForDefaultStringResources_when_embeddedMessagingContextIsNotAvailable() {
-        val testEmbeddedMessagingContext = EmbeddedMessagingContext(
-            metaData = null
-        )
+        val testMetaData = null
 
-        val result = translationMapper.map(testEmbeddedMessagingContext)
+        val result = translationMapper.map(testMetaData)
 
         result shouldBe StringResources()
     }

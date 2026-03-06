@@ -1,12 +1,11 @@
 package com.sap.ec.mobileengage.embeddedmessaging.ui.translation
 
-import com.sap.ec.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
+import com.sap.ec.networking.clients.embedded.messaging.model.MetaData
 
 internal class TranslationMapper : TranslationMapperApi {
 
-    override fun map(embeddedMessagingContext: EmbeddedMessagingContextApi): StringResources {
-        val translations = embeddedMessagingContext.metaData?.labels
-        return translations?.let {
+    override fun map(metaData: MetaData?): StringResources {
+        return metaData?.labels?.let {
             StringResources(
                 allMessagesFilterButtonLabel = it.allMessagesFilterButtonLabel,
                 unreadMessagesFilterButtonLabel = it.unreadMessagesFilterButtonLabel,

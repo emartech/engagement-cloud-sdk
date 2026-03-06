@@ -1,7 +1,7 @@
 package com.sap.ec.mobileengage.embeddedmessaging.ui.translation
 
-import com.sap.ec.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
+import com.sap.ec.networking.clients.embedded.messaging.model.MetaData
 
 internal interface TranslationMapperApi {
-    fun map(embeddedMessagingContext: EmbeddedMessagingContextApi): StringResources
+    fun map(metaData: MetaData?): StringResources
 }

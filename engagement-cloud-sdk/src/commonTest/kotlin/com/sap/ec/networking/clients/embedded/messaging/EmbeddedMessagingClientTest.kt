@@ -372,7 +372,7 @@ class EmbeddedMessagingClientTest {
                     )
                 )
             }
-            embeddedMessagingContext.metaData shouldBe expectedResponse.body<MetaData>()
+            embeddedMessagingContext.metaData.value shouldBe expectedResponse.body<MetaData>()
         }
 
     private fun createMetaDataResponseString(): String {

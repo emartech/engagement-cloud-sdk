@@ -2,6 +2,8 @@ package com.sap.ec.mobileengage.embeddedmessaging.ui.theme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import com.sap.ec.di.SdkKoinIsolationContext.koin
 import com.sap.ec.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import com.sap.ec.mobileengage.embeddedmessaging.ui.translation.LocalStringResources
@@ -16,11 +18,12 @@ fun EmbeddedMessagingTheme(content: @Composable () -> Unit) {
     val embeddedMessagingContext: EmbeddedMessagingContextApi? = koin.getOrNull()
 
     embeddedMessagingContext?.let {
+        val metaData by embeddedMessagingContext.metaData.collectAsState()
         val themeMapper =
-            ThemeMapper(it)
+            ThemeMapper(metaData)
         val designValues = themeMapper.mapMisc()
         val translationMapper = TranslationMapper()
-        val stringValues = translationMapper.map(it)
+        val stringValues = translationMapper.map(metaData)
         themeMapper.generateThemeCSS()
 
         CompositionLocalProvider(

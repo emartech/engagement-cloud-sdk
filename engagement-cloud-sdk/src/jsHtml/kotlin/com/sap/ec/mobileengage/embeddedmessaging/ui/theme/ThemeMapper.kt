@@ -1,17 +1,17 @@
 package com.sap.ec.mobileengage.embeddedmessaging.ui.theme
 
 import androidx.compose.runtime.Composable
-import com.sap.ec.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants
+import com.sap.ec.networking.clients.embedded.messaging.model.MetaData
 import com.sap.ec.networking.clients.embedded.messaging.model.TextMetaData
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Style
 
-internal class ThemeMapper(private val embeddedMessagingContext: EmbeddedMessagingContextApi) {
+internal class ThemeMapper(private val metaData: MetaData?) {
 
     @Composable
     fun generateThemeCSS() {
-        val design = embeddedMessagingContext.metaData?.design
+        val design = metaData?.design
         mapFontSizes(design?.text)
 
         val colors = design?.fillColor
