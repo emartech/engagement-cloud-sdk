@@ -27,10 +27,11 @@ internal class JsBridgeClient(
         }
 
         if (isFeatureEnabled()) {
-            val signatureResponse = fetchResponse(sdkContext.defaultUrls.jsBridgeSignatureUrl).getOrElse {
-                sdkLogger.error("Failed to fetch JsBridge signature: ${it.message}")
-                return Result.failure(it)
-            }
+            val signatureResponse =
+                fetchResponse(sdkContext.defaultUrls.jsBridgeSignatureUrl).getOrElse {
+                    sdkLogger.error("Failed to fetch JsBridge signature: ${it.message}")
+                    return Result.failure(it)
+                }
 
             val verified = runCatching {
                 crypto.verify(jsResponse.bodyAsText, signatureResponse.bodyAsText)
@@ -60,6 +61,9 @@ internal class JsBridgeClient(
         val response = networkClient.send(request).getOrElse {
             sdkLogger.error("JsBridge HEAD request failed: ${it.message}")
             return Result.failure(it)
+        }
+        response.headers.entries().map { entry ->
+            sdkLogger.error("TAG - verifying headers: ${entry.key} - ${entry.value}")
         }
         val md5 = parseMd5FromGoogHash(response.headers)
         if (md5 == null) {
