@@ -36,6 +36,7 @@ import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.events.Event
+import web.dom.Element
 import web.dom.document
 import web.intersection.IntersectionObserver
 
@@ -127,8 +128,8 @@ fun MessageList(
 
                     MessageListContent(
                         lazyPagingMessageItems = lazyPagingMessageItems,
-                        viewModel,
-                        customMessageItemElementName,
+                        listViewModel = viewModel,
+                        customMessageItemElementName = customMessageItemElementName,
                         onRefresh = { viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() } },
                         onItemClick = {
                             scope.launch {
@@ -187,8 +188,8 @@ fun MessageList(
 
                         MessageListContent(
                             lazyPagingMessageItems = lazyPagingMessageItems,
-                            viewModel,
-                            customMessageItemElementName,
+                            listViewModel = viewModel,
+                            customMessageItemElementName = customMessageItemElementName,
                             onRefresh = { viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() } },
                             onItemClick = {
                                 scope.launch {
@@ -282,13 +283,14 @@ fun MessageListContent(
                 }
             } else {
                 ListView(
-                    lazyPagingMessageItems,
-                    listViewModel,
-                    customMessageItemElementName,
+                    lazyPagingMessageItems = lazyPagingMessageItems,
+                    listViewModel = listViewModel,
+                    customMessageItemElementName = customMessageItemElementName,
                     onItemClick = {
                         onItemClick(it)
                     },
-                    withDeleteIcon = withDeleteIcon
+                    withDeleteIcon = withDeleteIcon,
+                    paginationId = "ListPageView"
                 ) { onDeleteIconClicked(it) }
             }
         }
@@ -440,8 +442,8 @@ fun FilteredMessageItemsListEmptyState(
     }
 }
 
-fun observePrefetch(onTrigger: () -> Unit): IntersectionObserver {
-    val target: web.dom.Element? = document.querySelector("[shouldLoadNextPage]")
+fun observePrefetch(paginationId: String, onTrigger: () -> Unit): IntersectionObserver {
+    val target: Element? = document.querySelector("[shouldLoadNextPage$paginationId]")
     val observer = IntersectionObserver(
         callback = { entries, _ ->
             if (entries.any { it.isIntersecting }) {

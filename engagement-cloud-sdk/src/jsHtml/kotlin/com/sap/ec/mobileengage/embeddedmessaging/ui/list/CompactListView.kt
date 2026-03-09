@@ -24,8 +24,8 @@ fun CompactListView(
             }) {
                 ListView(
                     lazyPagingMessageItems = viewModel.messagePagingDataFlowFiltered.collectAsLazyPagingItems(),
-                    viewModel,
-                    customMessageItemElementName,
+                    listViewModel = viewModel,
+                    customMessageItemElementName = customMessageItemElementName,
                     onItemClick = {
                         scope.launch {
                             viewModel.selectMessage(it) {
@@ -33,7 +33,8 @@ fun CompactListView(
                             }
                         }
                     },
-                    withDeleteIcon = false
+                    withDeleteIcon = false,
+                    paginationId = "CompactListPageView"
                 )
             }
         }

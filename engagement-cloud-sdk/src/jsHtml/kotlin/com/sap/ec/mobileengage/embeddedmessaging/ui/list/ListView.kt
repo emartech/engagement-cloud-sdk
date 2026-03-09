@@ -31,6 +31,7 @@ fun ListView(
     customMessageItemElementName: String? = null,
     onItemClick: (MessageItemViewModelApi) -> Unit,
     withDeleteIcon: Boolean = true,
+    paginationId: String,
     onDeleteIconClicked: (MessageItemViewModelApi) -> Unit = {}
 ) {
     val selectedMessage = listViewModel.selectedMessage.collectAsState()
@@ -58,7 +59,7 @@ fun ListView(
         }
         if (lazyPagingMessageItems.itemCount > 0) {
             Div({
-                attr("shouldLoadNextPage", "true")
+                attr("shouldLoadNextPage$paginationId", "true")
                 style {
                     height(1.px)
                     backgroundColor(Color.transparent)
@@ -69,7 +70,7 @@ fun ListView(
                 P {}
                 DisposableEffect(Unit) {
                     val observer =
-                        observePrefetch {
+                        observePrefetch(paginationId) {
                             if (lazyPagingMessageItems.itemCount > 0) {
                                 lazyPagingMessageItems[lazyPagingMessageItems.itemCount - 1]
                             }
@@ -77,7 +78,7 @@ fun ListView(
                     onDispose { observer.disconnect() }
                 }
                 val target: web.dom.Element? =
-                    document.querySelector("[shouldLoadNextPage]")
+                    document.querySelector("[shouldLoadNextPage$paginationId]")
                 if (target != null && isInViewPort(
                         target
                     )
