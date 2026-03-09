@@ -12,7 +12,7 @@ import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 
-class SharedPreferenceCrypto(
+internal class SharedPreferenceCrypto(
     private val sdkLogger: Logger
 ) {
     companion object {

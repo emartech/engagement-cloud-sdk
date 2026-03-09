@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 
-class AndroidConnectionWatchDog(
+internal class AndroidConnectionWatchDog(
     private val connectivityManager: ConnectivityManager,
     private val logger: Logger
 ) :

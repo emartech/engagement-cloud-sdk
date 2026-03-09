@@ -13,7 +13,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
 
-class SilentAndroidPushV2Mapper(
+internal class SilentAndroidPushV2Mapper(
     private val logger: Logger,
     private val json: Json
 ) : Mapper<JsonObject, SilentAndroidPushMessage> {

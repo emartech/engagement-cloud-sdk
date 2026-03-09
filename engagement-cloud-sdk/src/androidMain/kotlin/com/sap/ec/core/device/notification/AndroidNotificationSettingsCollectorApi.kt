@@ -1,6 +1,6 @@
 package com.sap.ec.core.device.notification
 
-interface AndroidNotificationSettingsCollectorApi {
+internal interface AndroidNotificationSettingsCollectorApi {
 
     fun collect(): AndroidNotificationSettings
 

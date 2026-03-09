@@ -9,7 +9,7 @@ import com.sap.ec.core.device.AndroidVersionUtils.isTiramisuOrAbove
 import com.sap.ec.core.permission.PermissionHandlerApi
 import com.sap.ec.watchdog.activity.TransitionSafeCurrentActivityWatchdog
 
-class AndroidPermissionHandler(
+internal class AndroidPermissionHandler(
     private val applicationContext: Context,
     private val currentActivityWatchdog: TransitionSafeCurrentActivityWatchdog,
 ) : PermissionHandlerApi {

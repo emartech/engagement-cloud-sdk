@@ -5,7 +5,7 @@ import android.content.pm.ApplicationInfo
 import android.content.res.Resources
 import android.util.DisplayMetrics
 
-class PlatformInfoCollector(
+internal class PlatformInfoCollector(
     private val context: Context,
 ) : PlatformInfoCollectorApi {
 

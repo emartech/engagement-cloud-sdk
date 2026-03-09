@@ -10,7 +10,7 @@ import com.sap.ec.core.util.DownloaderApi
 import com.sap.ec.mobileengage.push.model.AndroidPushMessage
 import com.sap.ec.mobileengage.push.model.NotificationStyle
 
-class NotificationCompatStyler(
+internal class NotificationCompatStyler(
     private val downloader: DownloaderApi
 ) {
 
@@ -87,7 +87,7 @@ class NotificationCompatStyler(
             .setBigContentTitle(pushMessage.displayableData?.title)
 }
 
-fun ByteArray.toOptimizedBitmap(): Bitmap? {
+internal fun ByteArray.toOptimizedBitmap(): Bitmap? {
     return try {
         val options = BitmapFactory.Options().apply {
             inJustDecodeBounds = true

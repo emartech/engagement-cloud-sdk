@@ -58,7 +58,7 @@ import kotlin.time.ExperimentalTime
 
 @Preview(showBackground = true)
 @Composable
-fun MessageItemViewPreview() {
+internal fun MessageItemViewPreview() {
     val previewSdkEventDistributor = object : SdkEventDistributorApi {
         override val sdkEventFlow =
             MutableSharedFlow<SdkEvent>()
@@ -95,7 +95,7 @@ fun MessageItemViewPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun ListPageViewPreview() {
+internal fun ListPageViewPreview() {
     val coroutineScope = remember {
         CoroutineScope(SupervisorJob() + Dispatchers.Default)
     }
@@ -131,7 +131,7 @@ fun ListPageViewPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun CategorySelectorButtonPreview() {
+internal fun CategorySelectorButtonPreview() {
     CategorySelectorButton(
         isCategorySelectionActive = false,
         onClick = {
@@ -141,7 +141,7 @@ fun CategorySelectorButtonPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun CategoriesDialogViewPreview() {
+internal fun CategoriesDialogViewPreview() {
     val messageCategories = listOf(
         MessageCategory("1", "Serums"),
         MessageCategory("2", "Creams"),

@@ -4,7 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import com.sap.ec.core.actions.clipboard.ClipboardHandlerApi
 
-class AndroidClipboardHandler(private val clipboardManager: ClipboardManager) :
+internal class AndroidClipboardHandler(private val clipboardManager: ClipboardManager) :
     ClipboardHandlerApi {
 
     companion object {

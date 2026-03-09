@@ -4,7 +4,7 @@ import com.sap.ec.core.device.ChannelSettings
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class AndroidNotificationSettings(
+internal data class AndroidNotificationSettings(
     val areNotificationsEnabled: Boolean,
     val importance: Int,
     val channelSettings: List<ChannelSettings>

@@ -2,7 +2,7 @@ package com.sap.ec.db_migration
 
 import android.content.SharedPreferences
 
-class LegacySharedPreferencesWrapper(
+internal class LegacySharedPreferencesWrapper(
     private val legacySharedPreferences: SharedPreferences,
     private val sharedPreferenceCrypto: SharedPreferenceCrypto
 ) {

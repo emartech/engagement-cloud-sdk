@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 
-class PushTokenRegisterOnBootCompletedReceiver : BroadcastReceiver() {
+internal class PushTokenRegisterOnBootCompletedReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action.equals(Intent.ACTION_BOOT_COMPLETED, true)) {

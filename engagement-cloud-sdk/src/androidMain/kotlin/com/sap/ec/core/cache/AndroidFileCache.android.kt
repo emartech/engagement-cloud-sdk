@@ -6,7 +6,7 @@ import okio.Path.Companion.toPath
 import okio.buffer
 import okio.use
 
-class AndroidFileCache(
+internal class AndroidFileCache(
     private val context: Context,
     private val fileSystem: FileSystem
 ) : FileCacheApi {

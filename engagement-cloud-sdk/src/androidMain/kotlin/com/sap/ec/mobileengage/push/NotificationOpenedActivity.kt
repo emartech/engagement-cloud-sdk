@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.sap.ec.di.SdkComponent
 import org.koin.core.component.inject
 
-class NotificationOpenedActivity : AppCompatActivity(), SdkComponent {
+internal class NotificationOpenedActivity : AppCompatActivity(), SdkComponent {
     private val notificationIntentProcessor: NotificationIntentProcessor by inject()
 
     public override fun onCreate(savedInstanceState: Bundle?) {

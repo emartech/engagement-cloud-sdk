@@ -8,7 +8,7 @@ import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
 
-fun BroadcastReceiver.goAsync(
+internal fun BroadcastReceiver.goAsync(
     context: CoroutineContext,
     lambda: suspend CoroutineScope.() -> Unit
 ) {

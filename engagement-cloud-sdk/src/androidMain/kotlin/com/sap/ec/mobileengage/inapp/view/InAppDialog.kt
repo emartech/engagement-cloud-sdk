@@ -10,7 +10,7 @@ import android.widget.FrameLayout
 import androidx.fragment.app.DialogFragment
 import com.sap.R
 
-class InAppDialog : DialogFragment() {
+internal class InAppDialog : DialogFragment() {
 
     companion object {
         const val TAG = "MOBILE_ENGAGE_IN_APP_DIALOG_TAG"

@@ -9,15 +9,15 @@ import java.util.TimeZone
 import kotlin.time.Instant
 import kotlin.time.toJavaInstant
 
-actual fun Long.asLocaleFormattedHoursAndMinutes(): String {
+internal actual fun Long.asLocaleFormattedHoursAndMinutes(): String {
     return this.asLocaleFormattedString(HOUR_MINUTE)
 }
 
-actual fun Long.asLocaleFormattedMonthsAndDays(): String {
+internal actual fun Long.asLocaleFormattedMonthsAndDays(): String {
     return this.asLocaleFormattedString("MMM d")
 }
 
-actual fun Long.asLocaleFormattedFullDate(): String {
+internal actual fun Long.asLocaleFormattedFullDate(): String {
     return this.asLocaleFormattedString("MMddyyyy")
 }
 

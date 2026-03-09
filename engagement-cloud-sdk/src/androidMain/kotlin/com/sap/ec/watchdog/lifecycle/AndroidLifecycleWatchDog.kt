@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
-class AndroidLifecycleWatchDog(
+internal class AndroidLifecycleWatchDog(
     private val processLifecycleOwnerLifecycle: Lifecycle,
     private val processLifecycleOwnerScope: CoroutineScope,
     private val lifecycleWatchDogScope: CoroutineScope

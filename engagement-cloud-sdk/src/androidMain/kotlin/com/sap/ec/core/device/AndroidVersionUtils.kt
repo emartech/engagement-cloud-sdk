@@ -3,7 +3,7 @@ package com.sap.ec.core.device
 import android.os.Build
 import androidx.annotation.ChecksSdkIntAtLeast
 
-object AndroidVersionUtils {
+internal object AndroidVersionUtils {
     val isBelowQ: Boolean
         get() = Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
     val isBelowS: Boolean

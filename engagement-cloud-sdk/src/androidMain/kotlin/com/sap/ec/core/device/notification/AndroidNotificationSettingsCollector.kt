@@ -5,7 +5,7 @@ import android.app.NotificationManager
 import android.content.Context
 import com.sap.ec.core.device.ChannelSettings
 
-class AndroidNotificationSettingsCollector(
+internal class AndroidNotificationSettingsCollector(
     private val context: Context,
 ) : AndroidNotificationSettingsCollectorApi {
 

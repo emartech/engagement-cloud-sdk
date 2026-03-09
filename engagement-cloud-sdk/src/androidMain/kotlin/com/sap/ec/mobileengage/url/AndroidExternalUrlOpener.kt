@@ -11,7 +11,7 @@ import com.sap.ec.mobileengage.action.models.OpenExternalUrlActionModel
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 
-class AndroidExternalUrlOpener(
+internal class AndroidExternalUrlOpener(
     private val applicationContext: Context,
     private val sdkLogger: Logger
 ) : ExternalUrlOpenerApi {

@@ -3,7 +3,7 @@ package com.sap.ec.core.resource
 import android.content.Context
 import android.content.pm.PackageManager
 
-class MetadataReader(private val context: Context) {
+internal class MetadataReader(private val context: Context) {
 
     fun getInt(key: String): Int {
         return try {

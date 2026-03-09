@@ -25,6 +25,7 @@ import com.sap.ec.api.push.PushInstance
 import com.sap.ec.api.push.PushInternal
 import com.sap.ec.api.setup.AndroidSetup
 import com.sap.ec.api.setup.AndroidSetupApi
+import com.sap.ec.InternalSdkApi
 import com.sap.ec.applicationContext
 import com.sap.ec.core.actions.clipboard.ClipboardHandlerApi
 import com.sap.ec.core.actions.launchapplication.LaunchApplicationHandlerApi
@@ -107,7 +108,7 @@ import org.koin.dsl.module
 import java.lang.reflect.Method
 import java.util.Locale
 
-object AndroidInjection {
+internal object AndroidInjection {
     val androidModules = module {
         single<MetadataReader> { MetadataReader(applicationContext) }
         single<PlatformInfoCollectorApi> { PlatformInfoCollector(applicationContext) }
@@ -407,10 +408,11 @@ object AndroidInjection {
     }
 }
 
-enum class AvailableServices {
+internal enum class AvailableServices {
     Google, Huawei
 }
 
+@InternalSdkApi
 actual fun SdkKoinIsolationContext.loadPlatformModules(): List<Module> {
     return listOf(AndroidInjection.androidModules)
 }

@@ -4,7 +4,7 @@ import com.sap.ec.mobileengage.push.PlatformData
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class AndroidPlatformData(
+internal data class AndroidPlatformData(
     val channelId: String,
     val notificationMethod: NotificationMethod,
     val style: NotificationStyle? = null

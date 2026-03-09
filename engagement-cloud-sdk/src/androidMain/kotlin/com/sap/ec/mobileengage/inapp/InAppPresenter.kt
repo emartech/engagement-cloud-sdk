@@ -108,7 +108,7 @@ internal class InAppPresenter(
     }
 }
 
-fun Activity.fragmentManager(): FragmentManager? {
+internal fun Activity.fragmentManager(): FragmentManager? {
     var fragmentManager: FragmentManager? = null
     if (this is FragmentActivity) {
         fragmentManager = this.supportFragmentManager
