@@ -3,6 +3,7 @@ package com.sap.ec.networking.clients.remoteConfig
 import com.sap.ec.core.channel.SdkEventManagerApi
 import com.sap.ec.core.crypto.CryptoApi
 import com.sap.ec.core.db.events.EventsDaoApi
+import com.sap.ec.core.exceptions.SdkException
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.clients.NetworkClientApi
 import com.sap.ec.core.networking.model.UrlRequest
@@ -16,6 +17,7 @@ import com.sap.ec.networking.clients.error.ClientExceptionHandler
 import com.sap.ec.remoteConfig.RemoteConfigResponse
 import com.sap.ec.remoteConfig.RemoteConfigResponseHandlerApi
 import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.async
@@ -52,22 +54,22 @@ internal class RemoteConfigClient(
     private suspend fun startEventConsumer() {
         sdkEventManager.onlineSdkEvents
             .filter { isRemoteConfigEvent(it) }
-            .collect {
+            .collect { event ->
                 try {
                     sdkLogger.debug("ConsumeRemoteConfigEvents")
-                    val remoteConfigResponse = fetchRemoteConfig(it)
+                    val remoteConfigResponse = fetchRemoteConfig(event)
                     remoteConfigResponse?.let {
                         remoteConfigResponseHandler.handle(remoteConfigResponse)
-                    }
-                    sdkEventManager.emitEvent(
-                        Response(
-                            originId = it.id,
-                            Result.success(remoteConfigResponse)
+                        sdkEventManager.emitEvent(
+                            Response(
+                                originId = event.id,
+                                Result.success(remoteConfigResponse)
+                            )
                         )
-                    )
-                    it.ack(eventsDao, sdkLogger)
+                        event.ack(eventsDao, sdkLogger)
+                    }
                 } catch (exception: Exception) {
-                    handleException(exception, it)
+                    handleException(exception, event)
                 }
             }
     }
@@ -79,12 +81,26 @@ internal class RemoteConfigClient(
             event
         )
 
-        sdkEventManager.emitEvent(
-            Response(
-                originId = event.id,
-                Result.failure<Exception>(exception)
+        // TEMPORARY FIX UNTIL REMOTE CONFIG UPLOAD IS AUTOMATED FOR NEW APP CODES
+        if (event is SdkEvent.Internal.Sdk.ApplyAppCodeBasedRemoteConfig &&
+            exception is SdkException.FailedRequestException &&
+            exception.response.status == HttpStatusCode.NotFound
+        ) {
+            sdkLogger.debug("Remote config for app code not found.")
+            sdkEventManager.emitEvent(
+                Response(
+                    originId = event.id,
+                    Result.success(Unit)
+                )
             )
-        )
+        } else {
+            sdkEventManager.emitEvent(
+                Response(
+                    originId = event.id,
+                    Result.failure<Exception>(exception)
+                )
+            )
+        }
     }
 
     private fun isRemoteConfigEvent(sdkEvent: SdkEvent): Boolean {
@@ -120,6 +136,13 @@ internal class RemoteConfigClient(
             if (verified) {
                 json.decodeFromString(config)
             } else {
+                event.ack(eventsDao, sdkLogger)
+                sdkEventManager.emitEvent(
+                    Response(
+                        originId = event.id,
+                        Result.failure<Unit>(RuntimeException("Remote config signature verification failed"))
+                    )
+                )
                 null
             }
         }
