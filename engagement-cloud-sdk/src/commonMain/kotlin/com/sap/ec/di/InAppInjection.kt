@@ -49,6 +49,7 @@ object InAppInjection {
         }
         single<InlineInAppMessageFetcherApi> {
             InlineInAppMessageFetcher(
+                genericClient = get(named(NetworkClientTypes.Generic)),
                 networkClient = get(named(NetworkClientTypes.EC)),
                 urlFactory = get(),
                 json = get(),
@@ -63,7 +64,7 @@ object InAppInjection {
                 elements = listOf()
             )
         }
-        single<InAppEventConsumer>{
+        single<InAppEventConsumer> {
             InAppEventConsumer(
                 applicationScope = get(named(CoroutineScopeTypes.Application)),
                 sdkEventManager = get(),

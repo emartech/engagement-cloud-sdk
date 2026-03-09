@@ -17,7 +17,8 @@ import kotlin.time.ExperimentalTime
 
 internal class MessageItemModel(
     override val message: EmbeddedMessage,
-    private val downloaderApi: DownloaderApi,
+    override val embeddedMessagingBaseUrl: String,
+    private val downloader: DownloaderApi,
     private val sdkEventDistributor: SdkEventDistributorApi,
     private val actionFactory: ActionFactoryApi<ActionModel>,
     private val logger: Logger
@@ -32,7 +33,7 @@ internal class MessageItemModel(
 
     override suspend fun downloadImage(): ByteArray {
         return message.listThumbnailImage?.let {
-            downloaderApi.download(it.src, getDecodedFallbackImage())
+            downloader.download(it.src, getDecodedFallbackImage())
         } ?: getDecodedFallbackImage()
     }
 

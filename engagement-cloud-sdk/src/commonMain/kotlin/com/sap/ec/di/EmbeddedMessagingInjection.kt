@@ -50,6 +50,7 @@ object EmbeddedMessagingInjection {
                 downloaderApi = get<DownloaderApi>(),
                 sdkEventDistributor = get<SdkEventDistributorApi>(),
                 actionFactory = get<EventActionFactoryApi>(),
+                defaultUrls = get(),
                 logger = get { parametersOf(PagerFactory::class.simpleName) }
             )
         }

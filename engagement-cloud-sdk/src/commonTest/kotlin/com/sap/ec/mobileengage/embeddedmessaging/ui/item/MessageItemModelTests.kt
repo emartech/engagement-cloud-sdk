@@ -48,6 +48,7 @@ import kotlin.time.ExperimentalTime
 
 class MessageItemModelTests {
     private companion object {
+        const val EMBEDDED_MESSAGING_BASE_URL = "testBaseUrl"
         val TEST_MESSAGE = EmbeddedMessage(
             id = "1",
             title = "testTitle",
@@ -95,7 +96,8 @@ class MessageItemModelTests {
     private fun createMessageItemModel(message: EmbeddedMessage = TEST_MESSAGE): MessageItemModel =
         MessageItemModel(
             message = message,
-            downloaderApi = mockDownloader,
+            embeddedMessagingBaseUrl = EMBEDDED_MESSAGING_BASE_URL,
+            downloader = mockDownloader,
             sdkEventDistributor = mockSdkEventDistributor,
             actionFactory = mockActionFactory,
             logger = mockLogger

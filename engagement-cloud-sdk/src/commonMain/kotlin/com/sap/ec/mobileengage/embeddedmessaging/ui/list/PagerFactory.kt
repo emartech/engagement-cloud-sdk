@@ -3,6 +3,7 @@ package com.sap.ec.mobileengage.embeddedmessaging.ui.list
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import com.sap.ec.context.DefaultUrlsApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.util.DownloaderApi
@@ -19,6 +20,7 @@ internal class PagerFactory(
     private val downloaderApi: DownloaderApi,
     private val sdkEventDistributor: SdkEventDistributorApi,
     private val actionFactory: ActionFactoryApi<ActionModel>,
+    private val defaultUrls: DefaultUrlsApi,
     private val logger: Logger
 ) : PagerFactoryApi {
     override fun create(
@@ -44,6 +46,7 @@ internal class PagerFactory(
                     downloader = downloaderApi,
                     actionFactory = actionFactory,
                     sdkEventDistributor = sdkEventDistributor,
+                    defaultUrls = defaultUrls,
                     logger = logger
                 )
             }

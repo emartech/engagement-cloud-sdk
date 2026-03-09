@@ -75,11 +75,14 @@ class MessageItemViewModel(
         MessageItemViewModel(model, isExcludedLocally = true)
 
     private fun getDefaultActionUrl(): Url? {
-        val defaultAction = model.message.defaultAction
-        return if (defaultAction is BasicRichContentDisplayActionModel) {
-            Url(defaultAction.url)
-            //TODO: SDK-576
-        } else {
+        return try {
+            val defaultAction = model.message.defaultAction
+            if (defaultAction is BasicRichContentDisplayActionModel) {
+                Url("${model.embeddedMessagingBaseUrl}${defaultAction.url}")
+            } else {
+                null
+            }
+        } catch (_: Throwable) {
             null
         }
     }

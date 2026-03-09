@@ -7,6 +7,7 @@ import com.sap.ec.core.networking.model.UrlRequest
 import com.sap.ec.core.url.ECUrlType
 import com.sap.ec.core.url.UrlFactoryApi
 import com.sap.ec.mobileengage.inapp.InAppMessage
+import com.sap.ec.mobileengage.inapp.networking.models.EmbeddedMessagingRichContentUrlHolder
 import com.sap.ec.mobileengage.inapp.networking.models.InlineMessageRequest
 import com.sap.ec.mobileengage.inapp.networking.models.InlineMessageResponse
 import com.sap.ec.mobileengage.inapp.presentation.InAppType
@@ -15,6 +16,7 @@ import io.ktor.http.Url
 import kotlinx.serialization.json.Json
 
 internal class InlineInAppMessageFetcher(
+    private val genericClient: NetworkClientApi,
     private val networkClient: NetworkClientApi,
     private val urlFactory: UrlFactoryApi,
     private val json: Json,
@@ -82,11 +84,19 @@ internal class InlineInAppMessageFetcher(
                     null
                 } else {
                     sdkLogger.debug("Successfully fetched inline message from url: $url")
-                    InAppMessage(
-                        type = InAppType.INLINE,
-                        trackingInfo = trackingInfo,
-                        content = content
-                    )
+                    val richContentUrl = json.decodeFromString<EmbeddedMessagingRichContentUrlHolder>(content).url
+                    val richContentRequest = UrlRequest(Url(richContentUrl), HttpMethod.Get)
+                    genericClient.send(richContentRequest).getOrElse {
+                        sdkLogger.error("Failed to fetch RichContent for embedded message from url: $richContentUrl", it)
+                        return null
+                    }.bodyAsText.let {
+                        sdkLogger.debug("Successfully fetched detail message content from url: $url")
+                        InAppMessage(
+                            type = InAppType.INLINE,
+                            trackingInfo = trackingInfo,
+                            content = it
+                        )
+                    }
                 }
             }
         } catch (e: Exception) {

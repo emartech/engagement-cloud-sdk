@@ -4,6 +4,7 @@ import com.sap.ec.networking.clients.embedded.messaging.model.EmbeddedMessage
 
 interface MessageItemModelApi {
     val message: EmbeddedMessage
+    val embeddedMessagingBaseUrl: String
     suspend fun downloadImage(): ByteArray
     suspend fun tagMessageOpened(): Result<Unit>
     suspend fun tagMessageRead(): Result<Unit>

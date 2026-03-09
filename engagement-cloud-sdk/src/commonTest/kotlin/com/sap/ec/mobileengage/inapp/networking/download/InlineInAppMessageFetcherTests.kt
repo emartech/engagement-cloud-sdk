@@ -6,6 +6,7 @@ import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.networking.model.UrlRequest
 import com.sap.ec.core.url.ECUrlType
 import com.sap.ec.core.url.UrlFactoryApi
+import com.sap.ec.mobileengage.inapp.networking.models.EmbeddedMessagingRichContentUrlHolder
 import com.sap.ec.mobileengage.inapp.presentation.InAppType
 import com.sap.ec.util.JsonUtil
 import dev.mokkery.MockMode
@@ -14,6 +15,7 @@ import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import io.ktor.http.Headers
@@ -27,10 +29,12 @@ import kotlin.test.Test
 
 class InlineInAppMessageFetcherTests {
 
-    private lateinit var mockNetworkClient: NetworkClientApi
+    private lateinit var mockECNetworkClient: NetworkClientApi
+    private lateinit var mockGenericNetworkClient: NetworkClientApi
     private lateinit var mockUrlFactory: UrlFactoryApi
     private lateinit var mockLogger: Logger
     private lateinit var fetcher: InlineInAppMessageFetcher
+    private lateinit var json: Json
 
     private val testViewId = "testViewId"
     private val testTrackingInfo = "testTrackingInfo"
@@ -38,13 +42,16 @@ class InlineInAppMessageFetcherTests {
 
     @BeforeTest
     fun setup() {
-        mockNetworkClient = mock(MockMode.autoUnit)
+        mockECNetworkClient = mock(MockMode.autoUnit)
+        mockGenericNetworkClient = mock(MockMode.autoUnit)
         mockUrlFactory = mock(MockMode.autoUnit)
         mockLogger = mock(MockMode.autofill)
+        json = JsonUtil.json
         fetcher = InlineInAppMessageFetcher(
-            mockNetworkClient,
+            mockGenericNetworkClient,
+            mockECNetworkClient,
             mockUrlFactory,
-            JsonUtil.json,
+            json,
             mockLogger
         )
 
@@ -67,13 +74,13 @@ class InlineInAppMessageFetcherTests {
         """.trimIndent()
 
         val response = Response(
-            originalRequest = UrlRequest(testUrl, HttpMethod.Companion.Post),
-            status = HttpStatusCode.Companion.OK,
-            headers = Headers.Companion.Empty,
+            originalRequest = UrlRequest(testUrl, HttpMethod.Post),
+            status = HttpStatusCode.OK,
+            headers = Headers.Empty,
             bodyAsText = responseJson
         )
 
-        everySuspend { mockNetworkClient.send(any()) } returns Result.success(response)
+        everySuspend { mockECNetworkClient.send(any()) } returns Result.success(response)
 
         val result = fetcher.fetch(testViewId)
 
@@ -83,7 +90,7 @@ class InlineInAppMessageFetcherTests {
 
         verifySuspend {
             mockUrlFactory.create(ECUrlType.FetchInlineInAppMessages)
-            mockNetworkClient.send(any())
+            mockECNetworkClient.send(any())
         }
     }
 
@@ -103,13 +110,13 @@ class InlineInAppMessageFetcherTests {
         """.trimIndent()
 
         val response = Response(
-            originalRequest = UrlRequest(testUrl, HttpMethod.Companion.Post),
-            status = HttpStatusCode.Companion.OK,
-            headers = Headers.Companion.Empty,
+            originalRequest = UrlRequest(testUrl, HttpMethod.Post),
+            status = HttpStatusCode.OK,
+            headers = Headers.Empty,
             bodyAsText = responseJson
         )
 
-        everySuspend { mockNetworkClient.send(any()) } returns Result.success(response)
+        everySuspend { mockECNetworkClient.send(any()) } returns Result.success(response)
 
         val result = fetcher.fetch(testViewId)
 
@@ -132,13 +139,13 @@ class InlineInAppMessageFetcherTests {
         """.trimIndent()
 
         val response = Response(
-            originalRequest = UrlRequest(testUrl, HttpMethod.Companion.Post),
-            status = HttpStatusCode.Companion.OK,
-            headers = Headers.Companion.Empty,
+            originalRequest = UrlRequest(testUrl, HttpMethod.Post),
+            status = HttpStatusCode.OK,
+            headers = Headers.Empty,
             bodyAsText = responseJson
         )
 
-        everySuspend { mockNetworkClient.send(any()) } returns Result.success(response)
+        everySuspend { mockECNetworkClient.send(any()) } returns Result.success(response)
 
         val result = fetcher.fetch(testViewId)
 
@@ -161,13 +168,13 @@ class InlineInAppMessageFetcherTests {
         """.trimIndent()
 
         val response = Response(
-            originalRequest = UrlRequest(testUrl, HttpMethod.Companion.Post),
-            status = HttpStatusCode.Companion.OK,
-            headers = Headers.Companion.Empty,
+            originalRequest = UrlRequest(testUrl, HttpMethod.Post),
+            status = HttpStatusCode.OK,
+            headers = Headers.Empty,
             bodyAsText = responseJson
         )
 
-        everySuspend { mockNetworkClient.send(any()) } returns Result.success(response)
+        everySuspend { mockECNetworkClient.send(any()) } returns Result.success(response)
 
         val result = fetcher.fetch(testViewId)
 
@@ -179,13 +186,13 @@ class InlineInAppMessageFetcherTests {
         val responseJson = "".trimIndent()
 
         val response = Response(
-            originalRequest = UrlRequest(testUrl, HttpMethod.Companion.Post),
+            originalRequest = UrlRequest(testUrl, HttpMethod.Post),
             status = HttpStatusCode.NoContent,
             headers = Headers.Empty,
             bodyAsText = responseJson
         )
 
-        everySuspend { mockNetworkClient.send(any()) } returns Result.success(response)
+        everySuspend { mockECNetworkClient.send(any()) } returns Result.success(response)
 
         val result = fetcher.fetch(testViewId)
 
@@ -198,7 +205,7 @@ class InlineInAppMessageFetcherTests {
     @Test
     fun fetch_shouldReturnNull_whenNetworkRequestFails() = runTest {
         val testException = Exception("Network error")
-        everySuspend { mockNetworkClient.send(any()) } returns Result.failure(testException)
+        everySuspend { mockECNetworkClient.send(any()) } returns Result.failure(testException)
 
         val result = fetcher.fetch(testViewId)
 
@@ -212,13 +219,13 @@ class InlineInAppMessageFetcherTests {
     @Test
     fun fetch_shouldReturnNull_whenResponseDecodingFails() = runTest {
         val response = Response(
-            originalRequest = UrlRequest(testUrl, HttpMethod.Companion.Post),
-            status = HttpStatusCode.Companion.OK,
-            headers = Headers.Companion.Empty,
+            originalRequest = UrlRequest(testUrl, HttpMethod.Post),
+            status = HttpStatusCode.OK,
+            headers = Headers.Empty,
             bodyAsText = "invalid json"
         )
 
-        everySuspend { mockNetworkClient.send(any()) } returns Result.success(response)
+        everySuspend { mockECNetworkClient.send(any()) } returns Result.success(response)
 
         val result = fetcher.fetch(testViewId)
 
@@ -231,26 +238,119 @@ class InlineInAppMessageFetcherTests {
 
     @Test
     fun fetchByUrl_shouldReturnMessage_whenResponseIsSuccessful() = runTest {
-        val contentUrl = Url("https://sap.com/inline-content")
+        val testRichContentUrl = Url("https://fetchUrlFromHere.com/url")
+        val contentUrl = "https://sap.com/inline-content"
+        val testUrlHolder = EmbeddedMessagingRichContentUrlHolder(contentUrl)
+        val urlHolderJson = json.encodeToString(testUrlHolder)
         val htmlContent = "<div>Inline Content</div>"
 
-        val response = Response(
-            originalRequest = UrlRequest(contentUrl, HttpMethod.Companion.Get),
-            status = HttpStatusCode.Companion.OK,
-            headers = Headers.Companion.Empty,
+        val urlHolderResponse = Response(
+            originalRequest = UrlRequest(testRichContentUrl, HttpMethod.Get),
+            status = HttpStatusCode.OK,
+            headers = Headers.Empty,
+            bodyAsText = urlHolderJson
+        )
+
+        val richContentResponse = Response(
+            originalRequest = UrlRequest(Url(contentUrl), HttpMethod.Get),
+            status = HttpStatusCode.OK,
+            headers = Headers.Empty,
             bodyAsText = htmlContent
         )
 
-        everySuspend { mockNetworkClient.send(any()) } returns Result.success(response)
+        everySuspend { mockECNetworkClient.send(any()) } returns Result.success(urlHolderResponse)
+        everySuspend { mockGenericNetworkClient.send(any()) } returns Result.success(
+            richContentResponse
+        )
 
-        val result = fetcher.fetch(contentUrl, testTrackingInfo)
+        val result = fetcher.fetch(testRichContentUrl, testTrackingInfo)
 
         result!!.type shouldBe InAppType.INLINE
         result.trackingInfo shouldBe testTrackingInfo
         result.content shouldBe htmlContent
 
-        verifySuspend {
-            mockNetworkClient.send(any())
+        verifySuspend(VerifyMode.exactly(1)) {
+            mockECNetworkClient.send(any())
+        }
+        verifySuspend(VerifyMode.exactly(1)) {
+            mockGenericNetworkClient.send(any())
+        }
+    }
+
+    @Test
+    fun fetchByUrl_shouldReturnNull_whenRichContentUrlResponseCannotBeParsed_asUrlHolder() = runTest {
+        val testRichContentUrl = Url("https://example.com/url")
+        val urlHolderJson = "can not parse this"
+
+        val urlHolderResponse = Response(
+            originalRequest = UrlRequest(testRichContentUrl, HttpMethod.Get),
+            status = HttpStatusCode.OK,
+            headers = Headers.Empty,
+            bodyAsText = urlHolderJson
+        )
+
+        everySuspend { mockECNetworkClient.send(any()) } returns Result.success(urlHolderResponse)
+
+        val result = fetcher.fetch(testRichContentUrl, testTrackingInfo)
+
+        result shouldBe null
+
+        verifySuspend(VerifyMode.exactly(1)) {
+            mockECNetworkClient.send(any())
+        }
+    }
+
+    @Test
+    fun fetchByUrl_shouldReturnNull_whenRichContentResponse_containsInvalidUrl() = runTest {
+        val testRichContentUrl = Url("https://example.com/url")
+        val contentUrl = "this is not a valid url %!=\\@"
+        val testUrlHolder = EmbeddedMessagingRichContentUrlHolder(contentUrl)
+        val urlHolderJson = json.encodeToString(testUrlHolder)
+
+        val urlHolderResponse = Response(
+            originalRequest = UrlRequest(testRichContentUrl, HttpMethod.Get),
+            status = HttpStatusCode.OK,
+            headers = Headers.Empty,
+            bodyAsText = urlHolderJson
+        )
+
+        everySuspend { mockECNetworkClient.send(any()) } returns Result.success(urlHolderResponse)
+
+        val result = fetcher.fetch(testRichContentUrl, testTrackingInfo)
+
+        result shouldBe null
+
+        verifySuspend(VerifyMode.exactly(1)) {
+            mockECNetworkClient.send(any())
+        }
+    }
+
+    @Test
+    fun fetchByUrl_shouldReturnNull_whenRichContentFetchingFails() = runTest {
+        val testRichContentUrl = Url("https://fetchUrlFromHere.com/url")
+        val contentUrl = "https://sap.com/inline-content"
+        val testUrlHolder = EmbeddedMessagingRichContentUrlHolder(contentUrl)
+        val urlHolderJson = json.encodeToString(testUrlHolder)
+
+        val urlHolderResponse = Response(
+            originalRequest = UrlRequest(testRichContentUrl, HttpMethod.Get),
+            status = HttpStatusCode.OK,
+            headers = Headers.Empty,
+            bodyAsText = urlHolderJson
+        )
+
+        everySuspend { mockECNetworkClient.send(any()) } returns Result.success(urlHolderResponse)
+        everySuspend { mockGenericNetworkClient.send(any()) } returns Result.failure(Exception("failure"))
+
+        val result = fetcher.fetch(testRichContentUrl, testTrackingInfo)
+
+        result shouldBe null
+
+        verifySuspend(VerifyMode.exactly(1)) {
+            mockECNetworkClient.send(any())
+        }
+        verifySuspend(VerifyMode.exactly(1)) {
+            mockGenericNetworkClient.send(any())
         }
     }
 
@@ -259,7 +359,7 @@ class InlineInAppMessageFetcherTests {
         val contentUrl = Url("https://sap.com/inline-content")
         val testException = Exception("Network error")
 
-        everySuspend { mockNetworkClient.send(any()) } returns Result.failure(testException)
+        everySuspend { mockECNetworkClient.send(any()) } returns Result.failure(testException)
 
         val result = fetcher.fetch(contentUrl, testTrackingInfo)
 
@@ -275,13 +375,13 @@ class InlineInAppMessageFetcherTests {
         val contentUrl = Url("https://sap.com/inline-content")
 
         val response = Response(
-            originalRequest = UrlRequest(contentUrl, HttpMethod.Companion.Get),
-            status = HttpStatusCode.Companion.OK,
-            headers = Headers.Companion.Empty,
+            originalRequest = UrlRequest(contentUrl, HttpMethod.Get),
+            status = HttpStatusCode.OK,
+            headers = Headers.Empty,
             bodyAsText = ""
         )
 
-        everySuspend { mockNetworkClient.send(any()) } returns Result.success(response)
+        everySuspend { mockECNetworkClient.send(any()) } returns Result.success(response)
 
         val result = fetcher.fetch(contentUrl, testTrackingInfo)
 

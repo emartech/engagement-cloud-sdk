@@ -13,18 +13,11 @@ import com.sap.ec.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingStyle
 import com.sap.ec.mobileengage.embeddedmessaging.ui.toReadTagId
 import com.sap.ec.mobileengage.inapp.view.InlineInAppView
 import io.ktor.http.Url
-import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.web.css.height
-import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Div
-import org.jetbrains.compose.web.dom.H2
-import org.jetbrains.compose.web.dom.Img
-import org.jetbrains.compose.web.dom.P
-import org.jetbrains.compose.web.dom.Text
 import web.dom.ElementId
 import web.dom.document
 import web.intersection.IntersectionObserver
@@ -34,73 +27,37 @@ import web.intersection.IntersectionObserverInit
 fun MessageDetailView(
     viewModel: MessageItemViewModelApi
 ) {
-    var imageDataUrl by remember { mutableStateOf<String?>(null) }
+    var detailedMessageUrl by remember { mutableStateOf<Url?>(null) }
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(viewModel.imageUrl) {
-        imageDataUrl = viewModel.imageUrl?.let {
-            try {
-                val imageBytes = viewModel.fetchImage()
-                if (imageBytes.isNotEmpty()) {
-                    byteArrayToDataUrl(
-                        imageBytes
-                    )
-                } else null
-            } catch (_: Exception) {
-                null
-            }
-        }
+        detailedMessageUrl = viewModel.richContentUrl
     }
 
-    Div({
-        id(viewModel.id.toReadTagId())
-        classes(EmbeddedMessagingStyleSheet.detailViewContainer)
-    }) {
-        if (!viewModel.isRead) {
-            DisposableEffect(Unit) {
-                val observer =
-                    observeDetailedMessageVisibility(
-                        viewModel,
-                        scope
-                    )
-                onDispose {
-                    observer.disconnect()
-                }
-            }
-        }
+    detailedMessageUrl?.let {
         Div({
-            classes(EmbeddedMessagingStyleSheet.detailContent)
+            id(viewModel.id.toReadTagId())
+            classes(EmbeddedMessagingStyleSheet.detailViewContainer)
         }) {
-            H2 {
-                Text(viewModel.title)
+            if (!viewModel.isRead) {
+                DisposableEffect(Unit) {
+                    val observer =
+                        observeDetailedMessageVisibility(
+                            viewModel,
+                            scope
+                        )
+                    onDispose {
+                        observer.disconnect()
+                    }
+                }
             }
             Div({
-                style {
-                    height(500.px)
-                }
+                classes(EmbeddedMessagingStyleSheet.detailContent)
             }) {
                 InlineInAppView(
-                    Url("https://www.example.com"),
+                    it,
                     viewModel.trackingInfo
                 )
-            }
-            imageDataUrl?.let { url ->
-                Img(src = url, alt = viewModel.imageAltText ?: "") {
-                    classes(EmbeddedMessagingStyleSheet.detailImage)
-                }
-            }
-            P {
-                Text(viewModel.lead)
-                Div({
-                    style {
-                        height(500.px)
-                    }
-                }) {
-                    InlineInAppView(
-                        Url("https://www.example.com"),
-                        viewModel.trackingInfo
-                    )
-                }
             }
         }
     }
@@ -136,11 +93,4 @@ private fun observeDetailedMessageVisibility(
     }
 
     return observer
-}
-
-private fun byteArrayToDataUrl(bytes: ByteArray): String {
-    val base64 = window.btoa(
-        bytes.joinToString("") { (it.toInt() and 0xFF).toChar().toString() }
-    )
-    return "data:image/jpeg;base64,$base64"
 }

@@ -80,7 +80,8 @@ fun MessageItemViewPreview() {
         MessageItemViewModel(
             MessageItemModel(
                 message = providePreviewMessage(),
-                downloaderApi = PreviewDownLoader(),
+                "testBaseUrl",
+                downloader = PreviewDownLoader(),
                 sdkEventDistributor = previewSdkEventDistributor,
                 actionFactory = PreviewActionFactory(),
                 logger = PreviewLogger()
@@ -202,7 +203,8 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
                                     mapOf("key1" to "value1", "key2" to "value2"),
                                     "tracking_info_example"
                                 ),
-                                downloaderApi = PreviewDownLoader(),
+                                "testBaseUrl",
+                                downloader = PreviewDownLoader(),
                                 sdkEventDistributor = previewSdkEventDistributor,
                                 actionFactory = PreviewActionFactory(),
                                 logger = PreviewLogger()
@@ -226,7 +228,8 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
                                     mapOf("key1" to "value1", "key2" to "value2"),
                                     "tracking_info_example"
                                 ),
-                                downloaderApi = PreviewDownLoader(),
+                                "testBaseUrl",
+                                downloader = PreviewDownLoader(),
                                 sdkEventDistributor = previewSdkEventDistributor,
                                 actionFactory = PreviewActionFactory(),
                                 logger = PreviewLogger()
