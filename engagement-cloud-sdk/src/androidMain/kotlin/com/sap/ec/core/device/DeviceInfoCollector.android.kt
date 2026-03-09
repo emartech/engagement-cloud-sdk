@@ -45,8 +45,8 @@ internal actual class DeviceInfoCollector(
             platformWrapperVersion = getWrapperInfo()?.wrapperVersion,
             applicationVersion = applicationVersionProvider.provide(),
             deviceModel = Build.MODEL,
-            osVersion = SdkBuildConfig.getOsVersion(),
-            sdkVersion = BuildConfig.VERSION_NAME,
+            osVersion = BuildConfig.VERSION_NAME, // TODO SdkBuildConfig.getOsVersion(),
+            sdkVersion = "4.0.0", // TODO BuildConfig.VERSION_NAME,
             language = language(),
             timezone = timezoneProvider.provide(),
             clientId = clientIdProvider.provide()

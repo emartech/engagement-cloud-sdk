@@ -44,8 +44,8 @@ internal actual class DeviceInfoCollector(
             platformWrapperVersion = getWrapperInfo()?.wrapperVersion,
             applicationVersion = applicationVersionProvider.provide(),
             deviceModel = window.navigator.userAgent,
-            osVersion = headerData.browserVersion,
-            sdkVersion = BuildConfig.VERSION_NAME,
+            osVersion = BuildConfig.VERSION_NAME, // TODO headerData.browserVersion,
+            sdkVersion = "4.0.0", // TODO BuildConfig.VERSION_NAME,
             language = stringStorage.get(SdkConstants.LANGUAGE_STORAGE_KEY)
                 ?: languageProvider.provide(),
             timezone = timezoneProvider.provide(),
