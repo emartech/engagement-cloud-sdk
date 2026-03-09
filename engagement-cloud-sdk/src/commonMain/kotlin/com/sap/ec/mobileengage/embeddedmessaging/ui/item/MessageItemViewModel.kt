@@ -4,7 +4,7 @@ import com.sap.ec.mobileengage.action.models.BasicRichContentDisplayActionModel
 import com.sap.ec.networking.clients.embedded.messaging.model.Category
 import io.ktor.http.Url
 
-class MessageItemViewModel(
+internal class MessageItemViewModel(
     private val model: MessageItemModelApi,
     override val isExcludedLocally: Boolean = false
 ) : MessageItemViewModelApi {
@@ -78,7 +78,7 @@ class MessageItemViewModel(
         return try {
             val defaultAction = model.message.defaultAction
             if (defaultAction is BasicRichContentDisplayActionModel) {
-                Url("${model.defaultUrls.embeddedMessagingBaseUrl}${defaultAction.url}")
+                Url("${model.sdkContext.defaultUrls.embeddedMessagingBaseUrl}${defaultAction.url}")
             } else {
                 null
             }

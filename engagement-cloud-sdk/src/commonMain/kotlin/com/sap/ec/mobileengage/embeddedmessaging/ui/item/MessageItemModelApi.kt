@@ -1,11 +1,11 @@
 package com.sap.ec.mobileengage.embeddedmessaging.ui.item
 
-import com.sap.ec.context.DefaultUrlsApi
+import com.sap.ec.context.SdkContextApi
 import com.sap.ec.networking.clients.embedded.messaging.model.EmbeddedMessage
 
-interface MessageItemModelApi {
+internal interface MessageItemModelApi {
     val message: EmbeddedMessage
-    val defaultUrls: DefaultUrlsApi
+    val sdkContext: SdkContextApi
     suspend fun downloadImage(): ByteArray
     suspend fun tagMessageOpened(): Result<Unit>
     suspend fun tagMessageRead(): Result<Unit>

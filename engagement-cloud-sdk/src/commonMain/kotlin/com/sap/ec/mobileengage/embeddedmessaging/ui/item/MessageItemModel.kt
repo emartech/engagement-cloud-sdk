@@ -1,6 +1,6 @@
 package com.sap.ec.mobileengage.embeddedmessaging.ui.item
 
-import com.sap.ec.context.DefaultUrlsApi
+import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.model.Response
@@ -18,7 +18,7 @@ import kotlin.time.ExperimentalTime
 
 internal class MessageItemModel(
     override val message: EmbeddedMessage,
-    override val defaultUrls: DefaultUrlsApi,
+    override val sdkContext: SdkContextApi,
     private val downloader: DownloaderApi,
     private val sdkEventDistributor: SdkEventDistributorApi,
     private val actionFactory: ActionFactoryApi<ActionModel>,
