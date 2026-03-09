@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 
 @Serializable
-data class LogRequest(
+internal data class LogRequest(
     val deviceInfo: DeviceInfoForLogs,
     val level: LogLevel,
     val message: String?,

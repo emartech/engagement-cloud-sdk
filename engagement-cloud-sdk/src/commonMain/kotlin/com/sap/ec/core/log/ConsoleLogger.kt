@@ -4,7 +4,7 @@ import com.sap.ec.InternalSdkApi
 import kotlinx.serialization.json.JsonObject
 
 @InternalSdkApi
-expect class ConsoleLogger() : ConsoleLoggerApi {
+internal expect class ConsoleLogger() : ConsoleLoggerApi {
 
     override fun logToConsole(
         loggerName: String,

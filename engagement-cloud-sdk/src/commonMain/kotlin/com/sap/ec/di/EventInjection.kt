@@ -21,7 +21,7 @@ import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
-object EventInjection {
+internal object EventInjection {
     val eventModules = module {
         single<MutableList<EventTrackerCall>>(named(PersistentListTypes.EventTrackerCall)) {
             PersistentList(

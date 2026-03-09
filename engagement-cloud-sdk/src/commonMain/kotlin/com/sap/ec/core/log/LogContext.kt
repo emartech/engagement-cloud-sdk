@@ -8,12 +8,12 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
 
-class LogContext(val contextMap: JsonObject) :
+internal class LogContext(val contextMap: JsonObject) :
     AbstractCoroutineContextElement(Key) {
     companion object Key : CoroutineContext.Key<LogContext>
 }
 
-suspend fun <T> withLogContext(
+internal suspend fun <T> withLogContext(
     contextMap: JsonObject,
     block: suspend CoroutineScope.() -> T
 ): T {
@@ -30,6 +30,6 @@ suspend fun <T> withLogContext(
     }
 }
 
-fun JsonObject.toContext(): CoroutineContext {
+internal fun JsonObject.toContext(): CoroutineContext {
     return LogContext(this)
 }

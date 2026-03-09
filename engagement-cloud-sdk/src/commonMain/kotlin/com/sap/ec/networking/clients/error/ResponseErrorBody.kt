@@ -3,10 +3,10 @@ package com.sap.ec.networking.clients.error
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ResponseErrorBody(val error: ResponseError)
+internal data class ResponseErrorBody(val error: ResponseError)
 
 @Serializable
-data class ResponseError(val code: String, val message: String, val target: String, val details: List<ErrorDetail>)
+internal data class ResponseError(val code: String, val message: String, val target: String, val details: List<ErrorDetail>)
 
 @Serializable
-data class ErrorDetail(val code: String, val message: String)
+internal data class ErrorDetail(val code: String, val message: String)

@@ -3,7 +3,7 @@ package com.sap.ec.util
 import kotlinx.coroutines.CancellationException
 
 
-suspend inline fun <R> runCatchingWithoutCancellation(block: suspend () -> R): Result<R> {
+internal suspend inline fun <R> runCatchingWithoutCancellation(block: suspend () -> R): Result<R> {
     return try {
         val result: R = block()
         Result.success(result)

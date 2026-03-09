@@ -3,7 +3,7 @@ package com.sap.ec.core.networking.model
 import io.ktor.http.HttpMethod
 import io.ktor.http.Url
 
-data class UrlRequest(
+internal data class UrlRequest(
     val url: Url,
     val method: HttpMethod,
     val bodyString: String? = null,

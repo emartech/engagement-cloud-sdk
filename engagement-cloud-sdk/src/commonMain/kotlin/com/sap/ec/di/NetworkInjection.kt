@@ -18,7 +18,7 @@ import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
-object NetworkInjection {
+internal object NetworkInjection {
     val networkModules = module {
         single<HttpClient> {
             HttpClient {

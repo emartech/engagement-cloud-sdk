@@ -2,7 +2,7 @@ package com.sap.ec.core.storage
 
 import kotlinx.serialization.KSerializer
 
-interface StorageApi {
+internal interface StorageApi {
 
     fun <Value>put(key: String, serializer: KSerializer<Value>, value: Value?)
 

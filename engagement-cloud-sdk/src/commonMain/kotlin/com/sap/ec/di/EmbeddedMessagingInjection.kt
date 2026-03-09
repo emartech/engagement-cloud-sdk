@@ -26,7 +26,7 @@ import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
-object EmbeddedMessagingInjection {
+internal object EmbeddedMessagingInjection {
     val embeddedMessagingModules = module {
         single<EmbeddedMessagingRequestFactoryApi> {
             EmbeddedMessagesRequestFactory(

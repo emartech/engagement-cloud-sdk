@@ -1,7 +1,7 @@
 package com.sap.ec.core.datetime
 
-expect fun Long.asLocaleFormattedHoursAndMinutes(): String
+internal expect fun Long.asLocaleFormattedHoursAndMinutes(): String
 
-expect fun Long.asLocaleFormattedMonthsAndDays(): String
+internal expect fun Long.asLocaleFormattedMonthsAndDays(): String
 
-expect fun Long.asLocaleFormattedFullDate(): String
+internal expect fun Long.asLocaleFormattedFullDate(): String

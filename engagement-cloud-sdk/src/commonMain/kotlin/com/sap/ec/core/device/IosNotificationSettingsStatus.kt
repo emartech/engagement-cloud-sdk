@@ -1,10 +1,11 @@
 package com.sap.ec.core.device
 
+import com.sap.ec.InternalSdkApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 
-interface IosNotificationConstant {
+internal interface IosNotificationConstant {
     val value: Long
 
     companion object {
@@ -15,6 +16,7 @@ interface IosNotificationConstant {
 }
 
 @Serializable
+@InternalSdkApi
 enum class IosAuthorizationStatus(override val value: Long) : IosNotificationConstant {
     @SerialName("notDetermined")
     NotDetermined(0),
@@ -33,6 +35,7 @@ enum class IosAuthorizationStatus(override val value: Long) : IosNotificationCon
 }
 
 @Serializable
+@InternalSdkApi
 enum class IosNotificationSetting(override val value: Long) : IosNotificationConstant {
     @SerialName("notSupported")
     NotSupported(0),
@@ -45,6 +48,7 @@ enum class IosNotificationSetting(override val value: Long) : IosNotificationCon
 }
 
 @Serializable
+@InternalSdkApi
 enum class IosAlertStyle(override val value: Long) : IosNotificationConstant {
     @SerialName("none")
     None(0),
@@ -57,6 +61,7 @@ enum class IosAlertStyle(override val value: Long) : IosNotificationConstant {
 }
 
 @Serializable
+@InternalSdkApi
 enum class IosShowPreviewSetting(override val value: Long) : IosNotificationConstant {
     @SerialName("always")
     Always(0),
@@ -68,7 +73,7 @@ enum class IosShowPreviewSetting(override val value: Long) : IosNotificationCons
     Never(2)
 }
 
-fun String.toShowPreviewSetting() : IosShowPreviewSetting {
+internal fun String.toShowPreviewSetting() : IosShowPreviewSetting {
     return when (this) {
         "UNShowPreviewsSettingAlways" -> IosShowPreviewSetting.Always
         "UNShowPreviewsSettingWhenAuthenticated" -> IosShowPreviewSetting.WhenAuthenticated

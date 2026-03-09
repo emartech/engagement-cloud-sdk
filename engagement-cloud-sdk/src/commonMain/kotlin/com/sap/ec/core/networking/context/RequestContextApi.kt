@@ -1,6 +1,6 @@
 package com.sap.ec.core.networking.context
 
-interface RequestContextApi {
+internal interface RequestContextApi {
 
     var contactToken: String?
 

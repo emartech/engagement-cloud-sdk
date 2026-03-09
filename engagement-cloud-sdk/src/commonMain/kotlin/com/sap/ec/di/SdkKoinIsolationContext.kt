@@ -1,5 +1,6 @@
 package com.sap.ec.di
 
+import com.sap.ec.InternalSdkApi
 import com.sap.ec.api.SdkState
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.log.Logger
@@ -15,6 +16,7 @@ import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.koinApplication
 
+@InternalSdkApi
 object SdkKoinIsolationContext {
     private var runningApp: KoinApplication? = null
 
@@ -74,4 +76,5 @@ object SdkKoinIsolationContext {
     }
 }
 
+@InternalSdkApi
 expect fun SdkKoinIsolationContext.loadPlatformModules(): List<Module>

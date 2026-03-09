@@ -4,11 +4,11 @@ import com.sap.ec.core.storage.StorageApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ListSerializer
 
-fun <Element>persistentListOf(id: String, storage: StorageApi, elementSerializer: KSerializer<Element>, vararg elements: Element): MutableList<Element> {
+internal fun <Element>persistentListOf(id: String, storage: StorageApi, elementSerializer: KSerializer<Element>, vararg elements: Element): MutableList<Element> {
     return PersistentList(id, storage, elementSerializer, elements.toList())
 }
 
-class PersistentList<Element>(
+internal class PersistentList<Element>(
     private val id: String,
     private val storage: StorageApi,
     elementSerializer: KSerializer<Element>): MutableList<Element> {

@@ -11,7 +11,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 
-fun <T> Flow<T>.batched(
+internal fun <T> Flow<T>.batched(
     batchSize: Int,
     batchIntervalMillis: Long,
 ): Flow<List<T>> = channelFlow {

@@ -1,6 +1,6 @@
 package com.sap.ec.core.actions.clipboard
 
-interface ClipboardHandlerApi {
+internal interface ClipboardHandlerApi {
 
     suspend fun copyToClipboard(text: String)
 

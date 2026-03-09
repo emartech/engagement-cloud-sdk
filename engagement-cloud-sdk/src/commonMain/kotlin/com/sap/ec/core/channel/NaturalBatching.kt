@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.produceIn
 
-fun <T> Flow<T>.naturalBatching(maxChunkSize: Int = 10): Flow<List<T>> {
+internal fun <T> Flow<T>.naturalBatching(maxChunkSize: Int = 10): Flow<List<T>> {
     require(maxChunkSize >= 1)
     return flow {
         coroutineScope {

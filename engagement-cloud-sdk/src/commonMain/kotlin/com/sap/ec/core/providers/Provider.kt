@@ -1,11 +1,11 @@
 package com.sap.ec.core.providers
 
-interface Provider<Value> {
+internal interface Provider<Value> {
 
     fun provide(): Value
 }
 
-interface SuspendProvider<Value> {
+internal interface SuspendProvider<Value> {
 
     suspend fun provide(): Value
 }

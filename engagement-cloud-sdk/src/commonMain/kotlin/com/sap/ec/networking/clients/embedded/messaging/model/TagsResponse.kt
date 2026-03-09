@@ -3,21 +3,21 @@ package com.sap.ec.networking.clients.embedded.messaging.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class TagsResponse(
+internal data class TagsResponse(
     val version: String,
     val totalChanges: Int,
     val changes: List<TagChange>
 )
 
 @Serializable
-data class TagChange(
+internal data class TagChange(
     val messageId: String,
     val operation: OperationType,
     val tag: String,
     val trackingInfo: String
 )
 
-enum class OperationType {
+internal enum class OperationType {
     ADD,
     REMOVE
 }

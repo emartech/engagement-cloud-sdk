@@ -13,7 +13,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
-object MessagesResponseSerializer : KSerializer<MessagesResponse> {
+internal object MessagesResponseSerializer : KSerializer<MessagesResponse> {
     @Serializable
     private data class EmbeddedMessageSurrogate(
         val id: String,

@@ -3,7 +3,7 @@ package com.sap.ec.init.states
 import com.sap.ec.core.Registerable
 import com.sap.ec.core.state.State
 
-class RegisterSdkEventDistributorState(
+internal class RegisterSdkEventDistributorState(
     private val sdkEventDistributor: Registerable
 ): State {
     override val name: String = "registerSdkEventDistributorState"

@@ -1,6 +1,6 @@
 package com.sap.ec.core.actions.launchapplication
 
-interface LaunchApplicationHandlerApi {
+internal interface LaunchApplicationHandlerApi {
 
     suspend fun launchApplication()
 

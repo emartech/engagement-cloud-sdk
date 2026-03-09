@@ -68,7 +68,7 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.binds
 import org.koin.dsl.module
 
-object CoreInjection {
+internal object CoreInjection {
     private const val PUBLIC_KEY =
         "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAELjWEUIBX9zlm1OI4gF1hMCBLzpaBwgs9HlmSIBAqP4MDGy4ibOOV3FVDrnAY0Q34LZTbPBlp3gRNZJ19UoSy2Q=="
 
@@ -196,35 +196,35 @@ object CoreInjection {
     }
 }
 
-enum class DispatcherTypes {
+internal enum class DispatcherTypes {
     Sdk, Main
 }
 
-enum class CoroutineScopeTypes {
+internal enum class CoroutineScopeTypes {
     Application
 }
 
-enum class PersistentListTypes {
+internal enum class PersistentListTypes {
     PushCall, InAppCall, ConfigCall, ContactCall, EventTrackerCall
 }
 
-enum class NetworkClientTypes {
+internal enum class NetworkClientTypes {
     Generic, EC
 }
 
-enum class EventBasedClientTypes {
+internal enum class EventBasedClientTypes {
     Device, Config, DeepLink, Contact, Event, Push, RemoteConfig, Logging, Reregistration, EmbeddedMessaging
 }
 
-enum class EventFlowTypes {
+internal enum class EventFlowTypes {
     Public
 }
 
-enum class SdkConfigStoreTypes {
+internal enum class SdkConfigStoreTypes {
     EC, Android, Web
 }
 
-object PersistentListIds {
+internal object PersistentListIds {
     const val PUSH_CONTEXT_PERSISTENT_ID = "SAPEngagementCloudSdkPushContextCalls"
     const val INAPP_CONTEXT_PERSISTENT_ID = "SAPEngagementCloudSdkInAppContextCalls"
     const val CONFIG_CONTEXT_PERSISTENT_ID = "SAPEngagementCloudSdkConfigContextCalls"

@@ -1,6 +1,6 @@
 package com.sap.ec.core.state
 
-enum class StateLifecycle {
+internal enum class StateLifecycle {
     prepare,
     activate,
     relaxed

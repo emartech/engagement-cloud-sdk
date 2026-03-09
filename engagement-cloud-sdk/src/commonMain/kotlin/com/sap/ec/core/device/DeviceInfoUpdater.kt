@@ -3,7 +3,7 @@ package com.sap.ec.core.device
 import com.sap.ec.core.storage.StorageConstants.DEVICE_INFO_STORAGE_KEY
 import com.sap.ec.core.storage.StringStorageApi
 
-class DeviceInfoUpdater(
+internal class DeviceInfoUpdater(
     private val stringStorage: StringStorageApi
 ) : DeviceInfoUpdaterApi {
 

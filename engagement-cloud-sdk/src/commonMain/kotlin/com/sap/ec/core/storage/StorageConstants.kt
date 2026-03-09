@@ -1,6 +1,6 @@
 package com.sap.ec.core.storage
 
-object StorageConstants {
+internal object StorageConstants {
     const val DB_NAME = "engagement_cloud_sdk.db"
     const val CACHE_DIR_NAME = "engagement_cloud_sdk_cache"
     const val SUITE_NAME = "sap-sdk"

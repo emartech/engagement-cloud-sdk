@@ -1,6 +1,6 @@
 package com.sap.ec.core.permission
 
-interface PermissionHandlerApi {
+internal interface PermissionHandlerApi {
 
     suspend fun requestPushPermission()
 

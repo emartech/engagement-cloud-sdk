@@ -3,6 +3,6 @@ package com.sap.ec.networking
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RefreshTokenResponseBody(
+internal data class RefreshTokenResponseBody(
     val contactToken: String
 )

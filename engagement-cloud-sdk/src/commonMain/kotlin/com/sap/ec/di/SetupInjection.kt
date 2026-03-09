@@ -30,7 +30,7 @@ import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
-object SetupInjection {
+internal object SetupInjection {
     val setupModules = module {
         single<State>(named(StateTypes.CollectDeviceInfo)) {
             CollectDeviceInfoState(
@@ -201,11 +201,11 @@ object SetupInjection {
     }
 }
 
-enum class StateMachineTypes {
+internal enum class StateMachineTypes {
     MobileEngageEnable, MobileEngageDisable, Init, MobileEngageReregistration, FollowUpChangeAppCodeStateMachine
 }
 
-enum class StateTypes {
+internal enum class StateTypes {
     CollectDeviceInfo,
     ApplyAppCodeBasedRemoteConfig,
     PlatformInit,

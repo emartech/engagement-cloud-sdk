@@ -2,10 +2,10 @@ package com.sap.ec.core.device
 
 import kotlinx.serialization.Serializable
 
-const val UNKNOWN_VERSION_NAME = "unknown"
+internal const val UNKNOWN_VERSION_NAME = "unknown"
 
 @Serializable
-data class DeviceInfo(
+internal data class DeviceInfo(
     val platform: String,
     val platformCategory: String,
     val platformWrapper: String?,
@@ -20,7 +20,7 @@ data class DeviceInfo(
 )
 
 @Serializable
-data class DeviceInfoForLogs(
+internal data class DeviceInfoForLogs(
     val platform: String,
     val platformCategory: String,
     val platformWrapper: String?,
@@ -42,7 +42,7 @@ data class NotificationSettings(
 )
 
 @Serializable
-data class ChannelSettings(
+internal data class ChannelSettings(
     val channelId: String,
     val importance: Int = -1000,
     val canBypassDnd: Boolean = false,

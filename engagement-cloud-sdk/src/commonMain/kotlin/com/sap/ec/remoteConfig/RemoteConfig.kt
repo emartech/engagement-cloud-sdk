@@ -4,7 +4,7 @@ import com.sap.ec.core.log.LogLevel
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RemoteConfig(
+internal data class RemoteConfig(
     val serviceUrls: ServiceUrls? = null,
     val logLevel: LogLevel? = null,
     val features: RemoteConfigFeatures? = null,

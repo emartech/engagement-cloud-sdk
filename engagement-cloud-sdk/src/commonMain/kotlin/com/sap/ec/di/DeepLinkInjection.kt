@@ -10,7 +10,7 @@ import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
-object DeepLinkInjection {
+internal object DeepLinkInjection {
     val deepLinkModules = module {
         single<EventBasedClientApi>(named(EventBasedClientTypes.DeepLink)) {
             DeepLinkClient(

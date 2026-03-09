@@ -25,7 +25,7 @@ import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
-object InAppInjection {
+internal object InAppInjection {
     val inAppModules = module {
         single<JsBridgeVerifierApi> {
             JsBridgeVerifier(

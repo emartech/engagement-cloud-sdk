@@ -2,7 +2,7 @@ package com.sap.ec.mobileengage.action.actions
 
 import com.sap.ec.mobileengage.action.models.BasicRichContentDisplayActionModel
 
-class RichContentDisplayAction(
+internal class RichContentDisplayAction(
     private val action: BasicRichContentDisplayActionModel
 ): Action<Unit> {
 

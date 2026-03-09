@@ -16,7 +16,7 @@ import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
-object ConfigInjection {
+internal object ConfigInjection {
     val configModules = module {
         single<MutableList<ConfigCall>>(named(PersistentListTypes.ConfigCall)) {
             PersistentList(

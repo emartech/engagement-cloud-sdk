@@ -1,6 +1,6 @@
 package com.sap.ec.core.cache
 
-interface FileCacheApi {
+internal interface FileCacheApi {
 
     fun get(fileName: String): ByteArray?
 

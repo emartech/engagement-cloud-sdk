@@ -82,13 +82,13 @@ sealed interface OnlineSdkEvent : SdkEvent {
     }
 }
 
-suspend fun List<OnlineSdkEvent>.ack(eventsDao: EventsDaoApi, sdkLogger: Logger) {
+internal suspend fun List<OnlineSdkEvent>.ack(eventsDao: EventsDaoApi, sdkLogger: Logger) {
     this.forEach {
         it.ack(eventsDao, sdkLogger)
     }
 }
 
-suspend fun List<OnlineSdkEvent>.nack(eventsDao: EventsDaoApi, sdkLogger: Logger) {
+internal suspend fun List<OnlineSdkEvent>.nack(eventsDao: EventsDaoApi, sdkLogger: Logger) {
     this.forEach {
         it.nack(eventsDao, sdkLogger)
     }

@@ -1,6 +1,6 @@
 package com.sap.ec.core.storage
 
-interface StringStorageApi {
+internal interface StringStorageApi {
 
     fun put(key: String, value: String?)
 

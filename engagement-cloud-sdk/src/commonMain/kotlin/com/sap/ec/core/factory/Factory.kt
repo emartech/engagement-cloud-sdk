@@ -1,6 +1,6 @@
 package com.sap.ec.core.factory
 
-interface Factory<Input, Result> {
+internal interface Factory<Input, Result> {
 
     fun create(value: Input): Result
 }

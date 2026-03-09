@@ -3,7 +3,7 @@ package com.sap.ec.core.storage
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 
-class Storage(private val stringStorage: StringStorageApi, val json: Json): StorageApi {
+internal class Storage(private val stringStorage: StringStorageApi, val json: Json): StorageApi {
 
     override fun <Value>put(key: String, serializer: KSerializer<Value>, value: Value?) {
         val encodedValue = value?.let {

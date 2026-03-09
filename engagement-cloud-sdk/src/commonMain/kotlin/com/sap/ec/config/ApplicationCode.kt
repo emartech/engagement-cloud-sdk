@@ -5,13 +5,13 @@ import com.sap.ec.core.log.Logger
 import kotlin.jvm.JvmInline
 
 @JvmInline
-value class ApplicationCode(val value: String)
+internal value class ApplicationCode(val value: String)
 
 private val applicationCodeValidationRegex = "^[A-Z0-9]+-[A-Z0-9]+\$".toRegex()
 private val multiRegionApplicationCodeValidationRegex =
     "^INS-[A-Z0-9]+-APP-[A-Z0-9]{5}\$".toRegex()
 
-suspend fun ApplicationCode.validate(logger: Logger) {
+internal suspend fun ApplicationCode.validate(logger: Logger) {
     logger.debug("applicationCode validation")
     if (this.value.isBlank()) {
         val exception =

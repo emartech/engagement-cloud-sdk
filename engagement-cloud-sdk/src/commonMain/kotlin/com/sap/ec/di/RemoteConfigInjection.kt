@@ -5,7 +5,7 @@ import com.sap.ec.remoteConfig.RemoteConfigResponseHandlerApi
 import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
 
-object RemoteConfigInjection {
+internal object RemoteConfigInjection {
     val remoteConfigModules = module {
         single<RemoteConfigResponseHandlerApi> {
             RemoteConfigResponseHandler(

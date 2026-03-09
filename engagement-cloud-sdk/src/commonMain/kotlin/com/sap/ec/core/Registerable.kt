@@ -1,5 +1,5 @@
 package com.sap.ec.core
 
-interface Registerable {
+internal interface Registerable {
     suspend fun register()
 }

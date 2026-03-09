@@ -25,7 +25,7 @@ import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
-object InitInjection {
+internal object InitInjection {
     val initModules = module {
         single<State>(named(InitStateTypes.ApplyGlobalRemoteConfig)) {
             ApplyGlobalRemoteConfigState(
@@ -135,6 +135,6 @@ object InitInjection {
     }
 }
 
-enum class InitStateTypes {
+internal enum class InitStateTypes {
     LegacySDKMigration, ApplyGlobalRemoteConfig, RegisterInstances, RegisterWatchdogs, SessionSubscription, Initializer, SdkConfigLoader, RegisterEventBasedClients, RegisterEventConsumers, RegisterSdkEventDistributorState, RestoreOperationalEvents
 }

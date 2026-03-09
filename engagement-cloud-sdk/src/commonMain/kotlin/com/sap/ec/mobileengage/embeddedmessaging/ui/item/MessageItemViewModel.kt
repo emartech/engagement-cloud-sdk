@@ -4,7 +4,7 @@ import com.sap.ec.mobileengage.action.models.BasicRichContentDisplayActionModel
 import com.sap.ec.networking.clients.embedded.messaging.model.Category
 import io.ktor.http.Url
 
-class MessageItemViewModel(
+internal class MessageItemViewModel(
     private val model: MessageItemModelApi,
     override val isExcludedLocally: Boolean = false
 ) : MessageItemViewModelApi {

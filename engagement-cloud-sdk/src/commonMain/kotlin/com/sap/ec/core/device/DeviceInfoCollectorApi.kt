@@ -1,6 +1,6 @@
 package com.sap.ec.core.device
 
-interface DeviceInfoCollectorApi {
+internal interface DeviceInfoCollectorApi {
     suspend fun collect(): String
 
     suspend fun collectAsDeviceInfo(): DeviceInfo

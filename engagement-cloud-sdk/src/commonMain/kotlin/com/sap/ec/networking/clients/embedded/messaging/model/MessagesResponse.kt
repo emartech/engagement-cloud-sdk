@@ -1,12 +1,13 @@
 package com.sap.ec.networking.clients.embedded.messaging.model
 
+import com.sap.ec.InternalSdkApi
 import com.sap.ec.mobileengage.action.models.BasicActionModel
 import com.sap.ec.mobileengage.action.models.PresentableActionModel
 import com.sap.ec.networking.clients.embedded.messaging.serializer.MessagesResponseSerializer
 import kotlinx.serialization.Serializable
 
 @Serializable(with = MessagesResponseSerializer::class)
-data class MessagesResponse(
+internal data class MessagesResponse(
     val version: String,
     val top: Int,
     val meta: Meta,
@@ -14,12 +15,12 @@ data class MessagesResponse(
 )
 
 @Serializable
-data class Meta(
+internal data class Meta(
     val categories: List<MessageCategory>,
 )
 
 @Serializable
-data class EmbeddedMessage(
+internal data class EmbeddedMessage(
     val id: String,
     val title: String,
     val lead: String,
@@ -35,12 +36,13 @@ data class EmbeddedMessage(
 )
 
 @Serializable
-data class ListThumbnailImage(
+internal data class ListThumbnailImage(
     val src: String,
     val alt: String?
 )
 
 @Serializable
+@InternalSdkApi
 data class Category(
     val id: String,
     val text: String

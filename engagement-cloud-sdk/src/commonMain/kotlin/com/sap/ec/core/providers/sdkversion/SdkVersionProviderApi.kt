@@ -1,5 +1,5 @@
 package com.sap.ec.core.providers.sdkversion
 
-interface SdkVersionProviderApi {
+internal interface SdkVersionProviderApi {
     fun provide(): String
 }

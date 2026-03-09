@@ -18,7 +18,7 @@ import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
-object ContactInjection {
+internal object ContactInjection {
     val contactModules = module {
         single<ContactTokenHandlerApi> {
             ContactTokenHandler(

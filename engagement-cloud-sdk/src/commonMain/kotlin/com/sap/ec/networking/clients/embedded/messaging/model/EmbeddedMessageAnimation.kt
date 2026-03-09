@@ -1,5 +1,5 @@
 package com.sap.ec.networking.clients.embedded.messaging.model
 
-enum class EmbeddedMessageAnimation {
+internal enum class EmbeddedMessageAnimation {
     FADING_FROM_BOTTOM
 }

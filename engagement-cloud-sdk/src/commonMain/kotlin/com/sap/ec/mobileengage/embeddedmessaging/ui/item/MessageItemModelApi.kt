@@ -2,7 +2,7 @@ package com.sap.ec.mobileengage.embeddedmessaging.ui.item
 
 import com.sap.ec.networking.clients.embedded.messaging.model.EmbeddedMessage
 
-interface MessageItemModelApi {
+internal interface MessageItemModelApi {
     val message: EmbeddedMessage
     val embeddedMessagingBaseUrl: String
     suspend fun downloadImage(): ByteArray

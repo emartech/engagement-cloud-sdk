@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("RichContentDisplay")
-data class BasicRichContentDisplayActionModel(
+internal data class BasicRichContentDisplayActionModel(
     override val reporting: String = "{}",
     val url: String,
     val animation: EmbeddedMessageAnimation

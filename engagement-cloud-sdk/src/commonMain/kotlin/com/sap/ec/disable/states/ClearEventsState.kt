@@ -6,7 +6,7 @@ import com.sap.ec.event.SdkEvent
 import com.sap.ec.util.runCatchingWithoutCancellation
 import kotlinx.coroutines.flow.filter
 
-class ClearEventsState(private val eventsDao: EventsDaoApi) : State {
+internal class ClearEventsState(private val eventsDao: EventsDaoApi) : State {
     override val name = "ClearEvents"
 
     override fun prepare() {

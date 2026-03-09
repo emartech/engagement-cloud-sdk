@@ -2,7 +2,7 @@ package com.sap.ec.core.exceptions
 
 import com.sap.ec.core.networking.model.Response
 
-sealed class SdkException(message: String) : RuntimeException(message) {
+internal sealed class SdkException(message: String) : RuntimeException(message) {
     class InvalidApplicationCodeException(message: String): SdkException(message)
     class SdkAlreadyEnabledException(message: String): SdkException(message)
     class SdkAlreadyDisabledException(message: String): SdkException(message)

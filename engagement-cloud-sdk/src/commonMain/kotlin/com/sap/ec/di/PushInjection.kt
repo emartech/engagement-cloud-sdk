@@ -21,7 +21,7 @@ import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
-object PushInjection {
+internal object PushInjection {
     val pushModules = module {
         singleOf(::PushActionFactory) { bind<PushActionFactoryApi>() }
         singleOf(::ActionHandler) { bind<ActionHandlerApi>() }
@@ -60,6 +60,6 @@ object PushInjection {
     }
 }
 
-enum class InstanceType {
+internal enum class InstanceType {
     Logging, Internal, Gatherer
 }

@@ -1,6 +1,6 @@
 package com.sap.ec.core.crypto
 
-interface CryptoApi {
+internal interface CryptoApi {
 
     suspend fun verify(message: String, signatureStr: String): Boolean
 
