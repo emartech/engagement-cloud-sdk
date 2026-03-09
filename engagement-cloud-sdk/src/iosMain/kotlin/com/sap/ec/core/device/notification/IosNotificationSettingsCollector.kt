@@ -11,7 +11,7 @@ import platform.UserNotifications.UNUserNotificationCenter
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-class IosNotificationSettingsCollector(
+internal class IosNotificationSettingsCollector(
     private val json: Json
 ) : IosNotificationSettingsCollectorApi {
 

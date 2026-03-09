@@ -1,6 +1,6 @@
 package com.sap.ec.core.watchdog.connection
 
-interface Reachability {
+internal interface Reachability {
     fun subscribeToNetworkChanges(lambda: (Boolean) -> Unit)
     fun isConnected(): Boolean
     fun getNetworkConnection(): NetworkConnection

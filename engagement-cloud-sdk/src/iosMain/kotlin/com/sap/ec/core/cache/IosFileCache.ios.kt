@@ -16,7 +16,7 @@ import platform.Foundation.create
 import platform.Foundation.writeToFile
 
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
-class IosFileCache(private val fileManager: NSFileManager) : FileCacheApi {
+internal class IosFileCache(private val fileManager: NSFileManager) : FileCacheApi {
 
     override fun get(fileName: String): ByteArray? {
         return getCacheDir()?.let { dir ->

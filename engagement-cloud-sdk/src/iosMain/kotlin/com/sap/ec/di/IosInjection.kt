@@ -1,6 +1,7 @@
 package com.sap.ec.di
 
 import app.cash.sqldelight.driver.native.NativeSqliteDriver
+import com.sap.ec.InternalSdkApi
 import com.sap.ec.IosEngagementCloudSDKConfig
 import com.sap.ec.api.config.IosConfig
 import com.sap.ec.api.config.IosConfigApi
@@ -98,7 +99,7 @@ import platform.UIKit.UIApplication
 import platform.UIKit.UIPasteboard
 import platform.UserNotifications.UNUserNotificationCenter
 
-object IosInjection {
+internal object IosInjection {
     val iosModules = module {
         single<NSUserDefaults> { NSUserDefaults(StorageConstants.SUITE_NAME) }
         single<IosContactApi> { IosContact() }
@@ -269,6 +270,7 @@ object IosInjection {
     }
 }
 
+@InternalSdkApi
 actual fun SdkKoinIsolationContext.loadPlatformModules(): List<Module> {
     return listOf(IosInjection.iosModules)
 }

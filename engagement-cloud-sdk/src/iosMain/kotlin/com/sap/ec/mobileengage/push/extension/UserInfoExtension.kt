@@ -13,7 +13,7 @@ import platform.Foundation.create
 
 
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
-fun Map<String, Any>.toPushUserInfo(json: Json): PushUserInfo? {
+internal fun Map<String, Any>.toPushUserInfo(json: Json): PushUserInfo? {
     return NSJSONSerialization.dataWithJSONObject(this, NSJSONWritingPrettyPrinted, null)
         ?.let { data ->
             NSString.create(data, NSUTF8StringEncoding)?.let { jsonString ->
@@ -23,7 +23,7 @@ fun Map<String, Any>.toPushUserInfo(json: Json): PushUserInfo? {
 }
 
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
-fun Map<String, Any>.toSilentPushUserInfo(json: Json): SilentPushUserInfo? {
+internal fun Map<String, Any>.toSilentPushUserInfo(json: Json): SilentPushUserInfo? {
     return NSJSONSerialization.dataWithJSONObject(this, NSJSONWritingPrettyPrinted, null)
         ?.let { data ->
             NSString.create(data, NSUTF8StringEncoding)?.let { jsonString ->

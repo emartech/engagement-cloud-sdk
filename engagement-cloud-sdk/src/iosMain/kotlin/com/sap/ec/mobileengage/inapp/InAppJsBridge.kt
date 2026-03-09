@@ -25,7 +25,7 @@ import platform.WebKit.WKScriptMessageHandlerProtocol
 import platform.WebKit.WKUserContentController
 import platform.darwin.NSObject
 
-class InAppJsBridge(
+internal class InAppJsBridge(
     private val actionFactory: ActionFactoryApi<ActionModel>,
     private val inAppJsBridgeData: InAppJsBridgeData,
     private val mainDispatcher: CoroutineDispatcher,

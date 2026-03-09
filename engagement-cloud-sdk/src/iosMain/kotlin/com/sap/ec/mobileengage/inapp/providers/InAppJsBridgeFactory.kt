@@ -9,7 +9,7 @@ import com.sap.ec.mobileengage.inapp.jsbridge.InAppJsBridgeData
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.serialization.json.Json
 
-class InAppJsBridgeFactory(
+internal class InAppJsBridgeFactory(
     private val actionFactory: ActionFactoryApi<ActionModel>,
     private val json: Json,
     private val mainDispatcher: CoroutineDispatcher,

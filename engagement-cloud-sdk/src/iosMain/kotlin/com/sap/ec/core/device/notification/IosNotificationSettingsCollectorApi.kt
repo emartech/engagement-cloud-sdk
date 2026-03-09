@@ -1,6 +1,6 @@
 package com.sap.ec.core.device.notification
 
-interface IosNotificationSettingsCollectorApi {
+internal interface IosNotificationSettingsCollectorApi {
 
     suspend fun collect(): IosNotificationSettings
 

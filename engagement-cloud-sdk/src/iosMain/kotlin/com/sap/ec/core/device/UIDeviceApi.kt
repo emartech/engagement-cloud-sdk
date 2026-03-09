@@ -1,6 +1,6 @@
 package com.sap.ec.core.device
 
-interface UIDeviceApi {
+internal interface UIDeviceApi {
 
     fun osVersion(): String
     fun deviceModel(): String

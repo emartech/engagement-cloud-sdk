@@ -4,7 +4,7 @@ import com.sap.ec.watchdog.connection.ConnectionWatchDog
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class IosConnectionWatchdog(
+internal class IosConnectionWatchdog(
     private val reachabilityWrapper: Reachability
 ) : ConnectionWatchDog {
 

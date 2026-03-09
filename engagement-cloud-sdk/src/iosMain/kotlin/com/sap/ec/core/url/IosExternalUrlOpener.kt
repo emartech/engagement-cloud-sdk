@@ -11,7 +11,7 @@ import kotlinx.serialization.json.buildJsonObject
 import platform.Foundation.NSURL
 import platform.UIKit.UIApplication
 
-class IosExternalUrlOpener(
+internal class IosExternalUrlOpener(
     private val uiApplication: UIApplication,
     private val mainDispatcher: CoroutineDispatcher,
     private val sdkDispatcher: CoroutineDispatcher,

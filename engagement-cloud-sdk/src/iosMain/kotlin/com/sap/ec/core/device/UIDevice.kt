@@ -5,7 +5,7 @@ import kotlinx.cinterop.cValue
 import platform.Foundation.NSOperatingSystemVersion
 import platform.Foundation.NSProcessInfo
 
-class UIDevice(
+internal class UIDevice(
     private val processInfo: NSProcessInfo
 ) : UIDeviceApi {
     override fun osVersion(): String {

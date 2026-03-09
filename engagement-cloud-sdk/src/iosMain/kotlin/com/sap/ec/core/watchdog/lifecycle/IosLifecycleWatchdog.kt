@@ -12,7 +12,7 @@ import platform.Foundation.NSNotificationCenter
 import platform.UIKit.UIApplicationDidBecomeActiveNotification
 import platform.UIKit.UIApplicationDidEnterBackgroundNotification
 
-class IosLifecycleWatchdog : LifecycleWatchDog {
+internal class IosLifecycleWatchdog : LifecycleWatchDog {
 
     private val _lifecycleEvents = MutableSharedFlow<LifecycleEvent>()
     override val lifecycleEvents: SharedFlow<LifecycleEvent> get() = _lifecycleEvents

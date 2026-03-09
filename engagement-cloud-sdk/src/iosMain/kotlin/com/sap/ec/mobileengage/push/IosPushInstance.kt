@@ -6,7 +6,7 @@ import com.sap.ec.api.push.PushInstance
 import com.sap.ec.api.push.SilentPushUserInfo
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 
-interface IosPushInstance : PushInstance {
+internal interface IosPushInstance : PushInstance {
     val registeredNotificationCenterDelegates: List<NotificationCenterDelegateRegistration>
     val userNotificationCenterDelegate: UNUserNotificationCenterDelegateProtocol
 

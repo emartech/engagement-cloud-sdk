@@ -7,13 +7,13 @@ import platform.Foundation.NSDateFormatterMediumStyle
 import platform.Foundation.NSLocale
 import platform.Foundation.currentLocale
 
-actual fun Long.asLocaleFormattedHoursAndMinutes(): String =
+internal actual fun Long.asLocaleFormattedHoursAndMinutes(): String =
     asLocaleFormattedString("jmm")
 
-actual fun Long.asLocaleFormattedMonthsAndDays(): String =
+internal actual fun Long.asLocaleFormattedMonthsAndDays(): String =
     asLocaleFormattedString("MMMd")
 
-actual fun Long.asLocaleFormattedFullDate(): String =
+internal actual fun Long.asLocaleFormattedFullDate(): String =
     asLocaleFormattedString("MMddyyyy")
 
 private fun Long.asLocaleFormattedString(format: String): String {

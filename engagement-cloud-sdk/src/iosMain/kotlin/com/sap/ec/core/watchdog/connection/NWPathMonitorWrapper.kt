@@ -20,7 +20,7 @@ import platform.Network.nw_path_uses_interface_type
 import platform.darwin.dispatch_queue_create
 import platform.darwin.dispatch_queue_t
 
-class NWPathMonitorWrapper(
+internal class NWPathMonitorWrapper(
     private val sdkDispatcher: CoroutineDispatcher
 ) : Reachability {
     private val pathMonitor: nw_path_monitor_t = nw_path_monitor_create()

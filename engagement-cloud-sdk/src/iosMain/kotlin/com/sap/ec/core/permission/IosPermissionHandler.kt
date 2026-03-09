@@ -7,7 +7,7 @@ import platform.UserNotifications.UNUserNotificationCenter
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class IosPermissionHandler(private val notificationCenter: UNUserNotificationCenter) :
+internal class IosPermissionHandler(private val notificationCenter: UNUserNotificationCenter) :
     PermissionHandlerApi {
 
     override suspend fun requestPushPermission() {
