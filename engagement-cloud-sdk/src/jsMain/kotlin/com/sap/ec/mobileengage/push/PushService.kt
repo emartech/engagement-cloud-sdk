@@ -13,7 +13,6 @@ import web.navigator.navigator
 import web.push.PushSubscriptionOptionsInit
 import web.push.subscribe
 
-//TODO: add logger instead of console log
 //TODO: handle errors in registration and subscription
 internal class PushService(
     private val pushServiceContext: PushServiceContextApi,

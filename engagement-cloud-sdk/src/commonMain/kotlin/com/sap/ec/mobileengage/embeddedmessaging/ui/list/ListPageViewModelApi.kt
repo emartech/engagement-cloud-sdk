@@ -7,8 +7,7 @@ import com.sap.ec.networking.clients.embedded.messaging.model.MessageCategory
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
-@InternalSdkApi
-interface ListPageViewModelApi {
+internal interface ListPageViewModelApi {
     val messagePagingDataFlowFiltered: Flow<PagingData<MessageItemViewModelApi>>
     val categories: StateFlow<List<MessageCategory>>
 

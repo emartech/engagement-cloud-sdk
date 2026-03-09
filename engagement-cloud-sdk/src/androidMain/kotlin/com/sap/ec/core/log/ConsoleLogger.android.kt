@@ -6,6 +6,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 
+//needs to be exposed for ServiceWorker
 @InternalSdkApi
 actual class ConsoleLogger : ConsoleLoggerApi {
 

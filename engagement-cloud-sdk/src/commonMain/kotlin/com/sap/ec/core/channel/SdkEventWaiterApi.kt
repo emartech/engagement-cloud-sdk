@@ -1,9 +1,11 @@
 package com.sap.ec.core.channel
 
+import com.sap.ec.InternalSdkApi
 import com.sap.ec.event.SdkEvent
 import kotlinx.coroutines.flow.StateFlow
 
-internal interface SdkEventWaiterApi {
+@InternalSdkApi
+interface SdkEventWaiterApi {
     val sdkEventDistributor: SdkEventDistributorApi
     val sdkEvent: SdkEvent
 

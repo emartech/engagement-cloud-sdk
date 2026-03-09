@@ -10,6 +10,7 @@ import com.sap.ec.mobileengage.push.DisplayablePush
 import com.sap.ec.mobileengage.push.PushMessage
 import kotlinx.serialization.Serializable
 
+//needs to be exposed for ServiceWorker
 @InternalSdkApi
 @Serializable
 data class JsPushMessage(

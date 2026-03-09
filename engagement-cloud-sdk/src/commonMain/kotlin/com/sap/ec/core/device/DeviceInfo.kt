@@ -42,7 +42,7 @@ data class NotificationSettings(
 )
 
 @Serializable
-internal data class ChannelSettings(
+data class ChannelSettings(
     val channelId: String,
     val importance: Int = -1000,
     val canBypassDnd: Boolean = false,

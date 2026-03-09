@@ -26,7 +26,6 @@ private fun LazyPagingItems<MessageItemViewModelApi>.shouldShowEmptyState(): Boo
     this.isIdleButEmpty() || (this.hasRefreshError() && this.itemCount == 0)
 
 @Composable
-@com.sap.ec.InternalSdkApi
 fun EmbeddedMessagingCompactView(
     onNavigate: () -> Unit = {},
     customMessageItem: (@Composable (viewModel: CustomMessageItemViewModelApi, isSelected: Boolean) -> Unit)? = null

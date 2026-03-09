@@ -6,26 +6,23 @@ import com.sap.ec.mobileengage.action.models.BadgeCount
 import com.sap.ec.mobileengage.action.models.BasicActionModel
 import kotlinx.serialization.Serializable
 
-@InternalSdkApi
-interface PlatformData
+internal interface PlatformData
 
-@InternalSdkApi
-interface PushMessage<T : PlatformData> {
+internal interface PushMessage<T : PlatformData> {
     val trackingInfo: String
     val platformData: T
     val badgeCount: BadgeCount?
 }
 
-@InternalSdkApi
-interface DisplayablePush {
+internal interface DisplayablePush {
     val displayableData: DisplayableData?
 }
 
-@InternalSdkApi
-interface ActionablePush<A: ActionModel> {
+internal interface ActionablePush<A: ActionModel> {
     val actionableData: ActionableData<A>?
 }
 
+//needs to be exposed for ServiceWorker
 @InternalSdkApi
 @Serializable
 data class DisplayableData(
@@ -35,6 +32,7 @@ data class DisplayableData(
     val imageUrlString: String? = null
 )
 
+//needs to be exposed for ServiceWorker
 @InternalSdkApi
 @Serializable
 data class ActionableData<A: ActionModel>(

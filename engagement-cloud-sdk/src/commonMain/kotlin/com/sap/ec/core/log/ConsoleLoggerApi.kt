@@ -1,8 +1,11 @@
 package com.sap.ec.core.log
 
+import com.sap.ec.InternalSdkApi
 import kotlinx.serialization.json.JsonObject
 
- internal interface ConsoleLoggerApi {
+//needs to be exposed for ServiceWorker
+@InternalSdkApi
+interface ConsoleLoggerApi {
 
     fun logToConsole(
         loggerName: String,

@@ -32,19 +32,19 @@ object FlexibleBooleanSerializer : KSerializer<Boolean> {
 }
 
 @Serializable
-data class PushUserInfo(
+internal data class PushUserInfo(
     val ems: Ems,
     val notification: Notification
 )
 
 @Serializable
-data class SilentPushUserInfo(
+internal data class SilentPushUserInfo(
     val ems: Ems,
     val notification: SilentNotification
 )
 
 @Serializable
-data class Notification(
+internal data class Notification(
     @Serializable(with = FlexibleBooleanSerializer::class)
     val silent: Boolean = false,
     val defaultAction: BasicActionModel? = null,
@@ -53,7 +53,7 @@ data class Notification(
 )
 
 @Serializable
-data class SilentNotification(
+internal data class SilentNotification(
     @Serializable(with = FlexibleBooleanSerializer::class)
     val silent: Boolean = false,
     val defaultAction: BasicActionModel? = null,

@@ -1,7 +1,6 @@
 package com.sap.ec.core.collections
 
 
-//TODO: Received concurrent modification exception, needs investigation
 internal suspend fun <Element>MutableList<Element>.dequeue(backward: Boolean = false, action: suspend (element: Element) -> (Unit)) {
     if (backward) {
         val iterator = this.listIterator(this.size)

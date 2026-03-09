@@ -1,5 +1,6 @@
 package com.sap.ec.event
 
+import com.sap.ec.InternalSdkApi
 import com.sap.ec.SdkConstants
 import com.sap.ec.SdkConstants.APPLY_APPCODE_BASED_REMOTE_CONFIG_EVENT_NAME
 import com.sap.ec.SdkConstants.APPLY_GLOBAL_REMOTE_CONFIG_EVENT_NAME
@@ -94,6 +95,7 @@ internal suspend fun List<OnlineSdkEvent>.nack(eventsDao: EventsDaoApi, sdkLogge
     }
 }
 
+@InternalSdkApi
 @OptIn(ExperimentalSerializationApi::class, ExperimentalTime::class)
 @Serializable
 @JsonClassDiscriminator("fullClassName")
@@ -175,8 +177,9 @@ sealed interface SdkEvent {
         }
     }
 
+
     @Serializable
-    sealed interface Internal : SdkEvent {
+     sealed interface Internal : SdkEvent {
 
         sealed interface EmbeddedMessaging : Internal, OnlineSdkEvent {
 

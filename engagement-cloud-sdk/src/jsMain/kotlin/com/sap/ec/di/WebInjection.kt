@@ -320,7 +320,6 @@ internal object WebInjection {
     }
 }
 
-@InternalSdkApi
-actual fun SdkKoinIsolationContext.loadPlatformModules(): List<Module> {
+internal actual fun SdkKoinIsolationContext.loadPlatformModules(): List<Module> {
     return listOf(WebInjection.webModules)
 }

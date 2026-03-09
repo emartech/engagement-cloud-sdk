@@ -412,7 +412,7 @@ internal enum class AvailableServices {
     Google, Huawei
 }
 
-@InternalSdkApi
-actual fun SdkKoinIsolationContext.loadPlatformModules(): List<Module> {
+
+internal actual fun SdkKoinIsolationContext.loadPlatformModules(): List<Module> {
     return listOf(AndroidInjection.androidModules)
 }

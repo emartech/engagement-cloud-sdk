@@ -76,5 +76,4 @@ object SdkKoinIsolationContext {
     }
 }
 
-@InternalSdkApi
-expect fun SdkKoinIsolationContext.loadPlatformModules(): List<Module>
+internal expect fun SdkKoinIsolationContext.loadPlatformModules(): List<Module>

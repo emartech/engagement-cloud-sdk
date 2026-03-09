@@ -1,11 +1,10 @@
 package com.sap.ec
 
-@InternalSdkApi
-enum class KotlinPlatform {
+
+internal enum class KotlinPlatform {
     JS,
     Android,
     IOS
 }
 
-@InternalSdkApi
-expect val currentPlatform: KotlinPlatform
+internal expect val currentPlatform: KotlinPlatform

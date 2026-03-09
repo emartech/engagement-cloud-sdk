@@ -9,6 +9,7 @@ import com.sap.ec.util.JsonUtil
 import org.w3c.notifications.NotificationAction
 import org.w3c.notifications.NotificationOptions
 
+
 @InternalSdkApi
 open class PushMessagePresenter(private val webPushNotificationPresenter: WebPushNotificationPresenterApi) :
     PushPresenter<JsPlatformData, JsPushMessage> {

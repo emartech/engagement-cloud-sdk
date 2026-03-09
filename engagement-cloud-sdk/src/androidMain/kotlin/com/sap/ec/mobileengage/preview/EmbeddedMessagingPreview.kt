@@ -58,7 +58,7 @@ import kotlin.time.ExperimentalTime
 
 @Preview(showBackground = true)
 @Composable
-internal fun MessageItemViewPreview() {
+fun MessageItemViewPreview() {
     val previewSdkEventDistributor = object : SdkEventDistributorApi {
         override val sdkEventFlow =
             MutableSharedFlow<SdkEvent>()

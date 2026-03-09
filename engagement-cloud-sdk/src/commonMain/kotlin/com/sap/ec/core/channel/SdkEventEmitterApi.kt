@@ -1,8 +1,10 @@
 package com.sap.ec.core.channel
 
+import com.sap.ec.InternalSdkApi
 import com.sap.ec.event.SdkEvent
 
-internal interface SdkEventEmitterApi {
+@InternalSdkApi
+interface SdkEventEmitterApi {
 
     /**
      * Emits an [SdkEvent] directly to the SDK event flow without persisting it to the database.

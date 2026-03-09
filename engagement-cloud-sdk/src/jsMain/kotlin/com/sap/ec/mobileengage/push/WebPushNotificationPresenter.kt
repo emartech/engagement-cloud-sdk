@@ -5,8 +5,8 @@ import com.sap.ec.mobileengage.push.model.WebPushNotificationData
 import com.sap.ec.self
 import web.serviceworker.showNotification
 
-@InternalSdkApi
-class WebPushNotificationPresenter: WebPushNotificationPresenterApi {
+
+internal class WebPushNotificationPresenter: WebPushNotificationPresenterApi {
 
     override suspend fun showNotification(
         webPushNotificationData: WebPushNotificationData

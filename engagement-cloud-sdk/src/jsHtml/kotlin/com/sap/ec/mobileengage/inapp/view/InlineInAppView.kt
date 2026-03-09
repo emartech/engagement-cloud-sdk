@@ -92,8 +92,7 @@ internal fun InlineInAppView(
 }
 
 @Composable
-@com.sap.ec.InternalSdkApi
-fun InlineInAppView(
+internal fun InlineInAppView(
     viewId: String,
     onLoaded: (() -> Unit)? = null,
     onClose: (() -> Unit)? = null

@@ -7,9 +7,11 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 
 
+//needs to be exposed for ServiceWorker
 @InternalSdkApi
-sealed interface ActionModel
+ sealed interface ActionModel
 
+//needs to be exposed for ServiceWorker
 @InternalSdkApi
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
@@ -18,6 +20,7 @@ sealed class BasicActionModel : ActionModel {
     abstract val reporting: String
 }
 
+//needs to be exposed for ServiceWorker
 @InternalSdkApi
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable

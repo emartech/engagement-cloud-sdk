@@ -3,6 +3,7 @@ package com.sap.ec.sample
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
@@ -12,7 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import com.sap.ec.core.device.AndroidVersionUtils.isTiramisuOrAbove
+import com.sap.ec.AndroidEngagementCloud
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -23,6 +24,7 @@ class MainActivity : AppCompatActivity() {
             App()
         }
         lifecycleScope.launch {
+            AndroidEngagementCloud.config.getNotificationSettings()
             askNotificationPermission()
         }
     }
@@ -38,7 +40,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun askNotificationPermission() {
-        if (isTiramisuOrAbove) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(
                     this,
                     Manifest.permission.POST_NOTIFICATIONS

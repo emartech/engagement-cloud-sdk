@@ -4,6 +4,7 @@ import com.sap.ec.InternalSdkApi
 import kotlinx.serialization.json.JsonObject
 import kotlin.js.Console
 
+//needs to be exposed for ServiceWorker
 @InternalSdkApi
 actual class ConsoleLogger : ConsoleLoggerApi {
     actual override fun logToConsole(

@@ -270,7 +270,6 @@ internal object IosInjection {
     }
 }
 
-@InternalSdkApi
-actual fun SdkKoinIsolationContext.loadPlatformModules(): List<Module> {
+internal actual fun SdkKoinIsolationContext.loadPlatformModules(): List<Module> {
     return listOf(IosInjection.iosModules)
 }

@@ -16,7 +16,6 @@ internal interface IosNotificationConstant {
 }
 
 @Serializable
-@InternalSdkApi
 enum class IosAuthorizationStatus(override val value: Long) : IosNotificationConstant {
     @SerialName("notDetermined")
     NotDetermined(0),
@@ -35,7 +34,6 @@ enum class IosAuthorizationStatus(override val value: Long) : IosNotificationCon
 }
 
 @Serializable
-@InternalSdkApi
 enum class IosNotificationSetting(override val value: Long) : IosNotificationConstant {
     @SerialName("notSupported")
     NotSupported(0),
@@ -48,7 +46,6 @@ enum class IosNotificationSetting(override val value: Long) : IosNotificationCon
 }
 
 @Serializable
-@InternalSdkApi
 enum class IosAlertStyle(override val value: Long) : IosNotificationConstant {
     @SerialName("none")
     None(0),
@@ -61,7 +58,6 @@ enum class IosAlertStyle(override val value: Long) : IosNotificationConstant {
 }
 
 @Serializable
-@InternalSdkApi
 enum class IosShowPreviewSetting(override val value: Long) : IosNotificationConstant {
     @SerialName("always")
     Always(0),

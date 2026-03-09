@@ -1,9 +1,10 @@
 package com.sap.ec.core.networking.model
 
+import com.sap.ec.InternalSdkApi
 import io.ktor.http.HttpMethod
 import io.ktor.http.Url
 
-internal data class UrlRequest(
+data class UrlRequest(
     val url: Url,
     val method: HttpMethod,
     val bodyString: String? = null,

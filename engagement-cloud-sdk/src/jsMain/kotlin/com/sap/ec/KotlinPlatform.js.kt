@@ -1,5 +1,5 @@
 package com.sap.ec
 
-@InternalSdkApi
-actual val currentPlatform: KotlinPlatform
+
+internal actual val currentPlatform: KotlinPlatform
     get() = KotlinPlatform.JS

@@ -15,8 +15,8 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 
-@InternalSdkApi
-class PushMessageWebV2Mapper(
+
+internal class PushMessageWebV2Mapper(
     private val json: Json,
     private val logger: ConsoleLogger
 ) : Mapper<String, JsPushMessage> {
