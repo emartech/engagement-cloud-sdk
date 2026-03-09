@@ -23,6 +23,8 @@ import dev.mokkery.answering.throws
 import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
+import dev.mokkery.matcher.capture.Capture
+import dev.mokkery.matcher.capture.capture
 import dev.mokkery.mock
 import dev.mokkery.resetAnswers
 import dev.mokkery.resetCalls
@@ -90,7 +92,7 @@ class RemoteConfigClientTests {
         mockEventsDao = mock(MockMode.autoUnit)
         mockClientExceptionHandler = mock(MockMode.autoUnit)
         mockSdkLogger = mock(MockMode.autofill)
-        everySuspend { mockSdkLogger.error(any<String>(), any<Throwable>()) } returns Unit
+        everySuspend { mockSdkLogger.error(any(), any<Throwable>()) } returns Unit
     }
 
     @AfterTest
@@ -222,7 +224,12 @@ class RemoteConfigClientTests {
             )
         } returns Result.success(configSignatureResponse)
         everySuspend { mockCrypto.verify(any(), any()) } returns false
-
+        val eventSlot = Capture.slot<SdkEvent.Internal.Sdk.Answer.Response<Response>>()
+        everySuspend {
+            mockSdkEventManager.emitEvent(
+                capture(eventSlot)
+            )
+        } returns Unit
 
         val appCodeBasedRemoteConfigEvent = SdkEvent.Internal.Sdk.ApplyAppCodeBasedRemoteConfig()
 
@@ -234,51 +241,82 @@ class RemoteConfigClientTests {
 
         onlineSdkEvents.await() shouldBe listOf(appCodeBasedRemoteConfigEvent)
         verifySuspend(VerifyMode.exactly(0)) { mockRemoteConfigResponseHandler.handle(any()) }
-        verifySuspend { mockEventsDao.removeEvent(appCodeBasedRemoteConfigEvent) }
+        verifySuspend {
+            appCodeBasedRemoteConfigEvent.ack(mockEventsDao, mockSdkLogger)
+        }
+        verifySuspend(VerifyMode.exactly(1)) {
+            mockSdkEventManager.emitEvent(any())
+        }
+        eventSlot.values.size shouldBe 1
+        eventSlot.values.first().let {
+            it.originId shouldBe appCodeBasedRemoteConfigEvent.id
+            it.result.isFailure shouldBe true
+            it.result.exceptionOrNull()?.message shouldBe "Remote config signature verification failed"
+        }
     }
 
     @Test
-    fun testConsumer_shouldNotCall_responseHandler_butAckEvent_whenConfigIsNotFound() = runTest {
-        createClient(backgroundScope).register()
+    fun testConsumer_shouldNotCall_responseHandler_butAckEvent_andNotReemitEvent_whenConfigIsNotFound() =
+        runTest {
+            createClient(backgroundScope).register()
 
-        val configResponse =
-            Response(configRequest, HttpStatusCode.NotFound, Headers.Empty, CONFIG_RESULT)
-        val configSignatureResponse = Response(
-            configSignatureRequest,
-            HttpStatusCode.OK,
-            Headers.Empty,
-            CONFIG_SIGNATURE_RESULT
-        )
-
-        every { mockUrlFactory.create(ECUrlType.RemoteConfig) } returns configUrl
-        every {
-            mockUrlFactory.create(
-                ECUrlType.RemoteConfigSignature
+            val configResponse =
+                Response(configRequest, HttpStatusCode.NotFound, Headers.Empty, CONFIG_RESULT)
+            val configSignatureResponse = Response(
+                configSignatureRequest,
+                HttpStatusCode.OK,
+                Headers.Empty,
+                CONFIG_SIGNATURE_RESULT
             )
-        } returns configSignatureUrl
-        everySuspend { mockNetworkClient.send(configRequest) } returns Result.failure(
-            SdkException.FailedRequestException(
+
+            every { mockUrlFactory.create(ECUrlType.RemoteConfig) } returns configUrl
+            every {
+                mockUrlFactory.create(
+                    ECUrlType.RemoteConfigSignature
+                )
+            } returns configSignatureUrl
+            val exception = SdkException.FailedRequestException(
                 configResponse
             )
-        )
-        everySuspend {
-            mockNetworkClient.send(
-                configSignatureRequest
+            everySuspend { mockNetworkClient.send(configRequest) } returns Result.failure(
+                exception
             )
-        } returns Result.success(configSignatureResponse)
+            everySuspend {
+                mockNetworkClient.send(
+                    configSignatureRequest
+                )
+            } returns Result.success(configSignatureResponse)
 
-        val appCodeBasedRemoteConfigEvent = SdkEvent.Internal.Sdk.ApplyAppCodeBasedRemoteConfig()
+            val appCodeBasedRemoteConfigEvent =
+                SdkEvent.Internal.Sdk.ApplyAppCodeBasedRemoteConfig()
 
-        val onlineSdkEvents = backgroundScope.async {
-            onlineEvents.take(1).toList()
+            val onlineSdkEvents = backgroundScope.async {
+                onlineEvents.take(1).toList()
+            }
+
+            onlineEvents.emit(appCodeBasedRemoteConfigEvent)
+
+            onlineSdkEvents.await() shouldBe listOf(appCodeBasedRemoteConfigEvent)
+            verifySuspend(VerifyMode.exactly(0)) { mockRemoteConfigResponseHandler.handle(any()) }
+            verifySuspend {
+                mockClientExceptionHandler.handleException(
+                    exception,
+                    any(),
+                    appCodeBasedRemoteConfigEvent
+                )
+            }
+            verifySuspend {
+                mockSdkEventManager.emitEvent(
+                    SdkEvent.Internal.Sdk.Answer.Response(
+                        appCodeBasedRemoteConfigEvent.id,
+                        Result.success(Unit)
+                    )
+                )
+            }
+            verifySuspend(VerifyMode.exactly(0)) {
+                mockSdkEventManager.emitEvent(appCodeBasedRemoteConfigEvent)
+            }
         }
-
-        onlineEvents.emit(appCodeBasedRemoteConfigEvent)
-
-        onlineSdkEvents.await() shouldBe listOf(appCodeBasedRemoteConfigEvent)
-        verifySuspend(VerifyMode.exactly(0)) { mockRemoteConfigResponseHandler.handle(any()) }
-        verifySuspend { mockEventsDao.removeEvent(appCodeBasedRemoteConfigEvent) }
-    }
 
     @Test
     fun testConsumer_shouldNotCall_responseHandler_butAckEvent_whenSignatureIsNotFound() = runTest {
@@ -300,11 +338,12 @@ class RemoteConfigClientTests {
             )
         } returns configSignatureUrl
         everySuspend { mockNetworkClient.send(configRequest) } returns Result.success(configResponse)
+        val exception = SdkException.FailedRequestException(configSignatureResponse)
         everySuspend {
             mockNetworkClient.send(
                 configSignatureRequest
             )
-        } returns Result.failure(SdkException.FailedRequestException(configSignatureResponse))
+        } returns Result.failure(exception)
 
         val appCodeBasedRemoteConfigEvent = SdkEvent.Internal.Sdk.ApplyAppCodeBasedRemoteConfig()
 
@@ -316,7 +355,13 @@ class RemoteConfigClientTests {
 
         onlineSdkEvents.await() shouldBe listOf(appCodeBasedRemoteConfigEvent)
         verifySuspend(VerifyMode.exactly(0)) { mockRemoteConfigResponseHandler.handle(any()) }
-        verifySuspend { mockEventsDao.removeEvent(appCodeBasedRemoteConfigEvent) }
+        verifySuspend {
+            mockClientExceptionHandler.handleException(
+                exception,
+                any(),
+                appCodeBasedRemoteConfigEvent
+            )
+        }
     }
 
     @Test
@@ -331,7 +376,9 @@ class RemoteConfigClientTests {
             every {
                 mockUrlFactory.create(ECUrlType.RemoteConfig)
             } returns configUrl
-            everySuspend { mockNetworkClient.send(configRequest) } returns Result.success(configResponse)
+            everySuspend { mockNetworkClient.send(configRequest) } returns Result.success(
+                configResponse
+            )
             every {
                 mockUrlFactory.create(ECUrlType.RemoteConfigSignature)
             } returns configSignatureUrl

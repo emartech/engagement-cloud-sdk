@@ -2,7 +2,7 @@ package com.sap.ec.mobileengage.embeddedmessaging.pagination
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.sap.ec.context.DefaultUrlsApi
+import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.util.DownloaderApi
@@ -23,7 +23,7 @@ internal class EmbeddedMessagingPagingSource(
     private val downloader: DownloaderApi,
     private val actionFactory: ActionFactoryApi<ActionModel>,
     private val sdkEventDistributor: SdkEventDistributorApi,
-    private val defaultUrls: DefaultUrlsApi,
+    private val sdkContext: SdkContextApi,
     private val logger: Logger
 ) : PagingSource<Int, MessageItemViewModelApi>() {
 
@@ -49,7 +49,7 @@ internal class EmbeddedMessagingPagingSource(
                             MessageItemViewModel(
                                 MessageItemModel(
                                     message,
-                                    defaultUrls.embeddedMessagingBaseUrl,
+                                    sdkContext,
                                     downloader,
                                     sdkEventDistributor,
                                     actionFactory,

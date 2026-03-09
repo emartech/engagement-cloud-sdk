@@ -1,5 +1,7 @@
 package com.sap.ec.mobileengage.embeddedmessaging.ui.item
 
+import com.sap.ec.context.DefaultUrlsApi
+import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.channel.SdkEventWaiterApi
 import com.sap.ec.core.log.Logger
@@ -21,6 +23,7 @@ import com.sap.ec.networking.clients.embedded.messaging.model.EmbeddedMessageAni
 import com.sap.ec.networking.clients.embedded.messaging.model.ListThumbnailImage
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
+import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.matcher.capture.Capture.Companion.slot
@@ -48,7 +51,7 @@ import kotlin.time.ExperimentalTime
 
 class MessageItemModelTests {
     private companion object {
-        const val EMBEDDED_MESSAGING_BASE_URL = "testBaseUrl"
+        const val EMBEDDED_MESSAGING_BASE_URL = "https://example.com/url"
         val TEST_MESSAGE = EmbeddedMessage(
             id = "1",
             title = "testTitle",
@@ -76,6 +79,8 @@ class MessageItemModelTests {
     private lateinit var mockDownloader: DownloaderApi
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
     private lateinit var mockSdkEventWaiter: SdkEventWaiterApi
+    private lateinit var mockDefaultUrls: DefaultUrlsApi
+    private lateinit var mockSdkContext: SdkContextApi
     private lateinit var mockActionFactory: ActionFactoryApi<ActionModel>
     private lateinit var mockLogger: Logger
     private lateinit var messageItemModel: MessageItemModel
@@ -85,6 +90,10 @@ class MessageItemModelTests {
     @BeforeTest
     fun setup() {
         mockDownloader = mock(MockMode.autofill)
+        mockDefaultUrls = mock(MockMode.autofill)
+        every { mockDefaultUrls.embeddedMessagingBaseUrl } returns EMBEDDED_MESSAGING_BASE_URL
+        mockSdkContext = mock(MockMode.autofill)
+        every { mockSdkContext.defaultUrls } returns mockDefaultUrls
         mockSdkEventDistributor = mock(MockMode.autofill)
         mockSdkEventWaiter = mock(MockMode.autofill)
         mockActionFactory = mock(MockMode.autofill)
@@ -96,7 +105,7 @@ class MessageItemModelTests {
     private fun createMessageItemModel(message: EmbeddedMessage = TEST_MESSAGE): MessageItemModel =
         MessageItemModel(
             message = message,
-            embeddedMessagingBaseUrl = EMBEDDED_MESSAGING_BASE_URL,
+            sdkContext = mockSdkContext,
             downloader = mockDownloader,
             sdkEventDistributor = mockSdkEventDistributor,
             actionFactory = mockActionFactory,

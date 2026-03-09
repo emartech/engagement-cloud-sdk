@@ -3,7 +3,7 @@ package com.sap.ec.mobileengage.embeddedmessaging.pagination
 import androidx.paging.PagingConfig
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.sap.ec.context.DefaultUrlsApi
+import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.util.DownloaderApi
@@ -30,7 +30,7 @@ class EmbeddedMessagingPagingSourceTests {
     private lateinit var mockListPageModel: ListPageModelApi
     private lateinit var mockDownloader: DownloaderApi
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
-    private lateinit var mockDefaultUrls: DefaultUrlsApi
+    private lateinit var mockSdkContext: SdkContextApi
 
     private lateinit var mockActionFactory: ActionFactoryApi<ActionModel>
     private lateinit var mockLogger: Logger
@@ -40,7 +40,7 @@ class EmbeddedMessagingPagingSourceTests {
         mockListPageModel = mock()
         mockDownloader = mock()
         mockSdkEventDistributor = mock()
-        mockDefaultUrls = mock()
+        mockSdkContext = mock()
         mockActionFactory = mock()
         mockLogger = mock()
 
@@ -61,7 +61,7 @@ class EmbeddedMessagingPagingSourceTests {
         downloader = mockDownloader,
         actionFactory = mockActionFactory,
         sdkEventDistributor = mockSdkEventDistributor,
-        mockDefaultUrls,
+        mockSdkContext,
         logger = mockLogger,
     )
 
