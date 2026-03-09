@@ -1,5 +1,6 @@
 package com.sap.ec.mobileengage.push.model
 
+import com.sap.ec.InternalSdkApi
 import com.sap.ec.mobileengage.action.models.BadgeCount
 import com.sap.ec.mobileengage.action.models.PresentableActionModel
 import com.sap.ec.mobileengage.push.ActionableData
@@ -9,6 +10,7 @@ import com.sap.ec.mobileengage.push.DisplayablePush
 import com.sap.ec.mobileengage.push.PushMessage
 import kotlinx.serialization.Serializable
 
+@InternalSdkApi
 @Serializable
 data class JsPushMessage(
     override val trackingInfo: String,

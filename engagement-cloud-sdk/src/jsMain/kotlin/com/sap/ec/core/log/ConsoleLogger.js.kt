@@ -1,8 +1,10 @@
 package com.sap.ec.core.log
 
+import com.sap.ec.InternalSdkApi
 import kotlinx.serialization.json.JsonObject
 import kotlin.js.Console
 
+@InternalSdkApi
 actual class ConsoleLogger : ConsoleLoggerApi {
     actual override fun logToConsole(
         loggerName: String,

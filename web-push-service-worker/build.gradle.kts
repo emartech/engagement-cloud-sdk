@@ -6,6 +6,9 @@ plugins {
 
 kotlin {
     js(IR) {
+        compilerOptions {
+            freeCompilerArgs.add("-opt-in=com.sap.ec.InternalSdkApi")
+        }
         browser {
             useCommonJs()
             commonWebpackConfig {

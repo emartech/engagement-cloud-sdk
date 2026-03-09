@@ -1,5 +1,6 @@
 package com.sap.ec.mobileengage.push.mappers
 
+import com.sap.ec.InternalSdkApi
 import com.sap.ec.core.log.ConsoleLogger
 import com.sap.ec.core.log.LogLevel
 import com.sap.ec.core.mapper.Mapper
@@ -14,6 +15,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 
+@InternalSdkApi
 class PushMessageWebV2Mapper(
     private val json: Json,
     private val logger: ConsoleLogger

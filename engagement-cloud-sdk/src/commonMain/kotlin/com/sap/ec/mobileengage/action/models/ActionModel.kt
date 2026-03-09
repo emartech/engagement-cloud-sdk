@@ -1,13 +1,16 @@
 package com.sap.ec.mobileengage.action.models
 
+import com.sap.ec.InternalSdkApi
 import com.sap.ec.mobileengage.inapp.jsbridge.InAppJsBridgeData
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 
 
+@InternalSdkApi
 sealed interface ActionModel
 
+@InternalSdkApi
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
 @JsonClassDiscriminator("type")
@@ -15,6 +18,7 @@ sealed class BasicActionModel : ActionModel {
     abstract val reporting: String
 }
 
+@InternalSdkApi
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
 @JsonClassDiscriminator("type")

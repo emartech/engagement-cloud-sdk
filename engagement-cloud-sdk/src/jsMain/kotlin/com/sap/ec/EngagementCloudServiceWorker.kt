@@ -11,8 +11,10 @@ import kotlinx.serialization.json.JsonObject
 import web.broadcast.BroadcastChannel
 import web.serviceworker.ServiceWorkerGlobalScope
 
+@InternalSdkApi
 external var self: ServiceWorkerGlobalScope
 
+@InternalSdkApi
 @JsName("EngagementCloudServiceWorker")
 class EngagementCloudServiceWorker(
     private val pushMessagePresenter: PushMessagePresenter,

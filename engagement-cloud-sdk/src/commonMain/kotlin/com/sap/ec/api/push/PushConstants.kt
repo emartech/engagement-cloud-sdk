@@ -1,5 +1,8 @@
 package com.sap.ec.api.push
 
+import com.sap.ec.InternalSdkApi
+
+@InternalSdkApi
 object PushConstants {
     const val PUSH_TOKEN_STORAGE_KEY = "emsPushToken"
     const val LAST_SENT_PUSH_TOKEN_STORAGE_KEY = "emsLastSentPushToken"

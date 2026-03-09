@@ -1,6 +1,6 @@
 package com.sap.ec.mobileengage.push
 
-
+import com.sap.ec.InternalSdkApi
 import com.sap.ec.mobileengage.action.models.PresentableActionModel
 import com.sap.ec.mobileengage.push.model.JsPlatformData
 import com.sap.ec.mobileengage.push.model.JsPushMessage
@@ -9,6 +9,7 @@ import com.sap.ec.util.JsonUtil
 import org.w3c.notifications.NotificationAction
 import org.w3c.notifications.NotificationOptions
 
+@InternalSdkApi
 open class PushMessagePresenter(private val webPushNotificationPresenter: WebPushNotificationPresenterApi) :
     PushPresenter<JsPlatformData, JsPushMessage> {
 

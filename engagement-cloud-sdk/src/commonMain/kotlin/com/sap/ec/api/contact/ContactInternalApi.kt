@@ -1,5 +1,8 @@
 package com.sap.ec.api.contact
 
+import com.sap.ec.InternalSdkApi
+
+@InternalSdkApi
 interface ContactInternalApi {
 
     suspend fun link(contactFieldValue: String)
