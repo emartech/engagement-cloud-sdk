@@ -15,6 +15,7 @@ import com.sap.ec.core.url.ExternalUrlOpenerApi
 import com.sap.ec.core.util.DownloaderApi
 import com.sap.ec.event.OnlineSdkEvent
 import com.sap.ec.api.event.model.EngagementCloudEvent
+import com.sap.ec.context.DefaultUrls
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.mobileengage.action.ActionFactoryApi
 import com.sap.ec.mobileengage.action.actions.Action
@@ -56,6 +57,17 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.ExperimentalTime
 
+val defaultUrls = DefaultUrls(
+    clientServiceBaseUrl = "",
+    eventServiceBaseUrl = "",
+    deepLinkBaseUrl = "",
+    remoteConfigBaseUrl = "",
+    loggingUrl = "",
+    embeddedMessagingBaseUrl = "",
+    jsBridgeUrl = "",
+    jsBridgeSignatureUrl = ""
+)
+
 @Preview(showBackground = true)
 @Composable
 fun MessageItemViewPreview() {
@@ -80,7 +92,7 @@ fun MessageItemViewPreview() {
         MessageItemViewModel(
             MessageItemModel(
                 message = providePreviewMessage(),
-                "testBaseUrl",
+                defaultUrls,
                 downloader = PreviewDownLoader(),
                 sdkEventDistributor = previewSdkEventDistributor,
                 actionFactory = PreviewActionFactory(),
@@ -203,7 +215,7 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
                                     mapOf("key1" to "value1", "key2" to "value2"),
                                     "tracking_info_example"
                                 ),
-                                "testBaseUrl",
+                                defaultUrls,
                                 downloader = PreviewDownLoader(),
                                 sdkEventDistributor = previewSdkEventDistributor,
                                 actionFactory = PreviewActionFactory(),
@@ -228,7 +240,7 @@ private fun providePreviewMessageViewModel(previewSdkEventDistributor: SdkEventD
                                     mapOf("key1" to "value1", "key2" to "value2"),
                                     "tracking_info_example"
                                 ),
-                                "testBaseUrl",
+                                defaultUrls,
                                 downloader = PreviewDownLoader(),
                                 sdkEventDistributor = previewSdkEventDistributor,
                                 actionFactory = PreviewActionFactory(),

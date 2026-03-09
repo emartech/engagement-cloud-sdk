@@ -49,7 +49,7 @@ internal class EmbeddedMessagingPagingSource(
                             MessageItemViewModel(
                                 MessageItemModel(
                                     message,
-                                    defaultUrls.embeddedMessagingBaseUrl,
+                                    defaultUrls,
                                     downloader,
                                     sdkEventDistributor,
                                     actionFactory,
