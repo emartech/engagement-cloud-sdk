@@ -6,7 +6,7 @@ import org.jetbrains.compose.web.dom.Div
 
 
 @Composable
-fun PlaceholderMessageList() {
+internal fun PlaceholderMessageList() {
     EmbeddedMessagingTheme {
         Div {
             repeat(3) {

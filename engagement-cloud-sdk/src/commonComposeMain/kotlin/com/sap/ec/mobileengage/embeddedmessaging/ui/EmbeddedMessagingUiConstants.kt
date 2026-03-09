@@ -7,7 +7,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.sap.ec.mobileengage.embeddedmessaging.ui.theme.toColor
 
-object EmbeddedMessagingUiConstants {
+internal object EmbeddedMessagingUiConstants {
 
     internal object Dimensions {
         val MESSAGE_ITEM_IMAGE_SIZE = 78.dp

@@ -87,7 +87,7 @@ private fun LazyPagingItems<MessageItemViewModelApi>.shouldShowErrorStateNoConne
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-fun MessageItemsListPane(
+internal fun MessageItemsListPane(
     lazyPagingMessageItems: LazyPagingItems<MessageItemViewModelApi>,
     selectedMessage: MessageItemViewModelApi?,
     hasFiltersApplied: Boolean,
@@ -324,7 +324,7 @@ private fun RefreshableMessageItemsList(
 }
 
 @Composable
-fun BoxWithDeleteIcon(
+internal fun BoxWithDeleteIcon(
     onDelete: () -> Unit,
     content: @Composable () -> Unit
 ) {

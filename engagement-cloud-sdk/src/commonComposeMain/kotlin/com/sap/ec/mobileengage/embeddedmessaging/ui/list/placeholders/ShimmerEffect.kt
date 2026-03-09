@@ -12,7 +12,7 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.tan
 
-public data class Shimmer(
+internal data class Shimmer(
     private val highlightColor: Color,
     override val animationSpec: InfiniteRepeatableSpec<Float> = infiniteRepeatable(
         animation = tween(durationMillis = 1200, easing = LinearEasing),

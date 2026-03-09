@@ -10,7 +10,7 @@ import com.sap.ec.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 import com.sap.ec.mobileengage.inapp.view.InlineInAppView
 
 @Composable
-fun MessageDetailView(
+internal fun MessageDetailView(
     messageViewModel: MessageItemViewModelApi,
     onBack: () -> Unit,
     modifier: Modifier

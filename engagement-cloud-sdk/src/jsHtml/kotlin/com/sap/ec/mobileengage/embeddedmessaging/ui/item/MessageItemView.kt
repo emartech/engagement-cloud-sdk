@@ -30,7 +30,7 @@ private const val DELETE_ICON_PATH =
     "M7 21q-0.83 0-1.41-0.59t-0.59-1.41V6H4V4h5V3h6v1h5v2h-1v13q0 0.82-0.59 1.41t-1.41 0.59H7Zm10-15H7v13h10V6ZM9 17h2V8H9v9Zm4 0h2V8h-2v9ZM7 6v13-13Z"
 
 @Composable
-fun MessageItemView(
+internal fun MessageItemView(
     viewModel: MessageItemViewModelApi,
     selectedMessageId: String?,
     customMessageItemName: String?,
@@ -328,7 +328,7 @@ private fun ECMessageItem(viewModel: MessageItemViewModelApi) {
 }
 
 @Composable
-fun LoadingSpinner() {
+internal fun LoadingSpinner() {
     Div({
         classes(EmbeddedMessagingStyleSheet.loadingSpinner)
     }) {

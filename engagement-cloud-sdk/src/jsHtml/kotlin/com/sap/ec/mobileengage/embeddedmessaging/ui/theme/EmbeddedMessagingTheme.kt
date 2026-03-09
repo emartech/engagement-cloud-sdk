@@ -12,7 +12,7 @@ import com.sap.ec.mobileengage.embeddedmessaging.ui.translation.TranslationMappe
 import org.jetbrains.compose.web.css.Style
 
 @Composable
-fun EmbeddedMessagingTheme(content: @Composable () -> Unit) {
+internal fun EmbeddedMessagingTheme(content: @Composable () -> Unit) {
     Style(EmbeddedMessagingStyleSheet)
 
     val embeddedMessagingContext: EmbeddedMessagingContextApi? = koin.getOrNull()

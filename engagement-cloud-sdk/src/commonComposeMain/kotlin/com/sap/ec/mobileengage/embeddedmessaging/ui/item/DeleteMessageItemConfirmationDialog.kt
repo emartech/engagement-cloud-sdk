@@ -18,7 +18,7 @@ import com.sap.ec.mobileengage.embeddedmessaging.ui.translation.LocalStringResou
 
 
 @Composable
-fun DeleteMessageItemConfirmationDialog(
+internal fun DeleteMessageItemConfirmationDialog(
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
 ) {

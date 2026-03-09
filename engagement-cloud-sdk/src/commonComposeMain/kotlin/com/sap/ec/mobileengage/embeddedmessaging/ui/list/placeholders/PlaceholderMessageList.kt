@@ -31,7 +31,7 @@ import com.sap.ec.mobileengage.embeddedmessaging.ui.theme.LocalDesignValues
 
 
 @Composable
-fun PlaceholderMessageList() {
+internal fun PlaceholderMessageList() {
     EmbeddedMessagingTheme {
         Column(
             modifier = Modifier

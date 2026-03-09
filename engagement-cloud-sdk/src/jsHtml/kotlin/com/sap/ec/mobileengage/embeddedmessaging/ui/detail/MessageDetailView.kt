@@ -24,7 +24,7 @@ import web.intersection.IntersectionObserver
 import web.intersection.IntersectionObserverInit
 
 @Composable
-fun MessageDetailView(
+internal fun MessageDetailView(
     viewModel: MessageItemViewModelApi
 ) {
     var detailedMessageUrl by remember { mutableStateOf<Url?>(null) }

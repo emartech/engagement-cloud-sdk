@@ -2,7 +2,7 @@ package com.sap.ec.mobileengage.embeddedmessaging.ui
 
 import kotlinx.browser.window
 
-actual fun initializeCustomElements() {
+internal actual fun initializeCustomElements() {
     window.customElements.define(
         "ec-embedded-messaging",
         createBridge(

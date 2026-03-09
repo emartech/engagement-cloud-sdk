@@ -3,7 +3,7 @@ package com.sap.ec.mobileengage.embeddedmessaging.ui
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
 
-object EmbeddedMessagingUiConstants {
+internal object EmbeddedMessagingUiConstants {
     val MESSAGE_ITEM_IMAGE_SIZE = 78.px
     val CHECKMARK_ICON_DEFAULT_SIZE = 19.px
     val DEFAULT_ICON_SIZE = 24.px

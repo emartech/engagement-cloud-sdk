@@ -10,6 +10,10 @@ plugins {
 kotlin {
     jvmToolchain(17)
 
+    sourceSets.all {
+        languageSettings.optIn("com.sap.ec.InternalSdkApi")
+    }
+
     js(IR) {
         outputModuleName.set("composeApp")
         browser {

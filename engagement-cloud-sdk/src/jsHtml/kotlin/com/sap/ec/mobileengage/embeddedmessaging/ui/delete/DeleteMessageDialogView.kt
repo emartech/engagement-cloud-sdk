@@ -9,7 +9,7 @@ import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 
 @Composable
-fun DeleteMessageDialogView(
+internal fun DeleteMessageDialogView(
     onApplyClicked: () -> Unit,
     onDismiss: () -> Unit
 ) {

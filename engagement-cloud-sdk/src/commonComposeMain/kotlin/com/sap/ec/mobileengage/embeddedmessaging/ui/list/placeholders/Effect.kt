@@ -5,7 +5,7 @@ import androidx.compose.animation.core.InfiniteRepeatableSpec
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 
-interface Effect {
+internal interface Effect {
     val animationSpec: InfiniteRepeatableSpec<Float>?
 
     fun brush(@FloatRange(from = 0.0, to = 1.0) progress: Float, size: Size): Brush

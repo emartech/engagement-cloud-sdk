@@ -60,6 +60,7 @@ import com.sap.ec.mobileengage.embeddedmessaging.ui.translation.LocalStringResou
 import kotlinx.coroutines.launch
 
 @Composable
+@com.sap.ec.InternalSdkApi
 fun EmbeddedMessagingView(
     showFilters: Boolean = true,
     customMessageItem: (@Composable (message: CustomMessageItemViewModelApi, isSelected: Boolean) -> Unit)? = null
@@ -285,7 +286,7 @@ private fun MessageList(
 }
 
 @Composable
-fun AdaptiveCardContainer(isTabletScale: Boolean, content: @Composable () -> Unit) {
+internal fun AdaptiveCardContainer(isTabletScale: Boolean, content: @Composable () -> Unit) {
     MaterialTheme {
         if (isTabletScale) {
             Card(

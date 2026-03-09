@@ -6,11 +6,11 @@ import org.jetbrains.compose.web.css.Color
 import org.jetbrains.compose.web.css.StyleScope
 import org.jetbrains.compose.web.css.px
 
-data class CssColorVar(val name: String) {
+internal data class CssColorVar(val name: String) {
     fun value(): CSSColorValue = Color("var($name)")
 }
 
-fun StyleScope.setVar(variable: CssColorVar, value: String) {
+internal fun StyleScope.setVar(variable: CssColorVar, value: String) {
     property(variable.name, value)
 }
 

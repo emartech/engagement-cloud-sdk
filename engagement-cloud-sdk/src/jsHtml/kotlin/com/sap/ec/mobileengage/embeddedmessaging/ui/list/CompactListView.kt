@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.web.dom.Div
 
 @Composable
-fun CompactListView(
+internal fun CompactListView(
     customMessageItemElementName: String? = null,
     navigateToDetailedView: () -> Unit = {}
 ) {

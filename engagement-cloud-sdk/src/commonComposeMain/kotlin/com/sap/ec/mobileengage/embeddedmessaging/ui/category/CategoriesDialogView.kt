@@ -48,7 +48,7 @@ import com.sap.ec.networking.clients.embedded.messaging.model.MessageCategory
 
 
 @Composable
-fun CategoriesDialogView(
+internal fun CategoriesDialogView(
     categories: List<MessageCategory>,
     selectedCategoriesOnDialogOpen: Set<String>,
     onApplyClicked: (Set<String>) -> Unit,

@@ -101,7 +101,7 @@ import org.jetbrains.compose.web.css.transitions
 import org.jetbrains.compose.web.css.whiteSpace
 import org.jetbrains.compose.web.css.width
 
-object EmbeddedMessagingStyleSheet : StyleSheet() {
+internal object EmbeddedMessagingStyleSheet : StyleSheet() {
     val listPageContainer by style {
         backgroundColor(CssColorVars.colorSurface.value())
         height(MAX_HEIGHT)

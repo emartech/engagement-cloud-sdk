@@ -25,7 +25,7 @@ private fun isTouchDevice(): Boolean {
 }
 
 @Composable
-fun ListView(
+internal fun ListView(
     lazyPagingMessageItems: LazyPagingItems<MessageItemViewModelApi>,
     listViewModel: ListPageViewModelApi,
     customMessageItemElementName: String? = null,

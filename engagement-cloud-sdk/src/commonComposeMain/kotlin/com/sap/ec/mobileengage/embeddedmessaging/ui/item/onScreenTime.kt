@@ -11,7 +11,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 
 @Composable
-fun Modifier.onScreenTime(
+internal fun Modifier.onScreenTime(
     minScreenTimeMs: Long,
     minFractionVisible: Float,
     onMinScreenTimeReached: () -> Unit

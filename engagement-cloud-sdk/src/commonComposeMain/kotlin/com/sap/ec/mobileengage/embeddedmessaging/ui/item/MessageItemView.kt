@@ -44,7 +44,7 @@ import com.sap.ec.mobileengage.embeddedmessaging.util.asFormattedTimestamp
 
 
 @Composable
-fun MessageItemView(
+internal fun MessageItemView(
     viewModel: MessageItemViewModelApi,
     isSelected: Boolean = false,
     onClick: () -> Unit
@@ -157,7 +157,7 @@ private fun imageClipShape(): RoundedCornerShape {
 }
 
 @Composable
-fun LoadingSpinner() {
+internal fun LoadingSpinner() {
     EmbeddedMessagingTheme {
         CircularProgressIndicator(
             modifier = Modifier.size(MESSAGE_ITEM_IMAGE_SIZE)

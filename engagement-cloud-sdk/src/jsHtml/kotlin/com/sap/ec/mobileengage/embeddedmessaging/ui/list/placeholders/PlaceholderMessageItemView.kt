@@ -18,7 +18,7 @@ import org.jetbrains.compose.web.css.width
 import org.jetbrains.compose.web.dom.Div
 
 @Composable
-fun PlaceholderMessageItemView() {
+internal fun PlaceholderMessageItemView() {
     Div({
         style {
             display(DisplayStyle.Flex)

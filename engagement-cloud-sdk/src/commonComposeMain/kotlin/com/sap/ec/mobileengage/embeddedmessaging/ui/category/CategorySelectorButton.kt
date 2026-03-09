@@ -20,7 +20,7 @@ import com.sap.ec.mobileengage.embeddedmessaging.ui.translation.LocalStringResou
 
 
 @Composable
-fun CategorySelectorButton(
+internal fun CategorySelectorButton(
     isCategorySelectionActive: Boolean,
     onClick: () -> Unit
 ) {
