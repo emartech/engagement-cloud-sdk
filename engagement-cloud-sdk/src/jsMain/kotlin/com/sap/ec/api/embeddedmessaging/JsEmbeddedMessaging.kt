@@ -1,7 +1,7 @@
 package com.sap.ec.api.embeddedmessaging
 
 @OptIn(ExperimentalWasmJsInterop::class)
-class JsEmbeddedMessaging(private val embeddedMessaging: EmbeddedMessagingApi) :
+internal class JsEmbeddedMessaging(private val embeddedMessaging: EmbeddedMessagingApi) :
     JsEmbeddedMessagingApi {
     override fun getCategories(): Array<JsMessageCategory> {
         return embeddedMessaging.categories.map { JSApiMessageCategory(it.id, it.value) }.toJsArray()

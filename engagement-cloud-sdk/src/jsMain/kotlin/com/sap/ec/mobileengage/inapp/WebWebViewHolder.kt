@@ -4,7 +4,7 @@ import com.sap.ec.mobileengage.inapp.reporting.InAppLoadingMetric
 import com.sap.ec.mobileengage.inapp.webview.WebViewHolder
 import web.html.HTMLElement
 
-data class WebWebViewHolder(
+internal data class WebWebViewHolder(
     @JsName("webView") val webView: HTMLElement,
     override val metrics: InAppLoadingMetric
 ) :

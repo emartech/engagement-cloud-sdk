@@ -6,7 +6,7 @@ import org.w3c.dom.Window
 import org.w3c.dom.events.Event
 
 
-class WebConnectionWatchDog(
+internal class WebConnectionWatchDog(
     private val window: Window
 ) :
     ConnectionWatchDog {

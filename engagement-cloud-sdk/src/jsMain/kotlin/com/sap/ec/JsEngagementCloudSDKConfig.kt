@@ -3,7 +3,7 @@ import com.sap.ec.config.SdkConfig
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class JsEngagementCloudSDKConfig(
+internal data class JsEngagementCloudSDKConfig(
     override val applicationCode: String,
     val serviceWorkerOptions: ServiceWorkerOptions? = null,
 ) : SdkConfig {

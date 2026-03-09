@@ -2,7 +2,7 @@ package com.sap.ec.mobileengage.push
 
 import web.serviceworker.ServiceWorkerRegistration
 
-interface PushServiceContextApi {
+internal interface PushServiceContextApi {
     var registration: ServiceWorkerRegistration?
     var isServiceWorkerRegistered: Boolean
     var isSubscribed: Boolean

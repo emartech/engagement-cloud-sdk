@@ -33,8 +33,8 @@ class LinkContactStateTests {
     companion object {
         private const val TEST_CONTACT_FIELD_VALUE = "testContactFieldValue"
         private const val TEST_OPEN_ID_TOKEN = "testOpenIdToken"
-        val testException = Exception("failed")
-        val successResponse = SdkEvent.Internal.Sdk.Answer.Response(
+        private val testException = Exception("failed")
+        private val successResponse = SdkEvent.Internal.Sdk.Answer.Response(
             "0",
             Result.success(
                 Response(
@@ -45,7 +45,7 @@ class LinkContactStateTests {
                 )
             )
         )
-        val failedResponse = successResponse.copy(result = Result.failure(testException))
+        private val failedResponse = successResponse.copy(result = Result.failure(testException))
     }
 
     private lateinit var mockSdkContext: SdkContextApi

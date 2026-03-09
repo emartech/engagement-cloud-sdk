@@ -3,7 +3,7 @@ package com.sap.ec.core.device
 import com.sap.ec.core.device.constants.BrowserInfo
 import com.sap.ec.core.device.constants.OsInfo
 
-class WebPlatformInfoCollector(private val navigatorData: String) : WebPlatformInfoCollectorApi {
+internal class WebPlatformInfoCollector(private val navigatorData: String) : WebPlatformInfoCollectorApi {
     private companion object {
         const val DEFAULT_BROWSER_VERSION = "0"
     }

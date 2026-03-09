@@ -2,7 +2,7 @@ package com.sap.ec.mobileengage.push
 
 import com.sap.ec.mobileengage.push.model.WebPushNotificationData
 
-interface PushBroadcasterApi {
+internal interface PushBroadcasterApi {
 
     fun broadcast(pushData: WebPushNotificationData)
 }

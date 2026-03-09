@@ -4,11 +4,11 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
-sealed interface JsEventValidationData
+internal sealed interface JsEventValidationData
 
 @Serializable
 @SerialName("CUSTOM")
-data class JsCustomEventValidationData(
+internal data class JsCustomEventValidationData(
     override val name: String,
     @Transient
     override val attributes: dynamic = null
@@ -19,7 +19,7 @@ data class JsCustomEventValidationData(
 
 @Serializable
 @SerialName("NAVIGATE")
-data class JsNavigateEventValidationData(
+internal data class JsNavigateEventValidationData(
     override val location: String,
 ) : JsNavigateEvent, JsEventValidationData {
     override val type: String = JsEventType.NAVIGATE.name

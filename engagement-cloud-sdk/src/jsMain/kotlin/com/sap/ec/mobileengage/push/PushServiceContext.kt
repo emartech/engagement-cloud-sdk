@@ -3,7 +3,7 @@ package com.sap.ec.mobileengage.push
 import com.sap.ec.core.device.notification.PermissionState
 import web.serviceworker.ServiceWorkerRegistration
 
-class PushServiceContext : PushServiceContextApi {
+internal class PushServiceContext : PushServiceContextApi {
 
     override var registration: ServiceWorkerRegistration? = null
     override var isServiceWorkerRegistered: Boolean = (registration == null)

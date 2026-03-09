@@ -1,6 +1,6 @@
 package com.sap.ec.core.cache
 
-class WebFileCache : FileCacheApi {
+internal class WebFileCache : FileCacheApi {
     override fun get(fileName: String): ByteArray? {
         return null
     }

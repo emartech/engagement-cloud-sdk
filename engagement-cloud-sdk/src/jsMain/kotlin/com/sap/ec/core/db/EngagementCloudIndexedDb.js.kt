@@ -9,7 +9,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-class EngagementCloudIndexedDb(
+internal class EngagementCloudIndexedDb(
     private val indexedDBFactory: IDBFactory,
     private val sdkLogger: Logger
 ) {

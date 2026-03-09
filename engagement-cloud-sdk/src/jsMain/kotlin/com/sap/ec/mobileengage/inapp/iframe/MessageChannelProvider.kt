@@ -82,4 +82,4 @@ internal class MessageChannelProvider(
 }
 
 @Serializable
-data class IframeResizeMessage(val type: String, val height: Int)
+internal data class IframeResizeMessage(val type: String, val height: Int)

@@ -4,7 +4,7 @@ import com.sap.ec.event.SdkEvent
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.serializer
 
-sealed interface EngagementCloudObjectStoreConfig<T> {
+internal sealed interface EngagementCloudObjectStoreConfig<T> {
     val name: String
     val serializer: KSerializer<T>
 

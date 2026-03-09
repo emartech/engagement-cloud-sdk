@@ -9,7 +9,7 @@ import org.w3c.dom.Window
 import org.w3c.dom.url.URL
 
 
-class WebExternalUrlOpener(
+internal class WebExternalUrlOpener(
     private val window: Window,
     private val sdkLogger: Logger
 ) : ExternalUrlOpenerApi {

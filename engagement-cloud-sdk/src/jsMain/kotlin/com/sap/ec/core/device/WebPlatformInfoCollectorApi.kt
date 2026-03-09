@@ -1,5 +1,5 @@
 package com.sap.ec.core.device
 
-interface WebPlatformInfoCollectorApi {
+internal interface WebPlatformInfoCollectorApi {
     fun collect(): WebPlatformInfo
 }

@@ -1,6 +1,6 @@
 package com.sap.ec.core.device.constants
 
-enum class OsInfo(val value: String, val versionPrefix: String) {
+internal enum class OsInfo(val value: String, val versionPrefix: String) {
     WindowsPhone("Windows Phone", "OS"),
     Windows(value = "Win", versionPrefix = "NT"),
     IPhone(value = "iPhone", versionPrefix = "OS"),

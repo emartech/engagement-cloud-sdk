@@ -1,6 +1,6 @@
 package com.sap.ec.core.device.notification
 
-interface WebNotificationSettingsCollectorApi {
+internal interface WebNotificationSettingsCollectorApi {
 
     suspend fun collect(): WebNotificationSettings
 

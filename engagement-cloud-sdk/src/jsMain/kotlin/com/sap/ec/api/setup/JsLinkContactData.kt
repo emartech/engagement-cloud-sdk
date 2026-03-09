@@ -20,7 +20,7 @@ external interface JsOpenIdTokenData : JsLinkContactData {
 }
 
 @OptIn(ExperimentalWasmJsInterop::class)
-fun JsLinkContactData.toLinkContactData(): LinkContactData? {
+internal fun JsLinkContactData.toLinkContactData(): LinkContactData? {
     return if (Object.hasOwn(this, "contactFieldValue")) {
         LinkContactData.ContactFieldValueData(asDynamic().contactFieldValue)
     } else if (Object.hasOwn(this, "openIdToken")) {

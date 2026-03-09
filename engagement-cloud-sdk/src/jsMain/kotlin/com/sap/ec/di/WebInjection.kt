@@ -1,6 +1,7 @@
 package com.sap.ec.di
 
 import JsEngagementCloudSDKConfig
+import com.sap.ec.InternalSdkApi
 import com.sap.ec.api.config.JSConfig
 import com.sap.ec.api.config.JSConfigApi
 import com.sap.ec.api.contact.JSContact
@@ -105,7 +106,7 @@ import web.broadcast.BroadcastChannel
 import web.dom.document
 import web.idb.indexedDB
 
-object WebInjection {
+internal object WebInjection {
     val webModules = module {
         single<StringStorageApi> { StringStorage(window.localStorage) }
         single<SdkConfigStoreApi<JsEngagementCloudSDKConfig>> {
@@ -319,6 +320,7 @@ object WebInjection {
     }
 }
 
+@InternalSdkApi
 actual fun SdkKoinIsolationContext.loadPlatformModules(): List<Module> {
     return listOf(WebInjection.webModules)
 }

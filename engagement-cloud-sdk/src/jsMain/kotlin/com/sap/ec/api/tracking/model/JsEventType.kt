@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @OptIn(ExperimentalJsExport::class)
 @Serializable
-enum class JsEventType {
+internal enum class JsEventType {
     CUSTOM,
     NAVIGATE
 }

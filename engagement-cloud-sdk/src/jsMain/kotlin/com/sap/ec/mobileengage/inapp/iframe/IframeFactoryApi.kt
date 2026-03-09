@@ -2,6 +2,6 @@ package com.sap.ec.mobileengage.inapp.iframe
 
 import web.html.HTMLIFrameElement
 
-interface IframeFactoryApi {
+internal interface IframeFactoryApi {
     fun create(): HTMLIFrameElement
 }

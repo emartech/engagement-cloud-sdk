@@ -1,6 +1,6 @@
 package com.sap.ec.core.device.constants
 
-enum class BrowserInfo(val value: String, val versionPrefix: String) {
+internal enum class BrowserInfo(val value: String, val versionPrefix: String) {
     Chrome(value = "Chrome", versionPrefix = "Chrome"),
     Firefox(value = "Firefox", versionPrefix = "Firefox"),
     Safari(value = "Safari", versionPrefix = "Version"),

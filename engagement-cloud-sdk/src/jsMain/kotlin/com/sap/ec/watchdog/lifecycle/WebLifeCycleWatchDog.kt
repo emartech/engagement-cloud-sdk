@@ -13,7 +13,7 @@ import web.events.Event
 import web.events.EventType
 import web.events.addEventListener
 
-class WebLifeCycleWatchDog(
+internal class WebLifeCycleWatchDog(
     private val document: Document,
     private val lifeCycleWatchDogScope: CoroutineScope
 ) : LifecycleWatchDog {

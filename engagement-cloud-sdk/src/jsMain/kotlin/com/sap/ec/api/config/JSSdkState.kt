@@ -12,7 +12,7 @@ object JSSdkState {
     const val INITIALIZED = "initialized"
 }
 
-fun SdkState.toJsSdkState(): String = when (this) {
+internal fun SdkState.toJsSdkState(): String = when (this) {
     SdkState.Active -> JSSdkState.ACTIVE
     SdkState.OnHold -> JSSdkState.ON_HOLD
     SdkState.UnInitialized -> JSSdkState.UN_INITIALIZED

@@ -21,7 +21,7 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 @OptIn(ExperimentalWasmJsInterop::class)
-class ECIndexedDbObjectStore<T>(
+internal class ECIndexedDbObjectStore<T>(
     private val engagementCloudIndexedDb: EngagementCloudIndexedDb,
     private val engagementCloudObjectStoreConfig: EngagementCloudObjectStoreConfig<T>,
     private val json: StringFormat,

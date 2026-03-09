@@ -12,15 +12,15 @@ interface JsMessageCategory {
 }
 
 @Serializable
-data class JSApiMessageCategory(
+internal data class JSApiMessageCategory(
     override val id: String,
     override val value: String
 ) : JsMessageCategory
 
-fun JsMessageCategory.toMessageCategory(): MessageCategory {
+internal fun JsMessageCategory.toMessageCategory(): MessageCategory {
     return MessageCategory(id, value)
 }
 
-fun MessageCategory.toJsApiMessageCategory(): JSApiMessageCategory {
+internal fun MessageCategory.toJsApiMessageCategory(): JSApiMessageCategory {
     return JSApiMessageCategory(id, value)
 }
