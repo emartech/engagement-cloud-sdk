@@ -58,10 +58,10 @@ internal class UrlFactory(
             ECUrlType.GlobalRemoteConfig -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/GLOBAL")
             ECUrlType.DeepLink -> Url(sdkContext.defaultUrls.deepLinkBaseUrl)
             ECUrlType.Logging -> Url("${sdkContext.defaultUrls.loggingUrl}/v1/log")
-            ECUrlType.FetchEmbeddedMessages -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/$V1_API/${getApplicationCode()}/messages")
-            ECUrlType.FetchBadgeCount -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/$V1_API/${getApplicationCode()}/badge-count")
-            ECUrlType.FetchMeta -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/$V1_API/${getApplicationCode()}/meta")
-            ECUrlType.UpdateTagsForMessages -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/$V1_API/${getApplicationCode()}/tags")
+            ECUrlType.FetchEmbeddedMessages -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/embedded-messaging/api/$V1_API/${getApplicationCode()}/messages")
+            ECUrlType.FetchBadgeCount -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/embedded-messaging/api/$V1_API/${getApplicationCode()}/badge-count")
+            ECUrlType.FetchMeta -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/embedded-messaging/api/$V1_API/${getApplicationCode()}/meta")
+            ECUrlType.UpdateTagsForMessages -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/embedded-messaging/api/$V1_API/${getApplicationCode()}/tags")
             is ECUrlType.FetchInlineInAppMessages -> {
                 Url("${sdkContext.defaultUrls.eventServiceBaseUrl}/$V5_API/apps/${getApplicationCode()}/inline-messages")
             }

@@ -139,7 +139,7 @@ class UrlFactoryTests {
 
         val result = urlFactory.create(ECUrlType.FetchEmbeddedMessages)
 
-        result shouldBe Url("testEmbeddedMessagingBaseUrl/v1/$APPLICATION_CODE/messages")
+        result shouldBe Url("testEmbeddedMessagingBaseUrl/embedded-messaging/api/v1/$APPLICATION_CODE/messages")
     }
 
     @Test
@@ -148,7 +148,7 @@ class UrlFactoryTests {
 
         val result = urlFactory.create(ECUrlType.FetchBadgeCount)
 
-        result shouldBe Url("testEmbeddedMessagingBaseUrl/v1/$APPLICATION_CODE/badge-count")
+        result shouldBe Url("testEmbeddedMessagingBaseUrl/embedded-messaging/api/v1/$APPLICATION_CODE/badge-count")
     }
 
     @Test
@@ -157,7 +157,7 @@ class UrlFactoryTests {
 
         val result = urlFactory.create(ECUrlType.FetchMeta)
 
-        result shouldBe Url("testEmbeddedMessagingBaseUrl/v1/$APPLICATION_CODE/meta")
+        result shouldBe Url("testEmbeddedMessagingBaseUrl/embedded-messaging/api/v1/$APPLICATION_CODE/meta")
     }
 
     @Test
@@ -166,7 +166,7 @@ class UrlFactoryTests {
 
         val result = urlFactory.create(ECUrlType.UpdateTagsForMessages)
 
-        result shouldBe Url("testEmbeddedMessagingBaseUrl/v1/$APPLICATION_CODE/tags")
+        result shouldBe Url("testEmbeddedMessagingBaseUrl/embedded-messaging/api/v1/$APPLICATION_CODE/tags")
     }
 
     @Test
