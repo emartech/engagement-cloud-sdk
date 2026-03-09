@@ -1,11 +1,11 @@
 package com.sap.ec.api.push
 
-import Activatable
+import com.sap.ec.api.Activatable
 import com.sap.ec.api.generic.GenericApi
 import com.sap.ec.context.SdkContextApi
 import kotlinx.coroutines.withContext
 
-interface PushInstance : PushInternalApi, Activatable
+internal interface PushInstance : PushInternalApi, Activatable
 
 internal class Push<Logging : PushInstance, Gatherer : PushInstance, Internal : PushInstance>(
     loggingApi: Logging,

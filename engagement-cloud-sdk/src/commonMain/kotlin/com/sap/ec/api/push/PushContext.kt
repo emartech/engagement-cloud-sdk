@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 internal class PushContext(override val calls: MutableList<PushCall>) : PushContextApi
 
 @Serializable
-sealed interface PushCall {
+internal sealed interface PushCall {
 
     @Serializable
     data class RegisterPushToken(val pushToken: String) : PushCall

@@ -1,11 +1,11 @@
 package com.sap.ec.api.inapp
 
-import Activatable
+import com.sap.ec.api.Activatable
 import com.sap.ec.api.generic.GenericApi
 import com.sap.ec.context.SdkContextApi
 import kotlinx.coroutines.withContext
 
-interface InAppInstance : InAppInternalApi, Activatable
+internal interface InAppInstance : InAppInternalApi, Activatable
 
 internal class InApp<Logging : InAppInstance, Gatherer : InAppInstance, Internal : InAppInstance>(
     loggingApi: Logging,

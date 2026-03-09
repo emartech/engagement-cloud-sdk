@@ -1,5 +1,5 @@
 package com.sap.ec.mobileengage.inapp.view
 
-interface InAppViewProviderApi {
+internal interface InAppViewProviderApi {
     suspend fun provide(): InAppViewApi
 }

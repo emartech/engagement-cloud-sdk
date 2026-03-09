@@ -1,3 +1,3 @@
 package com.sap.ec.mobileengage.embeddedmessaging.ui
 
-expect fun initializeCustomElements()
+internal expect fun initializeCustomElements()

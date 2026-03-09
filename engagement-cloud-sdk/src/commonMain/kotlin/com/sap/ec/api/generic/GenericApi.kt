@@ -1,6 +1,6 @@
 package com.sap.ec.api.generic
 
-import Activatable
+import com.sap.ec.api.Activatable
 import com.sap.ec.api.Api
 import com.sap.ec.api.AutoRegisterable
 import com.sap.ec.api.SdkState

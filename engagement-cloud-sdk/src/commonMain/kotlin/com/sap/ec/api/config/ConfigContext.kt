@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 internal class ConfigContext(override val calls: MutableList<ConfigCall>) : ConfigContextApi
 
 @Serializable
-sealed interface ConfigCall {
+internal sealed interface ConfigCall {
     @Serializable
     data class ChangeApplicationCode(val applicationCode: String) : ConfigCall
 

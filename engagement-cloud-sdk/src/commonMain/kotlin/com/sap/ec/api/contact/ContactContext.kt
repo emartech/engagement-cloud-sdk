@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 internal class ContactContext(override val calls: MutableList<ContactCall>) : ContactContextApi
 
 @Serializable
-sealed interface ContactCall {
+internal sealed interface ContactCall {
     @Serializable
     data class LinkContact(val contactFieldValue: String) : ContactCall
 

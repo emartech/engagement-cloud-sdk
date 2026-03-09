@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 internal class InAppContext(override val calls: MutableList<InAppCall>) : InAppContextApi
 
 @Serializable
-sealed interface InAppCall {
+internal sealed interface InAppCall {
 
     @Serializable
     class Pause : InAppCall {

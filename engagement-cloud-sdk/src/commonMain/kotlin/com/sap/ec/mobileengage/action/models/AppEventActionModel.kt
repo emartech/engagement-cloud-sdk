@@ -4,14 +4,14 @@ import com.sap.ec.core.providers.UUIDProvider
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-interface AppEventActionModel {
+internal interface AppEventActionModel {
     val name: String
     val payload: Map<String, String>?
 }
 
 @Serializable
 @SerialName("MEAppEvent")
-data class PresentableAppEventActionModel(
+internal data class PresentableAppEventActionModel(
     override val id: String = UUIDProvider().provide(),
     override val reporting: String,
     override val title: String,
@@ -21,7 +21,7 @@ data class PresentableAppEventActionModel(
 
 @Serializable
 @SerialName("MEAppEvent")
-data class BasicAppEventActionModel(
+internal data class BasicAppEventActionModel(
     override val reporting: String = "",
     override val name: String,
     override val payload: Map<String, String>?

@@ -8,7 +8,7 @@ internal class EventTrackerContext(
 ) : EventTrackerContextApi
 
 @Serializable
-sealed interface EventTrackerCall {
+internal sealed interface EventTrackerCall {
 
     @Serializable
     data class TrackEvent(val event: SdkEvent) : EventTrackerCall

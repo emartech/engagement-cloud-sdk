@@ -1,8 +1,10 @@
 package com.sap.ec.mobileengage.embeddedmessaging.ui.item
 
+import com.sap.ec.InternalSdkApi
 import com.sap.ec.networking.clients.embedded.messaging.model.Category
 import io.ktor.http.Url
 
+@InternalSdkApi
 interface MessageItemViewModelApi : CustomMessageItemViewModelApi {
     val id: String
     val isExcludedLocally: Boolean
@@ -19,6 +21,7 @@ interface MessageItemViewModelApi : CustomMessageItemViewModelApi {
     fun copyAsExcludedLocally(): MessageItemViewModelApi
 }
 
+@InternalSdkApi
 interface CustomMessageItemViewModelApi {
     val title: String
     val lead: String

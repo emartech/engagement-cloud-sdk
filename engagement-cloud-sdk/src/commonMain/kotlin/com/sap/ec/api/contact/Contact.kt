@@ -1,6 +1,6 @@
 package com.sap.ec.api.contact
 
-import Activatable
+import com.sap.ec.api.Activatable
 import com.sap.ec.api.generic.GenericApi
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.log.withLogContext
@@ -8,7 +8,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 
-interface ContactInstance : ContactInternalApi, Activatable
+internal interface ContactInstance : ContactInternalApi, Activatable
 
 internal class Contact<Logging : ContactInstance, Gatherer : ContactInstance, Internal : ContactInstance>(
     loggingApi: Logging,

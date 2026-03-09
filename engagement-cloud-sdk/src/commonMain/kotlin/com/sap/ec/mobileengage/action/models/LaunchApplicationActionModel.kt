@@ -5,4 +5,4 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("LaunchApplication")
-data object BasicLaunchApplicationActionModel: ActionModel
+internal data object BasicLaunchApplicationActionModel: ActionModel

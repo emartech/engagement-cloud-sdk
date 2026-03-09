@@ -1,12 +1,12 @@
 package com.sap.ec.api.event
 
-import Activatable
+import com.sap.ec.api.Activatable
 import com.sap.ec.api.event.model.TrackedEvent
 import com.sap.ec.api.generic.GenericApi
 import com.sap.ec.context.SdkContextApi
 import kotlinx.coroutines.withContext
 
-interface EventTrackerInstance : EventTrackerInternalApi, Activatable
+internal interface EventTrackerInstance : EventTrackerInternalApi, Activatable
 
 internal class EventTracker<Logging : EventTrackerInstance, Gatherer : EventTrackerInstance, Internal : EventTrackerInstance>(
     loggingApi: Logging,

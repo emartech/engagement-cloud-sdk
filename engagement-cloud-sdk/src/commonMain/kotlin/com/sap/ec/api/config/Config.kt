@@ -1,6 +1,6 @@
 package com.sap.ec.api.config
 
-import Activatable
+import com.sap.ec.api.Activatable
 import com.sap.ec.api.SdkState
 import com.sap.ec.api.generic.GenericApi
 import com.sap.ec.context.SdkContextApi
@@ -13,7 +13,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 
-interface ConfigInstance : ConfigInternalApi, Activatable
+internal interface ConfigInstance : ConfigInternalApi, Activatable
 
 internal class Config<Logging : ConfigInstance, Gatherer : ConfigInstance, Internal : ConfigInstance>(
     loggingApi: Logging,

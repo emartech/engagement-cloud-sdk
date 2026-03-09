@@ -1,6 +1,6 @@
 package com.sap.ec.mobileengage.inapp.jsbridge
 
-data class InAppJsBridgeData(
+internal data class InAppJsBridgeData(
     val dismissId: String,
     val trackingInfo: String
 )

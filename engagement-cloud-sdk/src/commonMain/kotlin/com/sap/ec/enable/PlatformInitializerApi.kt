@@ -1,6 +1,6 @@
 package com.sap.ec.enable
 
-interface PlatformInitializerApi {
+internal interface PlatformInitializerApi {
 
     suspend fun init()
 

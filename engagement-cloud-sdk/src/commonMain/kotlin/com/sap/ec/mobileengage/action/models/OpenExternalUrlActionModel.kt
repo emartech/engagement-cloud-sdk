@@ -4,14 +4,14 @@ import com.sap.ec.core.providers.UUIDProvider
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-interface OpenExternalUrlActionModel {
+internal interface OpenExternalUrlActionModel {
     val url: String
     val target: HtmlTarget?
 }
 
 @Serializable
 @SerialName("OpenExternalUrl")
-data class PresentableOpenExternalUrlActionModel(
+internal data class PresentableOpenExternalUrlActionModel(
     override val id: String = UUIDProvider().provide(),
     override val reporting: String,
     override val title: String,
@@ -22,14 +22,14 @@ data class PresentableOpenExternalUrlActionModel(
 
 @Serializable
 @SerialName("OpenExternalUrl")
-data class BasicOpenExternalUrlActionModel(
+internal data class BasicOpenExternalUrlActionModel(
     override val reporting: String = "",
     override val url: String,
     override val target: HtmlTarget? = null
 ) : BasicActionModel(), OpenExternalUrlActionModel
 
 @Serializable
-enum class HtmlTarget(val raw: String) {
+internal enum class HtmlTarget(val raw: String) {
     @SerialName("_blank")
     BLANK("_blank"),
     @SerialName("_top")

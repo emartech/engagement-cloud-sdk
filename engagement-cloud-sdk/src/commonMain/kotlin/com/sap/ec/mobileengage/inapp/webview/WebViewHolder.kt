@@ -2,6 +2,6 @@ package com.sap.ec.mobileengage.inapp.webview
 
 import com.sap.ec.mobileengage.inapp.reporting.InAppLoadingMetric
 
-interface WebViewHolder {
+internal interface WebViewHolder {
     val metrics: InAppLoadingMetric
 }

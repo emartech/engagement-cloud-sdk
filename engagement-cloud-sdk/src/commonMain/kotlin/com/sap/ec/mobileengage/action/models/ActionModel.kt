@@ -28,7 +28,7 @@ sealed class PresentableActionModel : ActionModel {
     abstract val title: String
 }
 
-fun BasicActionModel.amendForJsBridge(data: InAppJsBridgeData): BasicActionModel {
+internal fun BasicActionModel.amendForJsBridge(data: InAppJsBridgeData): BasicActionModel {
     if (this is DismissActionModel) {
         this.dismissId = data.dismissId
     } else if (this is BasicInAppButtonClickedActionModel) {
