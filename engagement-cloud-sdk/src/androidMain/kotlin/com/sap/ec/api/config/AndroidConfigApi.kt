@@ -1,5 +1,6 @@
 package com.sap.ec.api.config
 
+import com.sap.ec.api.SdkState
 import com.sap.ec.core.device.notification.AndroidNotificationSettings
 
 interface AndroidConfigApi {
@@ -19,6 +20,8 @@ interface AndroidConfigApi {
     suspend fun setLanguage(language: String): Result<Unit>
 
     suspend fun resetLanguage(): Result<Unit>
+
+    suspend fun getCurrentSdkState(): SdkState
 
     suspend fun getNotificationSettings(): AndroidNotificationSettings
 }

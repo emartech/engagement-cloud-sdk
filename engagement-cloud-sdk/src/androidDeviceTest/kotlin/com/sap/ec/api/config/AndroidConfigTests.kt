@@ -1,5 +1,6 @@
 package com.sap.ec.api.config
 
+import com.sap.ec.api.SdkState
 import com.sap.ec.core.device.notification.AndroidNotificationSettings
 import com.sap.ec.core.device.notification.AndroidNotificationSettingsCollectorApi
 import dev.mokkery.MockMode
@@ -69,7 +70,9 @@ class AndroidConfigTests {
     @Test
     fun changeApplicationCode_shouldCall_sameMethod_onConfigApi_andReturnSuccessResult() = runTest {
         val testAppCode = "ABCDE-12345"
-        everySuspend { mockConfigApi.changeApplicationCode(testAppCode) } returns Result.success(Unit)
+        everySuspend { mockConfigApi.changeApplicationCode(testAppCode) } returns Result.success(
+            Unit
+        )
 
         val result = androidConfig.changeApplicationCode(testAppCode)
 
@@ -142,5 +145,17 @@ class AndroidConfigTests {
             verifySuspend { mockAndroidNotificationSettingsCollector.collect() }
 
             settings shouldBe testAndroidNotificationSettings
+        }
+
+    @Test
+    fun getCurrentSdkState_shouldCall_sameMethod_onConfigApi() =
+        runTest {
+            everySuspend { mockConfigApi.getCurrentSdkState() } returns SdkState.Active
+
+            val sdkState = androidConfig.getCurrentSdkState()
+
+            verifySuspend { mockConfigApi.getCurrentSdkState() }
+
+            sdkState shouldBe SdkState.Active
         }
 }

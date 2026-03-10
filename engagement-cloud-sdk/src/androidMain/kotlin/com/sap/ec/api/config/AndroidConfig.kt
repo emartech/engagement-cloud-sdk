@@ -1,5 +1,6 @@
 package com.sap.ec.api.config
 
+import com.sap.ec.api.SdkState
 import com.sap.ec.core.device.notification.AndroidNotificationSettings
 import com.sap.ec.core.device.notification.AndroidNotificationSettingsCollectorApi
 
@@ -39,6 +40,8 @@ internal class AndroidConfig(
     override suspend fun resetLanguage(): Result<Unit> {
         return configApi.resetLanguage()
     }
+
+    override suspend fun getCurrentSdkState(): SdkState = configApi.getCurrentSdkState()
 
     override suspend fun getNotificationSettings(): AndroidNotificationSettings {
         return androidNotificationSettingsCollector.collect()
