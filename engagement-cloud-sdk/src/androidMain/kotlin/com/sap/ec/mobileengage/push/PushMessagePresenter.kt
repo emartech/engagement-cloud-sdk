@@ -6,6 +6,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
+import com.sap.R
 import com.sap.ec.api.push.PushConstants.DEFAULT_TAP_ACTION_ID
 import com.sap.ec.api.push.PushConstants.INTENT_EXTRA_ACTION_KEY
 import com.sap.ec.api.push.PushConstants.INTENT_EXTRA_DEFAULT_TAP_ACTION_KEY
@@ -35,6 +36,7 @@ internal class PushMessagePresenter(
     private companion object {
         const val DEBUG_CHANNEL_ID = "ems_debug"
         const val DEBUG_CHANNEL_NAME = "Engagement Cloud SDK Debug Messages"
+        val DEFAULT_SMALL_NOTIFICATION_ICON = R.drawable.default_small_notification_icon
     }
 
     override suspend fun present(pushMessage: AndroidPushMessage) {
@@ -44,7 +46,8 @@ internal class PushMessagePresenter(
             context
         )
 
-        val iconId = metadataReader.getInt(PUSH_NOTIFICATION_ICON_NAME)
+        val iconId =
+            metadataReader.getInt(PUSH_NOTIFICATION_ICON_NAME, DEFAULT_SMALL_NOTIFICATION_ICON)
         val channelId = message.platformData.channelId
         val collapseId = message.platformData.notificationMethod.collapseId
         val tapActionPendingIntent = createTapActionPendingIntent(message)
