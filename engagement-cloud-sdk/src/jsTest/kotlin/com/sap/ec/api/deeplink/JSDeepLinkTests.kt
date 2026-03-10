@@ -12,29 +12,42 @@ import kotlin.test.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class JSDeepLinkTests {
     private companion object {
-        val testUrl = Url("https://sap.com")
+        const val testUrl = "https://sap.com"
     }
 
     @Test
     fun testTrack_shouldCall_track_onDeepLinkApi() {
         val mockDeepLinkApi: DeepLinkApi = mock()
-        every { mockDeepLinkApi.track(testUrl) } returns Result.success(true)
+        every { mockDeepLinkApi.track(Url(testUrl)) } returns Result.success(true)
         val jsDeepLink = JSDeepLink(mockDeepLinkApi)
 
         val result = jsDeepLink.track(testUrl)
 
-        verify { mockDeepLinkApi.track(testUrl) }
+        verify { mockDeepLinkApi.track(Url(testUrl)) }
         result shouldBe true
     }
 
     @Test
     fun testTrack_shouldReturnFalse_ifTrackingFails() {
         val mockDeepLinkApi: DeepLinkApi = mock()
-        every { mockDeepLinkApi.track(testUrl) } returns Result.failure(Exception())
+        every { mockDeepLinkApi.track(Url(testUrl)) } returns Result.failure(Exception())
         val jsDeepLink = JSDeepLink(mockDeepLinkApi)
 
         val result = jsDeepLink.track(testUrl)
 
         result shouldBe false
+    }
+
+    @Test
+    fun testTrack_shouldPassConvertedUrlToDeepLinkApi() {
+        val mockDeepLinkApi: DeepLinkApi = mock()
+        val urlString = "https://example.com?ems_dl=abc123"
+        every { mockDeepLinkApi.track(Url(urlString)) } returns Result.success(true)
+        val jsDeepLink = JSDeepLink(mockDeepLinkApi)
+
+        val result = jsDeepLink.track(urlString)
+
+        verify { mockDeepLinkApi.track(Url(urlString)) }
+        result shouldBe true
     }
 }
