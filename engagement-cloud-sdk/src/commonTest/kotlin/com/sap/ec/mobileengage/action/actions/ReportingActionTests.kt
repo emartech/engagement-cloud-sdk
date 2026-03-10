@@ -1,5 +1,6 @@
 package com.sap.ec.mobileengage.action.actions
 
+import com.sap.ec.SdkConstants
 import com.sap.ec.SdkConstants.BUTTON_CLICK_ORIGIN
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.event.SdkEvent
@@ -31,6 +32,11 @@ class ReportingActionTests {
 
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
 
+    @Test
+    fun testInAppButtonClickedEventName_shouldUseNamespacedFormat() {
+        SdkConstants.IN_APP_BUTTON_CLICKED_EVENT_NAME shouldBe "inapp:click"
+    }
+
     @BeforeTest
     fun setUp() = runTest {
         mockSdkEventDistributor = mock()
@@ -55,7 +61,7 @@ class ReportingActionTests {
 
         action.invoke()
 
-        verifyArguments(eventSlot, expectedEvent)
+        verifyArguments(eventSlot, expectedEvent, "push:click")
     }
 
     @Test
@@ -80,7 +86,7 @@ class ReportingActionTests {
 
         action.invoke()
 
-        verifyArguments(eventSlot, expectedEvent)
+        verifyArguments(eventSlot, expectedEvent, "inapp:click")
     }
 
     @Test
@@ -102,15 +108,17 @@ class ReportingActionTests {
 
             action.invoke()
 
-            verifyArguments(eventSlot, expectedEvent)
+            verifyArguments(eventSlot, expectedEvent, "push:click")
         }
 
     private fun verifyArguments(
         eventSlot: SlotCapture<SdkEvent>,
-        expectedEvent: SdkEvent.Internal.Reporting
+        expectedEvent: SdkEvent.Internal.Reporting,
+        expectedName: String
     ) {
         eventSlot.get().type shouldBe expectedEvent.type
         (eventSlot.get() as SdkEvent.Internal.Reporting).reporting shouldBe expectedEvent.reporting
         (eventSlot.get() as SdkEvent.Internal.Reporting).trackingInfo shouldBe expectedEvent.trackingInfo
+        (eventSlot.get() as SdkEvent.DeviceEvent).name shouldBe expectedName
     }
 }
