@@ -11,6 +11,8 @@ import com.sap.ec.mobileengage.inapp.networking.models.EmbeddedMessagingRichCont
 import com.sap.ec.mobileengage.inapp.networking.models.InlineMessageRequest
 import com.sap.ec.mobileengage.inapp.networking.models.InlineMessageResponse
 import com.sap.ec.mobileengage.inapp.presentation.InAppType
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.Url
 import kotlinx.serialization.json.Json
@@ -85,7 +87,11 @@ internal class InlineInAppMessageFetcher(
                 } else {
                     sdkLogger.debug("Successfully fetched inline message from url: $url")
                     val richContentUrl = json.decodeFromString<EmbeddedMessagingRichContentUrlHolder>(content).url
-                    val richContentRequest = UrlRequest(Url(richContentUrl), HttpMethod.Get)
+                    val richContentRequest = UrlRequest(
+                        Url(richContentUrl),
+                        HttpMethod.Get,
+                        headers = mapOf(HttpHeaders.ContentType to ContentType.Text.Html.toString())
+                    )
                     genericClient.send(richContentRequest).getOrElse {
                         sdkLogger.error("Failed to fetch RichContent for embedded message from url: $richContentUrl", it)
                         return null

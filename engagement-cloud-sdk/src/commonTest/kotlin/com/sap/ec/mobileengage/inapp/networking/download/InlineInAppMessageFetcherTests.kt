@@ -13,14 +13,21 @@ import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
+import dev.mokkery.matcher.capture.Capture.Companion.slot
+import dev.mokkery.matcher.capture.SlotCapture
+import dev.mokkery.matcher.capture.capture
+import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
+import io.ktor.http.ContentType
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
+import io.ktor.http.HttpHeaders as KtorHttpHeaders
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import kotlin.test.BeforeTest
@@ -385,5 +392,43 @@ class InlineInAppMessageFetcherTests {
         val result = fetcher.fetch(contentUrl, testTrackingInfo)
 
         result shouldBe null
+    }
+
+    @Test
+    fun fetchByUrl_shouldSendRichContentRequest_withContentTypeTextHtmlHeader() = runTest {
+        val testRichContentUrl = Url("https://fetchUrlFromHere.com/url")
+        val contentUrl = "https://sap.com/inline-content"
+        val testUrlHolder = EmbeddedMessagingRichContentUrlHolder(contentUrl)
+        val urlHolderJson = json.encodeToString(testUrlHolder)
+        val htmlContent = "<div>Inline Content</div>"
+
+        val urlHolderResponse = Response(
+            originalRequest = UrlRequest(testRichContentUrl, HttpMethod.Get),
+            status = HttpStatusCode.OK,
+            headers = Headers.Empty,
+            bodyAsText = urlHolderJson
+        )
+
+        val richContentResponse = Response(
+            originalRequest = UrlRequest(Url(contentUrl), HttpMethod.Get),
+            status = HttpStatusCode.OK,
+            headers = Headers.Empty,
+            bodyAsText = htmlContent
+        )
+
+        everySuspend { mockECNetworkClient.send(any()) } returns Result.success(urlHolderResponse)
+
+        val richContentRequestSlot: SlotCapture<UrlRequest> = slot()
+        everySuspend {
+            mockGenericNetworkClient.send(capture(richContentRequestSlot))
+        } returns Result.success(richContentResponse)
+
+        fetcher.fetch(testRichContentUrl, testTrackingInfo)
+
+        val capturedRequest = richContentRequestSlot.get()
+        capturedRequest.url shouldBe Url(contentUrl)
+        capturedRequest.method shouldBe HttpMethod.Get
+        capturedRequest.headers shouldNotBe null
+        capturedRequest.headers!![KtorHttpHeaders.ContentType] shouldBe ContentType.Text.Html.toString()
     }
 }
