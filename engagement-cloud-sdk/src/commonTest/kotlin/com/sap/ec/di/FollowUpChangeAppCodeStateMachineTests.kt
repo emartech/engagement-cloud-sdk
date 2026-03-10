@@ -22,7 +22,7 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class FollowUpChangeAppCodeStateMachineTests {
+internal class FollowUpChangeAppCodeStateMachineTests {
     private lateinit var mockSdkContext: SdkContextApi
     private lateinit var mockSdkEventEmitter: SdkEventEmitterApi
     private lateinit var mockLogger: Logger
@@ -83,7 +83,7 @@ class FollowUpChangeAppCodeStateMachineTests {
     }
 
     @Test
-    fun activate_shouldExecuteStatesInCorrectOrder() = runTest {
+    fun activate_shouldActivateAllThreeStates_inCorrectOrder() = runTest {
         val applyConfig = TestState("applyAppCodeBasedRemoteConfig")
         val fetchMeta = TestState("fetchEmbeddedMessagingMetaState")
         val loadMessages = TestState("loadEmbeddedMessagingFetchMessagesState")
