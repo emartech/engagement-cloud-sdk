@@ -1,14 +1,8 @@
 package com.sap.ec.api.inapp
 
 import com.sap.ec.api.SdkState
-import com.sap.ec.context.DefaultUrls
-import com.sap.ec.context.SdkContext
 import com.sap.ec.context.SdkContextApi
-import com.sap.ec.core.log.LogLevel
-import com.sap.ec.core.storage.StringStorageApi
-import com.sap.ec.di.SdkKoinIsolationContext.koin
-import com.sap.ec.fake.FakeStringStorage
-import com.sap.ec.util.JsonUtil
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
 import dev.mokkery.every
@@ -19,80 +13,59 @@ import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlinx.serialization.json.Json
-import org.koin.core.Koin
-import org.koin.core.module.Module
-import org.koin.dsl.module
-import org.koin.test.KoinTest
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class InappTests : KoinTest {
-
-    override fun getKoin(): Koin = koin
-
+class InappTests {
     private companion object {
-        val testException = Exception()
+        val TEST_EXCEPTION = Exception()
     }
-
-    private lateinit var testModule: Module
 
     private lateinit var mockLoggingInApp: InAppInstance
     private lateinit var mockGathererInApp: InAppInstance
     private lateinit var mockInAppInternal: InAppInstance
-    private lateinit var sdkContext: SdkContextApi
+    private lateinit var mockSdkContext: SdkContextApi
     private lateinit var inApp: InApp<InAppInstance, InAppInstance, InAppInstance>
 
-    private val mainDispatcher = StandardTestDispatcher()
-
-    init {
-        Dispatchers.setMain(mainDispatcher)
-    }
 
     @BeforeTest
-    fun setup() = runTest {
-        testModule = module {
-            single<StringStorageApi> { FakeStringStorage() }
-            single<Json> { JsonUtil.json }
-        }
-        koin.loadModules(listOf(testModule))
+    fun setup() {
+        val mainDispatcher = StandardTestDispatcher()
+        Dispatchers.setMain(mainDispatcher)
+        mockLoggingInApp = mock(MockMode.autofill)
+        mockGathererInApp = mock(MockMode.autofill)
+        mockInAppInternal = mock(MockMode.autofill)
 
-        mockLoggingInApp = mock()
-        mockGathererInApp = mock()
-        mockInAppInternal = mock()
+        mockSdkContext = mock(MockMode.autofill)
+        every { mockSdkContext.sdkDispatcher } returns mainDispatcher
 
-        sdkContext = SdkContext(
-            sdkDispatcher = StandardTestDispatcher(),
-            mainDispatcher = mainDispatcher,
-            defaultUrls = DefaultUrls("", "", "", "", "", "", "", ""),
-            remoteLogLevel = LogLevel.Error,
-            features = mutableSetOf(),
-            logBreadcrumbsQueueSize = 10,
-            onContactLinkingFailed = null
+        inApp = InApp(
+            mockLoggingInApp,
+            mockGathererInApp,
+            mockInAppInternal,
+            mockSdkContext
         )
-
-        everySuspend { mockLoggingInApp.activate() } returns Unit
-        everySuspend { mockGathererInApp.activate() } returns Unit
-        everySuspend { mockInAppInternal.activate() } returns Unit
-
-        inApp = InApp(mockLoggingInApp, mockGathererInApp, mockInAppInternal, sdkContext)
-        inApp.registerOnContext()
     }
 
     @AfterTest
     fun tearDown() {
-        koin.unloadModules(listOf(testModule))
+        Dispatchers.resetMain()
     }
 
     @Test
     fun testIsPaused_when_inactiveState() = runTest {
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Initialized)
         every { mockLoggingInApp.isPaused } returns false
+
+        inApp.registerOnContext()
 
         inApp.isPaused shouldBe false
         verify { mockLoggingInApp.isPaused }
@@ -100,9 +73,11 @@ class InappTests : KoinTest {
 
     @Test
     fun testIsPaused_when_onHoldState() = runTest {
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.OnHold)
         every { mockGathererInApp.isPaused } returns true
 
-        sdkContext.setSdkState(SdkState.OnHold)
+        inApp.registerOnContext()
+
         advanceUntilIdle()
 
         inApp.isPaused shouldBe true
@@ -112,9 +87,11 @@ class InappTests : KoinTest {
 
     @Test
     fun testIsPaused_when_activeState() = runTest {
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
         every { mockInAppInternal.isPaused } returns true
 
-        sdkContext.setSdkState(SdkState.Active)
+        inApp.registerOnContext()
+
         advanceUntilIdle()
         inApp.isPaused shouldBe true
 
@@ -123,7 +100,11 @@ class InappTests : KoinTest {
 
     @Test
     fun testPause_when_inactiveState() = runTest {
-        everySuspend { mockLoggingInApp.pause() } returns Unit
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Initialized)
+
+        inApp.registerOnContext()
+
+        advanceUntilIdle()
 
         inApp.pause()
 
@@ -132,9 +113,10 @@ class InappTests : KoinTest {
 
     @Test
     fun testPause_when_onHoldState() = runTest {
-        everySuspend { mockGathererInApp.pause() } returns Unit
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.OnHold)
 
-        sdkContext.setSdkState(SdkState.OnHold)
+        inApp.registerOnContext()
+
         advanceUntilIdle()
 
         inApp.pause()
@@ -144,8 +126,10 @@ class InappTests : KoinTest {
 
     @Test
     fun testPause_when_activeState() = runTest {
-        everySuspend { mockInAppInternal.pause() } returns Unit
-        sdkContext.setSdkState(SdkState.Active)
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
+
+        inApp.registerOnContext()
+
         advanceUntilIdle()
 
         inApp.pause()
@@ -155,41 +139,54 @@ class InappTests : KoinTest {
 
     @Test
     fun testPause_when_activeState_throws() = runTest {
-        everySuspend { mockInAppInternal.pause() } throws testException
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
+        everySuspend { mockInAppInternal.pause() } throws TEST_EXCEPTION
 
-        sdkContext.setSdkState(SdkState.Active)
+        inApp.registerOnContext()
+
         advanceUntilIdle()
 
         val result = inApp.pause()
 
-        result.exceptionOrNull() shouldBe testException
+        result.exceptionOrNull() shouldBe TEST_EXCEPTION
     }
 
     @Test
     fun testResume_when_inactiveState() = runTest {
-        everySuspend { mockLoggingInApp.resume() } returns Unit
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Initialized)
+
+        inApp.registerOnContext()
+
+        advanceUntilIdle()
 
         inApp.resume()
+
+        advanceUntilIdle()
 
         verifySuspend { mockLoggingInApp.resume() }
     }
 
     @Test
     fun testResume_when_onHoldState() = runTest {
-        everySuspend { mockGathererInApp.resume() } returns Unit
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.OnHold)
 
-        sdkContext.setSdkState(SdkState.OnHold)
+        inApp.registerOnContext()
+
         advanceUntilIdle()
 
         inApp.resume()
+
+        advanceUntilIdle()
 
         verifySuspend { mockGathererInApp.resume() }
     }
 
     @Test
     fun testResume_when_activeState() = runTest {
-        everySuspend { mockInAppInternal.resume() } returns Unit
-        sdkContext.setSdkState(SdkState.Active)
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
+
+        inApp.registerOnContext()
+
         advanceUntilIdle()
 
         inApp.resume()
@@ -199,14 +196,16 @@ class InappTests : KoinTest {
 
     @Test
     fun testResume_when_activeState_throws() = runTest {
-        everySuspend { mockInAppInternal.resume() } throws testException
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
+        everySuspend { mockInAppInternal.resume() } throws TEST_EXCEPTION
 
-        sdkContext.setSdkState(SdkState.Active)
+        inApp.registerOnContext()
+
         advanceUntilIdle()
 
         val result = inApp.resume()
 
-        result.exceptionOrNull() shouldBe testException
+        result.exceptionOrNull() shouldBe TEST_EXCEPTION
     }
 
 }

@@ -53,7 +53,7 @@ class EventTrackerGathererTests {
             "TestLoggerName",
             mock(MockMode.autofill),
             remoteLogger = null,
-            sdkContext = mock()
+            logConfigHolder = mock()
         )
 
         eventTrackerContext = EventTrackerContext(mutableListOf())

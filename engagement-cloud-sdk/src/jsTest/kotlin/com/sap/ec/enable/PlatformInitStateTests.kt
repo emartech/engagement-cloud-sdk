@@ -1,75 +1,55 @@
 package com.sap.ec.enable
 
 import JsEngagementCloudSDKConfig
-import com.sap.ec.context.DefaultUrls
-import com.sap.ec.context.SdkContext
-import com.sap.ec.core.log.LogLevel
-import com.sap.ec.core.storage.StringStorageApi
-import com.sap.ec.di.SdkKoinIsolationContext.koin
-import com.sap.ec.fake.FakeStringStorage
+import com.sap.ec.context.SdkContextApi
 import com.sap.ec.mobileengage.push.PushServiceApi
-import com.sap.ec.util.JsonUtil
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
+import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.json.Json
-import org.koin.core.Koin
-import org.koin.core.module.Module
-import org.koin.dsl.module
-import org.koin.test.KoinTest
+import kotlinx.coroutines.test.setMain
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class PlatformInitStateTests : KoinTest {
-
-    override fun getKoin(): Koin = koin
-
-    private lateinit var testModule: Module
-
+@OptIn(ExperimentalCoroutinesApi::class)
+class PlatformInitStateTests {
     private lateinit var platformInitState: PlatformInitState
     private lateinit var mockPushService: PushServiceApi
-    private lateinit var testSdkContext: SdkContext
+    private lateinit var mockSdkContext: SdkContextApi
 
     @BeforeTest
-    fun setup() = runTest {
-        testModule = module {
-            single<StringStorageApi> { FakeStringStorage() }
-            single<Json> { JsonUtil.json }
-        }
-        koin.loadModules(listOf(testModule))
+    fun setup() {
+        val testDispatcher = StandardTestDispatcher()
+        Dispatchers.setMain(testDispatcher)
 
-        testSdkContext = SdkContext(
-            sdkDispatcher = StandardTestDispatcher(),
-            mainDispatcher = StandardTestDispatcher(),
-            defaultUrls = DefaultUrls("", "", "", "", "", "", "", ""),
-            remoteLogLevel = LogLevel.Error,
-            features = mutableSetOf(),
-            logBreadcrumbsQueueSize = 10,
-            onContactLinkingFailed = null
-        )
-        mockPushService = mock()
-        everySuspend { mockPushService.register(any()) } returns Unit
-        everySuspend { mockPushService.subscribeForPushMessages(any()) } returns Unit
-        platformInitState = PlatformInitState(mockPushService, testSdkContext)
+        mockSdkContext = mock(MockMode.autofill)
+        every { mockSdkContext.sdkDispatcher } returns testDispatcher
+        mockPushService = mock(MockMode.autofill)
+
+        platformInitState = PlatformInitState(mockPushService, mockSdkContext)
     }
 
     @AfterTest
     fun tearDown() {
-        koin.unloadModules(listOf(testModule))
+        Dispatchers.resetMain()
     }
 
     @Test
     fun activate_shouldCallRegister_onJsBridge_ifSdkContext_hasConfig_andReturnSuccess() = runTest {
         val testConfig = JsEngagementCloudSDKConfig(applicationCode = "test-app-code")
-        testSdkContext.config = testConfig
+        every { mockSdkContext.config } returns testConfig
 
         val result = platformInitState.active()
 
@@ -95,7 +75,7 @@ class PlatformInitStateTests : KoinTest {
     @Test
     fun activate_should_callRegister_onPushService_ifSdkContext_hasConfig_andReturnFailure_ifErrorHappens() =
         runTest {
-            testSdkContext.config = JsEngagementCloudSDKConfig(applicationCode = "test-app-code")
+            every { mockSdkContext.config } returns JsEngagementCloudSDKConfig(applicationCode = "test-app-code")
             val testException = Exception("failure")
             everySuspend { mockPushService.register(any()) } throws testException
 

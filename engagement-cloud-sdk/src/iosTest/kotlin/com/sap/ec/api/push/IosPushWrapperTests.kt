@@ -1,20 +1,16 @@
 package com.sap.ec.api.push
 
 import com.sap.ec.api.SdkState
-import com.sap.ec.context.DefaultUrls
-import com.sap.ec.context.SdkContext
+import com.sap.ec.config.SdkConfig
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.exceptions.SdkException.PreconditionFailedException
-import com.sap.ec.core.log.LogLevel
+import com.sap.ec.core.log.LogConfigHolderApi
 import com.sap.ec.core.log.Logger
-import com.sap.ec.core.storage.StringStorageApi
-import com.sap.ec.di.SdkKoinIsolationContext.koin
-import com.sap.ec.fake.FakeStringStorage
+import com.sap.ec.enable.config.SdkConfigStoreApi
 import com.sap.ec.mobileengage.action.models.BasicAppEventActionModel
 import com.sap.ec.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.sap.ec.mobileengage.push.IosPushInstance
 import com.sap.ec.mobileengage.push.IosPushWrapper
-import com.sap.ec.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
@@ -27,26 +23,18 @@ import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlinx.serialization.json.Json
-import org.koin.core.Koin
-import org.koin.core.module.Module
-import org.koin.dsl.module
-import org.koin.test.KoinTest
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class IosPushTests: KoinTest {
-
-    override fun getKoin(): Koin = koin
-
+class IosPushWrapperTests {
     private companion object {
         const val PUSH_TOKEN = "testPushToken"
         const val VERSION = "APNS_V2"
@@ -96,121 +84,93 @@ class IosPushTests: KoinTest {
         )
     }
 
-    private lateinit var testModule: Module
-
     private lateinit var mockLoggingPush: IosPushInstance
     private lateinit var mockGathererPush: IosPushInstance
     private lateinit var mockPushInternal: IosPushInstance
     private lateinit var mockSdkLogger: Logger
+    private lateinit var mockSdkConfigStore: SdkConfigStoreApi<SdkConfig>
+    private lateinit var mockRemoteLogLevelHolder: LogConfigHolderApi
     private lateinit var testUNUserNotificationCenterDelegateProtocol: UNUserNotificationCenterDelegateProtocol
-    private lateinit var sdkContext: SdkContextApi
+    private lateinit var mockSdkContext: SdkContextApi
     private lateinit var iosPushWrapper: IosPushWrapper<IosPushInstance, IosPushInstance, IosPushInstance>
 
     @BeforeTest
     fun setup() = runTest {
-        testModule = module {
-            single<StringStorageApi> { FakeStringStorage() }
-            single<Json> { JsonUtil.json }
-        }
-        koin.loadModules(listOf(testModule))
-
         val sdkDispatcher = StandardTestDispatcher()
         Dispatchers.setMain(sdkDispatcher)
 
-        mockLoggingPush = mock()
-        mockGathererPush = mock()
-        mockPushInternal = mock()
+        mockLoggingPush = mock(MockMode.autofill)
+        mockGathererPush = mock(MockMode.autofill)
+        everySuspend { mockGathererPush.activate() } returns Unit
+        mockPushInternal = mock(MockMode.autofill)
+        mockSdkConfigStore = mock(MockMode.autofill)
+        mockRemoteLogLevelHolder = mock(MockMode.autofill)
         mockSdkLogger = mock(MockMode.autofill)
         everySuspend { mockSdkLogger.error(any(), any<Throwable>()) } returns Unit
 
         testUNUserNotificationCenterDelegateProtocol =
             TestUserNotificationCenterDelegate()
 
-        sdkContext = SdkContext(
-            sdkDispatcher = StandardTestDispatcher(),
-            mainDispatcher = StandardTestDispatcher(),
-            defaultUrls = DefaultUrls("", "", "", "", "", "", "", ""),
-            remoteLogLevel = LogLevel.Error,
-            features = mutableSetOf(),
-            logBreadcrumbsQueueSize = 10,
-            onContactLinkingFailed = null
-        )
-
-        everySuspend { mockLoggingPush.activate() } returns Unit
-        everySuspend { mockGathererPush.activate() } returns Unit
-        everySuspend { mockPushInternal.activate() } returns Unit
+        mockSdkContext = mock(MockMode.autofill)
+        every { mockSdkContext.sdkDispatcher } returns sdkDispatcher
 
         iosPushWrapper =
-            IosPushWrapper(mockLoggingPush, mockGathererPush, mockPushInternal, sdkContext, mockSdkLogger)
-        iosPushWrapper.registerOnContext()
+            IosPushWrapper(
+                mockLoggingPush,
+                mockGathererPush,
+                mockPushInternal,
+                mockSdkContext,
+                mockSdkLogger
+            )
     }
 
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
-        koin.unloadModules(listOf(testModule))
     }
 
     @Test
     fun testRegisterPushToken_inactiveState() = runTest {
-        everySuspend {
-            mockLoggingPush.registerPushToken(
-                IosPushTests.Companion.PUSH_TOKEN
-            )
-        } returns Unit
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Initialized)
 
-        iosPushWrapper.registerPushToken(IosPushTests.Companion.PUSH_TOKEN)
+        iosPushWrapper.registerOnContext()
 
-        verifySuspend(exactly(1)) {
-            mockLoggingPush.registerPushToken(
-                IosPushTests.Companion.PUSH_TOKEN
-            )
-        }
+        iosPushWrapper.registerPushToken(PUSH_TOKEN)
+
+        verifySuspend(exactly(1)) { mockLoggingPush.registerPushToken(PUSH_TOKEN) }
     }
 
     @Test
     fun testRegisterPushToken_onHoldState() = runTest {
-        everySuspend {
-            mockGathererPush.registerPushToken(
-                IosPushTests.Companion.PUSH_TOKEN
-            )
-        } returns Unit
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.OnHold)
 
-        sdkContext.setSdkState(SdkState.OnHold)
-        iosPushWrapper.registerPushToken(IosPushTests.Companion.PUSH_TOKEN)
+        iosPushWrapper.registerOnContext()
 
-        verifySuspend { mockGathererPush.registerPushToken(IosPushTests.Companion.PUSH_TOKEN) }
+        iosPushWrapper.registerPushToken(PUSH_TOKEN)
+
+        verifySuspend { mockGathererPush.registerPushToken(PUSH_TOKEN) }
     }
 
     @Test
     fun testRegisterPushToken_activeState() = runTest {
-        everySuspend {
-            mockPushInternal.registerPushToken(
-                IosPushTests.Companion.PUSH_TOKEN
-            )
-        } returns Unit
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
 
-        sdkContext.setSdkState(SdkState.Active)
-        iosPushWrapper.registerPushToken(IosPushTests.Companion.PUSH_TOKEN)
+        iosPushWrapper.registerOnContext()
 
-        verifySuspend {
-            mockPushInternal.registerPushToken(
-                IosPushTests.Companion.PUSH_TOKEN
-            )
-        }
+        iosPushWrapper.registerPushToken(PUSH_TOKEN)
+
+        verifySuspend { mockPushInternal.registerPushToken(PUSH_TOKEN) }
     }
 
     @Test
     fun testRegisterPushToken_activeState_when_throws() = runTest {
         val expectedException = Exception()
-        everySuspend {
-            mockPushInternal.registerPushToken(
-                IosPushTests.Companion.PUSH_TOKEN
-            )
-        } throws expectedException
+        everySuspend { mockPushInternal.registerPushToken(PUSH_TOKEN) } throws expectedException
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
 
-        sdkContext.setSdkState(SdkState.Active)
-        val result = iosPushWrapper.registerPushToken(IosPushTests.Companion.PUSH_TOKEN)
+        iosPushWrapper.registerOnContext()
+
+        val result = iosPushWrapper.registerPushToken(PUSH_TOKEN)
 
         result.isFailure shouldBe true
         result.exceptionOrNull() shouldBe expectedException
@@ -218,43 +178,35 @@ class IosPushTests: KoinTest {
 
     @Test
     fun testClearPushToken_inactiveState() = runTest {
-        everySuspend {
-            mockLoggingPush.clearPushToken()
-        } returns Unit
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Initialized)
+
+        iosPushWrapper.registerOnContext()
 
         iosPushWrapper.clearPushToken()
 
-        verifySuspend {
-            mockLoggingPush.clearPushToken()
-        }
+        verifySuspend { mockLoggingPush.clearPushToken() }
     }
 
     @Test
     fun testClearPushToken_onHoldState() = runTest {
-        everySuspend {
-            mockGathererPush.clearPushToken()
-        } returns Unit
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.OnHold)
 
-        sdkContext.setSdkState(SdkState.OnHold)
+        iosPushWrapper.registerOnContext()
+
         iosPushWrapper.clearPushToken()
 
-        verifySuspend {
-            mockGathererPush.clearPushToken()
-        }
+        verifySuspend { mockGathererPush.clearPushToken() }
     }
 
     @Test
     fun testClearPushToken_activeState() = runTest {
-        everySuspend {
-            mockPushInternal.clearPushToken()
-        } returns Unit
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
 
-        sdkContext.setSdkState(SdkState.Active)
+        iosPushWrapper.registerOnContext()
+
         iosPushWrapper.clearPushToken()
 
-        verifySuspend {
-            mockPushInternal.clearPushToken()
-        }
+        verifySuspend { mockPushInternal.clearPushToken() }
     }
 
     @Test
@@ -263,8 +215,10 @@ class IosPushTests: KoinTest {
         everySuspend {
             mockPushInternal.clearPushToken()
         } throws expectedException
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
 
-        sdkContext.setSdkState(SdkState.Active)
+        iosPushWrapper.registerOnContext()
+
         val result = iosPushWrapper.clearPushToken()
 
         result.isFailure shouldBe true
@@ -273,52 +227,46 @@ class IosPushTests: KoinTest {
 
     @Test
     fun testPushToken_inactiveState() = runTest {
-        everySuspend {
-            mockLoggingPush.getPushToken()
-        } returns null
+        everySuspend { mockLoggingPush.getPushToken() } returns null
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Initialized)
+
+        iosPushWrapper.registerOnContext()
 
         val result = iosPushWrapper.getPushToken()
 
-        result.onSuccess {
-            it shouldBe null
-        }
+        result.onSuccess { it shouldBe null }
     }
 
     @Test
     fun testPushToken_onHoldState() = runTest {
-        everySuspend {
-            mockGathererPush.getPushToken()
-        } returns IosPushTests.Companion.PUSH_TOKEN
+        everySuspend { mockGathererPush.getPushToken() } returns PUSH_TOKEN
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.OnHold)
 
-        sdkContext.setSdkState(SdkState.OnHold)
+        iosPushWrapper.registerOnContext()
 
         val result = iosPushWrapper.getPushToken()
 
-        result.onSuccess {
-            it shouldBe IosPushTests.Companion.PUSH_TOKEN
-        }
+        result.onSuccess { it shouldBe PUSH_TOKEN }
     }
 
     @Test
     fun testPushToken_activeState() = runTest {
-        everySuspend {
-            mockPushInternal.getPushToken()
-        } returns IosPushTests.Companion.PUSH_TOKEN
+        everySuspend { mockPushInternal.getPushToken() } returns PUSH_TOKEN
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
 
-        sdkContext.setSdkState(SdkState.Active)
+        iosPushWrapper.registerOnContext()
 
         val result = iosPushWrapper.getPushToken()
 
-        result.onSuccess {
-            it shouldBe IosPushTests.Companion.PUSH_TOKEN
-        }
+        result.onSuccess { it shouldBe PUSH_TOKEN }
     }
 
     @Test
     fun testUserNotificationCenterDelegate_inactiveState() = runTest {
-        every {
-            mockLoggingPush.userNotificationCenterDelegate
-        } returns testUNUserNotificationCenterDelegateProtocol
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Initialized)
+        every { mockLoggingPush.userNotificationCenterDelegate } returns testUNUserNotificationCenterDelegateProtocol
+
+        iosPushWrapper.registerOnContext()
 
         val result = iosPushWrapper.userNotificationCenterDelegate
 
@@ -327,13 +275,10 @@ class IosPushTests: KoinTest {
 
     @Test
     fun testUserNotificationCenterDelegate_onHoldState() = runTest {
-        every {
-            mockGathererPush.userNotificationCenterDelegate
-        } returns testUNUserNotificationCenterDelegateProtocol
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.OnHold)
+        every { mockGathererPush.userNotificationCenterDelegate } returns testUNUserNotificationCenterDelegateProtocol
 
-        sdkContext.setSdkState(SdkState.OnHold)
-
-        advanceUntilIdle()
+        iosPushWrapper.registerOnContext()
 
         val result = iosPushWrapper.userNotificationCenterDelegate
 
@@ -342,13 +287,10 @@ class IosPushTests: KoinTest {
 
     @Test
     fun testUserNotificationCenterDelegate_onActiveState() = runTest {
-        every {
-            mockPushInternal.userNotificationCenterDelegate
-        } returns testUNUserNotificationCenterDelegateProtocol
+        every { mockPushInternal.userNotificationCenterDelegate } returns testUNUserNotificationCenterDelegateProtocol
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
 
-        sdkContext.setSdkState(SdkState.Active)
-
-        advanceUntilIdle()
+        iosPushWrapper.registerOnContext()
 
         val result = iosPushWrapper.userNotificationCenterDelegate
 
@@ -357,50 +299,47 @@ class IosPushTests: KoinTest {
 
     @Test
     fun testHandleSilentMessageWithUserInfo_inactiveState() = runTest {
-        everySuspend {
-            mockLoggingPush.handleSilentMessageWithUserInfo(any())
-        } returns Unit
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Initialized)
 
-        iosPushWrapper.handleSilentMessageWithUserInfo(IosPushTests.Companion.SILENT_USER_INFO_MAP)
+        iosPushWrapper.registerOnContext()
 
-        verifySuspend {
-            mockLoggingPush.handleSilentMessageWithUserInfo(IosPushTests.Companion.SILENT_PUSH_USER_INFO)
-        }
+        iosPushWrapper.handleSilentMessageWithUserInfo(SILENT_USER_INFO_MAP)
+
+        verifySuspend { mockLoggingPush.handleSilentMessageWithUserInfo(SILENT_PUSH_USER_INFO) }
     }
 
     @Test
     fun testHandleSilentMessageWithUserInfo_onHoldState() = runTest {
-        everySuspend {
-            mockGathererPush.handleSilentMessageWithUserInfo(any())
-        } returns Unit
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.OnHold)
+        iosPushWrapper.handleSilentMessageWithUserInfo(SILENT_USER_INFO_MAP)
 
-        sdkContext.setSdkState(SdkState.OnHold)
-        iosPushWrapper.handleSilentMessageWithUserInfo(IosPushTests.Companion.SILENT_USER_INFO_MAP)
+        iosPushWrapper.registerOnContext()
 
-        verifySuspend { mockGathererPush.handleSilentMessageWithUserInfo(IosPushTests.Companion.SILENT_PUSH_USER_INFO) }
+        iosPushWrapper.handleSilentMessageWithUserInfo(SILENT_USER_INFO_MAP)
+
+        verifySuspend { mockGathererPush.handleSilentMessageWithUserInfo(SILENT_PUSH_USER_INFO) }
     }
 
     @Test
     fun testHandleSilentMessageWithUserInfo_onActiveState() = runTest {
-        everySuspend {
-            mockPushInternal.handleSilentMessageWithUserInfo(any())
-        } returns Unit
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
+        iosPushWrapper.handleSilentMessageWithUserInfo(SILENT_USER_INFO_MAP)
 
-        sdkContext.setSdkState(SdkState.Active)
-        iosPushWrapper.handleSilentMessageWithUserInfo(IosPushTests.Companion.SILENT_USER_INFO_MAP)
+        iosPushWrapper.registerOnContext()
 
-        verifySuspend { mockPushInternal.handleSilentMessageWithUserInfo(IosPushTests.Companion.SILENT_PUSH_USER_INFO) }
+        iosPushWrapper.handleSilentMessageWithUserInfo(SILENT_USER_INFO_MAP)
+
+        verifySuspend { mockPushInternal.handleSilentMessageWithUserInfo(SILENT_PUSH_USER_INFO) }
     }
 
     @Test
     fun testHandleSilentMessageWithUserInfo_onActiveState_whenUserInfoDeSerializationFails() =
         runTest {
             val invalidUserInfoMap = mapOf("key" to "value")
-            everySuspend {
-                mockPushInternal.handleSilentMessageWithUserInfo(any())
-            } returns Unit
+            every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
 
-            sdkContext.setSdkState(SdkState.Active)
+            iosPushWrapper.registerOnContext()
+
             val result = iosPushWrapper.handleSilentMessageWithUserInfo(invalidUserInfoMap)
 
             result.isFailure shouldBe true

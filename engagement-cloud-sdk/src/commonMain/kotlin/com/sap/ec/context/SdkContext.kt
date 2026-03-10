@@ -3,7 +3,7 @@ package com.sap.ec.context
 import com.sap.ec.api.SdkState
 import com.sap.ec.config.LinkContactData
 import com.sap.ec.config.SdkConfig
-import com.sap.ec.core.log.LogLevel
+import com.sap.ec.enable.config.SdkConfigStoreApi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -12,11 +12,23 @@ internal class SdkContext(
     override val mainDispatcher: CoroutineDispatcher,
     override var onContactLinkingFailed: (suspend () -> LinkContactData?)?,
     override var defaultUrls: DefaultUrlsApi,
-    override var remoteLogLevel: LogLevel,
     override val features: MutableSet<Features>,
-    override var logBreadcrumbsQueueSize: Int,
+    private val sdkConfigStore: SdkConfigStoreApi<SdkConfig>
 ) : SdkContextApi {
     override var config: SdkConfig? = null
+
+    private var _cachedConfig: SdkConfig? = null
+
+    override suspend fun getSdkConfig(): SdkConfig? {
+        return _cachedConfig ?: sdkConfigStore.load().also { _cachedConfig = it }
+    }
+
+    override suspend fun setSdkConfig(config: SdkConfig?) {
+        config?.let {
+            sdkConfigStore.store(config)
+            _cachedConfig = config
+        } ?: sdkConfigStore.clear()
+    }
 
     override val currentSdkState = MutableStateFlow(SdkState.UnInitialized)
 

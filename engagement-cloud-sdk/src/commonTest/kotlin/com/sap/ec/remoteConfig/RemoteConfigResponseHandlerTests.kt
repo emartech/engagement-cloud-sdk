@@ -2,12 +2,12 @@ package com.sap.ec.remoteConfig
 
 import com.sap.ec.context.DefaultUrls
 import com.sap.ec.context.DefaultUrlsApi
-import com.sap.ec.context.Features
 import com.sap.ec.context.Features.EmbeddedMessaging
 import com.sap.ec.context.Features.JsBridgeSignatureCheck
 import com.sap.ec.context.Features.MobileEngage
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.device.DeviceInfoCollectorApi
+import com.sap.ec.core.log.LogConfigHolderApi
 import com.sap.ec.core.log.LogLevel
 import com.sap.ec.core.log.SdkLogger
 import com.sap.ec.core.providers.DoubleProvider
@@ -30,6 +30,7 @@ import kotlin.test.Test
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class RemoteConfigResponseHandlerTests {
     private lateinit var mockSdkContext: SdkContextApi
+    private lateinit var mockLogConfigHolder: LogConfigHolderApi
     private lateinit var defaultUrls: DefaultUrlsApi
     private lateinit var mockDeviceInfoCollector: DeviceInfoCollectorApi
     private lateinit var mockRandomProvider: DoubleProvider
@@ -41,6 +42,8 @@ class RemoteConfigResponseHandlerTests {
         defaultUrls = DefaultUrls("", "", "", "", "", "", "", "")
         every { mockSdkContext.defaultUrls } returns defaultUrls
 
+        mockLogConfigHolder = mock(MockMode.autofill)
+
         everySuspend { mockSdkContext.sdkDispatcher } returns StandardTestDispatcher()
         every { mockSdkContext.features } returns mutableSetOf(JsBridgeSignatureCheck)
 
@@ -49,9 +52,10 @@ class RemoteConfigResponseHandlerTests {
 
         remoteConfigResponseHandler = RemoteConfigResponseHandler(
             mockDeviceInfoCollector,
+            mockLogConfigHolder,
             mockSdkContext,
             mockRandomProvider,
-            SdkLogger("TestLoggerName", mock(MockMode.autofill), sdkContext = mockSdkContext)
+            SdkLogger("TestLoggerName", mock(MockMode.autofill), logConfigHolder = mock(MockMode.autofill))
         )
     }
 
@@ -96,7 +100,7 @@ class RemoteConfigResponseHandlerTests {
         defaultUrlSlot.get().deepLinkBaseUrl shouldBe deeplinkServiceUrl
         defaultUrlSlot.get().embeddedMessagingBaseUrl shouldBe embeddedMessagingServiceUrl
         defaultUrlSlot.get().jsBridgeUrl shouldBe jsBridgeUrl
-        verify { mockSdkContext.remoteLogLevel = LogLevel.Error }
+        verify { mockLogConfigHolder.remoteLogLevel = LogLevel.Error }
         mockSdkContext.features.size shouldBe 3
         mockSdkContext.features shouldContainAll listOf(
             MobileEngage,
@@ -126,7 +130,7 @@ class RemoteConfigResponseHandlerTests {
 
             remoteConfigResponseHandler.handle(configResponse)
 
-            verify { mockSdkContext.remoteLogLevel = LogLevel.Error }
+            verify { mockLogConfigHolder.remoteLogLevel = LogLevel.Error }
             mockSdkContext.features shouldBe listOf(
                 JsBridgeSignatureCheck
             )
@@ -156,7 +160,7 @@ class RemoteConfigResponseHandlerTests {
         remoteConfigResponseHandler.handle(configResponse)
 
         defaultUrlSlot.get().clientServiceBaseUrl shouldBe clientServiceUrl
-        verify { mockSdkContext.remoteLogLevel = LogLevel.Error }
+        verify { mockLogConfigHolder.remoteLogLevel = LogLevel.Error }
         mockSdkContext.features shouldBe listOf(MobileEngage)
     }
 

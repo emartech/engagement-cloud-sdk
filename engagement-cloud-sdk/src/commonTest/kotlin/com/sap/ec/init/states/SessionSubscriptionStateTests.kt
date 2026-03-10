@@ -24,7 +24,7 @@ class SessionSubscriptionStateTests {
         mockLifecycleWatchDog = mock()
 
         sessionSubscriptionState =
-            SessionSubscriptionState(mockMobileEngageSession, mockLifecycleWatchDog, SdkLogger("TestLoggerName", mock(MockMode.autofill), sdkContext = mock()))
+            SessionSubscriptionState(mockMobileEngageSession, mockLifecycleWatchDog, SdkLogger("TestLoggerName", mock(MockMode.autofill), logConfigHolder = mock()))
     }
 
     @Test

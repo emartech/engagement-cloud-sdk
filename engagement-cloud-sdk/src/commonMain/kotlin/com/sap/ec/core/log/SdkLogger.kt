@@ -1,6 +1,5 @@
 package com.sap.ec.core.log
 
-import com.sap.ec.context.SdkContextApi
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -12,7 +11,7 @@ internal class SdkLogger(
     private val loggerName: String,
     private val consoleLogger: ConsoleLoggerApi,
     private val remoteLogger: RemoteLoggerApi? = null,
-    private val sdkContext: SdkContextApi? = null
+    private val logConfigHolder: LogConfigHolderApi? = null
 ) : Logger {
 
     companion object {
@@ -125,7 +124,7 @@ internal class SdkLogger(
         if (remoteLogger != null && isRemoteLog) {
             if (level == LogLevel.Debug || level == LogLevel.Info) {
                 mutex.withLock {
-                    if (breadcrumbsQueue.size >= (sdkContext?.logBreadcrumbsQueueSize ?: 10)) {
+                    if (breadcrumbsQueue.size >= (logConfigHolder?.logBreadcrumbsQueueSize ?: 10)) {
                         breadcrumbsQueue.removeLast()
                     }
                     val breadcrumbLog =

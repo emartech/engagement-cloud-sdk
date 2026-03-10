@@ -10,6 +10,7 @@ internal object RemoteConfigInjection {
         single<RemoteConfigResponseHandlerApi> {
             RemoteConfigResponseHandler(
                 deviceInfoCollector = get(),
+                logConfigHolder = get(),
                 sdkContext = get(),
                 randomProvider = get(),
                 sdkLogger = get { parametersOf(RemoteConfigResponseHandler::class.simpleName) }

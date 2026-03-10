@@ -3,7 +3,6 @@ package com.sap.ec.context
 import com.sap.ec.api.SdkState
 import com.sap.ec.config.LinkContactData
 import com.sap.ec.config.SdkConfig
-import com.sap.ec.core.log.LogLevel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.StateFlow
 
@@ -14,11 +13,13 @@ internal interface SdkContextApi {
     var config: SdkConfig?
     var onContactLinkingFailed: (suspend () -> LinkContactData?)?
     var defaultUrls: DefaultUrlsApi
-    var remoteLogLevel: LogLevel
     val features: MutableSet<Features>
-    var logBreadcrumbsQueueSize: Int
 
     suspend fun isEnabledState(): Boolean
+
+    suspend fun getSdkConfig(): SdkConfig?
+
+    suspend fun setSdkConfig(config: SdkConfig?)
 
     suspend fun setSdkState(sdkState: SdkState)
 }

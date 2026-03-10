@@ -52,7 +52,7 @@ class EnableOrganizerTests {
             mockSdkContext,
             mockSdkConfigStore,
             mockSession,
-            SdkLogger("TestLoggerName", mock(MockMode.autofill), sdkContext = mock())
+            SdkLogger("TestLoggerName", mock(MockMode.autofill), logConfigHolder = mock())
         )
     }
 

@@ -1,16 +1,20 @@
 package com.sap.ec.remoteConfig
 
 import com.sap.ec.context.Features
-import com.sap.ec.context.Features.*
+import com.sap.ec.context.Features.EmbeddedMessaging
+import com.sap.ec.context.Features.JsBridgeSignatureCheck
+import com.sap.ec.context.Features.MobileEngage
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.context.copyWith
 import com.sap.ec.core.device.DeviceInfoCollectorApi
+import com.sap.ec.core.log.LogConfigHolderApi
 import com.sap.ec.core.log.LogLevel
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.providers.DoubleProvider
 
 internal class RemoteConfigResponseHandler(
     private val deviceInfoCollector: DeviceInfoCollectorApi,
+    private val logConfigHolder: LogConfigHolderApi,
     private val sdkContext: SdkContextApi,
     private val randomProvider: DoubleProvider,
     private val sdkLogger: Logger
@@ -59,7 +63,7 @@ internal class RemoteConfigResponseHandler(
 
     private fun applyLogLevel(logLevel: LogLevel?) {
         logLevel?.let {
-            sdkContext.remoteLogLevel = it
+            logConfigHolder.remoteLogLevel = it
         }
     }
 
@@ -73,7 +77,7 @@ internal class RemoteConfigResponseHandler(
         luckyLogger?.let {
             val randomNumber = randomProvider.provide()
             if (it.threshold != 0.0 && randomNumber <= it.threshold) {
-                sdkContext.remoteLogLevel = it.logLevel
+                logConfigHolder.remoteLogLevel = it.logLevel
             }
         }
     }

@@ -17,9 +17,10 @@ import com.sap.ec.core.device.DeviceInfoUpdater
 import com.sap.ec.core.device.DeviceInfoUpdaterApi
 import com.sap.ec.core.log.ConsoleLogger
 import com.sap.ec.core.log.ConsoleLoggerApi
+import com.sap.ec.core.log.LogConfigHolder
+import com.sap.ec.core.log.LogConfigHolderApi
 import com.sap.ec.core.log.LogEventRegistry
 import com.sap.ec.core.log.LogEventRegistryApi
-import com.sap.ec.core.log.LogLevel
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.log.RemoteLogger
 import com.sap.ec.core.log.RemoteLoggerApi
@@ -84,10 +85,13 @@ internal object CoreInjection {
         single<LogEventRegistryApi> {
             LogEventRegistry()
         }
+        single<LogConfigHolderApi> {
+            LogConfigHolder()
+        }
         single<RemoteLoggerApi> {
             RemoteLogger(
                 logEventRegistry = get(),
-                sdkContext = get()
+                logConfigHolder = get()
             )
         }
         factory<Logger> { (loggerName: String) ->
@@ -95,7 +99,7 @@ internal object CoreInjection {
                 loggerName,
                 consoleLogger = get(),
                 remoteLogger = get(),
-                sdkContext = get()
+                logConfigHolder = get()
             )
         }
         singleOf(::TimestampProvider) { bind<InstantProvider>() }
@@ -153,9 +157,8 @@ internal object CoreInjection {
                 mainDispatcher = get(named(DispatcherTypes.Main)),
                 onContactLinkingFailed = null,
                 defaultUrls = get(),
-                remoteLogLevel = LogLevel.Error,
                 features = mutableSetOf(Features.JsBridgeSignatureCheck),
-                logBreadcrumbsQueueSize = 10
+                sdkConfigStore = get()
             )
         }
         single<DownloaderApi> {

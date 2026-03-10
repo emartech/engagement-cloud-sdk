@@ -1,6 +1,5 @@
 package com.sap.ec.core.log
 
-import com.sap.ec.context.SdkContextApi
 import com.sap.ec.event.SdkEvent
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -26,19 +25,19 @@ class RemoteLoggerTests {
 
     private lateinit var mockLogEventRegistry: LogEventRegistryApi
     private lateinit var remoteLogger: RemoteLoggerApi
-    private lateinit var mockSdkContext: SdkContextApi
+    private lateinit var mockRemoteLogLevelHolder: LogConfigHolderApi
 
     @BeforeTest
     fun setup() {
         mockLogEventRegistry = mock(MockMode.autofill)
-        mockSdkContext = mock(MockMode.autofill)
-        remoteLogger = RemoteLogger(mockLogEventRegistry, mockSdkContext)
+        mockRemoteLogLevelHolder = mock(MockMode.autofill)
+        remoteLogger = RemoteLogger(mockLogEventRegistry, mockRemoteLogLevelHolder)
     }
 
     @Test
     fun testLogToRemote_shouldRegisterLogEvent_whenRemoteLogLevelIsLowerThanLogLevel() = runTest {
         val logLevel = LogLevel.Error
-        every { mockSdkContext.remoteLogLevel } returns LogLevel.Info
+        every { mockRemoteLogLevelHolder.remoteLogLevel } returns LogLevel.Info
 
         val logMessage = JsonObject(mapOf("message" to JsonPrimitive("This is a test log")))
         val eventCapture = slot<SdkEvent.Internal.Sdk.Log>()
@@ -58,7 +57,7 @@ class RemoteLoggerTests {
     @Test
     fun testLogToRemote_shouldNotRegisterLogEvent_whenRemoteLogLevelIsHigher() = runTest {
         val logLevel = LogLevel.Info
-        every { mockSdkContext.remoteLogLevel } returns LogLevel.Error
+        every { mockRemoteLogLevelHolder.remoteLogLevel } returns LogLevel.Error
         val logMessage = JsonObject(mapOf("message" to JsonPrimitive("This is a test log")))
 
         remoteLogger.logToRemote(logLevel, logMessage)
@@ -71,7 +70,7 @@ class RemoteLoggerTests {
     @Test
     fun testLogToRemote_shouldRegisterLogEvent_whenRemoteLogLevelEqualsLogLevel() = runTest {
         val logLevel = LogLevel.Info
-        every { mockSdkContext.remoteLogLevel } returns LogLevel.Info
+        every { mockRemoteLogLevelHolder.remoteLogLevel } returns LogLevel.Info
 
         val logMessage = JsonObject(mapOf("message" to JsonPrimitive("This is a test log")))
         val eventCapture = slot<SdkEvent.Internal.Sdk.Log>()

@@ -20,7 +20,7 @@ class PlatformInitStateTests {
     fun setup() {
         mockPlatformInitializer = mock()
 
-        initializerState = InitializerState(mockPlatformInitializer, SdkLogger("TestLoggerName", mock(MockMode.autofill), sdkContext = mock()))
+        initializerState = InitializerState(mockPlatformInitializer, SdkLogger("TestLoggerName", mock(MockMode.autofill), logConfigHolder = mock()))
     }
 
     @Test

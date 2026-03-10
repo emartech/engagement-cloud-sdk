@@ -9,54 +9,36 @@ import com.sap.ec.api.contact.ContactContextApi
 import com.sap.ec.api.contact.ContactGatherer
 import com.sap.ec.api.contact.ContactInternal
 import com.sap.ec.api.contact.LoggingContact
-import com.sap.ec.context.DefaultUrls
-import com.sap.ec.context.SdkContext
-import com.sap.ec.core.log.LogLevel
+import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.log.Logger
-import com.sap.ec.core.storage.StringStorageApi
-import com.sap.ec.di.SdkKoinIsolationContext.koin
-import com.sap.ec.fake.FakeStringStorage
-import com.sap.ec.util.JsonUtil
 import dev.mokkery.MockMode
+import dev.mokkery.answering.returns
+import dev.mokkery.every
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlinx.serialization.json.Json
-import org.koin.core.Koin
-import org.koin.core.module.Module
-import org.koin.dsl.module
-import org.koin.test.KoinTest
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-class GenericApiTests : KoinTest {
-
-    override fun getKoin(): Koin = koin
-
-    private lateinit var testModule: Module
-
+class GenericApiTests {
     private lateinit var mockSdkLogger: Logger
     private lateinit var loggingContact: LoggingContact
     private lateinit var contactGatherer: ContactGatherer
     private lateinit var contactInternal: ContactInternal
-    private lateinit var sdkContext: SdkContext
+    private lateinit var mockSdkContext: SdkContextApi
     private lateinit var contactContext: ContactContextApi
     private lateinit var genericApi: GenericApi<LoggingContact, ContactGatherer, ContactInternal>
 
     @BeforeTest
-    fun setup() = runTest {
-        testModule = module {
-            single<StringStorageApi> { FakeStringStorage() }
-            single<Json> { JsonUtil.json }
-        }
-        koin.loadModules(listOf(testModule))
-
+    fun setup() {
         val mainDispatcher = StandardTestDispatcher()
         Dispatchers.setMain(mainDispatcher)
         contactContext = ContactContext(mutableListOf())
@@ -65,27 +47,25 @@ class GenericApiTests : KoinTest {
         contactGatherer = ContactGatherer(contactContext, mockSdkLogger)
         contactInternal =
             ContactInternal(contactContext, mockSdkLogger, sdkEventDistributor = mock())
-        sdkContext = SdkContext(
-            sdkDispatcher = StandardTestDispatcher(),
-            mainDispatcher = mainDispatcher,
-            defaultUrls = DefaultUrls("", "", "", "", "", "", "", ""),
-            remoteLogLevel = LogLevel.Error,
-            features = mutableSetOf(),
-            logBreadcrumbsQueueSize = 10,
-            onContactLinkingFailed = null
+        mockSdkContext = mock(MockMode.autofill)
+        every { mockSdkContext.sdkDispatcher } returns mainDispatcher
+        genericApi = GenericApi(
+            loggingContact,
+            contactGatherer,
+            contactInternal,
+            mockSdkContext
         )
-        genericApi = GenericApi(loggingContact, contactGatherer, contactInternal, sdkContext)
-        genericApi.registerOnContext()
     }
 
     @AfterTest
     fun tearDown() {
-        koin.unloadModules(listOf(testModule))
+        Dispatchers.resetMain()
     }
 
     @Test
     fun testActive_whenSdkState_isUnInitialized() = runTest {
-        sdkContext.setSdkState(UnInitialized)
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(UnInitialized)
+        genericApi.registerOnContext()
 
         advanceUntilIdle()
 
@@ -94,7 +74,8 @@ class GenericApiTests : KoinTest {
 
     @Test
     fun testActive_whenSdkState_isOnHold() = runTest {
-        sdkContext.setSdkState(OnHold)
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(OnHold)
+        genericApi.registerOnContext()
 
         advanceUntilIdle()
 
@@ -103,7 +84,8 @@ class GenericApiTests : KoinTest {
 
     @Test
     fun testActive_whenSdkState_isActive() = runTest {
-        sdkContext.setSdkState(Active)
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(Active)
+        genericApi.registerOnContext()
 
         advanceUntilIdle()
 
@@ -112,7 +94,8 @@ class GenericApiTests : KoinTest {
 
     @Test
     fun testActive_whenSdkState_isInitialized() = runTest {
-        sdkContext.setSdkState(Initialized)
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(Initialized)
+        genericApi.registerOnContext()
 
         advanceUntilIdle()
 

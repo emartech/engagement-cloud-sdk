@@ -29,7 +29,11 @@ class ApplyGlobalRemoteConfigStateTests {
 
         applyGlobalRemoteConfigState = ApplyGlobalRemoteConfigState(
             mockSdkEventDistributor,
-            SdkLogger("TestLoggerName", mock(MockMode.autofill), sdkContext = mock())
+            SdkLogger(
+                "TestLoggerName",
+                mock(MockMode.autofill),
+                logConfigHolder = mock(MockMode.autofill)
+            )
         )
     }
 
@@ -41,7 +45,8 @@ class ApplyGlobalRemoteConfigStateTests {
     @Test
     fun testActive_should_handleGlobal_with_remoteConfigHandler() = runTest {
         everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(
-            MockMode.autofill)
+            MockMode.autofill
+        )
 
         applyGlobalRemoteConfigState.active()
 

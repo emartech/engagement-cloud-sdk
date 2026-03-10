@@ -1,6 +1,5 @@
 package com.sap.ec.core.log
 
-import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.log.SdkLogger.Companion.breadcrumbsQueue
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -32,20 +31,20 @@ class SdkLoggerTests {
         private val LOGGER_NAME = SdkLoggerTests::class.simpleName!!
     }
 
-    private lateinit var mockSdkContext: SdkContextApi
+    private lateinit var mockLogConfigHolder: LogConfigHolderApi
     private lateinit var mockRemoteLogger: RemoteLoggerApi
     private lateinit var logger: Logger
 
     @BeforeTest
     fun setup() = runTest {
-        mockSdkContext = mock()
-        every { mockSdkContext.logBreadcrumbsQueueSize } returns 10
+        mockLogConfigHolder = mock(MockMode.autofill)
+        every { mockLogConfigHolder.logBreadcrumbsQueueSize } returns 10
         mockRemoteLogger = mock(MockMode.autofill)
         logger = SdkLogger(
             LOGGER_NAME,
             mock(MockMode.autofill),
             remoteLogger = mockRemoteLogger,
-            sdkContext = mockSdkContext
+            logConfigHolder = mockLogConfigHolder
         )
     }
 
@@ -95,9 +94,9 @@ class SdkLoggerTests {
     @Test
     fun testBreadCrumbsQueue_shouldFillUp_whenThereIsMoreThanConfiguredParallelLogs() = runTest {
         val testLogBreadcrumbsQueueSize = 10
-        every { mockSdkContext.logBreadcrumbsQueueSize } returns testLogBreadcrumbsQueueSize
+        every { mockLogConfigHolder.logBreadcrumbsQueueSize } returns testLogBreadcrumbsQueueSize
 
-        val numberOfLogs = mockSdkContext.logBreadcrumbsQueueSize + 5
+        val numberOfLogs = mockLogConfigHolder.logBreadcrumbsQueueSize + 5
         val jobs = (0..numberOfLogs).map {
             CoroutineScope(Dispatchers.Default + CoroutineName("coroutine $it")).launch {
                 logger.info("log number $it")
@@ -112,9 +111,9 @@ class SdkLoggerTests {
     @Test
     fun testBreadCrumbsQueue_shouldContainLatestArrivingLogs() = runTest {
         val testLogBreadcrumbsQueueSize = 10
-        every { mockSdkContext.logBreadcrumbsQueueSize } returns testLogBreadcrumbsQueueSize
+        every { mockLogConfigHolder.logBreadcrumbsQueueSize } returns testLogBreadcrumbsQueueSize
 
-        val numberOfLogs = mockSdkContext.logBreadcrumbsQueueSize + 5
+        val numberOfLogs = mockLogConfigHolder.logBreadcrumbsQueueSize + 5
         (0..numberOfLogs).map {
             logger.info("log number $it")
         }
@@ -181,7 +180,7 @@ class SdkLoggerTests {
             LOGGER_NAME,
             mock(MockMode.autofill),
             remoteLogger = null,
-            sdkContext = mockSdkContext
+            logConfigHolder = mockLogConfigHolder
         )
 
         logger.info("test")
@@ -198,7 +197,7 @@ class SdkLoggerTests {
             LOGGER_NAME,
             mock(MockMode.autofill),
             remoteLogger = mockRemoteLogger,
-            sdkContext = mockSdkContext
+            logConfigHolder = mockLogConfigHolder
         )
 
         logger.info("test", isRemoteLog = false)

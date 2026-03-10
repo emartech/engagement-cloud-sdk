@@ -320,6 +320,7 @@ internal object WebInjection {
     }
 }
 
+@OptIn(InternalSdkApi::class)
 internal actual fun SdkKoinIsolationContext.loadPlatformModules(): List<Module> {
     return listOf(WebInjection.webModules)
 }

@@ -53,7 +53,7 @@ class EventActionFactoryTests {
             mockPermissionHandler,
             mockExternalUrlOpener,
             mockClipboardHandler,
-            SdkLogger("TestLoggerName", mock(MockMode.autofill), sdkContext = mock())
+            SdkLogger("TestLoggerName", mock(MockMode.autofill), logConfigHolder = mock())
         )
     }
 
