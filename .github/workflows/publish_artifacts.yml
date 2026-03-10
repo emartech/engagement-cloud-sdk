@@ -155,7 +155,7 @@ jobs:
             dist/cdn/${{ env.VERSION }}/engagement-cloud-sdk.d.ts 2>/dev/null || true
           
           # Copy loader script
-          cp engagement-cloud-sdk/src/jsHtml/resources/engagement-cloud-sdk-loader.js \
+          cp engagement-cloud-sdk/build/dist/js/productionExecutable/engagement-cloud-sdk-loader.js \
             dist/cdn/${{ env.VERSION }}/engagement-cloud-sdk-loader.js
           
           # Copy service worker
