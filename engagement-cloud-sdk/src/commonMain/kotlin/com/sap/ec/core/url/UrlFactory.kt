@@ -17,7 +17,7 @@ internal class UrlFactory(
     }
 
     //TODO: remove sdkEvent, add to the URLType if needed
-    override fun create(urlType: ECUrlType, sdkEvent: OnlineSdkEvent?): Url {
+    override suspend fun create(urlType: ECUrlType, sdkEvent: OnlineSdkEvent?): Url {
         return when (urlType) {
             ECUrlType.ChangeApplicationCode -> {
                 URLBuilder("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client/app").build()
@@ -68,8 +68,8 @@ internal class UrlFactory(
         }
     }
 
-    private fun getApplicationCode(): String {
-        return sdkContext.config?.applicationCode
+    private suspend fun getApplicationCode(): String {
+        return sdkContext.getSdkConfig()?.applicationCode
             ?: throw MissingApplicationCodeException("Application code is missing!")
     }
 
@@ -78,7 +78,7 @@ internal class UrlFactory(
             ?: throw MissingApplicationCodeException("Application code is missing!")
     }
 
-    private fun createUrl(
+    private suspend fun createUrl(
         baseUrl: String,
         mePath: String
     ): URLBuilder {

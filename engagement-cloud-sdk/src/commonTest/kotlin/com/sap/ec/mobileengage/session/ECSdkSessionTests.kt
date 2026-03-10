@@ -114,7 +114,7 @@ class ECSdkSessionTests {
     fun testSubscribe_shouldCallStartSession() = runTest {
         sessionContext.sessionId = null
         sessionContext.sessionStart = null
-        every { mockSdkContext.config } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
         every { mockTimestampProvider.provide() } returns Instant.fromEpochMilliseconds(
             SESSION_START
         )
@@ -140,7 +140,7 @@ class ECSdkSessionTests {
         everySuspend { mockSdkEventDistributor.registerEvent(sessionEndEvent) } returns mock(
             MockMode.autofill
         )
-        every { mockSdkContext.config } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
         every { mockTimestampProvider.provide() } returns Instant.fromEpochMilliseconds(
             SESSION_START
         )
@@ -171,7 +171,7 @@ class ECSdkSessionTests {
     fun testStartSession_shouldTrackSessionStartEvent() = runTest {
         sessionContext.sessionId = null
         sessionContext.sessionStart = null
-        every { mockSdkContext.config } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
         every { mockTimestampProvider.provide() } returns Instant.fromEpochMilliseconds(
             SESSION_START
         )
@@ -184,7 +184,7 @@ class ECSdkSessionTests {
     @Test
     fun testEndSession_shouldTrackSessionEndEvent() = runTest {
         every { mockTimestampProvider.provide() } returns Instant.fromEpochMilliseconds(SESSION_END)
-        every { mockSdkContext.config } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
 
         ECSdkSession.endSession()
 
@@ -201,7 +201,7 @@ class ECSdkSessionTests {
         every { mockTimestampProvider.provide() } returns Instant.fromEpochMilliseconds(
             SESSION_START
         )
-        every { mockSdkContext.config } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
 
         ECSdkSession.startSession()
 
@@ -213,7 +213,7 @@ class ECSdkSessionTests {
     fun testStartSession_shouldNotDoAnything_whenConfigIsNull() = runTest {
         sessionContext.sessionId = null
         sessionContext.sessionStart = null
-        every { mockSdkContext.config } returns null
+        everySuspend { mockSdkContext.getSdkConfig() } returns null
 
         ECSdkSession.startSession()
 
@@ -225,7 +225,7 @@ class ECSdkSessionTests {
     @Test
     fun testStartSession_shouldNotDoAnything_whenContactTokenIsNull() = runTest {
         every { mockRequestContext.contactToken } returns null
-        every { mockSdkContext.config } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
 
         ECSdkSession.startSession()
 
@@ -237,7 +237,7 @@ class ECSdkSessionTests {
     @Test
     fun testStartSession_shouldNotDoAnything_whenSessionIdIsNull() = runTest {
         sessionContext.sessionId = null
-        every { mockSdkContext.config } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
 
         ECSdkSession.startSession()
 
@@ -249,7 +249,7 @@ class ECSdkSessionTests {
     @Test
     fun testStartSession_shouldNotDoAnything_whenSessionStartIsNull() = runTest {
         sessionContext.sessionStart = null
-        every { mockSdkContext.config } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
 
         ECSdkSession.startSession()
 
@@ -266,7 +266,7 @@ class ECSdkSessionTests {
             "request failed"
         )
 
-        every { mockSdkContext.config } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
 
         ECSdkSession.endSession()
 
@@ -277,7 +277,7 @@ class ECSdkSessionTests {
     @Test
     fun testEndSession_shouldNotDoAnything_whenSessionIdIsNull() = runTest {
         sessionContext.sessionId = null
-        every { mockSdkContext.config } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
 
         ECSdkSession.endSession()
 
@@ -289,7 +289,7 @@ class ECSdkSessionTests {
     @Test
     fun testEndSession_shouldNotDoAnything_whenSessionStartIsNull() = runTest {
         sessionContext.sessionStart = null
-        every { mockSdkContext.config } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
 
         ECSdkSession.endSession()
 
@@ -301,7 +301,7 @@ class ECSdkSessionTests {
     @Test
     fun testEndSession_shouldNotDoAnything_whenContactTokenIsNull() = runTest {
         every { mockRequestContext.contactToken } returns null
-        every { mockSdkContext.config } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
 
         ECSdkSession.endSession()
 
@@ -312,7 +312,7 @@ class ECSdkSessionTests {
 
     private fun verifySessionEventNotRegistered(sessionEvent: SdkEvent) {
         verifySuspend {
-            mockSdkContext.config
+            mockSdkContext.getSdkConfig()
             mockSdkLogger.debug(any<LogEntry>())
             repeat(0) {
                 mockSdkEventDistributor.registerEvent(sessionEvent)

@@ -102,7 +102,7 @@ internal class DeviceClient(
         )
     }
 
-    private fun createRequest(deviceInfoString: String): UrlRequest {
+    private suspend fun createRequest(deviceInfoString: String): UrlRequest {
         val url = urlFactory.create(ECUrlType.RegisterDeviceInfo)
         return UrlRequest(
             url,

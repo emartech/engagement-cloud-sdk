@@ -49,7 +49,7 @@ class PlatformInitStateTests {
     @Test
     fun activate_shouldCallRegister_onJsBridge_ifSdkContext_hasConfig_andReturnSuccess() = runTest {
         val testConfig = JsEngagementCloudSDKConfig(applicationCode = "test-app-code")
-        every { mockSdkContext.config } returns testConfig
+        everySuspend { mockSdkContext.getSdkConfig() } returns testConfig
 
         val result = platformInitState.active()
 
@@ -75,7 +75,7 @@ class PlatformInitStateTests {
     @Test
     fun activate_should_callRegister_onPushService_ifSdkContext_hasConfig_andReturnFailure_ifErrorHappens() =
         runTest {
-            every { mockSdkContext.config } returns JsEngagementCloudSDKConfig(applicationCode = "test-app-code")
+            everySuspend { mockSdkContext.getSdkConfig() } returns JsEngagementCloudSDKConfig(applicationCode = "test-app-code")
             val testException = Exception("failure")
             everySuspend { mockPushService.register(any()) } throws testException
 

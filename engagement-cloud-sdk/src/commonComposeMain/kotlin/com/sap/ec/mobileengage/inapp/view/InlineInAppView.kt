@@ -27,7 +27,7 @@ internal actual fun InlineInAppView(
     onLoaded: (() -> Unit)?
 ) {
     val sdkContext: SdkContextApi? = koin.getOrNull()
-    if (!SdkKoinIsolationContext.isInitialized() || sdkContext?.config?.applicationCode == null) {
+    if (!SdkKoinIsolationContext.isInitialized()) {
         return
     }
     val inAppViewProvider: InAppViewProviderApi = koin.get()
@@ -38,18 +38,20 @@ internal actual fun InlineInAppView(
     val isVisible = rememberSaveable(message.dismissId) { mutableStateOf(true) }
 
     LaunchedEffect(message) {
-        val inAppView = inAppViewProvider.provide()
-        val holder = inAppView.load(message)
-        webViewHolder.value = holder
+        if (sdkContext?.getSdkConfig()?.applicationCode != null) {
+            val inAppView = inAppViewProvider.provide()
+            val holder = inAppView.load(message)
+            webViewHolder.value = holder
 
-        onLoaded?.invoke()
+            onLoaded?.invoke()
 
-        launch {
-            sdkEventDistributor.sdkEventFlow.first { sdkEvent ->
-                sdkEvent is SdkEvent.Internal.Sdk.Dismiss && sdkEvent.id == message.dismissId
+            launch {
+                sdkEventDistributor.sdkEventFlow.first { sdkEvent ->
+                    sdkEvent is SdkEvent.Internal.Sdk.Dismiss && sdkEvent.id == message.dismissId
+                }
+                isVisible.value = false
+                onClose()
             }
-            isVisible.value = false
-            onClose()
         }
     }
 
@@ -67,8 +69,7 @@ internal fun InlineInAppView(
     onClose: () -> Unit,
     onLoaded: (() -> Unit)? = null
 ) {
-    val sdkContext: SdkContextApi? = koin.getOrNull()
-    if (!SdkKoinIsolationContext.isInitialized() || sdkContext?.config?.applicationCode == null) {
+    if (!SdkKoinIsolationContext.isInitialized()) {
         return
     }
     val fetcher: InlineInAppMessageFetcherApi = koin.get()
@@ -90,8 +91,7 @@ fun InlineInAppView(
     onLoaded: (() -> Unit)? = null,
     onClose: (() -> Unit)? = null
 ) {
-    val sdkContext: SdkContextApi? = koin.getOrNull()
-    if (!SdkKoinIsolationContext.isInitialized() || sdkContext?.config?.applicationCode == null) {
+    if (!SdkKoinIsolationContext.isInitialized()) {
         return
     }
 

@@ -75,7 +75,7 @@ class DeviceInfoCollectorTests {
         every { mockStringStorage.get(any()) } returns null
 
         mockSdkContext = mockk(relaxed = true)
-        every { mockSdkContext.config?.applicationCode } returns "testAppCode"
+        coEvery { mockSdkContext.getSdkConfig()?.applicationCode } returns "testAppCode"
 
         mockAndroidNotificationSettingsCollector = mockk(relaxed = true)
 

@@ -90,7 +90,7 @@ class ConfigInternalTests {
         )
         everySuspend { mockWaiter.await<Any>() } returns successResponse
         everySuspend { mockSdkEventDistributor.registerEvent(expectedEvent) } returns mockWaiter
-        everySuspend { mockSdkContext.config } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
 
         configInternal.changeApplicationCode(NEW_APPCODE)
 
@@ -112,7 +112,7 @@ class ConfigInternalTests {
             )
             everySuspend { mockWaiter.await<Any>() } returns successResponse
             everySuspend { mockSdkEventDistributor.registerEvent(expectedEvent) } returns mockWaiter
-            everySuspend { mockSdkContext.config } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
+            everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
 
             configInternal.changeApplicationCode(MULTI_REGION_APPCODE)
 
@@ -131,7 +131,7 @@ class ConfigInternalTests {
 
     @Test
     fun testChangeApplicationCode_shouldNotRegisterChangeAppCodeEvent_whenAppCode_hasNotChanged() = runTest {
-        everySuspend { mockSdkContext.config } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
         everySuspend { mockLogger.info(any<String>()) } returns Unit
 
         configInternal.changeApplicationCode(OLD_APPCODE)
@@ -197,7 +197,7 @@ class ConfigInternalTests {
         everySuspend { mockWaiter.await<Any>() } returns successResponse
         everySuspend { mockConfigContext.calls } returns testCalls
         everySuspend { mockSdkEventDistributor.registerEvent(capture(slot)) } returns mockWaiter
-        everySuspend { mockSdkContext.config } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
 
         configInternal.activate()
 
@@ -225,7 +225,7 @@ class ConfigInternalTests {
         )
         everySuspend { mockWaiter.await<Any>() } returns failureResponse
         everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mockWaiter
-        everySuspend { mockSdkContext.config } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
 
         val exception = shouldThrow<Exception> {
             configInternal.changeApplicationCode(NEW_APPCODE)
@@ -244,7 +244,7 @@ class ConfigInternalTests {
         )
         everySuspend { mockWaiter.await<Any>() } returns successResponse
         everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mockWaiter
-        everySuspend { mockSdkContext.config } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
 
         configInternal.changeApplicationCode(NEW_APPCODE)
 

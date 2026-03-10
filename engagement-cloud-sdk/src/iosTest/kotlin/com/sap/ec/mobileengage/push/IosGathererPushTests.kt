@@ -13,6 +13,7 @@ import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.storage.StringStorageApi
 import dev.mokkery.answering.returns
 import dev.mokkery.every
+import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.verify
@@ -40,7 +41,7 @@ class IosGathererPushTests {
         mockStorage = mock()
         mockIosPushInternal = mock()
         mockSdkContext = mock()
-        every { mockSdkContext.config } returns TestEngagementCloudSDKConfig(TEST_APPLICATION_CODE)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(TEST_APPLICATION_CODE)
         testNotificationCenterDelegateProtocol =
             object : NSObject(), UNUserNotificationCenterDelegateProtocol {}
         pushContext = PushContext(mutableListOf())

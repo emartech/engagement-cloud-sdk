@@ -104,14 +104,14 @@ internal class ECSdkSession(
         }
     }
 
-    private fun canStartSession() =
-        sdkContext.config?.applicationCode != null
+    private suspend fun canStartSession() =
+        sdkContext.getSdkConfig()?.applicationCode != null
                 && requestContext.contactToken != null
                 && sessionContext.sessionId == null
                 && sessionContext.sessionStart == null
 
-    private fun canEndSession() =
-        sdkContext.config?.applicationCode != null
+    private suspend fun canEndSession() =
+        sdkContext.getSdkConfig()?.applicationCode != null
                 && requestContext.contactToken != null
                 && sessionContext.sessionId != null
                 && sessionContext.sessionStart != null

@@ -29,7 +29,6 @@ import kotlin.test.Test
 class LaunchApplicationHandlerTest {
 
     private lateinit var launchApplicationHandler: LaunchApplicationHandler
-
     private lateinit var mockApplicationContext: Context
     private lateinit var mockActivityFinder: ActivityFinderApi
     private lateinit var mockSdkContext: SdkContextApi
@@ -40,7 +39,8 @@ class LaunchApplicationHandlerTest {
     companion object {
         const val BACKGROUND_ACTIVITY_CREATOR_START_MODE_KEY =
             "android.activity.pendingIntentCreatorBackgroundActivityStartMode"
-        const val BACKGROUND_ACTIVITY_START_MODE_KEY = "android.pendingIntent.backgroundActivityAllowed"
+        const val BACKGROUND_ACTIVITY_START_MODE_KEY =
+            "android.pendingIntent.backgroundActivityAllowed"
     }
 
     @Before
@@ -69,7 +69,7 @@ class LaunchApplicationHandlerTest {
     @Test
     fun testLaunchApplication_when_activityIsNull_inConfig() = runTest {
         val config = AndroidEngagementCloudSDKConfig("testAppCode")
-        every { mockSdkContext.config } returns config
+        coEvery { mockSdkContext.getSdkConfig() } returns config
 
         val expectedIntent = mockk<Intent>(relaxed = true)
         val mockPackageManager: PackageManager = mockk(relaxed = true)
@@ -123,7 +123,7 @@ class LaunchApplicationHandlerTest {
     fun testLaunchApplication_when_activityIsNull_inConfig_andLaunchIntentIsNull() =
         runTest {
             val config = AndroidEngagementCloudSDKConfig("testAppCode")
-            every { mockSdkContext.config } returns config
+            coEvery { mockSdkContext.getSdkConfig() } returns config
 
             val mockPackageManager: PackageManager = mockk(relaxed = true)
             every { mockApplicationContext.packageManager } returns mockPackageManager
@@ -146,8 +146,11 @@ class LaunchApplicationHandlerTest {
     @Test
     fun testLaunchApplication_when_activityIsGiven_inConfig_andAndroidVersionIsBelow34() = runTest {
         val config =
-            AndroidEngagementCloudSDKConfig("testAppCode", launchActivityClass = FakeActivity::class.java)
-        every { mockSdkContext.config } returns config
+            AndroidEngagementCloudSDKConfig(
+                "testAppCode",
+                launchActivityClass = FakeActivity::class.java
+            )
+        coEvery { mockSdkContext.getSdkConfig() } returns config
 
         val mockPackageManager: PackageManager = mockk(relaxed = true)
         every { mockApplicationContext.packageManager } returns mockPackageManager

@@ -67,8 +67,8 @@ internal class ConfigClient(
                         sdkContext.setSdkState(SdkState.OnHold)
                         contactTokenHandler.handleContactTokens(it)
 
-                        val updatedConfig = sdkContext.config?.copyWith(applicationCode = sdkEvent.applicationCode)
-                        sdkContext.config = updatedConfig
+                        val updatedConfig = sdkContext.getSdkConfig()?.copyWith(applicationCode = sdkEvent.applicationCode)
+                        sdkContext.setSdkConfig(updatedConfig)
                         updatedConfig?.let { config -> sdkConfigStore.store(config) }
 
                         followUpChangeAppCodeOrganizer.organize()

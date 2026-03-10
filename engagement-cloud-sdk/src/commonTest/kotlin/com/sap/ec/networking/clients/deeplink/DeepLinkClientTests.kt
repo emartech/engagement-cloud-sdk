@@ -20,13 +20,11 @@ import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
-import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.resetAnswers
 import dev.mokkery.resetCalls
-import dev.mokkery.verify
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
@@ -90,7 +88,7 @@ class DeepLinkClientTests {
         onlineEvents = MutableSharedFlow()
         everySuspend { mockSdkEventManager.onlineSdkEvents } returns onlineEvents
         everySuspend { mockUserAgentProvider.provide() } returns TEST_USER_AGENT
-        every { mockUrlFactory.create(ECUrlType.DeepLink) } returns TEST_BASE_URL
+        everySuspend { mockUrlFactory.create(ECUrlType.DeepLink) } returns TEST_BASE_URL
         everySuspend { mockLogger.error(any(), any<Throwable>()) } calls {
             (it.args[1] as Throwable).printStackTrace()
         }
@@ -146,7 +144,7 @@ class DeepLinkClientTests {
         advanceUntilIdle()
 
         onlineSdkEvents.await() shouldBe listOf(trackDeepLink)
-        verify { mockUrlFactory.create(any()) }
+        verifySuspend { mockUrlFactory.create(any()) }
         verifySuspend { mockNetworkClient.send(expectedRequest) }
         verifySuspend { mockEventsDao.removeEvent(trackDeepLink) }
         verifySuspend {
@@ -181,7 +179,7 @@ class DeepLinkClientTests {
         advanceUntilIdle()
 
         onlineSdkEvents.await() shouldBe listOf(trackDeepLink)
-        verify { mockUrlFactory.create(any()) }
+        everySuspend { mockUrlFactory.create(any()) }
         verifySuspend { mockNetworkClient.send(any()) }
         verifySuspend {
             mockClientExceptionHandler.handleException(
@@ -224,7 +222,7 @@ class DeepLinkClientTests {
         advanceUntilIdle()
 
         onlineSdkEvents.await() shouldBe listOf(trackDeepLink)
-        verify { mockUrlFactory.create(any()) }
+        everySuspend { mockUrlFactory.create(any()) }
         verifySuspend { mockNetworkClient.send(any()) }
         verifySuspend(VerifyMode.exactly(0)) {
             mockSdkEventManager.emitEvent(trackDeepLink)
@@ -242,7 +240,7 @@ class DeepLinkClientTests {
     fun testConsumer_should_call_clientExceptionHandler_when_exception_happens() = runTest {
         createDeepLinkClient(backgroundScope).register()
         val testException = Exception("Test exception")
-        every { mockUrlFactory.create(ECUrlType.DeepLink) } throws testException
+        everySuspend { mockUrlFactory.create(ECUrlType.DeepLink) } throws testException
         val trackDeepLink = SdkEvent.Internal.Sdk.TrackDeepLink(
             id = "trackDeepLink",
             trackingId = TRACKING_ID

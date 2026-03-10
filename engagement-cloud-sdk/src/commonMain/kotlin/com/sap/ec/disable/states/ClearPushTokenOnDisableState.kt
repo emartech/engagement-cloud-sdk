@@ -21,7 +21,7 @@ internal class ClearPushTokenOnDisableState(
 
     override suspend fun active(): Result<Unit> {
         return sdkEventDistributor.registerEvent(
-            SdkEvent.Internal.Sdk.ClearPushToken(applicationCode = sdkContext.config?.applicationCode)
+            SdkEvent.Internal.Sdk.ClearPushToken(applicationCode = sdkContext.getSdkConfig()?.applicationCode)
         ).await<Response>()
             .mapToUnitOrFailure()
     }

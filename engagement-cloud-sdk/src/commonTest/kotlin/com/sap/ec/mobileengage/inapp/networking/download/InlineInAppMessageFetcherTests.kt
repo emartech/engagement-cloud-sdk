@@ -11,7 +11,6 @@ import com.sap.ec.mobileengage.inapp.presentation.InAppType
 import com.sap.ec.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
-import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
@@ -55,7 +54,7 @@ class InlineInAppMessageFetcherTests {
             mockLogger
         )
 
-        every { mockUrlFactory.create(any()) } returns testUrl
+        everySuspend { mockUrlFactory.create(any()) } returns testUrl
     }
 
     @Test

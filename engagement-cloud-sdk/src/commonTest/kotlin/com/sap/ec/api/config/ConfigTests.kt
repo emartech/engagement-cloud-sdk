@@ -78,7 +78,6 @@ class ConfigTest {
         mockInternalConfig = mock(MockMode.autofill)
         mockSdkContext = mock(MockMode.autofill)
 
-        every { mockSdkContext.config } returns TEST_CONFIG
         every { mockSdkContext.sdkDispatcher } returns StandardTestDispatcher()
 
         everySuspend { mockDeviceInfoCollector.collect() } returns Json.encodeToString(DEVICE_INFO)
@@ -106,7 +105,7 @@ class ConfigTest {
 
     @Test
     fun testApplicationCode_whenActiveState_returnsApplicationCode() = runTest {
-        every { mockSdkContext.config } returns TEST_CONFIG
+        everySuspend { mockSdkContext.getSdkConfig() } returns TEST_CONFIG
         every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
 
         config.registerOnContext()
@@ -117,6 +116,7 @@ class ConfigTest {
     @Test
     fun testApplicationCode_whenOnHoldState_awaitsAndReturnsApplicationCodeWhenSdkBecomesActive() =
         runTest {
+            everySuspend { mockSdkContext.getSdkConfig() } returns TEST_CONFIG
             every { mockSdkContext.currentSdkState } sequentially {
                 returns(MutableStateFlow(SdkState.OnHold))
                 returns(MutableStateFlow(SdkState.Active))
@@ -138,7 +138,7 @@ class ConfigTest {
                 returns(MutableStateFlow(SdkState.OnHold))
                 returns(MutableStateFlow(SdkState.Initialized))
             }
-            every { mockSdkContext.config } returns null
+            everySuspend { mockSdkContext.getSdkConfig() } returns null
 
             config.registerOnContext()
 
@@ -153,6 +153,7 @@ class ConfigTest {
 
     @Test
     fun testApplicationCode_whenUnInitializedState_returnsNull() = runTest {
+        everySuspend { mockSdkContext.getSdkConfig() } returns TEST_CONFIG
         every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.UnInitialized)
 
         config.registerOnContext()
@@ -162,6 +163,7 @@ class ConfigTest {
 
     @Test
     fun testApplicationCode_whenInitializedState_returnsNull() = runTest {
+        everySuspend { mockSdkContext.getSdkConfig() } returns TEST_CONFIG
         every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Initialized)
 
         config.registerOnContext()

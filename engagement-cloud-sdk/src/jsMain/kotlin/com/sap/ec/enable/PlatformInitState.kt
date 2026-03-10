@@ -19,8 +19,8 @@ internal class PlatformInitState(
 
     override suspend fun active(): Result<Unit> {
         return runCatchingWithoutCancellation {
-            sdkContext.config?.let {
-                val jsEngagementCloudSDKConfig = sdkContext.config as JsEngagementCloudSDKConfig
+            sdkContext.getSdkConfig()?.let {
+                val jsEngagementCloudSDKConfig = it as JsEngagementCloudSDKConfig
                 pushService.register(jsEngagementCloudSDKConfig)
                 pushService.subscribeForPushMessages(jsEngagementCloudSDKConfig)
             }

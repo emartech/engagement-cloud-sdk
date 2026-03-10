@@ -10,7 +10,6 @@ internal interface SdkContextApi {
     val currentSdkState: StateFlow<SdkState>
     val sdkDispatcher: CoroutineDispatcher
     val mainDispatcher: CoroutineDispatcher
-    var config: SdkConfig?
     var onContactLinkingFailed: (suspend () -> LinkContactData?)?
     var defaultUrls: DefaultUrlsApi
     val features: MutableSet<Features>

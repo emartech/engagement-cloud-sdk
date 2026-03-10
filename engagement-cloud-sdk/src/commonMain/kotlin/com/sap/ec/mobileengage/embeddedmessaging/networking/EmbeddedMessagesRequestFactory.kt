@@ -17,7 +17,7 @@ internal class EmbeddedMessagesRequestFactory(
     private val json: Json
 ) : EmbeddedMessagingRequestFactoryApi {
 
-    override fun create(embeddedMessagingEvent: SdkEvent.Internal.EmbeddedMessaging): UrlRequest {
+    override suspend fun create(embeddedMessagingEvent: SdkEvent.Internal.EmbeddedMessaging): UrlRequest {
         return when (embeddedMessagingEvent) {
             is SdkEvent.Internal.EmbeddedMessaging.FetchMessages ->
                 createFetchMessagesRequest(embeddedMessagingEvent)
@@ -57,9 +57,10 @@ internal class EmbeddedMessagesRequestFactory(
         }
     }
 
-    private fun createFetchMessagesRequest(embeddedMessagingEvent: SdkEvent.Internal.EmbeddedMessaging.FetchMessages): UrlRequest {
+    private suspend fun createFetchMessagesRequest(embeddedMessagingEvent: SdkEvent.Internal.EmbeddedMessaging.FetchMessages): UrlRequest {
+        val fetchMessagesUrl = urlFactory.create(ECUrlType.FetchEmbeddedMessages)
         val url = buildUrl {
-            takeFrom(urlFactory.create(ECUrlType.FetchEmbeddedMessages))
+            takeFrom(fetchMessagesUrl)
             if (embeddedMessagingEvent.offset > 0) {
                 parameters.append("\$skip", embeddedMessagingEvent.offset.toString())
             }

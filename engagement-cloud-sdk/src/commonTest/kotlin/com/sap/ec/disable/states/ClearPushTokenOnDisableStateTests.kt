@@ -9,7 +9,6 @@ import com.sap.ec.core.networking.model.UrlRequest
 import com.sap.ec.event.SdkEvent
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
-import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.capture.Capture.Companion.slot
 import dev.mokkery.matcher.capture.SlotCapture
@@ -57,7 +56,7 @@ class ClearPushTokenOnDisableStateTests {
     fun setup() {
         mockSdkEventDistributor = mock(MockMode.autofill)
         mockSdkContext = mock()
-        every { mockSdkContext.config } returns TestEngagementCloudSDKConfig(TEST_APPLICATION_CODE)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(TEST_APPLICATION_CODE)
         mockWaiter = mock(MockMode.autofill)
         slot = slot()
         everySuspend { mockWaiter.await<Response>() } returns successResult

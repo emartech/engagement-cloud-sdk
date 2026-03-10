@@ -116,7 +116,7 @@ internal class ContactClient(
         return event is SdkEvent.Internal.Sdk.LinkContact || event is SdkEvent.Internal.Sdk.LinkAuthenticatedContact || event is SdkEvent.Internal.Sdk.UnlinkContact
     }
 
-    private fun createUrlRequest(event: SdkEvent): UrlRequest {
+    private suspend fun createUrlRequest(event: SdkEvent): UrlRequest {
         val headers = mutableMapOf<String, Any?>()
         return when (event) {
             is SdkEvent.Internal.Sdk.LinkContact -> {

@@ -28,10 +28,10 @@ internal class EnableOrganizer(
     override suspend fun enable(config: SdkConfig) {
         sdkContext.setSdkState(SdkState.OnHold)
         sdkConfigStore.store(config)
-        sdkContext.config = config
+        sdkContext.setSdkConfig(config)
         meStateMachine.activate()
             .onFailure {
-                sdkContext.config = null
+                sdkContext.setSdkConfig(null)
                 sdkConfigStore.clear()
                 sdkContext.setSdkState(SdkState.Initialized)
                 sdkLogger.debug("Enabling SDK failed during MeStateMachine activation. Failed with exception: ${it.message}")

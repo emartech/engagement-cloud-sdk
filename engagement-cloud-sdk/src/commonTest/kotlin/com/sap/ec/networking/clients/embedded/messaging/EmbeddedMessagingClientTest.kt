@@ -19,7 +19,6 @@ import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.sequentiallyReturns
 import dev.mokkery.answering.throws
-import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
@@ -108,7 +107,7 @@ class EmbeddedMessagingClientTest {
                 method = HttpMethod.Get
             )
 
-            every {
+            everySuspend {
                 mockEmbeddedMessagesRequestFactory.create(
                     event
                 )
@@ -239,7 +238,7 @@ class EmbeddedMessagingClientTest {
             method = HttpMethod.Get
         )
 
-        every {
+        everySuspend {
             mockEmbeddedMessagesRequestFactory.create(
                 event
             )
@@ -322,7 +321,7 @@ class EmbeddedMessagingClientTest {
                 method = HttpMethod.Get
             )
 
-            every {
+            everySuspend {
                 mockEmbeddedMessagesRequestFactory.create(
                     event
                 )

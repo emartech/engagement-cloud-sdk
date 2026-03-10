@@ -45,7 +45,7 @@ class EmbeddedMessagingE2ETests {
             sdkContext.defaultUrls.copyWith(
                 embeddedMessagingBaseUrl = "https://embedded-messaging-staging.gservice.emarsys.com/embedded-messaging/api"
             )
-        sdkContext.config = AndroidEngagementCloudSDKConfig(applicationCode = STAGING_APP_CODE)
+        sdkContext.setSdkConfig(AndroidEngagementCloudSDKConfig(applicationCode = STAGING_APP_CODE))
         sdkContext.setSdkState(SdkState.Active)
         sdkEventDistributor = SdkKoinIsolationContext.koin.get<SdkEventDistributor>()
         embeddedMessagingContext = SdkKoinIsolationContext.koin.get<EmbeddedMessagingContextApi>()

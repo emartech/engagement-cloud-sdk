@@ -14,7 +14,6 @@ import com.sap.ec.event.OnlineSdkEvent
 import com.sap.ec.event.SdkEvent
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
-import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.capture.Capture
 import dev.mokkery.matcher.capture.Capture.Companion.slot
@@ -62,7 +61,7 @@ class PushInternalTests {
     fun setup() {
         mockStringStorage = mock()
         mockSdkContext = mock()
-        every { mockSdkContext.config } returns TestEngagementCloudSDKConfig(APPLICATION_CODE)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(APPLICATION_CODE)
         eventSlot = slot()
         mockSdkEventDistributor = mock(MockMode.autofill)
         mockLogger = mock(MockMode.autofill)

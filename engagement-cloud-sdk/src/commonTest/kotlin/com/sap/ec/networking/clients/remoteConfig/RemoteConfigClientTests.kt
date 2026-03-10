@@ -129,8 +129,8 @@ class RemoteConfigClientTests {
             Headers.Empty,
             CONFIG_SIGNATURE_RESULT
         )
-        every { mockUrlFactory.create(ECUrlType.RemoteConfig) } returns configUrl
-        every {
+        everySuspend { mockUrlFactory.create(ECUrlType.RemoteConfig) } returns configUrl
+        everySuspend {
             mockUrlFactory.create(ECUrlType.RemoteConfigSignature)
         } returns configSignatureUrl
         everySuspend { mockNetworkClient.send(configRequest) } returns Result.success(configResponse)
@@ -171,8 +171,8 @@ class RemoteConfigClientTests {
             CONFIG_SIGNATURE_RESULT
         )
 
-        every { mockUrlFactory.create(ECUrlType.GlobalRemoteConfig) } returns configUrl
-        every {
+        everySuspend { mockUrlFactory.create(ECUrlType.GlobalRemoteConfig) } returns configUrl
+        everySuspend {
             mockUrlFactory.create(ECUrlType.GlobalRemoteConfigSignature)
         } returns configSignatureUrl
         everySuspend { mockNetworkClient.send(configRequest) } returns Result.success(configResponse)
@@ -213,8 +213,8 @@ class RemoteConfigClientTests {
             CONFIG_SIGNATURE_RESULT
         )
 
-        every { mockUrlFactory.create(ECUrlType.RemoteConfig) } returns configUrl
-        every {
+        everySuspend { mockUrlFactory.create(ECUrlType.RemoteConfig) } returns configUrl
+        everySuspend {
             mockUrlFactory.create(ECUrlType.RemoteConfigSignature)
         } returns configSignatureUrl
         everySuspend { mockNetworkClient.send(configRequest) } returns Result.success(configResponse)
@@ -269,8 +269,8 @@ class RemoteConfigClientTests {
                 CONFIG_SIGNATURE_RESULT
             )
 
-            every { mockUrlFactory.create(ECUrlType.RemoteConfig) } returns configUrl
-            every {
+            everySuspend { mockUrlFactory.create(ECUrlType.RemoteConfig) } returns configUrl
+            everySuspend {
                 mockUrlFactory.create(
                     ECUrlType.RemoteConfigSignature
                 )
@@ -331,8 +331,8 @@ class RemoteConfigClientTests {
             CONFIG_SIGNATURE_RESULT
         )
 
-        every { mockUrlFactory.create(ECUrlType.RemoteConfig) } returns configUrl
-        every {
+        everySuspend { mockUrlFactory.create(ECUrlType.RemoteConfig) } returns configUrl
+        everySuspend {
             mockUrlFactory.create(
                 ECUrlType.RemoteConfigSignature
             )
@@ -373,13 +373,13 @@ class RemoteConfigClientTests {
             val configResponse =
                 Response(configRequest, HttpStatusCode.OK, Headers.Empty, CONFIG_RESULT)
 
-            every {
+            everySuspend {
                 mockUrlFactory.create(ECUrlType.RemoteConfig)
             } returns configUrl
             everySuspend { mockNetworkClient.send(configRequest) } returns Result.success(
                 configResponse
             )
-            every {
+            everySuspend {
                 mockUrlFactory.create(ECUrlType.RemoteConfigSignature)
             } returns configSignatureUrl
             everySuspend {
@@ -416,10 +416,10 @@ class RemoteConfigClientTests {
     fun testConsumer_should_reEmit_events_on_network_error() = runTest {
         createClient(backgroundScope).register()
         val testException = IOException("No Internet")
-        every {
+        everySuspend {
             mockUrlFactory.create(ECUrlType.RemoteConfig)
         } returns configUrl
-        every {
+        everySuspend {
             mockUrlFactory.create(ECUrlType.RemoteConfigSignature)
         } returns configSignatureUrl
 

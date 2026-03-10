@@ -32,10 +32,10 @@ internal class Config<Logging : ConfigInstance, Gatherer : ConfigInstance, Inter
         return when (sdkContext.currentSdkState.value) {
             SdkState.OnHold -> {
                 sdkContext.currentSdkState.first { it == SdkState.Active || it == SdkState.Initialized }
-                sdkContext.config?.applicationCode
+                sdkContext.getSdkConfig()?.applicationCode
             }
             SdkState.UnInitialized, SdkState.Initialized -> null
-            SdkState.Active -> sdkContext.config?.applicationCode
+            SdkState.Active -> sdkContext.getSdkConfig()?.applicationCode
         }
     }
 

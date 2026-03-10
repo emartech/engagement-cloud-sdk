@@ -8,7 +8,7 @@ import com.sap.ec.mobileengage.embeddedmessaging.models.TagOperation
 import com.sap.ec.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
-import dev.mokkery.every
+import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import io.ktor.http.HttpMethod
@@ -31,10 +31,10 @@ class EmbeddedMessagesRequestFactoryTests {
         json = JsonUtil.json
         mockUrlFactory = mock(MockMode.autofill)
 
-        every { mockUrlFactory.create(ECUrlType.FetchEmbeddedMessages) } returns Url("https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages")
-        every { mockUrlFactory.create(ECUrlType.FetchBadgeCount) } returns Url("https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/badge-count")
-        every { mockUrlFactory.create(ECUrlType.FetchMeta) } returns Url("https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/meta")
-        every { mockUrlFactory.create(ECUrlType.UpdateTagsForMessages) } returns Url("https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/tags")
+        everySuspend { mockUrlFactory.create(ECUrlType.FetchEmbeddedMessages) } returns Url("https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages")
+        everySuspend { mockUrlFactory.create(ECUrlType.FetchBadgeCount) } returns Url("https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/badge-count")
+        everySuspend { mockUrlFactory.create(ECUrlType.FetchMeta) } returns Url("https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/meta")
+        everySuspend { mockUrlFactory.create(ECUrlType.UpdateTagsForMessages) } returns Url("https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/tags")
 
         embeddedMessagesRequestFactory = EmbeddedMessagesRequestFactory(mockUrlFactory, json)
     }

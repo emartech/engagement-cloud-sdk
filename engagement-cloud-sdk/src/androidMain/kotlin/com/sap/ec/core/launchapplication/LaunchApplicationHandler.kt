@@ -23,7 +23,7 @@ internal class LaunchApplicationHandler(
 
     override suspend fun launchApplication() {
         if (activityFinder.currentActivity() == null) {
-            val config = sdkContext.config as? AndroidEngagementCloudSDKConfig
+            val config = sdkContext.getSdkConfig() as? AndroidEngagementCloudSDKConfig
             val launchIntent = if (config?.launchActivityClass != null) {
                 Intent(applicationContext, config.launchActivityClass)
             } else {

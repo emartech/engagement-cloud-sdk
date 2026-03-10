@@ -91,7 +91,7 @@ internal class ECClient(
         requestContext.contactToken = responseBody.contactToken
     }
 
-    private fun createRefreshContactTokenRequest() = UrlRequest(
+    private suspend fun createRefreshContactTokenRequest() = UrlRequest(
         urlFactory.create(ECUrlType.RefreshToken),
         HttpMethod.Post,
         json.encodeToString(RefreshTokenRequestBody(requestContext.refreshToken!!)),

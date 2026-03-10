@@ -15,8 +15,6 @@ internal class SdkContext(
     override val features: MutableSet<Features>,
     private val sdkConfigStore: SdkConfigStoreApi<SdkConfig>
 ) : SdkContextApi {
-    override var config: SdkConfig? = null
-
     private var _cachedConfig: SdkConfig? = null
 
     override suspend fun getSdkConfig(): SdkConfig? {

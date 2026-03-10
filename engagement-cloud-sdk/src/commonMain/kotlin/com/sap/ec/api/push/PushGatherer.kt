@@ -13,7 +13,7 @@ internal open class PushGatherer(
     }
 
     override suspend fun clearPushToken() {
-        context.calls.add(PushCall.ClearPushToken(sdkContext.config?.applicationCode))
+        context.calls.add(PushCall.ClearPushToken(sdkContext.getSdkConfig()?.applicationCode))
     }
 
     override suspend fun getPushToken(): String? = storage.get(PushConstants.PUSH_TOKEN_STORAGE_KEY)

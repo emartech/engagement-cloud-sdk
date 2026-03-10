@@ -78,7 +78,7 @@ class DeviceInfoCollectorTests {
         every { mockStringStorage.get(any()) } returns null
         mockSdkContext = mock()
         val mockConfig: SdkConfig = mock()
-        every { mockSdkContext.config } returns mockConfig
+        everySuspend { mockSdkContext.getSdkConfig() } returns mockConfig
         every { mockConfig.applicationCode } returns "testAppCode"
         mockPlatformCategoryProvider = mock()
         every { mockPlatformCategoryProvider.provide() } returns PLATFORM_CATEGORY

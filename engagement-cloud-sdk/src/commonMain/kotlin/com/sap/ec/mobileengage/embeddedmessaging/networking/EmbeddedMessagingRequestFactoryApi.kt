@@ -4,5 +4,5 @@ import com.sap.ec.core.networking.model.UrlRequest
 import com.sap.ec.event.SdkEvent
 
 internal interface EmbeddedMessagingRequestFactoryApi {
-    fun create(embeddedMessagingEvent: SdkEvent.Internal.EmbeddedMessaging): UrlRequest
+    suspend fun create(embeddedMessagingEvent: SdkEvent.Internal.EmbeddedMessaging): UrlRequest
 }

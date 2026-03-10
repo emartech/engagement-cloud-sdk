@@ -93,8 +93,7 @@ class ConfigClientTests {
         every { mockSdkEventManager.onlineSdkEvents } returns onlineEvents
 
         everySuspend { mockContactTokenHandler.handleContactTokens(any()) } returns Unit
-        everySuspend { mockSdkContext.config } returns mockConfig
-        everySuspend { mockSdkContext.config = any() } returns Unit
+        everySuspend { mockSdkContext.getSdkConfig() } returns mockConfig
         everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
         everySuspend { mockSdkLogger.error(any(), any<Throwable>()) } calls {
             (it.args[1] as Throwable).printStackTrace()
@@ -128,7 +127,7 @@ class ConfigClientTests {
         configClient = createConfigClient(backgroundScope)
         configClient.register()
 
-        every { mockUrlFactory.create(ECUrlType.ChangeApplicationCode) }.returns(
+        everySuspend { mockUrlFactory.create(ECUrlType.ChangeApplicationCode) }.returns(
             TEST_BASE_URL
         )
         val testResponse = createTestResponse("{}")
@@ -163,7 +162,7 @@ class ConfigClientTests {
             mockSdkContext.setSdkState(SdkState.OnHold)
             mockContactTokenHandler.handleContactTokens(any())
             mockConfig.copyWith(applicationCode = "NewAppCode")
-            mockSdkContext.config = mockConfig
+            mockSdkContext.setSdkConfig(mockConfig)
             mockSdkConfigStore.store(mockConfig)
             mockFollowUpChangeAppCodeOrganizer.organize()
             mockSdkContext.setSdkState(SdkState.Active)
@@ -183,7 +182,7 @@ class ConfigClientTests {
         configClient = createConfigClient(backgroundScope)
         configClient.register()
 
-        every { mockUrlFactory.create(ECUrlType.ChangeApplicationCode) } returns TEST_BASE_URL
+        everySuspend { mockUrlFactory.create(ECUrlType.ChangeApplicationCode) } returns TEST_BASE_URL
         val testException = NetworkIOException("No Network")
         everySuspend { mockEcClient.send(any()) } returns Result.failure(testException)
 
@@ -226,10 +225,8 @@ class ConfigClientTests {
 
         val testException = Exception("Test Exception")
 
-        every {
-            mockUrlFactory.create(
-                ECUrlType.ChangeApplicationCode
-            )
+        everySuspend {
+            mockUrlFactory.create(ECUrlType.ChangeApplicationCode)
         } throws testException
         val changeAppCode = SdkEvent.Internal.Sdk.ChangeAppCode(
             id = "changeAppCode",
@@ -261,7 +258,7 @@ class ConfigClientTests {
         configClient = createConfigClient(backgroundScope)
         configClient.register()
 
-        every { mockUrlFactory.create(ECUrlType.ChangeApplicationCode) }.returns(TEST_BASE_URL)
+        everySuspend { mockUrlFactory.create(ECUrlType.ChangeApplicationCode) }.returns(TEST_BASE_URL)
         val testResponse = createTestResponse("{}")
         everySuspend { mockEcClient.send(any()) }.returns(Result.success(testResponse))
         every { mockConfig.copyWith("PersistTestAppCode") } returns mockConfig
@@ -282,7 +279,7 @@ class ConfigClientTests {
         onlineSdkEvents.await() shouldBe listOf(changeAppCode)
 
         verifySuspend {
-            mockSdkContext.config = mockConfig
+            mockSdkContext.setSdkConfig(mockConfig)
             mockSdkConfigStore.store(mockConfig)
         }
     }
@@ -292,7 +289,7 @@ class ConfigClientTests {
         configClient = createConfigClient(backgroundScope)
         configClient.register()
 
-        every { mockUrlFactory.create(ECUrlType.ChangeApplicationCode) } returns TEST_BASE_URL
+        everySuspend { mockUrlFactory.create(ECUrlType.ChangeApplicationCode) } returns TEST_BASE_URL
         val testException = NetworkIOException("No Network")
         everySuspend { mockEcClient.send(any()) } returns Result.failure(testException)
         everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
@@ -315,7 +312,7 @@ class ConfigClientTests {
             mockSdkConfigStore.store(any())
         }
         verifySuspend(VerifyMode.exactly(0)) {
-            mockSdkContext.config = any()
+            mockSdkContext.setSdkConfig(any())
         }
         verifySuspend(VerifyMode.exactly(0)) {
             mockConfig.copyWith(any<String>())
@@ -327,7 +324,7 @@ class ConfigClientTests {
         configClient = createConfigClient(backgroundScope)
         configClient.register()
 
-        every { mockUrlFactory.create(ECUrlType.ChangeApplicationCode) } returns TEST_BASE_URL
+        everySuspend { mockUrlFactory.create(ECUrlType.ChangeApplicationCode) } returns TEST_BASE_URL
         val testException = Exception("Backend error")
         everySuspend { mockEcClient.send(any()) } returns Result.failure(testException)
         everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit

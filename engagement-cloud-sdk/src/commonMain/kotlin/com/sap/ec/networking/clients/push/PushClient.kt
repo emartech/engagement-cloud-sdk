@@ -88,7 +88,7 @@ internal class PushClient(
         }
     }
 
-    private fun createRequest(sdkEvent: OnlineSdkEvent): UrlRequest {
+    private suspend fun createRequest(sdkEvent: OnlineSdkEvent): UrlRequest {
         return when (sdkEvent) {
             is SdkEvent.Internal.Sdk.RegisterPushToken -> {
                 val url = urlFactory.create(ECUrlType.PushToken)

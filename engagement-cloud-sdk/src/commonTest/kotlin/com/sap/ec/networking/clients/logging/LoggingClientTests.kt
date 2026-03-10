@@ -18,7 +18,6 @@ import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
-import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
@@ -129,7 +128,7 @@ class LoggingClientTests {
     fun testConsumer_should_call_client_with_logEvent() = runTest {
         createLoggingClient(backgroundScope).register()
 
-        every { mockUrlFactory.create(ECUrlType.Logging) } returns TEST_BASE_URL
+        everySuspend { mockUrlFactory.create(ECUrlType.Logging) } returns TEST_BASE_URL
         everySuspend { mockEmarsysClient.send(any()) } returns Result.success(createTestResponse("{}"))
         everySuspend { mockDeviceInfoCollector.collectAsDeviceInfoForLogs() } returns deviceInfoForLogs
         val testLogAttributes = buildJsonObject {
@@ -183,7 +182,7 @@ class LoggingClientTests {
     @Test
     fun testConsumer_should_call_client_with_metricEvent() = runTest {
         createLoggingClient(backgroundScope).register()
-        every { mockUrlFactory.create(ECUrlType.Logging) } returns TEST_BASE_URL
+        everySuspend { mockUrlFactory.create(ECUrlType.Logging) } returns TEST_BASE_URL
         everySuspend { mockEmarsysClient.send(any()) } returns Result.success(createTestResponse("{}"))
         everySuspend { mockDeviceInfoCollector.collectAsDeviceInfoForLogs() } returns deviceInfoForLogs
 
@@ -226,7 +225,7 @@ class LoggingClientTests {
         createLoggingClient(backgroundScope).register()
 
         val testException = IOException("No Internet")
-        every { mockUrlFactory.create(ECUrlType.Logging) } returns TEST_BASE_URL
+        everySuspend { mockUrlFactory.create(ECUrlType.Logging) } returns TEST_BASE_URL
         everySuspend { mockEmarsysClient.send(any()) } returns Result.failure(testException)
         everySuspend { mockDeviceInfoCollector.collectAsDeviceInfoForLogs() } returns deviceInfoForLogs
         val logEvent = SdkEvent.Internal.Sdk.Metric(
@@ -257,7 +256,7 @@ class LoggingClientTests {
         createLoggingClient(backgroundScope).register()
         val testException = Exception("Test exception")
 
-        every { mockUrlFactory.create(ECUrlType.Logging) } throws testException
+        everySuspend { mockUrlFactory.create(ECUrlType.Logging) } throws testException
         val logEvent = SdkEvent.Internal.Sdk.Metric(
             level = LogLevel.Metric
         )

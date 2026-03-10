@@ -46,7 +46,7 @@ internal open class PushInternal(
     }
 
     override suspend fun clearPushToken() {
-        sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.ClearPushToken(applicationCode = sdkContext.config?.applicationCode))
+        sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.ClearPushToken(applicationCode = sdkContext.getSdkConfig()?.applicationCode))
         storage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, null)
     }
 

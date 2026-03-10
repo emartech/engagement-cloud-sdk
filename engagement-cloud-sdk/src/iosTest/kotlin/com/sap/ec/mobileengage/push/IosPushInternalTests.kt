@@ -131,7 +131,7 @@ internal class IosPushInternalTests {
         mockStorage = mock()
         mockSdkContext = mock()
         sdkStateFlow = MutableStateFlow(SdkState.Active)
-        every { mockSdkContext.config } returns TestEngagementCloudSDKConfig(TEST_APPLICATION_CODE)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(TEST_APPLICATION_CODE)
         every { mockSdkContext.currentSdkState } returns sdkStateFlow
         mockActionFactory = mock()
         mockActionHandler = mock()

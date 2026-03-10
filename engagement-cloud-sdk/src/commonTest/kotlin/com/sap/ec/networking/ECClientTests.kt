@@ -96,7 +96,7 @@ class ECClientTests {
 
         json = JsonUtil.json
 
-        every {
+        everySuspend {
             mockUrlFactory.create(ECUrlType.RefreshToken)
         } returns Url("https://testUrl.com")
 

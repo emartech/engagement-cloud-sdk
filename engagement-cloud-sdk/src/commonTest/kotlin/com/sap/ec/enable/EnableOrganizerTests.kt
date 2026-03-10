@@ -14,7 +14,6 @@ import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
-import dev.mokkery.verify
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.assertions.throwables.shouldThrow
@@ -65,7 +64,7 @@ class EnableOrganizerTests {
 
             verifySuspend { mockSdkConfigStore.store(config) }
             verifySuspend { mockMeStateMachine.activate() }
-            verify { mockSdkContext.config = config }
+            verifySuspend { mockSdkContext.setSdkConfig(config) }
             verifySuspend { mockSdkContext.setSdkState(SdkState.OnHold) }
             verifySuspend { mockSdkContext.setSdkState(SdkState.Active) }
             verifySuspend { mockSession.startSession() }
@@ -100,7 +99,7 @@ class EnableOrganizerTests {
             verifySuspend {
                 mockMeStateMachine.activate()
             }
-            verify { mockSdkContext.config = config }
+            verifySuspend { mockSdkContext.setSdkConfig(config) }
             verifySuspend { mockSdkContext.setSdkState(SdkState.OnHold) }
             verifySuspend { mockSdkContext.setSdkState(SdkState.Active) }
         }
@@ -120,9 +119,9 @@ class EnableOrganizerTests {
             verifySuspend(VerifyMode.order) {
                  mockSdkContext.setSdkState(SdkState.OnHold)
                  mockSdkConfigStore.store(config)
-                 mockSdkContext.config = config
+                 mockSdkContext.setSdkConfig(config)
                  mockMeStateMachine.activate()
-                 mockSdkContext.config = null
+                 mockSdkContext.setSdkConfig(null)
                  mockSdkConfigStore.clear()
                  mockSdkContext.setSdkState(SdkState.Initialized)
             }

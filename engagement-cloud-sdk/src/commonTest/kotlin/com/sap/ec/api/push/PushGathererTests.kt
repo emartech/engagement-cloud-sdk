@@ -6,6 +6,7 @@ import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.storage.StringStorageApi
 import dev.mokkery.answering.returns
 import dev.mokkery.every
+import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
@@ -34,7 +35,7 @@ class PushGathererTests {
     fun setUp() {
         mockStringStorage = mock()
         mockSdkContext = mock()
-        every { mockSdkContext.config } returns TestEngagementCloudSDKConfig(APPLICATION_CODE)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(APPLICATION_CODE)
         pushContext = PushContext(mutableListOf())
         pushGatherer = PushGatherer(pushContext, mockStringStorage, mockSdkContext)
     }

@@ -65,7 +65,7 @@ internal actual class DeviceInfoCollector(
             osVersion = deviceInfo.osVersion,
             sdkVersion = deviceInfo.sdkVersion,
             isDebugMode = false,
-            applicationCode = sdkContext.config?.applicationCode,
+            applicationCode = sdkContext.getSdkConfig()?.applicationCode,
             language = deviceInfo.language,
             timezone = deviceInfo.timezone,
             clientId = deviceInfo.clientId

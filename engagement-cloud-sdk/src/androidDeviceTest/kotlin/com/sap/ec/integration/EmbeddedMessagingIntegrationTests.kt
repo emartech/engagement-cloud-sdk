@@ -55,7 +55,7 @@ class EmbeddedMessagingIntegrationTests {
             sdkContext.defaultUrls.copyWith(
                 embeddedMessagingBaseUrl = "https://embedded-messaging-staging.gservice.emarsys.com/embedded-messaging/fake-api"
             )
-        sdkContext.config = AndroidEngagementCloudSDKConfig(applicationCode = STAGING_APP_CODE)
+        sdkContext.setSdkConfig(AndroidEngagementCloudSDKConfig(applicationCode = STAGING_APP_CODE))
         sdkContext.setSdkState(SdkState.Active)
         sdkEventDistributor = SdkKoinIsolationContext.koin.get<SdkEventDistributor>()
         embeddedMessagingContext = SdkKoinIsolationContext.koin.get<EmbeddedMessagingContextApi>()
@@ -68,7 +68,7 @@ class EmbeddedMessagingIntegrationTests {
         forAll(
             provideExpectedStatusesForAppCodes()
         ) { applicationCode, expectedStatus ->
-            sdkContext.config = sdkContext.config?.copyWith(applicationCode = applicationCode)
+            sdkContext.setSdkConfig(sdkContext.getSdkConfig()?.copyWith(applicationCode = applicationCode))
 
             val response: SdkEvent.Internal.Sdk.Answer.Response<Response> =
                 sdkEventDistributor.registerEvent(
@@ -87,7 +87,7 @@ class EmbeddedMessagingIntegrationTests {
         forAll(
             provideExpectedStatusesForAppCodes()
         ) { applicationCode, expectedStatus ->
-            sdkContext.config = sdkContext.config?.copyWith(applicationCode = applicationCode)
+            sdkContext.setSdkConfig(sdkContext.getSdkConfig()?.copyWith(applicationCode = applicationCode))
 
             val response: SdkEvent.Internal.Sdk.Answer.Response<Response> =
                 sdkEventDistributor.registerEvent(
@@ -108,7 +108,7 @@ class EmbeddedMessagingIntegrationTests {
         forAll(
             provideExpectedStatusesForAppCodes()
         ) { applicationCode, expectedStatus ->
-            sdkContext.config = sdkContext.config?.copyWith(applicationCode = applicationCode)
+            sdkContext.setSdkConfig(sdkContext.getSdkConfig()?.copyWith(applicationCode = applicationCode))
 
             val response: SdkEvent.Internal.Sdk.Answer.Response<Response> =
                 sdkEventDistributor.registerEvent(
@@ -127,7 +127,7 @@ class EmbeddedMessagingIntegrationTests {
         forAll(
             provideExpectedStatusesForAppCodes()
         ) { applicationCode, expectedStatus ->
-            sdkContext.config = sdkContext.config?.copyWith(applicationCode = applicationCode)
+            sdkContext.setSdkConfig(sdkContext.getSdkConfig()?.copyWith(applicationCode = applicationCode))
 
             val response: SdkEvent.Internal.Sdk.Answer.Response<Response> =
                 sdkEventDistributor.registerEvent(

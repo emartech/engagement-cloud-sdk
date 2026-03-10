@@ -78,7 +78,7 @@ class DeviceClientTests {
         Dispatchers.setMain(StandardTestDispatcher())
         mockEcClient = mock()
         mockUrlFactory = mock()
-        every { mockUrlFactory.create(ECUrlType.RegisterDeviceInfo) } returns URL
+        everySuspend { mockUrlFactory.create(ECUrlType.RegisterDeviceInfo) } returns URL
         mockDeviceInfoCollector = mock()
         everySuspend { mockDeviceInfoCollector.collect() } returns NEW_DEVICE_INFO
         mockContactTokenHandler = mock()
@@ -189,7 +189,7 @@ class DeviceClientTests {
             },
             ""
         )
-        every { mockUrlFactory.create(ECUrlType.RegisterDeviceInfo) } returns testUrl
+        everySuspend { mockUrlFactory.create(ECUrlType.RegisterDeviceInfo) } returns testUrl
         everySuspend { mockEcClient.send(any()) } returns Result.success(expectedResponse)
         val registerDeviceInfoEvent = SdkEvent.Internal.Sdk.RegisterDeviceInfo()
 
@@ -255,7 +255,7 @@ class DeviceClientTests {
         createDeviceClient(backgroundScope).register()
         val testException = Exception("Test Exception")
 
-        every {
+        everySuspend {
             mockUrlFactory.create(ECUrlType.RegisterDeviceInfo)
         } throws testException
 

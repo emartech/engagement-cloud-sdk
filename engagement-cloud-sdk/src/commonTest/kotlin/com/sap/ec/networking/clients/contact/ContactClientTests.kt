@@ -27,7 +27,6 @@ import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.resetAnswers
 import dev.mokkery.resetCalls
-import dev.mokkery.verify
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.ktor.http.Headers
@@ -94,12 +93,12 @@ class ContactClientTests {
         everySuspend { mockSdkEventManager.onlineSdkEvents } returns onlineEvents
         everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
         sdkDispatcher = StandardTestDispatcher()
-        every { mockSdkContext.config } returns mockConfig
+        everySuspend { mockSdkContext.getSdkConfig() } returns mockConfig
         everySuspend { mockContactTokenHandler.handleContactTokens(any()) } returns Unit
         testResponse = createTestResponse("{}")
         everySuspend { mockEcClient.send(any()) } returns (Result.success(testResponse))
-        every { mockUrlFactory.create(ECUrlType.LinkContact) } returns TEST_BASE_URL
-        every { mockUrlFactory.create(ECUrlType.UnlinkContact) } returns TEST_BASE_URL
+        everySuspend { mockUrlFactory.create(ECUrlType.LinkContact) } returns TEST_BASE_URL
+        everySuspend { mockUrlFactory.create(ECUrlType.UnlinkContact) } returns TEST_BASE_URL
         everySuspend { mockLogger.error(any(), any<Throwable>()) } calls {
             (it.args[1] as Throwable).printStackTrace()
         }
@@ -137,7 +136,7 @@ class ContactClientTests {
 
         advanceUntilIdle()
 
-        verify { mockUrlFactory.create(any()) }
+        everySuspend { mockUrlFactory.create(any()) }
         verifySuspend { mockEcClient.send(any()) }
         verifySuspend { mockContactTokenHandler.handleContactTokens(any()) }
         verifySuspend { mockEcSdkSession.startSession() }
@@ -178,7 +177,7 @@ class ContactClientTests {
 
         advanceUntilIdle()
 
-        verify { mockUrlFactory.create(any()) }
+        everySuspend { mockUrlFactory.create(any()) }
         verifySuspend { mockEcClient.send(any()) }
         verifySuspend(VerifyMode.exactly(0)) { mockContactTokenHandler.handleContactTokens(any()) }
         verifySuspend { mockEcSdkSession.startSession() }
@@ -209,7 +208,7 @@ class ContactClientTests {
 
         advanceUntilIdle()
 
-        verify { mockUrlFactory.create(any()) }
+        everySuspend { mockUrlFactory.create(any()) }
         verifySuspend { mockEcClient.send(any()) }
         verifySuspend { mockContactTokenHandler.handleContactTokens(any()) }
         verifySuspend { mockEcSdkSession.startSession() }
@@ -237,7 +236,7 @@ class ContactClientTests {
 
         advanceUntilIdle()
 
-        verify { mockUrlFactory.create(any()) }
+        everySuspend { mockUrlFactory.create(any()) }
         verifySuspend { mockEcClient.send(any()) }
         verifySuspend { mockContactTokenHandler.handleContactTokens(any()) }
         verifySuspend { mockEcSdkSession.endSession() }
@@ -269,7 +268,7 @@ class ContactClientTests {
 
         advanceUntilIdle()
 
-        verify { mockUrlFactory.create(any()) }
+        everySuspend { mockUrlFactory.create(any()) }
         verifySuspend { mockEcClient.send(any()) }
         verifySuspend(VerifyMode.exactly(0)) { mockContactTokenHandler.handleContactTokens(any()) }
         verifySuspend {
@@ -312,7 +311,7 @@ class ContactClientTests {
 
             advanceUntilIdle()
 
-            verify { mockUrlFactory.create(any()) }
+            everySuspend { mockUrlFactory.create(any()) }
             verifySuspend { mockEcClient.send(any()) }
             verifySuspend {
                 mockClientExceptionHandler.handleException(

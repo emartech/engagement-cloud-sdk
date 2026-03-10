@@ -107,7 +107,7 @@ class SetupTests {
     @Test
     fun testIsEnabled_shouldReturnTrue_ifAppCode_is_set() = runTest {
         val mockConfig: SdkConfig = mock()
-        every { mockSdkContext.config } returns mockConfig
+        everySuspend { mockSdkContext.getSdkConfig() } returns mockConfig
         every { mockConfig.applicationCode } returns "ABCDE-12345"
 
         val result = setup.isEnabled()
