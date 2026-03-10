@@ -45,9 +45,9 @@ object AndroidEngagementCloud {
         get() = koin.get<PushApi>()
 
     /**
-     * Provides access to the Tracking API, which allows tracking custom events.
+     * Provides access to the Tracking API, which allows tracking all kinds of events.
      */
-    val tracking: TrackingApi
+    val event: TrackingApi
         get() = koin.get<TrackingApi>()
 
     /**
