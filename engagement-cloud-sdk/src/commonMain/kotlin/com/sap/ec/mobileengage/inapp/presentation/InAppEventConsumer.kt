@@ -38,6 +38,15 @@ internal class InAppEventConsumer(
                 val view = inAppViewProvider.provide()
                 val webViewHolder = view.load(presentEvent.inAppMessage)
                 inAppPresenter.present(view, webViewHolder, InAppPresentationMode.Overlay)
+
+                val trackingInfo = presentEvent.inAppMessage.trackingInfo
+                sdkEventManager.registerEvent(
+                    SdkEvent.Internal.InApp.Viewed(
+                        reporting = trackingInfo,
+                        trackingInfo = trackingInfo,
+                        attributes = null
+                    )
+                )
             }
     }
 }
