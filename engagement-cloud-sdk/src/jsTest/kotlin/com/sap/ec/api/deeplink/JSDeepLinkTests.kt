@@ -2,6 +2,7 @@ package com.sap.ec.api.deeplink
 
 import dev.mokkery.answering.returns
 import dev.mokkery.every
+import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.verify
 import io.kotest.matchers.shouldBe
@@ -49,5 +50,16 @@ class JSDeepLinkTests {
 
         verify { mockDeepLinkApi.track(Url(urlString)) }
         result shouldBe true
+    }
+
+    @Test
+    fun testTrack_shouldReturnFalse_ifUrlIsMalformed() {
+        val mockDeepLinkApi: DeepLinkApi = mock()
+        every { mockDeepLinkApi.track(any()) } returns Result.success(false)
+        val jsDeepLink = JSDeepLink(mockDeepLinkApi)
+
+        val result = jsDeepLink.track("not a valid url")
+
+        result shouldBe false
     }
 }

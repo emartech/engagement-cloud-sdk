@@ -6,7 +6,8 @@ internal class JSDeepLink(
     private val deepLinkApi: DeepLinkApi
 ) : JSDeepLinkApi {
     override fun track(url: String): Boolean {
-        return deepLinkApi.track(Url(url)).getOrNull() ?: false
+        val parsedUrl = runCatching { Url(url) }.getOrNull() ?: return false
+        return deepLinkApi.track(parsedUrl).getOrNull() ?: false
     }
 
 }
