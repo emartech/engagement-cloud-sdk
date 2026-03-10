@@ -2,7 +2,7 @@ name: Publish Artifacts
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   workflow_dispatch:
     inputs:
       dry_run:
@@ -125,6 +125,8 @@ jobs:
 
       - name: Run JS Pipeline (Build, Test)
         run: make pipeline-js
+        env:
+          VERSION_OVERRIDE: ${{ env.VERSION }}
 
       - name: Assemble NPM package
         run: |
@@ -315,7 +317,7 @@ jobs:
   report-slack:
     name: Report / Slack
     if: always()
-    needs: [android-pipeline, js-pipeline, ios-pipeline]
+    needs: [ android-pipeline, js-pipeline, ios-pipeline ]
     runs-on: ubuntu-latest
     steps:
       - name: Compute Slack prefix

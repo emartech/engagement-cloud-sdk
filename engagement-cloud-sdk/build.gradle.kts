@@ -352,7 +352,8 @@ if (project.findProperty("ENABLE_PUBLISHING") == "true") {
         repositories {
             maven {
                 name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/${System.getenv("GITHUB_REPO") ?: "emartech/engagement-cloud-sdk"}")
+                url =
+                    uri("https://maven.pkg.github.com/${System.getenv("GITHUB_REPO") ?: "emartech/engagement-cloud-sdk"}")
                 credentials {
                     username = System.getenv("GITHUB_ACTOR")
                     password = System.getenv("GITHUB_TOKEN")
@@ -415,6 +416,20 @@ tasks {
             file(file).apply {
                 writeBytes(decodedBytes)
             }
+        }
+    }
+}
+
+tasks.withType<ProcessResources> {
+    outputs.upToDateWhen { false }  // always run this task to ensure the file is updated with the correct version
+    val sdkVersion = version.toString()
+    filesMatching("**/engagement-cloud-sdk-loader.js") {
+        println("Replacing sdk-loader-version with $sdkVersion in ${this.path}")
+        filter { line ->
+            line.replace(
+                "/latest/engagement-cloud-sdk.js",
+                "/${sdkVersion}/engagement-cloud-sdk.js"
+            )
         }
     }
 }
