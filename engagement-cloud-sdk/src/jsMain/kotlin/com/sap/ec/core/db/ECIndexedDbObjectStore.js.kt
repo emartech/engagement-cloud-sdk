@@ -53,12 +53,12 @@ internal class ECIndexedDbObjectStore<T>(
 
                 transaction.onerror = EventHandler {
                     CoroutineScope(sdkDispatcher).launch {
-                        logger.error("EmarsysIndexedDbObjectStore - put", buildJsonObject {
+                        logger.error("ECIndexedDbObjectStore - put", buildJsonObject {
                             put("value", JsonPrimitive(value.toString()))
                             put("id", JsonPrimitive(id))
                         }, isRemoteLog = value !is SdkEvent.Internal.LogEvent)
                     }
-                    continuation.resumeWithException(request.error!!)
+                    continuation.resumeWithException(request.error ?: Exception("Unknown IndexedDB error"))
                 }
             }
             savedId
@@ -94,7 +94,7 @@ internal class ECIndexedDbObjectStore<T>(
                     CoroutineScope(sdkDispatcher).launch {
                         logger.error("Failed to retrieve data from store: ${engagementCloudObjectStoreConfig.name}")
                     }
-                    continuation.resumeWithException(request.error!!)
+                    continuation.resumeWithException(request.error ?: Exception("Unknown IndexedDB error"))
                 }
             }.asFlow()
         }
@@ -130,13 +130,13 @@ internal class ECIndexedDbObjectStore<T>(
                 transaction.onerror = EventHandler {
                     CoroutineScope(sdkDispatcher).launch {
                         logger.error(
-                            "EmarsysIndexedDbObjectStore - get",
+                            "ECIndexedDbObjectStore - get",
                             buildJsonObject {
                                 put("id", JsonPrimitive(id))
                             }
                         )
                     }
-                    continuation.resumeWithException(request.error!!)
+                    continuation.resumeWithException(request.error ?: Exception("Unknown IndexedDB error"))
                 }
             }
         }
@@ -166,7 +166,7 @@ internal class ECIndexedDbObjectStore<T>(
                             }
                         )
                     }
-                    continuation.resumeWithException(request.error!!)
+                    continuation.resumeWithException(request.error ?: Exception("Unknown IndexedDB error"))
                 }
             }
         }
@@ -191,7 +191,7 @@ internal class ECIndexedDbObjectStore<T>(
                     CoroutineScope(sdkDispatcher).launch {
                         logger.error("clear")
                     }
-                    continuation.resumeWithException(request.error!!)
+                    continuation.resumeWithException(request.error ?: Exception("Unknown IndexedDB error"))
                 }
             }
         }
