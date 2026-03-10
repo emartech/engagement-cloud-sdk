@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import com.sap.ec.SdkConstants
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.providers.InstantProvider
@@ -23,6 +24,9 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
+import io.mockk.slot
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import io.mockk.unmockkAll
 import io.mockk.verify
 import kotlinx.coroutines.CoroutineDispatcher
@@ -131,6 +135,48 @@ class InAppPresenterTests {
             }
             verify { mockFragmentTransaction.addToBackStack(null) }
             verify { mockFragmentTransaction.commit() }
+        }
+
+    @Test
+    fun present_shouldRegisterViewedEvent_afterFragmentCommit() =
+        runTest {
+            val testTrackingInfo = """{"campaignId":"test123"}"""
+            val mockFragmentTransaction = mockk<FragmentTransaction>(relaxed = true)
+            val mockFragmentManager = mockk<FragmentManager>(relaxed = true) {
+                every { beginTransaction() } returns mockFragmentTransaction
+            }
+            val mockActivity = mockk<FragmentActivity> {
+                every { supportFragmentManager } returns mockFragmentManager
+            }
+            coEvery { mockCurrentActivityWatchdog.waitForActivity() } returns mockActivity
+            val mockView = mockk<InAppView>()
+            val mockWebViewHolder = mockk<WebViewHolder>()
+            coEvery { mockView.load(any()) } returns mockWebViewHolder
+            every { mockView.inAppMessage } returns InAppMessage(
+                dismissId = "testDismissId",
+                trackingInfo = testTrackingInfo,
+                content = "testContent"
+            )
+
+            val eventSlot = slot<SdkEvent>()
+            coEvery { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mockk(relaxed = true)
+
+            val inAppPresenter = InAppPresenter(
+                mockInAppDialogProvider,
+                mockCurrentActivityWatchdog,
+                mainDispatcher,
+                mockSdkEventDistributor,
+                timestampProvider = mockTimestampProvider,
+                logger = mockLogger,
+                applicationScope = backgroundScope,
+            )
+
+            inAppPresenter.present(mockView, mockWebViewHolder, InAppPresentationMode.Overlay)
+            advanceUntilIdle()
+
+            val viewed = eventSlot.captured.shouldBeInstanceOf<SdkEvent.Internal.InApp.Viewed>()
+            viewed.trackingInfo shouldBe testTrackingInfo
+            viewed.name shouldBe SdkConstants.INAPP_VIEWED_EVENT_NAME
         }
 
     @Test

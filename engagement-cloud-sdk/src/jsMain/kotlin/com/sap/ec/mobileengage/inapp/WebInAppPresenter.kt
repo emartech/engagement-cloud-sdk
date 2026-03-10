@@ -57,30 +57,36 @@ internal class WebInAppPresenter(
     }
 
     override suspend fun present(
-        view: InAppViewApi,
+        inAppView: InAppViewApi,
         webViewHolder: WebViewHolder,
         mode: InAppPresentationMode,
         animation: InAppPresentationAnimation?
     ) {
-        val inAppMessage = view.inAppMessage
+        val inAppMessage = inAppView.inAppMessage
         if (inAppMessage.type == InAppType.INLINE || inAppMessage.type.name == "INLINE") {
             return
         }
 
-        val inappView = (webViewHolder as WebWebViewHolder).webView
-        val styledInappView = inappView.let {
+        val view = (webViewHolder as WebWebViewHolder).webView
+        val styledInAppView = view.let {
             if (mode is InAppPresentationMode.Overlay) {
-                applyOverlayStyle(inappView)
+                applyOverlayStyle(view)
             } else {
-                applyRibbonStyle(inappView)
+                applyRibbonStyle(view)
             }
         }
+        sdkEventDistributor.registerEvent(
+            SdkEvent.Internal.InApp.Viewed(
+                trackingInfo = inAppView.inAppMessage.trackingInfo,
+                attributes = null
+            )
+        )
         CoroutineScope(sdkDispatcher).launch {
-            sdkEventDistributor.sdkEventFlow.first { it is SdkEvent.Internal.Sdk.Dismiss && it.id == view.inAppMessage.dismissId }
-            styledInappView.remove()
+            sdkEventDistributor.sdkEventFlow.first { it is SdkEvent.Internal.Sdk.Dismiss && it.id == inAppView.inAppMessage.dismissId }
+            styledInAppView.remove()
         }
 
-        styledInappView.let { document.body.appendChild(it) }
+        styledInAppView.let { document.body.appendChild(it) }
     }
 
     private fun applyOverlayStyle(viewContainer: HTMLElement): HTMLElement {

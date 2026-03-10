@@ -88,6 +88,14 @@ internal class InAppPresenter(
                 addToBackStack(null)
                 commit()
             }
+
+            sdkEventDistributor.registerEvent(
+                SdkEvent.Internal.InApp.Viewed(
+                    trackingInfo = inAppView.inAppMessage.trackingInfo,
+                    attributes = null
+                )
+            )
+
             applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
                 sdkEventDistributor.sdkEventFlow.first { sdkEvent ->
                     sdkEvent is SdkEvent.Internal.Sdk.Dismiss && sdkEvent.id == inAppView.inAppMessage.dismissId
