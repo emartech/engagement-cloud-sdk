@@ -179,7 +179,7 @@ sealed interface SdkEvent {
 
 
     @Serializable
-     sealed interface Internal : SdkEvent {
+    sealed interface Internal : SdkEvent {
 
         sealed interface EmbeddedMessaging : Internal, OnlineSdkEvent {
 
@@ -489,7 +489,7 @@ sealed interface SdkEvent {
                 override val id: String = UUIDProvider().provide(),
                 override val attributes: JsonObject?,
                 override val timestamp: Instant = TimestampProvider().provide(),
-                override val reporting: String,
+                override val reporting: String? = null,
                 override val trackingInfo: String,
                 override var nackCount: Int = 0,
             ) : InApp(INAPP_VIEWED_EVENT_NAME), Reporting

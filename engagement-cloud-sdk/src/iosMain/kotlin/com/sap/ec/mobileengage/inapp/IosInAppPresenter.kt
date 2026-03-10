@@ -83,6 +83,12 @@ internal class IosInAppPresenter(
             window.makeKeyAndVisible()
             originalWindow
         }
+        sdkEventDistributor.registerEvent(
+            SdkEvent.Internal.InApp.Viewed(
+                trackingInfo = inAppView.inAppMessage.trackingInfo,
+                attributes = null
+            )
+        )
         CoroutineScope(sdkDispatcher).launch {
             sdkEventDistributor.sdkEventFlow.first { it is SdkEvent.Internal.Sdk.Dismiss && it.id == inAppView.inAppMessage.dismissId }
 
