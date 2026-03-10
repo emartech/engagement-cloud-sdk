@@ -63,7 +63,7 @@ kotlin {
         }
     }
 
-    val jsVariant = project.findProperty("js.variant")?.toString() ?: "canvas"
+    val jsVariant = project.findProperty("js.variant")?.toString() ?: "html"
     println("Building JS variant: $jsVariant")
 
     js(IR) {
