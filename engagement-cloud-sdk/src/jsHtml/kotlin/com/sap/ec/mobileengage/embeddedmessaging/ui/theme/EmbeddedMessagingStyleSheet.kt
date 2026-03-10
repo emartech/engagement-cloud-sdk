@@ -279,7 +279,7 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
         flex(1)
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Column)
-        property("overflow", "scroll")
+        property("overflow", "auto")
     }
 
     val emptyStateContainer by style {
