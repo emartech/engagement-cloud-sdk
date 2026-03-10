@@ -62,7 +62,7 @@ object IosEngagementCloud {
         get() = koin.get<IosInAppApi>()
     val config: IosConfigApi
         get() = koin.get<IosConfigApi>()
-    val deeplink: IosDeepLinkApi
+    val deepLink: IosDeepLinkApi
         get() = koin.get<IosDeepLinkApi>()
     val embeddedMessaging: IosEmbeddedMessagingApi
         get() = koin.get<IosEmbeddedMessagingApi>()

@@ -26,7 +26,7 @@ import UIKit
     }
 
     @objc public func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
-        return self.ec.deeplink.track(userActivity: userActivity)
+        return self.ec.deepLink.track(userActivity: userActivity)
     }
 
     @objc public func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
