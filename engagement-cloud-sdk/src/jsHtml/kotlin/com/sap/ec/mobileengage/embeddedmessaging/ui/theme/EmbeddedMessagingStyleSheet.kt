@@ -532,7 +532,7 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
         padding(DEFAULT_PADDING)
         borderRadius(DEFAULT_BORDER_RADIUS)
         marginRight(DEFAULT_MARGIN)
-        background("radial-gradient(circle, transparent, var(--emarsys-color-surface-dim))")
+        background("radial-gradient(circle, transparent, var(--sap-color-surface-variant))")
         property("opacity", 0)
         property("pointer-events", "none")
         property("transform", "scale(0.8)")
