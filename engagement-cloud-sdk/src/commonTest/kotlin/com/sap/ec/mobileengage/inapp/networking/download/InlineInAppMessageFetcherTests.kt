@@ -20,8 +20,8 @@ import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import io.ktor.http.ContentType
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
@@ -428,7 +428,7 @@ class InlineInAppMessageFetcherTests {
         val capturedRequest = richContentRequestSlot.get()
         capturedRequest.url shouldBe Url(contentUrl)
         capturedRequest.method shouldBe HttpMethod.Get
-        capturedRequest.headers shouldNotBe null
-        capturedRequest.headers!![KtorHttpHeaders.ContentType] shouldBe ContentType.Text.Html.toString()
+        val headers = capturedRequest.headers.shouldNotBeNull()
+        headers[KtorHttpHeaders.ContentType] shouldBe ContentType.Text.Html.toString()
     }
 }
