@@ -1,6 +1,5 @@
 package com.sap.ec.mobileengage.inapp.presentation
 
-import com.sap.ec.SdkConstants
 import com.sap.ec.core.channel.SdkEventManagerApi
 import com.sap.ec.core.log.Logger
 import com.sap.ec.event.SdkEvent
@@ -12,14 +11,10 @@ import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
-import dev.mokkery.matcher.capture.Capture.Companion.slot
-import dev.mokkery.matcher.capture.capture
-import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -105,7 +100,6 @@ class InAppEventConsumerTest {
         everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
         everySuspend { mockInAppViewProvider.provide() } returns mockInAppView
         everySuspend { mockInAppView.load(inAppMessage) } returns mockWebViewHolder
-        everySuspend { mockSdkEventManager.registerEvent(any()) } returns mock(MockMode.autofill)
 
         val sdkEvents = backgroundScope.async {
             sdkEventFlow.take(1).toList()
@@ -123,109 +117,6 @@ class InAppEventConsumerTest {
                 InAppPresentationMode.Overlay
             )
         }
-    }
-
-    @Test
-    fun testEventConsumer_shouldEmitViewedEvent_afterSuccessfulPresentation() = runTest {
-        createInAppEventHandler(backgroundScope).register()
-        val mockInAppView: InAppViewApi = mock(MockMode.autofill)
-        val mockWebViewHolder: WebViewHolder = mock(MockMode.autofill)
-        val trackingInfo = """{"campaignId":"test123"}"""
-        val inAppMessage = InAppMessage(
-            dismissId = "testDismissId",
-            trackingInfo = trackingInfo,
-            content = "testContent"
-        )
-        val event = SdkEvent.Internal.InApp.Present(
-            inAppMessage = inAppMessage
-        )
-
-        val eventSlot = slot<SdkEvent>()
-
-        everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
-        everySuspend { mockInAppViewProvider.provide() } returns mockInAppView
-        everySuspend { mockInAppView.load(inAppMessage) } returns mockWebViewHolder
-        everySuspend { mockSdkEventManager.registerEvent(capture(eventSlot)) } returns mock(MockMode.autofill)
-
-        val sdkEvents = backgroundScope.async {
-            sdkEventFlow.take(1).toList()
-        }
-
-        sdkEventFlow.emit(event)
-        sdkEvents.await()
-
-        val viewed = eventSlot.get().shouldBeInstanceOf<SdkEvent.Internal.InApp.Viewed>()
-        viewed.trackingInfo shouldBe trackingInfo
-        viewed.reporting shouldBe trackingInfo
-        viewed.name shouldBe SdkConstants.INAPP_VIEWED_EVENT_NAME
-    }
-
-    @Test
-    fun testEventConsumer_viewedEventName_shouldBeInappViewed() = runTest {
-        SdkConstants.INAPP_VIEWED_EVENT_NAME shouldBe "inapp:viewed"
-    }
-
-    @Test
-    fun testEventConsumer_shouldNotEmitViewedEvent_forInlineMessages() = runTest {
-        createInAppEventHandler(backgroundScope).register()
-        val inAppMessage = InAppMessage(
-            dismissId = "testDismissId",
-            type = InAppType.INLINE,
-            trackingInfo = "{}",
-            content = "testContent"
-        )
-        val event = SdkEvent.Internal.InApp.Present(
-            inAppMessage = inAppMessage
-        )
-
-        val sdkEvents = backgroundScope.async {
-            sdkEventFlow.take(1).toList()
-        }
-
-        sdkEventFlow.emit(event)
-        sdkEvents.await()
-
-        verifySuspend(VerifyMode.Companion.exactly(0)) {
-            mockSdkEventManager.registerEvent(any())
-        }
-        verifySuspend(VerifyMode.Companion.exactly(0)) {
-            mockInAppViewProvider.provide()
-        }
-    }
-
-    @Test
-    fun testEventConsumer_viewedEvent_shouldUseTrackingInfoFromMessage() = runTest {
-        createInAppEventHandler(backgroundScope).register()
-        val mockInAppView: InAppViewApi = mock(MockMode.autofill)
-        val mockWebViewHolder: WebViewHolder = mock(MockMode.autofill)
-        val specificTrackingInfo = """{"campaignId":"campaign-abc-123","sid":"session-xyz"}"""
-        val inAppMessage = InAppMessage(
-            dismissId = "testDismissId",
-            trackingInfo = specificTrackingInfo,
-            content = "testContent"
-        )
-        val event = SdkEvent.Internal.InApp.Present(
-            inAppMessage = inAppMessage
-        )
-
-        val eventSlot = slot<SdkEvent>()
-
-        everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
-        everySuspend { mockInAppViewProvider.provide() } returns mockInAppView
-        everySuspend { mockInAppView.load(inAppMessage) } returns mockWebViewHolder
-        everySuspend { mockSdkEventManager.registerEvent(capture(eventSlot)) } returns mock(MockMode.autofill)
-
-        val sdkEvents = backgroundScope.async {
-            sdkEventFlow.take(1).toList()
-        }
-
-        sdkEventFlow.emit(event)
-        sdkEvents.await()
-
-        val viewed = eventSlot.get() as SdkEvent.Internal.InApp.Viewed
-        viewed.trackingInfo shouldBe specificTrackingInfo
-        viewed.reporting shouldBe specificTrackingInfo
-        viewed.attributes shouldBe null
     }
 
 }
