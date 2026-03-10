@@ -149,7 +149,8 @@ internal object SetupInjection {
             StateMachine(
                 states = listOf(
                     get<State>(named(StateTypes.ApplyAppCodeBasedRemoteConfig)),
-                    get<State>(named(StateTypes.FetchEmbeddedMessagingMetaState))
+                    get<State>(named(StateTypes.FetchEmbeddedMessagingMetaState)),
+                    get<State>(named(StateTypes.LoadEmbeddedMessagingMessages)),
                 ),
                 name = StateMachineTypes.FollowUpChangeAppCodeStateMachine.name,
                 logger = get { parametersOf(StateMachineTypes.FollowUpChangeAppCodeStateMachine.name) }
