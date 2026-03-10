@@ -17,7 +17,7 @@ struct SdkTestView: View {
                 enableTracking()
                 let userActivity = NSUserActivity(activityType: NSUserActivityTypeBrowsingWeb)
                 userActivity.webpageURL = URL(string: "http://www.google.com/something?fancy_url=1&ems_dl=1_2_3_4_5")
-                let deeplinkHandled = engagementCloud.deepLink.track(userActivity: userActivity)
+                let deeplinkHandled = engagementCloud.deeplink.track(userActivity: userActivity)
                 print("Deeplink handled: \(deeplinkHandled)")
             } label: {
                 Text("testDeeplinkWithDemoData")
