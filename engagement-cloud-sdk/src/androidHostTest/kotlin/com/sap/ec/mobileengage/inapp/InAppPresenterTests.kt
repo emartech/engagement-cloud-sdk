@@ -25,6 +25,8 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.slot
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import io.mockk.unmockkAll
 import io.mockk.verify
 import kotlinx.coroutines.CoroutineDispatcher
@@ -172,11 +174,9 @@ class InAppPresenterTests {
             inAppPresenter.present(mockView, mockWebViewHolder, InAppPresentationMode.Overlay)
             advanceUntilIdle()
 
-            val captured = eventSlot.captured
-            assert(captured is SdkEvent.Internal.InApp.Viewed) { "Expected Viewed event but got ${captured::class.simpleName}" }
-            val viewed = captured as SdkEvent.Internal.InApp.Viewed
-            assert(viewed.trackingInfo == testTrackingInfo) { "Expected trackingInfo '$testTrackingInfo' but got '${viewed.trackingInfo}'" }
-            assert(viewed.name == SdkConstants.INAPP_VIEWED_EVENT_NAME) { "Expected name '${SdkConstants.INAPP_VIEWED_EVENT_NAME}' but got '${viewed.name}'" }
+            val viewed = eventSlot.captured.shouldBeInstanceOf<SdkEvent.Internal.InApp.Viewed>()
+            viewed.trackingInfo shouldBe testTrackingInfo
+            viewed.name shouldBe SdkConstants.INAPP_VIEWED_EVENT_NAME
         }
 
     @Test
