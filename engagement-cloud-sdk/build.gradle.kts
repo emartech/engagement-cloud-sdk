@@ -390,7 +390,7 @@ mavenPublishing {
         developers {
             developer {
                 id = "sap"
-                name = "Emarsys"
+                name = "SAP"
                 url = "https://sap.com"
             }
         }
