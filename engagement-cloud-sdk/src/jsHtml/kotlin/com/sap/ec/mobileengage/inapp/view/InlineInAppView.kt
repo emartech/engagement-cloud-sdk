@@ -1,6 +1,7 @@
 package com.sap.ec.mobileengage.inapp.view
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -17,7 +18,9 @@ import org.jetbrains.compose.web.css.height
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.width
 import org.jetbrains.compose.web.dom.Div
+import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.Node
+import org.w3c.dom.asList
 import web.dom.ElementId
 import web.dom.document
 import web.html.HTMLElement
@@ -29,6 +32,7 @@ internal actual fun InlineInAppView(
     onLoaded: (() -> Unit)?
 ) {
     val webViewElement = remember { mutableStateOf<HTMLElement?>(null) }
+    val iframeHolder = remember { mutableStateOf<HTMLDivElement?>(null) }
 
     LaunchedEffect(message) {
         val inAppViewProvider: InAppViewProviderApi = koin.get()
@@ -51,18 +55,30 @@ internal actual fun InlineInAppView(
         }
     }
 
-    webViewElement.value?.let { webView ->
-        Div(attrs = {
-            id(message.dismissId.toDismissId())
-            style {
-                width(100.percent)
-                height(100.percent)
+    DisposableEffect(message) {
+        onDispose {
+            iframeHolder.value?.childNodes?.asList()?.forEach {
+                iframeHolder.value?.removeChild(it)
             }
-            ref { element ->
-                element.appendChild(webView.unsafeCast<Node>())
-                onDispose { }
-            }
-        })
+        }
+    }
+
+    Div(attrs = {
+        id(message.dismissId.toDismissId())
+        style {
+            width(100.percent)
+            height(100.percent)
+        }
+        ref { element ->
+            iframeHolder.value = element
+            onDispose { }
+        }
+    })
+
+    iframeHolder.value?.let { holder ->
+        webViewElement.value?.let { webview ->
+            holder.appendChild(webview.unsafeCast<Node>())
+        }
     }
 }
 
@@ -76,7 +92,6 @@ internal fun InlineInAppView(
     val message = remember { mutableStateOf<InAppMessage?>(null) }
 
     LaunchedEffect(url) {
-
         message.value = fetcher.fetch(url, trackingInfo)
     }
 

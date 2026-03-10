@@ -27,14 +27,9 @@ import web.intersection.IntersectionObserverInit
 internal fun MessageDetailView(
     viewModel: MessageItemViewModelApi
 ) {
-    var detailedMessageUrl by remember { mutableStateOf<Url?>(null) }
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(viewModel.imageUrl) {
-        detailedMessageUrl = viewModel.richContentUrl
-    }
-
-    detailedMessageUrl?.let {
+    viewModel.richContentUrl?.let {
         Div({
             id(viewModel.id.toReadTagId())
             classes(EmbeddedMessagingStyleSheet.detailViewContainer)

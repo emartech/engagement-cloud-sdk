@@ -155,7 +155,11 @@ internal fun MessageList(
                 })
             }
 
-            AdaptiveCardContainer(isTabletScale = isTabletScale, flex = true, isLandscape = isLandscape) {
+            AdaptiveCardContainer(
+                isTabletScale = isTabletScale,
+                flex = true,
+                isLandscape = isLandscape
+            ) {
                 Div({ classes(EmbeddedMessagingStyleSheet.detailPane) }) {
                     if (selectedMessage?.hasRichContent() ?: false) {
                         MessageDetailView(

@@ -20,12 +20,12 @@ internal class StateMachine(
             innerStateLifecycle.value = it.name to StateLifecycle.prepare
             it.prepare()
             innerStateLifecycle.value = it.name to StateLifecycle.activate
-            logger.trace("$name machine activating state: ${it.name}")
+            logger.debug("$name machine activating state: ${it.name}")
             it.active()
                 .onSuccess { _ ->
-                    logger.trace("$name machine successfully activated state: ${it.name}")
+                    logger.debug("$name machine successfully activated state: ${it.name}")
                 }.onFailure { throwable ->
-                    logger.trace("$name machine failed to activate state: ${it.name} with error: $throwable")
+                    logger.debug("$name machine failed to activate state: ${it.name} with error: $throwable")
                     return Result.failure(throwable)
                 }
             it.relax()
