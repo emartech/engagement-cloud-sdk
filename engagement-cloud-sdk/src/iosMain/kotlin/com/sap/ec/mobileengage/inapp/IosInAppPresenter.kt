@@ -87,6 +87,7 @@ internal class IosInAppPresenter(
             sdkEventDistributor.sdkEventFlow.first { it is SdkEvent.Internal.Sdk.Dismiss && it.id == inAppView.inAppMessage.dismissId }
 
             withContext(mainDispatcher) {
+                window.setHidden(true)
                 window.removeFromSuperview()
                 originalWindow?.makeKeyAndVisible()
             }

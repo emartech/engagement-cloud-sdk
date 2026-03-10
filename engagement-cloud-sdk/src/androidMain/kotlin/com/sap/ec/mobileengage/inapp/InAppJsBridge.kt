@@ -14,6 +14,7 @@ import com.sap.ec.mobileengage.action.models.RequestPushPermissionActionModel
 import com.sap.ec.mobileengage.action.models.amendForJsBridge
 import com.sap.ec.mobileengage.inapp.jsbridge.InAppJsBridgeData
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -27,13 +28,23 @@ internal class InAppJsBridge(
     private val json: Json,
     private val logger: Logger
 ) {
+    private val actionChannel = Channel<suspend () -> Unit>(Channel.UNLIMITED)
+
+    init {
+        applicationScope.launch {
+            for (action in actionChannel) {
+                action()
+            }
+        }
+    }
+
     @JavascriptInterface
     fun handleInAppAction(jsonString: String) {
         try {
             val actionModel =
                 json.decodeFromString<BasicActionModel>(jsonString)
                     .amendForJsBridge(inAppJsBridgeData)
-            applicationScope.launch {
+            actionChannel.trySend {
                 actionFactory.create(actionModel).invoke()
             }
         } catch (error: Throwable) {
@@ -45,7 +56,7 @@ internal class InAppJsBridge(
 
     @JavascriptInterface
     fun triggerMEEvent(jsonString: String) {
-        applicationScope.launch {
+        actionChannel.trySend {
             val actionModel = json.decodeFromString<BasicCustomEventActionModel>(jsonString)
             actionFactory.create(actionModel)()
         }
@@ -53,19 +64,18 @@ internal class InAppJsBridge(
 
     @JavascriptInterface
     fun buttonClicked(jsonString: String) {
-        applicationScope.launch {
+        actionChannel.trySend {
             val buttonClickJson = json.decodeFromString<JsonObject>(jsonString)
             val reporting: String = buttonClickJson["reporting"]?.jsonPrimitive?.contentOrNull ?: ""
             val actionModel =
                 BasicInAppButtonClickedActionModel(reporting, inAppJsBridgeData.trackingInfo)
             actionFactory.create(actionModel)()
-
         }
     }
 
     @JavascriptInterface
     fun triggerAppEvent(jsonString: String) {
-        applicationScope.launch {
+        actionChannel.trySend {
             val actionModel = json.decodeFromString<BasicAppEventActionModel>(jsonString)
             actionFactory.create(actionModel)()
         }
@@ -73,7 +83,7 @@ internal class InAppJsBridge(
 
     @JavascriptInterface
     fun requestPushPermission(jsonString: String) {
-        applicationScope.launch {
+        actionChannel.trySend {
             val actionModel =
                 json.decodeFromString<RequestPushPermissionActionModel>(jsonString)
             actionFactory.create(actionModel)()
@@ -82,7 +92,7 @@ internal class InAppJsBridge(
 
     @JavascriptInterface
     fun openExternalLink(jsonString: String) {
-        applicationScope.launch {
+        actionChannel.trySend {
             val actionModel =
                 json.decodeFromString<BasicOpenExternalUrlActionModel>(jsonString)
             actionFactory.create(actionModel)()
@@ -91,7 +101,7 @@ internal class InAppJsBridge(
 
     @JavascriptInterface
     fun close(jsonString: String) {
-        applicationScope.launch {
+        actionChannel.trySend {
             val actionModel = json.decodeFromString<BasicDismissActionModel>(jsonString)
             actionModel.dismissId = inAppJsBridgeData.dismissId
             actionFactory.create(actionModel)()
@@ -100,11 +110,10 @@ internal class InAppJsBridge(
 
     @JavascriptInterface
     fun copyToClipboard(jsonString: String) {
-        applicationScope.launch {
+        actionChannel.trySend {
             val actionModel =
                 json.decodeFromString<BasicCopyToClipboardActionModel>(jsonString)
             actionFactory.create(actionModel)()
         }
     }
 }
-

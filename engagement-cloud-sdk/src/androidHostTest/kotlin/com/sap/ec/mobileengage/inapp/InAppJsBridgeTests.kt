@@ -11,8 +11,11 @@ import com.sap.ec.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.sap.ec.mobileengage.action.models.RequestPushPermissionActionModel
 import com.sap.ec.mobileengage.inapp.jsbridge.InAppJsBridgeData
 import com.sap.ec.util.JsonUtil
+import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.coVerifyOrder
 import io.mockk.mockk
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -29,6 +32,8 @@ import kotlinx.serialization.json.put
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.AfterTest
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class InAppJsBridgeTests {
@@ -356,6 +361,54 @@ class InAppJsBridgeTests {
 
         coVerify {
             mockActionFactory.create(expectedActionModel)
+        }
+    }
+
+    @Test
+    fun actions_shouldExecuteSequentially_dismissWaitsForPrecedingAction() = runTest {
+        val customEventGate = CompletableDeferred<Unit>()
+        val executionOrder = mutableListOf<String>()
+
+        val customEventAction = object : com.sap.ec.mobileengage.action.actions.Action<Unit> {
+            override suspend fun invoke(value: Unit?) {
+                customEventGate.await()
+                executionOrder.add("customEvent")
+            }
+        }
+        val dismissAction = object : com.sap.ec.mobileengage.action.actions.Action<Unit> {
+            override suspend fun invoke(value: Unit?) {
+                executionOrder.add("dismiss")
+            }
+        }
+
+        coEvery { mockActionFactory.create(any<BasicCustomEventActionModel>()) } returns customEventAction
+        coEvery { mockActionFactory.create(any<BasicDismissActionModel>()) } returns dismissAction
+
+        val customEventString = buildJsonObject {
+            put("type", "MECustomEvent")
+            put("reporting", reporting)
+            put("name", "testEvent")
+            put("payload", json.encodeToJsonElement(payloadMap))
+        }.toString()
+        val dismissString = buildJsonObject {
+            put("type", "Dismiss")
+            put("reporting", reporting)
+        }.toString()
+
+        inAppJsBridge.triggerMEEvent(customEventString)
+        inAppJsBridge.close(dismissString)
+
+        advanceUntilIdle()
+
+        assertTrue(executionOrder.isEmpty(), "Dismiss should not have executed while customEvent is suspended")
+
+        customEventGate.complete(Unit)
+        advanceUntilIdle()
+
+        assertEquals(listOf("customEvent", "dismiss"), executionOrder, "Actions should execute sequentially in order")
+        coVerifyOrder {
+            mockActionFactory.create(any<BasicCustomEventActionModel>())
+            mockActionFactory.create(any<BasicDismissActionModel>())
         }
     }
 }

@@ -8,7 +8,7 @@ import com.sap.ec.mobileengage.action.models.DismissActionModel
 import com.sap.ec.mobileengage.inapp.InAppMessage
 import com.sap.ec.mobileengage.inapp.toIframeId
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -24,6 +24,16 @@ internal class MessageChannelProvider(
 ) : MessageChannelProviderApi {
     private companion object {
         const val CONNECTED_EVENT = "connected"
+    }
+
+    private val actionChannel = Channel<suspend () -> Unit>(Channel.UNLIMITED)
+
+    init {
+        applicationScope.launch {
+            for (action in actionChannel) {
+                action()
+            }
+        }
     }
 
     override fun provide(inAppMessage: InAppMessage): MessageChannel {
@@ -48,7 +58,7 @@ internal class MessageChannelProvider(
                     json.decodeFromString<BasicActionModel>(JSON.stringify(messageEvent.data))
                         .amend(message)
 
-                applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
+                actionChannel.trySend {
                     eventActionFactory.create(actionModel).invoke()
                 }
             } catch (exception: Throwable) {

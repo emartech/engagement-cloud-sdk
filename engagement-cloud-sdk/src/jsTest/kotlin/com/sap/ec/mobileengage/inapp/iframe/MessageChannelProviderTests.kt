@@ -3,6 +3,7 @@ package com.sap.ec.mobileengage.inapp.iframe
 import com.sap.ec.core.log.Logger
 import com.sap.ec.mobileengage.action.EventActionFactoryApi
 import com.sap.ec.mobileengage.action.actions.Action
+import com.sap.ec.mobileengage.action.models.BasicCustomEventActionModel
 import com.sap.ec.mobileengage.action.models.BasicDismissActionModel
 import com.sap.ec.mobileengage.action.models.BasicInAppButtonClickedActionModel
 import com.sap.ec.mobileengage.action.models.BasicOpenExternalUrlActionModel
@@ -30,10 +31,12 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.put
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class MessageChannelProviderTests {
@@ -226,5 +229,59 @@ class MessageChannelProviderTests {
         verifySuspend(VerifyMode.exactly(0)) {
             mockEventActionFactory.create(any())
         }
+    }
+
+    @Test
+    fun provide_shouldExecuteActionsSequentially_dismissWaitsForPrecedingAction() = runTest {
+        val executionOrder = mutableListOf<String>()
+        val customEventGate = CompletableDeferred<Unit>()
+        val dismissCompleted = CompletableDeferred<Unit>()
+
+        val customEventActionModel = BasicCustomEventActionModel(
+            REPORTING,
+            "testEvent",
+            mapOf("pay" to "load")
+        )
+        val dismissActionModel = BasicDismissActionModel(dismissId = DISMISS_ID)
+
+        val mockCustomEventAction: Action<*> = mock(MockMode.autofill) {
+            everySuspend { invoke() } calls {
+                customEventGate.await()
+                executionOrder.add("customEvent")
+            }
+        }
+        val mockDismissAction: Action<*> = mock(MockMode.autofill) {
+            everySuspend { invoke() } calls {
+                executionOrder.add("dismiss")
+                dismissCompleted.complete(Unit)
+            }
+        }
+
+        everySuspend { mockEventActionFactory.create(customEventActionModel) } returns mockCustomEventAction
+        everySuspend { mockEventActionFactory.create(dismissActionModel) } returns mockDismissAction
+
+        val channel = messageChannelProvider.provide(testInAppMessage)
+
+        val customEventMessage = buildJsonObject {
+            put("type", "MECustomEvent")
+            put("reporting", REPORTING)
+            put("name", "testEvent")
+            put("payload", json.encodeToJsonElement(mapOf("pay" to "load")))
+        }
+        val dismissMessage = buildJsonObject {
+            put("type", "Dismiss")
+        }
+
+        channel.port2.postMessage(JSON.parse(json.encodeToString(customEventMessage)))
+        channel.port2.postMessage(JSON.parse(json.encodeToString(dismissMessage)))
+
+        advanceUntilIdle()
+
+        customEventGate.complete(Unit)
+        advanceUntilIdle()
+
+        dismissCompleted.await()
+
+        assertEquals(listOf("customEvent", "dismiss"), executionOrder, "Actions should execute sequentially in order")
     }
 }
