@@ -67,10 +67,13 @@ internal class ListPageViewModel(
     override val platformCategory: String = platformCategoryProvider.provide()
 
     init {
-        coroutineScope.launch(start= CoroutineStart.UNDISPATCHED) {
+        coroutineScope.launch(start = CoroutineStart.UNDISPATCHED) {
             sdkEventDistributor.sdkEventFlow
                 .filter { it is SdkEvent.Internal.EmbeddedMessaging.TriggerRefresh }
-                .collect { refreshTrigger.value = !refreshTrigger.value }
+                .collect {
+                    _selectedMessage.value = null
+                    refreshTrigger.value = !refreshTrigger.value
+                }
         }
     }
 

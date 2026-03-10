@@ -41,6 +41,12 @@
 <div style="margin-top:32px;">
     <button type="button" id="button-disable-sdk">Disable tracking in SDK</button>
 </div>
+<div style="margin-top:32px;">
+    <button type="button" id="button-link-contact">Link contact</button>
+</div>
+<div style="margin-top:32px;">
+    <button type="button" id="button-unlink-contact">Unlink contact</button>
+</div>
 <hr/>
 <div class="embedded-messaging-demo">
     <p>Embedded Messaging Demo</p>
@@ -93,6 +99,14 @@
 
     document.getElementById("button-navigate-event").onclick = async () => {
         await engagementCloud.event.track({ type: "NAVIGATE", location: "https://www.emarsys.com" });
+    }
+
+    document.getElementById("button-link-contact").onclick = async () => {
+        await engagementCloud.contact.link("test1@test.com");
+    }
+
+    document.getElementById("button-unlink-contact").onclick = async () => {
+        await engagementCloud.contact.unlink();
     }
 
     document.getElementById("button-disable-sdk").onclick = async () => {

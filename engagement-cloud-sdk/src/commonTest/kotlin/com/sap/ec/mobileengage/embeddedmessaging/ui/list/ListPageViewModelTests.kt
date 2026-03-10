@@ -4,9 +4,8 @@ import androidx.paging.PagingData
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.providers.InstantProvider
 import com.sap.ec.core.providers.platform.PlatformCategoryProviderApi
-import com.sap.ec.event.SdkEvent
-import kotlinx.coroutines.flow.MutableSharedFlow
 import com.sap.ec.core.util.DownloaderApi
+import com.sap.ec.event.SdkEvent
 import com.sap.ec.mobileengage.action.ActionFactoryApi
 import com.sap.ec.mobileengage.action.models.ActionModel
 import com.sap.ec.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
@@ -28,6 +27,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -543,6 +543,8 @@ class ListPageViewModelTests {
         advanceUntilIdle()
 
         pagingDataList.size shouldBe initialCount + 1
+
+        refreshViewModel.selectedMessage.value shouldBe null
     }
 
 }
