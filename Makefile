@@ -49,9 +49,9 @@ create-apks: check-env
 test: check-env test-android test-web test-sdk-loader test-ios
 
 build-js-html: check-env
-	@./gradlew :engagement-cloud-sdk:jsBrowserProductionWebpack \
+	@./gradlew :engagement-cloud-sdk:jsBrowserDistribution \
 		-Pjs.variant=html \
-		-x :composeApp:jsBrowserProductionWebpack
+		-x :composeApp:jsBrowserDistribution
 
 build-web: build-js-html
 
@@ -181,11 +181,11 @@ pipeline-android: check-env
 
 pipeline-js: check-env
 	@./gradlew \
-		:engagement-cloud-sdk:jsBrowserProductionWebpack \
-		:web-push-service-worker:jsBrowserProductionWebpack \
+		:engagement-cloud-sdk:jsBrowserDistribution \
+		:web-push-service-worker:jsBrowserDistribution \
 		:engagement-cloud-sdk:jsBrowserTest \
 		-Pjs.variant=html \
-		-x :composeApp:jsBrowserProductionWebpack \
+		-x :composeApp:jsBrowserDistribution \
 		-x :composeApp:jsBrowserTest \
 		--no-daemon
 

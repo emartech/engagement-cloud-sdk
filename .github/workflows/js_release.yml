@@ -31,14 +31,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          ./gradlew clean && ./gradlew kotlinUpgradeYarnLock && ./gradlew jsBrowserProductionWebpack
+          ./gradlew clean && ./gradlew kotlinUpgradeYarnLock && ./gradlew jsBrowserDistribution
 
       - name: Gather Artifacts
         id: gather_artifacts
         run: |
           ARTIFACT_DIR="dist/js-artifacts"
           mkdir -p "$ARTIFACT_DIR" && \
-          cp ./engagement-cloud-sdk/build/kotlin-webpack/js/productionExecutable/*.js* "$ARTIFACT_DIR"/ && \
+          cp ./engagement-cloud-sdk/build/dist/js/productionExecutable/*.js* "$ARTIFACT_DIR"/ && \
           cp ./build/js/packages/engagement-cloud-sdk/kotlin/*.d.ts* "$ARTIFACT_DIR"/
           echo "artifact_path=$ARTIFACT_DIR" >> "$GITHUB_OUTPUT"
         shell: bash

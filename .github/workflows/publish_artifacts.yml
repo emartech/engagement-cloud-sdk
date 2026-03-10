@@ -131,7 +131,7 @@ jobs:
       - name: Assemble NPM package
         run: |
           mkdir -p dist/npm
-          cp engagement-cloud-sdk/build/kotlin-webpack/js/productionExecutable/engagement-cloud-sdk-html.js dist/npm/
+          cp engagement-cloud-sdk/build/dist/js/productionExecutable/engagement-cloud-sdk-html.js dist/npm/
           cp build/js/packages/engagement-cloud-sdk/kotlin/engagement-cloud-sdk-html.d.ts dist/npm/ 2>/dev/null || true
           sed "s/\"version\": \"0.0.0\"/\"version\": \"${{ env.VERSION }}\"/" \
             engagement-cloud-sdk/npm-package.json > dist/npm/package.json
@@ -147,7 +147,7 @@ jobs:
           mkdir -p dist/cdn/${{ env.VERSION }}
           
           # Copy main SDK bundle
-          cp engagement-cloud-sdk/build/kotlin-webpack/js/productionExecutable/engagement-cloud-sdk-html.js \
+          cp engagement-cloud-sdk/build/dist/js/productionExecutable/engagement-cloud-sdk-html.js \
             dist/cdn/${{ env.VERSION }}/engagement-cloud-sdk.js
           
           # Copy TypeScript definitions
@@ -159,7 +159,7 @@ jobs:
             dist/cdn/${{ env.VERSION }}/engagement-cloud-sdk-loader.js
           
           # Copy service worker
-          cp web-push-service-worker/build/kotlin-webpack/js/productionExecutable/ec-service-worker.js \
+          cp web-push-service-worker/build/dist/js/productionExecutable/ec-service-worker.js \
             dist/cdn/${{ env.VERSION }}/ec-service-worker.js
           
           # Create latest symlink content (copy same files to latest/)
