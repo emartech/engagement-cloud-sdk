@@ -86,7 +86,7 @@ object EngagementCloud {
     /**
      * Provides access to the Deep Link API, which allows tracking deep link interactions.
      */
-    val deepLink: DeepLinkApi
+    val deeplink: DeepLinkApi
         get() = koin.get<DeepLinkApi>()
 
     /**

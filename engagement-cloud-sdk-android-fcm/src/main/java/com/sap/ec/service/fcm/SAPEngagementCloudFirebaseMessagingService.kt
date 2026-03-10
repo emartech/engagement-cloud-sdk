@@ -43,14 +43,12 @@ class SAPEngagementCloudFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        println("token received: $token")
         val intent = createIntent(PUSH_TOKEN_INTENT_FILTER_ACTION, PUSH_TOKEN_INTENT_KEY, token)
         applicationContext.sendBroadcast(intent)
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
-        println("message received: ${remoteMessage.messageId}")
         messagingServices
             .filter {
                 it.first.includeEngagementCloudMessages || !isEmarsysMessage(remoteMessage.data)

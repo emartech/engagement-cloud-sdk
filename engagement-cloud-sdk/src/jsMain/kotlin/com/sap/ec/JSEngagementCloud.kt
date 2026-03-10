@@ -46,7 +46,7 @@ object JSEngagementCloud {
     val contact: JSContactApi by lazy { koin.get<JSContactApi>() }
     val event: JSTrackingApi by lazy { koin.get<JSTrackingApi>() }
     val push: JSPushApi by lazy { koin.get<JSPushApi>() }
-    val deepLink: JSDeepLinkApi by lazy { koin.get<JSDeepLinkApi>() }
+    val deeplink: JSDeepLinkApi by lazy { koin.get<JSDeepLinkApi>() }
     val embeddedMessaging: JsEmbeddedMessagingApi by lazy { koin.get<JsEmbeddedMessagingApi>() }
 
     suspend fun initializeSdk() {

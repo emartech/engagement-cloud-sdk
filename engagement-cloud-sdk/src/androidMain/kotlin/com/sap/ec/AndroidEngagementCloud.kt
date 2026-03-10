@@ -53,7 +53,7 @@ object AndroidEngagementCloud {
     /**
      * Provides access to the Android Deep Link API, which allows tracking deep link interactions.
      */
-    val deepLink: AndroidDeepLinkApi
+    val deeplink: AndroidDeepLinkApi
         get() = koin.get<AndroidDeepLinkApi>()
 
     /**
