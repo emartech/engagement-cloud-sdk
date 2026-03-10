@@ -31,7 +31,7 @@ env:
   SLACK_CHANNEL: mobile-team-ci
   SLACK_ICON: https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Kotlin_Icon.svg/1200px-Kotlin_Icon.svg.png
   SLACK_TITLE: Commit status
-  SLACK_USERNAME: Unified Emarsys SDK - KMP
+  SLACK_USERNAME: Engagement Cloud SDK
   SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
   SPM_BUILD: ${{ vars.SPM_BUILD }}
 
@@ -183,7 +183,7 @@ jobs:
           user_name: '${{env.SLACK_USERNAME}}'
           job_status: 'failure'
           user_icon: '${{env.SLACK_ICON}}'
-          actions: '[{ "type": "button", "text": "View actions", "url": "https://github.com/emartech/kmp-emarsys-sdk/actions" }]'
+          actions: '[{ "type": "button", "text": "View actions", "url": "https://github.com/emartech/engagement-cloud-sdk/actions" }]'
 
       - name: Report on Slack (Success)
         if: ${{ !contains(needs.*.result, 'cancelled') && !contains(needs.*.result, 'failure') }}
@@ -195,4 +195,4 @@ jobs:
           user_name: '${{env.SLACK_USERNAME}}'
           job_status: 'success'
           user_icon: '${{env.SLACK_ICON}}'
-          actions: '[{ "type": "button", "text": "View actions", "url": "https://github.com/emartech/kmp-emarsys-sdk/actions" }]'
+          actions: '[{ "type": "button", "text": "View actions", "url": "https://github.com/emartech/engagement-cloud-sdk/actions" }]'

@@ -193,10 +193,10 @@ jobs:
           webhook_url: '${{env.SLACK_WEBHOOK}}'
           channel: 'mobile-team-ci'
           message: 'Last push build failed! :man-gesturing-no: :blobcatfearful:'
-          user_name: 'Unified Emarsys SDK'
+          user_name: 'Engagement Cloud SDK'
           job_status: 'failure'
           user_icon: '${{env.SLACK_ICON}}'
-          actions: '[{ "type": "button", "text": "View actions", "url": "https://github.com/emartech/kmp-emarsys-sdk/actions" }]'
+          actions: '[{ "type": "button", "text": "View actions", "url": "https://github.com/emartech/engagement-cloud-sdk/actions" }]'
 
       - name: Report on Slack (Success)
         if: ${{ !contains(needs.*.result, 'cancelled') && !contains(needs.*.result, 'failure') }}
@@ -205,10 +205,10 @@ jobs:
           webhook_url: '${{env.SLACK_WEBHOOK}}'
           channel: 'mobile-team-ci'
           message: 'Last push build successful! :man-gesturing-ok: :bananadance:'
-          user_name: 'Unified Emarsys SDK'
+          user_name: 'Engagement Cloud SDK'
           job_status: 'success'
           user_icon: '${{env.SLACK_ICON}}'
-          actions: '[{ "type": "button", "text": "View actions", "url": "https://github.com/emartech/kmp-emarsys-sdk/actions" }]'
+          actions: '[{ "type": "button", "text": "View actions", "url": "https://github.com/emartech/engagement-cloud-sdk/actions" }]'
 
       - name: Trigger automerge
         if: ${{ !contains(needs.*.result, 'cancelled') && !contains(needs.*.result, 'failure') && github.event.pull_request != null && github.actor == 'dependabot[bot]' && github.event.pull_request.merged == false}}
