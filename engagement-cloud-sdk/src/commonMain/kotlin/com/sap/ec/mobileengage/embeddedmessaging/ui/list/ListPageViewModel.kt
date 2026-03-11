@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.stateIn
 import kotlin.time.ExperimentalTime
@@ -31,7 +32,7 @@ import kotlin.time.Instant
 internal class ListPageViewModel(
     private val embeddedMessagingContext: EmbeddedMessagingContextApi,
     private val timestampProvider: InstantProvider,
-    coroutineScope: CoroutineScope,
+    private val coroutineScope: CoroutineScope,
     private val pagerFactory: PagerFactoryApi,
     connectionWatchDog: ConnectionWatchDog,
     private val locallyDeletedMessageIds: MutableStateFlow<Set<String>>,
@@ -57,6 +58,8 @@ internal class ListPageViewModel(
         MutableStateFlow(null)
     override val selectedMessage: StateFlow<MessageItemViewModelApi?> =
         _selectedMessage.asStateFlow()
+
+    private var selectionJob: Job? = null
 
     private val _showCategorySelector = MutableStateFlow(false)
     override val showCategorySelector: StateFlow<Boolean> = _showCategorySelector.asStateFlow()
@@ -132,28 +135,32 @@ internal class ListPageViewModel(
         _selectedCategoryIds.value = categoryIds
     }
 
-    override suspend fun selectMessage(
+    override fun selectMessage(
         messageViewModel: MessageItemViewModelApi,
         onNavigate: suspend () -> Unit
     ) {
         _selectedMessage.value = messageViewModel
-
-        if (!locallyOpenedMessageIds.value.contains(messageViewModel.id) && messageViewModel.isNotOpened) {
-            messageViewModel.tagMessageOpened()
-                .onSuccess {
-                    val newOpenedIdSet = mutableSetOf(messageViewModel.id)
-                    newOpenedIdSet.addAll(locallyOpenedMessageIds.value)
-                    locallyOpenedMessageIds.value = newOpenedIdSet
-                }
-        }
-
-        if (messageViewModel.hasRichContent()) {
-            onNavigate.invoke()
-        } else {
-            messageViewModel.tagMessageRead().onFailure {
-
+        selectionJob?.cancel()
+        selectionJob = coroutineScope.launch {
+            if (!locallyOpenedMessageIds.value.contains(messageViewModel.id) && messageViewModel.isNotOpened) {
+                messageViewModel.tagMessageOpened()
+                    .onSuccess {
+                        if (_selectedMessage.value == messageViewModel) {
+                            val newOpenedIdSet = mutableSetOf(messageViewModel.id)
+                            newOpenedIdSet.addAll(locallyOpenedMessageIds.value)
+                            locallyOpenedMessageIds.value = newOpenedIdSet
+                        }
+                    }
             }
-            messageViewModel.handleDefaultAction()  // todo error handling
+
+            if (_selectedMessage.value != messageViewModel) return@launch
+
+            if (messageViewModel.hasRichContent()) {
+                onNavigate.invoke()
+            } else {
+                messageViewModel.tagMessageRead().onFailure { }
+                messageViewModel.handleDefaultAction()
+            }
         }
     }
 
@@ -180,6 +187,8 @@ internal class ListPageViewModel(
     }
 
     override fun clearMessageSelection() {
+        selectionJob?.cancel()
+        selectionJob = null
         _selectedMessage.value = null
     }
 

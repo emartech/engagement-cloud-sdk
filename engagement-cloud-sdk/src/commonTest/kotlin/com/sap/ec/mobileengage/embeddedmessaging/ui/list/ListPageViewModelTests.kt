@@ -13,6 +13,7 @@ import com.sap.ec.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
 import com.sap.ec.watchdog.connection.ConnectionWatchDog
 import dev.mokkery.MockMode
+import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.sequentiallyReturns
 import dev.mokkery.every
@@ -28,6 +29,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -339,6 +341,7 @@ class ListPageViewModelTests {
             everySuspend { mockMessageViewModel.deleteMessage() } returns Result.success(Unit)
 
             viewModel.selectMessage(mockMessageViewModel) {}
+            advanceUntilIdle()
             viewModel.deleteMessage(mockMessageViewModel)
             advanceUntilIdle()
 
@@ -392,6 +395,55 @@ class ListPageViewModelTests {
 
         viewModel.selectedMessage.value shouldBe null
     }
+
+    @Test
+    fun testSelectMessage_shouldCancelPreviousSelection_andOnlyApplyLastMessageSideEffects_whenCalledRapidly() =
+        runTest {
+            val mockMessageA = mock<MessageItemViewModelApi>(MockMode.autofill)
+            every { mockMessageA.id } returns "msg-a"
+            every { mockMessageA.isNotOpened } returns true
+            every { mockMessageA.hasRichContent() } returns false
+            everySuspend { mockMessageA.tagMessageOpened() } calls {
+                delay(1000)
+                Result.success(Unit)
+            }
+
+            val mockMessageB = mock<MessageItemViewModelApi>(MockMode.autofill)
+            every { mockMessageB.id } returns "msg-b"
+            every { mockMessageB.isNotOpened } returns true
+            every { mockMessageB.hasRichContent() } returns false
+            everySuspend { mockMessageB.tagMessageOpened() } returns Result.success(Unit)
+
+            viewModel.selectMessage(mockMessageA) {}
+            viewModel.selectMessage(mockMessageB) {}
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            viewModel.selectedMessage.value shouldBe mockMessageB
+            readMessageIds.value shouldBe setOf("msg-b")
+            verifySuspend(VerifyMode.exactly(0)) { mockMessageA.handleDefaultAction() }
+            verifySuspend { mockMessageB.handleDefaultAction() }
+        }
+
+    @Test
+    fun testClearMessageSelection_shouldCancelInFlightSelectionCoroutine() =
+        runTest {
+            val mockMessageA = mock<MessageItemViewModelApi>(MockMode.autofill)
+            every { mockMessageA.id } returns "msg-a"
+            every { mockMessageA.isNotOpened } returns true
+            every { mockMessageA.hasRichContent() } returns false
+            everySuspend { mockMessageA.tagMessageOpened() } calls {
+                delay(1000)
+                Result.success(Unit)
+            }
+
+            viewModel.selectMessage(mockMessageA) {}
+            viewModel.clearMessageSelection()
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            viewModel.selectedMessage.value shouldBe null
+            readMessageIds.value shouldBe emptySet()
+            verifySuspend(VerifyMode.exactly(0)) { mockMessageA.handleDefaultAction() }
+        }
 
     @Test
     fun testOpenCategorySelector_shouldSetShowCategorySelectorToTrue() = runTest {
