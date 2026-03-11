@@ -24,6 +24,7 @@ import com.sap.ec.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingStyle
 import com.sap.ec.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 import com.sap.ec.mobileengage.embeddedmessaging.ui.translation.LocalStringResources
 import kotlinx.browser.window
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.web.css.Position
 import org.jetbrains.compose.web.css.left
@@ -85,6 +86,7 @@ internal fun MessageList(
     val hasFiltersApplied by viewModel.hasFiltersApplied.collectAsState()
 
     val scope = rememberCoroutineScope()
+    var selectionJob by remember { mutableStateOf<Job?>(null) }
 
     var isLandscape by remember {
         mutableStateOf(window.matchMedia("(orientation: landscape)").matches)
@@ -143,7 +145,8 @@ internal fun MessageList(
                         customMessageItemElementName = customMessageItemElementName,
                         onRefresh = { viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() } },
                         onItemClick = {
-                            scope.launch {
+                            selectionJob?.cancel()
+                            selectionJob = scope.launch {
                                 viewModel.selectMessage(it, onNavigate = {})
                             }
                         },
@@ -187,7 +190,7 @@ internal fun MessageList(
             AdaptiveCardContainer(isTabletScale = isTabletScale, isLandscape = isLandscape) {
                 if (selectedMessage?.hasRichContent() ?: false) {
                     MessageDetailView(
-                        viewModel = viewModel.selectedMessage.value!!
+                        viewModel = selectedMessage!!
                     )
                 } else {
                     Div({ classes(EmbeddedMessagingStyleSheet.compactListView) }) {
@@ -207,7 +210,8 @@ internal fun MessageList(
                             customMessageItemElementName = customMessageItemElementName,
                             onRefresh = { viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() } },
                             onItemClick = {
-                                scope.launch {
+                                selectionJob?.cancel()
+                                selectionJob = scope.launch {
                                     viewModel.selectMessage(it, onNavigate = {})
                                 }
                             },

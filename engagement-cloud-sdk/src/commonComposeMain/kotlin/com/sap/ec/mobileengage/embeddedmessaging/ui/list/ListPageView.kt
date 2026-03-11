@@ -56,6 +56,7 @@ import com.sap.ec.mobileengage.embeddedmessaging.ui.item.CustomMessageItemViewMo
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.onScreenTime
 import com.sap.ec.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 import com.sap.ec.mobileengage.embeddedmessaging.ui.translation.LocalStringResources
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 @Composable
@@ -108,6 +109,7 @@ private fun MessageList(
     }
 
     val selectedMessageViewModel by viewModel.selectedMessage.collectAsState()
+    var selectionJob by remember { mutableStateOf<Job?>(null) }
     val hasFiltersApplied by viewModel.hasFiltersApplied.collectAsState()
     val categories by viewModel.categories.collectAsState()
     val hasConnection by viewModel.hasConnection.collectAsState()
@@ -156,11 +158,13 @@ private fun MessageList(
 
     LaunchedEffect(navigator.scaffoldValue[ListDetailPaneScaffoldRole.Detail]) {
         if (navigator.scaffoldValue[ListDetailPaneScaffoldRole.Detail] == PaneAdaptedValue.Hidden) {
+            selectionJob?.cancel()
             viewModel.clearMessageSelection()
         }
     }
 
     BackHandler(enabled = selectedMessageViewModel != null) {
+        selectionJob?.cancel()
         scope.launch {
             navigator.navigateTo(ListDetailPaneScaffoldRole.List)
         }
@@ -204,7 +208,8 @@ private fun MessageList(
                                     withSwipeGestures = viewModel.hasTouchInput,
                                     onRefresh = { viewModel.refreshMessagesWithThrottling { lazyPagingMessageItems.refresh() } },
                                     onMessageClick = { messageViewModel ->
-                                        scope.launch {
+                                        selectionJob?.cancel()
+                                        selectionJob = scope.launch {
                                             viewModel.selectMessage(messageViewModel) {
                                                 navigator.navigateTo(ListDetailPaneScaffoldRole.Detail)
                                             }
@@ -242,8 +247,8 @@ private fun MessageList(
                                 transitionSpec = {
                                     fadeIn() + slideInVertically() togetherWith fadeOut() + slideOutVertically()
                                 }
-                            ) {
-                                selectedMessageViewModel?.let { messageViewModel ->
+                            ) { targetMessage ->
+                                targetMessage?.let { messageViewModel ->
                                     if (messageViewModel.hasRichContent()) {
                                         MessageDetailView(
                                             messageViewModel = messageViewModel,
