@@ -6,6 +6,8 @@ import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.state.State
 import com.sap.ec.response.mapToUnitOrFailure
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
@@ -28,6 +30,7 @@ internal class LinkContactState(
         val linkContactData = try {
             sdkContext.onContactLinkingFailed?.invoke()
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             sdkLogger.debug("Error invoking onContactLinkingFailed callback: ${e.message}", e)
             return Result.failure(e)
         }

@@ -22,6 +22,7 @@ import com.sap.ec.networking.clients.embedded.messaging.model.EmbeddedMessage
 import com.sap.ec.networking.clients.embedded.messaging.model.EmbeddedMessageAnimation
 import com.sap.ec.networking.clients.embedded.messaging.model.ListThumbnailImage
 import dev.mokkery.MockMode
+import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
@@ -42,6 +43,13 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import io.ktor.http.headersOf
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlin.io.encoding.Base64
 import kotlin.test.BeforeTest
@@ -49,6 +57,7 @@ import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class MessageItemModelTests {
     private companion object {
         const val EMBEDDED_MESSAGING_BASE_URL = "https://example.com/url"
@@ -308,4 +317,24 @@ class MessageItemModelTests {
         verifySuspend { mockActionFactory.create(TEST_ACTION) }
         verifySuspend { mockAction() }
     }
+
+    @Test
+    fun updateTagsForMessage_shouldPropagateCancellationException_whenCoroutineIsCancelled() =
+        runTest {
+            val testJob = Job()
+            val testScope = CoroutineScope(StandardTestDispatcher(testScheduler) + testJob)
+
+            everySuspend { mockSdkEventDistributor.registerEvent(any()) } calls {
+                testJob.cancel()
+                throw CancellationException("Job was cancelled")
+            }
+
+            var result: Result<Unit>? = null
+            testScope.launch {
+                result = messageItemModel.tagMessageOpened()
+            }
+            advanceUntilIdle()
+
+            result shouldBe null
+        }
 }

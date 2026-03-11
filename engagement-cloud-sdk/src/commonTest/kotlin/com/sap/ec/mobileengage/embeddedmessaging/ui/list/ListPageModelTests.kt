@@ -13,6 +13,7 @@ import com.sap.ec.networking.clients.embedded.messaging.model.MessagesResponse
 import com.sap.ec.networking.clients.embedded.messaging.model.Meta
 import com.sap.ec.util.JsonUtil.json
 import dev.mokkery.MockMode
+import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend
@@ -21,6 +22,7 @@ import dev.mokkery.matcher.capture.Capture.Companion.slot
 import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
+import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -28,10 +30,18 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import io.ktor.http.headersOf
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ListPageModelTests {
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
     private lateinit var mockSdkEventWaiter: SdkEventWaiterApi
@@ -359,6 +369,69 @@ class ListPageModelTests {
             result.isFailure shouldBe true
             result.exceptionOrNull()?.message shouldBe "Can't fetch more pages because last page reached"
             verifySuspend { mockSdkLogger.debug("Can't fetch more messages, final page reached") }
+        }
+
+    @Test
+    fun fetchMessagesWithCategories_shouldPropagateCancellationException_whenCoroutineIsCancelled() =
+        runTest {
+            val testJob = Job()
+            val testScope = CoroutineScope(StandardTestDispatcher(testScheduler) + testJob)
+
+            everySuspend { mockSdkEventDistributor.registerEvent(any()) } calls {
+                testJob.cancel()
+                throw CancellationException("Job was cancelled")
+            }
+
+            testScope.launch {
+                model.fetchMessagesWithCategories(false, emptyList())
+            }
+            advanceUntilIdle()
+
+            verifySuspend(VerifyMode.exactly(0)) {
+                mockSdkLogger.error("FetchMessagesWithCategories exception.", any<Throwable>())
+            }
+        }
+
+    @Test
+    fun fetchBadgeCount_shouldPropagateCancellationException_whenCoroutineIsCancelled() =
+        runTest {
+            val testJob = Job()
+            val testScope = CoroutineScope(StandardTestDispatcher(testScheduler) + testJob)
+
+            everySuspend { mockSdkEventDistributor.registerEvent(any()) } calls {
+                testJob.cancel()
+                throw CancellationException("Job was cancelled")
+            }
+
+            testScope.launch {
+                model.fetchBadgeCount()
+            }
+            advanceUntilIdle()
+
+            verifySuspend(VerifyMode.exactly(0)) {
+                mockSdkLogger.error("FetchBadgeCount exception.", any<Throwable>())
+            }
+        }
+
+    @Test
+    fun fetchNextPage_shouldPropagateCancellationException_whenCoroutineIsCancelled() =
+        runTest {
+            val testJob = Job()
+            val testScope = CoroutineScope(StandardTestDispatcher(testScheduler) + testJob)
+
+            everySuspend { mockSdkEventDistributor.registerEvent(any()) } calls {
+                testJob.cancel()
+                throw CancellationException("Job was cancelled")
+            }
+
+            testScope.launch {
+                model.fetchNextPage()
+            }
+            advanceUntilIdle()
+
+            verifySuspend(VerifyMode.exactly(0)) {
+                mockSdkLogger.error("FetchNextPage exception.", any<Throwable>())
+            }
         }
 
     private fun createTestMessagesResponse(

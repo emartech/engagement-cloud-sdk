@@ -13,6 +13,8 @@ import com.sap.ec.mobileengage.embeddedmessaging.models.MessageTagUpdate
 import com.sap.ec.mobileengage.embeddedmessaging.models.TagOperation
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Image.BASE64_PLACEHOLDER_IMAGE
 import com.sap.ec.networking.clients.embedded.messaging.model.EmbeddedMessage
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlin.io.encoding.Base64
 import kotlin.time.ExperimentalTime
 
@@ -83,6 +85,7 @@ internal class MessageItemModel(
                     logger.debug("tag update success: $tag $operation for message id '${message.id}'")
                 }
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             Result.failure(e)
         }
     }

@@ -10,6 +10,7 @@ import com.sap.ec.mobileengage.inapp.networking.models.EmbeddedMessagingRichCont
 import com.sap.ec.mobileengage.inapp.presentation.InAppType
 import com.sap.ec.util.JsonUtil
 import dev.mokkery.MockMode
+import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
@@ -28,11 +29,19 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import io.ktor.http.HttpHeaders as KtorHttpHeaders
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class InlineInAppMessageFetcherTests {
 
     private lateinit var mockECNetworkClient: NetworkClientApi
@@ -431,4 +440,53 @@ class InlineInAppMessageFetcherTests {
         val headers = capturedRequest.headers.shouldNotBeNull()
         headers[KtorHttpHeaders.ContentType] shouldBe ContentType.Text.Html.toString()
     }
+
+    @Test
+    fun fetch_byViewId_shouldPropagateCancellationException_whenCoroutineIsCancelled() =
+        runTest {
+            val testJob = Job()
+            val testScope = CoroutineScope(StandardTestDispatcher(testScheduler) + testJob)
+
+            everySuspend { mockECNetworkClient.send(any()) } calls {
+                testJob.cancel()
+                throw CancellationException("Job was cancelled")
+            }
+
+            testScope.launch {
+                fetcher.fetch(testViewId)
+            }
+            advanceUntilIdle()
+
+            verifySuspend(VerifyMode.exactly(0)) {
+                mockLogger.error(
+                    "Exception occurred while fetching or decoding inline message for viewId: $testViewId",
+                    any<Throwable>()
+                )
+            }
+        }
+
+    @Test
+    fun fetch_byUrl_shouldPropagateCancellationException_whenCoroutineIsCancelled() =
+        runTest {
+            val testJob = Job()
+            val testScope = CoroutineScope(StandardTestDispatcher(testScheduler) + testJob)
+            val contentUrl = Url("https://sap.com/inline-content")
+
+            everySuspend { mockECNetworkClient.send(any()) } calls {
+                testJob.cancel()
+                throw CancellationException("Job was cancelled")
+            }
+
+            testScope.launch {
+                fetcher.fetch(contentUrl, testTrackingInfo)
+            }
+            advanceUntilIdle()
+
+            verifySuspend(VerifyMode.exactly(0)) {
+                mockLogger.error(
+                    "Exception occurred while fetching inline message from url: $contentUrl",
+                    any<Throwable>()
+                )
+            }
+        }
 }

@@ -4,6 +4,7 @@ import com.sap.ec.config.LinkContactData
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.channel.SdkEventWaiterApi
+import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.networking.model.UrlRequest
 import com.sap.ec.event.SdkEvent
@@ -24,10 +25,18 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import io.ktor.http.headersOf
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class LinkContactStateTests {
 
     companion object {
@@ -53,6 +62,7 @@ class LinkContactStateTests {
     private lateinit var eventSlot: SlotCapture<SdkEvent>
     private lateinit var linkContactState: LinkContactState
     private lateinit var mockSdkEventWaiter: SdkEventWaiterApi
+    private lateinit var mockSdkLogger: Logger
 
     @BeforeTest
     fun setUp() {
@@ -60,13 +70,14 @@ class LinkContactStateTests {
         mockSdkEventWaiter = mock()
         mockSdkContext = mock(MockMode.autofill)
         mockSdkEventDistributor = mock(MockMode.autofill)
+        mockSdkLogger = mock(MockMode.autofill)
         everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mockSdkEventWaiter
 
         linkContactState =
             LinkContactState(
                 mockSdkContext,
                 mockSdkEventDistributor,
-                sdkLogger = mock(MockMode.autofill)
+                sdkLogger = mockSdkLogger
             )
     }
 
@@ -157,6 +168,32 @@ class LinkContactStateTests {
             result shouldBe Result.failure(testException)
             verifySuspend(VerifyMode.exactly(0)) {
                 mockSdkEventDistributor.registerEvent(any())
+            }
+        }
+
+    @Test
+    fun active_shouldPropagateCancellationException_whenCoroutineIsCancelledDuringCallback() =
+        runTest {
+            val testJob = Job()
+            val testScope = CoroutineScope(StandardTestDispatcher(testScheduler) + testJob)
+
+            every {
+                mockSdkContext.onContactLinkingFailed
+            } returns {
+                testJob.cancel()
+                throw CancellationException("Job was cancelled")
+            }
+
+            testScope.launch {
+                linkContactState.active()
+            }
+            advanceUntilIdle()
+
+            verifySuspend(VerifyMode.exactly(0)) {
+                mockSdkLogger.debug(
+                    "Error invoking onContactLinkingFailed callback: Job was cancelled",
+                    any<Throwable>()
+                )
             }
         }
 
