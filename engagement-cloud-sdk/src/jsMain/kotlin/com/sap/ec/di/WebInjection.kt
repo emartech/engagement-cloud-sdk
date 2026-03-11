@@ -85,11 +85,11 @@ import com.sap.ec.mobileengage.inapp.iframe.MessageChannelProviderApi
 import com.sap.ec.mobileengage.inapp.presentation.InAppPresenterApi
 import com.sap.ec.mobileengage.inapp.presentation.InlineInAppViewRendererApi
 import com.sap.ec.mobileengage.inapp.view.InAppViewProviderApi
-import com.sap.ec.mobileengage.push.PushNotificationClickHandler
-import com.sap.ec.mobileengage.push.PushNotificationClickHandlerApi
 import com.sap.ec.mobileengage.push.PushService
 import com.sap.ec.mobileengage.push.PushServiceContext
 import com.sap.ec.mobileengage.push.PushServiceContextApi
+import com.sap.ec.mobileengage.push.presentation.PushNotificationClickHandler
+import com.sap.ec.mobileengage.push.presentation.PushNotificationClickHandlerApi
 import com.sap.ec.watchdog.connection.ConnectionWatchDog
 import com.sap.ec.watchdog.connection.WebConnectionWatchDog
 import com.sap.ec.watchdog.lifecycle.LifecycleWatchDog
