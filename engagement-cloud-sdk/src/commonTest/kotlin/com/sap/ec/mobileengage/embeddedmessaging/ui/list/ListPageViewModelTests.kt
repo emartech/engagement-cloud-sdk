@@ -3,6 +3,7 @@ package com.sap.ec.mobileengage.embeddedmessaging.ui.list
 import androidx.paging.PagingData
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.providers.InstantProvider
+import com.sap.ec.core.providers.inputmode.InputModeProviderApi
 import com.sap.ec.core.providers.platform.PlatformCategoryProviderApi
 import com.sap.ec.core.util.DownloaderApi
 import com.sap.ec.event.SdkEvent
@@ -65,6 +66,7 @@ class ListPageViewModelTests {
     private lateinit var deletedMessageIds: MutableStateFlow<Set<String>>
     private lateinit var readMessageIds: MutableStateFlow<Set<String>>
     private lateinit var mockPlatformCategoryProvider: PlatformCategoryProviderApi
+    private lateinit var mockInputModeProvider: InputModeProviderApi
 
     @BeforeTest
     fun setup() {
@@ -78,7 +80,9 @@ class ListPageViewModelTests {
         mockConnectionWatchDog = mock(MockMode.autofill)
         mockEmbeddedMessagingContext = mock(MockMode.autofill)
         mockPlatformCategoryProvider = mock(MockMode.autofill)
+        mockInputModeProvider = mock(MockMode.autofill)
         every { mockPlatformCategoryProvider.provide() } returns PLATFORM_CATEGORY
+        every { mockInputModeProvider.hasTouchSupport() } returns true
         deletedMessageIds = MutableStateFlow(emptySet())
         readMessageIds = MutableStateFlow(emptySet())
 
@@ -93,6 +97,7 @@ class ListPageViewModelTests {
             locallyDeletedMessageIds = deletedMessageIds,
             locallyOpenedMessageIds = readMessageIds,
             platformCategoryProvider = mockPlatformCategoryProvider,
+            inputModeProvider = mockInputModeProvider,
             sdkEventDistributor = mockSdkEventDistributor
         )
     }
@@ -505,6 +510,36 @@ class ListPageViewModelTests {
     }
 
     @Test
+    fun hasTouchInput_shouldReturn_true_whenProviderReturnsTrue() {
+        every { mockInputModeProvider.hasTouchSupport() } returns true
+
+        viewModel.hasTouchInput shouldBe true
+    }
+
+    @Test
+    fun hasTouchInput_shouldReturn_false_whenProviderReturnsFalse() {
+        val falseProvider = mock<InputModeProviderApi>()
+        every { falseProvider.hasTouchSupport() } returns false
+        every { mockSdkEventDistributor.sdkEventFlow } returns MutableSharedFlow()
+        every { mockPlatformCategoryProvider.provide() } returns PLATFORM_CATEGORY
+
+        val viewModelWithNoTouch = ListPageViewModel(
+            embeddedMessagingContext = mockEmbeddedMessagingContext,
+            timestampProvider = mockTimestampProvider,
+            coroutineScope = CoroutineScope(SupervisorJob() + testDispatcher),
+            pagerFactory = mockPagerFactory,
+            connectionWatchDog = mockConnectionWatchDog,
+            locallyDeletedMessageIds = deletedMessageIds,
+            locallyOpenedMessageIds = readMessageIds,
+            platformCategoryProvider = mockPlatformCategoryProvider,
+            inputModeProvider = falseProvider,
+            sdkEventDistributor = mockSdkEventDistributor
+        )
+
+        viewModelWithNoTouch.hasTouchInput shouldBe false
+    }
+
+    @Test
     fun testTriggerEmbeddedMessagingRefresh_shouldTriggerPagerRecreation() = runTest {
         val sdkEventFlow = MutableSharedFlow<SdkEvent>(replay = 1)
         every { mockSdkEventDistributor.sdkEventFlow } returns sdkEventFlow
@@ -526,6 +561,7 @@ class ListPageViewModelTests {
             locallyDeletedMessageIds = deletedMessageIds,
             locallyOpenedMessageIds = readMessageIds,
             platformCategoryProvider = mockPlatformCategoryProvider,
+            inputModeProvider = mockInputModeProvider,
             sdkEventDistributor = mockSdkEventDistributor
         )
 

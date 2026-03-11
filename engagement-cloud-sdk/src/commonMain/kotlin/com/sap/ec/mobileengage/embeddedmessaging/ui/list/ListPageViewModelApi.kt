@@ -24,6 +24,8 @@ internal interface ListPageViewModelApi {
 
     val platformCategory: String
 
+    val hasTouchInput: Boolean
+
     fun setFilterUnopenedOnly(unopenedOnly: Boolean)
     fun setSelectedCategoryIds(categoryIds: Set<String>)
 

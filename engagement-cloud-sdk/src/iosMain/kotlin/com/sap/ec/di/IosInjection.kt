@@ -47,6 +47,8 @@ import com.sap.ec.core.providers.IosLanguageProvider
 import com.sap.ec.core.providers.LanguageProviderApi
 import com.sap.ec.core.providers.pagelocation.PageLocationProvider
 import com.sap.ec.core.providers.pagelocation.PageLocationProviderApi
+import com.sap.ec.core.providers.inputmode.InputModeProvider
+import com.sap.ec.core.providers.inputmode.InputModeProviderApi
 import com.sap.ec.core.providers.platform.PlatformCategoryProvider
 import com.sap.ec.core.providers.platform.PlatformCategoryProviderApi
 import com.sap.ec.core.setup.PlatformInitState
@@ -126,6 +128,7 @@ internal object IosInjection {
         }
         single<PageLocationProviderApi> { PageLocationProvider() }
         single<PlatformCategoryProviderApi> { PlatformCategoryProvider() }
+        single<InputModeProviderApi> { InputModeProvider() }
         single<DeviceInfoCollectorApi> {
             DeviceInfoCollector(
                 clientIdProvider = ClientIdProvider(uuidProvider = get(), storage = get()),

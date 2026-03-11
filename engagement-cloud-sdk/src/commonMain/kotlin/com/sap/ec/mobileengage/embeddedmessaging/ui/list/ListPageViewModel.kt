@@ -4,6 +4,7 @@ import androidx.paging.cachedIn
 import androidx.paging.map
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.providers.InstantProvider
+import com.sap.ec.core.providers.inputmode.InputModeProviderApi
 import com.sap.ec.core.providers.platform.PlatformCategoryProviderApi
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
@@ -36,6 +37,7 @@ internal class ListPageViewModel(
     private val locallyDeletedMessageIds: MutableStateFlow<Set<String>>,
     private val locallyOpenedMessageIds: MutableStateFlow<Set<String>>,
     platformCategoryProvider: PlatformCategoryProviderApi,
+    inputModeProvider: InputModeProviderApi,
     sdkEventDistributor: SdkEventDistributorApi
 ) : ListPageViewModelApi {
     private val _categories = MutableStateFlow<List<MessageCategory>>(emptyList())
@@ -65,6 +67,8 @@ internal class ListPageViewModel(
     private val refreshTrigger = MutableStateFlow(false)
 
     override val platformCategory: String = platformCategoryProvider.provide()
+
+    override val hasTouchInput: Boolean = inputModeProvider.hasTouchSupport()
 
     init {
         coroutineScope.launch(start = CoroutineStart.UNDISPATCHED) {
