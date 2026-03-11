@@ -471,7 +471,6 @@ class ListPageViewModelTests {
 
             viewModel.selectedMessage.value shouldBe mockMessageB
             readMessageIds.value shouldBe setOf("msg-b")
-            readMessageIds.value.contains("msg-a") shouldBe false
             navigationCountA shouldBe 0
             navigationCountB shouldBe 1
         }
@@ -489,12 +488,14 @@ class ListPageViewModelTests {
             every { mockMessageB.id } returns "msg-b"
             every { mockMessageB.isNotOpened } returns false
             every { mockMessageB.hasRichContent() } returns false
+            everySuspend { mockMessageB.handleDefaultAction() } calls { }
 
             viewModel.selectMessage(mockMessageA) {}
             viewModel.selectMessage(mockMessageB) {}
             testDispatcher.scheduler.advanceUntilIdle()
 
             viewModel.selectedMessage.value shouldBe mockMessageB
+            verifySuspend(VerifyMode.exactly(0)) { mockMessageA.handleDefaultAction() }
             verifySuspend { mockMessageB.handleDefaultAction() }
         }
 
