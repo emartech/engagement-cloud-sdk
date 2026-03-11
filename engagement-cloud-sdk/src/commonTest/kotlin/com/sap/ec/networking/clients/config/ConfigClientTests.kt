@@ -36,9 +36,11 @@ import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.take
@@ -349,6 +351,34 @@ class ConfigClientTests {
         }
         verifySuspend(VerifyMode.exactly(0)) {
             mockEventsDao.removeEvent(changeAppCode)
+        }
+    }
+
+    @Test
+    fun testConsumer_shouldPropagateCancellationException_whenCoroutineIsCancelled() = runTest {
+        val clientJob = Job()
+        val clientScope = CoroutineScope(StandardTestDispatcher(testScheduler) + clientJob)
+
+        everySuspend { mockUrlFactory.create(ECUrlType.ChangeApplicationCode) } calls {
+            clientJob.cancel()
+            throw CancellationException("Job was cancelled")
+        }
+
+        createConfigClient(clientScope).register()
+
+        val changeAppCode = SdkEvent.Internal.Sdk.ChangeAppCode(
+            id = "cancellationTestId",
+            applicationCode = "CancelAppCode"
+        )
+        onlineEvents.emit(changeAppCode)
+        advanceUntilIdle()
+
+        verifySuspend(VerifyMode.exactly(0)) {
+            mockClientExceptionHandler.handleException(
+                any(),
+                any<String>(),
+                any()
+            )
         }
     }
 

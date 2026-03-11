@@ -16,6 +16,7 @@ import com.sap.ec.mobileengage.embeddedmessaging.networking.EmbeddedMessagingReq
 import com.sap.ec.networking.clients.embedded.messaging.model.MetaData
 import com.sap.ec.networking.clients.error.ClientExceptionHandler
 import dev.mokkery.MockMode
+import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.sequentiallyReturns
 import dev.mokkery.answering.throws
@@ -32,9 +33,11 @@ import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.take
@@ -373,6 +376,35 @@ class EmbeddedMessagingClientTest {
             }
             embeddedMessagingContext.metaData.value shouldBe expectedResponse.body<MetaData>()
         }
+
+    @Test
+    fun testConsumer_shouldPropagateCancellationException_whenCoroutineIsCancelled() = runTest {
+        val clientJob = Job()
+        val clientScope = CoroutineScope(StandardTestDispatcher(testScheduler) + clientJob)
+
+        everySuspend { mockEmbeddedMessagesRequestFactory.create(any()) } calls {
+            clientJob.cancel()
+            throw CancellationException("Job was cancelled")
+        }
+        everySuspend {
+            mockClientExceptionHandler.handleException(any(), any<String>(), any())
+        } returns Unit
+        everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
+
+        createEmbeddedMessagingClient(clientScope).register()
+
+        val event = SdkEvent.Internal.EmbeddedMessaging.FetchBadgeCount(nackCount = 0)
+        onlineEvents.emit(event)
+        advanceUntilIdle()
+
+        verifySuspend(VerifyMode.exactly(0)) {
+            mockClientExceptionHandler.handleException(
+                any(),
+                any<String>(),
+                any()
+            )
+        }
+    }
 
     private fun createMetaDataResponseString(): String {
         val metaDataResponseString = """{

@@ -19,6 +19,8 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlin.time.ExperimentalTime
@@ -86,6 +88,7 @@ internal class DeviceClient(
     }
 
     private suspend fun handleException(exception: Throwable, sdkEvent: OnlineSdkEvent) {
+        currentCoroutineContext().ensureActive()
         if (exception is NetworkIOException) {
             sdkEventManager.emitEvent(sdkEvent)
         } else {
