@@ -139,8 +139,8 @@ internal class ListPageViewModel(
         messageViewModel: MessageItemViewModelApi,
         onNavigate: suspend () -> Unit
     ) {
-        _selectedMessage.value = messageViewModel
         selectionJob?.cancel()
+        _selectedMessage.value = messageViewModel
         selectionJob = coroutineScope.launch {
             if (!locallyOpenedMessageIds.value.contains(messageViewModel.id) && messageViewModel.isNotOpened) {
                 messageViewModel.tagMessageOpened()
@@ -158,6 +158,7 @@ internal class ListPageViewModel(
             if (messageViewModel.hasRichContent()) {
                 onNavigate.invoke()
             } else {
+                // Fire-and-forget: read tagging failures are non-critical and do not affect UX
                 messageViewModel.tagMessageRead().onFailure { }
                 messageViewModel.handleDefaultAction()
             }

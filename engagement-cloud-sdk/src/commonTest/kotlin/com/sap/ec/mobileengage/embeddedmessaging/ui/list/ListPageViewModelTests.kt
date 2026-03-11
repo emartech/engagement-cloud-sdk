@@ -345,7 +345,7 @@ class ListPageViewModelTests {
             viewModel.deleteMessage(mockMessageViewModel)
             advanceUntilIdle()
 
-
+            viewModel.selectedMessage.value shouldBe null
             verifySuspend {
                 mockMessageViewModel.deleteMessage()
             }
