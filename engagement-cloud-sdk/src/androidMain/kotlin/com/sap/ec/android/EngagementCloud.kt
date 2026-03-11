@@ -1,4 +1,4 @@
-package com.sap.ec
+package com.sap.ec.android
 
 import com.sap.ec.api.config.AndroidConfigApi
 import com.sap.ec.api.contact.ContactApi
@@ -20,7 +20,7 @@ import org.koin.core.qualifier.named
 /**
  * The main entry point for interacting with the Engagement Cloud SDK on Android.
  */
-object AndroidEngagementCloud {
+object EngagementCloud {
 
     /**
      * Publishes a flow of SDK events that can be observed externally.
