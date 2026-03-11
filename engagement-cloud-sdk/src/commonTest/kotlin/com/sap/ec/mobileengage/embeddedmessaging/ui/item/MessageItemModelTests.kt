@@ -227,6 +227,24 @@ class MessageItemModelTests {
     }
 
     @Test
+    fun deleteMessage_shouldPropagateCancellationException() = runTest {
+        everySuspend { mockSdkEventDistributor.registerEvent(any()) } throws CancellationException("coroutine cancelled")
+
+        shouldThrow<CancellationException> {
+            messageItemModel.deleteMessage()
+        }
+    }
+
+    @Test
+    fun tagMessageRead_shouldPropagateCancellationException() = runTest {
+        everySuspend { mockSdkEventDistributor.registerEvent(any()) } throws CancellationException("coroutine cancelled")
+
+        shouldThrow<CancellationException> {
+            messageItemModel.tagMessageRead()
+        }
+    }
+
+    @Test
     fun isNotOpened_shouldReturnFalse_whenTagsContainingOpened() = runTest {
         val model = createMessageItemModel(TEST_MESSAGE.copy(tags = listOf("opened")))
 

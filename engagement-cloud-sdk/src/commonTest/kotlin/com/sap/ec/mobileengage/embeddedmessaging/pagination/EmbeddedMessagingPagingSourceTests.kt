@@ -230,6 +230,20 @@ class EmbeddedMessagingPagingSourceTests {
     }
 
     @Test
+    fun testLoad_shouldPropagateCancellationException_whenFetchNextPageThrowsCancellationException() = runTest {
+        val embeddedMessagingPagingSource = createEmbeddedMessagingPagingSource()
+        everySuspend { mockListPageModel.fetchNextPage() } throws CancellationException("coroutine cancelled")
+
+        shouldThrow<CancellationException> {
+            embeddedMessagingPagingSource.load(
+                PagingSource.LoadParams.Refresh(
+                    key = 1, loadSize = 20, placeholdersEnabled = false
+                )
+            )
+        }
+    }
+
+    @Test
     fun testGetRefreshKey_should_return_0() = runTest {
         val embeddedMessagingPagingSource = createEmbeddedMessagingPagingSource()
 

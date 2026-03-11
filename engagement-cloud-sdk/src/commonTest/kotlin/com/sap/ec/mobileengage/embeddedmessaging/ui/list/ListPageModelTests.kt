@@ -390,6 +390,36 @@ class ListPageModelTests {
         }
     }
 
+    @Test
+    fun fetchMessagesWithCategories_shouldPropagateCancellationException_fromAwait() = runTest {
+        everySuspend { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMessages>()) } returns mockSdkEventWaiter
+        everySuspend { mockSdkEventWaiter.await<Response>() } throws CancellationException("coroutine cancelled")
+
+        shouldThrow<CancellationException> {
+            model.fetchMessagesWithCategories(false, emptyList())
+        }
+    }
+
+    @Test
+    fun fetchBadgeCount_shouldPropagateCancellationException_fromAwait() = runTest {
+        everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mockSdkEventWaiter
+        everySuspend { mockSdkEventWaiter.await<Response>() } throws CancellationException("coroutine cancelled")
+
+        shouldThrow<CancellationException> {
+            model.fetchBadgeCount()
+        }
+    }
+
+    @Test
+    fun fetchNextPage_shouldPropagateCancellationException_fromAwait() = runTest {
+        everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mockSdkEventWaiter
+        everySuspend { mockSdkEventWaiter.await<Response>() } throws CancellationException("coroutine cancelled")
+
+        shouldThrow<CancellationException> {
+            model.fetchNextPage()
+        }
+    }
+
     private fun createTestMessagesResponse(
         messagesReturned: Int,
         maximumMessagesPerPageReturned: Int,
