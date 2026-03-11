@@ -25,16 +25,17 @@ import web.window.window
 
 @OptIn(ExperimentalWasmJsInterop::class)
 fun main() {
+    window["engagementCloudHtmlVersion"] = true
     val loaderUsed = (window["engagementCloudSdkLoaderUsed"] as? Boolean) ?: false
     if (!loaderUsed) {
         SdkKoinIsolationContext.init()
-        JSEngagementCloud.init()
+        initializeCustomElements()
     }
 }
 
 typealias EngagementCloudSdkEventListener = (JsApiEvent) -> Unit
 
-@OptIn(ExperimentalJsExport::class)
+@OptIn(ExperimentalJsExport::class, ExperimentalWasmJsInterop::class)
 @JsExport
 @JsName("EngagementCloud")
 object JSEngagementCloud {
@@ -49,12 +50,18 @@ object JSEngagementCloud {
     val deepLink: JSDeepLinkApi by lazy { koin.get<JSDeepLinkApi>() }
     val embeddedMessaging: JsEmbeddedMessagingApi by lazy { koin.get<JsEmbeddedMessagingApi>() }
 
-    suspend fun initializeSdk() {
-        SdkKoinIsolationContext.initLaunch()
-        init()
+    init {
+        val isHtmlVersion = (window["engagementCloudHtmlVersion"] as? Boolean) ?: false
+                || (window["engagementCloudSdkLoaderUsed"] as? Boolean) ?: false
+        if (!isHtmlVersion) {
+            println("Init running for canvas version")
+            SdkKoinIsolationContext.init()
+            initializeCustomElements()
+        }
     }
 
-    internal fun init() {
+    suspend fun initializeSdk() {
+        SdkKoinIsolationContext.initLaunch()
         initializeCustomElements()
     }
 
