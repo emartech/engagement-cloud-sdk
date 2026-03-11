@@ -12,6 +12,8 @@ import com.sap.ec.mobileengage.push.model.AndroidPlatformData
 import com.sap.ec.mobileengage.push.model.NotificationMethod
 import com.sap.ec.mobileengage.push.model.NotificationStyle
 import com.sap.ec.mobileengage.push.model.SilentAndroidPushMessage
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
@@ -80,6 +82,7 @@ internal class SilentHuaweiPushV2Mapper(
                 actionableData = actionableData
             )
         } catch (exception: Exception) {
+            currentCoroutineContext().ensureActive()
             logger.error("push mapping failed", exception)
             null
         }

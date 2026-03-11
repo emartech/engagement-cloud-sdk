@@ -11,6 +11,8 @@ import com.sap.ec.mobileengage.push.DisplayableData
 import com.sap.ec.mobileengage.push.model.JsPlatformData
 import com.sap.ec.mobileengage.push.model.JsPushMessage
 import com.sap.ec.mobileengage.push.model.v1.RemoteWebPushMessageV2
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -50,6 +52,7 @@ class PushMessageWebV2Mapper(
                 )
             )
         } catch (exception: Exception) {
+            currentCoroutineContext().ensureActive()
             logger.logToConsole(
                 "WebPushMessageV2Mapper",
                 LogLevel.Error,

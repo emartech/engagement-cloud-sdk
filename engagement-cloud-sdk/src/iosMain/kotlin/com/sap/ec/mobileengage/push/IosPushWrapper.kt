@@ -10,6 +10,8 @@ import com.sap.ec.core.log.Logger
 import com.sap.ec.mobileengage.push.extension.toSilentPushUserInfo
 import com.sap.ec.util.JsonUtil
 import com.sap.ec.util.runCatchingWithoutCancellation
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 
@@ -65,6 +67,7 @@ internal class IosPushWrapper<Logging : IosPushInstance, Gatherer : IosPushInsta
                         )
                     }
                 } catch (e: Exception) {
+                    currentCoroutineContext().ensureActive()
                     sdkLogger.error("IosPush - handleSilentMessageWithUserInfo", e)
                     throw PreconditionFailedException("Error while handling silent push message, the userInfo can't be parsed")
                 }

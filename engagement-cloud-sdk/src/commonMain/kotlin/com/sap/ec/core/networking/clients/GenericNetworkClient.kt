@@ -22,6 +22,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.isActive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -111,6 +112,7 @@ internal class GenericNetworkClient(
                 }
             }
         } catch (throwable: Throwable) {
+            currentCoroutineContext().ensureActive()
             sdkLogger.error(
                 "EventClient - consumeEvents: Exception during event consumption",
                 throwable,

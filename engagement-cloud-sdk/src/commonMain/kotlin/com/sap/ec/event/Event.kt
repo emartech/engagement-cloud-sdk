@@ -41,6 +41,8 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
@@ -51,6 +53,7 @@ sealed interface OnlineSdkEvent : SdkEvent {
         try {
             eventsDao.removeEvent(this)
         } catch (exception: Exception) {
+            currentCoroutineContext().ensureActive()
             sdkLogger.error(
                 "OnlineSdkEvent - ack: error acking OnlineSdkEvent",
                 exception,
@@ -71,6 +74,7 @@ sealed interface OnlineSdkEvent : SdkEvent {
                 eventsDao.upsertEvent(this)
             }
         } catch (exception: Exception) {
+            currentCoroutineContext().ensureActive()
             sdkLogger.error(
                 "OnlineSdkEvent - nack: error nack OnlineSdkEvent",
                 exception,

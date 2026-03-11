@@ -19,6 +19,8 @@ import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
@@ -69,6 +71,7 @@ internal class ContactClient(
     }
 
     private suspend fun handleException(exception: Throwable, sdkEvent: OnlineSdkEvent) {
+        currentCoroutineContext().ensureActive()
         if (exception is NetworkIOException) {
             sdkEventManager.emitEvent(sdkEvent)
         } else {

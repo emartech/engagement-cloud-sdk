@@ -33,6 +33,8 @@ import com.sap.ec.mobileengage.push.extension.toPushUserInfo
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -155,6 +157,7 @@ internal class IosPushInternal(
                     sdkLogger.debug("Could not parse push notification user info")
                 }
             } catch (exception: Exception) {
+                currentCoroutineContext().ensureActive()
                 sdkLogger.error("DidReceiveNotificationResponse", exception)
             } finally {
                 withContext(Dispatchers.Main) {

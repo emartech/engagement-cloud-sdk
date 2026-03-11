@@ -1,6 +1,8 @@
 package com.sap.ec.core.storage
 
 import com.sap.ec.core.log.Logger
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 
@@ -15,6 +17,7 @@ internal class TypedStorage(
             val stringValue = json.encodeToString(serializer, value)
             stringStorage.put(key, stringValue)
         } catch (exception: Exception) {
+            currentCoroutineContext().ensureActive()
             sdkLogger.error("put", exception)
         }
     }
@@ -25,6 +28,7 @@ internal class TypedStorage(
                 json.decodeFromString(serializer, it)
             }
         } catch (exception: Exception) {
+            currentCoroutineContext().ensureActive()
             sdkLogger.error("get", exception)
             null
         }

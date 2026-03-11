@@ -7,6 +7,8 @@ import io.ktor.client.request.get
 import io.ktor.client.statement.readRawBytes
 import io.ktor.http.Url
 import io.ktor.http.isSuccess
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 
 internal class Downloader(
     private val client: HttpClient,
@@ -20,6 +22,7 @@ internal class Downloader(
             val fileName = "${urlString.hashCode()}"
             fileCache.get(fileName) ?: downloadAndCache(url, fileName) ?: fallback
         } catch (exception: Exception) {
+            currentCoroutineContext().ensureActive()
             logger.error("Downloader", exception)
             fallback
         }

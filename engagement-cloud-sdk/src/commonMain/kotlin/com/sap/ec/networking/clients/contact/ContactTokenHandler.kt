@@ -4,6 +4,8 @@ import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.context.RequestContextApi
 import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.networking.model.body
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 
 internal class ContactTokenHandler(
     private val requestContext: RequestContextApi,
@@ -16,6 +18,7 @@ internal class ContactTokenHandler(
             requestContext.refreshToken = body.refreshToken
             requestContext.contactToken = body.contactToken
         } catch (ignored: Exception) {
+            currentCoroutineContext().ensureActive()
             sdkLogger.error("ContactTokenHandler - handleContactTokens", ignored)
         }
     }
