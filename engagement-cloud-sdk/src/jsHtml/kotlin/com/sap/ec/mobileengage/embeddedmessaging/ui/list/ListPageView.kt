@@ -305,8 +305,9 @@ internal fun MessageListContent(
                         onItemClick(it)
                     },
                     withDeleteIcon = withDeleteIcon,
-                    paginationId = "ListPageView"
-                ) { onDeleteIconClicked(it) }
+                    paginationId = "ListPageView",
+                    onDeleteIconClicked = { onDeleteIconClicked(it) }
+                )
             }
         }
     }

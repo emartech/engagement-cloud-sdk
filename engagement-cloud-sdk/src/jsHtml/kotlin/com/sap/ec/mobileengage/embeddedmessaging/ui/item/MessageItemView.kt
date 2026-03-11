@@ -99,7 +99,10 @@ internal fun MessageItemView(
             if (withDeleteIcon) {
                 Div({
                     classes(EmbeddedMessagingStyleSheet.messageItemMisc)
-                    onClick { onDeleteClicked() }
+                    onClick {
+                        it.stopPropagation()
+                        onDeleteClicked()
+                    }
                 }) {
                     SvgIcon(
                         path = DELETE_ICON_PATH,
