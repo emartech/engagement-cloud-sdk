@@ -124,7 +124,7 @@ private fun CategoryFilterChipsList(
                 if (isSelected) {
                     SvgIcon(
                         path = CHECK_ICON_PATH,
-                        className = "EmbeddedMessagingStyleSheet-svgCheckmarkIconSize"
+                        className = EmbeddedMessagingStyleSheet.svgCheckmarkIconSize
                     )
                 }
                 Text(value)

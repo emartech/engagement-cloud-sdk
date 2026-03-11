@@ -268,6 +268,7 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
     val svgDefaultIconSize by style {
         width(DEFAULT_ICON_SIZE)
         height(DEFAULT_ICON_SIZE)
+        property("box-sizing", "initial")
     }
 
     val svgCheckmarkIconSize by style {
@@ -698,12 +699,6 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Column)
         gap(DEFAULT_PADDING)
-    }
-
-    val detailImage by style {
-        maxWidth(MAX_WIDTH)
-        borderRadius(DEFAULT_BORDER_RADIUS)
-        property("object-fit", "contain")
     }
 
     private val shimmer by keyframes {
