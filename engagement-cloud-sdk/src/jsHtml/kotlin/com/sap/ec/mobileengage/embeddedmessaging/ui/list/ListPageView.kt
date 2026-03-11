@@ -24,7 +24,6 @@ import com.sap.ec.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingStyle
 import com.sap.ec.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 import com.sap.ec.mobileengage.embeddedmessaging.ui.translation.LocalStringResources
 import kotlinx.browser.window
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.web.css.Position
 import org.jetbrains.compose.web.css.left
@@ -86,7 +85,6 @@ internal fun MessageList(
     val hasFiltersApplied by viewModel.hasFiltersApplied.collectAsState()
 
     val scope = rememberCoroutineScope()
-    val selectionJobRef = remember { object { var job: Job? = null } }
 
     var isLandscape by remember {
         mutableStateOf(window.matchMedia("(orientation: landscape)").matches)
@@ -145,10 +143,7 @@ internal fun MessageList(
                         customMessageItemElementName = customMessageItemElementName,
                         onRefresh = { viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() } },
                         onItemClick = {
-                            selectionJobRef.job?.cancel()
-                            selectionJobRef.job = scope.launch {
-                                viewModel.selectMessage(it, onNavigate = {})
-                            }
+                            viewModel.selectMessage(it, onNavigate = {})
                         },
                         onClearFilters = {
                             viewModel.setSelectedCategoryIds(emptySet())
@@ -212,10 +207,7 @@ internal fun MessageList(
                             customMessageItemElementName = customMessageItemElementName,
                             onRefresh = { viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() } },
                             onItemClick = {
-                                selectionJobRef.job?.cancel()
-                                selectionJobRef.job = scope.launch {
-                                    viewModel.selectMessage(it, onNavigate = {})
-                                }
+                                viewModel.selectMessage(it, onNavigate = {})
                             },
                             onClearFilters = {
                                 viewModel.setSelectedCategoryIds(emptySet())

@@ -56,7 +56,6 @@ import com.sap.ec.mobileengage.embeddedmessaging.ui.item.CustomMessageItemViewMo
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.onScreenTime
 import com.sap.ec.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 import com.sap.ec.mobileengage.embeddedmessaging.ui.translation.LocalStringResources
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 @Composable
@@ -109,7 +108,6 @@ private fun MessageList(
     }
 
     val selectedMessageViewModel by viewModel.selectedMessage.collectAsState()
-    val selectionJobRef = remember { object { var job: Job? = null } }
     val hasFiltersApplied by viewModel.hasFiltersApplied.collectAsState()
     val categories by viewModel.categories.collectAsState()
     val hasConnection by viewModel.hasConnection.collectAsState()
@@ -158,13 +156,11 @@ private fun MessageList(
 
     LaunchedEffect(navigator.scaffoldValue[ListDetailPaneScaffoldRole.Detail]) {
         if (navigator.scaffoldValue[ListDetailPaneScaffoldRole.Detail] == PaneAdaptedValue.Hidden) {
-            selectionJobRef.job?.cancel()
             viewModel.clearMessageSelection()
         }
     }
 
     BackHandler(enabled = selectedMessageViewModel != null) {
-        selectionJobRef.job?.cancel()
         scope.launch {
             navigator.navigateTo(ListDetailPaneScaffoldRole.List)
         }
@@ -208,11 +204,8 @@ private fun MessageList(
                                     withSwipeGestures = viewModel.hasTouchInput,
                                     onRefresh = { viewModel.refreshMessagesWithThrottling { lazyPagingMessageItems.refresh() } },
                                     onMessageClick = { messageViewModel ->
-                                        selectionJobRef.job?.cancel()
-                                        selectionJobRef.job = scope.launch {
-                                            viewModel.selectMessage(messageViewModel) {
-                                                navigator.navigateTo(ListDetailPaneScaffoldRole.Detail)
-                                            }
+                                        viewModel.selectMessage(messageViewModel) {
+                                            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail)
                                         }
                                     },
                                     onMessageDelete = { messageId ->
