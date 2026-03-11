@@ -30,25 +30,18 @@ internal data class ReportingAction(
             }
 
             is BasicInAppButtonClickedActionModel -> {
-                if (action.inAppType == InAppType.EMBEDDED_MESSAGING) {
-                    sdkEventDistributor.registerEvent(
-                        SdkEvent.Internal.InApp.ButtonClicked(
-                            reporting = action.reporting,
-                            trackingInfo = action.trackingInfo,
-                            origin = BUTTON_CLICK_ORIGIN,
-                            reportingName = EMBEDDED_MESSAGING_BUTTON_CLICKED_EVENT_NAME
-                        )
+                val eventName = if (action.inAppType == InAppType.EMBEDDED_MESSAGING)
+                    EMBEDDED_MESSAGING_BUTTON_CLICKED_EVENT_NAME
+                else
+                    IN_APP_BUTTON_CLICKED_EVENT_NAME
+                sdkEventDistributor.registerEvent(
+                    SdkEvent.Internal.InApp.ButtonClicked(
+                        reporting = action.reporting,
+                        trackingInfo = action.trackingInfo,
+                        origin = BUTTON_CLICK_ORIGIN,
+                        reportingName = eventName
                     )
-                } else {
-                    sdkEventDistributor.registerEvent(
-                        SdkEvent.Internal.InApp.ButtonClicked(
-                            reporting = action.reporting,
-                            trackingInfo = action.trackingInfo,
-                            origin = BUTTON_CLICK_ORIGIN,
-                            reportingName = IN_APP_BUTTON_CLICKED_EVENT_NAME
-                        )
-                    )
-                }
+                )
             }
 
             is NotificationOpenedActionModel -> {

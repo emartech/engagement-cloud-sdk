@@ -106,9 +106,9 @@ internal class InAppJsBridge(
     @JavascriptInterface
     fun close(jsonString: String) {
         actionChannel.trySend {
-            val actionModel = json.decodeFromString<BasicDismissActionModel>(jsonString)
-            actionModel.dismissId = inAppJsBridgeData.dismissId
-            actionModel.inAppType = inAppJsBridgeData.inAppType
+            val actionModel =
+                json.decodeFromString<BasicDismissActionModel>(jsonString)
+                    .amendForJsBridge(inAppJsBridgeData)
             actionFactory.create(actionModel)()
         }
     }

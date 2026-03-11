@@ -75,11 +75,11 @@ class ReportingActionTests {
         )
         val action = ReportingAction(inAppButtonClickedActionModel, mockSdkEventDistributor)
         val expectedEvent = SdkEvent.Internal.InApp.ButtonClicked(
-            reportingName = "inapp:click",
-            ID,
+            id = ID,
             reporting = REPORTING,
             trackingInfo = TRACKING_INFO,
-            origin = BUTTON_CLICK_ORIGIN
+            origin = BUTTON_CLICK_ORIGIN,
+            reportingName = "inapp:click"
         )
 
         val eventSlot = slot<SdkEvent>()
@@ -103,11 +103,11 @@ class ReportingActionTests {
             )
             val action = ReportingAction(inAppButtonClickedActionModel, mockSdkEventDistributor)
             val expectedEvent = SdkEvent.Internal.InApp.ButtonClicked(
-                reportingName = "em:click",
-                ID,
+                id = ID,
                 reporting = REPORTING,
                 trackingInfo = TRACKING_INFO,
-                origin = BUTTON_CLICK_ORIGIN
+                origin = BUTTON_CLICK_ORIGIN,
+                reportingName = "em:click"
             )
 
             val eventSlot = slot<SdkEvent>()

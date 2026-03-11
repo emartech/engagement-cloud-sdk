@@ -6,6 +6,7 @@ import com.sap.ec.mobileengage.action.actions.Action
 import com.sap.ec.mobileengage.action.models.ActionModel
 import com.sap.ec.mobileengage.action.models.BasicCustomEventActionModel
 import com.sap.ec.mobileengage.action.models.BasicDismissActionModel
+import com.sap.ec.mobileengage.action.models.BasicInAppButtonClickedActionModel
 import com.sap.ec.mobileengage.inapp.jsbridge.InAppJsBridgeData
 import com.sap.ec.mobileengage.inapp.presentation.InAppType
 import com.sap.ec.util.JsonUtil
@@ -29,6 +30,7 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
 private class FakeWKScriptMessage(
@@ -110,5 +112,41 @@ class InAppJsBridgeTests {
         advanceUntilIdle()
 
         assertEquals(listOf("customEvent", "dismiss"), executionOrder, "Actions should execute sequentially in order")
+    }
+
+    @Test
+    fun buttonClicked_shouldPassEmbeddedMessagingInAppType_whenBridgeDataHasEmbeddedMessaging() = runTest {
+        val dispatcher = StandardTestDispatcher(testScheduler)
+        val embeddedMockActionFactory: ActionFactoryApi<ActionModel> = mock(MockMode.autofill)
+        val embeddedMockLogger: Logger = mock(MockMode.autofill)
+
+        val embeddedBridge = InAppJsBridge(
+            actionFactory = embeddedMockActionFactory,
+            inAppJsBridgeData = InAppJsBridgeData(DISMISS_ID, TRACKING_INFO, InAppType.EMBEDDED_MESSAGING),
+            mainDispatcher = dispatcher,
+            sdkDispatcher = dispatcher,
+            logger = embeddedMockLogger,
+            json = json
+        )
+
+        var capturedModel: ActionModel? = null
+        val mockAction: Action<*> = mock(MockMode.autofill) {
+            everySuspend { invoke(any()) } returns Unit
+        }
+        everySuspend { embeddedMockActionFactory.create(any()) } calls { args ->
+            capturedModel = args.arg(0)
+            mockAction
+        }
+
+        val contentController = embeddedBridge.registerContentController()
+        val buttonClickedBody = mapOf("reporting" to "rep")
+
+        embeddedBridge.userContentController(contentController, FakeWKScriptMessage("buttonClicked", buttonClickedBody))
+
+        advanceUntilIdle()
+
+        assertIs<BasicInAppButtonClickedActionModel>(capturedModel)
+        assertEquals(InAppType.EMBEDDED_MESSAGING, (capturedModel as BasicInAppButtonClickedActionModel).inAppType)
+        assertEquals(TRACKING_INFO, (capturedModel as BasicInAppButtonClickedActionModel).trackingInfo)
     }
 }

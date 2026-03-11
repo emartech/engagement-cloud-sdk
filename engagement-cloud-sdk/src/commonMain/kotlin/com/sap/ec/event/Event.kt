@@ -500,11 +500,11 @@ sealed interface SdkEvent {
 
             @Serializable
             data class ButtonClicked(
-                val reportingName: String,
                 override val id: String = UUIDProvider().provide(),
                 override val reporting: String,
                 override val trackingInfo: String,
                 val origin: String,
+                val reportingName: String = IN_APP_BUTTON_CLICKED_EVENT_NAME,
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0,
