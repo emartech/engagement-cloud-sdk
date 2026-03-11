@@ -64,4 +64,6 @@ internal object EmbeddedMessagingUiConstants {
 
     const val SWIPE_THRESHOLD_PERCENTAGE = 0.3
     val SWIPE_DELETE_BACKGROUND_CORRECTION = 2.px
+
+    const val ID_PREFIX = "sap-ec"
 }

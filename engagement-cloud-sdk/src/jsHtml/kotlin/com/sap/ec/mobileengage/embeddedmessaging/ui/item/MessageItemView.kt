@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.ID_PREFIX
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.SWIPE_THRESHOLD_PERCENTAGE
 import com.sap.ec.mobileengage.embeddedmessaging.ui.category.SvgIcon
 import com.sap.ec.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingStyleSheet
@@ -70,8 +71,8 @@ internal fun MessageItemView(
         )
     } else {
         Div({
-            id("mi-${viewModel.id}")
-            classes(classes)
+            id("$ID_PREFIX-mi-${viewModel.id}")
+            classes(classes + "$ID_PREFIX-mi-${viewModel.id}")
             onClick { onClick() }
         }) {
             if (hasCustomElementDefined) {
@@ -124,8 +125,8 @@ private fun SwipeableMessageItem(
     var swipeContainerRef by remember { mutableStateOf<HTMLElement?>(null) }
 
     Div({
-        id("mi-${viewModel.id}")
-        classes(EmbeddedMessagingStyleSheet.swipeContainer)
+        id("$ID_PREFIX-mi-${viewModel.id}")
+        classes(EmbeddedMessagingStyleSheet.swipeContainer, "$ID_PREFIX-mi-${viewModel.id}")
         ref { element ->
             swipeContainerRef = element
             onDispose { }
