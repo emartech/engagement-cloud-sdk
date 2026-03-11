@@ -7,7 +7,7 @@ import EngagementCloudSDK
 struct EmbeddedMessagingListView: UIViewControllerRepresentable {
     
     func makeUIViewController(context: Context) -> UIViewController {
-        EngagementCloud.shared.embeddedMessaging.View(showFilters: true)
+        EngagementCloud.shared.embeddedMessaging.ViewController(showFilters: true)
     }
     
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {

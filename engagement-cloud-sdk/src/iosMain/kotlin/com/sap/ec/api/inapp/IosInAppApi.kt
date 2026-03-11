@@ -6,7 +6,7 @@ interface IosInAppApi {
     val isPaused:Boolean
     suspend fun pause()
     suspend fun resume()
-    fun InlineInAppView(
+    fun InlineInAppViewController(
         viewId: String,
         onLoaded: (() -> Unit)? = null,
         onClose: (() -> Unit)? = null

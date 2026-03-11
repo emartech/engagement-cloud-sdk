@@ -30,7 +30,7 @@ class IosEmbeddedMessaging(private val embeddedMessaging: EmbeddedMessagingApi) 
         embeddedMessaging.filterByCategories(categories)
     }
 
-    override fun View(
+    override fun ViewController(
         showFilters: Boolean,
         customMessageItem: ((viewModel: CustomMessageItemViewModelApi, isSelected: Boolean) -> UIViewController)?
     ): UIViewController {
@@ -45,7 +45,7 @@ class IosEmbeddedMessaging(private val embeddedMessaging: EmbeddedMessagingApi) 
         }
     }
 
-    override fun CompactView(
+    override fun CompactViewController(
         onNavigate: () -> Unit,
         customMessageItem: ((viewModel: CustomMessageItemViewModelApi, isSelected: Boolean) -> UIViewController)?
     ): UIViewController {

@@ -10,7 +10,7 @@ struct InlineInAppViewWrapper: UIViewControllerRepresentable {
     let onClose: (() -> Void)?
     
     func makeUIViewController(context: Context) -> UIViewController {
-        EngagementCloud.shared.inApp.InlineInAppView(viewId: viewId, onLoaded: onLoaded, onClose: onClose)
+        EngagementCloud.shared.inApp.InlineInAppViewController(viewId: viewId, onLoaded: onLoaded, onClose: onClose)
     }
     
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
