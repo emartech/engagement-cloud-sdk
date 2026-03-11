@@ -175,9 +175,10 @@ internal fun MessageList(
                 isLandscape = isLandscape
             ) {
                 Div({ classes(EmbeddedMessagingStyleSheet.detailPane) }) {
-                    if (selectedMessage?.hasRichContent() ?: false) {
+                    val currentMessage = selectedMessage
+                    if (currentMessage != null && currentMessage.hasRichContent()) {
                         MessageDetailView(
-                            viewModel = selectedMessage!!
+                            viewModel = currentMessage
                         )
                     } else {
                         EmptyDetailState()
@@ -188,9 +189,10 @@ internal fun MessageList(
     } else {
         Div({ classes(EmbeddedMessagingStyleSheet.listViewContainer) }) {
             AdaptiveCardContainer(isTabletScale = isTabletScale, isLandscape = isLandscape) {
-                if (selectedMessage?.hasRichContent() ?: false) {
+                val currentMessage = selectedMessage
+                if (currentMessage != null && currentMessage.hasRichContent()) {
                     MessageDetailView(
-                        viewModel = selectedMessage!!
+                        viewModel = currentMessage
                     )
                 } else {
                     Div({ classes(EmbeddedMessagingStyleSheet.compactListView) }) {
