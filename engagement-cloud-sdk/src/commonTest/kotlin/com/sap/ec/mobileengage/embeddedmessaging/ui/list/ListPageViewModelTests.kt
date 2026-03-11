@@ -446,6 +446,59 @@ class ListPageViewModelTests {
         }
 
     @Test
+    fun testSelectMessage_shouldNotCorruptLocallyOpenedMessageIds_whenStaleTagMessageOpenedCompletes() =
+        runTest {
+            val mockMessageA = mock<MessageItemViewModelApi>(MockMode.autofill)
+            every { mockMessageA.id } returns "msg-a"
+            every { mockMessageA.isNotOpened } returns true
+            every { mockMessageA.hasRichContent() } returns true
+            everySuspend { mockMessageA.tagMessageOpened() } calls {
+                delay(1000)
+                Result.success(Unit)
+            }
+
+            val mockMessageB = mock<MessageItemViewModelApi>(MockMode.autofill)
+            every { mockMessageB.id } returns "msg-b"
+            every { mockMessageB.isNotOpened } returns true
+            every { mockMessageB.hasRichContent() } returns true
+            everySuspend { mockMessageB.tagMessageOpened() } returns Result.success(Unit)
+
+            var navigationCountA = 0
+            var navigationCountB = 0
+            viewModel.selectMessage(mockMessageA) { navigationCountA++ }
+            viewModel.selectMessage(mockMessageB) { navigationCountB++ }
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            viewModel.selectedMessage.value shouldBe mockMessageB
+            readMessageIds.value shouldBe setOf("msg-b")
+            readMessageIds.value.contains("msg-a") shouldBe false
+            navigationCountA shouldBe 0
+            navigationCountB shouldBe 1
+        }
+
+    @Test
+    fun testSelectMessage_shouldNotInvokeHandleDefaultAction_whenMessageDeselectedBeforeActionRuns() =
+        runTest {
+            val mockMessageA = mock<MessageItemViewModelApi>(MockMode.autofill)
+            every { mockMessageA.id } returns "msg-a"
+            every { mockMessageA.isNotOpened } returns false
+            every { mockMessageA.hasRichContent() } returns false
+            everySuspend { mockMessageA.handleDefaultAction() } calls { delay(500) }
+
+            val mockMessageB = mock<MessageItemViewModelApi>(MockMode.autofill)
+            every { mockMessageB.id } returns "msg-b"
+            every { mockMessageB.isNotOpened } returns false
+            every { mockMessageB.hasRichContent() } returns false
+
+            viewModel.selectMessage(mockMessageA) {}
+            viewModel.selectMessage(mockMessageB) {}
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            viewModel.selectedMessage.value shouldBe mockMessageB
+            verifySuspend { mockMessageB.handleDefaultAction() }
+        }
+
+    @Test
     fun testOpenCategorySelector_shouldSetShowCategorySelectorToTrue() = runTest {
         viewModel.showCategorySelector.value shouldBe false
 
