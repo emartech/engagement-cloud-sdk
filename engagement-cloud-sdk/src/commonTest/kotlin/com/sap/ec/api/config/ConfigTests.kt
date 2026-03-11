@@ -10,12 +10,15 @@ import com.sap.ec.core.device.NotificationSettings
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.sequentially
+import dev.mokkery.answering.throws
 import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import dev.mokkery.verify
 import dev.mokkery.verifySuspend
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
@@ -226,5 +229,14 @@ class ConfigTest {
         advanceUntilIdle()
 
         verifySuspend { mockGathererConfig.resetLanguage() }
+    }
+
+    @Test
+    fun changeApplicationCode_shouldPropagateCancellationException() = runTest {
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
+        everySuspend { mockInternalConfig.changeApplicationCode("newAppCode") } throws CancellationException("test cancellation")
+        config.registerOnContext()
+
+        shouldThrow<CancellationException> { config.changeApplicationCode("newAppCode") }
     }
 }

@@ -8,6 +8,7 @@ import com.sap.ec.core.device.DeviceInfo
 import com.sap.ec.core.device.DeviceInfoCollectorApi
 import com.sap.ec.core.device.NotificationSettings
 import com.sap.ec.core.log.withLogContext
+import com.sap.ec.util.runCatchingWithoutCancellation
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonPrimitive
@@ -50,7 +51,7 @@ internal class Config<Logging : ConfigInstance, Gatherer : ConfigInstance, Inter
     override suspend fun getCurrentSdkState(): SdkState = sdkContext.currentSdkState.value
 
     override suspend fun changeApplicationCode(applicationCode: String): Result<Unit> =
-        runCatching {
+        runCatchingWithoutCancellation {
             withContext(sdkContext.sdkDispatcher) {
                 withLogContext(buildJsonObject {
                     put(
@@ -63,7 +64,7 @@ internal class Config<Logging : ConfigInstance, Gatherer : ConfigInstance, Inter
             }
         }
 
-    override suspend fun setLanguage(language: String): Result<Unit> = runCatching {
+    override suspend fun setLanguage(language: String): Result<Unit> = runCatchingWithoutCancellation {
         withContext(sdkContext.sdkDispatcher) {
             withLogContext(buildJsonObject {
                 put("language", JsonPrimitive(language))
@@ -73,7 +74,7 @@ internal class Config<Logging : ConfigInstance, Gatherer : ConfigInstance, Inter
         }
     }
 
-    override suspend fun resetLanguage(): Result<Unit> = runCatching {
+    override suspend fun resetLanguage(): Result<Unit> = runCatchingWithoutCancellation {
         withContext(sdkContext.sdkDispatcher) {
             withLogContext(buildJsonObject {}) {
                 activeInstance<ConfigInternalApi>().resetLanguage()
