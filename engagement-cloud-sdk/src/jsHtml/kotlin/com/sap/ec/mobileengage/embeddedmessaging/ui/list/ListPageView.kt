@@ -86,7 +86,7 @@ internal fun MessageList(
     val hasFiltersApplied by viewModel.hasFiltersApplied.collectAsState()
 
     val scope = rememberCoroutineScope()
-    var selectionJob by remember { mutableStateOf<Job?>(null) }
+    val selectionJobRef = remember { object { var job: Job? = null } }
 
     var isLandscape by remember {
         mutableStateOf(window.matchMedia("(orientation: landscape)").matches)
@@ -145,8 +145,8 @@ internal fun MessageList(
                         customMessageItemElementName = customMessageItemElementName,
                         onRefresh = { viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() } },
                         onItemClick = {
-                            selectionJob?.cancel()
-                            selectionJob = scope.launch {
+                            selectionJobRef.job?.cancel()
+                            selectionJobRef.job = scope.launch {
                                 viewModel.selectMessage(it, onNavigate = {})
                             }
                         },
@@ -210,8 +210,8 @@ internal fun MessageList(
                             customMessageItemElementName = customMessageItemElementName,
                             onRefresh = { viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() } },
                             onItemClick = {
-                                selectionJob?.cancel()
-                                selectionJob = scope.launch {
+                                selectionJobRef.job?.cancel()
+                                selectionJobRef.job = scope.launch {
                                     viewModel.selectMessage(it, onNavigate = {})
                                 }
                             },
