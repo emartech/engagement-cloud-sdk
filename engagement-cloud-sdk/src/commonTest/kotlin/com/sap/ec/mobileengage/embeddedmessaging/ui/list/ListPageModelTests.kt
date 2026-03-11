@@ -13,6 +13,7 @@ import com.sap.ec.networking.clients.embedded.messaging.model.MessagesResponse
 import com.sap.ec.networking.clients.embedded.messaging.model.Meta
 import com.sap.ec.util.JsonUtil.json
 import dev.mokkery.MockMode
+import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend
@@ -21,6 +22,7 @@ import dev.mokkery.matcher.capture.Capture.Companion.slot
 import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
+import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
@@ -30,10 +32,17 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import io.ktor.http.headersOf
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ListPageModelTests {
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
     private lateinit var mockSdkEventWaiter: SdkEventWaiterApi
@@ -364,61 +373,67 @@ class ListPageModelTests {
         }
 
     @Test
-    fun fetchMessagesWithCategories_shouldPropagateCancellationException() = runTest {
-        everySuspend { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMessages>()) } throws CancellationException("coroutine cancelled")
+    fun fetchMessagesWithCategories_shouldPropagateCancellationException_whenCoroutineIsCancelled() =
+        runTest {
+            val testJob = Job()
+            val testScope = CoroutineScope(StandardTestDispatcher(testScheduler) + testJob)
 
-        shouldThrow<CancellationException> {
-            model.fetchMessagesWithCategories(false, emptyList())
+            everySuspend { mockSdkEventDistributor.registerEvent(any()) } calls {
+                testJob.cancel()
+                throw CancellationException("Job was cancelled")
+            }
+
+            testScope.launch {
+                model.fetchMessagesWithCategories(false, emptyList())
+            }
+            advanceUntilIdle()
+
+            verifySuspend(VerifyMode.exactly(0)) {
+                mockSdkLogger.error("FetchMessagesWithCategories exception.", any<Throwable>())
+            }
         }
-    }
 
     @Test
-    fun fetchBadgeCount_shouldPropagateCancellationException() = runTest {
-        everySuspend { mockSdkEventDistributor.registerEvent(any()) } throws CancellationException("coroutine cancelled")
+    fun fetchBadgeCount_shouldPropagateCancellationException_whenCoroutineIsCancelled() =
+        runTest {
+            val testJob = Job()
+            val testScope = CoroutineScope(StandardTestDispatcher(testScheduler) + testJob)
 
-        shouldThrow<CancellationException> {
-            model.fetchBadgeCount()
+            everySuspend { mockSdkEventDistributor.registerEvent(any()) } calls {
+                testJob.cancel()
+                throw CancellationException("Job was cancelled")
+            }
+
+            testScope.launch {
+                model.fetchBadgeCount()
+            }
+            advanceUntilIdle()
+
+            verifySuspend(VerifyMode.exactly(0)) {
+                mockSdkLogger.error("FetchBadgeCount exception.", any<Throwable>())
+            }
         }
-    }
 
     @Test
-    fun fetchNextPage_shouldPropagateCancellationException() = runTest {
-        everySuspend { mockSdkEventDistributor.registerEvent(any()) } throws CancellationException("coroutine cancelled")
+    fun fetchNextPage_shouldPropagateCancellationException_whenCoroutineIsCancelled() =
+        runTest {
+            val testJob = Job()
+            val testScope = CoroutineScope(StandardTestDispatcher(testScheduler) + testJob)
 
-        shouldThrow<CancellationException> {
-            model.fetchNextPage()
+            everySuspend { mockSdkEventDistributor.registerEvent(any()) } calls {
+                testJob.cancel()
+                throw CancellationException("Job was cancelled")
+            }
+
+            testScope.launch {
+                model.fetchNextPage()
+            }
+            advanceUntilIdle()
+
+            verifySuspend(VerifyMode.exactly(0)) {
+                mockSdkLogger.error("FetchNextPage exception.", any<Throwable>())
+            }
         }
-    }
-
-    @Test
-    fun fetchMessagesWithCategories_shouldPropagateCancellationException_fromAwait() = runTest {
-        everySuspend { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMessages>()) } returns mockSdkEventWaiter
-        everySuspend { mockSdkEventWaiter.await<Response>() } throws CancellationException("coroutine cancelled")
-
-        shouldThrow<CancellationException> {
-            model.fetchMessagesWithCategories(false, emptyList())
-        }
-    }
-
-    @Test
-    fun fetchBadgeCount_shouldPropagateCancellationException_fromAwait() = runTest {
-        everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mockSdkEventWaiter
-        everySuspend { mockSdkEventWaiter.await<Response>() } throws CancellationException("coroutine cancelled")
-
-        shouldThrow<CancellationException> {
-            model.fetchBadgeCount()
-        }
-    }
-
-    @Test
-    fun fetchNextPage_shouldPropagateCancellationException_fromAwait() = runTest {
-        everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mockSdkEventWaiter
-        everySuspend { mockSdkEventWaiter.await<Response>() } throws CancellationException("coroutine cancelled")
-
-        shouldThrow<CancellationException> {
-            model.fetchNextPage()
-        }
-    }
 
     private fun createTestMessagesResponse(
         messagesReturned: Int,

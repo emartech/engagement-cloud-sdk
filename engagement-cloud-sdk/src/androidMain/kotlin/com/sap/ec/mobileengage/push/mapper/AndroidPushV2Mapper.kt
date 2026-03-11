@@ -12,6 +12,8 @@ import com.sap.ec.mobileengage.push.model.AndroidPlatformData
 import com.sap.ec.mobileengage.push.model.AndroidPushMessage
 import com.sap.ec.mobileengage.push.model.NotificationMethod
 import com.sap.ec.mobileengage.push.model.NotificationStyle
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
@@ -80,6 +82,7 @@ internal class AndroidPushV2Mapper(
                 actionableData = actionableData
             )
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             logger.error("push mapping failed", e)
             null
         }

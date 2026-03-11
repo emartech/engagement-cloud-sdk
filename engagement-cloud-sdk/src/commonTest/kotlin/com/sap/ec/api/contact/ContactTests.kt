@@ -9,7 +9,9 @@ import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -188,4 +190,14 @@ class ContactTests {
 
         result.exceptionOrNull() shouldBe testException
     }
+
+    @Test
+    fun link_shouldPropagateCancellationException_whenInternalApiThrowsCancellationException() =
+        runTest {
+            every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
+            everySuspend { mockContactInternal.link(CONTACT_FIELD_VALUE) } throws CancellationException("test cancellation")
+            contact.registerOnContext()
+
+            shouldThrow<CancellationException> { contact.link(CONTACT_FIELD_VALUE) }
+        }
 }

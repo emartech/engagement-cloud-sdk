@@ -6,6 +6,8 @@ import com.sap.ec.core.state.State
 import com.sap.ec.enable.EnableOrganizerApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 
 internal class SdkConfigLoaderState(
@@ -28,6 +30,7 @@ internal class SdkConfigLoaderState(
                 try {
                     setupOrganizer.enable(it)
                 } catch (exception: Exception) {
+                    currentCoroutineContext().ensureActive()
                     sdkLogger.debug("Failed to setup SDK with loaded config", exception)
                 }
             }

@@ -41,6 +41,8 @@ import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants
 import com.sap.ec.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 import com.sap.ec.mobileengage.embeddedmessaging.ui.theme.LocalDesignValues
 import com.sap.ec.mobileengage.embeddedmessaging.util.asFormattedTimestamp
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 
 
 @Composable
@@ -59,6 +61,7 @@ internal fun MessageItemView(
                     it.width > 0 && it.height > 0
                 }
             } catch (_: Exception) {
+                currentCoroutineContext().ensureActive()
                 null
             }
         }

@@ -16,6 +16,8 @@ import com.sap.ec.networking.clients.error.ClientExceptionHandler
 import io.ktor.http.HttpMethod
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
@@ -82,6 +84,7 @@ internal class DeepLinkClient(
         exception: Throwable,
         sdkEvent: SdkEvent.Internal.Sdk.TrackDeepLink
     ) {
+        currentCoroutineContext().ensureActive()
         if (exception is NetworkIOException) {
             sdkEventManager.emitEvent(sdkEvent)
         } else {

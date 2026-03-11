@@ -16,6 +16,8 @@ import js.coroutines.promise
 import js.promise.Promise
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import web.broadcast.BroadcastChannel
 import web.events.EventHandler
@@ -85,6 +87,7 @@ fun main() {
                     event.notification.close()
                     resolve(Unit)
                 } catch (e: Exception) {
+                    currentCoroutineContext().ensureActive()
                     reject(e)
                 }
             }

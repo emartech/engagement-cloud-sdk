@@ -15,6 +15,8 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.Url
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.json.Json
 
 internal class InlineInAppMessageFetcher(
@@ -40,6 +42,7 @@ internal class InlineInAppMessageFetcher(
                 createInAppFromResponse(response, viewId)
             }
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             sdkLogger.error(
                 "Exception occurred while fetching or decoding inline message for viewId: $viewId",
                 e
@@ -106,6 +109,7 @@ internal class InlineInAppMessageFetcher(
                 }
             }
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             sdkLogger.error("Exception occurred while fetching inline message from url: $url", e)
             null
         }

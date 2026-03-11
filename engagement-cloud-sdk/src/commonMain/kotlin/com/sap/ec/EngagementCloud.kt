@@ -13,6 +13,7 @@ import com.sap.ec.di.SdkKoinIsolationContext.koin
 import com.sap.ec.api.event.model.EngagementCloudEvent
 import com.sap.ec.init.InitOrganizerApi
 import com.sap.ec.tracking.TrackingApi
+import com.sap.ec.util.runCatchingWithoutCancellation
 import kotlinx.coroutines.flow.Flow
 import org.koin.core.qualifier.named
 import kotlin.experimental.ExperimentalObjCRefinement
@@ -31,7 +32,7 @@ object EngagementCloud {
     }
 
     suspend fun initialize(): Result<Unit> {
-        return runCatching {
+        return runCatchingWithoutCancellation {
             initDI()
             runInitOrganizer()
         }

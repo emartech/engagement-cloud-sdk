@@ -9,7 +9,9 @@ import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -176,5 +178,14 @@ class PushTests {
         val result = push.getPushToken()
 
         result.onSuccess { it shouldBe PUSH_TOKEN }
+    }
+
+    @Test
+    fun registerPushToken_shouldPropagateCancellationException() = runTest {
+        every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
+        everySuspend { mockPushInternal.registerPushToken(PUSH_TOKEN) } throws CancellationException("test cancellation")
+        push.registerOnContext()
+
+        shouldThrow<CancellationException> { push.registerPushToken(PUSH_TOKEN) }
     }
 }

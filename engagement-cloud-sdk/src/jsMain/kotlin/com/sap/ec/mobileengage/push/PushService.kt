@@ -9,6 +9,8 @@ import js.buffer.BufferSource
 import js.promise.await
 import js.typedarrays.toUint8Array
 import kotlinx.browser.window
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import web.navigator.navigator
 import web.push.PushSubscriptionOptionsInit
 import web.push.subscribe
@@ -43,6 +45,7 @@ internal class PushService(
                 }
             }
         } catch (e: Throwable) {
+            currentCoroutineContext().ensureActive()
             sdkLogger.error("Push subscription failed", e)
         }
     }

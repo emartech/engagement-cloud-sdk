@@ -35,9 +35,11 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import io.ktor.http.headers
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.take
@@ -355,6 +357,31 @@ class DeviceClientTests {
                     originId = changeLanguageEvent.id,
                     Result.success(Unit)
                 )
+            )
+        }
+    }
+
+    @Test
+    fun testConsumer_shouldPropagateCancellationException_whenCoroutineIsCancelled() = runTest {
+        val clientJob = Job()
+        val clientScope = CoroutineScope(StandardTestDispatcher(testScheduler) + clientJob)
+
+        everySuspend { mockEcClient.send(any()) } calls {
+            clientJob.cancel()
+            throw CancellationException("Job was cancelled")
+        }
+
+        createDeviceClient(clientScope).register()
+
+        val registerDeviceInfoEvent = SdkEvent.Internal.Sdk.RegisterDeviceInfo()
+        onlineEvents.emit(registerDeviceInfoEvent)
+        advanceUntilIdle()
+
+        verifySuspend(VerifyMode.exactly(0)) {
+            mockClientExceptionHandler.handleException(
+                any(),
+                any<String>(),
+                any()
             )
         }
     }

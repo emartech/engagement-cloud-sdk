@@ -7,6 +7,8 @@ import com.sap.ec.core.providers.UuidProviderApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
@@ -103,6 +105,7 @@ internal class EventEmitter(
         return try {
             JSON.parse<JsApiEvent>(json.encodeToString(EngagementCloudEvent.serializer(), event))
         } catch (error: Throwable) {
+            currentCoroutineContext().ensureActive()
             logger.error("SdkEvent parsing failed", error)
             null
         }
@@ -115,6 +118,7 @@ internal class EventEmitter(
         try {
             listener(event)
         } catch (error: Throwable) {
+            currentCoroutineContext().ensureActive()
             logger.error("Listener invocation failed for event type: ${event.type}", error, false)
         }
     }

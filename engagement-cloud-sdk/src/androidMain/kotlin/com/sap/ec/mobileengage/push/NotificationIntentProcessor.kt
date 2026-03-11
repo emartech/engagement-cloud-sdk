@@ -18,6 +18,8 @@ import com.sap.ec.mobileengage.action.models.NotificationOpenedActionModel
 import com.sap.ec.mobileengage.action.models.PresentableActionModel
 import com.sap.ec.mobileengage.push.model.AndroidPushMessage
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
@@ -54,6 +56,7 @@ internal class NotificationIntentProcessor(
             action?.let { json.decodeFromString<PresentableActionModel>(it) }
                 ?: defaultAction?.let { json.decodeFromString<BasicActionModel>(it) }
         } catch (exception: Exception) {
+            currentCoroutineContext().ensureActive()
             sdkLogger.error("Action parsing failed", exception, buildJsonObject {
                 put("action", action)
                 put("defaultAction", defaultAction)
@@ -106,6 +109,7 @@ internal class NotificationIntentProcessor(
                     reportingAction?.let { add(actionFactory.create(reportingAction)) }
                 }
             } catch (exception: Exception) {
+                currentCoroutineContext().ensureActive()
                 sdkLogger.error(
                     "Notification intent processor failed",
                     exception

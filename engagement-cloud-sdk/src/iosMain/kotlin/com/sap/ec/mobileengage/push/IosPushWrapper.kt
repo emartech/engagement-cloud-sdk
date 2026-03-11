@@ -9,6 +9,9 @@ import com.sap.ec.core.exceptions.SdkException.PreconditionFailedException
 import com.sap.ec.core.log.Logger
 import com.sap.ec.mobileengage.push.extension.toSilentPushUserInfo
 import com.sap.ec.util.JsonUtil
+import com.sap.ec.util.runCatchingWithoutCancellation
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 
@@ -20,20 +23,20 @@ internal class IosPushWrapper<Logging : IosPushInstance, Gatherer : IosPushInsta
     private val sdkLogger: Logger
 ) : GenericApi<Logging, Gatherer, Internal>(loggingApi, gathererApi, internalApi, sdkContext),
     IosPushWrapperApi {
-    override suspend fun registerPushToken(pushToken: String): Result<Unit> = runCatching {
+    override suspend fun registerPushToken(pushToken: String): Result<Unit> = runCatchingWithoutCancellation {
         withContext(sdkContext.sdkDispatcher) {
             activeInstance<PushInternalApi>().registerPushToken(pushToken)
         }
     }
 
-    override suspend fun clearPushToken(): Result<Unit> = runCatching {
+    override suspend fun clearPushToken(): Result<Unit> = runCatchingWithoutCancellation {
         withContext(sdkContext.sdkDispatcher) {
             activeInstance<PushInternalApi>().clearPushToken()
         }
     }
 
     override suspend fun getPushToken(): Result<String?> {
-        return kotlin.runCatching { activeInstance<PushInternalApi>().getPushToken() }
+        return runCatchingWithoutCancellation { activeInstance<PushInternalApi>().getPushToken() }
     }
 
     override val registeredNotificationCenterDelegates: List<NotificationCenterDelegateRegistration>
@@ -54,7 +57,7 @@ internal class IosPushWrapper<Logging : IosPushInstance, Gatherer : IosPushInsta
         get() = activeInstance<IosPushInstance>().userNotificationCenterDelegate
 
     override suspend fun handleSilentMessageWithUserInfo(rawUserInfo: Map<String, Any>): Result<Unit> =
-        runCatching {
+        runCatchingWithoutCancellation {
             withContext(sdkContext.sdkDispatcher) {
                 try {
                     val pushUserInfo = rawUserInfo.toSilentPushUserInfo(JsonUtil.json)
@@ -64,6 +67,7 @@ internal class IosPushWrapper<Logging : IosPushInstance, Gatherer : IosPushInsta
                         )
                     }
                 } catch (e: Exception) {
+                    currentCoroutineContext().ensureActive()
                     sdkLogger.error("IosPush - handleSilentMessageWithUserInfo", e)
                     throw PreconditionFailedException("Error while handling silent push message, the userInfo can't be parsed")
                 }

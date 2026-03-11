@@ -3,6 +3,8 @@ package com.sap.ec.core.url
 import com.sap.ec.core.log.Logger
 import com.sap.ec.mobileengage.action.models.HtmlTarget
 import com.sap.ec.mobileengage.action.models.OpenExternalUrlActionModel
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.w3c.dom.Window
@@ -20,6 +22,7 @@ internal class WebExternalUrlOpener(
             val parsedUrl = URL(actionModel.url)
             window.open(parsedUrl.href, target.raw)?.also { it.focus() }
         } catch (e: Throwable) {
+            currentCoroutineContext().ensureActive()
             sdkLogger.error(
                 "open-external-url-failed",
                 e,

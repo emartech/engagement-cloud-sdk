@@ -48,10 +48,12 @@ import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -642,6 +644,36 @@ class EventClientTests {
         }
     }
 
+
+    @Test
+    fun testConsumer_shouldPropagateCancellationException_whenCoroutineIsCancelled() = runTest {
+        val clientJob = Job()
+        val clientScope = CoroutineScope(StandardTestDispatcher(testScheduler) + clientJob)
+
+        everySuspend { mockEmarsysClient.send(any()) } calls {
+            clientJob.cancel()
+            throw CancellationException("Job was cancelled")
+        }
+
+        createEventClient(clientScope).register()
+
+        val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
+            onlineEvents.take(1).toList()
+        }
+
+        onlineEvents.emit(testEvent)
+        advanceUntilIdle()
+
+        onlineSdkEvents.await() shouldBe listOf(testEvent)
+
+        verifySuspend(VerifyMode.exactly(0)) {
+            mockClientExceptionHandler.handleException(
+                any(),
+                any<String>(),
+                any()
+            )
+        }
+    }
 
     private fun createTestRequest(): UrlRequest {
         val expectedUrlRequest = UrlRequest(

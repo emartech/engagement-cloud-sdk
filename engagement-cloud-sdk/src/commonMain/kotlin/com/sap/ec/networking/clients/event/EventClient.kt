@@ -124,6 +124,7 @@ internal class EventClient(
         exception: Throwable,
         sdkEvents: List<OnlineSdkEvent>
     ) {
+        currentCoroutineContext().ensureActive()
         clientExceptionHandler.handleException(
             exception,
             "EventClient: Error during event consumption",

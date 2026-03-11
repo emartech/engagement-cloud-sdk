@@ -4,6 +4,7 @@ import com.sap.ec.api.Activatable
 import com.sap.ec.api.generic.GenericApi
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.log.withLogContext
+import com.sap.ec.util.runCatchingWithoutCancellation
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
@@ -28,7 +29,7 @@ internal class Contact<Logging : ContactInstance, Gatherer : ContactInstance, In
      * @param contactFieldValue The value of the contact field.
      */
     override suspend fun link(contactFieldValue: String): Result<Unit> =
-        runCatching {
+        runCatchingWithoutCancellation {
             withContext(sdkContext.sdkDispatcher) {
                 withLogContext(
                     buildJsonObject {
@@ -52,7 +53,7 @@ internal class Contact<Logging : ContactInstance, Gatherer : ContactInstance, In
     override suspend fun linkAuthenticated(
         openIdToken: String
     ): Result<Unit> =
-        runCatching {
+        runCatchingWithoutCancellation {
             withContext(sdkContext.sdkDispatcher) {
                 withLogContext(
                     buildJsonObject {
@@ -70,7 +71,7 @@ internal class Contact<Logging : ContactInstance, Gatherer : ContactInstance, In
     /**
      * Unlinks the currently linked contact from the SDK. And replaces it with an anonymous contact
      */
-    override suspend fun unlink(): Result<Unit> = runCatching {
+    override suspend fun unlink(): Result<Unit> = runCatchingWithoutCancellation {
         withContext(sdkContext.sdkDispatcher) {
             activeInstance<ContactInternalApi>().unlink()
         }

@@ -15,6 +15,8 @@ import com.sap.ec.watchdog.lifecycle.LifecycleWatchDog
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
@@ -56,6 +58,7 @@ internal class ECSdkSession(
                     )
                 )
             } catch (exception: Exception) {
+                currentCoroutineContext().ensureActive()
                 sdkLogger.error(
                     LogEntry(
                         "mobile-engage-session-start-request-failed",
@@ -83,6 +86,7 @@ internal class ECSdkSession(
                 val event = createSessionEndEvent()
                 sdkEventDistributor.registerEvent(event)
             } catch (exception: Exception) {
+                currentCoroutineContext().ensureActive()
                 sdkLogger.error(
                     LogEntry(
                         "mobile-engage-session-end-request-failed",

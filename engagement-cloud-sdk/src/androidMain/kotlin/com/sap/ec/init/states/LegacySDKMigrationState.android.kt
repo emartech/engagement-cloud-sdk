@@ -11,6 +11,8 @@ import com.sap.ec.core.storage.StringStorageApi
 import com.sap.ec.db_migration.LegacySharedPreferencesWrapper
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import kotlin.use
 
@@ -55,6 +57,7 @@ internal actual class LegacySDKMigrationState(
                     }
                 }
             } catch (exception: Exception) {
+                currentCoroutineContext().ensureActive()
                 sdkLogger.debug("Migrating legacy clientId failed: ${exception.message}")
             }
 
@@ -82,6 +85,7 @@ internal actual class LegacySDKMigrationState(
             sdkLogger.debug("Migration from legacy SDK completed")
             Result.success(Unit)
         } catch (exception: Exception) {
+            currentCoroutineContext().ensureActive()
             sdkLogger.error("Migration from legacy SDK failed.", exception)
             Result.failure(exception)
         }
@@ -96,6 +100,7 @@ internal actual class LegacySDKMigrationState(
                 sdkLogger.debug("Migrated legacy $key.")
             }
         } catch (exception: Exception) {
+            currentCoroutineContext().ensureActive()
             sdkLogger.error("Migrating legacy $key failed.", exception)
         }
 

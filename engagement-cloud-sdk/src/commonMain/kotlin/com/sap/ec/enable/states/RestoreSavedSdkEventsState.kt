@@ -4,6 +4,8 @@ import com.sap.ec.core.channel.SdkEventEmitterApi
 import com.sap.ec.core.db.events.EventsDaoApi
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.state.State
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
@@ -23,6 +25,7 @@ internal class RestoreSavedSdkEventsState(
             try {
                 sdkEventEmitter.emitEvent(it)
             } catch (exception: Exception) {
+                currentCoroutineContext().ensureActive()
                 sdkLogger.error(
                     "RestoreSavedSdkEventsState - active",
                     exception,

@@ -16,6 +16,8 @@ import com.sap.ec.networking.clients.embedded.messaging.model.MetaData
 import com.sap.ec.networking.clients.error.ClientExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlin.time.ExperimentalTime
@@ -106,6 +108,7 @@ internal class EmbeddedMessagingClient(
         exception: Throwable,
         sdkEvent: OnlineSdkEvent
     ) {
+        currentCoroutineContext().ensureActive()
         if (exception is NetworkIOException) {
             sdkEventManager.emitEvent(sdkEvent)
         } else {

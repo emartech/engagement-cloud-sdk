@@ -22,6 +22,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
@@ -75,6 +77,7 @@ internal class RemoteConfigClient(
     }
 
     private suspend fun handleException(exception: Throwable, event: OnlineSdkEvent) {
+        currentCoroutineContext().ensureActive()
         clientExceptionHandler.handleException(
             exception,
             "RemoteConfigClient: ConsumeRemoteConfigEvents error",
