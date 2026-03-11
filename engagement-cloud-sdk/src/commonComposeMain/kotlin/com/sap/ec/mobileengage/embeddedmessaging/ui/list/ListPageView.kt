@@ -247,6 +247,7 @@ private fun MessageList(
                                             messageViewModel = messageViewModel,
                                             onBack = {
                                                 scope.launch {
+                                                    viewModel.clearMessageSelection()
                                                     navigator.navigateTo(
                                                         ListDetailPaneScaffoldRole.List
                                                     )

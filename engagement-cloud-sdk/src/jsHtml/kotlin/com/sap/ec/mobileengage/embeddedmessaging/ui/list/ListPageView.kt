@@ -173,7 +173,8 @@ internal fun MessageList(
                     val currentMessage = selectedMessage
                     if (currentMessage != null && currentMessage.hasRichContent()) {
                         MessageDetailView(
-                            viewModel = currentMessage
+                            viewModel = currentMessage,
+                            onClose = { viewModel.clearMessageSelection() }
                         )
                     } else {
                         EmptyDetailState()
@@ -187,7 +188,8 @@ internal fun MessageList(
                 val currentMessage = selectedMessage
                 if (currentMessage != null && currentMessage.hasRichContent()) {
                     MessageDetailView(
-                        viewModel = currentMessage
+                        viewModel = currentMessage,
+                        onClose = { viewModel.clearMessageSelection() }
                     )
                 } else {
                     Div({ classes(EmbeddedMessagingStyleSheet.compactListView) }) {

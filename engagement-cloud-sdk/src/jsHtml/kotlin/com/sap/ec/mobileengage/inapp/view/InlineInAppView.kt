@@ -87,6 +87,7 @@ internal actual fun InlineInAppView(
 internal fun InlineInAppView(
     url: Url,
     trackingInfo: String,
+    onClose: () -> Unit,
     onLoaded: (() -> Unit)? = null
 ) {
     val fetcher: InlineInAppMessageFetcherApi = koin.get()
@@ -100,6 +101,7 @@ internal fun InlineInAppView(
         InlineInAppView(
             message = it,
             onClose = {
+                onClose()
                 removeInlineInApp(it)
             },
             onLoaded = onLoaded

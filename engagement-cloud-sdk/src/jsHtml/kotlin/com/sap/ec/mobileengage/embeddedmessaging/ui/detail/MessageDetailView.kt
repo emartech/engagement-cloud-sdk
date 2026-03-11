@@ -25,7 +25,8 @@ import web.intersection.IntersectionObserverInit
 
 @Composable
 internal fun MessageDetailView(
-    viewModel: MessageItemViewModelApi
+    viewModel: MessageItemViewModelApi,
+    onClose: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
 
@@ -51,7 +52,8 @@ internal fun MessageDetailView(
             }) {
                 InlineInAppView(
                     it,
-                    viewModel.trackingInfo
+                    viewModel.trackingInfo,
+                    onClose = { onClose() }
                 )
             }
         }
