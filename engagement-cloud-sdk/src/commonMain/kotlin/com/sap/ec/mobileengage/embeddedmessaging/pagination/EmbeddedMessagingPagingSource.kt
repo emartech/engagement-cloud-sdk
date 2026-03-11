@@ -14,6 +14,8 @@ import com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemViewModel
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
 import com.sap.ec.mobileengage.embeddedmessaging.ui.list.ListPageModelApi
 import com.sap.ec.networking.clients.embedded.messaging.model.MessageCategory
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 
 internal class EmbeddedMessagingPagingSource(
     private val listPageModel: ListPageModelApi,
@@ -74,6 +76,7 @@ internal class EmbeddedMessagingPagingSource(
                     }
                 })
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             logger.error("Error loading page", e)
             LoadResult.Error(e)
         }
