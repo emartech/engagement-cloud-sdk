@@ -10,6 +10,7 @@ import com.sap.ec.mobileengage.embeddedmessaging.pagination.EmbeddedMessagingPag
 import com.sap.ec.networking.clients.embedded.messaging.model.BadgeCountResponse
 import com.sap.ec.networking.clients.embedded.messaging.model.MessagesResponse
 import kotlin.time.ExperimentalTime
+import kotlinx.coroutines.CancellationException
 
 @OptIn(ExperimentalTime::class)
 internal class ListPageModel(
@@ -57,6 +58,8 @@ internal class ListPageModel(
                     Result.failure(it)
                 }
             )
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             sdkLogger.error("FetchMessagesWithCategories exception.", e)
             Result.failure(e)
@@ -80,6 +83,8 @@ internal class ListPageModel(
                     0
                 }
             )
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             sdkLogger.error("FetchBadgeCount exception.", e)
             0
@@ -118,6 +123,8 @@ internal class ListPageModel(
                 sdkLogger.debug("Can't fetch more messages, final page reached")
                 Result.failure(LastPageReachedException("Can't fetch more pages because last page reached"))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             sdkLogger.error("FetchNextPage exception.", e)
             Result.failure(e)

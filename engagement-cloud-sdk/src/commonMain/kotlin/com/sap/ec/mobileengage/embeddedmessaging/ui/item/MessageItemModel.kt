@@ -11,6 +11,7 @@ import com.sap.ec.mobileengage.action.models.ActionModel
 import com.sap.ec.mobileengage.action.models.BasicRichContentDisplayActionModel
 import com.sap.ec.mobileengage.embeddedmessaging.models.MessageTagUpdate
 import com.sap.ec.mobileengage.embeddedmessaging.models.TagOperation
+import kotlinx.coroutines.CancellationException
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Image.BASE64_PLACEHOLDER_IMAGE
 import com.sap.ec.networking.clients.embedded.messaging.model.EmbeddedMessage
 import kotlin.io.encoding.Base64
@@ -82,6 +83,8 @@ internal class MessageItemModel(
                 .map {
                     logger.debug("tag update success: $tag $operation for message id '${message.id}'")
                 }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Result.failure(e)
         }

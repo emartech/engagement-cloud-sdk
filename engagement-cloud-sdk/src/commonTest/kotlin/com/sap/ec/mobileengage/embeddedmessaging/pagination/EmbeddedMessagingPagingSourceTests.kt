@@ -20,7 +20,9 @@ import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -209,6 +211,22 @@ class EmbeddedMessagingPagingSourceTests {
             mockListPageModel.fetchNextPage()
         }
         (result is PagingSource.LoadResult.Error) shouldBe false
+    }
+
+    @Test
+    fun testLoad_shouldPropagateCancellationException_whenFetchThrowsCancellationException() = runTest {
+        val embeddedMessagingPagingSource = createEmbeddedMessagingPagingSource()
+        everySuspend {
+            mockListPageModel.fetchMessagesWithCategories(false, emptyList())
+        } throws CancellationException("coroutine cancelled")
+
+        shouldThrow<CancellationException> {
+            embeddedMessagingPagingSource.load(
+                PagingSource.LoadParams.Refresh(
+                    key = null, loadSize = 20, placeholdersEnabled = false
+                )
+            )
+        }
     }
 
     @Test

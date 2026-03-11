@@ -22,12 +22,14 @@ import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import io.ktor.http.headersOf
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -360,6 +362,33 @@ class ListPageModelTests {
             result.exceptionOrNull()?.message shouldBe "Can't fetch more pages because last page reached"
             verifySuspend { mockSdkLogger.debug("Can't fetch more messages, final page reached") }
         }
+
+    @Test
+    fun fetchMessagesWithCategories_shouldPropagateCancellationException() = runTest {
+        everySuspend { mockSdkEventDistributor.registerEvent(any<SdkEvent.Internal.EmbeddedMessaging.FetchMessages>()) } throws CancellationException("coroutine cancelled")
+
+        shouldThrow<CancellationException> {
+            model.fetchMessagesWithCategories(false, emptyList())
+        }
+    }
+
+    @Test
+    fun fetchBadgeCount_shouldPropagateCancellationException() = runTest {
+        everySuspend { mockSdkEventDistributor.registerEvent(any()) } throws CancellationException("coroutine cancelled")
+
+        shouldThrow<CancellationException> {
+            model.fetchBadgeCount()
+        }
+    }
+
+    @Test
+    fun fetchNextPage_shouldPropagateCancellationException() = runTest {
+        everySuspend { mockSdkEventDistributor.registerEvent(any()) } throws CancellationException("coroutine cancelled")
+
+        shouldThrow<CancellationException> {
+            model.fetchNextPage()
+        }
+    }
 
     private fun createTestMessagesResponse(
         messagesReturned: Int,

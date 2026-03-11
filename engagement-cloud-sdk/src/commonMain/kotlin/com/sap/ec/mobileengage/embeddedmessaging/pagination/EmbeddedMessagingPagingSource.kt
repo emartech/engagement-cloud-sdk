@@ -9,6 +9,7 @@ import com.sap.ec.core.util.DownloaderApi
 import com.sap.ec.mobileengage.action.ActionFactoryApi
 import com.sap.ec.mobileengage.action.models.ActionModel
 import com.sap.ec.mobileengage.embeddedmessaging.exceptions.LastPageReachedException
+import kotlinx.coroutines.CancellationException
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemModel
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemViewModel
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
@@ -73,6 +74,8 @@ internal class EmbeddedMessagingPagingSource(
                         LoadResult.Error(it)
                     }
                 })
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logger.error("Error loading page", e)
             LoadResult.Error(e)

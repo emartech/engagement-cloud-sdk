@@ -23,6 +23,7 @@ import com.sap.ec.networking.clients.embedded.messaging.model.EmbeddedMessageAni
 import com.sap.ec.networking.clients.embedded.messaging.model.ListThumbnailImage
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
+import dev.mokkery.answering.throws
 import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
@@ -33,6 +34,7 @@ import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.data.forAll
 import io.kotest.data.headers
 import io.kotest.data.row
@@ -42,6 +44,7 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import io.ktor.http.headersOf
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.test.runTest
 import kotlin.io.encoding.Base64
 import kotlin.test.BeforeTest
@@ -211,6 +214,15 @@ class MessageItemModelTests {
             val result = testMethod()
 
             result.isSuccess shouldBe false
+        }
+    }
+
+    @Test
+    fun tagMessageOpened_shouldPropagateCancellationException() = runTest {
+        everySuspend { mockSdkEventDistributor.registerEvent(any()) } throws CancellationException("coroutine cancelled")
+
+        shouldThrow<CancellationException> {
+            messageItemModel.tagMessageOpened()
         }
     }
 
