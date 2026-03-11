@@ -77,7 +77,7 @@ internal object InitInjection {
         }
         single<State>(named(InitStateTypes.SdkConfigLoader)) {
             SdkConfigLoaderState(
-                sdkConfigStore = get(),
+                sdkContext = get(),
                 setupOrganizer = get(),
                 applicationScope = get(named(CoroutineScopeTypes.Application)),
                 sdkLogger = get { parametersOf(SdkConfigLoaderState::class.simpleName) }

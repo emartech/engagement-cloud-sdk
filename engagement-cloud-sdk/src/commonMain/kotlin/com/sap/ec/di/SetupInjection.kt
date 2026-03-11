@@ -15,8 +15,8 @@ import com.sap.ec.enable.states.AppStartState
 import com.sap.ec.enable.states.ApplyAppCodeBasedRemoteConfigState
 import com.sap.ec.enable.states.CollectDeviceInfoState
 import com.sap.ec.enable.states.FetchEmbeddedMessagingMetaState
-import com.sap.ec.enable.states.LoadEmbeddedMessagingFetchMessagesState
 import com.sap.ec.enable.states.FetchJsBridgeState
+import com.sap.ec.enable.states.LoadEmbeddedMessagingFetchMessagesState
 import com.sap.ec.enable.states.RegisterClientState
 import com.sap.ec.enable.states.RegisterPushTokenState
 import com.sap.ec.enable.states.RestoreSavedSdkEventsState
@@ -87,7 +87,7 @@ internal object SetupInjection {
         }
         single<State>(named(StateTypes.ClearStoredConfig)) {
             ClearStoredConfigState(
-                sdkConfigStore = get(),
+                sdkContext = get(),
                 sdkLogger = get { parametersOf(ClearStoredConfigState::class.simpleName) }
             )
         }
@@ -171,7 +171,6 @@ internal object SetupInjection {
             EnableOrganizer(
                 meStateMachine = get(named(StateMachineTypes.MobileEngageEnable)),
                 sdkContext = get(),
-                sdkConfigStore = get(),
                 ecSdkSession = get(),
                 sdkLogger = get { parametersOf(EnableOrganizer::class.simpleName) }
             )

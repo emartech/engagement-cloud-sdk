@@ -1,13 +1,12 @@
 package com.sap.ec.disable.states
 
-import com.sap.ec.config.SdkConfig
+import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.state.State
-import com.sap.ec.enable.config.SdkConfigStoreApi
 import com.sap.ec.util.runCatchingWithoutCancellation
 
 internal class ClearStoredConfigState(
-    private val sdkConfigStore: SdkConfigStoreApi<SdkConfig>,
+    private val sdkContext: SdkContextApi,
     private val sdkLogger: Logger
 ) : State {
     override val name = "ClearStoredConfig"
@@ -17,7 +16,7 @@ internal class ClearStoredConfigState(
 
     override suspend fun active(): Result<Unit> {
         return runCatchingWithoutCancellation {
-            sdkConfigStore.clear()
+            sdkContext.setSdkConfig(null)
             sdkLogger.debug("Cleared stored config")
         }
     }

@@ -12,7 +12,6 @@ import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.networking.model.UrlRequest
 import com.sap.ec.core.url.ECUrlType
 import com.sap.ec.core.url.UrlFactoryApi
-import com.sap.ec.enable.config.SdkConfigStoreApi
 import com.sap.ec.event.OnlineSdkEvent
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.mobileengage.config.FollowUpChangeAppCodeOrganizerApi
@@ -72,7 +71,6 @@ class ConfigClientTests {
     private lateinit var onlineEvents: MutableSharedFlow<OnlineSdkEvent>
     private lateinit var mockSdkEventManager: SdkEventManagerApi
     private lateinit var mockFollowUpChangeAppCodeOrganizer: FollowUpChangeAppCodeOrganizerApi
-    private lateinit var mockSdkConfigStore: SdkConfigStoreApi<SdkConfig>
     private lateinit var configClient: ConfigClient
 
     @BeforeTest
@@ -89,7 +87,6 @@ class ConfigClientTests {
         onlineEvents = spy(MutableSharedFlow())
         mockSdkEventManager = mock()
         mockFollowUpChangeAppCodeOrganizer = mock(MockMode.autofill)
-        mockSdkConfigStore = mock(MockMode.autofill)
         every { mockSdkEventManager.onlineSdkEvents } returns onlineEvents
 
         everySuspend { mockContactTokenHandler.handleContactTokens(any()) } returns Unit
@@ -116,7 +113,6 @@ class ConfigClientTests {
             mockContactTokenHandler,
             mockFollowUpChangeAppCodeOrganizer,
             mockEventsDao,
-            mockSdkConfigStore,
             mockSdkLogger,
             applicationScope,
             JsonUtil.json,
@@ -163,7 +159,6 @@ class ConfigClientTests {
             mockContactTokenHandler.handleContactTokens(any())
             mockConfig.copyWith(applicationCode = "NewAppCode")
             mockSdkContext.setSdkConfig(mockConfig)
-            mockSdkConfigStore.store(mockConfig)
             mockFollowUpChangeAppCodeOrganizer.organize()
             mockSdkContext.setSdkState(SdkState.Active)
             mockEventsDao.removeEvent(changeAppCode)
@@ -278,10 +273,7 @@ class ConfigClientTests {
 
         onlineSdkEvents.await() shouldBe listOf(changeAppCode)
 
-        verifySuspend {
-            mockSdkContext.setSdkConfig(mockConfig)
-            mockSdkConfigStore.store(mockConfig)
-        }
+        verifySuspend { mockSdkContext.setSdkConfig(mockConfig) }
     }
 
     @Test
@@ -308,9 +300,6 @@ class ConfigClientTests {
 
         onlineSdkEvents.await() shouldBe listOf(changeAppCode)
 
-        verifySuspend(VerifyMode.exactly(0)) {
-            mockSdkConfigStore.store(any())
-        }
         verifySuspend(VerifyMode.exactly(0)) {
             mockSdkContext.setSdkConfig(any())
         }

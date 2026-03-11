@@ -1,7 +1,6 @@
 package com.sap.ec.networking.clients.config
 
 import com.sap.ec.api.SdkState
-import com.sap.ec.config.SdkConfig
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventManagerApi
 import com.sap.ec.core.db.events.EventsDaoApi
@@ -11,7 +10,6 @@ import com.sap.ec.core.networking.clients.NetworkClientApi
 import com.sap.ec.core.networking.model.UrlRequest
 import com.sap.ec.core.url.ECUrlType
 import com.sap.ec.core.url.UrlFactoryApi
-import com.sap.ec.enable.config.SdkConfigStoreApi
 import com.sap.ec.event.OnlineSdkEvent
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.mobileengage.config.FollowUpChangeAppCodeOrganizerApi
@@ -36,7 +34,6 @@ internal class ConfigClient(
     private val contactTokenHandler: ContactTokenHandlerApi,
     private val followUpChangeAppCodeOrganizer: FollowUpChangeAppCodeOrganizerApi,
     private val eventsDao: EventsDaoApi,
-    private val sdkConfigStore: SdkConfigStoreApi<SdkConfig>,
     private val sdkLogger: Logger,
     private val applicationScope: CoroutineScope,
     private val json: Json
@@ -69,7 +66,6 @@ internal class ConfigClient(
 
                         val updatedConfig = sdkContext.getSdkConfig()?.copyWith(applicationCode = sdkEvent.applicationCode)
                         sdkContext.setSdkConfig(updatedConfig)
-                        updatedConfig?.let { config -> sdkConfigStore.store(config) }
 
                         followUpChangeAppCodeOrganizer.organize()
 

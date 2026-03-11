@@ -1,9 +1,8 @@
 package com.sap.ec.init.states
 
 import com.sap.ec.TestEngagementCloudSDKConfig
-import com.sap.ec.config.SdkConfig
+import com.sap.ec.context.SdkContextApi
 import com.sap.ec.enable.EnableOrganizerApi
-import com.sap.ec.enable.config.SdkConfigStoreApi
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
@@ -26,7 +25,7 @@ import kotlin.test.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class SdkConfigLoaderStateTests {
 
-    private lateinit var mockSdkConfigLoader: SdkConfigStoreApi<SdkConfig>
+    private lateinit var mockSdkContext: SdkContextApi
     private lateinit var mockSetupOrganizer: EnableOrganizerApi
 
     private lateinit var sdkConfigLoaderState: SdkConfigLoaderState
@@ -35,7 +34,7 @@ class SdkConfigLoaderStateTests {
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(StandardTestDispatcher())
-        mockSdkConfigLoader = mock()
+        mockSdkContext = mock(MockMode.autofill)
         mockSetupOrganizer = mock(MockMode.autofill)
     }
 
@@ -43,18 +42,18 @@ class SdkConfigLoaderStateTests {
     fun testActive_should_loadSdkConfig_andDoNothing_whenNoConfigIsSaved() = runTest {
         sdkConfigLoaderState =
             SdkConfigLoaderState(
-                mockSdkConfigLoader,
+                mockSdkContext,
                 mockSetupOrganizer,
                 applicationScope = backgroundScope,
                 sdkLogger = mock(MockMode.autofill)
             )
-        everySuspend { mockSdkConfigLoader.load() } returns null
+        everySuspend { mockSdkContext.getSdkConfig() } returns null
 
         val result = sdkConfigLoaderState.active()
         advanceUntilIdle()
 
         result shouldBe Result.success(Unit)
-        verifySuspend { mockSdkConfigLoader.load() }
+        verifySuspend { mockSdkContext.getSdkConfig() }
         verifySuspend(VerifyMode.exactly(0)) {
             mockSetupOrganizer.enable(any())
         }
@@ -64,42 +63,40 @@ class SdkConfigLoaderStateTests {
     fun testActive_should_loadSdkConfig_andSetup_whenConfigIsSaved() = runTest {
         sdkConfigLoaderState =
             SdkConfigLoaderState(
-                mockSdkConfigLoader, mockSetupOrganizer, applicationScope = TestScope(
+                mockSdkContext, mockSetupOrganizer, applicationScope = TestScope(
                     StandardTestDispatcher()
                 ), sdkLogger = mock(MockMode.autofill)
             )
         val testConfig = TestEngagementCloudSDKConfig(applicationCode = "test-app-code")
-        everySuspend { mockSdkConfigLoader.load() } returns testConfig
+        everySuspend { mockSdkContext.getSdkConfig() } returns testConfig
 
         val result = sdkConfigLoaderState.active()
         advanceUntilIdle()
 
         result shouldBe Result.success(Unit)
-        verifySuspend { mockSdkConfigLoader.load() }
-        verifySuspend {
-            mockSetupOrganizer.enable(testConfig)
-        }
+        verifySuspend { mockSdkContext.getSdkConfig() }
+        verifySuspend { mockSetupOrganizer.enable(testConfig) }
     }
 
     @Test
     fun testActive_should_returnFailure_whenEnableThrowsException() = runTest {
         sdkConfigLoaderState =
             SdkConfigLoaderState(
-                mockSdkConfigLoader,
+                mockSdkContext,
                 mockSetupOrganizer,
                 applicationScope = backgroundScope,
                 sdkLogger = mock(MockMode.autofill)
             )
         val testConfig = TestEngagementCloudSDKConfig(applicationCode = "test-app-code")
         val testException = RuntimeException("Enable failed")
-        everySuspend { mockSdkConfigLoader.load() } returns testConfig
+        everySuspend { mockSdkContext.getSdkConfig() } returns testConfig
         everySuspend { mockSetupOrganizer.enable(any()) } throws testException
 
         val result = sdkConfigLoaderState.active()
         advanceUntilIdle()
 
         result.isSuccess shouldBe true
-        verifySuspend { mockSdkConfigLoader.load() }
+        verifySuspend { mockSdkContext.getSdkConfig() }
         verifySuspend { mockSetupOrganizer.enable(testConfig) }
     }
 }

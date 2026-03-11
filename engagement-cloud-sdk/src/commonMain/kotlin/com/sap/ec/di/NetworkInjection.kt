@@ -118,7 +118,6 @@ internal object NetworkInjection {
                 contactTokenHandler = get(),
                 followUpChangeAppCodeOrganizer = get(),
                 eventsDao = get(),
-                sdkConfigStore = get(),
                 sdkLogger = get { parametersOf(ConfigClient::class.simpleName) },
                 applicationScope = get(named(CoroutineScopeTypes.Application)),
                 json = get(),
