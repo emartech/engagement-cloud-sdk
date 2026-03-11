@@ -12,6 +12,8 @@ import com.sap.ec.mobileengage.action.models.PresentableActionModel
 import com.sap.ec.mobileengage.push.model.JsNotificationClickedData
 import com.sap.ec.util.JsonUtil
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import web.broadcast.BroadcastChannel
 import web.events.EventHandler
@@ -52,6 +54,7 @@ internal class PushNotificationClickHandler(
             actionHandler.handleActions(mandatoryActions, triggeredAction)
 
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             sdkLogger.error("PushNotificationClickHandler - handleNotificationClick", e)
         }
     }

@@ -6,6 +6,8 @@ import com.sap.ec.api.event.model.BadgeCountEvent
 import com.sap.ec.mobileengage.action.models.BadgeCount
 import com.sap.ec.util.JsonUtil
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import web.broadcast.BroadcastChannel
 import web.events.EventHandler
@@ -38,6 +40,7 @@ internal class WebBadgeCountHandler(
                 )
             )
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             sdkLogger.error("WebBadgeCountHandler - handleBadgeCount", e)
         }
     }

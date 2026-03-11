@@ -1,6 +1,7 @@
 package com.sap.ec.mobileengage.push
 
 import com.sap.ec.core.actions.ActionHandlerApi
+import com.sap.ec.core.log.Logger
 import com.sap.ec.mobileengage.action.PushActionFactoryApi
 import com.sap.ec.mobileengage.action.actions.Action
 import com.sap.ec.mobileengage.action.actions.ReportingAction
@@ -17,6 +18,7 @@ import com.sap.ec.mobileengage.push.model.JsPlatformData
 import com.sap.ec.mobileengage.push.model.JsPushMessage
 import com.sap.ec.util.JsonUtil
 import dev.mokkery.MockMode
+import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend
@@ -29,10 +31,15 @@ import dev.mokkery.verifyNoMoreCalls
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import web.broadcast.BroadcastChannel
@@ -328,6 +335,57 @@ class PushNotificationClickHandlerTests {
 
             verifySuspend { mockActionFactory.create(actionModel) }
             verifyNoMoreCalls(mockAction)
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun handleNotificationClick_shouldPropagateCancellationException_whenCoroutineIsCancelled() =
+        runTest {
+            val testJob = Job()
+            val testScope = CoroutineScope(StandardTestDispatcher(testScheduler) + testJob)
+            val mockLogger = mock<Logger> {
+                everySuspend { error(any<String>(), any<Throwable>()) } returns Unit
+            }
+            val handler = PushNotificationClickHandler(
+                mockActionFactory,
+                mockActionHandler,
+                onNotificationClickedBroadcastChannel,
+                testScope,
+                sdkLogger = mockLogger
+            )
+            val notificationClickedData =
+                createTestJsNotificationClickedData(
+                    "",
+                    defaultTapActionModel = null,
+                    actionModels = null
+                )
+            val event =
+                JsonUtil.json.encodeToString<JsNotificationClickedData>(notificationClickedData)
+            val mockReportingAction = mock<Action<*>>(MockMode.autofill)
+            everySuspend {
+                mockActionFactory.create(
+                    NotificationOpenedActionModel(
+                        null,
+                        TRACKING_INFO
+                    )
+                )
+            } returns mockReportingAction
+            everySuspend { mockActionHandler.handleActions(any(), any()) } calls {
+                testJob.cancel()
+                throw CancellationException("Job was cancelled")
+            }
+
+            testScope.launch {
+                handler.handleNotificationClick(event)
+            }
+            advanceUntilIdle()
+
+            verifySuspend(VerifyMode.exactly(0)) {
+                mockLogger.error(
+                    "PushNotificationClickHandler - handleNotificationClick",
+                    any<Throwable>()
+                )
+            }
         }
 
     private fun createTestJsNotificationClickedData(

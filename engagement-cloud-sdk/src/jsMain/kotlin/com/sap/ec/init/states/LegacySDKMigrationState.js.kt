@@ -9,6 +9,8 @@ import com.sap.ec.core.state.State
 import com.sap.ec.core.storage.StorageConstants.CLIENT_ID_STORAGE_KEY
 import com.sap.ec.core.storage.StringStorageApi
 import com.sap.ec.util.runCatchingWithoutCancellation
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -83,6 +85,7 @@ internal actual class LegacySDKMigrationState(
     private suspend fun openLegacyDatabase(): IDBDatabase? = try {
         openIndexedDB(LEGACY_DB_NAME, LEGACY_DB_VERSION)
     } catch (e: Exception) {
+        currentCoroutineContext().ensureActive()
         sdkLogger.debug("Legacy IndexedDB not found or error opening: ${e.message}")
         null
     }
