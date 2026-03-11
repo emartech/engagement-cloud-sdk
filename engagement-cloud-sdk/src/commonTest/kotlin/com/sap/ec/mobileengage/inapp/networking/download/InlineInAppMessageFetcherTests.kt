@@ -280,7 +280,7 @@ class InlineInAppMessageFetcherTests {
 
         val result = fetcher.fetch(testRichContentUrl, testTrackingInfo)
 
-        result!!.type shouldBe InAppType.INLINE
+        result!!.type shouldBe InAppType.EMBEDDED_MESSAGING
         result.trackingInfo shouldBe testTrackingInfo
         result.content shouldBe htmlContent
 

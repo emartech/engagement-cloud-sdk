@@ -1,5 +1,6 @@
 package com.sap.ec.mobileengage.action.models
 
+import com.sap.ec.mobileengage.inapp.presentation.InAppType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -11,6 +12,8 @@ internal interface PushButtonClickedActionModel : ReportingActionModel {
 
 internal interface InAppButtonClickedActionModel : ReportingActionModel {
     var trackingInfo: String
+    var inAppType: InAppType
+
 }
 
 @Serializable
@@ -25,6 +28,8 @@ internal data class BasicPushButtonClickedActionModel(
 internal data class BasicInAppButtonClickedActionModel(
     override val reporting: String = "",
     override var trackingInfo: String = "",
+    override var inAppType: InAppType = InAppType.OVERLAY
+
 ) : BasicActionModel(), InAppButtonClickedActionModel
 
 @Serializable

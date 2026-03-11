@@ -7,6 +7,7 @@ import com.sap.ec.event.SdkEvent
 import com.sap.ec.mobileengage.action.models.BasicInAppButtonClickedActionModel
 import com.sap.ec.mobileengage.action.models.BasicPushButtonClickedActionModel
 import com.sap.ec.mobileengage.action.models.NotificationOpenedActionModel
+import com.sap.ec.mobileengage.inapp.presentation.InAppType
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -44,7 +45,8 @@ class ReportingActionTests {
 
     @Test
     fun testInvoke_shouldSendEventWithProperPayload_whenActionModel_pushButtonClicked() = runTest {
-        val pushButtonClickedActionModel = BasicPushButtonClickedActionModel(reporting = REPORTING, TRACKING_INFO)
+        val pushButtonClickedActionModel =
+            BasicPushButtonClickedActionModel(reporting = REPORTING, TRACKING_INFO)
         val action = ReportingAction(pushButtonClickedActionModel, mockSdkEventDistributor)
         val expectedEvent = SdkEvent.Internal.Push.Clicked(
             ID,
@@ -68,10 +70,12 @@ class ReportingActionTests {
     fun testInvoke_shouldSendEventWithProperPayload_whenActionModel_inAppButtonClicked() = runTest {
         val inAppButtonClickedActionModel = BasicInAppButtonClickedActionModel(
             REPORTING,
-            TRACKING_INFO
+            TRACKING_INFO,
+            InAppType.INLINE
         )
         val action = ReportingAction(inAppButtonClickedActionModel, mockSdkEventDistributor)
         val expectedEvent = SdkEvent.Internal.InApp.ButtonClicked(
+            reportingName = "inapp:click",
             ID,
             reporting = REPORTING,
             trackingInfo = TRACKING_INFO,
@@ -88,6 +92,34 @@ class ReportingActionTests {
 
         verifyArguments(eventSlot, expectedEvent, "inapp:click")
     }
+
+    @Test
+    fun testInvoke_shouldSendEventWithProperPayload_whenActionModel_EmbeddedMessagingButtonClicked() =
+        runTest {
+            val inAppButtonClickedActionModel = BasicInAppButtonClickedActionModel(
+                REPORTING,
+                TRACKING_INFO,
+                InAppType.EMBEDDED_MESSAGING
+            )
+            val action = ReportingAction(inAppButtonClickedActionModel, mockSdkEventDistributor)
+            val expectedEvent = SdkEvent.Internal.InApp.ButtonClicked(
+                reportingName = "em:click",
+                ID,
+                reporting = REPORTING,
+                trackingInfo = TRACKING_INFO,
+                origin = BUTTON_CLICK_ORIGIN
+            )
+
+            val eventSlot = slot<SdkEvent>()
+
+            everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(
+                MockMode.autofill
+            )
+
+            action.invoke()
+
+            verifyArguments(eventSlot, expectedEvent, "em:click")
+        }
 
     @Test
     fun testInvoke_shouldSendEventWithProperPayload_whenActionModel_isNotificationOpenedActionModel() =

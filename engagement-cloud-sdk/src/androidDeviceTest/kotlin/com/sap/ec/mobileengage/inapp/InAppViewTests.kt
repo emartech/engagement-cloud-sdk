@@ -60,7 +60,7 @@ class InAppViewTests {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun load_should_createWebView_andAddItToLayout() = runTest {
-        val inAppJsBridgeData = InAppJsBridgeData(UUID, TRACKING_INFO)
+        val inAppJsBridgeData = InAppJsBridgeData(UUID, TRACKING_INFO, InAppType.OVERLAY)
         val content = "testHtml"
         val replacedContent = "replaced_testHtml"
         every { mockWebView.parent } returns null

@@ -3,6 +3,7 @@ package com.sap.ec.mobileengage.inapp.providers
 import com.sap.ec.core.factory.Factory
 import com.sap.ec.mobileengage.inapp.InAppJsBridge
 import com.sap.ec.mobileengage.inapp.jsbridge.InAppJsBridgeData
+import com.sap.ec.mobileengage.inapp.presentation.InAppType
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.readValue
 import kotlinx.coroutines.CoroutineDispatcher
@@ -20,12 +21,13 @@ internal class IosWebViewFactory(
 ) : IosWebViewFactoryApi {
 
     @OptIn(ExperimentalForeignApi::class)
-    override suspend fun create(dismissId: String, trackingInfo: String): WKWebView {
+    override suspend fun create(dismissId: String, trackingInfo: String, inAppType: InAppType): WKWebView {
         return withContext(mainDispatcher) {
             val inAppJsBridge = inAppJsBridgeFactory.create(
                 InAppJsBridgeData(
                     dismissId = dismissId,
-                    trackingInfo = trackingInfo
+                    trackingInfo = trackingInfo,
+                    inAppType = inAppType
                 )
             )
             val webView =

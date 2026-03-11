@@ -20,6 +20,9 @@ enum class InAppType {
     @SerialName("inline")
     INLINE,
 
+    @SerialName("embedded-messaging")
+    EMBEDDED_MESSAGING,
+
     @SerialName("ribbon")
     RIBBON
 }

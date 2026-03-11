@@ -35,7 +35,7 @@ internal class InAppView(
         mInAppMessage = message
         val replacedContent = contentReplacer.replace(message.content)
         val webView = withContext(mainDispatcher) {
-            webViewFactory.create(message.dismissId, message.trackingInfo).apply {
+            webViewFactory.create(message.dismissId, message.trackingInfo, message.type).apply {
                 loadHTMLString(replacedContent, null)
             }
         }

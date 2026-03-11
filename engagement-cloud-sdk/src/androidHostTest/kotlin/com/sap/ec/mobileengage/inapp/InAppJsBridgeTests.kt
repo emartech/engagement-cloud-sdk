@@ -10,6 +10,7 @@ import com.sap.ec.mobileengage.action.models.BasicInAppButtonClickedActionModel
 import com.sap.ec.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.sap.ec.mobileengage.action.models.RequestPushPermissionActionModel
 import com.sap.ec.mobileengage.inapp.jsbridge.InAppJsBridgeData
+import com.sap.ec.mobileengage.inapp.presentation.InAppType
 import com.sap.ec.util.JsonUtil
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -57,7 +58,7 @@ class InAppJsBridgeTests {
     @Before
     fun setup() {
         Dispatchers.setMain(StandardTestDispatcher())
-        inAppJsBridgeData = InAppJsBridgeData(DISMISS_ID, TRACKING_INFO)
+        inAppJsBridgeData = InAppJsBridgeData(DISMISS_ID, TRACKING_INFO, InAppType.INLINE)
         mockActionFactory = mockk(relaxed = true)
         mockLogger = mockk(relaxed = true)
         applicationScope = TestScope(StandardTestDispatcher())
@@ -101,7 +102,7 @@ class InAppJsBridgeTests {
         }.toString()
 
         val expectedActionModel =
-            BasicInAppButtonClickedActionModel(reporting, TRACKING_INFO)
+            BasicInAppButtonClickedActionModel(reporting, TRACKING_INFO, InAppType.INLINE)
 
         inAppJsBridge.handleInAppAction(testEventString)
 
@@ -178,7 +179,7 @@ class InAppJsBridgeTests {
             put("reporting", reporting)
         }.toString()
 
-        val expectedActionModel = BasicDismissActionModel(reporting, DISMISS_ID)
+        val expectedActionModel = BasicDismissActionModel(reporting, DISMISS_ID, InAppType.INLINE)
 
         inAppJsBridge.handleInAppAction(testEventString)
 
@@ -257,7 +258,7 @@ class InAppJsBridgeTests {
             put("reporting", reporting)
         }.toString()
 
-        val expectedActionModel = BasicInAppButtonClickedActionModel(reporting, TRACKING_INFO)
+        val expectedActionModel = BasicInAppButtonClickedActionModel(reporting, TRACKING_INFO, InAppType.INLINE)
 
         inAppJsBridge.buttonClicked(testEventString)
 
@@ -333,7 +334,7 @@ class InAppJsBridgeTests {
             put("reporting", reporting)
         }.toString()
 
-        val expectedActionModel = BasicDismissActionModel(reporting, DISMISS_ID)
+        val expectedActionModel = BasicDismissActionModel(reporting, DISMISS_ID, InAppType.INLINE)
 
         inAppJsBridge.close(testEventString)
 

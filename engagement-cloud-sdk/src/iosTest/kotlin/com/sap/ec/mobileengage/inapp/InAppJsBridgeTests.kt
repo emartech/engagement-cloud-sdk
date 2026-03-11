@@ -7,6 +7,7 @@ import com.sap.ec.mobileengage.action.models.ActionModel
 import com.sap.ec.mobileengage.action.models.BasicCustomEventActionModel
 import com.sap.ec.mobileengage.action.models.BasicDismissActionModel
 import com.sap.ec.mobileengage.inapp.jsbridge.InAppJsBridgeData
+import com.sap.ec.mobileengage.inapp.presentation.InAppType
 import com.sap.ec.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
@@ -60,7 +61,7 @@ class InAppJsBridgeTests {
 
         inAppJsBridge = InAppJsBridge(
             actionFactory = mockActionFactory,
-            inAppJsBridgeData = InAppJsBridgeData(DISMISS_ID, TRACKING_INFO),
+            inAppJsBridgeData = InAppJsBridgeData(DISMISS_ID, TRACKING_INFO, InAppType.OVERLAY),
             mainDispatcher = dispatcher,
             sdkDispatcher = dispatcher,
             logger = mockLogger,

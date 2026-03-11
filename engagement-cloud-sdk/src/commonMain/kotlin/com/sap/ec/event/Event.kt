@@ -500,6 +500,7 @@ sealed interface SdkEvent {
 
             @Serializable
             data class ButtonClicked(
+                val reportingName: String,
                 override val id: String = UUIDProvider().provide(),
                 override val reporting: String,
                 override val trackingInfo: String,
@@ -507,7 +508,7 @@ sealed interface SdkEvent {
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0,
-            ) : InApp(IN_APP_BUTTON_CLICKED_EVENT_NAME), Reporting
+            ) : InApp(reportingName), Reporting
 
             @Serializable
             data class Present(

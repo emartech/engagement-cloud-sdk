@@ -25,7 +25,7 @@ class InAppViewProviderTest {
     @Test
     fun `test provide returns non-null InAppView`() = runTest {
         val webView = WKWebView()
-        everySuspend { mockWebViewFactory.create(any(), any()) } returns webView
+        everySuspend { mockWebViewFactory.create(any(), any(), any()) } returns webView
 
         val inAppViewProvider =
             InAppViewProvider(

@@ -68,7 +68,11 @@ internal class InAppJsBridge(
             val buttonClickJson = json.decodeFromString<JsonObject>(jsonString)
             val reporting: String = buttonClickJson["reporting"]?.jsonPrimitive?.contentOrNull ?: ""
             val actionModel =
-                BasicInAppButtonClickedActionModel(reporting, inAppJsBridgeData.trackingInfo)
+                BasicInAppButtonClickedActionModel(
+                    reporting,
+                    inAppJsBridgeData.trackingInfo,
+                    inAppJsBridgeData.inAppType
+                )
             actionFactory.create(actionModel)()
         }
     }
@@ -104,6 +108,7 @@ internal class InAppJsBridge(
         actionChannel.trySend {
             val actionModel = json.decodeFromString<BasicDismissActionModel>(jsonString)
             actionModel.dismissId = inAppJsBridgeData.dismissId
+            actionModel.inAppType = inAppJsBridgeData.inAppType
             actionFactory.create(actionModel)()
         }
     }

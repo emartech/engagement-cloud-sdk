@@ -3,6 +3,7 @@ package com.sap.ec.mobileengage.inapp.providers
 import com.sap.ec.core.factory.Factory
 import com.sap.ec.mobileengage.inapp.InAppJsBridge
 import com.sap.ec.mobileengage.inapp.jsbridge.InAppJsBridgeData
+import com.sap.ec.mobileengage.inapp.presentation.InAppType
 import com.sap.ec.util.JsonUtil
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -39,6 +40,7 @@ class WebViewFactoryTests {
                     inAppJsBridgeData = InAppJsBridgeData(
                         dismissId = DISMISS_ID,
                         trackingInfo = TRACKING_INFO,
+                        inAppType = InAppType.OVERLAY,
                     ),
                     StandardTestDispatcher(),
                     StandardTestDispatcher(),
@@ -61,7 +63,8 @@ class WebViewFactoryTests {
 
         val webView = provider.create(
             DISMISS_ID,
-            TRACKING_INFO
+            TRACKING_INFO,
+            InAppType.OVERLAY
         )
 
         webView.backgroundColor shouldBe UIColor.clearColor

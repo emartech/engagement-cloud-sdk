@@ -1,12 +1,15 @@
 package com.sap.ec.mobileengage.action.actions
 
 import com.sap.ec.SdkConstants.BUTTON_CLICK_ORIGIN
+import com.sap.ec.SdkConstants.EMBEDDED_MESSAGING_BUTTON_CLICKED_EVENT_NAME
+import com.sap.ec.SdkConstants.IN_APP_BUTTON_CLICKED_EVENT_NAME
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.mobileengage.action.models.BasicInAppButtonClickedActionModel
 import com.sap.ec.mobileengage.action.models.BasicPushButtonClickedActionModel
 import com.sap.ec.mobileengage.action.models.NotificationOpenedActionModel
 import com.sap.ec.mobileengage.action.models.ReportingActionModel
+import com.sap.ec.mobileengage.inapp.presentation.InAppType
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
@@ -27,13 +30,25 @@ internal data class ReportingAction(
             }
 
             is BasicInAppButtonClickedActionModel -> {
-                sdkEventDistributor.registerEvent(
-                    SdkEvent.Internal.InApp.ButtonClicked(
-                        reporting = action.reporting,
-                        trackingInfo = action.trackingInfo,
-                        origin = BUTTON_CLICK_ORIGIN
+                if (action.inAppType == InAppType.EMBEDDED_MESSAGING) {
+                    sdkEventDistributor.registerEvent(
+                        SdkEvent.Internal.InApp.ButtonClicked(
+                            reporting = action.reporting,
+                            trackingInfo = action.trackingInfo,
+                            origin = BUTTON_CLICK_ORIGIN,
+                            reportingName = EMBEDDED_MESSAGING_BUTTON_CLICKED_EVENT_NAME
+                        )
                     )
-                )
+                } else {
+                    sdkEventDistributor.registerEvent(
+                        SdkEvent.Internal.InApp.ButtonClicked(
+                            reporting = action.reporting,
+                            trackingInfo = action.trackingInfo,
+                            origin = BUTTON_CLICK_ORIGIN,
+                            reportingName = IN_APP_BUTTON_CLICKED_EVENT_NAME
+                        )
+                    )
+                }
             }
 
             is NotificationOpenedActionModel -> {

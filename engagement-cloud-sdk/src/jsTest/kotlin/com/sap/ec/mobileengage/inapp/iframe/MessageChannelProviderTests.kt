@@ -9,6 +9,7 @@ import com.sap.ec.mobileengage.action.models.BasicInAppButtonClickedActionModel
 import com.sap.ec.mobileengage.action.models.BasicOpenExternalUrlActionModel
 import com.sap.ec.mobileengage.action.models.HtmlTarget
 import com.sap.ec.mobileengage.inapp.InAppMessage
+import com.sap.ec.mobileengage.inapp.presentation.InAppType
 import com.sap.ec.mobileengage.inapp.toIframeId
 import com.sap.ec.util.JsonUtil
 import dev.mokkery.MockMode
@@ -144,7 +145,7 @@ class MessageChannelProviderTests {
     @Test
     fun provide_shouldAmend_theActionModel_inCaseOfDismiss() = runTest {
         val testActionModel = BasicDismissActionModel()
-        val amendedActionModel = testActionModel.copy(dismissId = DISMISS_ID)
+        val amendedActionModel = testActionModel.copy(dismissId = DISMISS_ID, inAppType = InAppType.OVERLAY)
         val actionInvoked = CompletableDeferred<Unit>()
         val mockAction: Action<*> = mock(MockMode.autofill) {
             everySuspend { invoke() } calls {
@@ -174,9 +175,10 @@ class MessageChannelProviderTests {
     fun provide_shouldAmend_theActionModel_inCaseOfButtonClick() = runTest {
         val testActionModel = BasicInAppButtonClickedActionModel(
             REPORTING,
-            ""
+            "",
+            InAppType.OVERLAY
         )
-        val amendedActionModel = testActionModel.copy(trackingInfo = TRACKING_INFO)
+        val amendedActionModel = testActionModel.copy(trackingInfo = TRACKING_INFO, inAppType = InAppType.OVERLAY)
         val actionInvoked = CompletableDeferred<Unit>()
         val mockAction: Action<*> = mock(MockMode.autofill) {
             everySuspend { invoke() } calls {
@@ -242,7 +244,7 @@ class MessageChannelProviderTests {
             "testEvent",
             mapOf("pay" to "load")
         )
-        val dismissActionModel = BasicDismissActionModel(dismissId = DISMISS_ID)
+        val dismissActionModel = BasicDismissActionModel(dismissId = DISMISS_ID, inAppType = InAppType.OVERLAY)
 
         val mockCustomEventAction: Action<*> = mock(MockMode.autofill) {
             everySuspend { invoke() } calls {

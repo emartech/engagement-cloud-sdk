@@ -73,8 +73,10 @@ internal class MessageChannelProvider(
     private fun BasicActionModel.amend(message: InAppMessage): BasicActionModel {
         if (this is DismissActionModel) {
             this.dismissId = message.dismissId
+            this.inAppType = message.type
         } else if (this is BasicInAppButtonClickedActionModel) {
             this.trackingInfo = message.trackingInfo
+            this.inAppType = message.type
         }
 
         return this

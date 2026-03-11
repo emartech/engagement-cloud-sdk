@@ -89,19 +89,23 @@ internal class InlineInAppMessageFetcher(
                     null
                 } else {
                     sdkLogger.debug("Successfully fetched inline message from url: $url")
-                    val richContentUrl = json.decodeFromString<EmbeddedMessagingRichContentUrlHolder>(content).url
+                    val richContentUrl =
+                        json.decodeFromString<EmbeddedMessagingRichContentUrlHolder>(content).url
                     val richContentRequest = UrlRequest(
                         Url(richContentUrl),
                         HttpMethod.Get,
                         headers = mapOf(HttpHeaders.ContentType to ContentType.Text.Html.toString())
                     )
                     genericClient.send(richContentRequest).getOrElse {
-                        sdkLogger.error("Failed to fetch RichContent for embedded message from url: $richContentUrl", it)
+                        sdkLogger.error(
+                            "Failed to fetch RichContent for embedded message from url: $richContentUrl",
+                            it
+                        )
                         return null
                     }.bodyAsText.let {
                         sdkLogger.debug("Successfully fetched detail message content from url: $url")
                         InAppMessage(
-                            type = InAppType.INLINE,
+                            type = InAppType.EMBEDDED_MESSAGING,
                             trackingInfo = trackingInfo,
                             content = it
                         )

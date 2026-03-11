@@ -9,7 +9,7 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 
 //needs to be exposed for ServiceWorker
 @InternalSdkApi
- sealed interface ActionModel
+sealed interface ActionModel
 
 //needs to be exposed for ServiceWorker
 @InternalSdkApi
@@ -34,8 +34,12 @@ sealed class PresentableActionModel : ActionModel {
 internal fun BasicActionModel.amendForJsBridge(data: InAppJsBridgeData): BasicActionModel {
     if (this is DismissActionModel) {
         this.dismissId = data.dismissId
+        this.inAppType = data.inAppType
+
     } else if (this is BasicInAppButtonClickedActionModel) {
         this.trackingInfo = data.trackingInfo
+        this.inAppType = data.inAppType
+
     }
 
     return this

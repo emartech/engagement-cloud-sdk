@@ -65,54 +65,83 @@ internal class InAppJsBridge(
             val name = withContext(mainScope.coroutineContext) {
                 didReceiveScriptMessage.name
             }
-            logger.debug("Received action: body(${json.encodeToString(JsonElement.serializer(), bodyElement)})")
+            logger.debug(
+                "Received action: body(${
+                    json.encodeToString(
+                        JsonElement.serializer(),
+                        bodyElement
+                    )
+                })"
+            )
             when (name) {
                 "triggerMEEvent" -> {
                     val actionModel =
-                        json.decodeFromJsonElement(BasicCustomEventActionModel.serializer(), bodyElement)
+                        json.decodeFromJsonElement(
+                            BasicCustomEventActionModel.serializer(),
+                            bodyElement
+                        )
                     actionFactory.create(actionModel)()
                 }
 
                 "buttonClicked" -> {
                     val actionModel =
-                        json.decodeFromJsonElement(BasicInAppButtonClickedActionModel.serializer(), bodyElement)
+                        json.decodeFromJsonElement(
+                            BasicInAppButtonClickedActionModel.serializer(),
+                            bodyElement
+                        ).amendForJsBridge(inAppJsBridgeData)
                     actionFactory.create(actionModel)()
                 }
 
                 "triggerAppEvent" -> {
                     val actionModel =
-                        json.decodeFromJsonElement(BasicAppEventActionModel.serializer(), bodyElement)
+                        json.decodeFromJsonElement(
+                            BasicAppEventActionModel.serializer(),
+                            bodyElement
+                        )
                     actionFactory.create(actionModel)()
                 }
 
                 "requestPushPermission" -> {
                     val actionModel =
-                        json.decodeFromJsonElement(RequestPushPermissionActionModel.serializer(), bodyElement)
+                        json.decodeFromJsonElement(
+                            RequestPushPermissionActionModel.serializer(),
+                            bodyElement
+                        )
                     actionFactory.create(actionModel)()
                 }
 
                 "openExternalLink" -> {
                     val actionModel =
-                        json.decodeFromJsonElement(BasicOpenExternalUrlActionModel.serializer(), bodyElement)
+                        json.decodeFromJsonElement(
+                            BasicOpenExternalUrlActionModel.serializer(),
+                            bodyElement
+                        )
                     actionFactory.create(actionModel)()
                 }
 
                 "close" -> {
                     val actionModel =
-                        json.decodeFromJsonElement(BasicDismissActionModel.serializer(), bodyElement)
-                    actionModel.dismissId = inAppJsBridgeData.dismissId
+                        json.decodeFromJsonElement(
+                            BasicDismissActionModel.serializer(),
+                            bodyElement
+                        ).amendForJsBridge(inAppJsBridgeData)
+
                     actionFactory.create(actionModel)()
                 }
 
                 "copyToClipboard" -> {
                     val actionModel =
-                        json.decodeFromJsonElement(BasicCopyToClipboardActionModel.serializer(), bodyElement)
+                        json.decodeFromJsonElement(
+                            BasicCopyToClipboardActionModel.serializer(),
+                            bodyElement
+                        )
                     actionFactory.create(actionModel)()
                 }
 
                 "handleInAppAction" -> {
-                    val actionModel = json.decodeFromJsonElement(BasicActionModel.serializer(), bodyElement)
-                        .amendForJsBridge(inAppJsBridgeData)
+                    val actionModel =
+                        json.decodeFromJsonElement(BasicActionModel.serializer(), bodyElement)
+                            .amendForJsBridge(inAppJsBridgeData)
                     actionFactory.create(actionModel).invoke()
                 }
 

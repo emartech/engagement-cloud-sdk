@@ -2,6 +2,7 @@ package com.sap.ec.mobileengage.inapp
 
 import com.sap.ec.mobileengage.action.EventActionFactoryApi
 import com.sap.ec.mobileengage.inapp.jsbridge.InAppJsBridgeData
+import com.sap.ec.mobileengage.inapp.presentation.InAppType
 import com.sap.ec.util.JsonUtil
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
@@ -30,7 +31,8 @@ class InAppJsBridgeFactoryTest {
         inAppJsBridgeProvider.create(
             InAppJsBridgeData(
                 DISMISS_ID,
-                TRACKING_INFO
+                TRACKING_INFO,
+                InAppType.INLINE
             )
         )::class.java shouldBe InAppJsBridge::class.java
     }

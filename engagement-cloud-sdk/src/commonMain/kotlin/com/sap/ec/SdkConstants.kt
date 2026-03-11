@@ -4,6 +4,8 @@ object SdkConstants {
     const val PUSH_CLICKED_EVENT_NAME = "push:click"
     const val BUTTON_CLICK_ORIGIN = "button"
     const val IN_APP_BUTTON_CLICKED_EVENT_NAME = "inapp:click"
+
+    const val EMBEDDED_MESSAGING_BUTTON_CLICKED_EVENT_NAME = "em:click"
     const val SILENT_PUSH_RECEIVED_EVENT_NAME = "push:silentPushReceived"
     const val SESSION_START_EVENT_NAME = "session:start"
     const val SESSION_END_EVENT_NAME = "session:end"

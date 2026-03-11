@@ -59,7 +59,13 @@ internal class InAppView @JvmOverloads constructor(
 
             addView(webView)
             webView.addJavascriptInterface(
-                jsBridgeFactory.create(InAppJsBridgeData(message.dismissId, message.trackingInfo)),
+                jsBridgeFactory.create(
+                    InAppJsBridgeData(
+                        message.dismissId,
+                        message.trackingInfo,
+                        message.type
+                    )
+                ),
                 JS_BRIDGE_NAME
             )
 
