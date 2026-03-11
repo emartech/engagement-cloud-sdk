@@ -13,7 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import com.sap.ec.AndroidEngagementCloud
+import com.sap.ec.android.EngagementCloud
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
             App()
         }
         lifecycleScope.launch {
-            AndroidEngagementCloud.config.getNotificationSettings()
+            EngagementCloud.config.getNotificationSettings()
             askNotificationPermission()
         }
     }

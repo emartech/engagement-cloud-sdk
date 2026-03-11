@@ -1,6 +1,6 @@
 package com.sap.ec.e2e
 
-import com.sap.ec.AndroidEngagementCloud
+import com.sap.ec.android.EngagementCloud
 import com.sap.ec.api.SdkState
 import com.sap.ec.api.config.AndroidEngagementCloudSDKConfig
 import com.sap.ec.context.SdkContextApi
@@ -35,7 +35,7 @@ class EmbeddedMessagingE2ETests {
 
     @BeforeTest
     fun setup() = runTest {
-        AndroidEngagementCloud.initialize()
+        EngagementCloud.initialize()
         val requestContext = SdkKoinIsolationContext.koin.get<RequestContextApi>()
         requestContext.clientId = STAGING_UNIVERSAL_TOKEN_EXPIRES_ON_2025_10_30
         requestContext.contactToken = STAGING_UNIVERSAL_TOKEN_EXPIRES_ON_2025_10_30
