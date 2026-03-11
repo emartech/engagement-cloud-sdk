@@ -5,6 +5,8 @@ import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
 import com.sap.ec.core.log.Logger
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import java.security.GeneralSecurityException
 import java.security.KeyStore
 import javax.crypto.Cipher
@@ -42,6 +44,7 @@ internal class SharedPreferenceCrypto(
                 null
             }
         } catch (exception: Exception) {
+            currentCoroutineContext().ensureActive()
             logCryptoError(value, exception)
             null
         }
