@@ -10,13 +10,13 @@ internal class PlatformInitializer(
     private val webBadgeCountHandler: WebBadgeCountHandlerApi
 ) : PlatformInitializerApi {
 
-    private val readyBroadcastChannel = BroadcastChannel(WEB_PUSH_SDK_READY_CHANNEL_NAME)
-
     override suspend fun init() {
         pushNotificationClickHandler.register()
         webBadgeCountHandler.register()
 
+        val readyBroadcastChannel = BroadcastChannel(WEB_PUSH_SDK_READY_CHANNEL_NAME)
         readyBroadcastChannel.postMessage("READY")
+        readyBroadcastChannel.close()
     }
 
 }
