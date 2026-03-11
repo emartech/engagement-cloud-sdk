@@ -177,6 +177,7 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
     val detailPane by style {
         flex(1)
         padding(DEFAULT_PADDING)
+        height(MAX_HEIGHT)
         property("overflow-y", "auto")
     }
 
@@ -692,12 +693,14 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
     val detailViewContainer by style {
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Column)
+        height(MAX_HEIGHT)
         gap(DEFAULT_SPACING)
     }
 
     val detailContent by style {
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Column)
+        height(MAX_HEIGHT)
         gap(DEFAULT_PADDING)
     }
 

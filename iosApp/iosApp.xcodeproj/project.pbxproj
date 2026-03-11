@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -18,8 +18,6 @@
 		2A866EF72F4DDF1B00BB51B0 /* InlineInAppViewWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A866EF62F4DDF1B00BB51B0 /* InlineInAppViewWrapper.swift */; };
 		2A918DE92C85E8FE00B1AF36 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A918DE82C85E8FE00B1AF36 /* NotificationService.swift */; };
 		5D13BC422F597A6D00736AF5 /* NotificationService.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2A918DE62C85E8FE00B1AF36 /* NotificationService.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		5D13BC482F597AAA00736AF5 /* EngagementCloudNotificationService in Frameworks */ = {isa = PBXBuildFile; productRef = 5D13BC472F597AAA00736AF5 /* EngagementCloudNotificationService */; };
-		5D13BC4A2F597AAA00736AF5 /* EngagementCloudSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 5D13BC492F597AAA00736AF5 /* EngagementCloudSDK */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
 /* End PBXBuildFile section */
 
@@ -92,7 +90,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5D13BC482F597AAA00736AF5 /* EngagementCloudNotificationService in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -100,7 +97,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5D13BC4A2F597AAA00736AF5 /* EngagementCloudSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -282,7 +278,6 @@
 			);
 			mainGroup = 7555FF72242A565900829871;
 			packageReferences = (
-				5D13BC462F597AAA00736AF5 /* XCLocalSwiftPackageReference "../../kmp-emarsys-sdk" */,
 			);
 			productRefGroup = 7555FF7C242A565900829871 /* Products */;
 			projectDirPath = "";
@@ -641,13 +636,6 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		5D13BC462F597AAA00736AF5 /* XCLocalSwiftPackageReference "../../kmp-emarsys-sdk" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = "../../kmp-emarsys-sdk";
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCSwiftPackageProductDependency section */
 		2A1005422F4F3FA700E746C4 /* EngagementCloudSDK */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -672,10 +660,6 @@
 		2A866EFB2F4DFC8B00BB51B0 /* EngagementCloudSDK */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = EngagementCloudSDK;
-		};
-		5D13BC472F597AAA00736AF5 /* EngagementCloudNotificationService */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = EngagementCloudNotificationService;
 		};
 		5D13BC492F597AAA00736AF5 /* EngagementCloudSDK */ = {
 			isa = XCSwiftPackageProductDependency;
