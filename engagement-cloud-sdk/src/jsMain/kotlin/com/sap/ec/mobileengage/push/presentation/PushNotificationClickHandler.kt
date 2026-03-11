@@ -1,4 +1,4 @@
-package com.sap.ec.mobileengage.push
+package com.sap.ec.mobileengage.push.presentation
 
 import com.sap.ec.core.actions.ActionHandlerApi
 import com.sap.ec.core.log.Logger

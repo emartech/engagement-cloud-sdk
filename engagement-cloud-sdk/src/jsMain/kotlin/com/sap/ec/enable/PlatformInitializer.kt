@@ -2,7 +2,7 @@ package com.sap.ec.enable
 
 import com.sap.ec.api.push.PushConstants.WEB_PUSH_SDK_READY_CHANNEL_NAME
 import com.sap.ec.core.badge.WebBadgeCountHandlerApi
-import com.sap.ec.mobileengage.push.PushNotificationClickHandlerApi
+import com.sap.ec.mobileengage.push.presentation.PushNotificationClickHandlerApi
 import org.w3c.dom.BroadcastChannel
 
 internal class PlatformInitializer(

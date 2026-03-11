@@ -1,4 +1,4 @@
-package com.sap.ec.mobileengage.push
+package com.sap.ec.mobileengage.push.presentation
 
 import com.sap.ec.core.actions.ActionHandlerApi
 import com.sap.ec.mobileengage.action.PushActionFactoryApi
@@ -12,6 +12,8 @@ import com.sap.ec.mobileengage.action.models.NotificationOpenedActionModel
 import com.sap.ec.mobileengage.action.models.PresentableActionModel
 import com.sap.ec.mobileengage.action.models.PresentableOpenExternalUrlActionModel
 import com.sap.ec.mobileengage.inapp.networking.models.PushToInAppPayload
+import com.sap.ec.mobileengage.push.ActionableData
+import com.sap.ec.mobileengage.push.DisplayableData
 import com.sap.ec.mobileengage.push.model.JsNotificationClickedData
 import com.sap.ec.mobileengage.push.model.JsPlatformData
 import com.sap.ec.mobileengage.push.model.JsPushMessage

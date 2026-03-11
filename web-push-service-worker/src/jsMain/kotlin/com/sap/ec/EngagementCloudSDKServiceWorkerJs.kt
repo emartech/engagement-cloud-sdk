@@ -4,7 +4,7 @@ import com.sap.ec.api.push.PushConstants.WEB_PUSH_ON_BADGE_COUNT_UPDATE_RECEIVED
 import com.sap.ec.api.push.PushConstants.WEB_PUSH_ON_NOTIFICATION_CLICKED_CHANNEL_NAME
 import com.sap.ec.api.push.PushConstants.WEB_PUSH_SDK_READY_CHANNEL_NAME
 import com.sap.ec.core.log.ConsoleLogger
-import com.sap.ec.mobileengage.push.PushMessagePresenter
+import com.sap.ec.mobileengage.push.presentation.PushMessagePresenter
 import com.sap.ec.mobileengage.push.WebPushNotificationPresenter
 import com.sap.ec.mobileengage.push.mappers.PushMessageWebV2Mapper
 import com.sap.ec.mobileengage.push.model.JsNotificationClickedData

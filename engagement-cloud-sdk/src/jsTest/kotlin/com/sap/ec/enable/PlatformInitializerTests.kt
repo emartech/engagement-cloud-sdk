@@ -1,7 +1,7 @@
 package com.sap.ec.enable
 
 import com.sap.ec.core.badge.WebBadgeCountHandlerApi
-import com.sap.ec.mobileengage.push.PushNotificationClickHandlerApi
+import com.sap.ec.mobileengage.push.presentation.PushNotificationClickHandlerApi
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.mock

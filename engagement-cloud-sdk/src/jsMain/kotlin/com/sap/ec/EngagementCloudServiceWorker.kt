@@ -3,7 +3,7 @@ package com.sap.ec
 import com.sap.ec.core.log.ConsoleLogger
 import com.sap.ec.core.log.LogLevel
 import com.sap.ec.core.mapper.Mapper
-import com.sap.ec.mobileengage.push.PushMessagePresenter
+import com.sap.ec.mobileengage.push.presentation.PushMessagePresenter
 import com.sap.ec.mobileengage.push.model.JsPushMessage
 import kotlinx.serialization.StringFormat
 import kotlinx.serialization.encodeToString

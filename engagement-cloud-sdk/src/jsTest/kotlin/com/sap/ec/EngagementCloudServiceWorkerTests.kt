@@ -6,7 +6,7 @@ import com.sap.ec.core.mapper.Mapper
 import com.sap.ec.mobileengage.action.models.BadgeCount
 import com.sap.ec.mobileengage.action.models.BadgeCountMethod
 import com.sap.ec.mobileengage.push.DisplayableData
-import com.sap.ec.mobileengage.push.PushMessagePresenter
+import com.sap.ec.mobileengage.push.presentation.PushMessagePresenter
 import com.sap.ec.mobileengage.push.model.JsPlatformData
 import com.sap.ec.mobileengage.push.model.JsPushMessage
 import com.sap.ec.util.JsonUtil
