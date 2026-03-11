@@ -558,7 +558,7 @@ private fun RefreshButtonOnWeb(listPageViewModel: ListPageViewModelApi) {
         ) {
             Icon(
                 imageVector = Icons.Outlined.Refresh,
-                contentDescription = LocalStringResources.current.deleteIconButtonAltText
+                contentDescription = LocalStringResources.current.errorStateNoConnectionRefreshIconAltText
             )
         }
     }

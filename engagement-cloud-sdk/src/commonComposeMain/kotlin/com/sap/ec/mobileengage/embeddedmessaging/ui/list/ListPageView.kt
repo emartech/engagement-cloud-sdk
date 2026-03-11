@@ -46,7 +46,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.window.core.layout.WindowSizeClass
-import com.sap.ec.SdkConstants
 import com.sap.ec.di.SdkKoinIsolationContext.koin
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.LARGE_PADDING
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.MEDIUM_PADDING
@@ -202,7 +201,7 @@ private fun MessageList(
                                     selectedMessage = selectedMessageViewModel,
                                     hasFiltersApplied = hasFiltersApplied,
                                     hasConnection = hasConnection,
-                                    withSwipeGestures = viewModel.platformCategory != SdkConstants.WEB_PLATFORM_CATEGORY,
+                                    withSwipeGestures = viewModel.hasTouchInput,
                                     onRefresh = { viewModel.refreshMessagesWithThrottling { lazyPagingMessageItems.refresh() } },
                                     onMessageClick = { messageViewModel ->
                                         scope.launch {
