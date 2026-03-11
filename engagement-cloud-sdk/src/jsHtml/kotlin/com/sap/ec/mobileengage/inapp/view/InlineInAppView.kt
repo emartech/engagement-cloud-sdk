@@ -12,6 +12,7 @@ import com.sap.ec.mobileengage.embeddedmessaging.ui.toDismissId
 import com.sap.ec.mobileengage.inapp.InAppMessage
 import com.sap.ec.mobileengage.inapp.networking.download.InlineInAppMessageFetcherApi
 import io.ktor.http.Url
+import js.array.asList
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.web.css.height
@@ -129,6 +130,9 @@ internal fun InlineInAppView(
 }
 
 private fun removeInlineInApp(message: InAppMessage) {
-    document.getElementById(ElementId(message.dismissId.toDismissId()))?.remove()
+    val iFrameContainer = document.getElementById(ElementId(message.dismissId.toDismissId()))
+    iFrameContainer?.childNodes?.asList()?.forEach {
+        iFrameContainer.removeChild(it)
+    }
 }
 
