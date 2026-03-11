@@ -11,6 +11,7 @@ import com.sap.ec.mobileengage.action.ActionFactoryApi
 import com.sap.ec.mobileengage.action.models.ActionModel
 import com.sap.ec.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
+import com.sap.ec.networking.clients.embedded.messaging.model.Category
 import com.sap.ec.watchdog.connection.ConnectionWatchDog
 import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
@@ -168,6 +169,35 @@ class ListPageViewModelTests {
                 categories = any()
             )
         }
+    }
+
+    @Test
+    fun testSetSelectCategoryIds_shouldClearMessageSelection_ifMessageCategoriesAreNotIncluded_inTheSet() = runTest {
+        viewModel.filterUnopenedOnly.value shouldBe false
+        viewModel.selectedCategoryIds.value shouldBe emptySet()
+        viewModel.categories.value shouldBe emptyList()
+        val mockMessageViewModel = mock<MessageItemViewModelApi>(MockMode.autofill)
+        every { mockMessageViewModel.categories } returns listOf(Category("5", "five"))
+
+        val selectedCategoryIds = setOf("1", "2", "3")
+
+        every { mockPagerFactory.create(any(), any(), any()) } returns flowOf(
+            PagingData.from(
+                data = emptyList(),
+                placeholdersBefore = 0,
+                placeholdersAfter = 0
+            )
+        )
+
+        viewModel.selectMessage(mockMessageViewModel) {}
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        viewModel.selectedMessage.value shouldBe mockMessageViewModel
+
+        viewModel.setSelectedCategoryIds(selectedCategoryIds)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+       viewModel.selectedMessage.value shouldBe null
     }
 
     @OptIn(ExperimentalTime::class)

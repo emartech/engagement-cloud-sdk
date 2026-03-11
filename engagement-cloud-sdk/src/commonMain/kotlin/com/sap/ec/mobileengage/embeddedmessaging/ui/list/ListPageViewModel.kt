@@ -133,6 +133,15 @@ internal class ListPageViewModel(
 
     override fun setSelectedCategoryIds(categoryIds: Set<String>) {
         _selectedCategoryIds.value = categoryIds
+
+        val selectedMessageIncludedInFilteredCategories =
+            (selectedMessage.value?.categories?.any {
+                _selectedCategoryIds.value.contains(it.id)
+            }) ?: false
+
+        if (!selectedMessageIncludedInFilteredCategories) {
+            clearMessageSelection()
+        }
     }
 
     override fun selectMessage(
