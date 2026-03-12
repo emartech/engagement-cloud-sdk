@@ -15,6 +15,9 @@ import js.typedarrays.toUint8Array
 import kotlinx.browser.window
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
+import web.notifications.Notification
+import web.notifications.NotificationPermission
+import web.notifications.granted
 import web.push.PushSubscription
 import web.push.PushSubscriptionOptionsInit
 import web.push.getSubscription
@@ -62,9 +65,9 @@ internal class PushService(
             }
             webPermissionHandler.requestPushPermission()
             if (
-                getPermissionState() != PermissionState.Granted
+                Notification.permission != NotificationPermission.granted
             ) {
-                return Result.failure(IllegalStateException("Push permission was not granted."))
+                return Result.failure(IllegalStateException("Notification permission was not granted."))
             }
             val options = createPushSubscriptionOptions(serviceWorkerOptions)
             println("Subscribing to push notifications with options: ${JSON.stringify(options)}")
@@ -99,10 +102,16 @@ internal class PushService(
     }
 
     override suspend fun getPermissionState(): PermissionState {
-        return getServiceWorkerRegistration()?.pushManager?.let { pushManager ->
-            enumValueOf<PermissionState>(
-                pushManager.permissionState().toString().replaceFirstChar { it.titlecase() })
-        } ?: PermissionState.Denied
+        return try {
+            getServiceWorkerRegistration()?.pushManager?.let { pushManager ->
+                enumValueOf<PermissionState>(
+                    pushManager.permissionState().toString().replaceFirstChar { it.titlecase() })
+            } ?: PermissionState.Denied
+        } catch (e: Throwable) {
+            currentCoroutineContext().ensureActive()
+            sdkLogger.error("Failed to get push permission state", e)
+            PermissionState.Denied
+        }
     }
 
     private suspend fun getServiceWorkerOptions(): ServiceWorkerOptions? {
