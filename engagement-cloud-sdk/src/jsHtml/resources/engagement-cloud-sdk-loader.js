@@ -38,9 +38,10 @@
     ]),
     event: createApiSegment("event", ["track"]),
     push: createApiSegment("push", [
-      "registerPushToken",
-      "clearPushToken",
-      "getPushToken",
+      "subscribe",
+      "unsubscribe",
+      "isSubscribed",
+      "getPermissionState",
     ]),
     deepLink: createApiSegment("deepLink", ["track"]),
     events: createApiSegment("events", [

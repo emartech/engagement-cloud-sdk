@@ -51,7 +51,7 @@ internal open class PushInternal(
     }
 
     override suspend fun getPushToken(): String? {
-        return storage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) ?: storage.get(PUSH_TOKEN_STORAGE_KEY)
+        return storage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) // ?: storage.get(PUSH_TOKEN_STORAGE_KEY) // todo check
     }
 
     override suspend fun activate() {
@@ -74,6 +74,9 @@ internal open class PushInternal(
                         "Common PushInternal: shouldn't handle silent message with user info: $call"
                     )
                 }
+
+                PushCall.Subscribe -> {}
+                PushCall.Unsubscribe -> {}
             }
         }
     }

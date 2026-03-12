@@ -15,4 +15,14 @@ internal sealed interface PushCall {
 
     @Serializable
     data class ClearPushToken(val applicationCode: String?) : PushCall
+
+    @Serializable
+    data object Subscribe : PushCall
+
+    @Serializable
+    data object Unsubscribe : PushCall
+
+
+
+
 }

@@ -17,6 +17,7 @@ open class PushMessagePresenter(private val webPushNotificationPresenter: WebPus
     PushPresenter<JsPlatformData, JsPushMessage> {
 
     override suspend fun present(pushMessage: JsPushMessage) {
+        println("Presenting push message with id: ${pushMessage}")
         pushMessage.displayableData?.let {
             val notificationOptions = js("{}").unsafeCast<NotificationOptions>().apply {
                 body = it.body
@@ -46,6 +47,16 @@ open class PushMessagePresenter(private val webPushNotificationPresenter: WebPus
                 action = it.id
                 title = it.title
             }
-        }.toTypedArray()
+        }.toTypedArray().also {
+            println(
+                "Presenting push message with id: ${
+                    it.joinToString { action ->
+                        JSON.stringify(
+                            action
+                        )
+                    }
+                }"
+            )
+        }
     }
 }

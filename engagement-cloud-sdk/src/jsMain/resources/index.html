@@ -78,27 +78,27 @@
     }
 
     document.getElementById("button-integration-demo").onclick = async () => {
-        const config = new window["engagement-cloud-sdk"].EngagementCloudConfig(
-            "EMS04-F3514",
-            null,
-            null,
-            new window["engagement-cloud-sdk"].ServiceWorkerOptions(
-                "BKlWDU3MxVpAEp7rjC5p9VYOhGBauYPO7K7b0117suJAoxaFzIwV4FT45eFI_hHBXgPlgKHyHDrbi1BpoKuiUww",
-                "/ec-service-worker.js"
-            )
-        )
-        await engagementCloud.setup.enable(config, async () => { return {contactFieldValue: "test2@test.com"} });
-        await engagementCloud.setup.setOnContactLinkingFailedCallback(async () => { return {contactFieldValue: "test2@test.com"} });
-        await engagementCloud.contact.link("test2@test.com");
+        const config = {
+                applicationCode: "EMS52-0718E",
+                serviceWorkerOptions: {
+                    applicationServerKey: "BCT_jb2Gx6GNacHVe6dHbGaeOVfHiiKM-c5RHnY0CjOFWc4Jbd7vRK3v0Rq0QGATJ0rpg8D3kQqNKLYkwKR0KKg",
+                    serviceWorkerPath: "/ec-service-worker.js",
+                    serviceWorkerScope: "/"
+                }
+            };
+        await engagementCloud.setup.enable(config, async () => { return {contactFieldValue: "test@test.com"} });
+        await engagementCloud.setup.setOnContactLinkingFailedCallback(async () => { return {contactFieldValue: "test@test.com"} });
+        await engagementCloud.contact.link("test@example.com");
+        await engagementCloud.push.subscribe();
     }
 
     document.getElementById("button-custom-event").onclick = async () => {
         const name = document.getElementById("customEventNameInput").value;
-        await engagementCloud.event.track({type: "CUSTOM", name: name, attributes: {"key1": "value1"}});
+        await engagementCloud.event.track({type: "custom", name: name, attributes: {"key1": "value1"}});
     }
 
     document.getElementById("button-navigate-event").onclick = async () => {
-        await engagementCloud.event.track({ type: "NAVIGATE", location: "https://www.emarsys.com" });
+        await engagementCloud.event.track({ type: "navigate", location: "https://www.emarsys.com" });
     }
 
     document.getElementById("button-link-contact").onclick = async () => {

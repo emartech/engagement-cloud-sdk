@@ -1,16 +1,24 @@
 package com.sap.ec.api.push
 
-internal class JSPush(private val pushApi: PushApi) :
-    JSPushApi {
-    override suspend fun registerPushToken(pushToken: String) {
-        pushApi.registerPushToken(pushToken).getOrThrow()
+import com.sap.ec.mobileengage.push.JsPushWrapperApi
+
+internal class JSPush(
+    private val jsPushWrapperApi: JsPushWrapperApi
+) : JSPushApi {
+
+    override suspend fun subscribe() {
+        jsPushWrapperApi.subscribe().getOrThrow()
     }
 
-    override suspend fun clearPushToken() {
-        pushApi.clearPushToken().getOrThrow()
+    override suspend fun unsubscribe() {
+        jsPushWrapperApi.unsubscribe().getOrThrow()
     }
 
-    override suspend fun getPushToken(): String? {
-        return pushApi.getPushToken().getOrThrow()
+    override suspend fun isSubscribed(): Boolean {
+        return jsPushWrapperApi.isSubscribed()
+    }
+
+    override suspend fun getPermissionState(): String {
+        return jsPushWrapperApi.getPermissionState()
     }
 }

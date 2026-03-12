@@ -1,15 +1,8 @@
 package com.sap.ec.enable
 
-import JsEngagementCloudSDKConfig
-import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.state.State
-import com.sap.ec.mobileengage.push.PushServiceApi
-import com.sap.ec.util.runCatchingWithoutCancellation
 
-internal class PlatformInitState(
-    private val pushService: PushServiceApi,
-    val sdkContext: SdkContextApi,
-) : State {
+internal class PlatformInitState : State {
 
     override val name: String = "jsInitState"
 
@@ -18,13 +11,7 @@ internal class PlatformInitState(
     }
 
     override suspend fun active(): Result<Unit> {
-        return runCatchingWithoutCancellation {
-            sdkContext.getSdkConfig()?.let {
-                val jsEngagementCloudSDKConfig = it as JsEngagementCloudSDKConfig
-                pushService.register(jsEngagementCloudSDKConfig)
-                pushService.subscribeForPushMessages(jsEngagementCloudSDKConfig)
-            }
-        }
+        return Result.success(Unit)
     }
 
     override fun relax() {

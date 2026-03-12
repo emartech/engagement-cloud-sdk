@@ -17,14 +17,9 @@ import com.sap.ec.api.inapp.JSInApp
 import com.sap.ec.api.inapp.JSInAppApi
 import com.sap.ec.api.push.JSPush
 import com.sap.ec.api.push.JSPushApi
-import com.sap.ec.api.push.LoggingPush
-import com.sap.ec.api.push.Push
 import com.sap.ec.api.push.PushApi
 import com.sap.ec.api.push.PushConstants.WEB_PUSH_ON_BADGE_COUNT_UPDATE_RECEIVED
 import com.sap.ec.api.push.PushConstants.WEB_PUSH_ON_NOTIFICATION_CLICKED_CHANNEL_NAME
-import com.sap.ec.api.push.PushGatherer
-import com.sap.ec.api.push.PushInstance
-import com.sap.ec.api.push.PushInternal
 import com.sap.ec.api.setup.JsSetup
 import com.sap.ec.api.setup.JsSetupApi
 import com.sap.ec.api.tracking.JSTracking
@@ -85,11 +80,17 @@ import com.sap.ec.mobileengage.inapp.iframe.MessageChannelProviderApi
 import com.sap.ec.mobileengage.inapp.presentation.InAppPresenterApi
 import com.sap.ec.mobileengage.inapp.presentation.InlineInAppViewRendererApi
 import com.sap.ec.mobileengage.inapp.view.InAppViewProviderApi
+import com.sap.ec.mobileengage.push.JsGathererPush
+import com.sap.ec.mobileengage.push.JsLoggingPush
+import com.sap.ec.mobileengage.push.JsPushInstance
+import com.sap.ec.mobileengage.push.JsPushInternal
+import com.sap.ec.mobileengage.push.JsPushWrapper
+import com.sap.ec.mobileengage.push.JsPushWrapperApi
 import com.sap.ec.mobileengage.push.PushService
-import com.sap.ec.mobileengage.push.PushServiceContext
-import com.sap.ec.mobileengage.push.PushServiceContextApi
+import com.sap.ec.mobileengage.push.PushServiceApi
 import com.sap.ec.mobileengage.push.presentation.PushNotificationClickHandler
 import com.sap.ec.mobileengage.push.presentation.PushNotificationClickHandlerApi
+import com.sap.ec.mobileengage.push.serviceworker.ServiceWorkerManager
 import com.sap.ec.watchdog.connection.ConnectionWatchDog
 import com.sap.ec.watchdog.connection.WebConnectionWatchDog
 import com.sap.ec.watchdog.lifecycle.LifecycleWatchDog
@@ -103,6 +104,7 @@ import kotlinx.serialization.json.Json
 import org.koin.core.module.Module
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
+import org.koin.dsl.binds
 import org.koin.dsl.module
 import web.broadcast.BroadcastChannel
 import web.dom.document
@@ -161,17 +163,20 @@ internal object WebInjection {
                 sdkLogger = get { parametersOf(LegacySDKMigrationState::class.simpleName) }
             )
         }
-        single<PushServiceContextApi> { PushServiceContext() }
-        single<State>(named(StateTypes.PlatformInit)) {
-            val pushService = PushService(
-                get(),
+        single<PushServiceApi> {
+            val serviceWorkerManager = ServiceWorkerManager(
+                sdkLogger = get { parametersOf(ServiceWorkerManager::class.simpleName) }
+            )
+            PushService(
+                serviceWorkerManager = serviceWorkerManager,
+                sdkContext = get(),
+                webPermissionHandler = get(),
                 storage = get<StringStorageApi>(),
                 sdkLogger = get { parametersOf(PushService::class.simpleName) }
             )
-            PlatformInitState(
-                pushService = pushService,
-                sdkContext = get(),
-            )
+        }
+        single<State>(named(StateTypes.PlatformInit)) {
+            PlatformInitState()
         }
         single<PushNotificationClickHandlerApi> {
             PushNotificationClickHandler(
@@ -260,39 +265,45 @@ internal object WebInjection {
                 typedStorage = get()
             )
         }
-        single<PushInstance>(named(InstanceType.Logging)) {
-            LoggingPush(
-                storage = get(),
-                logger = get { parametersOf(LoggingPush::class.simpleName) }
-            )
-        }
-        single<PushInstance>(named(InstanceType.Gatherer)) {
-            PushGatherer(
-                context = get(),
-                storage = get(),
-                sdkContext = get()
-            )
-        }
-        single<PushInstance>(named(InstanceType.Internal)) {
-            PushInternal(
+        single<JsPushInstance>(named(InstanceType.Internal)) {
+            JsPushInternal(
                 storage = get(),
                 pushContext = get(),
-                sdkEventDistributor = get(),
                 sdkContext = get(),
-                sdkLogger = get { parametersOf(PushInternal::class.simpleName) }
+                sdkEventDistributor = get(),
+                sdkLogger = get { parametersOf(JsPushInternal::class.simpleName) },
+                pushService = get(),
+            )
+        }
+        single<JsPushInstance>(named(InstanceType.Logging)) {
+            JsLoggingPush(
+                logger = get { parametersOf(JsLoggingPush::class.simpleName) },
+            )
+        }
+        single<JsPushInstance>(named(InstanceType.Gatherer)) {
+            JsGathererPush(
+                context = get(),
+                jsPushInternal = get(named(InstanceType.Internal)),
+                sdkLogger = get { parametersOf(JsGathererPush::class.simpleName) },
             )
         }
         single<PushApi> {
-            Push(
+            JsPushWrapper(
                 loggingApi = get(named(InstanceType.Logging)),
                 gathererApi = get(named(InstanceType.Gatherer)),
                 internalApi = get(named(InstanceType.Internal)),
-                sdkContext = get()
+                sdkContext = get(),
             )
-        }
+        } binds arrayOf(
+            JsPushWrapperApi::class,
+            PushApi::class
+        )
         single<JsSetupApi> { JsSetup(get()) }
         single<WebNotificationSettingsCollectorApi> {
-            WebNotificationSettingsCollector(pushServiceContext = get())
+            WebNotificationSettingsCollector(
+                pushService = get(),
+                jsPushWrapperApi = get()
+            )
         }
         single<JSConfigApi> {
             JSConfig(
@@ -307,7 +318,11 @@ internal object WebInjection {
                 sdkLogger = get { parametersOf(JSTracking::class.simpleName) }
             )
         }
-        single<JSPushApi> { JSPush(pushApi = get()) }
+        single<JSPushApi> {
+            JSPush(
+                jsPushWrapperApi = get(),
+            )
+        }
         single<JSDeepLinkApi> { JSDeepLink(deepLinkApi = get()) }
         single<JSInAppApi> { JSInApp(inAppApi = get()) }
         single<JsEmbeddedMessagingApi> { JsEmbeddedMessaging(embeddedMessaging = get()) }

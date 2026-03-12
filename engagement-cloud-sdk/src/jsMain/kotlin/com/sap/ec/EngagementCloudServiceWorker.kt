@@ -18,7 +18,7 @@ external var self: ServiceWorkerGlobalScope
 @JsName("EngagementCloudServiceWorker")
 class EngagementCloudServiceWorker(
     private val pushMessagePresenter: PushMessagePresenter,
-    private val pushMessageWebV1Mapper: Mapper<String, JsPushMessage>,
+    private val pushMessageWebV2Mapper: Mapper<String, JsPushMessage>,
     private val onBadgeCountUpdateReceivedBroadcastChannel: BroadcastChannel,
     private val json: StringFormat,
     private val logger: ConsoleLogger
@@ -26,7 +26,8 @@ class EngagementCloudServiceWorker(
 
     suspend fun onPush(event: String): JsPushMessage? {
         try {
-            val pushMessage: JsPushMessage? = pushMessageWebV1Mapper.map(event)
+            println("PUSH EVENT RECEIVED: $event")
+            val pushMessage: JsPushMessage? = pushMessageWebV2Mapper.map(event)
             pushMessage?.let {
                 pushMessagePresenter.present(it)
                 pushMessage.badgeCount?.let { badgeCount ->

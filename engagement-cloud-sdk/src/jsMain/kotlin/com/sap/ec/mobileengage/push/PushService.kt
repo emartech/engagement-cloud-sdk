@@ -3,51 +3,123 @@ package com.sap.ec.mobileengage.push
 import JsEngagementCloudSDKConfig
 import com.sap.ec.api.config.ServiceWorkerOptions
 import com.sap.ec.api.push.PushConstants
+import com.sap.ec.context.SdkContextApi
+import com.sap.ec.core.device.notification.PermissionState
 import com.sap.ec.core.log.Logger
+import com.sap.ec.core.permission.PermissionHandlerApi
 import com.sap.ec.core.storage.StringStorageApi
+import com.sap.ec.mobileengage.push.serviceworker.ServiceWorkerManagerApi
+import com.sap.ec.util.runCatchingWithoutCancellation
 import js.buffer.BufferSource
-import js.promise.await
 import js.typedarrays.toUint8Array
 import kotlinx.browser.window
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
-import web.navigator.navigator
+import web.push.PushSubscription
 import web.push.PushSubscriptionOptionsInit
+import web.push.getSubscription
+import web.push.permissionState
 import web.push.subscribe
+import web.push.unsubscribe
+import web.serviceworker.ServiceWorkerRegistration
+import web.serviceworker.unregister
+import web.serviceworker.update
 
-//TODO: handle errors in registration and subscription
 internal class PushService(
-    private val pushServiceContext: PushServiceContextApi,
+    private val serviceWorkerManager: ServiceWorkerManagerApi,
+    private val sdkContext: SdkContextApi,
+    private val webPermissionHandler: PermissionHandlerApi,
     private val storage: StringStorageApi,
     private val sdkLogger: Logger
 ) : PushServiceApi {
 
-    override suspend fun register(config: JsEngagementCloudSDKConfig) {
-        config.serviceWorkerOptions?.let {
-            pushServiceContext.registration =
-                (navigator.serviceWorker.asDynamic()
-                    .register(it.serviceWorkerPath) as js.promise.Promise<web.serviceworker.ServiceWorkerRegistration>).await()
-            navigator.serviceWorker.ready.await()
+    private var serviceWorkerRegistration: ServiceWorkerRegistration? = null
+    private var pushSubscription: PushSubscription? = null
+
+    override suspend fun subscribe(): Result<String?> {
+        if (js("!('serviceWorker' in navigator)")) {
+            sdkLogger.debug("Service workers are not supported in this browser. Push notifications will not work.")
+            return Result.failure(UnsupportedOperationException("Service workers are not supported in this browser."))  // todo custom exception
+        }
+        if (js("!('PushManager' in window)")) {
+            sdkLogger.debug("Push API is not supported in this browser. Push notifications will not work.")
+            return Result.failure(UnsupportedOperationException("Push API is not supported in this browser.")) // todo custom exception
+        }
+        return try {
+            val serviceWorkerOptions = getServiceWorkerOptions() ?: return Result.failure(
+                IllegalStateException("Service worker options are not set.")
+            )
+            println("Registering service worker with options: ${JSON.stringify(serviceWorkerOptions)}")
+            serviceWorkerManager.register(serviceWorkerOptions).onFailure {
+                return Result.failure(
+                    IllegalStateException(
+                        "Service worker registration failed: ${it.message}",
+                        it
+                    )
+                )
+            }.onSuccess {
+                serviceWorkerRegistration = it
+            }
+            webPermissionHandler.requestPushPermission()
+            if (
+                getPermissionState() != PermissionState.Granted
+            ) {
+                return Result.failure(IllegalStateException("Push permission was not granted."))
+            }
+            val options = createPushSubscriptionOptions(serviceWorkerOptions)
+            println("Subscribing to push notifications with options: ${JSON.stringify(options)}")
+            val pushSubscription = getServiceWorkerRegistration()?.pushManager?.subscribe(options)
+            println("Subscribing to push notifications with options: ${JSON.stringify(options)}")
+            val pushToken = pushSubscription?.let {
+                val pushToken = JSON.stringify(it)
+                storage.put(PushConstants.PUSH_TOKEN_STORAGE_KEY, pushToken)
+                pushToken
+            }
+            Result.success(pushToken)
+        } catch (e: Throwable) {
+            println("Error during push subscription: ${e.message}")
+            currentCoroutineContext().ensureActive()
+            sdkLogger.error("Push subscription failed", e)
+            Result.failure<String>(e)
         }
     }
 
-    override suspend fun subscribeForPushMessages(config: JsEngagementCloudSDKConfig) {
-        try {
-            config.serviceWorkerOptions?.let {
-                val options = createPushSubscriptionOptions(it)
-                val pushSubscription =
-                    pushServiceContext.registration?.pushManager?.subscribe(options)
-                val pushToken =
-                    pushSubscription?.let { subscription -> JSON.stringify(subscription) }
-                pushToken?.let { token ->
-                    storage.put(PushConstants.PUSH_TOKEN_STORAGE_KEY, token)
-                    pushServiceContext.isSubscribed = true
-                }
+    override suspend fun getServiceWorkerRegistration(): ServiceWorkerRegistration? {
+        return try {
+            serviceWorkerRegistration ?: getServiceWorkerOptions()?.let { options ->
+                serviceWorkerManager.register(options).getOrNull()
+                    .also { serviceWorkerRegistration = it }
+                this.serviceWorkerRegistration?.update()
             }
         } catch (e: Throwable) {
             currentCoroutineContext().ensureActive()
-            sdkLogger.error("Push subscription failed", e)
+            sdkLogger.error("Failed to get service worker registration", e)
+            null
         }
+    }
+
+    override suspend fun getPermissionState(): PermissionState {
+        return getServiceWorkerRegistration()?.pushManager?.let { pushManager ->
+            enumValueOf<PermissionState>(
+                pushManager.permissionState().toString().replaceFirstChar { it.titlecase() })
+        } ?: PermissionState.Denied
+    }
+
+    private suspend fun getServiceWorkerOptions(): ServiceWorkerOptions? {
+        val config = sdkContext.getSdkConfig() as JsEngagementCloudSDKConfig?
+        println("Getting service worker options from SDK config: ${JSON.stringify(config)}")
+        return config?.serviceWorkerOptions
+    }
+
+    override suspend fun unsubscribe(): Result<Unit> = runCatchingWithoutCancellation {
+        getPushSubscription()?.unsubscribe()
+        getServiceWorkerRegistration()?.unregister()
+    }
+
+
+    private suspend fun getPushSubscription(): PushSubscription? {
+        return pushSubscription ?: getServiceWorkerRegistration()?.pushManager?.getSubscription()
+            ?.also { pushSubscription = it }
     }
 
     private fun createPushSubscriptionOptions(serviceWorkerOptions: ServiceWorkerOptions): PushSubscriptionOptionsInit {
@@ -72,5 +144,4 @@ internal class PushService(
         }
         return outputArray.toUint8Array()
     }
-
 }

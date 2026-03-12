@@ -1,7 +1,7 @@
 package com.sap.ec.api.push
 
 import com.sap.ec.TestEngagementCloudSDKConfig
-import com.sap.ec.api.push.PushConstants.PUSH_TOKEN_STORAGE_KEY
+import com.sap.ec.api.push.PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.storage.StringStorageApi
 import dev.mokkery.answering.returns
@@ -35,7 +35,9 @@ class PushGathererTests {
     fun setUp() {
         mockStringStorage = mock()
         mockSdkContext = mock()
-        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(APPLICATION_CODE)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(
+            APPLICATION_CODE
+        )
         pushContext = PushContext(mutableListOf())
         pushGatherer = PushGatherer(pushContext, mockStringStorage, mockSdkContext)
     }
@@ -51,7 +53,7 @@ class PushGathererTests {
 
     @Test
     fun testPushToken() = runTest {
-        every { mockStringStorage.get(PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
+        every { mockStringStorage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
 
         pushGatherer.getPushToken() shouldBe PUSH_TOKEN
     }

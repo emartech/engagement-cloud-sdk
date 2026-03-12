@@ -1,11 +1,11 @@
 package com.sap.ec.api.push
 
+import com.sap.ec.mobileengage.push.JsPushWrapperApi
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -19,20 +19,14 @@ import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class JSPushTests {
-    private companion object {
-        val testException = Exception("testException")
-        val testFailedResult = Result.failure<Unit>(testException)
-        val testSuccessResult = Result.success<Unit>(Unit)
-    }
-
     private lateinit var jsPush: JSPush
-    private lateinit var mockPushApi: PushApi
+    private lateinit var mockJsPushWrapperApi: JsPushWrapperApi
 
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(StandardTestDispatcher())
-        mockPushApi = mock(MockMode.autoUnit)
-        jsPush = JSPush(mockPushApi)
+        mockJsPushWrapperApi = mock(MockMode.autoUnit)
+        jsPush = JSPush(mockJsPushWrapperApi)
     }
 
     @AfterTest
@@ -41,55 +35,40 @@ class JSPushTests {
     }
 
     @Test
-    fun registerPushToken_shouldCall_registerPushTokenOnPushApi() = runTest {
-        val testPushToken = "testPushToken"
-        everySuspend { mockPushApi.registerPushToken(testPushToken) } returns testSuccessResult
+    fun subscribe_shouldDelegateTo_jsPushWrapperApi() = runTest {
+        everySuspend { mockJsPushWrapperApi.subscribe() } returns Result.success(Unit)
 
-        jsPush.registerPushToken(testPushToken)
+        jsPush.subscribe()
 
-        verifySuspend { mockPushApi.registerPushToken(testPushToken) }
+        verifySuspend { mockJsPushWrapperApi.subscribe() }
     }
 
     @Test
-    fun registerPushToken_shouldThrowException_ifRegisterPushToken_fails() = runTest {
-        val testPushToken = "testPushToken"
-        everySuspend { mockPushApi.registerPushToken(testPushToken) } returns testFailedResult
+    fun unsubscribe_shouldDelegateTo_jsPushWrapperApi() = runTest {
+        everySuspend { mockJsPushWrapperApi.unsubscribe() } returns Result.success(Unit)
 
-        shouldThrow<Exception> { jsPush.registerPushToken(testPushToken) }
+        jsPush.unsubscribe()
+
+        verifySuspend { mockJsPushWrapperApi.unsubscribe() }
     }
 
     @Test
-    fun clearPushToken_shouldCall_clearPushTokenOnPushApi() = runTest {
-        everySuspend { mockPushApi.clearPushToken() } returns testSuccessResult
+    fun isSubscribed_shouldDelegateTo_jsPushWrapperApi() = runTest {
+        everySuspend { mockJsPushWrapperApi.isSubscribed() } returns true
 
-        jsPush.clearPushToken()
+        val result = jsPush.isSubscribed()
 
-        verifySuspend { mockPushApi.clearPushToken() }
+        result shouldBe true
+        verifySuspend { mockJsPushWrapperApi.isSubscribed() }
     }
 
     @Test
-    fun clearPushToken_shouldThrowException_ifClearPushToken_fails() = runTest {
-        everySuspend { mockPushApi.clearPushToken() } returns testFailedResult
+    fun getPermissionState_shouldDelegateTo_jsPushWrapperApi() = runTest {
+        everySuspend { mockJsPushWrapperApi.getPermissionState() } returns "granted"
 
-        shouldThrow<Exception> { jsPush.clearPushToken() }
-    }
+        val result = jsPush.getPermissionState()
 
-    @Test
-    fun getPushToken_shouldCall_getPushTokenOnPushApi() = runTest {
-        val token = "testPushToken"
-        val testSuccessResultWithString = Result.success<String>(token)
-        everySuspend { mockPushApi.getPushToken() } returns testSuccessResultWithString
-
-        val result = jsPush.getPushToken()
-
-        result shouldBe token
-    }
-
-    @Test
-    fun getPushToken_shouldThrowException_ifGetPushToken_fails() = runTest {
-        val testFailedResult = Result.failure<String>(testException)
-        everySuspend { mockPushApi.getPushToken() } returns testFailedResult
-
-        shouldThrow<Exception> { jsPush.clearPushToken() }
+        result shouldBe "granted"
+        verifySuspend { mockJsPushWrapperApi.getPermissionState() }
     }
 }

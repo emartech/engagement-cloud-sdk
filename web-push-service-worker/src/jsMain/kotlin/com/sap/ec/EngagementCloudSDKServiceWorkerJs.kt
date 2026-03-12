@@ -4,29 +4,23 @@ import com.sap.ec.api.push.PushConstants.WEB_PUSH_ON_BADGE_COUNT_UPDATE_RECEIVED
 import com.sap.ec.api.push.PushConstants.WEB_PUSH_ON_NOTIFICATION_CLICKED_CHANNEL_NAME
 import com.sap.ec.api.push.PushConstants.WEB_PUSH_SDK_READY_CHANNEL_NAME
 import com.sap.ec.core.log.ConsoleLogger
-import com.sap.ec.mobileengage.push.presentation.PushMessagePresenter
 import com.sap.ec.mobileengage.push.WebPushNotificationPresenter
 import com.sap.ec.mobileengage.push.mappers.PushMessageWebV2Mapper
 import com.sap.ec.mobileengage.push.model.JsNotificationClickedData
 import com.sap.ec.mobileengage.push.model.JsPushMessage
+import com.sap.ec.mobileengage.push.presentation.PushMessagePresenter
 import com.sap.ec.notification.NotificationClickHandler
 import com.sap.ec.util.JsonUtil
 import com.sap.ec.window.BrowserWindowHandler
 import js.coroutines.promise
-import js.promise.Promise
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.launch
 import web.broadcast.BroadcastChannel
 import web.events.EventHandler
 import web.events.EventType
 import web.events.addEventListener
 import web.push.PushEvent
 import web.serviceworker.NotificationEvent
-import kotlin.js.Promise.Companion.reject
-import kotlin.js.Promise.Companion.resolve
 
 
 @OptIn(ExperimentalWasmJsInterop::class)
@@ -60,7 +54,7 @@ fun main() {
 
     self.addEventListener(EventType("push"), { event: PushEvent ->
         event.data?.let {
-            val showNotificationPromise = CoroutineScope(SupervisorJob()).promise {
+            val showNotificationPromise = serviceWorkerScope.promise {
                 engagementCloudServiceWorker.onPush(JSON.stringify(it.json()))
             }
             event.waitUntil(showNotificationPromise)
@@ -72,6 +66,7 @@ fun main() {
     })
 
     self.addEventListener(EventType("notificationclick"), { event: NotificationEvent ->
+        println("Notification click event received with data: ${JSON.stringify(event)}")
         val jsPushMessage =
             JsonUtil.json.decodeFromString<JsPushMessage>(event.notification.data.unsafeCast<String>())
         val jsNotificationClickedData = JsonUtil.json.encodeToString(
@@ -80,21 +75,16 @@ fun main() {
                 jsPushMessage
             )
         )
-        event.waitUntil(Promise<Unit> { resolve, reject ->
-            serviceWorkerScope.launch {
-                try {
-                    notificationClickHandler.handleNotificationClick(jsNotificationClickedData)
-                    event.notification.close()
-                    resolve(Unit)
-                } catch (e: Exception) {
-                    currentCoroutineContext().ensureActive()
-                    reject(e)
-                }
+        event.waitUntil(
+            serviceWorkerScope.promise {
+                notificationClickHandler.handleNotificationClick(jsNotificationClickedData)
+                event.notification.close()
             }
-        })
+        )
     })
 
-    sdkReadyBroadcastChannel.onmessage = EventHandler {
+    sdkReadyBroadcastChannel.onmessage = EventHandler { event ->
+        println("SDK ready - posting stored notification click message if exists")
         notificationClickHandler.postStoredMessageToSDK()
     }
 

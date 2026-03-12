@@ -8,6 +8,8 @@ import com.sap.ec.api.push.NotificationCenterDelegateRegistrationOptions
 import com.sap.ec.api.push.PushCall.ClearPushToken
 import com.sap.ec.api.push.PushCall.HandleSilentMessageWithUserInfo
 import com.sap.ec.api.push.PushCall.RegisterPushToken
+import com.sap.ec.api.push.PushCall.Subscribe
+import com.sap.ec.api.push.PushCall.Unsubscribe
 import com.sap.ec.api.push.PushContextApi
 import com.sap.ec.api.push.PushInternal
 import com.sap.ec.api.push.PushUserInfo
@@ -138,6 +140,7 @@ internal class IosPushInternal(
                 )
 
                 is HandleSilentMessageWithUserInfo -> handleSilentMessageWithUserInfo(call.userInfo)
+                is Subscribe, is Unsubscribe -> {}
             }
         }
     }
@@ -185,7 +188,7 @@ internal class IosPushInternal(
         isObservingSdkState = true
         CoroutineScope(sdkDispatcher).launch {
             sdkContext.currentSdkState
-                .first {  it == SdkState.Active }
+                .first { it == SdkState.Active }
             processPendingNotificationResponses()
             isObservingSdkState = false
         }
