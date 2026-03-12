@@ -75,11 +75,12 @@ internal class ContactClient(
         if (exception is NetworkIOException) {
             sdkEventManager.emitEvent(sdkEvent)
         } else {
-            SdkEvent.Internal.Sdk.Answer.Response(
-                originId = sdkEvent.id,
-                Result.failure<Exception>(exception)
+            sdkEventManager.emitEvent(
+                SdkEvent.Internal.Sdk.Answer.Response(
+                    originId = sdkEvent.id,
+                    Result.failure<Exception>(exception)
+                )
             )
-
         }
         clientExceptionHandler.handleException(
             exception,

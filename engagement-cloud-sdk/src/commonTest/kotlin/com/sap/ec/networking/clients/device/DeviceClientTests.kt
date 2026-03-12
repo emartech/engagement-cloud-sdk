@@ -362,6 +362,44 @@ class DeviceClientTests {
     }
 
     @Test
+    fun testConsumer_should_emit_failure_response_when_non_network_exception_occurs() = runTest {
+        createDeviceClient(backgroundScope).register()
+
+        val testException = Exception("Backend error")
+        everySuspend { mockEcClient.send(any()) } returns Result.failure(testException)
+        val registerDeviceInfoEvent =
+            SdkEvent.Internal.Sdk.RegisterDeviceInfo("testId", TIMESTAMP)
+
+        val onlineSdkEvents = backgroundScope.async {
+            onlineEvents.take(1).toList()
+        }
+
+        onlineEvents.emit(registerDeviceInfoEvent)
+
+        advanceUntilIdle()
+
+        onlineSdkEvents.await() shouldBe listOf(registerDeviceInfoEvent)
+        verifySuspend {
+            mockSdkEventManager.emitEvent(
+                SdkEvent.Internal.Sdk.Answer.Response(
+                    originId = registerDeviceInfoEvent.id,
+                    Result.failure<Exception>(testException)
+                )
+            )
+        }
+        verifySuspend {
+            mockClientExceptionHandler.handleException(
+                testException,
+                "DeviceClient - consume RegisterDeviceInfo",
+                registerDeviceInfoEvent
+            )
+        }
+        verifySuspend(VerifyMode.exactly(0)) {
+            mockEventsDao.removeEvent(registerDeviceInfoEvent)
+        }
+    }
+
+    @Test
     fun testConsumer_shouldPropagateCancellationException_whenCoroutineIsCancelled() = runTest {
         val clientJob = Job()
         val clientScope = CoroutineScope(StandardTestDispatcher(testScheduler) + clientJob)

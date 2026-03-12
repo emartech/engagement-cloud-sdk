@@ -322,6 +322,16 @@ class ContactClientTests {
             }
             verifySuspend(VerifyMode.exactly(0)) {
                 mockContactTokenHandler.handleContactTokens(any())
+            }
+            verifySuspend {
+                mockSdkEventManager.emitEvent(
+                    SdkEvent.Internal.Sdk.Answer.Response(
+                        originId = unlinkContactEvent.id,
+                        Result.failure<Exception>(testException)
+                    )
+                )
+            }
+            verifySuspend(VerifyMode.exactly(0)) {
                 mockSdkEventManager.emitEvent(
                     SdkEvent.Internal.Sdk.Answer.Response(
                         originId = unlinkContactEvent.id,
@@ -334,6 +344,39 @@ class ContactClientTests {
             }
 
         }
+
+
+    @Test
+    fun testConsumer_should_emit_failure_response_when_non_network_exception_occurs() = runTest {
+        contactClient.register()
+
+        val testException = Exception("Backend error")
+        everySuspend { mockEcClient.send(any()) } returns Result.failure(testException)
+        val unlinkContactEvent = SdkEvent.Internal.Sdk.UnlinkContact("unlinkContact")
+
+        onlineEvents.emit(unlinkContactEvent)
+
+        advanceUntilIdle()
+
+        verifySuspend {
+            mockSdkEventManager.emitEvent(
+                SdkEvent.Internal.Sdk.Answer.Response(
+                    originId = unlinkContactEvent.id,
+                    Result.failure<Exception>(testException)
+                )
+            )
+        }
+        verifySuspend {
+            mockClientExceptionHandler.handleException(
+                testException,
+                "ContactClient - consumeContactChanges",
+                unlinkContactEvent
+            )
+        }
+        verifySuspend(VerifyMode.exactly(0)) {
+            mockEventsDao.removeEvent(unlinkContactEvent)
+        }
+    }
 
 
     private fun createTestResponse(

@@ -237,6 +237,46 @@ class DeepLinkClientTests {
     }
 
     @Test
+    fun testConsumer_should_emit_failure_response_when_non_network_exception_occurs() = runTest {
+        deepLinkClient = createDeepLinkClient(backgroundScope)
+        deepLinkClient.register()
+
+        val testException = Exception("Backend error")
+        everySuspend { mockNetworkClient.send(any()) } returns Result.failure(testException)
+        val trackDeepLink = SdkEvent.Internal.Sdk.TrackDeepLink(
+            id = "trackDeepLink",
+            trackingId = TRACKING_ID
+        )
+        val onlineSdkEvents = backgroundScope.async {
+            onlineEvents.take(1).toList()
+        }
+
+        onlineEvents.emit(trackDeepLink)
+
+        advanceUntilIdle()
+
+        onlineSdkEvents.await() shouldBe listOf(trackDeepLink)
+        verifySuspend {
+            mockSdkEventManager.emitEvent(
+                SdkEvent.Internal.Sdk.Answer.Response(
+                    originId = trackDeepLink.id,
+                    Result.failure<Exception>(testException)
+                )
+            )
+        }
+        verifySuspend {
+            mockClientExceptionHandler.handleException(
+                testException,
+                "DeepLinkClient - trackDeepLink(trackId: $TRACKING_ID)",
+                trackDeepLink
+            )
+        }
+        verifySuspend(VerifyMode.exactly(0)) {
+            mockEventsDao.removeEvent(trackDeepLink)
+        }
+    }
+
+    @Test
     fun testConsumer_should_call_clientExceptionHandler_when_exception_happens() = runTest {
         createDeepLinkClient(backgroundScope).register()
         val testException = Exception("Test exception")
