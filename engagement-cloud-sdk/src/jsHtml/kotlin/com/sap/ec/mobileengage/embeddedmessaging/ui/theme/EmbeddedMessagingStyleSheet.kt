@@ -288,6 +288,7 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
         display(DisplayStyle.Flex)
         alignItems(AlignItems.Center)
         justifyContent(JustifyContent.Center)
+        padding(DEFAULT_PADDING)
     }
 
     val emptyStateContent by style {
