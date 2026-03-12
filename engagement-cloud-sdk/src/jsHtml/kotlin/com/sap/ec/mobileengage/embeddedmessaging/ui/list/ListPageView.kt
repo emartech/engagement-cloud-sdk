@@ -83,6 +83,7 @@ internal fun MessageList(
     var messageToDelete by remember { mutableStateOf<MessageItemViewModelApi?>(null) }
     var showDeleteMessageDialog by remember { mutableStateOf(false) }
     val hasFiltersApplied by viewModel.hasFiltersApplied.collectAsState()
+    val isRefreshing = lazyPagingMessageItems.loadState.source.refresh is LoadState.Loading
 
     val scope = rememberCoroutineScope()
 
@@ -137,11 +138,12 @@ internal fun MessageList(
                         Hr({ classes(EmbeddedMessagingStyleSheet.divider) })
                     }
 
+                    RefreshButton(isRefreshing, viewModel)
+
                     MessageListContent(
                         lazyPagingMessageItems = lazyPagingMessageItems,
                         listViewModel = viewModel,
                         customMessageItemElementName = customMessageItemElementName,
-                        onRefresh = { viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() } },
                         onItemClick = {
                             viewModel.selectMessage(it, onNavigate = {})
                         },
@@ -203,11 +205,12 @@ internal fun MessageList(
                             Hr({ classes(EmbeddedMessagingStyleSheet.divider) })
                         }
 
+                        RefreshButton(isRefreshing, viewModel)
+
                         MessageListContent(
                             lazyPagingMessageItems = lazyPagingMessageItems,
                             listViewModel = viewModel,
                             customMessageItemElementName = customMessageItemElementName,
-                            onRefresh = { viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() } },
                             onItemClick = {
                                 viewModel.selectMessage(it, onNavigate = {})
                             },
@@ -264,7 +267,6 @@ internal fun MessageListContent(
     lazyPagingMessageItems: LazyPagingItems<MessageItemViewModelApi>,
     listViewModel: ListPageViewModelApi,
     customMessageItemElementName: String?,
-    onRefresh: () -> Unit,
     onItemClick: (MessageItemViewModelApi) -> Unit,
     withDeleteIcon: Boolean = true,
     onClearFilters: () -> Unit,
@@ -274,20 +276,11 @@ internal fun MessageListContent(
     val isRefreshing = lazyPagingMessageItems.loadState.source.refresh is LoadState.Loading
 
     Div({
-        classes(EmbeddedMessagingStyleSheet.messageListContainer)
+        classes(EmbeddedMessagingStyleSheet.scrollingMessageListContainer)
     }) {
         if (isRefreshing) {
             PlaceholderMessageList()
         } else {
-            Button({
-                onClick { onRefresh() }
-                classes(EmbeddedMessagingStyleSheet.refreshButton)
-            }) {
-                SvgIcon(
-                    path = REFRESH_ICON_PATH
-                )
-            }
-
             if (lazyPagingMessageItems.isIdleButEmpty()) {
                 if (hasFiltersApplied) {
                     FilteredMessageItemsListEmptyState {
@@ -319,6 +312,23 @@ internal fun EmptyDetailState() {
         classes(EmbeddedMessagingStyleSheet.emptyStateContainer)
     }) {
         Text("Select an item to view details")
+    }
+}
+
+@Composable
+internal fun RefreshButton(
+    isRefreshing: Boolean,
+    viewModel: ListPageViewModelApi
+) {
+    if (!isRefreshing) {
+        Button({
+            onClick { viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() } }
+            classes(EmbeddedMessagingStyleSheet.refreshButton)
+        }) {
+            SvgIcon(
+                path = REFRESH_ICON_PATH
+            )
+        }
     }
 }
 

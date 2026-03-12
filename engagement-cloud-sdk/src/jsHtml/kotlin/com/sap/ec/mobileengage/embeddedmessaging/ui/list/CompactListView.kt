@@ -20,7 +20,7 @@ internal fun CompactListView(
     EmbeddedMessagingTheme {
         Div({ classes(EmbeddedMessagingStyleSheet.compactListView) }) {
             Div({
-                classes(EmbeddedMessagingStyleSheet.messageListContainer)
+                classes(EmbeddedMessagingStyleSheet.scrollingMessageListContainer)
             }) {
                 ListView(
                     lazyPagingMessageItems = viewModel.messagePagingDataFlowFiltered.collectAsLazyPagingItems(),

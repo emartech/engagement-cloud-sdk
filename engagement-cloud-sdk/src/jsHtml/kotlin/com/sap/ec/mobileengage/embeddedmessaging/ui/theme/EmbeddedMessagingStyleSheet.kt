@@ -84,6 +84,7 @@ import org.jetbrains.compose.web.css.marginTop
 import org.jetbrains.compose.web.css.maxWidth
 import org.jetbrains.compose.web.css.minWidth
 import org.jetbrains.compose.web.css.ms
+import org.jetbrains.compose.web.css.overflow
 import org.jetbrains.compose.web.css.padding
 import org.jetbrains.compose.web.css.paddingBottom
 import org.jetbrains.compose.web.css.paddingRight
@@ -100,6 +101,7 @@ import org.jetbrains.compose.web.css.top
 import org.jetbrains.compose.web.css.transitions
 import org.jetbrains.compose.web.css.whiteSpace
 import org.jetbrains.compose.web.css.width
+import web.cssom.Overflow
 
 internal object EmbeddedMessagingStyleSheet : StyleSheet() {
     val listPageContainer by style {
@@ -238,11 +240,11 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
         margin(ZERO_MARGIN)
     }
 
-    val messageListContainer by style {
+    val scrollingMessageListContainer by style {
         flex(1)
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Column)
-        property("overflow", "auto")
+        overflow("auto")
     }
 
     val refreshIndicator by style {
@@ -276,11 +278,10 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
         height(CHECKMARK_ICON_DEFAULT_SIZE)
     }
 
-    val scrollableList by style {
+    val messageList by style {
         flex(1)
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Column)
-        property("overflow", "auto")
     }
 
     val emptyStateContainer by style {
@@ -582,7 +583,7 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
         alignItems(AlignItems.Center)
         justifyContent(JustifyContent.End)
         backgroundColor(CssColorVars.colorError.value())
-        padding(DEFAULT_PADDING)
+        margin(DEFAULT_MARGIN)
         width(ONE_THIRD_WIDTH)
     }
 

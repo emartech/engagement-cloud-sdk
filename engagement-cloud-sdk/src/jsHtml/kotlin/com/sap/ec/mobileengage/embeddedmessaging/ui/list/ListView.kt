@@ -38,7 +38,7 @@ internal fun ListView(
     val isTouchEnabled = remember { isTouchDevice() }
 
     Div({
-        classes(EmbeddedMessagingStyleSheet.scrollableList)
+        classes(EmbeddedMessagingStyleSheet.messageList)
     }) {
         lazyPagingMessageItems.itemSnapshotList.map { messageViewModel ->
             messageViewModel?.let {
