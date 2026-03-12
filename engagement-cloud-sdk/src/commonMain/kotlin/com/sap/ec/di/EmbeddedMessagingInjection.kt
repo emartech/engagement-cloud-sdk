@@ -7,7 +7,6 @@ import com.sap.ec.api.embeddedmessaging.EmbeddedMessagingInternal
 import com.sap.ec.api.embeddedmessaging.LoggingEmbeddedMessaging
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.util.DownloaderApi
-import com.sap.ec.core.providers.inputmode.InputModeProviderApi
 import com.sap.ec.mobileengage.action.EventActionFactoryApi
 import com.sap.ec.mobileengage.embeddedmessaging.EmbeddedMessagingContext
 import com.sap.ec.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
@@ -66,7 +65,8 @@ internal object EmbeddedMessagingInjection {
                 locallyOpenedMessageIds = MutableStateFlow(emptySet()),
                 platformCategoryProvider = get(),
                 inputModeProvider = get(),
-                sdkEventDistributor = get()
+                sdkEventDistributor = get(),
+                _categories = MutableStateFlow(emptyList())
             )
         }
         single<EmbeddedMessagingInstance>(named(InstanceType.Logging)) {

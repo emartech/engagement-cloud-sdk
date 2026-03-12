@@ -39,9 +39,9 @@ internal class ListPageViewModel(
     private val locallyOpenedMessageIds: MutableStateFlow<Set<String>>,
     platformCategoryProvider: PlatformCategoryProviderApi,
     inputModeProvider: InputModeProviderApi,
-    sdkEventDistributor: SdkEventDistributorApi
+    sdkEventDistributor: SdkEventDistributorApi,
+    private val _categories: MutableStateFlow<List<MessageCategory>>
 ) : ListPageViewModelApi {
-    private val _categories = MutableStateFlow<List<MessageCategory>>(emptyList())
     override val categories: StateFlow<List<MessageCategory>> = _categories.asStateFlow()
 
     private val _filterUnopenedOnly = MutableStateFlow(false)
@@ -132,7 +132,13 @@ internal class ListPageViewModel(
     }
 
     override fun setSelectedCategoryIds(categoryIds: Set<String>) {
-        _selectedCategoryIds.value = categoryIds
+        val existingCategoryIds = categoryIds.filter { id ->
+            _categories.value.any { category ->
+                category.id == id
+            }
+        }.toSet()
+
+        _selectedCategoryIds.value = existingCategoryIds
 
         val selectedMessageIncludedInFilteredCategories =
             (selectedMessage.value?.categories?.any {

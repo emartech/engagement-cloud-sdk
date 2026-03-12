@@ -12,6 +12,7 @@ import com.sap.ec.mobileengage.action.models.ActionModel
 import com.sap.ec.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
 import com.sap.ec.networking.clients.embedded.messaging.model.Category
+import com.sap.ec.networking.clients.embedded.messaging.model.MessageCategory
 import com.sap.ec.watchdog.connection.ConnectionWatchDog
 import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
@@ -54,8 +55,11 @@ class ListPageViewModelTests {
     companion object {
         const val TEST_MESSAGE_ID = "test-message-id"
         const val PLATFORM_CATEGORY = "testCategory"
+        const val TEST_ID = "testId"
+        val testCategory = MessageCategory(TEST_ID, "testValue")
     }
 
+    private lateinit var categories: MutableStateFlow<List<MessageCategory>>
     private lateinit var mockModel: ListPageModelApi
     private lateinit var mockDownloaderApi: DownloaderApi
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
@@ -74,6 +78,7 @@ class ListPageViewModelTests {
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(testDispatcher)
+        categories = MutableStateFlow(listOf(testCategory))
         mockModel = mock(MockMode.autofill)
         mockDownloaderApi = mock(MockMode.autofill)
         mockSdkEventDistributor = mock(MockMode.autofill)
@@ -101,7 +106,8 @@ class ListPageViewModelTests {
             locallyOpenedMessageIds = readMessageIds,
             platformCategoryProvider = mockPlatformCategoryProvider,
             inputModeProvider = mockInputModeProvider,
-            sdkEventDistributor = mockSdkEventDistributor
+            sdkEventDistributor = mockSdkEventDistributor,
+            _categories = categories
         )
     }
 
@@ -114,7 +120,7 @@ class ListPageViewModelTests {
     fun testSetFilterUnopenedOnly_shouldCallPagerFactory_withFilterUnopenedOnlyTrue() = runTest {
         viewModel.filterUnopenedOnly.value shouldBe false
         viewModel.selectedCategoryIds.value shouldBe emptySet()
-        viewModel.categories.value shouldBe emptyList()
+        viewModel.categories.value shouldBe listOf(testCategory)
 
         every { mockPagerFactory.create(any(), any(), any()) } returns flowOf(
             PagingData.from(
@@ -141,11 +147,14 @@ class ListPageViewModelTests {
 
     @Test
     fun testSetSelectCategoryIds_shouldCallPagerFactory_withCorrectSelectedCategoryIds() = runTest {
+        val testId2 = "testId2"
+        val testCategory2 = MessageCategory(testId2, "testValue2")
+        categories.value = listOf(testCategory, testCategory2)
+
         viewModel.filterUnopenedOnly.value shouldBe false
         viewModel.selectedCategoryIds.value shouldBe emptySet()
-        viewModel.categories.value shouldBe emptyList()
 
-        val selectedCategoryIds = setOf("1", "2", "3")
+        val selectedCategoryIds = setOf(TEST_ID, testId2, "3")
 
         every { mockPagerFactory.create(any(), any(), any()) } returns flowOf(
             PagingData.from(
@@ -159,27 +168,24 @@ class ListPageViewModelTests {
 
         val firstMessage = viewModel.messagePagingDataFlowFiltered.first()
 
-        viewModel.selectedCategoryIds.value shouldBe selectedCategoryIds
+        viewModel.selectedCategoryIds.value shouldBe listOf(TEST_ID, testId2)
 
         firstMessage shouldNotBe null
         verify {
             mockPagerFactory.create(
                 filterUnopenedOnly = false,
-                selectedCategoryIds = selectedCategoryIds.toList(),
+                selectedCategoryIds = listOf(TEST_ID, testId2),
                 categories = any()
             )
         }
     }
 
     @Test
-    fun testSetSelectCategoryIds_shouldClearMessageSelection_ifMessageCategoriesAreNotIncluded_inTheSet() = runTest {
+    fun testSetSelectCategoryIds_shouldOmit_nonExistingCategoryIds() = runTest {
         viewModel.filterUnopenedOnly.value shouldBe false
         viewModel.selectedCategoryIds.value shouldBe emptySet()
-        viewModel.categories.value shouldBe emptyList()
-        val mockMessageViewModel = mock<MessageItemViewModelApi>(MockMode.autofill)
-        every { mockMessageViewModel.categories } returns listOf(Category("5", "five"))
 
-        val selectedCategoryIds = setOf("1", "2", "3")
+        val testCategoryIds = setOf(TEST_ID, "nonExistingId")
 
         every { mockPagerFactory.create(any(), any(), any()) } returns flowOf(
             PagingData.from(
@@ -189,16 +195,51 @@ class ListPageViewModelTests {
             )
         )
 
-        viewModel.selectMessage(mockMessageViewModel) {}
-        testDispatcher.scheduler.advanceUntilIdle()
+        viewModel.setSelectedCategoryIds(testCategoryIds)
 
-        viewModel.selectedMessage.value shouldBe mockMessageViewModel
+        val firstMessage = viewModel.messagePagingDataFlowFiltered.first()
 
-        viewModel.setSelectedCategoryIds(selectedCategoryIds)
-        testDispatcher.scheduler.advanceUntilIdle()
+        viewModel.selectedCategoryIds.value shouldBe listOf(TEST_ID)
 
-       viewModel.selectedMessage.value shouldBe null
+        firstMessage shouldNotBe null
+        verify {
+            mockPagerFactory.create(
+                filterUnopenedOnly = false,
+                selectedCategoryIds = listOf(TEST_ID),
+                categories = any()
+            )
+        }
     }
+
+    @Test
+    fun testSetSelectCategoryIds_shouldClearMessageSelection_ifMessageCategoriesAreNotIncluded_inTheSet() =
+        runTest {
+            viewModel.filterUnopenedOnly.value shouldBe false
+            viewModel.selectedCategoryIds.value shouldBe emptySet()
+            viewModel.categories.value shouldBe listOf(testCategory)
+            val mockMessageViewModel = mock<MessageItemViewModelApi>(MockMode.autofill)
+            every { mockMessageViewModel.categories } returns listOf(Category("5", "five"))
+
+            val selectedCategoryIds = setOf("1", "2", "3")
+
+            every { mockPagerFactory.create(any(), any(), any()) } returns flowOf(
+                PagingData.from(
+                    data = emptyList(),
+                    placeholdersBefore = 0,
+                    placeholdersAfter = 0
+                )
+            )
+
+            viewModel.selectMessage(mockMessageViewModel) {}
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            viewModel.selectedMessage.value shouldBe mockMessageViewModel
+
+            viewModel.setSelectedCategoryIds(selectedCategoryIds)
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            viewModel.selectedMessage.value shouldBe null
+        }
 
     @OptIn(ExperimentalTime::class)
     @Test
@@ -550,7 +591,7 @@ class ListPageViewModelTests {
 
     @Test
     fun testApplyCategorySelection_shouldSetCategoryIdsAndCloseDialog() = runTest {
-        val selectedCategoryIds = setOf("1", "2", "3")
+        val selectedCategoryIds = setOf(TEST_ID)
 
         every { mockPagerFactory.create(any(), any(), any()) } returns flowOf(
             PagingData.from(
@@ -590,7 +631,7 @@ class ListPageViewModelTests {
 
     @Test
     fun testHasFiltersApplied_shouldReturnTrue_whenSelectedCategoryIdsIsNotEmpty() = runTest {
-        val selectedCategoryIds = setOf("1", "2")
+        val selectedCategoryIds = setOf(TEST_ID)
 
         every { mockPagerFactory.create(any(), any(), any()) } returns flowOf(
             PagingData.from(
@@ -669,7 +710,8 @@ class ListPageViewModelTests {
             locallyOpenedMessageIds = readMessageIds,
             platformCategoryProvider = mockPlatformCategoryProvider,
             inputModeProvider = falseProvider,
-            sdkEventDistributor = mockSdkEventDistributor
+            sdkEventDistributor = mockSdkEventDistributor,
+            _categories = categories
         )
 
         viewModelWithNoTouch.hasTouchInput shouldBe false
@@ -698,7 +740,8 @@ class ListPageViewModelTests {
             locallyOpenedMessageIds = readMessageIds,
             platformCategoryProvider = mockPlatformCategoryProvider,
             inputModeProvider = mockInputModeProvider,
-            sdkEventDistributor = mockSdkEventDistributor
+            sdkEventDistributor = mockSdkEventDistributor,
+            _categories = categories
         )
 
         val pagingDataList = mutableListOf<PagingData<MessageItemViewModelApi>>()
