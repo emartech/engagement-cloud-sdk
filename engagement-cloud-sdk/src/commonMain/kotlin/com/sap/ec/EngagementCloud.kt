@@ -11,10 +11,16 @@ import com.sap.ec.di.EventFlowTypes
 import com.sap.ec.di.SdkKoinIsolationContext
 import com.sap.ec.di.SdkKoinIsolationContext.koin
 import com.sap.ec.api.event.model.EngagementCloudEvent
+import com.sap.ec.currentPlatform
+import com.sap.ec.di.CoroutineScopeTypes
 import com.sap.ec.init.InitOrganizerApi
 import com.sap.ec.tracking.TrackingApi
 import com.sap.ec.util.runCatchingWithoutCancellation
+import io.ktor.util.PlatformUtils
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import org.koin.core.qualifier.named
 import kotlin.experimental.ExperimentalObjCRefinement
 import kotlin.native.HiddenFromObjC
@@ -22,6 +28,11 @@ import kotlin.native.HiddenFromObjC
 @HiddenFromObjC
 @OptIn(ExperimentalObjCRefinement::class)
 object EngagementCloud {
+    init {
+        if (currentPlatform == KotlinPlatform.IOS) {
+            SdkKoinIsolationContext.init()
+        }
+    }
 
     internal fun initDI() {
         SdkKoinIsolationContext.init()
