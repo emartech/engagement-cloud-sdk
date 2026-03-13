@@ -71,7 +71,7 @@ class PushClientTests {
         mockEmarsysClient = mock()
         mockDefaultUrls = mock()
         mockUrlFactory = mock()
-        everySuspend { mockUrlFactory.create(ECUrlType.ClearPushToken, any()) } returns URL
+        everySuspend { mockUrlFactory.create(any<ECUrlType.ClearPushToken>()) } returns URL
         everySuspend { mockUrlFactory.create(ECUrlType.PushToken) } returns URL
         onlineEvents = spy(MutableSharedFlow(replay = 5))
         mockSdkEventManager = mock()
@@ -237,7 +237,7 @@ class PushClientTests {
                 applicationCode = TEST_APPLICATION_CODE
             )
         everySuspend {
-            mockUrlFactory.create(ECUrlType.ClearPushToken, clearPushTokenEvent)
+            mockUrlFactory.create(any<ECUrlType.ClearPushToken>())
         } throws testException
 
         val onlineSdkEvents = backgroundScope.async {

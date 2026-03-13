@@ -3,15 +3,11 @@ package com.sap.ec.core.url
 import com.sap.ec.TestEngagementCloudSDKConfig
 import com.sap.ec.context.DefaultUrlsApi
 import com.sap.ec.context.SdkContextApi
-import com.sap.ec.core.exceptions.SdkException.MissingApplicationCodeException
-import com.sap.ec.event.SdkEvent
-import com.sap.ec.event.SdkEvent.Internal.Sdk
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.ktor.http.Url
 import kotlinx.coroutines.test.runTest
@@ -74,24 +70,9 @@ class UrlFactoryTests {
 
     @Test
     fun testCreate_clearPushToken_should_return_url() = runTest {
-        val testEvent = SdkEvent.Internal.Sdk.ClearPushToken(applicationCode = APPLICATION_CODE)
-
-        val result = urlFactory.create(ECUrlType.ClearPushToken, testEvent)
+        val result = urlFactory.create(ECUrlType.ClearPushToken(applicationCode = APPLICATION_CODE))
 
         result shouldBe Url("https://me-client.gservice.emarsys.net/v4/apps/$APPLICATION_CODE/client/push-token")
-    }
-
-    @Test
-    fun testCreate_clearPushToken_should_throwException_ifEventIsNull() = runTest {
-
-        shouldThrow<MissingApplicationCodeException> { urlFactory.create(ECUrlType.ClearPushToken) }
-    }
-
-    @Test
-    fun testCreate_clearPushToken_should_throwException_ifAppCodeIsNull() = runTest {
-        val testEvent = SdkEvent.Internal.Sdk.ClearPushToken(applicationCode = null)
-
-        shouldThrow<MissingApplicationCodeException> { urlFactory.create(ECUrlType.ClearPushToken, testEvent) }
     }
 
     @Test
@@ -111,7 +92,7 @@ class UrlFactoryTests {
 
     @Test
     fun testCreate_unlinkContact_should_return_url_withAppCode() = runTest {
-        val result = urlFactory.create(ECUrlType.UnlinkContact, Sdk.UnlinkContact(applicationCode = APPLICATION_CODE))
+        val result = urlFactory.create(ECUrlType.UnlinkContact(applicationCode = APPLICATION_CODE))
 
         result shouldBe Url("https://me-client.gservice.emarsys.net/v4/apps/$APPLICATION_CODE/client/contact")
     }

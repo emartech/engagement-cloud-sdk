@@ -99,7 +99,7 @@ class ContactClientTests {
         testResponse = createTestResponse("{}")
         everySuspend { mockEcClient.send(any()) } returns (Result.success(testResponse))
         everySuspend { mockUrlFactory.create(ECUrlType.LinkContact) } returns TEST_BASE_URL
-        everySuspend { mockUrlFactory.create(ECUrlType.UnlinkContact, any()) } returns TEST_BASE_URL
+        everySuspend { mockUrlFactory.create(any<ECUrlType.UnlinkContact>()) } returns TEST_BASE_URL
         everySuspend { mockLogger.error(any(), any<Throwable>()) } calls {
             (it.args[1] as Throwable).printStackTrace()
         }

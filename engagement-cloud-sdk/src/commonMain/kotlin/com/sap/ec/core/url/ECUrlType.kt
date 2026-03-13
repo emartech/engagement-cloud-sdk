@@ -3,11 +3,11 @@ package com.sap.ec.core.url
 internal sealed interface ECUrlType {
     data object ChangeApplicationCode : ECUrlType
     data object LinkContact : ECUrlType
-    data object UnlinkContact : ECUrlType
+    data class UnlinkContact(val applicationCode: String) : ECUrlType
     data object RefreshToken : ECUrlType
     data object ChangeMerchantId : ECUrlType
     data object PushToken : ECUrlType
-    data object ClearPushToken : ECUrlType
+    data class ClearPushToken(val applicationCode: String) : ECUrlType
     data object Event : ECUrlType
     data object RegisterDeviceInfo : ECUrlType
     data object RemoteConfigSignature : ECUrlType
