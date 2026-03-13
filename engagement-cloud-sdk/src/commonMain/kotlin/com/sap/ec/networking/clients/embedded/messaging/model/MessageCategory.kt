@@ -7,3 +7,5 @@ internal data class MessageCategory(
     val id: String,
     val value: String
 )
+
+internal fun MessageCategory.toCategory(): Category = Category(id, value)
