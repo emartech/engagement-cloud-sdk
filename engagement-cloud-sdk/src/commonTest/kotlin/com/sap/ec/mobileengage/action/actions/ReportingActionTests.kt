@@ -1,8 +1,12 @@
 package com.sap.ec.mobileengage.action.actions
 
+import com.sap.ec.KotlinPlatform
 import com.sap.ec.SdkConstants
 import com.sap.ec.SdkConstants.BUTTON_CLICK_ORIGIN
+import com.sap.ec.SdkConstants.PUSH_CLICKED_EVENT_NAME
+import com.sap.ec.SdkConstants.WEBPUSH_CLICKED_EVENT_NAME
 import com.sap.ec.core.channel.SdkEventDistributorApi
+import com.sap.ec.currentPlatform
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.mobileengage.action.models.BasicInAppButtonClickedActionModel
 import com.sap.ec.mobileengage.action.models.BasicPushButtonClickedActionModel
@@ -29,6 +33,8 @@ class ReportingActionTests {
         const val ID = "testId"
         const val TRACKING_INFO = """{"key:"value"}"""
         const val REPORTING = """{"reportingKey":"reportingValue"}"""
+        val EXPECTED_PUSH_CLICK_NAME =
+            if (currentPlatform == KotlinPlatform.JS) WEBPUSH_CLICKED_EVENT_NAME else PUSH_CLICKED_EVENT_NAME
     }
 
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
@@ -36,6 +42,11 @@ class ReportingActionTests {
     @Test
     fun testInAppButtonClickedEventName_shouldUseNamespacedFormat() {
         SdkConstants.IN_APP_BUTTON_CLICKED_EVENT_NAME shouldBe "inapp:click"
+    }
+
+    @Test
+    fun testWebPushClickedEventName_shouldUseNamespacedFormat() {
+        SdkConstants.WEBPUSH_CLICKED_EVENT_NAME shouldBe "webpush:click"
     }
 
     @BeforeTest
@@ -63,7 +74,7 @@ class ReportingActionTests {
 
         action.invoke()
 
-        verifyArguments(eventSlot, expectedEvent, "push:click")
+        verifyArguments(eventSlot, expectedEvent, EXPECTED_PUSH_CLICK_NAME)
     }
 
     @Test
@@ -140,7 +151,7 @@ class ReportingActionTests {
 
             action.invoke()
 
-            verifyArguments(eventSlot, expectedEvent, "push:click")
+            verifyArguments(eventSlot, expectedEvent, EXPECTED_PUSH_CLICK_NAME)
         }
 
     private fun verifyArguments(
