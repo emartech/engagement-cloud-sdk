@@ -2,12 +2,12 @@
 import PackageDescription
 
 let engagementCloudSDKPackageName = "EngagementCloudSDK"
-let engagementCloudSDKUrl = "https://github.com/emartech/engagement-cloud-sdk/releases/download/0.0.214/EngagementCloudSDK.xcframework.zip"
-let engagementCloudSDKChecksum = "262d5c553acab9717fe48f6d9ca315df49503f582c2251bc367b508af01461d1"
+let engagementCloudSDKUrl = "https://github.com/emartech/engagement-cloud-sdk/releases/download/0.0.216/EngagementCloudSDK.xcframework.zip"
+let engagementCloudSDKChecksum = "943970848220cfcc6e95c7cb2bcb9da191a821c793b52fcdd9afeb3023731a29"
 
 let engagementCloudNotificationServicePackageName = "EngagementCloudSDKNotificationService"
-let engagementCloudNotificationServiceUrl = "https://github.com/emartech/engagement-cloud-sdk/releases/download/0.0.214/EngagementCloudSDKNotificationService.xcframework.zip"
-let engagementCloudNotificationServiceChecksum = "b2c3ee33c813abd3a79e8c940cc2d6bdef3ef10a038d02380485a9ef81a90f55"
+let engagementCloudNotificationServiceUrl = "https://github.com/emartech/engagement-cloud-sdk/releases/download/0.0.216/EngagementCloudSDKNotificationService.xcframework.zip"
+let engagementCloudNotificationServiceChecksum = "b10f12c8a4eaf2f4cd4c97d6fd9055ecc98c98369c69bffd31cff6bfc07518b7"
 
 let package = Package(
     name: engagementCloudSDKPackageName,
