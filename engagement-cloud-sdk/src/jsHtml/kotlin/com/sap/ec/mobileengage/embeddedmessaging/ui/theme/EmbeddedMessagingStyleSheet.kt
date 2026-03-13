@@ -180,6 +180,8 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
         flex(1)
         height(MAX_HEIGHT)
         property("overflow-y", "auto")
+        display(DisplayStyle.Flex)
+        flexDirection(FlexDirection.Column)
     }
 
     val compactListView by style {
