@@ -2,6 +2,7 @@ package com.sap.ec
 
 object SdkConstants {
     const val PUSH_CLICKED_EVENT_NAME = "push:click"
+    const val WEBPUSH_CLICKED_EVENT_NAME = "webpush:click"
     const val BUTTON_CLICK_ORIGIN = "button"
     const val IN_APP_BUTTON_CLICKED_EVENT_NAME = "inapp:click"
 

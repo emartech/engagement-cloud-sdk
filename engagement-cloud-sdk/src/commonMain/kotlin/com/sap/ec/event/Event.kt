@@ -1,6 +1,7 @@
 package com.sap.ec.event
 
 import com.sap.ec.InternalSdkApi
+import com.sap.ec.KotlinPlatform
 import com.sap.ec.SdkConstants
 import com.sap.ec.SdkConstants.APPLY_APPCODE_BASED_REMOTE_CONFIG_EVENT_NAME
 import com.sap.ec.SdkConstants.APPLY_GLOBAL_REMOTE_CONFIG_EVENT_NAME
@@ -26,6 +27,8 @@ import com.sap.ec.SdkConstants.SESSION_END_EVENT_NAME
 import com.sap.ec.SdkConstants.SESSION_START_EVENT_NAME
 import com.sap.ec.SdkConstants.TRACK_DEEPLINK_NAME
 import com.sap.ec.SdkConstants.UNLINK_CONTACT_NAME
+import com.sap.ec.SdkConstants.WEBPUSH_CLICKED_EVENT_NAME
+import com.sap.ec.currentPlatform
 import com.sap.ec.core.db.events.EventsDaoApi
 import com.sap.ec.core.log.LogLevel
 import com.sap.ec.core.log.Logger
@@ -469,7 +472,7 @@ sealed interface SdkEvent {
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0,
-            ) : Push(PUSH_CLICKED_EVENT_NAME), Reporting
+            ) : Push(if (currentPlatform == KotlinPlatform.JS) WEBPUSH_CLICKED_EVENT_NAME else PUSH_CLICKED_EVENT_NAME), Reporting
         }
 
         @Serializable
