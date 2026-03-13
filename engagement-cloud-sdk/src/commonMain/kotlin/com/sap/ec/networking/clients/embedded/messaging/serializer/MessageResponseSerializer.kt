@@ -86,7 +86,7 @@ internal object MessagesResponseSerializer : KSerializer<MessagesResponse> {
                         if (category == null) {
                             null
                         } else {
-                            Category(category.id, category.value)
+                            Category(category.id, category.text)
                         }
                     },
                     receivedAt = messageSurrogate.receivedAt,

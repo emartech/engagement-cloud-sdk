@@ -4,7 +4,7 @@ package com.sap.ec.api.embeddedmessaging
 internal class JsEmbeddedMessaging(private val embeddedMessaging: EmbeddedMessagingApi) :
     JsEmbeddedMessagingApi {
     override fun getCategories(): Array<JsMessageCategory> {
-        return embeddedMessaging.categories.map { JSApiMessageCategory(it.id, it.value) }.toJsArray()
+        return embeddedMessaging.categories.map { JSApiMessageCategory(it.id, it.text) }.toJsArray()
     }
 
     override fun isUnreadFilterActive(): Boolean {
