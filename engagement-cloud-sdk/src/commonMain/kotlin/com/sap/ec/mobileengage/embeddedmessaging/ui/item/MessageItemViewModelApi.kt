@@ -17,6 +17,7 @@ internal interface MessageItemViewModelApi : CustomMessageItemViewModelApi {
     suspend fun tagMessageRead(): Result<Unit>
     suspend fun deleteMessage(): Result<Unit>
     fun copyAsExcludedLocally(): MessageItemViewModelApi
+    fun copyAsOpenedLocally(): MessageItemViewModelApi
 }
 
 

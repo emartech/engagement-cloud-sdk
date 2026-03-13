@@ -74,6 +74,10 @@ internal class MessageItemViewModel(
     override fun copyAsExcludedLocally(): MessageItemViewModelApi =
         MessageItemViewModel(model, isExcludedLocally = true)
 
+    override fun copyAsOpenedLocally(): MessageItemViewModelApi =
+        MessageItemViewModel(model.copyAsOpenedLocally(), isExcludedLocally = isExcludedLocally)
+
+
     private fun getDefaultActionUrl(): Url? {
         return try {
             val defaultAction = model.message.defaultAction

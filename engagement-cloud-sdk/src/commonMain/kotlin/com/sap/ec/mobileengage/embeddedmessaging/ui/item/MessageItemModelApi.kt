@@ -16,4 +16,6 @@ internal interface MessageItemModelApi {
     fun isDeleted(): Boolean
     fun hasRichContent(): Boolean
     suspend fun handleDefaultAction()
+
+    fun copyAsOpenedLocally(): MessageItemModelApi
 }

@@ -40,6 +40,7 @@ import io.kotest.data.forAll
 import io.kotest.data.headers
 import io.kotest.data.row
 import io.kotest.data.table
+import io.kotest.matchers.equals.shouldNotBeEqual
 import io.kotest.matchers.shouldBe
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -339,4 +340,12 @@ class MessageItemModelTests {
 
             result shouldBe null
         }
+
+    @Test
+    fun copyAsOpenedLocally_shouldCreateNewInstance_andLeaveExcludedLocallyAsFalse() = runTest {
+        val copiedViewModel = messageItemModel.copyAsOpenedLocally()
+
+        copiedViewModel shouldNotBeEqual messageItemModel
+        copiedViewModel.isNotOpened() shouldBe false
+    }
 }

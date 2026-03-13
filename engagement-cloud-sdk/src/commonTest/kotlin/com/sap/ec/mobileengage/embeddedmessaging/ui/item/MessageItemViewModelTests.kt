@@ -153,6 +153,16 @@ class MessageItemViewModelTests {
     }
 
     @Test
+    fun copyAsOpenedLocally_shouldCreateNewInstance_withUpdatedModel() = runTest {
+        everySuspend { mockMessageItemModel.copyAsOpenedLocally() } returns mock()
+        val result = viewModel.copyAsOpenedLocally()
+
+        result shouldNotBeEqual viewModel
+        result.isExcludedLocally shouldBe false
+        verifySuspend { mockMessageItemModel.copyAsOpenedLocally() }
+    }
+
+    @Test
     fun hasRichContent_shouldReturn_ModelHasRichContentToDetailView() {
         every { mockMessageItemModel.hasRichContent() } returns true
 

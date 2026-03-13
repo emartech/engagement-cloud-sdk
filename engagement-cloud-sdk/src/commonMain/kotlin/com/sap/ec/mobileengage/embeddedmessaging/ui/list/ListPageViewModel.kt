@@ -117,11 +117,23 @@ internal class ListPageViewModel(
         combine(
             _messagePagingDataFlowFromApi,
             locallyDeletedMessageIds,
-        ) { pagingData, deletedIds ->
-            pagingData.map {
-                if (!it.isExcludedLocally && deletedIds.contains(it.id)) {
-                    it.copyAsExcludedLocally()
-                } else it
+            locallyOpenedMessageIds
+        ) { pagingData, deletedIds, openedIds ->
+            pagingData.map { messageItemViewModel ->
+                val shouldBeExcludedLocally =
+                    !messageItemViewModel.isExcludedLocally && deletedIds.contains(
+                        messageItemViewModel.id
+                    )
+                val isOpenedLocally = openedIds.contains(messageItemViewModel.id)
+                messageItemViewModel.let {
+                    if (shouldBeExcludedLocally) {
+                        it.copyAsExcludedLocally()
+                    } else it
+                }.let {
+                    if (isOpenedLocally) {
+                        it.copyAsOpenedLocally()
+                    } else it
+                }
             }
         }
 

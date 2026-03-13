@@ -111,4 +111,18 @@ internal class MessageItemModel(
         val byteArray = BASE64_PLACEHOLDER_IMAGE.encodeToByteArray()
         return Base64.decode(byteArray)
     }
+
+
+    override fun copyAsOpenedLocally(): MessageItemModelApi {
+        return MessageItemModel(
+            message = this.message.copy(
+                tags = message.tags + OPENED_TAG
+            ),
+            sdkContext = sdkContext,
+            downloader = downloader,
+            sdkEventDistributor = sdkEventDistributor,
+            actionFactory = actionFactory,
+            logger = logger
+        )
+    }
 }
