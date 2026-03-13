@@ -2,8 +2,10 @@ package com.sap.ec.mobileengage.embeddedmessaging.ui.item
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -28,6 +30,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.DEFAULT_PADDING
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.MESSAGE_ITEM_HORIZONTAL_PADDING
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.MESSAGE_ITEM_IMAGE_SIZE
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.MESSAGE_ITEM_VERTICAL_PADDING
@@ -86,14 +89,26 @@ internal fun MessageItemView(
             ) {
                 if (hasThumbnailImage) {
                     imageBitmap?.let {
-                        Image(
-                            bitmap = it,
-                            contentDescription = viewModel.imageAltText,
-                            contentScale = ContentScale.Crop,
+                        Box(
                             modifier = Modifier
                                 .size(MESSAGE_ITEM_IMAGE_SIZE)
-                                .clip(imageClipShape())
-                        )
+                                .padding(DEFAULT_PADDING)
+                        ) {
+                           val alignment=  if (it.height > it.width) {
+                                Alignment.Center
+                            } else {
+                                Alignment.TopCenter
+                            }
+                            Image(
+                                bitmap = it,
+                                contentDescription = viewModel.imageAltText,
+                                contentScale = ContentScale.Inside,
+                                modifier = Modifier
+                                    .fillMaxSize(1f)
+                                    .clip(imageClipShape()),
+                                alignment = alignment
+                            )
+                        }
                     }
                         ?: LoadingSpinner()
                 }
