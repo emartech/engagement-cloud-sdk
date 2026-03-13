@@ -1,6 +1,6 @@
 package com.sap.ec.api.embeddedmessaging
 
-import com.sap.ec.networking.clients.embedded.messaging.model.MessageCategory
+import com.sap.ec.networking.clients.embedded.messaging.model.Category
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -15,11 +15,11 @@ import kotlin.test.Test
 class JsEmbeddedMessagingTests {
     private companion object {
         val CATEGORIES = listOf(
-            MessageCategory("1", "Category 1"),
-            MessageCategory("2", "Category 2")
+            Category("1", "Category 1"),
+            Category("2", "Category 2")
         )
         val jsMessageCategories = CATEGORIES.map {
-            JSApiMessageCategory(it.id, it.value)
+            JSApiMessageCategory(it.id, it.text)
         }
     }
 

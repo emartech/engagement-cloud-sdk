@@ -1,6 +1,5 @@
 package com.sap.ec.networking.clients.embedded.messaging.model
 
-import com.sap.ec.InternalSdkApi
 import com.sap.ec.mobileengage.action.models.BasicActionModel
 import com.sap.ec.mobileengage.action.models.PresentableActionModel
 import com.sap.ec.networking.clients.embedded.messaging.serializer.MessagesResponseSerializer
@@ -42,7 +41,6 @@ internal data class ListThumbnailImage(
 )
 
 @Serializable
-@InternalSdkApi
 data class Category(
     val id: String,
     val text: String
