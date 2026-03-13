@@ -8,8 +8,8 @@ import com.sap.ec.event.SdkEvent
 import com.sap.ec.mobileengage.embeddedmessaging.exceptions.LastPageReachedException
 import com.sap.ec.mobileengage.embeddedmessaging.pagination.EmbeddedMessagingPaginationState
 import com.sap.ec.networking.clients.embedded.messaging.model.BadgeCountResponse
-import com.sap.ec.networking.clients.embedded.messaging.model.Category
 import com.sap.ec.networking.clients.embedded.messaging.model.MessagesResponse
+import com.sap.ec.networking.clients.embedded.messaging.model.toCategory
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlin.time.ExperimentalTime
@@ -50,7 +50,7 @@ internal class ListPageModel(
                     updatePaginationState(messagesResponse)
                     Result.success(
                         MessagesWithCategories(
-                            messagesResponse.meta.categories.map { Category(it.id, it.value) },
+                            messagesResponse.meta.categories.map { it.toCategory() },
                             messagesResponse.messages,
                             isEndReached = paginationState.isEndReached
                         )
@@ -113,7 +113,7 @@ internal class ListPageModel(
                         updatePaginationState(messagesResponse)
                         Result.success(
                             MessagesWithCategories(
-                                messagesResponse.meta.categories.map { Category(it.id, it.value) },
+                                messagesResponse.meta.categories.map { it.toCategory() },
                                 messagesResponse.messages,
                                 isEndReached = paginationState.isEndReached
                             )
