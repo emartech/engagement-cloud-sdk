@@ -5,5 +5,11 @@ import web.serviceworker.ServiceWorkerRegistration
 
 interface ServiceWorkerManagerApi {
 
-    suspend fun register(serviceWorkerOptions: ServiceWorkerOptions): Result<ServiceWorkerRegistration>
+    suspend fun register(): Result<ServiceWorkerRegistration>
+
+    suspend fun unregister()
+
+    suspend fun getServiceWorkerOptions(): ServiceWorkerOptions?
+
+    suspend fun getServiceWorkerRegistration(): ServiceWorkerRegistration?
 }
