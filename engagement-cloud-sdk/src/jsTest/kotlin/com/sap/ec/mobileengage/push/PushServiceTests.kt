@@ -1,13 +1,14 @@
 package com.sap.ec.mobileengage.push
 
+import com.sap.ec.core.exceptions.SdkException
 import com.sap.ec.core.log.Logger
+import com.sap.ec.core.permission.PermissionHandlerApi
 import com.sap.ec.core.storage.StringStorageApi
+import com.sap.ec.mobileengage.push.serviceworker.ServiceWorkerManagerApi
 import dev.mokkery.MockMode
-import dev.mokkery.answering.returns
-import dev.mokkery.everySuspend
 import dev.mokkery.mock
-import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -15,34 +16,36 @@ import kotlin.test.Test
 class PushServiceTests {
 
     private lateinit var pushService: PushService
+    private lateinit var mockServiceWorkerManager: ServiceWorkerManagerApi
+    private lateinit var mockWebPermissionHandler: PermissionHandlerApi
     private lateinit var mockStorage: StringStorageApi
     private lateinit var mockLogger: Logger
 
-//    @BeforeTest
-//    fun setup() {
-//        mockPushServiceContext = mock(MockMode.autoUnit)
-//        mockStorage = mock(MockMode.autoUnit)
-//        mockLogger = mock(MockMode.autoUnit)
-//        pushService = PushService(mockPushServiceContext, mockStorage, mockLogger)
-//    }
-//
-//    @Test
-//    fun subscribeForPushMessages_shouldReturnNull_whenServiceWorkerOptionsIsNull() = runTest {
-//        everySuspend { mockPushServiceContext.serviceWorkerOptions } returns null
-//
-//        val result = pushService.subscribe()
-//
-//        result shouldBe null
-//        everySuspend { mockPushServiceContext.isSubscribed } returns false
-//        mockPushServiceContext.isSubscribed shouldBe false
-//    }
-//
-//    @Test
-//    fun unsubscribe_shouldSetIsSubscribedToFalse_andClearToken() = runTest {
-//        everySuspend { mockPushServiceContext.registration } returns null
-//
-//        pushService.unsubscribe()
-//
-//        verifySuspend { mockStorage.put("emsPushToken", null) }
-//    }
+    @BeforeTest
+    fun setup() {
+        mockServiceWorkerManager = mock(MockMode.autofill)
+        mockWebPermissionHandler = mock(MockMode.autofill)
+        mockStorage = mock(MockMode.autofill)
+        mockLogger = mock(MockMode.autofill)
+        pushService = PushService(
+            mockServiceWorkerManager,
+            mockWebPermissionHandler,
+            mockStorage,
+            mockLogger
+        )
+    }
+
+    @Test
+    fun serviceWorkerUnavailableException_shouldBeSdkException() {
+        val exception = SdkException.ServiceWorkerUnavailableException("Service workers are not supported in this browser.")
+        exception.shouldBeInstanceOf<SdkException>()
+        exception.message shouldBe "Service workers are not supported in this browser."
+    }
+
+    @Test
+    fun pushManagerUnavailableException_shouldBeSdkException() {
+        val exception = SdkException.PushManagerUnavailableException("Push API is not supported in this browser.")
+        exception.shouldBeInstanceOf<SdkException>()
+        exception.message shouldBe "Push API is not supported in this browser."
+    }
 }

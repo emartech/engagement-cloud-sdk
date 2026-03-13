@@ -3,6 +3,7 @@ package com.sap.ec.mobileengage.push
 import com.sap.ec.api.config.ServiceWorkerOptions
 import com.sap.ec.api.push.PushConstants
 import com.sap.ec.core.device.notification.PermissionState
+import com.sap.ec.core.exceptions.SdkException
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.permission.PermissionHandlerApi
 import com.sap.ec.core.storage.StringStorageApi
@@ -79,11 +80,11 @@ internal class PushService(
     private suspend fun checkAPIBrowserAvailability(): Result<Unit> {
         if (js("!('serviceWorker' in navigator)")) {
             sdkLogger.debug("Service workers are not supported in this browser. Push notifications will not work.")
-            return Result.failure(UnsupportedOperationException("Service workers are not supported in this browser."))  // todo custom exception
+            return Result.failure(SdkException.ServiceWorkerUnavailableException("Service workers are not supported in this browser."))
         }
         if (js("!('PushManager' in window)")) {
             sdkLogger.debug("Push API is not supported in this browser. Push notifications will not work.")
-            return Result.failure(UnsupportedOperationException("Push API is not supported in this browser.")) // todo custom exception
+            return Result.failure(SdkException.PushManagerUnavailableException("Push API is not supported in this browser."))
         }
         return Result.success(Unit)
     }

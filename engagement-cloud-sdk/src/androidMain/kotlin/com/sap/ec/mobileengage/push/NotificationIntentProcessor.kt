@@ -33,7 +33,8 @@ internal class NotificationIntentProcessor(
     private val sdkLogger: Logger
 ) {
     fun processIntent(intent: Intent?) {
-        //TODO: check if SDK setup has been completed
+        // SDK setup is implicitly guarded by applicationScope: if the SDK is not initialized,
+        // applicationScope is cancelled and this coroutine launch will not execute.
 
         if (intent != null) {
             applicationScope.launch {

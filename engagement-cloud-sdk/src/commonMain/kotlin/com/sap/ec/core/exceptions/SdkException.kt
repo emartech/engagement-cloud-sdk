@@ -14,4 +14,6 @@ sealed class SdkException(message: String) : RuntimeException(message) {
     class NetworkIOException(message: String): SdkException(message)
     class CoroutineException(message: String): SdkException(message)
     class DecryptionFailedException(message: String): SdkException(message)
+    class ServiceWorkerUnavailableException(message: String): SdkException(message)
+    class PushManagerUnavailableException(message: String): SdkException(message)
 }

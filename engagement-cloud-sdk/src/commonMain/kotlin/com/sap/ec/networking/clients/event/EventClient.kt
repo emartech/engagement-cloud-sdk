@@ -102,7 +102,7 @@ internal class EventClient(
                         }
                         val result: DeviceEventResponse = response.body()
                         handleDeviceEventState(result)
-                        handleInApp(result.contentCampaigns?.getOrNull(0))  // todo handle all campaigns returned
+                        result.contentCampaigns?.forEach { handleInApp(it) }
                         result.actionCampaigns?.let { handleOnEventActionCampaigns(it) }
                         emitResponseEventOnSuccess(sdkEvents, response)
                         sdkEvents.ack(eventsDao, sdkLogger)
