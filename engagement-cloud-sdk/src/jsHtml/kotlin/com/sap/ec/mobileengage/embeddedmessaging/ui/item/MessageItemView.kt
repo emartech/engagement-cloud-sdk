@@ -180,9 +180,11 @@ private fun SwipeableMessageItem(
 
             if (swipeElement != null && swipeContainer != null) {
                 var startX = 0.0
+                var startY = 0.0
                 var currentX = 0.0
                 var isSwiping = false
                 var hasTriggeredDelete = false
+                var isHorizontal: Boolean? = null
 
                 val onTouchStart = EventListener { event ->
                     val touchEvent = event as TouchEvent
@@ -190,8 +192,10 @@ private fun SwipeableMessageItem(
                         val touch = touchEvent.touches.item(0)
                         if (touch != null) {
                             startX = touch.clientX.toDouble()
+                            startY = touch.clientY.toDouble()
                             currentX = startX
                             isSwiping = true
+                            isHorizontal = null
                             hasTriggeredDelete = false
                             swipeElement.style.transition = "none"
                         }
@@ -206,6 +210,19 @@ private fun SwipeableMessageItem(
                         if (touch != null) {
                             currentX = touch.clientX.toDouble()
                             val deltaX = currentX - startX
+                            val deltaY = touch.clientY.toDouble() - startY
+
+                            if (isHorizontal == null) {
+                                isHorizontal = kotlin.math.abs(deltaX) >= kotlin.math.abs(deltaY)
+                            }
+
+                            if (isHorizontal == false) {
+                                isSwiping = false
+                                hasTriggeredDelete = false
+                                swipeElement.style.transition = "transform 0.2s ease"
+                                swipeElement.style.transform = "translateX(0)"
+                                return@EventListener
+                            }
 
                             if (deltaX < 0) {
                                 event.preventDefault()
@@ -224,6 +241,7 @@ private fun SwipeableMessageItem(
                 }
 
                 val onTouchEnd = EventListener {
+                    isHorizontal = null
                     if (!isSwiping) return@EventListener
                     isSwiping = false
                     swipeElement.style.transition = "transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1)"

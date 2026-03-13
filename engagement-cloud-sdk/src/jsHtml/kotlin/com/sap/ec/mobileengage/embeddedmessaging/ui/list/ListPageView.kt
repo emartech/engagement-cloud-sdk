@@ -1,6 +1,7 @@
 package com.sap.ec.mobileengage.embeddedmessaging.ui.list
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -36,7 +37,10 @@ import org.jetbrains.compose.web.dom.Hr
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 import org.w3c.dom.HTMLButtonElement
+import org.w3c.dom.HTMLElement
+import org.w3c.dom.TouchEvent
 import org.w3c.dom.events.Event
+import org.w3c.dom.events.EventListener
 import web.dom.Element
 import web.dom.document
 import web.intersection.IntersectionObserver
@@ -95,6 +99,8 @@ internal fun MessageList(
         mutableStateOf(window.matchMedia("(min-width: 1240px)").matches)
     }
 
+    val isTouchEnabled = remember { isTouchDevice() }
+
     LaunchedEffect(Unit) {
         val landscapeMediaQuery = window.matchMedia("(orientation: landscape)")
         val landscapeListener: (Event) -> Unit = { _ -> isLandscape = landscapeMediaQuery.matches }
@@ -138,7 +144,9 @@ internal fun MessageList(
                         Hr({ classes(EmbeddedMessagingStyleSheet.divider) })
                     }
 
-                    RefreshButton(isRefreshing, viewModel)
+                    if(!isTouchEnabled){
+                        RefreshButton(isRefreshing, viewModel)
+                    }
 
                     MessageListContent(
                         lazyPagingMessageItems = lazyPagingMessageItems,
@@ -205,7 +213,9 @@ internal fun MessageList(
                             Hr({ classes(EmbeddedMessagingStyleSheet.divider) })
                         }
 
-                        RefreshButton(isRefreshing, viewModel)
+                        if(!isTouchEnabled){
+                            RefreshButton(isRefreshing, viewModel)
+                        }
 
                         MessageListContent(
                             lazyPagingMessageItems = lazyPagingMessageItems,
@@ -273,6 +283,49 @@ internal fun MessageListContent(
     hasFiltersApplied: Boolean,
     onDeleteIconClicked: (MessageItemViewModelApi) -> Unit = {},
 ) {
+    val isTouchEnabled = remember { isTouchDevice() }
+
+    if (isTouchEnabled) {
+        PullToRefreshContainer(
+            onRefresh = {
+                listViewModel.refreshMessagesWithThrottling { listViewModel.triggerRefreshFromJs() }
+            },
+            content = { ListContent(
+                lazyPagingMessageItems = lazyPagingMessageItems,
+                listViewModel = listViewModel,
+                customMessageItemElementName = customMessageItemElementName,
+                onItemClick = onItemClick,
+                withDeleteIcon = withDeleteIcon,
+                onClearFilters = onClearFilters,
+                hasFiltersApplied = hasFiltersApplied,
+                onDeleteIconClicked = onDeleteIconClicked
+            ) }
+        )
+    } else {
+        ListContent(
+            lazyPagingMessageItems = lazyPagingMessageItems,
+            listViewModel = listViewModel,
+            customMessageItemElementName = customMessageItemElementName,
+            onItemClick = onItemClick,
+            withDeleteIcon = withDeleteIcon,
+            onClearFilters = onClearFilters,
+            hasFiltersApplied = hasFiltersApplied,
+            onDeleteIconClicked = onDeleteIconClicked
+        )
+    }
+}
+
+@Composable
+internal fun ListContent(
+    lazyPagingMessageItems: LazyPagingItems<MessageItemViewModelApi>,
+    listViewModel: ListPageViewModelApi,
+    customMessageItemElementName: String?,
+    onItemClick: (MessageItemViewModelApi) -> Unit,
+    withDeleteIcon: Boolean = true,
+    onClearFilters: () -> Unit,
+    hasFiltersApplied: Boolean,
+    onDeleteIconClicked: (MessageItemViewModelApi) -> Unit = {},
+){
     val isRefreshing = lazyPagingMessageItems.loadState.source.refresh is LoadState.Loading
 
     Div({
@@ -302,6 +355,150 @@ internal fun MessageListContent(
                     onDeleteIconClicked = { onDeleteIconClicked(it) }
                 )
             }
+        }
+    }
+}
+
+@Composable
+internal fun PullToRefreshContainer(
+    onRefresh: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    val pullThresholdPx = 80
+    val indicatorMaxHeightPx = 56
+
+    var containerRef by remember { mutableStateOf<HTMLElement?>(null) }
+    var indicatorRef  by remember { mutableStateOf<HTMLElement?>(null) }
+
+    Div({
+        classes(EmbeddedMessagingStyleSheet.pullToRefreshContainer)
+        ref { element ->
+            containerRef = element
+            onDispose { }
+        }
+    }) {
+        Div({
+            classes(EmbeddedMessagingStyleSheet.pullToRefreshIndicator)
+            ref { element ->
+                indicatorRef = element
+                onDispose { }
+            }
+        }) {
+            SvgIcon(path = REFRESH_ICON_PATH)
+        }
+
+        content()
+    }
+
+    DisposableEffect(containerRef, indicatorRef) {
+        val container = containerRef ?: return@DisposableEffect onDispose {}
+        val indicator = indicatorRef ?: return@DisposableEffect onDispose {}
+
+        var startY = 0.0
+        var startX = 0.0
+        var pulling = false
+        var triggered = false
+        var isVertical: Boolean? = null
+
+        fun findScrollableChild(): HTMLElement? {
+            for (i in 0 until container.children.length) {
+                val child = container.children.item(i) as? HTMLElement ?: continue
+                if (child === indicator) continue
+                return child
+            }
+            return null
+        }
+
+        val onTouchStart = EventListener { event ->
+            val touch = (event as TouchEvent).touches.item(0) ?: return@EventListener
+            val scrollableChild = findScrollableChild()
+            if (scrollableChild == null || scrollableChild.scrollTop == 0.0) {
+                startY = touch.clientY.toDouble()
+                startX = touch.clientX.toDouble()
+                pulling = true
+                triggered = false
+                isVertical = null
+                indicator.style.transition = "none"
+            }
+        }
+
+        val onTouchMove = EventListener { event ->
+            if (!pulling) return@EventListener
+            val touch = (event as TouchEvent).touches.item(0) ?: return@EventListener
+            val deltaY = touch.clientY.toDouble() - startY
+            val deltaX = touch.clientX.toDouble() - startX
+
+            if (isVertical == null) {
+                isVertical = kotlin.math.abs(deltaY) >= kotlin.math.abs(deltaX)
+            }
+
+            if (isVertical == false) {
+                pulling = false
+                triggered = false
+                indicator.style.transition = "height 0.2s ease"
+                indicator.style.height = "0px"
+                return@EventListener
+            }
+
+            val scrollableChild = findScrollableChild()
+            if (scrollableChild != null && scrollableChild.scrollTop > 0.0) {
+                pulling = false
+                triggered = false
+                indicator.style.transition = "height 0.2s ease"
+                indicator.style.height = "0px"
+                return@EventListener
+            }
+
+            if (deltaY > 0) {
+                event.preventDefault()
+                val progress = (deltaY / pullThresholdPx).coerceIn(0.0, 1.5)
+                val height = (progress * indicatorMaxHeightPx)
+                    .coerceAtMost(indicatorMaxHeightPx.toDouble())
+                indicator.style.height = "${height}px"
+
+                if (deltaY >= pullThresholdPx && !triggered) {
+                    triggered = true
+                }
+                if (deltaY < pullThresholdPx && triggered) {
+                    triggered = false
+                }
+            } else if (deltaY <= 0) {
+                pulling = false
+                indicator.style.transition = "height 0.2s ease"
+                indicator.style.height = "0px"
+            }
+        }
+
+        val onTouchEnd = EventListener { _ ->
+            if (!pulling) {
+                isVertical = null
+                return@EventListener
+            }
+            pulling = false
+            isVertical = null
+            indicator.style.transition = "height 0.2s ease"
+
+            if (triggered) {
+                indicator.style.height = "${indicatorMaxHeightPx}px"
+                onRefresh()
+                window.setTimeout({
+                    indicator.style.height = "0px"
+                }, 1000)
+            } else {
+                indicator.style.height = "0px"
+            }
+        }
+
+        container.addEventListener("touchstart", onTouchStart, js("{passive: false}"))
+        container.addEventListener("touchmove",  onTouchMove,  js("{passive: false}"))
+        container.addEventListener("touchend",   onTouchEnd,   js("{passive: false}"))
+        container.addEventListener("touchcancel",onTouchEnd,   js("{passive: false}"))
+
+        onDispose {
+            container.removeEventListener("touchstart", onTouchStart, js("{passive: false}"))
+            container.removeEventListener("touchmove",  onTouchMove,  js("{passive: false}"))
+            container.removeEventListener("touchend",   onTouchEnd,   js("{passive: false}"))
+            container.removeEventListener("touchcancel",onTouchEnd,   js("{passive: false}"))
         }
     }
 }
@@ -507,4 +704,3 @@ internal fun AdaptiveCardContainer(
         content()
     }
 }
-

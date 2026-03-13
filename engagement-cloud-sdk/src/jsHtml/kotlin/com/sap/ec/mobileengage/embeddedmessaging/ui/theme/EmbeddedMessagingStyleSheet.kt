@@ -101,7 +101,6 @@ import org.jetbrains.compose.web.css.top
 import org.jetbrains.compose.web.css.transitions
 import org.jetbrains.compose.web.css.whiteSpace
 import org.jetbrains.compose.web.css.width
-import web.cssom.Overflow
 
 internal object EmbeddedMessagingStyleSheet : StyleSheet() {
     val listPageContainer by style {
@@ -245,6 +244,7 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Column)
         overflow("auto")
+        property("min-height", "0")
     }
 
     val refreshIndicator by style {
@@ -265,6 +265,25 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
         display(DisplayStyle.Flex)
         justifyContent(JustifyContent.Center)
         alignItems(AlignItems.Center)
+    }
+
+    val pullToRefreshIndicator by style {
+        display(DisplayStyle.Flex)
+        alignItems(AlignItems.Center)
+        justifyContent(JustifyContent.Center)
+        height(0.px)
+        overflow("hidden")
+        property("transition", "height 0.2s ease")
+        backgroundColor(CssColorVars.colorSurface.value())
+        color(CssColorVars.colorPrimary.value())
+    }
+
+    val pullToRefreshContainer by style {
+        flex(1)
+        display(DisplayStyle.Flex)
+        flexDirection(FlexDirection.Column)
+        width(MAX_WIDTH)
+        property("min-height", "0")
     }
 
     val svgDefaultIconSize by style {

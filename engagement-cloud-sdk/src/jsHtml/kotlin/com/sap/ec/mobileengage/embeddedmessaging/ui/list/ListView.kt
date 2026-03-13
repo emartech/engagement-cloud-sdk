@@ -20,7 +20,7 @@ import web.cssom.atrule.height
 import web.cssom.px
 import web.dom.document
 
-private fun isTouchDevice(): Boolean {
+internal fun isTouchDevice(): Boolean {
     return js("'ontouchstart' in window || navigator.maxTouchPoints > 0") as Boolean
 }
 
