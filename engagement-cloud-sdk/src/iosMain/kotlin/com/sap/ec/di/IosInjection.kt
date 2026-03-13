@@ -1,7 +1,6 @@
 package com.sap.ec.di
 
 import app.cash.sqldelight.driver.native.NativeSqliteDriver
-import com.sap.ec.InternalSdkApi
 import com.sap.ec.IosEngagementCloudSDKConfig
 import com.sap.ec.api.config.IosConfig
 import com.sap.ec.api.config.IosConfigApi
@@ -51,7 +50,6 @@ import com.sap.ec.core.providers.inputmode.InputModeProvider
 import com.sap.ec.core.providers.inputmode.InputModeProviderApi
 import com.sap.ec.core.providers.platform.PlatformCategoryProvider
 import com.sap.ec.core.providers.platform.PlatformCategoryProviderApi
-import com.sap.ec.core.setup.PlatformInitState
 import com.sap.ec.core.state.State
 import com.sap.ec.core.storage.KeychainStorage
 import com.sap.ec.core.storage.StorageConstants
@@ -153,7 +151,6 @@ internal object IosInjection {
                 sdkLogger = get { parametersOf(LegacySDKMigrationState::class.simpleName) }
             )
         }
-        single<State>(named(StateTypes.PlatformInit)) { PlatformInitState() }
         single<EventsDaoApi> {
             val driver = NativeSqliteDriver(SapEngagementCloudDB.Schema, DB_NAME)
             IosSqDelightEventsDao(

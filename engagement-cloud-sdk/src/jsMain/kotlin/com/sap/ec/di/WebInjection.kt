@@ -62,7 +62,6 @@ import com.sap.ec.core.storage.StringStorage
 import com.sap.ec.core.storage.StringStorageApi
 import com.sap.ec.core.url.ExternalUrlOpenerApi
 import com.sap.ec.core.url.WebExternalUrlOpener
-import com.sap.ec.enable.PlatformInitState
 import com.sap.ec.enable.PlatformInitializer
 import com.sap.ec.enable.PlatformInitializerApi
 import com.sap.ec.enable.config.JsECConfigStore
@@ -174,9 +173,6 @@ internal object WebInjection {
                 storage = get<StringStorageApi>(),
                 sdkLogger = get { parametersOf(PushService::class.simpleName) }
             )
-        }
-        single<State>(named(StateTypes.PlatformInit)) {
-            PlatformInitState()
         }
         single<PushNotificationClickHandlerApi> {
             PushNotificationClickHandler(

@@ -129,7 +129,6 @@ internal object SetupInjection {
                     get<State>(named(StateTypes.ApplyAppCodeBasedRemoteConfig)),
                     get<State>(named(StateTypes.FetchJsBridge)),
                     get<State>(named(StateTypes.RegisterClient)),
-                    get<State>(named(StateTypes.PlatformInit)),
                     get<State>(named(StateTypes.RegisterPushToken)),
                     get<State>(named(StateTypes.RestoreSavedSdkEvents)),
                     get<State>(named(StateTypes.AppStart)),
@@ -217,7 +216,6 @@ internal enum class StateMachineTypes {
 internal enum class StateTypes {
     CollectDeviceInfo,
     ApplyAppCodeBasedRemoteConfig,
-    PlatformInit,
     RegisterClient,
     RegisterPushToken,
     AppStart,
