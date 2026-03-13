@@ -171,6 +171,7 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Column)
         property("overflow", "auto")
+        height(MAX_HEIGHT)
     }
 
     val listViewContainer by style {
@@ -313,6 +314,7 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
         alignItems(AlignItems.Center)
         justifyContent(JustifyContent.Center)
         padding(DEFAULT_PADDING)
+        flexDirection(FlexDirection.Column)
     }
 
     val emptyStateContent by style {
@@ -323,9 +325,10 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
     }
 
     val emptyStateText by style {
-        fontSize(CssFontVars.fontSizeBodyLarge)
-        color(CssColorVars.colorOnSurface.value())
+        fontSize(CssFontVars.fontSizeBodySmall)
+        color(CssColorVars.colorOnSurfaceVariant.value())
         display(DisplayStyle.Block)
+        fontWeight(TITLE_FONT_WEIGHT)
     }
 
     val emptyStateButtonTextContainer by style {
@@ -333,8 +336,10 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
     }
 
     val emptyStateTitle by style {
+        fontSize(CssFontVars.fontSizeBodyLarge)
         marginBottom(DEFAULT_MARGIN)
-        fontWeight("bold")
+        fontWeight(TITLE_FONT_WEIGHT)
+        color(CssColorVars.colorOnSurface.value())
     }
 
     val dialogOverlay by style {
@@ -534,6 +539,23 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
         alignItems("center")
         display(DisplayStyle.LegacyInlineFlex)
         padding(DEFAULT_PADDING)
+    }
+
+    val errorStateNoConnectionRetryButton by style {
+        height(FLOATING_ACTION_BUTTON_SIZE)
+        display(DisplayStyle.Flex)
+        alignItems(AlignItems.Center)
+        gap(DEFAULT_SPACING)
+        padding(DEFAULT_PADDING)
+        border(ZERO_BORDER_WIDTH)
+        borderRadius(SMALL_BORDER_RADIUS)
+        cursor(DEFAULT_CURSOR)
+        fontSize(CssFontVars.fontSizeLabelMedium)
+        fontWeight(BUTTON_FONT_WEIGHT)
+        backgroundColor(CssColorVars.colorSurfaceVariant.value())
+        color(CssColorVars.colorOnSurfaceVariant.value())
+        marginTop(DEFAULT_MARGIN)
+        property("box-shadow", "0 2px 4px rgba(0,0,0,0.1)")
     }
 
     val emptyStateClearFiltersButton by style {
