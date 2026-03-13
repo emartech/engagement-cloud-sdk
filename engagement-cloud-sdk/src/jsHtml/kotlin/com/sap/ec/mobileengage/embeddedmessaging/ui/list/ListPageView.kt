@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -101,6 +102,10 @@ internal fun MessageList(
 
     val isTouchEnabled = remember { isTouchDevice() }
 
+    val hasConnection by viewModel.hasConnection.collectAsState()
+
+    val hasConnectionError by remember { derivedStateOf { !hasConnection && lazyPagingMessageItems.hasRefreshError() } }
+
     LaunchedEffect(Unit) {
         val landscapeMediaQuery = window.matchMedia("(orientation: landscape)")
         val landscapeListener: (Event) -> Unit = { _ -> isLandscape = landscapeMediaQuery.matches }
@@ -144,7 +149,7 @@ internal fun MessageList(
                         Hr({ classes(EmbeddedMessagingStyleSheet.divider) })
                     }
 
-                    if(!isTouchEnabled){
+                    if (!isTouchEnabled && !hasConnectionError) {
                         RefreshButton(isRefreshing, viewModel)
                     }
 
@@ -160,6 +165,7 @@ internal fun MessageList(
                             viewModel.setFilterUnopenedOnly(false)
                         },
                         hasFiltersApplied = hasFiltersApplied,
+                        hasConnectionError = hasConnectionError,
                         onDeleteIconClicked = {
                             messageToDelete = it
                             showDeleteMessageDialog = true
@@ -213,7 +219,7 @@ internal fun MessageList(
                             Hr({ classes(EmbeddedMessagingStyleSheet.divider) })
                         }
 
-                        if(!isTouchEnabled){
+                        if (!isTouchEnabled && !hasConnectionError) {
                             RefreshButton(isRefreshing, viewModel)
                         }
 
@@ -229,6 +235,7 @@ internal fun MessageList(
                                 viewModel.setFilterUnopenedOnly(false)
                             },
                             hasFiltersApplied = hasFiltersApplied,
+                            hasConnectionError = hasConnectionError,
                             onDeleteIconClicked = {
                                 messageToDelete = it
                                 showDeleteMessageDialog = true
@@ -281,6 +288,7 @@ internal fun MessageListContent(
     withDeleteIcon: Boolean = true,
     onClearFilters: () -> Unit,
     hasFiltersApplied: Boolean,
+    hasConnectionError: Boolean,
     onDeleteIconClicked: (MessageItemViewModelApi) -> Unit = {},
 ) {
     val isTouchEnabled = remember { isTouchDevice() }
@@ -290,16 +298,19 @@ internal fun MessageListContent(
             onRefresh = {
                 listViewModel.refreshMessagesWithThrottling { listViewModel.triggerRefreshFromJs() }
             },
-            content = { ListContent(
-                lazyPagingMessageItems = lazyPagingMessageItems,
-                listViewModel = listViewModel,
-                customMessageItemElementName = customMessageItemElementName,
-                onItemClick = onItemClick,
-                withDeleteIcon = withDeleteIcon,
-                onClearFilters = onClearFilters,
-                hasFiltersApplied = hasFiltersApplied,
-                onDeleteIconClicked = onDeleteIconClicked
-            ) }
+            content = {
+                ListContent(
+                    lazyPagingMessageItems = lazyPagingMessageItems,
+                    listViewModel = listViewModel,
+                    customMessageItemElementName = customMessageItemElementName,
+                    onItemClick = onItemClick,
+                    withDeleteIcon = withDeleteIcon,
+                    onClearFilters = onClearFilters,
+                    hasFiltersApplied = hasFiltersApplied,
+                    onDeleteIconClicked = onDeleteIconClicked,
+                    hasConnectionError = hasConnectionError
+                )
+            }
         )
     } else {
         ListContent(
@@ -310,7 +321,8 @@ internal fun MessageListContent(
             withDeleteIcon = withDeleteIcon,
             onClearFilters = onClearFilters,
             hasFiltersApplied = hasFiltersApplied,
-            onDeleteIconClicked = onDeleteIconClicked
+            onDeleteIconClicked = onDeleteIconClicked,
+            hasConnectionError = hasConnectionError
         )
     }
 }
@@ -325,35 +337,71 @@ internal fun ListContent(
     onClearFilters: () -> Unit,
     hasFiltersApplied: Boolean,
     onDeleteIconClicked: (MessageItemViewModelApi) -> Unit = {},
-){
+    hasConnectionError: Boolean
+) {
     val isRefreshing = lazyPagingMessageItems.loadState.source.refresh is LoadState.Loading
 
-    Div({
-        classes(EmbeddedMessagingStyleSheet.scrollingMessageListContainer)
-    }) {
-        if (isRefreshing) {
-            PlaceholderMessageList()
+    if (isRefreshing) {
+        PlaceholderMessageList()
+    } else if (hasConnectionError) {
+        NoConnectionErrorState(
+            onRetry = { listViewModel.refreshMessagesWithThrottling { listViewModel.triggerRefreshFromJs() } }
+        )
+    } else if (lazyPagingMessageItems.isIdleButEmpty()) {
+        if (hasFiltersApplied) {
+            FilteredMessageItemsListEmptyState {
+                onClearFilters()
+            }
         } else {
-            if (lazyPagingMessageItems.isIdleButEmpty()) {
-                if (hasFiltersApplied) {
-                    FilteredMessageItemsListEmptyState {
-                        onClearFilters()
-                    }
-                } else {
-                    EmptyState()
-                }
-            } else {
-                ListView(
-                    lazyPagingMessageItems = lazyPagingMessageItems,
-                    listViewModel = listViewModel,
-                    customMessageItemElementName = customMessageItemElementName,
-                    onItemClick = {
-                        onItemClick(it)
-                    },
-                    withDeleteIcon = withDeleteIcon,
-                    paginationId = "ListPageView",
-                    onDeleteIconClicked = { onDeleteIconClicked(it) }
+            EmptyState()
+        }
+    } else {
+        Div({
+            classes(EmbeddedMessagingStyleSheet.scrollingMessageListContainer)
+        }) {
+            ListView(
+                lazyPagingMessageItems = lazyPagingMessageItems,
+                listViewModel = listViewModel,
+                customMessageItemElementName = customMessageItemElementName,
+                onItemClick = {
+                    onItemClick(it)
+                },
+                withDeleteIcon = withDeleteIcon,
+                paginationId = "ListPageView",
+                onDeleteIconClicked = { onDeleteIconClicked(it) }
+            )
+        }
+    }
+}
+
+@Composable
+internal fun NoConnectionErrorState(onRetry: () -> Unit) {
+    Div({
+        classes(EmbeddedMessagingStyleSheet.emptyStateContainer)
+    }) {
+        Div({
+            classes(EmbeddedMessagingStyleSheet.emptyStateContent)
+        }) {
+            Span({
+                classes(
+                    EmbeddedMessagingStyleSheet.emptyStateTitle
                 )
+            }) {
+                Text(LocalStringResources.current.errorStateNoConnectionTitle)
+            }
+            Span({
+                classes(EmbeddedMessagingStyleSheet.emptyStateText)
+            }) {
+                Text(LocalStringResources.current.errorStateNoConnectionDescription)
+            }
+            Button({
+                onClick { onRetry() }
+                classes(EmbeddedMessagingStyleSheet.errorStateNoConnectionRetryButton)
+            }) {
+                SvgIcon(path = REFRESH_ICON_PATH)
+                Span {
+                    Text(LocalStringResources.current.errorStateNoConnectionRetryButtonLabel)
+                }
             }
         }
     }
@@ -368,7 +416,7 @@ internal fun PullToRefreshContainer(
     val indicatorMaxHeightPx = 56
 
     var containerRef by remember { mutableStateOf<HTMLElement?>(null) }
-    var indicatorRef  by remember { mutableStateOf<HTMLElement?>(null) }
+    var indicatorRef by remember { mutableStateOf<HTMLElement?>(null) }
 
     Div({
         classes(EmbeddedMessagingStyleSheet.pullToRefreshContainer)
@@ -490,15 +538,15 @@ internal fun PullToRefreshContainer(
         }
 
         container.addEventListener("touchstart", onTouchStart, js("{passive: false}"))
-        container.addEventListener("touchmove",  onTouchMove,  js("{passive: false}"))
-        container.addEventListener("touchend",   onTouchEnd,   js("{passive: false}"))
-        container.addEventListener("touchcancel",onTouchEnd,   js("{passive: false}"))
+        container.addEventListener("touchmove", onTouchMove, js("{passive: false}"))
+        container.addEventListener("touchend", onTouchEnd, js("{passive: false}"))
+        container.addEventListener("touchcancel", onTouchEnd, js("{passive: false}"))
 
         onDispose {
             container.removeEventListener("touchstart", onTouchStart, js("{passive: false}"))
-            container.removeEventListener("touchmove",  onTouchMove,  js("{passive: false}"))
-            container.removeEventListener("touchend",   onTouchEnd,   js("{passive: false}"))
-            container.removeEventListener("touchcancel",onTouchEnd,   js("{passive: false}"))
+            container.removeEventListener("touchmove", onTouchMove, js("{passive: false}"))
+            container.removeEventListener("touchend", onTouchEnd, js("{passive: false}"))
+            container.removeEventListener("touchcancel", onTouchEnd, js("{passive: false}"))
         }
     }
 }
@@ -611,7 +659,6 @@ internal fun EmptyState() {
         }) {
             Span({
                 classes(
-                    EmbeddedMessagingStyleSheet.emptyStateText,
                     EmbeddedMessagingStyleSheet.emptyStateTitle
                 )
             }) {
@@ -638,7 +685,6 @@ internal fun FilteredMessageItemsListEmptyState(
         }) {
             Span({
                 classes(
-                    EmbeddedMessagingStyleSheet.emptyStateText,
                     EmbeddedMessagingStyleSheet.emptyStateTitle
                 )
             }) {
