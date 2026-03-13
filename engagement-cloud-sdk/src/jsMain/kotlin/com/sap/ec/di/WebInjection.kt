@@ -108,6 +108,7 @@ import org.koin.dsl.module
 import web.broadcast.BroadcastChannel
 import web.dom.document
 import web.idb.indexedDB
+import web.navigator.navigator
 
 internal object WebInjection {
     val webModules = module {
@@ -164,11 +165,12 @@ internal object WebInjection {
         }
         single<PushServiceApi> {
             val serviceWorkerManager = ServiceWorkerManager(
-                sdkLogger = get { parametersOf(ServiceWorkerManager::class.simpleName) }
+                sdkContext = get(),
+                sdkLogger = get { parametersOf(ServiceWorkerManager::class.simpleName) },
+                serviceWorkerContainer = navigator.serviceWorker
             )
             PushService(
                 serviceWorkerManager = serviceWorkerManager,
-                sdkContext = get(),
                 webPermissionHandler = get(),
                 storage = get<StringStorageApi>(),
                 sdkLogger = get { parametersOf(PushService::class.simpleName) }
