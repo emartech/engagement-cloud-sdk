@@ -31,7 +31,6 @@ internal class JsPushInternal(
         }
     }
 
-    // todo test
     override suspend fun unsubscribe(): Result<Unit> {
         return runCatchingWithoutCancellation {
             clearPushToken()
