@@ -83,6 +83,7 @@ internal object SetupInjection {
         single<State>(named(StateTypes.ClearPushTokenOnDisable)) {
             ClearPushTokenOnDisableState(
                 sdkEventDistributor = get(),
+                storage = get(),
                 sdkContext = get()
             )
         }

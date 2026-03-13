@@ -1,20 +1,25 @@
 package com.sap.ec.disable.states
 
 import com.sap.ec.TestEngagementCloudSDKConfig
+import com.sap.ec.api.push.PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.channel.SdkEventWaiterApi
 import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.networking.model.UrlRequest
+import com.sap.ec.core.storage.StringStorageApi
 import com.sap.ec.event.SdkEvent
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
+import dev.mokkery.matcher.any
 import dev.mokkery.matcher.capture.Capture.Companion.slot
 import dev.mokkery.matcher.capture.SlotCapture
 import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
+import dev.mokkery.verify.VerifyMode
+import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -49,18 +54,24 @@ class ClearPushTokenOnDisableStateTests {
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
     private lateinit var mockSdkContext: SdkContextApi
     private lateinit var mockWaiter: SdkEventWaiterApi
+    private lateinit var mockStorage: StringStorageApi
     private lateinit var slot: SlotCapture<SdkEvent>
     private lateinit var clearPushTokenOnDisableState: ClearPushTokenOnDisableState
 
     @BeforeTest
     fun setup() {
         mockSdkEventDistributor = mock(MockMode.autofill)
+        mockStorage = mock()
+        everySuspend { mockStorage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns "testToken"
         mockSdkContext = mock()
-        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(TEST_APPLICATION_CODE)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(
+            TEST_APPLICATION_CODE
+        )
         mockWaiter = mock(MockMode.autofill)
         slot = slot()
         everySuspend { mockWaiter.await<Response>() } returns successResult
-        clearPushTokenOnDisableState = ClearPushTokenOnDisableState(mockSdkEventDistributor, mockSdkContext)
+        clearPushTokenOnDisableState =
+            ClearPushTokenOnDisableState(mockSdkEventDistributor, mockStorage, mockSdkContext)
     }
 
     @Test
@@ -87,5 +98,16 @@ class ClearPushTokenOnDisableStateTests {
             val emittedEvent = slot.get()
             (emittedEvent is SdkEvent.Internal.Sdk.ClearPushToken) shouldBe true
             result shouldBe Result.failure(testException)
+        }
+
+    @Test
+    fun active_shouldNOTRegisterClearPushTokenEvent_whenNoPushToken_isStored() =
+        runTest {
+            everySuspend { mockStorage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns null
+
+            val result = clearPushTokenOnDisableState.active()
+
+            result.isSuccess shouldBe true
+            verifySuspend(VerifyMode.exactly(0)) { mockSdkEventDistributor.registerEvent(any()) }
         }
 }
