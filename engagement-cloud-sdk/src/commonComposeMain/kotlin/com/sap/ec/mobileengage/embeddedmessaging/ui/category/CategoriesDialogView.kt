@@ -150,7 +150,7 @@ private fun CategoryFilterChipsList(
                 .fillMaxWidth()
                 .padding(DEFAULT_PADDING)
         ) {
-            categories.forEach { (id, text) ->
+            categories.forEach { (id, value) ->
                 FilterChip(
                     border = filterChipBorderSettings(
                         selectedCategories,
@@ -177,11 +177,11 @@ private fun CategoryFilterChipsList(
                             if (selectedCategories.value.contains(id)) {
                                 Icon(
                                     Icons.Outlined.Check,
-                                    contentDescription = "$text ${LocalStringResources.current.selectedCategoryFilterChipIconAltText}"
+                                    contentDescription = "$value ${LocalStringResources.current.selectedCategoryFilterChipIconAltText}"
                                 )
                             }
                             Text(
-                                text = text,
+                                text = value,
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = MEDIUM_FONT_WEIGHT,
                                 letterSpacing = 0.11.sp

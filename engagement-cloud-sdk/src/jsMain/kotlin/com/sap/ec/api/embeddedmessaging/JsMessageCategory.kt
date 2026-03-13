@@ -8,19 +8,19 @@ import kotlinx.serialization.Serializable
 @JsName("MessageCategory")
 interface JsMessageCategory {
     val id: String
-    val text: String
+    val value: String
 }
 
 @Serializable
 internal data class JSApiMessageCategory(
     override val id: String,
-    override val text: String
+    override val value: String
 ) : JsMessageCategory
 
 internal fun JsMessageCategory.toMessageCategory(): MessageCategory {
-    return MessageCategory(id, text)
+    return MessageCategory(id, value)
 }
 
 internal fun MessageCategory.toJsApiMessageCategory(): JSApiMessageCategory {
-    return JSApiMessageCategory(id, text)
+    return JSApiMessageCategory(id, value)
 }

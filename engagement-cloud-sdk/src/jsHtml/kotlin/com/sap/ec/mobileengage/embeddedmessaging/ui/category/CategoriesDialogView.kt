@@ -103,7 +103,7 @@ private fun CategoryFilterChipsList(
     Div({
         classes(EmbeddedMessagingStyleSheet.categoryChipsContainer)
     }) {
-        categories.forEach { (id, text) ->
+        categories.forEach { (id, value) ->
             val isSelected = selectedCategories.value.contains(id)
 
             Button({
@@ -127,7 +127,7 @@ private fun CategoryFilterChipsList(
                         className = EmbeddedMessagingStyleSheet.svgCheckmarkIconSize
                     )
                 }
-                Text(text)
+                Text(value)
             }
         }
     }
