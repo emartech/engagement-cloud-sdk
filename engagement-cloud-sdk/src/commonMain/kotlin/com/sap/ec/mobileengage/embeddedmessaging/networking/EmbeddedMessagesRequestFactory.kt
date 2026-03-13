@@ -49,12 +49,17 @@ internal class EmbeddedMessagesRequestFactory(
                 )
 
             is SdkEvent.Internal.EmbeddedMessaging.UpdateTagsForMessages ->
-                UrlRequest(
-                    urlFactory.create(ECUrlType.UpdateTagsForMessages),
-                    HttpMethod.Patch,
-                    bodyString = json.encodeToString(embeddedMessagingEvent.updateData)
-                )
+                createBatched(listOf(embeddedMessagingEvent))
         }
+    }
+
+    override suspend fun createBatched(updateTagsEvents: List<SdkEvent.Internal.EmbeddedMessaging.UpdateTagsForMessages>): UrlRequest {
+        val updateData = updateTagsEvents.map { it.updateData }
+        return UrlRequest(
+            urlFactory.create(ECUrlType.UpdateTagsForMessages),
+            HttpMethod.Patch,
+            bodyString = json.encodeToString(updateData)
+        )
     }
 
     private suspend fun createFetchMessagesRequest(embeddedMessagingEvent: SdkEvent.Internal.EmbeddedMessaging.FetchMessages): UrlRequest {

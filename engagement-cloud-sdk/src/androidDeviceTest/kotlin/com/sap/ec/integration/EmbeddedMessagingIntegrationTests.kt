@@ -68,7 +68,9 @@ class EmbeddedMessagingIntegrationTests {
         forAll(
             provideExpectedStatusesForAppCodes()
         ) { applicationCode, expectedStatus ->
-            sdkContext.setSdkConfig(sdkContext.getSdkConfig()?.copyWith(applicationCode = applicationCode))
+            sdkContext.setSdkConfig(
+                sdkContext.getSdkConfig()?.copyWith(applicationCode = applicationCode)
+            )
 
             val response: SdkEvent.Internal.Sdk.Answer.Response<Response> =
                 sdkEventDistributor.registerEvent(
@@ -87,7 +89,9 @@ class EmbeddedMessagingIntegrationTests {
         forAll(
             provideExpectedStatusesForAppCodes()
         ) { applicationCode, expectedStatus ->
-            sdkContext.setSdkConfig(sdkContext.getSdkConfig()?.copyWith(applicationCode = applicationCode))
+            sdkContext.setSdkConfig(
+                sdkContext.getSdkConfig()?.copyWith(applicationCode = applicationCode)
+            )
 
             val response: SdkEvent.Internal.Sdk.Answer.Response<Response> =
                 sdkEventDistributor.registerEvent(
@@ -108,7 +112,9 @@ class EmbeddedMessagingIntegrationTests {
         forAll(
             provideExpectedStatusesForAppCodes()
         ) { applicationCode, expectedStatus ->
-            sdkContext.setSdkConfig(sdkContext.getSdkConfig()?.copyWith(applicationCode = applicationCode))
+            sdkContext.setSdkConfig(
+                sdkContext.getSdkConfig()?.copyWith(applicationCode = applicationCode)
+            )
 
             val response: SdkEvent.Internal.Sdk.Answer.Response<Response> =
                 sdkEventDistributor.registerEvent(
@@ -127,20 +133,21 @@ class EmbeddedMessagingIntegrationTests {
         forAll(
             provideExpectedStatusesForAppCodes()
         ) { applicationCode, expectedStatus ->
-            sdkContext.setSdkConfig(sdkContext.getSdkConfig()?.copyWith(applicationCode = applicationCode))
+            sdkContext.setSdkConfig(
+                sdkContext.getSdkConfig()?.copyWith(applicationCode = applicationCode)
+            )
 
             val response: SdkEvent.Internal.Sdk.Answer.Response<Response> =
                 sdkEventDistributor.registerEvent(
                     SdkEvent.Internal.EmbeddedMessaging.UpdateTagsForMessages(
                         nackCount = 0,
-                        updateData = listOf(
+                        updateData =
                             MessageTagUpdate(
                                 "testId",
                                 TagOperation.Add,
                                 tag = "testTag",
                                 trackingInfo = ""
                             )
-                        )
                     )
                 ).await()
 

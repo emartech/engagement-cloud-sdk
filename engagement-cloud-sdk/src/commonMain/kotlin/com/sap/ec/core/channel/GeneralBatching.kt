@@ -34,6 +34,7 @@ internal fun <T> Flow<T>.batched(
             job = launch {
                 delay(batchIntervalMillis)
                 flushBuffer()
+                job = null
             }
         }
 

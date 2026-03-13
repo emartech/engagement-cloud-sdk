@@ -120,14 +120,13 @@ class EmbeddedMessagesRequestFactoryTests {
     @Test
     fun create_should_return_request_for_updateTagsForMessages() = runTest {
         val trackingInfo = """{"key1":"value1","key2":"value2"}"""
-        val updateData = listOf(
-            MessageTagUpdate(
-                messageId = "messageId",
-                operation = TagOperation.Add,
-                tag = "seen",
-                trackingInfo = trackingInfo
-            )
+        val updateData = MessageTagUpdate(
+            messageId = "messageId",
+            operation = TagOperation.Add,
+            tag = "seen",
+            trackingInfo = trackingInfo
         )
+
 
         val result = embeddedMessagesRequestFactory.create(
             SdkEvent.Internal.EmbeddedMessaging.UpdateTagsForMessages(
@@ -138,7 +137,43 @@ class EmbeddedMessagesRequestFactoryTests {
 
         result.method shouldBe HttpMethod.Patch
         result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/tags"
-        result.bodyString shouldBe JsonUtil.json.encodeToString(updateData)
+        result.bodyString shouldBe JsonUtil.json.encodeToString(listOf(updateData))
+    }
+
+    @Test
+    fun createBatched_should_return_request_for_updateTagsForMessages() = runTest {
+        val trackingInfo = """{"key1":"value1","key2":"value2"}"""
+        val updateData1 = MessageTagUpdate(
+            messageId = "messageId",
+            operation = TagOperation.Add,
+            tag = "read",
+            trackingInfo = trackingInfo
+        )
+
+        val updateData2 = MessageTagUpdate(
+            messageId = "messageId2",
+            operation = TagOperation.Add,
+            tag = "seen",
+            trackingInfo = trackingInfo
+        )
+
+        val result = embeddedMessagesRequestFactory.createBatched(
+            listOf(
+                SdkEvent.Internal.EmbeddedMessaging.UpdateTagsForMessages(
+                    nackCount = 0,
+                    updateData = updateData1
+                ),
+                SdkEvent.Internal.EmbeddedMessaging.UpdateTagsForMessages(
+                    nackCount = 0,
+                    updateData = updateData2
+                )
+            )
+        )
+        val expectedBody = JsonUtil.json.encodeToString(listOf(updateData1, updateData2))
+
+        result.method shouldBe HttpMethod.Patch
+        result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/tags"
+        result.bodyString shouldBe expectedBody
     }
 
     @Test

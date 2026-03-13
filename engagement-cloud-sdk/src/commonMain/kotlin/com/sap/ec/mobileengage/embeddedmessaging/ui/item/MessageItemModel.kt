@@ -3,7 +3,6 @@ package com.sap.ec.mobileengage.embeddedmessaging.ui.item
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.log.Logger
-import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.util.DownloaderApi
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.mobileengage.action.ActionFactoryApi
@@ -11,9 +10,9 @@ import com.sap.ec.mobileengage.action.models.ActionModel
 import com.sap.ec.mobileengage.action.models.BasicRichContentDisplayActionModel
 import com.sap.ec.mobileengage.embeddedmessaging.models.MessageTagUpdate
 import com.sap.ec.mobileengage.embeddedmessaging.models.TagOperation
-import kotlinx.coroutines.CancellationException
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Image.BASE64_PLACEHOLDER_IMAGE
 import com.sap.ec.networking.clients.embedded.messaging.model.EmbeddedMessage
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlin.io.encoding.Base64
@@ -60,31 +59,20 @@ internal class MessageItemModel(
     ): Result<Unit> {
         logger.debug("Updating tag '$tag' with operation '$operation' for message id '${message.id}'")
         return try {
-            val updateData = listOf(
-                MessageTagUpdate(
-                    messageId = message.id,
-                    operation = operation,
-                    tag = tag,
-                    trackingInfo = message.trackingInfo
-                )
+            val updateData = MessageTagUpdate(
+                messageId = message.id,
+                operation = operation,
+                tag = tag,
+                trackingInfo = message.trackingInfo
             )
+
             val updateTagsEvent = SdkEvent.Internal.EmbeddedMessaging.UpdateTagsForMessages(
                 nackCount = 0,
                 updateData = updateData
             )
-            val waiter = sdkEventDistributor.registerEvent(updateTagsEvent)
-            val response = waiter.await<Response>()
 
-            response.result
-                .onFailure {
-                    logger.debug(
-                        "tag update failure: $tag $operation for message id '${message.id}'",
-                        it
-                    )
-                }
-                .map {
-                    logger.debug("tag update success: $tag $operation for message id '${message.id}'")
-                }
+            sdkEventDistributor.registerEvent(updateTagsEvent)
+            Result.success(Unit)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {

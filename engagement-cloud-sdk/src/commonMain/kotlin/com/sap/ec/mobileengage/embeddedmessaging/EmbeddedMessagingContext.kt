@@ -6,7 +6,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 internal class EmbeddedMessagingContext(
-    frequencyCapSeconds: Int = 5
+    frequencyCapSeconds: Int = 5,
+    override var tagUpdateBatchSize: Int = 10,
+    override var tagUpdateFrequencyCapSeconds: Int = 5
 ) : EmbeddedMessagingContextApi {
     private val _metaData = MutableStateFlow<MetaData?>(null)
     override val metaData: StateFlow<MetaData?> = _metaData.asStateFlow()

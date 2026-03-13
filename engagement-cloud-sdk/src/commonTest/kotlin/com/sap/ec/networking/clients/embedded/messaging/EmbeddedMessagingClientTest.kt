@@ -12,6 +12,8 @@ import com.sap.ec.event.OnlineSdkEvent
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.mobileengage.embeddedmessaging.EmbeddedMessagingContext
 import com.sap.ec.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
+import com.sap.ec.mobileengage.embeddedmessaging.models.MessageTagUpdate
+import com.sap.ec.mobileengage.embeddedmessaging.models.TagOperation
 import com.sap.ec.mobileengage.embeddedmessaging.networking.EmbeddedMessagingRequestFactoryApi
 import com.sap.ec.networking.clients.embedded.messaging.model.MetaData
 import com.sap.ec.networking.clients.error.ClientExceptionHandler
@@ -39,10 +41,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -53,6 +57,10 @@ import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
 class EmbeddedMessagingClientTest {
+    private companion object {
+        const val ADVANCE_TIME_FOR_BATCHING = 5001L
+    }
+
     private lateinit var mockSdkLogger: Logger
     private lateinit var mockSdkEventManager: SdkEventManagerApi
     private lateinit var mockEventsDao: EventsDaoApi
@@ -66,18 +74,16 @@ class EmbeddedMessagingClientTest {
     fun setup() = runTest {
         Dispatchers.setMain(StandardTestDispatcher())
         mockSdkLogger = mock(MockMode.autofill)
-        mockSdkEventManager = mock()
-        mockEventsDao = mock()
-        mockEmbeddedMessagesRequestFactory = mock()
-        mockClientExceptionHandler = mock()
-        mockECNetworkClient = mock()
+        mockSdkEventManager = mock(MockMode.autofill)
+        mockEventsDao = mock(MockMode.autofill)
+        mockEmbeddedMessagesRequestFactory = mock(MockMode.autofill)
+        mockClientExceptionHandler = mock(MockMode.autofill)
+        mockECNetworkClient = mock(MockMode.autofill)
         embeddedMessagingContext = EmbeddedMessagingContext()
 
-        onlineEvents = MutableSharedFlow()
+        onlineEvents = MutableSharedFlow(replay = 100, extraBufferCapacity = Channel.UNLIMITED)
 
-        everySuspend {
-            mockSdkLogger.debug(any<String>())
-        }
+        everySuspend { mockSdkLogger.debug(any<String>()) }
         everySuspend { mockSdkEventManager.onlineSdkEvents } returns onlineEvents
     }
 
@@ -87,8 +93,14 @@ class EmbeddedMessagingClientTest {
         resetAnswers()
     }
 
-    private fun createEmbeddedMessagingClient(applicationScope: CoroutineScope) =
-        EmbeddedMessagingClient(
+    private fun createEmbeddedMessagingClient(
+        applicationScope: CoroutineScope,
+        tagBatchSize: Int = 2,
+        tagBatchInterval: Int = 5
+    ): EmbeddedMessagingClient {
+        embeddedMessagingContext.tagUpdateBatchSize = tagBatchSize
+        embeddedMessagingContext.tagUpdateFrequencyCapSeconds = tagBatchInterval
+        return EmbeddedMessagingClient(
             sdkLogger = mockSdkLogger,
             sdkEventManager = mockSdkEventManager,
             applicationScope = applicationScope,
@@ -98,6 +110,7 @@ class EmbeddedMessagingClientTest {
             clientExceptionHandler = mockClientExceptionHandler,
             embeddedMessagingContext = embeddedMessagingContext
         )
+    }
 
     @Test
     fun testConsumer_shouldGetFetchBadgeCountEventFromFlow_andSendHttpRequest_andAckEvent_andEmitResponse() =
@@ -126,15 +139,6 @@ class EmbeddedMessagingClientTest {
             everySuspend { mockECNetworkClient.send(request) } returns Result.success(
                 expectedResponse
             )
-            everySuspend { mockEventsDao.removeEvent(event) } returns Unit
-            everySuspend {
-                mockSdkEventManager.emitEvent(
-                    SdkEvent.Internal.Sdk.Answer.Response(
-                        event.id,
-                        Result.success(expectedResponse)
-                    )
-                )
-            } returns Unit
 
             val onlineSdkEvents = backgroundScope.async {
                 onlineEvents.take(1).toList()
@@ -175,7 +179,7 @@ class EmbeddedMessagingClientTest {
         val event3 = SdkEvent.Internal.EmbeddedMessaging.FetchMeta(nackCount = 0)
         val event4 = SdkEvent.Internal.EmbeddedMessaging.UpdateTagsForMessages(
             nackCount = 0,
-            updateData = emptyList()
+            updateData = MessageTagUpdate("testId", TagOperation.Add, "testTag", "testTrackingInfo")
         )
         val event5 = SdkEvent.Internal.EmbeddedMessaging.FetchNextPage(
             nackCount = 0,
@@ -183,13 +187,22 @@ class EmbeddedMessagingClientTest {
             categoryIds = emptyList(),
             filterUnopenedMessages = false
         )
+        val event6 = SdkEvent.Internal.EmbeddedMessaging.UpdateTagsForMessages(
+            nackCount = 0,
+            updateData = MessageTagUpdate(
+                "testId2",
+                TagOperation.Add,
+                "testTag2",
+                "testTrackingInfo2"
+            )
+        )
         val wrongEvent =
             SdkEvent.Internal.Sdk.LinkContact(
                 contactFieldValue = "value",
                 nackCount = 0
             )
         val onlineSdkEvents = backgroundScope.async {
-            onlineEvents.take(6).toList()
+            onlineEvents.take(7).toList()
         }
         val request = UrlRequest(
             url = Url("https://test.com"),
@@ -209,8 +222,12 @@ class EmbeddedMessagingClientTest {
             bodyAsText = createMetaDataResponseString()
         )
 
-        everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
         everySuspend { mockEmbeddedMessagesRequestFactory.create(any()) } returns request
+        everySuspend {
+            mockEmbeddedMessagesRequestFactory.createBatched(
+                listOf(event4, event6)
+            )
+        } returns request
         everySuspend { mockECNetworkClient.send(any()) } sequentiallyReturns listOf(
             Result.success(anyResponse),
             Result.success(anyResponse),
@@ -224,12 +241,23 @@ class EmbeddedMessagingClientTest {
         onlineEvents.emit(event3)
         onlineEvents.emit(event4)
         onlineEvents.emit(event5)
+        onlineEvents.emit(event6)
         onlineEvents.emit(wrongEvent)
 
+        advanceTimeBy(ADVANCE_TIME_FOR_BATCHING)
         advanceUntilIdle()
 
-        onlineSdkEvents.await() shouldBe listOf(event1, event2, event3, event4, event5, wrongEvent)
-        verifySuspend(VerifyMode.exactly(5)) { mockEmbeddedMessagesRequestFactory.create(any()) }
+        onlineSdkEvents.await() shouldBe listOf(
+            event1,
+            event2,
+            event3,
+            event4,
+            event5,
+            event6,
+            wrongEvent
+        )
+        verifySuspend(VerifyMode.exactly(4)) { mockEmbeddedMessagesRequestFactory.create(any()) }
+        verifySuspend(VerifyMode.exactly(1)) { mockEmbeddedMessagesRequestFactory.createBatched(any()) }
     }
 
     @Test
@@ -257,8 +285,6 @@ class EmbeddedMessagingClientTest {
             onlineEvents.take(1).toList()
         }
 
-        everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
-
         onlineEvents.emit(event)
         advanceUntilIdle()
 
@@ -275,20 +301,9 @@ class EmbeddedMessagingClientTest {
         val event = SdkEvent.Internal.EmbeddedMessaging.FetchBadgeCount(nackCount = 0)
 
         everySuspend { mockEmbeddedMessagesRequestFactory.create(event) } throws testException
-        everySuspend {
-            mockClientExceptionHandler.handleException(testException, any(), event)
-        } returns Unit
         val onlineSdkEvents = backgroundScope.async {
             onlineEvents.take(1).toList()
         }
-        everySuspend {
-            mockSdkEventManager.emitEvent(
-                SdkEvent.Internal.Sdk.Answer.Response(
-                    event.id,
-                    Result.failure<Exception>(testException)
-                )
-            )
-        } returns Unit
 
         onlineEvents.emit(event)
 
@@ -324,11 +339,7 @@ class EmbeddedMessagingClientTest {
                 method = HttpMethod.Get
             )
 
-            everySuspend {
-                mockEmbeddedMessagesRequestFactory.create(
-                    event
-                )
-            } returns request
+            everySuspend { mockEmbeddedMessagesRequestFactory.create(event) } returns request
 
             val expectedResponse = Response(
                 status = HttpStatusCode.OK,
@@ -340,15 +351,6 @@ class EmbeddedMessagingClientTest {
             everySuspend { mockECNetworkClient.send(request) } returns Result.success(
                 expectedResponse
             )
-            everySuspend { mockEventsDao.removeEvent(event) } returns Unit
-            everySuspend {
-                mockSdkEventManager.emitEvent(
-                    SdkEvent.Internal.Sdk.Answer.Response(
-                        event.id,
-                        Result.success(expectedResponse)
-                    )
-                )
-            } returns Unit
 
             val onlineSdkEvents = backgroundScope.async {
                 onlineEvents.take(1).toList()
@@ -386,10 +388,6 @@ class EmbeddedMessagingClientTest {
             clientJob.cancel()
             throw CancellationException("Job was cancelled")
         }
-        everySuspend {
-            mockClientExceptionHandler.handleException(any(), any<String>(), any())
-        } returns Unit
-        everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
 
         createEmbeddedMessagingClient(clientScope).register()
 
@@ -405,6 +403,223 @@ class EmbeddedMessagingClientTest {
             )
         }
     }
+
+    @Test
+    fun testBatchedTagsConsumer_shouldSendBatchedRequest_andAckAllEvents_andEmitResponseForEach_whenBatchSizeReached() =
+        runTest {
+            createEmbeddedMessagingClient(backgroundScope).register()
+
+            val event1 = SdkEvent.Internal.EmbeddedMessaging.UpdateTagsForMessages(
+                nackCount = 0,
+                updateData = MessageTagUpdate("id1", TagOperation.Add, "read", "trackingInfo1")
+            )
+            val event2 = SdkEvent.Internal.EmbeddedMessaging.UpdateTagsForMessages(
+                nackCount = 0,
+                updateData = MessageTagUpdate("id2", TagOperation.Add, "opened", "trackingInfo2")
+            )
+            val request = UrlRequest(url = Url("https://test.com"), method = HttpMethod.Patch)
+            val expectedResponse = Response(
+                status = HttpStatusCode.OK,
+                headers = Headers.Empty,
+                originalRequest = request,
+                bodyAsText = "{}"
+            )
+
+            everySuspend {
+                mockEmbeddedMessagesRequestFactory.createBatched(
+                    listOf(event1, event2)
+                )
+            } returns request
+            everySuspend { mockECNetworkClient.send(request) } returns Result.success(
+                expectedResponse
+            )
+
+            onlineEvents.emit(event1)
+            onlineEvents.emit(event2)
+
+            advanceTimeBy(ADVANCE_TIME_FOR_BATCHING)
+            advanceUntilIdle()
+
+            verifySuspend {
+                mockEmbeddedMessagesRequestFactory.createBatched(
+                    listOf(
+                        event1,
+                        event2
+                    )
+                )
+            }
+            verifySuspend { mockECNetworkClient.send(request) }
+            verifySuspend { mockEventsDao.removeEvent(event1) }
+            verifySuspend { mockEventsDao.removeEvent(event2) }
+            verifySuspend {
+                mockSdkEventManager.emitEvent(
+                    SdkEvent.Internal.Sdk.Answer.Response(
+                        event1.id,
+                        Result.success(expectedResponse)
+                    )
+                )
+            }
+            verifySuspend {
+                mockSdkEventManager.emitEvent(
+                    SdkEvent.Internal.Sdk.Answer.Response(
+                        event2.id,
+                        Result.success(expectedResponse)
+                    )
+                )
+            }
+        }
+
+    @Test
+    fun testBatchedTagsConsumer_shouldSendBatchedRequest_andAckAllEvents_andEmitResponseForEach_whenBatchTimeIntervalReached() =
+        runTest {
+            createEmbeddedMessagingClient(backgroundScope).register()
+
+            val event1 = SdkEvent.Internal.EmbeddedMessaging.UpdateTagsForMessages(
+                nackCount = 0,
+                updateData = MessageTagUpdate("id1", TagOperation.Add, "read", "trackingInfo1")
+            )
+            val request = UrlRequest(url = Url("https://test.com"), method = HttpMethod.Patch)
+            val expectedResponse = Response(
+                status = HttpStatusCode.OK,
+                headers = Headers.Empty,
+                originalRequest = request,
+                bodyAsText = "{}"
+            )
+
+            everySuspend { mockEmbeddedMessagesRequestFactory.createBatched(listOf(event1)) } returns request
+            everySuspend { mockECNetworkClient.send(request) } returns Result.success(
+                expectedResponse
+            )
+
+            onlineEvents.emit(event1)
+
+            advanceTimeBy(6000)
+            advanceUntilIdle()
+
+            verifySuspend { mockEmbeddedMessagesRequestFactory.createBatched(listOf(event1)) }
+            verifySuspend { mockECNetworkClient.send(request) }
+            verifySuspend { mockEventsDao.removeEvent(event1) }
+            verifySuspend {
+                mockSdkEventManager.emitEvent(
+                    SdkEvent.Internal.Sdk.Answer.Response(
+                        event1.id,
+                        Result.success(expectedResponse)
+                    )
+                )
+            }
+        }
+
+    @Test
+    fun testBatchedTagsConsumer_shouldReEmitAllEventsIndividually_whenThereIsANetworkError() =
+        runTest {
+            createEmbeddedMessagingClient(backgroundScope).register()
+
+            val event1 = SdkEvent.Internal.EmbeddedMessaging.UpdateTagsForMessages(
+                nackCount = 0,
+                updateData = MessageTagUpdate("id1", TagOperation.Add, "read", "trackingInfo1")
+            )
+            val event2 = SdkEvent.Internal.EmbeddedMessaging.UpdateTagsForMessages(
+                nackCount = 0,
+                updateData = MessageTagUpdate("id2", TagOperation.Add, "opened", "trackingInfo2")
+            )
+            val request = UrlRequest(url = Url("https://test.com"), method = HttpMethod.Patch)
+
+            everySuspend {
+                mockEmbeddedMessagesRequestFactory.createBatched(
+                    listOf(
+                        event1,
+                        event2
+                    )
+                )
+            } returns request
+            everySuspend { mockECNetworkClient.send(request) } returns Result.failure(
+                SdkException.NetworkIOException("Network error")
+            )
+
+            onlineEvents.emit(event1)
+            onlineEvents.emit(event2)
+
+            advanceTimeBy(5001L)
+            advanceUntilIdle()
+
+            verifySuspend {
+                mockEmbeddedMessagesRequestFactory.createBatched(
+                    listOf(
+                        event1,
+                        event2
+                    )
+                )
+            }
+            verifySuspend { mockECNetworkClient.send(request) }
+            verifySuspend { mockSdkEventManager.emitEvent(event1) }
+            verifySuspend { mockSdkEventManager.emitEvent(event2) }
+            verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(any()) }
+        }
+
+    @Test
+    fun testBatchedTagsConsumer_shouldCallClientExceptionHandler_andEmitFailureResponseForEach_onException() =
+        runTest {
+            createEmbeddedMessagingClient(backgroundScope).register()
+
+            val testException = Exception("Unexpected error")
+            val event = SdkEvent.Internal.EmbeddedMessaging.UpdateTagsForMessages(
+                nackCount = 0,
+                updateData = MessageTagUpdate("id1", TagOperation.Add, "read", "trackingInfo1")
+            )
+
+            everySuspend { mockEmbeddedMessagesRequestFactory.createBatched(listOf(event)) } throws testException
+
+            onlineEvents.emit(event)
+            advanceTimeBy(5001L)
+            advanceUntilIdle()
+
+            verifySuspend {
+                mockClientExceptionHandler.handleException(
+                    testException,
+                    any(),
+                    event
+                )
+            }
+            verifySuspend {
+                mockSdkEventManager.emitEvent(
+                    SdkEvent.Internal.Sdk.Answer.Response(
+                        event.id,
+                        Result.failure<Response>(testException)
+                    )
+                )
+            }
+            verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(any()) }
+        }
+
+    @Test
+    fun testBatchedTagsConsumer_shouldNotUseSingleCreateForUpdateTagsEvents_areNotConsumedByUnbatchedCollector() =
+        runTest {
+            createEmbeddedMessagingClient(backgroundScope).register()
+
+            val event = SdkEvent.Internal.EmbeddedMessaging.UpdateTagsForMessages(
+                nackCount = 0,
+                updateData = MessageTagUpdate("id1", TagOperation.Add, "read", "trackingInfo1")
+            )
+            val request = UrlRequest(url = Url("https://test.com"), method = HttpMethod.Patch)
+            val expectedResponse = Response(
+                status = HttpStatusCode.OK,
+                headers = Headers.Empty,
+                originalRequest = request,
+                bodyAsText = "{}"
+            )
+
+            everySuspend { mockEmbeddedMessagesRequestFactory.createBatched(listOf(event)) } returns request
+            everySuspend { mockECNetworkClient.send(request) } returns Result.success(
+                expectedResponse
+            )
+
+            onlineEvents.emit(event)
+            advanceTimeBy(ADVANCE_TIME_FOR_BATCHING)
+            advanceUntilIdle()
+
+            verifySuspend(VerifyMode.exactly(0)) { mockEmbeddedMessagesRequestFactory.create(any()) }
+            verifySuspend { mockEmbeddedMessagesRequestFactory.createBatched(listOf(event)) }
+        }
 
     private fun createMetaDataResponseString(): String {
         val metaDataResponseString = """{

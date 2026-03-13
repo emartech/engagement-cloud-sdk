@@ -34,6 +34,8 @@ import com.sap.ec.core.providers.UUIDProvider
 import com.sap.ec.mobileengage.embeddedmessaging.models.MessageTagUpdate
 import com.sap.ec.mobileengage.inapp.InAppMessage
 import com.sap.ec.networking.clients.event.model.DeviceEvent
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
@@ -41,8 +43,6 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
@@ -239,7 +239,7 @@ sealed interface SdkEvent {
                 override val type: String = "updateTagsForMessages",
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int,
-                val updateData: List<MessageTagUpdate>
+                val updateData: MessageTagUpdate
             ) : EmbeddedMessaging
         }
 

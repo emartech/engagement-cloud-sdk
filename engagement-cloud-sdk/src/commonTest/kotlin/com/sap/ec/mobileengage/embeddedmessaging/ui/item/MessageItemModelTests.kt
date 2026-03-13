@@ -187,41 +187,14 @@ class MessageItemModelTests {
             result.isSuccess shouldBe true
             eventSlot.get().run {
                 nackCount shouldBe 0
-                updateData shouldBe listOf(
-                    MessageTagUpdate(
-                        messageId = messageItemModel.message.id,
-                        operation = TagOperation.Add,
-                        tag = expectedTag,
-                        trackingInfo = messageItemModel.message.trackingInfo
-                    )
+                updateData shouldBe MessageTagUpdate(
+                    messageId = messageItemModel.message.id,
+                    operation = TagOperation.Add,
+                    tag = expectedTag,
+                    trackingInfo = messageItemModel.message.trackingInfo
                 )
+
             }
-        }
-    }
-
-    @Test
-    fun messageTagging_shouldReturnFailure_whenResponseFails() = runTest {
-        forAll(
-            table(
-                headers("testMethod"),
-                listOf(
-                    row(messageItemModel::deleteMessage),
-                    row(messageItemModel::tagMessageOpened),
-                )
-            )
-        ) { testMethod ->
-            val testException = Exception("Network error")
-            val answerResponse = SdkEvent.Internal.Sdk.Answer.Response<Response>(
-                originId = "test-id",
-                result = Result.failure(testException)
-            )
-
-            everySuspend { mockSdkEventWaiter.await<Response>() } returns answerResponse
-            everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mockSdkEventWaiter
-
-            val result = testMethod()
-
-            result.isSuccess shouldBe false
         }
     }
 

@@ -1,6 +1,7 @@
 package com.sap.ec.networking.clients.embedded.messaging
 
 import com.sap.ec.core.channel.SdkEventManagerApi
+import com.sap.ec.core.channel.batched
 import com.sap.ec.core.db.events.EventsDaoApi
 import com.sap.ec.core.exceptions.SdkException.NetworkIOException
 import com.sap.ec.core.log.Logger
@@ -31,64 +32,92 @@ internal class EmbeddedMessagingClient(
     private val ecNetworkClient: NetworkClientApi,
     private val eventsDao: EventsDaoApi,
     private val clientExceptionHandler: ClientExceptionHandler,
-    private val embeddedMessagingContext: EmbeddedMessagingContextApi
+    private val embeddedMessagingContext: EmbeddedMessagingContextApi,
 ) : EventBasedClientApi {
 
     override suspend fun register() {
+        sdkLogger.debug("register EmbeddedMessagingClient")
+        startEventConsumer()
+        startBatchEventConsumer()
+    }
+
+    @OptIn(ExperimentalTime::class)
+    private fun startEventConsumer() {
         applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
-            sdkLogger.debug("register EmbeddedMessagingClient")
-            startEventConsumer()
+            sdkEventManager.onlineSdkEvents
+                .filter {
+                    it is SdkEvent.Internal.EmbeddedMessaging.FetchBadgeCount
+                            || it is SdkEvent.Internal.EmbeddedMessaging.FetchMessages
+                            || it is SdkEvent.Internal.EmbeddedMessaging.FetchMeta
+                            || it is SdkEvent.Internal.EmbeddedMessaging.FetchNextPage
+                }
+                .collect {
+                    try {
+                        sdkLogger.debug("consume EmbeddedMessaging events")
+                        val request =
+                            embeddedMessagingRequestFactory.create(it as SdkEvent.Internal.EmbeddedMessaging)
+                        when (it) {
+                            is SdkEvent.Internal.EmbeddedMessaging.FetchMeta -> {
+                                ecNetworkClient.send(request)
+                                    .onSuccess { response ->
+                                        val metaData = response.body<MetaData>()
+                                        embeddedMessagingContext.setMetaData(metaData)
+                                        sdkLogger.debug("Meta data fetched and stored in EmbeddedMessagingContext")
+                                        handleSuccess(it, response)
+                                    }.onFailure { exception ->
+                                        handleException(exception, it)
+                                        sdkLogger.error(
+                                            "Error happened while fetching Embedded Messaging Meta data",
+                                            exception
+                                        )
+                                    }
+                            }
+
+                            else -> {
+                                ecNetworkClient.send(request)
+                                    .onSuccess { response ->
+                                        handleSuccess(it, response)
+                                    }.onFailure { exception ->
+                                        handleException(exception, it)
+                                    }
+                            }
+                        }
+                    } catch (e: Exception) {
+                        handleException(e, it)
+                    }
+                }
         }
     }
 
     @OptIn(ExperimentalTime::class)
-    private suspend fun startEventConsumer() {
-        sdkEventManager.onlineSdkEvents
-            .filter {
-                it is SdkEvent.Internal.EmbeddedMessaging.FetchBadgeCount
-                        || it is SdkEvent.Internal.EmbeddedMessaging.FetchMessages
-                        || it is SdkEvent.Internal.EmbeddedMessaging.FetchMeta
-                        || it is SdkEvent.Internal.EmbeddedMessaging.UpdateTagsForMessages
-                        || it is SdkEvent.Internal.EmbeddedMessaging.FetchNextPage
-            }
-            .collect {
-                try {
-                    sdkLogger.debug("consume EmbeddedMessaging events")
-                    val request =
-                        embeddedMessagingRequestFactory.create(it as SdkEvent.Internal.EmbeddedMessaging)
-                    when (it) {
-                        is SdkEvent.Internal.EmbeddedMessaging.FetchMeta -> {
-                            ecNetworkClient.send(request)
-                                .onSuccess { response ->
-                                    val metaData = response.body<MetaData>()
-                                    embeddedMessagingContext.setMetaData(metaData)
-                                    sdkLogger.debug("Meta data fetched and stored in EmbeddedMessagingContext")
-                                    handleSuccess(it, response)
-                                }.onFailure { exception ->
-                                    handleException(
-                                        exception,
-                                        it
-                                    )
-                                    sdkLogger.error(
-                                        "Error happened while fetching Embedded Messaging Meta data",
-                                        exception
-                                    )
+    private fun startBatchEventConsumer() {
+        applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
+            sdkEventManager.onlineSdkEvents
+                .filter { it is SdkEvent.Internal.EmbeddedMessaging.UpdateTagsForMessages }
+                .batched(
+                    embeddedMessagingContext.tagUpdateBatchSize,
+                    embeddedMessagingContext.tagUpdateFrequencyCapSeconds * 1000L
+                )
+                .collect { tagEvents ->
+                    @Suppress("UNCHECKED_CAST")
+                    val batch =
+                        tagEvents as List<SdkEvent.Internal.EmbeddedMessaging.UpdateTagsForMessages>
+                    try {
+                        sdkLogger.debug("consume batched UpdateTagsForMessages events")
+                        val request = embeddedMessagingRequestFactory.createBatched(batch)
+                        ecNetworkClient.send(request)
+                            .onSuccess { response ->
+                                batch.forEach { event ->
+                                    handleSuccess(event, response)
                                 }
-                        }
-
-                        else -> {
-                            ecNetworkClient.send(request)
-                                .onSuccess { response ->
-                                    handleSuccess(it, response)
-                                }.onFailure { exception ->
-                                    handleException(exception, it)
-                                }
-                        }
+                            }.onFailure { exception ->
+                                batch.forEach { handleException(exception, it) }
+                            }
+                    } catch (e: Exception) {
+                        batch.forEach { handleException(e, it) }
                     }
-                } catch (e: Exception) {
-                    handleException(e, it)
                 }
-            }
+        }
     }
 
     private suspend fun handleSuccess(
