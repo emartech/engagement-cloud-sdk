@@ -8,25 +8,25 @@ import androidx.compose.ui.window.ComposeUIViewController
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.CustomMessageItemViewModelApi
 import com.sap.ec.mobileengage.embeddedmessaging.ui.list.EmbeddedMessagingCompactView
 import com.sap.ec.mobileengage.embeddedmessaging.ui.list.EmbeddedMessagingView
-import com.sap.ec.networking.clients.embedded.messaging.model.MessageCategory
+import com.sap.ec.networking.clients.embedded.messaging.model.Category
 import platform.UIKit.UIViewController
 
 class IosEmbeddedMessaging(private val embeddedMessaging: EmbeddedMessagingApi) :
     IosEmbeddedMessagingApi {
-    override val categories: List<MessageCategory>
+    override val categories: List<Category>
         get() = embeddedMessaging.categories
 
     override val isUnreadFilterActive: Boolean
         get() = embeddedMessaging.isUnreadFilterActive
 
-    override val activeCategoryFilters: List<MessageCategory>
+    override val activeCategoryFilters: List<Category>
         get() = embeddedMessaging.activeCategoryFilters
 
     override fun filterUnreadOnly(filterUnreadOnly: Boolean) {
         embeddedMessaging.filterUnreadOnly(filterUnreadOnly)
     }
 
-    override fun filterByCategories(categories: List<MessageCategory>) {
+    override fun filterByCategories(categories: List<Category>) {
         embeddedMessaging.filterByCategories(categories)
     }
 

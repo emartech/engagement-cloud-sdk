@@ -11,7 +11,7 @@ import com.sap.ec.mobileengage.action.ActionFactoryApi
 import com.sap.ec.mobileengage.action.models.ActionModel
 import com.sap.ec.mobileengage.embeddedmessaging.pagination.EmbeddedMessagingPagingSource
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
-import com.sap.ec.networking.clients.embedded.messaging.model.MessageCategory
+import com.sap.ec.networking.clients.embedded.messaging.model.Category
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -26,7 +26,7 @@ internal class PagerFactory(
     override fun create(
         filterUnopenedOnly: Boolean,
         selectedCategoryIds: List<String>,
-        categories: MutableStateFlow<List<MessageCategory>>
+        categories: MutableStateFlow<List<Category>>
     ): Flow<PagingData<MessageItemViewModelApi>> {
         return Pager(
             config = PagingConfig(

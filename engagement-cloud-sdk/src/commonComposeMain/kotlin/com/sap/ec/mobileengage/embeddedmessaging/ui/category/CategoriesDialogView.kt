@@ -44,12 +44,12 @@ import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants
 import com.sap.ec.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 import com.sap.ec.mobileengage.embeddedmessaging.ui.theme.LocalDesignValues
 import com.sap.ec.mobileengage.embeddedmessaging.ui.translation.LocalStringResources
-import com.sap.ec.networking.clients.embedded.messaging.model.MessageCategory
+import com.sap.ec.networking.clients.embedded.messaging.model.Category
 
 
 @Composable
 internal fun CategoriesDialogView(
-    categories: List<MessageCategory>,
+    categories: List<Category>,
     selectedCategoriesOnDialogOpen: Set<String>,
     onApplyClicked: (Set<String>) -> Unit,
     onDismiss: () -> Unit
@@ -139,7 +139,7 @@ private fun DialogHeader(onDismiss: () -> Unit) {
 
 @Composable
 private fun CategoryFilterChipsList(
-    categories: List<MessageCategory>,
+    categories: List<Category>,
     selectedCategories: MutableState<Set<String>>
 ) {
     EmbeddedMessagingTheme {
@@ -150,7 +150,7 @@ private fun CategoryFilterChipsList(
                 .fillMaxWidth()
                 .padding(DEFAULT_PADDING)
         ) {
-            categories.forEach { (id, value) ->
+            categories.forEach { (id, text) ->
                 FilterChip(
                     border = filterChipBorderSettings(
                         selectedCategories,
@@ -177,11 +177,11 @@ private fun CategoryFilterChipsList(
                             if (selectedCategories.value.contains(id)) {
                                 Icon(
                                     Icons.Outlined.Check,
-                                    contentDescription = "$value ${LocalStringResources.current.selectedCategoryFilterChipIconAltText}"
+                                    contentDescription = "$text ${LocalStringResources.current.selectedCategoryFilterChipIconAltText}"
                                 )
                             }
                             Text(
-                                text = value,
+                                text = text,
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = MEDIUM_FONT_WEIGHT,
                                 letterSpacing = 0.11.sp

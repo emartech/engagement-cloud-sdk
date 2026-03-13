@@ -14,7 +14,7 @@ import com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemModel
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemViewModel
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
 import com.sap.ec.mobileengage.embeddedmessaging.ui.list.ListPageModelApi
-import com.sap.ec.networking.clients.embedded.messaging.model.MessageCategory
+import com.sap.ec.networking.clients.embedded.messaging.model.Category
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 
@@ -22,7 +22,7 @@ internal class EmbeddedMessagingPagingSource(
     private val listPageModel: ListPageModelApi,
     private val filterUnopenedOnly: Boolean,
     private val selectedCategoryIds: List<String>,
-    private val setCategories: (List<MessageCategory>) -> Unit,
+    private val setCategories: (List<Category>) -> Unit,
     private val downloader: DownloaderApi,
     private val actionFactory: ActionFactoryApi<ActionModel>,
     private val sdkEventDistributor: SdkEventDistributorApi,

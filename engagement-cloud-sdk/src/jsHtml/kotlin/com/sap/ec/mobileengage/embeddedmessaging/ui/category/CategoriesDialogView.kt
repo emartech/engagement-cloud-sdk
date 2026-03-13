@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.sap.ec.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingStyleSheet
 import com.sap.ec.mobileengage.embeddedmessaging.ui.translation.LocalStringResources
-import com.sap.ec.networking.clients.embedded.messaging.model.MessageCategory
+import com.sap.ec.networking.clients.embedded.messaging.model.Category
 import org.jetbrains.compose.web.ExperimentalComposeWebSvgApi
 import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Div
@@ -23,7 +23,7 @@ private const val CHECK_ICON_PATH =
 
 @Composable
 internal fun CategoriesDialogView(
-    categories: List<MessageCategory>,
+    categories: List<Category>,
     selectedCategories: Set<String>,
     onApplyClicked: (Set<String>) -> Unit,
     onDismiss: () -> Unit
@@ -97,13 +97,13 @@ private fun DialogHeader(onDismiss: () -> Unit) {
 
 @Composable
 private fun CategoryFilterChipsList(
-    categories: List<MessageCategory>,
+    categories: List<Category>,
     selectedCategories: MutableState<Set<String>>
 ) {
     Div({
         classes(EmbeddedMessagingStyleSheet.categoryChipsContainer)
     }) {
-        categories.forEach { (id, value) ->
+        categories.forEach { (id, text) ->
             val isSelected = selectedCategories.value.contains(id)
 
             Button({
@@ -127,7 +127,7 @@ private fun CategoryFilterChipsList(
                         className = EmbeddedMessagingStyleSheet.svgCheckmarkIconSize
                     )
                 }
-                Text(value)
+                Text(text)
             }
         }
     }
