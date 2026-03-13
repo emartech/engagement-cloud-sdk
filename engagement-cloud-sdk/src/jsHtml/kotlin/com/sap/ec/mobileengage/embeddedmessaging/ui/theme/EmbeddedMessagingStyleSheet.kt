@@ -627,12 +627,18 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
         backgroundColor(CssColorVars.colorSurfaceVariant.value())
     }
 
-    val messageItemImage by style {
+    val messageItemImageContainer by style {
+        display(DisplayStyle.Flex)
+        flexDirection(FlexDirection.Column)
+        justifyContent(JustifyContent.Start)
         width(MESSAGE_ITEM_IMAGE_SIZE)
         height(MESSAGE_ITEM_IMAGE_SIZE)
-        property("object-fit", "cover")
         marginLeft(MEDIUM_MARGIN)
         marginRight(MEDIUM_MARGIN)
+    }
+
+    val messageItemImage by style {
+        width(MAX_WIDTH)
     }
 
     val messageItemContent by style {

@@ -319,8 +319,12 @@ private fun ECMessageItem(viewModel: MessageItemViewModelApi) {
     val hasThumbnailImage = viewModel.imageUrl != null
     if (hasThumbnailImage) {
         viewModel.imageUrl?.let { url ->
-            Img(src = url, alt = viewModel.imageAltText ?: "") {
-                classes(EmbeddedMessagingStyleSheet.messageItemImage)
+            Div(
+                { classes(EmbeddedMessagingStyleSheet.messageItemImageContainer) }
+            ) {
+                Img(src = url, alt = viewModel.imageAltText ?: "") {
+                    classes(EmbeddedMessagingStyleSheet.messageItemImage)
+                }
             }
         } ?: LoadingSpinner()
     }

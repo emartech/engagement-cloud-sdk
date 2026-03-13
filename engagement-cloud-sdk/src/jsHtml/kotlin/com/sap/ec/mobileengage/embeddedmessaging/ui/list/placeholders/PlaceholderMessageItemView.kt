@@ -28,7 +28,7 @@ internal fun PlaceholderMessageItemView() {
         }
     }) {
         Div({
-            classes(EmbeddedMessagingStyleSheet.shimmerEffect, EmbeddedMessagingStyleSheet.messageItemImage)
+            classes(EmbeddedMessagingStyleSheet.shimmerEffect, EmbeddedMessagingStyleSheet.messageItemImageContainer)
         })
 
         Div({
