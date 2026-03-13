@@ -80,7 +80,7 @@ class PushTokenBroadcastReceiverTest: KoinTest  {
 
         advanceUntilIdle()
 
-        coVerify { mockPushApi.registerPushToken(PUSH_TOKEN) }
+        coVerify { mockPushApi.registerToken(PUSH_TOKEN) }
     }
 
     @Test

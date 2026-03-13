@@ -15,10 +15,10 @@ interface PushApi : AutoRegisterable {
      * This operation stores the provided push token and ensures it is sent to the backend.
      * If the token has already been sent, it avoids redundant updates.
      *
-     * @param pushToken The push token to register.
+     * @param token The push token to register.
      * @return A [Result] indicating success or failure of the operation.
      */
-    suspend fun registerPushToken(pushToken: String): Result<Unit>
+    suspend fun registerToken(token: String): Result<Unit>
 
     /**
      * Clears the currently registered push token.
@@ -28,12 +28,12 @@ interface PushApi : AutoRegisterable {
      *
      * @return A [Result] indicating success or failure of the operation.
      */
-    suspend fun clearPushToken(): Result<Unit>
+    suspend fun clearToken(): Result<Unit>
 
     /**
      * Retrieves the currently registered push token.
      *
      * @return A [Result] containing the push token if available, or `null` if no token is registered.
      */
-    suspend fun getPushToken(): Result<String?>
+    suspend fun getToken(): Result<String?>
 }

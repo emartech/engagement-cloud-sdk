@@ -38,14 +38,14 @@ internal class JsPushWrapper<Logging : JsPushInstance, Gatherer : JsPushInstance
         }
     }
 
-    override suspend fun registerPushToken(pushToken: String): Result<Unit> =
+    override suspend fun registerToken(token: String): Result<Unit> =
         runCatchingWithoutCancellation {
             withContext(sdkContext.sdkDispatcher) {
-                activeInstance<PushInternalApi>().registerPushToken(pushToken)
+                activeInstance<PushInternalApi>().registerPushToken(token)
             }
         }
 
-    override suspend fun clearPushToken(): Result<Unit> =
+    override suspend fun clearToken(): Result<Unit> =
         runCatchingWithoutCancellation {
             withContext(sdkContext.sdkDispatcher) {
                 activeInstance<PushInternalApi>().clearPushToken()
@@ -53,7 +53,7 @@ internal class JsPushWrapper<Logging : JsPushInstance, Gatherer : JsPushInstance
         }
 
 
-    override suspend fun getPushToken(): Result<String?> = runCatchingWithoutCancellation {
+    override suspend fun getToken(): Result<String?> = runCatchingWithoutCancellation {
         withContext(sdkContext.sdkDispatcher) {
             activeInstance<PushInternalApi>().getPushToken()
         }

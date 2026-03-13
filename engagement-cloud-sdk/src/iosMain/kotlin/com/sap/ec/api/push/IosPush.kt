@@ -24,7 +24,7 @@ class IosPush : IosPushApi {
         get() = koin.get<IosPushWrapperApi>().userNotificationCenterDelegate
 
     override suspend fun getToken(): String? {
-        return koin.get<IosPushWrapperApi>().getPushToken().getOrNull()
+        return koin.get<IosPushWrapperApi>().getToken().getOrNull()
     }
 
     override suspend fun handleSilentMessageWithUserInfo(rawUserInfo: Map<String, Any>) {
@@ -32,10 +32,10 @@ class IosPush : IosPushApi {
     }
 
     override suspend fun registerToken(token: String) {
-        koin.get<IosPushWrapperApi>().registerPushToken(token)
+        koin.get<IosPushWrapperApi>().registerToken(token)
     }
 
     override suspend fun clearToken() {
-        koin.get<IosPushWrapperApi>().clearPushToken()
+        koin.get<IosPushWrapperApi>().clearToken()
     }
 }

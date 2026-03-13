@@ -80,7 +80,7 @@ class RegisterPushTokenStateTests {
     }
 
     @Test
-    fun active_shouldStorePushToken_andCallRegisterEvent_withRegisterPushToken_whenLastSentPushTokenIsMissing_pushTokenIsAvailable() =
+    fun active_shouldStorePushToken_andCallRegisterEvent_withRegisterPushToken_whenLastSentPushTokenIsMissing_TokenIsAvailable() =
         runTest {
             everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mockWaiter
             every { mockStringStorage.get(PushConstants.PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
@@ -108,7 +108,7 @@ class RegisterPushTokenStateTests {
         }
 
     @Test
-    fun active_shouldStorePushToken_andCallRegisterEvent_withRegisterPushToken_whenBothAvailable_butNotTheSame() =
+    fun active_shouldStorePushToken_andCallRegisterEvent_withRegisterToken_whenBothAvailable_butNotTheSame() =
         runTest {
             everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mockWaiter
             every { mockStringStorage.get(PushConstants.PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
@@ -131,7 +131,7 @@ class RegisterPushTokenStateTests {
         }
 
     @Test
-    fun testActive_shouldNotStorePushToken_andNotCallRegisterEvent_withRegisterPushToken_whenBothAvailable_andTheSame() =
+    fun testActive_shouldNotStorePushToken_andNotCallRegisterEvent_withRegisterToken_whenBothAvailable_andTheSame() =
         runTest {
             everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mock(MockMode.autofill)
             every { mockStringStorage.get(PushConstants.PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
@@ -145,7 +145,7 @@ class RegisterPushTokenStateTests {
         }
 
     @Test
-    fun active_shouldReturnFailure_when_registerPushTokenFails_andShouldNotStoreToken() =
+    fun active_shouldReturnFailure_when_registerTokenFails_andShouldNotStoreToken() =
         runTest {
             everySuspend { mockWaiter.await<Response>() } returns failureResult
             everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mockWaiter

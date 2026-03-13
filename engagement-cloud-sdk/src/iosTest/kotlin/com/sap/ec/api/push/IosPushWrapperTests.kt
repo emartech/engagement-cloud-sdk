@@ -135,7 +135,7 @@ class IosPushWrapperTests {
 
         iosPushWrapper.registerOnContext()
 
-        iosPushWrapper.registerPushToken(PUSH_TOKEN)
+        iosPushWrapper.registerToken(PUSH_TOKEN)
 
         verifySuspend(exactly(1)) { mockLoggingPush.registerPushToken(PUSH_TOKEN) }
     }
@@ -146,7 +146,7 @@ class IosPushWrapperTests {
 
         iosPushWrapper.registerOnContext()
 
-        iosPushWrapper.registerPushToken(PUSH_TOKEN)
+        iosPushWrapper.registerToken(PUSH_TOKEN)
 
         verifySuspend { mockGathererPush.registerPushToken(PUSH_TOKEN) }
     }
@@ -157,7 +157,7 @@ class IosPushWrapperTests {
 
         iosPushWrapper.registerOnContext()
 
-        iosPushWrapper.registerPushToken(PUSH_TOKEN)
+        iosPushWrapper.registerToken(PUSH_TOKEN)
 
         verifySuspend { mockPushInternal.registerPushToken(PUSH_TOKEN) }
     }
@@ -170,7 +170,7 @@ class IosPushWrapperTests {
 
         iosPushWrapper.registerOnContext()
 
-        val result = iosPushWrapper.registerPushToken(PUSH_TOKEN)
+        val result = iosPushWrapper.registerToken(PUSH_TOKEN)
 
         result.isFailure shouldBe true
         result.exceptionOrNull() shouldBe expectedException
@@ -182,7 +182,7 @@ class IosPushWrapperTests {
 
         iosPushWrapper.registerOnContext()
 
-        iosPushWrapper.clearPushToken()
+        iosPushWrapper.clearToken()
 
         verifySuspend { mockLoggingPush.clearPushToken() }
     }
@@ -193,7 +193,7 @@ class IosPushWrapperTests {
 
         iosPushWrapper.registerOnContext()
 
-        iosPushWrapper.clearPushToken()
+        iosPushWrapper.clearToken()
 
         verifySuspend { mockGathererPush.clearPushToken() }
     }
@@ -204,7 +204,7 @@ class IosPushWrapperTests {
 
         iosPushWrapper.registerOnContext()
 
-        iosPushWrapper.clearPushToken()
+        iosPushWrapper.clearToken()
 
         verifySuspend { mockPushInternal.clearPushToken() }
     }
@@ -219,7 +219,7 @@ class IosPushWrapperTests {
 
         iosPushWrapper.registerOnContext()
 
-        val result = iosPushWrapper.clearPushToken()
+        val result = iosPushWrapper.clearToken()
 
         result.isFailure shouldBe true
         result.exceptionOrNull() shouldBe expectedException
@@ -232,7 +232,7 @@ class IosPushWrapperTests {
 
         iosPushWrapper.registerOnContext()
 
-        val result = iosPushWrapper.getPushToken()
+        val result = iosPushWrapper.getToken()
 
         result.onSuccess { it shouldBe null }
     }
@@ -244,7 +244,7 @@ class IosPushWrapperTests {
 
         iosPushWrapper.registerOnContext()
 
-        val result = iosPushWrapper.getPushToken()
+        val result = iosPushWrapper.getToken()
 
         result.onSuccess { it shouldBe PUSH_TOKEN }
     }
@@ -256,7 +256,7 @@ class IosPushWrapperTests {
 
         iosPushWrapper.registerOnContext()
 
-        val result = iosPushWrapper.getPushToken()
+        val result = iosPushWrapper.getToken()
 
         result.onSuccess { it shouldBe PUSH_TOKEN }
     }

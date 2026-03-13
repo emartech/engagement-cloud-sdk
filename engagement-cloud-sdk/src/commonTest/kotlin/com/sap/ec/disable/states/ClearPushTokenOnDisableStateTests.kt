@@ -75,7 +75,7 @@ class ClearPushTokenOnDisableStateTests {
     }
 
     @Test
-    fun active_shouldRegisterClearPushTokenEvent_without_deletingPushTokenFromStorage_onSuccess() =
+    fun active_shouldRegisterClearPushTokenEvent_without_deletingTokenFromStorage_onSuccess() =
         runTest {
             everySuspend { mockSdkEventDistributor.registerEvent(capture(slot)) } returns mockWaiter
 
@@ -88,7 +88,7 @@ class ClearPushTokenOnDisableStateTests {
         }
 
     @Test
-    fun active_shouldRegisterClearPushTokenEvent_without_deletingPushTokenFromStorage_onFailure() =
+    fun active_shouldRegisterClearPushTokenEvent_without_deletingTokenFromStorage_onFailure() =
         runTest {
             everySuspend { mockSdkEventDistributor.registerEvent(capture(slot)) } returns mockWaiter
             everySuspend { mockWaiter.await<Response>() } returns failureResult
@@ -101,7 +101,7 @@ class ClearPushTokenOnDisableStateTests {
         }
 
     @Test
-    fun active_shouldNOTRegisterClearPushTokenEvent_whenNoPushToken_isStored() =
+    fun active_shouldNOTRegisterClearPushTokenEvent_whenNoToken_isStored() =
         runTest {
             everySuspend { mockStorage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns null
 

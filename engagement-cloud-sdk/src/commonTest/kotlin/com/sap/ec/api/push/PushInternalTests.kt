@@ -83,7 +83,7 @@ class PushInternalTests {
     }
 
     @Test
-    fun testRegisterPushToken_shouldNotDoAnything_whenPushTokenStoredAlready() = runTest {
+    fun testRegisterPushToken_shouldNotDoAnything_whenTokenStoredAlready() = runTest {
         everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(
             MockMode.autofill
         )
@@ -103,7 +103,7 @@ class PushInternalTests {
     }
 
     @Test
-    fun testRegisterPushToken_shouldRegisterPushToken_whenStoredPushTokenIsDifferent_andStorePushToken_onNetworkSuccess() =
+    fun testRegisterPushToken_shouldRegisterPushToken_whenStoredPushTokenIsDifferent_andStoreToken_onNetworkSuccess() =
         runTest {
             val successResponse: SdkEvent.Internal.Sdk.Answer.Response<Response> =
                 SdkEvent.Internal.Sdk.Answer.Response(
@@ -144,7 +144,7 @@ class PushInternalTests {
         }
 
     @Test
-    fun testRegisterPushToken_shouldRegisterPushToken_whenPushTokenWasNotStoredPreviously_andStorePushToken_onNetworkSuccess() =
+    fun testRegisterPushToken_shouldRegisterPushToken_whenPushTokenWasNotStoredPreviously_andStoreToken_onNetworkSuccess() =
         runTest {
             val successResponse: SdkEvent.Internal.Sdk.Answer.Response<Response> =
                 SdkEvent.Internal.Sdk.Answer.Response(
@@ -185,7 +185,7 @@ class PushInternalTests {
         }
 
     @Test
-    fun testRegisterPushToken_shouldRegisterPushToken_whenStoredPushTokenIsDifferent_andShouldNotStorePushToken_onNetworkFailure() =
+    fun testRegisterPushToken_shouldRegisterPushToken_whenStoredPushTokenIsDifferent_andShouldNotStoreToken_onNetworkFailure() =
         runTest {
             val failureResponse: SdkEvent.Internal.Sdk.Answer.Response<Response> =
                 SdkEvent.Internal.Sdk.Answer.Response(
@@ -215,7 +215,7 @@ class PushInternalTests {
         }
 
     @Test
-    fun testRegisterPushToken_shouldNotRegisterPushToken_whenStoredPushTokenIsTheSame() = runTest {
+    fun testRegisterPushToken_shouldNotRegisterPushToken_whenStoredTokenIsTheSame() = runTest {
         everySuspend { mockStringStorage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
         everySuspend { mockStringStorage.put(PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
 

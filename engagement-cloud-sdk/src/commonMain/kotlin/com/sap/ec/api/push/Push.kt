@@ -15,19 +15,19 @@ internal class Push<Logging : PushInstance, Gatherer : PushInstance, Internal : 
     sdkContext: SdkContextApi
 ) : GenericApi<Logging, Gatherer, Internal>(loggingApi, gathererApi, internalApi, sdkContext),
     PushApi {
-    override suspend fun registerPushToken(pushToken: String): Result<Unit> = runCatchingWithoutCancellation {
+    override suspend fun registerToken(token: String): Result<Unit> = runCatchingWithoutCancellation {
         withContext(sdkContext.sdkDispatcher) {
-            activeInstance<PushInternalApi>().registerPushToken(pushToken)
+            activeInstance<PushInternalApi>().registerPushToken(token)
         }
     }
 
-    override suspend fun clearPushToken(): Result<Unit> = runCatchingWithoutCancellation {
+    override suspend fun clearToken(): Result<Unit> = runCatchingWithoutCancellation {
         withContext(sdkContext.sdkDispatcher) {
             activeInstance<PushInternalApi>().clearPushToken()
         }
     }
 
-    override suspend fun getPushToken(): Result<String?> {
+    override suspend fun getToken(): Result<String?> {
         return runCatchingWithoutCancellation { activeInstance<PushInternalApi>().getPushToken() }
     }
 }

@@ -25,7 +25,7 @@ internal class PushTokenBroadcastReceiver : BroadcastReceiver(), SdkComponent {
         intent.getStringExtra(PushConstants.PUSH_TOKEN_KEY)?.let {
             logger.debug("push token received: token: $it")
             stringStorage.put(PushConstants.PUSH_TOKEN_STORAGE_KEY, it)
-            pushApi.registerPushToken(it)
+            pushApi.registerToken(it)
         }
     }
 }

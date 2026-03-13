@@ -60,88 +60,88 @@ class PushTests {
     }
 
     @Test
-    fun testRegisterPushToken_inactiveState() = runTest {
+    fun testRegisterToken_inactiveState() = runTest {
         every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Initialized)
         everySuspend {
             mockLoggingPush.registerPushToken(PUSH_TOKEN)
         } returns Unit
         push.registerOnContext()
 
-        push.registerPushToken(PUSH_TOKEN)
+        push.registerToken(PUSH_TOKEN)
 
         verifySuspend { mockLoggingPush.registerPushToken(PUSH_TOKEN) }
     }
 
     @Test
-    fun testRegisterPushToken_onHoldState() = runTest {
+    fun testRegisterToken_onHoldState() = runTest {
         every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.OnHold)
         push.registerOnContext()
 
-        push.registerPushToken(PUSH_TOKEN)
+        push.registerToken(PUSH_TOKEN)
 
         verifySuspend { mockGathererPush.registerPushToken(PUSH_TOKEN) }
     }
 
     @Test
-    fun testRegisterPushToken_activeState() = runTest {
+    fun testRegisterToken_activeState() = runTest {
         every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
         push.registerOnContext()
 
-        push.registerPushToken(PUSH_TOKEN)
+        push.registerToken(PUSH_TOKEN)
 
         verifySuspend { mockPushInternal.registerPushToken(PUSH_TOKEN) }
     }
 
     @Test
-    fun testRegisterPushToken_activeState_when_throws() = runTest {
+    fun testRegisterToken_activeState_when_throws() = runTest {
         every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
         val expectedException = Exception()
         everySuspend { mockPushInternal.registerPushToken(PUSH_TOKEN) } throws expectedException
         push.registerOnContext()
 
-        val result = push.registerPushToken(PUSH_TOKEN)
+        val result = push.registerToken(PUSH_TOKEN)
 
         result.onFailure { it shouldBe expectedException }
     }
 
     @Test
-    fun testClearPushToken_inactiveState() = runTest {
+    fun testClearToken_inactiveState() = runTest {
         every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Initialized)
         push.registerOnContext()
 
-        push.clearPushToken()
+        push.clearToken()
 
         verifySuspend { mockLoggingPush.clearPushToken() }
     }
 
     @Test
-    fun testClearPushToken_onHoldState() = runTest {
+    fun testClearToken_onHoldState() = runTest {
         every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.OnHold)
         push.registerOnContext()
 
-        push.clearPushToken()
+        push.clearToken()
 
         verifySuspend { mockGathererPush.clearPushToken() }
     }
 
     @Test
-    fun testClearPushToken_activeState() = runTest {
+    fun testClearToken_activeState() = runTest {
         every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
         push.registerOnContext()
 
-        push.clearPushToken()
+        push.clearToken()
 
         verifySuspend { mockPushInternal.clearPushToken() }
     }
 
     @Test
-    fun testClearPushToken_activeState_when_throws() = runTest {
+    fun testClearToken_activeState_when_throws() = runTest {
         every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
         val expectedException = Exception()
         everySuspend { mockPushInternal.clearPushToken() } throws expectedException
         push.registerOnContext()
 
-        val result = push.clearPushToken()
+        val result = push.clearToken()
 
         result.onFailure { it shouldBe expectedException }
     }
@@ -152,7 +152,7 @@ class PushTests {
         everySuspend { mockLoggingPush.getPushToken() } returns null
         push.registerOnContext()
 
-        val result = push.getPushToken()
+        val result = push.getToken()
 
         result.onSuccess { it shouldBe null }
     }
@@ -163,7 +163,7 @@ class PushTests {
         everySuspend { mockGathererPush.getPushToken() } returns PUSH_TOKEN
         push.registerOnContext()
 
-        val result = push.getPushToken()
+        val result = push.getToken()
 
         result.onSuccess { it shouldBe PUSH_TOKEN }
     }
@@ -175,17 +175,17 @@ class PushTests {
 
         push.registerOnContext()
 
-        val result = push.getPushToken()
+        val result = push.getToken()
 
         result.onSuccess { it shouldBe PUSH_TOKEN }
     }
 
     @Test
-    fun registerPushToken_shouldPropagateCancellationException() = runTest {
+    fun registerToken_shouldPropagateCancellationException() = runTest {
         every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
         everySuspend { mockPushInternal.registerPushToken(PUSH_TOKEN) } throws CancellationException("test cancellation")
         push.registerOnContext()
 
-        shouldThrow<CancellationException> { push.registerPushToken(PUSH_TOKEN) }
+        shouldThrow<CancellationException> { push.registerToken(PUSH_TOKEN) }
     }
 }

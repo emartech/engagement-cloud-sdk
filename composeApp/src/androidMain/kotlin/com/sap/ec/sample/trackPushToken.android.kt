@@ -9,5 +9,5 @@ import kotlinx.coroutines.tasks.await
 actual suspend fun registerPushToken() {
     val token = Firebase.messaging.token.await()
     Log.d("PUSH TOKEN", token)
-    EngagementCloud.push.registerPushToken(pushToken = token)
+    EngagementCloud.push.registerToken(token = token)
 }
