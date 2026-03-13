@@ -9,7 +9,7 @@ internal class InitializerState(
     private val platformInitializer: PlatformInitializerApi,
     private val sdkLogger: Logger
 ) : State {
-    override val name: String = "platformInitState"
+    override val name: String = "InitializerState"
 
     override fun prepare() {
     }

@@ -25,7 +25,6 @@ import com.sap.ec.api.push.PushInstance
 import com.sap.ec.api.push.PushInternal
 import com.sap.ec.api.setup.AndroidSetup
 import com.sap.ec.api.setup.AndroidSetupApi
-import com.sap.ec.InternalSdkApi
 import com.sap.ec.applicationContext
 import com.sap.ec.core.actions.clipboard.ClipboardHandlerApi
 import com.sap.ec.core.actions.launchapplication.LaunchApplicationHandlerApi
@@ -65,7 +64,6 @@ import com.sap.ec.db_migration.LegacyDBOpenHelper
 import com.sap.ec.db_migration.LegacySharedPreferencesWrapper
 import com.sap.ec.db_migration.LegacySharedPreferencesWrapper.Companion.EMARSYS_SECURE_SHARED_PREFERENCES_V3_NAME
 import com.sap.ec.db_migration.SharedPreferenceCrypto
-import com.sap.ec.enable.PlatformInitState
 import com.sap.ec.enable.PlatformInitializer
 import com.sap.ec.enable.PlatformInitializerApi
 import com.sap.ec.enable.config.AndroidSdkConfigStore
@@ -196,7 +194,6 @@ internal object AndroidInjection {
                 sdkLogger = get { parametersOf(LegacySDKMigrationState::class.simpleName) }
             )
         }
-        single<State>(named(StateTypes.PlatformInit)) { PlatformInitState() }
         single<PlatformInitializerApi> {
             PlatformInitializer(
                 sdkEventDistributor = get(),
