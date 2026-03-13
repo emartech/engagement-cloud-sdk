@@ -17,11 +17,11 @@ internal class ContentReplacer(
     override suspend fun replace(content: String): String {
         jsBridgeVerifier.verifyJsBridge()
         val jsBridge = stringStorage.get(StorageConstants.JS_BRIDGE)?.let {
-            "<script>$it</script>"
+            """<script type="text/javascript">$it</script>"""
         } ?: ""
 
         return content
-            .replace(JS_BRIDGE_PLACEHOLDER, jsBridge)
             .replace(SDK_VERSION_PLACEHOLDER, sdkVersionProvider.provide())
+            .replace(JS_BRIDGE_PLACEHOLDER, jsBridge)
     }
 }

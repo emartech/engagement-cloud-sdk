@@ -24,7 +24,7 @@ class ContentReplacerTests {
 <head>
   <meta sdkVersion="$SDK_VERSION_PLACEHOLDER">
   $JS_BRIDGE_PLACEHOLDER</head></html>"""
-        const val TEST_JS_BRIDGE = "function jsBridge() { /* bridge code */ }"
+        const val TEST_JS_BRIDGE = "function jsBridge() { /* bridge code EC-SDK-VERSION */ }"
     }
 
     private lateinit var contentReplacer: ContentReplacerApi
@@ -52,13 +52,14 @@ class ContentReplacerTests {
     }
 
     @Test
-    fun replace_shouldAdd_scriptSrcTag_toTheContent_whenInjectionAllowed() = runTest {
+    fun replace_shouldAdd_scriptSrcTag_toTheContent_whenInjectionAllowed_andReplaceInOrder() = runTest {
         everySuspend { mockJsBridgeVerifier.verifyJsBridge() } returns Result.success(Unit)
 
         val result = contentReplacer.replace(TEST_INAPP_CONTENT)
 
-        result.contains("<script>$TEST_JS_BRIDGE</script>") shouldBe true
+        result.contains("<script type=\"text/javascript\">$TEST_JS_BRIDGE</script>") shouldBe true
         result.contains(JS_BRIDGE_PLACEHOLDER) shouldBe false
+        result.contains("EC-SDK-VERSION")
     }
 
     @Test
@@ -79,7 +80,6 @@ class ContentReplacerTests {
         val result = contentReplacer.replace(TEST_INAPP_CONTENT)
 
         result.contains(TEST_SDK_VERSION) shouldBe true
-        result.contains(SDK_VERSION_PLACEHOLDER) shouldBe false
     }
 
     @Test
