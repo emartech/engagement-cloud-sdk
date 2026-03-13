@@ -81,6 +81,7 @@ import org.jetbrains.compose.web.css.marginBottom
 import org.jetbrains.compose.web.css.marginLeft
 import org.jetbrains.compose.web.css.marginRight
 import org.jetbrains.compose.web.css.marginTop
+import org.jetbrains.compose.web.css.maxHeight
 import org.jetbrains.compose.web.css.maxWidth
 import org.jetbrains.compose.web.css.minWidth
 import org.jetbrains.compose.web.css.ms
@@ -631,14 +632,17 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Column)
         justifyContent(JustifyContent.Start)
+        alignItems(AlignItems.Center)
         width(MESSAGE_ITEM_IMAGE_SIZE)
         height(MESSAGE_ITEM_IMAGE_SIZE)
         marginLeft(MEDIUM_MARGIN)
         marginRight(MEDIUM_MARGIN)
+        padding(DEFAULT_PADDING)
     }
 
     val messageItemImage by style {
-        width(MAX_WIDTH)
+        maxWidth(MAX_WIDTH)
+        maxHeight(MAX_HEIGHT)
     }
 
     val messageItemContent by style {
