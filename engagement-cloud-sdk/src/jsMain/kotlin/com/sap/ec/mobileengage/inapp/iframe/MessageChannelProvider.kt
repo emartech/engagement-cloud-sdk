@@ -46,7 +46,6 @@ internal class MessageChannelProvider(
     ): MessageChannel {
         messageChannel.port1.onmessage = EventHandler { messageEvent ->
             if (messageEvent.data == CONNECTED_EVENT) {
-                console.log("Iframe content loaded.")
                 return@EventHandler
             }
 

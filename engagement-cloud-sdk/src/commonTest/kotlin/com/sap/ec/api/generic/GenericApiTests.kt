@@ -42,12 +42,17 @@ class GenericApiTests {
         val mainDispatcher = StandardTestDispatcher()
         Dispatchers.setMain(mainDispatcher)
         contactContext = ContactContext(mutableListOf())
+        mockSdkContext = mock(MockMode.autofill)
         mockSdkLogger = mock(MockMode.autofill)
         loggingContact = LoggingContact(mockSdkLogger)
-        contactGatherer = ContactGatherer(contactContext, mockSdkLogger)
+        contactGatherer = ContactGatherer(contactContext, mockSdkContext, mockSdkLogger)
         contactInternal =
-            ContactInternal(contactContext, mockSdkLogger, sdkEventDistributor = mock())
-        mockSdkContext = mock(MockMode.autofill)
+            ContactInternal(
+                contactContext,
+                mockSdkLogger,
+                sdkEventDistributor = mock(),
+                mockSdkContext
+            )
         every { mockSdkContext.sdkDispatcher } returns mainDispatcher
         genericApi = GenericApi(
             loggingContact,

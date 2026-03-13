@@ -5,6 +5,7 @@ import com.sap.ec.context.DefaultUrlsApi
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.exceptions.SdkException.MissingApplicationCodeException
 import com.sap.ec.event.SdkEvent
+import com.sap.ec.event.SdkEvent.Internal.Sdk
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -104,6 +105,13 @@ class UrlFactoryTests {
     @Test
     fun testCreate_linkContact_should_return_url_withAppCode() = runTest {
         val result = urlFactory.create(ECUrlType.LinkContact)
+
+        result shouldBe Url("https://me-client.gservice.emarsys.net/v4/apps/$APPLICATION_CODE/client/contact")
+    }
+
+    @Test
+    fun testCreate_unlinkContact_should_return_url_withAppCode() = runTest {
+        val result = urlFactory.create(ECUrlType.UnlinkContact, Sdk.UnlinkContact(applicationCode = APPLICATION_CODE))
 
         result shouldBe Url("https://me-client.gservice.emarsys.net/v4/apps/$APPLICATION_CODE/client/contact")
     }

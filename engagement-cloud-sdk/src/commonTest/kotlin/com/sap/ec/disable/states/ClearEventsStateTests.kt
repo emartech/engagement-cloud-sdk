@@ -36,7 +36,7 @@ class ClearEventsStateTests {
 
     @Test
     fun testActive_shouldClearAllEvents_fromDatabase_except_Log_and_Operational() = runTest {
-        val testEvent1 = SdkEvent.Internal.Sdk.UnlinkContact()
+        val testEvent1 = SdkEvent.Internal.Sdk.UnlinkContact(applicationCode = TEST_APPLICATION_CODE)
         val testEvent2 = SdkEvent.Internal.Sdk.Log(LogLevel.Info)
         val testEvent3 = SdkEvent.Internal.Sdk.AppStart()
         val testEvent4 =
@@ -49,8 +49,8 @@ class ClearEventsStateTests {
 
         advanceUntilIdle()
 
-        verifySuspend { mockEventsDao.removeEvent(testEvent1) }
         verifySuspend { mockEventsDao.removeEvent(testEvent3) }
+        verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(testEvent1) }
         verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(testEvent2) }
         verifySuspend(VerifyMode.exactly(0)) { mockEventsDao.removeEvent(testEvent4) }
         result shouldBe Result.success(Unit)
@@ -58,7 +58,7 @@ class ClearEventsStateTests {
 
     @Test
     fun testActive_shouldReturn_failure_ifDBOperation_fails() = runTest {
-        val testEvent = SdkEvent.Internal.Sdk.UnlinkContact()
+        val testEvent = SdkEvent.Internal.Sdk.AppStart()
 
         val testEvents = flowOf(testEvent)
         everySuspend { mockEventsDao.getEvents() } returns testEvents

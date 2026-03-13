@@ -1,5 +1,7 @@
 package com.sap.ec.api.contact
 
+import com.sap.ec.TestEngagementCloudSDKConfig
+import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.event.SdkEvent
 import dev.mokkery.MockMode
@@ -22,15 +24,17 @@ class ContactInternalTests {
     private companion object {
         const val CONTACT_FIELD_VALUE = "testContactFieldValue"
         const val OPEN_ID_TOKEN = "testOpenIdToken"
+        const val APPLICATION_CODE = "testAppCode"
         val linkContact = ContactCall.LinkContact(CONTACT_FIELD_VALUE)
         val linkAuthenticatedContact =
             ContactCall.LinkAuthenticatedContact(OPEN_ID_TOKEN)
-        val unlinkContact = ContactCall.UnlinkContact()
+        val unlinkContact = ContactCall.UnlinkContact(APPLICATION_CODE)
         val calls = mutableListOf(linkContact, linkAuthenticatedContact, unlinkContact)
     }
 
     private lateinit var contactContext: ContactContextApi
     private lateinit var sdkEventDistributor: SdkEventDistributorApi
+    private lateinit var mockSdkContext: SdkContextApi
     private lateinit var eventSlot: SlotCapture<SdkEvent>
     private lateinit var contactInternal: ContactInstance
 
@@ -38,12 +42,17 @@ class ContactInternalTests {
     fun setUp() {
         eventSlot = slot()
         contactContext = ContactContext(calls)
+        mockSdkContext = mock(MockMode.autofill)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(
+            APPLICATION_CODE
+        )
         sdkEventDistributor = mock(MockMode.autofill)
         everySuspend { sdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(MockMode.autofill)
         contactInternal = ContactInternal(
             contactContext,
             sdkLogger = mock(MockMode.autofill),
-            sdkEventDistributor
+            sdkEventDistributor,
+            mockSdkContext
         )
     }
 

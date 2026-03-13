@@ -61,6 +61,7 @@ internal object ContactInjection {
         single<ContactInstance>(named(InstanceType.Gatherer)) {
             ContactGatherer(
                 context = get(),
+                sdkContext = get(),
                 sdkLogger = get { parametersOf(ContactGatherer::class.simpleName) },
             )
         }
@@ -68,7 +69,8 @@ internal object ContactInjection {
             ContactInternal(
                 contactContext = get(),
                 sdkLogger = get { parametersOf(ContactInternal::class.simpleName) },
-                sdkEventDistributor = get()
+                sdkEventDistributor = get(),
+                sdkContext = get(),
             )
         }
         single<ContactApi> {

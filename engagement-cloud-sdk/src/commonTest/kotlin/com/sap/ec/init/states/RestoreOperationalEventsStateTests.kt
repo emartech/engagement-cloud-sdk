@@ -40,7 +40,7 @@ class RestoreOperationalEventsStateTests {
 
     @Test
     fun active_shouldReEmit_operationalAndLogEvents_toEventFlow() = runTest {
-        val testEvent1 = SdkEvent.Internal.Sdk.UnlinkContact()
+        val testEvent1 = SdkEvent.Internal.Sdk.UnlinkContact(applicationCode = TEST_APPLICATION_CODE)
         val testEvent2 = SdkEvent.Internal.Sdk.Log(LogLevel.Info)
         val testEvent3 = SdkEvent.Internal.Sdk.AppStart()
         val testEvent4 =
@@ -56,7 +56,7 @@ class RestoreOperationalEventsStateTests {
         verifySuspend { mockEventsDao.getEvents() }
         verifySuspend { mockSdkEventEmitter.emitEvent(testEvent2) }
         verifySuspend { mockSdkEventEmitter.emitEvent(testEvent4) }
-        verifySuspend(VerifyMode.exactly(0)) { mockSdkEventEmitter.emitEvent(testEvent1) }
+        verifySuspend { mockSdkEventEmitter.emitEvent(testEvent1) }
         verifySuspend(VerifyMode.exactly(0)) { mockSdkEventEmitter.emitEvent(testEvent3) }
     }
 }

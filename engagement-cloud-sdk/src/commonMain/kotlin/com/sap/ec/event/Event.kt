@@ -412,8 +412,9 @@ sealed interface SdkEvent {
                 override val id: String = UUIDProvider().provide(),
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0,
-                val name: String = UNLINK_CONTACT_NAME
-            ) : Sdk(), OnlineSdkEvent
+                val name: String = UNLINK_CONTACT_NAME,
+                override val applicationCode: String?
+            ) : Sdk(), OnlineSdkEvent, OperationalEvent
 
             @Serializable
             data class TrackDeepLink(

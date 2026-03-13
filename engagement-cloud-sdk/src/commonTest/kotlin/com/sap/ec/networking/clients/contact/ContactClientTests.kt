@@ -53,6 +53,7 @@ class ContactClientTests {
         val TEST_BASE_URL = Url("https://test-base-url/")
         const val OPEN_ID_TOKEN = "testOpenIdToken"
         const val CONTACT_FIELD_VALUE = "testContactFieldValue"
+        const val APPLICATION_CODE = "testAppCode"
     }
 
     private lateinit var mockEcClient: NetworkClientApi
@@ -98,7 +99,7 @@ class ContactClientTests {
         testResponse = createTestResponse("{}")
         everySuspend { mockEcClient.send(any()) } returns (Result.success(testResponse))
         everySuspend { mockUrlFactory.create(ECUrlType.LinkContact) } returns TEST_BASE_URL
-        everySuspend { mockUrlFactory.create(ECUrlType.UnlinkContact) } returns TEST_BASE_URL
+        everySuspend { mockUrlFactory.create(ECUrlType.UnlinkContact, any()) } returns TEST_BASE_URL
         everySuspend { mockLogger.error(any(), any<Throwable>()) } calls {
             (it.args[1] as Throwable).printStackTrace()
         }
@@ -230,7 +231,8 @@ class ContactClientTests {
     fun testConsumer_should_call_client_with_unlinkContact_request() = runTest {
         contactClient.register()
 
-        val unlinkContactEvent = SdkEvent.Internal.Sdk.UnlinkContact("unlinkContact")
+        val unlinkContactEvent =
+            SdkEvent.Internal.Sdk.UnlinkContact("unlinkContact", applicationCode = APPLICATION_CODE)
 
         onlineEvents.emit(unlinkContactEvent)
 
@@ -258,7 +260,8 @@ class ContactClientTests {
     fun testConsumer_should_reEmit_events_into_flow_when_there_is_a_network_error() = runTest {
         contactClient.register()
 
-        val unlinkContactEvent = SdkEvent.Internal.Sdk.UnlinkContact("unlinkContact")
+        val unlinkContactEvent =
+            SdkEvent.Internal.Sdk.UnlinkContact("unlinkContact", applicationCode = APPLICATION_CODE)
         val testException = NetworkIOException("No Internet")
         everySuspend { mockEcClient.send(any()) } returns Result.failure(testException)
         everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
@@ -305,7 +308,10 @@ class ContactClientTests {
             everySuspend { mockEcClient.send(any()) } throws testException
             everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
 
-            val unlinkContactEvent = SdkEvent.Internal.Sdk.UnlinkContact("unlinkContact")
+            val unlinkContactEvent = SdkEvent.Internal.Sdk.UnlinkContact(
+                "unlinkContact",
+                applicationCode = APPLICATION_CODE
+            )
 
             onlineEvents.emit(unlinkContactEvent)
 
@@ -352,7 +358,7 @@ class ContactClientTests {
 
         val testException = Exception("Backend error")
         everySuspend { mockEcClient.send(any()) } returns Result.failure(testException)
-        val unlinkContactEvent = SdkEvent.Internal.Sdk.UnlinkContact("unlinkContact")
+        val unlinkContactEvent = SdkEvent.Internal.Sdk.UnlinkContact("unlinkContact", applicationCode = APPLICATION_CODE)
 
         onlineEvents.emit(unlinkContactEvent)
 

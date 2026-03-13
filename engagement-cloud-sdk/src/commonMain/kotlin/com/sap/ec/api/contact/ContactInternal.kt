@@ -3,6 +3,7 @@ package com.sap.ec.api.contact
 import com.sap.ec.api.contact.ContactCall.LinkAuthenticatedContact
 import com.sap.ec.api.contact.ContactCall.LinkContact
 import com.sap.ec.api.contact.ContactCall.UnlinkContact
+import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.collections.dequeue
 import com.sap.ec.core.log.Logger
@@ -13,7 +14,8 @@ import kotlin.time.ExperimentalTime
 internal class ContactInternal(
     private val contactContext: ContactContextApi,
     private val sdkLogger: Logger,
-    private val sdkEventDistributor: SdkEventDistributorApi
+    private val sdkEventDistributor: SdkEventDistributorApi,
+    private val sdkContext: SdkContextApi
 ) : ContactInstance {
     override suspend fun link(contactFieldValue: String) {
         sdkLogger.debug("link")
@@ -35,7 +37,7 @@ internal class ContactInternal(
 
     override suspend fun unlink() {
         sdkLogger.debug("unlink")
-        sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.UnlinkContact())
+        sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.UnlinkContact(applicationCode = sdkContext.getSdkConfig()?.applicationCode))
     }
 
     override suspend fun activate() {
@@ -47,13 +49,15 @@ internal class ContactInternal(
                         contactFieldValue = it.contactFieldValue
                     )
                 )
+
                 is LinkAuthenticatedContact -> sdkEventDistributor.registerEvent(
                     SdkEvent.Internal.Sdk.LinkAuthenticatedContact(
                         openIdToken = it.openIdToken
                     )
                 )
+
                 is UnlinkContact -> sdkEventDistributor.registerEvent(
-                    SdkEvent.Internal.Sdk.UnlinkContact()
+                    SdkEvent.Internal.Sdk.UnlinkContact(applicationCode = it.applicationCode)
                 )
             }
         }

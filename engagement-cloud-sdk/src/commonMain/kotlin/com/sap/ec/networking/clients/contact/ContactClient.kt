@@ -113,6 +113,7 @@ internal class ContactClient(
                 Result.success(response)
             )
         )
+        sdkLogger.debug("TAG - triggering refresh")
         sdkEventManager.emitEvent(SdkEvent.Internal.EmbeddedMessaging.TriggerRefresh())
     }
 
@@ -145,9 +146,12 @@ internal class ContactClient(
                 UrlRequest(url, HttpMethod.Post, requestBody, headers)
             }
 
-            else -> {
-                val url = urlFactory.create(ECUrlType.UnlinkContact)
+            is SdkEvent.Internal.Sdk.UnlinkContact -> {
+                val url = urlFactory.create(ECUrlType.UnlinkContact, event)
                 UrlRequest(url, HttpMethod.Delete, null, headers)
+            }
+            else -> {
+                throw Exception("Unknown Contact Event type.")
             }
         }
     }

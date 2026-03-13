@@ -3,9 +3,14 @@ package com.sap.ec.api.contact
 import com.sap.ec.api.contact.ContactCall.LinkAuthenticatedContact
 import com.sap.ec.api.contact.ContactCall.LinkContact
 import com.sap.ec.api.contact.ContactCall.UnlinkContact
+import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.log.Logger
 
-internal class ContactGatherer(val context: ContactContextApi, private val sdkLogger: Logger) :
+internal class ContactGatherer(
+    val context: ContactContextApi,
+    val sdkContext: SdkContextApi,
+    private val sdkLogger: Logger
+) :
     ContactInstance {
     override suspend fun link(contactFieldValue: String) {
         sdkLogger.debug("ContactGatherer - linkContact")
@@ -19,7 +24,7 @@ internal class ContactGatherer(val context: ContactContextApi, private val sdkLo
 
     override suspend fun unlink() {
         sdkLogger.debug("ContactGatherer - unlinkContact")
-        context.calls.add(UnlinkContact())
+        context.calls.add(UnlinkContact(sdkContext.getSdkConfig()?.applicationCode))
     }
 
     override suspend fun activate() {

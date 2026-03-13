@@ -9,6 +9,7 @@ import com.sap.ec.disable.DisableOrganizerApi
 import com.sap.ec.disable.states.ClearEventsState
 import com.sap.ec.disable.states.ClearPushTokenOnDisableState
 import com.sap.ec.disable.states.ClearStoredConfigState
+import com.sap.ec.disable.states.UnlinkContactState
 import com.sap.ec.enable.EnableOrganizer
 import com.sap.ec.enable.EnableOrganizerApi
 import com.sap.ec.enable.states.AppStartState
@@ -57,6 +58,13 @@ internal object SetupInjection {
                 eventsDao = get(),
                 sdkEventEmitter = get<SdkEventEmitterApi>(),
                 sdkLogger = get { parametersOf(RestoreSavedSdkEventsState::class.simpleName) }
+            )
+        }
+        single<State>(named(StateTypes.UnlinkContact)) {
+            UnlinkContactState(
+                sdkEventDistributor = get(),
+                sdkContext = get(),
+                sdkLogger = get { parametersOf(UnlinkContactState::class.simpleName) }
             )
         }
         single<State>(named(StateTypes.AppStart)) {
@@ -159,6 +167,7 @@ internal object SetupInjection {
         single<StateMachineApi>(named(StateMachineTypes.MobileEngageDisable)) {
             StateMachine(
                 states = listOf(
+                    get<State>(named(StateTypes.UnlinkContact)),
                     get<State>(named(StateTypes.ClearPushTokenOnDisable)),
                     get<State>(named(StateTypes.ClearEvents)),
                     get<State>(named(StateTypes.ClearStoredConfig)),
@@ -216,6 +225,7 @@ internal enum class StateTypes {
     ClearRequestContextTokens,
     ClearPushTokenOnDisable,
     LinkContact,
+    UnlinkContact,
     ClearStoredConfig,
     ClearEvents,
     FetchEmbeddedMessagingMetaState,

@@ -10,11 +10,11 @@ internal sealed interface ContactCall {
     data class LinkContact(val contactFieldValue: String) : ContactCall
 
     @Serializable
-    data class LinkAuthenticatedContact( val openIdToken: String) :
+    data class LinkAuthenticatedContact(val openIdToken: String) :
         ContactCall
 
     @Serializable
-    class UnlinkContact : ContactCall {
+    data class UnlinkContact(val applicationCode: String?) : ContactCall {
         override fun equals(other: Any?): Boolean {
             return other is UnlinkContact
         }

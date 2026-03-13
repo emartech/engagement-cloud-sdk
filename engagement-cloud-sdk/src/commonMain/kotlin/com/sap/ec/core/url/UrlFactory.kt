@@ -28,10 +28,8 @@ internal class UrlFactory(
                 "client/contact"
             ).build()
 
-            ECUrlType.UnlinkContact -> createUrl(
-                sdkContext.defaultUrls.clientServiceBaseUrl,
-                "client/contact"
-            ).build()
+            ECUrlType.UnlinkContact ->
+                Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCodeFromEvent(sdkEvent)}/client/contact")
 
             ECUrlType.RefreshToken -> createUrl(
                 sdkContext.defaultUrls.clientServiceBaseUrl,
