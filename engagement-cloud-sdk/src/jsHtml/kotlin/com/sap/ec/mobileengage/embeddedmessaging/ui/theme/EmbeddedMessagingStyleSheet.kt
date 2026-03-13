@@ -84,6 +84,7 @@ import org.jetbrains.compose.web.css.marginTop
 import org.jetbrains.compose.web.css.maxHeight
 import org.jetbrains.compose.web.css.maxWidth
 import org.jetbrains.compose.web.css.minWidth
+import org.jetbrains.compose.web.css.minus
 import org.jetbrains.compose.web.css.ms
 import org.jetbrains.compose.web.css.overflow
 import org.jetbrains.compose.web.css.padding
@@ -154,7 +155,7 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
     val splitViewContainerWithIslands by style {
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Row)
-        height(MAX_HEIGHT)
+        height(MAX_HEIGHT - 2 * MEDIUM_LARGE_PADDING)
         gap(ZERO_SPACING)
         backgroundColor(CssColorVars.colorBackground.value())
         padding(MEDIUM_LARGE_PADDING, LARGE_PADDING)
