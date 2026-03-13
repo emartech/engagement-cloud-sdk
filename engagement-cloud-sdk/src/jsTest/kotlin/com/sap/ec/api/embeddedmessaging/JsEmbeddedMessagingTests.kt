@@ -19,7 +19,7 @@ class JsEmbeddedMessagingTests {
             MessageCategory("2", "Category 2")
         )
         val jsMessageCategories = CATEGORIES.map {
-            JSApiMessageCategory(it.id, it.text)
+            JSApiMessageCategory(it.id, it.value)
         }
     }
 
