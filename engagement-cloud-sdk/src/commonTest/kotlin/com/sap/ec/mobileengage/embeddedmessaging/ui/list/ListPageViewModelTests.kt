@@ -12,7 +12,7 @@ import com.sap.ec.mobileengage.action.models.ActionModel
 import com.sap.ec.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
 import com.sap.ec.networking.clients.embedded.messaging.model.Category
-import com.sap.ec.networking.clients.embedded.messaging.model.MessageCategory
+import com.sap.ec.networking.clients.embedded.messaging.model.Category
 import com.sap.ec.watchdog.connection.ConnectionWatchDog
 import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
@@ -56,10 +56,10 @@ class ListPageViewModelTests {
         const val TEST_MESSAGE_ID = "test-message-id"
         const val PLATFORM_CATEGORY = "testCategory"
         const val TEST_ID = "testId"
-        val testCategory = MessageCategory(TEST_ID, "testValue")
+        val testCategory = Category(TEST_ID, "testValue")
     }
 
-    private lateinit var categories: MutableStateFlow<List<MessageCategory>>
+    private lateinit var categories: MutableStateFlow<List<Category>>
     private lateinit var mockModel: ListPageModelApi
     private lateinit var mockDownloaderApi: DownloaderApi
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
@@ -148,7 +148,7 @@ class ListPageViewModelTests {
     @Test
     fun testSetSelectCategoryIds_shouldCallPagerFactory_withCorrectSelectedCategoryIds() = runTest {
         val testId2 = "testId2"
-        val testCategory2 = MessageCategory(testId2, "testValue2")
+        val testCategory2 = Category(testId2, "testValue2")
         categories.value = listOf(testCategory, testCategory2)
 
         viewModel.filterUnopenedOnly.value shouldBe false

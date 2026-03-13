@@ -13,7 +13,7 @@ import com.sap.ec.mobileengage.embeddedmessaging.exceptions.LastPageReachedExcep
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
 import com.sap.ec.mobileengage.embeddedmessaging.ui.list.ListPageModelApi
 import com.sap.ec.mobileengage.embeddedmessaging.ui.list.MessagesWithCategories
-import com.sap.ec.networking.clients.embedded.messaging.model.MessageCategory
+import com.sap.ec.networking.clients.embedded.messaging.model.Category
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend
@@ -54,7 +54,7 @@ class EmbeddedMessagingPagingSourceTests {
     private fun createEmbeddedMessagingPagingSource(
         filterUnopenedOnly: Boolean = false,
         selectedCategoryIds: List<String> = emptyList(),
-        setCategories: (List<MessageCategory>) -> Unit = { }
+        setCategories: (List<Category>) -> Unit = { }
     ) = EmbeddedMessagingPagingSource(
         listPageModel = mockListPageModel,
         filterUnopenedOnly = filterUnopenedOnly,

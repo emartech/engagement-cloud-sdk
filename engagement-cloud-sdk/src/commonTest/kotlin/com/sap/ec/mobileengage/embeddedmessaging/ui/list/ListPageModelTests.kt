@@ -8,6 +8,7 @@ import com.sap.ec.core.networking.model.UrlRequest
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.mobileengage.embeddedmessaging.pagination.EmbeddedMessagingPaginationState
 import com.sap.ec.networking.clients.embedded.messaging.model.EmbeddedMessage
+import com.sap.ec.networking.clients.embedded.messaging.model.Category
 import com.sap.ec.networking.clients.embedded.messaging.model.MessageCategory
 import com.sap.ec.networking.clients.embedded.messaging.model.MessagesResponse
 import com.sap.ec.networking.clients.embedded.messaging.model.Meta
@@ -87,7 +88,7 @@ class ListPageModelTests {
             val result = model.fetchMessagesWithCategories(false, emptyList()).getOrThrow()
 
             result.messages shouldBe lastPageOfMessagesResponse.messages
-            result.categories shouldBe lastPageOfMessagesResponse.meta.categories
+            result.categories shouldBe lastPageOfMessagesResponse.meta.categories.map { Category(it.id, it.value) }
             result.isEndReached shouldBe true
         }
 
@@ -114,7 +115,7 @@ class ListPageModelTests {
             val result = model.fetchMessagesWithCategories(false, emptyList()).getOrThrow()
 
             result.messages shouldBe messagesResponse.messages
-            result.categories shouldBe messagesResponse.meta.categories
+            result.categories shouldBe messagesResponse.meta.categories.map { Category(it.id, it.value) }
             result.isEndReached shouldBe false
         }
 
@@ -293,7 +294,7 @@ class ListPageModelTests {
             result.messages.size shouldBe 0
             result.messages shouldBe lastPageOfMessagesResponse.messages
             result.categories.size shouldBe 2
-            result.categories shouldBe lastPageOfMessagesResponse.meta.categories
+            result.categories shouldBe lastPageOfMessagesResponse.meta.categories.map { Category(it.id, it.value) }
             result.isEndReached shouldBe true
         }
 
@@ -323,7 +324,7 @@ class ListPageModelTests {
             val result = model.fetchNextPage().getOrThrow()
 
             result.messages shouldBe response.messages
-            result.categories shouldBe response.meta.categories
+            result.categories shouldBe response.meta.categories.map { Category(it.id, it.value) }
             result.isEndReached shouldBe false
         }
 
