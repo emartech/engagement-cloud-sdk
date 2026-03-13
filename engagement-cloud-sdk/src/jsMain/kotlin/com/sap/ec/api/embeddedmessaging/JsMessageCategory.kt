@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @OptIn(ExperimentalJsExport::class)
 @JsExport
-@JsName("MessageCategory")
+@JsName("Category")
 interface JsMessageCategory {
     val id: String
     val value: String
