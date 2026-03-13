@@ -30,18 +30,18 @@ class FetchJsBridgeStateTests {
 
     @Test
     fun active_shouldReturnSuccess_whenFetchAndVerifySucceeds() = runTest {
-        everySuspend { mockJsBridgeClient.validateJSBridge() } returns Result.success(Unit)
+        everySuspend { mockJsBridgeClient.fetchJSBridge() } returns Result.success(Unit)
 
         val result = state.active()
 
         result shouldBe Result.success(Unit)
-        verifySuspend { mockJsBridgeClient.validateJSBridge() }
+        verifySuspend { mockJsBridgeClient.fetchJSBridge() }
     }
 
     @Test
     fun active_shouldReturnFailure_whenFetchAndVerifyFails() = runTest {
         val error = Exception("fetch failed")
-        everySuspend { mockJsBridgeClient.validateJSBridge() } returns Result.failure(error)
+        everySuspend { mockJsBridgeClient.fetchJSBridge() } returns Result.failure(error)
 
         val result = state.active()
 

@@ -36,9 +36,9 @@ internal object InAppInjection {
         }
         single<ContentReplacerApi> {
             ContentReplacer(
-                sdkContext = get(),
                 sdkVersionProvider = get(),
-                jsBridgeVerifier = get()
+                jsBridgeVerifier = get(),
+                stringStorage = get()
             )
         }
         single<InAppDownloaderApi> {

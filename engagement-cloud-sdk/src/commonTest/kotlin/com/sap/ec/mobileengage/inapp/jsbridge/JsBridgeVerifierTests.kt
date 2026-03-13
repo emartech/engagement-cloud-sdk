@@ -39,67 +39,67 @@ class JsBridgeVerifierTests {
     }
 
     @Test
-    fun shouldInject_shouldReturnSuccess_true_whenMd5MatchesCache() = runTest {
+    fun verifyJsBridge_shouldReturnSuccess_true_whenMd5MatchesCache() = runTest {
         everySuspend { mockJsBridgeClient.fetchServerMd5() } returns Result.success(CACHED_MD5)
         every { mockStringStorage.get(StorageConstants.JS_BRIDGE_MD5_KEY) } returns CACHED_MD5
 
-        val result = verifier.shouldInjectJsBridge()
+        val result = verifier.verifyJsBridge()
 
-        result shouldBe Result.success(true)
+        result shouldBe Result.success(Unit)
     }
 
     @Test
-    fun shouldInject_shouldReDownload_whenMd5DoesNotMatchCache() = runTest {
+    fun verifyJsBridge_shouldReDownload_whenMd5DoesNotMatchCache() = runTest {
         everySuspend { mockJsBridgeClient.fetchServerMd5() } returns Result.success(CACHED_MD5)
         every { mockStringStorage.get(StorageConstants.JS_BRIDGE_MD5_KEY) } returns "differentMd5Hash"
-        everySuspend { mockJsBridgeClient.validateJSBridge() } returns Result.success(Unit)
+        everySuspend { mockJsBridgeClient.fetchJSBridge() } returns Result.success(Unit)
 
-        val result = verifier.shouldInjectJsBridge()
+        val result = verifier.verifyJsBridge()
 
-        result shouldBe Result.success(true)
-        verifySuspend { mockJsBridgeClient.validateJSBridge() }
+        result shouldBe Result.success(Unit)
+        verifySuspend { mockJsBridgeClient.fetchJSBridge() }
     }
 
     @Test
-    fun shouldInject_shouldReDownload_whenNoCachedMd5() = runTest {
+    fun verifyJsBridge_shouldReDownload_whenNoCachedMd5() = runTest {
         everySuspend { mockJsBridgeClient.fetchServerMd5() } returns Result.success(CACHED_MD5)
         every { mockStringStorage.get(StorageConstants.JS_BRIDGE_MD5_KEY) } returns null
-        everySuspend { mockJsBridgeClient.validateJSBridge() } returns Result.success(Unit)
+        everySuspend { mockJsBridgeClient.fetchJSBridge() } returns Result.success(Unit)
 
-        val result = verifier.shouldInjectJsBridge()
+        val result = verifier.verifyJsBridge()
 
-        result shouldBe Result.success(true)
-        verifySuspend { mockJsBridgeClient.validateJSBridge() }
+        result shouldBe Result.success(Unit)
+        verifySuspend { mockJsBridgeClient.fetchJSBridge() }
     }
 
     @Test
-    fun shouldInject_shouldReturnFailure_whenReDownloadFails() = runTest {
+    fun verifyJsBridge_shouldReturnFailure_whenReDownloadFails() = runTest {
         everySuspend { mockJsBridgeClient.fetchServerMd5() } returns Result.success(CACHED_MD5)
         every { mockStringStorage.get(StorageConstants.JS_BRIDGE_MD5_KEY) } returns "differentMd5Hash"
-        everySuspend { mockJsBridgeClient.validateJSBridge() } returns
+        everySuspend { mockJsBridgeClient.fetchJSBridge() } returns
             Result.failure(IllegalStateException("verification failed"))
 
-        val result = verifier.shouldInjectJsBridge()
+        val result = verifier.verifyJsBridge()
 
         result.isFailure shouldBe true
     }
 
     @Test
-    fun shouldInject_shouldReturnFailure_whenFetchServerMd5Fails() = runTest {
+    fun verifyJsBridge_shouldReturnFailure_whenFetchServerMd5Fails() = runTest {
         everySuspend { mockJsBridgeClient.fetchServerMd5() } returns
             Result.failure(Exception("network error"))
 
-        val result = verifier.shouldInjectJsBridge()
+        val result = verifier.verifyJsBridge()
 
         result.isFailure shouldBe true
     }
 
     @Test
-    fun shouldInject_shouldReturnFailure_whenNoGoogHashHeader() = runTest {
+    fun verifyJsBridge_shouldReturnFailure_whenNoGoogHashHeader() = runTest {
         everySuspend { mockJsBridgeClient.fetchServerMd5() } returns
             Result.failure(IllegalStateException("JsBridge HEAD response missing x-goog-hash MD5"))
 
-        val result = verifier.shouldInjectJsBridge()
+        val result = verifier.verifyJsBridge()
 
         result.isFailure shouldBe true
     }

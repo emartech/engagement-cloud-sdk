@@ -1,8 +1,9 @@
 package com.sap.ec.mobileengage.inapp.jsbridge
 
 import com.sap.ec.context.DefaultUrlsApi
-import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.providers.sdkversion.SdkVersionProviderApi
+import com.sap.ec.core.storage.StorageConstants
+import com.sap.ec.core.storage.StringStorageApi
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -23,57 +24,52 @@ class ContentReplacerTests {
 <head>
   <meta sdkVersion="$SDK_VERSION_PLACEHOLDER">
   $JS_BRIDGE_PLACEHOLDER</head></html>"""
-        const val TEST_JS_BRIDGE_HOST_URL = "https://example.com"
+        const val TEST_JS_BRIDGE = "function jsBridge() { /* bridge code */ }"
     }
 
     private lateinit var contentReplacer: ContentReplacerApi
     private lateinit var mockDefaultUrls: DefaultUrlsApi
     private lateinit var mockSdkVersionProvider: SdkVersionProviderApi
-    private lateinit var mockSdkContext: SdkContextApi
+    private lateinit var mockStringStorage: StringStorageApi
     private lateinit var mockJsBridgeVerifier: JsBridgeVerifierApi
 
     @BeforeTest
     fun setup() {
         mockDefaultUrls = mock(MockMode.autofill)
-        every { mockDefaultUrls.jsBridgeUrl } returns TEST_JS_BRIDGE_HOST_URL
-        mockSdkContext = mock(MockMode.autofill)
-        every { mockSdkContext.defaultUrls } returns mockDefaultUrls
+        every { mockDefaultUrls.jsBridgeUrl } returns TEST_JS_BRIDGE
+        mockStringStorage = mock(MockMode.autofill)
+        every { mockStringStorage.get(StorageConstants.JS_BRIDGE) } returns TEST_JS_BRIDGE
         mockSdkVersionProvider = mock(MockMode.autofill)
         every { mockSdkVersionProvider.provide() } returns TEST_SDK_VERSION
         mockJsBridgeVerifier = mock(MockMode.autofill)
-        everySuspend { mockJsBridgeVerifier.shouldInjectJsBridge() } returns Result.success(true)
+        everySuspend { mockJsBridgeVerifier.verifyJsBridge() } returns Result.success(Unit)
 
-        contentReplacer = ContentReplacer(mockSdkContext, mockSdkVersionProvider, mockJsBridgeVerifier)
+        contentReplacer = ContentReplacer(
+            mockSdkVersionProvider,
+            mockJsBridgeVerifier,
+            mockStringStorage
+        )
     }
 
     @Test
     fun replace_shouldAdd_scriptSrcTag_toTheContent_whenInjectionAllowed() = runTest {
-        everySuspend { mockJsBridgeVerifier.shouldInjectJsBridge() } returns Result.success(true)
+        everySuspend { mockJsBridgeVerifier.verifyJsBridge() } returns Result.success(Unit)
 
         val result = contentReplacer.replace(TEST_INAPP_CONTENT)
 
-        result.contains("<script src=\"$TEST_JS_BRIDGE_HOST_URL\"></script>") shouldBe true
-        result.contains(JS_BRIDGE_PLACEHOLDER) shouldBe false
-    }
-
-    @Test
-    fun replace_shouldRemovePlaceholder_whenInjectionDenied() = runTest {
-        everySuspend { mockJsBridgeVerifier.shouldInjectJsBridge() } returns Result.success(false)
-
-        val result = contentReplacer.replace(TEST_INAPP_CONTENT)
-
-        result.contains(TEST_JS_BRIDGE_HOST_URL) shouldBe false
+        result.contains("<script>$TEST_JS_BRIDGE</script>") shouldBe true
         result.contains(JS_BRIDGE_PLACEHOLDER) shouldBe false
     }
 
     @Test
     fun replace_shouldRemovePlaceholder_whenVerifierReturnsFailure() = runTest {
-        everySuspend { mockJsBridgeVerifier.shouldInjectJsBridge() } returns
+        everySuspend { mockJsBridgeVerifier.verifyJsBridge() } returns
             Result.failure(Exception("error"))
+        every { mockStringStorage.get(StorageConstants.JS_BRIDGE) } returns null
 
         val result = contentReplacer.replace(TEST_INAPP_CONTENT)
 
-        result.contains(TEST_JS_BRIDGE_HOST_URL) shouldBe false
+        result.contains(TEST_JS_BRIDGE) shouldBe false
         result.contains(JS_BRIDGE_PLACEHOLDER) shouldBe false
     }
 

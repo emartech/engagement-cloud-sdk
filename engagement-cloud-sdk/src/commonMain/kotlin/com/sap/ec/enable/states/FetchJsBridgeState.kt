@@ -15,7 +15,7 @@ internal class FetchJsBridgeState(
 
     override suspend fun active(): Result<Unit> {
         sdkLogger.debug("FetchJsBridgeState started")
-        return jsBridgeClient.validateJSBridge()
+        return jsBridgeClient.fetchJSBridge()
     }
 
     override fun relax() {

@@ -20,13 +20,13 @@ internal class JsBridgeClient(
     private val sdkLogger: Logger
 ) : JsBridgeClientApi {
 
-    override suspend fun validateJSBridge(): Result<Unit> {
-        val jsResponse = fetchResponse(sdkContext.defaultUrls.jsBridgeUrl).getOrElse {
+    override suspend fun fetchJSBridge(): Result<Unit> {
+        val jsBridgeResponse = fetchResponse(sdkContext.defaultUrls.jsBridgeUrl).getOrElse {
             sdkLogger.error("Failed to fetch JsBridge: ${it.message}")
             return Result.failure(it)
         }
 
-        if (isFeatureEnabled()) {
+        if (isSignatureCheckEnabled()) {
             val signatureResponse =
                 fetchResponse(sdkContext.defaultUrls.jsBridgeSignatureUrl).getOrElse {
                     sdkLogger.error("Failed to fetch JsBridge signature: ${it.message}")
@@ -34,7 +34,7 @@ internal class JsBridgeClient(
                 }
 
             val verified = runCatching {
-                crypto.verify(jsResponse.bodyAsText, signatureResponse.bodyAsText)
+                crypto.verify(jsBridgeResponse.bodyAsText, signatureResponse.bodyAsText)
             }.getOrElse {
                 sdkLogger.error("JsBridge crypto verification error: ${it.message}")
                 return Result.failure(it)
@@ -47,7 +47,13 @@ internal class JsBridgeClient(
             }
         }
 
-        val md5 = parseMd5FromGoogHash(jsResponse.headers)
+        val jsBody = jsBridgeResponse.bodyAsText
+        if (jsBody.isNotEmpty()) {
+            stringStorage.put(StorageConstants.JS_BRIDGE, jsBody)
+            sdkLogger.debug("JsBridge body cached")
+        }
+
+        val md5 = parseMd5FromGoogHash(jsBridgeResponse.headers)
         stringStorage.put(StorageConstants.JS_BRIDGE_MD5_KEY, md5)
         sdkLogger.debug("JsBridge fetched and hash cached")
         return Result.success(Unit)
@@ -70,7 +76,7 @@ internal class JsBridgeClient(
         return Result.success(md5)
     }
 
-    private fun isFeatureEnabled(): Boolean {
+    private fun isSignatureCheckEnabled(): Boolean {
         return sdkContext.features.contains(Features.JsBridgeSignatureCheck)
     }
 

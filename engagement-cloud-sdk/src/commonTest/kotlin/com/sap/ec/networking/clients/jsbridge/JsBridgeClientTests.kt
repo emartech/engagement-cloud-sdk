@@ -18,6 +18,7 @@ import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.verify
+import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import io.ktor.http.HttpMethod
@@ -90,10 +91,8 @@ class JsBridgeClientTests {
         )
     }
 
-    // --- Feature ON tests ---
-
     @Test
-    fun testValidateJSBridge_shouldReturnSuccess_andCacheMd5_whenVerificationSucceeds() = runTest {
+    fun testFetchJSBridge_shouldReturnSuccess_andCacheMd5_whenVerificationSucceeds() = runTest {
         everySuspend { mockNetworkClient.send(any()) } sequentially {
             returns(Result.success(createResponse(JS_CONTENT, googHashHeader = "crc32c=abc, md5=$SERVER_MD5")))
             returns(Result.success(createResponse(SIGNATURE)))
@@ -101,14 +100,14 @@ class JsBridgeClientTests {
         everySuspend { mockCrypto.verify(JS_CONTENT, SIGNATURE) } returns true
         every { mockStringStorage.put(any(), any<String>()) } returns Unit
 
-        val result = jsBridgeClient.validateJSBridge()
+        val result = jsBridgeClient.fetchJSBridge()
 
         result.isSuccess shouldBe true
         verify { mockStringStorage.put(StorageConstants.JS_BRIDGE_MD5_KEY, SERVER_MD5) }
     }
 
     @Test
-    fun testValidateJSBridge_shouldReturnSuccess_andCacheNull_whenHeaderMissing() = runTest {
+    fun testFetchJSBridge_shouldReturnSuccess_andCacheNull_whenHeaderMissing() = runTest {
         everySuspend { mockNetworkClient.send(any()) } sequentially {
             returns(Result.success(createResponse(JS_CONTENT)))
             returns(Result.success(createResponse(SIGNATURE)))
@@ -116,14 +115,14 @@ class JsBridgeClientTests {
         everySuspend { mockCrypto.verify(JS_CONTENT, SIGNATURE) } returns true
         every { mockStringStorage.put(any(), any<String?>()) } returns Unit
 
-        val result = jsBridgeClient.validateJSBridge()
+        val result = jsBridgeClient.fetchJSBridge()
 
         result.isSuccess shouldBe true
         verify { mockStringStorage.put(StorageConstants.JS_BRIDGE_MD5_KEY, null) }
     }
 
     @Test
-    fun testValidateJSBridge_shouldReturnFailure_andClearHash_whenVerificationFails() = runTest {
+    fun testFetchJSBridge_shouldReturnFailure_andClearHash_whenVerificationFails() = runTest {
         everySuspend { mockNetworkClient.send(any()) } sequentially {
             returns(Result.success(createResponse(JS_CONTENT, googHashHeader = "md5=$SERVER_MD5")))
             returns(Result.success(createResponse(SIGNATURE)))
@@ -131,36 +130,36 @@ class JsBridgeClientTests {
         everySuspend { mockCrypto.verify(JS_CONTENT, SIGNATURE) } returns false
         every { mockStringStorage.put(any(), any<String?>()) } returns Unit
 
-        val result = jsBridgeClient.validateJSBridge()
+        val result = jsBridgeClient.fetchJSBridge()
 
         result.isFailure shouldBe true
         verify { mockStringStorage.put(StorageConstants.JS_BRIDGE_MD5_KEY, null) }
     }
 
     @Test
-    fun testValidateJSBridge_shouldReturnFailure_whenJsFetchFails() = runTest {
+    fun testFetchJSBridge_shouldReturnFailure_whenJsFetchFails() = runTest {
         everySuspend { mockNetworkClient.send(any()) } returns
             Result.failure(Exception("network error"))
 
-        val result = jsBridgeClient.validateJSBridge()
+        val result = jsBridgeClient.fetchJSBridge()
 
         result.isFailure shouldBe true
     }
 
     @Test
-    fun testValidateJSBridge_shouldReturnFailure_whenSignatureFetchFails() = runTest {
+    fun testFetchJSBridge_shouldReturnFailure_whenSignatureFetchFails() = runTest {
         everySuspend { mockNetworkClient.send(any()) } sequentially {
             returns(Result.success(createResponse(JS_CONTENT, googHashHeader = "md5=$SERVER_MD5")))
             returns(Result.failure(Exception("signature download error")))
         }
 
-        val result = jsBridgeClient.validateJSBridge()
+        val result = jsBridgeClient.fetchJSBridge()
 
         result.isFailure shouldBe true
     }
 
     @Test
-    fun testValidateJSBridge_shouldParseMd5Only_fromGoogHashHeader() = runTest {
+    fun testFetchJSBridge_shouldParseMd5Only_fromGoogHashHeader() = runTest {
         everySuspend { mockNetworkClient.send(any()) } sequentially {
             returns(Result.success(createResponse(JS_CONTENT, googHashHeader = "md5=$SERVER_MD5")))
             returns(Result.success(createResponse(SIGNATURE)))
@@ -168,13 +167,13 @@ class JsBridgeClientTests {
         everySuspend { mockCrypto.verify(JS_CONTENT, SIGNATURE) } returns true
         every { mockStringStorage.put(any(), any<String>()) } returns Unit
 
-        jsBridgeClient.validateJSBridge()
+        jsBridgeClient.fetchJSBridge()
 
         verify { mockStringStorage.put(StorageConstants.JS_BRIDGE_MD5_KEY, SERVER_MD5) }
     }
 
     @Test
-    fun testValidateJSBridge_shouldParseMd5_whenGoogHashReturnedAsSeparateHeaders() = runTest {
+    fun testFetchJSBridge_shouldParseMd5_whenGoogHashReturnedAsSeparateHeaders() = runTest {
         everySuspend { mockNetworkClient.send(any()) } sequentially {
             returns(Result.success(createResponse(JS_CONTENT, googHashHeaders = listOf("crc32c=abc", "md5=$SERVER_MD5"))))
             returns(Result.success(createResponse(SIGNATURE)))
@@ -182,67 +181,124 @@ class JsBridgeClientTests {
         everySuspend { mockCrypto.verify(JS_CONTENT, SIGNATURE) } returns true
         every { mockStringStorage.put(any(), any<String>()) } returns Unit
 
-        val result = jsBridgeClient.validateJSBridge()
+        val result = jsBridgeClient.fetchJSBridge()
 
         result.isSuccess shouldBe true
         verify { mockStringStorage.put(StorageConstants.JS_BRIDGE_MD5_KEY, SERVER_MD5) }
     }
 
-    // --- Feature OFF tests ---
-
     @Test
-    fun testValidateJSBridge_shouldFetchJsOnly_whenFeatureIsOff() = runTest {
+    fun testFetchJSBridge_shouldFetchJsOnly_whenFeatureIsOff() = runTest {
         every { mockSdkContext.features } returns mutableSetOf()
         everySuspend { mockNetworkClient.send(any()) } returns
             Result.success(createResponse(JS_CONTENT, googHashHeader = "md5=$SERVER_MD5"))
         every { mockStringStorage.put(any(), any<String>()) } returns Unit
 
-        val result = jsBridgeClient.validateJSBridge()
+        val result = jsBridgeClient.fetchJSBridge()
 
         result.isSuccess shouldBe true
-        verifySuspend(dev.mokkery.verify.VerifyMode.exactly(1)) {
+        verifySuspend(VerifyMode.exactly(1)) {
             mockNetworkClient.send(any())
         }
     }
 
     @Test
-    fun testValidateJSBridge_shouldNotVerifySignature_whenFeatureIsOff() = runTest {
+    fun testFetchJSBridge_shouldNotVerifySignature_whenFeatureIsOff() = runTest {
         every { mockSdkContext.features } returns mutableSetOf()
         everySuspend { mockNetworkClient.send(any()) } returns
             Result.success(createResponse(JS_CONTENT, googHashHeader = "md5=$SERVER_MD5"))
         every { mockStringStorage.put(any(), any<String>()) } returns Unit
 
-        jsBridgeClient.validateJSBridge()
+        jsBridgeClient.fetchJSBridge()
 
-        verifySuspend(dev.mokkery.verify.VerifyMode.exactly(0)) {
+        verifySuspend(VerifyMode.exactly(0)) {
             mockCrypto.verify(any(), any())
         }
     }
 
     @Test
-    fun testValidateJSBridge_shouldCacheMd5_whenFeatureIsOff() = runTest {
+    fun testFetchJSBridge_shouldCacheMd5_whenFeatureIsOff() = runTest {
         every { mockSdkContext.features } returns mutableSetOf()
         everySuspend { mockNetworkClient.send(any()) } returns
             Result.success(createResponse(JS_CONTENT, googHashHeader = "md5=$SERVER_MD5"))
         every { mockStringStorage.put(any(), any<String>()) } returns Unit
 
-        jsBridgeClient.validateJSBridge()
+        jsBridgeClient.fetchJSBridge()
 
         verify { mockStringStorage.put(StorageConstants.JS_BRIDGE_MD5_KEY, SERVER_MD5) }
     }
 
     @Test
-    fun testValidateJSBridge_shouldReturnFailure_whenFeatureIsOff_andJsFetchFails() = runTest {
+    fun testFetchJSBridge_shouldReturnFailure_whenFeatureIsOff_andJsFetchFails() = runTest {
         every { mockSdkContext.features } returns mutableSetOf()
         everySuspend { mockNetworkClient.send(any()) } returns
             Result.failure(Exception("network error"))
 
-        val result = jsBridgeClient.validateJSBridge()
+        val result = jsBridgeClient.fetchJSBridge()
 
         result.isFailure shouldBe true
     }
 
-    // --- fetchServerMd5 tests ---
+    @Test
+    fun testFetchJSBridge_shouldCacheJsBody_whenBodyIsNotEmpty() = runTest {
+        everySuspend { mockNetworkClient.send(any()) } sequentially {
+            returns(Result.success(createResponse(JS_CONTENT, googHashHeader = "md5=$SERVER_MD5")))
+            returns(Result.success(createResponse(SIGNATURE)))
+        }
+        everySuspend { mockCrypto.verify(JS_CONTENT, SIGNATURE) } returns true
+
+        jsBridgeClient.fetchJSBridge()
+
+        verify { mockStringStorage.put(StorageConstants.JS_BRIDGE, JS_CONTENT) }
+    }
+
+    @Test
+    fun testFetchJSBridge_shouldNotCacheJsBody_whenBodyIsEmpty() = runTest {
+        everySuspend { mockNetworkClient.send(any()) } sequentially {
+            returns(Result.success(createResponse("", googHashHeader = "md5=$SERVER_MD5")))
+            returns(Result.success(createResponse(SIGNATURE)))
+        }
+        everySuspend { mockCrypto.verify("", SIGNATURE) } returns true
+
+        jsBridgeClient.fetchJSBridge()
+
+        verify(VerifyMode.exactly(0)) { mockStringStorage.put(StorageConstants.JS_BRIDGE, any<String>()) }
+    }
+
+    @Test
+    fun testFetchJSBridge_shouldCacheJsBody_whenFeatureIsOff_andBodyIsNotEmpty() = runTest {
+        every { mockSdkContext.features } returns mutableSetOf()
+        everySuspend { mockNetworkClient.send(any()) } returns
+            Result.success(createResponse(JS_CONTENT, googHashHeader = "md5=$SERVER_MD5"))
+
+        jsBridgeClient.fetchJSBridge()
+
+        verify { mockStringStorage.put(StorageConstants.JS_BRIDGE, JS_CONTENT) }
+    }
+
+    @Test
+    fun testFetchJSBridge_shouldNotCacheJsBody_whenBodyIsEmpty_andFeatureIsOff() = runTest {
+        every { mockSdkContext.features } returns mutableSetOf()
+        everySuspend { mockNetworkClient.send(any()) } returns
+            Result.success(createResponse("", googHashHeader = "md5=$SERVER_MD5"))
+
+        jsBridgeClient.fetchJSBridge()
+
+        verify(VerifyMode.exactly(0)) { mockStringStorage.put(StorageConstants.JS_BRIDGE, any<String>()) }
+    }
+
+    @Test
+    fun testFetchJSBridge_shouldNotCacheJsBody_whenVerificationFails() = runTest {
+        everySuspend { mockNetworkClient.send(any()) } sequentially {
+            returns(Result.success(createResponse(JS_CONTENT, googHashHeader = "md5=$SERVER_MD5")))
+            returns(Result.success(createResponse(SIGNATURE)))
+        }
+        everySuspend { mockCrypto.verify(JS_CONTENT, SIGNATURE) } returns false
+
+        jsBridgeClient.fetchJSBridge()
+
+        verify(VerifyMode.exactly(0)) { mockStringStorage.put(StorageConstants.JS_BRIDGE, any<String>()) }
+    }
 
     @Test
     fun fetchServerMd5_shouldReturnMd5_whenHeaderPresent() = runTest {

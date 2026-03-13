@@ -11,7 +11,7 @@ internal class JsBridgeVerifier(
     private val sdkLogger: Logger
 ) : JsBridgeVerifierApi {
 
-    override suspend fun shouldInjectJsBridge(): Result<Boolean> {
+    override suspend fun verifyJsBridge(): Result<Unit> {
         val serverMd5 = jsBridgeClient.fetchServerMd5().getOrElse {
             sdkLogger.error("JsBridge server MD5 fetch failed: ${it.message}")
             return Result.failure(it)
@@ -21,15 +21,15 @@ internal class JsBridgeVerifier(
 
         if (cachedMd5 != null && cachedMd5 == serverMd5) {
             sdkLogger.debug("JsBridge MD5 matched, skipping download")
-            return Result.success(true)
+            return Result.success(Unit)
         }
 
         sdkLogger.debug("JsBridge MD5 mismatch or no cached MD5, re-downloading")
-        jsBridgeClient.validateJSBridge().getOrElse {
+        jsBridgeClient.fetchJSBridge().getOrElse {
             sdkLogger.error("JsBridge re-download failed: ${it.message}")
             return Result.failure(it)
         }
 
-        return Result.success(true)
+        return Result.success(Unit)
     }
 }

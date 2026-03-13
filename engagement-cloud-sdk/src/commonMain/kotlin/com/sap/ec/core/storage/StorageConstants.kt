@@ -5,8 +5,9 @@ internal object StorageConstants {
     const val CACHE_DIR_NAME = "engagement_cloud_sdk_cache"
     const val SUITE_NAME = "sap-sdk"
 
-    const val WRAPPER_INFO_KEY = "wrapper_info"
-    const val JS_BRIDGE_MD5_KEY = "js_bridge_md5"
+    const val WRAPPER_INFO_KEY = "SAPEngagementCloudSdkWrapperInfo"
+    const val JS_BRIDGE_MD5_KEY = "SAPEngagementCloudSdkJSBridgeMD5"
+    const val JS_BRIDGE = "SAPEngagementCloudSdkJSBridge"
 
     const val SDK_CONFIG_STORAGE_KEY = "SAPEngagementCloudSdkConfig"
     const val CLIENT_ID_STORAGE_KEY = "SAPEngagementCloudSdkClientId"
