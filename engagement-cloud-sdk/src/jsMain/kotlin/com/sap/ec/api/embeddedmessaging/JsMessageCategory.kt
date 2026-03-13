@@ -1,6 +1,6 @@
 package com.sap.ec.api.embeddedmessaging
 
-import com.sap.ec.networking.clients.embedded.messaging.model.MessageCategory
+import com.sap.ec.networking.clients.embedded.messaging.model.Category
 import kotlinx.serialization.Serializable
 
 @OptIn(ExperimentalJsExport::class)
@@ -17,10 +17,10 @@ internal data class JSApiMessageCategory(
     override val value: String
 ) : JsMessageCategory
 
-internal fun JsMessageCategory.toMessageCategory(): MessageCategory {
-    return MessageCategory(id, value)
+internal fun JsMessageCategory.toCategory(): Category {
+    return Category(id, value)
 }
 
-internal fun MessageCategory.toJsApiMessageCategory(): JSApiMessageCategory {
-    return JSApiMessageCategory(id, value)
+internal fun Category.toJsApiCategory(): JSApiMessageCategory {
+    return JSApiMessageCategory(id, text)
 }

@@ -12,7 +12,6 @@ import com.sap.ec.mobileengage.action.models.ActionModel
 import com.sap.ec.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
 import com.sap.ec.networking.clients.embedded.messaging.model.Category
-import com.sap.ec.networking.clients.embedded.messaging.model.Category
 import com.sap.ec.watchdog.connection.ConnectionWatchDog
 import dev.mokkery.MockMode
 import dev.mokkery.answering.calls

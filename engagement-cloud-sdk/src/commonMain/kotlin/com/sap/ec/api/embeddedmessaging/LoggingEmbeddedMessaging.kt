@@ -3,7 +3,7 @@ package com.sap.ec.api.embeddedmessaging
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.log.LogEntry
 import com.sap.ec.core.log.Logger
-import com.sap.ec.networking.clients.embedded.messaging.model.MessageCategory
+import com.sap.ec.networking.clients.embedded.messaging.model.Category
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -11,7 +11,7 @@ internal class LoggingEmbeddedMessaging(
     private val sdkContext: SdkContextApi,
     private val logger: Logger
 ) : EmbeddedMessagingInstance {
-    override val categories: List<MessageCategory>
+    override val categories: List<Category>
         get() {
             val entry = LogEntry.createMethodNotAllowed<LoggingEmbeddedMessaging>(
                 this, this::categories.name
@@ -31,7 +31,7 @@ internal class LoggingEmbeddedMessaging(
             }
             return false
         }
-    override val activeCategoryFilters: Set<MessageCategory>
+    override val activeCategoryFilters: Set<Category>
         get() {
             val entry = LogEntry.createMethodNotAllowed<LoggingEmbeddedMessaging>(
                 this, this::activeCategoryFilters.name
@@ -51,7 +51,7 @@ internal class LoggingEmbeddedMessaging(
         }
     }
 
-    override fun filterByCategories(categories: Set<MessageCategory>) {
+    override fun filterByCategories(categories: Set<Category>) {
         val entry = LogEntry.createMethodNotAllowed<LoggingEmbeddedMessaging>(
             this, this::filterByCategories.name
         )

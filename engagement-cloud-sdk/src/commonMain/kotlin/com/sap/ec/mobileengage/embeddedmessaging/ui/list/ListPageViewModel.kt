@@ -9,7 +9,7 @@ import com.sap.ec.core.providers.platform.PlatformCategoryProviderApi
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
-import com.sap.ec.networking.clients.embedded.messaging.model.MessageCategory
+import com.sap.ec.networking.clients.embedded.messaging.model.Category
 import com.sap.ec.watchdog.connection.ConnectionWatchDog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -40,9 +40,9 @@ internal class ListPageViewModel(
     platformCategoryProvider: PlatformCategoryProviderApi,
     inputModeProvider: InputModeProviderApi,
     sdkEventDistributor: SdkEventDistributorApi,
-    private val _categories: MutableStateFlow<List<MessageCategory>>
+    private val _categories: MutableStateFlow<List<Category>>
 ) : ListPageViewModelApi {
-    override val categories: StateFlow<List<MessageCategory>> = _categories.asStateFlow()
+    override val categories: StateFlow<List<Category>> = _categories.asStateFlow()
 
     private val _filterUnopenedOnly = MutableStateFlow(false)
     override val filterUnopenedOnly: StateFlow<Boolean> = _filterUnopenedOnly.asStateFlow()

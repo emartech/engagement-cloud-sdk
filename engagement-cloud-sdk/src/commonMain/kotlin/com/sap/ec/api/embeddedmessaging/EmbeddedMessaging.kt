@@ -3,7 +3,7 @@ package com.sap.ec.api.embeddedmessaging
 import com.sap.ec.api.Activatable
 import com.sap.ec.api.generic.GenericApi
 import com.sap.ec.context.SdkContextApi
-import com.sap.ec.networking.clients.embedded.messaging.model.MessageCategory
+import com.sap.ec.networking.clients.embedded.messaging.model.Category
 
 internal interface EmbeddedMessagingInstance : EmbeddedMessagingInternalApi, Activatable
 
@@ -19,18 +19,18 @@ internal class EmbeddedMessaging<Logging : EmbeddedMessagingInstance, Gatherer :
     sdkContext
 ), EmbeddedMessagingApi {
 
-    override val categories: List<MessageCategory>
+    override val categories: List<Category>
         get() = activeInstance<EmbeddedMessagingInternalApi>().categories
     override val isUnreadFilterActive: Boolean
         get() = activeInstance<EmbeddedMessagingInternalApi>().isUnreadFilterActive
-    override val activeCategoryFilters: List<MessageCategory>
+    override val activeCategoryFilters: List<Category>
         get() = activeInstance<EmbeddedMessagingInternalApi>().activeCategoryFilters.toList()
 
     override fun filterUnreadOnly(filterUnreadOnly: Boolean) {
         activeInstance<EmbeddedMessagingInternalApi>().filterUnreadOnly(filterUnreadOnly)
     }
 
-    override fun filterByCategories(categories: List<MessageCategory>) {
+    override fun filterByCategories(categories: List<Category>) {
         activeInstance<EmbeddedMessagingInternalApi>().filterByCategories(categories.toSet())
     }
 }

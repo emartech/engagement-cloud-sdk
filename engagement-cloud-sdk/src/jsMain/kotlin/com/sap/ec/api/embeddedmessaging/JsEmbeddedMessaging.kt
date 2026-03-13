@@ -4,7 +4,7 @@ package com.sap.ec.api.embeddedmessaging
 internal class JsEmbeddedMessaging(private val embeddedMessaging: EmbeddedMessagingApi) :
     JsEmbeddedMessagingApi {
     override fun getCategories(): Array<JsMessageCategory> {
-        return embeddedMessaging.categories.map { JSApiMessageCategory(it.id, it.value) }.toJsArray()
+        return embeddedMessaging.categories.map { JSApiMessageCategory(it.id, it.text) }.toJsArray()
     }
 
     override fun isUnreadFilterActive(): Boolean {
@@ -12,7 +12,7 @@ internal class JsEmbeddedMessaging(private val embeddedMessaging: EmbeddedMessag
     }
 
     override fun getActiveCategoryFilters(): Array<JsMessageCategory> {
-        return embeddedMessaging.activeCategoryFilters.map { it.toJsApiMessageCategory() }
+        return embeddedMessaging.activeCategoryFilters.map { it.toJsApiCategory() }
             .toJsArray()
     }
 
@@ -21,6 +21,6 @@ internal class JsEmbeddedMessaging(private val embeddedMessaging: EmbeddedMessag
     }
 
     override fun filterByCategories(categories: Array<JsMessageCategory>) {
-        embeddedMessaging.filterByCategories(categories.toList().map { it.toMessageCategory() })
+        embeddedMessaging.filterByCategories(categories.toList().map { it.toCategory() })
     }
 }

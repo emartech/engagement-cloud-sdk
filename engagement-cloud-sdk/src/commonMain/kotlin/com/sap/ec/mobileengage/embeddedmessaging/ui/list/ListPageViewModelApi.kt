@@ -1,15 +1,14 @@
 package com.sap.ec.mobileengage.embeddedmessaging.ui.list
 
 import androidx.paging.PagingData
-import com.sap.ec.InternalSdkApi
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
-import com.sap.ec.networking.clients.embedded.messaging.model.MessageCategory
+import com.sap.ec.networking.clients.embedded.messaging.model.Category
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 internal interface ListPageViewModelApi {
     val messagePagingDataFlowFiltered: Flow<PagingData<MessageItemViewModelApi>>
-    val categories: StateFlow<List<MessageCategory>>
+    val categories: StateFlow<List<Category>>
 
     val filterUnopenedOnly: StateFlow<Boolean>
     val selectedCategoryIds: StateFlow<Set<String>>

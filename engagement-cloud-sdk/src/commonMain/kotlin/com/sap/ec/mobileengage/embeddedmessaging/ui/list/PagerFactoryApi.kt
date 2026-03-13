@@ -2,7 +2,7 @@ package com.sap.ec.mobileengage.embeddedmessaging.ui.list
 
 import androidx.paging.PagingData
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
-import com.sap.ec.networking.clients.embedded.messaging.model.MessageCategory
+import com.sap.ec.networking.clients.embedded.messaging.model.Category
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -10,6 +10,6 @@ internal interface PagerFactoryApi {
     fun create(
         filterUnopenedOnly: Boolean,
         selectedCategoryIds: List<String>,
-        categories: MutableStateFlow<List<MessageCategory>>
+        categories: MutableStateFlow<List<Category>>
     ): Flow<PagingData<MessageItemViewModelApi>>
 }
