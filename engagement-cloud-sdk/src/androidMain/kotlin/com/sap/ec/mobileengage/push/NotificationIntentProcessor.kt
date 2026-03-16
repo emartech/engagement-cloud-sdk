@@ -33,9 +33,6 @@ internal class NotificationIntentProcessor(
     private val sdkLogger: Logger
 ) {
     fun processIntent(intent: Intent?) {
-        // SDK setup is implicitly guarded by applicationScope: if the SDK is not initialized,
-        // applicationScope is cancelled and this coroutine launch will not execute.
-
         if (intent != null) {
             applicationScope.launch {
                 val triggeredActionModel = getActionModel(intent)
