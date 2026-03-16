@@ -592,7 +592,7 @@ internal fun EmptyDetailState() {
     Div({
         classes(EmbeddedMessagingStyleSheet.emptyStateContainer)
     }) {
-        Text("Select an item to view details")
+        Text(LocalStringResources.current.detailedMessageEmptyStateText)
     }
 }
 
