@@ -72,12 +72,14 @@ else
 fi
 
 # 6. Unused secrets removed from env block
+SECRET_ERRORS=0
 for SECRET in OSSRH_USERNAME OSSRH_PASSWORD SONATYPE_STAGING_PROFILE_ID SONATYPE_SIGNING_KEY_ID SONATYPE_SIGNING_PASSWORD SONATYPE_SIGNING_SECRET_KEY_RING_FILE DETECT_LATEST_RELEASE_VERSION DETECT_PROJECT_USER_GROUPS DETECT_PROJECT_VERSION_DISTRIBUTION BLACKDUCK_ACCESS_TOKEN BLACKDUCK_URL ANDROID_RELEASE_KEY_PASSWORD ANDROID_RELEASE_KEY_ALIAS ANDROID_RELEASE_STORE_PASSWORD ANDROID_RELEASE_STORE_FILE_BASE64; do
   if grep -q "$SECRET" "$WORKFLOW"; then
     fail "Unused secret $SECRET should be removed from env block"
+    SECRET_ERRORS=$((SECRET_ERRORS + 1))
   fi
 done
-if [ $ERRORS -eq 0 ]; then
+if [ $SECRET_ERRORS -eq 0 ]; then
   pass "All unused secrets removed from env block"
 fi
 
@@ -111,12 +113,8 @@ else
 fi
 
 # 11. Slack messages reference E2E
-if grep -q -i 'e2e' "$WORKFLOW" | grep -q 'message'; then
+if grep -i 'message:' "$WORKFLOW" | grep -qi 'e2e'; then
   pass "Slack messages reference E2E status"
-fi
-# More lenient check -- just verify E2E is mentioned in context of reporting
-if grep -A2 'message:' "$WORKFLOW" | grep -qi 'e2e'; then
-  pass "Slack messages mention E2E"
 else
   fail "Slack messages should mention E2E dispatch status"
 fi
