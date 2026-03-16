@@ -51,7 +51,7 @@ internal open class PushInternal(
     }
 
     override suspend fun getPushToken(): String? {
-        return storage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) // ?: storage.get(PUSH_TOKEN_STORAGE_KEY) // todo check
+        return storage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY)
     }
 
     override suspend fun activate() {
