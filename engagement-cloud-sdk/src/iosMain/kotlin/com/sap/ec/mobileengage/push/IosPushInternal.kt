@@ -117,7 +117,6 @@ internal class IosPushInternal(
             actionFactory.create(it).invoke()
         }
 
-        //TODO: revisit what we want to send in attributes after API discovery
         sdkEventDistributor.registerPublicEvent(
             AppEvent(
                 id = uuidProvider.provide(),
