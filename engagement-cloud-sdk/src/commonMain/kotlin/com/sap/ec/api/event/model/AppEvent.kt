@@ -35,35 +35,3 @@ data class AppEvent(
     val payload: Map<String, Any>? = null,
     override val type: EventType = EventType.APP_EVENT
 ) : EngagementCloudEvent()
-
-internal object AppEventSerializer : KSerializer<AppEvent> {
-    override val descriptor: SerialDescriptor =
-        buildClassSerialDescriptor("AppEvent") {
-            element<String>("id")
-            element<String>("name")
-            element<JsonObject?>("payload", isOptional = true)
-            element<String>("type")
-        }
-
-    override fun deserialize(decoder: Decoder): AppEvent {
-        val jsonObject = decoder.decodeSerializableValue(JsonObject.Companion.serializer())
-        return AppEvent(
-            id = jsonObject["id"]?.jsonPrimitive?.content!!,
-            name = jsonObject["name"]?.jsonPrimitive?.content!!,
-            payload = jsonObject["payload"]?.jsonObject?.toMap(),
-            type = EventType.fromValue(jsonObject["type"]?.jsonPrimitive?.content!!)
-        )
-    }
-
-    override fun serialize(encoder: Encoder, value: AppEvent) {
-        val jsonObject = buildJsonObject {
-            put("id", JsonPrimitive(value.id))
-            put("name", JsonPrimitive(value.name))
-            value.payload?.let { attributes ->
-                put("payload", attributes.toJsonObject())
-            }
-            put("type", JsonPrimitive(value.type.value))
-        }
-        encoder.encodeSerializableValue(JsonObject.Companion.serializer(), jsonObject)
-    }
-}
