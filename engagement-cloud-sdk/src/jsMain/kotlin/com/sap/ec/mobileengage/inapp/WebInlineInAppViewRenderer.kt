@@ -15,7 +15,6 @@ internal class WebInlineInAppViewRenderer : InlineInAppViewRendererApi {
         val webViewElement = holder.asDynamic().webView as? HTMLElement
         val containerId = remember { "ems-inline-inapp-container-${js("Date.now()")}" }
 
-        //TODO: Why DisposableEffect why not LaunchedEffect?
         DisposableEffect(holder) {
             webViewElement?.let { webView ->
                 val container = document.createElement("div") as HTMLElement
