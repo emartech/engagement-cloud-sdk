@@ -3,6 +3,7 @@ package com.sap.ec.mobileengage.push
 import com.sap.ec.SdkConstants.SILENT_PUSH_RECEIVED_EVENT_NAME
 import com.sap.ec.api.SdkState
 import com.sap.ec.api.event.model.AppEvent
+import com.sap.ec.api.event.model.EventSource
 import com.sap.ec.api.push.NotificationCenterDelegateRegistration
 import com.sap.ec.api.push.NotificationCenterDelegateRegistrationOptions
 import com.sap.ec.api.push.PushCall.ClearPushToken
@@ -120,7 +121,8 @@ internal class IosPushInternal(
         sdkEventDistributor.registerPublicEvent(
             AppEvent(
                 id = uuidProvider.provide(),
-                name = SILENT_PUSH_RECEIVED_EVENT_NAME
+                name = SILENT_PUSH_RECEIVED_EVENT_NAME,
+                source = EventSource.Push
             )
         )
     }

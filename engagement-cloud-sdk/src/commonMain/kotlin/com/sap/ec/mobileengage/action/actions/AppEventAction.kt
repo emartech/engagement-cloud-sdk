@@ -11,12 +11,12 @@ internal class AppEventAction(
     private val action: AppEventActionModel,
     private val sdkEventDistributor: SdkEventDistributorApi
 ) : Action<SdkEvent> {
-    //TODO we should add the source!!
     override suspend fun invoke(value: SdkEvent?) {
         sdkEventDistributor.registerPublicEvent(
             AppEvent(
                 name = action.name,
-                payload = action.payload
+                payload = action.payload,
+                source = action.source
             )
         )
     }

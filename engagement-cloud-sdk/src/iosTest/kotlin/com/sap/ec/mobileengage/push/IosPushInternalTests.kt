@@ -4,6 +4,7 @@ import com.sap.ec.SdkConstants.SILENT_PUSH_RECEIVED_EVENT_NAME
 import com.sap.ec.TestEngagementCloudSDKConfig
 import com.sap.ec.api.SdkState
 import com.sap.ec.api.event.model.AppEvent
+import com.sap.ec.api.event.model.EventSource
 import com.sap.ec.api.push.Ems
 import com.sap.ec.api.push.NotificationCenterDelegateRegistration
 import com.sap.ec.api.push.NotificationCenterDelegateRegistrationOptions
@@ -520,7 +521,8 @@ internal class IosPushInternalTests {
             mockSdkEventDistributor.registerPublicEvent(
                 AppEvent(
                     id = UUID,
-                    name = SILENT_PUSH_RECEIVED_EVENT_NAME
+                    name = SILENT_PUSH_RECEIVED_EVENT_NAME,
+                    source = EventSource.Push
                 )
             )
         }

@@ -1,5 +1,6 @@
 package com.sap.ec.mobileengage.push.mapper
 
+import com.sap.ec.api.event.model.EventSource
 import com.sap.ec.mobileengage.action.models.BadgeCount
 import com.sap.ec.mobileengage.action.models.BadgeCountMethod
 import com.sap.ec.mobileengage.action.models.BasicAppEventActionModel
@@ -91,7 +92,8 @@ class SilentAndroidPushV2MapperTest {
                         name = "testEvent",
                         payload = buildMap {
                             put("key", "value")
-                        }
+                        },
+                        source = EventSource.Push
                     )
                 )
             )

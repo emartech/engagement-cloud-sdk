@@ -1,5 +1,6 @@
 package com.sap.ec.mobileengage.push.mappers
 
+import com.sap.ec.api.event.model.EventSource
 import com.sap.ec.core.log.ConsoleLogger
 import com.sap.ec.mobileengage.action.models.BadgeCount
 import com.sap.ec.mobileengage.action.models.BadgeCountMethod
@@ -119,7 +120,8 @@ class PushMessageWebV2MapperTests {
                         REPORTING2,
                         ACTION_TITLE,
                         ACTION_NAME,
-                        mapOf("actionPayloadKey" to "actionPayloadValue")
+                        mapOf("actionPayloadKey" to "actionPayloadValue"),
+                        source = EventSource.Push
                     )
                 )
             ),

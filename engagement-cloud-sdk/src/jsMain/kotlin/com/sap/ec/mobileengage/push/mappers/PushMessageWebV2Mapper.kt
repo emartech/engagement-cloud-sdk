@@ -1,10 +1,14 @@
 package com.sap.ec.mobileengage.push.mappers
 
 import com.sap.ec.InternalSdkApi
+import com.sap.ec.api.event.model.EventSource
 import com.sap.ec.core.log.ConsoleLogger
 import com.sap.ec.core.log.LogLevel
 import com.sap.ec.core.mapper.Mapper
+import com.sap.ec.mobileengage.action.models.BasicAppEventActionModel
 import com.sap.ec.mobileengage.action.models.PresentableActionModel
+import com.sap.ec.mobileengage.action.models.addAppEventSource
+import com.sap.ec.mobileengage.action.models.addSource
 import com.sap.ec.mobileengage.inapp.networking.models.PushToInAppPayload
 import com.sap.ec.mobileengage.push.ActionableData
 import com.sap.ec.mobileengage.push.DisplayableData
@@ -28,8 +32,14 @@ class PushMessageWebV2Mapper(
         return try {
             val remoteMessage = json.decodeFromString<RemoteWebPushMessageV2>(from)
 
-            val defaultTapAction = remoteMessage.notification.defaultAction
+            val defaultTapAction = remoteMessage.notification.defaultAction?.let { action ->
+                when (action) {
+                    is BasicAppEventActionModel -> action.addSource(EventSource.Push)
+                    else -> action
+                }
+            }
             val actions: List<PresentableActionModel>? = remoteMessage.notification.actions
+                ?.addAppEventSource(EventSource.Push)
             val pushToInAppPayload: PushToInAppPayload? = null
             val actionableData =
                 if (actions != null || defaultTapAction != null || pushToInAppPayload != null) {

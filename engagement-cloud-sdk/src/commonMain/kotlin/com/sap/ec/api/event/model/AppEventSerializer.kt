@@ -21,6 +21,7 @@ internal object AppEventSerializer : KSerializer<AppEvent> {
             element<String>("id")
             element<String>("name")
             element<JsonObject?>("payload", isOptional = true)
+            element<String?>("source", isOptional = true)
             element<String>("type")
         }
 
@@ -30,6 +31,9 @@ internal object AppEventSerializer : KSerializer<AppEvent> {
             id = jsonObject["id"]?.jsonPrimitive?.content!!,
             name = jsonObject["name"]?.jsonPrimitive?.content!!,
             payload = jsonObject["payload"]?.jsonObject?.toMap(),
+            source = jsonObject["source"]?.jsonPrimitive?.content?.let { sourceValue ->
+                EventSource.entries.find { it.value == sourceValue }
+            },
             type = EventType.fromValue(jsonObject["type"]?.jsonPrimitive?.content!!)
         )
     }
@@ -40,6 +44,9 @@ internal object AppEventSerializer : KSerializer<AppEvent> {
             put("name", JsonPrimitive(value.name))
             value.payload?.let { attributes ->
                 put("payload", attributes.toJsonObject())
+            }
+            value.source?.let { source ->
+                put("source", JsonPrimitive(source.value))
             }
             put("type", JsonPrimitive(value.type.value))
         }

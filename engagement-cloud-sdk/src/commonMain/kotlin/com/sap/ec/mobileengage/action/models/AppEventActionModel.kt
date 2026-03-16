@@ -1,5 +1,6 @@
 package com.sap.ec.mobileengage.action.models
 
+import com.sap.ec.api.event.model.EventSource
 import com.sap.ec.core.providers.UUIDProvider
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -7,6 +8,7 @@ import kotlinx.serialization.Serializable
 internal interface AppEventActionModel {
     val name: String
     val payload: Map<String, String>?
+    val source: EventSource?
 }
 
 @Serializable
@@ -17,6 +19,7 @@ internal data class PresentableAppEventActionModel(
     override val title: String,
     override val name: String,
     override val payload: Map<String, String>?,
+    override val source: EventSource? = null,
 ) : PresentableActionModel(), AppEventActionModel
 
 @Serializable
@@ -24,5 +27,6 @@ internal data class PresentableAppEventActionModel(
 internal data class BasicAppEventActionModel(
     override val reporting: String = "",
     override val name: String,
-    override val payload: Map<String, String>?
+    override val payload: Map<String, String>?,
+    override val source: EventSource? = null,
 ) : BasicActionModel(), AppEventActionModel

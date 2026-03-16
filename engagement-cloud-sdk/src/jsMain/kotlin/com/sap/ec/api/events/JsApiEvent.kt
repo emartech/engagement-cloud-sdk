@@ -25,6 +25,7 @@ external interface JsAppEvent : JsApiEvent {
     override val id: String
     val name: String
     val payload: JSON
+    val source: String?
 }
 
 @JsExport
