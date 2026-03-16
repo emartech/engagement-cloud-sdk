@@ -34,7 +34,7 @@ internal class PushMessagePresenter(
     private val sdkLogger: Logger
 ) : PushPresenter<AndroidPlatformData, AndroidPushMessage> {
     private companion object {
-        const val DEBUG_CHANNEL_ID = "ems_debug"
+        const val DEBUG_CHANNEL_ID = "engagement_cloud_debug"
         const val DEBUG_CHANNEL_NAME = "Engagement Cloud SDK Debug Messages"
         val DEFAULT_SMALL_NOTIFICATION_ICON = R.drawable.default_small_notification_icon
     }

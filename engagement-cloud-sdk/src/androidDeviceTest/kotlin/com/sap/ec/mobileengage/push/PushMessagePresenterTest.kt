@@ -45,7 +45,7 @@ class PushMessagePresenterTest {
         const val REPORTING = """{"reportingKey":"reportingValue"}"""
         const val ICON_ID = 10
         const val CHANNEL_ID = "testChannelId"
-        const val DEBUG_CHANNEL_ID = "ems_debug"
+        const val DEBUG_CHANNEL_ID = "engagement_cloud_debug"
         const val TITLE = "testTitle"
         const val BODY = "testBody"
         val testCustomEventAction =
