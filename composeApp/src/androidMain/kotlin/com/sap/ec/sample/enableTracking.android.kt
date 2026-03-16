@@ -6,6 +6,9 @@ import com.sap.ec.api.config.AndroidEngagementCloudSDKConfig
 import com.sap.ec.api.event.model.AppEvent
 import com.sap.ec.api.event.model.BadgeCountEvent
 import com.sap.ec.config.LinkContactData
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 actual suspend fun enableTracking() {
     EngagementCloud.setup.enable(
@@ -15,17 +18,19 @@ actual suspend fun enableTracking() {
             LinkContactData.ContactFieldValueData("test1@test.com")
         }
     )
-    EngagementCloud.events.collect {
-        when (it) {
-            is AppEvent -> Log.i(
-                "Engagement Cloud SDK",
-                "Received AppEvent: ${it.name} with payload: ${it.payload}"
-            )
+    CoroutineScope(Dispatchers.Default).launch {
+        EngagementCloud.events.collect {
+            when (it) {
+                is AppEvent -> Log.i(
+                    "Engagement Cloud SDK",
+                    "Received AppEvent: ${it.name} with payload: ${it.payload}"
+                )
 
-            is BadgeCountEvent -> Log.i(
-                "Engagement Cloud SDK",
-                "Received BadgeCountEvent with method: ${it.method} and count: ${it.badgeCount}"
-            )
+                is BadgeCountEvent -> Log.i(
+                    "Engagement Cloud SDK",
+                    "Received BadgeCountEvent with method: ${it.method} and count: ${it.badgeCount}"
+                )
+            }
         }
     }
 }
