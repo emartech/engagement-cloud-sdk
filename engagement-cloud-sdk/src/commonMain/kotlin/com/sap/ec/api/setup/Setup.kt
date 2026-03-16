@@ -16,12 +16,15 @@ internal class Setup(
     private val sdkContext: SdkContextApi,
     private val logger: Logger
 ) : SetupApi {
+    /**
+     * Enables the SDK with the provided configuration.
+     * @param config The configuration for the SDK.
+     */
     override suspend fun enable(
         config: SdkConfig,
         onContactLinkingFailed: suspend () -> LinkContactData?
     ): Result<Unit> {
         return withContext(sdkContext.sdkDispatcher) {
-            //todo check exception handling
             runCatchingWithoutCancellation {
                 config.isValid(logger)
                 sdkContext.onContactLinkingFailed = onContactLinkingFailed
@@ -30,9 +33,12 @@ internal class Setup(
         }
     }
 
+    /**
+     * Disables the SDK.
+     * @returns a [Result] indicating the success or failure of the operation.
+     */
     override suspend fun disable(): Result<Unit> {
         return withContext(sdkContext.sdkDispatcher) {
-            //todo check usage of SdkAlreadyDisabledException
             runCatchingWithoutCancellation {
                 disableOrganizer.disable()
             }
