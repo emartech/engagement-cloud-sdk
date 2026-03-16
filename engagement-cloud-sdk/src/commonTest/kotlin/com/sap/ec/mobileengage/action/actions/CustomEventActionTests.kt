@@ -35,10 +35,6 @@ class CustomEventActionTests {
     fun setup() {
         eventSlot = Capture.slot()
         mockSdkEventWaiter = mock(MockMode.autoUnit)
-        everySuspend { mockSdkEventWaiter.await<Any>() } returns SdkEvent.Internal.Sdk.Answer.Response(
-            "0",
-            Result.success(Any())
-        )
         mockSdkEventDistributor = mock(MockMode.autofill)
         everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mockSdkEventWaiter
     }

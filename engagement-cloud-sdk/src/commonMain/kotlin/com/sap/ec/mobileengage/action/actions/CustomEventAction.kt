@@ -1,7 +1,6 @@
 package com.sap.ec.mobileengage.action.actions
 
 import com.sap.ec.core.channel.SdkEventDistributorApi
-import com.sap.ec.core.networking.model.Response
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.mobileengage.action.models.CustomEventActionModel
 import kotlinx.serialization.json.JsonPrimitive
@@ -27,6 +26,6 @@ internal class CustomEventAction(
                         }
                     }
                 })
-        ).await<SdkEvent.Internal.Sdk.Answer.Response<Response>>()
+        )
     }
 }

@@ -18,7 +18,7 @@ internal class ApplyAppCodeBasedRemoteConfigState(private val sdkEventDistributo
 
     override suspend fun active(): Result<Unit> {
         return sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.ApplyAppCodeBasedRemoteConfig())
-            .await<SdkEvent.Internal.Sdk.Answer.Response<Response>>()
+            .await<Response>()
             .mapToUnitOrFailure()
     }
 
