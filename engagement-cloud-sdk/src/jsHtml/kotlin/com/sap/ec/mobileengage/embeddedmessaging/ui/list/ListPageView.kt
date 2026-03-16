@@ -104,7 +104,14 @@ internal fun MessageList(
 
     val hasConnection by viewModel.hasConnection.collectAsState()
 
-    val hasConnectionError by remember { derivedStateOf { !hasConnection && lazyPagingMessageItems.hasRefreshError() } }
+    val noConnectionRefreshErrorWithEmptyList by remember { derivedStateOf { !hasConnection && lazyPagingMessageItems.itemCount == 0 && lazyPagingMessageItems.hasRefreshError() } }
+    val noConnectionRefreshErrorWithMessages by remember { derivedStateOf { !hasConnection && lazyPagingMessageItems.itemCount > 0 && lazyPagingMessageItems.hasRefreshError() } }
+
+    LaunchedEffect(noConnectionRefreshErrorWithMessages) {
+        if (hasConnection) {
+            viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() }
+        }
+    }
 
     LaunchedEffect(Unit) {
         val landscapeMediaQuery = window.matchMedia("(orientation: landscape)")
@@ -149,7 +156,7 @@ internal fun MessageList(
                         Hr({ classes(EmbeddedMessagingStyleSheet.divider) })
                     }
 
-                    if (!isTouchEnabled && !hasConnectionError) {
+                    if (!isTouchEnabled && !noConnectionRefreshErrorWithEmptyList) {
                         RefreshButton(isRefreshing, viewModel)
                     }
 
@@ -165,7 +172,8 @@ internal fun MessageList(
                             viewModel.setFilterUnopenedOnly(false)
                         },
                         hasFiltersApplied = hasFiltersApplied,
-                        hasConnectionError = hasConnectionError,
+                        noConnectionWithEmptyList = noConnectionRefreshErrorWithEmptyList,
+                        noConnectionWithList = noConnectionRefreshErrorWithMessages,
                         onDeleteIconClicked = {
                             messageToDelete = it
                             showDeleteMessageDialog = true
@@ -219,7 +227,7 @@ internal fun MessageList(
                             Hr({ classes(EmbeddedMessagingStyleSheet.divider) })
                         }
 
-                        if (!isTouchEnabled && !hasConnectionError) {
+                        if (!isTouchEnabled && !noConnectionRefreshErrorWithEmptyList) {
                             RefreshButton(isRefreshing, viewModel)
                         }
 
@@ -235,7 +243,8 @@ internal fun MessageList(
                                 viewModel.setFilterUnopenedOnly(false)
                             },
                             hasFiltersApplied = hasFiltersApplied,
-                            hasConnectionError = hasConnectionError,
+                            noConnectionWithEmptyList = noConnectionRefreshErrorWithEmptyList,
+                            noConnectionWithList = noConnectionRefreshErrorWithMessages,
                             onDeleteIconClicked = {
                                 messageToDelete = it
                                 showDeleteMessageDialog = true
@@ -288,7 +297,8 @@ internal fun MessageListContent(
     withDeleteIcon: Boolean = true,
     onClearFilters: () -> Unit,
     hasFiltersApplied: Boolean,
-    hasConnectionError: Boolean,
+    noConnectionWithEmptyList: Boolean,
+    noConnectionWithList: Boolean,
     onDeleteIconClicked: (MessageItemViewModelApi) -> Unit = {},
 ) {
     val isTouchEnabled = remember { isTouchDevice() }
@@ -308,7 +318,8 @@ internal fun MessageListContent(
                     onClearFilters = onClearFilters,
                     hasFiltersApplied = hasFiltersApplied,
                     onDeleteIconClicked = onDeleteIconClicked,
-                    hasConnectionError = hasConnectionError
+                    noConnectionWithEmptyList = noConnectionWithEmptyList,
+                    noConnectionWithList = noConnectionWithList
                 )
             }
         )
@@ -322,7 +333,8 @@ internal fun MessageListContent(
             onClearFilters = onClearFilters,
             hasFiltersApplied = hasFiltersApplied,
             onDeleteIconClicked = onDeleteIconClicked,
-            hasConnectionError = hasConnectionError
+            noConnectionWithEmptyList = noConnectionWithEmptyList,
+            noConnectionWithList = noConnectionWithList
         )
     }
 }
@@ -337,13 +349,14 @@ internal fun ListContent(
     onClearFilters: () -> Unit,
     hasFiltersApplied: Boolean,
     onDeleteIconClicked: (MessageItemViewModelApi) -> Unit = {},
-    hasConnectionError: Boolean
+    noConnectionWithEmptyList: Boolean,
+    noConnectionWithList: Boolean
 ) {
     val isRefreshing = lazyPagingMessageItems.loadState.source.refresh is LoadState.Loading
 
     if (isRefreshing) {
         PlaceholderMessageList()
-    } else if (hasConnectionError) {
+    } else if (noConnectionWithEmptyList) {
         NoConnectionErrorState(
             onRetry = { listViewModel.refreshMessagesWithThrottling { listViewModel.triggerRefreshFromJs() } }
         )
@@ -359,6 +372,29 @@ internal fun ListContent(
         Div({
             classes(EmbeddedMessagingStyleSheet.scrollingMessageListContainer)
         }) {
+            if (noConnectionWithList) {
+                Div({
+                    classes(EmbeddedMessagingStyleSheet.noConnectionEmptyStateContainer)
+                }) {
+                    Span(attrs = {
+                        classes(EmbeddedMessagingStyleSheet.noConnectionEmptyStateText)
+                    }) {
+                        Text(LocalStringResources.current.errorStateNoConnectionDescription)
+                    }
+                    Div(attrs = {
+                        onClick { listViewModel.refreshMessagesWithThrottling { listViewModel.triggerRefreshFromJs() } }
+                    }) {
+                        Span(attrs = {
+                            classes(
+                                EmbeddedMessagingStyleSheet.noConnectionEmptyStateText,
+                                EmbeddedMessagingStyleSheet.noConnectionEmptyStateRetryButton
+                            )
+                        }) {
+                            Text(LocalStringResources.current.errorStateNoConnectionRetryButtonLabel)
+                        }
+                    }
+                }
+            }
             ListView(
                 lazyPagingMessageItems = lazyPagingMessageItems,
                 listViewModel = listViewModel,

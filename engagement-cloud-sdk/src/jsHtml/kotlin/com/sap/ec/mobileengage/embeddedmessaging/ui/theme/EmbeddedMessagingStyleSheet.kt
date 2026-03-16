@@ -86,6 +86,7 @@ import org.jetbrains.compose.web.css.maxWidth
 import org.jetbrains.compose.web.css.minWidth
 import org.jetbrains.compose.web.css.minus
 import org.jetbrains.compose.web.css.ms
+import org.jetbrains.compose.web.css.opacity
 import org.jetbrains.compose.web.css.overflow
 import org.jetbrains.compose.web.css.padding
 import org.jetbrains.compose.web.css.paddingBottom
@@ -106,6 +107,7 @@ import org.jetbrains.compose.web.css.width
 
 internal object EmbeddedMessagingStyleSheet : StyleSheet() {
     val listPageContainer by style {
+        position(Position.Relative)
         backgroundColor(CssColorVars.colorSurface.value())
         height(MAX_HEIGHT)
         display(DisplayStyle.Flex)
@@ -162,6 +164,7 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
     }
 
     val listPane by style {
+        position(Position.Relative)
         maxWidth(LIST_VIEW_MAX_WIDTH)
         minWidth(LIST_PANE_MIN_WIDTH)
         property(
@@ -303,6 +306,7 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
     }
 
     val messageList by style {
+        position(Position.Relative)
         flex(1)
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Column)
@@ -340,6 +344,31 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
         marginBottom(DEFAULT_MARGIN)
         fontWeight(TITLE_FONT_WEIGHT)
         color(CssColorVars.colorOnSurface.value())
+    }
+
+    val noConnectionEmptyStateContainer by style {
+        position(Position.Absolute)
+        bottom(MEDIUM_LARGE_PADDING)
+        left(DEFAULT_PADDING)
+        right(DEFAULT_PADDING)
+        display(DisplayStyle.Flex)
+        flexDirection(FlexDirection.Row)
+        justifyContent(JustifyContent.SpaceAround)
+        alignItems(AlignItems.Center)
+        gap(MEDIUM_LARGE_PADDING)
+        opacity(0.8)
+        property("z-index", "100")
+        padding(DEFAULT_PADDING)
+        backgroundColor(CssColorVars.colorOnPrimaryFixed.value())
+        borderRadius(DEFAULT_BORDER_RADIUS)
+    }
+
+    val noConnectionEmptyStateText by style {
+        color(CssColorVars.colorPrimaryFixed.value())
+    }
+
+    val noConnectionEmptyStateRetryButton by style {
+        cursor("pointer")
     }
 
     val dialogOverlay by style {
