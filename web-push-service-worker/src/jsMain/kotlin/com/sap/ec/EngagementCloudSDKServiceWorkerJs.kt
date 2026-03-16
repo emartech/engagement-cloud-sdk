@@ -20,7 +20,9 @@ import web.events.EventHandler
 import web.events.EventType
 import web.events.addEventListener
 import web.push.PushEvent
+import web.serviceworker.ExtendableEvent
 import web.serviceworker.NotificationEvent
+import web.serviceworker.skipWaiting
 
 
 @OptIn(ExperimentalWasmJsInterop::class)
@@ -61,8 +63,11 @@ fun main() {
         }
     })
 
-    self.addEventListener(EventType("install"), {
-        console.log("install")
+    self.addEventListener(EventType("install"), { event: ExtendableEvent ->
+        val installPromise = serviceWorkerScope.promise {
+            self.skipWaiting()
+        }
+        event.waitUntil(installPromise)
     })
 
     self.addEventListener(EventType("notificationclick"), { event: NotificationEvent ->
@@ -83,7 +88,7 @@ fun main() {
         )
     })
 
-    sdkReadyBroadcastChannel.onmessage = EventHandler { event ->
+    sdkReadyBroadcastChannel.onmessage = EventHandler {
         println("SDK ready - posting stored notification click message if exists")
         notificationClickHandler.postStoredMessageToSDK()
     }
