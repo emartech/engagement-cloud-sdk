@@ -11,15 +11,18 @@ import com.sap.ec.core.log.LogConfigHolderApi
 import com.sap.ec.core.log.LogLevel
 import com.sap.ec.core.log.SdkLogger
 import com.sap.ec.core.providers.DoubleProvider
+import com.sap.ec.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
+import dev.mokkery.matcher.any
 import dev.mokkery.matcher.capture.Capture.Companion.slot
 import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import dev.mokkery.verify
+import dev.mokkery.verify.VerifyMode
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -34,6 +37,7 @@ class RemoteConfigResponseHandlerTests {
     private lateinit var defaultUrls: DefaultUrlsApi
     private lateinit var mockDeviceInfoCollector: DeviceInfoCollectorApi
     private lateinit var mockRandomProvider: DoubleProvider
+    private lateinit var mockEmbeddedMessagingContext: EmbeddedMessagingContextApi
     private lateinit var remoteConfigResponseHandler: RemoteConfigResponseHandler
 
     @BeforeTest
@@ -49,12 +53,14 @@ class RemoteConfigResponseHandlerTests {
 
         mockDeviceInfoCollector = mock(MockMode.autofill)
         mockRandomProvider = mock(MockMode.autofill)
+        mockEmbeddedMessagingContext = mock(MockMode.autofill)
 
         remoteConfigResponseHandler = RemoteConfigResponseHandler(
             mockDeviceInfoCollector,
             mockLogConfigHolder,
             mockSdkContext,
             mockRandomProvider,
+            mockEmbeddedMessagingContext,
             SdkLogger("TestLoggerName", mock(MockMode.autofill), logConfigHolder = mock(MockMode.autofill))
         )
     }
@@ -164,4 +170,130 @@ class RemoteConfigResponseHandlerTests {
         mockSdkContext.features shouldBe listOf(MobileEngage)
     }
 
+    @Test
+    fun testHandleEmbeddedMessagingConfig_shouldApplyBothProperties() = runTest {
+        val batchSize = 20
+        val frequencyCap = 10
+        val configResponse = RemoteConfigResponse(
+            embeddedMessagingConfig = EmbeddedMessagingConfig(
+                tagUpdateBatchSize = batchSize,
+                tagUpdateFrequencyCapSeconds = frequencyCap
+            )
+        )
+        every { mockRandomProvider.provide() } returns 0.5
+
+        remoteConfigResponseHandler.handle(configResponse)
+
+        verify { mockEmbeddedMessagingContext.tagUpdateBatchSize = batchSize }
+        verify { mockEmbeddedMessagingContext.tagUpdateFrequencyCapSeconds = frequencyCap }
+    }
+
+    @Test
+    fun testHandleEmbeddedMessagingConfig_shouldApplyOnlyBatchSize() = runTest {
+        val batchSize = 15
+        val configResponse = RemoteConfigResponse(
+            embeddedMessagingConfig = EmbeddedMessagingConfig(
+                tagUpdateBatchSize = batchSize,
+                tagUpdateFrequencyCapSeconds = null
+            )
+        )
+        every { mockRandomProvider.provide() } returns 0.5
+
+        remoteConfigResponseHandler.handle(configResponse)
+
+        verify { mockEmbeddedMessagingContext.tagUpdateBatchSize = batchSize }
+    }
+
+    @Test
+    fun testHandleEmbeddedMessagingConfig_shouldApplyOnlyFrequencyCap() = runTest {
+        val frequencyCap = 30
+        val configResponse = RemoteConfigResponse(
+            embeddedMessagingConfig = EmbeddedMessagingConfig(
+                tagUpdateBatchSize = null,
+                tagUpdateFrequencyCapSeconds = frequencyCap
+            )
+        )
+        every { mockRandomProvider.provide() } returns 0.5
+
+        remoteConfigResponseHandler.handle(configResponse)
+
+        verify { mockEmbeddedMessagingContext.tagUpdateFrequencyCapSeconds = frequencyCap }
+    }
+
+    @Test
+    fun testHandleEmbeddedMessagingConfig_shouldNotApplyWhenConfigIsNull() = runTest {
+        val configResponse = RemoteConfigResponse(
+            embeddedMessagingConfig = null
+        )
+        every { mockRandomProvider.provide() } returns 0.5
+
+        remoteConfigResponseHandler.handle(configResponse)
+
+        verify(VerifyMode.exactly(0)) {
+            mockEmbeddedMessagingContext.tagUpdateBatchSize = any()
+            mockEmbeddedMessagingContext.tagUpdateFrequencyCapSeconds = any()
+        }
+    }
+
+    @Test
+    fun testHandleEmbeddedMessagingConfig_shouldApplyOverride() = runTest {
+        val globalBatchSize = 10
+        val globalFrequencyCap = 5
+        val overrideBatchSize = 25
+        val overrideFrequencyCap = 15
+        val clientId = "testClientId"
+        val configResponse = RemoteConfigResponse(
+            embeddedMessagingConfig = EmbeddedMessagingConfig(
+                tagUpdateBatchSize = globalBatchSize,
+                tagUpdateFrequencyCapSeconds = globalFrequencyCap
+            ),
+            overrides = mapOf(
+                clientId to RemoteConfig(
+                    embeddedMessagingConfig = EmbeddedMessagingConfig(
+                        tagUpdateBatchSize = overrideBatchSize,
+                        tagUpdateFrequencyCapSeconds = overrideFrequencyCap
+                    )
+                )
+            )
+        )
+        everySuspend { mockDeviceInfoCollector.getClientId() } returns clientId
+        every { mockRandomProvider.provide() } returns 0.5
+
+        remoteConfigResponseHandler.handle(configResponse)
+
+        verify { mockEmbeddedMessagingContext.tagUpdateBatchSize = globalBatchSize }
+        verify { mockEmbeddedMessagingContext.tagUpdateFrequencyCapSeconds = globalFrequencyCap }
+        verify { mockEmbeddedMessagingContext.tagUpdateBatchSize = overrideBatchSize }
+        verify { mockEmbeddedMessagingContext.tagUpdateFrequencyCapSeconds = overrideFrequencyCap }
+    }
+
+    @Test
+    fun testHandleEmbeddedMessagingConfig_shouldApplyOnlyOverrideBatchSize() = runTest {
+        val globalBatchSize = 10
+        val globalFrequencyCap = 5
+        val overrideBatchSize = 25
+        val clientId = "testClientId"
+        val configResponse = RemoteConfigResponse(
+            embeddedMessagingConfig = EmbeddedMessagingConfig(
+                tagUpdateBatchSize = globalBatchSize,
+                tagUpdateFrequencyCapSeconds = globalFrequencyCap
+            ),
+            overrides = mapOf(
+                clientId to RemoteConfig(
+                    embeddedMessagingConfig = EmbeddedMessagingConfig(
+                        tagUpdateBatchSize = overrideBatchSize,
+                        tagUpdateFrequencyCapSeconds = null
+                    )
+                )
+            )
+        )
+        everySuspend { mockDeviceInfoCollector.getClientId() } returns clientId
+        every { mockRandomProvider.provide() } returns 0.5
+
+        remoteConfigResponseHandler.handle(configResponse)
+
+        verify { mockEmbeddedMessagingContext.tagUpdateBatchSize = globalBatchSize }
+        verify { mockEmbeddedMessagingContext.tagUpdateFrequencyCapSeconds = globalFrequencyCap }
+        verify { mockEmbeddedMessagingContext.tagUpdateBatchSize = overrideBatchSize }
+    }
 }

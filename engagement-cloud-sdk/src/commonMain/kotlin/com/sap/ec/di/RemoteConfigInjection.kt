@@ -13,6 +13,7 @@ internal object RemoteConfigInjection {
                 logConfigHolder = get(),
                 sdkContext = get(),
                 randomProvider = get(),
+                embeddedMessagingContext = get(),
                 sdkLogger = get { parametersOf(RemoteConfigResponseHandler::class.simpleName) }
             )
         }

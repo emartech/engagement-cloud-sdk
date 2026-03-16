@@ -11,16 +11,18 @@ import com.sap.ec.core.log.LogConfigHolderApi
 import com.sap.ec.core.log.LogLevel
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.providers.DoubleProvider
+import com.sap.ec.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 
 internal class RemoteConfigResponseHandler(
     private val deviceInfoCollector: DeviceInfoCollectorApi,
     private val logConfigHolder: LogConfigHolderApi,
     private val sdkContext: SdkContextApi,
     private val randomProvider: DoubleProvider,
+    private val embeddedMessagingContext: EmbeddedMessagingContextApi,
     private val sdkLogger: Logger
 ) : RemoteConfigResponseHandlerApi {
-    override suspend fun handle(response: RemoteConfigResponse?) {
-        if (response == null) {
+    override suspend fun handle(config: RemoteConfigResponse?) {
+        if (config == null) {
             sdkLogger.error("config is null")
             return
         }
@@ -28,15 +30,17 @@ internal class RemoteConfigResponseHandler(
         val clientId = deviceInfoCollector.getClientId()
 
         sdkLogger.debug("applyServiceUrls")
-        applyServiceUrls(response.serviceUrls)
+        applyServiceUrls(config.serviceUrls)
         sdkLogger.debug("applyLogLevel")
-        applyLogLevel(response.logLevel)
+        applyLogLevel(config.logLevel)
         sdkLogger.debug("applyFeatures")
-        applyFeatures(response.features)
+        applyFeatures(config.features)
         sdkLogger.debug("applyLuckyLogger")
-        applyLuckyLogger(response.luckyLogger)
+        applyLuckyLogger(config.luckyLogger)
+        sdkLogger.debug("applyEmbeddedMessagingConfig")
+        applyEmbeddedMessagingConfig(config.embeddedMessagingConfig)
 
-        response.overrides?.let {
+        config.overrides?.let {
             it[clientId]?.let { override ->
                 sdkLogger.debug("override applyServiceUrls")
                 applyServiceUrls(override.serviceUrls)
@@ -44,6 +48,8 @@ internal class RemoteConfigResponseHandler(
                 applyLogLevel(override.logLevel)
                 sdkLogger.debug("override applyFeatures")
                 applyFeatures(override.features)
+                sdkLogger.debug("override applyEmbeddedMessagingConfig")
+                applyEmbeddedMessagingConfig(override.embeddedMessagingConfig)
             }
         }
     }
@@ -79,6 +85,15 @@ internal class RemoteConfigResponseHandler(
             if (it.threshold != 0.0 && randomNumber <= it.threshold) {
                 logConfigHolder.remoteLogLevel = it.logLevel
             }
+        }
+    }
+
+    private fun applyEmbeddedMessagingConfig(config: EmbeddedMessagingConfig?) {
+        config?.tagUpdateBatchSize?.let {
+            embeddedMessagingContext.tagUpdateBatchSize = it
+        }
+        config?.tagUpdateFrequencyCapSeconds?.let {
+            embeddedMessagingContext.tagUpdateFrequencyCapSeconds = it
         }
     }
 
