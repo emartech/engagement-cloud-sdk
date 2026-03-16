@@ -144,25 +144,28 @@ fi
 echo ""
 echo "[Pipeline Job Dependencies]"
 
-# 15. android-pipeline needs derive-version and create-tag
-if grep -A3 'android-pipeline:' "$PUBLISH_FILE" | grep -q 'derive-version'; then
-  check "android-pipeline depends on derive-version" "pass"
+# 15. android-pipeline needs derive-version, create-tag, and create-release
+if grep -A3 'android-pipeline:' "$PUBLISH_FILE" | grep -q 'derive-version' && \
+   grep -A3 'android-pipeline:' "$PUBLISH_FILE" | grep -q 'create-release'; then
+  check "android-pipeline depends on derive-version and create-release" "pass"
 else
-  check "android-pipeline depends on derive-version" "fail"
+  check "android-pipeline depends on derive-version and create-release" "fail"
 fi
 
-# 16. js-pipeline needs derive-version and create-tag
-if grep -A3 'js-pipeline:' "$PUBLISH_FILE" | grep -q 'derive-version'; then
-  check "js-pipeline depends on derive-version" "pass"
+# 16. js-pipeline needs derive-version, create-tag, and create-release
+if grep -A3 'js-pipeline:' "$PUBLISH_FILE" | grep -q 'derive-version' && \
+   grep -A3 'js-pipeline:' "$PUBLISH_FILE" | grep -q 'create-release'; then
+  check "js-pipeline depends on derive-version and create-release" "pass"
 else
-  check "js-pipeline depends on derive-version" "fail"
+  check "js-pipeline depends on derive-version and create-release" "fail"
 fi
 
-# 17. ios-pipeline needs derive-version and create-tag
-if grep -A3 'ios-pipeline:' "$PUBLISH_FILE" | grep -q 'derive-version'; then
-  check "ios-pipeline depends on derive-version" "pass"
+# 17. ios-pipeline needs derive-version, create-tag, and create-release
+if grep -A3 'ios-pipeline:' "$PUBLISH_FILE" | grep -q 'derive-version' && \
+   grep -A3 'ios-pipeline:' "$PUBLISH_FILE" | grep -q 'create-release'; then
+  check "ios-pipeline depends on derive-version and create-release" "pass"
 else
-  check "ios-pipeline depends on derive-version" "fail"
+  check "ios-pipeline depends on derive-version and create-release" "fail"
 fi
 
 echo ""

@@ -107,9 +107,28 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  create-release:
+    name: Create GitHub Release
+    if: ${{ !cancelled() && needs.derive-version.result == 'success' }}
+    needs: [derive-version, create-tag]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Create GitHub Release
+        if: env.DRY_RUN != 'true'
+        run: |
+          VERSION="${{ needs.derive-version.outputs.version }}"
+          gh release create "$VERSION" \
+            --title "Release $VERSION" \
+            --generate-notes || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == true }}
+
   android-pipeline:
     name: Android Pipeline (Build, Test, Publish)
-    needs: [derive-version, create-tag]
+    needs: [derive-version, create-tag, create-release]
     runs-on: macos-latest-xlarge
     steps:
       - uses: actions/checkout@v6
@@ -149,7 +168,7 @@ jobs:
 
   js-pipeline:
     name: JS Pipeline (Build, Test, Publish)
-    needs: [derive-version, create-tag]
+    needs: [derive-version, create-tag, create-release]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -269,7 +288,7 @@ jobs:
 
   ios-pipeline:
     name: iOS Pipeline (Build, Test, Publish)
-    needs: [derive-version, create-tag]
+    needs: [derive-version, create-tag, create-release]
     runs-on: macos-latest-xlarge
     env:
       SPM_BUILD: release
@@ -356,26 +375,6 @@ jobs:
           path: |
             engagement-cloud-sdk/build/XCFrameworks/release/*.xcframework
             ios-notification-service/build/XCFrameworks/release/*.xcframework
-
-
-  create-release:
-    name: Create GitHub Release
-    if: ${{ !cancelled() && needs.derive-version.result == 'success' }}
-    needs: [derive-version, android-pipeline, js-pipeline, ios-pipeline]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Create GitHub Release
-        if: env.DRY_RUN != 'true'
-        run: |
-          VERSION="${{ needs.derive-version.outputs.version }}"
-          gh release create "$VERSION" \
-            --title "Release $VERSION" \
-            --generate-notes || true
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == true }}
 
 
   report-slack:
