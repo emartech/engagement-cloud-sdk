@@ -4,7 +4,7 @@
 
 > __`Important!`__
 >
-> This product is currently available in a pilot release for a select group of clients. If you wish to participate in the Pilot phase, please reach out to your client success manager.
+The SAP Engagement Cloud SDK is currently available in a pilot release for a select group of clients. If you wish to participate, please reach out to your client success manager.
 >
 > Implementation should only begin after receiving confirmation of your pilot status from SAP.
 
