@@ -12,6 +12,7 @@ OLD_WORKFLOW_FILE="$WORKFLOW_DIR/on_push_worklow.yml"
 
 PASSED=0
 FAILED=0
+SKIPPED=0
 
 check() {
   local description="$1"
@@ -47,12 +48,13 @@ if [ ! -f "$WORKFLOW_FILE" ]; then
   echo ""
   echo "  Skipping content checks -- workflow file not found at expected path."
   echo ""
-  echo "=== Results: $PASSED passed, $FAILED failed ==="
+  echo "=== Results: $PASSED passed, $FAILED failed, $SKIPPED skipped ==="
   exit 1
 fi
 
 # Test 3: Push trigger restricts to main branch only
-if grep -A2 'push:' "$WORKFLOW_FILE" | grep -q 'branches:.*\[main\]'; then
+# Anchor to the on: trigger block by matching 'push:' preceded by 2-space indent (top-level trigger)
+if grep -A1 '^  push:' "$WORKFLOW_FILE" | grep -q 'branches:.*\[main\]'; then
   check "Push trigger restricted to branches: [main]" "pass"
 else
   check "Push trigger restricted to branches: [main]" "fail"
@@ -87,7 +89,7 @@ else
 fi
 
 # Test 8: cancel-in-progress only for PRs (not unconditional true)
-if grep -q "cancel-in-progress:.*github.event_name.*==.*'pull_request'" "$WORKFLOW_FILE"; then
+if grep -qE "cancel-in-progress:.*github\.event_name\s*==\s*['\"]pull_request['\"]" "$WORKFLOW_FILE"; then
   check "cancel-in-progress conditional on pull_request event" "pass"
 elif grep -q 'cancel-in-progress: true' "$WORKFLOW_FILE"; then
   check "cancel-in-progress conditional on pull_request event" "fail"
@@ -104,6 +106,7 @@ if command -v actionlint >/dev/null 2>&1; then
   fi
 else
   echo "  SKIP: actionlint not installed"
+  SKIPPED=$((SKIPPED + 1))
 fi
 
 # Test 10: All existing job names unchanged (build, test, lint, reporting)
@@ -123,7 +126,7 @@ else
 fi
 
 echo ""
-echo "=== Results: $PASSED passed, $FAILED failed ==="
+echo "=== Results: $PASSED passed, $FAILED failed, $SKIPPED skipped ==="
 
 if [ "$FAILED" -gt 0 ]; then
   exit 1
