@@ -98,13 +98,9 @@ class CryptoTests {
         val withoutNewlines = "SGVsbG8sIFdvcmxkIQ=="
 
         // Stdlib Base64.Default rejects newlines -- verify this strictness
-        val threw = try {
+        shouldThrow<IllegalArgumentException> {
             Base64.decode(withNewlines)
-            false
-        } catch (_: IllegalArgumentException) {
-            true
         }
-        threw shouldBe true
 
         // The clean version decodes correctly
         val decoded = Base64.decode(withoutNewlines)
@@ -125,13 +121,9 @@ class CryptoTests {
         val withoutPadding = "SGVsbG8sIFdvcmxkIQ"
 
         // Stdlib Base64.Default rejects missing padding -- verify this strictness
-        val threw = try {
+        shouldThrow<IllegalArgumentException> {
             Base64.decode(withoutPadding)
-            false
-        } catch (_: IllegalArgumentException) {
-            true
         }
-        threw shouldBe true
 
         // The properly padded version decodes correctly
         val decoded = Base64.decode(withPadding)

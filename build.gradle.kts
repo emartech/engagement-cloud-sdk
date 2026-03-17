@@ -3,8 +3,9 @@ buildscript {
         // Required: the Huawei agconnect plugin (AGCPlugin.groovy) uses
         // GradleVersionTool to read the AGP version from the buildscript classpath.
         // Without this entry, plugin application fails with "No value present".
-        // The version is defined once in gradle.properties (agpVersion) and
-        // referenced by both this classpath entry and libs.versions.toml.
+        // The version is also defined in gradle/libs.versions.toml — both must
+        // stay in sync. The buildscript block cannot access the version catalog
+        // (Gradle evaluation ordering).
         classpath("com.android.tools.build:gradle:${property("agpVersion")}")
     }
 }
