@@ -7,6 +7,8 @@ import dev.mokkery.mock
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.ktor.util.decodeBase64Bytes
+import io.ktor.util.encodeBase64
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
@@ -64,5 +66,21 @@ class CryptoTests {
         shouldThrow<DecryptionFailedException> {
             crypto.decrypt(encrypted, TEST_SECRET + 2)
         }
+    }
+
+    @Test
+    fun base64EncodingShouldMatchKtorFormat() = runTest {
+        // Oracle: encode a known byte array and assert the exact Base64 string
+        // This test must pass with BOTH the old (Ktor) and new (stdlib) Base64 implementations
+        val knownBytes = "Hello, World!".encodeToByteArray()
+        val expected = "SGVsbG8sIFdvcmxkIQ=="
+
+        // Using current Ktor implementation (before swap)
+        val encoded = knownBytes.encodeBase64()
+        encoded shouldBe expected
+
+        // Verify decode round-trip
+        val decoded = encoded.decodeBase64Bytes()
+        decoded.decodeToString() shouldBe "Hello, World!"
     }
 }
