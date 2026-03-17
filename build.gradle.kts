@@ -1,10 +1,10 @@
-buildscript{
-    repositories {
-        maven(url = "https://developer.huawei.com/repo/")
-    }
+buildscript {
     dependencies {
+        // Required: the Huawei agconnect plugin (AGCPlugin.groovy) uses
+        // GradleVersionTool to read the AGP version from the buildscript classpath.
+        // Without this entry, plugin application fails with "No value present".
+        // Keep this in sync with the 'agp' version in gradle/libs.versions.toml.
         classpath("com.android.tools.build:gradle:9.1.0")
-        classpath("com.huawei.agconnect:agcp:1.9.5.302")
     }
 }
 
