@@ -1,3 +1,8 @@
+// TODO(AGP-KMP): The combination of com.android.application + kotlinMultiplatform is deprecated.
+// The replacement plugin (com.android.kotlin.multiplatform.application) does not exist as of
+// AGP 9.1.0 / Kotlin 2.3.10. The suppression property kotlin.mpp.androidGradlePluginCompatibility.nowarn
+// is itself deprecated and non-functional in Kotlin 2.3.10. This warning is a known limitation.
+// Remove this comment and migrate when the replacement plugin becomes available.
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.agconnect)
