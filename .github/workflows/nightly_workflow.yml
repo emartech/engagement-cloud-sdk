@@ -33,7 +33,7 @@ jobs:
       matrix:
         include:
           - platform: android
-            os: ubuntu-latest
+            os: macos-latest
           - platform: web
             os: ubuntu-latest
           - platform: ios
@@ -99,7 +99,7 @@ jobs:
       matrix:
         include:
           - platform: android
-            os: ubuntu-latest
+            os: macos-latest
           - platform: web
             os: ubuntu-latest
           - platform: ios
