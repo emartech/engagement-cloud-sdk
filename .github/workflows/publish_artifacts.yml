@@ -280,14 +280,12 @@ jobs:
           ls -la "dist/cdn/$VERSION/"
           ls -la dist/cdn/
 
-      - name: Deploy to GitHub Pages
-        if: env.DRY_RUN != 'true'
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Upload CDN artifacts for Pages deployment
+        uses: actions/upload-artifact@v7
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist/cdn
-          keep_files: true
-          destination_dir: .
+          name: js-cdn-artifacts
+          retention-days: 1
+          path: dist/cdn/
 
       - name: Upload JS Web Bundle to GitHub Release
         if: env.DRY_RUN != 'true'
@@ -402,10 +400,93 @@ jobs:
             ios-notification-service/build/XCFrameworks/release/*.xcframework
 
 
+  deploy-pages:
+    name: Deploy to GitHub Pages
+    # Single deployment job: assembles CDN artifacts + Docusaurus docs into one
+    # directory tree and pushes once. This prevents the race condition that occurs
+    # when multiple jobs independently deploy to GitHub Pages (peaceiris force-pushes
+    # to gh-pages, so concurrent pushes would overwrite each other).
+    if: ${{ !cancelled() && needs.derive-version.result == 'success' }}
+    needs: [derive-version, js-pipeline, ios-pipeline, android-pipeline]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Update submodule to latest
+        # Uses --remote to pull the latest commit from the docs repo's default
+        # branch. The pinned submodule SHA in the SDK repo tracks the "verified"
+        # docs version; this deploy-time pull provides "latest docs" semantics.
+        run: |
+          git submodule update --remote docs/engagement-cloud-sdk-docs
+          echo "Docs submodule updated to:"
+          cd docs/engagement-cloud-sdk-docs && git log --oneline -1
+
+      - name: Setup Node.js for Docusaurus
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Build Docusaurus docs
+        # The docs repo uses @docusaurus/core ^3.9.2 (>= 3.1.0 required for
+        # --out-dir). The baseUrl is overridden via sed because docusaurus.config.ts
+        # hardcodes baseUrl: '/' and does not support env var overrides.
+        working-directory: docs/engagement-cloud-sdk-docs
+        run: |
+          npm ci
+          sed -i'' -e "s|baseUrl: '/'|baseUrl: '/engagement-cloud-sdk/docs/'|" docusaurus.config.ts
+          echo "Updated baseUrl to /engagement-cloud-sdk/docs/"
+          npx docusaurus build --out-dir ../../dist/docs
+
+      - name: Download JS CDN artifacts
+        uses: actions/download-artifact@v7
+        with:
+          name: js-cdn-artifacts
+          path: dist/cdn
+
+      - name: Assemble deployment directory
+        run: |
+          mkdir -p deploy
+
+          # Guard: fail if CDN artifacts are empty (prevents silent empty deployment
+          # that would break all existing CDN URLs)
+          if [ -z "$(ls -A dist/cdn/ 2>/dev/null)" ]; then
+            echo "::error::CDN artifacts directory is empty -- js-pipeline may have failed to upload artifacts"
+            exit 1
+          fi
+
+          # Guard: fail if docs build output is empty
+          if [ -z "$(ls -A dist/docs/ 2>/dev/null)" ]; then
+            echo "::error::Docusaurus build output is empty -- docs build may have failed"
+            exit 1
+          fi
+
+          # CDN artifacts go at root level (preserving version directories)
+          cp -r dist/cdn/* deploy/
+          # Docs go under /docs/
+          mkdir -p deploy/docs
+          cp -r dist/docs/* deploy/docs/
+          echo "Deployment directory contents:"
+          find deploy -maxdepth 1 -printf '%f\n'
+          echo "Docs directory:"
+          find deploy/docs -maxdepth 1 -printf '%f\n' | head -10
+
+      - name: Deploy to GitHub Pages
+        if: env.DRY_RUN != 'true'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy
+          keep_files: true
+          destination_dir: .
+
+
   report-slack:
     name: Report / Slack
     if: always()
-    needs: [derive-version, android-pipeline, js-pipeline, ios-pipeline, create-release]
+    needs: [derive-version, android-pipeline, js-pipeline, ios-pipeline, create-release, deploy-pages]
     runs-on: ubuntu-latest
     steps:
       - name: Compute Slack prefix
