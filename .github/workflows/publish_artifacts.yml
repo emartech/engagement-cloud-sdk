@@ -115,13 +115,39 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Extract release notes from CHANGELOG
+        id: changelog
+        run: |
+          VERSION="${{ needs.derive-version.outputs.version }}"
+          if [ ! -f CHANGELOG.md ]; then
+            echo "No CHANGELOG.md found, will use auto-generated notes"
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          NOTES=$(sed -n "/^## \[$VERSION\]/,/^## \[/{/^## \[/!p;}" CHANGELOG.md | sed '/^$/N;/^\n$/d')
+          if [ -z "$NOTES" ]; then
+            echo "No changelog entry for $VERSION, will use auto-generated notes"
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "$NOTES" > /tmp/release-notes.md
+            echo "found=true" >> "$GITHUB_OUTPUT"
+            echo "Release notes extracted for $VERSION"
+          fi
+
       - name: Create GitHub Release
         if: env.DRY_RUN != 'true'
         run: |
           VERSION="${{ needs.derive-version.outputs.version }}"
-          gh release create "$VERSION" \
-            --title "Release $VERSION" \
-            --generate-notes || true
+          if [ "${{ steps.changelog.outputs.found }}" = "true" ]; then
+            gh release create "$VERSION" \
+              --title "Release $VERSION" \
+              --notes-file /tmp/release-notes.md
+          else
+            gh release create "$VERSION" \
+              --title "Release $VERSION" \
+              --generate-notes
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == true }}
