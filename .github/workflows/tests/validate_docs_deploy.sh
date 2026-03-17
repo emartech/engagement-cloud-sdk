@@ -169,9 +169,7 @@ else
 fi
 
 # 18. deploy-pages Deploy step must NOT have a step-level DRY_RUN env re-declaration
-# Check for env: block right after/within the peaceiris step that redeclares DRY_RUN
-PEACEIRIS_BLOCK=$(sed -n '/Deploy to GitHub Pages/,/^      - name:\|^  [a-z]/p' "$PUBLISH_FILE" | tail -n +1)
-# Look specifically in the deploy-pages section for env: DRY_RUN after peaceiris
+# Extract the peaceiris step within deploy-pages and check for DRY_RUN env re-declaration
 DEPLOY_PAGES_FULL=$(sed -n '/^  deploy-pages:/,/^  [a-z][a-z_-]*:$/p' "$PUBLISH_FILE")
 PEACEIRIS_IN_DEPLOY=$(echo "$DEPLOY_PAGES_FULL" | sed -n '/Deploy to GitHub Pages/,/^      - name:\|^  [a-z]/p')
 if echo "$PEACEIRIS_IN_DEPLOY" | grep -q 'DRY_RUN:'; then
