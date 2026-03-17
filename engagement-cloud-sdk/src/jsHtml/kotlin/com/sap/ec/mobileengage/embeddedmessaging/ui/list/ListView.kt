@@ -75,17 +75,19 @@ internal fun ListView(
                                 lazyPagingMessageItems[lazyPagingMessageItems.itemCount - 1]
                             }
                         }
-                    onDispose { observer.disconnect() }
-                }
-                val target: web.dom.Element? =
-                    document.querySelector("[shouldLoadNextPage$paginationId]")
-                if (target != null && isInViewPort(
-                        target
-                    )
-                ) {
-                    if (lazyPagingMessageItems.itemCount > 0) {
-                        lazyPagingMessageItems[lazyPagingMessageItems.itemCount - 1]
+
+                    val target: web.dom.Element? =
+                        document.querySelector("[shouldLoadNextPage$paginationId]")
+                    if (target != null && isInViewPort(
+                            target
+                        )
+                    ) {
+                        if (lazyPagingMessageItems.itemCount > 0) {
+                            lazyPagingMessageItems[lazyPagingMessageItems.itemCount - 1]
+                        }
                     }
+
+                    onDispose { observer.disconnect() }
                 }
             }
         }
