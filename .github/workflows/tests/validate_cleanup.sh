@@ -126,7 +126,7 @@ CODEQL_FILE="$WORKFLOW_DIR/codeql.yml"
 if [ -f "$CODEQL_FILE" ]; then
   # Count lines in the workflow-level env block that look like VAR_NAME: value
   CODEQL_ENV=$(sed -n '/^env:/,/^[a-z]/{ /^env:/d; /^[a-z]/d; p; }' "$CODEQL_FILE")
-  ENV_COUNT=$(echo "$CODEQL_ENV" | grep -cE '^\s+[A-Z_]+:' || true)
+  ENV_COUNT=$(echo "$CODEQL_ENV" | grep -cE '^\s+[A-Z0-9_]+:' || true)
   if [ "$ENV_COUNT" -lt 10 ]; then
     check "codeql.yml has fewer than 10 env vars (found $ENV_COUNT)" "pass"
   else
