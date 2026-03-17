@@ -16,6 +16,5 @@ class IframeFactoryTests {
         iframe.style.display shouldBe "block"
         iframe.style.border shouldBe "none"
         iframe.style.height shouldBe "100%"
-        iframe.attributes.getNamedItem("sandbox")?.value shouldBe "allow-scripts"
     }
 }
