@@ -19,6 +19,7 @@ import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
@@ -54,7 +55,8 @@ class EmbeddedMessagingPagingSourceTests {
     private fun createEmbeddedMessagingPagingSource(
         filterUnopenedOnly: Boolean = false,
         selectedCategoryIds: List<String> = emptyList(),
-        setCategories: (List<Category>) -> Unit = { }
+        setCategories: (List<Category>) -> Unit = { },
+        hasContactToken: () -> Boolean = { true }
     ) = EmbeddedMessagingPagingSource(
         listPageModel = mockListPageModel,
         filterUnopenedOnly = filterUnopenedOnly,
@@ -65,6 +67,7 @@ class EmbeddedMessagingPagingSourceTests {
         sdkEventDistributor = mockSdkEventDistributor,
         mockSdkContext,
         logger = mockLogger,
+        hasContactToken = hasContactToken
     )
 
     @Test
@@ -93,6 +96,35 @@ class EmbeddedMessagingPagingSourceTests {
         }
         (result is PagingSource.LoadResult.Error) shouldBe false
     }
+
+    @Test
+    fun testLoad_shouldNot_call_fetchMessagesWithCategories_when_contactTokenIsNotAvailable() =
+        runTest {
+            val embeddedMessagingPagingSource =
+                createEmbeddedMessagingPagingSource(hasContactToken = { false })
+
+            val result =
+                embeddedMessagingPagingSource.load(
+                    PagingSource.LoadParams.Refresh(
+                        key = null, loadSize = 20, placeholdersEnabled = false
+                    )
+                )
+
+            verifySuspend(VerifyMode.exactly(0)) {
+                mockListPageModel.fetchMessagesWithCategories(
+                    filterUnopenedOnly = any(), categoryIds = any()
+                )
+            }
+            verifySuspend(VerifyMode.exactly(0)) {
+                mockListPageModel.fetchNextPage()
+            }
+
+            with(result as PagingSource.LoadResult.Page) {
+                data shouldBe emptyList()
+                prevKey shouldBe null
+                nextKey shouldBe null
+            }
+        }
 
     @Test
     fun testLoad_should_call_fetchMessagesWithCategories_when_invokedFirstTime_and_HandleErrors_WhenResultFailed() =
@@ -214,34 +246,36 @@ class EmbeddedMessagingPagingSourceTests {
     }
 
     @Test
-    fun testLoad_shouldPropagateCancellationException_whenFetchThrowsCancellationException() = runTest {
-        val embeddedMessagingPagingSource = createEmbeddedMessagingPagingSource()
-        everySuspend {
-            mockListPageModel.fetchMessagesWithCategories(false, emptyList())
-        } throws CancellationException("coroutine cancelled")
+    fun testLoad_shouldPropagateCancellationException_whenFetchThrowsCancellationException() =
+        runTest {
+            val embeddedMessagingPagingSource = createEmbeddedMessagingPagingSource()
+            everySuspend {
+                mockListPageModel.fetchMessagesWithCategories(false, emptyList())
+            } throws CancellationException("coroutine cancelled")
 
-        shouldThrow<CancellationException> {
-            embeddedMessagingPagingSource.load(
-                PagingSource.LoadParams.Refresh(
-                    key = null, loadSize = 20, placeholdersEnabled = false
+            shouldThrow<CancellationException> {
+                embeddedMessagingPagingSource.load(
+                    PagingSource.LoadParams.Refresh(
+                        key = null, loadSize = 20, placeholdersEnabled = false
+                    )
                 )
-            )
+            }
         }
-    }
 
     @Test
-    fun testLoad_shouldPropagateCancellationException_whenFetchNextPageThrowsCancellationException() = runTest {
-        val embeddedMessagingPagingSource = createEmbeddedMessagingPagingSource()
-        everySuspend { mockListPageModel.fetchNextPage() } throws CancellationException("coroutine cancelled")
+    fun testLoad_shouldPropagateCancellationException_whenFetchNextPageThrowsCancellationException() =
+        runTest {
+            val embeddedMessagingPagingSource = createEmbeddedMessagingPagingSource()
+            everySuspend { mockListPageModel.fetchNextPage() } throws CancellationException("coroutine cancelled")
 
-        shouldThrow<CancellationException> {
-            embeddedMessagingPagingSource.load(
-                PagingSource.LoadParams.Refresh(
-                    key = 1, loadSize = 20, placeholdersEnabled = false
+            shouldThrow<CancellationException> {
+                embeddedMessagingPagingSource.load(
+                    PagingSource.LoadParams.Refresh(
+                        key = 1, loadSize = 20, placeholdersEnabled = false
+                    )
                 )
-            )
+            }
         }
-    }
 
     @Test
     fun testGetRefreshKey_should_return_0() = runTest {
