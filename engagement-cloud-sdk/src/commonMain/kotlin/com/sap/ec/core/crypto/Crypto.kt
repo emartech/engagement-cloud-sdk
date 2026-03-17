@@ -11,9 +11,10 @@ import dev.whyoleg.cryptography.algorithms.ECDSA
 import dev.whyoleg.cryptography.algorithms.SHA256
 import dev.whyoleg.cryptography.algorithms.SHA512
 import dev.whyoleg.cryptography.operations.Hasher
-import io.ktor.util.decodeBase64Bytes
-import io.ktor.util.encodeBase64
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
+@OptIn(ExperimentalEncodingApi::class)
 internal class Crypto(
     private val logger: Logger,
     private val publicKey: String
@@ -30,18 +31,18 @@ internal class Crypto(
 
     override suspend fun verify(message: String, signatureStr: String): Boolean {
         val decodedKey = ecdsaProvider.publicKeyDecoder(EC.Curve.P256)
-            .decodeFromByteArray(EC.PublicKey.Format.DER, publicKey.decodeBase64Bytes())
+            .decodeFromByteArray(EC.PublicKey.Format.DER, Base64.decode(publicKey))
         val (format: ECDSA.SignatureFormat, signature: ByteArray) = when (currentPlatform) {
             KotlinPlatform.JS -> {
-                ECDSA.SignatureFormat.RAW to derToRawSignature(signatureStr.decodeBase64Bytes())
+                ECDSA.SignatureFormat.RAW to derToRawSignature(Base64.decode(signatureStr))
             }
 
             KotlinPlatform.Android -> {
-                ECDSA.SignatureFormat.DER to signatureStr.decodeBase64Bytes()
+                ECDSA.SignatureFormat.DER to Base64.decode(signatureStr)
             }
 
             KotlinPlatform.IOS -> {
-                ECDSA.SignatureFormat.DER to signatureStr.decodeBase64Bytes()
+                ECDSA.SignatureFormat.DER to Base64.decode(signatureStr)
             }
         }
         val verifier = decodedKey.signatureVerifier(SHA256, format)
@@ -106,7 +107,7 @@ internal class Crypto(
 
         val encryptedValue = decodedKey.cipher().encrypt(value.encodeToByteArray())
 
-        return encryptedValue.encodeBase64()
+        return Base64.encode(encryptedValue)
     }
 
     override suspend fun decrypt(encryptedValue: String, secret: String): String {
@@ -119,7 +120,7 @@ internal class Crypto(
                         key.copyOfRange(SECRET_START_INDEX, SECRET_END_INDEX)
                     )
 
-            decodedKey.cipher().decrypt(encryptedValue.decodeBase64Bytes())
+            decodedKey.cipher().decrypt(Base64.decode(encryptedValue))
         } catch (exception: Throwable) {
             throw DecryptionFailedException(exception.message ?: "Decryption failed")
         }
