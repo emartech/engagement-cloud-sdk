@@ -45,7 +45,7 @@ kotlin {
     }
     jvmToolchain(17)
 
-    androidLibrary {
+    android {
         namespace = "com.sap"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
@@ -253,6 +253,16 @@ kotlin {
     }
 }
 
+// Consumer ProGuard rules — bundled into the AAR for downstream app builds.
+// Publishing is opt-in for KMP libraries. Configured outside kotlin {} to avoid
+// scope resolution conflicts with KotlinMultiplatformExtension's source set DSL.
+run {
+    val androidTarget = (kotlin as org.gradle.api.plugins.ExtensionAware).extensions
+        .findByType(com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget::class.java)
+        ?: error("Android KMP library target not found")
+    androidTarget.optimization.consumerKeepRules.publish = true
+    androidTarget.optimization.consumerKeepRules.file("proguard-rules.pro")
+}
 
 buildConfig {
     packageName("com.sap.ec.core.device")
