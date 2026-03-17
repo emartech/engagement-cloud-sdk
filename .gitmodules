@@ -1,3 +1,4 @@
 [submodule "docs/engagement-cloud-sdk-docs"]
 	path = docs/engagement-cloud-sdk-docs
 	url = https://github.com/emartech/engagement-cloud-sdk-docs.git
+	branch = main

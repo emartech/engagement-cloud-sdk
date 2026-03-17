@@ -285,6 +285,7 @@ jobs:
         with:
           name: js-cdn-artifacts
           retention-days: 1
+          if-no-files-found: error
           path: dist/cdn/
 
       - name: Upload JS Web Bundle to GitHub Release
@@ -414,6 +415,9 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
+          # NOTE: Submodule cloning uses GITHUB_TOKEN which is repo-scoped.
+          # This requires docs/engagement-cloud-sdk-docs to be a PUBLIC repository.
+          # If the docs repo becomes private, add: token: ${{ secrets.DOCS_READ_PAT }}
 
       - name: Update submodule to latest
         # Uses --remote to pull the latest commit from the docs repo's default
