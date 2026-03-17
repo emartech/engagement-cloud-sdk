@@ -53,9 +53,7 @@
     <div class="embedded-messaging-demo-container">
         <div class="compact-view-display">
             <button type="button" id="button-render-compact-view">Open Compact View</button>
-            <div id="example-compact-view-tab" class="hidden" style="height:400px; width:300px">
-                <ec-embedded-messaging-compact></ec-embedded-messaging-compact>
-            </div>
+            <div id="example-compact-view-container" style="height:400px; width:300px"></div>
         </div>
         <div class="detail-view-display">
             <p>Detail view</p>
@@ -114,7 +112,14 @@
     }
 
     document.getElementById("button-render-compact-view").onclick = () => {
-        document.querySelector('#example-compact-view-tab').classList.toggle("hidden");
+        const container = document.getElementById("example-compact-view-container");
+        const existing = container.querySelector('ec-embedded-messaging-compact');
+        if (existing) {
+            container.removeChild(existing);
+        } else {
+            const compactView = document.createElement('ec-embedded-messaging-compact');
+            container.appendChild(compactView);
+        }
     }
 
     engagementCloud.loaded.then(() => {
@@ -231,10 +236,6 @@
 <style>
     body {
         padding: 8px;
-    }
-
-    .hidden {
-        visibility: hidden;
     }
 
     .embedded-messaging-demo {
