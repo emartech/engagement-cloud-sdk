@@ -717,7 +717,10 @@ class ListPageViewModelTests {
     }
 
     @Test
-    fun testTriggerEmbeddedMessagingRefresh_shouldTriggerPagerRecreation() = runTest {
+    fun testTriggerEmbeddedMessagingRefresh_shouldTriggerPagerRecreation_andClearSelectedMessage() = runTest {
+        val mockMessageViewModel = mock<MessageItemViewModelApi>(MockMode.autofill)
+        every { mockMessageViewModel.id } returns TEST_MESSAGE_ID
+
         val sdkEventFlow = MutableSharedFlow<SdkEvent>(replay = 1)
         every { mockSdkEventDistributor.sdkEventFlow } returns sdkEventFlow
 
@@ -752,6 +755,11 @@ class ListPageViewModelTests {
         advanceUntilIdle()
 
         val initialCount = pagingDataList.size
+
+        refreshViewModel.selectMessage(mockMessageViewModel) {}
+        advanceUntilIdle()
+
+        refreshViewModel.selectedMessage.value shouldBe mockMessageViewModel
 
         sdkEventFlow.emit(SdkEvent.Internal.EmbeddedMessaging.TriggerRefresh())
         advanceUntilIdle()

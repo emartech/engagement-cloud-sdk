@@ -79,6 +79,7 @@ internal class ListPageViewModel(
                 .filter { it is SdkEvent.Internal.EmbeddedMessaging.TriggerRefresh }
                 .collect {
                     _categories.value = emptyList()
+                    _selectedMessage.value = null
                     refreshTrigger.value = !refreshTrigger.value
                 }
         }
