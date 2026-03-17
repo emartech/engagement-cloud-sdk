@@ -54,7 +54,7 @@ mavenPublishing {
     )
 
     val version = System.getenv("VERSION_OVERRIDE") ?: "4.0.0"
-    coordinates("com.sap", "engagement-cloud-sdk-android-hms", version)
+    coordinates("com.sap.engagement-cloud", "engagement-cloud-sdk-android-hms", version)
 }
 
 if (findProperty("ENABLE_PUBLISHING") == "true") {

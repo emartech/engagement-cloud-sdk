@@ -33,7 +33,7 @@ if (isMac) {
     apply(plugin = "co.touchlab.kmmbridge")
 }
 
-group = "com.sap"
+group = "com.sap.engagement-cloud"
 version = System.getenv("VERSION_OVERRIDE") ?: "4.0.0"
 
 kotlin {

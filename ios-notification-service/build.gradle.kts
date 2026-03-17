@@ -12,7 +12,7 @@ plugins {
     `maven-publish`
 }
 
-group = "com.sap"
+group = "com.sap.engagement-cloud"
 version = System.getenv("VERSION_OVERRIDE") ?: "4.0.0"
 
 val isMac = System.getProperty("os.name").contains("Mac", ignoreCase = true)
