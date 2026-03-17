@@ -30,11 +30,11 @@ echo ""
 # --- Trigger checks ---
 echo "[Trigger Configuration]"
 
-# 1. Must trigger on push: tags with numeric semver pattern
-if grep -q "tags:" "$PUBLISH_FILE" && grep -q '\[0-9\]' "$PUBLISH_FILE"; then
-  check "Triggers on push: tags with numeric semver pattern" "pass"
+# 1. Must trigger on push: tags with correct glob semver pattern (using * not +)
+if grep -A3 'tags:' "$PUBLISH_FILE" | grep -qE "\[0-9\]\*\.\[0-9\]\*\.\[0-9\]\*"; then
+  check "Triggers on push: tags with correct glob semver pattern ([0-9]* not [0-9]+)" "pass"
 else
-  check "Triggers on push: tags with numeric semver pattern" "fail"
+  check "Triggers on push: tags with correct glob semver pattern ([0-9]* not [0-9]+)" "fail"
 fi
 
 # 2. Must NOT trigger on push: branches: [main]
