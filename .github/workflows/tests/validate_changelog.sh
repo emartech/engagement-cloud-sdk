@@ -92,10 +92,7 @@ fi
 
 # 8. [Unreleased] section is NOT extracted by version extraction
 if [ -f "$CHANGELOG_FILE" ]; then
-  UNRELEASED_NOTES=$(sed -n "/^## \[Unreleased\]/,/^## \[/{/^## \[/!p;}" "$CHANGELOG_FILE" | sed '/^$/N;/^\n$/d')
-  # Unreleased should have content, but should NOT match a semver pattern extraction
-  SEMVER_NOTES=$(sed -n "/^## \[Unreleased\]/,/^## \[/{/^## \[/!p;}" "$CHANGELOG_FILE")
-  # The point: when we search for a specific version like "1.0.0", [Unreleased] is NOT matched
+  # When we search for a specific version like "1.0.0", [Unreleased] must NOT match
   SPECIFIC_NOTES=$(sed -n "/^## \[1\.0\.0\]/,/^## \[/{/^## \[/!p;}" "$CHANGELOG_FILE" | sed '/^$/N;/^\n$/d')
   if [ -z "$SPECIFIC_NOTES" ]; then
     check "[Unreleased] section is not extracted for specific version search" "pass"
