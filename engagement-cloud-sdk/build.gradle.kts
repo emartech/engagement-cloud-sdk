@@ -39,6 +39,8 @@ version = System.getenv("VERSION_OVERRIDE") ?: "4.0.0"
 kotlin {
     compilerOptions {
         apiVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_3)
+        // Experimental: enables @JsExport of suspend functions as JS async functions (Kotlin 2.3+)
+        freeCompilerArgs.add("-Xenable-suspend-function-exporting")
         freeCompilerArgs.add("-opt-in=com.sap.ec.InternalSdkApi")
         // Suppress expect/actual classes Beta warning globally (13 expect declarations across 10 files)
         freeCompilerArgs.add("-Xexpect-actual-classes")
