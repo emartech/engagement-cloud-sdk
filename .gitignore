@@ -470,6 +470,8 @@ gradle-app.setting
 # End of https://www.toptal.com/developers/gitignore/api/gradle,kotlin,intellij,intellij+iml,intellij+all,node,xcode,cocoapods
 /composeApp/google-services.json
 /composeApp/src/androidMain/assets/agconnect-services.json
+/androidApp/google-services.json
+/androidApp/src/main/assets/agconnect-services.json
 /resources/ec-service-worker.js
 /resources/ec-service-worker.js.map
 /SAPEngagementCloudSDK.xcframework/

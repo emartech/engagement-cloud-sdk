@@ -30,6 +30,7 @@ dependencyResolutionManagement {
 }
 rootProject.name = "EngagementCloudSDK"
 include(
+    ":androidApp",
     ":composeApp",
     ":engagement-cloud-sdk",
     ":engagement-cloud-sdk-android-hms",
