@@ -1,4 +1,4 @@
-.PHONY: build build-pipeline build-android build-ios build-ios-all-archtypes build-js-html build-web check-env clean create-apks help lint pipeline-android pipeline-js pipeline-ios prepare-release prepare-spm prepare-local-spm publish-android publish-ios-spm publish-npm release release-locally test test-android test-android-firebase test-ios test-sdk-loader test-web
+.PHONY: build build-pipeline build-android build-ios build-ios-all-archtypes build-js-html build-web check-env clean create-apks help lint pipeline-android pipeline-js pipeline-ios prepare-release prepare-spm prepare-local-spm publish-android publish-ios-spm publish-npm release release-locally stage-maven-central test test-android test-android-firebase test-ios test-sdk-loader test-web
 .DEFAULT_GOAL := help
 SHELL := /bin/bash
 
@@ -155,6 +155,12 @@ release: check-env prepare-release
 
 release-locally: check-env prepare-release
 	@./gradlew assembleRelease publishToMavenLocal -PPROMOTE_TO_MAVEN_CENTRAL=true
+
+stage-maven-central: check-env prepare-release
+	@./gradlew publishToMavenCentral \
+		-PPROMOTE_TO_MAVEN_CENTRAL=true \
+		-PENABLE_PUBLISHING=true \
+		--no-daemon
 
 pipeline-android: check-env
 	@./gradlew \

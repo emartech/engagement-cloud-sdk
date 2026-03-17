@@ -6,10 +6,10 @@ name: Revoke Release
 #   3. GitHub Packages NPM (delete package version)
 #   4. GitHub Packages Maven (delete package versions)
 #   5. SPM (revert Package.swift to previous release on main)
+#   6. Maven Central staging (drop pending deployment if not yet promoted)
 #
-# MavenCentral: artifacts on Maven Central are IMMUTABLE and cannot be deleted.
-#   This workflow logs a reminder to request manual deprecation via Sonatype support
-#   if the release contained a security vulnerability.
+# If the deployment was already promoted to Maven Central, artifacts are IMMUTABLE.
+#   This workflow logs a reminder to request manual deprecation via Sonatype support.
 
 on:
   workflow_dispatch:
@@ -407,21 +407,109 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  maven-central-reminder:
-    name: MavenCentral Deprecation Reminder
+  drop-maven-central-staging:
+    name: Drop Maven Central Staging
     needs: validate
     runs-on: ubuntu-latest
-    if: inputs.skip_maven_central_reminder != true
+    outputs:
+      result: ${{ steps.drop.outputs.result }}
+    steps:
+      - name: Build Central Portal auth token
+        id: auth
+        run: |
+          TOKEN=$(echo -n "${{ secrets.OSSRH_USERNAME }}:${{ secrets.OSSRH_PASSWORD }}" | base64)
+          echo "token=$TOKEN" >> "$GITHUB_OUTPUT"
+
+      - name: Find and drop staged deployment
+        id: drop
+        run: |
+          VERSION="${{ needs.validate.outputs.version }}"
+          TOKEN="${{ steps.auth.outputs.token }}"
+
+          echo "Searching for pending deployment matching version $VERSION..."
+
+          # List all deployments and find one matching our version
+          RESPONSE=$(curl -sf \
+            -H "Authorization: Bearer $TOKEN" \
+            -H "Accept: application/json" \
+            "https://central.sonatype.com/api/v1/publisher/deployments" 2>/dev/null || echo "[]")
+
+          DEPLOYMENT_ID=$(echo "$RESPONSE" | jq -r ".[] | select(.deploymentName | contains(\"$VERSION\")) | .deploymentId" | head -1)
+          DEPLOYMENT_STATE=$(echo "$RESPONSE" | jq -r ".[] | select(.deploymentName | contains(\"$VERSION\")) | .deploymentState" | head -1)
+
+          if [ -z "$DEPLOYMENT_ID" ]; then
+            echo "No staged deployment found for version $VERSION"
+            echo "This could mean:"
+            echo "  - Artifacts were already promoted to Maven Central (immutable)"
+            echo "  - Staging was never done for this version"
+            echo "  - The deployment was already dropped"
+            echo "result=not_found" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "Found deployment: $DEPLOYMENT_ID (state: $DEPLOYMENT_STATE)"
+
+          if [ "$DEPLOYMENT_STATE" = "PUBLISHED" ]; then
+            echo "::warning::Deployment $DEPLOYMENT_ID was already PUBLISHED — cannot drop"
+            echo "result=already_published" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "[DRY RUN] Would drop deployment $DEPLOYMENT_ID (state: $DEPLOYMENT_STATE)"
+            echo "result=dry_run" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "Dropping deployment $DEPLOYMENT_ID..."
+          HTTP_CODE=$(curl -s -o /tmp/drop-response.txt -w "%{http_code}" \
+            -X DELETE \
+            -H "Authorization: Bearer $TOKEN" \
+            "https://central.sonatype.com/api/v1/publisher/deployment/$DEPLOYMENT_ID")
+
+          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+            echo "✓ Staged deployment $DEPLOYMENT_ID dropped successfully"
+            echo "  Artifacts will NOT appear on Maven Central"
+            echo "result=dropped" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::Failed to drop deployment (HTTP $HTTP_CODE)"
+            cat /tmp/drop-response.txt 2>/dev/null || true
+            echo "result=drop_failed" >> "$GITHUB_OUTPUT"
+          fi
+
+  maven-central-reminder:
+    name: MavenCentral Deprecation Reminder
+    needs: [validate, drop-maven-central-staging]
+    runs-on: ubuntu-latest
+    # Only show the reminder if the staging drop didn't fully resolve the situation
+    if: |
+      inputs.skip_maven_central_reminder != true &&
+      needs.drop-maven-central-staging.outputs.result != 'dropped'
     steps:
       - name: Log MavenCentral status
         run: |
           VERSION="${{ needs.validate.outputs.version }}"
+          DROP_RESULT="${{ needs.drop-maven-central-staging.outputs.result }}"
+
           echo ""
           echo "============================================"
-          echo "  ⚠  MAVEN CENTRAL — MANUAL ACTION NEEDED"
+          if [ "$DROP_RESULT" = "already_published" ]; then
+            echo "  ⚠  MAVEN CENTRAL — ALREADY PUBLISHED"
+          else
+            echo "  ℹ  MAVEN CENTRAL — STATUS UNKNOWN"
+          fi
           echo "============================================"
           echo ""
-          echo "Artifacts on Maven Central are IMMUTABLE and cannot be deleted."
+
+          if [ "$DROP_RESULT" = "already_published" ]; then
+            echo "The deployment was already promoted to Maven Central."
+            echo "Artifacts on Maven Central are IMMUTABLE and cannot be deleted."
+          else
+            echo "Could not determine if artifacts were published to Maven Central."
+            echo "Check https://central.sonatype.com/publishing/deployments"
+          fi
+
+          echo ""
           echo "The following artifacts for version $VERSION may exist on Maven Central:"
           echo ""
           echo "  - com.sap.engagement-cloud:engagement-cloud-sdk:$VERSION"
@@ -447,7 +535,7 @@ jobs:
   summary:
     name: Revocation Summary
     if: always()
-    needs: [validate, revoke-github-release, revoke-github-pages, revoke-github-packages, revoke-spm, maven-central-reminder]
+    needs: [validate, revoke-github-release, revoke-github-pages, revoke-github-packages, revoke-spm, drop-maven-central-staging, maven-central-reminder]
     runs-on: ubuntu-latest
     steps:
       - name: Print summary
@@ -463,7 +551,8 @@ jobs:
           echo "GitHub Pages CDN:      ${{ needs.revoke-github-pages.result }}"
           echo "GitHub Packages:       ${{ needs.revoke-github-packages.result }}"
           echo "SPM (Package.swift):   ${{ needs.revoke-spm.result }}"
-          echo "MavenCentral:          IMMUTABLE (see reminder above)"
+          echo "MavenCentral staging:  ${{ needs.drop-maven-central-staging.outputs.result || 'skipped' }}"
+          echo "MavenCentral reminder: ${{ needs.maven-central-reminder.result }}"
           echo ""
           if [ "$DRY_RUN" = "true" ]; then
             echo "This was a DRY RUN. Re-run with dry_run=false to execute."
