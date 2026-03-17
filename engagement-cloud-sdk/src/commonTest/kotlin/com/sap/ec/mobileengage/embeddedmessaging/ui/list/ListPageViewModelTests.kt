@@ -768,6 +768,5 @@ class ListPageViewModelTests {
 
         refreshViewModel.selectedMessage.value shouldBe null
     }
-
 }
 

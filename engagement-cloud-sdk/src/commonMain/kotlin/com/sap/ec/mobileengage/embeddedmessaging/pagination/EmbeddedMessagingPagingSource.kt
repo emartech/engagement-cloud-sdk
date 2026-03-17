@@ -9,12 +9,12 @@ import com.sap.ec.core.util.DownloaderApi
 import com.sap.ec.mobileengage.action.ActionFactoryApi
 import com.sap.ec.mobileengage.action.models.ActionModel
 import com.sap.ec.mobileengage.embeddedmessaging.exceptions.LastPageReachedException
-import kotlinx.coroutines.CancellationException
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemModel
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemViewModel
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
 import com.sap.ec.mobileengage.embeddedmessaging.ui.list.ListPageModelApi
 import com.sap.ec.networking.clients.embedded.messaging.model.Category
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 
@@ -27,10 +27,15 @@ internal class EmbeddedMessagingPagingSource(
     private val actionFactory: ActionFactoryApi<ActionModel>,
     private val sdkEventDistributor: SdkEventDistributorApi,
     private val sdkContext: SdkContextApi,
-    private val logger: Logger
+    private val logger: Logger,
+    private val hasContactToken: () -> Boolean
 ) : PagingSource<Int, MessageItemViewModelApi>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MessageItemViewModelApi> {
+        if (!hasContactToken()) {
+            logger.trace("Skipping page load: no contact token")
+            return LoadResult.Page(data = emptyList(), prevKey = null, nextKey = null)
+        }
         return try {
             val pageNumber = params.key ?: 0
             logger.trace("pageNumber: $pageNumber")
