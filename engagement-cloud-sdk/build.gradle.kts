@@ -258,6 +258,9 @@ kotlin {
 // Consumer ProGuard rules — bundled into the AAR for downstream app builds.
 // Publishing is opt-in for KMP libraries. Configured outside kotlin {} to avoid
 // scope resolution conflicts with KotlinMultiplatformExtension's source set DSL.
+// NOTE: KmpOptimization.consumerKeepRules is @Incubating (AGP KMP library plugin API).
+// If this stops working after an AGP upgrade, check for a stable replacement or
+// revert to consumerProguardFiles once KMP library plugin exposes LibraryExtension.
 run {
     val androidTarget = (kotlin as org.gradle.api.plugins.ExtensionAware).extensions
         .findByType(com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget::class.java)

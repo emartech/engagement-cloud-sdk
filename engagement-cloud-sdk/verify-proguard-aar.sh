@@ -34,7 +34,7 @@ fi
 echo ""
 echo "Check 2: proguard.txt contains the -keep rule"
 PROGUARD_CONTENT=$(unzip -p "$AAR_PATH" proguard.txt)
-if echo "$PROGUARD_CONTENT" | grep -q '\-keep public class !com.sap.ec.EngagementCloud, com.sap.ec.\*\*'; then
+if echo "$PROGUARD_CONTENT" | grep -qF -- '-keep public class !com.sap.ec.EngagementCloud, com.sap.ec.**'; then
   echo "  PASS: -keep rule found"
 else
   echo "  FAIL: -keep rule NOT found in proguard.txt"
