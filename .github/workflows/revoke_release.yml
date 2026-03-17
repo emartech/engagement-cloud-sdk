@@ -281,13 +281,15 @@ jobs:
         run: |
           VERSION="${{ needs.validate.outputs.version }}"
           OWNER="emartech"
-          PACKAGE="engagement-cloud-sdk"
+          # GitHub Packages API uses URL-encoded scoped name (e.g., @sap/engagement-cloud-sdk)
+          PACKAGE_DISPLAY="@sap/engagement-cloud-sdk"
+          PACKAGE_API="@sap%2Fengagement-cloud-sdk"
 
-          echo "--- NPM Package: @${OWNER}/${PACKAGE} ---"
+          echo "--- NPM Package: ${PACKAGE_DISPLAY} ---"
 
           # Find the NPM package version ID
           VERSION_ID=$(gh api \
-            "/orgs/$OWNER/packages/npm/$PACKAGE/versions" \
+            "/orgs/$OWNER/packages/npm/$PACKAGE_API/versions" \
             --jq ".[] | select(.name == \"$VERSION\") | .id" 2>/dev/null || true)
 
           if [ -z "$VERSION_ID" ]; then
@@ -297,7 +299,7 @@ jobs:
           else
             echo "Deleting NPM package version $VERSION (ID: $VERSION_ID)..."
             gh api --method DELETE \
-              "/orgs/$OWNER/packages/npm/$PACKAGE/versions/$VERSION_ID" || true
+              "/orgs/$OWNER/packages/npm/$PACKAGE_API/versions/$VERSION_ID" || true
             echo "✓ NPM package version $VERSION deleted"
           fi
         env:
