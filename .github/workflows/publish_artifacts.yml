@@ -150,7 +150,6 @@ jobs:
           fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == true }}
 
   android-pipeline:
     name: Android Pipeline (Build, Test, Publish)

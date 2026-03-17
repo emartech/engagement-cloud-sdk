@@ -78,30 +78,37 @@ fi
 echo ""
 echo "[Changelog Extraction Logic]"
 
-# 7. Extraction script returns empty for non-existent version
-if [ -f "$CHANGELOG_FILE" ]; then
-  NOTES=$(sed -n "/^## \[99\.99\.99\]/,/^## \[/{/^## \[/!p;}" "$CHANGELOG_FILE" | sed '/^$/N;/^\n$/d')
-  if [ -z "$NOTES" ]; then
-    check "Extraction returns empty for non-existent version (99.99.99)" "pass"
-  else
-    check "Extraction returns empty for non-existent version (99.99.99)" "fail"
-  fi
+# Create a temp changelog fixture with both [Unreleased] and [1.0.0] sections for checks 7-8
+FIXTURE_CHANGELOG=$(mktemp)
+cat > "$FIXTURE_CHANGELOG" << 'FIXTUREEOF'
+## [Unreleased]
+
+### Changed
+- Unreleased work
+
+## [1.0.0]
+
+### Changed
+- Released item
+FIXTUREEOF
+
+# 7. Extraction returns empty for non-existent version (uses fixture with known versions)
+NOTES=$(sed -n "/^## \[99\.99\.99\]/,/^## \[/{/^## \[/!p;}" "$FIXTURE_CHANGELOG" | sed '/^$/N;/^\n$/d')
+if [ -z "$NOTES" ]; then
+  check "Extraction returns empty for non-existent version (99.99.99)" "pass"
 else
   check "Extraction returns empty for non-existent version (99.99.99)" "fail"
 fi
 
-# 8. [Unreleased] section is NOT extracted by version extraction
-if [ -f "$CHANGELOG_FILE" ]; then
-  # When we search for a specific version like "1.0.0", [Unreleased] must NOT match
-  SPECIFIC_NOTES=$(sed -n "/^## \[1\.0\.0\]/,/^## \[/{/^## \[/!p;}" "$CHANGELOG_FILE" | sed '/^$/N;/^\n$/d')
-  if [ -z "$SPECIFIC_NOTES" ]; then
-    check "[Unreleased] section is not extracted for specific version search" "pass"
-  else
-    check "[Unreleased] section is not extracted for specific version search" "fail"
-  fi
+# 8. Extracting [1.0.0] gets released content but NOT unreleased content
+SPECIFIC_NOTES=$(sed -n "/^## \[1\.0\.0\]/,/^## \[/{/^## \[/!p;}" "$FIXTURE_CHANGELOG" | sed '/^$/N;/^\n$/d')
+if echo "$SPECIFIC_NOTES" | grep -q "Released item" && ! echo "$SPECIFIC_NOTES" | grep -q "Unreleased work"; then
+  check "[Unreleased] section is not extracted for specific version search" "pass"
 else
   check "[Unreleased] section is not extracted for specific version search" "fail"
 fi
+
+rm -f "$FIXTURE_CHANGELOG"
 
 echo ""
 echo "[Workflow Integration: Changelog Extraction Step]"
