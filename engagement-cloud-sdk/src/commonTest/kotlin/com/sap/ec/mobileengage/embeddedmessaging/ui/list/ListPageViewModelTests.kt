@@ -1,6 +1,8 @@
 package com.sap.ec.mobileengage.embeddedmessaging.ui.list
 
 import androidx.paging.PagingData
+import com.sap.ec.api.SdkState
+import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.providers.InstantProvider
 import com.sap.ec.core.providers.inputmode.InputModeProviderApi
@@ -33,6 +35,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
@@ -73,6 +76,7 @@ class ListPageViewModelTests {
     private lateinit var readMessageIds: MutableStateFlow<Set<String>>
     private lateinit var mockPlatformCategoryProvider: PlatformCategoryProviderApi
     private lateinit var mockInputModeProvider: InputModeProviderApi
+    private lateinit var mockSdkContext: SdkContextApi
 
     @BeforeTest
     fun setup() {
@@ -88,6 +92,8 @@ class ListPageViewModelTests {
         mockEmbeddedMessagingContext = mock(MockMode.autofill)
         mockPlatformCategoryProvider = mock(MockMode.autofill)
         mockInputModeProvider = mock(MockMode.autofill)
+        mockSdkContext = mock(MockMode.autofill)
+        everySuspend { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
         every { mockPlatformCategoryProvider.provide() } returns PLATFORM_CATEGORY
         every { mockInputModeProvider.hasTouchSupport() } returns true
         deletedMessageIds = MutableStateFlow(emptySet())
@@ -106,7 +112,8 @@ class ListPageViewModelTests {
             platformCategoryProvider = mockPlatformCategoryProvider,
             inputModeProvider = mockInputModeProvider,
             sdkEventDistributor = mockSdkEventDistributor,
-            _categories = categories
+            _categories = categories,
+            sdkContext = mockSdkContext
         )
     }
 
@@ -710,63 +717,106 @@ class ListPageViewModelTests {
             platformCategoryProvider = mockPlatformCategoryProvider,
             inputModeProvider = falseProvider,
             sdkEventDistributor = mockSdkEventDistributor,
-            _categories = categories
+            _categories = categories,
+            sdkContext = mockSdkContext
         )
 
         viewModelWithNoTouch.hasTouchInput shouldBe false
     }
 
     @Test
-    fun testTriggerEmbeddedMessagingRefresh_shouldTriggerPagerRecreation_andClearSelectedMessage() = runTest {
-        val mockMessageViewModel = mock<MessageItemViewModelApi>(MockMode.autofill)
-        every { mockMessageViewModel.id } returns TEST_MESSAGE_ID
+    fun testTriggerEmbeddedMessagingRefresh_shouldTriggerPagerRecreation_andClearSelectedMessage() =
+        runTest {
+            val mockMessageViewModel = mock<MessageItemViewModelApi>(MockMode.autofill)
+            every { mockMessageViewModel.id } returns TEST_MESSAGE_ID
 
-        val sdkEventFlow = MutableSharedFlow<SdkEvent>(replay = 1)
-        every { mockSdkEventDistributor.sdkEventFlow } returns sdkEventFlow
+            val sdkEventFlow = MutableSharedFlow<SdkEvent>(replay = 1)
+            every { mockSdkEventDistributor.sdkEventFlow } returns sdkEventFlow
 
-        every { mockPagerFactory.create(any(), any(), any()) } returns flowOf(
-            PagingData.from(
-                data = emptyList(),
-                placeholdersBefore = 0,
-                placeholdersAfter = 0
+            every { mockPagerFactory.create(any(), any(), any()) } returns flowOf(
+                PagingData.from(
+                    data = emptyList(),
+                    placeholdersBefore = 0,
+                    placeholdersAfter = 0
+                )
             )
-        )
 
-        val refreshViewModel = ListPageViewModel(
-            embeddedMessagingContext = mockEmbeddedMessagingContext,
-            timestampProvider = mockTimestampProvider,
-            coroutineScope = CoroutineScope(SupervisorJob() + testDispatcher),
-            pagerFactory = mockPagerFactory,
-            connectionWatchDog = mockConnectionWatchDog,
-            locallyDeletedMessageIds = deletedMessageIds,
-            locallyOpenedMessageIds = readMessageIds,
-            platformCategoryProvider = mockPlatformCategoryProvider,
-            inputModeProvider = mockInputModeProvider,
-            sdkEventDistributor = mockSdkEventDistributor,
-            _categories = categories
-        )
+            val refreshViewModel = ListPageViewModel(
+                embeddedMessagingContext = mockEmbeddedMessagingContext,
+                timestampProvider = mockTimestampProvider,
+                coroutineScope = CoroutineScope(SupervisorJob() + testDispatcher),
+                pagerFactory = mockPagerFactory,
+                connectionWatchDog = mockConnectionWatchDog,
+                locallyDeletedMessageIds = deletedMessageIds,
+                locallyOpenedMessageIds = readMessageIds,
+                platformCategoryProvider = mockPlatformCategoryProvider,
+                inputModeProvider = mockInputModeProvider,
+                sdkEventDistributor = mockSdkEventDistributor,
+                _categories = categories,
+                sdkContext = mockSdkContext
+            )
 
-        val pagingDataList = mutableListOf<PagingData<MessageItemViewModelApi>>()
-        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-            refreshViewModel.messagePagingDataFlowFiltered.collect {
-                pagingDataList.add(it)
+            val pagingDataList = mutableListOf<PagingData<MessageItemViewModelApi>>()
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+                refreshViewModel.messagePagingDataFlowFiltered.collect {
+                    pagingDataList.add(it)
+                }
             }
+            advanceUntilIdle()
+
+            val initialCount = pagingDataList.size
+
+            refreshViewModel.selectMessage(mockMessageViewModel) {}
+            advanceUntilIdle()
+
+            refreshViewModel.selectedMessage.value shouldBe mockMessageViewModel
+
+            sdkEventFlow.emit(SdkEvent.Internal.EmbeddedMessaging.TriggerRefresh())
+            advanceUntilIdle()
+
+            pagingDataList.size shouldBe initialCount + 1
+
+            refreshViewModel.selectedMessage.value shouldBe null
         }
-        advanceUntilIdle()
 
-        val initialCount = pagingDataList.size
+    @Test
+    fun testCurrentSdkStateChange_shouldTriggerPagerRecreation() =
+        runTest {
+            val sdkEventFlow = MutableSharedFlow<SdkEvent>(replay = 1)
+            every { mockSdkEventDistributor.sdkEventFlow } returns sdkEventFlow
 
-        refreshViewModel.selectMessage(mockMessageViewModel) {}
-        advanceUntilIdle()
+            every { mockPagerFactory.create(any(), any(), any()) } returns flowOf(
+                PagingData.from(
+                    data = emptyList(),
+                    placeholdersBefore = 0,
+                    placeholdersAfter = 0
+                )
+            )
 
-        refreshViewModel.selectedMessage.value shouldBe mockMessageViewModel
+            val currentSdkState = MutableStateFlow(SdkState.Active)
+            everySuspend { mockSdkContext.currentSdkState } returns currentSdkState
 
-        sdkEventFlow.emit(SdkEvent.Internal.EmbeddedMessaging.TriggerRefresh())
-        advanceUntilIdle()
+            val viewModel = ListPageViewModel(
+                embeddedMessagingContext = mockEmbeddedMessagingContext,
+                timestampProvider = mockTimestampProvider,
+                coroutineScope = CoroutineScope(SupervisorJob() + testDispatcher),
+                pagerFactory = mockPagerFactory,
+                connectionWatchDog = mockConnectionWatchDog,
+                locallyDeletedMessageIds = deletedMessageIds,
+                locallyOpenedMessageIds = readMessageIds,
+                platformCategoryProvider = mockPlatformCategoryProvider,
+                inputModeProvider = mockInputModeProvider,
+                sdkEventDistributor = mockSdkEventDistributor,
+                _categories = categories,
+                sdkContext = mockSdkContext
+            )
+            currentSdkState.value = SdkState.OnHold
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+                viewModel.messagePagingDataFlowFiltered.collect()
+            }
+            advanceUntilIdle()
 
-        pagingDataList.size shouldBe initialCount + 1
-
-        refreshViewModel.selectedMessage.value shouldBe null
-    }
+            verifySuspend { mockPagerFactory.create(any(), any(), any()) }
+        }
 }
 

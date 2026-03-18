@@ -17,7 +17,6 @@ import com.sap.ec.enable.states.ApplyAppCodeBasedRemoteConfigState
 import com.sap.ec.enable.states.CollectDeviceInfoState
 import com.sap.ec.enable.states.FetchEmbeddedMessagingMetaState
 import com.sap.ec.enable.states.FetchJsBridgeState
-import com.sap.ec.enable.states.LoadEmbeddedMessagingFetchMessagesState
 import com.sap.ec.enable.states.RegisterClientState
 import com.sap.ec.enable.states.RegisterPushTokenState
 import com.sap.ec.enable.states.RestoreSavedSdkEventsState
@@ -110,13 +109,6 @@ internal object SetupInjection {
                 sdkLogger = get { parametersOf(FetchEmbeddedMessagingMetaState::class.simpleName) }
             )
         }
-        single<State>(named(StateTypes.LoadEmbeddedMessagingMessages)) {
-            LoadEmbeddedMessagingFetchMessagesState(
-                sdkEventEmitter = get<SdkEventEmitterApi>(),
-                sdkContext = get(),
-                sdkLogger = get { parametersOf(LoadEmbeddedMessagingFetchMessagesState::class.simpleName) }
-            )
-        }
         single<State>(named(StateTypes.FetchJsBridge)) {
             FetchJsBridgeState(
                 jsBridgeClient = get(),
@@ -134,7 +126,6 @@ internal object SetupInjection {
                     get<State>(named(StateTypes.RestoreSavedSdkEvents)),
                     get<State>(named(StateTypes.AppStart)),
                     get<State>(named(StateTypes.FetchEmbeddedMessagingMetaState)),
-                    get<State>(named(StateTypes.LoadEmbeddedMessagingMessages)),
                 ),
                 name = StateMachineTypes.MobileEngageEnable.name,
                 logger = get { parametersOf(StateMachineTypes.MobileEngageEnable.name) }
@@ -158,7 +149,6 @@ internal object SetupInjection {
                 states = listOf(
                     get<State>(named(StateTypes.ApplyAppCodeBasedRemoteConfig)),
                     get<State>(named(StateTypes.FetchEmbeddedMessagingMetaState)),
-                    get<State>(named(StateTypes.LoadEmbeddedMessagingMessages)),
                 ),
                 name = StateMachineTypes.FollowUpChangeAppCodeStateMachine.name,
                 logger = get { parametersOf(StateMachineTypes.FollowUpChangeAppCodeStateMachine.name) }
@@ -228,6 +218,5 @@ internal enum class StateTypes {
     ClearStoredConfig,
     ClearEvents,
     FetchEmbeddedMessagingMetaState,
-    LoadEmbeddedMessagingMessages,
     FetchJsBridge,
 }

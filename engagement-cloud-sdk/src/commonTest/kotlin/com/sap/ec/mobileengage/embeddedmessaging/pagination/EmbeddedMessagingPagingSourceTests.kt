@@ -3,6 +3,7 @@ package com.sap.ec.mobileengage.embeddedmessaging.pagination
 import androidx.paging.PagingConfig
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import com.sap.ec.api.SdkState
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.log.Logger
@@ -24,6 +25,7 @@ import dev.mokkery.verifySuspend
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -46,6 +48,8 @@ class EmbeddedMessagingPagingSourceTests {
         mockSdkContext = mock()
         mockActionFactory = mock()
         mockLogger = mock()
+
+        everySuspend { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
 
         everySuspend { mockLogger.trace(any()) } returns Unit
         everySuspend { mockLogger.error(any(), any<Throwable>()) } returns Unit
@@ -102,6 +106,36 @@ class EmbeddedMessagingPagingSourceTests {
         runTest {
             val embeddedMessagingPagingSource =
                 createEmbeddedMessagingPagingSource(hasContactToken = { false })
+
+            val result =
+                embeddedMessagingPagingSource.load(
+                    PagingSource.LoadParams.Refresh(
+                        key = null, loadSize = 20, placeholdersEnabled = false
+                    )
+                )
+
+            verifySuspend(VerifyMode.exactly(0)) {
+                mockListPageModel.fetchMessagesWithCategories(
+                    filterUnopenedOnly = any(), categoryIds = any()
+                )
+            }
+            verifySuspend(VerifyMode.exactly(0)) {
+                mockListPageModel.fetchNextPage()
+            }
+
+            with(result as PagingSource.LoadResult.Page) {
+                data shouldBe emptyList()
+                prevKey shouldBe null
+                nextKey shouldBe null
+            }
+        }
+
+    @Test
+    fun testLoad_shouldNot_call_fetchMessagesWithCategories_when_SdkIsNotActive() =
+        runTest {
+            everySuspend { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Initialized)
+            val embeddedMessagingPagingSource =
+                createEmbeddedMessagingPagingSource(hasContactToken = { true })
 
             val result =
                 embeddedMessagingPagingSource.load(
