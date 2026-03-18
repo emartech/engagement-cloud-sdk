@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.0.0]
 
-First public release of the **SAP Engagement Cloud SDK** — the next-generation, Kotlin Multiplatform SDK that replaces the SAP Emarsys SDKs for Android, iOS, and Web.
+First public release of the **SAP Engagement Cloud SDK** — a complete rewrite and the next major version of the SAP Emarsys SDK (Android & iOS) and the Web Push SDK, unified into a single Kotlin Multiplatform SDK for Android, iOS, and Web.
 
 ### Highlights
 
