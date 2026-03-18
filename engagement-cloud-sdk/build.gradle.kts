@@ -34,7 +34,7 @@ if (isMac) {
 }
 
 group = "com.sap.engagement-cloud"
-version = System.getenv("VERSION_OVERRIDE") ?: "4.0.0"
+version = System.getenv("VERSION_OVERRIDE")
 
 kotlin {
     compilerOptions {

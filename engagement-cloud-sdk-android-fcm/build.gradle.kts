@@ -52,7 +52,7 @@ mavenPublishing {
         )
     )
 
-    val version = System.getenv("VERSION_OVERRIDE") ?: "4.0.0"
+    val version = System.getenv("VERSION_OVERRIDE")
     coordinates("com.sap.engagement-cloud", "engagement-cloud-sdk-android-fcm", version)
 }
 
