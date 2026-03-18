@@ -71,9 +71,6 @@ class CryptoTests {
     @OptIn(ExperimentalEncodingApi::class)
     @Test
     fun testBase64Encoding_should_matchKtorFormat() {
-        // Oracle: encode a known byte array and assert the exact Base64 string.
-        // This test confirms Kotlin stdlib Base64.Default produces identical output
-        // to Ktor's encodeBase64(), which was the previous implementation.
         val knownBytes = "Hello, World!".encodeToByteArray()
         val expected = "SGVsbG8sIFdvcmxkIQ=="
 
@@ -87,13 +84,6 @@ class CryptoTests {
     @OptIn(ExperimentalEncodingApi::class)
     @Test
     fun testBase64Decode_should_handleInputWithEmbeddedNewlines() {
-        // Ktor's decodeBase64Bytes() was lenient with embedded newlines.
-        // Kotlin stdlib Base64.Default is strict and rejects them.
-        // This is safe because our usage in Crypto.kt only decodes:
-        //   1. Public keys (constant strings without newlines)
-        //   2. Signatures (single-line Base64 from backend)
-        //   3. AES ciphertext produced by Base64.encode() (no newlines)
-        // None of these sources contain embedded newlines.
         val withNewlines = "SGVsbG8s\nIFdvcmxkIQ=="
         val withoutNewlines = "SGVsbG8sIFdvcmxkIQ=="
 
@@ -110,22 +100,13 @@ class CryptoTests {
     @OptIn(ExperimentalEncodingApi::class)
     @Test
     fun testBase64Decode_should_handleInputWithoutTrailingPadding() {
-        // Ktor's decodeBase64Bytes() was lenient with missing padding (=).
-        // Kotlin stdlib Base64.Default is strict and rejects unpadded input.
-        // This is safe because our usage in Crypto.kt only decodes:
-        //   1. Public keys (always properly padded standard Base64)
-        //   2. Signatures (properly padded Base64 from backend)
-        //   3. AES ciphertext produced by Base64.encode() (always padded)
-        // None of these sources omit padding characters.
         val withPadding = "SGVsbG8sIFdvcmxkIQ=="
         val withoutPadding = "SGVsbG8sIFdvcmxkIQ"
 
-        // Stdlib Base64.Default rejects missing padding -- verify this strictness
         shouldThrow<IllegalArgumentException> {
             Base64.decode(withoutPadding)
         }
 
-        // The properly padded version decodes correctly
         val decoded = Base64.decode(withPadding)
         decoded.decodeToString() shouldBe "Hello, World!"
     }
