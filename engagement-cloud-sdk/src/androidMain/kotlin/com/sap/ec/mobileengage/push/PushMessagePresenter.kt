@@ -6,7 +6,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
-import com.sap.R
+import com.sap.ec.R
 import com.sap.ec.api.push.PushConstants.DEFAULT_TAP_ACTION_ID
 import com.sap.ec.api.push.PushConstants.INTENT_EXTRA_ACTION_KEY
 import com.sap.ec.api.push.PushConstants.INTENT_EXTRA_DEFAULT_TAP_ACTION_KEY
