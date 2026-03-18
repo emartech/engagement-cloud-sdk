@@ -117,6 +117,7 @@ internal class IosPushInternal(
         userInfo.notification.actions?.forEach {
             actionFactory.create(it).invoke()
         }
+        userInfo.notification.badgeCount?.let { badgeCountHandler.handle(it) }
 
         sdkEventDistributor.registerPublicEvent(
             AppEvent(

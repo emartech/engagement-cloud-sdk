@@ -23,7 +23,6 @@ actual class ConsoleLogger : ConsoleLoggerApi {
             LogLevel.Metric -> console.log(colorizeLog(logString, color))
             LogLevel.Trace -> console.trace(colorizeLog(logString, color))
         }
-        println(colorizeLog(logString, color))
     }
 
     private fun Console.debug(message: String) {

@@ -1,13 +1,11 @@
 package com.sap.ec.di
 
-import com.sap.ec.context.Features
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventEmitterApi
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.state.State
 import com.sap.ec.core.state.StateMachine
 import com.sap.ec.core.state.TestState
-import com.sap.ec.enable.states.LoadEmbeddedMessagingFetchMessagesState
 import com.sap.ec.event.SdkEvent
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -43,30 +41,11 @@ internal class FollowUpChangeAppCodeStateMachineTests {
             every { name } returns "fetchEmbeddedMessagingMetaState"
             everySuspend { active() } returns Result.success(Unit)
         }
-        val loadMessagesState = LoadEmbeddedMessagingFetchMessagesState(
-            sdkEventEmitter = mockSdkEventEmitter,
-            sdkContext = mockSdkContext,
-            sdkLogger = mockLogger
-        )
         return StateMachine(
-            states = listOf(applyConfigState, fetchMetaState, loadMessagesState),
+            states = listOf(applyConfigState, fetchMetaState),
             name = StateMachineTypes.FollowUpChangeAppCodeStateMachine.name,
             logger = mockLogger
         )
-    }
-
-    @Test
-    fun activate_shouldEmitTriggerRefresh_whenEmbeddedMessagingEnabled() = runTest {
-        every { mockSdkContext.features } returns mutableSetOf(Features.EmbeddedMessaging)
-        everySuspend { mockSdkEventEmitter.emitEvent(any()) } returns Unit
-
-        val stateMachine = createStateMachineWithRealLoadState()
-        val result = stateMachine.activate()
-
-        result shouldBe Result.success(Unit)
-        verifySuspend {
-            mockSdkEventEmitter.emitEvent(any<SdkEvent.Internal.EmbeddedMessaging.TriggerRefresh>())
-        }
     }
 
     @Test
@@ -86,10 +65,9 @@ internal class FollowUpChangeAppCodeStateMachineTests {
     fun activate_shouldActivateAllThreeStates_inCorrectOrder() = runTest {
         val applyConfig = TestState("applyAppCodeBasedRemoteConfig")
         val fetchMeta = TestState("fetchEmbeddedMessagingMetaState")
-        val loadMessages = TestState("loadEmbeddedMessagingFetchMessagesState")
 
         val activatedStateNames = mutableListOf<String>()
-        listOf(applyConfig, fetchMeta, loadMessages).forEach { state ->
+        listOf(applyConfig, fetchMeta).forEach { state ->
             state.functionCalls = { stateName, functionName ->
                 if (functionName == "active") {
                     activatedStateNames.add(stateName)
@@ -98,7 +76,7 @@ internal class FollowUpChangeAppCodeStateMachineTests {
         }
 
         val stateMachine = StateMachine(
-            states = listOf(applyConfig, fetchMeta, loadMessages),
+            states = listOf(applyConfig, fetchMeta),
             name = StateMachineTypes.FollowUpChangeAppCodeStateMachine.name,
             logger = mockLogger
         )
@@ -108,7 +86,6 @@ internal class FollowUpChangeAppCodeStateMachineTests {
         activatedStateNames shouldBe listOf(
             "applyAppCodeBasedRemoteConfig",
             "fetchEmbeddedMessagingMetaState",
-            "loadEmbeddedMessagingFetchMessagesState"
         )
     }
 }
