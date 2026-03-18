@@ -4,7 +4,6 @@ import com.vanniktech.maven.publish.SourcesJar
 
 plugins {
     alias(libs.plugins.androidLibrary)
-    alias(libs.plugins.googleServices)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.builtInKotlin)
     alias(libs.plugins.mavenPublish)
