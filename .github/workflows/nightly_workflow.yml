@@ -48,11 +48,11 @@ jobs:
       matrix:
         include:
           - platform: android
-            os: macos-latest
+            os: macos-latest-xlarge
           - platform: web
             os: ubuntu-latest
           - platform: ios
-            os: macos-latest
+            os: macos-latest-xlarge
 
     steps:
       - uses: actions/checkout@v6
@@ -114,11 +114,11 @@ jobs:
       matrix:
         include:
           - platform: android
-            os: macos-latest
+            os: macos-latest-xlarge
           - platform: web
             os: ubuntu-latest
           - platform: ios
-            os: macos-latest
+            os: macos-latest-xlarge
 
     steps:
       - uses: actions/checkout@v6
