@@ -58,9 +58,13 @@ jobs:
           if git describe --tags --match '[0-9]*.[0-9]*.[0-9]*' >/dev/null 2>&1; then
             TAG=$(git describe --tags --match '[0-9]*.[0-9]*.[0-9]*' --abbrev=0)
             COMMITS=$(git rev-list "${TAG}..HEAD" --count)
-            VERSION="${TAG}.${COMMITS}"
+            if [ "$COMMITS" -eq 0 ]; then
+              VERSION="$TAG"
+            else
+              VERSION="${TAG}-prerelease.${COMMITS}"
+            fi
           else
-            VERSION="0.0.0.${{ github.run_number }}"
+            VERSION="0.0.0-prerelease.${{ github.run_number }}"
           fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Snapshot version: $VERSION"
@@ -215,7 +219,7 @@ jobs:
     name: Publish Android Snapshot
     if: github.ref == 'refs/heads/main'
     needs: [derive-version, test, lint]
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     permissions:
       packages: write
     steps:
