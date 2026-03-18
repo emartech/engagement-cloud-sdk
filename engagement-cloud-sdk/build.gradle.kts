@@ -39,10 +39,8 @@ version = System.getenv("VERSION_OVERRIDE") ?: "4.0.0"
 kotlin {
     compilerOptions {
         apiVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_3)
-        // Experimental: enables @JsExport of suspend functions as JS async functions (Kotlin 2.3+)
         freeCompilerArgs.add("-Xenable-suspend-function-exporting")
         freeCompilerArgs.add("-opt-in=com.sap.ec.InternalSdkApi")
-        // Suppress expect/actual classes Beta warning globally (13 expect declarations across 10 files)
         freeCompilerArgs.add("-Xexpect-actual-classes")
     }
     jvmToolchain(17)
@@ -255,12 +253,7 @@ kotlin {
     }
 }
 
-// Consumer ProGuard rules — bundled into the AAR for downstream app builds.
-// Publishing is opt-in for KMP libraries. Configured outside kotlin {} to avoid
-// scope resolution conflicts with KotlinMultiplatformExtension's source set DSL.
-// NOTE: KmpOptimization.consumerKeepRules is @Incubating (AGP KMP library plugin API).
-// If this stops working after an AGP upgrade, check for a stable replacement or
-// revert to consumerProguardFiles once KMP library plugin exposes LibraryExtension.
+
 run {
     val androidTarget = (kotlin as org.gradle.api.plugins.ExtensionAware).extensions
         .findByType(com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget::class.java)
