@@ -415,16 +415,20 @@ mavenPublishing {
 tasks {
     register("base64EnvToFile") {
         val propertyName = providers.gradleProperty("propertyName")
-            .orElse(provider { throw IllegalArgumentException("Property 'propertyName' is not provided.") })
         val filePath = providers.gradleProperty("file")
-            .orElse(provider { throw IllegalArgumentException("Property 'file' is not provided.") })
-        val outputFile = filePath.map { layout.projectDirectory.file(it).asFile }
+        val base64Content = propertyName.flatMap { providers.environmentVariable(it) }
+        val projectDir = layout.projectDirectory.asFile
 
         doLast {
-            val base64String = env.fetch(propertyName.get())
-            val decoder = Base64.getDecoder()
-            val decodedBytes = decoder.decode(base64String)
-            outputFile.get().writeBytes(decodedBytes)
+            val name = propertyName.orNull
+                ?: throw IllegalArgumentException("Property 'propertyName' is not provided.")
+            val file = filePath.orNull
+                ?: throw IllegalArgumentException("Property 'file' is not provided.")
+            val base64String = base64Content.orNull
+                ?: throw IllegalArgumentException("Environment variable '$name' is not set.")
+            val decodedBytes = Base64.getDecoder().decode(base64String)
+
+            projectDir.resolve(file).writeBytes(decodedBytes)
         }
     }
 }
