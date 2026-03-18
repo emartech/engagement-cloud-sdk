@@ -56,23 +56,9 @@ First public release of the **SAP Engagement Cloud SDK** — the next-generation
 - **Reactive Event Stream**
   - `EngagementCloud.events` — a unified reactive stream (`Flow` on Kotlin, `AsyncSequence` on Swift, `EventEmitter` on Web) emitting `AppEvent`, `BadgeCountEvent`, and other SDK events. Replaces per-feature `onEventAction` handler registrations.
 
-- **Distribution**
-  - Published to Maven Central (`com.sap.engagement-cloud:engagement-cloud-sdk`)
-  - Published to GitHub Packages (Maven + NPM `@sap/engagement-cloud-sdk`)
-  - iOS distributed via Swift Package Manager (XCFramework)
-  - Web distributed via GitHub Pages CDN and NPM
-  - Docusaurus documentation site deployed to GitHub Pages
-
-- **CI/CD**
-  - Unified publish pipeline triggered by semantic version tags
-  - Dry-run support for safe manual workflow dispatch
-  - Maven Central staging with separate manual promotion step
-  - Release revocation workflow for all distribution channels
-  - Nightly E2E workflow with per-platform runner matrix
-
 ### Changed (vs. SAP Emarsys SDK)
 
-- **Maven coordinates**: `com.sap:emarsys-sdk` → `com.sap.engagement-cloud:engagement-cloud-sdk`
+- **Maven coordinates**: `com.emarsys:emarsys-sdk` → `com.sap.engagement-cloud:engagement-cloud-sdk`
 - **iOS distribution**: CocoaPods → Swift Package Manager
 - **API style**: Completion-listener callbacks → Kotlin `suspend` functions returning `Result`, Swift `async throws`, JavaScript `Promise`
 - **Contact API naming**: `setContact` / `clearContact` → `link` / `unlink`
