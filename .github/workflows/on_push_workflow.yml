@@ -10,10 +10,6 @@ on:
     tags-ignore:
       - '*'
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
-
 env:
   USE_LOCAL_DEPENDENCY: ${{ vars.USE_LOCAL_DEPENDENCY }}
   GOOGLE_SERVICES_API_KEY: ${{ secrets.GOOGLE_SERVICES_API_KEY }}
@@ -255,6 +251,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       packages: write
+      pages: write
+      id-token: write
     steps:
       - uses: actions/checkout@v6
         with:
@@ -300,6 +298,43 @@ jobs:
         run: npm publish dist/npm/
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Assemble snapshot CDN artifacts
+        run: |
+          mkdir -p dist/cdn/snapshots
+
+          # Main SDK bundle + sourcemap
+          cp engagement-cloud-sdk/build/dist/js/productionExecutable/engagement-cloud-sdk-html.js \
+            dist/cdn/snapshots/engagement-cloud-sdk.js
+          cp engagement-cloud-sdk/build/dist/js/productionExecutable/engagement-cloud-sdk-html.js.map \
+            dist/cdn/snapshots/engagement-cloud-sdk.js.map 2>/dev/null || true
+
+          # TypeScript definitions
+          cp build/js/packages/engagement-cloud-sdk/kotlin/engagement-cloud-sdk-html.d.ts \
+            dist/cdn/snapshots/engagement-cloud-sdk.d.ts 2>/dev/null || true
+
+          # Loader script + sourcemap
+          cp engagement-cloud-sdk/build/dist/js/productionExecutable/engagement-cloud-sdk-loader.js \
+            dist/cdn/snapshots/engagement-cloud-sdk-loader.js
+          cp engagement-cloud-sdk/build/dist/js/productionExecutable/engagement-cloud-sdk-loader.js.map \
+            dist/cdn/snapshots/engagement-cloud-sdk-loader.js.map 2>/dev/null || true
+
+          # Service worker + sourcemap
+          cp web-push-service-worker/build/dist/js/productionExecutable/ec-service-worker.js \
+            dist/cdn/snapshots/ec-service-worker.js
+          cp web-push-service-worker/build/dist/js/productionExecutable/ec-service-worker.js.map \
+            dist/cdn/snapshots/ec-service-worker.js.map 2>/dev/null || true
+
+          echo "Snapshot CDN artifacts:"
+          ls -la dist/cdn/snapshots/
+
+      - name: Deploy snapshots to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist/cdn
+          keep_files: true
+          destination_dir: .
 
   reporting:
     if: always()

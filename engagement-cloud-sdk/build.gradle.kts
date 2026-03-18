@@ -89,7 +89,8 @@ kotlin {
 
         compilerOptions {
             moduleKind.set(org.jetbrains.kotlin.gradle.dsl.JsModuleKind.MODULE_ES)
-            sourceMap.set(false)
+            sourceMap.set(true)
+            sourceMapEmbedSources.set(org.jetbrains.kotlin.gradle.dsl.JsSourceMapEmbedMode.SOURCE_MAP_SOURCE_CONTENT_NEVER)
             freeCompilerArgs.addAll(
                 listOf(
                     // Experimental: enables @JsExport of suspend functions as JS async functions (Kotlin 2.3+)

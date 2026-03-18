@@ -8,6 +8,8 @@ kotlin {
     js(IR) {
         compilerOptions {
             freeCompilerArgs.add("-opt-in=com.sap.ec.InternalSdkApi")
+            sourceMap.set(true)
+            sourceMapEmbedSources.set(org.jetbrains.kotlin.gradle.dsl.JsSourceMapEmbedMode.SOURCE_MAP_SOURCE_CONTENT_NEVER)
         }
         browser {
             useCommonJs()

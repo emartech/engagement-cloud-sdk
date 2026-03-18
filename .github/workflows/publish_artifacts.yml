@@ -301,21 +301,27 @@ jobs:
           VERSION="${{ needs.derive-version.outputs.version }}"
           mkdir -p "dist/cdn/$VERSION"
 
-          # Copy main SDK bundle
+          # Copy main SDK bundle + sourcemap
           cp engagement-cloud-sdk/build/dist/js/productionExecutable/engagement-cloud-sdk-html.js \
             "dist/cdn/$VERSION/engagement-cloud-sdk.js"
+          cp engagement-cloud-sdk/build/dist/js/productionExecutable/engagement-cloud-sdk-html.js.map \
+            "dist/cdn/$VERSION/engagement-cloud-sdk.js.map" 2>/dev/null || true
 
           # Copy TypeScript definitions
           cp build/js/packages/engagement-cloud-sdk/kotlin/engagement-cloud-sdk-html.d.ts \
             "dist/cdn/$VERSION/engagement-cloud-sdk.d.ts" 2>/dev/null || true
 
-          # Copy loader script
+          # Copy loader script + sourcemap
           cp engagement-cloud-sdk/build/dist/js/productionExecutable/engagement-cloud-sdk-loader.js \
             "dist/cdn/$VERSION/engagement-cloud-sdk-loader.js"
+          cp engagement-cloud-sdk/build/dist/js/productionExecutable/engagement-cloud-sdk-loader.js.map \
+            "dist/cdn/$VERSION/engagement-cloud-sdk-loader.js.map" 2>/dev/null || true
 
-          # Copy service worker
+          # Copy service worker + sourcemap
           cp web-push-service-worker/build/dist/js/productionExecutable/ec-service-worker.js \
             "dist/cdn/$VERSION/ec-service-worker.js"
+          cp web-push-service-worker/build/dist/js/productionExecutable/ec-service-worker.js.map \
+            "dist/cdn/$VERSION/ec-service-worker.js.map" 2>/dev/null || true
 
           # Create latest symlink content (copy same files to latest/)
           mkdir -p dist/cdn/latest
