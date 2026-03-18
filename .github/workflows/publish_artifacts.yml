@@ -499,7 +499,7 @@ jobs:
           npx docusaurus build --out-dir ../../dist/docs
 
       - name: Download JS CDN artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: js-cdn-artifacts
           path: dist/cdn
