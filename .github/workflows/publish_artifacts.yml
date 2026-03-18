@@ -292,7 +292,7 @@ jobs:
             engagement-cloud-sdk/npm-package.json > dist/npm/package.json
 
       - name: Publish to NPM
-        if: false  # TODO: re-enable once OSPO configures Trusted Publisher on npmjs.com
+        if: env.DRY_RUN != 'true'
         run: npm publish dist/npm/ --provenance --access public
 
       - name: Assemble Pure JS Artifacts for CDN
