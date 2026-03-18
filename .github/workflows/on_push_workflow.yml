@@ -61,10 +61,10 @@ jobs:
             if [ "$COMMITS" -eq 0 ]; then
               VERSION="$TAG"
             else
-              VERSION="${TAG}-prerelease.${COMMITS}"
+              VERSION="${TAG}-${COMMITS}"
             fi
           else
-            VERSION="0.0.0-prerelease.${{ github.run_number }}"
+            VERSION="0.0.0-${{ github.run_number }}"
           fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Snapshot version: $VERSION"
