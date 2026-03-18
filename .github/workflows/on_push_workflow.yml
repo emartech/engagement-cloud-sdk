@@ -5,7 +5,8 @@ on:
     types: [opened, reopened, synchronize]
   workflow_dispatch:
   push:
-    branches: [main]
+    branches-ignore:
+      - 'dependabot/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -23,11 +24,45 @@ env:
   FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
   GOOGLE_OAUTH_SERVER_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_SERVER_CLIENT_ID }}
   GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
+  OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+  OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+  SONATYPE_STAGING_PROFILE_ID: ${{ secrets.SONATYPE_STAGING_PROFILE_ID }}
+  SONATYPE_SIGNING_KEY_ID: ${{ secrets.SONATYPE_SIGNING_KEY_ID }}
+  SONATYPE_SIGNING_PASSWORD: ${{ secrets.SONATYPE_SIGNING_PASSWORD }}
+  SONATYPE_SIGNING_SECRET_KEY_RING_FILE: ${{ secrets.SONATYPE_SIGNING_SECRET_KEY_RING_FILE }}
+  DETECT_LATEST_RELEASE_VERSION: ${{ vars.DETECT_LATEST_RELEASE_VERSION }}
+  DETECT_PROJECT_USER_GROUPS: ${{ vars.DETECT_PROJECT_USER_GROUPS }}
+  DETECT_PROJECT_VERSION_DISTRIBUTION: ${{ vars.DETECT_PROJECT_VERSION_DISTRIBUTION }}
+  BLACKDUCK_ACCESS_TOKEN: ${{ secrets.BLACKDUCK_ACCESS_TOKEN }}
+  BLACKDUCK_URL: ${{ vars.BLACKDUCK_URL }}
   SLACK_ICON: https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Kotlin_Icon.svg/1200px-Kotlin_Icon.svg.png
   SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
   SPM_BUILD: ${{ vars.SPM_BUILD }}
 
 jobs:
+  derive-version:
+    name: Derive Snapshot Version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.snapshot-version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Derive snapshot version
+        id: snapshot-version
+        run: |
+          if git describe --tags --match '[0-9]*.[0-9]*.[0-9]*' >/dev/null 2>&1; then
+            TAG=$(git describe --tags --match '[0-9]*.[0-9]*.[0-9]*' --abbrev=0)
+            COMMITS=$(git rev-list "${TAG}..HEAD" --count)
+            VERSION="${TAG}.${COMMITS}"
+          else
+            VERSION="0.0.0.${{ github.run_number }}"
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Snapshot version: $VERSION"
+
   build:
     name: Build ${{ matrix.platform }} / ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -46,19 +81,6 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-
-      - name: Derive snapshot version
-        id: snapshot-version
-        run: |
-          if git describe --tags --match '[0-9]*.[0-9]*.[0-9]*' >/dev/null 2>&1; then
-            TAG=$(git describe --tags --match '[0-9]*.[0-9]*.[0-9]*' --abbrev=0)
-            COMMITS=$(git rev-list "${TAG}..HEAD" --count)
-            VERSION="${TAG}.${COMMITS}"
-          else
-            VERSION="0.0.0.${{ github.run_number }}"
-          fi
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "Snapshot version: $VERSION"
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -186,9 +208,96 @@ jobs:
 
       - name: Run lint
         run: make lint
+
+  publish-android:
+    name: Publish Android Snapshot
+    if: github.ref == 'refs/heads/main'
+    needs: [derive-version, test, lint]
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Publish to GitHub Packages
+        run: make pipeline-android
+        env:
+          PUBLISH: true
+          VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_REPO: ${{ github.repository }}
+
+  publish-js:
+    name: Publish JS Snapshot
+    if: github.ref == 'refs/heads/main'
+    needs: [derive-version, test, lint]
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@sap'
+
+      - name: Install npm dependencies
+        run: npm install
+
+      - name: Run JS Pipeline (Build, Test)
+        run: make pipeline-js
+        env:
+          VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
+
+      - name: Assemble NPM package
+        run: |
+          VERSION="${{ needs.derive-version.outputs.version }}"
+          mkdir -p dist/npm
+          cp engagement-cloud-sdk/build/dist/js/productionExecutable/engagement-cloud-sdk-html.js dist/npm/
+          cp build/js/packages/engagement-cloud-sdk/kotlin/engagement-cloud-sdk-html.d.ts dist/npm/ 2>/dev/null || true
+          sed "s/\"version\": \"0.0.0\"/\"version\": \"$VERSION\"/" \
+            engagement-cloud-sdk/npm-package.json > dist/npm/package.json
+
+      - name: Publish to GitHub Packages NPM
+        run: npm publish dist/npm/
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   reporting:
     if: always()
-    needs: [ build, test, lint ]
+    needs: [ build, test, lint, publish-android, publish-js ]
     runs-on: ubuntu-latest
     steps:
       - name: Report on Slack (Error)
