@@ -14,6 +14,18 @@ on:
         description: 'Dry run — build and validate without publishing'
         type: boolean
         default: true
+      publish_kmp:
+        description: 'Run KMP pipeline (Android + Maven Central)'
+        type: boolean
+        default: true
+      publish_js:
+        description: 'Run JS pipeline (NPM + CDN)'
+        type: boolean
+        default: true
+      publish_ios:
+        description: 'Run iOS pipeline (XCFramework + SPM)'
+        type: boolean
+        default: true
 
 concurrency:
   group: publish-release
@@ -157,6 +169,7 @@ jobs:
 
   android-pipeline:
     name: KMP Pipeline (Build, Test, Publish, Stage to Maven Central)
+    if: ${{ !cancelled() && (github.event_name == 'push' || inputs.publish_kmp == true) }}
     needs: [derive-version, create-tag, create-release]
     runs-on: macos-latest-xlarge
     env:
@@ -241,6 +254,7 @@ jobs:
 
   js-pipeline:
     name: JS Pipeline (Build, Test, Publish)
+    if: ${{ !cancelled() && (github.event_name == 'push' || inputs.publish_js == true) }}
     needs: [derive-version, create-tag, create-release]
     runs-on: ubuntu-latest
     environment: 'npmjs:@sap/engagement-cloud-sdk'
@@ -367,6 +381,7 @@ jobs:
 
   ios-pipeline:
     name: iOS Pipeline (Build, Test, Publish)
+    if: ${{ !cancelled() && (github.event_name == 'push' || inputs.publish_ios == true) }}
     needs: [derive-version, create-tag, create-release]
     runs-on: macos-latest-xlarge
     env:
@@ -556,13 +571,40 @@ jobs:
             echo "value=" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Compute pipeline summary
+        id: pipelines
+        run: |
+          SUMMARY=""
+          if [ "${{ needs.android-pipeline.result }}" = "success" ]; then
+            SUMMARY="${SUMMARY} KMP:✅"
+          elif [ "${{ needs.android-pipeline.result }}" = "skipped" ]; then
+            SUMMARY="${SUMMARY} KMP:⏭️"
+          else
+            SUMMARY="${SUMMARY} KMP:❌"
+          fi
+          if [ "${{ needs.js-pipeline.result }}" = "success" ]; then
+            SUMMARY="${SUMMARY} JS:✅"
+          elif [ "${{ needs.js-pipeline.result }}" = "skipped" ]; then
+            SUMMARY="${SUMMARY} JS:⏭️"
+          else
+            SUMMARY="${SUMMARY} JS:❌"
+          fi
+          if [ "${{ needs.ios-pipeline.result }}" = "success" ]; then
+            SUMMARY="${SUMMARY} iOS:✅"
+          elif [ "${{ needs.ios-pipeline.result }}" = "skipped" ]; then
+            SUMMARY="${SUMMARY} iOS:⏭️"
+          else
+            SUMMARY="${SUMMARY} iOS:❌"
+          fi
+          echo "value=$SUMMARY" >> "$GITHUB_OUTPUT"
+
       - name: Notify Slack (failure)
         if: ${{ !cancelled() && (contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')) }}
         uses: 8398a7/action-slack@v3
         with:
           status: failure
           channel: mobile-team-ci
-          text: '${{ steps.prefix.outputs.value }}Publish pipeline failed! :man-gesturing-no: :blobcatfearful:'
+          text: '${{ steps.prefix.outputs.value }}Publish pipeline failed! :man-gesturing-no: :blobcatfearful: |${{ steps.pipelines.outputs.value }}'
           fields: repo,workflow,job,took
           github_token: ${{ secrets.GITHUB_TOKEN }}
         env:
@@ -574,7 +616,7 @@ jobs:
         with:
           status: success
           channel: mobile-team-ci
-          text: '${{ steps.prefix.outputs.value }}Publish pipeline succeeded! v${{ needs.derive-version.outputs.version }} :man-gesturing-ok: :bananadance:'
+          text: '${{ steps.prefix.outputs.value }}Publish pipeline succeeded! v${{ needs.derive-version.outputs.version }} :man-gesturing-ok: :bananadance: |${{ steps.pipelines.outputs.value }}'
           fields: repo,workflow,job,took
           github_token: ${{ secrets.GITHUB_TOKEN }}
         env:
