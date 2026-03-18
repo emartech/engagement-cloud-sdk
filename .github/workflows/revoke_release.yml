@@ -56,7 +56,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          fetch-depth: 0
           fetch-tags: true
 
       - name: Validate version format
@@ -160,9 +159,6 @@ jobs:
     if: needs.validate.outputs.release_exists == 'true' || needs.validate.outputs.tag_exists == 'true'
     steps:
       - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-          fetch-tags: true
 
       - name: Delete GitHub Release
         if: needs.validate.outputs.release_exists == 'true'
@@ -393,8 +389,6 @@ jobs:
       - uses: actions/checkout@v6
         with:
           ref: main
-          fetch-depth: 0
-          fetch-tags: true
 
       - name: Revert Package.swift to previous version
         run: |
