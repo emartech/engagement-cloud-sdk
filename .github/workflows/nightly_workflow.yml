@@ -126,7 +126,7 @@ jobs:
         if: matrix.platform == 'android'
         uses: davidSchuppa/base64Secret-toFile-action@v3
         with:
-          destination-path: composeApp/src/
+          destination-path: androidApp/
           filename: google-services.json
           secret: ${{ env.GOOGLE_SERVICES_JSON_BASE64 }}
 

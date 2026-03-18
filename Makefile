@@ -35,7 +35,7 @@ clean-dist:
 	@rm -rf dist
 
 build: check-env
-	@./gradlew :composeApp:yarnActualization && ./gradlew assemble
+	@./gradlew assemble
 
 build-pipeline: check-env
 	@./gradlew assemble
@@ -44,7 +44,7 @@ clean: check-env
 	@./gradlew clean
 
 create-apks: check-env
-	@./gradlew :composeApp:assembleRelease
+	@./gradlew :androidApp:assembleRelease
 
 test: check-env test-android test-web test-sdk-loader test-ios
 
