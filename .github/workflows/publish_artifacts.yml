@@ -30,6 +30,10 @@ on:
         description: 'Run iOS pipeline (XCFramework + SPM)'
         type: boolean
         default: true
+      skip_tests:
+        description: 'Skip tests (use only for hotfix re-releases)'
+        type: boolean
+        default: false
 
 concurrency:
   group: publish-release
@@ -37,6 +41,7 @@ concurrency:
 
 env:
   DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == true }}
+  SKIP_TESTS: ${{ github.event_name == 'workflow_dispatch' && inputs.skip_tests == true }}
   JAVA_VERSION: '17'
   JAVA_DISTRIBUTION: 'temurin'
   USE_LOCAL_DEPENDENCY: ${{ vars.USE_LOCAL_DEPENDENCY }}
@@ -203,7 +208,30 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run Android Pipeline (Build, Lint, Test, [Publish])
-        run: make pipeline-android
+        run: |
+          if [ "$SKIP_TESTS" = "true" ]; then
+            echo "⚠️ Skipping tests (skip_tests=true)"
+            ./gradlew \
+              :engagement-cloud-sdk:assembleAndroidMain \
+              :engagement-cloud-sdk-android-fcm:assembleRelease \
+              :engagement-cloud-sdk-android-hms:assembleRelease \
+              :engagement-cloud-sdk-android-fcm:lintRelease \
+              :engagement-cloud-sdk-android-hms:lintRelease \
+              $(if [ "$PUBLISH" = "true" ]; then echo \
+                ":engagement-cloud-sdk:publishKotlinMultiplatformPublicationToGitHubPackagesRepository \
+                 :engagement-cloud-sdk:publishAndroidPublicationToGitHubPackagesRepository \
+                 :engagement-cloud-sdk:publishJsPublicationToGitHubPackagesRepository \
+                 :engagement-cloud-sdk:publishIosArm64PublicationToGitHubPackagesRepository \
+                 :engagement-cloud-sdk:publishIosX64PublicationToGitHubPackagesRepository \
+                 :engagement-cloud-sdk:publishIosSimulatorArm64PublicationToGitHubPackagesRepository \
+                 :engagement-cloud-sdk-android-fcm:publishMavenPublicationToGitHubPackagesRepository \
+                 :engagement-cloud-sdk-android-hms:publishMavenPublicationToGitHubPackagesRepository"; fi) \
+              -Pjs.variant=canvas \
+              -PENABLE_PUBLISHING=$PUBLISH \
+              --no-daemon
+          else
+            make pipeline-android
+          fi
         env:
           PUBLISH: ${{ env.DRY_RUN != 'true' }}
           VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
@@ -287,6 +315,7 @@ jobs:
         run: npm install
 
       - name: Install Chrome for tests
+        if: env.SKIP_TESTS != 'true'
         run: |
           wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
           sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
@@ -294,7 +323,18 @@ jobs:
           sudo apt-get install -y google-chrome-stable
 
       - name: Run JS Pipeline (Build, Test)
-        run: make pipeline-js
+        run: |
+          if [ "$SKIP_TESTS" = "true" ]; then
+            echo "⚠️ Skipping tests (skip_tests=true)"
+            ./gradlew \
+              :web-push-service-worker:jsBrowserDistribution \
+              :engagement-cloud-sdk:jsBrowserDistribution \
+              -Pjs.variant=html \
+              -x :composeApp:jsBrowserDistribution \
+              --no-daemon
+          else
+            make pipeline-js
+          fi
         env:
           VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
 
@@ -416,7 +456,19 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build and Test iOS
-        run: make pipeline-ios
+        run: |
+          if [ "$SKIP_TESTS" = "true" ]; then
+            echo "⚠️ Skipping tests (skip_tests=true)"
+            ./gradlew \
+              $(if [ "$PUBLISH" = "true" ]; then echo \
+                ":engagement-cloud-sdk:assembleEngagementCloudSDKReleaseXCFramework \
+                 :ios-notification-service:assembleEngagementCloudNotificationServiceReleaseXCFramework"; fi) \
+              -PNATIVE_BUILD_TYPE="$(if [ "$PUBLISH" = "true" ]; then echo RELEASE; else echo DEBUG; fi)" \
+              $(if [ "$PUBLISH" = "true" ]; then echo "-PENABLE_PUBLISHING=true"; fi) \
+              --no-daemon
+          else
+            make pipeline-ios
+          fi
         env:
           PUBLISH: ${{ env.DRY_RUN != 'true' }}
           VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
