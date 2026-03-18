@@ -39,7 +39,6 @@ version = System.getenv("VERSION_OVERRIDE") ?: "4.0.0"
 kotlin {
     compilerOptions {
         apiVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_3)
-        freeCompilerArgs.add("-Xenable-suspend-function-exporting")
         freeCompilerArgs.add("-opt-in=com.sap.ec.InternalSdkApi")
         freeCompilerArgs.add("-Xexpect-actual-classes")
     }
@@ -93,6 +92,8 @@ kotlin {
             sourceMap.set(false)
             freeCompilerArgs.addAll(
                 listOf(
+                    // Experimental: enables @JsExport of suspend functions as JS async functions (Kotlin 2.3+)
+                    "-Xenable-suspend-function-exporting",
                     "-Xir-dce",
                     "-Xir-minimized-member-names=true",
                     "-Xir-per-module-output-name=false",

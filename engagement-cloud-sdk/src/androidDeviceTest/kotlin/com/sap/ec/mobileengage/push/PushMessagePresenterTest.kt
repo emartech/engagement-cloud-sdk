@@ -100,7 +100,7 @@ class PushMessagePresenterTest {
 
         json = JsonUtil.json
         mockMetadataReader = mockk(relaxed = true)
-        every { mockMetadataReader.getInt(any(), com.sap.R.drawable.default_small_notification_icon) } returns ICON_ID
+        every { mockMetadataReader.getInt(any(), com.sap.ec.R.drawable.default_small_notification_icon) } returns ICON_ID
 
         pushMessagePresenter = PushMessagePresenter(
             mockContext,
