@@ -11,7 +11,7 @@ import kotlin.experimental.ExperimentalObjCName
  */
 @Serializable
 @OptIn(ExperimentalObjCName::class)
-@ObjCName("IosEngagementCloudSDKConfig")
+@ObjCName("EngagementCloudConfig")
 data class IosEngagementCloudSDKConfig(
     override val applicationCode: String,
 ): SdkConfig {
