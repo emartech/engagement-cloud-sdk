@@ -46,7 +46,7 @@ kotlin {
     jvmToolchain(17)
 
     android {
-        namespace = "com.sap"
+        namespace = "com.sap.ec"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
 
@@ -253,7 +253,7 @@ kotlin {
     }
 }
 
-
+//TODO check if needed
 run {
     val androidTarget = (kotlin as org.gradle.api.plugins.ExtensionAware).extensions
         .findByType(com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget::class.java)

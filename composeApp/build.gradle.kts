@@ -44,7 +44,6 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.compose.ui.tooling.preview)
             implementation(libs.androidx.appcompat)
-            implementation(project(":engagement-cloud-sdk-android-fcm"))
         }
         commonMain.dependencies {
             implementation(compose.runtime)
