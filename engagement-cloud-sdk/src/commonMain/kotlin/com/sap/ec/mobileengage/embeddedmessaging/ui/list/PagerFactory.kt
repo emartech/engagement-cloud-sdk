@@ -6,6 +6,7 @@ import androidx.paging.PagingData
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.log.Logger
+import com.sap.ec.core.networking.context.RequestContextApi
 import com.sap.ec.core.util.DownloaderApi
 import com.sap.ec.mobileengage.action.ActionFactoryApi
 import com.sap.ec.mobileengage.action.models.ActionModel
@@ -21,7 +22,8 @@ internal class PagerFactory(
     private val sdkEventDistributor: SdkEventDistributorApi,
     private val actionFactory: ActionFactoryApi<ActionModel>,
     private val sdkContext: SdkContextApi,
-    private val logger: Logger
+    private val logger: Logger,
+    private val requestContext: RequestContextApi
 ) : PagerFactoryApi {
     override fun create(
         filterUnopenedOnly: Boolean,
@@ -47,7 +49,8 @@ internal class PagerFactory(
                     actionFactory = actionFactory,
                     sdkEventDistributor = sdkEventDistributor,
                     sdkContext = sdkContext,
-                    logger = logger
+                    logger = logger,
+                    hasContactToken = { requestContext.contactToken != null }
                 )
             }
         ).flow

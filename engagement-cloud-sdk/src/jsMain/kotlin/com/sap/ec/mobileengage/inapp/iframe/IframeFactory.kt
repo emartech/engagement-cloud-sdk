@@ -11,7 +11,6 @@ internal class IframeFactory : IframeFactoryApi {
             style.display = "block"
             style.border = "none"
             style.height = "100%"
-            setAttribute("sandbox", "allow-scripts")
             setAttribute("scrolling", "no")
         }
     }

@@ -35,7 +35,7 @@ clean-dist:
 	@rm -rf dist
 
 build: check-env
-	@./gradlew :composeApp:yarnActualization && ./gradlew assemble
+	@./gradlew assemble
 
 build-pipeline: check-env
 	@./gradlew assemble
@@ -44,7 +44,7 @@ clean: check-env
 	@./gradlew clean
 
 create-apks: check-env
-	@./gradlew :composeApp:assembleRelease
+	@./gradlew :androidApp:assembleRelease
 
 test: check-env test-android test-web test-sdk-loader test-ios
 
@@ -77,8 +77,7 @@ test-android: check-env
 		:engagement-cloud-sdk:testAndroidHostTest \
 		:engagement-cloud-sdk:connectedAndroidDeviceTest \
 		:engagement-cloud-sdk-android-fcm:testDebugUnitTest \
-		:engagement-cloud-sdk-android-hms:testDebugUnitTest \
-		-x :composeApp:test
+		:engagement-cloud-sdk-android-hms:testDebugUnitTest
 
 build-ios-all-archtypes: check-env
 	@./gradlew \

@@ -40,11 +40,12 @@ kotlin {
     compilerOptions {
         apiVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_3)
         freeCompilerArgs.add("-opt-in=com.sap.ec.InternalSdkApi")
+        freeCompilerArgs.add("-Xexpect-actual-classes")
     }
     jvmToolchain(17)
 
-    androidLibrary {
-        namespace = "com.sap"
+    android {
+        namespace = "com.sap.ec"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
 
@@ -253,6 +254,13 @@ kotlin {
     }
 }
 
+run {
+    val androidTarget = (kotlin as org.gradle.api.plugins.ExtensionAware).extensions
+        .findByType(com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget::class.java)
+        ?: error("Android KMP library target not found")
+    androidTarget.optimization.consumerKeepRules.publish = true
+    androidTarget.optimization.consumerKeepRules.file("proguard-rules.pro")
+}
 
 buildConfig {
     packageName("com.sap.ec.core.device")

@@ -1,9 +1,7 @@
 plugins {
-    alias(libs.plugins.androidApplication)
-    alias(libs.plugins.agconnect)
+    alias(libs.plugins.kotlinMultiplatformLibrary)
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.jetbrainsCompose)
-    alias(libs.plugins.googleServices)
     alias(libs.plugins.composeCompiler)
 }
 
@@ -34,19 +32,18 @@ kotlin {
             isStatic = true
         }
     }
-    
-    androidTarget {
+
+    android {
+        namespace = "com.sap.ec.sample.shared"
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
     }
-    
+
     sourceSets {
-        
+
         androidMain.dependencies {
             implementation(libs.compose.ui.tooling.preview)
-            implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.appcompat)
-            implementation(project(":engagement-cloud-sdk-android-fcm"))
-            implementation(project(":engagement-cloud-sdk-android-hms"))
-
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -61,38 +58,5 @@ kotlin {
         iosMain.dependencies {
             implementation(project(":engagement-cloud-sdk"))
         }
-    }
-}
-
-android {
-    namespace = "com.sap.ec.sample"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
-
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    sourceSets["main"].res.srcDirs("src/androidMain/res")
-    sourceSets["main"].resources.srcDirs("src/commonMain/resources")
-
-    defaultConfig {
-        applicationId = "com.sap.ec.sample"
-        minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
-    }
-    packaging {
-        resources {
-            pickFirsts.add("META-INF/LICENSE.md")
-            pickFirsts.add("META-INF/LICENSE-notice.md")
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = false
-        }
-    }
-    dependencies {
-        implementation(libs.androidx.appcompat)
-        debugImplementation(libs.compose.ui.tooling)
     }
 }

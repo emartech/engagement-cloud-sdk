@@ -107,11 +107,11 @@ internal fun MessageList(
     val noConnectionRefreshErrorWithEmptyList by remember { derivedStateOf { !hasConnection && lazyPagingMessageItems.itemCount == 0 && lazyPagingMessageItems.hasRefreshError() } }
     val noConnectionRefreshErrorWithMessages by remember { derivedStateOf { !hasConnection && lazyPagingMessageItems.itemCount > 0 && lazyPagingMessageItems.hasRefreshError() } }
 
-    LaunchedEffect(noConnectionRefreshErrorWithMessages) {
-        if (hasConnection) {
-            viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() }
-        }
-    }
+    RefreshOnConnectionRestored(
+        noConnectionRefreshErrorWithMessages = noConnectionRefreshErrorWithMessages,
+        hasConnection = hasConnection,
+        onRefresh = { viewModel.refreshMessagesWithThrottling { viewModel.triggerRefreshFromJs() } }
+    )
 
     LaunchedEffect(Unit) {
         val landscapeMediaQuery = window.matchMedia("(orientation: landscape)")
@@ -285,6 +285,22 @@ internal fun MessageList(
                 messageToDelete = null
             }
         )
+    }
+}
+
+@Composable
+private fun RefreshOnConnectionRestored(
+    noConnectionRefreshErrorWithMessages: Boolean,
+    hasConnection: Boolean,
+    onRefresh: () -> Unit
+) {
+    var wasInNoConnectionErrorState by remember { mutableStateOf(false) }
+
+    LaunchedEffect(noConnectionRefreshErrorWithMessages) {
+        if (wasInNoConnectionErrorState && !noConnectionRefreshErrorWithMessages && hasConnection) {
+            onRefresh()
+        }
+        wasInNoConnectionErrorState = noConnectionRefreshErrorWithMessages
     }
 }
 

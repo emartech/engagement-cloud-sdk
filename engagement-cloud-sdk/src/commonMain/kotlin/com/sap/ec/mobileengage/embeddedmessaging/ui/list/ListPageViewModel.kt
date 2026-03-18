@@ -14,6 +14,7 @@ import com.sap.ec.watchdog.connection.ConnectionWatchDog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -22,9 +23,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
@@ -66,7 +66,6 @@ internal class ListPageViewModel(
 
     private var lastRefreshTimestamp: Instant? = null
 
-    private val triggerFromJS = MutableStateFlow(false)
     private val refreshTrigger = MutableStateFlow(false)
 
     override val platformCategory: String = platformCategoryProvider.provide()
@@ -79,6 +78,7 @@ internal class ListPageViewModel(
                 .filter { it is SdkEvent.Internal.EmbeddedMessaging.TriggerRefresh }
                 .collect {
                     _categories.value = emptyList()
+                    _selectedMessage.value = null
                     refreshTrigger.value = !refreshTrigger.value
                 }
         }
@@ -89,9 +89,8 @@ internal class ListPageViewModel(
         combine(
             _filterUnopenedOnly,
             _selectedCategoryIds,
-            triggerFromJS,
             refreshTrigger
-        ) { filterUnopenedOnly, selectedCategoryIds, _, _ ->
+        ) { filterUnopenedOnly, selectedCategoryIds, _ ->
             Pair(filterUnopenedOnly, selectedCategoryIds)
         }
             .flatMapLatest { pair ->
@@ -137,7 +136,7 @@ internal class ListPageViewModel(
             }
         }
 
-    override val triggerRefreshFromJs = { triggerFromJS.value = !triggerFromJS.value }
+    override val triggerRefreshFromJs = { refreshTrigger.value = !refreshTrigger.value }
 
     override fun setFilterUnopenedOnly(unopenedOnly: Boolean) {
         _filterUnopenedOnly.value = unopenedOnly

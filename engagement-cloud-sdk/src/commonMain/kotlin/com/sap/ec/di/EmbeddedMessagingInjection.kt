@@ -51,7 +51,8 @@ internal object EmbeddedMessagingInjection {
                 sdkEventDistributor = get<SdkEventDistributorApi>(),
                 actionFactory = get<EventActionFactoryApi>(),
                 sdkContext = get(),
-                logger = get { parametersOf(PagerFactory::class.simpleName) }
+                logger = get { parametersOf(PagerFactory::class.simpleName) },
+                requestContext = get()
             )
         }
         single<ListPageViewModelApi> {
