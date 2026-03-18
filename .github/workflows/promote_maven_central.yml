@@ -27,7 +27,7 @@ on:
       dry_run:
         description: 'Dry run — check deployment status without promoting'
         type: boolean
-        default: false
+        default: true
 
 concurrency:
   group: promote-maven-central
