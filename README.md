@@ -14,7 +14,7 @@ The **SAP Engagement Cloud SDK** is the next-generation SDK for **SAP Engagement
 
 ## Requirements and Setup
 
-You can access our official documentation here: [SAP Engagement Cloud SDK - Wiki](https://super-carnival-yw59vq9.pages.github.io/)
+You can access our official documentation here: [SAP Engagement Cloud SDK - Wiki](https://emartech.github.io/engagement-cloud-sdk/docs/index.html)
 
 ## Additional Resources
 
