@@ -462,7 +462,8 @@ jobs:
     # directory tree and pushes once. This prevents the race condition that occurs
     # when multiple jobs independently deploy to GitHub Pages (peaceiris force-pushes
     # to gh-pages, so concurrent pushes would overwrite each other).
-    if: ${{ !cancelled() && needs.derive-version.result == 'success' }}
+    # Requires js-pipeline success (produces CDN artifacts). Skips on dry-run (pipelines are skipped).
+    if: ${{ !cancelled() && needs.js-pipeline.result == 'success' }}
     needs: [derive-version, js-pipeline, ios-pipeline, android-pipeline]
     runs-on: ubuntu-latest
     steps:
