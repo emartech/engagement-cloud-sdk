@@ -18,8 +18,12 @@ on:
         description: 'Run KMP pipeline (Android + Maven Central)'
         type: boolean
         default: true
-      publish_js:
-        description: 'Run JS pipeline (NPM + CDN)'
+      publish_npm:
+        description: 'Publish to NPM (@sap/engagement-cloud-sdk)'
+        type: boolean
+        default: true
+      publish_cdn:
+        description: 'Deploy JS artifacts to CDN (GitHub Pages)'
         type: boolean
         default: true
       publish_ios:
@@ -254,7 +258,7 @@ jobs:
 
   js-pipeline:
     name: JS Pipeline (Build, Test, Publish)
-    if: ${{ !cancelled() && (github.event_name == 'push' || inputs.publish_js == true) }}
+    if: ${{ !cancelled() && (github.event_name == 'push' || inputs.publish_npm == true || inputs.publish_cdn == true) }}
     needs: [derive-version, create-tag, create-release]
     runs-on: ubuntu-latest
     environment: 'npmjs:@sap/engagement-cloud-sdk'
@@ -306,7 +310,7 @@ jobs:
             engagement-cloud-sdk/npm-package.json > dist/npm/package.json
 
       - name: Publish to NPM
-        if: env.DRY_RUN != 'true'
+        if: ${{ env.DRY_RUN != 'true' && (github.event_name == 'push' || inputs.publish_npm == true) }}
         run: npm publish dist/npm/ --provenance --access public
 
       - name: Assemble Pure JS Artifacts for CDN
@@ -350,6 +354,7 @@ jobs:
           ls -la dist/cdn/
 
       - name: Upload CDN artifacts for Pages deployment
+        if: ${{ github.event_name == 'push' || inputs.publish_cdn == true }}
         uses: actions/upload-artifact@v7
         with:
           name: js-cdn-artifacts
@@ -477,8 +482,8 @@ jobs:
     # directory tree and pushes once. This prevents the race condition that occurs
     # when multiple jobs independently deploy to GitHub Pages (peaceiris force-pushes
     # to gh-pages, so concurrent pushes would overwrite each other).
-    # Requires js-pipeline success (produces CDN artifacts). Skips on dry-run (pipelines are skipped).
-    if: ${{ !cancelled() && needs.js-pipeline.result == 'success' }}
+    # Requires js-pipeline success (produces CDN artifacts). Skips when CDN is deselected or on dry-run.
+    if: ${{ !cancelled() && needs.js-pipeline.result == 'success' && (github.event_name == 'push' || inputs.publish_cdn == true) }}
     needs: [derive-version, js-pipeline, ios-pipeline, android-pipeline]
     runs-on: ubuntu-latest
     steps:
@@ -583,11 +588,18 @@ jobs:
             SUMMARY="${SUMMARY} KMP:❌"
           fi
           if [ "${{ needs.js-pipeline.result }}" = "success" ]; then
-            SUMMARY="${SUMMARY} JS:✅"
+            SUMMARY="${SUMMARY} NPM:✅"
           elif [ "${{ needs.js-pipeline.result }}" = "skipped" ]; then
-            SUMMARY="${SUMMARY} JS:⏭️"
+            SUMMARY="${SUMMARY} NPM:⏭️"
           else
-            SUMMARY="${SUMMARY} JS:❌"
+            SUMMARY="${SUMMARY} NPM:❌"
+          fi
+          if [ "${{ needs.deploy-pages.result }}" = "success" ]; then
+            SUMMARY="${SUMMARY} CDN:✅"
+          elif [ "${{ needs.deploy-pages.result }}" = "skipped" ]; then
+            SUMMARY="${SUMMARY} CDN:⏭️"
+          else
+            SUMMARY="${SUMMARY} CDN:❌"
           fi
           if [ "${{ needs.ios-pipeline.result }}" = "success" ]; then
             SUMMARY="${SUMMARY} iOS:✅"
