@@ -1,5 +1,5 @@
 {
-    "name": "@sap/engagement-cloud-sdk",
+    "name": "@emartech/engagement-cloud-sdk",
     "version": "0.0.0",
     "description": "SAP Engagement Cloud SDK for Web",
     "main": "engagement-cloud-sdk-html.js",

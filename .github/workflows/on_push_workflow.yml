@@ -216,7 +216,7 @@ jobs:
         run: make lint
 
   publish-android:
-    name: Publish Android Snapshot
+    name: Publish KMP Snapshot
     if: github.ref == 'refs/heads/main'
     needs: [derive-version, test, lint]
     runs-on: macos-latest
@@ -277,7 +277,7 @@ jobs:
         with:
           node-version: '22'
           registry-url: 'https://npm.pkg.github.com'
-          scope: '@sap'
+          scope: '@emartech'
 
       - name: Install npm dependencies
         run: npm install

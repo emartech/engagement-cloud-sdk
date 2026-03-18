@@ -261,7 +261,7 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '22'
-          registry-url: 'https://npm.pkg.github.com'
+          registry-url: 'https://registry.npmjs.org'
           scope: '@sap'
 
       - name: Install npm dependencies
@@ -285,14 +285,16 @@ jobs:
           mkdir -p dist/npm
           cp engagement-cloud-sdk/build/dist/js/productionExecutable/engagement-cloud-sdk-html.js dist/npm/
           cp build/js/packages/engagement-cloud-sdk/kotlin/engagement-cloud-sdk-html.d.ts dist/npm/ 2>/dev/null || true
-          sed "s/\"version\": \"0.0.0\"/\"version\": \"$VERSION\"/" \
+          sed -e "s/\"version\": \"0.0.0\"/\"version\": \"$VERSION\"/" \
+              -e "s/@emartech\/engagement-cloud-sdk/@sap\/engagement-cloud-sdk/" \
+              -e "s|https://npm.pkg.github.com|https://registry.npmjs.org|" \
             engagement-cloud-sdk/npm-package.json > dist/npm/package.json
 
-      - name: Publish to GitHub Packages NPM
+      - name: Publish to NPM
         if: env.DRY_RUN != 'true'
         run: npm publish dist/npm/
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Assemble Pure JS Artifacts for CDN
         run: |
