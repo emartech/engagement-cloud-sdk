@@ -346,9 +346,16 @@ jobs:
           VERSION="${{ needs.validate.outputs.version }}"
           OWNER="emartech"
 
-          # Maven packages published by this project (from build.gradle.kts coordinates)
+          # All Maven packages published by the KMP pipeline (build.gradle.kts coordinates
+          # + KMP platform suffixes). The main SDK publishes 6 artifacts (metadata, android,
+          # js, iosarm64, iosx64, iossimulatorarm64) plus FCM and HMS companion modules.
           MAVEN_PACKAGES=(
             "com.sap.engagement-cloud.engagement-cloud-sdk"
+            "com.sap.engagement-cloud.engagement-cloud-sdk-android"
+            "com.sap.engagement-cloud.engagement-cloud-sdk-js"
+            "com.sap.engagement-cloud.engagement-cloud-sdk-iosarm64"
+            "com.sap.engagement-cloud.engagement-cloud-sdk-iosx64"
+            "com.sap.engagement-cloud.engagement-cloud-sdk-iossimulatorarm64"
             "com.sap.engagement-cloud.engagement-cloud-sdk-android-fcm"
             "com.sap.engagement-cloud.engagement-cloud-sdk-android-hms"
           )
