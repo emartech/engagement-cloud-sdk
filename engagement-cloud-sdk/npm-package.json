@@ -6,7 +6,7 @@
     "types": "engagement-cloud-sdk-html.d.ts",
     "repository": {
         "type": "git",
-        "url": "https://github.com/emartech/engagement-cloud-sdk"
+        "url": "git+https://github.com/emartech/engagement-cloud-sdk.git"
     },
     "publishConfig": {
         "registry": "https://npm.pkg.github.com"

@@ -3,10 +3,11 @@ name: Revoke Release
 # Removes artifacts for a specific release version from:
 #   1. GitHub Release (delete release + tag)
 #   2. GitHub Pages CDN (remove version directory, rebuild latest/)
-#   3. GitHub Packages NPM (delete package version)
-#   4. GitHub Packages Maven (delete package versions)
-#   5. SPM (revert Package.swift to previous release on main)
-#   6. Maven Central staging (drop pending deployment if not yet promoted)
+#   3. npmjs.org (unpublish @sap/engagement-cloud-sdk via OIDC Trusted Publisher)
+#   4. GitHub Packages NPM (delete @emartech snapshot version)
+#   5. GitHub Packages Maven (delete package versions)
+#   6. SPM (revert Package.swift to previous release on main)
+#   7. Maven Central staging (drop pending deployment if not yet promoted)
 #
 # If the deployment was already promoted to Maven Central, artifacts are IMMUTABLE.
 #   This workflow logs a reminder to request manual deprecation via Sonatype support.
@@ -35,6 +36,7 @@ permissions:
   contents: write
   packages: write
   pages: write
+  id-token: write
 
 env:
   DRY_RUN: ${{ inputs.dry_run }}
@@ -145,8 +147,8 @@ jobs:
           echo "1. GitHub Release:  ${{ steps.check-release.outputs.exists == 'true' && 'WILL DELETE' || 'SKIP (not found)' }}"
           echo "2. Git tag:         ${{ steps.check-tag.outputs.exists == 'true' && 'WILL DELETE' || 'SKIP (not found)' }}"
           echo "3. GitHub Pages:    ${{ steps.check-pages.outputs.exists == 'true' && 'WILL REMOVE version directory' || 'SKIP (not found)' }}"
-          echo "4. NPM package:     WILL ATTEMPT (version deletion)"
-          echo "5. Maven packages:  WILL ATTEMPT (version deletion)"
+          echo "4. npmjs.org:       WILL ATTEMPT (unpublish @sap/engagement-cloud-sdk)"
+          echo "5. GitHub Packages: WILL ATTEMPT (delete @emartech snapshot + Maven versions)"
           echo "6. SPM:             ${{ steps.check-spm.outputs.matches == 'true' && format('WILL REVERT to {0}', steps.find-previous.outputs.version) || 'SKIP (already points elsewhere)' }}"
           echo "7. MavenCentral:    CANNOT DELETE (immutable) — reminder will be logged"
           echo ""
@@ -272,20 +274,54 @@ jobs:
             echo "✓ Version $VERSION removed from GitHub Pages"
           fi
 
+  revoke-npmjs:
+    name: Unpublish from npmjs.org
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: 'npmjs:@sap/engagement-cloud-sdk'
+    steps:
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+          scope: '@sap'
+
+      - name: Unpublish NPM package version
+        run: |
+          VERSION="${{ needs.validate.outputs.version }}"
+          PACKAGE="@sap/engagement-cloud-sdk"
+
+          echo "--- npmjs.org: ${PACKAGE}@${VERSION} ---"
+
+          # Check if the version exists on npmjs.org
+          if npm view "${PACKAGE}@${VERSION}" version 2>/dev/null; then
+            echo "✓ Found ${PACKAGE}@${VERSION} on npmjs.org"
+
+            if [ "$DRY_RUN" = "true" ]; then
+              echo "[DRY RUN] Would unpublish ${PACKAGE}@${VERSION} from npmjs.org"
+            else
+              echo "Unpublishing ${PACKAGE}@${VERSION}..."
+              npm unpublish "${PACKAGE}@${VERSION}" --force
+              echo "✓ ${PACKAGE}@${VERSION} unpublished from npmjs.org"
+            fi
+          else
+            echo "✗ ${PACKAGE}@${VERSION} not found on npmjs.org (may not have been published)"
+          fi
+
   revoke-github-packages:
     name: Delete from GitHub Packages
     needs: validate
     runs-on: ubuntu-latest
     steps:
-      - name: Delete NPM package version
+      - name: Delete NPM snapshot package version
         run: |
           VERSION="${{ needs.validate.outputs.version }}"
           OWNER="emartech"
-          # GitHub Packages API uses URL-encoded scoped name (e.g., @sap/engagement-cloud-sdk)
-          PACKAGE_DISPLAY="@sap/engagement-cloud-sdk"
-          PACKAGE_API="@sap%2Fengagement-cloud-sdk"
+          # Snapshots are published as @emartech/engagement-cloud-sdk to GitHub Packages
+          PACKAGE_DISPLAY="@emartech/engagement-cloud-sdk"
+          PACKAGE_API="@emartech%2Fengagement-cloud-sdk"
 
-          echo "--- NPM Package: ${PACKAGE_DISPLAY} ---"
+          echo "--- GitHub Packages NPM: ${PACKAGE_DISPLAY} ---"
 
           # Find the NPM package version ID
           VERSION_ID=$(gh api \
@@ -293,14 +329,14 @@ jobs:
             --jq ".[] | select(.name == \"$VERSION\") | .id" 2>/dev/null || true)
 
           if [ -z "$VERSION_ID" ]; then
-            echo "✗ NPM package version $VERSION not found (may not have been published)"
+            echo "✗ NPM package version $VERSION not found on GitHub Packages (expected for releases)"
           elif [ "$DRY_RUN" = "true" ]; then
             echo "[DRY RUN] Would delete NPM package version $VERSION (ID: $VERSION_ID)"
           else
             echo "Deleting NPM package version $VERSION (ID: $VERSION_ID)..."
             gh api --method DELETE \
               "/orgs/$OWNER/packages/npm/$PACKAGE_API/versions/$VERSION_ID" || true
-            echo "✓ NPM package version $VERSION deleted"
+            echo "✓ NPM package version $VERSION deleted from GitHub Packages"
           fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -537,7 +573,7 @@ jobs:
   summary:
     name: Revocation Summary
     if: always()
-    needs: [validate, revoke-github-release, revoke-github-pages, revoke-github-packages, revoke-spm, drop-maven-central-staging, maven-central-reminder]
+    needs: [validate, revoke-github-release, revoke-github-pages, revoke-npmjs, revoke-github-packages, revoke-spm, drop-maven-central-staging, maven-central-reminder]
     runs-on: ubuntu-latest
     steps:
       - name: Print summary
@@ -551,6 +587,7 @@ jobs:
           echo ""
           echo "GitHub Release + Tag:  ${{ needs.revoke-github-release.result }}"
           echo "GitHub Pages CDN:      ${{ needs.revoke-github-pages.result }}"
+          echo "npmjs.org (@sap):      ${{ needs.revoke-npmjs.result }}"
           echo "GitHub Packages:       ${{ needs.revoke-github-packages.result }}"
           echo "SPM (Package.swift):   ${{ needs.revoke-spm.result }}"
           echo "MavenCentral staging:  ${{ needs.drop-maven-central-staging.outputs.result || 'skipped' }}"

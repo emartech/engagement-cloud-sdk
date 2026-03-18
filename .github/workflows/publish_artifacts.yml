@@ -243,6 +243,7 @@ jobs:
     name: JS Pipeline (Build, Test, Publish)
     needs: [derive-version, create-tag, create-release]
     runs-on: ubuntu-latest
+    environment: 'npmjs:@sap/engagement-cloud-sdk'
     steps:
       - uses: actions/checkout@v6
         with:
@@ -292,9 +293,7 @@ jobs:
 
       - name: Publish to NPM
         if: env.DRY_RUN != 'true'
-        run: npm publish dist/npm/
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish dist/npm/ --provenance --access public
 
       - name: Assemble Pure JS Artifacts for CDN
         run: |
