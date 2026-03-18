@@ -77,7 +77,7 @@ jobs:
           - platform: web
             os: ubuntu-latest
           - platform: ios
-            os: macos-latest
+            os: macos-latest-xlarge
 
     steps:
       - uses: actions/checkout@v6
@@ -120,7 +120,7 @@ jobs:
           - platform: web
             os: ubuntu-latest
           - platform: ios
-            os: macos-latest
+            os: macos-latest-xlarge
 
     steps:
       - uses: actions/checkout@v6
