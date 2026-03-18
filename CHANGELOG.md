@@ -12,7 +12,7 @@ First public release of the **SAP Engagement Cloud SDK** — the next-generation
 ### Highlights
 
 - **One SDK, all platforms.** A single Kotlin Multiplatform codebase powers Android, iOS (via XCFramework + SPM), and Web (via JavaScript/TypeScript). Integration patterns, API naming, and behavior are consistent across every platform.
-- **Two-phase initialization.** `initialize()` (automatic on Android and Web) prepares the SDK without network traffic. `setup.enable(config)` starts data flow only after marketing consent is obtained — giving full control over when tracking begins.
+- **Two-phase initialization.** `initialize()` (automatic on all platforms) prepares the SDK without network traffic. `setup.enable(config)` starts data flow only after marketing consent is obtained — giving full control over when tracking begins.
 - **First-party data collection on Web.** The Web target collects behavioral data through first-party mechanisms, avoiding the limitations of third-party cookies and ad blockers for more accurate personalization.
 - **Redesigned architecture.** Event-driven internals with a state-machine core deliver measurable performance gains — for example, in-app messages appear faster than in the SAP Emarsys SDK.
 
@@ -22,7 +22,7 @@ First public release of the **SAP Engagement Cloud SDK** — the next-generation
   - `EngagementCloud.setup.enable(config)` — start tracking with consent-aware two-phase flow
   - `EngagementCloud.setup.disable()` — stop all tracking at any time (replaces the `changeApplicationCode(null)` workaround)
   - `EngagementCloud.setup.setOnContactLinkingFailedCallback(callback)` — handle contact linking failures with a retry prompt
-  - Automatic initialization on Android (via AndroidX Startup) and Web (via loader script)
+  - Automatic initialization on all platforms
 
 - **Contact Management**
   - `contact.link(contactFieldValue)` — identify a contact (replaces `setContact`)
