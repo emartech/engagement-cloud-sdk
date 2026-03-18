@@ -216,6 +216,9 @@ jobs:
     if: github.ref == 'refs/heads/main'
     needs: [derive-version, test, lint]
     runs-on: macos-latest
+    concurrency:
+      group: publish-kmp-snapshot
+      cancel-in-progress: true
     permissions:
       packages: write
     steps:
@@ -249,7 +252,11 @@ jobs:
     if: github.ref == 'refs/heads/main'
     needs: [derive-version, test, lint]
     runs-on: ubuntu-latest
+    concurrency:
+      group: publish-js-snapshot
+      cancel-in-progress: true
     permissions:
+      contents: write
       packages: write
       pages: write
       id-token: write
@@ -338,7 +345,7 @@ jobs:
 
   reporting:
     if: always()
-    needs: [ build, test, lint, publish-android, publish-js ]
+    needs: [ derive-version, build, test, lint, publish-android, publish-js ]
     runs-on: ubuntu-latest
     steps:
       - name: Report on Slack (Error)
@@ -347,7 +354,7 @@ jobs:
         with:
           webhook_url: '${{env.SLACK_WEBHOOK}}'
           channel: 'mobile-team-ci'
-          message: 'Last push build failed! :man-gesturing-no: :blobcatfearful:'
+          message: 'Last push build failed! :man-gesturing-no: :blobcatfearful: (snapshot: ${{ needs.derive-version.outputs.version }})'
           user_name: 'Engagement Cloud SDK'
           job_status: 'failure'
           user_icon: '${{env.SLACK_ICON}}'
@@ -359,7 +366,7 @@ jobs:
         with:
           webhook_url: '${{env.SLACK_WEBHOOK}}'
           channel: 'mobile-team-ci'
-          message: 'Last push build successful! :man-gesturing-ok: :bananadance:'
+          message: 'Last push build successful! :man-gesturing-ok: :bananadance: (snapshot: ${{ needs.derive-version.outputs.version }})'
           user_name: 'Engagement Cloud SDK'
           job_status: 'success'
           user_icon: '${{env.SLACK_ICON}}'
