@@ -1,6 +1,6 @@
 name: Revoke Release
 
-# Removes artifacts for a specific release version from:
+# Removes artifacts for a specific release version from selected targets:
 #   1. GitHub Release (delete release + tag)
 #   2. GitHub Pages CDN (remove version directory, rebuild latest/)
 #   3. npmjs.org (unpublish @sap/engagement-cloud-sdk via OIDC Trusted Publisher)
@@ -19,14 +19,30 @@ on:
         description: 'Version to revoke (x.y.z format, e.g. 1.2.3)'
         type: string
         required: true
-      dry_run:
-        description: 'Dry run — show what would be removed without deleting anything'
+      revoke_github_release:
+        description: 'Revoke GitHub Release + tag'
         type: boolean
         default: true
-      skip_maven_central_reminder:
-        description: 'Skip the MavenCentral deprecation reminder'
+      revoke_cdn:
+        description: 'Remove from GitHub Pages CDN'
         type: boolean
-        default: false
+        default: true
+      revoke_npm:
+        description: 'Unpublish from npmjs.org (@sap/engagement-cloud-sdk)'
+        type: boolean
+        default: true
+      revoke_github_packages:
+        description: 'Delete from GitHub Packages (NPM + Maven)'
+        type: boolean
+        default: true
+      revoke_maven_central:
+        description: 'Drop Maven Central staging + show deprecation reminder'
+        type: boolean
+        default: true
+      revoke_spm:
+        description: 'Revert Package.swift to previous version'
+        type: boolean
+        default: true
 
 concurrency:
   group: revoke-release
@@ -37,9 +53,6 @@ permissions:
   packages: write
   pages: write
   id-token: write
-
-env:
-  DRY_RUN: ${{ inputs.dry_run }}
 
 jobs:
   validate:
@@ -140,23 +153,24 @@ jobs:
           echo ""
           echo "============================================"
           echo "  REVOCATION PLAN for v${{ steps.validate.outputs.version }}"
-          echo "  Mode: ${{ env.DRY_RUN == 'true' && 'DRY RUN' || 'LIVE' }}"
           echo "============================================"
           echo ""
-          echo "1. GitHub Release:  ${{ steps.check-release.outputs.exists == 'true' && 'WILL DELETE' || 'SKIP (not found)' }}"
-          echo "2. Git tag:         ${{ steps.check-tag.outputs.exists == 'true' && 'WILL DELETE' || 'SKIP (not found)' }}"
-          echo "3. GitHub Pages:    ${{ steps.check-pages.outputs.exists == 'true' && 'WILL REMOVE version directory' || 'SKIP (not found)' }}"
-          echo "4. npmjs.org:       WILL ATTEMPT (unpublish @sap/engagement-cloud-sdk)"
-          echo "5. GitHub Packages: WILL ATTEMPT (delete @emartech snapshot + Maven versions)"
-          echo "6. SPM:             ${{ steps.check-spm.outputs.matches == 'true' && format('WILL REVERT to {0}', steps.find-previous.outputs.version) || 'SKIP (already points elsewhere)' }}"
-          echo "7. MavenCentral:    CANNOT DELETE (immutable) — reminder will be logged"
+          echo "1. GitHub Release:  ${{ inputs.revoke_github_release == true && (steps.check-release.outputs.exists == 'true' && 'WILL DELETE' || 'SKIP (not found)') || 'SKIP (not selected)' }}"
+          echo "2. Git tag:         ${{ inputs.revoke_github_release == true && (steps.check-tag.outputs.exists == 'true' && 'WILL DELETE' || 'SKIP (not found)') || 'SKIP (not selected)' }}"
+          echo "3. GitHub Pages:    ${{ inputs.revoke_cdn == true && (steps.check-pages.outputs.exists == 'true' && 'WILL REMOVE version directory' || 'SKIP (not found)') || 'SKIP (not selected)' }}"
+          echo "4. npmjs.org:       ${{ inputs.revoke_npm == true && 'WILL ATTEMPT (unpublish @sap/engagement-cloud-sdk)' || 'SKIP (not selected)' }}"
+          echo "5. GitHub Packages: ${{ inputs.revoke_github_packages == true && 'WILL ATTEMPT (delete @emartech snapshot + Maven versions)' || 'SKIP (not selected)' }}"
+          echo "6. SPM:             ${{ inputs.revoke_spm == true && (steps.check-spm.outputs.matches == 'true' && format('WILL REVERT to {0}', steps.find-previous.outputs.version) || 'SKIP (already points elsewhere)') || 'SKIP (not selected)' }}"
+          echo "7. MavenCentral:    ${{ inputs.revoke_maven_central == true && 'WILL ATTEMPT (drop staging + reminder)' || 'SKIP (not selected)' }}"
           echo ""
 
   revoke-github-release:
     name: Delete GitHub Release + Tag
     needs: validate
     runs-on: ubuntu-latest
-    if: needs.validate.outputs.release_exists == 'true' || needs.validate.outputs.tag_exists == 'true'
+    if: |
+      inputs.revoke_github_release == true &&
+      (needs.validate.outputs.release_exists == 'true' || needs.validate.outputs.tag_exists == 'true')
     steps:
       - uses: actions/checkout@v6
 
@@ -164,15 +178,9 @@ jobs:
         if: needs.validate.outputs.release_exists == 'true'
         run: |
           VERSION="${{ needs.validate.outputs.version }}"
-          if [ "$DRY_RUN" = "true" ]; then
-            echo "[DRY RUN] Would delete GitHub Release $VERSION"
-            echo "Assets that would be removed:"
-            gh release view "$VERSION" --json assets --jq '.assets[].name' || true
-          else
-            echo "Deleting GitHub Release $VERSION..."
-            gh release delete "$VERSION" --yes --cleanup-tag
-            echo "✓ GitHub Release $VERSION deleted (with tag cleanup)"
-          fi
+          echo "Deleting GitHub Release $VERSION..."
+          gh release delete "$VERSION" --yes --cleanup-tag
+          echo "✓ GitHub Release $VERSION deleted (with tag cleanup)"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -182,13 +190,9 @@ jobs:
           VERSION="${{ needs.validate.outputs.version }}"
           # Check if the tag still exists (gh release delete --cleanup-tag may have removed it)
           if git ls-remote --tags origin "$VERSION" | grep -q .; then
-            if [ "$DRY_RUN" = "true" ]; then
-              echo "[DRY RUN] Would delete remote tag $VERSION"
-            else
-              echo "Deleting remote tag $VERSION..."
-              git push origin ":refs/tags/$VERSION"
-              echo "✓ Remote tag $VERSION deleted"
-            fi
+            echo "Deleting remote tag $VERSION..."
+            git push origin ":refs/tags/$VERSION"
+            echo "✓ Remote tag $VERSION deleted"
           else
             echo "Tag $VERSION already removed by release deletion"
           fi
@@ -199,7 +203,7 @@ jobs:
     name: Remove from GitHub Pages CDN
     needs: validate
     runs-on: ubuntu-latest
-    if: needs.validate.outputs.pages_exists == 'true'
+    if: inputs.revoke_cdn == true && needs.validate.outputs.pages_exists == 'true'
     steps:
       - uses: actions/checkout@v6
         with:
@@ -210,28 +214,6 @@ jobs:
         run: |
           VERSION="${{ needs.validate.outputs.version }}"
 
-          if [ "$DRY_RUN" = "true" ]; then
-            echo "[DRY RUN] Would remove directory: $VERSION/"
-            echo "Contents:"
-            ls -la "$VERSION/" 2>/dev/null || echo "  (directory not found in checkout)"
-
-            if [ -d "latest" ]; then
-              echo ""
-              echo "[DRY RUN] Would check if latest/ needs rebuilding"
-              # Check if latest points to the revoked version by comparing file sizes/checksums
-              if [ -f "latest/engagement-cloud-sdk.js" ] && [ -f "$VERSION/engagement-cloud-sdk.js" ]; then
-                LATEST_SUM=$(sha256sum latest/engagement-cloud-sdk.js | cut -d' ' -f1)
-                VERSION_SUM=$(sha256sum "$VERSION/engagement-cloud-sdk.js" | cut -d' ' -f1)
-                if [ "$LATEST_SUM" = "$VERSION_SUM" ]; then
-                  echo "[DRY RUN] latest/ matches revoked version — would rebuild from previous version"
-                else
-                  echo "[DRY RUN] latest/ does not match revoked version — no rebuild needed"
-                fi
-              fi
-            fi
-            exit 0
-          fi
-
           echo "Removing $VERSION/ from gh-pages..."
           rm -rf "$VERSION"
 
@@ -239,11 +221,10 @@ jobs:
           REBUILD_LATEST=false
           PREVIOUS="${{ needs.validate.outputs.previous_version }}"
           if [ -d "latest" ] && [ -n "$PREVIOUS" ] && [ -d "$PREVIOUS" ]; then
-            # Compare latest/ with the revoked version — if latest was this version, rebuild
+            # latest/ existed but the version dir is now gone, so if files matched
+            # we need to copy from previous. Conservative approach: always rebuild
+            # from previous version since we can't compare anymore.
             if [ -f "latest/engagement-cloud-sdk.js" ]; then
-              # latest/ existed but the version dir is now gone, so if files matched
-              # we need to copy from previous. Conservative approach: always rebuild
-              # from previous version since we can't compare anymore.
               echo "Rebuilding latest/ from $PREVIOUS..."
               rm -rf latest
               cp -r "$PREVIOUS" latest
@@ -274,6 +255,7 @@ jobs:
     name: Unpublish from npmjs.org
     needs: validate
     runs-on: ubuntu-latest
+    if: inputs.revoke_npm == true
     environment: 'npmjs:@sap/engagement-cloud-sdk'
     steps:
       - uses: actions/setup-node@v6
@@ -292,14 +274,9 @@ jobs:
           # Check if the version exists on npmjs.org
           if npm view "${PACKAGE}@${VERSION}" version 2>/dev/null; then
             echo "✓ Found ${PACKAGE}@${VERSION} on npmjs.org"
-
-            if [ "$DRY_RUN" = "true" ]; then
-              echo "[DRY RUN] Would unpublish ${PACKAGE}@${VERSION} from npmjs.org"
-            else
-              echo "Unpublishing ${PACKAGE}@${VERSION}..."
-              npm unpublish "${PACKAGE}@${VERSION}" --force
-              echo "✓ ${PACKAGE}@${VERSION} unpublished from npmjs.org"
-            fi
+            echo "Unpublishing ${PACKAGE}@${VERSION}..."
+            npm unpublish "${PACKAGE}@${VERSION}" --force
+            echo "✓ ${PACKAGE}@${VERSION} unpublished from npmjs.org"
           else
             echo "✗ ${PACKAGE}@${VERSION} not found on npmjs.org (may not have been published)"
           fi
@@ -308,6 +285,7 @@ jobs:
     name: Delete from GitHub Packages
     needs: validate
     runs-on: ubuntu-latest
+    if: inputs.revoke_github_packages == true
     steps:
       - name: Delete NPM snapshot package version
         run: |
@@ -326,8 +304,6 @@ jobs:
 
           if [ -z "$VERSION_ID" ]; then
             echo "✗ NPM package version $VERSION not found on GitHub Packages (expected for releases)"
-          elif [ "$DRY_RUN" = "true" ]; then
-            echo "[DRY RUN] Would delete NPM package version $VERSION (ID: $VERSION_ID)"
           else
             echo "Deleting NPM package version $VERSION (ID: $VERSION_ID)..."
             gh api --method DELETE \
@@ -342,9 +318,10 @@ jobs:
           VERSION="${{ needs.validate.outputs.version }}"
           OWNER="emartech"
 
-          # All Maven packages published by the KMP pipeline (build.gradle.kts coordinates
-          # + KMP platform suffixes). The main SDK publishes 6 artifacts (metadata, android,
-          # js, iosarm64, iosx64, iossimulatorarm64) plus FCM and HMS companion modules.
+          # All Maven packages published by the KMP pipeline. The main SDK publishes
+          # 6 artifacts (metadata, android, js, iosarm64, iosx64, iossimulatorarm64),
+          # plus FCM and HMS companion modules, plus the ios-notification-service module
+          # (metadata + 3 iOS platform variants).
           MAVEN_PACKAGES=(
             "com.sap.engagement-cloud.engagement-cloud-sdk"
             "com.sap.engagement-cloud.engagement-cloud-sdk-android"
@@ -354,6 +331,10 @@ jobs:
             "com.sap.engagement-cloud.engagement-cloud-sdk-iossimulatorarm64"
             "com.sap.engagement-cloud.engagement-cloud-sdk-android-fcm"
             "com.sap.engagement-cloud.engagement-cloud-sdk-android-hms"
+            "com.sap.engagement-cloud.engagement-cloud-sdk-ios-notification-service"
+            "com.sap.engagement-cloud.engagement-cloud-sdk-ios-notification-service-iosarm64"
+            "com.sap.engagement-cloud.engagement-cloud-sdk-ios-notification-service-iosx64"
+            "com.sap.engagement-cloud.engagement-cloud-sdk-ios-notification-service-iossimulatorarm64"
           )
 
           for PACKAGE in "${MAVEN_PACKAGES[@]}"; do
@@ -366,8 +347,6 @@ jobs:
 
             if [ -z "$VERSION_ID" ]; then
               echo "  ✗ Version $VERSION not found"
-            elif [ "$DRY_RUN" = "true" ]; then
-              echo "  [DRY RUN] Would delete version $VERSION (ID: $VERSION_ID)"
             else
               echo "  Deleting version $VERSION (ID: $VERSION_ID)..."
               gh api --method DELETE \
@@ -383,6 +362,8 @@ jobs:
     needs: [validate, revoke-github-release]
     runs-on: ubuntu-latest
     if: |
+      !cancelled() &&
+      inputs.revoke_spm == true &&
       needs.validate.outputs.spm_matches == 'true' &&
       needs.validate.outputs.previous_version != ''
     steps:
@@ -396,15 +377,6 @@ jobs:
           PREVIOUS="${{ needs.validate.outputs.previous_version }}"
 
           echo "Reverting Package.swift from $VERSION to $PREVIOUS..."
-
-          if [ "$DRY_RUN" = "true" ]; then
-            echo "[DRY RUN] Would revert Package.swift to point at $PREVIOUS"
-            echo "Current URLs:"
-            grep "releases/download/" Package.swift || true
-            echo ""
-            echo "Would change to $PREVIOUS URLs"
-            exit 0
-          fi
 
           # The previous release must have XCFramework assets — verify
           SDK_ASSET="EngagementCloudSDK.xcframework.zip"
@@ -450,6 +422,7 @@ jobs:
     name: Drop Maven Central Staging
     needs: validate
     runs-on: ubuntu-latest
+    if: inputs.revoke_maven_central == true
     outputs:
       result: ${{ steps.drop.outputs.result }}
     steps:
@@ -494,12 +467,6 @@ jobs:
             exit 0
           fi
 
-          if [ "$DRY_RUN" = "true" ]; then
-            echo "[DRY RUN] Would drop deployment $DEPLOYMENT_ID (state: $DEPLOYMENT_STATE)"
-            echo "result=dry_run" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
           echo "Dropping deployment $DEPLOYMENT_ID..."
           HTTP_CODE=$(curl -s -o /tmp/drop-response.txt -w "%{http_code}" \
             -X DELETE \
@@ -520,9 +487,11 @@ jobs:
     name: MavenCentral Deprecation Reminder
     needs: [validate, drop-maven-central-staging]
     runs-on: ubuntu-latest
-    # Only show the reminder if the staging drop didn't fully resolve the situation
+    # Only show the reminder if Maven Central revocation was selected and staging
+    # drop didn't fully resolve the situation
     if: |
-      inputs.skip_maven_central_reminder != true &&
+      !cancelled() &&
+      inputs.revoke_maven_central == true &&
       needs.drop-maven-central-staging.outputs.result != 'dropped'
     steps:
       - name: Log MavenCentral status
@@ -583,7 +552,6 @@ jobs:
           echo ""
           echo "============================================"
           echo "  REVOCATION SUMMARY for v$VERSION"
-          echo "  Mode: ${{ env.DRY_RUN == 'true' && 'DRY RUN' || 'LIVE' }}"
           echo "============================================"
           echo ""
           echo "GitHub Release + Tag:  ${{ needs.revoke-github-release.result }}"
@@ -594,12 +562,8 @@ jobs:
           echo "MavenCentral staging:  ${{ needs.drop-maven-central-staging.outputs.result || 'skipped' }}"
           echo "MavenCentral reminder: ${{ needs.maven-central-reminder.result }}"
           echo ""
-          if [ "$DRY_RUN" = "true" ]; then
-            echo "This was a DRY RUN. Re-run with dry_run=false to execute."
-          else
-            echo "Revocation complete. Verify:"
-            echo "  - https://github.com/${{ github.repository }}/releases (release removed)"
-            echo "  - https://emartech.github.io/engagement-cloud-sdk/$VERSION/ (should 404)"
-            echo "  - https://github.com/orgs/emartech/packages?repo_name=engagement-cloud-sdk (versions removed)"
-          fi
+          echo "Revocation complete. Verify:"
+          echo "  - https://github.com/${{ github.repository }}/releases (release removed)"
+          echo "  - https://emartech.github.io/engagement-cloud-sdk/$VERSION/ (should 404)"
+          echo "  - https://github.com/orgs/emartech/packages?repo_name=engagement-cloud-sdk (versions removed)"
           echo ""

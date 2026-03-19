@@ -34,6 +34,14 @@ on:
         description: 'Skip tests (use only for hotfix re-releases)'
         type: boolean
         default: false
+      create_tag:
+        description: 'Create git tag (disable for re-releases where tag already exists)'
+        type: boolean
+        default: true
+      create_release:
+        description: 'Create/update GitHub Release (disable for re-releases to registries only)'
+        type: boolean
+        default: true
 
 concurrency:
   group: publish-release
@@ -104,80 +112,10 @@ jobs:
           echo "value=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Derived version: $VERSION"
 
-  create-tag:
-    name: Create Release Tag
-    if: github.event_name == 'workflow_dispatch' && inputs.dry_run != true
-    needs: derive-version
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-tags: true
-
-      - name: Check tag does not exist
-        run: |
-          VERSION="${{ needs.derive-version.outputs.version }}"
-          if git tag -l "$VERSION" | grep -q .; then
-            echo "::error::Tag $VERSION already exists. Cannot overwrite existing release tags."
-            exit 1
-          fi
-
-      - name: Create and push tag
-        run: |
-          VERSION="${{ needs.derive-version.outputs.version }}"
-          git tag "$VERSION"
-          git push origin "$VERSION"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  create-release:
-    name: Create GitHub Release
-    if: ${{ !cancelled() && needs.derive-version.result == 'success' }}
-    needs: [derive-version, create-tag]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Extract release notes from CHANGELOG
-        id: changelog
-        run: |
-          VERSION="${{ needs.derive-version.outputs.version }}"
-          if [ ! -f CHANGELOG.md ]; then
-            echo "No CHANGELOG.md found, will use auto-generated notes"
-            echo "found=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          NOTES=$(sed -n "/^## \[$VERSION\]/,/^## \[/{/^## \[/!p;}" CHANGELOG.md | sed '/^$/N;/^\n$/d')
-          if [ -z "$NOTES" ]; then
-            echo "No changelog entry for $VERSION, will use auto-generated notes"
-            echo "found=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "$NOTES" > /tmp/release-notes.md
-            echo "found=true" >> "$GITHUB_OUTPUT"
-            echo "Release notes extracted for $VERSION"
-          fi
-
-      - name: Create GitHub Release
-        if: env.DRY_RUN != 'true'
-        run: |
-          VERSION="${{ needs.derive-version.outputs.version }}"
-          if [ "${{ steps.changelog.outputs.found }}" = "true" ]; then
-            gh release create "$VERSION" \
-              --title "Release $VERSION" \
-              --notes-file /tmp/release-notes.md
-          else
-            gh release create "$VERSION" \
-              --title "Release $VERSION" \
-              --generate-notes
-          fi
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   android-pipeline:
     name: KMP Pipeline (Build, Test, Publish, Stage to Maven Central)
     if: ${{ !cancelled() && (github.event_name == 'push' || inputs.publish_kmp == true) }}
-    needs: [derive-version, create-tag, create-release]
+    needs: [derive-version]
     runs-on: macos-latest-xlarge
     env:
       OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
@@ -203,7 +141,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Run Android Pipeline (Build, Lint, Test, [Publish])
+      - name: Run Android Pipeline (Build, Lint, Test, [Publish to GitHub Packages])
         run: |
           if [ "$SKIP_TESTS" = "true" ]; then
             echo "⚠️ Skipping tests (skip_tests=true)"
@@ -213,7 +151,7 @@ jobs:
               :engagement-cloud-sdk-android-hms:assembleRelease \
               :engagement-cloud-sdk-android-fcm:lintRelease \
               :engagement-cloud-sdk-android-hms:lintRelease \
-              $(if [ "$PUBLISH" = "true" ]; then echo \
+              $(if [ "$PUBLISH_GITHUB_PACKAGES" = "true" ]; then echo \
                 ":engagement-cloud-sdk:publishKotlinMultiplatformPublicationToGitHubPackagesRepository \
                  :engagement-cloud-sdk:publishAndroidPublicationToGitHubPackagesRepository \
                  :engagement-cloud-sdk:publishJsPublicationToGitHubPackagesRepository \
@@ -223,13 +161,14 @@ jobs:
                  :engagement-cloud-sdk-android-fcm:publishMavenPublicationToGitHubPackagesRepository \
                  :engagement-cloud-sdk-android-hms:publishMavenPublicationToGitHubPackagesRepository"; fi) \
               -Pjs.variant=canvas \
-              -PENABLE_PUBLISHING=$PUBLISH \
+              -PENABLE_PUBLISHING=$PUBLISH_GITHUB_PACKAGES \
               --no-daemon
           else
             make pipeline-android
           fi
         env:
           PUBLISH: ${{ env.DRY_RUN != 'true' }}
+          PUBLISH_GITHUB_PACKAGES: ${{ env.DRY_RUN != 'true' }}
           VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
@@ -247,10 +186,28 @@ jobs:
             engagement-cloud-sdk-android-hms/build/outputs/aar/*-release.aar
 
       - name: Decode signing key for Maven Central
-        if: env.DRY_RUN != 'true'
         run: ./gradlew base64EnvToFile -PpropertyName=SONATYPE_SIGNING_SECRET_KEY_RING_FILE_BASE64 -Pfile=./secring.asc.gpg
         env:
           SONATYPE_SIGNING_SECRET_KEY_RING_FILE_BASE64: ${{ secrets.SONATYPE_SIGNING_SECRET_KEY_RING_FILE }}
+
+      - name: Validate signing via publishToMavenLocal
+        # Signs all KMP artifacts and writes them to ~/.m2/repository.
+        # This validates that signing credentials work without uploading anything.
+        # Runs on both dry-run and real builds; the real upload is a separate step.
+        run: |
+          echo "Validating signing by publishing to Maven Local..."
+          ./gradlew publishToMavenLocal \
+            -PENABLE_PUBLISHING=true \
+            -Psigning.keyId="${{ secrets.SONATYPE_SIGNING_KEY_ID }}" \
+            -Psigning.password="${{ secrets.SONATYPE_SIGNING_PASSWORD }}" \
+            -Psigning.secretKeyRingFile=./secring.asc.gpg \
+            --no-daemon
+          echo "✓ All KMP artifacts signed and published to Maven Local"
+        env:
+          VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_REPO: ${{ github.repository }}
 
       - name: Stage all KMP artifacts to Maven Central (no auto-promote)
         # Uploads signed artifacts to Sonatype Central Portal staging.
@@ -283,7 +240,7 @@ jobs:
   js-pipeline:
     name: JS Pipeline (Build, Test, Publish)
     if: ${{ !cancelled() && (github.event_name == 'push' || inputs.publish_npm == true || inputs.publish_cdn == true) }}
-    needs: [derive-version, create-tag, create-release]
+    needs: [derive-version]
     runs-on: ubuntu-latest
     environment: 'npmjs:@sap/engagement-cloud-sdk'
     steps:
@@ -396,17 +353,6 @@ jobs:
           if-no-files-found: error
           path: dist/cdn/
 
-      - name: Upload JS Web Bundle to GitHub Release
-        if: env.DRY_RUN != 'true'
-        run: |
-          VERSION="${{ needs.derive-version.outputs.version }}"
-          # Upload web bundle zip (release created by create-release job)
-          gh release upload "$VERSION" \
-            "dist/cdn/engagement-cloud-sdk-web-$VERSION.zip" \
-            --clobber
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Upload JS artifacts
         uses: actions/upload-artifact@v7
         with:
@@ -421,7 +367,7 @@ jobs:
   ios-pipeline:
     name: iOS Pipeline (Build, Test, Publish)
     if: ${{ !cancelled() && (github.event_name == 'push' || inputs.publish_ios == true) }}
-    needs: [derive-version, create-tag, create-release]
+    needs: [derive-version]
     runs-on: macos-latest-xlarge
     env:
       SPM_BUILD: release
@@ -453,21 +399,19 @@ jobs:
           if [ "$SKIP_TESTS" = "true" ]; then
             echo "⚠️ Skipping tests (skip_tests=true)"
             ./gradlew \
-              $(if [ "$PUBLISH" = "true" ]; then echo \
-                ":engagement-cloud-sdk:assembleEngagementCloudSDKReleaseXCFramework \
-                 :ios-notification-service:assembleEngagementCloudNotificationServiceReleaseXCFramework"; fi) \
-              -PNATIVE_BUILD_TYPE="$(if [ "$PUBLISH" = "true" ]; then echo RELEASE; else echo DEBUG; fi)" \
-              $(if [ "$PUBLISH" = "true" ]; then echo "-PENABLE_PUBLISHING=true"; fi) \
+              :engagement-cloud-sdk:assembleEngagementCloudSDKReleaseXCFramework \
+              :ios-notification-service:assembleEngagementCloudNotificationServiceReleaseXCFramework \
+              -PNATIVE_BUILD_TYPE=RELEASE \
+              -PENABLE_PUBLISHING=true \
               --no-daemon
           else
             make pipeline-ios
           fi
         env:
-          PUBLISH: ${{ env.DRY_RUN != 'true' }}
+          PUBLISH: true
           VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
 
-      - name: Upload XCFrameworks to GitHub Release
-        if: env.DRY_RUN != 'true'
+      - name: Zip XCFrameworks and compute checksums
         run: |
           VERSION="${{ needs.derive-version.outputs.version }}"
           # Zip XCFrameworks (preserving directory structure)
@@ -482,14 +426,6 @@ jobs:
           # Calculate checksums
           echo "SDK_CHECKSUM=$(shasum -a 256 EngagementCloudSDK.xcframework.zip | cut -d ' ' -f 1)" >> "$GITHUB_ENV"
           echo "NS_CHECKSUM=$(shasum -a 256 EngagementCloudSDKNotificationService.xcframework.zip | cut -d ' ' -f 1)" >> "$GITHUB_ENV"
-
-          # Upload to GitHub Release (release created by create-release job)
-          gh release upload "$VERSION" \
-            EngagementCloudSDK.xcframework.zip \
-            EngagementCloudSDKNotificationService.xcframework.zip \
-            --clobber
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Generate and commit Package.swift for SPM
         if: env.DRY_RUN != 'true'
@@ -510,6 +446,25 @@ jobs:
           git commit -m "Update Package.swift for SPM release $VERSION"
           git push origin HEAD:main
 
+      - name: Create and push release tag
+        if: github.event_name == 'workflow_dispatch' && env.DRY_RUN != 'true' && inputs.create_tag == true
+        run: |
+          VERSION="${{ needs.derive-version.outputs.version }}"
+          git tag "$VERSION"
+          git push origin "$VERSION"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload XCFramework zips
+        uses: actions/upload-artifact@v7
+        with:
+          name: ios-xcframework-zips
+          retention-days: 1
+          if-no-files-found: error
+          path: |
+            EngagementCloudSDK.xcframework.zip
+            EngagementCloudSDKNotificationService.xcframework.zip
+
       - name: Upload iOS XCFramework artifacts
         uses: actions/upload-artifact@v7
         with:
@@ -519,6 +474,123 @@ jobs:
           path: |
             engagement-cloud-sdk/build/XCFrameworks/release/*.xcframework
             ios-notification-service/build/XCFrameworks/release/*.xcframework
+
+
+  create-tag-fallback:
+    name: Create Release Tag (iOS skipped)
+    # When iOS pipeline is skipped, no tag is created by ios-pipeline.
+    # This fallback job creates the tag on HEAD instead.
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run != true && inputs.create_tag == true && needs.ios-pipeline.result == 'skipped' }}
+    needs: [derive-version, ios-pipeline]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-tags: true
+
+      - name: Check tag does not exist
+        run: |
+          VERSION="${{ needs.derive-version.outputs.version }}"
+          if git tag -l "$VERSION" | grep -q .; then
+            echo "::error::Tag $VERSION already exists. Cannot overwrite existing release tags."
+            exit 1
+          fi
+
+      - name: Create and push tag
+        run: |
+          VERSION="${{ needs.derive-version.outputs.version }}"
+          git tag "$VERSION"
+          git push origin "$VERSION"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+  create-release:
+    name: Create GitHub Release
+    # Runs after all pipeline jobs complete. Creates the release and uploads
+    # all assets (XCFramework zips, web bundle) in one step.
+    if: ${{ !cancelled() && needs.derive-version.result == 'success' }}
+    needs: [derive-version, android-pipeline, js-pipeline, ios-pipeline, create-tag-fallback]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Extract release notes from CHANGELOG
+        id: changelog
+        run: |
+          VERSION="${{ needs.derive-version.outputs.version }}"
+          if [ ! -f CHANGELOG.md ]; then
+            echo "No CHANGELOG.md found, will use auto-generated notes"
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          NOTES=$(sed -n "/^## \[$VERSION\]/,/^## \[/{/^## \[/!p;}" CHANGELOG.md | sed '/^$/N;/^\n$/d')
+          if [ -z "$NOTES" ]; then
+            echo "No changelog entry for $VERSION, will use auto-generated notes"
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "$NOTES" > /tmp/release-notes.md
+            echo "found=true" >> "$GITHUB_OUTPUT"
+            echo "Release notes extracted for $VERSION"
+          fi
+
+      - name: Download iOS XCFramework zips
+        if: needs.ios-pipeline.result == 'success'
+        uses: actions/download-artifact@v8
+        with:
+          name: ios-xcframework-zips
+          path: release-assets/
+
+      - name: Download JS CDN artifacts (for web bundle zip)
+        if: needs.js-pipeline.result == 'success'
+        uses: actions/download-artifact@v8
+        with:
+          name: js-cdn-artifacts
+          path: release-assets/cdn/
+
+      - name: Locate web bundle zip
+        if: needs.js-pipeline.result == 'success'
+        run: |
+          VERSION="${{ needs.derive-version.outputs.version }}"
+          # The zip is at release-assets/cdn/engagement-cloud-sdk-web-<version>.zip
+          if [ -f "release-assets/cdn/engagement-cloud-sdk-web-$VERSION.zip" ]; then
+            mv "release-assets/cdn/engagement-cloud-sdk-web-$VERSION.zip" release-assets/
+          fi
+          # Clean up the cdn subdirectory
+          rm -rf release-assets/cdn
+
+      - name: Create GitHub Release and upload assets
+        if: ${{ env.DRY_RUN != 'true' && (github.event_name == 'push' || inputs.create_release == true) }}
+        run: |
+          VERSION="${{ needs.derive-version.outputs.version }}"
+          mkdir -p release-assets
+
+          # Check if release already exists
+          if gh release view "$VERSION" &>/dev/null; then
+            echo "Release $VERSION already exists — uploading assets to existing release"
+            for file in release-assets/*; do
+              [ -f "$file" ] && gh release upload "$VERSION" "$file" --clobber
+            done
+          else
+            echo "Creating new release $VERSION"
+            # Build gh release create command
+            ARGS=(gh release create "$VERSION" --title "Release $VERSION")
+            if [ "${{ steps.changelog.outputs.found }}" = "true" ]; then
+              ARGS+=(--notes-file /tmp/release-notes.md)
+            else
+              ARGS+=(--generate-notes)
+            fi
+
+            # Attach all release assets
+            for file in release-assets/*; do
+              [ -f "$file" ] && ARGS+=("$file")
+            done
+
+            "${ARGS[@]}"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
   deploy-pages:
