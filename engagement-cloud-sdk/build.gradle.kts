@@ -386,8 +386,8 @@ mavenPublishing {
     coordinates(group.toString(), "engagement-cloud-sdk", version.toString())
 
     pom {
-        name = "Engagement Cloud SDK"
-        description = "Engagement Cloud SDK"
+        name = "SAP Engagement Cloud SDK"
+        description = "SAP Engagement Cloud SDK"
         inceptionYear = "2025"
         url = "https://github.com/emartech/engagement-cloud-sdk/"
         licenses {

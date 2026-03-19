@@ -3,7 +3,6 @@ pluginManagement {
         google()
         gradlePluginPortal()
         mavenCentral()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         maven(url = "https://oss.sonatype.org/content/repositories/snapshots")
         maven("https://developer.huawei.com/repo/")
     }
@@ -23,7 +22,6 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         maven("https://developer.huawei.com/repo/")
         maven(url = "https://oss.sonatype.org/content/repositories/snapshots")
     }
