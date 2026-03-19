@@ -436,13 +436,12 @@ tasks {
 tasks.withType<ProcessResources> {
     outputs.upToDateWhen { false }  // always run this task to ensure the file is updated with the correct version
     val sdkVersion = version.toString()
+    val isSnapshot = sdkVersion.contains("-")
     filesMatching("**/engagement-cloud-sdk-loader.js") {
-        println("Replacing sdk-loader-version with $sdkVersion in ${this.path}")
+        val targetPath = if (isSnapshot) "/snapshots/engagement-cloud-sdk.js" else "/${sdkVersion}/engagement-cloud-sdk.js"
+        println("Replacing loader SDK URL with $targetPath in ${this.path}")
         filter { line ->
-            line.replace(
-                "/latest/engagement-cloud-sdk.js",
-                "/${sdkVersion}/engagement-cloud-sdk.js"
-            )
+            line.replace("/latest/engagement-cloud-sdk.js", targetPath)
         }
     }
 }
