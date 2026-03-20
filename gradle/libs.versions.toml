@@ -46,7 +46,7 @@ cryptography = "0.5.0"
 sqlDelight = "2.3.2"
 mavenPublish = "0.36.0"
 dotEnv = "4.0.0"
-uiBackhandler = "1.10.2"
+uiBackhandler = "1.10.3"
 
 [libraries]
 compose-html-core = { module = "org.jetbrains.compose.html:html-core", version.ref = "compose-plugin" }
