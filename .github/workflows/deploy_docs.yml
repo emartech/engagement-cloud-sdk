@@ -1,0 +1,45 @@
+name: Deploy Documentation
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+jobs:
+  deploy-docs:
+    name: Build & Deploy Docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+          token: ${{ secrets.DOCS_READ_PAT }}
+
+      - name: Update submodule to latest
+        run: |
+          git submodule update --remote docs/engagement-cloud-sdk-docs
+          echo "Docs submodule updated to:"
+          cd docs/engagement-cloud-sdk-docs && git log --oneline -1
+
+      - name: Setup Node.js for Docusaurus
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Build Docusaurus docs
+        working-directory: docs/engagement-cloud-sdk-docs
+        run: |
+          npm ci
+          sed -i'' -e "s|baseUrl: '/'|baseUrl: '/engagement-cloud-sdk/docs/'|" docusaurus.config.ts
+          echo "Updated baseUrl to /engagement-cloud-sdk/docs/"
+          npx docusaurus build --out-dir ../../dist/docs
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist/docs
+          keep_files: true
+          destination_dir: docs
