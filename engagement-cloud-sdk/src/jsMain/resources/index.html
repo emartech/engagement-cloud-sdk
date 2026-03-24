@@ -8,6 +8,10 @@
         EngagementCloud.event.track({type: "CUSTOM", name: "TEST AFTER LOADER", attributes: {"key1": "value1"}})
             .then(() => console.log("Tracking Event successful"))
             .catch(e => console.error(e))
+
+        EngagementCloud.config.getApplicationCode()
+            .then(appCode => console.log("Application code: " + appCode))
+            .catch(e => console.error(e))
     </script>
     <style>
         .selected {
@@ -128,7 +132,7 @@
                 console.log("Navigating to somewhere.");
             });
     });
-    
+
     class MyCustomMessageItem extends HTMLElement {
         static get observedAttributes() {
             return ["image", "title", "lead","image-alt-text", "is-not-opened", "is-selected", "is-pinned", "categories"]
