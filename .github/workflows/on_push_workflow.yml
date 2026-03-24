@@ -68,6 +68,8 @@ jobs:
   build:
     name: Build ${{ matrix.platform }} / ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    env:
+      VERSION_OVERRIDE: 'ci'
     strategy:
       fail-fast: false
       matrix:
@@ -109,6 +111,8 @@ jobs:
     name: Test ${{ matrix.platform }} / ${{ matrix.os }}
     needs: build
     runs-on: ${{ matrix.os }}
+    env:
+      VERSION_OVERRIDE: 'ci'
     strategy:
       fail-fast: false
       matrix:
@@ -188,6 +192,8 @@ jobs:
   lint:
     needs: build
     runs-on: macos-latest-xlarge
+    env:
+      VERSION_OVERRIDE: 'ci'
     steps:
       - uses: actions/checkout@v6
       - name: Set up JDK 17
