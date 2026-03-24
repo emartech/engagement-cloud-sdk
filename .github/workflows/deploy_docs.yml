@@ -12,16 +12,15 @@ jobs:
     name: Build & Deploy Docs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-        with:
-          submodules: recursive
-          token: ${{ secrets.DOCS_READ_PAT }}
+      - name: Checkout SDK repository
+        uses: actions/checkout@v6
 
-      - name: Update submodule to latest
-        run: |
-          git submodule update --remote docs/engagement-cloud-sdk-docs
-          echo "Docs submodule updated to:"
-          cd docs/engagement-cloud-sdk-docs && git log --oneline -1
+      - name: Clone docs repository
+        uses: actions/checkout@v6
+        with:
+          repository: emartech/engagement-cloud-sdk-docs
+          token: ${{ secrets.DOCS_READ_PAT }}
+          path: docs/engagement-cloud-sdk-docs
 
       - name: Setup Node.js for Docusaurus
         uses: actions/setup-node@v6
