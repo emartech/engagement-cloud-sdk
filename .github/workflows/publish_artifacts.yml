@@ -115,7 +115,7 @@ jobs:
   android-pipeline:
     name: KMP Pipeline (Build, Test, Publish, Stage to Maven Central)
     if: ${{ !cancelled() && (github.event_name == 'push' || inputs.publish_kmp == true) }}
-    needs: [derive-version]
+    needs: [ derive-version ]
     runs-on: macos-latest-xlarge
     env:
       OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
@@ -240,7 +240,7 @@ jobs:
   js-pipeline:
     name: JS Pipeline (Build, Test, Publish)
     if: ${{ !cancelled() && (github.event_name == 'push' || inputs.publish_npm == true || inputs.publish_cdn == true) }}
-    needs: [derive-version]
+    needs: [ derive-version ]
     runs-on: ubuntu-latest
     environment: 'npmjs:@sap/engagement-cloud-sdk'
     steps:
@@ -256,12 +256,11 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - uses: actions/checkout@v6
-          - uses: actions/setup-node@v6
-          with:
-            node-version: '22'
-            registry-url: 'https://registry.npmjs.org'
-        - run: npm ci
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm ci
 
       - name: Install npm dependencies
         run: npm install
@@ -368,7 +367,7 @@ jobs:
   ios-pipeline:
     name: iOS Pipeline (Build, Test, Publish)
     if: ${{ !cancelled() && (github.event_name == 'push' || inputs.publish_ios == true) }}
-    needs: [derive-version]
+    needs: [ derive-version ]
     runs-on: macos-latest-xlarge
     env:
       SPM_BUILD: release
@@ -482,7 +481,7 @@ jobs:
     # When iOS pipeline is skipped, no tag is created by ios-pipeline.
     # This fallback job creates the tag on HEAD instead.
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run != true && inputs.create_tag == true && needs.ios-pipeline.result == 'skipped' }}
-    needs: [derive-version, ios-pipeline]
+    needs: [ derive-version, ios-pipeline ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -511,7 +510,7 @@ jobs:
     # Runs after all pipeline jobs complete. Creates the release and uploads
     # all assets (XCFramework zips, web bundle) in one step.
     if: ${{ !cancelled() && needs.derive-version.result == 'success' }}
-    needs: [derive-version, android-pipeline, js-pipeline, ios-pipeline, create-tag-fallback]
+    needs: [ derive-version, android-pipeline, js-pipeline, ios-pipeline, create-tag-fallback ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -602,7 +601,7 @@ jobs:
     # to gh-pages, so concurrent pushes would overwrite each other).
     # Requires js-pipeline success (produces CDN artifacts). Skips when CDN is deselected or on dry-run.
     if: ${{ !cancelled() && needs.js-pipeline.result == 'success' && (github.event_name == 'push' || inputs.publish_cdn == true) }}
-    needs: [derive-version, js-pipeline, ios-pipeline, android-pipeline]
+    needs: [ derive-version, js-pipeline, ios-pipeline, android-pipeline ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout SDK repository
@@ -698,7 +697,7 @@ jobs:
   report-slack:
     name: Report / Slack
     if: always()
-    needs: [derive-version, android-pipeline, js-pipeline, ios-pipeline, create-release, deploy-pages]
+    needs: [ derive-version, android-pipeline, js-pipeline, ios-pipeline, create-release, deploy-pages ]
     runs-on: ubuntu-latest
     steps:
       - name: Compute Slack prefix
