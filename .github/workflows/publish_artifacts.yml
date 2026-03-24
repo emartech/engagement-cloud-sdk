@@ -243,6 +243,9 @@ jobs:
     needs: [ derive-version ]
     runs-on: ubuntu-latest
     environment: 'npmjs:@sap/engagement-cloud-sdk'
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v6
 
