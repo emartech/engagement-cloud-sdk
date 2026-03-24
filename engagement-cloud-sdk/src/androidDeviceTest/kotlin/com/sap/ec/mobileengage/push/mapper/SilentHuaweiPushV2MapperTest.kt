@@ -1,5 +1,6 @@
 package com.sap.ec.mobileengage.push.mapper
 
+import com.sap.ec.api.event.model.EventSource
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.providers.UuidProviderApi
 import com.sap.ec.mobileengage.action.models.BadgeCount
@@ -117,7 +118,8 @@ class SilentHuaweiPushV2MapperTest {
                     name = "testEvent",
                     payload = buildMap {
                         put("key", "value")
-                    }
+                    },
+                    source = EventSource.Push
                 )
             )
         )

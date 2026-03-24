@@ -4,6 +4,7 @@ import com.sap.ec.SdkConstants.SILENT_PUSH_RECEIVED_EVENT_NAME
 import com.sap.ec.TestEngagementCloudSDKConfig
 import com.sap.ec.api.SdkState
 import com.sap.ec.api.event.model.AppEvent
+import com.sap.ec.api.event.model.EventSource
 import com.sap.ec.api.push.Ems
 import com.sap.ec.api.push.NotificationCenterDelegateRegistration
 import com.sap.ec.api.push.NotificationCenterDelegateRegistrationOptions
@@ -490,6 +491,28 @@ internal class IosPushInternalTests {
     }
 
     @Test
+    fun `handleSilentMessageWithUserInfo should handle badgeCount`() = runTest {
+        val expectedBadgeCount = BadgeCount(SET, 42)
+        val userInfo = SilentPushUserInfo(
+            ems = Ems(
+                version = VERSION,
+                trackingInfo = TRACKING_INFO
+            ),
+            notification = SilentNotification(
+                silent = true,
+                actions = emptyList(),
+                badgeCount = expectedBadgeCount
+            ),
+        )
+        everySuspend { mockSdkEventDistributor.registerPublicEvent(any()) }
+        everySuspend { mockBadgeCountHandler.handle(any()) } returns Unit
+
+        iosPushInternal.handleSilentMessageWithUserInfo(userInfo)
+
+        verifySuspend { mockBadgeCountHandler.handle(expectedBadgeCount) }
+    }
+
+    @Test
     fun `handleMessageWithUserInfo should emit event with campaignId`() = runTest {
         val openExternalUrlActionModel =
             BasicOpenExternalUrlActionModel(
@@ -520,7 +543,8 @@ internal class IosPushInternalTests {
             mockSdkEventDistributor.registerPublicEvent(
                 AppEvent(
                     id = UUID,
-                    name = SILENT_PUSH_RECEIVED_EVENT_NAME
+                    name = SILENT_PUSH_RECEIVED_EVENT_NAME,
+                    source = EventSource.Push
                 )
             )
         }
@@ -532,6 +556,7 @@ internal class IosPushInternalTests {
         everySuspend { mockSdkEventDistributor.registerEvent(capture(eventContainer)) } returns mock(
             MockMode.autofill
         )
+        everySuspend { mockBadgeCountHandler.handle(any()) } returns Unit
 
         iosPushInternal.activate()
 

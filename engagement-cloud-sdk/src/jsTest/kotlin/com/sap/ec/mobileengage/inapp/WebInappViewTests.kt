@@ -94,7 +94,7 @@ class WebInappViewTests {
         }
 
         document.body.contains(webViewHolder.webView) shouldBe true
-        val iframe = document.querySelector("iframe[sandbox='allow-scripts']") as HTMLIFrameElement
+        val iframe = document.querySelector("iframe") as HTMLIFrameElement
 
         val content = fetch(iframe.src).text()
 

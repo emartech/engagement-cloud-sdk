@@ -1,11 +1,13 @@
 package com.sap.ec.mobileengage.push.mapper
 
+import com.sap.ec.api.event.model.EventSource
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.mapper.Mapper
 import com.sap.ec.core.providers.UuidProviderApi
 import com.sap.ec.mobileengage.action.models.BadgeCount
 import com.sap.ec.mobileengage.action.models.BadgeCountMethod
 import com.sap.ec.mobileengage.action.models.BasicActionModel
+import com.sap.ec.mobileengage.action.models.addAppEventSource
 import com.sap.ec.mobileengage.push.ActionableData
 import com.sap.ec.mobileengage.push.NotificationOperation
 import com.sap.ec.mobileengage.push.model.AndroidPlatformData
@@ -52,7 +54,8 @@ internal class SilentHuaweiPushV2Mapper(
                 ?: throw Exception("notification object missing from push payload: $from")
 
             val actions: List<BasicActionModel>? =
-                notificationObject[ACTIONS]?.jsonArray?.let { json.decodeFromJsonElement(it) }
+                notificationObject[ACTIONS]?.jsonArray?.let { json.decodeFromJsonElement<List<BasicActionModel>>(it) }
+                    ?.addAppEventSource(EventSource.Push)
             val actionableData = ActionableData(actions)
 
             val trackingInfo = emsObject[TRACKING_INFO]?.jsonPrimitive?.contentOrNull ?: "{}"

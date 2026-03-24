@@ -1,8 +1,9 @@
 package com.sap.ec.mobileengage.push
 
 import com.sap.ec.SdkConstants.SILENT_PUSH_RECEIVED_EVENT_NAME
-import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.api.event.model.AppEvent
+import com.sap.ec.api.event.model.EventSource
+import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.mobileengage.action.PushActionFactoryApi
 import com.sap.ec.mobileengage.push.model.AndroidPlatformData
 import com.sap.ec.mobileengage.push.model.SilentAndroidPushMessage
@@ -21,7 +22,8 @@ internal class SilentPushMessageHandler(
 
         sdkEventDistributor.registerPublicEvent(
             AppEvent(
-                name = SILENT_PUSH_RECEIVED_EVENT_NAME
+                name = SILENT_PUSH_RECEIVED_EVENT_NAME,
+                source = EventSource.Push
             )
         )
     }

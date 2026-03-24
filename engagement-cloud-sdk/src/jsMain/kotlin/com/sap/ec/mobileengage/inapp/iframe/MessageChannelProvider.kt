@@ -3,9 +3,9 @@ package com.sap.ec.mobileengage.inapp.iframe
 import com.sap.ec.core.log.Logger
 import com.sap.ec.mobileengage.action.EventActionFactoryApi
 import com.sap.ec.mobileengage.action.models.BasicActionModel
-import com.sap.ec.mobileengage.action.models.BasicInAppButtonClickedActionModel
-import com.sap.ec.mobileengage.action.models.DismissActionModel
+import com.sap.ec.mobileengage.action.models.amendForJsBridge
 import com.sap.ec.mobileengage.inapp.InAppMessage
+import com.sap.ec.mobileengage.inapp.jsbridge.InAppJsBridgeData
 import com.sap.ec.mobileengage.inapp.toIframeId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
@@ -69,17 +69,14 @@ internal class MessageChannelProvider(
         return messageChannel
     }
 
-    private fun BasicActionModel.amend(message: InAppMessage): BasicActionModel {
-        if (this is DismissActionModel) {
-            this.dismissId = message.dismissId
-            this.inAppType = message.type
-        } else if (this is BasicInAppButtonClickedActionModel) {
-            this.trackingInfo = message.trackingInfo
-            this.inAppType = message.type
-        }
-
-        return this
-    }
+    private fun BasicActionModel.amend(message: InAppMessage) =
+        this.amendForJsBridge(
+            InAppJsBridgeData(
+                message.dismissId,
+                message.trackingInfo,
+                message.type
+            )
+        )
 
     private fun handleResizeEvent(messageData: String, dismissId: String): Boolean {
         return try {

@@ -67,7 +67,8 @@ internal object EmbeddedMessagingInjection {
                 platformCategoryProvider = get(),
                 inputModeProvider = get(),
                 sdkEventDistributor = get(),
-                _categories = MutableStateFlow(emptyList())
+                _categories = MutableStateFlow(emptyList()),
+                sdkContext = get()
             )
         }
         single<EmbeddedMessagingInstance>(named(InstanceType.Logging)) {

@@ -60,7 +60,7 @@ struct SdkTestView: View {
     func enableTracking() {
         Task {
             try? await engagementCloud.setup.enable(
-                config: IosEngagementCloudSDKConfig(applicationCode: "EMSE3-B4341"),
+                config: EngagementCloudConfig(applicationCode: "EMSE3-B4341"),
                 onContactLinkingFailed: { onSuccess, onError in
                     Task {
                         // login

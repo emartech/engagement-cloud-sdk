@@ -52,9 +52,41 @@ mavenPublishing {
             variant = "release",
         )
     )
+    if (project.findProperty("PROMOTE_TO_MAVEN_CENTRAL") == "true") {
+        publishToMavenCentral()
+    }
+    if (project.hasProperty("signing.keyId") || System.getenv("GPG_PRIVATE_KEY") != null) {
+        signAllPublications()
+    }
 
-    val version = System.getenv("VERSION_OVERRIDE") ?: "4.0.0"
-    coordinates("com.sap", "engagement-cloud-sdk-android-hms", version)
+    val version = System.getenv("VERSION_OVERRIDE")
+    coordinates("com.sap.engagement-cloud", "engagement-cloud-sdk-android-hms", version)
+
+    pom {
+        name = "SAP Engagement Cloud SDK Android HMS"
+        description = "Huawei Push Kit integration for SAP Engagement Cloud SDK"
+        inceptionYear = "2025"
+        url = "https://github.com/emartech/engagement-cloud-sdk/"
+        licenses {
+            license {
+                name = "Apache License 2.0"
+                url = "https://github.com/emartech/engagement-cloud-sdk/blob/main/LICENSE"
+                distribution = "https://github.com/emartech/engagement-cloud-sdk/blob/main/LICENSE"
+            }
+        }
+        developers {
+            developer {
+                id = "sap"
+                name = "SAP"
+                url = "https://sap.com"
+            }
+        }
+        scm {
+            url = "https://github.com/emartech/engagement-cloud-sdk"
+            connection = "scm:git:https://github.com/emartech/engagement-cloud-sdk.git"
+            developerConnection = "scm:git:https://github.com/emartech/engagement-cloud-sdk.git"
+        }
+    }
 }
 
 if (findProperty("ENABLE_PUBLISHING") == "true") {

@@ -1,7 +1,9 @@
 package com.sap.ec.mobileengage.action.actions
 
 import com.sap.ec.api.event.model.AppEvent
+import com.sap.ec.api.event.model.EventSource
 import com.sap.ec.core.channel.SdkEventDistributorApi
+import com.sap.ec.event.SdkEvent
 import com.sap.ec.mobileengage.action.models.BasicAppEventActionModel
 import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
@@ -63,5 +65,66 @@ class AppEventActionTests {
 
         completableDeferred.await()
         eventSlot.get().payload shouldBe testPayload
+    }
+
+    @Test
+    fun invoke_shouldSetSource_toInapp_whenSdkEventIsInApp() = runTest {
+        val testActionModel = BasicAppEventActionModel(name = TEST_NAME, payload = null, source = EventSource.InApp)
+        val inAppEvent = SdkEvent.Internal.InApp.ButtonClicked(
+            reporting = "testReporting",
+            trackingInfo = "testTrackingInfo",
+            origin = "testOrigin"
+        )
+
+        AppEventAction(testActionModel, mockSdkEventDistributor).invoke(inAppEvent)
+
+        advanceUntilIdle()
+
+        completableDeferred.await()
+        eventSlot.get().source shouldBe EventSource.InApp
+    }
+
+    @Test
+    fun invoke_shouldSetSource_toPush_whenSdkEventIsPush() = runTest {
+        val testActionModel = BasicAppEventActionModel(name = TEST_NAME, payload = null, source = EventSource.Push)
+        val pushEvent = SdkEvent.Internal.Push.Clicked(
+            reporting = "testReporting",
+            trackingInfo = "testTrackingInfo",
+            origin = "testOrigin"
+        )
+
+        AppEventAction(testActionModel, mockSdkEventDistributor).invoke(pushEvent)
+
+        advanceUntilIdle()
+
+        completableDeferred.await()
+        eventSlot.get().source shouldBe EventSource.Push
+    }
+
+    @Test
+    fun invoke_shouldSetSource_toOnEvent_whenSdkEventIsOnEventAction() = runTest {
+        val testActionModel = BasicAppEventActionModel(name = TEST_NAME, payload = null, source = EventSource.OnEvent)
+        val onEventAction = SdkEvent.Internal.OnEventAction(
+            timestamp = kotlin.time.Clock.System.now()
+        )
+
+        AppEventAction(testActionModel, mockSdkEventDistributor).invoke(onEventAction)
+
+        advanceUntilIdle()
+
+        completableDeferred.await()
+        eventSlot.get().source shouldBe EventSource.OnEvent
+    }
+
+    @Test
+    fun invoke_shouldSetSource_toNull_whenSdkEventIsNull() = runTest {
+        val testActionModel = BasicAppEventActionModel(name = TEST_NAME, payload = null)
+
+        AppEventAction(testActionModel, mockSdkEventDistributor).invoke(null)
+
+        advanceUntilIdle()
+
+        completableDeferred.await()
+        eventSlot.get().source shouldBe null
     }
 }

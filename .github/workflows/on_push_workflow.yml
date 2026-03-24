@@ -2,11 +2,13 @@ name: Engagement Cloud SDK CI
 
 on:
   pull_request:
-    types: [ opened, reopened, synchronize ]
+    types: [opened, reopened, synchronize]
   workflow_dispatch:
   push:
     branches-ignore:
       - 'dependabot/**'
+    tags-ignore:
+      - '*'
 
 env:
   USE_LOCAL_DEPENDENCY: ${{ vars.USE_LOCAL_DEPENDENCY }}
@@ -26,16 +28,43 @@ env:
   SONATYPE_SIGNING_KEY_ID: ${{ secrets.SONATYPE_SIGNING_KEY_ID }}
   SONATYPE_SIGNING_PASSWORD: ${{ secrets.SONATYPE_SIGNING_PASSWORD }}
   SONATYPE_SIGNING_SECRET_KEY_RING_FILE: ${{ secrets.SONATYPE_SIGNING_SECRET_KEY_RING_FILE }}
-  DETECT_LATEST_RELEASE_VERSION: ${{ secrets.DETECT_LATEST_RELEASE_VERSION }}
-  DETECT_PROJECT_USER_GROUPS: ${{ secrets.DETECT_PROJECT_USER_GROUPS }}
-  DETECT_PROJECT_VERSION_DISTRIBUTION: ${{ secrets.DETECT_PROJECT_VERSION_DISTRIBUTION }}
+  DETECT_LATEST_RELEASE_VERSION: ${{ vars.DETECT_LATEST_RELEASE_VERSION }}
+  DETECT_PROJECT_USER_GROUPS: ${{ vars.DETECT_PROJECT_USER_GROUPS }}
+  DETECT_PROJECT_VERSION_DISTRIBUTION: ${{ vars.DETECT_PROJECT_VERSION_DISTRIBUTION }}
   BLACKDUCK_ACCESS_TOKEN: ${{ secrets.BLACKDUCK_ACCESS_TOKEN }}
-  BLACKDUCK_URL: ${{ secrets.BLACKDUCK_URL }}
+  BLACKDUCK_URL: ${{ vars.BLACKDUCK_URL }}
   SLACK_ICON: https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Kotlin_Icon.svg/1200px-Kotlin_Icon.svg.png
   SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
   SPM_BUILD: ${{ vars.SPM_BUILD }}
 
 jobs:
+  derive-version:
+    name: Derive Snapshot Version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.snapshot-version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Derive snapshot version
+        id: snapshot-version
+        run: |
+          if git describe --tags --match '[0-9]*.[0-9]*.[0-9]*' >/dev/null 2>&1; then
+            TAG=$(git describe --tags --match '[0-9]*.[0-9]*.[0-9]*' --abbrev=0)
+            COMMITS=$(git rev-list "${TAG}..HEAD" --count)
+            if [ "$COMMITS" -eq 0 ]; then
+              VERSION="$TAG"
+            else
+              VERSION="${TAG}-${COMMITS}"
+            fi
+          else
+            VERSION="0.0.0-${{ github.run_number }}"
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Snapshot version: $VERSION"
+
   build:
     name: Build ${{ matrix.platform }} / ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -48,12 +77,10 @@ jobs:
           - platform: web
             os: ubuntu-latest
           - platform: ios
-            os: macos-latest
+            os: macos-latest-xlarge
 
     steps:
       - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -65,7 +92,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Setup node
         uses: actions/setup-node@v6
@@ -91,12 +118,10 @@ jobs:
           - platform: web
             os: ubuntu-latest
           - platform: ios
-            os: macos-latest
+            os: macos-latest-xlarge
 
     steps:
       - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -105,7 +130,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -162,11 +187,9 @@ jobs:
 
   lint:
     needs: build
-    runs-on: macos-latest
+    runs-on: macos-latest-xlarge
     steps:
       - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -177,13 +200,142 @@ jobs:
         run: chmod +x gradlew
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Run lint
         run: make lint
+
+  publish-android:
+    name: Publish KMP Snapshot
+    if: github.ref == 'refs/heads/main'
+    needs: [derive-version, test, lint]
+    runs-on: macos-latest-xlarge
+    concurrency:
+      group: publish-kmp-snapshot
+      cancel-in-progress: true
+    permissions:
+      packages: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Publish to GitHub Packages
+        run: make pipeline-android
+        env:
+          PUBLISH: true
+          VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_REPO: ${{ github.repository }}
+
+  publish-js:
+    name: Publish JS Snapshot
+    if: github.ref == 'refs/heads/main'
+    needs: [derive-version, test, lint]
+    runs-on: ubuntu-latest
+    concurrency:
+      group: publish-js-snapshot
+      cancel-in-progress: true
+    permissions:
+      contents: write
+      packages: write
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@emartech'
+
+      - name: Install npm dependencies
+        run: npm install
+
+      - name: Run JS Pipeline (Build, Test)
+        run: make pipeline-js
+        env:
+          VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
+
+      - name: Assemble NPM package
+        run: |
+          VERSION="${{ needs.derive-version.outputs.version }}"
+          mkdir -p dist/npm
+          cp engagement-cloud-sdk/build/dist/js/productionExecutable/engagement-cloud-sdk-html.js dist/npm/
+          cp build/js/packages/engagement-cloud-sdk/kotlin/engagement-cloud-sdk-html.d.ts dist/npm/ 2>/dev/null || true
+          sed "s/\"version\": \"0.0.0\"/\"version\": \"$VERSION\"/" \
+            engagement-cloud-sdk/npm-package.json > dist/npm/package.json
+
+      - name: Publish to GitHub Packages NPM
+        run: npm publish dist/npm/
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Assemble snapshot CDN artifacts
+        run: |
+          mkdir -p dist/cdn/snapshots
+
+          # Main SDK bundle + sourcemap
+          cp engagement-cloud-sdk/build/dist/js/productionExecutable/engagement-cloud-sdk-html.js \
+            dist/cdn/snapshots/engagement-cloud-sdk.js
+          cp engagement-cloud-sdk/build/dist/js/productionExecutable/engagement-cloud-sdk-html.js.map \
+            dist/cdn/snapshots/engagement-cloud-sdk.js.map 2>/dev/null || true
+
+          # TypeScript definitions
+          cp build/js/packages/engagement-cloud-sdk/kotlin/engagement-cloud-sdk-html.d.ts \
+            dist/cdn/snapshots/engagement-cloud-sdk.d.ts 2>/dev/null || true
+
+          # Loader script + sourcemap
+          cp engagement-cloud-sdk/build/dist/js/productionExecutable/engagement-cloud-sdk-loader.js \
+            dist/cdn/snapshots/engagement-cloud-sdk-loader.js
+          cp engagement-cloud-sdk/build/dist/js/productionExecutable/engagement-cloud-sdk-loader.js.map \
+            dist/cdn/snapshots/engagement-cloud-sdk-loader.js.map 2>/dev/null || true
+
+          # Service worker + sourcemap
+          cp web-push-service-worker/build/dist/js/productionExecutable/ec-service-worker.js \
+            dist/cdn/snapshots/ec-service-worker.js
+          cp web-push-service-worker/build/dist/js/productionExecutable/ec-service-worker.js.map \
+            dist/cdn/snapshots/ec-service-worker.js.map 2>/dev/null || true
+
+          echo "Snapshot CDN artifacts:"
+          ls -la dist/cdn/snapshots/
+
+      - name: Deploy snapshots to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist/cdn
+          keep_files: true
+          destination_dir: .
+
   reporting:
     if: always()
-    needs: [ build, test, lint ]
+    needs: [ derive-version, build, test, lint, publish-android, publish-js ]
     runs-on: ubuntu-latest
     steps:
       - name: Report on Slack (Error)
@@ -192,7 +344,7 @@ jobs:
         with:
           webhook_url: '${{env.SLACK_WEBHOOK}}'
           channel: 'mobile-team-ci'
-          message: 'Last push build failed! :man-gesturing-no: :blobcatfearful:'
+          message: 'Last push build failed! :man-gesturing-no: :blobcatfearful: (snapshot: ${{ needs.derive-version.outputs.version }})'
           user_name: 'Engagement Cloud SDK'
           job_status: 'failure'
           user_icon: '${{env.SLACK_ICON}}'
@@ -204,7 +356,7 @@ jobs:
         with:
           webhook_url: '${{env.SLACK_WEBHOOK}}'
           channel: 'mobile-team-ci'
-          message: 'Last push build successful! :man-gesturing-ok: :bananadance:'
+          message: 'Last push build successful! :man-gesturing-ok: :bananadance: (snapshot: ${{ needs.derive-version.outputs.version }})'
           user_name: 'Engagement Cloud SDK'
           job_status: 'success'
           user_icon: '${{env.SLACK_ICON}}'

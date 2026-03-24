@@ -2,43 +2,80 @@ name: Publish Artifacts
 
 on:
   push:
-    branches: [ main ]
+    tags:
+      - '[0-9]*.[0-9]*.[0-9]*'
   workflow_dispatch:
     inputs:
+      version:
+        description: 'Release version (x.y.z format, e.g. 1.0.0)'
+        type: string
+        required: true
       dry_run:
         description: 'Dry run — build and validate without publishing'
         type: boolean
         default: true
+      publish_kmp:
+        description: 'Run KMP pipeline (Android + Maven Central)'
+        type: boolean
+        default: true
+      publish_npm:
+        description: 'Publish to NPM (@sap/engagement-cloud-sdk)'
+        type: boolean
+        default: true
+      publish_cdn:
+        description: 'Deploy JS artifacts to CDN (GitHub Pages)'
+        type: boolean
+        default: true
+      publish_ios:
+        description: 'Run iOS pipeline (XCFramework + SPM)'
+        type: boolean
+        default: true
+      skip_tests:
+        description: 'Skip tests (use only for hotfix re-releases)'
+        type: boolean
+        default: false
+      create_tag:
+        description: 'Create git tag (disable for re-releases where tag already exists)'
+        type: boolean
+        default: true
+      create_release:
+        description: 'Create/update GitHub Release (disable for re-releases to registries only)'
+        type: boolean
+        default: true
+
+concurrency:
+  group: publish-release
+  cancel-in-progress: false
 
 env:
   DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == true }}
-  VERSION: 0.0.${{ github.run_number }}
+  SKIP_TESTS: ${{ github.event_name == 'workflow_dispatch' && inputs.skip_tests == true }}
   JAVA_VERSION: '17'
   JAVA_DISTRIBUTION: 'temurin'
   USE_LOCAL_DEPENDENCY: ${{ vars.USE_LOCAL_DEPENDENCY }}
   RELEASE_MODE: ${{ vars.RELEASE_MODE }}
+  ANDROID_RELEASE_STORE_FILE_BASE64: ${{ secrets.ANDROID_RELEASE_STORE_FILE_BASE64 }}
+  ANDROID_RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_RELEASE_STORE_PASSWORD }}
+  ANDROID_RELEASE_KEY_ALIAS: ${{ secrets.ANDROID_RELEASE_KEY_ALIAS }}
+  ANDROID_RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}
   FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
   FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
   GOOGLE_OAUTH_SERVER_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_SERVER_CLIENT_ID }}
   GOOGLE_SERVICES_API_KEY: ${{ secrets.GOOGLE_SERVICES_API_KEY }}
+  GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
   OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
   OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-  ANDROID_RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}
-  ANDROID_RELEASE_KEY_ALIAS: ${{ secrets.ANDROID_RELEASE_KEY_ALIAS }}
-  ANDROID_RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_RELEASE_STORE_PASSWORD }}
-  ANDROID_RELEASE_STORE_FILE_BASE64: ${{ secrets.ANDROID_RELEASE_STORE_FILE_BASE64 }}
   SONATYPE_STAGING_PROFILE_ID: ${{ secrets.SONATYPE_STAGING_PROFILE_ID }}
   SONATYPE_SIGNING_KEY_ID: ${{ secrets.SONATYPE_SIGNING_KEY_ID }}
   SONATYPE_SIGNING_PASSWORD: ${{ secrets.SONATYPE_SIGNING_PASSWORD }}
   SONATYPE_SIGNING_SECRET_KEY_RING_FILE: ${{ secrets.SONATYPE_SIGNING_SECRET_KEY_RING_FILE }}
-  GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
+  DETECT_LATEST_RELEASE_VERSION: ${{ vars.DETECT_LATEST_RELEASE_VERSION }}
+  DETECT_PROJECT_USER_GROUPS: ${{ vars.DETECT_PROJECT_USER_GROUPS }}
+  DETECT_PROJECT_VERSION_DISTRIBUTION: ${{ vars.DETECT_PROJECT_VERSION_DISTRIBUTION }}
+  BLACKDUCK_ACCESS_TOKEN: ${{ secrets.BLACKDUCK_ACCESS_TOKEN }}
+  BLACKDUCK_URL: ${{ vars.BLACKDUCK_URL }}
   SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
   SLACK_ICON: https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Kotlin_Icon.svg/1200px-Kotlin_Icon.svg.png
-  DETECT_LATEST_RELEASE_VERSION: ${{ secrets.DETECT_LATEST_RELEASE_VERSION }}
-  DETECT_PROJECT_USER_GROUPS: ${{ secrets.DETECT_PROJECT_USER_GROUPS }}
-  DETECT_PROJECT_VERSION_DISTRIBUTION: ${{ secrets.DETECT_PROJECT_VERSION_DISTRIBUTION }}
-  BLACKDUCK_ACCESS_TOKEN: ${{ secrets.BLACKDUCK_ACCESS_TOKEN }}
-  BLACKDUCK_URL: ${{ secrets.BLACKDUCK_URL }}
   SPM_BUILD: ${{ vars.SPM_BUILD }}
 
 permissions:
@@ -50,29 +87,89 @@ permissions:
 
 
 jobs:
-  android-pipeline:
-    name: Android Pipeline (Build, Test, Publish)
-    runs-on: macos-latest-xlarge
+  derive-version:
+    name: Derive Version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.value }}
     steps:
       - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
+
+      - name: Validate and extract version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            VERSION="${GITHUB_REF_NAME}"
+          else
+            VERSION="${{ inputs.version }}"
+          fi
+
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Invalid version format: '$VERSION'. Must be x.y.z (e.g., 1.0.0)"
+            exit 1
+          fi
+
+          echo "value=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Derived version: $VERSION"
+
+  android-pipeline:
+    name: KMP Pipeline (Build, Test, Publish, Stage to Maven Central)
+    if: ${{ !cancelled() && (github.event_name == 'push' || inputs.publish_kmp == true) }}
+    needs: [ derive-version ]
+    runs-on: macos-latest-xlarge
+    env:
+      OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+      OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+      SONATYPE_STAGING_PROFILE_ID: ${{ secrets.SONATYPE_STAGING_PROFILE_ID }}
+      SONATYPE_SIGNING_KEY_ID: ${{ secrets.SONATYPE_SIGNING_KEY_ID }}
+      SONATYPE_SIGNING_PASSWORD: ${{ secrets.SONATYPE_SIGNING_PASSWORD }}
+      SONATYPE_SIGNING_SECRET_KEY_RING_FILE: ${{ secrets.SONATYPE_SIGNING_SECRET_KEY_RING_FILE }}
+      ANDROID_RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}
+      ANDROID_RELEASE_KEY_ALIAS: ${{ secrets.ANDROID_RELEASE_KEY_ALIAS }}
+      ANDROID_RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_RELEASE_STORE_PASSWORD }}
+      ANDROID_RELEASE_STORE_FILE_BASE64: ${{ secrets.ANDROID_RELEASE_STORE_FILE_BASE64 }}
+    steps:
+      - uses: actions/checkout@v6
 
       - uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Run Android Pipeline (Build, Lint, Test, [Publish])
-        run: make pipeline-android
+      - name: Run Android Pipeline (Build, Lint, Test, [Publish to GitHub Packages])
+        run: |
+          if [ "$SKIP_TESTS" = "true" ]; then
+            echo "⚠️ Skipping tests (skip_tests=true)"
+            ./gradlew \
+              :engagement-cloud-sdk:assembleAndroidMain \
+              :engagement-cloud-sdk-android-fcm:assembleRelease \
+              :engagement-cloud-sdk-android-hms:assembleRelease \
+              :engagement-cloud-sdk-android-fcm:lintRelease \
+              :engagement-cloud-sdk-android-hms:lintRelease \
+              $(if [ "$PUBLISH_GITHUB_PACKAGES" = "true" ]; then echo \
+                ":engagement-cloud-sdk:publishKotlinMultiplatformPublicationToGitHubPackagesRepository \
+                 :engagement-cloud-sdk:publishAndroidPublicationToGitHubPackagesRepository \
+                 :engagement-cloud-sdk:publishJsPublicationToGitHubPackagesRepository \
+                 :engagement-cloud-sdk:publishIosArm64PublicationToGitHubPackagesRepository \
+                 :engagement-cloud-sdk:publishIosX64PublicationToGitHubPackagesRepository \
+                 :engagement-cloud-sdk:publishIosSimulatorArm64PublicationToGitHubPackagesRepository \
+                 :engagement-cloud-sdk-android-fcm:publishMavenPublicationToGitHubPackagesRepository \
+                 :engagement-cloud-sdk-android-hms:publishMavenPublicationToGitHubPackagesRepository"; fi) \
+              -Pjs.variant=canvas \
+              -PENABLE_PUBLISHING=$PUBLISH_GITHUB_PACKAGES \
+              --no-daemon
+          else
+            make pipeline-android
+          fi
         env:
           PUBLISH: ${{ env.DRY_RUN != 'true' }}
-          VERSION_OVERRIDE: ${{ env.VERSION }}
+          PUBLISH_GITHUB_PACKAGES: ${{ env.DRY_RUN != 'true' }}
+          VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_REPO: ${{ github.repository }}
@@ -88,21 +185,76 @@ jobs:
             engagement-cloud-sdk-android-fcm/build/outputs/aar/*-release.aar
             engagement-cloud-sdk-android-hms/build/outputs/aar/*-release.aar
 
+      - name: Decode signing key for Maven Central
+        run: ./gradlew base64EnvToFile -PpropertyName=SONATYPE_SIGNING_SECRET_KEY_RING_FILE_BASE64 -Pfile=./secring.asc.gpg
+        env:
+          SONATYPE_SIGNING_SECRET_KEY_RING_FILE_BASE64: ${{ secrets.SONATYPE_SIGNING_SECRET_KEY_RING_FILE }}
+
+      - name: Validate signing via publishToMavenLocal
+        # Signs all KMP artifacts and writes them to ~/.m2/repository.
+        # This validates that signing credentials work without uploading anything.
+        # Runs on both dry-run and real builds; the real upload is a separate step.
+        run: |
+          echo "Validating signing by publishing to Maven Local..."
+          ./gradlew publishToMavenLocal \
+            -PENABLE_PUBLISHING=true \
+            -Psigning.keyId="${{ secrets.SONATYPE_SIGNING_KEY_ID }}" \
+            -Psigning.password="${{ secrets.SONATYPE_SIGNING_PASSWORD }}" \
+            -Psigning.secretKeyRingFile=./secring.asc.gpg \
+            --no-daemon
+          echo "✓ All KMP artifacts signed and published to Maven Local"
+        env:
+          VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_REPO: ${{ github.repository }}
+
+      - name: Stage all KMP artifacts to Maven Central (no auto-promote)
+        # Uploads signed artifacts to Sonatype Central Portal staging.
+        # The deployment stays in PENDING state until manually promoted
+        # via the promote_maven_central.yml workflow or the Central Portal UI.
+        # Runs in the same job as pipeline-android so the exact build artifacts
+        # that were tested are staged — no rebuild, no artifact mismatch.
+        # Publishes: KotlinMultiplatform metadata, Android, JS, iOS (arm64, x64,
+        # simulatorArm64), FCM, HMS — the full set of KMP publications.
+        if: env.DRY_RUN != 'true'
+        run: |
+          echo "Staging all KMP artifacts to Maven Central (no auto-promote)..."
+          ./gradlew publishToMavenCentral \
+            -PPROMOTE_TO_MAVEN_CENTRAL=true \
+            -PENABLE_PUBLISHING=true \
+            -PmavenCentralUsername="${{ secrets.OSSRH_USERNAME }}" \
+            -PmavenCentralPassword="${{ secrets.OSSRH_PASSWORD }}" \
+            -Psigning.keyId="${{ secrets.SONATYPE_SIGNING_KEY_ID }}" \
+            -Psigning.password="${{ secrets.SONATYPE_SIGNING_PASSWORD }}" \
+            -Psigning.secretKeyRingFile=./secring.asc.gpg \
+            --no-daemon
+          echo "✓ All KMP artifacts staged to Maven Central — promote via promote_maven_central.yml"
+        env:
+          VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_REPO: ${{ github.repository }}
+
 
   js-pipeline:
     name: JS Pipeline (Build, Test, Publish)
+    if: ${{ !cancelled() && (github.event_name == 'push' || inputs.publish_npm == true || inputs.publish_cdn == true) }}
+    needs: [ derive-version ]
     runs-on: ubuntu-latest
+    environment: 'npmjs:@sap/engagement-cloud-sdk'
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
 
       - uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -110,13 +262,14 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '22'
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@emartech'
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm ci
 
       - name: Install npm dependencies
         run: npm install
 
       - name: Install Chrome for tests
+        if: env.SKIP_TESTS != 'true'
         run: |
           wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
           sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
@@ -124,81 +277,84 @@ jobs:
           sudo apt-get install -y google-chrome-stable
 
       - name: Run JS Pipeline (Build, Test)
-        run: make pipeline-js
+        run: |
+          if [ "$SKIP_TESTS" = "true" ]; then
+            echo "⚠️ Skipping tests (skip_tests=true)"
+            ./gradlew \
+              :web-push-service-worker:jsBrowserDistribution \
+              :engagement-cloud-sdk:jsBrowserDistribution \
+              -Pjs.variant=html \
+              -x :composeApp:jsBrowserDistribution \
+              --no-daemon
+          else
+            make pipeline-js
+          fi
         env:
-          VERSION_OVERRIDE: ${{ env.VERSION }}
+          VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
 
       - name: Assemble NPM package
         run: |
+          VERSION="${{ needs.derive-version.outputs.version }}"
           mkdir -p dist/npm
           cp engagement-cloud-sdk/build/dist/js/productionExecutable/engagement-cloud-sdk-html.js dist/npm/
           cp build/js/packages/engagement-cloud-sdk/kotlin/engagement-cloud-sdk-html.d.ts dist/npm/ 2>/dev/null || true
-          sed "s/\"version\": \"0.0.0\"/\"version\": \"${{ env.VERSION }}\"/" \
+          sed -e "s/\"version\": \"0.0.0\"/\"version\": \"$VERSION\"/" \
+              -e "s/@emartech\/engagement-cloud-sdk/@sap\/engagement-cloud-sdk/" \
+              -e "s|https://npm.pkg.github.com|https://registry.npmjs.org|" \
             engagement-cloud-sdk/npm-package.json > dist/npm/package.json
 
-      - name: Publish to GitHub Packages NPM
-        if: env.DRY_RUN != 'true'
-        run: npm publish dist/npm/
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish to NPM
+        if: ${{ env.DRY_RUN != 'true' && (github.event_name == 'push' || inputs.publish_npm == true) }}
+        run: npm publish dist/npm/ --provenance --access public
 
       - name: Assemble Pure JS Artifacts for CDN
         run: |
-          mkdir -p dist/cdn/${{ env.VERSION }}
-          
-          # Copy main SDK bundle
+          VERSION="${{ needs.derive-version.outputs.version }}"
+          mkdir -p "dist/cdn/$VERSION"
+
+          # Copy main SDK bundle + sourcemap
           cp engagement-cloud-sdk/build/dist/js/productionExecutable/engagement-cloud-sdk-html.js \
-            dist/cdn/${{ env.VERSION }}/engagement-cloud-sdk.js
-          
+            "dist/cdn/$VERSION/engagement-cloud-sdk.js"
+          cp engagement-cloud-sdk/build/dist/js/productionExecutable/engagement-cloud-sdk-html.js.map \
+            "dist/cdn/$VERSION/engagement-cloud-sdk.js.map" 2>/dev/null || true
+
           # Copy TypeScript definitions
           cp build/js/packages/engagement-cloud-sdk/kotlin/engagement-cloud-sdk-html.d.ts \
-            dist/cdn/${{ env.VERSION }}/engagement-cloud-sdk.d.ts 2>/dev/null || true
-          
-          # Copy loader script
+            "dist/cdn/$VERSION/engagement-cloud-sdk.d.ts" 2>/dev/null || true
+
+          # Copy loader script + sourcemap
           cp engagement-cloud-sdk/build/dist/js/productionExecutable/engagement-cloud-sdk-loader.js \
-            dist/cdn/${{ env.VERSION }}/engagement-cloud-sdk-loader.js
-          
-          # Copy service worker
+            "dist/cdn/$VERSION/engagement-cloud-sdk-loader.js"
+          cp engagement-cloud-sdk/build/dist/js/productionExecutable/engagement-cloud-sdk-loader.js.map \
+            "dist/cdn/$VERSION/engagement-cloud-sdk-loader.js.map" 2>/dev/null || true
+
+          # Copy service worker + sourcemap
           cp web-push-service-worker/build/dist/js/productionExecutable/ec-service-worker.js \
-            dist/cdn/${{ env.VERSION }}/ec-service-worker.js
-          
+            "dist/cdn/$VERSION/ec-service-worker.js"
+          cp web-push-service-worker/build/dist/js/productionExecutable/ec-service-worker.js.map \
+            "dist/cdn/$VERSION/ec-service-worker.js.map" 2>/dev/null || true
+
           # Create latest symlink content (copy same files to latest/)
           mkdir -p dist/cdn/latest
-          cp dist/cdn/${{ env.VERSION }}/* dist/cdn/latest/
-          
+          cp "dist/cdn/$VERSION/"* dist/cdn/latest/
+
           # Create zip for GitHub Release
-          cd dist/cdn/${{ env.VERSION }}
-          zip -r ../engagement-cloud-sdk-web-${{ env.VERSION }}.zip .
+          cd "dist/cdn/$VERSION"
+          zip -r "../engagement-cloud-sdk-web-$VERSION.zip" .
           cd -
-          
+
           echo "CDN artifacts assembled:"
-          ls -la dist/cdn/${{ env.VERSION }}/
+          ls -la "dist/cdn/$VERSION/"
           ls -la dist/cdn/
 
-      - name: Deploy to GitHub Pages
-        if: env.DRY_RUN != 'true'
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Upload CDN artifacts for Pages deployment
+        if: ${{ github.event_name == 'push' || inputs.publish_cdn == true }}
+        uses: actions/upload-artifact@v7
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist/cdn
-          keep_files: true
-          destination_dir: .
-
-      - name: Upload JS Web Bundle to GitHub Release
-        if: env.DRY_RUN != 'true'
-        run: |
-          # Create release if it doesn't exist (iOS pipeline may have created it)
-          gh release create ${{ env.VERSION }} \
-            --title "Release ${{ env.VERSION }}" \
-            --prerelease \
-            --generate-release-notes || true
-          
-          # Upload web bundle zip
-          gh release upload ${{ env.VERSION }} \
-            dist/cdn/engagement-cloud-sdk-web-${{ env.VERSION }}.zip \
-            --clobber
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: js-cdn-artifacts
+          retention-days: 1
+          if-no-files-found: error
+          path: dist/cdn/
 
       - name: Upload JS artifacts
         uses: actions/upload-artifact@v7
@@ -208,18 +364,19 @@ jobs:
           if-no-files-found: error
           path: |
             dist/npm/
-            dist/cdn/${{ env.VERSION }}/
+            dist/cdn/
 
 
   ios-pipeline:
     name: iOS Pipeline (Build, Test, Publish)
+    if: ${{ !cancelled() && (github.event_name == 'push' || inputs.publish_ios == true) }}
+    needs: [ derive-version ]
     runs-on: macos-latest-xlarge
     env:
       SPM_BUILD: release
     steps:
       - uses: actions/checkout@v6
         with:
-          fetch-depth: 0
           fetch-tags: true
 
       - uses: actions/setup-java@v4
@@ -235,73 +392,81 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-konan-
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Create GitHub Release for SPM artifact
-        if: env.DRY_RUN != 'true'
-        id: spm_release
-        uses: softprops/action-gh-release@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag_name: ${{ env.VERSION }}
-          name: SPM Release ${{ env.VERSION }}
-          prerelease: true
-          generate_release_notes: false
-
       - name: Build and Test iOS
-        run: make pipeline-ios
-        env:
-          PUBLISH: ${{ env.DRY_RUN != 'true' }}
-          VERSION_OVERRIDE: ${{ env.VERSION }}
-
-      - name: Upload XCFrameworks to GitHub Release
-        if: env.DRY_RUN != 'true'
         run: |
+          if [ "$SKIP_TESTS" = "true" ]; then
+            echo "⚠️ Skipping tests (skip_tests=true)"
+            ./gradlew \
+              :engagement-cloud-sdk:assembleEngagementCloudSDKReleaseXCFramework \
+              :ios-notification-service:assembleEngagementCloudNotificationServiceReleaseXCFramework \
+              -PNATIVE_BUILD_TYPE=RELEASE \
+              -PENABLE_PUBLISHING=true \
+              --no-daemon
+          else
+            make pipeline-ios
+          fi
+        env:
+          PUBLISH: true
+          VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
+
+      - name: Zip XCFrameworks and compute checksums
+        run: |
+          VERSION="${{ needs.derive-version.outputs.version }}"
           # Zip XCFrameworks (preserving directory structure)
           cd engagement-cloud-sdk/build/XCFrameworks/release
-          zip -r $GITHUB_WORKSPACE/EngagementCloudSDK.xcframework.zip EngagementCloudSDK.xcframework
-          cd $GITHUB_WORKSPACE
-          
+          zip -r "$GITHUB_WORKSPACE/EngagementCloudSDK.xcframework.zip" EngagementCloudSDK.xcframework
+          cd "$GITHUB_WORKSPACE"
+
           cd ios-notification-service/build/XCFrameworks/release
-          zip -r $GITHUB_WORKSPACE/EngagementCloudSDKNotificationService.xcframework.zip EngagementCloudSDKNotificationService.xcframework
-          cd $GITHUB_WORKSPACE
-          
+          zip -r "$GITHUB_WORKSPACE/EngagementCloudSDKNotificationService.xcframework.zip" EngagementCloudSDKNotificationService.xcframework
+          cd "$GITHUB_WORKSPACE"
+
           # Calculate checksums
-          echo "SDK_CHECKSUM=$(shasum -a 256 EngagementCloudSDK.xcframework.zip | cut -d ' ' -f 1)" >> $GITHUB_ENV
-          echo "NS_CHECKSUM=$(shasum -a 256 EngagementCloudSDKNotificationService.xcframework.zip | cut -d ' ' -f 1)" >> $GITHUB_ENV
-          
-          # Upload to GitHub Release
-          gh release upload ${{ env.VERSION }} \
-            EngagementCloudSDK.xcframework.zip \
-            EngagementCloudSDKNotificationService.xcframework.zip \
-            --clobber
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          echo "SDK_CHECKSUM=$(shasum -a 256 EngagementCloudSDK.xcframework.zip | cut -d ' ' -f 1)" >> "$GITHUB_ENV"
+          echo "NS_CHECKSUM=$(shasum -a 256 EngagementCloudSDKNotificationService.xcframework.zip | cut -d ' ' -f 1)" >> "$GITHUB_ENV"
 
       - name: Generate and commit Package.swift for SPM
         if: env.DRY_RUN != 'true'
         run: |
+          VERSION="${{ needs.derive-version.outputs.version }}"
           # Generate Package.swift from template
-          sed -e "s|__SDK_URL__|https://github.com/${{ github.repository }}/releases/download/${{ env.VERSION }}/EngagementCloudSDK.xcframework.zip|" \
+          sed -e "s|__SDK_URL__|https://github.com/${{ github.repository }}/releases/download/$VERSION/EngagementCloudSDK.xcframework.zip|" \
               -e "s|__SDK_CHECKSUM__|${{ env.SDK_CHECKSUM }}|" \
-              -e "s|__NS_URL__|https://github.com/${{ github.repository }}/releases/download/${{ env.VERSION }}/EngagementCloudSDKNotificationService.xcframework.zip|" \
+              -e "s|__NS_URL__|https://github.com/${{ github.repository }}/releases/download/$VERSION/EngagementCloudSDKNotificationService.xcframework.zip|" \
               -e "s|__NS_CHECKSUM__|${{ env.NS_CHECKSUM }}|" \
               iosReleaseSpm/Package.swift > Package.swift
-          
+
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          
+
           # Update main branch with latest Package.swift
           git add Package.swift
-          git commit -m "Update Package.swift for SPM release ${{ env.VERSION }}"
+          git commit -m "Update Package.swift for SPM release $VERSION"
           git push origin HEAD:main
-          
-          # Also tag this commit for SPM version resolution
-          git tag -f ${{ env.VERSION }}
-          git push origin ${{ env.VERSION }} --force
+
+      - name: Create and push release tag
+        if: github.event_name == 'workflow_dispatch' && env.DRY_RUN != 'true' && inputs.create_tag == true
+        run: |
+          VERSION="${{ needs.derive-version.outputs.version }}"
+          git tag "$VERSION"
+          git push origin "$VERSION"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload XCFramework zips
+        uses: actions/upload-artifact@v7
+        with:
+          name: ios-xcframework-zips
+          retention-days: 1
+          if-no-files-found: error
+          path: |
+            EngagementCloudSDK.xcframework.zip
+            EngagementCloudSDKNotificationService.xcframework.zip
 
       - name: Upload iOS XCFramework artifacts
         uses: actions/upload-artifact@v7
@@ -314,10 +479,228 @@ jobs:
             ios-notification-service/build/XCFrameworks/release/*.xcframework
 
 
+  create-tag-fallback:
+    name: Create Release Tag (iOS skipped)
+    # When iOS pipeline is skipped, no tag is created by ios-pipeline.
+    # This fallback job creates the tag on HEAD instead.
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run != true && inputs.create_tag == true && needs.ios-pipeline.result == 'skipped' }}
+    needs: [ derive-version, ios-pipeline ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-tags: true
+
+      - name: Check tag does not exist
+        run: |
+          VERSION="${{ needs.derive-version.outputs.version }}"
+          if git tag -l "$VERSION" | grep -q .; then
+            echo "::error::Tag $VERSION already exists. Cannot overwrite existing release tags."
+            exit 1
+          fi
+
+      - name: Create and push tag
+        run: |
+          VERSION="${{ needs.derive-version.outputs.version }}"
+          git tag "$VERSION"
+          git push origin "$VERSION"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+  create-release:
+    name: Create GitHub Release
+    # Runs after all pipeline jobs complete. Creates the release and uploads
+    # all assets (XCFramework zips, web bundle) in one step.
+    if: ${{ !cancelled() && needs.derive-version.result == 'success' }}
+    needs: [ derive-version, android-pipeline, js-pipeline, ios-pipeline, create-tag-fallback ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Extract release notes from CHANGELOG
+        id: changelog
+        run: |
+          VERSION="${{ needs.derive-version.outputs.version }}"
+          if [ ! -f CHANGELOG.md ]; then
+            echo "No CHANGELOG.md found, will use auto-generated notes"
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          NOTES=$(sed -n "/^## \[$VERSION\]/,/^## \[/{/^## \[/!p;}" CHANGELOG.md | sed '/^$/N;/^\n$/d')
+          if [ -z "$NOTES" ]; then
+            echo "No changelog entry for $VERSION, will use auto-generated notes"
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "$NOTES" > /tmp/release-notes.md
+            echo "found=true" >> "$GITHUB_OUTPUT"
+            echo "Release notes extracted for $VERSION"
+          fi
+
+      - name: Download iOS XCFramework zips
+        if: needs.ios-pipeline.result == 'success'
+        uses: actions/download-artifact@v8
+        with:
+          name: ios-xcframework-zips
+          path: release-assets/
+
+      - name: Download JS CDN artifacts (for web bundle zip)
+        if: needs.js-pipeline.result == 'success'
+        uses: actions/download-artifact@v8
+        with:
+          name: js-cdn-artifacts
+          path: release-assets/cdn/
+
+      - name: Locate web bundle zip
+        if: needs.js-pipeline.result == 'success'
+        run: |
+          VERSION="${{ needs.derive-version.outputs.version }}"
+          # The zip is at release-assets/cdn/engagement-cloud-sdk-web-<version>.zip
+          if [ -f "release-assets/cdn/engagement-cloud-sdk-web-$VERSION.zip" ]; then
+            mv "release-assets/cdn/engagement-cloud-sdk-web-$VERSION.zip" release-assets/
+          fi
+          # Clean up the cdn subdirectory
+          rm -rf release-assets/cdn
+
+      - name: Create GitHub Release and upload assets
+        if: ${{ env.DRY_RUN != 'true' && (github.event_name == 'push' || inputs.create_release == true) }}
+        run: |
+          VERSION="${{ needs.derive-version.outputs.version }}"
+          mkdir -p release-assets
+
+          # Check if release already exists
+          if gh release view "$VERSION" &>/dev/null; then
+            echo "Release $VERSION already exists — uploading assets to existing release"
+            for file in release-assets/*; do
+              [ -f "$file" ] && gh release upload "$VERSION" "$file" --clobber
+            done
+          else
+            echo "Creating new release $VERSION"
+            # Build gh release create command
+            ARGS=(gh release create "$VERSION" --title "Release $VERSION")
+            if [ "${{ steps.changelog.outputs.found }}" = "true" ]; then
+              ARGS+=(--notes-file /tmp/release-notes.md)
+            else
+              ARGS+=(--generate-notes)
+            fi
+
+            # Attach all release assets
+            for file in release-assets/*; do
+              [ -f "$file" ] && ARGS+=("$file")
+            done
+
+            "${ARGS[@]}"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+  deploy-pages:
+    name: Deploy to GitHub Pages
+    # Single deployment job: assembles CDN artifacts + Docusaurus docs into one
+    # directory tree and pushes once. This prevents the race condition that occurs
+    # when multiple jobs independently deploy to GitHub Pages (peaceiris force-pushes
+    # to gh-pages, so concurrent pushes would overwrite each other).
+    # Requires js-pipeline success (produces CDN artifacts). Skips when CDN is deselected or on dry-run.
+    if: ${{ !cancelled() && needs.js-pipeline.result == 'success' && (github.event_name == 'push' || inputs.publish_cdn == true) }}
+    needs: [ derive-version, js-pipeline, ios-pipeline, android-pipeline ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout SDK repository
+        uses: actions/checkout@v6
+
+      - name: Clone docs repository
+        uses: actions/checkout@v6
+        with:
+          repository: emartech/engagement-cloud-sdk-docs
+          token: ${{ secrets.DOCS_READ_PAT }}
+          path: docs/engagement-cloud-sdk-docs
+
+      - name: Setup Node.js for Docusaurus
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Build Docusaurus docs
+        working-directory: docs/engagement-cloud-sdk-docs
+        run: |
+          npm ci
+          sed -i'' -e "s|baseUrl: '/'|baseUrl: '/engagement-cloud-sdk/docs/'|" docusaurus.config.ts
+          echo "Updated baseUrl to /engagement-cloud-sdk/docs/"
+          npx docusaurus build --out-dir ../../dist/docs
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist/docs
+          keep_files: true
+          destination_dir: docs
+
+      - name: Setup Node.js for Docusaurus
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Build Docusaurus docs
+        # The docs repo uses @docusaurus/core ^3.9.2 (>= 3.1.0 required for
+        # --out-dir). The baseUrl is overridden via sed because docusaurus.config.ts
+        # hardcodes baseUrl: '/' and does not support env var overrides.
+        working-directory: docs/engagement-cloud-sdk-docs
+        run: |
+          npm ci
+          sed -i'' -e "s|baseUrl: '/'|baseUrl: '/engagement-cloud-sdk/docs/'|" docusaurus.config.ts
+          echo "Updated baseUrl to /engagement-cloud-sdk/docs/"
+          npx docusaurus build --out-dir ../../dist/docs
+
+      - name: Download JS CDN artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: js-cdn-artifacts
+          path: dist/cdn
+
+      - name: Assemble deployment directory
+        run: |
+          mkdir -p deploy
+
+          # Guard: fail if CDN artifacts are empty (prevents silent empty deployment
+          # that would break all existing CDN URLs)
+          if [ -z "$(ls -A dist/cdn/ 2>/dev/null)" ]; then
+            echo "::error::CDN artifacts directory is empty -- js-pipeline may have failed to upload artifacts"
+            exit 1
+          fi
+
+          # Guard: fail if docs build output is empty
+          if [ -z "$(ls -A dist/docs/ 2>/dev/null)" ]; then
+            echo "::error::Docusaurus build output is empty -- docs build may have failed"
+            exit 1
+          fi
+
+          # CDN artifacts go at root level (preserving version directories)
+          cp -r dist/cdn/* deploy/
+          # Docs go under /docs/
+          mkdir -p deploy/docs
+          cp -r dist/docs/* deploy/docs/
+          echo "Deployment directory contents:"
+          find deploy -maxdepth 1 -printf '%f\n'
+          echo "Docs directory:"
+          find deploy/docs -maxdepth 1 -printf '%f\n' | head -10
+
+      - name: Deploy to GitHub Pages
+        if: env.DRY_RUN != 'true'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy
+          keep_files: true
+          destination_dir: .
+
+
   report-slack:
     name: Report / Slack
     if: always()
-    needs: [ android-pipeline, js-pipeline, ios-pipeline ]
+    needs: [ derive-version, android-pipeline, js-pipeline, ios-pipeline, create-release, deploy-pages ]
     runs-on: ubuntu-latest
     steps:
       - name: Compute Slack prefix
@@ -329,13 +712,47 @@ jobs:
             echo "value=" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Compute pipeline summary
+        id: pipelines
+        run: |
+          SUMMARY=""
+          if [ "${{ needs.android-pipeline.result }}" = "success" ]; then
+            SUMMARY="${SUMMARY} KMP:✅"
+          elif [ "${{ needs.android-pipeline.result }}" = "skipped" ]; then
+            SUMMARY="${SUMMARY} KMP:⏭️"
+          else
+            SUMMARY="${SUMMARY} KMP:❌"
+          fi
+          if [ "${{ needs.js-pipeline.result }}" = "success" ]; then
+            SUMMARY="${SUMMARY} NPM:✅"
+          elif [ "${{ needs.js-pipeline.result }}" = "skipped" ]; then
+            SUMMARY="${SUMMARY} NPM:⏭️"
+          else
+            SUMMARY="${SUMMARY} NPM:❌"
+          fi
+          if [ "${{ needs.deploy-pages.result }}" = "success" ]; then
+            SUMMARY="${SUMMARY} CDN:✅"
+          elif [ "${{ needs.deploy-pages.result }}" = "skipped" ]; then
+            SUMMARY="${SUMMARY} CDN:⏭️"
+          else
+            SUMMARY="${SUMMARY} CDN:❌"
+          fi
+          if [ "${{ needs.ios-pipeline.result }}" = "success" ]; then
+            SUMMARY="${SUMMARY} iOS:✅"
+          elif [ "${{ needs.ios-pipeline.result }}" = "skipped" ]; then
+            SUMMARY="${SUMMARY} iOS:⏭️"
+          else
+            SUMMARY="${SUMMARY} iOS:❌"
+          fi
+          echo "value=$SUMMARY" >> "$GITHUB_OUTPUT"
+
       - name: Notify Slack (failure)
         if: ${{ !cancelled() && (contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')) }}
         uses: 8398a7/action-slack@v3
         with:
           status: failure
           channel: mobile-team-ci
-          text: '${{ steps.prefix.outputs.value }}Publish pipeline failed! :man-gesturing-no: :blobcatfearful:'
+          text: '${{ steps.prefix.outputs.value }}Publish pipeline failed! :man-gesturing-no: :blobcatfearful: |${{ steps.pipelines.outputs.value }}'
           fields: repo,workflow,job,took
           github_token: ${{ secrets.GITHUB_TOKEN }}
         env:
@@ -347,7 +764,7 @@ jobs:
         with:
           status: success
           channel: mobile-team-ci
-          text: '${{ steps.prefix.outputs.value }}Publish pipeline succeeded! v${{ env.VERSION }} :man-gesturing-ok: :bananadance:'
+          text: '${{ steps.prefix.outputs.value }}Publish pipeline succeeded! v${{ needs.derive-version.outputs.version }} :man-gesturing-ok: :bananadance: |${{ steps.pipelines.outputs.value }}'
           fields: repo,workflow,job,took
           github_token: ${{ secrets.GITHUB_TOKEN }}
         env:

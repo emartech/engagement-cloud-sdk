@@ -1,10 +1,14 @@
 package com.sap.ec.mobileengage.push.mapper
 
+import com.sap.ec.api.event.model.EventSource
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.mapper.Mapper
 import com.sap.ec.core.providers.UuidProviderApi
 import com.sap.ec.mobileengage.action.models.BasicActionModel
+import com.sap.ec.mobileengage.action.models.BasicAppEventActionModel
 import com.sap.ec.mobileengage.action.models.PresentableActionModel
+import com.sap.ec.mobileengage.action.models.addAppEventSource
+import com.sap.ec.mobileengage.action.models.addSource
 import com.sap.ec.mobileengage.push.ActionableData
 import com.sap.ec.mobileengage.push.DisplayableData
 import com.sap.ec.mobileengage.push.NotificationOperation
@@ -45,9 +49,14 @@ internal class AndroidPushV2Mapper(
         return try {
             val trackingInfo: String = from[TRACKING_INFO]?.jsonPrimitive?.content ?: "{}"
             val defaultTapAction: BasicActionModel? =
-                from[DEFAULT_ACTION]?.jsonPrimitive?.contentOrNull.fromString(json)
+                from[DEFAULT_ACTION]?.jsonPrimitive?.contentOrNull.fromString<BasicActionModel>(json)
+
+            addSource(defaultTapAction)
+
             val actions: List<PresentableActionModel>? =
-                from[ACTIONS]?.jsonPrimitive?.contentOrNull.fromString(json)
+                from[ACTIONS]?.jsonPrimitive?.contentOrNull.fromString<List<PresentableActionModel>>(
+                    json
+                )?.addAppEventSource(EventSource.Push)
 
             val actionableData =
                 ActionableData(actions = actions, defaultTapAction = defaultTapAction)
@@ -61,15 +70,11 @@ internal class AndroidPushV2Mapper(
                         collapseId = from[COLLAPSE_ID]?.jsonPrimitive?.contentOrNull
                             ?: uuidProvider.provide(),
                         operation = from[OPERATION]?.jsonPrimitive?.contentOrNull?.let {
-                            NotificationOperation.valueOf(
-                                it.uppercase()
-                            )
+                            NotificationOperation.valueOf(it.uppercase())
                         } ?: NotificationOperation.INIT
                     ),
                     style = from[STYLE]?.jsonPrimitive?.contentOrNull?.let {
-                        NotificationStyle.valueOf(
-                            it
-                        )
+                        NotificationStyle.valueOf(it)
                     }
                 ),
                 badgeCount = from[BADGE_COUNT]?.jsonPrimitive?.contentOrNull.fromString(json),
@@ -86,6 +91,13 @@ internal class AndroidPushV2Mapper(
             logger.error("push mapping failed", e)
             null
         }
+    }
+}
+
+private fun addSource(action: BasicActionModel?): BasicActionModel? {
+    return when (action) {
+        is BasicAppEventActionModel -> action.addSource(EventSource.Push)
+        else -> action
     }
 }
 

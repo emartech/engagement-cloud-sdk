@@ -2,6 +2,7 @@ package com.sap.ec.mobileengage.embeddedmessaging.ui.list
 
 import androidx.paging.cachedIn
 import androidx.paging.map
+import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.providers.InstantProvider
 import com.sap.ec.core.providers.inputmode.InputModeProviderApi
@@ -40,7 +41,8 @@ internal class ListPageViewModel(
     platformCategoryProvider: PlatformCategoryProviderApi,
     inputModeProvider: InputModeProviderApi,
     sdkEventDistributor: SdkEventDistributorApi,
-    private val _categories: MutableStateFlow<List<Category>>
+    private val _categories: MutableStateFlow<List<Category>>,
+    sdkContext: SdkContextApi
 ) : ListPageViewModelApi {
     override val categories: StateFlow<List<Category>> = _categories.asStateFlow()
 
@@ -78,6 +80,7 @@ internal class ListPageViewModel(
                 .filter { it is SdkEvent.Internal.EmbeddedMessaging.TriggerRefresh }
                 .collect {
                     _categories.value = emptyList()
+                    _selectedMessage.value = null
                     refreshTrigger.value = !refreshTrigger.value
                 }
         }
@@ -88,12 +91,12 @@ internal class ListPageViewModel(
         combine(
             _filterUnopenedOnly,
             _selectedCategoryIds,
+            sdkContext.currentSdkState,
             refreshTrigger
-        ) { filterUnopenedOnly, selectedCategoryIds, _ ->
+        ) { filterUnopenedOnly, selectedCategoryIds, _, _ ->
             Pair(filterUnopenedOnly, selectedCategoryIds)
         }
-            .flatMapLatest { pair ->
-                val (filterUnopenedOnly, selectedCategoryIds) = pair
+            .flatMapLatest { (filterUnopenedOnly, selectedCategoryIds) ->
                 pagerFactory.create(
                     filterUnopenedOnly = filterUnopenedOnly,
                     selectedCategoryIds = selectedCategoryIds.toList(),

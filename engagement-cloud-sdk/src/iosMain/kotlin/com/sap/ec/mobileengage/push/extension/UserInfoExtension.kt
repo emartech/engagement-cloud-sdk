@@ -1,7 +1,11 @@
 package com.sap.ec.mobileengage.push.extension
 
+import com.sap.ec.api.event.model.EventSource
 import com.sap.ec.api.push.PushUserInfo
 import com.sap.ec.api.push.SilentPushUserInfo
+import com.sap.ec.mobileengage.action.models.BasicAppEventActionModel
+import com.sap.ec.mobileengage.action.models.addAppEventSource
+import com.sap.ec.mobileengage.action.models.addSource
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.serialization.json.Json
@@ -17,7 +21,18 @@ internal fun Map<String, Any>.toPushUserInfo(json: Json): PushUserInfo? {
     return NSJSONSerialization.dataWithJSONObject(this, NSJSONWritingPrettyPrinted, null)
         ?.let { data ->
             NSString.create(data, NSUTF8StringEncoding)?.let { jsonString ->
-                json.decodeFromString(jsonString.toString())
+                val userInfo = json.decodeFromString<PushUserInfo>(jsonString.toString())
+                userInfo.copy(
+                    notification = userInfo.notification.copy(
+                        actions = userInfo.notification.actions?.addAppEventSource(EventSource.Push),
+                        defaultAction = userInfo.notification.defaultAction?.let { action ->
+                            when (action) {
+                                is BasicAppEventActionModel -> action.addSource(EventSource.Push)
+                                else -> action
+                            }
+                        }
+                    )
+                )
             }
         }
 }
@@ -27,7 +42,18 @@ internal fun Map<String, Any>.toSilentPushUserInfo(json: Json): SilentPushUserIn
     return NSJSONSerialization.dataWithJSONObject(this, NSJSONWritingPrettyPrinted, null)
         ?.let { data ->
             NSString.create(data, NSUTF8StringEncoding)?.let { jsonString ->
-                json.decodeFromString(jsonString.toString())
+                val userInfo = json.decodeFromString<SilentPushUserInfo>(jsonString.toString())
+                userInfo.copy(
+                    notification = userInfo.notification.copy(
+                        actions = userInfo.notification.actions?.addAppEventSource(EventSource.Push),
+                        defaultAction = userInfo.notification.defaultAction?.let { action ->
+                            when (action) {
+                                is BasicAppEventActionModel -> action.addSource(EventSource.Push)
+                                else -> action
+                            }
+                        }
+                    )
+                )
             }
         }
 }

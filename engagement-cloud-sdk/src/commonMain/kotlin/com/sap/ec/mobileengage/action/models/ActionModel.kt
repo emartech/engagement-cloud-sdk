@@ -2,6 +2,7 @@ package com.sap.ec.mobileengage.action.models
 
 import com.sap.ec.InternalSdkApi
 import com.sap.ec.mobileengage.inapp.jsbridge.InAppJsBridgeData
+import com.sap.ec.mobileengage.inapp.jsbridge.toEventSource
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
@@ -32,15 +33,20 @@ sealed class PresentableActionModel : ActionModel {
 }
 
 internal fun BasicActionModel.amendForJsBridge(data: InAppJsBridgeData): BasicActionModel {
-    if (this is DismissActionModel) {
-        this.dismissId = data.dismissId
-        this.inAppType = data.inAppType
-
-    } else if (this is BasicInAppButtonClickedActionModel) {
-        this.trackingInfo = data.trackingInfo
-        this.inAppType = data.inAppType
-
+    return when (this) {
+        is DismissActionModel -> {
+            this.dismissId = data.dismissId
+            this.inAppType = data.inAppType
+            this
+        }
+        is BasicInAppButtonClickedActionModel -> {
+            this.trackingInfo = data.trackingInfo
+            this.inAppType = data.inAppType
+            this
+        }
+        is BasicAppEventActionModel -> {
+            this.addSource(data.toEventSource())
+        }
+        else -> this
     }
-
-    return this
 }

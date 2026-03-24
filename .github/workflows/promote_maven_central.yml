@@ -1,0 +1,161 @@
+name: Promote to Maven Central
+
+# Promotes a staged deployment from Sonatype Central Portal to Maven Central.
+#
+# Prerequisites:
+#   - A publish_artifacts.yml run must have completed successfully, which stages
+#     artifacts to the Central Portal in PENDING state
+#   - The deployment must not have been dropped
+#
+# After promotion, artifacts become IMMUTABLE on Maven Central — they cannot be
+# deleted or replaced. Only promote after verifying the staged artifacts.
+#
+# You can verify staged artifacts at:
+#   https://central.sonatype.com/publishing/deployments
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to promote (x.y.z format, e.g. 1.0.0)'
+        type: string
+        required: true
+      deployment_id:
+        description: 'Deployment ID from Central Portal (optional — auto-detected from version if omitted)'
+        type: string
+        required: false
+      dry_run:
+        description: 'Dry run — check deployment status without promoting'
+        type: boolean
+        default: true
+
+concurrency:
+  group: promote-maven-central
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  promote:
+    name: Promote Deployment to Maven Central
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate version format
+        run: |
+          VERSION="${{ inputs.version }}"
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Invalid version format: '$VERSION'. Must be x.y.z (e.g., 1.0.0)"
+            exit 1
+          fi
+          echo "Promoting version: $VERSION"
+
+      - name: Build Central Portal auth token
+        id: auth
+        run: |
+          TOKEN=$(echo -n "${{ secrets.OSSRH_USERNAME }}:${{ secrets.OSSRH_PASSWORD }}" | base64)
+          echo "token=$TOKEN" >> "$GITHUB_OUTPUT"
+
+      - name: Find deployment
+        id: find
+        run: |
+          VERSION="${{ inputs.version }}"
+          DEPLOYMENT_ID="${{ inputs.deployment_id }}"
+          TOKEN="${{ steps.auth.outputs.token }}"
+
+          if [ -n "$DEPLOYMENT_ID" ]; then
+            echo "Using provided deployment ID: $DEPLOYMENT_ID"
+            echo "id=$DEPLOYMENT_ID" >> "$GITHUB_OUTPUT"
+          else
+            echo "Searching for deployment matching version $VERSION..."
+            # List deployments and find the one matching our version
+            # The deployment name follows the pattern: group-version or group-artifactId-version
+            RESPONSE=$(curl -sf \
+              -H "Authorization: Bearer $TOKEN" \
+              -H "Accept: application/json" \
+              "https://central.sonatype.com/api/v1/publisher/published?namespace=com.sap.engagement-cloud&name=engagement-cloud-sdk&version=$VERSION" 2>/dev/null || true)
+
+            # Fall back to listing all deployments if the direct lookup fails
+            if [ -z "$RESPONSE" ]; then
+              echo "Direct lookup failed, listing all pending deployments..."
+              RESPONSE=$(curl -sf \
+                -H "Authorization: Bearer $TOKEN" \
+                -H "Accept: application/json" \
+                "https://central.sonatype.com/api/v1/publisher/deployments" 2>/dev/null || echo "[]")
+
+              DEPLOYMENT_ID=$(echo "$RESPONSE" | jq -r ".[] | select(.deploymentName | contains(\"$VERSION\")) | .deploymentId" | head -1)
+            fi
+
+            if [ -z "$DEPLOYMENT_ID" ]; then
+              echo "::error::No pending deployment found for version $VERSION"
+              echo "Check https://central.sonatype.com/publishing/deployments for available deployments"
+              exit 1
+            fi
+
+            echo "Found deployment: $DEPLOYMENT_ID"
+            echo "id=$DEPLOYMENT_ID" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check deployment status
+        id: status
+        run: |
+          TOKEN="${{ steps.auth.outputs.token }}"
+          DEPLOYMENT_ID="${{ steps.find.outputs.id }}"
+
+          STATUS=$(curl -sf \
+            -H "Authorization: Bearer $TOKEN" \
+            -H "Accept: application/json" \
+            "https://central.sonatype.com/api/v1/publisher/status?id=$DEPLOYMENT_ID" 2>/dev/null || echo "{}")
+
+          STATE=$(echo "$STATUS" | jq -r '.deploymentState // "UNKNOWN"')
+          echo "Deployment state: $STATE"
+          echo "state=$STATE" >> "$GITHUB_OUTPUT"
+
+          if [ "$STATE" = "PUBLISHED" ]; then
+            echo "::warning::Deployment $DEPLOYMENT_ID is already PUBLISHED on Maven Central"
+            exit 0
+          elif [ "$STATE" = "FAILED" ] || [ "$STATE" = "UNKNOWN" ]; then
+            echo "::error::Deployment $DEPLOYMENT_ID is in $STATE state — cannot promote"
+            echo "Full status:"
+            echo "$STATUS" | jq .
+            exit 1
+          fi
+
+          echo "Deployment is in $STATE state — ready for promotion"
+
+      - name: Promote deployment
+        if: inputs.dry_run != true && steps.status.outputs.state != 'PUBLISHED'
+        run: |
+          TOKEN="${{ steps.auth.outputs.token }}"
+          DEPLOYMENT_ID="${{ steps.find.outputs.id }}"
+          VERSION="${{ inputs.version }}"
+
+          echo "Promoting deployment $DEPLOYMENT_ID to Maven Central..."
+          HTTP_CODE=$(curl -s -o /tmp/promote-response.txt -w "%{http_code}" \
+            -X POST \
+            -H "Authorization: Bearer $TOKEN" \
+            "https://central.sonatype.com/api/v1/publisher/deployment/$DEPLOYMENT_ID")
+
+          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+            echo "✓ Promotion initiated for $DEPLOYMENT_ID"
+            echo ""
+            echo "Artifacts will be available on Maven Central within ~30 minutes:"
+            echo "  - com.sap.engagement-cloud:engagement-cloud-sdk:$VERSION"
+            echo "  - com.sap.engagement-cloud:engagement-cloud-sdk-android-fcm:$VERSION"
+            echo "  - com.sap.engagement-cloud:engagement-cloud-sdk-android-hms:$VERSION"
+            echo ""
+            echo "⚠  Once published, these artifacts are IMMUTABLE and cannot be deleted."
+          else
+            echo "::error::Promotion failed with HTTP $HTTP_CODE"
+            cat /tmp/promote-response.txt
+            exit 1
+          fi
+
+      - name: Dry run notice
+        if: inputs.dry_run == true
+        run: |
+          DEPLOYMENT_ID="${{ steps.find.outputs.id }}"
+          STATE="${{ steps.status.outputs.state }}"
+          echo ""
+          echo "[DRY RUN] Would promote deployment $DEPLOYMENT_ID (current state: $STATE)"
+          echo "Re-run with dry_run=false to execute promotion."

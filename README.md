@@ -4,17 +4,17 @@
 
 > __`Important!`__
 >
-> This product is currently available in a pilot release for a select group of clients. If you wish to participate in the Pilot phase, please reach out to your Client Success Manager.
+> The SAP Engagement Cloud SDK is currently available in a pilot release for a select group of clients. If you wish to participate, please reach out to your client success manager.
 >
 > Implementation should only begin after receiving confirmation of your pilot status from SAP.
 
 ## About this project
 
-The **SAP Engagement Cloud SDK** is a Kotlin Multiplatform SDK designed to integrate with SAP Engagement Cloud. It provides a unified interface for managing events, push notifications, in-app messages, and other functionalities across Android, iOS, and Web platforms.
+The **SAP Engagement Cloud SDK** is the next-generation SDK for **SAP Engagement Cloud**, providing a unified API for managing events, push notifications, in-app messaging, and more across Android, iOS, and Web. Built around integration consistency and ease of use, it enables straightforward onboarding and fast time-to-value across all platforms.
 
 ## Requirements and Setup
 
-You can access our official documentation here: [SAP Engagement Cloud SDK - Wiki](https://super-carnival-yw59vq9.pages.github.io/)
+You can access our official documentation here: [SAP Engagement Cloud SDK - Wiki](https://emartech.github.io/engagement-cloud-sdk/docs/index.html)
 
 ## Additional Resources
 

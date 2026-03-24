@@ -97,7 +97,7 @@ internal class InAppJsBridge(
                         json.decodeFromJsonElement(
                             BasicAppEventActionModel.serializer(),
                             bodyElement
-                        )
+                        ).amendForJsBridge(inAppJsBridgeData)
                     actionFactory.create(actionModel)()
                 }
 

@@ -8,6 +8,8 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.test.runTest
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.test.Test
 
 class CryptoTests {
@@ -64,5 +66,48 @@ class CryptoTests {
         shouldThrow<DecryptionFailedException> {
             crypto.decrypt(encrypted, TEST_SECRET + 2)
         }
+    }
+
+    @OptIn(ExperimentalEncodingApi::class)
+    @Test
+    fun testBase64Encoding_should_matchKtorFormat() {
+        val knownBytes = "Hello, World!".encodeToByteArray()
+        val expected = "SGVsbG8sIFdvcmxkIQ=="
+
+        val encoded = Base64.encode(knownBytes)
+        encoded shouldBe expected
+
+        val decoded = Base64.decode(encoded)
+        decoded.decodeToString() shouldBe "Hello, World!"
+    }
+
+    @OptIn(ExperimentalEncodingApi::class)
+    @Test
+    fun testBase64Decode_should_handleInputWithEmbeddedNewlines() {
+        val withNewlines = "SGVsbG8s\nIFdvcmxkIQ=="
+        val withoutNewlines = "SGVsbG8sIFdvcmxkIQ=="
+
+        // Stdlib Base64.Default rejects newlines -- verify this strictness
+        shouldThrow<IllegalArgumentException> {
+            Base64.decode(withNewlines)
+        }
+
+        // The clean version decodes correctly
+        val decoded = Base64.decode(withoutNewlines)
+        decoded.decodeToString() shouldBe "Hello, World!"
+    }
+
+    @OptIn(ExperimentalEncodingApi::class)
+    @Test
+    fun testBase64Decode_should_handleInputWithoutTrailingPadding() {
+        val withPadding = "SGVsbG8sIFdvcmxkIQ=="
+        val withoutPadding = "SGVsbG8sIFdvcmxkIQ"
+
+        shouldThrow<IllegalArgumentException> {
+            Base64.decode(withoutPadding)
+        }
+
+        val decoded = Base64.decode(withPadding)
+        decoded.decodeToString() shouldBe "Hello, World!"
     }
 }

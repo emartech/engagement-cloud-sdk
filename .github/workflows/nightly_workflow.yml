@@ -5,17 +5,21 @@ on:
   schedule:
     - cron: '0 2 * * *'
 
+permissions:
+  contents: read
+  actions: read
+
 env:
   USE_LOCAL_DEPENDENCY: ${{ vars.USE_LOCAL_DEPENDENCY }}
   GOOGLE_SERVICES_API_KEY: ${{ secrets.GOOGLE_SERVICES_API_KEY }}
   RELEASE_MODE: ${{ vars.RELEASE_MODE }}
-  ANDROID_RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}
-  ANDROID_RELEASE_KEY_ALIAS: ${{ secrets.ANDROID_RELEASE_KEY_ALIAS }}
-  ANDROID_RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_RELEASE_STORE_PASSWORD }}
-  ANDROID_RELEASE_STORE_FILE_BASE64: ${{ secrets.ANDROID_RELEASE_STORE_FILE_BASE64 }}
   FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
   FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
   GOOGLE_OAUTH_SERVER_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_SERVER_CLIENT_ID }}
+  ANDROID_RELEASE_STORE_FILE_BASE64: ${{ secrets.ANDROID_RELEASE_STORE_FILE_BASE64 }}
+  ANDROID_RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_RELEASE_STORE_PASSWORD }}
+  ANDROID_RELEASE_KEY_ALIAS: ${{ secrets.ANDROID_RELEASE_KEY_ALIAS }}
+  ANDROID_RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}
   GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
   OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
   OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
@@ -23,11 +27,11 @@ env:
   SONATYPE_SIGNING_KEY_ID: ${{ secrets.SONATYPE_SIGNING_KEY_ID }}
   SONATYPE_SIGNING_PASSWORD: ${{ secrets.SONATYPE_SIGNING_PASSWORD }}
   SONATYPE_SIGNING_SECRET_KEY_RING_FILE: ${{ secrets.SONATYPE_SIGNING_SECRET_KEY_RING_FILE }}
-  DETECT_LATEST_RELEASE_VERSION: ${{ secrets.DETECT_LATEST_RELEASE_VERSION }}
-  DETECT_PROJECT_USER_GROUPS: ${{ secrets.DETECT_PROJECT_USER_GROUPS }}
-  DETECT_PROJECT_VERSION_DISTRIBUTION: ${{ secrets.DETECT_PROJECT_VERSION_DISTRIBUTION }}
+  DETECT_LATEST_RELEASE_VERSION: ${{ vars.DETECT_LATEST_RELEASE_VERSION }}
+  DETECT_PROJECT_USER_GROUPS: ${{ vars.DETECT_PROJECT_USER_GROUPS }}
+  DETECT_PROJECT_VERSION_DISTRIBUTION: ${{ vars.DETECT_PROJECT_VERSION_DISTRIBUTION }}
   BLACKDUCK_ACCESS_TOKEN: ${{ secrets.BLACKDUCK_ACCESS_TOKEN }}
-  BLACKDUCK_URL: ${{ secrets.BLACKDUCK_URL }}
+  BLACKDUCK_URL: ${{ vars.BLACKDUCK_URL }}
   SLACK_CHANNEL: mobile-team-ci
   SLACK_ICON: https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Kotlin_Icon.svg/1200px-Kotlin_Icon.svg.png
   SLACK_TITLE: Commit status
@@ -37,18 +41,21 @@ env:
 
 jobs:
   build:
-    runs-on: macos-latest
+    name: Build ${{ matrix.platform }} / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         include:
           - platform: android
+            os: macos-latest-xlarge
           - platform: web
+            os: ubuntu-latest
           - platform: ios
+            os: macos-latest-xlarge
 
     steps:
       - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -60,7 +67,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Setup node
         uses: actions/setup-node@v6
@@ -75,11 +82,10 @@ jobs:
 
   lint:
     needs: build
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -90,25 +96,28 @@ jobs:
         run: chmod +x gradlew
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Run lint
         run: make lint
 
   test:
+    name: Test ${{ matrix.platform }} / ${{ matrix.os }}
     needs: build
-    runs-on: macos-latest
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         include:
           - platform: android
+            os: macos-latest-xlarge
           - platform: web
+            os: ubuntu-latest
           - platform: ios
+            os: macos-latest-xlarge
 
     steps:
       - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -117,7 +126,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -126,7 +135,7 @@ jobs:
         if: matrix.platform == 'android'
         uses: davidSchuppa/base64Secret-toFile-action@v3
         with:
-          destination-path: composeApp/src/
+          destination-path: androidApp/
           filename: google-services.json
           secret: ${{ env.GOOGLE_SERVICES_JSON_BASE64 }}
 
@@ -146,7 +155,7 @@ jobs:
         if: matrix.platform == 'android'
         run: make create-apks
 
-      - name: Run tests
+      - name: Run Android tests on Firebase Test Lab
         if: matrix.platform == 'android'
         run: make test-android-firebase
 
@@ -162,15 +171,57 @@ jobs:
 
       - name: Setup Chrome
         if: matrix.platform == 'web'
-        run: brew install --cask google-chrome && open -a Google\ Chrome
+        run: |
+          if [ "${{ runner.os }}" == "Linux" ]; then
+            wget -q -O - https://dl.google.com/linux/linux_signing_key.pub \
+              | sudo gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg
+            echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" \
+              | sudo tee /etc/apt/sources.list.d/google-chrome.list
+            sudo apt-get update
+            sudo apt-get install -y google-chrome-stable
+          fi
 
       - name: Test Web
         if: matrix.platform == 'web'
         run: make test-web
 
+  # E2E dispatch: non-blocking fire-and-report pattern.
+  # Dispatches a repository_dispatch event to engagement-cloud-sdk-test-app.
+  # The test-app may not have a receiving workflow yet -- dispatch returns 204
+  # regardless, which is correct. When the test-app adds a workflow for
+  # event_type "nightly-e2e", it will trigger automatically.
+  # Requires E2E_DISPATCH_TOKEN secret (fine-grained PAT scoped to test-app
+  # with actions:write and contents:read permissions).
+  trigger-e2e:
+    name: Trigger E2E Tests
+    if: ${{ !cancelled() && !contains(needs.*.result, 'failure') }}
+    needs: [build, test, lint]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch E2E to test-app
+        id: dispatch
+        run: |
+          HTTP_CODE=$(curl -s -o /tmp/dispatch-response.txt -w "%{http_code}" \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.E2E_DISPATCH_TOKEN }}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/emartech/engagement-cloud-sdk-test-app/dispatches \
+            -d '{"event_type":"nightly-e2e","client_payload":{"run_id":"${{ github.run_id }}"}}')
+
+          echo "status=$HTTP_CODE" >> "$GITHUB_OUTPUT"
+
+          if [ "$HTTP_CODE" = "204" ]; then
+            echo "E2E dispatch sent successfully to engagement-cloud-sdk-test-app"
+          elif [ "$HTTP_CODE" = "404" ]; then
+            echo "::warning::E2E dispatch returned 404 -- target repo may not have a matching workflow yet"
+          else
+            echo "::warning::E2E dispatch returned unexpected status $HTTP_CODE"
+          fi
+
   reporting:
     if: always()
-    needs: [ build, test, lint ]
+    needs: [build, test, lint, trigger-e2e]
     runs-on: ubuntu-latest
     steps:
       - name: Report on Slack (Error)
@@ -179,7 +230,7 @@ jobs:
         with:
           webhook_url: '${{env.SLACK_WEBHOOK}}'
           channel: '${{env.SLACK_CHANNEL}}'
-          message: 'Nightly build failed! :man-gesturing-no: :blobcatfearful:'
+          message: 'Nightly build failed! :man-gesturing-no: :blobcatfearful: (E2E dispatch skipped due to failures)'
           user_name: '${{env.SLACK_USERNAME}}'
           job_status: 'failure'
           user_icon: '${{env.SLACK_ICON}}'
@@ -191,7 +242,7 @@ jobs:
         with:
           webhook_url: '${{env.SLACK_WEBHOOK}}'
           channel: '${{env.SLACK_CHANNEL}}'
-          message: 'Nightly build successful! :man-gesturing-ok: :bananadance:'
+          message: 'Nightly build successful! :man-gesturing-ok: :bananadance: E2E dispatch: ${{ needs.trigger-e2e.result }}'
           user_name: '${{env.SLACK_USERNAME}}'
           job_status: 'success'
           user_icon: '${{env.SLACK_ICON}}'

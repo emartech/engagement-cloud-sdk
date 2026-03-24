@@ -33,19 +33,19 @@ if (isMac) {
     apply(plugin = "co.touchlab.kmmbridge")
 }
 
-group = "com.sap"
-version = System.getenv("VERSION_OVERRIDE") ?: "4.0.0"
+group = "com.sap.engagement-cloud"
+version = System.getenv("VERSION_OVERRIDE")
 
 kotlin {
     compilerOptions {
         apiVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_3)
-        freeCompilerArgs.add("-Xenable-suspend-function-exporting")
         freeCompilerArgs.add("-opt-in=com.sap.ec.InternalSdkApi")
+        freeCompilerArgs.add("-Xexpect-actual-classes")
     }
     jvmToolchain(17)
 
-    androidLibrary {
-        namespace = "com.sap"
+    android {
+        namespace = "com.sap.ec"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
 
@@ -89,9 +89,12 @@ kotlin {
 
         compilerOptions {
             moduleKind.set(org.jetbrains.kotlin.gradle.dsl.JsModuleKind.MODULE_ES)
-            sourceMap.set(false)
+            sourceMap.set(true)
+            sourceMapEmbedSources.set(org.jetbrains.kotlin.gradle.dsl.JsSourceMapEmbedMode.SOURCE_MAP_SOURCE_CONTENT_NEVER)
             freeCompilerArgs.addAll(
                 listOf(
+                    // Experimental: enables @JsExport of suspend functions as JS async functions (Kotlin 2.3+)
+                    "-Xenable-suspend-function-exporting",
                     "-Xir-dce",
                     "-Xir-minimized-member-names=true",
                     "-Xir-per-module-output-name=false",
@@ -252,6 +255,13 @@ kotlin {
     }
 }
 
+run {
+    val androidTarget = (kotlin as org.gradle.api.plugins.ExtensionAware).extensions
+        .findByType(com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget::class.java)
+        ?: error("Android KMP library target not found")
+    androidTarget.optimization.consumerKeepRules.publish = true
+    androidTarget.optimization.consumerKeepRules.file("proguard-rules.pro")
+}
 
 buildConfig {
     packageName("com.sap.ec.core.device")
@@ -376,8 +386,8 @@ mavenPublishing {
     coordinates(group.toString(), "engagement-cloud-sdk", version.toString())
 
     pom {
-        name = "Engagement Cloud SDK"
-        description = "Engagement Cloud SDK"
+        name = "SAP Engagement Cloud SDK"
+        description = "SAP Engagement Cloud SDK"
         inceptionYear = "2025"
         url = "https://github.com/emartech/engagement-cloud-sdk/"
         licenses {
@@ -404,18 +414,21 @@ mavenPublishing {
 
 tasks {
     register("base64EnvToFile") {
-        doLast {
-            val propertyName = project.property("propertyName") as String?
-                ?: throw IllegalArgumentException("Property 'propertyName' is not provided.")
-            val file = project.property("file") as String?
-                ?: throw IllegalArgumentException("Property 'file' is not provided.")
-            val base64String = env.fetch(propertyName)
-            val decoder = Base64.getDecoder()
-            val decodedBytes = decoder.decode(base64String)
+        val propertyName = providers.gradleProperty("propertyName")
+        val filePath = providers.gradleProperty("file")
+        val base64Content = propertyName.flatMap { providers.environmentVariable(it) }
+        val projectDir = layout.projectDirectory.asFile
 
-            file(file).apply {
-                writeBytes(decodedBytes)
-            }
+        doLast {
+            val name = propertyName.orNull
+                ?: throw IllegalArgumentException("Property 'propertyName' is not provided.")
+            val file = filePath.orNull
+                ?: throw IllegalArgumentException("Property 'file' is not provided.")
+            val base64String = base64Content.orNull
+                ?: throw IllegalArgumentException("Environment variable '$name' is not set.")
+            val decodedBytes = Base64.getDecoder().decode(base64String)
+
+            projectDir.resolve(file).writeBytes(decodedBytes)
         }
     }
 }
@@ -423,13 +436,12 @@ tasks {
 tasks.withType<ProcessResources> {
     outputs.upToDateWhen { false }  // always run this task to ensure the file is updated with the correct version
     val sdkVersion = version.toString()
+    val isSnapshot = sdkVersion.contains("-")
     filesMatching("**/engagement-cloud-sdk-loader.js") {
-        println("Replacing sdk-loader-version with $sdkVersion in ${this.path}")
+        val targetPath = if (isSnapshot) "/snapshots/engagement-cloud-sdk.js" else "/${sdkVersion}/engagement-cloud-sdk.js"
+        println("Replacing loader SDK URL with $targetPath in ${this.path}")
         filter { line ->
-            line.replace(
-                "/latest/engagement-cloud-sdk.js",
-                "/${sdkVersion}/engagement-cloud-sdk.js"
-            )
+            line.replace("/latest/engagement-cloud-sdk.js", targetPath)
         }
     }
 }

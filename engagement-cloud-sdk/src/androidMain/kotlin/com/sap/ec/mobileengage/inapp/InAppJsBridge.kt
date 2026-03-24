@@ -81,6 +81,7 @@ internal class InAppJsBridge(
     fun triggerAppEvent(jsonString: String) {
         actionChannel.trySend {
             val actionModel = json.decodeFromString<BasicAppEventActionModel>(jsonString)
+                .amendForJsBridge(inAppJsBridgeData)
             actionFactory.create(actionModel)()
         }
     }

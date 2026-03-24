@@ -1,12 +1,16 @@
 package com.sap.ec.mobileengage.push.mapper
 
+import com.sap.ec.api.event.model.EventSource
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.mapper.Mapper
 import com.sap.ec.core.providers.UuidProviderApi
 import com.sap.ec.mobileengage.action.models.BadgeCount
 import com.sap.ec.mobileengage.action.models.BadgeCountMethod
 import com.sap.ec.mobileengage.action.models.BasicActionModel
+import com.sap.ec.mobileengage.action.models.BasicAppEventActionModel
 import com.sap.ec.mobileengage.action.models.PresentableActionModel
+import com.sap.ec.mobileengage.action.models.addAppEventSource
+import com.sap.ec.mobileengage.action.models.addSource
 import com.sap.ec.mobileengage.push.ActionableData
 import com.sap.ec.mobileengage.push.DisplayableData
 import com.sap.ec.mobileengage.push.NotificationOperation
@@ -57,9 +61,16 @@ internal class HuaweiPushV2Mapper(
             val notificationObject = from[NOTIFICATION]?.jsonObject
                 ?: throw Exception("notification object missing from push payload: $from")
             val defaultTapAction: BasicActionModel? =
-                notificationObject[DEFAULT_ACTION]?.jsonObject?.let { json.decodeFromJsonElement(it) }
+                notificationObject[DEFAULT_ACTION]?.jsonObject?.let { json.decodeFromJsonElement<BasicActionModel>(it) }
+                    ?.let { action ->
+                        when (action) {
+                            is BasicAppEventActionModel -> action.addSource(EventSource.Push)
+                            else -> action
+                        }
+                    }
             val actions: List<PresentableActionModel>? =
-                notificationObject[ACTIONS]?.jsonArray?.let { json.decodeFromJsonElement(it) }
+                notificationObject[ACTIONS]?.jsonArray?.let { json.decodeFromJsonElement<List<PresentableActionModel>>(it) }
+                    ?.addAppEventSource(EventSource.Push)
             val actionableData = ActionableData(actions, defaultTapAction)
 
             val trackingInfo = emsObject[TRACKING_INFO]?.jsonPrimitive?.contentOrNull ?: "{}"

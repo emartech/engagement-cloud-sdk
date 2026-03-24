@@ -2,6 +2,7 @@ package com.sap.ec.mobileengage.embeddedmessaging.pagination
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import com.sap.ec.api.SdkState
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.log.Logger
@@ -32,8 +33,8 @@ internal class EmbeddedMessagingPagingSource(
 ) : PagingSource<Int, MessageItemViewModelApi>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MessageItemViewModelApi> {
-        if (!hasContactToken()) {
-            logger.trace("Skipping page load: no contact token")
+        if (sdkContext.currentSdkState.value != SdkState.Active || !hasContactToken()) {
+            logger.trace("Skipping page load: no contact token or SDK not active")
             return LoadResult.Page(data = emptyList(), prevKey = null, nextKey = null)
         }
         return try {

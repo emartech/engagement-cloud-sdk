@@ -1,5 +1,6 @@
 package com.sap.ec.mobileengage.inapp
 
+import com.sap.ec.api.event.model.EventSource
 import com.sap.ec.core.log.Logger
 import com.sap.ec.mobileengage.action.EventActionFactoryApi
 import com.sap.ec.mobileengage.action.models.BasicAppEventActionModel
@@ -123,7 +124,7 @@ class InAppJsBridgeTests {
             put("payload", json.encodeToJsonElement(payloadMap))
         }.toString()
 
-        val expectedActionModel = BasicAppEventActionModel(reporting, eventName, payloadMap)
+        val expectedActionModel = BasicAppEventActionModel(reporting, eventName, payloadMap, source = EventSource.InlineInApp)
 
         inAppJsBridge.handleInAppAction(testEventString)
 
@@ -279,7 +280,7 @@ class InAppJsBridgeTests {
             put("payload", json.encodeToJsonElement(payloadMap))
         }.toString()
 
-        val expectedActionModel = BasicAppEventActionModel(reporting, eventName, payloadMap)
+        val expectedActionModel = BasicAppEventActionModel(reporting, eventName, payloadMap, source = EventSource.InlineInApp)
 
         inAppJsBridge.triggerAppEvent(testEventString)
 
@@ -340,9 +341,7 @@ class InAppJsBridgeTests {
 
         advanceUntilIdle()
 
-        coVerify {
-            mockActionFactory.create(expectedActionModel)
-        }
+        coVerify { mockActionFactory.create(expectedActionModel) }
     }
 
     @Test

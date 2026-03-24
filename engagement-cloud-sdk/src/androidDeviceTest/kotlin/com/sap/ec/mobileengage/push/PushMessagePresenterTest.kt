@@ -45,7 +45,7 @@ class PushMessagePresenterTest {
         const val REPORTING = """{"reportingKey":"reportingValue"}"""
         const val ICON_ID = 10
         const val CHANNEL_ID = "testChannelId"
-        const val DEBUG_CHANNEL_ID = "ems_debug"
+        const val DEBUG_CHANNEL_ID = "engagement_cloud_debug"
         const val TITLE = "testTitle"
         const val BODY = "testBody"
         val testCustomEventAction =
@@ -100,7 +100,7 @@ class PushMessagePresenterTest {
 
         json = JsonUtil.json
         mockMetadataReader = mockk(relaxed = true)
-        every { mockMetadataReader.getInt(any(), com.sap.R.drawable.default_small_notification_icon) } returns ICON_ID
+        every { mockMetadataReader.getInt(any(), com.sap.ec.R.drawable.default_small_notification_icon) } returns ICON_ID
 
         pushMessagePresenter = PushMessagePresenter(
             mockContext,
