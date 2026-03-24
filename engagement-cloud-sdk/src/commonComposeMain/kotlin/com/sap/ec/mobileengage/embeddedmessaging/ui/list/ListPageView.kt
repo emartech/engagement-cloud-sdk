@@ -30,6 +30,7 @@ import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
+import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -56,6 +57,7 @@ import com.sap.ec.mobileengage.embeddedmessaging.ui.item.CustomMessageItemViewMo
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.onScreenTime
 import com.sap.ec.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 import com.sap.ec.mobileengage.embeddedmessaging.ui.translation.LocalStringResources
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
@@ -161,9 +163,7 @@ private fun MessageList(
     }
 
     BackHandler(enabled = selectedMessageViewModel != null) {
-        scope.launch {
-            navigator.navigateTo(ListDetailPaneScaffoldRole.List)
-        }
+        navigateToListPane(scope, navigator)
     }
 
     EmbeddedMessagingTheme {
@@ -243,29 +243,29 @@ private fun MessageList(
                             ) { targetMessage ->
                                 targetMessage?.let { messageViewModel ->
                                     if (messageViewModel.hasRichContent()) {
-                                        MessageDetailView(
-                                            messageViewModel = messageViewModel,
-                                            onBack = {
+                                        messageViewModel.richContentUrl?.let { richContentUrl ->
+                                            MessageDetailView(
+                                                richContentUrl,
+                                                messageViewModel.trackingInfo,
+                                                Modifier.onScreenTime(
+                                                    3000L,
+                                                    0.5f
+                                                ) {
+                                                    scope.launch {
+                                                        viewModel.tagMessageRead(messageViewModel)
+                                                    }
+                                                }
+                                            ) {
                                                 scope.launch {
                                                     viewModel.clearMessageSelection()
                                                     navigator.navigateTo(
                                                         ListDetailPaneScaffoldRole.List
                                                     )
                                                 }
-                                            },
-                                            modifier = Modifier.onScreenTime(
-                                                3000L,
-                                                0.5f
-                                            ) {
-                                                scope.launch {
-                                                    viewModel.tagMessageRead(messageViewModel)
-                                                }
                                             }
-                                        )
+                                        } ?: navigateToListPane(scope, navigator)
                                     } else {
-                                        scope.launch {
-                                            navigator.navigateTo(ListDetailPaneScaffoldRole.List)
-                                        }
+                                        navigateToListPane(scope, navigator)
                                     }
                                 } ?: Box(
                                     modifier = Modifier.fillMaxSize(),
@@ -279,6 +279,15 @@ private fun MessageList(
                 )
             }
         }
+    }
+}
+
+private fun navigateToListPane(
+    scope: CoroutineScope,
+    navigator: ThreePaneScaffoldNavigator<String>
+) {
+    scope.launch {
+        navigator.navigateTo(ListDetailPaneScaffoldRole.List)
     }
 }
 
