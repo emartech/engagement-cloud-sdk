@@ -187,7 +187,9 @@ jobs:
 
       - name: Test Web
         if: matrix.platform == 'web'
-        run: make test-web
+        run: |
+          npm install
+          make test-web
 
   lint:
     needs: build

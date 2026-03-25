@@ -189,7 +189,9 @@ jobs:
 
       - name: Test Web
         if: matrix.platform == 'web'
-        run: make test-web
+        run: |
+          npm install
+          make test-web
 
   # E2E dispatch: non-blocking fire-and-report pattern.
   # Dispatches a repository_dispatch event to engagement-cloud-sdk-test-app.
