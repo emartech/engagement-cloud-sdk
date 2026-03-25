@@ -11,6 +11,7 @@ import com.sap.ec.api.contact.ContactInternal
 import com.sap.ec.api.contact.LoggingContact
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.log.Logger
+import com.sap.ec.core.networking.context.RequestContextApi
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -36,6 +37,7 @@ class GenericApiTests {
     private lateinit var mockSdkContext: SdkContextApi
     private lateinit var contactContext: ContactContextApi
     private lateinit var genericApi: GenericApi<LoggingContact, ContactGatherer, ContactInternal>
+    private lateinit var mockRequestContext: RequestContextApi
 
     @BeforeTest
     fun setup() {
@@ -43,6 +45,7 @@ class GenericApiTests {
         Dispatchers.setMain(mainDispatcher)
         contactContext = ContactContext(mutableListOf())
         mockSdkContext = mock(MockMode.autofill)
+        mockRequestContext = mock(MockMode.autofill)
         mockSdkLogger = mock(MockMode.autofill)
         loggingContact = LoggingContact(mockSdkLogger)
         contactGatherer = ContactGatherer(contactContext, mockSdkContext, mockSdkLogger)
@@ -51,7 +54,8 @@ class GenericApiTests {
                 contactContext,
                 mockSdkLogger,
                 sdkEventDistributor = mock(),
-                mockSdkContext
+                mockSdkContext,
+                mockRequestContext
             )
         every { mockSdkContext.sdkDispatcher } returns mainDispatcher
         genericApi = GenericApi(

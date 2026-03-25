@@ -72,6 +72,7 @@ internal object ContactInjection {
                 sdkLogger = get { parametersOf(ContactInternal::class.simpleName) },
                 sdkEventDistributor = get(),
                 sdkContext = get(),
+                requestContext = get()
             )
         }
         single<ContactApi> {
