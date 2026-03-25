@@ -137,7 +137,7 @@ jobs:
 
       - name: Setup Android SDK
         if: matrix.platform == 'android'
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
 
       - name: Enable KVM group permissions
         if: matrix.platform == 'android'
