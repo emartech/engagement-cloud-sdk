@@ -62,6 +62,7 @@ internal object SetupInjection {
         single<State>(named(StateTypes.UnlinkContact)) {
             UnlinkContactState(
                 sdkEventDistributor = get(),
+                requestContext = get(),
                 sdkContext = get(),
                 sdkLogger = get { parametersOf(UnlinkContactState::class.simpleName) }
             )
