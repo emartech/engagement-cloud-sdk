@@ -261,7 +261,7 @@ jobs:
 
       - uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org'
       - run: npm ci
 
@@ -620,7 +620,7 @@ jobs:
       - name: Setup Node.js for Docusaurus
         uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: '24'
 
       - name: Build Docusaurus docs
         working-directory: docs/engagement-cloud-sdk-docs
@@ -641,7 +641,7 @@ jobs:
       - name: Setup Node.js for Docusaurus
         uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: '24'
 
       - name: Build Docusaurus docs
         # The docs repo uses @docusaurus/core ^3.9.2 (>= 3.1.0 required for
