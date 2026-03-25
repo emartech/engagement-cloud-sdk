@@ -12,6 +12,8 @@ internal interface RequestContextApi {
 
     var deviceEventState: String?
 
+    var isContactLinked: Boolean?
+
     fun clearTokens()
 
 }

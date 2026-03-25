@@ -6,6 +6,7 @@ import com.sap.ec.core.exceptions.SdkException.MissingApplicationCodeException
 import com.sap.ec.core.exceptions.SdkException.NetworkIOException
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.clients.NetworkClientApi
+import com.sap.ec.core.networking.context.RequestContextApi
 import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.networking.model.UrlRequest
 import com.sap.ec.core.url.ECUrlType
@@ -32,6 +33,7 @@ internal class ContactClient(
     private val sdkEventManager: SdkEventManagerApi,
     private val urlFactory: UrlFactoryApi,
     private val contactTokenHandler: ContactTokenHandlerApi,
+    private val requestContext: RequestContextApi,
     private val ecSdkSession: SessionApi,
     private val eventsDao: EventsDaoApi,
     private val json: Json,
@@ -93,14 +95,17 @@ internal class ContactClient(
     private suspend fun handleSuccess(event: OnlineSdkEvent, response: Response) {
         when (event) {
             is SdkEvent.Internal.Sdk.LinkContact -> {
+                requestContext.isContactLinked = true
                 ecSdkSession.startSession()
             }
 
             is SdkEvent.Internal.Sdk.LinkAuthenticatedContact -> {
+                requestContext.isContactLinked = true
                 ecSdkSession.startSession()
             }
 
             is SdkEvent.Internal.Sdk.UnlinkContact -> {
+                requestContext.isContactLinked = false
                 ecSdkSession.endSession()
             }
 
@@ -153,6 +158,7 @@ internal class ContactClient(
                 val url = urlFactory.create(ECUrlType.UnlinkContact(applicationCode))
                 UrlRequest(url, HttpMethod.Delete, null, headers)
             }
+
             else -> {
                 throw Exception("Unknown Contact Event type.")
             }

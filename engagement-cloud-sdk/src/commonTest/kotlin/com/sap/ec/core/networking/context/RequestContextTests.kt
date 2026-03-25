@@ -14,7 +14,7 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class RequestContextTests: KoinTest {
+class RequestContextTests : KoinTest {
     override fun getKoin(): Koin = koin
 
     private lateinit var testModule: Module
@@ -55,4 +55,16 @@ class RequestContextTests: KoinTest {
         requestContext.refreshToken shouldBe null
     }
 
+    @Test
+    fun setIsContactLinked_shouldSet_isContactLinked_toCorrectValue() {
+        requestContext.isContactLinked shouldBe null
+
+        requestContext.isContactLinked = true
+
+        requestContext.isContactLinked shouldBe true
+
+        requestContext.isContactLinked = false
+
+        requestContext.isContactLinked shouldBe false
+    }
 }
