@@ -11,6 +11,7 @@ import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DEFAULT_PADDING
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DEFAULT_SPACING
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DIALOG_CARD_WIDTH
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.FIFTY_PERCENT
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.FLOATING_ACTION_BUTTON_SIZE
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.ISLAND_SPACING
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.LARGE_BORDER_RADIUS
@@ -31,7 +32,7 @@ import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MESSAGE_ITEM_TITLE_FONT_WEIGHT
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MESSAGE_ITEM_UNOPENED_FONT_WEIGHT
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MESSAGE_ITEM_UNOPENED_LEAD_FONT_WEIGHT
-import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.ONE_THIRD_WIDTH
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.ONE_THIRD
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.SMALL_BORDER_RADIUS
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.SMALL_PADDING
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.SWIPE_DELETE_BACKGROUND_CORRECTION
@@ -184,6 +185,7 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
     val detailPane by style {
         flex(1)
         height(MAX_HEIGHT)
+        minWidth(FIFTY_PERCENT)
         property("overflow-y", "auto")
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Column)
@@ -658,7 +660,7 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
         justifyContent(JustifyContent.End)
         backgroundColor(CssColorVars.colorError.value())
         margin(DEFAULT_MARGIN)
-        width(ONE_THIRD_WIDTH)
+        width(ONE_THIRD)
     }
 
     val swipeDeleteIcon by style {
