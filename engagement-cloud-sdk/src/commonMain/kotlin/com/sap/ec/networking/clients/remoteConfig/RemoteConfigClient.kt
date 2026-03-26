@@ -117,22 +117,20 @@ internal class RemoteConfigClient(
             buildJsonObject { put("global", JsonPrimitive(isGlobal)) })
         return coroutineScope {
             val toBeConfigBytes =
-                async(start = CoroutineStart.UNDISPATCHED) { fetchConfig(isGlobal, event) }
+                async { fetchConfig(isGlobal, event) }
             val toBeSignatureBytes =
-                async(start = CoroutineStart.UNDISPATCHED) { fetchSignature(isGlobal, event) }
+                async { fetchSignature(isGlobal, event) }
 
             val configResponse = toBeConfigBytes.await()
             val signatureResponse = toBeSignatureBytes.await()
 
-            val config = configResponse.getOrElse(onFailure = { exception ->
-                handleException(exception, event)
-                null
-            })?.bodyAsText
-            val signature = signatureResponse.getOrElse(onFailure = { exception ->
-                handleException(exception, event)
-                null
-            })?.bodyAsText
+            val config = configResponse.getOrNull()?.bodyAsText
+            val signature = signatureResponse.getOrNull()?.bodyAsText
+
             if (config == null || signature == null) {
+                val exception =
+                    (configResponse.exceptionOrNull() ?: signatureResponse.exceptionOrNull())!!
+                handleException(exception, event)
                 return@coroutineScope null
             }
             val verified = crypto.verify(config, signature)
