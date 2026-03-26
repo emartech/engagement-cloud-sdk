@@ -290,6 +290,7 @@ jobs:
           cp build/js/packages/engagement-cloud-sdk/kotlin/engagement-cloud-sdk-html.d.ts dist/npm/ 2>/dev/null || true
           sed "s/\"version\": \"0.0.0\"/\"version\": \"$VERSION\"/" \
             engagement-cloud-sdk/npm-package.json > dist/npm/package.json
+          cp README.md dist/npm/
 
       - name: Publish to GitHub Packages NPM
         run: npm publish dist/npm/

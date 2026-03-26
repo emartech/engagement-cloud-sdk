@@ -302,6 +302,7 @@ jobs:
               -e "s/@emartech\/engagement-cloud-sdk/@sap\/engagement-cloud-sdk/" \
               -e "s|https://npm.pkg.github.com|https://registry.npmjs.org|" \
             engagement-cloud-sdk/npm-package.json > dist/npm/package.json
+          cp README.md dist/npm/
 
       - name: Publish to NPM
         if: ${{ env.DRY_RUN != 'true' && (github.event_name == 'push' || inputs.publish_npm == true) }}
