@@ -200,7 +200,7 @@ jobs:
             -PENABLE_PUBLISHING=true \
             -Psigning.keyId="${{ secrets.SONATYPE_SIGNING_KEY_ID }}" \
             -Psigning.password="${{ secrets.SONATYPE_SIGNING_PASSWORD }}" \
-            -Psigning.secretKeyRingFile=./secring.asc.gpg \
+            -Psigning.secretKeyRingFile=$GITHUB_WORKSPACE/engagement-cloud-sdk/secring.asc.gpg \
             --no-daemon
           echo "✓ All KMP artifacts signed and published to Maven Local"
         env:
@@ -227,7 +227,7 @@ jobs:
             -PmavenCentralPassword="${{ secrets.OSSRH_PASSWORD }}" \
             -Psigning.keyId="${{ secrets.SONATYPE_SIGNING_KEY_ID }}" \
             -Psigning.password="${{ secrets.SONATYPE_SIGNING_PASSWORD }}" \
-            -Psigning.secretKeyRingFile=./secring.asc.gpg \
+            -Psigning.secretKeyRingFile=$GITHUB_WORKSPACE/engagement-cloud-sdk/secring.asc.gpg \
             --no-daemon
           echo "✓ All KMP artifacts staged to Maven Central — promote via promote_maven_central.yml"
         env:
