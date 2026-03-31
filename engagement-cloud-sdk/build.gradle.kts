@@ -357,6 +357,53 @@ skie {
     }
 }
 
+if (isMac) {
+    val privacyFile = file("src/iosMain/resources/PrivacyInfo.xcprivacy")
+
+    if (!privacyFile.exists()) {
+        throw GradleException(
+            "iOS Privacy Manifest not found at ${privacyFile.absolutePath}. " +
+            "This file is required for iOS frameworks and must be present at " +
+            "src/iosMain/resources/PrivacyInfo.xcprivacy"
+        )
+    }
+
+    val copyPrivacyManifestTasks = mutableListOf<TaskProvider<Copy>>()
+
+    val iosTargetNames = kotlin.targets
+        .filter { it.platformType == org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType.native }
+        .filter { it.name.startsWith("ios") }
+        .map { it.name }
+
+    iosTargetNames.forEach { target ->
+        listOf("debug", "release").forEach { buildType ->
+            val taskName = "copyPrivacyManifest${target.replaceFirstChar { it.uppercase() }}${buildType.replaceFirstChar { it.uppercase() }}"
+            val copyTask = tasks.register(taskName, Copy::class) {
+                description = "Copy PrivacyInfo.xcprivacy into $target $buildType framework bundle"
+                from(privacyFile)
+                into(layout.buildDirectory.dir("bin/$target/${buildType}Framework/EngagementCloudSDK.framework"))
+            }
+            copyPrivacyManifestTasks.add(copyTask)
+        }
+    }
+
+    tasks.matching {
+        it.name.matches(Regex("link.*Framework.*Ios.*"))
+    }.configureEach {
+        copyPrivacyManifestTasks.forEach { copyTask ->
+            finalizedBy(copyTask)
+        }
+    }
+
+    tasks.matching {
+        it.name.contains("assembleEngagementCloudSDKXCFramework")
+    }.configureEach {
+        copyPrivacyManifestTasks.forEach { copyTask ->
+            dependsOn(copyTask)
+        }
+    }
+}
+
 if (project.findProperty("ENABLE_PUBLISHING") == "true") {
     publishing {
         repositories {
