@@ -67,6 +67,7 @@ jobs:
 
   build:
     name: Build ${{ matrix.platform }} / ${{ matrix.os }}
+    needs: derive-version
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -104,10 +105,12 @@ jobs:
 
       - name: Build
         run: make build-${{ matrix.platform }}
+        env:
+          VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
 
   test:
     name: Test ${{ matrix.platform }} / ${{ matrix.os }}
-    needs: build
+    needs: [derive-version, build]
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -160,10 +163,14 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           script: |
             make test-android
+        env:
+          VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
 
       - name: Test iOS
         if: matrix.platform == 'ios'
         run: make test-ios
+        env:
+          VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
 
       - name: Setup Node.js
         if: matrix.platform == 'web'
@@ -184,9 +191,11 @@ jobs:
       - name: Test Web
         if: matrix.platform == 'web'
         run: make test-web
+        env:
+          VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
 
   lint:
-    needs: build
+    needs: [derive-version, build]
     runs-on: macos-latest-xlarge
     steps:
       - uses: actions/checkout@v6
@@ -204,6 +213,8 @@ jobs:
 
       - name: Run lint
         run: make lint
+        env:
+          VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
 
   publish-android:
     name: Publish KMP Snapshot

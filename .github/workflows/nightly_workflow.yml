@@ -10,6 +10,7 @@ permissions:
   actions: read
 
 env:
+  VERSION_OVERRIDE: 0.0.0-NIGHTLY
   USE_LOCAL_DEPENDENCY: ${{ vars.USE_LOCAL_DEPENDENCY }}
   GOOGLE_SERVICES_API_KEY: ${{ secrets.GOOGLE_SERVICES_API_KEY }}
   RELEASE_MODE: ${{ vars.RELEASE_MODE }}
