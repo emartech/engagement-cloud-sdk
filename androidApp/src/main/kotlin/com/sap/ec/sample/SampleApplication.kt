@@ -12,12 +12,12 @@ class SampleApplication : Application() {
 
     private fun createNotificationChannels() {
         createNotificationChannel(
-            "ems_sample_news",
+            "engagement_cloud_news",
             "News",
             "News and updates go into this channel"
         )
         createNotificationChannel(
-            "ems_sample_messages",
+            "engagement_cloud_discounts",
             "Messages",
             "Important messages go into this channel"
         )
