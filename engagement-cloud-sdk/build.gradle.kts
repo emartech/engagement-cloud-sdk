@@ -35,6 +35,7 @@ if (isMac) {
 
 group = "com.sap.engagement-cloud"
 version = System.getenv("VERSION_OVERRIDE")
+    ?: throw IllegalStateException("VERSION_OVERRIDE environment variable is not set. Please set it to the desired SDK version before building.")
 
 kotlin {
     compilerOptions {
@@ -363,8 +364,8 @@ if (isMac) {
     if (!privacyFile.exists()) {
         throw GradleException(
             "iOS Privacy Manifest not found at ${privacyFile.absolutePath}. " +
-            "This file is required for iOS frameworks and must be present at " +
-            "src/iosMain/resources/PrivacyInfo.xcprivacy"
+                    "This file is required for iOS frameworks and must be present at " +
+                    "src/iosMain/resources/PrivacyInfo.xcprivacy"
         )
     }
 
@@ -377,7 +378,8 @@ if (isMac) {
 
     iosTargetNames.forEach { target ->
         listOf("debug", "release").forEach { buildType ->
-            val taskName = "copyPrivacyManifest${target.replaceFirstChar { it.uppercase() }}${buildType.replaceFirstChar { it.uppercase() }}"
+            val taskName =
+                "copyPrivacyManifest${target.replaceFirstChar { it.uppercase() }}${buildType.replaceFirstChar { it.uppercase() }}"
             val copyTask = tasks.register(taskName, Copy::class) {
                 description = "Copy PrivacyInfo.xcprivacy into $target $buildType framework bundle"
                 from(privacyFile)
@@ -485,7 +487,8 @@ tasks.withType<ProcessResources> {
     val sdkVersion = version.toString()
     val isSnapshot = sdkVersion.contains("-")
     filesMatching("**/engagement-cloud-sdk-loader.js") {
-        val targetPath = if (isSnapshot) "/snapshots/engagement-cloud-sdk.js" else "/${sdkVersion}/engagement-cloud-sdk.js"
+        val targetPath =
+            if (isSnapshot) "/snapshots/engagement-cloud-sdk.js" else "/${sdkVersion}/engagement-cloud-sdk.js"
         println("Replacing loader SDK URL with $targetPath in ${this.path}")
         filter { line ->
             line.replace("/latest/engagement-cloud-sdk.js", targetPath)
