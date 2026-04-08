@@ -2,17 +2,11 @@ package com.sap.ec.mobileengage.embeddedmessaging.ui.detail
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
 import com.sap.ec.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingStyleSheet
 import com.sap.ec.mobileengage.embeddedmessaging.ui.toReadTagId
 import com.sap.ec.mobileengage.inapp.view.InlineInAppView
-import io.ktor.http.Url
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -26,7 +20,8 @@ import web.intersection.IntersectionObserverInit
 @Composable
 internal fun MessageDetailView(
     viewModel: MessageItemViewModelApi,
-    onClose: () -> Unit
+    onClose: () -> Unit,
+    onLoaded: ((String) -> Unit)? = null
 ) {
     val scope = rememberCoroutineScope()
 
@@ -53,7 +48,8 @@ internal fun MessageDetailView(
                 InlineInAppView(
                     it,
                     viewModel.trackingInfo,
-                    onClose = { onClose() }
+                    onClose = { onClose() },
+                    onLoaded = onLoaded
                 )
             }
         }

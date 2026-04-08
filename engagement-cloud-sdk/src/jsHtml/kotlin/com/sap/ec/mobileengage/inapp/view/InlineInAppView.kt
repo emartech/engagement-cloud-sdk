@@ -30,7 +30,7 @@ import web.html.HTMLElement
 internal actual fun InlineInAppView(
     message: InAppMessage,
     onClose: () -> Unit,
-    onLoaded: (() -> Unit)?
+    onLoaded: ((String) -> Unit)?
 ) {
     val webViewElement = remember { mutableStateOf<HTMLElement?>(null) }
     val iframeHolder = remember { mutableStateOf<HTMLDivElement?>(null) }
@@ -45,7 +45,7 @@ internal actual fun InlineInAppView(
         val webElement = holder.asDynamic().webView as? HTMLElement
         webViewElement.value = webElement
 
-        onLoaded?.invoke()
+        onLoaded?.invoke(message.dismissId)
 
         launch {
             sdkEventDistributor.sdkEventFlow.first { sdkEvent ->
@@ -88,7 +88,7 @@ internal fun InlineInAppView(
     url: Url,
     trackingInfo: String,
     onClose: () -> Unit,
-    onLoaded: (() -> Unit)? = null
+    onLoaded: ((String) -> Unit)? = null
 ) {
     val fetcher: InlineInAppMessageFetcherApi = koin.get()
     val message = remember { mutableStateOf<InAppMessage?>(null) }
@@ -102,7 +102,7 @@ internal fun InlineInAppView(
             message = it,
             onClose = {
                 onClose()
-                removeInlineInApp(it)
+                removeInlineInApp(it.dismissId)
             },
             onLoaded = onLoaded
         )
@@ -126,13 +126,13 @@ internal fun InlineInAppView(
         InlineInAppView(
             message = it,
             onClose = { onClose?.invoke() },
-            onLoaded = onLoaded
+            onLoaded = { onLoaded?.invoke() }
         )
     }
 }
 
-private fun removeInlineInApp(message: InAppMessage) {
-    val iFrameContainer = document.getElementById(ElementId(message.dismissId.toDismissId()))
+internal fun removeInlineInApp(dismissId: String) {
+    val iFrameContainer = document.getElementById(ElementId(dismissId.toDismissId()))
     iFrameContainer?.childNodes?.asList()?.forEach {
         iFrameContainer.removeChild(it)
     }

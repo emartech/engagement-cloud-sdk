@@ -7,5 +7,5 @@ import com.sap.ec.mobileengage.inapp.InAppMessage
 internal expect fun InlineInAppView(
     message: InAppMessage,
     onClose: () -> Unit,
-    onLoaded: (() -> Unit)? = null
+    onLoaded: ((String) -> Unit)? = null
 )
