@@ -30,7 +30,10 @@ internal class InAppDialog : DialogFragment() {
         val view =
             inflater.inflate(R.layout.mobile_engage_in_app_message, container, false)
         val inAppContainer: FrameLayout = view.findViewById(R.id.mobileEngageInAppMessageContainer)
-        inAppView?.let { inAppContainer.addView(it) }
+        inAppView?.let {
+            (it.parent as? ViewGroup)?.removeView(it)
+            inAppContainer.addView(it)
+        }
         return inAppContainer
     }
 
