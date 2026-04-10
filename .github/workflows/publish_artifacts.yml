@@ -415,6 +415,9 @@ jobs:
           PUBLISH: true
           VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
 
+      - name: Copy Privacy Manifest to EC framework
+        run: make add-privacy-manifest-to-frameworks
+
       - name: Zip XCFrameworks and compute checksums
         run: |
           VERSION="${{ needs.derive-version.outputs.version }}"

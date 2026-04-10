@@ -1,4 +1,4 @@
-.PHONY: build build-pipeline build-android build-ios build-ios-all-archtypes build-js-html build-web check-env clean create-apks help lint pipeline-android pipeline-js pipeline-ios prepare-release prepare-spm prepare-local-spm publish-android publish-ios-spm publish-npm release release-locally stage-maven-central test test-android test-android-firebase test-ios test-sdk-loader test-web
+.PHONY: build build-pipeline build-android build-ios build-ios-all-archtypes build-js-html build-web check-env clean create-apks help lint pipeline-android pipeline-js pipeline-ios prepare-release prepare-spm prepare-local-spm publish-android publish-ios-spm publish-npm release release-locally stage-maven-central test test-android test-android-firebase test-ios test-sdk-loader test-web add-privacy-manifest-to-frameworks
 .DEFAULT_GOAL := help
 SHELL := /bin/bash
 
@@ -22,14 +22,16 @@ check-env:
 	fi
 help:
 	@echo "Available targets:"
-	@echo "  build-android    - Build Android artifacts"
-	@echo "  build-ios        - Build iOS artifacts"
-	@echo "  build-js-html    - Build JS artifacts"
-	@echo "  lint             - Run lint"
-	@echo "  test             - Run all tests"
-	@echo "  publish-maven    - Publish to GitHub Packages (Maven)"
-	@echo "  publish-npm      - Publish to GitHub Packages (NPM)"
-	@echo "  publish-ios-spm  - Publish iOS SPM"
+	@echo "  build-android               - Build Android artifacts"
+	@echo "  build-ios                   - Build iOS artifacts"
+	@echo "  build-js-html               - Build JS artifacts"
+	@echo "  lint                        - Run lint"
+	@echo "  test                        - Run all tests"
+	@echo "  prepare-local-spm           - Build local iOS frameworks for iosApp testing (no Privacy Manifest)"
+	@echo "  add-privacy-manifest-to-frameworks - Add Privacy Manifest to release XCFrameworks (run after building release frameworks)"
+	@echo "  publish-maven               - Publish to GitHub Packages (Maven)"
+	@echo "  publish-npm                 - Publish to GitHub Packages (NPM)"
+	@echo "  publish-ios-spm             - Publish iOS SPM"
 
 clean-dist:
 	@rm -rf dist
@@ -115,6 +117,19 @@ prepare-local-spm: check-env
 		spmDevBuild && \
 		cp -f "./iosReleaseSpm/Package.swift" "./Package.swift" && \
 		echo "Local Swift Package is prepared."
+
+add-privacy-manifest-to-frameworks:
+	@echo "Adding Privacy Manifest to release XCFrameworks..."
+	@PRIVACY_MANIFEST="engagement-cloud-sdk/src/iosMain/resources/PrivacyInfo.xcprivacy"; \
+	if [ ! -f "$$PRIVACY_MANIFEST" ]; then \
+		echo "Error: Privacy Manifest not found at $$PRIVACY_MANIFEST"; \
+		exit 1; \
+	fi; \
+	find engagement-cloud-sdk/build/XCFrameworks/release -name "EngagementCloudSDK.framework" -type d | while read framework; do \
+		echo "  → $$framework"; \
+		cp "$$PRIVACY_MANIFEST" "$$framework/"; \
+	done; \
+	echo "Privacy Manifest added to all framework variants"
 
 publish-maven: check-env
 	@./gradlew \
