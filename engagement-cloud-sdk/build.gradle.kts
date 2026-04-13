@@ -34,8 +34,7 @@ if (isMac) {
 }
 
 group = "com.sap.engagement-cloud"
-version = System.getenv("VERSION_OVERRIDE")
-    ?: throw IllegalStateException("VERSION_OVERRIDE environment variable is not set. Please set it to the desired SDK version before building.")
+version = project.extra["SDK_VERSION"] as String
 
 kotlin {
     compilerOptions {

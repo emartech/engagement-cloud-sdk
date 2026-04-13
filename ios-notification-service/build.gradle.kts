@@ -13,7 +13,7 @@ plugins {
 }
 
 group = "com.sap.engagement-cloud"
-version = System.getenv("VERSION_OVERRIDE")
+version = project.extra["SDK_VERSION"] as String
 
 val isMac = System.getProperty("os.name").contains("Mac", ignoreCase = true)
 if (isMac) {

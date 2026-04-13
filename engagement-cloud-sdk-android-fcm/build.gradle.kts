@@ -58,7 +58,7 @@ mavenPublishing {
         signAllPublications()
     }
 
-    val version = System.getenv("VERSION_OVERRIDE")
+    val version = project.extra["SDK_VERSION"] as String
     coordinates("com.sap.engagement-cloud", "engagement-cloud-sdk-android-fcm", version)
 
     pom {
