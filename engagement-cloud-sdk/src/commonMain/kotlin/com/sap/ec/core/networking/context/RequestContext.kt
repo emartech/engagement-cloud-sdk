@@ -1,5 +1,6 @@
 package com.sap.ec.core.networking.context
 
+import com.sap.ec.InternalSdkApi
 import com.sap.ec.core.storage.StorageConstants.CLIENT_STATE_STORAGE_KEY
 import com.sap.ec.core.storage.StorageConstants.CONTACT_TOKEN_STORAGE_KEY
 import com.sap.ec.core.storage.StorageConstants.DEVICE_EVENT_STATE_STORAGE_KEY
@@ -8,7 +9,8 @@ import com.sap.ec.core.storage.StorageConstants.REFRESH_TOKEN_STORAGE_KEY
 import com.sap.ec.core.storage.Store
 import kotlinx.serialization.builtins.serializer
 
-internal class RequestContext() : RequestContextApi {
+@InternalSdkApi
+class RequestContext() : RequestContextApi {
 
     override var contactToken: String? by Store(
         key = CONTACT_TOKEN_STORAGE_KEY,
