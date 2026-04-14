@@ -14,7 +14,7 @@ class IframeFactoryTests {
         iframe.style.width shouldBe "100%"
         iframe.style.padding shouldBe "0px"
         iframe.style.display shouldBe "block"
-        iframe.style.border shouldBe "none"
+        iframe.style.borderStyle shouldBe "none"
         iframe.style.height shouldBe "100%"
     }
 }
