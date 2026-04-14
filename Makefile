@@ -1,4 +1,4 @@
-.PHONY: build build-pipeline build-android build-ios build-ios-all-archtypes build-js-html build-web check-env clean create-apks help lint pipeline-android pipeline-js pipeline-ios prepare-release prepare-spm prepare-local-spm publish-android publish-ios-spm publish-npm release release-locally stage-maven-central test test-android test-android-firebase test-ios test-sdk-loader test-web add-privacy-manifest-to-frameworks
+.PHONY: build build-pipeline build-android build-ios build-ios-all-archtypes build-js-html build-web check-env clean create-apks help lint pipeline-android pipeline-js pipeline-ios prepare-release prepare-local-spm publish-android publish-ios-spm publish-npm release release-locally stage-maven-central test test-android test-android-firebase test-ios test-sdk-loader test-web add-privacy-manifest-to-frameworks
 .DEFAULT_GOAL := help
 SHELL := /bin/bash
 
@@ -104,18 +104,11 @@ lint: check-env
 		:engagement-cloud-sdk-android-fcm:lintRelease \
 		:engagement-cloud-sdk-android-hms:lintRelease
 
-prepare-spm: check-env
-	@./gradlew \
-		-PENABLE_PUBLISHING=true \
-		spmDevBuild && \
-		cp -f "./iosReleaseSpm/Package.swift" "./Package.swift" && \
-		echo "Swift Package is prepared. To use it as a local dependency add the project in Xcode at the Package Dependencies section"
-
 prepare-local-spm: check-env
 	@./gradlew \
 		-PENABLE_PUBLISHING=true \
 		spmDevBuild && \
-		cp -f "./iosReleaseSpm/Package.swift" "./Package.swift" && \
+		cp -f "./spmLocalRelease/Package.swift" "./Package.swift" && \
 		echo "Local Swift Package is prepared."
 
 add-privacy-manifest-to-frameworks:
