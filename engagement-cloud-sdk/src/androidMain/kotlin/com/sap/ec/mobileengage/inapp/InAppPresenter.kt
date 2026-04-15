@@ -14,7 +14,6 @@ import com.sap.ec.mobileengage.inapp.presentation.InAppPresenterApi
 import com.sap.ec.mobileengage.inapp.provider.InAppDialogProviderApi
 import com.sap.ec.mobileengage.inapp.reporting.InAppLoadingMetric
 import com.sap.ec.mobileengage.inapp.view.InAppDialog
-import com.sap.ec.mobileengage.inapp.view.InAppView
 import com.sap.ec.mobileengage.inapp.view.InAppViewApi
 import com.sap.ec.mobileengage.inapp.webview.WebViewHolder
 import com.sap.ec.watchdog.activity.TransitionSafeCurrentActivityWatchdog
@@ -77,7 +76,7 @@ internal class InAppPresenter(
         animation: InAppPresentationAnimation?
     ) {
         val inAppDialog = inAppDialogProvider.provide().apply {
-            setInAppView(inAppView as InAppView)
+            setInAppView(inAppView)
         }
         val currentActivity = currentActivityWatchdog.waitForActivity()
         val onScreenTimeStart = timestampProvider.provide().toEpochMilliseconds()
@@ -109,7 +108,10 @@ internal class InAppPresenter(
                     onScreenTimeEnd
                 )
                 withContext(mainDispatcher) {
-                    inAppDialog.dismiss()
+                    val activity = currentActivityWatchdog.currentActivity()
+                    val fragmentManager = activity?.fragmentManager()
+                    val activeDialog = fragmentManager?.findFragmentByTag(InAppDialog.TAG) as? InAppDialog
+                    activeDialog?.dismiss() ?: inAppDialog.dismiss()
                 }
             }
         }
