@@ -1,0 +1,90 @@
+# SAP Engagement Cloud SDK
+
+> A unified, multi-platform mobile and web SDK for SAP Engagement Cloud that manages push notifications, in-app messaging, embedded messaging, contact identification, event tracking, and deep link handling across Android, Kotlin Multiplatform (KMP), iOS, and Web.
+
+The SDK requires a two-phase setup: automatic initialization on app start, then an explicit `enable(config)` call after user consent. All four platforms share a consistent `EngagementCloud.*` namespace. An application code and External Contact Field ID must be provisioned by SAP before integration.
+
+## Sections
+
+- [Home / Quick Start](https://emartech.github.io/engagement-cloud-sdk/docs/): 7-step quick start checklist, feature matrix by platform, code examples for all 4 platforms.
+
+- [Architecture Overview](https://emartech.github.io/engagement-cloud-sdk/docs/concepts/architecture): SDK layers (Public API → Domain Modules → Networking → Platform Adapters), event flow (validate → store → dispatch → retry), lifecycle states, "When to Call What" table.
+
+- [Lifecycle and Consent](https://emartech.github.io/engagement-cloud-sdk/docs/concepts/lifecycle): Three consent strategies (enable-early / link-first / delay-both), state transitions, in-app pause/resume, re-enable after disable, error handling.
+
+- [Data Security and Privacy](https://emartech.github.io/engagement-cloud-sdk/docs/concepts/security): Automatically and manually tracked data; database retention; push-service identifier table; HTTPS, consent, data deletion, security checklist.
+
+- [Release Versioning](https://emartech.github.io/engagement-cloud-sdk/docs/concepts/release-versioning): Semantic versioning, upgrade actions, compatibility (Kotlin 2.2.0, Android API 28+, iOS 13+), deprecation policy, smoke test checklist, Maven/SPM/NPM.
+
+- [Android vs. Kotlin Multiplatform Differences](https://emartech.github.io/engagement-cloud-sdk/docs/concepts/android-vs-kmp): `com.sap.ec.android` vs `com.sap.ec` — packages, config objects, deep link signatures, notification settings types, when to use each.
+
+- [Using Compose in Non-Compose Android Apps](https://emartech.github.io/engagement-cloud-sdk/docs/concepts/android-non-compose): Embedding SDK Compose views (Embedded Messaging, Inline In-App) in XML-layout apps via `ComposeView`; Fragment example.
+
+- [iOS Privacy Manifest](https://emartech.github.io/engagement-cloud-sdk/docs/concepts/ios-privacy-manifest): Privacy Manifest categories (Other Usage Data, Device ID, User ID); automatic SDK inclusion; App Store impact.
+
+- [Joining the Pilot Program](https://emartech.github.io/engagement-cloud-sdk/docs/integration/onboarding): Onboarding for existing apps (migrating from Emarsys) and new apps — what to provide SAP, dashboard setup, prerequisite before installing.
+
+- [Installing Dependencies](https://emartech.github.io/engagement-cloud-sdk/docs/integration/dependencies): Coordinates for Android, KMP, FCM/HMS, iOS SPM, Web NPM (`@sap/engagement-cloud-sdk`); manifest permissions; ProGuard/R8 notes.
+
+- [Initializing the SDK](https://emartech.github.io/engagement-cloud-sdk/docs/integration/initialization): Android/KMP auto-init, iOS three options (`EngagementCloudSDKAppDelegate` / subclass / manual), Web script loader and NPM import; idempotency table.
+
+- [Initial Configuration](https://emartech.github.io/engagement-cloud-sdk/docs/integration/configuration): Config objects for Android, KMP, iOS, and Web; required vs optional fields; `enable()` validation; app code change sequence.
+
+- [Enabling Tracking](https://emartech.github.io/engagement-cloud-sdk/docs/integration/tracking): `enable()` with `onContactLinkingFailed`; `disable()`, `isEnabled()`, `setOnContactLinkingFailedCallback()`; `LinkContactData` fields; post-enable behavior.
+
+- [Configuring at Runtime](https://emartech.github.io/engagement-cloud-sdk/docs/config/sdkConfiguration): Getters/setters for app code, language, client ID, SDK version, and notification settings; `SdkState` enum; per-platform notification settings; BCP-47.
+
+- [Linking Contacts](https://emartech.github.io/engagement-cloud-sdk/docs/contact): `link(contactFieldValue)`, `linkAuthenticated(openIdToken)`, `unlink()` for all platforms; identity strategy; unlinking effects; token rotation.
+
+- [OpenID Authentication](https://emartech.github.io/engagement-cloud-sdk/docs/contact/openIdToken): When to use `linkAuthenticated` vs `link`; mutual exclusivity; token rotation; post-enable sequence.
+
+- [Sending Events](https://emartech.github.io/engagement-cloud-sdk/docs/eventTracking): `event.track()` for all platforms; `CustomEvent` (name + attributes Map) and `NavigateEvent` (location string); campaign trigger matching; error handling.
+
+- [Receiving SDK Events](https://emartech.github.io/engagement-cloud-sdk/docs/events): `EngagementCloud.events` — Kotlin flow, iOS AsyncStream + `registerEventListener`, Web `on/once/off`; `AppEvent` and `BadgeCountEvent`; memory leak note.
+
+- [Deep Link Requirements](https://emartech.github.io/engagement-cloud-sdk/docs/deeplink): iOS `apple-app-site-association` and Android App Links JSON setup, domain association, host/schema security, testing checklist.
+
+- [Tracking Deep Links](https://emartech.github.io/engagement-cloud-sdk/docs/deeplink/engagementCloudDeeplink): `deepLink.track()` — Android + `onNewIntent`, KMP URL string, iOS `continueUserActivity`, Web `ems_dl`; what is NOT deep linking; duplicate prevention.
+
+- [Push Integration](https://emartech.github.io/engagement-cloud-sdk/docs/push): FCM/HMS/APNs/Web VAPID setup, iOS `EngagementCloudSDKAppDelegate` and NotificationService extension, Web service worker; push lifecycle and campaign types.
+
+- [Push API](https://emartech.github.io/engagement-cloud-sdk/docs/push/api): `registerToken(token)`, `getToken()`, `clearToken()` for Android/KMP/iOS; iOS deviceToken hex conversion; token lifecycle; best practices.
+
+- [Web Push API](https://emartech.github.io/engagement-cloud-sdk/docs/push/webPushApi): Web-only — `subscribe()`, `unsubscribe()`, `isSubscribed()`, `getPermissionState()` ("Granted"/"Denied"/"Prompt").
+
+- [Using Multiple Push Providers](https://emartech.github.io/engagement-cloud-sdk/docs/push/providers): Android `registerMessagingService()` for FCM/HMS; iOS notification center delegate API; multi-provider setup.
+
+- [Notification Channels (Android)](https://emartech.github.io/engagement-cloud-sdk/docs/push/notificationChannels): API 26+ channel setup in dashboard and app code; channel ID matching; debug behavior for mismatches; recommendations.
+
+- [Push Content Limits](https://emartech.github.io/engagement-cloud-sdk/docs/push/pushLimitations): Text length limits per platform (collapsed/expanded/lockscreen); image dimensions (800–1038px, ~16:9, HTTPS); Web 4KB payload; Chrome/macOS click issue.
+
+- [Overlay In-App Messaging](https://emartech.github.io/engagement-cloud-sdk/docs/inapp): `inApp.pause()`, `inApp.resume()`, `inApp.isPaused` (Android/KMP/iOS); display lifecycle (Eligible → Queued → Displayed → Dismissed); when to pause.
+
+- [Inline In-App Messaging](https://emartech.github.io/engagement-cloud-sdk/docs/inapp/inlineInApp): `InlineInAppView` Composable (Android/KMP) and `InlineInAppViewController` (iOS) with viewId; `onLoaded`/`onClose`; SwiftUI wrapper; ignores pause.
+
+- [Embedded Messaging Overview](https://emartech.github.io/engagement-cloud-sdk/docs/embeddedMessaging/overview): Inbox-like message list; rich content, categories, read/unread, deletion, pagination; full/compact/programmatic API; Compose Multiplatform note.
+
+- [Displaying the Embedded Message List](https://emartech.github.io/engagement-cloud-sdk/docs/embeddedMessaging/displaying-message-list): `EmbeddedMessagingView` and `EmbeddedMessagingCompactView` composables/view controllers per platform with examples.
+
+- [Embedded Messaging API](https://emartech.github.io/engagement-cloud-sdk/docs/embeddedMessaging/api): Programmatic API for categories, filters, pagination, and state management with method signatures.
+
+- [Custom Message Item](https://emartech.github.io/engagement-cloud-sdk/docs/embeddedMessaging/custom-message-item): Provide a custom composable/view for individual message list items to override default rendering.
+
+- [Embedded Messaging Localization](https://emartech.github.io/engagement-cloud-sdk/docs/embeddedMessaging/localization): Override SDK string resources; language determination per platform; English fallback; category translation.
+
+- [Migration Guide Overview](https://emartech.github.io/engagement-cloud-sdk/docs/migrationGuide/overview): Architectural changes from Emarsys SDK (init, contact, push, events, errors); migration steps; `enable()` timing.
+
+- [Migration Steps](https://emartech.github.io/engagement-cloud-sdk/docs/migrationGuide/migration): Step-by-step migration instructions per platform from SAP Emarsys SDK.
+
+- [API Mapping](https://emartech.github.io/engagement-cloud-sdk/docs/migrationGuide/api-mapping): Old vs new API method names for Android, KMP, iOS, and Web — setup, contact, push, events, config, and deep link.
+
+- [Known Limitations](https://emartech.github.io/engagement-cloud-sdk/docs/migrationGuide/known-limitations): Not yet available — Geofencing, Web Extend events (cart, purchase, item view, search), Product recommendations; workarounds included.
+
+- [FAQ](https://emartech.github.io/engagement-cloud-sdk/docs/concepts/faq): 16 Q&A covering tracking start, app code changes, push status, event persistence, double enable, consent revocation, in-app on Web, attribute limits, OpenID rotation, and batching.
+
+- [Troubleshooting](https://emartech.github.io/engagement-cloud-sdk/docs/concepts/troubleshooting): Causes and fixes for activation, contact linking, push, in-app, deep links, embedded messaging, language, OpenID rotation, and event naming; support ticket info.
+
+## Optional
+
+- [GitHub Repository](https://github.com/emartech/engagement-cloud-sdk): SDK source code, Swift Package Manager URL for iOS dependency installation.
+- [SAP Engagement Cloud Dashboard](https://help.sap.com/docs/SAP_EMARSYS): Apps and Channel Configurations for provisioning application codes, External Contact Field IDs, and push channel credentials.
