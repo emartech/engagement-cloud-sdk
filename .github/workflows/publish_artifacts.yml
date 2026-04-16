@@ -527,15 +527,14 @@ jobs:
         run: |
           VERSION="${{ needs.derive-version.outputs.version }}"
           if [ ! -f CHANGELOG.md ]; then
-            echo "No CHANGELOG.md found, will use auto-generated notes"
-            echo "found=false" >> "$GITHUB_OUTPUT"
-            exit 0
+            echo "::error::CHANGELOG.md not found. Changelog must be present and reviewed before release."
+            exit 1
           fi
 
           NOTES=$(sed -n "/^## \[$VERSION\]/,/^## \[/{/^## \[/!p;}" CHANGELOG.md | sed '/^$/N;/^\n$/d')
           if [ -z "$NOTES" ]; then
-            echo "No changelog entry for $VERSION, will use auto-generated notes"
-            echo "found=false" >> "$GITHUB_OUTPUT"
+            echo "::error::No changelog entry found for version $VERSION in CHANGELOG.md. Please add release notes before publishing."
+            exit 1
           else
             echo "$NOTES" > /tmp/release-notes.md
             echo "found=true" >> "$GITHUB_OUTPUT"
@@ -581,13 +580,8 @@ jobs:
             done
           else
             echo "Creating new release $VERSION"
-            # Build gh release create command
-            ARGS=(gh release create "$VERSION" --title "Release $VERSION")
-            if [ "${{ steps.changelog.outputs.found }}" = "true" ]; then
-              ARGS+=(--notes-file /tmp/release-notes.md)
-            else
-              ARGS+=(--generate-notes)
-            fi
+            # Build gh release create command with changelog notes
+            ARGS=(gh release create "$VERSION" --title "Release $VERSION" --notes-file /tmp/release-notes.md)
 
             # Attach all release assets
             for file in release-assets/*; do
