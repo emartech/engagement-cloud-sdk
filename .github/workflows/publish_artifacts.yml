@@ -259,7 +259,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - uses: actions/setup-node@v6.3.0
+      - uses: actions/setup-node@v6.4.0
         with:
           node-version: '24'
           registry-url: 'https://registry.npmjs.org'
@@ -616,7 +616,7 @@ jobs:
           path: docs/engagement-cloud-sdk-docs
 
       - name: Setup Node.js for Docusaurus
-        uses: actions/setup-node@v6.3.0
+        uses: actions/setup-node@v6.4.0
         with:
           node-version: '24'
 
@@ -637,7 +637,7 @@ jobs:
           destination_dir: docs
 
       - name: Setup Node.js for Docusaurus
-        uses: actions/setup-node@v6.3.0
+        uses: actions/setup-node@v6.4.0
         with:
           node-version: '24'
 
