@@ -25,7 +25,6 @@ import com.sap.ec.mobileengage.embeddedmessaging.ui.list.placeholders.Placeholde
 import com.sap.ec.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingStyleSheet
 import com.sap.ec.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
 import com.sap.ec.mobileengage.embeddedmessaging.ui.translation.LocalStringResources
-import com.sap.ec.mobileengage.inapp.view.removeInlineInApp
 import kotlinx.browser.window
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.web.css.Position
@@ -107,12 +106,6 @@ internal fun MessageList(
 
     val noConnectionRefreshErrorWithEmptyList by remember { derivedStateOf { !hasConnection && lazyPagingMessageItems.itemCount == 0 && lazyPagingMessageItems.hasRefreshError() } }
     val noConnectionRefreshErrorWithMessages by remember { derivedStateOf { !hasConnection && lazyPagingMessageItems.itemCount > 0 && lazyPagingMessageItems.hasRefreshError() } }
-
-    var messageDetailInAppDismissId: String? = remember { null }
-
-    LaunchedEffect(messageDetailInAppDismissId) {
-        messageDetailInAppDismissId?.let { removeInlineInApp(it) }
-    }
 
     RefreshOnConnectionRestored(
         noConnectionRefreshErrorWithMessages = noConnectionRefreshErrorWithMessages,
@@ -205,8 +198,7 @@ internal fun MessageList(
                     if (currentMessage != null && currentMessage.hasRichContent()) {
                         MessageDetailView(
                             viewModel = currentMessage,
-                            onClose = { viewModel.clearMessageSelection() },
-                            onLoaded = { messageDetailInAppDismissId = it }
+                            onClose = { viewModel.clearMessageSelection() }
                         )
                     } else {
                         EmptyDetailState()
@@ -222,7 +214,6 @@ internal fun MessageList(
                     MessageDetailView(
                         viewModel = currentMessage,
                         onClose = { viewModel.clearMessageSelection() },
-                        onLoaded = { messageDetailInAppDismissId = it }
                     )
                 } else {
                     Div({ classes(EmbeddedMessagingStyleSheet.compactListView) }) {

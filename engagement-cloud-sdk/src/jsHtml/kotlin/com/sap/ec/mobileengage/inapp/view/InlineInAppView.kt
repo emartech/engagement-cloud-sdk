@@ -32,37 +32,7 @@ internal actual fun InlineInAppView(
     onClose: () -> Unit,
     onLoaded: ((String) -> Unit)?
 ) {
-    val webViewElement = remember { mutableStateOf<HTMLElement?>(null) }
     val iframeHolder = remember { mutableStateOf<HTMLDivElement?>(null) }
-
-    LaunchedEffect(message) {
-        val inAppViewProvider: InAppViewProviderApi = koin.get()
-        val sdkEventDistributor: SdkEventDistributorApi = koin.get()
-
-        val inAppView = inAppViewProvider.provide()
-        val holder = inAppView.load(message)
-
-        val webElement = holder.asDynamic().webView as? HTMLElement
-        webViewElement.value = webElement
-
-        onLoaded?.invoke(message.dismissId)
-
-        launch {
-            sdkEventDistributor.sdkEventFlow.first { sdkEvent ->
-                sdkEvent is SdkEvent.Internal.Sdk.Dismiss && sdkEvent.id == message.dismissId
-            }
-            webViewElement.value = null
-            onClose()
-        }
-    }
-
-    DisposableEffect(message) {
-        onDispose {
-            iframeHolder.value?.childNodes?.asList()?.forEach {
-                iframeHolder.value?.removeChild(it)
-            }
-        }
-    }
 
     Div(attrs = {
         id(message.dismissId.toDismissId())
@@ -76,9 +46,36 @@ internal actual fun InlineInAppView(
         }
     })
 
-    iframeHolder.value?.let { holder ->
-        webViewElement.value?.let { webview ->
-            holder.appendChild(webview.unsafeCast<Node>())
+    LaunchedEffect(message) {
+        val inAppViewProvider: InAppViewProviderApi = koin.get()
+        val sdkEventDistributor: SdkEventDistributorApi = koin.get()
+
+        val inAppView = inAppViewProvider.provide()
+        val holder = inAppView.load(message)
+
+        val webViewElement = holder.asDynamic().webView as? HTMLElement
+
+        launch {
+            sdkEventDistributor.sdkEventFlow.first { sdkEvent ->
+                sdkEvent is SdkEvent.Internal.Sdk.Dismiss && sdkEvent.id == message.dismissId
+            }
+            onClose()
+        }
+
+        iframeHolder.value?.let { holder ->
+            webViewElement?.let { webview ->
+                holder.appendChild(webview.unsafeCast<Node>())
+            }
+        }
+
+        onLoaded?.invoke(message.dismissId)
+    }
+
+    DisposableEffect(message) {
+        onDispose {
+            iframeHolder.value?.childNodes?.asList()?.forEach {
+                iframeHolder.value?.removeChild(it)
+            }
         }
     }
 }
@@ -126,7 +123,9 @@ internal fun InlineInAppView(
         InlineInAppView(
             message = it,
             onClose = { onClose?.invoke() },
-            onLoaded = { onLoaded?.invoke() }
+            onLoaded = {
+                onLoaded?.invoke()
+            }
         )
     }
 }
