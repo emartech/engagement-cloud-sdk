@@ -22,6 +22,35 @@ You can access our official documentation here: [SAP Engagement Cloud SDK - Wiki
 - [Swift Package Manager Documentation](https://swift.org/package-manager/)
 - [NPM Documentation](https://www.npmjs.com/)
 
+## Static Analysis (detekt)
+
+The project uses [detekt](https://detekt.dev/) 2.0.0-alpha.3 for Kotlin static analysis. Configuration lives in `config/detekt/detekt.yml` (every rule set explicitly) and existing findings are absorbed into `config/detekt/baseline.xml`. CI fails on any new violation outside the baseline.
+
+**Run locally:**
+
+```bash
+./gradlew detekt                       # all per-source-set tasks across every module
+./gradlew :engagement-cloud-sdk:detekt # single module
+```
+
+`./gradlew detekt` covers `commonMain`, `androidMain`, `jsMain`, `iosMain` (on macOS), and the Compose source set. It does **not** include the Android type-resolution tasks (`detektMain`, `detektMainAndroid`, …) — those need `google-services.json` and run in CI. To run them locally, materialize `google-services.json` first (e.g. via `make build-android`) and then:
+
+```bash
+./gradlew :engagement-cloud-sdk:detektMainAndroid :androidApp:detektMain
+```
+
+iOS-specific detekt tasks (`detektIosMainSourceSet`, `detektIosArm64MainSourceSet`, …) only register on macOS hosts; CI runs them via the macOS-based reviewer pass (see `SPEC.md` AC-7b), not on the Linux CI runner.
+
+**Reports:** every module writes `build/reports/detekt/<sourceSet>.{html,sarif,xml,md}`. Open the `.html` files for human-readable findings; CI uploads SARIF to GitHub code-scanning so PR annotations appear in the "Files changed" tab. The Linux CI run uploads the aggregated HTML reports as a `detekt-html-reports` artifact for offline triage.
+
+**Baseline policy:** never edit `config/detekt/baseline.xml` by hand. To regenerate it after a sweeping fix or a detekt bump:
+
+```bash
+./gradlew detektProjectBaseline
+```
+
+This walks every Kotlin source file in the repo and rewrites the single baseline. See `CONTRIBUTING.md` for the full workflow when a new finding lands on your PR.
+
 ## Support, Feedback, Contributing
 
 This project is open to feature requests/suggestions, bug reports etc. via [Zendesk](https://emarsys.zendesk.com). Contribution and feedback are encouraged and always welcome. For more information about how to contribute, the project structure, as well as additional contribution information, see our [Contribution Guidelines](https://github.com/SAP/.github/blob/main/CONTRIBUTING.md).
