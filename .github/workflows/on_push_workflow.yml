@@ -216,6 +216,92 @@ jobs:
         env:
           VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
 
+  detekt:
+    name: Detekt static analysis
+    needs: [derive-version, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write   # required by github/codeql-action/upload-sarif
+    steps:
+      - uses: actions/checkout@v6.0.3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          java-version: 17
+          distribution: 'temurin'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6.1.0
+
+      # Detekt's Android type-resolution tasks (`detektMain`, `detektMainAndroid`,
+      # `detektHostTestAndroid`, `detektDeviceTestAndroid`) transitively depend on
+      # the full Android compilation graph, which requires google-services.json.
+      # See SPEC §10 D-3. This step mirrors `nightly_workflow.yml` so any
+      # maintenance there propagates here.
+      - name: Materialize google-services.json from secret
+        uses: davidSchuppa/base64Secret-toFile-action@v3
+        with:
+          destination-path: androidApp/
+          filename: google-services.json
+          secret: ${{ env.GOOGLE_SERVICES_JSON_BASE64 }}
+
+      # `./gradlew detekt` covers all per-source-set tasks across every module.
+      # The explicit Android type-resolution tasks tacked on the end add
+      # `LibraryEntitiesShouldNotBePublic` and other TR-only rules (SPEC US-4).
+      # Run with --configuration-cache per SPEC §9 to catch regressions early.
+      # Fail-fast: no `continue-on-error`, no `ignoreFailures`. The committed
+      # baseline absorbs existing findings; any NEW finding fails the build.
+      - name: Run detekt
+        run: |
+          ./gradlew detekt \
+            :engagement-cloud-sdk:detektMainAndroid \
+            :engagement-cloud-sdk:detektHostTestAndroid \
+            :engagement-cloud-sdk-android-fcm:detektMain \
+            :engagement-cloud-sdk-android-hms:detektMain \
+            :androidApp:detektMain \
+            --configuration-cache
+        env:
+          VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
+
+      # Aggregate every module's SARIF into one upload directory. The codeql
+      # action walks the directory for *.sarif files. AC-9.
+      - name: Aggregate SARIF reports
+        if: always()
+        run: |
+          mkdir -p build/detekt-sarif
+          find . -path '*/build/reports/detekt/*.sarif' -print0 \
+            | while IFS= read -r -d '' f; do
+                # Prefix with module path so collisions are impossible
+                rel="${f#./}"
+                safe="${rel//\//__}"
+                cp "$f" "build/detekt-sarif/$safe"
+              done
+          echo "Aggregated SARIF files:"
+          ls -la build/detekt-sarif/ || true
+
+      - name: Upload SARIF to code-scanning
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4.36.2
+        with:
+          sarif_file: build/detekt-sarif
+          category: detekt
+
+      # HTML reports are kept as a workflow artifact so reviewers can drill
+      # into findings without re-running detekt locally.
+      - name: Upload detekt HTML reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: detekt-html-reports
+          path: '**/build/reports/detekt/*.html'
+          if-no-files-found: warn
+          retention-days: 14
+
   publish-android:
     name: Publish KMP Snapshot
     if: github.ref == 'refs/heads/main'
@@ -446,7 +532,7 @@ jobs:
 
   reporting:
     if: always()
-    needs: [ derive-version, build, test, lint, publish-android, publish-js, publish-ios-snapshot ]
+    needs: [ derive-version, build, test, lint, detekt, publish-android, publish-js, publish-ios-snapshot ]
     runs-on: ubuntu-latest
     steps:
       - name: Compute pipeline summary
