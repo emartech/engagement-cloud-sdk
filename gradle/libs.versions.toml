@@ -47,6 +47,8 @@ sqlDelight = "2.3.2"
 mavenPublish = "0.36.0"
 dotEnv = "4.0.0"
 uiBackhandler = "1.10.3"
+detekt = "2.0.0-alpha.3"
+composeRules = "0.6.0"
 
 [libraries]
 compose-html-core = { module = "org.jetbrains.compose.html:html-core", version.ref = "compose-plugin" }
@@ -117,6 +119,10 @@ cryptography-provider-jdk = { module = "dev.whyoleg.cryptography:cryptography-pr
 cryptography-provider-apple = { module = "dev.whyoleg.cryptography:cryptography-provider-openssl3-prebuilt" }
 cryptography-provider-webcrypto = { module = "dev.whyoleg.cryptography:cryptography-provider-webcrypto" }
 google-play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "google-play-services-location" }
+detekt-rules-libraries = { module = "dev.detekt:detekt-rules-libraries", version.ref = "detekt" }
+detekt-rules-ktlint-wrapper = { module = "dev.detekt:detekt-rules-ktlint-wrapper", version.ref = "detekt" }
+detekt-rules-ruleauthors = { module = "dev.detekt:detekt-rules-ruleauthors", version.ref = "detekt" }
+detekt-rules-compose = { module = "io.nlopez.compose.rules:detekt", version.ref = "composeRules" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -139,3 +145,4 @@ skie = { id = "co.touchlab.skie", version.ref = "skie" }
 sqlDelight = { id = "app.cash.sqldelight", version.ref = "sqlDelight" }
 mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
 dotenv = { id = "co.uzzu.dotenv.gradle", version.ref = "dotEnv" }
+detekt = { id = "dev.detekt", version.ref = "detekt" }
