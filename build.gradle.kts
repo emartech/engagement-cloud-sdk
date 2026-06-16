@@ -123,42 +123,65 @@ subprojects {
         // We use `tasks.withType` lazily — it returns a TaskCollection that
         // configures dependencies without realizing tasks at configuration time.
         //
-        // EXCLUSION: detekt 2.0's Android type-resolution tasks
+        // EXCLUSION 1 (Android type resolution): detekt 2.0's Android TR tasks
         //   (`detektMain`, `detektDebug`, `detektRelease`, `detektTest`,
         //    `detektMainAndroid`, `detektHostTestAndroid`, `detektDeviceTestAndroid`)
-        // transitively depend on the full Android compilation graph, which requires
-        // `google-services.json` to be materialized at build time. This is fine in
-        // CI (the `detekt` workflow job materializes it from the
-        // GOOGLE_SERVICES_JSON_BASE64 secret, mirroring the existing nightly job)
-        // but breaks `./gradlew detekt` for local devs without the secret.
-        //
-        // We aggregate ONLY the per-source-set tasks (`detekt*SourceSet`) into the
-        // local `detekt` task. CI runs `./gradlew detekt detektMainAndroid
+        // transitively depend on the full Android compilation graph, which
+        // requires `google-services.json` to be materialized at build time.
+        // This is fine in CI (the `detekt` workflow job materializes it from the
+        // GOOGLE_SERVICES_JSON_BASE64 secret, mirroring the existing nightly
+        // job) but breaks `./gradlew detekt` for local devs without the secret.
+        // We aggregate ONLY the per-source-set tasks (`detekt*SourceSet`) into
+        // the local `detekt` task. CI runs `./gradlew detekt detektMainAndroid
         // detektHostTestAndroid` (and android variants on pure-android modules)
-        // explicitly, after the secret materialization step. SPEC US-4's marquee
-        // type-resolution rules (`LibraryEntitiesShouldNotBePublic`) thus run in CI.
+        // explicitly, after the secret materialization step. SPEC US-4's
+        // marquee type-resolution rules (`LibraryEntitiesShouldNotBePublic`)
+        // thus run in CI.
         //
-        // Coverage note: pure-Android modules (`androidApp`, `engagement-cloud-sdk-android-fcm`,
-        // `engagement-cloud-sdk-android-hms`) have no `*SourceSet` tasks — their
-        // detekt tasks are `detektMain`/`detektDebug`/`detektRelease`/`detektTest`,
-        // all type-resolution. The aggregate `:detekt` on those modules is therefore
-        // a clean no-op locally; CI invokes `detektMain` explicitly. KMP modules
-        // (`engagement-cloud-sdk`, `composeApp`, `ios-notification-service`,
-        // `web-push-service-worker`) DO have `*SourceSet` tasks that fold into the
-        // aggregate.
+        // EXCLUSION 2 (iOS on Linux, AC-7): the iOS source-set detekt tasks
+        // (`detektIosMainSourceSet`, `detektIosArm64MainSourceSet`, …)
+        // transitively depend on `compileKotlinIos*`, which fails on Linux
+        // because Compose Multiplatform iOS artifacts aren't resolvable from
+        // a Linux host (Konan / Compose iOS targets need macOS). The iOS
+        // targets themselves are registered unconditionally by the SDK's
+        // build.gradle.kts (the project relies on `isMac` only to gate the
+        // *binary framework* output, not the source-sets), so detekt sees
+        // them on Linux too. We strip iOS source-set tasks from the
+        // aggregate on non-Mac hosts; iOS coverage is provided by the
+        // reviewer's macOS pass (SPEC AC-7b) and any future macOS CI job.
         //
-        // Bump-detection: if a future detekt bump renames per-source-set tasks
-        // (drops the `SourceSet` suffix), `:detekt` on KMP modules silently
-        // regresses to NO-SOURCE. Defense: T6's iOS verification + the regular
-        // `./gradlew :engagement-cloud-sdk:detekt --dry-run` check during PR
-        // review catch the regression. We do NOT add a runtime assertion here
-        // because pure-Android modules legitimately match zero tasks, and
-        // distinguishing "expected zero" from "unexpected zero" requires gating
-        // on AGP plugin presence which adds more surface than the assertion saves.
+        // Coverage note: pure-Android modules (`androidApp`,
+        // `engagement-cloud-sdk-android-fcm`, `engagement-cloud-sdk-android-hms`)
+        // have no `*SourceSet` tasks — their detekt tasks are
+        // `detektMain`/`detektDebug`/`detektRelease`/`detektTest`, all type-
+        // resolution. The aggregate `:detekt` on those modules is therefore
+        // a clean no-op locally; CI invokes `detektMain` explicitly. KMP
+        // modules (`engagement-cloud-sdk`, `composeApp`,
+        // `ios-notification-service`, `web-push-service-worker`) DO have
+        // `*SourceSet` tasks that fold into the aggregate.
+        //
+        // Bump-detection: if a future detekt bump renames per-source-set
+        // tasks (drops the `SourceSet` suffix), `:detekt` on KMP modules
+        // silently regresses to NO-SOURCE. Defense: T6's iOS verification +
+        // the regular `./gradlew :engagement-cloud-sdk:detekt --dry-run`
+        // check during PR review catch the regression. We do NOT add a
+        // runtime assertion here because pure-Android modules legitimately
+        // match zero tasks, and distinguishing "expected zero" from
+        // "unexpected zero" requires gating on AGP plugin presence which
+        // adds more surface than the assertion saves.
+        val isMac = System.getProperty("os.name").contains("Mac", ignoreCase = true)
         tasks.named("detekt").configure {
             dependsOn(
                 tasks.withType<dev.detekt.gradle.Detekt>()
-                    .matching { it.name.endsWith("SourceSet") }
+                    .matching { task ->
+                        if (!task.name.endsWith("SourceSet")) return@matching false
+                        // On non-Mac hosts, skip iOS source-set tasks. Ios prefixes:
+                        // detektIosMainSourceSet, detektIosArm64MainSourceSet,
+                        // detektIosX64MainSourceSet, detektIosSimulatorArm64MainSourceSet
+                        // (and the matching *TestSourceSet variants).
+                        if (!isMac && task.name.contains("Ios")) return@matching false
+                        true
+                    }
             )
         }
     }

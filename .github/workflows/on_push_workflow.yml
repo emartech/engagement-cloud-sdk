@@ -268,27 +268,33 @@ jobs:
         env:
           VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
 
-      # Aggregate every module's SARIF into one upload directory. The codeql
-      # action walks the directory for *.sarif files. AC-9.
-      - name: Aggregate SARIF reports
+      # Aggregate every module's SARIF into one merged file. The codeql action
+      # rejects a directory containing multiple SARIF runs under one category
+      # (https://github.blog/changelog/2025-07-21-code-scanning-will-stop-combining-multiple-sarif-runs-uploaded-in-the-same-sarif-file/),
+      # so we merge per-module runs into the schema's `runs[]` array of a single
+      # file. AC-9.
+      - name: Merge SARIF reports
         if: always()
         run: |
           mkdir -p build/detekt-sarif
+          # Collect every per-module SARIF into one merged.sarif. Each input is a
+          # full SARIF document with a top-level `runs[]`; we concatenate them.
+          # `jq -s` slurps inputs into an array, then we project the runs.
           find . -path '*/build/reports/detekt/*.sarif' -print0 \
-            | while IFS= read -r -d '' f; do
-                # Prefix with module path so collisions are impossible
-                rel="${f#./}"
-                safe="${rel//\//__}"
-                cp "$f" "build/detekt-sarif/$safe"
-              done
-          echo "Aggregated SARIF files:"
-          ls -la build/detekt-sarif/ || true
+            | xargs -0 jq -s '{
+                "$schema": .[0]["$schema"],
+                version: .[0].version,
+                runs: ([.[].runs[]?])
+              }' > build/detekt-sarif/detekt.sarif
+          echo "Merged SARIF stats:"
+          jq '{ runs_count: (.runs | length), total_results: ([.runs[].results | length] | add) }' \
+            build/detekt-sarif/detekt.sarif
 
       - name: Upload SARIF to code-scanning
         if: always()
         uses: github/codeql-action/upload-sarif@v4.36.2
         with:
-          sarif_file: build/detekt-sarif
+          sarif_file: build/detekt-sarif/detekt.sarif
           category: detekt
 
       # HTML reports are kept as a workflow artifact so reviewers can drill
