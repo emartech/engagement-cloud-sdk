@@ -33,13 +33,9 @@ The project uses [detekt](https://detekt.dev/) 2.0.0-alpha.3 for Kotlin static a
 ./gradlew :engagement-cloud-sdk:detekt # single module
 ```
 
-`./gradlew detekt` covers `commonMain`, `androidMain`, `jsMain`, `iosMain` (on macOS), and the Compose source set. It does **not** include the Android type-resolution tasks (`detektMain`, `detektMainAndroid`, …) — those need `google-services.json` and run in CI. To run them locally, materialize `google-services.json` first (e.g. via `make build-android`) and then:
+`./gradlew detekt` covers `commonMain`, `androidMain`, `jsMain`, `iosMain` (on macOS), and the Compose source set. v1 ships without the type-resolution-only `detekt-rules-libraries` rule set (`LibraryEntitiesShouldNotBePublic`, `LibraryCodeMustSpecifyReturnType`) — see `SPEC.md` §10 D-3 for the deferral rationale and §12 for the v2 follow-up.
 
-```bash
-./gradlew :engagement-cloud-sdk:detektMainAndroid :androidApp:detektMain
-```
-
-iOS-specific detekt tasks (`detektIosMainSourceSet`, `detektIosArm64MainSourceSet`, …) only register on macOS hosts; CI runs them via the macOS-based reviewer pass (see `SPEC.md` AC-7b), not on the Linux CI runner.
+iOS-specific detekt tasks (`detektIosMainSourceSet`, `detektIosArm64MainSourceSet`, …) only register on macOS hosts; on Linux they are stripped from the aggregate so `./gradlew detekt` runs cleanly. CI verifies the macOS-only iOS coverage via the reviewer pass (see `SPEC.md` AC-7b), not on the Linux CI runner.
 
 **Reports:** every module writes `build/reports/detekt/<sourceSet>.{html,sarif,xml,md}`. Open the `.html` files for human-readable findings; CI uploads SARIF to GitHub code-scanning so PR annotations appear in the "Files changed" tab. The Linux CI run uploads the aggregated HTML reports as a `detekt-html-reports` artifact for offline triage.
 

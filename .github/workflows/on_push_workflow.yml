@@ -238,57 +238,52 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6.1.0
 
-      # Detekt's Android type-resolution tasks (`detektMain`, `detektMainAndroid`,
-      # `detektHostTestAndroid`, `detektDeviceTestAndroid`) transitively depend on
-      # the full Android compilation graph, which requires google-services.json.
-      # See SPEC §10 D-3. This step mirrors `nightly_workflow.yml` so any
-      # maintenance there propagates here.
-      - name: Materialize google-services.json from secret
-        uses: davidSchuppa/base64Secret-toFile-action@v3
-        with:
-          destination-path: androidApp/
-          filename: google-services.json
-          secret: ${{ env.GOOGLE_SERVICES_JSON_BASE64 }}
-
       # `./gradlew detekt` covers all per-source-set tasks across every module.
-      # The explicit Android type-resolution tasks tacked on the end add
-      # `LibraryEntitiesShouldNotBePublic` and other TR-only rules (SPEC US-4).
+      # The Android type-resolution tasks (`detektMain`, `detektMainAndroid`,
+      # `detektHostTestAndroid`, `detektDeviceTestAndroid`) and the type-
+      # resolution-only `detekt-rules-libraries` rule set are DEFERRED to v2:
+      # the noJdk baseline cannot absorb their findings, and detekt 2.0 writes
+      # per-task baselines that don't merge into our single baseline.xml.
+      # See SPEC §10 D-3 + §12 follow-up. Until that's redesigned, CI runs the
+      # AST-only path. The gate is real but narrower.
+      #
       # Run with --configuration-cache per SPEC §9 to catch regressions early.
       # Fail-fast: no `continue-on-error`, no `ignoreFailures`. The committed
       # baseline absorbs existing findings; any NEW finding fails the build.
       - name: Run detekt
-        run: |
-          ./gradlew detekt \
-            :engagement-cloud-sdk:detektMainAndroid \
-            :engagement-cloud-sdk:detektHostTestAndroid \
-            :engagement-cloud-sdk-android-fcm:detektMain \
-            :engagement-cloud-sdk-android-hms:detektMain \
-            :androidApp:detektMain \
-            --configuration-cache
+        run: ./gradlew detekt --configuration-cache
         env:
           VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
 
-      # Aggregate every module's SARIF into one merged file. The codeql action
-      # rejects a directory containing multiple SARIF runs under one category
+      # Merge every module's SARIF into ONE single-run SARIF. The codeql action
+      # rejects SARIF files containing multiple runs under the same category
       # (https://github.blog/changelog/2025-07-21-code-scanning-will-stop-combining-multiple-sarif-runs-uploaded-in-the-same-sarif-file/),
-      # so we merge per-module runs into the schema's `runs[]` array of a single
-      # file. AC-9.
+      # so we collapse all per-module results into one run with a shared tool
+      # definition (the rule list is identical across modules — same detekt
+      # config, same plugins). AC-9.
       - name: Merge SARIF reports
         if: always()
         run: |
           mkdir -p build/detekt-sarif
-          # Collect every per-module SARIF into one merged.sarif. Each input is a
-          # full SARIF document with a top-level `runs[]`; we concatenate them.
-          # `jq -s` slurps inputs into an array, then we project the runs.
+          # `jq -s` slurps all SARIFs into an array. Then we project ONE run with
+          # the tool definition from the first SARIF (rules are config-driven, so
+          # every module's SARIF declares the same rule set) and concatenate
+          # every module's results into a single results[] array.
           find . -path '*/build/reports/detekt/*.sarif' -print0 \
             | xargs -0 jq -s '{
                 "$schema": .[0]["$schema"],
                 version: .[0].version,
-                runs: ([.[].runs[]?])
+                runs: [{
+                  tool: .[0].runs[0].tool,
+                  results: ([.[].runs[]?.results // [] | .[]])
+                }]
               }' > build/detekt-sarif/detekt.sarif
           echo "Merged SARIF stats:"
-          jq '{ runs_count: (.runs | length), total_results: ([.runs[].results | length] | add) }' \
-            build/detekt-sarif/detekt.sarif
+          jq '{
+            runs_count: (.runs | length),
+            total_results: (.runs[0].results | length),
+            unique_rules: (.runs[0].tool.driver.rules | length)
+          }' build/detekt-sarif/detekt.sarif
 
       - name: Upload SARIF to code-scanning
         if: always()

@@ -128,15 +128,16 @@ subprojects {
         //    `detektMainAndroid`, `detektHostTestAndroid`, `detektDeviceTestAndroid`)
         // transitively depend on the full Android compilation graph, which
         // requires `google-services.json` to be materialized at build time.
-        // This is fine in CI (the `detekt` workflow job materializes it from the
-        // GOOGLE_SERVICES_JSON_BASE64 secret, mirroring the existing nightly
-        // job) but breaks `./gradlew detekt` for local devs without the secret.
-        // We aggregate ONLY the per-source-set tasks (`detekt*SourceSet`) into
-        // the local `detekt` task. CI runs `./gradlew detekt detektMainAndroid
-        // detektHostTestAndroid` (and android variants on pure-android modules)
-        // explicitly, after the secret materialization step. SPEC US-4's
-        // marquee type-resolution rules (`LibraryEntitiesShouldNotBePublic`)
-        // thus run in CI.
+        //
+        // In v1 this matters because we ship without the type-resolution-only
+        // `detekt-rules-libraries` rule set (deferred to v2 — see SPEC §10 D-3
+        // and §12 follow-up): the noJdk baseline can't absorb TR findings,
+        // and detekt 2.0's per-task baseline writing doesn't merge into our
+        // single baseline.xml. Until v2 redesigns the baseline task, the TR
+        // detekt tasks have nothing useful to add (the AST-only rules are
+        // covered by `*SourceSet` tasks already), so we exclude them from the
+        // aggregate. The TR variants stay registered by detekt — they're just
+        // not invoked from `:detekt`.
         //
         // EXCLUSION 2 (iOS on Linux, AC-7): the iOS source-set detekt tasks
         // (`detektIosMainSourceSet`, `detektIosArm64MainSourceSet`, …)

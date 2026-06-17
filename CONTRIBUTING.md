@@ -34,7 +34,9 @@ If you've applied a sweeping fix that resolves many baseline entries, or after a
 git add config/detekt/baseline.xml
 ```
 
-Inspect the diff before committing — a baseline that *grows* on a sweeping-fix commit indicates new violations were introduced; investigate before merging. Baseline regeneration runs without type resolution (`noJdk = true` in the task config) so it's host-portable; type-resolution-only findings (`LibraryEntitiesShouldNotBePublic` and similar) won't appear in the baseline and will surface as new findings the first time CI runs after a regen — that's intended (see `SPEC.md` D-3).
+Inspect the diff before committing — a baseline that *grows* on a sweeping-fix commit indicates new violations were introduced; investigate before merging.
+
+> **Note (v1 only):** the type-resolution-only `detekt-rules-libraries` rule set is deferred to v2 (`LibraryEntitiesShouldNotBePublic`, `LibraryCodeMustSpecifyReturnType`, etc.). They are disabled in `detekt.yml` because the noJdk baseline can't absorb their findings under the current single-baseline architecture. See `SPEC.md` §10 D-3 + §12 follow-up.
 
 ## Reporting issues
 
