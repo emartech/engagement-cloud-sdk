@@ -12,3 +12,9 @@ package com.sap.ec
     AnnotationTarget.TYPEALIAS
 )
 annotation class InternalSdkApi
+
+// DELIBERATE detekt violation for T5 negative test — DELETE before merge.
+@Suppress("unused")
+private fun magicNumberTest(): Int {
+    return 42 + 73 + 314 + 1729 + 6174  // MagicNumber rule should fire
+}
