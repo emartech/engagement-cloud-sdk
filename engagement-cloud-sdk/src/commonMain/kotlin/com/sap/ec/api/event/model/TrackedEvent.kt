@@ -6,7 +6,7 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
 @OptIn(ExperimentalSerializationApi::class)
-sealed interface TrackedEvent {
+internal interface TrackedEvent {
     @OptIn(ExperimentalTime::class)
     fun toSdkEvent(uuid: String, timestamp: Instant): SdkEvent
 }

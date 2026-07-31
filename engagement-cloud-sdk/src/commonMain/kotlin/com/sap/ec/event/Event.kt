@@ -28,15 +28,16 @@ import com.sap.ec.SdkConstants.SESSION_START_EVENT_NAME
 import com.sap.ec.SdkConstants.TRACK_DEEPLINK_NAME
 import com.sap.ec.SdkConstants.UNLINK_CONTACT_NAME
 import com.sap.ec.SdkConstants.WEBPUSH_CLICKED_EVENT_NAME
-import com.sap.ec.currentPlatform
 import com.sap.ec.core.db.events.EventsDaoApi
 import com.sap.ec.core.log.LogLevel
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.providers.TimestampProvider
 import com.sap.ec.core.providers.UUIDProvider
+import com.sap.ec.currentPlatform
 import com.sap.ec.mobileengage.embeddedmessaging.models.MessageTagUpdate
 import com.sap.ec.mobileengage.inapp.InAppMessage
 import com.sap.ec.networking.clients.event.model.DeviceEvent
+import com.sap.ec.webExtend.CartItem
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -156,6 +157,70 @@ sealed interface SdkEvent {
     }
 
     sealed interface External : SdkEvent {
+
+        sealed interface WebExtendEvent : External, OnlineSdkEvent {
+            override val type: String get() = "WebExtendEvent"
+
+            @Serializable
+            data class ItemView(
+                val itemId: String,
+                override val id: String = UUIDProvider().provide(),
+                override val timestamp: Instant = TimestampProvider().provide(),
+                override var nackCount: Int = 0
+            ) : WebExtendEvent
+
+            @Serializable
+            data class Cart(
+                val items: List<CartItem>,
+                override val id: String = UUIDProvider().provide(),
+                override val timestamp: Instant = TimestampProvider().provide(),
+                override var nackCount: Int = 0
+            ) : WebExtendEvent
+
+            @Serializable
+            data class Purchase(
+                val orderId: String,
+                val items: List<CartItem>,
+                override val id: String = UUIDProvider().provide(),
+                override val timestamp: Instant = TimestampProvider().provide(),
+                override var nackCount: Int = 0
+            ) : WebExtendEvent
+
+            @Serializable
+            data class CategoryView(
+                val categoryPath: String,
+                override val id: String = UUIDProvider().provide(),
+                override val timestamp: Instant = TimestampProvider().provide(),
+                override var nackCount: Int = 0
+            ) : WebExtendEvent
+
+            @Serializable
+            data class Search(
+                val searchTerm: String,
+                override val id: String = UUIDProvider().provide(),
+                override val timestamp: Instant = TimestampProvider().provide(),
+                override var nackCount: Int = 0
+            ) : WebExtendEvent
+
+            @Serializable
+            data class Tag(
+                val tag: String,
+                val attributes: Map<String, String>? = null,
+                override val id: String = UUIDProvider().provide(),
+                override val timestamp: Instant = TimestampProvider().provide(),
+                override var nackCount: Int = 0
+            ) : WebExtendEvent
+
+            @Serializable
+            data class RecommendationClick(
+                val productId: String,
+                val feature: String,
+                val cohort: String,
+                override val id: String = UUIDProvider().provide(),
+                override val timestamp: Instant = TimestampProvider().provide(),
+                override var nackCount: Int = 0
+            ) : WebExtendEvent
+        }
 
         @Serializable
         data class Custom(
