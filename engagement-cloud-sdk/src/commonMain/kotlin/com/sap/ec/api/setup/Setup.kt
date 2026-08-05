@@ -40,7 +40,7 @@ internal class Setup(
     override suspend fun disable(): Result<Unit> {
         return withContext(sdkContext.sdkDispatcher) {
             runCatchingWithoutCancellation {
-                disableOrganizer.disable()
+                disableOrganizer.disableWithValidation()
             }
         }
     }

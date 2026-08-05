@@ -96,7 +96,7 @@ class SetupTests {
     @Test
     fun disableTracking_shouldReturnFailure_ifDisableOrganizer_fails() = runTest {
         val testException = Exception("failed")
-        everySuspend { mockDisableOrganizer.disable() } throws testException
+        everySuspend { mockDisableOrganizer.disableWithValidation() } throws testException
 
         val result = setup.disable()
 
