@@ -24,6 +24,9 @@ import io.ktor.http.Url
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.time.ExperimentalTime
@@ -53,24 +56,41 @@ class DefaultClientExceptionHandlerTests {
     }
 
     @Test
-    fun testTransformException_shouldTransformException_forKnownError() = runTest {
-        val testException = FailedRequestException(Response(
-            UrlRequest(
-                Url("testUrl"),
-                HttpMethod.Get
-            ),
-            HttpStatusCode.NotFound, Headers.Empty,
-            bodyAsText = """
-                {"error":{"code":"1002","message":"invalid app-code","target":"/ABC-123","details":[{"code":"ERROR","message":"invalid app-code"}]}}
-            """.trimIndent()
-        ))
-        val expectedException = InvalidApplicationCodeException("Invalid application code")
-
-        val resultException = exceptionHandler.transformException(
-            throwable = testException
+    fun testTransformException_shouldTransformException_forKnownError() = forAll(
+        table(
+            headers("errorCode", "errorDetailsMessage"),
+            listOf(
+                row("1002", "invalid app-code"),
+                row("1000", "Target app not found"),
+            )
         )
+    ) { errorCode, errorDetailsMessage ->
+        runTest {
+            val testException = FailedRequestException(Response(
+                UrlRequest(Url("testUrl"), HttpMethod.Get),
+                HttpStatusCode.NotFound, Headers.Empty,
+                bodyAsText = buildJsonObject {
+                    put("error", buildJsonObject {
+                        put("code", errorCode)
+                        put("message", "invalid app-code")
+                        put("target", "/ABC-123")
+                        put("details", buildJsonArray {
+                            add(buildJsonObject {
+                                put("code", "ERROR")
+                                put("message", errorDetailsMessage)
+                            })
+                        })
+                    })
+                }.toString()
+            ))
+            val expectedException = InvalidApplicationCodeException("Invalid application code")
 
-        resultException shouldBe expectedException
+            val resultException = exceptionHandler.transformException(
+                throwable = testException
+            )
+
+            resultException shouldBe expectedException
+        }
     }
 
     @Test

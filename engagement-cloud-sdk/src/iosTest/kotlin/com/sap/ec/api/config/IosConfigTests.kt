@@ -7,6 +7,7 @@ import com.sap.ec.core.device.IosNotificationSetting
 import com.sap.ec.core.device.IosShowPreviewSetting
 import com.sap.ec.core.device.notification.IosNotificationSettings
 import com.sap.ec.core.device.notification.IosNotificationSettingsCollectorApi
+import com.sap.ec.core.exceptions.SdkException.InvalidApplicationCodeException
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -108,6 +109,19 @@ class IosConfigTests {
         verifySuspend { mockConfigApi.changeApplicationCode(testAppCode) }
         result shouldBe Unit
     }
+
+    @Test
+    fun changeApplicationCode_shouldCall_sameMethod_onConfigApi_andThrowInvalidApplicationCodeException() =
+        runTest {
+            val testAppCode = "ABCDE-00000"
+            val testException = InvalidApplicationCodeException("Change app code failed - Invalid app code")
+            everySuspend { mockConfigApi.changeApplicationCode(testAppCode) } returns Result.failure(testException)
+
+            val exception = shouldThrow<InvalidApplicationCodeException> { iosConfig.changeApplicationCode(testAppCode) }
+
+            verifySuspend { mockConfigApi.changeApplicationCode(testAppCode) }
+            exception shouldBe testException
+        }
 
     @Test
     fun changeApplicationCode_shouldCall_sameMethod_onConfigApi_andThrowException() =
