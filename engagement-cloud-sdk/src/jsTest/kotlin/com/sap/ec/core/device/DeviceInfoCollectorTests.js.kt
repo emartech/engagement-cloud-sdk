@@ -50,7 +50,8 @@ class DeviceInfoCollectorTests {
             osName = "Macintosh",
             osVersion = "OS X 11.0.5",
             browserName = BROWSER_NAME,
-            browserVersion = BROWSER_VERSION
+            browserVersion = BROWSER_VERSION,
+            deviceCategory = SdkConstants.DESKTOP_DEVICE_CATEGORY
         )
     }
 
@@ -119,6 +120,7 @@ class DeviceInfoCollectorTests {
             platformWrapperVersion = null,
             applicationVersion = APPLICATION_VERSION,
             deviceModel = navigator.userAgent,
+            deviceCategory = SdkConstants.DESKTOP_DEVICE_CATEGORY,
             osVersion = BROWSER_VERSION,
             sdkVersion = BuildConfig.VERSION_NAME,
             language = LANGUAGE,
@@ -150,6 +152,7 @@ class DeviceInfoCollectorTests {
             platformWrapperVersion = WRAPPER_VERSION,
             applicationVersion = APPLICATION_VERSION,
             deviceModel = navigator.userAgent,
+            deviceCategory = SdkConstants.DESKTOP_DEVICE_CATEGORY,
             osVersion = BROWSER_VERSION,
             sdkVersion = BuildConfig.VERSION_NAME,
             language = LANGUAGE,
@@ -173,6 +176,7 @@ class DeviceInfoCollectorTests {
             platformWrapperVersion = null,
             applicationVersion = APPLICATION_VERSION,
             deviceModel = navigator.userAgent,
+            deviceCategory = SdkConstants.DESKTOP_DEVICE_CATEGORY,
             osVersion = BROWSER_VERSION,
             sdkVersion = BuildConfig.VERSION_NAME,
             language = "hu-HU",
@@ -194,6 +198,7 @@ class DeviceInfoCollectorTests {
             platformWrapperVersion = null,
             applicationVersion = APPLICATION_VERSION,
             deviceModel = navigator.userAgent,
+            deviceCategory = SdkConstants.DESKTOP_DEVICE_CATEGORY,
             osVersion = BROWSER_VERSION,
             sdkVersion = BuildConfig.VERSION_NAME,
             isDebugMode = false,
@@ -231,7 +236,7 @@ class DeviceInfoCollectorTests {
         }
 
     @Test
-    fun getPlatformCategory_shouldReturn_webPlatformCategory() = {
+    fun getPlatformCategory_shouldReturn_webPlatformCategory() {
         deviceInfoCollector.getPlatformCategory() shouldBe PLATFORM_CATEGORY
     }
 

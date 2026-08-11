@@ -37,6 +37,9 @@ object SdkConstants {
     const val MOBILE_PLATFORM_CATEGORY = "mobile"
     const val WEB_PLATFORM_CATEGORY = "web"
 
+    const val MOBILE_DEVICE_CATEGORY = "mobile"
+    const val DESKTOP_DEVICE_CATEGORY = "desktop"
+
     const val UNKNOWN_WRAPPER_INFO = "unknown"
 
     const val LANGUAGE_STORAGE_KEY = "customerOverwroteLanguageCodeKey"

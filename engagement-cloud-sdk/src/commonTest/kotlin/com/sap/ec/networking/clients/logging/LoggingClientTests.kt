@@ -71,6 +71,7 @@ class LoggingClientTests {
             null,
             "1.0.0",
             "testDevice",
+            "mobile",
             "8.0.0",
             "4.0.0",
             true,
