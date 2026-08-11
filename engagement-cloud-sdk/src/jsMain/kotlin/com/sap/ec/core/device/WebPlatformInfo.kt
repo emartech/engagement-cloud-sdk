@@ -9,5 +9,6 @@ internal data class WebPlatformInfo(
     val osName: String,
     val osVersion: String,
     val browserName: String,
-    val browserVersion: String
+    val browserVersion: String,
+    val deviceCategory: String
 )

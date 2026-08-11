@@ -1,8 +1,14 @@
 package com.sap.ec.core.device
 
+import com.sap.ec.SdkConstants
 import com.sap.ec.core.device.constants.BrowserInfo
 import com.sap.ec.core.device.constants.OsInfo
+import io.kotest.data.forAll
+import io.kotest.data.headers
+import io.kotest.data.row
+import io.kotest.data.table
 import io.kotest.matchers.shouldBe
+import kotlinx.browser.window
 import kotlin.test.Test
 
 class WebPlatformInfoCollectorTests {
@@ -22,7 +28,8 @@ class WebPlatformInfoCollectorTests {
                 it.name,
                 "1.2.3",
                 "chrome",
-                "3.4.5"
+                "3.4.5",
+                SdkConstants.DESKTOP_DEVICE_CATEGORY
             )
 
             val result = webPlatformInfoCollector.collect()
@@ -43,7 +50,8 @@ class WebPlatformInfoCollectorTests {
                 OsInfo.Android.name,
                 "1.2.3",
                 it.name.lowercase(),
-                "5.6.7"
+                "5.6.7",
+                SdkConstants.DESKTOP_DEVICE_CATEGORY
             )
 
             val result = webPlatformInfoCollector.collect()
@@ -62,7 +70,8 @@ class WebPlatformInfoCollectorTests {
             OsInfo.IPhone.name,
             "6.5.4",
             "unknown",
-            "0"
+            "0",
+            SdkConstants.DESKTOP_DEVICE_CATEGORY
         )
 
         val result = webPlatformInfoCollector.collect()
@@ -80,11 +89,56 @@ class WebPlatformInfoCollectorTests {
             OsInfo.Unknown.name,
             "0",
             "chrome",
-            "9.8.7"
+            "9.8.7",
+            SdkConstants.DESKTOP_DEVICE_CATEGORY
         )
 
         val result = webPlatformInfoCollector.collect()
 
         result shouldBe expectation
+    }
+
+    @Test
+    fun collect_shouldReturn_correctDeviceCategory() {
+        forAll(
+            table(
+                headers("userAgent", "deviceCategory"),
+                listOf(
+                    // mobile
+                    row("Mozilla/5.0 (Linux; Android 10; Pixel 2) AppleWebKit/537.36 (KHTML, like Gecko) Edg/57.0.986.6", SdkConstants.MOBILE_DEVICE_CATEGORY),
+                    row("Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53", SdkConstants.MOBILE_DEVICE_CATEGORY),
+                    // desktop
+                    row("Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.17 Safari/537.36", SdkConstants.DESKTOP_DEVICE_CATEGORY),
+                    row("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15", SdkConstants.DESKTOP_DEVICE_CATEGORY),
+                )
+            )
+        ) { userAgent, deviceCategory ->
+            js("""
+                Object.defineProperty(window.navigator, 'userAgent', {
+                    value: userAgent,
+                    configurable: true,
+                    writable: true
+                });
+            """)
+            window.navigator.userAgent shouldBe userAgent
+
+            val webPlatformInfoCollector = WebPlatformInfoCollector("testNavigatorData")
+            val result = webPlatformInfoCollector.collect()
+            val expectation = WebPlatformInfo(
+                null,
+                false,
+                OsInfo.Unknown.name,
+                "0",
+                BrowserInfo.Unknown.name.lowercase(),
+                "0",
+                deviceCategory
+            )
+
+            result shouldBe expectation
+        }
+
+        js("""
+            delete window.navigator.userAgent;
+        """)
     }
 }

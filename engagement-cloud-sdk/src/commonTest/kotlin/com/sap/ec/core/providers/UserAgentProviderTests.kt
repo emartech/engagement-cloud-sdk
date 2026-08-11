@@ -24,6 +24,7 @@ class UserAgentProviderTests {
             null,
             "testAppVersion",
             "testDeviceModel",
+            SdkConstants.DESKTOP_DEVICE_CATEGORY,
             "testOsVersion",
             "testSdkVersion",
             "testLanguageCode",
