@@ -5,6 +5,7 @@ object SdkConstants {
     const val WEBPUSH_CLICKED_EVENT_NAME = "webpush:click"
     const val BUTTON_CLICK_ORIGIN = "button"
     const val IN_APP_BUTTON_CLICKED_EVENT_NAME = "inapp:click"
+    const val WEB_BUTTON_CLICKED_EVENT_NAME = "web:click"
 
     const val EMBEDDED_MESSAGING_BUTTON_CLICKED_EVENT_NAME = "em:click"
     const val SILENT_PUSH_RECEIVED_EVENT_NAME = "push:silentPushReceived"
@@ -17,6 +18,7 @@ object SdkConstants {
     const val UNLINK_CONTACT_NAME = "unlinkContact"
     const val TRACK_DEEPLINK_NAME = "trackDeepLink"
     const val INAPP_VIEWED_EVENT_NAME = "inapp:viewed"
+    const val WEB_VIEWED_EVENT_NAME = "web:viewed"
     const val ON_EVENT_ACTION_REPORTING_EVENT_NAME = "on_event:action"
     const val ON_EVENT_ACTION_ORIGIN = "onEventAction"
     const val DISMISS_EVENT_NAME = "dismiss"
