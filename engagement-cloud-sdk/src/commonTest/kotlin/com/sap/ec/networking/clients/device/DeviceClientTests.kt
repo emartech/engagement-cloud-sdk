@@ -3,8 +3,8 @@ package com.sap.ec.networking.clients.device
 import com.sap.ec.core.channel.SdkEventManagerApi
 import com.sap.ec.core.db.events.EventsDaoApi
 import com.sap.ec.core.device.DeviceInfoCollectorApi
-import com.sap.ec.core.device.DeviceInfoUpdater
-import com.sap.ec.core.device.DeviceInfoUpdaterApi
+import com.sap.ec.core.device.DeviceInfoStorage
+import com.sap.ec.core.device.DeviceInfoStorageApi
 import com.sap.ec.core.exceptions.SdkException.NetworkIOException
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.clients.NetworkClientApi
@@ -72,7 +72,7 @@ class DeviceClientTests {
     private lateinit var mockEventsDao: EventsDaoApi
     private lateinit var mockClientExceptionHandler: ClientExceptionHandler
     private lateinit var mockSdkLogger: Logger
-    private lateinit var deviceInfoUpdater: DeviceInfoUpdaterApi
+    private lateinit var deviceInfoStorage: DeviceInfoStorageApi
     private lateinit var fakeStringStorage: FakeStringStorage
     private lateinit var onlineEvents: MutableSharedFlow<OnlineSdkEvent>
 
@@ -95,7 +95,7 @@ class DeviceClientTests {
             STORED_DEVICE_INFO_STRING
         )
 
-        deviceInfoUpdater = DeviceInfoUpdater(fakeStringStorage)
+        deviceInfoStorage = DeviceInfoStorage(fakeStringStorage)
 
         onlineEvents = MutableSharedFlow(replay = 5)
         mockSdkEventManager = mock(MockMode.autofill)
@@ -117,7 +117,7 @@ class DeviceClientTests {
             mockClientExceptionHandler,
             mockUrlFactory,
             mockDeviceInfoCollector,
-            deviceInfoUpdater,
+            deviceInfoStorage,
             mockContactTokenHandler,
             mockSdkEventManager,
             mockEventsDao,

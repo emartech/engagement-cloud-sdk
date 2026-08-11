@@ -6,6 +6,7 @@ import com.sap.ec.core.state.StateMachine
 import com.sap.ec.core.state.StateMachineApi
 import com.sap.ec.disable.DisableOrganizer
 import com.sap.ec.disable.DisableOrganizerApi
+import com.sap.ec.disable.states.ClearDeviceInfoState
 import com.sap.ec.disable.states.ClearEventsState
 import com.sap.ec.disable.states.ClearPushTokenOnDisableState
 import com.sap.ec.disable.states.ClearStoredConfigState
@@ -78,6 +79,11 @@ internal object SetupInjection {
             ClearRequestContextTokensState(
                 requestContext = get(),
                 sdkLogger = get { parametersOf(ClearRequestContextTokensState::class.simpleName) }
+            )
+        }
+        single<State>(named(StateTypes.ClearDeviceInfo)) {
+            ClearDeviceInfoState(
+                deviceInfoUpdater = get()
             )
         }
         single<State>(named(StateTypes.ClearPushTokenOnDisable)) {
@@ -162,6 +168,7 @@ internal object SetupInjection {
                     get<State>(named(StateTypes.ClearPushTokenOnDisable)),
                     get<State>(named(StateTypes.ClearEvents)),
                     get<State>(named(StateTypes.ClearStoredConfig)),
+                    get<State>(named(StateTypes.ClearDeviceInfo))
                 ),
                 name = StateMachineTypes.MobileEngageDisable.name,
                 logger = get { parametersOf(StateMachineTypes.MobileEngageDisable.name) }
@@ -218,6 +225,7 @@ internal enum class StateTypes {
     UnlinkContact,
     ClearStoredConfig,
     ClearEvents,
+    ClearDeviceInfo,
     FetchEmbeddedMessagingMetaState,
     FetchJsBridge,
 }

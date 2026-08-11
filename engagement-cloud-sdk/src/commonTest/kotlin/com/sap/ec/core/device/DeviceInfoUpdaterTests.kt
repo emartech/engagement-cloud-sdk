@@ -18,19 +18,26 @@ class DeviceInfoUpdaterTests {
     }
 
     private lateinit var mockStringStorage: StringStorageApi
-    private lateinit var deviceInfoUpdater: DeviceInfoUpdaterApi
+    private lateinit var deviceInfoStorage: DeviceInfoStorageApi
 
     @BeforeTest
     fun setup() {
         mockStringStorage = mock(MockMode.autofill)
-        deviceInfoUpdater = DeviceInfoUpdater(mockStringStorage)
+        deviceInfoStorage = DeviceInfoStorage(mockStringStorage)
     }
 
     @Test
     fun storeDeviceInfo_shouldStoreTheInputString() {
-        deviceInfoUpdater.storeDeviceInfo(TEST_DEVICE_INFO)
+        deviceInfoStorage.store(TEST_DEVICE_INFO)
 
         verify { mockStringStorage.put(DEVICE_INFO_STORAGE_KEY, TEST_DEVICE_INFO) }
+    }
+
+    @Test
+    fun clearDeviceInfo_shouldSetDeviceInfo_toNull() {
+        deviceInfoStorage.clear()
+
+        verify { mockStringStorage.put(DEVICE_INFO_STORAGE_KEY, null) }
     }
 
     @Test
@@ -39,7 +46,7 @@ class DeviceInfoUpdaterTests {
             val storedDeviceInfo = "storedDeviceInfo"
             everySuspend { mockStringStorage.get(DEVICE_INFO_STORAGE_KEY) } returns storedDeviceInfo
 
-            val hasChanged = deviceInfoUpdater.hasDeviceInfoChanged(TEST_DEVICE_INFO)
+            val hasChanged = deviceInfoStorage.hasDeviceInfoChanged(TEST_DEVICE_INFO)
 
             verify { mockStringStorage.get(DEVICE_INFO_STORAGE_KEY) }
             hasChanged shouldBe true
@@ -50,7 +57,7 @@ class DeviceInfoUpdaterTests {
         runTest {
             everySuspend { mockStringStorage.get(DEVICE_INFO_STORAGE_KEY) } returns TEST_DEVICE_INFO
 
-            val hasChanged = deviceInfoUpdater.hasDeviceInfoChanged(TEST_DEVICE_INFO)
+            val hasChanged = deviceInfoStorage.hasDeviceInfoChanged(TEST_DEVICE_INFO)
 
             verify { mockStringStorage.get(DEVICE_INFO_STORAGE_KEY) }
             hasChanged shouldBe false

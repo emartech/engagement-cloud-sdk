@@ -19,6 +19,17 @@
 		2A918DE92C85E8FE00B1AF36 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A918DE82C85E8FE00B1AF36 /* NotificationService.swift */; };
 		2AC829672F8D1DE7007A9AE8 /* EngagementCloudSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 2AC829662F8D1DE7007A9AE8 /* EngagementCloudSDK */; };
 		2AC829692F8D1DE7007A9AE8 /* EngagementCloudSDKNotificationService in Frameworks */ = {isa = PBXBuildFile; productRef = 2AC829682F8D1DE7007A9AE8 /* EngagementCloudSDKNotificationService */; };
+		57042E35302B6D0100B10EA0 /* EngagementCloudSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 2A866EEE2F4C9B5900BB51B0 /* EngagementCloudSDK */; };
+		57042E36302B6D0100B10EA0 /* EngagementCloudSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 2A866EF32F4DCB6300BB51B0 /* EngagementCloudSDK */; };
+		57042E37302B6D0100B10EA0 /* EngagementCloudSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 2A866EFB2F4DFC8B00BB51B0 /* EngagementCloudSDK */; };
+		57042E38302B6D0100B10EA0 /* EngagementCloudSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 2A1005422F4F3FA700E746C4 /* EngagementCloudSDK */; };
+		57042E39302B6D0100B10EA0 /* EngagementCloudSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 2A10054C2F55B0B600E746C4 /* EngagementCloudSDK */; };
+		57042E3A302B6D0100B10EA0 /* EngagementCloudSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 2A10059D2F57290200E746C4 /* EngagementCloudSDK */; };
+		57042E3B302B6D0100B10EA0 /* EngagementCloudSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 5D13BC492F597AAA00736AF5 /* EngagementCloudSDK */; };
+		57042E3C302B6D0100B10EA0 /* EngagementCloudSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 2A9537362F61CD9E003411C8 /* EngagementCloudSDK */; };
+		57042E3D302B6D0100B10EA0 /* EngagementCloudSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 2A15355A2F6413B1009EE1DA /* EngagementCloudSDK */; };
+		57042E3E302B6D0100B10EA0 /* EngagementCloudSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 2A15356F2F647437009EE1DA /* EngagementCloudSDK */; };
+		57042E3F302B6D0100B10EA0 /* EngagementCloudSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 2A6B92AD2F8CE64400FFEA9E /* EngagementCloudSDK */; };
 		5D13BC422F597A6D00736AF5 /* NotificationService.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2A918DE62C85E8FE00B1AF36 /* NotificationService.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
 /* End PBXBuildFile section */
@@ -100,6 +111,17 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				57042E3F302B6D0100B10EA0 /* EngagementCloudSDK in Frameworks */,
+				57042E3E302B6D0100B10EA0 /* EngagementCloudSDK in Frameworks */,
+				57042E3D302B6D0100B10EA0 /* EngagementCloudSDK in Frameworks */,
+				57042E3C302B6D0100B10EA0 /* EngagementCloudSDK in Frameworks */,
+				57042E3B302B6D0100B10EA0 /* EngagementCloudSDK in Frameworks */,
+				57042E3A302B6D0100B10EA0 /* EngagementCloudSDK in Frameworks */,
+				57042E39302B6D0100B10EA0 /* EngagementCloudSDK in Frameworks */,
+				57042E38302B6D0100B10EA0 /* EngagementCloudSDK in Frameworks */,
+				57042E37302B6D0100B10EA0 /* EngagementCloudSDK in Frameworks */,
+				57042E36302B6D0100B10EA0 /* EngagementCloudSDK in Frameworks */,
+				57042E35302B6D0100B10EA0 /* EngagementCloudSDK in Frameworks */,
 				2AC829672F8D1DE7007A9AE8 /* EngagementCloudSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -568,7 +590,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
-				DEVELOPMENT_TEAM = "${TEAM_ID}";
+				DEVELOPMENT_TEAM = 4J5FXBB97U;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iosApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
@@ -595,7 +617,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
-				DEVELOPMENT_TEAM = "${TEAM_ID}";
+				DEVELOPMENT_TEAM = 4J5FXBB97U;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iosApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
