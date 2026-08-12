@@ -7,6 +7,12 @@ import kotlin.time.Instant
 
 data class CategoryViewEvent(val categoryPath: String) : TrackedEvent {
     @OptIn(ExperimentalTime::class)
-    override fun toSdkEvent(uuid: String, timestamp: Instant): SdkEvent =
-        SdkEvent.External.WebExtendEvent.CategoryView(categoryPath = categoryPath, id = uuid, timestamp = timestamp)
+    override fun toSdkEvent(uuid: String, timestamp: Instant): Result<SdkEvent> =
+        Result.success(
+            SdkEvent.External.WebExtendEvent.CategoryView(
+                categoryPath = categoryPath,
+                id = uuid,
+                timestamp = timestamp
+            )
+        )
 }

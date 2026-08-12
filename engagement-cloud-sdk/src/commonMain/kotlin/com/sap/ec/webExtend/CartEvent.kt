@@ -7,6 +7,12 @@ import kotlin.time.Instant
 
 data class CartEvent(val items: List<CartItem>) : TrackedEvent {
     @OptIn(ExperimentalTime::class)
-    override fun toSdkEvent(uuid: String, timestamp: Instant): SdkEvent =
-        SdkEvent.External.WebExtendEvent.Cart(items = items, id = uuid, timestamp = timestamp)
+    override fun toSdkEvent(uuid: String, timestamp: Instant): Result<SdkEvent> =
+        Result.success(
+            SdkEvent.External.WebExtendEvent.Cart(
+                items = items,
+                id = uuid,
+                timestamp = timestamp
+            )
+        )
 }

@@ -7,6 +7,13 @@ import kotlin.time.Instant
 
 data class TagEvent(val tag: String, val attributes: Map<String, String>? = null) : TrackedEvent {
     @OptIn(ExperimentalTime::class)
-    override fun toSdkEvent(uuid: String, timestamp: Instant): SdkEvent =
-        SdkEvent.External.WebExtendEvent.Tag(tag = tag, attributes = attributes, id = uuid, timestamp = timestamp)
+    override fun toSdkEvent(uuid: String, timestamp: Instant): Result<SdkEvent> =
+        Result.success(
+            SdkEvent.External.WebExtendEvent.Tag(
+                tag = tag,
+                attributes = attributes,
+                id = uuid,
+                timestamp = timestamp
+            )
+        )
 }

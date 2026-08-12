@@ -7,6 +7,14 @@ import kotlin.time.Instant
 
 data class RecommendationClickEvent(val productId: String) : TrackedEvent {
     @OptIn(ExperimentalTime::class)
-    override fun toSdkEvent(uuid: String, timestamp: Instant): SdkEvent =
-        SdkEvent.External.WebExtendEvent.RecommendationClick(productId = productId, feature = "", cohort = "", id = uuid, timestamp = timestamp)
+    override fun toSdkEvent(uuid: String, timestamp: Instant): Result<SdkEvent> =
+        Result.success(
+            SdkEvent.External.WebExtendEvent.RecommendationClick(
+                productId = productId,
+                feature = "",
+                cohort = "",
+                id = uuid,
+                timestamp = timestamp
+            )
+        )
 }
