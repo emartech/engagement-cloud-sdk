@@ -13,8 +13,8 @@ import com.sap.ec.core.channel.SdkEventEmitterApi
 import com.sap.ec.core.channel.SdkEventManagerApi
 import com.sap.ec.core.crypto.Crypto
 import com.sap.ec.core.crypto.CryptoApi
-import com.sap.ec.core.device.DeviceInfoUpdater
-import com.sap.ec.core.device.DeviceInfoUpdaterApi
+import com.sap.ec.core.device.DeviceInfoStorage
+import com.sap.ec.core.device.DeviceInfoStorageApi
 import com.sap.ec.core.log.ConsoleLogger
 import com.sap.ec.core.log.ConsoleLoggerApi
 import com.sap.ec.core.log.LogConfigHolder
@@ -116,7 +116,7 @@ internal object CoreInjection {
         }
         single<Json> { JsonUtil.json }
         single<StorageApi> { Storage(stringStorage = get(), json = get()) }
-        single<DeviceInfoUpdaterApi> { DeviceInfoUpdater(stringStorage = get()) }
+        single<DeviceInfoStorageApi> { DeviceInfoStorage(stringStorage = get()) }
         singleOf(::UserAgentProvider) { bind<UserAgentProviderApi>() }
         single<DefaultUrlsApi> {
             DefaultUrls(

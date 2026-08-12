@@ -24,7 +24,7 @@ import kotlinx.serialization.json.Json
 internal actual fun InlineInAppView(
     message: InAppMessage,
     onClose: () -> Unit,
-    onLoaded: (() -> Unit)?
+    onLoaded: ((String) -> Unit)?
 ) {
     val sdkContext: SdkContextApi? = koin.getOrNull()
     if (!SdkKoinIsolationContext.isInitialized()) {
@@ -43,7 +43,7 @@ internal actual fun InlineInAppView(
             val holder = inAppView.load(message)
             webViewHolder.value = holder
 
-            onLoaded?.invoke()
+            onLoaded?.invoke(message.dismissId)
 
             launch {
                 sdkEventDistributor.sdkEventFlow.first { sdkEvent ->
@@ -67,7 +67,7 @@ internal fun InlineInAppView(
     url: Url,
     trackingInfo: String,
     onClose: () -> Unit,
-    onLoaded: (() -> Unit)? = null
+    onLoaded: ((String) -> Unit)? = null
 ) {
     if (!SdkKoinIsolationContext.isInitialized()) {
         return
@@ -107,7 +107,7 @@ fun InlineInAppView(
         InlineInAppView(
             message = it,
             onClose = { onClose?.invoke() },
-            onLoaded = onLoaded
+            onLoaded = { onLoaded?.invoke() }
         )
     }
 }

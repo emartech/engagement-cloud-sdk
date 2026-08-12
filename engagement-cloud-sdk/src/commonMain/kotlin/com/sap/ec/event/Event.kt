@@ -443,8 +443,9 @@ sealed interface SdkEvent {
                 override val id: String = UUIDProvider().provide(),
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0,
-                val name: String = APPLY_GLOBAL_REMOTE_CONFIG_EVENT_NAME
-            ) : Sdk(), OnlineSdkEvent, SetupFlowEvent
+                val name: String = APPLY_GLOBAL_REMOTE_CONFIG_EVENT_NAME,
+                override val applicationCode: String? = null
+            ) : Sdk(), OperationalEvent, SetupFlowEvent
 
             @Serializable
             data class ChangeAppCode(

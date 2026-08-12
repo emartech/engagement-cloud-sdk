@@ -3,7 +3,7 @@ package com.sap.ec.networking.clients.device
 import com.sap.ec.core.channel.SdkEventManagerApi
 import com.sap.ec.core.db.events.EventsDaoApi
 import com.sap.ec.core.device.DeviceInfoCollectorApi
-import com.sap.ec.core.device.DeviceInfoUpdaterApi
+import com.sap.ec.core.device.DeviceInfoStorageApi
 import com.sap.ec.core.exceptions.SdkException.NetworkIOException
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.clients.NetworkClientApi
@@ -31,7 +31,7 @@ internal class DeviceClient(
     private val clientExceptionHandler: ClientExceptionHandler,
     private val urlFactory: UrlFactoryApi,
     private val deviceInfoCollector: DeviceInfoCollectorApi,
-    private val deviceInfoUpdater: DeviceInfoUpdaterApi,
+    private val deviceInfoStorage: DeviceInfoStorageApi,
     private val contactTokenHandler: ContactTokenHandlerApi,
     private val sdkEventManager: SdkEventManagerApi,
     private val eventsDao: EventsDaoApi,
@@ -52,7 +52,7 @@ internal class DeviceClient(
                 sdkLogger.debug("DeviceClient - consume ${sdkEvent::class.simpleName}")
                 try {
                     val deviceInfo = deviceInfoCollector.collect()
-                    if (deviceInfoUpdater.hasDeviceInfoChanged(deviceInfo)) {
+                    if (deviceInfoStorage.hasDeviceInfoChanged(deviceInfo)) {
                         val request = createRequest(deviceInfo)
                         val networkResponse = ecClient.send(request)
                         networkResponse.onSuccess { response ->
@@ -65,7 +65,7 @@ internal class DeviceClient(
                                     Result.success(Unit)
                                 )
                             )
-                            deviceInfoUpdater.storeDeviceInfo(deviceInfo)
+                            deviceInfoStorage.store(deviceInfo)
                             sdkEvent.ack(eventsDao, sdkLogger)
                         }
                         networkResponse.onFailure { exception ->
@@ -92,10 +92,11 @@ internal class DeviceClient(
         if (exception is NetworkIOException) {
             sdkEventManager.emitEvent(sdkEvent)
         } else {
+            val transformedException = clientExceptionHandler.transformException(exception)
             sdkEventManager.emitEvent(
                 SdkEvent.Internal.Sdk.Answer.Response(
                     originId = sdkEvent.id,
-                    Result.failure<Exception>(exception)
+                    Result.failure<Exception>(transformedException)
                 )
             )
         }

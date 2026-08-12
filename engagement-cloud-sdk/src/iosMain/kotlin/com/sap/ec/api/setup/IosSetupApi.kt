@@ -2,6 +2,7 @@ package com.sap.ec.api.setup
 
 import com.sap.ec.IosEngagementCloudSDKConfig
 import com.sap.ec.config.LinkContactData
+import com.sap.ec.core.exceptions.SdkException.InvalidApplicationCodeException
 import com.sap.ec.core.exceptions.SdkException.SdkAlreadyDisabledException
 import com.sap.ec.core.exceptions.SdkException.SdkAlreadyEnabledException
 import io.ktor.utils.io.CancellationException
@@ -29,7 +30,7 @@ interface IosSetupApi {
      * @returns a [Result] indicating the result of the operation,
      * containing SdkAlreadyEnabledException if tracking is already enabled.
      */
-    @Throws(SdkAlreadyEnabledException::class, CancellationException::class)
+    @Throws(SdkAlreadyEnabledException::class, InvalidApplicationCodeException::class, CancellationException::class)
     suspend fun enable(
         config: IosEngagementCloudSDKConfig,
         onContactLinkingFailed: OnContactLinkingFailed

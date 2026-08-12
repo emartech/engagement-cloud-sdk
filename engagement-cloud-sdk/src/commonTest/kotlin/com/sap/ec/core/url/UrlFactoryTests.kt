@@ -45,14 +45,6 @@ class UrlFactoryTests {
     }
 
     @Test
-    fun testCreate_changeMerchantId_should_return_url_with_appCode() = runTest {
-
-        val result = urlFactory.create(ECUrlType.ChangeMerchantId)
-
-        result shouldBe Url("https://me-client.gservice.emarsys.net/v4/apps/$APPLICATION_CODE/client/contact-token")
-    }
-
-    @Test
     fun testCreate_changeApplicationCode_should_return_url() = runTest {
 
         val result = urlFactory.create(ECUrlType.ChangeApplicationCode)

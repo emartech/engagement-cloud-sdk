@@ -54,6 +54,7 @@ class RemoteConfigResponseHandlerTests {
         mockDeviceInfoCollector = mock(MockMode.autofill)
         mockRandomProvider = mock(MockMode.autofill)
         mockEmbeddedMessagingContext = mock(MockMode.autofill)
+        every { mockRandomProvider.provide() } returns 0.5
 
         remoteConfigResponseHandler = RemoteConfigResponseHandler(
             mockDeviceInfoCollector,
@@ -61,7 +62,11 @@ class RemoteConfigResponseHandlerTests {
             mockSdkContext,
             mockRandomProvider,
             mockEmbeddedMessagingContext,
-            SdkLogger("TestLoggerName", mock(MockMode.autofill), logConfigHolder = mock(MockMode.autofill))
+            SdkLogger(
+                "TestLoggerName",
+                mock(MockMode.autofill),
+                logConfigHolder = mock(MockMode.autofill)
+            )
         )
     }
 
@@ -95,7 +100,6 @@ class RemoteConfigResponseHandlerTests {
             )
         )
         everySuspend { mockDeviceInfoCollector.getClientId() } returns clientId
-        every { mockRandomProvider.provide() } returns 0.1
         every { mockSdkContext.defaultUrls = capture(defaultUrlSlot) } returns Unit
 
 
@@ -130,9 +134,7 @@ class RemoteConfigResponseHandlerTests {
 
                 ),
             )
-            every { mockRandomProvider.provide() } returns 0.1
             every { mockSdkContext.defaultUrls = capture(defaultUrlSlot) } returns Unit
-
 
             remoteConfigResponseHandler.handle(configResponse)
 
@@ -161,7 +163,6 @@ class RemoteConfigResponseHandlerTests {
         )
         every { mockSdkContext.defaultUrls = capture(defaultUrlSlot) } returns Unit
         everySuspend { mockDeviceInfoCollector.getClientId() } returns clientId
-        every { mockRandomProvider.provide() } returns 0.1
 
         remoteConfigResponseHandler.handle(configResponse)
 
@@ -180,7 +181,6 @@ class RemoteConfigResponseHandlerTests {
                 tagUpdateFrequencyCapSeconds = frequencyCap
             )
         )
-        every { mockRandomProvider.provide() } returns 0.5
 
         remoteConfigResponseHandler.handle(configResponse)
 
@@ -197,7 +197,6 @@ class RemoteConfigResponseHandlerTests {
                 tagUpdateFrequencyCapSeconds = null
             )
         )
-        every { mockRandomProvider.provide() } returns 0.5
 
         remoteConfigResponseHandler.handle(configResponse)
 
@@ -213,7 +212,6 @@ class RemoteConfigResponseHandlerTests {
                 tagUpdateFrequencyCapSeconds = frequencyCap
             )
         )
-        every { mockRandomProvider.provide() } returns 0.5
 
         remoteConfigResponseHandler.handle(configResponse)
 
@@ -225,7 +223,6 @@ class RemoteConfigResponseHandlerTests {
         val configResponse = RemoteConfigResponse(
             embeddedMessagingConfig = null
         )
-        every { mockRandomProvider.provide() } returns 0.5
 
         remoteConfigResponseHandler.handle(configResponse)
 
@@ -257,7 +254,6 @@ class RemoteConfigResponseHandlerTests {
             )
         )
         everySuspend { mockDeviceInfoCollector.getClientId() } returns clientId
-        every { mockRandomProvider.provide() } returns 0.5
 
         remoteConfigResponseHandler.handle(configResponse)
 
@@ -288,12 +284,51 @@ class RemoteConfigResponseHandlerTests {
             )
         )
         everySuspend { mockDeviceInfoCollector.getClientId() } returns clientId
-        every { mockRandomProvider.provide() } returns 0.5
 
         remoteConfigResponseHandler.handle(configResponse)
 
         verify { mockEmbeddedMessagingContext.tagUpdateBatchSize = globalBatchSize }
         verify { mockEmbeddedMessagingContext.tagUpdateFrequencyCapSeconds = globalFrequencyCap }
         verify { mockEmbeddedMessagingContext.tagUpdateBatchSize = overrideBatchSize }
+    }
+
+    @Test
+    fun testHandle_shouldAssignSdkManagementApplicationCodeValidationRegex_toSdkContext() =
+        runTest {
+            val expectedRegex = "^CUSTOM-[A-Z0-9]+$"
+            val regexSlot = slot<Regex?>()
+            val configResponse = RemoteConfigResponse(
+                globalRemoteConfigApplicationCodeValidationRegex = expectedRegex
+            )
+            every {
+                mockSdkContext.globalRemoteConfigApplicationCodeValidationRegex = capture(regexSlot)
+            } returns Unit
+
+            remoteConfigResponseHandler.handle(configResponse)
+
+            regexSlot.get()!!.pattern shouldBe expectedRegex
+        }
+
+    @Test
+    fun testHandle_shouldDiscardInvalidRegex_andAssignNull() = runTest {
+        val invalidRegex = "[invalid("
+        val configResponse = RemoteConfigResponse(
+            globalRemoteConfigApplicationCodeValidationRegex = invalidRegex
+        )
+
+        remoteConfigResponseHandler.handle(configResponse)
+
+        verify { mockSdkContext.globalRemoteConfigApplicationCodeValidationRegex = null }
+    }
+
+    @Test
+    fun testHandle_shouldNotResetRegex_whenFieldIsAbsentFromResponse() = runTest {
+        val configResponse = RemoteConfigResponse()
+
+        remoteConfigResponseHandler.handle(configResponse)
+
+        verify(VerifyMode.exactly(0)) {
+            mockSdkContext.globalRemoteConfigApplicationCodeValidationRegex = any()
+        }
     }
 }

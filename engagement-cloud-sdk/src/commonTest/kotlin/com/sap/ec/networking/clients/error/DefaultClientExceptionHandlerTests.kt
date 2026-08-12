@@ -2,6 +2,7 @@ package com.sap.ec.networking.clients.error
 
 import com.sap.ec.core.db.events.EventsDaoApi
 import com.sap.ec.core.exceptions.SdkException.FailedRequestException
+import com.sap.ec.core.exceptions.SdkException.InvalidApplicationCodeException
 import com.sap.ec.core.exceptions.SdkException.MissingApplicationCodeException
 import com.sap.ec.core.exceptions.SdkException.RetryLimitReachedException
 import com.sap.ec.core.log.Logger
@@ -15,6 +16,7 @@ import io.kotest.data.forAll
 import io.kotest.data.headers
 import io.kotest.data.row
 import io.kotest.data.table
+import io.kotest.matchers.shouldBe
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -22,6 +24,9 @@ import io.ktor.http.Url
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.time.ExperimentalTime
@@ -48,6 +53,63 @@ class DefaultClientExceptionHandlerTests {
         mockSdkLogger = mock(MockMode.autofill)
 
         exceptionHandler = DefaultClientExceptionHandler(mockEventsDao, mockSdkLogger)
+    }
+
+    @Test
+    fun testTransformException_shouldTransformException_forKnownError() = forAll(
+        table(
+            headers("errorCode", "errorDetailsMessage"),
+            listOf(
+                row("1002", "invalid app-code"),
+                row("1000", "Target app not found"),
+            )
+        )
+    ) { errorCode, errorDetailsMessage ->
+        runTest {
+            val testException = FailedRequestException(Response(
+                UrlRequest(Url("testUrl"), HttpMethod.Get),
+                HttpStatusCode.NotFound, Headers.Empty,
+                bodyAsText = buildJsonObject {
+                    put("error", buildJsonObject {
+                        put("code", errorCode)
+                        put("message", "invalid app-code")
+                        put("target", "/ABC-123")
+                        put("details", buildJsonArray {
+                            add(buildJsonObject {
+                                put("code", "ERROR")
+                                put("message", errorDetailsMessage)
+                            })
+                        })
+                    })
+                }.toString()
+            ))
+            val expectedException = InvalidApplicationCodeException("Invalid application code")
+
+            val resultException = exceptionHandler.transformException(
+                throwable = testException
+            )
+
+            resultException shouldBe expectedException
+        }
+    }
+
+    @Test
+    fun testTransformException_shouldNotTransformException_forUnknownError() = forAll(
+        table(
+            headers("exception"),
+            listOf(
+                row(FailedRequestException(RESPONSE)),
+                row(Exception("Unknown error")),
+            )
+        )
+    ) { testException ->
+        runTest {
+            val resultException = exceptionHandler.transformException(
+                throwable = testException
+            )
+
+            resultException shouldBe testException
+        }
     }
 
     @Test

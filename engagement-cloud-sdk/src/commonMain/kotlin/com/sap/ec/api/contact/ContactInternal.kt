@@ -7,6 +7,7 @@ import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.collections.dequeue
 import com.sap.ec.core.log.Logger
+import com.sap.ec.core.networking.context.RequestContextApi
 import com.sap.ec.event.SdkEvent
 import kotlin.time.ExperimentalTime
 
@@ -15,7 +16,8 @@ internal class ContactInternal(
     private val contactContext: ContactContextApi,
     private val sdkLogger: Logger,
     private val sdkEventDistributor: SdkEventDistributorApi,
-    private val sdkContext: SdkContextApi
+    private val sdkContext: SdkContextApi,
+    private val requestContext: RequestContextApi
 ) : ContactInstance {
     override suspend fun link(contactFieldValue: String) {
         sdkLogger.debug("link")
@@ -37,7 +39,9 @@ internal class ContactInternal(
 
     override suspend fun unlink() {
         sdkLogger.debug("unlink")
-        sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.UnlinkContact(applicationCode = sdkContext.getSdkConfig()?.applicationCode))
+        if (requestContext.isContactLinked ?: false) {
+            sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.UnlinkContact(applicationCode = sdkContext.getSdkConfig()?.applicationCode))
+        }
     }
 
     override suspend fun activate() {

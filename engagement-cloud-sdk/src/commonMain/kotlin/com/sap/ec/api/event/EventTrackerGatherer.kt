@@ -15,14 +15,12 @@ internal class EventTrackerGatherer(
     private val sdkLogger: Logger
 ) : EventTrackerInstance {
     override suspend fun trackEvent(trackedEvent: TrackedEvent) {
-        context.calls.add(
-            TrackEvent(
-                trackedEvent.toSdkEvent(
-                    uuidProvider.provide(),
-                    timestampProvider.provide(),
-                )
-            )
-        )
+        val event = trackedEvent.toSdkEvent(
+            uuidProvider.provide(),
+            timestampProvider.provide(),
+        ).getOrThrow()
+
+        context.calls.add(TrackEvent(event))
         sdkLogger.debug("EventTrackerGatherer - trackEvent")
     }
 

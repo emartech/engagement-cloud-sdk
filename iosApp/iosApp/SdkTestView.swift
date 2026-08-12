@@ -5,9 +5,14 @@ struct SdkTestView: View {
     @State private var eventName = ""
     private let engagementCloud = EngagementCloud.shared
     @State private var showInlineInApp = false
+    @State private var sdkVersion: String = "Loading..."
 
     var body: some View {
         VStack {
+            Text("SDK Version: \(sdkVersion)")
+            
+            Spacer()
+            
             Button {
                 enableTracking()
             } label: {
@@ -54,6 +59,11 @@ struct SdkTestView: View {
                         self.showInlineInApp.toggle()
                     })
             }
+            
+            Spacer()
+        }
+        .task {
+            await loadSdkVersion()
         }
     }
 
@@ -95,6 +105,14 @@ struct SdkTestView: View {
     func trackEvent(eventName: String) {
         Task {
             try await engagementCloud.event.track(event: CustomEvent(name: eventName, attributes: nil))
+        }
+    }
+
+    func loadSdkVersion() async {
+        do {
+            sdkVersion = try await engagementCloud.config.getSdkVersion()
+        } catch {
+            sdkVersion = "Error: \(error.localizedDescription)"
         }
     }
 }

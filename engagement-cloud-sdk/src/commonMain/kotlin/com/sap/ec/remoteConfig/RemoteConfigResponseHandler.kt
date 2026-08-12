@@ -12,6 +12,8 @@ import com.sap.ec.core.log.LogLevel
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.providers.DoubleProvider
 import com.sap.ec.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 
 internal class RemoteConfigResponseHandler(
     private val deviceInfoCollector: DeviceInfoCollectorApi,
@@ -39,6 +41,19 @@ internal class RemoteConfigResponseHandler(
         applyLuckyLogger(config.luckyLogger)
         sdkLogger.debug("applyEmbeddedMessagingConfig")
         applyEmbeddedMessagingConfig(config.embeddedMessagingConfig)
+
+        config.globalRemoteConfigApplicationCodeValidationRegex?.let { regexString ->
+            sdkContext.globalRemoteConfigApplicationCodeValidationRegex = try {
+                regexString.toRegex()
+            } catch (exception: Throwable) {
+                currentCoroutineContext().ensureActive()
+                sdkLogger.error(
+                    "Invalid sdkManagementApplicationCodeValidationRegex: $regexString",
+                    exception
+                )
+                null
+            }
+        }
 
         config.overrides?.let {
             it[clientId]?.let { override ->

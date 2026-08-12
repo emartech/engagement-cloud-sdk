@@ -10,5 +10,6 @@ internal data class RemoteConfigResponse(
     val luckyLogger: LuckyLogger? = null,
     val features: RemoteConfigFeatures? = null,
     val embeddedMessagingConfig: EmbeddedMessagingConfig? = null,
-    val overrides: Map<String, RemoteConfig>? = null
+    val overrides: Map<String, RemoteConfig>? = null,
+    val globalRemoteConfigApplicationCodeValidationRegex: String? = null
 )

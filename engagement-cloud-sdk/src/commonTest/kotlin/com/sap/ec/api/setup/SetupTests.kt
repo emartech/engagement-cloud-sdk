@@ -96,7 +96,7 @@ class SetupTests {
     @Test
     fun disableTracking_shouldReturnFailure_ifDisableOrganizer_fails() = runTest {
         val testException = Exception("failed")
-        everySuspend { mockDisableOrganizer.disable() } throws testException
+        everySuspend { mockDisableOrganizer.disableWithValidation() } throws testException
 
         val result = setup.disable()
 
@@ -113,5 +113,86 @@ class SetupTests {
         val result = setup.isEnabled()
 
         result shouldBe true
+    }
+
+    @Test
+    fun enable_shouldUseRemoteConfigRegex_forValidation() = runTest {
+        val customRegex = "^CUSTOM\\.[A-Z0-9]+$".toRegex()
+        val testConfig = TestEngagementCloudSDKConfig("CUSTOM.ABC123")
+        every { mockSdkContext.globalRemoteConfigApplicationCodeValidationRegex } returns customRegex
+
+        val result = setup.enable(testConfig, mockOnContactLinkingFailedCallback)
+
+        result.isSuccess shouldBe true
+    }
+
+    @Test
+    fun enable_shouldRejectAppCode_notMatchingRemoteConfigRegex() = runTest {
+        val customRegex = "^CUSTOM\\.[A-Z0-9]+$".toRegex()
+        val testConfig = TestEngagementCloudSDKConfig("INVALID")
+        every { mockSdkContext.globalRemoteConfigApplicationCodeValidationRegex } returns customRegex
+
+        val result = setup.enable(testConfig, mockOnContactLinkingFailedCallback)
+
+        result.isFailure shouldBe true
+        (result.exceptionOrNull() is SdkException.InvalidApplicationCodeException) shouldBe true
+    }
+
+    @Test
+    fun enable_shouldStillAcceptStandardFormat_whenRemoteConfigRegexIsSet() = runTest {
+        val customRegex = "^CUSTOM\\.[A-Z0-9]+$".toRegex()
+        val testConfig = TestEngagementCloudSDKConfig("ABCDE-12345")
+        every { mockSdkContext.globalRemoteConfigApplicationCodeValidationRegex } returns customRegex
+
+        val result = setup.enable(testConfig, mockOnContactLinkingFailedCallback)
+
+        result.isSuccess shouldBe true
+    }
+
+    @Test
+    fun enable_shouldAcceptMultiRegionV1AppCode() = runTest {
+        val testConfig = TestEngagementCloudSDKConfig("INS-S01-APP-ABC12")
+
+        val result = setup.enable(testConfig, mockOnContactLinkingFailedCallback)
+
+        result.isSuccess shouldBe true
+    }
+
+    @Test
+    fun enable_shouldAcceptMultiRegionV2AppCode() = runTest {
+        val testConfig = TestEngagementCloudSDKConfig("S-AB123-0DB36")
+
+        val result = setup.enable(testConfig, mockOnContactLinkingFailedCallback)
+
+        result.isSuccess shouldBe true
+    }
+
+    @Test
+    fun enable_shouldAcceptMultiRegionV2AppCode_withPPrefix() = runTest {
+        val testConfig = TestEngagementCloudSDKConfig("P-CD456-1EF78")
+
+        val result = setup.enable(testConfig, mockOnContactLinkingFailedCallback)
+
+        result.isSuccess shouldBe true
+    }
+
+    @Test
+    fun enable_shouldRejectInvalidAppCode_withNoMatch() = runTest {
+        val testConfig = TestEngagementCloudSDKConfig("INVALID")
+
+        val result = setup.enable(testConfig, mockOnContactLinkingFailedCallback)
+
+        result.isFailure shouldBe true
+        (result.exceptionOrNull() is SdkException.InvalidApplicationCodeException) shouldBe true
+    }
+
+    @Test
+    fun enable_shouldRejectEmptyAppCode() = runTest {
+        val testConfig = TestEngagementCloudSDKConfig(" ")
+
+        val result = setup.enable(testConfig, mockOnContactLinkingFailedCallback)
+
+        result.isFailure shouldBe true
+        (result.exceptionOrNull() is SdkException.InvalidApplicationCodeException) shouldBe true
     }
 }

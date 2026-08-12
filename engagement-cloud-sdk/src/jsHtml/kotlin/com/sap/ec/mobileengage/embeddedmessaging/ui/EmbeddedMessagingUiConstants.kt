@@ -34,10 +34,11 @@ internal object EmbeddedMessagingUiConstants {
 
     val MAX_HEIGHT = 100.percent
     val MAX_WIDTH = 100.percent
-    val ONE_THIRD_WIDTH = 33.percent
+    val ONE_THIRD = 33.percent
+    val FIFTY_PERCENT = 50.percent
 
     val DIALOG_CARD_WIDTH = 500.px
-    val LIST_PANE_MIN_WIDTH = 400.px
+    val LIST_PANE_MIN_WIDTH = 200.px
     val LIST_VIEW_MAX_WIDTH = 600.px
 
     val ZERO_BORDER_WIDTH = 0.px

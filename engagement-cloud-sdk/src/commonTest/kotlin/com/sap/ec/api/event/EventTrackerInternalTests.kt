@@ -14,6 +14,7 @@ import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
+import io.kotest.assertions.throwables.shouldThrow
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
@@ -66,6 +67,7 @@ class EventTrackerInternalTests {
             Result.success(Any())
         )
         every { mockUuidProvider.provide() } returns UUID
+        everySuspend { mockTimestampProvider.provide() } returns timestamp
         logger = SdkLogger("TestLoggerName", mock(MockMode.autofill), logConfigHolder = mock())
 
         eventTrackerContext = EventTrackerContext(expectedEvents)
@@ -83,7 +85,6 @@ class EventTrackerInternalTests {
     @Test
     fun testTrackEvent_shouldMakeCall_onClient() = runTest {
         everySuspend { mockSdkEventDistributor.registerEvent(event) } returns mockWaiter
-        everySuspend { mockTimestampProvider.provide() } returns timestamp
 
         eventTrackerInternal.trackEvent(customEvent)
 
@@ -91,6 +92,13 @@ class EventTrackerInternalTests {
             mockTimestampProvider.provide()
             mockSdkEventDistributor.registerEvent(event)
         }
+    }
+
+    @Test
+    fun testTrackEvent_shouldThrowIllegalArgumentException_ifEventName_isBlank() = runTest {
+        val testEvent = CustomEvent("   ", mapOf("testAttribute" to "testValue"))
+
+        shouldThrow<IllegalArgumentException> { eventTrackerInternal.trackEvent(testEvent) }
     }
 
     @Test

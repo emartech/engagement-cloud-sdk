@@ -25,7 +25,7 @@ internal class ConfigInternal(
 
     override suspend fun changeApplicationCode(applicationCode: String) {
         val appCode = ApplicationCode(applicationCode.uppercase())
-        appCode.validate(sdkLogger)
+        appCode.validate(sdkLogger, sdkContext.globalRemoteConfigApplicationCodeValidationRegex)
         if (appCode.value == sdkContext.getSdkConfig()?.applicationCode) {
             sdkLogger.info("The new appcode is the same as the currently used.")
         } else {

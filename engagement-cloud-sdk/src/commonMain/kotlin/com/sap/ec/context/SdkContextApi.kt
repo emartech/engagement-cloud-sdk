@@ -13,6 +13,7 @@ internal interface SdkContextApi {
     var onContactLinkingFailed: (suspend () -> LinkContactData?)?
     var defaultUrls: DefaultUrlsApi
     val features: MutableSet<Features>
+    var globalRemoteConfigApplicationCodeValidationRegex: Regex?
 
     suspend fun isEnabledState(): Boolean
 

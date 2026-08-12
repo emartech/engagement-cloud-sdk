@@ -86,9 +86,11 @@ class SdkContextTests {
 
     @Test
     fun testSetSdkConfig_shouldClearStoreWhenConfigToSetIsNull() = runTest {
+        sdkContext.setSdkConfig(TEST_CONFIG)
         sdkContext.setSdkConfig(null)
 
         verifySuspend { mockSdkConfigStore.clear() }
+        sdkContext.getSdkConfig() shouldBe null
     }
 
     @Test
@@ -99,5 +101,10 @@ class SdkContextTests {
         result shouldBe TEST_CONFIG
         verifySuspend { mockSdkConfigStore.store(TEST_CONFIG) }
         verifySuspend(VerifyMode.exactly(0)) { mockSdkConfigStore.load() }
+    }
+
+    @Test
+    fun testSdkManagementApplicationCodeValidationRegex_shouldBeNullByDefault() {
+        sdkContext.globalRemoteConfigApplicationCodeValidationRegex shouldBe null
     }
 }

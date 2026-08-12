@@ -11,11 +11,13 @@ data class NavigateEvent(
     override fun toSdkEvent(
         uuid: String,
         timestamp: Instant
-    ): SdkEvent {
-        return SdkEvent.External.NavigateEvent(
-            id = uuid,
-            timestamp = timestamp,
-            location = location
+    ): Result<SdkEvent> {
+        return Result.success(
+            SdkEvent.External.NavigateEvent(
+                id = uuid,
+                timestamp = timestamp,
+                location = location
+            )
         )
     }
 }

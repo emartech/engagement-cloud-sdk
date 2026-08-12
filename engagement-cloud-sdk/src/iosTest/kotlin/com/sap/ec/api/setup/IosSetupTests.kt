@@ -1,6 +1,7 @@
 package com.sap.ec.api.setup
 
 import com.sap.ec.IosEngagementCloudSDKConfig
+import com.sap.ec.core.exceptions.SdkException.InvalidApplicationCodeException
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -34,7 +35,24 @@ class IosSetupTests {
     }
 
     @Test
-    fun enableTracking_shouldThrow_whenSetupApi_returnsFailure() = runTest {
+    fun enableTracking_shouldThrow_whenSetupApi_returnsFailureWithInvalidApplicationCodeException() = runTest {
+        val iosConfig = IosEngagementCloudSDKConfig("ABC-123")
+        val onContactLinkingFailed: OnContactLinkingFailed = { onSuccess, onError -> }
+        everySuspend { mockSetup.enable(iosConfig, any()) } returns Result.failure(
+            InvalidApplicationCodeException(
+                "Enable failed - Invalid app code"
+            )
+        )
+
+        shouldThrow<InvalidApplicationCodeException> {
+            iosSetup.enable(iosConfig, onContactLinkingFailed = onContactLinkingFailed)
+        }
+
+        verifySuspend { mockSetup.enable(iosConfig, any()) }
+    }
+
+    @Test
+    fun enableTracking_shouldThrow_whenSetupApi_returnsFailureWithAnyException() = runTest {
         val iosConfig = IosEngagementCloudSDKConfig("ABC-123")
         val onContactLinkingFailed: OnContactLinkingFailed = { onSuccess, onError -> }
         everySuspend { mockSetup.enable(iosConfig, any()) } returns Result.failure(

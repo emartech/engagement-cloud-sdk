@@ -8,6 +8,6 @@ import kotlin.time.Instant
 @OptIn(ExperimentalSerializationApi::class)
 interface TrackedEvent {
     @OptIn(ExperimentalTime::class)
-    fun toSdkEvent(uuid: String, timestamp: Instant): SdkEvent
+    fun toSdkEvent(uuid: String, timestamp: Instant): Result<SdkEvent>
 }
 

@@ -19,12 +19,12 @@ internal class EventTrackerInternal(
 ) : EventTrackerInstance {
 
     override suspend fun trackEvent(trackedEvent: TrackedEvent) {
-        sdkEventDistributor.registerEvent(
-            trackedEvent.toSdkEvent(
-                uuidProvider.provide(),
-                timestampProvider.provide()
-            )
-        ).await<Response>()
+        val event = trackedEvent.toSdkEvent(
+            uuidProvider.provide(),
+            timestampProvider.provide()
+        ).getOrThrow()
+
+        sdkEventDistributor.registerEvent(event).await<Response>()
         sdkLogger.debug("EventTrackerInternal - trackEvent")
     }
 

@@ -9,6 +9,7 @@ on:
     - cron: '44 9 * * 0'
 
 env:
+  VERSION_OVERRIDE: 0.0.0-CODEQL
   USE_LOCAL_DEPENDENCY: ${{ vars.USE_LOCAL_DEPENDENCY }}
   RELEASE_MODE: ${{ vars.RELEASE_MODE }}
   GOOGLE_SERVICES_API_KEY: ${{ secrets.GOOGLE_SERVICES_API_KEY }}
@@ -41,16 +42,16 @@ jobs:
       
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7.0.1
 
-    - uses: actions/setup-java@v4
+    - uses: actions/setup-java@v5.6.0
       with:
         distribution: temurin
         java-version: 17
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v4
+      uses: github/codeql-action/init@v4.37.3
       with:
         languages: ${{ matrix.language }}
         build-mode: ${{ matrix.build-mode }}
@@ -62,6 +63,6 @@ jobs:
           :engagement-cloud-sdk-android-hms:assembleRelease
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v4
+      uses: github/codeql-action/analyze@v4.37.3
       with:
         category: "/language:${{matrix.language}}"

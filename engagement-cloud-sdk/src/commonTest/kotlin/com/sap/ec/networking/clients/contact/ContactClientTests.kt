@@ -21,7 +21,6 @@ import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
-import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
@@ -86,7 +85,6 @@ class ContactClientTests {
         mockRequestContext = mock(MockMode.autofill)
         mockEcSdkSession = mock(MockMode.autofill)
         mockClientExceptionHandler = mock(MockMode.autofill)
-        every { mockRequestContext.refreshToken } returns "testRefreshToken"
         json = JsonUtil.json
         onlineEvents = MutableSharedFlow(replay = 5)
         mockSdkEventManager = mock()
@@ -110,6 +108,7 @@ class ContactClientTests {
             mockSdkEventManager,
             mockUrlFactory,
             mockContactTokenHandler,
+            mockRequestContext,
             mockEcSdkSession,
             mockEventsDao,
             json,
@@ -141,6 +140,7 @@ class ContactClientTests {
         verifySuspend { mockEcClient.send(any()) }
         verifySuspend { mockContactTokenHandler.handleContactTokens(any()) }
         verifySuspend { mockEcSdkSession.startSession() }
+        verifySuspend { mockRequestContext.isContactLinked = true }
         verifySuspend { mockEventsDao.removeEvent(linkContactEvent) }
         verifySuspend {
             mockSdkEventManager.emitEvent(
@@ -182,6 +182,7 @@ class ContactClientTests {
         verifySuspend { mockEcClient.send(any()) }
         verifySuspend(VerifyMode.exactly(0)) { mockContactTokenHandler.handleContactTokens(any()) }
         verifySuspend { mockEcSdkSession.startSession() }
+        verifySuspend { mockRequestContext.isContactLinked = true }
         verifySuspend { mockEventsDao.removeEvent(linkContactEvent) }
         verifySuspend {
             mockSdkEventManager.emitEvent(
@@ -213,6 +214,7 @@ class ContactClientTests {
         verifySuspend { mockEcClient.send(any()) }
         verifySuspend { mockContactTokenHandler.handleContactTokens(any()) }
         verifySuspend { mockEcSdkSession.startSession() }
+        verifySuspend { mockRequestContext.isContactLinked = true }
         verifySuspend { mockEventsDao.removeEvent(linkAuthenticatedContactEvent) }
         verifySuspend {
             mockSdkEventManager.emitEvent(
@@ -242,6 +244,7 @@ class ContactClientTests {
         verifySuspend { mockEcClient.send(any()) }
         verifySuspend { mockContactTokenHandler.handleContactTokens(any()) }
         verifySuspend { mockEcSdkSession.endSession() }
+        verifySuspend { mockRequestContext.isContactLinked = false }
         verifySuspend { mockEventsDao.removeEvent(unlinkContactEvent) }
         verifySuspend {
             mockSdkEventManager.emitEvent(

@@ -213,7 +213,7 @@ internal fun MessageList(
                 if (currentMessage != null && currentMessage.hasRichContent()) {
                     MessageDetailView(
                         viewModel = currentMessage,
-                        onClose = { viewModel.clearMessageSelection() }
+                        onClose = { viewModel.clearMessageSelection() },
                     )
                 } else {
                     Div({ classes(EmbeddedMessagingStyleSheet.compactListView) }) {

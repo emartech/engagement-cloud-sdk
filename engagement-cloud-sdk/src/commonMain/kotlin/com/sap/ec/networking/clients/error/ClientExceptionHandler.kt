@@ -4,6 +4,8 @@ import com.sap.ec.event.OnlineSdkEvent
 
 internal interface ClientExceptionHandler {
 
+    fun transformException(throwable: Throwable): Throwable
+
     suspend fun handleException(
         throwable: Throwable,
         errorMessage: String,

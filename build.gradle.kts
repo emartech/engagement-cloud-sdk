@@ -21,3 +21,9 @@ plugins {
     alias(libs.plugins.mavenPublish) apply false
     alias(libs.plugins.dotenv)
 }
+
+val sdkVersion = System.getenv("VERSION_OVERRIDE") ?: "4.0.0-LOCAL"
+
+allprojects {
+	extra["SDK_VERSION"] = sdkVersion
+}

@@ -93,7 +93,7 @@ jobs:
     outputs:
       version: ${{ steps.version.outputs.value }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7.0.1
 
       - name: Validate and extract version
         id: version
@@ -129,14 +129,14 @@ jobs:
       ANDROID_RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_RELEASE_STORE_PASSWORD }}
       ANDROID_RELEASE_STORE_FILE_BASE64: ${{ secrets.ANDROID_RELEASE_STORE_FILE_BASE64 }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7.0.1
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5.6.0
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
 
-      - uses: gradle/actions/setup-gradle@v6
+      - uses: gradle/actions/setup-gradle@v6.2.0
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -200,7 +200,7 @@ jobs:
             -PENABLE_PUBLISHING=true \
             -Psigning.keyId="${{ secrets.SONATYPE_SIGNING_KEY_ID }}" \
             -Psigning.password="${{ secrets.SONATYPE_SIGNING_PASSWORD }}" \
-            -Psigning.secretKeyRingFile=./secring.asc.gpg \
+            -Psigning.secretKeyRingFile=$GITHUB_WORKSPACE/engagement-cloud-sdk/secring.asc.gpg \
             --no-daemon
           echo "✓ All KMP artifacts signed and published to Maven Local"
         env:
@@ -227,7 +227,7 @@ jobs:
             -PmavenCentralPassword="${{ secrets.OSSRH_PASSWORD }}" \
             -Psigning.keyId="${{ secrets.SONATYPE_SIGNING_KEY_ID }}" \
             -Psigning.password="${{ secrets.SONATYPE_SIGNING_PASSWORD }}" \
-            -Psigning.secretKeyRingFile=./secring.asc.gpg \
+            -Psigning.secretKeyRingFile=$GITHUB_WORKSPACE/engagement-cloud-sdk/secring.asc.gpg \
             --no-daemon
           echo "✓ All KMP artifacts staged to Maven Central — promote via promote_maven_central.yml"
         env:
@@ -247,22 +247,21 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7.0.1
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5.6.0
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
 
-      - uses: gradle/actions/setup-gradle@v6
+      - uses: gradle/actions/setup-gradle@v6.2.0
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7.0.0
         with:
-          node-version: '22'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: '24'
       - run: npm ci
 
       - name: Install npm dependencies
@@ -293,15 +292,7 @@ jobs:
           VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
 
       - name: Assemble NPM package
-        run: |
-          VERSION="${{ needs.derive-version.outputs.version }}"
-          mkdir -p dist/npm
-          cp engagement-cloud-sdk/build/dist/js/productionExecutable/engagement-cloud-sdk-html.js dist/npm/
-          cp build/js/packages/engagement-cloud-sdk/kotlin/engagement-cloud-sdk-html.d.ts dist/npm/ 2>/dev/null || true
-          sed -e "s/\"version\": \"0.0.0\"/\"version\": \"$VERSION\"/" \
-              -e "s/@emartech\/engagement-cloud-sdk/@sap\/engagement-cloud-sdk/" \
-              -e "s|https://npm.pkg.github.com|https://registry.npmjs.org|" \
-            engagement-cloud-sdk/npm-package.json > dist/npm/package.json
+        run: make assemble-npm-package
 
       - name: Publish to NPM
         if: ${{ env.DRY_RUN != 'true' && (github.event_name == 'push' || inputs.publish_npm == true) }}
@@ -317,10 +308,6 @@ jobs:
             "dist/cdn/$VERSION/engagement-cloud-sdk.js"
           cp engagement-cloud-sdk/build/dist/js/productionExecutable/engagement-cloud-sdk-html.js.map \
             "dist/cdn/$VERSION/engagement-cloud-sdk.js.map" 2>/dev/null || true
-
-          # Copy TypeScript definitions
-          cp build/js/packages/engagement-cloud-sdk/kotlin/engagement-cloud-sdk-html.d.ts \
-            "dist/cdn/$VERSION/engagement-cloud-sdk.d.ts" 2>/dev/null || true
 
           # Copy loader script + sourcemap
           cp engagement-cloud-sdk/build/dist/js/productionExecutable/engagement-cloud-sdk-loader.js \
@@ -375,24 +362,24 @@ jobs:
     env:
       SPM_BUILD: release
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7.0.1
         with:
           fetch-tags: true
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5.6.0
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
 
       - name: Cache Konan directory
-        uses: actions/cache@v5
+        uses: actions/cache@v6.1.0
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan-${{ hashFiles('**/*.gradle.kts', '**/libs.versions.toml') }}
           restore-keys: |
             ${{ runner.os }}-konan-
 
-      - uses: gradle/actions/setup-gradle@v6
+      - uses: gradle/actions/setup-gradle@v6.2.0
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -413,6 +400,9 @@ jobs:
         env:
           PUBLISH: true
           VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
+
+      - name: Copy Privacy Manifest to EC framework
+        run: make add-privacy-manifest-to-frameworks
 
       - name: Zip XCFrameworks and compute checksums
         run: |
@@ -487,7 +477,7 @@ jobs:
     needs: [ derive-version, ios-pipeline ]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7.0.1
         with:
           fetch-tags: true
 
@@ -516,22 +506,21 @@ jobs:
     needs: [ derive-version, android-pipeline, js-pipeline, ios-pipeline, create-tag-fallback ]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7.0.1
 
       - name: Extract release notes from CHANGELOG
         id: changelog
         run: |
           VERSION="${{ needs.derive-version.outputs.version }}"
           if [ ! -f CHANGELOG.md ]; then
-            echo "No CHANGELOG.md found, will use auto-generated notes"
-            echo "found=false" >> "$GITHUB_OUTPUT"
-            exit 0
+            echo "::error::CHANGELOG.md not found. Changelog must be present and reviewed before release."
+            exit 1
           fi
 
           NOTES=$(sed -n "/^## \[$VERSION\]/,/^## \[/{/^## \[/!p;}" CHANGELOG.md | sed '/^$/N;/^\n$/d')
           if [ -z "$NOTES" ]; then
-            echo "No changelog entry for $VERSION, will use auto-generated notes"
-            echo "found=false" >> "$GITHUB_OUTPUT"
+            echo "::error::No changelog entry found for version $VERSION in CHANGELOG.md. Please add release notes before publishing."
+            exit 1
           else
             echo "$NOTES" > /tmp/release-notes.md
             echo "found=true" >> "$GITHUB_OUTPUT"
@@ -577,13 +566,8 @@ jobs:
             done
           else
             echo "Creating new release $VERSION"
-            # Build gh release create command
-            ARGS=(gh release create "$VERSION" --title "Release $VERSION")
-            if [ "${{ steps.changelog.outputs.found }}" = "true" ]; then
-              ARGS+=(--notes-file /tmp/release-notes.md)
-            else
-              ARGS+=(--generate-notes)
-            fi
+            # Build gh release create command with changelog notes
+            ARGS=(gh release create "$VERSION" --title "Release $VERSION" --notes-file /tmp/release-notes.md)
 
             # Attach all release assets
             for file in release-assets/*; do
@@ -608,19 +592,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout SDK repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7.0.1
 
       - name: Clone docs repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7.0.1
         with:
           repository: emartech/engagement-cloud-sdk-docs
           token: ${{ secrets.DOCS_READ_PAT }}
           path: docs/engagement-cloud-sdk-docs
 
       - name: Setup Node.js for Docusaurus
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7.0.0
         with:
-          node-version: '22'
+          node-version: '24'
 
       - name: Build Docusaurus docs
         working-directory: docs/engagement-cloud-sdk-docs
@@ -639,9 +623,9 @@ jobs:
           destination_dir: docs
 
       - name: Setup Node.js for Docusaurus
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7.0.0
         with:
-          node-version: '22'
+          node-version: '24'
 
       - name: Build Docusaurus docs
         # The docs repo uses @docusaurus/core ^3.9.2 (>= 3.1.0 required for

@@ -18,6 +18,7 @@ import com.sap.ec.remoteConfig.RemoteConfigResponse
 import com.sap.ec.remoteConfig.RemoteConfigResponseHandlerApi
 import com.sap.ec.util.JsonUtil
 import dev.mokkery.MockMode
+import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
 import dev.mokkery.every
@@ -41,9 +42,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -65,7 +68,9 @@ class RemoteConfigClientTests {
     private lateinit var mockEventsDao: EventsDaoApi
     private lateinit var mockClientExceptionHandler: ClientExceptionHandler
     private lateinit var mockSdkLogger: Logger
+    private lateinit var applicationScope: CoroutineScope
     private lateinit var onlineEvents: MutableSharedFlow<OnlineSdkEvent>
+    private lateinit var sdkEvents: MutableSharedFlow<SdkEvent>
 
     private companion object {
         const val CONFIG_RESULT = """{"logLevel":"ERROR"}"""
@@ -81,13 +86,20 @@ class RemoteConfigClientTests {
     @BeforeTest
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
+        applicationScope = TestScope()
         mockNetworkClient = mock(MockMode.autofill)
         mockUrlFactory = mock()
         mockCrypto = mock()
         mockSdkEventManager = mock()
         onlineEvents = spy(MutableSharedFlow(replay = 5))
+        sdkEvents = spy(MutableSharedFlow(replay = 5))
         every { mockSdkEventManager.onlineSdkEvents } returns onlineEvents
-        everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
+        every { mockSdkEventManager.sdkEventFlow } returns sdkEvents
+        everySuspend { mockSdkEventManager.emitEvent(any()) } calls {
+            it.args[0]?.let { event ->
+                sdkEvents.emit(event as SdkEvent)
+            }
+        }
         mockRemoteConfigResponseHandler = mock(MockMode.autoUnit)
         mockEventsDao = mock(MockMode.autoUnit)
         mockClientExceptionHandler = mock(MockMode.autoUnit)
@@ -143,13 +155,15 @@ class RemoteConfigClientTests {
 
         val appCodeBasedRemoteConfigEvent = SdkEvent.Internal.Sdk.ApplyAppCodeBasedRemoteConfig()
 
-        val onlineSdkEvents = backgroundScope.async {
-            onlineEvents.take(1).toList()
+        val responseEvents = backgroundScope.async {
+            sdkEvents.filterIsInstance(SdkEvent.Internal.Sdk.Answer.Response::class).take(1)
+                .toList()
         }
 
         onlineEvents.emit(appCodeBasedRemoteConfigEvent)
+        advanceUntilIdle()
 
-        onlineSdkEvents.await() shouldBe listOf(appCodeBasedRemoteConfigEvent)
+        responseEvents.await().size shouldBe 1
         verifySuspend { mockNetworkClient.send(configRequest) }
         verifySuspend { mockNetworkClient.send(configSignatureRequest) }
         verifySuspend { mockRemoteConfigResponseHandler.handle(RemoteConfigResponse(logLevel = LogLevel.Error)) }
@@ -185,13 +199,15 @@ class RemoteConfigClientTests {
 
         val globalRemoteConfig = SdkEvent.Internal.Sdk.ApplyGlobalRemoteConfig()
 
-        val onlineSdkEvents = backgroundScope.async {
-            onlineEvents.take(1).toList()
+        val responseEvents = backgroundScope.async {
+            sdkEvents.filterIsInstance(SdkEvent.Internal.Sdk.Answer.Response::class).take(1)
+                .toList()
         }
 
         onlineEvents.emit(globalRemoteConfig)
+        advanceUntilIdle()
 
-        onlineSdkEvents.await() shouldBe listOf(globalRemoteConfig)
+        responseEvents.await().size shouldBe 1
         verifySuspend { mockNetworkClient.send(configRequest) }
         verifySuspend { mockNetworkClient.send(configSignatureRequest) }
         verifySuspend { mockRemoteConfigResponseHandler.handle(RemoteConfigResponse(logLevel = LogLevel.Error)) }
@@ -229,17 +245,20 @@ class RemoteConfigClientTests {
             mockSdkEventManager.emitEvent(
                 capture(eventSlot)
             )
-        } returns Unit
+        } calls {
+            sdkEvents.emit(it.args[0] as SdkEvent)
+        }
 
         val appCodeBasedRemoteConfigEvent = SdkEvent.Internal.Sdk.ApplyAppCodeBasedRemoteConfig()
-
-        val onlineSdkEvents = backgroundScope.async {
-            onlineEvents.take(1).toList()
+        val responseEvents = backgroundScope.async {
+            sdkEvents.filterIsInstance(SdkEvent.Internal.Sdk.Answer.Response::class).take(1)
+                .toList()
         }
 
         onlineEvents.emit(appCodeBasedRemoteConfigEvent)
+        advanceUntilIdle()
 
-        onlineSdkEvents.await() shouldBe listOf(appCodeBasedRemoteConfigEvent)
+        responseEvents.await().size shouldBe 1
         verifySuspend(VerifyMode.exactly(0)) { mockRemoteConfigResponseHandler.handle(any()) }
         verifySuspend {
             appCodeBasedRemoteConfigEvent.ack(mockEventsDao, mockSdkLogger)
@@ -290,15 +309,18 @@ class RemoteConfigClientTests {
             val appCodeBasedRemoteConfigEvent =
                 SdkEvent.Internal.Sdk.ApplyAppCodeBasedRemoteConfig()
 
-            val onlineSdkEvents = backgroundScope.async {
-                onlineEvents.take(1).toList()
+            val responseEvents = backgroundScope.async {
+                sdkEvents.filterIsInstance(SdkEvent.Internal.Sdk.Answer.Response::class).take(1)
+                    .toList()
             }
 
             onlineEvents.emit(appCodeBasedRemoteConfigEvent)
+            advanceUntilIdle()
 
-            onlineSdkEvents.await() shouldBe listOf(appCodeBasedRemoteConfigEvent)
+            responseEvents.await().size shouldBe 1
+
             verifySuspend(VerifyMode.exactly(0)) { mockRemoteConfigResponseHandler.handle(any()) }
-            verifySuspend {
+            verifySuspend(VerifyMode.exactly(1)) {
                 mockClientExceptionHandler.handleException(
                     exception,
                     any(),
@@ -347,13 +369,15 @@ class RemoteConfigClientTests {
 
         val appCodeBasedRemoteConfigEvent = SdkEvent.Internal.Sdk.ApplyAppCodeBasedRemoteConfig()
 
-        val onlineSdkEvents = backgroundScope.async {
-            onlineEvents.take(1).toList()
+        val responseEvents = backgroundScope.async {
+            sdkEvents.filterIsInstance(SdkEvent.Internal.Sdk.Answer.Response::class).take(1)
+                .toList()
         }
 
         onlineEvents.emit(appCodeBasedRemoteConfigEvent)
+        advanceUntilIdle()
 
-        onlineSdkEvents.await() shouldBe listOf(appCodeBasedRemoteConfigEvent)
+        responseEvents.await().size shouldBe 1
         verifySuspend(VerifyMode.exactly(0)) { mockRemoteConfigResponseHandler.handle(any()) }
         verifySuspend {
             mockClientExceptionHandler.handleException(
@@ -363,6 +387,68 @@ class RemoteConfigClientTests {
             )
         }
     }
+
+    @Test
+    fun testConsumer_shouldNotCall_responseHandler_butAckEvent_andNotReemitEvent_whenConfigAndSignatureAreNotFound() =
+        runTest {
+            createClient(backgroundScope).register()
+
+            val configResponse =
+                Response(configRequest, HttpStatusCode.NotFound, Headers.Empty, CONFIG_RESULT)
+
+            everySuspend { mockUrlFactory.create(ECUrlType.RemoteConfig) } returns configUrl
+            everySuspend {
+                mockUrlFactory.create(
+                    ECUrlType.RemoteConfigSignature
+                )
+            } returns configSignatureUrl
+            val exception = SdkException.FailedRequestException(
+                configResponse
+            )
+            everySuspend { mockNetworkClient.send(configRequest) } returns Result.failure(
+                exception
+            )
+            everySuspend {
+                mockNetworkClient.send(
+                    configSignatureRequest
+                )
+            } returns Result.failure(
+                exception
+            )
+
+            val appCodeBasedRemoteConfigEvent =
+                SdkEvent.Internal.Sdk.ApplyAppCodeBasedRemoteConfig()
+
+            val responseEvents = backgroundScope.async {
+                sdkEvents.filterIsInstance(SdkEvent.Internal.Sdk.Answer.Response::class).take(1)
+                    .toList()
+            }
+
+            onlineEvents.emit(appCodeBasedRemoteConfigEvent)
+            advanceUntilIdle()
+
+            responseEvents.await().size shouldBe 1
+
+            verifySuspend(VerifyMode.exactly(0)) { mockRemoteConfigResponseHandler.handle(any()) }
+            verifySuspend(VerifyMode.exactly(1)) {
+                mockClientExceptionHandler.handleException(
+                    exception,
+                    any(),
+                    appCodeBasedRemoteConfigEvent
+                )
+            }
+            verifySuspend {
+                mockSdkEventManager.emitEvent(
+                    SdkEvent.Internal.Sdk.Answer.Response(
+                        appCodeBasedRemoteConfigEvent.id,
+                        Result.success(Unit)
+                    )
+                )
+            }
+            verifySuspend(VerifyMode.exactly(0)) {
+                mockSdkEventManager.emitEvent(appCodeBasedRemoteConfigEvent)
+            }
+        }
 
     @Test
     fun testConsumer_shouldNotCall_responseHandler_andCallClientExceptionHandler_whenFetchingSignatureThrows() =
@@ -393,14 +479,15 @@ class RemoteConfigClientTests {
                 timestamp = timestamp
             )
 
-            val onlineSdkEvents = backgroundScope.async {
-                onlineEvents.take(1).toList()
+            val responseEvents = backgroundScope.async {
+                sdkEvents.filterIsInstance(SdkEvent.Internal.Sdk.Answer.Response::class).take(1)
+                    .toList()
             }
 
             onlineEvents.emit(remoteConfigEvent)
             advanceUntilIdle()
 
-            onlineSdkEvents.await() shouldBe listOf(remoteConfigEvent)
+            responseEvents.await().size shouldBe 1
             verifySuspend(VerifyMode.exactly(0)) { mockCrypto.verify(any(), any()) }
             verifySuspend(VerifyMode.exactly(0)) { mockRemoteConfigResponseHandler.handle(any()) }
             verifySuspend {
@@ -428,29 +515,60 @@ class RemoteConfigClientTests {
             id = EVENT_ID,
             timestamp = timestamp
         )
-        everySuspend {
-            mockSdkEventManager.emitEvent(
-                SdkEvent.Internal.Sdk.Answer.Response(
-                    originId = remoteConfigEvent.id,
-                    Result.failure<Exception>(testException)
-                )
-            )
-        } returns Unit
 
-        val onlineSdkEvents = backgroundScope.async {
-            onlineEvents.take(1).toList()
+        val responseEvents = backgroundScope.async {
+            sdkEvents.filterIsInstance(SdkEvent.Internal.Sdk.Answer.Response::class).take(1)
+                .toList()
         }
 
         onlineEvents.emit(remoteConfigEvent)
-
         advanceUntilIdle()
 
-        onlineSdkEvents.await() shouldBe listOf(remoteConfigEvent)
+        responseEvents.await().size shouldBe 1
         verifySuspend {
             mockNetworkClient.send(any())
             remoteConfigEvent.nack(mockEventsDao, mockSdkLogger)
         }
         verifySuspend {
+            mockClientExceptionHandler.handleException(
+                any<IOException>(),
+                "RemoteConfigClient: ConsumeRemoteConfigEvents error",
+                remoteConfigEvent
+            )
+        }
+    }
+
+    @Test
+    fun testConsumer_should_reEmit_events_once_on_network_error() = runTest {
+        createClient(backgroundScope).register()
+        val testException = IOException("No Internet")
+        everySuspend {
+            mockUrlFactory.create(ECUrlType.RemoteConfig)
+        } returns configUrl
+        everySuspend {
+            mockUrlFactory.create(ECUrlType.RemoteConfigSignature)
+        } returns configSignatureUrl
+
+        everySuspend { mockNetworkClient.send(any()) } returns Result.failure(testException)
+        val remoteConfigEvent = SdkEvent.Internal.Sdk.ApplyAppCodeBasedRemoteConfig(
+            id = EVENT_ID,
+            timestamp = timestamp
+        )
+
+        val responseEvents = backgroundScope.async {
+            sdkEvents.filterIsInstance(SdkEvent.Internal.Sdk.Answer.Response::class).take(1)
+                .toList()
+        }
+
+        onlineEvents.emit(remoteConfigEvent)
+        advanceUntilIdle()
+
+        responseEvents.await().size shouldBe 1
+        verifySuspend {
+            mockNetworkClient.send(any())
+            remoteConfigEvent.nack(mockEventsDao, mockSdkLogger)
+        }
+        verifySuspend(VerifyMode.exactly(1)) {
             mockClientExceptionHandler.handleException(
                 any<IOException>(),
                 "RemoteConfigClient: ConsumeRemoteConfigEvents error",

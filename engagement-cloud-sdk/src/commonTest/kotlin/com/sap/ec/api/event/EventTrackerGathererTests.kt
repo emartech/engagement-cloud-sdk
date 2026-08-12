@@ -9,6 +9,7 @@ import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.mock
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.JsonPrimitive
@@ -77,5 +78,14 @@ class EventTrackerGathererTests {
         gatherer.trackEvent(customEvent)
 
         eventTrackerContext.calls shouldBe expected
+    }
+
+    @Test
+    fun testGathering_shouldThrowIllegalArgumentException_ifEventName_isBlank() = runTest {
+        val testEvent = CustomEvent("   ", mapOf("testAttribute" to "testValue"))
+
+        shouldThrow<IllegalArgumentException> { gatherer.trackEvent(testEvent) }
+
+        eventTrackerContext.calls shouldBe listOf()
     }
 }

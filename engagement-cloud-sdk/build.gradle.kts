@@ -34,7 +34,7 @@ if (isMac) {
 }
 
 group = "com.sap.engagement-cloud"
-version = System.getenv("VERSION_OVERRIDE") ?: throw IllegalStateException("VERSION_OVERRIDE environment variable is not set")
+version = project.extra["SDK_VERSION"] as String
 
 kotlin {
     compilerOptions {
@@ -103,6 +103,47 @@ kotlin {
             )
         }
         generateTypeScriptDefinitions()
+
+        compilations["main"].packageJson {
+            name = "@sap/engagement-cloud-sdk"
+            customField("version", version)
+            customField("description", "SAP Engagement Cloud SDK for Web")
+            customField("license", "Apache-2.0")
+            customField(
+                "repository", mapOf(
+                    "type" to "git",
+                    "url" to "git+https://github.com/emartech/engagement-cloud-sdk.git"
+                )
+            )
+            customField(
+                "publishConfig", mapOf(
+                    "registry" to "https://registry.npmjs.org"
+                )
+            )
+            customField(
+                "homepage",
+                "https://emartech.github.io/engagement-cloud-sdk/docs/index.html"
+            )
+            customField(
+                "author", mapOf(
+                    "name" to "SAP"
+                )
+            )
+            customField(
+                "keywords", listOf(
+                    "sap",
+                    "engagement-cloud",
+                    "engagement cloud",
+                    "sdk",
+                    "push-notifications",
+                    "push notifications",
+                    "in-app-messaging",
+                    "in app messaging",
+                    "analytics",
+                    "embedded messaging"
+                )
+            )
+        }
     }
 
     applyDefaultHierarchyTemplate()
@@ -438,7 +479,8 @@ tasks.withType<ProcessResources> {
     val sdkVersion = version.toString()
     val isSnapshot = sdkVersion.contains("-")
     filesMatching("**/engagement-cloud-sdk-loader.js") {
-        val targetPath = if (isSnapshot) "/snapshots/engagement-cloud-sdk.js" else "/${sdkVersion}/engagement-cloud-sdk.js"
+        val targetPath =
+            if (isSnapshot) "/snapshots/engagement-cloud-sdk.js" else "/${sdkVersion}/engagement-cloud-sdk.js"
         println("Replacing loader SDK URL with $targetPath in ${this.path}")
         filter { line ->
             line.replace("/latest/engagement-cloud-sdk.js", targetPath)

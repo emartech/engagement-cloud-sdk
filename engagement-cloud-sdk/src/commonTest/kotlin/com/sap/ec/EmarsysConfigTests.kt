@@ -16,7 +16,7 @@ class EngagementCloudSDKConfigTest {
         val config = TestEngagementCloudSDKConfig("ASD12-FGH34")
 
         config.applicationCode shouldBe "ASD12-FGH34"
-        config.isValid(mock(mode = MockMode.autofill)) shouldBe true
+        config.isValid(mock(mode = MockMode.autofill), null) shouldBe true
     }
 
     @Test
@@ -26,7 +26,7 @@ class EngagementCloudSDKConfigTest {
         config.applicationCode shouldBe "null"
 
         shouldThrow<SdkException.InvalidApplicationCodeException> {
-            config.isValid(mock(mode = MockMode.autofill))
+            config.isValid(mock(mode = MockMode.autofill), null)
         }
     }
 }

@@ -16,4 +16,5 @@ internal object StorageConstants {
     const val REFRESH_TOKEN_STORAGE_KEY = "SAPEngagementCloudSdkRefreshToken"
     const val CLIENT_STATE_STORAGE_KEY = "SAPEngagementCloudSdkClientState"
     const val DEVICE_EVENT_STATE_STORAGE_KEY = "SAPEngagementCloudSdkDeviceEventState"
+    const val IS_CONTACT_LINKED_STORAGE_KEY = "SAPEngagementCloudSdkIsContactLinked"
 }

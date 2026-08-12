@@ -21,6 +21,7 @@ import com.sap.ec.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
+import dev.mokkery.answering.returnsArgAt
 import dev.mokkery.answering.throws
 import dev.mokkery.every
 import dev.mokkery.everySuspend
@@ -85,6 +86,7 @@ class ConfigClientTests {
         mockSdkLogger = mock(MockMode.autofill)
         mockConfig = mock()
         mockClientExceptionHandler = mock(MockMode.autofill)
+        every { mockClientExceptionHandler.transformException(any()) } returnsArgAt 0
         mockEventsDao = mock()
         onlineEvents = spy(MutableSharedFlow())
         mockSdkEventManager = mock()

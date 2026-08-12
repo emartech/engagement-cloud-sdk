@@ -44,7 +44,7 @@ jobs:
     outputs:
       version: ${{ steps.snapshot-version.outputs.version }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
 
@@ -67,9 +67,8 @@ jobs:
 
   build:
     name: Build ${{ matrix.platform }} / ${{ matrix.os }}
+    needs: derive-version
     runs-on: ${{ matrix.os }}
-    env:
-      VERSION_OVERRIDE: 'ci'
     strategy:
       fail-fast: false
       matrix:
@@ -82,10 +81,10 @@ jobs:
             os: macos-latest-xlarge
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7.0.1
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5.6.0
         with:
           java-version: 17
           distribution: 'temurin'
@@ -94,10 +93,10 @@ jobs:
         run: chmod +x gradlew
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
+        uses: gradle/actions/setup-gradle@v6.2.0
 
       - name: Setup node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7.0.0
         with:
           node-version: 22
 
@@ -106,13 +105,13 @@ jobs:
 
       - name: Build
         run: make build-${{ matrix.platform }}
+        env:
+          VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
 
   test:
     name: Test ${{ matrix.platform }} / ${{ matrix.os }}
-    needs: build
+    needs: [derive-version, build]
     runs-on: ${{ matrix.os }}
-    env:
-      VERSION_OVERRIDE: 'ci'
     strategy:
       fail-fast: false
       matrix:
@@ -125,23 +124,23 @@ jobs:
             os: macos-latest-xlarge
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7.0.1
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5.6.0
         with:
           java-version: 17
           distribution: 'temurin'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
+        uses: gradle/actions/setup-gradle@v6.2.0
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Setup Android SDK
         if: matrix.platform == 'android'
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
 
       - name: Enable KVM group permissions
         if: matrix.platform == 'android'
@@ -152,7 +151,7 @@ jobs:
 
       - name: Setup Android Emulator & Test
         if: matrix.platform == 'android'
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@v2.38.0
         with:
           api-level: 30
           arch: x86_64
@@ -164,14 +163,18 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           script: |
             make test-android
+        env:
+          VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
 
       - name: Test iOS
         if: matrix.platform == 'ios'
         run: make test-ios
+        env:
+          VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
 
       - name: Setup Node.js
         if: matrix.platform == 'web'
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7.0.0
         with:
           node-version: '20'
 
@@ -187,19 +190,17 @@ jobs:
 
       - name: Test Web
         if: matrix.platform == 'web'
-        run: |
-          npm install
-          make test-web
+        run: make test-web
+        env:
+          VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
 
   lint:
-    needs: build
+    needs: [derive-version, build]
     runs-on: macos-latest-xlarge
-    env:
-      VERSION_OVERRIDE: 'ci'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7.0.1
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5.6.0
         with:
           java-version: 17
           distribution: 'temurin'
@@ -208,10 +209,12 @@ jobs:
         run: chmod +x gradlew
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
+        uses: gradle/actions/setup-gradle@v6.2.0
 
       - name: Run lint
         run: make lint
+        env:
+          VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
 
   publish-android:
     name: Publish KMP Snapshot
@@ -224,16 +227,16 @@ jobs:
     permissions:
       packages: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7.0.1
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5.6.0
         with:
           java-version: 17
           distribution: 'temurin'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
+        uses: gradle/actions/setup-gradle@v6.2.0
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -261,26 +264,24 @@ jobs:
       pages: write
       id-token: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7.0.1
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5.6.0
         with:
           java-version: 17
           distribution: 'temurin'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
+        uses: gradle/actions/setup-gradle@v6.2.0
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7.0.0
         with:
-          node-version: '22'
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@emartech'
+          node-version: '24'
 
       - name: Install npm dependencies
         run: npm install
@@ -291,16 +292,21 @@ jobs:
           VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
 
       - name: Assemble NPM package
+        run: make assemble-npm-package
+
+      - name: Replace namespace for snapshot NPM release
         run: |
-          VERSION="${{ needs.derive-version.outputs.version }}"
-          mkdir -p dist/npm
-          cp engagement-cloud-sdk/build/dist/js/productionExecutable/engagement-cloud-sdk-html.js dist/npm/
-          cp build/js/packages/engagement-cloud-sdk/kotlin/engagement-cloud-sdk-html.d.ts dist/npm/ 2>/dev/null || true
-          sed "s/\"version\": \"0.0.0\"/\"version\": \"$VERSION\"/" \
-            engagement-cloud-sdk/npm-package.json > dist/npm/package.json
+          sed 's/@sap\/engagement-cloud-sdk/@emartech\/engagement-cloud-sdk/' engagement-cloud-sdk/build/tmp/jsPublicPackageJson/package.json > dist/npm/package.json
+
+      - name: Configure GitHub Packages registry
+        uses: actions/setup-node@v7.0.0
+        with:
+          node-version: '24'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@emartech'
 
       - name: Publish to GitHub Packages NPM
-        run: npm publish dist/npm/
+        run: npm publish dist/npm/ --tag snapshot
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -313,10 +319,6 @@ jobs:
             dist/cdn/snapshots/engagement-cloud-sdk.js
           cp engagement-cloud-sdk/build/dist/js/productionExecutable/engagement-cloud-sdk-html.js.map \
             dist/cdn/snapshots/engagement-cloud-sdk.js.map 2>/dev/null || true
-
-          # TypeScript definitions
-          cp build/js/packages/engagement-cloud-sdk/kotlin/engagement-cloud-sdk-html.d.ts \
-            dist/cdn/snapshots/engagement-cloud-sdk.d.ts 2>/dev/null || true
 
           # Loader script + sourcemap
           cp engagement-cloud-sdk/build/dist/js/productionExecutable/engagement-cloud-sdk-loader.js \
@@ -341,18 +343,151 @@ jobs:
           keep_files: true
           destination_dir: .
 
+  publish-ios-snapshot:
+    name: Publish iOS Snapshot
+    if: github.ref == 'refs/heads/main'
+    needs: [derive-version, test, lint]
+    runs-on: macos-latest-xlarge
+    concurrency:
+      group: publish-ios-snapshot
+      cancel-in-progress: true
+    permissions:
+      contents: write
+    env:
+      SPM_BUILD: release
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5.6.0
+        with:
+          java-version: 17
+          distribution: 'temurin'
+
+      - name: Cache Konan directory
+        uses: actions/cache@v6.1.0
+        with:
+          path: ~/.konan
+          key: ${{ runner.os }}-konan-${{ hashFiles('**/*.gradle.kts', '**/libs.versions.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-konan-
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6.2.0
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build iOS XCFrameworks
+        run: |
+          ./gradlew \
+            :engagement-cloud-sdk:assembleEngagementCloudSDKReleaseXCFramework \
+            :ios-notification-service:assembleEngagementCloudNotificationServiceReleaseXCFramework \
+            -PNATIVE_BUILD_TYPE=RELEASE \
+            -PENABLE_PUBLISHING=true \
+            --no-daemon
+        env:
+          VERSION_OVERRIDE: ${{ needs.derive-version.outputs.version }}
+
+      - name: Copy Privacy Manifest to EC framework
+        run: make add-privacy-manifest-to-frameworks
+
+      - name: Zip XCFrameworks and compute checksums
+        run: |
+          cd engagement-cloud-sdk/build/XCFrameworks/release
+          zip -r "$GITHUB_WORKSPACE/EngagementCloudSDK.xcframework.zip" EngagementCloudSDK.xcframework
+          cd "$GITHUB_WORKSPACE"
+
+          cd ios-notification-service/build/XCFrameworks/release
+          zip -r "$GITHUB_WORKSPACE/EngagementCloudSDKNotificationService.xcframework.zip" EngagementCloudSDKNotificationService.xcframework
+          cd "$GITHUB_WORKSPACE"
+
+          echo "SDK_CHECKSUM=$(shasum -a 256 EngagementCloudSDK.xcframework.zip | cut -d ' ' -f 1)" >> "$GITHUB_ENV"
+          echo "NS_CHECKSUM=$(shasum -a 256 EngagementCloudSDKNotificationService.xcframework.zip | cut -d ' ' -f 1)" >> "$GITHUB_ENV"
+
+      - name: Recreate snapshot-latest pre-release with zips
+        run: |
+          gh release delete snapshot-latest --yes --cleanup-tag || true
+
+          gh release create snapshot-latest \
+            --title "Snapshot (${{ needs.derive-version.outputs.version }})" \
+            --notes "Rolling snapshot built from main. Not for production use. Built from commit ${{ github.sha }}." \
+            --prerelease \
+            --target "${{ github.sha }}" \
+            EngagementCloudSDK.xcframework.zip \
+            EngagementCloudSDKNotificationService.xcframework.zip
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate snapshot Package.swift
+        run: |
+          SDK_URL="https://github.com/${{ github.repository }}/releases/download/snapshot-latest/EngagementCloudSDK.xcframework.zip"
+          NS_URL="https://github.com/${{ github.repository }}/releases/download/snapshot-latest/EngagementCloudSDKNotificationService.xcframework.zip"
+
+          sed -e "s|__SDK_URL__|$SDK_URL|" \
+              -e "s|__SDK_CHECKSUM__|${{ env.SDK_CHECKSUM }}|" \
+              -e "s|__NS_URL__|$NS_URL|" \
+              -e "s|__NS_CHECKSUM__|${{ env.NS_CHECKSUM }}|" \
+              iosReleaseSpm/Package.swift > /tmp/Package.swift
+
+      - name: Force-push Package.swift to snapshot branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git worktree add --detach /tmp/snapshot-worktree
+          cd /tmp/snapshot-worktree
+
+          git checkout --orphan snapshot
+          git rm -rf --quiet . || true
+          cp /tmp/Package.swift Package.swift
+          git add Package.swift
+          git commit -m "Snapshot Package.swift for ${{ needs.derive-version.outputs.version }} (${GITHUB_SHA::7})"
+          git push --force origin snapshot
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   reporting:
     if: always()
-    needs: [ derive-version, build, test, lint, publish-android, publish-js ]
+    needs: [ derive-version, build, test, lint, publish-android, publish-js, publish-ios-snapshot ]
     runs-on: ubuntu-latest
     steps:
+      - name: Compute pipeline summary
+        id: pipelines
+        run: |
+          SUMMARY=""
+          if [ "${{ needs.publish-android.result }}" = "success" ]; then
+            SUMMARY="${SUMMARY} KMP:✅"
+          elif [ "${{ needs.publish-android.result }}" = "skipped" ]; then
+            SUMMARY="${SUMMARY} KMP:⏭️"
+          else
+            SUMMARY="${SUMMARY} KMP:❌"
+          fi
+          if [ "${{ needs.publish-js.result }}" = "success" ]; then
+            SUMMARY="${SUMMARY} NPM:✅"
+          elif [ "${{ needs.publish-js.result }}" = "skipped" ]; then
+            SUMMARY="${SUMMARY} NPM:⏭️"
+          else
+            SUMMARY="${SUMMARY} NPM:❌"
+          fi
+          if [ "${{ needs.publish-ios-snapshot.result }}" = "success" ]; then
+            SUMMARY="${SUMMARY} iOS:✅"
+          elif [ "${{ needs.publish-ios-snapshot.result }}" = "skipped" ]; then
+            SUMMARY="${SUMMARY} iOS:⏭️"
+          else
+            SUMMARY="${SUMMARY} iOS:❌"
+          fi
+          echo "value=$SUMMARY" >> "$GITHUB_OUTPUT"
+
       - name: Report on Slack (Error)
         if: ${{ !cancelled() && contains(needs.*.result, 'failure') }}
-        uses: megamegax/slack_action@0.3.1
+        uses: megamegax/slack_action@0.3.2
         with:
           webhook_url: '${{env.SLACK_WEBHOOK}}'
           channel: 'mobile-team-ci'
-          message: 'Last push build failed! :man-gesturing-no: :blobcatfearful: (snapshot: ${{ needs.derive-version.outputs.version }})'
+          message: 'Last push build failed! :man-gesturing-no: :blobcatfearful: (snapshot: ${{ needs.derive-version.outputs.version }}) |${{ steps.pipelines.outputs.value }}'
           user_name: 'Engagement Cloud SDK'
           job_status: 'failure'
           user_icon: '${{env.SLACK_ICON}}'
@@ -360,11 +495,11 @@ jobs:
 
       - name: Report on Slack (Success)
         if: ${{ !contains(needs.*.result, 'cancelled') && !contains(needs.*.result, 'failure') }}
-        uses: megamegax/slack_action@0.3.1
+        uses: megamegax/slack_action@0.3.2
         with:
           webhook_url: '${{env.SLACK_WEBHOOK}}'
           channel: 'mobile-team-ci'
-          message: 'Last push build successful! :man-gesturing-ok: :bananadance: (snapshot: ${{ needs.derive-version.outputs.version }})'
+          message: 'Last push build successful! :man-gesturing-ok: :bananadance: (snapshot: ${{ needs.derive-version.outputs.version }}) |${{ steps.pipelines.outputs.value }}'
           user_name: 'Engagement Cloud SDK'
           job_status: 'success'
           user_icon: '${{env.SLACK_ICON}}'

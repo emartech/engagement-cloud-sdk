@@ -20,21 +20,27 @@ data class CustomEvent(
     override fun toSdkEvent(
         uuid: String,
         timestamp: Instant
-    ): SdkEvent {
-        return SdkEvent.External.Custom(
-            id = uuid,
-            name = name,
-            attributes = attributes?.let { attributes ->
-                buildJsonObject {
-                    attributes.forEach { (key, value) ->
-                        put(
-                            key,
-                            JsonPrimitive(value)
-                        )
-                    }
-                }
-            },
-            timestamp = timestamp
-        )
+    ): Result<SdkEvent> {
+        return if (name.isBlank()) {
+            Result.failure(IllegalArgumentException("Custom event name cannot be blank."))
+        } else {
+            Result.success(
+                SdkEvent.External.Custom(
+                    id = uuid,
+                    name = name,
+                    attributes = attributes?.let { attributes ->
+                        buildJsonObject {
+                            attributes.forEach { (key, value) ->
+                                put(
+                                    key,
+                                    JsonPrimitive(value)
+                                )
+                            }
+                        }
+                    },
+                    timestamp = timestamp
+                )
+            )
+        }
     }
 }

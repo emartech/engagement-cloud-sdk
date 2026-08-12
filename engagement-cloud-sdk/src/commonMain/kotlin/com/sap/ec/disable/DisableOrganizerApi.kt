@@ -8,4 +8,6 @@ internal interface DisableOrganizerApi {
     val sdkContext: SdkContextApi
 
     suspend fun disable()
+
+    suspend fun disableWithValidation()
 }

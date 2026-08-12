@@ -64,6 +64,7 @@ class ConfigInternalTests {
         everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mock(MockMode.autofill)
         mockConfigContext = mock()
         mockSdkContext = mock()
+        every { mockSdkContext.globalRemoteConfigApplicationCodeValidationRegex } returns null
         configInternal =
             ConfigInternal(
                 mockSdkEventDistributor,
@@ -113,11 +114,97 @@ class ConfigInternalTests {
             everySuspend { mockWaiter.await<Any>() } returns successResponse
             everySuspend { mockSdkEventDistributor.registerEvent(expectedEvent) } returns mockWaiter
             everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
+            every { mockSdkContext.globalRemoteConfigApplicationCodeValidationRegex } returns null
 
             configInternal.changeApplicationCode(MULTI_REGION_APPCODE)
 
             verifySuspend { mockSdkEventDistributor.registerEvent(expectedEvent) }
         }
+
+    @Test
+    fun testChangeApplicationCode_shouldUseRemoteConfigRegex_whenProvided() =
+        runTest {
+            val customRegex = "^CUSTOM\\.[A-Z0-9]+$".toRegex()
+            val customAppCode = "CUSTOM.ABC123"
+            val expectedEvent = SdkEvent.Internal.Sdk.ChangeAppCode(
+                id = UUID,
+                applicationCode = customAppCode.uppercase(),
+                timestamp = TIMESTAMP
+            )
+            val mockWaiter = mock<SdkEventWaiterApi>()
+            val successResponse = SdkEvent.Internal.Sdk.Answer.Response<Any>(
+                originId = UUID,
+                Result.success(Unit)
+            )
+            everySuspend { mockWaiter.await<Any>() } returns successResponse
+            everySuspend { mockSdkEventDistributor.registerEvent(expectedEvent) } returns mockWaiter
+            everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
+            every { mockSdkContext.globalRemoteConfigApplicationCodeValidationRegex } returns customRegex
+
+            configInternal.changeApplicationCode(customAppCode)
+
+            verifySuspend { mockSdkEventDistributor.registerEvent(expectedEvent) }
+        }
+
+    @Test
+    fun testChangeApplicationCode_shouldRejectCode_notMatchingRemoteConfigRegex_whenProvided() =
+        runTest {
+            val customRegex = "^CUSTOM\\.[A-Z0-9]+$".toRegex()
+            everySuspend { mockLogger.error(any(), any<Throwable>(), true) } returns Unit
+            every { mockSdkContext.globalRemoteConfigApplicationCodeValidationRegex } returns customRegex
+
+            shouldThrow<SdkException.InvalidApplicationCodeException> {
+                configInternal.changeApplicationCode("INVALID")
+            }
+
+            verifySuspend(mode = VerifyMode.exactly(0)) { mockSdkEventDistributor.registerEvent(any()) }
+        }
+
+    @Test
+    fun testChangeApplicationCode_shouldUseFallbackMultiRegionRegex_whenRemoteConfigRegexIsNull() =
+        runTest {
+            val expectedEvent = SdkEvent.Internal.Sdk.ChangeAppCode(
+                id = UUID,
+                applicationCode = MULTI_REGION_APPCODE.uppercase(),
+                timestamp = TIMESTAMP
+            )
+            val mockWaiter = mock<SdkEventWaiterApi>()
+            val successResponse = SdkEvent.Internal.Sdk.Answer.Response<Any>(
+                originId = UUID,
+                Result.success(Unit)
+            )
+            everySuspend { mockWaiter.await<Any>() } returns successResponse
+            everySuspend { mockSdkEventDistributor.registerEvent(expectedEvent) } returns mockWaiter
+            everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
+            every { mockSdkContext.globalRemoteConfigApplicationCodeValidationRegex } returns null
+
+            configInternal.changeApplicationCode(MULTI_REGION_APPCODE)
+
+            verifySuspend { mockSdkEventDistributor.registerEvent(expectedEvent) }
+        }
+
+    @Test
+    fun testChangeApplicationCode_shouldAcceptMultiRegionV2AppCode() = runTest {
+        val v2AppCode = "S-AB123-0DB36"
+        val expectedEvent = SdkEvent.Internal.Sdk.ChangeAppCode(
+            id = UUID,
+            applicationCode = v2AppCode.uppercase(),
+            timestamp = TIMESTAMP
+        )
+        val mockWaiter = mock<SdkEventWaiterApi>()
+        val successResponse = SdkEvent.Internal.Sdk.Answer.Response<Any>(
+            originId = UUID,
+            Result.success(Unit)
+        )
+        everySuspend { mockWaiter.await<Any>() } returns successResponse
+        everySuspend { mockSdkEventDistributor.registerEvent(expectedEvent) } returns mockWaiter
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
+        every { mockSdkContext.globalRemoteConfigApplicationCodeValidationRegex } returns null
+
+        configInternal.changeApplicationCode(v2AppCode)
+
+        verifySuspend { mockSdkEventDistributor.registerEvent(expectedEvent) }
+    }
 
     @Test
     fun testChangeApplicationCode_shouldNotRegisterChangeAppCodeEvent_whenAppCode_isEmpty() = runTest {

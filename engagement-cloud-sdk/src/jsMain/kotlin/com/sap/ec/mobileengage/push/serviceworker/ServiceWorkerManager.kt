@@ -10,11 +10,10 @@ import kotlinx.coroutines.ensureActive
 import web.serviceworker.RegistrationOptions
 import web.serviceworker.ServiceWorkerContainer
 import web.serviceworker.ServiceWorkerRegistration
+import web.serviceworker.getRegistration
 import web.serviceworker.register
 import web.serviceworker.unregister
 import web.serviceworker.update
-import kotlin.apply
-import kotlin.js.unsafeCast
 
 
 internal class ServiceWorkerManager(
@@ -22,8 +21,6 @@ internal class ServiceWorkerManager(
     private val sdkLogger: Logger,
     private val serviceWorkerContainer: ServiceWorkerContainer
 ) : ServiceWorkerManagerApi {
-
-    private var serviceWorkerRegistration: ServiceWorkerRegistration? = null
 
     override suspend fun register(): Result<ServiceWorkerRegistration> {
         return try {
@@ -45,7 +42,6 @@ internal class ServiceWorkerManager(
                 println("REGISTER DONE")
                 serviceWorkerContainer.ready.await()
                 println("READY DONE")
-                serviceWorkerRegistration = registration
                 Result.success(registration)
             } ?: Result.failure(IllegalStateException("Service worker options are not set."))
         } catch (e: Throwable) {
@@ -57,7 +53,6 @@ internal class ServiceWorkerManager(
 
     override suspend fun unregister() {
         getServiceWorkerRegistration()?.unregister()
-        serviceWorkerRegistration = null
     }
 
     override suspend fun getServiceWorkerOptions(): ServiceWorkerOptions? {
@@ -68,10 +63,9 @@ internal class ServiceWorkerManager(
 
     override suspend fun getServiceWorkerRegistration(): ServiceWorkerRegistration? {
         return try {
-            serviceWorkerRegistration ?: register().getOrNull()
+            serviceWorkerContainer.getRegistration()
                 .also {
-                    serviceWorkerRegistration = it
-                    serviceWorkerRegistration?.update()
+                    it?.update()
                 }
         } catch (e: Throwable) {
             currentCoroutineContext().ensureActive()

@@ -18,12 +18,11 @@ class CustomEventTests {
 
     @Test
     fun toSdkEvent_shouldNotAddAttribute_ifAttributeProperty_isNull() {
-
         val testEvent = CustomEvent(TEST_NAME, attributes = null)
 
-        val sdkEvent = testEvent.toSdkEvent(TEST_UUID, TEST_TIMESTAMP) as SdkEvent.External.Custom
+        val sdkEvent = testEvent.toSdkEvent(TEST_UUID, TEST_TIMESTAMP).getOrThrow()
 
-        sdkEvent.attributes shouldBe null
+        (sdkEvent as SdkEvent.External.Custom).attributes shouldBe null
     }
 
     @Test
@@ -32,11 +31,21 @@ class CustomEventTests {
 
         val testEvent = CustomEvent(TEST_NAME, attributes = testAttributes)
 
-        val sdkEvent = testEvent.toSdkEvent(TEST_UUID, TEST_TIMESTAMP) as SdkEvent.External.Custom
+        val sdkEvent = testEvent.toSdkEvent(TEST_UUID, TEST_TIMESTAMP).getOrThrow()
 
-        sdkEvent.attributes shouldBe buildJsonObject {
+        (sdkEvent as SdkEvent.External.Custom).attributes shouldBe buildJsonObject {
             put("key", "value")
             put("testKey", "testValue")
         }
+    }
+
+    @Test
+    fun toSdkEvent_shouldReturnResultFailure_withIllegalArgumentException_ifNameIsBlank() {
+        val testEvent = CustomEvent("", attributes = null)
+
+        val result = testEvent.toSdkEvent(TEST_UUID, TEST_TIMESTAMP)
+
+        result.isFailure shouldBe true
+        (result.exceptionOrNull() is IllegalArgumentException) shouldBe true
     }
 }

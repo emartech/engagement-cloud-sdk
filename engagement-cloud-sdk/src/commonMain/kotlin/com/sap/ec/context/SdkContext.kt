@@ -16,6 +16,7 @@ internal class SdkContext(
     private val sdkConfigStore: SdkConfigStoreApi<SdkConfig>
 ) : SdkContextApi {
     private var _cachedConfig: SdkConfig? = null
+    override var globalRemoteConfigApplicationCodeValidationRegex: Regex? = null
 
     override suspend fun getSdkConfig(): SdkConfig? {
         return _cachedConfig ?: sdkConfigStore.load().also { _cachedConfig = it }
@@ -25,7 +26,7 @@ internal class SdkContext(
         config?.let {
             sdkConfigStore.store(config)
             _cachedConfig = config
-        } ?: sdkConfigStore.clear()
+        } ?: clearSdkConfig()
     }
 
     override val currentSdkState = MutableStateFlow(SdkState.UnInitialized)
@@ -35,6 +36,11 @@ internal class SdkContext(
 
     override suspend fun setSdkState(sdkState: SdkState) {
         currentSdkState.value = sdkState
+    }
+
+    private suspend fun clearSdkConfig() {
+        _cachedConfig = null
+        sdkConfigStore.clear()
     }
 }
 

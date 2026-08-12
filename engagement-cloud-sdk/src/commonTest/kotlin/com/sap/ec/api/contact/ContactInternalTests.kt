@@ -3,15 +3,18 @@ package com.sap.ec.api.contact
 import com.sap.ec.TestEngagementCloudSDKConfig
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
+import com.sap.ec.core.networking.context.RequestContextApi
 import com.sap.ec.event.SdkEvent
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
+import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.matcher.capture.Capture.Companion.slot
 import dev.mokkery.matcher.capture.SlotCapture
 import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
+import dev.mokkery.matcher.capture.isAbsent
 import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
@@ -35,6 +38,7 @@ class ContactInternalTests {
     private lateinit var contactContext: ContactContextApi
     private lateinit var sdkEventDistributor: SdkEventDistributorApi
     private lateinit var mockSdkContext: SdkContextApi
+    private lateinit var mockRequestContext: RequestContextApi
     private lateinit var eventSlot: SlotCapture<SdkEvent>
     private lateinit var contactInternal: ContactInstance
 
@@ -46,13 +50,15 @@ class ContactInternalTests {
         everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(
             APPLICATION_CODE
         )
+        mockRequestContext = mock(MockMode.autofill)
         sdkEventDistributor = mock(MockMode.autofill)
         everySuspend { sdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(MockMode.autofill)
         contactInternal = ContactInternal(
             contactContext,
             sdkLogger = mock(MockMode.autofill),
             sdkEventDistributor,
-            mockSdkContext
+            mockSdkContext,
+            mockRequestContext
         )
     }
 
@@ -76,12 +82,26 @@ class ContactInternalTests {
         }
 
     @Test
-    fun testUnlinkContact_should_emit_unlinkContact_event_into_sdkFlow() = runTest {
-        contactInternal.unlink()
+    fun testUnlinkContact_should_emit_unlinkContact_event_into_sdkFlow_if_isContactLinked_is_true() =
+        runTest {
+            every { mockRequestContext.isContactLinked } returns true
 
-        val emitted = eventSlot.get()
-        (emitted is SdkEvent.Internal.Sdk.UnlinkContact) shouldBe true
-    }
+            contactInternal.unlink()
+
+            val emitted = eventSlot.get()
+            (emitted is SdkEvent.Internal.Sdk.UnlinkContact) shouldBe true
+        }
+
+    @Test
+    fun testUnlinkContact_should_not_emit_unlinkContact_event_into_sdkFlow_if_isContactLinked_is_false() =
+        runTest {
+            every { mockRequestContext.isContactLinked } returns false
+
+            contactInternal.unlink()
+
+            eventSlot.isAbsent shouldBe true
+            verifySuspend(VerifyMode.exactly(0)) { sdkEventDistributor.registerEvent(any()) }
+        }
 
     @Test
     fun testActivate_should_emit_stored_calls_as_events_to_event_flow() = runTest {

@@ -37,7 +37,7 @@ data class ServiceWorkerOptions(
 @OptIn(ExperimentalJsExport::class)
 @JsExport
 @Serializable
-sealed interface EngagementCloudConfig {
+sealed external interface EngagementCloudConfig {
     val applicationCode: String
     val serviceWorkerOptions: EngagementCloudCServiceWorkerOptions?
 }
@@ -53,7 +53,7 @@ sealed interface EngagementCloudConfig {
 @JsExport
 @JsName("ServiceWorkerOptions")
 @Serializable
-sealed interface EngagementCloudCServiceWorkerOptions {
+sealed external interface EngagementCloudCServiceWorkerOptions {
     val applicationServerKey: String
     val serviceWorkerPath: String
     val serviceWorkerScope: String?

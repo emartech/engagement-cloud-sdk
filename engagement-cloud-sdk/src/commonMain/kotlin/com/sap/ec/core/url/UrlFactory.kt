@@ -33,11 +33,6 @@ internal class UrlFactory(
                 "client/contact-token"
             ).build()
 
-            ECUrlType.ChangeMerchantId -> createUrl(
-                sdkContext.defaultUrls.clientServiceBaseUrl,
-                "client/contact-token"
-            ).build()
-
             ECUrlType.PushToken -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client/push-token")
             is ECUrlType.ClearPushToken ->
                 Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${urlType.applicationCode}/client/push-token")

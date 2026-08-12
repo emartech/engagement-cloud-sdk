@@ -33,6 +33,7 @@ internal object ContactInjection {
                 sdkEventManager = get(),
                 urlFactory = get(),
                 contactTokenHandler = get(),
+                requestContext = get(),
                 ecSdkSession = get(),
                 eventsDao = get(),
                 json = get(),
@@ -71,6 +72,7 @@ internal object ContactInjection {
                 sdkLogger = get { parametersOf(ContactInternal::class.simpleName) },
                 sdkEventDistributor = get(),
                 sdkContext = get(),
+                requestContext = get()
             )
         }
         single<ContactApi> {

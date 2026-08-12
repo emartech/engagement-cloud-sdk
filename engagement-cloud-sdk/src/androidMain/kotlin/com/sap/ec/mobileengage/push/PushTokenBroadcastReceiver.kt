@@ -3,6 +3,7 @@ package com.sap.ec.mobileengage.push
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import com.sap.ec.api.push.PushApi
 import com.sap.ec.api.push.PushConstants
 import com.sap.ec.core.extension.goAsync
@@ -21,11 +22,24 @@ internal class PushTokenBroadcastReceiver : BroadcastReceiver(), SdkComponent {
     private val pushApi: PushApi = get()
     private val logger: Logger = get { parametersOf(PushTokenBroadcastReceiver::class.simpleName) }
 
-    override fun onReceive(context: Context, intent: Intent) = goAsync(sdkDispatcher) {
-        intent.getStringExtra(PushConstants.PUSH_TOKEN_KEY)?.let {
-            logger.debug("push token received: token: $it")
-            stringStorage.put(PushConstants.PUSH_TOKEN_STORAGE_KEY, it)
-            pushApi.registerToken(it)
+    init {
+        Log.d(TAG, "PushTokenBroadcastReceiver created, DI resolved successfully")
+    }
+
+    override fun onReceive(context: Context, intent: Intent) {
+        Log.d(TAG, "onReceive called, action=${intent.action}")
+        goAsync(sdkDispatcher) {
+            logger.debug("onReceive processing started", isRemoteLog = false)
+            intent.getStringExtra(PushConstants.PUSH_TOKEN_KEY)?.let {
+                logger.debug("push token received, registering: $it", isRemoteLog = false)
+                stringStorage.put(PushConstants.PUSH_TOKEN_STORAGE_KEY, it)
+                pushApi.registerToken(it)
+                logger.debug("push token registration completed", isRemoteLog = false)
+            } ?: logger.debug("intent had no push token extra (key=${PushConstants.PUSH_TOKEN_KEY})", isRemoteLog = false)
         }
+    }
+
+    companion object {
+        private const val TAG = "PushTokenBR"
     }
 }
