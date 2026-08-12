@@ -23,7 +23,6 @@ object SdkConstants {
     const val REREGISTRATION_REQUIRED_EVENT_NAME = "reregistrationRequired"
     const val REGISTER_DEVICE_INFO_EVENT_NAME = "registerDeviceInfo"
     const val CHANGE_LANGUAGE_EVENT_NAME = "changeLanguage"
-    const val DEVICE_INFO_READY_EVENT_NAME = "DeviceInfoReady"
     const val REGISTER_PUSH_TOKEN_EVENT_NAME = "registerPushToken"
     const val CLEAR_PUSH_TOKEN_EVENT_NAME = "clearPushToken"
     const val REMOTE_CONFIG_UPDATE_REQUIRED_EVENT_NAME = "remoteConfigUpdateRequired"
@@ -39,7 +38,6 @@ object SdkConstants {
     const val UNKNOWN_WRAPPER_INFO = "unknown"
 
     const val LANGUAGE_STORAGE_KEY = "customerOverwroteLanguageCodeKey"
-    const val DEVICE_INFO_UPDATE_REQUIRED_EVENT_NAME = "deviceInfoUpdateRequired"
     const val PAGE_LOCATION_ATTRIBUTE_KEY = "url"
     const val LEGACY_SDK_MIGRATION_DONE_KEY = "SAPEngagementCloudSdkLegacySdkMigrationDone"
 }

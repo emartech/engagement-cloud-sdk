@@ -12,7 +12,7 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class DeviceInfoUpdaterTests {
+class DeviceInfoStorageTests {
     private companion object {
         const val TEST_DEVICE_INFO = "testDeviceInfo"
     }
@@ -27,14 +27,14 @@ class DeviceInfoUpdaterTests {
     }
 
     @Test
-    fun storeDeviceInfo_shouldStoreTheInputString() {
+    fun store_shouldStoreTheInputString() {
         deviceInfoStorage.store(TEST_DEVICE_INFO)
 
         verify { mockStringStorage.put(DEVICE_INFO_STORAGE_KEY, TEST_DEVICE_INFO) }
     }
 
     @Test
-    fun clearDeviceInfo_shouldSetDeviceInfo_toNull() {
+    fun clear_shouldSetDeviceInfo_toNull() {
         deviceInfoStorage.clear()
 
         verify { mockStringStorage.put(DEVICE_INFO_STORAGE_KEY, null) }

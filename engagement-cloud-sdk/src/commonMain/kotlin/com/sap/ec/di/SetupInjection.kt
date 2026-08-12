@@ -83,7 +83,7 @@ internal object SetupInjection {
         }
         single<State>(named(StateTypes.ClearDeviceInfo)) {
             ClearDeviceInfoState(
-                deviceInfoUpdater = get()
+                deviceInfoStorage = get()
             )
         }
         single<State>(named(StateTypes.ClearPushTokenOnDisable)) {

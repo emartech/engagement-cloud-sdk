@@ -12,31 +12,31 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class ClearDeviceInfoStateTests {
-    private lateinit var mockDeviceInfoUpdater: DeviceInfoStorageApi
+    private lateinit var mockDeviceInfoStorage: DeviceInfoStorageApi
     private lateinit var clearDeviceInfoState: ClearDeviceInfoState
 
     @BeforeTest
     fun setup() {
-        mockDeviceInfoUpdater = mock(MockMode.autofill)
-        clearDeviceInfoState = ClearDeviceInfoState(mockDeviceInfoUpdater)
+        mockDeviceInfoStorage = mock(MockMode.autofill)
+        clearDeviceInfoState = ClearDeviceInfoState(mockDeviceInfoStorage)
     }
 
     @Test
     fun active_shouldCall_clearDeviceInfo_andReturnSuccess() = runTest {
         val result = clearDeviceInfoState.active()
 
-        verify { mockDeviceInfoUpdater.clear() }
+        verify { mockDeviceInfoStorage.clear() }
         result shouldBe Result.success(Unit)
     }
 
     @Test
     fun active_shouldCall_clearDeviceInfo_andReturnFailure_withTheError() = runTest {
         val testError = RuntimeException("Operation failed")
-        everySuspend { mockDeviceInfoUpdater.clear() } throws testError
+        everySuspend { mockDeviceInfoStorage.clear() } throws testError
 
         val result = clearDeviceInfoState.active()
 
-        verify { mockDeviceInfoUpdater.clear() }
+        verify { mockDeviceInfoStorage.clear() }
         result shouldBe Result.failure(testError)
     }
 }
