@@ -73,7 +73,8 @@ class AppEventActionTests {
         val inAppEvent = SdkEvent.Internal.InApp.ButtonClicked(
             reporting = "testReporting",
             trackingInfo = "testTrackingInfo",
-            origin = "testOrigin"
+            origin = "testOrigin",
+            reportingName = "inapp:click"
         )
 
         AppEventAction(testActionModel, mockSdkEventDistributor).invoke(inAppEvent)
