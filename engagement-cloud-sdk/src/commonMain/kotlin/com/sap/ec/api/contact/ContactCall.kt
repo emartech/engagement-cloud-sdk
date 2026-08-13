@@ -2,8 +2,6 @@ package com.sap.ec.api.contact
 
 import kotlinx.serialization.Serializable
 
-internal class ContactContext(override val calls: MutableList<ContactCall>) : ContactContextApi
-
 @Serializable
 internal sealed interface ContactCall {
     @Serializable

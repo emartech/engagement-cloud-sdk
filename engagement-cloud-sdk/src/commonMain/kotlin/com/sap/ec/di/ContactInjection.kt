@@ -3,13 +3,12 @@ package com.sap.ec.di
 import com.sap.ec.api.contact.Contact
 import com.sap.ec.api.contact.ContactApi
 import com.sap.ec.api.contact.ContactCall
-import com.sap.ec.api.contact.ContactContext
-import com.sap.ec.api.contact.ContactContextApi
 import com.sap.ec.api.contact.ContactGatherer
 import com.sap.ec.api.contact.ContactInstance
 import com.sap.ec.api.contact.ContactInternal
 import com.sap.ec.api.contact.LoggingContact
-import com.sap.ec.core.collections.PersistentList
+import com.sap.ec.core.collections.ThreadSafePersistentStore
+import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
 import com.sap.ec.networking.clients.EventBasedClientApi
 import com.sap.ec.networking.clients.contact.ContactClient
 import com.sap.ec.networking.clients.contact.ContactTokenHandler
@@ -41,17 +40,11 @@ internal object ContactInjection {
                 sdkDispatcher = get(named(DispatcherTypes.Sdk)),
             )
         }
-        single<MutableList<ContactCall>>(named(PersistentListTypes.ContactCall)) {
-            PersistentList(
+        single<ThreadSafePersistentStoreApi<ContactCall>>(named(ThreadSafePersistentStoreTypes.ContactCall)) {
+            ThreadSafePersistentStore(
                 id = PersistentListIds.CONTACT_CONTEXT_PERSISTENT_ID,
                 storage = get(),
-                elementSerializer = ContactCall.serializer(),
-                elements = listOf()
-            )
-        }
-        single<ContactContextApi> {
-            ContactContext(
-                calls = get(named(PersistentListTypes.ContactCall))
+                itemSerializer = ContactCall.serializer()
             )
         }
         single<ContactInstance>(named(InstanceType.Logging)) {
@@ -61,18 +54,18 @@ internal object ContactInjection {
         }
         single<ContactInstance>(named(InstanceType.Gatherer)) {
             ContactGatherer(
-                context = get(),
                 sdkContext = get(),
+                threadSafePersistentStore = get(named(ThreadSafePersistentStoreTypes.ContactCall)),
                 sdkLogger = get { parametersOf(ContactGatherer::class.simpleName) },
             )
         }
         single<ContactInstance>(named(InstanceType.Internal)) {
             ContactInternal(
-                contactContext = get(),
-                sdkLogger = get { parametersOf(ContactInternal::class.simpleName) },
                 sdkEventDistributor = get(),
                 sdkContext = get(),
-                requestContext = get()
+                threadSafePersistentStore = get(named(ThreadSafePersistentStoreTypes.ContactCall)),
+                requestContext = get(),
+                sdkLogger = get { parametersOf(ContactInternal::class.simpleName) }
             )
         }
         single<ContactApi> {

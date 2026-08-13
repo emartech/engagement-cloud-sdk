@@ -3,7 +3,10 @@ package com.sap.ec.api.contact
 import com.sap.ec.TestEngagementCloudSDKConfig
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
+import com.sap.ec.core.collections.ThreadSafePersistentStore
+import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
 import com.sap.ec.core.networking.context.RequestContextApi
+import com.sap.ec.core.storage.StorageApi
 import com.sap.ec.event.SdkEvent
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -20,11 +23,13 @@ import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.KSerializer
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class ContactInternalTests {
     private companion object {
+        const val STORE_ID = "testStoreId"
         const val CONTACT_FIELD_VALUE = "testContactFieldValue"
         const val OPEN_ID_TOKEN = "testOpenIdToken"
         const val APPLICATION_CODE = "testAppCode"
@@ -35,17 +40,18 @@ class ContactInternalTests {
         val calls = mutableListOf(linkContact, linkAuthenticatedContact, unlinkContact)
     }
 
-    private lateinit var contactContext: ContactContextApi
     private lateinit var sdkEventDistributor: SdkEventDistributorApi
     private lateinit var mockSdkContext: SdkContextApi
     private lateinit var mockRequestContext: RequestContextApi
+    private lateinit var threadSafePersistentStore: ThreadSafePersistentStoreApi<ContactCall>
+    private lateinit var mockStorage: StorageApi
     private lateinit var eventSlot: SlotCapture<SdkEvent>
     private lateinit var contactInternal: ContactInstance
 
     @BeforeTest
     fun setUp() {
         eventSlot = slot()
-        contactContext = ContactContext(calls)
+        mockStorage = mock(MockMode.autofill)
         mockSdkContext = mock(MockMode.autofill)
         everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(
             APPLICATION_CODE
@@ -53,13 +59,8 @@ class ContactInternalTests {
         mockRequestContext = mock(MockMode.autofill)
         sdkEventDistributor = mock(MockMode.autofill)
         everySuspend { sdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(MockMode.autofill)
-        contactInternal = ContactInternal(
-            contactContext,
-            sdkLogger = mock(MockMode.autofill),
-            sdkEventDistributor,
-            mockSdkContext,
-            mockRequestContext
-        )
+        threadSafePersistentStore = createThreadSafeStore()
+        contactInternal = createContactInternal()
     }
 
     @Test
@@ -105,10 +106,29 @@ class ContactInternalTests {
 
     @Test
     fun testActivate_should_emit_stored_calls_as_events_to_event_flow() = runTest {
-        contactInternal.activate()
+        every { mockStorage.get(STORE_ID, any<KSerializer<List<Any>>>()) } returns calls
+        val safeStore = createThreadSafeStore(mockStorage)
+        val testInternal = createContactInternal(safeStore)
+
+        testInternal.activate()
 
         verifySuspend(VerifyMode.exactly(3)) { sdkEventDistributor.registerEvent(any()) }
+    }
 
-        contactContext.calls.size shouldBe 0
+    private fun createContactInternal(persistentStore: ThreadSafePersistentStoreApi<ContactCall> = threadSafePersistentStore): ContactInternal =
+        ContactInternal(
+            sdkEventDistributor,
+            mockSdkContext,
+            persistentStore,
+            mockRequestContext,
+            sdkLogger = mock(MockMode.autofill)
+        )
+
+    private fun createThreadSafeStore(storage: StorageApi = mockStorage): ThreadSafePersistentStoreApi<ContactCall> {
+        return ThreadSafePersistentStore(
+            STORE_ID,
+            storage,
+            ContactCall.serializer()
+        )
     }
 }

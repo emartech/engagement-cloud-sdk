@@ -4,12 +4,12 @@ import com.sap.ec.api.SdkState.Active
 import com.sap.ec.api.SdkState.Initialized
 import com.sap.ec.api.SdkState.OnHold
 import com.sap.ec.api.SdkState.UnInitialized
-import com.sap.ec.api.contact.ContactContext
-import com.sap.ec.api.contact.ContactContextApi
+import com.sap.ec.api.contact.ContactCall
 import com.sap.ec.api.contact.ContactGatherer
 import com.sap.ec.api.contact.ContactInternal
 import com.sap.ec.api.contact.LoggingContact
 import com.sap.ec.context.SdkContextApi
+import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.context.RequestContextApi
 import dev.mokkery.MockMode
@@ -35,27 +35,27 @@ class GenericApiTests {
     private lateinit var contactGatherer: ContactGatherer
     private lateinit var contactInternal: ContactInternal
     private lateinit var mockSdkContext: SdkContextApi
-    private lateinit var contactContext: ContactContextApi
     private lateinit var genericApi: GenericApi<LoggingContact, ContactGatherer, ContactInternal>
+    private lateinit var mockThreadSafePersistentStore: ThreadSafePersistentStoreApi<ContactCall>
     private lateinit var mockRequestContext: RequestContextApi
 
     @BeforeTest
     fun setup() {
         val mainDispatcher = StandardTestDispatcher()
         Dispatchers.setMain(mainDispatcher)
-        contactContext = ContactContext(mutableListOf())
         mockSdkContext = mock(MockMode.autofill)
         mockRequestContext = mock(MockMode.autofill)
+        mockThreadSafePersistentStore = mock(MockMode.autofill)
         mockSdkLogger = mock(MockMode.autofill)
         loggingContact = LoggingContact(mockSdkLogger)
-        contactGatherer = ContactGatherer(contactContext, mockSdkContext, mockSdkLogger)
+        contactGatherer = ContactGatherer(mockSdkContext, mockThreadSafePersistentStore, mockSdkLogger)
         contactInternal =
             ContactInternal(
-                contactContext,
-                mockSdkLogger,
                 sdkEventDistributor = mock(),
                 mockSdkContext,
-                mockRequestContext
+                mockThreadSafePersistentStore,
+                mockRequestContext,
+                mockSdkLogger
             )
         every { mockSdkContext.sdkDispatcher } returns mainDispatcher
         genericApi = GenericApi(

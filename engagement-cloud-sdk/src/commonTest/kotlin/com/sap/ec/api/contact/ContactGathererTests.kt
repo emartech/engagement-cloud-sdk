@@ -2,6 +2,9 @@ package com.sap.ec.api.contact
 
 import com.sap.ec.TestEngagementCloudSDKConfig
 import com.sap.ec.context.SdkContextApi
+import com.sap.ec.core.collections.ThreadSafePersistentStore
+import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
+import com.sap.ec.core.storage.StorageApi
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -13,6 +16,7 @@ import kotlin.test.Test
 
 class ContactGathererTests {
     private companion object {
+        const val TEST_STORE_ID = "testStoreId"
         const val CONTACT_FIELD_VALUE = "testContactFieldValue"
         const val OPEN_ID_TOKEN = "testOpenIdToken"
         const val APPLICATION_CODE = "testAppCode"
@@ -32,23 +36,32 @@ class ContactGathererTests {
     }
 
     private lateinit var contactGatherer: ContactGatherer
-    private lateinit var contactContext: ContactContextApi
+    private lateinit var mockStorage: StorageApi
+    private lateinit var threadSafePersistentStore: ThreadSafePersistentStoreApi<ContactCall>
     private lateinit var mockSdkContext: SdkContextApi
 
     @BeforeTest
     fun setup() {
-        contactContext = ContactContext(mutableListOf())
+        mockStorage = mock(MockMode.autofill)
+        threadSafePersistentStore = ThreadSafePersistentStore(
+            TEST_STORE_ID,
+            mockStorage,
+            ContactCall.serializer()
+        )
         mockSdkContext = mock(MockMode.autofill)
         everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(
             APPLICATION_CODE
         )
         contactGatherer =
-            ContactGatherer(contactContext, mockSdkContext, sdkLogger = mock(MockMode.autofill))
+            ContactGatherer(
+                mockSdkContext,
+                threadSafePersistentStore,
+                sdkLogger = mock(MockMode.autofill)
+            )
     }
 
     @Test
     fun testGathering() = runTest {
-
         contactGatherer.link(CONTACT_FIELD_VALUE)
         contactGatherer.linkAuthenticated(OPEN_ID_TOKEN)
         contactGatherer.unlink()
@@ -56,7 +69,7 @@ class ContactGathererTests {
         contactGatherer.unlink()
         contactGatherer.linkAuthenticated(OPEN_ID_TOKEN)
 
-        contactContext.calls shouldBe expected
+        threadSafePersistentStore.items shouldBe expected
     }
 
 }

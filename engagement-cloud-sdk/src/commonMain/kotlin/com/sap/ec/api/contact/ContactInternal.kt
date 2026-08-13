@@ -5,7 +5,7 @@ import com.sap.ec.api.contact.ContactCall.LinkContact
 import com.sap.ec.api.contact.ContactCall.UnlinkContact
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
-import com.sap.ec.core.collections.dequeue
+import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.context.RequestContextApi
 import com.sap.ec.event.SdkEvent
@@ -13,11 +13,11 @@ import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 internal class ContactInternal(
-    private val contactContext: ContactContextApi,
-    private val sdkLogger: Logger,
     private val sdkEventDistributor: SdkEventDistributorApi,
     private val sdkContext: SdkContextApi,
-    private val requestContext: RequestContextApi
+    private val threadSafePersistentStore: ThreadSafePersistentStoreApi<ContactCall>,
+    private val requestContext: RequestContextApi,
+    private val sdkLogger: Logger
 ) : ContactInstance {
     override suspend fun link(contactFieldValue: String) {
         sdkLogger.debug("link")
@@ -46,7 +46,7 @@ internal class ContactInternal(
 
     override suspend fun activate() {
         sdkLogger.debug("activate")
-        contactContext.calls.dequeue {
+        threadSafePersistentStore.dequeue {
             when (it) {
                 is LinkContact -> sdkEventDistributor.registerEvent(
                     SdkEvent.Internal.Sdk.LinkContact(
