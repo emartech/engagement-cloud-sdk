@@ -2,14 +2,10 @@ package com.sap.ec.core.device
 
 import com.sap.ec.core.device.constants.BrowserInfo
 import com.sap.ec.core.device.constants.OsInfo
-import com.sap.ec.core.log.Logger
-import com.sap.ec.npm_dependencies.parseUserAgent
 
 internal class WebPlatformInfoCollector(
     private val navigatorData: String,
-    private val userAgent: String,
-    private val userAgentData: dynamic,
-    private val sdkLogger: Logger
+    private val deviceCategoryProvider: DeviceCategoryProviderApi
 ) :
     WebPlatformInfoCollectorApi {
     private companion object {
@@ -40,7 +36,7 @@ internal class WebPlatformInfoCollector(
         } ?: BrowserInfo.Unknown
         val browserVersion = extractBrowserVersionNumber(browserInfo.versionPrefix)
 
-        val deviceCategory = getDeviceCategory()
+        val deviceCategory = deviceCategoryProvider.getDeviceCategory()
 
         return WindowHeaderData(
             osInfo.name,
@@ -58,22 +54,5 @@ internal class WebPlatformInfoCollector(
             val versionNumbers = versionMatches.drop(1)
             versionNumbers.first().replace("_", ".")
         } else DEFAULT_BROWSER_VERSION
-    }
-
-    private suspend fun getDeviceCategory(): DeviceCategory {
-        try {
-            val type =
-                parseUserAgent(
-                    userAgent,
-                    userAgentData
-                ).platform?.type
-
-            if (type != null) {
-                return DeviceCategory.valueOf(type.uppercase())
-            }
-        } catch (e: Exception) {
-            sdkLogger.info("determining device category failed", e)
-        }
-        return DeviceCategory.UNKNOWN
     }
 }
