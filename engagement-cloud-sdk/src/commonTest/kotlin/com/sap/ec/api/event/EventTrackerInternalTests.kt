@@ -3,19 +3,24 @@ package com.sap.ec.api.event
 import com.sap.ec.api.event.model.CustomEvent
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.channel.SdkEventWaiterApi
+import com.sap.ec.core.collections.ThreadSafePersistentStore
+import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.log.SdkLogger
 import com.sap.ec.core.providers.InstantProvider
 import com.sap.ec.core.providers.UuidProviderApi
+import com.sap.ec.core.storage.StorageApi
 import com.sap.ec.event.SdkEvent
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
+import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
 import io.kotest.assertions.throwables.shouldThrow
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlin.test.BeforeTest
@@ -27,6 +32,7 @@ import kotlin.time.ExperimentalTime
 class EventTrackerInternalTests {
 
     private companion object {
+        const val STORE_ID = "testStoreId"
         const val UUID = "testUUID"
         val timestamp = Clock.System.now()
         val customEvent = CustomEvent("testEvent", mapOf("testAttribute" to "testValue"))
@@ -52,13 +58,15 @@ class EventTrackerInternalTests {
     private lateinit var mockTimestampProvider: InstantProvider
     private lateinit var mockUuidProvider: UuidProviderApi
     private lateinit var eventTrackerInternal: EventTrackerInstance
-    private lateinit var eventTrackerContext: EventTrackerContextApi
+    private lateinit var threadSafePersistentStore: ThreadSafePersistentStoreApi<EventTrackerCall>
+    private lateinit var mockStorage: StorageApi
     private lateinit var logger: Logger
     private lateinit var mockWaiter: SdkEventWaiterApi
 
     @BeforeTest
     fun setUp() {
         mockSdkEventDistributor = mock()
+        mockStorage = mock(MockMode.autofill)
         mockTimestampProvider = mock()
         mockUuidProvider = mock()
         mockWaiter = mock()
@@ -69,18 +77,10 @@ class EventTrackerInternalTests {
         every { mockUuidProvider.provide() } returns UUID
         everySuspend { mockTimestampProvider.provide() } returns timestamp
         logger = SdkLogger("TestLoggerName", mock(MockMode.autofill), logConfigHolder = mock())
-
-        eventTrackerContext = EventTrackerContext(expectedEvents)
-
-        eventTrackerInternal =
-            EventTrackerInternal(
-                mockSdkEventDistributor,
-                eventTrackerContext,
-                mockTimestampProvider,
-                mockUuidProvider,
-                logger
-            )
+        threadSafePersistentStore = createSafeStore()
+        eventTrackerInternal = createEventInternal()
     }
+
 
     @Test
     fun testTrackEvent_shouldMakeCall_onClient() = runTest {
@@ -105,12 +105,33 @@ class EventTrackerInternalTests {
     fun testActivate_should_send_calls_to_client() = runTest {
         everySuspend { mockSdkEventDistributor.registerEvent(event) } returns mockWaiter
         everySuspend { mockSdkEventDistributor.registerEvent(event2) } returns mockWaiter
+        every { mockStorage.get(STORE_ID, any<KSerializer<List<Any>>>()) } returns expectedEvents
 
-        eventTrackerInternal.activate()
+        val store = createSafeStore()
+        val testInternal = createEventInternal(store)
+
+        testInternal.activate()
 
         verifySuspend {
             mockSdkEventDistributor.registerEvent(event)
             mockSdkEventDistributor.registerEvent(event2)
         }
     }
+
+    private fun createSafeStore(storage: StorageApi = mockStorage): ThreadSafePersistentStoreApi<EventTrackerCall> {
+        return ThreadSafePersistentStore(
+            STORE_ID,
+            storage,
+            EventTrackerCall.serializer()
+        )
+    }
+
+    private fun createEventInternal(safeStore: ThreadSafePersistentStoreApi<EventTrackerCall> = threadSafePersistentStore): EventTrackerInternal =
+        EventTrackerInternal(
+            mockSdkEventDistributor,
+            safeStore,
+            mockTimestampProvider,
+            mockUuidProvider,
+            logger
+        )
 }

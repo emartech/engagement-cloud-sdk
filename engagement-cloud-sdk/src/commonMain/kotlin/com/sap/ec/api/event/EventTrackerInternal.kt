@@ -2,7 +2,7 @@ package com.sap.ec.api.event
 
 import com.sap.ec.api.event.model.TrackedEvent
 import com.sap.ec.core.channel.SdkEventDistributorApi
-import com.sap.ec.core.collections.dequeue
+import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.providers.InstantProvider
@@ -12,7 +12,7 @@ import kotlin.time.ExperimentalTime
 @OptIn(ExperimentalTime::class)
 internal class EventTrackerInternal(
     private val sdkEventDistributor: SdkEventDistributorApi,
-    private val eventTrackerContext: EventTrackerContextApi,
+    private val threadSafePersistentStore: ThreadSafePersistentStoreApi<EventTrackerCall>,
     private val timestampProvider: InstantProvider,
     private val uuidProvider: UuidProviderApi,
     private val sdkLogger: Logger
@@ -31,7 +31,7 @@ internal class EventTrackerInternal(
     override suspend fun activate() {
         sdkLogger.debug("EventTrackerInternal - activate")
 
-        eventTrackerContext.calls.dequeue { call ->
+        threadSafePersistentStore.dequeue { call ->
             when (call) {
                 is EventTrackerCall.TrackEvent -> sdkEventDistributor.registerEvent(call.event)
             }

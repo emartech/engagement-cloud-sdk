@@ -1,9 +1,12 @@
 package com.sap.ec.api.event
 
 import com.sap.ec.api.event.model.CustomEvent
+import com.sap.ec.core.collections.ThreadSafePersistentStore
+import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
 import com.sap.ec.core.log.SdkLogger
 import com.sap.ec.core.providers.InstantProvider
 import com.sap.ec.core.providers.UuidProviderApi
+import com.sap.ec.core.storage.StorageApi
 import com.sap.ec.event.SdkEvent
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -14,7 +17,6 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
-import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.time.Clock
@@ -23,6 +25,7 @@ import kotlin.time.ExperimentalTime
 @OptIn(ExperimentalTime::class)
 class EventTrackerGathererTests {
     private companion object {
+        const val STORE_ID = "testStoreId"
         const val UUID = "testUUID"
         val customEvent = CustomEvent("testEvent", mapOf("testAttribute" to "testValue"))
         val timestamp = Clock.System.now()
@@ -41,12 +44,19 @@ class EventTrackerGathererTests {
     private lateinit var mockTimestampProvider: InstantProvider
     private lateinit var mockUuidProvider: UuidProviderApi
     private lateinit var gatherer: EventTrackerGatherer
-    private lateinit var eventTrackerContext: EventTrackerContextApi
+    private lateinit var threadSafePersistentStore: ThreadSafePersistentStoreApi<EventTrackerCall>
+    private lateinit var mockStorage: StorageApi
 
     @BeforeTest
     fun setup() {
         mockTimestampProvider = mock()
         mockUuidProvider = mock()
+        mockStorage = mock(MockMode.autofill)
+        threadSafePersistentStore = ThreadSafePersistentStore(
+            STORE_ID,
+            mockStorage,
+            EventTrackerCall.serializer()
+        )
 
         every { mockTimestampProvider.provide() } returns timestamp
         every { mockUuidProvider.provide() } returns UUID
@@ -57,27 +67,19 @@ class EventTrackerGathererTests {
             logConfigHolder = mock()
         )
 
-        eventTrackerContext = EventTrackerContext(mutableListOf())
-
         gatherer = EventTrackerGatherer(
-            eventTrackerContext,
+            threadSafePersistentStore,
             mockTimestampProvider,
             mockUuidProvider,
             logger
         )
     }
 
-    @AfterTest
-    fun teardown() {
-        eventTrackerContext.calls.clear()
-
-    }
-
     @Test
     fun testGathering() = runTest {
         gatherer.trackEvent(customEvent)
 
-        eventTrackerContext.calls shouldBe expected
+        threadSafePersistentStore.items shouldBe expected
     }
 
     @Test
@@ -86,6 +88,6 @@ class EventTrackerGathererTests {
 
         shouldThrow<IllegalArgumentException> { gatherer.trackEvent(testEvent) }
 
-        eventTrackerContext.calls shouldBe listOf()
+        threadSafePersistentStore.items shouldBe listOf()
     }
 }

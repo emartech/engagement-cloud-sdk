@@ -3,15 +3,14 @@ package com.sap.ec.di
 import com.sap.ec.api.event.EventTracker
 import com.sap.ec.api.event.EventTrackerApi
 import com.sap.ec.api.event.EventTrackerCall
-import com.sap.ec.api.event.EventTrackerContext
-import com.sap.ec.api.event.EventTrackerContextApi
 import com.sap.ec.api.event.EventTrackerGatherer
 import com.sap.ec.api.event.EventTrackerInstance
 import com.sap.ec.api.event.EventTrackerInternal
 import com.sap.ec.api.event.LoggingEventTracker
-import com.sap.ec.core.collections.PersistentList
 import com.sap.ec.api.event.model.EngagementCloudEvent
 import com.sap.ec.core.channel.SdkEventDistributorApi
+import com.sap.ec.core.collections.ThreadSafePersistentStore
+import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
 import com.sap.ec.mobileengage.session.ECSdkSession
 import com.sap.ec.mobileengage.session.SessionApi
 import com.sap.ec.tracking.Tracking
@@ -23,17 +22,11 @@ import org.koin.dsl.module
 
 internal object EventInjection {
     val eventModules = module {
-        single<MutableList<EventTrackerCall>>(named(PersistentListTypes.EventTrackerCall)) {
-            PersistentList(
+        single<ThreadSafePersistentStoreApi<EventTrackerCall>>(named(ThreadSafePersistentStoreTypes.EventTrackerCall)) {
+            ThreadSafePersistentStore(
                 id = PersistentListIds.EVENT_TRACKER_CONTEXT_PERSISTENT_ID,
                 storage = get(),
-                elementSerializer = EventTrackerCall.serializer(),
-                elements = listOf()
-            )
-        }
-        single<EventTrackerContextApi> {
-            EventTrackerContext(
-                calls = get(named(PersistentListTypes.EventTrackerCall))
+                itemSerializer = EventTrackerCall.serializer()
             )
         }
         single<EventTrackerInstance>(named(InstanceType.Logging)) {
@@ -43,7 +36,7 @@ internal object EventInjection {
         }
         single<EventTrackerInstance>(named(InstanceType.Gatherer)) {
             EventTrackerGatherer(
-                context = get(),
+                threadSafePersistentStore = get(named(ThreadSafePersistentStoreTypes.EventTrackerCall)),
                 timestampProvider = get(),
                 uuidProvider = get(),
                 sdkLogger = get { parametersOf(EventTrackerGatherer::class.simpleName) },
@@ -52,7 +45,7 @@ internal object EventInjection {
         single<EventTrackerInstance>(named(InstanceType.Internal)) {
             EventTrackerInternal(
                 sdkEventDistributor = get(),
-                eventTrackerContext = get(),
+                threadSafePersistentStore = get(named(ThreadSafePersistentStoreTypes.EventTrackerCall)),
                 timestampProvider = get(),
                 uuidProvider = get(),
                 sdkLogger = get { parametersOf(EventTrackerInternal::class.simpleName) },
