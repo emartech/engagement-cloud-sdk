@@ -4,7 +4,7 @@ import com.sap.ec.config.ApplicationCode
 import com.sap.ec.config.validate
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
-import com.sap.ec.core.collections.dequeue
+import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
 import com.sap.ec.core.language.LanguageHandlerApi
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.providers.InstantProvider
@@ -15,7 +15,7 @@ import kotlin.time.ExperimentalTime
 @OptIn(ExperimentalTime::class)
 internal class ConfigInternal(
     private val sdkEventDistributor: SdkEventDistributorApi,
-    private val configContext: ConfigContextApi,
+    private val threadSafePersistentStore: ThreadSafePersistentStoreApi<ConfigCall>,
     private val uuidProvider: UuidProviderApi,
     private val timestampProvider: InstantProvider,
     private val sdkLogger: Logger,
@@ -50,7 +50,7 @@ internal class ConfigInternal(
 
     override suspend fun activate() {
         sdkLogger.debug("ConfigInternal - activate")
-        configContext.calls.dequeue {
+        threadSafePersistentStore.dequeue {
             when (it) {
                 is ConfigCall.ChangeApplicationCode -> changeApplicationCode(it.applicationCode)
                 is ConfigCall.SetLanguage -> setLanguage(it.language)

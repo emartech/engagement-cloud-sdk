@@ -1,10 +1,13 @@
 package com.sap.ec.api.config
 
+import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
 import dev.mokkery.MockMode
+import dev.mokkery.answering.returns
+import dev.mokkery.everySuspend
+import dev.mokkery.matcher.any
 import dev.mokkery.mock
-import io.kotest.matchers.shouldBe
+import dev.mokkery.verifySuspend
 import kotlinx.coroutines.test.runTest
-import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -14,17 +17,14 @@ class GathererConfigTests {
     }
 
     private lateinit var gathererConfig: GathererConfig
-    private lateinit var configContext: ConfigContextApi
+    private lateinit var mockThreadSafePersistentStore: ThreadSafePersistentStoreApi<ConfigCall>
 
     @BeforeTest
     fun setUp() = runTest {
-        configContext = ConfigContext(mutableListOf())
-        gathererConfig = GathererConfig(configContext, sdkLogger = mock(MockMode.autofill))
-    }
-
-    @AfterTest
-    fun tearDown() {
-        configContext.calls.clear()
+        mockThreadSafePersistentStore = mock(MockMode.autofill)
+        everySuspend { mockThreadSafePersistentStore.add(any()) } returns Unit
+        gathererConfig =
+            GathererConfig(mockThreadSafePersistentStore, sdkLogger = mock(MockMode.autofill))
     }
 
     @Test
@@ -33,7 +33,7 @@ class GathererConfigTests {
 
         gathererConfig.changeApplicationCode(APP_CODE)
 
-        configContext.calls.contains(expectedCall) shouldBe true
+        verifySuspend { mockThreadSafePersistentStore.add(expectedCall) }
     }
 
     @Test
@@ -42,7 +42,7 @@ class GathererConfigTests {
 
         gathererConfig.setLanguage("hu-HU")
 
-        configContext.calls.contains(expectedCall) shouldBe true
+        verifySuspend { mockThreadSafePersistentStore.add(expectedCall) }
     }
 
     @Test
@@ -51,6 +51,6 @@ class GathererConfigTests {
 
         gathererConfig.resetLanguage()
 
-        configContext.calls.contains(expectedCall) shouldBe true
+        verifySuspend { mockThreadSafePersistentStore.add(expectedCall) }
     }
 }

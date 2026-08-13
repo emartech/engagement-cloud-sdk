@@ -2,8 +2,6 @@ package com.sap.ec.api.config
 
 import kotlinx.serialization.Serializable
 
-internal class ConfigContext(override val calls: MutableList<ConfigCall>) : ConfigContextApi
-
 @Serializable
 internal sealed interface ConfigCall {
     @Serializable

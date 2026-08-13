@@ -4,11 +4,14 @@ import com.sap.ec.TestEngagementCloudSDKConfig
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.channel.SdkEventWaiterApi
+import com.sap.ec.core.collections.ThreadSafePersistentStore
+import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
 import com.sap.ec.core.exceptions.SdkException
 import com.sap.ec.core.language.LanguageHandlerApi
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.providers.InstantProvider
 import com.sap.ec.core.providers.UuidProviderApi
+import com.sap.ec.core.storage.StorageApi
 import com.sap.ec.event.SdkEvent
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -26,6 +29,7 @@ import io.kotest.data.forAll
 import io.kotest.data.row
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.KSerializer
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.time.Clock
@@ -34,12 +38,13 @@ import kotlin.time.ExperimentalTime
 @OptIn(ExperimentalTime::class)
 class ConfigInternalTests {
     private companion object {
+        const val STORE_ID = "testStoreId"
         const val UUID = "testUUID"
-        val TIMESTAMP = Clock.System.now()
         const val OLD_APPCODE = "B2B3C-D6T2C"
         const val NEW_APPCODE = "A1s2D-F3G4H"
         const val MULTI_REGION_APPCODE = "INS-S01-APP-ABC12"
         const val HUNGARIAN_LANGUAGE = "hu-HU"
+        val TIMESTAMP = Clock.System.now()
     }
 
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
@@ -48,7 +53,8 @@ class ConfigInternalTests {
     private lateinit var mockLogger: Logger
     private lateinit var mockLanguageHandler: LanguageHandlerApi
     private lateinit var configInternal: ConfigInternal
-    private lateinit var mockConfigContext: ConfigContextApi
+    private lateinit var threadSafePersistentStore: ThreadSafePersistentStoreApi<ConfigCall>
+    private lateinit var mockStorage: StorageApi
     private lateinit var mockSdkContext: SdkContextApi
 
     @BeforeTest
@@ -62,19 +68,11 @@ class ConfigInternalTests {
         mockLanguageHandler = mock(MockMode.autofill)
         mockSdkEventDistributor = mock(MockMode.autofill)
         everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mock(MockMode.autofill)
-        mockConfigContext = mock()
+        mockStorage = mock(MockMode.autofill)
+        threadSafePersistentStore = createThreadSafeStore()
         mockSdkContext = mock()
         every { mockSdkContext.globalRemoteConfigApplicationCodeValidationRegex } returns null
-        configInternal =
-            ConfigInternal(
-                mockSdkEventDistributor,
-                mockConfigContext,
-                mockUuidProvider,
-                mockTimestampProvider,
-                mockLogger,
-                mockLanguageHandler,
-                mockSdkContext
-            )
+        configInternal = createConfigInternal()
     }
 
     @Test
@@ -91,7 +89,9 @@ class ConfigInternalTests {
         )
         everySuspend { mockWaiter.await<Any>() } returns successResponse
         everySuspend { mockSdkEventDistributor.registerEvent(expectedEvent) } returns mockWaiter
-        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(
+            OLD_APPCODE
+        )
 
         configInternal.changeApplicationCode(NEW_APPCODE)
 
@@ -113,7 +113,9 @@ class ConfigInternalTests {
             )
             everySuspend { mockWaiter.await<Any>() } returns successResponse
             everySuspend { mockSdkEventDistributor.registerEvent(expectedEvent) } returns mockWaiter
-            everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
+            everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(
+                OLD_APPCODE
+            )
             every { mockSdkContext.globalRemoteConfigApplicationCodeValidationRegex } returns null
 
             configInternal.changeApplicationCode(MULTI_REGION_APPCODE)
@@ -138,7 +140,9 @@ class ConfigInternalTests {
             )
             everySuspend { mockWaiter.await<Any>() } returns successResponse
             everySuspend { mockSdkEventDistributor.registerEvent(expectedEvent) } returns mockWaiter
-            everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
+            everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(
+                OLD_APPCODE
+            )
             every { mockSdkContext.globalRemoteConfigApplicationCodeValidationRegex } returns customRegex
 
             configInternal.changeApplicationCode(customAppCode)
@@ -175,7 +179,9 @@ class ConfigInternalTests {
             )
             everySuspend { mockWaiter.await<Any>() } returns successResponse
             everySuspend { mockSdkEventDistributor.registerEvent(expectedEvent) } returns mockWaiter
-            everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
+            everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(
+                OLD_APPCODE
+            )
             every { mockSdkContext.globalRemoteConfigApplicationCodeValidationRegex } returns null
 
             configInternal.changeApplicationCode(MULTI_REGION_APPCODE)
@@ -198,7 +204,9 @@ class ConfigInternalTests {
         )
         everySuspend { mockWaiter.await<Any>() } returns successResponse
         everySuspend { mockSdkEventDistributor.registerEvent(expectedEvent) } returns mockWaiter
-        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(
+            OLD_APPCODE
+        )
         every { mockSdkContext.globalRemoteConfigApplicationCodeValidationRegex } returns null
 
         configInternal.changeApplicationCode(v2AppCode)
@@ -207,24 +215,28 @@ class ConfigInternalTests {
     }
 
     @Test
-    fun testChangeApplicationCode_shouldNotRegisterChangeAppCodeEvent_whenAppCode_isEmpty() = runTest {
-        everySuspend { mockLogger.error(message = any()) } returns Unit
-        shouldThrow<SdkException.InvalidApplicationCodeException> {
-            configInternal.changeApplicationCode(" ")
+    fun testChangeApplicationCode_shouldNotRegisterChangeAppCodeEvent_whenAppCode_isEmpty() =
+        runTest {
+            everySuspend { mockLogger.error(message = any()) } returns Unit
+            shouldThrow<SdkException.InvalidApplicationCodeException> {
+                configInternal.changeApplicationCode(" ")
+            }
+
+            verifySuspend(mode = VerifyMode.exactly(0)) { mockSdkEventDistributor.registerEvent(any()) }
         }
 
-        verifySuspend(mode = VerifyMode.exactly(0)) { mockSdkEventDistributor.registerEvent(any()) }
-    }
-
     @Test
-    fun testChangeApplicationCode_shouldNotRegisterChangeAppCodeEvent_whenAppCode_hasNotChanged() = runTest {
-        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
-        everySuspend { mockLogger.info(any<String>()) } returns Unit
+    fun testChangeApplicationCode_shouldNotRegisterChangeAppCodeEvent_whenAppCode_hasNotChanged() =
+        runTest {
+            everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(
+                OLD_APPCODE
+            )
+            everySuspend { mockLogger.info(any<String>()) } returns Unit
 
-        configInternal.changeApplicationCode(OLD_APPCODE)
+            configInternal.changeApplicationCode(OLD_APPCODE)
 
-        verifySuspend(mode = VerifyMode.exactly(0)) { mockSdkEventDistributor.registerEvent(any()) }
-    }
+            verifySuspend(mode = VerifyMode.exactly(0)) { mockSdkEventDistributor.registerEvent(any()) }
+        }
 
     @Test
     fun testChangeApplicationCode_shouldThrow_whenAppCode_isInvalid() = runTest {
@@ -276,17 +288,22 @@ class ConfigInternalTests {
             ConfigCall.SetLanguage(HUNGARIAN_LANGUAGE),
             ConfigCall.ResetLanguage
         )
+        every { mockStorage.get(STORE_ID, any<KSerializer<List<Any>>>()) } returns testCalls
+        every { mockStorage.put(STORE_ID, ConfigCall.serializer(), null) } returns Unit
+        val safeStorage = createThreadSafeStore()
+        val testInternal = createConfigInternal(safeStorage)
         val mockWaiter = mock<SdkEventWaiterApi>()
         val successResponse = SdkEvent.Internal.Sdk.Answer.Response<Any>(
             originId = UUID,
             Result.success(Unit)
         )
         everySuspend { mockWaiter.await<Any>() } returns successResponse
-        everySuspend { mockConfigContext.calls } returns testCalls
         everySuspend { mockSdkEventDistributor.registerEvent(capture(slot)) } returns mockWaiter
-        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(
+            OLD_APPCODE
+        )
 
-        configInternal.activate()
+        testInternal.activate()
 
         val testEvent = slot.get()
         verifySuspend(VerifyMode.order) {
@@ -299,7 +316,6 @@ class ConfigInternalTests {
             mockLanguageHandler.handleLanguage(HUNGARIAN_LANGUAGE)
             mockLanguageHandler.handleLanguage(null)
         }
-        testCalls.size shouldBe 0
     }
 
     @Test
@@ -312,7 +328,9 @@ class ConfigInternalTests {
         )
         everySuspend { mockWaiter.await<Any>() } returns failureResponse
         everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mockWaiter
-        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(
+            OLD_APPCODE
+        )
 
         val exception = shouldThrow<Exception> {
             configInternal.changeApplicationCode(NEW_APPCODE)
@@ -331,11 +349,32 @@ class ConfigInternalTests {
         )
         everySuspend { mockWaiter.await<Any>() } returns successResponse
         everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mockWaiter
-        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(OLD_APPCODE)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(
+            OLD_APPCODE
+        )
 
         configInternal.changeApplicationCode(NEW_APPCODE)
 
         verifySuspend { mockSdkEventDistributor.registerEvent(any()) }
     }
 
+    private fun createConfigInternal(persistentStore: ThreadSafePersistentStoreApi<ConfigCall> = threadSafePersistentStore): ConfigInternal {
+        return ConfigInternal(
+            mockSdkEventDistributor,
+            persistentStore,
+            mockUuidProvider,
+            mockTimestampProvider,
+            mockLogger,
+            mockLanguageHandler,
+            mockSdkContext
+        )
+    }
+
+    private fun createThreadSafeStore(storage: StorageApi = mockStorage): ThreadSafePersistentStoreApi<ConfigCall> {
+        return ThreadSafePersistentStore(
+            STORE_ID,
+            storage,
+            ConfigCall.serializer()
+        )
+    }
 }
