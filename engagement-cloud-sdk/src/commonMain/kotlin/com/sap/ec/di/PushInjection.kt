@@ -45,7 +45,7 @@ internal object PushInjection {
         }
         single<ThreadSafePersistentStoreApi<PushCall>>(named(ThreadSafePersistentStoreTypes.PushCall)) {
             ThreadSafePersistentStore(
-                id = PersistentListIds.PUSH_CONTEXT_PERSISTENT_ID,
+                id = PersistentStoreIds.PUSH_CONTEXT_PERSISTENT_ID,
                 storage = get(),
                 itemSerializer = PushCall.serializer(),
             )

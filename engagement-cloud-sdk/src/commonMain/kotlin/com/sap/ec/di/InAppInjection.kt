@@ -57,7 +57,7 @@ internal object InAppInjection {
         }
         single<ThreadSafePersistentStoreApi<InAppCall>>(named(ThreadSafePersistentStoreTypes.InAppCall)) {
             ThreadSafePersistentStore(
-                id = PersistentListIds.INAPP_CONTEXT_PERSISTENT_ID,
+                id = PersistentStoreIds.INAPP_CONTEXT_PERSISTENT_ID,
                 storage = get(),
                 itemSerializer = InAppCall.serializer(),
             )

@@ -227,7 +227,7 @@ internal enum class SdkConfigStoreTypes {
     EC, Android, Web
 }
 
-internal object PersistentListIds {
+internal object PersistentStoreIds {
     const val PUSH_CONTEXT_PERSISTENT_ID = "SAPEngagementCloudSdkPushContextCalls"
     const val INAPP_CONTEXT_PERSISTENT_ID = "SAPEngagementCloudSdkInAppContextCalls"
     const val CONFIG_CONTEXT_PERSISTENT_ID = "SAPEngagementCloudSdkConfigContextCalls"

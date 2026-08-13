@@ -42,7 +42,7 @@ internal object ContactInjection {
         }
         single<ThreadSafePersistentStoreApi<ContactCall>>(named(ThreadSafePersistentStoreTypes.ContactCall)) {
             ThreadSafePersistentStore(
-                id = PersistentListIds.CONTACT_CONTEXT_PERSISTENT_ID,
+                id = PersistentStoreIds.CONTACT_CONTEXT_PERSISTENT_ID,
                 storage = get(),
                 itemSerializer = ContactCall.serializer()
             )

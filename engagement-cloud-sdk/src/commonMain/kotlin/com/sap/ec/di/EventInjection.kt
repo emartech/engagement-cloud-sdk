@@ -24,7 +24,7 @@ internal object EventInjection {
     val eventModules = module {
         single<ThreadSafePersistentStoreApi<EventTrackerCall>>(named(ThreadSafePersistentStoreTypes.EventTrackerCall)) {
             ThreadSafePersistentStore(
-                id = PersistentListIds.EVENT_TRACKER_CONTEXT_PERSISTENT_ID,
+                id = PersistentStoreIds.EVENT_TRACKER_CONTEXT_PERSISTENT_ID,
                 storage = get(),
                 itemSerializer = EventTrackerCall.serializer()
             )

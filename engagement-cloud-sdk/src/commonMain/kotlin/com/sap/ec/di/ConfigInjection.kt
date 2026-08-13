@@ -19,7 +19,7 @@ internal object ConfigInjection {
     val configModules = module {
         single<ThreadSafePersistentStoreApi<ConfigCall>>(named(ThreadSafePersistentStoreTypes.ConfigCall)) {
             ThreadSafePersistentStore(
-                id = PersistentListIds.CONFIG_CONTEXT_PERSISTENT_ID,
+                id = PersistentStoreIds.CONFIG_CONTEXT_PERSISTENT_ID,
                 storage = get(),
                 itemSerializer = ConfigCall.serializer()
             )
