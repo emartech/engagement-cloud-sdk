@@ -1,7 +1,7 @@
 @file:JsModule("bowser")
 @file:JsNonModule
 
-package com.sap.ec.npm_dependencies
+package com.sap.ec.npm_dependencies.bowser
 
 external interface BowserPlatform {
     // can be "bot, "desktop", "mobile", "tablet", "tv"
