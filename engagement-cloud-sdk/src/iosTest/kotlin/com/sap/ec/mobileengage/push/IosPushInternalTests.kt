@@ -8,11 +8,10 @@ import com.sap.ec.api.event.model.EventSource
 import com.sap.ec.api.push.Ems
 import com.sap.ec.api.push.NotificationCenterDelegateRegistration
 import com.sap.ec.api.push.NotificationCenterDelegateRegistrationOptions
+import com.sap.ec.api.push.PushCall
 import com.sap.ec.api.push.PushCall.ClearPushToken
 import com.sap.ec.api.push.PushCall.HandleSilentMessageWithUserInfo
 import com.sap.ec.api.push.PushCall.RegisterPushToken
-import com.sap.ec.api.push.PushContext
-import com.sap.ec.api.push.PushContextApi
 import com.sap.ec.api.push.SilentNotification
 import com.sap.ec.api.push.SilentPushUserInfo
 import com.sap.ec.context.SdkContextApi
@@ -20,9 +19,12 @@ import com.sap.ec.core.actions.ActionHandlerApi
 import com.sap.ec.core.actions.badge.BadgeCountHandlerApi
 import com.sap.ec.core.actions.pushtoinapp.PushToInAppHandlerApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
+import com.sap.ec.core.collections.ThreadSafePersistentStore
+import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.providers.InstantProvider
 import com.sap.ec.core.providers.UuidProviderApi
+import com.sap.ec.core.storage.StorageApi
 import com.sap.ec.core.storage.StringStorageApi
 import com.sap.ec.core.url.ExternalUrlOpenerApi
 import com.sap.ec.event.SdkEvent
@@ -62,6 +64,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import platform.UserNotifications.UNNotificationDefaultActionIdentifier
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
@@ -75,6 +78,7 @@ import kotlin.time.Instant
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
 internal class IosPushInternalTests {
     private companion object {
+        const val STORE_ID = "testStoreId"
         const val UUID = "testUUID"
         const val TEST_APPLICATION_CODE = "testAppCode"
         const val PUSH_TOKEN = "testPushToken"
@@ -108,8 +112,9 @@ internal class IosPushInternalTests {
 
     private lateinit var iosPushInternal: IosPushInternal
 
-    private lateinit var mockStorage: StringStorageApi
-    private lateinit var pushContext: PushContextApi
+    private lateinit var mockStringStorage: StringStorageApi
+    private lateinit var threadSafePersistentStore: ThreadSafePersistentStoreApi<PushCall>
+    private lateinit var mockStorage: StorageApi
     private lateinit var mockSdkContext: SdkContextApi
     private lateinit var mockActionFactory: PushActionFactoryApi
     private lateinit var mockActionHandler: ActionHandlerApi
@@ -128,11 +133,15 @@ internal class IosPushInternalTests {
     @BeforeTest
     fun setup() = runTest {
         Dispatchers.setMain(StandardTestDispatcher())
-
-        mockStorage = mock()
+        mockStringStorage = mock()
         mockSdkContext = mock()
+        mockStorage = mock(MockMode.autofill)
+        threadSafePersistentStore =
+            ThreadSafePersistentStore(STORE_ID, mockStorage, PushCall.serializer())
         sdkStateFlow = MutableStateFlow(SdkState.Active)
-        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(TEST_APPLICATION_CODE)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(
+            TEST_APPLICATION_CODE
+        )
         every { mockSdkContext.currentSdkState } returns sdkStateFlow
         mockActionFactory = mock()
         mockActionHandler = mock()
@@ -147,11 +156,10 @@ internal class IosPushInternalTests {
         everySuspend { mockTimestampProvider.provide() } returns Instant.DISTANT_PAST
         everySuspend { mockUuidProvider.provide() } returns UUID
 
-        pushContext = PushContext(pushCalls)
         iosPushInternal = IosPushInternal(
-            mockStorage,
-            pushContext,
+            mockStringStorage,
             mockSdkContext,
+            threadSafePersistentStore,
             mockActionFactory,
             mockActionHandler,
             mockBadgeCountHandler,
@@ -159,7 +167,6 @@ internal class IosPushInternalTests {
             sdkDispatcher,
             mockSdkLogger,
             mockSdkEventDistributor,
-            mockTimestampProvider,
             mockUuidProvider
         )
 
@@ -433,7 +440,8 @@ internal class IosPushInternalTests {
                 actions = null
             )
 
-            val notificationOpenedActionModel = NotificationOpenedActionModel(null,
+            val notificationOpenedActionModel = NotificationOpenedActionModel(
+                null,
                 TRACKING_INFO
             )
 
@@ -553,12 +561,27 @@ internal class IosPushInternalTests {
     @Test
     fun `testActivate should handle pushCalls`() = runTest {
         val eventContainer = Capture.container<SdkEvent>()
+        every { mockStorage.get(STORE_ID, any<KSerializer<List<Any>>>()) } returns pushCalls
         everySuspend { mockSdkEventDistributor.registerEvent(capture(eventContainer)) } returns mock(
             MockMode.autofill
         )
         everySuspend { mockBadgeCountHandler.handle(any()) } returns Unit
+        val safeStore = ThreadSafePersistentStore(STORE_ID, mockStorage, PushCall.serializer())
+        val testInternal = IosPushInternal(
+            mockStringStorage,
+            mockSdkContext,
+            safeStore,
+            mockActionFactory,
+            mockActionHandler,
+            mockBadgeCountHandler,
+            json,
+            sdkDispatcher,
+            mockSdkLogger,
+            mockSdkEventDistributor,
+            mockUuidProvider
+        )
 
-        iosPushInternal.activate()
+        testInternal.activate()
 
         advanceUntilIdle()
 
@@ -609,7 +632,8 @@ internal class IosPushInternalTests {
 
     @Test
     fun `registerNotificationCenterDelegate should use provided options`() {
-        val options = NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = true)
+        val options =
+            NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = true)
 
         iosPushInternal.registerNotificationCenterDelegate(testDelegate1, options)
 
@@ -627,8 +651,10 @@ internal class IosPushInternalTests {
 
     @Test
     fun `registerNotificationCenterDelegate should replace existing registration for same delegate`() {
-        val options1 = NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = false)
-        val options2 = NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = true)
+        val options1 =
+            NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = false)
+        val options2 =
+            NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = true)
 
         iosPushInternal.registerNotificationCenterDelegate(testDelegate1, options1)
         iosPushInternal.registerNotificationCenterDelegate(testDelegate1, options2)
@@ -701,8 +727,14 @@ internal class IosPushInternalTests {
     @Test
     fun `filterDelegates should return all delegates for non-EC notification`() {
         val registrations = listOf(
-            NotificationCenterDelegateRegistration(testDelegate1, NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = false)),
-            NotificationCenterDelegateRegistration(testDelegate2, NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = true))
+            NotificationCenterDelegateRegistration(
+                testDelegate1,
+                NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = false)
+            ),
+            NotificationCenterDelegateRegistration(
+                testDelegate2,
+                NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = true)
+            )
         )
         val nonEcUserInfo = mapOf<Any?, Any?>("someKey" to "value")
 
@@ -715,8 +747,14 @@ internal class IosPushInternalTests {
     @Test
     fun `filterDelegates should only return delegates with includeEngagementCloudMessages true for EC notification`() {
         val registrations = listOf(
-            NotificationCenterDelegateRegistration(testDelegate1, NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = false)),
-            NotificationCenterDelegateRegistration(testDelegate2, NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = true))
+            NotificationCenterDelegateRegistration(
+                testDelegate1,
+                NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = false)
+            ),
+            NotificationCenterDelegateRegistration(
+                testDelegate2,
+                NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = true)
+            )
         )
         val ecUserInfo = mapOf<Any?, Any?>("ems" to mapOf("version" to "1.0"))
 
@@ -729,8 +767,14 @@ internal class IosPushInternalTests {
     @Test
     fun `filterDelegates should return empty list when no delegates match for EC notification`() {
         val registrations = listOf(
-            NotificationCenterDelegateRegistration(testDelegate1, NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = false)),
-            NotificationCenterDelegateRegistration(testDelegate2, NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = false))
+            NotificationCenterDelegateRegistration(
+                testDelegate1,
+                NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = false)
+            ),
+            NotificationCenterDelegateRegistration(
+                testDelegate2,
+                NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = false)
+            )
         )
         val ecUserInfo = mapOf<Any?, Any?>("ems" to mapOf("version" to "1.0"))
 
@@ -742,8 +786,14 @@ internal class IosPushInternalTests {
     @Test
     fun `filterDelegates should return all delegates when all have includeEngagementCloudMessages true for EC notification`() {
         val registrations = listOf(
-            NotificationCenterDelegateRegistration(testDelegate1, NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = true)),
-            NotificationCenterDelegateRegistration(testDelegate2, NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = true))
+            NotificationCenterDelegateRegistration(
+                testDelegate1,
+                NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = true)
+            ),
+            NotificationCenterDelegateRegistration(
+                testDelegate2,
+                NotificationCenterDelegateRegistrationOptions(includeEngagementCloudMessages = true)
+            )
         )
         val ecUserInfo = mapOf<Any?, Any?>("ems" to mapOf("version" to "1.0"))
 
@@ -784,8 +834,10 @@ internal class IosPushInternalTests {
     fun `didReceiveNotificationResponse should always call completion handler on success`() =
         runTest {
             var completionHandlerCalled = false
-            val actionModel = BasicOpenExternalUrlActionModel(REPORTING, url = "https://www.sap.com")
-            val notificationOpenedActionModel = NotificationOpenedActionModel(REPORTING, TRACKING_INFO)
+            val actionModel =
+                BasicOpenExternalUrlActionModel(REPORTING, url = "https://www.sap.com")
+            val notificationOpenedActionModel =
+                NotificationOpenedActionModel(REPORTING, TRACKING_INFO)
             val mockAction: Action<Unit> = mock(MockMode.autoUnit)
             val mockReportingAction: Action<Unit> = mock(MockMode.autoUnit)
 
@@ -818,8 +870,10 @@ internal class IosPushInternalTests {
         runTest {
             sdkStateFlow.value = SdkState.Active
             var handlerProcessed = false
-            val actionModel = BasicOpenExternalUrlActionModel(REPORTING, url = "https://www.sap.com")
-            val notificationOpenedActionModel = NotificationOpenedActionModel(REPORTING, TRACKING_INFO)
+            val actionModel =
+                BasicOpenExternalUrlActionModel(REPORTING, url = "https://www.sap.com")
+            val notificationOpenedActionModel =
+                NotificationOpenedActionModel(REPORTING, TRACKING_INFO)
             val mockAction: Action<Unit> = mock(MockMode.autoUnit)
             val mockReportingAction: Action<Unit> = mock(MockMode.autoUnit)
 
@@ -857,9 +911,9 @@ internal class IosPushInternalTests {
             sdkStateFlow.value = SdkState.Initialized
 
             val nonActiveIosPushInternal = IosPushInternal(
-                mockStorage,
-                pushContext,
+                mockStringStorage,
                 mockSdkContext,
+                threadSafePersistentStore,
                 mockActionFactory,
                 mockActionHandler,
                 mockBadgeCountHandler,
@@ -867,13 +921,14 @@ internal class IosPushInternalTests {
                 sdkDispatcher,
                 mockSdkLogger,
                 mockSdkEventDistributor,
-                mockTimestampProvider,
                 mockUuidProvider
             )
 
             var completionHandlerCalled = false
-            val actionModel = BasicOpenExternalUrlActionModel(REPORTING, url = "https://www.sap.com")
-            val notificationOpenedActionModel = NotificationOpenedActionModel(REPORTING, TRACKING_INFO)
+            val actionModel =
+                BasicOpenExternalUrlActionModel(REPORTING, url = "https://www.sap.com")
+            val notificationOpenedActionModel =
+                NotificationOpenedActionModel(REPORTING, TRACKING_INFO)
             val mockAction: Action<Unit> = mock(MockMode.autoUnit)
             val mockReportingAction: Action<Unit> = mock(MockMode.autoUnit)
 
@@ -1044,7 +1099,8 @@ internal class IosPushInternalTests {
         )
 
         val notificationOpenedActionModel = NotificationOpenedActionModel(null, TRACKING_INFO)
-        val reportingAction = ReportingAction(notificationOpenedActionModel, mock(MockMode.autoUnit))
+        val reportingAction =
+            ReportingAction(notificationOpenedActionModel, mock(MockMode.autoUnit))
         everySuspend { mockActionFactory.create(notificationOpenedActionModel) } returns reportingAction
 
         iosPushInternal.didReceiveNotificationResponse(wrongActionId, userInfo) {}

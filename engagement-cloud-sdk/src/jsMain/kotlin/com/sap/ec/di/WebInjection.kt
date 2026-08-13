@@ -266,8 +266,8 @@ internal object WebInjection {
         single<JsPushInstance>(named(InstanceType.Internal)) {
             JsPushInternal(
                 storage = get(),
-                pushContext = get(),
                 sdkContext = get(),
+                threadSafePersistentStore = get(named(ThreadSafePersistentStoreTypes.PushCall)),
                 sdkEventDistributor = get(),
                 sdkLogger = get { parametersOf(JsPushInternal::class.simpleName) },
                 pushService = get(),
@@ -280,9 +280,9 @@ internal object WebInjection {
         }
         single<JsPushInstance>(named(InstanceType.Gatherer)) {
             JsGathererPush(
-                context = get(),
                 jsPushInternal = get(named(InstanceType.Internal)),
                 sdkLogger = get { parametersOf(JsGathererPush::class.simpleName) },
+                threadSafePersistentStore = get(named(ThreadSafePersistentStoreTypes.PushCall)),
             )
         }
         single<PushApi> {

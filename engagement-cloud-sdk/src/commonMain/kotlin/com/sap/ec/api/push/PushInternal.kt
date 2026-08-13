@@ -6,7 +6,7 @@ import com.sap.ec.api.push.PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY
 import com.sap.ec.api.push.PushConstants.PUSH_TOKEN_STORAGE_KEY
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
-import com.sap.ec.core.collections.dequeue
+import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.storage.StringStorageApi
@@ -16,7 +16,7 @@ import kotlin.time.ExperimentalTime
 @OptIn(ExperimentalTime::class)
 internal open class PushInternal(
     private val storage: StringStorageApi,
-    private val pushContext: PushContextApi,
+    private val threadSafePersistentStore: ThreadSafePersistentStoreApi<PushCall>,
     private val sdkEventDistributor: SdkEventDistributorApi,
     private val sdkContext: SdkContextApi,
     private val sdkLogger: Logger
@@ -55,7 +55,7 @@ internal open class PushInternal(
     }
 
     override suspend fun activate() {
-        pushContext.calls.dequeue { call ->
+        threadSafePersistentStore.dequeue { call ->
             when (call) {
                 is RegisterPushToken -> sdkEventDistributor.registerEvent(
                     SdkEvent.Internal.Sdk.RegisterPushToken(

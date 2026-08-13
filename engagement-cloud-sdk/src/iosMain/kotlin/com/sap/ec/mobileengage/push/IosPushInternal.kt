@@ -6,12 +6,12 @@ import com.sap.ec.api.event.model.AppEvent
 import com.sap.ec.api.event.model.EventSource
 import com.sap.ec.api.push.NotificationCenterDelegateRegistration
 import com.sap.ec.api.push.NotificationCenterDelegateRegistrationOptions
+import com.sap.ec.api.push.PushCall
 import com.sap.ec.api.push.PushCall.ClearPushToken
 import com.sap.ec.api.push.PushCall.HandleSilentMessageWithUserInfo
 import com.sap.ec.api.push.PushCall.RegisterPushToken
 import com.sap.ec.api.push.PushCall.Subscribe
 import com.sap.ec.api.push.PushCall.Unsubscribe
-import com.sap.ec.api.push.PushContextApi
 import com.sap.ec.api.push.PushInternal
 import com.sap.ec.api.push.PushUserInfo
 import com.sap.ec.api.push.SilentPushUserInfo
@@ -19,9 +19,8 @@ import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.actions.ActionHandlerApi
 import com.sap.ec.core.actions.badge.BadgeCountHandlerApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
-import com.sap.ec.core.collections.dequeue
+import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
 import com.sap.ec.core.log.Logger
-import com.sap.ec.core.providers.InstantProvider
 import com.sap.ec.core.providers.UuidProviderApi
 import com.sap.ec.core.storage.StringStorageApi
 import com.sap.ec.event.SdkEvent
@@ -59,8 +58,8 @@ import kotlin.time.ExperimentalTime
 @OptIn(ExperimentalTime::class)
 internal class IosPushInternal(
     storage: StringStorageApi,
-    private val pushContext: PushContextApi,
     private val sdkContext: SdkContextApi,
+    private val threadSafePersistentStore: ThreadSafePersistentStoreApi<PushCall>,
     private val actionFactory: PushActionFactoryApi,
     private val actionHandler: ActionHandlerApi,
     private val badgeCountHandler: BadgeCountHandlerApi,
@@ -68,9 +67,8 @@ internal class IosPushInternal(
     private val sdkDispatcher: CoroutineDispatcher,
     private val sdkLogger: Logger,
     private val sdkEventDistributor: SdkEventDistributorApi,
-    private val timestampProvider: InstantProvider,
     private val uuidProvider: UuidProviderApi
-) : PushInternal(storage, pushContext, sdkEventDistributor, sdkContext, sdkLogger),
+) : PushInternal(storage, threadSafePersistentStore, sdkEventDistributor, sdkContext, sdkLogger),
     IosPushInstance {
 
     private val _registeredDelegates = mutableListOf<NotificationCenterDelegateRegistration>()
@@ -129,7 +127,7 @@ internal class IosPushInternal(
     }
 
     override suspend fun activate() {
-        pushContext.calls.dequeue { call ->
+        threadSafePersistentStore.dequeue { call ->
             when (call) {
                 is RegisterPushToken -> sdkEventDistributor.registerEvent(
                     SdkEvent.Internal.Sdk.RegisterPushToken(pushToken = call.pushToken)

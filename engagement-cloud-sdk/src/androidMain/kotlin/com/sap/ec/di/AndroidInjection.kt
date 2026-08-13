@@ -350,7 +350,7 @@ internal object AndroidInjection {
         }
         single<PushInstance>(named(InstanceType.Gatherer)) {
             PushGatherer(
-                context = get(),
+                threadSafePersistentStore = get(named(ThreadSafePersistentStoreTypes.PushCall)),
                 storage = get(),
                 sdkContext = get()
             )
@@ -358,7 +358,7 @@ internal object AndroidInjection {
         single<PushInstance>(named(InstanceType.Internal)) {
             PushInternal(
                 storage = get(),
-                pushContext = get(),
+                threadSafePersistentStore = get(named(ThreadSafePersistentStoreTypes.PushCall)),
                 sdkEventDistributor = get(),
                 sdkContext = get(),
                 sdkLogger = get { parametersOf(PushInternal::class.simpleName) }

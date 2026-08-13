@@ -225,8 +225,8 @@ internal object IosInjection {
             )
             IosPushInternal(
                 storage = get(),
-                pushContext = get(),
                 sdkContext = get(),
+                threadSafePersistentStore = get(named(ThreadSafePersistentStoreTypes.PushCall)),
                 actionFactory = get(),
                 actionHandler = get(),
                 badgeCountHandler = badgeCountHandler,
@@ -234,16 +234,15 @@ internal object IosInjection {
                 sdkDispatcher = get(named(DispatcherTypes.Sdk)),
                 sdkLogger = get { parametersOf(IosPushInternal::class.simpleName) },
                 sdkEventDistributor = get(),
-                timestampProvider = get(),
                 uuidProvider = get()
             )
         }
         single<IosPushInstance>(named(InstanceType.Gatherer)) {
             IosGathererPush(
-                context = get(),
                 storage = get(),
                 iosPushInternal = get(named(InstanceType.Internal)),
-                sdkContext = get()
+                sdkContext = get(),
+                safePersistentStore = get(named(ThreadSafePersistentStoreTypes.PushCall)),
             )
         }
         single<IosPushInstance>(named(InstanceType.Logging)) {

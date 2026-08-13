@@ -2,8 +2,6 @@ package com.sap.ec.api.push
 
 import kotlinx.serialization.Serializable
 
-internal class PushContext(override val calls: MutableList<PushCall>) : PushContextApi
-
 @Serializable
 internal sealed interface PushCall {
 

@@ -6,15 +6,20 @@ import com.sap.ec.api.push.PushConstants.PUSH_TOKEN_STORAGE_KEY
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.channel.SdkEventWaiterApi
+import com.sap.ec.core.collections.ThreadSafePersistentStore
+import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.networking.model.UrlRequest
+import com.sap.ec.core.storage.StorageApi
 import com.sap.ec.core.storage.StringStorageApi
 import com.sap.ec.event.OnlineSdkEvent
 import com.sap.ec.event.SdkEvent
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
+import dev.mokkery.every
 import dev.mokkery.everySuspend
+import dev.mokkery.matcher.any
 import dev.mokkery.matcher.capture.Capture
 import dev.mokkery.matcher.capture.Capture.Companion.slot
 import dev.mokkery.matcher.capture.SlotCapture
@@ -33,12 +38,14 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.KSerializer
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class PushInternalTests {
     private companion object {
+        const val STORE_ID = "testStoreId"
         const val PUSH_TOKEN = "testPushToken"
         const val APPLICATION_CODE = "testAppCode"
         val registerPushToken = PushCall.RegisterPushToken(PUSH_TOKEN)
@@ -54,30 +61,27 @@ class PushInternalTests {
     private lateinit var eventSlot: SlotCapture<SdkEvent>
     private lateinit var mockLogger: Logger
     private lateinit var mockSdkContext: SdkContextApi
-    private lateinit var pushContext: PushContextApi
+    private lateinit var threadSafePersistentStore: ThreadSafePersistentStoreApi<PushCall>
+    private lateinit var mockStorage: StorageApi
     private lateinit var pushInternal: PushInternal
 
     @BeforeTest
     fun setup() {
         mockStringStorage = mock()
+        mockStorage = mock(MockMode.autofill)
         mockSdkContext = mock()
-        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(APPLICATION_CODE)
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(
+            APPLICATION_CODE
+        )
         eventSlot = slot()
         mockSdkEventDistributor = mock(MockMode.autofill)
         mockLogger = mock(MockMode.autofill)
-        pushContext = PushContext(mutableListOf())
-        pushInternal = PushInternal(
-            mockStringStorage,
-            pushContext,
-            mockSdkEventDistributor,
-            mockSdkContext,
-            mockLogger
-        )
+        threadSafePersistentStore = createSafeStore()
+        pushInternal = createPushInternal()
     }
 
     @AfterTest
     fun teardown() {
-        pushContext.calls.clear()
         resetCalls()
         resetAnswers()
     }
@@ -257,13 +261,15 @@ class PushInternalTests {
     @Test
     fun testActivate_should_sendCalls_toPushClient() = runTest {
         val eventContainer = Capture.container<OnlineSdkEvent>()
+        every { mockStorage.get(STORE_ID, any<KSerializer<List<Any>>>())} returns expectedCalls
         everySuspend { mockSdkEventDistributor.registerEvent(capture(eventContainer)) } returns mock(
             MockMode.autofill
         )
 
-        pushContext.calls.addAll(expectedCalls)
+        val safeStore = createSafeStore()
+        val testInternal = createPushInternal(safeStore)
 
-        pushInternal.activate()
+        testInternal.activate()
 
         val emittedValues = eventContainer.values
         emittedValues.first { it is SdkEvent.Internal.Sdk.RegisterPushToken }.apply {
@@ -273,5 +279,22 @@ class PushInternalTests {
             this shouldNotBe null
             (this as SdkEvent.Internal.Sdk.ClearPushToken).applicationCode shouldBe APPLICATION_CODE
         }
+    }
+
+    private fun createPushInternal(safeStore: ThreadSafePersistentStoreApi<PushCall> = threadSafePersistentStore): PushInternal =
+        PushInternal(
+            mockStringStorage,
+            safeStore,
+            mockSdkEventDistributor,
+            mockSdkContext,
+            mockLogger
+        )
+
+    private fun createSafeStore(storage: StorageApi = mockStorage): ThreadSafePersistentStoreApi<PushCall> {
+        return ThreadSafePersistentStore(
+            STORE_ID,
+            storage,
+            PushCall.serializer()
+        )
     }
 }

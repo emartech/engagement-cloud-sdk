@@ -1,12 +1,11 @@
 package com.sap.ec.di
 
 import com.sap.ec.api.push.PushCall
-import com.sap.ec.api.push.PushContext
-import com.sap.ec.api.push.PushContextApi
 import com.sap.ec.core.actions.ActionHandler
 import com.sap.ec.core.actions.ActionHandlerApi
 import com.sap.ec.core.actions.pushtoinapp.PushToInAppHandlerApi
-import com.sap.ec.core.collections.PersistentList
+import com.sap.ec.core.collections.ThreadSafePersistentStore
+import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
 import com.sap.ec.core.networking.clients.NetworkClientApi
 import com.sap.ec.core.url.UrlFactoryApi
 import com.sap.ec.mobileengage.action.PushActionFactory
@@ -44,17 +43,11 @@ internal object PushInjection {
                 sdkLogger = get { parametersOf(PushClient::class.simpleName) }
             )
         }
-        single<MutableList<PushCall>>(named(PersistentListTypes.PushCall)) {
-            PersistentList(
+        single<ThreadSafePersistentStoreApi<PushCall>>(named(ThreadSafePersistentStoreTypes.PushCall)) {
+            ThreadSafePersistentStore(
                 id = PersistentListIds.PUSH_CONTEXT_PERSISTENT_ID,
                 storage = get(),
-                elementSerializer = PushCall.serializer(),
-                elements = listOf()
-            )
-        }
-        single<PushContextApi> {
-            PushContext(
-                calls = get(named(PersistentListTypes.PushCall))
+                itemSerializer = PushCall.serializer(),
             )
         }
     }
