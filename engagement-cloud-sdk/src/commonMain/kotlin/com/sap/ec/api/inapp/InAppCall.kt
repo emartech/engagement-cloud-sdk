@@ -2,8 +2,6 @@ package com.sap.ec.api.inapp
 
 import kotlinx.serialization.Serializable
 
-internal class InAppContext(override val calls: MutableList<InAppCall>) : InAppContextApi
-
 @Serializable
 internal sealed interface InAppCall {
 

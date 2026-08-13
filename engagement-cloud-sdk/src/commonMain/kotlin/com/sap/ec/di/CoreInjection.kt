@@ -207,10 +207,6 @@ internal enum class CoroutineScopeTypes {
     Application
 }
 
-internal enum class PersistentListTypes {
-    InAppCall
-}
-
 internal enum class ThreadSafePersistentStoreTypes {
     PushCall, InAppCall, ConfigCall, ContactCall, EventTrackerCall
 }

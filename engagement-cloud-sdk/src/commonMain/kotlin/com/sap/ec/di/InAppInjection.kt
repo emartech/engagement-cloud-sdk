@@ -6,12 +6,11 @@ import com.sap.ec.api.inapp.InAppApi
 import com.sap.ec.api.inapp.InAppCall
 import com.sap.ec.api.inapp.InAppConfig
 import com.sap.ec.api.inapp.InAppConfigApi
-import com.sap.ec.api.inapp.InAppContext
-import com.sap.ec.api.inapp.InAppContextApi
 import com.sap.ec.api.inapp.InAppInstance
 import com.sap.ec.api.inapp.InAppInternal
 import com.sap.ec.api.inapp.LoggingInApp
-import com.sap.ec.core.collections.PersistentList
+import com.sap.ec.core.collections.ThreadSafePersistentStore
+import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
 import com.sap.ec.mobileengage.inapp.jsbridge.ContentReplacer
 import com.sap.ec.mobileengage.inapp.jsbridge.ContentReplacerApi
 import com.sap.ec.mobileengage.inapp.jsbridge.JsBridgeVerifier
@@ -56,12 +55,11 @@ internal object InAppInjection {
                 sdkLogger = get { parametersOf(InlineInAppMessageFetcher::class.simpleName) }
             )
         }
-        single<MutableList<InAppCall>>(named(PersistentListTypes.InAppCall)) {
-            PersistentList(
+        single<ThreadSafePersistentStoreApi<InAppCall>>(named(ThreadSafePersistentStoreTypes.InAppCall)) {
+            ThreadSafePersistentStore(
                 id = PersistentListIds.INAPP_CONTEXT_PERSISTENT_ID,
                 storage = get(),
-                elementSerializer = InAppCall.serializer(),
-                elements = listOf()
+                itemSerializer = InAppCall.serializer(),
             )
         }
         single<InAppEventConsumer> {
@@ -74,11 +72,6 @@ internal object InAppInjection {
             )
         }
         single<InAppConfigApi> { InAppConfig() }
-        single<InAppContextApi> {
-            InAppContext(
-                calls = get(named(PersistentListTypes.InAppCall))
-            )
-        }
         single<InAppInstance>(named(InstanceType.Logging)) {
             LoggingInApp(
                 sdkContext = get(),
@@ -88,13 +81,13 @@ internal object InAppInjection {
         single<InAppInstance>(named(InstanceType.Gatherer)) {
             GathererInApp(
                 inAppConfig = get(),
-                inAppContext = get(),
+                threadSafePersistentStore = get(named(ThreadSafePersistentStoreTypes.InAppCall)),
             )
         }
         single<InAppInstance>(named(InstanceType.Internal)) {
             InAppInternal(
                 inAppConfig = get(),
-                inAppContext = get()
+                threadSafePersistentStore = get(named(ThreadSafePersistentStoreTypes.InAppCall))
             )
         }
         single<InAppApi> {

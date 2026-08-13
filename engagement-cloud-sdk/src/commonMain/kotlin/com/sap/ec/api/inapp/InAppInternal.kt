@@ -1,9 +1,11 @@
 package com.sap.ec.api.inapp
 
+import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
+
 
 internal class InAppInternal(
     private val inAppConfig: InAppConfigApi,
-    private val inAppContext: InAppContextApi
+    private val threadSafePersistentStore: ThreadSafePersistentStoreApi<InAppCall>
 ) : InAppInstance {
     override suspend fun pause() {
         inAppConfig.inAppDnd = true
@@ -17,8 +19,8 @@ internal class InAppInternal(
         get() = inAppConfig.inAppDnd
 
     override suspend fun activate() {
-        if(inAppContext.calls.isNotEmpty()){
-            when(inAppContext.calls.last()) {
+        if (threadSafePersistentStore.items.isNotEmpty()) {
+            when (threadSafePersistentStore.items.last()) {
                 is InAppCall.Pause -> pause()
                 is InAppCall.Resume -> resume()
             }

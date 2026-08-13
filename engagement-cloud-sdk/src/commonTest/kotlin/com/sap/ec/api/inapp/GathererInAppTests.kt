@@ -1,21 +1,35 @@
 package com.sap.ec.api.inapp
 
+import com.sap.ec.core.collections.ThreadSafePersistentStore
+import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
+import com.sap.ec.core.storage.StorageApi
+import dev.mokkery.MockMode
+import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class GathererInAppTests {
+    private companion object {
+        const val TEST_STORE_ID = "testStoreId"
+    }
+
     private lateinit var gathererInApp: GathererInApp
-    private lateinit var inAppContext: InAppContextApi
+    private lateinit var mockStorage: StorageApi
+    private lateinit var threadSafePersistentStore: ThreadSafePersistentStoreApi<InAppCall>
     private lateinit var inAppConfig: InAppConfig
 
     @BeforeTest
     fun setup() = runTest {
-        inAppContext = InAppContext(mutableListOf())
         inAppConfig = InAppConfig()
-
-        gathererInApp = GathererInApp(inAppContext, inAppConfig)
+        mockStorage = mock(MockMode.autofill)
+        threadSafePersistentStore = ThreadSafePersistentStore(
+            TEST_STORE_ID,
+            mockStorage,
+            InAppCall.serializer()
+        )
+        gathererInApp = GathererInApp(inAppConfig, threadSafePersistentStore)
     }
 
     @Test
@@ -32,7 +46,7 @@ class GathererInAppTests {
         val testCall = InAppCall.Pause()
 
         gathererInApp.pause()
-        inAppContext.calls.contains(testCall) shouldBe true
+        threadSafePersistentStore.items.contains(testCall) shouldBe true
     }
 
     @Test
@@ -41,7 +55,7 @@ class GathererInAppTests {
 
         gathererInApp.resume()
 
-        inAppContext.calls.contains(testCall) shouldBe true
-        inAppContext.calls.size shouldBe 1
+        threadSafePersistentStore.items.contains(testCall) shouldBe true
+        threadSafePersistentStore.items.size shouldBe 1
     }
 }
