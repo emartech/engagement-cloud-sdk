@@ -2,6 +2,7 @@ package com.sap.ec.networking.clients.logging
 
 import com.sap.ec.core.channel.SdkEventManagerApi
 import com.sap.ec.core.db.events.EventsDaoApi
+import com.sap.ec.core.device.DeviceCategory
 import com.sap.ec.core.device.DeviceInfoCollectorApi
 import com.sap.ec.core.device.DeviceInfoForLogs
 import com.sap.ec.core.log.LogLevel
@@ -71,7 +72,7 @@ class LoggingClientTests {
             null,
             "1.0.0",
             "testDevice",
-            "mobile",
+            DeviceCategory.MOBILE,
             "8.0.0",
             "4.0.0",
             true,

@@ -42,7 +42,7 @@ internal actual class DeviceInfoCollector(
             platformWrapperVersion = getWrapperInfo()?.wrapperVersion,
             applicationVersion = applicationVersionProvider.provide(),
             deviceModel = deviceInformation.deviceModel(),
-            deviceCategory = SdkConstants.MOBILE_DEVICE_CATEGORY,
+            deviceCategory = DeviceCategory.MOBILE,
             osVersion = deviceInformation.osVersion(),
             sdkVersion = BuildConfig.VERSION_NAME,
             language = stringStorage.get(SdkConstants.LANGUAGE_STORAGE_KEY)
@@ -62,7 +62,7 @@ internal actual class DeviceInfoCollector(
             platformWrapperVersion = deviceInfo.platformWrapperVersion,
             applicationVersion = deviceInfo.applicationVersion,
             deviceModel = deviceInfo.deviceModel,
-            deviceCategory = SdkConstants.MOBILE_DEVICE_CATEGORY,
+            deviceCategory = DeviceCategory.MOBILE,
             osVersion = deviceInfo.osVersion,
             sdkVersion = deviceInfo.sdkVersion,
             isDebugMode = Platform.isDebugBinary,

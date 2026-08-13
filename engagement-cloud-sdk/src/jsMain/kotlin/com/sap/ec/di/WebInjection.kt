@@ -144,7 +144,12 @@ internal object WebInjection {
             DeviceInfoCollector(
                 clientIdProvider = ClientIdProvider(uuidProvider = get(), storage = get()),
                 timezoneProvider = get(),
-                webPlatformInfoCollector = WebPlatformInfoCollector(getNavigatorData()),
+                webPlatformInfoCollector = WebPlatformInfoCollector(
+                    getNavigatorData(),
+                    window.navigator.userAgent,
+                    window.navigator.asDynamic().userAgentData,
+                    sdkLogger = get { parametersOf(WebPlatformInfoCollector::class.simpleName) }
+                ),
                 applicationVersionProvider = get(),
                 languageProvider = get(),
                 wrapperInfoStorage = get(),

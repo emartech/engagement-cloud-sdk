@@ -1,16 +1,22 @@
 package com.sap.ec.core.device
 
-import com.sap.ec.SdkConstants
 import com.sap.ec.core.device.constants.BrowserInfo
 import com.sap.ec.core.device.constants.OsInfo
-import kotlinx.browser.window
+import com.sap.ec.core.log.Logger
+import com.sap.ec.npm_dependencies.parseUserAgent
 
-internal class WebPlatformInfoCollector(private val navigatorData: String) : WebPlatformInfoCollectorApi {
+internal class WebPlatformInfoCollector(
+    private val navigatorData: String,
+    private val userAgent: String,
+    private val userAgentData: dynamic,
+    private val sdkLogger: Logger
+) :
+    WebPlatformInfoCollectorApi {
     private companion object {
         const val DEFAULT_BROWSER_VERSION = "0"
     }
 
-    override fun collect(): WebPlatformInfo {
+    override suspend fun collect(): WebPlatformInfo {
         val headerData = analiseHeaders()
         return WebPlatformInfo(
             null,
@@ -23,7 +29,7 @@ internal class WebPlatformInfoCollector(private val navigatorData: String) : Web
         )
     }
 
-    private fun analiseHeaders(): WindowHeaderData {
+    private suspend fun analiseHeaders(): WindowHeaderData {
         val osInfo = OsInfo.entries.firstOrNull {
             navigatorData.contains(it.value)
         } ?: OsInfo.Unknown
@@ -36,7 +42,13 @@ internal class WebPlatformInfoCollector(private val navigatorData: String) : Web
 
         val deviceCategory = getDeviceCategory()
 
-        return WindowHeaderData(osInfo.name, osVersion, browserInfo.name, browserVersion, deviceCategory)
+        return WindowHeaderData(
+            osInfo.name,
+            osVersion,
+            browserInfo.name,
+            browserVersion,
+            deviceCategory
+        )
     }
 
     private fun extractBrowserVersionNumber(versionPrefix: String): String {
@@ -44,20 +56,24 @@ internal class WebPlatformInfoCollector(private val navigatorData: String) : Web
         val versionMatches = versionRegex.findAll(navigatorData).firstOrNull()?.groupValues
         return if (!versionMatches.isNullOrEmpty()) {
             val versionNumbers = versionMatches.drop(1)
-            return versionNumbers.first().replace("_", ".")
+            versionNumbers.first().replace("_", ".")
         } else DEFAULT_BROWSER_VERSION
     }
 
-    private fun getDeviceCategory(): String {
-        val type =
-            if (Regex("""/Mobi|Android|iPhone|iPad|iPod/i""").containsMatchIn(window.navigator.userAgent)) "mobile"
-            else "desktop"
-        // val type = parseUserAgent(window.navigator.userAgent).platform.type
+    private suspend fun getDeviceCategory(): DeviceCategory {
+        try {
+            val type =
+                parseUserAgent(
+                    userAgent,
+                    userAgentData
+                ).platform?.type
 
-        return when (type) {
-            "mobile", "tablet" -> SdkConstants.MOBILE_DEVICE_CATEGORY
-            "desktop" -> SdkConstants.DESKTOP_DEVICE_CATEGORY
-            else -> SdkConstants.DESKTOP_DEVICE_CATEGORY
+            if (type != null) {
+                return DeviceCategory.valueOf(type.uppercase())
+            }
+        } catch (e: Exception) {
+            sdkLogger.info("determining device category failed", e)
         }
+        return DeviceCategory.UNKNOWN
     }
 }
