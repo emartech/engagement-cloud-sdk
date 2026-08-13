@@ -1,6 +1,7 @@
 package com.sap.ec.core.providers
 
 import com.sap.ec.SdkConstants
+import com.sap.ec.core.device.DeviceCategory
 import com.sap.ec.core.device.DeviceInfo
 import com.sap.ec.core.device.DeviceInfoCollectorApi
 import com.sap.ec.core.networking.UserAgentProvider
@@ -24,7 +25,7 @@ class UserAgentProviderTests {
             null,
             "testAppVersion",
             "testDeviceModel",
-            SdkConstants.DESKTOP_DEVICE_CATEGORY,
+            DeviceCategory.DESKTOP,
             "testOsVersion",
             "testSdkVersion",
             "testLanguageCode",

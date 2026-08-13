@@ -51,7 +51,7 @@ class DeviceInfoCollectorTests {
             osVersion = "OS X 11.0.5",
             browserName = BROWSER_NAME,
             browserVersion = BROWSER_VERSION,
-            deviceCategory = SdkConstants.DESKTOP_DEVICE_CATEGORY
+            deviceCategory = DeviceCategory.DESKTOP
         )
     }
 
@@ -77,7 +77,7 @@ class DeviceInfoCollectorTests {
         mockApplicationVersionProvider = mock()
         every { mockApplicationVersionProvider.provide() } returns APPLICATION_VERSION
         mockWebPlatformInfoCollector = mock()
-        every { mockWebPlatformInfoCollector.collect() } returns testWebPlatformInfo
+        everySuspend { mockWebPlatformInfoCollector.collect() } returns testWebPlatformInfo
         mockLanguageProvider = mock()
         every { mockLanguageProvider.provide() } returns LANGUAGE
         mockWrapperInfoStorage = mock()
@@ -120,7 +120,7 @@ class DeviceInfoCollectorTests {
             platformWrapperVersion = null,
             applicationVersion = APPLICATION_VERSION,
             deviceModel = navigator.userAgent,
-            deviceCategory = SdkConstants.DESKTOP_DEVICE_CATEGORY,
+            deviceCategory = DeviceCategory.DESKTOP,
             osVersion = BROWSER_VERSION,
             sdkVersion = BuildConfig.VERSION_NAME,
             language = LANGUAGE,
@@ -152,7 +152,7 @@ class DeviceInfoCollectorTests {
             platformWrapperVersion = WRAPPER_VERSION,
             applicationVersion = APPLICATION_VERSION,
             deviceModel = navigator.userAgent,
-            deviceCategory = SdkConstants.DESKTOP_DEVICE_CATEGORY,
+            deviceCategory = DeviceCategory.DESKTOP,
             osVersion = BROWSER_VERSION,
             sdkVersion = BuildConfig.VERSION_NAME,
             language = LANGUAGE,
@@ -176,7 +176,7 @@ class DeviceInfoCollectorTests {
             platformWrapperVersion = null,
             applicationVersion = APPLICATION_VERSION,
             deviceModel = navigator.userAgent,
-            deviceCategory = SdkConstants.DESKTOP_DEVICE_CATEGORY,
+            deviceCategory = DeviceCategory.DESKTOP,
             osVersion = BROWSER_VERSION,
             sdkVersion = BuildConfig.VERSION_NAME,
             language = "hu-HU",
@@ -198,7 +198,7 @@ class DeviceInfoCollectorTests {
             platformWrapperVersion = null,
             applicationVersion = APPLICATION_VERSION,
             deviceModel = navigator.userAgent,
-            deviceCategory = SdkConstants.DESKTOP_DEVICE_CATEGORY,
+            deviceCategory = DeviceCategory.DESKTOP,
             osVersion = BROWSER_VERSION,
             sdkVersion = BuildConfig.VERSION_NAME,
             isDebugMode = false,

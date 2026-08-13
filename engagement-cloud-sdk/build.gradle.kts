@@ -267,6 +267,7 @@ kotlin {
                 implementation(libs.ktor.client.js)
                 implementation(libs.kotlin.wrapper.browser)
                 implementation(libs.cryptography.provider.webcrypto)
+                implementation(npm( "bowser", libs.versions.bowser.get()))
             }
         }
 
