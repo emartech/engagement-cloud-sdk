@@ -18,7 +18,8 @@ internal class DeviceCategoryProvider(
                 ).platform?.type
 
             if (type != null) {
-                return DeviceCategory.valueOf(type.uppercase())
+                return DeviceCategory.entries.firstOrNull { it.name == type.uppercase() }
+                    ?: DeviceCategory.UNKNOWN
             }
         } catch (e: Exception) {
             sdkLogger.info("determining device category failed", e)
