@@ -62,7 +62,7 @@ internal actual class DeviceInfoCollector(
             platformWrapperVersion = deviceInfo.platformWrapperVersion,
             applicationVersion = deviceInfo.applicationVersion,
             deviceModel = deviceInfo.deviceModel,
-            deviceCategory = DeviceCategory.MOBILE,
+            deviceCategory = deviceInfo.deviceCategory,
             osVersion = deviceInfo.osVersion,
             sdkVersion = deviceInfo.sdkVersion,
             isDebugMode = Platform.isDebugBinary,

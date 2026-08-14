@@ -15,4 +15,4 @@ external interface BowserParserResult {
 
 
 @JsName("parse")
-external fun parseUserAgent(userAgent: String, clientHints: Any): BowserParserResult
+external fun parseUserAgent(userAgent: String, clientHints: Any?): BowserParserResult
