@@ -188,8 +188,18 @@ class LoggingClientTests {
         everySuspend { mockEmarsysClient.send(any()) } returns Result.success(createTestResponse("{}"))
         everySuspend { mockDeviceInfoCollector.collectAsDeviceInfoForLogs() } returns deviceInfoForLogs
 
+        val metricAttributes = buildJsonObject {
+            put("trackingInfo", JsonPrimitive("testId"))
+            put("loadingTimeStart", JsonPrimitive(10))
+            put("loadingTimeEnd", JsonPrimitive(20))
+            put("loadingTimeDuration", JsonPrimitive(10))
+            put("onScreenTimeStart", JsonPrimitive(10))
+            put("onScreenTimeEnd", JsonPrimitive(20))
+            put("onScreenTimeDuration", JsonPrimitive(10))
+        }
         val logEvent = SdkEvent.Internal.Sdk.Metric(
-            level = LogLevel.Metric
+            level = LogLevel.Metric,
+            attributes = metricAttributes
         )
         val expectedRequest = UrlRequest(
             TEST_BASE_URL,
@@ -197,12 +207,15 @@ class LoggingClientTests {
             json.encodeToString(
                 buildJsonObject {
                     put("logs", JsonArray(listOf(buildJsonObject {
-                        put("type", "log_request")
+                        put("type", "log_inapp_metrics")
                         put("level", logEvent.level.name.uppercase())
                         put(
                             "deviceInfo",
                             json.encodeToJsonElement(deviceInfoForLogs)
                         )
+                        metricAttributes.forEach { attribute ->
+                            put(attribute.key, attribute.value)
+                        }
                     })))
                 }
 

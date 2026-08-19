@@ -12,12 +12,18 @@ internal class RemoteLogger(
 
     override suspend fun logToRemote(level: LogLevel, log: JsonObject) {
         if (logConfigHolder.remoteLogLevel.priority <= level.priority) {
-            logEventRegistry.registerLogEvent(
+            val logEvent = if (level == LogLevel.Metric) {
+                SdkEvent.Internal.Sdk.Metric(
+                    level = level,
+                    attributes = log
+                )
+            } else {
                 SdkEvent.Internal.Sdk.Log(
                     level = level,
                     attributes = log
                 )
-            )
+            }
+            logEventRegistry.registerLogEvent(logEvent)
         }
     }
 }
