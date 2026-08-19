@@ -307,6 +307,7 @@ sealed interface SdkEvent {
                 override val id: String = UUIDProvider().provide(),
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0,
+                val attributes: JsonObject? = null,
                 val name: String = METRIC_EVENT_NAME
             ) : Sdk(), LogEvent
 

@@ -86,4 +86,25 @@ class RemoteLoggerTests {
         capturedEvent.name shouldBe "log"
         capturedEvent.attributes shouldBe logMessage
     }
+
+    // todo review tests
+    @Test
+    fun testLogToRemote_shouldRegisterMetricEvent_whenLogLevelIsMetric() = runTest {
+        val logLevel = LogLevel.Metric
+        every { mockRemoteLogLevelHolder.remoteLogLevel } returns LogLevel.Error
+
+        val logMessage = JsonObject(mapOf("loadingTimeStart" to JsonPrimitive(10)))
+        val eventCapture = slot<SdkEvent.Internal.Sdk.Metric>()
+        everySuspend { mockLogEventRegistry.registerLogEvent(capture(eventCapture)) } returns Unit
+
+        remoteLogger.logToRemote(logLevel, logMessage)
+
+        val capturedEvent: SdkEvent.Internal.Sdk.Metric = eventCapture.get()
+        verifySuspend {
+            mockLogEventRegistry.registerLogEvent(capturedEvent)
+        }
+        capturedEvent.level shouldBe logLevel
+        capturedEvent.name shouldBe "metric"
+        capturedEvent.attributes shouldBe logMessage
+    }
 }
