@@ -306,16 +306,13 @@ sealed interface SdkEvent {
 
             @Serializable
             data class Metric(
+                override val level: LogLevel = LogLevel.Metric,
                 override val id: String = UUIDProvider().provide(),
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0,
                 override val attributes: JsonObject? = null,
                 val name: String = METRIC_EVENT_NAME
-            ) : Sdk(), LogEvent {
-
-                override val level: LogLevel = LogLevel.Metric
-
-            }
+            ) : Sdk(), LogEvent
 
             @Serializable
             data class Dismiss(
