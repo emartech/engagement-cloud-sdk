@@ -264,7 +264,10 @@ sealed interface SdkEvent {
 
         sealed interface Custom : Internal, OnlineSdkEvent, DeviceEventWithCustomAttributes
 
-        sealed interface LogEvent : Internal, OnlineSdkEvent
+        sealed interface LogEvent : Internal, OnlineSdkEvent {
+            val level: LogLevel
+            val attributes: JsonObject?
+        }
 
         sealed interface SetupFlowEvent : Internal, OnlineSdkEvent
 
@@ -279,7 +282,7 @@ sealed interface SdkEvent {
         sealed class Sdk : Internal {
             override val type: String = "internal"
 
-            sealed class Answer() : Sdk() {
+            sealed class Answer : Sdk() {
 
                 override val id: String = UUIDProvider().provide()
                 abstract val originId: String
@@ -293,23 +296,26 @@ sealed interface SdkEvent {
 
             @Serializable
             data class Log(
-                val level: LogLevel,
+                override val level: LogLevel,
                 override val id: String = UUIDProvider().provide(),
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0,
-                val attributes: JsonObject? = null,
+                override val attributes: JsonObject? = null,
                 val name: String = LOG_EVENT_NAME
             ) : Sdk(), LogEvent
 
             @Serializable
             data class Metric(
-                val level: LogLevel = LogLevel.Metric,
                 override val id: String = UUIDProvider().provide(),
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0,
-                val attributes: JsonObject? = null,
+                override val attributes: JsonObject? = null,
                 val name: String = METRIC_EVENT_NAME
-            ) : Sdk(), LogEvent
+            ) : Sdk(), LogEvent {
+
+                override val level: LogLevel = LogLevel.Metric
+
+            }
 
             @Serializable
             data class Dismiss(
