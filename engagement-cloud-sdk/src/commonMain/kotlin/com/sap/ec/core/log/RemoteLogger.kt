@@ -14,7 +14,6 @@ internal class RemoteLogger(
         if (logConfigHolder.remoteLogLevel.priority <= level.priority) {
             val logEvent = if (level == LogLevel.Metric) {
                 SdkEvent.Internal.Sdk.Metric(
-                    level = level,
                     attributes = log
                 )
             } else {
