@@ -139,7 +139,7 @@ class ContactClientTests {
         everySuspend { mockUrlFactory.create(any()) }
         verifySuspend { mockEcClient.send(any()) }
         verifySuspend { mockContactTokenHandler.handleContactTokens(any()) }
-        verifySuspend { mockEcSdkSession.startSession() }
+        verifySuspend { mockEcSdkSession.restartSession() }
         verifySuspend { mockRequestContext.isContactLinked = true }
         verifySuspend { mockEventsDao.removeEvent(linkContactEvent) }
         verifySuspend {
@@ -181,7 +181,7 @@ class ContactClientTests {
         everySuspend { mockUrlFactory.create(any()) }
         verifySuspend { mockEcClient.send(any()) }
         verifySuspend(VerifyMode.exactly(0)) { mockContactTokenHandler.handleContactTokens(any()) }
-        verifySuspend { mockEcSdkSession.startSession() }
+        verifySuspend { mockEcSdkSession.restartSession() }
         verifySuspend { mockRequestContext.isContactLinked = true }
         verifySuspend { mockEventsDao.removeEvent(linkContactEvent) }
         verifySuspend {
@@ -213,7 +213,7 @@ class ContactClientTests {
         everySuspend { mockUrlFactory.create(any()) }
         verifySuspend { mockEcClient.send(any()) }
         verifySuspend { mockContactTokenHandler.handleContactTokens(any()) }
-        verifySuspend { mockEcSdkSession.startSession() }
+        verifySuspend { mockEcSdkSession.restartSession() }
         verifySuspend { mockRequestContext.isContactLinked = true }
         verifySuspend { mockEventsDao.removeEvent(linkAuthenticatedContactEvent) }
         verifySuspend {
@@ -243,7 +243,7 @@ class ContactClientTests {
         everySuspend { mockUrlFactory.create(any()) }
         verifySuspend { mockEcClient.send(any()) }
         verifySuspend { mockContactTokenHandler.handleContactTokens(any()) }
-        verifySuspend { mockEcSdkSession.endSession() }
+        verifySuspend { mockEcSdkSession.restartSession() }
         verifySuspend { mockRequestContext.isContactLinked = false }
         verifySuspend { mockEventsDao.removeEvent(unlinkContactEvent) }
         verifySuspend {

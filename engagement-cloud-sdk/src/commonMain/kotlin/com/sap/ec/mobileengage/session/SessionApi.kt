@@ -6,4 +6,5 @@ internal interface SessionApi {
     suspend fun subscribe(lifecycleWatchDog: LifecycleWatchDog)
     suspend fun startSession()
     suspend fun endSession()
+    suspend fun restartSession()
 }

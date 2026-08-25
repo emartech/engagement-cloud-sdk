@@ -17,11 +17,14 @@ import com.sap.ec.event.SdkEvent
 import com.sap.ec.watchdog.lifecycle.LifecycleWatchDog
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
+import dev.mokkery.answering.sequentiallyReturns
 import dev.mokkery.answering.throws
 import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.verify.VerifyMode
+import dev.mokkery.verifyNoMoreCalls
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CoroutineDispatcher
@@ -43,18 +46,24 @@ class ECSdkSessionTests {
     private companion object Companion {
         const val APPLICATION_CODE = "testApplicationCode"
         const val CONTACT_TOKEN = "testContactToken"
-        val SESSION_START_UTC = Instant.parse("1970-01-02T10:17:36.789Z")
-        const val SESSION_START = 123456789L
+        const val SESSION_START_1 = 123456789L
+        val SESSION_START_1_UTC = Instant.parse("1970-01-02T10:17:36.789Z")
         const val SESSION_END = 123457789L
         val SESSION_END_UTC = Instant.parse("1970-01-02T10:17:37.789Z")
+        const val SESSION_START_2 = 123458789L
+        val SESSION_START_2_UTC = Instant.parse("1970-01-02T10:17:38.789Z")
         const val SESSION_DURATION = 1000L
-        val SESSION_ID = SessionId("testSessionId")
+        val SESSION_ID_1 = SessionId("testSessionId1")
+        val SESSION_ID_2 = SessionId("testSessionId2")
+        const val SESSION_END_EVENT_ID = "sessionEndEventId"
+        const val SESSION_START_EVENT_ID_1 = "sessionStartEventId1"
+        const val SESSION_START_EVENT_ID_2 = "sessionStartEventId2"
         val sessionStartEvent = SdkEvent.Internal.Sdk.SessionStart(
-            id = SESSION_ID.value,
-            timestamp = SESSION_START_UTC
+            id = SESSION_START_EVENT_ID_1,
+            timestamp = SESSION_START_1_UTC
         )
         val sessionEndEvent = SdkEvent.Internal.Sdk.SessionEnd(
-            id = SESSION_ID.value,
+            id = SESSION_END_EVENT_ID,
             duration = SESSION_DURATION,
             timestamp = SESSION_END_UTC
         )
@@ -68,7 +77,7 @@ class ECSdkSessionTests {
     private lateinit var mockRequestContext: RequestContextApi
     private lateinit var sessionContext: SessionContext
     private lateinit var sdkDispatcher: CoroutineDispatcher
-    private lateinit var ECSdkSession: ECSdkSession
+    private lateinit var ecSdkSession: ECSdkSession
 
     init {
         Dispatchers.setMain(
@@ -86,19 +95,23 @@ class ECSdkSessionTests {
         sdkDispatcher = StandardTestDispatcher()
         mockRequestContext = mock(MockMode.autofill)
         every { mockRequestContext.contactToken } returns CONTACT_TOKEN
-        sessionContext = SessionContext(
-            SESSION_ID,
-            SESSION_START
+        sessionContext = SessionContext()
+        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(
+            applicationCode = APPLICATION_CODE
         )
 
-        every { mockUuidProvider.provide() } returns SESSION_ID.value
-        everySuspend { mockSdkEventDistributor.registerEvent(sessionStartEvent) } returns mock()
-        everySuspend { mockSdkEventDistributor.registerEvent(sessionEndEvent) } returns mock()
-        everySuspend { mockSdkLogger.debug(any<LogEntry>()) } returns Unit
+        every { mockUuidProvider.provide() } sequentiallyReturns listOf(
+            SESSION_START_EVENT_ID_1,
+            SESSION_ID_1.value,
+            SESSION_END_EVENT_ID,
+            SESSION_START_EVENT_ID_2,
+            SESSION_ID_2.value
+        )
+        everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mock()
         everySuspend { mockSdkLogger.debug(any<LogEntry>()) } returns Unit
         everySuspend { mockSdkLogger.error(message = any()) } returns Unit
 
-        ECSdkSession = ECSdkSession(
+        ecSdkSession = ECSdkSession(
             mockTimestampProvider,
             mockUuidProvider,
             mockRequestContext,
@@ -112,14 +125,11 @@ class ECSdkSessionTests {
 
     @Test
     fun testSubscribe_shouldCallStartSession() = runTest {
-        sessionContext.sessionId = null
-        sessionContext.sessionStart = null
-        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
         every { mockTimestampProvider.provide() } returns Instant.fromEpochMilliseconds(
-            SESSION_START
+            SESSION_START_1
         )
         val sharedFlow = MutableSharedFlow<LifecycleEvent>()
-        ECSdkSession.subscribe(object : LifecycleWatchDog {
+        ecSdkSession.subscribe(object : LifecycleWatchDog {
             override val lifecycleEvents: SharedFlow<LifecycleEvent> = sharedFlow
 
             override suspend fun register() {}
@@ -128,24 +138,17 @@ class ECSdkSessionTests {
         sharedFlow.emit(LifecycleEvent.OnForeground)
         advanceUntilIdle()
 
-        sessionContext.sessionStart shouldBe SESSION_START
-        sessionContext.sessionId shouldBe SESSION_ID
+        sessionContext.sessionStart shouldBe SESSION_START_1
+        sessionContext.sessionId shouldBe SESSION_ID_1
     }
 
     @Test
     fun testSubscribe_shouldCallEndSession() = runTest {
-        everySuspend { mockSdkEventDistributor.registerEvent(sessionStartEvent) } returns mock(
-            MockMode.autofill
-        )
-        everySuspend { mockSdkEventDistributor.registerEvent(sessionEndEvent) } returns mock(
-            MockMode.autofill
-        )
-        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
         every { mockTimestampProvider.provide() } returns Instant.fromEpochMilliseconds(
-            SESSION_START
+            SESSION_START_1
         )
         val sharedFlow = MutableSharedFlow<LifecycleEvent>()
-        ECSdkSession.subscribe(object : LifecycleWatchDog {
+        ecSdkSession.subscribe(object : LifecycleWatchDog {
             override val lifecycleEvents: SharedFlow<LifecycleEvent> = sharedFlow
 
             override suspend fun register() {}
@@ -154,8 +157,8 @@ class ECSdkSessionTests {
         sharedFlow.emit(LifecycleEvent.OnForeground)
         advanceUntilIdle()
 
-        sessionContext.sessionStart shouldBe SESSION_START
-        sessionContext.sessionId shouldBe SESSION_ID
+        sessionContext.sessionStart shouldBe SESSION_START_1
+        sessionContext.sessionId shouldBe SESSION_ID_1
 
         every { mockTimestampProvider.provide() } returns Instant.fromEpochMilliseconds(SESSION_END)
 
@@ -169,53 +172,47 @@ class ECSdkSessionTests {
 
     @Test
     fun testStartSession_shouldTrackSessionStartEvent() = runTest {
-        sessionContext.sessionId = null
-        sessionContext.sessionStart = null
-        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
         every { mockTimestampProvider.provide() } returns Instant.fromEpochMilliseconds(
-            SESSION_START
+            SESSION_START_1
         )
 
-        ECSdkSession.startSession()
+        ecSdkSession.startSession()
 
         verifySuspend { mockSdkEventDistributor.registerEvent(sessionStartEvent) }
     }
 
     @Test
     fun testEndSession_shouldTrackSessionEndEvent() = runTest {
+        sessionContext.sessionId = SESSION_ID_1
+        sessionContext.sessionStart = SESSION_START_1
+        every { mockUuidProvider.provide() } returns SESSION_END_EVENT_ID
         every { mockTimestampProvider.provide() } returns Instant.fromEpochMilliseconds(SESSION_END)
-        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
 
-        ECSdkSession.endSession()
+        ecSdkSession.endSession()
 
         verifySuspend { mockSdkEventDistributor.registerEvent(sessionEndEvent) }
     }
 
     @Test
     fun testStartSession_shouldSetSession_evenWhenRegisteringEventFails() = runTest {
-        sessionContext.sessionId = null
-        sessionContext.sessionStart = null
         everySuspend { mockSdkEventDistributor.registerEvent(sessionStartEvent) } throws RuntimeException(
             "uuid provider failed"
         )
         every { mockTimestampProvider.provide() } returns Instant.fromEpochMilliseconds(
-            SESSION_START
+            SESSION_START_1
         )
-        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
 
-        ECSdkSession.startSession()
+        ecSdkSession.startSession()
 
-        sessionContext.sessionStart shouldBe SESSION_START
-        sessionContext.sessionId shouldBe SESSION_ID
+        sessionContext.sessionStart shouldBe SESSION_START_1
+        sessionContext.sessionId shouldBe SESSION_ID_1
     }
 
     @Test
     fun testStartSession_shouldNotDoAnything_whenConfigIsNull() = runTest {
-        sessionContext.sessionId = null
-        sessionContext.sessionStart = null
         everySuspend { mockSdkContext.getSdkConfig() } returns null
 
-        ECSdkSession.startSession()
+        ecSdkSession.startSession()
 
         verifySessionEventNotRegistered(sessionStartEvent)
         sessionContext.sessionId shouldBe null
@@ -225,51 +222,49 @@ class ECSdkSessionTests {
     @Test
     fun testStartSession_shouldNotDoAnything_whenContactTokenIsNull() = runTest {
         every { mockRequestContext.contactToken } returns null
-        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
 
-        ECSdkSession.startSession()
-
-        verifySessionEventNotRegistered(sessionStartEvent)
-        sessionContext.sessionId shouldBe SESSION_ID
-        sessionContext.sessionStart shouldBe SESSION_START
-    }
-
-    @Test
-    fun testStartSession_shouldNotDoAnything_whenSessionIdIsNull() = runTest {
-        sessionContext.sessionId = null
-        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
-
-        ECSdkSession.startSession()
+        ecSdkSession.startSession()
 
         verifySessionEventNotRegistered(sessionStartEvent)
         sessionContext.sessionId shouldBe null
-        sessionContext.sessionStart shouldBe SESSION_START
-    }
-
-    @Test
-    fun testStartSession_shouldNotDoAnything_whenSessionStartIsNull() = runTest {
-        sessionContext.sessionStart = null
-        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
-
-        ECSdkSession.startSession()
-
-        verifySessionEventNotRegistered(sessionStartEvent)
-        sessionContext.sessionId shouldBe SESSION_ID
         sessionContext.sessionStart shouldBe null
     }
 
     @Test
-    fun testEndSession_shouldResetSession_evenWhenRegisteringEventFails() = runTest {
-        every { mockTimestampProvider.provide() } returns Instant.fromEpochMilliseconds(SESSION_END)
+    fun testStartSession_shouldNotDoAnything_whenSessionIdIsNotNull() = runTest {
+        sessionContext.sessionId = SESSION_ID_1
 
+        ecSdkSession.startSession()
+
+        verifySessionEventNotRegistered(sessionStartEvent)
+        sessionContext.sessionId shouldBe SESSION_ID_1
+        sessionContext.sessionStart shouldBe null
+    }
+
+    @Test
+    fun testStartSession_shouldNotDoAnything_whenSessionStartIsNotNull() = runTest {
+        sessionContext.sessionStart = SESSION_START_1
+
+        ecSdkSession.startSession()
+
+        verifySessionEventNotRegistered(sessionStartEvent)
+        sessionContext.sessionId shouldBe null
+        sessionContext.sessionStart shouldBe SESSION_START_1
+    }
+
+    @Test
+    fun testEndSession_shouldResetSession_evenWhenRegisteringEventFails() = runTest {
+        sessionContext.sessionId = SESSION_ID_1
+        sessionContext.sessionStart = SESSION_START_1
+        every { mockUuidProvider.provide() } returns SESSION_END_EVENT_ID
+        every { mockTimestampProvider.provide() } returns Instant.fromEpochMilliseconds(SESSION_END)
         everySuspend { mockSdkEventDistributor.registerEvent(sessionEndEvent) } throws RuntimeException(
             "request failed"
         )
 
-        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
+        ecSdkSession.endSession()
 
-        ECSdkSession.endSession()
-
+        verifySuspend { mockSdkEventDistributor.registerEvent(sessionEndEvent) }
         sessionContext.sessionStart shouldBe null
         sessionContext.sessionId shouldBe null
     }
@@ -277,46 +272,93 @@ class ECSdkSessionTests {
     @Test
     fun testEndSession_shouldNotDoAnything_whenSessionIdIsNull() = runTest {
         sessionContext.sessionId = null
-        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
+        sessionContext.sessionStart = SESSION_START_1
 
-        ECSdkSession.endSession()
+        ecSdkSession.endSession()
 
         verifySessionEventNotRegistered(sessionEndEvent)
         sessionContext.sessionId shouldBe null
-        sessionContext.sessionStart shouldBe SESSION_START
+        sessionContext.sessionStart shouldBe SESSION_START_1
     }
 
     @Test
     fun testEndSession_shouldNotDoAnything_whenSessionStartIsNull() = runTest {
+        sessionContext.sessionId = SESSION_ID_1
         sessionContext.sessionStart = null
-        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
 
-        ECSdkSession.endSession()
+        ecSdkSession.endSession()
 
         verifySessionEventNotRegistered(sessionEndEvent)
-        sessionContext.sessionId shouldBe SESSION_ID
+        sessionContext.sessionId shouldBe SESSION_ID_1
         sessionContext.sessionStart shouldBe null
     }
 
     @Test
     fun testEndSession_shouldNotDoAnything_whenContactTokenIsNull() = runTest {
+        sessionContext.sessionId = SESSION_ID_1
+        sessionContext.sessionStart = SESSION_START_1
         every { mockRequestContext.contactToken } returns null
-        everySuspend { mockSdkContext.getSdkConfig() } returns TestEngagementCloudSDKConfig(applicationCode = APPLICATION_CODE)
 
-        ECSdkSession.endSession()
+        ecSdkSession.endSession()
 
         verifySessionEventNotRegistered(sessionEndEvent)
-        sessionContext.sessionId shouldBe SESSION_ID
-        sessionContext.sessionStart shouldBe SESSION_START
+        sessionContext.sessionId shouldBe SESSION_ID_1
+        sessionContext.sessionStart shouldBe SESSION_START_1
+    }
+
+    @Test
+    fun testRestartSession_shouldEndCurrentSessionAndStartNew_whenSessionIsActive() = runTest {
+        sessionContext.sessionId = SESSION_ID_1
+        sessionContext.sessionStart = SESSION_START_1
+        every { mockUuidProvider.provide() } sequentiallyReturns listOf(
+            SESSION_END_EVENT_ID,
+            SESSION_START_EVENT_ID_2,
+            SESSION_ID_2.value,
+        )
+        val restartedSessionStartEvent = SdkEvent.Internal.Sdk.SessionStart(
+            id = SESSION_START_EVENT_ID_2,
+            timestamp = SESSION_START_2_UTC
+        )
+        every { mockTimestampProvider.provide() } sequentiallyReturns listOf(
+            Instant.fromEpochMilliseconds(
+                SESSION_END
+            ), Instant.fromEpochMilliseconds(SESSION_START_2)
+        )
+
+        ecSdkSession.restartSession()
+
+        verifySuspend {
+            mockSdkEventDistributor.registerEvent(sessionEndEvent)
+            mockSdkEventDistributor.registerEvent(restartedSessionStartEvent)
+        }
+        sessionContext.sessionStart shouldBe SESSION_START_2
+        sessionContext.sessionId shouldBe SESSION_ID_2
+    }
+
+    @Test
+    fun testRestartSession_shouldStartSession_whenNoSessionIsActive() = runTest {
+        sessionContext.sessionId = null
+        sessionContext.sessionStart = null
+        every { mockTimestampProvider.provide() } returns Instant.fromEpochMilliseconds(
+            SESSION_START_1
+        )
+
+        ecSdkSession.restartSession()
+
+        verifySessionEventNotRegistered(sessionEndEvent)
+        verifySuspend { mockSdkEventDistributor.registerEvent(sessionStartEvent) }
+        verifyNoMoreCalls(mockSdkEventDistributor)
+        sessionContext.sessionStart shouldBe SESSION_START_1
+        sessionContext.sessionId shouldBe SESSION_ID_1
     }
 
     private fun verifySessionEventNotRegistered(sessionEvent: SdkEvent) {
         verifySuspend {
             mockSdkContext.getSdkConfig()
             mockSdkLogger.debug(any<LogEntry>())
-            repeat(0) {
-                mockSdkEventDistributor.registerEvent(sessionEvent)
-            }
+        }
+        verifySuspend(mode = VerifyMode.exactly(0)) {
+            mockSdkEventDistributor.registerEvent(sessionEvent)
         }
     }
 }
