@@ -255,6 +255,7 @@ class ECSdkSessionTests {
     fun testEndSession_shouldResetSession_evenWhenRegisteringEventFails() = runTest {
         sessionContext.sessionId = SESSION_ID_1
         sessionContext.sessionStart = SESSION_START_1
+        every { mockUuidProvider.provide() } returns SESSION_END_EVENT_ID
         every { mockTimestampProvider.provide() } returns Instant.fromEpochMilliseconds(SESSION_END)
         everySuspend { mockSdkEventDistributor.registerEvent(sessionEndEvent) } throws RuntimeException(
             "request failed"
@@ -262,6 +263,7 @@ class ECSdkSessionTests {
 
         ecSdkSession.endSession()
 
+        verifySuspend { mockSdkEventDistributor.registerEvent(sessionEndEvent) }
         sessionContext.sessionStart shouldBe null
         sessionContext.sessionId shouldBe null
     }
