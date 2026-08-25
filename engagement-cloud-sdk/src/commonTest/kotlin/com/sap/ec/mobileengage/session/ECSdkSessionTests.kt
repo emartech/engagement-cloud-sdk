@@ -23,6 +23,7 @@ import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifyNoMoreCalls
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
@@ -355,9 +356,9 @@ class ECSdkSessionTests {
         verifySuspend {
             mockSdkContext.getSdkConfig()
             mockSdkLogger.debug(any<LogEntry>())
-            repeat(0) {
-                mockSdkEventDistributor.registerEvent(sessionEvent)
-            }
+        }
+        verifySuspend(mode = VerifyMode.exactly(0)) {
+            mockSdkEventDistributor.registerEvent(sessionEvent)
         }
     }
 }
