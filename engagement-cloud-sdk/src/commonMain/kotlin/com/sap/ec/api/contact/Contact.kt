@@ -3,11 +3,8 @@ package com.sap.ec.api.contact
 import com.sap.ec.api.Activatable
 import com.sap.ec.api.generic.GenericApi
 import com.sap.ec.context.SdkContextApi
-import com.sap.ec.core.log.withLogContext
 import com.sap.ec.util.runCatchingWithoutCancellation
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonObject
 
 internal interface ContactInstance : ContactInternalApi, Activatable
 
@@ -31,16 +28,9 @@ internal class Contact<Logging : ContactInstance, Gatherer : ContactInstance, In
     override suspend fun link(contactFieldValue: String): Result<Unit> =
         runCatchingWithoutCancellation {
             withContext(sdkContext.sdkDispatcher) {
-                withLogContext(
-                    buildJsonObject {
-                        put(
-                            "contactFieldValue", JsonPrimitive(contactFieldValue)
-                        )
-                    }) {
-                    activeInstance<ContactInternalApi>().link(
-                        contactFieldValue
-                    )
-                }
+                activeInstance<ContactInternalApi>().link(
+                    contactFieldValue
+                )
             }
         }
 
@@ -55,16 +45,9 @@ internal class Contact<Logging : ContactInstance, Gatherer : ContactInstance, In
     ): Result<Unit> =
         runCatchingWithoutCancellation {
             withContext(sdkContext.sdkDispatcher) {
-                withLogContext(
-                    buildJsonObject {
-                        put(
-                            "openIdToken", JsonPrimitive(openIdToken)
-                        )
-                    }) {
-                    activeInstance<ContactInternalApi>().linkAuthenticated(
-                        openIdToken
-                    )
-                }
+                activeInstance<ContactInternalApi>().linkAuthenticated(
+                    openIdToken
+                )
             }
         }
 
