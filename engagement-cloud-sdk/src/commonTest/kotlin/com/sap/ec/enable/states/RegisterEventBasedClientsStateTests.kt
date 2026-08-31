@@ -21,6 +21,7 @@ class RegisterEventBasedClientsStateTests {
     private lateinit var mockLoggingClient: EventBasedClientApi
     private lateinit var mockReregistrationClient: EventBasedClientApi
     private lateinit var mockEmbeddedMessagingClient: EventBasedClientApi
+    private lateinit var mockRecommendationClient: EventBasedClientApi
     private lateinit var clients: List<EventBasedClientApi>
     private lateinit var registerEventBasedClientsState: RegisterEventBasedClientsState
 
@@ -36,6 +37,7 @@ class RegisterEventBasedClientsStateTests {
         mockLoggingClient = mock(MockMode.autoUnit)
         mockReregistrationClient = mock(MockMode.autoUnit)
         mockEmbeddedMessagingClient = mock(MockMode.autoUnit)
+        mockRecommendationClient = mock(MockMode.autoUnit)
         clients = listOf(
             mockDeviceClient,
             mockConfigClient,
@@ -46,7 +48,8 @@ class RegisterEventBasedClientsStateTests {
             mockRemoteConfigClient,
             mockLoggingClient,
             mockReregistrationClient,
-            mockEmbeddedMessagingClient
+            mockEmbeddedMessagingClient,
+            mockRecommendationClient
         )
 
         registerEventBasedClientsState = RegisterEventBasedClientsState(clients)
@@ -69,6 +72,7 @@ class RegisterEventBasedClientsStateTests {
             mockLoggingClient.register()
             mockReregistrationClient.register()
             mockEmbeddedMessagingClient.register()
+            mockRecommendationClient.register()
         }
 
         result shouldBe Result.success(Unit)

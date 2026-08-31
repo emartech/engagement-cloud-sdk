@@ -11,6 +11,7 @@ import com.sap.ec.networking.clients.error.ClientExceptionHandler
 import com.sap.ec.networking.clients.error.DefaultClientExceptionHandler
 import com.sap.ec.networking.clients.event.EventClient
 import com.sap.ec.networking.clients.logging.LoggingClient
+import com.sap.ec.networking.clients.recommendation.RecommendationClient
 import com.sap.ec.networking.clients.remoteConfig.RemoteConfigClient
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpRequestRetry
@@ -78,6 +79,13 @@ internal object NetworkInjection {
                 eventsDao = get(),
                 clientExceptionHandler = get(),
                 embeddedMessagingContext = get()
+            )
+        }
+        single<EventBasedClientApi>(named(EventBasedClientTypes.RecommendationClient)) {
+            RecommendationClient(
+                sdkLogger = get { parametersOf(RecommendationClient::class.simpleName) },
+                sdkEventManager = get(),
+                applicationScope = get(named(CoroutineScopeTypes.Application)),
             )
         }
         single<EventBasedClientApi>(named(EventBasedClientTypes.Device)) {

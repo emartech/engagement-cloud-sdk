@@ -216,7 +216,7 @@ internal enum class NetworkClientTypes {
 }
 
 internal enum class EventBasedClientTypes {
-    Device, Config, DeepLink, Contact, Event, Push, RemoteConfig, Logging, Reregistration, EmbeddedMessaging
+    Device, Config, DeepLink, Contact, Event, Push, RemoteConfig, Logging, Reregistration, EmbeddedMessaging, RecommendationClient
 }
 
 internal enum class EventFlowTypes {

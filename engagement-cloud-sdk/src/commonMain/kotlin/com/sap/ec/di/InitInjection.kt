@@ -95,6 +95,7 @@ internal object InitInjection {
                     get(named(EventBasedClientTypes.RemoteConfig)),
                     get(named(EventBasedClientTypes.Logging)),
                     get(named(EventBasedClientTypes.EmbeddedMessaging)),
+                    get(named(EventBasedClientTypes.RecommendationClient)),
                     get(named(EventBasedClientTypes.Reregistration)),
                 ),
             )
