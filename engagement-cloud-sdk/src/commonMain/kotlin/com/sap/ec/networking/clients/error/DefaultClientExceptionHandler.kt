@@ -16,16 +16,13 @@ internal class DefaultClientExceptionHandler(
 
     private companion object {
         const val RESPONSE_ERROR_CODE_INVALID_APPLICATION = "1002"
-        const val RESPONSE_ERROR_CODE_UNKNOWN_ERROR = "1000"
-        const val RESPONSE_ERROR_DETAILS_MESSAGE_TARGET_APP_NOT_FOUND = "Target app not found"
     }
 
     override fun transformException(throwable: Throwable): Throwable {
         when (throwable) {
             is FailedRequestException -> {
                 runCatching { throwable.response.body<ResponseErrorBody>() }.getOrNull()?.let {
-                    if ((it.error.code == RESPONSE_ERROR_CODE_INVALID_APPLICATION) ||
-                        (it.error.code == RESPONSE_ERROR_CODE_UNKNOWN_ERROR && it.error.details[0].message == RESPONSE_ERROR_DETAILS_MESSAGE_TARGET_APP_NOT_FOUND)) {
+                    if (it.error.code == RESPONSE_ERROR_CODE_INVALID_APPLICATION) {
                         return InvalidApplicationCodeException("Invalid application code")
                     }
                 }
