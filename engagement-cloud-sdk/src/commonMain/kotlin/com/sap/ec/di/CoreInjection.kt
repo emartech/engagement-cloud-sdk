@@ -52,6 +52,8 @@ import com.sap.ec.mobileengage.action.EventActionFactory
 import com.sap.ec.mobileengage.action.EventActionFactoryApi
 import com.sap.ec.mobileengage.embeddedmessaging.networking.EmbeddedMessagesRequestFactory
 import com.sap.ec.mobileengage.embeddedmessaging.networking.EmbeddedMessagingRequestFactoryApi
+import com.sap.ec.mobileengage.recommendation.networking.RecommendationRequestFactory
+import com.sap.ec.mobileengage.recommendation.networking.RecommendationRequestFactoryApi
 import com.sap.ec.networking.clients.jsbridge.JsBridgeClient
 import com.sap.ec.networking.clients.jsbridge.JsBridgeClientApi
 import com.sap.ec.util.JsonUtil
@@ -127,7 +129,8 @@ internal object CoreInjection {
                 "https://log-dealer.gservice.emarsys.net",
                 "https://embedded-messaging.gservice.emarsys.net",
                 "https://mobile-sdk-config.gservice.emarsys.net/jsbridge/latest.min.js",
-                "https://mobile-sdk-config.gservice.emarsys.net/jsbridge/latest.min.sign"
+                "https://mobile-sdk-config.gservice.emarsys.net/jsbridge/latest.min.sign",
+                "https://recommender.scarabresearch.com/merchants"
             )
         }
         single<SdkEventDistributor> {
@@ -181,6 +184,7 @@ internal object CoreInjection {
         single<SessionContext> { SessionContext() }
         singleOf(::UrlFactory) { bind<UrlFactoryApi>() }
         singleOf(::EmbeddedMessagesRequestFactory) { bind<EmbeddedMessagingRequestFactoryApi>() }
+        singleOf(::RecommendationRequestFactory) { bind<RecommendationRequestFactoryApi>() }
         single<CryptoApi> {
             Crypto(
                 logger = get<Logger> { parametersOf(Crypto::class.simpleName) },
@@ -216,7 +220,7 @@ internal enum class NetworkClientTypes {
 }
 
 internal enum class EventBasedClientTypes {
-    Device, Config, DeepLink, Contact, Event, Push, RemoteConfig, Logging, Reregistration, EmbeddedMessaging, RecommendationClient
+    Device, Config, DeepLink, Contact, Event, Push, RemoteConfig, Logging, Reregistration, EmbeddedMessaging, Recommendation
 }
 
 internal enum class EventFlowTypes {

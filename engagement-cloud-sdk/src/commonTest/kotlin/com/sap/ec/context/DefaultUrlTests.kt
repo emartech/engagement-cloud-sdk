@@ -14,7 +14,8 @@ class DefaultUrlTests {
         "loggingUrl - origin",
         "embeddedMessagingBaseUrl - origin",
         "ecJsBridgeUrl - origin",
-        "jsBridgeSignatureUrl - origin"
+        "jsBridgeSignatureUrl - origin",
+        "recommendationBaseUrl - origin"
     )
 
     @Test
@@ -27,11 +28,12 @@ class DefaultUrlTests {
             "loggingUrl - new",
             "embeddedMessagingBaseUrl - origin",
             "ecJsBridgeUrl - origin",
-            "jsBridgeSignatureUrl - origin"
+            "jsBridgeSignatureUrl - origin",
+            "recommendationBaseUrl - origin"
         )
         val result = defaultUrls.copyWith(
             clientServiceBaseUrl = "clientServiceBaseUrl - new",
-            loggingUrl = "loggingUrl - new"
+            loggingUrl = "loggingUrl - new",
         )
 
         result shouldBe expected

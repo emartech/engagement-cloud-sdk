@@ -8,7 +8,8 @@ internal data class DefaultUrls(
     override val loggingUrl: String,
     override val embeddedMessagingBaseUrl: String,
     override val jsBridgeUrl: String,
-    override val jsBridgeSignatureUrl: String
+    override val jsBridgeSignatureUrl: String,
+    override val recommendationBaseUrl: String
 ) : DefaultUrlsApi
 
 internal fun DefaultUrlsApi.copyWith(
@@ -19,7 +20,8 @@ internal fun DefaultUrlsApi.copyWith(
     loggingUrl: String? = null,
     embeddedMessagingBaseUrl: String? = null,
     jsBridgeUrl: String? = null,
-    jsBridgeSignatureUrl: String? = null
+    jsBridgeSignatureUrl: String? = null,
+    recommendationBaseUrl: String? = null
 ) = DefaultUrls(
     clientServiceBaseUrl = clientServiceBaseUrl ?: this.clientServiceBaseUrl,
     eventServiceBaseUrl = eventServiceBaseUrl ?: this.eventServiceBaseUrl,
@@ -28,5 +30,6 @@ internal fun DefaultUrlsApi.copyWith(
     loggingUrl = loggingUrl ?: this.loggingUrl,
     embeddedMessagingBaseUrl = embeddedMessagingBaseUrl ?: this.embeddedMessagingBaseUrl,
     jsBridgeUrl = jsBridgeUrl ?: this.jsBridgeUrl,
-    jsBridgeSignatureUrl = jsBridgeSignatureUrl ?: this.jsBridgeSignatureUrl
+    jsBridgeSignatureUrl = jsBridgeSignatureUrl ?: this.jsBridgeSignatureUrl,
+    recommendationBaseUrl = recommendationBaseUrl ?: this.recommendationBaseUrl
 )

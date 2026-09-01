@@ -3,8 +3,10 @@ package com.sap.ec.networking.clients.recommendation
 import com.sap.ec.core.channel.SdkEventManagerApi
 import com.sap.ec.core.db.events.EventsDaoApi
 import com.sap.ec.core.log.Logger
+import com.sap.ec.core.networking.clients.NetworkClientApi
 import com.sap.ec.event.OnlineSdkEvent
 import com.sap.ec.event.SdkEvent
+import com.sap.ec.mobileengage.recommendation.networking.RecommendationRequestFactoryApi
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -33,6 +35,8 @@ class RecommendationClientTests {
     private lateinit var mockSdkLogger: Logger
     private lateinit var mockSdkEventManager: SdkEventManagerApi
     private lateinit var mockEventsDao: EventsDaoApi
+    private lateinit var mockNetworkClient: NetworkClientApi
+    private lateinit var mockRecommendationRequestFactory: RecommendationRequestFactoryApi
     private lateinit var onlineEvents: MutableSharedFlow<OnlineSdkEvent>
 
     @BeforeTest
@@ -41,6 +45,8 @@ class RecommendationClientTests {
         mockSdkLogger = mock(MockMode.autofill)
         mockSdkEventManager = mock(MockMode.autofill)
         mockEventsDao = mock(MockMode.autofill)
+        mockNetworkClient = mock(MockMode.autofill)
+        mockRecommendationRequestFactory = mock(MockMode.autofill)
 
         onlineEvents = MutableSharedFlow(replay = 100, extraBufferCapacity = Channel.UNLIMITED)
 
@@ -50,7 +56,7 @@ class RecommendationClientTests {
 
     @Test
     fun testConsumer_shouldConsumeWebExtendEventsOnly() = runTest {
-        RecommendationClient(mockSdkEventManager, backgroundScope, mockSdkLogger).register()
+        RecommendationClient(mockSdkEventManager, backgroundScope, mockNetworkClient, mockRecommendationRequestFactory, mockSdkLogger).register()
         val relevantEvent = SdkEvent.External.WebExtendEvent.Search("testData")
         val notRelevantEvent = SdkEvent.Internal.EmbeddedMessaging.FetchMeta()
 

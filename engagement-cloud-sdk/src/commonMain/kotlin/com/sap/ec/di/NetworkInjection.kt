@@ -81,11 +81,13 @@ internal object NetworkInjection {
                 embeddedMessagingContext = get()
             )
         }
-        single<EventBasedClientApi>(named(EventBasedClientTypes.RecommendationClient)) {
+        single<EventBasedClientApi>(named(EventBasedClientTypes.Recommendation)) {
             RecommendationClient(
-                sdkLogger = get { parametersOf(RecommendationClient::class.simpleName) },
                 sdkEventManager = get(),
                 applicationScope = get(named(CoroutineScopeTypes.Application)),
+                ecNetworkClient = get(named(NetworkClientTypes.EC)),
+                recommendationRequestFactory = get(),
+                sdkLogger = get { parametersOf(RecommendationClient::class.simpleName) },
             )
         }
         single<EventBasedClientApi>(named(EventBasedClientTypes.Device)) {

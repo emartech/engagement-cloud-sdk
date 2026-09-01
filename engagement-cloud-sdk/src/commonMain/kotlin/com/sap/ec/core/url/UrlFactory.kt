@@ -55,6 +55,7 @@ internal class UrlFactory(
             is ECUrlType.FetchInlineInAppMessages -> {
                 Url("${sdkContext.defaultUrls.eventServiceBaseUrl}/$V5_API/apps/${getApplicationCode()}/inline-messages")
             }
+            ECUrlType.Recommendation -> Url("${sdkContext.defaultUrls.recommendationBaseUrl}/${sdkContext.getSdkConfig()?.applicationCode}")
         }
     }
 

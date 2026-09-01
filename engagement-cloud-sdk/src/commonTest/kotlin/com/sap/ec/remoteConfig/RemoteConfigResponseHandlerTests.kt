@@ -43,7 +43,7 @@ class RemoteConfigResponseHandlerTests {
     @BeforeTest
     fun setUp() {
         mockSdkContext = mock(MockMode.autofill)
-        defaultUrls = DefaultUrls("", "", "", "", "", "", "", "")
+        defaultUrls = DefaultUrls("", "", "", "", "", "", "", "", "")
         every { mockSdkContext.defaultUrls } returns defaultUrls
 
         mockLogConfigHolder = mock(MockMode.autofill)
@@ -78,6 +78,7 @@ class RemoteConfigResponseHandlerTests {
         val deeplinkServiceUrl = "testDeepLinkServiceUrl"
         val jsBridgeUrl = "testJsBridgeUrl"
         val embeddedMessagingServiceUrl = "testEmbeddedMessagingServiceUrl"
+        val recommendationServiceUrl = "testRecommendationServiceUrl"
         val clientId = "testClientId"
         val configResponse = RemoteConfigResponse(
             ServiceUrls(
@@ -85,7 +86,8 @@ class RemoteConfigResponseHandlerTests {
                 eventService = eventServiceUrl,
                 deepLinkService = deeplinkServiceUrl,
                 embeddedMessagingService = embeddedMessagingServiceUrl,
-                jsBridgeUrl = jsBridgeUrl
+                jsBridgeUrl = jsBridgeUrl,
+                recommendationService = recommendationServiceUrl
             ), LogLevel.Debug,
             LuckyLogger(LogLevel.Error, 1.0),
             RemoteConfigFeatures(
@@ -110,6 +112,7 @@ class RemoteConfigResponseHandlerTests {
         defaultUrlSlot.get().deepLinkBaseUrl shouldBe deeplinkServiceUrl
         defaultUrlSlot.get().embeddedMessagingBaseUrl shouldBe embeddedMessagingServiceUrl
         defaultUrlSlot.get().jsBridgeUrl shouldBe jsBridgeUrl
+        defaultUrlSlot.get().recommendationBaseUrl shouldBe recommendationServiceUrl
         verify { mockLogConfigHolder.remoteLogLevel = LogLevel.Error }
         mockSdkContext.features.size shouldBe 3
         mockSdkContext.features shouldContainAll listOf(

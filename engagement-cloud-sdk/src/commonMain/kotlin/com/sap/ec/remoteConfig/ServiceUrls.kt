@@ -9,5 +9,6 @@ internal data class ServiceUrls(
     val deepLinkService: String? = null,
     val embeddedMessagingService: String? = null,
     val jsBridgeUrl: String? = null,
-    val jsBridgeSignatureUrl: String? = null
+    val jsBridgeSignatureUrl: String? = null,
+    val recommendationService: String? = null
 )

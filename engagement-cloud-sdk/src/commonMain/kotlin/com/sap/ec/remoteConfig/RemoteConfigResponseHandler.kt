@@ -78,6 +78,7 @@ internal class RemoteConfigResponseHandler(
                 embeddedMessagingBaseUrl = it.embeddedMessagingService,
                 jsBridgeUrl = it.jsBridgeUrl,
                 jsBridgeSignatureUrl = it.jsBridgeSignatureUrl,
+                recommendationBaseUrl = it.recommendationService
             )
         }
     }

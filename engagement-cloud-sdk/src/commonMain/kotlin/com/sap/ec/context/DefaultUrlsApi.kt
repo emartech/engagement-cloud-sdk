@@ -9,4 +9,5 @@ internal interface DefaultUrlsApi {
     val embeddedMessagingBaseUrl: String
     val jsBridgeUrl: String
     val jsBridgeSignatureUrl: String
+    val recommendationBaseUrl: String
 }
