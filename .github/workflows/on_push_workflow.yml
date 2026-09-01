@@ -188,6 +188,10 @@ jobs:
             sudo apt-get install -y google-chrome-stable
           fi
 
+      - name: Install npm dependencies
+        if: matrix.platform == 'web'
+        run: npm install
+
       - name: Test Web
         if: matrix.platform == 'web'
         run: make test-web
