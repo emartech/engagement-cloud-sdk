@@ -11,7 +11,6 @@ import com.sap.ec.SdkConstants.CHANGE_LANGUAGE_EVENT_NAME
 import com.sap.ec.SdkConstants.CLEAR_PUSH_TOKEN_EVENT_NAME
 import com.sap.ec.SdkConstants.DISMISS_EVENT_NAME
 import com.sap.ec.SdkConstants.INAPP_VIEWED_EVENT_NAME
-import com.sap.ec.SdkConstants.IN_APP_BUTTON_CLICKED_EVENT_NAME
 import com.sap.ec.SdkConstants.LINK_AUTHENTICATED_CONTACT_NAME
 import com.sap.ec.SdkConstants.LINK_CONTACT_NAME
 import com.sap.ec.SdkConstants.LOG_EVENT_NAME
@@ -28,6 +27,7 @@ import com.sap.ec.SdkConstants.SESSION_START_EVENT_NAME
 import com.sap.ec.SdkConstants.TRACK_DEEPLINK_NAME
 import com.sap.ec.SdkConstants.UNLINK_CONTACT_NAME
 import com.sap.ec.SdkConstants.WEBPUSH_CLICKED_EVENT_NAME
+import com.sap.ec.SdkConstants.WEB_VIEWED_EVENT_NAME
 import com.sap.ec.core.db.events.EventsDaoApi
 import com.sap.ec.core.log.LogLevel
 import com.sap.ec.core.log.Logger
@@ -329,7 +329,10 @@ sealed interface SdkEvent {
 
         sealed interface Custom : Internal, OnlineSdkEvent, DeviceEventWithCustomAttributes
 
-        sealed interface LogEvent : Internal, OnlineSdkEvent
+        sealed interface LogEvent : Internal, OnlineSdkEvent {
+            val level: LogLevel
+            val attributes: JsonObject?
+        }
 
         sealed interface SetupFlowEvent : Internal, OnlineSdkEvent
 
@@ -344,7 +347,7 @@ sealed interface SdkEvent {
         sealed class Sdk : Internal {
             override val type: String = "internal"
 
-            sealed class Answer() : Sdk() {
+            sealed class Answer : Sdk() {
 
                 override val id: String = UUIDProvider().provide()
                 abstract val originId: String
@@ -358,20 +361,21 @@ sealed interface SdkEvent {
 
             @Serializable
             data class Log(
-                val level: LogLevel,
+                override val level: LogLevel,
                 override val id: String = UUIDProvider().provide(),
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0,
-                val attributes: JsonObject? = null,
+                override val attributes: JsonObject? = null,
                 val name: String = LOG_EVENT_NAME
             ) : Sdk(), LogEvent
 
             @Serializable
             data class Metric(
-                val level: LogLevel = LogLevel.Metric,
+                override val level: LogLevel = LogLevel.Metric,
                 override val id: String = UUIDProvider().provide(),
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0,
+                override val attributes: JsonObject? = null,
                 val name: String = METRIC_EVENT_NAME
             ) : Sdk(), LogEvent
 
@@ -538,7 +542,8 @@ sealed interface SdkEvent {
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0,
-            ) : Push(if (currentPlatform == KotlinPlatform.JS) WEBPUSH_CLICKED_EVENT_NAME else PUSH_CLICKED_EVENT_NAME), Reporting
+            ) : Push(if (currentPlatform == KotlinPlatform.JS) WEBPUSH_CLICKED_EVENT_NAME else PUSH_CLICKED_EVENT_NAME),
+                Reporting
         }
 
         @Serializable
@@ -566,7 +571,8 @@ sealed interface SdkEvent {
                 override val reporting: String? = null,
                 override val trackingInfo: String,
                 override var nackCount: Int = 0,
-            ) : InApp(INAPP_VIEWED_EVENT_NAME), Reporting
+            ) : InApp(if (currentPlatform == KotlinPlatform.JS) WEB_VIEWED_EVENT_NAME else INAPP_VIEWED_EVENT_NAME),
+                Reporting
 
             @Serializable
             data class ButtonClicked(
@@ -574,7 +580,7 @@ sealed interface SdkEvent {
                 override val reporting: String,
                 override val trackingInfo: String,
                 val origin: String,
-                val reportingName: String = IN_APP_BUTTON_CLICKED_EVENT_NAME,
+                val reportingName: String,
                 override val attributes: JsonObject? = null,
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0,

@@ -2,26 +2,16 @@ package com.sap.ec.api.contact
 
 import com.sap.ec.core.log.LogEntry
 import com.sap.ec.core.log.Logger
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonObject
 
 internal class LoggingContact(private val logger: Logger) : ContactInstance {
 
     override suspend fun link(contactFieldValue: String) {
-        val entry = LogEntry.createMethodNotAllowed(
-            this, this::link.name, buildJsonObject {
-                put("contactFieldValue", JsonPrimitive(contactFieldValue))
-            }
-        )
+        val entry = LogEntry.createMethodNotAllowed(this, this::link.name)
         logger.debug(entry)
     }
 
     override suspend fun linkAuthenticated(openIdToken: String) {
-        val entry = LogEntry.createMethodNotAllowed(
-            this, this::linkAuthenticated.name, buildJsonObject {
-                put("openIdToken", JsonPrimitive(openIdToken))
-            }
-        )
+        val entry = LogEntry.createMethodNotAllowed(this, this::linkAuthenticated.name)
         logger.debug(entry)
     }
 

@@ -2,6 +2,7 @@ package com.sap.ec.networking.clients.logging
 
 import com.sap.ec.core.channel.SdkEventManagerApi
 import com.sap.ec.core.db.events.EventsDaoApi
+import com.sap.ec.core.device.DeviceCategory
 import com.sap.ec.core.device.DeviceInfoCollectorApi
 import com.sap.ec.core.device.DeviceInfoForLogs
 import com.sap.ec.core.log.LogLevel
@@ -45,7 +46,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.io.IOException
 import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.put
@@ -71,6 +71,7 @@ class LoggingClientTests {
             null,
             "1.0.0",
             "testDevice",
+            DeviceCategory.MOBILE,
             "8.0.0",
             "4.0.0",
             true,
@@ -132,12 +133,12 @@ class LoggingClientTests {
         everySuspend { mockEmarsysClient.send(any()) } returns Result.success(createTestResponse("{}"))
         everySuspend { mockDeviceInfoCollector.collectAsDeviceInfoForLogs() } returns deviceInfoForLogs
         val testLogAttributes = buildJsonObject {
-            put("message", JsonPrimitive("Test log message"))
-            put("url", JsonPrimitive("https://test.url"))
-            put("statusCode", JsonPrimitive("200"))
-            put("networkingDuration", JsonPrimitive("123"))
-            put("networkingEnd", JsonPrimitive("456"))
-            put("networkingStart", JsonPrimitive("123"))
+            put("message", "Test log message")
+            put("url", "https://test.url")
+            put("statusCode", "200")
+            put("networkingDuration", "123")
+            put("networkingEnd", "456")
+            put("networkingStart", "123")
         }
         val logEvent = SdkEvent.Internal.Sdk.Log(
             level = LogLevel.Debug,
@@ -186,8 +187,17 @@ class LoggingClientTests {
         everySuspend { mockEmarsysClient.send(any()) } returns Result.success(createTestResponse("{}"))
         everySuspend { mockDeviceInfoCollector.collectAsDeviceInfoForLogs() } returns deviceInfoForLogs
 
+        val metricAttributes = buildJsonObject {
+            put("trackingInfo", "testId")
+            put("loadingTimeStart", 10)
+            put("loadingTimeEnd", 20)
+            put("loadingTimeDuration", 10)
+            put("onScreenTimeStart", 10)
+            put("onScreenTimeEnd", 20)
+            put("onScreenTimeDuration", 10)
+        }
         val logEvent = SdkEvent.Internal.Sdk.Metric(
-            level = LogLevel.Metric
+            attributes = metricAttributes
         )
         val expectedRequest = UrlRequest(
             TEST_BASE_URL,
@@ -195,12 +205,15 @@ class LoggingClientTests {
             json.encodeToString(
                 buildJsonObject {
                     put("logs", JsonArray(listOf(buildJsonObject {
-                        put("type", "log_request")
+                        put("type", "log_inapp_metrics")
                         put("level", logEvent.level.name.uppercase())
                         put(
                             "deviceInfo",
                             json.encodeToJsonElement(deviceInfoForLogs)
                         )
+                        metricAttributes.forEach { attribute ->
+                            put(attribute.key, attribute.value)
+                        }
                     })))
                 }
 
@@ -228,9 +241,7 @@ class LoggingClientTests {
         everySuspend { mockUrlFactory.create(ECUrlType.Logging) } returns TEST_BASE_URL
         everySuspend { mockEmarsysClient.send(any()) } returns Result.failure(testException)
         everySuspend { mockDeviceInfoCollector.collectAsDeviceInfoForLogs() } returns deviceInfoForLogs
-        val logEvent = SdkEvent.Internal.Sdk.Metric(
-            level = LogLevel.Metric
-        )
+        val logEvent = SdkEvent.Internal.Sdk.Metric()
         everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
         val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
             logEvents.take(1).toList()
@@ -257,9 +268,7 @@ class LoggingClientTests {
         val testException = Exception("Test exception")
 
         everySuspend { mockUrlFactory.create(ECUrlType.Logging) } throws testException
-        val logEvent = SdkEvent.Internal.Sdk.Metric(
-            level = LogLevel.Metric
-        )
+        val logEvent = SdkEvent.Internal.Sdk.Metric()
 
         val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
             logEvents.take(1).toList()

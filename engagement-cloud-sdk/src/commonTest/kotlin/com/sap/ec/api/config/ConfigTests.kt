@@ -4,6 +4,7 @@ import com.sap.ec.SdkConstants
 import com.sap.ec.TestEngagementCloudSDKConfig
 import com.sap.ec.api.SdkState
 import com.sap.ec.context.SdkContextApi
+import com.sap.ec.core.device.DeviceCategory
 import com.sap.ec.core.device.DeviceInfo
 import com.sap.ec.core.device.DeviceInfoCollectorApi
 import com.sap.ec.core.device.NotificationSettings
@@ -49,6 +50,7 @@ class ConfigTest {
             null,
             "testAppVersion",
             "testDeviceModel",
+            DeviceCategory.DESKTOP,
             "testOsVersion",
             "testSdkVersion",
             "testLanguageCode",

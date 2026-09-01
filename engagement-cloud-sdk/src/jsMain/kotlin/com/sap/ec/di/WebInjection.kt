@@ -38,6 +38,7 @@ import com.sap.ec.core.db.events.EventsDaoApi
 import com.sap.ec.core.db.events.JSEventsDao
 import com.sap.ec.core.device.DeviceInfoCollector
 import com.sap.ec.core.device.DeviceInfoCollectorApi
+import com.sap.ec.core.device.DeviceCategoryProvider
 import com.sap.ec.core.device.WebPlatformInfoCollector
 import com.sap.ec.core.device.notification.WebNotificationSettingsCollector
 import com.sap.ec.core.device.notification.WebNotificationSettingsCollectorApi
@@ -144,7 +145,14 @@ internal object WebInjection {
             DeviceInfoCollector(
                 clientIdProvider = ClientIdProvider(uuidProvider = get(), storage = get()),
                 timezoneProvider = get(),
-                webPlatformInfoCollector = WebPlatformInfoCollector(getNavigatorData()),
+                webPlatformInfoCollector = WebPlatformInfoCollector(
+                    getNavigatorData(),
+                    deviceCategoryProvider = DeviceCategoryProvider(
+                        window.navigator.userAgent,
+                        window.navigator.asDynamic().userAgentData,
+                        sdkLogger = get { parametersOf(DeviceCategoryProvider::class.simpleName) }
+                    )
+                ),
                 applicationVersionProvider = get(),
                 languageProvider = get(),
                 wrapperInfoStorage = get(),

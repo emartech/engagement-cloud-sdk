@@ -48,6 +48,8 @@ mavenPublish = "0.36.0"
 dotEnv = "4.0.0"
 uiBackhandler = "1.10.3"
 
+bowser ="2.14.1"
+
 [libraries]
 compose-html-core = { module = "org.jetbrains.compose.html:html-core", version.ref = "compose-plugin" }
 compose-html-svg = { module = "org.jetbrains.compose.html:html-svg", version.ref = "compose-plugin" }

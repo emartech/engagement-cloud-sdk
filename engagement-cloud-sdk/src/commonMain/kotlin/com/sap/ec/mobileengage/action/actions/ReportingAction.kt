@@ -1,9 +1,12 @@
 package com.sap.ec.mobileengage.action.actions
 
+import com.sap.ec.KotlinPlatform
 import com.sap.ec.SdkConstants.BUTTON_CLICK_ORIGIN
 import com.sap.ec.SdkConstants.EMBEDDED_MESSAGING_BUTTON_CLICKED_EVENT_NAME
 import com.sap.ec.SdkConstants.IN_APP_BUTTON_CLICKED_EVENT_NAME
+import com.sap.ec.SdkConstants.WEB_BUTTON_CLICKED_EVENT_NAME
 import com.sap.ec.core.channel.SdkEventDistributorApi
+import com.sap.ec.currentPlatform
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.mobileengage.action.models.BasicInAppButtonClickedActionModel
 import com.sap.ec.mobileengage.action.models.BasicPushButtonClickedActionModel
@@ -32,8 +35,10 @@ internal data class ReportingAction(
             is BasicInAppButtonClickedActionModel -> {
                 val eventName = if (action.inAppType == InAppType.EMBEDDED_MESSAGING)
                     EMBEDDED_MESSAGING_BUTTON_CLICKED_EVENT_NAME
-                else
-                    IN_APP_BUTTON_CLICKED_EVENT_NAME
+                else if (currentPlatform == KotlinPlatform.JS)
+                    WEB_BUTTON_CLICKED_EVENT_NAME
+                else IN_APP_BUTTON_CLICKED_EVENT_NAME
+
                 sdkEventDistributor.registerEvent(
                     SdkEvent.Internal.InApp.ButtonClicked(
                         reporting = action.reporting,

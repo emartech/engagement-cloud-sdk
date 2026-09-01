@@ -56,45 +56,75 @@ class DefaultClientExceptionHandlerTests {
     }
 
     @Test
-    fun testTransformException_shouldTransformException_forKnownError() = forAll(
-        table(
-            headers("errorCode", "errorDetailsMessage"),
-            listOf(
-                row("1002", "invalid app-code"),
-                row("1000", "Target app not found"),
+    fun transformException_shouldTransformException_forPredefinedErrorCodes() =
+        forAll(
+            table(
+                headers("errorCode", "errorDetailsMessage"),
+                listOf(
+                    row("1002", "invalid app-code")
+                )
             )
-        )
-    ) { errorCode, errorDetailsMessage ->
-        runTest {
-            val testException = FailedRequestException(Response(
-                UrlRequest(Url("testUrl"), HttpMethod.Get),
-                HttpStatusCode.NotFound, Headers.Empty,
-                bodyAsText = buildJsonObject {
-                    put("error", buildJsonObject {
-                        put("code", errorCode)
-                        put("message", "invalid app-code")
-                        put("target", "/ABC-123")
-                        put("details", buildJsonArray {
-                            add(buildJsonObject {
-                                put("code", "ERROR")
-                                put("message", errorDetailsMessage)
+        ) { errorCode, errorDetailsMessage ->
+            runTest {
+                val testException = FailedRequestException(
+                    Response(
+                        UrlRequest(Url("testUrl"), HttpMethod.Get),
+                        HttpStatusCode.NotFound, Headers.Empty,
+                        bodyAsText = buildJsonObject {
+                            put("error", buildJsonObject {
+                                put("code", errorCode)
+                                put("message", "invalid app-code")
+                                put("target", "/ABC-123")
+                                put("details", buildJsonArray {
+                                    add(buildJsonObject {
+                                        put("code", "ERROR")
+                                        put("message", errorDetailsMessage)
+                                    })
+                                })
                             })
-                        })
-                    })
-                }.toString()
-            ))
-            val expectedException = InvalidApplicationCodeException("Invalid application code")
+                        }.toString()
+                    )
+                )
+                val expectedException = InvalidApplicationCodeException("Invalid application code")
 
-            val resultException = exceptionHandler.transformException(
-                throwable = testException
-            )
+                val resultException = exceptionHandler.transformException(
+                    throwable = testException
+                )
 
-            resultException shouldBe expectedException
+                resultException shouldBe expectedException
+            }
         }
-    }
 
     @Test
-    fun testTransformException_shouldNotTransformException_forUnknownError() = forAll(
+    fun transformException_shouldNotTransformException_forErrorCode_1000_UnknowError() =
+        runTest {
+            val testException = FailedRequestException(
+                Response(
+                    UrlRequest(Url("testUrl"), HttpMethod.Get),
+                    HttpStatusCode.NotFound, Headers.Empty,
+                    bodyAsText = buildJsonObject {
+                        put("error", buildJsonObject {
+                            put("code", 1000)
+                            put("message", "Target app not found")
+                            put("target", "/ABC-123")
+                            put("details", buildJsonArray {
+                                add(buildJsonObject {
+                                    put("code", "ERROR")
+                                    put("message", "Target app not found")
+                                })
+                            })
+                        })
+                    }.toString()
+                )
+            )
+
+            val resultException = exceptionHandler.transformException(testException)
+
+            resultException shouldBe testException
+        }
+
+    @Test
+    fun transformException_shouldNotTransformException_forUnknownError() = forAll(
         table(
             headers("exception"),
             listOf(
@@ -113,14 +143,16 @@ class DefaultClientExceptionHandlerTests {
     }
 
     @Test
-    fun testHandleException_shouldAckEvent_onKnownError() = forAll(
+    fun handleException_shouldAckEvent_onKnownError() = forAll(
         table(
             headers("exception"),
             listOf(
                 row(FailedRequestException(RESPONSE)),
-                row(RetryLimitReachedException(
-                    "Retry limit reached",
-                    RESPONSE)
+                row(
+                    RetryLimitReachedException(
+                        "Retry limit reached",
+                        RESPONSE
+                    )
                 ),
                 row(MissingApplicationCodeException("Missing app code")),
             )
@@ -145,7 +177,7 @@ class DefaultClientExceptionHandlerTests {
     }
 
     @Test
-    fun testHandleException_shouldNackEvent_onUnknownException() = runTest {
+    fun handleException_shouldNackEvent_onUnknownException() = runTest {
         val trackDeepLinkEvent = SdkEvent.Internal.Sdk.TrackDeepLink(
             id = "testId",
             trackingId = "testTrackingId",
@@ -167,7 +199,7 @@ class DefaultClientExceptionHandlerTests {
     }
 
     @Test
-    fun testHandleException_shouldNackEvent_onUnknownException_whenCalledWithMultipleEvents() =
+    fun handleException_shouldNackEvent_onUnknownException_whenCalledWithMultipleEvents() =
         runTest {
             val trackDeepLinkEvent = SdkEvent.Internal.Sdk.TrackDeepLink(
                 id = "testId",

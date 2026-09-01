@@ -96,17 +96,17 @@ internal class ContactClient(
         when (event) {
             is SdkEvent.Internal.Sdk.LinkContact -> {
                 requestContext.isContactLinked = true
-                ecSdkSession.startSession()
+                ecSdkSession.restartSession()
             }
 
             is SdkEvent.Internal.Sdk.LinkAuthenticatedContact -> {
                 requestContext.isContactLinked = true
-                ecSdkSession.startSession()
+                ecSdkSession.restartSession()
             }
 
             is SdkEvent.Internal.Sdk.UnlinkContact -> {
                 requestContext.isContactLinked = false
-                ecSdkSession.endSession()
+                ecSdkSession.restartSession()
             }
 
             else -> {}

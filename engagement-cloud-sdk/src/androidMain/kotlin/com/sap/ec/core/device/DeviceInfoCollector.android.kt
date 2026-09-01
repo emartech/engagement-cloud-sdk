@@ -45,6 +45,7 @@ internal actual class DeviceInfoCollector(
             platformWrapperVersion = getWrapperInfo()?.wrapperVersion,
             applicationVersion = applicationVersionProvider.provide(),
             deviceModel = Build.MODEL,
+            deviceCategory = DeviceCategory.MOBILE,
             osVersion = SdkBuildConfig.getOsVersion(),
             sdkVersion = BuildConfig.VERSION_NAME,
             language = language(),
@@ -61,6 +62,7 @@ internal actual class DeviceInfoCollector(
             platformWrapperVersion = getWrapperInfo()?.wrapperVersion,
             applicationVersion = applicationVersionProvider.provide(),
             deviceModel = Build.MODEL,
+            deviceCategory = DeviceCategory.MOBILE,
             osVersion = SdkBuildConfig.getOsVersion(),
             sdkVersion = BuildConfig.VERSION_NAME,
             isDebugMode = (0 != applicationContext.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE),
@@ -71,7 +73,7 @@ internal actual class DeviceInfoCollector(
         )
     }
 
-    private suspend fun language(): String {
+    private fun language(): String {
         return stringStorage.get(SdkConstants.LANGUAGE_STORAGE_KEY) ?: languageProvider.provide()
     }
 

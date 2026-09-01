@@ -3,12 +3,16 @@ package com.sap.ec.core.device
 import com.sap.ec.core.device.constants.BrowserInfo
 import com.sap.ec.core.device.constants.OsInfo
 
-internal class WebPlatformInfoCollector(private val navigatorData: String) : WebPlatformInfoCollectorApi {
+internal class WebPlatformInfoCollector(
+    private val navigatorData: String,
+    private val deviceCategoryProvider: DeviceCategoryProviderApi
+) :
+    WebPlatformInfoCollectorApi {
     private companion object {
         const val DEFAULT_BROWSER_VERSION = "0"
     }
 
-    override fun collect(): WebPlatformInfo {
+    override suspend fun collect(): WebPlatformInfo {
         val headerData = analiseHeaders()
         return WebPlatformInfo(
             null,
@@ -16,11 +20,12 @@ internal class WebPlatformInfoCollector(private val navigatorData: String) : Web
             headerData.osName,
             headerData.osVersion,
             headerData.browserName.lowercase(),
-            headerData.browserVersion
+            headerData.browserVersion,
+            headerData.deviceCategory
         )
     }
 
-    private fun analiseHeaders(): WindowHeaderData {
+    private suspend fun analiseHeaders(): WindowHeaderData {
         val osInfo = OsInfo.entries.firstOrNull {
             navigatorData.contains(it.value)
         } ?: OsInfo.Unknown
@@ -31,7 +36,15 @@ internal class WebPlatformInfoCollector(private val navigatorData: String) : Web
         } ?: BrowserInfo.Unknown
         val browserVersion = extractBrowserVersionNumber(browserInfo.versionPrefix)
 
-        return WindowHeaderData(osInfo.name, osVersion, browserInfo.name, browserVersion)
+        val deviceCategory = deviceCategoryProvider.getDeviceCategory()
+
+        return WindowHeaderData(
+            osInfo.name,
+            osVersion,
+            browserInfo.name,
+            browserVersion,
+            deviceCategory
+        )
     }
 
     private fun extractBrowserVersionNumber(versionPrefix: String): String {
@@ -39,7 +52,7 @@ internal class WebPlatformInfoCollector(private val navigatorData: String) : Web
         val versionMatches = versionRegex.findAll(navigatorData).firstOrNull()?.groupValues
         return if (!versionMatches.isNullOrEmpty()) {
             val versionNumbers = versionMatches.drop(1)
-            return versionNumbers.first().replace("_", ".")
+            versionNumbers.first().replace("_", ".")
         } else DEFAULT_BROWSER_VERSION
     }
 }
