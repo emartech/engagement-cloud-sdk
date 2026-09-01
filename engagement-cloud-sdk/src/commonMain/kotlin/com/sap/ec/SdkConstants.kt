@@ -42,4 +42,6 @@ object SdkConstants {
     const val LANGUAGE_STORAGE_KEY = "customerOverwroteLanguageCodeKey"
     const val PAGE_LOCATION_ATTRIBUTE_KEY = "url"
     const val LEGACY_SDK_MIGRATION_DONE_KEY = "SAPEngagementCloudSdkLegacySdkMigrationDone"
+
+    const val PUSH_DEFAULT_REPORTING = "{ \"id\": \"defaultReportingId\" }"
 }

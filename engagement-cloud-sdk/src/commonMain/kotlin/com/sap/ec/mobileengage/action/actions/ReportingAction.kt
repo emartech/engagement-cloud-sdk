@@ -1,6 +1,7 @@
 package com.sap.ec.mobileengage.action.actions
 
 import com.sap.ec.KotlinPlatform
+import com.sap.ec.SdkConstants
 import com.sap.ec.SdkConstants.BUTTON_CLICK_ORIGIN
 import com.sap.ec.SdkConstants.EMBEDDED_MESSAGING_BUTTON_CLICKED_EVENT_NAME
 import com.sap.ec.SdkConstants.IN_APP_BUTTON_CLICKED_EVENT_NAME
@@ -52,7 +53,7 @@ internal data class ReportingAction(
             is NotificationOpenedActionModel -> {
                 sdkEventDistributor.registerEvent(
                     SdkEvent.Internal.Push.Clicked(
-                        reporting = action.reporting,
+                        reporting = action.reporting ?: SdkConstants.PUSH_DEFAULT_REPORTING,
                         trackingInfo = action.trackingInfo,
                         origin = "main"
                     )

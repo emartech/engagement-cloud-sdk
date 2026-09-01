@@ -146,6 +146,28 @@ class ReportingActionTests {
             verifyArguments(eventSlot, expectedEvent, EXPECTED_PUSH_CLICK_NAME)
         }
 
+    @Test
+    fun testInvoke_shouldSendEventWithDefaultReportingAction_whenReporting_isNull() =
+        runTest {
+            val notificationOpenedActionModel =
+                NotificationOpenedActionModel(null, TRACKING_INFO)
+            val action = ReportingAction(notificationOpenedActionModel, mockSdkEventDistributor)
+            val expectedEvent = SdkEvent.Internal.Push.Clicked(
+                reporting = "{ \"id\": \"defaultReportingId\" }",
+                trackingInfo = TRACKING_INFO,
+                origin = "main"
+            )
+
+            val eventSlot = slot<SdkEvent.Internal.Reporting>()
+
+            everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns
+                    mock(MockMode.autofill)
+
+            action.invoke()
+
+            verifyArguments(eventSlot, expectedEvent, EXPECTED_PUSH_CLICK_NAME)
+        }
+
     private fun verifyArguments(
         eventSlot: SlotCapture<SdkEvent.Internal.Reporting>,
         expectedEvent: SdkEvent.Internal.Reporting,
