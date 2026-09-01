@@ -35,19 +35,11 @@ class ReportingActionTests {
         const val REPORTING = """{"reportingKey":"reportingValue"}"""
         val EXPECTED_PUSH_CLICK_NAME =
             if (currentPlatform == KotlinPlatform.JS) WEBPUSH_CLICKED_EVENT_NAME else PUSH_CLICKED_EVENT_NAME
+        val EXPECTED_IN_APP_CLICK_NAME =
+            if (currentPlatform == KotlinPlatform.JS) SdkConstants.WEB_BUTTON_CLICKED_EVENT_NAME else SdkConstants.IN_APP_BUTTON_CLICKED_EVENT_NAME
     }
 
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
-
-    @Test
-    fun testInAppButtonClickedEventName_shouldUseNamespacedFormat() {
-        SdkConstants.IN_APP_BUTTON_CLICKED_EVENT_NAME shouldBe "inapp:click"
-    }
-
-    @Test
-    fun testWebPushClickedEventName_shouldUseNamespacedFormat() {
-        SdkConstants.WEBPUSH_CLICKED_EVENT_NAME shouldBe "webpush:click"
-    }
 
     @BeforeTest
     fun setUp() = runTest {
@@ -66,7 +58,7 @@ class ReportingActionTests {
             origin = BUTTON_CLICK_ORIGIN
         )
 
-        val eventSlot = slot<SdkEvent>()
+        val eventSlot = slot<SdkEvent.Internal.Reporting>()
 
         everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(
             MockMode.autofill
@@ -90,10 +82,10 @@ class ReportingActionTests {
             reporting = REPORTING,
             trackingInfo = TRACKING_INFO,
             origin = BUTTON_CLICK_ORIGIN,
-            reportingName = "inapp:click"
+            reportingName = EXPECTED_IN_APP_CLICK_NAME
         )
 
-        val eventSlot = slot<SdkEvent>()
+        val eventSlot = slot<SdkEvent.Internal.Reporting>()
 
         everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(
             MockMode.autofill
@@ -101,7 +93,7 @@ class ReportingActionTests {
 
         action.invoke()
 
-        verifyArguments(eventSlot, expectedEvent, "inapp:click")
+        verifyArguments(eventSlot, expectedEvent, EXPECTED_IN_APP_CLICK_NAME)
     }
 
     @Test
@@ -121,7 +113,7 @@ class ReportingActionTests {
                 reportingName = "em:click"
             )
 
-            val eventSlot = slot<SdkEvent>()
+            val eventSlot = slot<SdkEvent.Internal.Reporting>()
 
             everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(
                 MockMode.autofill
@@ -144,7 +136,7 @@ class ReportingActionTests {
                 origin = "main"
             )
 
-            val eventSlot = slot<SdkEvent>()
+            val eventSlot = slot<SdkEvent.Internal.Reporting>()
 
             everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns
                     mock(MockMode.autofill)
@@ -155,13 +147,13 @@ class ReportingActionTests {
         }
 
     private fun verifyArguments(
-        eventSlot: SlotCapture<SdkEvent>,
+        eventSlot: SlotCapture<SdkEvent.Internal.Reporting>,
         expectedEvent: SdkEvent.Internal.Reporting,
-        expectedName: String
+        expectedEventName: String
     ) {
         eventSlot.get().type shouldBe expectedEvent.type
-        (eventSlot.get() as SdkEvent.Internal.Reporting).reporting shouldBe expectedEvent.reporting
-        (eventSlot.get() as SdkEvent.Internal.Reporting).trackingInfo shouldBe expectedEvent.trackingInfo
-        (eventSlot.get() as SdkEvent.DeviceEvent).name shouldBe expectedName
+        eventSlot.get().reporting shouldBe expectedEvent.reporting
+        eventSlot.get().trackingInfo shouldBe expectedEvent.trackingInfo
+        eventSlot.get().name shouldBe expectedEventName
     }
 }

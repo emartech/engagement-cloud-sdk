@@ -44,6 +44,7 @@ internal actual class DeviceInfoCollector(
             platformWrapperVersion = getWrapperInfo()?.wrapperVersion,
             applicationVersion = applicationVersionProvider.provide(),
             deviceModel = window.navigator.userAgent,
+            deviceCategory = headerData.deviceCategory,
             osVersion = headerData.browserVersion,
             sdkVersion = BuildConfig.VERSION_NAME,
             language = stringStorage.get(SdkConstants.LANGUAGE_STORAGE_KEY)
@@ -62,6 +63,7 @@ internal actual class DeviceInfoCollector(
             platformWrapperVersion = deviceInfo.platformWrapperVersion,
             applicationVersion = deviceInfo.applicationVersion,
             deviceModel = deviceInfo.deviceModel,
+            deviceCategory = deviceInfo.deviceCategory,
             osVersion = deviceInfo.osVersion,
             sdkVersion = deviceInfo.sdkVersion,
             isDebugMode = false,

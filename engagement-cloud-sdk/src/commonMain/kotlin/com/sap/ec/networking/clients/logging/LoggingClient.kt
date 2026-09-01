@@ -56,22 +56,20 @@ internal class LoggingClient(
                     val logRequestsJson =
                         buildJsonObject {
                             val logRequestJsonArray = sdkEvents.map { sdkEvent ->
-                                val logLevel = if (sdkEvent is SdkEvent.Internal.Sdk.Log) {
-                                    sdkEvent.level
-                                } else {
-                                    (sdkEvent as SdkEvent.Internal.Sdk.Metric).level
-                                }
                                 buildJsonObject {
-                                    put("type", "log_request")
-                                    put("level", logLevel.name.uppercase())
+                                    val type = if (sdkEvent is SdkEvent.Internal.Sdk.Metric) {
+                                        "log_inapp_metrics"
+                                    } else {
+                                        "log_request"
+                                    }
+                                    put("type", type)
+                                    put("level", sdkEvent.level.name.uppercase())
                                     put(
                                         "deviceInfo",
                                         json.encodeToJsonElement(deviceInfoCollector.collectAsDeviceInfoForLogs())
                                     )
-                                    if (sdkEvent is SdkEvent.Internal.Sdk.Log) {
-                                        sdkEvent.attributes?.forEach { attribute ->
-                                            put(attribute.key, attribute.value)
-                                        }
+                                    sdkEvent.attributes?.forEach { attribute ->
+                                        put(attribute.key, attribute.value)
                                     }
                                 }
                             }

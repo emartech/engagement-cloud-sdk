@@ -93,7 +93,7 @@ class WebInAppPresenterTests {
 
         val viewed = eventSlot.get().shouldBeInstanceOf<SdkEvent.Internal.InApp.Viewed>()
         viewed.trackingInfo shouldBe testTrackingInfo
-        viewed.name shouldBe SdkConstants.INAPP_VIEWED_EVENT_NAME
+        viewed.name shouldBe SdkConstants.WEB_VIEWED_EVENT_NAME
     }
 
     @Test
@@ -103,7 +103,7 @@ class WebInAppPresenterTests {
 
         presenter.present(mockView, webViewHolder, InAppPresentationMode.Overlay)
 
-        verifySuspend(VerifyMode.Companion.exactly(0)) {
+        verifySuspend(VerifyMode.exactly(0)) {
             mockSdkEventDistributor.registerEvent(any())
         }
     }

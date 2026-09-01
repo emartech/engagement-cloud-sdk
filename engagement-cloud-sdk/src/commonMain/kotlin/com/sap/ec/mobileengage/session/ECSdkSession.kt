@@ -108,6 +108,11 @@ internal class ECSdkSession(
         }
     }
 
+    override suspend fun restartSession() {
+        endSession()
+        startSession()
+    }
+
     private suspend fun canStartSession() =
         sdkContext.getSdkConfig()?.applicationCode != null
                 && requestContext.contactToken != null
