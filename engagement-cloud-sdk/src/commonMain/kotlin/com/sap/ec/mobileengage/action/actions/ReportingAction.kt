@@ -53,7 +53,7 @@ internal data class ReportingAction(
             is NotificationOpenedActionModel -> {
                 sdkEventDistributor.registerEvent(
                     SdkEvent.Internal.Push.Clicked(
-                        reporting = action.reporting ?: SdkConstants.PUSH_DEFAULT_REPORTING,
+                        reporting = action.reporting?.takeIf { it.isNotBlank() } ?: SdkConstants.PUSH_DEFAULT_REPORTING,
                         trackingInfo = action.trackingInfo,
                         origin = "main"
                     )
