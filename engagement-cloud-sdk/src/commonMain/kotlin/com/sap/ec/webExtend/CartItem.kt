@@ -5,6 +5,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CartItem(
     val itemId: String,
-    val price: Float,
-    val quantity: Int,
+    val price: Double,
+    val quantity: Double,
 )
