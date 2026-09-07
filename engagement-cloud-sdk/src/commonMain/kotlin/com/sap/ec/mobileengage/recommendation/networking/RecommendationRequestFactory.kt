@@ -9,6 +9,8 @@ import com.sap.ec.mobileengage.recommendation.RecommendationConstants.CART_LIST_
 import com.sap.ec.mobileengage.recommendation.RecommendationConstants.CART_LIST_ITEM_QUANTITY_KEY
 import com.sap.ec.mobileengage.recommendation.RecommendationConstants.CART_VERSION_FLAG_KEY
 import com.sap.ec.mobileengage.recommendation.RecommendationConstants.CHECKOUT_ITEMS_KEY
+import com.sap.ec.mobileengage.recommendation.RecommendationConstants.COHORT_KEY
+import com.sap.ec.mobileengage.recommendation.RecommendationConstants.FEATURE_KEY
 import com.sap.ec.mobileengage.recommendation.RecommendationConstants.ITEM_ID_KEY
 import com.sap.ec.mobileengage.recommendation.RecommendationConstants.ITEM_VIEW_KEY
 import com.sap.ec.mobileengage.recommendation.RecommendationConstants.ORDER_ID_KEY
@@ -58,7 +60,11 @@ internal class RecommendationRequestFactory(
                     )
                 }
 
-                is SdkEvent.External.WebExtendEvent.RecommendationClick -> TODO()
+                is SdkEvent.External.WebExtendEvent.RecommendationClick -> {
+                    parameters.append(ITEM_VIEW_KEY,
+                        "$ITEM_ID_KEY:${webExtendEvent.productId},$FEATURE_KEY:${webExtendEvent.feature},$COHORT_KEY:${webExtendEvent.cohort}"
+                        )
+                }
                 is SdkEvent.External.WebExtendEvent.Search -> parameters.append(
                     SEARCH_KEY,
                     webExtendEvent.searchTerm

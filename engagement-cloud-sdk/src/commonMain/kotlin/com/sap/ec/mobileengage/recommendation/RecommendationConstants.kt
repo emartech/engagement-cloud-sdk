@@ -14,4 +14,7 @@ object RecommendationConstants {
     const val SEARCH_KEY = "q"
     const val TAG_KEY = "t"
     const val TAG_WITH_ATTRIBUTES_KEY = "ta"
+
+    const val FEATURE_KEY = "t"
+    const val COHORT_KEY = "c"
 }

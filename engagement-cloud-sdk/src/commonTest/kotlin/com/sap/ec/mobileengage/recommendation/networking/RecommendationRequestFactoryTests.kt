@@ -71,8 +71,6 @@ class RecommendationRequestFactoryTests {
 
         val result = recommendationRequestFactory.create(cartEvent)
 
-        println(expectedUrl)
-
         assertUrl(result, expectedUrl)
     }
 
@@ -208,6 +206,26 @@ class RecommendationRequestFactoryTests {
             val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
 
             val result = recommendationRequestFactory.create(tagEvent)
+
+            assertUrl(result, expectedUrl)
+        }
+
+    @Test
+    fun test_create_RecommendationClick_shouldReturn_recommendationClickUrlPath_when_trackingRecommendationClick() =
+        runTest {
+            val productId = "testProductId"
+            val feature = "testFeature"
+            val cohort = "testCohort"
+            val recommendationClick = SdkEvent.External.WebExtendEvent.RecommendationClick(productId, feature, cohort)
+            val params = parameters {
+                append(
+                    "v",
+                    "i:$productId,t:$feature,c:$cohort"
+                )
+            }.formUrlEncode()
+            val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
+
+            val result = recommendationRequestFactory.create(recommendationClick)
 
             assertUrl(result, expectedUrl)
         }
