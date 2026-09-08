@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 internal class RecommendationClient(
     private val sdkEventManager: SdkEventManagerApi,
     private val applicationScope: CoroutineScope,
-    private val ecNetworkClient: NetworkClientApi,
+    private val recommendationNetworkClient: NetworkClientApi,
     private val recommendationRequestFactory: RecommendationRequestFactoryApi,
     private val eventsDao: EventsDaoApi,
     private val sdkLogger: Logger
@@ -29,7 +29,7 @@ internal class RecommendationClient(
                 .collect { event ->
                     sdkLogger.debug("consume RecommendationClient events")
                     val request = recommendationRequestFactory.create(event)
-                    ecNetworkClient.send(request).fold(
+                    recommendationNetworkClient.send(request).fold(
                         onSuccess = { successResponse ->
                             sdkEventManager.emitEvent(
                                 SdkEvent.Internal.Sdk.Answer.Response(

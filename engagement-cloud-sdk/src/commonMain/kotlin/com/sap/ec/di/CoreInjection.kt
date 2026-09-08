@@ -216,7 +216,7 @@ internal enum class ThreadSafePersistentStoreTypes {
 }
 
 internal enum class NetworkClientTypes {
-    Generic, EC
+    Generic, EC, Recommendation
 }
 
 internal enum class EventBasedClientTypes {

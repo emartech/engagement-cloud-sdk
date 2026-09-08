@@ -56,7 +56,6 @@ import kotlinx.serialization.json.putJsonArray
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
@@ -75,7 +74,6 @@ class ECClientTests {
     private lateinit var json: Json
     private lateinit var mockRequestContext: RequestContextApi
     private lateinit var eCClient: ECClient
-    private val now = Clock.System.now()
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
 
     private lateinit var mockSdkLogger: Logger

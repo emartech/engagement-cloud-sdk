@@ -17,4 +17,7 @@ object RecommendationConstants {
 
     const val FEATURE_KEY = "t"
     const val COHORT_KEY = "c"
+
+    const val XP_COOKIE_KEY = "xp"
+    const val VISITOR_ID_COOKIE_KEY = "cdv"
 }

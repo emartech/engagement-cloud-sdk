@@ -2,7 +2,9 @@ package com.sap.ec.di
 
 import com.sap.ec.core.networking.clients.GenericNetworkClient
 import com.sap.ec.core.networking.clients.NetworkClientApi
+import com.sap.ec.core.storage.StringStorageApi
 import com.sap.ec.networking.ECClient
+import com.sap.ec.networking.RecommendationNetworkClient
 import com.sap.ec.networking.clients.EventBasedClientApi
 import com.sap.ec.networking.clients.config.ConfigClient
 import com.sap.ec.networking.clients.device.DeviceClient
@@ -42,6 +44,14 @@ internal object NetworkInjection {
                 json = get(),
                 sdkLogger = get { parametersOf(ECClient::class.simpleName) },
                 sdkEventDistributor = get()
+            )
+        }
+        single<NetworkClientApi>(named(NetworkClientTypes.Recommendation)) {
+            RecommendationNetworkClient(
+                genericNetworkClient = get<NetworkClientApi>(
+                    named(NetworkClientTypes.Generic)
+                ),
+                stringStorage = get<StringStorageApi>()
             )
         }
         single<ClientExceptionHandler> {
@@ -85,7 +95,7 @@ internal object NetworkInjection {
             RecommendationClient(
                 sdkEventManager = get(),
                 applicationScope = get(named(CoroutineScopeTypes.Application)),
-                ecNetworkClient = get(named(NetworkClientTypes.EC)),
+                recommendationNetworkClient = get(named(NetworkClientTypes.Recommendation)),
                 recommendationRequestFactory = get(),
                 eventsDao = get(),
                 sdkLogger = get { parametersOf(RecommendationClient::class.simpleName) },
