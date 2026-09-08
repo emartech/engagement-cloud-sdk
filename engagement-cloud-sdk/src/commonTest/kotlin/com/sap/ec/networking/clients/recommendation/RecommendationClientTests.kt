@@ -2,19 +2,27 @@ package com.sap.ec.networking.clients.recommendation
 
 import com.sap.ec.core.channel.SdkEventManagerApi
 import com.sap.ec.core.db.events.EventsDaoApi
+import com.sap.ec.core.exceptions.SdkException
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.clients.NetworkClientApi
+import com.sap.ec.core.networking.model.Response
+import com.sap.ec.core.networking.model.UrlRequest
 import com.sap.ec.event.OnlineSdkEvent
 import com.sap.ec.event.SdkEvent
+import com.sap.ec.mobileengage.recommendation.RecommendationConstants.CART_LIST_ITEM_QUANTITY_KEY
 import com.sap.ec.mobileengage.recommendation.networking.RecommendationRequestFactoryApi
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
-import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
+import io.ktor.http.Headers
+import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.Url
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
@@ -39,6 +47,11 @@ class RecommendationClientTests {
     private lateinit var mockRecommendationRequestFactory: RecommendationRequestFactoryApi
     private lateinit var onlineEvents: MutableSharedFlow<OnlineSdkEvent>
 
+    private companion object {
+        private const val RECOMMENDATION_BASE_URL =
+            "https://recommender.scarabresearch.com/merchants/"
+    }
+
     @BeforeTest
     fun setup() = runTest {
         Dispatchers.setMain(StandardTestDispatcher())
@@ -55,21 +68,99 @@ class RecommendationClientTests {
     }
 
     @Test
-    fun testConsumer_shouldConsumeWebExtendEventsOnly() = runTest {
-        RecommendationClient(mockSdkEventManager, backgroundScope, mockNetworkClient, mockRecommendationRequestFactory, mockSdkLogger).register()
-        val relevantEvent = SdkEvent.External.WebExtendEvent.Search("testData")
-        val notRelevantEvent = SdkEvent.Internal.EmbeddedMessaging.FetchMeta()
+    fun testConsumer_shouldConsumeWebExtendEvent_and_sendTheRequestToTheBackend_andAckEvent_whenReceivingSuccessResponse() =
+        runTest {
+            createRecommendationClient(backgroundScope).register()
+            val searchEvent = SdkEvent.External.WebExtendEvent.Search("testSearchTerm")
+            val request = UrlRequest(
+                url = Url("$RECOMMENDATION_BASE_URL?$CART_LIST_ITEM_QUANTITY_KEY=testSearchTerm"),
+                method = HttpMethod.Get
+            )
+            val successResponse = Response(
+                status = HttpStatusCode.OK,
+                headers = Headers.Empty,
+                originalRequest = request,
+                bodyAsText = "{}"
+            )
+            val successResult = Result.success(successResponse)
+            everySuspend { mockRecommendationRequestFactory.create(searchEvent) } returns request
+            everySuspend { mockNetworkClient.send(request) } returns successResult
 
-        val onlineSdkEvents = backgroundScope.async {
-            onlineEvents.take(2).toList()
+            val onlineSdkEvents = backgroundScope.async {
+                onlineEvents.take(1).toList()
+            }
+
+            onlineEvents.emit(searchEvent)
+
+            advanceUntilIdle()
+
+            onlineSdkEvents.await().size shouldBe 1
+            verifySuspend {
+                mockSdkLogger.debug("consume RecommendationClient events")
+                mockRecommendationRequestFactory.create(searchEvent)
+                mockNetworkClient.send(request)
+                mockSdkEventManager.emitEvent(
+                    SdkEvent.Internal.Sdk.Answer.Response(
+                        searchEvent.id,
+                        successResult
+                    )
+                )
+                mockEventsDao.removeEvent(searchEvent)
+            }
         }
 
-        onlineEvents.emit(relevantEvent)
-        onlineEvents.emit(notRelevantEvent)
+    @Test
+    fun testConsumer_shouldConsumeWebExtendEvent_and_sendTheRequestToTheBackend_andAckEvent_whenReceivingFailureResponse() =
+        runTest {
+            createRecommendationClient(backgroundScope).register()
+            val searchEvent = SdkEvent.External.WebExtendEvent.Search("testSearchTerm")
+            val request = UrlRequest(
+                url = Url("$RECOMMENDATION_BASE_URL?$CART_LIST_ITEM_QUANTITY_KEY=testSearchTerm"),
+                method = HttpMethod.Get
+            )
+            val failureResponse = Response(
+                status = HttpStatusCode.BadRequest,
+                headers = Headers.Empty,
+                originalRequest = request,
+                bodyAsText = "{}"
+            )
+            val failureResult =
+                Result.failure<Response>(SdkException.FailedRequestException(failureResponse))
+            everySuspend { mockRecommendationRequestFactory.create(searchEvent) } returns request
+            everySuspend { mockNetworkClient.send(request) } returns failureResult
 
-        advanceUntilIdle()
+            val onlineSdkEvents = backgroundScope.async {
+                onlineEvents.take(1).toList()
+            }
 
-        onlineSdkEvents.await().size shouldBe 2
-        verifySuspend(VerifyMode.exactly(1)) { mockSdkLogger.debug("consume RecommendationClient events") }
+            onlineEvents.emit(searchEvent)
+
+            advanceUntilIdle()
+
+            onlineSdkEvents.await().size shouldBe 1
+            verifySuspend {
+                mockSdkLogger.debug("consume RecommendationClient events")
+                mockRecommendationRequestFactory.create(searchEvent)
+                mockNetworkClient.send(request)
+
+                mockSdkEventManager.emitEvent(
+                    SdkEvent.Internal.Sdk.Answer.Response(
+                        searchEvent.id,
+                        failureResult
+                    )
+                )
+                mockEventsDao.removeEvent(searchEvent)
+            }
+        }
+
+    private fun createRecommendationClient(applicationScope: CoroutineScope): RecommendationClient {
+        return RecommendationClient(
+            mockSdkEventManager,
+            applicationScope,
+            mockNetworkClient,
+            mockRecommendationRequestFactory,
+            mockEventsDao,
+            mockSdkLogger
+        )
     }
 }
