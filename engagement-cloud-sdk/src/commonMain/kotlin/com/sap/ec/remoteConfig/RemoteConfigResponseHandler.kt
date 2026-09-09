@@ -14,6 +14,7 @@ import com.sap.ec.core.providers.DoubleProvider
 import com.sap.ec.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
+import com.sap.ec.core.exceptions.SdkException.SdkDisabledException
 
 internal class RemoteConfigResponseHandler(
     private val deviceInfoCollector: DeviceInfoCollectorApi,
@@ -36,7 +37,7 @@ internal class RemoteConfigResponseHandler(
         sdkLogger.debug("applyLogLevel")
         applyLogLevel(config.logLevel)
         sdkLogger.debug("applyFeatures")
-        applyFeatures(config.features)
+        applyFeatures(config.features, config.disabled)
         sdkLogger.debug("applyLuckyLogger")
         applyLuckyLogger(config.luckyLogger)
         sdkLogger.debug("applyEmbeddedMessagingConfig")
@@ -62,7 +63,7 @@ internal class RemoteConfigResponseHandler(
                 sdkLogger.debug("override applyLogLevel")
                 applyLogLevel(override.logLevel)
                 sdkLogger.debug("override applyFeatures")
-                applyFeatures(override.features)
+                applyFeatures(override.features, config.disabled)
                 sdkLogger.debug("override applyEmbeddedMessagingConfig")
                 applyEmbeddedMessagingConfig(override.embeddedMessagingConfig)
             }
@@ -88,10 +89,17 @@ internal class RemoteConfigResponseHandler(
         }
     }
 
-    private fun applyFeatures(features: RemoteConfigFeatures?) {
-        features?.mobileEngage?.let { switch(MobileEngage, it) }
-        features?.embeddedMessaging?.let { switch(EmbeddedMessaging, it) }
-        features?.jsBridgeSignatureCheck?.let { switch(JsBridgeSignatureCheck, it) }
+    private fun applyFeatures(features: RemoteConfigFeatures?, sdkDisabled: Boolean? = false) {
+        if (sdkDisabled == true) {
+            switch(MobileEngage, false)
+            switch(EmbeddedMessaging, false)
+            switch(JsBridgeSignatureCheck, false)
+            throw SdkDisabledException("SDK is disabled!")
+        } else {
+            features?.mobileEngage?.let { switch(MobileEngage, it) }
+            features?.embeddedMessaging?.let { switch(EmbeddedMessaging, it) }
+            features?.jsBridgeSignatureCheck?.let { switch(JsBridgeSignatureCheck, it) }
+        }
     }
 
     private fun applyLuckyLogger(luckyLogger: LuckyLogger?) {

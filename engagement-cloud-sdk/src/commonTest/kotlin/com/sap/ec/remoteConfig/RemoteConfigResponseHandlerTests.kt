@@ -7,6 +7,7 @@ import com.sap.ec.context.Features.JsBridgeSignatureCheck
 import com.sap.ec.context.Features.MobileEngage
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.device.DeviceInfoCollectorApi
+import com.sap.ec.core.exceptions.SdkException
 import com.sap.ec.core.log.LogConfigHolderApi
 import com.sap.ec.core.log.LogLevel
 import com.sap.ec.core.log.SdkLogger
@@ -29,6 +30,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.test.assertFailsWith
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class RemoteConfigResponseHandlerTests {
@@ -330,5 +332,41 @@ class RemoteConfigResponseHandlerTests {
         verify(VerifyMode.exactly(0)) {
             mockSdkContext.globalRemoteConfigApplicationCodeValidationRegex = any()
         }
+    }
+
+    @Test
+    fun testApplyFeatures_shouldFail_whenSdkDisabledIsTrue() = runTest {
+        val configResponse = RemoteConfigResponse(
+            features = RemoteConfigFeatures(jsBridgeSignatureCheck = true, mobileEngage = true, embeddedMessaging = true),
+            disabled = true
+        )
+
+        assertFailsWith<SdkException.SdkDisabledException> {
+            remoteConfigResponseHandler.handle(configResponse)
+        }
+    }
+
+    @Test
+    fun testApplyFeatures_shouldApplyingFeatures_whenSdkDisabledIsFalse() = runTest {
+        val configResponse = RemoteConfigResponse(
+            features = RemoteConfigFeatures(jsBridgeSignatureCheck = true, mobileEngage = true, embeddedMessaging = true),
+            disabled = false
+        )
+
+        remoteConfigResponseHandler.handle(configResponse)
+
+        mockSdkContext.features shouldBe listOf(JsBridgeSignatureCheck, MobileEngage, EmbeddedMessaging)
+    }
+
+    @Test
+    fun testApplyFeatures_shouldApplyingFeatures_whenSdkDisabledIsNull() = runTest {
+        val configResponse = RemoteConfigResponse(
+            features = RemoteConfigFeatures(jsBridgeSignatureCheck = true, mobileEngage = true, embeddedMessaging = true),
+            disabled = null
+        )
+
+        remoteConfigResponseHandler.handle(configResponse)
+
+        mockSdkContext.features shouldBe listOf(JsBridgeSignatureCheck, MobileEngage, EmbeddedMessaging)
     }
 }
