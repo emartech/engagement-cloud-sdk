@@ -1,6 +1,5 @@
 package com.sap.ec.core.exceptions
 
-import com.sap.ec.InternalSdkApi
 import com.sap.ec.core.networking.model.Response
 
 sealed class SdkException(message: String) : RuntimeException(message) {
@@ -16,4 +15,5 @@ sealed class SdkException(message: String) : RuntimeException(message) {
     class DecryptionFailedException(message: String): SdkException(message)
     class ServiceWorkerUnavailableException(message: String): SdkException(message)
     class PushManagerUnavailableException(message: String): SdkException(message)
+    class ContactTokenNotFoundException(message: String): SdkException(message)
 }

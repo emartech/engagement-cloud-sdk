@@ -51,7 +51,10 @@ internal object NetworkInjection {
                 genericNetworkClient = get<NetworkClientApi>(
                     named(NetworkClientTypes.Generic)
                 ),
-                stringStorage = get<StringStorageApi>()
+                stringStorage = get<StringStorageApi>(),
+                requestContext = get(),
+                userAgentProvider = get(),
+                sdkLogger = get { parametersOf(RecommendationNetworkClient::class.simpleName) },
             )
         }
         single<ClientExceptionHandler> {
