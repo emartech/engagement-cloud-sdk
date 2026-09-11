@@ -23,6 +23,7 @@ import com.sap.ec.util.JsonUtil
 import com.sap.ec.webExtend.CartItem
 import io.ktor.http.HttpMethod
 import io.ktor.http.buildUrl
+import io.ktor.http.encodeURLParameter
 import io.ktor.http.takeFrom
 
 internal class RecommendationRequestFactory(
@@ -49,7 +50,7 @@ internal class RecommendationRequestFactory(
 
                 is SdkEvent.External.WebExtendEvent.ItemView -> parameters.append(
                     ITEM_VIEW_KEY,
-                    "$ITEM_ID_KEY:${webExtendEvent.itemId}"
+                    "$ITEM_ID_KEY:${webExtendEvent.itemId.encodeURLParameter()}"
                 )
 
                 is SdkEvent.External.WebExtendEvent.Purchase -> {
@@ -62,7 +63,7 @@ internal class RecommendationRequestFactory(
 
                 is SdkEvent.External.WebExtendEvent.RecommendationClick -> {
                     parameters.append(ITEM_VIEW_KEY,
-                        "$ITEM_ID_KEY:${webExtendEvent.productId},$FEATURE_KEY:${webExtendEvent.feature},$COHORT_KEY:${webExtendEvent.cohort}"
+                        "$ITEM_ID_KEY:${webExtendEvent.productId.encodeURLParameter()},$FEATURE_KEY:${webExtendEvent.feature},$COHORT_KEY:${webExtendEvent.cohort}"
                         )
                 }
                 is SdkEvent.External.WebExtendEvent.Search -> parameters.append(
@@ -94,7 +95,7 @@ internal class RecommendationRequestFactory(
 
     private fun List<CartItem>.toUrlParamValue(): String {
         return this.joinToString("|") { item ->
-            "$ITEM_ID_KEY:${item.itemId},$CART_LIST_ITEM_PRICE_KEY:${item.price},$CART_LIST_ITEM_QUANTITY_KEY:${item.quantity}"
+            "$ITEM_ID_KEY:${item.itemId.encodeURLParameter()},$CART_LIST_ITEM_PRICE_KEY:${item.price},$CART_LIST_ITEM_QUANTITY_KEY:${item.quantity}"
         }
     }
 }

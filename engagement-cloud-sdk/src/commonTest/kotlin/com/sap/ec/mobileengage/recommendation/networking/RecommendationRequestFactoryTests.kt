@@ -29,8 +29,12 @@ class RecommendationRequestFactoryTests {
         const val APP_CODE = "ABCDE-12345"
         const val RECOMMENDATION_BASE_URL =
             "https://recommender.scarabresearch.com/merchants/$APP_CODE"
-        val CART_ITEM_1 = CartItem("test%Item", 10.0, 1.0)
-        val CART_ITEM_2 = CartItem("test%Item2", 20.0, 3.0)
+        const val CART_ITEM_1_ITEM_ID = "testCategory's/test%Item"
+        const val CART_ITEM_1_ITEM_ID_URL_ENCODED = "testCategory%27s%2Ftest%25Item"
+        const val CART_ITEM_2_ITEM_ID = "testCategory's/test%Item2"
+        const val CART_ITEM_2_ITEM_ID_URL_ENCODED = "testCategory%27s%2Ftest%25Item2"
+        val CART_ITEM_1 = CartItem(CART_ITEM_1_ITEM_ID, 10.0, 1.0)
+        val CART_ITEM_2 = CartItem(CART_ITEM_2_ITEM_ID, 20.0, 3.0)
         const val TEST_CATEGORY = "test%category"
         const val TEST_ORDER_ID = "test%Order"
         const val SEARCH_TERM = "Search%Test"
@@ -47,24 +51,25 @@ class RecommendationRequestFactoryTests {
     }
 
     @Test
-    fun test_create_ItemView_shouldReturn_itemViewUrlPath() = runTest {
-        val itemViewEvent = SdkEvent.External.WebExtendEvent.ItemView(CART_ITEM_1.itemId)
-        val params = parameters {
-            append("v", "i:${CART_ITEM_1.itemId}")
-        }.formUrlEncode()
-        val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
+    fun test_create_ItemView_shouldReturn_itemViewUrlPath_withDoubleUrlEncodedCartItemId() =
+        runTest {
+            val itemViewEvent = SdkEvent.External.WebExtendEvent.ItemView(CART_ITEM_1.itemId)
+            val params = parameters {
+                append("v", "i:$CART_ITEM_1_ITEM_ID_URL_ENCODED")
+            }.formUrlEncode()
+            val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
 
-        val result = recommendationRequestFactory.create(itemViewEvent)
+            val result = recommendationRequestFactory.create(itemViewEvent)
 
-        assertUrl(result, expectedUrl)
-    }
+            assertUrl(result, expectedUrl)
+        }
 
     @Test
     fun test_create_Cart_shouldReturn_cartEventUrlPath_when_trackingSingleCartItem() = runTest {
         val cartEvent = SdkEvent.External.WebExtendEvent.Cart(listOf(CART_ITEM_1))
         val params = parameters {
             append("cv", "1")
-            append("ca", "i:${CART_ITEM_1.itemId},p:${CART_ITEM_1.price},q:${CART_ITEM_1.quantity}")
+            append("ca", "i:${CART_ITEM_1_ITEM_ID_URL_ENCODED},p:${CART_ITEM_1.price},q:${CART_ITEM_1.quantity}")
         }.formUrlEncode()
         val expectedUrl =
             "$RECOMMENDATION_BASE_URL?$params"
@@ -81,8 +86,8 @@ class RecommendationRequestFactoryTests {
             append("cv", "1")
             append(
                 "ca",
-                "i:${CART_ITEM_1.itemId},p:${CART_ITEM_1.price},q:${CART_ITEM_1.quantity}" +
-                        "|i:${CART_ITEM_2.itemId},p:${CART_ITEM_2.price},q:${CART_ITEM_2.quantity}"
+                "i:${CART_ITEM_1_ITEM_ID_URL_ENCODED},p:${CART_ITEM_1.price},q:${CART_ITEM_1.quantity}" +
+                        "|i:${CART_ITEM_2_ITEM_ID_URL_ENCODED},p:${CART_ITEM_2.price},q:${CART_ITEM_2.quantity}"
             )
         }.formUrlEncode()
         val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
@@ -114,7 +119,7 @@ class RecommendationRequestFactoryTests {
                 append("oi", TEST_ORDER_ID)
                 append(
                     "co",
-                    "i:${CART_ITEM_1.itemId},p:${CART_ITEM_1.price},q:${CART_ITEM_1.quantity}"
+                    "i:${CART_ITEM_1_ITEM_ID_URL_ENCODED},p:${CART_ITEM_1.price},q:${CART_ITEM_1.quantity}"
                 )
             }.formUrlEncode()
             val expectedUrl =
@@ -136,8 +141,8 @@ class RecommendationRequestFactoryTests {
                 append("oi", TEST_ORDER_ID)
                 append(
                     "co",
-                    "i:${CART_ITEM_1.itemId},p:${CART_ITEM_1.price},q:${CART_ITEM_1.quantity}" +
-                            "|i:${CART_ITEM_2.itemId},p:${CART_ITEM_2.price},q:${CART_ITEM_2.quantity}"
+                    "i:${CART_ITEM_1_ITEM_ID_URL_ENCODED},p:${CART_ITEM_1.price},q:${CART_ITEM_1.quantity}" +
+                            "|i:${CART_ITEM_2_ITEM_ID_URL_ENCODED},p:${CART_ITEM_2.price},q:${CART_ITEM_2.quantity}"
                 )
             }.formUrlEncode()
             val expectedUrl =
@@ -211,16 +216,19 @@ class RecommendationRequestFactoryTests {
         }
 
     @Test
-    fun test_create_RecommendationClick_shouldReturn_recommendationClickUrlPath_when_trackingRecommendationClick() =
+    fun test_create_RecommendationClick_shouldReturn_recommendationClickUrlPath_withDoubleUrlEncodedProductId_when_trackingRecommendationClick() =
         runTest {
-            val productId = "testProductId"
             val feature = "testFeature"
             val cohort = "testCohort"
-            val recommendationClick = SdkEvent.External.WebExtendEvent.RecommendationClick(productId, feature, cohort)
+            val recommendationClick = SdkEvent.External.WebExtendEvent.RecommendationClick(
+                CART_ITEM_1_ITEM_ID,
+                feature,
+                cohort
+            )
             val params = parameters {
                 append(
                     "v",
-                    "i:$productId,t:$feature,c:$cohort"
+                    "i:$CART_ITEM_1_ITEM_ID_URL_ENCODED,t:$feature,c:$cohort"
                 )
             }.formUrlEncode()
             val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
