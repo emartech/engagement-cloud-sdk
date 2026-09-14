@@ -1,4 +1,4 @@
-package com.sap.ec.webExtend
+package com.sap.ec.recommendation
 
 import kotlinx.serialization.Serializable
 

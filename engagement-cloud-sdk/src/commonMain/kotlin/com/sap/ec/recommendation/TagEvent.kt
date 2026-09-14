@@ -1,16 +1,17 @@
-package com.sap.ec.webExtend
+package com.sap.ec.recommendation
 
 import com.sap.ec.api.event.model.TrackedEvent
 import com.sap.ec.event.SdkEvent
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
-data class SearchEvent(val searchTerm: String) : TrackedEvent {
+data class TagEvent(val tag: String, val attributes: Map<String, String>? = null) : TrackedEvent {
     @OptIn(ExperimentalTime::class)
     override fun toSdkEvent(uuid: String, timestamp: Instant): Result<SdkEvent> =
         Result.success(
-            SdkEvent.External.WebExtendEvent.Search(
-                searchTerm = searchTerm,
+            SdkEvent.External.RecommendationEvent.Tag(
+                tag = tag,
+                attributes = attributes,
                 id = uuid,
                 timestamp = timestamp
             )

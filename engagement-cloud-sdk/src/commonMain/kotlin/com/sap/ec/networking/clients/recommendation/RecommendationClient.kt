@@ -10,7 +10,7 @@ import com.sap.ec.mobileengage.recommendation.networking.RecommendationRequestFa
 import com.sap.ec.networking.clients.EventBasedClientApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 internal class RecommendationClient(
@@ -25,7 +25,7 @@ internal class RecommendationClient(
     override suspend fun register() {
         sdkLogger.debug("register RecommendationClient")
         applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
-            sdkEventManager.onlineSdkEvents.filterIsInstance<SdkEvent.External.WebExtendEvent>()
+            sdkEventManager.sdkEventFlow.filter { it is SdkEvent.External.RecommendationEvent }
                 .collect { event ->
                     sdkLogger.debug("consume RecommendationClient events")
                     val request = recommendationRequestFactory.create(event)

@@ -1,4 +1,4 @@
-package com.sap.ec.webExtend
+package com.sap.ec.recommendation
 
 data class Product(
     val productId: String,

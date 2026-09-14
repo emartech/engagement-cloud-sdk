@@ -5,7 +5,7 @@ import com.sap.ec.core.url.ECUrlType
 import com.sap.ec.core.url.UrlFactoryApi
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.util.toJsonObject
-import com.sap.ec.webExtend.CartItem
+import com.sap.ec.recommendation.CartItem
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -53,7 +53,7 @@ class RecommendationRequestFactoryTests {
     @Test
     fun test_create_ItemView_shouldReturn_itemViewUrlPath_withDoubleUrlEncodedCartItemId() =
         runTest {
-            val itemViewEvent = SdkEvent.External.WebExtendEvent.ItemView(CART_ITEM_1.itemId)
+            val itemViewEvent = SdkEvent.External.RecommendationEvent.ItemView(CART_ITEM_1.itemId)
             val params = parameters {
                 append("v", "i:$CART_ITEM_1_ITEM_ID_URL_ENCODED")
             }.formUrlEncode()
@@ -66,7 +66,7 @@ class RecommendationRequestFactoryTests {
 
     @Test
     fun test_create_Cart_shouldReturn_cartEventUrlPath_when_trackingSingleCartItem() = runTest {
-        val cartEvent = SdkEvent.External.WebExtendEvent.Cart(listOf(CART_ITEM_1))
+        val cartEvent = SdkEvent.External.RecommendationEvent.Cart(listOf(CART_ITEM_1))
         val params = parameters {
             append("cv", "1")
             append("ca", "i:${CART_ITEM_1_ITEM_ID_URL_ENCODED},p:${CART_ITEM_1.price},q:${CART_ITEM_1.quantity}")
@@ -81,7 +81,7 @@ class RecommendationRequestFactoryTests {
 
     @Test
     fun test_create_Cart_shouldReturn_cartEventUrlPath_when_trackingMultipleCartItems() = runTest {
-        val cartEvent = SdkEvent.External.WebExtendEvent.Cart(listOf(CART_ITEM_1, CART_ITEM_2))
+        val cartEvent = SdkEvent.External.RecommendationEvent.Cart(listOf(CART_ITEM_1, CART_ITEM_2))
         val params = parameters {
             append("cv", "1")
             append(
@@ -99,7 +99,7 @@ class RecommendationRequestFactoryTests {
 
     @Test
     fun test_create_CategoryView_shouldReturn_categoryViewUrlPath() = runTest {
-        val categoryView = SdkEvent.External.WebExtendEvent.CategoryView(TEST_CATEGORY)
+        val categoryView = SdkEvent.External.RecommendationEvent.CategoryView(TEST_CATEGORY)
         val params = parameters {
             append("vc", TEST_CATEGORY)
         }.formUrlEncode()
@@ -114,7 +114,7 @@ class RecommendationRequestFactoryTests {
     fun test_create_Purchase_shouldReturn_purchaseUrlPath_when_trackingSinglePurchasedCartItems() =
         runTest {
             val purchase =
-                SdkEvent.External.WebExtendEvent.Purchase(TEST_ORDER_ID, listOf(CART_ITEM_1))
+                SdkEvent.External.RecommendationEvent.Purchase(TEST_ORDER_ID, listOf(CART_ITEM_1))
             val params = parameters {
                 append("oi", TEST_ORDER_ID)
                 append(
@@ -133,7 +133,7 @@ class RecommendationRequestFactoryTests {
     @Test
     fun test_create_Purchase_shouldReturn_purchaseUrlPath_when_trackingMultiplePurchasedCartItems() =
         runTest {
-            val purchase = SdkEvent.External.WebExtendEvent.Purchase(
+            val purchase = SdkEvent.External.RecommendationEvent.Purchase(
                 TEST_ORDER_ID,
                 listOf(CART_ITEM_1, CART_ITEM_2)
             )
@@ -155,7 +155,7 @@ class RecommendationRequestFactoryTests {
 
     @Test
     fun test_create_Search_shouldReturn_searchUrlPath_when_trackingSearch() = runTest {
-        val search = SdkEvent.External.WebExtendEvent.Search(SEARCH_TERM)
+        val search = SdkEvent.External.RecommendationEvent.Search(SEARCH_TERM)
         val params = parameters {
             append("q", SEARCH_TERM)
         }.formUrlEncode()
@@ -168,7 +168,7 @@ class RecommendationRequestFactoryTests {
 
     @Test
     fun test_create_Tag_shouldReturn_tagUrlPath_when_trackingTag_withoutTagAttributes() = runTest {
-        val tag = SdkEvent.External.WebExtendEvent.Tag(TEST_TAG)
+        val tag = SdkEvent.External.RecommendationEvent.Tag(TEST_TAG)
         val params = parameters {
             append("t", TEST_TAG)
         }.formUrlEncode()
@@ -183,7 +183,7 @@ class RecommendationRequestFactoryTests {
     fun test_create_Tag_shouldReturn_tagUrlPath_when_trackingTag_withTagAttributes_withSingleKeyValuePair() =
         runTest {
             val tagAttributes = mapOf("ke%y" to "val%ue")
-            val tagEvent = SdkEvent.External.WebExtendEvent.Tag(TEST_TAG, tagAttributes)
+            val tagEvent = SdkEvent.External.RecommendationEvent.Tag(TEST_TAG, tagAttributes)
             val params = parameters {
                 append(
                     "ta",
@@ -220,7 +220,7 @@ class RecommendationRequestFactoryTests {
         runTest {
             val feature = "testFeature"
             val cohort = "testCohort"
-            val recommendationClick = SdkEvent.External.WebExtendEvent.RecommendationClick(
+            val recommendationClick = SdkEvent.External.RecommendationEvent.RecommendationClick(
                 CART_ITEM_1_ITEM_ID,
                 feature,
                 cohort

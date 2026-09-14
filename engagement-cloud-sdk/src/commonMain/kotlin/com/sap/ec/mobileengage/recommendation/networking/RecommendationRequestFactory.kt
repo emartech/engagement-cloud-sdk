@@ -19,8 +19,8 @@ import com.sap.ec.mobileengage.recommendation.RecommendationConstants.TAG_KEY
 import com.sap.ec.mobileengage.recommendation.RecommendationConstants.TAG_WITH_ATTRIBUTES_KEY
 import com.sap.ec.mobileengage.recommendation.RecommendationConstants.VIEW_CATEGORY_KEY
 import com.sap.ec.mobileengage.recommendation.models.TagWithAttributes
+import com.sap.ec.recommendation.CartItem
 import com.sap.ec.util.JsonUtil
-import com.sap.ec.webExtend.CartItem
 import io.ktor.http.HttpMethod
 import io.ktor.http.buildUrl
 import io.ktor.http.encodeURLParameter
@@ -30,59 +30,61 @@ internal class RecommendationRequestFactory(
     private val urlFactory: UrlFactoryApi
 ) : RecommendationRequestFactoryApi {
 
-    override suspend fun create(webExtendEvent: SdkEvent.External.WebExtendEvent): UrlRequest {
+    override suspend fun create(recommendationEvent: SdkEvent.External.RecommendationEvent): UrlRequest {
         val baseUrlWithAppCode = urlFactory.create(ECUrlType.Recommendation)
         val url = buildUrl {
             takeFrom(baseUrlWithAppCode)
-            when (webExtendEvent) {
-                is SdkEvent.External.WebExtendEvent.Cart -> {
+            when (recommendationEvent) {
+                is SdkEvent.External.RecommendationEvent.Cart -> {
                     parameters.append(CART_VERSION_FLAG_KEY, "1")
                     parameters.append(
                         CART_ITEMS_KEY,
-                        webExtendEvent.items.toUrlParamValue()
+                        recommendationEvent.items.toUrlParamValue()
                     )
                 }
 
-                is SdkEvent.External.WebExtendEvent.CategoryView -> parameters.append(
+                is SdkEvent.External.RecommendationEvent.CategoryView -> parameters.append(
                     VIEW_CATEGORY_KEY,
-                    webExtendEvent.categoryPath
+                    recommendationEvent.categoryPath
                 )
 
-                is SdkEvent.External.WebExtendEvent.ItemView -> parameters.append(
+                is SdkEvent.External.RecommendationEvent.ItemView -> parameters.append(
                     ITEM_VIEW_KEY,
-                    "$ITEM_ID_KEY:${webExtendEvent.itemId.encodeURLParameter()}"
+                    "$ITEM_ID_KEY:${recommendationEvent.itemId.encodeURLParameter()}"
                 )
 
-                is SdkEvent.External.WebExtendEvent.Purchase -> {
-                    parameters.append(ORDER_ID_KEY, webExtendEvent.orderId)
+                is SdkEvent.External.RecommendationEvent.Purchase -> {
+                    parameters.append(ORDER_ID_KEY, recommendationEvent.orderId)
                     parameters.append(
                         CHECKOUT_ITEMS_KEY,
-                        webExtendEvent.items.toUrlParamValue()
+                        recommendationEvent.items.toUrlParamValue()
                     )
                 }
 
-                is SdkEvent.External.WebExtendEvent.RecommendationClick -> {
-                    parameters.append(ITEM_VIEW_KEY,
-                        "$ITEM_ID_KEY:${webExtendEvent.productId.encodeURLParameter()},$FEATURE_KEY:${webExtendEvent.feature},$COHORT_KEY:${webExtendEvent.cohort}"
-                        )
+                is SdkEvent.External.RecommendationEvent.RecommendationClick -> {
+                    parameters.append(
+                        ITEM_VIEW_KEY,
+                        "$ITEM_ID_KEY:${recommendationEvent.productId.encodeURLParameter()},$FEATURE_KEY:${recommendationEvent.feature},$COHORT_KEY:${recommendationEvent.cohort}"
+                    )
                 }
-                is SdkEvent.External.WebExtendEvent.Search -> parameters.append(
+
+                is SdkEvent.External.RecommendationEvent.Search -> parameters.append(
                     SEARCH_KEY,
-                    webExtendEvent.searchTerm
+                    recommendationEvent.searchTerm
                 )
 
-                is SdkEvent.External.WebExtendEvent.Tag -> {
-                    webExtendEvent.attributes?.let {
+                is SdkEvent.External.RecommendationEvent.Tag -> {
+                    recommendationEvent.attributes?.let {
                         parameters.append(
                             TAG_WITH_ATTRIBUTES_KEY,
                             JsonUtil.json.encodeToString(
                                 TagWithAttributes(
-                                    webExtendEvent.tag,
-                                    webExtendEvent.attributes
+                                    recommendationEvent.tag,
+                                    recommendationEvent.attributes
                                 )
                             )
                         )
-                    } ?: parameters.append(TAG_KEY, webExtendEvent.tag)
+                    } ?: parameters.append(TAG_KEY, recommendationEvent.tag)
                 }
             }
         }

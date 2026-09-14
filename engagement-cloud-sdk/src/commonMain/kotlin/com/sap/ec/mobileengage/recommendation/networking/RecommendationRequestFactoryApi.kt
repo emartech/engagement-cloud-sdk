@@ -4,5 +4,5 @@ import com.sap.ec.core.networking.model.UrlRequest
 import com.sap.ec.event.SdkEvent
 
 internal interface RecommendationRequestFactoryApi {
-    suspend fun create(webExtendEvent: SdkEvent.External.WebExtendEvent): UrlRequest
+    suspend fun create(recommendationEvent: SdkEvent.External.RecommendationEvent): UrlRequest
 }

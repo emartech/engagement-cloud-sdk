@@ -1,16 +1,18 @@
-package com.sap.ec.webExtend
+package com.sap.ec.recommendation
 
 import com.sap.ec.api.event.model.TrackedEvent
 import com.sap.ec.event.SdkEvent
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
-data class CartEvent(val items: List<CartItem>) : TrackedEvent {
+data class RecommendationClickEvent(val productId: String) : TrackedEvent {
     @OptIn(ExperimentalTime::class)
     override fun toSdkEvent(uuid: String, timestamp: Instant): Result<SdkEvent> =
         Result.success(
-            SdkEvent.External.WebExtendEvent.Cart(
-                items = items,
+            SdkEvent.External.RecommendationEvent.RecommendationClick(
+                productId = productId,
+                feature = "",
+                cohort = "",
                 id = uuid,
                 timestamp = timestamp
             )
