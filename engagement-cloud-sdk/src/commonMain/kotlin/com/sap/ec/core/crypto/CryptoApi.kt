@@ -2,6 +2,8 @@ package com.sap.ec.core.crypto
 
 internal interface CryptoApi {
 
+    suspend fun hash(value: String): String
+
     suspend fun verify(message: String, signatureStr: String): Boolean
 
     suspend fun encrypt(value: String, secret: String): String

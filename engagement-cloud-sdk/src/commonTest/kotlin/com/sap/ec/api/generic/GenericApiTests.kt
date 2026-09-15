@@ -55,6 +55,7 @@ class GenericApiTests {
                 mockSdkContext,
                 mockThreadSafePersistentStore,
                 mockRequestContext,
+                mock(MockMode.autofill),
                 mockSdkLogger
             )
         every { mockSdkContext.sdkDispatcher } returns mainDispatcher

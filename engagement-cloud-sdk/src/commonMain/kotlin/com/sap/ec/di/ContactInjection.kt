@@ -33,6 +33,7 @@ internal object ContactInjection {
                 urlFactory = get(),
                 contactTokenHandler = get(),
                 requestContext = get(),
+                crypto = get(),
                 ecSdkSession = get(),
                 eventsDao = get(),
                 json = get(),
@@ -65,6 +66,7 @@ internal object ContactInjection {
                 sdkContext = get(),
                 threadSafePersistentStore = get(named(ThreadSafePersistentStoreTypes.ContactCall)),
                 requestContext = get(),
+                crypto = get(),
                 sdkLogger = get { parametersOf(ContactInternal::class.simpleName) }
             )
         }

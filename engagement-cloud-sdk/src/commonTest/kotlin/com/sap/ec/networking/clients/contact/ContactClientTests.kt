@@ -3,6 +3,7 @@ package com.sap.ec.networking.clients.contact
 import com.sap.ec.config.SdkConfig
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventManagerApi
+import com.sap.ec.core.crypto.CryptoApi
 import com.sap.ec.core.db.events.EventsDaoApi
 import com.sap.ec.core.exceptions.SdkException.NetworkIOException
 import com.sap.ec.core.log.Logger
@@ -53,6 +54,7 @@ class ContactClientTests {
         const val OPEN_ID_TOKEN = "testOpenIdToken"
         const val CONTACT_FIELD_VALUE = "testContactFieldValue"
         const val APPLICATION_CODE = "testAppCode"
+        const val CONTACT_HASH = "testContactHash"
     }
 
     private lateinit var mockEcClient: NetworkClientApi
@@ -60,6 +62,7 @@ class ContactClientTests {
     private lateinit var mockSdkContext: SdkContextApi
     private lateinit var mockConfig: SdkConfig
     private lateinit var mockContactTokenHandler: ContactTokenHandlerApi
+    private lateinit var mockCrypto: CryptoApi
     private lateinit var mockLogger: Logger
     private lateinit var mockRequestContext: RequestContextApi
     private lateinit var mockEcSdkSession: SessionApi
@@ -81,6 +84,8 @@ class ContactClientTests {
         mockSdkContext = mock(mode = MockMode.autofill)
         mockConfig = mock()
         mockContactTokenHandler = mock()
+        mockCrypto = mock(MockMode.autofill)
+        everySuspend { mockCrypto.hash(any()) } returns CONTACT_HASH
         mockLogger = mock(MockMode.autofill)
         mockRequestContext = mock(MockMode.autofill)
         mockEcSdkSession = mock(MockMode.autofill)
@@ -109,6 +114,7 @@ class ContactClientTests {
             mockUrlFactory,
             mockContactTokenHandler,
             mockRequestContext,
+            mockCrypto,
             mockEcSdkSession,
             mockEventsDao,
             json,
@@ -141,6 +147,7 @@ class ContactClientTests {
         verifySuspend { mockContactTokenHandler.handleContactTokens(any()) }
         verifySuspend { mockEcSdkSession.restartSession() }
         verifySuspend { mockRequestContext.isContactLinked = true }
+        verifySuspend { mockRequestContext.linkedContactHash = CONTACT_HASH }
         verifySuspend { mockEventsDao.removeEvent(linkContactEvent) }
         verifySuspend {
             mockSdkEventManager.emitEvent(
@@ -215,6 +222,7 @@ class ContactClientTests {
         verifySuspend { mockContactTokenHandler.handleContactTokens(any()) }
         verifySuspend { mockEcSdkSession.restartSession() }
         verifySuspend { mockRequestContext.isContactLinked = true }
+        verifySuspend { mockRequestContext.linkedContactHash = CONTACT_HASH }
         verifySuspend { mockEventsDao.removeEvent(linkAuthenticatedContactEvent) }
         verifySuspend {
             mockSdkEventManager.emitEvent(
@@ -245,6 +253,7 @@ class ContactClientTests {
         verifySuspend { mockContactTokenHandler.handleContactTokens(any()) }
         verifySuspend { mockEcSdkSession.restartSession() }
         verifySuspend { mockRequestContext.isContactLinked = false }
+        verifySuspend { mockRequestContext.linkedContactHash = null }
         verifySuspend { mockEventsDao.removeEvent(unlinkContactEvent) }
         verifySuspend {
             mockSdkEventManager.emitEvent(
