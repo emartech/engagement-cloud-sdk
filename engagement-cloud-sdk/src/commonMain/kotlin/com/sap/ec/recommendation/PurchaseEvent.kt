@@ -9,7 +9,7 @@ data class PurchaseEvent(val orderId: String, val items: List<CartItem>) : Track
     @OptIn(ExperimentalTime::class)
     override fun toSdkEvent(uuid: String, timestamp: Instant): Result<SdkEvent> =
         Result.success(
-            SdkEvent.External.RecommendationEvent.Purchase(
+            SdkEvent.External.RecommendationTrackEvent.Purchase(
                 orderId = orderId,
                 items = items,
                 id = uuid,

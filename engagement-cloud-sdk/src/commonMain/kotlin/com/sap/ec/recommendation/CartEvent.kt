@@ -9,7 +9,7 @@ data class CartEvent(val items: List<CartItem>) : TrackedEvent {
     @OptIn(ExperimentalTime::class)
     override fun toSdkEvent(uuid: String, timestamp: Instant): Result<SdkEvent> =
         Result.success(
-            SdkEvent.External.RecommendationEvent.Cart(
+            SdkEvent.External.RecommendationTrackEvent.Cart(
                 items = items,
                 id = uuid,
                 timestamp = timestamp

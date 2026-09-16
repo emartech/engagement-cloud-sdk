@@ -38,7 +38,6 @@ import com.sap.ec.mobileengage.embeddedmessaging.models.MessageTagUpdate
 import com.sap.ec.mobileengage.inapp.InAppMessage
 import com.sap.ec.networking.clients.event.model.DeviceEvent
 import com.sap.ec.recommendation.CartItem
-import com.sap.ec.recommendation.RecommendationFilter
 import com.sap.ec.recommendation.RecommendationLogic
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
@@ -92,6 +91,8 @@ sealed interface OnlineSdkEvent : SdkEvent {
         }
     }
 }
+
+interface RecommendationEvent
 
 internal suspend fun List<OnlineSdkEvent>.ack(eventsDao: EventsDaoApi, sdkLogger: Logger) {
     this.forEach {
@@ -160,8 +161,8 @@ sealed interface SdkEvent {
 
     sealed interface External : SdkEvent {
 
-        sealed interface RecommendationEvent : External, OnlineSdkEvent {
-            override val type: String get() = "RecommendationEvent"
+        sealed interface RecommendationTrackEvent : External, OnlineSdkEvent, RecommendationEvent {
+            override val type: String get() = "RecommendationTrackEvent"
 
             @Serializable
             data class ItemView(
@@ -169,7 +170,7 @@ sealed interface SdkEvent {
                 override val id: String = UUIDProvider().provide(),
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0
-            ) : RecommendationEvent
+            ) : RecommendationTrackEvent
 
             @Serializable
             data class Cart(
@@ -177,7 +178,7 @@ sealed interface SdkEvent {
                 override val id: String = UUIDProvider().provide(),
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0
-            ) : RecommendationEvent
+            ) : RecommendationTrackEvent
 
             @Serializable
             data class Purchase(
@@ -186,7 +187,7 @@ sealed interface SdkEvent {
                 override val id: String = UUIDProvider().provide(),
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0
-            ) : RecommendationEvent
+            ) : RecommendationTrackEvent
 
             @Serializable
             data class CategoryView(
@@ -194,7 +195,7 @@ sealed interface SdkEvent {
                 override val id: String = UUIDProvider().provide(),
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0
-            ) : RecommendationEvent
+            ) : RecommendationTrackEvent
 
             @Serializable
             data class Search(
@@ -202,7 +203,7 @@ sealed interface SdkEvent {
                 override val id: String = UUIDProvider().provide(),
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0
-            ) : RecommendationEvent
+            ) : RecommendationTrackEvent
 
             @Serializable
             data class Tag(
@@ -211,17 +212,17 @@ sealed interface SdkEvent {
                 override val id: String = UUIDProvider().provide(),
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0
-            ) : RecommendationEvent
+            ) : RecommendationTrackEvent
 
             @Serializable
-            data class RecommendationClick(
+            data class RecommendationTrackClick(
                 val productId: String,
                 val feature: String,
                 val cohort: String,
                 override val id: String = UUIDProvider().provide(),
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0
-            ) : RecommendationEvent
+            ) : RecommendationTrackEvent
         }
 
         @Serializable
@@ -348,6 +349,18 @@ sealed interface SdkEvent {
         @Serializable
         sealed class Sdk : Internal {
             override val type: String = "internal"
+
+            data class RequestRecommendation(
+                override val id: String = UUIDProvider().provide(),
+                override val type: String = "internal",
+                override val timestamp: Instant = TimestampProvider().provide(),
+                val logic: RecommendationLogic,
+                val limit: Int = 5,
+                val offset: Int = 0,
+                val availabilityZone: String? = null,
+                val language: String? = null,
+                val displayCurrency: String? = null,
+            ): Sdk(), RecommendationEvent
 
             sealed class Answer : Sdk() {
 

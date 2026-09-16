@@ -20,4 +20,12 @@ object RecommendationConstants {
 
     const val XP_COOKIE_KEY = "xp"
     const val VISITOR_ID_COOKIE_KEY = "cdv"
+
+    const val FEATURES_TO_RETRIEVE_RECOMMENDATIONS_FOR_KEY = "f"
+    const val FEATURE_ID_KEY = "f"
+    const val LIMIT_KEY = "l"
+    const val OFFSET_KEY = "o"
+    const val AVAILABILITY_ZONE_KEY = "az"
+    const val LANGUAGE_KEY = "lang"
+    const val CURRENCY_KEY = "currency"
 }

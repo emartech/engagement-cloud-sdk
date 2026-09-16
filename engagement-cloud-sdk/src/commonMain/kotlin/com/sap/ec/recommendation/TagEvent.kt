@@ -9,7 +9,7 @@ data class TagEvent(val tag: String, val attributes: Map<String, String>? = null
     @OptIn(ExperimentalTime::class)
     override fun toSdkEvent(uuid: String, timestamp: Instant): Result<SdkEvent> =
         Result.success(
-            SdkEvent.External.RecommendationEvent.Tag(
+            SdkEvent.External.RecommendationTrackEvent.Tag(
                 tag = tag,
                 attributes = attributes,
                 id = uuid,

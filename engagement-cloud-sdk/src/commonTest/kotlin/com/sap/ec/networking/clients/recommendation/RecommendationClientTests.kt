@@ -71,7 +71,7 @@ class RecommendationClientTests {
     fun testConsumer_shouldConsumeRecommendationEvent_and_sendTheRequestToTheBackend_andAckEvent_whenReceivingSuccessResponse() =
         runTest {
             createRecommendationClient(backgroundScope).register()
-            val searchEvent = SdkEvent.External.RecommendationEvent.Search("testSearchTerm")
+            val searchEvent = SdkEvent.External.RecommendationTrackEvent.Search("testSearchTerm")
             val request = UrlRequest(
                 url = Url("$RECOMMENDATION_BASE_URL?$CART_LIST_ITEM_QUANTITY_KEY=testSearchTerm"),
                 method = HttpMethod.Get
@@ -113,7 +113,7 @@ class RecommendationClientTests {
     fun testConsumer_shouldConsumeRecommendationEvent_and_sendTheRequestToTheBackend_andAckEvent_whenReceivingFailureResponse() =
         runTest {
             createRecommendationClient(backgroundScope).register()
-            val searchEvent = SdkEvent.External.RecommendationEvent.Search("testSearchTerm")
+            val searchEvent = SdkEvent.External.RecommendationTrackEvent.Search("testSearchTerm")
             val request = UrlRequest(
                 url = Url("$RECOMMENDATION_BASE_URL?$CART_LIST_ITEM_QUANTITY_KEY=testSearchTerm"),
                 method = HttpMethod.Get

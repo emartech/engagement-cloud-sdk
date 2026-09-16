@@ -9,7 +9,7 @@ data class ItemViewEvent(val itemId: String) : TrackedEvent {
     @OptIn(ExperimentalTime::class)
     override fun toSdkEvent(uuid: String, timestamp: Instant): Result<SdkEvent> =
         Result.success(
-            SdkEvent.External.RecommendationEvent.ItemView(
+            SdkEvent.External.RecommendationTrackEvent.ItemView(
                 itemId = itemId,
                 id = uuid,
                 timestamp = timestamp

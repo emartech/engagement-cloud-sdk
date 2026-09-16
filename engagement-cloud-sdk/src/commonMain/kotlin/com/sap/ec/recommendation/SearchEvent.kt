@@ -9,7 +9,7 @@ data class SearchEvent(val searchTerm: String) : TrackedEvent {
     @OptIn(ExperimentalTime::class)
     override fun toSdkEvent(uuid: String, timestamp: Instant): Result<SdkEvent> =
         Result.success(
-            SdkEvent.External.RecommendationEvent.Search(
+            SdkEvent.External.RecommendationTrackEvent.Search(
                 searchTerm = searchTerm,
                 id = uuid,
                 timestamp = timestamp

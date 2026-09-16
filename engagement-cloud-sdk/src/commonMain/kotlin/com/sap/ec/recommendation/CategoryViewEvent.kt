@@ -9,7 +9,7 @@ data class CategoryViewEvent(val categoryPath: String) : TrackedEvent {
     @OptIn(ExperimentalTime::class)
     override fun toSdkEvent(uuid: String, timestamp: Instant): Result<SdkEvent> =
         Result.success(
-            SdkEvent.External.RecommendationEvent.CategoryView(
+            SdkEvent.External.RecommendationTrackEvent.CategoryView(
                 categoryPath = categoryPath,
                 id = uuid,
                 timestamp = timestamp

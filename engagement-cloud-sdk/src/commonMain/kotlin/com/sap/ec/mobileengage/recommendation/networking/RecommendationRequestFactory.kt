@@ -3,16 +3,24 @@ package com.sap.ec.mobileengage.recommendation.networking
 import com.sap.ec.core.networking.model.UrlRequest
 import com.sap.ec.core.url.ECUrlType
 import com.sap.ec.core.url.UrlFactoryApi
+import com.sap.ec.event.RecommendationEvent
 import com.sap.ec.event.SdkEvent
+import com.sap.ec.mobileengage.recommendation.RecommendationConstants.AVAILABILITY_ZONE_KEY
 import com.sap.ec.mobileengage.recommendation.RecommendationConstants.CART_ITEMS_KEY
 import com.sap.ec.mobileengage.recommendation.RecommendationConstants.CART_LIST_ITEM_PRICE_KEY
 import com.sap.ec.mobileengage.recommendation.RecommendationConstants.CART_LIST_ITEM_QUANTITY_KEY
 import com.sap.ec.mobileengage.recommendation.RecommendationConstants.CART_VERSION_FLAG_KEY
 import com.sap.ec.mobileengage.recommendation.RecommendationConstants.CHECKOUT_ITEMS_KEY
 import com.sap.ec.mobileengage.recommendation.RecommendationConstants.COHORT_KEY
+import com.sap.ec.mobileengage.recommendation.RecommendationConstants.CURRENCY_KEY
+import com.sap.ec.mobileengage.recommendation.RecommendationConstants.FEATURES_TO_RETRIEVE_RECOMMENDATIONS_FOR_KEY
+import com.sap.ec.mobileengage.recommendation.RecommendationConstants.FEATURE_ID_KEY
 import com.sap.ec.mobileengage.recommendation.RecommendationConstants.FEATURE_KEY
 import com.sap.ec.mobileengage.recommendation.RecommendationConstants.ITEM_ID_KEY
 import com.sap.ec.mobileengage.recommendation.RecommendationConstants.ITEM_VIEW_KEY
+import com.sap.ec.mobileengage.recommendation.RecommendationConstants.LANGUAGE_KEY
+import com.sap.ec.mobileengage.recommendation.RecommendationConstants.LIMIT_KEY
+import com.sap.ec.mobileengage.recommendation.RecommendationConstants.OFFSET_KEY
 import com.sap.ec.mobileengage.recommendation.RecommendationConstants.ORDER_ID_KEY
 import com.sap.ec.mobileengage.recommendation.RecommendationConstants.SEARCH_KEY
 import com.sap.ec.mobileengage.recommendation.RecommendationConstants.TAG_KEY
@@ -30,12 +38,12 @@ internal class RecommendationRequestFactory(
     private val urlFactory: UrlFactoryApi
 ) : RecommendationRequestFactoryApi {
 
-    override suspend fun create(recommendationEvent: SdkEvent.External.RecommendationEvent): UrlRequest {
+    override suspend fun create(recommendationEvent: RecommendationEvent): UrlRequest {
         val baseUrlWithAppCode = urlFactory.create(ECUrlType.Recommendation)
         val url = buildUrl {
             takeFrom(baseUrlWithAppCode)
             when (recommendationEvent) {
-                is SdkEvent.External.RecommendationEvent.Cart -> {
+                is SdkEvent.External.RecommendationTrackEvent.Cart -> {
                     parameters.append(CART_VERSION_FLAG_KEY, "1")
                     parameters.append(
                         CART_ITEMS_KEY,
@@ -43,17 +51,17 @@ internal class RecommendationRequestFactory(
                     )
                 }
 
-                is SdkEvent.External.RecommendationEvent.CategoryView -> parameters.append(
+                is SdkEvent.External.RecommendationTrackEvent.CategoryView -> parameters.append(
                     VIEW_CATEGORY_KEY,
                     recommendationEvent.categoryPath
                 )
 
-                is SdkEvent.External.RecommendationEvent.ItemView -> parameters.append(
+                is SdkEvent.External.RecommendationTrackEvent.ItemView -> parameters.append(
                     ITEM_VIEW_KEY,
                     "$ITEM_ID_KEY:${recommendationEvent.itemId.encodeURLParameter()}"
                 )
 
-                is SdkEvent.External.RecommendationEvent.Purchase -> {
+                is SdkEvent.External.RecommendationTrackEvent.Purchase -> {
                     parameters.append(ORDER_ID_KEY, recommendationEvent.orderId)
                     parameters.append(
                         CHECKOUT_ITEMS_KEY,
@@ -61,19 +69,19 @@ internal class RecommendationRequestFactory(
                     )
                 }
 
-                is SdkEvent.External.RecommendationEvent.RecommendationClick -> {
+                is SdkEvent.External.RecommendationTrackEvent.RecommendationTrackClick -> {
                     parameters.append(
                         ITEM_VIEW_KEY,
                         "$ITEM_ID_KEY:${recommendationEvent.productId.encodeURLParameter()},$FEATURE_KEY:${recommendationEvent.feature},$COHORT_KEY:${recommendationEvent.cohort}"
                     )
                 }
 
-                is SdkEvent.External.RecommendationEvent.Search -> parameters.append(
+                is SdkEvent.External.RecommendationTrackEvent.Search -> parameters.append(
                     SEARCH_KEY,
                     recommendationEvent.searchTerm
                 )
 
-                is SdkEvent.External.RecommendationEvent.Tag -> {
+                is SdkEvent.External.RecommendationTrackEvent.Tag -> {
                     recommendationEvent.attributes?.let {
                         parameters.append(
                             TAG_WITH_ATTRIBUTES_KEY,
@@ -85,6 +93,21 @@ internal class RecommendationRequestFactory(
                             )
                         )
                     } ?: parameters.append(TAG_KEY, recommendationEvent.tag)
+                }
+                is SdkEvent.Internal.Sdk.RequestRecommendation -> {
+                    parameters.append(
+                        FEATURES_TO_RETRIEVE_RECOMMENDATIONS_FOR_KEY,
+                        "$FEATURE_ID_KEY:${recommendationEvent.logic},$LIMIT_KEY:${recommendationEvent.limit},$OFFSET_KEY:${recommendationEvent.offset}"
+                    )
+                    recommendationEvent.availabilityZone?.takeIf { it.isNotEmpty() }?.let {
+                        parameters.append(AVAILABILITY_ZONE_KEY, it)
+                    }
+                    recommendationEvent.language?.takeIf { it.isNotEmpty() }?.let {
+                        parameters.append(LANGUAGE_KEY, it)
+                    }
+                    recommendationEvent.displayCurrency?.takeIf { it.isNotEmpty() }?.let {
+                        parameters.append(CURRENCY_KEY, it)
+                    }
                 }
             }
         }
