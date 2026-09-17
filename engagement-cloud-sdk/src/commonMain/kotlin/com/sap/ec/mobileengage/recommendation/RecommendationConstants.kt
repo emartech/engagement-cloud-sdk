@@ -28,4 +28,10 @@ object RecommendationConstants {
     const val AVAILABILITY_ZONE_KEY = "az"
     const val LANGUAGE_KEY = "lang"
     const val CURRENCY_KEY = "currency"
+
+    const val FILTER_EXCLUDE_KEY = "ex"
+    const val FILTER_FIELD_KEY = "f"
+    const val FILTER_RULE_KEY = "r"
+    const val FILTER_VALUE_KEY = "v"
+    const val FILTER_NEGATE_KEY = "n"
 }

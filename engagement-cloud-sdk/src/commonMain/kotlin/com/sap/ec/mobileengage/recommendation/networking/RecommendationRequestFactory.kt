@@ -16,6 +16,11 @@ import com.sap.ec.mobileengage.recommendation.RecommendationConstants.CURRENCY_K
 import com.sap.ec.mobileengage.recommendation.RecommendationConstants.FEATURES_TO_RETRIEVE_RECOMMENDATIONS_FOR_KEY
 import com.sap.ec.mobileengage.recommendation.RecommendationConstants.FEATURE_ID_KEY
 import com.sap.ec.mobileengage.recommendation.RecommendationConstants.FEATURE_KEY
+import com.sap.ec.mobileengage.recommendation.RecommendationConstants.FILTER_EXCLUDE_KEY
+import com.sap.ec.mobileengage.recommendation.RecommendationConstants.FILTER_FIELD_KEY
+import com.sap.ec.mobileengage.recommendation.RecommendationConstants.FILTER_NEGATE_KEY
+import com.sap.ec.mobileengage.recommendation.RecommendationConstants.FILTER_RULE_KEY
+import com.sap.ec.mobileengage.recommendation.RecommendationConstants.FILTER_VALUE_KEY
 import com.sap.ec.mobileengage.recommendation.RecommendationConstants.ITEM_ID_KEY
 import com.sap.ec.mobileengage.recommendation.RecommendationConstants.ITEM_VIEW_KEY
 import com.sap.ec.mobileengage.recommendation.RecommendationConstants.LANGUAGE_KEY
@@ -28,11 +33,15 @@ import com.sap.ec.mobileengage.recommendation.RecommendationConstants.TAG_WITH_A
 import com.sap.ec.mobileengage.recommendation.RecommendationConstants.VIEW_CATEGORY_KEY
 import com.sap.ec.mobileengage.recommendation.models.TagWithAttributes
 import com.sap.ec.recommendation.CartItem
+import com.sap.ec.recommendation.FilterType
 import com.sap.ec.util.JsonUtil
 import io.ktor.http.HttpMethod
 import io.ktor.http.buildUrl
 import io.ktor.http.encodeURLParameter
 import io.ktor.http.takeFrom
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 internal class RecommendationRequestFactory(
     private val urlFactory: UrlFactoryApi
@@ -97,15 +106,30 @@ internal class RecommendationRequestFactory(
                 is SdkEvent.Internal.Sdk.RequestRecommendation -> {
                     parameters.append(
                         FEATURES_TO_RETRIEVE_RECOMMENDATIONS_FOR_KEY,
-                        "$FEATURE_ID_KEY:${recommendationEvent.logic},$LIMIT_KEY:${recommendationEvent.limit},$OFFSET_KEY:${recommendationEvent.offset}"
+                        "$FEATURE_ID_KEY:${recommendationEvent.options.logic},$LIMIT_KEY:${recommendationEvent.options.limit},$OFFSET_KEY:${recommendationEvent.options.offset}"
                     )
-                    recommendationEvent.availabilityZone?.takeIf { it.isNotEmpty() }?.let {
+                    recommendationEvent.options.filters?.takeIf { it.isNotEmpty() }?.let { filters ->
+                        parameters.append(FILTER_EXCLUDE_KEY, buildJsonArray {
+                            filters.forEach { filter ->
+                                add(buildJsonObject {
+                                    put(FILTER_FIELD_KEY, filter.field)
+                                    put(FILTER_RULE_KEY, filter.comparison.toString())
+                                    put(FILTER_VALUE_KEY, filter.expectations.joinToString("|"))
+                                    put(
+                                        FILTER_NEGATE_KEY,
+                                        filter.type == FilterType.INCLUDE
+                                    )
+                                })
+                            }
+                        }.toString())
+                    }
+                    recommendationEvent.options.availabilityZone?.takeIf { it.isNotEmpty() }?.let {
                         parameters.append(AVAILABILITY_ZONE_KEY, it)
                     }
-                    recommendationEvent.language?.takeIf { it.isNotEmpty() }?.let {
+                    recommendationEvent.options.language?.takeIf { it.isNotEmpty() }?.let {
                         parameters.append(LANGUAGE_KEY, it)
                     }
-                    recommendationEvent.displayCurrency?.takeIf { it.isNotEmpty() }?.let {
+                    recommendationEvent.options.displayCurrency?.takeIf { it.isNotEmpty() }?.let {
                         parameters.append(CURRENCY_KEY, it)
                     }
                 }

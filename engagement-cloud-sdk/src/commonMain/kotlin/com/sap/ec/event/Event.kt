@@ -38,7 +38,7 @@ import com.sap.ec.mobileengage.embeddedmessaging.models.MessageTagUpdate
 import com.sap.ec.mobileengage.inapp.InAppMessage
 import com.sap.ec.networking.clients.event.model.DeviceEvent
 import com.sap.ec.recommendation.CartItem
-import com.sap.ec.recommendation.RecommendationLogic
+import com.sap.ec.recommendation.RecommendationOptions
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -354,12 +354,7 @@ sealed interface SdkEvent {
                 override val id: String = UUIDProvider().provide(),
                 override val type: String = "internal",
                 override val timestamp: Instant = TimestampProvider().provide(),
-                val logic: RecommendationLogic,
-                val limit: Int = 5,
-                val offset: Int = 0,
-                val availabilityZone: String? = null,
-                val language: String? = null,
-                val displayCurrency: String? = null,
+                val options: RecommendationOptions
             ): Sdk(), RecommendationEvent
 
             sealed class Answer : Sdk() {

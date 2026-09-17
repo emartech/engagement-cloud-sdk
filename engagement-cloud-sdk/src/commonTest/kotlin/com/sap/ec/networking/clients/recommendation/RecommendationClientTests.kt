@@ -11,11 +11,14 @@ import com.sap.ec.event.OnlineSdkEvent
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.mobileengage.recommendation.RecommendationConstants.CART_LIST_ITEM_QUANTITY_KEY
 import com.sap.ec.mobileengage.recommendation.networking.RecommendationRequestFactoryApi
+import com.sap.ec.recommendation.RecommendationLogic
+import com.sap.ec.recommendation.RecommendationOptions
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import io.ktor.http.Headers
@@ -45,7 +48,8 @@ class RecommendationClientTests {
     private lateinit var mockEventsDao: EventsDaoApi
     private lateinit var mockNetworkClient: NetworkClientApi
     private lateinit var mockRecommendationRequestFactory: RecommendationRequestFactoryApi
-    private lateinit var onlineEvents: MutableSharedFlow<OnlineSdkEvent>
+    private lateinit var sdkEventsFlow: MutableSharedFlow<SdkEvent>
+    private lateinit var onlineSdkEventsFlow: MutableSharedFlow<OnlineSdkEvent>
 
     private companion object {
         private const val RECOMMENDATION_BASE_URL =
@@ -61,14 +65,16 @@ class RecommendationClientTests {
         mockNetworkClient = mock(MockMode.autofill)
         mockRecommendationRequestFactory = mock(MockMode.autofill)
 
-        onlineEvents = MutableSharedFlow(replay = 100, extraBufferCapacity = Channel.UNLIMITED)
+        sdkEventsFlow = MutableSharedFlow(replay = 100, extraBufferCapacity = Channel.UNLIMITED)
+        onlineSdkEventsFlow = MutableSharedFlow(replay = 100, extraBufferCapacity = Channel.UNLIMITED)
 
         everySuspend { mockSdkLogger.debug(any<String>()) }
-        everySuspend { mockSdkEventManager.onlineSdkEvents } returns onlineEvents
+        everySuspend { mockSdkEventManager.sdkEventFlow } returns sdkEventsFlow
+        everySuspend { mockSdkEventManager.onlineSdkEvents } returns onlineSdkEventsFlow
     }
 
     @Test
-    fun testConsumer_shouldConsumeRecommendationEvent_and_sendTheRequestToTheBackend_andAckEvent_whenReceivingSuccessResponse() =
+    fun testConsumer_shouldConsumeRecommendationTrackEvent_and_sendTheRequest_andAckEvent_whenReceivingSuccessResponse() =
         runTest {
             createRecommendationClient(backgroundScope).register()
             val searchEvent = SdkEvent.External.RecommendationTrackEvent.Search("testSearchTerm")
@@ -86,17 +92,17 @@ class RecommendationClientTests {
             everySuspend { mockRecommendationRequestFactory.create(searchEvent) } returns request
             everySuspend { mockNetworkClient.send(request) } returns successResult
 
-            val onlineSdkEvents = backgroundScope.async {
-                onlineEvents.take(1).toList()
+            val sdkEvents = backgroundScope.async {
+                onlineSdkEventsFlow.take(1).toList()
             }
 
-            onlineEvents.emit(searchEvent)
+            onlineSdkEventsFlow.emit(searchEvent)
 
             advanceUntilIdle()
 
-            onlineSdkEvents.await().size shouldBe 1
+            sdkEvents.await().size shouldBe 1
             verifySuspend {
-                mockSdkLogger.debug("consume RecommendationClient events")
+                mockSdkLogger.debug("consume RecommendationTrackEvent events")
                 mockRecommendationRequestFactory.create(searchEvent)
                 mockNetworkClient.send(request)
                 mockSdkEventManager.emitEvent(
@@ -110,7 +116,7 @@ class RecommendationClientTests {
         }
 
     @Test
-    fun testConsumer_shouldConsumeRecommendationEvent_and_sendTheRequestToTheBackend_andAckEvent_whenReceivingFailureResponse() =
+    fun testConsumer_shouldConsumeRecommendationTrackEvent_and_sendTheRequest_andAckEvent_whenReceivingFailureResponse() =
         runTest {
             createRecommendationClient(backgroundScope).register()
             val searchEvent = SdkEvent.External.RecommendationTrackEvent.Search("testSearchTerm")
@@ -129,17 +135,17 @@ class RecommendationClientTests {
             everySuspend { mockRecommendationRequestFactory.create(searchEvent) } returns request
             everySuspend { mockNetworkClient.send(request) } returns failureResult
 
-            val onlineSdkEvents = backgroundScope.async {
-                onlineEvents.take(1).toList()
+            val sdkEvents = backgroundScope.async {
+                onlineSdkEventsFlow.take(1).toList()
             }
 
-            onlineEvents.emit(searchEvent)
+            onlineSdkEventsFlow.emit(searchEvent)
 
             advanceUntilIdle()
 
-            onlineSdkEvents.await().size shouldBe 1
+            sdkEvents.await().size shouldBe 1
             verifySuspend {
-                mockSdkLogger.debug("consume RecommendationClient events")
+                mockSdkLogger.debug("consume RecommendationTrackEvent events")
                 mockRecommendationRequestFactory.create(searchEvent)
                 mockNetworkClient.send(request)
 
@@ -150,6 +156,119 @@ class RecommendationClientTests {
                     )
                 )
                 mockEventsDao.removeEvent(searchEvent)
+            }
+        }
+
+    @Test
+    fun testConsumer_shouldConsumeRequestRecommendation_and_sendTheRequest_and_emitResponse_whenReceivingSuccessResponse() =
+        runTest {
+            createRecommendationClient(backgroundScope).register()
+            val requestRecommendation = SdkEvent.Internal.Sdk.RequestRecommendation(options = RecommendationOptions(
+                RecommendationLogic.HOME))
+            val request = UrlRequest(
+                url = Url(RECOMMENDATION_BASE_URL),
+                method = HttpMethod.Get
+            )
+            val successResponse = Response(
+                status = HttpStatusCode.OK,
+                headers = Headers.Empty,
+                originalRequest = request,
+                bodyAsText = "{}"
+            )
+            val successResult = Result.success(successResponse)
+            everySuspend { mockRecommendationRequestFactory.create(requestRecommendation) } returns request
+            everySuspend { mockNetworkClient.send(request) } returns successResult
+
+            val sdkEvents = backgroundScope.async {
+                sdkEventsFlow.take(1).toList()
+            }
+
+            sdkEventsFlow.emit(requestRecommendation)
+
+            advanceUntilIdle()
+
+            sdkEvents.await().size shouldBe 1
+            verifySuspend {
+                mockSdkLogger.debug("consume RequestRecommendation events")
+                mockRecommendationRequestFactory.create(requestRecommendation)
+                mockNetworkClient.send(request)
+                mockSdkEventManager.emitEvent(
+                    SdkEvent.Internal.Sdk.Answer.Response(
+                        requestRecommendation.id,
+                        successResult
+                    )
+                )
+            }
+        }
+
+    @Test
+    fun testConsumer_shouldConsumeRequestRecommendation_and_sendTheRequest_and_emitResponse_whenReceivingFailureResponse() =
+        runTest {
+            createRecommendationClient(backgroundScope).register()
+            val requestRecommendation = SdkEvent.Internal.Sdk.RequestRecommendation(options = RecommendationOptions(
+                RecommendationLogic.HOME))
+            val request = UrlRequest(
+                url = Url(RECOMMENDATION_BASE_URL),
+                method = HttpMethod.Get
+            )
+            val failureResponse = Response(
+                status = HttpStatusCode.BadRequest,
+                headers = Headers.Empty,
+                originalRequest = request,
+                bodyAsText = "{}"
+            )
+            val failureResult =
+                Result.failure<Response>(SdkException.FailedRequestException(failureResponse))
+            everySuspend { mockRecommendationRequestFactory.create(requestRecommendation) } returns request
+            everySuspend { mockNetworkClient.send(request) } returns failureResult
+
+            val sdkEvents = backgroundScope.async {
+                sdkEventsFlow.take(1).toList()
+            }
+
+            sdkEventsFlow.emit(requestRecommendation)
+
+            advanceUntilIdle()
+
+            sdkEvents.await().size shouldBe 1
+            verifySuspend {
+                mockSdkLogger.debug("consume RequestRecommendation events")
+                mockRecommendationRequestFactory.create(requestRecommendation)
+                mockNetworkClient.send(request)
+
+                mockSdkEventManager.emitEvent(
+                    SdkEvent.Internal.Sdk.Answer.Response(
+                        requestRecommendation.id,
+                        failureResult
+                    )
+                )
+            }
+        }
+
+    @Test
+    fun testConsumer_shouldConsumeRequestRecommendation_and_RecommendationTrackEvent() =
+        runTest {
+            createRecommendationClient(backgroundScope).register()
+            val requestRecommendation = SdkEvent.Internal.Sdk.RequestRecommendation(options = RecommendationOptions(
+                RecommendationLogic.HOME))
+            val searchEvent = SdkEvent.External.RecommendationTrackEvent.Search("testSearchTerm")
+            val sdkEvents = backgroundScope.async {
+                sdkEventsFlow.take(1).toList()
+            }
+            val sdkOnlineEvents = backgroundScope.async {
+                onlineSdkEventsFlow.take(1).toList()
+            }
+
+            sdkEventsFlow.emit(requestRecommendation)
+            onlineSdkEventsFlow.emit(searchEvent)
+
+            advanceUntilIdle()
+
+            sdkEvents.await().size shouldBe 1
+            sdkOnlineEvents.await().size shouldBe 1
+            verifySuspend(VerifyMode.exactly(1)) {
+                mockRecommendationRequestFactory.create(requestRecommendation)
+                mockRecommendationRequestFactory.create(searchEvent)
             }
         }
 

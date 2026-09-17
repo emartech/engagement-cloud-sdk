@@ -27,7 +27,7 @@ internal class RecommendationClient(
         applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
             sdkEventManager.onlineSdkEvents.filterIsInstance<SdkEvent.External.RecommendationTrackEvent>()
                 .collect { event ->
-                    sdkLogger.debug("consume RecommendationClient events")
+                    sdkLogger.debug("consume RecommendationTrackEvent events")
                     val request = recommendationRequestFactory.create(event)
                     recommendationNetworkClient.send(request).fold(
                         onSuccess = { successResponse ->
@@ -47,6 +47,32 @@ internal class RecommendationClient(
                                 )
                             )
                             event.ack(eventsDao, sdkLogger)
+                        }
+                    )
+                }
+        }
+
+        applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
+            sdkEventManager.sdkEventFlow.filterIsInstance<SdkEvent.Internal.Sdk.RequestRecommendation>()
+                .collect { event ->
+                    sdkLogger.debug("consume RequestRecommendation events")
+                    val request = recommendationRequestFactory.create(event)
+                    recommendationNetworkClient.send(request).fold(
+                        onSuccess = { successResponse ->
+                            sdkEventManager.emitEvent(
+                                SdkEvent.Internal.Sdk.Answer.Response(
+                                    event.id,
+                                    Result.success(successResponse)
+                                )
+                            )
+                        },
+                        onFailure = { exception ->
+                            sdkEventManager.emitEvent(
+                                SdkEvent.Internal.Sdk.Answer.Response(
+                                    event.id,
+                                    Result.failure<Response>(exception)
+                                )
+                            )
                         }
                     )
                 }

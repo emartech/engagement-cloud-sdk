@@ -4,8 +4,13 @@ import com.sap.ec.core.networking.model.UrlRequest
 import com.sap.ec.core.url.ECUrlType
 import com.sap.ec.core.url.UrlFactoryApi
 import com.sap.ec.event.SdkEvent
+import com.sap.ec.event.SdkEvent.Internal.Sdk.RequestRecommendation
 import com.sap.ec.recommendation.CartItem
+import com.sap.ec.recommendation.ComparisonType
+import com.sap.ec.recommendation.FilterType
+import com.sap.ec.recommendation.RecommendationFilter
 import com.sap.ec.recommendation.RecommendationLogic
+import com.sap.ec.recommendation.RecommendationOptions
 import com.sap.ec.util.toJsonObject
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -21,7 +26,6 @@ import io.ktor.http.parameters
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import com.sap.ec.event.SdkEvent.Internal.Sdk.RequestRecommendation
 
 
 class RecommendationRequestFactoryTests {
@@ -43,6 +47,8 @@ class RecommendationRequestFactoryTests {
         const val TEST_ORDER_ID = "test%Order"
         const val SEARCH_TERM = "Search%Test"
         const val TEST_TAG = "test%Tag"
+        const val TEST_CATEGORY = "testCategory"
+        const val TEST_CATEGORY2 = "testCategory2"
     }
 
     @BeforeTest
@@ -229,7 +235,7 @@ class RecommendationRequestFactoryTests {
         }
 
     @Test
-    fun test_create_RecommendationClick_shouldReturn_recommendationClickUrlPath_withDoubleUrlEncodedProductId_when_trackingRecommendationClick() =
+    fun test_createationClick_shouldReturn_recommendationClickUrlPath_withDoubleUrlEncodedProductId_when_trackingRecommendationClick() =
         runTest {
             val feature = "testFeature"
             val cohort = "testCohort"
@@ -253,8 +259,12 @@ class RecommendationRequestFactoryTests {
         }
 
     @Test
-    fun test_create_Recommend_shouldReturn_recommendationUrlPath_withBasicHomeLogic() = runTest {
-        val requestRecommendationEvent = RequestRecommendation(logic = RecommendationLogic.HOME)
+    fun test_create_shouldReturn_recommendationUrlPath_withBasicHomeLogic() = runTest {
+        val requestRecommendationEvent = RequestRecommendation(
+            options = RecommendationOptions(
+                RecommendationLogic.HOME
+            )
+        )
         val params = parameters {
             append(
                 "f",
@@ -269,9 +279,14 @@ class RecommendationRequestFactoryTests {
     }
 
     @Test
-    fun test_create_Recommend_shouldReturn_recommendationUrlPath_withLimit10() = runTest {
+    fun test_create_shouldReturn_recommendationUrlPath_withLimit10() = runTest {
         val requestRecommendationEvent =
-            RequestRecommendation(logic = RecommendationLogic.HOME, limit = 10)
+            RequestRecommendation(
+                options = RecommendationOptions(
+                    logic = RecommendationLogic.HOME,
+                    limit = 10
+                )
+            )
         val params = parameters {
             append(
                 "f",
@@ -286,9 +301,14 @@ class RecommendationRequestFactoryTests {
     }
 
     @Test
-    fun test_create_Recommend_shouldReturn_recommendationUrlPath_withOffset() = runTest {
+    fun test_create_shouldReturn_recommendationUrlPath_withOffset() = runTest {
         val requestRecommendationEvent =
-            RequestRecommendation(logic = RecommendationLogic.HOME, offset = 15)
+            RequestRecommendation(
+                options = RecommendationOptions(
+                    logic = RecommendationLogic.HOME,
+                    offset = 15
+                )
+            )
         val params = parameters {
             append(
                 "f",
@@ -303,10 +323,12 @@ class RecommendationRequestFactoryTests {
     }
 
     @Test
-    fun test_create_Recommend_shouldReturn_recommendationUrlPath_withAvailabilityZone() = runTest {
+    fun test_create_shouldReturn_recommendationUrlPath_withAvailabilityZone() = runTest {
         val requestRecommendationEvent = RequestRecommendation(
-            logic = RecommendationLogic.HOME,
-            availabilityZone = "eu"
+            options = RecommendationOptions(
+                logic = RecommendationLogic.HOME,
+                availabilityZone = "eu"
+            )
         )
         val params = parameters {
             append(
@@ -323,9 +345,14 @@ class RecommendationRequestFactoryTests {
     }
 
     @Test
-    fun test_create_Recommend_shouldReturn_recommendationUrlPath_withLanguage() = runTest {
+    fun test_create_shouldReturn_recommendationUrlPath_withLanguage() = runTest {
         val requestRecommendationEvent =
-            RequestRecommendation(logic = RecommendationLogic.HOME, language = "hu")
+            RequestRecommendation(
+                options = RecommendationOptions(
+                    logic = RecommendationLogic.HOME,
+                    language = "hu"
+                )
+            )
         val params = parameters {
             append(
                 "f",
@@ -341,11 +368,13 @@ class RecommendationRequestFactoryTests {
     }
 
     @Test
-    fun test_create_Recommend_shouldReturn_recommendationUrlPath_withCurrency() = runTest {
+    fun test_create_shouldReturn_recommendationUrlPath_withCurrency() = runTest {
         val requestRecommendationEvent =
             RequestRecommendation(
-                logic = RecommendationLogic.HOME,
-                displayCurrency = "EUR"
+                options = RecommendationOptions(
+                    logic = RecommendationLogic.HOME,
+                    displayCurrency = "EUR"
+                )
             )
         val params = parameters {
             append(
@@ -359,6 +388,87 @@ class RecommendationRequestFactoryTests {
         val result = recommendationRequestFactory.create(requestRecommendationEvent)
 
         assertUrl(result, expectedUrl)
+    }
+
+    @Test
+    fun test_create_shouldReturn_recommendationUrlPath_withFilters_parameterized() = runTest {
+        data class TestCase(val options: RecommendationOptions, val expectedUrl: String)
+
+        listOf(
+            TestCase(
+                options = RecommendationOptions(RecommendationLogic.HOME, filters = null),
+                expectedUrl = "$RECOMMENDATION_BASE_URL?${parameters {
+                    append("f", "f:HOME,l:5,o:0")
+                }.formUrlEncode()}"
+            ),
+            TestCase(
+                options = RecommendationOptions(RecommendationLogic.HOME, filters = emptyList()),
+                expectedUrl = "$RECOMMENDATION_BASE_URL?${parameters {
+                    append("f", "f:HOME,l:5,o:0")
+                }.formUrlEncode()}"
+            ),
+            TestCase(
+                options = RecommendationOptions(RecommendationLogic.HOME, filters = listOf(RecommendationFilter(FilterType.INCLUDE, "category", ComparisonType.IS, TEST_CATEGORY))),
+                expectedUrl = "$RECOMMENDATION_BASE_URL?${parameters {
+                    append("f", "f:HOME,l:5,o:0")
+                    append("ex", "[{\"f\":\"category\",\"r\":\"IS\",\"v\":\"$TEST_CATEGORY\",\"n\":true}]")
+                }.formUrlEncode()}"
+            ),
+            TestCase(
+                options = RecommendationOptions(RecommendationLogic.HOME, filters = listOf(RecommendationFilter(FilterType.INCLUDE, "category", ComparisonType.HAS, TEST_CATEGORY))),
+                expectedUrl = "$RECOMMENDATION_BASE_URL?${parameters {
+                    append("f", "f:HOME,l:5,o:0")
+                    append("ex", "[{\"f\":\"category\",\"r\":\"HAS\",\"v\":\"$TEST_CATEGORY\",\"n\":true}]")
+                }.formUrlEncode()}"
+            ),
+            TestCase(
+                options = RecommendationOptions(RecommendationLogic.HOME, filters = listOf(RecommendationFilter(FilterType.INCLUDE, "category", ComparisonType.OVERLAPS, listOf(TEST_CATEGORY, TEST_CATEGORY2)))),
+                expectedUrl = "$RECOMMENDATION_BASE_URL?${parameters {
+                    append("f", "f:HOME,l:5,o:0")
+                    append("ex", "[{\"f\":\"category\",\"r\":\"OVERLAPS\",\"v\":\"$TEST_CATEGORY|$TEST_CATEGORY2\",\"n\":true}]")
+                }.formUrlEncode()}"
+            ),
+            TestCase(
+                options = RecommendationOptions(RecommendationLogic.HOME, filters = listOf(RecommendationFilter(FilterType.INCLUDE, "category", ComparisonType.IN, listOf(TEST_CATEGORY, TEST_CATEGORY2)))),
+                expectedUrl = "$RECOMMENDATION_BASE_URL?${parameters {
+                    append("f", "f:HOME,l:5,o:0")
+                    append("ex", "[{\"f\":\"category\",\"r\":\"IN\",\"v\":\"$TEST_CATEGORY|$TEST_CATEGORY2\",\"n\":true}]")
+                }.formUrlEncode()}"
+            ),
+            TestCase(
+                options = RecommendationOptions(RecommendationLogic.HOME, filters = listOf(RecommendationFilter(FilterType.EXCLUDE, "category", ComparisonType.IS, TEST_CATEGORY))),
+                expectedUrl = "$RECOMMENDATION_BASE_URL?${parameters {
+                    append("f", "f:HOME,l:5,o:0")
+                    append("ex", "[{\"f\":\"category\",\"r\":\"IS\",\"v\":\"$TEST_CATEGORY\",\"n\":false}]")
+                }.formUrlEncode()}"
+            ),
+            TestCase(
+                options = RecommendationOptions(RecommendationLogic.HOME, filters = listOf(
+                    RecommendationFilter(FilterType.INCLUDE, "category", ComparisonType.IS, "bike"),
+                    RecommendationFilter(FilterType.EXCLUDE, "type", ComparisonType.IS, "electric")
+                )),
+                expectedUrl = "$RECOMMENDATION_BASE_URL?${parameters {
+                    append("f", "f:HOME,l:5,o:0")
+                    append("ex", "[{\"f\":\"category\",\"r\":\"IS\",\"v\":\"bike\",\"n\":true},{\"f\":\"type\",\"r\":\"IS\",\"v\":\"electric\",\"n\":false}]")
+                }.formUrlEncode()}"
+            ),
+            TestCase(
+                options = RecommendationOptions(RecommendationLogic.HOME, limit = 10, offset = 20, filters = listOf(
+                    RecommendationFilter(FilterType.INCLUDE, "category", ComparisonType.IS, "bike"),
+                    RecommendationFilter(FilterType.EXCLUDE, "type", ComparisonType.IS, "electric")
+                ), availabilityZone = "eu", language = "hu", displayCurrency = "EUR"),
+                expectedUrl = "$RECOMMENDATION_BASE_URL?${parameters {
+                    append("f", "f:HOME,l:10,o:20")
+                    append("ex", "[{\"f\":\"category\",\"r\":\"IS\",\"v\":\"bike\",\"n\":true},{\"f\":\"type\",\"r\":\"IS\",\"v\":\"electric\",\"n\":false}]")
+                    append("az", "eu")
+                    append("lang", "hu")
+                    append("currency", "EUR")
+                }.formUrlEncode()}"
+            )
+        ).forEach { (options, expectedUrl) ->
+            val result = recommendationRequestFactory.create(RequestRecommendation(options = options))
+            assertUrl(result, expectedUrl)
+        }
     }
 
     private fun assertUrl(
