@@ -35,6 +35,6 @@ internal data class BasicInAppButtonClickedActionModel(
 @Serializable
 @SerialName("notificationOpened")
 internal data class NotificationOpenedActionModel(
-    val reporting: String? = null,
+    val reporting: String,
     val trackingInfo: String
 ) : ActionModel, ReportingActionModel

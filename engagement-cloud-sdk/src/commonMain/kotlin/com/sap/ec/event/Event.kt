@@ -555,7 +555,7 @@ sealed interface SdkEvent {
             @Serializable
             data class Clicked(
                 override val id: String = UUIDProvider().provide(),
-                override val reporting: String?,
+                override val reporting: String,
                 override val trackingInfo: String,
                 val origin: String,
                 override val attributes: JsonObject? = null,
