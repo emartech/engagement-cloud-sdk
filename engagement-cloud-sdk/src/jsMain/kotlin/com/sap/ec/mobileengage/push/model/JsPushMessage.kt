@@ -15,8 +15,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class JsPushMessage(
     override val trackingInfo: String,
+    override val reporting: String,
     override val platformData: JsPlatformData,
     override val badgeCount: BadgeCount?,
     override val actionableData: ActionableData<PresentableActionModel>?,
     override val displayableData: DisplayableData?
-): PushMessage<JsPlatformData>, ActionablePush<PresentableActionModel>, DisplayablePush
+) : PushMessage<JsPlatformData>, ActionablePush<PresentableActionModel>, DisplayablePush

@@ -50,7 +50,8 @@ class PushMessageWebV2Mapper(
                 } else null
 
             return JsPushMessage(
-                remoteMessage.ems.trackingInfo,
+                trackingInfo = remoteMessage.ems.trackingInfo,
+                reporting = remoteMessage.notification.reporting,
                 JsPlatformData,
                 remoteMessage.notification.badgeCount,
                 actionableData,

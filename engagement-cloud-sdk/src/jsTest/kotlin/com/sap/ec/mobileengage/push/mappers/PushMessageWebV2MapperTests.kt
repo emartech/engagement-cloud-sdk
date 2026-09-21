@@ -36,6 +36,7 @@ class PushMessageWebV2MapperTests {
         const val TRACKING_INFO = """{"key":"value"}"""
         const val REPORTING = """{"reportingKey":"reportingValue"}"""
         const val REPORTING2 = """{"reportingKey2":"reportingValue2"}"""
+        const val DEFAULT_REPORTING = """{"defaultReportingKey":"defaultReportingValue"}"""
     }
 
     private lateinit var json: Json
@@ -53,6 +54,7 @@ class PushMessageWebV2MapperTests {
     @Test
     fun map_shouldCreate_jsPushMessage_fromRemotePayload() = runTest {
         val notification = buildJsonObject {
+            put("reporting", DEFAULT_REPORTING)
             put("silent", false)
             put("title", TITLE)
             put("body", BODY)
@@ -106,6 +108,7 @@ class PushMessageWebV2MapperTests {
 
         val expectedMessage = JsPushMessage(
             TRACKING_INFO,
+            reporting = DEFAULT_REPORTING,
             platformData = JsPlatformData,
             badgeCount = BadgeCount(BadgeCountMethod.ADD, BADGE_VALUE),
             actionableData = ActionableData(

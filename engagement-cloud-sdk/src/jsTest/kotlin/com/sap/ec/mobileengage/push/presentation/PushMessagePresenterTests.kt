@@ -29,6 +29,7 @@ class PushMessagePresenterTests {
         private const val IMAGE = "image"
         private const val REPORTING = """{"reportingKey":"reportingValue"}"""
         private const val REPORTING2 = """{"reportingKey2":"reportingValue2"}"""
+        private const val DEFAULT_REPORTING = """{"defaultReportingKey":"defaultReportingValue"}"""
     }
 
     private val slot = Capture.slot<WebPushNotificationData>()
@@ -105,15 +106,15 @@ class PushMessagePresenterTests {
         val expectedNotificationOptions: NotificationOptions =
             getTestNotificationOptions(
                 testPushMessage, arrayOf(
-                js("{}").unsafeCast<NotificationAction>().apply {
-                    action = "actionId1"
-                    title = "actionTitle1"
-                },
-                js("{}").unsafeCast<NotificationAction>().apply {
-                    action = "actionId2"
-                    title = "actionTitle2"
-                }
-            ))
+                    js("{}").unsafeCast<NotificationAction>().apply {
+                        action = "actionId1"
+                        title = "actionTitle1"
+                    },
+                    js("{}").unsafeCast<NotificationAction>().apply {
+                        action = "actionId2"
+                        title = "actionTitle2"
+                    }
+                ))
 
         pushMessagePresenter.present(testPushMessage)
 
@@ -128,6 +129,7 @@ class PushMessagePresenterTests {
     ): JsPushMessage {
         return JsPushMessage(
             trackingInfo = """{"trackingInfoKey":"trackingInfoValue"}""",
+            reporting = DEFAULT_REPORTING,
             platformData = JsPlatformData,
             badgeCount = null,
             actionableData = ActionableData(
