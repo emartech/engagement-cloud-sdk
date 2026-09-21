@@ -234,7 +234,8 @@ internal object IosInjection {
                 sdkDispatcher = get(named(DispatcherTypes.Sdk)),
                 sdkLogger = get { parametersOf(IosPushInternal::class.simpleName) },
                 sdkEventDistributor = get(),
-                uuidProvider = get()
+                operationalEventDistributor = get(),
+                uuidProvider = get(),
             )
         }
         single<IosPushInstance>(named(InstanceType.Gatherer)) {

@@ -18,6 +18,7 @@ import com.sap.ec.api.push.SilentPushUserInfo
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.actions.ActionHandlerApi
 import com.sap.ec.core.actions.badge.BadgeCountHandlerApi
+import com.sap.ec.core.channel.OperationalEventDistributorApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
 import com.sap.ec.core.log.Logger
@@ -67,9 +68,16 @@ internal class IosPushInternal(
     private val sdkDispatcher: CoroutineDispatcher,
     private val sdkLogger: Logger,
     private val sdkEventDistributor: SdkEventDistributorApi,
+    private val operationalEventDistributor: OperationalEventDistributorApi,
     private val uuidProvider: UuidProviderApi
-) : PushInternal(storage, threadSafePersistentStore, sdkEventDistributor, sdkContext, sdkLogger),
-    IosPushInstance {
+) : PushInternal(
+    storage,
+    threadSafePersistentStore,
+    sdkEventDistributor,
+    operationalEventDistributor,
+    sdkContext,
+    sdkLogger
+), IosPushInstance {
 
     private val _registeredDelegates = mutableListOf<NotificationCenterDelegateRegistration>()
     private val pendingNotificationResponses = mutableListOf<PendingNotificationResponse>()
@@ -133,7 +141,7 @@ internal class IosPushInternal(
                     SdkEvent.Internal.Sdk.RegisterPushToken(pushToken = call.pushToken)
                 )
 
-                is ClearPushToken -> sdkEventDistributor.registerEvent(
+                is ClearPushToken -> operationalEventDistributor.registerOperationalEvent(
                     SdkEvent.Internal.Sdk.ClearPushToken(
                         applicationCode = call.applicationCode
                     )

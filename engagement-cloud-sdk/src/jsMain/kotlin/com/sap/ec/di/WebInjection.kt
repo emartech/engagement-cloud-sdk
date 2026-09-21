@@ -277,6 +277,7 @@ internal object WebInjection {
                 sdkContext = get(),
                 threadSafePersistentStore = get(named(ThreadSafePersistentStoreTypes.PushCall)),
                 sdkEventDistributor = get(),
+                operationalEventDistributor = get(),
                 sdkLogger = get { parametersOf(JsPushInternal::class.simpleName) },
                 pushService = get(),
             )

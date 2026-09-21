@@ -4,6 +4,7 @@ import com.sap.ec.TestEngagementCloudSDKConfig
 import com.sap.ec.api.push.PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY
 import com.sap.ec.api.push.PushConstants.PUSH_TOKEN_STORAGE_KEY
 import com.sap.ec.context.SdkContextApi
+import com.sap.ec.core.channel.OperationalEventDistributorApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.channel.SdkEventWaiterApi
 import com.sap.ec.core.collections.ThreadSafePersistentStore
@@ -56,8 +57,10 @@ class PushInternalTests {
         )
     }
 
+    private lateinit var mockEventWaiter: SdkEventWaiterApi
     private lateinit var mockStringStorage: StringStorageApi
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
+    private lateinit var mockOperationalEventDistributor: OperationalEventDistributorApi
     private lateinit var eventSlot: SlotCapture<SdkEvent>
     private lateinit var mockLogger: Logger
     private lateinit var mockSdkContext: SdkContextApi
@@ -67,6 +70,7 @@ class PushInternalTests {
 
     @BeforeTest
     fun setup() {
+        mockEventWaiter = mock(MockMode.autofill)
         mockStringStorage = mock()
         mockStorage = mock(MockMode.autofill)
         mockSdkContext = mock()
@@ -75,6 +79,7 @@ class PushInternalTests {
         )
         eventSlot = slot()
         mockSdkEventDistributor = mock(MockMode.autofill)
+        mockOperationalEventDistributor = mock(MockMode.autofill)
         mockLogger = mock(MockMode.autofill)
         threadSafePersistentStore = createSafeStore()
         pushInternal = createPushInternal()
@@ -88,9 +93,7 @@ class PushInternalTests {
 
     @Test
     fun testRegisterPushToken_shouldNotDoAnything_whenTokenStoredAlready() = runTest {
-        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(
-            MockMode.autofill
-        )
+        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mockEventWaiter
         everySuspend { mockStringStorage.get(PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
         everySuspend { mockStringStorage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns PUSH_TOKEN
         everySuspend { mockStringStorage.put(PUSH_TOKEN_STORAGE_KEY, PUSH_TOKEN) } returns Unit
@@ -240,14 +243,11 @@ class PushInternalTests {
     @Test
     fun testClearPushToken_shouldRegisterEventOnSdkDistributor_andClear_lastSentPushToken_fromStorage() =
         runTest {
-            everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(
-                MockMode.autofill
-            )
             everySuspend {
-                mockStringStorage.put(
-                    LAST_SENT_PUSH_TOKEN_STORAGE_KEY,
-                    null
-                )
+                mockOperationalEventDistributor.registerOperationalEvent(capture(eventSlot))
+            } returns mockEventWaiter
+            everySuspend {
+                mockStringStorage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, null)
             } returns Unit
 
             pushInternal.clearPushToken()
@@ -261,11 +261,13 @@ class PushInternalTests {
     @Test
     fun testActivate_should_sendCalls_toPushClient() = runTest {
         val eventContainer = Capture.container<OnlineSdkEvent>()
-        every { mockStorage.get(STORE_ID, any<KSerializer<List<Any>>>())} returns expectedCalls
-        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventContainer)) } returns mock(
-            MockMode.autofill
-        )
-
+        every { mockStorage.get(STORE_ID, any<KSerializer<List<Any>>>()) } returns expectedCalls
+        everySuspend {
+            mockSdkEventDistributor.registerEvent(capture(eventContainer))
+        } returns mockEventWaiter
+        everySuspend {
+            mockOperationalEventDistributor.registerOperationalEvent(capture(eventContainer))
+        } returns mockEventWaiter
         val safeStore = createSafeStore()
         val testInternal = createPushInternal(safeStore)
 
@@ -286,6 +288,7 @@ class PushInternalTests {
             mockStringStorage,
             safeStore,
             mockSdkEventDistributor,
+            mockOperationalEventDistributor,
             mockSdkContext,
             mockLogger
         )

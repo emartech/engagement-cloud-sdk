@@ -3,7 +3,7 @@ package com.sap.ec.disable.states
 import com.sap.ec.TestEngagementCloudSDKConfig
 import com.sap.ec.api.push.PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY
 import com.sap.ec.context.SdkContextApi
-import com.sap.ec.core.channel.SdkEventDistributorApi
+import com.sap.ec.core.channel.OperationalEventDistributorApi
 import com.sap.ec.core.channel.SdkEventWaiterApi
 import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.networking.model.UrlRequest
@@ -51,7 +51,7 @@ class ClearPushTokenOnDisableStateTests {
             successResult.copy(result = Result.failure(testException))
     }
 
-    private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
+    private lateinit var mockOperationalEventDistributor: OperationalEventDistributorApi
     private lateinit var mockSdkContext: SdkContextApi
     private lateinit var mockWaiter: SdkEventWaiterApi
     private lateinit var mockStorage: StringStorageApi
@@ -60,7 +60,7 @@ class ClearPushTokenOnDisableStateTests {
 
     @BeforeTest
     fun setup() {
-        mockSdkEventDistributor = mock(MockMode.autofill)
+        mockOperationalEventDistributor = mock(MockMode.autofill)
         mockStorage = mock()
         everySuspend { mockStorage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) } returns "testToken"
         mockSdkContext = mock()
@@ -71,13 +71,13 @@ class ClearPushTokenOnDisableStateTests {
         slot = slot()
         everySuspend { mockWaiter.await<Response>() } returns successResult
         clearPushTokenOnDisableState =
-            ClearPushTokenOnDisableState(mockSdkEventDistributor, mockStorage, mockSdkContext)
+            ClearPushTokenOnDisableState(mockOperationalEventDistributor, mockStorage, mockSdkContext)
     }
 
     @Test
     fun active_shouldRegisterClearPushTokenEvent_without_deletingTokenFromStorage_onSuccess() =
         runTest {
-            everySuspend { mockSdkEventDistributor.registerEvent(capture(slot)) } returns mockWaiter
+            everySuspend { mockOperationalEventDistributor.registerOperationalEvent(capture(slot)) } returns mockWaiter
 
             val result = clearPushTokenOnDisableState.active()
 
@@ -90,7 +90,7 @@ class ClearPushTokenOnDisableStateTests {
     @Test
     fun active_shouldRegisterClearPushTokenEvent_without_deletingTokenFromStorage_onFailure() =
         runTest {
-            everySuspend { mockSdkEventDistributor.registerEvent(capture(slot)) } returns mockWaiter
+            everySuspend { mockOperationalEventDistributor.registerOperationalEvent(capture(slot)) } returns mockWaiter
             everySuspend { mockWaiter.await<Response>() } returns failureResult
 
             val result = clearPushTokenOnDisableState.active()
@@ -108,6 +108,6 @@ class ClearPushTokenOnDisableStateTests {
             val result = clearPushTokenOnDisableState.active()
 
             result.isSuccess shouldBe true
-            verifySuspend(VerifyMode.exactly(0)) { mockSdkEventDistributor.registerEvent(any()) }
+            verifySuspend(VerifyMode.exactly(0)) { mockOperationalEventDistributor.registerOperationalEvent(any()) }
         }
 }

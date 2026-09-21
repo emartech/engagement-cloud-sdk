@@ -4,6 +4,7 @@ import com.sap.ec.TestEngagementCloudSDKConfig
 import com.sap.ec.api.push.PushCall
 import com.sap.ec.api.push.PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY
 import com.sap.ec.context.SdkContextApi
+import com.sap.ec.core.channel.OperationalEventDistributorApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.collections.ThreadSafePersistentStore
 import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
@@ -33,6 +34,7 @@ class JsPushInternalTests {
     private lateinit var mockStorage: StorageApi
     private lateinit var mockSdkContext: SdkContextApi
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
+    private lateinit var mockOperationalEventDistributor: OperationalEventDistributorApi
     private lateinit var mockLogger: Logger
     private lateinit var mockPushService: PushServiceApi
     private lateinit var jsPushInternal: JsPushInternal
@@ -48,6 +50,7 @@ class JsPushInternalTests {
             APPLICATION_CODE
         )
         mockSdkEventDistributor = mock(MockMode.autofill)
+        mockOperationalEventDistributor = mock(MockMode.autofill)
         mockLogger = mock(MockMode.autofill)
         mockPushService = mock(MockMode.autofill)
         jsPushInternal = JsPushInternal(
@@ -55,6 +58,7 @@ class JsPushInternalTests {
             mockSdkContext,
             threadSafePersistentStore,
             mockSdkEventDistributor,
+            mockOperationalEventDistributor,
             mockLogger,
             mockPushService
         )
@@ -68,7 +72,7 @@ class JsPushInternalTests {
         val result = jsPushInternal.unsubscribe()
 
         result.isSuccess shouldBe true
-        verifySuspend { mockSdkEventDistributor.registerEvent(any()) }
+        verifySuspend { mockOperationalEventDistributor.registerOperationalEvent(any()) }
         verifySuspend { mockStringStorage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, null) }
         verifySuspend { mockPushService.unsubscribe() }
     }

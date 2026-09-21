@@ -5,6 +5,7 @@ import com.sap.ec.api.push.PushCall.RegisterPushToken
 import com.sap.ec.api.push.PushConstants.LAST_SENT_PUSH_TOKEN_STORAGE_KEY
 import com.sap.ec.api.push.PushConstants.PUSH_TOKEN_STORAGE_KEY
 import com.sap.ec.context.SdkContextApi
+import com.sap.ec.core.channel.OperationalEventDistributorApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
 import com.sap.ec.core.log.Logger
@@ -18,6 +19,7 @@ internal open class PushInternal(
     private val storage: StringStorageApi,
     private val threadSafePersistentStore: ThreadSafePersistentStoreApi<PushCall>,
     private val sdkEventDistributor: SdkEventDistributorApi,
+    private val operationalEventDistributor: OperationalEventDistributorApi,
     private val sdkContext: SdkContextApi,
     private val sdkLogger: Logger
 ) : PushInstance {
@@ -46,7 +48,11 @@ internal open class PushInternal(
     }
 
     override suspend fun clearPushToken() {
-        sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.ClearPushToken(applicationCode = sdkContext.getSdkConfig()?.applicationCode))
+        operationalEventDistributor.registerOperationalEvent(
+            SdkEvent.Internal.Sdk.ClearPushToken(
+                applicationCode = sdkContext.getSdkConfig()?.applicationCode
+            )
+        )
         storage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, null)
     }
 
@@ -63,7 +69,7 @@ internal open class PushInternal(
                     )
                 )
 
-                is ClearPushToken -> sdkEventDistributor.registerEvent(
+                is ClearPushToken -> operationalEventDistributor.registerOperationalEvent(
                     SdkEvent.Internal.Sdk.ClearPushToken(
                         applicationCode = call.applicationCode
                     )

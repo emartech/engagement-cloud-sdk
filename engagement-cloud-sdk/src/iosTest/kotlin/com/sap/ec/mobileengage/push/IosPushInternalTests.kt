@@ -18,6 +18,7 @@ import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.actions.ActionHandlerApi
 import com.sap.ec.core.actions.badge.BadgeCountHandlerApi
 import com.sap.ec.core.actions.pushtoinapp.PushToInAppHandlerApi
+import com.sap.ec.core.channel.OperationalEventDistributorApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.collections.ThreadSafePersistentStore
 import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
@@ -111,7 +112,6 @@ internal class IosPushInternalTests {
     }
 
     private lateinit var iosPushInternal: IosPushInternal
-
     private lateinit var mockStringStorage: StringStorageApi
     private lateinit var threadSafePersistentStore: ThreadSafePersistentStoreApi<PushCall>
     private lateinit var mockStorage: StorageApi
@@ -122,6 +122,7 @@ internal class IosPushInternalTests {
     private lateinit var json: Json
     private lateinit var sdkDispatcher: CoroutineDispatcher
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
+    private lateinit var mockOperationalEventDistributor: OperationalEventDistributorApi
     private lateinit var mockSdkLogger: Logger
     private lateinit var mockTimestampProvider: InstantProvider
     private lateinit var mockUuidProvider: UuidProviderApi
@@ -151,6 +152,7 @@ internal class IosPushInternalTests {
         mockUuidProvider = mock()
         sdkDispatcher = StandardTestDispatcher()
         mockSdkEventDistributor = mock(MockMode.autofill)
+        mockOperationalEventDistributor = mock(MockMode.autofill)
         mockSdkLogger = mock(MockMode.autofill)
         everySuspend { mockActionHandler.handleActions(any(), any()) } returns Unit
         everySuspend { mockTimestampProvider.provide() } returns Instant.DISTANT_PAST
@@ -167,6 +169,7 @@ internal class IosPushInternalTests {
             sdkDispatcher,
             mockSdkLogger,
             mockSdkEventDistributor,
+            mockOperationalEventDistributor,
             mockUuidProvider
         )
 
@@ -565,6 +568,9 @@ internal class IosPushInternalTests {
         everySuspend { mockSdkEventDistributor.registerEvent(capture(eventContainer)) } returns mock(
             MockMode.autofill
         )
+        everySuspend { mockOperationalEventDistributor.registerOperationalEvent(capture(eventContainer)) } returns mock(
+            MockMode.autofill
+        )
         everySuspend { mockBadgeCountHandler.handle(any()) } returns Unit
         val safeStore = ThreadSafePersistentStore(STORE_ID, mockStorage, PushCall.serializer())
         val testInternal = IosPushInternal(
@@ -578,6 +584,7 @@ internal class IosPushInternalTests {
             sdkDispatcher,
             mockSdkLogger,
             mockSdkEventDistributor,
+            mockOperationalEventDistributor,
             mockUuidProvider
         )
 
@@ -921,6 +928,7 @@ internal class IosPushInternalTests {
                 sdkDispatcher,
                 mockSdkLogger,
                 mockSdkEventDistributor,
+                mockOperationalEventDistributor,
                 mockUuidProvider
             )
 

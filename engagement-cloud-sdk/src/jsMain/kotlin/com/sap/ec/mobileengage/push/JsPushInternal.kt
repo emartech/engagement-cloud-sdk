@@ -5,6 +5,7 @@ import com.sap.ec.api.push.PushCall.ClearPushToken
 import com.sap.ec.api.push.PushCall.RegisterPushToken
 import com.sap.ec.api.push.PushInternal
 import com.sap.ec.context.SdkContextApi
+import com.sap.ec.core.channel.OperationalEventDistributorApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
 import com.sap.ec.core.device.notification.PermissionState
@@ -17,10 +18,17 @@ internal class JsPushInternal(
     sdkContext: SdkContextApi,
     private val threadSafePersistentStore: ThreadSafePersistentStoreApi<PushCall>,
     sdkEventDistributor: SdkEventDistributorApi,
+    operationalEventDistributor: OperationalEventDistributorApi,
     private val sdkLogger: Logger,
     private val pushService: PushServiceApi,
-) : PushInternal(storage, threadSafePersistentStore, sdkEventDistributor, sdkContext, sdkLogger),
-    JsPushInstance {
+) : PushInternal(
+    storage,
+    threadSafePersistentStore,
+    sdkEventDistributor,
+    operationalEventDistributor,
+    sdkContext,
+    sdkLogger
+), JsPushInstance {
 
     override suspend fun subscribe(): Result<Unit> {
         return pushService.subscribe().mapCatching {

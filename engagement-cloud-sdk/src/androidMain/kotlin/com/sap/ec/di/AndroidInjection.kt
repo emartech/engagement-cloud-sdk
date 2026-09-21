@@ -360,6 +360,7 @@ internal object AndroidInjection {
                 storage = get(),
                 threadSafePersistentStore = get(named(ThreadSafePersistentStoreTypes.PushCall)),
                 sdkEventDistributor = get(),
+                operationalEventDistributor = get(),
                 sdkContext = get(),
                 sdkLogger = get { parametersOf(PushInternal::class.simpleName) }
             )

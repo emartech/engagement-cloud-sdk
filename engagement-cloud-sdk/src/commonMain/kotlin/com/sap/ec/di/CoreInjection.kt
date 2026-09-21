@@ -7,6 +7,8 @@ import com.sap.ec.context.DefaultUrlsApi
 import com.sap.ec.context.Features
 import com.sap.ec.context.SdkContext
 import com.sap.ec.context.SdkContextApi
+import com.sap.ec.core.channel.OperationalEventDistributor
+import com.sap.ec.core.channel.OperationalEventDistributorApi
 import com.sap.ec.core.channel.SdkEventDistributor
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.channel.SdkEventEmitterApi
@@ -144,6 +146,12 @@ internal object CoreInjection {
             SdkEventEmitterApi::class,
             SdkEventManagerApi::class
         )
+        single<OperationalEventDistributorApi> {
+            OperationalEventDistributor(
+                sdkEventDistributor = get(),
+                urlFactory = get()
+            )
+        }
         single<SetupApi> {
             Setup(
                 get(),
