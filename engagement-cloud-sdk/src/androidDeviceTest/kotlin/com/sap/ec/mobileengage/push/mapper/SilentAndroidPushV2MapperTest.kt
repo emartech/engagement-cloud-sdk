@@ -24,6 +24,7 @@ import org.junit.Test
 class SilentAndroidPushV2MapperTest {
     private companion object {
         const val REPORTING = """{"reportingKey":"reportingValue"}"""
+        const val DEFAULT_REPORTING = """{"defaultReportingKey":"defaultReportingValue"}"""
     }
 
     private lateinit var mapper: SilentAndroidPushV2Mapper
@@ -54,6 +55,7 @@ class SilentAndroidPushV2MapperTest {
             }.toString())
             put("notification.channelId", "channelId")
             put("notification.collapseId", "collapseKey")
+            put("notification.reporting", DEFAULT_REPORTING)
             put("notification.operation", "INIT")
             put("notification.style", "BIG_TEXT")
             put("notification.badgeCount", buildJsonObject {
@@ -73,6 +75,7 @@ class SilentAndroidPushV2MapperTest {
         }
         val expected = SilentAndroidPushMessage(
             trackingInfo = """{"trackingInfoKey":"trackingInfoValue"}""",
+            reporting = DEFAULT_REPORTING,
             platformData = AndroidPlatformData(
                 channelId = "channelId",
                 notificationMethod = NotificationMethod(

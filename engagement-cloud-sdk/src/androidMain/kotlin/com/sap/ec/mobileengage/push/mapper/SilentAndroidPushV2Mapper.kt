@@ -1,6 +1,7 @@
 package com.sap.ec.mobileengage.push.mapper
 
 import com.sap.ec.api.event.model.EventSource
+import com.sap.ec.api.push.PushConstants
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.mapper.Mapper
 import com.sap.ec.mobileengage.action.models.BasicActionModel
@@ -31,6 +32,7 @@ internal class SilentAndroidPushV2Mapper(
         private const val OPERATION = "notification.operation"
         private const val ACTIONS = "notification.actions"
         private const val BADGE_COUNT = "notification.badgeCount"
+        private const val REPORTING = "notification.reporting"
         private const val EMS = "ems"
         private const val TRACKING_INFO = "trackingInfo"
     }
@@ -46,6 +48,7 @@ internal class SilentAndroidPushV2Mapper(
 
             SilentAndroidPushMessage(
                 trackingInfo = ems.getValue(TRACKING_INFO).jsonPrimitive.content,
+                reporting = from[REPORTING].getStringOrDefault(PushConstants.PUSH_DEFAULT_REPORTING),
                 platformData = AndroidPlatformData(
                     channelId = from[CHANNEL_ID]?.jsonPrimitive?.contentOrNull
                         ?: DEFAULT_CHANNEL_ID,

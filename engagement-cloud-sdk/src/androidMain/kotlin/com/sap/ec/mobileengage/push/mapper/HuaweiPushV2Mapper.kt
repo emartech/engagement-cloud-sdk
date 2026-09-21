@@ -1,6 +1,7 @@
 package com.sap.ec.mobileengage.push.mapper
 
 import com.sap.ec.api.event.model.EventSource
+import com.sap.ec.api.push.PushConstants.PUSH_DEFAULT_REPORTING
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.mapper.Mapper
 import com.sap.ec.core.providers.UuidProviderApi
@@ -45,6 +46,7 @@ internal class HuaweiPushV2Mapper(
         const val EMS = "ems"
         const val NOTIFICATION = "notification"
         const val TRACKING_INFO = "trackingInfo"
+        const val REPORTING = "reporting"
         const val CHANNEL_ID = "channelId"
         const val COLLAPSE_ID = "collapseId"
         const val OPERATION = "operation"
@@ -74,9 +76,11 @@ internal class HuaweiPushV2Mapper(
             val actionableData = ActionableData(actions, defaultTapAction)
 
             val trackingInfo = emsObject[TRACKING_INFO]?.jsonPrimitive?.contentOrNull ?: "{}"
+            val reporting = notificationObject[REPORTING]?.jsonPrimitive?.contentOrNull ?: PUSH_DEFAULT_REPORTING
 
             AndroidPushMessage(
                 trackingInfo = trackingInfo,
+                reporting = reporting,
                 platformData = AndroidPlatformData(
                     channelId = notificationObject[CHANNEL_ID].getStringOrDefault(DEFAULT_CHANNEL_ID),
                     NotificationMethod(

@@ -51,6 +51,7 @@ class NotificationIntentProcessorTests {
     private companion object {
         val PAYLOAD = mapOf("testKey" to "testValue")
         const val REPORTING = "{\"someKey\":\"someValue\"}"
+        const val DEFAULT_REPORTING = """{"defaultReportingKey":"defaultReportingValue"}"""
         const val TITLE = "testTitle"
         const val ID = "testId"
         const val NAME = "testName"
@@ -128,7 +129,7 @@ class NotificationIntentProcessorTests {
             coEvery {
                 mockActionFactory.create(
                     NotificationOpenedActionModel(
-                        null,
+                        DEFAULT_REPORTING,
                         TRACKING_INFO
                     )
                 )
@@ -394,6 +395,7 @@ class NotificationIntentProcessorTests {
     ): String {
         val jsonMessage = buildJsonObject {
             put("trackingInfo", """{"trackingInfoKey":"trackingInfoValue"}""")
+            put("reporting", """{"defaultReportingKey":"defaultReportingValue"}""")
             put("platformData", buildJsonObject {
                 put("channelId", "testChannelId")
                 put("notificationMethod", buildJsonObject {

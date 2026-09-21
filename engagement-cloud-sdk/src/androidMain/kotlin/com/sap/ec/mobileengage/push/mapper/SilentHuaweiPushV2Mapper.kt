@@ -1,6 +1,7 @@
 package com.sap.ec.mobileengage.push.mapper
 
 import com.sap.ec.api.event.model.EventSource
+import com.sap.ec.api.push.PushConstants
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.mapper.Mapper
 import com.sap.ec.core.providers.UuidProviderApi
@@ -37,6 +38,7 @@ internal class SilentHuaweiPushV2Mapper(
         const val EMS = "ems"
         const val NOTIFICATION = "notification"
         const val TRACKING_INFO = "trackingInfo"
+        const val REPORTING = "reporting"
         const val CHANNEL_ID = "channelId"
         const val COLLAPSE_ID = "collapseId"
         const val OPERATION = "operation"
@@ -54,14 +56,20 @@ internal class SilentHuaweiPushV2Mapper(
                 ?: throw Exception("notification object missing from push payload: $from")
 
             val actions: List<BasicActionModel>? =
-                notificationObject[ACTIONS]?.jsonArray?.let { json.decodeFromJsonElement<List<BasicActionModel>>(it) }
+                notificationObject[ACTIONS]?.jsonArray?.let {
+                    json.decodeFromJsonElement<List<BasicActionModel>>(
+                        it
+                    )
+                }
                     ?.addAppEventSource(EventSource.Push)
             val actionableData = ActionableData(actions)
 
             val trackingInfo = emsObject[TRACKING_INFO]?.jsonPrimitive?.contentOrNull ?: "{}"
+            val reporting = notificationObject[REPORTING].getStringOrDefault(PushConstants.PUSH_DEFAULT_REPORTING)
 
             SilentAndroidPushMessage(
                 trackingInfo = trackingInfo,
+                reporting = reporting,
                 platformData = AndroidPlatformData(
                     channelId = notificationObject[CHANNEL_ID].getStringOrDefault(DEFAULT_CHANNEL_ID),
                     notificationMethod = NotificationMethod(

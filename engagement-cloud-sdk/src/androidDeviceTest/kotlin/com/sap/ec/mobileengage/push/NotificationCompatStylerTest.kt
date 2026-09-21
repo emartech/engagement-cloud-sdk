@@ -176,6 +176,7 @@ class NotificationCompatStylerTest {
         imageUrlString: String? = null
     ) = AndroidPushMessage(
         trackingInfo = """{"trackingInfoKey":"trackingInfoValue"}""",
+        reporting = """{"defaultReportingKey":"defaultReportingValue"}""",
         platformData = AndroidPlatformData(
             channelId = CHANNEL_ID,
             notificationMethod = NotificationMethod("collapseId", NotificationOperation.INIT),
