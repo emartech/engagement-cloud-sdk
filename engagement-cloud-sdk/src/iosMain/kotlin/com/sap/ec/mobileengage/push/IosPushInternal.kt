@@ -249,8 +249,13 @@ internal class IosPushInternal(
                     )
                 }
 
-                is BasicActionModel, null -> NotificationOpenedActionModel(
-                    actionModel?.reporting,
+                is BasicActionModel -> NotificationOpenedActionModel(
+                    actionModel.reporting,
+                    pushUserInfo.ems.trackingInfo
+                )
+
+                null -> NotificationOpenedActionModel(
+                    pushUserInfo.notification.reporting,
                     pushUserInfo.ems.trackingInfo
                 )
 
