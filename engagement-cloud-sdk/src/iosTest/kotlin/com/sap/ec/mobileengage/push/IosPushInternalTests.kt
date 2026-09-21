@@ -86,6 +86,7 @@ internal class IosPushInternalTests {
         const val TRACKING_INFO = """{"trackingInfo":"testTrackingInfo"}"""
         const val REPORTING = """{"id":"testId"}"""
         const val REPORTING2 = """{"id":"testId2"}"""
+        const val DEFAULT_REPORTING = """{"defaultReportingKey":"defaultReportingValue"}"""
         val REGISTER_PUSH_TOKEN = RegisterPushToken(PUSH_TOKEN)
         val CLEAR_PUSH_TOKEN = ClearPushToken(TEST_APPLICATION_CODE)
         val HANDLE_SILENT_MESSAGE_WITH_USER_INFO = HandleSilentMessageWithUserInfo(
@@ -97,7 +98,8 @@ internal class IosPushInternalTests {
                 notification = SilentNotification(
                     silent = true,
                     actions = emptyList(),
-                    badgeCount = BadgeCount(SET, 42)
+                    badgeCount = BadgeCount(SET, 42),
+                    reporting = DEFAULT_REPORTING
                 )
             )
         )
@@ -309,7 +311,7 @@ internal class IosPushInternalTests {
         everySuspend {
             mockActionFactory.create(
                 NotificationOpenedActionModel(
-                    null,
+                    DEFAULT_REPORTING,
                     TRACKING_INFO
                 )
             )
@@ -441,7 +443,7 @@ internal class IosPushInternalTests {
             )
 
             val notificationOpenedActionModel = NotificationOpenedActionModel(
-                null,
+                DEFAULT_REPORTING,
                 TRACKING_INFO
             )
 
@@ -479,7 +481,8 @@ internal class IosPushInternalTests {
                     actions = listOf(
                         appEventActionModel,
                         openExternalUrlActionModel
-                    )
+                    ),
+                    reporting = DEFAULT_REPORTING
                 ),
             )
 
@@ -509,7 +512,8 @@ internal class IosPushInternalTests {
             notification = SilentNotification(
                 silent = true,
                 actions = emptyList(),
-                badgeCount = expectedBadgeCount
+                badgeCount = expectedBadgeCount,
+                reporting = DEFAULT_REPORTING
             ),
         )
         everySuspend { mockSdkEventDistributor.registerPublicEvent(any()) }
@@ -538,7 +542,8 @@ internal class IosPushInternalTests {
             notification = SilentNotification(
                 actions = listOf(
                     openExternalUrlActionModel
-                )
+                ),
+                reporting = DEFAULT_REPORTING
             ),
         )
         everySuspend { mockActionFactory.create(openExternalUrlActionModel) } returns mockOpenExternalUrlAction
@@ -605,6 +610,7 @@ internal class IosPushInternalTests {
                 )
             )
             put("notification", buildMap {
+                put("reporting", DEFAULT_REPORTING)
                 defaultAction?.let { put("defaultAction", it) }
                 actions?.let { put("actions", it) }
                 badgeCount?.let { put("badgeCount", it) }
@@ -1098,7 +1104,8 @@ internal class IosPushInternalTests {
             actions = actions
         )
 
-        val notificationOpenedActionModel = NotificationOpenedActionModel(null, TRACKING_INFO)
+        val notificationOpenedActionModel =
+            NotificationOpenedActionModel(DEFAULT_REPORTING, TRACKING_INFO)
         val reportingAction =
             ReportingAction(notificationOpenedActionModel, mock(MockMode.autoUnit))
         everySuspend { mockActionFactory.create(notificationOpenedActionModel) } returns reportingAction
