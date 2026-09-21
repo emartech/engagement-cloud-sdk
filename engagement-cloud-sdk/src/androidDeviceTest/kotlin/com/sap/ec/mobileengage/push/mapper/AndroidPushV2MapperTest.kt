@@ -35,6 +35,7 @@ class AndroidPushV2MapperTest {
         const val UUID = "testUUID"
         const val TRACKING_INFO = """{"trackingInfoKey":"trackingInfoValue"}"""
         const val REPORTING = """{"reportingKey":"reportingValue"}"""
+        const val DEFAULT_REPORTING = """{"defaultReportingKey":"defaultReportingValue"}"""
         const val ID = "testId"
     }
 
@@ -104,6 +105,7 @@ class AndroidPushV2MapperTest {
         )
     ): AndroidPushMessage = AndroidPushMessage(
         trackingInfo = TRACKING_INFO,
+        reporting = DEFAULT_REPORTING,
         platformData = AndroidPlatformData(
             channelId = "channelId",
             notificationMethod = NotificationMethod(
@@ -135,7 +137,8 @@ class AndroidPushV2MapperTest {
                     source = EventSource.Push
                 )
             ),
-            defaultTapAction = defaultActionModel)
+            defaultTapAction = defaultActionModel
+        )
     )
 
     private fun createTestJson(
@@ -152,6 +155,7 @@ class AndroidPushV2MapperTest {
             put("ems.version", "version")
             put("ems.trackingInfo", TRACKING_INFO)
             put("notification.channelId", "channelId")
+            put("notification.reporting", DEFAULT_REPORTING)
             put("notification.collapseId", "collapseKey")
             put("notification.operation", "init")
             put("notification.style", "BIG_TEXT")

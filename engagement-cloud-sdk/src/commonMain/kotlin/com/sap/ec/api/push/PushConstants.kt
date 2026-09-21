@@ -18,4 +18,5 @@ object PushConstants {
     const val WEB_PUSH_ON_NOTIFICATION_CLICKED_CHANNEL_NAME = "sap-sdk-on-notification-clicked-channel"
     const val WEB_PUSH_ON_BADGE_COUNT_UPDATE_RECEIVED = "sap-sdk-on-badge-count-update-received"
     const val WEB_PUSH_SDK_READY_CHANNEL_NAME = "sap-sdk-sdk-ready-channel"
+    const val PUSH_DEFAULT_REPORTING = "{ \"id\": \"defaultReportingId\" }"
 }

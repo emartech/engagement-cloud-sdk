@@ -36,6 +36,7 @@ class PushMessageHandlerTest {
         const val CHANNEL_ID = "testChannelId"
         const val TRACKING_INFO = """{"trackingInfoKey":"trackingInfoValue"}"""
         const val REPORTING = """{"key":"value"}"""
+        const val DEFAULT_REPORTING = """{"defaultReportingKey":"defaultReportingValue"}"""
 
         val testOpenExternalUrlBasicAction =
             BasicOpenExternalUrlActionModel(
@@ -118,7 +119,10 @@ class PushMessageHandlerTest {
         val tesMethod = NotificationMethod(COLLAPSE_ID, INIT)
         return SilentAndroidPushMessage(
             TRACKING_INFO,
-            AndroidPlatformData(CHANNEL_ID, tesMethod),
+            DEFAULT_REPORTING,
+            AndroidPlatformData(
+                CHANNEL_ID, tesMethod
+            ),
             badgeCount,
             ActionableData(
                 actions = actions

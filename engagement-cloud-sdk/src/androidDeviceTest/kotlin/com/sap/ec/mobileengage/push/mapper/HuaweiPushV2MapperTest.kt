@@ -43,6 +43,7 @@ class HuaweiPushV2MapperTest {
         const val UUID = "testUUID"
         const val TRACKING_INFO = """{"trackingInfoKey":"trackingInfoValue"}"""
         const val REPORTING = """{"reportingKey":"reportingValue"}"""
+        const val DEFAULT_REPORTING = """{"defaultReportingKey":"defaultReportingValue"}"""
         const val ID = "testId"
         const val CHANNEL_ID = "testChannelId"
         const val COLLAPSE_ID = "testCollapseId"
@@ -170,7 +171,8 @@ class HuaweiPushV2MapperTest {
 
 
         val expectedOutput = AndroidPushMessage(
-            TRACKING_INFO,
+            trackingInfo = TRACKING_INFO,
+            reporting = DEFAULT_REPORTING,
             platformData,
             badgeCount,
             displayableData,
@@ -193,6 +195,7 @@ class HuaweiPushV2MapperTest {
                 put("style", "MESSAGE")
                 put("collapseId", COLLAPSE_ID)
                 put("channelId", CHANNEL_ID)
+                put("reporting", DEFAULT_REPORTING)
                 put("operation", "init")
                 put("defaultAction", buildJsonObject {
                     put("type", "MECustomEvent")
