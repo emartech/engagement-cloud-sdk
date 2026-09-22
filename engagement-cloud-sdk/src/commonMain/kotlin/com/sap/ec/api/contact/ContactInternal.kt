@@ -57,7 +57,7 @@ internal class ContactInternal(
     override suspend fun unlink() {
         sdkLogger.debug("unlink")
         if (requestContext.isContactLinked ?: false) {
-            operationalEventDistributor.registerOperationalEvent(SdkEvent.Internal.Sdk.UnlinkContact(applicationCode = sdkContext.getSdkConfig()?.applicationCode))
+            operationalEventDistributor.registerEvent(SdkEvent.Internal.Sdk.UnlinkContact(applicationCode = sdkContext.getSdkConfig()?.applicationCode))
         }
     }
 
@@ -77,7 +77,7 @@ internal class ContactInternal(
                     )
                 )
 
-                is UnlinkContact -> operationalEventDistributor.registerOperationalEvent(
+                is UnlinkContact -> operationalEventDistributor.registerEvent(
                     SdkEvent.Internal.Sdk.UnlinkContact(applicationCode = it.applicationCode)
                 )
             }

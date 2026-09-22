@@ -22,7 +22,7 @@ internal class UnlinkContactState(
     override suspend fun active(): Result<Unit> {
         sdkLogger.debug("Register UnlinkContact event.")
         return if (requestContext.isContactLinked ?: false) {
-            operationalEventDistributor.registerOperationalEvent(SdkEvent.Internal.Sdk.UnlinkContact(applicationCode = sdkContext.getSdkConfig()?.applicationCode))
+            operationalEventDistributor.registerEvent(SdkEvent.Internal.Sdk.UnlinkContact(applicationCode = sdkContext.getSdkConfig()?.applicationCode))
                 .await<Response>().mapToUnitOrFailure()
         } else {
             Result.success(Unit)

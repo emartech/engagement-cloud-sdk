@@ -72,7 +72,7 @@ class JsPushInternalTests {
         val result = jsPushInternal.unsubscribe()
 
         result.isSuccess shouldBe true
-        verifySuspend { mockOperationalEventDistributor.registerOperationalEvent(any()) }
+        verifySuspend { mockOperationalEventDistributor.registerEvent(any()) }
         verifySuspend { mockStringStorage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, null) }
         verifySuspend { mockPushService.unsubscribe() }
     }

@@ -67,7 +67,7 @@ class ContactInternalTests {
         mockSdkEventDistributor = mock(MockMode.autofill)
         everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(MockMode.autofill)
         mockOperationalEventDistributor = mock(MockMode.autofill)
-        everySuspend { mockOperationalEventDistributor.registerOperationalEvent(capture(eventSlot)) } returns mock(MockMode.autofill)
+        everySuspend { mockOperationalEventDistributor.registerEvent(capture(eventSlot)) } returns mock(MockMode.autofill)
         threadSafePersistentStore = createThreadSafeStore()
         contactInternal = createContactInternal()
     }
@@ -165,7 +165,7 @@ class ContactInternalTests {
         testInternal.activate()
 
         verifySuspend(VerifyMode.exactly(2)) { mockSdkEventDistributor.registerEvent(any()) }
-        verifySuspend(VerifyMode.exactly(1)) { mockOperationalEventDistributor.registerOperationalEvent(any()) }
+        verifySuspend(VerifyMode.exactly(1)) { mockOperationalEventDistributor.registerEvent(any()) }
     }
 
     private fun createContactInternal(persistentStore: ThreadSafePersistentStoreApi<ContactCall> = threadSafePersistentStore): ContactInternal =

@@ -44,7 +44,7 @@ class ApplyGlobalRemoteConfigStateTests {
 
     @Test
     fun testActive_should_handleGlobal_with_remoteConfigHandler() = runTest {
-        everySuspend { mockOperationalEventDistributor.registerOperationalEvent(capture(eventSlot)) } returns mock(
+        everySuspend { mockOperationalEventDistributor.registerEvent(capture(eventSlot)) } returns mock(
             MockMode.autofill
         )
 

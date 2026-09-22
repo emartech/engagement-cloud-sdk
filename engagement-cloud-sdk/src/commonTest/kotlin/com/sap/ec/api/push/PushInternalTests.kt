@@ -244,7 +244,7 @@ class PushInternalTests {
     fun testClearPushToken_shouldRegisterEventOnSdkDistributor_andClear_lastSentPushToken_fromStorage() =
         runTest {
             everySuspend {
-                mockOperationalEventDistributor.registerOperationalEvent(capture(eventSlot))
+                mockOperationalEventDistributor.registerEvent(capture(eventSlot))
             } returns mockEventWaiter
             everySuspend {
                 mockStringStorage.put(LAST_SENT_PUSH_TOKEN_STORAGE_KEY, null)
@@ -266,7 +266,7 @@ class PushInternalTests {
             mockSdkEventDistributor.registerEvent(capture(eventContainer))
         } returns mockEventWaiter
         everySuspend {
-            mockOperationalEventDistributor.registerOperationalEvent(capture(eventContainer))
+            mockOperationalEventDistributor.registerEvent(capture(eventContainer))
         } returns mockEventWaiter
         val safeStore = createSafeStore()
         val testInternal = createPushInternal(safeStore)

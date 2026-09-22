@@ -68,7 +68,7 @@ class UnlinkContactStateTests {
         mockRequestContext = mock(MockMode.autofill)
         mockOperationalEventDistributor = mock(MockMode.autofill)
         eventSlot = slot()
-        everySuspend { mockOperationalEventDistributor.registerOperationalEvent(capture(eventSlot)) } returns mockSdkEventWaiter
+        everySuspend { mockOperationalEventDistributor.registerEvent(capture(eventSlot)) } returns mockSdkEventWaiter
         unlinkContactState = UnlinkContactState(
             mockOperationalEventDistributor,
             mockRequestContext,
@@ -97,7 +97,7 @@ class UnlinkContactStateTests {
 
             val result = unlinkContactState.active()
 
-            verifySuspend(VerifyMode.exactly(0)) { mockOperationalEventDistributor.registerOperationalEvent(any()) }
+            verifySuspend(VerifyMode.exactly(0)) { mockOperationalEventDistributor.registerEvent(any()) }
             eventSlot.isAbsent shouldBe true
 
             result shouldBe Result.success(Unit)

@@ -12,7 +12,7 @@ internal class OperationalEventDistributor(
     private val urlFactory: UrlFactoryApi
 ) : OperationalEventDistributorApi {
 
-    override suspend fun registerOperationalEvent(sdkEvent: OperationalEvent): SdkEventWaiterApi {
+    override suspend fun registerEvent(sdkEvent: OperationalEvent): SdkEventWaiterApi {
         val event = when (sdkEvent) {
             is ClearPushToken -> sdkEvent.applicationCode?.let { ECUrlType.ClearPushToken(it) }
             is UnlinkContact -> sdkEvent.applicationCode?.let { ECUrlType.UnlinkContact(it) }

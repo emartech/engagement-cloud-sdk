@@ -568,7 +568,7 @@ internal class IosPushInternalTests {
         everySuspend { mockSdkEventDistributor.registerEvent(capture(eventContainer)) } returns mock(
             MockMode.autofill
         )
-        everySuspend { mockOperationalEventDistributor.registerOperationalEvent(capture(eventContainer)) } returns mock(
+        everySuspend { mockOperationalEventDistributor.registerEvent(capture(eventContainer)) } returns mock(
             MockMode.autofill
         )
         everySuspend { mockBadgeCountHandler.handle(any()) } returns Unit

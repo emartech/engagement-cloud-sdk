@@ -141,7 +141,7 @@ internal class IosPushInternal(
                     SdkEvent.Internal.Sdk.RegisterPushToken(pushToken = call.pushToken)
                 )
 
-                is ClearPushToken -> operationalEventDistributor.registerOperationalEvent(
+                is ClearPushToken -> operationalEventDistributor.registerEvent(
                     SdkEvent.Internal.Sdk.ClearPushToken(
                         applicationCode = call.applicationCode
                     )

@@ -77,7 +77,7 @@ class ClearPushTokenOnDisableStateTests {
     @Test
     fun active_shouldRegisterClearPushTokenEvent_without_deletingTokenFromStorage_onSuccess() =
         runTest {
-            everySuspend { mockOperationalEventDistributor.registerOperationalEvent(capture(slot)) } returns mockWaiter
+            everySuspend { mockOperationalEventDistributor.registerEvent(capture(slot)) } returns mockWaiter
 
             val result = clearPushTokenOnDisableState.active()
 
@@ -90,7 +90,7 @@ class ClearPushTokenOnDisableStateTests {
     @Test
     fun active_shouldRegisterClearPushTokenEvent_without_deletingTokenFromStorage_onFailure() =
         runTest {
-            everySuspend { mockOperationalEventDistributor.registerOperationalEvent(capture(slot)) } returns mockWaiter
+            everySuspend { mockOperationalEventDistributor.registerEvent(capture(slot)) } returns mockWaiter
             everySuspend { mockWaiter.await<Response>() } returns failureResult
 
             val result = clearPushTokenOnDisableState.active()
@@ -108,6 +108,6 @@ class ClearPushTokenOnDisableStateTests {
             val result = clearPushTokenOnDisableState.active()
 
             result.isSuccess shouldBe true
-            verifySuspend(VerifyMode.exactly(0)) { mockOperationalEventDistributor.registerOperationalEvent(any()) }
+            verifySuspend(VerifyMode.exactly(0)) { mockOperationalEventDistributor.registerEvent(any()) }
         }
 }

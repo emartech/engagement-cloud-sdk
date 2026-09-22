@@ -48,7 +48,7 @@ internal open class PushInternal(
     }
 
     override suspend fun clearPushToken() {
-        operationalEventDistributor.registerOperationalEvent(
+        operationalEventDistributor.registerEvent(
             SdkEvent.Internal.Sdk.ClearPushToken(
                 applicationCode = sdkContext.getSdkConfig()?.applicationCode
             )
@@ -69,7 +69,7 @@ internal open class PushInternal(
                     )
                 )
 
-                is ClearPushToken -> operationalEventDistributor.registerOperationalEvent(
+                is ClearPushToken -> operationalEventDistributor.registerEvent(
                     SdkEvent.Internal.Sdk.ClearPushToken(
                         applicationCode = call.applicationCode
                     )

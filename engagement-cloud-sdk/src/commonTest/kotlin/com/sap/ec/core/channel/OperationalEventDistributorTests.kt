@@ -69,16 +69,16 @@ class OperationalEventDistributorTests {
         runTest {
             val expectedUrl = "$CLIENT_SERVICE_URL/v4/apps/$APP_CODE/client/push-token"
 
-            operationalEventDistributor.registerOperationalEvent(testEvent)
+            operationalEventDistributor.registerEvent(testEvent)
 
             verifySuspend { mockSdkEventDistributor.registerEvent(any()) }
             eventSlot.get().targetUrl.toString().endsWith(expectedUrl) shouldBe true
         }
 
     @Test
-    fun registerOperationalEvent_shouldReturn_eventWaiter_fromSdkEventDistributor() =
+    fun registerEvent_shouldReturn_eventWaiter_fromSdkEventDistributor() =
         runTest {
-            val result = operationalEventDistributor.registerOperationalEvent(testEvent)
+            val result = operationalEventDistributor.registerEvent(testEvent)
 
             result shouldBe mockEventWaiter
         }
@@ -87,7 +87,7 @@ class OperationalEventDistributorTests {
     fun registerOperationalEvent_shouldCallRegisterEvent_onSdkEventDistributor_withOriginalEvent_ifApplicationCode_isNull() =
         runTest {
             val unlinkContactEvent = UnlinkContact(applicationCode = null)
-            operationalEventDistributor.registerOperationalEvent(unlinkContactEvent)
+            operationalEventDistributor.registerEvent(unlinkContactEvent)
 
             verifySuspend {
                 mockSdkEventDistributor.registerEvent(unlinkContactEvent)
@@ -95,16 +95,16 @@ class OperationalEventDistributorTests {
         }
 
     @Test
-    fun registerOperationalEvent_shouldCallCreate_onUrlFactory() = runTest {
-        operationalEventDistributor.registerOperationalEvent(testEvent)
+    fun registerEvent_shouldCallCreate_onUrlFactory() = runTest {
+        operationalEventDistributor.registerEvent(testEvent)
 
         verifySuspend { urlFactorySpy.create(ECUrlType.ClearPushToken(APP_CODE)) }
     }
 
     @Test
-    fun registerOperationalEvent_shouldNotCallCreate_onUrlFactory_ifApplicationCode_isNull() =
+    fun registerEvent_shouldNotCallCreate_onUrlFactory_ifApplicationCode_isNull() =
         runTest {
-            operationalEventDistributor.registerOperationalEvent(ApplyGlobalRemoteConfig())
+            operationalEventDistributor.registerEvent(ApplyGlobalRemoteConfig())
 
             verifySuspend(VerifyMode.exactly(0)) {
                 urlFactorySpy.create(ECUrlType.ClearPushToken(APP_CODE))

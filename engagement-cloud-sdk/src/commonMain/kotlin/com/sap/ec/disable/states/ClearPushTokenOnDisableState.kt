@@ -26,7 +26,7 @@ internal class ClearPushTokenOnDisableState(
         if (storage.get(LAST_SENT_PUSH_TOKEN_STORAGE_KEY) == null) {
             return Result.success(Unit)
         }
-        return operationalEventDistributor.registerOperationalEvent(
+        return operationalEventDistributor.registerEvent(
             SdkEvent.Internal.Sdk.ClearPushToken(applicationCode = sdkContext.getSdkConfig()?.applicationCode)
         ).await<Response>()
             .mapToUnitOrFailure()

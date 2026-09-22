@@ -19,7 +19,7 @@ internal class ApplyGlobalRemoteConfigState(
 
     override suspend fun active(): Result<Unit> {
         sdkLogger.debug("Applying global remote config")
-        operationalEventDistributor.registerOperationalEvent(SdkEvent.Internal.Sdk.ApplyGlobalRemoteConfig())
+        operationalEventDistributor.registerEvent(SdkEvent.Internal.Sdk.ApplyGlobalRemoteConfig())
         return Result.success(Unit)
     }
 

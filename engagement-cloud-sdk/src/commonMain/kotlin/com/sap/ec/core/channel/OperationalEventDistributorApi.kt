@@ -4,5 +4,5 @@ import com.sap.ec.event.SdkEvent.Internal.OperationalEvent
 
 interface OperationalEventDistributorApi {
 
-    suspend fun registerOperationalEvent(sdkEvent: OperationalEvent): SdkEventWaiterApi
+    suspend fun registerEvent(sdkEvent: OperationalEvent): SdkEventWaiterApi
 }
