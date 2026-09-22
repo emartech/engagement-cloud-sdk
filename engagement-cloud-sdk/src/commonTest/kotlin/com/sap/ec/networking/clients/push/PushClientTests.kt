@@ -3,6 +3,7 @@ package com.sap.ec.networking.clients.push
 import com.sap.ec.context.DefaultUrlsApi
 import com.sap.ec.core.channel.SdkEventManagerApi
 import com.sap.ec.core.db.events.EventsDaoApi
+import com.sap.ec.core.exceptions.SdkException
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.clients.NetworkClientApi
 import com.sap.ec.core.networking.model.Response
@@ -160,7 +161,8 @@ class PushClientTests {
         val clearPushTokenEvent = SdkEvent.Internal.Sdk.ClearPushToken(
             ID,
             TIMESTAMP,
-            applicationCode = TEST_APPLICATION_CODE
+            applicationCode = TEST_APPLICATION_CODE,
+            targetUrl = URL
         )
 
         val onlineSdkEvents = backgroundScope.async {
@@ -190,10 +192,10 @@ class PushClientTests {
         val testException = IOException("Network error")
 
         everySuspend { mockEmarsysClient.send(any()) } returns Result.failure(testException)
-        val clearPushTokenEvent = SdkEvent.Internal.Sdk.ClearPushToken(
+        val clearPushTokenEvent = SdkEvent.Internal.Sdk.RegisterPushToken(
             ID,
             TIMESTAMP,
-            applicationCode = TEST_APPLICATION_CODE
+            pushToken = TEST_PUSH_TOKEN
         )
         everySuspend { mockSdkEventManager.emitEvent(clearPushTokenEvent) } returns Unit
 
@@ -231,10 +233,10 @@ class PushClientTests {
 
         val testException = Exception("Test exception")
         val clearPushTokenEvent =
-            SdkEvent.Internal.Sdk.ClearPushToken(
+            SdkEvent.Internal.Sdk.RegisterPushToken(
                 ID,
                 TIMESTAMP,
-                applicationCode = TEST_APPLICATION_CODE
+                pushToken = TEST_PUSH_TOKEN
             )
         everySuspend {
             mockUrlFactory.create(any<ECUrlType.ClearPushToken>())
@@ -253,6 +255,35 @@ class PushClientTests {
         verifySuspend {
             mockClientExceptionHandler.handleException(
                 testException,
+                "PushClient - consumePushEvents",
+                clearPushTokenEvent
+            )
+        }
+    }
+
+    @Test
+    fun testConsumer_should_callClientExceptionHandler_when_urlIsMissing() = runTest {
+        createPushClient(backgroundScope).register()
+
+        val clearPushTokenEvent =
+            SdkEvent.Internal.Sdk.ClearPushToken(
+                ID,
+                TIMESTAMP,
+                applicationCode = TEST_APPLICATION_CODE
+            )
+
+        val onlineSdkEvents = backgroundScope.async {
+            onlineEvents.take(1).toList()
+        }
+
+        onlineEvents.emit(clearPushTokenEvent)
+
+        advanceUntilIdle()
+
+        onlineSdkEvents.await() shouldBe listOf(clearPushTokenEvent)
+        verifySuspend {
+            mockClientExceptionHandler.handleException(
+                any<SdkException.MissingEventUrl>(),
                 "PushClient - consumePushEvents",
                 clearPushTokenEvent
             )

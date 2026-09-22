@@ -2,7 +2,7 @@ package com.sap.ec.networking.clients.push
 
 import com.sap.ec.core.channel.SdkEventManagerApi
 import com.sap.ec.core.db.events.EventsDaoApi
-import com.sap.ec.core.exceptions.SdkException.MissingApplicationCodeException
+import com.sap.ec.core.exceptions.SdkException
 import com.sap.ec.core.exceptions.SdkException.NetworkIOException
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.clients.NetworkClientApi
@@ -102,10 +102,9 @@ internal class PushClient(
             }
 
             is SdkEvent.Internal.Sdk.ClearPushToken -> {
-                val applicationCode = sdkEvent.applicationCode
-                    ?: throw MissingApplicationCodeException("Application code is missing!")
-                val url = urlFactory.create(ECUrlType.ClearPushToken(applicationCode))
-                UrlRequest(url, HttpMethod.Delete)
+                sdkEvent.targetUrl?.let {
+                    UrlRequest(it, HttpMethod.Delete)
+                } ?: throw SdkException.MissingEventUrl()
             }
 
             else -> throw IllegalArgumentException("Unsupported event type: $sdkEvent")

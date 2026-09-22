@@ -16,4 +16,5 @@ sealed class SdkException(message: String) : RuntimeException(message) {
     class DecryptionFailedException(message: String): SdkException(message)
     class ServiceWorkerUnavailableException(message: String): SdkException(message)
     class PushManagerUnavailableException(message: String): SdkException(message)
+    class MissingEventUrl(message: String = "Event URL is missing!"): SdkException(message)
 }
