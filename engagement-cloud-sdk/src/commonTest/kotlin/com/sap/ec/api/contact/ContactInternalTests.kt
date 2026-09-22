@@ -2,6 +2,7 @@ package com.sap.ec.api.contact
 
 import com.sap.ec.TestEngagementCloudSDKConfig
 import com.sap.ec.context.SdkContextApi
+import com.sap.ec.core.channel.OperationalEventDistributorApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.collections.ThreadSafePersistentStore
 import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
@@ -42,7 +43,8 @@ class ContactInternalTests {
         val calls = mutableListOf(linkContact, linkAuthenticatedContact, unlinkContact)
     }
 
-    private lateinit var sdkEventDistributor: SdkEventDistributorApi
+    private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
+    private lateinit var mockOperationalEventDistributor: OperationalEventDistributorApi
     private lateinit var mockSdkContext: SdkContextApi
     private lateinit var mockRequestContext: RequestContextApi
     private lateinit var mockCrypto: CryptoApi
@@ -62,8 +64,10 @@ class ContactInternalTests {
         mockRequestContext = mock(MockMode.autofill)
         mockCrypto = mock(MockMode.autofill)
         everySuspend { mockCrypto.hash(any()) } returns CONTACT_HASH
-        sdkEventDistributor = mock(MockMode.autofill)
-        everySuspend { sdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(MockMode.autofill)
+        mockSdkEventDistributor = mock(MockMode.autofill)
+        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(MockMode.autofill)
+        mockOperationalEventDistributor = mock(MockMode.autofill)
+        everySuspend { mockOperationalEventDistributor.registerOperationalEvent(capture(eventSlot)) } returns mock(MockMode.autofill)
         threadSafePersistentStore = createThreadSafeStore()
         contactInternal = createContactInternal()
     }
@@ -106,7 +110,7 @@ class ContactInternalTests {
             contactInternal.unlink()
 
             eventSlot.isAbsent shouldBe true
-            verifySuspend(VerifyMode.exactly(0)) { sdkEventDistributor.registerEvent(any()) }
+            verifySuspend(VerifyMode.exactly(0)) { mockSdkEventDistributor.registerEvent(any()) }
         }
 
     @Test
@@ -117,7 +121,7 @@ class ContactInternalTests {
         contactInternal.link(CONTACT_FIELD_VALUE)
 
         eventSlot.isAbsent shouldBe true
-        verifySuspend(VerifyMode.exactly(0)) { sdkEventDistributor.registerEvent(any()) }
+        verifySuspend(VerifyMode.exactly(0)) { mockSdkEventDistributor.registerEvent(any()) }
     }
 
     @Test
@@ -149,7 +153,7 @@ class ContactInternalTests {
             contactInternal.linkAuthenticated(OPEN_ID_TOKEN)
 
             eventSlot.isAbsent shouldBe true
-            verifySuspend(VerifyMode.exactly(0)) { sdkEventDistributor.registerEvent(any()) }
+            verifySuspend(VerifyMode.exactly(0)) { mockSdkEventDistributor.registerEvent(any()) }
         }
 
     @Test
@@ -160,12 +164,14 @@ class ContactInternalTests {
 
         testInternal.activate()
 
-        verifySuspend(VerifyMode.exactly(3)) { sdkEventDistributor.registerEvent(any()) }
+        verifySuspend(VerifyMode.exactly(2)) { mockSdkEventDistributor.registerEvent(any()) }
+        verifySuspend(VerifyMode.exactly(1)) { mockOperationalEventDistributor.registerOperationalEvent(any()) }
     }
 
     private fun createContactInternal(persistentStore: ThreadSafePersistentStoreApi<ContactCall> = threadSafePersistentStore): ContactInternal =
         ContactInternal(
-            sdkEventDistributor,
+            mockSdkEventDistributor,
+            mockOperationalEventDistributor,
             mockSdkContext,
             persistentStore,
             mockRequestContext,

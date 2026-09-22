@@ -4,6 +4,7 @@ import com.sap.ec.api.contact.ContactCall.LinkAuthenticatedContact
 import com.sap.ec.api.contact.ContactCall.LinkContact
 import com.sap.ec.api.contact.ContactCall.UnlinkContact
 import com.sap.ec.context.SdkContextApi
+import com.sap.ec.core.channel.OperationalEventDistributorApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
 import com.sap.ec.core.crypto.CryptoApi
@@ -15,6 +16,7 @@ import kotlin.time.ExperimentalTime
 @OptIn(ExperimentalTime::class)
 internal class ContactInternal(
     private val sdkEventDistributor: SdkEventDistributorApi,
+    private val operationalEventDistributor: OperationalEventDistributorApi,
     private val sdkContext: SdkContextApi,
     private val threadSafePersistentStore: ThreadSafePersistentStoreApi<ContactCall>,
     private val requestContext: RequestContextApi,
@@ -55,7 +57,7 @@ internal class ContactInternal(
     override suspend fun unlink() {
         sdkLogger.debug("unlink")
         if (requestContext.isContactLinked ?: false) {
-            sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.UnlinkContact(applicationCode = sdkContext.getSdkConfig()?.applicationCode))
+            operationalEventDistributor.registerOperationalEvent(SdkEvent.Internal.Sdk.UnlinkContact(applicationCode = sdkContext.getSdkConfig()?.applicationCode))
         }
     }
 
@@ -75,7 +77,7 @@ internal class ContactInternal(
                     )
                 )
 
-                is UnlinkContact -> sdkEventDistributor.registerEvent(
+                is UnlinkContact -> operationalEventDistributor.registerOperationalEvent(
                     SdkEvent.Internal.Sdk.UnlinkContact(applicationCode = it.applicationCode)
                 )
             }

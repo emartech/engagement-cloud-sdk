@@ -52,6 +52,7 @@ class GenericApiTests {
         contactInternal =
             ContactInternal(
                 sdkEventDistributor = mock(),
+                operationalEventDistributor = mock(),
                 mockSdkContext,
                 mockThreadSafePersistentStore,
                 mockRequestContext,

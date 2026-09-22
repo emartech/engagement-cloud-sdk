@@ -63,6 +63,7 @@ internal object ContactInjection {
         single<ContactInstance>(named(InstanceType.Internal)) {
             ContactInternal(
                 sdkEventDistributor = get(),
+                operationalEventDistributor = get(),
                 sdkContext = get(),
                 threadSafePersistentStore = get(named(ThreadSafePersistentStoreTypes.ContactCall)),
                 requestContext = get(),

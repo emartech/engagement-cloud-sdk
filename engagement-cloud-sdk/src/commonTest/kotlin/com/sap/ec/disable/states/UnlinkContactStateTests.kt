@@ -2,7 +2,7 @@ package com.sap.ec.disable.states
 
 import com.sap.ec.TestEngagementCloudSDKConfig
 import com.sap.ec.context.SdkContextApi
-import com.sap.ec.core.channel.SdkEventDistributorApi
+import com.sap.ec.core.channel.OperationalEventDistributorApi
 import com.sap.ec.core.channel.SdkEventWaiterApi
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.context.RequestContextApi
@@ -50,7 +50,7 @@ class UnlinkContactStateTests {
     }
 
     private lateinit var mockLogger: Logger
-    private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
+    private lateinit var mockOperationalEventDistributor: OperationalEventDistributorApi
     private lateinit var mockSdkContext: SdkContextApi
     private lateinit var mockRequestContext: RequestContextApi
     private lateinit var unlinkContactState: UnlinkContactState
@@ -66,11 +66,11 @@ class UnlinkContactStateTests {
             APPLICATION_CODE
         )
         mockRequestContext = mock(MockMode.autofill)
-        mockSdkEventDistributor = mock(MockMode.autofill)
+        mockOperationalEventDistributor = mock(MockMode.autofill)
         eventSlot = slot()
-        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mockSdkEventWaiter
+        everySuspend { mockOperationalEventDistributor.registerOperationalEvent(capture(eventSlot)) } returns mockSdkEventWaiter
         unlinkContactState = UnlinkContactState(
-            mockSdkEventDistributor,
+            mockOperationalEventDistributor,
             mockRequestContext,
             mockSdkContext,
             mockLogger
@@ -97,7 +97,7 @@ class UnlinkContactStateTests {
 
             val result = unlinkContactState.active()
 
-            verifySuspend(VerifyMode.exactly(0)) { mockSdkEventDistributor.registerEvent(any()) }
+            verifySuspend(VerifyMode.exactly(0)) { mockOperationalEventDistributor.registerOperationalEvent(any()) }
             eventSlot.isAbsent shouldBe true
 
             result shouldBe Result.success(Unit)
