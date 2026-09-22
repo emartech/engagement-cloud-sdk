@@ -3,7 +3,7 @@ package com.sap.ec.networking.clients.contact
 import com.sap.ec.core.channel.SdkEventManagerApi
 import com.sap.ec.core.crypto.CryptoApi
 import com.sap.ec.core.db.events.EventsDaoApi
-import com.sap.ec.core.exceptions.SdkException.MissingApplicationCodeException
+import com.sap.ec.core.exceptions.SdkException.MissingEventUrl
 import com.sap.ec.core.exceptions.SdkException.NetworkIOException
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.clients.NetworkClientApi
@@ -157,10 +157,9 @@ internal class ContactClient(
             }
 
             is SdkEvent.Internal.Sdk.UnlinkContact -> {
-                val applicationCode = event.applicationCode
-                    ?: throw MissingApplicationCodeException("Application code is missing!")
-                val url = urlFactory.create(ECUrlType.UnlinkContact(applicationCode))
-                UrlRequest(url, HttpMethod.Delete, null, headers)
+                event.targetUrl?.let {
+                    UrlRequest(it, HttpMethod.Delete, null, headers)
+                }  ?: throw MissingEventUrl()
             }
 
             else -> {

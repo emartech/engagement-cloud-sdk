@@ -5,6 +5,7 @@ import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventManagerApi
 import com.sap.ec.core.crypto.CryptoApi
 import com.sap.ec.core.db.events.EventsDaoApi
+import com.sap.ec.core.exceptions.SdkException.MissingEventUrl
 import com.sap.ec.core.exceptions.SdkException.NetworkIOException
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.clients.NetworkClientApi
@@ -242,7 +243,11 @@ class ContactClientTests {
         contactClient.register()
 
         val unlinkContactEvent =
-            SdkEvent.Internal.Sdk.UnlinkContact("unlinkContact", applicationCode = APPLICATION_CODE)
+            SdkEvent.Internal.Sdk.UnlinkContact(
+                "unlinkContact",
+                applicationCode = APPLICATION_CODE,
+                targetUrl = TEST_BASE_URL
+            )
 
         onlineEvents.emit(unlinkContactEvent)
 
@@ -273,7 +278,11 @@ class ContactClientTests {
         contactClient.register()
 
         val unlinkContactEvent =
-            SdkEvent.Internal.Sdk.UnlinkContact("unlinkContact", applicationCode = APPLICATION_CODE)
+            SdkEvent.Internal.Sdk.UnlinkContact(
+                "unlinkContact",
+                applicationCode = APPLICATION_CODE,
+                targetUrl = TEST_BASE_URL
+            )
         val testException = NetworkIOException("No Internet")
         everySuspend { mockEcClient.send(any()) } returns Result.failure(testException)
         everySuspend { mockSdkEventManager.emitEvent(any()) } returns Unit
@@ -322,7 +331,8 @@ class ContactClientTests {
 
             val unlinkContactEvent = SdkEvent.Internal.Sdk.UnlinkContact(
                 "unlinkContact",
-                applicationCode = APPLICATION_CODE
+                applicationCode = APPLICATION_CODE,
+                targetUrl = TEST_BASE_URL
             )
 
             onlineEvents.emit(unlinkContactEvent)
@@ -363,14 +373,17 @@ class ContactClientTests {
 
         }
 
-
     @Test
     fun testConsumer_should_emit_failure_response_when_non_network_exception_occurs() = runTest {
         contactClient.register()
 
         val testException = Exception("Backend error")
         everySuspend { mockEcClient.send(any()) } returns Result.failure(testException)
-        val unlinkContactEvent = SdkEvent.Internal.Sdk.UnlinkContact("unlinkContact", applicationCode = APPLICATION_CODE)
+        val unlinkContactEvent = SdkEvent.Internal.Sdk.UnlinkContact(
+            "unlinkContact",
+            applicationCode = APPLICATION_CODE,
+            targetUrl = TEST_BASE_URL
+        )
 
         onlineEvents.emit(unlinkContactEvent)
 
@@ -387,6 +400,31 @@ class ContactClientTests {
         verifySuspend {
             mockClientExceptionHandler.handleException(
                 testException,
+                "ContactClient - consumeContactChanges",
+                unlinkContactEvent
+            )
+        }
+        verifySuspend(VerifyMode.exactly(0)) {
+            mockEventsDao.removeEvent(unlinkContactEvent)
+        }
+    }
+
+    @Test
+    fun testConsumer_should_callException_when_urlIsMissing() = runTest {
+        contactClient.register()
+
+        val unlinkContactEvent = SdkEvent.Internal.Sdk.UnlinkContact(
+            "unlinkContact",
+            applicationCode = APPLICATION_CODE
+        )
+
+        onlineEvents.emit(unlinkContactEvent)
+
+        advanceUntilIdle()
+
+        verifySuspend {
+            mockClientExceptionHandler.handleException(
+                any<MissingEventUrl>(),
                 "ContactClient - consumeContactChanges",
                 unlinkContactEvent
             )

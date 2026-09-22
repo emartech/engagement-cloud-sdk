@@ -3,7 +3,7 @@ package com.sap.ec.networking.clients.push
 import com.sap.ec.context.DefaultUrlsApi
 import com.sap.ec.core.channel.SdkEventManagerApi
 import com.sap.ec.core.db.events.EventsDaoApi
-import com.sap.ec.core.exceptions.SdkException
+import com.sap.ec.core.exceptions.SdkException.MissingEventUrl
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.clients.NetworkClientApi
 import com.sap.ec.core.networking.model.Response
@@ -283,7 +283,7 @@ class PushClientTests {
         onlineSdkEvents.await() shouldBe listOf(clearPushTokenEvent)
         verifySuspend {
             mockClientExceptionHandler.handleException(
-                any<SdkException.MissingEventUrl>(),
+                any<MissingEventUrl>(),
                 "PushClient - consumePushEvents",
                 clearPushTokenEvent
             )
