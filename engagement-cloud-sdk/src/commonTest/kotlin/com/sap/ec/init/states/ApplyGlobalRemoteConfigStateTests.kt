@@ -1,6 +1,6 @@
 package com.sap.ec.init.states
 
-import com.sap.ec.core.channel.SdkEventDistributorApi
+import com.sap.ec.core.channel.OperationalEventDistributorApi
 import com.sap.ec.core.log.SdkLogger
 import com.sap.ec.event.SdkEvent
 import dev.mokkery.MockMode
@@ -20,15 +20,15 @@ import kotlin.test.Test
 class ApplyGlobalRemoteConfigStateTests {
     private lateinit var applyGlobalRemoteConfigState: ApplyGlobalRemoteConfigState
     private lateinit var eventSlot: SlotCapture<SdkEvent>
-    private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
+    private lateinit var mockOperationalEventDistributor: OperationalEventDistributorApi
 
     @BeforeTest
     fun setup() {
         eventSlot = slot()
-        mockSdkEventDistributor = mock()
+        mockOperationalEventDistributor = mock()
 
         applyGlobalRemoteConfigState = ApplyGlobalRemoteConfigState(
-            mockSdkEventDistributor,
+            mockOperationalEventDistributor,
             SdkLogger(
                 "TestLoggerName",
                 mock(MockMode.autofill),
@@ -44,7 +44,7 @@ class ApplyGlobalRemoteConfigStateTests {
 
     @Test
     fun testActive_should_handleGlobal_with_remoteConfigHandler() = runTest {
-        everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mock(
+        everySuspend { mockOperationalEventDistributor.registerOperationalEvent(capture(eventSlot)) } returns mock(
             MockMode.autofill
         )
 
