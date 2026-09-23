@@ -11,12 +11,16 @@ import com.sap.ec.event.OnlineSdkEvent
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.mobileengage.recommendation.RecommendationConstants.CART_LIST_ITEM_QUANTITY_KEY
 import com.sap.ec.mobileengage.recommendation.networking.RecommendationRequestFactoryApi
+import com.sap.ec.recommendation.Product
 import com.sap.ec.recommendation.RecommendationLogic
 import com.sap.ec.recommendation.RecommendationOptions
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
+import dev.mokkery.matcher.capture.Capture.Companion.slot
+import dev.mokkery.matcher.capture.capture
+import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
@@ -50,6 +54,7 @@ class RecommendationClientTests {
     private lateinit var mockRecommendationRequestFactory: RecommendationRequestFactoryApi
     private lateinit var sdkEventsFlow: MutableSharedFlow<SdkEvent>
     private lateinit var onlineSdkEventsFlow: MutableSharedFlow<OnlineSdkEvent>
+    private lateinit var mockRecommendationResponseMapper: RecommendationResponseMapperApi
 
     private companion object {
         private const val RECOMMENDATION_BASE_URL =
@@ -64,6 +69,7 @@ class RecommendationClientTests {
         mockEventsDao = mock(MockMode.autofill)
         mockNetworkClient = mock(MockMode.autofill)
         mockRecommendationRequestFactory = mock(MockMode.autofill)
+        mockRecommendationResponseMapper = mock(MockMode.autofill)
 
         sdkEventsFlow = MutableSharedFlow(replay = 100, extraBufferCapacity = Channel.UNLIMITED)
         onlineSdkEventsFlow = MutableSharedFlow(replay = 100, extraBufferCapacity = Channel.UNLIMITED)
@@ -160,7 +166,7 @@ class RecommendationClientTests {
         }
 
     @Test
-    fun testConsumer_shouldConsumeRequestRecommendation_and_sendTheRequest_and_emitResponse_whenReceivingSuccessResponse() =
+    fun testConsumer_shouldConsumeRequestRecommendation_and_sendTheRequest_and_mapResponse_and_emitResultSuccessProductList_whenReceivingSuccessResponse() =
         runTest {
             createRecommendationClient(backgroundScope).register()
             val requestRecommendation = SdkEvent.Internal.Sdk.RequestRecommendation(options = RecommendationOptions(
@@ -176,8 +182,12 @@ class RecommendationClientTests {
                 bodyAsText = "{}"
             )
             val successResult = Result.success(successResponse)
+            val expectedProductsList = listOf(Product("testId", "testTitle", "https://www.test.com"))
+            val responseCaptor = slot<SdkEvent.Internal.Sdk.Answer.Response<List<Product>>>()
             everySuspend { mockRecommendationRequestFactory.create(requestRecommendation) } returns request
             everySuspend { mockNetworkClient.send(request) } returns successResult
+            everySuspend { mockRecommendationResponseMapper.map(successResponse) } returns expectedProductsList
+            everySuspend { mockSdkEventManager.emitEvent(capture(responseCaptor)) } returns Unit
 
             val sdkEvents = backgroundScope.async {
                 sdkEventsFlow.take(1).toList()
@@ -188,16 +198,14 @@ class RecommendationClientTests {
             advanceUntilIdle()
 
             sdkEvents.await().size shouldBe 1
+            val sentEvent = responseCaptor.get()
+            sentEvent.result.getOrNull() shouldBe expectedProductsList
             verifySuspend {
                 mockSdkLogger.debug("consume RequestRecommendation events")
                 mockRecommendationRequestFactory.create(requestRecommendation)
                 mockNetworkClient.send(request)
-                mockSdkEventManager.emitEvent(
-                    SdkEvent.Internal.Sdk.Answer.Response(
-                        requestRecommendation.id,
-                        successResult
-                    )
-                )
+                mockRecommendationResponseMapper.map(successResponse)
+                mockSdkEventManager.emitEvent(any())
             }
         }
 
@@ -278,6 +286,7 @@ class RecommendationClientTests {
             applicationScope,
             mockNetworkClient,
             mockRecommendationRequestFactory,
+            mockRecommendationResponseMapper,
             mockEventsDao,
             mockSdkLogger
         )

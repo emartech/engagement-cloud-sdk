@@ -54,8 +54,10 @@ import com.sap.ec.mobileengage.embeddedmessaging.networking.EmbeddedMessagesRequ
 import com.sap.ec.mobileengage.embeddedmessaging.networking.EmbeddedMessagingRequestFactoryApi
 import com.sap.ec.mobileengage.recommendation.networking.RecommendationRequestFactory
 import com.sap.ec.mobileengage.recommendation.networking.RecommendationRequestFactoryApi
+import com.sap.ec.networking.clients.recommendation.RecommendationResponseMapper
 import com.sap.ec.networking.clients.jsbridge.JsBridgeClient
 import com.sap.ec.networking.clients.jsbridge.JsBridgeClientApi
+import com.sap.ec.networking.clients.recommendation.RecommendationResponseMapperApi
 import com.sap.ec.util.JsonUtil
 import com.sap.ec.watchdog.connection.ConnectionWatchDog
 import io.ktor.client.HttpClient
@@ -185,6 +187,12 @@ internal object CoreInjection {
         singleOf(::UrlFactory) { bind<UrlFactoryApi>() }
         singleOf(::EmbeddedMessagesRequestFactory) { bind<EmbeddedMessagingRequestFactoryApi>() }
         singleOf(::RecommendationRequestFactory) { bind<RecommendationRequestFactoryApi>() }
+        single<RecommendationResponseMapperApi> {
+            RecommendationResponseMapper(
+                json = get(),
+                sdkLogger = get { parametersOf(RecommendationResponseMapper::class.simpleName) }
+            )
+        }
         single<CryptoApi> {
             Crypto(
                 logger = get<Logger> { parametersOf(Crypto::class.simpleName) },

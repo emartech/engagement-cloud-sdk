@@ -1,7 +1,6 @@
 package com.sap.ec.networking.clients.recommendation
 
 import com.sap.ec.core.log.Logger
-import com.sap.ec.core.mapper.Mapper
 import com.sap.ec.core.networking.model.Response
 import com.sap.ec.recommendation.Feature
 import com.sap.ec.recommendation.Product
@@ -17,7 +16,7 @@ import kotlinx.serialization.serializer
 class RecommendationResponseMapper(
     val json: Json,
     val sdkLogger: Logger
-) : Mapper<Response, List<Product>> {
+) : RecommendationResponseMapperApi {
     override suspend fun map(from: Response): List<Product> {
         val jsonResponse = json.parseToJsonElement(from.bodyAsText).jsonObject
 

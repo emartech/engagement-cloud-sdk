@@ -18,12 +18,18 @@ internal class RecommendationClient(
     private val applicationScope: CoroutineScope,
     private val recommendationNetworkClient: NetworkClientApi,
     private val recommendationRequestFactory: RecommendationRequestFactoryApi,
+    private val recommendationResponseMapper: RecommendationResponseMapperApi,
     private val eventsDao: EventsDaoApi,
     private val sdkLogger: Logger
 ) : EventBasedClientApi {
 
     override suspend fun register() {
         sdkLogger.debug("register RecommendationClient")
+        startRecommendationTrackEventConsumer()
+        startRequestRecommendationEventConsumer()
+    }
+
+    private fun startRecommendationTrackEventConsumer() {
         applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
             sdkEventManager.onlineSdkEvents.filterIsInstance<SdkEvent.External.RecommendationTrackEvent>()
                 .collect { event ->
@@ -51,7 +57,9 @@ internal class RecommendationClient(
                     )
                 }
         }
+    }
 
+    private fun startRequestRecommendationEventConsumer() {
         applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
             sdkEventManager.sdkEventFlow.filterIsInstance<SdkEvent.Internal.Sdk.RequestRecommendation>()
                 .collect { event ->
@@ -59,10 +67,11 @@ internal class RecommendationClient(
                     val request = recommendationRequestFactory.create(event)
                     recommendationNetworkClient.send(request).fold(
                         onSuccess = { successResponse ->
+                            val listOfProducts = recommendationResponseMapper.map(successResponse)
                             sdkEventManager.emitEvent(
                                 SdkEvent.Internal.Sdk.Answer.Response(
                                     event.id,
-                                    Result.success(successResponse)
+                                    Result.success(listOfProducts)
                                 )
                             )
                         },

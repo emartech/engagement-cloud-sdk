@@ -100,6 +100,7 @@ internal object NetworkInjection {
                 applicationScope = get(named(CoroutineScopeTypes.Application)),
                 recommendationNetworkClient = get(named(NetworkClientTypes.Recommendation)),
                 recommendationRequestFactory = get(),
+                recommendationResponseMapper = get(),
                 eventsDao = get(),
                 sdkLogger = get { parametersOf(RecommendationClient::class.simpleName) },
             )
