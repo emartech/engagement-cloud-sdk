@@ -36,4 +36,11 @@ internal class ThreadSafePersistentStore<Item>(
             persist()
         }
     }
+
+    override suspend fun clear(){
+        mutex.withLock {
+            this.items.clear()
+            persist()
+        }
+    }
 }
