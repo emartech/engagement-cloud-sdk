@@ -50,14 +50,8 @@ import com.sap.ec.core.util.Downloader
 import com.sap.ec.core.util.DownloaderApi
 import com.sap.ec.mobileengage.action.EventActionFactory
 import com.sap.ec.mobileengage.action.EventActionFactoryApi
-import com.sap.ec.mobileengage.embeddedmessaging.networking.EmbeddedMessagesRequestFactory
-import com.sap.ec.mobileengage.embeddedmessaging.networking.EmbeddedMessagingRequestFactoryApi
-import com.sap.ec.mobileengage.recommendation.networking.RecommendationRequestFactory
-import com.sap.ec.mobileengage.recommendation.networking.RecommendationRequestFactoryApi
-import com.sap.ec.networking.clients.recommendation.RecommendationResponseMapper
 import com.sap.ec.networking.clients.jsbridge.JsBridgeClient
 import com.sap.ec.networking.clients.jsbridge.JsBridgeClientApi
-import com.sap.ec.networking.clients.recommendation.RecommendationResponseMapperApi
 import com.sap.ec.util.JsonUtil
 import com.sap.ec.watchdog.connection.ConnectionWatchDog
 import io.ktor.client.HttpClient
@@ -185,14 +179,6 @@ internal object CoreInjection {
         single<RequestContextApi> { RequestContext() }
         single<SessionContext> { SessionContext() }
         singleOf(::UrlFactory) { bind<UrlFactoryApi>() }
-        singleOf(::EmbeddedMessagesRequestFactory) { bind<EmbeddedMessagingRequestFactoryApi>() }
-        singleOf(::RecommendationRequestFactory) { bind<RecommendationRequestFactoryApi>() }
-        single<RecommendationResponseMapperApi> {
-            RecommendationResponseMapper(
-                json = get(),
-                sdkLogger = get { parametersOf(RecommendationResponseMapper::class.simpleName) }
-            )
-        }
         single<CryptoApi> {
             Crypto(
                 logger = get<Logger> { parametersOf(Crypto::class.simpleName) },
