@@ -5,6 +5,8 @@ interface ThreadSafePersistentStoreApi<Item> {
 
     suspend fun add(item: Item)
 
+    suspend fun setAll(items: List<Item>)
+
     suspend fun dequeue(action: suspend (item: Item) -> Unit)
 
     suspend fun clear()

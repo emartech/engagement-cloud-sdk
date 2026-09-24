@@ -96,6 +96,22 @@ class ThreadSafePersistentStoreTests {
     }
 
     @Test
+    fun setAll_should_setItems_to_inputItems_andCallPutOnStore() = runTest {
+        val newItems = listOf("newItem1", "newItem2")
+        teachStorageGet(storedList)
+
+        threadSafePersistentStore =
+            ThreadSafePersistentStore(TEST_ID, mockStorage, String.serializer())
+
+        threadSafePersistentStore.items.size shouldBe 3
+        teachStoragePut(newItems)
+
+        threadSafePersistentStore.setAll(newItems)
+        verifySuspend { mockStorage.put(TEST_ID, any<KSerializer<List<String>>>(), newItems) }
+        threadSafePersistentStore.items.size shouldBe 2
+    }
+
+    @Test
     fun dequeue_shouldRemoveItems_andCallPutOnStore_whenDone() = runTest {
         teachStorageGet(storedList)
         teachStoragePut(emptyList())
@@ -112,7 +128,7 @@ class ThreadSafePersistentStoreTests {
     }
 
     @Test
-    fun clear_shouldRemoveItems_fromStorage() = runTest {
+    fun clear_shouldRemoveItems_fromStorage_andCallPutOnStore_withEmptyList() = runTest {
         teachStorageGet(storedList)
 
         threadSafePersistentStore =

@@ -28,6 +28,13 @@ internal class ThreadSafePersistentStore<Item>(
         }
     }
 
+    override suspend fun setAll(items: List<Item>) {
+        mutex.withLock {
+            this.items = items.toMutableList()
+            persist()
+        }
+    }
+
     override suspend fun dequeue(action: suspend (call: Item) -> Unit) {
         mutex.withLock {
             this.items.dequeue {
