@@ -206,7 +206,7 @@ internal enum class CoroutineScopeTypes {
 }
 
 internal enum class ThreadSafePersistentStoreTypes {
-    PushCall, InAppCall, ConfigCall, ContactCall, EventTrackerCall
+    PushCall, InAppCall, ConfigCall, ContactCall, EventTrackerCall, RecommendationCartItems
 }
 
 internal enum class NetworkClientTypes {
@@ -231,4 +231,5 @@ internal object PersistentStoreIds {
     const val CONFIG_CONTEXT_PERSISTENT_ID = "SAPEngagementCloudSdkConfigContextCalls"
     const val CONTACT_CONTEXT_PERSISTENT_ID = "SAPEngagementCloudSdkContactContextCalls"
     const val EVENT_TRACKER_CONTEXT_PERSISTENT_ID = "SAPEngagementCloudSdkEventTrackerContextCalls"
+    const val RECOMMENDATION_CART_ITEMS_PERSISTENT_ID = "SAPEngagementCloudSdkCartItems"
 }

@@ -1,5 +1,6 @@
 package com.sap.ec.mobileengage.recommendation.networking
 
+import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
 import com.sap.ec.core.networking.model.UrlRequest
 import com.sap.ec.core.url.ECUrlType
 import com.sap.ec.core.url.UrlFactoryApi
@@ -44,7 +45,8 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
 internal class RecommendationRequestFactory(
-    private val urlFactory: UrlFactoryApi
+    private val urlFactory: UrlFactoryApi,
+    private val cartItemStorage: ThreadSafePersistentStoreApi<CartItem>
 ) : RecommendationRequestFactoryApi {
 
     override suspend fun create(recommendationEvent: RecommendationEvent): UrlRequest {
@@ -103,26 +105,28 @@ internal class RecommendationRequestFactory(
                         )
                     } ?: parameters.append(TAG_KEY, recommendationEvent.tag)
                 }
+
                 is SdkEvent.Internal.Sdk.RequestRecommendation -> {
                     parameters.append(
                         FEATURES_TO_RETRIEVE_RECOMMENDATIONS_FOR_KEY,
                         "$FEATURE_ID_KEY:${recommendationEvent.options.logic},$LIMIT_KEY:${recommendationEvent.options.limit},$OFFSET_KEY:${recommendationEvent.options.offset}"
                     )
-                    recommendationEvent.options.filters?.takeIf { it.isNotEmpty() }?.let { filters ->
-                        parameters.append(FILTER_EXCLUDE_KEY, buildJsonArray {
-                            filters.forEach { filter ->
-                                add(buildJsonObject {
-                                    put(FILTER_FIELD_KEY, filter.field)
-                                    put(FILTER_RULE_KEY, filter.comparison.toString())
-                                    put(FILTER_VALUE_KEY, filter.expectations.joinToString("|"))
-                                    put(
-                                        FILTER_NEGATE_KEY,
-                                        filter.type == FilterType.INCLUDE
-                                    )
-                                })
-                            }
-                        }.toString())
-                    }
+                    recommendationEvent.options.filters?.takeIf { it.isNotEmpty() }
+                        ?.let { filters ->
+                            parameters.append(FILTER_EXCLUDE_KEY, buildJsonArray {
+                                filters.forEach { filter ->
+                                    add(buildJsonObject {
+                                        put(FILTER_FIELD_KEY, filter.field)
+                                        put(FILTER_RULE_KEY, filter.comparison.toString())
+                                        put(FILTER_VALUE_KEY, filter.expectations.joinToString("|"))
+                                        put(
+                                            FILTER_NEGATE_KEY,
+                                            filter.type == FilterType.INCLUDE
+                                        )
+                                    })
+                                }
+                            }.toString())
+                        }
                     recommendationEvent.options.availabilityZone?.takeIf { it.isNotEmpty() }?.let {
                         parameters.append(AVAILABILITY_ZONE_KEY, it)
                     }
@@ -131,6 +135,13 @@ internal class RecommendationRequestFactory(
                     }
                     recommendationEvent.options.displayCurrency?.takeIf { it.isNotEmpty() }?.let {
                         parameters.append(CURRENCY_KEY, it)
+                    }
+                    cartItemStorage.items.let {
+                        parameters.append(CART_VERSION_FLAG_KEY, "1")
+                        parameters.append(
+                            CART_ITEMS_KEY,
+                            it.toUrlParamValue()
+                        )
                     }
                 }
             }

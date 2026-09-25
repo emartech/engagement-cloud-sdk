@@ -354,7 +354,8 @@ sealed interface SdkEvent {
                 override val id: String = UUIDProvider().provide(),
                 override val type: String = "internal",
                 override val timestamp: Instant = TimestampProvider().provide(),
-                val options: RecommendationOptions
+                val options: RecommendationOptions,
+                val contextEvent: External.RecommendationTrackEvent? = null
             ): Sdk(), RecommendationEvent
 
             sealed class Answer : Sdk() {
