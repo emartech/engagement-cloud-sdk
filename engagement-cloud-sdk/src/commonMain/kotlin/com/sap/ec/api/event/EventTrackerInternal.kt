@@ -7,12 +7,15 @@ import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.providers.InstantProvider
 import com.sap.ec.core.providers.UuidProviderApi
+import com.sap.ec.event.EventPreProcessorApi
+import com.sap.ec.event.SdkEvent
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 internal class EventTrackerInternal(
     private val sdkEventDistributor: SdkEventDistributorApi,
     private val threadSafePersistentStore: ThreadSafePersistentStoreApi<EventTrackerCall>,
+    private val eventPreProcessor: EventPreProcessorApi<SdkEvent>,
     private val timestampProvider: InstantProvider,
     private val uuidProvider: UuidProviderApi,
     private val sdkLogger: Logger
@@ -23,6 +26,8 @@ internal class EventTrackerInternal(
             uuidProvider.provide(),
             timestampProvider.provide()
         ).getOrThrow()
+
+        eventPreProcessor.process(event)
 
         sdkEventDistributor.registerEvent(event).await<Response>()
         sdkLogger.debug("EventTrackerInternal - trackEvent")

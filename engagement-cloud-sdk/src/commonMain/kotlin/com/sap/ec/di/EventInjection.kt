@@ -11,6 +11,10 @@ import com.sap.ec.api.event.model.EngagementCloudEvent
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.collections.ThreadSafePersistentStore
 import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
+import com.sap.ec.event.EventPreProcessor
+import com.sap.ec.event.EventPreProcessorApi
+import com.sap.ec.event.RecommendationEventPreProcessor
+import com.sap.ec.event.SdkEvent
 import com.sap.ec.mobileengage.session.ECSdkSession
 import com.sap.ec.mobileengage.session.SessionApi
 import com.sap.ec.tracking.Tracking
@@ -46,6 +50,7 @@ internal object EventInjection {
             EventTrackerInternal(
                 sdkEventDistributor = get(),
                 threadSafePersistentStore = get(named(ThreadSafePersistentStoreTypes.EventTrackerCall)),
+                eventPreProcessor = get(),
                 timestampProvider = get(),
                 uuidProvider = get(),
                 sdkLogger = get { parametersOf(EventTrackerInternal::class.simpleName) },
@@ -57,6 +62,15 @@ internal object EventInjection {
                 gathererApi = get(named(InstanceType.Gatherer)),
                 internalApi = get(named(InstanceType.Internal)),
                 sdkContext = get()
+            )
+        }
+        single<EventPreProcessorApi<SdkEvent>> {
+            EventPreProcessor(
+                listOf(
+                    RecommendationEventPreProcessor(
+                        cartItemStorage = get(named(ThreadSafePersistentStoreTypes.RecommendationCartItems))
+                    )
+                )
             )
         }
         single<SessionApi> {
