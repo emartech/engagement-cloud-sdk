@@ -222,7 +222,7 @@ jobs:
 
   publish-android:
     name: Publish KMP Snapshot
-    if: github.ref == 'refs/heads/main'
+    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')
     needs: [derive-version, test, lint]
     runs-on: macos-latest-xlarge
     concurrency:
@@ -256,7 +256,7 @@ jobs:
 
   publish-js:
     name: Publish JS Snapshot
-    if: github.ref == 'refs/heads/main'
+    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')
     needs: [derive-version, test, lint]
     runs-on: ubuntu-latest
     concurrency:
@@ -349,7 +349,7 @@ jobs:
 
   publish-ios-snapshot:
     name: Publish iOS Snapshot
-    if: github.ref == 'refs/heads/main'
+    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')
     needs: [derive-version, test, lint]
     runs-on: macos-latest-xlarge
     concurrency:
@@ -417,7 +417,7 @@ jobs:
 
           gh release create snapshot-latest \
             --title "Snapshot (${{ needs.derive-version.outputs.version }})" \
-            --notes "Rolling snapshot built from main. Not for production use. Built from commit ${{ github.sha }}." \
+            --notes "Rolling snapshot built from last commit. Not for production use. Built from commit ${{ github.sha }}." \
             --prerelease \
             --target "${{ github.sha }}" \
             EngagementCloudSDK.xcframework.zip \

@@ -73,9 +73,26 @@ internal class PushNotificationClickHandler(
                 listOf(actionFactory.create(model))
             }
 
-            is BasicActionModel,
+            is BasicActionModel -> {
+                listOf(
+                    actionFactory.create(
+                        NotificationOpenedActionModel(
+                            actionModel.reporting,
+                            jsNotificationClickedData.jsPushMessage.trackingInfo
+                        )
+                    )
+                )
+            }
+
             null -> {
-                listOf(actionFactory.create(NotificationOpenedActionModel(actionModel?.reporting, jsNotificationClickedData.jsPushMessage.trackingInfo)))
+                listOf(
+                    actionFactory.create(
+                        NotificationOpenedActionModel(
+                            jsNotificationClickedData.jsPushMessage.reporting,
+                            jsNotificationClickedData.jsPushMessage.trackingInfo
+                        )
+                    )
+                )
             }
 
             else -> emptyList()

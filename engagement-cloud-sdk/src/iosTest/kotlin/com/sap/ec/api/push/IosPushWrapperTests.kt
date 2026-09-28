@@ -41,6 +41,7 @@ class IosPushWrapperTests {
         const val TRACKING_INFO = """{"trackingInfo":"testTrackingInfo"}"""
         const val REPORTING = """{"reportingKey":"reportingValue"}"""
         const val REPORTING2 = """{"reportingKey2":"reportingValue2"}"""
+        const val DEFAULT_REPORTING = """{"defaultReportingKey":"defaultReportingValue"}"""
         const val NAME = "testName"
         val PAYLOAD = mapOf("key" to "value")
         const val URL_STRING = "https://www.sap.com"
@@ -79,7 +80,8 @@ class IosPushWrapperTests {
                 actions = listOf(
                     BasicOpenExternalUrlActionModel(REPORTING, URL_STRING),
                     BasicAppEventActionModel(REPORTING2, NAME, PAYLOAD)
-                )
+                ),
+                reporting = DEFAULT_REPORTING
             )
         )
     }

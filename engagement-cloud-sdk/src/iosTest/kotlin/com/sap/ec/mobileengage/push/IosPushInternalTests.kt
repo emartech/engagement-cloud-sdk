@@ -18,6 +18,7 @@ import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.actions.ActionHandlerApi
 import com.sap.ec.core.actions.badge.BadgeCountHandlerApi
 import com.sap.ec.core.actions.pushtoinapp.PushToInAppHandlerApi
+import com.sap.ec.core.channel.OperationalEventDistributorApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.collections.ThreadSafePersistentStore
 import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
@@ -86,6 +87,7 @@ internal class IosPushInternalTests {
         const val TRACKING_INFO = """{"trackingInfo":"testTrackingInfo"}"""
         const val REPORTING = """{"id":"testId"}"""
         const val REPORTING2 = """{"id":"testId2"}"""
+        const val DEFAULT_REPORTING = """{"defaultReportingKey":"defaultReportingValue"}"""
         val REGISTER_PUSH_TOKEN = RegisterPushToken(PUSH_TOKEN)
         val CLEAR_PUSH_TOKEN = ClearPushToken(TEST_APPLICATION_CODE)
         val HANDLE_SILENT_MESSAGE_WITH_USER_INFO = HandleSilentMessageWithUserInfo(
@@ -97,7 +99,8 @@ internal class IosPushInternalTests {
                 notification = SilentNotification(
                     silent = true,
                     actions = emptyList(),
-                    badgeCount = BadgeCount(SET, 42)
+                    badgeCount = BadgeCount(SET, 42),
+                    reporting = DEFAULT_REPORTING
                 )
             )
         )
@@ -111,7 +114,6 @@ internal class IosPushInternalTests {
     }
 
     private lateinit var iosPushInternal: IosPushInternal
-
     private lateinit var mockStringStorage: StringStorageApi
     private lateinit var threadSafePersistentStore: ThreadSafePersistentStoreApi<PushCall>
     private lateinit var mockStorage: StorageApi
@@ -122,6 +124,7 @@ internal class IosPushInternalTests {
     private lateinit var json: Json
     private lateinit var sdkDispatcher: CoroutineDispatcher
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
+    private lateinit var mockOperationalEventDistributor: OperationalEventDistributorApi
     private lateinit var mockSdkLogger: Logger
     private lateinit var mockTimestampProvider: InstantProvider
     private lateinit var mockUuidProvider: UuidProviderApi
@@ -151,6 +154,7 @@ internal class IosPushInternalTests {
         mockUuidProvider = mock()
         sdkDispatcher = StandardTestDispatcher()
         mockSdkEventDistributor = mock(MockMode.autofill)
+        mockOperationalEventDistributor = mock(MockMode.autofill)
         mockSdkLogger = mock(MockMode.autofill)
         everySuspend { mockActionHandler.handleActions(any(), any()) } returns Unit
         everySuspend { mockTimestampProvider.provide() } returns Instant.DISTANT_PAST
@@ -167,6 +171,7 @@ internal class IosPushInternalTests {
             sdkDispatcher,
             mockSdkLogger,
             mockSdkEventDistributor,
+            mockOperationalEventDistributor,
             mockUuidProvider
         )
 
@@ -309,7 +314,7 @@ internal class IosPushInternalTests {
         everySuspend {
             mockActionFactory.create(
                 NotificationOpenedActionModel(
-                    null,
+                    DEFAULT_REPORTING,
                     TRACKING_INFO
                 )
             )
@@ -441,7 +446,7 @@ internal class IosPushInternalTests {
             )
 
             val notificationOpenedActionModel = NotificationOpenedActionModel(
-                null,
+                DEFAULT_REPORTING,
                 TRACKING_INFO
             )
 
@@ -479,7 +484,8 @@ internal class IosPushInternalTests {
                     actions = listOf(
                         appEventActionModel,
                         openExternalUrlActionModel
-                    )
+                    ),
+                    reporting = DEFAULT_REPORTING
                 ),
             )
 
@@ -509,7 +515,8 @@ internal class IosPushInternalTests {
             notification = SilentNotification(
                 silent = true,
                 actions = emptyList(),
-                badgeCount = expectedBadgeCount
+                badgeCount = expectedBadgeCount,
+                reporting = DEFAULT_REPORTING
             ),
         )
         everySuspend { mockSdkEventDistributor.registerPublicEvent(any()) }
@@ -538,7 +545,8 @@ internal class IosPushInternalTests {
             notification = SilentNotification(
                 actions = listOf(
                     openExternalUrlActionModel
-                )
+                ),
+                reporting = DEFAULT_REPORTING
             ),
         )
         everySuspend { mockActionFactory.create(openExternalUrlActionModel) } returns mockOpenExternalUrlAction
@@ -565,6 +573,9 @@ internal class IosPushInternalTests {
         everySuspend { mockSdkEventDistributor.registerEvent(capture(eventContainer)) } returns mock(
             MockMode.autofill
         )
+        everySuspend { mockOperationalEventDistributor.registerEvent(capture(eventContainer)) } returns mock(
+            MockMode.autofill
+        )
         everySuspend { mockBadgeCountHandler.handle(any()) } returns Unit
         val safeStore = ThreadSafePersistentStore(STORE_ID, mockStorage, PushCall.serializer())
         val testInternal = IosPushInternal(
@@ -578,6 +589,7 @@ internal class IosPushInternalTests {
             sdkDispatcher,
             mockSdkLogger,
             mockSdkEventDistributor,
+            mockOperationalEventDistributor,
             mockUuidProvider
         )
 
@@ -605,6 +617,7 @@ internal class IosPushInternalTests {
                 )
             )
             put("notification", buildMap {
+                put("reporting", DEFAULT_REPORTING)
                 defaultAction?.let { put("defaultAction", it) }
                 actions?.let { put("actions", it) }
                 badgeCount?.let { put("badgeCount", it) }
@@ -921,6 +934,7 @@ internal class IosPushInternalTests {
                 sdkDispatcher,
                 mockSdkLogger,
                 mockSdkEventDistributor,
+                mockOperationalEventDistributor,
                 mockUuidProvider
             )
 
@@ -1098,7 +1112,8 @@ internal class IosPushInternalTests {
             actions = actions
         )
 
-        val notificationOpenedActionModel = NotificationOpenedActionModel(null, TRACKING_INFO)
+        val notificationOpenedActionModel =
+            NotificationOpenedActionModel(DEFAULT_REPORTING, TRACKING_INFO)
         val reportingAction =
             ReportingAction(notificationOpenedActionModel, mock(MockMode.autoUnit))
         everySuspend { mockActionFactory.create(notificationOpenedActionModel) } returns reportingAction

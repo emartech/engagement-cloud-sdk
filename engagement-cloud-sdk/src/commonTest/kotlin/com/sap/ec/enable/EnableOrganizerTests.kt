@@ -5,6 +5,7 @@ import com.sap.ec.api.SdkState
 import com.sap.ec.config.SdkConfig
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.exceptions.SdkException.SdkAlreadyEnabledException
+import com.sap.ec.core.exceptions.SdkException.SdkDisabledException
 import com.sap.ec.core.log.SdkLogger
 import com.sap.ec.core.state.StateMachineApi
 import com.sap.ec.enable.config.SdkConfigStoreApi
@@ -112,6 +113,28 @@ class EnableOrganizerTests {
                  mockMeStateMachine.activate()
                  mockSdkContext.setSdkConfig(null)
                  mockSdkContext.setSdkState(SdkState.Initialized)
+            }
+
+            verifySuspend(VerifyMode.exactly(0)) { mockSdkContext.setSdkState(SdkState.Active) }
+            verifySuspend(VerifyMode.exactly(0)) { mockSession.startSession() }
+        }
+
+    @Test
+    fun testEnable_shouldThrowSdkDisabledException_andRollbackStateToInitialized_whenRemoteConfigIsDisabled() =
+        runTest {
+            val sdkDisabledException = SdkDisabledException("SDK is disabled!")
+            everySuspend { mockMeStateMachine.activate() } returns Result.failure(sdkDisabledException)
+
+            val config = TestEngagementCloudSDKConfig("testAppCode")
+
+            shouldThrow<SdkDisabledException> { enableOrganizer.enable(config) }
+
+            verifySuspend(VerifyMode.order) {
+                mockSdkContext.setSdkState(SdkState.OnHold)
+                mockSdkContext.setSdkConfig(config)
+                mockMeStateMachine.activate()
+                mockSdkContext.setSdkConfig(null)
+                mockSdkContext.setSdkState(SdkState.Initialized)
             }
 
             verifySuspend(VerifyMode.exactly(0)) { mockSdkContext.setSdkState(SdkState.Active) }

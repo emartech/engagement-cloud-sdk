@@ -10,6 +10,7 @@ internal interface PlatformData
 
 internal interface PushMessage<T : PlatformData> {
     val trackingInfo: String
+    val reporting: String
     val platformData: T
     val badgeCount: BadgeCount?
 }

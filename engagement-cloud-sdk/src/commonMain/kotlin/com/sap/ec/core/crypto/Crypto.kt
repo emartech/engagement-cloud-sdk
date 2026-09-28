@@ -26,8 +26,13 @@ internal class Crypto(
 
     private val aesGcm: AES.GCM = CryptographyProvider.Default.get(AES.GCM)
     private val hasher: Hasher = CryptographyProvider.Default.get(SHA512).hasher()
+    private val sha256Hasher: Hasher = CryptographyProvider.Default.get(SHA256).hasher()
     private val ecdsaProvider = CryptographyProvider.Default.get(ECDSA)
 
+
+    override suspend fun hash(value: String): String {
+        return Base64.encode(sha256Hasher.hash(value.encodeToByteArray()))
+    }
 
     override suspend fun verify(message: String, signatureStr: String): Boolean {
         val decodedKey = ecdsaProvider.publicKeyDecoder(EC.Curve.P256)

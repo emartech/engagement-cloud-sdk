@@ -52,6 +52,7 @@ class PushNotificationClickHandlerTests {
     private companion object {
         const val TRACKING_INFO = """{"trackingInfoKey":"trackingInfoValue"}"""
         const val REPORTING = """{"reportingKey":"reportingValue"}"""
+        const val DEFAULT_REPORTING = """{"defaultReportingKey":"defaultReportingValue"}"""
     }
 
     private lateinit var mockActionFactory: PushActionFactoryApi
@@ -236,7 +237,7 @@ class PushNotificationClickHandlerTests {
             everySuspend {
                 mockActionFactory.create(
                     NotificationOpenedActionModel(
-                        null,
+                        DEFAULT_REPORTING,
                         TRACKING_INFO
                     )
                 )
@@ -261,7 +262,7 @@ class PushNotificationClickHandlerTests {
             verifySuspend {
                 mockActionFactory.create(
                     NotificationOpenedActionModel(
-                        null,
+                        DEFAULT_REPORTING,
                         TRACKING_INFO
                     )
                 )
@@ -276,7 +277,7 @@ class PushNotificationClickHandlerTests {
             everySuspend {
                 mockActionFactory.create(
                     NotificationOpenedActionModel(
-                        null,
+                        DEFAULT_REPORTING,
                         TRACKING_INFO
                     )
                 )
@@ -295,7 +296,7 @@ class PushNotificationClickHandlerTests {
             verifySuspend {
                 mockActionFactory.create(
                     NotificationOpenedActionModel(
-                        null,
+                        DEFAULT_REPORTING,
                         TRACKING_INFO
                     )
                 )
@@ -367,7 +368,7 @@ class PushNotificationClickHandlerTests {
             everySuspend {
                 mockActionFactory.create(
                     NotificationOpenedActionModel(
-                        null,
+                        DEFAULT_REPORTING,
                         TRACKING_INFO
                     )
                 )
@@ -399,6 +400,7 @@ class PushNotificationClickHandlerTests {
             actionId = actionId,
             jsPushMessage = JsPushMessage(
                 trackingInfo = TRACKING_INFO,
+                reporting = DEFAULT_REPORTING,
                 platformData = JsPlatformData,
                 badgeCount = null,
                 actionableData = ActionableData(

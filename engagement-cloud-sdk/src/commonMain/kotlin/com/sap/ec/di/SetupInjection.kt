@@ -65,7 +65,7 @@ internal object SetupInjection {
         }
         single<State>(named(StateTypes.UnlinkContact)) {
             UnlinkContactState(
-                sdkEventDistributor = get(),
+                operationalEventDistributor = get(),
                 requestContext = get(),
                 sdkContext = get(),
                 sdkLogger = get { parametersOf(UnlinkContactState::class.simpleName) }
@@ -101,7 +101,7 @@ internal object SetupInjection {
         }
         single<State>(named(StateTypes.ClearPushTokenOnDisable)) {
             ClearPushTokenOnDisableState(
-                sdkEventDistributor = get(),
+                operationalEventDistributor = get(),
                 storage = get(),
                 sdkContext = get()
             )

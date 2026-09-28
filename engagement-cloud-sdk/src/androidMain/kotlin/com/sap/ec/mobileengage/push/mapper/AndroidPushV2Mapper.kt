@@ -1,6 +1,7 @@
 package com.sap.ec.mobileengage.push.mapper
 
 import com.sap.ec.api.event.model.EventSource
+import com.sap.ec.api.push.PushConstants.PUSH_DEFAULT_REPORTING
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.mapper.Mapper
 import com.sap.ec.core.providers.UuidProviderApi
@@ -41,6 +42,7 @@ internal class AndroidPushV2Mapper(
         private const val OPERATION = "notification.operation"
         private const val DEFAULT_ACTION = "notification.defaultAction"
         private const val ACTIONS = "notification.actions"
+        private const val REPORTING = "notification.reporting"
         private const val BADGE_COUNT = "notification.badgeCount"
         private const val TRACKING_INFO = "ems.trackingInfo"
     }
@@ -48,6 +50,8 @@ internal class AndroidPushV2Mapper(
     override suspend fun map(from: JsonObject): AndroidPushMessage? {
         return try {
             val trackingInfo: String = from[TRACKING_INFO]?.jsonPrimitive?.content ?: "{}"
+            val reporting: String =
+                from[REPORTING]?.jsonPrimitive?.contentOrNull ?: PUSH_DEFAULT_REPORTING
             val defaultTapAction: BasicActionModel? =
                 from[DEFAULT_ACTION]?.jsonPrimitive?.contentOrNull.fromString<BasicActionModel>(json)
 
@@ -63,6 +67,7 @@ internal class AndroidPushV2Mapper(
 
             AndroidPushMessage(
                 trackingInfo = trackingInfo,
+                reporting = reporting,
                 platformData = AndroidPlatformData(
                     channelId = from[CHANNEL_ID]?.jsonPrimitive?.contentOrNull
                         ?: DEFAULT_CHANNEL_ID,

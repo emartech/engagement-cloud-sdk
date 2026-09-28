@@ -29,7 +29,7 @@ internal object InitInjection {
     val initModules = module {
         single<State>(named(InitStateTypes.ApplyGlobalRemoteConfig)) {
             ApplyGlobalRemoteConfigState(
-                sdkEventDistributor = get(),
+                operationalEventDistributor = get(),
                 sdkLogger = get { parametersOf(ApplyGlobalRemoteConfigState::class.simpleName) },
             )
         }

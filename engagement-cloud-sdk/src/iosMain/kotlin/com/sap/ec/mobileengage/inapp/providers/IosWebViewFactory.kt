@@ -21,7 +21,11 @@ internal class IosWebViewFactory(
 ) : IosWebViewFactoryApi {
 
     @OptIn(ExperimentalForeignApi::class)
-    override suspend fun create(dismissId: String, trackingInfo: String, inAppType: InAppType): WKWebView {
+    override suspend fun create(
+        dismissId: String,
+        trackingInfo: String,
+        inAppType: InAppType
+    ): WKWebView {
         return withContext(mainDispatcher) {
             val inAppJsBridge = inAppJsBridgeFactory.create(
                 InAppJsBridgeData(
@@ -38,7 +42,9 @@ internal class IosWebViewFactory(
             webView.setBackgroundColor(UIColor.clearColor)
             webView.setOpaque(false)
             webView.scrollView.setBackgroundColor(UIColor.clearColor)
-            webView.scrollView.setScrollEnabled(false)
+            if (inAppType != InAppType.EMBEDDED_MESSAGING) {
+                webView.scrollView.setScrollEnabled(false)
+            }
             webView.scrollView.setBounces(false)
             webView.scrollView.setBouncesZoom(false)
             webView.scrollView.contentInsetAdjustmentBehavior =

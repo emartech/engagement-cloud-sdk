@@ -33,6 +33,7 @@ class SilentHuaweiPushV2MapperTest {
         const val UUID = "testUUID"
         const val TRACKING_INFO = """{"trackingInfoKey":"trackingInfoValue"}"""
         const val REPORTING = """{"reportingKey":"reportingValue"}"""
+        const val DEFAULT_REPORTING = """{"defaultReportingKey":"defaultReportingValue"}"""
         const val CHANNEL_ID = "testChannelId"
         const val COLLAPSE_ID = "testCollapseId"
     }
@@ -66,6 +67,7 @@ class SilentHuaweiPushV2MapperTest {
     fun map_shouldReturnSilentAndroidPushMessage_whenInputIsValid() = runTest {
         val input = buildJsonObject {
             putJsonObject("notification") {
+                put("reporting", DEFAULT_REPORTING)
                 put("collapseId", COLLAPSE_ID)
                 put("channelId", CHANNEL_ID)
                 put("operation", "init")
@@ -126,6 +128,7 @@ class SilentHuaweiPushV2MapperTest {
 
         val expectedOutput = SilentAndroidPushMessage(
             TRACKING_INFO,
+            reporting = DEFAULT_REPORTING,
             platformData,
             badgeCount,
             actionableData

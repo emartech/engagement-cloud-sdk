@@ -17,6 +17,8 @@ interface RequestContextApi {
 
     var isContactLinked: Boolean?
 
+    var linkedContactHash: String?
+
     fun clearTokens()
 
 }

@@ -68,7 +68,8 @@ class IosLoggingPushTests {
                 silent = true,
                 defaultAction = null,
                 actions = null,
-                badgeCount = null
+                badgeCount = null,
+                reporting = "testReporting",
             )
         )
 

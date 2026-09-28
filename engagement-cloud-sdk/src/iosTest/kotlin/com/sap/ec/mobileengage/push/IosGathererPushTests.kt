@@ -79,7 +79,8 @@ class IosGathererPushTests {
                 silent = true,
                 defaultAction = null,
                 actions = null,
-                badgeCount = null
+                badgeCount = null,
+                reporting = """{"defaultReportingKey":"defaultReportingValue"}"""
             )
         )
 

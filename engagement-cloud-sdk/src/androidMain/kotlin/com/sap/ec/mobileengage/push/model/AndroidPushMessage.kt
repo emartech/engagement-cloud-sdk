@@ -11,21 +11,23 @@ import com.sap.ec.mobileengage.push.PushMessage
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal sealed class AndroidPush: PushMessage<AndroidPlatformData>
+internal sealed class AndroidPush : PushMessage<AndroidPlatformData>
 
 @Serializable
 internal data class AndroidPushMessage(
     override val trackingInfo: String,
+    override val reporting: String,
     override val platformData: AndroidPlatformData,
     override val badgeCount: BadgeCount? = null,
     override val displayableData: DisplayableData,
     override val actionableData: ActionableData<PresentableActionModel>? = null
-): AndroidPush(), DisplayablePush, ActionablePush<PresentableActionModel>
+) : AndroidPush(), DisplayablePush, ActionablePush<PresentableActionModel>
 
 @Serializable
 internal data class SilentAndroidPushMessage(
     override val trackingInfo: String,
+    override val reporting: String,
     override val platformData: AndroidPlatformData,
     override val badgeCount: BadgeCount?,
     override val actionableData: ActionableData<BasicActionModel>?
-): AndroidPush(), ActionablePush<BasicActionModel>
+) : AndroidPush(), ActionablePush<BasicActionModel>

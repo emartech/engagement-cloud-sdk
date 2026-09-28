@@ -113,6 +113,7 @@ class EngagementCloudServiceWorkerTests {
 
     private fun getJsPushMessage(badgeCount: BadgeCount? = null) = JsPushMessage(
         trackingInfo = """{"trackingInfoKey":"trackingInfoValue"}""",
+        reporting = """{"defaultReportingKey":"defaultReportingValue"}""",
         platformData = JsPlatformData,
         badgeCount = badgeCount,
         actionableData = null,

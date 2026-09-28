@@ -14,6 +14,7 @@ internal data class RemoteWebPushMessageV2(
 
 @Serializable
 internal data class RemoteWebPushNotificationV2(
+    val reporting: String,
     val silent: Boolean,
     val title: String,
     val body: String,

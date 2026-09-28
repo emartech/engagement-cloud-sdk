@@ -39,6 +39,7 @@ import com.sap.ec.mobileengage.inapp.InAppMessage
 import com.sap.ec.networking.clients.event.model.DeviceEvent
 import com.sap.ec.recommendation.CartItem
 import com.sap.ec.recommendation.RecommendationOptions
+import io.ktor.http.Url
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -344,6 +345,9 @@ sealed interface SdkEvent {
          */
         sealed interface OperationalEvent : Internal, OnlineSdkEvent {
             val applicationCode: String?
+            val targetUrl: Url?
+
+            fun withUrl(url: Url): OperationalEvent
         }
 
         @Serializable
@@ -435,8 +439,13 @@ sealed interface SdkEvent {
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0,
                 val name: String = CLEAR_PUSH_TOKEN_EVENT_NAME,
-                override val applicationCode: String?
-            ) : Sdk(), OnlineSdkEvent, OperationalEvent
+                override val applicationCode: String?,
+                override val targetUrl: Url? = null
+            ) : Sdk(), OnlineSdkEvent, OperationalEvent {
+                override fun withUrl(url: Url): OperationalEvent {
+                    return this.copy(targetUrl = url)
+                }
+            }
 
             @Serializable
             data class RemoteConfigUpdateRequired(
@@ -459,8 +468,13 @@ sealed interface SdkEvent {
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0,
                 val name: String = APPLY_GLOBAL_REMOTE_CONFIG_EVENT_NAME,
-                override val applicationCode: String? = null
-            ) : Sdk(), OperationalEvent, SetupFlowEvent
+                override val applicationCode: String? = null,
+                override val targetUrl: Url? = null
+            ) : Sdk(), OperationalEvent, SetupFlowEvent {
+                override fun withUrl(url: Url): OperationalEvent {
+                    return this
+                }
+            }
 
             @Serializable
             data class ChangeAppCode(
@@ -497,8 +511,13 @@ sealed interface SdkEvent {
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0,
                 val name: String = UNLINK_CONTACT_NAME,
-                override val applicationCode: String?
-            ) : Sdk(), OnlineSdkEvent, OperationalEvent
+                override val applicationCode: String?,
+                override val targetUrl: Url? = null
+            ) : Sdk(), OnlineSdkEvent, OperationalEvent {
+                override fun withUrl(url: Url): OperationalEvent {
+                    return this.copy(targetUrl = url)
+                }
+            }
 
             @Serializable
             data class TrackDeepLink(
@@ -547,7 +566,7 @@ sealed interface SdkEvent {
             @Serializable
             data class Clicked(
                 override val id: String = UUIDProvider().provide(),
-                override val reporting: String?,
+                override val reporting: String,
                 override val trackingInfo: String,
                 val origin: String,
                 override val attributes: JsonObject? = null,

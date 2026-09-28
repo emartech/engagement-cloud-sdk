@@ -11,5 +11,6 @@ internal data class RemoteConfigResponse(
     val features: RemoteConfigFeatures? = null,
     val embeddedMessagingConfig: EmbeddedMessagingConfig? = null,
     val overrides: Map<String, RemoteConfig>? = null,
-    val globalRemoteConfigApplicationCodeValidationRegex: String? = null
+    val globalRemoteConfigApplicationCodeValidationRegex: String? = null,
+    val disabled: Boolean? = false
 )

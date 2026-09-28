@@ -43,6 +43,7 @@ class PushMessagePresenterTest {
         const val COLLAPSE_ID = "testCollapseId"
         const val TRACKING_INFO = """{"trackingInfoKey":"trackingInfoValue"}"""
         const val REPORTING = """{"reportingKey":"reportingValue"}"""
+        const val DEFAULT_REPORTING = """{defaultReportingKey":"defaultReportingValue"}"""
         const val ICON_ID = 10
         const val CHANNEL_ID = "testChannelId"
         const val DEBUG_CHANNEL_ID = "engagement_cloud_debug"
@@ -375,7 +376,8 @@ class PushMessagePresenterTest {
     ): AndroidPushMessage {
         val testMethod = NotificationMethod(COLLAPSE_ID, NotificationOperation.INIT)
         return AndroidPushMessage(
-            TRACKING_INFO,
+            trackingInfo = TRACKING_INFO,
+            reporting = DEFAULT_REPORTING,
             AndroidPlatformData(CHANNEL_ID, testMethod),
             badgeCount,
             DisplayableData(TITLE, BODY, iconUrlString, imageUrlString),
