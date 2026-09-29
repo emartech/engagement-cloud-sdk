@@ -25,6 +25,7 @@ import com.sap.ec.mobileengage.config.FollowUpChangeAppCodeOrganizer
 import com.sap.ec.mobileengage.config.FollowUpChangeAppCodeOrganizerApi
 import com.sap.ec.networking.clients.EventBasedClientApi
 import com.sap.ec.networking.clients.reregistration.ReregistrationClient
+import com.sap.ec.changeappcode.states.ClearLinkedContactHashState
 import com.sap.ec.reregistration.states.ClearRequestContextTokensState
 import com.sap.ec.reregistration.states.LinkContactState
 import org.koin.core.parameter.parametersOf
@@ -100,6 +101,12 @@ internal object SetupInjection {
                 sdkLogger = get { parametersOf(LinkContactState::class.simpleName) }
             )
         }
+        single<State>(named(StateTypes.ClearLinkedContactHash)) {
+            ClearLinkedContactHashState(
+                requestContext = get(),
+                sdkLogger = get { parametersOf(ClearLinkedContactHashState::class.simpleName) }
+            )
+        }
         single<State>(named(StateTypes.ClearStoredConfig)) {
             ClearStoredConfigState(
                 sdkContext = get(),
@@ -155,6 +162,7 @@ internal object SetupInjection {
             StateMachine(
                 states = listOf(
                     get<State>(named(StateTypes.ApplyAppCodeBasedRemoteConfig)),
+                    get<State>(named(StateTypes.ClearLinkedContactHash)),
                     get<State>(named(StateTypes.FetchEmbeddedMessagingMetaState)),
                 ),
                 name = StateMachineTypes.FollowUpChangeAppCodeStateMachine.name,
@@ -223,6 +231,7 @@ internal enum class StateTypes {
     ClearPushTokenOnDisable,
     LinkContact,
     UnlinkContact,
+    ClearLinkedContactHash,
     ClearStoredConfig,
     ClearEvents,
     ClearDeviceInfo,
