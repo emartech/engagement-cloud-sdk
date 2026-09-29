@@ -19,15 +19,28 @@ class RecommendationEventPreProcessorTests {
     }
 
     @Test
-    fun process_shouldAddCartItems_toCartStorage_whenEventIsCartEvent() = runTest {
+    fun process_shouldSetAllCartItem_toCartStorage_whenEventIsCartEvent() = runTest {
         val cartItems = listOf(
             CartItem("testId", 10.0, 1.0),
             CartItem("testId2", 20.0, 3.0)
         )
-        val event = SdkEvent.External.RecommendationTrackEvent.Cart(cartItems)
+        val cartEvent = SdkEvent.External.RecommendationTrackEvent.Cart(cartItems)
 
-        RecommendationEventPreProcessor(mockCartItemStorage).process(event)
+        RecommendationEventPreProcessor(mockCartItemStorage).process(cartEvent)
 
         verifySuspend { mockCartItemStorage.setAll(cartItems) }
+    }
+
+    @Test
+    fun process_shouldClearCartStorage_whenEventIsPurchase() = runTest {
+        val cartItems = listOf(
+            CartItem("testId", 10.0, 1.0),
+            CartItem("testId2", 20.0, 3.0)
+        )
+        val purchaseEvent = SdkEvent.External.RecommendationTrackEvent.Purchase("testOrderId", cartItems)
+
+        RecommendationEventPreProcessor(mockCartItemStorage).process(purchaseEvent)
+
+        verifySuspend { mockCartItemStorage.clear() }
     }
 }

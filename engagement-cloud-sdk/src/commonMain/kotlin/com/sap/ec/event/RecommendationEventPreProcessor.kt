@@ -10,5 +10,8 @@ class RecommendationEventPreProcessor(
         if (event is SdkEvent.External.RecommendationTrackEvent.Cart) {
             cartItemStorage.setAll(event.items)
         }
+        if (event is SdkEvent.External.RecommendationTrackEvent.Purchase) {
+            cartItemStorage.clear()
+        }
     }
 }
