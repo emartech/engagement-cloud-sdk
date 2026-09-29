@@ -50,13 +50,12 @@ internal class ContactInternal(
     }
 
     private suspend fun isAlreadyLinked(value: String): Boolean {
-        return requestContext.isContactLinked == true &&
-            crypto.hash(value) == requestContext.linkedContactHash
+        return crypto.hash(value) == requestContext.linkedContactHash
     }
 
     override suspend fun unlink() {
         sdkLogger.debug("unlink")
-        if (requestContext.isContactLinked ?: false) {
+        if (requestContext.linkedContactHash != null) {
             operationalEventDistributor.registerEvent(SdkEvent.Internal.Sdk.UnlinkContact(applicationCode = sdkContext.getSdkConfig()?.applicationCode))
         }
     }

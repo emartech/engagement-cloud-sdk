@@ -147,7 +147,6 @@ class ContactClientTests {
         verifySuspend { mockEcClient.send(any()) }
         verifySuspend { mockContactTokenHandler.handleContactTokens(any()) }
         verifySuspend { mockEcSdkSession.restartSession() }
-        verifySuspend { mockRequestContext.isContactLinked = true }
         verifySuspend { mockRequestContext.linkedContactHash = CONTACT_HASH }
         verifySuspend { mockEventsDao.removeEvent(linkContactEvent) }
         verifySuspend {
@@ -190,7 +189,7 @@ class ContactClientTests {
         verifySuspend { mockEcClient.send(any()) }
         verifySuspend(VerifyMode.exactly(0)) { mockContactTokenHandler.handleContactTokens(any()) }
         verifySuspend { mockEcSdkSession.restartSession() }
-        verifySuspend { mockRequestContext.isContactLinked = true }
+        verifySuspend { mockRequestContext.linkedContactHash = CONTACT_HASH }
         verifySuspend { mockEventsDao.removeEvent(linkContactEvent) }
         verifySuspend {
             mockSdkEventManager.emitEvent(
@@ -222,7 +221,6 @@ class ContactClientTests {
         verifySuspend { mockEcClient.send(any()) }
         verifySuspend { mockContactTokenHandler.handleContactTokens(any()) }
         verifySuspend { mockEcSdkSession.restartSession() }
-        verifySuspend { mockRequestContext.isContactLinked = true }
         verifySuspend { mockRequestContext.linkedContactHash = CONTACT_HASH }
         verifySuspend { mockEventsDao.removeEvent(linkAuthenticatedContactEvent) }
         verifySuspend {
@@ -257,7 +255,6 @@ class ContactClientTests {
         verifySuspend { mockEcClient.send(any()) }
         verifySuspend { mockContactTokenHandler.handleContactTokens(any()) }
         verifySuspend { mockEcSdkSession.restartSession() }
-        verifySuspend { mockRequestContext.isContactLinked = false }
         verifySuspend { mockRequestContext.linkedContactHash = null }
         verifySuspend { mockEventsDao.removeEvent(unlinkContactEvent) }
         verifySuspend {

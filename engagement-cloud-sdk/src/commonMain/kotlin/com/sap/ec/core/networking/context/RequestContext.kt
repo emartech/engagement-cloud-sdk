@@ -4,7 +4,6 @@ import com.sap.ec.InternalSdkApi
 import com.sap.ec.core.storage.StorageConstants.CLIENT_STATE_STORAGE_KEY
 import com.sap.ec.core.storage.StorageConstants.CONTACT_TOKEN_STORAGE_KEY
 import com.sap.ec.core.storage.StorageConstants.DEVICE_EVENT_STATE_STORAGE_KEY
-import com.sap.ec.core.storage.StorageConstants.IS_CONTACT_LINKED_STORAGE_KEY
 import com.sap.ec.core.storage.StorageConstants.LINKED_CONTACT_HASH_STORAGE_KEY
 import com.sap.ec.core.storage.StorageConstants.REFRESH_TOKEN_STORAGE_KEY
 import com.sap.ec.core.storage.Store
@@ -33,11 +32,6 @@ class RequestContext() : RequestContextApi {
     override var deviceEventState: String? by Store(
         key = DEVICE_EVENT_STATE_STORAGE_KEY,
         serializer = String.serializer()
-    )
-
-    override var isContactLinked: Boolean? by Store(
-        key = IS_CONTACT_LINKED_STORAGE_KEY,
-        serializer = Boolean.serializer()
     )
 
     override var linkedContactHash: String? by Store(

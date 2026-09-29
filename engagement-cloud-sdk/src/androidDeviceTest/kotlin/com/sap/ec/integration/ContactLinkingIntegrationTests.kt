@@ -37,7 +37,6 @@ class ContactLinkingIntegrationTests {
         sdkContext = SdkKoinIsolationContext.koin.get<SdkContextApi>()
         sdkContext.setSdkConfig(AndroidEngagementCloudSDKConfig(applicationCode = APP_CODE))
         sdkContext.setSdkState(SdkState.Active)
-        requestContext.isContactLinked = false
         requestContext.linkedContactHash = null
     }
 
@@ -84,7 +83,6 @@ class ContactLinkingIntegrationTests {
     private fun uniqueValue(): String = "contact-${Random.nextLong()}"
 
     private suspend fun markLinked(value: String) {
-        requestContext.isContactLinked = true
         requestContext.linkedContactHash = crypto.hash(value)
     }
 

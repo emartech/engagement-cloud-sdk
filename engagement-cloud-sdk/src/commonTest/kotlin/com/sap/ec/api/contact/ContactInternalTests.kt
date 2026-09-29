@@ -92,9 +92,9 @@ class ContactInternalTests {
         }
 
     @Test
-    fun testUnlinkContact_should_emit_unlinkContact_event_into_sdkFlow_if_isContactLinked_is_true() =
+    fun testUnlinkContact_should_emit_unlinkContact_event_into_sdkFlow_if_linkedContactHash_is_notNull() =
         runTest {
-            every { mockRequestContext.isContactLinked } returns true
+            every { mockRequestContext.linkedContactHash } returns CONTACT_HASH
 
             contactInternal.unlink()
 
@@ -103,9 +103,9 @@ class ContactInternalTests {
         }
 
     @Test
-    fun testUnlinkContact_should_not_emit_unlinkContact_event_into_sdkFlow_if_isContactLinked_is_false() =
+    fun testUnlinkContact_should_not_emit_unlinkContact_event_into_sdkFlow_if_linkedContactHash_is_null() =
         runTest {
-            every { mockRequestContext.isContactLinked } returns false
+            every { mockRequestContext.linkedContactHash } returns null
 
             contactInternal.unlink()
 
@@ -115,7 +115,6 @@ class ContactInternalTests {
 
     @Test
     fun testLinkContact_should_not_emit_event_when_same_contact_already_linked() = runTest {
-        every { mockRequestContext.isContactLinked } returns true
         every { mockRequestContext.linkedContactHash } returns CONTACT_HASH
 
         contactInternal.link(CONTACT_FIELD_VALUE)
@@ -126,7 +125,6 @@ class ContactInternalTests {
 
     @Test
     fun testLinkContact_should_emit_event_when_a_different_contact_is_linked() = runTest {
-        every { mockRequestContext.isContactLinked } returns true
         every { mockRequestContext.linkedContactHash } returns "otherHash"
 
         contactInternal.link(CONTACT_FIELD_VALUE)
@@ -136,8 +134,7 @@ class ContactInternalTests {
 
     @Test
     fun testLinkContact_should_emit_event_when_no_contact_is_linked() = runTest {
-        every { mockRequestContext.isContactLinked } returns false
-        every { mockRequestContext.linkedContactHash } returns CONTACT_HASH
+        every { mockRequestContext.linkedContactHash } returns null
 
         contactInternal.link(CONTACT_FIELD_VALUE)
 
@@ -147,7 +144,6 @@ class ContactInternalTests {
     @Test
     fun testLinkAuthenticatedContact_should_not_emit_event_when_same_contact_already_linked() =
         runTest {
-            every { mockRequestContext.isContactLinked } returns true
             every { mockRequestContext.linkedContactHash } returns CONTACT_HASH
 
             contactInternal.linkAuthenticated(OPEN_ID_TOKEN)

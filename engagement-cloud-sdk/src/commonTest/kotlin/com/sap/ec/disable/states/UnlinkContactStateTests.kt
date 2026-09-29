@@ -34,6 +34,7 @@ import kotlin.test.Test
 class UnlinkContactStateTests {
     private companion object {
         const val APPLICATION_CODE = "testAppCode"
+        const val CONTACT_HASH = "testContactHash"
         val testException = Exception("failed")
         val successResponse = SdkEvent.Internal.Sdk.Answer.Response(
             "0",
@@ -78,10 +79,10 @@ class UnlinkContactStateTests {
     }
 
     @Test
-    fun activate_shouldRegister_unlinkContactEvent_andReturnSuccess_ifIsContactLinked_isTrue() =
+    fun activate_shouldRegister_unlinkContactEvent_andReturnSuccess_ifLinkedContactHash_isNotNull() =
         runTest {
             everySuspend { mockSdkEventWaiter.await<Response>() } returns successResponse
-            every { mockRequestContext.isContactLinked } returns true
+            every { mockRequestContext.linkedContactHash } returns CONTACT_HASH
 
             val result = unlinkContactState.active()
 
@@ -91,9 +92,9 @@ class UnlinkContactStateTests {
         }
 
     @Test
-    fun activate_shouldNotRegister_unlinkContactEvent_andReturnSuccess_ifIsContactLinked_isFalse() =
+    fun activate_shouldNotRegister_unlinkContactEvent_andReturnSuccess_ifLinkedContactHash_isNull() =
         runTest {
-            every { mockRequestContext.isContactLinked } returns false
+            every { mockRequestContext.linkedContactHash } returns null
 
             val result = unlinkContactState.active()
 
@@ -105,7 +106,7 @@ class UnlinkContactStateTests {
 
     @Test
     fun activate_shouldRegister_unlinkContactEvent_andReturnFailure_ifErrorHappened() = runTest {
-        every { mockRequestContext.isContactLinked } returns true
+        every { mockRequestContext.linkedContactHash } returns CONTACT_HASH
         everySuspend { mockSdkEventWaiter.await<Response>() } returns failedResponse
 
         val result = unlinkContactState.active()

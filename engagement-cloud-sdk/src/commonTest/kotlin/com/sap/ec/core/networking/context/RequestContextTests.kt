@@ -54,17 +54,4 @@ class RequestContextTests : KoinTest {
         requestContext.contactToken shouldBe null
         requestContext.refreshToken shouldBe null
     }
-
-    @Test
-    fun setIsContactLinked_shouldSet_isContactLinked_toCorrectValue() {
-        requestContext.isContactLinked shouldBe null
-
-        requestContext.isContactLinked = true
-
-        requestContext.isContactLinked shouldBe true
-
-        requestContext.isContactLinked = false
-
-        requestContext.isContactLinked shouldBe false
-    }
 }

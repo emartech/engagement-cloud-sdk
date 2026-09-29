@@ -97,19 +97,16 @@ internal class ContactClient(
     private suspend fun handleSuccess(event: OnlineSdkEvent, response: Response) {
         when (event) {
             is SdkEvent.Internal.Sdk.LinkContact -> {
-                requestContext.isContactLinked = true
                 requestContext.linkedContactHash = crypto.hash(event.contactFieldValue)
                 ecSdkSession.restartSession()
             }
 
             is SdkEvent.Internal.Sdk.LinkAuthenticatedContact -> {
-                requestContext.isContactLinked = true
                 requestContext.linkedContactHash = crypto.hash(event.openIdToken)
                 ecSdkSession.restartSession()
             }
 
             is SdkEvent.Internal.Sdk.UnlinkContact -> {
-                requestContext.isContactLinked = false
                 requestContext.linkedContactHash = null
                 ecSdkSession.restartSession()
             }
