@@ -1,5 +1,11 @@
 package com.sap.ec.di
 
+import com.sap.ec.api.recommendation.LoggingRecommendation
+import com.sap.ec.api.recommendation.Recommendation
+import com.sap.ec.api.recommendation.RecommendationApi
+import com.sap.ec.api.recommendation.RecommendationGatherer
+import com.sap.ec.api.recommendation.RecommendationInstance
+import com.sap.ec.api.recommendation.RecommendationInternal
 import com.sap.ec.core.collections.ThreadSafePersistentStore
 import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
 import com.sap.ec.mobileengage.recommendation.networking.RecommendationRequestFactory
@@ -30,6 +36,30 @@ internal object RecommendationInjection {
             RecommendationResponseMapper(
                 json = get(),
                 sdkLogger = get { parametersOf(RecommendationResponseMapper::class.simpleName) }
+            )
+        }
+        single<RecommendationInstance>(named(InstanceType.Logging)) {
+            LoggingRecommendation(
+                logger = get { parametersOf(LoggingRecommendation::class.simpleName) },
+            )
+        }
+        single<RecommendationInstance>(named(InstanceType.Gatherer)) {
+            RecommendationGatherer(
+                sdkLogger = get { parametersOf(RecommendationGatherer::class.simpleName) }
+            )
+        }
+        single<RecommendationInstance>(named(InstanceType.Internal)) {
+            RecommendationInternal(
+                sdkEventDistributor = get(),
+                sdkLogger = get { parametersOf(RecommendationInternal::class.simpleName) }
+            )
+        }
+        single<RecommendationApi> {
+            Recommendation(
+                loggingApi = get(named(InstanceType.Logging)),
+                gathererApi = get(named(InstanceType.Gatherer)),
+                internalApi = get(named(InstanceType.Internal)),
+                sdkContext = get()
             )
         }
     }

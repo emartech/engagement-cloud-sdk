@@ -18,4 +18,5 @@ sealed class SdkException(message: String) : RuntimeException(message) {
     class PushManagerUnavailableException(message: String): SdkException(message)
     class MissingEventUrl(message: String = "Event URL is missing!"): SdkException(message)
     class ContactTokenNotFoundException(message: String): SdkException(message)
+    class RecommendationApiNotReady(message: String = "Recommendation API not ready!"): SdkException(message)
 }
