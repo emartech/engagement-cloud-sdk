@@ -24,11 +24,11 @@ import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import io.ktor.http.HttpMethod
+import io.ktor.http.ParametersBuilder
 import io.ktor.http.Url
 import io.ktor.http.formUrlEncode
 import io.ktor.http.parameters
 import kotlinx.coroutines.test.runTest
-import kotlin.collections.emptyList
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -76,12 +76,13 @@ class RecommendationRequestFactoryTests {
                 SdkEvent.External.RecommendationTrackEvent.ItemView(CART_ITEM_1.itemId)
             val params = parameters {
                 append("v", "i:$CART_ITEM_1_ITEM_ID_URL_ENCODED")
+                appendEmptyCart()
             }.formUrlEncode()
             val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
 
             val result = recommendationRequestFactory.create(itemViewEvent)
 
-            assertUrl(result, expectedUrl)
+            verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = true)
         }
 
     @Test
@@ -99,7 +100,7 @@ class RecommendationRequestFactoryTests {
 
         val result = recommendationRequestFactory.create(cartEvent)
 
-        assertUrl(result, expectedUrl)
+        verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = false)
     }
 
     @Test
@@ -118,7 +119,7 @@ class RecommendationRequestFactoryTests {
 
         val result = recommendationRequestFactory.create(cartEvent)
 
-        assertUrl(result, expectedUrl)
+        verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = false)
     }
 
     @Test
@@ -127,12 +128,13 @@ class RecommendationRequestFactoryTests {
             SdkEvent.External.RecommendationTrackEvent.CategoryView(TEST_CATEGORY_WITH_SPECIAL_CHAR)
         val params = parameters {
             append("vc", TEST_CATEGORY_WITH_SPECIAL_CHAR)
+            appendEmptyCart()
         }.formUrlEncode()
         val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
 
         val result = recommendationRequestFactory.create(categoryView)
 
-        assertUrl(result, expectedUrl)
+        verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = true)
     }
 
     @Test
@@ -155,7 +157,7 @@ class RecommendationRequestFactoryTests {
 
             val result = recommendationRequestFactory.create(purchase)
 
-            assertUrl(result, expectedUrl)
+            verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = false)
         }
 
     @Test
@@ -178,7 +180,7 @@ class RecommendationRequestFactoryTests {
 
             val result = recommendationRequestFactory.create(purchase)
 
-            assertUrl(result, expectedUrl)
+            verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = false)
         }
 
     @Test
@@ -186,12 +188,13 @@ class RecommendationRequestFactoryTests {
         val search = SdkEvent.External.RecommendationTrackEvent.Search(SEARCH_TERM)
         val params = parameters {
             append("q", SEARCH_TERM)
+            appendEmptyCart()
         }.formUrlEncode()
         val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
 
         val result = recommendationRequestFactory.create(search)
 
-        assertUrl(result, expectedUrl)
+        verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = true)
     }
 
     @Test
@@ -199,12 +202,13 @@ class RecommendationRequestFactoryTests {
         val tag = SdkEvent.External.RecommendationTrackEvent.Tag(TEST_TAG)
         val params = parameters {
             append("t", TEST_TAG)
+            appendEmptyCart()
         }.formUrlEncode()
         val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
 
         val result = recommendationRequestFactory.create(tag)
 
-        assertUrl(result, expectedUrl)
+        verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = true)
     }
 
     @Test
@@ -217,12 +221,17 @@ class RecommendationRequestFactoryTests {
                     "ta",
                     "{\"name\":\"$TEST_TAG\",\"attributes\":${tagAttributes.toJsonObject()}}"
                 )
+                append("cv", "1")
+                append(
+                    "ca",
+                    ""
+                )
             }.formUrlEncode()
             val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
 
             val result = recommendationRequestFactory.create(tagEvent)
 
-            assertUrl(result, expectedUrl)
+            verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = true)
         }
 
     @Test
@@ -235,12 +244,17 @@ class RecommendationRequestFactoryTests {
                     "ta",
                     "{\"name\":\"$TEST_TAG\",\"attributes\":${tagAttributes.toJsonObject()}}"
                 )
+                append("cv", "1")
+                append(
+                    "ca",
+                    ""
+                )
             }.formUrlEncode()
             val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
 
             val result = recommendationRequestFactory.create(tagEvent)
 
-            assertUrl(result, expectedUrl)
+            verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = true)
         }
 
     @Test
@@ -259,23 +273,17 @@ class RecommendationRequestFactoryTests {
                     "v",
                     "i:$CART_ITEM_1_ITEM_ID_URL_ENCODED,t:$feature,c:$cohort"
                 )
+                append("cv", "1")
+                append(
+                    "ca",
+                    ""
+                )
             }.formUrlEncode()
             val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
 
             val result = recommendationRequestFactory.create(recommendationClick)
 
-            assertUrl(result, expectedUrl)
-        }
-
-    @Test
-    fun test_create_shouldNotCall_cartItemsStorageItems_when_recommendationEvent_isNotRequestRecommendation() =
-        runTest {
-            val itemViewEvent =
-                SdkEvent.External.RecommendationTrackEvent.ItemView(CART_ITEM_1.itemId)
-
-            recommendationRequestFactory.create(itemViewEvent)
-
-            verify(VerifyMode.exactly(0)) { mockCartItemStorage.items }
+            verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = true)
         }
 
     @Test
@@ -302,8 +310,7 @@ class RecommendationRequestFactoryTests {
 
             val result = recommendationRequestFactory.create(requestRecommendationEvent)
 
-            assertUrl(result, expectedUrl)
-            verify { mockCartItemStorage.items }
+            verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = true)
         }
 
     @Test
@@ -318,18 +325,13 @@ class RecommendationRequestFactoryTests {
                 "f",
                 "f:HOME,l:5,o:0"
             )
-            append("cv", "1")
-            append(
-                "ca",
-                ""
-            )
+            appendEmptyCart()
         }.formUrlEncode()
         val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
 
         val result = recommendationRequestFactory.create(requestRecommendationEvent)
 
-        assertUrl(result, expectedUrl)
-        verify { mockCartItemStorage.items }
+        verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = true)
     }
 
     @Test
@@ -346,18 +348,13 @@ class RecommendationRequestFactoryTests {
                 "f",
                 "f:HOME,l:10,o:0"
             )
-            append("cv", "1")
-            append(
-                "ca",
-                ""
-            )
+            appendEmptyCart()
         }.formUrlEncode()
         val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
 
         val result = recommendationRequestFactory.create(requestRecommendationEvent)
 
-        assertUrl(result, expectedUrl)
-        verify { mockCartItemStorage.items }
+        verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = true)
     }
 
     @Test
@@ -374,18 +371,13 @@ class RecommendationRequestFactoryTests {
                 "f",
                 "f:HOME,l:5,o:15"
             )
-            append("cv", "1")
-            append(
-                "ca",
-                ""
-            )
+            appendEmptyCart()
         }.formUrlEncode()
         val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
 
         val result = recommendationRequestFactory.create(requestRecommendationEvent)
 
-        assertUrl(result, expectedUrl)
-        verify { mockCartItemStorage.items }
+        verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = true)
     }
 
     @Test
@@ -402,18 +394,13 @@ class RecommendationRequestFactoryTests {
                 "f:HOME,l:5,o:0"
             )
             append("az", "eu")
-            append("cv", "1")
-            append(
-                "ca",
-                ""
-            )
+            appendEmptyCart()
         }.formUrlEncode()
         val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
 
         val result = recommendationRequestFactory.create(requestRecommendationEvent)
 
-        assertUrl(result, expectedUrl)
-        verify { mockCartItemStorage.items }
+        verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = true)
     }
 
     @Test
@@ -431,18 +418,13 @@ class RecommendationRequestFactoryTests {
                 "f:HOME,l:5,o:0"
             )
             append("lang", "hu")
-            append("cv", "1")
-            append(
-                "ca",
-                ""
-            )
+            appendEmptyCart()
         }.formUrlEncode()
         val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
 
         val result = recommendationRequestFactory.create(requestRecommendationEvent)
 
-        assertUrl(result, expectedUrl)
-        verify { mockCartItemStorage.items }
+        verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = true)
     }
 
     @Test
@@ -460,18 +442,13 @@ class RecommendationRequestFactoryTests {
                 "f:HOME,l:5,o:0"
             )
             append("currency", "EUR")
-            append("cv", "1")
-            append(
-                "ca",
-                ""
-            )
+            appendEmptyCart()
         }.formUrlEncode()
         val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
 
         val result = recommendationRequestFactory.create(requestRecommendationEvent)
 
-        assertUrl(result, expectedUrl)
-        verify { mockCartItemStorage.items }
+        verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = true)
     }
 
     @Test
@@ -484,8 +461,7 @@ class RecommendationRequestFactoryTests {
                 expectedUrl = "$RECOMMENDATION_BASE_URL?${
                     parameters {
                         append("f", "f:HOME,l:5,o:0")
-                        append("cv", "1")
-                        append("ca", "")
+                        appendEmptyCart()
                     }.formUrlEncode()
                 }"
             ),
@@ -494,8 +470,7 @@ class RecommendationRequestFactoryTests {
                 expectedUrl = "$RECOMMENDATION_BASE_URL?${
                     parameters {
                         append("f", "f:HOME,l:5,o:0")
-                        append("cv", "1")
-                        append("ca", "")
+                        appendEmptyCart()
                     }.formUrlEncode()
                 }"
             ),
@@ -518,8 +493,7 @@ class RecommendationRequestFactoryTests {
                             "ex",
                             "[{\"f\":\"category\",\"r\":\"IS\",\"v\":\"$TEST_CATEGORY\",\"n\":true}]"
                         )
-                        append("cv", "1")
-                        append("ca", "")
+                        appendEmptyCart()
                     }.formUrlEncode()
                 }"
             ),
@@ -542,8 +516,7 @@ class RecommendationRequestFactoryTests {
                             "ex",
                             "[{\"f\":\"category\",\"r\":\"HAS\",\"v\":\"$TEST_CATEGORY\",\"n\":true}]"
                         )
-                        append("cv", "1")
-                        append("ca", "")
+                        appendEmptyCart()
                     }.formUrlEncode()
                 }"
             ),
@@ -566,8 +539,7 @@ class RecommendationRequestFactoryTests {
                             "ex",
                             "[{\"f\":\"category\",\"r\":\"OVERLAPS\",\"v\":\"$TEST_CATEGORY|$TEST_CATEGORY2\",\"n\":true}]"
                         )
-                        append("cv", "1")
-                        append("ca", "")
+                        appendEmptyCart()
                     }.formUrlEncode()
                 }"
             ),
@@ -590,8 +562,7 @@ class RecommendationRequestFactoryTests {
                             "ex",
                             "[{\"f\":\"category\",\"r\":\"IN\",\"v\":\"$TEST_CATEGORY|$TEST_CATEGORY2\",\"n\":true}]"
                         )
-                        append("cv", "1")
-                        append("ca", "")
+                        appendEmptyCart()
                     }.formUrlEncode()
                 }"
             ),
@@ -614,8 +585,7 @@ class RecommendationRequestFactoryTests {
                             "ex",
                             "[{\"f\":\"category\",\"r\":\"IS\",\"v\":\"$TEST_CATEGORY\",\"n\":false}]"
                         )
-                        append("cv", "1")
-                        append("ca", "")
+                        appendEmptyCart()
                     }.formUrlEncode()
                 }"
             ),
@@ -643,8 +613,7 @@ class RecommendationRequestFactoryTests {
                             "ex",
                             "[{\"f\":\"category\",\"r\":\"IS\",\"v\":\"bike\",\"n\":true},{\"f\":\"type\",\"r\":\"IS\",\"v\":\"electric\",\"n\":false}]"
                         )
-                        append("cv", "1")
-                        append("ca", "")
+                        appendEmptyCart()
                     }.formUrlEncode()
                 }"
             ),
@@ -675,26 +644,38 @@ class RecommendationRequestFactoryTests {
                         append("az", "eu")
                         append("lang", "hu")
                         append("currency", "EUR")
-                        append("cv", "1")
-                        append("ca", "")
+                        appendEmptyCart()
                     }.formUrlEncode()
                 }"
             )
         ).forEach { (options, expectedUrl) ->
             val result =
                 recommendationRequestFactory.create(RequestRecommendation(options = options))
-            assertUrl(result, expectedUrl)
-            verify { mockCartItemStorage.items }
+            verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = true)
             resetCalls(mockUrlFactory)
         }
     }
 
-    private fun assertUrl(
+    private fun verifyResult(
         result: UrlRequest,
-        expectedUrl: String
+        expectedUrl: String,
+        shouldMockCartItemStorageBeCalled: Boolean
     ) {
         result.url.toString() shouldBe expectedUrl
         result.method shouldBe HttpMethod.Get
         verifySuspend(VerifyMode.exactly(1)) { mockUrlFactory.create(ECUrlType.Recommendation) }
+        if (shouldMockCartItemStorageBeCalled) {
+            verify { mockCartItemStorage.items }
+        } else {
+            verify(VerifyMode.exactly(0)) { mockCartItemStorage.items }
+        }
+    }
+
+    private fun ParametersBuilder.appendEmptyCart() {
+        append("cv", "1")
+        append(
+            "ca",
+            ""
+        )
     }
 }

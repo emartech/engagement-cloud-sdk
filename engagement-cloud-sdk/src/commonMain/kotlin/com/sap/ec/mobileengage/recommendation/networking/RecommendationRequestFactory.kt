@@ -37,6 +37,7 @@ import com.sap.ec.recommendation.CartItem
 import com.sap.ec.recommendation.FilterType
 import com.sap.ec.util.JsonUtil
 import io.ktor.http.HttpMethod
+import io.ktor.http.URLBuilder
 import io.ktor.http.buildUrl
 import io.ktor.http.encodeURLParameter
 import io.ktor.http.takeFrom
@@ -62,15 +63,21 @@ internal class RecommendationRequestFactory(
                     )
                 }
 
-                is SdkEvent.External.RecommendationTrackEvent.CategoryView -> parameters.append(
-                    VIEW_CATEGORY_KEY,
-                    recommendationEvent.categoryPath
-                )
+                is SdkEvent.External.RecommendationTrackEvent.CategoryView -> {
+                    parameters.append(
+                        VIEW_CATEGORY_KEY,
+                        recommendationEvent.categoryPath
+                    )
+                    appendStoredCartItems()
+                }
 
-                is SdkEvent.External.RecommendationTrackEvent.ItemView -> parameters.append(
-                    ITEM_VIEW_KEY,
-                    "$ITEM_ID_KEY:${recommendationEvent.itemId.encodeURLParameter()}"
-                )
+                is SdkEvent.External.RecommendationTrackEvent.ItemView -> {
+                    parameters.append(
+                        ITEM_VIEW_KEY,
+                        "$ITEM_ID_KEY:${recommendationEvent.itemId.encodeURLParameter()}"
+                    )
+                    appendStoredCartItems()
+                }
 
                 is SdkEvent.External.RecommendationTrackEvent.Purchase -> {
                     parameters.append(ORDER_ID_KEY, recommendationEvent.orderId)
@@ -85,12 +92,16 @@ internal class RecommendationRequestFactory(
                         ITEM_VIEW_KEY,
                         "$ITEM_ID_KEY:${recommendationEvent.productId.encodeURLParameter()},$FEATURE_KEY:${recommendationEvent.feature},$COHORT_KEY:${recommendationEvent.cohort}"
                     )
+                    appendStoredCartItems()
                 }
 
-                is SdkEvent.External.RecommendationTrackEvent.Search -> parameters.append(
-                    SEARCH_KEY,
-                    recommendationEvent.searchTerm
-                )
+                is SdkEvent.External.RecommendationTrackEvent.Search -> {
+                    parameters.append(
+                        SEARCH_KEY,
+                        recommendationEvent.searchTerm
+                    )
+                    appendStoredCartItems()
+                }
 
                 is SdkEvent.External.RecommendationTrackEvent.Tag -> {
                     recommendationEvent.attributes?.let {
@@ -104,6 +115,7 @@ internal class RecommendationRequestFactory(
                             )
                         )
                     } ?: parameters.append(TAG_KEY, recommendationEvent.tag)
+                    appendStoredCartItems()
                 }
 
                 is SdkEvent.Internal.Sdk.RequestRecommendation -> {
@@ -136,13 +148,7 @@ internal class RecommendationRequestFactory(
                     recommendationEvent.options.displayCurrency?.takeIf { it.isNotEmpty() }?.let {
                         parameters.append(CURRENCY_KEY, it)
                     }
-                    cartItemStorage.items.let {
-                        parameters.append(CART_VERSION_FLAG_KEY, "1")
-                        parameters.append(
-                            CART_ITEMS_KEY,
-                            it.toUrlParamValue()
-                        )
-                    }
+                    appendStoredCartItems()
                 }
             }
         }
@@ -151,6 +157,16 @@ internal class RecommendationRequestFactory(
             url = url,
             method = HttpMethod.Get
         )
+    }
+
+    private fun URLBuilder.appendStoredCartItems() {
+        cartItemStorage.items.let {
+            parameters.append(CART_VERSION_FLAG_KEY, "1")
+            parameters.append(
+                CART_ITEMS_KEY,
+                it.toUrlParamValue()
+            )
+        }
     }
 
     private fun List<CartItem>.toUrlParamValue(): String {
