@@ -1,5 +1,6 @@
 package com.sap.ec.di
 
+import com.sap.ec.changeappcode.states.ClearLinkedContactState
 import com.sap.ec.core.channel.SdkEventEmitterApi
 import com.sap.ec.core.state.State
 import com.sap.ec.core.state.StateMachine
@@ -100,6 +101,12 @@ internal object SetupInjection {
                 sdkLogger = get { parametersOf(LinkContactState::class.simpleName) }
             )
         }
+        single<State>(named(StateTypes.ClearLinkedContact)) {
+            ClearLinkedContactState(
+                requestContext = get(),
+                sdkLogger = get { parametersOf(ClearLinkedContactState::class.simpleName) }
+            )
+        }
         single<State>(named(StateTypes.ClearStoredConfig)) {
             ClearStoredConfigState(
                 sdkContext = get(),
@@ -155,6 +162,7 @@ internal object SetupInjection {
             StateMachine(
                 states = listOf(
                     get<State>(named(StateTypes.ApplyAppCodeBasedRemoteConfig)),
+                    get<State>(named(StateTypes.ClearLinkedContact)),
                     get<State>(named(StateTypes.FetchEmbeddedMessagingMetaState)),
                 ),
                 name = StateMachineTypes.FollowUpChangeAppCodeStateMachine.name,
@@ -223,6 +231,7 @@ internal enum class StateTypes {
     ClearPushTokenOnDisable,
     LinkContact,
     UnlinkContact,
+    ClearLinkedContact,
     ClearStoredConfig,
     ClearEvents,
     ClearDeviceInfo,
