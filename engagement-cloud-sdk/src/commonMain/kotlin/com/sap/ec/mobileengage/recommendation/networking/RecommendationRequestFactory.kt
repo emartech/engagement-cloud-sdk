@@ -55,67 +55,8 @@ internal class RecommendationRequestFactory(
         val url = buildUrl {
             takeFrom(baseUrlWithAppCode)
             when (recommendationEvent) {
-                is SdkEvent.External.RecommendationTrackEvent.Cart -> {
-                    parameters.append(CART_VERSION_FLAG_KEY, "1")
-                    parameters.append(
-                        CART_ITEMS_KEY,
-                        recommendationEvent.items.toUrlParamValue()
-                    )
-                }
-
-                is SdkEvent.External.RecommendationTrackEvent.CategoryView -> {
-                    parameters.append(
-                        VIEW_CATEGORY_KEY,
-                        recommendationEvent.categoryPath
-                    )
-                    appendStoredCartItems()
-                }
-
-                is SdkEvent.External.RecommendationTrackEvent.ItemView -> {
-                    parameters.append(
-                        ITEM_VIEW_KEY,
-                        "$ITEM_ID_KEY:${recommendationEvent.itemId.encodeURLParameter()}"
-                    )
-                    appendStoredCartItems()
-                }
-
-                is SdkEvent.External.RecommendationTrackEvent.Purchase -> {
-                    parameters.append(ORDER_ID_KEY, recommendationEvent.orderId)
-                    parameters.append(
-                        CHECKOUT_ITEMS_KEY,
-                        recommendationEvent.items.toUrlParamValue()
-                    )
-                }
-
-                is SdkEvent.External.RecommendationTrackEvent.RecommendationTrackClick -> {
-                    parameters.append(
-                        ITEM_VIEW_KEY,
-                        "$ITEM_ID_KEY:${recommendationEvent.productId.encodeURLParameter()},$FEATURE_KEY:${recommendationEvent.feature},$COHORT_KEY:${recommendationEvent.cohort}"
-                    )
-                    appendStoredCartItems()
-                }
-
-                is SdkEvent.External.RecommendationTrackEvent.Search -> {
-                    parameters.append(
-                        SEARCH_KEY,
-                        recommendationEvent.searchTerm
-                    )
-                    appendStoredCartItems()
-                }
-
-                is SdkEvent.External.RecommendationTrackEvent.Tag -> {
-                    recommendationEvent.attributes?.let {
-                        parameters.append(
-                            TAG_WITH_ATTRIBUTES_KEY,
-                            JsonUtil.json.encodeToString(
-                                TagWithAttributes(
-                                    recommendationEvent.tag,
-                                    recommendationEvent.attributes
-                                )
-                            )
-                        )
-                    } ?: parameters.append(TAG_KEY, recommendationEvent.tag)
-                    appendStoredCartItems()
+                is SdkEvent.External.RecommendationTrackEvent -> {
+                    appendRecommendationTrackEventParams(recommendationEvent)
                 }
 
                 is SdkEvent.Internal.Sdk.RequestRecommendation -> {
@@ -148,7 +89,9 @@ internal class RecommendationRequestFactory(
                     recommendationEvent.options.displayCurrency?.takeIf { it.isNotEmpty() }?.let {
                         parameters.append(CURRENCY_KEY, it)
                     }
-                    appendStoredCartItems()
+                    recommendationEvent.contextEvent?.let { recommendationTrackEvent ->
+                        appendRecommendationTrackEventParams(recommendationTrackEvent)
+                    } ?: appendStoredCartItems()
                 }
             }
         }
@@ -159,14 +102,92 @@ internal class RecommendationRequestFactory(
         )
     }
 
-    private fun URLBuilder.appendStoredCartItems() {
-        cartItemStorage.items.let {
-            parameters.append(CART_VERSION_FLAG_KEY, "1")
-            parameters.append(
-                CART_ITEMS_KEY,
-                it.toUrlParamValue()
-            )
+    private fun URLBuilder.appendRecommendationTrackEventParams(event: SdkEvent.External.RecommendationTrackEvent) {
+        appendEventParams(event)
+        appendCartParams(event)
+    }
+
+    private fun URLBuilder.appendEventParams(
+        event: SdkEvent.External.RecommendationTrackEvent
+    ) {
+        when (event) {
+            is SdkEvent.External.RecommendationTrackEvent.Cart -> {}
+            is SdkEvent.External.RecommendationTrackEvent.CategoryView -> {
+                parameters.append(
+                    VIEW_CATEGORY_KEY,
+                    event.categoryPath
+                )
+            }
+
+            is SdkEvent.External.RecommendationTrackEvent.ItemView -> {
+                parameters.append(
+                    ITEM_VIEW_KEY,
+                    "$ITEM_ID_KEY:${event.itemId.encodeURLParameter()}"
+                )
+            }
+
+            is SdkEvent.External.RecommendationTrackEvent.Purchase -> {
+                parameters.append(ORDER_ID_KEY, event.orderId)
+                parameters.append(
+                    CHECKOUT_ITEMS_KEY,
+                    event.items.toUrlParamValue()
+                )
+            }
+
+            is SdkEvent.External.RecommendationTrackEvent.RecommendationTrackClick -> {
+                parameters.append(
+                    ITEM_VIEW_KEY,
+                    "$ITEM_ID_KEY:${event.productId.encodeURLParameter()},$FEATURE_KEY:${event.feature},$COHORT_KEY:${event.cohort}"
+                )
+            }
+
+            is SdkEvent.External.RecommendationTrackEvent.Search -> {
+                parameters.append(
+                    SEARCH_KEY,
+                    event.searchTerm
+                )
+            }
+
+            is SdkEvent.External.RecommendationTrackEvent.Tag -> {
+                event.attributes?.let {
+                    parameters.append(
+                        TAG_WITH_ATTRIBUTES_KEY,
+                        JsonUtil.json.encodeToString(
+                            TagWithAttributes(
+                                event.tag,
+                                it
+                            )
+                        )
+                    )
+                } ?: parameters.append(TAG_KEY, event.tag)
+            }
         }
+    }
+
+    private fun URLBuilder.appendCartParams(event: SdkEvent.External.RecommendationTrackEvent) {
+        when (event) {
+            is SdkEvent.External.RecommendationTrackEvent.Cart -> {
+                appendCartItems(event.items)
+            }
+
+            is SdkEvent.External.RecommendationTrackEvent.Purchase -> {
+                appendCartItems(emptyList())
+            }
+
+            else -> appendStoredCartItems()
+        }
+    }
+
+    private fun URLBuilder.appendStoredCartItems() {
+        appendCartItems(cartItemStorage.items)
+    }
+
+    private fun URLBuilder.appendCartItems(cartItems: List<CartItem>) {
+        parameters.append(CART_VERSION_FLAG_KEY, "1")
+        parameters.append(
+            CART_ITEMS_KEY,
+            cartItems.toUrlParamValue()
+        )
     }
 
     private fun List<CartItem>.toUrlParamValue(): String {
