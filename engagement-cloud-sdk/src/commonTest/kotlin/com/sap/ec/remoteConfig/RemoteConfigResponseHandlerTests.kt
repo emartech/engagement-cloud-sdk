@@ -2,6 +2,7 @@ package com.sap.ec.remoteConfig
 
 import com.sap.ec.context.DefaultUrls
 import com.sap.ec.context.DefaultUrlsApi
+import com.sap.ec.context.Features.Recommendation
 import com.sap.ec.context.Features.EmbeddedMessaging
 import com.sap.ec.context.Features.JsBridgeSignatureCheck
 import com.sap.ec.context.Features.MobileEngage
@@ -25,6 +26,7 @@ import dev.mokkery.mock
 import dev.mokkery.verify
 import dev.mokkery.verify.VerifyMode
 import io.kotest.matchers.collections.shouldContainAll
+import io.kotest.matchers.collections.shouldNotContain
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -135,9 +137,7 @@ class RemoteConfigResponseHandlerTests {
                 ),
                 LogLevel.Debug,
                 LuckyLogger(LogLevel.Error, 1.0),
-                RemoteConfigFeatures(
-
-                ),
+                RemoteConfigFeatures(),
             )
             every { mockSdkContext.defaultUrls = capture(defaultUrlSlot) } returns Unit
 
@@ -159,7 +159,10 @@ class RemoteConfigResponseHandlerTests {
                 clientService = clientServiceUrl
             ), LogLevel.Debug,
             LuckyLogger(LogLevel.Error, 1.0),
-            RemoteConfigFeatures(mobileEngage = true, jsBridgeSignatureCheck = false),
+            RemoteConfigFeatures(
+                mobileEngage = true,
+                jsBridgeSignatureCheck = false
+            ),
             overrides = mapOf(
                 "differentClientId" to RemoteConfig(
                     ServiceUrls(clientService = "differentClientServiceUrl")
@@ -340,7 +343,12 @@ class RemoteConfigResponseHandlerTests {
     @Test
     fun testApplyFeatures_shouldFail_whenSdkDisabledIsTrue() = runTest {
         val configResponse = RemoteConfigResponse(
-            features = RemoteConfigFeatures(jsBridgeSignatureCheck = true, mobileEngage = true, embeddedMessaging = true),
+            features = RemoteConfigFeatures(
+                mobileEngage = true,
+                recommendation = true,
+                embeddedMessaging = true,
+                jsBridgeSignatureCheck = true
+            ),
             disabled = true
         )
 
@@ -352,24 +360,46 @@ class RemoteConfigResponseHandlerTests {
     @Test
     fun testApplyFeatures_shouldApplyingFeatures_whenSdkDisabledIsFalse() = runTest {
         val configResponse = RemoteConfigResponse(
-            features = RemoteConfigFeatures(jsBridgeSignatureCheck = true, mobileEngage = true, embeddedMessaging = true),
+            features = RemoteConfigFeatures(
+                mobileEngage = true,
+                recommendation = true,
+                embeddedMessaging = true,
+                jsBridgeSignatureCheck = true
+            ),
             disabled = false
         )
 
         remoteConfigResponseHandler.handle(configResponse)
 
-        mockSdkContext.features shouldBe listOf(JsBridgeSignatureCheck, MobileEngage, EmbeddedMessaging)
+        mockSdkContext.features shouldBe listOf(JsBridgeSignatureCheck, MobileEngage, Recommendation, EmbeddedMessaging)
+    }
+
+    @Test
+    fun testApplyFeatures_shouldNotApplyFeature_whenRecommendationIsNull() = runTest {
+        val configResponse = RemoteConfigResponse(
+            features = RemoteConfigFeatures(recommendation = null),
+            disabled = false
+        )
+
+        remoteConfigResponseHandler.handle(configResponse)
+
+        mockSdkContext.features shouldNotContain Recommendation
     }
 
     @Test
     fun testApplyFeatures_shouldApplyingFeatures_whenSdkDisabledIsNull() = runTest {
         val configResponse = RemoteConfigResponse(
-            features = RemoteConfigFeatures(jsBridgeSignatureCheck = true, mobileEngage = true, embeddedMessaging = true),
+            features = RemoteConfigFeatures(
+                mobileEngage = true,
+                recommendation = true,
+                embeddedMessaging = true,
+                jsBridgeSignatureCheck = true
+            ),
             disabled = null
         )
 
         remoteConfigResponseHandler.handle(configResponse)
 
-        mockSdkContext.features shouldBe listOf(JsBridgeSignatureCheck, MobileEngage, EmbeddedMessaging)
+        mockSdkContext.features shouldBe listOf(JsBridgeSignatureCheck, MobileEngage, Recommendation, EmbeddedMessaging)
     }
 }
