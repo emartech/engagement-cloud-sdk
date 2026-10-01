@@ -4,6 +4,7 @@ import com.sap.ec.context.Features
 import com.sap.ec.context.Features.EmbeddedMessaging
 import com.sap.ec.context.Features.JsBridgeSignatureCheck
 import com.sap.ec.context.Features.MobileEngage
+import com.sap.ec.context.Features.Recommendation
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.context.copyWith
 import com.sap.ec.core.device.DeviceInfoCollectorApi
@@ -93,11 +94,13 @@ internal class RemoteConfigResponseHandler(
     private fun applyFeatures(features: RemoteConfigFeatures?, sdkDisabled: Boolean? = false) {
         if (sdkDisabled == true) {
             switch(MobileEngage, false)
+            switch(Recommendation, false)
             switch(EmbeddedMessaging, false)
             switch(JsBridgeSignatureCheck, false)
             throw SdkDisabledException("SDK is disabled!")
         } else {
             features?.mobileEngage?.let { switch(MobileEngage, it) }
+            features?.recommendation?.let { switch(Recommendation, it) }
             features?.embeddedMessaging?.let { switch(EmbeddedMessaging, it) }
             features?.jsBridgeSignatureCheck?.let { switch(JsBridgeSignatureCheck, it) }
         }
