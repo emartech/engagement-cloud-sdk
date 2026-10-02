@@ -5,9 +5,10 @@ import com.sap.ec.core.db.events.EventsDaoApi
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.clients.NetworkClientApi
 import com.sap.ec.core.networking.model.Response
+import com.sap.ec.recommendation.RecommendationCartStorageUpdaterApi
 import com.sap.ec.event.SdkEvent
-import com.sap.ec.mobileengage.recommendation.networking.RecommendationRequestFactoryApi
 import com.sap.ec.networking.clients.EventBasedClientApi
+import com.sap.ec.recommendation.networking.RecommendationRequestFactoryApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.filterIsInstance
@@ -20,6 +21,7 @@ internal class RecommendationClient(
     private val recommendationRequestFactory: RecommendationRequestFactoryApi,
     private val recommendationResponseMapper: RecommendationResponseMapperApi,
     private val eventsDao: EventsDaoApi,
+    private val recommendationCartStorageUpdater: RecommendationCartStorageUpdaterApi,
     private val sdkLogger: Logger
 ) : EventBasedClientApi {
 
@@ -37,6 +39,7 @@ internal class RecommendationClient(
                     val request = recommendationRequestFactory.create(event)
                     recommendationNetworkClient.send(request).fold(
                         onSuccess = { successResponse ->
+                            recommendationCartStorageUpdater.updateFromEvent(event)
                             sdkEventManager.emitEvent(
                                 SdkEvent.Internal.Sdk.Answer.Response(
                                     event.id,
@@ -67,6 +70,7 @@ internal class RecommendationClient(
                     val request = recommendationRequestFactory.create(event)
                     recommendationNetworkClient.send(request).fold(
                         onSuccess = { successResponse ->
+                            recommendationCartStorageUpdater.updateFromEvent(event)
                             val listOfProducts = recommendationResponseMapper.map(successResponse)
                             sdkEventManager.emitEvent(
                                 SdkEvent.Internal.Sdk.Answer.Response(

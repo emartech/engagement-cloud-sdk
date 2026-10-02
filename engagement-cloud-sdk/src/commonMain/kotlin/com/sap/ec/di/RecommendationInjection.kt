@@ -8,8 +8,10 @@ import com.sap.ec.api.recommendation.RecommendationInstance
 import com.sap.ec.api.recommendation.RecommendationInternal
 import com.sap.ec.core.collections.ThreadSafePersistentStore
 import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
-import com.sap.ec.mobileengage.recommendation.networking.RecommendationRequestFactory
-import com.sap.ec.mobileengage.recommendation.networking.RecommendationRequestFactoryApi
+import com.sap.ec.recommendation.RecommendationCartStorageUpdater
+import com.sap.ec.recommendation.RecommendationCartStorageUpdaterApi
+import com.sap.ec.recommendation.networking.RecommendationRequestFactory
+import com.sap.ec.recommendation.networking.RecommendationRequestFactoryApi
 import com.sap.ec.networking.clients.recommendation.RecommendationResponseMapper
 import com.sap.ec.networking.clients.recommendation.RecommendationResponseMapperApi
 import com.sap.ec.recommendation.CartItem
@@ -36,6 +38,11 @@ internal object RecommendationInjection {
             RecommendationResponseMapper(
                 json = get(),
                 sdkLogger = get { parametersOf(RecommendationResponseMapper::class.simpleName) }
+            )
+        }
+        single<RecommendationCartStorageUpdaterApi> {
+            RecommendationCartStorageUpdater(
+                cartItemStorage = get(named(ThreadSafePersistentStoreTypes.RecommendationCartItems))
             )
         }
         single<RecommendationInstance>(named(InstanceType.Logging)) {

@@ -12,6 +12,8 @@ import com.sap.ec.recommendation.FilterType
 import com.sap.ec.recommendation.RecommendationFilter
 import com.sap.ec.recommendation.RecommendationLogic
 import com.sap.ec.recommendation.RecommendationOptions
+import com.sap.ec.recommendation.networking.RecommendationRequestFactory
+import com.sap.ec.recommendation.networking.RecommendationRequestFactoryApi
 import com.sap.ec.util.toJsonObject
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns

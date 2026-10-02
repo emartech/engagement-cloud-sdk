@@ -1,4 +1,4 @@
-package com.sap.ec.mobileengage.recommendation.networking
+package com.sap.ec.recommendation.networking
 
 import com.sap.ec.core.networking.model.UrlRequest
 import com.sap.ec.event.RecommendationEvent

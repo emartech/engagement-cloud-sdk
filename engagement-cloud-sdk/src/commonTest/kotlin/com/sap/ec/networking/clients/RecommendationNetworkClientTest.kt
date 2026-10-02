@@ -7,8 +7,8 @@ import com.sap.ec.core.networking.context.RequestContextApi
 import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.networking.model.UrlRequest
 import com.sap.ec.core.storage.StringStorageApi
-import com.sap.ec.mobileengage.recommendation.RecommendationConstants.VISITOR_ID_COOKIE_KEY
-import com.sap.ec.mobileengage.recommendation.RecommendationConstants.XP_COOKIE_KEY
+import com.sap.ec.recommendation.RecommendationConstants.VISITOR_ID_COOKIE_KEY
+import com.sap.ec.recommendation.RecommendationConstants.XP_COOKIE_KEY
 import com.sap.ec.networking.ECHeaders.CONTACT_TOKEN_HEADER
 import com.sap.ec.networking.RecommendationNetworkClient
 import dev.mokkery.MockMode

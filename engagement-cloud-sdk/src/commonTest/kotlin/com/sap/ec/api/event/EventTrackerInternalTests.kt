@@ -10,20 +10,15 @@ import com.sap.ec.core.log.SdkLogger
 import com.sap.ec.core.providers.InstantProvider
 import com.sap.ec.core.providers.UuidProviderApi
 import com.sap.ec.core.storage.StorageApi
-import com.sap.ec.event.EventPreProcessorApi
 import com.sap.ec.event.SdkEvent
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
-import dev.mokkery.matcher.capture.Capture.Companion.slot
-import dev.mokkery.matcher.capture.capture
-import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.JsonPrimitive
@@ -67,13 +62,11 @@ class EventTrackerInternalTests {
     private lateinit var mockStorage: StorageApi
     private lateinit var logger: Logger
     private lateinit var mockWaiter: SdkEventWaiterApi
-    private lateinit var mockEventPreProcessor: EventPreProcessorApi<SdkEvent>
 
     @BeforeTest
     fun setUp() {
         mockSdkEventDistributor = mock()
         mockStorage = mock(MockMode.autofill)
-        mockEventPreProcessor = mock(MockMode.autofill)
         mockWaiter = mock()
         everySuspend { mockWaiter.await<Any>() } returns SdkEvent.Internal.Sdk.Answer.Response(
             "0",
@@ -90,21 +83,14 @@ class EventTrackerInternalTests {
 
 
     @Test
-    fun testTrackEvent_shouldMakeCalls_onEventPreProcessor_and_onClient() = runTest {
+    fun testTrackEvent_shouldMakeCall_onClient() = runTest {
         everySuspend { mockSdkEventDistributor.registerEvent(event) } returns mockWaiter
-        val eventCaptor = slot<SdkEvent>()
-        everySuspend { mockEventPreProcessor.process(capture(eventCaptor)) } returns Unit
 
         eventTrackerInternal.trackEvent(customEvent)
 
-        val capturedEvent = eventCaptor.get() as SdkEvent.External.Custom
-        capturedEvent.name shouldBe customEvent.name
-        capturedEvent.attributes?.toMap()
-            ?.mapValues { (it.value as JsonPrimitive).content } shouldBe customEvent.attributes
         verifySuspend {
             mockTimestampProvider.provide()
             mockSdkEventDistributor.registerEvent(event)
-            mockEventPreProcessor.process(capturedEvent)
         }
     }
 
@@ -144,7 +130,6 @@ class EventTrackerInternalTests {
         EventTrackerInternal(
             mockSdkEventDistributor,
             safeStore,
-            mockEventPreProcessor,
             mockTimestampProvider,
             mockUuidProvider,
             logger

@@ -1,4 +1,4 @@
-package com.sap.ec.mobileengage.recommendation.networking
+package com.sap.ec.recommendation.networking
 
 import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
 import com.sap.ec.core.networking.model.UrlRequest
@@ -6,35 +6,35 @@ import com.sap.ec.core.url.ECUrlType
 import com.sap.ec.core.url.UrlFactoryApi
 import com.sap.ec.event.RecommendationEvent
 import com.sap.ec.event.SdkEvent
-import com.sap.ec.mobileengage.recommendation.RecommendationConstants.AVAILABILITY_ZONE_KEY
-import com.sap.ec.mobileengage.recommendation.RecommendationConstants.CART_ITEMS_KEY
-import com.sap.ec.mobileengage.recommendation.RecommendationConstants.CART_LIST_ITEM_PRICE_KEY
-import com.sap.ec.mobileengage.recommendation.RecommendationConstants.CART_LIST_ITEM_QUANTITY_KEY
-import com.sap.ec.mobileengage.recommendation.RecommendationConstants.CART_VERSION_FLAG_KEY
-import com.sap.ec.mobileengage.recommendation.RecommendationConstants.CHECKOUT_ITEMS_KEY
-import com.sap.ec.mobileengage.recommendation.RecommendationConstants.COHORT_KEY
-import com.sap.ec.mobileengage.recommendation.RecommendationConstants.CURRENCY_KEY
-import com.sap.ec.mobileengage.recommendation.RecommendationConstants.FEATURES_TO_RETRIEVE_RECOMMENDATIONS_FOR_KEY
-import com.sap.ec.mobileengage.recommendation.RecommendationConstants.FEATURE_ID_KEY
-import com.sap.ec.mobileengage.recommendation.RecommendationConstants.FEATURE_KEY
-import com.sap.ec.mobileengage.recommendation.RecommendationConstants.FILTER_EXCLUDE_KEY
-import com.sap.ec.mobileengage.recommendation.RecommendationConstants.FILTER_FIELD_KEY
-import com.sap.ec.mobileengage.recommendation.RecommendationConstants.FILTER_NEGATE_KEY
-import com.sap.ec.mobileengage.recommendation.RecommendationConstants.FILTER_RULE_KEY
-import com.sap.ec.mobileengage.recommendation.RecommendationConstants.FILTER_VALUE_KEY
-import com.sap.ec.mobileengage.recommendation.RecommendationConstants.ITEM_ID_KEY
-import com.sap.ec.mobileengage.recommendation.RecommendationConstants.ITEM_VIEW_KEY
-import com.sap.ec.mobileengage.recommendation.RecommendationConstants.LANGUAGE_KEY
-import com.sap.ec.mobileengage.recommendation.RecommendationConstants.LIMIT_KEY
-import com.sap.ec.mobileengage.recommendation.RecommendationConstants.OFFSET_KEY
-import com.sap.ec.mobileengage.recommendation.RecommendationConstants.ORDER_ID_KEY
-import com.sap.ec.mobileengage.recommendation.RecommendationConstants.SEARCH_KEY
-import com.sap.ec.mobileengage.recommendation.RecommendationConstants.TAG_KEY
-import com.sap.ec.mobileengage.recommendation.RecommendationConstants.TAG_WITH_ATTRIBUTES_KEY
-import com.sap.ec.mobileengage.recommendation.RecommendationConstants.VIEW_CATEGORY_KEY
-import com.sap.ec.mobileengage.recommendation.models.TagWithAttributes
+import com.sap.ec.recommendation.models.TagWithAttributes
 import com.sap.ec.recommendation.CartItem
 import com.sap.ec.recommendation.FilterType
+import com.sap.ec.recommendation.RecommendationConstants.AVAILABILITY_ZONE_KEY
+import com.sap.ec.recommendation.RecommendationConstants.CART_ITEMS_KEY
+import com.sap.ec.recommendation.RecommendationConstants.CART_LIST_ITEM_PRICE_KEY
+import com.sap.ec.recommendation.RecommendationConstants.CART_LIST_ITEM_QUANTITY_KEY
+import com.sap.ec.recommendation.RecommendationConstants.CART_VERSION_FLAG_KEY
+import com.sap.ec.recommendation.RecommendationConstants.CHECKOUT_ITEMS_KEY
+import com.sap.ec.recommendation.RecommendationConstants.COHORT_KEY
+import com.sap.ec.recommendation.RecommendationConstants.CURRENCY_KEY
+import com.sap.ec.recommendation.RecommendationConstants.FEATURE_ID_KEY
+import com.sap.ec.recommendation.RecommendationConstants.FEATURE_KEY
+import com.sap.ec.recommendation.RecommendationConstants.FEATURES_TO_RETRIEVE_RECOMMENDATIONS_FOR_KEY
+import com.sap.ec.recommendation.RecommendationConstants.FILTER_EXCLUDE_KEY
+import com.sap.ec.recommendation.RecommendationConstants.FILTER_FIELD_KEY
+import com.sap.ec.recommendation.RecommendationConstants.FILTER_NEGATE_KEY
+import com.sap.ec.recommendation.RecommendationConstants.FILTER_RULE_KEY
+import com.sap.ec.recommendation.RecommendationConstants.FILTER_VALUE_KEY
+import com.sap.ec.recommendation.RecommendationConstants.ITEM_ID_KEY
+import com.sap.ec.recommendation.RecommendationConstants.ITEM_VIEW_KEY
+import com.sap.ec.recommendation.RecommendationConstants.LANGUAGE_KEY
+import com.sap.ec.recommendation.RecommendationConstants.LIMIT_KEY
+import com.sap.ec.recommendation.RecommendationConstants.OFFSET_KEY
+import com.sap.ec.recommendation.RecommendationConstants.ORDER_ID_KEY
+import com.sap.ec.recommendation.RecommendationConstants.SEARCH_KEY
+import com.sap.ec.recommendation.RecommendationConstants.TAG_KEY
+import com.sap.ec.recommendation.RecommendationConstants.TAG_WITH_ATTRIBUTES_KEY
+import com.sap.ec.recommendation.RecommendationConstants.VIEW_CATEGORY_KEY
 import com.sap.ec.util.JsonUtil
 import io.ktor.http.HttpMethod
 import io.ktor.http.URLBuilder
@@ -62,7 +62,7 @@ internal class RecommendationRequestFactory(
                 is SdkEvent.Internal.Sdk.RequestRecommendation -> {
                     parameters.append(
                         FEATURES_TO_RETRIEVE_RECOMMENDATIONS_FOR_KEY,
-                        "$FEATURE_ID_KEY:${recommendationEvent.options.logic},$LIMIT_KEY:${recommendationEvent.options.limit},$OFFSET_KEY:${recommendationEvent.options.offset}"
+                        "${FEATURE_ID_KEY}:${recommendationEvent.options.logic},${LIMIT_KEY}:${recommendationEvent.options.limit},${OFFSET_KEY}:${recommendationEvent.options.offset}"
                     )
                     recommendationEvent.options.filters?.takeIf { it.isNotEmpty() }
                         ?.let { filters ->
@@ -122,7 +122,7 @@ internal class RecommendationRequestFactory(
             is SdkEvent.External.RecommendationTrackEvent.ItemView -> {
                 parameters.append(
                     ITEM_VIEW_KEY,
-                    "$ITEM_ID_KEY:${event.itemId.encodeURLParameter()}"
+                    "${ITEM_ID_KEY}:${event.itemId.encodeURLParameter()}"
                 )
             }
 
@@ -137,7 +137,7 @@ internal class RecommendationRequestFactory(
             is SdkEvent.External.RecommendationTrackEvent.RecommendationTrackClick -> {
                 parameters.append(
                     ITEM_VIEW_KEY,
-                    "$ITEM_ID_KEY:${event.productId.encodeURLParameter()},$FEATURE_KEY:${event.feature},$COHORT_KEY:${event.cohort}"
+                    "${ITEM_ID_KEY}:${event.productId.encodeURLParameter()},${FEATURE_KEY}:${event.feature},${COHORT_KEY}:${event.cohort}"
                 )
             }
 
@@ -192,7 +192,7 @@ internal class RecommendationRequestFactory(
 
     private fun List<CartItem>.toUrlParamValue(): String {
         return this.joinToString("|") { item ->
-            "$ITEM_ID_KEY:${item.itemId.encodeURLParameter()},$CART_LIST_ITEM_PRICE_KEY:${item.price},$CART_LIST_ITEM_QUANTITY_KEY:${item.quantity}"
+            "${ITEM_ID_KEY}:${item.itemId.encodeURLParameter()},${CART_LIST_ITEM_PRICE_KEY}:${item.price},${CART_LIST_ITEM_QUANTITY_KEY}:${item.quantity}"
         }
     }
 }

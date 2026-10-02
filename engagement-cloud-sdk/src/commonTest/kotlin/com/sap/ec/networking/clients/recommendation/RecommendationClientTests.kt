@@ -9,11 +9,12 @@ import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.networking.model.UrlRequest
 import com.sap.ec.event.OnlineSdkEvent
 import com.sap.ec.event.SdkEvent
-import com.sap.ec.mobileengage.recommendation.RecommendationConstants.CART_LIST_ITEM_QUANTITY_KEY
-import com.sap.ec.mobileengage.recommendation.networking.RecommendationRequestFactoryApi
 import com.sap.ec.recommendation.Product
+import com.sap.ec.recommendation.RecommendationCartStorageUpdaterApi
+import com.sap.ec.recommendation.RecommendationConstants.CART_LIST_ITEM_QUANTITY_KEY
 import com.sap.ec.recommendation.RecommendationLogic
 import com.sap.ec.recommendation.RecommendationOptions
+import com.sap.ec.recommendation.networking.RecommendationRequestFactoryApi
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -55,6 +56,7 @@ class RecommendationClientTests {
     private lateinit var sdkEventsFlow: MutableSharedFlow<SdkEvent>
     private lateinit var onlineSdkEventsFlow: MutableSharedFlow<OnlineSdkEvent>
     private lateinit var mockRecommendationResponseMapper: RecommendationResponseMapperApi
+    private lateinit var mockRecommendationCartStorageUpdater: RecommendationCartStorageUpdaterApi
 
     private companion object {
         private const val RECOMMENDATION_BASE_URL =
@@ -70,6 +72,7 @@ class RecommendationClientTests {
         mockNetworkClient = mock(MockMode.autofill)
         mockRecommendationRequestFactory = mock(MockMode.autofill)
         mockRecommendationResponseMapper = mock(MockMode.autofill)
+        mockRecommendationCartStorageUpdater = mock(MockMode.autofill)
 
         sdkEventsFlow = MutableSharedFlow(replay = 100, extraBufferCapacity = Channel.UNLIMITED)
         onlineSdkEventsFlow = MutableSharedFlow(replay = 100, extraBufferCapacity = Channel.UNLIMITED)
@@ -80,7 +83,7 @@ class RecommendationClientTests {
     }
 
     @Test
-    fun testConsumer_shouldConsumeRecommendationTrackEvent_and_sendTheRequest_andAckEvent_whenReceivingSuccessResponse() =
+    fun testConsumer_shouldConsumeRecommendationTrackEvent_andSendTheRequest_andCallRecommendationCartStorageUpdater_andAckEvent_whenReceivingSuccessResponse() =
         runTest {
             createRecommendationClient(backgroundScope).register()
             val searchEvent = SdkEvent.External.RecommendationTrackEvent.Search("testSearchTerm")
@@ -111,6 +114,7 @@ class RecommendationClientTests {
                 mockSdkLogger.debug("consume RecommendationTrackEvent events")
                 mockRecommendationRequestFactory.create(searchEvent)
                 mockNetworkClient.send(request)
+                mockRecommendationCartStorageUpdater.updateFromEvent(searchEvent)
                 mockSdkEventManager.emitEvent(
                     SdkEvent.Internal.Sdk.Answer.Response(
                         searchEvent.id,
@@ -122,7 +126,7 @@ class RecommendationClientTests {
         }
 
     @Test
-    fun testConsumer_shouldConsumeRecommendationTrackEvent_and_sendTheRequest_andAckEvent_whenReceivingFailureResponse() =
+    fun testConsumer_shouldConsumeRecommendationTrackEvent_andSendTheRequest_andNotCallRecommendationCartStorageUpdater_andAckEvent_whenReceivingFailureResponse() =
         runTest {
             createRecommendationClient(backgroundScope).register()
             val searchEvent = SdkEvent.External.RecommendationTrackEvent.Search("testSearchTerm")
@@ -154,7 +158,6 @@ class RecommendationClientTests {
                 mockSdkLogger.debug("consume RecommendationTrackEvent events")
                 mockRecommendationRequestFactory.create(searchEvent)
                 mockNetworkClient.send(request)
-
                 mockSdkEventManager.emitEvent(
                     SdkEvent.Internal.Sdk.Answer.Response(
                         searchEvent.id,
@@ -163,10 +166,11 @@ class RecommendationClientTests {
                 )
                 mockEventsDao.removeEvent(searchEvent)
             }
+            verifySuspend(VerifyMode.exactly(0)) { mockRecommendationCartStorageUpdater.updateFromEvent(any<SdkEvent.External.RecommendationTrackEvent.Search>()) }
         }
 
     @Test
-    fun testConsumer_shouldConsumeRequestRecommendation_and_sendTheRequest_and_mapResponse_and_emitResultSuccessProductList_whenReceivingSuccessResponse() =
+    fun testConsumer_shouldConsumeRequestRecommendation_andSendTheRequest_andCallRecommendationCartStorageUpdater_andMapResponse_andEmitResultSuccessProductList_whenReceivingSuccessResponse() =
         runTest {
             createRecommendationClient(backgroundScope).register()
             val requestRecommendation = SdkEvent.Internal.Sdk.RequestRecommendation(options = RecommendationOptions(
@@ -204,13 +208,14 @@ class RecommendationClientTests {
                 mockSdkLogger.debug("consume RequestRecommendation events")
                 mockRecommendationRequestFactory.create(requestRecommendation)
                 mockNetworkClient.send(request)
+                mockRecommendationCartStorageUpdater.updateFromEvent(requestRecommendation)
                 mockRecommendationResponseMapper.map(successResponse)
                 mockSdkEventManager.emitEvent(any())
             }
         }
 
     @Test
-    fun testConsumer_shouldConsumeRequestRecommendation_and_sendTheRequest_and_emitResponse_whenReceivingFailureResponse() =
+    fun testConsumer_shouldConsumeRequestRecommendation_andSendTheRequest_andNotCallRecommendationCartStorageUpdater_andEmitResponse_whenReceivingFailureResponse() =
         runTest {
             createRecommendationClient(backgroundScope).register()
             val requestRecommendation = SdkEvent.Internal.Sdk.RequestRecommendation(options = RecommendationOptions(
@@ -251,6 +256,7 @@ class RecommendationClientTests {
                     )
                 )
             }
+            verifySuspend(VerifyMode.exactly(0)) { mockRecommendationCartStorageUpdater.updateFromEvent(any<SdkEvent.Internal.Sdk.RequestRecommendation>()) }
         }
 
     @Test
@@ -288,6 +294,7 @@ class RecommendationClientTests {
             mockRecommendationRequestFactory,
             mockRecommendationResponseMapper,
             mockEventsDao,
+            mockRecommendationCartStorageUpdater,
             mockSdkLogger
         )
     }

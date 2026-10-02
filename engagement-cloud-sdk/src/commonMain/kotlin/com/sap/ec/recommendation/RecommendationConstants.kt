@@ -1,4 +1,4 @@
-package com.sap.ec.mobileengage.recommendation
+package com.sap.ec.recommendation
 
 object RecommendationConstants {
     const val CART_VERSION_FLAG_KEY = "cv"

@@ -1,4 +1,4 @@
-package com.sap.ec.mobileengage.recommendation.models
+package com.sap.ec.recommendation.models
 
 import kotlinx.serialization.Serializable
 
