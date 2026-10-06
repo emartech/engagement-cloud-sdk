@@ -25,3 +25,12 @@ internal data class JsNavigateEventValidationData(
     override val type: String = JsEventType.NAVIGATE.name
 
 }
+
+@Serializable
+@SerialName("RECOMMENDATION")
+internal data class JsRecommendationEventValidationData(
+    override val recommendationEventType: String,
+) : JsRecommendationEvent, JsEventValidationData {
+    override val type: String = JsEventType.RECOMMENDATION.name
+
+}

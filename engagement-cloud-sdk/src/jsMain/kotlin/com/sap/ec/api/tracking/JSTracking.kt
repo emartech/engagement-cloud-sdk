@@ -59,6 +59,10 @@ internal class JSTracking(
                     val jsNavigateEvent = event.unsafeCast<JsNavigateEvent>()
                     NavigateEvent(location = jsNavigateEvent.location)
                 }
+
+                JsEventType.RECOMMENDATION -> {
+                    TODO("Implement")
+                }
             }
         } catch (e: Exception) {
             sdkLogger.debug("Failed to parse event.", e, isRemoteLog = false)

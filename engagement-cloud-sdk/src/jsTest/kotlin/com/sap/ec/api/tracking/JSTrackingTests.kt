@@ -132,7 +132,7 @@ class JSTrackingTests {
             val exception =
                 shouldThrow<IllegalArgumentException> { jsTracking.track(jsNavigateEvent) }
 
-            exception.message shouldBe "Invalid event type: TEST. Valid types are: custom, navigate"
+            exception.message shouldBe "Invalid event type: TEST. Valid types are: custom, navigate, recommendation"
         }
 
     @Test
@@ -163,7 +163,7 @@ class JSTrackingTests {
         val exception = shouldThrow<IllegalArgumentException> {
             jsTracking.track(customEvent)
         }
-        exception.message shouldBe "Invalid event type: unknown. Valid types are: custom, navigate"
+        exception.message shouldBe "Invalid event type: unknown. Valid types are: custom, navigate, recommendation"
     }
 
     @Test

@@ -6,5 +6,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 internal enum class JsEventType {
     CUSTOM,
-    NAVIGATE
+    NAVIGATE,
+    RECOMMENDATION
 }
