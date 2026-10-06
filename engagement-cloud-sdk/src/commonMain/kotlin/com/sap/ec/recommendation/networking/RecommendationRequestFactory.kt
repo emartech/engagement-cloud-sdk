@@ -7,8 +7,8 @@ import com.sap.ec.core.url.UrlFactoryApi
 import com.sap.ec.event.RecommendationEvent
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.recommendation.models.TagWithAttributes
-import com.sap.ec.recommendation.CartItem
-import com.sap.ec.recommendation.FilterType
+import com.sap.ec.recommendation.models.CartItem
+import com.sap.ec.recommendation.models.requestRecommendation.FilterType
 import com.sap.ec.recommendation.RecommendationConstants.AVAILABILITY_ZONE_KEY
 import com.sap.ec.recommendation.RecommendationConstants.CART_ITEMS_KEY
 import com.sap.ec.recommendation.RecommendationConstants.CART_LIST_ITEM_PRICE_KEY

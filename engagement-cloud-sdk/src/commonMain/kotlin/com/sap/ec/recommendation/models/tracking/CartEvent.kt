@@ -1,16 +1,17 @@
-package com.sap.ec.recommendation
+package com.sap.ec.recommendation.models.tracking
 
 import com.sap.ec.api.event.model.TrackedEvent
 import com.sap.ec.event.SdkEvent
+import com.sap.ec.recommendation.models.CartItem
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
-data class CategoryViewEvent(val categoryPath: String) : TrackedEvent {
+data class CartEvent(val items: List<CartItem>) : TrackedEvent {
     @OptIn(ExperimentalTime::class)
     override fun toSdkEvent(uuid: String, timestamp: Instant): Result<SdkEvent> =
         Result.success(
-            SdkEvent.External.RecommendationTrackEvent.CategoryView(
-                categoryPath = categoryPath,
+            SdkEvent.External.RecommendationTrackEvent.Cart(
+                items = items,
                 id = uuid,
                 timestamp = timestamp
             )

@@ -8,13 +8,13 @@ import com.sap.ec.api.recommendation.RecommendationInstance
 import com.sap.ec.api.recommendation.RecommendationInternal
 import com.sap.ec.core.collections.ThreadSafePersistentStore
 import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
-import com.sap.ec.recommendation.RecommendationCartStorageUpdater
-import com.sap.ec.recommendation.RecommendationCartStorageUpdaterApi
+import com.sap.ec.recommendation.store.RecommendationCartStorageUpdater
+import com.sap.ec.recommendation.store.RecommendationCartStorageUpdaterApi
 import com.sap.ec.recommendation.networking.RecommendationRequestFactory
 import com.sap.ec.recommendation.networking.RecommendationRequestFactoryApi
 import com.sap.ec.networking.clients.recommendation.RecommendationResponseMapper
 import com.sap.ec.networking.clients.recommendation.RecommendationResponseMapperApi
-import com.sap.ec.recommendation.CartItem
+import com.sap.ec.recommendation.models.CartItem
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module

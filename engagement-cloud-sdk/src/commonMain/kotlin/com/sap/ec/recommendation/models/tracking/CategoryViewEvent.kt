@@ -1,17 +1,16 @@
-package com.sap.ec.recommendation
+package com.sap.ec.recommendation.models.tracking
 
 import com.sap.ec.api.event.model.TrackedEvent
 import com.sap.ec.event.SdkEvent
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
-data class TagEvent(val tag: String, val attributes: Map<String, String>? = null) : TrackedEvent {
+data class CategoryViewEvent(val categoryPath: String) : TrackedEvent {
     @OptIn(ExperimentalTime::class)
     override fun toSdkEvent(uuid: String, timestamp: Instant): Result<SdkEvent> =
         Result.success(
-            SdkEvent.External.RecommendationTrackEvent.Tag(
-                tag = tag,
-                attributes = attributes,
+            SdkEvent.External.RecommendationTrackEvent.CategoryView(
+                categoryPath = categoryPath,
                 id = uuid,
                 timestamp = timestamp
             )

@@ -1,18 +1,16 @@
-package com.sap.ec.recommendation
+package com.sap.ec.recommendation.models.tracking
 
 import com.sap.ec.api.event.model.TrackedEvent
 import com.sap.ec.event.SdkEvent
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
-data class RecommendationClickEvent(val productId: String) : TrackedEvent {
+data class ItemViewEvent(val itemId: String) : TrackedEvent {
     @OptIn(ExperimentalTime::class)
     override fun toSdkEvent(uuid: String, timestamp: Instant): Result<SdkEvent> =
         Result.success(
-            SdkEvent.External.RecommendationTrackEvent.RecommendationTrackClick(
-                productId = productId,
-                feature = "",
-                cohort = "",
+            SdkEvent.External.RecommendationTrackEvent.ItemView(
+                itemId = itemId,
                 id = uuid,
                 timestamp = timestamp
             )

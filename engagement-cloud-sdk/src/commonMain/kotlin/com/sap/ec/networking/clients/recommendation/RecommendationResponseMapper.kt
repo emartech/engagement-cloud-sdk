@@ -2,8 +2,8 @@ package com.sap.ec.networking.clients.recommendation
 
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.model.Response
-import com.sap.ec.recommendation.Feature
-import com.sap.ec.recommendation.Product
+import com.sap.ec.recommendation.models.product.Feature
+import com.sap.ec.recommendation.models.product.Product
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject

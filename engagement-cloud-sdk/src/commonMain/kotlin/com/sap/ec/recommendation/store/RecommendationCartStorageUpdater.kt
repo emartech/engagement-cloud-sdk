@@ -1,7 +1,8 @@
-package com.sap.ec.recommendation
+package com.sap.ec.recommendation.store
 
 import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
 import com.sap.ec.event.SdkEvent
+import com.sap.ec.recommendation.models.CartItem
 
 class RecommendationCartStorageUpdater(
     private val cartItemStorage: ThreadSafePersistentStoreApi<CartItem>

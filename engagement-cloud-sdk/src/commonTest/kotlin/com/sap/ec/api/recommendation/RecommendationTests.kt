@@ -3,8 +3,8 @@ package com.sap.ec.api.recommendation
 import com.sap.ec.api.SdkState
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.event.SdkEvent
-import com.sap.ec.recommendation.RecommendationLogic
-import com.sap.ec.recommendation.RecommendationOptions
+import com.sap.ec.recommendation.models.requestRecommendation.RecommendationLogic
+import com.sap.ec.recommendation.models.requestRecommendation.RecommendationOptions
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws

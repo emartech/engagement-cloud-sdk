@@ -5,7 +5,7 @@ import com.sap.ec.core.db.events.EventsDaoApi
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.clients.NetworkClientApi
 import com.sap.ec.core.networking.model.Response
-import com.sap.ec.recommendation.RecommendationCartStorageUpdaterApi
+import com.sap.ec.recommendation.store.RecommendationCartStorageUpdaterApi
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.networking.clients.EventBasedClientApi
 import com.sap.ec.recommendation.networking.RecommendationRequestFactoryApi

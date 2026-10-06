@@ -3,7 +3,7 @@ package com.sap.ec.api.recommendation
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.log.Logger
 import com.sap.ec.event.SdkEvent
-import com.sap.ec.recommendation.Product
+import com.sap.ec.recommendation.models.product.Product
 
 internal class RecommendationInternal(
     private val sdkEventDistributor: SdkEventDistributorApi,

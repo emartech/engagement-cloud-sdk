@@ -3,7 +3,7 @@ package com.sap.ec.disable.states
 import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.state.State
-import com.sap.ec.recommendation.CartItem
+import com.sap.ec.recommendation.models.CartItem
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 

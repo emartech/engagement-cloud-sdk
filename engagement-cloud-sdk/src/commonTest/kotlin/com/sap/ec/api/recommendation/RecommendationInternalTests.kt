@@ -3,9 +3,9 @@ package com.sap.ec.api.recommendation
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.channel.SdkEventWaiterApi
 import com.sap.ec.event.SdkEvent
-import com.sap.ec.recommendation.Product
-import com.sap.ec.recommendation.RecommendationLogic
-import com.sap.ec.recommendation.RecommendationOptions
+import com.sap.ec.recommendation.models.product.Product
+import com.sap.ec.recommendation.models.requestRecommendation.RecommendationLogic
+import com.sap.ec.recommendation.models.requestRecommendation.RecommendationOptions
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend

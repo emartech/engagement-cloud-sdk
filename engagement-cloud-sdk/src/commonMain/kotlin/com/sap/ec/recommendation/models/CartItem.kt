@@ -1,4 +1,4 @@
-package com.sap.ec.recommendation
+package com.sap.ec.recommendation.models
 
 import kotlinx.serialization.Serializable
 

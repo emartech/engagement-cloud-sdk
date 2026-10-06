@@ -27,7 +27,7 @@ import com.sap.ec.mobileengage.config.FollowUpChangeAppCodeOrganizer
 import com.sap.ec.mobileengage.config.FollowUpChangeAppCodeOrganizerApi
 import com.sap.ec.networking.clients.EventBasedClientApi
 import com.sap.ec.networking.clients.reregistration.ReregistrationClient
-import com.sap.ec.recommendation.CartItem
+import com.sap.ec.recommendation.models.CartItem
 import com.sap.ec.reregistration.states.ClearRequestContextTokensState
 import com.sap.ec.reregistration.states.LinkContactState
 import org.koin.core.parameter.parametersOf

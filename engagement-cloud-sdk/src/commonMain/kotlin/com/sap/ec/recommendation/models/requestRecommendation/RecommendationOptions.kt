@@ -1,4 +1,4 @@
-package com.sap.ec.recommendation
+package com.sap.ec.recommendation.models.requestRecommendation
 
 data class RecommendationOptions(
     val logic: RecommendationLogic,

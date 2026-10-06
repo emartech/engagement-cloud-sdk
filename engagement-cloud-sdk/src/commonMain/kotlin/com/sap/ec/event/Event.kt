@@ -37,8 +37,8 @@ import com.sap.ec.currentPlatform
 import com.sap.ec.mobileengage.embeddedmessaging.models.MessageTagUpdate
 import com.sap.ec.mobileengage.inapp.InAppMessage
 import com.sap.ec.networking.clients.event.model.DeviceEvent
-import com.sap.ec.recommendation.CartItem
-import com.sap.ec.recommendation.RecommendationOptions
+import com.sap.ec.recommendation.models.CartItem
+import com.sap.ec.recommendation.models.requestRecommendation.RecommendationOptions
 import io.ktor.http.Url
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive

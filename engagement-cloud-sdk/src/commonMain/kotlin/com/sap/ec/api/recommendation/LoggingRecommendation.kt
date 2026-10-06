@@ -3,7 +3,7 @@ package com.sap.ec.api.recommendation
 import com.sap.ec.core.log.LogEntry
 import com.sap.ec.core.log.Logger
 import com.sap.ec.event.SdkEvent
-import com.sap.ec.recommendation.Product
+import com.sap.ec.recommendation.models.product.Product
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 

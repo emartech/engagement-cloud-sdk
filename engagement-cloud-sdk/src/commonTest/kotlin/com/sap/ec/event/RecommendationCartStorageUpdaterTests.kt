@@ -1,10 +1,10 @@
 package com.sap.ec.event
 
 import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
-import com.sap.ec.recommendation.CartItem
-import com.sap.ec.recommendation.RecommendationCartStorageUpdater
-import com.sap.ec.recommendation.RecommendationLogic
-import com.sap.ec.recommendation.RecommendationOptions
+import com.sap.ec.recommendation.models.CartItem
+import com.sap.ec.recommendation.store.RecommendationCartStorageUpdater
+import com.sap.ec.recommendation.models.requestRecommendation.RecommendationLogic
+import com.sap.ec.recommendation.models.requestRecommendation.RecommendationOptions
 import dev.mokkery.MockMode
 import dev.mokkery.matcher.any
 import dev.mokkery.mock

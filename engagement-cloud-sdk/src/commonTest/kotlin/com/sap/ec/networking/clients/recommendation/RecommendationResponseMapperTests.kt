@@ -3,7 +3,7 @@ package com.sap.ec.networking.clients.recommendation
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.networking.model.UrlRequest
-import com.sap.ec.recommendation.Product
+import com.sap.ec.recommendation.models.product.Product
 import com.sap.ec.util.JsonUtil
 import dev.mokkery.MockMode
 import dev.mokkery.mock

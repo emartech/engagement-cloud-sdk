@@ -3,8 +3,8 @@ package com.sap.ec.api.recommendation
 import com.sap.ec.core.exceptions.SdkException.RecommendationApiNotReady
 import com.sap.ec.core.log.Logger
 import com.sap.ec.event.SdkEvent
-import com.sap.ec.recommendation.RecommendationLogic
-import com.sap.ec.recommendation.RecommendationOptions
+import com.sap.ec.recommendation.models.requestRecommendation.RecommendationLogic
+import com.sap.ec.recommendation.models.requestRecommendation.RecommendationOptions
 import dev.mokkery.MockMode
 import dev.mokkery.mock
 import kotlinx.coroutines.test.runTest

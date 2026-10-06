@@ -9,11 +9,11 @@ import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.networking.model.UrlRequest
 import com.sap.ec.event.OnlineSdkEvent
 import com.sap.ec.event.SdkEvent
-import com.sap.ec.recommendation.Product
-import com.sap.ec.recommendation.RecommendationCartStorageUpdaterApi
+import com.sap.ec.recommendation.models.product.Product
+import com.sap.ec.recommendation.store.RecommendationCartStorageUpdaterApi
 import com.sap.ec.recommendation.RecommendationConstants.CART_LIST_ITEM_QUANTITY_KEY
-import com.sap.ec.recommendation.RecommendationLogic
-import com.sap.ec.recommendation.RecommendationOptions
+import com.sap.ec.recommendation.models.requestRecommendation.RecommendationLogic
+import com.sap.ec.recommendation.models.requestRecommendation.RecommendationOptions
 import com.sap.ec.recommendation.networking.RecommendationRequestFactoryApi
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
