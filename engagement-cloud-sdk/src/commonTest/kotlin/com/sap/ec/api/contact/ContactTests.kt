@@ -29,6 +29,7 @@ class ContactTests {
         const val CONTACT_FIELD_VALUE = "testContactFieldValue"
         const val OPEN_ID_TOKEN = "testOpenIdToken"
         val testException = Exception()
+        val testIllegalArgumentException = IllegalArgumentException("Input parameter is blank!")
     }
 
     private lateinit var mockSdkContext: SdkContextApi
@@ -94,6 +95,30 @@ class ContactTests {
     }
 
     @Test
+    fun testLink_shouldReturn_failureWith_IllegalArgumentException_whenInputIsBlank() =
+        runTest {
+            every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
+            contact.registerOnContext()
+
+            val result = contact.link("")
+
+            result.isFailure shouldBe true
+            result.exceptionOrNull() shouldBe testIllegalArgumentException
+        }
+
+    @Test
+    fun testLink_shouldReturn_failureWith_IllegalArgumentException_whenInputIsAllWhiteSpace() =
+        runTest {
+            every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
+            contact.registerOnContext()
+
+            val result = contact.link("      ")
+
+            result.isFailure shouldBe true
+            result.exceptionOrNull() shouldBe testIllegalArgumentException
+        }
+
+    @Test
     fun testLink_activeState_throws() = runTest {
         every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
         everySuspend { mockContactInternal.link(CONTACT_FIELD_VALUE) } throws testException
@@ -138,6 +163,28 @@ class ContactTests {
 
         verifySuspend { mockContactInternal.linkAuthenticated(OPEN_ID_TOKEN) }
     }
+
+    @Test
+    fun testLinkAuthenticated_shouldReturn_failureWith_IllegalArgumentException_whenInputIsBlank() =
+        runTest {
+            every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
+            contact.registerOnContext()
+
+            val result = contact.linkAuthenticated("")
+            result.isFailure shouldBe true
+            result.exceptionOrNull() shouldBe testIllegalArgumentException
+        }
+
+    @Test
+    fun testLinkAuthenticated_shouldReturn_failureWith_IllegalArgumentException_whenInputIsAllWhiteSpace() =
+        runTest {
+            every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
+            contact.registerOnContext()
+
+            val result = contact.linkAuthenticated("     ")
+            result.isFailure shouldBe true
+            result.exceptionOrNull() shouldBe testIllegalArgumentException
+        }
 
     @Test
     fun testLinkAuthenticated_activeState_throws() = runTest {
@@ -195,7 +242,9 @@ class ContactTests {
     fun link_shouldPropagateCancellationException_whenInternalApiThrowsCancellationException() =
         runTest {
             every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
-            everySuspend { mockContactInternal.link(CONTACT_FIELD_VALUE) } throws CancellationException("test cancellation")
+            everySuspend { mockContactInternal.link(CONTACT_FIELD_VALUE) } throws
+                    CancellationException("test cancellation")
+
             contact.registerOnContext()
 
             shouldThrow<CancellationException> { contact.link(CONTACT_FIELD_VALUE) }

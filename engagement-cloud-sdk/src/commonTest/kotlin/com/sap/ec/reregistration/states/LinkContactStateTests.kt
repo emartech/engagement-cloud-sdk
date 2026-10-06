@@ -17,6 +17,7 @@ import dev.mokkery.matcher.capture.Capture.Companion.slot
 import dev.mokkery.matcher.capture.SlotCapture
 import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
+import dev.mokkery.matcher.capture.isAbsent
 import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
@@ -39,11 +40,11 @@ import kotlin.test.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class LinkContactStateTests {
 
-    companion object {
-        private const val TEST_CONTACT_FIELD_VALUE = "testContactFieldValue"
-        private const val TEST_OPEN_ID_TOKEN = "testOpenIdToken"
-        private val testException = Exception("failed")
-        private val successResponse = SdkEvent.Internal.Sdk.Answer.Response(
+    private companion object {
+        const val TEST_CONTACT_FIELD_VALUE = "testContactFieldValue"
+        const val TEST_OPEN_ID_TOKEN = "testOpenIdToken"
+        val testException = Exception("failed")
+        val successResponse = SdkEvent.Internal.Sdk.Answer.Response(
             "0",
             Result.success(
                 Response(
@@ -54,7 +55,8 @@ class LinkContactStateTests {
                 )
             )
         )
-        private val failedResponse = successResponse.copy(result = Result.failure(testException))
+        val failedResponse = successResponse.copy(result = Result.failure(testException))
+        val testIllegalArgumentException = IllegalArgumentException("Input parameter is blank!")
     }
 
     private lateinit var mockSdkContext: SdkContextApi
@@ -117,6 +119,34 @@ class LinkContactStateTests {
         }
 
     @Test
+    fun active_shouldNotRegisterLinkContactEvent_whenOnContactLinking_returns_blankContactFieldValue() =
+        runTest {
+            every {
+                mockSdkContext.onContactLinkingFailed
+            } returns { LinkContactData.ContactFieldValueData(contactFieldValue = "") }
+
+            val result = linkContactState.active()
+
+            result.isFailure shouldBe true
+            result.exceptionOrNull() shouldBe testIllegalArgumentException
+            eventSlot.isAbsent shouldBe true
+        }
+
+    @Test
+    fun active_shouldNotRegisterLinkContactEvent_whenOnContactLinking_returns_ContactFieldValue_withWitheSpaces() =
+        runTest {
+            every {
+                mockSdkContext.onContactLinkingFailed
+            } returns { LinkContactData.ContactFieldValueData(contactFieldValue = "     ") }
+
+            val result = linkContactState.active()
+
+            result.isFailure shouldBe true
+            result.exceptionOrNull() shouldBe testIllegalArgumentException
+            eventSlot.isAbsent shouldBe true
+        }
+
+    @Test
     fun active_shouldRegisterLinkAuthenticatedContactEvent_throughSdkEventDistributor_whenOnContactLinking_returnsOpenIdToken() =
         runTest {
             every {
@@ -134,6 +164,34 @@ class LinkContactStateTests {
             val registeredEvent = eventSlot.get()
             (registeredEvent is SdkEvent.Internal.Sdk.LinkAuthenticatedContact) shouldBe true
             (registeredEvent as SdkEvent.Internal.Sdk.LinkAuthenticatedContact).openIdToken shouldBe TEST_OPEN_ID_TOKEN
+        }
+
+    @Test
+    fun active_shouldNotRegisterLinkAuthenticatedContactEvent_whenOnContactLinking_returns_BlankOpenIdToken() =
+        runTest {
+            every {
+                mockSdkContext.onContactLinkingFailed
+            } returns { LinkContactData.OpenIdTokenData(openIdToken = "") }
+
+            val result = linkContactState.active()
+
+            result.isFailure shouldBe true
+            result.exceptionOrNull() shouldBe testIllegalArgumentException
+            eventSlot.isAbsent shouldBe true
+        }
+
+    @Test
+    fun active_shouldNotRegisterLinkAuthenticatedContactEvent_whenOnContactLinking_returns_OpenIdToken_withWitheSpaces() =
+        runTest {
+            every {
+                mockSdkContext.onContactLinkingFailed
+            } returns { LinkContactData.OpenIdTokenData(openIdToken = "        ") }
+
+            val result = linkContactState.active()
+
+            result.isFailure shouldBe true
+            result.exceptionOrNull() shouldBe testIllegalArgumentException
+            eventSlot.isAbsent shouldBe true
         }
 
     @Test
