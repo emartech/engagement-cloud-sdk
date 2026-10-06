@@ -1,7 +1,8 @@
 package com.sap.ec.core.channel
 
-import com.sap.ec.context.ServiceUrlsApi
 import com.sap.ec.context.SdkContextApi
+import com.sap.ec.context.ServiceUrls.FeatureUrls
+import com.sap.ec.context.ServiceUrlsApi
 import com.sap.ec.core.url.ECUrlType
 import com.sap.ec.core.url.UrlFactory
 import com.sap.ec.core.url.UrlFactoryApi
@@ -55,7 +56,12 @@ class OperationalEventDistributorTests {
             mockSdkEventDistributor.registerEvent(capture(eventSlot))
         } returns mockEventWaiter
         mockServiceUrls = mock(MockMode.autofill)
-        every { mockServiceUrls.clientServiceBaseUrl } returns CLIENT_SERVICE_URL
+        every { mockServiceUrls.featureUrls } returns FeatureUrls(
+            clientServiceBaseUrl = CLIENT_SERVICE_URL,
+            eventServiceBaseUrl = "",
+            embeddedMessagingBaseUrl = "",
+            loggingUrl = ""
+        )
         mockSdkContext = mock(MockMode.autofill)
         every { mockSdkContext.serviceUrls } returns mockServiceUrls
         urlFactory = UrlFactory(mockSdkContext)

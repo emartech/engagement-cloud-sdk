@@ -94,6 +94,8 @@ internal class LoggingClient(
                             sdkEventManager.emitEvent(sdkEvent)
                         }
                     }
+                } catch (exception: IllegalStateException) {
+                    // TODO-remote-config: handle remote logs when sdk is disable
                 } catch (exception: Exception) {
                     handleException(exception, sdkEvents)
                 }

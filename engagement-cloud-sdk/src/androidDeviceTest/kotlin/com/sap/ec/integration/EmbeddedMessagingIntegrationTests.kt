@@ -4,7 +4,7 @@ import com.sap.ec.android.EngagementCloud
 import com.sap.ec.api.SdkState
 import com.sap.ec.api.config.AndroidEngagementCloudSDKConfig
 import com.sap.ec.context.SdkContextApi
-import com.sap.ec.context.copyWith
+import com.sap.ec.context.ServiceUrls.FeatureUrls
 import com.sap.ec.core.channel.SdkEventDistributor
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.exceptions.SdkException
@@ -51,10 +51,12 @@ class EmbeddedMessagingIntegrationTests {
         requestContext.contactToken = STAGING_UNIVERSAL_TOKEN
         requestContext.clientState = STAGING_UNIVERSAL_TOKEN
         sdkContext = SdkKoinIsolationContext.koin.get<SdkContextApi>()
-        sdkContext.serviceUrls =
-            sdkContext.serviceUrls.copyWith(
-                embeddedMessagingBaseUrl = "https://embedded-messaging-staging.gservice.emarsys.com/embedded-messaging/fake-api"
-            )
+        sdkContext.serviceUrls.featureUrls = FeatureUrls(
+            clientServiceBaseUrl = "",
+            eventServiceBaseUrl = "",
+            embeddedMessagingBaseUrl = "https://embedded-messaging-staging.gservice.emarsys.com/embedded-messaging/fake-api",
+            loggingUrl = ""
+        )
         sdkContext.setSdkConfig(AndroidEngagementCloudSDKConfig(applicationCode = STAGING_APP_CODE))
         sdkContext.setSdkState(SdkState.Active)
         sdkEventDistributor = SdkKoinIsolationContext.koin.get<SdkEventDistributor>()

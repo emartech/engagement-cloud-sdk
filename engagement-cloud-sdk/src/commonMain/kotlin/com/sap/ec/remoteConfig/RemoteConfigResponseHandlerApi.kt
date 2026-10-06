@@ -1,5 +1,5 @@
 package com.sap.ec.remoteConfig
 
 internal interface RemoteConfigResponseHandlerApi {
-    suspend fun handle(config: RemoteConfigResponse?)
+    suspend fun handle(config: RemoteConfigResponse, isSdkDefault: Boolean = false)
 }

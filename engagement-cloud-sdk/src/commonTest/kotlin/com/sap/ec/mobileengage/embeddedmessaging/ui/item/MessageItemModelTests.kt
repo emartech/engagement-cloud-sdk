@@ -1,7 +1,8 @@
 package com.sap.ec.mobileengage.embeddedmessaging.ui.item
 
-import com.sap.ec.context.ServiceUrlsApi
 import com.sap.ec.context.SdkContextApi
+import com.sap.ec.context.ServiceUrls.FeatureUrls
+import com.sap.ec.context.ServiceUrlsApi
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.channel.SdkEventWaiterApi
 import com.sap.ec.core.log.Logger
@@ -103,7 +104,12 @@ class MessageItemModelTests {
     fun setup() {
         mockDownloader = mock(MockMode.autofill)
         mockServiceUrls = mock(MockMode.autofill)
-        every { mockServiceUrls.embeddedMessagingBaseUrl } returns EMBEDDED_MESSAGING_BASE_URL
+        every { mockServiceUrls.featureUrls } returns FeatureUrls(
+            clientServiceBaseUrl = "",
+            eventServiceBaseUrl = "",
+            embeddedMessagingBaseUrl = EMBEDDED_MESSAGING_BASE_URL,
+            loggingUrl = ""
+        )
         mockSdkContext = mock(MockMode.autofill)
         every { mockSdkContext.serviceUrls } returns mockServiceUrls
         mockSdkEventDistributor = mock(MockMode.autofill)

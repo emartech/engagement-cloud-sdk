@@ -5,7 +5,8 @@ import com.sap.ec.context.Features.EmbeddedMessaging
 import com.sap.ec.context.Features.JsBridgeSignatureCheck
 import com.sap.ec.context.Features.MobileEngage
 import com.sap.ec.context.SdkContextApi
-import com.sap.ec.context.copyWith
+import com.sap.ec.context.ServiceUrls.FeatureUrls
+import com.sap.ec.context.ServiceUrls.GlobalFeatureUrls
 import com.sap.ec.core.device.DeviceInfoCollectorApi
 import com.sap.ec.core.log.LogConfigHolderApi
 import com.sap.ec.core.log.LogLevel
@@ -24,26 +25,20 @@ internal class RemoteConfigResponseHandler(
     private val embeddedMessagingContext: EmbeddedMessagingContextApi,
     private val sdkLogger: Logger
 ) : RemoteConfigResponseHandlerApi {
-    override suspend fun handle(config: RemoteConfigResponse?) {
-        if (config == null) {
-            sdkLogger.error("config is null")
-            return
-        }
-
+    override suspend fun handle(config: RemoteConfigResponse, isSdkDefault: Boolean) {
         val clientId = deviceInfoCollector.getClientId()
+        val override = config.overrides?.get(clientId)
 
-        sdkLogger.debug("applyServiceUrls")
-        applyServiceUrls(config.serviceUrls)
-        sdkLogger.debug("applyLogLevel")
-        applyLogLevel(config.logLevel)
-        sdkLogger.debug("applyFeatures")
-        applyFeatures(config.features, config.disabled)
-        sdkLogger.debug("applyLuckyLogger")
-        applyLuckyLogger(config.luckyLogger)
-        sdkLogger.debug("applyEmbeddedMessagingConfig")
-        applyEmbeddedMessagingConfig(config.embeddedMessagingConfig)
+        applyGlobalRemoteConfigApplicationCodeValidationRegex(config.globalRemoteConfigApplicationCodeValidationRegex)
+        applyGlobalServiceUrls(config.globalServiceUrls, isSdkDefault)
+        applyServiceUrls(config.serviceUrls, override?.serviceUrls, isSdkDefault)
+        applyLogLevel(config.logLevel, config.luckyLogger, override?.logLevel)
+        applyFeatures(config.features, override?.features, config.disabled)
+        applyEmbeddedMessagingConfig(config.embeddedMessagingConfig, override?.embeddedMessagingConfig)
+    }
 
-        config.globalRemoteConfigApplicationCodeValidationRegex?.let { regexString ->
+    private suspend fun applyGlobalRemoteConfigApplicationCodeValidationRegex(regex: String?) {
+        regex?.let { regexString ->
             sdkContext.globalRemoteConfigApplicationCodeValidationRegex = try {
                 regexString.toRegex()
             } catch (exception: Throwable) {
@@ -55,68 +50,71 @@ internal class RemoteConfigResponseHandler(
                 null
             }
         }
+    }
 
-        config.overrides?.let {
-            it[clientId]?.let { override ->
-                sdkLogger.debug("override applyServiceUrls")
-                applyServiceUrls(override.serviceUrls)
-                sdkLogger.debug("override applyLogLevel")
-                applyLogLevel(override.logLevel)
-                sdkLogger.debug("override applyFeatures")
-                applyFeatures(override.features, config.disabled)
-                sdkLogger.debug("override applyEmbeddedMessagingConfig")
-                applyEmbeddedMessagingConfig(override.embeddedMessagingConfig)
+    private suspend fun applyGlobalServiceUrls(globalServiceUrls: RemoteConfigGlobalServiceUrls?, isSdkDefault: Boolean) {
+        sdkLogger.debug("applyGlobalServiceUrls")
+        if (globalServiceUrls != null || isSdkDefault) {
+            sdkContext.serviceUrls.globalFeatureUrls = globalServiceUrls?.let {
+                GlobalFeatureUrls(
+                    deepLinkBaseUrl = it.deepLinkService,
+                    jsBridgeUrl = it.jsBridgeUrl,
+                    jsBridgeSignatureUrl = it.jsBridgeSignatureUrl,
+                )
             }
         }
     }
 
-    private fun applyServiceUrls(serviceUrls: ServiceUrls?) {
-        serviceUrls?.let {
-            sdkContext.serviceUrls = sdkContext.serviceUrls.copyWith(
-                clientServiceBaseUrl = it.clientService,
-                eventServiceBaseUrl = it.eventService,
-                deepLinkBaseUrl = it.deepLinkService,
-                embeddedMessagingBaseUrl = it.embeddedMessagingService,
-                jsBridgeUrl = it.jsBridgeUrl,
-                jsBridgeSignatureUrl = it.jsBridgeSignatureUrl,
-            )
+    private suspend fun applyServiceUrls(serviceUrls: RemoteConfigServiceUrls?, override: RemoteConfigOptionalServiceUrls?, isSdkDefault: Boolean) {
+        sdkLogger.debug("applyServiceUrls ${override?.let { "with override" } ?: ""}")
+        if (serviceUrls != null || isSdkDefault) {
+            sdkContext.serviceUrls.featureUrls = serviceUrls?.let {
+                FeatureUrls(
+                    clientServiceBaseUrl = override?.clientService ?: it.clientService,
+                    eventServiceBaseUrl = override?.eventService ?: it.eventService,
+                    embeddedMessagingBaseUrl = override?.embeddedMessagingService ?: it.embeddedMessagingService,
+                    loggingUrl = override?.loggingService ?: it.loggingService
+                )
+            }
         }
     }
 
-    private fun applyLogLevel(logLevel: LogLevel?) {
-        logLevel?.let {
+    private suspend fun applyLogLevel(logLevel: LogLevel?, luckyLogger: LuckyLogger?, override: LogLevel?) {
+        sdkLogger.debug("applyLogLevel ${override?.let { "with override" } ?: ""}")
+        (override ?: getLuckyLogLevel(luckyLogger) ?: logLevel)?.let {
             logConfigHolder.remoteLogLevel = it
         }
     }
 
-    private fun applyFeatures(features: RemoteConfigFeatures?, sdkDisabled: Boolean? = false) {
+    private suspend fun getLuckyLogLevel(luckyLogger: LuckyLogger?): LogLevel? {
+        return luckyLogger?.let {
+            sdkLogger.debug("applyLuckyLogger")
+            val randomNumber = randomProvider.provide()
+            if (it.threshold != 0.0 && randomNumber <= it.threshold) {
+                it.logLevel
+            } else {
+                null
+            }
+        }
+    }
+
+    private suspend fun applyFeatures(features: RemoteConfigFeatures?, override: RemoteConfigFeatures?, sdkDisabled: Boolean? = false) {
+        sdkLogger.debug("applyFeatures ${override?.let { "with override" } ?: ""}")
         if (sdkDisabled == true) {
             switch(MobileEngage, false)
             switch(EmbeddedMessaging, false)
             switch(JsBridgeSignatureCheck, false)
             throw SdkDisabledException("SDK is disabled!")
         } else {
-            features?.mobileEngage?.let { switch(MobileEngage, it) }
-            features?.embeddedMessaging?.let { switch(EmbeddedMessaging, it) }
-            features?.jsBridgeSignatureCheck?.let { switch(JsBridgeSignatureCheck, it) }
-        }
-    }
-
-    private fun applyLuckyLogger(luckyLogger: LuckyLogger?) {
-        luckyLogger?.let {
-            val randomNumber = randomProvider.provide()
-            if (it.threshold != 0.0 && randomNumber <= it.threshold) {
-                logConfigHolder.remoteLogLevel = it.logLevel
+            (override?.mobileEngage ?: features?.mobileEngage)?.let {
+                switch(MobileEngage, it)
             }
-        }
-    }
-
-    private fun applyEmbeddedMessagingConfig(config: EmbeddedMessagingConfig?) {
-        config?.tagUpdateBatchSize?.let {
-            embeddedMessagingContext.tagUpdateBatchSize = it
-        }
-        config?.tagUpdateFrequencyCapSeconds?.let {
-            embeddedMessagingContext.tagUpdateFrequencyCapSeconds = it
+            (override?.embeddedMessaging ?: features?.embeddedMessaging)?.let {
+                switch(EmbeddedMessaging, it)
+            }
+            (override?.jsBridgeSignatureCheck ?: features?.jsBridgeSignatureCheck)?.let {
+                switch(JsBridgeSignatureCheck, it)
+            }
         }
     }
 
@@ -125,6 +123,16 @@ internal class RemoteConfigResponseHandler(
             sdkContext.features.add(feature)
         } else {
             sdkContext.features.remove(feature)
+        }
+    }
+
+    private suspend fun applyEmbeddedMessagingConfig(config: EmbeddedMessagingConfig?, override: EmbeddedMessagingConfig?) {
+        sdkLogger.debug("applyEmbeddedMessagingConfig ${override?.let { "with override" } ?: ""}")
+        (override?.tagUpdateBatchSize ?: config?.tagUpdateBatchSize)?.let {
+            embeddedMessagingContext.tagUpdateBatchSize = it
+        }
+        (override?.tagUpdateFrequencyCapSeconds ?: config?.tagUpdateFrequencyCapSeconds)?.let {
+            embeddedMessagingContext.tagUpdateFrequencyCapSeconds = it
         }
     }
 }

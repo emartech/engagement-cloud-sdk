@@ -1,8 +1,9 @@
 package com.sap.ec.networking.clients.jsbridge
 
-import com.sap.ec.context.ServiceUrlsApi
 import com.sap.ec.context.Features
 import com.sap.ec.context.SdkContextApi
+import com.sap.ec.context.ServiceUrls.GlobalFeatureUrls
+import com.sap.ec.context.ServiceUrlsApi
 import com.sap.ec.core.crypto.CryptoApi
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.clients.NetworkClientApi
@@ -56,8 +57,11 @@ class JsBridgeClientTests {
         mockServiceUrls = mock(MockMode.autofill)
 
         every { mockSdkContext.serviceUrls } returns mockServiceUrls
-        every { mockServiceUrls.jsBridgeUrl } returns JS_BRIDGE_URL
-        every { mockServiceUrls.jsBridgeSignatureUrl } returns JS_BRIDGE_SIGNATURE_URL
+        every { mockServiceUrls.globalFeatureUrls } returns GlobalFeatureUrls(
+            deepLinkBaseUrl = "",
+            jsBridgeUrl = JS_BRIDGE_URL,
+            jsBridgeSignatureUrl = JS_BRIDGE_SIGNATURE_URL
+        )
         every { mockSdkContext.features } returns mutableSetOf(Features.JsBridgeSignatureCheck)
 
         jsBridgeClient = JsBridgeClient(

@@ -1,32 +1,24 @@
 package com.sap.ec.context
 
-internal data class ServiceUrls(
-    override val clientServiceBaseUrl: String,
-    override val eventServiceBaseUrl: String,
-    override val deepLinkBaseUrl: String,
-    override val remoteConfigBaseUrl: String,
-    override val loggingUrl: String,
-    override val embeddedMessagingBaseUrl: String,
-    override val jsBridgeUrl: String,
-    override val jsBridgeSignatureUrl: String
-) : ServiceUrlsApi
+import com.sap.ec.context.ServiceUrlsApi.FeatureUrlsApi
+import com.sap.ec.context.ServiceUrlsApi.GlobalFeatureUrlsApi
 
-internal fun ServiceUrlsApi.copyWith(
-    clientServiceBaseUrl: String? = null,
-    eventServiceBaseUrl: String? = null,
-    deepLinkBaseUrl: String? = null,
-    remoteConfigBaseUrl: String? = null,
-    loggingUrl: String? = null,
-    embeddedMessagingBaseUrl: String? = null,
-    jsBridgeUrl: String? = null,
-    jsBridgeSignatureUrl: String? = null
-) = ServiceUrls(
-    clientServiceBaseUrl = clientServiceBaseUrl ?: this.clientServiceBaseUrl,
-    eventServiceBaseUrl = eventServiceBaseUrl ?: this.eventServiceBaseUrl,
-    deepLinkBaseUrl = deepLinkBaseUrl ?: this.deepLinkBaseUrl,
-    remoteConfigBaseUrl = remoteConfigBaseUrl ?: this.remoteConfigBaseUrl,
-    loggingUrl = loggingUrl ?: this.loggingUrl,
-    embeddedMessagingBaseUrl = embeddedMessagingBaseUrl ?: this.embeddedMessagingBaseUrl,
-    jsBridgeUrl = jsBridgeUrl ?: this.jsBridgeUrl,
-    jsBridgeSignatureUrl = jsBridgeSignatureUrl ?: this.jsBridgeSignatureUrl
-)
+internal data class ServiceUrls(
+    override val remoteConfigBaseUrl: String,
+    override var globalFeatureUrls: GlobalFeatureUrlsApi? = null,
+    override var featureUrls: FeatureUrlsApi? = null
+) : ServiceUrlsApi {
+
+    data class GlobalFeatureUrls(
+        override val deepLinkBaseUrl: String,
+        override val jsBridgeUrl: String,
+        override val jsBridgeSignatureUrl: String,
+    ): GlobalFeatureUrlsApi
+
+    data class FeatureUrls(
+        override val clientServiceBaseUrl: String,
+        override val eventServiceBaseUrl: String,
+        override val embeddedMessagingBaseUrl: String,
+        override val loggingUrl: String
+    ): FeatureUrlsApi
+}
