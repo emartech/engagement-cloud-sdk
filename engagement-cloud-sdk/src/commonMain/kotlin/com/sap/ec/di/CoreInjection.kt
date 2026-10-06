@@ -2,8 +2,8 @@ package com.sap.ec.di
 
 import com.sap.ec.api.setup.Setup
 import com.sap.ec.api.setup.SetupApi
-import com.sap.ec.context.DefaultUrls
-import com.sap.ec.context.DefaultUrlsApi
+import com.sap.ec.context.ServiceUrls
+import com.sap.ec.context.ServiceUrlsApi
 import com.sap.ec.context.Features
 import com.sap.ec.context.SdkContext
 import com.sap.ec.context.SdkContextApi
@@ -120,8 +120,8 @@ internal object CoreInjection {
         single<StorageApi> { Storage(stringStorage = get(), json = get()) }
         single<DeviceInfoStorageApi> { DeviceInfoStorage(stringStorage = get()) }
         singleOf(::UserAgentProvider) { bind<UserAgentProviderApi>() }
-        single<DefaultUrlsApi> {
-            DefaultUrls(
+        single<ServiceUrlsApi> {
+            ServiceUrls(
                 "https://me-client.eservice.emarsys.net",
                 "https://mobile-events.eservice.emarsys.net",
                 "https://deep-link.eservice.emarsys.net",
@@ -164,7 +164,7 @@ internal object CoreInjection {
                 sdkDispatcher = get(named(DispatcherTypes.Sdk)),
                 mainDispatcher = get(named(DispatcherTypes.Main)),
                 onContactLinkingFailed = null,
-                defaultUrls = get(),
+                serviceUrls = get(),
                 features = mutableSetOf(Features.JsBridgeSignatureCheck),
                 sdkConfigStore = get()
             )

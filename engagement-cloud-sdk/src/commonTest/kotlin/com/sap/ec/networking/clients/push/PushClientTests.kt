@@ -1,6 +1,6 @@
 package com.sap.ec.networking.clients.push
 
-import com.sap.ec.context.DefaultUrlsApi
+import com.sap.ec.context.ServiceUrlsApi
 import com.sap.ec.core.channel.SdkEventManagerApi
 import com.sap.ec.core.db.events.EventsDaoApi
 import com.sap.ec.core.exceptions.SdkException.MissingEventUrl
@@ -59,7 +59,7 @@ class PushClientTests {
     }
 
     private lateinit var mockEmarsysClient: NetworkClientApi
-    private lateinit var mockDefaultUrls: DefaultUrlsApi
+    private lateinit var mockServiceUrls: ServiceUrlsApi
     private lateinit var mockUrlFactory: UrlFactoryApi
     private lateinit var mockSdkEventManager: SdkEventManagerApi
     private lateinit var mockEventsDao: EventsDaoApi
@@ -70,7 +70,7 @@ class PushClientTests {
     @BeforeTest
     fun setUp() {
         mockEmarsysClient = mock()
-        mockDefaultUrls = mock()
+        mockServiceUrls = mock()
         mockUrlFactory = mock()
         everySuspend { mockUrlFactory.create(any<ECUrlType.ClearPushToken>()) } returns URL
         everySuspend { mockUrlFactory.create(ECUrlType.PushToken) } returns URL

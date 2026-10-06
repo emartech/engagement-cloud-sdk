@@ -1,6 +1,6 @@
 package com.sap.ec.context
 
-internal data class DefaultUrls(
+internal data class ServiceUrls(
     override val clientServiceBaseUrl: String,
     override val eventServiceBaseUrl: String,
     override val deepLinkBaseUrl: String,
@@ -9,9 +9,9 @@ internal data class DefaultUrls(
     override val embeddedMessagingBaseUrl: String,
     override val jsBridgeUrl: String,
     override val jsBridgeSignatureUrl: String
-) : DefaultUrlsApi
+) : ServiceUrlsApi
 
-internal fun DefaultUrlsApi.copyWith(
+internal fun ServiceUrlsApi.copyWith(
     clientServiceBaseUrl: String? = null,
     eventServiceBaseUrl: String? = null,
     deepLinkBaseUrl: String? = null,
@@ -20,7 +20,7 @@ internal fun DefaultUrlsApi.copyWith(
     embeddedMessagingBaseUrl: String? = null,
     jsBridgeUrl: String? = null,
     jsBridgeSignatureUrl: String? = null
-) = DefaultUrls(
+) = ServiceUrls(
     clientServiceBaseUrl = clientServiceBaseUrl ?: this.clientServiceBaseUrl,
     eventServiceBaseUrl = eventServiceBaseUrl ?: this.eventServiceBaseUrl,
     deepLinkBaseUrl = deepLinkBaseUrl ?: this.deepLinkBaseUrl,

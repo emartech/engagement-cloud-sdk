@@ -51,8 +51,8 @@ class EmbeddedMessagingIntegrationTests {
         requestContext.contactToken = STAGING_UNIVERSAL_TOKEN
         requestContext.clientState = STAGING_UNIVERSAL_TOKEN
         sdkContext = SdkKoinIsolationContext.koin.get<SdkContextApi>()
-        sdkContext.defaultUrls =
-            sdkContext.defaultUrls.copyWith(
+        sdkContext.serviceUrls =
+            sdkContext.serviceUrls.copyWith(
                 embeddedMessagingBaseUrl = "https://embedded-messaging-staging.gservice.emarsys.com/embedded-messaging/fake-api"
             )
         sdkContext.setSdkConfig(AndroidEngagementCloudSDKConfig(applicationCode = STAGING_APP_CODE))

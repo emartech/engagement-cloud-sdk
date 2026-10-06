@@ -21,14 +21,14 @@ internal class JsBridgeClient(
 ) : JsBridgeClientApi {
 
     override suspend fun fetchJSBridge(): Result<Unit> {
-        val jsBridgeResponse = fetchResponse(sdkContext.defaultUrls.jsBridgeUrl).getOrElse {
+        val jsBridgeResponse = fetchResponse(sdkContext.serviceUrls.jsBridgeUrl).getOrElse {
             sdkLogger.error("Failed to fetch JsBridge: ${it.message}")
             return Result.failure(it)
         }
 
         if (isSignatureCheckEnabled()) {
             val signatureResponse =
-                fetchResponse(sdkContext.defaultUrls.jsBridgeSignatureUrl).getOrElse {
+                fetchResponse(sdkContext.serviceUrls.jsBridgeSignatureUrl).getOrElse {
                     sdkLogger.error("Failed to fetch JsBridge signature: ${it.message}")
                     return Result.failure(it)
                 }
@@ -61,7 +61,7 @@ internal class JsBridgeClient(
 
     override suspend fun fetchServerMd5(): Result<String> {
         val request = UrlRequest(
-            url = Url(sdkContext.defaultUrls.jsBridgeUrl),
+            url = Url(sdkContext.serviceUrls.jsBridgeUrl),
             method = HttpMethod.Head
         )
         val response = networkClient.send(request).getOrElse {

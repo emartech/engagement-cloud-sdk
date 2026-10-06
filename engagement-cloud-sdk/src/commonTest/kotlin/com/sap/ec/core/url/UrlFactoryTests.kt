@@ -1,7 +1,7 @@
 package com.sap.ec.core.url
 
 import com.sap.ec.TestEngagementCloudSDKConfig
-import com.sap.ec.context.DefaultUrlsApi
+import com.sap.ec.context.ServiceUrlsApi
 import com.sap.ec.context.SdkContextApi
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -24,15 +24,15 @@ class UrlFactoryTests {
     }
 
     private lateinit var mockSdkContext: SdkContextApi
-    private lateinit var mockDefaultUrls: DefaultUrlsApi
+    private lateinit var mockServiceUrls: ServiceUrlsApi
     private lateinit var urlFactory: UrlFactoryApi
 
     @BeforeTest
     fun setUp() {
-        mockDefaultUrls = mock(MockMode.autofill)
+        mockServiceUrls = mock(MockMode.autofill)
         mockSdkContext = mock(MockMode.autofill)
-        every { mockSdkContext.defaultUrls } returns mockDefaultUrls
-        every { mockDefaultUrls.clientServiceBaseUrl } returns CLIENT_SERVICE_BASE_URL
+        every { mockSdkContext.serviceUrls } returns mockServiceUrls
+        every { mockServiceUrls.clientServiceBaseUrl } returns CLIENT_SERVICE_BASE_URL
         everySuspend { mockSdkContext.getSdkConfig() } returns config
         urlFactory = UrlFactory(mockSdkContext)
     }
@@ -91,7 +91,7 @@ class UrlFactoryTests {
 
     @Test
     fun testCreate_remoteConfig_should_return_url_for_remoteConfig() = runTest {
-        every { mockDefaultUrls.remoteConfigBaseUrl } returns "testRemoteConfigBaseUrl"
+        every { mockServiceUrls.remoteConfigBaseUrl } returns "testRemoteConfigBaseUrl"
 
         val result = urlFactory.create(ECUrlType.RemoteConfig)
 
@@ -100,7 +100,7 @@ class UrlFactoryTests {
 
     @Test
     fun testCreate_remoteConfig_should_return_url_for_remoteConfigSignature() = runTest {
-        every { mockDefaultUrls.remoteConfigBaseUrl } returns "testRemoteConfigBaseUrl"
+        every { mockServiceUrls.remoteConfigBaseUrl } returns "testRemoteConfigBaseUrl"
 
         val result = urlFactory.create(ECUrlType.RemoteConfigSignature)
 
@@ -109,7 +109,7 @@ class UrlFactoryTests {
 
     @Test
     fun testCreate_deepLink_should_return_url_for_trackDeepLink() = runTest {
-        every { mockDefaultUrls.deepLinkBaseUrl } returns "testDeepLinkBaseUrl"
+        every { mockServiceUrls.deepLinkBaseUrl } returns "testDeepLinkBaseUrl"
 
         val result = urlFactory.create(ECUrlType.DeepLink)
 
@@ -118,7 +118,7 @@ class UrlFactoryTests {
 
     @Test
     fun testCreate_embeddedMessaging_should_return_url_for_fetchMessages() = runTest {
-        every { mockDefaultUrls.embeddedMessagingBaseUrl } returns "testEmbeddedMessagingBaseUrl"
+        every { mockServiceUrls.embeddedMessagingBaseUrl } returns "testEmbeddedMessagingBaseUrl"
 
         val result = urlFactory.create(ECUrlType.FetchEmbeddedMessages)
 
@@ -127,7 +127,7 @@ class UrlFactoryTests {
 
     @Test
     fun testCreate_embeddedMessaging_should_return_url_for_badgeCount() = runTest {
-        every { mockDefaultUrls.embeddedMessagingBaseUrl } returns "testEmbeddedMessagingBaseUrl"
+        every { mockServiceUrls.embeddedMessagingBaseUrl } returns "testEmbeddedMessagingBaseUrl"
 
         val result = urlFactory.create(ECUrlType.FetchBadgeCount)
 
@@ -136,7 +136,7 @@ class UrlFactoryTests {
 
     @Test
     fun testCreate_embeddedMessaging_should_return_url_for_fetchMeta() = runTest {
-        every { mockDefaultUrls.embeddedMessagingBaseUrl } returns "testEmbeddedMessagingBaseUrl"
+        every { mockServiceUrls.embeddedMessagingBaseUrl } returns "testEmbeddedMessagingBaseUrl"
 
         val result = urlFactory.create(ECUrlType.FetchMeta)
 
@@ -145,7 +145,7 @@ class UrlFactoryTests {
 
     @Test
     fun testCreate_embeddedMessaging_should_return_url_for_updateTagsForMessages() = runTest {
-        every { mockDefaultUrls.embeddedMessagingBaseUrl } returns "testEmbeddedMessagingBaseUrl"
+        every { mockServiceUrls.embeddedMessagingBaseUrl } returns "testEmbeddedMessagingBaseUrl"
 
         val result = urlFactory.create(ECUrlType.UpdateTagsForMessages)
 
@@ -154,7 +154,7 @@ class UrlFactoryTests {
 
     @Test
     fun testCreate_inlineInAppMessages_should_return_url() = runTest {
-        every { mockDefaultUrls.eventServiceBaseUrl } returns "testEventServiceBaseUrl"
+        every { mockServiceUrls.eventServiceBaseUrl } returns "testEventServiceBaseUrl"
 
         val result = urlFactory.create(ECUrlType.FetchInlineInAppMessages)
         result shouldBe Url("testEventServiceBaseUrl/v5/apps/$APPLICATION_CODE/inline-messages")

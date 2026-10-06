@@ -11,7 +11,7 @@ internal interface SdkContextApi {
     val sdkDispatcher: CoroutineDispatcher
     val mainDispatcher: CoroutineDispatcher
     var onContactLinkingFailed: (suspend () -> LinkContactData?)?
-    var defaultUrls: DefaultUrlsApi
+    var serviceUrls: ServiceUrlsApi
     val features: MutableSet<Features>
     var globalRemoteConfigApplicationCodeValidationRegex: Regex?
 

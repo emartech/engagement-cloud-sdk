@@ -17,43 +17,43 @@ internal class UrlFactory(
     override suspend fun create(urlType: ECUrlType): Url {
         return when (urlType) {
             ECUrlType.ChangeApplicationCode -> {
-                URLBuilder("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client/app").build()
+                URLBuilder("${sdkContext.serviceUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client/app").build()
             }
 
             ECUrlType.LinkContact -> createUrl(
-                sdkContext.defaultUrls.clientServiceBaseUrl,
+                sdkContext.serviceUrls.clientServiceBaseUrl,
                 "client/contact"
             ).build()
 
             is ECUrlType.UnlinkContact ->
-                Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${urlType.applicationCode}/client/contact")
+                Url("${sdkContext.serviceUrls.clientServiceBaseUrl}/$V4_API/apps/${urlType.applicationCode}/client/contact")
 
             ECUrlType.RefreshToken -> createUrl(
-                sdkContext.defaultUrls.clientServiceBaseUrl,
+                sdkContext.serviceUrls.clientServiceBaseUrl,
                 "client/contact-token"
             ).build()
 
-            ECUrlType.PushToken -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client/push-token")
+            ECUrlType.PushToken -> Url("${sdkContext.serviceUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client/push-token")
             is ECUrlType.ClearPushToken ->
-                Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${urlType.applicationCode}/client/push-token")
+                Url("${sdkContext.serviceUrls.clientServiceBaseUrl}/$V4_API/apps/${urlType.applicationCode}/client/push-token")
 
-            ECUrlType.RegisterDeviceInfo -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client")
+            ECUrlType.RegisterDeviceInfo -> Url("${sdkContext.serviceUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client")
             ECUrlType.Event -> {
-                Url("${sdkContext.defaultUrls.eventServiceBaseUrl}/$V5_API/apps/${getApplicationCode()}/client/events")
+                Url("${sdkContext.serviceUrls.eventServiceBaseUrl}/$V5_API/apps/${getApplicationCode()}/client/events")
             }
 
-            ECUrlType.RemoteConfigSignature -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/signature/${getApplicationCode()}")
-            ECUrlType.RemoteConfig -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/${getApplicationCode()}")
-            ECUrlType.GlobalRemoteConfigSignature -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/signature/GLOBAL")
-            ECUrlType.GlobalRemoteConfig -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/GLOBAL")
-            ECUrlType.DeepLink -> Url(sdkContext.defaultUrls.deepLinkBaseUrl)
-            ECUrlType.Logging -> Url("${sdkContext.defaultUrls.loggingUrl}/v1/log")
-            ECUrlType.FetchEmbeddedMessages -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/embedded-messaging/api/$V1_API/${getApplicationCode()}/messages")
-            ECUrlType.FetchBadgeCount -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/embedded-messaging/api/$V1_API/${getApplicationCode()}/badge-count")
-            ECUrlType.FetchMeta -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/embedded-messaging/api/$V1_API/${getApplicationCode()}/meta")
-            ECUrlType.UpdateTagsForMessages -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/embedded-messaging/api/$V1_API/${getApplicationCode()}/tags")
+            ECUrlType.RemoteConfigSignature -> Url("${sdkContext.serviceUrls.remoteConfigBaseUrl}/signature/${getApplicationCode()}")
+            ECUrlType.RemoteConfig -> Url("${sdkContext.serviceUrls.remoteConfigBaseUrl}/${getApplicationCode()}")
+            ECUrlType.GlobalRemoteConfigSignature -> Url("${sdkContext.serviceUrls.remoteConfigBaseUrl}/signature/GLOBAL")
+            ECUrlType.GlobalRemoteConfig -> Url("${sdkContext.serviceUrls.remoteConfigBaseUrl}/GLOBAL")
+            ECUrlType.DeepLink -> Url(sdkContext.serviceUrls.deepLinkBaseUrl)
+            ECUrlType.Logging -> Url("${sdkContext.serviceUrls.loggingUrl}/v1/log")
+            ECUrlType.FetchEmbeddedMessages -> Url("${sdkContext.serviceUrls.embeddedMessagingBaseUrl}/embedded-messaging/api/$V1_API/${getApplicationCode()}/messages")
+            ECUrlType.FetchBadgeCount -> Url("${sdkContext.serviceUrls.embeddedMessagingBaseUrl}/embedded-messaging/api/$V1_API/${getApplicationCode()}/badge-count")
+            ECUrlType.FetchMeta -> Url("${sdkContext.serviceUrls.embeddedMessagingBaseUrl}/embedded-messaging/api/$V1_API/${getApplicationCode()}/meta")
+            ECUrlType.UpdateTagsForMessages -> Url("${sdkContext.serviceUrls.embeddedMessagingBaseUrl}/embedded-messaging/api/$V1_API/${getApplicationCode()}/tags")
             is ECUrlType.FetchInlineInAppMessages -> {
-                Url("${sdkContext.defaultUrls.eventServiceBaseUrl}/$V5_API/apps/${getApplicationCode()}/inline-messages")
+                Url("${sdkContext.serviceUrls.eventServiceBaseUrl}/$V5_API/apps/${getApplicationCode()}/inline-messages")
             }
         }
     }

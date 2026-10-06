@@ -4,9 +4,9 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
-class DefaultUrlTests {
+class ServiceUrlTests {
 
-    private val defaultUrls = DefaultUrls(
+    private val serviceUrls = ServiceUrls(
         "clientServiceBaseUrl - origin",
         "eventServiceBaseUrl - origin",
         "deepLinkBaseUrl - origin",
@@ -19,7 +19,7 @@ class DefaultUrlTests {
 
     @Test
     fun testCopyWith() = runTest {
-        val expected = DefaultUrls(
+        val expected = ServiceUrls(
             "clientServiceBaseUrl - new",
             "eventServiceBaseUrl - origin",
             "deepLinkBaseUrl - origin",
@@ -29,7 +29,7 @@ class DefaultUrlTests {
             "ecJsBridgeUrl - origin",
             "jsBridgeSignatureUrl - origin"
         )
-        val result = defaultUrls.copyWith(
+        val result = serviceUrls.copyWith(
             clientServiceBaseUrl = "clientServiceBaseUrl - new",
             loggingUrl = "loggingUrl - new"
         )

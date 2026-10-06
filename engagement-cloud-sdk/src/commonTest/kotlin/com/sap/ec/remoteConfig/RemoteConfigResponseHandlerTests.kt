@@ -1,7 +1,7 @@
 package com.sap.ec.remoteConfig
 
-import com.sap.ec.context.DefaultUrls
-import com.sap.ec.context.DefaultUrlsApi
+import com.sap.ec.context.ServiceUrls
+import com.sap.ec.context.ServiceUrlsApi
 import com.sap.ec.context.Features.EmbeddedMessaging
 import com.sap.ec.context.Features.JsBridgeSignatureCheck
 import com.sap.ec.context.Features.MobileEngage
@@ -36,7 +36,7 @@ import kotlin.test.assertFailsWith
 class RemoteConfigResponseHandlerTests {
     private lateinit var mockSdkContext: SdkContextApi
     private lateinit var mockLogConfigHolder: LogConfigHolderApi
-    private lateinit var defaultUrls: DefaultUrlsApi
+    private lateinit var serviceUrls: ServiceUrlsApi
     private lateinit var mockDeviceInfoCollector: DeviceInfoCollectorApi
     private lateinit var mockRandomProvider: DoubleProvider
     private lateinit var mockEmbeddedMessagingContext: EmbeddedMessagingContextApi
@@ -45,8 +45,8 @@ class RemoteConfigResponseHandlerTests {
     @BeforeTest
     fun setUp() {
         mockSdkContext = mock(MockMode.autofill)
-        defaultUrls = DefaultUrls("", "", "", "", "", "", "", "")
-        every { mockSdkContext.defaultUrls } returns defaultUrls
+        serviceUrls = ServiceUrls("", "", "", "", "", "", "", "")
+        every { mockSdkContext.serviceUrls } returns serviceUrls
 
         mockLogConfigHolder = mock(MockMode.autofill)
 
@@ -74,7 +74,7 @@ class RemoteConfigResponseHandlerTests {
 
     @Test
     fun testHandleAppCodeBasedConfigs() = runTest {
-        val defaultUrlSlot = slot<DefaultUrlsApi>()
+        val serviceUrlSlot = slot<ServiceUrlsApi>()
         val clientServiceUrl = "testClientServiceUrl"
         val eventServiceUrl = "testEventServiceUrl"
         val deeplinkServiceUrl = "testDeepLinkServiceUrl"
@@ -102,16 +102,16 @@ class RemoteConfigResponseHandlerTests {
             )
         )
         everySuspend { mockDeviceInfoCollector.getClientId() } returns clientId
-        every { mockSdkContext.defaultUrls = capture(defaultUrlSlot) } returns Unit
+        every { mockSdkContext.serviceUrls = capture(serviceUrlSlot) } returns Unit
 
 
         remoteConfigResponseHandler.handle(configResponse)
 
-        defaultUrlSlot.get().clientServiceBaseUrl shouldBe clientServiceUrl
-        defaultUrlSlot.get().eventServiceBaseUrl shouldBe eventServiceUrl
-        defaultUrlSlot.get().deepLinkBaseUrl shouldBe deeplinkServiceUrl
-        defaultUrlSlot.get().embeddedMessagingBaseUrl shouldBe embeddedMessagingServiceUrl
-        defaultUrlSlot.get().jsBridgeUrl shouldBe jsBridgeUrl
+        serviceUrlSlot.get().clientServiceBaseUrl shouldBe clientServiceUrl
+        serviceUrlSlot.get().eventServiceBaseUrl shouldBe eventServiceUrl
+        serviceUrlSlot.get().deepLinkBaseUrl shouldBe deeplinkServiceUrl
+        serviceUrlSlot.get().embeddedMessagingBaseUrl shouldBe embeddedMessagingServiceUrl
+        serviceUrlSlot.get().jsBridgeUrl shouldBe jsBridgeUrl
         verify { mockLogConfigHolder.remoteLogLevel = LogLevel.Error }
         mockSdkContext.features.size shouldBe 3
         mockSdkContext.features shouldContainAll listOf(
@@ -124,7 +124,7 @@ class RemoteConfigResponseHandlerTests {
     @Test
     fun testHandleAppCodeBasedConfigs_shouldFallbackToJsBridgeSignatureCheck_evenIfJsBridgeIsNotDefined() =
         runTest {
-            val defaultUrlSlot = slot<DefaultUrlsApi>()
+            val serviceUrlSlot = slot<ServiceUrlsApi>()
 
             val configResponse = RemoteConfigResponse(
                 ServiceUrls(
@@ -136,7 +136,7 @@ class RemoteConfigResponseHandlerTests {
 
                 ),
             )
-            every { mockSdkContext.defaultUrls = capture(defaultUrlSlot) } returns Unit
+            every { mockSdkContext.serviceUrls = capture(serviceUrlSlot) } returns Unit
 
             remoteConfigResponseHandler.handle(configResponse)
 
@@ -148,7 +148,7 @@ class RemoteConfigResponseHandlerTests {
 
     @Test
     fun testHandleGlobalConfig() = runTest {
-        val defaultUrlSlot = slot<DefaultUrlsApi>()
+        val serviceUrlSlot = slot<ServiceUrlsApi>()
         val clientServiceUrl = "testClientServiceUrl"
         val clientId = "testClientId"
         val configResponse = RemoteConfigResponse(
@@ -163,12 +163,12 @@ class RemoteConfigResponseHandlerTests {
                 )
             )
         )
-        every { mockSdkContext.defaultUrls = capture(defaultUrlSlot) } returns Unit
+        every { mockSdkContext.serviceUrls = capture(serviceUrlSlot) } returns Unit
         everySuspend { mockDeviceInfoCollector.getClientId() } returns clientId
 
         remoteConfigResponseHandler.handle(configResponse)
 
-        defaultUrlSlot.get().clientServiceBaseUrl shouldBe clientServiceUrl
+        serviceUrlSlot.get().clientServiceBaseUrl shouldBe clientServiceUrl
         verify { mockLogConfigHolder.remoteLogLevel = LogLevel.Error }
         mockSdkContext.features shouldBe listOf(MobileEngage)
     }

@@ -72,7 +72,7 @@ internal class RemoteConfigResponseHandler(
 
     private fun applyServiceUrls(serviceUrls: ServiceUrls?) {
         serviceUrls?.let {
-            sdkContext.defaultUrls = sdkContext.defaultUrls.copyWith(
+            sdkContext.serviceUrls = sdkContext.serviceUrls.copyWith(
                 clientServiceBaseUrl = it.clientService,
                 eventServiceBaseUrl = it.eventService,
                 deepLinkBaseUrl = it.deepLinkService,

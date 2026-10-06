@@ -1,6 +1,6 @@
 package com.sap.ec.mobileengage.inapp.jsbridge
 
-import com.sap.ec.context.DefaultUrlsApi
+import com.sap.ec.context.ServiceUrlsApi
 import com.sap.ec.core.providers.sdkversion.SdkVersionProviderApi
 import com.sap.ec.core.storage.StorageConstants
 import com.sap.ec.core.storage.StringStorageApi
@@ -28,15 +28,15 @@ class ContentReplacerTests {
     }
 
     private lateinit var contentReplacer: ContentReplacerApi
-    private lateinit var mockDefaultUrls: DefaultUrlsApi
+    private lateinit var mockServiceUrls: ServiceUrlsApi
     private lateinit var mockSdkVersionProvider: SdkVersionProviderApi
     private lateinit var mockStringStorage: StringStorageApi
     private lateinit var mockJsBridgeVerifier: JsBridgeVerifierApi
 
     @BeforeTest
     fun setup() {
-        mockDefaultUrls = mock(MockMode.autofill)
-        every { mockDefaultUrls.jsBridgeUrl } returns TEST_JS_BRIDGE
+        mockServiceUrls = mock(MockMode.autofill)
+        every { mockServiceUrls.jsBridgeUrl } returns TEST_JS_BRIDGE
         mockStringStorage = mock(MockMode.autofill)
         every { mockStringStorage.get(StorageConstants.JS_BRIDGE) } returns TEST_JS_BRIDGE
         mockSdkVersionProvider = mock(MockMode.autofill)

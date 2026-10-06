@@ -1,6 +1,6 @@
 package com.sap.ec.context
 
-internal interface DefaultUrlsApi {
+internal interface ServiceUrlsApi {
     val clientServiceBaseUrl: String
     val eventServiceBaseUrl: String
     val deepLinkBaseUrl: String
