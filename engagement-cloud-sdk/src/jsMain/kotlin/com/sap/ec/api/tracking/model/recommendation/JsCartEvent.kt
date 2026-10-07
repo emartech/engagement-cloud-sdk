@@ -10,5 +10,5 @@ interface JsCartEvent : JsRecommendationEvent {
     override val recommendationEventType: String
         get() = JsRecommendationEventType.CART.name
 
-    val items: List<JsCartItem>
+    val items: Array<JsCartItem>
 }

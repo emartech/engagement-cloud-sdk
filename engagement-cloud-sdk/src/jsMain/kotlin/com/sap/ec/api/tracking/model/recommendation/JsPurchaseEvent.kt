@@ -12,5 +12,5 @@ interface JsPurchaseEvent : JsRecommendationEvent {
 
     val orderId: String
 
-    val items: List<JsCartItem>
+    val items: Array<JsCartItem>
 }
