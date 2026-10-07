@@ -6,6 +6,7 @@ import com.sap.ec.core.url.ECUrlType
 import com.sap.ec.core.url.UrlFactoryApi
 import com.sap.ec.event.RecommendationEvent
 import com.sap.ec.event.SdkEvent
+import com.sap.ec.event.SdkEvent.Internal.Sdk.RequestRecommendation
 import com.sap.ec.recommendation.RecommendationConstants.AVAILABILITY_ZONE_KEY
 import com.sap.ec.recommendation.RecommendationConstants.CART_ITEMS_KEY
 import com.sap.ec.recommendation.RecommendationConstants.CART_LIST_ITEM_PRICE_KEY
@@ -59,10 +60,10 @@ internal class RecommendationRequestFactory(
                     appendRecommendationTrackEventParams(recommendationEvent)
                 }
 
-                is SdkEvent.Internal.Sdk.RequestRecommendation -> {
+                is RequestRecommendation -> {
                     parameters.append(
                         FEATURES_TO_RETRIEVE_RECOMMENDATIONS_FOR_KEY,
-                        "${FEATURE_ID_KEY}:${recommendationEvent.options.logic.getLogicName()},${LIMIT_KEY}:${recommendationEvent.options.limit},${OFFSET_KEY}:${recommendationEvent.options.offset}"
+                        createLogicString(recommendationEvent)
                     )
                     recommendationEvent.options.filters?.takeIf { it.isNotEmpty() }
                         ?.let { filters ->
@@ -195,4 +196,20 @@ internal class RecommendationRequestFactory(
             "${ITEM_ID_KEY}:${item.itemId.encodeURLParameter()},${CART_LIST_ITEM_PRICE_KEY}:${item.price},${CART_LIST_ITEM_QUANTITY_KEY}:${item.quantity}"
         }
     }
+
+    private fun createLogicString(recommendationEvent: RequestRecommendation): String {
+        val logicName = recommendationEvent.options.logic.getLogicName()
+        return recommendationEvent.options.variants?.takeIf { it.isNotEmpty() }?.let {
+            it.joinToString(",") { variant ->
+                variantToLogic(logicName, recommendationEvent, variant)
+            }
+        } ?: variantToLogic(logicName, recommendationEvent, "")
+    }
+
+    private fun variantToLogic(
+        logicName: String,
+        recommendationEvent: RequestRecommendation,
+        variant: String = ""
+    ): String =
+        "${FEATURE_ID_KEY}:$logicName$variant,${LIMIT_KEY}:${recommendationEvent.options.limit},${OFFSET_KEY}:${recommendationEvent.options.offset}"
 }

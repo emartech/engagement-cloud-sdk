@@ -334,6 +334,118 @@ class RecommendationRequestFactoryTests {
         }
 
     @Test
+    fun test_create_recommendation_withVariants_shouldReturnRequestWithVariants_whenVariantIsNull() =
+        runTest {
+            every { mockCartItemStorage.items } returns mutableListOf(CART_ITEM_1)
+            val requestRecommendationEvent = RequestRecommendation(
+                options = RecommendationOptions(
+                    logic = RecommendationLogic.Home,
+                    variants = null
+                )
+            )
+            val params = parameters {
+                append(
+                    "f",
+                    "f:HOME,l:5,o:0"
+                )
+                append("cv", "1")
+                append(
+                    "ca",
+                    "i:${CART_ITEM_1_ITEM_ID_URL_ENCODED},p:${CART_ITEM_1.price},q:${CART_ITEM_1.quantity}"
+                )
+            }.formUrlEncode()
+            val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
+
+            val result = recommendationRequestFactory.create(requestRecommendationEvent)
+
+            verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = true)
+        }
+
+    @Test
+    fun test_create_recommendation_withVariants_shouldReturnRequestWithVariants_whenVariantIsEmptyList() =
+        runTest {
+            every { mockCartItemStorage.items } returns mutableListOf(CART_ITEM_1)
+            val requestRecommendationEvent = RequestRecommendation(
+                options = RecommendationOptions(
+                    logic = RecommendationLogic.Home,
+                    variants = emptyList()
+                )
+            )
+            val params = parameters {
+                append(
+                    "f",
+                    "f:HOME,l:5,o:0"
+                )
+                append("cv", "1")
+                append(
+                    "ca",
+                    "i:${CART_ITEM_1_ITEM_ID_URL_ENCODED},p:${CART_ITEM_1.price},q:${CART_ITEM_1.quantity}"
+                )
+            }.formUrlEncode()
+            val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
+
+            val result = recommendationRequestFactory.create(requestRecommendationEvent)
+
+            verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = true)
+        }
+
+    @Test
+    fun test_create_recommendation_withVariants_shouldReturnRequestWithVariants_whenVariantListHasSingleElement() =
+        runTest {
+            every { mockCartItemStorage.items } returns mutableListOf(CART_ITEM_1)
+            val requestRecommendationEvent = RequestRecommendation(
+                options = RecommendationOptions(
+                    logic = RecommendationLogic.Home,
+                    variants = listOf("_1")
+                )
+            )
+            val params = parameters {
+                append(
+                    "f",
+                    "f:HOME_1,l:5,o:0"
+                )
+                append("cv", "1")
+                append(
+                    "ca",
+                    "i:${CART_ITEM_1_ITEM_ID_URL_ENCODED},p:${CART_ITEM_1.price},q:${CART_ITEM_1.quantity}"
+                )
+            }.formUrlEncode()
+            val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
+
+            val result = recommendationRequestFactory.create(requestRecommendationEvent)
+
+            verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = true)
+        }
+
+    @Test
+    fun test_create_recommendation_withVariants_shouldReturnRequestWithVariants_whenVariantListHasMultipleElement() =
+        runTest {
+            every { mockCartItemStorage.items } returns mutableListOf(CART_ITEM_1)
+            val requestRecommendationEvent = RequestRecommendation(
+                options = RecommendationOptions(
+                    logic = RecommendationLogic.Home,
+                    variants = listOf("_1","_2")
+                )
+            )
+            val params = parameters {
+                append(
+                    "f",
+                    "f:HOME_1,l:5,o:0,f:HOME_2,l:5,o:0"
+                )
+                append("cv", "1")
+                append(
+                    "ca",
+                    "i:${CART_ITEM_1_ITEM_ID_URL_ENCODED},p:${CART_ITEM_1.price},q:${CART_ITEM_1.quantity}"
+                )
+            }.formUrlEncode()
+            val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
+
+            val result = recommendationRequestFactory.create(requestRecommendationEvent)
+
+            verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = true)
+        }
+
+    @Test
     fun test_create_shouldReturn_recommendationUrlPath_withEmptyCart_and_withBasicHomeLogic() = runTest {
         val requestRecommendationEvent = RequestRecommendation(
             options = RecommendationOptions(
