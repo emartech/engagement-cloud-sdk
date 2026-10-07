@@ -306,6 +306,34 @@ class RecommendationRequestFactoryTests {
         }
 
     @Test
+    fun test_create_recommendation_withCustomLogic_shouldReturnRequestWithCustomLogicName_regardlessItsCase() =
+        runTest {
+            val expectedString = "customLogicName"
+            every { mockCartItemStorage.items } returns mutableListOf(CART_ITEM_1)
+            val requestRecommendationEvent = RequestRecommendation(
+                options = RecommendationOptions(
+                    logic = RecommendationLogic.Custom(expectedString)
+                )
+            )
+            val params = parameters {
+                append(
+                    "f",
+                    "f:$expectedString,l:5,o:0"
+                )
+                append("cv", "1")
+                append(
+                    "ca",
+                    "i:${CART_ITEM_1_ITEM_ID_URL_ENCODED},p:${CART_ITEM_1.price},q:${CART_ITEM_1.quantity}"
+                )
+            }.formUrlEncode()
+            val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
+
+            val result = recommendationRequestFactory.create(requestRecommendationEvent)
+
+            verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = true)
+        }
+
+    @Test
     fun test_create_shouldReturn_recommendationUrlPath_withEmptyCart_and_withBasicHomeLogic() = runTest {
         val requestRecommendationEvent = RequestRecommendation(
             options = RecommendationOptions(
