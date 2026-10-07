@@ -70,7 +70,7 @@ class RecommendationCartStorageUpdaterTests {
         val cartEvent = SdkEvent.External.RecommendationTrackEvent.Cart(cartItems)
         val requestRecommendationEvent = SdkEvent.Internal.Sdk.RequestRecommendation(
             options = RecommendationOptions(
-                logic = RecommendationLogic.CART
+                logic = RecommendationLogic.Cart
             ),
             contextEvent = cartEvent
         )
@@ -89,7 +89,7 @@ class RecommendationCartStorageUpdaterTests {
         val purchaseEvent = SdkEvent.External.RecommendationTrackEvent.Purchase("testOrderId", cartItems)
         val requestRecommendationEvent = SdkEvent.Internal.Sdk.RequestRecommendation(
             options = RecommendationOptions(
-                logic = RecommendationLogic.HOME
+                logic = RecommendationLogic.Home
             ),
             contextEvent = purchaseEvent
         )
@@ -103,7 +103,7 @@ class RecommendationCartStorageUpdaterTests {
     fun updateFromEvent_shouldNotDoAnything_whenEventIsRequestRecommendation_andHasNoContextEvent() = runTest {
         val requestRecommendationEvent = SdkEvent.Internal.Sdk.RequestRecommendation(
             options = RecommendationOptions(
-                logic = RecommendationLogic.HOME
+                logic = RecommendationLogic.Home
             ),
             contextEvent = null
         )

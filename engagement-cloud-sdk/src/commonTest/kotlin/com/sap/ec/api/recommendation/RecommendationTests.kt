@@ -29,7 +29,7 @@ class RecommendationTests {
     private companion object {
         val event = SdkEvent.Internal.Sdk.RequestRecommendation(
             options = RecommendationOptions(
-                RecommendationLogic.HOME
+                RecommendationLogic.Home
             )
         )
         val testException = Exception()

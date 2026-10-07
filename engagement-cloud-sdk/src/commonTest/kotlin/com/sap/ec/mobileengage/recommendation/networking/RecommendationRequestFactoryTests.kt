@@ -284,7 +284,7 @@ class RecommendationRequestFactoryTests {
             every { mockCartItemStorage.items } returns mutableListOf(CART_ITEM_1)
             val requestRecommendationEvent = RequestRecommendation(
                 options = RecommendationOptions(
-                    RecommendationLogic.HOME
+                    RecommendationLogic.Home
                 )
             )
             val params = parameters {
@@ -309,7 +309,7 @@ class RecommendationRequestFactoryTests {
     fun test_create_shouldReturn_recommendationUrlPath_withEmptyCart_and_withBasicHomeLogic() = runTest {
         val requestRecommendationEvent = RequestRecommendation(
             options = RecommendationOptions(
-                RecommendationLogic.HOME
+                RecommendationLogic.Home
             )
         )
         val params = parameters {
@@ -331,7 +331,7 @@ class RecommendationRequestFactoryTests {
         val requestRecommendationEvent =
             RequestRecommendation(
                 options = RecommendationOptions(
-                    logic = RecommendationLogic.HOME,
+                    logic = RecommendationLogic.Home,
                     limit = 10
                 )
             )
@@ -354,7 +354,7 @@ class RecommendationRequestFactoryTests {
         val requestRecommendationEvent =
             RequestRecommendation(
                 options = RecommendationOptions(
-                    logic = RecommendationLogic.HOME,
+                    logic = RecommendationLogic.Home,
                     offset = 15
                 )
             )
@@ -376,7 +376,7 @@ class RecommendationRequestFactoryTests {
     fun test_create_shouldReturn_recommendationUrlPath_withEmptyCart_withAvailabilityZone() = runTest {
         val requestRecommendationEvent = RequestRecommendation(
             options = RecommendationOptions(
-                logic = RecommendationLogic.HOME,
+                logic = RecommendationLogic.Home,
                 availabilityZone = "eu"
             )
         )
@@ -400,7 +400,7 @@ class RecommendationRequestFactoryTests {
         val requestRecommendationEvent =
             RequestRecommendation(
                 options = RecommendationOptions(
-                    logic = RecommendationLogic.HOME,
+                    logic = RecommendationLogic.Home,
                     language = "hu"
                 )
             )
@@ -424,7 +424,7 @@ class RecommendationRequestFactoryTests {
         val requestRecommendationEvent =
             RequestRecommendation(
                 options = RecommendationOptions(
-                    logic = RecommendationLogic.HOME,
+                    logic = RecommendationLogic.Home,
                     displayCurrency = "EUR"
                 )
             )
@@ -449,7 +449,7 @@ class RecommendationRequestFactoryTests {
             val requestRecommendationEvent =
                 RequestRecommendation(
                     options = RecommendationOptions(
-                        logic = RecommendationLogic.HOME,
+                        logic = RecommendationLogic.Home,
                     ),
                     contextEvent = SdkEvent.External.RecommendationTrackEvent.Cart(
                         items = listOf(
@@ -481,7 +481,7 @@ class RecommendationRequestFactoryTests {
             val requestRecommendationEvent =
                 RequestRecommendation(
                     options = RecommendationOptions(
-                        logic = RecommendationLogic.HOME,
+                        logic = RecommendationLogic.Home,
                     ),
                     contextEvent = SdkEvent.External.RecommendationTrackEvent.Purchase(
                         TEST_ORDER_ID,
@@ -513,7 +513,7 @@ class RecommendationRequestFactoryTests {
             val requestRecommendationEvent =
                 RequestRecommendation(
                     options = RecommendationOptions(
-                        logic = RecommendationLogic.HOME,
+                        logic = RecommendationLogic.Home,
                     ),
                     contextEvent = SdkEvent.External.RecommendationTrackEvent.ItemView(
                         CART_ITEM_1.itemId
@@ -541,7 +541,7 @@ class RecommendationRequestFactoryTests {
             val requestRecommendationEvent =
                 RequestRecommendation(
                     options = RecommendationOptions(
-                        logic = RecommendationLogic.HOME,
+                        logic = RecommendationLogic.Home,
                     ),
                     contextEvent = SdkEvent.External.RecommendationTrackEvent.ItemView(
                         CART_ITEM_1.itemId
@@ -572,7 +572,7 @@ class RecommendationRequestFactoryTests {
 
         listOf(
             TestCase(
-                options = RecommendationOptions(RecommendationLogic.HOME, filters = null),
+                options = RecommendationOptions(RecommendationLogic.Home, filters = null),
                 expectedUrl = "$RECOMMENDATION_BASE_URL?${
                     parameters {
                         append("f", "f:HOME,l:5,o:0")
@@ -581,7 +581,7 @@ class RecommendationRequestFactoryTests {
                 }"
             ),
             TestCase(
-                options = RecommendationOptions(RecommendationLogic.HOME, filters = emptyList()),
+                options = RecommendationOptions(RecommendationLogic.Home, filters = emptyList()),
                 expectedUrl = "$RECOMMENDATION_BASE_URL?${
                     parameters {
                         append("f", "f:HOME,l:5,o:0")
@@ -591,7 +591,7 @@ class RecommendationRequestFactoryTests {
             ),
             TestCase(
                 options = RecommendationOptions(
-                    RecommendationLogic.HOME,
+                    RecommendationLogic.Home,
                     filters = listOf(
                         RecommendationFilter(
                             FilterType.INCLUDE,
@@ -614,7 +614,7 @@ class RecommendationRequestFactoryTests {
             ),
             TestCase(
                 options = RecommendationOptions(
-                    RecommendationLogic.HOME,
+                    RecommendationLogic.Home,
                     filters = listOf(
                         RecommendationFilter(
                             FilterType.INCLUDE,
@@ -637,7 +637,7 @@ class RecommendationRequestFactoryTests {
             ),
             TestCase(
                 options = RecommendationOptions(
-                    RecommendationLogic.HOME,
+                    RecommendationLogic.Home,
                     filters = listOf(
                         RecommendationFilter(
                             FilterType.INCLUDE,
@@ -660,7 +660,7 @@ class RecommendationRequestFactoryTests {
             ),
             TestCase(
                 options = RecommendationOptions(
-                    RecommendationLogic.HOME,
+                    RecommendationLogic.Home,
                     filters = listOf(
                         RecommendationFilter(
                             FilterType.INCLUDE,
@@ -683,7 +683,7 @@ class RecommendationRequestFactoryTests {
             ),
             TestCase(
                 options = RecommendationOptions(
-                    RecommendationLogic.HOME,
+                    RecommendationLogic.Home,
                     filters = listOf(
                         RecommendationFilter(
                             FilterType.EXCLUDE,
@@ -706,7 +706,7 @@ class RecommendationRequestFactoryTests {
             ),
             TestCase(
                 options = RecommendationOptions(
-                    RecommendationLogic.HOME, filters = listOf(
+                    RecommendationLogic.Home, filters = listOf(
                         RecommendationFilter(
                             FilterType.INCLUDE,
                             "category",
@@ -734,7 +734,7 @@ class RecommendationRequestFactoryTests {
             ),
             TestCase(
                 options = RecommendationOptions(
-                    RecommendationLogic.HOME, limit = 10, offset = 20, filters = listOf(
+                    RecommendationLogic.Home, limit = 10, offset = 20, filters = listOf(
                         RecommendationFilter(
                             FilterType.INCLUDE,
                             "category",

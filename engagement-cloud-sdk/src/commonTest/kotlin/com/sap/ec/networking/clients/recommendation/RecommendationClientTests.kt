@@ -174,7 +174,7 @@ class RecommendationClientTests {
         runTest {
             createRecommendationClient(backgroundScope).register()
             val requestRecommendation = SdkEvent.Internal.Sdk.RequestRecommendation(options = RecommendationOptions(
-                RecommendationLogic.HOME))
+                RecommendationLogic.Home))
             val request = UrlRequest(
                 url = Url(RECOMMENDATION_BASE_URL),
                 method = HttpMethod.Get
@@ -219,7 +219,7 @@ class RecommendationClientTests {
         runTest {
             createRecommendationClient(backgroundScope).register()
             val requestRecommendation = SdkEvent.Internal.Sdk.RequestRecommendation(options = RecommendationOptions(
-                RecommendationLogic.HOME))
+                RecommendationLogic.Home))
             val request = UrlRequest(
                 url = Url(RECOMMENDATION_BASE_URL),
                 method = HttpMethod.Get
@@ -264,7 +264,7 @@ class RecommendationClientTests {
         runTest {
             createRecommendationClient(backgroundScope).register()
             val requestRecommendation = SdkEvent.Internal.Sdk.RequestRecommendation(options = RecommendationOptions(
-                RecommendationLogic.HOME))
+                RecommendationLogic.Home))
             val searchEvent = SdkEvent.External.RecommendationTrackEvent.Search("testSearchTerm")
             val sdkEvents = backgroundScope.async {
                 sdkEventsFlow.take(1).toList()

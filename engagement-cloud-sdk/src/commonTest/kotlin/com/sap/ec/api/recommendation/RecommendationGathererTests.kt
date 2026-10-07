@@ -29,7 +29,7 @@ class RecommendationGathererTests {
     fun testGathering_shouldThrow() = runTest {
         val event = SdkEvent.Internal.Sdk.RequestRecommendation(
             options = RecommendationOptions(
-                RecommendationLogic.HOME
+                RecommendationLogic.Home
             )
         )
         assertFailsWith<RecommendationApiNotReady> {

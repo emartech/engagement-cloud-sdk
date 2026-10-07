@@ -6,9 +6,6 @@ import com.sap.ec.core.url.ECUrlType
 import com.sap.ec.core.url.UrlFactoryApi
 import com.sap.ec.event.RecommendationEvent
 import com.sap.ec.event.SdkEvent
-import com.sap.ec.recommendation.models.TagWithAttributes
-import com.sap.ec.recommendation.models.CartItem
-import com.sap.ec.recommendation.models.requestRecommendation.FilterType
 import com.sap.ec.recommendation.RecommendationConstants.AVAILABILITY_ZONE_KEY
 import com.sap.ec.recommendation.RecommendationConstants.CART_ITEMS_KEY
 import com.sap.ec.recommendation.RecommendationConstants.CART_LIST_ITEM_PRICE_KEY
@@ -17,9 +14,9 @@ import com.sap.ec.recommendation.RecommendationConstants.CART_VERSION_FLAG_KEY
 import com.sap.ec.recommendation.RecommendationConstants.CHECKOUT_ITEMS_KEY
 import com.sap.ec.recommendation.RecommendationConstants.COHORT_KEY
 import com.sap.ec.recommendation.RecommendationConstants.CURRENCY_KEY
+import com.sap.ec.recommendation.RecommendationConstants.FEATURES_TO_RETRIEVE_RECOMMENDATIONS_FOR_KEY
 import com.sap.ec.recommendation.RecommendationConstants.FEATURE_ID_KEY
 import com.sap.ec.recommendation.RecommendationConstants.FEATURE_KEY
-import com.sap.ec.recommendation.RecommendationConstants.FEATURES_TO_RETRIEVE_RECOMMENDATIONS_FOR_KEY
 import com.sap.ec.recommendation.RecommendationConstants.FILTER_EXCLUDE_KEY
 import com.sap.ec.recommendation.RecommendationConstants.FILTER_FIELD_KEY
 import com.sap.ec.recommendation.RecommendationConstants.FILTER_NEGATE_KEY
@@ -35,6 +32,9 @@ import com.sap.ec.recommendation.RecommendationConstants.SEARCH_KEY
 import com.sap.ec.recommendation.RecommendationConstants.TAG_KEY
 import com.sap.ec.recommendation.RecommendationConstants.TAG_WITH_ATTRIBUTES_KEY
 import com.sap.ec.recommendation.RecommendationConstants.VIEW_CATEGORY_KEY
+import com.sap.ec.recommendation.models.CartItem
+import com.sap.ec.recommendation.models.TagWithAttributes
+import com.sap.ec.recommendation.models.requestRecommendation.FilterType
 import com.sap.ec.util.JsonUtil
 import io.ktor.http.HttpMethod
 import io.ktor.http.URLBuilder
@@ -62,7 +62,7 @@ internal class RecommendationRequestFactory(
                 is SdkEvent.Internal.Sdk.RequestRecommendation -> {
                     parameters.append(
                         FEATURES_TO_RETRIEVE_RECOMMENDATIONS_FOR_KEY,
-                        "${FEATURE_ID_KEY}:${recommendationEvent.options.logic},${LIMIT_KEY}:${recommendationEvent.options.limit},${OFFSET_KEY}:${recommendationEvent.options.offset}"
+                        "${FEATURE_ID_KEY}:${recommendationEvent.options.logic.getLogicName()},${LIMIT_KEY}:${recommendationEvent.options.limit},${OFFSET_KEY}:${recommendationEvent.options.offset}"
                     )
                     recommendationEvent.options.filters?.takeIf { it.isNotEmpty() }
                         ?.let { filters ->
