@@ -13,7 +13,6 @@ import com.sap.ec.api.tracking.model.JsItemViewEventValidationData
 import com.sap.ec.api.tracking.model.JsNavigateEvent
 import com.sap.ec.api.tracking.model.JsNavigateEventValidationData
 import com.sap.ec.api.tracking.model.JsPurchaseEventValidationData
-import com.sap.ec.api.tracking.model.JsRecommendationClickEventValidationData
 import com.sap.ec.api.tracking.model.JsRecommendationEvent
 import com.sap.ec.api.tracking.model.JsRecommendationEventValidationData
 import com.sap.ec.api.tracking.model.JsSearchEventValidationData
@@ -24,7 +23,6 @@ import com.sap.ec.api.tracking.model.recommendation.JsCartEvent
 import com.sap.ec.api.tracking.model.recommendation.JsCartItem
 import com.sap.ec.api.tracking.model.recommendation.JsItemViewEvent
 import com.sap.ec.api.tracking.model.recommendation.JsPurchaseEvent
-import com.sap.ec.api.tracking.model.recommendation.JsRecommendationClickEvent
 import com.sap.ec.api.tracking.model.recommendation.JsRecommendationEventType
 import com.sap.ec.api.tracking.model.recommendation.JsSearchEvent
 import com.sap.ec.api.tracking.model.recommendation.JsTagEvent
@@ -34,7 +32,6 @@ import com.sap.ec.recommendation.models.tracking.CartEvent
 import com.sap.ec.recommendation.models.tracking.CategoryViewEvent
 import com.sap.ec.recommendation.models.tracking.ItemViewEvent
 import com.sap.ec.recommendation.models.tracking.PurchaseEvent
-import com.sap.ec.recommendation.models.tracking.RecommendationClickEvent
 import com.sap.ec.recommendation.models.tracking.SearchEvent
 import com.sap.ec.recommendation.models.tracking.TagEvent
 import com.sap.ec.tracking.TrackingApi
@@ -140,12 +137,6 @@ internal class JSTracking(
                 val event =
                     event.parseWithValidation<JsSearchEventValidationData, JsSearchEvent>()
                 SearchEvent(event.searchTerm)
-            }
-
-            JsRecommendationEventType.RECOMMENDATION_CLICK -> {
-                val event =
-                    event.parseWithValidation<JsRecommendationClickEventValidationData, JsRecommendationClickEvent>()
-                RecommendationClickEvent(event.productId)
             }
 
             JsRecommendationEventType.CART -> {

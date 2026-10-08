@@ -5,7 +5,6 @@ import com.sap.ec.api.tracking.model.recommendation.JsCartEvent
 import com.sap.ec.api.tracking.model.recommendation.JsCartItem
 import com.sap.ec.api.tracking.model.recommendation.JsItemViewEvent
 import com.sap.ec.api.tracking.model.recommendation.JsPurchaseEvent
-import com.sap.ec.api.tracking.model.recommendation.JsRecommendationClickEvent
 import com.sap.ec.api.tracking.model.recommendation.JsSearchEvent
 import com.sap.ec.api.tracking.model.recommendation.JsTagEvent
 import kotlinx.serialization.SerialName
@@ -99,12 +98,6 @@ internal data class JsPurchaseEventValidationData(
         return result
     }
 }
-
-@Serializable
-@SerialName("RECOMMENDATION_CLICK")
-internal data class JsRecommendationClickEventValidationData(
-    override val productId: String
-) : JsRecommendationClickEvent, JsEventValidationData
 
 @Serializable
 @SerialName("SEARCH")

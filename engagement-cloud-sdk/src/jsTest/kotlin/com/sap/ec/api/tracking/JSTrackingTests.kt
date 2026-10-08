@@ -9,7 +9,6 @@ import com.sap.ec.api.tracking.model.recommendation.JsCartEvent
 import com.sap.ec.api.tracking.model.recommendation.JsCartItem
 import com.sap.ec.api.tracking.model.recommendation.JsItemViewEvent
 import com.sap.ec.api.tracking.model.recommendation.JsPurchaseEvent
-import com.sap.ec.api.tracking.model.recommendation.JsRecommendationClickEvent
 import com.sap.ec.api.tracking.model.recommendation.JsSearchEvent
 import com.sap.ec.api.tracking.model.recommendation.JsTagEvent
 import com.sap.ec.recommendation.models.CartItem
@@ -17,7 +16,6 @@ import com.sap.ec.recommendation.models.tracking.CartEvent
 import com.sap.ec.recommendation.models.tracking.CategoryViewEvent
 import com.sap.ec.recommendation.models.tracking.ItemViewEvent
 import com.sap.ec.recommendation.models.tracking.PurchaseEvent
-import com.sap.ec.recommendation.models.tracking.RecommendationClickEvent
 import com.sap.ec.recommendation.models.tracking.SearchEvent
 import com.sap.ec.recommendation.models.tracking.TagEvent
 import com.sap.ec.tracking.TrackingApi
@@ -216,17 +214,6 @@ class JSTrackingTests {
     }
 
     @Test
-    fun track_shouldCallTrack_onEventTracker_withRecommendationClickEvent() = runTest {
-        val testProductId = "testProductId"
-        val recommendationClick: JsRecommendationClickEvent =
-            js("{ type: '$RECOMMENDATION_EVENT_TYPE', recommendationEventType: 'RECOMMENDATION_CLICK', productId: testProductId }").unsafeCast<JsRecommendationClickEvent>()
-
-        jsTracking.track(recommendationClick)
-
-        verifySuspend { mockEventTrackerApi.track(RecommendationClickEvent(testProductId)) }
-    }
-
-    @Test
     fun track_shouldCallTrack_onEventTracker_withCartEvent() = runTest {
         val item1 = js("{itemId: 'item1', price: 123.456 , quantity: 99}").unsafeCast<JsCartItem>()
         val item2 = js("{itemId: 'item2', price: 45.78 , quantity: 11.5}").unsafeCast<JsCartItem>()
@@ -295,6 +282,6 @@ class JSTrackingTests {
 
             val exception = shouldThrow<IllegalArgumentException> { jsTracking.track(jsTagEvent) }
 
-            exception.cause?.message shouldBe "Invalid recommendation event type: SOME_TYPE. Valid types are: category_view, item_view, recommendation_click, search, cart, purchase, tag"
+            exception.cause?.message shouldBe "Invalid recommendation event type: SOME_TYPE. Valid types are: category_view, item_view, search, cart, purchase, tag"
         }
 }

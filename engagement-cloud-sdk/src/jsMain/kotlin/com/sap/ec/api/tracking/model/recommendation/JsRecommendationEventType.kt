@@ -7,7 +7,6 @@ import kotlinx.serialization.Serializable
 enum class JsRecommendationEventType {
     CATEGORY_VIEW,
     ITEM_VIEW,
-    RECOMMENDATION_CLICK,
     SEARCH,
     CART,
     PURCHASE,
