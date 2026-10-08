@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import web.broadcast.BroadcastChannel
 import web.events.EventHandler
 
+@OptIn(ExperimentalWasmJsInterop::class)
 internal class PushNotificationClickHandler(
     private val actionFactory: PushActionFactoryApi,
     private val actionHandler: ActionHandlerApi,
