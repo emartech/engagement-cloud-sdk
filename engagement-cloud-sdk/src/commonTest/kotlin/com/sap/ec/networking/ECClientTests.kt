@@ -7,9 +7,6 @@ import com.sap.ec.core.networking.clients.NetworkClientApi
 import com.sap.ec.core.networking.context.RequestContextApi
 import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.networking.model.UrlRequest
-import com.sap.ec.core.networking.model.body
-import com.sap.ec.core.url.ECUrlType
-import com.sap.ec.core.url.UrlFactoryApi
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.model.TestDataClass
 import com.sap.ec.networking.ECHeaders.CLIENT_ID_HEADER
@@ -17,6 +14,7 @@ import com.sap.ec.networking.ECHeaders.CLIENT_STATE_HEADER
 import com.sap.ec.networking.ECHeaders.CONTACT_TOKEN_HEADER
 import com.sap.ec.util.JsonUtil
 import dev.mokkery.MockMode
+import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
@@ -25,7 +23,6 @@ import dev.mokkery.matcher.capture.Capture.Companion.slot
 import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.isPresent
 import dev.mokkery.mock
-import dev.mokkery.verify
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
@@ -38,7 +35,6 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.URLBuilder
 import io.ktor.http.Url
-import io.ktor.http.headers
 import io.ktor.http.headersOf
 import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.Dispatchers
@@ -49,16 +45,14 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class ECClientTests {
     private companion object Companion {
         const val ID = "testId"
@@ -69,42 +63,41 @@ class ECClientTests {
         val testData = TestDataClass(ID, NAME)
     }
 
-    private lateinit var mockUrlFactory: UrlFactoryApi
     private lateinit var mockNetworkClient: NetworkClientApi
+    private lateinit var mockContactTokenRefresher: ContactTokenRefresherApi
     private lateinit var json: Json
     private lateinit var mockRequestContext: RequestContextApi
     private lateinit var eCClient: ECClient
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
-
     private lateinit var mockSdkLogger: Logger
 
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(StandardTestDispatcher())
-        mockUrlFactory = mock()
         mockNetworkClient = mock()
+        mockContactTokenRefresher = mock(MockMode.autofill)
         mockSdkEventDistributor = mock(MockMode.autofill)
         mockRequestContext = mock(MockMode.autofill)
         mockSdkLogger = mock(MockMode.autofill)
 
-        every { mockRequestContext.refreshToken } returns null
         every { mockRequestContext.contactToken } returns CONTACT_TOKEN
         every { mockRequestContext.clientState } returns CLIENT_STATE
         every { mockRequestContext.clientId } returns CLIENT_ID
 
         json = JsonUtil.json
 
-        everySuspend {
-            mockUrlFactory.create(ECUrlType.RefreshToken)
-        } returns Url("https://testUrl.com")
-
         everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mock(MockMode.autofill)
+
+        everySuspend { mockContactTokenRefresher.executeWithTokenRefresh(any(), any()) } calls { args ->
+            @Suppress("UNCHECKED_CAST")
+            val callback = args.arg<suspend () -> Result<Response>>(1)
+            callback()
+        }
 
         eCClient = ECClient(
             mockNetworkClient,
             mockRequestContext,
-            mockUrlFactory,
-            json,
+            mockContactTokenRefresher,
             mockSdkLogger,
             mockSdkEventDistributor,
         )
@@ -113,91 +106,6 @@ class ECClientTests {
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
-    }
-
-    @Test
-    fun testSend_should_retry_on401_and_try_to_get_refreshToken() = runTest {
-        every { mockRequestContext.clientId } returns null
-        every { mockRequestContext.refreshToken } returns "testRefreshToken"
-
-        val mockHttpEngine = MockEngine.config {
-            addHandler {
-                respond(
-                    ByteReadChannel(
-                        buildJsonObject {
-                            put("error", buildJsonObject {
-                                put("code", "1000")
-                                put("message", "the contact-token needs to be refreshed")
-                                put("target", "/v4/apps/EMS-1234/client")
-                                put("details", buildJsonArray { })
-                            })
-                        }.toString()
-                    ),
-                    status = HttpStatusCode.Unauthorized,
-                    headers = headersOf("Content-Type", "application/json")
-
-                )
-            }
-            addHandler {
-                respond(
-                    ByteReadChannel("""{"contactToken":"testContactToken"}"""),
-                    status = HttpStatusCode.OK,
-                    headers = headersOf("Content-Type", "application/json")
-                )
-            }
-            addHandler {
-                respond(
-                    ByteReadChannel(json.encodeToString(testData)),
-                    status = HttpStatusCode.OK,
-                    headers = headers {
-                        append("Content-Type", "application/json")
-                        append("ec-client-state", "testClientState")
-                    }
-                )
-            }
-        }
-        val httpClient = HttpClient(mockHttpEngine) {
-            install(HttpRequestRetry)
-        }
-        val networkClient = GenericNetworkClient(httpClient, mockSdkLogger)
-        val eCClient = ECClient(
-            networkClient,
-            mockRequestContext,
-            mockUrlFactory,
-            json,
-            mock(MockMode.autofill),
-            mockSdkEventDistributor,
-        )
-
-        every { mockRequestContext.clientState } returns null
-        val urlString =
-            URLBuilder("https://testUrl.com").build()
-        val request = UrlRequest(
-            urlString,
-            HttpMethod.Get,
-            null,
-        )
-        val expectedRequest = request.copy(
-            headers = mapOf(
-                "ec-contact" to "testContactToken",
-            )
-        )
-
-        val expectedResponse = Response(
-            expectedRequest,
-            HttpStatusCode.OK,
-            headers {
-                append("Content-Type", "application/json")
-                append("ec-client-state", "testClientState")
-            },
-            json.encodeToString(testData)
-        )
-
-        val response: Response = eCClient.send(request).getOrNull()!!
-
-        response shouldBe expectedResponse
-        response.body<TestDataClass>() shouldBe testData
-        verify { mockRequestContext.clientState = "testClientState" }
     }
 
     @Test
@@ -218,21 +126,17 @@ class ECClientTests {
         val eCClient = ECClient(
             networkClient,
             mockRequestContext,
-            mockUrlFactory,
-            json,
+            mockContactTokenRefresher,
             mock(MockMode.autofill),
             mockSdkEventDistributor,
         )
 
-        val urlString =
-            URLBuilder("https://testUrl.com").build()
+        val urlString = URLBuilder("https://testUrl.com").build()
         val request = UrlRequest(
             urlString,
             HttpMethod.Get,
             null,
-            mapOf(
-                "test-header" to "testHeader"
-            )
+            mapOf("test-header" to "testHeader")
         )
 
         val response: Response = eCClient.send(request).getOrNull()!!
@@ -354,10 +258,7 @@ class ECClientTests {
                         putJsonArray("details") {
                             add(buildJsonObject {
                                 put("code", "1201")
-                                put(
-                                    "message",
-                                    "TestMessage"
-                                )
+                                put("message", "TestMessage")
                             })
                         }
                     })
@@ -376,8 +277,21 @@ class ECClientTests {
         verifySuspend(VerifyMode.exactly(0)) {
             mockSdkEventDistributor.registerEvent(any())
         }
-
-
     }
 
+    @Test
+    fun testSend_should_delegateToContactTokenRefresher() = runTest {
+        everySuspend { mockNetworkClient.send(any()) } returns Result.success(
+            Response(
+                UrlRequest(Url("https://testUrl.com"), HttpMethod.Get, null),
+                HttpStatusCode.OK,
+                headersOf("Content-Type", "application/json"),
+                "{}"
+            )
+        )
+
+        eCClient.send(UrlRequest(Url("https://testUrl.com"), HttpMethod.Get, null))
+
+        verifySuspend { mockContactTokenRefresher.executeWithTokenRefresh(any(), any()) }
+    }
 }

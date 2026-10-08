@@ -3,6 +3,8 @@ package com.sap.ec.di
 import com.sap.ec.core.networking.clients.GenericNetworkClient
 import com.sap.ec.core.networking.clients.NetworkClientApi
 import com.sap.ec.core.storage.StringStorageApi
+import com.sap.ec.networking.ContactTokenRefresher
+import com.sap.ec.networking.ContactTokenRefresherApi
 import com.sap.ec.networking.ECClient
 import com.sap.ec.networking.RecommendationNetworkClient
 import com.sap.ec.networking.clients.EventBasedClientApi
@@ -34,14 +36,22 @@ internal object NetworkInjection {
                 sdkLogger = get { parametersOf(GenericNetworkClient::class.simpleName) },
             )
         }
+        single<ContactTokenRefresherApi> {
+            ContactTokenRefresher(
+                networkClient = get<NetworkClientApi>(named(NetworkClientTypes.Generic)),
+                requestContext = get(),
+                urlFactory = get(),
+                json = get(),
+                sdkLogger = get { parametersOf(ContactTokenRefresher::class.simpleName) }
+            )
+        }
         single<NetworkClientApi>(named(NetworkClientTypes.EC)) {
             ECClient(
                 networkClient = get<NetworkClientApi>(
                     named(NetworkClientTypes.Generic)
                 ),
                 requestContext = get(),
-                urlFactory = get(),
-                json = get(),
+                contactTokenRefresher = get(),
                 sdkLogger = get { parametersOf(ECClient::class.simpleName) },
                 sdkEventDistributor = get()
             )
@@ -54,6 +64,7 @@ internal object NetworkInjection {
                 stringStorage = get<StringStorageApi>(),
                 requestContext = get(),
                 userAgentProvider = get(),
+                contactTokenRefresher = get(),
                 sdkLogger = get { parametersOf(RecommendationNetworkClient::class.simpleName) },
             )
         }

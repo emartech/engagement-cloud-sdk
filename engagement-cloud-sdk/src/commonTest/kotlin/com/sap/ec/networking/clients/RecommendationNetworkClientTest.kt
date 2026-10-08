@@ -7,14 +7,17 @@ import com.sap.ec.core.networking.context.RequestContextApi
 import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.networking.model.UrlRequest
 import com.sap.ec.core.storage.StringStorageApi
-import com.sap.ec.recommendation.RecommendationConstants.VISITOR_ID_COOKIE_KEY
-import com.sap.ec.recommendation.RecommendationConstants.XP_COOKIE_KEY
+import com.sap.ec.networking.ContactTokenRefresherApi
 import com.sap.ec.networking.ECHeaders.CONTACT_TOKEN_HEADER
 import com.sap.ec.networking.RecommendationNetworkClient
+import com.sap.ec.recommendation.RecommendationConstants.VISITOR_ID_COOKIE_KEY
+import com.sap.ec.recommendation.RecommendationConstants.XP_COOKIE_KEY
 import dev.mokkery.MockMode
+import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
+import dev.mokkery.matcher.any
 import dev.mokkery.matcher.capture.Capture.Companion.slot
 import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
@@ -43,6 +46,7 @@ class RecommendationNetworkClientTest {
     private lateinit var mockStringStorage: StringStorageApi
     private lateinit var mockRequestContext: RequestContextApi
     private lateinit var mockUserAgentProvider: UserAgentProviderApi
+    private lateinit var mockContactTokenRefresher: ContactTokenRefresherApi
 
     private companion object {
         private val REQUEST = UrlRequest(url = Url("https://test.com"), method = HttpMethod.Get)
@@ -101,14 +105,22 @@ class RecommendationNetworkClientTest {
         mockStringStorage = mock(MockMode.autofill)
         mockRequestContext = mock(MockMode.autofill)
         mockUserAgentProvider = mock(MockMode.autofill)
-        recommendationNetworkClient =
-            RecommendationNetworkClient(
-                mockGenericNetworkClient,
-                mockStringStorage,
-                mockRequestContext,
-                mockUserAgentProvider,
-                sdkLogger = mock(MockMode.autofill)
-            )
+        mockContactTokenRefresher = mock(MockMode.autofill)
+
+        everySuspend { mockContactTokenRefresher.executeWithTokenRefresh(any(), any()) } calls { args ->
+            @Suppress("UNCHECKED_CAST")
+            val callback = args.arg<suspend () -> Result<Response>>(1)
+            callback()
+        }
+
+        recommendationNetworkClient = RecommendationNetworkClient(
+            mockGenericNetworkClient,
+            mockStringStorage,
+            mockRequestContext,
+            mockUserAgentProvider,
+            mockContactTokenRefresher,
+            sdkLogger = mock(MockMode.autofill)
+        )
         everySuspend { mockUserAgentProvider.provide() } returns USER_AGENT_STRING
     }
 
@@ -288,5 +300,16 @@ class RecommendationNetworkClientTest {
             mockRequestContext.contactToken
         }
         verifySuspend { mockUserAgentProvider.provide() }
+    }
+
+    @Test
+    fun test_send_shouldDelegateToContactTokenRefresher() = runTest {
+        every { mockRequestContext.contactToken } returns CONTACT_TOKEN
+        every { mockStringStorage.get(any()) } returns null
+        everySuspend { mockGenericNetworkClient.send(any()) } returns SUCCESS_RESPONSE_WITHOUT_COOKIES
+
+        recommendationNetworkClient.send(REQUEST)
+
+        verifySuspend { mockContactTokenRefresher.executeWithTokenRefresh(any(), any()) }
     }
 }
