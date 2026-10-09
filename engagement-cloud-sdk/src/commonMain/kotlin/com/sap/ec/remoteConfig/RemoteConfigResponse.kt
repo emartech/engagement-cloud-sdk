@@ -5,12 +5,28 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 internal data class RemoteConfigResponse(
-    val serviceUrls: ServiceUrls? = null,
+    val globalRemoteConfigApplicationCodeValidationRegex: String? = null,
+    val globalServiceUrls: RemoteConfigGlobalServiceUrls? = null,
+    val serviceUrls: RemoteConfigServiceUrls? = null,
     val logLevel: LogLevel? = null,
     val luckyLogger: LuckyLogger? = null,
     val features: RemoteConfigFeatures? = null,
     val embeddedMessagingConfig: EmbeddedMessagingConfig? = null,
-    val overrides: Map<String, RemoteConfig>? = null,
-    val globalRemoteConfigApplicationCodeValidationRegex: String? = null,
+    val overrides: Map<String, RemoteConfigOverride>? = null,
     val disabled: Boolean? = false
-)
+) {
+    companion object {
+        val SDK_DEFAULT = RemoteConfigResponse(
+            logLevel = LogLevel.Error,
+            features = RemoteConfigFeatures(
+                mobileEngage = false,
+                embeddedMessaging = false,
+                jsBridgeSignatureCheck = true
+            ),
+            embeddedMessagingConfig = EmbeddedMessagingConfig(
+                tagUpdateBatchSize = 10,
+                tagUpdateFrequencyCapSeconds = 5
+            )
+        )
+    }
+}

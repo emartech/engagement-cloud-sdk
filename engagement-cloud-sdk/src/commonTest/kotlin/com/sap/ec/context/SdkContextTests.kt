@@ -28,7 +28,7 @@ class SdkContextTests {
     private var features: MutableSet<Features> = mutableSetOf()
     private lateinit var sdkDispatcher: CoroutineDispatcher
     private lateinit var mainDispatcher: CoroutineDispatcher
-    private lateinit var mockDefaultUrls: DefaultUrlsApi
+    private lateinit var mockServiceUrls: ServiceUrlsApi
     private lateinit var mockSdkConfigStore: SdkConfigStoreApi<SdkConfig>
     private lateinit var sdkContext: SdkContextApi
 
@@ -38,14 +38,14 @@ class SdkContextTests {
         sdkDispatcher = StandardTestDispatcher()
         mainDispatcher = StandardTestDispatcher()
         Dispatchers.setMain(mainDispatcher)
-        mockDefaultUrls = mock(MockMode.autofill)
+        mockServiceUrls = mock(MockMode.autofill)
         mockSdkConfigStore = mock(MockMode.autofill)
 
         sdkContext = SdkContext(
             sdkDispatcher = sdkDispatcher,
             mainDispatcher = mainDispatcher,
             onContactLinkingFailed = null,
-            defaultUrls = mockDefaultUrls,
+            serviceUrls = mockServiceUrls,
             features = features,
             sdkConfigStore = mockSdkConfigStore
         )

@@ -33,6 +33,7 @@ import dev.mokkery.spy
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -52,6 +53,8 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.io.IOException
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.MissingFieldException
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -496,6 +499,64 @@ class RemoteConfigClientTests {
                     "RemoteConfigClient: ConsumeRemoteConfigEvents error",
                     remoteConfigEvent
                 )
+            }
+        }
+
+    @OptIn(ExperimentalSerializationApi::class)
+    @Test
+    fun testConsumer_shouldNotCall_responseHandler_butAckEvent_whenServiceUrlsIsIncomplete() =
+        runTest {
+            val configResult = """{"serviceUrls":{"clientService":"test"},"logLevel":"ERROR"}"""
+
+            createClient(backgroundScope).register()
+
+            val eventSlot = Capture.slot<SdkEvent.Internal.Sdk.Answer.Response<Response>>()
+            everySuspend {
+                mockSdkEventManager.emitEvent(
+                    capture(eventSlot)
+                )
+            } calls {
+                sdkEvents.emit(it.args[0] as SdkEvent)
+            }
+
+            val configResponse =
+                Response(configRequest, HttpStatusCode.OK, Headers.Empty, configResult)
+            val configSignatureResponse = Response(
+                configSignatureRequest,
+                HttpStatusCode.OK,
+                Headers.Empty,
+                CONFIG_SIGNATURE_RESULT
+            )
+            everySuspend { mockUrlFactory.create(ECUrlType.RemoteConfig) } returns configUrl
+            everySuspend {
+                mockUrlFactory.create(ECUrlType.RemoteConfigSignature)
+            } returns configSignatureUrl
+            everySuspend { mockNetworkClient.send(configRequest) } returns Result.success(configResponse)
+            everySuspend {
+                mockNetworkClient.send(
+                    configSignatureRequest
+                )
+            } returns Result.success(configSignatureResponse)
+            everySuspend { mockCrypto.verify(any(), any()) } returns true
+
+            val appCodeBasedRemoteConfigEvent = SdkEvent.Internal.Sdk.ApplyAppCodeBasedRemoteConfig()
+
+            val responseEvents = backgroundScope.async {
+                sdkEvents.filterIsInstance(SdkEvent.Internal.Sdk.Answer.Response::class).take(1)
+                    .toList()
+            }
+
+            onlineEvents.emit(appCodeBasedRemoteConfigEvent)
+            advanceUntilIdle()
+
+            responseEvents.await().size shouldBe 1
+            verifySuspend { mockNetworkClient.send(configRequest) }
+            verifySuspend { mockNetworkClient.send(configSignatureRequest) }
+
+            eventSlot.values.first().let {
+                it.originId shouldBe appCodeBasedRemoteConfigEvent.id
+                it.result.isFailure shouldBe true
+                it.result.exceptionOrNull().shouldBeInstanceOf<MissingFieldException>()
             }
         }
 

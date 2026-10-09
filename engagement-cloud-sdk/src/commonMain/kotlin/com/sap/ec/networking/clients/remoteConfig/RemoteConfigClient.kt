@@ -26,6 +26,8 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.MissingFieldException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
@@ -76,6 +78,7 @@ internal class RemoteConfigClient(
             }
     }
 
+    @OptIn(ExperimentalSerializationApi::class)
     private suspend fun handleException(exception: Throwable, event: OnlineSdkEvent) {
         currentCoroutineContext().ensureActive()
         clientExceptionHandler.handleException(
@@ -94,6 +97,15 @@ internal class RemoteConfigClient(
                 Response(
                     originId = event.id,
                     Result.success(Unit)
+                )
+            )
+        } else if (exception is MissingFieldException &&
+            exception.message?.contains("RemoteConfigServiceUrls") ?: false) {
+            sdkLogger.error("Remote config service URLs incomplete.")
+            sdkEventManager.emitEvent(
+                Response(
+                    originId = event.id,
+                    Result.failure<Exception>(exception)
                 )
             )
         } else {

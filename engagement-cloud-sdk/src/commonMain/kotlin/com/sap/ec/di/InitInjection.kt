@@ -10,6 +10,7 @@ import com.sap.ec.enable.states.RegisterEventBasedClientsState
 import com.sap.ec.init.InitOrganizer
 import com.sap.ec.init.InitOrganizerApi
 import com.sap.ec.init.states.ApplyGlobalRemoteConfigState
+import com.sap.ec.init.states.ApplySDKDefaultRemoteConfigState
 import com.sap.ec.init.states.InitializerState
 import com.sap.ec.init.states.RegisterEventConsumersState
 import com.sap.ec.init.states.RegisterInstancesState
@@ -27,6 +28,12 @@ import org.koin.dsl.module
 
 internal object InitInjection {
     val initModules = module {
+        single<State>(named(InitStateTypes.ApplySDKDefaultRemoteConfig)) {
+            ApplySDKDefaultRemoteConfigState(
+                remoteConfigResponseHandler = get(),
+                sdkLogger = get { parametersOf(ApplySDKDefaultRemoteConfigState::class.simpleName) },
+            )
+        }
         single<State>(named(InitStateTypes.ApplyGlobalRemoteConfig)) {
             ApplyGlobalRemoteConfigState(
                 operationalEventDistributor = get(),
@@ -113,6 +120,7 @@ internal object InitInjection {
                     get(named(InitStateTypes.RegisterSdkEventDistributorState)),
                     get(named(InitStateTypes.RegisterEventBasedClients)),
                     get(named(InitStateTypes.RegisterEventConsumers)),
+                    get(named(InitStateTypes.ApplySDKDefaultRemoteConfig)),
                     get(named(InitStateTypes.ApplyGlobalRemoteConfig)),
                     get(named(InitStateTypes.RegisterInstances)),
                     get(named(InitStateTypes.RegisterWatchdogs)),
@@ -136,5 +144,5 @@ internal object InitInjection {
 }
 
 internal enum class InitStateTypes {
-    LegacySDKMigration, ApplyGlobalRemoteConfig, RegisterInstances, RegisterWatchdogs, SessionSubscription, Initializer, SdkConfigLoader, RegisterEventBasedClients, RegisterEventConsumers, RegisterSdkEventDistributorState, RestoreOperationalEvents
+    LegacySDKMigration, ApplySDKDefaultRemoteConfig, ApplyGlobalRemoteConfig, RegisterInstances, RegisterWatchdogs, SessionSubscription, Initializer, SdkConfigLoader, RegisterEventBasedClients, RegisterEventConsumers, RegisterSdkEventDistributorState, RestoreOperationalEvents
 }

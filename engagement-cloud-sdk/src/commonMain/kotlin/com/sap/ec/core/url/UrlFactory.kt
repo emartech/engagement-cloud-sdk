@@ -16,44 +16,57 @@ internal class UrlFactory(
 
     override suspend fun create(urlType: ECUrlType): Url {
         return when (urlType) {
-            ECUrlType.ChangeApplicationCode -> {
-                URLBuilder("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client/app").build()
+            ECUrlType.RemoteConfigSignature -> Url("${sdkContext.serviceUrls.remoteConfigBaseUrl}/signature/${getApplicationCode()}")
+            ECUrlType.RemoteConfig -> Url("${sdkContext.serviceUrls.remoteConfigBaseUrl}/${getApplicationCode()}")
+            ECUrlType.GlobalRemoteConfigSignature -> Url("${sdkContext.serviceUrls.remoteConfigBaseUrl}/signature/GLOBAL")
+            ECUrlType.GlobalRemoteConfig -> Url("${sdkContext.serviceUrls.remoteConfigBaseUrl}/GLOBAL")
+
+            ECUrlType.DeepLink -> {
+                sdkContext.serviceUrls.globalFeatureUrls?.let {
+                    Url(it.deepLinkBaseUrl)
+                } ?: throw IllegalStateException("Service URLs are not available")
             }
 
-            ECUrlType.LinkContact -> createUrl(
-                sdkContext.defaultUrls.clientServiceBaseUrl,
-                "client/contact"
-            ).build()
+            else -> {
+                sdkContext.serviceUrls.featureUrls?.let {
+                    when (urlType) {
+                        ECUrlType.ChangeApplicationCode -> {
+                            URLBuilder("${it.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client/app").build()
+                        }
 
-            is ECUrlType.UnlinkContact ->
-                Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${urlType.applicationCode}/client/contact")
+                        ECUrlType.LinkContact -> createUrl(
+                            it.clientServiceBaseUrl,
+                            "client/contact"
+                        ).build()
 
-            ECUrlType.RefreshToken -> createUrl(
-                sdkContext.defaultUrls.clientServiceBaseUrl,
-                "client/contact-token"
-            ).build()
+                        is ECUrlType.UnlinkContact ->
+                            Url("${it.clientServiceBaseUrl}/$V4_API/apps/${urlType.applicationCode}/client/contact")
 
-            ECUrlType.PushToken -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client/push-token")
-            is ECUrlType.ClearPushToken ->
-                Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${urlType.applicationCode}/client/push-token")
+                        ECUrlType.RefreshToken -> createUrl(
+                            it.clientServiceBaseUrl,
+                            "client/contact-token"
+                        ).build()
 
-            ECUrlType.RegisterDeviceInfo -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client")
-            ECUrlType.Event -> {
-                Url("${sdkContext.defaultUrls.eventServiceBaseUrl}/$V5_API/apps/${getApplicationCode()}/client/events")
-            }
+                        ECUrlType.PushToken -> Url("${it.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client/push-token")
+                        is ECUrlType.ClearPushToken ->
+                            Url("${it.clientServiceBaseUrl}/$V4_API/apps/${urlType.applicationCode}/client/push-token")
 
-            ECUrlType.RemoteConfigSignature -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/signature/${getApplicationCode()}")
-            ECUrlType.RemoteConfig -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/${getApplicationCode()}")
-            ECUrlType.GlobalRemoteConfigSignature -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/signature/GLOBAL")
-            ECUrlType.GlobalRemoteConfig -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/GLOBAL")
-            ECUrlType.DeepLink -> Url(sdkContext.defaultUrls.deepLinkBaseUrl)
-            ECUrlType.Logging -> Url("${sdkContext.defaultUrls.loggingUrl}/v1/log")
-            ECUrlType.FetchEmbeddedMessages -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/embedded-messaging/api/$V1_API/${getApplicationCode()}/messages")
-            ECUrlType.FetchBadgeCount -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/embedded-messaging/api/$V1_API/${getApplicationCode()}/badge-count")
-            ECUrlType.FetchMeta -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/embedded-messaging/api/$V1_API/${getApplicationCode()}/meta")
-            ECUrlType.UpdateTagsForMessages -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/embedded-messaging/api/$V1_API/${getApplicationCode()}/tags")
-            is ECUrlType.FetchInlineInAppMessages -> {
-                Url("${sdkContext.defaultUrls.eventServiceBaseUrl}/$V5_API/apps/${getApplicationCode()}/inline-messages")
+                        ECUrlType.RegisterDeviceInfo -> Url("${it.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client")
+                        ECUrlType.Event -> {
+                            Url("${it.eventServiceBaseUrl}/$V5_API/apps/${getApplicationCode()}/client/events")
+                        }
+
+                        ECUrlType.FetchEmbeddedMessages -> Url("${it.embeddedMessagingBaseUrl}/embedded-messaging/api/$V1_API/${getApplicationCode()}/messages")
+                        ECUrlType.FetchBadgeCount -> Url("${it.embeddedMessagingBaseUrl}/embedded-messaging/api/$V1_API/${getApplicationCode()}/badge-count")
+                        ECUrlType.FetchMeta -> Url("${it.embeddedMessagingBaseUrl}/embedded-messaging/api/$V1_API/${getApplicationCode()}/meta")
+                        ECUrlType.UpdateTagsForMessages -> Url("${it.embeddedMessagingBaseUrl}/embedded-messaging/api/$V1_API/${getApplicationCode()}/tags")
+                        is ECUrlType.FetchInlineInAppMessages -> {
+                            Url("${it.eventServiceBaseUrl}/$V5_API/apps/${getApplicationCode()}/inline-messages")
+                        }
+
+                        ECUrlType.Logging -> Url("${it.loggingUrl}/v1/log")
+                    }
+                } ?: throw IllegalStateException("Service URLs are not available")
             }
         }
     }
