@@ -71,11 +71,11 @@ internal class RecommendationClient(
                     recommendationNetworkClient.send(request).fold(
                         onSuccess = { successResponse ->
                             recommendationCartStorageUpdater.updateFromEvent(event)
-                            val listOfProducts = recommendationResponseMapper.map(successResponse)
+                            val recommendationResult = recommendationResponseMapper.map(successResponse)
                             sdkEventManager.emitEvent(
                                 SdkEvent.Internal.Sdk.Answer.Response(
                                     event.id,
-                                    Result.success(listOfProducts)
+                                    Result.success(recommendationResult)
                                 )
                             )
                         },

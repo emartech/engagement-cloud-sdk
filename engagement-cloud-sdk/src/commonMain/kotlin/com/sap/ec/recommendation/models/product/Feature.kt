@@ -7,7 +7,7 @@ data class Feature(
     val topicLabel: String?,
     val hasMore: Boolean,
     val merchants: List<String>,
-    val items: List<Item>
+    val items: List<Item>? = null
 )
 
 @Serializable

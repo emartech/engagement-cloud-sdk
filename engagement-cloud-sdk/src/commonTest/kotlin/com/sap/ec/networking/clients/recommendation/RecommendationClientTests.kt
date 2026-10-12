@@ -12,6 +12,7 @@ import com.sap.ec.event.SdkEvent
 import com.sap.ec.recommendation.models.product.Product
 import com.sap.ec.recommendation.store.RecommendationCartStorageUpdaterApi
 import com.sap.ec.recommendation.RecommendationConstants.CART_LIST_ITEM_QUANTITY_KEY
+import com.sap.ec.recommendation.models.RecommendationResult
 import com.sap.ec.recommendation.models.requestRecommendation.RecommendationLogic
 import com.sap.ec.recommendation.models.requestRecommendation.RecommendationOptions
 import com.sap.ec.recommendation.networking.RecommendationRequestFactoryApi
@@ -75,7 +76,8 @@ class RecommendationClientTests {
         mockRecommendationCartStorageUpdater = mock(MockMode.autofill)
 
         sdkEventsFlow = MutableSharedFlow(replay = 100, extraBufferCapacity = Channel.UNLIMITED)
-        onlineSdkEventsFlow = MutableSharedFlow(replay = 100, extraBufferCapacity = Channel.UNLIMITED)
+        onlineSdkEventsFlow =
+            MutableSharedFlow(replay = 100, extraBufferCapacity = Channel.UNLIMITED)
 
         everySuspend { mockSdkLogger.debug(any<String>()) }
         everySuspend { mockSdkEventManager.sdkEventFlow } returns sdkEventsFlow
@@ -166,15 +168,22 @@ class RecommendationClientTests {
                 )
                 mockEventsDao.removeEvent(searchEvent)
             }
-            verifySuspend(VerifyMode.exactly(0)) { mockRecommendationCartStorageUpdater.updateFromEvent(any<SdkEvent.External.RecommendationTrackEvent.Search>()) }
+            verifySuspend(VerifyMode.exactly(0)) {
+                mockRecommendationCartStorageUpdater.updateFromEvent(
+                    any<SdkEvent.External.RecommendationTrackEvent.Search>()
+                )
+            }
         }
 
     @Test
     fun testConsumer_shouldConsumeRequestRecommendation_andSendTheRequest_andCallRecommendationCartStorageUpdater_andMapResponse_andEmitResultSuccessProductList_whenReceivingSuccessResponse() =
         runTest {
             createRecommendationClient(backgroundScope).register()
-            val requestRecommendation = SdkEvent.Internal.Sdk.RequestRecommendation(options = RecommendationOptions(
-                RecommendationLogic.Home))
+            val requestRecommendation = SdkEvent.Internal.Sdk.RequestRecommendation(
+                options = RecommendationOptions(
+                    RecommendationLogic.Home
+                )
+            )
             val request = UrlRequest(
                 url = Url(RECOMMENDATION_BASE_URL),
                 method = HttpMethod.Get
@@ -186,11 +195,25 @@ class RecommendationClientTests {
                 bodyAsText = "{}"
             )
             val successResult = Result.success(successResponse)
-            val expectedProductsList = listOf(Product("testId", "testTitle", "https://www.test.com"))
+            val expectedProductResponse = mapOf(
+                "HOME_1" to RecommendationResult(
+                    featureName = "HOME_1",
+                    topicLabel = null,
+                    hasMore = false,
+                    merchants = listOf("testMerchants"),
+                    products = listOf(
+                        Product(
+                            "testId",
+                            "testTitle",
+                            "https://www.test.com"
+                        )
+                    )
+                )
+            )
             val responseCaptor = slot<SdkEvent.Internal.Sdk.Answer.Response<List<Product>>>()
             everySuspend { mockRecommendationRequestFactory.create(requestRecommendation) } returns request
             everySuspend { mockNetworkClient.send(request) } returns successResult
-            everySuspend { mockRecommendationResponseMapper.map(successResponse) } returns expectedProductsList
+            everySuspend { mockRecommendationResponseMapper.map(successResponse) } returns expectedProductResponse
             everySuspend { mockSdkEventManager.emitEvent(capture(responseCaptor)) } returns Unit
 
             val sdkEvents = backgroundScope.async {
@@ -203,7 +226,7 @@ class RecommendationClientTests {
 
             sdkEvents.await().size shouldBe 1
             val sentEvent = responseCaptor.get()
-            sentEvent.result.getOrNull() shouldBe expectedProductsList
+            sentEvent.result.getOrNull() shouldBe expectedProductResponse
             verifySuspend {
                 mockSdkLogger.debug("consume RequestRecommendation events")
                 mockRecommendationRequestFactory.create(requestRecommendation)
@@ -218,8 +241,11 @@ class RecommendationClientTests {
     fun testConsumer_shouldConsumeRequestRecommendation_andSendTheRequest_andNotCallRecommendationCartStorageUpdater_andEmitResponse_whenReceivingFailureResponse() =
         runTest {
             createRecommendationClient(backgroundScope).register()
-            val requestRecommendation = SdkEvent.Internal.Sdk.RequestRecommendation(options = RecommendationOptions(
-                RecommendationLogic.Home))
+            val requestRecommendation = SdkEvent.Internal.Sdk.RequestRecommendation(
+                options = RecommendationOptions(
+                    RecommendationLogic.Home
+                )
+            )
             val request = UrlRequest(
                 url = Url(RECOMMENDATION_BASE_URL),
                 method = HttpMethod.Get
@@ -256,15 +282,22 @@ class RecommendationClientTests {
                     )
                 )
             }
-            verifySuspend(VerifyMode.exactly(0)) { mockRecommendationCartStorageUpdater.updateFromEvent(any<SdkEvent.Internal.Sdk.RequestRecommendation>()) }
+            verifySuspend(VerifyMode.exactly(0)) {
+                mockRecommendationCartStorageUpdater.updateFromEvent(
+                    any<SdkEvent.Internal.Sdk.RequestRecommendation>()
+                )
+            }
         }
 
     @Test
     fun testConsumer_shouldConsumeRequestRecommendation_and_RecommendationTrackEvent() =
         runTest {
             createRecommendationClient(backgroundScope).register()
-            val requestRecommendation = SdkEvent.Internal.Sdk.RequestRecommendation(options = RecommendationOptions(
-                RecommendationLogic.Home))
+            val requestRecommendation = SdkEvent.Internal.Sdk.RequestRecommendation(
+                options = RecommendationOptions(
+                    RecommendationLogic.Home
+                )
+            )
             val searchEvent = SdkEvent.External.RecommendationTrackEvent.Search("testSearchTerm")
             val sdkEvents = backgroundScope.async {
                 sdkEventsFlow.take(1).toList()

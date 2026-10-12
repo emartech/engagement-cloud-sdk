@@ -2,14 +2,13 @@ package com.sap.ec.networking.clients.recommendation
 
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.model.Response
+import com.sap.ec.recommendation.models.RecommendationResult
 import com.sap.ec.recommendation.models.product.Feature
 import com.sap.ec.recommendation.models.product.Product
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.decodeFromJsonElement
-import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.serializer
 
@@ -17,71 +16,69 @@ class RecommendationResponseMapper(
     val json: Json,
     val sdkLogger: Logger
 ) : RecommendationResponseMapperApi {
-    override suspend fun map(from: Response): List<Product> {
-        val jsonResponse = json.parseToJsonElement(from.bodyAsText).jsonObject
-
-        val features: Map<String, Feature> = extractFeatures(jsonResponse)
-        val cohort = jsonResponse["cohort"]?.jsonPrimitive?.contentOrNull ?: throw RuntimeException(
-            "Cohort is missing from the recommendation response"
-        )
-
-        return jsonResponse["products"]?.jsonObject?.let { productsObject ->
-            productsObject.values.mapNotNull { productObject ->
-                try {
-                    val product = mapProduct(productObject)
-                    val feature: String = extractFeature(features, product)
-                        ?: throw RuntimeException("No relevant feature found for productId")
-                    product.copy(feature = feature, cohort = cohort)
-                } catch (e: Exception) {
-                    sdkLogger.error("Mapping failed for response: $jsonResponse", e)
-                    null
-                }
-            }
-        } ?: emptyList()
+    private val productProperties: List<String> = serializer<Product>().descriptor.let { d ->
+        (0 until d.elementsCount).map { d.getElementName(it) }
     }
 
-    private fun extractFeature(
-        features: Map<String, Feature>,
-        product: Product
-    ): String? = features.filter { entry ->
-        entry.value.items.map { it.id }.contains(product.productId)
-    }.keys.firstOrNull()
-
-    private fun extractFeatures(jsonResponse: JsonObject): Map<String, Feature> =
-        jsonResponse["features"]?.jsonObject?.let { featuresObject ->
-            val featuresMap = featuresObject.keys.associate { key ->
-                featuresObject[key]?.let { feature ->
-                    key to json.decodeFromJsonElement(Feature.serializer(), feature)
-                } ?: throw RuntimeException("Feature is null for key $key")
-            }
-            if (featuresMap.isEmpty()) {
-                throw RuntimeException("Features are empty")
-            }
-            featuresMap
-        } ?: throw RuntimeException("Features key is missing")
-
-    private fun mapProduct(
-        productObject: JsonElement
-    ): Product {
-        val properties: List<String> = productProperties()
-        val product: Product = json.decodeFromJsonElement(productObject)
-        val customFields: Map<String, String?> = extractCustomFields(productObject, properties)
-        return product.copy(customFields = customFields)
-    }
-
-    private fun productProperties(): List<String> {
-        val descriptor = serializer<Product>().descriptor
-        return (0 until descriptor.elementsCount).map {
-            descriptor.getElementName(it)
+    override suspend fun map(from: Response): Map<String, RecommendationResult> {
+        val response = try {
+            json.decodeFromString<RecommendationResponse>(from.bodyAsText)
+        } catch (_: Exception) {
+            sdkLogger.info("Failed to parse recommendation response body, response: $from")
+            return emptyMap()
         }
+        val features = response.features
+
+        if (features.isEmpty()) {
+            sdkLogger.info("Features key is missing or features are empty in the recommendation response, response: $from")
+            return emptyMap()
+        }
+
+        val products = buildProductMap(response)
+
+        return buildResultMap(features, products, response.cohort)
     }
 
-    private fun extractCustomFields(
-        productObject: JsonElement,
-        properties: List<String>
-    ): Map<String, String?> = productObject.jsonObject.filter { entry ->
-        !properties.contains(entry.key)
-    }.map { entry ->
-        entry.key to entry.value.jsonPrimitive.contentOrNull
-    }.associate { it.first to it.second }
+    private suspend fun buildProductMap(response: RecommendationResponse): Map<String, Product> =
+        response.products.mapNotNull { (productId, productObject) ->
+            try {
+                val product = json.decodeFromJsonElement<Product>(productObject)
+                productId to product.copy(customFields = extractCustomFields(productObject))
+            } catch (_: Exception) {
+                sdkLogger.info("Failed to parse product with key $productId")
+                null
+            }
+        }.toMap()
+
+    private suspend fun buildResultMap(
+        features: Map<String, Feature>,
+        products: Map<String, Product>,
+        cohort: String?
+    ): Map<String, RecommendationResult> =
+        features.mapNotNull { (featureName, feature) ->
+            if (feature.items == null) {
+                sdkLogger.info("Feature $featureName has no items and was omitted")
+                return@mapNotNull null
+            }
+            try {
+                val featureProducts = feature.items.mapNotNull { item ->
+                    products[item.id]?.copy(feature = featureName, cohort = cohort)
+                }
+                featureName to RecommendationResult(
+                    featureName = featureName,
+                    topicLabel = feature.topicLabel,
+                    hasMore = feature.hasMore,
+                    merchants = feature.merchants,
+                    products = featureProducts
+                )
+            } catch (e: Exception) {
+                sdkLogger.info("Mapping failed for feature: $featureName", e)
+                null
+            }
+        }.toMap()
+
+    private fun extractCustomFields(productObject: JsonObject): Map<String, String?> =
+        productObject
+            .filterKeys { it !in productProperties }
+            .mapValues { it.value.jsonPrimitive.contentOrNull }
 }

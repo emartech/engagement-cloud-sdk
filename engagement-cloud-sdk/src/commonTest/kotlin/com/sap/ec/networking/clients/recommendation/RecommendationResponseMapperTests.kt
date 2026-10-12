@@ -3,11 +3,13 @@ package com.sap.ec.networking.clients.recommendation
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.networking.model.UrlRequest
+import com.sap.ec.recommendation.models.RecommendationResult
 import com.sap.ec.recommendation.models.product.Product
 import com.sap.ec.util.JsonUtil
 import dev.mokkery.MockMode
+import dev.mokkery.matcher.any
 import dev.mokkery.mock
-import io.kotest.assertions.throwables.shouldThrow
+import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
@@ -91,12 +93,13 @@ class RecommendationResponseMapperTests {
     }
 
     @Test
-    fun map_should_map_recommendationResponse_withoutCustomFields_into_listOfProducts() = runTest {
-        val recommendationResponse = Response(
-            originalRequest = UrlRequest(Url("test.com"), HttpMethod.Get),
-            status = HttpStatusCode.OK,
-            headers = Headers.Empty,
-            bodyAsText = """
+    fun map_should_map_recommendationResponse_withoutCustomFields_into_RecommendationResultMap() =
+        runTest {
+            val recommendationResponse = Response(
+                originalRequest = UrlRequest(Url("test.com"), HttpMethod.Get),
+                status = HttpStatusCode.OK,
+                headers = Headers.Empty,
+                bodyAsText = """
             {
                 "cohort": "AAAA",
                 "visitor": "44416F78595EAE75",
@@ -142,15 +145,24 @@ class RecommendationResponseMapperTests {
                 }
             }
         """.trimIndent()
-        )
+            )
+            val expectedResult = mapOf(
+                "HOME_1" to RecommendationResult(
+                    featureName = "HOME_1",
+                    topicLabel = "WOMEN",
+                    hasMore = false,
+                    merchants = listOf("1DF86BF95CBE8F19"),
+                    products = listOf(PRODUCT_1, PRODUCT_2)
+                )
+            )
 
-        val result = recommendationResponseMapper.map(recommendationResponse)
+            val result = recommendationResponseMapper.map(recommendationResponse)
 
-        result shouldBe listOf(PRODUCT_1, PRODUCT_2)
-    }
+            result shouldBe expectedResult
+        }
 
     @Test
-    fun map_should_map_recommendationResponse_into_listOfProducts_withCustomFieldsIncluded() =
+    fun map_should_map_recommendationResponse_into_RecommendationResultMap_withCustomFieldsIncluded() =
         runTest {
             val recommendationResponse = Response(
                 originalRequest = UrlRequest(Url("test.com"), HttpMethod.Get),
@@ -217,14 +229,23 @@ class RecommendationResponseMapperTests {
                 }
             """.trimIndent()
             )
+            val expectedResult = mapOf(
+                "HOME_1" to RecommendationResult(
+                    featureName = "HOME_1",
+                    topicLabel = "WOMEN",
+                    hasMore = false,
+                    merchants = listOf("1DF86BF95CBE8F19"),
+                    products = listOf(PRODUCT_1_WITH_CUSTOM_FIELDS, PRODUCT_2_WITH_CUSTOM_FIELDS)
+                )
+            )
 
             val result = recommendationResponseMapper.map(recommendationResponse)
 
-            result shouldBe listOf(PRODUCT_1_WITH_CUSTOM_FIELDS, PRODUCT_2_WITH_CUSTOM_FIELDS)
+            result shouldBe expectedResult
         }
 
     @Test
-    fun map_should_map_recommendationResponse_into_listOfProducts_withCustomFieldsIncluded_when_multipleFeaturesReceived() =
+    fun map_should_map_recommendationResponse_into_RecommendationResultMap_withCustomFieldsIncluded_when_multipleFeaturesReceived() =
         runTest {
             val recommendationResponse = Response(
                 originalRequest = UrlRequest(Url("test.com"), HttpMethod.Get),
@@ -247,7 +268,7 @@ class RecommendationResponseMapperTests {
                             { "id": "2345" }
                         ]
                     },
-                    "PERSONAL": {
+                    "HOME_2": {
                         "hasMore": true,
                         "merchants": [
                             "1DF86BF95CBE8F19"
@@ -312,79 +333,46 @@ class RecommendationResponseMapperTests {
             }
         """.trimIndent()
             )
-
-            val result = recommendationResponseMapper.map(recommendationResponse)
-
-            result shouldBe listOf(
-                PRODUCT_1_WITH_CUSTOM_FIELDS,
-                PRODUCT_2_WITH_CUSTOM_FIELDS,
-                Product(
-                    productId = "2359",
-                    title = "LSL Women Sandals Classic - Black",
-                    linkUrl = "https://lifestylelabels.com/lsl-women-sandals-classic-black.html",
-                    customFields = emptyMap(),
-                    imageUrl = "https://lifestylelabels.com/pub/media/catalog/product/w/s/wsa001.jpg",
-                    zoomImageUrl = "https://lifestylelabels.com/pub/media/catalog/product/w/s/wsa001.jpg",
-                    categoryPath = "WOMEN>Shoes",
-                    available = true,
-                    description = "LSL Women Sandals Classic - Black",
-                    price = 350.0,
-                    msrp = 350.0,
-                    feature = "PERSONAL",
-                    cohort = "AAAA"
+            val expectedResult = mapOf(
+                "HOME_1" to RecommendationResult(
+                    featureName = "HOME_1",
+                    topicLabel = "WOMEN",
+                    hasMore = false,
+                    merchants = listOf("1DF86BF95CBE8F19"),
+                    products = listOf(PRODUCT_1_WITH_CUSTOM_FIELDS, PRODUCT_2_WITH_CUSTOM_FIELDS)
+                ),
+                "HOME_2" to RecommendationResult(
+                    featureName = "HOME_2",
+                    topicLabel = null,
+                    hasMore = true,
+                    merchants = listOf("1DF86BF95CBE8F19"),
+                    products = listOf(
+                        Product(
+                            productId = "2359",
+                            title = "LSL Women Sandals Classic - Black",
+                            linkUrl = "https://lifestylelabels.com/lsl-women-sandals-classic-black.html",
+                            customFields = emptyMap(),
+                            imageUrl = "https://lifestylelabels.com/pub/media/catalog/product/w/s/wsa001.jpg",
+                            zoomImageUrl = "https://lifestylelabels.com/pub/media/catalog/product/w/s/wsa001.jpg",
+                            categoryPath = "WOMEN>Shoes",
+                            available = true,
+                            description = "LSL Women Sandals Classic - Black",
+                            price = 350.0,
+                            msrp = 350.0,
+                            feature = "HOME_2",
+                            cohort = "AAAA"
+                        )
+                    )
                 )
             )
-        }
-
-    @Test
-    fun map_shouldReturnEmptyListInsteadOfProduct_when_castingExceptionIsThrown_duringProductMappingAtMSRP() =
-        runTest {
-            val recommendationResponse = Response(
-                originalRequest = UrlRequest(Url("test.com"), HttpMethod.Get),
-                status = HttpStatusCode.OK,
-                headers = Headers.Empty,
-                bodyAsText = """
-            {
-                "cohort": "AAAA",
-                "visitor": "44416F78595EAE75",
-                "session": "2DF46162A933D904",
-                "features": {
-                    "HOME_1": {
-                        "topicLabel": "WOMEN",
-                        "hasMore": false,
-                        "merchants": [
-                            "1DF86BF95CBE8F19"
-                        ],
-                        "items": [
-                            { "id": "2417" }
-                        ]
-                    }
-                },
-                "products": {
-                    "2417": {
-                        "item": "2417",
-                        "category": "WOMEN>Tops & Shirts|WOMEN>Hoodies|Cardigans & Jumpers",
-                        "title": "LSL Women Cardigan Vest - White",
-                        "description": "LSL Women Cardigan Vest - White",
-                        "available": true,
-                        "msrp": "75.0abc",
-                        "price": 75.0,
-                        "link": "https://lifestylelabels.com/lsl-women-cardigan-vest-white.html",
-                        "image": "https://lifestylelabels.com/pub/media/catalog/product/w/t/wt029.jpg",
-                        "zoom_image": "https://lifestylelabels.com/pub/media/catalog/product/w/t/wt029.jpg"
-                    }
-                }
-            }
-        """.trimIndent()
-            )
 
             val result = recommendationResponseMapper.map(recommendationResponse)
 
-            result shouldBe emptyList()
+            result shouldBe expectedResult
         }
 
     @Test
-    fun map_shouldSkipProduct_when_exceptionIsThrown_duringProductMapping() =
+    fun map_shouldLeaveOutProduct_andLog_when_castingExceptionIsThrown_duringProductMapping_MSRP() =
         runTest {
             val recommendationResponse = Response(
                 originalRequest = UrlRequest(Url("test.com"), HttpMethod.Get),
@@ -416,7 +404,7 @@ class RecommendationResponseMapperTests {
                         "description": "LSL Women Cardigan Vest - White",
                         "available": true,
                         "msrp": "75.0abc",
-                        "price": 75.0,
+                        "price": 75.0abc,
                         "link": "https://lifestylelabels.com/lsl-women-cardigan-vest-white.html",
                         "image": "https://lifestylelabels.com/pub/media/catalog/product/w/t/wt029.jpg",
                         "zoom_image": "https://lifestylelabels.com/pub/media/catalog/product/w/t/wt029.jpg"
@@ -445,13 +433,24 @@ class RecommendationResponseMapperTests {
         """.trimIndent()
             )
 
+            val expectedResult = mapOf(
+                "HOME_1" to RecommendationResult(
+                    featureName = "HOME_1",
+                    topicLabel = "WOMEN",
+                    hasMore = false,
+                    merchants = listOf("1DF86BF95CBE8F19"),
+                    products = listOf(PRODUCT_2_WITH_CUSTOM_FIELDS)
+                )
+            )
+
             val result = recommendationResponseMapper.map(recommendationResponse)
 
-            result shouldBe listOf(PRODUCT_2_WITH_CUSTOM_FIELDS)
+            result shouldBe expectedResult
+            verifySuspend { mockLogger.info(any<String>()) }
         }
 
     @Test
-    fun map_shouldThrow_when_featuresAreEmpty() = runTest {
+    fun map_shouldReturnEmptyMap_andLog_when_featuresAreEmpty() = runTest {
         val recommendationResponse = Response(
             originalRequest = UrlRequest(Url("test.com"), HttpMethod.Get),
             status = HttpStatusCode.OK,
@@ -480,11 +479,14 @@ class RecommendationResponseMapperTests {
         """.trimIndent()
         )
 
-        shouldThrow<RuntimeException> { recommendationResponseMapper.map(recommendationResponse) }
+        val result = recommendationResponseMapper.map(recommendationResponse)
+
+        result shouldBe emptyMap()
+        verifySuspend { mockLogger.info(any<String>()) }
     }
 
     @Test
-    fun map_shouldReturnEmptyList_when_featuresAreMissing() = runTest {
+    fun map_shouldReturnEmptyMap_andLog_when_featuresAreMissing() = runTest {
         val recommendationResponse = Response(
             originalRequest = UrlRequest(Url("test.com"), HttpMethod.Get),
             status = HttpStatusCode.OK,
@@ -512,16 +514,20 @@ class RecommendationResponseMapperTests {
         """.trimIndent()
         )
 
-        shouldThrow<RuntimeException> { recommendationResponseMapper.map(recommendationResponse) }
+        val result = recommendationResponseMapper.map(recommendationResponse)
+
+        result shouldBe emptyMap()
+        verifySuspend { mockLogger.info(any<String>()) }
     }
 
     @Test
-    fun map_shouldReturnEmptyList_when_noProductsReturnedForTheSearchCriteria() = runTest {
-        val recommendationResponse = Response(
-            originalRequest = UrlRequest(Url("test.com"), HttpMethod.Get),
-            status = HttpStatusCode.OK,
-            headers = Headers.Empty,
-            bodyAsText = """
+    fun map_shouldReturnEmptyRecommendationResults_when_noProductsReturnedForTheSearchCriteria() =
+        runTest {
+            val recommendationResponse = Response(
+                originalRequest = UrlRequest(Url("test.com"), HttpMethod.Get),
+                status = HttpStatusCode.OK,
+                headers = Headers.Empty,
+                bodyAsText = """
             {
                 "cohort": "AAAA",
                 "visitor": "44416F78595EAE75",
@@ -535,12 +541,22 @@ class RecommendationResponseMapperTests {
                 }
             }
         """.trimIndent()
-        )
+            )
 
-        val result = recommendationResponseMapper.map(recommendationResponse)
+            val expectedResult = mapOf(
+                "HOME_1" to RecommendationResult(
+                    featureName = "HOME_1",
+                    topicLabel = null,
+                    hasMore = false,
+                    merchants = emptyList(),
+                    products = emptyList()
+                )
+            )
 
-        result shouldBe emptyList()
-    }
+            val result = recommendationResponseMapper.map(recommendationResponse)
+
+            result shouldBe expectedResult
+        }
 
     @Test
     fun map_shouldOmitProduct_when_itIsNotAssignedToAFeature() = runTest {
@@ -602,13 +618,23 @@ class RecommendationResponseMapperTests {
         """.trimIndent()
         )
 
+        val expectedResult = mapOf(
+            "HOME_1" to RecommendationResult(
+                featureName = "HOME_1",
+                topicLabel = "WOMEN",
+                hasMore = false,
+                merchants = listOf("1DF86BF95CBE8F19"),
+                products = listOf(PRODUCT_1)
+            )
+        )
+
         val result = recommendationResponseMapper.map(recommendationResponse)
 
-        result shouldBe listOf(PRODUCT_1)
+        result shouldBe expectedResult
     }
 
     @Test
-    fun map_shouldThrow_when_responseDoesntContainCohort() = runTest {
+    fun map_shouldReturnRecommendationResultWithoutCohort_when_responseDoesntContainCohort() = runTest {
         val recommendationResponse = Response(
             originalRequest = UrlRequest(Url("test.com"), HttpMethod.Get),
             status = HttpStatusCode.OK,
@@ -646,17 +672,29 @@ class RecommendationResponseMapperTests {
             }
         """.trimIndent()
         )
+        val expectedResult = mapOf(
+            "HOME_1" to RecommendationResult(
+                featureName = "HOME_1",
+                topicLabel = "WOMEN",
+                hasMore = false,
+                merchants = listOf("1DF86BF95CBE8F19"),
+                products = listOf(PRODUCT_1.copy(cohort = null))
+            )
+        )
 
-        shouldThrow<RuntimeException> { recommendationResponseMapper.map(recommendationResponse) }
+        val result = recommendationResponseMapper.map(recommendationResponse)
+
+        result shouldBe expectedResult
     }
 
     @Test
-    fun map_shouldThrow_serializationException_when_MandatoryItemFieldIsMissingFromFeature() = runTest {
-        val recommendationResponse = Response(
-            originalRequest = UrlRequest(Url("test.com"), HttpMethod.Get),
-            status = HttpStatusCode.OK,
-            headers = Headers.Empty,
-            bodyAsText = """
+    fun map_shouldReturnEmptyMap_andLog_when_MandatoryItemFieldIsMissingFromFeature_itemsFromFeaturesAreMissing() =
+        runTest {
+            val recommendationResponse = Response(
+                originalRequest = UrlRequest(Url("test.com"), HttpMethod.Get),
+                status = HttpStatusCode.OK,
+                headers = Headers.Empty,
+                bodyAsText = """
             {
                 "cohort": "AAAA",
                 "visitor": "44416F78595EAE75",
@@ -698,9 +736,12 @@ class RecommendationResponseMapperTests {
                 }
             }
         """.trimIndent()
-        )
+            )
 
-        shouldThrow<RuntimeException> { recommendationResponseMapper.map(recommendationResponse) }
-    }
+            val result = recommendationResponseMapper.map(recommendationResponse)
+
+            result shouldBe emptyMap()
+            verifySuspend { mockLogger.info(any<String>()) }
+        }
 
 }
