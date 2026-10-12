@@ -214,16 +214,6 @@ sealed interface SdkEvent {
                 override val timestamp: Instant = TimestampProvider().provide(),
                 override var nackCount: Int = 0
             ) : RecommendationTrackEvent
-
-            @Serializable
-            data class RecommendationTrackClick(
-                val productId: String,
-                val feature: String,
-                val cohort: String,
-                override val id: String = UUIDProvider().provide(),
-                override val timestamp: Instant = TimestampProvider().provide(),
-                override var nackCount: Int = 0
-            ) : RecommendationTrackEvent
         }
 
         @Serializable
@@ -360,7 +350,7 @@ sealed interface SdkEvent {
                 override val timestamp: Instant = TimestampProvider().provide(),
                 val options: RecommendationOptions,
                 val contextEvent: External.RecommendationTrackEvent? = null
-            ): Sdk(), RecommendationEvent
+            ) : Sdk(), RecommendationEvent
 
             sealed class Answer : Sdk() {
 

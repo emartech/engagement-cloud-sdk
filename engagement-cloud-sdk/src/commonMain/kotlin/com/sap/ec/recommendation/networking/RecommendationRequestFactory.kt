@@ -13,11 +13,9 @@ import com.sap.ec.recommendation.RecommendationConstants.CART_LIST_ITEM_PRICE_KE
 import com.sap.ec.recommendation.RecommendationConstants.CART_LIST_ITEM_QUANTITY_KEY
 import com.sap.ec.recommendation.RecommendationConstants.CART_VERSION_FLAG_KEY
 import com.sap.ec.recommendation.RecommendationConstants.CHECKOUT_ITEMS_KEY
-import com.sap.ec.recommendation.RecommendationConstants.COHORT_KEY
 import com.sap.ec.recommendation.RecommendationConstants.CURRENCY_KEY
 import com.sap.ec.recommendation.RecommendationConstants.FEATURES_TO_RETRIEVE_RECOMMENDATIONS_FOR_KEY
 import com.sap.ec.recommendation.RecommendationConstants.FEATURE_ID_KEY
-import com.sap.ec.recommendation.RecommendationConstants.FEATURE_KEY
 import com.sap.ec.recommendation.RecommendationConstants.FILTER_EXCLUDE_KEY
 import com.sap.ec.recommendation.RecommendationConstants.FILTER_FIELD_KEY
 import com.sap.ec.recommendation.RecommendationConstants.FILTER_NEGATE_KEY
@@ -132,13 +130,6 @@ internal class RecommendationRequestFactory(
                 parameters.append(
                     CHECKOUT_ITEMS_KEY,
                     event.items.toUrlParamValue()
-                )
-            }
-
-            is SdkEvent.External.RecommendationTrackEvent.RecommendationTrackClick -> {
-                parameters.append(
-                    ITEM_VIEW_KEY,
-                    "${ITEM_ID_KEY}:${event.productId.encodeURLParameter()},${FEATURE_KEY}:${event.feature},${COHORT_KEY}:${event.cohort}"
                 )
             }
 

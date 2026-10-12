@@ -254,31 +254,6 @@ class RecommendationRequestFactoryTests {
         }
 
     @Test
-    fun test_creationClick_shouldReturn_recommendationClickUrlPath_withEmptyCart_and_withDoubleUrlEncodedProductId_when_trackingRecommendationClick() =
-        runTest {
-            val feature = "testFeature"
-            val cohort = "testCohort"
-            val recommendationClick =
-                SdkEvent.External.RecommendationTrackEvent.RecommendationTrackClick(
-                    CART_ITEM_1_ITEM_ID,
-                    feature,
-                    cohort
-                )
-            val params = parameters {
-                append(
-                    "v",
-                    "i:$CART_ITEM_1_ITEM_ID_URL_ENCODED,t:$feature,c:$cohort"
-                )
-                appendEmptyCart()
-            }.formUrlEncode()
-            val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
-
-            val result = recommendationRequestFactory.create(recommendationClick)
-
-            verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = true)
-        }
-
-    @Test
     fun test_create_shouldAlwaysReturn_recommendationUrlPath_withCartItemsAdded_andCallCartItemsStorageItems_whenEventIsRequestRecommendation() =
         runTest {
             every { mockCartItemStorage.items } returns mutableListOf(CART_ITEM_1)
