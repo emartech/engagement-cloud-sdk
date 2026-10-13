@@ -147,6 +147,9 @@ internal class JSTracking(
             JsRecommendationEventType.PURCHASE -> {
                 val event =
                     event.parseWithValidation<JsPurchaseEventValidationData, JsPurchaseEvent>()
+                if (event.items.isEmpty()) {
+                    throw IllegalArgumentException("Cart items list cannot be empty!")
+                }
                 PurchaseEvent(event.orderId, event.items.toCartItems())
             }
 

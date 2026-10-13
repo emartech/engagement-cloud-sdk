@@ -65,6 +65,10 @@ fun createCartEvent(items: Array<JsCartItem>): JsRecommendationEvent {
 @OptIn(ExperimentalJsExport::class)
 @JsExport
 fun createPurchaseEvent(orderId: String, items: Array<JsCartItem>): JsRecommendationEvent {
+    if (items.isEmpty()) {
+        throw IllegalArgumentException("Cart items list cannot be empty!")
+    }
+
     return object : JsPurchaseEvent {
         override val type = JsEventType.RECOMMENDATION.name
         override val recommendationEventType = JsRecommendationEventType.PURCHASE.name

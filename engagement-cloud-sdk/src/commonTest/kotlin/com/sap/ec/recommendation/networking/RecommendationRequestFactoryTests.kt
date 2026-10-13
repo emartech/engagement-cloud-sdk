@@ -1,19 +1,16 @@
-package com.sap.ec.mobileengage.recommendation.networking
+package com.sap.ec.recommendation.networking
 
 import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
 import com.sap.ec.core.networking.model.UrlRequest
 import com.sap.ec.core.url.ECUrlType
 import com.sap.ec.core.url.UrlFactoryApi
 import com.sap.ec.event.SdkEvent
-import com.sap.ec.event.SdkEvent.Internal.Sdk.RequestRecommendation
 import com.sap.ec.recommendation.models.CartItem
 import com.sap.ec.recommendation.models.requestRecommendation.ComparisonType
 import com.sap.ec.recommendation.models.requestRecommendation.FilterType
 import com.sap.ec.recommendation.models.requestRecommendation.RecommendationFilter
 import com.sap.ec.recommendation.models.requestRecommendation.RecommendationLogic
 import com.sap.ec.recommendation.models.requestRecommendation.RecommendationOptions
-import com.sap.ec.recommendation.networking.RecommendationRequestFactory
-import com.sap.ec.recommendation.networking.RecommendationRequestFactoryApi
 import com.sap.ec.util.toJsonObject
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -33,7 +30,6 @@ import io.ktor.http.parameters
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-
 
 class RecommendationRequestFactoryTests {
 
@@ -188,32 +184,34 @@ class RecommendationRequestFactoryTests {
         }
 
     @Test
-    fun test_create_Search_shouldReturn_searchUrlPath_withEmptyCart_when_trackingSearch() = runTest {
-        val search = SdkEvent.External.RecommendationTrackEvent.Search(SEARCH_TERM)
-        val params = parameters {
-            append("q", SEARCH_TERM)
-            appendEmptyCart()
-        }.formUrlEncode()
-        val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
+    fun test_create_Search_shouldReturn_searchUrlPath_withEmptyCart_when_trackingSearch() =
+        runTest {
+            val search = SdkEvent.External.RecommendationTrackEvent.Search(SEARCH_TERM)
+            val params = parameters {
+                append("q", SEARCH_TERM)
+                appendEmptyCart()
+            }.formUrlEncode()
+            val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
 
-        val result = recommendationRequestFactory.create(search)
+            val result = recommendationRequestFactory.create(search)
 
-        verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = true)
-    }
+            verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = true)
+        }
 
     @Test
-    fun test_create_Tag_shouldReturn_tagUrlPath_withEmptyCart_when_trackingTag_withoutTagAttributes() = runTest {
-        val tag = SdkEvent.External.RecommendationTrackEvent.Tag(TEST_TAG)
-        val params = parameters {
-            append("t", TEST_TAG)
-            appendEmptyCart()
-        }.formUrlEncode()
-        val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
+    fun test_create_Tag_shouldReturn_tagUrlPath_withEmptyCart_when_trackingTag_withoutTagAttributes() =
+        runTest {
+            val tag = SdkEvent.External.RecommendationTrackEvent.Tag(TEST_TAG)
+            val params = parameters {
+                append("t", TEST_TAG)
+                appendEmptyCart()
+            }.formUrlEncode()
+            val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
 
-        val result = recommendationRequestFactory.create(tag)
+            val result = recommendationRequestFactory.create(tag)
 
-        verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = true)
-    }
+            verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = true)
+        }
 
     @Test
     fun test_create_Tag_shouldReturn_tagUrlPath_withEmptyCart_when_trackingTag_withTagAttributes_withSingleKeyValuePair() =
@@ -257,7 +255,7 @@ class RecommendationRequestFactoryTests {
     fun test_create_shouldAlwaysReturn_recommendationUrlPath_withCartItemsAdded_andCallCartItemsStorageItems_whenEventIsRequestRecommendation() =
         runTest {
             every { mockCartItemStorage.items } returns mutableListOf(CART_ITEM_1)
-            val requestRecommendationEvent = RequestRecommendation(
+            val requestRecommendationEvent = SdkEvent.Internal.Sdk.RequestRecommendation(
                 options = RecommendationOptions(
                     RecommendationLogic.Home
                 )
@@ -285,7 +283,7 @@ class RecommendationRequestFactoryTests {
         runTest {
             val expectedString = "customLogicName"
             every { mockCartItemStorage.items } returns mutableListOf(CART_ITEM_1)
-            val requestRecommendationEvent = RequestRecommendation(
+            val requestRecommendationEvent = SdkEvent.Internal.Sdk.RequestRecommendation(
                 options = RecommendationOptions(
                     logic = RecommendationLogic.Custom(expectedString)
                 )
@@ -312,7 +310,7 @@ class RecommendationRequestFactoryTests {
     fun test_create_recommendation_withVariants_shouldReturnRequestWithVariants_whenVariantIsNull() =
         runTest {
             every { mockCartItemStorage.items } returns mutableListOf(CART_ITEM_1)
-            val requestRecommendationEvent = RequestRecommendation(
+            val requestRecommendationEvent = SdkEvent.Internal.Sdk.RequestRecommendation(
                 options = RecommendationOptions(
                     logic = RecommendationLogic.Home,
                     variants = null
@@ -340,7 +338,7 @@ class RecommendationRequestFactoryTests {
     fun test_create_recommendation_withVariants_shouldReturnRequestWithVariants_whenVariantIsEmptyList() =
         runTest {
             every { mockCartItemStorage.items } returns mutableListOf(CART_ITEM_1)
-            val requestRecommendationEvent = RequestRecommendation(
+            val requestRecommendationEvent = SdkEvent.Internal.Sdk.RequestRecommendation(
                 options = RecommendationOptions(
                     logic = RecommendationLogic.Home,
                     variants = emptyList()
@@ -368,7 +366,7 @@ class RecommendationRequestFactoryTests {
     fun test_create_recommendation_withVariants_shouldReturnRequestWithVariants_whenVariantListHasSingleElement() =
         runTest {
             every { mockCartItemStorage.items } returns mutableListOf(CART_ITEM_1)
-            val requestRecommendationEvent = RequestRecommendation(
+            val requestRecommendationEvent = SdkEvent.Internal.Sdk.RequestRecommendation(
                 options = RecommendationOptions(
                     logic = RecommendationLogic.Home,
                     variants = listOf("_1")
@@ -396,10 +394,10 @@ class RecommendationRequestFactoryTests {
     fun test_create_recommendation_withVariants_shouldReturnRequestWithVariants_whenVariantListHasMultipleElement() =
         runTest {
             every { mockCartItemStorage.items } returns mutableListOf(CART_ITEM_1)
-            val requestRecommendationEvent = RequestRecommendation(
+            val requestRecommendationEvent = SdkEvent.Internal.Sdk.RequestRecommendation(
                 options = RecommendationOptions(
                     logic = RecommendationLogic.Home,
-                    variants = listOf("_1","_2")
+                    variants = listOf("_1", "_2")
                 )
             )
             val params = parameters {
@@ -421,30 +419,31 @@ class RecommendationRequestFactoryTests {
         }
 
     @Test
-    fun test_create_shouldReturn_recommendationUrlPath_withEmptyCart_and_withBasicHomeLogic() = runTest {
-        val requestRecommendationEvent = RequestRecommendation(
-            options = RecommendationOptions(
-                RecommendationLogic.Home
+    fun test_create_shouldReturn_recommendationUrlPath_withEmptyCart_and_withBasicHomeLogic() =
+        runTest {
+            val requestRecommendationEvent = SdkEvent.Internal.Sdk.RequestRecommendation(
+                options = RecommendationOptions(
+                    RecommendationLogic.Home
+                )
             )
-        )
-        val params = parameters {
-            append(
-                "f",
-                "f:HOME,l:5,o:0"
-            )
-            appendEmptyCart()
-        }.formUrlEncode()
-        val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
+            val params = parameters {
+                append(
+                    "f",
+                    "f:HOME,l:5,o:0"
+                )
+                appendEmptyCart()
+            }.formUrlEncode()
+            val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
 
-        val result = recommendationRequestFactory.create(requestRecommendationEvent)
+            val result = recommendationRequestFactory.create(requestRecommendationEvent)
 
-        verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = true)
-    }
+            verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = true)
+        }
 
     @Test
     fun test_create_shouldReturn_recommendationUrlPath_withEmptyCart_and_withLimit10() = runTest {
         val requestRecommendationEvent =
-            RequestRecommendation(
+            SdkEvent.Internal.Sdk.RequestRecommendation(
                 options = RecommendationOptions(
                     logic = RecommendationLogic.Home,
                     limit = 10
@@ -467,7 +466,7 @@ class RecommendationRequestFactoryTests {
     @Test
     fun test_create_shouldReturn_recommendationUrlPath_withEmptyCart_and_withOffset() = runTest {
         val requestRecommendationEvent =
-            RequestRecommendation(
+            SdkEvent.Internal.Sdk.RequestRecommendation(
                 options = RecommendationOptions(
                     logic = RecommendationLogic.Home,
                     offset = 15
@@ -488,32 +487,33 @@ class RecommendationRequestFactoryTests {
     }
 
     @Test
-    fun test_create_shouldReturn_recommendationUrlPath_withEmptyCart_withAvailabilityZone() = runTest {
-        val requestRecommendationEvent = RequestRecommendation(
-            options = RecommendationOptions(
-                logic = RecommendationLogic.Home,
-                availabilityZone = "eu"
+    fun test_create_shouldReturn_recommendationUrlPath_withEmptyCart_withAvailabilityZone() =
+        runTest {
+            val requestRecommendationEvent = SdkEvent.Internal.Sdk.RequestRecommendation(
+                options = RecommendationOptions(
+                    logic = RecommendationLogic.Home,
+                    availabilityZone = "eu"
+                )
             )
-        )
-        val params = parameters {
-            append(
-                "f",
-                "f:HOME,l:5,o:0"
-            )
-            append("az", "eu")
-            appendEmptyCart()
-        }.formUrlEncode()
-        val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
+            val params = parameters {
+                append(
+                    "f",
+                    "f:HOME,l:5,o:0"
+                )
+                append("az", "eu")
+                appendEmptyCart()
+            }.formUrlEncode()
+            val expectedUrl = "$RECOMMENDATION_BASE_URL?$params"
 
-        val result = recommendationRequestFactory.create(requestRecommendationEvent)
+            val result = recommendationRequestFactory.create(requestRecommendationEvent)
 
-        verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = true)
-    }
+            verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = true)
+        }
 
     @Test
     fun test_create_shouldReturn_recommendationUrlPath_withEmptyCart_and_withLanguage() = runTest {
         val requestRecommendationEvent =
-            RequestRecommendation(
+            SdkEvent.Internal.Sdk.RequestRecommendation(
                 options = RecommendationOptions(
                     logic = RecommendationLogic.Home,
                     language = "hu"
@@ -537,7 +537,7 @@ class RecommendationRequestFactoryTests {
     @Test
     fun test_create_shouldReturn_recommendationUrlPath_withEmptyCart_and_withCurrency() = runTest {
         val requestRecommendationEvent =
-            RequestRecommendation(
+            SdkEvent.Internal.Sdk.RequestRecommendation(
                 options = RecommendationOptions(
                     logic = RecommendationLogic.Home,
                     displayCurrency = "EUR"
@@ -562,7 +562,7 @@ class RecommendationRequestFactoryTests {
     fun test_create_RequestRecommendation_shouldReturn_recommendationUrlPath_withCartItemsAttachedFromContextEvent_whenContextEventIsCart() =
         runTest {
             val requestRecommendationEvent =
-                RequestRecommendation(
+                SdkEvent.Internal.Sdk.RequestRecommendation(
                     options = RecommendationOptions(
                         logic = RecommendationLogic.Home,
                     ),
@@ -594,7 +594,7 @@ class RecommendationRequestFactoryTests {
     fun test_create_RequestRecommendation_shouldReturn_recommendationUrlPath_withEmptyCartItemsAttached_whenContextEventIsPurchase() =
         runTest {
             val requestRecommendationEvent =
-                RequestRecommendation(
+                SdkEvent.Internal.Sdk.RequestRecommendation(
                     options = RecommendationOptions(
                         logic = RecommendationLogic.Home,
                     ),
@@ -626,7 +626,7 @@ class RecommendationRequestFactoryTests {
     fun test_create_RequestRecommendation_shouldReturn_recommendationUrlPath_withEmptyCartItemsAttachedFromStorage_whenContextEventIsNotPurchase_andNotCart() =
         runTest {
             val requestRecommendationEvent =
-                RequestRecommendation(
+                SdkEvent.Internal.Sdk.RequestRecommendation(
                     options = RecommendationOptions(
                         logic = RecommendationLogic.Home,
                     ),
@@ -654,7 +654,7 @@ class RecommendationRequestFactoryTests {
         runTest {
             every { mockCartItemStorage.items } returns mutableListOf(CART_ITEM_1)
             val requestRecommendationEvent =
-                RequestRecommendation(
+                SdkEvent.Internal.Sdk.RequestRecommendation(
                     options = RecommendationOptions(
                         logic = RecommendationLogic.Home,
                     ),
@@ -880,7 +880,11 @@ class RecommendationRequestFactoryTests {
             )
         ).forEach { (options, expectedUrl) ->
             val result =
-                recommendationRequestFactory.create(RequestRecommendation(options = options))
+                recommendationRequestFactory.create(
+                    SdkEvent.Internal.Sdk.RequestRecommendation(
+                        options = options
+                    )
+                )
             verifyResult(result, expectedUrl, shouldMockCartItemStorageBeCalled = true)
             resetCalls(mockUrlFactory)
         }

@@ -247,6 +247,16 @@ class JSTrackingTests {
     }
 
     @Test
+    fun track_shouldThrowIllegalArgumentException_whenPurchased_cartIsEmpty() = runTest {
+        val testOrderId = "testOrderId"
+
+        val purchaseEvent: JsPurchaseEvent =
+            js("{ type: '$RECOMMENDATION_EVENT_TYPE', recommendationEventType: 'PURCHASE', orderId: testOrderId, items: [] }").unsafeCast<JsPurchaseEvent>()
+
+        shouldThrow<IllegalArgumentException> { jsTracking.track(purchaseEvent) }
+    }
+
+    @Test
     fun track_shouldCallTrack_onEventTracker_withTagEvent() = runTest {
         val testTag = "testMyTag"
         val purchaseEvent: JsTagEvent =

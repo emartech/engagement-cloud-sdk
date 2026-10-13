@@ -8,13 +8,18 @@ import kotlin.time.Instant
 
 data class PurchaseEvent(val orderId: String, val items: List<CartItem>) : TrackedEvent {
     @OptIn(ExperimentalTime::class)
-    override fun toSdkEvent(uuid: String, timestamp: Instant): Result<SdkEvent> =
-        Result.success(
-            SdkEvent.External.RecommendationTrackEvent.Purchase(
-                orderId = orderId,
-                items = items,
-                id = uuid,
-                timestamp = timestamp
+    override fun toSdkEvent(uuid: String, timestamp: Instant): Result<SdkEvent> {
+        return if (items.isNotEmpty()) {
+            Result.success(
+                SdkEvent.External.RecommendationTrackEvent.Purchase(
+                    orderId = orderId,
+                    items = items,
+                    id = uuid,
+                    timestamp = timestamp
+                )
             )
-        )
+        } else {
+            Result.failure(IllegalArgumentException("Cart items list cannot be empty!"))
+        }
+    }
 }

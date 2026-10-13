@@ -8,6 +8,7 @@ import com.sap.ec.api.tracking.model.recommendation.JsPurchaseEvent
 import com.sap.ec.api.tracking.model.recommendation.JsRecommendationEventType
 import com.sap.ec.api.tracking.model.recommendation.JsSearchEvent
 import com.sap.ec.api.tracking.model.recommendation.JsTagEvent
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import kotlin.test.Test
 
@@ -141,16 +142,13 @@ class JsRecommendationEventFactoryTests {
     }
 
     @Test
-    fun createPurchaseEvent_shouldReturn_jsPurchaseEvent_emptyCart() {
+    fun createPurchaseEvent_shouldThrowIllegalArgumentException_whenPurchasedCart_isEmpty() {
         val testOrderId = "testOrderId"
 
-        val event = createPurchaseEvent(testOrderId, arrayOf())
-
-        with(event as JsPurchaseEvent) {
-            type shouldBe JsEventType.RECOMMENDATION.name
-            recommendationEventType shouldBe JsRecommendationEventType.PURCHASE.name
-            orderId shouldBe testOrderId
-            items shouldBe arrayOf()
+        val exception = shouldThrow<IllegalArgumentException> {
+            createPurchaseEvent(testOrderId, arrayOf())
         }
+
+        exception.message shouldBe "Cart items list cannot be empty!"
     }
 }
