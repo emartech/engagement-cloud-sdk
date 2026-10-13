@@ -5,6 +5,7 @@ import com.sap.ec.core.db.events.EventsDaoApi
 import com.sap.ec.core.device.DeviceCategory
 import com.sap.ec.core.device.DeviceInfoCollectorApi
 import com.sap.ec.core.device.DeviceInfoForLogs
+import com.sap.ec.core.exceptions.SdkException.ServiceUrlsUnavailableException
 import com.sap.ec.core.log.LogLevel
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.clients.NetworkClientApi
@@ -290,9 +291,9 @@ class LoggingClientTests {
     }
 
     @Test
-    fun testConsumer_should_callEventNack_butNotClientExceptionHandler_when_IllegalStateException_happens() = runTest {
+    fun testConsumer_should_callEventNack_butNotClientExceptionHandler_when_ServiceUrlsUnavailableException_happens() = runTest {
         createLoggingClient(backgroundScope).register()
-        val testException = IllegalStateException("Test exception")
+        val testException = ServiceUrlsUnavailableException()
 
         everySuspend { mockUrlFactory.create(ECUrlType.Logging) } throws testException
         val logEvent = SdkEvent.Internal.Sdk.Metric()

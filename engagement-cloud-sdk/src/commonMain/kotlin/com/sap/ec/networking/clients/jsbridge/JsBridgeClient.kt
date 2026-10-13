@@ -3,6 +3,7 @@ package com.sap.ec.networking.clients.jsbridge
 import com.sap.ec.context.Features
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.crypto.CryptoApi
+import com.sap.ec.core.exceptions.SdkException.ServiceUrlsUnavailableException
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.clients.NetworkClientApi
 import com.sap.ec.core.networking.model.Response
@@ -21,15 +22,15 @@ internal class JsBridgeClient(
 ) : JsBridgeClientApi {
 
     override suspend fun fetchJSBridge(): Result<Unit> {
-        return sdkContext.serviceUrls.globalFeatureUrls?.let { globalFeatureUrls ->
-            val jsBridgeResponse = fetchResponse(globalFeatureUrls.jsBridgeUrl).getOrElse {
+        return sdkContext.serviceUrls.globalServiceUrls?.let { serviceUrls ->
+            val jsBridgeResponse = fetchResponse(serviceUrls.jsBridgeUrl).getOrElse {
                 sdkLogger.error("Failed to fetch JsBridge: ${it.message}")
                 return Result.failure(it)
             }
 
             if (isSignatureCheckEnabled()) {
                 val signatureResponse =
-                    fetchResponse(globalFeatureUrls.jsBridgeSignatureUrl).getOrElse {
+                    fetchResponse(serviceUrls.jsBridgeSignatureUrl).getOrElse {
                         sdkLogger.error("Failed to fetch JsBridge signature: ${it.message}")
                         return Result.failure(it)
                     }
@@ -58,13 +59,13 @@ internal class JsBridgeClient(
             stringStorage.put(StorageConstants.JS_BRIDGE_MD5_KEY, md5)
             sdkLogger.debug("JsBridge fetched and hash cached")
             return Result.success(Unit)
-        } ?: Result.failure(IllegalStateException("Failed to fetch JsBridge"))
+        } ?: Result.failure(ServiceUrlsUnavailableException())
     }
 
     override suspend fun fetchServerMd5(): Result<String> {
-        return sdkContext.serviceUrls.globalFeatureUrls?.let { globalFeatureUrls ->
+        return sdkContext.serviceUrls.globalServiceUrls?.let { serviceUrls ->
             val request = UrlRequest(
-                url = Url(globalFeatureUrls.jsBridgeUrl),
+                url = Url(serviceUrls.jsBridgeUrl),
                 method = HttpMethod.Head
             )
             val response = networkClient.send(request).getOrElse {
@@ -77,7 +78,7 @@ internal class JsBridgeClient(
                 return Result.failure(IllegalStateException("JsBridge HEAD response missing x-goog-hash MD5"))
             }
             return Result.success(md5)
-        } ?: Result.failure(IllegalStateException("Failed to fetch JsBridge"))
+        } ?: Result.failure(ServiceUrlsUnavailableException())
     }
 
     private fun isSignatureCheckEnabled(): Boolean {

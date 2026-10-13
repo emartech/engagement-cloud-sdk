@@ -4,9 +4,7 @@ import com.sap.ec.context.Features.EmbeddedMessaging
 import com.sap.ec.context.Features.JsBridgeSignatureCheck
 import com.sap.ec.context.Features.MobileEngage
 import com.sap.ec.context.SdkContextApi
-import com.sap.ec.context.ServiceUrls.FeatureUrls
-import com.sap.ec.context.ServiceUrls.GlobalFeatureUrls
-import com.sap.ec.context.ServiceUrlsApi
+import com.sap.ec.context.ServiceUrls
 import com.sap.ec.core.device.DeviceInfoCollectorApi
 import com.sap.ec.core.exceptions.SdkException
 import com.sap.ec.core.log.LogConfigHolderApi
@@ -34,20 +32,18 @@ import kotlin.test.Test
 import kotlin.test.assertFailsWith
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-class RemoteConfigResponseHandlerTests {
+class RemoteConfigHandlerTests {
     private lateinit var mockSdkContext: SdkContextApi
     private lateinit var mockLogConfigHolder: LogConfigHolderApi
-    private lateinit var serviceUrls: ServiceUrlsApi
     private lateinit var mockDeviceInfoCollector: DeviceInfoCollectorApi
     private lateinit var mockRandomProvider: DoubleProvider
     private lateinit var mockEmbeddedMessagingContext: EmbeddedMessagingContextApi
-    private lateinit var remoteConfigResponseHandler: RemoteConfigResponseHandler
+    private lateinit var remoteConfigHandler: RemoteConfigHandler
 
     @BeforeTest
     fun setUp() {
         mockSdkContext = mock(MockMode.autofill)
-        serviceUrls = mock(MockMode.autofill)
-        every { mockSdkContext.serviceUrls } returns serviceUrls
+        every { mockSdkContext.serviceUrls } returns ServiceUrls(remoteConfigBaseUrl = "")
 
         mockLogConfigHolder = mock(MockMode.autofill)
 
@@ -59,7 +55,7 @@ class RemoteConfigResponseHandlerTests {
         mockEmbeddedMessagingContext = mock(MockMode.autofill)
         every { mockRandomProvider.provide() } returns 0.5
 
-        remoteConfigResponseHandler = RemoteConfigResponseHandler(
+        remoteConfigHandler = RemoteConfigHandler(
             mockDeviceInfoCollector,
             mockLogConfigHolder,
             mockSdkContext,
@@ -74,15 +70,54 @@ class RemoteConfigResponseHandlerTests {
     }
 
     @Test
+    fun testHandleRemoteConfigs() = runTest {
+        every { mockSdkContext.serviceUrls } returns ServiceUrls(
+            remoteConfigBaseUrl = "",
+            globalServiceUrls = ServiceUrls.Global(
+                deepLinkBaseUrl = "",
+                jsBridgeUrl = "",
+                jsBridgeSignatureUrl = ""
+            ),
+            appCodeBasedServiceUrls = ServiceUrls.AppCodeBased(
+                clientServiceBaseUrl = "",
+                eventServiceBaseUrl = "",
+                embeddedMessagingBaseUrl = "",
+                loggingUrl = ""
+            )
+        )
+
+        val config = RemoteConfig.Default(
+            logLevel = LogLevel.Info,
+            features = RemoteConfigFeatures(
+                mobileEngage = true,
+                embeddedMessaging = true,
+                jsBridgeSignatureCheck = false
+            ),
+            embeddedMessagingConfig = EmbeddedMessagingConfig(
+                tagUpdateBatchSize = 111,
+                tagUpdateFrequencyCapSeconds = 222
+            )
+        )
+
+        remoteConfigHandler.handle(config)
+
+        mockSdkContext.serviceUrls.globalServiceUrls shouldBe null
+        mockSdkContext.serviceUrls.appCodeBasedServiceUrls shouldBe null
+        verify { mockLogConfigHolder.remoteLogLevel = LogLevel.Info }
+        mockSdkContext.features shouldBe listOf(MobileEngage, EmbeddedMessaging)
+        verify { mockEmbeddedMessagingContext.tagUpdateBatchSize = 111 }
+        verify { mockEmbeddedMessagingContext.tagUpdateFrequencyCapSeconds = 222 }
+    }
+
+    @Test
     fun testHandleAppCodeBasedConfigs() = runTest {
-        val featureUrlsSlot = slot<ServiceUrlsApi.FeatureUrlsApi>()
         val clientServiceUrl = "testClientServiceUrl"
         val eventServiceUrl = "testEventServiceUrl"
         val embeddedMessagingServiceUrl = "testEmbeddedMessagingServiceUrl"
         val loggingServiceUrl = "testLoggingServiceUrl"
         val clientId = "testClientId"
-        val configResponse = RemoteConfigResponse(
-            serviceUrls = RemoteConfigServiceUrls(
+        val config = RemoteConfig.Response.AppCodeBased(
+            appCodeBasedServiceUrls = RemoteConfigServiceUrls.AppCodeBased(
                 clientService = clientServiceUrl,
                 eventService = eventServiceUrl,
                 embeddedMessagingService = embeddedMessagingServiceUrl,
@@ -96,17 +131,16 @@ class RemoteConfigResponseHandlerTests {
                 jsBridgeSignatureCheck = true
             ),
             overrides = mapOf(
-                "differentClientId" to RemoteConfigOverride(
-                    RemoteConfigOptionalServiceUrls(clientService = "differentClientServiceUrl")
+                "differentClientId" to RemoteConfig.Response.Override(
+                    RemoteConfigServiceUrls.Optional(clientService = "differentClientServiceUrl")
                 )
             )
         )
         everySuspend { mockDeviceInfoCollector.getClientId() } returns clientId
-        every { mockSdkContext.serviceUrls.featureUrls = capture(featureUrlsSlot) } returns Unit
 
-        remoteConfigResponseHandler.handle(configResponse)
+        remoteConfigHandler.handle(config)
 
-        featureUrlsSlot.get() shouldBe FeatureUrls(
+        mockSdkContext.serviceUrls.appCodeBasedServiceUrls shouldBe ServiceUrls.AppCodeBased(
             clientServiceBaseUrl = clientServiceUrl,
             eventServiceBaseUrl = eventServiceUrl,
             embeddedMessagingBaseUrl = embeddedMessagingServiceUrl,
@@ -124,10 +158,8 @@ class RemoteConfigResponseHandlerTests {
     @Test
     fun testHandleAppCodeBasedConfigs_shouldFallbackToJsBridgeSignatureCheck_evenIfJsBridgeIsNotDefined() =
         runTest {
-            val serviceUrlSlot = slot<ServiceUrlsApi>()
-
-            val configResponse = RemoteConfigResponse(
-                serviceUrls = RemoteConfigServiceUrls(
+            val config = RemoteConfig.Response.AppCodeBased(
+                appCodeBasedServiceUrls = RemoteConfigServiceUrls.AppCodeBased(
                     clientService = "",
                     eventService = "",
                     embeddedMessagingService = "",
@@ -139,9 +171,8 @@ class RemoteConfigResponseHandlerTests {
 
                 ),
             )
-            every { mockSdkContext.serviceUrls = capture(serviceUrlSlot) } returns Unit
 
-            remoteConfigResponseHandler.handle(configResponse)
+            remoteConfigHandler.handle(config)
 
             verify { mockLogConfigHolder.remoteLogLevel = LogLevel.Error }
             mockSdkContext.features shouldBe listOf(
@@ -151,12 +182,11 @@ class RemoteConfigResponseHandlerTests {
 
     @Test
     fun testHandleGlobalConfig() = runTest {
-        val globalFeatureUrlsSlot = slot<ServiceUrlsApi.GlobalFeatureUrlsApi>()
         val deeplinkServiceUrl = "testDeepLinkServiceUrl"
         val jsBridgeUrl = "testJsBridgeUrl"
         val jsBridgeSignatureUrl = "testJsBridgeSignatureUrl"
-        val configResponse = RemoteConfigResponse(
-            globalServiceUrls = RemoteConfigGlobalServiceUrls(
+        val config = RemoteConfig.Response.Global(
+            globalServiceUrls = RemoteConfigServiceUrls.Global(
                 deepLinkService = deeplinkServiceUrl,
                 jsBridgeUrl = jsBridgeUrl,
                 jsBridgeSignatureUrl = jsBridgeSignatureUrl
@@ -165,11 +195,10 @@ class RemoteConfigResponseHandlerTests {
             luckyLogger = LuckyLogger(LogLevel.Error, 1.0),
             features = RemoteConfigFeatures(mobileEngage = true, jsBridgeSignatureCheck = false),
         )
-        every { mockSdkContext.serviceUrls.globalFeatureUrls = capture(globalFeatureUrlsSlot) } returns Unit
 
-        remoteConfigResponseHandler.handle(configResponse)
+        remoteConfigHandler.handle(config)
 
-        globalFeatureUrlsSlot.get() shouldBe GlobalFeatureUrls(
+        mockSdkContext.serviceUrls.globalServiceUrls shouldBe ServiceUrls.Global(
             deepLinkBaseUrl = deeplinkServiceUrl,
             jsBridgeUrl = jsBridgeUrl,
             jsBridgeSignatureUrl = jsBridgeSignatureUrl
@@ -179,71 +208,22 @@ class RemoteConfigResponseHandlerTests {
     }
 
     @Test
-    fun testHandleGlobalServiceUrls_shouldNotApplyNull_whenSdkDefaultFalse() = runTest {
-        val globalFeatureUrls: ServiceUrlsApi.GlobalFeatureUrlsApi = mock(MockMode.autofill)
-        every { serviceUrls.globalFeatureUrls } returns globalFeatureUrls
-
-        val configResponse = RemoteConfigResponse()
-
-        remoteConfigResponseHandler.handle(configResponse, false)
-
-        verify(VerifyMode.exactly(0)) { mockSdkContext.serviceUrls.globalFeatureUrls = null }
-    }
-
-    @Test
-    fun testHandleGlobalServiceUrls_shouldApplyNull_whenSdkDefaultTrue() = runTest {
-        val globalFeatureUrls: ServiceUrlsApi.GlobalFeatureUrlsApi = mock(MockMode.autofill)
-        every { serviceUrls.globalFeatureUrls } returns globalFeatureUrls
-
-        val configResponse = RemoteConfigResponse()
-
-        remoteConfigResponseHandler.handle(configResponse, true)
-
-        verify(VerifyMode.exactly(1)) { mockSdkContext.serviceUrls.globalFeatureUrls = null }
-    }
-
-    @Test
-    fun testHandleServiceUrls_shouldNotApplyNull_whenSdkDefaultFalse() = runTest {
-        val featureUrls: ServiceUrlsApi.FeatureUrlsApi = mock(MockMode.autofill)
-        every { serviceUrls.featureUrls } returns featureUrls
-
-        val configResponse = RemoteConfigResponse()
-
-        remoteConfigResponseHandler.handle(configResponse, false)
-
-        verify(VerifyMode.exactly(0)) { mockSdkContext.serviceUrls.featureUrls = null }
-    }
-
-    @Test
-    fun testHandleServiceUrls_shouldApplyNull_whenSdkDefaultTrue() = runTest {
-        val featureUrls: ServiceUrlsApi.FeatureUrlsApi = mock(MockMode.autofill)
-        every { serviceUrls.featureUrls } returns featureUrls
-
-        val configResponse = RemoteConfigResponse()
-
-        remoteConfigResponseHandler.handle(configResponse, true)
-
-        verify(VerifyMode.exactly(1)) { mockSdkContext.serviceUrls.featureUrls = null }
-    }
-
-    @Test
-    fun testHandleServiceUrls_shouldApplyOverride() = runTest {
-        val featureUrlsSlot = slot<ServiceUrlsApi.FeatureUrlsApi>()
+    fun testHandleAppCodeBasedServiceUrls_shouldApplyOverride() = runTest {
         val clientServiceUrl = "testClientServiceUrl"
         val eventServiceUrl = "testEventServiceUrl"
         val embeddedMessagingServiceUrl = "testEmbeddedMessagingServiceUrl"
         val loggingServiceUrl = "testLoggingServiceUrl"
         val clientId = "testClientId"
-        val configResponse = RemoteConfigResponse(
-            serviceUrls = RemoteConfigServiceUrls(
-                clientService = "url",
-                eventService = "url",
-                embeddedMessagingService = "url",
-                loggingService = "url"
+        val config = RemoteConfig.Response.AppCodeBased(
+            appCodeBasedServiceUrls = RemoteConfigServiceUrls.AppCodeBased(
+                clientService = "testUrl",
+                eventService = "testUrl",
+                embeddedMessagingService = "testUrl",
+                loggingService = "testUrl"
             ),
             overrides = mapOf(
-                clientId to RemoteConfigOverride(
-                    RemoteConfigOptionalServiceUrls(
+                clientId to RemoteConfig.Response.Override(
+                    RemoteConfigServiceUrls.Optional(
                         clientService = clientServiceUrl,
                         eventService = eventServiceUrl,
                         embeddedMessagingService = embeddedMessagingServiceUrl,
@@ -252,12 +232,11 @@ class RemoteConfigResponseHandlerTests {
                 )
             )
         )
-        every { mockSdkContext.serviceUrls.featureUrls = capture(featureUrlsSlot) } returns Unit
         everySuspend { mockDeviceInfoCollector.getClientId() } returns clientId
 
-        remoteConfigResponseHandler.handle(configResponse)
+        remoteConfigHandler.handle(config)
 
-        featureUrlsSlot.get() shouldBe FeatureUrls(
+        mockSdkContext.serviceUrls.appCodeBasedServiceUrls shouldBe ServiceUrls.AppCodeBased(
             clientServiceBaseUrl = clientServiceUrl,
             eventServiceBaseUrl = eventServiceUrl,
             embeddedMessagingBaseUrl = embeddedMessagingServiceUrl,
@@ -267,23 +246,27 @@ class RemoteConfigResponseHandlerTests {
 
     @Test
     fun testHandleLogLevel() = runTest {
-        val configResponse = RemoteConfigResponse(
-            logLevel = LogLevel.Info
+        val config = RemoteConfig.Default(
+            logLevel = LogLevel.Info,
+            features = RemoteConfigFeatures(),
+            embeddedMessagingConfig = EmbeddedMessagingConfig()
         )
 
-        remoteConfigResponseHandler.handle(configResponse)
+        remoteConfigHandler.handle(config)
 
         verify { mockLogConfigHolder.remoteLogLevel = LogLevel.Info }
     }
 
     @Test
     fun testHandleLogLevel_shouldApplyLuckyLogger() = runTest {
-        val configResponse = RemoteConfigResponse(
+        val config = RemoteConfig.Default(
             logLevel = LogLevel.Debug,
             luckyLogger = LuckyLogger(LogLevel.Error, 1.0),
+            features = RemoteConfigFeatures(),
+            embeddedMessagingConfig = EmbeddedMessagingConfig()
         )
 
-        remoteConfigResponseHandler.handle(configResponse)
+        remoteConfigHandler.handle(config)
 
         verify { mockLogConfigHolder.remoteLogLevel = LogLevel.Error }
     }
@@ -291,18 +274,24 @@ class RemoteConfigResponseHandlerTests {
     @Test
     fun testHandleLogLevel_shouldApplyOverride() = runTest {
         val clientId = "testClientId"
-        val configResponse = RemoteConfigResponse(
+        val config = RemoteConfig.Response.AppCodeBased(
+            appCodeBasedServiceUrls = RemoteConfigServiceUrls.AppCodeBased(
+                clientService = "",
+                eventService = "",
+                embeddedMessagingService = "",
+                loggingService = ""
+            ),
             logLevel = LogLevel.Debug,
             luckyLogger = LuckyLogger(LogLevel.Error, 1.0),
             overrides = mapOf(
-                clientId to RemoteConfigOverride(
+                clientId to RemoteConfig.Response.Override(
                     logLevel = LogLevel.Info,
                 )
             )
         )
         everySuspend { mockDeviceInfoCollector.getClientId() } returns clientId
 
-        remoteConfigResponseHandler.handle(configResponse)
+        remoteConfigHandler.handle(config)
 
         verify { mockLogConfigHolder.remoteLogLevel = LogLevel.Info }
     }
@@ -311,14 +300,16 @@ class RemoteConfigResponseHandlerTests {
     fun testHandleEmbeddedMessagingConfig_shouldApplyBothProperties() = runTest {
         val batchSize = 20
         val frequencyCap = 10
-        val configResponse = RemoteConfigResponse(
+        val config = RemoteConfig.Default(
+            logLevel = LogLevel.Error,
+            features = RemoteConfigFeatures(),
             embeddedMessagingConfig = EmbeddedMessagingConfig(
                 tagUpdateBatchSize = batchSize,
                 tagUpdateFrequencyCapSeconds = frequencyCap
             )
         )
 
-        remoteConfigResponseHandler.handle(configResponse)
+        remoteConfigHandler.handle(config)
 
         verify { mockEmbeddedMessagingContext.tagUpdateBatchSize = batchSize }
         verify { mockEmbeddedMessagingContext.tagUpdateFrequencyCapSeconds = frequencyCap }
@@ -327,14 +318,16 @@ class RemoteConfigResponseHandlerTests {
     @Test
     fun testHandleEmbeddedMessagingConfig_shouldApplyOnlyBatchSize() = runTest {
         val batchSize = 15
-        val configResponse = RemoteConfigResponse(
+        val config = RemoteConfig.Default(
+            logLevel = LogLevel.Error,
+            features = RemoteConfigFeatures(),
             embeddedMessagingConfig = EmbeddedMessagingConfig(
                 tagUpdateBatchSize = batchSize,
                 tagUpdateFrequencyCapSeconds = null
             )
         )
 
-        remoteConfigResponseHandler.handle(configResponse)
+        remoteConfigHandler.handle(config)
 
         verify { mockEmbeddedMessagingContext.tagUpdateBatchSize = batchSize }
     }
@@ -342,25 +335,32 @@ class RemoteConfigResponseHandlerTests {
     @Test
     fun testHandleEmbeddedMessagingConfig_shouldApplyOnlyFrequencyCap() = runTest {
         val frequencyCap = 30
-        val configResponse = RemoteConfigResponse(
+        val config = RemoteConfig.Default(
+            logLevel = LogLevel.Error,
+            features = RemoteConfigFeatures(),
             embeddedMessagingConfig = EmbeddedMessagingConfig(
                 tagUpdateBatchSize = null,
                 tagUpdateFrequencyCapSeconds = frequencyCap
             )
         )
 
-        remoteConfigResponseHandler.handle(configResponse)
+        remoteConfigHandler.handle(config)
 
         verify { mockEmbeddedMessagingContext.tagUpdateFrequencyCapSeconds = frequencyCap }
     }
 
     @Test
     fun testHandleEmbeddedMessagingConfig_shouldNotApplyWhenConfigIsNull() = runTest {
-        val configResponse = RemoteConfigResponse(
+        val config = RemoteConfig.Response.Global(
+            globalServiceUrls = RemoteConfigServiceUrls.Global(
+                deepLinkService = "",
+                jsBridgeUrl = "",
+                jsBridgeSignatureUrl = ""
+            ),
             embeddedMessagingConfig = null
         )
 
-        remoteConfigResponseHandler.handle(configResponse)
+        remoteConfigHandler.handle(config)
 
         verify(VerifyMode.exactly(0)) {
             mockEmbeddedMessagingContext.tagUpdateBatchSize = any()
@@ -375,13 +375,19 @@ class RemoteConfigResponseHandlerTests {
         val overrideBatchSize = 25
         val overrideFrequencyCap = 15
         val clientId = "testClientId"
-        val configResponse = RemoteConfigResponse(
+        val config = RemoteConfig.Response.AppCodeBased(
+            appCodeBasedServiceUrls = RemoteConfigServiceUrls.AppCodeBased(
+                clientService = "",
+                eventService = "",
+                embeddedMessagingService = "",
+                loggingService = ""
+            ),
             embeddedMessagingConfig = EmbeddedMessagingConfig(
                 tagUpdateBatchSize = globalBatchSize,
                 tagUpdateFrequencyCapSeconds = globalFrequencyCap
             ),
             overrides = mapOf(
-                clientId to RemoteConfigOverride(
+                clientId to RemoteConfig.Response.Override(
                     embeddedMessagingConfig = EmbeddedMessagingConfig(
                         tagUpdateBatchSize = overrideBatchSize,
                         tagUpdateFrequencyCapSeconds = overrideFrequencyCap
@@ -391,7 +397,7 @@ class RemoteConfigResponseHandlerTests {
         )
         everySuspend { mockDeviceInfoCollector.getClientId() } returns clientId
 
-        remoteConfigResponseHandler.handle(configResponse)
+        remoteConfigHandler.handle(config)
 
         verify { mockEmbeddedMessagingContext.tagUpdateBatchSize = overrideBatchSize }
         verify { mockEmbeddedMessagingContext.tagUpdateFrequencyCapSeconds = overrideFrequencyCap }
@@ -403,13 +409,19 @@ class RemoteConfigResponseHandlerTests {
         val globalFrequencyCap = 5
         val overrideBatchSize = 25
         val clientId = "testClientId"
-        val configResponse = RemoteConfigResponse(
+        val config = RemoteConfig.Response.AppCodeBased(
+            appCodeBasedServiceUrls = RemoteConfigServiceUrls.AppCodeBased(
+                clientService = "",
+                eventService = "",
+                embeddedMessagingService = "",
+                loggingService = ""
+            ),
             embeddedMessagingConfig = EmbeddedMessagingConfig(
                 tagUpdateBatchSize = globalBatchSize,
                 tagUpdateFrequencyCapSeconds = globalFrequencyCap
             ),
             overrides = mapOf(
-                clientId to RemoteConfigOverride(
+                clientId to RemoteConfig.Response.Override(
                     embeddedMessagingConfig = EmbeddedMessagingConfig(
                         tagUpdateBatchSize = overrideBatchSize,
                         tagUpdateFrequencyCapSeconds = null
@@ -419,7 +431,7 @@ class RemoteConfigResponseHandlerTests {
         )
         everySuspend { mockDeviceInfoCollector.getClientId() } returns clientId
 
-        remoteConfigResponseHandler.handle(configResponse)
+        remoteConfigHandler.handle(config)
 
         verify { mockEmbeddedMessagingContext.tagUpdateBatchSize = overrideBatchSize }
         verify { mockEmbeddedMessagingContext.tagUpdateFrequencyCapSeconds = globalFrequencyCap }
@@ -430,14 +442,19 @@ class RemoteConfigResponseHandlerTests {
         runTest {
             val expectedRegex = "^CUSTOM-[A-Z0-9]+$"
             val regexSlot = slot<Regex?>()
-            val configResponse = RemoteConfigResponse(
-                globalRemoteConfigApplicationCodeValidationRegex = expectedRegex
+            val config = RemoteConfig.Response.Global(
+                globalRemoteConfigApplicationCodeValidationRegex = expectedRegex,
+                globalServiceUrls = RemoteConfigServiceUrls.Global(
+                    deepLinkService = "",
+                    jsBridgeUrl = "",
+                    jsBridgeSignatureUrl = ""
+                )
             )
             every {
                 mockSdkContext.globalRemoteConfigApplicationCodeValidationRegex = capture(regexSlot)
             } returns Unit
 
-            remoteConfigResponseHandler.handle(configResponse)
+            remoteConfigHandler.handle(config)
 
             regexSlot.get()!!.pattern shouldBe expectedRegex
         }
@@ -445,20 +462,31 @@ class RemoteConfigResponseHandlerTests {
     @Test
     fun testHandle_shouldDiscardInvalidRegex_andAssignNull() = runTest {
         val invalidRegex = "[invalid("
-        val configResponse = RemoteConfigResponse(
-            globalRemoteConfigApplicationCodeValidationRegex = invalidRegex
+        val config = RemoteConfig.Response.Global(
+            globalRemoteConfigApplicationCodeValidationRegex = invalidRegex,
+            globalServiceUrls = RemoteConfigServiceUrls.Global(
+                deepLinkService = "",
+                jsBridgeUrl = "",
+                jsBridgeSignatureUrl = ""
+            )
         )
 
-        remoteConfigResponseHandler.handle(configResponse)
+        remoteConfigHandler.handle(config)
 
         verify { mockSdkContext.globalRemoteConfigApplicationCodeValidationRegex = null }
     }
 
     @Test
     fun testHandle_shouldNotResetRegex_whenFieldIsAbsentFromResponse() = runTest {
-        val configResponse = RemoteConfigResponse()
+        val config = RemoteConfig.Response.Global(
+            globalServiceUrls = RemoteConfigServiceUrls.Global(
+                deepLinkService = "",
+                jsBridgeUrl = "",
+                jsBridgeSignatureUrl = ""
+            )
+        )
 
-        remoteConfigResponseHandler.handle(configResponse)
+        remoteConfigHandler.handle(config)
 
         verify(VerifyMode.exactly(0)) {
             mockSdkContext.globalRemoteConfigApplicationCodeValidationRegex = any()
@@ -468,14 +496,20 @@ class RemoteConfigResponseHandlerTests {
     @Test
     fun testApplyFeatures_shouldApplyOverride() = runTest {
         val clientId = "testClientId"
-        val configResponse = RemoteConfigResponse(
+        val config = RemoteConfig.Response.AppCodeBased(
+            appCodeBasedServiceUrls = RemoteConfigServiceUrls.AppCodeBased(
+                clientService = "",
+                eventService = "",
+                embeddedMessagingService = "",
+                loggingService = ""
+            ),
             features = RemoteConfigFeatures(
                 jsBridgeSignatureCheck = true,
                 mobileEngage = false,
                 embeddedMessaging = true
             ),
             overrides = mapOf(
-                clientId to RemoteConfigOverride(
+                clientId to RemoteConfig.Response.Override(
                     features = RemoteConfigFeatures(
                         jsBridgeSignatureCheck = false,
                         mobileEngage = true,
@@ -486,43 +520,61 @@ class RemoteConfigResponseHandlerTests {
         )
         everySuspend { mockDeviceInfoCollector.getClientId() } returns clientId
 
-        remoteConfigResponseHandler.handle(configResponse)
+        remoteConfigHandler.handle(config)
 
         mockSdkContext.features shouldBe listOf(MobileEngage)
     }
 
     @Test
     fun testApplyFeatures_shouldFail_whenSdkDisabledIsTrue() = runTest {
-        val configResponse = RemoteConfigResponse(
-            features = RemoteConfigFeatures(jsBridgeSignatureCheck = true, mobileEngage = true, embeddedMessaging = true),
-            disabled = true
+        val config = RemoteConfig.Response.AppCodeBased(
+            disabled = true,
+            appCodeBasedServiceUrls = RemoteConfigServiceUrls.AppCodeBased(
+                clientService = "",
+                eventService = "",
+                embeddedMessagingService = "",
+                loggingService = ""
+            ),
+            features = RemoteConfigFeatures(jsBridgeSignatureCheck = true, mobileEngage = true, embeddedMessaging = true)
         )
 
         assertFailsWith<SdkException.SdkDisabledException> {
-            remoteConfigResponseHandler.handle(configResponse)
+            remoteConfigHandler.handle(config)
         }
     }
 
     @Test
     fun testApplyFeatures_shouldApplyingFeatures_whenSdkDisabledIsFalse() = runTest {
-        val configResponse = RemoteConfigResponse(
-            features = RemoteConfigFeatures(jsBridgeSignatureCheck = true, mobileEngage = true, embeddedMessaging = true),
-            disabled = false
+        val config = RemoteConfig.Response.AppCodeBased(
+            disabled = false,
+            appCodeBasedServiceUrls = RemoteConfigServiceUrls.AppCodeBased(
+                clientService = "",
+                eventService = "",
+                embeddedMessagingService = "",
+                loggingService = ""
+            ),
+            features = RemoteConfigFeatures(jsBridgeSignatureCheck = true, mobileEngage = true, embeddedMessaging = true)
         )
 
-        remoteConfigResponseHandler.handle(configResponse)
+        remoteConfigHandler.handle(config)
 
         mockSdkContext.features shouldBe listOf(JsBridgeSignatureCheck, MobileEngage, EmbeddedMessaging)
     }
 
     @Test
     fun testApplyFeatures_shouldApplyingFeatures_whenSdkDisabledIsNull() = runTest {
-        val configResponse = RemoteConfigResponse(
-            features = RemoteConfigFeatures(jsBridgeSignatureCheck = true, mobileEngage = true, embeddedMessaging = true),
-            disabled = null
+        val config = RemoteConfig.Response.AppCodeBased(
+            disabled = null,
+            appCodeBasedServiceUrls = RemoteConfigServiceUrls.AppCodeBased(
+                clientService = "",
+                eventService = "",
+                embeddedMessagingService = "",
+                loggingService = ""
+            ),
+            features = RemoteConfigFeatures(jsBridgeSignatureCheck = true, mobileEngage = true, embeddedMessaging = true)
         )
 
-        remoteConfigResponseHandler.handle(configResponse)
+        remoteConfigHandler.handle(config)
 
         mockSdkContext.features shouldBe listOf(JsBridgeSignatureCheck, MobileEngage, EmbeddedMessaging)
     }

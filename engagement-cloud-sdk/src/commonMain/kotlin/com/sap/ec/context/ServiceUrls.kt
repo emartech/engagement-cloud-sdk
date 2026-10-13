@@ -1,24 +1,20 @@
 package com.sap.ec.context
 
-import com.sap.ec.context.ServiceUrlsApi.FeatureUrlsApi
-import com.sap.ec.context.ServiceUrlsApi.GlobalFeatureUrlsApi
-
 internal data class ServiceUrls(
-    override val remoteConfigBaseUrl: String,
-    override var globalFeatureUrls: GlobalFeatureUrlsApi? = null,
-    override var featureUrls: FeatureUrlsApi? = null
-) : ServiceUrlsApi {
+    val remoteConfigBaseUrl: String,
+    var globalServiceUrls: Global? = null,
+    var appCodeBasedServiceUrls: AppCodeBased? = null
+) {
+    internal data class Global(
+        val deepLinkBaseUrl: String,
+        val jsBridgeUrl: String,
+        val jsBridgeSignatureUrl: String,
+    )
 
-    data class GlobalFeatureUrls(
-        override val deepLinkBaseUrl: String,
-        override val jsBridgeUrl: String,
-        override val jsBridgeSignatureUrl: String,
-    ): GlobalFeatureUrlsApi
-
-    data class FeatureUrls(
-        override val clientServiceBaseUrl: String,
-        override val eventServiceBaseUrl: String,
-        override val embeddedMessagingBaseUrl: String,
-        override val loggingUrl: String
-    ): FeatureUrlsApi
+    internal data class AppCodeBased(
+        val clientServiceBaseUrl: String,
+        val eventServiceBaseUrl: String,
+        val embeddedMessagingBaseUrl: String,
+        val loggingUrl: String
+    )
 }

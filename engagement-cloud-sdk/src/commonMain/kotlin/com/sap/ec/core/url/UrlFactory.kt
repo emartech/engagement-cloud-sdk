@@ -2,6 +2,7 @@ package com.sap.ec.core.url
 
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.exceptions.SdkException.MissingApplicationCodeException
+import com.sap.ec.core.exceptions.SdkException.ServiceUrlsUnavailableException
 import io.ktor.http.URLBuilder
 import io.ktor.http.Url
 
@@ -22,13 +23,13 @@ internal class UrlFactory(
             ECUrlType.GlobalRemoteConfig -> Url("${sdkContext.serviceUrls.remoteConfigBaseUrl}/GLOBAL")
 
             ECUrlType.DeepLink -> {
-                sdkContext.serviceUrls.globalFeatureUrls?.let {
+                sdkContext.serviceUrls.globalServiceUrls?.let {
                     Url(it.deepLinkBaseUrl)
-                } ?: throw IllegalStateException("Service URLs are not available")
+                } ?: throw ServiceUrlsUnavailableException()
             }
 
             else -> {
-                sdkContext.serviceUrls.featureUrls?.let {
+                sdkContext.serviceUrls.appCodeBasedServiceUrls?.let {
                     when (urlType) {
                         ECUrlType.ChangeApplicationCode -> {
                             URLBuilder("${it.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client/app").build()
@@ -66,7 +67,7 @@ internal class UrlFactory(
 
                         ECUrlType.Logging -> Url("${it.loggingUrl}/v1/log")
                     }
-                } ?: throw IllegalStateException("Service URLs are not available")
+                } ?: throw ServiceUrlsUnavailableException()
             }
         }
     }

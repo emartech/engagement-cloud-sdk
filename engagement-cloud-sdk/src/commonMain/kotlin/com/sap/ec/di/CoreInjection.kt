@@ -6,7 +6,6 @@ import com.sap.ec.context.Features
 import com.sap.ec.context.SdkContext
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.context.ServiceUrls
-import com.sap.ec.context.ServiceUrlsApi
 import com.sap.ec.core.channel.OperationalEventDistributor
 import com.sap.ec.core.channel.OperationalEventDistributorApi
 import com.sap.ec.core.channel.SdkEventDistributor
@@ -120,9 +119,9 @@ internal object CoreInjection {
         single<StorageApi> { Storage(stringStorage = get(), json = get()) }
         single<DeviceInfoStorageApi> { DeviceInfoStorage(stringStorage = get()) }
         singleOf(::UserAgentProvider) { bind<UserAgentProviderApi>() }
-        single<ServiceUrlsApi> {
+        single<ServiceUrls> {
             ServiceUrls(
-                "https://mobile-sdk-config.gservice.emarsys.net"
+                remoteConfigBaseUrl = "https://mobile-sdk-config.gservice.emarsys.net"
             )
         }
         single<SdkEventDistributor> {

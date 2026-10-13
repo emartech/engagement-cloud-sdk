@@ -30,7 +30,7 @@ internal object InitInjection {
     val initModules = module {
         single<State>(named(InitStateTypes.ApplySDKDefaultRemoteConfig)) {
             ApplySDKDefaultRemoteConfigState(
-                remoteConfigResponseHandler = get(),
+                remoteConfigHandler = get(),
                 sdkLogger = get { parametersOf(ApplySDKDefaultRemoteConfigState::class.simpleName) },
             )
         }

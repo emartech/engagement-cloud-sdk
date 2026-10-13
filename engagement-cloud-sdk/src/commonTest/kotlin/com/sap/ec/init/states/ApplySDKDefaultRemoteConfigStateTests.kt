@@ -1,8 +1,8 @@
 package com.sap.ec.init.states
 
 import com.sap.ec.core.log.SdkLogger
-import com.sap.ec.remoteConfig.RemoteConfigResponse
-import com.sap.ec.remoteConfig.RemoteConfigResponseHandlerApi
+import com.sap.ec.remoteConfig.RemoteConfig
+import com.sap.ec.remoteConfig.RemoteConfigHandlerApi
 import dev.mokkery.MockMode
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
@@ -12,15 +12,15 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class ApplySDKDefaultRemoteConfigStateTests {
-    private lateinit var mockRemoteConfigResponseHandler: RemoteConfigResponseHandlerApi
+    private lateinit var mockRemoteConfigHandler: RemoteConfigHandlerApi
     private lateinit var applySDKDefaultRemoteConfigState: ApplySDKDefaultRemoteConfigState
 
     @BeforeTest
     fun setup() {
-        mockRemoteConfigResponseHandler = mock(MockMode.autoUnit)
+        mockRemoteConfigHandler = mock(MockMode.autoUnit)
 
         applySDKDefaultRemoteConfigState = ApplySDKDefaultRemoteConfigState(
-            mockRemoteConfigResponseHandler,
+            mockRemoteConfigHandler,
             SdkLogger(
                 "TestLoggerName",
                 mock(MockMode.autofill),
@@ -38,6 +38,6 @@ class ApplySDKDefaultRemoteConfigStateTests {
     fun testActive_should_handleSDKDefault_with_remoteConfigHandler() = runTest {
         applySDKDefaultRemoteConfigState.active()
 
-        verifySuspend { mockRemoteConfigResponseHandler.handle(RemoteConfigResponse.SDK_DEFAULT, true) }
+        verifySuspend { mockRemoteConfigHandler.handle(RemoteConfig.Default.SDK) }
     }
 }
