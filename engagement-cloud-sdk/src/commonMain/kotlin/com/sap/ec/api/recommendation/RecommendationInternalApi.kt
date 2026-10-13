@@ -1,8 +1,8 @@
 package com.sap.ec.api.recommendation
 
 import com.sap.ec.event.SdkEvent
-import com.sap.ec.recommendation.models.product.Product
+import com.sap.ec.recommendation.models.RecommendationResult
 
 internal interface RecommendationInternalApi {
-    suspend fun requestRecommendation(event: SdkEvent): List<Product>
+    suspend fun requestRecommendation(event: SdkEvent): Map<String, RecommendationResult>
 }
