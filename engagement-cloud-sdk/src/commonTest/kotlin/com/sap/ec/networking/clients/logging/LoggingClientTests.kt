@@ -289,6 +289,30 @@ class LoggingClientTests {
         }
     }
 
+    @Test
+    fun testConsumer_should_callEventNack_butNotClientExceptionHandler_when_IllegalStateException_happens() = runTest {
+        createLoggingClient(backgroundScope).register()
+        val testException = IllegalStateException("Test exception")
+
+        everySuspend { mockUrlFactory.create(ECUrlType.Logging) } throws testException
+        val logEvent = SdkEvent.Internal.Sdk.Metric()
+
+        val onlineSdkEvents = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) {
+            logEvents.take(1).toList()
+        }
+
+        logEvents.emit(logEvent)
+
+        advanceTimeBy(11000)
+
+        onlineSdkEvents.await() shouldBe listOf(logEvent)
+        logEvent.nackCount shouldBe 1
+        verifySuspend { mockEventsDao.upsertEvent(logEvent) }
+
+        verifySuspend(VerifyMode.exactly(0)) { mockEmarsysClient.send(any()) }
+        verifySuspend(VerifyMode.exactly(0)) { mockClientExceptionHandler.handleException(any(), any(), any()) }
+    }
+
     private fun createTestResponse(
         body: String = "{}",
         statusCode: HttpStatusCode = HttpStatusCode.OK

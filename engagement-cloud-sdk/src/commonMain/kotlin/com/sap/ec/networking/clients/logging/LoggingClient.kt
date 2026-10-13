@@ -94,8 +94,6 @@ internal class LoggingClient(
                             sdkEventManager.emitEvent(sdkEvent)
                         }
                     }
-                } catch (exception: IllegalStateException) {
-                    // TODO-remote-config: handle remote logs when sdk is disable
                 } catch (exception: Exception) {
                     handleException(exception, sdkEvents)
                 }
@@ -107,10 +105,17 @@ internal class LoggingClient(
         sdkEvents: List<SdkEvent.Internal.LogEvent>
     ) {
         currentCoroutineContext().ensureActive()
-        clientExceptionHandler.handleException(
-            exception,
-            "LoggingClient: ConsumeLogsAndMetrics error",
-            *sdkEvents.toTypedArray()
-        )
+        if (exception is IllegalStateException) {
+            sdkLogger.debug("consumeLogsAndMetrics: Logging service URL is not available", isRemoteLog = false)
+            sdkEvents.forEach {
+                it.nack(eventsDao, sdkLogger)
+            }
+        } else {
+            clientExceptionHandler.handleException(
+                exception,
+                "LoggingClient: ConsumeLogsAndMetrics error",
+                *sdkEvents.toTypedArray()
+            )
+        }
     }
 }
