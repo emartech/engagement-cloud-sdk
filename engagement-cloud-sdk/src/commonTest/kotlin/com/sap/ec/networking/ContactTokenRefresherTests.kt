@@ -12,6 +12,7 @@ import com.sap.ec.core.url.UrlFactoryApi
 import com.sap.ec.model.TestDataClass
 import com.sap.ec.util.JsonUtil
 import dev.mokkery.MockMode
+import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.returnsBy
 import dev.mokkery.every
@@ -33,8 +34,13 @@ import io.ktor.http.headersOf
 import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.serialization.json.Json
@@ -270,5 +276,85 @@ class ContactTokenRefresherTests {
                 }
             )
         }
+    }
+
+    @Test
+    fun testExecuteWithTokenRefresh_should_send_single_refresh_when_multiple_requests_receive_401_concurrently() = runTest {
+        // Simulates the bug: several clients share the singleton refresher and all receive a 401
+        // at the same time. Without single-flight coordination each would fire its own refresh.
+        val expiredContactToken = "expiredContactToken"
+        var currentContactToken: String? = expiredContactToken
+        every { mockRequestContext.contactToken } returnsBy { currentContactToken }
+        every { mockRequestContext.contactToken = any() } calls { args ->
+            currentContactToken = args.arg<String?>(0)
+        }
+
+        val unauthorizedBody = buildJsonObject {
+            put("error", buildJsonObject {
+                put("code", "1000")
+                put("message", "the contact-token needs to be refreshed")
+                put("target", "/v4/apps/EMS-1234/client")
+            })
+        }.toString()
+
+        var refreshRequestCount = 0
+        val concurrentRequestCount = 5
+        val refreshUrl = URLBuilder("https://testUrl.com/refresh").build()
+        val originalRequestUrl = URLBuilder("https://testUrl.com/events").build()
+        everySuspend { mockUrlFactory.create(ECUrlType.RefreshToken) } returns refreshUrl
+
+        val networkClient = object : NetworkClientApi {
+            override suspend fun send(request: UrlRequest): Result<Response> {
+                if (request.url == refreshUrl) {
+                    refreshRequestCount++
+                    return Result.success(
+                        Response(
+                            request,
+                            HttpStatusCode.OK,
+                            headersOf("Content-Type", "application/json"),
+                            """{"contactToken":"$NEW_CONTACT_TOKEN"}"""
+                        )
+                    )
+                }
+                // Suspend first so every caller captures the same (expired) token before any refresh.
+                delay(10)
+                return if (currentContactToken == expiredContactToken) {
+                    Result.failure(
+                        SdkException.FailedRequestException(
+                            Response(
+                                request,
+                                HttpStatusCode.Unauthorized,
+                                headersOf("Content-Type", "application/json"),
+                                unauthorizedBody
+                            )
+                        )
+                    )
+                } else {
+                    Result.success(
+                        Response(
+                            request,
+                            HttpStatusCode.OK,
+                            headersOf("Content-Type", "application/json"),
+                            json.encodeToString(testData)
+                        )
+                    )
+                }
+            }
+        }
+
+        val refresher = buildRefresher(networkClient)
+        val request = UrlRequest(
+            originalRequestUrl,
+            HttpMethod.Post,
+            """{"event":"test"}"""
+        )
+
+        val results = (1..concurrentRequestCount).map {
+            async { refresher.executeWithTokenRefresh { networkClient.send(request) } }
+        }.awaitAll()
+
+        results.forEach { it.isSuccess shouldBe true }
+        refreshRequestCount shouldBe 1
+        currentContactToken shouldBe NEW_CONTACT_TOKEN
     }
 }

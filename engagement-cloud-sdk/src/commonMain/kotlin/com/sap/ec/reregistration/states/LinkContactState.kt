@@ -36,10 +36,14 @@ internal class LinkContactState(
         }
 
         return linkContactData?.let { linkContactData ->
-            sdkLogger.debug("Register LinkContact event.")
-            sdkEventDistributor.registerEvent(
-                linkContactData.toLinkContactEvent()
-            ).await<Response>().mapToUnitOrFailure()
+            try {
+                sdkLogger.debug("Register LinkContact event.")
+                sdkEventDistributor.registerEvent(linkContactData.toLinkContactEvent())
+                    .await<Response>().mapToUnitOrFailure()
+            } catch (e: Exception) {
+                currentCoroutineContext().ensureActive()
+                return Result.failure(e)
+            }
         } ?: run {
             sdkLogger.debug("No contact linking data provided, skipping contact linking.")
             Result.success(Unit)

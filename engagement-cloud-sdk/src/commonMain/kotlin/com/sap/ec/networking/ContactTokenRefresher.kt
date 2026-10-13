@@ -14,6 +14,8 @@ import com.sap.ec.networking.ECHeaders.CLIENT_STATE_HEADER
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
@@ -33,41 +35,72 @@ internal class ContactTokenRefresher(
         private const val MAX_RETRY_COUNT = 3
     }
 
+    private val refreshMutex = Mutex()
+
     override suspend fun executeWithTokenRefresh(
         retryCount: Long,
         callback: suspend () -> Result<Response>
     ): Result<Response> {
+        val tokenUsedForRequest = requestContext.contactToken
         val originalResponse = callback()
 
         val exception = originalResponse.exceptionOrNull()
-        return if (exception != null &&
-            exception is SdkException.FailedRequestException &&
-            exception.response.status == HttpStatusCode.Unauthorized &&
-            requestContext.refreshToken != null &&
-            retryCount < MAX_RETRY_COUNT
-        ) {
-            sdkLogger.debug(
-                "refreshing contact token",
-                buildJsonObject {
-                    put("retryCount", JsonPrimitive(retryCount))
-                    put("status", JsonPrimitive(exception.response.status.value))
-                }
-            )
-            delay((retryCount + 1).seconds)
-            val refreshRequest = createRefreshContactTokenRequest()
-            val refreshResponse = networkClient.send(refreshRequest)
-            refreshResponse.fold(
-                onSuccess = { response ->
-                    updateContactToken(response)
-                    executeWithTokenRefresh(retryCount + 1, callback)
-                },
-                onFailure = {
-                    originalResponse
-                }
-            )
+        val shouldRefresh = exception is SdkException.FailedRequestException &&
+                exception.response.status == HttpStatusCode.Unauthorized &&
+                requestContext.refreshToken != null &&
+                retryCount < MAX_RETRY_COUNT
+
+        if (!shouldRefresh) {
+            return originalResponse
+        }
+
+        val refreshSucceeded = refreshContactToken(
+            retryCount = retryCount,
+            status = exception.response.status.value,
+            tokenUsedForRequest = tokenUsedForRequest
+        )
+
+        return if (refreshSucceeded) {
+            executeWithTokenRefresh(retryCount + 1, callback)
         } else {
             originalResponse
         }
+    }
+
+    private suspend fun refreshContactToken(
+        retryCount: Long,
+        status: Int,
+        tokenUsedForRequest: String?
+    ): Boolean = refreshMutex.withLock {
+        if (requestContext.contactToken != tokenUsedForRequest) {
+            sdkLogger.debug(
+                "contact token already refreshed by a concurrent request, skipping refresh",
+                buildJsonObject {
+                    put("retryCount", JsonPrimitive(retryCount))
+                }
+            )
+            return@withLock true
+        }
+
+        sdkLogger.debug(
+            "refreshing contact token",
+            buildJsonObject {
+                put("retryCount", JsonPrimitive(retryCount))
+                put("status", JsonPrimitive(status))
+            }
+        )
+        delay((retryCount + 1).seconds)
+        val refreshToken = requestContext.refreshToken ?: return@withLock false
+        val refreshResponse = networkClient.send(createRefreshContactTokenRequest(refreshToken))
+        refreshResponse.fold(
+            onSuccess = { response ->
+                updateContactToken(response)
+                true
+            },
+            onFailure = {
+                false
+            }
+        )
     }
 
     private fun updateContactToken(refreshTokenResponse: Response) {
@@ -75,10 +108,10 @@ internal class ContactTokenRefresher(
         requestContext.contactToken = responseBody.contactToken
     }
 
-    private suspend fun createRefreshContactTokenRequest() = UrlRequest(
+    private suspend fun createRefreshContactTokenRequest(refreshToken: String) = UrlRequest(
         urlFactory.create(ECUrlType.RefreshToken),
         HttpMethod.Post,
-        json.encodeToString(RefreshTokenRequestBody(requestContext.refreshToken!!)),
+        json.encodeToString(RefreshTokenRequestBody(refreshToken)),
         mapOf(
             CLIENT_ID_HEADER to requestContext.clientId,
             CLIENT_STATE_HEADER to requestContext.clientState,

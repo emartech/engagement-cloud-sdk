@@ -3,6 +3,7 @@ package com.sap.ec.api.contact
 import com.sap.ec.api.Activatable
 import com.sap.ec.api.generic.GenericApi
 import com.sap.ec.context.SdkContextApi
+import com.sap.ec.core.validation.validateNotBlank
 import com.sap.ec.util.runCatchingWithoutCancellation
 import kotlinx.coroutines.withContext
 
@@ -27,10 +28,10 @@ internal class Contact<Logging : ContactInstance, Gatherer : ContactInstance, In
      */
     override suspend fun link(contactFieldValue: String): Result<Unit> =
         runCatchingWithoutCancellation {
+            contactFieldValue.validateNotBlank()
+
             withContext(sdkContext.sdkDispatcher) {
-                activeInstance<ContactInternalApi>().link(
-                    contactFieldValue
-                )
+                activeInstance<ContactInternalApi>().link(contactFieldValue)
             }
         }
 
@@ -44,10 +45,10 @@ internal class Contact<Logging : ContactInstance, Gatherer : ContactInstance, In
         openIdToken: String
     ): Result<Unit> =
         runCatchingWithoutCancellation {
+            openIdToken.validateNotBlank()
+
             withContext(sdkContext.sdkDispatcher) {
-                activeInstance<ContactInternalApi>().linkAuthenticated(
-                    openIdToken
-                )
+                activeInstance<ContactInternalApi>().linkAuthenticated(openIdToken)
             }
         }
 
