@@ -4,6 +4,7 @@ import com.sap.ec.core.channel.SdkEventManagerApi
 import com.sap.ec.core.channel.batched
 import com.sap.ec.core.db.events.EventsDaoApi
 import com.sap.ec.core.device.DeviceInfoCollectorApi
+import com.sap.ec.core.exceptions.SdkException.ServiceUrlsUnavailableException
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.clients.NetworkClientApi
 import com.sap.ec.core.networking.model.UrlRequest
@@ -105,8 +106,8 @@ internal class LoggingClient(
         sdkEvents: List<SdkEvent.Internal.LogEvent>
     ) {
         currentCoroutineContext().ensureActive()
-        if (exception is IllegalStateException) {
-            sdkLogger.debug("consumeLogsAndMetrics: Logging service URL is not available", isRemoteLog = false)
+        if (exception is ServiceUrlsUnavailableException) {
+            sdkLogger.debug("consumeLogsAndMetrics: Logging service URL unavailable", isRemoteLog = false)
             sdkEvents.forEach {
                 it.nack(eventsDao, sdkLogger)
             }

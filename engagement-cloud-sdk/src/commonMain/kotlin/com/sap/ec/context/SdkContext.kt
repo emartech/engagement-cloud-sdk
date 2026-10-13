@@ -11,7 +11,7 @@ internal class SdkContext(
     override val sdkDispatcher: CoroutineDispatcher,
     override val mainDispatcher: CoroutineDispatcher,
     override var onContactLinkingFailed: (suspend () -> LinkContactData?)?,
-    override var serviceUrls: ServiceUrlsApi,
+    override var serviceUrls: ServiceUrls,
     override val features: MutableSet<Features>,
     private val sdkConfigStore: SdkConfigStoreApi<SdkConfig>
 ) : SdkContextApi {

@@ -1,8 +1,7 @@
 package com.sap.ec.core.channel
 
 import com.sap.ec.context.SdkContextApi
-import com.sap.ec.context.ServiceUrls.FeatureUrls
-import com.sap.ec.context.ServiceUrlsApi
+import com.sap.ec.context.ServiceUrls
 import com.sap.ec.core.url.ECUrlType
 import com.sap.ec.core.url.UrlFactory
 import com.sap.ec.core.url.UrlFactoryApi
@@ -42,7 +41,6 @@ class OperationalEventDistributorTests {
     private lateinit var urlFactory: UrlFactoryApi
     private lateinit var urlFactorySpy: UrlFactoryApi
     private lateinit var mockSdkContext: SdkContextApi
-    private lateinit var mockServiceUrls: ServiceUrlsApi
     private lateinit var eventSlot: SlotCapture<OperationalEvent>
     private lateinit var mockEventWaiter: SdkEventWaiterApi
     private lateinit var operationalEventDistributor: OperationalEventDistributorApi
@@ -55,15 +53,16 @@ class OperationalEventDistributorTests {
         everySuspend {
             mockSdkEventDistributor.registerEvent(capture(eventSlot))
         } returns mockEventWaiter
-        mockServiceUrls = mock(MockMode.autofill)
-        every { mockServiceUrls.featureUrls } returns FeatureUrls(
-            clientServiceBaseUrl = CLIENT_SERVICE_URL,
-            eventServiceBaseUrl = "",
-            embeddedMessagingBaseUrl = "",
-            loggingUrl = ""
-        )
         mockSdkContext = mock(MockMode.autofill)
-        every { mockSdkContext.serviceUrls } returns mockServiceUrls
+        every { mockSdkContext.serviceUrls } returns ServiceUrls(
+            remoteConfigBaseUrl = "",
+            appCodeBasedServiceUrls = ServiceUrls.AppCodeBased(
+                clientServiceBaseUrl = CLIENT_SERVICE_URL,
+                eventServiceBaseUrl = "",
+                embeddedMessagingBaseUrl = "",
+                loggingUrl = ""
+            )
+        )
         urlFactory = UrlFactory(mockSdkContext)
         urlFactorySpy = spy(urlFactory)
         operationalEventDistributor =

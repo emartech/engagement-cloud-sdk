@@ -2,9 +2,8 @@ package com.sap.ec.core.url
 
 import com.sap.ec.TestEngagementCloudSDKConfig
 import com.sap.ec.context.SdkContextApi
-import com.sap.ec.context.ServiceUrls.FeatureUrls
-import com.sap.ec.context.ServiceUrls.GlobalFeatureUrls
-import com.sap.ec.context.ServiceUrlsApi
+import com.sap.ec.context.ServiceUrls
+import com.sap.ec.core.exceptions.SdkException.ServiceUrlsUnavailableException
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -32,25 +31,24 @@ class UrlFactoryTests {
     }
 
     private lateinit var mockSdkContext: SdkContextApi
-    private lateinit var mockServiceUrls: ServiceUrlsApi
     private lateinit var urlFactory: UrlFactoryApi
 
     @BeforeTest
     fun setUp() {
-        mockServiceUrls = mock(MockMode.autofill)
         mockSdkContext = mock(MockMode.autofill)
-        every { mockSdkContext.serviceUrls } returns mockServiceUrls
-        every { mockServiceUrls.remoteConfigBaseUrl } returns REMOTE_CONFIG_BASE_URL
-        every { mockServiceUrls.globalFeatureUrls } returns GlobalFeatureUrls(
-            deepLinkBaseUrl = DEEP_LINK_BASE_URL,
-            jsBridgeUrl = "",
-            jsBridgeSignatureUrl = ""
-        )
-        every { mockServiceUrls.featureUrls } returns FeatureUrls(
-            clientServiceBaseUrl = CLIENT_SERVICE_BASE_URL,
-            eventServiceBaseUrl = EVENT_SERVICE_BASE_URL,
-            embeddedMessagingBaseUrl = EMBEDDED_MESSAGING_BASE_URL,
-            loggingUrl = LOGGING_URL
+        every { mockSdkContext.serviceUrls } returns ServiceUrls(
+            remoteConfigBaseUrl = REMOTE_CONFIG_BASE_URL,
+            globalServiceUrls = ServiceUrls.Global(
+                deepLinkBaseUrl = DEEP_LINK_BASE_URL,
+                jsBridgeUrl = "",
+                jsBridgeSignatureUrl = ""
+            ),
+            appCodeBasedServiceUrls = ServiceUrls.AppCodeBased(
+                clientServiceBaseUrl = CLIENT_SERVICE_BASE_URL,
+                eventServiceBaseUrl = EVENT_SERVICE_BASE_URL,
+                embeddedMessagingBaseUrl = EMBEDDED_MESSAGING_BASE_URL,
+                loggingUrl = LOGGING_URL
+            )
         )
         everySuspend { mockSdkContext.getSdkConfig() } returns config
         urlFactory = UrlFactory(mockSdkContext)
@@ -194,9 +192,16 @@ class UrlFactoryTests {
     }
 
     @Test
-    fun testCreate_shouldThrowIllegalStateException_whenFeatureUrlsNull() = runTest {
-        every { mockServiceUrls.featureUrls } returns null
+    fun testCreate_shouldThrowServiceUrlsUnavailableException_whenGlobalServiceUrlsNull() = runTest {
+        every { mockSdkContext.serviceUrls } returns ServiceUrls(remoteConfigBaseUrl = "")
 
-        shouldThrow<IllegalStateException> { urlFactory.create(ECUrlType.Logging) }
+        shouldThrow<ServiceUrlsUnavailableException> { urlFactory.create(ECUrlType.DeepLink) }
+    }
+
+    @Test
+    fun testCreate_shouldThrowServiceUrlsUnavailableException_whenAppCodeBasedServiceUrlsNull() = runTest {
+        every { mockSdkContext.serviceUrls } returns ServiceUrls(remoteConfigBaseUrl = "")
+
+        shouldThrow<ServiceUrlsUnavailableException> { urlFactory.create(ECUrlType.Logging) }
     }
 }
