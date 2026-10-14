@@ -2,9 +2,9 @@ package com.sap.ec.api.recommendation
 
 import com.sap.ec.core.exceptions.SdkException.RecommendationApiNotReadyException
 import com.sap.ec.core.log.Logger
-import com.sap.ec.event.SdkEvent
 import com.sap.ec.recommendation.models.requestRecommendation.RecommendationLogic
 import com.sap.ec.recommendation.models.requestRecommendation.RecommendationOptions
+import com.sap.ec.recommendation.models.tracking.ItemViewEvent
 import dev.mokkery.MockMode
 import dev.mokkery.mock
 import kotlinx.coroutines.test.runTest
@@ -27,13 +27,14 @@ class RecommendationGathererTests {
 
     @Test
     fun testGathering_shouldThrow() = runTest {
-        val event = SdkEvent.Internal.Sdk.RequestRecommendation(
-            options = RecommendationOptions(
-                RecommendationLogic.Home
-            )
-        )
+        val recommendationOptions = RecommendationOptions(RecommendationLogic.Home)
+        val recommendationTrackEvent = ItemViewEvent("itemId")
+
         assertFailsWith<RecommendationApiNotReadyException> {
-            recommendationGatherer.requestRecommendation(event)
+            recommendationGatherer.requestRecommendation(
+                recommendationOptions,
+                recommendationTrackEvent
+            )
         }
     }
 }

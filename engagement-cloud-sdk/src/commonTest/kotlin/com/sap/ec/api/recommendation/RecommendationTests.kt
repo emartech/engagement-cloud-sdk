@@ -2,9 +2,9 @@ package com.sap.ec.api.recommendation
 
 import com.sap.ec.api.SdkState
 import com.sap.ec.context.SdkContextApi
-import com.sap.ec.event.SdkEvent
 import com.sap.ec.recommendation.models.requestRecommendation.RecommendationLogic
 import com.sap.ec.recommendation.models.requestRecommendation.RecommendationOptions
+import com.sap.ec.recommendation.models.tracking.ItemViewEvent
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
@@ -27,11 +27,8 @@ import kotlin.test.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class RecommendationTests {
     private companion object {
-        val event = SdkEvent.Internal.Sdk.RequestRecommendation(
-            options = RecommendationOptions(
-                RecommendationLogic.Home
-            )
-        )
+        val recommendationOptions = RecommendationOptions(RecommendationLogic.Home)
+        val recommendationTrackEvent = ItemViewEvent("itemId")
         val testException = Exception()
     }
 
@@ -72,9 +69,14 @@ class RecommendationTests {
         every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Initialized)
         recommendation.registerOnContext()
 
-        recommendation.requestRecommendation(event)
+        recommendation.requestRecommendation(recommendationOptions, recommendationTrackEvent)
 
-        verifySuspend { mockLoggingRecommendation.requestRecommendation(event) }
+        verifySuspend {
+            mockLoggingRecommendation.requestRecommendation(
+                recommendationOptions,
+                recommendationTrackEvent
+            )
+        }
     }
 
     @Test
@@ -82,9 +84,14 @@ class RecommendationTests {
         every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.UnInitialized)
         recommendation.registerOnContext()
 
-        recommendation.requestRecommendation(event)
+        recommendation.requestRecommendation(recommendationOptions, recommendationTrackEvent)
 
-        verifySuspend { mockLoggingRecommendation.requestRecommendation(event) }
+        verifySuspend {
+            mockLoggingRecommendation.requestRecommendation(
+                recommendationOptions,
+                recommendationTrackEvent
+            )
+        }
     }
 
     @Test
@@ -92,9 +99,14 @@ class RecommendationTests {
         every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.OnHold)
         recommendation.registerOnContext()
 
-        recommendation.requestRecommendation(event)
+        recommendation.requestRecommendation(recommendationOptions, recommendationTrackEvent)
 
-        verifySuspend { mockGathererRecommendation.requestRecommendation(event) }
+        verifySuspend {
+            mockGathererRecommendation.requestRecommendation(
+                recommendationOptions,
+                recommendationTrackEvent
+            )
+        }
     }
 
     @Test
@@ -102,18 +114,29 @@ class RecommendationTests {
         every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
         recommendation.registerOnContext()
 
-        recommendation.requestRecommendation(event)
+        recommendation.requestRecommendation(recommendationOptions, recommendationTrackEvent)
 
-        verifySuspend { mockRecommendationInternal.requestRecommendation(event) }
+        verifySuspend {
+            mockRecommendationInternal.requestRecommendation(
+                recommendationOptions,
+                recommendationTrackEvent
+            )
+        }
     }
 
     @Test
     fun testRequestRecommendation_activeState_throws() = runTest {
         every { mockSdkContext.currentSdkState } returns MutableStateFlow(SdkState.Active)
-        everySuspend { mockRecommendationInternal.requestRecommendation(event) } throws testException
+        everySuspend {
+            mockRecommendationInternal.requestRecommendation(
+                recommendationOptions,
+                recommendationTrackEvent
+            )
+        } throws testException
         recommendation.registerOnContext()
 
-        val result = recommendation.requestRecommendation(event)
+        val result =
+            recommendation.requestRecommendation(recommendationOptions, recommendationTrackEvent)
 
         result.exceptionOrNull() shouldBe testException
     }
