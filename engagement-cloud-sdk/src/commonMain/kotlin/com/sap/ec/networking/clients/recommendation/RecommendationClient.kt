@@ -6,6 +6,7 @@ import com.sap.ec.core.exceptions.SdkException
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.clients.NetworkClientApi
 import com.sap.ec.core.networking.model.Response
+import com.sap.ec.event.RecommendationEvent
 import com.sap.ec.recommendation.store.RecommendationCartStorageUpdaterApi
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.networking.clients.EventBasedClientApi
@@ -37,6 +38,7 @@ internal class RecommendationClient(
         applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
             sdkEventManager.onlineSdkEvents.filterIsInstance<SdkEvent.External.RecommendationTrackEvent>()
                 .collect { event ->
+                    // TODO: try catch
                     sdkLogger.debug("consume RecommendationTrackEvent events")
                     val request = recommendationRequestFactory.create(event)
                     recommendationNetworkClient.send(request).fold(
@@ -51,12 +53,7 @@ internal class RecommendationClient(
                             event.ack(eventsDao, sdkLogger)
                         },
                         onFailure = { exception ->
-                            sdkEventManager.emitEvent(
-                                SdkEvent.Internal.Sdk.Answer.Response(
-                                    event.id,
-                                    Result.failure<Response>(exception)
-                                )
-                            )
+                            handleFailure(exception, event)
                             event.ack(eventsDao, sdkLogger)
                         }
                     )
@@ -68,6 +65,7 @@ internal class RecommendationClient(
         applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
             sdkEventManager.sdkEventFlow.filterIsInstance<SdkEvent.Internal.Sdk.RequestRecommendation>()
                 .collect { event ->
+                    // TODO: try catch
                     sdkLogger.debug("consume RequestRecommendation events")
                     val request = recommendationRequestFactory.create(event)
                     recommendationNetworkClient.send(request).fold(
@@ -82,14 +80,14 @@ internal class RecommendationClient(
                             )
                         },
                         onFailure = { exception ->
-                            handleRequestRecommendationFailure(exception, event)
+                            handleFailure(exception, event)
                         }
                     )
                 }
         }
     }
 
-    private suspend fun handleRequestRecommendationFailure(exception: Throwable, event: SdkEvent.Internal.Sdk.RequestRecommendation) {
+    private suspend fun handleFailure(exception: Throwable, event: RecommendationEvent) {
         if (exception is SdkException.FailedRequestException) {
             when (exception.response.status) {
                 HttpStatusCode.BadRequest -> {

@@ -139,7 +139,7 @@ class RecommendationClientTests {
                 method = HttpMethod.Get
             )
             val failureResponse = Response(
-                status = HttpStatusCode.BadRequest,
+                status = HttpStatusCode.Unauthorized,
                 headers = Headers.Empty,
                 originalRequest = request,
                 bodyAsText = "{}"
@@ -239,7 +239,6 @@ class RecommendationClientTests {
             }
         }
 
-    @Ignore
     @Test
     fun testConsumer_shouldConsumeRequestRecommendation_andSendTheRequest_andNotCallRecommendationCartStorageUpdater_andEmitResponse_whenReceivingFailureResponse() =
         runTest {
@@ -254,7 +253,7 @@ class RecommendationClientTests {
                 method = HttpMethod.Get
             )
             val failureResponse = Response(
-                status = HttpStatusCode.BadRequest,
+                status = HttpStatusCode.Unauthorized,
                 headers = Headers.Empty,
                 originalRequest = request,
                 bodyAsText = "{}"
@@ -323,7 +322,251 @@ class RecommendationClientTests {
         }
 
     @Test
-    fun testHandleRequestRecommendationFailure_shouldEmitFailureResponse_whenReceiving400Response() =
+    fun testHandleFailure_trackEvent_shouldEmitFailureResponse_whenReceiving400Response() =
+        runTest {
+            createRecommendationClient(backgroundScope).register()
+            val searchEvent = SdkEvent.External.RecommendationTrackEvent.Search("testSearchTerm")
+            val request = UrlRequest(
+                url = Url("$RECOMMENDATION_BASE_URL?$CART_LIST_ITEM_QUANTITY_KEY=testSearchTerm"),
+                method = HttpMethod.Get
+            )
+            val response = Response(
+                status = HttpStatusCode.BadRequest,
+                headers = Headers.Empty,
+                originalRequest = request,
+                bodyAsText = "{}"
+            )
+
+            val exception = SdkException.FailedRequestException(response)
+            val failureResult = Result.failure<Response>(exception)
+            val responseCaptor = slot<SdkEvent.Internal.Sdk.Answer.Response<*>>()
+            everySuspend { mockRecommendationRequestFactory.create(searchEvent) } returns request
+            everySuspend { mockNetworkClient.send(request) } returns failureResult
+            everySuspend { mockSdkEventManager.emitEvent(capture(responseCaptor)) } returns Unit
+
+            val sdkEvents = backgroundScope.async {
+                onlineSdkEventsFlow.take(1).toList()
+            }
+
+            onlineSdkEventsFlow.emit(searchEvent)
+
+            advanceUntilIdle()
+
+            sdkEvents.await().size shouldBe 1
+            val sentEvent = responseCaptor.get()
+            val result = sentEvent.result
+            result.exceptionOrNull().shouldBeInstanceOf<SdkException.InvalidRecommendationConfigurationException>()
+            verifySuspend {
+                mockSdkEventManager.emitEvent(
+                    SdkEvent.Internal.Sdk.Answer.Response(
+                        searchEvent.id,
+                        result
+                    )
+                )
+            }
+        }
+
+    @Test
+    fun testHandleFailure_trackEvent_shouldEmitFailureResponse_whenReceiving401Response() =
+        runTest {
+            createRecommendationClient(backgroundScope).register()
+            val searchEvent = SdkEvent.External.RecommendationTrackEvent.Search("testSearchTerm")
+            val request = UrlRequest(
+                url = Url("$RECOMMENDATION_BASE_URL?$CART_LIST_ITEM_QUANTITY_KEY=testSearchTerm"),
+                method = HttpMethod.Get
+            )
+            val response = Response(
+                status = HttpStatusCode.Unauthorized,
+                headers = Headers.Empty,
+                originalRequest = request,
+                bodyAsText = "{}"
+            )
+
+            val exception = SdkException.FailedRequestException(response)
+            val failureResult = Result.failure<Response>(exception)
+            everySuspend { mockRecommendationRequestFactory.create(searchEvent) } returns request
+            everySuspend { mockNetworkClient.send(request) } returns failureResult
+
+            val sdkEvents = backgroundScope.async {
+                onlineSdkEventsFlow.take(1).toList()
+            }
+
+            onlineSdkEventsFlow.emit(searchEvent)
+
+            advanceUntilIdle()
+
+            sdkEvents.await().size shouldBe 1
+            verifySuspend {
+                mockSdkEventManager.emitEvent(
+                    SdkEvent.Internal.Sdk.Answer.Response(
+                        searchEvent.id,
+                        failureResult
+                    )
+                )
+            }
+        }
+
+    @Test
+    fun testHandleFailure_trackEvent_shouldEmitFailureResponse_whenReceiving404Response() =
+        runTest {
+            createRecommendationClient(backgroundScope).register()
+            val searchEvent = SdkEvent.External.RecommendationTrackEvent.Search("testSearchTerm")
+            val request = UrlRequest(
+                url = Url("$RECOMMENDATION_BASE_URL?$CART_LIST_ITEM_QUANTITY_KEY=testSearchTerm"),
+                method = HttpMethod.Get
+            )
+            val response = Response(
+                status = HttpStatusCode.NotFound,
+                headers = Headers.Empty,
+                originalRequest = request,
+                bodyAsText = "{}"
+            )
+
+            val exception = SdkException.FailedRequestException(response)
+            val failureResult = Result.failure<Response>(exception)
+            val responseCaptor = slot<SdkEvent.Internal.Sdk.Answer.Response<*>>()
+            everySuspend { mockRecommendationRequestFactory.create(searchEvent) } returns request
+            everySuspend { mockNetworkClient.send(request) } returns failureResult
+            everySuspend { mockSdkEventManager.emitEvent(capture(responseCaptor)) } returns Unit
+
+            val sdkEvents = backgroundScope.async {
+                onlineSdkEventsFlow.take(1).toList()
+            }
+
+            onlineSdkEventsFlow.emit(searchEvent)
+
+            advanceUntilIdle()
+
+            sdkEvents.await().size shouldBe 1
+            val sentEvent = responseCaptor.get()
+            val result = sentEvent.result
+            result.exceptionOrNull().shouldBeInstanceOf<SdkException.MissingRecommendationConfigurationException>()
+            verifySuspend {
+                mockSdkEventManager.emitEvent(
+                    SdkEvent.Internal.Sdk.Answer.Response(
+                        searchEvent.id,
+                        result
+                    )
+                )
+            }
+        }
+
+    @Test
+    fun testHandleFailure_trackEvent_shouldEmitFailureResponse_whenReceiving500Response() =
+        runTest {
+            createRecommendationClient(backgroundScope).register()
+            val searchEvent = SdkEvent.External.RecommendationTrackEvent.Search("testSearchTerm")
+            val request = UrlRequest(
+                url = Url("$RECOMMENDATION_BASE_URL?$CART_LIST_ITEM_QUANTITY_KEY=testSearchTerm"),
+                method = HttpMethod.Get
+            )
+            val response = Response(
+                status = HttpStatusCode.InternalServerError,
+                headers = Headers.Empty,
+                originalRequest = request,
+                bodyAsText = "{}"
+            )
+
+            val exception = SdkException.FailedRequestException(response)
+            val failureResult = Result.failure<Response>(exception)
+            everySuspend { mockRecommendationRequestFactory.create(searchEvent) } returns request
+            everySuspend { mockNetworkClient.send(request) } returns failureResult
+
+            val sdkEvents = backgroundScope.async {
+                onlineSdkEventsFlow.take(1).toList()
+            }
+
+            onlineSdkEventsFlow.emit(searchEvent)
+
+            advanceUntilIdle()
+
+            sdkEvents.await().size shouldBe 1
+            verifySuspend {
+                mockSdkEventManager.emitEvent(
+                    SdkEvent.Internal.Sdk.Answer.Response(
+                        searchEvent.id,
+                        failureResult
+                    )
+                )
+            }
+        }
+
+    @Test
+    fun testHandleFailure_trackEvent_shouldEmitFailureResponse_whenReceivingUnknownFailedRequestExceptionResponse() =
+        runTest {
+            createRecommendationClient(backgroundScope).register()
+            val searchEvent = SdkEvent.External.RecommendationTrackEvent.Search("testSearchTerm")
+            val request = UrlRequest(
+                url = Url("$RECOMMENDATION_BASE_URL?$CART_LIST_ITEM_QUANTITY_KEY=testSearchTerm"),
+                method = HttpMethod.Get
+            )
+            val response = Response(
+                status = HttpStatusCode.PaymentRequired,
+                headers = Headers.Empty,
+                originalRequest = request,
+                bodyAsText = "{}"
+            )
+
+            val exception = SdkException.FailedRequestException(response)
+            val failureResult = Result.failure<Response>(exception)
+            everySuspend { mockRecommendationRequestFactory.create(searchEvent) } returns request
+            everySuspend { mockNetworkClient.send(request) } returns failureResult
+
+            val sdkEvents = backgroundScope.async {
+                onlineSdkEventsFlow.take(1).toList()
+            }
+
+            onlineSdkEventsFlow.emit(searchEvent)
+
+            advanceUntilIdle()
+
+            sdkEvents.await().size shouldBe 1
+            verifySuspend {
+                mockSdkEventManager.emitEvent(
+                    SdkEvent.Internal.Sdk.Answer.Response(
+                        searchEvent.id,
+                        failureResult
+                    )
+                )
+            }
+        }
+
+    @Test
+    fun testHandleFailure_trackEvent_shouldEmitFailureResponse_whenReceivingUnknownErrorResponse() =
+        runTest {
+            createRecommendationClient(backgroundScope).register()
+            val searchEvent = SdkEvent.External.RecommendationTrackEvent.Search("testSearchTerm")
+            val request = UrlRequest(
+                url = Url("$RECOMMENDATION_BASE_URL?$CART_LIST_ITEM_QUANTITY_KEY=testSearchTerm"),
+                method = HttpMethod.Get
+            )
+
+            val exception = SdkException.SdkDisabledException("SDK is disabled!")
+            val failureResult = Result.failure<Response>(exception)
+            everySuspend { mockRecommendationRequestFactory.create(searchEvent) } returns request
+            everySuspend { mockNetworkClient.send(request) } returns failureResult
+
+            val sdkEvents = backgroundScope.async {
+                onlineSdkEventsFlow.take(1).toList()
+            }
+
+            onlineSdkEventsFlow.emit(searchEvent)
+
+            advanceUntilIdle()
+
+            sdkEvents.await().size shouldBe 1
+            verifySuspend {
+                mockSdkEventManager.emitEvent(
+                    SdkEvent.Internal.Sdk.Answer.Response(
+                        searchEvent.id,
+                        failureResult
+                    )
+                )
+            }
+        }
+
+    @Test
+    fun testHandleFailure_requestRecommendation_shouldEmitFailureResponse_whenReceiving400Response() =
         runTest {
             createRecommendationClient(backgroundScope).register()
             val requestRecommendation = SdkEvent.Internal.Sdk.RequestRecommendation(options = RecommendationOptions(
@@ -368,7 +611,7 @@ class RecommendationClientTests {
         }
 
     @Test
-    fun testHandleRequestRecommendationFailure_shouldEmitFailureResponse_whenReceiving401Response() =
+    fun testHandleFailure_requestRecommendation_shouldEmitFailureResponse_whenReceiving401Response() =
         runTest {
             createRecommendationClient(backgroundScope).register()
             val requestRecommendation = SdkEvent.Internal.Sdk.RequestRecommendation(options = RecommendationOptions(
@@ -408,7 +651,7 @@ class RecommendationClientTests {
         }
 
     @Test
-    fun testHandleRequestRecommendationFailure_shouldLog_andEmitMissingRecommendationConfigurationFailureResponse_whenReceiving404Response() =
+    fun testHandleFailure_requestRecommendation_shouldLog_andEmitMissingRecommendationConfigurationFailureResponse_whenReceiving404Response() =
         runTest {
             createRecommendationClient(backgroundScope).register()
             val requestRecommendation = SdkEvent.Internal.Sdk.RequestRecommendation(options = RecommendationOptions(
@@ -454,7 +697,7 @@ class RecommendationClientTests {
         }
 
     @Test
-    fun testHandleRequestRecommendationFailure_shouldEmitFailureResponse_whenReceiving500Response() =
+    fun testHandleFailure_requestRecommendation_shouldEmitFailureResponse_whenReceiving500Response() =
         runTest {
             createRecommendationClient(backgroundScope).register()
             val requestRecommendation = SdkEvent.Internal.Sdk.RequestRecommendation(options = RecommendationOptions(
@@ -494,7 +737,7 @@ class RecommendationClientTests {
         }
 
     @Test
-    fun testHandleRequestRecommendationFailure_shouldEmitFailureResponse_whenReceivingUnknownFailedRequestExceptionResponse() =
+    fun testHandleFailure_requestRecommendation_shouldEmitFailureResponse_whenReceivingUnknownFailedRequestExceptionResponse() =
         runTest {
             createRecommendationClient(backgroundScope).register()
             val requestRecommendation = SdkEvent.Internal.Sdk.RequestRecommendation(options = RecommendationOptions(
@@ -534,7 +777,7 @@ class RecommendationClientTests {
         }
 
     @Test
-    fun testHandleRequestRecommendationFailure_shouldEmitFailureResponse_whenReceivingUnknownErrorResponse() =
+    fun testHandleFailure_requestRecommendation_shouldEmitFailureResponse_whenReceivingUnknownErrorResponse() =
         runTest {
             createRecommendationClient(backgroundScope).register()
             val requestRecommendation = SdkEvent.Internal.Sdk.RequestRecommendation(options = RecommendationOptions(

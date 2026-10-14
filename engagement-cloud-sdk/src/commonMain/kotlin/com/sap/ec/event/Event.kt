@@ -93,7 +93,9 @@ sealed interface OnlineSdkEvent : SdkEvent {
     }
 }
 
-sealed interface RecommendationEvent
+sealed interface RecommendationEvent {
+    val id: String
+}
 
 internal suspend fun List<OnlineSdkEvent>.ack(eventsDao: EventsDaoApi, sdkLogger: Logger) {
     this.forEach {
