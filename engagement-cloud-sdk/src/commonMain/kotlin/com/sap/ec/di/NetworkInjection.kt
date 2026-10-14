@@ -110,7 +110,7 @@ internal object NetworkInjection {
                 clientExceptionHandler = get(),
                 urlFactoryApi = get(),
                 sdkEventManager = get(),
-                remoteConfigResponseHandler = get(),
+                remoteConfigHandler = get(),
                 applicationScope = get(named(CoroutineScopeTypes.Application)),
                 eventsDao = get(),
                 crypto = get(),
