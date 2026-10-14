@@ -2,6 +2,7 @@ package com.sap.ec.networking.clients.recommendation
 
 import com.sap.ec.core.channel.SdkEventManagerApi
 import com.sap.ec.core.db.events.EventsDaoApi
+import com.sap.ec.core.exceptions.SdkException
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.clients.NetworkClientApi
 import com.sap.ec.core.networking.model.Response
@@ -9,6 +10,7 @@ import com.sap.ec.recommendation.store.RecommendationCartStorageUpdaterApi
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.networking.clients.EventBasedClientApi
 import com.sap.ec.recommendation.networking.RecommendationRequestFactoryApi
+import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.filterIsInstance
@@ -80,15 +82,70 @@ internal class RecommendationClient(
                             )
                         },
                         onFailure = { exception ->
-                            sdkEventManager.emitEvent(
-                                SdkEvent.Internal.Sdk.Answer.Response(
-                                    event.id,
-                                    Result.failure<Response>(exception)
-                                )
-                            )
+                            handleRequestRecommendationFailure(exception, event)
                         }
                     )
                 }
+        }
+    }
+
+    private suspend fun handleRequestRecommendationFailure(exception: Throwable, event: SdkEvent.Internal.Sdk.RequestRecommendation) {
+        if (exception is SdkException.FailedRequestException) {
+            when (exception.response.status) {
+                HttpStatusCode.BadRequest -> {
+                    sdkLogger.error("recommendation request failed with 400", exception)
+                    sdkEventManager.emitEvent(
+                        SdkEvent.Internal.Sdk.Answer.Response(
+                            originId = event.id,
+                            Result.failure<Response>(SdkException.InvalidRecommendationConfigurationException())
+                        )
+                    )
+                }
+                HttpStatusCode.Unauthorized -> {
+                    sdkLogger.debug("recommendation request failed with 401", exception)
+                    sdkEventManager.emitEvent(
+                        SdkEvent.Internal.Sdk.Answer.Response(
+                            originId = event.id,
+                            Result.failure<Response>(exception)
+                        )
+                    )
+                }
+                HttpStatusCode.NotFound -> {
+                    sdkLogger.error("recommendation request failed with 404", exception)
+                    sdkEventManager.emitEvent(
+                        SdkEvent.Internal.Sdk.Answer.Response(
+                            originId = event.id,
+                            Result.failure<Response>(SdkException.MissingRecommendationConfigurationException())
+                        )
+                    )
+                }
+                HttpStatusCode.InternalServerError -> {
+                    sdkLogger.debug("recommendation request failed with 500", exception)
+                    sdkEventManager.emitEvent(
+                        SdkEvent.Internal.Sdk.Answer.Response(
+                            originId = event.id,
+                            Result.failure<Response>(exception)
+                        )
+                    )
+                }
+                else -> {
+                    sdkLogger.debug("recommendation request failed", exception)
+                    sdkEventManager.emitEvent(
+                        SdkEvent.Internal.Sdk.Answer.Response(
+                            originId = event.id,
+                            Result.failure<Response>(exception)
+                        )
+                    )
+                }
+            }
+        } else {
+            sdkLogger.debug("recommendation request failed", exception)
+            sdkEventManager.emitEvent(
+                SdkEvent.Internal.Sdk.Answer.Response(
+                    originId = event.id,
+                    Result.failure<Exception>(exception)
+                )
+            )
         }
     }
 }

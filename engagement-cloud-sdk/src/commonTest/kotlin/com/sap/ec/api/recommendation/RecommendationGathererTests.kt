@@ -1,6 +1,6 @@
 package com.sap.ec.api.recommendation
 
-import com.sap.ec.core.exceptions.SdkException.RecommendationApiNotReady
+import com.sap.ec.core.exceptions.SdkException.RecommendationApiNotReadyException
 import com.sap.ec.core.log.Logger
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.recommendation.models.requestRecommendation.RecommendationLogic
@@ -32,7 +32,7 @@ class RecommendationGathererTests {
                 RecommendationLogic.Home
             )
         )
-        assertFailsWith<RecommendationApiNotReady> {
+        assertFailsWith<RecommendationApiNotReadyException> {
             recommendationGatherer.requestRecommendation(event)
         }
     }

@@ -16,7 +16,9 @@ sealed class SdkException(message: String) : RuntimeException(message) {
     class DecryptionFailedException(message: String): SdkException(message)
     class ServiceWorkerUnavailableException(message: String): SdkException(message)
     class PushManagerUnavailableException(message: String): SdkException(message)
-    class MissingEventUrl(message: String = "Event URL is missing!"): SdkException(message)
+    class MissingEventUrlException(message: String = "Event URL is missing!"): SdkException(message)
     class ContactTokenNotFoundException(message: String): SdkException(message)
-    class RecommendationApiNotReady(message: String = "Recommendation API not ready!"): SdkException(message)
+    class RecommendationApiNotReadyException(message: String = "Recommendation API not ready!"): SdkException(message)
+    class MissingRecommendationConfigurationException(message: String = "Missing recommendation configuration!"): SdkException(message)
+    class InvalidRecommendationConfigurationException(message: String = "There's a problem with your recommendation configuration!"): SdkException(message)
 }
