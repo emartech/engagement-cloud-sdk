@@ -2,6 +2,7 @@ package com.sap.ec.api.recommendation
 
 import com.sap.ec.api.recommendation.model.JsProduct
 import com.sap.ec.event.SdkEvent
+import com.sap.ec.recommendation.models.FeatureRecommendation
 import com.sap.ec.recommendation.models.RecommendationResult
 import com.sap.ec.recommendation.models.product.Product
 import com.sap.ec.recommendation.models.requestRecommendation.RecommendationLogic
@@ -72,26 +73,28 @@ class JsRecommendationTests {
     }
 
     @Test
-    fun requestRecommendation_shouldReturn_mapOfFeatures_andJsRecommendationResults() = runTest {
-        val recommendationResultMap = mapOf(
-            FEATURE to RecommendationResult(
-                FEATURE,
-                topicLabel = TOPIC,
-                hasMore = false,
-                merchants = listOf(MERCHANT),
-                products = listOf(product1, product2)
+    fun requestRecommendation_shouldReturn_JsRecommendationResult_withFeatures() = runTest {
+        val recommendationResult = RecommendationResult(
+            mapOf(
+                FEATURE to FeatureRecommendation(
+                    FEATURE,
+                    topicLabel = TOPIC,
+                    hasMore = false,
+                    merchants = listOf(MERCHANT),
+                    products = listOf(product1, product2)
+                )
             )
         )
 
         everySuspend { mockRecommendation.requestRecommendation(any()) } returns Result.success(
-            recommendationResultMap
+            recommendationResult
         )
 
         val result = jsRecommendation.requestRecommendation(testRequestRecommendationEvent)
 
-        result.size shouldBe 1
+        result.recommendationsByFeature.size shouldBe 1
 
-        with(result[FEATURE]) {
+        with(result.recommendationsByFeature[FEATURE]) {
             this?.let {
                 featureName shouldBe FEATURE
                 topicLabel shouldBe TOPIC

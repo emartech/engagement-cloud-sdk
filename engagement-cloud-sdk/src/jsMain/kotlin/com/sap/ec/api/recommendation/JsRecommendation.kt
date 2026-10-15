@@ -1,24 +1,16 @@
 package com.sap.ec.api.recommendation
 
 import com.sap.ec.api.recommendation.model.JsRecommendationResult
-import com.sap.ec.api.recommendation.model.toJSRecommendationResult
+import com.sap.ec.api.recommendation.model.toJsRecommendationResult
 import com.sap.ec.event.SdkEvent
-import com.sap.ec.recommendation.models.requestRecommendation.RecommendationLogic
-import com.sap.ec.recommendation.models.requestRecommendation.RecommendationOptions
 
 internal class JsRecommendation(
     private val recommendation: RecommendationApi
 ) : JsRecommendationApi {
-    override suspend fun requestRecommendation(event: SdkEvent.Internal.Sdk.RequestRecommendation): Map<String, JsRecommendationResult> {
+    override suspend fun requestRecommendation(event: SdkEvent.Internal.Sdk.RequestRecommendation): JsRecommendationResult {
         return recommendation.requestRecommendation(
-            SdkEvent.Internal.Sdk.RequestRecommendation(
-                options = RecommendationOptions(
-                    RecommendationLogic.Home
-                )
-            )
+            event.options
         ).getOrThrow()
-            .mapValues { recommendationResultEntry ->
-                recommendationResultEntry.value.toJSRecommendationResult()
-            }
+            .toJsRecommendationResult()
     }
 }

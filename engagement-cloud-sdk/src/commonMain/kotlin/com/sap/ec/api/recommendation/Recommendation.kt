@@ -22,7 +22,7 @@ internal class Recommendation<Logging : RecommendationInstance, Gatherer : Recom
     override suspend fun requestRecommendation(
         recommendationOptions: RecommendationOptions,
         contextEvent: TrackedEvent?
-    ): Result<Map<String, RecommendationResult>> =
+    ): Result<RecommendationResult> =
         runCatchingWithoutCancellation {
             withContext(sdkContext.sdkDispatcher) {
                 activeInstance<RecommendationInternalApi>().requestRecommendation(

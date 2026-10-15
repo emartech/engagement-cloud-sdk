@@ -3,6 +3,7 @@ package com.sap.ec.networking.clients.recommendation
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.networking.model.UrlRequest
+import com.sap.ec.recommendation.models.FeatureRecommendation
 import com.sap.ec.recommendation.models.RecommendationResult
 import com.sap.ec.recommendation.models.product.Product
 import com.sap.ec.util.JsonUtil
@@ -93,7 +94,7 @@ class RecommendationResponseMapperTests {
     }
 
     @Test
-    fun map_should_map_recommendationResponse_withoutCustomFields_into_RecommendationResultMap() =
+    fun map_should_map_recommendationResponse_withoutCustomFields_into_RecommendationResult() =
         runTest {
             val recommendationResponse = Response(
                 originalRequest = UrlRequest(Url("test.com"), HttpMethod.Get),
@@ -147,7 +148,7 @@ class RecommendationResponseMapperTests {
         """.trimIndent()
             )
             val expectedResult = mapOf(
-                "HOME_1" to RecommendationResult(
+                "HOME_1" to FeatureRecommendation(
                     featureName = "HOME_1",
                     topicLabel = "WOMEN",
                     hasMore = false,
@@ -158,11 +159,11 @@ class RecommendationResponseMapperTests {
 
             val result = recommendationResponseMapper.map(recommendationResponse)
 
-            result shouldBe expectedResult
+            result shouldBe RecommendationResult(expectedResult)
         }
 
     @Test
-    fun map_should_map_recommendationResponse_into_RecommendationResultMap_withCustomFieldsIncluded() =
+    fun map_should_map_recommendationResponse_into_RecommendationResult_withCustomFieldsIncluded() =
         runTest {
             val recommendationResponse = Response(
                 originalRequest = UrlRequest(Url("test.com"), HttpMethod.Get),
@@ -230,7 +231,7 @@ class RecommendationResponseMapperTests {
             """.trimIndent()
             )
             val expectedResult = mapOf(
-                "HOME_1" to RecommendationResult(
+                "HOME_1" to FeatureRecommendation(
                     featureName = "HOME_1",
                     topicLabel = "WOMEN",
                     hasMore = false,
@@ -241,11 +242,11 @@ class RecommendationResponseMapperTests {
 
             val result = recommendationResponseMapper.map(recommendationResponse)
 
-            result shouldBe expectedResult
+            result shouldBe RecommendationResult(expectedResult)
         }
 
     @Test
-    fun map_should_map_recommendationResponse_into_RecommendationResultMap_withCustomFieldsIncluded_when_multipleFeaturesReceived() =
+    fun map_should_map_recommendationResponse_into_RecommendationResult_withCustomFieldsIncluded_when_multipleFeaturesReceived() =
         runTest {
             val recommendationResponse = Response(
                 originalRequest = UrlRequest(Url("test.com"), HttpMethod.Get),
@@ -334,14 +335,14 @@ class RecommendationResponseMapperTests {
         """.trimIndent()
             )
             val expectedResult = mapOf(
-                "HOME_1" to RecommendationResult(
+                "HOME_1" to FeatureRecommendation(
                     featureName = "HOME_1",
                     topicLabel = "WOMEN",
                     hasMore = false,
                     merchants = listOf("1DF86BF95CBE8F19"),
                     products = listOf(PRODUCT_1_WITH_CUSTOM_FIELDS, PRODUCT_2_WITH_CUSTOM_FIELDS)
                 ),
-                "HOME_2" to RecommendationResult(
+                "HOME_2" to FeatureRecommendation(
                     featureName = "HOME_2",
                     topicLabel = null,
                     hasMore = true,
@@ -368,7 +369,7 @@ class RecommendationResponseMapperTests {
 
             val result = recommendationResponseMapper.map(recommendationResponse)
 
-            result shouldBe expectedResult
+            result shouldBe RecommendationResult(expectedResult)
         }
 
     @Test
@@ -434,7 +435,7 @@ class RecommendationResponseMapperTests {
             )
 
             val expectedResult = mapOf(
-                "HOME_1" to RecommendationResult(
+                "HOME_1" to FeatureRecommendation(
                     featureName = "HOME_1",
                     topicLabel = "WOMEN",
                     hasMore = false,
@@ -445,12 +446,12 @@ class RecommendationResponseMapperTests {
 
             val result = recommendationResponseMapper.map(recommendationResponse)
 
-            result shouldBe expectedResult
+            result shouldBe RecommendationResult(expectedResult)
             verifySuspend { mockLogger.info(any<String>()) }
         }
 
     @Test
-    fun map_shouldReturnEmptyMap_andLog_when_featuresAreEmpty() = runTest {
+    fun map_shouldReturnEmptyRecommendationResult_andLog_when_featuresAreEmpty() = runTest {
         val recommendationResponse = Response(
             originalRequest = UrlRequest(Url("test.com"), HttpMethod.Get),
             status = HttpStatusCode.OK,
@@ -481,12 +482,12 @@ class RecommendationResponseMapperTests {
 
         val result = recommendationResponseMapper.map(recommendationResponse)
 
-        result shouldBe emptyMap()
+        result shouldBe RecommendationResult(emptyMap())
         verifySuspend { mockLogger.info(any<String>()) }
     }
 
     @Test
-    fun map_shouldReturnEmptyMap_andLog_when_featuresAreMissing() = runTest {
+    fun map_shouldReturnEmptyRecommendationResult_andLog_when_featuresAreMissing() = runTest {
         val recommendationResponse = Response(
             originalRequest = UrlRequest(Url("test.com"), HttpMethod.Get),
             status = HttpStatusCode.OK,
@@ -516,12 +517,12 @@ class RecommendationResponseMapperTests {
 
         val result = recommendationResponseMapper.map(recommendationResponse)
 
-        result shouldBe emptyMap()
+        result shouldBe RecommendationResult(emptyMap())
         verifySuspend { mockLogger.info(any<String>()) }
     }
 
     @Test
-    fun map_shouldReturnEmptyRecommendationResults_when_noProductsReturnedForTheSearchCriteria() =
+    fun map_shouldReturnFeatureRecommendationWithEmptyProducts_when_noProductsReturnedForTheSearchCriteria() =
         runTest {
             val recommendationResponse = Response(
                 originalRequest = UrlRequest(Url("test.com"), HttpMethod.Get),
@@ -544,7 +545,7 @@ class RecommendationResponseMapperTests {
             )
 
             val expectedResult = mapOf(
-                "HOME_1" to RecommendationResult(
+                "HOME_1" to FeatureRecommendation(
                     featureName = "HOME_1",
                     topicLabel = null,
                     hasMore = false,
@@ -555,7 +556,7 @@ class RecommendationResponseMapperTests {
 
             val result = recommendationResponseMapper.map(recommendationResponse)
 
-            result shouldBe expectedResult
+            result shouldBe RecommendationResult(expectedResult)
         }
 
     @Test
@@ -619,7 +620,7 @@ class RecommendationResponseMapperTests {
         )
 
         val expectedResult = mapOf(
-            "HOME_1" to RecommendationResult(
+            "HOME_1" to FeatureRecommendation(
                 featureName = "HOME_1",
                 topicLabel = "WOMEN",
                 hasMore = false,
@@ -630,11 +631,11 @@ class RecommendationResponseMapperTests {
 
         val result = recommendationResponseMapper.map(recommendationResponse)
 
-        result shouldBe expectedResult
+        result shouldBe RecommendationResult(expectedResult)
     }
 
     @Test
-    fun map_shouldReturnRecommendationResultWithoutCohort_when_responseDoesntContainCohort() = runTest {
+    fun map_shouldReturnFeatureRecommendationWithoutCohort_when_responseDoesntContainCohort() = runTest {
         val recommendationResponse = Response(
             originalRequest = UrlRequest(Url("test.com"), HttpMethod.Get),
             status = HttpStatusCode.OK,
@@ -673,7 +674,7 @@ class RecommendationResponseMapperTests {
         """.trimIndent()
         )
         val expectedResult = mapOf(
-            "HOME_1" to RecommendationResult(
+            "HOME_1" to FeatureRecommendation(
                 featureName = "HOME_1",
                 topicLabel = "WOMEN",
                 hasMore = false,
@@ -684,11 +685,11 @@ class RecommendationResponseMapperTests {
 
         val result = recommendationResponseMapper.map(recommendationResponse)
 
-        result shouldBe expectedResult
+        result shouldBe RecommendationResult(expectedResult)
     }
 
     @Test
-    fun map_shouldReturnEmptyMap_andLog_when_MandatoryItemFieldIsMissingFromFeature_itemsFromFeaturesAreMissing() =
+    fun map_shouldReturnEmptyRecommendationResult_andLog_when_MandatoryItemFieldIsMissingFromFeature_itemsFromFeaturesAreMissing() =
         runTest {
             val recommendationResponse = Response(
                 originalRequest = UrlRequest(Url("test.com"), HttpMethod.Get),
@@ -740,7 +741,7 @@ class RecommendationResponseMapperTests {
 
             val result = recommendationResponseMapper.map(recommendationResponse)
 
-            result shouldBe emptyMap()
+            result shouldBe RecommendationResult(emptyMap())
             verifySuspend { mockLogger.info(any<String>()) }
         }
 

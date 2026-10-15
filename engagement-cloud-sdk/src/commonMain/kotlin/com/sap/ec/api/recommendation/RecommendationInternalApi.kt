@@ -8,5 +8,5 @@ internal interface RecommendationInternalApi {
     suspend fun requestRecommendation(
         recommendationOptions: RecommendationOptions,
         contextEvent: TrackedEvent? = null
-    ): Map<String, RecommendationResult>
+    ): RecommendationResult
 }

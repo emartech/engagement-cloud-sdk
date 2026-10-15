@@ -5,6 +5,7 @@ import com.sap.ec.core.channel.SdkEventWaiterApi
 import com.sap.ec.core.providers.InstantProvider
 import com.sap.ec.core.providers.UuidProviderApi
 import com.sap.ec.event.SdkEvent
+import com.sap.ec.recommendation.models.FeatureRecommendation
 import com.sap.ec.recommendation.models.RecommendationResult
 import com.sap.ec.recommendation.models.product.Product
 import com.sap.ec.recommendation.models.requestRecommendation.RecommendationLogic
@@ -62,28 +63,29 @@ class RecommendationInternalTests {
     }
 
     @Test
-    fun testRequestRecommendation_shouldReturnMappedRecommendationResults_onSuccess() = runTest {
-        val expectedRecommendationResult: Map<String, RecommendationResult> = mapOf(
-            "feature_1" to RecommendationResult(
-                "feature_1",
-                topicLabel = "topicLabel",
-                hasMore = false,
-                listOf("testMerchant"),
-                listOf(
-                    Product(
-                        productId = "p1",
-                        title = "Product 1",
-                        linkUrl = "https://example.com/p1"
+    fun testRequestRecommendation_shouldReturnMappedRecommendationResult_onSuccess() = runTest {
+        val expectedRecommendationResult = RecommendationResult(
+            mapOf(
+                "feature_1" to FeatureRecommendation(
+                    "feature_1",
+                    topicLabel = "topicLabel",
+                    hasMore = false,
+                    listOf("testMerchant"),
+                    listOf(
+                        Product(
+                            productId = "p1",
+                            title = "Product 1",
+                            linkUrl = "https://example.com/p1"
+                        )
                     )
                 )
             )
-
         )
         val successResponse = SdkEvent.Internal.Sdk.Answer.Response(
             originId = "any",
             result = Result.success(expectedRecommendationResult)
         )
-        everySuspend { mockWaiter.await<Map<String, RecommendationResult>>() } returns successResponse
+        everySuspend { mockWaiter.await<RecommendationResult>() } returns successResponse
         everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mockWaiter
 
         val result = recommendationInternal.requestRecommendation(
@@ -105,27 +107,28 @@ class RecommendationInternalTests {
 
     @Test
     fun testRequestRecommendation_shouldOmitContextEvent_ifItWasNull() = runTest {
-        val recommendationResult: Map<String, RecommendationResult> = mapOf(
-            "feature_1" to RecommendationResult(
-                "feature_1",
-                topicLabel = "topicLabel",
-                hasMore = false,
-                listOf("testMerchant"),
-                listOf(
-                    Product(
-                        productId = "p1",
-                        title = "Product 1",
-                        linkUrl = "https://example.com/p1"
+        val recommendationResult = RecommendationResult(
+            mapOf(
+                "feature_1" to FeatureRecommendation(
+                    "feature_1",
+                    topicLabel = "topicLabel",
+                    hasMore = false,
+                    listOf("testMerchant"),
+                    listOf(
+                        Product(
+                            productId = "p1",
+                            title = "Product 1",
+                            linkUrl = "https://example.com/p1"
+                        )
                     )
                 )
             )
-
         )
         val successResponse = SdkEvent.Internal.Sdk.Answer.Response(
             originId = "any",
             result = Result.success(recommendationResult)
         )
-        everySuspend { mockWaiter.await<Map<String, RecommendationResult>>() } returns successResponse
+        everySuspend { mockWaiter.await<RecommendationResult>() } returns successResponse
         everySuspend { mockSdkEventDistributor.registerEvent(capture(eventSlot)) } returns mockWaiter
 
         recommendationInternal.requestRecommendation(recommendationOptions, null)
@@ -136,13 +139,13 @@ class RecommendationInternalTests {
     }
 
     @Test
-    fun testRequestRecommendation_shouldReturnEmptyMap_onFailure() = runTest {
+    fun testRequestRecommendation_shouldReturnEmptyRecommendationResult_onFailure() = runTest {
         val failureResponse =
-            SdkEvent.Internal.Sdk.Answer.Response<Map<String, RecommendationResult>>(
+            SdkEvent.Internal.Sdk.Answer.Response<RecommendationResult>(
                 originId = "any",
                 result = Result.failure(Exception("test error"))
             )
-        everySuspend { mockWaiter.await<Map<String, RecommendationResult>>() } returns failureResponse
+        everySuspend { mockWaiter.await<RecommendationResult>() } returns failureResponse
         everySuspend { mockSdkEventDistributor.registerEvent(any()) } returns mockWaiter
 
         val result = recommendationInternal.requestRecommendation(
@@ -150,6 +153,6 @@ class RecommendationInternalTests {
             recommendationTrackEvent
         )
 
-        result shouldBe mapOf()
+        result shouldBe RecommendationResult(emptyMap())
     }
 }

@@ -11,6 +11,7 @@ import com.sap.ec.event.OnlineSdkEvent
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.networking.clients.error.ClientExceptionHandler
 import com.sap.ec.recommendation.RecommendationConstants.CART_LIST_ITEM_QUANTITY_KEY
+import com.sap.ec.recommendation.models.FeatureRecommendation
 import com.sap.ec.recommendation.models.RecommendationResult
 import com.sap.ec.recommendation.models.product.Product
 import com.sap.ec.recommendation.models.requestRecommendation.RecommendationLogic
@@ -91,6 +92,8 @@ class RecommendationClientTests {
         )
 
         private val successResult = Result.success(successResponse)
+
+        private val sdkDisabledException = SdkException.SdkDisabledException("test exception")
     }
 
     @BeforeTest
@@ -187,17 +190,19 @@ class RecommendationClientTests {
                 url = Url(RECOMMENDATION_BASE_URL),
                 method = HttpMethod.Get
             )
-            val expectedProductResponse = mapOf(
-                "HOME_1" to RecommendationResult(
-                    featureName = "HOME_1",
-                    topicLabel = null,
-                    hasMore = false,
-                    merchants = listOf("testMerchants"),
-                    products = listOf(
-                        Product(
-                            "testId",
-                            "testTitle",
-                            "https://www.test.com"
+            val expectedProductResponse = RecommendationResult(
+                recommendationsByFeature = mapOf(
+                    "HOME_1" to FeatureRecommendation(
+                        featureName = "HOME_1",
+                        topicLabel = null,
+                        hasMore = false,
+                        merchants = listOf("testMerchants"),
+                        products = listOf(
+                            Product(
+                                "testId",
+                                "testTitle",
+                                "https://www.test.com"
+                            )
                         )
                     )
                 )
@@ -352,7 +357,7 @@ class RecommendationClientTests {
     fun testHandleFailure_trackEvent_shouldEmitFailure_andHandleEvent_whenReceivingNonFailedRequestException() =
         runTest {
             createRecommendationClient(backgroundScope).register()
-            val exception = SdkException.SdkDisabledException("SDK is disabled!")
+            val exception = sdkDisabledException
             everySuspend { mockRecommendationRequestFactory.create(searchEvent) } returns trackRequest
             everySuspend { mockNetworkClient.send(trackRequest) } returns Result.failure(exception)
 
@@ -414,10 +419,9 @@ class RecommendationClientTests {
     fun testHandleFailure_requestRecommendation_shouldEmitFailure_andLogEvent_whenReceivingNonFailedRequestException() =
         runTest {
             createRecommendationClient(backgroundScope).register()
-            val exception = SdkException.SdkDisabledException("SDK disabled")
             everySuspend { mockRecommendationRequestFactory.create(requestRecommendationEvent) } returns requestRecommendationUrlRequest
             everySuspend { mockNetworkClient.send(requestRecommendationUrlRequest) } returns Result.failure(
-                exception
+                sdkDisabledException
             )
 
             emitInternalAndAwait(requestRecommendationEvent) shouldBe 1
@@ -426,11 +430,11 @@ class RecommendationClientTests {
                 mockSdkEventManager.emitEvent(
                     SdkEvent.Internal.Sdk.Answer.Response(
                         requestRecommendationEvent.id,
-                        Result.failure<Response>(exception)
+                        Result.failure<Response>(sdkDisabledException)
                     )
                 )
                 mockClientExceptionHandler.handleException(
-                    exception,
+                    sdkDisabledException,
                     "exception while consuming RequestRecommendation events"
                 )
             }
@@ -440,8 +444,7 @@ class RecommendationClientTests {
     fun testHandleFailure_trackEvent_shouldEmitFailureResponse_andCallHandler_whenRequestFactoryThrows() =
         runTest {
             createRecommendationClient(backgroundScope).register()
-            val exception = SdkException.SdkDisabledException("test exception")
-            everySuspend { mockRecommendationRequestFactory.create(searchEvent) } throws exception
+            everySuspend { mockRecommendationRequestFactory.create(searchEvent) } throws sdkDisabledException
 
             emitOnlineAndAwait(searchEvent) shouldBe 1
 
@@ -449,11 +452,11 @@ class RecommendationClientTests {
                 mockSdkEventManager.emitEvent(
                     SdkEvent.Internal.Sdk.Answer.Response(
                         searchEvent.id,
-                        Result.failure<Response>(exception)
+                        Result.failure<Response>(sdkDisabledException)
                     )
                 )
                 mockClientExceptionHandler.handleException(
-                    exception,
+                    sdkDisabledException,
                     "exception while consuming RecommendationTrackEvent events",
                     searchEvent
                 )
@@ -468,8 +471,7 @@ class RecommendationClientTests {
     fun testHandleFailure_requestRecommendation_shouldEmitFailureResponse_andLog_whenRequestFactoryThrows() =
         runTest {
             createRecommendationClient(backgroundScope).register()
-            val exception = SdkException.SdkDisabledException("test exception")
-            everySuspend { mockRecommendationRequestFactory.create(requestRecommendationEvent) } throws exception
+            everySuspend { mockRecommendationRequestFactory.create(requestRecommendationEvent) } throws sdkDisabledException
 
             emitInternalAndAwait(requestRecommendationEvent) shouldBe 1
 
@@ -477,11 +479,11 @@ class RecommendationClientTests {
                 mockSdkEventManager.emitEvent(
                     SdkEvent.Internal.Sdk.Answer.Response(
                         requestRecommendationEvent.id,
-                        Result.failure<Response>(exception)
+                        Result.failure<Response>(sdkDisabledException)
                     )
                 )
                 mockClientExceptionHandler.handleException(
-                    exception,
+                    sdkDisabledException,
                     "exception while consuming RequestRecommendation events"
                 )
             }

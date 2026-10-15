@@ -12,7 +12,7 @@ internal class RecommendationGatherer(
     override suspend fun requestRecommendation(
         recommendationOptions: RecommendationOptions,
         contextEvent: TrackedEvent?
-    ): Map<String, RecommendationResult> {
+    ): RecommendationResult {
         sdkLogger.debug("RecommendationGatherer - requestRecommendation called on gatherer instance")
         throw RecommendationApiNotReadyException()
     }

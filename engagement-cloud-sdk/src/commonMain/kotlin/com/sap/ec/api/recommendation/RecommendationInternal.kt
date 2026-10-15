@@ -18,7 +18,7 @@ internal class RecommendationInternal(
     override suspend fun requestRecommendation(
         recommendationOptions: RecommendationOptions,
         contextEvent: TrackedEvent?
-    ): Map<String, RecommendationResult> {
+    ): RecommendationResult {
         val event = contextEvent?.let {
             it.toSdkEvent(
                 uuidProvider.provide(),
@@ -33,12 +33,12 @@ internal class RecommendationInternal(
                     contextEvent = event
                 )
 
-            ).await<Map<String, RecommendationResult>>()
+            ).await<RecommendationResult>()
         sdkLogger.debug("RecommendationInternal - requestRecommendation")
 
         return response.result.getOrElse {
             sdkLogger.info("RecommendationInternal - requestRecommendation failed")
-            mapOf()
+            RecommendationResult(emptyMap())
         }
     }
 

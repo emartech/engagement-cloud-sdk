@@ -12,7 +12,7 @@ class LoggingRecommendation(private val logger: Logger) : RecommendationInstance
     override suspend fun requestRecommendation(
         recommendationOptions: RecommendationOptions,
         contextEvent: TrackedEvent?
-    ): Map<String, RecommendationResult> {
+    ): RecommendationResult {
         val entry = LogEntry.createMethodNotAllowed(
             this, this::requestRecommendation.name, buildJsonObject {
                 put("options", recommendationOptions.toString())
@@ -20,7 +20,7 @@ class LoggingRecommendation(private val logger: Logger) : RecommendationInstance
             }
         )
         logger.debug(entry)
-        return mapOf()
+        return RecommendationResult(emptyMap())
     }
 
     override suspend fun activate() {
