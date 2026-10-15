@@ -114,6 +114,7 @@ internal object NetworkInjection {
                 recommendationResponseMapper = get(),
                 eventsDao = get(),
                 recommendationCartStorageUpdater = get(),
+                clientExceptionHandler = get(),
                 sdkLogger = get { parametersOf(RecommendationClient::class.simpleName) },
             )
         }
