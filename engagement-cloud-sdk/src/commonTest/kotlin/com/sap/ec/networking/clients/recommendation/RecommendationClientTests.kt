@@ -12,6 +12,7 @@ import com.sap.ec.event.SdkEvent
 import com.sap.ec.recommendation.models.product.Product
 import com.sap.ec.recommendation.store.RecommendationCartStorageUpdaterApi
 import com.sap.ec.recommendation.RecommendationConstants.CART_LIST_ITEM_QUANTITY_KEY
+import com.sap.ec.recommendation.models.FeatureRecommendation
 import com.sap.ec.recommendation.models.RecommendationResult
 import com.sap.ec.recommendation.models.requestRecommendation.RecommendationLogic
 import com.sap.ec.recommendation.models.requestRecommendation.RecommendationOptions
@@ -45,7 +46,6 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlin.test.BeforeTest
-import kotlin.test.Ignore
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -197,17 +197,19 @@ class RecommendationClientTests {
                 bodyAsText = "{}"
             )
             val successResult = Result.success(successResponse)
-            val expectedProductResponse = mapOf(
-                "HOME_1" to RecommendationResult(
-                    featureName = "HOME_1",
-                    topicLabel = null,
-                    hasMore = false,
-                    merchants = listOf("testMerchants"),
-                    products = listOf(
-                        Product(
-                            "testId",
-                            "testTitle",
-                            "https://www.test.com"
+            val expectedProductResponse = RecommendationResult(
+                mapOf(
+                    "HOME_1" to FeatureRecommendation(
+                        featureName = "HOME_1",
+                        topicLabel = null,
+                        hasMore = false,
+                        merchants = listOf("testMerchants"),
+                        products = listOf(
+                            Product(
+                                "testId",
+                                "testTitle",
+                                "https://www.test.com"
+                            )
                         )
                     )
                 )

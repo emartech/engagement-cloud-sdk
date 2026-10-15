@@ -2,6 +2,7 @@ package com.sap.ec.networking.clients.recommendation
 
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.model.Response
+import com.sap.ec.recommendation.models.FeatureRecommendation
 import com.sap.ec.recommendation.models.RecommendationResult
 import com.sap.ec.recommendation.models.product.Feature
 import com.sap.ec.recommendation.models.product.Product
@@ -20,23 +21,23 @@ class RecommendationResponseMapper(
         (0 until d.elementsCount).map { d.getElementName(it) }
     }
 
-    override suspend fun map(from: Response): Map<String, RecommendationResult> {
+    override suspend fun map(from: Response): RecommendationResult {
         val response = try {
             json.decodeFromString<RecommendationResponse>(from.bodyAsText)
         } catch (_: Exception) {
             sdkLogger.info("Failed to parse recommendation response body, response: $from")
-            return emptyMap()
+            return RecommendationResult(emptyMap())
         }
         val features = response.features
 
         if (features.isEmpty()) {
             sdkLogger.info("Features key is missing or features are empty in the recommendation response, response: $from")
-            return emptyMap()
+            return RecommendationResult(emptyMap())
         }
 
         val products = buildProductMap(response)
 
-        return buildResultMap(features, products, response.cohort)
+        return RecommendationResult(buildResultMap(features, products, response.cohort))
     }
 
     private suspend fun buildProductMap(response: RecommendationResponse): Map<String, Product> =
@@ -54,7 +55,7 @@ class RecommendationResponseMapper(
         features: Map<String, Feature>,
         products: Map<String, Product>,
         cohort: String?
-    ): Map<String, RecommendationResult> =
+    ): Map<String, FeatureRecommendation> =
         features.mapNotNull { (featureName, feature) ->
             if (feature.items == null) {
                 sdkLogger.info("Feature $featureName has no items and was omitted")
@@ -64,7 +65,7 @@ class RecommendationResponseMapper(
                 val featureProducts = feature.items.mapNotNull { item ->
                     products[item.id]?.copy(feature = featureName, cohort = cohort)
                 }
-                featureName to RecommendationResult(
+                featureName to FeatureRecommendation(
                     featureName = featureName,
                     topicLabel = feature.topicLabel,
                     hasMore = feature.hasMore,

@@ -6,5 +6,5 @@ import com.sap.ec.event.SdkEvent
 @OptIn(ExperimentalJsExport::class)
 @JsExport
 interface JsRecommendationApi {
-    suspend fun requestRecommendation(event: SdkEvent.Internal.Sdk.RequestRecommendation): Map<String, JsRecommendationResult>
+    suspend fun requestRecommendation(event: SdkEvent.Internal.Sdk.RequestRecommendation): JsRecommendationResult
 }

@@ -38,7 +38,6 @@ internal class RecommendationClient(
         applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
             sdkEventManager.onlineSdkEvents.filterIsInstance<SdkEvent.External.RecommendationTrackEvent>()
                 .collect { event ->
-                    // TODO: try catch
                     sdkLogger.debug("consume RecommendationTrackEvent events")
                     val request = recommendationRequestFactory.create(event)
                     recommendationNetworkClient.send(request).fold(
@@ -65,7 +64,6 @@ internal class RecommendationClient(
         applicationScope.launch(start = CoroutineStart.UNDISPATCHED) {
             sdkEventManager.sdkEventFlow.filterIsInstance<SdkEvent.Internal.Sdk.RequestRecommendation>()
                 .collect { event ->
-                    // TODO: try catch
                     sdkLogger.debug("consume RequestRecommendation events")
                     val request = recommendationRequestFactory.create(event)
                     recommendationNetworkClient.send(request).fold(

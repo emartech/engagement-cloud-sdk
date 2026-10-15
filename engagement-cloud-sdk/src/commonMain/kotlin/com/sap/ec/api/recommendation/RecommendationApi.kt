@@ -9,5 +9,5 @@ internal interface RecommendationApi: AutoRegisterable {
     suspend fun requestRecommendation(
         recommendationOptions: RecommendationOptions,
         contextEvent: TrackedEvent? = null
-    ): Result<Map<String, RecommendationResult>>
+    ): Result<RecommendationResult>
 }
