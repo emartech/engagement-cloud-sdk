@@ -37,9 +37,11 @@ internal class DefaultClientExceptionHandler(
         vararg events: OnlineSdkEvent
     ) {
         when (throwable) {
-            is FailedRequestException, is RetryLimitReachedException, is MissingApplicationCodeException -> events.forEach {
+            is FailedRequestException, is RetryLimitReachedException, is MissingApplicationCodeException ->  {
                 sdkLogger.error(errorMessage, throwable, isRemoteLog = false)
-                it.ack(eventsDao, sdkLogger)
+                events.forEach {
+                    it.ack(eventsDao, sdkLogger)
+                }
             }
 
             else -> {
