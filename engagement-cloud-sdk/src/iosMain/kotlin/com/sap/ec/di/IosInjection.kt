@@ -15,6 +15,8 @@ import com.sap.ec.api.inapp.IosInAppApi
 import com.sap.ec.api.push.IosPush
 import com.sap.ec.api.push.IosPushApi
 import com.sap.ec.api.push.PushApi
+import com.sap.ec.api.recommendation.IosRecommendation
+import com.sap.ec.api.recommendation.IosRecommendationApi
 import com.sap.ec.api.setup.IosSetup
 import com.sap.ec.api.setup.IosSetupApi
 import com.sap.ec.api.tracking.IosTracking
@@ -44,10 +46,10 @@ import com.sap.ec.core.providers.ClientIdProvider
 import com.sap.ec.core.providers.IosApplicationVersionProvider
 import com.sap.ec.core.providers.IosLanguageProvider
 import com.sap.ec.core.providers.LanguageProviderApi
-import com.sap.ec.core.providers.pagelocation.PageLocationProvider
-import com.sap.ec.core.providers.pagelocation.PageLocationProviderApi
 import com.sap.ec.core.providers.inputmode.InputModeProvider
 import com.sap.ec.core.providers.inputmode.InputModeProviderApi
+import com.sap.ec.core.providers.pagelocation.PageLocationProvider
+import com.sap.ec.core.providers.pagelocation.PageLocationProviderApi
 import com.sap.ec.core.providers.platform.PlatformCategoryProvider
 import com.sap.ec.core.providers.platform.PlatformCategoryProviderApi
 import com.sap.ec.core.state.State
@@ -103,6 +105,7 @@ internal object IosInjection {
     val iosModules = module {
         single<NSUserDefaults> { NSUserDefaults(StorageConstants.SUITE_NAME) }
         single<IosContactApi> { IosContact() }
+        single<IosRecommendationApi> { IosRecommendation(get()) }
         single<IosSetupApi> { IosSetup(get()) }
         single<IosPushApi> { IosPush() }
         single<IosTrackingApi> { IosTracking() }
