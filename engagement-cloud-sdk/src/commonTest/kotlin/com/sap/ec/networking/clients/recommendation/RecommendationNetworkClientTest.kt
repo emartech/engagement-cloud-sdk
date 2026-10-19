@@ -1,4 +1,4 @@
-package com.sap.ec.networking.clients
+package com.sap.ec.networking.clients.recommendation
 
 import com.sap.ec.core.exceptions.SdkException
 import com.sap.ec.core.networking.UserAgentProviderApi
