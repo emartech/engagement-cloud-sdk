@@ -16,13 +16,13 @@ import com.sap.ec.recommendation.models.requestRecommendation.RecommendationLogi
 import com.sap.ec.recommendation.models.requestRecommendation.RecommendationOptions
 
 internal class JsRecommendation(
-    private val recommendation: RecommendationApi
+    private val recommendationApi: RecommendationApi
 ) : JsRecommendationApi {
     override suspend fun requestRecommendation(
         recommendationOptions: JsRecommendationOptions,
         contextEvent: JsRecommendationEvent?
     ): JsRecommendationResult {
-        return recommendation.requestRecommendation(
+        return recommendationApi.requestRecommendation(
             recommendationOptions = recommendationOptions.toRecommendationOptions(),
             contextEvent = contextEvent?.let { parseRecommendationEvent(it) }
         ).getOrThrow().toJsRecommendationResult()

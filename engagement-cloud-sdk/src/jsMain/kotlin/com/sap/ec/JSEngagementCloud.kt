@@ -8,6 +8,7 @@ import com.sap.ec.api.events.JsApiEvent
 import com.sap.ec.api.events.SdkEventSubscription
 import com.sap.ec.api.events.SdkEventSubscriptionApi
 import com.sap.ec.api.push.JSPushApi
+import com.sap.ec.api.recommendation.JsRecommendationApi
 import com.sap.ec.api.setup.JsSetupApi
 import com.sap.ec.api.tracking.JSTrackingApi
 import com.sap.ec.di.CoroutineScopeTypes
@@ -49,6 +50,7 @@ object JSEngagementCloud {
     val push: JSPushApi by lazy { koin.get<JSPushApi>() }
     val deepLink: JSDeepLinkApi by lazy { koin.get<JSDeepLinkApi>() }
     val embeddedMessaging: JsEmbeddedMessagingApi by lazy { koin.get<JsEmbeddedMessagingApi>() }
+    val recommendation: JsRecommendationApi by lazy { koin.get<JsRecommendationApi>() }
 
     init {
         val isHtmlVersion = (window["engagementCloudHtmlVersion"] as? Boolean) ?: false

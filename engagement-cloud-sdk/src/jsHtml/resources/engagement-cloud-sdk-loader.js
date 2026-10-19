@@ -1,148 +1,162 @@
 (function (global) {
-    global.engagementCloudSdkLoaderUsed = true;
-    let engagementCloudSdkLoaded = false;
-    let sdkCore = null;
-    let calls = [];
-    let resolveLoaded;
-    const sdkLoaded = new Promise((resolve) => (resolveLoaded = resolve));
+  global.engagementCloudSdkLoaderUsed = true;
+  let engagementCloudSdkLoaded = false;
+  let sdkCore = null;
+  let calls = [];
+  let resolveLoaded;
+  const sdkLoaded = new Promise((resolve) => (resolveLoaded = resolve));
 
-    const sdkUrl = "https://emartech.github.io/engagement-cloud-sdk/latest/engagement-cloud-sdk.js";
-//     const currentSource = document.currentScript.src;
-//     const baseUrl = currentSource.substring(0, currentSource.lastIndexOf("/"));
-//     const sdkUrl = `${baseUrl}/engagement-cloud-sdk-html.js`;
+  const sdkUrl = "https://emartech.github.io/engagement-cloud-sdk/latest/engagement-cloud-sdk.js";
+  //     const currentSource = document.currentScript.src;
+  //     const baseUrl = currentSource.substring(0, currentSource.lastIndexOf("/"));
+  //     const sdkUrl = `${baseUrl}/engagement-cloud-sdk-html.js`;
 
-    global.EngagementCloud = {
-        loaded: sdkLoaded,
-        setup: createApiSegment("setup", [
-            "enable",
-            "disable",
-            "isEnabled",
-            "setOnContactLinkingFailedCallback",
-        ]),
-        config: createApiSegment("config", [
-            "getApplicationCode",
-            "getClientId",
-            "getLanguageCode",
-            "getApplicationVersion",
-            "getSdkVersion",
-            "getCurrentSdkState",
-            "changeApplicationCode",
-            "setLanguage",
-            "resetLanguage",
-            "getNotificationSettings",
-        ]),
-        contact: createApiSegment("contact", [
-            "link",
-            "linkAuthenticated",
-            "unlink",
-        ]),
-        event: createApiSegment("event", ["track"]),
-        push: createApiSegment("push", [
-            "subscribe",
-            "unsubscribe",
-            "isSubscribed",
-            "getPermissionState",
-        ]),
-        deepLink: createApiSegment("deepLink", ["track"]),
-        events: createApiSegment("events", [
-            "once",
-            "on",
-            "off",
-            "removeAllListeners",
-        ]),
-        embeddedMessaging: createApiSegment("embeddedMessaging", [
-            "getCategories",
-            "isUnreadFilterActive",
-            "getActiveCategoryFilters",
-            "filterUnreadOnly",
-            "filterByCategories",
-        ]),
+  global.EngagementCloud = {
+    loaded: sdkLoaded,
+    setup: createApiSegment("setup", [
+      "enable",
+      "disable",
+      "isEnabled",
+      "setOnContactLinkingFailedCallback",
+    ]),
+    config: createApiSegment("config", [
+      "getApplicationCode",
+      "getClientId",
+      "getLanguageCode",
+      "getApplicationVersion",
+      "getSdkVersion",
+      "getCurrentSdkState",
+      "changeApplicationCode",
+      "setLanguage",
+      "resetLanguage",
+      "getNotificationSettings",
+    ]),
+    contact: createApiSegment("contact", [
+      "link",
+      "linkAuthenticated",
+      "unlink",
+    ]),
+    event: createApiSegment("event", ["track"]),
+    push: createApiSegment("push", [
+      "subscribe",
+      "unsubscribe",
+      "isSubscribed",
+      "getPermissionState",
+    ]),
+    deepLink: createApiSegment("deepLink", ["track"]),
+    events: createApiSegment("events", [
+      "once",
+      "on",
+      "off",
+      "removeAllListeners",
+    ]),
+    embeddedMessaging: createApiSegment("embeddedMessaging", [
+      "getCategories",
+      "isUnreadFilterActive",
+      "getActiveCategoryFilters",
+      "filterUnreadOnly",
+      "filterByCategories",
+    ]),
 
-        registerEventListener: createApiSegment(null, "registerEventListener"),
+    registerEventListener: createApiSegment(null, "registerEventListener"),
+    recommendation: {
+      requestRecommendation: createRecommendationApi(),
+    },
+  };
+
+  const scriptTag = document.createElement("script");
+  scriptTag.src = sdkUrl;
+  scriptTag.async = true;
+  scriptTag.onload = async function () {
+    sdkCore = global["engagement-cloud-sdk"].EngagementCloud.getInstance();
+    resolveLoaded();
+    sdkCore
+      .initializeSdk()
+      .then(async () => {
+        engagementCloudSdkLoaded = true;
+        await replayCalls();
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+  scriptTag.onerror = function (error) {
+    console.error("SDK loading failed. Error: ", error);
+  };
+
+  document.head.appendChild(scriptTag);
+
+  function createApiMethods(apiSegment, methodName) {
+    return async function () {
+      let args = Array.prototype.slice.call(arguments);
+      if (engagementCloudSdkLoaded && sdkCore && calls.length === 0) {
+        const { target, apiMethod } = getTargetAndMethod(
+          apiSegment,
+          methodName,
+        );
+        return apiMethod.apply(target, args);
+      } else {
+        return new Promise((resolve, reject) => {
+          calls.push({
+            apiSegment: apiSegment,
+            method: methodName,
+            args: args,
+            timestamp: Date.now(),
+            resolve: resolve,
+            reject: reject,
+          });
+        });
+      }
     };
+  }
 
-    const scriptTag = document.createElement("script");
-    scriptTag.src = sdkUrl;
-    scriptTag.async = true;
-    scriptTag.onload = async function () {
-        sdkCore = global["engagement-cloud-sdk"].EngagementCloud.getInstance();
-        resolveLoaded();
-        sdkCore
-            .initializeSdk()
-            .then(async () => {
-                engagementCloudSdkLoaded = true;
-                await replayCalls();
-            })
-            .catch((error) => {
-                console.error(error);
-            });
+  function createApiSegment(apiSegment, methods) {
+    let gatherer = {};
+    for (let i = 0; i < methods.length; i++) {
+      gatherer[methods[i]] = createApiMethods(apiSegment, methods[i]);
+    }
+    return gatherer;
+  }
+
+  async function replayCalls() {
+    while (calls.length > 0) {
+      const call = calls.shift();
+      try {
+        const { target, apiMethod } = getTargetAndMethod(
+          call.apiSegment,
+          call.method,
+        );
+        const result = await apiMethod.apply(target, call.args);
+        call.resolve(result);
+      } catch (error) {
+        console.error("Error replaying call:", call, error);
+        call.reject(error);
+      }
+    }
+  }
+
+  function getTargetAndMethod(apiSegment, methodName) {
+    const target = apiSegment ? sdkCore[apiSegment] : sdkCore;
+    const method = target[methodName];
+    if (typeof method === "function") {
+      return {
+        target: apiSegment ? sdkCore[apiSegment] : sdkCore,
+        apiMethod: method,
+      };
+    } else {
+      console.error("No such method found: ", apiSegment + "." + methodName);
+      return undefined;
+    }
+  }
+
+  function createRecommendationApi() {
+    return async function () {
+      let args = Array.prototype.slice.call(arguments);
+      if (engagementCloudSdkLoaded && sdkCore && calls.length === 0) {
+        return sdkCore["recommendation"].requestRecommendation(args);
+      } else {
+        throw new Error("Recommendations are not available yet!");
+      }
     };
-    scriptTag.onerror = function (error) {
-        console.error("SDK loading failed. Error: ", error);
-    };
-
-    document.head.appendChild(scriptTag);
-
-    function createApiMethods(apiSegment, methodName) {
-        return async function () {
-            let args = Array.prototype.slice.call(arguments);
-            if (engagementCloudSdkLoaded && sdkCore && calls.length === 0) {
-                const {target, apiMethod} = getTargetAndMethod(
-                    apiSegment,
-                    methodName,
-                );
-                return apiMethod.apply(target, args);
-            } else {
-                return new Promise((resolve, reject) => {
-                    calls.push({
-                        apiSegment: apiSegment,
-                        method: methodName,
-                        args: args,
-                        timestamp: Date.now(),
-                        resolve: resolve,
-                        reject: reject,
-                    });
-                });
-            }
-        };
-    }
-
-    function createApiSegment(apiSegment, methods) {
-        let gatherer = {};
-        for (let i = 0; i < methods.length; i++) {
-            gatherer[methods[i]] = createApiMethods(apiSegment, methods[i]);
-        }
-        return gatherer;
-    }
-
-    async function replayCalls() {
-        while (calls.length > 0) {
-            const call = calls.shift();
-            try {
-                const {target, apiMethod} = getTargetAndMethod(
-                    call.apiSegment,
-                    call.method,
-                );
-                const result = await apiMethod.apply(target, call.args);
-                call.resolve(result);
-            } catch (error) {
-                console.error("Error replaying call:", call, error);
-                call.reject(error);
-            }
-        }
-    }
-
-    function getTargetAndMethod(apiSegment, methodName) {
-        const target = apiSegment ? sdkCore[apiSegment] : sdkCore;
-        const method = target[methodName];
-        if (typeof method === "function") {
-            return {
-                target: apiSegment ? sdkCore[apiSegment] : sdkCore,
-                apiMethod: method,
-            };
-        } else {
-            console.error("No such method found: ", apiSegment + "." + methodName);
-            return undefined;
-        }
-    }
+  }
 })(window);

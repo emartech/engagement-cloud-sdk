@@ -4,23 +4,18 @@ import com.sap.ec.api.config.ConfigApi
 import com.sap.ec.api.contact.ContactApi
 import com.sap.ec.api.deeplink.DeepLinkApi
 import com.sap.ec.api.embeddedmessaging.EmbeddedMessagingApi
+import com.sap.ec.api.event.model.EngagementCloudEvent
 import com.sap.ec.api.inapp.InAppApi
 import com.sap.ec.api.push.PushApi
+import com.sap.ec.api.recommendation.RecommendationApi
 import com.sap.ec.api.setup.SetupApi
 import com.sap.ec.di.EventFlowTypes
 import com.sap.ec.di.SdkKoinIsolationContext
 import com.sap.ec.di.SdkKoinIsolationContext.koin
-import com.sap.ec.api.event.model.EngagementCloudEvent
-import com.sap.ec.currentPlatform
-import com.sap.ec.di.CoroutineScopeTypes
 import com.sap.ec.init.InitOrganizerApi
 import com.sap.ec.tracking.TrackingApi
 import com.sap.ec.util.runCatchingWithoutCancellation
-import io.ktor.util.PlatformUtils
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 import org.koin.core.qualifier.named
 import kotlin.experimental.ExperimentalObjCRefinement
 import kotlin.native.HiddenFromObjC
@@ -106,4 +101,10 @@ object EngagementCloud {
      */
     val embeddedMessaging: EmbeddedMessagingApi
         get() = koin.get<EmbeddedMessagingApi>()
+
+    /**
+     * Provides access to the Recommendation API, which allows access to Recommendation feature.
+     */
+    val recommendation: RecommendationApi
+        get() = koin.get<RecommendationApi>()
 }
