@@ -6,6 +6,7 @@ import com.sap.ec.api.embeddedmessaging.EmbeddedMessagingApi
 import com.sap.ec.api.event.EventTrackerApi
 import com.sap.ec.api.inapp.InAppApi
 import com.sap.ec.api.push.PushApi
+import com.sap.ec.api.recommendation.RecommendationApi
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.state.State
 
@@ -16,6 +17,7 @@ internal class RegisterInstancesState(
     private val pushApi: PushApi,
     private val inAppApi: InAppApi,
     private val embeddedMessagingApi: EmbeddedMessagingApi,
+    private val recommendationApi: RecommendationApi,
     private val sdkLogger: Logger
 ) : State {
     override val name: String = "registerInstanceState"
@@ -31,6 +33,7 @@ internal class RegisterInstancesState(
         embeddedMessagingApi.registerOnContext()
         pushApi.registerOnContext()
         inAppApi.registerOnContext()
+        recommendationApi.registerOnContext()
 
         return Result.success(Unit)
     }

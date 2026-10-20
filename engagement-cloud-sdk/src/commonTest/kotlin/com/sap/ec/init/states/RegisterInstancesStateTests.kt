@@ -6,6 +6,7 @@ import com.sap.ec.api.embeddedmessaging.EmbeddedMessagingApi
 import com.sap.ec.api.event.EventTrackerApi
 import com.sap.ec.api.inapp.InAppApi
 import com.sap.ec.api.push.PushApi
+import com.sap.ec.api.recommendation.RecommendationApi
 import com.sap.ec.core.log.SdkLogger
 import dev.mokkery.MockMode
 import dev.mokkery.mock
@@ -23,6 +24,7 @@ class RegisterInstancesStateTests {
     private lateinit var mockInAppApi: InAppApi
     private lateinit var mockEmbeddedMessagingApi: EmbeddedMessagingApi
     private lateinit var mockConfigApi: ConfigApi
+    private lateinit var mockRecommendationApi: RecommendationApi
 
     @BeforeTest
     fun setup() {
@@ -32,6 +34,7 @@ class RegisterInstancesStateTests {
         mockConfigApi = mock(MockMode.autofill)
         mockEmbeddedMessagingApi = mock(MockMode.autofill)
         mockInAppApi = mock(MockMode.autofill)
+        mockRecommendationApi = mock(MockMode.autofill)
         registerInstancesState = RegisterInstancesState(
             mockEventTrackerApi,
             mockContactApi,
@@ -39,6 +42,7 @@ class RegisterInstancesStateTests {
             mockPushApi,
             mockInAppApi,
             mockEmbeddedMessagingApi,
+            mockRecommendationApi,
             SdkLogger("TestLoggerName", mock(MockMode.autofill), logConfigHolder = mock())
         )
     }

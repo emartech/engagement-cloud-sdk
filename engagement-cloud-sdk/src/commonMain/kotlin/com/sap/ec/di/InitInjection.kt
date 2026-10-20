@@ -41,6 +41,7 @@ internal object InitInjection {
                 pushApi = get(),
                 inAppApi = get(),
                 embeddedMessagingApi = get(),
+                recommendationApi = get(),
                 sdkLogger = get { parametersOf(RegisterInstancesState::class.simpleName) },
             )
         }
