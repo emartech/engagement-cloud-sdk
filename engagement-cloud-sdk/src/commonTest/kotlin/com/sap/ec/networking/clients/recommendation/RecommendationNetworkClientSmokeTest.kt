@@ -132,4 +132,90 @@ class RecommendationNetworkClientSmokeTest {
         result.isSuccess shouldBe true
         verifySuspend { mockRequestContext.contactToken = NEW_CONTACT_TOKEN }
     }
+
+    @Test
+    fun test_send_shouldRetryRequest_when500IsReturned_forRecommendationTrackEvent() = runTest {
+        every { mockRequestContext.contactToken } returns CONTACT_TOKEN
+
+        val mockHttpEngine = MockEngine.config {
+            addHandler {
+                respond(
+                    ByteReadChannel(""),
+                    status = HttpStatusCode.InternalServerError,
+                    headers = headersOf("Content-Type", "application/json")
+                )
+            }
+            addHandler {
+                respond(
+                    ByteReadChannel(""),
+                    status = HttpStatusCode.OK,
+                    headers = headersOf("Content-Type", "application/json")
+                )
+            }
+        }
+
+        val genericNetworkClient = GenericNetworkClient(
+            HttpClient(mockHttpEngine) { install(HttpRequestRetry) },
+            mock(MockMode.autofill)
+        )
+        val contactTokenRefresher = ContactTokenRefresher(
+            networkClient = genericNetworkClient,
+            requestContext = mockRequestContext,
+            urlFactory = mockUrlFactory,
+            json = JsonUtil.json,
+            sdkLogger = mock(MockMode.autofill)
+        )
+        val recommendationNetworkClient = RecommendationNetworkClient(
+            genericNetworkClient,
+            mockStringStorage,
+            mockRequestContext,
+            mockUserAgentProvider,
+            contactTokenRefresher,
+            sdkLogger = mock(MockMode.autofill)
+        )
+
+        val trackEventRequest = UrlRequest(BASE_URL, HttpMethod.Get, null, shouldRetryOnFail = true)
+        val result = recommendationNetworkClient.send(trackEventRequest)
+
+        result.isSuccess shouldBe true
+    }
+
+    @Test
+    fun test_send_shouldNotRetryRequest_when500IsReturned_forRecommendationRequest() = runTest {
+        every { mockRequestContext.contactToken } returns CONTACT_TOKEN
+
+        val mockHttpEngine = MockEngine {
+            respond(
+                ByteReadChannel(""),
+                status = HttpStatusCode.InternalServerError,
+                headers = headersOf("Content-Type", "application/json")
+            )
+        }
+
+        val genericNetworkClient = GenericNetworkClient(
+            HttpClient(mockHttpEngine) { install(HttpRequestRetry) },
+            mock(MockMode.autofill)
+        )
+        val contactTokenRefresher = ContactTokenRefresher(
+            networkClient = genericNetworkClient,
+            requestContext = mockRequestContext,
+            urlFactory = mockUrlFactory,
+            json = JsonUtil.json,
+            sdkLogger = mock(MockMode.autofill)
+        )
+        val recommendationNetworkClient = RecommendationNetworkClient(
+            genericNetworkClient,
+            mockStringStorage,
+            mockRequestContext,
+            mockUserAgentProvider,
+            contactTokenRefresher,
+            sdkLogger = mock(MockMode.autofill)
+        )
+
+        val recommendationEventRequest = UrlRequest(BASE_URL, HttpMethod.Get, null, shouldRetryOnFail = false)
+        val result = recommendationNetworkClient.send(recommendationEventRequest)
+
+        result.isFailure shouldBe true
+        mockHttpEngine.requestHistory.size shouldBe 1
+    }
 }

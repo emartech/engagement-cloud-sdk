@@ -62,6 +62,10 @@ internal class GenericNetworkClient(
                                 shouldRetry(httpResponse)
                             }
                         }
+                    } else {
+                        retry {
+                            noRetry()
+                        }
                     }
                     method = request.method
                     url(request.url)
