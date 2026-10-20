@@ -1,6 +1,6 @@
 package com.sap.ec.api.tracking.util
 
-import com.sap.ec.api.event.model.TrackedEvent
+import com.sap.ec.recommendation.models.tracking.TrackedRecommendationEvent
 import com.sap.ec.api.tracking.model.JsCartEventValidationData
 import com.sap.ec.api.tracking.model.JsCategoryViewEventValidationData
 import com.sap.ec.api.tracking.model.JsItemViewEventValidationData
@@ -31,7 +31,7 @@ private val validRecommendationEventTypesString =
     possibleRecommendationEventTypes.joinToString(", ") { it.lowercase() }
 
 @OptIn(ExperimentalWasmJsInterop::class)
-internal fun parseRecommendationEvent(event: JsRecommendationEvent): TrackedEvent {
+internal fun parseRecommendationEvent(event: JsRecommendationEvent): TrackedRecommendationEvent {
     if (!possibleRecommendationEventTypes.contains(event.recommendationEventType)) {
         throw IllegalArgumentException(
             "Invalid recommendation event type: ${event.recommendationEventType}. Valid types are: $validRecommendationEventTypesString"

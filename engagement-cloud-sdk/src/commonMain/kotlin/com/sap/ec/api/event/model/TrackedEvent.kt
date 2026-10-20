@@ -10,4 +10,3 @@ interface TrackedEvent {
     @OptIn(ExperimentalTime::class)
     fun toSdkEvent(uuid: String, timestamp: Instant): Result<SdkEvent>
 }
-

@@ -1,6 +1,6 @@
 package com.sap.ec.api.recommendation
 
-import com.sap.ec.api.event.model.TrackedEvent
+import com.sap.ec.recommendation.models.tracking.TrackedRecommendationEvent
 import com.sap.ec.core.exceptions.SdkException.RecommendationApiNotReadyException
 import com.sap.ec.core.log.Logger
 import com.sap.ec.recommendation.models.RecommendationResult
@@ -11,7 +11,7 @@ internal class RecommendationGatherer(
 ) : RecommendationInstance {
     override suspend fun requestRecommendation(
         recommendationOptions: RecommendationOptions,
-        contextEvent: TrackedEvent?
+        contextEvent: TrackedRecommendationEvent?
     ): RecommendationResult {
         sdkLogger.debug("RecommendationGatherer - requestRecommendation called on gatherer instance")
         throw RecommendationApiNotReadyException()

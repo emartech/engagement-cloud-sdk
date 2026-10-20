@@ -1,6 +1,6 @@
 package com.sap.ec.api.recommendation
 
-import com.sap.ec.api.event.model.TrackedEvent
+import com.sap.ec.recommendation.models.tracking.TrackedRecommendationEvent
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.providers.InstantProvider
@@ -17,14 +17,12 @@ internal class RecommendationInternal(
 ) : RecommendationInstance {
     override suspend fun requestRecommendation(
         recommendationOptions: RecommendationOptions,
-        contextEvent: TrackedEvent?
+        contextEvent: TrackedRecommendationEvent?
     ): RecommendationResult {
-        val event = contextEvent?.let {
-            it.toSdkEvent(
-                uuidProvider.provide(),
-                timestampProvider.provide()
-            ).getOrThrow() as SdkEvent.External.RecommendationTrackEvent
-        }
+        val event = contextEvent?.toSdkEvent(
+            uuidProvider.provide(),
+            timestampProvider.provide()
+        )?.getOrThrow()
 
         val response =
             sdkEventDistributor.registerEvent(
