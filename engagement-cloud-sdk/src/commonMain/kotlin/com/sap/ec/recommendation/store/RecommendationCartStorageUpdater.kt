@@ -4,7 +4,7 @@ import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
 import com.sap.ec.event.SdkEvent
 import com.sap.ec.recommendation.models.CartItem
 
-class RecommendationCartStorageUpdater(
+internal class RecommendationCartStorageUpdater(
     private val cartItemStorage: ThreadSafePersistentStoreApi<CartItem>
 ) : RecommendationCartStorageUpdaterApi {
     override suspend fun updateFromEvent(event: SdkEvent.Internal.Sdk.RequestRecommendation) {

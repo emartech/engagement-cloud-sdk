@@ -8,7 +8,7 @@ import com.sap.ec.recommendation.models.requestRecommendation.RecommendationOpti
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
-class LoggingRecommendation(private val logger: Logger) : RecommendationInstance {
+internal class LoggingRecommendation(private val logger: Logger) : RecommendationInstance {
     override suspend fun requestRecommendation(
         recommendationOptions: RecommendationOptions,
         contextEvent: TrackedRecommendationEvent?

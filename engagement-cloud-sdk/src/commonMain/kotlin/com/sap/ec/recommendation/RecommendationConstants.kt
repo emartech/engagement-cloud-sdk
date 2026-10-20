@@ -1,6 +1,6 @@
 package com.sap.ec.recommendation
 
-object RecommendationConstants {
+internal object RecommendationConstants {
     const val CART_VERSION_FLAG_KEY = "cv"
     const val CART_ITEMS_KEY = "ca"
     const val ITEM_ID_KEY = "i"

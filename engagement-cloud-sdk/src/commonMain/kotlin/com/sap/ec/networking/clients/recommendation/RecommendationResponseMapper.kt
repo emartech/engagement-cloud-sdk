@@ -13,7 +13,7 @@ import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.serializer
 
-class RecommendationResponseMapper(
+internal class RecommendationResponseMapper(
     val json: Json,
     val sdkLogger: Logger
 ) : RecommendationResponseMapperApi {
