@@ -1,7 +1,7 @@
 package com.sap.ec.api.recommendation
 
 import com.sap.ec.api.Activatable
-import com.sap.ec.api.event.model.TrackedEvent
+import com.sap.ec.recommendation.models.tracking.TrackedRecommendationEvent
 import com.sap.ec.api.generic.GenericApi
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.recommendation.models.RecommendationResult
@@ -21,7 +21,7 @@ internal class Recommendation<Logging : RecommendationInstance, Gatherer : Recom
 ), RecommendationApi {
     override suspend fun requestRecommendation(
         recommendationOptions: RecommendationOptions,
-        contextEvent: TrackedEvent?
+        contextEvent: TrackedRecommendationEvent?
     ): Result<RecommendationResult> =
         runCatchingWithoutCancellation {
             withContext(sdkContext.sdkDispatcher) {

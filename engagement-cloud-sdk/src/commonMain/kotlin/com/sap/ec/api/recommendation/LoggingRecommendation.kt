@@ -1,6 +1,6 @@
 package com.sap.ec.api.recommendation
 
-import com.sap.ec.api.event.model.TrackedEvent
+import com.sap.ec.recommendation.models.tracking.TrackedRecommendationEvent
 import com.sap.ec.core.log.LogEntry
 import com.sap.ec.core.log.Logger
 import com.sap.ec.recommendation.models.RecommendationResult
@@ -11,7 +11,7 @@ import kotlinx.serialization.json.put
 class LoggingRecommendation(private val logger: Logger) : RecommendationInstance {
     override suspend fun requestRecommendation(
         recommendationOptions: RecommendationOptions,
-        contextEvent: TrackedEvent?
+        contextEvent: TrackedRecommendationEvent?
     ): RecommendationResult {
         val entry = LogEntry.createMethodNotAllowed(
             this, this::requestRecommendation.name, buildJsonObject {

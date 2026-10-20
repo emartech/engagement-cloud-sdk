@@ -1,6 +1,6 @@
 package com.sap.ec.api.recommendation
 
-import com.sap.ec.api.event.model.TrackedEvent
+import com.sap.ec.recommendation.models.tracking.TrackedRecommendationEvent
 import com.sap.ec.core.exceptions.SdkException.InvalidRecommendationConfigurationException
 import com.sap.ec.core.exceptions.SdkException.MissingRecommendationConfigurationException
 import com.sap.ec.core.exceptions.SdkException.RecommendationApiNotReadyException
@@ -16,5 +16,5 @@ interface IosRecommendationApi {
         MissingRecommendationConfigurationException::class,
         InvalidRecommendationConfigurationException::class
     )
-    suspend fun requestRecommendation(recommendationOptions: RecommendationOptions, contextEvent: TrackedEvent? = null): RecommendationResult
+    suspend fun requestRecommendation(recommendationOptions: RecommendationOptions, contextEvent: TrackedRecommendationEvent? = null): RecommendationResult
 }
