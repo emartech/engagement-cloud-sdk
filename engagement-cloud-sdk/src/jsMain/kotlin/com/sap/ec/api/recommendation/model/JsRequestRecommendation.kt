@@ -4,6 +4,7 @@ package com.sap.ec.api.recommendation.model
 
 
 @JsExport
+@JsName("RecommendationOptions")
 interface JsRecommendationOptions {
     val logic: String
     val variants: Array<String>?
@@ -16,6 +17,7 @@ interface JsRecommendationOptions {
 }
 
 @JsExport
+@JsName("RecommendationLogic")
 enum class JsRecommendationLogic {
     RELATED,
     ALSOBOUGHT,
@@ -28,6 +30,7 @@ enum class JsRecommendationLogic {
 }
 
 @JsExport
+@JsName("RecommendationFilter")
 interface JsRecommendationFilter {
     val type: String
     val field: String
@@ -36,12 +39,14 @@ interface JsRecommendationFilter {
 }
 
 @JsExport
+@JsName("FilterType")
 enum class JsFilterType {
     INCLUDE,
     EXCLUDE
 }
 
 @JsExport
+@JsName("ComparisonType")
 enum class JsComparisonType {
     IS,
     IN,

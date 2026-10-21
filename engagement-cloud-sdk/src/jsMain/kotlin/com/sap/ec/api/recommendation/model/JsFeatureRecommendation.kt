@@ -3,6 +3,7 @@ package com.sap.ec.api.recommendation.model
 import com.sap.ec.recommendation.models.FeatureRecommendation
 
 @OptIn(ExperimentalJsExport::class)
+@JsName("FeatureRecommendation")
 @JsExport
 interface JsFeatureRecommendation {
     val featureName: String

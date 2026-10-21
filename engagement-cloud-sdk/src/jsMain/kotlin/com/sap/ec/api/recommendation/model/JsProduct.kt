@@ -3,6 +3,7 @@ package com.sap.ec.api.recommendation.model
 import com.sap.ec.recommendation.models.product.Product
 
 @OptIn(ExperimentalJsExport::class)
+@JsName("Product")
 @JsExport
 interface JsProduct {
     val productId: String
