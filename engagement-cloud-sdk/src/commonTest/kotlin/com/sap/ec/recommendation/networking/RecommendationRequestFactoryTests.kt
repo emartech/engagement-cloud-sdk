@@ -403,7 +403,7 @@ class RecommendationRequestFactoryTests {
             val params = parameters {
                 append(
                     "f",
-                    "f:HOME_1,l:5,o:0,f:HOME_2,l:5,o:0"
+                    "f:HOME_1,l:5,o:0|f:HOME_2,l:5,o:0"
                 )
                 append("cv", "1")
                 append(

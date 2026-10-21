@@ -191,7 +191,7 @@ internal class RecommendationRequestFactory(
     private fun createLogicString(recommendationEvent: RequestRecommendation): String {
         val logicName = recommendationEvent.options.logic.getLogicName()
         return recommendationEvent.options.variants?.takeIf { it.isNotEmpty() }?.let {
-            it.joinToString(",") { variant ->
+            it.joinToString("|") { variant ->
                 variantToLogic(logicName, recommendationEvent, variant)
             }
         } ?: variantToLogic(logicName, recommendationEvent, "")
