@@ -21,4 +21,5 @@ sealed class SdkException(message: String) : RuntimeException(message) {
     class RecommendationApiNotReadyException(message: String = "Recommendation API not ready!"): SdkException(message)
     class MissingRecommendationConfigurationException(message: String = "Missing recommendation configuration!"): SdkException(message)
     class InvalidRecommendationConfigurationException(message: String = "There's a problem with your recommendation configuration!"): SdkException(message)
+    class RecommendationRequestFailedException(message: String = "Recommendation Request Failed!"): SdkException(message)
 }

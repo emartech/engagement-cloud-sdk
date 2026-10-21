@@ -30,6 +30,7 @@ import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -154,21 +155,19 @@ class RecommendationClientTests {
             val exception = SdkException.FailedRequestException(failureResponse)
             val failureResult =
                 Result.failure<Response>(exception)
+            val responseCaptor = slot<SdkEvent.Internal.Sdk.Answer.Response<*>>()
             everySuspend { mockRecommendationRequestFactory.create(searchEvent) } returns trackRequest
             everySuspend { mockNetworkClient.send(trackRequest) } returns failureResult
+            everySuspend { mockSdkEventManager.emitEvent(capture(responseCaptor)) } returns Unit
 
             emitOnlineAndAwait(searchEvent) shouldBe 1
 
+            responseCaptor.get().result.exceptionOrNull()
+                .shouldBeInstanceOf<SdkException.RecommendationRequestFailedException>()
             verifySuspend {
                 mockSdkLogger.debug("consume RecommendationTrackEvent events")
                 mockRecommendationRequestFactory.create(searchEvent)
                 mockNetworkClient.send(trackRequest)
-                mockSdkEventManager.emitEvent(
-                    SdkEvent.Internal.Sdk.Answer.Response(
-                        searchEvent.id,
-                        failureResult
-                    )
-                )
                 mockClientExceptionHandler.handleException(
                     exception,
                     "exception while consuming RecommendationTrackEvent events",
@@ -243,22 +242,19 @@ class RecommendationClientTests {
             )
             val failureResult =
                 Result.failure<Response>(SdkException.FailedRequestException(failureResponse))
+            val responseCaptor = slot<SdkEvent.Internal.Sdk.Answer.Response<*>>()
             everySuspend { mockRecommendationRequestFactory.create(requestRecommendationEvent) } returns request
             everySuspend { mockNetworkClient.send(request) } returns failureResult
+            everySuspend { mockSdkEventManager.emitEvent(capture(responseCaptor)) } returns Unit
 
             emitInternalAndAwait(requestRecommendationEvent) shouldBe 1
 
+            responseCaptor.get().result.exceptionOrNull()
+                .shouldBeInstanceOf<SdkException.RecommendationRequestFailedException>()
             verifySuspend {
                 mockSdkLogger.debug("consume RequestRecommendation events")
                 mockRecommendationRequestFactory.create(requestRecommendationEvent)
                 mockNetworkClient.send(request)
-
-                mockSdkEventManager.emitEvent(
-                    SdkEvent.Internal.Sdk.Answer.Response(
-                        requestRecommendationEvent.id,
-                        failureResult
-                    )
-                )
             }
             verifySuspend(VerifyMode.exactly(0)) {
                 mockRecommendationCartStorageUpdater.updateFromEvent(
@@ -282,36 +278,30 @@ class RecommendationClientTests {
     private data class FailureCase(
         val status: HttpStatusCode,
         val surfacedException: (SdkException.FailedRequestException) -> Throwable,
-        val shouldTransformException: Boolean,
         val expectsErrorLog: Boolean = false
     )
 
     private val failureCases = listOf(
         FailureCase(
             status = HttpStatusCode.BadRequest,
-            surfacedException = { SdkException.InvalidRecommendationConfigurationException() },
-            shouldTransformException = true
+            surfacedException = { SdkException.InvalidRecommendationConfigurationException() }
         ),
         FailureCase(
             status = HttpStatusCode.NotFound,
             surfacedException = { SdkException.MissingRecommendationConfigurationException() },
-            shouldTransformException = true,
             expectsErrorLog = true
         ),
         FailureCase(
             status = HttpStatusCode.Unauthorized,
-            surfacedException = { it },
-            shouldTransformException = false
+            surfacedException = { SdkException.RecommendationRequestFailedException() }
         ),
         FailureCase(
             status = HttpStatusCode.InternalServerError,
-            surfacedException = { it },
-            shouldTransformException = false
+            surfacedException = { SdkException.RecommendationRequestFailedException() }
         ),
         FailureCase(
             status = HttpStatusCode.PaymentRequired,
-            surfacedException = { it },
-            shouldTransformException = false
+            surfacedException = { SdkException.RecommendationRequestFailedException() }
         )
     )
 
@@ -337,7 +327,8 @@ class RecommendationClientTests {
                 emitOnlineAndAwait(searchEvent) shouldBe 1
 
                 val surfaced = responseCaptor.get().result.exceptionOrNull()
-                assertSurfacedException(case, exception, surfaced)
+                val expected = case.surfacedException(exception)
+                surfaced!!::class shouldBe expected::class
                 verifySuspend {
                     mockClientExceptionHandler.handleException(
                         exception,
@@ -400,7 +391,8 @@ class RecommendationClientTests {
                 emitInternalAndAwait(requestRecommendationEvent) shouldBe 1
 
                 val surfaced = responseCaptor.get().result.exceptionOrNull()
-                assertSurfacedException(case, exception, surfaced)
+                val expected = case.surfacedException(exception)
+                surfaced!!::class shouldBe expected::class
                 verifySuspend {
                     mockClientExceptionHandler.handleException(
                         exception,
@@ -498,19 +490,6 @@ class RecommendationClientTests {
         originalRequest = request,
         bodyAsText = "{}"
     )
-
-    private fun assertSurfacedException(
-        case: FailureCase,
-        original: SdkException.FailedRequestException,
-        surfaced: Throwable?
-    ) {
-        val expected = case.surfacedException(original)
-        if (case.shouldTransformException) {
-            surfaced!!::class shouldBe expected::class
-        } else {
-            surfaced shouldBe original
-        }
-    }
 
     private suspend fun TestScope.emitOnlineAndAwait(event: OnlineSdkEvent): Int {
         val collected = backgroundScope.async { onlineSdkEventsFlow.take(1).toList() }

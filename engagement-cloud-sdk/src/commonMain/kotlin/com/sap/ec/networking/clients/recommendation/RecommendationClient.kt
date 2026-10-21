@@ -137,7 +137,7 @@ internal class RecommendationClient(
 
             HttpStatusCode.Unauthorized -> {
                 sdkLogger.debug("recommendation request failed with 401", exception)
-                exception
+                SdkException.RecommendationRequestFailedException()
             }
 
             HttpStatusCode.NotFound -> {
@@ -147,10 +147,10 @@ internal class RecommendationClient(
 
             HttpStatusCode.InternalServerError -> {
                 sdkLogger.debug("recommendation request failed with 500", exception)
-                exception
+                SdkException.RecommendationRequestFailedException()
             }
 
-            else -> exception
+            else -> SdkException.RecommendationRequestFailedException()
         }
     }
 }
