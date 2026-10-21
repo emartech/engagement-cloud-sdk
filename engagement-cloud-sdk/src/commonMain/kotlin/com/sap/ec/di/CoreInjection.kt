@@ -128,7 +128,7 @@ internal object CoreInjection {
                 "https://embedded-messaging.gservice.emarsys.net",
                 "https://mobile-sdk-config.gservice.emarsys.net/jsbridge/latest.min.js",
                 "https://mobile-sdk-config.gservice.emarsys.net/jsbridge/latest.min.sign",
-                "https://recommender.scarabresearch.com/merchants"
+                "https://recommender.scarabresearch.com/app"
             )
         }
         single<SdkEventDistributor> {

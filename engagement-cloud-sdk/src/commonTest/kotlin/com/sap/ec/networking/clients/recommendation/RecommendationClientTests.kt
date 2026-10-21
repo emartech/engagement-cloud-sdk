@@ -66,7 +66,7 @@ class RecommendationClientTests {
 
     private companion object {
         private const val RECOMMENDATION_BASE_URL =
-            "https://recommender.scarabresearch.com/merchants/"
+            "https://recommender.scarabresearch.com/app/"
 
         private val searchEvent = SdkEvent.External.RecommendationTrackEvent.Search("testSearchTerm")
 

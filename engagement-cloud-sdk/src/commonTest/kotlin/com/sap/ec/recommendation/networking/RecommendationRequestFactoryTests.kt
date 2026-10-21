@@ -40,7 +40,7 @@ class RecommendationRequestFactoryTests {
     private companion object {
         const val APP_CODE = "ABCDE-12345"
         const val RECOMMENDATION_BASE_URL =
-            "https://recommender.scarabresearch.com/merchants/$APP_CODE"
+            "https://recommender.scarabresearch.com/app/$APP_CODE"
         const val CART_ITEM_1_ITEM_ID = "testCategory's/test%Item"
         const val CART_ITEM_1_ITEM_ID_URL_ENCODED = "testCategory%27s%2Ftest%25Item"
         const val CART_ITEM_2_ITEM_ID = "testCategory's/test%Item2"
