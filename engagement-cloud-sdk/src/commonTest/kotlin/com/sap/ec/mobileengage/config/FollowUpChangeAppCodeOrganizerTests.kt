@@ -10,6 +10,7 @@ import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
+import io.kotest.assertions.throwables.shouldThrow
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -48,19 +49,20 @@ class FollowUpChangeAppCodeOrganizerTests {
     }
 
     @Test
-    fun testOrganize_should_setSdkToOnHold_active_ChangeAppCodeStateMachine_thenReactivateSdkAndLogFailure() = runTest {
+    fun testOrganize_should_setSdkToOnHold_active_ChangeAppCodeStateMachine_thenRollbackStateToInitializedAndLogFailure() = runTest {
         val exception = Exception("Activation failed")
         everySuspend {
             changeAppCodeStateMachine.activate()
         } returns Result.failure(exception)
 
-        followUpChangeAppCodeOrganizer.organize()
+        shouldThrow<Exception> { followUpChangeAppCodeOrganizer.organize() }
 
         verifySuspend(VerifyMode.order) {
             sdkContext.setSdkState(SdkState.OnHold)
             changeAppCodeStateMachine.activate()
+            sdkContext.setSdkConfig(null)
+            sdkContext.setSdkState(SdkState.Initialized)
             logger.error("Failed to activate ChangeAppCodeStateMachine during app code change", exception)
-            sdkContext.setSdkState(SdkState.Active)
         }
     }
 
