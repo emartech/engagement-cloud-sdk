@@ -28,7 +28,7 @@ class IosPush : IosPushApi {
     }
 
     override suspend fun handleSilentMessageWithUserInfo(rawUserInfo: Map<String, Any>) {
-        koin.get<IosPushWrapperApi>().handleSilentMessageWithUserInfo(rawUserInfo)
+        koin.get<IosPushWrapperApi>().handleSilentMessageWithUserInfo(rawUserInfo).getOrThrow()
     }
 
     override suspend fun registerToken(token: String) {

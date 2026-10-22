@@ -3,6 +3,7 @@ package com.sap.ec.api.config
 import com.sap.ec.api.SdkState
 import com.sap.ec.core.device.notification.IosNotificationSettings
 import com.sap.ec.core.exceptions.SdkException.InvalidApplicationCodeException
+import com.sap.ec.core.exceptions.SdkException.PreconditionFailedException
 import kotlin.coroutines.cancellation.CancellationException
 
 interface IosConfigApi {
@@ -17,7 +18,7 @@ interface IosConfigApi {
     @Throws(InvalidApplicationCodeException::class, CancellationException::class)
     suspend fun changeApplicationCode(applicationCode: String)
 
-    @Throws(CancellationException::class)
+    @Throws(PreconditionFailedException::class, CancellationException::class)
     suspend fun setLanguage(language: String)
 
     @Throws(CancellationException::class)

@@ -4,6 +4,6 @@ import com.sap.ec.api.event.model.TrackedEvent
 import io.ktor.utils.io.CancellationException
 
 interface IosTrackingApi {
-    @Throws(CancellationException::class)
+    @Throws(IllegalArgumentException::class, CancellationException::class)
     suspend fun track(event: TrackedEvent)
 }

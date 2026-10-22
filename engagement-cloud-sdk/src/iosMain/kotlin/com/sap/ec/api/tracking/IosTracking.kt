@@ -6,6 +6,6 @@ import com.sap.ec.tracking.TrackingApi
 
 class IosTracking: IosTrackingApi {
     override suspend fun track(event: TrackedEvent) {
-        koin.get<TrackingApi>().track(event)
+        koin.get<TrackingApi>().track(event).getOrThrow()
     }
 }
