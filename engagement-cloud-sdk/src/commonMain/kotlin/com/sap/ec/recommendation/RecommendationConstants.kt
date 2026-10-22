@@ -18,8 +18,10 @@ internal object RecommendationConstants {
     const val FEATURE_KEY = "t"
     const val COHORT_KEY = "c"
 
-    const val XP_COOKIE_KEY = "xp"
-    const val VISITOR_ID_COOKIE_KEY = "cdv"
+    const val SCARAB_VISITOR_HEADER = "X-Scarab-Visitor"
+    const val SCARAB_SESSION_HEADER = "X-Scarab-Session"
+    const val SCARAB_USER_PROFILE_HEADER = "X-Scarab-User-Profile"
+    const val SCARAB_FORCE_COHORT_HEADER = "X-Scarab-Force-Cohort"
 
     const val FEATURES_TO_RETRIEVE_RECOMMENDATIONS_FOR_KEY = "f"
     const val FEATURE_ID_KEY = "f"

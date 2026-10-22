@@ -10,8 +10,11 @@ import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.networking.model.UrlRequest
 import com.sap.ec.core.storage.StringStorageApi
 import com.sap.ec.networking.ECHeaders.CONTACT_TOKEN_HEADER
-import com.sap.ec.recommendation.RecommendationConstants.VISITOR_ID_COOKIE_KEY
-import com.sap.ec.recommendation.RecommendationConstants.XP_COOKIE_KEY
+import com.sap.ec.recommendation.RecommendationConstants.SCARAB_FORCE_COHORT_HEADER
+import com.sap.ec.recommendation.RecommendationConstants.SCARAB_SESSION_HEADER
+import com.sap.ec.recommendation.RecommendationConstants.SCARAB_USER_PROFILE_HEADER
+import com.sap.ec.recommendation.RecommendationConstants.SCARAB_VISITOR_HEADER
+import io.ktor.http.Headers
 
 internal class RecommendationNetworkClient(
     private val genericNetworkClient: NetworkClientApi,
@@ -21,26 +24,28 @@ internal class RecommendationNetworkClient(
     private val contactTokenRefresher: ContactTokenRefresherApi,
     private val sdkLogger: Logger
 ) : NetworkClientApi {
+    companion object {
+        private val scarabHeaders = listOf(
+            SCARAB_VISITOR_HEADER,
+            SCARAB_SESSION_HEADER,
+            SCARAB_USER_PROFILE_HEADER,
+            SCARAB_FORCE_COHORT_HEADER
+        )
+    }
+
     override suspend fun send(request: UrlRequest): Result<Response> {
         return contactTokenRefresher.executeWithTokenRefresh {
             val contactToken = requestContext.contactToken
             if (contactToken.isNullOrEmpty()) {
                 sdkLogger.error("Contact token is missing")
-                return@executeWithTokenRefresh Result.failure(SdkException.ContactTokenNotFoundException("Contact token is missing"))
-            }
-            val visitorIdCookie = stringStorage.get(VISITOR_ID_COOKIE_KEY)
-            val xpCookie = stringStorage.get(XP_COOKIE_KEY)
-
-            val cookieValue = buildString {
-                if (!xpCookie.isNullOrEmpty()) append("xp=$xpCookie;")
-                if (!visitorIdCookie.isNullOrEmpty()) append("cdv=$visitorIdCookie")
+                return@executeWithTokenRefresh Result.failure(
+                    SdkException.ContactTokenNotFoundException(
+                        "Contact token is missing"
+                    )
+                )
             }
 
-            val headers = buildMap {
-                if (cookieValue.isNotEmpty()) put("Cookie", cookieValue)
-                if (contactToken.isNotEmpty()) put(CONTACT_TOKEN_HEADER, contactToken)
-                put(UserAgentProvider.USER_AGENT_HEADER_NAME, userAgentProvider.provide())
-            }
+            val headers = buildRequestHeaders(contactToken)
 
             val populatedRequest =
                 if (headers.isNotEmpty()) request.copy(headers = headers) else request
@@ -48,30 +53,27 @@ internal class RecommendationNetworkClient(
             val response = genericNetworkClient.send(populatedRequest)
 
             if (response.isSuccess) {
-                val responseCookieHeaders =
-                    response.getOrNull()?.headers?.getAll("Set-Cookie") ?: emptyList()
-                val visitorId = responseCookieHeaders
-                    .firstOrNull { it.startsWith("cdv=") }
-                    ?.substringAfter("cdv=")
-                    ?.substringBefore(";")
-                val xp = responseCookieHeaders
-                    .firstOrNull { it.startsWith("xp=") }
-                    ?.substringAfter("xp=")
-                    ?.substringBefore(";")
-
-                visitorId.let {
-                    if (visitorIdCookie != visitorId) {
-                        stringStorage.put(VISITOR_ID_COOKIE_KEY, visitorId)
-                    }
-                }
-                xp.let {
-                    if (xpCookie != xp) {
-                        stringStorage.put(XP_COOKIE_KEY, xp)
-                    }
-                }
+                handleResponseHeaders(response.getOrNull()?.headers)
             }
 
             response
+        }
+    }
+
+    private suspend fun buildRequestHeaders(contactToken: String): Map<String, String> = buildMap {
+        put(CONTACT_TOKEN_HEADER, contactToken)
+        put(UserAgentProvider.USER_AGENT_HEADER_NAME, userAgentProvider.provide())
+        scarabHeaders.forEach { key ->
+            stringStorage.get(key)?.takeIf { it.isNotEmpty() }?.let { put(key, it) }
+        }
+    }
+
+    private fun handleResponseHeaders(responseHeaders: Headers?) {
+        scarabHeaders.forEach { key ->
+            val newValue = responseHeaders?.get(key)
+            if (newValue != null && stringStorage.get(key) != newValue) {
+                stringStorage.put(key, newValue)
+            }
         }
     }
 }
