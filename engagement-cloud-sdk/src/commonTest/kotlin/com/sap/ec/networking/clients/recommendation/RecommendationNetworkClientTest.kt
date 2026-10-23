@@ -10,8 +10,10 @@ import com.sap.ec.core.storage.StringStorageApi
 import com.sap.ec.networking.ContactTokenRefresherApi
 import com.sap.ec.networking.ECHeaders.CONTACT_TOKEN_HEADER
 import com.sap.ec.networking.RecommendationNetworkClient
-import com.sap.ec.recommendation.RecommendationConstants.VISITOR_ID_COOKIE_KEY
-import com.sap.ec.recommendation.RecommendationConstants.XP_COOKIE_KEY
+import com.sap.ec.recommendation.RecommendationConstants.SCARAB_FORCE_COHORT_HEADER
+import com.sap.ec.recommendation.RecommendationConstants.SCARAB_SESSION_HEADER
+import com.sap.ec.recommendation.RecommendationConstants.SCARAB_USER_PROFILE_HEADER
+import com.sap.ec.recommendation.RecommendationConstants.SCARAB_VISITOR_HEADER
 import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
@@ -50,42 +52,45 @@ class RecommendationNetworkClientTest {
 
     private companion object {
         private val REQUEST = UrlRequest(url = Url("https://test.com"), method = HttpMethod.Get)
-        private const val XP_VALUE = "testXpValue"
-        private const val OTHER_XP_VALUE = "otherTestXpValue"
-        private const val CVD_VALUE = "testCvdValue"
-        private const val OTHER_CVD_VALUE = "otherTestCvdValue"
         private const val CONTACT_TOKEN = "testContactToken"
-        private const val CVD_COOKIE_VALUE =
-            "cdv=$CVD_VALUE; Path=/; Expires=Thu, 9 Sep 2027 18:12:36 GMT; Max-Age=31556952; Secure; SameSite=None"
-        private const val OTHER_CVD_COOKIE_VALUE =
-            "cdv=$OTHER_CVD_VALUE; Path=/; Expires=Thu, 9 Sep 2027 18:12:36 GMT; Max-Age=31556952; Secure; SameSite=None"
-        private const val XP_COOKIE_VALUE =
-            "xp=$XP_VALUE; Path=/; Expires=Thu, 9 Sep 2027 18:12:36 GMT; Max-Age=31556952; Secure; SameSite=None"
-        private const val OTHER_XP_COOKIE_VALUE =
-            "xp=$OTHER_XP_VALUE; Path=/; Expires=Thu, 9 Sep 2027 18:12:36 GMT; Max-Age=31556952; Secure; SameSite=None"
-        private val SUCCESS_RESPONSE_WITH_COOKIES = Result.success(
+        private const val VISITOR_VALUE = "testVisitor"
+        private const val OTHER_VISITOR_VALUE = "otherTestVisitor"
+        private const val SESSION_VALUE = "testSession"
+        private const val OTHER_SESSION_VALUE = "otherTestSession"
+        private const val USER_PROFILE_VALUE = "testUserProfile"
+        private const val OTHER_USER_PROFILE_VALUE = "otherTestUserProfile"
+        private const val FORCE_COHORT_VALUE = "testForceCohort"
+        private const val OTHER_FORCE_COHORT_VALUE = "otherTestForceCohort"
+        private const val USER_AGENT_HEADER = "User-Agent"
+        private const val USER_AGENT_STRING = "Engagement Cloud SDK 4.0.0 IOS 26.0"
+
+        private val SUCCESS_RESPONSE_WITH_SCARAB_HEADERS = Result.success(
             Response(
                 originalRequest = UrlRequest(Url("test.com"), HttpMethod.Get),
                 status = HttpStatusCode.OK,
                 headers = Headers.build {
-                    append("set-cookie", CVD_COOKIE_VALUE)
-                    append("set-cookie", XP_COOKIE_VALUE)
+                    append(SCARAB_VISITOR_HEADER, VISITOR_VALUE)
+                    append(SCARAB_SESSION_HEADER, SESSION_VALUE)
+                    append(SCARAB_USER_PROFILE_HEADER, USER_PROFILE_VALUE)
+                    append(SCARAB_FORCE_COHORT_HEADER, FORCE_COHORT_VALUE)
                 },
                 bodyAsText = ""
             )
         )
-        private val SUCCESS_RESPONSE_WITH_DIFFERENT_COOKIES = Result.success(
+        private val SUCCESS_RESPONSE_WITH_DIFFERENT_SCARAB_HEADERS = Result.success(
             Response(
                 originalRequest = UrlRequest(Url("test.com"), HttpMethod.Get),
                 status = HttpStatusCode.OK,
                 headers = Headers.build {
-                    append("set-cookie", OTHER_CVD_COOKIE_VALUE)
-                    append("set-cookie", OTHER_XP_COOKIE_VALUE)
+                    append(SCARAB_VISITOR_HEADER, OTHER_VISITOR_VALUE)
+                    append(SCARAB_SESSION_HEADER, OTHER_SESSION_VALUE)
+                    append(SCARAB_USER_PROFILE_HEADER, OTHER_USER_PROFILE_VALUE)
+                    append(SCARAB_FORCE_COHORT_HEADER, OTHER_FORCE_COHORT_VALUE)
                 },
                 bodyAsText = ""
             )
         )
-        private val SUCCESS_RESPONSE_WITHOUT_COOKIES = Result.success(
+        private val SUCCESS_RESPONSE_WITHOUT_SCARAB_HEADERS = Result.success(
             Response(
                 originalRequest = UrlRequest(Url("test.com"), HttpMethod.Get),
                 status = HttpStatusCode.OK,
@@ -93,8 +98,6 @@ class RecommendationNetworkClientTest {
                 bodyAsText = ""
             )
         )
-        private const val USER_AGENT_HEADER = "User-Agent"
-        private const val USER_AGENT_STRING = "Engagement Cloud SDK 4.0.0 IOS 26.0"
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -107,7 +110,12 @@ class RecommendationNetworkClientTest {
         mockUserAgentProvider = mock(MockMode.autofill)
         mockContactTokenRefresher = mock(MockMode.autofill)
 
-        everySuspend { mockContactTokenRefresher.executeWithTokenRefresh(any(), any()) } calls { args ->
+        everySuspend {
+            mockContactTokenRefresher.executeWithTokenRefresh(
+                any(),
+                any()
+            )
+        } calls { args ->
             @Suppress("UNCHECKED_CAST")
             val callback = args.arg<suspend () -> Result<Response>>(1)
             callback()
@@ -125,118 +133,166 @@ class RecommendationNetworkClientTest {
     }
 
     @Test
-    fun test_send_shouldSendRequest_withPredictHeaders_whenStringStorageIsNotEmpty_andNotStoreCookies_WhenSuccessResponseCookiesAreTheSameAsStringStorageCookies() =
+    fun send_shouldSendRequest_withScarabHeaders_whenStringStorageIsNotEmpty_andNotStoreHeaders_whenResponseHeadersAreTheSame() =
         runTest {
-            every { mockStringStorage.get(XP_COOKIE_KEY) } returns XP_VALUE
-            every { mockStringStorage.get(VISITOR_ID_COOKIE_KEY) } returns CVD_VALUE
+            every { mockStringStorage.get(SCARAB_VISITOR_HEADER) } returns VISITOR_VALUE
+            every { mockStringStorage.get(SCARAB_SESSION_HEADER) } returns SESSION_VALUE
+            every { mockStringStorage.get(SCARAB_USER_PROFILE_HEADER) } returns USER_PROFILE_VALUE
+            every { mockStringStorage.get(SCARAB_FORCE_COHORT_HEADER) } returns FORCE_COHORT_VALUE
             every { mockRequestContext.contactToken } returns CONTACT_TOKEN
-            val expectedHeaders =
-                mapOf(
-                    "Cookie" to "xp=$XP_VALUE;cdv=$CVD_VALUE",
-                    CONTACT_TOKEN_HEADER to CONTACT_TOKEN,
-                    USER_AGENT_HEADER to USER_AGENT_STRING,
-                    USER_AGENT_HEADER to USER_AGENT_STRING
-                )
+            val expectedHeaders = mapOf(
+                CONTACT_TOKEN_HEADER to CONTACT_TOKEN,
+                USER_AGENT_HEADER to USER_AGENT_STRING,
+                SCARAB_VISITOR_HEADER to VISITOR_VALUE,
+                SCARAB_SESSION_HEADER to SESSION_VALUE,
+                SCARAB_USER_PROFILE_HEADER to USER_PROFILE_VALUE,
+                SCARAB_FORCE_COHORT_HEADER to FORCE_COHORT_VALUE
+            )
             val requestCaptor = slot<UrlRequest>()
-            everySuspend { mockGenericNetworkClient.send(capture(requestCaptor)) } returns SUCCESS_RESPONSE_WITH_COOKIES
+            everySuspend { mockGenericNetworkClient.send(capture(requestCaptor)) } returns SUCCESS_RESPONSE_WITH_SCARAB_HEADERS
 
             recommendationNetworkClient.send(REQUEST)
 
             verify {
-                mockStringStorage.get(XP_COOKIE_KEY)
-                mockStringStorage.get(VISITOR_ID_COOKIE_KEY)
-                mockRequestContext.contactToken
                 requestCaptor.get().headers shouldBe expectedHeaders
+                mockRequestContext.contactToken
             }
             verify(VerifyMode.exactly(0)) {
-                mockStringStorage.put(VISITOR_ID_COOKIE_KEY, CVD_VALUE)
-                mockStringStorage.put(XP_COOKIE_KEY, XP_VALUE)
+                mockStringStorage.put(SCARAB_VISITOR_HEADER, VISITOR_VALUE)
+                mockStringStorage.put(SCARAB_SESSION_HEADER, SESSION_VALUE)
+                mockStringStorage.put(SCARAB_USER_PROFILE_HEADER, USER_PROFILE_VALUE)
+                mockStringStorage.put(SCARAB_FORCE_COHORT_HEADER, FORCE_COHORT_VALUE)
             }
             verifySuspend { mockUserAgentProvider.provide() }
         }
 
     @Test
-    fun test_send_shouldSendRequest_withPredictHeaders_whenStringStorageIsNotEmpty_andStoreCookies_WhenSuccessResponseCookiesAreDifferFromStringStorageCookies() =
+    fun send_shouldSendRequest_withScarabHeaders_whenStringStorageIsNotEmpty_andStoreHeaders_whenResponseHeadersAreDifferent() =
         runTest {
-            every { mockStringStorage.get(XP_COOKIE_KEY) } returns XP_VALUE
-            every { mockStringStorage.get(VISITOR_ID_COOKIE_KEY) } returns CVD_VALUE
+            every { mockStringStorage.get(SCARAB_VISITOR_HEADER) } returns VISITOR_VALUE
+            every { mockStringStorage.get(SCARAB_SESSION_HEADER) } returns SESSION_VALUE
+            every { mockStringStorage.get(SCARAB_USER_PROFILE_HEADER) } returns USER_PROFILE_VALUE
+            every { mockStringStorage.get(SCARAB_FORCE_COHORT_HEADER) } returns FORCE_COHORT_VALUE
             every { mockRequestContext.contactToken } returns CONTACT_TOKEN
-            val expectedHeaders =
-                mapOf(
-                    "Cookie" to "xp=$XP_VALUE;cdv=$CVD_VALUE",
-                    CONTACT_TOKEN_HEADER to CONTACT_TOKEN,
-                    USER_AGENT_HEADER to USER_AGENT_STRING,
-                    USER_AGENT_HEADER to USER_AGENT_STRING
-                )
+            val expectedHeaders = mapOf(
+                CONTACT_TOKEN_HEADER to CONTACT_TOKEN,
+                USER_AGENT_HEADER to USER_AGENT_STRING,
+                SCARAB_VISITOR_HEADER to VISITOR_VALUE,
+                SCARAB_SESSION_HEADER to SESSION_VALUE,
+                SCARAB_USER_PROFILE_HEADER to USER_PROFILE_VALUE,
+                SCARAB_FORCE_COHORT_HEADER to FORCE_COHORT_VALUE
+            )
             val requestCaptor = slot<UrlRequest>()
-            everySuspend { mockGenericNetworkClient.send(capture(requestCaptor)) } returns SUCCESS_RESPONSE_WITH_DIFFERENT_COOKIES
+            everySuspend { mockGenericNetworkClient.send(capture(requestCaptor)) } returns SUCCESS_RESPONSE_WITH_DIFFERENT_SCARAB_HEADERS
 
             recommendationNetworkClient.send(REQUEST)
 
             verify {
-                mockStringStorage.get(XP_COOKIE_KEY)
-                mockStringStorage.get(VISITOR_ID_COOKIE_KEY)
-                mockRequestContext.contactToken
                 requestCaptor.get().headers shouldBe expectedHeaders
-                mockStringStorage.put(XP_COOKIE_KEY, OTHER_XP_VALUE)
-                mockStringStorage.put(VISITOR_ID_COOKIE_KEY, OTHER_CVD_VALUE)
+                mockRequestContext.contactToken
+                mockStringStorage.put(SCARAB_VISITOR_HEADER, OTHER_VISITOR_VALUE)
+                mockStringStorage.put(SCARAB_SESSION_HEADER, OTHER_SESSION_VALUE)
+                mockStringStorage.put(SCARAB_USER_PROFILE_HEADER, OTHER_USER_PROFILE_VALUE)
+                mockStringStorage.put(SCARAB_FORCE_COHORT_HEADER, OTHER_FORCE_COHORT_VALUE)
             }
             verifySuspend { mockUserAgentProvider.provide() }
         }
 
     @Test
-    fun test_send_shouldSendRequest_withContactTokenHeaderAndUserAgentHeaderOnly_whenStringStorageIsEmpty_andStoreCookies_WhenSuccessResponseIncludesThem() =
+    fun send_shouldNotClearStoredHeaders_whenResponseHeadersAreMissing() =
         runTest {
-            every { mockStringStorage.get(XP_COOKIE_KEY) } returns null
-            every { mockStringStorage.get(VISITOR_ID_COOKIE_KEY) } returns null
+            every { mockStringStorage.get(SCARAB_VISITOR_HEADER) } returns VISITOR_VALUE
+            every { mockStringStorage.get(SCARAB_SESSION_HEADER) } returns SESSION_VALUE
+            every { mockStringStorage.get(SCARAB_USER_PROFILE_HEADER) } returns USER_PROFILE_VALUE
+            every { mockStringStorage.get(SCARAB_FORCE_COHORT_HEADER) } returns FORCE_COHORT_VALUE
+            every { mockRequestContext.contactToken } returns CONTACT_TOKEN
+            val requestCaptor = slot<UrlRequest>()
+            everySuspend { mockGenericNetworkClient.send(capture(requestCaptor)) } returns SUCCESS_RESPONSE_WITHOUT_SCARAB_HEADERS
+
+            recommendationNetworkClient.send(REQUEST)
+
+            verify(VerifyMode.exactly(0)) {
+                mockStringStorage.put(SCARAB_VISITOR_HEADER, any())
+                mockStringStorage.put(SCARAB_SESSION_HEADER, any())
+                mockStringStorage.put(SCARAB_USER_PROFILE_HEADER, any())
+                mockStringStorage.put(SCARAB_FORCE_COHORT_HEADER, any())
+            }
+            verifySuspend { mockUserAgentProvider.provide() }
+        }
+
+    @Test
+    fun send_shouldSendRequest_withContactTokenAndUserAgentHeadersOnly_whenStringStorageIsEmpty_andStoreHeaders_whenResponseIncludesThem() =
+        runTest {
+            every { mockStringStorage.get(any()) } returns null
             every { mockRequestContext.contactToken } returns CONTACT_TOKEN
             val expectedHeaders =
                 mapOf(CONTACT_TOKEN_HEADER to CONTACT_TOKEN, USER_AGENT_HEADER to USER_AGENT_STRING)
             val requestCaptor = slot<UrlRequest>()
-            everySuspend { mockGenericNetworkClient.send(capture(requestCaptor)) } returns SUCCESS_RESPONSE_WITH_COOKIES
+            everySuspend { mockGenericNetworkClient.send(capture(requestCaptor)) } returns SUCCESS_RESPONSE_WITH_SCARAB_HEADERS
 
             recommendationNetworkClient.send(REQUEST)
 
             verify {
-                mockStringStorage.get(XP_COOKIE_KEY)
-                mockStringStorage.get(VISITOR_ID_COOKIE_KEY)
-                mockRequestContext.contactToken
                 requestCaptor.get().headers shouldBe expectedHeaders
-                mockStringStorage.put(VISITOR_ID_COOKIE_KEY, CVD_VALUE)
-                mockStringStorage.put(XP_COOKIE_KEY, XP_VALUE)
+                mockRequestContext.contactToken
+                mockStringStorage.put(SCARAB_VISITOR_HEADER, VISITOR_VALUE)
+                mockStringStorage.put(SCARAB_SESSION_HEADER, SESSION_VALUE)
+                mockStringStorage.put(SCARAB_USER_PROFILE_HEADER, USER_PROFILE_VALUE)
+                mockStringStorage.put(SCARAB_FORCE_COHORT_HEADER, FORCE_COHORT_VALUE)
             }
             verifySuspend { mockUserAgentProvider.provide() }
         }
 
     @Test
-    fun test_send_shouldNotSendAnyPredictHeader_whenStringStorageIsEmptyString_andNotStoreCookies_WhenSuccessResponseExcludesThem() =
+    fun send_shouldSendRequest_withContactTokenAndUserAgentHeadersOnly_whenStringStorageIsEmptyString_andNotStoreHeaders_whenResponseExcludesThem() =
         runTest {
-            every { mockStringStorage.get(XP_COOKIE_KEY) } returns ""
-            every { mockStringStorage.get(VISITOR_ID_COOKIE_KEY) } returns ""
+            every { mockStringStorage.get(any()) } returns ""
             every { mockRequestContext.contactToken } returns CONTACT_TOKEN
             val expectedHeaders =
                 mapOf(CONTACT_TOKEN_HEADER to CONTACT_TOKEN, USER_AGENT_HEADER to USER_AGENT_STRING)
             val requestCaptor = slot<UrlRequest>()
-            everySuspend { mockGenericNetworkClient.send(capture(requestCaptor)) } returns SUCCESS_RESPONSE_WITHOUT_COOKIES
+            everySuspend { mockGenericNetworkClient.send(capture(requestCaptor)) } returns SUCCESS_RESPONSE_WITHOUT_SCARAB_HEADERS
 
             recommendationNetworkClient.send(REQUEST)
 
             verify {
                 requestCaptor.get().headers shouldBe expectedHeaders
-                mockStringStorage.get(XP_COOKIE_KEY)
-                mockStringStorage.get(VISITOR_ID_COOKIE_KEY)
             }
             verify(VerifyMode.exactly(0)) {
-                mockStringStorage.put(VISITOR_ID_COOKIE_KEY, CVD_VALUE)
-                mockStringStorage.put(XP_COOKIE_KEY, XP_VALUE)
+                mockStringStorage.put(SCARAB_VISITOR_HEADER, any())
+                mockStringStorage.put(SCARAB_SESSION_HEADER, any())
+                mockStringStorage.put(SCARAB_USER_PROFILE_HEADER, any())
+                mockStringStorage.put(SCARAB_FORCE_COHORT_HEADER, any())
             }
             verifySuspend { mockUserAgentProvider.provide() }
         }
 
     @Test
-    fun test_send_shouldReturnResultFailure_whenContactTokenIsMissing() = runTest {
-        every { mockStringStorage.get(XP_COOKIE_KEY) } returns null
-        every { mockStringStorage.get(VISITOR_ID_COOKIE_KEY) } returns null
+    fun send_shouldOnlyAddExistingRecommendationHeaders() = runTest {
+        every { mockStringStorage.get(SCARAB_VISITOR_HEADER) } returns VISITOR_VALUE
+        every { mockStringStorage.get(SCARAB_SESSION_HEADER) } returns null
+        every { mockStringStorage.get(SCARAB_USER_PROFILE_HEADER) } returns null
+        every { mockStringStorage.get(SCARAB_FORCE_COHORT_HEADER) } returns null
+        every { mockRequestContext.contactToken } returns CONTACT_TOKEN
+        val expectedHeaders = mapOf(
+            CONTACT_TOKEN_HEADER to CONTACT_TOKEN,
+            USER_AGENT_HEADER to USER_AGENT_STRING,
+            SCARAB_VISITOR_HEADER to VISITOR_VALUE
+        )
+        val requestCaptor = slot<UrlRequest>()
+        everySuspend { mockGenericNetworkClient.send(capture(requestCaptor)) } returns SUCCESS_RESPONSE_WITHOUT_SCARAB_HEADERS
+
+        recommendationNetworkClient.send(REQUEST)
+
+        verify {
+            requestCaptor.get().headers shouldBe expectedHeaders
+            mockRequestContext.contactToken
+        }
+        verifySuspend { mockUserAgentProvider.provide() }
+    }
+
+    @Test
+    fun send_shouldReturnResultFailure_whenContactTokenIsMissing() = runTest {
         every { mockRequestContext.contactToken } returns null
 
         val result = recommendationNetworkClient.send(REQUEST)
@@ -252,61 +308,10 @@ class RecommendationNetworkClientTest {
     }
 
     @Test
-    fun test_send_shouldNotSendAnyPredictHeader_whenStringStorageIsNotEmpty_andContactTokenIsNotEmpty() =
-        runTest {
-            every { mockStringStorage.get(XP_COOKIE_KEY) } returns XP_VALUE
-            every { mockStringStorage.get(VISITOR_ID_COOKIE_KEY) } returns CVD_VALUE
-            every { mockRequestContext.contactToken } returns CONTACT_TOKEN
-            val expectedHeaders =
-                mapOf(
-                    "Cookie" to "xp=$XP_VALUE;cdv=$CVD_VALUE",
-                    CONTACT_TOKEN_HEADER to CONTACT_TOKEN,
-                    USER_AGENT_HEADER to USER_AGENT_STRING
-                )
-            val requestCaptor = slot<UrlRequest>()
-            everySuspend { mockGenericNetworkClient.send(capture(requestCaptor)) } returns SUCCESS_RESPONSE_WITH_COOKIES
-
-            recommendationNetworkClient.send(REQUEST)
-
-            verify {
-                requestCaptor.get().headers shouldBe expectedHeaders
-                mockStringStorage.get(XP_COOKIE_KEY)
-                mockStringStorage.get(VISITOR_ID_COOKIE_KEY)
-                mockRequestContext.contactToken
-            }
-            verifySuspend { mockUserAgentProvider.provide() }
-        }
-
-    @Test
-    fun test_send_shouldOnlyAddExistingPredictHeaders() = runTest {
-        every { mockStringStorage.get(XP_COOKIE_KEY) } returns XP_VALUE
-        every { mockStringStorage.get(VISITOR_ID_COOKIE_KEY) } returns ""
-        every { mockRequestContext.contactToken } returns CONTACT_TOKEN
-        val expectedHeaders =
-            mapOf(
-                "Cookie" to "xp=$XP_VALUE;",
-                CONTACT_TOKEN_HEADER to CONTACT_TOKEN,
-                USER_AGENT_HEADER to USER_AGENT_STRING
-            )
-        val requestCaptor = slot<UrlRequest>()
-        everySuspend { mockGenericNetworkClient.send(capture(requestCaptor)) } returns SUCCESS_RESPONSE_WITH_COOKIES
-
-        recommendationNetworkClient.send(REQUEST)
-
-        verify {
-            requestCaptor.get().headers shouldBe expectedHeaders
-            mockStringStorage.get(XP_COOKIE_KEY)
-            mockStringStorage.get(VISITOR_ID_COOKIE_KEY)
-            mockRequestContext.contactToken
-        }
-        verifySuspend { mockUserAgentProvider.provide() }
-    }
-
-    @Test
-    fun test_send_shouldDelegateToContactTokenRefresher() = runTest {
+    fun send_shouldDelegateToContactTokenRefresher() = runTest {
         every { mockRequestContext.contactToken } returns CONTACT_TOKEN
         every { mockStringStorage.get(any()) } returns null
-        everySuspend { mockGenericNetworkClient.send(any()) } returns SUCCESS_RESPONSE_WITHOUT_COOKIES
+        everySuspend { mockGenericNetworkClient.send(any()) } returns SUCCESS_RESPONSE_WITHOUT_SCARAB_HEADERS
 
         recommendationNetworkClient.send(REQUEST)
 
