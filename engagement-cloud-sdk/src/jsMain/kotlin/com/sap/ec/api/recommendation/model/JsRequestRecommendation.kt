@@ -8,16 +8,14 @@ package com.sap.ec.api.recommendation.model
 interface JsRecommendationOptions {
     val logic: String
     val variants: Array<String>?
-    val limit: Int
-    val offset: Int
+    val limit: Int?
+    val offset: Int?
     val filters: Array<JsRecommendationFilter>?
     val availabilityZone: String?
     val language: String?
     val displayCurrency: String?
 }
 
-@JsExport
-@JsName("RecommendationLogic")
 enum class JsRecommendationLogic {
     RELATED,
     ALSOBOUGHT,
@@ -38,15 +36,11 @@ interface JsRecommendationFilter {
     val expectations: Array<String>
 }
 
-@JsExport
-@JsName("FilterType")
 enum class JsFilterType {
     INCLUDE,
     EXCLUDE
 }
 
-@JsExport
-@JsName("ComparisonType")
 enum class JsComparisonType {
     IS,
     IN,

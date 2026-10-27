@@ -32,8 +32,8 @@ internal class JsRecommendation(
         return RecommendationOptions(
             logic = parseJsLogic(this.logic),
             variants = this.variants?.toList(),
-            limit = this.limit,
-            offset = this.offset,
+            limit = this.limit ?: 5,
+            offset = this.offset ?: 0,
             filters = parseJsFilters(this.filters),
             availabilityZone = this.availabilityZone,
             language = this.language,
