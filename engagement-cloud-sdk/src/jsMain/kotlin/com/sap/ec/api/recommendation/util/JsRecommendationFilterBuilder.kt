@@ -11,10 +11,10 @@ import com.sap.ec.api.recommendation.model.JsRecommendationFilter
 @JsName("RecommendationFilterBuilder")
 class JsRecommendationFilterBuilder {
 
-    private lateinit var filterType: String
-    private lateinit var field: String
-    private lateinit var comparison: String
-    private lateinit var expectations: Array<String>
+    private var filterType: String? = null
+    private var field: String? = null
+    private var comparison: String? = null
+    private var expectations: Array<String>? = null
 
     fun include(): JsRecommendationFilterBuilder {
         filterType = JsFilterType.INCLUDE.name
@@ -56,17 +56,14 @@ class JsRecommendationFilterBuilder {
     }
 
     fun build(): JsRecommendationFilter {
-        return try {
-            object : JsRecommendationFilter {
-                override val type: String = this@JsRecommendationFilterBuilder.filterType
-                override val field: String = this@JsRecommendationFilterBuilder.field
-                override val comparison: String =
-                    this@JsRecommendationFilterBuilder.comparison
-                override val expectations: Array<String> =
-                    this@JsRecommendationFilterBuilder.expectations
-            }
-        } catch (_: Throwable) {
-            throw IllegalStateException("At least one required field is not set!")
+        return object : JsRecommendationFilter {
+            override val type: String =
+                this@JsRecommendationFilterBuilder.filterType ?: throw IllegalStateException("FilterType is not set!")
+            override val field: String = this@JsRecommendationFilterBuilder.field ?: throw IllegalStateException("Field is not set!")
+            override val comparison: String =
+                this@JsRecommendationFilterBuilder.comparison ?: throw IllegalStateException("Comparison is not set!")
+            override val expectations: Array<String> =
+                this@JsRecommendationFilterBuilder.expectations ?: throw IllegalStateException("Expectations is not set!")
         }
     }
 }
