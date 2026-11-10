@@ -10,7 +10,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
 import org.koin.core.KoinApplication
-import org.koin.core.context.startKoin
 import org.koin.core.module.Module
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
@@ -71,7 +70,7 @@ object SdkKoinIsolationContext {
 
     private fun initKoin() {
         koinApp.koin.loadModules(loadPlatformModules())
-        runningApp = startKoin(koinApp)
+        runningApp = koinApp
 
     }
 }
