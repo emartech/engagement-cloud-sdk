@@ -174,6 +174,8 @@ internal object SetupInjection {
         single<StateMachineApi>(named(StateMachineTypes.FollowUpChangeAppCodeStateMachine)) {
             StateMachine(
                 states = listOf(
+                    get<State>(named(InitStateTypes.ApplySDKDefaultRemoteConfig)),
+                    get<State>(named(InitStateTypes.ApplyGlobalRemoteConfig)),
                     get<State>(named(StateTypes.ApplyAppCodeBasedRemoteConfig)),
                     get<State>(named(StateTypes.ClearLinkedContact)),
                     get<State>(named(StateTypes.FetchEmbeddedMessagingMetaState)),
@@ -190,7 +192,9 @@ internal object SetupInjection {
                     get<State>(named(StateTypes.ClearEvents)),
                     get<State>(named(StateTypes.ClearStoredConfig)),
                     get<State>(named(StateTypes.ClearDeviceInfo)),
-                    get<State>(named(StateTypes.ClearRecommendationCart))
+                    get<State>(named(StateTypes.ClearRecommendationCart)),
+                    get<State>(named(InitStateTypes.ApplySDKDefaultRemoteConfig)),
+                    get<State>(named(InitStateTypes.ApplyGlobalRemoteConfig))
                 ),
                 name = StateMachineTypes.MobileEngageDisable.name,
                 logger = get { parametersOf(StateMachineTypes.MobileEngageDisable.name) }
