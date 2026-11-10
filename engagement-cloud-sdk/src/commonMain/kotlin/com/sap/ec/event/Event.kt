@@ -459,7 +459,7 @@ sealed interface SdkEvent {
                 val name: String = APPLY_GLOBAL_REMOTE_CONFIG_EVENT_NAME,
                 override val applicationCode: String? = null,
                 override val targetUrl: Url? = null
-            ) : Sdk(), OperationalEvent, SetupFlowEvent {
+            ) : Sdk(), OperationalEvent {
                 override fun withUrl(url: Url): OperationalEvent {
                     return this
                 }

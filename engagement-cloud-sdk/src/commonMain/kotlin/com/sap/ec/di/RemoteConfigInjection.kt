@@ -1,20 +1,20 @@
 package com.sap.ec.di
 
-import com.sap.ec.remoteConfig.RemoteConfigResponseHandler
-import com.sap.ec.remoteConfig.RemoteConfigResponseHandlerApi
+import com.sap.ec.remoteConfig.RemoteConfigHandler
+import com.sap.ec.remoteConfig.RemoteConfigHandlerApi
 import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
 
 internal object RemoteConfigInjection {
     val remoteConfigModules = module {
-        single<RemoteConfigResponseHandlerApi> {
-            RemoteConfigResponseHandler(
+        single<RemoteConfigHandlerApi> {
+            RemoteConfigHandler(
                 deviceInfoCollector = get(),
                 logConfigHolder = get(),
                 sdkContext = get(),
                 randomProvider = get(),
                 embeddedMessagingContext = get(),
-                sdkLogger = get { parametersOf(RemoteConfigResponseHandler::class.simpleName) }
+                sdkLogger = get { parametersOf(RemoteConfigHandler::class.simpleName) }
             )
         }
     }

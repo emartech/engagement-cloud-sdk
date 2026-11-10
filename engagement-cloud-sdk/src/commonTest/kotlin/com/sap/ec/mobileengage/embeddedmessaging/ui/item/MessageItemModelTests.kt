@@ -1,7 +1,7 @@
 package com.sap.ec.mobileengage.embeddedmessaging.ui.item
 
-import com.sap.ec.context.DefaultUrlsApi
 import com.sap.ec.context.SdkContextApi
+import com.sap.ec.context.ServiceUrls
 import com.sap.ec.core.channel.SdkEventDistributorApi
 import com.sap.ec.core.channel.SdkEventWaiterApi
 import com.sap.ec.core.log.Logger
@@ -91,7 +91,6 @@ class MessageItemModelTests {
     private lateinit var mockDownloader: DownloaderApi
     private lateinit var mockSdkEventDistributor: SdkEventDistributorApi
     private lateinit var mockSdkEventWaiter: SdkEventWaiterApi
-    private lateinit var mockDefaultUrls: DefaultUrlsApi
     private lateinit var mockSdkContext: SdkContextApi
     private lateinit var mockActionFactory: ActionFactoryApi<ActionModel>
     private lateinit var mockLogger: Logger
@@ -102,10 +101,16 @@ class MessageItemModelTests {
     @BeforeTest
     fun setup() {
         mockDownloader = mock(MockMode.autofill)
-        mockDefaultUrls = mock(MockMode.autofill)
-        every { mockDefaultUrls.embeddedMessagingBaseUrl } returns EMBEDDED_MESSAGING_BASE_URL
         mockSdkContext = mock(MockMode.autofill)
-        every { mockSdkContext.defaultUrls } returns mockDefaultUrls
+        every { mockSdkContext.serviceUrls } returns ServiceUrls(
+            remoteConfigBaseUrl = "",
+            appCodeBasedServiceUrls = ServiceUrls.AppCodeBased(
+                clientServiceBaseUrl = "",
+                eventServiceBaseUrl = "",
+                embeddedMessagingBaseUrl = EMBEDDED_MESSAGING_BASE_URL,
+                loggingUrl = ""
+            )
+        )
         mockSdkEventDistributor = mock(MockMode.autofill)
         mockSdkEventWaiter = mock(MockMode.autofill)
         mockActionFactory = mock(MockMode.autofill)

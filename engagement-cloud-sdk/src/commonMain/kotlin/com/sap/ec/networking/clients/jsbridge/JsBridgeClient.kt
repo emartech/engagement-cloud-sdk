@@ -3,6 +3,7 @@ package com.sap.ec.networking.clients.jsbridge
 import com.sap.ec.context.Features
 import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.crypto.CryptoApi
+import com.sap.ec.core.exceptions.SdkException.ServiceUrlsUnavailableException
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.clients.NetworkClientApi
 import com.sap.ec.core.networking.model.Response
@@ -21,59 +22,63 @@ internal class JsBridgeClient(
 ) : JsBridgeClientApi {
 
     override suspend fun fetchJSBridge(): Result<Unit> {
-        val jsBridgeResponse = fetchResponse(sdkContext.defaultUrls.jsBridgeUrl).getOrElse {
-            sdkLogger.error("Failed to fetch JsBridge: ${it.message}")
-            return Result.failure(it)
-        }
-
-        if (isSignatureCheckEnabled()) {
-            val signatureResponse =
-                fetchResponse(sdkContext.defaultUrls.jsBridgeSignatureUrl).getOrElse {
-                    sdkLogger.error("Failed to fetch JsBridge signature: ${it.message}")
-                    return Result.failure(it)
-                }
-
-            val verified = runCatching {
-                crypto.verify(jsBridgeResponse.bodyAsText, signatureResponse.bodyAsText)
-            }.getOrElse {
-                sdkLogger.error("JsBridge crypto verification error: ${it.message}")
+        return sdkContext.serviceUrls.globalServiceUrls?.let { serviceUrls ->
+            val jsBridgeResponse = fetchResponse(serviceUrls.jsBridgeUrl).getOrElse {
+                sdkLogger.error("Failed to fetch JsBridge: ${it.message}")
                 return Result.failure(it)
             }
 
-            if (!verified) {
-                sdkLogger.error("JsBridge signature verification failed")
-                stringStorage.put(StorageConstants.JS_BRIDGE_MD5_KEY, null)
-                return Result.failure(IllegalStateException("JsBridge signature verification failed"))
+            if (isSignatureCheckEnabled()) {
+                val signatureResponse =
+                    fetchResponse(serviceUrls.jsBridgeSignatureUrl).getOrElse {
+                        sdkLogger.error("Failed to fetch JsBridge signature: ${it.message}")
+                        return Result.failure(it)
+                    }
+
+                val verified = runCatching {
+                    crypto.verify(jsBridgeResponse.bodyAsText, signatureResponse.bodyAsText)
+                }.getOrElse {
+                    sdkLogger.error("JsBridge crypto verification error: ${it.message}")
+                    return Result.failure(it)
+                }
+
+                if (!verified) {
+                    sdkLogger.error("JsBridge signature verification failed")
+                    stringStorage.put(StorageConstants.JS_BRIDGE_MD5_KEY, null)
+                    return Result.failure(IllegalStateException("JsBridge signature verification failed"))
+                }
             }
-        }
 
-        val jsBody = jsBridgeResponse.bodyAsText
-        if (jsBody.isNotEmpty()) {
-            stringStorage.put(StorageConstants.JS_BRIDGE, jsBody)
-            sdkLogger.debug("JsBridge body cached")
-        }
+            val jsBody = jsBridgeResponse.bodyAsText
+            if (jsBody.isNotEmpty()) {
+                stringStorage.put(StorageConstants.JS_BRIDGE, jsBody)
+                sdkLogger.debug("JsBridge body cached")
+            }
 
-        val md5 = parseMd5FromGoogHash(jsBridgeResponse.headers)
-        stringStorage.put(StorageConstants.JS_BRIDGE_MD5_KEY, md5)
-        sdkLogger.debug("JsBridge fetched and hash cached")
-        return Result.success(Unit)
+            val md5 = parseMd5FromGoogHash(jsBridgeResponse.headers)
+            stringStorage.put(StorageConstants.JS_BRIDGE_MD5_KEY, md5)
+            sdkLogger.debug("JsBridge fetched and hash cached")
+            return Result.success(Unit)
+        } ?: Result.failure(ServiceUrlsUnavailableException())
     }
 
     override suspend fun fetchServerMd5(): Result<String> {
-        val request = UrlRequest(
-            url = Url(sdkContext.defaultUrls.jsBridgeUrl),
-            method = HttpMethod.Head
-        )
-        val response = networkClient.send(request).getOrElse {
-            sdkLogger.error("JsBridge HEAD request failed: ${it.message}")
-            return Result.failure(it)
-        }
-        val md5 = parseMd5FromGoogHash(response.headers)
-        if (md5 == null) {
-            sdkLogger.error("JsBridge HEAD response missing x-goog-hash MD5")
-            return Result.failure(IllegalStateException("JsBridge HEAD response missing x-goog-hash MD5"))
-        }
-        return Result.success(md5)
+        return sdkContext.serviceUrls.globalServiceUrls?.let { serviceUrls ->
+            val request = UrlRequest(
+                url = Url(serviceUrls.jsBridgeUrl),
+                method = HttpMethod.Head
+            )
+            val response = networkClient.send(request).getOrElse {
+                sdkLogger.error("JsBridge HEAD request failed: ${it.message}")
+                return Result.failure(it)
+            }
+            val md5 = parseMd5FromGoogHash(response.headers)
+            if (md5 == null) {
+                sdkLogger.error("JsBridge HEAD response missing x-goog-hash MD5")
+                return Result.failure(IllegalStateException("JsBridge HEAD response missing x-goog-hash MD5"))
+            }
+            return Result.success(md5)
+        } ?: Result.failure(ServiceUrlsUnavailableException())
     }
 
     private fun isSignatureCheckEnabled(): Boolean {

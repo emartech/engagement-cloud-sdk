@@ -2,11 +2,10 @@ package com.sap.ec.di
 
 import com.sap.ec.api.setup.Setup
 import com.sap.ec.api.setup.SetupApi
-import com.sap.ec.context.DefaultUrls
-import com.sap.ec.context.DefaultUrlsApi
 import com.sap.ec.context.Features
 import com.sap.ec.context.SdkContext
 import com.sap.ec.context.SdkContextApi
+import com.sap.ec.context.ServiceUrls
 import com.sap.ec.core.channel.OperationalEventDistributor
 import com.sap.ec.core.channel.OperationalEventDistributorApi
 import com.sap.ec.core.channel.SdkEventDistributor
@@ -120,16 +119,9 @@ internal object CoreInjection {
         single<StorageApi> { Storage(stringStorage = get(), json = get()) }
         single<DeviceInfoStorageApi> { DeviceInfoStorage(stringStorage = get()) }
         singleOf(::UserAgentProvider) { bind<UserAgentProviderApi>() }
-        single<DefaultUrlsApi> {
-            DefaultUrls(
-                "https://me-client.eservice.emarsys.net",
-                "https://mobile-events.eservice.emarsys.net",
-                "https://deep-link.eservice.emarsys.net",
-                "https://mobile-sdk-config.gservice.emarsys.net",
-                "https://log-dealer.gservice.emarsys.net",
-                "https://embedded-messaging.gservice.emarsys.net",
-                "https://mobile-sdk-config.gservice.emarsys.net/jsbridge/latest.min.js",
-                "https://mobile-sdk-config.gservice.emarsys.net/jsbridge/latest.min.sign"
+        single<ServiceUrls> {
+            ServiceUrls(
+                remoteConfigBaseUrl = "https://mobile-sdk-config.gservice.emarsys.net"
             )
         }
         single<SdkEventDistributor> {
@@ -164,7 +156,7 @@ internal object CoreInjection {
                 sdkDispatcher = get(named(DispatcherTypes.Sdk)),
                 mainDispatcher = get(named(DispatcherTypes.Main)),
                 onContactLinkingFailed = null,
-                defaultUrls = get(),
+                serviceUrls = get(),
                 features = mutableSetOf(Features.JsBridgeSignatureCheck),
                 sdkConfigStore = get()
             )
